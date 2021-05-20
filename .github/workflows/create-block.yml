@@ -1,49 +1,44 @@
 name: Create Block
 
 on:
-  pull_request:
-    paths:
-    - 'packages/**'
-    - '!packages/**/test/**'
-    - '!packages/**/*.md'
-  push:
-    branches: [master, wp/trunk]
-    paths:
-    - 'packages/**'
-    - '!packages/**/test/**'
-    - '!packages/**/*.md'
+    pull_request:
+    push:
+        branches: [trunk, wp/trunk]
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
 
 jobs:
-  checks:
-    name: Checks
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [12, 14]
+    checks:
+        name: Checks
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                node: [12, 14]
 
-    steps:
-    - uses: actions/checkout@v2
+        steps:
+            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+            - name: Use Node.js ${{ matrix.node }}.x
+              uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
+              with:
+                  node-version: ${{ matrix.node }}
 
-    - name: Use Node.js ${{ matrix.node }}.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node }}
+            - name: Cache node modules
+              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
+              env:
+                  cache-name: cache-node-modules-${{ matrix.node }}
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
-    - name: npm install, build, format and lint
-      run: |
-        npm ci
-        npm run test:create-block
+            - name: npm install, build, format and lint
+              run: |
+                  npm ci
+                  npm run test:create-block

@@ -24,6 +24,26 @@ function useUniqueId( idProp ) {
 	return idProp || id;
 }
 
+// Adapter to map props for the new ui/flex compopnent.
+function getUIFlexProps( { labelPosition } ) {
+	const props = {};
+	switch ( labelPosition ) {
+		case 'top':
+			props.direction = 'column';
+			props.gap = 0;
+			break;
+		case 'bottom':
+			props.direction = 'column-reverse';
+			props.gap = 0;
+			break;
+		case 'edge':
+			props.justify = 'space-between';
+			break;
+	}
+
+	return props;
+}
+
 export function InputBase(
 	{
 		__unstableInputWidth,
@@ -48,6 +68,7 @@ export function InputBase(
 	return (
 		<Root
 			{ ...props }
+			{ ...getUIFlexProps( { labelPosition } ) }
 			className={ className }
 			isFocused={ isFocused }
 			labelPosition={ labelPosition }

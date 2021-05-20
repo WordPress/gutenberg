@@ -60,13 +60,6 @@ URL of the image or video to be displayed
 
 Autoplays HTML5 video. This only applies to video sources (`url`).
 
-### `dimensions`
-
--   Type: `Object`
--   Required: Yes
-
-An object describing the height and width of the image. Requires two parameters: `height`, `width`.
-
 ### `value`
 
 -   Type: `Object`
@@ -80,3 +73,24 @@ The focal point. Should be an object containing `x` and `y` params.
 -   Required: Yes
 
 Callback which is called when the focal point changes.
+
+### `onDrag`
+
+-   Type: `Function`
+-   Required: No
+
+Callback which is called repetitively during drag operations.
+
+### `onDragEnd`
+
+-   Type: `Function`
+-   Required: No
+
+Callback which is called at the end of drag operations.
+
+### `onDragStart`
+
+-   Type: `Function`
+-   Required: No
+
+Callback which is called at the start of drag operations.

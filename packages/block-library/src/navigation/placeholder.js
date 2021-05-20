@@ -1,20 +1,16 @@
 /**
- * External dependencies
- */
-import { some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { createBlock, parse } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
+	Placeholder,
 	Button,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
 	Spinner,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+
 import {
 	forwardRef,
 	useCallback,
@@ -22,80 +18,14 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { chevronDown } from '@wordpress/icons';
+import { navigation, chevronDown, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import createDataTree from './create-data-tree';
+import useNavigationEntities from './use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
-
-/**
- * A recursive function that maps menu item nodes to blocks.
- *
- * @param {Object[]} menuItems An array of menu items.
- * @return {WPBlock[]} An array of blocks.
- */
-function mapMenuItemsToBlocks( menuItems ) {
-	return menuItems.map( ( menuItem ) => {
-		if ( menuItem.type === 'block' ) {
-			const [ block ] = parse( menuItem.content.raw );
-
-			if ( ! block ) {
-				return createBlock( 'core/freeform', {
-					content: menuItem.content,
-				} );
-			}
-
-			return block;
-		}
-
-		const attributes = {
-			label: ! menuItem.title.rendered
-				? __( '(no title)' )
-				: menuItem.title.rendered,
-			opensInNewTab: menuItem.target === '_blank',
-		};
-
-		if ( menuItem.url ) {
-			attributes.url = menuItem.url;
-		}
-
-		if ( menuItem.description ) {
-			attributes.description = menuItem.description;
-		}
-
-		if ( menuItem.xfn?.length && some( menuItem.xfn ) ) {
-			attributes.rel = menuItem.xfn.join( ' ' );
-		}
-
-		if ( menuItem.classes?.length && some( menuItem.classes ) ) {
-			attributes.className = menuItem.classes.join( ' ' );
-		}
-
-		const innerBlocks = menuItem.children?.length
-			? mapMenuItemsToBlocks( menuItem.children )
-			: [];
-
-		return createBlock( 'core/navigation-link', attributes, innerBlocks );
-	} );
-}
-
-/**
- * Convert a flat menu item structure to a nested blocks structure.
- *
- * @param {Object[]} menuItems An array of menu items.
- *
- * @return {WPBlock[]} An array of blocks.
- */
-function convertMenuItemsToBlocks( menuItems ) {
-	if ( ! menuItems ) {
-		return null;
-	}
-
-	const menuTree = createDataTree( menuItems );
-	return mapMenuItemsToBlocks( menuTree );
-}
+import menuItemsToBlocks from './menu-items-to-blocks';
 
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
@@ -103,80 +33,19 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
 
 	const {
-		pages,
 		isResolvingPages,
-		hasResolvedPages,
 		menus,
 		isResolvingMenus,
-		hasResolvedMenus,
 		menuItems,
 		hasResolvedMenuItems,
-	} = useSelect(
-		( select ) => {
-			const {
-				getEntityRecords,
-				getMenus,
-				getMenuItems,
-				isResolving,
-				hasFinishedResolution,
-			} = select( 'core' );
-			const pagesParameters = [
-				'postType',
-				'page',
-				{
-					parent: 0,
-					order: 'asc',
-					orderby: 'id',
-					per_page: -1,
-				},
-			];
-			const menusParameters = [ { per_page: -1 } ];
-			const hasSelectedMenu = selectedMenu !== undefined;
-			const menuItemsParameters = hasSelectedMenu
-				? [
-						{
-							menus: selectedMenu,
-							per_page: -1,
-						},
-				  ]
-				: undefined;
+		hasPages,
+		hasMenus,
+	} = useNavigationEntities( selectedMenu );
 
-			return {
-				pages: getEntityRecords( ...pagesParameters ),
-				isResolvingPages: isResolving(
-					'getEntityRecords',
-					pagesParameters
-				),
-				hasResolvedPages: hasFinishedResolution(
-					'getEntityRecords',
-					pagesParameters
-				),
-				menus: getMenus( ...menusParameters ),
-				isResolvingMenus: isResolving( 'getMenus', menusParameters ),
-				hasResolvedMenus: hasFinishedResolution(
-					'getMenus',
-					menusParameters
-				),
-				menuItems: hasSelectedMenu
-					? getMenuItems( ...menuItemsParameters )
-					: undefined,
-				hasResolvedMenuItems: hasSelectedMenu
-					? hasFinishedResolution(
-							'getMenuItems',
-							menuItemsParameters
-					  )
-					: false,
-			};
-		},
-		[ selectedMenu ]
-	);
-
-	const hasPages = !! ( hasResolvedPages && pages?.length );
-	const hasMenus = !! ( hasResolvedMenus && menus?.length );
 	const isLoading = isResolvingPages || isResolvingMenus;
 
 	const createFromMenu = useCallback( () => {
-		const blocks = convertMenuItemsToBlocks( menuItems );
+		const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
 		const selectNavigationBlock = true;
 		onCreate( blocks, selectNavigationBlock );
 	} );
@@ -211,8 +80,12 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		}
 	}, [ isCreatingFromMenu, hasResolvedMenuItems ] );
 
+	const toggleProps = {
+		isPrimary: true,
+		className: 'wp-block-navigation-placeholder__actions__dropdown',
+	};
 	return (
-		<div className="wp-block-navigation-placeholder">
+		<Placeholder className="wp-block-navigation-placeholder">
 			<PlaceholderPreview />
 
 			<div className="wp-block-navigation-placeholder__controls">
@@ -226,11 +99,14 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						ref={ ref }
 						className="wp-block-navigation-placeholder__actions"
 					>
+						<div className="wp-block-navigation-placeholder__actions__indicator">
+							<Icon icon={ navigation } /> { __( 'Navigation' ) }
+						</div>
 						{ hasMenus ? (
 							<DropdownMenu
-								text={ __( 'Existing menu' ) }
+								text={ __( 'Add existing menu' ) }
 								icon={ chevronDown }
-								className="wp-block-navigation-placeholder__actions__dropdown"
+								toggleProps={ toggleProps }
 							>
 								{ ( { onClose } ) => (
 									<MenuGroup>
@@ -255,17 +131,21 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 							</DropdownMenu>
 						) : undefined }
 						{ hasPages ? (
-							<Button onClick={ onCreateAllPages }>
+							<Button
+								isPrimary={ hasMenus ? false : true }
+								isTertiary={ hasMenus ? true : false }
+								onClick={ onCreateAllPages }
+							>
 								{ __( 'Add all pages' ) }
 							</Button>
 						) : undefined }
-						<Button onClick={ onCreateEmptyMenu }>
+						<Button isTertiary onClick={ onCreateEmptyMenu }>
 							{ __( 'Start empty' ) }
 						</Button>
 					</div>
 				) }
 			</div>
-		</div>
+		</Placeholder>
 	);
 }
 

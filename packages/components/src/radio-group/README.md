@@ -22,11 +22,11 @@ Only one option in a radio group can be selected and active at a time. Selecting
 
 Radio groups should:
 
-- **Be clearly and accurately labeled.**
-- **Clearly communicate that clicking or tapping will trigger an action.**
-- **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
-- **Have consistent locations in the interface.**
-- **Have a default option already selected.**
+-   **Be clearly and accurately labeled.**
+-   **Clearly communicate that clicking or tapping will trigger an action.**
+-   **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
+-   **Have consistent locations in the interface.**
+-   **Have a default option already selected.**
 
 ### States
 
@@ -66,7 +66,10 @@ const MyControlledRadioRadioGroup = () => {
 When using the RadioGroup component as an uncontrolled component, the default value can be set with the `defaultChecked` prop.
 
 ```jsx
-import { __experimentalRadio as Radio, __experimentalRadioGroup as RadioGroup } from '@wordpress/components';
+import {
+	__experimentalRadio as Radio,
+	__experimentalRadioGroup as RadioGroup,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 const MyUncontrolledRadioRadioGroup = () => {
@@ -83,5 +86,5 @@ const MyUncontrolledRadioRadioGroup = () => {
 
 ## Related components
 
-- For simple buttons that are related, use a `ButtonGroup` component.
-- For traditional radio options, use a `RadioControl` component.
+-   For simple buttons that are related, use a `ButtonGroup` component.
+-   For traditional radio options, use a `RadioControl` component.

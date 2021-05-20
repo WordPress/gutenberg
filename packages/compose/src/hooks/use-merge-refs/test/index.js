@@ -218,4 +218,59 @@ describe( 'useMergeRefs', () => {
 			[ [], [ newElement, null ] ],
 		] );
 	} );
+
+	it( 'should work for dependency change after node change', () => {
+		const rootElement = document.getElementById( 'root' );
+
+		ReactDOM.render( <MergedRefs />, rootElement );
+
+		const originalElement = rootElement.firstElementChild;
+
+		ReactDOM.render( <MergedRefs tagName="button" />, rootElement );
+
+		const newElement = rootElement.firstElementChild;
+
+		// After a render with the original element and a second render with the
+		// new element, expect the initial callback functions to be called with
+		// the original element, then null, then the new element.
+		// Again, the new callback functions should not be called! There has
+		// been no dependency change.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null, newElement ],
+				[ originalElement, null, newElement ],
+			],
+			[ [], [] ],
+		] );
+
+		ReactDOM.render(
+			<MergedRefs tagName="button" count={ 1 } />,
+			rootElement
+		);
+
+		// After a third render with a dependency change, expect the inital
+		// callback function to be called with null and the new callback
+		// function to be called with the new element. Note that for callback
+		// one no dependencies have changed.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null, newElement ],
+				[ originalElement, null, newElement, null ],
+			],
+			[ [], [] ],
+			[ [], [ newElement ] ],
+		] );
+
+		ReactDOM.render( null, rootElement );
+
+		// Unmount: current callback functions should be called with null.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null, newElement, null ],
+				[ originalElement, null, newElement, null ],
+			],
+			[ [], [] ],
+			[ [], [ newElement, null ] ],
+		] );
+	} );
 } );

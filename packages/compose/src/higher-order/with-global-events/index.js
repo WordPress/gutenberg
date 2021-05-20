@@ -43,6 +43,7 @@ const listener = new Listener();
  */
 export default function withGlobalEvents( eventTypesToHandlers ) {
 	deprecated( 'wp.compose.withGlobalEvents', {
+		since: '5.7',
 		alternative: 'useEffect',
 	} );
 

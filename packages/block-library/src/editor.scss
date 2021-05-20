@@ -19,9 +19,8 @@
 @import "./heading/editor.scss";
 @import "./html/editor.scss";
 @import "./image/editor.scss";
-@import "./latest-comments/editor.scss";
 @import "./latest-posts/editor.scss";
-@import "./list/editor.scss";
+@import "./legacy-widget/editor.scss";
 @import "./media-text/editor.scss";
 @import "./more/editor.scss";
 @import "./navigation/editor.scss";
@@ -33,7 +32,6 @@
 @import "./post-excerpt/editor.scss";
 @import "./post-author/editor.scss";
 @import "./pullquote/editor.scss";
-@import "./quote/editor.scss";
 @import "./rss/editor.scss";
 @import "./search/editor.scss";
 @import "./separator/editor.scss";
@@ -42,18 +40,18 @@
 @import "./social-link/editor.scss";
 @import "./social-links/editor.scss";
 @import "./spacer/editor.scss";
-@import "./subhead/editor.scss";
 @import "./table/editor.scss";
 @import "./tag-cloud/editor.scss";
 @import "./template-part/editor.scss";
 @import "./text-columns/editor.scss";
-@import "./verse/editor.scss";
 @import "./video/editor.scss";
+@import "./query-title/editor.scss";
 @import "./query-loop/editor.scss";
 @import "./query/editor.scss";
 @import "./query-pagination/editor.scss";
 @import "./query-pagination-numbers/editor.scss";
 @import "./post-featured-image/editor.scss";
+@import "./term-description/editor.scss";
 
 :root .editor-styles-wrapper {
 	// Background colors.
@@ -97,13 +95,6 @@
  * These are only output in the editor, but styles here are NOT prefixed .editor-styles-wrapper.
  * This allows us to create normalization styles that are easily overridden by editor styles.
  */
-
-// Provide every block with a default base margin. This margin provides a consistent spacing
-// between blocks in the editor.
-.block-editor-block-list__block {
-	margin-top: $default-block-margin;
-	margin-bottom: $default-block-margin;
-}
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {

@@ -42,7 +42,6 @@ An array of block patterns that can be shown in the block patterns list.
 
 An array of shown block patterns objects.
 
-
 -   Type: `Array`
 -   Required: Yes
 
@@ -52,6 +51,28 @@ The performed event after a click on a block pattern. In most cases, the pattern
 
 -   Type: `Function`
 -   Required: Yes
+
+#### isDraggable
+
+Enables drag and drop functionality to the available block patterns.
+
+-   Type: `boolean`
+-   Required: No
+
+#### orientation
+
+The orientation value determines which arrow keys can be used to move focus. Available options are (`vertical`|`horizontal`). If not provided all arrow keys work.
+
+-   Type: `string`
+-   Required: No
+
+#### label
+
+The aria label for the block patterns list.
+
+-   Type: `string`
+-   Required: No
+-   Default: `Block Patterns`
 
 ## Related components
 

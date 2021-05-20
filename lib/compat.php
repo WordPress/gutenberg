@@ -9,83 +9,24 @@
  */
 
 /**
- * Adds a wp.date.setSettings with timezone abbr parameter
- *
- * This can be removed when plugin support requires WordPress 5.6.0+.
- *
- * The script registration occurs in core wp-includes/script-loader.php
- * wp_default_packages_inline_scripts()
- *
- * @since 8.6.0
- *
- * @param WP_Scripts $scripts WP_Scripts object.
- */
-function gutenberg_add_date_settings_timezone( $scripts ) {
-	if ( ! did_action( 'init' ) ) {
-		return;
-	}
-
-	global $wp_locale;
-
-	// Calculate the timezone abbr (EDT, PST) if possible.
-	$timezone_string = get_option( 'timezone_string', 'UTC' );
-	$timezone_abbr   = '';
-
-	if ( ! empty( $timezone_string ) ) {
-		$timezone_date = new DateTime( null, new DateTimeZone( $timezone_string ) );
-		$timezone_abbr = $timezone_date->format( 'T' );
-	}
-
-	$scripts->add_inline_script(
-		'wp-date',
-		sprintf(
-			'wp.date.setSettings( %s );',
-			wp_json_encode(
-				array(
-					'l10n'     => array(
-						'locale'        => get_user_locale(),
-						'months'        => array_values( $wp_locale->month ),
-						'monthsShort'   => array_values( $wp_locale->month_abbrev ),
-						'weekdays'      => array_values( $wp_locale->weekday ),
-						'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
-						'meridiem'      => (object) $wp_locale->meridiem,
-						'relative'      => array(
-							/* translators: %s: Duration. */
-							'future' => __( '%s from now', 'default' ),
-							/* translators: %s: Duration. */
-							'past'   => __( '%s ago', 'default' ),
-						),
-					),
-					'formats'  => array(
-						/* translators: Time format, see https://www.php.net/date */
-						'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
-						/* translators: Date format, see https://www.php.net/date */
-						'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
-						/* translators: Date/Time format, see https://www.php.net/date */
-						'datetime'            => __( 'F j, Y g:i a', 'default' ),
-						/* translators: Abbreviated date/time format, see https://www.php.net/date */
-						'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
-					),
-					'timezone' => array(
-						'offset' => get_option( 'gmt_offset', 0 ),
-						'string' => $timezone_string,
-						'abbr'   => $timezone_abbr,
-					),
-				)
-			)
-		),
-		'after'
-	);
-}
-add_action( 'wp_default_scripts', 'gutenberg_add_date_settings_timezone', 20 );
-
-/**
  * Determine if the current theme needs to load separate block styles or not.
+ *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
  *
  * @return bool
  */
-function gutenberg_should_load_separate_block_styles() {
-	$load_separate_styles = gutenberg_is_fse_theme();
+function gutenberg_should_load_separate_block_assets() {
+	if ( function_exists( 'wp_should_load_separate_core_block_assets' ) ) {
+		return wp_should_load_separate_core_block_assets();
+	}
+
+	if ( is_admin() || is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return false;
+	}
+
+	// The `should_load_separate_core_block_assets` filter was added in WP 5.8.
+	$load_separate_styles = apply_filters( 'should_load_separate_core_block_assets', gutenberg_is_fse_theme() );
+
 	/**
 	 * Determine if separate styles will be loaded for blocks on-render or not.
 	 *
@@ -93,8 +34,23 @@ function gutenberg_should_load_separate_block_styles() {
 	 *
 	 * @return bool
 	 */
-	return apply_filters( 'load_separate_block_styles', $load_separate_styles );
+	return apply_filters( 'load_separate_block_assets', $load_separate_styles );
 }
+
+/**
+ * Opt-in to separate styles loading for block themes in WordPress 5.8.
+ *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ */
+add_filter(
+	'separate_core_block_assets',
+	function( $load_separate_styles ) {
+		if ( function_exists( 'gutenberg_is_fse_theme' ) && gutenberg_is_fse_theme() ) {
+			return true;
+		}
+		return $load_separate_styles;
+	}
+);
 
 /**
  * Remove the `wp_enqueue_registered_block_scripts_and_styles` hook if needed.
@@ -102,7 +58,7 @@ function gutenberg_should_load_separate_block_styles() {
  * @return void
  */
 function gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles() {
-	if ( gutenberg_should_load_separate_block_styles() ) {
+	if ( gutenberg_should_load_separate_block_assets() ) {
 		/**
 		 * Avoid enqueueing block assets of all registered blocks for all posts, instead
 		 * deferring to block render mechanics to enqueue scripts, thereby ensuring only
@@ -213,57 +169,51 @@ function gutenberg_inject_default_block_context( $args ) {
 add_filter( 'register_block_type_args', 'gutenberg_inject_default_block_context' );
 
 /**
- * Amends the paths to preload when initializing edit post.
- *
- * @see https://core.trac.wordpress.org/ticket/50606
- *
- * @since 8.4.0
- *
- * @param  array $preload_paths Default path list that will be preloaded.
- * @return array Modified path list to preload.
- */
-function gutenberg_preload_edit_post( $preload_paths ) {
-	$additional_paths = array( '/?context=edit' );
-	return array_merge( $preload_paths, $additional_paths );
-}
-
-add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );
-
-/**
  * Override post type labels for Reusable Block custom post type.
+ * The labels are different from the ones in Core.
  *
- * This shim can be removed when the Gutenberg plugin requires a WordPress
- * version that has the ticket below.
- *
- * @see https://core.trac.wordpress.org/ticket/50755
- *
- * @since 8.6.0
+ * Remove this when Core receives the new labels (minimum supported version WordPress 5.8)
  *
  * @return array Array of new labels for Reusable Block post type.
  */
 function gutenberg_override_reusable_block_post_type_labels() {
 	return array(
-		'name'                     => _x( 'Reusable Blocks', 'post type general name', 'gutenberg' ),
-		'singular_name'            => _x( 'Reusable Block', 'post type singular name', 'gutenberg' ),
-		'menu_name'                => _x( 'Reusable Blocks', 'admin menu', 'gutenberg' ),
-		'name_admin_bar'           => _x( 'Reusable Block', 'add new on admin bar', 'gutenberg' ),
-		'add_new'                  => _x( 'Add New', 'Reusable Block', 'gutenberg' ),
-		'add_new_item'             => __( 'Add New Reusable Block', 'gutenberg' ),
-		'new_item'                 => __( 'New Reusable Block', 'gutenberg' ),
-		'edit_item'                => __( 'Edit Reusable Block', 'gutenberg' ),
-		'view_item'                => __( 'View Reusable Block', 'gutenberg' ),
-		'all_items'                => __( 'All Reusable Blocks', 'gutenberg' ),
-		'search_items'             => __( 'Search Reusable Blocks', 'gutenberg' ),
+		'name'                     => _x( 'Reusable blocks', 'post type general name', 'gutenberg' ),
+		'singular_name'            => _x( 'Reusable block', 'post type singular name', 'gutenberg' ),
+		'menu_name'                => _x( 'Reusable blocks', 'admin menu', 'gutenberg' ),
+		'name_admin_bar'           => _x( 'Reusable block', 'add new on admin bar', 'gutenberg' ),
+		'add_new'                  => _x( 'Add New', 'Reusable block', 'gutenberg' ),
+		'add_new_item'             => __( 'Add new Reusable block', 'gutenberg' ),
+		'new_item'                 => __( 'New Reusable block', 'gutenberg' ),
+		'edit_item'                => __( 'Edit Reusable block', 'gutenberg' ),
+		'view_item'                => __( 'View Reusable block', 'gutenberg' ),
+		'all_items'                => __( 'All Reusable blocks', 'gutenberg' ),
+		'search_items'             => __( 'Search Reusable blocks', 'gutenberg' ),
 		'not_found'                => __( 'No reusable blocks found.', 'gutenberg' ),
 		'not_found_in_trash'       => __( 'No reusable blocks found in Trash.', 'gutenberg' ),
 		'filter_items_list'        => __( 'Filter reusable blocks list', 'gutenberg' ),
-		'items_list_navigation'    => __( 'Reusable Blocks list navigation', 'gutenberg' ),
-		'items_list'               => __( 'Reusable Blocks list', 'gutenberg' ),
-		'item_published'           => __( 'Reusable Block published.', 'gutenberg' ),
-		'item_published_privately' => __( 'Reusable Block published privately.', 'gutenberg' ),
-		'item_reverted_to_draft'   => __( 'Reusable Block reverted to draft.', 'gutenberg' ),
-		'item_scheduled'           => __( 'Reusable Block scheduled.', 'gutenberg' ),
-		'item_updated'             => __( 'Reusable Block updated.', 'gutenberg' ),
+		'items_list_navigation'    => __( 'Reusable blocks list navigation', 'gutenberg' ),
+		'items_list'               => __( 'Reusable blocks list', 'gutenberg' ),
+		'item_published'           => __( 'Reusable block published.', 'gutenberg' ),
+		'item_published_privately' => __( 'Reusable block published privately.', 'gutenberg' ),
+		'item_reverted_to_draft'   => __( 'Reusable block reverted to draft.', 'gutenberg' ),
+		'item_scheduled'           => __( 'Reusable block scheduled.', 'gutenberg' ),
+		'item_updated'             => __( 'Reusable block updated.', 'gutenberg' ),
 	);
 }
 add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
+
+/**
+ * Update allowed inline style attributes list.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 5.8.
+ *
+ * @param string[] $attrs Array of allowed CSS attributes.
+ * @return string[] CSS attributes.
+ */
+function gutenberg_safe_style_attrs( $attrs ) {
+	$attrs[] = 'object-position';
+
+	return $attrs;
+}
+add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs' );

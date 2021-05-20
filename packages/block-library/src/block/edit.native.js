@@ -13,11 +13,19 @@ import {
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import {
+	useEntityBlockEditor,
+	useEntityProp,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { BottomSheet, Icon, Disabled } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
+import {
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	InnerBlocks,
+	Warning,
+} from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { help } from '@wordpress/icons';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
@@ -33,7 +41,9 @@ export default function ReusableBlockEdit( {
 	clientId,
 	isSelected,
 } ) {
-	const recordArgs = [ 'postType', 'wp_block', ref ];
+	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+		ref
+	);
 
 	const [ showHelp, setShowHelp ] = useState( false );
 	const infoTextStyle = usePreferredColorSchemeStyle(
@@ -53,30 +63,26 @@ export default function ReusableBlockEdit( {
 		styles.spinnerDark
 	);
 
-	const { reusableBlock, hasResolved, isEditing, settings } = useSelect(
+	const { hasResolved, isEditing, isMissing } = useSelect(
 		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
-
+			const persistedBlock = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_block',
+				ref
+			);
+			const hasResolvedBlock = select(
+				coreStore
+			).hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'wp_block',
+				ref,
+			] );
 			return {
-				reusableBlock: select( 'core' ).getEditedEntityRecord(
-					...recordArgs
-				),
-				hasResolved: select( 'core' ).hasFinishedResolution(
-					'getEditedEntityRecord',
-					recordArgs
-				),
-				isSaving: select( 'core' ).isSavingEntityRecord(
-					...recordArgs
-				),
-				canUserUpdate: select( 'core' ).canUser(
-					'update',
-					'blocks',
-					ref
-				),
+				hasResolved: hasResolvedBlock,
 				isEditing: select(
 					reusableBlocksStore
 				).__experimentalIsEditingReusableBlock( clientId ),
-				settings: getSettings(),
+				isMissing: hasResolvedBlock && ! persistedBlock,
 			};
 		},
 		[ ref, clientId ]
@@ -87,6 +93,8 @@ export default function ReusableBlockEdit( {
 		'wp_block',
 		{ id: ref }
 	);
+
+	const [ title ] = useEntityProp( 'postType', 'wp_block', 'title', ref );
 
 	function openSheet() {
 		setShowHelp( true );
@@ -124,6 +132,22 @@ export default function ReusableBlockEdit( {
 		);
 	}
 
+	if ( hasAlreadyRendered ) {
+		return (
+			<Warning
+				message={ __( 'Block cannot be rendered inside itself.' ) }
+			/>
+		);
+	}
+
+	if ( isMissing ) {
+		return (
+			<Warning
+				message={ __( 'Block has been deleted or is unavailable.' ) }
+			/>
+		);
+	}
+
 	if ( ! hasResolved ) {
 		return (
 			<View style={ spinnerStyle }>
@@ -132,22 +156,12 @@ export default function ReusableBlockEdit( {
 		);
 	}
 
-	if ( ! reusableBlock ) {
-		return (
-			<Text>{ __( 'Block has been deleted or is unavailable.' ) }</Text>
-		);
-	}
-
-	const { title } = reusableBlock;
 	let element = (
-		<BlockEditorProvider
-			settings={ settings }
+		<InnerBlocks
 			value={ blocks }
 			onChange={ onChange }
 			onInput={ onInput }
-		>
-			<BlockList withFooter={ false } marginHorizontal={ 0 } />
-		</BlockEditorProvider>
+		/>
 	);
 
 	if ( ! isEditing ) {
@@ -155,18 +169,20 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<TouchableWithoutFeedback
-			disabled={ ! isSelected }
-			accessibilityLabel={ __( 'Help button' ) }
-			accessibilityRole={ 'button' }
-			accessibilityHint={ __( 'Tap here to show help' ) }
-			onPress={ openSheet }
-		>
-			<View>
-				{ isSelected && <EditTitle title={ title } /> }
-				{ element }
-				{ renderSheet() }
-			</View>
-		</TouchableWithoutFeedback>
+		<RecursionProvider>
+			<TouchableWithoutFeedback
+				disabled={ ! isSelected }
+				accessibilityLabel={ __( 'Help button' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Tap here to show help' ) }
+				onPress={ openSheet }
+			>
+				<View>
+					{ isSelected && <EditTitle title={ title } /> }
+					{ element }
+					{ renderSheet() }
+				</View>
+			</TouchableWithoutFeedback>
+		</RecursionProvider>
 	);
 }

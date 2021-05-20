@@ -12,7 +12,7 @@ export const PREFERENCES_DEFAULTS = {
  *
  * @typedef {Object} SETTINGS_DEFAULT
  * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
- * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
+ * @property {boolean} supportsLayout Enable/disable layouts support in container blocks.
  * @property {boolean} imageEditing Image Editing settings set to false to disable.
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing
@@ -31,6 +31,8 @@ export const PREFERENCES_DEFAULTS = {
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
+	supportsLayout: true,
+
 	// colors setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	colors: [
@@ -121,6 +123,9 @@ export const SETTINGS_DEFAULTS = {
 		},
 	],
 
+	// Image default size slug.
+	imageDefaultSize: 'large',
+
 	imageSizes: [
 		{ slug: 'thumbnail', name: __( 'Thumbnail' ) },
 		{ slug: 'medium', name: __( 'Medium' ) },
@@ -144,7 +149,6 @@ export const SETTINGS_DEFAULTS = {
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
 
-	availableLegacyWidgets: {},
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalBlockDirectory: false,
 	__mobileEnablePageTemplates: false,

@@ -15,17 +15,18 @@ import { View, Text, TouchableOpacity } from 'react-native';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import useBlockDisplayInformation from '../use-block-display-information';
 import SubdirectorSVG from './subdirectory-icon';
 import { store as blockEditorStore } from '../../store';
 import styles from './block-selection-button.scss';
 
 const BlockSelectionButton = ( {
 	clientId,
-	blockIcon,
 	rootClientId,
 	rootBlockIcon,
 	isRTL,
 } ) => {
+	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
 		<View
 			style={ [
@@ -59,7 +60,7 @@ const BlockSelectionButton = ( {
 					] }
 				<Icon
 					size={ 24 }
-					icon={ blockIcon.src }
+					icon={ blockInformation?.icon?.src }
 					fill={ styles.icon.color }
 				/>
 				<Text
@@ -80,18 +81,10 @@ export default compose( [
 		const { getBlockRootClientId, getBlockName, getSettings } = select(
 			blockEditorStore
 		);
-
-		const blockName = getBlockName( clientId );
-		const blockType = getBlockType( blockName );
-		const blockIcon = blockType ? blockType.icon : {};
-
 		const rootClientId = getBlockRootClientId( clientId );
 
 		if ( ! rootClientId ) {
-			return {
-				clientId,
-				blockIcon,
-			};
+			return { clientId };
 		}
 		const rootBlockName = getBlockName( rootClientId );
 		const rootBlockType = getBlockType( rootBlockName );
@@ -99,7 +92,6 @@ export default compose( [
 
 		return {
 			clientId,
-			blockIcon,
 			rootClientId,
 			rootBlockIcon,
 			isRTL: getSettings().isRTL,

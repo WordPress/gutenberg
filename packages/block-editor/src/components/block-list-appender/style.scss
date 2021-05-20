@@ -5,8 +5,14 @@
 	padding: 0;
 	list-style: none;
 
+	// Themes sometimes apply a max-width to all elements classed blocks.
+	&.wp-block {
+		max-width: none;
+	}
+
 	// Add a little left margin when used horizontally.
-	margin: 0 0 0 $grid-unit-10;
+	// The right margin should be set to auto, so as to not shift layout in flex containers.
+	margin: 0 auto 0 $grid-unit-10;
 
 	// ... unless it's the only child.
 	&:first-child {

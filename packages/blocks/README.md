@@ -14,7 +14,7 @@ Install the module
 npm install @wordpress/blocks --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Getting Started
 
@@ -36,11 +36,11 @@ function myplugin_enqueue_block_editor_assets() {
 add_action( 'enqueue_block_editor_assets', 'myplugin_enqueue_block_editor_assets' );
 ```
 
-The `enqueue_block_editor_assets` hook is only run in the Gutenberg editor context when the editor is ready to receive additional scripts and stylesheets. There is also an `enqueue_block_assets` hook which is run under **both** the editor and front-end contexts.  This should be used to enqueue stylesheets common to the front-end and the editor.  (The rules can be overridden in the editor-specific stylesheet if necessary.)
+The `enqueue_block_editor_assets` hook is only run in the Gutenberg editor context when the editor is ready to receive additional scripts and stylesheets. There is also an `enqueue_block_assets` hook which is run under **both** the editor and front-end contexts. This should be used to enqueue stylesheets common to the front-end and the editor. (The rules can be overridden in the editor-specific stylesheet if necessary.)
 
 The following sections will describe what you'll need to include in `block.js` to describe the behavior of your custom block.
 
-Note that all JavaScript code samples in this document are enclosed in a function that is evaluated immediately afterwards.  We recommend using either ES6 modules [as used in this project](/docs/contributors/develop/coding-guidelines.md#imports) (documentation on setting up a plugin with Webpack + ES6 modules coming soon) or these ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) as used in this document.  Both of these methods ensure that your plugin's variables will not pollute the global `window` object, which could cause incompatibilities with WordPress core or with other plugins.
+Note that all JavaScript code samples in this document are enclosed in a function that is evaluated immediately afterwards. We recommend using either ES6 modules [as used in this project](/docs/contributors/develop/coding-guidelines.md#imports) (documentation on setting up a plugin with Webpack + ES6 modules coming soon) or these ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) as used in this document. Both of these methods ensure that your plugin's variables will not pollute the global `window` object, which could cause incompatibilities with WordPress core or with other plugins.
 
 ## Example
 
@@ -48,7 +48,7 @@ Let's imagine you wanted to define a block to show a randomly generated image in
 
 Take a step back and consider the ideal workflow for adding a new random image:
 
--   Insert the block.  It should be shown in some empty state, with an option to choose a category in a select dropdown.
+-   Insert the block. It should be shown in some empty state, with an option to choose a category in a select dropdown.
 -   Upon confirming my selection, a preview of the image should be shown next to the dropdown.
 
 At this point, you might realize that while you'd want some controls to be shown when editing content, the markup included in the published post might not appear the same (your visitors should not see a dropdown field when reading your content).
@@ -81,7 +81,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 ```js
 // block.js
-( function( blocks, element, blockEditor ) {
+( function ( blocks, element, blockEditor ) {
 	var el = element.createElement,
 		source = blocks.source,
 		useBlockProps = blockEditor.useBlockProps;
@@ -91,7 +91,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 		return el( 'img', {
 			src: src,
-			alt: props.category
+			alt: props.category,
 		} );
 	}
 
@@ -110,10 +110,10 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 				source: 'attribute',
 				attribute: 'alt',
 				selector: 'img',
-			}
+			},
 		},
 
-		edit: function( props ) {
+		edit: function ( props ) {
 			var blockProps = useBlockProps();
 			var category = props.attributes.category,
 				children;
@@ -130,7 +130,9 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 			}
 
 			children.push(
-				el( 'select', { value: category, onChange: setCategory },
+				el(
+					'select',
+					{ value: category, onChange: setCategory },
 					el( 'option', null, '- Select -' ),
 					el( 'option', { value: 'sports' }, 'Sports' ),
 					el( 'option', { value: 'animals' }, 'Animals' ),
@@ -138,18 +140,18 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 				)
 			);
 
-			return el( 'form', Object.assing( blockProps, {  onSubmit: setCategory } ), children );
+			return el(
+				'form',
+				Object.assing( blockProps, { onSubmit: setCategory } ),
+				children
+			);
 		},
 
-		save: function( props ) {
+		save: function ( props ) {
 			return RandomImage( { category: props.attributes.category } );
-		}
+		},
 	} );
-} )(
-	window.wp.blocks,
-	window.wp.element,
-	window.wp.blockEditor
-);
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
 ```
 
 _[(Example in ES2015+, JSX)](https://gist.github.com/aduth/fb1cc9a2296110a62b96383e4b2e8a7c)_
@@ -183,8 +185,8 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 <a name="cloneBlock" href="#cloneBlock">#</a> **cloneBlock**
 
-Given a block object, returns a copy of the block object, optionally merging
-new attributes and/or replacing its inner blocks.
+Given a block object, returns a copy of the block object,
+optionally merging new attributes and/or replacing its inner blocks.
 
 _Parameters_
 
@@ -223,7 +225,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<Object>`: Array of Block objects.
+-   `Object[]`: Array of Block objects.
 
 <a name="doBlocksMatchTemplate" href="#doBlocksMatchTemplate">#</a> **doBlocksMatchTemplate**
 
@@ -248,7 +250,7 @@ falsey value for all entries.
 
 _Parameters_
 
--   _transforms_ `Array<Object>`: Transforms to search.
+-   _transforms_ `Object[]`: Transforms to search.
 -   _predicate_ `Function`: Function returning true on matching transform.
 
 _Returns_
@@ -261,7 +263,7 @@ Returns the block attributes of a registered block node given its type.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _innerHTML_ `string`: Raw block content.
 -   _attributes_ `?Object`: Known block attributes (from delimiters).
 
@@ -342,7 +344,7 @@ transform object includes `blockName` as a property.
 _Parameters_
 
 -   _direction_ `string`: Transform direction ("to", "from").
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 
 _Returns_
 
@@ -379,7 +381,7 @@ _Parameters_
 
 _Returns_
 
--   `(Array<WPBlockVariation>|void)`: Block variations.
+-   `(WPBlockVariation[]|void)`: Block variations.
 
 <a name="getCategories" href="#getCategories">#</a> **getCategories**
 
@@ -387,7 +389,7 @@ Returns all the block categories.
 
 _Returns_
 
--   `Array<WPBlockCategory>`: Block categories.
+-   `WPBlockCategory[]`: Block categories.
 
 <a name="getChildBlockNames" href="#getChildBlockNames">#</a> **getChildBlockNames**
 
@@ -450,7 +452,7 @@ static markup to be saved.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
 
@@ -465,13 +467,13 @@ enhanced element to be saved or string when raw HTML expected.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
 
 _Returns_
 
--   `(Object|string)`: Save element or raw HTML string.
+-   `Object|string`: Save element or raw HTML string.
 
 <a name="getUnregisteredTypeHandlerName" href="#getUnregisteredTypeHandlerName">#</a> **getUnregisteredTypeHandlerName**
 
@@ -572,7 +574,7 @@ Logs to console in development environments when invalid.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type.
+-   _blockTypeOrName_ `string|Object`: Block type.
 -   _attributes_ `Object`: Parsed block attributes.
 -   _originalBlockContent_ `string`: Original block content.
 
@@ -661,7 +663,7 @@ _Parameters_
 
 _Returns_
 
--   `(Array|string)`: A list of blocks or a string, depending on `handlerMode`.
+-   `Array|string`: A list of blocks or a string, depending on `handlerMode`.
 
 <a name="rawHandler" href="#rawHandler">#</a> **rawHandler**
 
@@ -711,6 +713,26 @@ _Returns_
 
 -   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
 
+<a name="registerBlockTypeFromMetadata" href="#registerBlockTypeFromMetadata">#</a> **registerBlockTypeFromMetadata**
+
+Registers a new block provided from metadata stored in `block.json` file.
+It uses `registerBlockType` internally.
+
+_Related_
+
+-   registerBlockType
+
+_Parameters_
+
+-   _metadata_ `Object`: Block metadata loaded from `block.json`.
+-   _metadata.name_ `string`: Block name.
+-   _metadata.textdomain_ `string`: Textdomain to use with translations.
+-   _additionalSettings_ `Object`: Additional block settings.
+
+_Returns_
+
+-   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
+
 <a name="registerBlockVariation" href="#registerBlockVariation">#</a> **registerBlockVariation**
 
 Registers a new block variation for the given block type.
@@ -739,7 +761,7 @@ Sets the block categories.
 
 _Parameters_
 
--   _categories_ `Array<WPBlockCategory>`: Block categories.
+-   _categories_ `WPBlockCategory[]`: Block categories.
 
 <a name="setDefaultBlockName" href="#setDefaultBlockName">#</a> **setDefaultBlockName**
 
@@ -783,7 +805,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="switchToBlockType" href="#switchToBlockType">#</a> **switchToBlockType**
 
@@ -791,7 +813,7 @@ Switch one or more blocks into one or more blocks of the new block type.
 
 _Parameters_
 
--   _blocks_ `(Array|Object)`: Blocks array or block object.
+-   _blocks_ `Array|Object`: Blocks array or block object.
 -   _name_ `string`: Block name.
 
 _Returns_

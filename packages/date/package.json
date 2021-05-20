@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/date",
-	"version": "3.13.1",
+	"version": "4.0.0",
 	"description": "Date module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -18,11 +18,15 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"moment": "^2.22.1",
 		"moment-timezone": "^0.5.31"
 	},

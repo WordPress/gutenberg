@@ -16,7 +16,8 @@ import RangeCell from '../mobile/bottom-sheet/range-cell';
 import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 import Picker from '../mobile/picker';
 import styles from './style.scss';
-import { CSS_UNITS } from './utils';
+import { CSS_UNITS, hasUnits, parseA11yLabelForUnit } from './utils';
+
 /**
  * WordPress dependencies
  */
@@ -68,18 +69,26 @@ function UnitControl( {
 			: __( 'Double tap to open Bottom Sheet with available options' );
 
 	const renderUnitButton = useMemo( () => {
-		return (
-			<TouchableWithoutFeedback
-				onPress={ onPickerPresent }
-				accessibilityLabel={ accessibilityLabel }
-				accessibilityRole="button"
-				accessibilityHint={ accessibilityHint }
-			>
-				<View style={ styles.unitButton }>
-					<Text style={ unitButtonTextStyle }>{ unit }</Text>
-				</View>
-			</TouchableWithoutFeedback>
+		const unitButton = (
+			<View style={ styles.unitButton }>
+				<Text style={ unitButtonTextStyle }>{ unit }</Text>
+			</View>
 		);
+
+		if ( hasUnits( units ) ) {
+			return (
+				<TouchableWithoutFeedback
+					onPress={ onPickerPresent }
+					accessibilityLabel={ accessibilityLabel }
+					accessibilityRole="button"
+					accessibilityHint={ accessibilityHint }
+				>
+					{ unitButton }
+				</TouchableWithoutFeedback>
+			);
+		}
+
+		return unitButton;
 	}, [
 		onPickerPresent,
 		accessibilityLabel,
@@ -100,17 +109,30 @@ function UnitControl( {
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
 				{ renderUnitButton }
-				<Picker
-					ref={ pickerRef }
-					options={ units }
-					onChange={ onUnitChange }
-					hideCancelButton
-					leftAlign
-					getAnchor={ getAnchor }
-				/>
+				{ hasUnits( units ) ? (
+					<Picker
+						ref={ pickerRef }
+						options={ units }
+						onChange={ onUnitChange }
+						hideCancelButton
+						leftAlign
+						getAnchor={ getAnchor }
+					/>
+				) : null }
 			</View>
 		);
 	}, [ pickerRef, units, onUnitChange, getAnchor ] );
+
+	let step = props.step;
+
+	/*
+	 * If no step prop has been passed, lookup the active unit and
+	 * try to get step from `units`, or default to a value of `1`
+	 */
+	if ( ! step && units ) {
+		const activeUnit = units.find( ( option ) => option.value === unit );
+		step = activeUnit?.step ?? 1;
+	}
 
 	return (
 		<>
@@ -122,9 +144,12 @@ function UnitControl( {
 					onChange={ onChange }
 					separatorType={ separatorType }
 					value={ value }
+					step={ step }
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
 					decimalNum={ unit === 'px' ? 0 : decimalNum }
+					openUnitPicker={ onPickerPresent }
+					unitLabel={ parseA11yLabelForUnit( unit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
@@ -136,9 +161,13 @@ function UnitControl( {
 					minimumValue={ min }
 					maximumValue={ max }
 					value={ value }
+					step={ step }
+					unit={ unit }
 					defaultValue={ initialControlValue }
 					separatorType={ separatorType }
 					decimalNum={ decimalNum }
+					openUnitPicker={ onPickerPresent }
+					unitLabel={ parseA11yLabelForUnit( unit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
@@ -148,4 +177,5 @@ function UnitControl( {
 	);
 }
 
+export { useCustomUnits } from './utils';
 export default memo( withPreferredColorScheme( UnitControl ) );

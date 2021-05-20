@@ -42,7 +42,7 @@
 
 	.wp-block-template-part__selection-preview-item-title {
 		padding: $grid-unit-05;
-		font-size: 12px;
+		font-size: $helptext-font-size;
 		text-align: left;
 	}
 
@@ -62,45 +62,18 @@
 	}
 }
 
-.wp-block-template-part__block-control-group {
-	display: flex;
-
-	.wp-block-template-part__name-panel {
-		outline: 1px solid transparent;
-		padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-15;
-
-		.components-base-control__field {
-			align-items: center;
-			display: flex;
-			margin-bottom: 0;
-		}
-
-		.components-base-control__label {
-			margin-bottom: 0;
-			margin-right: 8px;
-		}
-	}
-}
-
-.is-navigate-mode .is-selected .wp-block-template-part__name-panel {
-	box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
-
-	.is-dark-theme & {
-		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
-	}
-}
-
 // Ensures a border is present when a child block is selected.
 .block-editor-block-list__block[data-type="core/template-part"] {
-	&.is-selected,
 	&.has-child-selected {
 		&::after {
-			top: $border-width;
-			bottom: $border-width;
-			left: $border-width;
-			right: $border-width;
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
-			box-shadow: 0 0 0 $border-width $gray-900;
+			border: $border-width dotted var(--wp-admin-theme-color);
+		}
+
+		&.is-hovered,
+		&.is-highlighted {
+			&::after {
+				border: none;
+			}
 		}
 	}
 }

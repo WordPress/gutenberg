@@ -20,21 +20,25 @@ import { store as blockEditorStore } from '../../../store';
 /**
  * Retrieves the block patterns inserter state.
  *
- * @param {Function} onInsert function called when inserter a list of blocks.
+ * @param {Function} onInsert     function called when inserter a list of blocks.
+ * @param {string=}  rootClientId Insertion's root client ID.
  *
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
-const usePatternsState = ( onInsert ) => {
-	const { patternCategories, patterns } = useSelect( ( select ) => {
-		const {
-			__experimentalBlockPatterns,
-			__experimentalBlockPatternCategories,
-		} = select( blockEditorStore ).getSettings();
-		return {
-			patterns: __experimentalBlockPatterns,
-			patternCategories: __experimentalBlockPatternCategories,
-		};
-	}, [] );
+const usePatternsState = ( onInsert, rootClientId ) => {
+	const { patternCategories, patterns } = useSelect(
+		( select ) => {
+			const { __experimentalGetAllowedPatterns, getSettings } = select(
+				blockEditorStore
+			);
+			return {
+				patterns: __experimentalGetAllowedPatterns( rootClientId ),
+				patternCategories: getSettings()
+					.__experimentalBlockPatternCategories,
+			};
+		},
+		[ rootClientId ]
+	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		onInsert(

@@ -12,12 +12,15 @@
 
 	.components-panel {
 		border: none;
+		// Make a stacking context that keeps all descendents behind the sticky header
+		position: relative;
+		z-index: z-index(".interface-complementary-area .components-panel");
 	}
 
 	.components-panel__header {
 		position: sticky;
 		top: 0;
-		z-index: z-index(".components-panel__header");
+		z-index: z-index(".interface-complementary-area .components-panel__header");
 
 		&.edit-post-sidebar__panel-tabs {
 			top: $panel-header-height;

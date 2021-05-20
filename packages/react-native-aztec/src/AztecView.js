@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import ReactNative, {
+import {
+	findNodeHandle,
 	requireNativeComponent,
 	UIManager,
 	TouchableWithoutFeedback,
@@ -39,7 +40,7 @@ class AztecView extends Component {
 	dispatch( command, params ) {
 		params = params || [];
 		UIManager.dispatchViewManagerCommand(
-			ReactNative.findNodeHandle( this ),
+			findNodeHandle( this ),
 			command,
 			params
 		);
@@ -125,7 +126,7 @@ class AztecView extends Component {
 
 	_onBlur( event ) {
 		this.selectionEndCaretY = null;
-		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
+		TextInputState.blurTextInput( findNodeHandle( this ) );
 
 		if ( ! this.props.onBlur ) {
 			return;
@@ -177,18 +178,16 @@ class AztecView extends Component {
 	}
 
 	blur() {
-		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
+		TextInputState.blurTextInput( findNodeHandle( this ) );
 	}
 
 	focus() {
-		TextInputState.focusTextInput( ReactNative.findNodeHandle( this ) );
+		TextInputState.focusTextInput( findNodeHandle( this ) );
 	}
 
 	isFocused() {
 		const focusedField = TextInputState.currentlyFocusedField();
-		return (
-			focusedField && focusedField === ReactNative.findNodeHandle( this )
-		);
+		return focusedField && focusedField === findNodeHandle( this );
 	}
 
 	_onPress( event ) {

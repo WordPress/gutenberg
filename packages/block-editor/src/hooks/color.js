@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isObject } from 'lodash';
+import { isObject, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,7 @@ import {
 } from '../components/gradients';
 import { cleanEmptyObject } from './utils';
 import ColorPanel from './color-panel';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 
 export const COLOR_SUPPORT_KEY = 'color';
 const EMPTY_ARRAY = [];
@@ -42,6 +42,12 @@ const hasColorSupport = ( blockType ) => {
 			colorSupport.background !== false ||
 			colorSupport.text !== false )
 	);
+};
+
+const shouldSkipSerialization = ( blockType ) => {
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return colorSupport?.__experimentalSkipSerialization;
 };
 
 const hasLinkColorSupport = ( blockType ) => {
@@ -124,7 +130,10 @@ function addAttributes( settings ) {
  * @return {Object}            Filtered props applied to save element
  */
 export function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasColorSupport( blockType ) ) {
+	if (
+		! hasColorSupport( blockType ) ||
+		shouldSkipSerialization( blockType )
+	) {
 		return props;
 	}
 
@@ -153,7 +162,7 @@ export function addSaveProps( props, blockType, attributes ) {
 				backgroundColor ||
 				style?.color?.background ||
 				( hasGradient && ( gradient || style?.color?.gradient ) ),
-			'has-link-color': style?.color?.link,
+			'has-link-color': style?.elements?.link?.color,
 		}
 	);
 	props.className = newClassName ? newClassName : undefined;
@@ -169,7 +178,10 @@ export function addSaveProps( props, blockType, attributes ) {
  * @return {Object}          Filtered block settings
  */
 export function addEditProps( settings ) {
-	if ( ! hasColorSupport( settings ) ) {
+	if (
+		! hasColorSupport( settings ) ||
+		shouldSkipSerialization( settings )
+	) {
 		return settings;
 	}
 	const existingGetEditWrapperProps = settings.getEditWrapperProps;
@@ -193,6 +205,10 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
 	return value;
 };
 
+function immutableSet( object, path, value ) {
+	return setWith( object ? clone( object ) : {}, path, value, clone );
+}
+
 /**
  * Inspector control panel containing the color related configuration
  *
@@ -202,9 +218,9 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
  */
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
-	const isLinkColorEnabled = useEditorFeature( 'color.link' );
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const isLinkColorEnabled = useSetting( 'color.link' );
+	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -291,17 +307,15 @@ export function ColorEdit( props ) {
 
 	const onChangeLinkColor = ( value ) => {
 		const colorObject = getColorObjectByColorValue( colors, value );
-		props.setAttributes( {
-			style: {
-				...props.attributes.style,
-				color: {
-					...props.attributes.style?.color,
-					link: colorObject?.slug
-						? `var:preset|color|${ colorObject.slug }`
-						: value,
-				},
-			},
-		} );
+		const newLinkColorValue = colorObject?.slug
+			? `var:preset|color|${ colorObject.slug }`
+			: value;
+		const newStyle = immutableSet(
+			style,
+			[ 'elements', 'link', 'color', 'text' ],
+			newLinkColorValue
+		);
+		props.setAttributes( { style: newStyle } );
 	};
 
 	return (
@@ -315,7 +329,7 @@ export function ColorEdit( props ) {
 				...( hasTextColorSupport( blockName )
 					? [
 							{
-								label: __( 'Text Color' ),
+								label: __( 'Text color' ),
 								onColorChange: onChangeColor( 'text' ),
 								colorValue: getColorObjectByAttributeValues(
 									colors,
@@ -328,7 +342,7 @@ export function ColorEdit( props ) {
 				...( hasBackground || hasGradient
 					? [
 							{
-								label: __( 'Background Color' ),
+								label: __( 'Background color' ),
 								onColorChange: hasBackground
 									? onChangeColor( 'background' )
 									: undefined,
@@ -351,10 +365,10 @@ export function ColorEdit( props ) {
 								onColorChange: onChangeLinkColor,
 								colorValue: getLinkColorFromAttributeValue(
 									colors,
-									style?.color?.link
+									style?.elements?.link?.color?.text
 								),
-								clearable: !! props.attributes.style?.color
-									?.link,
+								clearable: !! style?.elements?.link?.color
+									?.text,
 							},
 					  ]
 					: [] ),
@@ -374,8 +388,8 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-		if ( ! hasColorSupport( name ) ) {
+		const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}
 

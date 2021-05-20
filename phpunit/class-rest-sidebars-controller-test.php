@@ -1,26 +1,20 @@
 <?php
 /**
- * REST API: REST_Sidebars_Controller_Test class
+ * REST API: WP_Test_REST_Sidebars_Controller class
  *
  * @package    WordPress
  * @subpackage REST_API
+ * @since 5.6.0
  */
 
 /**
  * Tests for REST API for Menus.
  *
  * @see WP_Test_REST_Controller_Testcase
+ * @group restapi
+ * @covers WP_REST_Sidebars_Controller
  */
-class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
-	/**
-	 * @var int
-	 */
-	public $menu_id;
-
-	/**
-	 * @var int
-	 */
-	protected static $superadmin_id;
+class WP_Test_REST_Sidebars_Controller extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * @var int
@@ -30,27 +24,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
 	 */
-	protected static $admin_id_without_unfiltered_html;
-
-	/**
-	 * @var int
-	 */
-	protected static $editor_id;
-
-	/**
-	 * @var int
-	 */
-	protected static $subscriber_id;
-
-	/**
-	 * @var int
-	 */
 	protected static $author_id;
-
-	/**
-	 * @var int
-	 */
-	protected static $per_page = 50;
 
 	/**
 	 * Create fake data before our tests run.
@@ -58,40 +32,23 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$superadmin_id = $factory->user->create(
-			array(
-				'role'       => 'administrator',
-				'user_login' => 'superadmin',
-			)
-		);
-		if ( is_multisite() ) {
-			update_site_option( 'site_admins', array( 'superadmin' ) );
-		}
-		self::$admin_id      = $factory->user->create(
+		self::$admin_id  = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
 		);
-		self::$editor_id     = $factory->user->create(
-			array(
-				'role' => 'editor',
-			)
-		);
-		self::$author_id     = $factory->user->create(
+		self::$author_id = $factory->user->create(
 			array(
 				'role' => 'author',
 			)
 		);
-		self::$subscriber_id = $factory->user->create(
-			array(
-				'role' => 'subscriber',
-			)
-		);
 	}
 
-	/**
-	 *
-	 */
+	public static function wpTearDownAfterClass() {
+		wp_delete_user( self::$admin_id );
+		wp_delete_user( self::$author_id );
+	}
+
 	public function setUp() {
 		parent::setUp();
 
@@ -141,7 +98,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
@@ -150,13 +107,25 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_context_param() {
+		// Collection.
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/sidebars' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
+		// Single.
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/sidebars/sidebar-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items() {
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/sidebars' );
@@ -167,37 +136,27 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/sidebars' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_wrong_permission_author() {
 		wp_set_current_user( self::$author_id );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/sidebars' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
 
 	/**
-	 *
-	 */
-	public function test_get_items_wrong_permission_subscriber() {
-		wp_set_current_user( self::$subscriber_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/sidebars' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
-	}
-
-	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_basic_sidebar() {
 		$this->setup_sidebar(
@@ -231,7 +190,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_active_sidebar_with_widgets() {
 		$this->setup_widget(
@@ -283,7 +242,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item() {
 		$this->setup_sidebar(
@@ -315,7 +274,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_no_permission() {
 		wp_set_current_user( 0 );
@@ -328,11 +287,11 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/sidebars/sidebar-1' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_wrong_permission_author() {
 		wp_set_current_user( self::$author_id );
@@ -345,24 +304,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/sidebars/sidebar-1' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
-	}
-
-	/**
-	 *
-	 */
-	public function test_get_item_wrong_permission_subscriber() {
-		wp_set_current_user( self::$subscriber_id );
-		$this->setup_sidebar(
-			'sidebar-1',
-			array(
-				'name' => 'Test sidebar',
-			)
-		);
-
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/sidebars/sidebar-1' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
 
 	/**
@@ -372,7 +314,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item() {
 		$this->setup_widget(
@@ -437,7 +379,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item_removes_widget_from_existing_sidebar() {
 		$this->setup_widget(
@@ -478,7 +420,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item_moves_omitted_widget_to_inactive_sidebar() {
 		$this->setup_widget(
@@ -520,7 +462,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_inactive_widgets() {
 		$this->setup_widget(
@@ -595,7 +537,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item_no_permission() {
 		wp_set_current_user( 0 );
@@ -607,11 +549,11 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item_wrong_permission_author() {
 		wp_set_current_user( self::$author_id );
@@ -623,23 +565,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
-	}
-
-	/**
-	 *
-	 */
-	public function test_update_item_wrong_permission_subscriber() {
-		wp_set_current_user( self::$subscriber_id );
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/sidebars/sidebar-1' );
-		$request->set_body_params(
-			array(
-				'widgets' => array(),
-			)
-		);
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
 
 	/**
@@ -655,7 +581,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_schema() {
 		wp_set_current_user( self::$admin_id );
@@ -664,7 +590,6 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertEquals( 10, count( $properties ) );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
@@ -675,6 +600,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'after_widget', $properties );
 		$this->assertArrayHasKey( 'before_title', $properties );
 		$this->assertArrayHasKey( 'after_title', $properties );
+		$this->assertCount( 10, $properties );
 	}
 
 	/**

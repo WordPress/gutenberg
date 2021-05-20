@@ -9,10 +9,13 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
-	withColors,
 	InspectorControls,
 	BlockControls,
 	withGradient,
+	store as blockEditorStore,
+	getColorObjectByAttributeValues,
+	getGradientValueBySlug,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -20,6 +23,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 	LinkSettingsNavigation,
+	BottomSheetSelectControl,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -32,12 +36,53 @@ import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
 import ColorBackground from './color-background';
 import ColorEdit from './color-edit';
-import getColorAndStyleProps from './color-props';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
 const MIN_WIDTH = 40;
+// Map of the percentage width to pixel subtraction that make the buttons fit nicely into columns.
+const MIN_WIDTH_MARGINS = {
+	100: 0,
+	75: styles.button75?.marginLeft,
+	50: styles.button50?.marginLeft,
+	25: styles.button25?.marginLeft,
+};
+
+function WidthPanel( { selectedWidth, setAttributes } ) {
+	function handleChange( newWidth ) {
+		// Check if we are toggling the width off
+		let width = selectedWidth === newWidth ? undefined : newWidth;
+		if ( newWidth === 'auto' ) {
+			width = undefined;
+		}
+		// Update attributes
+		setAttributes( { width } );
+	}
+
+	const options = [
+		{ value: 'auto', label: __( 'Auto' ) },
+		{ value: 25, label: '25%' },
+		{ value: 50, label: '50%' },
+		{ value: 75, label: '75%' },
+		{ value: 100, label: '100%' },
+	];
+
+	if ( ! selectedWidth ) {
+		selectedWidth = 'auto';
+	}
+
+	return (
+		<PanelBody title={ __( 'Width Settings' ) }>
+			<BottomSheetSelectControl
+				label={ __( 'Button width' ) }
+				value={ selectedWidth }
+				onChange={ handleChange }
+				options={ options }
+			/>
+		</PanelBody>
+	);
+}
 
 class ButtonEdit extends Component {
 	constructor( props ) {
@@ -51,6 +96,7 @@ class ButtonEdit extends Component {
 		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
 		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
+		this.onPlaceholderTextWidth = this.onPlaceholderTextWidth.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.onRemove = this.onRemove.bind( this );
 		this.getPlaceholderWidth = this.getPlaceholderWidth.bind( this );
@@ -107,7 +153,7 @@ class ButtonEdit extends Component {
 		}
 
 		if ( prevProps.parentWidth !== parentWidth ) {
-			this.onSetMaxWidth();
+			this.onSetMaxWidth( null, true );
 		}
 
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
@@ -139,30 +185,47 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes, gradientValue } = this.props;
-		const { customGradient } = attributes;
+		const { attributes, colors, gradients } = this.props;
+		const { backgroundColor, gradient } = attributes;
 
-		if ( customGradient || gradientValue ) {
-			return customGradient || gradientValue;
+		// Return named gradient value if available.
+		const gradientValue = getGradientValueBySlug( gradients, gradient );
+
+		if ( gradientValue ) {
+			return gradientValue;
 		}
-		const colorAndStyleProps = getColorAndStyleProps( attributes );
+
+		const colorProps = getColorClassesAndStyles( attributes );
+
+		// Retrieve named color object to force inline styles for themes that
+		// do not load their color stylesheets in the editor.
+		const colorObject = getColorObjectByAttributeValues(
+			colors,
+			backgroundColor
+		);
+
 		return (
-			colorAndStyleProps.style?.backgroundColor ||
-			colorAndStyleProps.style?.background ||
-			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
-			backgroundColor.color ||
+			colorObject?.color ||
+			colorProps.style?.backgroundColor ||
+			colorProps.style?.background ||
 			styles.defaultButton.backgroundColor
 		);
 	}
 
 	getTextColor() {
-		const { textColor, attributes } = this.props;
-		const colorAndStyleProps = getColorAndStyleProps( attributes );
+		const { attributes, colors } = this.props;
+		const colorProps = getColorClassesAndStyles( attributes );
+
+		// Retrieve named color object to force inline styles for themes that
+		// do not load their color stylesheets in the editor.
+		const colorObject = getColorObjectByAttributeValues(
+			colors,
+			attributes.textColor
+		);
 
 		return (
-			colorAndStyleProps.style?.color ||
-			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
-			textColor.color ||
+			colorObject?.color ||
+			colorProps.style?.color ||
 			styles.defaultButton.color
 		);
 	}
@@ -210,20 +273,19 @@ class ButtonEdit extends Component {
 		this.onSetMaxWidth( width );
 	}
 
-	onSetMaxWidth( width ) {
+	onSetMaxWidth( width, isParentWidthDidChange = false ) {
 		const { maxWidth } = this.state;
 		const { parentWidth } = this.props;
 		const { marginRight: spacing } = styles.defaultButton;
 
-		const isParentWidthChanged = maxWidth !== parentWidth;
+		const isParentWidthChanged = isParentWidthDidChange
+			? isParentWidthDidChange
+			: maxWidth !== parentWidth;
 		const isWidthChanged = maxWidth !== width;
 
 		if ( parentWidth && ! width && isParentWidthChanged ) {
 			this.setState( {
-				maxWidth: Math.min(
-					parentWidth,
-					this.props.maxWidth - 2 * spacing
-				),
+				maxWidth: parentWidth - spacing,
 			} );
 		} else if ( ! parentWidth && width && isWidthChanged ) {
 			this.setState( { maxWidth: width - spacing } );
@@ -276,26 +338,26 @@ class ButtonEdit extends Component {
 	// Render `Text` with `placeholderText` styled as a placeholder
 	// to calculate its width which then is set as a `minWidth`
 	getPlaceholderWidth( placeholderText ) {
-		const { maxWidth, placeholderTextWidth } = this.state;
 		return (
 			<Text
 				style={ styles.placeholder }
-				onTextLayout={ ( { nativeEvent } ) => {
-					const textWidth =
-						nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
-					if ( textWidth && textWidth !== placeholderTextWidth ) {
-						this.setState( {
-							placeholderTextWidth: Math.min(
-								textWidth,
-								maxWidth
-							),
-						} );
-					}
-				} }
+				onTextLayout={ this.onPlaceholderTextWidth }
 			>
 				{ placeholderText }
 			</Text>
 		);
+	}
+
+	onPlaceholderTextWidth( { nativeEvent } ) {
+		const { maxWidth, placeholderTextWidth } = this.state;
+		const textWidth =
+			nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
+
+		if ( textWidth && textWidth !== placeholderTextWidth ) {
+			this.setState( {
+				placeholderTextWidth: Math.min( textWidth, maxWidth ),
+			} );
+		}
 	}
 
 	render() {
@@ -306,6 +368,7 @@ class ButtonEdit extends Component {
 			onReplace,
 			mergeBlocks,
 			parentWidth,
+			setAttributes,
 		} = this.props;
 		const {
 			placeholder,
@@ -313,6 +376,7 @@ class ButtonEdit extends Component {
 			borderRadius,
 			url,
 			align = 'center',
+			width,
 		} = attributes;
 		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
 		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
@@ -332,10 +396,16 @@ class ButtonEdit extends Component {
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
 		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
 		// different than empty string.
-		const minWidth =
+		let minWidth =
 			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
 				? MIN_WIDTH
 				: placeholderTextWidth;
+		if ( width ) {
+			// Set the width of the button.
+			minWidth = Math.floor(
+				maxWidth * ( width / 100 ) - MIN_WIDTH_MARGINS[ width ]
+			);
+		}
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,
 		// because `AztecView` is calculating a `minWidth` based on placeholder text.
@@ -346,6 +416,7 @@ class ButtonEdit extends Component {
 
 		const backgroundColor = this.getBackgroundColor();
 		const textColor = this.getTextColor();
+		const isFixedWidth = !! width;
 
 		return (
 			<View onLayout={ this.onLayout }>
@@ -374,6 +445,12 @@ class ButtonEdit extends Component {
 						onChange={ this.onChangeText }
 						style={ {
 							...richTextStyle.richText,
+							paddingLeft: isFixedWidth
+								? 0
+								: richTextStyle.richText.paddingLeft,
+							paddingRight: isFixedWidth
+								? 0
+								: richTextStyle.richText.paddingRight,
 							color: textColor,
 						} }
 						textAlign={ align }
@@ -382,8 +459,8 @@ class ButtonEdit extends Component {
 						}
 						identifier="text"
 						tagName="p"
-						minWidth={ minWidth }
-						maxWidth={ maxWidth }
+						minWidth={ minWidth } // The minimum Button size.
+						maxWidth={ isFixedWidth ? minWidth : maxWidth } // The width of the screen.
 						id={ clientId }
 						isSelected={ isButtonFocused }
 						withoutInteractiveFormatting
@@ -425,6 +502,10 @@ class ButtonEdit extends Component {
 									onChange={ this.onChangeBorderRadius }
 								/>
 							</PanelBody>
+							<WidthPanel
+								selectedWidth={ width }
+								setAttributes={ setAttributes }
+							/>
 							<PanelBody title={ __( 'Link Settings' ) }>
 								{ this.getLinkSettings( true ) }
 							</PanelBody>
@@ -439,21 +520,20 @@ class ButtonEdit extends Component {
 export default compose( [
 	withInstanceId,
 	withGradient,
-	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId, isSelected } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const { getBlockCount, getBlockRootClientId, getSettings } = select(
-			'core/block-editor'
+			blockEditorStore
 		);
-		const { maxWidth } = getSettings();
-
 		const parentId = getBlockRootClientId( clientId );
 		const numOfButtons = getBlockCount( parentId );
+		const settings = getSettings();
 
 		return {
+			colors: settings?.colors || [],
+			gradients: settings?.gradients || [],
 			editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			numOfButtons,
-			maxWidth,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

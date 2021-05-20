@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { ActionItem, PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
@@ -52,7 +52,7 @@ const MoreMenu = ( { showIconLabels } ) => {
 					<ActionItem.Slot
 						name="core/edit-post/plugin-more-menu"
 						label={ __( 'Plugins' ) }
-						as={ [ MenuGroup, MenuItem ] }
+						as={ MenuGroup }
 						fillProps={ { onClick: onClose } }
 					/>
 					<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />

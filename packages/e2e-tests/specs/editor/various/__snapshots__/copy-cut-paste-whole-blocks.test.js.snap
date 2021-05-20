@@ -24,6 +24,22 @@ exports[`Copy/cut/paste of whole blocks should copy and paste individual blocks 
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Copy/cut/paste of whole blocks should copy blocks when non textual elements are focused  (image, spacer) 1`] = `
+"<!-- wp:spacer -->
+<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<!-- /wp:spacer -->"
+`;
+
+exports[`Copy/cut/paste of whole blocks should copy blocks when non textual elements are focused  (image, spacer) 2`] = `
+"<!-- wp:spacer -->
+<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:spacer -->
+<div style=\\"height:100px\\" aria-hidden=\\"true\\" class=\\"wp-block-spacer\\"></div>
+<!-- /wp:spacer -->"
+`;
+
 exports[`Copy/cut/paste of whole blocks should cut and paste individual blocks 1`] = `
 "<!-- wp:paragraph -->
 <p>2</p>

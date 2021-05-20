@@ -241,12 +241,16 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__settings {
-	border-top: 1px solid $gray-300;
+	border-top: $border-width solid $gray-300;
 	margin: 0;
 	padding: $grid-unit-20 $grid-unit-30;
 
 	:last-child {
 		margin-bottom: 0;
+	}
+
+	.is-alternate & {
+		border-top: $border-width solid $gray-900;
 	}
 }
 

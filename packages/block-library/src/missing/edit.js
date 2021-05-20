@@ -6,7 +6,11 @@ import { RawHTML } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { getBlockType, createBlock } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
-import { Warning, useBlockProps } from '@wordpress/block-editor';
+import {
+	Warning,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 function MissingBlockWarning( { attributes, convertToHTML } ) {
 	const { originalName, originalUndelimitedContent } = attributes;
@@ -39,7 +43,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	}
 
 	return (
-		<div { ...useBlockProps() }>
+		<div { ...useBlockProps( { className: 'has-warning' } ) }>
 			<Warning actions={ actions }>{ messageHTML }</Warning>
 			<RawHTML>{ originalUndelimitedContent }</RawHTML>
 		</div>
@@ -47,7 +51,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 }
 
 const MissingEdit = withDispatch( ( dispatch, { clientId, attributes } ) => {
-	const { replaceBlock } = dispatch( 'core/block-editor' );
+	const { replaceBlock } = dispatch( blockEditorStore );
 	return {
 		convertToHTML() {
 			replaceBlock(

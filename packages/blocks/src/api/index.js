@@ -8,6 +8,7 @@ export {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
+	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
 	getBlockTransforms,
@@ -55,7 +56,7 @@ export {
 // attributes needed to operate with the block later on.
 export {
 	default as serialize,
-	getBlockContent,
+	getBlockInnerHTML as getBlockContent,
 	getBlockDefaultClassName,
 	getBlockMenuDefaultClassName,
 	getSaveElement,
@@ -107,6 +108,7 @@ export { getCategories, setCategories, updateCategory } from './categories';
 // children of another block.
 export {
 	registerBlockType,
+	registerBlockTypeFromMetadata,
 	registerBlockCollection,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
@@ -139,6 +141,8 @@ export {
 	isValidIcon,
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
+	__experimentalSanitizeBlockAttributes,
+	__experimentalGetBlockAttributesNamesByRole,
 } from './utils';
 
 // Templates are, in a general sense, a basic collection of block nodes with any
@@ -153,4 +157,7 @@ export {
 } from './templates';
 export { default as children } from './children';
 export { default as node } from './node';
-export { __EXPERIMENTAL_STYLE_PROPERTY } from './constants';
+export {
+	__EXPERIMENTAL_STYLE_PROPERTY,
+	__EXPERIMENTAL_ELEMENTS,
+} from './constants';

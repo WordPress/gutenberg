@@ -17,20 +17,13 @@ import { Icon, plus } from '@wordpress/icons';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender(
-	{
-		rootClientId,
-		className,
-		__experimentalSelectBlockOnInsert: selectBlockOnInsert,
-		onFocus,
-		tabIndex,
-	},
+	{ rootClientId, className, onFocus, tabIndex },
 	ref
 ) {
 	return (
 		<Inserter
 			position="bottom center"
 			rootClientId={ rootClientId }
-			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 			__experimentalIsQuick
 			renderToggle={ ( {
 				onToggle,

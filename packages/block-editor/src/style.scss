@@ -6,10 +6,11 @@
 // Only add styles for components that are used inside the editing canvas here:
 
 @import "./autocompleters/style.scss";
-@import "./components/block-alignment-matrix-toolbar/style.scss";
+@import "./components/block-alignment-matrix-control/style.scss";
 @import "./components/block-icon/style.scss";
 @import "./components/block-inspector/style.scss";
 @import "./components/block-list/style.scss";
+@import "./components/block-tools/style.scss";
 @import "./components/block-list-appender/style.scss";
 @import "./components/block-breadcrumb/style.scss";
 @import "./components/block-card/style.scss";
@@ -26,13 +27,16 @@
 @import "./components/block-switcher/style.scss";
 @import "./components/block-types-list/style.scss";
 @import "./components/block-variation-picker/style.scss";
+@import "./components/block-pattern-setup/style.scss";
 @import "./components/block-variation-transforms/style.scss";
+@import "./components/border-style-control/style.scss";
 @import "./components/button-block-appender/style.scss";
 @import "./components/colors-gradients/style.scss";
 @import "./components/contrast-checker/style.scss";
 @import "./components/default-block-appender/style.scss";
+@import "./components/duotone-control/style.scss";
 @import "./components/font-appearance-control/style.scss";
-@import "./components/justify-toolbar/style.scss";
+@import "./components/justify-content-control/style.scss";
 @import "./components/link-control/style.scss";
 @import "./components/line-height-control/style.scss";
 @import "./components/image-size-control/style.scss";
@@ -43,7 +47,6 @@
 @import "./components/multi-selection-inspector/style.scss";
 @import "./components/plain-text/style.scss";
 @import "./components/responsive-block-control/style.scss";
-@import "./components/rich-text/format-toolbar/style.scss";
 @import "./components/rich-text/style.scss";
 @import "./components/skip-to-selected-block/style.scss";
 @import "./components/text-decoration-and-transform/style.scss";
@@ -54,6 +57,7 @@
 @import "./components/url-popover/style.scss";
 @import "./components/warning/style.scss";
 @import "./hooks/anchor.scss";
+@import "./hooks/layout.scss";
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {

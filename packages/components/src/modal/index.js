@@ -116,11 +116,13 @@ class Modal extends Component {
 			...otherProps
 		} = this.props;
 
-		const headingId =
-			aria.labelledby || `components-modal-header-${ instanceId }`;
+		const headingId = title
+			? `components-modal-header-${ instanceId }`
+			: aria.labelledby;
 
 		if ( isDismissable ) {
 			deprecated( 'isDismissable prop of the Modal component', {
+				since: '5.4',
 				alternative:
 					'isDismissible prop (renamed) of the Modal component',
 			} );
@@ -131,7 +133,7 @@ class Modal extends Component {
 			<ModalFrame
 				onRequestClose={ onRequestClose }
 				aria={ {
-					labelledby: title ? headingId : null,
+					labelledby: headingId,
 					describedby: aria.describedby,
 				} }
 				{ ...otherProps }
@@ -139,7 +141,7 @@ class Modal extends Component {
 				<div className={ 'components-modal__content' } role="document">
 					<ModalHeader
 						closeLabel={ closeButtonLabel }
-						headingId={ headingId }
+						headingId={ title && headingId }
 						icon={ icon }
 						isDismissible={ isDismissible || isDismissable }
 						onClose={ onRequestClose }

@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import { castArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { _n } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { useCallback } from '@wordpress/element';
 
@@ -23,8 +28,6 @@ import { store as blockEditorStore } from '../../../store';
  *                                           block with this ID.
  * @property {boolean=}  isAppender          Whether the inserter is an appender
  *                                           or not.
- * @property {boolean=}  selectBlockOnInsert Whether the block should be
- *                                           selected on insert.
  * @property {Function=} onSelect            Called after insertion.
  */
 
@@ -35,59 +38,52 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Insertion Point State (rootClientID, onInsertBlocks and onToggle).
  */
 function useInsertionPoint( {
-	rootClientId,
+	rootClientId = '',
 	insertionIndex,
 	clientId,
 	isAppender,
-	selectBlockOnInsert,
 	onSelect,
+	shouldFocusBlock = true,
 } ) {
-	const {
-		selectedBlock,
-		destinationRootClientId,
-		destinationIndex,
-	} = useSelect(
+	const { getSelectedBlock } = useSelect( blockEditorStore );
+	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
 			const {
-				getSelectedBlock,
+				getSelectedBlockClientId,
+				getBlockRootClientId,
 				getBlockIndex,
 				getBlockOrder,
-				getBlockInsertionPoint,
 			} = select( blockEditorStore );
+			const selectedBlockClientId = getSelectedBlockClientId();
 
-			let _destinationRootClientId, _destinationIndex;
+			let _destinationRootClientId = rootClientId;
+			let _destinationIndex;
 
-			if ( rootClientId || insertionIndex || clientId || isAppender ) {
-				// If any of these arguments are set, we're in "manual mode"
-				// meaning the insertion point is set by the caller.
-
-				_destinationRootClientId = rootClientId;
-
-				if ( insertionIndex ) {
-					// Insert into a specific index.
-					_destinationIndex = insertionIndex;
-				} else if ( clientId ) {
-					// Insert after a specific client ID.
-					_destinationIndex = getBlockIndex(
-						clientId,
+			if ( insertionIndex ) {
+				// Insert into a specific index.
+				_destinationIndex = insertionIndex;
+			} else if ( clientId ) {
+				// Insert after a specific client ID.
+				_destinationIndex = getBlockIndex(
+					clientId,
+					_destinationRootClientId
+				);
+			} else if ( ! isAppender && selectedBlockClientId ) {
+				_destinationRootClientId = getBlockRootClientId(
+					selectedBlockClientId
+				);
+				_destinationIndex =
+					getBlockIndex(
+						selectedBlockClientId,
 						_destinationRootClientId
-					);
-				} else {
-					// Insert at the end of the list.
-					_destinationIndex = getBlockOrder(
-						_destinationRootClientId
-					).length;
-				}
+					) + 1;
 			} else {
-				// Otherwise, we're in "auto mode" where the insertion point is
-				// decided by getBlockInsertionPoint().
-				const insertionPoint = getBlockInsertionPoint();
-				_destinationRootClientId = insertionPoint.rootClientId;
-				_destinationIndex = insertionPoint.index;
+				// Insert at the end of the list.
+				_destinationIndex = getBlockOrder( _destinationRootClientId )
+					.length;
 			}
 
 			return {
-				selectedBlock: getSelectedBlock(),
 				destinationRootClientId: _destinationRootClientId,
 				destinationIndex: _destinationIndex,
 			};
@@ -103,7 +99,9 @@ function useInsertionPoint( {
 	} = useDispatch( blockEditorStore );
 
 	const onInsertBlocks = useCallback(
-		( blocks, meta ) => {
+		( blocks, meta, shouldForceFocusBlock = false ) => {
+			const selectedBlock = getSelectedBlock();
+
 			if (
 				! isAppender &&
 				selectedBlock &&
@@ -113,7 +111,7 @@ function useInsertionPoint( {
 					selectedBlock.clientId,
 					blocks,
 					null,
-					null,
+					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
 				);
 			} else {
@@ -121,20 +119,21 @@ function useInsertionPoint( {
 					blocks,
 					destinationIndex,
 					destinationRootClientId,
-					selectBlockOnInsert,
+					true,
+					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
 				);
 			}
-
-			if ( ! selectBlockOnInsert ) {
+			const message = sprintf(
 				// translators: %d: the name of the block that has been added
-				const message = _n(
+				_n(
 					'%d block added.',
 					'%d blocks added.',
-					blocks.length
-				);
-				speak( message );
-			}
+					castArray( blocks ).length
+				),
+				castArray( blocks ).length
+			);
+			speak( message );
 
 			if ( onSelect ) {
 				onSelect();
@@ -142,13 +141,13 @@ function useInsertionPoint( {
 		},
 		[
 			isAppender,
-			selectedBlock,
+			getSelectedBlock,
 			replaceBlocks,
 			insertBlocks,
 			destinationRootClientId,
 			destinationIndex,
-			selectBlockOnInsert,
 			onSelect,
+			shouldFocusBlock,
 		]
 	);
 

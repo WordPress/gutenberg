@@ -28,15 +28,15 @@
 	font-style: normal;
 }
 
+// Prevent the dropcap from breaking out of the box when a background is applied.
+p.has-drop-cap.has-background {
+	overflow: hidden;
+}
+
 p.has-background {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
 
 p.has-text-color a {
 	color: inherit;
-}
-
-// Prevent an empty P tag from collapsing, so it matches the backend.
-p:empty::before {
-	content: "\200B";
 }

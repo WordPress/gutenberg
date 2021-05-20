@@ -16,6 +16,7 @@ import {
 	withColors,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import {
@@ -398,7 +399,7 @@ export default compose(
 			getSelectedBlockClientId,
 			getBlockParents,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const parents = getBlockParents( clientId, true );
 

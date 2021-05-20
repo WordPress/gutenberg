@@ -21,10 +21,6 @@
 		[data-rich-text-format-boundary] {
 			border-radius: 2px;
 		}
-
-		&:not(.keep-placeholder-on-focus) [data-rich-text-placeholder]::after {
-			display: none;
-		}
 	}
 }
 
@@ -63,5 +59,28 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 		min-height: $block-toolbar-height;
 		padding-left: $grid-unit-15;
 		padding-right: $grid-unit-15;
+	}
+}
+
+.block-editor-rich-text__inline-format-toolbar-group {
+	.components-dropdown-menu__toggle {
+		justify-content: center;
+	}
+}
+
+.show-icon-labels {
+	.block-editor-rich-text__inline-format-toolbar-group {
+		.components-button.has-icon {
+			width: auto;
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+			}
+		}
 	}
 }

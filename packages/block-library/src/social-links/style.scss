@@ -1,7 +1,6 @@
 .wp-block-social-links {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: flex-start;
 	padding-left: 0;
 	padding-right: 0;
 	// Some themes set text-indent on all <ul>
@@ -21,7 +20,7 @@
 	.wp-social-link {
 		// This needs specificity to override some themes.
 		&.wp-social-link.wp-social-link {
-			margin: auto 8px auto 0;
+			margin: 4px 8px 4px 0;
 		}
 
 		// By setting the font size, we can scale icons and paddings consistently based on that.
@@ -67,19 +66,6 @@
 	}
 	&.alignright {
 		justify-content: flex-end;
-	}
-
-	// Ensure user color selections are applied to inner Social Link blocks.
-	// Double selectors to increase specificity to avoid themes overwriting user selection.
-	&.has-icon-color.has-icon-color {
-		> .wp-social-link {
-			color: var(--wp--social-links--icon-color);
-		}
-	}
-	&.has-icon-background-color.has-icon-background-color {
-		> .wp-social-link {
-			background-color: var(--wp--social-links--icon-background-color);
-		}
 	}
 }
 

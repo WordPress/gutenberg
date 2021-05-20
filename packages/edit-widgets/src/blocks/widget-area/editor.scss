@@ -1,5 +1,7 @@
 .wp-block[data-type="core/widget-area"] {
 	max-width: $widget-area-width;
+	margin-left: auto;
+	margin-right: auto;
 
 	.components-panel__body > .components-panel__body-title {
 		font-family: $default-font;

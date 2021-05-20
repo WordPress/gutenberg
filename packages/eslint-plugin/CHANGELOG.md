@@ -2,9 +2,22 @@
 
 ## Unreleased
 
+## 9.0.1 (2021-03-19)
+
+### Bug Fix
+
+-   Adds TypeScript as a peer dependency and makes it optional when not installed ([#29942](https://github.com/WordPress/gutenberg/pull/29942)).
+
+## 9.0.0 (2021-03-17)
+
+### Breaking Changes
+
+-   Add support and configuration for TypeScript files. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
+
 ### New Features
 
 -   Enabled `import/default` and `import/named` rules in the `recommended` ruleset. [#28513](https://github.com/WordPress/gutenberg/pull/28513)
+-   Add new rule `@wordpress/data-no-store-string-literals` to discourage passing string literals to reference data stores ([#28726](https://github.com/WordPress/gutenberg/pull/28726)).
 
 ## 8.0.1 (2021-01-28)
 

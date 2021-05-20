@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interface",
-	"version": "1.0.4",
+	"version": "3.0.0",
 	"description": "Interface module for WordPress. The package contains shared functionality across the modern JavaScript-based WordPress screens.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,6 +19,9 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
@@ -28,7 +31,7 @@
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
@@ -39,7 +42,7 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.19"
+		"lodash": "^4.17.21"
 	},
 	"publishConfig": {
 		"access": "public"

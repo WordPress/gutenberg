@@ -15,7 +15,7 @@ import {
 } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { Warning } from '@wordpress/block-editor';
+import { Warning, store as blockEditorStore } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
@@ -43,7 +43,7 @@ const enhance = compose(
 
 		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
-		const blocks = select( 'core/block-editor' ).getBlocks();
+		const blocks = select( blockEditorStore ).getBlocks();
 		const firstOfSameType = find(
 			blocks,
 			( { name } ) => block.name === name
@@ -56,9 +56,7 @@ const enhance = compose(
 	} ),
 	withDispatch( ( dispatch, { originalBlockClientId } ) => ( {
 		selectFirst: () =>
-			dispatch( 'core/block-editor' ).selectBlock(
-				originalBlockClientId
-			),
+			dispatch( blockEditorStore ).selectBlock( originalBlockClientId ),
 	} ) )
 );
 

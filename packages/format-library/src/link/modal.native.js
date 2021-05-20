@@ -22,7 +22,10 @@ const ModalLinkUI = ( { isVisible, ...restProps } ) => {
 			>
 				<BottomSheet.NavigationContainer animate main>
 					<BottomSheet.NavigationScreen name={ screens.settings }>
-						<LinkSettingsScreen { ...restProps } />
+						<LinkSettingsScreen
+							isVisible={ isVisible }
+							{ ...restProps }
+						/>
 					</BottomSheet.NavigationScreen>
 					<BottomSheet.NavigationScreen
 						name={ screens.picker }

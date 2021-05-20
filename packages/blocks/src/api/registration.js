@@ -4,10 +4,15 @@
  * External dependencies
  */
 import {
-	get,
+	camelCase,
+	isArray,
+	isEmpty,
 	isFunction,
 	isNil,
+	isObject,
 	isPlainObject,
+	isString,
+	mapKeys,
 	omit,
 	pick,
 	pickBy,
@@ -19,11 +24,13 @@ import {
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import { _x } from '@wordpress/i18n';
 import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import i18nBlockSchema from './i18n-block.json';
 import { isValidIcon, normalizeIconObject } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
 import { store as blocksStore } from '../store';
@@ -100,14 +107,16 @@ import { store as blocksStore } from '../store';
  * @property {string[]} [keywords]             An array of terms (which can be translated)
  *                                             that help users discover the variation
  *                                             while searching.
- * @property {Function} [isActive]             A function that accepts a block's attributes
- *                                             and the variation's attributes and determines
- *                                             if a variation is active. This function doesn't
- *                                             try to find a match dynamically based on all
- *                                             block's attributes, as in many cases some
- *                                             attributes are irrelevant. An example would
- *                                             be for `embed` block where we only care about
- *                                             `providerNameSlug` attribute's value.
+ * @property {Function|string[]} [isActive]    This can be a function or an array of block attributes.
+ *                                             Function that accepts a block's attributes and the
+ *                                             variation's attributes and determines if a variation is active.
+ *                                             This function doesn't try to find a match dynamically based
+ *                                             on all block's attributes, as in many cases some attributes are irrelevant.
+ *                                             An example would be for `embed` block where we only care
+ *                                             about `providerNameSlug` attribute's value.
+ *                                             We can also use a `string[]` to tell which attributes
+ *                                             should be compared as a shorthand. Each attributes will
+ *                                             be matched and the variation will be active if all of them are matching.
  */
 
 /**
@@ -149,7 +158,7 @@ const LEGACY_CATEGORY_MAPPING = {
 	layout: 'design',
 };
 
-export let serverSideBlockDefinitions = {};
+export const serverSideBlockDefinitions = {};
 
 /**
  * Sets the server side block definition of blocks.
@@ -158,10 +167,29 @@ export let serverSideBlockDefinitions = {};
  */
 // eslint-disable-next-line camelcase
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
-	serverSideBlockDefinitions = {
-		...serverSideBlockDefinitions,
-		...definitions,
-	};
+	for ( const blockName of Object.keys( definitions ) ) {
+		// Don't overwrite if already set. It covers the case when metadata
+		// was initialized from the server.
+		if ( serverSideBlockDefinitions[ blockName ] ) {
+			// We still need to polyfill `apiVersion` for WordPress version
+			// lower than 5.7. If it isn't present in the definition shared
+			// from the server, we try to fallback to the definition passed.
+			// @see https://github.com/WordPress/gutenberg/pull/29279
+			if (
+				serverSideBlockDefinitions[ blockName ].apiVersion ===
+					undefined &&
+				definitions[ blockName ].apiVersion
+			) {
+				serverSideBlockDefinitions[ blockName ].apiVersion =
+					definitions[ blockName ].apiVersion;
+			}
+			continue;
+		}
+		serverSideBlockDefinitions[ blockName ] = mapKeys(
+			pickBy( definitions[ blockName ], ( value ) => ! isNil( value ) ),
+			( value, key ) => camelCase( key )
+		);
+	}
 }
 
 /**
@@ -186,10 +214,7 @@ export function registerBlockType( name, settings ) {
 		supports: {},
 		styles: [],
 		save: () => null,
-		...pickBy(
-			get( serverSideBlockDefinitions, name, {} ),
-			( value ) => ! isNil( value )
-		),
+		...serverSideBlockDefinitions?.[ name ],
 		...settings,
 	};
 
@@ -289,6 +314,115 @@ export function registerBlockType( name, settings ) {
 	dispatch( blocksStore ).addBlockTypes( settings );
 
 	return settings;
+}
+
+/**
+ * Translates block settings provided with metadata using the i18n schema.
+ *
+ * @param {string|string[]|Object[]} i18nSchema    I18n schema for the block setting.
+ * @param {string|string[]|Object[]} settingValue  Value for the block setting.
+ * @param {string}                   textdomain    Textdomain to use with translations.
+ *
+ * @return {string|string[]|Object[]} Translated setting.
+ */
+function translateBlockSettingUsingI18nSchema(
+	i18nSchema,
+	settingValue,
+	textdomain
+) {
+	if ( isString( i18nSchema ) && isString( settingValue ) ) {
+		// eslint-disable-next-line @wordpress/i18n-no-variables, @wordpress/i18n-text-domain
+		return _x( settingValue, i18nSchema, textdomain );
+	}
+	if (
+		isArray( i18nSchema ) &&
+		! isEmpty( i18nSchema ) &&
+		isArray( settingValue )
+	) {
+		return settingValue.map( ( value ) =>
+			translateBlockSettingUsingI18nSchema(
+				i18nSchema[ 0 ],
+				value,
+				textdomain
+			)
+		);
+	}
+	if (
+		isObject( i18nSchema ) &&
+		! isEmpty( i18nSchema ) &&
+		isObject( settingValue )
+	) {
+		return Object.keys( settingValue ).reduce( ( accumulator, key ) => {
+			if ( ! i18nSchema[ key ] ) {
+				accumulator[ key ] = settingValue[ key ];
+				return accumulator;
+			}
+			accumulator[ key ] = translateBlockSettingUsingI18nSchema(
+				i18nSchema[ key ],
+				settingValue[ key ],
+				textdomain
+			);
+			return accumulator;
+		}, {} );
+	}
+	return settingValue;
+}
+
+/**
+ * Registers a new block provided from metadata stored in `block.json` file.
+ * It uses `registerBlockType` internally.
+ *
+ * @see registerBlockType
+ *
+ * @param {Object} metadata            Block metadata loaded from `block.json`.
+ * @param {string} metadata.name       Block name.
+ * @param {string} metadata.textdomain Textdomain to use with translations.
+ * @param {Object} additionalSettings  Additional block settings.
+ *
+ * @return {?WPBlock} The block, if it has been successfully registered;
+ *                    otherwise `undefined`.
+ */
+export function registerBlockTypeFromMetadata(
+	{ name, textdomain, ...metadata },
+	additionalSettings
+) {
+	const allowedFields = [
+		'apiVersion',
+		'title',
+		'category',
+		'parent',
+		'icon',
+		'description',
+		'keywords',
+		'attributes',
+		'providesContext',
+		'usesContext',
+		'supports',
+		'styles',
+		'example',
+		'variations',
+	];
+
+	const settings = pick( metadata, allowedFields );
+
+	if ( textdomain ) {
+		Object.keys( i18nBlockSchema ).forEach( ( key ) => {
+			if ( ! settings[ key ] ) {
+				return;
+			}
+			settings[ key ] = translateBlockSettingUsingI18nSchema(
+				i18nBlockSchema[ key ],
+				settings[ key ],
+				textdomain
+			);
+		} );
+	}
+
+	unstable__bootstrapServerSideBlockDefinitions( {
+		[ name ]: settings,
+	} );
+
+	return registerBlockType( name, additionalSettings );
 }
 
 /**

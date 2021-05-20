@@ -1,26 +1,22 @@
 /**
- * External dependencies
- */
-import { compact, map } from 'lodash';
-import tinycolor from 'tinycolor2';
-
-/**
  * WordPress dependencies
  */
 import {
 	useState,
 	createPortal,
 	useCallback,
-	useEffect,
 	forwardRef,
+	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
+import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import transformStyles from '../../utils/transform-styles';
+import { useBlockSelectionClearer } from '../block-selection-clearer';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -60,6 +56,13 @@ function styleSheetsCompat( doc ) {
 		);
 
 		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Stylesheet ${ ownerNode.id } was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`,
+				ownerNode
+			);
 			doc.head.appendChild( ownerNode.cloneNode( true ) );
 		}
 	} );
@@ -132,47 +135,34 @@ function setBodyClassName( doc ) {
 	}
 }
 
-/**
- * Sets the document head and default styles.
- *
- * @param {Document} doc  Document to set the head for.
- * @param {string}   head HTML to set as the head.
- */
-function setHead( doc, head ) {
-	doc.head.innerHTML =
-		// Body margin must be overridable by themes.
-		'<style>body{margin:0}</style>' + head;
+function useParsedAssets( html ) {
+	return useMemo( () => {
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = html;
+		return Array.from( doc.body.children );
+	}, [ html ] );
 }
 
-function updateEditorStyles( doc, styles ) {
-	if ( ! doc ) {
-		return;
-	}
-
-	const backgroundColor = window
-		.getComputedStyle( doc.body, null )
-		.getPropertyValue( 'background-color' );
-	if ( tinycolor( backgroundColor ).getLuminance() > 0.5 ) {
-		doc.body.classList.remove( 'is-dark-theme' );
-	} else {
-		doc.body.classList.add( 'is-dark-theme' );
-	}
-
-	const updatedStyles = transformStyles( styles, '.editor-styles-wrapper' );
-	map( compact( updatedStyles ), ( updatedStyle ) => {
-		const styleElement = doc.createElement( 'style' );
-		styleElement.innerHTML = updatedStyle;
-		doc.body.appendChild( styleElement );
+async function loadScript( doc, { id, src } ) {
+	return new Promise( ( resolve, reject ) => {
+		const script = doc.createElement( 'script' );
+		script.id = id;
+		if ( src ) {
+			script.src = src;
+			script.onload = () => resolve();
+			script.onerror = () => reject();
+		} else {
+			resolve();
+		}
+		doc.head.appendChild( script );
 	} );
 }
 
-function Iframe( { contentRef, editorStyles, children, head, ...props }, ref ) {
+function Iframe( { contentRef, children, head, ...props }, ref ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
-
-	useEffect( () => {
-		updateEditorStyles( iframeDocument, editorStyles );
-	}, [ editorStyles ] );
-
+	const styles = useParsedAssets( window.__editorAssets.styles );
+	const scripts = useParsedAssets( window.__editorAssets.scripts );
+	const clearerRef = useBlockSelectionClearer();
 	const setRef = useCallback( ( node ) => {
 		if ( ! node ) {
 			return;
@@ -180,20 +170,30 @@ function Iframe( { contentRef, editorStyles, children, head, ...props }, ref ) {
 
 		function setDocumentIfReady() {
 			const { contentDocument } = node;
-			const { readyState } = contentDocument;
+			const { readyState, body, documentElement } = contentDocument;
 
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
 			}
 
-			contentRef.current = contentDocument.body;
-			setIframeDocument( contentDocument );
-			setHead( contentDocument, head );
+			if ( typeof contentRef === 'function' ) {
+				contentRef( body );
+			} else if ( contentRef ) {
+				contentRef.current = body;
+			}
+
 			setBodyClassName( contentDocument );
-			styleSheetsCompat( contentDocument );
-			updateEditorStyles( contentDocument, editorStyles );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
+			setIframeDocument( contentDocument );
+			clearerRef( documentElement );
+			clearerRef( body );
+
+			scripts.reduce(
+				( promise, script ) =>
+					promise.then( () => loadScript( contentDocument, script ) ),
+				Promise.resolve()
+			);
 
 			return true;
 		}
@@ -208,6 +208,25 @@ function Iframe( { contentRef, editorStyles, children, head, ...props }, ref ) {
 		} );
 	}, [] );
 
+	useEffect( () => {
+		if ( iframeDocument ) {
+			styleSheetsCompat( iframeDocument );
+		}
+	}, [ iframeDocument ] );
+
+	head = (
+		<>
+			<style>{ 'body{margin:0}' }</style>
+			{ styles.map( ( { tagName, href, id, rel, media }, index ) => {
+				const TagName = tagName.toLowerCase();
+				return (
+					<TagName { ...{ href, id, rel, media } } key={ index } />
+				);
+			} ) }
+			{ head }
+		</>
+	);
+
 	return (
 		<iframe
 			{ ...props }
@@ -216,7 +235,14 @@ function Iframe( { contentRef, editorStyles, children, head, ...props }, ref ) {
 			title={ __( 'Editor canvas' ) }
 			name="editor-canvas"
 		>
-			{ iframeDocument && createPortal( children, iframeDocument.body ) }
+			{ iframeDocument &&
+				createPortal(
+					<StyleProvider document={ iframeDocument }>
+						{ children }
+					</StyleProvider>,
+					iframeDocument.body
+				) }
+			{ iframeDocument && createPortal( head, iframeDocument.head ) }
 		</iframe>
 	);
 }

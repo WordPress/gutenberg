@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { deburr } from 'lodash';
+import { noop, deburr } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -46,7 +46,7 @@ function ComboboxControl( {
 	label,
 	options,
 	onChange,
-	onFilterValueChange,
+	onFilterValueChange = noop,
 	hideLabelFromVision,
 	help,
 	allowReset = true,

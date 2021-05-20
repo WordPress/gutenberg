@@ -30,6 +30,7 @@ import {
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
+import { parse as parseBlocks } from '@wordpress/block-serialization-default-parser';
 
 /**
  * A block selection object.
@@ -262,6 +263,41 @@ export const __unstableGetBlockTree = createSelector(
 		state.blocks.order,
 		state.blocks.attributes,
 	]
+);
+
+/**
+ * Returns a stripped down block object containing only its client ID,
+ * and its inner blocks' client IDs.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Client ID of the block to get.
+ *
+ * @return {Object} Client IDs of the post blocks.
+ */
+export const __unstableGetClientIdWithClientIdsTree = createSelector(
+	( state, clientId ) => ( {
+		clientId,
+		innerBlocks: __unstableGetClientIdsTree( state, clientId ),
+	} ),
+	( state ) => [ state.blocks.order ]
+);
+
+/**
+ * Returns the block tree represented in the block-editor store from the
+ * given root, consisting of stripped down block objects containing only
+ * their client IDs, and their inner blocks' client IDs.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Client IDs of the post blocks.
+ */
+export const __unstableGetClientIdsTree = createSelector(
+	( state, rootClientId = '' ) =>
+		map( getBlockOrder( state, rootClientId ), ( clientId ) =>
+			__unstableGetClientIdWithClientIdsTree( state, clientId )
+		),
+	( state ) => [ state.blocks.order ]
 );
 
 /**
@@ -691,10 +727,11 @@ export function getNextBlockClientId( state, startClientId ) {
 /**
  * Returns the initial caret position for the selected block.
  * This position is to used to position the caret properly when the selected block changes.
+ * If the current block is not a RichText, having initial position set to 0 means "focus block"
  *
  * @param {Object} state Global application state.
  *
- * @return {?Object} Selected block.
+ * @return {0|-1|null} Initial position.
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
 	return state.initialPosition;
@@ -1141,18 +1178,12 @@ export function isCaretWithinFormattedText( state ) {
 }
 
 /**
- * Returns the insertion point. This will be:
+ * Returns the insertion point, the index at which the new inserted block would
+ * be placed. Defaults to the last index.
  *
- * 1) The insertion point manually set using setInsertionPoint() or
- *    showInsertionPoint(); or
- * 2) The point after the current block selection, if there is a selection; or
- * 3) The point at the end of the block list.
+ * @param {Object} state Editor state.
  *
- * Components like <Inserter> will default to inserting blocks at this point.
- *
- * @param {Object} state Global application state.
- *
- * @return {Object} Insertion point object with `rootClientId` and `index`.
+ * @return {Object} Insertion point object with `rootClientId`, `index`.
  */
 export function getBlockInsertionPoint( state ) {
 	let rootClientId, index;
@@ -1178,15 +1209,14 @@ export function getBlockInsertionPoint( state ) {
 }
 
 /**
- * Whether or not the insertion point should be shown to users. This is set
- * using showInsertionPoint() or hideInsertionPoint().
+ * Returns true if we should show the block insertion point.
  *
  * @param {Object} state Global application state.
  *
- * @return {?boolean} Whether the insertion point should be shown.
+ * @return {?boolean} Whether the insertion point is visible or not.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return state.insertionPointVisibility;
+	return state.insertionPoint !== null;
 }
 
 /**
@@ -1231,6 +1261,22 @@ export function getTemplateLock( state, rootClientId ) {
 	return blockListSettings.templateLock;
 }
 
+const checkAllowList = ( list, item, defaultResult = null ) => {
+	if ( isBoolean( list ) ) {
+		return list;
+	}
+	if ( isArray( list ) ) {
+		// TODO: when there is a canonical way to detect that we are editing a post
+		// the following check should be changed to something like:
+		// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
+		if ( list.includes( 'core/post-content' ) && item === null ) {
+			return true;
+		}
+		return list.includes( item );
+	}
+	return defaultResult;
+};
+
 /**
  * Determines if the given block type is allowed to be inserted into the block list.
  * This function is not exported and not memoized because using a memoized selector
@@ -1249,22 +1295,6 @@ const canInsertBlockTypeUnmemoized = (
 	blockName,
 	rootClientId = null
 ) => {
-	const checkAllowList = ( list, item, defaultResult = null ) => {
-		if ( isBoolean( list ) ) {
-			return list;
-		}
-		if ( isArray( list ) ) {
-			// TODO: when there is a canonical way to detect that we are editing a post
-			// the following check should be changed to something like:
-			// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
-			if ( list.includes( 'core/post-content' ) && item === null ) {
-				return true;
-			}
-			return list.includes( item );
-		}
-		return defaultResult;
-	};
-
 	let blockType;
 	if ( blockName && 'object' === typeof blockName ) {
 		blockType = blockName;
@@ -1598,12 +1628,26 @@ export const getInserterItems = createSelector(
 				blockVariations.push( ...variations.map( variationMapper ) );
 			}
 		}
-
-		return [
+		// Prioritize core blocks's display in inserter.
+		const prioritizeCoreBlocks = ( a, b ) => {
+			const coreBlockNamePrefix = 'core/';
+			const firstIsCoreBlock = a.name.startsWith( coreBlockNamePrefix );
+			const secondIsCoreBlock = b.name.startsWith( coreBlockNamePrefix );
+			if ( firstIsCoreBlock && secondIsCoreBlock ) {
+				return 0;
+			}
+			return firstIsCoreBlock && ! secondIsCoreBlock ? -1 : 1;
+		};
+		// Ensure core blocks are prioritized in the returned results,
+		// because third party blocks can be registered earlier than
+		// the core blocks (usually by using the `init` action),
+		// thus affecting the display order.
+		// We don't sort reusable blocks as they are handled differently.
+		const sortedBlockTypes = [
 			...visibleBlockTypeInserterItems,
 			...blockVariations,
-			...reusableBlockInserterItems,
-		];
+		].sort( prioritizeCoreBlocks );
+		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
@@ -1741,6 +1785,198 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
+const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
+	if ( isBoolean( allowedBlockTypes ) ) {
+		return allowedBlockTypes;
+	}
+
+	const blocksQueue = [ ...blocks ];
+	while ( blocksQueue.length > 0 ) {
+		const block = blocksQueue.shift();
+
+		const isAllowed = checkAllowList(
+			allowedBlockTypes,
+			block.name || block.blockName,
+			true
+		);
+		if ( ! isAllowed ) {
+			return false;
+		}
+
+		block.innerBlocks?.forEach( ( innerBlock ) => {
+			blocksQueue.push( innerBlock );
+		} );
+	}
+
+	return true;
+};
+
+export const __experimentalGetParsedPattern = createSelector(
+	( state, patternName ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const pattern = patterns.find( ( { name } ) => name === patternName );
+		if ( ! pattern ) {
+			return null;
+		}
+		return {
+			...pattern,
+			blocks: parse( pattern.content ),
+		};
+	},
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
+);
+
+const getAllAllowedPatterns = createSelector(
+	( state ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const { allowedBlockTypes } = getSettings( state );
+		const parsedPatterns = patterns.map( ( pattern ) => ( {
+			...pattern,
+			// We only need the overall block structure of the pattern. So, for
+			// performance reasons, we can parse the pattern's content using
+			// the raw blocks parser, also known as the "stage I" block parser.
+			// This is about 250x faster than the full parse that the Block API
+			// offers.
+			blockNodes: parseBlocks( pattern.content ),
+		} ) );
+		const allowedPatterns = parsedPatterns.filter( ( { blockNodes } ) =>
+			checkAllowListRecursive( blockNodes, allowedBlockTypes )
+		);
+		return allowedPatterns;
+	},
+	( state ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+	]
+);
+
+/**
+ * Returns the list of allowed patterns for inner blocks children.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional target root client ID.
+ *
+ * @return {Array?} The list of allowed patterns.
+ */
+export const __experimentalGetAllowedPatterns = createSelector(
+	( state, rootClientId = null ) => {
+		const availableParsedPatterns = getAllAllowedPatterns( state );
+		const patternsAllowed = filter(
+			availableParsedPatterns,
+			( { blockNodes } ) =>
+				blockNodes.every( ( { blockName } ) =>
+					canInsertBlockType( state, blockName, rootClientId )
+				)
+		);
+		return patternsAllowed;
+	},
+	( state, rootClientId ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId[ rootClientId ],
+	]
+);
+
+/**
+ * Returns the list of patterns based on their declared `blockTypes`
+ * and a block's name.
+ * Patterns can use `blockTypes` to integrate in work flows like
+ * suggesting appropriate patterns in a Placeholder state(during insertion)
+ * or blocks transformations.
+ *
+ * @param {Object} state Editor state.
+ * @param {string|string[]} blockNames Block's name or array of block names to find matching pattens.
+ * @param {?string} rootClientId Optional target root client ID.
+ *
+ * @return {Array} The list of matched block patterns based on declared `blockTypes` and block name.
+ */
+export const __experimentalGetPatternsByBlockTypes = createSelector(
+	( state, blockNames, rootClientId = null ) => {
+		if ( ! blockNames ) return EMPTY_ARRAY;
+		const patterns = __experimentalGetAllowedPatterns(
+			state,
+			rootClientId
+		);
+		const normalizedBlockNames = Array.isArray( blockNames )
+			? blockNames
+			: [ blockNames ];
+		return patterns.filter( ( pattern ) =>
+			pattern?.blockTypes?.some?.( ( blockName ) =>
+				normalizedBlockNames.includes( blockName )
+			)
+		);
+	},
+	( state, rootClientId ) => [
+		...__experimentalGetAllowedPatterns.getDependants(
+			state,
+			rootClientId
+		),
+	]
+);
+
+/**
+ * Determines the items that appear in the available pattern transforms list.
+ *
+ * For now we only handle blocks without InnerBlocks and take into account
+ * the `__experimentalRole` property of blocks' attributes for the transformation.
+ *
+ * We return the first set of possible eligible block patterns,
+ * by checking the `blockTypes` property. We still have to recurse through
+ * block pattern's blocks and try to find matches from the selected blocks.
+ * Now this happens in the consumer to avoid heavy operations in the selector.
+ *
+ * @param {Object}  state Editor state.
+ * @param {Object[]} blocks The selected blocks.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {WPBlockPattern[]} Items that are eligible for a pattern transformation.
+ */
+export const __experimentalGetPatternTransformItems = createSelector(
+	( state, blocks, rootClientId = null ) => {
+		if ( ! blocks ) return EMPTY_ARRAY;
+		/**
+		 * For now we only handle blocks without InnerBlocks and take into account
+		 * the `__experimentalRole` property of blocks' attributes for the transformation.
+		 * Note that the blocks have been retrieved through `getBlock`, which doesn't
+		 * return the inner blocks of an inner block controller, so we still need
+		 * to check for this case too.
+		 */
+		if (
+			blocks.some(
+				( { clientId, innerBlocks } ) =>
+					innerBlocks.length ||
+					areInnerBlocksControlled( state, clientId )
+			)
+		) {
+			return EMPTY_ARRAY;
+		}
+
+		// Create a Set of the selected block names that is used in patterns filtering.
+		const selectedBlockNames = Array.from(
+			new Set( blocks.map( ( { name } ) => name ) )
+		);
+		/**
+		 * Here we will return first set of possible eligible block patterns,
+		 * by checking the `blockTypes` property. We still have to recurse through
+		 * block pattern's blocks and try to find matches from the selected blocks.
+		 * Now this happens in the consumer to avoid heavy operations in the selector.
+		 */
+		return __experimentalGetPatternsByBlockTypes(
+			state,
+			selectedBlockNames,
+			rootClientId
+		);
+	},
+	( state, rootClientId ) => [
+		...__experimentalGetPatternsByBlockTypes.getDependants(
+			state,
+			rootClientId
+		),
+	]
+);
+
 /**
  * Returns the Block List settings of a block, if any exist.
  *
@@ -1778,18 +2014,26 @@ export function isLastBlockChangePersistent( state ) {
 }
 
 /**
- * Returns the Block List settings for an array of blocks, if any exist.
+ * Returns the block list settings for an array of blocks, if any exist.
  *
- * @param {Object}  state    Editor state.
- * @param {Array} clientIds Block client IDs.
+ * @param {Object} state     Editor state.
+ * @param {Array}  clientIds Block client IDs.
  *
- * @return {Array} Block List Settings for each of the found blocks
+ * @return {Object} An object where the keys are client ids and the values are
+ *                  a block list setting object.
  */
 export const __experimentalGetBlockListSettingsForBlocks = createSelector(
-	( state, clientIds ) => {
-		return filter( state.blockListSettings, ( value, key ) =>
-			clientIds.includes( key )
-		);
+	( state, clientIds = [] ) => {
+		return clientIds.reduce( ( blockListSettingsForBlocks, clientId ) => {
+			if ( ! state.blockListSettings[ clientId ] ) {
+				return blockListSettingsForBlocks;
+			}
+
+			return {
+				...blockListSettingsForBlocks,
+				[ clientId ]: state.blockListSettings[ clientId ],
+			};
+		}, {} );
 	},
 	( state ) => [ state.blockListSettings ]
 );
@@ -1990,3 +2234,19 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 		validBlockNames,
 	]
 );
+
+/**
+ * Tells if the block with the passed clientId was just inserted.
+ *
+ * @param {Object} state Global application state.
+ * @param {Object} clientId Client Id of the block.
+ * @param {?string} source Optional insertion source of the block.
+ * @return {boolean} True if the block matches the last block inserted from the specified source.
+ */
+export function wasBlockJustInserted( state, clientId, source ) {
+	const { lastBlockInserted } = state;
+	return (
+		lastBlockInserted.clientId === clientId &&
+		lastBlockInserted.source === source
+	);
+}

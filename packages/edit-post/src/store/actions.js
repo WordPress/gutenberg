@@ -11,6 +11,8 @@ import { apiFetch } from '@wordpress/data-controls';
 import { store as interfaceStore } from '@wordpress/interface';
 import { controls, dispatch, select, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -414,13 +416,32 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
 /**
  * Returns an action object used to open/close the inserter.
  *
- * @param {boolean} value A boolean representing whether the inserter should be opened or closed.
+ * @param {boolean|Object} value                Whether the inserter should be
+ *                                              opened (true) or closed (false).
+ *                                              To specify an insertion point,
+ *                                              use an object.
+ * @param {string}         value.rootClientId   The root client ID to insert at.
+ * @param {number}         value.insertionIndex The index to insert at.
+ *
  * @return {Object} Action object.
  */
 export function setIsInserterOpened( value ) {
 	return {
 		type: 'SET_IS_INSERTER_OPENED',
 		value,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the list view.
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsListViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
 	};
 }
 
@@ -435,4 +456,44 @@ export function setIsEditingTemplate( value ) {
 		type: 'SET_IS_EDITING_TEMPLATE',
 		value,
 	};
+}
+
+/**
+ * Potentially create a block based template and switches to the template mode.
+ *
+ * @param {Object?} template template to create and assign before switching.
+ */
+export function* __unstableSwitchToTemplateMode( template ) {
+	if ( !! template ) {
+		const savedTemplate = yield controls.dispatch(
+			coreStore,
+			'saveEntityRecord',
+			'postType',
+			'wp_template',
+			template
+		);
+		const post = yield controls.select( 'core/editor', 'getCurrentPost' );
+
+		yield controls.dispatch(
+			coreStore,
+			'editEntityRecord',
+			'postType',
+			post.type,
+			post.id,
+			{
+				template: savedTemplate.slug,
+			}
+		);
+	}
+
+	yield setIsEditingTemplate( true );
+
+	const message = !! template
+		? __( "Custom template created. You're in template mode now." )
+		: __(
+				'Editing template. Changes made here affect all posts and pages that use the template.'
+		  );
+	yield controls.dispatch( noticesStore, 'createSuccessNotice', message, {
+		type: 'snackbar',
+	} );
 }

@@ -13,10 +13,12 @@ import {
 	BlockIcon,
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -39,19 +41,24 @@ export function imageFillStyles( url, focalPoint ) {
 		: {};
 }
 
-function ResizableBoxContainer( { isSelected, isStackedOnMobile, ...props } ) {
-	const isMobile = useViewportMatch( 'small', '<' );
-	return (
-		<ResizableBox
-			showHandle={ isSelected && ( ! isMobile || ! isStackedOnMobile ) }
-			{ ...props }
-		/>
-	);
-}
+const ResizableBoxContainer = forwardRef(
+	( { isSelected, isStackedOnMobile, ...props }, ref ) => {
+		const isMobile = useViewportMatch( 'small', '<' );
+		return (
+			<ResizableBox
+				ref={ ref }
+				showHandle={
+					isSelected && ( ! isMobile || ! isStackedOnMobile )
+				}
+				{ ...props }
+			/>
+		);
+	}
+);
 
 function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
 	return (
-		<BlockControls>
+		<BlockControls group="other">
 			<MediaReplaceFlow
 				mediaId={ mediaId }
 				mediaURL={ mediaUrl }
@@ -90,7 +97,7 @@ function PlaceholderContainer( {
 	);
 }
 
-function MediaContainer( props ) {
+function MediaContainer( props, ref ) {
 	const {
 		className,
 		commitWidthChange,
@@ -108,7 +115,7 @@ function MediaContainer( props ) {
 		onWidthChange,
 	} = props;
 
-	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const { toggleSelection } = useDispatch( blockEditorStore );
 
 	if ( mediaType && mediaUrl ) {
 		const onResizeStart = () => {
@@ -154,6 +161,7 @@ function MediaContainer( props ) {
 				axis="x"
 				isSelected={ isSelected }
 				isStackedOnMobile={ isStackedOnMobile }
+				ref={ ref }
 			>
 				<ToolbarEditButton
 					onSelectMedia={ onSelectMedia }
@@ -168,4 +176,4 @@ function MediaContainer( props ) {
 	return <PlaceholderContainer { ...props } />;
 }
 
-export default withNotices( MediaContainer );
+export default withNotices( forwardRef( MediaContainer ) );

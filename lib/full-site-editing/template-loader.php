@@ -9,7 +9,7 @@
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
  */
 function gutenberg_add_template_loader_filters() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
 	}
 
@@ -20,6 +20,7 @@ function gutenberg_add_template_loader_filters() {
 		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
 	}
 }
+
 add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
 
 /**
@@ -61,17 +62,50 @@ function get_template_hierarchy( $template_type ) {
  * @param array  $templates A list of template candidates, in descending order of priority.
  * @return string The path to the Full Site Editing template canvas file.
  */
-function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
+function gutenberg_override_query_template( $template, $type, array $templates ) {
 	global $_wp_current_template_content;
-	$current_template = gutenberg_resolve_template( $type, $templates );
 
-	if ( $current_template ) {
-		$_wp_current_template_content = empty( $current_template->content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template->content;
+	if ( $template ) {
+		// locate_template() has found a PHP template at the path specified by $template.
+		// That means that we have a fallback candidate if we cannot find a block template
+		// with higher specificity.
+		// Thus, before looking for matching block themes, we shorten our list of candidate
+		// templates accordingly.
 
+		// Locate the index of $template (without the theme directory path) in $templates.
+		$relative_template_path = str_replace(
+			array( get_stylesheet_directory() . '/', get_template_directory() . '/' ),
+			'',
+			$template
+		);
+		$index                  = array_search( $relative_template_path, $templates, true );
+
+		// If the template hiearchy algorithm has successfully located a PHP template file,
+		// we will only consider block templates with higher or equal specificity.
+		$templates = array_slice( $templates, 0, $index + 1 );
+	}
+
+	$block_template = gutenberg_resolve_template( $type, $templates );
+
+	if ( $block_template ) {
+		if ( empty( $block_template->content ) && is_user_logged_in() ) {
+			$_wp_current_template_content =
+			sprintf(
+				/* translators: %s: Template title */
+				__( 'Empty template: %s', 'gutenberg' ),
+				$block_template->title
+			);
+		} elseif ( ! empty( $block_template->content ) ) {
+			$_wp_current_template_content = $block_template->content;
+		}
 		if ( isset( $_GET['_wp-find-template'] ) ) {
-			wp_send_json_success( $current_template );
+			wp_send_json_success( $block_template );
 		}
 	} else {
+		if ( $template ) {
+			return $template;
+		}
+
 		if ( 'index' === $type ) {
 			if ( isset( $_GET['_wp-find-template'] ) ) {
 				wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
@@ -94,7 +128,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 }
 
 /**
- * Return the correct 'wp_template' to render fot the request template type.
+ * Return the correct 'wp_template' to render for the request template type.
  *
  * Accepts an optional $template_hierarchy argument as a hint.
  *
@@ -105,17 +139,13 @@ function gutenberg_override_query_template( $template, $type, array $templates =
  *  @type int[] A list of template parts IDs for the template.
  * }
  */
-function gutenberg_resolve_template( $template_type, $template_hierarchy = array() ) {
+function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 	if ( ! $template_type ) {
 		return null;
 	}
 
 	if ( empty( $template_hierarchy ) ) {
-		if ( 'index' === $template_type ) {
-			$template_hierarchy = get_template_hierarchy( 'index' );
-		} else {
-			$template_hierarchy = array_merge( get_template_hierarchy( $template_type ), get_template_hierarchy( 'index' ) );
-		}
+		$template_hierarchy = array( $template_type );
 	}
 
 	$slugs = array_map(
@@ -161,7 +191,10 @@ function gutenberg_get_the_template_html() {
 	global $wp_embed;
 
 	if ( ! $_wp_current_template_content ) {
-		return '<h1>' . esc_html__( 'No matching template found', 'gutenberg' ) . '</h1>';
+		if ( is_user_logged_in() ) {
+			return '<h1>' . esc_html__( 'No matching template found', 'gutenberg' ) . '</h1>';
+		}
+		return;
 	}
 
 	$content = $wp_embed->run_shortcode( $_wp_current_template_content );

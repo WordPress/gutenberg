@@ -19,12 +19,7 @@
 .wp-block-social-links__social-placeholder {
 	display: flex;
 	opacity: 0.8;
-	transition: all 0.1s ease-in-out;
-	@include reduce-motion("transition");
-
-	.is-selected & {
-		opacity: 0.1;
-	}
+	list-style: none;
 
 	// Use the first link to set the height.
 	> .wp-social-link {
@@ -40,7 +35,6 @@
 	// Wrap the remaining placeholders in a container so the plus can overlap.
 	> .wp-block-social-links__social-placeholder-icons {
 		display: flex;
-		position: absolute;
 	}
 
 	& + .block-list-appender,
@@ -66,27 +60,66 @@
 	}
 }
 
+// Selected placeholder state.
+.wp-block-social-links .wp-block-social-links__social-prompt {
+	list-style: none;
+	order: 2; // Move after the appender button. Because this element is non-interactive, it does not affect tab order.
+
+	// Show as block UI.
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $button-size-small;
+	margin-top: auto;
+	margin-bottom: auto;
+	cursor: default;
+	padding-right: $grid-unit-10;
+
+	& + .block-list-appender {
+		margin-right: $grid-unit-10;
+		padding: 0.25em;
+	}
+}
+
 // Polish the Appender.
 .wp-block-social-links .block-list-appender {
-	padding: 0;
+	// Match the overall silhouette of social links.
+	margin: 4px auto 4px 0;
+	border-radius: 9999px; // This works as both circular and pill shapes.
 
-	&::before {
-		content: "";
-		display: block;
+	// Treat just like a social icon.
+	.block-editor-inserter {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: inherit;
 		width: 1em;
 		height: 1em;
 	}
 
-	.block-editor-inserter {
-		position: absolute;
-		top: 0;
+	// Duplicate the font sizes from style.scss to size the appender.
+	.has-small-icon-size & {
+		font-size: 16px; // 16 makes for a quarter-padding that keeps the icon centered.
+	}
+
+	// Normal/default.
+	.has-normal-icon-size & {
+		font-size: 24px;
+	}
+
+	// Large.
+	.has-large-icon-size & {
+		font-size: 36px;
+	}
+
+	// Huge.
+	.has-huge-icon-size & {
+		font-size: 48px;
+	}
+
+	&::before {
+		content: none;
 	}
 }
-
-.wp-block-social-links.is-style-logos-only .block-list-appender {
-	padding: 4px;
-}
-
 
 // Center flex items. This has an equivalent in style.scss.
 .wp-block[data-align="center"] > .wp-block-social-links {
@@ -109,15 +142,4 @@
 .wp-social-link.wp-social-link__is-incomplete:hover,
 .wp-social-link.wp-social-link__is-incomplete:focus {
 	opacity: 1;
-}
-
-
-// Focus styles for the button inside the child block.
-// The child block itself has a more generic focus style, see line 55.
-[data-type="core/social-links"] .wp-social-link:focus { // This needs specificity.
-	opacity: 1;
-	box-shadow: 0 0 0 2px $white, 0 0 0 4px var(--wp-admin-theme-color);
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
 }

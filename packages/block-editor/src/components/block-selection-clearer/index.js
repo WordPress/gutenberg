@@ -2,47 +2,51 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 
-export function useBlockSelectionClearer( ref ) {
-	const hasSelection = useSelect( ( select ) => {
-		const { hasSelectedBlock, hasMultiSelection } = select(
-			blockEditorStore
-		);
-
-		return hasSelectedBlock() || hasMultiSelection();
-	} );
+/**
+ * Pass the returned ref callback to an element that should clear block
+ * selection. Selection will only be cleared if the element is clicked directly,
+ * not if a child element is clicked.
+ *
+ * @return {import('react').RefCallback} Ref callback.
+ */
+export function useBlockSelectionClearer() {
+	const { hasSelectedBlock, hasMultiSelection } = useSelect(
+		blockEditorStore
+	);
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
-	useEffect( () => {
-		if ( ! hasSelection ) {
-			return;
-		}
+	return useRefEffect(
+		( node ) => {
+			function onMouseDown( event ) {
+				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
+					return;
+				}
 
-		function onMouseDown( event ) {
-			// Only handle clicks on the canvas, not the content.
-			if ( event.target.closest( '.wp-block' ) ) {
-				return;
+				// Only handle clicks on the element, not the children.
+				if ( event.target !== node ) {
+					return;
+				}
+
+				clearSelectedBlock();
 			}
 
-			clearSelectedBlock();
-		}
+			node.addEventListener( 'mousedown', onMouseDown );
 
-		ref.current.addEventListener( 'mousedown', onMouseDown );
-
-		return () => {
-			ref.current.removeEventListener( 'mousedown', onMouseDown );
-		};
-	}, [ hasSelection, clearSelectedBlock ] );
+			return () => {
+				node.removeEventListener( 'mousedown', onMouseDown );
+			};
+		},
+		[ hasSelectedBlock, hasMultiSelection, clearSelectedBlock ]
+	);
 }
 
 export default function BlockSelectionClearer( props ) {
-	const ref = useRef();
-	useBlockSelectionClearer( ref );
-	return <div ref={ ref } { ...props } />;
+	return <div ref={ useBlockSelectionClearer() } { ...props } />;
 }

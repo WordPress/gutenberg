@@ -14,18 +14,17 @@ import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
+	JustifyContentControl,
 	ContrastChecker,
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
 import {
-	DropdownMenu,
 	MenuGroup,
 	MenuItem,
 	PanelBody,
 	ToggleControl,
-	ToolbarItem,
-	ToolbarGroup,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
@@ -44,6 +43,7 @@ export function SocialLinksEdit( props ) {
 		attributes,
 		iconBackgroundColor,
 		iconColor,
+		isSelected,
 		setAttributes,
 		setIconBackgroundColor,
 		setIconColor,
@@ -52,6 +52,7 @@ export function SocialLinksEdit( props ) {
 	const {
 		iconBackgroundColorValue,
 		iconColorValue,
+		itemsJustification,
 		openInNewTab,
 		size,
 	} = attributes;
@@ -70,14 +71,20 @@ export function SocialLinksEdit( props ) {
 	}, [ logosOnly, setAttributes ] );
 
 	const SocialPlaceholder = (
-		<div className="wp-block-social-links__social-placeholder">
+		<li className="wp-block-social-links__social-placeholder">
 			<div className="wp-social-link"></div>
 			<div className="wp-block-social-links__social-placeholder-icons">
 				<div className="wp-social-link wp-social-link-twitter"></div>
 				<div className="wp-social-link wp-social-link-facebook"></div>
 				<div className="wp-social-link wp-social-link-instagram"></div>
 			</div>
-		</div>
+		</li>
+	);
+
+	const SelectedSocialPlaceholder = (
+		<li className="wp-block-social-links__social-prompt">
+			{ __( 'Click plus to add' ) }
+		</li>
 	);
 
 	// Fallback color values are used maintain selections in case switching
@@ -86,19 +93,14 @@ export function SocialLinksEdit( props ) {
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':
 			iconBackgroundColor.color || iconBackgroundColorValue,
+		[ `items-justified-${ itemsJustification }` ]: itemsJustification,
 	} );
 
-	const style = {
-		'--wp--social-links--icon-color': iconColor.color || iconColorValue,
-		'--wp--social-links--icon-background-color':
-			iconBackgroundColor.color || iconBackgroundColorValue,
-	};
-
-	const blockProps = useBlockProps( { className, style } );
+	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
-		placeholder: SocialPlaceholder,
+		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
 	} );
@@ -110,52 +112,60 @@ export function SocialLinksEdit( props ) {
 
 	return (
 		<Fragment>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<DropdownMenu
-								label={ __( 'Size' ) }
-								text={ __( 'Size' ) }
-								icon={ null }
-								popoverProps={ POPOVER_PROPS }
-								toggleProps={ toggleProps }
-							>
-								{ ( { onClose } ) => (
-									<MenuGroup>
-										{ sizeOptions.map( ( entry ) => {
-											return (
-												<MenuItem
-													icon={
-														( size ===
-															entry.value ||
-															( ! size &&
-																entry.value ===
-																	'has-normal-icon-size' ) ) &&
-														check
-													}
-													isSelected={
-														size === entry.value
-													}
-													key={ entry.value }
-													onClick={ () => {
-														setAttributes( {
-															size: entry.value,
-														} );
-													} }
-													onClose={ onClose }
-													role="menuitemradio"
-												>
-													{ entry.name }
-												</MenuItem>
-											);
-										} ) }
-									</MenuGroup>
-								) }
-							</DropdownMenu>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
+			<BlockControls group="block">
+				<JustifyContentControl
+					allowedControls={ [
+						'left',
+						'center',
+						'right',
+						'space-between',
+					] }
+					value={ itemsJustification }
+					onChange={ ( value ) =>
+						setAttributes( { itemsJustification: value } )
+					}
+					popoverProps={ {
+						position: 'bottom right',
+						isAlternate: true,
+					} }
+				/>
+			</BlockControls>
+			<BlockControls group="other">
+				<ToolbarDropdownMenu
+					label={ __( 'Size' ) }
+					text={ __( 'Size' ) }
+					icon={ null }
+					popoverProps={ POPOVER_PROPS }
+				>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							{ sizeOptions.map( ( entry ) => {
+								return (
+									<MenuItem
+										icon={
+											( size === entry.value ||
+												( ! size &&
+													entry.value ===
+														'has-normal-icon-size' ) ) &&
+											check
+										}
+										isSelected={ size === entry.value }
+										key={ entry.value }
+										onClick={ () => {
+											setAttributes( {
+												size: entry.value,
+											} );
+										} }
+										onClose={ onClose }
+										role="menuitemradio"
+									>
+										{ entry.name }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+				</ToolbarDropdownMenu>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
@@ -168,7 +178,7 @@ export function SocialLinksEdit( props ) {
 					/>
 				</PanelBody>
 				<PanelColorSettings
-					title={ __( 'Color settings' ) }
+					title={ __( 'Color' ) }
 					colorSettings={ [
 						{
 							// Use custom attribute as fallback to prevent loss of named color selection when
@@ -176,7 +186,6 @@ export function SocialLinksEdit( props ) {
 							value: iconColor.color || iconColorValue,
 							onChange: ( colorValue ) => {
 								setIconColor( colorValue );
-								// Set explicit color value used to add CSS variable in save.js
 								setAttributes( { iconColorValue: colorValue } );
 							},
 							label: __( 'Icon color' ),
@@ -189,7 +198,6 @@ export function SocialLinksEdit( props ) {
 								iconBackgroundColorValue,
 							onChange: ( colorValue ) => {
 								setIconBackgroundColor( colorValue );
-								// Set explicit color value used to add CSS variable in save.js
 								setAttributes( {
 									iconBackgroundColorValue: colorValue,
 								} );

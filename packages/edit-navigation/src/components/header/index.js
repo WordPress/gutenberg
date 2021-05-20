@@ -1,37 +1,26 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { DropdownMenu } from '@wordpress/components';
+import { PinnedItems } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Button,
-	Dropdown,
-	DropdownMenu,
-	MenuGroup,
-	MenuItemsChoice,
-	Popover,
-} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import SaveButton from './save-button';
-import ManageLocations from './manage-locations';
-import AddMenuForm from './add-menu-form';
+import MenuSwitcher from '../menu-switcher';
+import { useMenuEntityProp } from '../../hooks';
 
 export default function Header( {
+	isMenuSelected,
 	menus,
 	selectedMenuId,
 	onSelectMenu,
 	isPending,
 	navigationPost,
 } ) {
-	const selectedMenu = find( menus, { id: selectedMenuId } );
-	const menuName = selectedMenu ? selectedMenu.name : undefined;
+	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
 	let actionHeaderText;
 
 	if ( menuName ) {
@@ -54,75 +43,45 @@ export default function Header( {
 					{ __( 'Navigation' ) }
 				</h1>
 				<h2 className="edit-navigation-header__subtitle">
-					{ actionHeaderText }
+					{ isMenuSelected && actionHeaderText }
 				</h2>
 			</div>
-			<div className="edit-navigation-header__actions">
-				<DropdownMenu
-					icon={ null }
-					toggleProps={ {
-						showTooltip: false,
-						children: __( 'Select menu' ),
-						isTertiary: true,
-						disabled: ! menus?.length,
-						__experimentalIsFocusable: true,
-					} }
-					popoverProps={ {
-						position: 'bottom left',
-					} }
-				>
-					{ () => (
-						<MenuGroup>
-							<MenuItemsChoice
-								value={ selectedMenuId }
-								onSelect={ onSelectMenu }
-								choices={ menus.map( ( menu ) => ( {
-									value: menu.id,
-									label: menu.name,
-								} ) ) }
+			{ isMenuSelected && (
+				<div className="edit-navigation-header__actions">
+					<DropdownMenu
+						icon={ null }
+						toggleProps={ {
+							children: __( 'Switch menu' ),
+							'aria-label': __(
+								'Switch menu, or create a new menu'
+							),
+							showTooltip: false,
+							isTertiary: true,
+							disabled: ! menus?.length,
+							__experimentalIsFocusable: true,
+						} }
+						popoverProps={ {
+							className:
+								'edit-navigation-header__menu-switcher-dropdown',
+							position: 'bottom center',
+						} }
+					>
+						{ ( { onClose } ) => (
+							<MenuSwitcher
+								menus={ menus }
+								selectedMenuId={ selectedMenuId }
+								onSelectMenu={ ( menuId ) => {
+									onSelectMenu( menuId );
+									onClose();
+								} }
 							/>
-						</MenuGroup>
-					) }
-				</DropdownMenu>
+						) }
+					</DropdownMenu>
 
-				<Dropdown
-					position="bottom left"
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button
-							isTertiary
-							aria-expanded={ isOpen }
-							onClick={ onToggle }
-						>
-							{ __( 'Add new' ) }
-						</Button>
-					) }
-					renderContent={ () => (
-						<AddMenuForm
-							menus={ menus }
-							onCreate={ onSelectMenu }
-						/>
-					) }
-				/>
-
-				<Dropdown
-					contentClassName="edit-navigation-header__manage-locations"
-					position="bottom left"
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button
-							isTertiary
-							aria-expanded={ isOpen }
-							onClick={ onToggle }
-						>
-							{ __( 'Manage locations' ) }
-						</Button>
-					) }
-					renderContent={ () => <ManageLocations /> }
-				/>
-
-				<SaveButton navigationPost={ navigationPost } />
-
-				<Popover.Slot name="block-toolbar" />
-			</div>
+					<SaveButton navigationPost={ navigationPost } />
+					<PinnedItems.Slot scope="core/edit-navigation" />
+				</div>
+			) }
 		</div>
 	);
 }

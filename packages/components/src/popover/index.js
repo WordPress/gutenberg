@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import {
+	useRef,
+	useState,
+	useLayoutEffect,
+	forwardRef,
+} from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
@@ -24,7 +29,7 @@ import { close } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { computePopoverPosition } from './utils';
+import { computePopoverPosition, offsetIframe } from './utils';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
@@ -36,24 +41,6 @@ import { getAnimateClassName } from '../animate';
  * @type {string}
  */
 const SLOT_NAME = 'Popover';
-
-function offsetIframe( rect, ownerDocument ) {
-	const { defaultView } = ownerDocument;
-	const { frameElement } = defaultView;
-
-	if ( ! frameElement ) {
-		return rect;
-	}
-
-	const iframeRect = frameElement.getBoundingClientRect();
-
-	return new defaultView.DOMRect(
-		rect.left + iframeRect.left,
-		rect.top + iframeRect.top,
-		rect.width,
-		rect.height
-	);
-}
 
 function computeAnchorRect(
 	anchorRefFallback,
@@ -71,7 +58,11 @@ function computeAnchorRect(
 			return;
 		}
 
-		return getAnchorRect( anchorRefFallback.current );
+		const rect = getAnchorRect( anchorRefFallback.current );
+		return offsetIframe(
+			rect,
+			rect.ownerDocument || anchorRefFallback.current.ownerDocument
+		);
 	}
 
 	if ( anchorRef !== false ) {
@@ -237,36 +228,39 @@ function getAnchorDocument( anchor ) {
 	return anchor.ownerDocument;
 }
 
-const Popover = ( {
-	headerTitle,
-	onClose,
-	onKeyDown,
-	children,
-	className,
-	noArrow = true,
-	isAlternate,
-	// Disable reason: We generate the `...contentProps` rest as remainder
-	// of props which aren't explicitly handled by this component.
-	/* eslint-disable no-unused-vars */
-	position = 'bottom right',
-	range,
-	focusOnMount = 'firstElement',
-	anchorRef,
-	shouldAnchorIncludePadding,
-	anchorRect,
-	getAnchorRect,
-	expandOnMobile,
-	animate = true,
-	onClickOutside,
-	onFocusOutside,
-	__unstableStickyBoundaryElement,
-	__unstableSlotName = SLOT_NAME,
-	__unstableObserveElement,
-	__unstableBoundaryParent,
-	__unstableForcePosition,
-	/* eslint-enable no-unused-vars */
-	...contentProps
-} ) => {
+const Popover = (
+	{
+		headerTitle,
+		onClose,
+		onKeyDown,
+		children,
+		className,
+		noArrow = true,
+		isAlternate,
+		// Disable reason: We generate the `...contentProps` rest as remainder
+		// of props which aren't explicitly handled by this component.
+		/* eslint-disable no-unused-vars */
+		position = 'bottom right',
+		range,
+		focusOnMount = 'firstElement',
+		anchorRef,
+		shouldAnchorIncludePadding,
+		anchorRect,
+		getAnchorRect,
+		expandOnMobile,
+		animate = true,
+		onClickOutside,
+		onFocusOutside,
+		__unstableStickyBoundaryElement,
+		__unstableSlotName = SLOT_NAME,
+		__unstableObserveElement,
+		__unstableBoundaryParent,
+		__unstableForcePosition,
+		/* eslint-enable no-unused-vars */
+		...contentProps
+	},
+	ref
+) => {
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
@@ -488,6 +482,7 @@ const Popover = ( {
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
 	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
 	const mergedRefs = useMergeRefs( [
+		ref,
 		containerRef,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
@@ -559,6 +554,7 @@ const Popover = ( {
 		} );
 
 		deprecated( 'Popover onClickOutside prop', {
+			since: '5.3',
 			alternative: 'onFocusOutside',
 		} );
 
@@ -629,10 +625,19 @@ const Popover = ( {
 	return <span ref={ anchorRefFallback }>{ content }</span>;
 };
 
-const PopoverContainer = Popover;
+const PopoverContainer = forwardRef( Popover );
 
-PopoverContainer.Slot = ( { name = SLOT_NAME } ) => (
-	<Slot bubblesVirtually name={ name } className="popover-slot" />
-);
+function PopoverSlot( { name = SLOT_NAME }, ref ) {
+	return (
+		<Slot
+			bubblesVirtually
+			name={ name }
+			className="popover-slot"
+			ref={ ref }
+		/>
+	);
+}
+
+PopoverContainer.Slot = forwardRef( PopoverSlot );
 
 export default PopoverContainer;

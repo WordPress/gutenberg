@@ -19,11 +19,6 @@ export const mediaSources = {
 	siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 };
 
-export const userEvents = {
-	editorSessionTemplateApply: 'editor_session_template_apply',
-	editorSessionTemplatePreview: 'editor_session_template_preview',
-};
-
 export const actionButtons = {
 	missingBlockAlertActionButton: 'missing_block_alert_action_button',
 };
@@ -65,6 +60,15 @@ export function subscribeSetTitle( callback ) {
 
 export function subscribeUpdateHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
+}
+
+export function subscribeFeaturedImageIdNativeUpdated( callback ) {
+	return isAndroid
+		? gutenbergBridgeEvents.addListener(
+				'featuredImageIdNativeUpdated',
+				callback
+		  )
+		: undefined;
 }
 
 /**
@@ -271,12 +275,11 @@ export function requestMediaEditor( mediaUrl, callback ) {
 	);
 }
 
-export function fetchRequest( path ) {
+export function fetchRequest( path, enableCaching = true ) {
+	if ( isAndroid ) {
+		return RNReactNativeGutenbergBridge.fetchRequest( path, enableCaching );
+	}
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
-}
-
-export function logUserEvent( event, properties ) {
-	return RNReactNativeGutenbergBridge.logUserEvent( event, properties );
 }
 
 export function showUserSuggestions() {
@@ -357,6 +360,18 @@ export function mediaFilesBlockReplaceSync( mediaFiles, blockClientId ) {
 	RNReactNativeGutenbergBridge.mediaFilesBlockReplaceSync(
 		mediaFiles,
 		blockClientId
+	);
+}
+
+export function requestFocalPointPickerTooltipShown( callback ) {
+	return RNReactNativeGutenbergBridge.requestFocalPointPickerTooltipShown(
+		callback
+	);
+}
+
+export function setFocalPointPickerTooltipShown( tooltipShown ) {
+	return RNReactNativeGutenbergBridge.setFocalPointPickerTooltipShown(
+		tooltipShown
 	);
 }
 

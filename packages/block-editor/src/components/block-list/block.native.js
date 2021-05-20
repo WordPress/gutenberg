@@ -20,7 +20,7 @@ import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
-import { __experimentalUseEditorFeature as useEditorFeature } from '@wordpress/block-editor';
+import { useSetting } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -42,7 +42,6 @@ function BlockForType( {
 	mergeBlocks,
 	name,
 	onBlockFocus,
-	onCaretVerticalPositionChange,
 	onChange,
 	onDeleteBlock,
 	onReplace,
@@ -50,7 +49,7 @@ function BlockForType( {
 	wrapperProps,
 	blockWidth,
 } ) {
-	const defaultColors = useEditorFeature( 'color.palette' ) || emptyArray;
+	const defaultColors = useSetting( 'color.palette' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
@@ -81,7 +80,6 @@ function BlockForType( {
 				onReplace={ onReplace }
 				insertBlocksAfter={ insertBlocksAfter }
 				mergeBlocks={ mergeBlocks }
-				onCaretVerticalPositionChange={ onCaretVerticalPositionChange }
 				// Block level styles
 				wrapperProps={ wrapperProps }
 				// inherited styles merged with block level styles

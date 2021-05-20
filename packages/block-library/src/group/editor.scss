@@ -1,75 +1,17 @@
 /**
  * Group: All Alignment Settings
  */
-
 .wp-block-group {
-
 	// Ensure not rendering outside the element
 	// as -1px causes overflow-x scrollbars
 	.block-editor-block-list__insertion-point {
 		left: 0;
 		right: 0;
 	}
-
-	// Full Width Blocks
-	// specificity required to only target immediate child Blocks of a Group
-	> .wp-block-group__inner-container > [data-align="full"] {
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	// Full Width Blocks with a background (ie: has padding)
-	&.has-background > .wp-block-group__inner-container > [data-align="full"] {
-		// note: using position `left` causes hoz scrollbars so
-		// we opt to use margin instead
-		// the 30px matches the hoz padding applied in `theme.scss`
-		// added when the Block has a background set
-		margin-left: -30px;
-
-		// 60px here is x2 the hoz padding from `theme.scss` added when
-		// the Block has a background set
-		// note: also duplicated below for full width Groups
-		width: calc(100% + 60px);
-	}
-}
-
-/**
- * Group: Full Width Alignment
- */
-[data-align="full"] .wp-block-group {
-
-	// Non-full Width Blocks
-	// specificity required to only target immediate child Blocks of Group
-	> .wp-block-group__inner-container > .wp-block {
-		padding-left: $block-padding;
-		padding-right: $block-padding;
-
-		@include break-small() {
-			padding-left: 0;
-			padding-right: 0;
-		}
-	}
-
-	// Full Width Blocks
-	// specificity required to only target immediate child Blocks of Group
-	> .wp-block-group__inner-container > [data-align="full"] {
-		padding-right: 0;
-		padding-left: 0;
-		left: 0;
-		width: 100%;
-		max-width: none;
-	}
-
-	// Full Width Blocks with a background (ie: has padding)
-	// note: also duplicated above for all Group widths
-	&.has-background > .wp-block-group__inner-container > [data-align="full"] {
-		width: calc(100% + 60px);
-	}
 }
 
 // Place block list appender in the same place content will appear.
 [data-type="core/group"].is-selected {
-
 	.block-list-appender {
 		margin-left: 0;
 		margin-right: 0;

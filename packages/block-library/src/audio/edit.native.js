@@ -12,7 +12,6 @@ import {
 	PanelBody,
 	SelectControl,
 	ToggleControl,
-	withNotices,
 	ToolbarButton,
 	ToolbarGroup,
 	AudioPlayer,
@@ -25,10 +24,13 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -39,10 +41,8 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 function AudioEdit( {
 	attributes,
-	noticeOperations,
 	setAttributes,
 	isSelected,
-	noticeUI,
 	insertBlocksAfter,
 	onFocus,
 	onBlur,
@@ -56,9 +56,17 @@ function AudioEdit( {
 		setAttributes( { id: mediaId, src: mediaUrl } );
 	};
 
+	const { wasBlockJustInserted } = useSelect( ( select ) => ( {
+		wasBlockJustInserted: select( blockEditorStore ).wasBlockJustInserted(
+			clientId,
+			'inserter_menu'
+		),
+	} ) );
+
+	const { createErrorNotice } = useDispatch( noticesStore );
+
 	const onError = () => {
-		// TODO: Set up error state
-		onUploadError( __( 'Error' ) );
+		createErrorNotice( __( 'Failed to insert audio file.' ) );
 	};
 
 	function toggleAttribute( attribute ) {
@@ -69,11 +77,6 @@ function AudioEdit( {
 
 	function onSelectURL() {
 		// TODO: Set up add audio from URL flow
-	}
-
-	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
 	}
 
 	function onSelectAudio( media ) {
@@ -108,9 +111,8 @@ function AudioEdit( {
 					accept="audio/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
-					notices={ noticeUI }
-					onError={ onUploadError }
 					onFocus={ onFocus }
+					autoOpenMediaUpload={ isSelected && wasBlockJustInserted }
 				/>
 			</View>
 		);
@@ -179,6 +181,9 @@ function AudioEdit( {
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ __(
+								'Autoplay may cause usability issues for some users.'
+							) }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
@@ -200,6 +205,7 @@ function AudioEdit( {
 								{ value: 'metadata', label: __( 'Metadata' ) },
 								{ value: 'none', label: __( 'None' ) },
 							] }
+							hideCancelButton={ true }
 						/>
 					</PanelBody>
 				</InspectorControls>
@@ -233,4 +239,4 @@ function AudioEdit( {
 		</TouchableWithoutFeedback>
 	);
 }
-export default withNotices( AudioEdit );
+export default AudioEdit;

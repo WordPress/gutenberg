@@ -40,7 +40,7 @@ function usePostContentExcerpt( wordCount, postId, postType ) {
 	}, [ rawPostContent, wordCount ] );
 }
 
-function PostExcerptEditor( {
+export default function PostExcerptEditor( {
 	attributes: { textAlign, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
@@ -63,6 +63,27 @@ function PostExcerptEditor( {
 		} ),
 	} );
 
+	if ( ! postType || ! postId ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Post excerpt block: no post found.' ) }
+				</Warning>
+			</div>
+		);
+	}
+	const readMoreLink = (
+		<RichText
+			className="wp-block-post-excerpt__more-link"
+			tagName="a"
+			aria-label={ __( '"Read more" link text' ) }
+			placeholder={ __( 'Add "read more" link text' ) }
+			value={ moreText }
+			onChange={ ( newMoreText ) =>
+				setAttributes( { moreText: newMoreText } )
+			}
+		/>
+	);
 	return (
 		<>
 			<BlockControls>
@@ -114,49 +135,12 @@ function PostExcerptEditor( {
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
-						<RichText
-							tagName="a"
-							aria-label={ __( 'Read more link text' ) }
-							placeholder={ __( 'Read more…' ) }
-							value={ moreText }
-							onChange={ ( newMoreText ) =>
-								setAttributes( { moreText: newMoreText } )
-							}
-						/>
+						{ readMoreLink }
 					</p>
 				) : (
-					<RichText
-						tagName="a"
-						aria-label={ __( 'Read more link text' ) }
-						placeholder={ __( 'Read more…' ) }
-						value={ moreText }
-						onChange={ ( newMoreText ) =>
-							setAttributes( { moreText: newMoreText } )
-						}
-					/>
+					readMoreLink
 				) }
 			</div>
 		</>
-	);
-}
-
-export default function PostExcerptEdit( {
-	attributes,
-	setAttributes,
-	isSelected,
-	context,
-} ) {
-	if ( ! context.postType || ! context.postId ) {
-		return (
-			<Warning>{ __( 'Post excerpt block: no post found.' ) }</Warning>
-		);
-	}
-	return (
-		<PostExcerptEditor
-			attributes={ attributes }
-			setAttributes={ setAttributes }
-			isSelected={ isSelected }
-			context={ context }
-		/>
 	);
 }

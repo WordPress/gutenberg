@@ -14,6 +14,7 @@ export default function DefaultSidebar( {
 	children,
 	closeLabel,
 	header,
+	headerClassName,
 } ) {
 	return (
 		<>
@@ -25,6 +26,7 @@ export default function DefaultSidebar( {
 				icon={ icon }
 				closeLabel={ closeLabel }
 				header={ header }
+				headerClassName={ headerClassName }
 			>
 				{ children }
 			</ComplementaryArea>

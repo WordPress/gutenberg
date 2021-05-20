@@ -9,12 +9,11 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -27,6 +26,7 @@ function HeadingEdit( {
 	mergeBlocks,
 	onReplace,
 	mergedStyle,
+	clientId,
 } ) {
 	const { textAlign, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
@@ -39,16 +39,14 @@ function HeadingEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<HeadingLevelDropdown
-						selectedLevel={ level }
-						onChange={ ( newLevel ) =>
-							setAttributes( { level: newLevel } )
-						}
-					/>
-				</ToolbarGroup>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<HeadingLevelDropdown
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
+				/>
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );
@@ -61,20 +59,28 @@ function HeadingEdit( {
 				value={ content }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				onSplit={ ( value ) => {
-					if ( ! value ) {
-						return createBlock( 'core/paragraph' );
+				onSplit={ ( value, isOriginal ) => {
+					let block;
+
+					if ( isOriginal || value ) {
+						block = createBlock( 'core/heading', {
+							...attributes,
+							content: value,
+						} );
+					} else {
+						block = createBlock( 'core/paragraph' );
 					}
 
-					return createBlock( 'core/heading', {
-						...attributes,
-						content: value,
-					} );
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				aria-label={ __( 'Heading text' ) }
-				placeholder={ placeholder || __( 'Write heading…' ) }
+				placeholder={ placeholder || __( 'Heading' ) }
 				textAlign={ textAlign }
 				{ ...blockProps }
 			/>

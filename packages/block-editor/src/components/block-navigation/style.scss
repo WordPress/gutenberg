@@ -15,17 +15,40 @@
 	border-collapse: collapse;
 	padding: 0;
 	margin: 0;
+
+	// Move upwards when in modal.
+	.components-modal__content & {
+		margin: (-$grid-unit-15) (-$grid-unit-15 / 2) 0;
+		width: calc(100% + #{ $grid-unit-15 });
+	}
 }
 
 .block-editor-block-navigation-leaf {
 	// Use position relative for row animation.
 	position: relative;
 
-	&.is-selected .block-editor-block-navigation-block-contents,
-	&.is-selected:hover .block-editor-block-navigation-block-contents,
-	&.is-selected:focus .block-editor-block-navigation-block-contents {
-		background: $gray-900;
+	&.is-selected .block-editor-block-navigation-block-contents {
+		background: var(--wp-admin-theme-color);
 		color: $white;
+	}
+	&.is-selected .block-editor-block-navigation-block-contents:focus {
+		box-shadow:
+			inset 0 0 0 1px $white,
+			0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	&.is-branch-selected.is-selected .block-editor-block-navigation-block-contents {
+		border-radius: 2px 2px 0 0;
+	}
+	&.is-branch-selected:not(.is-selected) .block-editor-block-navigation-block-contents {
+		// Lighten a CSS variable without introducing a new SASS variable
+		background:
+			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
+			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
+		border-radius: 0;
+	}
+	&.is-branch-selected.is-last-of-selected-branch .block-editor-block-navigation-block-contents {
+		border-radius: 0 0 2px 2px;
 	}
 
 	&.is-dragging {
@@ -37,17 +60,17 @@
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: ($grid-unit-15 / 2);
+		padding: ($grid-unit-15 / 2) $grid-unit-15;
 		text-align: left;
 		color: $gray-900;
 		border-radius: 2px;
 		position: relative;
 		white-space: nowrap;
 
-		&:hover {
-			background: $gray-100;
+		&:hover,
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
-
 		&:focus {
 			z-index: 1;
 		}
@@ -98,7 +121,8 @@
 
 	.block-editor-block-icon {
 		align-self: flex-start;
-		margin-right: 6px;
+		margin-right: ( $grid-unit-05 * 2.5 ); // 10px is off the 4px grid, but required for visual alignment between block name and subsequent nested icon
+		width: 20px;
 	}
 
 	.block-editor-block-navigation-block__menu-cell,
@@ -116,7 +140,11 @@
 		vertical-align: top;
 		@include reduce-motion("transition");
 
+		// Show on hover, visible, and show above to keep the hit area size.
+		&:hover,
 		&.is-visible {
+			position: relative;
+			z-index: 1;
 			opacity: 1;
 			@include edit-post__fade-in-animation;
 		}
@@ -140,29 +168,31 @@
 		align-items: center;
 	}
 
-	// Keep the tap target large but the focus target small
+	// Keep the tap target large but the focus target small.
 	.block-editor-block-mover-button {
 		position: relative;
 		width: $button-size;
 		height: $button-size-small;
 
-		// Position the icon
+		// Position the icon.
 		svg {
 			position: relative;
 			height: $button-size-small;
 		}
 
 		&.is-up-button {
+			margin-top: -$grid-unit-15 / 2;
 			align-items: flex-end;
 			svg {
-				bottom: -4px;
+				bottom: -$grid-unit-05;
 			}
 		}
 
 		&.is-down-button {
+			margin-bottom: -$grid-unit-15 / 2;
 			align-items: flex-start;
 			svg {
-				top: -4px;
+				top: -$grid-unit-05;
 			}
 		}
 
@@ -231,5 +261,5 @@
 
 .block-editor-block-navigator-indentation {
 	flex-shrink: 0;
-	width: 18px;
+	width: $grid-unit-30 + $grid-unit-05; // Indent a full icon size, plus 4px which optically aligns child icons to the text label above.
 }

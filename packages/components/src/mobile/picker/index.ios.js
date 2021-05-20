@@ -7,7 +7,9 @@ import { ActionSheetIOS } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, forwardRef, useContext } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { BottomSheetContext } from '@wordpress/components';
 
 class Picker extends Component {
 	presentPicker() {
@@ -18,6 +20,9 @@ class Picker extends Component {
 			destructiveButtonIndex,
 			disabledButtonIndices,
 			getAnchor,
+			isBottomSheetOpened,
+			closeBottomSheet,
+			onHandleClosingBottomSheet,
 		} = this.props;
 		const labels = options.map( ( { label } ) => label );
 		const fullOptions = [ __( 'Cancel' ) ].concat( labels );
@@ -36,7 +41,15 @@ class Picker extends Component {
 					return;
 				}
 				const selected = options[ buttonIndex - 1 ];
-				onChange( selected.value );
+
+				if ( selected.requiresModal && isBottomSheetOpened ) {
+					onHandleClosingBottomSheet( () => {
+						onChange( selected.value );
+					} );
+					closeBottomSheet();
+				} else {
+					onChange( selected.value );
+				}
 			}
 		);
 	}
@@ -46,4 +59,22 @@ class Picker extends Component {
 	}
 }
 
-export default Picker;
+const PickerComponent = forwardRef( ( props, ref ) => {
+	const isBottomSheetOpened = useSelect( ( select ) =>
+		select( 'core/edit-post' ).isEditorSidebarOpened()
+	);
+	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
+	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
+
+	return (
+		<Picker
+			ref={ ref }
+			{ ...props }
+			isBottomSheetOpened={ isBottomSheetOpened }
+			closeBottomSheet={ closeGeneralSidebar }
+			onHandleClosingBottomSheet={ onHandleClosingBottomSheet }
+		/>
+	);
+} );
+
+export default PickerComponent;

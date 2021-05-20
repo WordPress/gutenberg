@@ -26,6 +26,8 @@ module.exports = async (
 		description,
 		dashicon,
 		category,
+		attributes,
+		supports,
 		author,
 		license,
 		licenseURI,
@@ -55,6 +57,8 @@ module.exports = async (
 		description,
 		dashicon,
 		category,
+		attributes,
+		supports,
 		version,
 		author,
 		license,
@@ -114,8 +118,8 @@ module.exports = async (
 		code( '  $ npm run build' );
 		info( '    Builds the code for production.' );
 		info( '' );
-		code( '  $ npm run format:js' );
-		info( '    Formats JavaScript files.' );
+		code( '  $ npm run format' );
+		info( '    Formats files.' );
 		info( '' );
 		code( '  $ npm run lint:css' );
 		info( '    Lints CSS files.' );

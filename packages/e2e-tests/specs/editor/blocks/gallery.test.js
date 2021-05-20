@@ -52,6 +52,44 @@ describe( 'Gallery', () => {
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 
+	it( 'gallery caption can be edited', async () => {
+		const galleryCaption = 'Tested gallery caption';
+
+		await insertBlock( 'Gallery' );
+		await upload( '.wp-block-gallery input[type="file"]' );
+
+		await page.click( '.wp-block-gallery>.blocks-gallery-caption' );
+		await page.keyboard.type( galleryCaption );
+
+		expect( await getEditedPostContent() ).toMatch(
+			new RegExp( `<figcaption.*?>${ galleryCaption }</figcaption>` )
+		);
+	} );
+
+	it( "uploaded images' captions can be edited", async () => {
+		await insertBlock( 'Gallery' );
+		await upload( '.wp-block-gallery input[type="file"]' );
+
+		const figureElement = await page.waitForSelector(
+			'.blocks-gallery-item figure'
+		);
+
+		await figureElement.click();
+
+		const captionElement = await figureElement.$(
+			'.block-editor-rich-text__editable'
+		);
+
+		const caption = 'Tested caption';
+
+		await captionElement.click();
+		await page.keyboard.type( caption );
+
+		expect( await getEditedPostContent() ).toMatch(
+			new RegExp( `<figcaption.*?>${ caption }</figcaption>` )
+		);
+	} );
+
 	// Disable reason:
 	// This test would be good to enable, but the media modal contains an
 	// invalid role, which is causing Axe tests to fail:

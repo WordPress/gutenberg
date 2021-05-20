@@ -23,10 +23,14 @@
 @import "./media-text/style.scss";
 @import "./navigation/style.scss";
 @import "./navigation-link/style.scss";
+@import "./home-link/style.scss";
 @import "./page-list/style.scss";
 @import "./paragraph/style.scss";
 @import "./post-author/style.scss";
+@import "./post-comments/style.scss";
 @import "./post-comments-form/style.scss";
+@import "./post-excerpt/style.scss";
+@import "./post-title/style.scss";
 @import "./preformatted/style.scss";
 @import "./pullquote/style.scss";
 @import "./query-loop/style.scss";
@@ -38,7 +42,6 @@
 @import "./site-logo/style.scss";
 @import "./social-links/style.scss";
 @import "./spacer/style.scss";
-@import "./subhead/style.scss";
 @import "./tag-cloud/style.scss";
 @import "./table/style.scss";
 @import "./text-columns/style.scss";

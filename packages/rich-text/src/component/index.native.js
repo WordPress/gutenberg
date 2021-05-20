@@ -117,6 +117,12 @@ export class RichText extends Component {
 		this.convertFontSizeFromString = this.convertFontSizeFromString.bind(
 			this
 		);
+		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
+			this
+		);
+		this.shouldDropEventFromAztec = this.shouldDropEventFromAztec.bind(
+			this
+		);
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -221,7 +227,7 @@ export class RichText extends Component {
 
 	insertString( record, string ) {
 		if ( record && string ) {
-			this.lastEventCount = undefined;
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			const toInsert = insert( record, string );
 			this.onFormatChange( toInsert );
 		}
@@ -285,6 +291,10 @@ export class RichText extends Component {
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 	onChangeFromAztec( event ) {
+		if ( this.shouldDropEventFromAztec( event, 'onChange' ) ) {
+			return;
+		}
+
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
@@ -365,6 +375,10 @@ export class RichText extends Component {
 	}
 
 	handleDelete( event ) {
+		if ( this.shouldDropEventFromAztec( event, 'handleDelete' ) ) {
+			return;
+		}
+
 		const { keyCode } = event;
 
 		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
@@ -592,7 +606,22 @@ export class RichText extends Component {
 		this.props.onSelectionChange( start, end );
 	}
 
+	shouldDropEventFromAztec( event, logText ) {
+		const shouldDrop =
+			! this.isIOS && event.nativeEvent.eventCount <= this.lastEventCount;
+		if ( shouldDrop ) {
+			window.console.log(
+				`Dropping ${ logText } from Aztec as its event counter is older than latest sent to the native side. Got ${ event.nativeEvent.eventCount } but lastEventCount is ${ this.lastEventCount }.`
+			);
+		}
+		return shouldDrop;
+	}
+
 	onSelectionChangeFromAztec( start, end, text, event ) {
+		if ( this.shouldDropEventFromAztec( event, 'onSelectionChange' ) ) {
+			return;
+		}
+
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
 		const realStart = Math.min( start, end );
@@ -667,13 +696,28 @@ export class RichText extends Component {
 		return value;
 	}
 
+	manipulateEventCounterToForceNativeToRefresh() {
+		if ( this.isIOS ) {
+			this.lastEventCount = undefined;
+			return;
+		}
+
+		if ( typeof this.lastEventCount !== 'undefined' ) {
+			this.lastEventCount += 100; // bump by a hundred, hopefully native hasn't bombarded the JS side in the meantime.
+		} else {
+			window.console.warn(
+				"Tried to bump the RichText native event counter but was 'undefined'. Aborting bump."
+			);
+		}
+	}
+
 	shouldComponentUpdate( nextProps ) {
 		if (
 			nextProps.tagName !== this.props.tagName ||
 			nextProps.reversed !== this.props.reversed ||
 			nextProps.start !== this.props.start
 		) {
-			this.lastEventCount = undefined;
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			this.value = undefined;
 			return true;
 		}
@@ -703,7 +747,7 @@ export class RichText extends Component {
 				this.needsSelectionUpdate = true;
 			}
 
-			this.lastEventCount = undefined; // force a refresh on the native side
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 		}
 
 		if ( ! this.comesFromAztec ) {
@@ -715,7 +759,7 @@ export class RichText extends Component {
 				nextProps.__unstableIsSelected
 			) {
 				this.needsSelectionUpdate = true;
-				this.lastEventCount = undefined; // force a refresh on the native side
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
 		}
 
@@ -748,7 +792,6 @@ export class RichText extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
-			this.lastEventCount = undefined;
 		}
 		const { __unstableIsSelected: isSelected } = this.props;
 
@@ -756,6 +799,12 @@ export class RichText extends Component {
 
 		if ( isSelected && ! prevIsSelected ) {
 			this._editor.focus();
+			// Update selection props explicitly when component is selected as Aztec won't call onSelectionChange
+			// if its internal value hasn't change. When created, default value is 0, 0
+			this.onSelectionChange(
+				this.props.selectionStart || 0,
+				this.props.selectionEnd || 0
+			);
 		} else if ( ! isSelected && prevIsSelected ) {
 			this._editor.blur();
 		}
@@ -766,7 +815,7 @@ export class RichText extends Component {
 		let value = this.valueToFormat( record );
 
 		if ( value === undefined ) {
-			this.lastEventCount = undefined; // force a refresh on the native side
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			value = '';
 		}
 		// On android if content is empty we need to send no content or else the placeholder will not show.
@@ -787,7 +836,7 @@ export class RichText extends Component {
 					extraAttributes += ` start=${ this.props.start }`;
 				}
 			}
-			value = `<${ tagName } ${ extraAttributes }>${ value }</${ tagName }>`;
+			value = `<${ tagName }${ extraAttributes }>${ value }</${ tagName }>`;
 		}
 		return value;
 	}
@@ -920,9 +969,13 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
-					triggerKeyCodes={ this.suggestionOptions().map(
-						( op ) => op.triggerChar
-					) }
+					triggerKeyCodes={
+						disableEditingMenu
+							? []
+							: this.suggestionOptions().map(
+									( op ) => op.triggerChar
+							  )
+					}
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }

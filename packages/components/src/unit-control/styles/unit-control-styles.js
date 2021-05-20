@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { color, rtl } from '../../utils/style-mixins';
+import { COLORS, rtl } from '../../utils';
 import NumberControl from '../../number-control';
 
 export const Root = styled.div`
@@ -77,7 +77,7 @@ const baseUnitLabelStyles = ( props ) => {
 		border-radius: 2px;
 		border: none;
 		box-sizing: border-box;
-		color: ${ color( 'darkGray.500' ) };
+		color: ${ COLORS.darkGray[ 500 ] };
 		display: block;
 		font-size: 8px;
 		line-height: 1;
@@ -110,11 +110,11 @@ export const UnitSelect = styled.select`
 		border: 1px solid transparent;
 
 		&:hover {
-			background-color: ${ color( 'lightGray.300' ) };
+			background-color: ${ COLORS.lightGray[ 300 ] };
 		}
 
 		&:focus {
-			border-color: ${ color( 'ui.borderFocus' ) };
+			border-color: ${ COLORS.ui.borderFocus };
 			outline: 2px solid transparent;
 			outline-offset: 0;
 		}

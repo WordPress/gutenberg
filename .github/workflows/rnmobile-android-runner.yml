@@ -1,52 +1,61 @@
 name: React Native E2E Tests (Android)
 
 on:
-  pull_request:
-    paths-ignore:
-    - '**.md'
-  push:
-    branches: [master]
-    paths-ignore:
-    - '**.md'
+    pull_request:
+    push:
+        branches: [trunk]
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        native-test-name: [
-          gutenberg-editor-gallery
-        ]
+    test:
+        runs-on: macos-latest
+        strategy:
+            matrix:
+                native-test-name: [gutenberg-editor-initial-html]
 
-    steps:
-    - name: checkout
-      uses: actions/checkout@v2
+        steps:
+            - name: checkout
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-    - name: Restore npm cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-npm-
+            - name: Use Node.js 14.x
+              uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
+              with:
+                  node-version: 14.x
 
-    - run: npm ci
+            - name: Restore npm cache
+              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
 
-    - name: Restore Gradle cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-        restore-keys: ${{ runner.os }}-gradle
+            - run: npm ci
 
-    - uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 28
-        profile: pixel_xl
-        script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
+            - name: Restore Gradle cache
+              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
+              with:
+                  path: ~/.gradle/caches
+                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
 
-    - uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: android-screen-recordings
-        path: packages/react-native-editor/android-screen-recordings
+            - uses: reactivecircus/android-emulator-runner@d2799957d660add41c61a5103e2fbb9e2889eb73 # v2.15.0
+              with:
+                  api-level: 28
+                  profile: pixel_xl
+                  script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
+
+            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              if: always()
+              with:
+                  name: android-screen-recordings
+                  path: packages/react-native-editor/android-screen-recordings
+
+            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              if: always()
+              with:
+                  name: appium-logs
+                  path: packages/react-native-editor/appium-out.log

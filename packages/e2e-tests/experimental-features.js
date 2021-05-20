@@ -129,4 +129,30 @@ export const siteEditor = {
 
 		await elementToClick.click();
 	},
+
+	async getEditedPostContent() {
+		return page.evaluate( async () => {
+			const postId = window.wp.data
+				.select( 'core/edit-site' )
+				.getEditedPostId();
+			const postType = window.wp.data
+				.select( 'core/edit-site' )
+				.getEditedPostType();
+			const record = window.wp.data
+				.select( 'core' )
+				.getEditedEntityRecord( 'postType', postType, postId );
+			if ( record ) {
+				if ( typeof record.content === 'function' ) {
+					return record.content( record );
+				} else if ( record.blocks ) {
+					return window.wp.blocks.__unstableSerializeAndClean(
+						record.blocks
+					);
+				} else if ( record.content ) {
+					return record.content;
+				}
+			}
+			return '';
+		} );
+	},
 };

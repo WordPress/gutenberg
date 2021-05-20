@@ -10,7 +10,8 @@ For example, a `mousedown` event in a modal container can propagate to the surro
 modal to be interacted with.
 
 The current isolated events are:
-- mousedown - This prevents UI interaction with other `mousedown` event handlers, such as selection
+
+-   mousedown - This prevents UI interaction with other `mousedown` event handlers, such as selection
 
 ## Usage
 

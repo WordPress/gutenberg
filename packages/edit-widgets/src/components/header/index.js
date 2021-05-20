@@ -3,16 +3,16 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { Button, ToolbarItem, VisuallyHidden } from '@wordpress/components';
 import {
 	BlockNavigationDropdown,
-	BlockToolbar,
 	NavigableToolbar,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PinnedItems } from '@wordpress/interface';
-import { useViewportMatch } from '@wordpress/compose';
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -20,12 +20,13 @@ import { useRef } from '@wordpress/element';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
+import MoreMenu from '../more-menu';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
 
 function Header() {
+	const isMediumViewport = useViewportMatch( 'medium' );
 	const inserterButton = useRef();
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const widgetAreaClientId = useLastSelectedWidgetArea();
 	const isLastSelectedWidgetAreaOpen = useSelect(
 		( select ) =>
@@ -40,7 +41,7 @@ function Header() {
 	const { setIsWidgetAreaOpen, setIsInserterOpened } = useDispatch(
 		editWidgetsStore
 	);
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const handleClick = () => {
 		if ( isInserterOpened ) {
 			// Focusing the inserter button closes the inserter popover
@@ -65,9 +66,19 @@ function Header() {
 		<>
 			<div className="edit-widgets-header">
 				<div className="edit-widgets-header__navigable-toolbar-wrapper">
-					<h1 className="edit-widgets-header__title">
-						{ __( 'Widgets' ) }
-					</h1>
+					{ isMediumViewport && (
+						<h1 className="edit-widgets-header__title">
+							{ __( 'Widgets' ) }
+						</h1>
+					) }
+					{ ! isMediumViewport && (
+						<VisuallyHidden
+							as="h1"
+							className="edit-widgets-header__title"
+						>
+							{ __( 'Widgets' ) }
+						</VisuallyHidden>
+					) }
 					<NavigableToolbar
 						className="edit-widgets-header-toolbar"
 						aria-label={ __( 'Document tools' ) }
@@ -90,21 +101,21 @@ function Header() {
 								'Generic label for block inserter button'
 							) }
 						/>
-						<ToolbarItem as={ UndoButton } />
-						<ToolbarItem as={ RedoButton } />
-						<ToolbarItem as={ BlockNavigationDropdown } />
+						{ isMediumViewport && (
+							<>
+								<UndoButton />
+								<RedoButton />
+								<ToolbarItem as={ BlockNavigationDropdown } />
+							</>
+						) }
 					</NavigableToolbar>
 				</div>
 				<div className="edit-widgets-header__actions">
 					<SaveButton />
 					<PinnedItems.Slot scope="core/edit-widgets" />
+					<MoreMenu />
 				</div>
 			</div>
-			{ ! isLargeViewport && (
-				<div className="edit-widgets-header__block-toolbar">
-					<BlockToolbar hideDragHandle />
-				</div>
-			) }
 		</>
 	);
 }

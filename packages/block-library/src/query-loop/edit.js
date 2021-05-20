@@ -14,12 +14,10 @@ import {
 	BlockPreview,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import { useQueryContext } from '../query';
+import { Spinner } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
@@ -43,18 +41,18 @@ export default function QueryLoopEdit( {
 			sticky,
 			inherit,
 		} = {},
-		queryContext = [ {} ],
+		queryContext = [ { page: 1 } ],
 		templateSlug,
-		layout: { type: layoutType = 'flex', columns = 1 } = {},
+		displayLayout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
 } ) {
-	const [ { page } ] = useQueryContext() || queryContext;
+	const [ { page } ] = queryContext;
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
 
 	const { posts, blocks } = useSelect(
 		( select ) => {
-			const { getEntityRecords } = select( 'core' );
-			const { getBlocks } = select( 'core/block-editor' );
+			const { getEntityRecords } = select( coreStore );
+			const { getBlocks } = select( blockEditorStore );
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
 				categories: categoryIds,
@@ -130,7 +128,11 @@ export default function QueryLoopEdit( {
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 
 	if ( ! posts ) {
-		return <p { ...blockProps }>{ __( 'Loading…' ) }</p>;
+		return (
+			<p { ...blockProps }>
+				<Spinner />
+			</p>
+		);
 	}
 
 	if ( ! posts.length ) {

@@ -10,7 +10,7 @@ Install the module:
 npm install @wordpress/i18n --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Usage
 
@@ -35,11 +35,45 @@ _Parameters_
 
 -   _initialData_ `[LocaleData]`: Locale data configuration.
 -   _initialDomain_ `[string]`: Domain for which configuration applies.
--   _hooks_ `[ApplyFiltersInterface]`: Hooks implementation.
+-   _hooks_ `[Hooks]`: Hooks implementation.
 
 _Returns_
 
 -   `I18n`: I18n instance
+
+<a name="defaultI18n" href="#defaultI18n">#</a> **defaultI18n**
+
+Default, singleton instance of `I18n`.
+
+<a name="getLocaleData" href="#getLocaleData">#</a> **getLocaleData**
+
+Returns locale data by domain in a Jed-formatted JSON object shape.
+
+_Related_
+
+-   <http://messageformat.github.io/Jed/>
+
+_Parameters_
+
+-   _domain_ `[string]`: Domain for which to get the data.
+
+_Returns_
+
+-   `LocaleData`: Locale data.
+
+<a name="hasTranslation" href="#hasTranslation">#</a> **hasTranslation**
+
+Check if there is a translation for a given string (in singular form).
+
+_Parameters_
+
+-   _single_ `string`: Singular form of the string to look up.
+-   _context_ `[string]`: Context information for the translators.
+-   _domain_ `[string]`: Domain to retrieve the translated text.
+
+_Returns_
+
+-   `boolean`: Whether the translation exists or not.
 
 <a name="isRTL" href="#isRTL">#</a> **isRTL**
 
@@ -53,6 +87,20 @@ including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`f
 _Returns_
 
 -   `boolean`: Whether locale is RTL.
+
+<a name="resetLocaleData" href="#resetLocaleData">#</a> **resetLocaleData**
+
+Resets all current Tannin instance locale data and sets the specified
+locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
+
+_Related_
+
+-   <http://messageformat.github.io/Jed/>
+
+_Parameters_
+
+-   _data_ `[LocaleData]`: Locale data configuration.
+-   _domain_ `[string]`: Domain for which configuration applies.
 
 <a name="setLocaleData" href="#setLocaleData">#</a> **setLocaleData**
 
@@ -75,7 +123,7 @@ original format string is returned.
 
 _Related_
 
--   <http://www.diveintojavascript.com/projects/javascript-sprintf>
+-   <https://www.npmjs.com/package/sprintf-js>
 
 _Parameters_
 
@@ -85,6 +133,18 @@ _Parameters_
 _Returns_
 
 -   `string`: The formatted string.
+
+<a name="subscribe" href="#subscribe">#</a> **subscribe**
+
+Subscribes to changes of locale data
+
+_Parameters_
+
+-   _callback_ `SubscribeCallback`: Subscription callback
+
+_Returns_
+
+-   `UnsubscribeCallback`: Unsubscribe callback
 
 <a name="_n" href="#_n">#</a> **\_n**
 

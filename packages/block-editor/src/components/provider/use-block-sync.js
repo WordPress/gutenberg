@@ -55,10 +55,7 @@ import { store as blockEditorStore } from '../../store';
  *                                is used to initalize the block-editor store
  *                                and for resetting the blocks to incoming
  *                                changes like undo.
- * @param {Object} props.selectionStart The selection start vlaue from the
- *                                controlling component.
- * @param {Object} props.selectionEnd The selection end vlaue from the
- *                                controlling component.
+ * @param {Object} props.selection The selection state responsible to restore the selection on undo/redo.
  * @param {onBlockUpdate} props.onChange Function to call when a persistent
  *                                change has been made in the block-editor blocks
  *                                for the given clientId. For example, after
@@ -72,8 +69,7 @@ import { store as blockEditorStore } from '../../store';
 export default function useBlockSync( {
 	clientId = null,
 	value: controlledBlocks,
-	selectionStart: controlledSelectionStart,
-	selectionEnd: controlledSelectionEnd,
+	selection: controlledSelection,
 	onChange = noop,
 	onInput = noop,
 } ) {
@@ -151,10 +147,11 @@ export default function useBlockSync( {
 			pendingChanges.current.outgoing = [];
 			setControlledBlocks();
 
-			if ( controlledSelectionStart && controlledSelectionEnd ) {
+			if ( controlledSelection ) {
 				resetSelection(
-					controlledSelectionStart,
-					controlledSelectionEnd
+					controlledSelection.selectionStart,
+					controlledSelection.selectionEnd,
+					controlledSelection.initialPosition
 				);
 			}
 		}
@@ -164,6 +161,7 @@ export default function useBlockSync( {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
+			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
 		} = registry.select( blockEditorStore );
@@ -223,8 +221,11 @@ export default function useBlockSync( {
 					? onChangeRef.current
 					: onInputRef.current;
 				updateParent( blocks, {
-					selectionStart: getSelectionStart(),
-					selectionEnd: getSelectionEnd(),
+					selection: {
+						selectionStart: getSelectionStart(),
+						selectionEnd: getSelectionEnd(),
+						initialPosition: getSelectedBlocksInitialCaretPosition(),
+					},
 				} );
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;

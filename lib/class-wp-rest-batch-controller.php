@@ -7,7 +7,7 @@
  */
 
 /**
- * Core class used to perform abtch requests.
+ * Core class used to perform batch requests.
  *
  * @see WP_REST_Controller
  */

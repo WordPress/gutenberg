@@ -7,18 +7,14 @@ import { castArray, flow, noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	ClipboardButton,
-} from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { useCopyToClipboard } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,7 +22,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import BlockActions from '../block-actions';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
-import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
+import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 
 const POPOVER_PROPS = {
@@ -34,6 +30,11 @@ const POPOVER_PROPS = {
 	position: 'bottom right',
 	isAlternate: true,
 };
+
+function CopyMenuItem( { blocks, onCopy } ) {
+	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
+	return <MenuItem ref={ ref }>{ __( 'Copy' ) }</MenuItem>;
+}
 
 export function BlockSettingsDropdown( {
 	clientIds,
@@ -104,7 +105,7 @@ export function BlockSettingsDropdown( {
 					{ ( { onClose } ) => (
 						<>
 							<MenuGroup>
-								<__experimentalBlockSettingsMenuFirstItem.Slot
+								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
 								{ count === 1 && (
@@ -112,14 +113,10 @@ export function BlockSettingsDropdown( {
 										clientId={ firstBlockClientId }
 									/>
 								) }
-								<ClipboardButton
-									text={ () => serialize( blocks ) }
-									role="menuitem"
-									className="components-menu-item__button"
+								<CopyMenuItem
+									blocks={ blocks }
 									onCopy={ onCopy }
-								>
-									{ __( 'Copy' ) }
-								</ClipboardButton>
+								/>
 								{ canDuplicate && (
 									<MenuItem
 										onClick={ flow(

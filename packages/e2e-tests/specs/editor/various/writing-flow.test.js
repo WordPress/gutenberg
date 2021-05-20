@@ -558,6 +558,8 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await clickBlockToolbarButton( 'Align' );
 		await clickButton( 'Wide width' );
+
+		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Confirm correct setup.
@@ -588,5 +590,39 @@ describe( 'Writing Flow', () => {
 		);
 
 		expect( type ).toBe( 'core/image' );
+	} );
+
+	it( 'should only consider the content as one tab stop', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/table' );
+		await page.keyboard.press( 'Enter' );
+		// Move into the placeholder UI.
+		await page.keyboard.press( 'ArrowDown' );
+		// Tab to the "Create table" button.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		// Create the table.
+		await page.keyboard.press( 'Space' );
+		// Return focus after focus loss. This should be fixed.
+		await page.keyboard.press( 'Tab' );
+		// Navigate to the second cell.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '2' );
+		// Confirm correct setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// The content should only have one tab stop.
+		await page.keyboard.press( 'Tab' );
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Post' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Table' );
 	} );
 } );

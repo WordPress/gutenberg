@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import {
 	Icon,
@@ -43,7 +43,7 @@ function PostFeaturedImageDisplay( {
 	);
 	const media = useSelect(
 		( select ) =>
-			featuredImage && select( 'core' ).getMedia( featuredImage ),
+			featuredImage && select( coreStore ).getMedia( featuredImage ),
 		[ featuredImage ]
 	);
 	const onSelectImage = ( value ) => {
@@ -100,7 +100,7 @@ function PostFeaturedImageDisplay( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls>
+			<BlockControls group="other">
 				{ !! media && (
 					<MediaReplaceFlow
 						mediaId={ featuredImage }
@@ -112,7 +112,7 @@ function PostFeaturedImageDisplay( {
 					/>
 				) }
 			</BlockControls>
-			<div { ...useBlockProps() }>{ image }</div>
+			<figure { ...useBlockProps() }>{ image }</figure>
 		</>
 	);
 }
@@ -120,8 +120,9 @@ function PostFeaturedImageDisplay( {
 const PostFeaturedImageWithNotices = withNotices( PostFeaturedImageDisplay );
 
 export default function PostFeaturedImageEdit( props ) {
+	const blockProps = useBlockProps();
 	if ( ! props.context?.postId ) {
-		return placeholderChip;
+		return <div { ...blockProps }>{ placeholderChip }</div>;
 	}
 	return <PostFeaturedImageWithNotices { ...props } />;
 }

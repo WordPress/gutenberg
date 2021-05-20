@@ -61,6 +61,7 @@ module.exports = {
 			},
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
+		'@wordpress/data-no-store-string-literals': 'warn',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
@@ -87,6 +88,11 @@ module.exports = {
 						importNames: [ 'combineReducers' ],
 						message:
 							'Please use `combineReducers` from `@wordpress/data` instead.',
+					},
+					{
+						name: 'puppeteer-testing-library',
+						message:
+							'`puppeteer-testing-library` is still experimental.',
 					},
 				],
 			},
@@ -162,6 +168,7 @@ module.exports = {
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
+				'@wordpress/data-no-store-string-literals': 'off',
 			},
 		},
 		{
@@ -175,7 +182,6 @@ module.exports = {
 					'error',
 					{
 						forbid: [
-							[ 'button', 'Button' ],
 							[ 'circle', 'Circle' ],
 							[ 'g', 'G' ],
 							[ 'path', 'Path' ],
@@ -204,7 +210,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js' ],
+			files: [ 'bin/**/*.js', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},

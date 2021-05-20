@@ -8,19 +8,15 @@ import classnames from 'classnames';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	PlainText,
 } from '@wordpress/block-editor';
-import {
-	ToolbarGroup,
-	ToggleControl,
-	TextControl,
-	PanelBody,
-} from '@wordpress/components';
+import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -36,14 +32,14 @@ export default function PostTitleEdit( {
 
 	const post = useSelect(
 		( select ) =>
-			select( 'core' ).getEditedEntityRecord(
+			select( coreStore ).getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
 			),
 		[ postType, postId ]
 	);
-	const { editEntityRecord } = useDispatch( 'core' );
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -55,7 +51,7 @@ export default function PostTitleEdit( {
 		return null;
 	}
 
-	const { title, link } = post;
+	const { title = '', link } = post;
 
 	let titleElement = (
 		<TagName { ...( isLink ? {} : blockProps ) }>
@@ -82,30 +78,35 @@ export default function PostTitleEdit( {
 
 	if ( isLink ) {
 		titleElement = (
-			<a
-				href={ link }
-				target={ linkTarget }
-				rel={ rel }
-				onClick={ ( event ) => event.preventDefault() }
-				{ ...blockProps }
-			>
-				{ titleElement }
-			</a>
+			<TagName { ...blockProps }>
+				<PlainText
+					tagName="a"
+					href={ link }
+					target={ linkTarget }
+					rel={ rel }
+					placeholder={ title.length === 0 ? __( 'No Title' ) : null }
+					value={ title }
+					onChange={ ( value ) =>
+						editEntityRecord( 'postType', postType, postId, {
+							title: value,
+						} )
+					}
+					__experimentalVersion={ 2 }
+				/>
+			</TagName>
 		);
 	}
 
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<HeadingLevelDropdown
-						selectedLevel={ level }
-						onChange={ ( newLevel ) =>
-							setAttributes( { level: newLevel } )
-						}
-					/>
-				</ToolbarGroup>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<HeadingLevelDropdown
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
+				/>
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );

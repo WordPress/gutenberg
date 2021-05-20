@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 
-import { getTextContent } from './get-text-content';
 import { insert } from './insert';
 import { LINE_SEPARATOR } from './special-characters';
 
@@ -24,7 +23,7 @@ export function insertLineSeparator(
 	startIndex = value.start,
 	endIndex = value.end
 ) {
-	const beforeText = getTextContent( value ).slice( 0, startIndex );
+	const beforeText = value.text.slice( 0, startIndex );
 	const previousLineSeparatorIndex = beforeText.lastIndexOf( LINE_SEPARATOR );
 	const previousLineSeparatorFormats =
 		value.replacements[ previousLineSeparatorIndex ];

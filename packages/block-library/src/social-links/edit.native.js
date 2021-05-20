@@ -5,7 +5,10 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -115,7 +118,7 @@ export default compose(
 			getSelectedBlockClientId,
 			getBlocks,
 			getBlock,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlockParents = getBlockParents(
 			selectedBlockClientId,
@@ -135,7 +138,7 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
-		const { removeBlock } = dispatch( 'core/block-editor' );
+		const { removeBlock } = dispatch( blockEditorStore );
 
 		return {
 			onDelete: () => {

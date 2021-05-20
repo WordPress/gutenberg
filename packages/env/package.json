@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/env",
-	"version": "3.0.2",
+	"version": "4.0.4",
 	"description": "A zero-config, self contained local WordPress environment for development and testing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,9 +39,9 @@
 		"got": "^10.7.0",
 		"inquirer": "^7.1.0",
 		"js-yaml": "^3.13.1",
-		"nodegit": "^0.27.0",
 		"ora": "^4.0.2",
 		"rimraf": "^3.0.2",
+		"simple-git": "^2.35.0",
 		"terminal-link": "^2.0.0",
 		"yargs": "^14.0.0"
 	},

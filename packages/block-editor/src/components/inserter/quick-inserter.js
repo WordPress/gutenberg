@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -30,7 +30,6 @@ export default function QuickInserter( {
 	rootClientId,
 	clientId,
 	isAppender,
-	selectBlockOnInsert,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -38,27 +37,31 @@ export default function QuickInserter( {
 		rootClientId,
 		clientId,
 		isAppender,
-		selectBlockOnInsert,
 	} );
 	const [ blockTypes ] = useBlockTypesState(
 		destinationRootClientId,
 		onInsertBlocks
 	);
 
-	const [ patterns ] = usePatternsState( onInsertBlocks );
-	const showPatterns =
-		! destinationRootClientId && patterns.length && !! filterValue;
+	const [ patterns ] = usePatternsState(
+		onInsertBlocks,
+		destinationRootClientId
+	);
+	const showPatterns = patterns.length && !! filterValue;
 	const showSearch =
 		( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
 		blockTypes.length > SEARCH_THRESHOLD;
 
-	const { setInserterIsOpened, blockIndex } = useSelect(
+	const { setInserterIsOpened, insertionIndex } = useSelect(
 		( select ) => {
-			const { getSettings, getBlockIndex } = select( blockEditorStore );
+			const { getSettings, getBlockIndex, getBlockCount } = select(
+				blockEditorStore
+			);
+			const index = getBlockIndex( clientId, rootClientId );
 			return {
 				setInserterIsOpened: getSettings()
 					.__experimentalSetIsInserterOpened,
-				blockIndex: getBlockIndex( clientId, rootClientId ),
+				insertionIndex: index === -1 ? getBlockCount() : index,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -70,13 +73,10 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
-	const { __unstableSetInsertionPoint } = useDispatch( blockEditorStore );
-
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected
 	const onBrowseAll = () => {
-		__unstableSetInsertionPoint( rootClientId, blockIndex );
-		setInserterIsOpened( true );
+		setInserterIsOpened( { rootClientId, insertionIndex } );
 	};
 
 	return (
@@ -92,7 +92,8 @@ export default function QuickInserter( {
 					onChange={ ( value ) => {
 						setFilterValue( value );
 					} }
-					placeholder={ __( 'Search for a block' ) }
+					label={ __( 'Search for blocks and patterns' ) }
+					placeholder={ __( 'Search' ) }
 				/>
 			) }
 
@@ -103,7 +104,6 @@ export default function QuickInserter( {
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
-					selectBlockOnInsert={ selectBlockOnInsert }
 					maxBlockPatterns={ showPatterns ? SHOWN_BLOCK_PATTERNS : 0 }
 					maxBlockTypes={ SHOWN_BLOCK_TYPES }
 					isDraggable={ false }

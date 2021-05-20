@@ -29,13 +29,15 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { useDispatch, withSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -72,12 +74,10 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
 function GalleryEdit( props ) {
 	const {
 		attributes,
+		clientId,
 		isSelected,
 		noticeUI,
 		noticeOperations,
-		mediaUpload,
-		imageSizes,
-		resizedImages,
 		onFocus,
 	} = props;
 	const {
@@ -90,8 +90,67 @@ function GalleryEdit( props ) {
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
+
+	const {
+		imageSizes,
+		mediaUpload,
+		getMedia,
+		wasBlockJustInserted,
+	} = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+
+		return {
+			imageSizes: settings.imageSizes,
+			mediaUpload: settings.mediaUpload,
+			getMedia: select( coreStore ).getMedia,
+			wasBlockJustInserted: select(
+				blockEditorStore
+			).wasBlockJustInserted( clientId, 'inserter_menu' ),
+		};
+	} );
+
+	const resizedImages = useMemo( () => {
+		if ( isSelected ) {
+			return reduce(
+				attributes.ids,
+				( currentResizedImages, id ) => {
+					if ( ! id ) {
+						return currentResizedImages;
+					}
+					const image = getMedia( id );
+					const sizes = reduce(
+						imageSizes,
+						( currentSizes, size ) => {
+							const defaultUrl = get( image, [
+								'sizes',
+								size.slug,
+								'url',
+							] );
+							const mediaDetailsUrl = get( image, [
+								'media_details',
+								'sizes',
+								size.slug,
+								'source_url',
+							] );
+							return {
+								...currentSizes,
+								[ size.slug ]: defaultUrl || mediaDetailsUrl,
+							};
+						},
+						{}
+					);
+					return {
+						...currentResizedImages,
+						[ parseInt( id, 10 ) ]: sizes,
+					};
+				},
+				{}
+			);
+		}
+		return {};
+	}, [ isSelected, attributes.ids, imageSizes ] );
 
 	function setAttributes( newAttrs ) {
 		if ( newAttrs.ids ) {
@@ -236,10 +295,6 @@ function GalleryEdit( props ) {
 			: __( 'Thumbnails are not cropped.' );
 	}
 
-	function onFocusGalleryCaption() {
-		setSelectedImage();
-	}
-
 	function setImageAttributes( index, newAttributes ) {
 		if ( ! images[ index ] ) {
 			return;
@@ -322,10 +377,11 @@ function GalleryEdit( props ) {
 	}, [ linkTo ] );
 
 	const hasImages = !! images.length;
+	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ hasImages }
+			addToGallery={ hasImageIds }
 			isAppender={ hasImages }
 			disableMediaButtons={ hasImages && ! isSelected }
 			icon={ ! hasImages && sharedIcon }
@@ -337,10 +393,13 @@ function GalleryEdit( props ) {
 			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
-			value={ images }
+			value={ hasImageIds ? images : {} }
 			onError={ onUploadError }
 			notices={ hasImages ? undefined : noticeUI }
 			onFocus={ onFocus }
+			autoOpenMediaUpload={
+				! hasImages && isSelected && wasBlockJustInserted
+			}
 		/>
 	);
 
@@ -379,6 +438,7 @@ function GalleryEdit( props ) {
 						value={ linkTo }
 						onChange={ setLinkTo }
 						options={ linkOptions }
+						hideCancelButton={ true }
 					/>
 					{ shouldShowSizeOptions && (
 						<SelectControl
@@ -386,6 +446,7 @@ function GalleryEdit( props ) {
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
+							hideCancelButton={ true }
 						/>
 					) }
 				</PanelBody>
@@ -401,7 +462,6 @@ function GalleryEdit( props ) {
 				onSelectImage={ onSelectImage }
 				onDeselectImage={ onDeselectImage }
 				onSetImageAttributes={ setImageAttributes }
-				onFocusGalleryCaption={ onFocusGalleryCaption }
 				blockProps={ blockProps }
 			/>
 		</>
@@ -409,59 +469,6 @@ function GalleryEdit( props ) {
 }
 
 export default compose( [
-	withSelect( ( select, { attributes: { ids }, isSelected } ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
-		const { imageSizes, mediaUpload } = getSettings();
-
-		const resizedImages = useMemo( () => {
-			if ( isSelected ) {
-				return reduce(
-					ids,
-					( currentResizedImages, id ) => {
-						if ( ! id ) {
-							return currentResizedImages;
-						}
-						const image = getMedia( id );
-						const sizes = reduce(
-							imageSizes,
-							( currentSizes, size ) => {
-								const defaultUrl = get( image, [
-									'sizes',
-									size.slug,
-									'url',
-								] );
-								const mediaDetailsUrl = get( image, [
-									'media_details',
-									'sizes',
-									size.slug,
-									'source_url',
-								] );
-								return {
-									...currentSizes,
-									[ size.slug ]:
-										defaultUrl || mediaDetailsUrl,
-								};
-							},
-							{}
-						);
-						return {
-							...currentResizedImages,
-							[ parseInt( id, 10 ) ]: sizes,
-						};
-					},
-					{}
-				);
-			}
-			return {};
-		}, [ isSelected, ids, imageSizes ] );
-
-		return {
-			imageSizes,
-			mediaUpload,
-			resizedImages,
-		};
-	} ),
 	withNotices,
 	withViewportMatch( { isNarrow: '< small' } ),
 ] )( GalleryEdit );

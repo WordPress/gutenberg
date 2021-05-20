@@ -2,12 +2,21 @@
 
 ## Unreleased
 
+## 3.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
+## 2.20.0 (2021-03-17)
+
 ## 2.17.1 (2020-09-17)
 
 ### Bug fix
 
-- Declare @types/react and @types/react-dom dependencies which could cause type errors when using
-  this package with TypeScript ([#25086](https://github.com/WordPress/gutenberg/pull/25086))
+-   Declare @types/react and @types/react-dom dependencies which could cause type errors when using
+    this package with TypeScript ([#25086](https://github.com/WordPress/gutenberg/pull/25086))
 
 ## 2.14.0 (2020-05-14)
 

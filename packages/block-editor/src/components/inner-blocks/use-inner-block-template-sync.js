@@ -40,8 +40,10 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
+	const { getSelectedBlocksInitialCaretPosition } = useSelect(
+		blockEditorStore
+	);
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-
 	const innerBlocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),
 		[ clientId ]
@@ -69,7 +71,12 @@ export default function useInnerBlockTemplateSync(
 						nextBlocks,
 						innerBlocks.length === 0 &&
 							templateInsertUpdatesSelection &&
-							nextBlocks.length !== 0
+							nextBlocks.length !== 0,
+						// This ensures the "initialPosition" doesn't change when applying the template
+						// If we're supposed to focus the block, we'll focus the first inner block
+						// otherwise, we won't apply any auto-focus.
+						// This ensures for instance that the focus stays in the inserter when inserting the "buttons" block.
+						getSelectedBlocksInitialCaretPosition()
 					);
 				}
 			}

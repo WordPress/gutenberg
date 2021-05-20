@@ -297,3 +297,9 @@ exports[`Writing Flow should remember initial vertical position 1`] = `
 <p><br>2</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`Writing Flow should only consider the content as one tab stop 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+<!-- /wp:table -->"
+`;

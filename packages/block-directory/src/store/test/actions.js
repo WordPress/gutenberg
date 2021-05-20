@@ -90,7 +90,13 @@ describe( 'actions', () => {
 				type: '@@data/SELECT',
 			} );
 
-			expect( generator.next( [ block ] ).value ).toEqual( {
+			expect( generator.next( [ block ] ).value ).toMatchObject( {
+				type: '@@data/DISPATCH',
+				actionName: 'createInfoNotice',
+				storeKey: noticesStore,
+			} );
+
+			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
 				blockId: block.id,
 				isInstalling: false,
@@ -152,7 +158,13 @@ describe( 'actions', () => {
 				type: '@@data/SELECT',
 			} );
 
-			expect( generator.next( [ inactiveBlock ] ).value ).toEqual( {
+			expect( generator.next( [ inactiveBlock ] ).value ).toMatchObject( {
+				type: '@@data/DISPATCH',
+				actionName: 'createInfoNotice',
+				storeKey: noticesStore,
+			} );
+
+			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
 				blockId: inactiveBlock.id,
 				isInstalling: false,
@@ -194,6 +206,12 @@ describe( 'actions', () => {
 			expect( generator.throw( apiError ).value ).toMatchObject( {
 				type: 'SET_ERROR_NOTICE',
 				blockId: block.id,
+			} );
+
+			expect( generator.next().value ).toMatchObject( {
+				type: '@@data/DISPATCH',
+				actionName: 'createErrorNotice',
+				storeKey: noticesStore,
 			} );
 
 			expect( generator.next().value ).toEqual( {

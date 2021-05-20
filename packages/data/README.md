@@ -12,7 +12,7 @@ Install the module
 npm install @wordpress/data --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Registering a Store
 
@@ -385,7 +385,7 @@ configurations.
 _Parameters_
 
 -   _storeConfigs_ `Object`: Initial store configurations.
--   _parent_ `?Object`: Parent registry.
+-   _parent_ `Object?`: Parent registry.
 
 _Returns_
 
@@ -484,7 +484,7 @@ dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _storeNameOrDefinition_ `(string|WPDataStore)`: Unique namespace identifier for the store or the store definition.
+-   _storeNameOrDefinition_ `string|WPDataStore`: Unique namespace identifier for the store or the store definition.
 
 _Returns_
 
@@ -500,7 +500,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="register" href="#register">#</a> **register**
 
@@ -608,7 +608,7 @@ resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
 
 _Parameters_
 
--   _storeNameOrDefinition_ `(string|WPDataStore)`: Unique namespace identifier for the store or the store definition.
+-   _storeNameOrDefinition_ `string|WPDataStore`: Unique namespace identifier for the store or the store definition.
 
 _Returns_
 
@@ -630,7 +630,7 @@ select( 'my-shop' ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _storeNameOrDefinition_ `(string|WPDataStore)`: Unique namespace identifier for the store or the store definition.
+-   _storeNameOrDefinition_ `string|WPDataStore`: Unique namespace identifier for the store or the store definition.
 
 _Returns_
 
@@ -711,7 +711,7 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeNameOrDefinition_ `[(string|WPDataStore)]`: Optionally provide the name of the store or its definition from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDefinition_ `[string|WPDataStore]`: Optionally provide the name of the store or its definition from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
@@ -793,9 +793,28 @@ any price in the state for that currency is retrieved. If the currency prop
 doesn't change and other props are passed in that do change, the price will
 not change because the dependency is just the currency.
 
+When data is only used in an event callback, the data should not be retrieved
+on render, so it may be useful to get the selectors function instead.
+
+**Don't use `useSelect` this way when calling the selectors in the render
+function because your component won't re-render on a data change.**
+
+```js
+import { useSelect } from '@wordpress/data';
+
+function Paste( { children } ) {
+  const { getSettings } = useSelect( 'my-shop' );
+  function onPaste() {
+    // Do something with the settings.
+    const settings = getSettings();
+  }
+  return <div onPaste={ onPaste }>{ children }</div>;
+}
+```
+
 _Parameters_
 
--   _\_mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument.
+-   _\_mapSelect_ `Function|WPDataStore|string`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
 -   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_

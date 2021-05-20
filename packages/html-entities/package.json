@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/html-entities",
-	"version": "2.10.1",
+	"version": "3.0.0",
 	"description": "HTML entity utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,12 +19,15 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.12.5"
+		"@babel/runtime": "^7.13.10"
 	},
 	"publishConfig": {
 		"access": "public"

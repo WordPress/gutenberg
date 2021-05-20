@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/url --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Usage
 
@@ -102,7 +102,7 @@ const imageUrl = filterURLForDisplay( 'https://www.wordpress.org/wp-content/uplo
 _Parameters_
 
 -   _url_ `string`: Original URL.
--   _maxLength_ `(number|null)`: URL length.
+-   _maxLength_ `number|null`: URL length.
 
 _Returns_
 
@@ -125,7 +125,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The authority part of the URL.
+-   `string|void`: The authority part of the URL.
 
 <a name="getFragment" href="#getFragment">#</a> **getFragment**
 
@@ -144,7 +144,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The fragment part of the URL.
+-   `string|void`: The fragment part of the URL.
 
 <a name="getPath" href="#getPath">#</a> **getPath**
 
@@ -163,7 +163,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The path part of the URL.
+-   `string|void`: The path part of the URL.
 
 <a name="getPathAndQueryString" href="#getPathAndQueryString">#</a> **getPathAndQueryString**
 
@@ -201,7 +201,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The protocol part of the URL.
+-   `string|void`: The protocol part of the URL.
 
 <a name="getQueryArg" href="#getQueryArg">#</a> **getQueryArg**
 
@@ -220,7 +220,7 @@ _Parameters_
 
 _Returns_
 
--   `(QueryArgParsed|void)`: Query arg value.
+-   `QueryArgParsed|void`: Query arg value.
 
 <a name="getQueryArgs" href="#getQueryArgs">#</a> **getQueryArgs**
 
@@ -258,7 +258,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The query string part of the URL.
+-   `string|void`: The query string part of the URL.
 
 <a name="hasQueryArg" href="#hasQueryArg">#</a> **hasQueryArg**
 

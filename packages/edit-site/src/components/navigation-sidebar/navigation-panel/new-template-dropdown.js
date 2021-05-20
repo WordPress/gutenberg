@@ -50,7 +50,7 @@ export default function NewTemplateDropdown() {
 			excerpt: description,
 			// Slugs need to be strings, so this is for template `404`
 			slug: slug.toString(),
-			status: 'draft',
+			status: 'publish',
 			title,
 		} );
 	};

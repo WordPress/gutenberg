@@ -24,7 +24,7 @@ _Parameters_
 
 _Returns_
 
--   `?DOMRect`: The rectangle.
+-   `DOMRect | null`: The rectangle.
 
 <a name="documentHasSelection" href="#documentHasSelection">#</a> **documentHasSelection**
 
@@ -84,7 +84,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<Object>`: An array containing all files.
+-   `File[]`: An array containing all files.
 
 <a name="getOffsetParent" href="#getOffsetParent">#</a> **getOffsetParent**
 
@@ -102,7 +102,7 @@ _Parameters_
 
 _Returns_
 
--   `?Node`: Offset parent.
+-   `Node | null`: Offset parent.
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
@@ -114,11 +114,11 @@ _Related_
 
 _Parameters_
 
--   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
+-   _context_ `[string]`: Set to "paste" to exclude invisible elements and sensitive data.
 
 _Returns_
 
--   `Object`: Schema.
+-   `Partial<ContentSchema>`: Schema.
 
 <a name="getRectangleFromRange" href="#getRectangleFromRange">#</a> **getRectangleFromRange**
 
@@ -138,11 +138,11 @@ Given a DOM node, finds the closest scrollable container node.
 
 _Parameters_
 
--   _node_ `Element`: Node from which to start.
+-   _node_ `Element | null`: Node from which to start.
 
 _Returns_
 
--   `?Element`: Scrollable container node, if found.
+-   `Element | undefined`: Scrollable container node, if found.
 
 <a name="insertAfter" href="#insertAfter">#</a> **insertAfter**
 
@@ -151,8 +151,8 @@ the latter.
 
 _Parameters_
 
--   _newNode_ `Element`: Node to be inserted.
--   _referenceNode_ `Element`: Node after which to perform the insertion.
+-   _newNode_ `Node`: Node to be inserted.
+-   _referenceNode_ `Node`: Node after which to perform the insertion.
 
 _Returns_
 
@@ -178,7 +178,7 @@ Returns true if there is no possibility of selection.
 
 _Parameters_
 
--   _element_ `Element`: The element to check.
+-   _element_ `HTMLElement`: The element to check.
 
 _Returns_
 
@@ -204,11 +204,11 @@ and has a valueAsNumber
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _node_ `Node`: The HTML node.
 
 _Returns_
 
--   `boolean`: True if the element is input and holds a number.
+-   `node is HTMLInputElement`: True if the node is input and holds a number.
 
 <a name="isPhrasingContent" href="#isPhrasingContent">#</a> **isPhrasingContent**
 
@@ -220,15 +220,33 @@ _Related_
 
 _Parameters_
 
--   _node_ `Element`: The node to test.
+-   _node_ `Node`: The node to test.
 
 _Returns_
 
 -   `boolean`: True if phrasing content, false if not.
 
+<a name="isRTL" href="#isRTL">#</a> **isRTL**
+
+Whether the element's text direction is right-to-left.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+
+_Returns_
+
+-   `boolean`: True if rtl, false if ltr.
+
 <a name="isTextContent" href="#isTextContent">#</a> **isTextContent**
 
-Undocumented declaration.
+_Parameters_
+
+-   _node_ `Node`: 
+
+_Returns_
+
+-   `boolean`: Node is text content
 
 <a name="isTextField" href="#isTextField">#</a> **isTextField**
 
@@ -239,11 +257,11 @@ See: <https://html.spec.whatwg.org/#textFieldSelection>
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _node_ `Node`: The HTML element.
 
 _Returns_
 
--   `boolean`: True if the element is an text field, false if not.
+-   `node is HTMLElement`: True if the element is an text field, false if not.
 
 <a name="isVerticalEdge" href="#isVerticalEdge">#</a> **isVerticalEdge**
 
@@ -264,7 +282,7 @@ Places the caret at start or end of a given element.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: True for end, false for start.
 
 <a name="placeCaretAtVerticalEdge" href="#placeCaretAtVerticalEdge">#</a> **placeCaretAtVerticalEdge**
@@ -273,7 +291,7 @@ Places the caret at the top or bottom of a given element.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: True for bottom, false for top.
 -   _rect_ `[DOMRect]`: The rectangle to position the caret with.
 -   _mayUseScroll_ `[boolean]`: True to allow scrolling, false to disallow.
@@ -284,7 +302,7 @@ Given a DOM node, removes it from the DOM.
 
 _Parameters_
 
--   _node_ `Element`: Node to be removed.
+-   _node_ `Node`: Node to be removed.
 
 _Returns_
 
@@ -297,8 +315,8 @@ Given a schema, unwraps or removes nodes, attributes and classes on HTML.
 _Parameters_
 
 -   _HTML_ `string`: The HTML to clean up.
--   _schema_ `Object`: Schema for the HTML.
--   _inline_ `Object`: Whether to clean for inline mode.
+-   _schema_ `import('./clean-node-list').Schema`: Schema for the HTML.
+-   _inline_ `boolean`: Whether to clean for inline mode.
 
 _Returns_
 

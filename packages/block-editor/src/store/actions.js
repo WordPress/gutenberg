@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { castArray, findKey, first, last, some } from 'lodash';
+import { castArray, findKey, first, isObject, last, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import {
 	cloneBlock,
+	__experimentalCloneSanitizedBlock,
 	createBlock,
 	doBlocksMatchTemplate,
 	getBlockType,
@@ -20,6 +21,7 @@ import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { controls } from '@wordpress/data';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -113,16 +115,22 @@ export function* validateBlocksToTemplate( blocks ) {
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
  *
- * @param {WPBlockSelection} selectionStart The selection start.
- * @param {WPBlockSelection} selectionEnd   The selection end.
+ * @param {WPBlockSelection} selectionStart  The selection start.
+ * @param {WPBlockSelection} selectionEnd    The selection end.
+ * @param {0|-1|null}        initialPosition Initial block position.
  *
  * @return {Object} Action object.
  */
-export function resetSelection( selectionStart, selectionEnd ) {
+export function resetSelection(
+	selectionStart,
+	selectionEnd,
+	initialPosition
+) {
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
 		selectionEnd,
+		initialPosition,
 	};
 }
 
@@ -147,15 +155,21 @@ export function receiveBlocks( blocks ) {
  * attributes with the specified client IDs have been updated.
  *
  * @param {string|string[]} clientIds  Block client IDs.
- * @param {Object}          attributes Block attributes to be merged.
- *
+ * @param {Object}          attributes Block attributes to be merged. Should be keyed by clientIds if
+ * uniqueByBlock is true.
+ * @param {boolean}          uniqueByBlock true if each block in clientIds array has a unique set of attributes
  * @return {Object} Action object.
  */
-export function updateBlockAttributes( clientIds, attributes ) {
+export function updateBlockAttributes(
+	clientIds,
+	attributes,
+	uniqueByBlock = false
+) {
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientIds: castArray( clientIds ),
 		attributes,
+		uniqueByBlock,
 	};
 }
 
@@ -182,13 +196,13 @@ export function updateBlock( clientId, updates ) {
  * value reflecting its selection directionality. An initialPosition of -1
  * reflects a reverse selection.
  *
- * @param {string}  clientId        Block client ID.
- * @param {?number} initialPosition Optional initial position. Pass as -1 to
+ * @param {string}    clientId        Block client ID.
+ * @param {0|-1|null} initialPosition Optional initial position. Pass as -1 to
  *                                  reflect reverse selection.
  *
  * @return {Object} Action object.
  */
-export function selectBlock( clientId, initialPosition = null ) {
+export function selectBlock( clientId, initialPosition = 0 ) {
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
@@ -347,7 +361,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  * @param {(string|string[])} clientIds       Block client ID(s) to replace.
  * @param {(Object|Object[])} blocks          Replacement block(s).
  * @param {number}            indexToSelect   Index of replacement block to select.
- * @param {number}            initialPosition Index of caret after in the selected block after the operation.
+ * @param {0|-1|null}         initialPosition Index of caret after in the selected block after the operation.
  * @param {?Object}           meta            Optional Meta values to be passed to the action object.
  *
  * @yield {Object} Action object.
@@ -356,7 +370,7 @@ export function* replaceBlocks(
 	clientIds,
 	blocks,
 	indexToSelect,
-	initialPosition,
+	initialPosition = 0,
 	meta
 ) {
 	clientIds = castArray( clientIds );
@@ -524,6 +538,7 @@ export function* moveBlockToPosition(
  * @param {?number} index            Index at which block should be inserted.
  * @param {?string} rootClientId     Optional root client ID of block list on which to insert.
  * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ * @param {?Object} meta             Optional Meta values to be passed to the action object.
  *
  * @return {Object} Action object.
  */
@@ -531,30 +546,49 @@ export function insertBlock(
 	block,
 	index,
 	rootClientId,
-	updateSelection = true
+	updateSelection = true,
+	meta
 ) {
-	return insertBlocks( [ block ], index, rootClientId, updateSelection );
+	return insertBlocks(
+		[ block ],
+		index,
+		rootClientId,
+		updateSelection,
+		0,
+		meta
+	);
 }
 
 /**
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object[]}   blocks          Block objects to insert.
- * @param {?number}    index           Index at which block should be inserted.
- * @param {?string}    rootClientId    Optional root client ID of block list on which to insert.
- * @param {?boolean}   updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
- * @param {?Object}  meta             Optional Meta values to be passed to the action object.
- *
- *  @return {Object} Action object.
+ * @param {Object[]}  blocks          Block objects to insert.
+ * @param {?number}   index           Index at which block should be inserted.
+ * @param {?string}   rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean}  updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+ * @param {0|-1|null} initialPosition Initial focus position. Setting it to null prevent focusing the inserted block.
+ * @param {?Object}   meta            Optional Meta values to be passed to the action object.
+ * @return {Object} Action object.
  */
 export function* insertBlocks(
 	blocks,
 	index,
 	rootClientId,
 	updateSelection = true,
+	initialPosition = 0,
 	meta
 ) {
+	if ( isObject( initialPosition ) ) {
+		meta = initialPosition;
+		initialPosition = 0;
+		deprecated( "meta argument in wp.data.dispatch('core/block-editor')", {
+			since: '10.1',
+			plugin: 'Gutenberg',
+			hint: 'The meta argument is now the 6th argument of the function',
+		} );
+	}
+
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
 		yield controls.select( blockEditorStoreName, 'getSettings' )
@@ -579,53 +613,39 @@ export function* insertBlocks(
 			rootClientId,
 			time: Date.now(),
 			updateSelection,
+			initialPosition: updateSelection ? initialPosition : null,
 			meta,
 		};
 	}
 }
 
 /**
- * Sets the insertion point without showing it to users.
+ * Returns an action object used in signalling that the insertion point should
+ * be shown.
  *
- * Components like <Inserter> will default to inserting blocks at this point.
- *
- * @param {?string} rootClientId Root client ID of block list in which to
- *                               insert. Use `undefined` for the root block
- *                               list.
- * @param {number} index         Index at which block should be inserted.
- *
- * @return {Object} Action object.
- */
-export function __unstableSetInsertionPoint( rootClientId, index ) {
-	return {
-		type: 'SET_INSERTION_POINT',
-		rootClientId,
-		index,
-	};
-}
-
-/**
- * Sets the insertion point and shows it to users.
- *
- * Components like <Inserter> will default to inserting blocks at this point.
- *
- * @param {?string} rootClientId Root client ID of block list in which to
- *                               insert. Use `undefined` for the root block
- *                               list.
- * @param {number} index         Index at which block should be inserted.
+ * @param {?string} rootClientId Optional root client ID of block list on
+ *                               which to insert.
+ * @param {?number} index        Index at which block should be inserted.
+ * @param {Object}  __unstableOptions Wether or not to show an inserter button.
  *
  * @return {Object} Action object.
  */
-export function showInsertionPoint( rootClientId, index ) {
+export function showInsertionPoint(
+	rootClientId,
+	index,
+	__unstableOptions = {}
+) {
+	const { __unstableWithInserter } = __unstableOptions;
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
+		__unstableWithInserter,
 	};
 }
 
 /**
- * Hides the insertion point for users.
+ * Returns an action object hiding the insertion point.
  *
  * @return {Object} Action object.
  */
@@ -902,22 +922,24 @@ export function removeBlock( clientId, selectPrevious ) {
  * Returns an action object used in signalling that the inner blocks with the
  * specified client ID should be replaced.
  *
- * @param {string}   rootClientId    Client ID of the block whose InnerBlocks will re replaced.
- * @param {Object[]} blocks          Block objects to insert as new InnerBlocks
- * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to false.
- *
+ * @param {string}    rootClientId    Client ID of the block whose InnerBlocks will re replaced.
+ * @param {Object[]}  blocks          Block objects to insert as new InnerBlocks
+ * @param {?boolean}  updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to false.
+ * @param {0|-1|null} initialPosition Initial block position.
  * @return {Object} Action object.
  */
 export function replaceInnerBlocks(
 	rootClientId,
 	blocks,
-	updateSelection = false
+	updateSelection = false,
+	initialPosition = 0
 ) {
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
 		rootClientId,
 		blocks,
 		updateSelection,
+		initialPosition: updateSelection ? initialPosition : null,
 		time: Date.now(),
 	};
 }
@@ -1227,7 +1249,9 @@ export function* duplicateBlocks( clientIds, updateSelection = true ) {
 		last( castArray( clientIds ) ),
 		rootClientId
 	);
-	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+	const clonedBlocks = blocks.map( ( block ) =>
+		__experimentalCloneSanitizedBlock( block )
+	);
 	yield insertBlocks(
 		clonedBlocks,
 		lastSelectedIndex + 1,

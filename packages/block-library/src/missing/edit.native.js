@@ -21,10 +21,11 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { help, plugins } from '@wordpress/icons';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -33,6 +34,7 @@ import styles from './style.scss';
 
 // Blocks that can't be edited through the Unsupported block editor identified by their name.
 const UBE_INCOMPATIBLE_BLOCKS = [ 'core/block' ];
+const I18N_BLOCK_SCHEMA_TITLE = 'block title';
 
 export class UnsupportedBlockEdit extends Component {
 	constructor( props ) {
@@ -60,6 +62,18 @@ export class UnsupportedBlockEdit extends Component {
 		if ( this.timeout ) {
 			clearTimeout( this.timeout );
 		}
+	}
+
+	getTitle() {
+		const { originalName } = this.props.attributes;
+		const blockType = coreBlocks[ originalName ];
+		const title = blockType?.metadata.title;
+		const textdomain = blockType?.metadata.textdomain;
+
+		return title && textdomain
+			? // eslint-disable-next-line @wordpress/i18n-no-variables, @wordpress/i18n-text-domain
+			  _x( title, I18N_BLOCK_SCHEMA_TITLE, textdomain )
+			: originalName;
 	}
 
 	renderHelpIcon() {
@@ -224,7 +238,7 @@ export class UnsupportedBlockEdit extends Component {
 		const { getStylesFromColorScheme, preferredColorScheme } = this.props;
 		const blockType = coreBlocks[ originalName ];
 
-		const title = blockType ? blockType.settings.title : originalName;
+		const title = this.getTitle();
 		const titleStyle = getStylesFromColorScheme(
 			styles.unsupportedBlockMessage,
 			styles.unsupportedBlockMessageDark
@@ -277,7 +291,7 @@ export class UnsupportedBlockEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, { attributes } ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return {
 			isUnsupportedBlockEditorSupported:
 				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
@@ -290,7 +304,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { selectBlock } = dispatch( 'core/block-editor' );
+		const { selectBlock } = dispatch( blockEditorStore );
 		return {
 			selectBlock() {
 				selectBlock( ownProps.clientId );

@@ -1,12 +1,12 @@
 [
-    {
-        "blockName": "core/tag-cloud",
-        "attrs": {
-            "showTagCounts": true,
-            "taxonomy": "category"
-        },
-        "innerBlocks": [],
-        "innerHTML": "",
-        "innerContent": []
-    }
+	{
+		"blockName": "core/tag-cloud",
+		"attrs": {
+			"showTagCounts": true,
+			"taxonomy": "category"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
 ]

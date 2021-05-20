@@ -9,6 +9,7 @@
 @import "./components/manage-blocks-modal/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
 @import "./components/preferences-modal/style.scss";
+@import "./components/secondary-sidebar/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/last-revision/style.scss";
 @import "./components/sidebar/post-author/style.scss";
@@ -16,9 +17,10 @@
 @import "./components/sidebar/post-schedule/style.scss";
 @import "./components/sidebar/post-slug/style.scss";
 @import "./components/sidebar/post-status/style.scss";
-@import "./components/sidebar/post-template/style.scss";
 @import "./components/sidebar/post-visibility/style.scss";
 @import "./components/sidebar/settings-header/style.scss";
+@import "./components/sidebar/template/style.scss";
+@import "./components/sidebar/template-summary/style.scss";
 @import "./components/text-editor/style.scss";
 @import "./components/visual-editor/style.scss";
 @import "./components/welcome-guide/style.scss";
@@ -49,6 +51,14 @@ body.block-editor-page {
 	@include wp-admin-reset( ".block-editor" );
 }
 
+// Fix issue with wp-admin menu not scrolling between 170% and 200% zoom.
+.block-editor-page #wpwrap {
+	overflow-y: auto;
+	@include break-medium() {
+		overflow-y: initial;
+	}
+}
+
 // Target the editor UI excluding the metaboxes and custom fields areas.
 .edit-post-header,
 .edit-post-visual-editor,
@@ -57,7 +67,7 @@ body.block-editor-page {
 .editor-post-publish-panel,
 .components-popover,
 .components-modal__frame,
-.edit-post-layout__inserter-panel {
+.edit-post-editor__inserter-panel {
 	@include reset;
 }
 
@@ -92,5 +102,4 @@ body.block-editor-page {
 	}
 }
 
-@include default-block-widths();
 @include wordpress-admin-schemes();

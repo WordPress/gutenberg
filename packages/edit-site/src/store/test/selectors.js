@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { store as coreDataStore } from '@wordpress/core-data';
+
+/**
  * Internal dependencies
  */
 import {
@@ -12,6 +17,7 @@ import {
 	getNavigationPanelActiveMenu,
 	isNavigationOpened,
 	isInserterOpened,
+	isListViewOpened,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -70,7 +76,7 @@ describe( 'selectors', () => {
 			expect( getCanUserCreateMedia() ).toBe( true );
 			expect(
 				getCanUserCreateMedia.registry.select
-			).toHaveBeenCalledWith( 'core' );
+			).toHaveBeenCalledWith( coreDataStore );
 			expect( canUser ).toHaveBeenCalledWith( 'create', 'media' );
 		} );
 	} );
@@ -168,6 +174,17 @@ describe( 'selectors', () => {
 			expect( isInserterOpened( state ) ).toBe( true );
 			state.blockInserterPanel = false;
 			expect( isInserterOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isListViewOpened', () => {
+		it( 'returns the list view panel isOpened state', () => {
+			const state = {
+				listViewPanel: true,
+			};
+			expect( isListViewOpened( state ) ).toBe( true );
+			state.listViewPanel = false;
+			expect( isListViewOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

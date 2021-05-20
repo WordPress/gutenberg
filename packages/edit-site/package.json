@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "1.16.6",
+	"version": "2.0.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,11 +19,14 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
@@ -51,7 +54,7 @@
 		"downloadjs": "^1.4.7",
 		"file-saver": "^2.0.2",
 		"jszip": "^3.2.2",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

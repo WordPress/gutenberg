@@ -42,7 +42,6 @@ const {
 	resetBlocks,
 	selectBlock,
 	selectPreviousBlock,
-	__unstableSetInsertionPoint,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
@@ -90,6 +89,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ clientId ],
 				attributes,
+				uniqueByBlock: false,
 			} );
 		} );
 
@@ -101,6 +101,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds,
 				attributes,
+				uniqueByBlock: false,
 			} );
 		} );
 	} );
@@ -200,6 +201,7 @@ describe( 'actions', () => {
 				clientIds: [ 'chicken' ],
 				blocks: [ block ],
 				time: expect.any( Number ),
+				initialPosition: 0,
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
@@ -318,6 +320,7 @@ describe( 'actions', () => {
 				clientIds: [ 'chicken' ],
 				blocks,
 				time: expect.any( Number ),
+				initialPosition: 0,
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual(
@@ -406,6 +409,7 @@ describe( 'actions', () => {
 					rootClientId: 'testclientid',
 					time: expect.any( Number ),
 					updateSelection: true,
+					initialPosition: 0,
 				},
 			} );
 		} );
@@ -493,6 +497,7 @@ describe( 'actions', () => {
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
 					updateSelection: false,
+					initialPosition: null,
 				},
 			} );
 		} );
@@ -549,6 +554,7 @@ describe( 'actions', () => {
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
 					updateSelection: false,
+					initialPosition: null,
 				},
 			} );
 		} );
@@ -613,6 +619,7 @@ describe( 'actions', () => {
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
 					updateSelection: false,
+					initialPosition: null,
 				},
 			} );
 		} );
@@ -683,6 +690,7 @@ describe( 'actions', () => {
 				5,
 				'testrootid',
 				false,
+				0,
 				meta
 			);
 
@@ -725,24 +733,10 @@ describe( 'actions', () => {
 					rootClientId: 'testrootid',
 					time: expect.any( Number ),
 					updateSelection: false,
+					initialPosition: null,
 					meta: { patternName: 'core/chicken-ribs-pattern' },
 				},
 			} );
-		} );
-	} );
-
-	describe( '__unstableSetInsertionPoint', () => {
-		it( 'should return the SET_INSERTION_POINT action', () => {
-			expect( __unstableSetInsertionPoint() ).toEqual( {
-				type: 'SET_INSERTION_POINT',
-			} );
-			expect( __unstableSetInsertionPoint( 'rootClientId', 2 ) ).toEqual(
-				{
-					type: 'SET_INSERTION_POINT',
-					rootClientId: 'rootClientId',
-					index: 2,
-				}
-			);
 		} );
 	} );
 
@@ -750,11 +744,6 @@ describe( 'actions', () => {
 		it( 'should return the SHOW_INSERTION_POINT action', () => {
 			expect( showInsertionPoint() ).toEqual( {
 				type: 'SHOW_INSERTION_POINT',
-			} );
-			expect( showInsertionPoint( 'rootClientId', 2 ) ).toEqual( {
-				type: 'SHOW_INSERTION_POINT',
-				rootClientId: 'rootClientId',
-				index: 2,
 			} );
 		} );
 	} );
@@ -1140,6 +1129,7 @@ describe( 'actions', () => {
 				rootClientId: 'root',
 				time: expect.any( Number ),
 				updateSelection: false,
+				initialPosition: null,
 			} );
 		} );
 
@@ -1150,6 +1140,7 @@ describe( 'actions', () => {
 				rootClientId: 'root',
 				time: expect.any( Number ),
 				updateSelection: true,
+				initialPosition: 0,
 			} );
 		} );
 	} );

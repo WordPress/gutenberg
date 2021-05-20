@@ -3,6 +3,7 @@
  */
 const readConfig = require( './config' );
 const { ValidationError } = require( './validate-config' );
+const dbEnv = require( './db-env' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -13,4 +14,5 @@ const { ValidationError } = require( './validate-config' );
 module.exports = {
 	ValidationError,
 	readConfig,
+	dbEnv,
 };

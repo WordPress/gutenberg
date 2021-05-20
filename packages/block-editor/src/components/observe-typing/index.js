@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
 import {
@@ -19,8 +19,6 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 /**
  * Set of key codes upon which typing is to be initiated on a keydown event.
@@ -53,56 +51,59 @@ function isKeyDownEligibleForStartTyping( event ) {
 /**
  * Removes the `isTyping` flag when the mouse moves in the document of the given
  * element.
- *
- * @param {RefObject} ref React ref containing an element.
  */
-export function useMouseMoveTypingReset( ref ) {
+export function useMouseMoveTypingReset() {
 	const isTyping = useSelect( ( select ) =>
 		select( blockEditorStore ).isTyping()
 	);
 	const { stopTyping } = useDispatch( blockEditorStore );
 
-	useEffect( () => {
-		if ( ! isTyping ) {
-			return;
-		}
-
-		const element = ref.current;
-		const { ownerDocument } = element;
-		let lastClientX;
-		let lastClientY;
-
-		/**
-		 * On mouse move, unset typing flag if user has moved cursor.
-		 *
-		 * @param {MouseEvent} event Mousemove event.
-		 */
-		function stopTypingOnMouseMove( event ) {
-			const { clientX, clientY } = event;
-
-			// We need to check that the mouse really moved because Safari
-			// triggers mousemove events when shift or ctrl are pressed.
-			if (
-				lastClientX &&
-				lastClientY &&
-				( lastClientX !== clientX || lastClientY !== clientY )
-			) {
-				stopTyping();
+	return useRefEffect(
+		( node ) => {
+			if ( ! isTyping ) {
+				return;
 			}
 
-			lastClientX = clientX;
-			lastClientY = clientY;
-		}
+			const { ownerDocument } = node;
+			let lastClientX;
+			let lastClientY;
 
-		ownerDocument.addEventListener( 'mousemove', stopTypingOnMouseMove );
+			/**
+			 * On mouse move, unset typing flag if user has moved cursor.
+			 *
+			 * @param {MouseEvent} event Mousemove event.
+			 */
+			function stopTypingOnMouseMove( event ) {
+				const { clientX, clientY } = event;
 
-		return () => {
-			ownerDocument.removeEventListener(
+				// We need to check that the mouse really moved because Safari
+				// triggers mousemove events when shift or ctrl are pressed.
+				if (
+					lastClientX &&
+					lastClientY &&
+					( lastClientX !== clientX || lastClientY !== clientY )
+				) {
+					stopTyping();
+				}
+
+				lastClientX = clientX;
+				lastClientY = clientY;
+			}
+
+			ownerDocument.addEventListener(
 				'mousemove',
 				stopTypingOnMouseMove
 			);
-		};
-	}, [ isTyping, stopTyping ] );
+
+			return () => {
+				ownerDocument.removeEventListener(
+					'mousemove',
+					stopTypingOnMouseMove
+				);
+			};
+		},
+		[ isTyping, stopTyping ]
+	);
 }
 
 /**
@@ -111,140 +112,143 @@ export function useMouseMoveTypingReset( ref ) {
  * - Sets the flag if the user types within the given element.
  * - Removes the flag when the user selects some text, focusses a non-text
  *   field, presses ESC or TAB, or moves the mouse in the document.
- *
- * @param {RefObject} ref React ref containing an element.
  */
-export function useTypingObserver( ref ) {
+export function useTypingObserver() {
 	const isTyping = useSelect( ( select ) =>
 		select( blockEditorStore ).isTyping()
 	);
 	const { startTyping, stopTyping } = useDispatch( blockEditorStore );
 
-	useMouseMoveTypingReset( ref );
-	useEffect( () => {
-		const element = ref.current;
-		const { ownerDocument } = element;
-		const { defaultView } = ownerDocument;
+	const ref1 = useMouseMoveTypingReset();
+	const ref2 = useRefEffect(
+		( node ) => {
+			const { ownerDocument } = node;
+			const { defaultView } = ownerDocument;
 
-		// Listeners to stop typing should only be added when typing.
-		// Listeners to start typing should only be added when not typing.
-		if ( isTyping ) {
-			let timerId;
+			// Listeners to stop typing should only be added when typing.
+			// Listeners to start typing should only be added when not typing.
+			if ( isTyping ) {
+				let timerId;
 
-			/**
-			 * Stops typing when focus transitions to a non-text field element.
-			 *
-			 * @param {FocusEvent} event Focus event.
-			 */
-			function stopTypingOnNonTextField( event ) {
-				const { target } = event;
+				/**
+				 * Stops typing when focus transitions to a non-text field element.
+				 *
+				 * @param {FocusEvent} event Focus event.
+				 */
+				function stopTypingOnNonTextField( event ) {
+					const { target } = event;
 
-				// Since focus to a non-text field via arrow key will trigger
-				// before the keydown event, wait until after current stack
-				// before evaluating whether typing is to be stopped. Otherwise,
-				// typing will re-start.
-				timerId = defaultView.setTimeout( () => {
-					if ( ! isTextField( target ) ) {
+					// Since focus to a non-text field via arrow key will trigger
+					// before the keydown event, wait until after current stack
+					// before evaluating whether typing is to be stopped. Otherwise,
+					// typing will re-start.
+					timerId = defaultView.setTimeout( () => {
+						if ( ! isTextField( target ) ) {
+							stopTyping();
+						}
+					} );
+				}
+
+				/**
+				 * Unsets typing flag if user presses Escape while typing flag is
+				 * active.
+				 *
+				 * @param {KeyboardEvent} event Keypress or keydown event to
+				 *                              interpret.
+				 */
+				function stopTypingOnEscapeKey( event ) {
+					const { keyCode } = event;
+
+					if ( keyCode === ESCAPE || keyCode === TAB ) {
 						stopTyping();
 					}
-				} );
-			}
-
-			/**
-			 * Unsets typing flag if user presses Escape while typing flag is
-			 * active.
-			 *
-			 * @param {KeyboardEvent} event Keypress or keydown event to
-			 *                              interpret.
-			 */
-			function stopTypingOnEscapeKey( event ) {
-				const { keyCode } = event;
-
-				if ( keyCode === ESCAPE || keyCode === TAB ) {
-					stopTyping();
 				}
-			}
 
-			/**
-			 * On selection change, unset typing flag if user has made an
-			 * uncollapsed (shift) selection.
-			 */
-			function stopTypingOnSelectionUncollapse() {
-				const selection = defaultView.getSelection();
-				const isCollapsed =
-					selection.rangeCount > 0 &&
-					selection.getRangeAt( 0 ).collapsed;
+				/**
+				 * On selection change, unset typing flag if user has made an
+				 * uncollapsed (shift) selection.
+				 */
+				function stopTypingOnSelectionUncollapse() {
+					const selection = defaultView.getSelection();
+					const isCollapsed =
+						selection.rangeCount > 0 &&
+						selection.getRangeAt( 0 ).collapsed;
 
-				if ( ! isCollapsed ) {
-					stopTyping();
+					if ( ! isCollapsed ) {
+						stopTyping();
+					}
 				}
-			}
 
-			element.addEventListener( 'focus', stopTypingOnNonTextField );
-			element.addEventListener( 'keydown', stopTypingOnEscapeKey );
-			ownerDocument.addEventListener(
-				'selectionchange',
-				stopTypingOnSelectionUncollapse
-			);
-
-			return () => {
-				defaultView.clearTimeout( timerId );
-				element.removeEventListener(
-					'focus',
-					stopTypingOnNonTextField
-				);
-				element.removeEventListener( 'keydown', stopTypingOnEscapeKey );
-				ownerDocument.removeEventListener(
+				node.addEventListener( 'focus', stopTypingOnNonTextField );
+				node.addEventListener( 'keydown', stopTypingOnEscapeKey );
+				ownerDocument.addEventListener(
 					'selectionchange',
 					stopTypingOnSelectionUncollapse
 				);
+
+				return () => {
+					defaultView.clearTimeout( timerId );
+					node.removeEventListener(
+						'focus',
+						stopTypingOnNonTextField
+					);
+					node.removeEventListener(
+						'keydown',
+						stopTypingOnEscapeKey
+					);
+					ownerDocument.removeEventListener(
+						'selectionchange',
+						stopTypingOnSelectionUncollapse
+					);
+				};
+			}
+
+			/**
+			 * Handles a keypress or keydown event to infer intention to start
+			 * typing.
+			 *
+			 * @param {KeyboardEvent} event Keypress or keydown event to interpret.
+			 */
+			function startTypingInTextField( event ) {
+				const { type, target } = event;
+
+				// Abort early if already typing, or key press is incurred outside a
+				// text field (e.g. arrow-ing through toolbar buttons).
+				// Ignore typing if outside the current DOM container
+				if ( ! isTextField( target ) || ! node.contains( target ) ) {
+					return;
+				}
+
+				// Special-case keydown because certain keys do not emit a keypress
+				// event. Conversely avoid keydown as the canonical event since
+				// there are many keydown which are explicitly not targeted for
+				// typing.
+				if (
+					type === 'keydown' &&
+					! isKeyDownEligibleForStartTyping( event )
+				) {
+					return;
+				}
+
+				startTyping();
+			}
+
+			node.addEventListener( 'keypress', startTypingInTextField );
+			node.addEventListener( 'keydown', startTypingInTextField );
+
+			return () => {
+				node.removeEventListener( 'keypress', startTypingInTextField );
+				node.removeEventListener( 'keydown', startTypingInTextField );
 			};
-		}
+		},
+		[ isTyping, startTyping, stopTyping ]
+	);
 
-		/**
-		 * Handles a keypress or keydown event to infer intention to start
-		 * typing.
-		 *
-		 * @param {KeyboardEvent} event Keypress or keydown event to interpret.
-		 */
-		function startTypingInTextField( event ) {
-			const { type, target } = event;
-
-			// Abort early if already typing, or key press is incurred outside a
-			// text field (e.g. arrow-ing through toolbar buttons).
-			// Ignore typing if outside the current DOM container
-			if ( ! isTextField( target ) || ! element.contains( target ) ) {
-				return;
-			}
-
-			// Special-case keydown because certain keys do not emit a keypress
-			// event. Conversely avoid keydown as the canonical event since
-			// there are many keydown which are explicitly not targeted for
-			// typing.
-			if (
-				type === 'keydown' &&
-				! isKeyDownEligibleForStartTyping( event )
-			) {
-				return;
-			}
-
-			startTyping();
-		}
-
-		element.addEventListener( 'keypress', startTypingInTextField );
-		element.addEventListener( 'keydown', startTypingInTextField );
-
-		return () => {
-			element.removeEventListener( 'keypress', startTypingInTextField );
-			element.removeEventListener( 'keydown', startTypingInTextField );
-		};
-	}, [ isTyping, startTyping, stopTyping ] );
+	return useMergeRefs( [ ref1, ref2 ] );
 }
 
 function ObserveTyping( { children } ) {
-	const ref = useRef();
-	useTypingObserver( ref );
-	return <div ref={ ref }>{ children }</div>;
+	return <div ref={ useTypingObserver() }>{ children }</div>;
 }
 
 /**

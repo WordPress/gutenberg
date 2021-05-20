@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import {
 	serialize,
 	pasteHandler,
@@ -14,6 +14,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,14 +23,8 @@ import { getPasteEventData } from '../../utils/get-paste-event-data';
 import { store as blockEditorStore } from '../../store';
 
 export function useNotifyCopy() {
-	const { getBlockName } = useSelect(
-		( select ) => select( blockEditorStore ),
-		[]
-	);
-	const { getBlockType } = useSelect(
-		( select ) => select( blocksStore ),
-		[]
-	);
+	const { getBlockName } = useSelect( blockEditorStore );
+	const { getBlockType } = useSelect( blocksStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	return useCallback( ( eventType, selectedBlockClientIds ) => {
@@ -77,19 +72,19 @@ export function useNotifyCopy() {
 	}, [] );
 }
 
-export function useClipboardHandler( ref ) {
+export function useClipboardHandler() {
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
-	} = useSelect( ( select ) => select( blockEditorStore ), [] );
+	} = useSelect( blockEditorStore );
 	const { flashBlock, removeBlocks, replaceBlocks } = useDispatch(
 		blockEditorStore
 	);
 	const notifyCopy = useNotifyCopy();
 
-	useEffect( () => {
+	return useRefEffect( ( node ) => {
 		function handler( event ) {
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 
@@ -114,9 +109,10 @@ export function useClipboardHandler( ref ) {
 				}
 			}
 
-			if ( ! ref.current.contains( event.target ) ) {
+			if ( ! node.contains( event.target.ownerDocument.activeElement ) ) {
 				return;
 			}
+
 			event.preventDefault();
 
 			if ( event.type === 'copy' || event.type === 'cut' ) {
@@ -154,22 +150,20 @@ export function useClipboardHandler( ref ) {
 			}
 		}
 
-		ref.current.addEventListener( 'copy', handler );
-		ref.current.addEventListener( 'cut', handler );
-		ref.current.addEventListener( 'paste', handler );
+		node.ownerDocument.addEventListener( 'copy', handler );
+		node.ownerDocument.addEventListener( 'cut', handler );
+		node.ownerDocument.addEventListener( 'paste', handler );
 
 		return () => {
-			ref.current.removeEventListener( 'copy', handler );
-			ref.current.removeEventListener( 'cut', handler );
-			ref.current.removeEventListener( 'paste', handler );
+			node.ownerDocument.removeEventListener( 'copy', handler );
+			node.ownerDocument.removeEventListener( 'cut', handler );
+			node.ownerDocument.removeEventListener( 'paste', handler );
 		};
 	}, [] );
 }
 
 function CopyHandler( { children } ) {
-	const ref = useRef();
-	useClipboardHandler( ref );
-	return <div ref={ ref }>{ children }</div>;
+	return <div ref={ useClipboardHandler() }>{ children }</div>;
 }
 
 export default CopyHandler;

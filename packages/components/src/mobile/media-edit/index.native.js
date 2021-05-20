@@ -22,6 +22,7 @@ const editOption = {
 	id: MEDIA_EDITOR,
 	value: MEDIA_EDITOR,
 	label: __( 'Edit' ),
+	requiresModal: true,
 	types: [ MEDIA_TYPE_IMAGE ],
 };
 

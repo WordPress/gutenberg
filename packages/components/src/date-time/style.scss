@@ -1,7 +1,14 @@
 @import "./datepicker";
 
 .components-datetime {
-	padding: 0;
+	// This padding is leveraged when the component is used alone,
+	// usually inside popovers.
+	padding: $grid-unit-20;
+
+	// This rule removes the padding when used inside a panel.
+	.components-panel__body & {
+		padding: 0;
+	}
 
 	.components-datetime__calendar-help {
 		padding: $grid-unit-20;
@@ -109,6 +116,31 @@
 	&.is-description-visible .DayPicker {
 		visibility: hidden;
 	}
+}
+
+.components-datetime__date .CalendarDay .components-datetime__date__day {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	flex-direction: column;
+	position: relative;
+
+	&.has-events::before {
+		content: " ";
+		width: 4px;
+		height: 4px;
+		border-radius: 2px;
+		position: absolute;
+		left: 50%;
+		margin-left: -2px;
+		bottom: 0;
+		background-color: $white;
+	}
+}
+
+.components-datetime__date .CalendarDay:not(.CalendarDay__selected) .components-datetime__date__day.has-events::before {
+	background: var(--wp-admin-theme-color);
 }
 
 .components-datetime__time {

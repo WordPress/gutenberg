@@ -6,24 +6,30 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import getColorAndStyleProps from './color-props';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes, className } ) {
 	const {
-		borderRadius,
+		fontSize,
 		linkTarget,
 		rel,
+		style,
 		text,
 		title,
 		url,
 		width,
 	} = attributes;
-	const colorProps = getColorAndStyleProps( attributes );
+
+	if ( ! text ) {
+		return null;
+	}
+
+	const borderRadius = style?.border?.radius;
+	const colorProps = getColorClassesAndStyles( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
@@ -42,6 +48,7 @@ export default function save( { attributes, className } ) {
 
 	const wrapperClasses = classnames( className, {
 		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+		[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
 	} );
 
 	return (

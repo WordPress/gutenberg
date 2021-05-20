@@ -16,7 +16,9 @@ module.exports = ( api ) => {
 	} );
 
 	const getPresetEnv = () => {
-		const opts = {};
+		const opts = {
+			include: [ 'proposal-nullish-coalescing-operator' ],
+		};
 
 		if ( isTestEnv ) {
 			opts.targets = {
@@ -54,7 +56,10 @@ module.exports = ( api ) => {
 	};
 
 	return {
-		presets: [ getPresetEnv() ],
+		presets: [
+			getPresetEnv(),
+			require.resolve( '@babel/preset-typescript' ),
+		],
 		plugins: [
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[

@@ -26,6 +26,14 @@ export function DefaultStory() {
 					onClick={ () => setActiveItem( 'item-2' ) }
 					title="Item 2"
 				/>
+				<NavigationItem>
+					<a
+						className="components-button"
+						href="http://www.example.com"
+					>
+						External Link
+					</a>
+				</NavigationItem>
 				<NavigationItem
 					item="item-sub-menu"
 					navigateToMenu="sub-menu"

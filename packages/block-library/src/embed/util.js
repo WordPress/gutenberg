@@ -156,6 +156,12 @@ export const createUpgradedEmbedBlock = (
  * @return {string} The class names without any aspect ratio related class.
  */
 export const removeAspectRatioClasses = ( existingClassNames ) => {
+	if ( ! existingClassNames ) {
+		// Avoids extraneous work and also, by returning the same value as
+		// received, ensures the post is not dirtied by a change of the block
+		// attribute from `undefined` to an emtpy string.
+		return existingClassNames;
+	}
 	const aspectRatioClassNames = ASPECT_RATIOS.reduce(
 		( accumulator, { className } ) => {
 			accumulator[ className ] = false;
@@ -176,7 +182,7 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
  */
 export function getClassNames(
 	html,
-	existingClassNames = '',
+	existingClassNames,
 	allowResponsive = true
 ) {
 	if ( ! allowResponsive ) {
@@ -198,6 +204,14 @@ export function getClassNames(
 		) {
 			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
 			if ( aspectRatio >= potentialRatio.ratio ) {
+				// Evaluate the difference between actual aspect ratio and closest match.
+				// If the difference is too big, do not scale the embed according to aspect ratio.
+				const ratioDiff = aspectRatio - potentialRatio.ratio;
+				if ( ratioDiff > 0.1 ) {
+					// No close aspect ratio match found.
+					return removeAspectRatioClasses( existingClassNames );
+				}
+				// Close aspect ratio match found.
 				return classnames(
 					removeAspectRatioClasses( existingClassNames ),
 					potentialRatio.className,

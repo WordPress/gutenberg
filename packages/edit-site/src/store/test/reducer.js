@@ -13,6 +13,7 @@ import {
 	editedPost,
 	navigationPanel,
 	blockInserterPanel,
+	listViewPanel,
 } from '../reducer';
 import { PREFERENCES_DEFAULTS } from '../defaults';
 
@@ -21,6 +22,7 @@ import {
 	openNavigationPanelToMenu,
 	setIsNavigationPanelOpened,
 	setIsInserterOpened,
+	setIsListViewOpened,
 } from '../actions';
 
 describe( 'state', () => {
@@ -208,6 +210,21 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should close the navigation panel when opening the list view and change the menu to root', () => {
+			const state = navigationPanel(
+				undefined,
+				openNavigationPanelToMenu( 'test-menu' )
+			);
+
+			expect( state.menu ).toEqual( 'test-menu' );
+			expect(
+				navigationPanel( state, setIsListViewOpened( true ) )
+			).toEqual( {
+				isOpen: false,
+				menu: 'root',
+			} );
+		} );
+
 		it( 'should not change the state when closing the inserter', () => {
 			const state = navigationPanel(
 				undefined,
@@ -217,6 +234,18 @@ describe( 'state', () => {
 			expect( state.menu ).toEqual( 'test-menu' );
 			expect(
 				navigationPanel( state, setIsInserterOpened( false ) )
+			).toEqual( state );
+		} );
+
+		it( 'should not change the state when closing the list view', () => {
+			const state = navigationPanel(
+				undefined,
+				openNavigationPanelToMenu( 'test-menu' )
+			);
+
+			expect( state.menu ).toEqual( 'test-menu' );
+			expect(
+				navigationPanel( state, setIsListViewOpened( false ) )
 			).toEqual( state );
 		} );
 	} );
@@ -248,10 +277,68 @@ describe( 'state', () => {
 			).toBe( false );
 		} );
 
+		it( 'should close the inserter when opening the list view panel', () => {
+			expect(
+				blockInserterPanel( true, setIsListViewOpened( true ) )
+			).toBe( false );
+		} );
+
 		it( 'should not change the state when closing the nav panel', () => {
 			expect(
 				blockInserterPanel( true, setIsNavigationPanelOpened( false ) )
 			).toBe( true );
+		} );
+
+		it( 'should not change the state when closing the list view panel', () => {
+			expect(
+				blockInserterPanel( true, setIsListViewOpened( false ) )
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'listViewPanel()', () => {
+		it( 'should apply default state', () => {
+			expect( listViewPanel( undefined, {} ) ).toEqual( false );
+		} );
+
+		it( 'should default to returning the same state', () => {
+			expect( listViewPanel( true, {} ) ).toBe( true );
+		} );
+
+		it( 'should set the open state of the list view panel', () => {
+			expect( listViewPanel( false, setIsListViewOpened( true ) ) ).toBe(
+				true
+			);
+			expect( listViewPanel( true, setIsListViewOpened( false ) ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should close the list view when opening the nav panel', () => {
+			expect(
+				listViewPanel( true, openNavigationPanelToMenu( 'noop' ) )
+			).toBe( false );
+			expect(
+				listViewPanel( true, setIsNavigationPanelOpened( true ) )
+			).toBe( false );
+		} );
+
+		it( 'should close the list view when opening the inserter panel', () => {
+			expect( listViewPanel( true, setIsInserterOpened( true ) ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should not change the state when closing the nav panel', () => {
+			expect(
+				listViewPanel( true, setIsNavigationPanelOpened( false ) )
+			).toBe( true );
+		} );
+
+		it( 'should not change the state when closing the inserter panel', () => {
+			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
+				true
+			);
 		} );
 	} );
 } );

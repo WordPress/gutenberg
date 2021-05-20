@@ -44,10 +44,15 @@ export const SVG = ( {
 	const defaultStyle = isPressed
 		? styles[ 'is-pressed' ]
 		: styles[ 'components-toolbar__control-' + colorScheme ];
+	const propStyle = Array.isArray( props.style )
+		? props.style.reduce( ( acc, el ) => {
+				return { ...acc, ...el };
+		  }, {} )
+		: props.style;
 	const styleValues = Object.assign(
 		{},
 		defaultStyle,
-		props.style,
+		propStyle,
 		...stylesFromClasses
 	);
 

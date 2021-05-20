@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
 /**
@@ -41,7 +42,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-widgets-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Pattern_Directory_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-pattern-directory-controller.php';
+		require_once __DIR__ . '/class-wp-rest-pattern-directory-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menus-controller.php';
@@ -55,17 +56,14 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/class-wp-rest-customizer-nonces.php';
 	}
-	if ( ! class_exists( 'WP_REST_Post_Format_Search_Handler' ) ) {
-		require_once __DIR__ . '/class-wp-rest-post-format-search-handler.php';
-	}
-	if ( ! class_exists( 'WP_REST_Term_Search_Handler' ) ) {
-		require_once __DIR__ . '/class-wp-rest-term-search-handler.php';
-	}
 	if ( ! class_exists( 'WP_REST_Batch_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-batch-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Templates_Controller' ) ) {
 		require_once __DIR__ . '/full-site-editing/class-wp-rest-templates-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-block-editor-settings-controller.php';
 	}
 	/**
 	* End: Include for phase 2
@@ -85,6 +83,7 @@ if ( ! class_exists( 'WP_Widget_Block' ) ) {
 require_once __DIR__ . '/widgets-page.php';
 
 require __DIR__ . '/compat.php';
+require __DIR__ . '/compat/wordpress-5.8.php';
 require __DIR__ . '/utils.php';
 require __DIR__ . '/editor-settings.php';
 
@@ -94,6 +93,8 @@ if ( ! class_exists( 'WP_Block_Template ' ) ) {
 
 // These are used by some FSE features
 // as well as global styles.
+require __DIR__ . '/interface-wp-theme-json-schema.php';
+require __DIR__ . '/class-wp-theme-json-schema-v0.php';
 require __DIR__ . '/class-wp-theme-json.php';
 require __DIR__ . '/class-wp-theme-json-resolver.php';
 
@@ -109,21 +110,25 @@ require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/full-site-editing/edit-site-export.php';
 
 require __DIR__ . '/blocks.php';
+require __DIR__ . '/block-editor.php';
+require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/widgets.php';
+require __DIR__ . '/widgets-api.php';
+require __DIR__ . '/widgets-customize.php';
 require __DIR__ . '/navigation.php';
 require __DIR__ . '/navigation-page.php';
 require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/global-styles.php';
-require __DIR__ . '/query-utils.php';
 
-if ( ! class_exists( 'WP_Block_Supports' ) ) {
-	require_once __DIR__ . '/class-wp-block-supports.php';
-}
 require __DIR__ . '/block-supports/generated-classname.php';
+require __DIR__ . '/block-supports/elements.php';
 require __DIR__ . '/block-supports/colors.php';
 require __DIR__ . '/block-supports/align.php';
 require __DIR__ . '/block-supports/typography.php';
 require __DIR__ . '/block-supports/custom-classname.php';
 require __DIR__ . '/block-supports/border.php';
+require __DIR__ . '/block-supports/layout.php';
+require __DIR__ . '/block-supports/spacing.php';
+require __DIR__ . '/block-supports/duotone.php';

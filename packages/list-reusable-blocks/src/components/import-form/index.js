@@ -60,8 +60,8 @@ class ImportForm extends Component {
 					case 'Invalid JSON file':
 						uiMessage = __( 'Invalid JSON file' );
 						break;
-					case 'Invalid Reusable Block JSON file':
-						uiMessage = __( 'Invalid Reusable Block JSON file' );
+					case 'Invalid Reusable block JSON file':
+						uiMessage = __( 'Invalid Reusable block JSON file' );
 						break;
 					default:
 						uiMessage = __( 'Unknown error' );

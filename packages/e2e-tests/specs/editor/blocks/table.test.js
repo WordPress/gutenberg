@@ -77,16 +77,16 @@ describe( 'Table', () => {
 		await page.click( 'td' );
 		await page.keyboard.type( 'This' );
 
-		// Tab to the next cell and add some text.
-		await page.keyboard.press( 'Tab' );
+		// Navigate to the next cell and add some text.
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'is' );
 
-		// Tab to the next cell and add some text.
-		await page.keyboard.press( 'Tab' );
+		// Navigate to the next cell and add some text.
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'table' );
 
-		// Tab to the next cell and add some text.
-		await page.keyboard.press( 'Tab' );
+		// Navigate to the next cell and add some text.
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'block' );
 
 		// Expect the post to have the correct written content inside the table.

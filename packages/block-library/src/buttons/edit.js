@@ -10,7 +10,7 @@ import {
 	BlockControls,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	JustifyToolbar,
+	JustifyContentControl,
 } from '@wordpress/block-editor';
 
 /**
@@ -42,23 +42,20 @@ function ButtonsEdit( {
 		templateInsertUpdatesSelection: true,
 	} );
 
-	function handleItemsAlignment( align ) {
-		return () => {
-			const justification =
-				contentJustification === align ? undefined : align;
-			setAttributes( {
-				contentJustification: justification,
-			} );
-		};
-	}
+	const justifyControls =
+		orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
 
 	return (
 		<>
-			<BlockControls>
-				<JustifyToolbar
-					allowedControls={ [ 'left', 'center', 'right' ] }
+			<BlockControls group="block">
+				<JustifyContentControl
+					allowedControls={ justifyControls }
 					value={ contentJustification }
-					onChange={ handleItemsAlignment }
+					onChange={ ( value ) =>
+						setAttributes( { contentJustification: value } )
+					}
 					popoverProps={ {
 						position: 'bottom right',
 						isAlternate: true,

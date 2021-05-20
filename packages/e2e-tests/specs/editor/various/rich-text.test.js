@@ -8,6 +8,7 @@ import {
 	clickBlockAppender,
 	pressKeyWithModifier,
 	showBlockToolbar,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
@@ -373,5 +374,81 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'primary', 'v' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should preserve internal formatting', async () => {
+		await clickBlockAppender();
+
+		// Add text and select to color.
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await clickBlockToolbarButton( 'More' );
+
+		const button = await page.waitForXPath(
+			`//button[contains(text(), 'Text color')]`
+		);
+		// Clicks may fail if the button is out of view. Assure it is before click.
+		await button.evaluate( ( element ) => element.scrollIntoView() );
+		await button.click();
+
+		// Select color other than black.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Dismiss color picker popover
+		await page.keyboard.press( 'Escape' );
+
+		// Navigate to the block.
+		await page.keyboard.press( 'Tab' );
+
+		// Copy the colored text.
+		await pressKeyWithModifier( 'primary', 'c' );
+
+		// Collapsed the selection to the end.
+		await page.keyboard.press( 'ArrowRight' );
+
+		// Create a new paragraph.
+		await page.keyboard.press( 'Enter' );
+
+		// Paste the colored text.
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate arround emoji', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '🍓' );
+		// Only one press on arrow left should be required to move in front of
+		// the emoji.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( '1' );
+
+		// Expect '1🍓'.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should show/hide toolbar when entering/exiting format', async () => {
+		const blockToolbarSelector = '.block-editor-block-toolbar';
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await pressKeyWithModifier( 'primary', 'b' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.keyboard.type( '2' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await pressKeyWithModifier( 'primary', 'b' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
 	} );
 } );

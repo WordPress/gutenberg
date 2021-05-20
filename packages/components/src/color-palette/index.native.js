@@ -81,7 +81,7 @@ function ColorPalette( {
 	useEffect( () => {
 		if ( scrollViewRef.current ) {
 			if ( isSelectedCustom() ) {
-				scrollViewRef.current.scrollToEnd();
+				scrollToEndWithDelay();
 			} else {
 				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 			}
@@ -89,7 +89,8 @@ function ColorPalette( {
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {
-		const isWithinColors = activeColor && colors.includes( activeColor );
+		const isWithinColors =
+			activeColor && colors && colors.includes( activeColor );
 		if ( activeColor ) {
 			if ( isGradientSegment ) {
 				return isGradientColor && ! isWithinColors;
@@ -163,8 +164,17 @@ function ColorPalette( {
 	function onContentSizeChange( width ) {
 		contentWidth = width;
 		if ( isSelectedCustom() && scrollViewRef.current ) {
-			scrollViewRef.current.scrollToEnd( { animated: ! isIOS } );
+			scrollToEndWithDelay();
 		}
+	}
+
+	function scrollToEndWithDelay() {
+		const delayedScroll = setTimeout( () => {
+			scrollViewRef.current.scrollToEnd();
+		}, ANIMATION_DURATION );
+		return () => {
+			clearTimeout( delayedScroll );
+		};
 	}
 
 	function onCustomIndicatorLayout( { nativeEvent } ) {

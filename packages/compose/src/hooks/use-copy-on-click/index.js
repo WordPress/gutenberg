@@ -7,9 +7,12 @@ import Clipboard from 'clipboard';
  * WordPress dependencies
  */
 import { useRef, useEffect, useState } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Copies the text to the clipboard when the element is clicked.
+ *
+ * @deprecated
  *
  * @param {Object}          ref     Reference with the element.
  * @param {string|Function} text    The text to copy.
@@ -20,6 +23,12 @@ import { useRef, useEffect, useState } from '@wordpress/element';
  *                   timeout.
  */
 export default function useCopyOnClick( ref, text, timeout = 4000 ) {
+	deprecated( 'wp.compose.useCopyOnClick', {
+		since: '10.3',
+		plugin: 'Gutenberg',
+		alternative: 'wp.compose.useCopyToClipboard',
+	} );
+
 	const clipboard = useRef();
 	const [ hasCopied, setHasCopied ] = useState( false );
 

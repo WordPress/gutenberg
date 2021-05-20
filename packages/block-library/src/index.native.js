@@ -10,6 +10,7 @@ import { sortBy } from 'lodash';
 import {
 	hasBlockSupport,
 	registerBlockType,
+	registerBlockTypeFromMetadata,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -52,7 +53,6 @@ import * as search from './search';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
-import * as subhead from './subhead';
 import * as table from './table';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
@@ -63,6 +63,8 @@ import * as group from './group';
 import * as buttons from './buttons';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
+
+import { transformationCategory } from './transformationCategories';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -101,7 +103,6 @@ export const coreBlocks = [
 	separator,
 	reusableBlock,
 	spacer,
-	subhead,
 	table,
 	tagCloud,
 	textColumns,
@@ -127,10 +128,13 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	registerBlockType( name, {
-		...metadata,
-		...settings,
-	} );
+	registerBlockTypeFromMetadata(
+		{
+			name,
+			...metadata,
+		},
+		settings
+	);
 };
 
 /**
@@ -182,6 +186,28 @@ addFilter(
 	}
 );
 
+addFilter(
+	'blocks.registerBlockType',
+	'core/react-native-editor',
+	( settings, name ) => {
+		if ( ! settings.transforms ) {
+			return settings;
+		}
+
+		if ( ! settings.transforms.supportedMobileTransforms ) {
+			return {
+				...settings,
+				transforms: {
+					...settings.transforms,
+					supportedMobileTransforms: transformationCategory( name ),
+				},
+			};
+		}
+
+		return settings;
+	}
+);
+
 /**
  * Function to register core blocks provided by the block editor.
  *
@@ -226,6 +252,8 @@ export const registerCoreBlocks = () => {
 		file,
 		audio,
 		devOnly( reusableBlock ),
+		search,
+		devOnly( embed ),
 	].forEach( registerBlock );
 
 	registerBlockVariations( socialLink );

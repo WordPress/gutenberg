@@ -22,7 +22,12 @@ const stopKeyPropagation = ( event ) => event.stopPropagation();
 // Disable reason (no-static-element-interactions): Navigational key-presses within
 // the menu are prevented from triggering WritingFlow and ObserveTyping interactions.
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-export default function TemplatePartSelection( { setAttributes, onClose } ) {
+export default function TemplatePartSelection( {
+	setAttributes,
+	onClose,
+	area,
+	templatePartId = null,
+} ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	return (
 		<div
@@ -39,6 +44,8 @@ export default function TemplatePartSelection( { setAttributes, onClose } ) {
 					setAttributes={ setAttributes }
 					filterValue={ filterValue }
 					onClose={ onClose }
+					area={ area }
+					templatePartId={ templatePartId }
 				/>
 			</div>
 		</div>

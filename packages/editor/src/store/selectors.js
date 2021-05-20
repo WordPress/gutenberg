@@ -27,6 +27,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -40,6 +41,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { cleanForSlug } from '../utils/url';
+import { getTemplatePartIcon } from './utils/get-template-part-icon';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -305,6 +307,7 @@ export const getReferenceByDistinctEdits = createRegistrySelector(
 		deprecated(
 			"`wp.data.select( 'core/editor' ).getReferenceByDistinctEdits`",
 			{
+				since: '5.4',
 				alternative:
 					"`wp.data.select( 'core' ).getReferenceByDistinctEdits`",
 			}
@@ -684,9 +687,9 @@ export const isEditedPostAutosaveable = createRegistrySelector(
  */
 export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
 	deprecated( "`wp.data.select( 'core/editor' ).getAutosave()`", {
+		since: '5.3',
 		alternative:
 			"`wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
-		plugin: 'Gutenberg',
 	} );
 
 	const postType = getCurrentPostType( state );
@@ -712,9 +715,9 @@ export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
  */
 export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
 	deprecated( "`wp.data.select( 'core/editor' ).hasAutosave()`", {
+		since: '5.3',
 		alternative:
 			"`!! wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
-		plugin: 'Gutenberg',
 	} );
 
 	const postType = getCurrentPostType( state );
@@ -952,7 +955,7 @@ export function getSuggestedPostFormat( state ) {
  */
 export function getBlocksForSerialization( state ) {
 	deprecated( '`core/editor` getBlocksForSerialization selector', {
-		plugin: 'Gutenberg',
+		since: '5.3',
 		alternative: 'getEditorBlocks',
 		hint: 'Blocks serialization pre-processing occurs at save time',
 	} );
@@ -1229,9 +1232,16 @@ export function getEditorBlocks( state ) {
  *
  * @param {Object} state
  * @return {WPBlockSelection} The selection start.
+ *
+ * @deprecated since Gutenberg 10.0.0.
  */
 export function getEditorSelectionStart( state ) {
-	return getEditedPostAttribute( state, 'selectionStart' );
+	deprecated( "select('core/editor').getEditorSelectionStart", {
+		since: '10.0',
+		plugin: 'Gutenberg',
+		alternative: "select('core/editor').getEditorSelection",
+	} );
+	return getEditedPostAttribute( state, 'selection' )?.selectionStart;
 }
 
 /**
@@ -1239,9 +1249,26 @@ export function getEditorSelectionStart( state ) {
  *
  * @param {Object} state
  * @return {WPBlockSelection} The selection end.
+ *
+ * @deprecated since Gutenberg 10.0.0.
  */
 export function getEditorSelectionEnd( state ) {
-	return getEditedPostAttribute( state, 'selectionEnd' );
+	deprecated( "select('core/editor').getEditorSelectionStart", {
+		since: '10.0',
+		plugin: 'Gutenberg',
+		alternative: "select('core/editor').getEditorSelection",
+	} );
+	return getEditedPostAttribute( state, 'selection' )?.selectionEnd;
+}
+
+/**
+ * Returns the current selection.
+ *
+ * @param {Object} state
+ * @return {WPBlockSelection} The selection end.
+ */
+export function getEditorSelection( state ) {
+	return getEditedPostAttribute( state, 'selection' );
 }
 
 /**
@@ -1277,6 +1304,7 @@ export function getEditorSettings( state ) {
  */
 export function getStateBeforeOptimisticTransaction() {
 	deprecated( "select('core/editor').getStateBeforeOptimisticTransaction", {
+		since: '5.7',
 		hint: 'No state history is kept on this store anymore',
 	} );
 
@@ -1290,6 +1318,7 @@ export function getStateBeforeOptimisticTransaction() {
  */
 export function inSomeHistory() {
 	deprecated( "select('core/editor').inSomeHistory", {
+		since: '5.7',
 		hint: 'No state history is kept on this store anymore',
 	} );
 	return false;
@@ -1298,6 +1327,7 @@ export function inSomeHistory() {
 function getBlockEditorSelector( name ) {
 	return createRegistrySelector( ( select ) => ( state, ...args ) => {
 		deprecated( "`wp.data.select( 'core/editor' )." + name + '`', {
+			since: '5.3',
 			alternative: "`wp.data.select( 'core/block-editor' )." + name + '`',
 		} );
 
@@ -1643,6 +1673,24 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
 }
 
 /**
+ * Returns the default template part areas.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} The template part areas.
+ */
+export const __experimentalGetDefaultTemplatePartAreas = createSelector(
+	( state ) => {
+		const areas =
+			getEditorSettings( state )?.defaultTemplatePartAreas || [];
+		return areas?.map( ( item ) => {
+			return { ...item, icon: getTemplatePartIcon( item.icon ) };
+		} );
+	},
+	( state ) => [ getEditorSettings( state )?.defaultTemplatePartAreas ]
+);
+
+/**
  * Returns a default template type searched by slug.
  *
  * @param {Object} state Global application state.
@@ -1658,18 +1706,18 @@ export const __experimentalGetDefaultTemplateType = createSelector(
 
 /**
  * Given a template entity, return information about it which is ready to be
- * rendered, such as the title and description.
+ * rendered, such as the title, description, and icon.
  *
  * @param {Object} state Global application state.
  * @param {Object} template The template for which we need information.
- * @return {Object} Information about the template, including title and description.
+ * @return {Object} Information about the template, including title, description, and icon.
  */
 export function __experimentalGetTemplateInfo( state, template ) {
 	if ( ! template ) {
 		return {};
 	}
 
-	const { excerpt, slug, title } = template;
+	const { excerpt, slug, title, area } = template;
 	const {
 		title: defaultTitle,
 		description: defaultDescription,
@@ -1677,6 +1725,10 @@ export function __experimentalGetTemplateInfo( state, template ) {
 
 	const templateTitle = isString( title ) ? title : title?.rendered;
 	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
+	const templateIcon =
+		__experimentalGetDefaultTemplatePartAreas( state ).find(
+			( item ) => area === item.area
+		)?.icon || layout;
 
 	return {
 		title:
@@ -1684,5 +1736,6 @@ export function __experimentalGetTemplateInfo( state, template ) {
 				? templateTitle
 				: defaultTitle || slug,
 		description: templateDescription || defaultDescription,
+		icon: templateIcon,
 	};
 }

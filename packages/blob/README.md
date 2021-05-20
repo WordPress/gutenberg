@@ -38,7 +38,7 @@ _Parameters_
 
 _Returns_
 
--   `(File|undefined)`: The file for the blob URL.
+-   `File|undefined`: The file for the blob URL.
 
 <a name="getBlobTypeByURL" href="#getBlobTypeByURL">#</a> **getBlobTypeByURL**
 
@@ -52,7 +52,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|undefined)`: The blob type.
+-   `string|undefined`: The blob type.
 
 <a name="isBlobURL" href="#isBlobURL">#</a> **isBlobURL**
 

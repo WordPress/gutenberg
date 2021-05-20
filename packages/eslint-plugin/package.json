@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "8.0.2",
+	"version": "9.0.5",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,6 +31,8 @@
 	],
 	"main": "index.js",
 	"dependencies": {
+		"@typescript-eslint/eslint-plugin": "^4.15.0",
+		"@typescript-eslint/parser": "^4.15.0",
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"babel-eslint": "^10.1.0",
 		"cosmiconfig": "^7.0.0",
@@ -47,7 +49,13 @@
 		"requireindex": "^1.2.0"
 	},
 	"peerDependencies": {
-		"eslint": "^6 || ^7"
+		"eslint": "^6 || ^7",
+		"typescript": "^4"
+	},
+	"peerDependenciesMeta": {
+		"typescript": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

@@ -11,6 +11,7 @@ import {
 	useLayoutEffect,
 	useReducer,
 	useMemo,
+	useRef,
 } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
@@ -41,19 +42,19 @@ const getAbsolutePosition = ( element ) => {
  *  - It uses the "resetAnimation" flag to reset the animation
  *    from the beginning in order to animate to the new destination point.
  *
- * @param {Object}  ref                      Reference to the element to animate.
- * @param {boolean} isSelected               Whether it's the current block or not.
- * @param {boolean} adjustScrolling          Adjust the scroll position to the current block.
- * @param {boolean} enableAnimation          Enable/Disable animation.
- * @param {*}       triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param {Object}  $1                          Options
+ * @param {boolean} $1.isSelected               Whether it's the current block or not.
+ * @param {boolean} $1.adjustScrolling          Adjust the scroll position to the current block.
+ * @param {boolean} $1.enableAnimation          Enable/Disable animation.
+ * @param {*}       $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
  */
-function useMovingAnimation(
-	ref,
+function useMovingAnimation( {
 	isSelected,
 	adjustScrolling,
 	enableAnimation,
-	triggerAnimationOnChange
-) {
+	triggerAnimationOnChange,
+} ) {
+	const ref = useRef();
 	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
 	const [ triggeredAnimation, triggerAnimation ] = useReducer(
 		counterReducer,
@@ -163,6 +164,8 @@ function useMovingAnimation(
 		immediate: prefersReducedMotion,
 		onFrame,
 	} );
+
+	return ref;
 }
 
 export default useMovingAnimation;

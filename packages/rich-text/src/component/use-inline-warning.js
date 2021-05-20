@@ -1,9 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
-export function useInlineWarning( { ref } ) {
+const message =
+	'RichText cannot be used with an inline container. Please use a different display property.';
+
+export function useInlineWarning() {
+	const ref = useRef();
 	useEffect( () => {
 		if ( process.env.NODE_ENV === 'development' ) {
 			const target = ref.current;
@@ -12,10 +16,9 @@ export function useInlineWarning( { ref } ) {
 
 			if ( computedStyle.display === 'inline' ) {
 				// eslint-disable-next-line no-console
-				console.warn(
-					'RichText cannot be used with an inline container. Please use a different tagName.'
-				);
+				console.error( message );
 			}
 		}
 	}, [] );
+	return ref;
 }
