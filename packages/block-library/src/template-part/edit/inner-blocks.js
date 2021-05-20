@@ -36,31 +36,34 @@ export default function TemplatePartInnerBlocks( {
 		{ id }
 	);
 
-	// Use blockProps as the starting point for innerBlockProps to ensure
-	// the overlay does not cause style and layout regressions.
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		value: blocks,
-		onInput,
-		onChange,
-		renderAppender: hasInnerBlocks
-			? undefined
-			: InnerBlocks.ButtonBlockAppender,
-		__experimentalLayout: {
-			type: 'default',
-			// Find a way to inject this in the support flag code (hooks).
-			alignments: themeSupportsLayout ? alignments : undefined,
+	const { className, 'data-type': dataType, style } = blockProps;
+	// Use classnames, common selectors, and style from blockProps in the
+	// innerBlockProps to ensure the overlay does not cause style and layout regressions.
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className,
+			'data-type': dataType,
+			style,
 		},
-	} );
+		{
+			value: blocks,
+			onInput,
+			onChange,
+			renderAppender: hasInnerBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+			__experimentalLayout: {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments: themeSupportsLayout ? alignments : undefined,
+			},
+		}
+	);
 
 	return (
 		<TagName { ...blockProps }>
 			<BlockContentOverlay clientId={ clientId }>
-				{
-					// Set tabIndex to remove this from keyboard nav since we have
-					// duplicated blockProps into this wrapper.  Otherwise keyboard nav
-					// will seem to stay on this block for one extra key press.
-					<div { ...innerBlocksProps } tabIndex={ -1 } />
-				}
+				<div { ...innerBlocksProps } />
 			</BlockContentOverlay>
 		</TagName>
 	);
