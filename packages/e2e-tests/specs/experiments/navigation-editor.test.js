@@ -420,7 +420,7 @@ describe( 'Navigation editor', () => {
 			expect( navigatorNameEditor ).toBeDefined();
 		} );
 
-		it( 'saves menu name upon clicking save button', async () => {
+		it.skip( 'saves menu name upon clicking save button', async () => {
 			const newName = 'newName';
 			const menuPostResponse = {
 				id: 4,
@@ -553,11 +553,11 @@ describe( 'Navigation editor', () => {
 			}
 		}
 
-		it( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
+		it.skip( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
 			assertIsDirty( false );
 		} );
 
-		it( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
+		it.skip( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
 			await page.type(
 				'.edit-navigation-name-editor__text-control input',
 				' Menu'
