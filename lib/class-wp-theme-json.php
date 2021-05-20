@@ -1076,8 +1076,10 @@ class WP_Theme_JSON {
 	 * Merge new incoming data.
 	 *
 	 * @param WP_Theme_JSON $incoming Data to merge.
+	 * @param string $update_or_remove Whether update or remove existing colors
+	 *                                 for which the incoming data has a duplicated slug.
 	 */
-	public function merge( $incoming ) {
+	public function merge( $incoming, $update_or_remove = 'remove' ) {
 		$incoming_data = $incoming->get_raw_data();
 		$existing_data = $this->theme_json;
 
@@ -1095,11 +1097,16 @@ class WP_Theme_JSON {
 		$to_replace[] = array( 'typography', 'fontSizes' );
 		$to_replace[] = array( 'typography', 'fontFamilies' );
 
-		// Some others should be either appended to the existing
-		// or update the existing if the slug is the same.
+		// Some others should be appended to the existing.
+		// If the slug is the same than an existing element,
+		// the $update_or_remove param is used to decide
+		// what to do with the existing element:
+		// either remove it and append the incoming,
+		// or update it with the incoming.
 		$to_append   = array();
-		$to_append[] = array( 'color', 'palette' );
+		$to_append[] = array( 'color', 'duotone' );
 		$to_append[] = array( 'color', 'gradients' );
+		$to_append[] = array( 'color', 'palette' );
 
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
@@ -1128,13 +1135,23 @@ class WP_Theme_JSON {
 					$merged[ $key ]                = $value;
 				}
 
+				$to_remove = [];
 				foreach( $incoming_node as $value ) {
-					if ( in_array( $value['slug'], $existing_slugs ) ) {
+					if ( ! in_array( $value['slug'], $existing_slugs ) ) {
+						$merged[] = $value;
+					} elseif ( 'update' === $update_or_remove ) {
 						$merged[ $index_table[ $value['slug'] ] ] = $value;
 					} else {
-						$merged[] = $value;
+						$merged[]    = $value;
+						$to_remove[] = $index_table[ $value['slug'] ];
 					}
 				}
+
+				// Remove the duplicated values and pack the sparsed array.
+				foreach( $to_remove as $index ) {
+					unset( $merged[ $index ] );
+				}
+				$merged = array_values( $merged );
 
 				gutenberg_experimental_set( $this->theme_json, $path, $merged );
 			}
