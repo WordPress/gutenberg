@@ -9,7 +9,7 @@ import type { Ref } from 'react';
  */
 import { useContextSystem, contextConnect } from '../context';
 // eslint-disable-next-line no-duplicate-imports
-import type { ViewOwnProps } from '../context';
+import type { PolymorphicComponentProps } from '../context';
 
 export interface ShortcutDescription {
 	display: string;
@@ -22,7 +22,7 @@ export interface Props {
 }
 
 function Shortcut(
-	props: ViewOwnProps< Props, 'span' >,
+	props: PolymorphicComponentProps< Props, 'span' >,
 	forwardedRef: Ref< any >
 ): JSX.Element | null {
 	const { shortcut, className, ...otherProps } = useContextSystem(
