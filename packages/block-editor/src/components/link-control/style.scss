@@ -212,6 +212,11 @@ $block-editor-link-control-number-of-actions: 1;
 		background-color: $gray-100;
 		border-radius: 2px;
 	}
+
+	.block-editor-link-control__search-item-description {
+		padding-top: $grid-unit-10;
+		margin: 0;
+	}
 }
 
 .block-editor-link-control__search-item-top {
