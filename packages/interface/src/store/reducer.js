@@ -87,7 +87,7 @@ export function multipleEnableItems(
  * @return {Object} Updated state.
  */
 export const preferences = flow( [ combineReducers ] )( {
-	featuresDefaults( state, action ) {
+	featuresDefaults( state = {}, action ) {
 		if ( action.type === 'SET_FEATURE_DEFAULTS' ) {
 			const { scope, defaults } = action;
 			return {
@@ -101,14 +101,14 @@ export const preferences = flow( [ combineReducers ] )( {
 
 		return state;
 	},
-	features( state, action ) {
+	features( state = {}, action ) {
 		if ( action.type === 'TOGGLE_FEATURE' ) {
 			const { scope, featureName } = action;
 			return {
 				...state,
 				[ scope ]: {
 					...state[ scope ],
-					[ featureName ]: ! state[ scope ][ featureName ],
+					[ featureName ]: ! state?.[ scope ]?.[ featureName ],
 				},
 			};
 		}

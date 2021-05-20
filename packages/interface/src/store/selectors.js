@@ -71,7 +71,7 @@ export function isItemPinned( state, scope, item ) {
  *
  * @return {boolean} Is the feature enabled?
  */
-export function isFeatureEnabled( state, scope, featureName ) {
+export function isFeatureActive( state, scope, featureName ) {
 	const featureValue = state.preferences.features[ scope ]?.[ featureName ];
 	const defaultedFeatureValue =
 		featureValue !== undefined
