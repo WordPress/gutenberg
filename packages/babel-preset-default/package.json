@@ -38,6 +38,7 @@
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/element": "file:../element",
 		"@wordpress/warning": "file:../warning",
+		"browserslist": "^4.16.6",
 		"core-js": "^3.6.4"
 	},
 	"publishConfig": {
