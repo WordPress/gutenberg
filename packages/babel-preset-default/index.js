@@ -31,7 +31,8 @@ module.exports = ( api ) => {
 			};
 		} else {
 			opts.modules = false;
-			const localBrowserslistConfig = browserslist.findConfig( '.' ) || {};
+			const localBrowserslistConfig =
+				browserslist.findConfig( '.' ) || {};
 			opts.targets = {
 				browsers:
 					localBrowserslistConfig.defaults ||
