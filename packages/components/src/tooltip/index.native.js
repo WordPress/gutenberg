@@ -251,10 +251,8 @@ const TooltipSlot = ( { children, ...rest } ) => {
 		setHandleScreenTouch( () => callback );
 	};
 	const handleTouchStart = () => {
-		if ( handleScreenTouch ) {
-			handleScreenTouch();
-			setHandleScreenTouch( null );
-		}
+		handleScreenTouch();
+		setHandleScreenTouch( null );
 	};
 	// Memoize context value to avoid unnecessary rerenders of the Provider's children
 	const value = useMemo( () => ( { onHandleScreenTouch } ) );
@@ -262,7 +260,11 @@ const TooltipSlot = ( { children, ...rest } ) => {
 	return (
 		<TooltipContext.Provider value={ value }>
 			<View
-				onTouchStart={ handleTouchStart }
+				onTouchStart={
+					typeof handleScreenTouch === 'function'
+						? handleTouchStart
+						: undefined
+				}
 				pointerEvents="box-none"
 				style={ StyleSheet.absoluteFill }
 			>
