@@ -8,6 +8,10 @@ import type { Interpolation } from 'create-emotion';
 
 /**
  * Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
+ *
+ * The `children` prop is being explicitely omitted since it is otherwise implicitly added
+ * by `ComponentPropsWithRef`. The context is that components should require the `children`
+ * prop explicitely when needed (see https://github.com/WordPress/gutenberg/pull/31817).
  */
 export type PolymorphicComponentProps< P, T extends As > = P &
 	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P | 'children' > & {
