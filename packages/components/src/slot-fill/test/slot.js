@@ -167,68 +167,7 @@ describe( 'Slot', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should render in expected order when fills always mounted', () => {
-		const { container, rerender } = render(
-			<Provider>
-				<div key="slot">
-					<Slot name="egg" />
-				</div>
-			</Provider>
-		);
-
-		rerender(
-			<Provider>
-				<div key="slot">
-					<Slot name="egg" />
-				</div>
-				<Fill name="egg" key="first">
-					first
-				</Fill>
-				<Fill name="egg" key="second">
-					second
-				</Fill>
-			</Provider>
-		);
-
-		rerender(
-			<Provider>
-				<div key="slot">
-					<Slot name="egg" />
-				</div>
-				<Fill name="egg" key="first" />
-				<Fill name="egg" key="second">
-					second
-				</Fill>
-				<Fill name="egg" key="third">
-					third
-				</Fill>
-			</Provider>
-		);
-
-		rerender(
-			<Provider>
-				<div key="slot">
-					<Slot name="egg" />
-				</div>
-				<Fill name="egg" key="first">
-					first (rerendered)
-				</Fill>
-				<Fill name="egg" key="second">
-					second
-				</Fill>
-				<Fill name="egg" key="third">
-					third
-				</Fill>
-				<Fill name="egg" key="fourth">
-					fourth (new)
-				</Fill>
-			</Provider>
-		);
-
-		expect( container ).toMatchSnapshot();
-	} );
-
-	it( 'should render in expected order when fills unmounted', () => {
+	it( 'should render in expected order', () => {
 		const { container, rerender } = render(
 			<Provider>
 				<div key="slot">
@@ -253,7 +192,6 @@ describe( 'Slot', () => {
 					<Slot name="egg" />
 				</div>
 				<Filler name="egg" key="second" text="second" />
-				<Filler name="egg" key="third" text="third" />
 			</Provider>
 		);
 
@@ -262,10 +200,8 @@ describe( 'Slot', () => {
 				<div key="slot">
 					<Slot name="egg" />
 				</div>
-				<Filler name="egg" key="first" text="first (rerendered)" />
+				<Filler name="egg" key="first" text="first" />
 				<Filler name="egg" key="second" text="second" />
-				<Filler name="egg" key="third" text="third" />
-				<Filler name="egg" key="fourth" text="fourth (new)" />
 			</Provider>
 		);
 

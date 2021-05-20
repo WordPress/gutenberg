@@ -150,31 +150,12 @@ exports[`Slot should render empty Fills without HTML wrapper when render props u
 </div>
 `;
 
-exports[`Slot should render in expected order when fills always mounted 1`] = `
+exports[`Slot should render in expected order 1`] = `
 <div>
   <div>
-    first (rerendered)
+    first
     second
-    third
-    fourth (new)
   </div>
-</div>
-`;
-
-exports[`Slot should render in expected order when fills unmounted 1`] = `
-<div>
-  <div>
-    second
-    third
-    first (rerendered)
-    fourth (new)
-  </div>
-  <button
-    type="button"
-  />
-  <button
-    type="button"
-  />
   <button
     type="button"
   />

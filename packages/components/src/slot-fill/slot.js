@@ -62,6 +62,7 @@ class SlotComponent extends Component {
 		const { children, name, fillProps = {}, getFills } = this.props;
 
 		const fills = map( getFills( name, this ), ( fill ) => {
+			const fillKey = fill.occurrence;
 			const fillChildren = isFunction( fill.children )
 				? fill.children( fillProps )
 				: fill.children;
@@ -71,7 +72,7 @@ class SlotComponent extends Component {
 					return child;
 				}
 
-				const childKey = child.key || childIndex;
+				const childKey = `${ fillKey }---${ child.key || childIndex }`;
 				return cloneElement( child, { key: childKey } );
 			} );
 		} ).filter(
