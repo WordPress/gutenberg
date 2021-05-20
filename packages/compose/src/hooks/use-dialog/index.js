@@ -12,7 +12,7 @@ import useFocusOnMount from '../use-focus-on-mount';
 import useFocusReturn from '../use-focus-return';
 import useFocusOutside from '../use-focus-outside';
 import useMergeRefs from '../use-merge-refs';
-import useFreshRef from '../use-fresh-ref';
+import useLatestRef from '../use-latest-ref';
 
 /**
  * Returns a ref and props to apply to a dialog wrapper to enable the following behaviors:
@@ -24,7 +24,7 @@ import useFreshRef from '../use-fresh-ref';
  * @param {Object} options Dialog Options.
  */
 function useDialog( options ) {
-	const onClose = useFreshRef( options.onClose );
+	const onClose = useLatestRef( options.onClose );
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusOnMountRef = useFocusOnMount();
 	const focusReturnRef = useFocusReturn();

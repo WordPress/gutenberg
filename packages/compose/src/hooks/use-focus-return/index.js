@@ -6,7 +6,7 @@ import { useRef, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useFreshRef from '../use-fresh-ref';
+import useLatestRef from '../use-latest-ref';
 
 /**
  * When opening modals/sidebars/dialogs, the focus
@@ -35,7 +35,7 @@ import useFreshRef from '../use-fresh-ref';
 function useFocusReturn( onFocusReturn ) {
 	const ref = useRef();
 	const focusedBeforeMount = useRef();
-	const onFocusReturnRef = useFreshRef( onFocusReturn );
+	const onFocusReturnRef = useLatestRef( onFocusReturn );
 
 	return useCallback( ( node ) => {
 		if ( node ) {

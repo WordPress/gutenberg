@@ -13,7 +13,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useFreshRef from '../use-fresh-ref';
+import useLatestRef from '../use-latest-ref';
 
 /**
  * A block selection object.
@@ -59,7 +59,7 @@ function useKeyboardShortcut(
 		target,
 	} = {}
 ) {
-	const currentCallback = useFreshRef( callback );
+	const currentCallback = useLatestRef( callback );
 
 	useEffect( () => {
 		if ( isDisabled ) {

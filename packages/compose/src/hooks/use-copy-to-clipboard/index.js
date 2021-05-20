@@ -7,7 +7,7 @@ import Clipboard from 'clipboard';
  * Internal dependencies
  */
 import useRefEffect from '../use-ref-effect';
-import useFreshRef from '../use-fresh-ref';
+import useLatestRef from '../use-latest-ref';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -23,8 +23,8 @@ import useFreshRef from '../use-fresh-ref';
 export default function useCopyToClipboard( text, onSuccess ) {
 	// Store the dependencies as refs and continuesly update them so they're
 	// fresh when the callback is called.
-	const textRef = useFreshRef( text );
-	const onSuccesRef = useFreshRef( onSuccess );
+	const textRef = useLatestRef( text );
+	const onSuccesRef = useLatestRef( onSuccess );
 	return useRefEffect( ( node ) => {
 		// Clipboard listens to click events.
 		const clipboard = new Clipboard( node, {

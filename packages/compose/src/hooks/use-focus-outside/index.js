@@ -11,7 +11,7 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useFreshRef from '../use-fresh-ref';
+import useLatestRef from '../use-latest-ref';
 
 /**
  * Input types which are classified as button types, for use in considering
@@ -97,7 +97,7 @@ function isFocusNormalizedButton( eventTarget ) {
  *                                   outside that element.
  */
 export default function useFocusOutside( onFocusOutside ) {
-	const currentOnFocusOutside = useFreshRef( onFocusOutside );
+	const currentOnFocusOutside = useLatestRef( onFocusOutside );
 
 	const preventBlurCheck = useRef( false );
 
