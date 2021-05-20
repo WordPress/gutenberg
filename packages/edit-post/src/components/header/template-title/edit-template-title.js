@@ -41,7 +41,7 @@ export default function EditTemplateTitle() {
 			label={ __( 'Title' ) }
 			value={ templateTitle }
 			help={ __(
-				'Give the template a title that indicates its purpose, e.g. "Full Width"'
+				'Give the template a title that indicates its purpose, e.g. "Full Width".'
 			) }
 			onChange={ ( newTitle ) => {
 				const settings = getEditorSettings();
