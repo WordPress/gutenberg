@@ -337,7 +337,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	$query_result = array();
 
 	// https://core.trac.wordpress.org/ticket/28099
-	if ( $wp_query_args['post__in'] !== array() ) {
+	if ( ! isset( $wp_query_args['post__in'] ) || $wp_query_args['post__in'] !== array() ) {
 		$template_query = new WP_Query( $wp_query_args );
 		foreach ( $template_query->get_posts() as $post ) {
 			$template = _gutenberg_build_template_result_from_post( $post, $template_type );
