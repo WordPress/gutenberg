@@ -58,7 +58,6 @@ const DEFAULT_INNER_PADDING = 4;
 const BUTTON_BEHAVIOR_EXPAND = 'expand-searchfield';
 const BUTTON_BEHAVIOR_LINK = 'search-page-link';
 
-
 export default function SearchEdit( {
 	className,
 	attributes,

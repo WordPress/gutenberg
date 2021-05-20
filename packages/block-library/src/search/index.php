@@ -94,11 +94,17 @@ function render_block_core_search( $attributes ) {
 		$input_markup . $button_markup
 	);
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
-	$block_attributes = '<script type="application/json" class="wp-block-search__attributes">' .
-		wp_json_encode( (object) [ "width" => $attributes['width'], 'widthUnit' => $attributes['widthUnit'] ] ) .
-	'</script>';
+	$block_attributes = '';
 
-	wp_enqueue_script( 'wp-block-library-search', plugins_url( 'search/frontend.js', __FILE__ ) );
+	if ( ! empty( $attributes['buttonPosition'] ) && ! empty( $attributes['buttonBehavior'] ) ) {
+		if ( 'button-only' === $attributes['buttonPosition'] && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
+			$block_attributes = '<script type="application/json" class="wp-block-search__attributes">' .
+				wp_json_encode( (object) [ "width" => $attributes['width'], 'widthUnit' => $attributes['widthUnit'] ] ) .
+			'</script>';
+
+			wp_enqueue_script( 'wp-block-library-search', plugins_url( 'search/frontend.js', __FILE__ ) );
+		}
+	}
 
 	return sprintf(
 		'<form role="search" method="get" action="%s" %s>%s</form>',

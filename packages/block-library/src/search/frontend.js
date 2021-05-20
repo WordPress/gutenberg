@@ -51,7 +51,9 @@ const wpBlockSearch = ( block ) => {
 };
 
 document.addEventListener( 'DOMContentLoaded', () => {
-	Array.from( document.getElementsByClassName( 'wp-block-search' ) ).forEach( ( block ) => {
-		wpBlockSearch( block );
-	} );
+	Array.from( document.getElementsByClassName( 'wp-block-search__button-behavior-expand' ) ).forEach(
+		( block ) => {
+			wpBlockSearch( block );
+		}
+	);
 } );
