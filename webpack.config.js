@@ -4,7 +4,6 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
 const { escapeRegExp, compact } = require( 'lodash' );
 const { sep } = require( 'path' );
@@ -24,11 +23,11 @@ const {
  * Internal dependencies
  */
 const { dependencies } = require( './package' );
+const AddReadableJsAssetsWebpackPlugin = require( './add-readable-js-assets-webpack-plugin' );
 
 const {
 	NODE_ENV: mode = 'development',
 	WP_DEVTOOL: devtool = mode === 'production' ? false : 'source-map',
-	MINIMIZE,
 } = process.env;
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
@@ -112,26 +111,6 @@ module.exports = {
 		// Only concatenate modules in production, when not analyzing bundles.
 		concatenateModules:
 			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
-		minimizer: [
-			new TerserPlugin( {
-				test: /\.min\.js$/,
-				cache: true,
-				parallel: true,
-				sourceMap: mode !== 'production',
-				terserOptions: {
-					output: {
-						comments: /translators:/i,
-					},
-					compress: {
-						passes: 2,
-					},
-					mangle: {
-						reserved: [ '__', '_n', '_nx', '_x' ],
-					},
-				},
-				extractComments: false,
-			} ),
-		],
 	},
 	mode,
 	entry: createEntrypoints(),
@@ -142,17 +121,15 @@ module.exports = {
 			const { entryModule } = chunk;
 			const { rawRequest } = entryModule;
 
-			const extension = MINIMIZE ? '.min.js' : '.js';
-
 			/*
 			 * If the file being built is a Core Block's frontend file,
 			 * we build it in the block's directory.
 			 */
 			if ( rawRequest && rawRequest.includes( '/frontend.js' ) ) {
-				return `./build/block-library/blocks/[name]/frontend${ extension }`;
+				return `./build/block-library/blocks/[name]/frontend.min.js`;
 			}
 
-			return `./build/[name]/index${ extension }`;
+			return `./build/[name]/index.min.js`;
 		},
 		path: __dirname,
 		library: [ 'wp', '[camelName]' ],
@@ -305,6 +282,7 @@ module.exports = {
 			] )
 		),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+		new AddReadableJsAssetsWebpackPlugin( { mode } ),
 	].filter( Boolean ),
 	watchOptions: {
 		ignored: [ '**/node_modules', '**/packages/*/src' ],

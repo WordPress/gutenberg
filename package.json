@@ -219,7 +219,7 @@
 		"build:packages": "npm run build:package-types && node ./bin/packages/build.js",
 		"build:package-types": "node ./bin/packages/validate-typescript-version.js && tsc --build",
 		"build:plugin-zip": "./bin/build-plugin-zip.sh",
-		"build": "npm run build:packages && wp-scripts build && MINIMIZE=true wp-scripts build",
+		"build": "npm run build:packages && wp-scripts build",
 		"changelog": "./bin/plugin/cli.js changelog",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
