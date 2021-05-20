@@ -96,7 +96,7 @@ if ( ! class_exists( 'WP_Block_Template ' ) ) {
 require __DIR__ . '/interface-wp-theme-json-schema.php';
 require __DIR__ . '/class-wp-theme-json-schema-v0.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
-require __DIR__ . '/class-wp-theme-json-resolver.php';
+require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 
 require __DIR__ . '/full-site-editing/full-site-editing.php';
 require __DIR__ . '/full-site-editing/block-templates.php';
