@@ -110,6 +110,7 @@ export function toggleFeature( scope, featureName ) {
 export function setFeatureDefaults( scope, defaults ) {
 	return {
 		type: 'SET_FEATURE_DEFAULTS',
+		scope,
 		defaults,
 	};
 }

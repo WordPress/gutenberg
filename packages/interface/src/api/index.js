@@ -1,0 +1,1 @@
+export { setFeatureDefaults } from './preferences';
