@@ -34,6 +34,9 @@ export function useScrollIntoView( clientId ) {
 		[ clientId ]
 	);
 
+	// Note that we can't use `useRefEffect` here, since an element change does
+	// not mean we can scroll. `isSelectionEnd` should be the sole dependency,
+	// while with `useRefEffect`, the element is a dependency as well.
 	useEffect( () => {
 		if ( ! isSelectionEnd ) {
 			return;
@@ -41,13 +44,19 @@ export function useScrollIntoView( clientId ) {
 
 		const extentNode = ref.current;
 
+		if ( ! extentNode ) {
+			return;
+		}
+
 		// If the block is focused, the browser will already have scrolled into
 		// view if necessary.
 		if ( extentNode.contains( extentNode.ownerDocument.activeElement ) ) {
 			return;
 		}
 
-		const scrollContainer = getScrollContainer( extentNode );
+		const scrollContainer =
+			getScrollContainer( extentNode ) ||
+			extentNode.ownerDocument.defaultView;
 
 		// If there's no scroll container, it follows that there's no scrollbar
 		// and thus there's no need to try to scroll into view.

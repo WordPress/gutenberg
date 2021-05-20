@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VisuallyHidden should render correctly 1`] = `
+.emotion-0 {
+  border: 0;
+  -webkit-clip: rect( 1px,1px,1px,1px );
+  clip: rect( 1px,1px,1px,1px );
+  -webkit-clip-path: inset( 50% );
+  -webkit-clip-path: inset( 50% );
+  clip-path: inset( 50% );
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  word-wrap: normal !important;
+}
+
+.emotion-0:focus {
+  background-color: #edeff0;
+  -webkit-clip: auto !important;
+  clip: auto !important;
+  -webkit-clip-path: none;
+  clip-path: none;
+  color: #444;
+  display: block;
+  font-size: 1em;
+  height: auto;
+  left: 5px;
+  line-height: normal;
+  padding: 15px 23px 14px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  top: 5px;
+  width: auto;
+  z-index: 100000;
+}
+
+<div
+  class="components-visually-hidden wp-components-visually-hidden emotion-0 emotion-1 emotion-2"
+>
+  This is hidden
+</div>
+`;

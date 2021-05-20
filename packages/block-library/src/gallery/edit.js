@@ -111,7 +111,7 @@ function GalleryEdit( props ) {
 		};
 	} );
 
-	const { resizedImages } = useMemo( () => {
+	const resizedImages = useMemo( () => {
 		if ( isSelected ) {
 			return reduce(
 				attributes.ids,
@@ -151,6 +151,10 @@ function GalleryEdit( props ) {
 		}
 		return {};
 	}, [ isSelected, attributes.ids, imageSizes ] );
+
+	function onFocusGalleryCaption() {
+		setSelectedImage();
+	}
 
 	function setAttributes( newAttrs ) {
 		if ( newAttrs.ids ) {
@@ -463,6 +467,8 @@ function GalleryEdit( props ) {
 				onDeselectImage={ onDeselectImage }
 				onSetImageAttributes={ setImageAttributes }
 				blockProps={ blockProps }
+				// This prop is used by gallery.native.js.
+				onFocusGalleryCaption={ onFocusGalleryCaption }
 			/>
 		</>
 	);

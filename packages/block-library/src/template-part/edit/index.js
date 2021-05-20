@@ -26,6 +26,7 @@ import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
+import { createTemplatePartId } from './utils/create-template-part-id';
 
 export default function TemplatePartEdit( {
 	attributes,
@@ -33,7 +34,7 @@ export default function TemplatePartEdit( {
 	clientId,
 } ) {
 	const { slug, theme, tagName, layout = {} } = attributes;
-	const templatePartId = theme && slug ? theme + '//' + slug : null;
+	const templatePartId = createTemplatePartId( theme, slug );
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		templatePartId
@@ -48,11 +49,14 @@ export default function TemplatePartEdit( {
 		isMissing,
 		defaultWrapper,
 		area,
+		enableSelection,
 	} = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } = select(
-				coreStore
-			);
+			const {
+				getEditedEntityRecord,
+				getEntityRecords,
+				hasFinishedResolution,
+			} = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 
 			const getEntityArgs = [
@@ -64,6 +68,19 @@ export default function TemplatePartEdit( {
 				? getEditedEntityRecord( ...getEntityArgs )
 				: null;
 			const _area = entityRecord?.area || attributes.area;
+
+			// Check whether other entities exist for switching/selection.
+			const availableReplacementArgs = [
+				'postType',
+				'wp_template_part',
+				_area && 'uncategorized' !== _area && { area: _area },
+			];
+			const matchingReplacements = getEntityRecords(
+				...availableReplacementArgs
+			);
+			const _enableSelection = templatePartId
+				? matchingReplacements?.length > 1
+				: matchingReplacements?.length > 0;
 
 			const hasResolvedEntity = templatePartId
 				? hasFinishedResolution(
@@ -82,6 +99,7 @@ export default function TemplatePartEdit( {
 				isMissing: hasResolvedEntity && ! entityRecord,
 				defaultWrapper: defaultWrapperElement || 'div',
 				area: _area,
+				enableSelection: _enableSelection,
 			};
 		},
 		[ templatePartId, clientId ]
@@ -138,10 +156,11 @@ export default function TemplatePartEdit( {
 						area={ attributes.area }
 						clientId={ clientId }
 						setAttributes={ setAttributes }
+						enableSelection={ enableSelection }
 					/>
 				</TagName>
 			) }
-			{ isEntityAvailable && (
+			{ isEntityAvailable && enableSelection && (
 				<BlockControls>
 					<ToolbarGroup className="wp-block-template-part__block-control-group">
 						<Dropdown
@@ -164,6 +183,7 @@ export default function TemplatePartEdit( {
 									setAttributes={ setAttributes }
 									onClose={ onClose }
 									area={ area }
+									templatePartId={ templatePartId }
 								/>
 							) }
 						/>

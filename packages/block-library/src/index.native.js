@@ -10,7 +10,6 @@ import { sortBy } from 'lodash';
 import {
 	hasBlockSupport,
 	registerBlockType,
-	registerBlockTypeFromMetadata,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -128,7 +127,7 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	registerBlockTypeFromMetadata(
+	registerBlockType(
 		{
 			name,
 			...metadata,

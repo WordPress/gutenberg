@@ -9,13 +9,14 @@ import { startCase } from 'lodash';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import { layout } from '@wordpress/icons';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import metadata from './block.json';
 import edit from './edit';
-import './variations';
+import { enhanceTemplatePartVariations } from './variations';
 
 const { name } = metadata;
 export { metadata, name };
@@ -42,3 +43,10 @@ export const settings = {
 	},
 	edit,
 };
+
+// Importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
+addFilter(
+	'blocks.registerBlockType',
+	'core/template-part',
+	enhanceTemplatePartVariations
+);

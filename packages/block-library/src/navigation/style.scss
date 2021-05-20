@@ -97,12 +97,12 @@
 			color: inherit;
 			position: absolute;
 			z-index: 2;
-			display: flex;
 			flex-direction: column;
 			align-items: normal;
 			min-width: 200px;
 
 			// Hide until hover or focus within.
+			display: none;
 			opacity: 0;
 			transition: opacity 0.1s linear;
 			visibility: hidden;
@@ -146,17 +146,19 @@
 		}
 
 		// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
-		// We will need to replace focus-within with a JS solution for IE keyboard support.
+		// We don't actually have to support this anymore, but it's easy to keep for now.
 
 		// Custom menu items.
 		// Show submenus on hover.
 		&:hover > .wp-block-navigation-link__container {
+			display: flex;
 			visibility: visible;
 			opacity: 1;
 		}
 
 		// Keep submenus open when focus is within.
 		&:focus-within > .wp-block-navigation-link__container {
+			display: flex;
 			visibility: visible;
 			opacity: 1;
 		}
@@ -166,6 +168,7 @@
 			cursor: pointer;
 
 			> .submenu-container {
+				display: flex;
 				visibility: visible;
 				opacity: 1;
 			}
@@ -175,6 +178,7 @@
 			cursor: pointer;
 
 			> .submenu-container {
+				display: flex;
 				visibility: visible;
 				opacity: 1;
 			}
@@ -187,7 +191,8 @@
 	// This needs high specificity.
 	&.wp-block-navigation.items-justified-space-between > .submenu-container > .has-child:last-child,
 	&.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
-	&.wp-block-navigation.items-justified-right .has-child {
+	&.wp-block-navigation.items-justified-right > .submenu-container .has-child,
+	&.wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child {
 
 		// First submenu.
 		.submenu-container,
@@ -250,10 +255,18 @@
 		}
 
 		// Submenu indentation when there's no background.
+		// It should align with the text above.
 		left: -1em;
 		top: 100%;
 
-		// Indentation for all submenus.
+		// Indentation when no background on small viewports.
+		// It should align with the parent menu above.
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			left: -1px;
+		}
+
+		// Indentation for all submenus on large viewports.
 		@include break-medium {
 			.submenu-container,
 			.wp-block-navigation-link__container {
@@ -264,10 +277,18 @@
 	}
 
 	// Submenu indentation when there's a background.
+	// It should align with menu item itself.
 	&.has-background .has-child .submenu-container,
 	&.has-background .has-child .wp-block-navigation-link__container {
 		left: 0;
 		top: 100%;
+
+		// Indentation when there's a background on small viewports.
+		// It should align with the parent menu above.
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			left: 0;
+		}
 
 		// There's no border on submenus when there are backgrounds.
 		@include break-medium {
@@ -351,6 +372,7 @@
 		justify-content: flex-end;
 	}
 }
+
 
 /**
  * Mobile menu.
@@ -459,8 +481,26 @@
 
 // Button to open the menu.
 .wp-block-navigation__responsive-container-open {
+	display: flex;
+
 	@include break-small {
 		display: none;
+	}
+
+	// Justify the button.
+	.items-justified-left & {
+		margin-left: 0;
+		margin-right: auto;
+	}
+
+	.items-justified-center & {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.items-justified-right & {
+		margin-left: auto;
+		margin-right: 0;
 	}
 }
 
@@ -472,7 +512,11 @@
 	z-index: 2; // Needs to be above the modal z index itself.
 }
 
-// The menu adds a wrapping container.
+// The menu adds wrapping containers.
+.wp-block-navigation__responsive-close {
+	width: 100%;
+}
+
 .is-menu-open .wp-block-navigation__responsive-close,
 .is-menu-open .wp-block-navigation__responsive-dialog,
 .is-menu-open .wp-block-navigation__responsive-container-content {
