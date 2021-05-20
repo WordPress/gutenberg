@@ -391,8 +391,16 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string the <head> section (may be empty).
 	 */
 	private function get_document_head( $html ) {
-		preg_match( '|([\s\S]*)<body>|is', $html, $matches );
-		$head = isset( $matches[1] ) && is_string( $matches[1] ) ? trim( $matches[1] ) : '';
-		return $head;
+		preg_match( '|([\s\S]*)</head>|is', $html, $head_matches );
+
+		$doc_head = isset( $head_matches[1] ) && is_string( $head_matches[1] ) ? trim( $head_matches[1] ) : '';
+
+		// If missing `</head>` then look for opening <body>.
+		if ( empty( $doc_head ) ) {
+			preg_match( '|([\s\S]*)<body>|is', $html, $body_matches );
+			$head = isset( $body_matches[1] ) && is_string( $body_matches[1] ) ? trim( $body_matches[1] ) : '';
+		}
+
+		return $doc_head;
 	}
 }
