@@ -156,7 +156,7 @@ This field describes the format of the `theme.json` file and it's used to detect
 
 ### Settings
 
-The settings section has the following structure and default values:
+The settings section has the following structure:
 
 ```json
 {
@@ -166,35 +166,36 @@ The settings section has the following structure and default values:
 			"customColor": false,
 			"customRadius": false,
 			"customStyle": false,
-			"customWidth": false,
+			"customWidth": false
 		},
 		"color": {
-			"custom": true, /* Supersedes add_theme_support('disable-custom-colors') */
-			"customGradient": true, /* Supersedes add_theme_support('disable-custom-gradients') */
-			"duotone": [], /* Duotone presets } */
-			"gradients": [], /* Gradient presets, supersedes add_theme_support('editor-gradient-presets', ... ) */
-			"link": false, /* Supersedes add_theme_support('experimental-link-color') */
-			"palette": [], /* Color presets, supersedes add_theme_support('editor-color-palette', ... ) */
+			"custom": true,
+			"customGradient": true,
+			"duotone": [],
+			"gradients": [],
+			"link": false,
+			"palette": []
 		},
 		"custom": {},
-		"layout": { /* Default layout to be used in the post editor */
+		"layout": {
 			"contentSize": "800px",
-			"wideSize": "1000px",
+			"wideSize": "1000px"
 		},
 		"spacing": {
-			"customPadding": false, /* Supersedes add_theme_support('custom-spacing') */
-			"units": [ "px", "em", "rem", "vh", "vw" ], /* filter values, as in add_theme_support('custom-units', ... ) */
+			"customMargin": false,
+			"customPadding": false,
+			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
 		"typography": {
-			"customFontSize": true, /* Supersedes add_theme_support( 'disable-custom-font-sizes' ) */
+			"customFontSize": true,
 			"customFontStyle": true,
 			"customFontWeight": true,
-			"customLineHeight": false, /* Supersedes add_theme_support( 'custom-line-height' ) */
+			"customLineHeight": false,
 			"customTextDecorations": true,
 			"customTextTransforms": true,
 			"dropCap": true,
 			"fontFamilies": [],
-			"fontSizes": [], /* Font size presets, supersedes add_theme_support('editor-font-sizes', ... ) */
+			"fontSizes": []
 		},
 		"blocks": {
 			"core/paragraph": {
@@ -212,9 +213,24 @@ The settings section has the following structure and default values:
 }
 ```
 
+
+
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`. The settings declared at the top-level affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and configure all blocks at once.
 
-To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
+To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`. This is the complete list of equivalences:
+
+| add_theme_support           | theme.json setting                                        |
+| --------------------------- | --------------------------------------------------------- |
+| `custom-line-height`        | Set `typography.customLineHeight`to `false`.              |
+| `custom-spacing`            | Set `spacing.customPadding` to `true`.                    |
+| `custom-units`              | Provide the list of units via `spacing.units`.            |
+| `disable-custom-colors`     | Set `color.custom` to `false`.                            |
+| `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.               |
+| `disable-custom-gradients`  | Set `color.customGradient` to `false`.                    |
+| `editor-color-palette`      | Provide the list of colors via `color.palette`.           |
+| `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`. |
+| `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.      |
+| `experimental-link-color`   | Set `color.link` to `true`.                               |
 
 Let's say a theme author wants to enable custom colors only for the paragraph block. This is how it can be done:
 
@@ -223,12 +239,12 @@ Let's say a theme author wants to enable custom colors only for the paragraph bl
 	"version": 1,
 	"settings": {
 		"color": {
-			"custom": false // Disable it for all blocks.
+			"custom": false
 		},
 		"blocks": {
 			"core/paragraph": {
 				"color": {
-					"custom": true // Paragraph overrides the setting.
+					"custom": true
 				}
 			}
 		}
@@ -464,6 +480,12 @@ Each block declares which style properties it exposes via the [block supports me
 			"text": "value"
 		},
 		"spacing": {
+			"margin": {
+				"top": "value",
+				"right": "value",
+				"bottom": "value",
+				"left": "value"
+			},
 			"padding": {
 				"top": "value",
 				"right": "value",
@@ -509,7 +531,8 @@ Each block declares which style properties it exposes via the [block supports me
 					"h5": {},
 					"h6": {}
 				}
-			}
+			},
+            "etc": {}
 		}
 	}
 }
@@ -681,17 +704,22 @@ h3 {
 
 Within this field themes can list the custom templates present in the `block-templates` folder. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
 
+- name: mandatory.
+- title: mandatory, translatable.
+- postTypes: optional, only applies to the `page` by default.
+
 ```json
 {
+    "version": 1,
 	"customTemplates": [
 		{
-			"name": "my-custom-template" /* Mandatory */,
-			"title": "The template title" /* Mandatory, translatable */,
+			"name": "my-custom-template",
+			"title": "The template title",
 			"postTypes": [
 				"page",
 				"post",
 				"my-cpt"
-			] /* Optional, will only apply to "page" by default. */
+			]
 		}
 	]
 }
@@ -703,12 +731,16 @@ Within this field themes can list the template parts present in the `block-templ
 
 Currently block variations exist for "header" and "footer" values of the area term, any other values and template parts not defined in the json will default to the general template part block. Variations will be denoted by specific icons within the editor's interface, will default to the corresponding semantic HTML element for the wrapper (this can also be overridden by the `tagName` attribute set on the template part block), and will contextualize the template part allowing more custom flows in future editor improvements.
 
+- name: mandatory.
+- area: optional, will be set to `uncategorized` by default and trigger no block variation.
+
 ```json
 {
+    "version": 1,
 	"templateParts": [
 		{
-			"name": "my-template-part" /* Mandatory */,
-			"area": "header" /* Optional, will be set to 'uncategorized' by default and trigger no block variation */
+			"name": "my-template-part",
+			"area": "header"
 		}
 	]
 }

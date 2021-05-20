@@ -11,16 +11,15 @@ import {
 	BlockInspector,
 	WritingFlow,
 	BlockList,
+	BlockTools,
 	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -57,24 +56,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
 	const ref = useMouseMoveTypingReset();
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [
-		contentRef,
-		useBlockSelectionClearer(),
-		useTypingObserver(),
-	] );
-
-	// Allow scrolling "through" popovers over the canvas. This is only called
-	// for as long as the pointer is over a popover. Do not use React events
-	// because it will bubble through portals.
-	const toolWrapperRef = useRefEffect( ( node ) => {
-		function onWheel( { deltaX, deltaY } ) {
-			contentRef.current.scrollBy( deltaX, deltaY );
-		}
-		node.addEventListener( 'wheel', onWheel );
-		return () => {
-			node.addEventListener( 'wheel', onWheel );
-		};
-	}, [] );
+	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 
 	return (
 		<BlockEditorProvider
@@ -101,26 +83,26 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor" ref={ toolWrapperRef }>
-				<Popover.Slot name="block-toolbar" />
-				<Iframe
-					style={ resizedCanvasStyles }
-					headHTML={ window.__editorStyles.html }
-					head={ <EditorStyles styles={ settings.styles } /> }
-					ref={ ref }
-					contentRef={ mergedRefs }
-				>
-					<WritingFlow>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							__experimentalLayout={ {
-								type: 'default',
-								// At the root level of the site editor, no alignments should be allowed.
-								alignments: [],
-							} }
-						/>
-					</WritingFlow>
-				</Iframe>
+			<div className="edit-site-visual-editor">
+				<BlockTools __unstableContentRef={ contentRef }>
+					<Iframe
+						style={ resizedCanvasStyles }
+						head={ <EditorStyles styles={ settings.styles } /> }
+						ref={ ref }
+						contentRef={ mergedRefs }
+					>
+						<WritingFlow>
+							<BlockList
+								className="edit-site-block-editor__block-list"
+								__experimentalLayout={ {
+									type: 'default',
+									// At the root level of the site editor, no alignments should be allowed.
+									alignments: [],
+								} }
+							/>
+						</WritingFlow>
+					</Iframe>
+				</BlockTools>
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />

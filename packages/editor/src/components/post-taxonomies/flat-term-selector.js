@@ -2,12 +2,12 @@
  * External dependencies
  */
 import {
+	debounce,
 	escape as escapeString,
 	find,
 	get,
 	invoke,
 	isEmpty,
-	throttle,
 	uniqBy,
 } from 'lodash';
 
@@ -60,7 +60,7 @@ class FlatTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
-		this.searchTerms = throttle( this.searchTerms.bind( this ), 500 );
+		this.searchTerms = debounce( this.searchTerms.bind( this ), 500 );
 		this.findOrCreateTerm = this.findOrCreateTerm.bind( this );
 		this.appendTerm = this.appendTerm.bind( this );
 		this.state = {

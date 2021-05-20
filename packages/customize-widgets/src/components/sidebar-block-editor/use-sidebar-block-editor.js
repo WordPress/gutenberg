@@ -172,6 +172,11 @@ export default function useSidebarBlockEditor( sidebar ) {
 					return blockToWidget( nextBlock );
 				} );
 
+				// Bail out updates if the updated widgets are the same.
+				if ( isShallowEqual( sidebar.getWidgets(), nextWidgets ) ) {
+					return prevBlocks;
+				}
+
 				const addedWidgetIds = sidebar.setWidgets( nextWidgets );
 
 				return nextBlocks.reduce(

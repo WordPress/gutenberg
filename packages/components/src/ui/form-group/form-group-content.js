@@ -6,7 +6,7 @@ import { useMemo, memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { VStack } from '../v-stack';
+import { VStack } from '../../v-stack';
 import { FormGroupContext } from './form-group-context';
 import FormGroupHelp from './form-group-help';
 import FormGroupLabel from './form-group-label';

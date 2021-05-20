@@ -4,25 +4,30 @@
 import { useContext } from '@wordpress/element';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { BlockControls } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
+import { sprintf, __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
 import {
 	untitledMenu,
-	useMenuEntity,
 	useSelectedMenuId,
+	useMenuEntityProp,
 	IsMenuNameControlFocusedContext,
 } from '../../hooks';
+import { SIDEBAR_SCOPE, SIDEBAR_MENU } from '../../constants';
 
-import { sprintf, __ } from '@wordpress/i18n';
 export default function NameDisplay() {
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const [ menuId ] = useSelectedMenuId();
-	const { editedMenu } = useMenuEntity( menuId );
+	const [ name ] = useMenuEntityProp( 'name', menuId );
 	const [ , setIsMenuNameEditFocused ] = useContext(
 		IsMenuNameControlFocusedContext
 	);
 
-	const menuName = editedMenu?.name ?? untitledMenu;
+	const menuName = name ?? untitledMenu;
 
 	return (
 		<BlockControls>
@@ -33,7 +38,10 @@ export default function NameDisplay() {
 						__( `Edit menu name: %s` ),
 						menuName
 					) }
-					onClick={ () => setIsMenuNameEditFocused( true ) }
+					onClick={ () => {
+						enableComplementaryArea( SIDEBAR_SCOPE, SIDEBAR_MENU );
+						setIsMenuNameEditFocused( true );
+					} }
 				>
 					{ menuName }
 				</ToolbarButton>

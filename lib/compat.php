@@ -16,16 +16,16 @@
  * @return bool
  */
 function gutenberg_should_load_separate_block_assets() {
-	if ( function_exists( 'should_load_separate_core_block_assets' ) ) {
-		return should_load_separate_core_block_assets();
+	if ( function_exists( 'wp_should_load_separate_core_block_assets' ) ) {
+		return wp_should_load_separate_core_block_assets();
 	}
 
 	if ( is_admin() || is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
 		return false;
 	}
 
-	// The `separate_core_block_assets` filter was added in WP 5.8.
-	$load_separate_styles = apply_filters( 'separate_core_block_assets', gutenberg_is_fse_theme() );
+	// The `should_load_separate_core_block_assets` filter was added in WP 5.8.
+	$load_separate_styles = apply_filters( 'should_load_separate_core_block_assets', gutenberg_is_fse_theme() );
 
 	/**
 	 * Determine if separate styles will be loaded for blocks on-render or not.

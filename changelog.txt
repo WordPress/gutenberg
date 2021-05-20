@@ -1,5 +1,33 @@
 == Changelog ==
 
+= 10.6.2 =
+
+
+
+### Bug Fixes
+
+- Workflows: Fix "Stable tag:" readme.txt field in SVN upload. ([31897](https://github.com/WordPress/gutenberg/pull/31897))
+- Gallery: Fix Image Size regression. ([31884](https://github.com/WordPress/gutenberg/pull/31884))
+
+### Various
+
+- Plugin: Guard `construct_wp_query_args` with check if implemented in WordPress Core. ([32008](https://github.com/WordPress/gutenberg/pull/32008))
+
+
+
+
+= 10.6.1 =
+
+### Bug Fixes
+
+- Revert "components: Promote VisuallyHidden from ui into full components (#31244)". ([31882](https://github.com/WordPress/gutenberg/pull/31882))
+- Allow more complex contentWidth & wideWidth values. ([31740](https://github.com/WordPress/gutenberg/pull/31740))
+- Fix link color selector. ([31820](https://github.com/WordPress/gutenberg/pull/31820))
+- Register template part variations server side. ([31761](https://github.com/WordPress/gutenberg/pull/31761))
+- Do not provide a default value for the link color property. ([31755](https://github.com/WordPress/gutenberg/pull/31755))
+- Fixes FSE Navigation sub-menu item styling regression. ([31754](https://github.com/WordPress/gutenberg/pull/31754))
+
+
 = 10.6.0 =
 
 ### New Features

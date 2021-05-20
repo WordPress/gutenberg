@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
+import { createContext, useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,10 +17,13 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
 import { useInBetweenInserter } from './use-in-between-inserter';
-import BlockTools from '../block-tools';
 import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
+import BlockToolsBackCompat from '../block-tools/back-compat';
+import { useBlockSelectionClearer } from '../block-selection-clearer';
+
+export const IntersectionObserver = createContext();
 
 function Root( { className, children } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -45,6 +49,7 @@ function Root( { className, children } ) {
 	return (
 		<div
 			ref={ useMergeRefs( [
+				useBlockSelectionClearer(),
 				useBlockDropZone(),
 				useInBetweenInserter(),
 			] ) }
@@ -67,11 +72,11 @@ function Root( { className, children } ) {
 export default function BlockList( { className, __experimentalLayout } ) {
 	usePreParsePatterns();
 	return (
-		<BlockTools>
+		<BlockToolsBackCompat>
 			<Root className={ className }>
 				<BlockListItems __experimentalLayout={ __experimentalLayout } />
 			</Root>
-		</BlockTools>
+		</BlockToolsBackCompat>
 	);
 }
 
@@ -82,52 +87,60 @@ function Items( {
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
 } ) {
-	function selector( select ) {
-		const {
-			getBlockOrder,
-			getSelectedBlockClientId,
-			getMultiSelectedBlockClientIds,
-			hasMultiSelection,
-		} = select( blockEditorStore );
-		return {
-			blockClientIds: getBlockOrder( rootClientId ),
-			selectedBlockClientId: getSelectedBlockClientId(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			hasMultiSelection: hasMultiSelection(),
-		};
-	}
+	const [ intersectingBlocks, setIntersectingBlocks ] = useState( new Set() );
+	const intersectionObserver = useMemo( () => {
+		const { IntersectionObserver: Observer } = window;
 
-	const {
-		blockClientIds,
-		selectedBlockClientId,
-		multiSelectedBlockClientIds,
-		hasMultiSelection,
-	} = useSelect( selector, [ rootClientId ] );
+		if ( ! Observer ) {
+			return;
+		}
+
+		return new Observer( ( entries ) => {
+			setIntersectingBlocks( ( oldIntersectingBlocks ) => {
+				const newIntersectingBlocks = new Set( oldIntersectingBlocks );
+				for ( const entry of entries ) {
+					const clientId = entry.target.getAttribute( 'data-block' );
+					const action = entry.isIntersecting ? 'add' : 'delete';
+					newIntersectingBlocks[ action ]( clientId );
+				}
+				return newIntersectingBlocks;
+			} );
+		} );
+	}, [ setIntersectingBlocks ] );
+	const { order, selectedBlocks } = useSelect(
+		( select ) => {
+			const { getBlockOrder, getSelectedBlockClientIds } = select(
+				blockEditorStore
+			);
+			return {
+				order: getBlockOrder( rootClientId ),
+				selectedBlocks: getSelectedBlockClientIds(),
+			};
+		},
+		[ rootClientId ]
+	);
 
 	return (
 		<LayoutProvider value={ layout }>
-			{ blockClientIds.map( ( clientId, index ) => {
-				const isBlockInSelection = hasMultiSelection
-					? multiSelectedBlockClientIds.includes( clientId )
-					: selectedBlockClientId === clientId;
-
-				return (
+			<IntersectionObserver.Provider value={ intersectionObserver }>
+				{ order.map( ( clientId ) => (
 					<AsyncModeProvider
 						key={ clientId }
-						value={ ! isBlockInSelection }
+						value={
+							// Only provide data asynchronously if the block is
+							// not visible and not selected.
+							! intersectingBlocks.has( clientId ) &&
+							! selectedBlocks.includes( clientId )
+						}
 					>
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							// This prop is explicitely computed and passed down
-							// to avoid being impacted by the async mode
-							// otherwise there might be a small delay to trigger the animation.
-							index={ index }
 						/>
 					</AsyncModeProvider>
-				);
-			} ) }
-			{ blockClientIds.length < 1 && placeholder }
+				) ) }
+			</IntersectionObserver.Provider>
+			{ order.length < 1 && placeholder }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }

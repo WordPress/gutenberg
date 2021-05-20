@@ -15,7 +15,7 @@ import {
 	__experimentalGetGradientClass,
 	getGradientValueBySlug,
 } from '../components/gradients';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 
 // The code in this file has largely been lifted from the color block support
 // hook.
@@ -56,7 +56,7 @@ export function getColorClassesAndStyles( attributes ) {
 			style?.color?.background ||
 			gradient ||
 			style?.color?.gradient,
-		'has-link-color': style?.color?.link,
+		'has-link-color': style?.elements?.link?.color,
 	} );
 
 	// Collect inline styles for colors.
@@ -82,8 +82,8 @@ export function getColorClassesAndStyles( attributes ) {
 export function useColorProps( attributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;
 
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
 
 	const colorProps = getColorClassesAndStyles( attributes );
 
