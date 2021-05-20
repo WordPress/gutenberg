@@ -553,7 +553,7 @@ describe( 'Navigation editor', () => {
 			}
 		}
 
-		it( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
+		it.skip( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
 			assertIsDirty( false );
 		} );
 
