@@ -9,36 +9,18 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Button, ExternalLink } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+
 import { Icon, globe } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { ViewerSlot } from './viewer-slot';
-import { store as blockEditorStore } from '../../store';
+
+import useRemoteUrlData from './use-remote-url-data';
 
 export default function LinkPreview( { value, onEditClick } ) {
-	const [ richData, setRichData ] = useState( {} );
-
-	const { fetchRemoteUrlData } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return {
-			fetchRemoteUrlData: getSettings().__experimentalFetchRemoteUrlData,
-		};
-	}, [] );
-
-	useEffect( () => {
-		const fetchRichData = async () => {
-			const urlData = await fetchRemoteUrlData( value.url );
-			setRichData( urlData );
-		};
-
-		if ( value?.url?.length ) {
-			fetchRichData();
-		}
-	}, [ value ] );
+	const richData = useRemoteUrlData( value?.url );
 
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
