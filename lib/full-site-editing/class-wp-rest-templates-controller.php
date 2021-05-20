@@ -337,7 +337,6 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	protected function prepare_item_for_database( $request ) {
 		$template           = $request['id'] ? gutenberg_get_block_template( $request['id'], $this->post_type ) : null;
 		$changes            = new stdClass();
-		$changes->post_name = $template->slug;
 		if ( null === $template ) {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';

@@ -174,11 +174,18 @@ add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
 function set_unique_slug_on_create_template( $post_id, $post, $update ) {
 	if ( ! $update && $post->post_name ) {
 		$templates = get_theme_mod( $post->post_type, array() );
+		$slug = $post->post_name;
 		
-		if ( ! isset( $templates[ $post->post_name ] ) ) {
-			$templates[ $post->post_name ] = $post->ID;
-			set_theme_mod( $post->post_type, $templates );
+		if ( isset( $templates[ $slug ] ) ) {
+			$suffix = 2;
+			do {
+				$slug = _truncate_post_slug( $post->post_name, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
+				$suffix++;
+			} while ( isset( $templates[ $slug ] ) );
 		}
+
+		$templates[ $slug ] = $post->ID;
+		set_theme_mod( $post->post_type, $templates );
 	}
 }
 add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template', 10, 3 );
