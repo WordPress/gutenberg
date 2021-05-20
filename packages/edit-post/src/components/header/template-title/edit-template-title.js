@@ -40,6 +40,9 @@ export default function EditTemplateTitle() {
 		<TextControl
 			label={ __( 'Title' ) }
 			value={ templateTitle }
+			help={ __(
+				'Give the template a title that indicates its purpose, e.g. "Full Width"'
+			) }
 			onChange={ ( newTitle ) => {
 				const settings = getEditorSettings();
 				const newAvailableTemplates = mapValues(
