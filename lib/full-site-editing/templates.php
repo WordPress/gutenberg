@@ -165,22 +165,24 @@ add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template
 add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
 
 /**
- * Sets a custom slug when creating auto-draft templates.
+ * Sets a custom slug when creating new templates and template parts.
  *
- * @param int $post_id Post ID.
+ * @param int     $post_id Post ID.
+ * @param WP_Post $post    Post object.
+ * @param bool    $update  Update post or new post.
  */
 function set_unique_slug_on_create_template( $post_id, $post, $update ) {
-	if ( $update ) {
-		return;
-	}
-
-	if ( $post->post_name ) {
-		$templates = get_theme_mod( 'wp_template', array() );
-		$templates[ $post->post_name ] = $post->ID;
-		set_theme_mod( 'wp_template', $templates );
+	if ( ! $update && $post->post_name ) {
+		$templates = get_theme_mod( $post->post_type, array() );
+		
+		if ( ! isset( $templates[ $post->post_name ] ) ) {
+			$templates[ $post->post_name ] = $post->ID;
+			set_theme_mod( $post->post_type, $templates );
+		}
 	}
 }
 add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template', 10, 3 );
+add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template', 10, 3 );
 
 /**
  * Print the skip-link script & styles.

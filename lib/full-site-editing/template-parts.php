@@ -134,24 +134,6 @@ add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_tem
 add_filter( 'views_edit-wp_template_part', 'gutenberg_filter_templates_edit_views' );
 
 /**
- * Sets a custom slug when creating auto-draft template parts.
- *
- * @param int $post_id Post ID.
- */
-function set_unique_slug_on_create_template_part( $post_id, $post, $update ) {
-	if ( $update ) {
-		return;
-	}
-
-	if ( $post->post_name ) {
-		$templates = get_theme_mod( 'wp_template_part', array() );
-		$templates[ $post->post_name ] = $post->ID;
-		set_theme_mod( 'wp_template_part', $templates );
-	}
-}
-add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part', 10, 3 );
-
-/**
  * Returns a filtered list of allowed area values for template parts.
  *
  * @return array The supported template part area values.
