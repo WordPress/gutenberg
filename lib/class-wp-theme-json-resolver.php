@@ -10,7 +10,7 @@
  * Class that abstracts the processing
  * of the different data sources.
  */
-class WP_Theme_JSON_Resolver {
+class WP_Theme_JSON_Resolver_Gutenberg {
 
 	/**
 	 * Container for data coming from core.
@@ -532,4 +532,4 @@ class WP_Theme_JSON_Resolver {
 
 }
 
-add_action( 'switch_theme', array( 'WP_Theme_JSON_Resolver', 'clean_cached_data' ) );
+add_action( 'switch_theme', array( 'WP_Theme_JSON_Resolver_Gutenberg', 'clean_cached_data' ) );

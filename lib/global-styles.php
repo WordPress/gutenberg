@@ -50,12 +50,12 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 function gutenberg_experimental_global_styles_enqueue_assets() {
 	if (
 		! get_theme_support( 'experimental-link-color' ) && // link color support needs the presets CSS variables regardless of the presence of theme.json file.
-		! WP_Theme_JSON_Resolver::theme_has_support() ) {
+		! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		return;
 	}
 
 	$settings = gutenberg_get_default_block_editor_settings();
-	$all      = WP_Theme_JSON_Resolver::get_merged_data( $settings );
+	$all      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
 
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
 	if ( empty( $stylesheet ) ) {
@@ -82,7 +82,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
 		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
-		WP_Theme_JSON_Resolver::theme_has_support() &&
+		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
 		gutenberg_supports_block_templates()
 	) {
 		$context = 'site-editor';
@@ -93,28 +93,28 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		REST_REQUEST &&
 		isset( $_GET['context'] ) &&
 		'mobile' === $_GET['context'] &&
-		WP_Theme_JSON_Resolver::theme_has_support()
+		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support()
 	) {
 		$context = 'mobile';
 	}
 
 	$origin = 'theme';
 	if (
-		WP_Theme_JSON_Resolver::theme_has_support() &&
+		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
 		gutenberg_supports_block_templates()
 	) {
 		// Only lookup for the user data if we need it.
 		$origin = 'user';
 	}
-	$consolidated = WP_Theme_JSON_Resolver::get_merged_data( $settings, $origin );
+	$consolidated = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, $origin );
 
 	if ( 'mobile' === $context ) {
 		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 	}
 
 	if ( 'site-editor' === $context ) {
-		$theme       = WP_Theme_JSON_Resolver::get_merged_data( $settings, 'theme' );
-		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
+		$theme       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings, 'theme' );
+		$user_cpt_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_custom_post_type_id();
 
 		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $theme->get_raw_data();
@@ -123,7 +123,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	if (
 		'site-editor' !== $context &&
 		'mobile' !== $context &&
-		( WP_Theme_JSON_Resolver::theme_has_support() || get_theme_support( 'experimental-link-color' ) )
+		( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() || get_theme_support( 'experimental-link-color' ) )
 	) {
 		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
 		$css_variables = array(
@@ -155,11 +155,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
  * @return array|undefined
  */
 function gutenberg_experimental_global_styles_register_user_cpt() {
-	if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) {
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		return;
 	}
 
-	WP_Theme_JSON_Resolver::register_user_custom_post_type();
+	WP_Theme_JSON_Resolver_Gutenberg::register_user_custom_post_type();
 }
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );

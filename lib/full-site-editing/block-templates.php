@@ -124,8 +124,8 @@ function _gutenberg_get_template_files( $template_type ) {
  * @return array Template.
  */
 function _gutenberg_add_template_part_area_info( $template_info ) {
-	if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
-		$theme_data = WP_Theme_JSON_Resolver::get_theme_data()->get_template_parts();
+	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_template_parts();
 	}
 
 	if ( isset( $theme_data[ $template_info['slug'] ]['area'] ) ) {
