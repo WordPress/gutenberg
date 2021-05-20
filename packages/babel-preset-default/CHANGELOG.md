@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Configure `@babel/preset-env` preset to respect a local Browserslist configuration.
+
 ## 6.0.0 (2021-05-14)
 
 ### Breaking Changes

@@ -39,6 +39,34 @@ import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
 
+/**
+ * Removes props used for the native version of RichText so that they are not
+ * passed to the DOM element and log warnings.
+ *
+ * @param {Object} props Props to filter.
+ *
+ * @return {Object} Filtered props.
+ */
+function removeNativeProps( props ) {
+	return omit( props, [
+		'__unstableMobileNoFocusOnMount',
+		'deleteEnter',
+		'placeholderTextColor',
+		'textAlign',
+		'selectionColor',
+		'tagsToEliminate',
+		'rootTagsToEliminate',
+		'disableEditingMenu',
+		'fontSize',
+		'fontFamily',
+		'fontWeight',
+		'fontStyle',
+		'minWidth',
+		'maxWidth',
+		'setRef',
+	] );
+}
+
 function RichTextWrapper(
 	{
 		children,
@@ -75,6 +103,7 @@ function RichTextWrapper(
 	const instanceId = useInstanceId( RichTextWrapper );
 
 	identifier = identifier || instanceId;
+	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
 	const { clientId } = useBlockEditContext();

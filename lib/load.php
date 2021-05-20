@@ -83,6 +83,7 @@ if ( ! class_exists( 'WP_Widget_Block' ) ) {
 require_once __DIR__ . '/widgets-page.php';
 
 require __DIR__ . '/compat.php';
+require __DIR__ . '/compat/wordpress-5.8.php';
 require __DIR__ . '/utils.php';
 require __DIR__ . '/editor-settings.php';
 
@@ -120,9 +121,9 @@ require __DIR__ . '/navigation.php';
 require __DIR__ . '/navigation-page.php';
 require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/global-styles.php';
-require __DIR__ . '/query-utils.php';
 
 require __DIR__ . '/block-supports/generated-classname.php';
+require __DIR__ . '/block-supports/elements.php';
 require __DIR__ . '/block-supports/colors.php';
 require __DIR__ . '/block-supports/align.php';
 require __DIR__ . '/block-supports/typography.php';
