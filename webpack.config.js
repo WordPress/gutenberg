@@ -4,6 +4,7 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
 const { escapeRegExp, compact } = require( 'lodash' );
 const { sep } = require( 'path' );
@@ -15,6 +16,11 @@ const fastGlob = require( 'fast-glob' );
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
+ * Internal dependencies
+ */
+const AddReadableJsAssetsWebpackPlugin = require( './add-readable-js-assets-webpack-plugin' );
 const {
 	camelCaseDash,
 } = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
@@ -23,7 +29,6 @@ const {
  * Internal dependencies
  */
 const { dependencies } = require( './package' );
-const AddReadableJsAssetsWebpackPlugin = require( './add-readable-js-assets-webpack-plugin' );
 
 const {
 	NODE_ENV: mode = 'development',
@@ -111,6 +116,25 @@ module.exports = {
 		// Only concatenate modules in production, when not analyzing bundles.
 		concatenateModules:
 			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+		minimizer: [
+			new TerserPlugin( {
+				cache: true,
+				parallel: true,
+				sourceMap: mode !== 'production',
+				terserOptions: {
+					output: {
+						comments: /translators:/i,
+					},
+					compress: {
+						passes: 2,
+					},
+					mangle: {
+						reserved: [ '__', '_n', '_nx', '_x' ],
+					},
+				},
+				extractComments: false,
+			} ),
+		],
 	},
 	mode,
 	entry: createEntrypoints(),
@@ -120,7 +144,6 @@ module.exports = {
 			const { chunk } = data;
 			const { entryModule } = chunk;
 			const { rawRequest } = entryModule;
-
 			/*
 			 * If the file being built is a Core Block's frontend file,
 			 * we build it in the block's directory.
