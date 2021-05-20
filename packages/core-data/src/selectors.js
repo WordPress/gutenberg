@@ -730,5 +730,14 @@ export function __experimentalGetTemplateForLink( state, link ) {
 		'find-template': link,
 	} );
 
-	return records?.length ? records[ 0 ] : null;
+	const template = records?.length ? records[ 0 ] : null;
+	if ( template ) {
+		return getEditedEntityRecord(
+			state,
+			'postType',
+			'wp_template',
+			template.id
+		);
+	}
+	return template;
 }
