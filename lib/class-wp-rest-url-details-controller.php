@@ -214,11 +214,11 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Parses the <title> contents from the provided HTML
 	 *
-	 * @param string $html the HTML from the remote website at URL.
-	 * @return string the title tag contents (maybe empty).
+	 * @param string $html The HTML from the remote website at URL.
+	 * @return string The title tag contents on success; else empty string.
 	 */
 	private function get_title( $html ) {
-		preg_match( '|<\s*title[^>]*>(.*?)<\s*/\s*title>|is', $html, $match_title );
+		preg_match( '|<title[^>]*>(.*?)<\s*/\s*title>|is', $html, $match_title );
 
 		$title = isset( $match_title[1] ) && is_string( $match_title[1] ) ? trim( $match_title[1] ) : '';
 
@@ -228,21 +228,31 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Parses the site icon from the provided HTML
 	 *
-	 * @param string $html the HTML from the remote website at URL.
-	 * @param string $url the target website URL.
-	 * @return string the icon URI (maybe empty).
+	 * @param string $html The HTML from the remote website at URL.
+	 * @param string $url  The target website URL.
+	 * @return string The icon URI on success; else empty string.
 	 */
 	private function get_icon( $html, $url ) {
-		preg_match( '|<link.*?rel="\s*[shortcut]+(?:\s+[icon]+)*\s*".*?href="(.*?)".*?\/?>|is', $html, $matches );
+		// Grab the icon's link element.
+		$pattern = '#<link\s[^>]*rel=(?:[\"\']??)\s*(?:icon|shortcut icon|icon shortcut)\s*(?:[\"\']??)[^>]*\/?>#isU';
+		preg_match( $pattern, $html, $element );
+		$element = ! empty( $element[0] ) && is_string( $element[0] ) ? trim( $element[0] ) : '';
+		if ( empty( $element ) ) {
+			return '';
+		}
 
-		$icon = isset( $matches[1] ) && is_string( $matches[1] ) ? trim( $matches[1] ) : '';
+		// Get the icon's href value.
+		$pattern = '#href=([\"\']??)([^\" >]*?)\\1[^>]*#isU';
+		preg_match( $pattern, $element, $icon );
+		$icon = ! empty( $icon[2] ) && is_string( $icon[2] ) ? trim( $icon[2] ) : '';
+		if ( empty( $icon ) ) {
+			return '';
+		}
 
 		// Attempt to convert relative URLs to absolute.
-		if ( ! empty( $icon ) ) {
-			$parsed_url = parse_url( $url );
-			$root_url   = $parsed_url['scheme'] . '://' . $parsed_url['host'] . '/';
-			$icon = \WP_Http::make_absolute_url( $icon, $root_url );
-		}
+		$parsed_url = parse_url( $url );
+		$root_url   = $parsed_url['scheme'] . '://' . $parsed_url['host'] . '/';
+		$icon       = WP_Http::make_absolute_url( $icon, $root_url );
 
 		return $icon;
 	}

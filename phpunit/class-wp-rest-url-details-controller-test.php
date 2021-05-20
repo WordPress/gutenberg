@@ -494,80 +494,191 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	/**
 	 * @dataProvider provide_get_title_data
 	 */
-	public function test_get_title( $html, $expected_title ) {
-
+	public function test_get_title( $html, $expected ) {
 		$controller = new WP_REST_URL_Details_Controller();
 		$method     = $this->get_reflective_method( 'get_title' );
-		$result     = $method->invoke(
+
+		$actual = $method->invoke(
 			$controller,
-			$this->wrap_html_in_doc( $html ),
+			$this->wrap_html_in_doc( $html )
 		);
-		$this->assertEquals( $expected_title, $result );
+		$this->assertSame( $expected, $actual );
 	}
 
 
 	public function provide_get_title_data() {
 		return array(
-			'no_attributes'   => array(
-				'<title>Testing the title</title>',
-				'Testing the title',
+			'no attributes'                  => array(
+				'<title>Testing &lt;title&gt;:</title>',
+				'Testing &lt;title&gt;:',
 			),
-			'with_attributes' => array(
-				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">Testing the title</title>',
-				'Testing the title',
+			'with attributes'                => array(
+				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">Testing &lt;title&gt;:</title>',
+				'Testing &lt;title&gt;:',
+			),
+			'with text whitespace'           => array(
+				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">   Testing &lt;title&gt;:	</title>',
+				'Testing &lt;title&gt;:',
+			),
+			'when opening tag is malformed'  => array(
+				'< title>Testing &lt;title&gt;: when opening tag is invalid</title>',
+				'',
+			),
+			'with whitespace in opening tag' => array(
+				'<title >Testing &lt;title&gt;: with whitespace in opening tag</title>',
+				'Testing &lt;title&gt;: with whitespace in opening tag',
+			),
+			'when whitepace in closing tag'  => array(
+				'<title>Testing &lt;title&gt;: with whitespace in closing tag</ title>',
+				'Testing &lt;title&gt;: with whitespace in closing tag',
 			),
 		);
 	}
 
 	/**
-	 * @dataProvider provide_get_icon_data
+	 * @dataProvider data_get_icon
 	 */
-	public function test_get_icon( $html, $expected_icon, $target_url = 'https://wordpress.org' ) {
-
+	public function test_get_icon( $html, $expected, $target_url = 'https://wordpress.org' ) {
 		$controller = new WP_REST_URL_Details_Controller();
 		$method     = $this->get_reflective_method( 'get_icon' );
-		$result     = $method->invoke(
+
+		$actual = $method->invoke(
 			$controller,
 			$this->wrap_html_in_doc( $html ),
 			$target_url
 		);
-		$this->assertEquals( $expected_icon, $result );
+		$this->assertSame( $expected, $actual );
 	}
 
-	public function provide_get_icon_data() {
+	public function data_get_icon() {
 		return array(
-			'default'                => array(
+
+			// Happy path for default.
+			'default'                               => array(
 				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
-			'with_query_string'      => array(
+			'default with no closing whitespace'    => array(
+				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico"/>',
+				'https://wordpress.org/favicon.ico',
+			),
+			'default without self-closing'          => array(
+				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico">',
+				'https://wordpress.org/favicon.ico',
+			),
+			'default with href first'               => array(
+				'<link href="https://wordpress.org/favicon.ico" rel="shortcut icon" />',
+				'https://wordpress.org/favicon.ico',
+			),
+			'default with type last'                => array(
+				'<link href="https://wordpress.org/favicon.png" rel="icon" type="image/png" />',
+				'https://wordpress.org/favicon.png',
+			),
+			'default with type first'               => array(
+				'<link type="image/png" href="https://wordpress.org/favicon.png" rel="icon" />',
+				'https://wordpress.org/favicon.png',
+			),
+			'default with single quotes'            => array(
+				'<link type="image/png" href=\'https://wordpress.org/favicon.png\' rel=\'icon\' />',
+				'https://wordpress.org/favicon.png',
+			),
+
+			// Happy paths.
+			'with query string'                     => array(
 				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico?somequerystring=foo&another=bar" />',
 				'https://wordpress.org/favicon.ico?somequerystring=foo&another=bar',
 			),
-			'relative_url'           => array(
+			'with another link'                     => array(
+				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" /><link rel="canonical" href="https://example.com">',
+				'https://wordpress.org/favicon.ico',
+			),
+			'relative url'                          => array(
 				'<link rel="shortcut icon" href="/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
-			'relative_url_no_slash'  => array(
+			'relative url no slash'                 => array(
 				'<link rel="shortcut icon" href="favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
-			'relative_url_with_path' => array(
+			'relative url with path'                => array(
 				'<link rel="shortcut icon" href="favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 				'https://wordpress.org/my/path/here/',
 			),
-			'rel_reverse_order'      => array(
+			'rel reverse order'                     => array(
 				'<link rel="icon shortcut" href="https://wordpress.org/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
-			'rel_icon_only'          => array(
+			'rel icon only'                         => array(
 				'<link rel="icon" href="https://wordpress.org/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
-			'rel_shortcut_only'      => array(
-				'<link rel="icon" href="https://wordpress.org/favicon.ico" />',
+			'rel icon only with whitespace'         => array(
+				'<link rel=" icon " href="https://wordpress.org/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
+			),
+			'multiline attributes'                  => array(
+				'<link
+					rel="icon"
+					href="https://wordpress.org/favicon.ico" 
+				/>',
+				'https://wordpress.org/favicon.ico',
+			),
+			'multiline attributes in reverse order' => array(
+				'<link
+					rel="icon"
+					href="https://wordpress.org/favicon.ico" 
+				/>',
+				'https://wordpress.org/favicon.ico',
+			),
+			'multiline attributes with type'        => array(
+				'<link
+					rel="icon"
+					href="https://wordpress.org/favicon.ico"
+					type="image/x-icon"
+				/>',
+				'https://wordpress.org/favicon.ico',
+			),
+			'multiline with type first'             => array(
+				'<link
+					type="image/x-icon"
+					rel="icon"
+					href="https://wordpress.org/favicon.ico"
+				/>',
+				'https://wordpress.org/favicon.ico',
+			),
+
+			// Unhappy paths.
+			'empty rel'                             => array(
+				'<link rel="" href="https://wordpress.org/favicon.ico" />',
+				'',
+			),
+			'empty href'                            => array(
+				'<link rel="icon" href="" />',
+				'',
+			),
+			'no rel'                                => array(
+				'<link href="https://wordpress.org/favicon.ico" />',
+				'',
+			),
+			'link to external stylesheet'           => array(
+				'<link rel="stylesheet" href="https://example.com/assets/style.css" />',
+				'',
+				'https://example.com',
+			),
+			'multiline with no href'                => array(
+				'<link
+					rel="icon"
+					href="" 
+				/>',
+				'',
+			),
+			'multiline with no rel'                 => array(
+				'<link
+					rel=""
+					href="https://wordpress.org/favicon.ico"
+				/>',
+				'',
 			),
 		);
 	}
@@ -711,18 +822,22 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
-	private function wrap_html_in_doc( $html ) {
+	private function wrap_html_in_doc( $html, $with_body = false ) {
 		$doc = '<!DOCTYPE html>
 				<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
 				<head>
-					%%HEAD_CONTENT%%
-				</head>
+				<meta charset="utf-8" />' . $html . "\n" . '</head>';
+
+		if ( $with_body ) {
+			$doc .= '
 				<body>
 					<h1>Example Website</h1>
 					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 				</body>
-				</html>';
-		return str_replace( '%%HEAD_CONTENT%%', $html, $doc );
+			</html>';
+		}
+
+		return $doc;
 	}
 
 	/**
