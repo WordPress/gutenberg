@@ -205,54 +205,54 @@ class WP_Theme_JSON {
 	 * - 'value': path to the value in theme.json and block attributes.
 	 */
 	const PROPERTIES_METADATA = array(
-		'background'               => array(
+		'background'       => array(
 			'value' => array( 'color', 'gradient' ),
 		),
-		'background-color'         => array(
+		'background-color' => array(
 			'value' => array( 'color', 'background' ),
 		),
-		'border-radius'            => array(
+		'border-radius'    => array(
 			'value' => array( 'border', 'radius' ),
 		),
-		'border-color'             => array(
+		'border-color'     => array(
 			'value' => array( 'border', 'color' ),
 		),
-		'border-width'             => array(
+		'border-width'     => array(
 			'value' => array( 'border', 'width' ),
 		),
-		'border-style'             => array(
+		'border-style'     => array(
 			'value' => array( 'border', 'style' ),
 		),
-		'color'                    => array(
+		'color'            => array(
 			'value' => array( 'color', 'text' ),
 		),
-		'font-family'              => array(
+		'font-family'      => array(
 			'value' => array( 'typography', 'fontFamily' ),
 		),
-		'font-size'                => array(
+		'font-size'        => array(
 			'value' => array( 'typography', 'fontSize' ),
 		),
-		'font-style'               => array(
+		'font-style'       => array(
 			'value' => array( 'typography', 'fontStyle' ),
 		),
-		'font-weight'              => array(
+		'font-weight'      => array(
 			'value' => array( 'typography', 'fontWeight' ),
 		),
-		'line-height'              => array(
+		'line-height'      => array(
 			'value' => array( 'typography', 'lineHeight' ),
 		),
-		'margin'                   => array(
+		'margin'           => array(
 			'value'      => array( 'spacing', 'margin' ),
 			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
-		'padding'                  => array(
+		'padding'          => array(
 			'value'      => array( 'spacing', 'padding' ),
 			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
-		'text-decoration'          => array(
+		'text-decoration'  => array(
 			'value' => array( 'typography', 'textDecoration' ),
 		),
-		'text-transform'           => array(
+		'text-transform'   => array(
 			'value' => array( 'typography', 'textTransform' ),
 		),
 	);
@@ -1214,12 +1214,11 @@ class WP_Theme_JSON {
 	 * Processes a style node and returns the same node
 	 * without the insecure styles.
 	 *
-	 * @param array  $input Node to process.
-	 * @param string $selector Selector for the node.
+	 * @param array $input Node to process.
 	 *
 	 * @return array
 	 */
-	private static function remove_insecure_styles( $input, $selector ) {
+	private static function remove_insecure_styles( $input ) {
 		$output       = array();
 		$declarations = self::compute_style_properties( $input );
 
@@ -1264,7 +1263,7 @@ class WP_Theme_JSON {
 				continue;
 			}
 
-			$output = self::remove_insecure_styles( $input, $metadata['selector'] );
+			$output = self::remove_insecure_styles( $input );
 			if ( ! empty( $output ) ) {
 				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
 			}

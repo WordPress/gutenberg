@@ -13,7 +13,6 @@
  * @return string                Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content, $block ) {
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', 'color', 'text' ), null );
 
 	/*
@@ -40,7 +39,7 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 
 	// Like the layout hook this assumes the hook only applies to blocks with a single wrapper.
 	// Retrieve the opening tag of the first HTML element.
-	$html_element_matches;
+	$html_element_matches = array();
 	preg_match( '/<[^>]+>/', $block_content, $html_element_matches, PREG_OFFSET_CAPTURE );
 	$first_element = $html_element_matches[0][0];
 	// If the first HTML element has a class attribute just add the new class
