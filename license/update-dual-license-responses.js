@@ -35,8 +35,8 @@ async function handleClaimEmailIssueComment(comment) {
     console.log('********************\n')
 
     const commentClaimsOwnership = (claim) => {
-        claim.gitHubUser = author
         claim.comment = {
+            gitHubLogin: author,
             date: comment.createdAt,
             id: comment.databaseId,
             path: comment.resourcePath,
