@@ -7,9 +7,9 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { isEntirelySelected } from '@wordpress/dom';
-import { isKeyboardEvent } from '@wordpress/keycodes';
+import { useRef, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -17,28 +17,54 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 
 export default function useSelectAll() {
-	const { getBlockOrder } = useSelect( blockEditorStore );
+	const ref = useRef();
+	const {
+		getBlockOrder,
+		getSelectedBlockClientIds,
+		getBlockRootClientId,
+	} = useSelect( blockEditorStore );
 	const { multiSelect } = useDispatch( blockEditorStore );
 
-	return useRefEffect( ( node ) => {
-		function onKeyDown( event ) {
-			if (
-				isKeyboardEvent.primary( event, 'a' ) &&
-				isEntirelySelected( event.target )
-			) {
-				const blocks = getBlockOrder();
-				const firstClientId = first( blocks );
-				const lastClientId = last( blocks );
-				if ( firstClientId !== lastClientId ) {
-					multiSelect( firstClientId, lastClientId );
-					event.preventDefault();
-				}
-			}
+	const callback = useCallback( ( event ) => {
+		const selectedClientIds = getSelectedBlockClientIds();
+
+		if ( ! selectedClientIds.length ) {
+			return;
 		}
 
-		node.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			node.removeEventListener( 'keydown', onKeyDown );
-		};
+		if (
+			selectedClientIds.length === 1 &&
+			! isEntirelySelected( event.target )
+		) {
+			return;
+		}
+
+		const [ firstSelectedClientId ] = selectedClientIds;
+		const rootClientId = getBlockRootClientId( firstSelectedClientId );
+		let blockClientIds = getBlockOrder( rootClientId );
+
+		// If we have selected all sibling nested blocks, try selecting up a
+		// level. See: https://github.com/WordPress/gutenberg/pull/31859/
+		if ( selectedClientIds.length === blockClientIds.length ) {
+			blockClientIds = getBlockOrder(
+				getBlockRootClientId( rootClientId )
+			);
+		}
+
+		const firstClientId = first( blockClientIds );
+		const lastClientId = last( blockClientIds );
+
+		if ( firstClientId === lastClientId ) {
+			return;
+		}
+
+		multiSelect( firstClientId, lastClientId );
+		event.preventDefault();
 	}, [] );
+
+	useShortcut( 'core/block-editor/select-all', callback, {
+		target: ref,
+	} );
+
+	return ref;
 }

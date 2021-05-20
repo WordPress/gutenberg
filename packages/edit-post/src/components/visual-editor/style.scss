@@ -28,13 +28,6 @@
 
 }
 
-.editor-styles-wrapper {
-	// Default background color so that grey .edit-post-editor-regions__content
-	// color doesn't show through.
-	background-color: $white;
-	flex: 1;
-}
-
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks
 // .block-editor-block-list__layout and block-editor-block-list__block
 // We need to have two DOM elements.

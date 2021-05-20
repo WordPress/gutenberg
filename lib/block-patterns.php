@@ -90,7 +90,7 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Grid', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"layout":{"type":"flex","columns":3}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
 							<div class="wp-block-query">
 							<!-- wp:query-loop -->
 							<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
@@ -141,7 +141,7 @@ function register_gutenberg_patterns() {
 			'content'    => '<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
 							<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:columns -->
 							<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->
-							<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"layout":{"type":"list"}} -->
+							<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->
 							<div class="wp-block-query"><!-- wp:query-loop -->
 							<!-- wp:post-featured-image /-->
 							<!-- wp:post-title /-->
@@ -153,7 +153,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query --></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"width":"50%"} -->
-							<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":2,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"layout":{"type":"list"}} -->
+							<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":2,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->
 							<div class="wp-block-query"><!-- wp:query-loop -->
 							<!-- wp:spacer {"height":200} -->
 							<div style="height:200px" aria-hidden="true" class="wp-block-spacer"></div>
@@ -470,10 +470,9 @@ function register_gutenberg_patterns() {
 }
 
 /**
- * Deactivate the legacy patterns bundled with WordPress, and add new block patterns for testing.
- * More details in the trac issue (https://core.trac.wordpress.org/ticket/52846).
+ * Deactivate the legacy patterns bundled with WordPress.
  */
-function update_core_patterns() {
+function remove_core_patterns() {
 	$core_block_patterns = array(
 		'text-two-columns',
 		'two-buttons',
@@ -487,36 +486,34 @@ function update_core_patterns() {
 		'quote',
 	);
 
-	$new_core_block_patterns = array(
-		'media-text-nature',
-		'two-images-gallery',
-		'three-columns-media-text',
-		'quote',
-		'large-header-left',
-		'large-header-text-button',
-		'media-text-art',
-		'text-two-columns-title',
-		'three-columns-text',
-		'text-two-columns-title-offset',
-		'heading',
-		'three-images-gallery',
-		'text-two-columns',
-		'media-text-arquitecture',
-		'two-buttons',
-	);
-
 	foreach ( $core_block_patterns as $core_block_pattern ) {
 		$name = 'core/' . $core_block_pattern;
 		if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $name ) ) {
 			unregister_block_pattern( $name );
 		}
 	}
+}
 
-	foreach ( $new_core_block_patterns as $core_block_pattern ) {
-		register_block_pattern(
-			'core/' . $core_block_pattern,
-			require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
-		);
+/**
+ * Import patterns from wordpress.org/patterns.
+ */
+function load_remote_patterns() {
+	$patterns = get_transient( 'gutenberg_remote_block_patterns' );
+	if ( ! $patterns ) {
+		$request         = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$core_keyword_id = 11; // 11 is the ID for "core".
+		$request->set_param( 'keyword', $core_keyword_id );
+		$response = rest_do_request( $request );
+		if ( $response->is_error() ) {
+			return;
+		}
+		$patterns = $response->get_data();
+		set_transient( 'gutenberg_remote_block_patterns', $patterns, HOUR_IN_SECONDS );
+	}
+
+	foreach ( $patterns as $settings ) {
+		$pattern_name = 'core/' . sanitize_title( $settings['title'] );
+		register_block_pattern( $pattern_name, (array) $settings );
 	}
 }
 
@@ -526,7 +523,21 @@ add_action(
 		if ( ! get_theme_support( 'core-block-patterns' ) || ! function_exists( 'unregister_block_pattern' ) ) {
 			return;
 		}
+		remove_core_patterns();
 		register_gutenberg_patterns();
-		update_core_patterns();
+	}
+);
+
+add_action(
+	'current_screen',
+	function( $current_screen ) {
+		if ( ! get_theme_support( 'core-block-patterns' ) ) {
+			return;
+		}
+
+		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
+		if ( $current_screen->is_block_editor || $is_site_editor ) {
+			load_remote_patterns();
+		}
 	}
 );

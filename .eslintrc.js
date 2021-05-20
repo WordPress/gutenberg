@@ -168,6 +168,7 @@ module.exports = {
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
+				'@wordpress/data-no-store-string-literals': 'off',
 			},
 		},
 		{

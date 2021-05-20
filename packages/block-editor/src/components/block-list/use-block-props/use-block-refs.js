@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import {
-	useCallback,
 	useContext,
 	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,21 +29,24 @@ export function useBlockRefProvider( clientId ) {
 	const { refs, callbacks } = useContext( BlockRefs );
 	const ref = useRef();
 	useLayoutEffect( () => {
-		refs.set( clientId, ref );
+		refs.set( ref, clientId );
 		return () => {
-			refs.delete( clientId );
+			refs.delete( ref );
 		};
-	}, [] );
-	return useCallback( ( element ) => {
-		// Update the ref in the provider.
-		ref.current = element;
-		// Call any update functions.
-		callbacks.forEach( ( id, setElement ) => {
-			if ( clientId === id ) {
-				setElement( element );
-			}
-		} );
-	}, [] );
+	}, [ clientId ] );
+	return useRefEffect(
+		( element ) => {
+			// Update the ref in the provider.
+			ref.current = element;
+			// Call any update functions.
+			callbacks.forEach( ( id, setElement ) => {
+				if ( clientId === id ) {
+					setElement( element );
+				}
+			} );
+		},
+		[ clientId ]
+	);
 }
 
 /**
@@ -63,7 +66,17 @@ function useBlockRef( clientId ) {
 	return useMemo(
 		() => ( {
 			get current() {
-				return refs.get( freshClientId.current )?.current || null;
+				let element = null;
+
+				// Multiple refs may be created for a single block. Find the
+				// first that has an element set.
+				for ( const [ ref, id ] of refs.entries() ) {
+					if ( id === freshClientId.current && ref.current ) {
+						element = ref.current;
+					}
+				}
+
+				return element;
 			},
 		} ),
 		[]
