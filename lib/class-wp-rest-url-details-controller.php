@@ -260,34 +260,72 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Parses the meta description from the provided HTML.
 	 *
-	 * @param string $html the HTML from the remote website at URL.
-	 * @return string the meta description contents (maybe empty).
+	 * @param string $html The HTML from the remote website at URL.
+	 * @return string The meta description contents on success, else empty string.
 	 */
 	private function get_description( $html ) {
-		$description = '';
+		$pattern = '#<meta\s' .
 
-		$temp = tmpfile();
+			/*
+			 * Alows for additional attributes before name and/or content.
+			 * Searches for anything other than > symbol.
+			 */
+			'[^>]*' .
 
-		if ( ! $temp ) {
-			fclose( $temp ); // clean up tmp file.
-			return $description;
+			/*
+			 * Forward looking to find the name attribute with the value of description.
+			 * Allows for (a) single or double quotes and (b) whitespace in the value.
+			 */
+			'(?=.*name=(["\'])\s*\bdescription\b\s*\1)' .
+
+			/*
+			 * Forward looking to find the content attribute. When found, match the value (.*).
+			 * Allows for (a) single or double quotes and (b) whitespace in the value.
+			 *
+			 * Why capture the opening quotation mark, i.e. (["\']), and then backreference,
+			 * i.e \1, for the closing quotation mark?
+			 * To ensure the closing quotation mark matches the opening one. Why? Attribute values
+			 * can contain quotation marks, such as an apostrophe in the content.
+			 */
+			'(?=.*content=(["\'])(.*)\1)' .
+
+			/*
+			 * Alows for additional attributes before name and/or content.
+			 * Searches for anything other than > symbol.
+			 */
+			'[^>]*' .
+
+			/*
+			 * \/?> searches for the closing > symbol, which can be in either /> or > format.
+			 * # ends the pattern.
+			 */
+			'\/?>#' .
+
+			/*
+			 * These are the options:
+			 * - i : case insensitive
+			 * - s : allows newline characters for the . match (needed for multiline elements)
+			 * - U means non-greedy matching
+			 */
+			'isU';
+
+		/*
+		 * The above pattern results in $matches = array(
+		 * 		0 => the matching HTML
+		 * 		1 => name attribute's opening quotation mark
+		 * 		2 => content attribute's opening quotation mark
+		 * 		3 => the description (i.e. content attribute's value)
+		 * )
+		 */
+		preg_match( $pattern, $html, $matches );
+
+		$description = ! empty( $matches[3] ) && is_string( $matches[3] ) ? trim( $matches[3] ) : '';
+		if ( empty( $description ) ) {
+			return '';
 		}
 
-		$path = stream_get_meta_data( $temp )['uri'];
+		// @TODO ensure well-formed HTML.
 
-		// Write HTML.
-		fwrite( $temp, $html );
-
-		$meta = get_meta_tags( $path );
-
-		if ( empty( $meta ) ) {
-			fclose( $temp ); // clean up tmp file.
-			return $description;
-		}
-
-		$description = ! empty( $meta['description'] ) ? $meta['description'] : '';
-
-		fclose( $temp ); // clean up tmp file.
 		return $description;
 	}
 

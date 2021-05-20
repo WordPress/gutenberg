@@ -684,6 +684,125 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	/**
+	 * @dataProvider data_get_description
+	 */
+	public function test_get_description( $html, $expected ) {
+		$controller = new WP_REST_URL_Details_Controller();
+		$method     = $this->get_reflective_method( 'get_description' );
+
+		$actual = $method->invoke(
+			$controller,
+			$this->wrap_html_in_doc( $html )
+		);
+		$this->assertSame( $expected, $actual );
+	}
+
+	public function data_get_description() {
+		return array(
+
+			// Happy paths.
+			'default'                                    => array(
+				'<meta name="description" content="This is a description.">',
+				'This is a description.',
+			),
+			'with whitespace'                            => array(
+				'<meta  name=" description "   content=" This is a description.  "   >',
+				'This is a description.',
+			),
+			'with self-closing'                          => array(
+				'<meta name="description" content="This is a description."/>',
+				'This is a description.',
+			),
+			'with self-closing and whitespace'           => array(
+				'<meta  name=" description "   content=" This is a description.  "   />',
+				'This is a description.',
+			),
+			'with content first'                         => array(
+				'<meta content="Content is first" name="description">',
+				'Content is first',
+			),
+			'with single quotes'                         => array(
+				'<meta name=\'description\' content=\'with single quotes\'>',
+				'with single quotes',
+			),
+			'with another element'                       => array(
+				'<meta name="description" content="This is a description."><meta name="viewport" content="width=device-width, initial-scale=1">',
+				'This is a description.',
+			),
+			'with other attributes'                      => array(
+				'<meta first="first" name="description" third="third" content="description with other attributes" fifth="fifth">',
+				'description with other attributes',
+			),
+
+			// Happy paths with multiline attributes.
+			'with multiline attributes'                  => array(
+				'<meta
+					name="description" 
+					content="with multiline attributes"
+				>',
+				'with multiline attributes',
+			),
+			'with multiline attributes in reverse order' => array(
+				'<meta 
+					content="with multiline attributes in reverse order"
+					name="description"
+				>',
+				'with multiline attributes in reverse order',
+			),
+			'with multiline attributes and another element' => array(
+				'<meta 
+					name="description" 
+					content="with multiline attributes"
+				>
+				<meta name="viewport" content="width=device-width, initial-scale=1">',
+				'with multiline attributes',
+			),
+			'with multiline and other attributes'        => array(
+				'<meta 
+					first="first" 
+					name="description" 
+					third="third" 
+					content="description with multiline and other attributes" 
+					fifth="fifth"
+				>',
+				'description with multiline and other attributes',
+			),
+
+			// Happy paths with HTML tags in the description.
+			'with HTML tags'                             => array(
+				'<meta name="description" content="<strong>Description</strong>: has <em>HTML</em> tags">',
+				'<strong>Description</strong>: has <em>HTML</em> tags',
+			),
+			'with content first and HTML tags'           => array(
+				'<meta content="<strong>Description</strong>: has <em>HTML</em> tags" name="description">',
+				'<strong>Description</strong>: has <em>HTML</em> tags',
+			),
+			'with HTML tags and other attributes'        => array(
+				'<meta first="first" name="description" third="third" content="<strong>Description</strong>: has <em>HTML</em> tags" fifth="fifth>',
+				'<strong>Description</strong>: has <em>HTML</em> tags',
+			),
+
+			// Unhappy paths.
+			'with empty content'                         => array(
+				'<meta name="description" content="">',
+				'',
+			),
+			'with empty name'                            => array(
+				'<meta name="" content="name is empty">',
+				'',
+			),
+			'without a name attribute'                   => array(
+				'<meta content="without a name attribute">',
+				'',
+			),
+			'without a content attribute'                => array(
+				'<meta name="description">',
+				'',
+			),
+		);
+	}
+
+	/**
 	 * @dataProvider provide_get_image_data
 	 */
 	public function test_get_image( $html, $expected_image, $target_url = 'https://wordpress.org' ) {
