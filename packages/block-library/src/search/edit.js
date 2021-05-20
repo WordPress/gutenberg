@@ -48,6 +48,8 @@ import {
 	PX_WIDTH_DEFAULT,
 	MIN_WIDTH,
 	MIN_WIDTH_UNIT,
+	showSearchField,
+	hideSearchField,
 } from './utils.js';
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
@@ -55,7 +57,7 @@ import {
 const DEFAULT_INNER_PADDING = 4;
 const BUTTON_BEHAVIOR_EXPAND = 'expand-searchfield';
 const BUTTON_BEHAVIOR_LINK = 'search-page-link';
-const SEARCHFIELD_ANIMATION_DURATION = 300; //ms
+
 
 export default function SearchEdit( {
 	className,
@@ -96,9 +98,18 @@ export default function SearchEdit( {
 		}
 
 		if ( isSearchFieldHidden ) {
-			hideSearchField();
+			hideSearchField(
+				searchFieldRef.current.offsetParent,
+				searchFieldRef.current,
+				buttonRef.current
+			);
 		} else {
-			showSearchField();
+			showSearchField(
+				searchFieldRef.current.offsetParent,
+				searchFieldRef.current,
+				width,
+				widthUnit
+			);
 		}
 	}, [ buttonPosition, isSearchFieldHidden, buttonUseIcon ] );
 
@@ -180,38 +191,6 @@ export default function SearchEdit( {
 			right: align === 'right' ? false : true,
 			left: align === 'right' ? true : false,
 		};
-	};
-
-	const hideSearchField = () => {
-		const wrapper = searchFieldRef.current.offsetParent;
-		const searchField = searchFieldRef.current;
-		const button = buttonRef.current;
-
-		searchField.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
-		wrapper.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
-		wrapper.style.width = `${ button.offsetWidth }px`;
-
-		const removeTransitions = setTimeout( () => {
-			wrapper.style.transitionDuration = 'unset';
-
-			clearTimeout( removeTransitions );
-		}, SEARCHFIELD_ANIMATION_DURATION );
-	};
-
-	const showSearchField = () => {
-		const wrapper = searchFieldRef.current.offsetParent;
-		const searchField = searchFieldRef.current;
-
-		searchField.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
-		wrapper.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
-		wrapper.style.width = `${ width }${ widthUnit }`;
-
-		const removeTransitions = setTimeout( () => {
-			searchField.style.width = `${ width }${ widthUnit }`;
-			wrapper.style.transitionDuration = 'unset';
-
-			clearTimeout( removeTransitions );
-		}, SEARCHFIELD_ANIMATION_DURATION );
 	};
 
 	const renderTextField = () => {
