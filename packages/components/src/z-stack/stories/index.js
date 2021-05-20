@@ -20,7 +20,7 @@ export default {
 	title: 'Components/ZStack',
 };
 
-const Avatar = () => {
+const Avatar = ( { backgroundColor } ) => {
 	return (
 		<View>
 			<View
@@ -29,7 +29,7 @@ const Avatar = () => {
 					borderRadius: '9999px',
 					height: '48px',
 					width: '48px',
-					backgroundColor: 'lightgray',
+					backgroundColor,
 				} }
 			/>
 			<Elevation
@@ -46,7 +46,8 @@ const AnimatedAvatars = () => {
 	const hoveredOffset = number( 'offset', 20 );
 	const props = {
 		offset: isHover ? 0 : hoveredOffset,
-		isLayered: boolean( 'isLayerd', false ),
+		isLayered: boolean( 'isLayered', false ),
+		isReversed: boolean( 'isReversed', false ),
 	};
 
 	return (
@@ -56,10 +57,10 @@ const AnimatedAvatars = () => {
 				onMouseEnter={ () => setIsHover( true ) }
 			>
 				<ZStack { ...props }>
-					<Avatar />
-					<Avatar />
-					<Avatar />
-					<Avatar />
+					<Avatar backgroundColor="#444" />
+					<Avatar backgroundColor="#777" />
+					<Avatar backgroundColor="#aaa" />
+					<Avatar backgroundColor="#fff" />
 				</ZStack>
 			</View>
 		</HStack>
