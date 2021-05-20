@@ -39,7 +39,6 @@ const Caption = ( {
 			__unstableMobileNoFocusOnMount
 			fontSize={ style && style.fontSize ? style.fontSize : 14 }
 			inlineToolbar={ inlineToolbar }
-			isSelected={ isSelected }
 			onBlur={ onBlur }
 			onChange={ onChange }
 			placeholder={ placeholder }
