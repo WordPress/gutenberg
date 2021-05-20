@@ -59,7 +59,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import styles from './styles.scss';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import { LINK_DESTINATION_CUSTOM } from './constants';
+import {
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA,
+} from './constants';
 
 const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
@@ -167,10 +171,10 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		if ( ! previousProps.image && this.props.image ) {
-			const { image, attributes } = this.props;
+		const { image, attributes, setAttributes } = this.props;
+		if ( ! previousProps.image && image ) {
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
-			this.props.setAttributes( { url } );
+			setAttributes( { url } );
 		}
 	}
 
@@ -283,14 +287,13 @@ export class ImageEdit extends Component {
 	}
 
 	onSetSizeSlug( sizeSlug ) {
-		const { image } = this.props;
+		const { image, setAttributes } = this.props;
 
 		const url = getUrlForSlug( image, { sizeSlug } );
 		if ( ! url ) {
 			return null;
 		}
-
-		this.props.setAttributes( {
+		setAttributes( {
 			url,
 			width: undefined,
 			height: undefined,
@@ -299,11 +302,8 @@ export class ImageEdit extends Component {
 	}
 
 	onSelectMediaUploadOption( media ) {
-		const {
-			attributes: { id, url },
-			imageDefaultSize,
-		} = this.props;
-
+		const { imageDefaultSize } = this.props;
+		const { id, url, destination } = this.props.attributes;
 		const mediaAttributes = {
 			id: media.id,
 			url: media.url,
@@ -322,6 +322,17 @@ export class ImageEdit extends Component {
 			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
 			additionalAttributes = { url };
 		}
+
+		let href;
+		switch ( destination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
+		}
+		mediaAttributes.href = href;
 
 		this.props.setAttributes( {
 			...mediaAttributes,
@@ -363,9 +374,17 @@ export class ImageEdit extends Component {
 
 	setMappedAttributes( { url: href, ...restAttributes } ) {
 		const { setAttributes } = this.props;
+
 		return href === undefined
-			? setAttributes( restAttributes )
-			: setAttributes( { ...restAttributes, href } );
+			? setAttributes( {
+					...restAttributes,
+					linkDestination: LINK_DESTINATION_CUSTOM,
+			  } )
+			: setAttributes( {
+					...restAttributes,
+					href,
+					linkDestination: LINK_DESTINATION_CUSTOM,
+			  } );
 	}
 
 	getLinkSettings() {
@@ -373,7 +392,6 @@ export class ImageEdit extends Component {
 		const {
 			attributes: { href: url, ...unMappedAttributes },
 		} = this.props;
-
 		const mappedAttributes = { ...unMappedAttributes, url };
 
 		return (
@@ -438,6 +456,7 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
+			context: { isGrouped = false, imageCrop = false },
 			featuredImageId,
 			wasBlockJustInserted,
 		} = this.props;
@@ -516,6 +535,13 @@ export class ImageEdit extends Component {
 			wide: 'center',
 		};
 
+		const additionalImageProps = isGrouped
+			? {
+					height: '100%',
+					resizeMode: imageCrop ? 'cover' : 'contain',
+			  }
+			: {};
+
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
 				<TouchableWithoutFeedback
@@ -548,25 +574,35 @@ export class ImageEdit extends Component {
 								retryMessage,
 							} ) => {
 								return (
-									<Image
-										align={ align && alignToFlex[ align ] }
-										alt={ alt }
-										isSelected={
-											isSelected && ! isCaptionSelected
-										}
-										isUploadFailed={ isUploadFailed }
-										isUploadInProgress={
-											isUploadInProgress
-										}
-										onSelectMediaUploadOption={
-											this.onSelectMediaUploadOption
-										}
-										openMediaOptions={ openMediaOptions }
-										retryMessage={ retryMessage }
-										url={ url }
-										shapeStyle={ styles[ className ] }
-										width={ this.getWidth() }
-									/>
+									<View
+										style={ isGrouped && styles.isGallery }
+									>
+										<Image
+											align={
+												align && alignToFlex[ align ]
+											}
+											alt={ alt }
+											isSelected={
+												isSelected &&
+												! isCaptionSelected
+											}
+											isUploadFailed={ isUploadFailed }
+											isUploadInProgress={
+												isUploadInProgress
+											}
+											onSelectMediaUploadOption={
+												this.onSelectMediaUploadOption
+											}
+											openMediaOptions={
+												openMediaOptions
+											}
+											retryMessage={ retryMessage }
+											url={ url }
+											shapeStyle={ styles[ className ] }
+											width={ this.getWidth() }
+											{ ...additionalImageProps }
+										/>
+									</View>
 								);
 							} }
 						/>

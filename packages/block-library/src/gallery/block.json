@@ -104,7 +104,8 @@
 	},
 	"providesContext": {
 		"allowResize": "allowResize",
-		"isGrouped": "isGrouped"
+		"isGrouped": "isGrouped",
+		"imageCrop": "imageCrop",
 	},
 	"supports": {
 		"anchor": true,
