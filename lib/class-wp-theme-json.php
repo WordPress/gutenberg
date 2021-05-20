@@ -55,6 +55,12 @@ class WP_Theme_JSON {
 			'text'       => null,
 		),
 		'spacing'    => array(
+			'margin'  => array(
+				'top'    => null,
+				'right'  => null,
+				'bottom' => null,
+				'left'   => null,
+			),
 			'padding' => array(
 				'bottom' => null,
 				'left'   => null,
@@ -91,6 +97,7 @@ class WP_Theme_JSON {
 		'custom'     => null,
 		'layout'     => null,
 		'spacing'    => array(
+			'customMargin'  => null,
 			'customPadding' => null,
 			'units'         => null,
 		),
@@ -198,9 +205,6 @@ class WP_Theme_JSON {
 	 * - 'value': path to the value in theme.json and block attributes.
 	 */
 	const PROPERTIES_METADATA = array(
-		'--wp--style--color--link' => array(
-			'value' => array( 'color', 'link' ),
-		),
 		'background'               => array(
 			'value' => array( 'color', 'gradient' ),
 		),
@@ -236,6 +240,10 @@ class WP_Theme_JSON {
 		),
 		'line-height'              => array(
 			'value' => array( 'typography', 'lineHeight' ),
+		),
+		'margin'                   => array(
+			'value'      => array( 'spacing', 'margin' ),
+			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
 		'padding'                  => array(
 			'value'      => array( 'spacing', 'padding' ),
@@ -825,7 +833,7 @@ class WP_Theme_JSON {
 	 * @return string The new stylesheet.
 	 */
 	private function get_block_styles( $style_nodes, $setting_nodes ) {
-		$block_rules = self::ELEMENTS['link'] . '{color: var(--wp--style--color--link);}';
+		$block_rules = '';
 		foreach ( $style_nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
 				continue;
@@ -834,53 +842,7 @@ class WP_Theme_JSON {
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$selector     = $metadata['selector'];
 			$declarations = self::compute_style_properties( $node );
-
-			$is_link_element = self::is_link_element( $metadata['selector'] );
-			if ( ! $is_link_element ) {
-				$block_rules .= self::to_ruleset( $selector, $declarations );
-			} else {
-				/*
-				 * To be removed when the user provided styles for link color
-				 * no longer use the --wp--style--link-color variable.
-				 *
-				 * We need to:
-				 *
-				 * 1. For the color property, output:
-				 *
-				 *    $selector_without_the_link_element_selector {
-				 *        --wp--style--color--link: value
-				 *    }
-				 *
-				 * 2. For the rest of the properties:
-				 *
-				 *    $selector {
-				 *        other-prop: value;
-				 *        other-prop: value;
-				 *    }
-				 *
-				 * The reason for 1 is that user styles are attached to the block wrapper.
-				 * If 1 targets the a element is going to have higher specificity
-				 * and will overwrite the user preferences.
-				 *
-				 * Once the user styles are updated to output an `a` element instead
-				 * this can be removed.
-				 */
-				$declarations_color = array();
-				$declarations_other = array();
-				foreach ( $declarations as $declaration ) {
-					if ( 'color' === $declaration['name'] ) {
-						$declarations_color[] = array(
-							'name'  => '--wp--style--color--link',
-							'value' => $declaration['value'],
-						);
-					} else {
-						$declarations_other[] = $declaration;
-					}
-				}
-
-				$block_rules .= self::to_ruleset( $selector, $declarations_other );
-				$block_rules .= self::to_ruleset( self::without_link_selector( $selector ), $declarations_color );
-			}
+			$block_rules .= self::to_ruleset( $selector, $declarations );
 		}
 
 		$preset_rules = '';
@@ -1135,20 +1097,9 @@ class WP_Theme_JSON {
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
 			foreach ( $properties as $property_path ) {
-				$paths   = array();
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-
-				foreach ( $paths as $path ) {
-					$node = _wp_array_get( $incoming_data, $path, array() );
-					if ( empty( $node ) ) {
-						continue;
-					}
-
+				$path = array_merge( $metadata['path'], $property_path );
+				$node = _wp_array_get( $incoming_data, $path, array() );
+				if ( ! empty( $node ) ) {
 					gutenberg_experimental_set( $this->theme_json, $path, $node );
 				}
 			}
@@ -1219,15 +1170,6 @@ class WP_Theme_JSON {
 	private static function remove_insecure_styles( $input, $selector ) {
 		$output       = array();
 		$declarations = self::compute_style_properties( $input );
-		// To be removed once the user styles
-		// no longer use the --wp--style--color--link.
-		if ( self::is_link_element( $selector ) ) {
-			foreach ( $declarations as $index => $declaration ) {
-				if ( 'color' === $declaration['name'] ) {
-					$declarations[ $index ]['name'] = '--wp--style--color--link';
-				}
-			}
-		}
 
 		foreach ( $declarations as $declaration ) {
 			if ( self::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
@@ -1254,39 +1196,6 @@ class WP_Theme_JSON {
 		$style_to_validate = $property_name . ': ' . $property_value;
 		$filtered          = esc_html( safecss_filter_attr( $style_to_validate ) );
 		return ! empty( trim( $filtered ) );
-	}
-
-	/**
-	 * Whether the selector contains a link element.
-	 *
-	 * @param string $selector The selector to check.
-	 *
-	 * @return boolean
-	 */
-	private static function is_link_element( $selector ) {
-		$result = true;
-		if ( false === stripos( $selector, self::ELEMENTS['link'] ) ) {
-			$result = false;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Remove the link selector from the input.
-	 *
-	 * @param string $selector CSS selector to process.
-	 *
-	 * @return string
-	 */
-	private static function without_link_selector( $selector ) {
-		$result = str_ireplace( self::ELEMENTS['link'], '', $selector );
-
-		if ( '' === trim( $result ) ) {
-			return self::ROOT_BLOCK_SELECTOR;
-		}
-
-		return $result;
 	}
 
 	/**

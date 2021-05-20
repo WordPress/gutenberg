@@ -14,7 +14,6 @@ import {
 	BlockTools,
 	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableEditorStyles as EditorStyles,
@@ -57,11 +56,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
 	const ref = useMouseMoveTypingReset();
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [
-		contentRef,
-		useBlockSelectionClearer(),
-		useTypingObserver(),
-	] );
+	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 
 	return (
 		<BlockEditorProvider
@@ -92,7 +87,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<BlockTools __unstableContentRef={ contentRef }>
 					<Iframe
 						style={ resizedCanvasStyles }
-						headHTML={ window.__editorStyles.html }
 						head={ <EditorStyles styles={ settings.styles } /> }
 						ref={ ref }
 						contentRef={ mergedRefs }

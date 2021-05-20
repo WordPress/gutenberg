@@ -22,6 +22,21 @@ import { groupBy, mapValues } from 'lodash';
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
 		await visitAdminPage( 'themes.php', 'page=gutenberg-widgets' );
+
+		// Disable welcome guide if it is enabled.
+		const isWelcomeGuideActive = await page.evaluate( () =>
+			wp.data
+				.select( 'core/edit-widgets' )
+				.__unstableIsFeatureActive( 'welcomeGuide' )
+		);
+		if ( isWelcomeGuideActive ) {
+			await page.evaluate( () =>
+				wp.data
+					.dispatch( 'core/edit-widgets' )
+					.__unstableToggleFeature( 'welcomeGuide' )
+			);
+		}
+
 		// Wait for the widget areas to load.
 		await findAll( {
 			role: 'group',

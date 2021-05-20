@@ -35,11 +35,11 @@ import {
 } from '../../hooks';
 import ErrorBoundary from '../error-boundary';
 import NavigationEditorShortcuts from './shortcuts';
-import Sidebar from './sidebar';
+import Sidebar from '../sidebar';
 import Header from '../header';
 import Notices from '../notices';
 import Editor from '../editor';
-import InspectorAdditions from '../inspector-additions';
+import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
 
 const interfaceLabels = {
@@ -174,24 +174,6 @@ export default function Layout( { blockEditorSettings } ) {
 													}
 													blocks={ blocks }
 												/>
-												<InspectorAdditions
-													isManageLocationsModalOpen={
-														isManageLocationsModalOpen
-													}
-													openManageLocationsModal={
-														openManageLocationsModal
-													}
-													closeManageLocationsModal={
-														closeManageLocationsModal
-													}
-													onSelectMenu={ selectMenu }
-													menus={ menus }
-													menuId={ selectedMenuId }
-													onDeleteMenu={ deleteMenu }
-													isMenuBeingDeleted={
-														isMenuBeingDeleted
-													}
-												/>
 											</div>
 										</BlockTools>
 									) }
@@ -204,8 +186,25 @@ export default function Layout( { blockEditorSettings } ) {
 								)
 							}
 						/>
-						<Sidebar hasPermanentSidebar={ hasPermanentSidebar } />
+						<Sidebar
+							onSelectMenu={ selectMenu }
+							menus={ menus }
+							menuId={ selectedMenuId }
+							onDeleteMenu={ deleteMenu }
+							isMenuBeingDeleted={ isMenuBeingDeleted }
+							hasPermanentSidebar={ hasPermanentSidebar }
+							isManageLocationsModalOpen={
+								isManageLocationsModalOpen
+							}
+							openManageLocationsModal={
+								openManageLocationsModal
+							}
+							closeManageLocationsModal={
+								closeManageLocationsModal
+							}
+						/>
 					</IsMenuNameControlFocusedContext.Provider>
+					<UnsavedChangesWarning />
 				</BlockEditorProvider>
 				<Popover.Slot />
 			</SlotFillProvider>

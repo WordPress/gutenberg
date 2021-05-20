@@ -43,6 +43,7 @@ $z-layers: (
 
 	// Navigation menu dropdown.
 	".has-child .wp-block-navigation-link__container": 28,
+	".has-child:hover .wp-block-navigation-link__container": 29,
 
 	// Active pill button
 	".components-button {:focus or .is-primary}": 1,
@@ -141,8 +142,10 @@ $z-layers: (
 	".components-popover.block-editor-inserter__popover": 99999,
 	".components-popover.table-of-contents__popover": 99998,
 	".components-popover.block-editor-block-navigation__popover": 99998,
+	".components-popover.customize-widgets-more-menu__content": 99998,
 	".components-popover.edit-post-more-menu__content": 99998,
 	".components-popover.edit-site-more-menu__content": 99998,
+	".components-popover.edit-widgets-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,
 	".components-popover.edit-navigation-header__menu-switcher-dropdown": 99998,
@@ -176,6 +179,12 @@ $z-layers: (
 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
 	".components-circular-option-picker__option.is-pressed + svg": 2,
 	".edit-navigation-layout__overlay": 999,
+
+	// Appear under the customizer heading UI, but over anything else.
+	".customize-widgets__topbar": 8,
+
+	// Appear under the topbar.
+	".customize-widgets__block-toolbar": 7,
 );
 
 @function z-index( $key ) {

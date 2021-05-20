@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { Text } from '../../../text';
-import { color } from '../../../utils/style-mixins';
+import { COLORS } from '../../../utils';
 
 export const Root = styled.div`
 	bottom: 0;
@@ -30,11 +30,11 @@ export const TooltipWrapper = styled.div`
 `;
 
 export const Tooltip = styled.div`
-	background: ${ color( 'ui.border' ) };
+	background: ${ COLORS.ui.border };
 	border-radius: 2px;
 	box-sizing: border-box;
 	font-size: 12px;
-	color: ${ color( 'ui.textDark' ) };
+	color: ${ COLORS.ui.textDark };
 	padding: 4px 8px;
 	position: relative;
 `;
