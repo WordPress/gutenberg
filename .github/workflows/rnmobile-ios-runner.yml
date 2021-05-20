@@ -27,6 +27,8 @@ jobs:
             #       path: ~/.npm
             #       key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
 
+            - run: npm --version
+            - run: npm cache clean --force
             - run: npm ci
 
             - name: Prepare build cache key
