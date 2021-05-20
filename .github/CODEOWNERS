@@ -123,7 +123,7 @@
 /lib                                            @timothybjacobs @spacedmonkey
 /lib/global-styles.php                          @timothybjabocs @spacedmonkey @nosolosw
 /lib/experimental-default-theme.json            @timothybjabocs @spacedmonkey @nosolosw
-/lib/class-wp-theme-json.php                    @timothybjabocs @spacedmonkey @nosolosw
+/lib/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @nosolosw
 /lib/class-wp-theme-json-resolver.php           @timothybjabocs @spacedmonkey @nosolosw
 /phpunit/class-wp-theme-json-test.php           @nosolosw
 
