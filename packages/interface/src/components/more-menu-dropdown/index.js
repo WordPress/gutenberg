@@ -15,6 +15,7 @@ const TOGGLE_PROPS = {
 };
 
 export default function MoreMenuDropdown( {
+	/* translators: button label text should, if possible, be under 16 characters. */
 	label = __( 'Options' ),
 	popoverProps,
 	toggleProps,
@@ -24,7 +25,6 @@ export default function MoreMenuDropdown( {
 		<DropdownMenu
 			className="interface-more-menu-dropdown"
 			icon={ moreVertical }
-			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ label }
 			popoverProps={ {
 				...POPOVER_PROPS,
