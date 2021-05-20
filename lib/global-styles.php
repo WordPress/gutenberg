@@ -9,8 +9,8 @@
  * Takes a tree adhering to the theme.json schema and generates
  * the corresponding stylesheet.
  *
- * @param WP_Theme_JSON $tree Input tree.
- * @param string        $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+ * @param WP_Theme_JSON_Gutenberg $tree Input tree.
+ * @param string                  $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
  *
  * @return string Stylesheet.
  */
@@ -189,7 +189,7 @@ function gutenberg_global_styles_filter_post( $content ) {
 		$decoded_data['isGlobalStylesUserThemeJSON']
 	) {
 		unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
-		$theme_json = new WP_Theme_JSON( $decoded_data );
+		$theme_json = new WP_Theme_JSON_Gutenberg( $decoded_data );
 		$theme_json->remove_insecure_properties();
 		$data_to_encode                                = $theme_json->get_raw_data();
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;

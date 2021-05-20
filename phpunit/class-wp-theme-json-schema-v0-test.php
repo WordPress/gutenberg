@@ -157,7 +157,7 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 	function test_get_settings() {
 		$defaults   = WP_Theme_JSON_Schema_V0::ALL_BLOCKS_NAME;
 		$root       = WP_Theme_JSON_Schema_V0::ROOT_BLOCK_NAME;
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'settings' => array(
 					$defaults             => array(
@@ -336,7 +336,7 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 		$root_name       = WP_Theme_JSON_Schema_V0::ROOT_BLOCK_NAME;
 		$all_blocks_name = WP_Theme_JSON_Schema_V0::ALL_BLOCKS_NAME;
 
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'settings' => array(
 					$all_blocks_name => array(
