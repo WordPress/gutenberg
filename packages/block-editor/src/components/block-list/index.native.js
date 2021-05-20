@@ -230,6 +230,7 @@ export class BlockList extends Component {
 
 		return (
 			<View
+				accessibilityLabel="block-list-wrapper"
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 				onLayout={ this.onLayout }
