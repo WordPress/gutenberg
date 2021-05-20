@@ -1,20 +1,17 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { DropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 
-const POPOVER_PROPS = {
-	className: 'interface-more-menu__content',
-	position: 'bottom left',
-};
-
-const TOGGLE_PROPS = {
-	tooltipPosition: 'bottom',
-};
-
 export default function MoreMenuDropdown( {
+	className,
 	/* translators: button label text should, if possible, be under 16 characters. */
 	label = __( 'Options' ),
 	popoverProps,
@@ -23,15 +20,22 @@ export default function MoreMenuDropdown( {
 } ) {
 	return (
 		<DropdownMenu
-			className="interface-more-menu-dropdown"
+			className={ classnames(
+				'interface-more-menu-dropdown',
+				className
+			) }
 			icon={ moreVertical }
 			label={ label }
 			popoverProps={ {
-				...POPOVER_PROPS,
+				position: 'bottom left',
 				...popoverProps,
+				className: classnames(
+					'interface-more-menu-dropdown__content',
+					popoverProps?.className
+				),
 			} }
 			toggleProps={ {
-				...TOGGLE_PROPS,
+				tooltipPosition: 'bottom',
 				...toggleProps,
 			} }
 		>
