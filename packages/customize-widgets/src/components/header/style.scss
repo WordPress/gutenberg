@@ -26,6 +26,8 @@
 .customize-widgets-header-toolbar {
 	display: flex;
 	border: none;
+	width: 100%;
+	align-items: center;
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
 		border-radius: 2px;
@@ -33,7 +35,7 @@
 		padding: 0;
 		min-width: $grid-unit-30;
 		height: $grid-unit-30;
-		margin: $grid-unit-15 0 $grid-unit-15;
+		margin: $grid-unit-15 0 $grid-unit-15 auto;
 
 		&::before {
 			content: none;
@@ -42,5 +44,10 @@
 		&.is-pressed {
 			background: $gray-900;
 		}
+	}
+
+	// Move it more closely to he left visually.
+	.components-button.has-icon.customize-widgets-editor-history-button.redo-button {
+		margin-left: -12px;
 	}
 }

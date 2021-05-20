@@ -59,7 +59,7 @@
 		left: auto;
 
 		// Hide the toggle as the sidebar should be permanently open.
-		.interface-complementary-area-header {
+		.edit-navigation-sidebar__panel-tabs > button {
 			display: none;
 		}
 	}
