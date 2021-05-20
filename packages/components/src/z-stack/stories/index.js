@@ -17,7 +17,7 @@ import { ZStack } from '..';
 
 export default {
 	component: ZStack,
-	title: 'Components/ZStack',
+	title: 'Components (Experimental)/ZStack',
 };
 
 const Avatar = ( { backgroundColor } ) => {
@@ -43,9 +43,9 @@ const Avatar = ( { backgroundColor } ) => {
 
 const AnimatedAvatars = () => {
 	const [ isHover, setIsHover ] = useState( false );
-	const hoveredOffset = number( 'offset', 20 );
+	const overlap = number( 'overlap', 20 );
 	const props = {
-		offset: isHover ? 0 : hoveredOffset,
+		overlap: isHover ? 0 : overlap,
 		isLayered: boolean( 'isLayered', false ),
 		isReversed: boolean( 'isReversed', false ),
 	};

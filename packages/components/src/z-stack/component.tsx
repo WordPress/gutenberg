@@ -35,11 +35,11 @@ export interface ZStackProps {
 	 */
 	isReversed?: boolean;
 	/**
-	 * The amount of space between each child element.
+	 * The amount of overlap between each child element.
 	 *
 	 * @default 0
 	 */
-	offset?: number;
+	overlap?: number;
 	/**
 	 * Child elements.
 	 */
@@ -55,7 +55,7 @@ function ZStack(
 		className,
 		isLayered = true,
 		isReversed = false,
-		offset = 0,
+		overlap = 0,
 		...otherProps
 	} = useContextSystem( props, 'ZStack' );
 
@@ -68,7 +68,7 @@ function ZStack(
 		const classes = cx(
 			isLayered ? styles.positionAbsolute : styles.positionRelative,
 			css( {
-				marginLeft: ! isLayered && offset * -1,
+				marginLeft: ( ! isLayered && overlap * -1 ) || undefined,
 			} )
 		);
 
@@ -89,7 +89,7 @@ function ZStack(
 
 	const classes = cx(
 		css( {
-			paddingLeft: ! isLayered ? offset : null,
+			paddingLeft: ! isLayered ? overlap : undefined,
 		} ),
 		className
 	);
