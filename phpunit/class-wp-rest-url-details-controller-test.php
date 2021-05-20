@@ -729,6 +729,10 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'<meta name="description" content="This is a description."><meta name="viewport" content="width=device-width, initial-scale=1">',
 				'This is a description.',
 			),
+			'with several elements'                       => array(
+				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg" /><meta name="description" content="This is a description."><meta name="viewport" content="width=device-width, initial-scale=1">',
+				'This is a description.',
+			),			
 			'with other attributes'                      => array(
 				'<meta first="first" name="description" third="third" content="description with other attributes" fifth="fifth">',
 				'description with other attributes',
