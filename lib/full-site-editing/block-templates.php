@@ -327,11 +327,6 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		}
 	}
 
-	// https://core.trac.wordpress.org/ticket/28099
-	if ( $wp_query_args['post__in'] === array() ) {
-		return array();
-	}
-
 	// This is only needed for the regular templates/template parts CPT listing and editor.
 	if ( isset( $query['wp_id'] ) ) {
 		$wp_query_args['p'] = $query['wp_id'];
@@ -339,13 +334,17 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$wp_query_args['post_status'] = 'publish';
 	}
 
-	$template_query = new WP_Query( $wp_query_args );
-	$query_result   = array();
-	foreach ( $template_query->get_posts() as $post ) {
-		$template = _gutenberg_build_template_result_from_post( $post, $template_type );
+	$query_result = array();
 
-		if ( ! is_wp_error( $template ) ) {
-			$query_result[] = $template;
+	// https://core.trac.wordpress.org/ticket/28099
+	if ( $wp_query_args['post__in'] !== array() ) {
+		$template_query = new WP_Query( $wp_query_args );
+		foreach ( $template_query->get_posts() as $post ) {
+			$template = _gutenberg_build_template_result_from_post( $post, $template_type );
+
+			if ( ! is_wp_error( $template ) ) {
+				$query_result[] = $template;
+			}
 		}
 	}
 
