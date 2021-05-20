@@ -3,16 +3,12 @@
  */
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { dashedIcon, dottedIcon, solidIcon } from './icons';
+import { lineDashed, lineDotted, lineSolid } from '@wordpress/icons';
 
 const BORDER_STYLES = [
-	{ label: __( 'Solid' ), icon: solidIcon, value: 'solid' },
-	{ label: __( 'Dashed' ), icon: dashedIcon, value: 'dashed' },
-	{ label: __( 'Dotted' ), icon: dottedIcon, value: 'dotted' },
+	{ label: __( 'Solid' ), icon: lineSolid, value: 'solid' },
+	{ label: __( 'Dashed' ), icon: lineDashed, value: 'dashed' },
+	{ label: __( 'Dotted' ), icon: lineDotted, value: 'dotted' },
 ];
 
 /**
