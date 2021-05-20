@@ -5,7 +5,12 @@
 	"description": "Prototyping since 1440. Development hub for the editor focus in core.",
 	"homepage": "https://wordpress.github.io/gutenberg/",
 	"keywords": [
-		"gutenberg", "wordpress", "editor", "wp", "react", "javascript"
+		"gutenberg",
+		"wordpress",
+		"editor",
+		"wp",
+		"react",
+		"javascript"
 	],
 	"support": {
 		"issues": "https://github.com/WordPress/gutenberg/issues"

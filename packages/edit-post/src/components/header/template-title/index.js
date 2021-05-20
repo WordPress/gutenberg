@@ -1,13 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { Button, Dropdown } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
+import DeleteTemplate from './delete-template';
+import EditTemplateTitle from './edit-template-title';
 
 function TemplateTitle() {
 	const { template, isEditing } = useSelect( ( select ) => {
@@ -25,13 +28,40 @@ function TemplateTitle() {
 		return null;
 	}
 
+	let templateTitle = __( 'Default' );
+	if ( template?.title ) {
+		templateTitle = template.title;
+	} else if ( !! template ) {
+		templateTitle = template.slug;
+	}
+
 	return (
-		<span className="edit-post-template-title">
-			{
-				/* translators: 1: Template name. */
-				sprintf( __( 'Editing template: %s' ), template.slug )
-			}
-		</span>
+		<Dropdown
+			position="bottom center"
+			className="edit-post-template-top-area"
+			contentClassName="edit-post-template-top-area__popover"
+			renderToggle={ ( { onToggle } ) => (
+				<>
+					<div className="edit-post-template-title">
+						{ __( 'About' ) }
+					</div>
+					<Button
+						isSmall
+						isTertiary
+						onClick={ onToggle }
+						aria-label={ __( 'Template Options' ) }
+					>
+						{ templateTitle }
+					</Button>
+				</>
+			) }
+			renderContent={ () => (
+				<>
+					<EditTemplateTitle />
+					<DeleteTemplate />
+				</>
+			) }
+		/>
 	);
 }
 

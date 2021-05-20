@@ -24,11 +24,12 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -54,6 +55,13 @@ function AudioEdit( {
 	const onFileChange = ( { mediaId, mediaUrl } ) => {
 		setAttributes( { id: mediaId, src: mediaUrl } );
 	};
+
+	const { wasBlockJustInserted } = useSelect( ( select ) => ( {
+		wasBlockJustInserted: select( blockEditorStore ).wasBlockJustInserted(
+			clientId,
+			'inserter_menu'
+		),
+	} ) );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -104,6 +112,7 @@ function AudioEdit( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onFocus={ onFocus }
+					autoOpenMediaUpload={ isSelected && wasBlockJustInserted }
 				/>
 			</View>
 		);
@@ -170,6 +179,9 @@ function AudioEdit( {
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ __(
+								'Autoplay may cause usability issues for some users.'
+							) }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }

@@ -82,7 +82,6 @@ describe( 'env cli', () => {
 	} );
 
 	it( 'handles failed commands with messages.', async () => {
-		/* eslint-disable no-console */
 		env.start.mockRejectedValueOnce( {
 			message: 'failure message',
 		} );
@@ -100,10 +99,8 @@ describe( 'env cli', () => {
 		expect( process.exit ).toHaveBeenCalledWith( 1 );
 		console.error = consoleError;
 		process.exit = processExit;
-		/* eslint-enable no-console */
 	} );
 	it( 'handles failed docker commands with errors.', async () => {
-		/* eslint-disable no-console */
 		env.start.mockRejectedValueOnce( {
 			err: 'failure error',
 			out: 'message',
@@ -128,6 +125,5 @@ describe( 'env cli', () => {
 		console.error = consoleError;
 		process.exit = processExit;
 		process.stderr.write = stderr;
-		/* eslint-enable no-console */
 	} );
 } );

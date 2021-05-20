@@ -12,10 +12,7 @@
 			"column": 30
 		}
 	},
-	"range": [
-		111,
-		141
-	],
+	"range": [ 111, 141 ],
 	"declaration": {
 		"type": "VariableDeclaration",
 		"start": 118,
@@ -30,10 +27,7 @@
 				"column": 30
 			}
 		},
-		"range": [
-			118,
-			141
-		],
+		"range": [ 118, 141 ],
 		"declarations": [
 			{
 				"type": "VariableDeclarator",
@@ -49,10 +43,7 @@
 						"column": 29
 					}
 				},
-				"range": [
-					124,
-					140
-				],
+				"range": [ 124, 140 ],
 				"id": {
 					"type": "Identifier",
 					"start": 124,
@@ -67,10 +58,7 @@
 							"column": 24
 						}
 					},
-					"range": [
-						124,
-						135
-					],
+					"range": [ 124, 135 ],
 					"name": "THE_MEANING"
 				},
 				"init": {
@@ -87,10 +75,7 @@
 							"column": 29
 						}
 					},
-					"range": [
-						138,
-						140
-					],
+					"range": [ 138, 140 ],
 					"value": 42,
 					"raw": "42"
 				}
@@ -106,10 +91,7 @@
 			"value": "*\n * Constant to document the meaning of life,\n * the universe and everything else.\n *\n * @type {number}\n ",
 			"start": 0,
 			"end": 110,
-			"range": [
-				0,
-				110
-			],
+			"range": [ 0, 110 ],
 			"loc": {
 				"start": {
 					"line": 1,

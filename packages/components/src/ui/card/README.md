@@ -13,13 +13,14 @@ import {
 	CardBody,
 	CardFooter,
 	Text,
-} from '@wordpress/components/ui';
+	Heading,
+} from '@wordpress/components';
 
 function Example() {
 	return (
 		<Card>
 			<CardHeader>
-				<Heading size={4}>Card Title</Heading>
+				<Heading size={ 4 }>Card Title</Heading>
 			</CardHeader>
 			<CardBody>
 				<Text>Card Content</Text>

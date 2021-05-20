@@ -20,17 +20,17 @@ While modals can be an effective way to disclose additional controls or informat
 
 #### Principles
 
-- **Focused**. Modals pull user attention away from the rest of the screen to focus their attention, ensuring that the modal’s content is addressed.
-- **Direct**. Modal text should communicate important information and be dedicated to helping the user appropriately complete a task.
-- **Helpful**. Modals should appear in response to a user task or an action to offer relevant and contextual information.
+-   **Focused**. Modals pull user attention away from the rest of the screen to focus their attention, ensuring that the modal’s content is addressed.
+-   **Direct**. Modal text should communicate important information and be dedicated to helping the user appropriately complete a task.
+-   **Helpful**. Modals should appear in response to a user task or an action to offer relevant and contextual information.
 
 #### When to use
 
 Modals are used for:
 
-- Errors that block normal operation.
-- Critical information that requires a specific user task, decision, or acknowledgement.
-- Contextual information that appears in response to a user task or action.
+-   Errors that block normal operation.
+-   Critical information that requires a specific user task, decision, or acknowledgement.
+-   Contextual information that appears in response to a user task or action.
 
 ### Anatomy
 
@@ -56,8 +56,8 @@ All modals should have a title for accessibility reasons (the `contentLabel` pro
 
 Titles should:
 
-- Contain a brief, clear statement or question
-- Avoid apologies (“Sorry for the interruption”), alarm (“Warning!”), or ambiguity (“Are you sure?”).
+-   Contain a brief, clear statement or question
+-   Avoid apologies (“Sorry for the interruption”), alarm (“Warning!”), or ambiguity (“Are you sure?”).
 
 ![A modal that asks "Trash post?"](https://wordpress.org/gutenberg/files/2019/04/Modal-do-1.png)
 
@@ -103,9 +103,9 @@ When viewing a scrollable list of options, the modal title and buttons remain fi
 
 Modals are dismissible in three ways:
 
-- Tapping outside of the modal
-- Tapping the “Cancel” button
-- Tapping the “Close” icon button, or pressing the `esc` key
+-   Tapping outside of the modal
+-   Tapping the “Cancel” button
+-   Tapping the “Close” icon button, or pressing the `esc` key
 
 If the user’s ability to dismiss a modal is disabled, they must choose a modal action to proceed.
 
@@ -130,19 +130,19 @@ const MyModal = () => {
 
 	return (
 		<>
-			<Button isSecondary onClick={ openModal }>Open Modal</Button>
+			<Button isSecondary onClick={ openModal }>
+				Open Modal
+			</Button>
 			{ isOpen && (
-				<Modal
-					title="This is my modal"
-					onRequestClose={ closeModal }>
+				<Modal title="This is my modal" onRequestClose={ closeModal }>
 					<Button isSecondary onClick={ closeModal }>
 						My custom close button
 					</Button>
 				</Modal>
 			) }
 		</>
-	)
-}
+	);
+};
 ```
 
 ### Props
@@ -156,15 +156,15 @@ This property is used as the modal header's title.
 
 Titles are required for accessibility reasons, see `aria.labelledby` and `contentLabel` for other ways to provide a title.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 #### onRequestClose
 
 This function is called to indicate that the modal should be closed.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes
 
 #### contentLabel
 
@@ -172,8 +172,8 @@ If this property is added, it will be added to the modal content `div` as `aria-
 
 Titles are required for accessibility reasons, see `aria.labelledby` and `title` for other ways to provide a title.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 #### aria.labelledby
 
@@ -182,72 +182,71 @@ Use this when you are rendering the title yourself within the modal's content ar
 
 Titles are required for accessibility reasons, see `contentLabel` and `title` for other ways to provide a title.
 
-- Type: `String`
-- Required: No
-- Default: if the `title` prop is provided, this will default to the id of the element that renders `title`
+-   Type: `String`
+-   Required: No
+-   Default: if the `title` prop is provided, this will default to the id of the element that renders `title`
 
 #### aria.describedby
 
 If this property is added, it will be added to the modal content `div` as `aria-describedby`.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 #### focusOnMount
 
 If this property is true, it will focus the first tabbable element rendered in the modal.
 
-- Type: `boolean`
-- Required: No
-- Default: true
+-   Type: `boolean`
+-   Required: No
+-   Default: true
 
 #### shouldCloseOnEsc
 
 If this property is added, it will determine whether the modal requests to close when the escape key is pressed.
 
-- Type: `boolean`
-- Required: No
-- Default: true
+-   Type: `boolean`
+-   Required: No
+-   Default: true
 
 #### shouldCloseOnClickOutside
 
 If this property is added, it will determine whether the modal requests to close when a mouse click occurs outside of the modal content.
 
-- Type: `boolean`
-- Required: No
-- Default: true
+-   Type: `boolean`
+-   Required: No
+-   Default: true
 
 #### isDismissible
 
 If this property is set to false, the modal will not display a close icon and cannot be dismissed.
 
-- Type: `boolean`
-- Required: No
-- Default: true
+-   Type: `boolean`
+-   Required: No
+-   Default: true
 
 #### className
 
 If this property is added, it will an additional class name to the modal content `div`.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 #### role
 
 If this property is added, it will override the default role of the modal.
 
-- Type: `String`
-- Required: No
-- Default: `dialog`
+-   Type: `String`
+-   Required: No
+-   Default: `dialog`
 
 #### overlayClassName
 
 If this property is added, it will an additional class name to the modal overlay `div`.
 
-- Type: `String`
-- Required: No
-
+-   Type: `String`
+-   Required: No
 
 ## Related components
 
-- To notify a user with a message of medium importance, use `Notice`.
+-   To notify a user with a message of medium importance, use `Notice`.

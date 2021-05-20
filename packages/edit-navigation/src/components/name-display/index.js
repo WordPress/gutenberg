@@ -1,23 +1,37 @@
 /**
  * WordPress dependencies
  */
+import { useContext } from '@wordpress/element';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { BlockControls } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
+import { sprintf, __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
 import {
-	useSelectedMenuData,
+	untitledMenu,
+	useSelectedMenuId,
+	useMenuEntityProp,
 	IsMenuNameControlFocusedContext,
 } from '../../hooks';
-import { useContext } from '@wordpress/element';
+import {
+	COMPLEMENTARY_AREA_SCOPE,
+	COMPLEMENTARY_AREA_ID,
+} from '../../constants';
 
-import { sprintf, __ } from '@wordpress/i18n';
 export default function NameDisplay() {
-	const { menuName } = useSelectedMenuData();
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const [ menuId ] = useSelectedMenuId();
+	const [ name ] = useMenuEntityProp( 'name', menuId );
 	const [ , setIsMenuNameEditFocused ] = useContext(
 		IsMenuNameControlFocusedContext
 	);
+
+	const menuName = name ?? untitledMenu;
+
 	return (
 		<BlockControls>
 			<ToolbarGroup>
@@ -27,7 +41,13 @@ export default function NameDisplay() {
 						__( `Edit menu name: %s` ),
 						menuName
 					) }
-					onClick={ () => setIsMenuNameEditFocused( true ) }
+					onClick={ () => {
+						enableComplementaryArea(
+							COMPLEMENTARY_AREA_SCOPE,
+							COMPLEMENTARY_AREA_ID
+						);
+						setIsMenuNameEditFocused( true );
+					} }
 				>
 					{ menuName }
 				</ToolbarButton>

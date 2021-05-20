@@ -26,7 +26,7 @@ import {
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	ContrastChecker,
 	InspectorControls,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useSetting,
 } from '@wordpress/block-editor';
 
 const EMPTY_ARRAY = [];
@@ -68,9 +68,7 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 
-	const title = isWebPlatform
-		? __( 'Color settings' )
-		: __( 'Color Settings' );
+	const title = __( 'Color' );
 
 	useEffect( () => {
 		if ( isWebPlatform && ! enableContrastChecking ) {
@@ -127,8 +125,8 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
  */
 function ColorEdit( props ) {
 	const { attributes } = props;
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -209,7 +207,7 @@ function ColorEdit( props ) {
 	const settings = useMemo( () => {
 		return [
 			{
-				label: __( 'Text Color' ),
+				label: __( 'Text color' ),
 				onColorChange: onChangeColor( 'text' ),
 				colorValue: getColorObjectByAttributeValues(
 					colors,
@@ -218,7 +216,7 @@ function ColorEdit( props ) {
 				).color,
 			},
 			{
-				label: __( 'Background Color' ),
+				label: __( 'Background color' ),
 				onColorChange: onChangeColor( 'background' ),
 				colorValue: getColorObjectByAttributeValues(
 					colors,

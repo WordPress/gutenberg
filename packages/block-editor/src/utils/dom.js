@@ -1,35 +1,6 @@
-/**
- * Given a block client ID, returns the corresponding DOM node for the block,
- * if exists. As much as possible, this helper should be avoided, and used only
- * in cases where isolated behaviors need remote access to a block node.
- *
- * @param {string}   clientId Block client ID.
- * @param {Document} doc      Document to search.
- *
- * @return {Element?} Block DOM node.
- */
-export function getBlockDOMNode( clientId, doc ) {
-	return doc.getElementById( 'block-' + clientId );
-}
-
-/**
- * Returns the preview container DOM node for a given block client ID, or
- * undefined if the container cannot be determined.
- *
- * @param {string}   clientId Block client ID.
- * @param {Document} doc      Document to search.
- *
- * @return {Node|undefined} Preview container DOM node.
- */
-export function getBlockPreviewContainerDOMNode( clientId, doc ) {
-	const domNode = getBlockDOMNode( clientId, doc );
-
-	if ( ! domNode ) {
-		return;
-	}
-
-	return domNode.firstChild || domNode;
-}
+// Consider the block appender to be a child block of its own, which also has
+// this class.
+const BLOCK_SELECTOR = '.wp-block';
 
 /**
  * Returns true if two elements are contained within the same block.
@@ -40,10 +11,7 @@ export function getBlockPreviewContainerDOMNode( clientId, doc ) {
  * @return {boolean} Whether elements are in the same block.
  */
 export function isInSameBlock( a, b ) {
-	return (
-		a.closest( '.block-editor-block-list__block' ) ===
-		b.closest( '.block-editor-block-list__block' )
-	);
+	return a.closest( BLOCK_SELECTOR ) === b.closest( BLOCK_SELECTOR );
 }
 
 /**
@@ -57,7 +25,7 @@ export function isInSameBlock( a, b ) {
  *                   children.
  */
 export function isInsideRootBlock( blockElement, element ) {
-	const parentBlock = element.closest( '.block-editor-block-list__block' );
+	const parentBlock = element.closest( BLOCK_SELECTOR );
 	return parentBlock === blockElement;
 }
 
@@ -79,7 +47,7 @@ export function getBlockClientId( node ) {
 	}
 
 	const elementNode = /** @type {Element} */ ( node );
-	const blockNode = elementNode.closest( '.block-editor-block-list__block' );
+	const blockNode = elementNode.closest( BLOCK_SELECTOR );
 
 	if ( ! blockNode ) {
 		return;

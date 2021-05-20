@@ -22,7 +22,10 @@ const MyScrollLock = withState( {
 				Toggle scroll lock
 			</Button>
 			{ isScrollLocked && <ScrollLock /> }
-			<p>Scroll locked: <strong>{ isScrollLocked ? 'Yes' : 'No' }</strong></p>
+			<p>
+				Scroll locked:
+				<strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
+			</p>
 		</div>
 	);
 } );

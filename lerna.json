@@ -10,8 +10,6 @@
 		"**/{__mocks__,__tests__,test}/**",
 		"**/{storybook,stories}/**"
 	],
-	"packages": [
-		"packages/*"
-	],
+	"packages": [ "packages/*" ],
 	"version": "independent"
 }

@@ -58,7 +58,7 @@ The granular rulesets will not define any environment globals. As such, if they 
 
 | Rule                                                                                                                 | Description                                                                                    | Recommended |
 | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------- |
-| [data-no-store-string-literals](/packages/eslint-plugin/docs/rules/data-no-store-string-literals.md)                                           | Discourage passing string literals to reference data stores                                                      |             |
+| [data-no-store-string-literals](/packages/eslint-plugin/docs/rules/data-no-store-string-literals.md)                 | Discourage passing string literals to reference data stores                                    |             |
 | [dependency-group](/packages/eslint-plugin/docs/rules/dependency-group.md)                                           | Enforce dependencies docblocks formatting                                                      | ✓           |
 | [gutenberg-phase](docs/rules/gutenberg-phase.md)                                                                     | Governs the use of the `process.env.GUTENBERG_PHASE` constant                                  | ✓           |
 | [no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md) | Disallow the usage of BaseControl component with a label prop set but omitting the id property | ✓           |

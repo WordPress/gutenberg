@@ -1,14 +1,14 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/navigation-link",
-        "isValid": true,
-        "attributes": {
-            "label": "WordPress",
-            "opensInNewTab": false,
-            "url": "https://wordpress.org/"
-        },
-        "innerBlocks": [],
-        "originalContent": ""
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/navigation-link",
+		"isValid": true,
+		"attributes": {
+			"label": "WordPress",
+			"opensInNewTab": false,
+			"url": "https://wordpress.org/"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
 ]

@@ -16,6 +16,9 @@
 /**
  * External dependencies
  */
+const path = require( 'path' );
+const { writeFile, mkdir } = require( 'fs' ).promises;
+const filenamify = require( 'filenamify' );
 const NodeEnvironment = require( 'jest-environment-node' );
 const chalk = require( 'chalk' );
 
@@ -25,7 +28,12 @@ const chalk = require( 'chalk' );
 const { readConfig, getPuppeteer } = require( './config' );
 
 const handleError = ( error ) => {
-	process.emit( 'uncaughtException', error );
+	// To match the same behavior in jest-jasmine2:
+	// https://github.com/facebook/jest/blob/1be8d737abd0e2f30e3314184a0efc372ad6d88f/packages/jest-jasmine2/src/jasmine/Env.ts#L250-L251
+	// Emitting an uncaughtException event to the process will throw an
+	// empty error which is very hard to debug in puppeteer context.
+	// eslint-disable-next-line no-console
+	console.error( error );
 };
 
 const KEYS = {
@@ -33,6 +41,9 @@ const KEYS = {
 	CONTROL_D: '\u0004',
 	ENTER: '\r',
 };
+
+const root = process.env.GITHUB_WORKSPACE || process.cwd();
+const ARTIFACTS_PATH = path.join( root, 'artifacts' );
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
@@ -158,6 +169,14 @@ class PuppeteerEnvironment extends NodeEnvironment {
 		};
 
 		await this.global.jestPuppeteer.resetBrowser();
+
+		try {
+			await mkdir( ARTIFACTS_PATH );
+		} catch ( err ) {
+			if ( err.code !== 'EEXIST' ) {
+				throw err;
+			}
+		}
 	}
 
 	async teardown() {
@@ -177,6 +196,27 @@ class PuppeteerEnvironment extends NodeEnvironment {
 
 		if ( browser ) {
 			await browser.disconnect();
+		}
+	}
+
+	async storeArtifacts( testName ) {
+		const datetime = new Date().toISOString().split( '.' )[ 0 ];
+		const fileName = filenamify( `${ testName } ${ datetime }`, {
+			replacement: '-',
+		} );
+		await writeFile(
+			path.join( ARTIFACTS_PATH, `${ fileName }-snapshot.html` ),
+			await this.global.page.content()
+		);
+		await this.global.page.screenshot( {
+			path: path.join( ARTIFACTS_PATH, `${ fileName }.jpg` ),
+		} );
+	}
+
+	async handleTestEvent( event, state ) {
+		if ( event.name === 'test_fn_failure' ) {
+			const testName = state.currentlyRunningTest.name;
+			await this.storeArtifacts( testName );
 		}
 	}
 }

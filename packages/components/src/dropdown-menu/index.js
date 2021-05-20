@@ -15,7 +15,6 @@ import { menu } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../button';
-import ToolbarButton from '../toolbar-button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
@@ -50,7 +49,6 @@ function DropdownMenu( {
 	menuLabel,
 	position,
 	noIcons,
-	isToolbarButton = false,
 } ) {
 	if ( menuLabel ) {
 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
@@ -86,8 +84,6 @@ function DropdownMenu( {
 		popoverProps
 	);
 
-	const ButtonComponent = isToolbarButton ? ToolbarButton : Button;
-
 	return (
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
@@ -117,7 +113,7 @@ function DropdownMenu( {
 				);
 
 				return (
-					<ButtonComponent
+					<Button
 						{ ...mergedToggleProps }
 						icon={ icon }
 						onClick={ ( event ) => {
@@ -139,7 +135,7 @@ function DropdownMenu( {
 						showTooltip={ toggleProps?.showTooltip ?? true }
 					>
 						{ mergedToggleProps.children }
-					</ButtonComponent>
+					</Button>
 				);
 			} }
 			renderContent={ ( props ) => {

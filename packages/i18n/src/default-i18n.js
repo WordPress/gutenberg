@@ -48,6 +48,17 @@ export const getLocaleData = i18n.getLocaleData.bind( i18n );
 export const setLocaleData = i18n.setLocaleData.bind( i18n );
 
 /**
+ * Resets all current Tannin instance locale data and sets the specified
+ * locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ *
+ * @param {LocaleData} [data]   Locale data configuration.
+ * @param {string}     [domain] Domain for which configuration applies.
+ */
+export const resetLocaleData = i18n.resetLocaleData.bind( i18n );
+
+/**
  * Subscribes to changes of locale data
  *
  * @param {SubscribeCallback} callback Subscription callback

@@ -1,6 +1,6 @@
 # BottomSheetSubSheet
 
-BottomSheetSubSheet allows for adding controls inside the React Native bottom sheet settings. 
+BottomSheetSubSheet allows for adding controls inside the React Native bottom sheet settings.
 
 ### Usage
 
@@ -38,10 +38,10 @@ const ExampleControl = () => {
 				<BottomSheet.Cell
 					label={ 'Howdy' }
 					separatorType="none"
-                    onPress={ openSubSheet }
-                    accessibilityRole={ 'button' }
-				    accessibilityLabel={ 'Howdy' }
-				    accessibilityHint={ 'Navigates to Howdy bottom sheet' }
+					onPress={ openSubSheet }
+					accessibilityRole={ 'button' }
+					accessibilityLabel={ 'Howdy' }
+					accessibilityHint={ 'Navigates to Howdy bottom sheet' }
 				>
 					<Icon icon={ chevronRight }></Icon>
 				</BottomSheet.Cell>
@@ -79,7 +79,6 @@ UI rendered to allow navigating to the Sub Sheet when tapped.
 
 -   Type: `ReactComponent`
 -   Required: Yes
-
 
 #### isFullScreen
 

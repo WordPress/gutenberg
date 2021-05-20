@@ -41,7 +41,6 @@ exports[`File block renders file error state without crashing 1`] = `
     >
       
     </Text>
-    Modal
     <View
       style={
         Object {
@@ -95,7 +94,7 @@ exports[`File block renders file error state without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
-              "text": "<p >File name</p>",
+              "text": "<p>File name</p>",
             }
           }
           textAlign="left"
@@ -187,7 +186,7 @@ exports[`File block renders file error state without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
-              "text": "<p >Download</p>",
+              "text": "<p>Download</p>",
             }
           }
           textAlign="center"
@@ -240,7 +239,6 @@ exports[`File block renders file without crashing 1`] = `
     >
       
     </Text>
-    Modal
     <View
       style={
         Object {
@@ -294,7 +292,7 @@ exports[`File block renders file without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
-              "text": "<p >File name</p>",
+              "text": "<p>File name</p>",
             }
           }
           textAlign="left"
@@ -368,7 +366,7 @@ exports[`File block renders file without crashing 1`] = `
               "eventCount": undefined,
               "linkTextColor": undefined,
               "selection": null,
-              "text": "<p >Download</p>",
+              "text": "<p>Download</p>",
             }
           }
           textAlign="center"
@@ -412,7 +410,6 @@ exports[`File block renders placeholder without crashing 1`] = `
       ]
     }
   >
-    Modal
     <View
       style={
         Object {

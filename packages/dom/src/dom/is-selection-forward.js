@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import { assertIsDefined } from '../utils/assert-is-defined';
+
+/**
  * Returns true if the given selection object is in the forward direction, or
  * false otherwise.
  *
@@ -11,6 +16,8 @@
 export default function isSelectionForward( selection ) {
 	const { anchorNode, focusNode, anchorOffset, focusOffset } = selection;
 
+	assertIsDefined( anchorNode, 'anchorNode' );
+	assertIsDefined( focusNode, 'focusNode' );
 	const position = anchorNode.compareDocumentPosition( focusNode );
 
 	// Disable reason: `Node#compareDocumentPosition` returns a bitmask value,

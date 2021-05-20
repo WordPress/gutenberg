@@ -15,7 +15,7 @@ A tree grid allows the user to navigate using arrow keys. Up/down to navigate ve
 
 For more information on a tree grid, see the following links:
 
-- https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html
+-   https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html
 
 ### Usage
 
@@ -27,35 +27,71 @@ function TreeMenu() {
 		<TreeGrid>
 			<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 2 }>
 				<TreeGridCell>
-					{ ( props ) => <Button onClick={ onSelect } { ...props }>Select</Button> }
+					{ ( props ) => (
+						<Button onClick={ onSelect } { ...props }>
+							Select
+						</Button>
+					) }
 				</TreeGridCell>
 				<TreeGridCell>
-					{ ( props ) => <Button onClick={ onMoveUp } { ...props }>Move Up</Button> }
+					{ ( props ) => (
+						<Button onClick={ onMoveUp } { ...props }>
+							Move Up
+						</Button>
+					) }
 				</TreeGridCell>
 				<TreeGridCell>
-					{ ( props ) => <Button onClick={ onMoveDown } { ...props }>Move Down</Button> }
+					{ ( props ) => (
+						<Button onClick={ onMoveDown } { ...props }>
+							Move Down
+						</Button>
+					) }
 				</TreeGridCell>
 			</TreeGridRow>
 			<TreeGridRow level={ 1 } positionInSet={ 2 } setSize={ 2 }>
 				<TreeGridCell>
-					{ ( props ) => <Button onClick={ onSelect } { ...props }>Select</Button> }
+					{ ( props ) => (
+						<Button onClick={ onSelect } { ...props }>
+							Select
+						</Button>
+					) }
 				</TreeGridCell>
 				<TreeGridCell>
-					{ ( props ) => <Button onClick={ onMoveUp } { ...props }>Move Up</Button> }
+					{ ( props ) => (
+						<Button onClick={ onMoveUp } { ...props }>
+							Move Up
+						</Button>
+					) }
 				</TreeGridCell>
 				<TreeGridCell>
-					{ ( props ) => <Button onClick={ onMoveDown } { ...props }>Move Down</Button> }
+					{ ( props ) => (
+						<Button onClick={ onMoveDown } { ...props }>
+							Move Down
+						</Button>
+					) }
 				</TreeGridCell>
 			</TreeGridRow>
 			<TreeGridRow level={ 2 } positionInSet={ 1 } setSize={ 1 }>
 				<TreeGridCell>
-					{ ( props ) => <Button onClick={ onSelect } { ...props }>Select</Button> }
+					{ ( props ) => (
+						<Button onClick={ onSelect } { ...props }>
+							Select
+						</Button>
+					) }
 				</TreeGridCell>
 				<TreeGridCell>
-					{ ( props ) => <Button onClick={ onMoveUp } { ...props }>Move Up</Button> }
+					{ ( props ) => (
+						<Button onClick={ onMoveUp } { ...props }>
+							Move Up
+						</Button>
+					) }
 				</TreeGridCell>
 				<TreeGridCell>
-					{ ( props ) => <Button onClick={ onMoveDown } { ...props }>Move Down</Button> }
+					{ ( props ) => (
+						<Button onClick={ onMoveDown } { ...props }>
+							Move Down
+						</Button>
+					) }
 				</TreeGridCell>
 			</TreeGridRow>
 		</TreeGrid>
@@ -83,29 +119,29 @@ Additional props other than those specified below will be passed to the `tr` ele
 
 An integer value designating the level in the hierarchical tree structure. Counting starts at 1. A value of `1` indicates the root level of the structure.
 
-- Type: `Number`
-- Required: Yes
+-   Type: `Number`
+-   Required: Yes
 
 ###### positionInSet
 
 An integer value that represents the position in the set. A set is the count of elements at a specific level. Counting starts at 1.
 
-- Type: `Number`
-- Required: Yes
+-   Type: `Number`
+-   Required: Yes
 
 ###### setSize
 
 An integer value that represents the total number of items in the set ... that is the total number of items at this specific level of the hierarchy.
 
-- Type: `Number`
-- Required: Yes
+-   Type: `Number`
+-   Required: Yes
 
 ###### isExpanded
 
 An optional value that designates whether a row is expanded or collapsed. Currently this value only sets the correct aria-expanded property on a row, it has no other built-in behavior.
 
-- Type: `Boolean`
-- Required: No
+-   Type: `Boolean`
+-   Required: No
 
 ### TreeGridCell
 
@@ -119,11 +155,16 @@ An optional value that designates whether a row is expanded or collapsed. Curren
 
 ```jsx
 <TreeGridCell>
-	{ ( props ) => <Button onClick={ onMoveDown } { ...props }>Move Down</Button> }
+	{ ( props ) => (
+		<Button onClick={ onMoveDown } { ...props }>
+			Move Down
+		</Button>
+	) }
 </TreeGridCell>
 ```
 
 Props passed as an argument to the render prop must be passed to the child focusable component/element within the cell. If a component is used, it must correctly handle the `onFocus`, `tabIndex`, and `ref` props, passing these to the element it renders. These props are used to handle the roving tab index functionality of the tree grid.
 
 ## Related components
-- This component implements `RovingTabIndex`.
+
+-   This component implements `RovingTabIndex`.

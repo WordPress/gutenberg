@@ -168,7 +168,7 @@ class RangeTextInput extends Component {
 	}
 
 	render() {
-		const { getStylesFromColorScheme, children } = this.props;
+		const { getStylesFromColorScheme, children, label } = this.props;
 		const { fontScale, inputValue, hasFocus } = this.state;
 
 		const textInputStyle = getStylesFromColorScheme(
@@ -208,6 +208,7 @@ class RangeTextInput extends Component {
 				>
 					{ isIOS || hasFocus ? (
 						<TextInput
+							accessibilityLabel={ label }
 							ref={ ( c ) => ( this._valueTextInput = c ) }
 							style={ valueFinalStyle }
 							onChangeText={ this.onChangeText }
@@ -218,7 +219,7 @@ class RangeTextInput extends Component {
 							returnKeyType="done"
 							numberOfLines={ 1 }
 							defaultValue={ `${ inputValue }` }
-							value={ inputValue }
+							value={ inputValue.toString() }
 							pointerEvents={ hasFocus ? 'auto' : 'none' }
 						/>
 					) : (

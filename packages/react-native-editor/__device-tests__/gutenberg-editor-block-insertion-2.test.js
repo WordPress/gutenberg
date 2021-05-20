@@ -54,6 +54,8 @@ describe( 'Gutenberg Editor tests for Block insertion 2', () => {
 		await separatorBlockElement.click();
 
 		await editorPage.addNewBlock( blockNames.image, 'before' );
+		await editorPage.driver.sleep( 1000 );
+		await editorPage.closePicker();
 
 		const expectedHtml = `<!-- wp:heading -->
 <h2></h2>

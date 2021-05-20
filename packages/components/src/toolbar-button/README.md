@@ -55,5 +55,5 @@ This component accepts [the same API of the Button](/packages/components/src/but
 
 ## Related components
 
-* If you wish to implement a control to select options grouped as icon buttons you can use the [Toolbar](/packages/components/src/toolbar/README.md) component, which already handles this strategy.
-* The ToolbarButton may be used with other elements such as [Dropdown](/packages/components/src/dropdown/README.md) to display options in a popover.
+-   If you wish to implement a control to select options grouped as icon buttons you can use the [Toolbar](/packages/components/src/toolbar/README.md) component, which already handles this strategy.
+-   The ToolbarButton may be used with other elements such as [Dropdown](/packages/components/src/dropdown/README.md) to display options in a popover.

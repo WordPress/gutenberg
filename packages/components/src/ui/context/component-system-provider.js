@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { ContextSystemProvider } from '@wp-g2/context';
+import { ContextSystemProvider } from './context-system-provider';
 
 /**
  * @param {Object} props

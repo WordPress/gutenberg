@@ -132,6 +132,28 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 		// Copy everything.
 		$new = $old;
 
+		// Overwrite the things that change.
+		if ( isset( $old['settings'] ) ) {
+			$new['settings'] = self::process_settings( $old['settings'] );
+		}
+		if ( isset( $old['styles'] ) ) {
+			$new['styles'] = self::process_styles( $old['styles'] );
+		}
+
+		$new['version'] = WP_Theme_JSON::LATEST_SCHEMA;
+
+		return $new;
+	}
+
+	/**
+	 * Processes the settings subtree.
+	 *
+	 * @param array $settings Array to process.
+	 *
+	 * @return array The settings in the new format.
+	 */
+	private static function process_settings( $settings ) {
+		$new                   = array();
 		$blocks_to_consolidate = array(
 			'core/heading/h1'     => 'core/heading',
 			'core/heading/h2'     => 'core/heading',
@@ -152,30 +174,6 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 			'core/query-title/h5' => 'core/query-title',
 			'core/query-title/h6' => 'core/query-title',
 		);
-
-		// Overwrite the things that change.
-		if ( isset( $old['settings'] ) ) {
-			$new['settings'] = self::process_settings( $old['settings'], $blocks_to_consolidate );
-		}
-		if ( isset( $old['styles'] ) ) {
-			$new['styles'] = self::process_styles( $old['styles'], $blocks_to_consolidate );
-		}
-
-		$new['version'] = 1;
-
-		return $new;
-	}
-
-	/**
-	 * Processes the settings subtree.
-	 *
-	 * @param array $settings Array to process.
-	 * @param array $blocks_to_consolidate A list of blocks that are transformed.
-	 *
-	 * @return array The settings in the new format.
-	 */
-	private static function process_settings( $settings, $blocks_to_consolidate ) {
-		$new = array();
 
 		$paths_to_override = array(
 			array( 'color', 'palette' ),
@@ -260,12 +258,33 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 	 * Processes the styles subtree.
 	 *
 	 * @param array $styles Array to process.
-	 * @param array $blocks_to_consolidate A list of blocks that are transformed.
 	 *
 	 * @return array The styles in the new format.
 	 */
-	private static function process_styles( $styles, $blocks_to_consolidate ) {
-		$new = array();
+	private static function process_styles( $styles ) {
+		$new                   = array();
+		$block_heading         = array(
+			'core/heading/h1' => 'h1',
+			'core/heading/h2' => 'h2',
+			'core/heading/h3' => 'h3',
+			'core/heading/h4' => 'h4',
+			'core/heading/h5' => 'h5',
+			'core/heading/h6' => 'h6',
+		);
+		$blocks_to_consolidate = array(
+			'core/post-title/h1'  => 'core/post-title',
+			'core/post-title/h2'  => 'core/post-title',
+			'core/post-title/h3'  => 'core/post-title',
+			'core/post-title/h4'  => 'core/post-title',
+			'core/post-title/h5'  => 'core/post-title',
+			'core/post-title/h6'  => 'core/post-title',
+			'core/query-title/h1' => 'core/query-title',
+			'core/query-title/h2' => 'core/query-title',
+			'core/query-title/h3' => 'core/query-title',
+			'core/query-title/h4' => 'core/query-title',
+			'core/query-title/h5' => 'core/query-title',
+			'core/query-title/h6' => 'core/query-title',
+		);
 
 		// Styles within root become top-level.
 		if ( isset( $styles[ self::ROOT_BLOCK_NAME ] ) ) {
@@ -287,9 +306,9 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 		 * At this point, it only contains block's data.
 		 * However, we still need to consolidate a few things:
 		 *
-		 * - link element => tranform from link color property
+		 * - link element => transform from link color property
 		 * - heading elements => consolidate multiple blocks (core/heading/h1, core/heading/h2)
-		 *   into a single one with elements (core/heading with elements h1, h2, etc).
+		 *   into a single one (core/heading).
 		 */
 		$new['blocks'] = $styles;
 
@@ -301,38 +320,40 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 			}
 		}
 
-		// heading elements.
+		/*
+		 * The heading block needs a special treatment:
+		 *
+		 * - if it has a link color => it needs to be moved to the blocks.core/heading
+		 * - the rest is consolidated into the corresponding element
+		 *
+		 */
+		foreach ( $block_heading as $old_name => $new_name ) {
+			if ( ! isset( $new['blocks'][ $old_name ] ) ) {
+				continue;
+			}
+
+			gutenberg_experimental_set( $new, array( 'elements', $new_name ), $new['blocks'][ $old_name ] );
+
+			if ( isset( $new['blocks'][ $old_name ]['elements'] ) ) {
+				gutenberg_experimental_set( $new, array( 'blocks', 'core/heading', 'elements' ), $new['blocks'][ $old_name ]['elements'] );
+			}
+
+			unset( $new['blocks'][ $old_name ] );
+
+		}
+
+		/*
+		 * Port the styles from the old blocks to the new,
+		 * overriding the previous values.
+		 */
 		foreach ( $blocks_to_consolidate as $old_name => $new_name ) {
 			if ( ! isset( $new['blocks'][ $old_name ] ) ) {
 				continue;
 			}
 
-			if ( ! isset( $new['blocks'][ $new_name ] ) ) {
-				$new['blocks'][ $new_name ] = array();
-			}
+			gutenberg_experimental_set( $new, array( 'blocks', $new_name ), $new['blocks'][ $old_name ] );
+			unset( $new['blocks'][ $old_name ] );
 
-			/*
-			 * First, port the existing link color element to the block,
-			 * overriding the previous value.
-			 */
-			if ( isset( $new['blocks'][ $old_name ]['elements'] ) ) {
-				$new['blocks'][ $new_name ]['elements']['link'] = $new['blocks'][ $old_name ]['elements']['link'];
-				unset( $new['blocks'][ $old_name ]['elements'] );
-			}
-
-			/*
-			 * Then, port any style categories left to the element
-			 * resulting of exploding the previous block selector:
-			 *
-			 * - core/heading/h1 => h1 element
-			 * - core/heading/h2 => h2 element
-			 * - and so on
-			 */
-			if ( isset( $new['blocks'][ $old_name ] ) ) {
-				$element_name = explode( '/', $old_name )[2];
-				$new['blocks'][ $new_name ]['elements'][ $element_name ] = $new['blocks'][ $old_name ];
-				unset( $new['blocks'][ $old_name ] );
-			}
 		}
 
 		return $new;
