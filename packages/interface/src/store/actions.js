@@ -82,3 +82,34 @@ export function pinItem( scope, itemId ) {
 export function unpinItem( scope, itemId ) {
 	return setMultipleEnableItem( 'pinnedItems', scope, itemId, false );
 }
+
+/**
+ * Returns an action object used in signalling that a feature should be toggled.
+ *
+ * @param {string} scope       The feature scope (e.g. core/edit-post).
+ * @param {string} featureName The feature name.
+ *
+ * @return {Object} Action object.
+ */
+export function toggleFeature( scope, featureName ) {
+	return {
+		type: 'TOGGLE_FEATURE',
+		scope,
+		featureName,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that defaults should be set for features.
+ *
+ * @param {string} scope                     The feature scope (e.g. core/edit-post).
+ * @param {Object<string, boolean>} defaults A key/value map of feature names to values.
+ *
+ * @return {Object} Action object.
+ */
+export function setFeatureDefaults( scope, defaults ) {
+	return {
+		type: 'SET_FEATURE_DEFAULTS',
+		defaults,
+	};
+}

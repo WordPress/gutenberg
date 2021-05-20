@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { flow, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -78,6 +78,45 @@ export function multipleEnableItems(
 	};
 }
 
+/**
+ * Reducer returning the user preferences.
+ *
+ * @param {Object}  state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const preferences = flow( [ combineReducers ] )( {
+	featuresDefaults( state, action ) {
+		if ( action.type === 'SET_FEATURE_DEFAULTS' ) {
+			const { scope, defaults } = action;
+			return {
+				...state,
+				[ scope ]: {
+					...state[ scope ],
+					...defaults,
+				},
+			};
+		}
+
+		return state;
+	},
+	features( state, action ) {
+		if ( action.type === 'TOGGLE_FEATURE' ) {
+			const { scope, featureName } = action;
+			return {
+				...state,
+				[ scope ]: {
+					...state[ scope ],
+					[ featureName ]: ! state[ scope ][ featureName ],
+				},
+			};
+		}
+
+		return state;
+	},
+} );
+
 const enableItems = combineReducers( {
 	singleEnableItems,
 	multipleEnableItems,
@@ -85,4 +124,5 @@ const enableItems = combineReducers( {
 
 export default combineReducers( {
 	enableItems,
+	preferences,
 } );

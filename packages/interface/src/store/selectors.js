@@ -61,3 +61,22 @@ export function isItemPinned( state, scope, item ) {
 		false
 	);
 }
+
+/**
+ *
+ *
+ * @param {Object} state       The store state.
+ * @param {string} scope       The scope of the feature (e.g. core/edit-post).
+ * @param {string} featureName The name of the feature.
+ *
+ * @return {boolean} Is the feature enabled?
+ */
+export function isFeatureEnabled( state, scope, featureName ) {
+	const featureValue = state.preferences.features[ scope ]?.[ featureName ];
+	const defaultedFeatureValue =
+		featureValue !== undefined
+			? featureValue
+			: state.preferences.featuresDefaults[ scope ]?.[ featureName ];
+
+	return !! defaultedFeatureValue;
+}
