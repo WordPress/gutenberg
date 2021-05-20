@@ -176,12 +176,12 @@ function set_unique_slug_on_create_template( $post_id, $post, $update ) {
 		$templates = get_theme_mod( $post->post_type, array() );
 		$slug = $post->post_name;
 		
-		if ( isset( $templates[ $slug ] ) ) {
+		if ( isset( $templates[ $slug ] ) && ( $existing = get_post( $templates[ $slug ] ) ) && $existing->post_type === $post->post_type ) {
 			$suffix = 2;
 			do {
 				$slug = _truncate_post_slug( $post->post_name, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
 				$suffix++;
-			} while ( isset( $templates[ $slug ] ) );
+			} while ( isset( $templates[ $slug ] ) && ( $existing = get_post( $templates[ $slug ] ) ) && $existing->post_type === $post->post_type );
 		}
 
 		$templates[ $slug ] = $post->ID;
