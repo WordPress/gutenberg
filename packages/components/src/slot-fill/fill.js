@@ -14,8 +14,6 @@ import { createPortal, useLayoutEffect, useRef } from '@wordpress/element';
 import SlotFillContext from './context';
 import useSlot from './use-slot';
 
-let occurrences = 0;
-
 function FillComponent( { name, children, registerFill, unregisterFill } ) {
 	const slot = useSlot( name );
 
@@ -23,10 +21,6 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
 		name,
 		children,
 	} );
-
-	if ( ! ref.current.occurrence ) {
-		ref.current.occurrence = ++occurrences;
-	}
 
 	useLayoutEffect( () => {
 		registerFill( name, ref.current );
