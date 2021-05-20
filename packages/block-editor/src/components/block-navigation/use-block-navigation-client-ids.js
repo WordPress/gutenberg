@@ -11,7 +11,6 @@ import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 
 const useBlockNavigationSelectedClientIds = (
-	selectedBlockClientIds,
 	__experimentalPersistentListViewFeatures
 ) =>
 	useSelect(
@@ -21,17 +20,13 @@ const useBlockNavigationSelectedClientIds = (
 				getSelectedBlockClientIds,
 			} = select( blockEditorStore );
 
-			if ( selectedBlockClientIds ) {
-				return selectedBlockClientIds;
-			}
-
 			if ( __experimentalPersistentListViewFeatures ) {
 				return getSelectedBlockClientIds();
 			}
 
 			return getSelectedBlockClientId();
 		},
-		[ selectedBlockClientIds, __experimentalPersistentListViewFeatures ]
+		[ __experimentalPersistentListViewFeatures ]
 	);
 
 const useBlockNavigationClientIdsTree = (
@@ -79,11 +74,9 @@ const useBlockNavigationClientIdsTree = (
 export default function useBlockNavigationClientIds(
 	blocks,
 	showOnlyCurrentHierarchy,
-	selectedBlockClientIds,
 	__experimentalPersistentListViewFeatures
 ) {
 	const selectedClientIds = useBlockNavigationSelectedClientIds(
-		selectedBlockClientIds,
 		__experimentalPersistentListViewFeatures
 	);
 	const clientIdsTree = useBlockNavigationClientIdsTree(

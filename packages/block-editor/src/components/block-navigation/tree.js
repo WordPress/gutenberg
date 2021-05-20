@@ -26,7 +26,6 @@ const noop = () => {};
  * @param {Object}   props                                          Components props.
  * @param {Array}    props.blocks                                   Custom subset of block client IDs to be used instead of the default hierarchy.
  * @param {Function} props.onSelect                                 Block selection callback.
- * @param {Array}    props.selectedBlockClientIds                   The client IDs of the (single or multi-) selected blocks.
  * @param {boolean}  props.showNestedBlocks                         Flag to enable displaying nested blocks.
  * @param {boolean}  props.showOnlyCurrentHierarchy                 Flag to limit the list to the current hierarchy of blocks.
  * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
@@ -36,7 +35,6 @@ export default function BlockNavigationTree( {
 	blocks,
 	showOnlyCurrentHierarchy,
 	onSelect = noop,
-	selectedBlockClientIds,
 	__experimentalFeatures,
 	__experimentalPersistentListViewFeatures,
 	...props
@@ -44,7 +42,6 @@ export default function BlockNavigationTree( {
 	const { clientIdsTree, selectedClientIds } = useBlockNavigationClientIds(
 		blocks,
 		showOnlyCurrentHierarchy,
-		selectedBlockClientIds,
 		__experimentalPersistentListViewFeatures
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
