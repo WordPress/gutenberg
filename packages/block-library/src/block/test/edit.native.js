@@ -31,11 +31,11 @@ afterAll( () => {
 
 afterEach( cleanup );
 
-describe( 'Reusable block', () => {
-	// The skipped tests below pass but are currently skipped because multiple
-	// async findBy* queries currently cause errors in test output
-	// https://git.io/JYYGE
-	// eslint-disable-next-line jest/no-disabled-tests
+// The skipped tests below pass but are currently skipped because multiple
+// async findBy* queries currently cause errors in test output
+// https://git.io/JYYGE
+// eslint-disable-next-line jest/no-disabled-tests
+describe.skip( 'Reusable block', () => {
 	it( 'renders warning when the block does not exist', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 1;
@@ -61,10 +61,6 @@ describe( 'Reusable block', () => {
 		expect( global.getEditorHtml() ).toBe( initialHtml );
 	} );
 
-	// The skipped tests below pass but are currently skipped because multiple
-	// async findBy* queries currently cause errors in test output
-	// https://git.io/JYYGE
-	// eslint-disable-next-line jest/no-disabled-tests
 	it( 'renders block content', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 2;
