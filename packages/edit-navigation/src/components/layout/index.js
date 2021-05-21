@@ -183,14 +183,16 @@ export default function Layout( { blockEditorSettings } ) {
 								)
 							}
 						/>
-						<Sidebar
-							onSelectMenu={ selectMenu }
-							menus={ menus }
-							menuId={ selectedMenuId }
-							onDeleteMenu={ deleteMenu }
-							isMenuBeingDeleted={ isMenuBeingDeleted }
-							hasPermanentSidebar={ hasPermanentSidebar }
-						/>
+						{ isMenuSelected && (
+							<Sidebar
+								menus={ menus }
+								menuId={ selectedMenuId }
+								onSelectMenu={ selectMenu }
+								onDeleteMenu={ deleteMenu }
+								isMenuBeingDeleted={ isMenuBeingDeleted }
+								hasPermanentSidebar={ hasPermanentSidebar }
+							/>
+						) }
 					</IsMenuNameControlFocusedContext.Provider>
 					<UnsavedChangesWarning />
 				</BlockEditorProvider>
