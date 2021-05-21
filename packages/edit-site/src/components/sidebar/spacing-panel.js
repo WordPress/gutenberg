@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalBoxControl as BoxControl,
 	PanelBody,
+	useCustomUnits,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
 
@@ -13,35 +13,6 @@ import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block
  * Internal dependencies
  */
 import { useSetting } from '../editor/utils';
-
-const isWeb = Platform.OS === 'web';
-const CSS_UNITS = [
-	{
-		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
-		default: '',
-	},
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
-		default: '',
-	},
-];
 
 export function useHasSpacingPanel( context ) {
 	const hasPadding = useHasPadding( context );
@@ -62,22 +33,6 @@ function useHasMargin( { name, supports } ) {
 	return settings && supports.includes( 'margin' );
 }
 
-function filterUnitsWithSettings( settings = [], units = [] ) {
-	return units.filter( ( unit ) => {
-		return settings.includes( unit.value );
-	} );
-}
-
-function useCustomUnits( { units, contextName } ) {
-	const availableUnits = useSetting( 'spacing.units', contextName );
-	const usedUnits = filterUnitsWithSettings(
-		! availableUnits ? [] : availableUnits,
-		units
-	);
-
-	return usedUnits.length === 0 ? false : usedUnits;
-}
-
 function filterValuesBySides( values, sides ) {
 	if ( ! sides ) {
 		// If no custom side configuration all sides are opted into by default.
@@ -95,7 +50,15 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
 	const showPaddingControl = useHasPadding( context );
 	const showMarginControl = useHasMargin( context );
-	const units = useCustomUnits( { contextName: name, units: CSS_UNITS } );
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units', name ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
+	} );
 
 	const paddingValues = getStyle( name, 'padding' );
 	const paddingSides = useCustomSides( name, 'padding' );

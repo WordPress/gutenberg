@@ -1,5 +1,14 @@
-.edit-post-template-title {
-	display: inline-flex;
-	flex-grow: 1;
-	justify-content: center;
+.edit-post-template-top-area {
+	display: flex;
+	flex-direction: column;
+	align-content: space-between;
+	width: 100%;
+	align-items: center;
+	.components-button.is-small {
+		height: $button-size-small;
+	}
+}
+
+.edit-post-template-top-area__popover .components-popover__content {
+	min-width: 360px;
 }

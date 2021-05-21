@@ -18,7 +18,13 @@ import CircularOptionPicker from '../circular-option-picker';
 import CustomDuotoneBar from './custom-duotone-bar';
 import { getDefaultColors, getGradientFromCSSColors } from './utils';
 
-function DuotonePicker( { colorPalette, duotonePalette, value, onChange } ) {
+function DuotonePicker( {
+	colorPalette,
+	duotonePalette,
+	disableCustomColors,
+	value,
+	onChange,
+} ) {
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
 		[ colorPalette ]
@@ -68,23 +74,28 @@ function DuotonePicker( { colorPalette, duotonePalette, value, onChange } ) {
 				</CircularOptionPicker.ButtonAction>
 			}
 		>
-			<CustomDuotoneBar value={ value } onChange={ onChange } />
-			<ColorListPicker
-				labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
-				colors={ colorPalette }
-				value={ value }
-				onChange={ ( newColors ) => {
-					if ( ! newColors[ 0 ] ) {
-						newColors[ 0 ] = defaultDark;
-					}
-					if ( ! newColors[ 1 ] ) {
-						newColors[ 1 ] = defaultLight;
-					}
-					const newValue =
-						newColors.length >= 2 ? newColors : undefined;
-					onChange( newValue );
-				} }
-			/>
+			{ ! disableCustomColors && (
+				<CustomDuotoneBar value={ value } onChange={ onChange } />
+			) }
+			{ colorPalette && (
+				<ColorListPicker
+					labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
+					colors={ colorPalette }
+					value={ value }
+					disableCustomColors={ disableCustomColors }
+					onChange={ ( newColors ) => {
+						if ( ! newColors[ 0 ] ) {
+							newColors[ 0 ] = defaultDark;
+						}
+						if ( ! newColors[ 1 ] ) {
+							newColors[ 1 ] = defaultLight;
+						}
+						const newValue =
+							newColors.length >= 2 ? newColors : undefined;
+						onChange( newValue );
+					} }
+				/>
+			) }
 		</CircularOptionPicker>
 	);
 }

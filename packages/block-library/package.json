@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "3.0.0",
+	"version": "3.1.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,7 +28,8 @@
 		"build-style/**",
 		"src/**/*.scss",
 		"src/navigation-link/index.js",
-		"src/template-part/index.js"
+		"src/template-part/index.js",
+		"src/query/index.js"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
