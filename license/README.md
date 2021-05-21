@@ -10,13 +10,23 @@ The `gitHubUserContributors` node includes an object in `gitHubUserContributors.
 
 When a relevant comment is noted for either the `claimedEmails` or `gitHubUserContributors`, information about that comment is recorded in the `comment` field on the relevant node.
 
-## Updating `dual-license-responses.json`
+## Updating With the Latest Responses
 
-That file can be updated with the latest comments on those issues by running `node update-dual-license-responses.js`. This script has been tested with node v14.16.0. In order to run this script, you must have the [GitHub CLI](https://cli.github.com/) installed and configured (the script uses that because it handles the pagination of the search results). 
+### 1. Update `dual-license-responses.json`
 
-That script will download all of the comments for each issue, and allow the user to process each comment individually, updating the `dual-license-responses.json` file appropriately based on the user's input.
+Execute `node update-dual-license-responses.js` to update `dual-license-responses.json` with the latest comments on the relevant GitHub issues. This script has been tested with node v14.16.0. In order to run this script, you must have the [GitHub CLI](https://cli.github.com/) installed and configured (the GitHub CLI handled pagination of the search results). 
+
+Running that script will download all the comments on each issue, allow the user to process each new comment individually (previously processed comments are skipped), and update the `dual-license-responses.json` file appropriately based on the user's input.
+
+### 2. Update `status.md`
+
+Execute `node summarize-dual-license-responses.js`. That will print out some information about the current status of the requests for consent and update the `status.md` file in this directory.
 
 ## How Was `dual-license-responses.json` Initialized?
+
+The `dual-license-responses.json` json file was initialized with:
+1. All the GitHub users who have contributed to Gutenberg; and 
+2. All of the email addresses that authored a commit on Gutenberg's `trunk` branch but was not associated with any GitHub account. We want to identify the GitHub users behind these commits and ask those GitHub users to consent to dual-license their past contributions.
 
 ### How Gutenberg’s Contributors Were Identified
 
