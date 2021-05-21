@@ -148,23 +148,20 @@ export class MediaUpload extends Component {
 
 		return this.getAllSources()
 			.filter( ( source ) => {
-				return __experimentalOnlyMediaLibrary
-					? source.mediaLibrary
-					: allowedTypes.some( ( allowedType ) =>
-							source.types.includes( allowedType )
-					  );
-			} )
-			.filter( ( source ) => {
-				if (
+				if ( __experimentalOnlyMediaLibrary ) {
+					return source.mediaLibrary;
+				} else if (
 					allowedTypes.every(
 						( allowedType ) => allowedType === MEDIA_TYPE_AUDIO
-					)
+					) &&
+					source.id !== URL_MEDIA_SOURCE
 				) {
-					if ( source.id !== URL_MEDIA_SOURCE ) {
-						return isAudioBlockMediaUploadEnabled === true;
-					}
+					return isAudioBlockMediaUploadEnabled === true;
 				}
-				return true;
+
+				return allowedTypes.some( ( allowedType ) =>
+					source.types.includes( allowedType )
+				);
 			} )
 			.map( ( source ) => {
 				return {
