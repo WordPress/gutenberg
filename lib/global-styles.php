@@ -263,6 +263,38 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
 }
 
+function gutenberg_global_styles_theme_json_core_data( $data ){
+	return array_merge(
+		$data,
+		array_merge_recursive(
+			array( 'settings' => $data['settings'] ),
+			array(
+				'settings' => array(
+					'border'     => array(
+						'customColor'  => false,
+						'customRadius' => false,
+						'customStyle'  => false,
+						'customWidth'  => false,
+					),
+					'typography' => array(
+						'customFontStyle'       => true,
+						'customFontWeight'      => true,
+						'customTextDecorations' => true,
+						'customTextTransforms'  => true,
+					),
+					"blocks" => array(
+						"core/button" => array(
+							"border" => array(
+								"customRadius" => true
+							),
+						),
+					),
+				),
+			),
+		)
+	);
+}
+
 function gutenberg_global_styles_theme_json_allowed_schema( $allowed_schema ) {
 	return array_merge(
 		$allowed_schema,
@@ -296,3 +328,4 @@ add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_global_styles_include_su
 // This filter needs to be executed last.
 
 add_filter( 'theme_json_allowed_schema', 'gutenberg_global_styles_theme_json_allowed_schema' );
+add_filter( 'theme_json_core_data', 'gutenberg_global_styles_theme_json_core_data' );
