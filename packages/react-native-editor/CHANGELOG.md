@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [***] Slash inserter 
 
 -   [*] Audio block: Add Insert from URL functionality. [#27817]
 
