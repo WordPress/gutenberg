@@ -403,7 +403,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').RefCallback<Node>`: Ref callback.
+-   `import('react').RefCallback<Node | null>`: Ref callback.
 
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 

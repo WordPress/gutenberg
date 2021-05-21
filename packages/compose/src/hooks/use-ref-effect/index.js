@@ -20,12 +20,12 @@ import { useCallback, useRef } from '@wordpress/element';
  * @param {(node: Node) => (() => void) | undefined} callback     Callback with ref as argument.
  * @param {import('react').DependencyList}    dependencies Dependencies of the callback.
  *
- * @return {import('react').RefCallback<Node>} Ref callback.
+ * @return {import('react').RefCallback<Node | null>} Ref callback.
  */
 export default function useRefEffect( callback, dependencies ) {
 	/** @type {import('react').MutableRefObject<(() => void) | undefined>}  */
 	const cleanup = useRef();
-	return useCallback( ( /** @type {Node} */ node ) => {
+	return useCallback( ( /** @type {Node | null} */ node ) => {
 		if ( node ) {
 			cleanup.current = callback( node );
 		} else if ( cleanup.current ) {
