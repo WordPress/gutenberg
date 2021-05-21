@@ -401,23 +401,38 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Retrieves the <head> section (including opening <body> tag from an HTML string if present.
+	 * Retrieves the `<head>` section.
 	 *
-	 * @param string $html the string of HTML to return the <head> section.
-	 * @return string the <head> section (may be empty).
+	 * @param string $html The string of HTML to parse.
+	 * @return string The `<head>..</head>` section on succes, or original HTML.
 	 */
 	private function get_document_head( $html ) {
-		preg_match( '|([\s\S]*)</head>|is', $html, $head_matches );
+		$head_html = $html;
 
-		$doc_head = isset( $head_matches[1] ) && is_string( $head_matches[1] ) ? trim( $head_matches[1] ) : '';
-
-		// If missing `</head>` then look for opening <body>.
-		if ( empty( $doc_head ) ) {
-			preg_match( '|([\s\S]*)<body>|is', $html, $body_matches );
-			$head = isset( $body_matches[1] ) && is_string( $body_matches[1] ) ? trim( $body_matches[1] ) : '';
+		// Find the opening `<head>` tag.
+		$head_start = strpos( $html, '<head' );
+		if ( false === $head_start ) {
+			// Didn't find it. Return the original HTML.
+			return $html;
 		}
 
-		return $doc_head;
+		// Find the closing `</head>` tag.
+		$head_end = strpos( $head_html, '</head>' );
+		if ( false === $head_end ) {
+			// Didn't find it. Find the opening `<body>` tag.
+			$head_end = strpos( $head_html, '<body' );
+
+			// Didn't find it. Return the original HTML.
+			if ( false === $head_end ) {
+				return $html;
+			}
+		}
+
+		// Extract the HTML from opening tag to the closing tag. Then add the closing tag.
+		$head_html  = substr( $head_html, $head_start, $head_end );
+		$head_html .= '</head>';
+
+		return $head_html;
 	}
 
 	/**
