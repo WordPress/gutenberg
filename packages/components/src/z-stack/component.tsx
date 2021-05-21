@@ -35,11 +35,11 @@ export interface ZStackProps {
 	 */
 	isReversed?: boolean;
 	/**
-	 * The amount of overlap between each child element.
+	 * The amount of offset between each child element.
 	 *
 	 * @default 0
 	 */
-	overlap?: number;
+	offset?: number;
 	/**
 	 * Child elements.
 	 */
@@ -55,20 +55,23 @@ function ZStack(
 		className,
 		isLayered = true,
 		isReversed = false,
-		overlap = 0,
+		offset = 0,
 		...otherProps
 	} = useContextSystem( props, 'ZStack' );
 
 	const validChildren = getValidChildren( children );
-	const childrenCount = validChildren.length - 1;
+	const childrenLastIndex = validChildren.length - 1;
 
 	const clonedChildren = validChildren.map( ( child, index ) => {
-		const zIndex = isReversed ? childrenCount - index : index;
+		const zIndex = isReversed ? childrenLastIndex - index : index;
+		const offsetAmount = offset * index;
 
 		const classes = cx(
 			isLayered ? styles.positionAbsolute : styles.positionRelative,
 			css( {
-				marginLeft: ( ! isLayered && overlap * -1 ) || undefined,
+				...( isLayered
+					? { marginLeft: offsetAmount }
+					: { right: offsetAmount * -1 } ),
 			} )
 		);
 
@@ -87,17 +90,10 @@ function ZStack(
 		);
 	} );
 
-	const classes = cx(
-		css( {
-			paddingLeft: ! isLayered ? overlap : undefined,
-		} ),
-		className
-	);
-
 	return (
 		<ZStackView
 			{ ...otherProps }
-			className={ classes }
+			className={ className }
 			ref={ forwardedRef }
 		>
 			{ clonedChildren }

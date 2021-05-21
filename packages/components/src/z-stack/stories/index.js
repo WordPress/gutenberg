@@ -1,8 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-/**
  * External dependencies
  */
 import { boolean, number } from '@storybook/addon-knobs';
@@ -42,20 +38,15 @@ const Avatar = ( { backgroundColor } ) => {
 };
 
 const AnimatedAvatars = () => {
-	const [ isHover, setIsHover ] = useState( false );
-	const overlap = number( 'overlap', 20 );
 	const props = {
-		overlap: isHover ? 0 : overlap,
-		isLayered: boolean( 'isLayered', false ),
+		offset: number( 'offset', 20 ),
+		isLayered: boolean( 'isLayered', true ),
 		isReversed: boolean( 'isReversed', false ),
 	};
 
 	return (
 		<HStack>
-			<View
-				onMouseLeave={ () => setIsHover( false ) }
-				onMouseEnter={ () => setIsHover( true ) }
-			>
+			<View>
 				<ZStack { ...props }>
 					<Avatar backgroundColor="#444" />
 					<Avatar backgroundColor="#777" />
