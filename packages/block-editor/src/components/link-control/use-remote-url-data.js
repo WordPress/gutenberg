@@ -49,7 +49,7 @@ function useRemoteUrlData( url ) {
 			}
 		};
 
-		if ( url?.length && isMounted.current ) {
+		if ( url?.length && isMounted.current && fetchRemoteUrlData ) {
 			fetchRichData();
 		}
 
