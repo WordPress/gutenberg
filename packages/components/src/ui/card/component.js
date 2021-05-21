@@ -19,7 +19,7 @@ import { useCard } from './hook';
 import CONFIG from '../../utils/config-values';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').CardProps, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').CardProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Card( props, forwardedRef ) {

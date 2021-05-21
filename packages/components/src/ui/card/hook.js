@@ -16,7 +16,7 @@ import { useSurface } from '../surface';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').CardProps, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').CardProps, 'div'>} props
  */
 export function useCard( props ) {
 	const {
