@@ -17,7 +17,7 @@ import { View } from '../../view';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').CardBodyProps, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').CardBodyProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardBody( props, forwardedRef ) {

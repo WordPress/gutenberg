@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 16.1.0 (2021-05-20)
+
+### Bug Fix
+
+-   The default Babel configuration has changed to respect a local Browserslist configuration.
+
 ## 16.0.0 (2021-05-14)
 
 ### Breaking Changes

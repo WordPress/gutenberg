@@ -90,6 +90,7 @@ dependencies {
         implementation "com.github.wordpress-mobile:react-native-screens:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-screens', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-safe-area-context:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-safe-area-context', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-reanimated:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-reanimated', 'dependencies')}"
+        implementation "com.github.wordpress-mobile:react-native-prompt-android:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-prompt-android', 'dependencies')}"
         runtimeOnly "org.wordpress-mobile:hermes-release-mirror:0.61.5"
    } else {
         api 'com.facebook.react:react-native:+'
@@ -104,6 +105,7 @@ dependencies {
         api project(':react-native-screens')
         api project(':react-native-safe-area-context')
         api project(':react-native-reanimated')
+        api project(':react-native-prompt-android')
         debugRuntimeOnly "org.wordpress-mobile:hermes-debug-mirror:0.61.5"
         releaseRuntimeOnly "org.wordpress-mobile:hermes-release-mirror:0.61.5"
    }

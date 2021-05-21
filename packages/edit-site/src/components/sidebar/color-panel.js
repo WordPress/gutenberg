@@ -7,7 +7,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { LINK_COLOR, useSetting } from '../editor/utils';
+
+import { useSetting } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
 export function useHasColorPanel( { supports } ) {
@@ -15,7 +16,7 @@ export function useHasColorPanel( { supports } ) {
 		supports.includes( 'color' ) ||
 		supports.includes( 'backgroundColor' ) ||
 		supports.includes( 'background' ) ||
-		supports.includes( LINK_COLOR )
+		supports.includes( 'linkColor' )
 	);
 }
 
@@ -84,12 +85,12 @@ export default function ColorPanel( {
 		} );
 	}
 
-	if ( supports.includes( LINK_COLOR ) ) {
-		const color = getStyle( name, LINK_COLOR );
-		const userColor = getStyle( name, LINK_COLOR, 'user' );
+	if ( supports.includes( 'linkColor' ) ) {
+		const color = getStyle( name, 'linkColor' );
+		const userColor = getStyle( name, 'linkColor', 'user' );
 		settings.push( {
 			colorValue: color,
-			onColorChange: ( value ) => setStyle( name, LINK_COLOR, value ),
+			onColorChange: ( value ) => setStyle( name, 'linkColor', value ),
 			label: __( 'Link color' ),
 			clearable: color === userColor,
 		} );
