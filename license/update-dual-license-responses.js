@@ -281,6 +281,7 @@ async function main() {
     fs.writeFileSync(jsonFileName, JSON.stringify(preservedJson, null, 2))
     console.log(`Updated ${jsonFileName}`)
 
+    require('./summarize-dual-license-responses')
     exit(0)
 }
 
