@@ -182,6 +182,13 @@ function remove_core_patterns() {
 		'three-buttons',
 		'heading-paragraph',
 		'quote',
+		'query-standard-posts',
+		'query-medium-posts',
+		'query-small-posts',
+		'query-grid-posts',
+		'query-large-title-posts',
+		'query-offset-posts',
+		'social-links-shared-background-color',
 	);
 
 	foreach ( $core_block_patterns as $core_block_pattern ) {
