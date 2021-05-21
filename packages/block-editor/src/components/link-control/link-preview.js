@@ -33,6 +33,7 @@ export default function LinkPreview( { value, onEditClick } ) {
 				'is-current': true,
 				'is-rich': richData,
 				'is-fetching': isFetching,
+				'is-preview': true,
 			} ) }
 		>
 			<div className="block-editor-link-control__search-item-top">

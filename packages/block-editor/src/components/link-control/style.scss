@@ -150,12 +150,16 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__search-item-header {
-		display: flex;
+		display: block;
 		flex-direction: row;
 		align-items: center;
 		margin-right: $grid-unit-20;
 		overflow: hidden;
 		white-space: nowrap;
+	}
+
+	&.is-preview .block-editor-link-control__search-item-header {
+		display: flex;
 	}
 
 	.block-editor-link-control__search-item-details {
