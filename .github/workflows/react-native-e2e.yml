@@ -18,26 +18,31 @@ jobs:
         runs-on: macos-latest
 
         steps:
-          - name: checkout
-            uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+            - name: checkout
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  path: gutenberg
 
-          - name: Use Node.js 14.x
-            uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
-            with:
-              node-version: 14.x
+            - name: Use Node.js 14.x
+              uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
+              with:
+                  node-version: 14.x
 
-          - name: Restore npm cache
-            uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
-            with:
-              path: ~/.npm
-              key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+            - name: Restore npm cache
+              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
 
-          - run: npm ci
+            - name: Install NPM packages
+              run: npm ci
+              working-directory: gutenberg
 
-          - name: Cache build
-            uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
-            with:
-              key: ${{ github.workflow }}-${{ github.sha }}
+            - name: Cache build
+              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
+              with:
+                  path: gutenberg
+                  key: ${{ github.workflow }}-${{ github.sha }}
 
     android:
         name: Android
@@ -51,7 +56,7 @@ jobs:
             - name: Cache build
               uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
               with:
-                key: ${{ github.workflow }}-${{ github.sha }}
+                  key: ${{ github.workflow }}-${{ github.sha }}
 
             - name: Restore Gradle cache
               uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
@@ -90,7 +95,7 @@ jobs:
             - name: Cache build
               uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
               with:
-                key: ${{ github.workflow }}-${{ github.sha }}
+                  key: ${{ github.workflow }}-${{ github.sha }}
 
             - name: Prepare build cache key
               run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
