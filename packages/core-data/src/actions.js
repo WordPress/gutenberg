@@ -23,6 +23,15 @@ import {
 import { createBatch } from './batch';
 import { getDispatch } from './controls';
 
+export function receiveSearchQuery( searchQuery, type, subtype, results ) {
+	return {
+		type: 'RECEIVE_SEARCH_QUERY',
+		results: castArray( results ),
+		searchQuery,
+		entityType: subtype || type,
+	};
+}
+
 /**
  * Returns an action object used in signalling that authors have been received.
  *

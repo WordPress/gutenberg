@@ -9,6 +9,8 @@ import { find, includes, get, hasIn, compact, uniq } from 'lodash';
 import { addQueryArgs } from '@wordpress/url';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+import { decodeEntities } from '@wordpress/html-entities';
+import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -26,6 +28,7 @@ import {
 	receiveEmbedPreview,
 	receiveUserPermission,
 	receiveAutosaves,
+	receiveSearchQuery,
 } from './actions';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
@@ -33,6 +36,82 @@ import {
 	__unstableAcquireStoreLock,
 	__unstableReleaseStoreLock,
 } from './locks';
+
+const KINDMAP = {
+	post: 'post-type',
+	page: 'post-type',
+	term: 'taxonomy',
+	'post-format': 'taxonomy',
+};
+
+export function* searchEntities(
+	searchQuery = '',
+	searchOptions = {},
+	settings = {}
+) {
+	let {
+		isInitialSuggestions = false,
+		type = undefined,
+		subtype = undefined,
+		page = undefined,
+		perPage = isInitialSuggestions ? 3 : 20,
+	} = searchOptions;
+
+	const { disablePostFormats = false } = settings;
+
+	if ( type === 'post-format' && disablePostFormats ) {
+		yield receiveSearchQuery( searchQuery, type, [] );
+	}
+
+	// Normalize "Page" as it is so common.
+	if ( type === 'page' ) {
+		type = 'post';
+		subtype = 'page';
+	}
+
+	const path = addQueryArgs( '/wp/v2/search', {
+		search: searchQuery,
+		page,
+		per_page: perPage,
+		type,
+		subtype,
+	} );
+
+	let results = yield apiFetch( {
+		path,
+	} );
+
+	results = results
+		.filter(
+			/**
+			 * @param {{ id: number }} result
+			 */
+			( result ) => {
+				return !! result.id;
+			}
+		)
+		.slice( 0, perPage )
+		.map(
+			/**
+			 * @param {{ id: number, url:string, title?:string, subtype?: string, type?: string }} result
+			 */
+			( result ) => {
+				return {
+					id: result.id,
+					url: result.url,
+					title:
+						decodeEntities( result.title || '' ) ||
+						__( '(no title)' ),
+					type: result.subtype || result.type,
+					kind: KINDMAP[ type ],
+				};
+			}
+		);
+
+	searchQuery = searchQuery?.length ? searchQuery : '__ALL__';
+
+	yield receiveSearchQuery( searchQuery, type, subtype, results );
+}
 
 /**
  * Requests authors from the REST API.

@@ -48,6 +48,36 @@ export const isRequestingEmbedPreview = createRegistrySelector(
 	}
 );
 
+export function searchEntities( state, searchQuery, searchOptions = {} ) {
+	let queryResults = null;
+
+	if ( searchOptions.subtype ) {
+		queryResults = get(
+			state,
+			[ 'searches', 'types', searchOptions.subtype, searchQuery ],
+			null
+		);
+	} else if ( searchOptions.type ) {
+		queryResults = get(
+			state,
+			[ 'searches', 'types', searchOptions.type, searchQuery ],
+			null
+		);
+	} else {
+		queryResults = get(
+			state,
+			[ 'searches', 'queries', searchQuery ],
+			null
+		);
+	}
+
+	if ( ! queryResults ) {
+		return [];
+	}
+
+	return map( queryResults, ( id ) => state.searches.byId[ id ] );
+}
+
 /**
  * Returns all available authors.
  *

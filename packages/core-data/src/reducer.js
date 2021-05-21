@@ -40,6 +40,40 @@ export function terms( state = {}, action ) {
 	return state;
 }
 
+export function searches(
+	state = { byId: {}, types: {}, queries: {} },
+	action
+) {
+	switch ( action.type ) {
+		case 'RECEIVE_SEARCH_QUERY':
+			return {
+				byId: {
+					...state.byId,
+					...keyBy( action.results, 'id' ),
+				},
+				types: {
+					...state.types,
+					[ action.entityType ]: {
+						...( state.types[ action.entityType ] || {} ),
+						[ action.searchQuery ]: map(
+							action.results,
+							( result ) => result.id
+						),
+					},
+				},
+				queries: {
+					...state.queries,
+					[ action.searchQuery ]: map(
+						action.results,
+						( result ) => result.id
+					),
+				},
+			};
+	}
+
+	return state;
+}
+
 /**
  * Reducer managing authors state. Keyed by id.
  *
@@ -576,4 +610,5 @@ export default combineReducers( {
 	userPermissions,
 	autosaves,
 	locks: locksReducer,
+	searches,
 } );
