@@ -194,13 +194,19 @@ be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to debounce, so please wrap functions created on
 render in components in `useCallback`.
 
+_Related_
+
+-   <https://docs-lodash.com/v4/debounce/>
+
 _Parameters_
 
--   _args_ `...any`: Arguments passed to Lodash's `debounce`.
+-   _fn_ `TFunc`: The function to debounce.
+-   _wait_ `[number]`: The number of milliseconds to delay.
+-   _options_ `[import('lodash').DebounceSettings]`: The options object.
 
 _Returns_
 
--   `Function`: Debounced function.
+-   `TFunc & import('lodash').Cancelable`: Debounced function.
 
 <a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
 
