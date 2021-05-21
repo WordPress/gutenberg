@@ -163,7 +163,7 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__search-item-details {
-		display: block;
+		overflow: hidden; // clip to force text ellipsis.
 	}
 
 	.block-editor-link-control__search-item-icon {
