@@ -278,7 +278,7 @@ async function main() {
       await handleConsentIssueComment(comment)
     }
 
-    fs.writeFileSync(jsonFileName, JSON.stringify(preservedJson))
+    fs.writeFileSync(jsonFileName, JSON.stringify(preservedJson, null, 2))
     console.log(`Updated ${jsonFileName}`)
 
     exit(0)
