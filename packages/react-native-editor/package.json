@@ -56,7 +56,7 @@
 		"node-fetch": "^2.6.0",
 		"react-native": "0.64.0",
 		"react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
-		"react-native-gesture-handler": "git+https://github.com/wordpress-mobile/react-native-gesture-handler.git#6c83188fb0078bb5c966e7cce2084bc64f6c6ea6",
+		"react-native-gesture-handler": "git+https://github.com/wordpress-mobile/react-native-gesture-handler.git#e7b44cb3717da86c197322a28227468f6d77aecc",
 		"react-native-get-random-values": "git+https://github.com/wordpress-mobile/react-native-get-random-values.git#f03f2c16414aff4ea76064dcd00a9e3c6efc838d",
 		"react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
 		"react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker",
@@ -68,9 +68,9 @@
 		"react-native-safe-area-context": "git+https://github.com/wordpress-mobile/react-native-safe-area-context.git#1e3c0d34f31b59fb79f71ec0b4c39c513f684871",
 		"react-native-sass-transformer": "^1.1.1",
 		"react-native-screens": "git+https://github.com/wordpress-mobile/react-native-screens.git#b3d907bda2695743f35fd874261dcd27e0912eca",
-		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#3915f4d404b60c21d1dc8dc20fbb3b35483e3c38",
+		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#83c4e7c16b704c7706339341b22434b29f0b27d6",
 		"react-native-url-polyfill": "^1.1.2",
-		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#97792c7737b234fe48840d443a9b3135711e5df7"
+		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#e74bb901f37f86a8842232468b43c9cbaedb6aa4"
 	},
 	"publishConfig": {
 		"access": "public"
