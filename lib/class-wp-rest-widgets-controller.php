@@ -284,9 +284,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function delete_item( $request ) {
+	public function delete_item( $request ) {		
 		$widget_id  = $request['id'];
 		$sidebar_id = wp_find_widgets_sidebar( $widget_id );
+		$id_base = wp_parse_widget_id( $widget_id )['id_base'];
 
 		if ( is_null( $sidebar_id ) ) {
 			return new WP_Error(
@@ -317,6 +318,9 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				$request
 			);
 		}
+
+		/** This action is documented in wp-admin/widgets.php */
+		do_action( 'delete_widget', $widget_id, $sidebar_id, $id_base );
 
 		return $prepared;
 	}
