@@ -231,6 +231,10 @@ function gutenberg_load_remote_core_patterns() {
 
 		foreach ( $patterns as $settings ) {
 			$pattern_name = 'core/' . sanitize_title( $settings['title'] );
+			if ( isset( $settings['block_types'] ) ) {
+				$settings['blockTypes'] = $settings['block_types'];
+				unset( $settings['block_types'] );
+			}
 			register_block_pattern( $pattern_name, (array) $settings );
 		}
 	}
