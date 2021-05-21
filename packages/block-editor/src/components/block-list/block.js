@@ -297,5 +297,6 @@ export default compose(
 	// see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
 	ifCondition( ( { block } ) => !! block ),
-	withFilters( 'editor.BlockListBlock' )
+	withFilters( 'editor.BlockListBlock' ),
+	pure
 )( BlockListBlock );
