@@ -10,12 +10,12 @@
  */
 function register_gutenberg_patterns() {
 	// Register categories used for block patterns.
-	register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
+	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'query' ) ) {
+		register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
+	}
 
-	// Initial Query block patterns.
-	register_block_pattern(
-		'query/standard-posts',
-		array(
+	$patterns = array(
+		'query/standard-posts'                 => array(
 			'title'      => __( 'Standard', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -32,12 +32,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/medium-posts',
-		array(
+		),
+		'query/medium-posts'                   => array(
 			'title'      => __( 'Image at left', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -56,12 +52,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/small-posts',
-		array(
+		),
+		'query/small-posts'                    => array(
 			'title'      => __( 'Small image and title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -79,12 +71,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/grid-posts',
-		array(
+		),
+		'query/grid-posts'                     => array(
 			'title'      => __( 'Grid', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -99,12 +87,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/large-title-posts',
-		array(
+		),
+		'query/large-title-posts'              => array(
 			'title'      => __( 'Large title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -127,13 +111,9 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop --></div>
 							<!-- /wp:query --></div>
 							<!-- /wp:group -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/offset-posts',
-		array(
-			'title'      => __( 'Offset', 'gutenberg' ),
+		),
+		'query/offset-posts'                   => array(
+			'title'      => __( 'Offsetss', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
@@ -164,13 +144,9 @@ function register_gutenberg_patterns() {
 							<!-- /wp:column --></div>
 							<!-- /wp:columns --></main>
 							<!-- /wp:group -->',
-		)
-	);
-
-	// Initial block pattern to be used with block transformations with patterns.
-	register_block_pattern(
-		'social-links/shared-background-color',
-		array(
+		),
+		// Initial block pattern to be used with block transformations with patterns.
+		'social-links/shared-background-color' => array(
 			'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
 			'categories'    => array( 'buttons' ),
 			'blockTypes'    => array( 'core/social-links' ),
@@ -180,8 +156,15 @@ function register_gutenberg_patterns() {
 								<!-- wp:social-link {"url":"#","service":"chain"} /-->
 								<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
 								<!-- /wp:social-links -->',
-		)
+		),
 	);
+
+	foreach ( $patterns as $name => $pattern ) {
+		$pattern_name = 'core/' . $name;
+		if ( ! WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_name ) ) {
+			register_block_pattern( $pattern_name, $pattern );
+		}
+	}
 }
 
 /**
