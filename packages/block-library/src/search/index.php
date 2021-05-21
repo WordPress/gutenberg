@@ -191,9 +191,7 @@ function styles_for_block_core_search( $attributes ) {
 		if ( $has_side_alignment ) {
 			// If block is aligned the width style must go on the root block
 			// element for it to be the correct size.
-			//
-			// To enforce user's width selection adjust max-width as well.
-			$block_styles = sprintf( 'width: %s; max-width: %s;', $width, $width );
+			$block_styles = sprintf( 'width: %s;', $width );
 		} else {
 			$wrapper_styles[] = sprintf( 'width: %s;', $width );
 		}
