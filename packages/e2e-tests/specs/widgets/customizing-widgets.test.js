@@ -632,10 +632,10 @@ describe( 'Widgets Customizer', () => {
 		await publishButton.click();
 
 		// Wait for publishing to finish.
+		await page.waitForResponse( createURL( '/wp-admin/admin-ajax.php' ) );
 		await expect( publishButton ).toMatchQuery( {
 			disabled: true,
 		} );
-		await page.waitForResponse( createURL( '/wp-admin/admin-ajax.php' ) );
 
 		expect( console ).toHaveWarned(
 			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
