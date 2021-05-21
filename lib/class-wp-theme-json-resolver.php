@@ -318,7 +318,7 @@ class WP_Theme_JSON_Resolver {
 				'order'       => 'desc',
 				'post_type'   => $post_type_filter,
 				'post_status' => $post_status_filter,
-				'tax_query'      => array(
+				'tax_query'   => array(
 					array(
 						'taxonomy' => 'wp_theme',
 						'field'    => 'name',
@@ -419,7 +419,7 @@ class WP_Theme_JSON_Resolver {
 		$result->merge( self::get_theme_data( $theme_support_data ) );
 
 		if ( 'user' === $origin ) {
-			$result->merge( self::get_user_data() );
+			$result->merge( self::get_user_data(), 'update' );
 		}
 
 		return $result;

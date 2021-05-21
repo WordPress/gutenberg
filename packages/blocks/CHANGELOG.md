@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 9.1.0 (2021-05-20)
+
+### New API
+
+-   `registerBlockType` method can be used to register a block type using the metadata loaded from `block.json` file ([#32030](https://github.com/WordPress/gutenberg/pull/32030)).
+
+### Deprecations
+
+-   `registerBlockTypeFromMetadata` was deprecated in favor of `registerBlockType` that support now the same functionality ([#32030](https://github.com/WordPress/gutenberg/pull/32030)).
+
+## 9.0.0 (2021-05-14)
+
 ### Breaking Changes
 
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.

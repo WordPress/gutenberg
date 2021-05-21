@@ -111,7 +111,7 @@ function GalleryEdit( props ) {
 		};
 	} );
 
-	const { resizedImages } = useMemo( () => {
+	const resizedImages = useMemo( () => {
 		if ( isSelected ) {
 			return reduce(
 				attributes.ids,
@@ -151,6 +151,10 @@ function GalleryEdit( props ) {
 		}
 		return {};
 	}, [ isSelected, attributes.ids, imageSizes ] );
+
+	function onFocusGalleryCaption() {
+		setSelectedImage();
+	}
 
 	function setAttributes( newAttrs ) {
 		if ( newAttrs.ids ) {
@@ -293,10 +297,6 @@ function GalleryEdit( props ) {
 		return checked
 			? __( 'Thumbnails are cropped to align.' )
 			: __( 'Thumbnails are not cropped.' );
-	}
-
-	function onFocusGalleryCaption() {
-		setSelectedImage();
 	}
 
 	function setImageAttributes( index, newAttributes ) {
@@ -466,8 +466,9 @@ function GalleryEdit( props ) {
 				onSelectImage={ onSelectImage }
 				onDeselectImage={ onDeselectImage }
 				onSetImageAttributes={ setImageAttributes }
-				onFocusGalleryCaption={ onFocusGalleryCaption }
 				blockProps={ blockProps }
+				// This prop is used by gallery.native.js.
+				onFocusGalleryCaption={ onFocusGalleryCaption }
 			/>
 		</>
 	);

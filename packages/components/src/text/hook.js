@@ -22,7 +22,7 @@ import { CONFIG, COLORS } from '../utils';
 import { getLineHeight } from './get-line-height';
 
 /**
- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'span'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
  */
 export default function useText( props ) {
 	const {

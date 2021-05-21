@@ -14,17 +14,23 @@ function usePatternsSetup( clientId, blockName, filterPatternsFn ) {
 			const {
 				getBlockRootClientId,
 				__experimentalGetPatternsByBlockTypes,
+				__experimentalGetParsedPattern,
 				__experimentalGetAllowedPatterns,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
+			let patterns = [];
 			if ( filterPatternsFn ) {
-				return __experimentalGetAllowedPatterns( rootClientId ).filter(
-					filterPatternsFn
+				patterns = __experimentalGetAllowedPatterns(
+					rootClientId
+				).filter( filterPatternsFn );
+			} else {
+				patterns = __experimentalGetPatternsByBlockTypes(
+					blockName,
+					rootClientId
 				);
 			}
-			return __experimentalGetPatternsByBlockTypes(
-				blockName,
-				rootClientId
+			return patterns.map( ( { name } ) =>
+				__experimentalGetParsedPattern( name )
 			);
 		},
 		[ clientId, blockName, filterPatternsFn ]

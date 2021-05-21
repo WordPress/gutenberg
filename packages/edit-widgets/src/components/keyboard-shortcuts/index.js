@@ -81,6 +81,16 @@ function KeyboardShortcutsRegister() {
 				character: 's',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/edit-widgets/keyboard-shortcuts',
+			category: 'main',
+			description: __( 'Display these keyboard shortcuts.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'h',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;

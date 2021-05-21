@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/postcss-plugins-preset",
-	"version": "3.0.0",
+	"version": "3.1.0",
 	"description": "PostCSS sharable plugins preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,9 +30,7 @@
 	"main": "lib/index.js",
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/postcss-themes": "file:../postcss-themes",
-		"autoprefixer": "^10.2.5",
-		"postcss-custom-properties": "^11.0.0"
+		"autoprefixer": "^10.2.5"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/base-styles",
-	"version": "3.4.3",
+	"version": "3.5.0",
 	"description": "Base SCSS utilities and variables for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

@@ -29,7 +29,7 @@ export function getBoxShadow( value ) {
 }
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 export function useElevation( props ) {
 	const {

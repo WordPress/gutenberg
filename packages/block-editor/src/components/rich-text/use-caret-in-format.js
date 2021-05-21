@@ -9,7 +9,9 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-export function useCaretInFormat( hasActiveFormats ) {
+export function useCaretInFormat( { value } ) {
+	const hasActiveFormats =
+		value.activeFormats && !! value.activeFormats.length;
 	const { isCaretWithinFormattedText } = useSelect( blockEditorStore );
 	const { enterFormattedText, exitFormattedText } = useDispatch(
 		blockEditorStore

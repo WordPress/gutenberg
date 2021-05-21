@@ -397,9 +397,11 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
+		// Dismiss color picker popover
+		await page.keyboard.press( 'Escape' );
+
 		// Navigate to the block.
 		await page.keyboard.press( 'Tab' );
-		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Copy the colored text.
 		await pressKeyWithModifier( 'primary', 'c' );

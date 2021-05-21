@@ -26,6 +26,7 @@ export default function TemplatePartSelection( {
 	setAttributes,
 	onClose,
 	area,
+	templatePartId = null,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	return (
@@ -44,6 +45,7 @@ export default function TemplatePartSelection( {
 					filterValue={ filterValue }
 					onClose={ onClose }
 					area={ area }
+					templatePartId={ templatePartId }
 				/>
 			</div>
 		</div>
