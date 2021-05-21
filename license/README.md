@@ -36,8 +36,6 @@ The easiest way to execute the GraphQL queries listed below is by using the [Git
 
 #### All Merged and Open PRs
 
-Saved as [2021-04-16_merged-or-open-prs.json](data/2021-04-16_merged-or-open-prs.json)
-
 <details>
   <summary>GraphQL query</summary>
   
@@ -62,7 +60,7 @@ query($endCursor: String) {
       }
     }
   }
-}'
+} > 2021-04-16_merged-or-open-prs.json'
 ```
 
 Note that this query returns _all_ PRs through the date the script is run.
@@ -80,8 +78,6 @@ cat 2021-04-16_merged-or-open-prs.json \
 ```
 
 #### All Authors and Co-Authors of commits on trunk
-
-Saved as [all_commits_before_2021-04-16.json](data/all_commits_before_2021-04-16.json) with 743 unique logins.
 
 <details>
 <summary>GraphQL query</summary>
@@ -123,7 +119,7 @@ query($endCursor: String) {
       }
     }
   }
-}'
+} > all_commits_before_2021-04-16.json'
 ``` 
 </details>
 
