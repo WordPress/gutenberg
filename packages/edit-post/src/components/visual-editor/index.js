@@ -240,13 +240,12 @@ export default function VisualEditor( { styles } ) {
 									animate={ { opacity: 1 } }
 								>
 									<WritingFlow>
-										{ ! isTemplateMode && (
-											<div className="edit-post-visual-editor__post-title-wrapper">
-												{ 'page' !== postType && (
+										{ ! isTemplateMode &&
+											'page' !== postType && (
+												<div className="edit-post-visual-editor__post-title-wrapper">
 													<PostTitle />
-												) }
-											</div>
-										) }
+												</div>
+											) }
 										<RecursionProvider>
 											{ hasTemplateBeenFetched ? (
 												<BlockList
