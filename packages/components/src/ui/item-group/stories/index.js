@@ -9,7 +9,7 @@ import { Button } from '../../button';
 
 export default {
 	component: ItemGroup,
-	title: 'G2 Components (Experimental)/ItemGroup',
+	title: 'Components (Experimental)/ItemGroup',
 };
 
 export const _default = () => (

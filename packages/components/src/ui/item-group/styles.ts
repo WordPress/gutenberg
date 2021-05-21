@@ -1,9 +1,14 @@
 /**
  * External dependencies
  */
-import { ui, css } from '@wp-g2/styles';
+import { css } from 'emotion';
 
-// @todo: Maybe abstract to a dedicated UnstyledButton component.
+/**
+ * Internal dependencies
+ */
+import { CONFIG } from '../../utils';
+import COLORS from '../../utils/colors-values';
+
 export const unstyledButton = css`
 	appearance: none;
 	border: 1px solid transparent;
@@ -12,13 +17,13 @@ export const unstyledButton = css`
 	text-align: left;
 
 	&:hover {
-		color: ${ ui.get( 'colorAdmin' ) };
+		color: ${ COLORS.admin.theme };
 	}
 
 	&:focus {
 		background-color: transparent;
-		color: ${ ui.get( 'colorAdmin' ) };
-		border-color: ${ ui.get( 'colorAdmin' ) };
+		color: ${ COLORS.admin.theme };
+		border-color: ${ COLORS.admin.theme };
 		outline: 3px solid transparent;
 	}
 `;
@@ -29,12 +34,12 @@ export const item = css`
 `;
 
 export const bordered = css`
-	${ ui.border.all }
+	border: 1px solid ${ CONFIG.surfaceBorderColor };
 `;
 
 export const separated = css`
 	> *:not( marquee ) {
-		${ ui.border.bottom }
+		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
 	}
 
 	> *:last-child:not( :focus ) {
@@ -42,14 +47,14 @@ export const separated = css`
 	}
 `;
 
-const borderRadius = ui.get( 'controlBorderRadius' );
+const borderRadius = CONFIG.controlBorderRadius;
 
 export const spacedAround = css`
-	${ ui.borderRadius( borderRadius ) }
+	border-radius: ${ borderRadius };
 `;
 
 export const rounded = css`
-	${ ui.borderRadius( borderRadius ) }
+	border-radius: ${ borderRadius };
 
 	> *:first-child {
 		border-top-left-radius: ${ borderRadius };
@@ -62,9 +67,7 @@ export const rounded = css`
 	}
 `;
 
-const baseFontHeight = `calc(${ ui.get( 'fontSize' ) } * ${ ui.get(
-	'fontLineHeightBase'
-) })`;
+const baseFontHeight = `calc(${ CONFIG.fontSize } * ${ CONFIG.fontLineHeightBase })`;
 
 /*
  * Math:
@@ -73,27 +76,18 @@ const baseFontHeight = `calc(${ ui.get( 'fontSize' ) } * ${ ui.get(
  * - Subtract the effects of border
  * - Divide the calculated number by 2, in order to get an individual top/bottom padding
  */
-const paddingY = `calc((${ ui.get(
-	'controlHeight'
-) } - ${ baseFontHeight } - 2px) / 2)`;
-const paddingYSmall = `calc((${ ui.get(
-	'controlHeightSmall'
-) } - ${ baseFontHeight } - 2px) / 2)`;
-const paddingYLarge = `calc((${ ui.get(
-	'controlHeightLarge'
-) } - ${ baseFontHeight } - 2px) / 2)`;
+const paddingY = `calc((${ CONFIG.controlHeight } - ${ baseFontHeight } - 2px) / 2)`;
+const paddingYSmall = `calc((${ CONFIG.controlHeightSmall } - ${ baseFontHeight } - 2px) / 2)`;
+const paddingYLarge = `calc((${ CONFIG.controlHeightLarge } - ${ baseFontHeight } - 2px) / 2)`;
 
 export const itemSizes = {
 	small: css`
-		${ ui.padding.y( paddingYSmall ) }
-		${ ui.padding.x( ui.get( 'controlPaddingXSmall' ) ) }
+		padding: ${ paddingYSmall }, ${ CONFIG.controlPaddingXSmall };
 	`,
 	medium: css`
-		${ ui.padding.y( paddingY ) }
-		${ ui.padding.x( ui.get( 'controlPaddingX' ) ) }
+		padding: ${ paddingY }, ${ CONFIG.controlPaddingX };
 	`,
 	large: css`
-		${ ui.padding.y( paddingYLarge ) }
-		${ ui.padding.x( ui.get( 'controlPaddingXLarge' ) ) }
+		padding: ${ paddingYLarge }, ${ CONFIG.controlPaddingXLarge };
 	`,
 };

@@ -1,9 +1,14 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
-import type { ViewOwnProps } from '@wp-g2/create-styles';
-import { cx } from '@wp-g2/styles';
+import { cx } from 'emotion';
+
+/**
+ * Internal dependencies
+ */
+import { useContextSystem } from '../context';
+// eslint-disable-next-line no-duplicate-imports
+import type { PolymorphicComponentProps } from '../context';
 
 /**
  * Internal dependencies
@@ -17,7 +22,9 @@ export interface Props {
 	size?: 'large' | 'medium' | 'small';
 }
 
-export function useItemGroup( props: ViewOwnProps< Props, 'div' > ) {
+export function useItemGroup(
+	props: PolymorphicComponentProps< Props, 'div' >
+) {
 	const {
 		className,
 		bordered = false,
