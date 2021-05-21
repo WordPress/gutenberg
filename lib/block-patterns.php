@@ -113,7 +113,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:group -->',
 		),
 		'query-offset-posts'                   => array(
-			'title'      => __( 'Offsetss', 'gutenberg' ),
+			'title'      => __( 'Offset', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
