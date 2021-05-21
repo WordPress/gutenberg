@@ -21,12 +21,18 @@ function useRemoteUrlData( url ) {
 		};
 	}, [] );
 
+	// Avoid fetching or state updates if not mounted.
 	useEffect( () => {
 		isMounted.current = true;
 		return () => {
 			isMounted.current = false;
 		};
 	}, [] );
+
+	// Clear the data if the URL changes to avoid stale data in hook consumer.
+	useEffect( () => {
+		setRichData( null );
+	}, [ url ] );
 
 	useEffect( () => {
 		const fetchRichData = async () => {
