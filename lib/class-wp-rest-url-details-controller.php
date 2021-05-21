@@ -264,22 +264,38 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string The meta description contents on success, else empty string.
 	 */
 	private function get_description( $html ) {
+		/*
+		 * Parse all meta elements with a content attribute.
+		 *
+		 * Why first search for the content attribute rather than directly searching for name=description element?
+		 * tl;dr The content attribute's value will be truncated when it contains a > symbol.
+		 *
+		 * The content attribute's value (i.e. the description to get) can have HTML in it and be well-formed as
+		 * it's a string to the browser. Imagine what happens when attempting to match for the name=description
+		 * first. Hmm, if a > or /> symbol is in the content attribute's value, then it terminates the match
+		 * as the element's closing symbol. But wait, it's in the content attribute and is not the end of the
+		 * element. This is a limitation of using regex. It can't determine "wait a minute this is inside of quotation".
+		 * If this happens, what gets matched is not the entire element or all of the content.
+		 *
+		 * Why not search for the name=description and then content="(.*)"?
+		 * The attribute order could be opposite. Plus, additional attributes may exist including being between
+		 * the name and content attributes.
+		 *
+		 * Why not lookahead?
+		 * Lookahead is not constrained to stay within the element. The first <meta it finds may not include
+		 * the name or content, but rather could be from a different element downstream.
+		 */
 		$pattern = '#<meta\s' .
 
 			/*
-			 * Alows for additional attributes before name and/or content.
+			 * Alows for additional attributes before the content attribute.
 			 * Searches for anything other than > symbol.
 			 */
 			'[^>]*' .
 
 			/*
-			 * Forward looking to find the name attribute with the value of description.
-			 * Allows for (a) single or double quotes and (b) whitespace in the value.
-			 */
-			'(?=.*name=(["\'])\s*\bdescription\b\s*\1)' .
-
-			/*
-			 * Forward looking to find the content attribute. When found, match the value (.*).
+			 * Find the content attribute. When found, capture its value (.*).
+			 *
 			 * Allows for (a) single or double quotes and (b) whitespace in the value.
 			 *
 			 * Why capture the opening quotation mark, i.e. (["\']), and then backreference,
@@ -287,10 +303,10 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			 * To ensure the closing quotation mark matches the opening one. Why? Attribute values
 			 * can contain quotation marks, such as an apostrophe in the content.
 			 */
-			'(?=.*content=(["\'])(.*)\1)' .
+			'content=(["\']??)(.*)\1' .
 
 			/*
-			 * Alows for additional attributes before name and/or content.
+			 * Alows for additional attributes after the content attribute.
 			 * Searches for anything other than > symbol.
 			 */
 			'[^>]*' .
@@ -310,17 +326,42 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			'isU';
 
 		/*
-		 * The above pattern results in $matches = array(
-		 * 		0 => the matching HTML
-		 * 		1 => name attribute's opening quotation mark
-		 * 		2 => content attribute's opening quotation mark
-		 * 		3 => the description (i.e. content attribute's value)
+		 * $elements = array(
+		 * 		0 string[] Meta elements with a content attribute.
+		 * 		1 string[] Content attribute's opening quotation mark.
+		 * 		2 string[] Content attribute's value for each meta element.
 		 * )
 		 */
-		preg_match( $pattern, $html, $matches );
+		preg_match_all( $pattern, $html, $elements );
 
-		$description = ! empty( $matches[3] ) && is_string( $matches[3] ) ? trim( $matches[3] ) : '';
-		if ( empty( $description ) ) {
+		// Bail out if none were found.
+		if ( empty( $elements[0] ) ) {
+			return '';
+		}
+
+		// Find the description meta element.
+		$pattern     = '#name=([\"\']??)\s*\bdescription\b\s*\1[^>]*#isU';
+		$description = '';
+		foreach ( $elements[0] as $index => $element ) {
+			preg_match( $pattern, $element, $match );
+
+			// This meta is not a description. Skip it.
+			if ( empty( $match ) ) {
+				continue;
+			}
+
+			/*
+			 * Found the description meta element.
+			 * Get the element's description from its matching content array.
+			 */
+			if ( isset( $elements[2][ $index ] ) && is_string( $elements[2][ $index ] ) ) {
+				$description = trim( $elements[2][ $index ] );
+			}
+
+			break;
+		}
+
+		if ( '' === $description ) {
 			return '';
 		}
 

@@ -592,6 +592,12 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" /><link rel="canonical" href="https://example.com">',
 				'https://wordpress.org/favicon.ico',
 			),
+			'with multiple links'                   => array(
+				'<link rel="manifest" href="/manifest.56b1cedc.json">
+				<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" />
+				<link rel="canonical" href="https://example.com">',
+				'https://wordpress.org/favicon.ico',
+			),
 			'relative url'                          => array(
 				'<link rel="shortcut icon" href="/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
@@ -729,10 +735,13 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'<meta name="description" content="This is a description."><meta name="viewport" content="width=device-width, initial-scale=1">',
 				'This is a description.',
 			),
-			'with several elements'                       => array(
-				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg" /><meta name="description" content="This is a description."><meta name="viewport" content="width=device-width, initial-scale=1">',
+			'with multiple elements'                     => array(
+				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg" />
+				<link rel="stylesheet" href="https://example.com/assets/style.css" />
+				<meta name="description" content="This is a description.">
+				<meta name="viewport" content="width=device-width, initial-scale=1">',
 				'This is a description.',
-			),			
+			),
 			'with other attributes'                      => array(
 				'<meta first="first" name="description" third="third" content="description with other attributes" fifth="fifth">',
 				'description with other attributes',
