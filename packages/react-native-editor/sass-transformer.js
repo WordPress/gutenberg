@@ -39,7 +39,7 @@ const path = require( 'path' );
 const sass = require( 'sass' );
 // eslint-disable-next-line import/no-extraneous-dependencies
 const css2rn = require( 'css-to-react-native-transform' ).default;
-
+// eslint-disable-next-line import/no-extraneous-dependencies
 const upstreamTransformer = require( 'metro-react-native-babel-transformer' );
 
 // TODO: need to find a way to pass the include paths and the default asset files via some config
