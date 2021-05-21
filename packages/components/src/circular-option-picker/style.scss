@@ -100,7 +100,6 @@ $color-palette-circle-spacing: 12px;
 		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 		// Show a thin circular outline in Windows high contrast mode, otherwise the button is invisible.
 		border: 1px solid transparent;
-		box-sizing: border-box;
 	}
 
 	&:focus {
