@@ -15,12 +15,10 @@ import { useComponentsContext } from './context-system-provider';
 import { getNamespace, getConnectedNamespace } from './utils';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * @template TProps
- * @typedef {TProps & { className: string; children?: import('react').ReactNode }} ConnectedProps
+ * @typedef {TProps & { className: string; }} ConnectedProps
  */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * Custom hook that derives registered props from the Context system.

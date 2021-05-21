@@ -23,4 +23,8 @@ export type Props = Pick< FlexProps, 'direction' > & {
 	 * Adjust the layout (width) of content using CSS grid (`grid-template-columns`).
 	 */
 	templateColumns?: CSSProperties[ 'gridTemplateColumns' ];
+	/**
+	 * The children elements.
+	 */
+	children?: React.ReactNode;
 };

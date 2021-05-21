@@ -12,7 +12,7 @@ import * as styles from './styles';
 /** @typedef {import('../context').PolymorphicComponentProps<{}, 'div'>} Props */
 
 /**
- * @param {import('../context').PolymorphicComponentProps<{}, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<{ children?: import('react').ReactNode }, 'div'>} props
  */
 export function useVisuallyHidden( { className, ...props } ) {
 	// circumvent the context system and write the classnames ourselves
