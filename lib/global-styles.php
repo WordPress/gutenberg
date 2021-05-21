@@ -263,7 +263,15 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
 }
 
-function gutenberg_global_styles_theme_json_core_data( $data ){
+/**
+ * Sets the default values for core data.
+ * Used to set the defaults to the new settings.
+ *
+ * @param array $data Existing core data.
+ *
+ * @return array New defaults for core data.
+ */
+function gutenberg_global_styles_theme_json_core_data( $data ) {
 	return array_merge(
 		$data,
 		array_merge_recursive(
@@ -282,19 +290,26 @@ function gutenberg_global_styles_theme_json_core_data( $data ){
 						'customTextDecorations' => true,
 						'customTextTransforms'  => true,
 					),
-					"blocks" => array(
-						"core/button" => array(
-							"border" => array(
-								"customRadius" => true
+					'blocks'     => array(
+						'core/button' => array(
+							'border' => array(
+								'customRadius' => true,
 							),
 						),
 					),
 				),
-			),
+			)
 		)
 	);
 }
 
+/**
+ * Expands the theme.json schema provided by core.
+ *
+ * @param array $allowed_schema Existing schema.
+ *
+ * @return array New schema.
+ */
 function gutenberg_global_styles_theme_json_allowed_schema( $allowed_schema ) {
 	return array_merge(
 		$allowed_schema,
@@ -315,9 +330,9 @@ function gutenberg_global_styles_theme_json_allowed_schema( $allowed_schema ) {
 						'customTextTransforms'  => null,
 						'fontFamilies'          => null,
 					),
-				)
+				),
 			)
-		),
+		)
 	);
 }
 
