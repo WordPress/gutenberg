@@ -23,6 +23,7 @@
 		"src/hooks/use-previous/**/*",
 		"src/hooks/use-media-query/**/*",
 		"src/hooks/use-reduced-motion/**/*",
+		"src/hooks/use-merge-refs/**/*",
 		"src/utils/**/*"
 	]
 }
