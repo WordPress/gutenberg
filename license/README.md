@@ -178,10 +178,7 @@ cat 2021-04-16_authors-and-coauthors-on-trunk.json \
          | select(.user.login == null)
          | .email' --raw-output \
   | sort \
-  | uniq \
-> 2021-04-16_authors-emails-with-no-github-account.txt
+  | uniq
 ```
-
-And the results of that are saved [here](data/2021-04-16_authors-emails-with-no-github-account.txt).
 
 These emails were used to initialize the `claimedEmails.responses` array in `dual-license-responses.json`.
