@@ -16,7 +16,7 @@ import { isValidElement } from '@wordpress/element';
 import { getValidChildren } from '../ui/utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
-import type { ViewOwnProps } from '../ui/context';
+import type { PolymorphicComponentProps } from '../ui/context';
 import { View } from '../view';
 import * as styles from './styles';
 const { ZStackView } = styles;
@@ -47,7 +47,7 @@ export interface ZStackProps {
 }
 
 function ZStack(
-	props: ViewOwnProps< ZStackProps, 'div' >,
+	props: PolymorphicComponentProps< ZStackProps, 'div' >,
 	forwardedRef: Ref< any >
 ) {
 	const {
