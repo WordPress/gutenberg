@@ -28,6 +28,7 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
+import { BlockHeadFill } from '../components/block-list';
 
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;
@@ -212,10 +213,12 @@ export const withLayoutStyles = createHigherOrderComponent(
 
 		return (
 			<>
-				<LayoutStyle
-					selector={ `.wp-container-${ id }` }
-					layout={ usedLayout }
-				/>
+				<BlockHeadFill>
+					<LayoutStyle
+						selector={ `.wp-container-${ id }` }
+						layout={ usedLayout }
+					/>
+				</BlockHeadFill>
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);

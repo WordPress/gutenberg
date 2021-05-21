@@ -8,7 +8,13 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { createContext, useState, useMemo } from '@wordpress/element';
+import {
+	createContext,
+	useState,
+	useMemo,
+	createPortal,
+} from '@wordpress/element';
+import { createSlotFill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,8 +30,14 @@ import BlockToolsBackCompat from '../block-tools/back-compat';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 
 export const IntersectionObserver = createContext();
+const { Fill: BlockHeadFill, Slot: BlockHeadSlot } = createSlotFill(
+	'__unstableBlockHead'
+);
+
+export { BlockHeadFill };
 
 function Root( { className, children } ) {
+	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isOutlineMode, isFocusMode, isNavigationMode } = useSelect(
 		( select ) => {
@@ -47,6 +59,7 @@ function Root( { className, children } ) {
 				useBlockSelectionClearer(),
 				useBlockDropZone(),
 				useInBetweenInserter(),
+				setElement,
 			] ) }
 			className={ classnames(
 				'block-editor-block-list__layout is-root-container',
@@ -58,6 +71,8 @@ function Root( { className, children } ) {
 				}
 			) }
 		>
+			{ element &&
+				createPortal( <BlockHeadSlot />, element.ownerDocument.head ) }
 			{ children }
 		</div>
 	);
