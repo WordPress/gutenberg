@@ -1,6 +1,8 @@
 # Readme
 
-The [`dual-license-responses.json`](dual-license-responses.json) file records responses relevant to the dual-licensing of Gutenberg from (#31893)[https://github.com/WordPress/gutenberg/issues/31893] and (#31913)[https://github.com/WordPress/gutenberg/issues/31913].
+Gutenberg's current license is available at [LICENSE.md](../LICENSE.md) file.
+
+The [`dual-license-responses.json`](dual-license-responses.json) file records responses relevant to the work to update Gutenberg to be dual-licensed from (#31893)[https://github.com/WordPress/gutenberg/issues/31893] and (#31913)[https://github.com/WordPress/gutenberg/issues/31913].
 
 # Checking the Latest Responses
 
