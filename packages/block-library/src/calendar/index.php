@@ -15,12 +15,7 @@
 function render_block_core_calendar( $attributes ) {
 	global $monthnum, $year;
 
-	$has_published_posts = get_option( 'gutenberg_calendar_block_has_published_posts', null );
-	if ( null === $has_published_posts ) {
-		$has_published_posts = block_core_calendar_update_has_published_posts();
-	}
-
-	if ( ! $has_published_posts ) {
+	if ( ! block_core_calendar_get_has_published_posts() ) {
 		return '';
 	}
 
@@ -68,6 +63,20 @@ function register_block_core_calendar() {
 }
 
 add_action( 'init', 'register_block_core_calendar' );
+
+/**
+ * Returns the cached value whether any published post exists or not.
+ * In case of missing cached value, it updates the cache.
+ *
+ * @return bool Has any published posts or not.
+ */
+function block_core_calendar_get_has_published_posts() {
+	$has_published_posts = get_option( 'gutenberg_calendar_block_has_published_posts', null );
+	if ( null === $has_published_posts ) {
+		$has_published_posts = block_core_calendar_update_has_published_posts();
+	}
+	return $has_published_posts;
+}
 
 /**
  * Queries the database for any published post and saves
