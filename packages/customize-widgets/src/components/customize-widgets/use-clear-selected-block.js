@@ -38,7 +38,8 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 					// 3. It should also not exist in the container, inspector, nor the popover.
 					! container.contains( element ) &&
 					! popoverRef.current.contains( element ) &&
-					! inspectorContainer.contains( element )
+					! inspectorContainer.contains( element ) &&
+					! element.closest( '[role="dialog"]' )
 				) {
 					clearSelectedBlock();
 				}

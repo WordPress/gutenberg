@@ -12,6 +12,7 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
 	margin-bottom: $grid-unit-15;
 	padding-left: $components-custom-gradient-picker__padding;
 	padding-right: $button-size - $components-custom-gradient-picker__padding;
+	box-sizing: border-box;
 
 	.components-custom-gradient-picker__markers-container {
 		position: relative;
