@@ -163,9 +163,18 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__search-item-icon {
+		position: relative;
 		margin-right: $grid-unit-10;
 		width: 32px;
+		height: 32px;
+
+		svg,
+		img {
+			max-width: none;
+			width: 32px;
+		}
 	}
+
 
 	.block-editor-link-control__search-item-info,
 	.block-editor-link-control__search-item-title {
@@ -216,6 +225,13 @@ $block-editor-link-control-number-of-actions: 1;
 	.block-editor-link-control__search-item-description {
 		padding-top: $grid-unit-10;
 		margin: 0;
+		font-size: 0.9em;
+
+	}
+
+	.block-editor-link-control__search-item-image {
+		width: 100%;
+		min-height: 170px;
 	}
 }
 
@@ -227,8 +243,49 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control__search-item-bottom {
 	padding-top: $grid-unit-20;
+	transition: opacity 1.5s;
+	min-height: 100px;
+	width: 100%;
 }
 
+.block-editor-link-control__search-item.is-fetching {
+
+	.block-editor-link-control__search-item-bottom {
+		opacity: 0;
+	}
+
+	.block-editor-link-control__search-item-icon {
+		svg,
+		img {
+			opacity: 0;
+		}
+
+		&::before {
+			content: "";
+			display: block;
+			background-color: #999;
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			border-radius: 100%;
+			animation: loadingpulse 1s linear infinite;
+		}
+	}
+
+	@keyframes loadingpulse {
+		0% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
+		}
+	}
+}
 
 .block-editor-link-control__loading {
 	margin: $grid-unit-20; // when only loading control is shown it requires it's own spacing.

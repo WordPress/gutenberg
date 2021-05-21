@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from '@wordpress/element';
 
 function useRemoteUrlData( url ) {
 	const isMounted = useRef( false );
+	const isFetching = useRef( false );
 	const [ richData, setRichData ] = useState( null );
 
 	const { fetchRemoteUrlData } = useSelect( ( select ) => {
@@ -29,7 +30,14 @@ function useRemoteUrlData( url ) {
 
 	useEffect( () => {
 		const fetchRichData = async () => {
-			const urlData = await fetchRemoteUrlData( url );
+			isFetching.current = true;
+
+			const urlData = await fetchRemoteUrlData( url ).catch( () => {
+				isFetching.current = false;
+			} );
+
+			isFetching.current = false;
+
 			if ( isMounted.current ) {
 				setRichData( urlData );
 			}
@@ -38,9 +46,16 @@ function useRemoteUrlData( url ) {
 		if ( url?.length && isMounted.current ) {
 			fetchRichData();
 		}
+
+		return () => {
+			isFetching.current = false;
+		};
 	}, [ url ] );
 
-	return richData;
+	return {
+		richData,
+		isFetching: isFetching.current,
+	};
 }
 
 export default useRemoteUrlData;

@@ -20,34 +20,37 @@ import { ViewerSlot } from './viewer-slot';
 import useRemoteUrlData from './use-remote-url-data';
 
 export default function LinkPreview( { value, onEditClick } ) {
-	const richData = useRemoteUrlData( value?.url );
+	const { richData, isFetching } = useRemoteUrlData( value?.url );
 
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
-
 	return (
 		<div
 			aria-label={ __( 'Currently selected' ) }
 			aria-selected="true"
 			className={ classnames( 'block-editor-link-control__search-item', {
 				'is-current': true,
+				'is-rich': richData,
+				'is-fetching': isFetching,
 			} ) }
 		>
 			<div className="block-editor-link-control__search-item-top">
 				<span className="block-editor-link-control__search-item-header">
-					{ richData?.icon ? (
-						<img
-							className="block-editor-link-control__search-item-icon is-image"
-							src={ richData?.icon }
-							alt=""
-						/>
-					) : (
-						<Icon
-							className="block-editor-link-control__search-item-icon"
-							icon={ globe }
-						/>
-					) }
+					<span
+						className={ classnames(
+							'block-editor-link-control__search-item-icon',
+							{
+								'is-image': richData?.icon,
+							}
+						) }
+					>
+						{ richData?.icon ? (
+							<img src={ richData?.icon } alt="" />
+						) : (
+							<Icon icon={ globe } />
+						) }
+					</span>
 					<span className="block-editor-link-control__search-item-details">
 						<ExternalLink
 							className="block-editor-link-control__search-item-title"
