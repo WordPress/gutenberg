@@ -30,7 +30,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					'elements' => array(
 						'link' => array(
 							'color' => array(
-								'text'       => '#111',
+								'text' => '#111',
 							),
 						),
 					),
@@ -411,6 +411,14 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					'customGradient' => true,
 					'palette'        => array(
 						array(
+							'slug'  => 'red',
+							'color' => 'red',
+						),
+						array(
+							'slug'  => 'green',
+							'color' => 'green',
+						),
+						array(
 							'slug'  => 'blue',
 							'color' => 'blue',
 						),
@@ -546,7 +554,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 				'blocks'   => array(
 					'core/group' => array(
-						'color' => array(
+						'color'    => array(
 							'text' => 'var:preset|color|dark-gray',
 						),
 						'elements' => array(

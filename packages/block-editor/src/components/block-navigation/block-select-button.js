@@ -65,6 +65,11 @@ function BlockNavigationBlockSelectButton(
 				<Indentation level={ level } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
 				<BlockTitle clientId={ clientId } />
+				{ blockInformation?.anchor && (
+					<span className="block-editor-block-navigation-block-select-button__anchor">
+						{ blockInformation.anchor }
+					</span>
+				) }
 				{ isSelected && (
 					<VisuallyHidden>
 						{ __( '(selected block)' ) }

@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Audio block: Add Insert from URL functionality. [#27817]
+
 ## 1.53.0
 
 -   [*] Bottom-sheet: Add custom header [#30291]

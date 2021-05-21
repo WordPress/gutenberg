@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { Button, Dropdown } from '@wordpress/components';
+import { Dropdown, ToolbarItem, Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -36,32 +36,37 @@ function TemplateTitle() {
 	}
 
 	return (
-		<Dropdown
-			position="bottom center"
-			className="edit-post-template-top-area"
-			contentClassName="edit-post-template-top-area__popover"
-			renderToggle={ ( { onToggle } ) => (
-				<>
-					<div className="edit-post-template-title">
-						{ __( 'About' ) }
-					</div>
-					<Button
-						isSmall
-						isTertiary
-						onClick={ onToggle }
-						aria-label={ __( 'Template Options' ) }
-					>
-						{ templateTitle }
-					</Button>
-				</>
-			) }
-			renderContent={ () => (
-				<>
-					<EditTemplateTitle />
-					<DeleteTemplate />
-				</>
-			) }
-		/>
+		<ToolbarItem>
+			{ ( toolbarItemHTMLProps ) => {
+				return (
+					<Dropdown
+						className="edit-post-template-top-area"
+						position="bottom center"
+						contentClassName="edit-post-template-top-area__popover"
+						renderToggle={ ( { onToggle } ) => (
+							<>
+								<div>{ __( 'About' ) }</div>
+								<Button
+									{ ...toolbarItemHTMLProps }
+									isSmall
+									isTertiary
+									onClick={ onToggle }
+									aria-label={ __( 'Template Options' ) }
+								>
+									{ templateTitle }
+								</Button>
+							</>
+						) }
+						renderContent={ () => (
+							<>
+								<EditTemplateTitle />
+								<DeleteTemplate />
+							</>
+						) }
+					/>
+				);
+			} }
+		</ToolbarItem>
 	);
 }
 
