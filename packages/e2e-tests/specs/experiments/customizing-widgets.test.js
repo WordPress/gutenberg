@@ -20,6 +20,20 @@ describe( 'Widgets Customizer', () => {
 	beforeEach( async () => {
 		await cleanupWidgets();
 		await visitAdminPage( 'customize.php' );
+
+		// Disable welcome guide if it is enabled.
+		const isWelcomeGuideActive = await page.evaluate( () =>
+			wp.data
+				.select( 'core/customize-widgets' )
+				.__unstableIsFeatureActive( 'welcomeGuide' )
+		);
+		if ( isWelcomeGuideActive ) {
+			await page.evaluate( () =>
+				wp.data
+					.dispatch( 'core/customize-widgets' )
+					.__unstableToggleFeature( 'welcomeGuide' )
+			);
+		}
 	} );
 
 	beforeAll( async () => {
@@ -547,6 +561,16 @@ async function addBlock( blockName ) {
 		}
 	);
 	await addBlockButton.click();
+
+	// TODO - remove this timeout when the test plugin for disabling CSS
+	// animations in tests works properly.
+	//
+	// This waits for the inserter panel animation to finish before
+	// attempting to insert a block. If the panel is still animating
+	// puppeteer can click on the wrong block.
+	//
+	// eslint-disable-next-line no-restricted-syntax
+	await page.waitForTimeout( 300 );
 
 	const blockOption = await find( {
 		role: 'option',
