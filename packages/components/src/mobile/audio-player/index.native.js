@@ -128,9 +128,15 @@ function Player( {
 
 	if ( src ) {
 		const decodedURI = safeDecodeURI( src );
-		const fileName = decodedURI.split( '/' ).pop();
+		const fileName = decodedURI
+			.split( '#' )
+			.shift()
+			.split( '?' )
+			.shift()
+			.split( '/' )
+			.pop();
 		const parts = fileName.split( '.' );
-		extension = parts.pop().toUpperCase();
+		extension = parts.length === 2 ? parts.pop().toUpperCase() + ' ' : '';
 		title = parts.join( '.' );
 	}
 
@@ -144,7 +150,7 @@ function Player( {
 		return (
 			extension +
 			// translators: displays audio file extension. e.g. MP3 audio file
-			__( ' audio file' )
+			__( 'audio file' )
 		);
 	};
 

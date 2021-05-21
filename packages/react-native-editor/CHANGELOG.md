@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Audio block: Add Insert from URL functionality. [#27817]
+
 ## 1.53.0
 
 -   [*] Bottom-sheet: Add custom header [#30291]
@@ -18,7 +20,6 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Add enableCaching param to fetch request on Android [#31186]
 -   [***] Add reusable blocks to the inserter menu. [#28495]
 -   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
-
 
 ## 1.52.2
 
