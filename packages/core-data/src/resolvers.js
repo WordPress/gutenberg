@@ -44,11 +44,7 @@ const KINDMAP = {
 	'post-format': 'taxonomy',
 };
 
-export function* searchEntities(
-	searchQuery = '',
-	searchOptions = {},
-	settings = {}
-) {
+export function* search( searchQuery = '', searchOptions = {}, settings = {} ) {
 	let {
 		isInitialSuggestions = false,
 		type = undefined,

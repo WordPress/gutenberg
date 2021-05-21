@@ -48,19 +48,23 @@ export const isRequestingEmbedPreview = createRegistrySelector(
 	}
 );
 
-export function searchEntities( state, searchQuery, searchOptions = {} ) {
+export function search( state, searchQuery, searchOptions = {} ) {
 	let queryResults = null;
 
-	if ( searchOptions.subtype ) {
+	// Modify search query to "all" constant here (for lookup purposes) to avoid mangling
+	// the arguments sent to the matching resolver. Otherwise the REST API
+	// would receieve a search term of '__ALL__' for empty search strings.
+	searchQuery = searchQuery?.length || '__ALL__';
+
+	if ( searchOptions.type || searchOptions.subtype ) {
 		queryResults = get(
 			state,
-			[ 'searches', 'types', searchOptions.subtype, searchQuery ],
-			null
-		);
-	} else if ( searchOptions.type ) {
-		queryResults = get(
-			state,
-			[ 'searches', 'types', searchOptions.type, searchQuery ],
+			[
+				'searches',
+				'types',
+				searchOptions.subtype || searchOptions.type, // prefer subtype
+				searchQuery,
+			],
 			null
 		);
 	} else {

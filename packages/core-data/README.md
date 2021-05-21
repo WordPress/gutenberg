@@ -729,7 +729,7 @@ _Returns_
 
 -   `boolean`: Whether the entity record is saving or not.
 
-<a name="searchEntities" href="#searchEntities">#</a> **searchEntities**
+<a name="search" href="#search">#</a> **search**
 
 Undocumented declaration.
 
