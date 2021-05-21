@@ -80,10 +80,6 @@ export function useInputAndSelection( props ) {
 				inputType = event.inputType;
 			}
 
-			if ( ! inputType && event && event.nativeEvent ) {
-				inputType = event.nativeEvent.inputType;
-			}
-
 			const {
 				record,
 				applyRecord,
@@ -138,7 +134,6 @@ export function useInputAndSelection( props ) {
 				createRecord,
 				isSelected,
 				onSelectionChange,
-				setActiveFormats,
 			} = propsRef.current;
 
 			if ( event.type !== 'selectionchange' && ! isSelected ) {
@@ -203,7 +198,6 @@ export function useInputAndSelection( props ) {
 			record.current = newValue;
 			applyRecord( newValue, { domOnly: true } );
 			onSelectionChange( start, end );
-			setActiveFormats( newActiveFormats );
 		}
 
 		function onCompositionStart() {
@@ -230,12 +224,7 @@ export function useInputAndSelection( props ) {
 		}
 
 		function onFocus() {
-			const {
-				record,
-				isSelected,
-				onSelectionChange,
-				setActiveFormats,
-			} = propsRef.current;
+			const { record, isSelected, onSelectionChange } = propsRef.current;
 
 			if ( ! isSelected ) {
 				// We know for certain that on focus, the old selection is invalid.
@@ -250,7 +239,6 @@ export function useInputAndSelection( props ) {
 					activeFormats: EMPTY_ACTIVE_FORMATS,
 				};
 				onSelectionChange( index, index );
-				setActiveFormats( EMPTY_ACTIVE_FORMATS );
 			} else {
 				onSelectionChange( record.current.start, record.current.end );
 			}

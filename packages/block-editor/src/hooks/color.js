@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isObject } from 'lodash';
+import { isObject, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -162,7 +162,7 @@ export function addSaveProps( props, blockType, attributes ) {
 				backgroundColor ||
 				style?.color?.background ||
 				( hasGradient && ( gradient || style?.color?.gradient ) ),
-			'has-link-color': style?.color?.link,
+			'has-link-color': style?.elements?.link?.color,
 		}
 	);
 	props.className = newClassName ? newClassName : undefined;
@@ -204,6 +204,10 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
 	}
 	return value;
 };
+
+function immutableSet( object, path, value ) {
+	return setWith( object ? clone( object ) : {}, path, value, clone );
+}
 
 /**
  * Inspector control panel containing the color related configuration
@@ -303,17 +307,15 @@ export function ColorEdit( props ) {
 
 	const onChangeLinkColor = ( value ) => {
 		const colorObject = getColorObjectByColorValue( colors, value );
-		props.setAttributes( {
-			style: {
-				...props.attributes.style,
-				color: {
-					...props.attributes.style?.color,
-					link: colorObject?.slug
-						? `var:preset|color|${ colorObject.slug }`
-						: value,
-				},
-			},
-		} );
+		const newLinkColorValue = colorObject?.slug
+			? `var:preset|color|${ colorObject.slug }`
+			: value;
+		const newStyle = immutableSet(
+			style,
+			[ 'elements', 'link', 'color', 'text' ],
+			newLinkColorValue
+		);
+		props.setAttributes( { style: newStyle } );
 	};
 
 	return (
@@ -363,10 +365,10 @@ export function ColorEdit( props ) {
 								onColorChange: onChangeLinkColor,
 								colorValue: getLinkColorFromAttributeValue(
 									colors,
-									style?.color?.link
+									style?.elements?.link?.color?.text
 								),
-								clearable: !! props.attributes.style?.color
-									?.link,
+								clearable: !! style?.elements?.link?.color
+									?.text,
 							},
 					  ]
 					: [] ),

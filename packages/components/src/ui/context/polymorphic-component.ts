@@ -9,28 +9,25 @@ import type { Interpolation } from 'create-emotion';
 /**
  * Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
  */
-export type ViewOwnProps< P, T extends As > = P &
+export type PolymorphicComponentProps< P, T extends As > = P &
 	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P > & {
 		as?: T | keyof JSX.IntrinsicElements;
 		children?: React.ReactNode | RenderProp< ExtractHTMLAttributes< any > >;
 	};
 
-export type ElementTypeFromViewOwnProps< P > = P extends ViewOwnProps<
-	unknown,
-	infer T
->
-	? T
-	: never;
+export type ElementTypeFromPolymorphicComponentProps<
+	P
+> = P extends PolymorphicComponentProps< unknown, infer T > ? T : never;
 
-export type PropsFromViewOwnProps< P > = P extends ViewOwnProps< infer PP, any >
-	? PP
-	: never;
+export type PropsFromPolymorphicComponentProps<
+	P
+> = P extends PolymorphicComponentProps< infer PP, any > ? PP : never;
 
 export type PolymorphicComponent< T extends As, O > = {
 	< TT extends As >(
-		props: ViewOwnProps< O, TT > & { as: TT }
+		props: PolymorphicComponentProps< O, TT > & { as: TT }
 	): JSX.Element | null;
-	( props: ViewOwnProps< O, T > ): JSX.Element | null;
+	( props: PolymorphicComponentProps< O, T > ): JSX.Element | null;
 	displayName?: string;
 	selector: string;
 };

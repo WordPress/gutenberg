@@ -16,13 +16,13 @@ npm install @wordpress/babel-preset-default --save-dev
 
 ### Usage
 
-There are a number of methods to configure Babel. See [Babel's Configuration documentation](https://babeljs.io/docs/en/configuration) for more information. To use this preset, simply reference `@wordpress/default` in the `presets` option in your Babel configuration.
+There are a number of methods to configure Babel. See [Babel's Configuration documentation](https://babeljs.io/docs/en/configuration) for more information. To use this preset, simply reference `@wordpress/babel-preset-default` in the `presets` option in your Babel configuration.
 
 For example, using `.babelrc`:
 
 ```json
 {
-	"presets": [ "@wordpress/default" ]
+	"presets": [ "@wordpress/babel-preset-default" ]
 }
 ```
 

@@ -9,26 +9,17 @@ import { omit } from 'lodash';
  */
 import { RawHTML, useRef, useCallback, forwardRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	children as childrenSource,
-	getBlockTransforms,
-	findTransform,
-} from '@wordpress/blocks';
+import { children as childrenSource } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
 	__unstableCreateElement,
 	isEmpty,
-	__unstableIsEmptyLine as isEmptyLine,
-	insert,
-	__unstableInsertLineSeparator as insertLineSeparator,
-	split,
-	toHTMLString,
 	isCollapsed,
 	removeFormat,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -43,9 +34,38 @@ import { useCaretInFormat } from './use-caret-in-format';
 import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
 import { useInputRules } from './use-input-rules';
+import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
+
+/**
+ * Removes props used for the native version of RichText so that they are not
+ * passed to the DOM element and log warnings.
+ *
+ * @param {Object} props Props to filter.
+ *
+ * @return {Object} Filtered props.
+ */
+function removeNativeProps( props ) {
+	return omit( props, [
+		'__unstableMobileNoFocusOnMount',
+		'deleteEnter',
+		'placeholderTextColor',
+		'textAlign',
+		'selectionColor',
+		'tagsToEliminate',
+		'rootTagsToEliminate',
+		'disableEditingMenu',
+		'fontSize',
+		'fontFamily',
+		'fontWeight',
+		'fontStyle',
+		'minWidth',
+		'maxWidth',
+		'setRef',
+	] );
+}
 
 function RichTextWrapper(
 	{
@@ -83,6 +103,7 @@ function RichTextWrapper(
 	const instanceId = useInstanceId( RichTextWrapper );
 
 	identifier = identifier || instanceId;
+	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
 	const { clientId } = useBlockEditContext();
@@ -119,9 +140,7 @@ function RichTextWrapper(
 	const { selectionStart, selectionEnd, isSelected, disabled } = useSelect(
 		selector
 	);
-	const { selectionChange, __unstableMarkAutomaticChange } = useDispatch(
-		blockEditorStore
-	);
+	const { selectionChange } = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -149,87 +168,6 @@ function RichTextWrapper(
 			selectionChange( clientId, identifier, start, end );
 		},
 		[ clientId, identifier ]
-	);
-
-	/**
-	 * Signals to the RichText owner that the block can be replaced with two
-	 * blocks as a result of splitting the block by pressing enter, or with
-	 * blocks as a result of splitting the block by pasting block content in the
-	 * instance.
-	 *
-	 * @param  {Object} record       The rich text value to split.
-	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
-	 */
-	const splitValue = useCallback(
-		( record, pastedBlocks = [] ) => {
-			if ( ! onReplace || ! onSplit ) {
-				return;
-			}
-
-			const blocks = [];
-			const [ before, after ] = split( record );
-			const hasPastedBlocks = pastedBlocks.length > 0;
-			let lastPastedBlockIndex = -1;
-
-			// Consider the after value to be the original it is not empty and
-			// the before value *is* empty.
-			const isAfterOriginal = isEmpty( before ) && ! isEmpty( after );
-
-			// Create a block with the content before the caret if there's no pasted
-			// blocks, or if there are pasted blocks and the value is not empty.
-			// We do not want a leading empty block on paste, but we do if split
-			// with e.g. the enter key.
-			if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
-				blocks.push(
-					onSplit(
-						toHTMLString( {
-							value: before,
-							multilineTag,
-						} ),
-						! isAfterOriginal
-					)
-				);
-				lastPastedBlockIndex += 1;
-			}
-
-			if ( hasPastedBlocks ) {
-				blocks.push( ...pastedBlocks );
-				lastPastedBlockIndex += pastedBlocks.length;
-			} else if ( onSplitMiddle ) {
-				blocks.push( onSplitMiddle() );
-			}
-
-			// If there's pasted blocks, append a block with non empty content
-			/// after the caret. Otherwise, do append an empty block if there
-			// is no `onSplitMiddle` prop, but if there is and the content is
-			// empty, the middle block is enough to set focus in.
-			if (
-				hasPastedBlocks
-					? ! isEmpty( after )
-					: ! onSplitMiddle || ! isEmpty( after )
-			) {
-				blocks.push(
-					onSplit(
-						toHTMLString( {
-							value: after,
-							multilineTag,
-						} ),
-						isAfterOriginal
-					)
-				);
-			}
-
-			// If there are pasted blocks, set the selection to the last one.
-			// Otherwise, set the selection to the second block.
-			const indexToSelect = hasPastedBlocks ? lastPastedBlockIndex : 1;
-
-			// If there are pasted blocks, move the caret to the end of the selected block
-			// Otherwise, retain the default value.
-			const initialPosition = hasPastedBlocks ? -1 : 0;
-
-			onReplace( blocks, indexToSelect, initialPosition );
-		},
-		[ onReplace, onSplit, multilineTag, onSplitMiddle ]
 	);
 
 	const {
@@ -275,13 +213,7 @@ function RichTextWrapper(
 		);
 	}
 
-	const {
-		value,
-		onChange,
-		onFocus,
-		ref: richTextRef,
-		hasActiveFormats,
-	} = useRichText( {
+	const { value, onChange, onFocus, ref: richTextRef } = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			adjustedOnChange( html );
@@ -309,8 +241,8 @@ function RichTextWrapper(
 		onChange,
 	} );
 
-	useCaretInFormat( hasActiveFormats );
-	useMarkPersistent( { hasActiveFormats, html: adjustedValue, value } );
+	useCaretInFormat( { value } );
+	useMarkPersistent( { html: adjustedValue, value } );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;
@@ -319,59 +251,11 @@ function RichTextWrapper(
 			return;
 		}
 
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-
-			const _value = { ...value };
-			_value.formats = removeEditorOnlyFormats( value );
-			const canSplit = onReplace && onSplit;
-
-			if ( onReplace ) {
-				const transforms = getBlockTransforms( 'from' ).filter(
-					( { type } ) => type === 'enter'
-				);
-				const transformation = findTransform( transforms, ( item ) => {
-					return item.regExp.test( _value.text );
-				} );
-
-				if ( transformation ) {
-					onReplace( [
-						transformation.transform( {
-							content: _value.text,
-						} ),
-					] );
-					__unstableMarkAutomaticChange();
-				}
-			}
-
-			if ( multiline ) {
-				if ( event.shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( _value ) ) {
-					splitValue( _value );
-				} else {
-					onChange( insertLineSeparator( _value ) );
-				}
-			} else {
-				const { text, start, end } = _value;
-				const canSplitAtEnd =
-					onSplitAtEnd && start === end && end === text.length;
-
-				if ( event.shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( _value );
-				}
-			}
-		} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			const { start, end, text } = value;
 			const isReverse = keyCode === BACKSPACE;
+			const hasActiveFormats =
+				value.activeFormats && !! value.activeFormats.length;
 
 			// Only process delete if the key press occurs at an uncollapsed edge.
 			if (
@@ -402,7 +286,9 @@ function RichTextWrapper(
 	const TagName = tagName;
 	const content = (
 		<>
-			{ children && children( { value, onChange, onFocus } ) }
+			{ isSelected &&
+				children &&
+				children( { value, onChange, onFocus } ) }
 			{ isSelected && <RemoveBrowserShortcuts /> }
 			{ isSelected && autocompleteProps.children }
 			{ isSelected && (
@@ -448,11 +334,22 @@ function RichTextWrapper(
 						tagName,
 						onReplace,
 						onSplit,
-						splitValue,
+						onSplitMiddle,
 						__unstableEmbedURLOnPaste,
 						multilineTag,
 						preserveWhiteSpace,
 						pastePlainText,
+					} ),
+					useEnter( {
+						removeEditorOnlyFormats,
+						value,
+						onReplace,
+						onSplit,
+						onSplitMiddle,
+						multilineTag,
+						onChange,
+						disableLineBreaks,
+						onSplitAtEnd,
 					} ),
 					anchorRef,
 					forwardedRef,
@@ -466,10 +363,7 @@ function RichTextWrapper(
 					'rich-text'
 				) }
 				onFocus={ unstableOnFocus }
-				onKeyDown={ ( event ) => {
-					autocompleteProps.onKeyDown( event );
-					onKeyDown( event );
-				} }
+				onKeyDown={ onKeyDown }
 			/>
 		</>
 	);

@@ -9,8 +9,10 @@ import { useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
-export function useMarkPersistent( { hasActiveFormats, html, value } ) {
+export function useMarkPersistent( { html, value } ) {
 	const previousText = useRef();
+	const hasActiveFormats =
+		value.activeFormats && !! value.activeFormats.length;
 	const { __unstableMarkLastChangeAsPersistent } = useDispatch(
 		blockEditorStore
 	);

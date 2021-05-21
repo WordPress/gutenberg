@@ -38,19 +38,18 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		const { canUserUseUnfilteredHTML, isPostTitleSelected } = select(
 			editorStore
 		);
+		const isWeb = Platform.OS === 'web';
 		const { canUser } = select( coreStore );
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			reusableBlocks: select( coreStore ).getEntityRecords(
-				'postType',
-				'wp_block',
-				/**
-				 * Unbounded queries are not supported on native so as a workaround, we set per_page with the maximum value that native version can handle.
-				 * Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
-				 */
-				{ per_page: Platform.select( { web: -1, native: 10 } ) }
-			),
+			reusableBlocks: isWeb
+				? select( coreStore ).getEntityRecords(
+						'postType',
+						'wp_block',
+						{ per_page: -1 }
+				  )
+				: [], // Reusable blocks are fetched in the native version of this hook.
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),
 				true
