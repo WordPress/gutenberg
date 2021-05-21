@@ -9,7 +9,8 @@
 		"meta": {
 			"spay_email": "",
 			"wpop_description": "A large hero section with a bright gradient background, a big heading and a filled button.",
-			"wpop_viewport_width": 1000
+			"wpop_viewport_width": 1000,
+			"wpop_block_types": []
 		},
 		"category_slugs": [ "header" ],
 		"keyword_slugs": [ "core" ],
@@ -25,7 +26,8 @@
 		"meta": {
 			"spay_email": "",
 			"wpop_description": "Three small columns of text, each with an outlined button with rounded corners at the bottom.",
-			"wpop_viewport_width": 1000
+			"wpop_viewport_width": 1000,
+			"wpop_block_types": []
 		},
 		"category_slugs": [ "columns" ],
 		"keyword_slugs": [ "core" ],
@@ -41,7 +43,8 @@
 		"meta": {
 			"spay_email": "",
 			"wpop_description": "Three filled buttons with rounded corners, side by side.",
-			"wpop_viewport_width": 600
+			"wpop_viewport_width": 600,
+			"wpop_block_types": []
 		},
 		"category_slugs": [ "buttons" ],
 		"keyword_slugs": [ "core" ],
@@ -57,7 +60,8 @@
 		"meta": {
 			"spay_email": "",
 			"wpop_description": "Two buttons, one filled and one outlined, side by side.",
-			"wpop_viewport_width": 500
+			"wpop_viewport_width": 500,
+			"wpop_block_types": []
 		},
 		"category_slugs": [ "buttons" ],
 		"keyword_slugs": [ "core" ],
