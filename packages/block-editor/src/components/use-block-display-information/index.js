@@ -49,14 +49,16 @@ export default function useBlockDisplayInformation( clientId ) {
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
 			if ( ! blockType ) return null;
+			const attributes = getBlockAttributes( clientId );
+			const match = getActiveBlockVariation( blockName, attributes );
 			const blockTypeInfo = {
 				title: blockType.title,
 				icon: blockType.icon,
 				description: blockType.description,
+				anchor: attributes?.anchor,
 			};
-			const attributes = getBlockAttributes( clientId );
-			const match = getActiveBlockVariation( blockName, attributes );
 			if ( ! match ) return blockTypeInfo;
+
 			return {
 				title: match.title || blockType.title,
 				icon: match.icon || blockType.icon,

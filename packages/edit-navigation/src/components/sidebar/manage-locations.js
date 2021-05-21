@@ -1,14 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import {
+	Button,
+	CheckboxControl,
+	Modal,
+	PanelBody,
 	Spinner,
 	SelectControl,
-	CheckboxControl,
-	Button,
-	Modal,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -29,12 +30,16 @@ export default function ManageLocations( {
 		toggleMenuLocationAssignment,
 	} = useMenuLocations();
 
-	if ( ! menuLocations ) {
+	if ( ! menuLocations || ! menus?.length ) {
 		return <Spinner />;
 	}
 
 	if ( ! menuLocations.length ) {
-		return <p>{ __( 'There are no available menu locations.' ) }</p>;
+		return (
+			<PanelBody title={ __( 'Theme locations' ) }>
+				<p>{ __( 'There are no available menu locations.' ) }</p>
+			</PanelBody>
+		);
 	}
 
 	const themeLocationCountTextMain = sprintf(
@@ -124,7 +129,7 @@ export default function ManageLocations( {
 	) );
 
 	return (
-		<>
+		<PanelBody title={ __( 'Theme locations' ) }>
 			<div className="edit-navigation-manage-locations__theme-location-text-main">
 				{ themeLocationCountTextMain }
 			</div>
@@ -151,6 +156,6 @@ export default function ManageLocations( {
 					{ menuLocationCard }
 				</Modal>
 			) }
-		</>
+		</PanelBody>
 	);
 }

@@ -470,16 +470,16 @@ Implementation follows the existing [get_plugin_data](https://codex.wordpress.or
 
 ### JavaScript
 
-In JavaScript, you need to use `registerBlockTypeFromMetadata` method from `@wordpress/blocks` package to process loaded block metadata. All localized properties get automatically wrapped in `_x` (from `@wordpress/i18n` package) function calls similar to how it works in PHP.
+In JavaScript, you can use `registerBlockType` method from `@wordpress/blocks` package and pass the metadata object loaded from `block.json` as the first param. All localized properties get automatically wrapped in `_x` (from `@wordpress/i18n` package) function calls similar to how it works in PHP.
 
 **Example:**
 
 ```js
-import { registerBlockTypeFromMetadata } from '@wordpress/blocks';
+import { registerBlockType } from '@wordpress/blocks';
 import Edit from './edit';
 import metadata from './block.json';
 
-registerBlockTypeFromMetadata( metadata, {
+registerBlockType( metadata, {
 	edit: Edit,
 	// ...other client-side settings
 } );
