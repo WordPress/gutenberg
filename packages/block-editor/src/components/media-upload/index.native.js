@@ -143,7 +143,7 @@ export class MediaUpload extends Component {
 		const {
 			allowedTypes = [],
 			__experimentalOnlyMediaLibrary,
-			isAudioBlockEnabled,
+			isAudioBlockMediaUploadEnabled,
 		} = this.props;
 
 		return this.getAllSources()
@@ -161,7 +161,7 @@ export class MediaUpload extends Component {
 					)
 				) {
 					if ( source.id !== URL_MEDIA_SOURCE ) {
-						return isAudioBlockEnabled === true;
+						return isAudioBlockMediaUploadEnabled === true;
 					}
 				}
 				return true;
@@ -308,9 +308,9 @@ export class MediaUpload extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			isAudioBlockEnabled:
+			isAudioBlockMediaUploadEnabled:
 				select( blockEditorStore ).getSettings( 'capabilities' )
-					.audioBlock === true,
+					.isAudioBlockMediaUploadEnabled === true,
 		};
 	} ),
 ] )( MediaUpload );
