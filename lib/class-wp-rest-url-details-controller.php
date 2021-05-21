@@ -276,28 +276,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return '';
 		}
 
-		// Find the description meta element.
-		$pattern     = '#name=([\"\']??)\s*\bdescription\b\s*\1[^>]*#isU';
-		$description = '';
-		foreach ( $meta_elements[0] as $index => $element ) {
-			preg_match( $pattern, $element, $match );
+		$description = $this->get_metadata_from_meta_element( $meta_elements, 'name', '\bdescription\b' );
 
-			// This meta is not a description. Skip it.
-			if ( empty( $match ) ) {
-				continue;
-			}
-
-			/*
-			 * Found the description meta element.
-			 * Get the element's description from its matching content array.
-			 */
-			if ( isset( $meta_elements[2][ $index ] ) && is_string( $meta_elements[2][ $index ] ) ) {
-				$description = trim( $meta_elements[2][ $index ] );
-			}
-
-			break;
-		}
-
+		// Bail out if description not found.
 		if ( '' === $description ) {
 			return '';
 		}
@@ -323,33 +304,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string The OG image on success, or empty string.
 	 */
 	private function get_image( $meta_elements, $url ) {
-		// Bail out if there are no meta elements.
-		if ( empty( $meta_elements[0] ) ) {
-			return '';
-		}
+		$image = $this->get_metadata_from_meta_element( $meta_elements, 'property', '(?:og:image|og:image:url)' );
 
-		// Find the og:image or og:image:url meta element.
-		$pattern = '#property=([\"\']??)\s*(?:og:image|og:image:url)\s*\1[^>]*#isU';
-		$image   = '';
-		foreach ( $meta_elements[0] as $index => $element ) {
-			preg_match( $pattern, $element, $match );
-
-			// This meta is not an OG image. Skip it.
-			if ( empty( $match ) ) {
-				continue;
-			}
-
-			/*
-			 * Found the OG image meta element.
-			 * Get its URL from its matching content array.
-			 */
-			if ( isset( $meta_elements[2][ $index ] ) && is_string( $meta_elements[2][ $index ] ) ) {
-				$image = trim( $meta_elements[2][ $index ] );
-			}
-
-			break;
-		}
-
+		// Bail out if image not found.
 		if ( '' === $image ) {
 			return '';
 		}
@@ -543,5 +500,71 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		preg_match_all( $pattern, $html, $elements );
 
 		return $elements;
+	}
+
+	/**
+	 * Gets the metadata from a target meta element.
+	 *
+	 * @param array  $meta_elements {
+	 *     A multi-dimensional indexed array on success, or empty array.
+	 *
+	 *     @type string[] 0 Meta elements with a content attribute.
+	 *     @type string[] 1 Content attribute's opening quotation mark.
+	 *     @type string[] 2 Content attribute's value for each meta element.
+	 * }
+	 * @param string $attr Attribute that identifies the element with the target metadata.
+	 * @param string $attr_value The attribute's value that identifies the element with the target metadata.
+	 * @return string The metadata on success, or an empty string.
+	 */
+	private function get_metadata_from_meta_element( $meta_elements, $attr, $attr_value ) {
+		// Bail out if there are no meta elements.
+		if ( empty( $meta_elements[0] ) ) {
+			return '';
+		}
+
+		$metadata = '';
+		$pattern  = '#' .
+
+			/*
+			 * Target this attribute and value to find the metadata element.
+			 *
+			 * Allows for (a) no, single, double quotes and (b) whitespace in the value.
+			 *
+			 * Why capture the opening quotation mark, i.e. (["\']), and then backreference,
+			 * i.e \1, for the closing quotation mark?
+			 * To ensure the closing quotation mark matches the opening one. Why? Attribute values
+			 * can contain quotation marks, such as an apostrophe in the content.
+			 */
+			$attr . '=([\"\']??)\s*' . $attr_value . '\s*\1' .
+
+			/*
+			 * These are the options:
+			 * - i : case insensitive
+			 * - s : allows newline characters for the . match (needed for multiline elements)
+			 * - U means non-greedy matching
+			 */
+			'#isU';
+
+		// Find the metdata element.
+		foreach ( $meta_elements[0] as $index => $element ) {
+			preg_match( $pattern, $element, $match );
+
+			// This is not the metadata element. Skip it.
+			if ( empty( $match ) ) {
+				continue;
+			}
+
+			/*
+			 * Found the metadata element.
+			 * Get the metadata from its matching content array.
+			 */
+			if ( isset( $meta_elements[2][ $index ] ) && is_string( $meta_elements[2][ $index ] ) ) {
+				$metadata = trim( $meta_elements[2][ $index ] );
+			}
+
+			break;
+		}
+
+		return $metadata;
 	}
 }
