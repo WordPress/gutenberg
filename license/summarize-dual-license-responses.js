@@ -68,7 +68,7 @@ const statusFileContent = `# Current Status
 
 | Contributor Has | Number |
 | --- | --- |
-| Have Consented | ${consentResponses.consenting.length} |
+| Consented | ${consentResponses.consenting.length} |
 | Denied Consent | ${consentResponses.denying.length} |
 | No Response | ${consentResponses.noResponse.length} |
 

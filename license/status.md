@@ -11,7 +11,7 @@
 
 | Contributor Has | Number |
 | --- | --- |
-| Have Consented | 558 |
+| Consented | 558 |
 | Denied Consent | 2 |
 | No Response | 261 |
 
