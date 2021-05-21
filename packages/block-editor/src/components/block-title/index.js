@@ -35,43 +35,44 @@ import { store as blockEditorStore } from '../../store';
  * @return {?string} Block title.
  */
 export default function BlockTitle( { clientId } ) {
-	const { attributes, name, reusableBlockTitle } = useSelect(
+	const blockInformation = useBlockDisplayInformation( clientId );
+	const title = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return {};
+				return null;
 			}
+
 			const {
 				getBlockName,
 				getBlockAttributes,
 				__experimentalGetReusableBlockTitle,
 			} = select( blockEditorStore );
 			const blockName = getBlockName( clientId );
+
 			if ( ! blockName ) {
-				return {};
+				return null;
 			}
-			const isReusable = isReusableBlock( getBlockType( blockName ) );
-			return {
-				attributes: getBlockAttributes( clientId ),
-				name: blockName,
-				reusableBlockTitle:
-					isReusable &&
-					__experimentalGetReusableBlockTitle(
-						getBlockAttributes( clientId ).ref
-					),
-			};
+
+			const blockType = getBlockType( blockName );
+			const isReusable = isReusableBlock( blockType );
+			const attributes = getBlockAttributes( clientId );
+			const reusableBlockTitle =
+				isReusable &&
+				__experimentalGetReusableBlockTitle( attributes.ref );
+			const label =
+				reusableBlockTitle || getBlockLabel( blockType, attributes );
+
+			// Label will fallback to the title if no label is defined for the
+			// current label context. If the label is defined we prioritize it
+			// over possible possible block variation title match.
+			if ( label === blockType.title ) {
+				return null;
+			}
+
+			return truncate( label, { length: 35 } );
 		},
 		[ clientId ]
 	);
 
-	const blockInformation = useBlockDisplayInformation( clientId );
-	if ( ! name || ! blockInformation ) return null;
-	const blockType = getBlockType( name );
-	const label = reusableBlockTitle || getBlockLabel( blockType, attributes );
-	// Label will fallback to the title if no label is defined for the current
-	// label context. If the label is defined we prioritize it over possible
-	// possible block variation title match.
-	if ( label !== blockType.title ) {
-		return truncate( label, { length: 35 } );
-	}
-	return blockInformation.title;
+	return title || blockInformation.title;
 }
