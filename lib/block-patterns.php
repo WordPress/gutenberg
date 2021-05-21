@@ -15,7 +15,7 @@ function register_gutenberg_patterns() {
 	}
 
 	$patterns = array(
-		'query/standard-posts'                 => array(
+		'query_standard-posts'                 => array(
 			'title'      => __( 'Standard', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -33,7 +33,7 @@ function register_gutenberg_patterns() {
 							</div>
 							<!-- /wp:query -->',
 		),
-		'query/medium-posts'                   => array(
+		'query_medium-posts'                   => array(
 			'title'      => __( 'Image at left', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -53,7 +53,7 @@ function register_gutenberg_patterns() {
 							</div>
 							<!-- /wp:query -->',
 		),
-		'query/small-posts'                    => array(
+		'query_small-posts'                    => array(
 			'title'      => __( 'Small image and title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -72,7 +72,7 @@ function register_gutenberg_patterns() {
 							</div>
 							<!-- /wp:query -->',
 		),
-		'query/grid-posts'                     => array(
+		'query_grid-posts'                     => array(
 			'title'      => __( 'Grid', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -88,7 +88,7 @@ function register_gutenberg_patterns() {
 							</div>
 							<!-- /wp:query -->',
 		),
-		'query/large-title-posts'              => array(
+		'query_large-title-posts'              => array(
 			'title'      => __( 'Large title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -112,7 +112,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query --></div>
 							<!-- /wp:group -->',
 		),
-		'query/offset-posts'                   => array(
+		'query_offset-posts'                   => array(
 			'title'      => __( 'Offsetss', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -146,7 +146,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:group -->',
 		),
 		// Initial block pattern to be used with block transformations with patterns.
-		'social-links/shared-background-color' => array(
+		'social-links_shared-background-color' => array(
 			'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
 			'categories'    => array( 'buttons' ),
 			'blockTypes'    => array( 'core/social-links' ),
