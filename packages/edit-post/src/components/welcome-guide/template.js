@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { DocumentationImage } from './images';
+import { TemplateEditorImage } from './images';
 import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuideTemplate() {
@@ -22,7 +22,7 @@ export default function WelcomeGuideTemplate() {
 			onFinish={ () => toggleFeature( 'welcomeGuideTemplate' ) }
 			pages={ [
 				{
-					image: <DocumentationImage />,
+					image: <TemplateEditorImage />,
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">

@@ -12,14 +12,14 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { contextConnect } from '../context';
-import { Elevation } from '../elevation';
+import { Elevation } from '../../elevation';
 import { View } from '../../view';
 import * as styles from './styles';
 import { useCard } from './hook';
 import CONFIG from '../../utils/config-values';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').CardProps, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').CardProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Card( props, forwardedRef ) {

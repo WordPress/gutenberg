@@ -7,7 +7,11 @@
 The shadow effect is generated using the `value` prop.
 
 ```jsx
-import { Elevation, Surface, Text, View } from '@wordpress/components/ui';
+import {
+	__experimentalElevation as Elevation,
+	__experimentalSurface as Surface,
+	__experimentalText as Text
+} from '@wordpress/components';
 
 function Example() {
 	return (
@@ -63,3 +67,15 @@ Dimensional offsets (margin) for the shadow.
 
 Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
 In the example below, `isInteractive` is activated to give a better sense of depth.
+
+```jsx
+import { __experimentalElevation as Elevation } from '@wordpress/components';
+
+function Example() {
+	return (
+		<div>
+			<Elevation isInteractive value={ 200 } />
+		</div>
+	);
+}
+```

@@ -194,13 +194,19 @@ be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to debounce, so please wrap functions created on
 render in components in `useCallback`.
 
+_Related_
+
+-   <https://docs-lodash.com/v4/debounce/>
+
 _Parameters_
 
--   _args_ `...any`: Arguments passed to Lodash's `debounce`.
+-   _fn_ `TFunc`: The function to debounce.
+-   _wait_ `[number]`: The number of milliseconds to delay.
+-   _options_ `[import('lodash').DebounceSettings]`: The options object.
 
 _Returns_
 
--   `Function`: Debounced function.
+-   `TFunc & import('lodash').Cancelable`: Debounced function.
 
 <a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
 
@@ -255,11 +261,11 @@ const WithFocusReturn = () => {
 
 _Parameters_
 
--   _onFocusReturn_ `Function?`: Overrides the default return behavior.
+-   _onFocusReturn_ `[() => void]`: Overrides the default return behavior.
 
 _Returns_
 
--   `Function`: Element Ref.
+-   `import('react').RefCallback<HTMLElement>`: Element Ref.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
@@ -305,13 +311,42 @@ _Returns_
 
 <a name="useMergeRefs" href="#useMergeRefs">#</a> **useMergeRefs**
 
-Merges refs into one ref callback. Ensures the merged ref callbacks are only
-called when it changes (as a result of a `useCallback` dependency update) or
-when the ref value changes. If you don't wish a ref callback to be called on
-every render, wrap it with `useCallback( ref, [] )`.
-Dependencies can be added, but when a dependency changes, the old ref
-callback will be called with `null` and the new ref callback will be called
-with the same node.
+Merges refs into one ref callback.
+
+It also ensures that the merged ref callbacks are only called when they
+change (as a result of a `useCallback` dependency update) OR when the ref
+value changes, just as React does when passing a single ref callback to the
+component.
+
+As expected, if you pass a new function on every render, the ref callback
+will be called after every render.
+
+If you don't wish a ref callback to be called after every render, wrap it
+with `useCallback( callback, dependencies )`. When a dependency changes, the
+old ref callback will be called with `null` and the new ref callback will be
+called with the same value.
+
+To make ref callbacks easier to use, you can also pass the result of
+`useRefEffect`, which makes cleanup easier by allowing you to return a
+cleanup function instead of handling `null`.
+
+It's also possible to _disable_ a ref (and its behaviour) by simply not
+passing the ref.
+
+```jsx
+const ref = useRefEffect( ( node ) => {
+  node.addEventListener( ... );
+  return () => {
+    node.removeEventListener( ... );
+  };
+}, [ ...dependencies ] );
+const otherRef = useRef();
+const mergedRefs useMergeRefs( [
+  enabled && ref,
+  otherRef,
+] );
+return <div ref={ mergedRefs } />;
+```
 
 _Parameters_
 
@@ -332,7 +367,7 @@ _Parameters_
 
 _Returns_
 
--   `T|undefined`: The value from the previous render.
+-   `T | undefined`: The value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
