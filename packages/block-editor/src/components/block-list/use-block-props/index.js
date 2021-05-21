@@ -98,8 +98,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
 				enableAnimation:
-					! isTyping() &&
-					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD &&
+					( ! isSelected || ! isTyping() ),
 			};
 		},
 		[ clientId ]
