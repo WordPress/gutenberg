@@ -30,9 +30,9 @@ function BlockListAppender( {
 	tagName: TagName = 'div',
 } ) {
 	if ( undefined !== CustomAppender ) {
-		deprecated( 'renderAppender prop of the BlockListAppender component', {
-			since: '5.7',
-			alternative: 'appender prop of the BlockListAppender component',
+		deprecated( 'renderAppender prop', {
+			since: '10.8',
+			alternative: 'appender prop',
 		} );
 	}
 
