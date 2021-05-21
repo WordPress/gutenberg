@@ -33,7 +33,7 @@ function BlockListAppender( {
 		} );
 	}
 
-	if ( isLocked ) {
+	if ( isLocked || false === appender ) {
 		return null;
 	}
 
