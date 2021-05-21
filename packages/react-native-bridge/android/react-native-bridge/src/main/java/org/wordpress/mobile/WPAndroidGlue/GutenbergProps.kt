@@ -10,6 +10,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableUnsupportedBlockEditor: Boolean,
     val canEnableUnsupportedBlockEditor: Boolean,
     val enableAudioBlock: Boolean,
+    val enableReusableBlock: Boolean,
     val localeSlug: String,
     val postType: String,
     val featuredImageId: Int,
@@ -49,6 +50,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_AUDIO_BLOCK, enableAudioBlock)
+        putBoolean(PROP_CAPABILITIES_REUSABLE_BLOCK, enableReusableBlock)
         putBoolean(PROP_CAPABILITIES_CAN_VIEW_EDITOR_ONBOARDING, canViewEditorOnboarding)
     }
 
@@ -80,6 +82,7 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
         const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
         const val PROP_CAPABILITIES_AUDIO_BLOCK = "audioBlock"
+        const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
         const val PROP_CAPABILITIES_CAN_VIEW_EDITOR_ONBOARDING = "canViewEditorOnboarding"
     }
 }

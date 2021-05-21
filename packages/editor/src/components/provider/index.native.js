@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import memize from 'memize';
+
+/**
  * WordPress dependencies
  */
 import RNReactNativeGutenbergBridge, {
@@ -63,6 +68,15 @@ class NativeEditorProvider extends Component {
 			'postType',
 			this.post.type,
 			this.post
+		);
+		this.getEditorSettings = memize(
+			( settings, capabilities ) => ( {
+				...settings,
+				capabilities,
+			} ),
+			{
+				maxSize: 1,
+			}
 		);
 	}
 
@@ -270,11 +284,18 @@ class NativeEditorProvider extends Component {
 		const {
 			children,
 			post, // eslint-disable-line no-unused-vars
+			capabilities,
+			settings,
 			...props
 		} = this.props;
+		const editorSettings = this.getEditorSettings( settings, capabilities );
 
 		return (
-			<EditorProvider post={ this.post } { ...props }>
+			<EditorProvider
+				post={ this.post }
+				settings={ editorSettings }
+				{ ...props }
+			>
 				{ children }
 			</EditorProvider>
 		);

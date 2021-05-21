@@ -19,6 +19,7 @@ import { isURL } from '@wordpress/url';
  */
 import { filePasteHandler } from './file-paste-handler';
 import { addActiveFormats, isShortcode } from './utils';
+import { splitValue } from './split-value';
 
 export function usePasteHandler( props ) {
 	const propsRef = useRef( props );
@@ -34,7 +35,7 @@ export function usePasteHandler( props ) {
 				tagName,
 				onReplace,
 				onSplit,
-				splitValue,
+				onSplitMiddle,
 				__unstableEmbedURLOnPaste,
 				multilineTag,
 				preserveWhiteSpace,
@@ -140,7 +141,14 @@ export function usePasteHandler( props ) {
 				if ( onReplace && isEmpty( value ) ) {
 					onReplace( content );
 				} else {
-					splitValue( value, content );
+					splitValue( {
+						value,
+						pastedBlocks: content,
+						onReplace,
+						onSplit,
+						onSplitMiddle,
+						multilineTag,
+					} );
 				}
 
 				return;
@@ -196,7 +204,14 @@ export function usePasteHandler( props ) {
 				if ( onReplace && isEmpty( value ) ) {
 					onReplace( content, content.length - 1, -1 );
 				} else {
-					splitValue( value, content );
+					splitValue( {
+						value,
+						pastedBlocks: content,
+						onReplace,
+						onSplit,
+						onSplitMiddle,
+						multilineTag,
+					} );
 				}
 			}
 		}

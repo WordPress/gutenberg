@@ -15,6 +15,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	store as blockEditorStore,
+	useSetting,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -22,6 +23,7 @@ import {
 	UnitControl,
 	getValueAndUnit,
 	alignmentHelpers,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -33,7 +35,6 @@ import {
 	getWidths,
 	getWidthWithUnit,
 	isPercentageUnit,
-	CSS_UNITS,
 } from '../columns/utils';
 
 const { isWider } = alignmentHelpers;
@@ -62,6 +63,16 @@ function ColumnEdit( {
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
 	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
+
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'layout.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
+	} );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -169,7 +180,7 @@ function ColumnEdit( {
 									getWidths( columns )[ selectedColumnIndex ]
 								}
 								unit={ widthUnit }
-								units={ CSS_UNITS }
+								units={ units }
 								preview={
 									<ColumnsPreview
 										columnWidths={ getWidths(

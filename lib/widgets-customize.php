@@ -75,7 +75,7 @@ function gutenberg_widgets_customize_register( $manager ) {
  * @param string $id   Widget setting ID.
  */
 function gutenberg_widgets_customize_add_unstable_instance( $args, $id ) {
-	if ( preg_match( '/^widget_(?P<id_base>.+?)(?:\[(?P<widget_number>\d+)\])?$/', $id, $matches ) ) {
+	if ( gutenberg_use_widgets_block_editor() && preg_match( '/^widget_(?P<id_base>.+?)(?:\[(?P<widget_number>\d+)\])?$/', $id, $matches ) ) {
 		$id_base = $matches['id_base'];
 
 		$args['sanitize_callback'] = function( $value ) use ( $id_base ) {
@@ -166,9 +166,7 @@ function gutenberg_widgets_customize_load_block_editor_scripts_and_styles( $is_b
 	return $is_block_editor_screen;
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-widgets-in-customizer' ) ) {
-	add_action( 'customize_register', 'gutenberg_widgets_customize_register' );
-	add_filter( 'widget_customizer_setting_args', 'gutenberg_widgets_customize_add_unstable_instance', 10, 2 );
-	add_action( 'customize_controls_enqueue_scripts', 'gutenberg_customize_widgets_init' );
-	add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_customize_load_block_editor_scripts_and_styles' );
-}
+add_action( 'customize_register', 'gutenberg_widgets_customize_register' );
+add_filter( 'widget_customizer_setting_args', 'gutenberg_widgets_customize_add_unstable_instance', 10, 2 );
+add_action( 'customize_controls_enqueue_scripts', 'gutenberg_customize_widgets_init' );
+add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_customize_load_block_editor_scripts_and_styles' );

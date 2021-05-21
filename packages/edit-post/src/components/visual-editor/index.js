@@ -60,7 +60,7 @@ function MaybeIframe( {
 				<div
 					ref={ contentRef }
 					className="editor-styles-wrapper"
-					style={ { width: '100%', height: '100%', ...style } }
+					style={ { flex: '1', ...style } }
 				>
 					{ children }
 				</div>
@@ -70,7 +70,6 @@ function MaybeIframe( {
 
 	return (
 		<Iframe
-			headHTML={ window.__editorStyles.html }
 			head={ <EditorStyles styles={ styles } /> }
 			ref={ ref }
 			contentRef={ contentRef }
@@ -93,13 +92,19 @@ export default function VisualEditor( { styles } ) {
 			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const _isTemplateMode = isEditingTemplate();
+		let _wrapperBlockName;
+
+		if ( getCurrentPostType() === 'wp_block' ) {
+			_wrapperBlockName = 'core/block';
+		} else if ( ! _isTemplateMode ) {
+			_wrapperBlockName = 'core/post-content';
+		}
+
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			isTemplateMode: isEditingTemplate(),
-			wrapperBlockName:
-				getCurrentPostType() === 'wp_block'
-					? 'core/block'
-					: 'core/post-content',
+			isTemplateMode: _isTemplateMode,
+			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
 	}, [] );
@@ -119,6 +124,9 @@ export default function VisualEditor( { styles } ) {
 		margin: 0,
 		display: 'flex',
 		flexFlow: 'column',
+		// Default background color so that grey
+		// .edit-post-editor-regions__content color doesn't show through.
+		background: 'white',
 	};
 	const templateModeStyles = {
 		...desktopCanvasStyles,
@@ -159,7 +167,7 @@ export default function VisualEditor( { styles } ) {
 		useBlockSelectionClearer(),
 	] );
 
-	const blockSelectionClearerRef = useBlockSelectionClearer( true );
+	const blockSelectionClearerRef = useBlockSelectionClearer();
 
 	const [ , RecursionProvider ] = useNoRecursiveRenders(
 		wrapperUniqueId,
@@ -167,83 +175,87 @@ export default function VisualEditor( { styles } ) {
 	);
 
 	return (
-		<motion.div
+		<div
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }
-			animate={
-				isTemplateMode ? { padding: '48px 48px 0' } : { padding: 0 }
-			}
-			ref={ blockSelectionClearerRef }
 		>
-			{ themeSupportsLayout && (
-				<LayoutStyle
-					selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-					layout={ defaultLayout }
-				/>
-			) }
 			<VisualEditorGlobalKeyboardShortcuts />
-			{ isTemplateMode && (
-				<Button
-					className="edit-post-visual-editor__exit-template-mode"
-					icon={ arrowLeft }
-					onClick={ () => {
-						clearSelectedBlock();
-						setIsEditingTemplate( false );
+			<BlockTools __unstableContentRef={ ref }>
+				<motion.div
+					className="edit-post-visual-editor__content-area"
+					animate={ {
+						padding: isTemplateMode ? '48px 48px 0' : '0',
 					} }
+					ref={ blockSelectionClearerRef }
 				>
-					{ __( 'Back' ) }
-				</Button>
-			) }
-			<motion.div
-				animate={ animatedStyles }
-				initial={ desktopCanvasStyles }
-			>
-				<BlockTools __unstableContentRef={ ref }>
-					<MaybeIframe
-						isTemplateMode={ isTemplateMode }
-						contentRef={ contentRef }
-						styles={ styles }
-						style={ { paddingBottom } }
+					{ isTemplateMode && (
+						<Button
+							className="edit-post-visual-editor__exit-template-mode"
+							icon={ arrowLeft }
+							onClick={ () => {
+								clearSelectedBlock();
+								setIsEditingTemplate( false );
+							} }
+						>
+							{ __( 'Back' ) }
+						</Button>
+					) }
+					<motion.div
+						animate={ animatedStyles }
+						initial={ desktopCanvasStyles }
 					>
-						<AnimatePresence>
-							<motion.div
-								key={ isTemplateMode ? 'template' : 'post' }
-								initial={ { opacity: 0 } }
-								animate={ { opacity: 1 } }
-							>
-								<WritingFlow>
-									{ ! isTemplateMode && (
-										<div className="edit-post-visual-editor__post-title-wrapper">
-											<PostTitle />
-										</div>
-									) }
-									<RecursionProvider>
-										<BlockList
-											__experimentalLayout={
-												themeSupportsLayout
-													? {
-															type: 'default',
-															// Find a way to inject this in the support flag code (hooks).
-															alignments: themeSupportsLayout
-																? alignments
-																: undefined,
-													  }
-													: undefined
-											}
-										/>
-									</RecursionProvider>
-								</WritingFlow>
-							</motion.div>
-						</AnimatePresence>
-					</MaybeIframe>
-				</BlockTools>
-			</motion.div>
+						<MaybeIframe
+							isTemplateMode={ isTemplateMode }
+							contentRef={ contentRef }
+							styles={ styles }
+							style={ { paddingBottom } }
+						>
+							{ themeSupportsLayout && (
+								<LayoutStyle
+									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+									layout={ defaultLayout }
+								/>
+							) }
+							<AnimatePresence>
+								<motion.div
+									key={ isTemplateMode ? 'template' : 'post' }
+									initial={ { opacity: 0 } }
+									animate={ { opacity: 1 } }
+								>
+									<WritingFlow>
+										{ ! isTemplateMode && (
+											<div className="edit-post-visual-editor__post-title-wrapper">
+												<PostTitle />
+											</div>
+										) }
+										<RecursionProvider>
+											<BlockList
+												__experimentalLayout={
+													themeSupportsLayout
+														? {
+																type: 'default',
+																// Find a way to inject this in the support flag code (hooks).
+																alignments: themeSupportsLayout
+																	? alignments
+																	: undefined,
+														  }
+														: undefined
+												}
+											/>
+										</RecursionProvider>
+									</WritingFlow>
+								</motion.div>
+							</AnimatePresence>
+						</MaybeIframe>
+					</motion.div>
+				</motion.div>
+			</BlockTools>
 			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__unstableBlockSettingsMenuFirstItem>
-		</motion.div>
+		</div>
 	);
 }

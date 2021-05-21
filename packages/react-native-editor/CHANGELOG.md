@@ -10,17 +10,19 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+-   [***] Slash inserter [#29772]
+-   [*] Audio block: Add Insert from URL functionality. [#27817]
+-   [*] Fix missing title for some unsupported blocks [#31743]
+-   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
+-   [***] Enable reusable block only in WP.com sites [#31744]
+
+## 1.53.0
+
 -   [*] Bottom-sheet: Add custom header [#30291]
 -   [*] Fixes color picker rendering bug when scrolling [#30994]
 -   [*] Add enableCaching param to fetch request on Android [#31186]
--   [*] Disabled featured image banner on iOS. [#31681]
 -   [***] Add reusable blocks to the inserter menu. [#28495]
-
-## 1.52.1
-
-- [*] Fixes for the generated localized strings files.
-
-## 1.52.0
 
 ## 1.52.2
 
@@ -28,7 +30,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.52.1
 
-- [*] Fixes for the generated localized strings files.
+-   [*] Fixes for the generated localized strings files.
 
 ## 1.52.0
 
