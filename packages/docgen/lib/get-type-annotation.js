@@ -8,12 +8,13 @@ const { types: babelTypes } = require( '@babel/core' );
 /** @typedef {ReturnType<import('comment-parser').parse>[0]} CommentBlock */
 /** @typedef {CommentBlock['tags'][0]} CommentTag */
 /** @typedef {babelTypes.TSType} TypeAnnotation */
+/** @typedef {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} ExtendedTypeAnnotation */
 /** @typedef {import('@babel/core').Node} ASTNode */
 /* eslint-enable jsdoc/valid-types */
 
 /**
- * @param {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} typeAnnotation
- * @param {' => ' | ': '} returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
+ * @param {ExtendedTypeAnnotation} typeAnnotation
+ * @param {' => ' | ': '}          returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
  */
 function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 	const nonRestParams = typeAnnotation.parameters
