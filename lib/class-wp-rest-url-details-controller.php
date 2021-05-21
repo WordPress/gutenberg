@@ -124,7 +124,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 				'title'       => $this->get_title( $html_head ),
 				'icon'        => $this->get_icon( $html_head, $url ),
 				'description' => $this->get_description( $meta_elements ),
-				'image'       => $this->get_image( $html_head, $url ),
+				'image'       => $this->get_image( $meta_elements, $url ),
 			),
 			$request
 		);
@@ -312,21 +312,52 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 *
 	 * See: https://ogp.me/.
 	 *
-	 * @param string $html the HTML from the remote website at URL.
-	 * @param string $url the target website URL.
-	 * @return string the OG image (maybe empty).
+	 * @param array  $meta_elements {
+	 *     A multi-dimensional indexed array on success, or empty array.
+	 *
+	 *     @type string[] 0 Meta elements with a content attribute.
+	 *     @type string[] 1 Content attribute's opening quotation mark.
+	 *     @type string[] 2 Content attribute's value for each meta element.
+	 * }
+	 * @param string $url The target website URL.
+	 * @return string The OG image on success, or empty string.
 	 */
-	private function get_image( $html, $url ) {
-		preg_match( '|<meta.*?property="og:image[:url]*?".*?content="(.*?)".*?\/?>|is', $html, $matches );
+	private function get_image( $meta_elements, $url ) {
+		// Bail out if there are no meta elements.
+		if ( empty( $meta_elements[0] ) ) {
+			return '';
+		}
 
-		$image = isset( $matches[1] ) && is_string( $matches[1] ) ? trim( $matches[1] ) : '';
+		// Find the og:image or og:image:url meta element.
+		$pattern = '#property=([\"\']??)\s*(?:og:image|og:image:url)\s*\1[^>]*#isU';
+		$image   = '';
+		foreach ( $meta_elements[0] as $index => $element ) {
+			preg_match( $pattern, $element, $match );
+
+			// This meta is not an OG image. Skip it.
+			if ( empty( $match ) ) {
+				continue;
+			}
+
+			/*
+			 * Found the OG image meta element.
+			 * Get its URL from its matching content array.
+			 */
+			if ( isset( $meta_elements[2][ $index ] ) && is_string( $meta_elements[2][ $index ] ) ) {
+				$image = trim( $meta_elements[2][ $index ] );
+			}
+
+			break;
+		}
+
+		if ( '' === $image ) {
+			return '';
+		}
 
 		// Attempt to convert relative URLs to absolute.
-		if ( ! empty( $image ) ) {
-			$parsed_url = parse_url( $url );
-			$root_url   = $parsed_url['scheme'] . '://' . $parsed_url['host'] . '/';
-			$image      = \WP_Http::make_absolute_url( $image, $root_url );
-		}
+		$parsed_url = parse_url( $url );
+		$root_url   = $parsed_url['scheme'] . '://' . $parsed_url['host'] . '/';
+		$image      = WP_Http::make_absolute_url( $image, $root_url );
 
 		return $image;
 	}
