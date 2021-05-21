@@ -197,7 +197,9 @@ register_setting(
 			'schema' => array(
 				'type'       => 'object',
 				'properties' => array(
-					'custom_logo' => array( 'type' => 'integer' ),
+					'custom_logo' => array(
+						'type' => array( 'integer', 'boolean' ),
+					),
 				),
 			),
 		),
@@ -234,6 +236,7 @@ function gutenberg_rest_pre_get_setting_filter_custom_logo( $result, $name ) {
 			'custom_logo' => get_theme_mod( 'custom_logo' ),
 		);
 	}
+	return $result;
 }
 add_filter( 'rest_pre_get_setting', 'gutenberg_rest_pre_get_setting_filter_custom_logo', 10, 2 );
 
@@ -258,6 +261,7 @@ function gutenberg_rest_pre_set_setting_filter_theme_mods( $result, $name, $valu
 		update_option( $theme_mods_setting_name, $value );
 		return true;
 	}
+	return $result;
 }
 
 add_filter( 'rest_pre_update_setting', 'gutenberg_rest_pre_set_setting_filter_theme_mods', 10, 3 );
