@@ -694,12 +694,16 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	 */
 	public function test_get_description( $html, $expected ) {
 		$controller = new WP_REST_URL_Details_Controller();
-		$method     = $this->get_reflective_method( 'get_description' );
 
-		$actual = $method->invoke(
+		// Parse the meta elements from the given HTML.
+		$method        = $this->get_reflective_method( 'get_meta_with_content_elements' );
+		$meta_elements = $method->invoke(
 			$controller,
 			$this->wrap_html_in_doc( $html )
 		);
+
+		$method = $this->get_reflective_method( 'get_description' );
+		$actual = $method->invoke( $controller, $meta_elements );
 		$this->assertSame( $expected, $actual );
 	}
 
