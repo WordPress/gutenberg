@@ -10,8 +10,8 @@ import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef } from '@wordpress/element';
 
 function useRemoteUrlData( url ) {
-	let { current: isMounted } = useRef( false );
-	const [ richData, setRichData ] = useState( {} );
+	const isMounted = useRef( false );
+	const [ richData, setRichData ] = useState( null );
 
 	const { fetchRemoteUrlData } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -21,24 +21,24 @@ function useRemoteUrlData( url ) {
 	}, [] );
 
 	useEffect( () => {
+		isMounted.current = true;
+		return () => {
+			isMounted.current = false;
+		};
+	}, [] );
+
+	useEffect( () => {
 		const fetchRichData = async () => {
 			const urlData = await fetchRemoteUrlData( url );
-			if ( isMounted ) {
+			if ( isMounted.current ) {
 				setRichData( urlData );
 			}
 		};
 
-		if ( url?.length && isMounted ) {
+		if ( url?.length && isMounted.current ) {
 			fetchRichData();
 		}
 	}, [ url ] );
-
-	useEffect( () => {
-		isMounted = true;
-		return () => {
-			isMounted = false;
-		};
-	}, [] );
 
 	return richData;
 }
