@@ -33,15 +33,19 @@ export default function CalendarEdit( { attributes } ) {
 		const { getEntityRecords, hasFinishedResolution } = select( coreStore );
 		const { getEditedPostAttribute } = select( editorStore );
 
-		const query = {
+		const singlePublishedPostQuery = {
 			status: 'publish',
 			per_page: 1,
 		};
-		const posts = getEntityRecords( 'postType', 'post', query );
+		const posts = getEntityRecords(
+			'postType',
+			'post',
+			singlePublishedPostQuery
+		);
 		const postsResolved = hasFinishedResolution( 'getEntityRecords', [
 			'postType',
 			'post',
-			query,
+			singlePublishedPostQuery,
 		] );
 
 		const postType = getEditedPostAttribute( 'type' );
@@ -53,8 +57,7 @@ export default function CalendarEdit( { attributes } ) {
 		return {
 			date: _date,
 			hasPostsResolved: postsResolved,
-			hasPosts:
-				postsResolved && Array.isArray( posts ) && posts.length === 1,
+			hasPosts: postsResolved && posts?.length === 1,
 		};
 	}, [] );
 
