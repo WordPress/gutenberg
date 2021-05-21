@@ -278,11 +278,6 @@
 		"env": "wp-scripts env",
 		"wp-env": "wp-env"
 	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	},
 	"lint-staged": {
 		"package-lock.json": [
 			"npm run lint-lockfile",
