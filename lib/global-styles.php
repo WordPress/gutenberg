@@ -377,8 +377,15 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 	add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 	add_filter( 'theme_json_allowed_schema', 'gutenberg_global_styles_theme_json_allowed_schema' );
 	add_filter( 'theme_json_core_data', 'gutenberg_global_styles_theme_json_core_data' );
+
+	// This is only necessary to make it work with WordPress 5.8-alpha.
+	// When https://github.com/WordPress/wordpress-develop/pull/1262 lands
+	// and the wp-env is updated accordingly this can be removed.
+	if ( ! class_exists( 'WP_Theme_JSON') ) {
+		add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings_5_8', PHP_INT_MAX );
+	}
+
 } else {
-	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings_5_8', PHP_INT_MAX );
 	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 }
 
