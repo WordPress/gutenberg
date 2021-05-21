@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ],
 	},
 	"references": [
 		{ "path": "../element" },
@@ -20,6 +21,8 @@
 		"src/hooks/use-instance-id/**/*",
 		"src/hooks/use-focus-return/**/*",
 		"src/hooks/use-previous/**/*",
+		"src/hooks/use-media-query/**/*",
+		"src/hooks/use-reduced-motion/**/*",
 		"src/utils/**/*"
 	]
 }
