@@ -785,7 +785,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'description with multiline and other attributes',
 			),
 
-			// Happy paths with HTML tags in the description.
+			// Happy paths with HTML tags or entities in the description.
 			'with HTML tags'                             => array(
 				'<meta name="description" content="<strong>Description</strong>: has <em>HTML</em> tags">',
 				'<strong>Description</strong>: has <em>HTML</em> tags',
@@ -797,6 +797,10 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			'with HTML tags and other attributes'        => array(
 				'<meta first="first" name="description" third="third" content="<strong>Description</strong>: has <em>HTML</em> tags" fifth="fifth>',
 				'<strong>Description</strong>: has <em>HTML</em> tags',
+			),
+			'with HTML entities'                         => array(
+				'<meta name="description" content="The &lt;strong&gt;description&lt;/strong&gt; meta &amp; its attribute value"',
+				'The <strong>description</strong> meta & its attribute value',
 			),
 
 			// Unhappy paths.

@@ -283,7 +283,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return '';
 		}
 
-		// @TODO ensure well-formed HTML.
+		// Convert any entities to HTML for use downstream.
+		$description = html_entity_decode( $description, ENT_QUOTES, get_bloginfo( 'charset' ) );
 
 		return $description;
 	}
