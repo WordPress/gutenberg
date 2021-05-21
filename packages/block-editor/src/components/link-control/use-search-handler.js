@@ -19,11 +19,7 @@ import { store as blockEditorStore } from '../../store';
 
 export const handleNoop = () => Promise.resolve( [] );
 
-export const handleDirectEntry = async (
-	val,
-	fetchRemoteUrlData,
-	{ fetchUrlInfo = true } = {}
-) => {
+export const handleDirectEntry = ( val ) => {
 	let type = 'URL';
 
 	const protocol = getProtocol( val ) || '';
@@ -40,44 +36,14 @@ export const handleDirectEntry = async (
 		type = 'internal';
 	}
 
-	const defaultResponse = {
-		id: val,
-		title: val,
-		url: type === 'URL' ? prependHTTP( val ) : val,
-		type,
-	};
-
-	if (
-		fetchUrlInfo &&
-		type === 'URL' &&
-		isURLLike( prependHTTP( val ) ) &&
-		val.length > 3
-	) {
-		try {
-			const urlData = await fetchRemoteUrlData( val );
-
-			return [
-				{
-					...defaultResponse,
-					richMeta: {
-						...( urlData?.title && {
-							title: urlData.title,
-						} ),
-						...( urlData?.description && {
-							description: urlData.description,
-						} ),
-						...( urlData?.icon && {
-							icon: urlData.title,
-						} ),
-					},
-				},
-			];
-		} catch ( error ) {
-			return [ defaultResponse ];
-		}
-	}
-
-	return [ defaultResponse ];
+	return Promise.resolve( [
+		{
+			id: val,
+			title: val,
+			url: type === 'URL' ? prependHTTP( val ) : val,
+			type,
+		},
+	] );
 };
 
 const handleEntitySearch = async (
@@ -143,18 +109,13 @@ export default function useSearchHandler(
 	withCreateSuggestion,
 	withURLSuggestion
 ) {
-	const { fetchSearchSuggestions, fetchRemoteUrlData } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return {
-				fetchSearchSuggestions: getSettings()
-					.__experimentalFetchLinkSuggestions,
-				fetchRemoteUrlData: getSettings()
-					.__experimentalFetchRemoteUrlData,
-			};
-		},
-		[]
-	);
+	const { fetchSearchSuggestions } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return {
+			fetchSearchSuggestions: getSettings()
+				.__experimentalFetchLinkSuggestions,
+		};
+	}, [] );
 
 	const directEntryHandler = allowDirectEntry
 		? handleDirectEntry
@@ -163,9 +124,7 @@ export default function useSearchHandler(
 	return useCallback(
 		( val, { isInitialSuggestions } ) => {
 			return isURLLike( val )
-				? directEntryHandler( val, fetchRemoteUrlData, {
-						isInitialSuggestions,
-				  } )
+				? directEntryHandler( val, { isInitialSuggestions } )
 				: handleEntitySearch(
 						val,
 						{ ...suggestionsQuery, isInitialSuggestions },
