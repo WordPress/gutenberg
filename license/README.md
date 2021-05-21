@@ -78,10 +78,8 @@ The authors of the PRs were extracted by running
 cat 2021-04-16_merged-or-open-prs.json \
   | jq --raw-output '.data.repository.pullRequests.nodes[].author.login' \
   | sort \
-  | uniq \
-  > 2021-04-16_merged-or-open-prs_authors.txt
+  | uniq
 ```
-the output of which is saved [here](data/2021-04-16_merged-or-open-prs_authors.txt).
 
 ##### All Authors and Co-Authors of commits on trunk
 
@@ -151,20 +149,9 @@ cat all_commits_before_2021-04-16.json \
   > all_commit_authors_with_github_logins.txt
 ```
 
-the output of which is saved [here](data/all_commit_authors_with_github_logins.txt).
-
 ##### Resulting data
 
-I determined all of the "contributors" for which we have GitHub logins by running
-
-```
-cat all_commit_authors_with_github_logins.txt 2021-04-16_merged-or-open-prs_authors.txt \
-  | sort \
-  | uniq \
-  > 2021-04-16_gutenberg_contributors_with_github_logins.txt
-```
-
-which is saved [here](data/2021-04-16_gutenberg_contributors_with_github_logins.txt).
+All contributors for which we have GitHub logins were determined by combining the users with commits on `trunk` with the users who had opened or merged any Gutenberg PR.
 
 These users were used to initialize the `gitHubUserContributors.responses` array in `dual-license-responses.json`.
 
