@@ -36,6 +36,7 @@
 		"src/__next/**/*",
 		"src/h-stack/**/*",
 		"src/v-stack/**/*",
+		"src/z-stack/**/*",
 		"src/view/**/*"
 	],
 	"exclude": [

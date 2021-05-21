@@ -1230,6 +1230,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ZStack",
+		"slug": "z-stack",
+		"markdown_source": "../packages/components/src/z-stack/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Package Reference",
 		"slug": "packages",
 		"markdown_source": "../docs/reference-guides/packages.md",
