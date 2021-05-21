@@ -261,11 +261,11 @@ const WithFocusReturn = () => {
 
 _Parameters_
 
--   _onFocusReturn_ `Function?`: Overrides the default return behavior.
+-   _onFocusReturn_ `[() => void]`: Overrides the default return behavior.
 
 _Returns_
 
--   `Function`: Element Ref.
+-   `import('react').RefCallback<HTMLElement>`: Element Ref.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
