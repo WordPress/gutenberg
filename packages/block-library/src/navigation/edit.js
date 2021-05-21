@@ -153,7 +153,7 @@ function Navigation( {
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				isSelected ? (
-					<InnerBlocks.DefaultAppender />
+					<InnerBlocks.DefaultBlockAppender />
 				) : (
 					false
 				),
