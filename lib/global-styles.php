@@ -263,40 +263,43 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 	return ! ! preg_match( '/^var\(--wp-[a-zA-Z0-9\-]+\)$/', trim( $parts[1] ) );
 }
 
-function gutenberg_global_styles_theme_json_allowed_settings( $allowed_settings ) {
+function gutenberg_global_styles_theme_json_allowed_schema( $allowed_schema ) {
 	return array(
-		'border'     => array(
-			'customColor'  => null,
-			'customRadius' => null,
-			'customStyle'  => null,
-			'customWidth'  => null,
-		),
-		'color'      => array(
-			'custom'         => null,
-			'customGradient' => null,
-			'duotone'        => null,
-			'gradients'      => null,
-			'link'           => null,
-			'palette'        => null,
-		),
-		'custom'     => null,
-		'layout'     => null,
-		'spacing'    => array(
-			'customMargin'  => null,
-			'customPadding' => null,
-			'units'         => null,
-		),
-		'typography' => array(
-			'customFontSize'        => null,
-			'customFontStyle'       => null,
-			'customFontWeight'      => null,
-			'customLineHeight'      => null,
-			'customTextDecorations' => null,
-			'customTextTransforms'  => null,
-			'dropCap'               => null,
-			'fontFamilies'          => null,
-			'fontSizes'             => null,
-		),
+		'topLevel' => $allowed_schema['topLevel'],
+		'settings' => array(
+			'border'     => array(
+				'customColor'  => null,
+				'customRadius' => null,
+				'customStyle'  => null,
+				'customWidth'  => null,
+			),
+			'color'      => array(
+				'custom'         => null,
+				'customGradient' => null,
+				'duotone'        => null,
+				'gradients'      => null,
+				'link'           => null,
+				'palette'        => null,
+			),
+			'custom'     => null,
+			'layout'     => null,
+			'spacing'    => array(
+				'customMargin'  => null,
+				'customPadding' => null,
+				'units'         => null,
+			),
+			'typography' => array(
+				'customFontSize'        => null,
+				'customFontStyle'       => null,
+				'customFontWeight'      => null,
+				'customLineHeight'      => null,
+				'customTextDecorations' => null,
+				'customTextTransforms'  => null,
+				'dropCap'               => null,
+				'fontFamilies'          => null,
+				'fontSizes'             => null,
+			),
+		)
 	);
 }
 
@@ -306,4 +309,4 @@ add_filter( 'force_filtered_html_on_import', 'gutenberg_global_styles_force_filt
 add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_global_styles_include_support_for_wp_variables', 10, 2 );
 // This filter needs to be executed last.
 
-add_filter( 'theme_json_allowed_settings', 'gutenberg_global_styles_theme_json_allowed_settings' );
+add_filter( 'theme_json_allowed_schema', 'gutenberg_global_styles_theme_json_allowed_schema' );
