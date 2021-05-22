@@ -16,7 +16,7 @@
  */
 function render_block_core_query_pagination_previous( $attributes, $content, $block ) {
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : filter_var( $_GET[ $page_key ], FILTER_VALIDATE_INT );
+	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$default_label      = __( '&laquo; Previous Page', 'gutenberg' );
