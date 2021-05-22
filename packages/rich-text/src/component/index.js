@@ -71,23 +71,26 @@ export function useRichText( {
 	}
 
 	// Internal values are updated synchronously, unlike props and state.
-	const _value = useRef( value );
+	const _value = useRef();
 	const record = useRef();
 
 	function setRecordFromProps() {
-		_value.current = value;
-		record.current = create( {
-			html: value,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-			preserveWhiteSpace,
-		} );
-		if ( disableFormats ) {
-			record.current.formats = Array( value.length );
-			record.current.replacements = Array( value.length );
+		if ( _value.current !== value ) {
+			record.current = create( {
+				html: value,
+				multilineTag,
+				multilineWrapperTags:
+					multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
+				preserveWhiteSpace,
+			} );
+			if ( disableFormats ) {
+				record.current.formats = Array( value.length );
+				record.current.replacements = Array( value.length );
+			}
+			record.current.formats = __unstableAfterParse( record.current );
+			_value.current = value;
 		}
-		record.current.formats = __unstableAfterParse( record.current );
+
 		record.current.start = selectionStart;
 		record.current.end = selectionEnd;
 	}
