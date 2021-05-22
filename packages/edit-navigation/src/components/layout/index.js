@@ -69,9 +69,6 @@ export default function Layout( { blockEditorSettings } ) {
 		isMenuBeingDeleted,
 		selectMenu,
 		deleteMenu,
-		openManageLocationsModal,
-		closeManageLocationsModal,
-		isManageLocationsModalOpen,
 		isMenuSelected,
 	} = useNavigationEditor();
 
@@ -193,15 +190,6 @@ export default function Layout( { blockEditorSettings } ) {
 							onDeleteMenu={ deleteMenu }
 							isMenuBeingDeleted={ isMenuBeingDeleted }
 							hasPermanentSidebar={ hasPermanentSidebar }
-							isManageLocationsModalOpen={
-								isManageLocationsModalOpen
-							}
-							openManageLocationsModal={
-								openManageLocationsModal
-							}
-							closeManageLocationsModal={
-								closeManageLocationsModal
-							}
 						/>
 					</IsMenuNameControlFocusedContext.Provider>
 					<UnsavedChangesWarning />
