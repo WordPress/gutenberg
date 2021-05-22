@@ -28,6 +28,7 @@ const developmentFiles = [
 	'**/benchmark/**/*.js',
 	'**/@(__mocks__|__tests__|test)/**/*.js',
 	'**/@(storybook|stories)/**/*.js',
+	'packages/babel-preset-default/bin/**/*.js',
 ];
 
 // All files from packages that have types provided with TypeScript.
