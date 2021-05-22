@@ -94,7 +94,7 @@ export default function Layout( { blockEditorSettings } ) {
 	useMenuNotifications( selectedMenuId );
 
 	const hasMenus = !! menus?.length;
-	const hasPermanentSidebar = isLargeViewport && hasMenus;
+	const hasPermanentSidebar = isLargeViewport && isMenuSelected;
 
 	const isBlockEditorReady = !! (
 		hasMenus &&
