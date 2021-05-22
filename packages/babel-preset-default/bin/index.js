@@ -21,7 +21,7 @@ builder( {
 		const output = minify( code, {
 			output: {
 				comments: ( node, comment ) =>
-					comment.value.indexOf( 'License' ) > 0,
+					comment.value.indexOf( 'License' ) >= 0,
 			},
 		} );
 		await writeFile( './build/polyfill.min.js', output.code );
