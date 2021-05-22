@@ -36,7 +36,7 @@ echo "Publishing 'react-native-aztec' version '$VERSION'"
 
 if [ $? -eq 0 ]; then
     echo "Wait 30 seconds for the new 'react-native-aztec' version to be available"
-    sleep 120
+    sleep 30
 else
     echo "Failed to publish 'react-native-aztec' version '$VERSION'."
     exit 1
