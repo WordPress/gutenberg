@@ -20,7 +20,7 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
 /**
  * Internal dependencies
  */
-const AddReadableJsAssetsWebpackPlugin = require( './add-readable-js-assets-webpack-plugin' );
+const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 const {
 	camelCaseDash,
 } = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
@@ -305,7 +305,7 @@ module.exports = {
 			] )
 		),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
-		new AddReadableJsAssetsWebpackPlugin(),
+		new ReadableJsAssetsWebpackPlugin(),
 	].filter( Boolean ),
 	watchOptions: {
 		ignored: [ '**/node_modules', '**/packages/*/src' ],
