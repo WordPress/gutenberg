@@ -520,34 +520,25 @@ describe( 'Navigation editor', () => {
 			] );
 
 			await visitNavigationEditor();
+
+			// Wait for the navigation setting sidebar.
+			await page.waitForSelector( '.edit-navigation-sidebar' );
 		} );
 
 		afterEach( async () => {
 			await setUpResponseMocking( [] );
 		} );
 
-		async function assertIsDirty( isDirty ) {
-			let hadDialog = false;
+		async function getIsDirty() {
+			const dirtyRecords = await page.evaluate( () =>
+				wp.data.select( 'core' ).__experimentalGetDirtyEntityRecords()
+			);
 
-			function handleOnDialog() {
-				hadDialog = true;
-			}
-
-			try {
-				page.on( 'dialog', handleOnDialog );
-				await page.reload();
-
-				// Ensure whether it was expected that dialog was encountered.
-				expect( hadDialog ).toBe( isDirty );
-			} catch ( error ) {
-				throw error;
-			} finally {
-				page.removeListener( 'dialog', handleOnDialog );
-			}
+			return dirtyRecords.length > 0;
 		}
 
 		it( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
-			await assertIsDirty( false );
+			expect( await getIsDirty() ).toBe( false );
 		} );
 
 		it( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
@@ -556,7 +547,7 @@ describe( 'Navigation editor', () => {
 				' Menu'
 			);
 
-			await assertIsDirty( true );
+			expect( await getIsDirty() ).toBe( true );
 		} );
 	} );
 } );
