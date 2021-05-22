@@ -262,7 +262,7 @@ async function runPerformanceTests( branches, options ) {
 	log( '>> Starting the WordPress environment' );
 	await runShellScript( 'npm run wp-env start', environmentDirectory );
 
-	const testSuites = [ 'post-editor', 'i18n-filters', 'site-editor' ];
+	const testSuites = [ 'post-editor', 'site-editor' ];
 
 	/** @type {Record<string,Record<string, WPFormattedPerformanceResults>>} */
 	let results = {};

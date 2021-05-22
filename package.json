@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "10.6.1",
+	"version": "10.7.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -152,7 +152,7 @@
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
-		"browserslist": "4.16.5",
+		"browserslist": "4.16.6",
 		"chalk": "4.0.0",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
