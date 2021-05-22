@@ -43,6 +43,9 @@ class WP_Theme_JSON {
 	);
 
 	const VALID_STYLES = array(
+		'experience' => array(
+			'enable_fse' => null,
+		),
 		'border'     => array(
 			'color'  => null,
 			'radius' => null,
