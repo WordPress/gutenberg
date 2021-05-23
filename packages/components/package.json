@@ -50,6 +50,7 @@
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/warning": "file:../warning",
 		"classnames": "^2.2.5",
+		"construct-style-sheets-polyfill": "^2.4.16",
 		"dom-scroll-into-view": "^1.2.1",
 		"downshift": "^6.0.15",
 		"emotion": "^10.0.23",
