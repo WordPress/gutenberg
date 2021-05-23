@@ -245,8 +245,8 @@ export function useInputAndSelection( props ) {
 				};
 				onSelectionChange( index, index );
 			} else {
-				onSelectionChange( record.current.start, record.current.end );
 				applyRecord( record.current );
+				onSelectionChange( record.current.start, record.current.end );
 			}
 
 			// Update selection as soon as possible, which is at the next animation
