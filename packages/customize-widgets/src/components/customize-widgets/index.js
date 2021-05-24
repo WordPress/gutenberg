@@ -11,6 +11,7 @@ import SidebarBlockEditor from '../sidebar-block-editor';
 import FocusControl from '../focus-control';
 import SidebarControls from '../sidebar-controls';
 import useClearSelectedBlock from './use-clear-selected-block';
+import useInterceptCustomizerKeyboardEvents from '../../hooks/use-intercept-customizer-keyboard-events';
 
 export default function CustomizeWidgets( {
 	api,
@@ -24,6 +25,7 @@ export default function CustomizeWidgets( {
 	const popoverRef = useRef();
 
 	useClearSelectedBlock( activeSidebarControl, popoverRef );
+	const ref = useInterceptCustomizerKeyboardEvents();
 
 	useEffect( () => {
 		const unsubscribers = sidebarControls.map( ( sidebarControl ) =>
@@ -58,7 +60,9 @@ export default function CustomizeWidgets( {
 		parentContainer &&
 		createPortal(
 			<div ref={ popoverRef }>
-				<Popover.Slot />
+				<div ref={ ref }>
+					<Popover.Slot />
+				</div>
 			</div>,
 			parentContainer
 		);
