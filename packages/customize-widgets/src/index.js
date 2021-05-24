@@ -31,7 +31,9 @@ export function initialize( editorName, blockEditorSettings ) {
 	);
 	registerCoreBlocks( coreBlocks );
 
-	__experimentalRegisterExperimentalCoreBlocks();
+	if ( process.env.GUTENBERG_PHASE === 2 ) {
+		__experimentalRegisterExperimentalCoreBlocks();
+	}
 
 	registerLegacyWidgetVariations( blockEditorSettings );
 
