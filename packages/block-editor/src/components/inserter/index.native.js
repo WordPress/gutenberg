@@ -378,8 +378,7 @@ export default compose( [
 		const insertionIndexEnd = endOfRootIndex;
 
 		return {
-			canViewEditorOnboarding: select( blockEditorStore ).getSettings()
-				.canViewEditorOnboarding,
+			canViewEditorOnboarding: getSettings().canViewEditorOnboarding,
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,
