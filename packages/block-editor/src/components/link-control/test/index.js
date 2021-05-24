@@ -1752,6 +1752,52 @@ describe( 'Additional Settings UI', () => {
 			'myplugin/block-editor/link-control-settings'
 		);
 	} );
+
+	it.each( [ [], false, undefined, 'foo' ] )(
+		'should not render a UI for invalid/empty settings value of: %s',
+		( filteredSettings ) => {
+			const selectedLink = first( fauxEntitySuggestions );
+
+			const LinkControlConsumer = () => {
+				const [ link ] = useState( selectedLink );
+
+				return <LinkControl value={ { ...link } } />;
+			};
+
+			// Filter the settings.
+			addFilter(
+				'core.block-editor.link-control.settings',
+				'myplugin/block-editor/link-control-settings',
+				() => {
+					return filteredSettings;
+				}
+			);
+
+			act( () => {
+				render( <LinkControlConsumer />, container );
+			} );
+
+			// Grab the elements using user perceivable DOM queries
+			const settingsLegend = Array.from(
+				container.querySelectorAll( 'legend' )
+			).find(
+				( legend ) =>
+					legend.innerHTML &&
+					legend.innerHTML.includes(
+						'Currently selected link settings'
+					)
+			);
+
+			// Should not exist because component will have returned null due
+			// no settings being passed.
+			expect( settingsLegend ).toBeUndefined();
+
+			removeFilter(
+				'core.block-editor.link-control.settings',
+				'myplugin/block-editor/link-control-settings'
+			);
+		}
+	);
 } );
 
 describe( 'Post types', () => {
