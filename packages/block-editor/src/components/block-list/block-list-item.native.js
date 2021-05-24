@@ -16,6 +16,8 @@ import { ReadableContentView, alignmentHelpers } from '@wordpress/components';
  */
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
+import Grid from './grid-item';
+
 import styles from './block-list-item.native.scss';
 import { store as blockEditorStore } from '../../store';
 
@@ -104,7 +106,7 @@ export class BlockListItem extends Component {
 		];
 	}
 
-	render() {
+	renderContent() {
 		const {
 			blockAlignment,
 			clientId,
@@ -161,6 +163,23 @@ export class BlockListItem extends Component {
 				</View>
 			</ReadableContentView>
 		);
+	}
+
+	render() {
+		const { gridProperties, clientId, parentWidth, items } = this.props;
+		if ( gridProperties ) {
+			return (
+				<Grid
+					numOfColumns={ gridProperties.numColumns }
+					tileCount={ items.length }
+					index={ items.indexOf( clientId ) }
+					maxWidth={ parentWidth }
+				>
+					{ this.renderContent() }
+				</Grid>
+			);
+		}
+		return this.renderContent();
 	}
 }
 
