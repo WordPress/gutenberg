@@ -48,6 +48,7 @@ function BlockForType( {
 	parentWidth,
 	wrapperProps,
 	blockWidth,
+	blockProps,
 } ) {
 	const defaultColors = useSetting( 'color.palette' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
@@ -89,6 +90,7 @@ function BlockForType( {
 				contentStyle={ contentStyle }
 				onDeleteBlock={ onDeleteBlock }
 				blockWidth={ blockWidth }
+				{ ...( blockProps || {} ) }
 			/>
 			<View onLayout={ getBlockWidth } />
 		</GlobalStylesContext.Provider>
