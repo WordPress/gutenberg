@@ -89,16 +89,18 @@ function block_core_page_list_build_css_font_sizes( $context ) {
  * Outputs Page list markup from an array of pages with nested children.
  *
  * @param array $nested_pages The array of nested pages.
+ * @param array $active_page_ancestor_ids An array of ancestor ids for active page.
  *
  * @return string List markup.
  */
-function render_nested_page_list( $nested_pages ) {
+function render_nested_page_list( $nested_pages, $active_page_ancestor_ids = array() ) {
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
 	$markup = '';
 	foreach ( (array) $nested_pages as $page ) {
-		$css_class = 'wp-block-pages-list__item';
+		$css_class = 'wp-block-pages-list__item' . $page['is_active'] ? ' current-menu-item' : '';
+		$css_class .= in_array( $page['page_id'], $active_page_ancestor_ids, true ) ? ' current-menu-ancestor' : '';
 		if ( isset( $page['children'] ) ) {
 			$css_class .= ' has-child';
 		}
@@ -165,16 +167,28 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$pages_with_children = array();
 
+	$active_page_ancestor_ids = array();
+
 	foreach ( (array) $all_pages as $page ) {
+		$is_active   = ! empty( $page->ID ) && ( get_the_ID() === $page->ID );
+		
+		if ( $is_active ) {
+			$active_page_ancestor_ids = get_post_ancestors( $page->ID );
+		}
+
 		if ( $page->post_parent ) {
 			$pages_with_children[ $page->post_parent ][ $page->ID ] = array(
+				'page_id' => $page->ID,
 				'title' => $page->post_title,
 				'link'  => get_permalink( $page->ID ),
+				'is_active' => $is_active,
 			);
 		} else {
 			$top_level_pages[ $page->ID ] = array(
+				'page_id' => $page->ID,
 				'title' => $page->post_title,
 				'link'  => get_permalink( $page->ID ),
+				'is_active' => $is_active,
 			);
 
 		}
@@ -184,7 +198,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$wrapper_markup = '<ul %1$s>%2$s</ul>';
 
-	$items_markup = render_nested_page_list( $nested_pages );
+	$items_markup = render_nested_page_list( $nested_pages, $active_page_ancestor_ids );
 
 	$colors          = block_core_page_list_build_css_colors( $block->context );
 	$font_sizes      = block_core_page_list_build_css_font_sizes( $block->context );
