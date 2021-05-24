@@ -74,6 +74,7 @@ dependencies {
     implementation 'com.facebook.fresco:animated-gif:2.0.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation "org.wordpress:utils:1.22"
+    implementation 'com.facebook.soloader:soloader:0.10.1+'
 
     if (willPublishReactNativeBridgeBinary) {
         def rnVersion = readReactNativeVersion('../../../../package.json', 'devDependencies')
@@ -91,7 +92,7 @@ dependencies {
         implementation "com.github.wordpress-mobile:react-native-safe-area-context:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-safe-area-context', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-reanimated:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-reanimated', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-prompt-android:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-prompt-android', 'dependencies')}"
-        runtimeOnly "org.wordpress-mobile:hermes-release-mirror:0.61.5"
+        debugRuntimeOnly "org.wordpress-mobile:hermes-release-mirror:0.61.5"
    } else {
         api 'com.facebook.react:react-native:+'
         api project(':@wordpress_react-native-aztec')
