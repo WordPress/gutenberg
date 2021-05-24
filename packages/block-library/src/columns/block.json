@@ -6,6 +6,17 @@
 	"description": "Add a block that displays content in multiple columns, then add whatever content blocks you’d like.",
 	"textdomain": "default",
 	"attributes": {
+		"gridGap": {
+			"type": "number",
+			"default": 2
+		},
+		"gridGapUnit": {
+			"type": "string",
+			"default": "em"
+		},
+		"gridTemplateColumns": {
+			"type": "string"
+		},
 		"verticalAlignment": {
 			"type": "string"
 		}

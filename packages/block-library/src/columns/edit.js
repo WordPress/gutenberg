@@ -8,8 +8,13 @@ import { dropRight, get, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl, Notice } from '@wordpress/components';
-
+import {
+	BaseControl,
+	Notice,
+	PanelBody,
+	RangeControl,
+	__experimentalUseCustomUnits as useCustomUnits,
+} from '@wordpress/components';
 import {
 	InspectorControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -17,8 +22,12 @@ import {
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
 	useBlockProps,
+	useSetting,
+	__experimentalUnitControl as UnitControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useInstanceId } from '@wordpress/compose';
+import { useEffect, useState } from '@wordpress/element';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import {
 	createBlock,
@@ -31,6 +40,7 @@ import {
  */
 import {
 	hasExplicitPercentColumnWidths,
+	getEffectiveColumnWidth,
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
@@ -47,22 +57,112 @@ import {
  */
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
+function GridGapInput( { onChange, onUnitChange, unit = 'px', value = '' } ) {
+	const [ temporaryInput, setTemporaryInput ] = useState( null );
+
+	const instanceId = useInstanceId( UnitControl );
+	const inputId = `block-columns-grid-gap-input-${ instanceId }`;
+
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'px',
+			'em',
+			'rem',
+			'vw',
+			'vh',
+		],
+		defaultValues: { px: '40', em: '2', rem: '2', vw: '5', vh: '5' },
+	} );
+
+	const handleOnChange = ( unprocessedValue ) => {
+		const inputValue =
+			unprocessedValue !== ''
+				? parseInt( unprocessedValue, 10 )
+				: undefined;
+
+		if ( isNaN( inputValue ) && inputValue !== undefined ) {
+			setTemporaryInput( unprocessedValue );
+			return;
+		}
+		setTemporaryInput( null );
+		onChange( inputValue );
+		if ( inputValue === undefined ) {
+			onUnitChange();
+		}
+	};
+
+	const handleOnBlur = () => {
+		if ( temporaryInput !== null ) {
+			setTemporaryInput( null );
+		}
+	};
+
+	const inputValue = temporaryInput !== null ? temporaryInput : value;
+	const min = 0;
+
+	return (
+		<BaseControl label={ __( 'Gap' ) } id={ inputId }>
+			<UnitControl
+				id={ inputId }
+				isResetValueOnUnitChange
+				min={ min }
+				onBlur={ handleOnBlur }
+				onChange={ handleOnChange }
+				onUnitChange={ onUnitChange }
+				step="1"
+				style={ { maxWidth: 80 } }
+				unit={ unit }
+				units={ units }
+				value={ inputValue }
+			/>
+		</BaseControl>
+	);
+}
+
 function ColumnsEditContainer( {
 	attributes,
+	clientId,
+	setAttributes,
 	updateAlignment,
 	updateColumns,
-	clientId,
 } ) {
-	const { verticalAlignment } = attributes;
+	const {
+		gridGap,
+		gridGapUnit,
+		gridTemplateColumns,
+		verticalAlignment,
+	} = attributes;
 
-	const { count } = useSelect(
+	const { count, innerBlocks } = useSelect(
 		( select ) => {
 			return {
 				count: select( blockEditorStore ).getBlockCount( clientId ),
+				innerBlocks: select( blockEditorStore ).getBlocks( clientId ),
 			};
 		},
 		[ clientId ]
 	);
+
+	useEffect( () => {
+		const percentageWidths = innerBlocks.map( ( block ) =>
+			getEffectiveColumnWidth( block, innerBlocks.length )
+		);
+		const fractions = percentageWidths.map(
+			( width ) => ( width / 100 ) * innerBlocks.length
+		);
+		let fractionsString = '';
+
+		fractions.forEach( ( fraction ) => {
+			fractionsString += fraction + 'fr ';
+		} );
+		setAttributes( {
+			gridTemplateColumns: fractionsString.trim(),
+		} );
+	}, [ count, innerBlocks ] );
+
+	const gridGapWithUnit = gridGapUnit
+		? `${ gridGap }${ gridGapUnit }`
+		: gridGap;
 
 	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -70,7 +170,12 @@ function ColumnsEditContainer( {
 
 	const blockProps = useBlockProps( {
 		className: classes,
+		style: {
+			gap: gridGapWithUnit || undefined,
+			gridTemplateColumns,
+		},
 	} );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
@@ -101,6 +206,18 @@ function ColumnsEditContainer( {
 							) }
 						</Notice>
 					) }
+					<GridGapInput
+						value={ gridGap }
+						unit={ gridGapUnit }
+						onChange={ ( newGridGap ) =>
+							setAttributes( { gridGap: newGridGap } )
+						}
+						onUnitChange={ ( nextUnit ) =>
+							setAttributes( {
+								gridGapUnit: nextUnit,
+							} )
+						}
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
