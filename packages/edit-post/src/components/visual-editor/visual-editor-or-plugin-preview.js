@@ -21,11 +21,11 @@ function VisualEditorOrPluginPreview( props ) {
 			select( editPostStore ).__experimentalGetPreviewDeviceType(),
 		[]
 	);
-	const slotName = `core/block-editor/plugin-preview/${ previewId }`;
-	const slot = useSlot( slotName );
+	const previewSlotName = `core/block-editor/plugin-preview/${ previewId }`;
+	const previewSlot = useSlot( previewSlotName );
 
-	if ( slot?.fills?.length > 0 ) {
-		return <Slot name={ slotName } fillProps={ props } />;
+	if ( previewSlot.fills?.length > 0 ) {
+		return <Slot name={ previewSlotName } fillProps={ props } />;
 	}
 
 	return <VisualEditor { ...props } />;
