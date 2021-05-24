@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test WP_Theme_JSON class.
+ * Test WP_Theme_JSON_Gutenberg class.
  *
  * @package Gutenberg
  */
