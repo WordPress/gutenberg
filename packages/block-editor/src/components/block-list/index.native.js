@@ -48,6 +48,7 @@ const getStyles = (
 	const computedStyles = [
 		isStackedHorizontally && styles.horizontal,
 		horizontalAlignment && styles[ `is-aligned-${ horizontalAlignment }` ],
+		styles.overflowVisible,
 	];
 	stylesMemo[ styleName ] = computedStyles;
 	return computedStyles;
@@ -129,6 +130,8 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			contentStyle,
 			renderAppender,
+			blockProps,
+			gridProperties,
 		} = this.props;
 		const { blockWidth } = this.state;
 		if (
@@ -137,7 +140,9 @@ export class BlockList extends Component {
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
 			this.extraData.renderAppender !== renderAppender ||
-			this.extraData.blockWidth !== blockWidth
+			this.extraData.blockWidth !== blockWidth ||
+			this.extraData.blockProps !== blockProps ||
+			this.extraData.gridProperties !== gridProperties
 		) {
 			this.extraData = {
 				parentWidth,
@@ -146,6 +151,8 @@ export class BlockList extends Component {
 				contentStyle,
 				renderAppender,
 				blockWidth,
+				blockProps,
+				gridProperties,
 			};
 		}
 		return this.extraData;
@@ -315,30 +322,34 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			rootClientId,
 			isStackedHorizontally,
+			blockClientIds,
 			parentWidth,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			blockProps,
+			gridProperties,
 		} = this.props;
 		const { blockWidth } = this.state;
 		return (
-			<View style={ { flex: 1 } }>
-				<BlockListItem
-					isStackedHorizontally={ isStackedHorizontally }
-					rootClientId={ rootClientId }
-					clientId={ clientId }
-					parentWidth={ parentWidth }
-					contentResizeMode={ contentResizeMode }
-					contentStyle={ contentStyle }
-					onAddBlock={ onAddBlock }
-					marginVertical={ marginVertical }
-					marginHorizontal={ marginHorizontal }
-					onDeleteBlock={ onDeleteBlock }
-					shouldShowInnerBlockAppender={
-						this.shouldShowInnerBlockAppender
-					}
-					blockWidth={ blockWidth }
-				/>
-			</View>
+			<BlockListItem
+				isStackedHorizontally={ isStackedHorizontally }
+				rootClientId={ rootClientId }
+				clientId={ clientId }
+				parentWidth={ parentWidth }
+				contentResizeMode={ contentResizeMode }
+				contentStyle={ contentStyle }
+				onAddBlock={ onAddBlock }
+				marginVertical={ marginVertical }
+				marginHorizontal={ marginHorizontal }
+				onDeleteBlock={ onDeleteBlock }
+				shouldShowInnerBlockAppender={
+					this.shouldShowInnerBlockAppender
+				}
+				blockWidth={ blockWidth }
+				blockProps={ blockProps }
+				gridProperties={ gridProperties }
+				items={ blockClientIds }
+			/>
 		);
 	}
 
