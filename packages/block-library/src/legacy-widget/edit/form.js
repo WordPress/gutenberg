@@ -82,7 +82,11 @@ export default function Form( {
 						{ title }
 					</h3>
 				) }
-				<Popover focusOnMount={ false } position="middle left">
+				<Popover
+					focusOnMount={ false }
+					position="middle right"
+					__unstableForceXAlignment
+				>
 					<div
 						ref={ ref }
 						className="wp-block-legacy-widget__edit-form"
