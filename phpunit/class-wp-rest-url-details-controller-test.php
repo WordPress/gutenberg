@@ -189,10 +189,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	/**
-	 * @dataProvider provide_invalid_url_data
+	 * @dataProvider data_invalid_url
 	 */
 	public function test_get_items_fails_for_invalid_url( $expected, $invalid_url ) {
-
 		wp_set_current_user( self::$admin_id );
 
 		$request = new WP_REST_Request( 'GET', static::$route );
@@ -214,6 +213,23 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$this->assertContains(
 			strtolower( 'Invalid parameter(s): url' ),
 			strtolower( $data['message'] )
+		);
+	}
+
+	public function data_invalid_url() {
+		return array(
+			'empty_url'          => array(
+				null,
+				'',
+			), // empty!
+			'not_a_string'       => array(
+				null,
+				1234456,
+			),
+			'string_but_invalid' => array(
+				null,
+				'invalid.proto://wordpress.org',
+			),
 		);
 	}
 
@@ -354,7 +370,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	public function test_allows_filtering_data_retrieved_for_a_given_url() {
-
 		add_filter(
 			'rest_prepare_url_details',
 			function( $response ) {
@@ -400,9 +415,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			'rest_prepare_url_details'
 		);
 	}
-
-
-
 
 	public function test_allows_filtering_response() {
 
@@ -450,8 +462,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
-
-
 	public function test_get_item() {
 	}
 
@@ -492,7 +502,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	/**
-	 * @dataProvider provide_get_title_data
+	 * @dataProvider data_get_title
 	 */
 	public function test_get_title( $html, $expected ) {
 		$controller = new WP_REST_URL_Details_Controller();
@@ -505,10 +515,11 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$this->assertSame( $expected, $actual );
 	}
 
-
-	public function provide_get_title_data() {
+	public function data_get_title() {
 		return array(
-			'no attributes'                  => array(
+
+			// Happy path for default.
+			'default'                        => array(
 				'<title>Testing &lt;title&gt;:</title>',
 				'Testing &lt;title&gt;:',
 			),
@@ -520,10 +531,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">   Testing &lt;title&gt;:	</title>',
 				'Testing &lt;title&gt;:',
 			),
-			'when opening tag is malformed'  => array(
-				'< title>Testing &lt;title&gt;: when opening tag is invalid</title>',
-				'',
-			),
 			'with whitespace in opening tag' => array(
 				'<title >Testing &lt;title&gt;: with whitespace in opening tag</title>',
 				'Testing &lt;title&gt;: with whitespace in opening tag',
@@ -531,6 +538,24 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			'when whitepace in closing tag'  => array(
 				'<title>Testing &lt;title&gt;: with whitespace in closing tag</ title>',
 				'Testing &lt;title&gt;: with whitespace in closing tag',
+			),
+			'with other elements'            => array(
+				'<meta name="viewport" content="width=device-width">
+				<title>Testing &lt;title&gt;:</title>
+				<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" />',
+				'Testing &lt;title&gt;:',
+			),
+			'multiline'                      => array(
+				'<title>
+					Testing &lt;title&gt;:
+				</title>',
+				'Testing &lt;title&gt;:',
+			),
+
+			// Unhappy paths.
+			'when opening tag is malformed'  => array(
+				'< title>Testing &lt;title&gt;: when opening tag is invalid</title>',
+				'',
 			),
 		);
 	}
@@ -978,27 +1003,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
-
-
-
-
-	public function provide_invalid_url_data() {
-		return array(
-			'empty_url'          => array(
-				null,
-				'',
-			), // empty!
-			'not_a_string'       => array(
-				null,
-				1234456,
-			),
-			'string_but_invalid' => array(
-				null,
-				'invalid.proto://wordpress.org',
-			),
-		);
-	}
-
 	public function provide_response_is_from_cache() {
 		return array(
 			'uncached_response' => array(
@@ -1011,8 +1015,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			),
 		);
 	}
-
-
 
 	/**
 	 * Mocks the HTTP response for the the `wp_safe_remote_get()` which
