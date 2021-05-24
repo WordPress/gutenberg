@@ -526,23 +526,33 @@ describe( 'Writing Flow', () => {
 
 		// Find a point outside the paragraph between the blocks where it's
 		// expected that the sibling inserter would be placed.
+		const paragraph = await page.$(
+			'[data-type="core/paragraph"]:nth-child(2)'
+		);
+		const paragraphRect = await paragraph.boundingBox();
+		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
+		const y = paragraphRect.y - 1;
+
+		await page.mouse.click( x, y );
+		await page.keyboard.type( '3' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not have a dead zone between blocks (upper)', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		// Find a point outside the paragraph between the blocks where it's
+		// expected that the sibling inserter would be placed.
 		const paragraph = await page.$( '[data-type="core/paragraph"]' );
 		const paragraphRect = await paragraph.boundingBox();
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
 		const y = paragraphRect.y + paragraphRect.height + 1;
 
-		await page.mouse.move( x, y );
-		await page.waitForSelector(
-			'.block-editor-block-list__insertion-point'
-		);
-
-		const inserter = await page.$(
-			'.block-editor-block-list__insertion-point'
-		);
-		const inserterRect = await inserter.boundingBox();
-		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
-
-		await page.mouse.click( x, lowerInserterY );
+		await page.mouse.click( x, y );
 		await page.keyboard.type( '3' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
