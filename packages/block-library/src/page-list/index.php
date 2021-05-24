@@ -99,19 +99,19 @@ function render_nested_page_list( $nested_pages, $active_page_ancestor_ids = arr
 	}
 	$markup = '';
 	foreach ( (array) $nested_pages as $page ) {
-		$css_class = 'wp-block-pages-list__item' . $page['is_active'] ? ' current-menu-item' : '';
+		$css_class = $page['is_active'] ? ' current-menu-item' : '';
 		$css_class .= in_array( $page['page_id'], $active_page_ancestor_ids, true ) ? ' current-menu-ancestor' : '';
 		if ( isset( $page['children'] ) ) {
 			$css_class .= ' has-child';
 		}
-		$markup .= '<li class="' . $css_class . '">';
+		$markup .= '<li class="wp-block-pages-list__item' . $css_class . '">';
 		$markup .= '<a class="wp-block-pages-list__item__link" href="' . esc_url( $page['link'] ) . '">' . wp_kses(
 			$page['title'],
 			wp_kses_allowed_html( 'post' )
 		) . '</a>';
 		if ( isset( $page['children'] ) ) {
 			$markup .= '<span class="wp-block-page-list__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
-			$markup .= '<ul class="submenu-container">' . render_nested_page_list( $page['children'] ) . '</ul>';
+			$markup .= '<ul class="submenu-container">' . render_nested_page_list( $page['children'], $active_page_ancestor_ids ) . '</ul>';
 		}
 		$markup .= '</li>';
 	}
