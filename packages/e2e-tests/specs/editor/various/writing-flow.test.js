@@ -636,4 +636,28 @@ describe( 'Writing Flow', () => {
 			)
 		).toBe( 'Table' );
 	} );
+
+	it( 'should be easy to select separator (tiny block with margin)', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/separator' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+
+		// Confirm correct setup: Separator and Paragraph.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Click right under the separator.
+		const separator = await page.$( '[data-type="core/separator"]' );
+		const separatorRect = await separator.boundingBox();
+		const x = separatorRect.x + ( 2 * separatorRect.width ) / 3;
+		const y = separatorRect.y + separatorRect.height + 1;
+
+		await page.mouse.click( x, y );
+
+		const hasSelectedClass = await separator.evaluate( ( element ) =>
+			element.classList.contains( 'is-selected' )
+		);
+
+		expect( hasSelectedClass ).toBe( true );
+	} );
 } );

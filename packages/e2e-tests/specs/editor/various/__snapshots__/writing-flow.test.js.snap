@@ -34,6 +34,12 @@ exports[`Writing Flow should allow selecting entire list with longer last item 1
 <!-- /wp:list -->"
 `;
 
+exports[`Writing Flow should be easy to select separator (tiny block with margin) 1`] = `
+"<!-- wp:separator -->
+<hr class=\\"wp-block-separator\\"/>
+<!-- /wp:separator -->"
+`;
+
 exports[`Writing Flow should create valid paragraph blocks when rapidly pressing Enter 1`] = `
 "<!-- wp:paragraph -->
 <p></p>
