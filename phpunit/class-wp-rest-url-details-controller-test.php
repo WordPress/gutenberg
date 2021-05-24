@@ -18,40 +18,13 @@
  */
 class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
-	/**
-	 * Admin user ID.
-	 *
-	 * @since x.x.0
-	 *
-	 * @var int $subscriber_id
-	 */
 	protected static $admin_id;
-
-	/**
-	 * Subscriber user ID.
-	 *
-	 * @since x.x.0
-	 *
-	 * @var int $subscriber_id
-	 */
 	protected static $subscriber_id;
-
-
-	protected static $route = '/__experimental/url-details';
-
-
+	protected static $route           = '/__experimental/url-details';
 	protected static $url_placeholder = 'https://placeholder-site.com';
+	protected static $request_args    = array();
 
-	protected static $request_args = array();
-
-	/**
-	 * Create fake data before our tests run.
-	 *
-	 * @since x.x.0
-	 *
-	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
-	 */
-	public static function wpSetUpBeforeClass( $factory ) {
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$admin_id      = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -69,11 +42,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		self::delete_user( self::$subscriber_id );
 	}
 
-
-
-	/**
-	 * Setup.
-	 */
 	public function setUp() {
 		parent::setUp();
 
@@ -81,28 +49,17 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		// Disables usage of cache during major of tests.
 		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
-		add_filter(
-			"pre_transient_$transient_name",
-			'__return_null'
-		);
+		add_filter( "pre_transient_{$transient_name}", '__return_null' );
 	}
 
-	/**
-	 * Tear down.
-	 */
 	public function tearDown() {
 		remove_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10 );
 		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
 
-		remove_filter(
-			"pre_transient_$transient_name",
-			'__return_null'
-		);
+		remove_filter( "pre_transient_{$transient_name}", '__return_null' );
 		static::$request_args = array();
 		parent::tearDown();
 	}
-
-
 
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
