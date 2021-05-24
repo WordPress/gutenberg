@@ -80,7 +80,7 @@ if ( ! class_exists( 'WP_Widget_Block' ) ) {
 require_once __DIR__ . '/widgets-page.php';
 
 require __DIR__ . '/compat.php';
-require __DIR__ . '/compat/wordpress-5.8.php';
+require __DIR__ . '/compat/wordpress-5.8/index.php';
 require __DIR__ . '/utils.php';
 require __DIR__ . '/editor-settings.php';
 
@@ -107,7 +107,6 @@ require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/full-site-editing/edit-site-export.php';
 
 require __DIR__ . '/blocks.php';
-require __DIR__ . '/block-editor.php';
 require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
