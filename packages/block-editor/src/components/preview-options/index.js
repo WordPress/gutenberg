@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalUseSlot as useSlot,
-	createSlotFill,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -17,12 +16,10 @@ import {
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
-const {
-	Fill: PluginPreviewMenuFill,
-	Slot: PluginPreviewMenuSlot,
-} = createSlotFill( 'PluginPreviewOptionsMenu' );
-
-export { PluginPreviewMenuFill };
+/**
+ * Internal dependencies
+ */
+import { PluginPreviewMenuSlot } from '../plugin-preview';
 
 /**
  * An array of strings that represent `deviceType` values that belong to the
@@ -33,9 +30,8 @@ export { PluginPreviewMenuFill };
  * a preview of that type.
  *
  * When the `deviceType` is something other than one of the `coreDeviceTypes`,
- * we are rendering a custom preview registered by the
- * `<PluginPreviewMenuItem />` and `<PluginPreview />` components, and defer to
- * a `<Slot />` filled by the plugin to draw the preview.
+ * we are rendering a custom preview registered by the `<PluginPreview />`
+ * component and defer to a `<Slot />` filled by the plugin to draw the preview.
  *
  * @type {Array}
  */
@@ -48,7 +44,7 @@ export default function PreviewOptions( {
 	deviceType,
 	setDeviceType,
 } ) {
-	const slot = useSlot( PluginPreviewMenuSlot.__unstableName );
+	const previewMenuSlot = useSlot( PluginPreviewMenuSlot.__unstableName );
 	const isMobile = useViewportMatch( 'small', '<' );
 	if ( isMobile ) return null;
 
@@ -99,7 +95,7 @@ export default function PreviewOptions( {
 						</MenuItem>
 					</MenuGroup>
 
-					{ slot?.fills?.length && (
+					{ previewMenuSlot.fills?.length > 0 && (
 						<MenuGroup>
 							<PluginPreviewMenuSlot
 								fillProps={ {

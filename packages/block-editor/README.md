@@ -280,9 +280,8 @@ one of these values, the built-in `VisualEditor` is responsible for rendering
 a preview of that type.
 
 When the `deviceType` is something other than one of the `coreDeviceTypes`,
-we are rendering a custom preview registered by the
-`<PluginPreviewMenuItem />` and `<PluginPreview />` components, and defer to
-a `<Slot />` filled by the plugin to draw the preview.
+we are rendering a custom preview registered by the `<PluginPreview />`
+component and defer to a `<Slot />` filled by the plugin to draw the preview.
 
 _Type_
 
@@ -515,29 +514,21 @@ _Related_
 
 <a name="PluginPreview" href="#PluginPreview">#</a> **PluginPreview**
 
-Component used by a plugin to define the contents of a "custom
-preview". The children of this component will be displayed in the main editor
-screen when this "custom preview" is chosen from the preview menu.
+Component used to define a custom preview menu item and optional content.
+
+The children of this component will be displayed in the main area of the
+block editor, instead of the `VisualEditor` component.
+
+The `title` and `icon` are used to populate the Preview menu item.
 
 _Parameters_
 
 -   _props_ `Object`: Component properties.
--   _props.previewId_ `string`: The internal name of this custom preview. Must match the `previewId` given to `PluginPreviewMenuItem`.
--   _props.children_ `WPElement`: Children to be rendered.
-
-<a name="PluginPreviewMenuItem" href="#PluginPreviewMenuItem">#</a> **PluginPreviewMenuItem**
-
-Component used by a plugin to define the contents of a menu item that
-selects a "custom preview". The children of this component will be displayed
-inside the preview menu. Typically a single string is good enough.
-
-_Parameters_
-
--   _props_ `Object`: Component properties.
--   _props.children_ `WPElement`: Children to be rendered.
+-   _props.children_ `WPElement`: Preview content.
 -   _props.icon_ `WPIcon`: Menu item icon to be rendered.
--   _props.onClick_ `Function`: Menu item click handler, e.g. for previews that do not register slot fills.
--   _props.previewId_ `string`: The internal name of this custom preview. Must match the _previewId_ given to `PluginPreview`.
+-   _props.name_ `string`: A unique name of the custom preview.
+-   _props.onClick_ `Function`: Menu item click handler, e.g. for previews that provide no content (`children`).
+-   _props.title_ `string`: Menu item title.
 
 <a name="PreserveScrollInReorder" href="#PreserveScrollInReorder">#</a> **PreserveScrollInReorder**
 

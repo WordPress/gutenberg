@@ -89,7 +89,11 @@ export { default as withColorContext } from './color-palette/with-color-context'
 
 export { default as __unstableBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __unstableInserterMenuExtension } from './inserter-menu-extension';
-export { default as __experimentalPreviewOptions } from './preview-options';
+export {
+	default as __experimentalPreviewOptions,
+	coreDeviceTypes,
+} from './preview-options';
+export { default as PluginPreview } from './plugin-preview';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
