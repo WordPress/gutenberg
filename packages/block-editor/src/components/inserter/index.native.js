@@ -315,7 +315,7 @@ export default compose( [
 			getBlockOrder,
 			getBlockIndex,
 			getBlock,
-			getSettings,
+			getSettings: getBlockEditorSettings,
 		} = select( blockEditorStore );
 
 		const end = getBlockSelectionEnd();
@@ -338,7 +338,7 @@ export default compose( [
 		function getDefaultInsertionIndex() {
 			const {
 				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-			} = getSettings();
+			} = getBlockEditorSettings();
 
 			// if post title is selected insert as first block
 			if ( shouldInsertAtTheTop ) {
@@ -378,7 +378,8 @@ export default compose( [
 		const insertionIndexEnd = endOfRootIndex;
 
 		return {
-			canViewEditorOnboarding: getSettings().canViewEditorOnboarding,
+			canViewEditorOnboarding: getBlockEditorSettings()
+				.canViewEditorOnboarding,
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,
