@@ -93,6 +93,8 @@ function UncontrolledInnerBlocks( props ) {
 		blockWidth,
 		__experimentalLayout: layout = defaultLayout,
 		numColumns,
+		gridProperties,
+		blockProps,
 	} = props;
 
 	const block = useSelect(
@@ -126,6 +128,8 @@ function UncontrolledInnerBlocks( props ) {
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
 			filterInnerBlocks={ filterInnerBlocks }
+			gridProperties={ gridProperties }
+			blockProps={ blockProps }
 			blockWidth={ blockWidth }
 			numColumns={ numColumns }
 		/>
