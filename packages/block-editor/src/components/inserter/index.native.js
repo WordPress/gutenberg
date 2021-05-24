@@ -70,7 +70,7 @@ export class Inserter extends Component {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
-		this.renderToggle = this.renderToggle.bind( this );
+		this.renderInserterToggle = this.renderInserterToggle.bind( this );
 		this.renderContent = this.renderContent.bind( this );
 	}
 
@@ -198,7 +198,7 @@ export class Inserter extends Component {
 	 *
 	 * @return {WPElement} Dropdown toggle element.
 	 */
-	renderToggle( { onToggle, isOpen } ) {
+	renderInserterToggle( { onToggle, isOpen } ) {
 		const {
 			canViewEditorOnboarding,
 			disabled,
@@ -300,7 +300,7 @@ export class Inserter extends Component {
 			<Dropdown
 				onToggle={ this.onToggle }
 				headerTitle={ __( 'Add a block' ) }
-				renderToggle={ this.renderToggle }
+				renderToggle={ this.renderInserterToggle }
 				renderContent={ this.renderContent }
 			/>
 		);
