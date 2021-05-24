@@ -99,7 +99,7 @@ function render_nested_page_list( $nested_pages, $active_page_ancestor_ids = arr
 	}
 	$markup = '';
 	foreach ( (array) $nested_pages as $page ) {
-		$css_class = $page['is_active'] ? ' current-menu-item' : '';
+		$css_class  = $page['is_active'] ? ' current-menu-item' : '';
 		$css_class .= in_array( $page['page_id'], $active_page_ancestor_ids, true ) ? ' current-menu-ancestor' : '';
 		if ( isset( $page['children'] ) ) {
 			$css_class .= ' has-child';
@@ -170,24 +170,24 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$active_page_ancestor_ids = array();
 
 	foreach ( (array) $all_pages as $page ) {
-		$is_active   = ! empty( $page->ID ) && ( get_the_ID() === $page->ID );
-		
+		$is_active = ! empty( $page->ID ) && ( get_the_ID() === $page->ID );
+
 		if ( $is_active ) {
 			$active_page_ancestor_ids = get_post_ancestors( $page->ID );
 		}
 
 		if ( $page->post_parent ) {
 			$pages_with_children[ $page->post_parent ][ $page->ID ] = array(
-				'page_id' => $page->ID,
-				'title' => $page->post_title,
-				'link'  => get_permalink( $page->ID ),
+				'page_id'   => $page->ID,
+				'title'     => $page->post_title,
+				'link'      => get_permalink( $page->ID ),
 				'is_active' => $is_active,
 			);
 		} else {
 			$top_level_pages[ $page->ID ] = array(
-				'page_id' => $page->ID,
-				'title' => $page->post_title,
-				'link'  => get_permalink( $page->ID ),
+				'page_id'   => $page->ID,
+				'title'     => $page->post_title,
+				'link'      => get_permalink( $page->ID ),
 				'is_active' => $is_active,
 			);
 
