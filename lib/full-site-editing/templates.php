@@ -84,7 +84,7 @@ add_action( 'init', 'gutenberg_register_template_post_type' );
  * Registers block editor 'wp_theme' taxonomy.
  */
 function gutenberg_register_wp_theme_taxonomy() {
-	if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver::theme_has_support() ) {
+	if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		return;
 	}
 
