@@ -134,7 +134,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['styles'][] = $block_styles;
 	}
 
-	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php
+	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
 	$settings['__experimentalFeatures'] = $consolidated->get_settings();
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
 		$settings['colors'] = $settings['__experimentalFeatures']['color']['palette'];
