@@ -328,8 +328,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Utility function to build cache key for a given URL.
 	 *
-	 * @param string $url the URL for which to build a cache key.
-	 * @return string the cache key.
+	 * @param string $url The URL for which to build a cache key.
+	 * @return string The cache key.
 	 */
 	private function build_cache_key_for_url( $url ) {
 		return 'g_url_details_response_' . md5( $url );
@@ -338,8 +338,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Utility function to retrieve a value from the cache at a given key.
 	 *
-	 * @param string $key the cache key.
-	 * @return string the value from the cache.
+	 * @param string $key The cache key.
+	 * @return mixed The value from the cache.
 	 */
 	private function get_cache( $key ) {
 		return get_transient( $key );
@@ -348,13 +348,13 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Utility function to cache a given data set at a given cache key.
 	 *
-	 * @param string $key the cache key under which to store the value.
-	 * @param string $data the data to be stored at the given cache key.
-	 * @return void
+	 * @param string $key  The cache key under which to store the value.
+	 * @param string $data The data to be stored at the given cache key.
+	 * @return bool True when transient set, or false.
 	 */
 	private function set_cache( $key, $data = '' ) {
 		if ( ! is_array( $data ) ) {
-			return;
+			return false;
 		}
 
 		$ttl = HOUR_IN_SECONDS;
