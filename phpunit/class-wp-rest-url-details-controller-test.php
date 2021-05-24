@@ -81,9 +81,11 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		// Note the data in the subset comes from the fixture HTML returned by
-		// the filter `pre_http_request` (see this class's `setUp` method).
-		$this->assertArraySubset(
+		/*
+		 * Note the data in the subset comes from the fixture HTML returned by
+		 * the filter `pre_http_request` (see this class's `setUp` method).
+		 */
+		$this->assertSame(
 			array(
 				'title'       => 'Example Website — - with encoded content.',
 				'icon'        => 'https://placeholder-site.com/favicon.ico?querystringaddedfortesting',
@@ -93,7 +95,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			$data
 		);
 	}
-
 
 	public function test_get_items_fails_for_unauthenticated_user() {
 		wp_set_current_user( 0 );
@@ -107,12 +108,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( WP_Http::UNAUTHORIZED, $response->get_status() );
+		$this->assertSame( WP_Http::UNAUTHORIZED, $response->get_status() );
 
-		$this->assertEquals(
-			'rest_cannot_view_url_details',
-			$data['code']
-		);
+		$this->assertSame( 'rest_cannot_view_url_details', $data['code'] );
 
 		$this->assertContains(
 			strtolower( 'you are not allowed to process remote urls' ),
@@ -132,12 +130,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( WP_Http::FORBIDDEN, $response->get_status() );
+		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status() );
 
-		$this->assertEquals(
-			'rest_cannot_view_url_details',
-			$data['code']
-		);
+		$this->assertSame( 'rest_cannot_view_url_details', $data['code'] );
 
 		$this->assertContains(
 			strtolower( 'you are not allowed to process remote urls' ),
@@ -160,12 +155,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( WP_Http::BAD_REQUEST, $response->get_status() );
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
 
-		$this->assertEquals(
-			'rest_invalid_param',
-			$data['code']
-		);
+		$this->assertSame( 'rest_invalid_param', $data['code'] );
 
 		$this->assertContains(
 			strtolower( 'Invalid parameter(s): url' ),
@@ -206,12 +198,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 404, $response->get_status() );
+		$this->assertSame( 404, $response->get_status() );
 
-		$this->assertEquals(
-			'no_response',
-			$data['code']
-		);
+		$this->assertSame( 'no_response', $data['code'] );
 
 		$this->assertContains(
 			strtolower( 'Not found' ),
@@ -235,12 +224,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 404, $response->get_status() );
+		$this->assertSame( 404, $response->get_status() );
 
-		$this->assertEquals(
-			'no_content',
-			$data['code']
-		);
+		$this->assertSame( 'no_content', $data['code'] );
 
 		$this->assertContains(
 			strtolower( 'Unable to retrieve body from response at this URL' ),
@@ -276,7 +262,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		rest_get_server()->dispatch( $request );
 
 		// Check the args were filtered as expected.
-		$this->assertArraySubset(
+		$this->assertContains(
 			array(
 				'timeout'             => 27,
 				'limit_response_size' => 153600,
@@ -291,14 +277,11 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	public function test_will_return_from_cache_if_populated() {
 		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
 
-		remove_filter(
-			"pre_transient_$transient_name",
-			'__return_null'
-		);
+		remove_filter( "pre_transient_{$transient_name}", '__return_null' );
 
 		// Force cache to return a known value as the remote URL http response body.
 		add_filter(
-			"pre_transient_$transient_name",
+			"pre_transient_{$transient_name}",
 			function() {
 				return '<html><head><title>This value from cache.</title></head><body></body></html>';
 			}
@@ -316,14 +299,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$data     = $response->get_data();
 
 		// Data should be that from cache not from mocked network response.
-		$this->assertContains(
-			'This value from cache',
-			$data['title']
-		);
+		$this->assertContains( 'This value from cache', $data['title'] );
 
-		remove_all_filters(
-			"pre_transient_$transient_name"
-		);
+		remove_all_filters( "pre_transient_{$transient_name}" );
 	}
 
 	public function test_allows_filtering_data_retrieved_for_a_given_url() {
@@ -358,24 +336,21 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		// Instead of the default data retrieved we expect to see the modified
-		// data we provided via the filter.
-		$this->assertArraySubset(
-			array(
-				'title'    => 'Example Website — - with encoded content.',
-				'og_title' => 'This was manually added to the data via filter',
-			),
-			$data
-		);
+		/*
+		 * Instead of the default data retrieved we expect to see the modified
+		 * data we provided via the filter.
+		 */
+		$this->assertSame( 'Example Website — - with encoded content.', $data['title'] );
+		$this->assertSame( 'This was manually added to the data via filter', $data['og_title'] );
 
-		remove_all_filters(
-			'rest_prepare_url_details'
-		);
+		remove_all_filters( 'rest_prepare_url_details' );
 	}
 
 	public function test_allows_filtering_response() {
-		// Filter the response to known set of values changing only
-		// based on whether the response came from the cache or not.
+		/*
+		 * Filter the response to known set of values changing only
+		 * based on whether the response came from the cache or not.
+		 */
 		add_filter(
 			'rest_prepare_url_details',
 			function( $response, $url ) {
@@ -403,19 +378,14 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		$data = $response->get_data();
 
-		$this->assertEquals(
-			'418',
-			$data['status']
-		);
+		$this->assertSame( 418, $data['status'] );
 
-		$this->assertEquals(
+		$this->assertSame(
 			'Response for URL https://placeholder-site.com altered via rest_prepare_url_details filter',
 			$data['response']
 		);
 
-		remove_all_filters(
-			'rest_prepare_url_details'
-		);
+		remove_all_filters( 'rest_prepare_url_details' );
 	}
 
 	public function test_get_item() {
@@ -447,7 +417,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$endpoint = $data['endpoints'][0];
 
 		$this->assertArrayHasKey( 'url', $endpoint['args'] );
-		$this->assertArraySubset(
+		$this->assertContains(
 			array(
 				'type'     => 'string',
 				'required' => true,
@@ -978,7 +948,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	private function mock_request_to_remote_url( $result_type = 'success', $args ) {
-
 		static::$request_args = $args;
 
 		$types = array(
