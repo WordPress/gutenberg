@@ -1,5 +1,10 @@
 @import "./v1/gallery-styles.native.scss";
 
 .galleryAppender {
-	padding-top: 16px;
+	padding-top: $grid-unit-20;
+}
+
+.fullWidth {
+	margin-left: $block-edge-to-content;
+	margin-right: $block-edge-to-content;
 }
