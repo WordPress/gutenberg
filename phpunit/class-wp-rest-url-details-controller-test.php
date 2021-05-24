@@ -1003,19 +1003,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
-	public function provide_response_is_from_cache() {
-		return array(
-			'uncached_response' => array(
-				null,
-				false,
-			), // empty!
-			'cached_response'   => array(
-				null,
-				true,
-			),
-		);
-	}
-
 	/**
 	 * Mocks the HTTP response for the the `wp_safe_remote_get()` which
 	 * would otherwise make a call to a real website.
