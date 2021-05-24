@@ -19,7 +19,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { contextConnect, useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
-import type { ViewOwnProps } from '../ui/context';
+import type { PolymorphicComponentProps } from '../ui/context';
 import * as styles from './styles';
 import { space } from '../ui/utils/space';
 
@@ -39,7 +39,7 @@ export interface DividerProps extends SeparatorProps {
 }
 
 function Divider(
-	props: ViewOwnProps< DividerProps, 'hr' >,
+	props: PolymorphicComponentProps< DividerProps, 'hr' >,
 	forwardedRef: Ref< any >
 ) {
 	const {

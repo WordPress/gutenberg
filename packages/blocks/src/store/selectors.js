@@ -84,16 +84,22 @@ export function getBlockStyles( state, name ) {
  *
  * @return {(WPBlockVariation[]|void)} Block variations.
  */
-export function getBlockVariations( state, blockName, scope ) {
-	const variations = state.blockVariations[ blockName ];
-	if ( ! variations || ! scope ) {
-		return variations;
-	}
-	return variations.filter( ( variation ) => {
-		// For backward compatibility reasons, variation's scope defaults to `block` and `inserter` when not set.
-		return ( variation.scope || [ 'block', 'inserter' ] ).includes( scope );
-	} );
-}
+export const getBlockVariations = createSelector(
+	( state, blockName, scope ) => {
+		const variations = state.blockVariations[ blockName ];
+		if ( ! variations || ! scope ) {
+			return variations;
+		}
+		return variations.filter( ( variation ) => {
+			// For backward compatibility reasons, variation's scope defaults to
+			// `block` and `inserter` when not set.
+			return ( variation.scope || [ 'block', 'inserter' ] ).includes(
+				scope
+			);
+		} );
+	},
+	( state, blockName ) => [ state.blockVariations[ blockName ] ]
+);
 
 /**
  * Returns the active block variation for a given block based on its attributes.

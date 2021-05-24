@@ -48,10 +48,10 @@ const switchToTemplateMode = async () => {
 		'//*[contains(@class, "components-snackbar")]/*[text()="Editing template. Changes made here affect all posts and pages that use the template."]'
 	);
 	const title = await page.$eval(
-		'.edit-post-template-title',
+		'.edit-post-template-top-area',
 		( el ) => el.innerText
 	);
-	expect( title ).toContain( 'Editing template:' );
+	expect( title ).toContain( 'About\n' );
 
 	await disableTemplateWelcomeGuide();
 };

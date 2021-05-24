@@ -12,7 +12,7 @@ import { useText } from '../../text';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'label'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'label'>} props
  */
 export function useControlLabel( props ) {
 	const {

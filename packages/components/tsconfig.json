@@ -20,6 +20,7 @@
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
 		"src/draggable/**/*",
+		"src/elevation/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
 		"src/scroll-lock/**/*",
@@ -36,6 +37,7 @@
 		"src/__next/**/*",
 		"src/h-stack/**/*",
 		"src/v-stack/**/*",
+		"src/z-stack/**/*",
 		"src/view/**/*"
 	],
 	"exclude": [

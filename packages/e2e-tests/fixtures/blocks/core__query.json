@@ -20,7 +20,7 @@
 				"inherit": true
 			},
 			"tagName": "div",
-			"layout": {
+			"displayLayout": {
 				"type": "list"
 			}
 		},
