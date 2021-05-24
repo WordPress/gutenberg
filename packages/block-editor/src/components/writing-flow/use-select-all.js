@@ -7,9 +7,9 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { isEntirelySelected } from '@wordpress/dom';
-import { useRef, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { __unstableUseShortcutRef as useShortcutRef } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -17,7 +17,6 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { store as blockEditorStore } from '../../store';
 
 export default function useSelectAll() {
-	const ref = useRef();
 	const {
 		getBlockOrder,
 		getSelectedBlockClientIds,
@@ -62,9 +61,5 @@ export default function useSelectAll() {
 		event.preventDefault();
 	}, [] );
 
-	useShortcut( 'core/block-editor/select-all', callback, {
-		target: ref,
-	} );
-
-	return ref;
+	return useShortcutRef( 'core/block-editor/select-all', callback );
 }
