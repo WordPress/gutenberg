@@ -5,7 +5,6 @@ import { render } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
-	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { registerLegacyWidgetVariations } from '@wordpress/widgets';
 
@@ -30,12 +29,6 @@ export function initialize( editorName, blockEditorSettings ) {
 		( block ) => ! [ 'core/more' ].includes( block.name )
 	);
 	registerCoreBlocks( coreBlocks );
-
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableLegacyWidgetBlock: true,
-		} );
-	}
 
 	registerLegacyWidgetVariations( blockEditorSettings );
 
