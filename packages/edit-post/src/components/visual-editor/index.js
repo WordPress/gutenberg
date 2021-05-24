@@ -106,6 +106,7 @@ export default function VisualEditor( { styles } ) {
 			coreStore
 		).hasFinishedResolution( '__experimentalGetTemplateForLink', [
 			post.link,
+			post.status === 'auto-draft',
 		] );
 
 		if ( currentPostType === 'wp_block' ) {

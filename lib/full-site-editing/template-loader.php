@@ -4,6 +4,9 @@
  *
  * @package gutenberg
  */
+function gutenberg_resolve_template_for_new_page( $query ) {
+	$query->set( 'post_status', 'auto-draft' );
+}
 
 /**
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
@@ -18,6 +21,15 @@ function gutenberg_add_template_loader_filters() {
 			continue;
 		}
 		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
+	}
+
+	if (
+		isset( $_GET['_wp-find-template'] ) &&
+		'true' === $_GET['_wp-find-template'] &&
+		isset( $_GET['post-new'] ) &&
+		'true' === $_GET['post-new']
+	) {
+		add_filter( 'pre_get_posts', 'gutenberg_resolve_template_for_new_page' );
 	}
 }
 

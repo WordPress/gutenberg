@@ -379,9 +379,10 @@ export function* getAutosave( postType, postId ) {
 /**
  * Retrieve the frontend template used for a given link.
  *
- * @param {string} link  Link.
+ * @param {string}  link  Link.
+ * @param {boolean} isNew If the template is for a newly created post/page.
  */
-export function* __experimentalGetTemplateForLink( link ) {
+export function* __experimentalGetTemplateForLink( link, isNew = false ) {
 	// Ideally this should be using an apiFetch call
 	// We could potentially do so by adding a "filter" to the `wp_template` end point.
 	// Also it seems the returned object is not a regular REST API post type.
@@ -390,6 +391,7 @@ export function* __experimentalGetTemplateForLink( link ) {
 		template = yield regularFetch(
 			addQueryArgs( link, {
 				'_wp-find-template': true,
+				'post-new': isNew,
 			} )
 		);
 	} catch ( e ) {
