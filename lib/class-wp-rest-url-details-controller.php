@@ -212,11 +212,16 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string The title tag contents on success, or an empty string.
 	 */
 	private function get_title( $html ) {
-		preg_match( '|<title[^>]*>(.*?)<\s*/\s*title>|is', $html, $match_title );
+		$pattern = '#<title[^>]*>(.*?)<\s*/\s*title>#is';
+		preg_match( $pattern, $html, $match_title );
 
-		$title = isset( $match_title[1] ) && is_string( $match_title[1] ) ? trim( $match_title[1] ) : '';
+		$title = ! empty( $match_title[1] ) && is_string( $match_title[1] ) ? trim( $match_title[1] ) : '';
 
-		return $title;
+		if ( empty( $title ) ) {
+			return '';
+		}
+
+		return $this->convert_html_entities( $title );
 	}
 
 	/**
@@ -276,10 +281,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return '';
 		}
 
-		// Convert any entities to HTML for use downstream.
-		$description = html_entity_decode( $description, ENT_QUOTES, get_bloginfo( 'charset' ) );
-
-		return $description;
+		return $this->convert_html_entities( $description );
 	}
 
 	/**
@@ -311,6 +313,16 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$image      = WP_Http::make_absolute_url( $image, $root_url );
 
 		return $image;
+	}
+
+	/**
+	 * Convert HTML entities into HTML for use downstream.
+	 *
+	 * @param string $html The HTML to convert.
+	 * @return string The HTML with all entities converted.
+	 */
+	private function convert_html_entities( $html ) {
+		return html_entity_decode( $html, ENT_QUOTES, get_bloginfo( 'charset' ) );
 	}
 
 	/**

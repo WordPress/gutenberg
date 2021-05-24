@@ -85,7 +85,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		// the filter `pre_http_request` (see this class's `setUp` method).
 		$this->assertArraySubset(
 			array(
-				'title'       => 'Example Website &mdash; - with encoded content.',
+				'title'       => 'Example Website — - with encoded content.',
 				'icon'        => 'https://placeholder-site.com/favicon.ico?querystringaddedfortesting',
 				'description' => 'Example description text here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.',
 				'image'       => 'https://placeholder-site.com/images/home/screen-themes.png?3',
@@ -362,7 +362,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		// data we provided via the filter.
 		$this->assertArraySubset(
 			array(
-				'title'    => 'Example Website &mdash; - with encoded content.',
+				'title'    => 'Example Website — - with encoded content.',
 				'og_title' => 'This was manually added to the data via filter',
 			),
 			$data
@@ -374,7 +374,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	public function test_allows_filtering_response() {
-
 		// Filter the response to known set of values changing only
 		// based on whether the response came from the cache or not.
 		add_filter(
@@ -477,36 +476,36 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 			// Happy path for default.
 			'default'                        => array(
-				'<title>Testing &lt;title&gt;:</title>',
-				'Testing &lt;title&gt;:',
+				'<title>Testing &lt;title&gt;</title>',
+				'Testing <title>',
 			),
 			'with attributes'                => array(
-				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">Testing &lt;title&gt;:</title>',
-				'Testing &lt;title&gt;:',
+				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">Testing &lt;title&gt;</title>',
+				'Testing <title>',
 			),
 			'with text whitespace'           => array(
-				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">   Testing &lt;title&gt;:	</title>',
-				'Testing &lt;title&gt;:',
+				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">   Testing &lt;title&gt;	</title>',
+				'Testing <title>',
 			),
 			'with whitespace in opening tag' => array(
 				'<title >Testing &lt;title&gt;: with whitespace in opening tag</title>',
-				'Testing &lt;title&gt;: with whitespace in opening tag',
+				'Testing <title>: with whitespace in opening tag',
 			),
 			'when whitepace in closing tag'  => array(
 				'<title>Testing &lt;title&gt;: with whitespace in closing tag</ title>',
-				'Testing &lt;title&gt;: with whitespace in closing tag',
+				'Testing <title>: with whitespace in closing tag',
 			),
 			'with other elements'            => array(
 				'<meta name="viewport" content="width=device-width">
-				<title>Testing &lt;title&gt;:</title>
+				<title>Testing &lt;title&gt;</title>
 				<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" />',
-				'Testing &lt;title&gt;:',
+				'Testing <title>',
 			),
 			'multiline'                      => array(
 				'<title>
-					Testing &lt;title&gt;:
+					Testing &lt;title&gt;
 				</title>',
-				'Testing &lt;title&gt;:',
+				'Testing <title>',
 			),
 
 			// Unhappy paths.
