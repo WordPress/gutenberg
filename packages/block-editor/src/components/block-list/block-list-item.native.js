@@ -125,10 +125,6 @@ export class BlockListItem extends Component {
 			contentResizeMode === 'stretch' && stretchStyle;
 		const { isContainerRelated } = alignmentHelpers;
 
-		if ( ! blockWidth ) {
-			return null;
-		}
-
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
@@ -166,7 +162,18 @@ export class BlockListItem extends Component {
 	}
 
 	render() {
-		const { gridProperties, clientId, parentWidth, items } = this.props;
+		const {
+			gridProperties,
+			clientId,
+			parentWidth,
+			items,
+			blockWidth,
+		} = this.props;
+
+		if ( ! blockWidth ) {
+			return null;
+		}
+
 		if ( gridProperties ) {
 			return (
 				<Grid
