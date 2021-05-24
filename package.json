@@ -90,6 +90,7 @@
 		"@babel/plugin-syntax-jsx": "7.12.13",
 		"@babel/runtime-corejs3": "7.13.10",
 		"@babel/traverse": "7.13.0",
+		"@emotion/native": "10.0.27",
 		"@octokit/rest": "16.26.0",
 		"@octokit/webhooks": "7.1.0",
 		"@storybook/addon-a11y": "6.2.5",
