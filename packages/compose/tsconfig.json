@@ -37,6 +37,7 @@
 		"src/hooks/use-resize-observer/**/*",
 		"src/hooks/use-viewport-match/**/*",
 		"src/hooks/use-warn-on-change/**/*",
+		"src/hooks/use-throttle/**/*",
 		"src/utils/**/*"
 	]
 }

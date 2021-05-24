@@ -437,13 +437,19 @@ be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to throttle, so please wrap functions created on
 render in components in `useCallback`.
 
+_Related_
+
+-   <https://docs-lodash.com/v4/throttle/>
+
 _Parameters_
 
--   _args_ `...any`: Arguments passed to Lodash's `throttle`.
+-   _fn_ `TFunc`: The function to throttle.
+-   _wait_ `[number]`: The number of milliseconds to throttle invocations to.
+-   _options_ `[import('lodash').ThrottleSettings]`: The options object. See linked documentation for details.
 
 _Returns_
 
--   `Function`: Throttled function.
+-   `TFunc & import('lodash').Cancelable`: Throttled function.
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
