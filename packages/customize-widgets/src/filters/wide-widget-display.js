@@ -10,11 +10,9 @@ const withWideWidgetDisplay = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { idBase } = props.attributes;
 		const isWide =
-			wp && wp.customize
-				? wp.customize.Widgets.data.availableWidgets.filter(
-						( widget ) => widget.id_base === idBase
-				  )[ 0 ]?.is_wide
-				: false;
+			wp.customize.Widgets.data.availableWidgets.find(
+				( widget ) => widget.id_base === idBase
+			)?.is_wide ?? false;
 
 		return <BlockEdit { ...props } isWide={ isWide } />;
 	},

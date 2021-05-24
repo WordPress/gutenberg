@@ -45,7 +45,7 @@ export default function Edit( props ) {
 			{ ! id && ! idBase ? (
 				<Empty { ...props } />
 			) : (
-				<NotEmpty { ...props } isWide={ isWide } />
+				<NotEmpty { ...props } />
 			) }
 		</div>
 	);
@@ -90,7 +90,7 @@ function NotEmpty( {
 	setAttributes,
 	clientId,
 	isSelected,
-	isWide,
+	isWide = false,
 } ) {
 	const [ hasPreview, setHasPreview ] = useState( null );
 
