@@ -23,11 +23,13 @@ import {
 	MediaUploadCheck,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import PostFeaturedImageCheck from './check';
+import { store as editorStore } from '../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -209,10 +211,8 @@ function PostFeaturedImage( {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getMedia, getPostType } = select( 'core' );
-	const { getCurrentPostId, getEditedPostAttribute } = select(
-		'core/editor'
-	);
+	const { getMedia, getPostType } = select( coreStore );
+	const { getCurrentPostId, getEditedPostAttribute } = select( editorStore );
 	const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 	return {
@@ -225,7 +225,7 @@ const applyWithSelect = withSelect( ( select ) => {
 
 const applyWithDispatch = withDispatch(
 	( dispatch, { noticeOperations }, { select } ) => {
-		const { editPost } = dispatch( 'core/editor' );
+		const { editPost } = dispatch( editorStore );
 		return {
 			onUpdateImage( image ) {
 				editPost( { featured_media: image.id } );

@@ -13,6 +13,12 @@ import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 function writeInterstitialMessage( targetDocument ) {
 	let markup = renderToString(
@@ -232,8 +238,8 @@ export default compose( [
 			isEditedPostSaveable,
 			isEditedPostAutosaveable,
 			getEditedPostPreviewLink,
-		} = select( 'core/editor' );
-		const { getPostType } = select( 'core' );
+		} = select( editorStore );
+		const { getPostType } = select( coreStore );
 
 		const previewLink = getEditedPostPreviewLink();
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
@@ -253,8 +259,8 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
-		autosave: dispatch( 'core/editor' ).autosave,
-		savePost: dispatch( 'core/editor' ).savePost,
+		autosave: dispatch( editorStore ).autosave,
+		savePost: dispatch( editorStore ).savePost,
 	} ) ),
 	ifCondition( ( { isViewable } ) => isViewable ),
 ] )( PostPreviewButton );

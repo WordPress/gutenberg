@@ -15,6 +15,8 @@ import {
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -119,7 +121,12 @@ export function* resetAutosave( newAutosave ) {
 	} );
 
 	const postId = yield controls.select( STORE_NAME, 'getCurrentPostId' );
-	yield controls.dispatch( 'core', 'receiveAutosaves', postId, newAutosave );
+	yield controls.dispatch(
+		coreStore,
+		'receiveAutosaves',
+		postId,
+		newAutosave
+	);
 
 	return { type: '__INERT__' };
 }
@@ -196,7 +203,7 @@ export function setupEditorState( post ) {
 export function* editPost( edits, options ) {
 	const { id, type } = yield controls.select( STORE_NAME, 'getCurrentPost' );
 	yield controls.dispatch(
-		'core',
+		coreStore,
 		'editEntityRecord',
 		'postType',
 		type,
@@ -232,7 +239,7 @@ export function* savePost( options = {} ) {
 	edits = {
 		id: previousRecord.id,
 		...( yield controls.select(
-			'core',
+			coreStore,
 			'getEntityRecordNonTransientEdits',
 			'postType',
 			previousRecord.type,
@@ -241,7 +248,7 @@ export function* savePost( options = {} ) {
 		...edits,
 	};
 	yield controls.dispatch(
-		'core',
+		coreStore,
 		'saveEntityRecord',
 		'postType',
 		previousRecord.type,
@@ -251,7 +258,7 @@ export function* savePost( options = {} ) {
 	yield __experimentalRequestPostUpdateFinish( options );
 
 	const error = yield controls.select(
-		'core',
+		coreStore,
 		'getLastEntitySaveError',
 		'postType',
 		previousRecord.type,
@@ -279,7 +286,7 @@ export function* savePost( options = {} ) {
 			previousPost: previousRecord,
 			post: updatedRecord,
 			postType: yield controls.resolveSelect(
-				'core',
+				coreStore,
 				'getPostType',
 				updatedRecord.type
 			),
@@ -296,7 +303,7 @@ export function* savePost( options = {} ) {
 		// considered for change detection.
 		if ( ! options.isAutosave ) {
 			yield controls.dispatch(
-				'core/block-editor',
+				blockEditorStore,
 				'__unstableMarkLastChangeAsPersistent'
 			);
 		}
@@ -313,7 +320,7 @@ export function* refreshPost() {
 		'getCurrentPostType'
 	);
 	const postType = yield controls.resolveSelect(
-		'core',
+		coreStore,
 		'getPostType',
 		postTypeSlug
 	);
@@ -336,7 +343,7 @@ export function* trashPost() {
 		'getCurrentPostType'
 	);
 	const postType = yield controls.resolveSelect(
-		'core',
+		coreStore,
 		'getPostType',
 		postTypeSlug
 	);
@@ -415,7 +422,7 @@ export function* autosave( { local = false, ...options } = {} ) {
  * @yield {Object} Action object.
  */
 export function* redo() {
-	yield controls.dispatch( 'core', 'redo' );
+	yield controls.dispatch( coreStore, 'redo' );
 }
 
 /**
@@ -424,7 +431,7 @@ export function* redo() {
  * @yield {Object} Action object.
  */
 export function* undo() {
-	yield controls.dispatch( 'core', 'undo' );
+	yield controls.dispatch( coreStore, 'undo' );
 }
 
 /**
@@ -604,7 +611,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		);
 		const noChange =
 			( yield controls.select(
-				'core',
+				coreStore,
 				'getEditedEntityRecord',
 				'postType',
 				type,
@@ -612,7 +619,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 			) ).blocks === edits.blocks;
 		if ( noChange ) {
 			return yield controls.dispatch(
-				'core',
+				coreStore,
 				'__unstableCreateUndoLevel',
 				'postType',
 				type,
@@ -654,7 +661,7 @@ const getBlockEditorAction = ( name ) =>
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
 		} );
-		yield controls.dispatch( 'core/block-editor', name, ...args );
+		yield controls.dispatch( blockEditorStore, name, ...args );
 	};
 
 /**

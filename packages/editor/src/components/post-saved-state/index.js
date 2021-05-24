@@ -21,6 +21,7 @@ import { displayShortcut } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
+import { store as editorStore } from '../../store';
 
 /**
  * Component showing whether the post is saved or not and providing save
@@ -64,7 +65,7 @@ export default function PostSavedState( {
 				getCurrentPost,
 				isAutosavingPost,
 				getEditedPostAttribute,
-			} = select( 'core/editor' );
+			} = select( editorStore );
 
 			return {
 				isAutosaving: isAutosavingPost(),
@@ -82,7 +83,7 @@ export default function PostSavedState( {
 		[ forceIsDirty, forceIsSaving ]
 	);
 
-	const { savePost } = useDispatch( 'core/editor' );
+	const { savePost } = useDispatch( editorStore );
 
 	const wasSaving = usePrevious( isSaving );
 
