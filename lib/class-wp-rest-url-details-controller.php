@@ -358,10 +358,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return bool True when transient set, or false.
 	 */
 	private function set_cache( $key, $data = '' ) {
-		if ( ! is_array( $data ) ) {
-			return false;
-		}
-
 		$ttl = HOUR_IN_SECONDS;
 
 		/**
