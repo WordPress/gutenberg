@@ -221,7 +221,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return '';
 		}
 
-		return $this->convert_html_entities( $title );
+		return $this->prepare_metadata_for_output( $title );
 	}
 
 	/**
@@ -281,7 +281,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return '';
 		}
 
-		return $this->convert_html_entities( $description );
+		return $this->prepare_metadata_for_output( $description );
 	}
 
 	/**
@@ -316,13 +316,18 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Convert HTML entities into HTML for use downstream.
+	 * Prepare the metadata by:
 	 *
-	 * @param string $html The HTML to convert.
-	 * @return string The HTML with all entities converted.
+	 *    - stripping all HTML tags and tag entities
+	 *    - converting non-tag entities into characters.
+	 *
+	 * @param string $metadata The metadata content to prepare.
+	 * @return string The prepared metadata.
 	 */
-	private function convert_html_entities( $html ) {
-		return html_entity_decode( $html, ENT_QUOTES, get_bloginfo( 'charset' ) );
+	private function prepare_metadata_for_output( $metadata ) {
+		$metadata = html_entity_decode( $metadata, ENT_QUOTES, get_bloginfo( 'charset' ) );
+		$metadata = wp_strip_all_tags( $metadata );
+		return $metadata;
 	}
 
 	/**

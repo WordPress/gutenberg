@@ -447,35 +447,35 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			// Happy path for default.
 			'default'                        => array(
 				'<title>Testing &lt;title&gt;</title>',
-				'Testing <title>',
+				'Testing',
 			),
 			'with attributes'                => array(
 				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">Testing &lt;title&gt;</title>',
-				'Testing <title>',
+				'Testing',
 			),
 			'with text whitespace'           => array(
 				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">   Testing &lt;title&gt;	</title>',
-				'Testing <title>',
+				'Testing',
 			),
 			'with whitespace in opening tag' => array(
 				'<title >Testing &lt;title&gt;: with whitespace in opening tag</title>',
-				'Testing <title>: with whitespace in opening tag',
+				'Testing : with whitespace in opening tag',
 			),
 			'when whitepace in closing tag'  => array(
 				'<title>Testing &lt;title&gt;: with whitespace in closing tag</ title>',
-				'Testing <title>: with whitespace in closing tag',
+				'Testing : with whitespace in closing tag',
 			),
 			'with other elements'            => array(
 				'<meta name="viewport" content="width=device-width">
 				<title>Testing &lt;title&gt;</title>
 				<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" />',
-				'Testing <title>',
+				'Testing',
 			),
 			'multiline'                      => array(
 				'<title>
 					Testing &lt;title&gt;
 				</title>',
-				'Testing <title>',
+				'Testing',
 			),
 
 			// Unhappy paths.
@@ -739,19 +739,19 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			// Happy paths with HTML tags or entities in the description.
 			'with HTML tags'                             => array(
 				'<meta name="description" content="<strong>Description</strong>: has <em>HTML</em> tags">',
-				'<strong>Description</strong>: has <em>HTML</em> tags',
+				'Description: has HTML tags',
 			),
 			'with content first and HTML tags'           => array(
 				'<meta content="<strong>Description</strong>: has <em>HTML</em> tags" name="description">',
-				'<strong>Description</strong>: has <em>HTML</em> tags',
+				'Description: has HTML tags',
 			),
 			'with HTML tags and other attributes'        => array(
 				'<meta first="first" name="description" third="third" content="<strong>Description</strong>: has <em>HTML</em> tags" fifth="fifth>',
-				'<strong>Description</strong>: has <em>HTML</em> tags',
+				'Description: has HTML tags',
 			),
 			'with HTML entities'                         => array(
 				'<meta name="description" content="The &lt;strong&gt;description&lt;/strong&gt; meta &amp; its attribute value"',
-				'The <strong>description</strong> meta & its attribute value',
+				'The description meta & its attribute value',
 			),
 
 			// Unhappy paths.
