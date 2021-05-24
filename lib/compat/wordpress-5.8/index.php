@@ -7,6 +7,12 @@
  * @package gutenberg
  */
 
+if ( ! class_exists( 'WP_Block_Editor_Context' ) ) {
+	require_once __DIR__ . '/class-wp-block-editor-context.php';
+}
+
+require_once __DIR__ . '/block-editor.php';
+
 if ( ! function_exists( 'build_query_vars_from_query_block' ) ) {
 	/**
 	 * Helper function that constructs a WP_Query args array from
