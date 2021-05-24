@@ -90,7 +90,7 @@ function gutenberg_inject_default_block_context( $args ) {
 	if ( is_callable( $args['render_callback'] ) ) {
 		$block_render_callback   = $args['render_callback'];
 		$args['render_callback'] = function( $attributes, $content, $block = null ) use ( $block_render_callback ) {
-			global $post, $wp_query;
+			global $post;
 
 			// Check for null for back compatibility with WP_Block_Type->render
 			// which is unused since the introduction of WP_Block class.
@@ -125,39 +125,6 @@ function gutenberg_inject_default_block_context( $args ) {
 				* it should be included to consistently fulfill the expectation.
 				*/
 				$block->context['postType'] = $post->post_type;
-			}
-
-			// Inject the query context if not done by Core.
-			$needs_query = ! empty( $block_type->uses_context ) && in_array( 'query', $block_type->uses_context, true );
-			if ( ! isset( $block->context['query'] ) && $needs_query ) {
-				if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
-					$block->context['query'] = array( 'categoryIds' => array() );
-
-					foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_slug_or_id ) {
-						$block->context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
-					}
-				}
-
-				if ( isset( $wp_query->tax_query->queried_terms['post_tag'] ) ) {
-					if ( isset( $block->context['query'] ) ) {
-						$block->context['query']['tagIds'] = array();
-					} else {
-						$block->context['query'] = array( 'tagIds' => array() );
-					}
-
-					foreach ( $wp_query->tax_query->queried_terms['post_tag']['terms'] as $tag_slug_or_id ) {
-						$tag_ID = $tag_slug_or_id;
-
-						if ( 'slug' === $wp_query->tax_query->queried_terms['post_tag']['field'] ) {
-							$tag = get_term_by( 'slug', $tag_slug_or_id, 'post_tag' );
-
-							if ( $tag ) {
-								$tag_ID = $tag->term_id;
-							}
-						}
-						$block->context['query']['tagIds'][] = $tag_ID;
-					}
-				}
 			}
 
 			return $block_render_callback( $attributes, $content, $block );

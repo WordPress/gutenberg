@@ -4,7 +4,7 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import {
-	registerBlockTypeFromMetadata,
+	registerBlockType,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -105,7 +105,7 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	registerBlockTypeFromMetadata( { name, ...metadata }, settings );
+	registerBlockType( { name, ...metadata }, settings );
 };
 
 /**
@@ -148,6 +148,7 @@ export const __experimentalGetCoreBlocks = () => [
 	mediaText,
 	latestComments,
 	latestPosts,
+	legacyWidget,
 	missing,
 	more,
 	nextpage,
@@ -183,7 +184,6 @@ export const __experimentalGetCoreBlocks = () => [
 
 	postTitle,
 	postContent,
-	postAuthor,
 	postDate,
 	postExcerpt,
 	postFeaturedImage,
@@ -230,19 +230,17 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( { enableLegacyWidgetBlock, enableFSEBlocks } = {} ) => {
+		? ( { enableFSEBlocks } = {} ) => {
 				[
 					navigation,
 					navigationLink,
 					homeLink,
 
-					// Register Legacy Widget block.
-					...( enableLegacyWidgetBlock ? [ legacyWidget ] : [] ),
-
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks
 						? [
 								templatePart,
+								postAuthor,
 								postComment,
 								postCommentAuthor,
 								postCommentContent,

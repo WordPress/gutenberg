@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 3.2.0 (2021-05-24)
+
+### New Features
+
+-   Marks the `core/legacy-widget` block as stable.
+
+## 3.1.0 (2021-05-20)
+
 ## 3.0.0 (2021-05-14)
 
 ### Breaking Changes

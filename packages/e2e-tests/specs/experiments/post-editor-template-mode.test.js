@@ -18,6 +18,68 @@ const openSidebarPanelWithTitle = async ( title ) => {
 	await panel.click();
 };
 
+const disableTemplateWelcomeGuide = async () => {
+	// Turn off the welcome guide if it's visible.
+	const isWelcomeGuideActive = await page.evaluate( () =>
+		wp.data
+			.select( 'core/edit-post' )
+			.isFeatureActive( 'welcomeGuideTemplate' )
+	);
+	if ( isWelcomeGuideActive ) {
+		await page.evaluate( () =>
+			wp.data
+				.dispatch( 'core/edit-post' )
+				.toggleFeature( 'welcomeGuideTemplate' )
+		);
+	}
+};
+
+const switchToTemplateMode = async () => {
+	// Switch to template mode.
+	await openDocumentSettingsSidebar();
+	await openSidebarPanelWithTitle( 'Template' );
+	const editTemplateXPath =
+		"//*[contains(@class, 'edit-post-template__actions')]//button[contains(text(), 'Edit')]";
+	const switchLink = await page.waitForXPath( editTemplateXPath );
+	await switchLink.click();
+
+	// Check that we switched properly to edit mode.
+	await page.waitForXPath(
+		'//*[contains(@class, "components-snackbar")]/*[text()="Editing template. Changes made here affect all posts and pages that use the template."]'
+	);
+	const title = await page.$eval(
+		'.edit-post-template-top-area',
+		( el ) => el.innerText
+	);
+	expect( title ).toContain( 'About\n' );
+
+	await disableTemplateWelcomeGuide();
+};
+
+const createNewTemplate = async ( templateName ) => {
+	// Create a new custom template.
+	await openDocumentSettingsSidebar();
+	await openSidebarPanelWithTitle( 'Template' );
+	const newTemplateXPath =
+		"//*[contains(@class, 'edit-post-template__actions')]//button[contains(text(), 'New')]";
+	const newButton = await page.waitForXPath( newTemplateXPath );
+	await newButton.click();
+
+	// Fill the template title and submit.
+	const templateNameInputSelector =
+		'.edit-post-template__modal .components-text-control__input';
+	await page.click( templateNameInputSelector );
+	await page.keyboard.type( templateName );
+	await page.keyboard.press( 'Enter' );
+
+	// Check that we switched properly to edit mode.
+	await page.waitForXPath(
+		'//*[contains(@class, "components-snackbar")]/*[text()="Custom template created. You\'re in template mode now."]'
+	);
+
+	await disableTemplateWelcomeGuide();
+};
+
 describe( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
@@ -47,23 +109,7 @@ describe( 'Post Editor Template mode', () => {
 		await saveDraft();
 		await page.reload();
 
-		// Switch to template mode.
-		await openDocumentSettingsSidebar();
-		await openSidebarPanelWithTitle( 'Template' );
-		const editTemplateXPath =
-			"//*[contains(@class, 'edit-post-template__actions')]//button[contains(text(), 'Edit')]";
-		const switchLink = await page.waitForXPath( editTemplateXPath );
-		await switchLink.click();
-
-		// Check that we switched properly to edit mode.
-		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Editing template. Changes made here affect all posts and pages that use the template."]'
-		);
-		const title = await page.$eval(
-			'.edit-post-template-title',
-			( el ) => el.innerText
-		);
-		expect( title ).toContain( 'Editing template:' );
+		await switchToTemplateMode();
 
 		// Edit the template
 		await insertBlock( 'Paragraph' );
@@ -107,25 +153,7 @@ describe( 'Post Editor Template mode', () => {
 		await saveDraft();
 		await page.reload();
 
-		// Create a new custom template.
-		await openDocumentSettingsSidebar();
-		await openSidebarPanelWithTitle( 'Template' );
-		const newTemplateXPath =
-			"//*[contains(@class, 'edit-post-template__actions')]//button[contains(text(), 'New')]";
-		const newButton = await page.waitForXPath( newTemplateXPath );
-		await newButton.click();
-
-		// Fill the template title and submit.
-		const templateNameInputSelector =
-			'.edit-post-template__modal .components-text-control__input';
-		await page.click( templateNameInputSelector );
-		await page.keyboard.type( 'Blank Template' );
-		await page.keyboard.press( 'Enter' );
-
-		// Check that we switched properly to edit mode.
-		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Custom template created. You\'re in template mode now."]'
-		);
+		await createNewTemplate( 'Blank Template' );
 
 		// Edit the template
 		await insertBlock( 'Paragraph' );

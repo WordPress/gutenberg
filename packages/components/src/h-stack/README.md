@@ -1,6 +1,8 @@
 # HStack
 
-> **Experimental!**
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
 
@@ -93,7 +95,7 @@ function Example() {
 		<HStack>
 			<Text>Code</Text>
 			<Spacer>
-			<Text>is</Text>
+				<Text>is</Text>
 			</Spacer>
 			<Text>Poetry</Text>
 		</HStack>
