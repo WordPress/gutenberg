@@ -592,6 +592,12 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" /><link rel="canonical" href="https://example.com">',
 				'https://wordpress.org/favicon.ico',
 			),
+			'with multiple links'                   => array(
+				'<link rel="manifest" href="/manifest.56b1cedc.json">
+				<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" />
+				<link rel="canonical" href="https://example.com">',
+				'https://wordpress.org/favicon.ico',
+			),
 			'relative url'                          => array(
 				'<link rel="shortcut icon" href="/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
@@ -684,57 +690,290 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	/**
-	 * @dataProvider provide_get_image_data
+	 * @dataProvider data_get_description
 	 */
-	public function test_get_image( $html, $expected_image, $target_url = 'https://wordpress.org' ) {
-
+	public function test_get_description( $html, $expected ) {
 		$controller = new WP_REST_URL_Details_Controller();
-		$method     = $this->get_reflective_method( 'get_image' );
-		$result     = $method->invoke(
+
+		// Parse the meta elements from the given HTML.
+		$method        = $this->get_reflective_method( 'get_meta_with_content_elements' );
+		$meta_elements = $method->invoke(
 			$controller,
-			$this->wrap_html_in_doc( $html ),
-			$target_url
+			$this->wrap_html_in_doc( $html )
 		);
-		$this->assertEquals( $expected_image, $result );
+
+		$method = $this->get_reflective_method( 'get_description' );
+		$actual = $method->invoke( $controller, $meta_elements );
+		$this->assertSame( $expected, $actual );
 	}
 
-	public function provide_get_image_data() {
+	public function data_get_description() {
 		return array(
-			'default'                       => array(
-				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg" />',
-				'https://wordpress.org/images/myimage.jpg',
+
+			// Happy paths.
+			'default'                                    => array(
+				'<meta name="description" content="This is a description.">',
+				'This is a description.',
 			),
-			'no_closing_tag'                => array(
+			'with whitespace'                            => array(
+				'<meta  name=" description "   content=" This is a description.  "   >',
+				'This is a description.',
+			),
+			'with self-closing'                          => array(
+				'<meta name="description" content="This is a description."/>',
+				'This is a description.',
+			),
+			'with self-closing and whitespace'           => array(
+				'<meta  name=" description "   content=" This is a description.  "   />',
+				'This is a description.',
+			),
+			'with content first'                         => array(
+				'<meta content="Content is first" name="description">',
+				'Content is first',
+			),
+			'with single quotes'                         => array(
+				'<meta name=\'description\' content=\'with single quotes\'>',
+				'with single quotes',
+			),
+			'with another element'                       => array(
+				'<meta name="description" content="This is a description."><meta name="viewport" content="width=device-width, initial-scale=1">',
+				'This is a description.',
+			),
+			'with multiple elements'                     => array(
+				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg" />
+				<link rel="stylesheet" href="https://example.com/assets/style.css" />
+				<meta name="description" content="This is a description.">
+				<meta name="viewport" content="width=device-width, initial-scale=1">',
+				'This is a description.',
+			),
+			'with other attributes'                      => array(
+				'<meta first="first" name="description" third="third" content="description with other attributes" fifth="fifth">',
+				'description with other attributes',
+			),
+
+			// Happy paths with multiline attributes.
+			'with multiline attributes'                  => array(
+				'<meta
+					name="description" 
+					content="with multiline attributes"
+				>',
+				'with multiline attributes',
+			),
+			'with multiline attributes in reverse order' => array(
+				'<meta 
+					content="with multiline attributes in reverse order"
+					name="description"
+				>',
+				'with multiline attributes in reverse order',
+			),
+			'with multiline attributes and another element' => array(
+				'<meta 
+					name="description" 
+					content="with multiline attributes"
+				>
+				<meta name="viewport" content="width=device-width, initial-scale=1">',
+				'with multiline attributes',
+			),
+			'with multiline and other attributes'        => array(
+				'<meta 
+					first="first" 
+					name="description" 
+					third="third" 
+					content="description with multiline and other attributes" 
+					fifth="fifth"
+				>',
+				'description with multiline and other attributes',
+			),
+
+			// Happy paths with HTML tags or entities in the description.
+			'with HTML tags'                             => array(
+				'<meta name="description" content="<strong>Description</strong>: has <em>HTML</em> tags">',
+				'<strong>Description</strong>: has <em>HTML</em> tags',
+			),
+			'with content first and HTML tags'           => array(
+				'<meta content="<strong>Description</strong>: has <em>HTML</em> tags" name="description">',
+				'<strong>Description</strong>: has <em>HTML</em> tags',
+			),
+			'with HTML tags and other attributes'        => array(
+				'<meta first="first" name="description" third="third" content="<strong>Description</strong>: has <em>HTML</em> tags" fifth="fifth>',
+				'<strong>Description</strong>: has <em>HTML</em> tags',
+			),
+			'with HTML entities'                         => array(
+				'<meta name="description" content="The &lt;strong&gt;description&lt;/strong&gt; meta &amp; its attribute value"',
+				'The <strong>description</strong> meta & its attribute value',
+			),
+
+			// Unhappy paths.
+			'with empty content'                         => array(
+				'<meta name="description" content="">',
+				'',
+			),
+			'with empty name'                            => array(
+				'<meta name="" content="name is empty">',
+				'',
+			),
+			'without a name attribute'                   => array(
+				'<meta content="without a name attribute">',
+				'',
+			),
+			'without a content attribute'                => array(
+				'<meta name="description">',
+				'',
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider data_get_image
+	 */
+	public function test_get_image( $html, $expected, $target_url = 'https://wordpress.org' ) {
+		$controller = new WP_REST_URL_Details_Controller();
+
+		// Parse the meta elements from the given HTML.
+		$method        = $this->get_reflective_method( 'get_meta_with_content_elements' );
+		$meta_elements = $method->invoke(
+			$controller,
+			$this->wrap_html_in_doc( $html )
+		);
+
+		$method = $this->get_reflective_method( 'get_image' );
+		$actual = $method->invoke( $controller, $meta_elements, $target_url );
+		$this->assertEquals( $expected, $actual );
+	}
+
+	public function data_get_image() {
+		return array(
+
+			// Happy paths.
+			'default'                                      => array(
 				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg">',
 				'https://wordpress.org/images/myimage.jpg',
 			),
-			'using_url_modifier'            => array(
-				'<meta property="og:image:url" content="https://wordpress.org/images/myimage.jpg" />
-				<meta property="og:image:alt" content="Ignore this please" />',
+			'with whitespace'                              => array(
+				'<meta  property=" og:image "   content="  https://wordpress.org/images/myimage.jpg "  >',
 				'https://wordpress.org/images/myimage.jpg',
 			),
-			'should_ignore_other_modifiers' => array(
+			'with self-closing'                            => array(
+				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg"/>',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'with self-closing and whitespace'             => array(
+				'<meta  property=" og:image "   content="  https://wordpress.org/images/myimage.jpg "  />',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'with single quotes'                           => array(
+				"<meta property='og:image' content='https://wordpress.org/images/myimage.jpg'>",
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'without quotes'                               => array(
+				'<meta property=og:image content="https://wordpress.org/images/myimage.jpg">',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'with url modifier'                            => array(
+				'<meta property="og:image:url" content="https://wordpress.org/images/url-modifier.jpg" />
+				<meta property="og:image" content="https://wordpress.org/images/myimage.jpg">',
+				'https://wordpress.org/images/url-modifier.jpg',
+			),
+			'with query string'                            => array(
+				'<meta property="og:image" content="https://wordpress.org/images/withquerystring.jpg?foo=bar&bar=foo" />',
+				'https://wordpress.org/images/withquerystring.jpg?foo=bar&bar=foo',
+			),
+
+			// Happy paths with changing attributes order or adding attributes.
+			'with content first'                           => array(
+				'<meta content="https://wordpress.org/images/myimage.jpg" property="og:image">',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'with other attributes'                        => array(
+				'<meta first="first" property="og:image" third="third" content="https://wordpress.org/images/myimage.jpg" fifth="fifth">',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'with other og meta'                           => array(
 				'<meta property="og:image:height" content="720" />
+				<meta property="og:image:alt" content="Ignore this please" />
 				<meta property="og:image" content="https://wordpress.org/images/myimage.jpg" />
-				<meta property="og:image:alt" content="Ignore this please" />',
+				<link rel="stylesheet" href="https://example.com/assets/style.css" />',
 				'https://wordpress.org/images/myimage.jpg',
 			),
-			'with_query_string'             => array(
-				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg?foo=bar&bar=foo" />',
-				'https://wordpress.org/images/myimage.jpg?foo=bar&bar=foo',
-			),
-			'relative_url'                  => array(
+
+			// Happy paths with relative url.
+			'with relative url'                            => array(
 				'<meta property="og:image" content="/images/myimage.jpg" />',
 				'https://wordpress.org/images/myimage.jpg',
 			),
-			'relative_url_no_slash'         => array(
+			'with relative url without starting slash'     => array(
 				'<meta property="og:image" content="images/myimage.jpg" />',
 				'https://wordpress.org/images/myimage.jpg',
 			),
-			'relative_url_with_path'        => array(
+			'with relative url and path'                   => array(
 				'<meta property="og:image" content="images/myimage.jpg" />',
 				'https://wordpress.org/images/myimage.jpg',
 				'https://wordpress.org/my/path/here/',
+			),
+
+			// Happy paths with multiline attributes.
+			'with multiline attributes'                    => array(
+				'<meta
+					property="og:image"
+					content="https://wordpress.org/images/myimage.jpg"
+				>',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'with multiline attributes in reverse order'   => array(
+				'<meta 
+					content="https://wordpress.org/images/myimage.jpg"
+					property="og:image"
+				>',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'with multiline attributes and other elements' => array(
+				'<meta 
+					property="og:image:height" 
+					content="720" 
+				/>
+				<meta 
+					property="og:image:alt" 
+					content="Ignore this please" 
+				/>
+				<meta 
+					property="og:image"
+					content="https://wordpress.org/images/myimage.jpg"
+				>
+				<link rel="stylesheet" href="https://example.com/assets/style.css" />',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'with multiline and other attributes'          => array(
+				'<meta 
+					first="first" 
+					property="og:image:url" 
+					third="third" 
+					content="https://wordpress.org/images/myimage.jpg"
+					fifth="fifth"
+				>',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+
+			// Happy paths with HTML tags in the content.
+			'with other og meta'                           => array(
+				'<meta property="og:image:height" content="720" />
+				<meta property="og:image:alt" content="<em>ignore this please</em>" />
+				<meta property="og:image" content="https://wordpress.org/images/myimage.jpg" />
+				<link rel="stylesheet" href="https://example.com/assets/style.css" />',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+
+			// Unhappy paths.
+			'with empty content'                           => array(
+				'<meta property="og:image" content="">',
+				'',
+			),
+			'without a property attribute'                 => array(
+				'<meta content="https://wordpress.org/images/myimage.jpg">',
+				'',
+			),
+			'without a content attribute empty property'   => array(
+				'<meta property="og:image" href="https://wordpress.org/images/myimage.jpg">',
+				'',
 			),
 		);
 	}
