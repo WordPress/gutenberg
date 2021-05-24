@@ -12,7 +12,10 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { STORE_NAME as editSiteStoreName } from './constants';
+import {
+	STORE_NAME as editSiteStoreName,
+	CORE_STORE_NAME as coreStoreName,
+} from './constants';
 import isTemplateRevertable from '../utils/is-template-revertable';
 
 /**
@@ -54,7 +57,7 @@ export function* setTemplate( templateId, templateSlug ) {
 	const pageContext = { templateSlug };
 	if ( ! templateSlug ) {
 		const template = yield controls.resolveSelect(
-			coreStore,
+			coreStoreName,
 			'getEntityRecord',
 			'postType',
 			'wp_template',
@@ -78,7 +81,7 @@ export function* setTemplate( templateId, templateSlug ) {
  */
 export function* addTemplate( template ) {
 	const newTemplate = yield controls.dispatch(
-		coreStore,
+		coreStoreName,
 		'saveEntityRecord',
 		'postType',
 		'wp_template',
@@ -87,7 +90,7 @@ export function* addTemplate( template ) {
 
 	if ( template.content ) {
 		yield controls.dispatch(
-			coreStore,
+			coreStoreName,
 			'editEntityRecord',
 			'postType',
 			'wp_template',
@@ -160,7 +163,7 @@ export function setHomeTemplateId( homeTemplateId ) {
 export function* setPage( page ) {
 	if ( ! page.path && page.context?.postId ) {
 		const entity = yield controls.resolveSelect(
-			coreStore,
+			coreStoreName,
 			'getEntityRecord',
 			'postType',
 			page.context.postType || 'post',
@@ -170,7 +173,7 @@ export function* setPage( page ) {
 		page.path = getPathAndQueryString( entity.link );
 	}
 	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
-		coreStore,
+		coreStoreName,
 		'__experimentalGetTemplateForLink',
 		page.path
 	);
@@ -198,7 +201,7 @@ export function* showHomepage() {
 		show_on_front: showOnFront,
 		page_on_front: frontpageId,
 	} = yield controls.resolveSelect(
-		coreStore,
+		coreStoreName,
 		'getEntityRecord',
 		'root',
 		'site'
