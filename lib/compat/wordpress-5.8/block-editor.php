@@ -256,7 +256,7 @@ function gutenberg_get_default_block_editor_settings() {
  *
  * @since 10.5.0
  *
- * @param array                   $custom_settings      Optional custom settings to use with the editor type.
+ * @param array                   $custom_settings      Custom settings to use with the given editor type.
  * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
  *
  * @return array The contextualized block editor settings.
