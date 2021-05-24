@@ -33,11 +33,7 @@ export function initialize( id, settings ) {
 		( block ) => ! [ 'core/more' ].includes( block.name )
 	);
 	registerCoreBlocks( coreBlocks );
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableLegacyWidgetBlock: true,
-		} );
-	}
+	__experimentalRegisterExperimentalCoreBlocks();
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
