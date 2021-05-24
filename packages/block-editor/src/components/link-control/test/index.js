@@ -10,6 +10,7 @@ import { default as lodash, first, last, nth, uniqueId } from 'lodash';
  */
 import { useState } from '@wordpress/element';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 /**
  * WordPress dependencies
  */
@@ -1558,7 +1559,7 @@ describe( 'Selecting links', () => {
 	} );
 } );
 
-describe( 'Addition Settings UI', () => {
+describe( 'Additional Settings UI', () => {
 	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
 		const selectedLink = first( fauxEntitySuggestions );
 		const expectedSettingText = 'Open in new tab';
@@ -1658,6 +1659,98 @@ describe( 'Addition Settings UI', () => {
 		// Assert the default "checked" states match the expected
 		expect( settingControlsInputs[ 0 ].checked ).toEqual( false );
 		expect( settingControlsInputs[ 1 ].checked ).toEqual( true );
+	} );
+
+	it( 'should allow for extending settings via filter', () => {
+		const selectedLink = first( fauxEntitySuggestions );
+
+		const customSettings = [
+			{
+				id: 'newTab',
+				title: 'Open in new tab',
+			},
+			{
+				id: 'noFollow',
+				title: 'No follow',
+			},
+		];
+
+		const customSettingsInitialStates = {
+			newTab: false,
+			noFollow: true,
+		};
+
+		const customSettingsLabelsText = customSettings.map(
+			( setting ) => setting.title
+		);
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return (
+				<LinkControl
+					value={ { ...link, ...customSettingsInitialStates } }
+				/>
+			);
+		};
+
+		// Filter the settings.
+		addFilter(
+			'core.block-editor.link-control.settings',
+			'myplugin/block-editor/link-control-settings',
+			( settings ) => {
+				return [
+					...settings,
+					{
+						id: 'noFollow',
+						title: 'No follow',
+					},
+				];
+			}
+		);
+
+		act( () => {
+			render( <LinkControlConsumer />, container );
+		} );
+
+		// Grab the elements using user perceivable DOM queries
+		const settingsLegend = Array.from(
+			container.querySelectorAll( 'legend' )
+		).find(
+			( legend ) =>
+				legend.innerHTML &&
+				legend.innerHTML.includes( 'Currently selected link settings' )
+		);
+		const settingsFieldset = settingsLegend.closest( 'fieldset' );
+		const settingControlsLabels = Array.from(
+			settingsFieldset.querySelectorAll( 'label' )
+		);
+		const settingControlsInputs = settingControlsLabels.map( ( label ) => {
+			return settingsFieldset.querySelector(
+				`#${ label.getAttribute( 'for' ) }`
+			);
+		} );
+
+		const settingControlLabelsText = Array.from(
+			settingControlsLabels
+		).map( ( label ) => label.innerHTML );
+
+		// Check we have the correct number of controls
+		expect( settingControlsLabels ).toHaveLength( 2 );
+
+		// Check the labels match
+		expect( settingControlLabelsText ).toEqual(
+			expect.arrayContaining( customSettingsLabelsText )
+		);
+
+		// Assert the default "checked" states match the expected
+		expect( settingControlsInputs[ 0 ].checked ).toEqual( false );
+		expect( settingControlsInputs[ 1 ].checked ).toEqual( true );
+
+		removeFilter(
+			'core.block-editor.link-control.settings',
+			'myplugin/block-editor/link-control-settings'
+		);
 	} );
 } );
 
