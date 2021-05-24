@@ -19,6 +19,7 @@ import {
 	validateThemeGradients,
 } from '@wordpress/block-editor';
 import { dispatch } from '@wordpress/data';
+import { unregisterBlockType } from '@wordpress/blocks';
 
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
@@ -56,6 +57,11 @@ const setupInitHooks = () => {
 		'core/react-native-editor',
 		( props ) => {
 			setupLocale( props.locale, props.translations );
+
+			const capabilities = props.capabilities ?? {};
+			if ( capabilities.reusableBlock !== true ) {
+				unregisterBlockType( 'core/block' );
+			}
 		}
 	);
 

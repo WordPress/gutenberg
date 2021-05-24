@@ -24,14 +24,6 @@ const getMenusData = ( select ) => {
 	};
 };
 export default function useNavigationEditor() {
-	const [
-		isManageLocationsModalOpen,
-		setIsManageLocationsModalOpen,
-	] = useState( false );
-	const [ openManageLocationsModal, closeManageLocationsModal ] = [
-		true,
-		false,
-	].map( ( bool ) => () => setIsManageLocationsModalOpen( bool ) );
 	const { deleteMenu: _deleteMenu } = useDispatch( coreStore );
 	const [ selectedMenuId, setSelectedMenuId ] = useSelectedMenuId();
 	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
@@ -101,9 +93,6 @@ export default function useNavigationEditor() {
 		isMenuBeingDeleted,
 		selectMenu: setSelectedMenuId,
 		deleteMenu,
-		openManageLocationsModal,
-		closeManageLocationsModal,
-		isManageLocationsModalOpen,
 		isMenuSelected: !! selectedMenuId,
 	};
 }

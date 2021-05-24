@@ -4,12 +4,6 @@
 import { sumBy, merge, mapValues } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
-
-/**
  * Returns a column width attribute value rounded to standard precision.
  * Returns `undefined` if the value is not a valid finite number.
  *
@@ -168,36 +162,6 @@ export function getWidthWithUnit( width, unit ) {
 
 	return `${ width }${ unit }`;
 }
-
-const isWeb = Platform.OS === 'web';
-
-export const CSS_UNITS = [
-	{
-		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
-		default: '',
-	},
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
-		default: '',
-	},
-];
 
 /**
  * Returns a boolean whether passed unit is percentage

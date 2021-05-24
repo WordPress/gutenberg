@@ -30,7 +30,7 @@ export default function QueryLoopEdit( {
 		query: {
 			perPage,
 			offset,
-			categoryIds,
+			categoryIds = [],
 			postType,
 			tagIds = [],
 			order,
@@ -43,7 +43,7 @@ export default function QueryLoopEdit( {
 		} = {},
 		queryContext = [ { page: 1 } ],
 		templateSlug,
-		layout: { type: layoutType = 'flex', columns = 1 } = {},
+		displayLayout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
 } ) {
 	const [ { page } ] = queryContext;
