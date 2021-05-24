@@ -21,6 +21,7 @@ import {
 import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
+import { useResizeObserver } from '@wordpress/compose';
 
 const TILE_SPACING = 8;
 
@@ -30,6 +31,8 @@ const MAX_DISPLAYED_COLUMNS_NARROW = 2;
 
 export const Gallery = ( props ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+	const [ resizeObserver, sizes ] = useResizeObserver();
+	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	useEffect( mediaUploadSync, [] );
 
 	const {
@@ -41,11 +44,17 @@ export const Gallery = ( props ) => {
 		clientId,
 	} = props;
 
+	useEffect( () => {
+		const { width } = sizes || {};
+		if ( width ) {
+			setMaxWidth( width );
+		}
+	}, [ sizes ] );
+
 	const {
 		imageCount,
 		align,
 		columns = defaultColumnsNumber( imageCount ),
-		// eslint-disable-next-line no-unused-vars
 		imageCrop,
 	} = attributes;
 
@@ -64,6 +73,15 @@ export const Gallery = ( props ) => {
 			numColumns: displayedColumns,
 			marginHorizontal: TILE_SPACING,
 			marginVertical: TILE_SPACING,
+			__experimentalLayout: { type: 'default', alignments: [] },
+			blockProps: {
+				imageCrop,
+				isGallery: true,
+			},
+			gridProperties: {
+				numColumns: displayedColumns,
+			},
+			parentWidth: maxWidth + 2 * TILE_SPACING,
 		}
 	);
 
@@ -77,6 +95,7 @@ export const Gallery = ( props ) => {
 
 	return (
 		<View style={ isFullWidth && styles.fullWidth }>
+			{ resizeObserver }
 			<View { ...innerBlocksProps } />
 			<View
 				style={ [
