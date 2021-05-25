@@ -137,10 +137,14 @@ export function useEntityProp( kind, type, prop, _id ) {
 export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, type );
 	const id = _id ?? providerId;
+	const { getEditedEntityRecord } = useSelect( 'core' );
 	const { content, blocks } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord } = select( 'core' );
-			const editedEntity = getEditedEntityRecord( kind, type, id );
+			const editedEntity = select( 'core' ).getEditedEntityRecord(
+				kind,
+				type,
+				id
+			);
 			return {
 				blocks: editedEntity.blocks,
 				content: editedEntity.content,
@@ -156,7 +160,11 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 		// Load the blocks from the content if not already in state
 		// Guard against other instances that might have
 		// set content to a function already or the blocks are already in state.
-		if ( content && typeof content !== 'function' && ! blocks ) {
+		if (
+			content &&
+			typeof content !== 'function' &&
+			! getEditedEntityRecord( kind, type, id ).blocks
+		) {
 			const parsedContent = parse( content );
 			editEntityRecord(
 				kind,
