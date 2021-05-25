@@ -14,7 +14,7 @@ const customEnvVariables = {};
 
 const modulesDir = path.join( __dirname, '../node_modules' );
 
-// Workaround for Emtion 11
+// Workaround for Emotion 11
 // https://github.com/storybookjs/storybook/pull/13300#issuecomment-783268111
 const updateEmotionAliases = ( config ) => ( {
 	...config,
