@@ -407,7 +407,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			),
 			'status'         => $template->status,
 			'wp_id'          => $template->wp_id,
-			'has_theme_file' => $template->has_theme_file
+			'has_theme_file' => $template->has_theme_file,
 		);
 
 		if ( 'wp_template_part' === $template->type ) {
