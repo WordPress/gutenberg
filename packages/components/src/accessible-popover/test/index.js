@@ -6,21 +6,21 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import Button from '../../../button';
-import { CardBody } from '../../../card';
-import { Popover } from '../index';
+import Button from '../../button';
+import { CardBody } from '../../card';
+import { AccessiblePopover } from '..';
 
 describe( 'props', () => {
 	const basePopoverId = 'base-popover';
 	beforeEach( () => {
 		render(
-			<Popover
+			<AccessiblePopover
 				baseId={ basePopoverId }
 				trigger={ <Button>WordPress.org</Button> }
 				visible
 			>
 				<CardBody>Code is Poetry</CardBody>
-			</Popover>
+			</AccessiblePopover>
 		);
 	} );
 
@@ -33,13 +33,13 @@ describe( 'props', () => {
 		const invisiblePopoverTriggerContent =
 			'WordPress.org - invisible popover';
 		render(
-			<Popover
+			<AccessiblePopover
 				baseId="popover"
 				trigger={ <Button>{ invisiblePopoverTriggerContent }</Button> }
 				visible={ false }
 			>
 				<CardBody>Code is Poetry</CardBody>
-			</Popover>
+			</AccessiblePopover>
 		);
 
 		const popovers = screen.getAllByRole( 'dialog' );
@@ -53,9 +53,9 @@ describe( 'props', () => {
 	test( 'should render without trigger', () => {
 		const triggerlessPopoverId = 'triggerless-popover';
 		render(
-			<Popover baseId={ triggerlessPopoverId } visible>
+			<AccessiblePopover baseId={ triggerlessPopoverId } visible>
 				<CardBody>Code is Poetry</CardBody>
-			</Popover>
+			</AccessiblePopover>
 		);
 		const popovers = screen.getAllByRole( 'dialog' );
 		const triggerlessPopover = popovers.find(
@@ -67,7 +67,7 @@ describe( 'props', () => {
 	test( 'should render without content', () => {
 		const contentlessPopoverId = 'contentless-popover';
 		render(
-			<Popover
+			<AccessiblePopover
 				baseId={ contentlessPopoverId }
 				trigger={ <Button>WordPress.org</Button> }
 				visible
@@ -84,14 +84,14 @@ describe( 'props', () => {
 	test( 'should render label', () => {
 		const labelledPopoverId = 'labelled-popover';
 		render(
-			<Popover
+			<AccessiblePopover
 				baseId={ labelledPopoverId }
 				label="show"
 				trigger={ <Button>WordPress.org</Button> }
 				visible
 			>
 				<CardBody>Code is Poetry</CardBody>
-			</Popover>
+			</AccessiblePopover>
 		);
 		const popovers = screen.getAllByRole( 'dialog' );
 		const labelledPopover = popovers.find(

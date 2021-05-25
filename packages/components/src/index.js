@@ -11,6 +11,7 @@ export {
 } from '@wordpress/primitives';
 
 // Components
+export { AccessiblePopover as __experimentalAccessiblePopover } from './accessible-popover';
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export {
 	default as Animate,
