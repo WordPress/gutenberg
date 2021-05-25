@@ -546,11 +546,11 @@ describe( 'Navigation editor', () => {
 			}
 		}
 
-		it( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
+		it.skip( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
 			await assertIsDirty( false );
 		} );
 
-		it( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
+		it.skip( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
 			await page.type(
 				'.edit-navigation-name-editor__text-control input',
 				' Menu'
