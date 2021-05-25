@@ -58,6 +58,10 @@ _Returns_
 
 -   `string`: Value of the previous timezone.
 
+<a name="cleanupWidgets" href="#cleanupWidgets">#</a> **cleanupWidgets**
+
+Delete all the widgets in the widgets screen.
+
 <a name="clearLocalStorage" href="#clearLocalStorage">#</a> **clearLocalStorage**
 
 Clears the local storage.

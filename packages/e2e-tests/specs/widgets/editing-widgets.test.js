@@ -8,6 +8,7 @@ import {
 	deactivatePlugin,
 	showBlockToolbar,
 	visitAdminPage,
+	cleanupWidgets,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -16,11 +17,6 @@ import {
 // eslint-disable-next-line no-restricted-imports
 import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
-
-/**
- * Internal dependencies
- */
-import { cleanupWidgets } from './test-utils';
 
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
@@ -33,12 +29,19 @@ describe( 'Widgets screen', () => {
 		await visitAdminPage( 'themes.php' );
 
 		// Go to the Widgets page.
-		const appearanceList = await page.$( '#menu-appearance' );
+		const appearanceMenu = await page.$( '#menu-appearance' );
+		await appearanceMenu.hover();
 		const widgetsLink = await find(
 			{ role: 'link', name: 'Widgets' },
-			{ root: appearanceList }
+			{ root: appearanceMenu }
 		);
-		await Promise.all( [ page.waitForNavigation(), widgetsLink.click() ] );
+		await Promise.all( [
+			page.waitForNavigation(),
+			// Click on the link no matter if it's visible or not.
+			widgetsLink.evaluate( ( link ) => {
+				link.click();
+			} ),
+		] );
 
 		// Disable welcome guide if it is enabled.
 		const isWelcomeGuideActive = await page.evaluate( () =>

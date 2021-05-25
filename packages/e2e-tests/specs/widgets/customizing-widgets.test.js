@@ -8,6 +8,7 @@ import {
 	visitAdminPage,
 	showBlockToolbar,
 	clickBlockToolbarButton,
+	cleanupWidgets,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -15,11 +16,6 @@ import {
  */
 // eslint-disable-next-line no-restricted-imports
 import { find } from 'puppeteer-testing-library';
-
-/**
- * Internal dependencies
- */
-import { cleanupWidgets } from './test-utils';
 
 describe( 'Widgets Customizer', () => {
 	beforeEach( async () => {

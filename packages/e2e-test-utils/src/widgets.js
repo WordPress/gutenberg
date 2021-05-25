@@ -1,18 +1,16 @@
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import {
-	visitAdminPage,
-	activatePlugin,
-	deactivatePlugin,
-} from '@wordpress/e2e-test-utils';
+import { activatePlugin } from './activate-plugin';
+import { deactivatePlugin } from './deactivate-plugin';
+import { visitAdminPage } from './visit-admin-page';
 
 /**
- * TODO: Deleting widgets in the new widgets screen seems to be unreliable.
- * We visit the old widgets screen to delete them.
- * Refactor this to use real interactions in the new widgets screen once the bug is fixed.
+ * Delete all the widgets in the widgets screen.
  */
-async function cleanupWidgets() {
+export async function cleanupWidgets() {
+	// TODO: Deleting widgets in the new widgets screen is cumbersome and slow.
+	// To workaround this for now, we visit the old widgets screen to delete them.
 	await activatePlugin( 'gutenberg-test-classic-widgets' );
 
 	await visitAdminPage( 'widgets.php' );
@@ -32,5 +30,3 @@ async function cleanupWidgets() {
 
 	await deactivatePlugin( 'gutenberg-test-classic-widgets' );
 }
-
-export { cleanupWidgets };
