@@ -13,7 +13,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { caption, url, align, id, anchor, duotone } ) =>
+			transform: ( { caption, url, align, id, anchor, style } ) =>
 				createBlock(
 					'core/cover',
 					{
@@ -21,7 +21,11 @@ const transforms = {
 						align,
 						id,
 						anchor,
-						duotone,
+						style: {
+							color: {
+								duotone: style?.color?.duotone,
+							},
+						},
 					},
 					[
 						createBlock( 'core/paragraph', {
@@ -113,14 +117,18 @@ const transforms = {
 					! customGradient
 				);
 			},
-			transform: ( { title, url, align, id, anchor, duotone } ) =>
+			transform: ( { title, url, align, id, anchor, style } ) =>
 				createBlock( 'core/image', {
 					caption: title,
 					url,
 					align,
 					id,
 					anchor,
-					duotone,
+					style: {
+						color: {
+							duotone: style.color.duotone,
+						},
+					},
 				} ),
 		},
 		{

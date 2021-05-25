@@ -1,7 +1,22 @@
 /**
  * External dependencies
  */
-import { capitalize, get, has, omit, omitBy, startsWith } from 'lodash';
+import {
+	capitalize,
+	find,
+	first,
+	forEach,
+	get,
+	has,
+	isEmpty,
+	isEqual,
+	kebabCase,
+	map,
+	omit,
+	startsWith,
+	without,
+} from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -11,8 +26,9 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -59,7 +75,8 @@ export function getInlineStyles( styles = {} ) {
 	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
 		const path = STYLE_PROPERTY[ propKey ].value;
 		const subPaths = STYLE_PROPERTY[ propKey ].properties;
-		if ( has( styles, path ) ) {
+		// Ignore styles on elements because they are handled on the server.
+		if ( has( styles, path ) && 'elements' !== first( path ) ) {
 			if ( !! subPaths ) {
 				subPaths.forEach( ( suffix ) => {
 					output[
@@ -73,6 +90,26 @@ export function getInlineStyles( styles = {} ) {
 	} );
 
 	return output;
+}
+
+function compileElementsStyles( selector, elements = {} ) {
+	return map( elements, ( styles, element ) => {
+		const elementStyles = getInlineStyles( styles );
+		if ( ! isEmpty( elementStyles ) ) {
+			return [
+				`.${ selector } ${ ELEMENTS[ element ] }{`,
+				...map(
+					elementStyles,
+					( value, property ) =>
+						`\t${ kebabCase( property ) }: ${ value }${
+							element === 'link' ? '!important' : ''
+						};`
+				),
+				'}',
+			].join( '\n' );
+		}
+		return '';
+	} ).join( '\n' );
 }
 
 /**
@@ -98,21 +135,25 @@ function addAttribute( settings ) {
 	return settings;
 }
 
-/**
- * Filters a style object returning only the keys
- * that are serializable for a given block.
- *
- * @param {Object} style Input style object to filter.
- * @param {Object} blockSupports Info about block supports.
- * @return {Object} Filtered style.
- */
-export function omitKeysNotToSerialize( style, blockSupports ) {
-	return omitBy(
-		style,
-		( value, key ) =>
-			!! blockSupports[ key ]?.__experimentalSkipSerialization
-	);
-}
+const skipSerializationPaths = {
+	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
+	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		COLOR_SUPPORT_KEY,
+	],
+	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		'spacing',
+	],
+	[ `__experimentalSkipFontSizeSerialization` ]: [ 'typography', 'fontSize' ],
+	[ `__experimentalSkipTypographySerialization` ]: without(
+		TYPOGRAPHY_SUPPORT_KEYS,
+		FONT_SIZE_SUPPORT_KEY
+	).map(
+		( feature ) =>
+			find( STYLE_PROPERTY, ( property ) =>
+				isEqual( property.support, [ feature ] )
+			)?.value
+	),
+};
 
 /**
  * Override props assigned to save component to inject the CSS variables definition.
@@ -127,22 +168,16 @@ export function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
-	const { style } = attributes;
-	let filteredStyle = omitKeysNotToSerialize( style, {
-		border: getBlockSupport( blockType, BORDER_SUPPORT_KEY ),
-		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
+	let { style } = attributes;
+
+	forEach( skipSerializationPaths, ( path, indicator ) => {
+		if ( getBlockSupport( blockType, indicator ) ) {
+			style = omit( style, path );
+		}
 	} );
 
-	if (
-		getBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
-	) {
-		filteredStyle = omit( filteredStyle, [
-			[ 'typography', FONT_SIZE_SUPPORT_KEY ],
-		] );
-	}
-
 	props.style = {
-		...getInlineStyles( filteredStyle ),
+		...getInlineStyles( style ),
 		...props.style,
 	};
 
@@ -202,6 +237,45 @@ export const withBlockControls = createHigherOrderComponent(
 	'withToolbarControls'
 );
 
+/**
+ * Override the default block element to include duotone styles.
+ *
+ * @param  {Function} BlockListBlock Original component
+ * @return {Function}                Wrapped component
+ */
+const withElementsStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const elements = props.attributes.style?.elements;
+		if ( ! elements ) {
+			return <BlockListBlock { ...props } />;
+		}
+		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
+			BlockListBlock
+		) }`;
+		const styles = compileElementsStyles(
+			blockElementsContainerIdentifier,
+			props.attributes.style?.elements
+		);
+
+		return (
+			<>
+				<style
+					dangerouslySetInnerHTML={ {
+						__html: styles,
+					} }
+				/>
+				<BlockListBlock
+					{ ...props }
+					className={ classnames(
+						props.classname,
+						blockElementsContainerIdentifier
+					) }
+				/>
+			</>
+		);
+	}
+);
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/style/addAttribute',
@@ -224,4 +298,10 @@ addFilter(
 	'editor.BlockEdit',
 	'core/style/with-block-controls',
 	withBlockControls
+);
+
+addFilter(
+	'editor.BlockListBlock',
+	'core/editor/with-elements-styles',
+	withElementsStyles
 );

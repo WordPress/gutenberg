@@ -111,7 +111,7 @@ function GalleryEdit( props ) {
 		};
 	} );
 
-	const { resizedImages } = useMemo( () => {
+	const resizedImages = useMemo( () => {
 		if ( isSelected ) {
 			return reduce(
 				attributes.ids,

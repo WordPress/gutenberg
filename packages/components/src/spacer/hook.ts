@@ -8,7 +8,7 @@ import { css, cx } from 'emotion';
  */
 import { useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
-import type { ViewOwnProps } from '../ui/context';
+import type { PolymorphicComponentProps } from '../ui/context';
 import { space } from '../ui/utils/space';
 
 const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
@@ -75,7 +75,9 @@ export interface SpacerProps {
 	paddingRight?: number;
 }
 
-export function useSpacer( props: ViewOwnProps< SpacerProps, 'div' > ) {
+export function useSpacer(
+	props: PolymorphicComponentProps< SpacerProps, 'div' >
+) {
 	const {
 		className,
 		margin,

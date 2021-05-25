@@ -12,7 +12,6 @@ import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
-import { useInlineWarning } from './use-inline-warning';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
@@ -145,9 +144,9 @@ export function useRichText( {
 		forceRender();
 	}
 
-	function applyFromProps( { domOnly } = {} ) {
+	function applyFromProps() {
 		setRecordFromProps();
-		applyRecord( record.current, { domOnly } );
+		applyRecord( record.current );
 	}
 
 	const didMount = useRef( false );
@@ -178,7 +177,6 @@ export function useRichText( {
 		ref,
 		useDefaultStyle(),
 		useBoundaryStyle( { record } ),
-		useInlineWarning(),
 		useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
 		useSelectObject(),
 		useFormatBoundaries( { record, applyRecord } ),
@@ -201,12 +199,7 @@ export function useRichText( {
 			onSelectionChange,
 		} ),
 		useRefEffect( () => {
-			if ( didMount.current ) {
-				applyFromProps();
-			} else {
-				applyFromProps( { domOnly: true } );
-			}
-
+			applyFromProps();
 			didMount.current = true;
 		}, [ placeholder, ...__unstableDependencies ] ),
 	] );

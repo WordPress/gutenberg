@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import { keyBy } from 'lodash';
+import { get, keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
 import { getWidgetIdFromBlock } from '@wordpress/widgets';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -23,7 +25,7 @@ import {
 import { STORE_NAME as editWidgetsStoreName } from './constants';
 
 export const getWidgets = createRegistrySelector( ( select ) => () => {
-	const widgets = select( 'core' ).getEntityRecords(
+	const widgets = select( coreStore ).getEntityRecords(
 		'root',
 		'widget',
 		buildWidgetsQuery()
@@ -47,7 +49,7 @@ export const getWidget = createRegistrySelector(
 
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 	const query = buildWidgetAreasQuery();
-	return select( 'core' ).getEntityRecords(
+	return select( coreStore ).getEntityRecords(
 		KIND,
 		WIDGET_AREA_ENTITY_TYPE,
 		query
@@ -64,7 +66,7 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
 	( select ) => ( state, widgetId ) => {
 		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
 		return widgetAreas.find( ( widgetArea ) => {
-			const post = select( 'core' ).getEditedEntityRecord(
+			const post = select( coreStore ).getEditedEntityRecord(
 				KIND,
 				POST_TYPE,
 				buildWidgetAreaPostId( widgetArea.id )
@@ -90,14 +92,14 @@ export const getEditedWidgetAreas = createRegistrySelector(
 		}
 		return widgetAreas
 			.filter( ( { id } ) =>
-				select( 'core' ).hasEditsForEntityRecord(
+				select( coreStore ).hasEditsForEntityRecord(
 					KIND,
 					POST_TYPE,
 					buildWidgetAreaPostId( id )
 				)
 			)
 			.map( ( { id } ) =>
-				select( 'core' ).getEditedEntityRecord(
+				select( coreStore ).getEditedEntityRecord(
 					KIND,
 					WIDGET_AREA_ENTITY_TYPE,
 					id
@@ -117,7 +119,7 @@ export const getReferenceWidgetBlocks = createRegistrySelector(
 		const results = [];
 		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
 		for ( const _widgetArea of widgetAreas ) {
-			const post = select( 'core' ).getEditedEntityRecord(
+			const post = select( coreStore ).getEditedEntityRecord(
 				KIND,
 				POST_TYPE,
 				buildWidgetAreaPostId( _widgetArea.id )
@@ -146,7 +148,7 @@ export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
 	}
 
 	for ( const id of widgetAreasIds ) {
-		const isSaving = select( 'core' ).isSavingEntityRecord(
+		const isSaving = select( coreStore ).isSavingEntityRecord(
 			KIND,
 			WIDGET_AREA_ENTITY_TYPE,
 			id
@@ -161,7 +163,7 @@ export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
 		undefined, // account for new widgets without an ID
 	];
 	for ( const id of widgetIds ) {
-		const isSaving = select( 'core' ).isSavingEntityRecord(
+		const isSaving = select( coreStore ).isSavingEntityRecord(
 			'root',
 			'widget',
 			id
@@ -208,15 +210,31 @@ export function isInserterOpened( state ) {
 export const canInsertBlockInWidgetArea = createRegistrySelector(
 	( select ) => ( state, blockName ) => {
 		// Widget areas are always top-level blocks, which getBlocks will return.
-		const widgetAreas = select( 'core/block-editor' ).getBlocks();
+		const widgetAreas = select( blockEditorStore ).getBlocks();
 
 		// Makes an assumption that a block that can be inserted into one
 		// widget area can be inserted into any widget area. Uses the first
 		// widget area for testing whether the block can be inserted.
 		const [ firstWidgetArea ] = widgetAreas;
-		return select( 'core/block-editor' ).canInsertBlockType(
+		return select( blockEditorStore ).canInsertBlockType(
 			blockName,
 			firstWidgetArea.clientId
 		);
 	}
 );
+
+/**
+ * Returns whether the given feature is enabled or not.
+ *
+ * This function is unstable, as it is mostly copied from the edit-post
+ * package. Editor features and preferences have a lot of scope for
+ * being generalized and refactored.
+ *
+ * @param {Object} state   Global application state.
+ * @param {string} feature Feature slug.
+ *
+ * @return {boolean} Is active.
+ */
+export function __unstableIsFeatureActive( state, feature ) {
+	return get( state.preferences.features, [ feature ], false );
+}

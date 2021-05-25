@@ -57,6 +57,7 @@ export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
+export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
 export { default as FocalPointPicker } from './focal-point-picker';
@@ -131,8 +132,11 @@ export {
 } from './tree-grid';
 export { default as TreeSelect } from './tree-select';
 export { Truncate as __experimentalTruncate } from './truncate';
-export { default as __experimentalUnitControl } from './unit-control';
-export { VisuallyHidden } from './visually-hidden';
+export {
+	default as __experimentalUnitControl,
+	useCustomUnits as __experimentalUseCustomUnits,
+} from './unit-control';
+export { default as VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {
@@ -143,6 +147,7 @@ export {
 	useSlot as __experimentalUseSlot,
 } from './slot-fill';
 export { default as __experimentalStyleProvider } from './style-provider';
+export { ZStack as __experimentalZStack } from './z-stack';
 
 // Higher-Order Components
 export {

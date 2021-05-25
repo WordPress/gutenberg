@@ -232,7 +232,7 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.clickItemByText( 'Index' );
 
 			// Select the header template part via list view.
-			await page.click( 'button[aria-label="List View"]' );
+			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
 				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
 			);

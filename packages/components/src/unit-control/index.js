@@ -200,4 +200,5 @@ function UnitControl(
 
 const ForwardedUnitControl = forwardRef( UnitControl );
 
+export { useCustomUnits } from './utils';
 export default ForwardedUnitControl;
