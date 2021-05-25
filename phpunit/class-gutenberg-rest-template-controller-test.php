@@ -1,6 +1,6 @@
 <?php
 
-class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
 	 */
