@@ -28,40 +28,5 @@ jobs:
               with:
                   node-version: 14.x
 
-            - name: Restore npm cache
-              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
-              with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
-
-            - run: npm ci
-
-            - name: Restore Gradle cache
-              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
-              with:
-                  path: ~/.gradle/caches
-                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-
-            - uses: reactivecircus/android-emulator-runner@d2799957d660add41c61a5103e2fbb9e2889eb73 # v2.15.0
-              with:
-                  api-level: 28
-                  profile: pixel_xl
-                  script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
-
-            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
-              if: always()
-              with:
-                  name: android-screen-recordings
-                  path: packages/react-native-editor/android-screen-recordings
-
-            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
-              if: always()
-              with:
-                  name: appium-logs
-                  path: packages/react-native-editor/appium-out.log
-
-            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
-              if: always()
-              with:
-                  name: npm-logs
-                  path: /Users/runner/.npm/_logs/*
+            - name: Setup tmate session
+              uses: mxschmitt/action-tmate@v3
