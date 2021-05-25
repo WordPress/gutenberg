@@ -19,6 +19,13 @@ class WP_Theme_JSON_Gutenberg {
 	private $theme_json = null;
 
 	/**
+	 * Container of append paths that were merged with a non null value before.
+	 *
+	 * @var array
+	 */
+	private $merged_append_paths_with_data = array();
+
+	/**
 	 * Holds block metadata extracted from block.json
 	 * to be shared among all instances so we don't
 	 * process it twice.
@@ -1119,11 +1126,39 @@ class WP_Theme_JSON_Gutenberg {
 			}
 			foreach ( $to_append as $path_to_append ) {
 				$path          = array_merge( $metadata['path'], $path_to_append );
-				$incoming_node = _wp_array_get( $incoming_data, $path, array() );
+				$incoming_node = _wp_array_get( $incoming_data, $path, null );
 				$existing_node = _wp_array_get( $existing_data, $path, array() );
 
 				if ( empty( $incoming_node ) && empty( $existing_node ) ) {
 					continue;
+				}
+
+				// If we are merging with something that has no values
+				// core origin should be  treated as if the values were present
+				// and we can remove the origin.
+				if ( null === $incoming_node ) {
+					if ( _wp_array_get( $this->merged_append_paths_with_data, $path, false ) ) {
+						continue;
+					}
+					$all_nodes_are_core_origin = true;
+					foreach ( $existing_node as $value ) {
+						if ( ! ( isset( $value['origin'] ) && 'core' === $value['origin'] ) ) {
+							$all_nodes_are_core_origin = false;
+							break;
+						}
+					}
+					if ( $all_nodes_are_core_origin ) {
+						$merged = array();
+						foreach ( $existing_node as $value ) {
+							unset( $value['origin'] );
+							$merged[] = $value;
+						}
+						gutenberg_experimental_set( $this->theme_json, $path, $merged );
+					}
+					continue;
+				}
+				if ( ! empty( $existing_node ) ) {
+					gutenberg_experimental_set( $this->merged_append_paths_with_data, $path, true );
 				}
 
 				$index_table    = array();

@@ -177,6 +177,22 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['spacing']['customPadding'] );
 	}
 
+	// On the site-editor for now we still need the core origin colors.
+	if ( 'site-editor' !== $context ) {
+		$settings_with_core_origin = array( 'colors', 'gradients' );
+		foreach ( $settings_with_core_origin as $setting_key ) {
+			if ( isset( $settings[ $setting_key ] ) ) {
+				$new_setting = array();
+				foreach ( $settings[ $setting_key ] as $node ) {
+					if ( ! ( isset( $node['origin'] ) && 'core' === $node['origin'] ) ) {
+						$new_setting[] = $node;
+					}
+				}
+				$settings[ $setting_key ] = $new_setting;
+			}
+		}
+	}
+
 	return $settings;
 }
 
