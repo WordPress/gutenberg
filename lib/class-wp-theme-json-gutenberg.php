@@ -620,6 +620,28 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Function that appends a sub-selector to a existing one.
+	 *
+	 * Given the compounded $selector "h1, h2, h3"
+	 * and the $to_append selector ".some-class" the result will be
+	 * "h1.some-class, h2.some-class, h3.some-class".
+	 *
+	 * @param string $selector
+	 * @param string $to_append
+	 *
+	 * @return string
+	 */
+	private static function append_to_selector( $selector, $to_append ) {
+		$new_selectors = [];
+		$selectors     = explode( ',', $selector );
+		foreach ( $selectors as $sel ) {
+			$new_selectors[] = $sel . $to_append;
+		}
+
+		return implode( ',', $new_selectors );
+	}
+
+	/**
 	 * Given a settings array, it returns the generated rulesets
 	 * for the preset classes.
 	 *
@@ -641,7 +663,7 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= self::to_ruleset(
-						$selector . '.has-' . $value['slug'] . '-' . $class['class_suffix'],
+						self::append_to_selector( $selector, '.has-' . $value['slug'] . '-' . $class['class_suffix'] ),
 						array(
 							array(
 								'name'  => $class['property_name'],
