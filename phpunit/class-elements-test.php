@@ -4,12 +4,6 @@
  *
  * @package Gutenberg
  */
-
-/**
- * Test WP_Theme_JSON class.
- *
- * @package Gutenberg
- */
 class Gutenberg_Elements_Test extends WP_UnitTestCase {
 	/**
 	 * Given a string containing a class prefixed by "wp-elements-" followed by a unique id,
@@ -61,7 +55,7 @@ class Gutenberg_Elements_Test extends WP_UnitTestCase {
 				array(
 					'blockName' => 'core/paragraph',
 					'attrs'     => array(
-						'style' => array(
+						'style'           => array(
 							'elements' => array(
 								'link' => array(
 									'color' => array(

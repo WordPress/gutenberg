@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Test WP_Theme_JSON class.
+ * Test WP_Theme_JSON_Gutenberg class.
  *
  * @package Gutenberg
  */
 
-class WP_Theme_JSON_Test extends WP_UnitTestCase {
+class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	function test_get_settings() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'color'       => array(
 						'custom' => false,
@@ -30,7 +30,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					'elements' => array(
 						'link' => array(
 							'color' => array(
-								'text'       => '#111',
+								'text' => '#111',
 							),
 						),
 					),
@@ -57,9 +57,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'color'      => array(
 						'text'    => 'value',
@@ -175,9 +175,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_stylesheet_preset_rules_come_after_block_rules() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'blocks' => array(
 						'core/group' => array(
@@ -215,9 +215,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	public function test_get_stylesheet_preset_values_are_marked_as_important() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'color' => array(
 						'palette' => array(
@@ -253,7 +253,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
 	public function test_merge_incoming_data() {
 		$initial = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color'  => array(
 					'custom'  => false,
@@ -284,7 +284,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$add_new_block = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'blocks' => array(
 					'core/list' => array(
@@ -309,7 +309,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$add_key_in_settings = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color' => array(
 					'customGradient' => true,
@@ -318,7 +318,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$update_key_in_settings = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color' => array(
 					'custom' => true,
@@ -327,7 +327,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$add_styles = array(
-			'version' => WP_Theme_JSON::LATEST_SCHEMA,
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
 				'blocks' => array(
 					'core/group' => array(
@@ -342,7 +342,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$add_key_in_styles = array(
-			'version' => WP_Theme_JSON::LATEST_SCHEMA,
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
 				'blocks' => array(
 					'core/group' => array(
@@ -357,7 +357,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$add_invalid_context = array(
-			'version' => WP_Theme_JSON::LATEST_SCHEMA,
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
 				'blocks' => array(
 					'core/para' => array(
@@ -370,7 +370,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$update_presets = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color'      => array(
 					'palette'   => array(
@@ -404,7 +404,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color'      => array(
 					'custom'         => true,
@@ -482,23 +482,23 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$theme_json = new WP_Theme_JSON( $initial );
-		$theme_json->merge( new WP_Theme_JSON( $add_new_block ) );
-		$theme_json->merge( new WP_Theme_JSON( $add_key_in_settings ) );
-		$theme_json->merge( new WP_Theme_JSON( $update_key_in_settings ) );
-		$theme_json->merge( new WP_Theme_JSON( $add_styles ) );
-		$theme_json->merge( new WP_Theme_JSON( $add_key_in_styles ) );
-		$theme_json->merge( new WP_Theme_JSON( $add_invalid_context ) );
-		$theme_json->merge( new WP_Theme_JSON( $update_presets ) );
+		$theme_json = new WP_Theme_JSON_Gutenberg( $initial );
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $add_new_block ) );
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $add_key_in_settings ) );
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $update_key_in_settings ) );
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $add_styles ) );
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $add_key_in_styles ) );
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $add_invalid_context ) );
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $update_presets ) );
 		$actual = $theme_json->get_raw_data();
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 	function test_remove_insecure_properties_removes_unsafe_styles() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version' => WP_Theme_JSON::LATEST_SCHEMA,
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'color'    => array(
 						'gradient' => 'url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+PHNjcmlwdD5hbGVydCgnb2snKTwvc2NyaXB0PjxsaW5lYXJHcmFkaWVudCBpZD0nZ3JhZGllbnQnPjxzdG9wIG9mZnNldD0nMTAlJyBzdG9wLWNvbG9yPScjRjAwJy8+PHN0b3Agb2Zmc2V0PSc5MCUnIHN0b3AtY29sb3I9JyNmY2MnLz4gPC9saW5lYXJHcmFkaWVudD48cmVjdCBmaWxsPSd1cmwoI2dyYWRpZW50KScgeD0nMCcgeT0nMCcgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScvPjwvc3ZnPg==\')',
@@ -539,7 +539,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json->remove_insecure_properties();
 		$actual   = $theme_json->get_raw_data();
 		$expected = array(
-			'version' => WP_Theme_JSON::LATEST_SCHEMA,
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
 				'color'    => array(
 					'text' => 'var:preset|color|dark-red',
@@ -554,7 +554,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 				'blocks'   => array(
 					'core/group' => array(
-						'color' => array(
+						'color'    => array(
 							'text' => 'var:preset|color|dark-gray',
 						),
 						'elements' => array(
@@ -572,9 +572,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_remove_insecure_properties_removes_unsafe_styles_sub_properties() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version' => WP_Theme_JSON::LATEST_SCHEMA,
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'spacing'  => array(
 						'padding' => array(
@@ -627,7 +627,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json->remove_insecure_properties();
 		$actual   = $theme_json->get_raw_data();
 		$expected = array(
-			'version' => WP_Theme_JSON::LATEST_SCHEMA,
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
 				'spacing'  => array(
 					'padding' => array(
@@ -675,9 +675,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_remove_insecure_properties_removes_non_preset_settings() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'color'   => array(
 						'custom'  => true,
@@ -736,7 +736,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json->remove_insecure_properties();
 		$result   = $theme_json->get_raw_data();
 		$expected = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color'  => array(
 					'palette' => array(
@@ -786,9 +786,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_remove_insecure_properties_removes_unsafe_preset_settings() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'color'      => array(
 						'palette' => array(
@@ -873,7 +873,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json->remove_insecure_properties();
 		$result   = $theme_json->get_raw_data();
 		$expected = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color'      => array(
 					'palette' => array(
@@ -912,9 +912,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_remove_insecure_properties_applies_safe_styles() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version' => WP_Theme_JSON::LATEST_SCHEMA,
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'color' => array(
 						'text' => '#abcabc ', // Trailing space.
@@ -926,7 +926,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json->remove_insecure_properties();
 		$result   = $theme_json->get_raw_data();
 		$expected = array(
-			'version' => WP_Theme_JSON::LATEST_SCHEMA,
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
 				'color' => array(
 					'text' => '#abcabc ',
@@ -937,7 +937,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_custom_templates() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'customTemplates' => array(
 					array(
@@ -962,7 +962,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_template_parts() {
-		$theme_json = new WP_Theme_JSON(
+		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'templateParts' => array(
 					array(
@@ -1016,7 +1016,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color'      => array(
 					'custom'         => false,
@@ -1053,7 +1053,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON::get_from_editor_settings( $input );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
@@ -1089,7 +1089,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(
 				'color'      => array(
 					'custom'         => true,
@@ -1105,17 +1105,17 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON::get_from_editor_settings( $input );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 	function test_get_editor_settings_blank() {
 		$expected = array(
-			'version'  => WP_Theme_JSON::LATEST_SCHEMA,
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'settings' => array(),
 		);
-		$actual   = WP_Theme_JSON::get_from_editor_settings( array() );
+		$actual   = WP_Theme_JSON_Gutenberg::get_from_editor_settings( array() );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
@@ -1129,7 +1129,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			'customPadding' => false,
 		);
 
-		$actual = WP_Theme_JSON::get_from_editor_settings( $input );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['spacing'] );
 	}
@@ -1143,7 +1143,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			'customPadding' => false,
 		);
 
-		$actual = WP_Theme_JSON::get_from_editor_settings( $input );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['spacing'] );
 	}
@@ -1157,7 +1157,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			'customPadding' => false,
 		);
 
-		$actual = WP_Theme_JSON::get_from_editor_settings( $input );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['spacing'] );
 	}

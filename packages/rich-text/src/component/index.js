@@ -12,7 +12,6 @@ import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
-import { useInlineWarning } from './use-inline-warning';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
@@ -178,7 +177,6 @@ export function useRichText( {
 		ref,
 		useDefaultStyle(),
 		useBoundaryStyle( { record } ),
-		useInlineWarning(),
 		useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
 		useSelectObject(),
 		useFormatBoundaries( { record, applyRecord } ),

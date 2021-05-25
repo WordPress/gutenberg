@@ -15,7 +15,7 @@ import { useContextSystem } from '../context';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 export function useSurface( props ) {
 	const {

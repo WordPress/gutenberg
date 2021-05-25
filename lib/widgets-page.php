@@ -34,7 +34,8 @@ function gutenberg_widgets_init( $hook ) {
 
 	add_filter( 'admin_body_class', 'gutenberg_widgets_editor_add_admin_body_classes' );
 
-	$settings = array_merge(
+	$widgets_editor_context = new WP_Block_Editor_Context();
+	$settings               = array_merge(
 		gutenberg_get_default_block_editor_settings(),
 		gutenberg_get_legacy_widget_settings()
 	);
@@ -60,7 +61,7 @@ function gutenberg_widgets_init( $hook ) {
 
 	wp_add_inline_script(
 		'wp-blocks',
-		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( 'widgets_editor' ) ) ),
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( $widgets_editor_context ) ) ),
 		'after'
 	);
 
