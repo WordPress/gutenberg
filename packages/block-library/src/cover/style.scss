@@ -61,6 +61,9 @@
 		right: 0;
 		z-index: z-index(".wp-block-cover.has-background-dim::before");
 		opacity: 0.5;
+
+		// This renders the border on the GPU which fixes a Safari flicker issue.
+		will-change: transform;
 	}
 
 

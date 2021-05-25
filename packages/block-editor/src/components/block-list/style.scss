@@ -160,14 +160,14 @@
 			z-index: 1;
 			pointer-events: none;
 			content: "";
-			top: $border-width;
-			bottom: $border-width;
-			left: $border-width;
-			right: $border-width;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
 
-			// 2px outside.
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
+			// 2px inside.
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui;
 
 			// This renders the border on the GPU which fixes a Safari flicker issue.
 			will-change: transform;
