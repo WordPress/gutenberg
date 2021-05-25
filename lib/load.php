@@ -56,9 +56,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/class-wp-rest-customizer-nonces.php';
 	}
-	if ( ! class_exists( 'WP_REST_Batch_Controller' ) ) {
-		require_once __DIR__ . '/class-wp-rest-batch-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Templates_Controller' ) ) {
 		require_once __DIR__ . '/full-site-editing/class-wp-rest-templates-controller.php';
 	}
@@ -83,7 +80,7 @@ if ( ! class_exists( 'WP_Widget_Block' ) ) {
 require_once __DIR__ . '/widgets-page.php';
 
 require __DIR__ . '/compat.php';
-require __DIR__ . '/compat/wordpress-5.8.php';
+require __DIR__ . '/compat/wordpress-5.8/index.php';
 require __DIR__ . '/utils.php';
 require __DIR__ . '/editor-settings.php';
 
@@ -95,8 +92,8 @@ if ( ! class_exists( 'WP_Block_Template ' ) ) {
 // as well as global styles.
 require __DIR__ . '/interface-wp-theme-json-schema.php';
 require __DIR__ . '/class-wp-theme-json-schema-v0.php';
-require __DIR__ . '/class-wp-theme-json.php';
-require __DIR__ . '/class-wp-theme-json-resolver.php';
+require __DIR__ . '/class-wp-theme-json-gutenberg.php';
+require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 
 require __DIR__ . '/full-site-editing/full-site-editing.php';
 require __DIR__ . '/full-site-editing/block-templates.php';
@@ -110,7 +107,6 @@ require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/full-site-editing/edit-site-export.php';
 
 require __DIR__ . '/blocks.php';
-require __DIR__ . '/block-editor.php';
 require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
