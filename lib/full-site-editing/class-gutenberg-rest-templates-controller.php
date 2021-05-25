@@ -335,22 +335,23 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return stdClass Changes to pass to wp_update_post.
 	 */
 	protected function prepare_item_for_database( $request ) {
-		$template           = $request['id'] ? gutenberg_get_block_template( $request['id'], $this->post_type ) : null;
-		$changes            = new stdClass();
-		$changes->post_name = $template->slug;
+		$template = $request['id'] ? gutenberg_get_block_template( $request['id'], $this->post_type ) : null;
+		$changes  = new stdClass();
 		if ( null === $template ) {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
 			$changes->tax_input   = array(
-				'wp_theme' => isset( $request['theme'] ) ? $request['content'] : wp_get_theme()->get_stylesheet(),
+				'wp_theme' => isset( $request['theme'] ) ? $request['theme'] : wp_get_theme()->get_stylesheet(),
 			);
 		} elseif ( 'custom' !== $template->source ) {
+			$changes->post_name   = $template->slug;
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
 			$changes->tax_input   = array(
 				'wp_theme' => $template->theme,
 			);
 		} else {
+			$changes->post_name   = $template->slug;
 			$changes->ID          = $template->wp_id;
 			$changes->post_status = 'publish';
 		}
