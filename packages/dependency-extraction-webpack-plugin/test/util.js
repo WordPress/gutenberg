@@ -50,9 +50,11 @@ describe( 'defaultRequestToExternal', () => {
 
 	test( 'Handles skipping over additional bundled packages', () => {
 		expect(
-			defaultRequestToExternal( '@wordpress/some-future-package', ['@wordpress/some-future-package'] )
+			defaultRequestToExternal( '@wordpress/some-future-package', [
+				'@wordpress/some-future-package',
+			] )
 		).toBeUndefined();
-	});
+	} );
 } );
 
 describe( 'defaultRequestToHandle', () => {

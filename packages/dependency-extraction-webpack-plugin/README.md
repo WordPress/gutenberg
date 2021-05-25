@@ -219,3 +219,15 @@ wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+
+##### `bundledPackages`
+
+-   Type: array
+
+A list of optional package names that will be bundled into the build.
+
+```js
+module.exports = {
+	plugins: [ new DependencyExtractionWebpackPlugin( { bundledPackages: [ '@wordpress/components' ] } ) ],
+};
+```
