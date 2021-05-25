@@ -333,14 +333,15 @@ export function computePopoverPosition(
  *
  * @param {DOMRect} rect bounds of the element
  * @param {Document} ownerDocument document of the element
+ * @param {Element}  container The positioned container.
  *
  * @return {DOMRect} offsetted bounds
  */
-export function offsetIframe( rect, ownerDocument ) {
+export function offsetIframe( rect, ownerDocument, container ) {
 	const { defaultView } = ownerDocument;
 	const { frameElement } = defaultView;
 
-	if ( ! frameElement ) {
+	if ( ! frameElement || ownerDocument === container.ownerDocument ) {
 		return rect;
 	}
 
