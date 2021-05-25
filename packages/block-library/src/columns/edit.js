@@ -173,6 +173,7 @@ function ColumnsEditContainer( {
 		style: {
 			gap: gridGapWithUnit || undefined,
 			gridTemplateColumns,
+			counterReset: 'grid-gap-' + gridGapWithUnit || undefined, // This is a hack to enforce re-rendering in Safari when the gap value changes.
 		},
 	} );
 
