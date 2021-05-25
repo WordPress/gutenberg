@@ -35,7 +35,7 @@ const wpBlockSearch = ( block ) => {
 
 			if (
 				block.classList.contains(
-					'wp-search-block__searchfield-hidden'
+					'wp-block-search__searchfield-hidden'
 				)
 			) {
 				showSearchField(
@@ -44,16 +44,21 @@ const wpBlockSearch = ( block ) => {
 					attributes.width,
 					attributes.widthUnit
 				);
+				block.classList.remove( 'wp-block-search__searchfield-hidden' );
 			} else {
 				hideSearchField( wrapper, searchField, button );
+				block.classList.add( 'wp-block-search__searchfield-hidden' );
 			}
 		} );
 };
 
+// eslint-disable-next-line @wordpress/no-global-event-listener
 document.addEventListener( 'DOMContentLoaded', () => {
-	Array.from( document.getElementsByClassName( 'wp-block-search__button-behavior-expand' ) ).forEach(
-		( block ) => {
-			wpBlockSearch( block );
-		}
-	);
+	Array.from(
+		document.getElementsByClassName(
+			'wp-block-search__button-behavior-expand'
+		)
+	).forEach( ( block ) => {
+		wpBlockSearch( block );
+	} );
 } );
