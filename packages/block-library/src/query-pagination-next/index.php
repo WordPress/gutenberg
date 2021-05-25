@@ -20,7 +20,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$default_label      = __( 'Next Page &raquo;', 'gutenberg' );
+	$default_label      = __( 'Next Page &raquo;' );
 	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$content            = '';
 
