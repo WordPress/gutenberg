@@ -27,6 +27,7 @@
 		"src/flex/**/*",
 		"src/form-group/**/*",
 		"src/heading/**/*",
+		"src/icon/**/*",
 		"src/scroll-lock/**/*",
 		"src/shortcut/**/*",
 		"src/spinner/**/*",
