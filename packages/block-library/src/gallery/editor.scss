@@ -51,6 +51,9 @@ figure.wp-block-gallery {
 			left: 0;
 			z-index: 1;
 			pointer-events: none;
+
+			// This renders the border on the GPU which fixes a Safari flicker issue.
+			will-change: transform;
 		}
 		figcaption {
 			z-index: 2;

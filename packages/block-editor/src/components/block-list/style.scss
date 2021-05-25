@@ -169,6 +169,9 @@
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
 
+			// This renders the border on the GPU which fixes a Safari flicker issue.
+			will-change: transform;
+
 			// Show a light color for dark themes.
 			.is-dark-theme & {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;
