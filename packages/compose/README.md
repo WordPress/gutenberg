@@ -185,7 +185,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').Ref<Node>`: A ref to assign to the target element.
+-   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
 
 <a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
 
@@ -398,12 +398,12 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _callback_ `(node: Node) => (() => void) | undefined`: Callback with ref as argument.
+-   _callback_ `(node: HTMLElement) => (() => void) | undefined`: Callback with ref as argument.
 -   _dependencies_ `import('react').DependencyList`: Dependencies of the callback.
 
 _Returns_
 
--   `import('react').RefCallback<Node | null>`: Ref callback.
+-   `import('react').RefCallback<HTMLElement | null>`: Ref callback.
 
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 

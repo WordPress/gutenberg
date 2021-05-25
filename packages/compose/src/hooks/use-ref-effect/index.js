@@ -17,15 +17,15 @@ import { useCallback, useRef } from '@wordpress/element';
  * to be removed. It *is* necessary if you add dependencies because the ref
  * callback will be called multiple times for the same node.
  *
- * @param {(node: Node) => (() => void) | undefined} callback     Callback with ref as argument.
- * @param {import('react').DependencyList}    dependencies Dependencies of the callback.
+ * @param {(node: HTMLElement) => (() => void) | undefined} callback Callback with ref as argument.
+ * @param {import('react').DependencyList} dependencies Dependencies of the callback.
  *
- * @return {import('react').RefCallback<Node | null>} Ref callback.
+ * @return {import('react').RefCallback<HTMLElement | null>} Ref callback.
  */
 export default function useRefEffect( callback, dependencies ) {
 	/** @type {import('react').MutableRefObject<(() => void) | undefined>}  */
 	const cleanup = useRef();
-	return useCallback( ( /** @type {Node | null} */ node ) => {
+	return useCallback( ( /** @type {HTMLElement | null} */ node ) => {
 		if ( node ) {
 			cleanup.current = callback( node );
 		} else if ( cleanup.current ) {
