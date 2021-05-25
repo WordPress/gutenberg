@@ -298,7 +298,7 @@ _Related_
 _Parameters_
 
 -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `import('mousetrap').MousetrapInstance['bind']`: Shortcut callback.
+-   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**

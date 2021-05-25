@@ -44,7 +44,7 @@ function isAppleOS( _window = window ) {
  * @see https://craig.is/killing/mice#api.bind for information about the `callback` parameter.
  *
  * @param {string[]|string} shortcuts Keyboard Shortcuts.
- * @param {import('mousetrap').MousetrapInstance['bind']} callback Shortcut callback.
+ * @param {(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void} callback Shortcut callback.
  * @param {WPKeyboardShortcutConfig} options Shortcut options.
  */
 function useKeyboardShortcut(
@@ -103,7 +103,7 @@ function useKeyboardShortcut(
 				shortcut,
 				(
 					/* eslint-disable jsdoc/valid-types */
-					/** @type {Parameters<import('mousetrap').MousetrapInstance['bind']>} */ ...args
+					/** @type {[e: import('mousetrap').ExtendedKeyboardEvent, combo: string]} */ ...args
 				) =>
 					/* eslint-enable jsdoc/valid-types */
 					currentCallback.current( ...args ),
