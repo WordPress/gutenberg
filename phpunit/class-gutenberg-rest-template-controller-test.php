@@ -35,6 +35,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 	public function test_context_param() {
 		// TODO: Implement test_context_param() method.
+		$this->markTestIncomplete();
 	}
 
 	public function test_get_items() {
@@ -275,9 +276,11 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 	public function test_prepare_item() {
 		// TODO: Implement test_prepare_item() method.
+		$this->markTestIncomplete();
 	}
 
 	public function test_get_item_schema() {
 		// TODO: Implement test_get_item_schema() method.
+		$this->markTestIncomplete();
 	}
 }
