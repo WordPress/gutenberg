@@ -12,9 +12,11 @@ import {
 	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
+	store as editorStore,
 } from '@wordpress/editor';
 import { StrictMode, useMemo } from '@wordpress/element';
 import { KeyboardShortcuts, SlotFillProvider } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -55,9 +57,9 @@ function Editor( {
 			getEditedPostTemplate,
 		} = select( editPostStore );
 		const { getEntityRecord, getPostType, getEntityRecords } = select(
-			'core'
+			coreStore
 		);
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getEditorSettings } = select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postType
