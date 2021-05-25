@@ -80,21 +80,6 @@ function gutenberg_skip_spacing_serialization( $block_type ) {
 		$spacing_support['__experimentalSkipSerialization'];
 }
 
-/**
- * Checks whether serialization of the current block's padding should occur.
- *
- * @param WP_Block_Type $block_type       Block Type.
- *
- * @return boolean
- */
-function gutenberg_skip_spacing_serialization( $block_type ) {
-	$spacing_support = _wp_array_get( $block_type->supports, array( 'spacing' ), false );
-
-	return is_array( $spacing_support ) &&
-		array_key_exists( '__experimentalSkipSerialization', $spacing_support ) &&
-		$spacing_support[ '__experimentalSkipSerialization' ];
-}
-
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'spacing',
