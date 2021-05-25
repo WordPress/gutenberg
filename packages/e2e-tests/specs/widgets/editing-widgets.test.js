@@ -20,28 +20,7 @@ import { groupBy, mapValues } from 'lodash';
 
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
-		/**
-		 * Visit the widgets screen via link clicking. The widgets screen currently
-		 * has different URLs during the integration to core.
-		 * We should be able to refactor it once it's fully merged into core.
-		 */
-		// Visit the Appearance page.
-		await visitAdminPage( 'themes.php' );
-
-		// Go to the Widgets page.
-		const appearanceMenu = await page.$( '#menu-appearance' );
-		await appearanceMenu.hover();
-		const widgetsLink = await find(
-			{ role: 'link', name: 'Widgets' },
-			{ root: appearanceMenu }
-		);
-		await Promise.all( [
-			page.waitForNavigation(),
-			// Click on the link no matter if it's visible or not.
-			widgetsLink.evaluate( ( link ) => {
-				link.click();
-			} ),
-		] );
+		await visitWidgetsScreen();
 
 		// Disable welcome guide if it is enabled.
 		const isWelcomeGuideActive = await page.evaluate( () =>
@@ -537,7 +516,7 @@ describe( 'Widgets screen', () => {
 		// eslint-disable-next-line no-restricted-syntax
 		await page.waitForTimeout( 500 );
 
-		await visitAdminPage( 'themes.php', 'page=gutenberg-widgets' );
+		await visitWidgetsScreen();
 
 		// Wait for the Legacy Widget block's preview iframe to load.
 		const frame = await new Promise( ( resolve ) => {
@@ -690,6 +669,31 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 } );
+
+/**
+ * Visit the widgets screen via link clicking. The widgets screen currently
+ * has different URLs during the integration to core.
+ * We should be able to refactor it once it's fully merged into core.
+ */
+async function visitWidgetsScreen() {
+	// Visit the Appearance page.
+	await visitAdminPage( 'themes.php' );
+
+	// Go to the Widgets page.
+	const appearanceMenu = await page.$( '#menu-appearance' );
+	await appearanceMenu.hover();
+	const widgetsLink = await find(
+		{ role: 'link', name: 'Widgets' },
+		{ root: appearanceMenu }
+	);
+	await Promise.all( [
+		page.waitForNavigation(),
+		// Click on the link no matter if it's visible or not.
+		widgetsLink.evaluate( ( link ) => {
+			link.click();
+		} ),
+	] );
+}
 
 async function saveWidgets() {
 	const updateButton = await find( {
