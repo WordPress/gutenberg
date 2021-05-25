@@ -135,6 +135,7 @@ function InlineLinkUI( {
 			focusOnMount={ focusOnMount.current }
 			onClose={ stopAddingLink }
 			position="bottom center"
+			isAlternate={ true }
 		>
 			<LinkControl
 				value={ linkValue }

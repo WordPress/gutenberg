@@ -7,7 +7,6 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Button, Spinner, Notice } from '@wordpress/components';
-import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
@@ -200,13 +199,14 @@ function LinkControl( {
 		>
 			{ isCreatingPage && (
 				<div className="block-editor-link-control__loading">
-					<Spinner /> { __( 'Creating' ) }…
+					<Spinner />
+					{ __( 'Creating page' ) }…
 				</div>
 			) }
 
 			{ ( isEditingLink || ! value ) && ! isCreatingPage && (
 				<>
-					<div className="block-editor-link-control__search-input-wrapper">
+					<div className="block-editor-link-control__search">
 						<LinkControlSearchInput
 							currentLink={ value }
 							className="block-editor-link-control__search-input"
@@ -225,16 +225,17 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 						>
-							<div className="block-editor-link-control__search-actions">
-								<Button
-									type="submit"
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
-									className="block-editor-link-control__search-submit"
-								/>
-							</div>
+							<Button
+								isPrimary
+								type="submit"
+								label={ __( 'Done' ) }
+								className="block-editor-link-control__search-submit"
+							>
+								{ __( 'Done' ) }
+							</Button>
 						</LinkControlSearchInput>
 					</div>
+
 					{ errorMessage && (
 						<Notice
 							className="block-editor-link-control__search-error"
@@ -244,6 +245,12 @@ function LinkControl( {
 							{ errorMessage }
 						</Notice>
 					) }
+
+					<LinkControlSettingsDrawer
+						value={ value }
+						settings={ settings }
+						onChange={ onChange }
+					/>
 				</>
 			) }
 
@@ -253,12 +260,6 @@ function LinkControl( {
 					onEditClick={ () => setIsEditingLink( true ) }
 				/>
 			) }
-
-			<LinkControlSettingsDrawer
-				value={ value }
-				settings={ settings }
-				onChange={ onChange }
-			/>
 		</div>
 	);
 }

@@ -3,7 +3,7 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
-import { queryByText, queryByRole } from '@testing-library/react';
+import { queryByText } from '@testing-library/react';
 import { default as lodash, first, last, nth, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
@@ -79,7 +79,7 @@ function getSearchResults() {
 
 function getCurrentLink() {
 	return container.querySelector(
-		'.block-editor-link-control__search-item.is-current'
+		'.block-editor-link-control__link.is-current'
 	);
 }
 
@@ -338,8 +338,8 @@ describe( 'Searching for a link', () => {
 		const mockFetchSuggestionsFirstArg =
 			mockFetchSearchSuggestions.mock.calls[ 0 ][ 0 ];
 
-		// Given we're mocking out the results we should always have 4 mark elements.
-		expect( searchResultTextHighlightElements ).toHaveLength( 4 );
+		// Given we're mocking out the results we should always have 3 mark elements.
+		expect( searchResultTextHighlightElements ).toHaveLength( 3 );
 
 		// Make sure there are no `mark` elements which contain anything other
 		// than the trimmed search term (ie: no whitespace).
@@ -378,26 +378,9 @@ describe( 'Searching for a link', () => {
 
 			const searchResultElements = getSearchResults();
 
-			const lastSearchResultItemHTML = last( searchResultElements )
-				.innerHTML;
-			const additionalDefaultFallbackURLSuggestionLength = 1;
-
 			// We should see a search result for each of the expect search suggestions
-			// plus 1 additional one for the fallback URL suggestion
 			expect( searchResultElements ).toHaveLength(
-				fauxEntitySuggestions.length +
-					additionalDefaultFallbackURLSuggestionLength
-			);
-
-			// The last item should be a URL search suggestion
-			expect( lastSearchResultItemHTML ).toEqual(
-				expect.stringContaining( searchTerm )
-			);
-			expect( lastSearchResultItemHTML ).toEqual(
-				expect.stringContaining( 'URL' )
-			);
-			expect( lastSearchResultItemHTML ).toEqual(
-				expect.stringContaining( 'Press ENTER to add this link' )
+				fauxEntitySuggestions.length
 			);
 		}
 	);
@@ -456,23 +439,7 @@ describe( 'Manual link entry', () => {
 			await eventLoopTick();
 
 			const searchResultElements = getSearchResults();
-
-			const firstSearchResultItemHTML =
-				searchResultElements[ 0 ].innerHTML;
-			const expectedResultsLength = 1;
-
-			expect( searchResultElements ).toHaveLength(
-				expectedResultsLength
-			);
-			expect( firstSearchResultItemHTML ).toEqual(
-				expect.stringContaining( searchTerm )
-			);
-			expect( firstSearchResultItemHTML ).toEqual(
-				expect.stringContaining( 'URL' )
-			);
-			expect( firstSearchResultItemHTML ).toEqual(
-				expect.stringContaining( 'Press ENTER to add this link' )
-			);
+			expect( searchResultElements[ 0 ] ).toBeUndefined();
 		}
 	);
 
@@ -483,7 +450,7 @@ describe( 'Manual link entry', () => {
 			[ '#internal-anchor', 'internal' ],
 		] )(
 			'should recognise "%s" as a %s link and handle as manual entry by displaying a single suggestion',
-			async ( searchTerm, searchType ) => {
+			async ( searchTerm ) => {
 				act( () => {
 					render( <LinkControl />, container );
 				} );
@@ -502,23 +469,7 @@ describe( 'Manual link entry', () => {
 				await eventLoopTick();
 
 				const searchResultElements = getSearchResults();
-
-				const firstSearchResultItemHTML =
-					searchResultElements[ 0 ].innerHTML;
-				const expectedResultsLength = 1;
-
-				expect( searchResultElements ).toHaveLength(
-					expectedResultsLength
-				);
-				expect( firstSearchResultItemHTML ).toEqual(
-					expect.stringContaining( searchTerm )
-				);
-				expect( firstSearchResultItemHTML ).toEqual(
-					expect.stringContaining( searchType )
-				);
-				expect( firstSearchResultItemHTML ).toEqual(
-					expect.stringContaining( 'Press ENTER to add this link' )
-				);
+				expect( searchResultElements[ 0 ] ).toBeUndefined();
 			}
 		);
 	} );
@@ -584,7 +535,7 @@ describe( 'Default search suggestions', () => {
 		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 
 		//
-		// Click the "Edit/Change" button and check initial suggestions are not
+		// Click the "Edit" button and check initial suggestions are not
 		// shown.
 		//
 		const currentLinkUI = getCurrentLink();
@@ -604,8 +555,8 @@ describe( 'Default search suggestions', () => {
 		// search input is set to the URL value
 		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
 
-		// it should match any url that's like ?p= and also include a URL option
-		expect( searchResultElements ).toHaveLength( 5 );
+		// it should match any url that's like ?p=
+		expect( searchResultElements ).toHaveLength( 4 );
 
 		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
 
@@ -760,7 +711,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'Create:' )
+					result.innerHTML.includes( 'Create draft' )
 				)
 			);
 
@@ -803,9 +754,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const currentLinkHTML = currentLink.innerHTML;
 
-			expect( currentLinkHTML ).toEqual(
-				expect.stringContaining( entityNameText )
-			);
 			expect( currentLinkHTML ).toEqual(
 				expect.stringContaining( '/?p=123' )
 			);
@@ -857,7 +805,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'Create:' )
+				result.innerHTML.includes( 'Create draft' )
 			)
 		);
 
@@ -873,9 +821,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		const currentLinkHTML = currentLink.innerHTML;
 
-		expect( currentLinkHTML ).toEqual(
-			expect.stringContaining( 'Some new page to create' )
-		);
 		expect( currentLinkHTML ).toEqual(
 			expect.stringContaining( '/?p=123' )
 		);
@@ -930,7 +875,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const form = container.querySelector( 'form' );
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'Create:' )
+				result.innerHTML.includes( 'Create draft' )
 			)
 		);
 
@@ -1028,7 +973,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				);
 				const createButton = first(
 					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'Create:' )
+						result.innerHTML.includes( 'Create draft' )
 					)
 				);
 
@@ -1153,7 +1098,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 			let createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'Create:' )
+					result.innerHTML.includes( 'Create draft' )
 				)
 			);
 
@@ -1217,17 +1162,10 @@ describe( 'Selecting links', () => {
 
 		// TODO: select by aria role or visible text
 		const currentLink = getCurrentLink();
-		const currentLinkHTML = currentLink.innerHTML;
 		const currentLinkAnchor = currentLink.querySelector(
 			`[href="${ selectedLink.url }"]`
 		);
 
-		expect( currentLinkHTML ).toEqual(
-			expect.stringContaining( selectedLink.title )
-		);
-		expect(
-			queryByRole( currentLink, 'button', { name: 'Edit' } )
-		).toBeTruthy();
 		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 
@@ -1270,16 +1208,6 @@ describe( 'Selecting links', () => {
 	describe( 'Selection using mouse click', () => {
 		it.each( [
 			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
-			[
-				'url',
-				'https://www.wordpress.org',
-				{
-					id: '1',
-					title: 'https://www.wordpress.org',
-					url: 'https://www.wordpress.org',
-					type: 'URL',
-				},
-			], // url
 		] )(
 			'should display a current selected link UI when a %s suggestion for the search "%s" is clicked',
 			async ( type, searchTerm, selectedLink ) => {
@@ -1321,7 +1249,7 @@ describe( 'Selecting links', () => {
 				} );
 
 				const currentLink = container.querySelector(
-					'.block-editor-link-control__search-item.is-current'
+					'.block-editor-link-control__link.is-current'
 				);
 				const currentLinkHTML = currentLink.innerHTML;
 				const currentLinkAnchor = currentLink.querySelector(
@@ -1329,9 +1257,6 @@ describe( 'Selecting links', () => {
 				);
 
 				// Check that this suggestion is now shown as selected
-				expect( currentLinkHTML ).toEqual(
-					expect.stringContaining( selectedLink.title )
-				);
 				expect( currentLinkHTML ).toEqual(
 					expect.stringContaining( 'Edit' )
 				);
@@ -1343,16 +1268,6 @@ describe( 'Selecting links', () => {
 	describe( 'Selection using keyboard', () => {
 		it.each( [
 			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
-			[
-				'url',
-				'https://www.wordpress.org',
-				{
-					id: '1',
-					title: 'https://www.wordpress.org',
-					url: 'https://www.wordpress.org',
-					type: 'URL',
-				},
-			], // url
 		] )(
 			'should display a current selected link UI when an %s suggestion for the search "%s" is selected using the keyboard',
 			async ( type, searchTerm, selectedLink ) => {
@@ -1446,7 +1361,7 @@ describe( 'Selecting links', () => {
 
 				// Check that the suggestion selected via is now shown as selected
 				const currentLink = container.querySelector(
-					'.block-editor-link-control__search-item.is-current'
+					'.block-editor-link-control__link.is-current'
 				);
 				const currentLinkHTML = currentLink.innerHTML;
 				const currentLinkAnchor = currentLink.querySelector(
@@ -1458,9 +1373,6 @@ describe( 'Selecting links', () => {
 					true
 				);
 
-				expect( currentLinkHTML ).toEqual(
-					expect.stringContaining( selectedLink.title )
-				);
 				expect( currentLinkHTML ).toEqual(
 					expect.stringContaining( 'Edit' )
 				);
@@ -1559,6 +1471,15 @@ describe( 'Addition Settings UI', () => {
 			render( <LinkControlConsumer />, container );
 		} );
 
+		// Click the "Edit" button to trigger into the editing mode.
+		const editButton = Array.from(
+			container.querySelectorAll( 'button' )
+		).find( ( button ) => button.innerHTML.includes( 'Edit' ) );
+
+		act( () => {
+			Simulate.click( editButton );
+		} );
+
 		const newTabSettingLabel = Array.from(
 			container.querySelectorAll( 'label' )
 		).find(
@@ -1609,6 +1530,15 @@ describe( 'Addition Settings UI', () => {
 
 		act( () => {
 			render( <LinkControlConsumer />, container );
+		} );
+
+		// Click the "Edit" button to trigger into the editing mode.
+		const editButton = Array.from(
+			container.querySelectorAll( 'button' )
+		).find( ( button ) => button.innerHTML.includes( 'Edit' ) );
+
+		act( () => {
+			Simulate.click( editButton );
 		} );
 
 		// Grab the elements using user perceivable DOM queries

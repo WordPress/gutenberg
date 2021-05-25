@@ -555,7 +555,8 @@ export default function NavigationLinkEdit( {
 					) }
 					{ isLinkOpen && (
 						<Popover
-							position="bottom center"
+							position="bottom right"
+							isAlternate={ true }
 							onClose={ () => setIsLinkOpen( false ) }
 							anchorRef={ listItemRef.current }
 						>
@@ -576,12 +577,12 @@ export default function NavigationLinkEdit( {
 									if ( type === 'post' ) {
 										/* translators: %s: search term. */
 										format = __(
-											'Create draft post: <mark>%s</mark>'
+											'"<mark>%s</mark>" (page)'
 										);
 									} else {
 										/* translators: %s: search term. */
 										format = __(
-											'Create draft page: <mark>%s</mark>'
+											'"<mark>%s</mark>" (page)'
 										);
 									}
 									return createInterpolateElement(
