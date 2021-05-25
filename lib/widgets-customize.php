@@ -116,7 +116,8 @@ function gutenberg_customize_widgets_init() {
 		return;
 	}
 
-	$settings = array_merge(
+	$customizer_context = new WP_Block_Editor_Context();
+	$settings           = array_merge(
 		gutenberg_get_default_block_editor_settings(),
 		gutenberg_get_legacy_widget_settings()
 	);
@@ -137,7 +138,7 @@ function gutenberg_customize_widgets_init() {
 
 	wp_add_inline_script(
 		'wp-blocks',
-		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( 'widgets_customizer' ) ) ),
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( $customizer_context ) ) ),
 		'after'
 	);
 
