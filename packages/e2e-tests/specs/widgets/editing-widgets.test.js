@@ -8,6 +8,7 @@ import {
 	deactivatePlugin,
 	showBlockToolbar,
 	visitAdminPage,
+	deleteAllWidgets,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -17,11 +18,9 @@ import {
 import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
 
-/** @typedef {import('puppeteer').ElementHandle} ElementHandle */
-
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
-		await visitAdminPage( 'themes.php', 'page=gutenberg-widgets' );
+		await visitWidgetsScreen();
 
 		// Disable welcome guide if it is enabled.
 		const isWelcomeGuideActive = await page.evaluate( () =>
@@ -45,7 +44,7 @@ describe( 'Widgets screen', () => {
 	} );
 
 	afterEach( async () => {
-		await cleanupWidgets();
+		await deleteAllWidgets();
 	} );
 
 	beforeAll( async () => {
@@ -54,7 +53,7 @@ describe( 'Widgets screen', () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
-		await cleanupWidgets();
+		await deleteAllWidgets();
 	} );
 
 	afterAll( async () => {
@@ -517,7 +516,7 @@ describe( 'Widgets screen', () => {
 		// eslint-disable-next-line no-restricted-syntax
 		await page.waitForTimeout( 500 );
 
-		await visitAdminPage( 'themes.php', 'page=gutenberg-widgets' );
+		await visitWidgetsScreen();
 
 		// Wait for the Legacy Widget block's preview iframe to load.
 		const frame = await new Promise( ( resolve ) => {
@@ -671,6 +670,31 @@ describe( 'Widgets screen', () => {
 	} );
 } );
 
+/**
+ * Visit the widgets screen via link clicking. The widgets screen currently
+ * has different URLs during the integration to core.
+ * We should be able to refactor it once it's fully merged into core.
+ */
+async function visitWidgetsScreen() {
+	// Visit the Appearance page.
+	await visitAdminPage( 'themes.php' );
+
+	// Go to the Widgets page.
+	const appearanceMenu = await page.$( '#menu-appearance' );
+	await appearanceMenu.hover();
+	const widgetsLink = await find(
+		{ role: 'link', name: 'Widgets' },
+		{ root: appearanceMenu }
+	);
+	await Promise.all( [
+		page.waitForNavigation(),
+		// Click on the link no matter if it's visible or not.
+		widgetsLink.evaluate( ( link ) => {
+			link.click();
+		} ),
+	] );
+}
+
 async function saveWidgets() {
 	const updateButton = await find( {
 		role: 'button',
@@ -720,26 +744,4 @@ async function getWidgetAreaWidgets() {
 	} );
 
 	return widgets;
-}
-
-/**
- * TODO: Deleting widgets in the new widgets screen seems to be unreliable.
- * We visit the old widgets screen to delete them.
- * Refactor this to use real interactions in the new widgets screen once the bug is fixed.
- */
-async function cleanupWidgets() {
-	await visitAdminPage( 'widgets.php' );
-
-	let widget = await page.$( '.widgets-sortables .widget' );
-
-	// We have to do this one-by-one since there might be race condition when deleting multiple widgets at once.
-	while ( widget ) {
-		const deleteButton = await widget.$( 'button.widget-control-remove' );
-		const id = await widget.evaluate( ( node ) => node.id );
-		await deleteButton.evaluate( ( node ) => node.click() );
-		// Wait for the widget to be removed from DOM.
-		await page.waitForSelector( `#${ id }`, { hidden: true } );
-
-		widget = await page.$( '.widgets-sortables .widget' );
-	}
 }
