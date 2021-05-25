@@ -57,7 +57,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return array the schema.
 	 */
 	public function get_item_schema() {
-
 		if ( $this->schema ) {
 			return $this->add_additional_fields_schema( $this->schema );
 		}
@@ -86,10 +85,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * response.
 	 *
 	 * @param WP_REST_REQUEST $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error The parsed details as a response object or an error.
+	 * @return WP_REST_Response|WP_Error The parsed details as a response object, or an error.
 	 */
 	public function parse_url_details( $request ) {
-
 		$url = untrailingslashit( $request['url'] );
 
 		if ( empty( $url ) ) {
@@ -143,12 +141,10 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		return apply_filters( 'rest_prepare_url_details', $response, $url, $request, $remote_url_response );
 	}
 
-
-
 	/**
 	 * Checks whether a given request has permission to read remote urls.
 	 *
-	 * @return WP_Error|bool True if the request has access, WP_Error object otherwise.
+	 * @return WP_Error|bool True if the request has access, or WP_Error object.
 	 */
 	public function permissions_check() {
 		if ( current_user_can( 'edit_posts' ) ) {
@@ -168,16 +164,13 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		);
 	}
 
-
-
 	/**
 	 * Retrieves the document title from a remote URL.
 	 *
 	 * @param string $url The website url whose HTML we want to access.
-	 * @return array|WP_Error the HTTP response from the remote URL or error.
+	 * @return array|WP_Error the HTTP response from the remote URL, or an error.
 	 */
 	private function get_remote_url( $url ) {
-
 		$args = array(
 			'limit_response_size' => 150 * KB_IN_BYTES,
 			'user-agent'          => $this->get_random_user_agent(),
@@ -216,14 +209,19 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * Parses the <title> contents from the provided HTML
 	 *
 	 * @param string $html The HTML from the remote website at URL.
-	 * @return string The title tag contents on success; else empty string.
+	 * @return string The title tag contents on success, or an empty string.
 	 */
 	private function get_title( $html ) {
-		preg_match( '|<title[^>]*>(.*?)<\s*/\s*title>|is', $html, $match_title );
+		$pattern = '#<title[^>]*>(.*?)<\s*/\s*title>#is';
+		preg_match( $pattern, $html, $match_title );
 
-		$title = isset( $match_title[1] ) && is_string( $match_title[1] ) ? trim( $match_title[1] ) : '';
+		$title = ! empty( $match_title[1] ) && is_string( $match_title[1] ) ? trim( $match_title[1] ) : '';
 
-		return $title;
+		if ( empty( $title ) ) {
+			return '';
+		}
+
+		return $this->prepare_metadata_for_output( $title );
 	}
 
 	/**
@@ -231,7 +229,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 *
 	 * @param string $html The HTML from the remote website at URL.
 	 * @param string $url  The target website URL.
-	 * @return string The icon URI on success; else empty string.
+	 * @return string The icon URI on success, or an empty string.
 	 */
 	private function get_icon( $html, $url ) {
 		// Grab the icon's link element.
@@ -268,7 +266,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 *     @type string[] 1 Content attribute's opening quotation mark.
 	 *     @type string[] 2 Content attribute's value for each meta element.
 	 * }
-	 * @return string The meta description contents on success, else empty string.
+	 * @return string The meta description contents on success, or an empty string.
 	 */
 	private function get_description( $meta_elements ) {
 		// Bail out if there are no meta elements.
@@ -283,10 +281,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return '';
 		}
 
-		// Convert any entities to HTML for use downstream.
-		$description = html_entity_decode( $description, ENT_QUOTES, get_bloginfo( 'charset' ) );
-
-		return $description;
+		return $this->prepare_metadata_for_output( $description );
 	}
 
 	/**
@@ -321,10 +316,25 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Prepare the metadata by:
+	 *
+	 *    - stripping all HTML tags and tag entities
+	 *    - converting non-tag entities into characters.
+	 *
+	 * @param string $metadata The metadata content to prepare.
+	 * @return string The prepared metadata.
+	 */
+	private function prepare_metadata_for_output( $metadata ) {
+		$metadata = html_entity_decode( $metadata, ENT_QUOTES, get_bloginfo( 'charset' ) );
+		$metadata = wp_strip_all_tags( $metadata );
+		return $metadata;
+	}
+
+	/**
 	 * Utility function to build cache key for a given URL.
 	 *
-	 * @param string $url the URL for which to build a cache key.
-	 * @return string the cache key.
+	 * @param string $url The URL for which to build a cache key.
+	 * @return string The cache key.
 	 */
 	private function build_cache_key_for_url( $url ) {
 		return 'g_url_details_response_' . md5( $url );
@@ -333,8 +343,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Utility function to retrieve a value from the cache at a given key.
 	 *
-	 * @param string $key the cache key.
-	 * @return string the value from the cache.
+	 * @param string $key The cache key.
+	 * @return mixed The value from the cache.
 	 */
 	private function get_cache( $key ) {
 		return get_transient( $key );
@@ -343,15 +353,11 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Utility function to cache a given data set at a given cache key.
 	 *
-	 * @param string $key the cache key under which to store the value.
-	 * @param string $data the data to be stored at the given cache key.
-	 * @return void
+	 * @param string $key  The cache key under which to store the value.
+	 * @param string $data The data to be stored at the given cache key.
+	 * @return bool True when transient set, or false.
 	 */
 	private function set_cache( $key, $data = '' ) {
-		if ( ! is_array( $data ) ) {
-			return;
-		}
-
 		$ttl = HOUR_IN_SECONDS;
 
 		/**
@@ -377,7 +383,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string the user agent string.
 	 */
 	private function get_random_user_agent() {
-
 		$agents = array(
 			'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', // Windows 10-based PC using Edge browser.
 			'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9', // Mac OS X-based computer using a Safari browser.

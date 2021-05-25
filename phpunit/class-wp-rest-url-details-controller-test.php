@@ -18,40 +18,13 @@
  */
 class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
-	/**
-	 * Admin user ID.
-	 *
-	 * @since x.x.0
-	 *
-	 * @var int $subscriber_id
-	 */
 	protected static $admin_id;
-
-	/**
-	 * Subscriber user ID.
-	 *
-	 * @since x.x.0
-	 *
-	 * @var int $subscriber_id
-	 */
 	protected static $subscriber_id;
-
-
-	protected static $route = '/__experimental/url-details';
-
-
+	protected static $route           = '/__experimental/url-details';
 	protected static $url_placeholder = 'https://placeholder-site.com';
+	protected static $request_args    = array();
 
-	protected static $request_args = array();
-
-	/**
-	 * Create fake data before our tests run.
-	 *
-	 * @since x.x.0
-	 *
-	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
-	 */
-	public static function wpSetUpBeforeClass( $factory ) {
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$admin_id      = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -69,11 +42,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		self::delete_user( self::$subscriber_id );
 	}
 
-
-
-	/**
-	 * Setup.
-	 */
 	public function setUp() {
 		parent::setUp();
 
@@ -81,28 +49,17 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		// Disables usage of cache during major of tests.
 		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
-		add_filter(
-			"pre_transient_$transient_name",
-			'__return_null'
-		);
+		add_filter( "pre_transient_{$transient_name}", '__return_null' );
 	}
 
-	/**
-	 * Tear down.
-	 */
 	public function tearDown() {
 		remove_filter( 'pre_http_request', array( $this, 'mock_success_request_to_remote_url' ), 10 );
 		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
 
-		remove_filter(
-			"pre_transient_$transient_name",
-			'__return_null'
-		);
+		remove_filter( "pre_transient_{$transient_name}", '__return_null' );
 		static::$request_args = array();
 		parent::tearDown();
 	}
-
-
 
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
@@ -124,11 +81,13 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		// Note the data in the subset comes from the fixture HTML returned by
-		// the filter `pre_http_request` (see this class's `setUp` method).
-		$this->assertArraySubset(
+		/*
+		 * Note the data in the subset comes from the fixture HTML returned by
+		 * the filter `pre_http_request` (see this class's `setUp` method).
+		 */
+		$this->assertSame(
 			array(
-				'title'       => 'Example Website &mdash; - with encoded content.',
+				'title'       => 'Example Website — - with encoded content.',
 				'icon'        => 'https://placeholder-site.com/favicon.ico?querystringaddedfortesting',
 				'description' => 'Example description text here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.',
 				'image'       => 'https://placeholder-site.com/images/home/screen-themes.png?3',
@@ -136,7 +95,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			$data
 		);
 	}
-
 
 	public function test_get_items_fails_for_unauthenticated_user() {
 		wp_set_current_user( 0 );
@@ -150,12 +108,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( WP_Http::UNAUTHORIZED, $response->get_status() );
+		$this->assertSame( WP_Http::UNAUTHORIZED, $response->get_status() );
 
-		$this->assertEquals(
-			'rest_cannot_view_url_details',
-			$data['code']
-		);
+		$this->assertSame( 'rest_cannot_view_url_details', $data['code'] );
 
 		$this->assertContains(
 			strtolower( 'you are not allowed to process remote urls' ),
@@ -175,12 +130,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( WP_Http::FORBIDDEN, $response->get_status() );
+		$this->assertSame( WP_Http::FORBIDDEN, $response->get_status() );
 
-		$this->assertEquals(
-			'rest_cannot_view_url_details',
-			$data['code']
-		);
+		$this->assertSame( 'rest_cannot_view_url_details', $data['code'] );
 
 		$this->assertContains(
 			strtolower( 'you are not allowed to process remote urls' ),
@@ -189,10 +141,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	/**
-	 * @dataProvider provide_invalid_url_data
+	 * @dataProvider data_invalid_url
 	 */
 	public function test_get_items_fails_for_invalid_url( $expected, $invalid_url ) {
-
 		wp_set_current_user( self::$admin_id );
 
 		$request = new WP_REST_Request( 'GET', static::$route );
@@ -204,16 +155,30 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( WP_Http::BAD_REQUEST, $response->get_status() );
+		$this->assertSame( WP_Http::BAD_REQUEST, $response->get_status() );
 
-		$this->assertEquals(
-			'rest_invalid_param',
-			$data['code']
-		);
+		$this->assertSame( 'rest_invalid_param', $data['code'] );
 
 		$this->assertContains(
 			strtolower( 'Invalid parameter(s): url' ),
 			strtolower( $data['message'] )
+		);
+	}
+
+	public function data_invalid_url() {
+		return array(
+			'empty_url'          => array(
+				null,
+				'',
+			), // empty!
+			'not_a_string'       => array(
+				null,
+				1234456,
+			),
+			'string_but_invalid' => array(
+				null,
+				'invalid.proto://wordpress.org',
+			),
 		);
 	}
 
@@ -233,12 +198,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 404, $response->get_status() );
+		$this->assertSame( 404, $response->get_status() );
 
-		$this->assertEquals(
-			'no_response',
-			$data['code']
-		);
+		$this->assertSame( 'no_response', $data['code'] );
 
 		$this->assertContains(
 			strtolower( 'Not found' ),
@@ -262,12 +224,9 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( 404, $response->get_status() );
+		$this->assertSame( 404, $response->get_status() );
 
-		$this->assertEquals(
-			'no_content',
-			$data['code']
-		);
+		$this->assertSame( 'no_content', $data['code'] );
 
 		$this->assertContains(
 			strtolower( 'Unable to retrieve body from response at this URL' ),
@@ -303,7 +262,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		rest_get_server()->dispatch( $request );
 
 		// Check the args were filtered as expected.
-		$this->assertArraySubset(
+		$this->assertContains(
 			array(
 				'timeout'             => 27,
 				'limit_response_size' => 153600,
@@ -318,14 +277,11 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	public function test_will_return_from_cache_if_populated() {
 		$transient_name = 'g_url_details_response_' . md5( static::$url_placeholder );
 
-		remove_filter(
-			"pre_transient_$transient_name",
-			'__return_null'
-		);
+		remove_filter( "pre_transient_{$transient_name}", '__return_null' );
 
 		// Force cache to return a known value as the remote URL http response body.
 		add_filter(
-			"pre_transient_$transient_name",
+			"pre_transient_{$transient_name}",
 			function() {
 				return '<html><head><title>This value from cache.</title></head><body></body></html>';
 			}
@@ -343,18 +299,12 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$data     = $response->get_data();
 
 		// Data should be that from cache not from mocked network response.
-		$this->assertContains(
-			'This value from cache',
-			$data['title']
-		);
+		$this->assertContains( 'This value from cache', $data['title'] );
 
-		remove_all_filters(
-			"pre_transient_$transient_name"
-		);
+		remove_all_filters( "pre_transient_{$transient_name}" );
 	}
 
 	public function test_allows_filtering_data_retrieved_for_a_given_url() {
-
 		add_filter(
 			'rest_prepare_url_details',
 			function( $response ) {
@@ -386,28 +336,21 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		// Instead of the default data retrieved we expect to see the modified
-		// data we provided via the filter.
-		$this->assertArraySubset(
-			array(
-				'title'    => 'Example Website &mdash; - with encoded content.',
-				'og_title' => 'This was manually added to the data via filter',
-			),
-			$data
-		);
+		/*
+		 * Instead of the default data retrieved we expect to see the modified
+		 * data we provided via the filter.
+		 */
+		$this->assertSame( 'Example Website — - with encoded content.', $data['title'] );
+		$this->assertSame( 'This was manually added to the data via filter', $data['og_title'] );
 
-		remove_all_filters(
-			'rest_prepare_url_details'
-		);
+		remove_all_filters( 'rest_prepare_url_details' );
 	}
 
-
-
-
 	public function test_allows_filtering_response() {
-
-		// Filter the response to known set of values changing only
-		// based on whether the response came from the cache or not.
+		/*
+		 * Filter the response to known set of values changing only
+		 * based on whether the response came from the cache or not.
+		 */
 		add_filter(
 			'rest_prepare_url_details',
 			function( $response, $url ) {
@@ -435,22 +378,15 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		$data = $response->get_data();
 
-		$this->assertEquals(
-			'418',
-			$data['status']
-		);
+		$this->assertSame( 418, $data['status'] );
 
-		$this->assertEquals(
+		$this->assertSame(
 			'Response for URL https://placeholder-site.com altered via rest_prepare_url_details filter',
 			$data['response']
 		);
 
-		remove_all_filters(
-			'rest_prepare_url_details'
-		);
+		remove_all_filters( 'rest_prepare_url_details' );
 	}
-
-
 
 	public function test_get_item() {
 	}
@@ -481,7 +417,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$endpoint = $data['endpoints'][0];
 
 		$this->assertArrayHasKey( 'url', $endpoint['args'] );
-		$this->assertArraySubset(
+		$this->assertContains(
 			array(
 				'type'     => 'string',
 				'required' => true,
@@ -492,7 +428,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	/**
-	 * @dataProvider provide_get_title_data
+	 * @dataProvider data_get_title
 	 */
 	public function test_get_title( $html, $expected ) {
 		$controller = new WP_REST_URL_Details_Controller();
@@ -505,32 +441,47 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$this->assertSame( $expected, $actual );
 	}
 
-
-	public function provide_get_title_data() {
+	public function data_get_title() {
 		return array(
-			'no attributes'                  => array(
-				'<title>Testing &lt;title&gt;:</title>',
-				'Testing &lt;title&gt;:',
+
+			// Happy path for default.
+			'default'                        => array(
+				'<title>Testing &lt;title&gt;</title>',
+				'Testing',
 			),
 			'with attributes'                => array(
-				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">Testing &lt;title&gt;:</title>',
-				'Testing &lt;title&gt;:',
+				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">Testing &lt;title&gt;</title>',
+				'Testing',
 			),
 			'with text whitespace'           => array(
-				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">   Testing &lt;title&gt;:	</title>',
-				'Testing &lt;title&gt;:',
-			),
-			'when opening tag is malformed'  => array(
-				'< title>Testing &lt;title&gt;: when opening tag is invalid</title>',
-				'',
+				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">   Testing &lt;title&gt;	</title>',
+				'Testing',
 			),
 			'with whitespace in opening tag' => array(
 				'<title >Testing &lt;title&gt;: with whitespace in opening tag</title>',
-				'Testing &lt;title&gt;: with whitespace in opening tag',
+				'Testing : with whitespace in opening tag',
 			),
 			'when whitepace in closing tag'  => array(
 				'<title>Testing &lt;title&gt;: with whitespace in closing tag</ title>',
-				'Testing &lt;title&gt;: with whitespace in closing tag',
+				'Testing : with whitespace in closing tag',
+			),
+			'with other elements'            => array(
+				'<meta name="viewport" content="width=device-width">
+				<title>Testing &lt;title&gt;</title>
+				<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" />',
+				'Testing',
+			),
+			'multiline'                      => array(
+				'<title>
+					Testing &lt;title&gt;
+				</title>',
+				'Testing',
+			),
+
+			// Unhappy paths.
+			'when opening tag is malformed'  => array(
+				'< title>Testing &lt;title&gt;: when opening tag is invalid</title>',
+				'',
 			),
 		);
 	}
@@ -788,19 +739,19 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			// Happy paths with HTML tags or entities in the description.
 			'with HTML tags'                             => array(
 				'<meta name="description" content="<strong>Description</strong>: has <em>HTML</em> tags">',
-				'<strong>Description</strong>: has <em>HTML</em> tags',
+				'Description: has HTML tags',
 			),
 			'with content first and HTML tags'           => array(
 				'<meta content="<strong>Description</strong>: has <em>HTML</em> tags" name="description">',
-				'<strong>Description</strong>: has <em>HTML</em> tags',
+				'Description: has HTML tags',
 			),
 			'with HTML tags and other attributes'        => array(
 				'<meta first="first" name="description" third="third" content="<strong>Description</strong>: has <em>HTML</em> tags" fifth="fifth>',
-				'<strong>Description</strong>: has <em>HTML</em> tags',
+				'Description: has HTML tags',
 			),
 			'with HTML entities'                         => array(
 				'<meta name="description" content="The &lt;strong&gt;description&lt;/strong&gt; meta &amp; its attribute value"',
-				'The <strong>description</strong> meta & its attribute value',
+				'The description meta & its attribute value',
 			),
 
 			// Unhappy paths.
@@ -978,42 +929,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
-
-
-
-
-	public function provide_invalid_url_data() {
-		return array(
-			'empty_url'          => array(
-				null,
-				'',
-			), // empty!
-			'not_a_string'       => array(
-				null,
-				1234456,
-			),
-			'string_but_invalid' => array(
-				null,
-				'invalid.proto://wordpress.org',
-			),
-		);
-	}
-
-	public function provide_response_is_from_cache() {
-		return array(
-			'uncached_response' => array(
-				null,
-				false,
-			), // empty!
-			'cached_response'   => array(
-				null,
-				true,
-			),
-		);
-	}
-
-
-
 	/**
 	 * Mocks the HTTP response for the the `wp_safe_remote_get()` which
 	 * would otherwise make a call to a real website.
@@ -1033,7 +948,6 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	private function mock_request_to_remote_url( $result_type = 'success', $args ) {
-
 		static::$request_args = $args;
 
 		$types = array(
