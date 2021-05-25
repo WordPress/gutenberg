@@ -17,7 +17,7 @@ function render_block_core_calendar( $attributes ) {
 
 	// Calendar shouldn't be rendered
 	// when there are no published posts on the site.
-	if ( ! block_core_calendar_get_has_published_posts() ) {
+	if ( ! block_core_calendar_has_published_posts() ) {
 		return '';
 	}
 
@@ -67,42 +67,45 @@ function register_block_core_calendar() {
 add_action( 'init', 'register_block_core_calendar' );
 
 /**
- * Returns the cached value whether any published post exists or not.
- * In case of missing cached value, it updates the cache.
+ * Returns whether or not there are currently published posts.
+ *
+ * Used to hide the calendar block when there are no published posts.
+ * This compensates for a known Core bug: https://core.trac.wordpress.org/ticket/12016
  *
  * @return bool Has any published posts or not.
  */
-function block_core_calendar_get_has_published_posts() {
-	$has_published_posts = get_option( 'gutenberg_calendar_block_has_published_posts', null );
-	if ( null === $has_published_posts ) {
-		$has_published_posts = block_core_calendar_update_has_published_posts();
+function block_core_calendar_has_published_posts() {
+	// 1. Multisite already has cached post counts, use them.
+	if ( is_multisite() ) {
+		return 0 < (int) get_option( 'post_count' );
 	}
-	return $has_published_posts;
-}
-
-/**
- * Queries the database for any published post and saves
- * a flag whether any published post exists or not.
- *
- * @return bool Has any published posts or not.
- */
-function block_core_calendar_update_has_published_posts() {
+	// 2. Use our own cached version on single site.
+	$has_published_posts = get_option( 'gutenberg_calendar_block_has_published_posts', null );
+	if ( null !== $has_published_posts ) {
+		return (bool) $has_published_posts;
+	}
+	// 3. Didn't get a cache hit, prime it.
 	global $wpdb;
-	$has_published_posts = ! ! $wpdb->get_var( "SELECT 1 as test FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' LIMIT 1" );
+	$has_published_posts = (bool) $wpdb->get_var( "SELECT 1 as test FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' LIMIT 1" );
 	update_option( 'gutenberg_calendar_block_has_published_posts', $has_published_posts );
+
 	return $has_published_posts;
 }
 
 /**
- * Update `has_published_posts` cached value
- * if the updated post's type is `post`.
+ * Delete the `gutenberg_calendar_block_has_published_posts` option after
+ * publishing a post.
  *
  * @param int     $post_ID     Updated post ID.
  * @param WP_Post $post_after  Post object after update.
  */
 function block_core_calendar_post_updated( $post_ID, $post_after ) {
+	// Multisite already caches post counts and we use those.
+	if ( is_multisite() ) {
+		return;
+	}
 	if ( 'post' === $post_after->post_type ) {
-		block_core_calendar_update_has_published_posts();
+		delete_option( 'gutenberg_calendar_block_has_published_posts' );
 	}
 }
 add_action( 'post_updated', 'block_core_calendar_post_updated', 10, 2 );
