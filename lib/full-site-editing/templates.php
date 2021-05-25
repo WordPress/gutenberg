@@ -165,6 +165,29 @@ add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template
 add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
 
 /**
+ * Finds whether a template or template part slug is customized for the currently active theme.
+ *
+ * @param string $slug          Template or template part slug.
+ * @param string $template_type wp_template or wp_template_part.
+ *
+ * @return bool Whether the template is customized for the currently active theme.
+ */
+function template_is_customized( $slug, $template_type = 'wp_template' ) {
+	$templates = get_theme_mod( $template_type, array() );
+
+	if ( ! isset( $templates[ $slug ] ) ) {
+		return false;
+	}
+
+	$customized = get_post( $templates[ $slug ] );
+	if ( $customized && $customized->post_type === $template_type ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+	
+/**
  * Sets a custom slug when creating new templates and template parts.
  *
  * @param int     $post_id Post ID.
@@ -174,14 +197,14 @@ add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
 function set_unique_slug_on_create_template( $post_id, $post, $update ) {
 	if ( ! $update && $post->post_name ) {
 		$templates = get_theme_mod( $post->post_type, array() );
-		$slug = $post->post_name;
-		
-		if ( isset( $templates[ $slug ] ) && ( $existing = get_post( $templates[ $slug ] ) ) && $existing->post_type === $post->post_type ) {
+		$slug      = $post->post_name;
+
+		if ( template_is_customized( $slug, $post->post_type ) ) {
 			$suffix = 2;
 			do {
 				$slug = _truncate_post_slug( $post->post_name, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
 				$suffix++;
-			} while ( isset( $templates[ $slug ] ) && ( $existing = get_post( $templates[ $slug ] ) ) && $existing->post_type === $post->post_type );
+			} while ( template_is_customized( $slug, $post->post_type ) );
 		}
 
 		$templates[ $slug ] = $post->ID;
