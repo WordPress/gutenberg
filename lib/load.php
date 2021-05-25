@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+global $wp_version;
+
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
@@ -73,7 +75,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/rest-api.php';
 }
 
-if ( ! class_exists( 'WP_Widget_Block' ) ) {
+if ( version_compare( $wp_version, '5.8-alpha', '<' ) ) {
 	require_once __DIR__ . '/class-wp-widget-block.php';
 }
 
