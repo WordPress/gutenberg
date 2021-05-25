@@ -441,6 +441,8 @@ export class ImageEdit extends Component {
 	}
 
 	getSetFeaturedButton( isFeaturedImage ) {
+		const MEDIA_ID_NO_FEATURED_IMAGE_SET = 0;
+
 		const { attributes, getStylesFromColorScheme } = this.props;
 
 		const setFeaturedButtonStyle = getStylesFromColorScheme(
@@ -455,7 +457,9 @@ export class ImageEdit extends Component {
 					setFeaturedButtonStyle,
 					styles.removeFeaturedButton,
 				] }
-				onPress={ () => this.onSetFeatured( 0 ) }
+				onPress={ () =>
+					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
+				}
 			/>
 		);
 
