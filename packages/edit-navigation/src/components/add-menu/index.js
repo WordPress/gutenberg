@@ -12,6 +12,7 @@ import { TextControl, Button } from '@wordpress/components';
 import { useFocusOnMount } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
@@ -29,7 +30,7 @@ export default function AddMenu( {
 		noticesStore
 	);
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
-	const { saveMenu } = useDispatch( 'core' );
+	const { saveMenu } = useDispatch( coreStore );
 
 	const inputRef = useFocusOnMount( focusInputOnMount );
 
