@@ -10,6 +10,7 @@ import {
 	useRef,
 	useState,
 	useLayoutEffect,
+	useEffect,
 	forwardRef,
 } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
@@ -490,18 +491,25 @@ const Popover = (
 	] );
 
 	// Event handlers
-	const maybeClose = ( event ) => {
-		// Close on escape
-		if ( event.keyCode === ESCAPE && onClose ) {
-			event.stopPropagation();
-			onClose();
-		}
+	useEffect( () => {
+		const container = containerRef.current;
 
-		// Preserve original content prop behavior
-		if ( onKeyDown ) {
-			onKeyDown( event );
+		if ( container ) {
+			function maybeClose( event ) {
+				// Close on escape
+				if ( event.keyCode === ESCAPE && onClose ) {
+					event.stopPropagation();
+					onClose();
+				}
+			}
+
+			container.addEventListener( 'keydown', maybeClose );
+
+			return () => {
+				container.removeEventListener( 'keydown', maybeClose );
+			};
 		}
-	};
+	}, [ onClose ] );
 
 	/**
 	 * Shims an onFocusOutside callback to be compatible with a deprecated
@@ -587,7 +595,7 @@ const Popover = (
 				}
 			) }
 			{ ...contentProps }
-			onKeyDown={ maybeClose }
+			onKeyDown={ onKeyDown }
 			{ ...focusOutsideProps }
 			ref={ mergedRefs }
 			tabIndex="-1"
