@@ -479,6 +479,10 @@ describe( 'Widgets screen', () => {
 	} );
 
 	it( 'Should display legacy widgets', async () => {
+		/**
+		 * Using the classic widgets screen to simulate creating legacy widgets.
+		 */
+		await activatePlugin( 'gutenberg-test-classic-widgets' );
 		await visitAdminPage( 'widgets.php' );
 
 		const searchWidget = await find(
@@ -516,6 +520,7 @@ describe( 'Widgets screen', () => {
 		// eslint-disable-next-line no-restricted-syntax
 		await page.waitForTimeout( 500 );
 
+		await deactivatePlugin( 'gutenberg-test-classic-widgets' );
 		await visitWidgetsScreen();
 
 		// Wait for the Legacy Widget block's preview iframe to load.
