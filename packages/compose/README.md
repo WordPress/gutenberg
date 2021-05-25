@@ -398,12 +398,12 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _callback_ `(node: HTMLElement) => (() => void) | undefined`: Callback with ref as argument.
--   _dependencies_ `import('react').DependencyList`: Dependencies of the callback.
+-   _callback_ `( node: TElement ) => ( () => void ) | undefined`: Callback with ref as argument.
+-   _dependencies_ `DependencyList`: Dependencies of the callback.
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement | null>`: Ref callback.
+-   `RefCallback< TElement | null >`: Ref callback.
 
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 
