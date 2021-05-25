@@ -1,5 +1,5 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
+const DEFAULT_BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
 
 /**
  * Default request to global transformation
@@ -8,11 +8,12 @@ const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
  * - request `@wordpress/api-fetch` becomes `[ 'wp', 'apiFetch' ]`
  * - request `@wordpress/i18n` becomes `[ 'wp', 'i18n' ]`
  *
- * @param {string} request Module request (the module name in `import from`) to be transformed
+ * @param {string}   request Module request (the module name in `import from`) to be transformed
+ * @param {string[]} additionalBundledPackages Optional bundled package list in addition to the default.
  * @return {string|string[]|undefined} The resulting external definition. Return `undefined`
  *   to ignore the request. Return `string|string[]` to map the request to an external.
  */
-function defaultRequestToExternal( request ) {
+function defaultRequestToExternal( request, additionalBundledPackages ) {
 	switch ( request ) {
 		case 'moment':
 			return request;
@@ -34,7 +35,8 @@ function defaultRequestToExternal( request ) {
 			return 'ReactDOM';
 	}
 
-	if ( BUNDLED_PACKAGES.includes( request ) ) {
+	const bundledPackages = [...DEFAULT_BUNDLED_PACKAGES, ...(additionalBundledPackages || [])]
+	if ( bundledPackages.includes( request ) ) {
 		return undefined;
 	}
 
