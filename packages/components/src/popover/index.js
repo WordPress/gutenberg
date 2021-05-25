@@ -233,7 +233,6 @@ const Popover = (
 	{
 		headerTitle,
 		onClose,
-		onKeyDown,
 		children,
 		className,
 		noArrow = true,
@@ -505,7 +504,8 @@ const Popover = (
 	const mergedRefs = useMergeRefs( [
 		ref,
 		containerRef,
-		closeEventRef,
+		// Don't register the event at all if there's no onClose callback.
+		onClose ? closeEventRef : null,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
 		focusOnMount ? focusOnMountRef : null,
@@ -595,7 +595,6 @@ const Popover = (
 				}
 			) }
 			{ ...contentProps }
-			onKeyDown={ onKeyDown }
 			{ ...focusOutsideProps }
 			ref={ mergedRefs }
 			tabIndex="-1"
