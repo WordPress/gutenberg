@@ -17,11 +17,28 @@ import {
 import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
 
-/** @typedef {import('puppeteer').ElementHandle} ElementHandle */
+/**
+ * Internal dependencies
+ */
+import { cleanupWidgets } from './test-utils';
 
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
-		await visitAdminPage( 'themes.php', 'page=gutenberg-widgets' );
+		/**
+		 * Visit the widgets screen via link clicking. The widgets screen currently
+		 * has different URLs during the integration to core.
+		 * We should be able to refactor it once it's fully merged into core.
+		 */
+		// Visit the Appearance page.
+		await visitAdminPage( 'themes.php' );
+
+		// Go to the Widgets page.
+		const appearanceList = await page.$( '#menu-appearance' );
+		const widgetsLink = await find(
+			{ role: 'link', name: 'Widgets' },
+			{ root: appearanceList }
+		);
+		await Promise.all( [ page.waitForNavigation(), widgetsLink.click() ] );
 
 		// Disable welcome guide if it is enabled.
 		const isWelcomeGuideActive = await page.evaluate( () =>
@@ -720,26 +737,4 @@ async function getWidgetAreaWidgets() {
 	} );
 
 	return widgets;
-}
-
-/**
- * TODO: Deleting widgets in the new widgets screen seems to be unreliable.
- * We visit the old widgets screen to delete them.
- * Refactor this to use real interactions in the new widgets screen once the bug is fixed.
- */
-async function cleanupWidgets() {
-	await visitAdminPage( 'widgets.php' );
-
-	let widget = await page.$( '.widgets-sortables .widget' );
-
-	// We have to do this one-by-one since there might be race condition when deleting multiple widgets at once.
-	while ( widget ) {
-		const deleteButton = await widget.$( 'button.widget-control-remove' );
-		const id = await widget.evaluate( ( node ) => node.id );
-		await deleteButton.evaluate( ( node ) => node.click() );
-		// Wait for the widget to be removed from DOM.
-		await page.waitForSelector( `#${ id }`, { hidden: true } );
-
-		widget = await page.$( '.widgets-sortables .widget' );
-	}
 }
