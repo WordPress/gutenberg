@@ -8,7 +8,7 @@ import {
 	deactivatePlugin,
 	showBlockToolbar,
 	visitAdminPage,
-	cleanupWidgets,
+	deleteAllWidgets,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -44,7 +44,7 @@ describe( 'Widgets screen', () => {
 	} );
 
 	afterEach( async () => {
-		await cleanupWidgets();
+		await deleteAllWidgets();
 	} );
 
 	beforeAll( async () => {
@@ -53,7 +53,7 @@ describe( 'Widgets screen', () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
-		await cleanupWidgets();
+		await deleteAllWidgets();
 	} );
 
 	afterAll( async () => {

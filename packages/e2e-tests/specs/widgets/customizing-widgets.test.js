@@ -8,7 +8,7 @@ import {
 	visitAdminPage,
 	showBlockToolbar,
 	clickBlockToolbarButton,
-	cleanupWidgets,
+	deleteAllWidgets,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -19,7 +19,7 @@ import { find } from 'puppeteer-testing-library';
 
 describe( 'Widgets Customizer', () => {
 	beforeEach( async () => {
-		await cleanupWidgets();
+		await deleteAllWidgets();
 		await visitAdminPage( 'customize.php' );
 
 		// Disable welcome guide if it is enabled.

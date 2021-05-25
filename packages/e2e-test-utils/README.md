@@ -58,10 +58,6 @@ _Returns_
 
 -   `string`: Value of the previous timezone.
 
-<a name="cleanupWidgets" href="#cleanupWidgets">#</a> **cleanupWidgets**
-
-Delete all the widgets in the widgets screen.
-
 <a name="clearLocalStorage" href="#clearLocalStorage">#</a> **clearLocalStorage**
 
 Clears the local storage.
@@ -184,6 +180,10 @@ Deactivates an active plugin.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
+
+<a name="deleteAllWidgets" href="#deleteAllWidgets">#</a> **deleteAllWidgets**
+
+Delete all the widgets in the widgets screen.
 
 <a name="deleteTheme" href="#deleteTheme">#</a> **deleteTheme**
 

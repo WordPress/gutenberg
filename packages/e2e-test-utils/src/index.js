@@ -78,6 +78,6 @@ export { waitForWindowDimensions } from './wait-for-window-dimensions';
 export { showBlockToolbar } from './show-block-toolbar';
 export { openPreviewPage } from './preview';
 export { wpDataSelect } from './wp-data-select';
-export { cleanupWidgets } from './widgets';
+export { deleteAllWidgets } from './widgets';
 
 export * from './mocks';

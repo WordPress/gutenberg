@@ -8,7 +8,7 @@ import { visitAdminPage } from './visit-admin-page';
 /**
  * Delete all the widgets in the widgets screen.
  */
-export async function cleanupWidgets() {
+export async function deleteAllWidgets() {
 	// TODO: Deleting widgets in the new widgets screen is cumbersome and slow.
 	// To workaround this for now, we visit the old widgets screen to delete them.
 	await activatePlugin( 'gutenberg-test-classic-widgets' );

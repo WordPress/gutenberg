@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Added `cleanupWidgets` - Delete all the widgets in the widgets screen.
+-   Added `deleteAllWidgets` - Delete all widgets in the widgets screen.
 
 ## 5.0.0 (2021-01-21)
 
