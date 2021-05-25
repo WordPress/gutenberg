@@ -10,7 +10,6 @@ import {
 	useRef,
 	useState,
 	useLayoutEffect,
-	useEffect,
 	forwardRef,
 } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
@@ -24,6 +23,7 @@ import {
 	useConstrainedTabbing,
 	useFocusReturn,
 	useMergeRefs,
+	useRefEffect,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
@@ -478,6 +478,26 @@ const Popover = (
 		__unstableBoundaryParent,
 	] );
 
+	// Event handlers for closing the popover.
+	const closeEventRef = useRefEffect(
+		( node ) => {
+			function maybeClose( event ) {
+				// Close on escape.
+				if ( event.keyCode === ESCAPE && onClose ) {
+					event.stopPropagation();
+					onClose();
+				}
+			}
+
+			node.addEventListener( 'keydown', maybeClose );
+
+			return () => {
+				node.removeEventListener( 'keydown', maybeClose );
+			};
+		},
+		[ onClose ]
+	);
+
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
@@ -485,31 +505,11 @@ const Popover = (
 	const mergedRefs = useMergeRefs( [
 		ref,
 		containerRef,
+		closeEventRef,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
 		focusOnMount ? focusOnMountRef : null,
 	] );
-
-	// Event handlers
-	useEffect( () => {
-		const container = containerRef.current;
-
-		if ( container ) {
-			function maybeClose( event ) {
-				// Close on escape
-				if ( event.keyCode === ESCAPE && onClose ) {
-					event.stopPropagation();
-					onClose();
-				}
-			}
-
-			container.addEventListener( 'keydown', maybeClose );
-
-			return () => {
-				container.removeEventListener( 'keydown', maybeClose );
-			};
-		}
-	}, [ onClose ] );
 
 	/**
 	 * Shims an onFocusOutside callback to be compatible with a deprecated
