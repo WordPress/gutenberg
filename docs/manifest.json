@@ -654,6 +654,12 @@
 		"parent": "reference-guides"
 	},
 	{
+		"title": "AccessiblePopover",
+		"slug": "accessible-popover",
+		"markdown_source": "../packages/components/src/accessible-popover/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "AlignmentMatrixControl",
 		"slug": "alignment-matrix-control",
 		"markdown_source": "../packages/components/src/alignment-matrix-control/README.md",
