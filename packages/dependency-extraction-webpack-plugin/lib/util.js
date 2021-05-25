@@ -35,7 +35,10 @@ function defaultRequestToExternal( request, additionalBundledPackages ) {
 			return 'ReactDOM';
 	}
 
-	const bundledPackages = [...DEFAULT_BUNDLED_PACKAGES, ...(additionalBundledPackages || [])]
+	const bundledPackages = [
+		...DEFAULT_BUNDLED_PACKAGES,
+		...( additionalBundledPackages || [] ),
+	];
 	if ( bundledPackages.includes( request ) ) {
 		return undefined;
 	}

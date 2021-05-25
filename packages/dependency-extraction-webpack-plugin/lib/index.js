@@ -25,7 +25,7 @@ class DependencyExtractionWebpackPlugin {
 				injectPolyfill: false,
 				outputFormat: 'php',
 				useDefaults: true,
-				bundledPackages: []
+				bundledPackages: [],
 			},
 			options
 		);
@@ -59,7 +59,10 @@ class DependencyExtractionWebpackPlugin {
 			typeof externalRequest === 'undefined' &&
 			this.options.useDefaults
 		) {
-			externalRequest = defaultRequestToExternal( request, this.options.bundledPackages );
+			externalRequest = defaultRequestToExternal(
+				request,
+				this.options.bundledPackages
+			);
 		}
 
 		if ( externalRequest ) {
