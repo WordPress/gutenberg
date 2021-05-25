@@ -19,6 +19,7 @@
 	],
 	"include": [
 		"src/__next/**/*",
+		"src/accessible-popover/**/*",
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/base-field/**/*",
