@@ -1,4 +1,3 @@
-export { ComponentSystemProvider } from './component-system-provider';
 export {
 	ContextSystemProvider,
 	useComponentsContext,
