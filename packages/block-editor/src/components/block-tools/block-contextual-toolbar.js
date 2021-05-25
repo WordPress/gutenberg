@@ -37,7 +37,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 				blockType:
 					selectedBlockClientId &&
 					getBlockType( getBlockName( selectedBlockClientId ) ),
-				hasParents: getBlockParents( selectedBlockClientId ).length,
+				hasParents: parents.length,
 				showParentSelector: hasBlockSupport(
 					parentBlockType,
 					'__experimentalParentSelector',
