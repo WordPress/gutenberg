@@ -25,13 +25,13 @@ Learning the ingredients of the interface happens once, but scales to hundreds o
 
 ### Accessible
 
-Being accessible is a holistic principle that embraces not only the desire that _everyone can work with Gutenberg interfaces no matter their ability_ but also that the improvements made are _equitable_ and improve the experience for both those *creating* the content and those *consuming* the content. This is a lofty challenge and definitely hard balance to get right. As a canvas of expression, the project seeks to embrace the fact that users interacting with the software have distinct characteristics and preferences shaping helpful workflows for what they need to do.
+Being accessible is a holistic principle that embraces not only the desire that _everyone can work with Gutenberg user interfaces no matter their ability_ but also that the improvements made are _equitable_ and improve the experience for both those *creating* the content and those *consuming* the content. This is a lofty challenge and definitely hard balance to get right. As a canvas of expression, the project seeks to embrace the fact that users interacting with the software have distinct characteristics and preferences shaping helpful workflows for what they need to do.
 
 Modern web application development brings its own set of accessibility problems around standards and consistent application between browsers which often requires some unique solutions that might not be apparent on the first attempt. So we acknowledge that accessibility is not something that can be implemented statically but instead is an ongoing part of the interface creation and refinement.
 
 ## Curated Extensibility
 
-The use of the word _curated_ expressly refers to implementing extensibility in a way that prioritizes those _using Gutenberg interfaces to create their content_ over developers integrating with the system. As a result, every extensibility interface request is filtered through the question of how it impacts creator workflows.
+The use of the word _curated_ expressly refers to implementing extensibility in a way that prioritizes those _using Gutenberg user interfaces to create their content_ over developers integrating with the system. As a result, every extensibility interface request is filtered through the question of how it impacts creator workflows.
 
 Implementation details are ephemeral. Practically this means that the traditional WP approach of wrapping things in filters and liberal use of actions is avoided in favor of explicit extension interfaces that expose _functionality_ but hide the _implementation details._ Gutenberg has opinionated APIs that favor stability and functionality for the user over flexibility for the developer.
 
@@ -50,11 +50,11 @@ For more information around currently built patterns for extensibility and key a
 
 _“On the Layers of the Onion”_ (Matías - [Gutenberg or the Ship of Theseus](https://matiasventura.com/post/gutenberg-or-the-ship-of-theseus/))
 
-The initial interfaces for those interacting with Gutenberg should be simple and straightforward yet provide a path through progressive complexity to accomplish what is needed for expressive content.
+The initial user interfaces for those interacting with Gutenberg should be simple and straightforward yet provide a path through progressive complexity to accomplish what is needed for expressive content.
 
 There are two perspectives for this principle:
 
-As it applies to **developers** (plugin or theme), progressive complexity means that there are degrees of ability and understanding needed in order to extend or contribute to Gutenberg. This has overlap with the _curated extensibility_ principle where some interfaces have clearly defined (opinionated) registration APIs that hide much of the complexity in the lower layers that implement the things registered.
+As it applies to **developers** (plugin or theme), progressive complexity means that there are degrees of ability and understanding needed in order to extend or contribute to Gutenberg. This has overlap with the _curated extensibility_ principle where some extensibility interfaces have clearly defined (opinionated) registration APIs that hide much of the complexity in the lower layers that implement the things registered.
 
 As an example of this continuum, the complexity needed for building and distributing blocks or building and distributing themes should be minimal. As you get closer to working within Gutenberg internals directly, it does require more understanding of various technologies and technical stacks to be effective in this area.
 
