@@ -77,7 +77,12 @@ export default function PostContentEdit( {
 		contextPostId
 	);
 
-	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
+	if (
+		contextPostId &&
+		contextPostType &&
+		'page' !== contextPostType &&
+		hasAlreadyRendered
+	) {
 		return <RecursionError />;
 	}
 
