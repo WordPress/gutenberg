@@ -9,7 +9,7 @@
  * Class that encapsulates the processing of
  * structures that adhere to the theme.json spec.
  */
-class WP_Theme_JSON {
+class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Container of data in theme.json format.
@@ -240,7 +240,7 @@ class WP_Theme_JSON {
 		'font-weight'      => array(
 			'value' => array( 'typography', 'fontWeight' ),
 		),
-		'letter-spacing'           => array(
+		'letter-spacing'   => array(
 			'value' => array( 'typography', 'letterSpacing' ),
 		),
 		'line-height'      => array(
@@ -1080,9 +1080,9 @@ class WP_Theme_JSON {
 	/**
 	 * Merge new incoming data.
 	 *
-	 * @param WP_Theme_JSON $incoming Data to merge.
-	 * @param string        $update_or_remove Whether update or remove existing colors
-	 *                                 for which the incoming data has a duplicated slug.
+	 * @param WP_Theme_JSON_Gutenberg $incoming Data to merge.
+	 * @param string                  $update_or_remove Whether update or remove existing colors
+	 *                                                  for which the incoming data has a duplicated slug.
 	 */
 	public function merge( $incoming, $update_or_remove = 'remove' ) {
 		$incoming_data = $incoming->get_raw_data();
