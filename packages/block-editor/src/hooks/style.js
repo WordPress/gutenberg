@@ -140,6 +140,9 @@ const skipSerializationPaths = {
 	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		COLOR_SUPPORT_KEY,
 	],
+	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		'spacing',
+	],
 	[ `__experimentalSkipFontSizeSerialization` ]: [ 'typography', 'fontSize' ],
 	[ `__experimentalSkipTypographySerialization` ]: without(
 		TYPOGRAPHY_SUPPORT_KEYS,

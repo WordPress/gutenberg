@@ -1,6 +1,8 @@
 # Spacer
 
-> **Experimental!**
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 `Spacer` is a primitive layout component that providers inner (`padding`) or outer (`margin`) space in-between components. It can also be used to adaptively provide space within an `HStack` or `VStack`.
 
@@ -14,7 +16,7 @@
 import {
 	__experimentalSpacer as Spacer,
 	__experimentalHeading as Heading,
-	__experimentalView as View
+	__experimentalView as View,
 } from '@wordpress/components';
 
 function Example() {
@@ -23,9 +25,7 @@ function Example() {
 			<Spacer>
 				<Heading>WordPress.org</Heading>
 			</Spacer>
-			<Text>
-				Code is Poetry
-			</Text>
+			<Text>Code is Poetry</Text>
 		</View>
 	);
 }

@@ -8,7 +8,7 @@ import { useContextSystem } from './use-context-system';
  * @template {{}} TCurrentProps
  * @template {{}} TNextProps
  * @param {import('react').ForwardRefExoticComponent<TCurrentProps>} CurrentComponent
- * @param {import('react').ComponentType<TNextProps>} NextComponent
+ * @param {(props: TNextProps) => JSX.Element | null} NextComponent
  * @param {string} namespace
  * @param {(props: TCurrentProps) => TNextProps} adapter
  */

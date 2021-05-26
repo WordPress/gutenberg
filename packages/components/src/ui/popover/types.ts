@@ -4,7 +4,7 @@
 // eslint-disable-next-line no-restricted-imports
 import type { PopoverStateReturn } from 'reakit';
 // eslint-disable-next-line no-restricted-imports
-import type { CSSProperties, FunctionComponentElement, ReactNode } from 'react';
+import type { CSSProperties, FunctionComponentElement } from 'react';
 
 /**
  * Internal dependencies
@@ -35,10 +35,6 @@ export type Props = PopperProps & {
 	 * @see https://reakit.io/docs/popover/#usepopoverstate
 	 */
 	baseId?: string;
-	/**
-	 * Content to render within the `Popover` floating label.
-	 */
-	content?: ReactNode;
 	/**
 	 * Renders `Elevation` styles for the `Popover`.
 	 *
@@ -72,9 +68,14 @@ export type Props = PopperProps & {
 	 * @see https://reakit.io/docs/popover/#usepopoverstate
 	 */
 	visible?: boolean;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 };
 
 export type ContentProps = {
 	elevation?: number;
 	maxWidth?: CSSProperties[ 'maxWidth' ];
+	children: React.ReactNode;
 };

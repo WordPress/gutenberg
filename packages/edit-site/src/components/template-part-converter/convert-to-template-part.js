@@ -140,7 +140,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 																icon={ icon }
 															/>
 														</FlexItem>
-														<FlexBlock>
+														<FlexBlock className="edit-site-template-part-converter__option-label">
 															{ label }
 															<div>
 																{ description }

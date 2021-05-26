@@ -22,6 +22,7 @@ import {
 } from './locks';
 import { createBatch } from './batch';
 import { getDispatch } from './controls';
+import { CORE_STORE_NAME as coreStoreName } from './utils/constants';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -182,7 +183,7 @@ export function* deleteEntityRecord(
 	}
 
 	const lock = yield* __unstableAcquireStoreLock(
-		'core',
+		coreStoreName,
 		[ 'entities', 'data', kind, name, recordId ],
 		{ exclusive: true }
 	);
@@ -246,7 +247,12 @@ export function* deleteEntityRecord(
  * @return {Object} Action object.
  */
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const entity = yield controls.select( 'core', 'getEntity', kind, name );
+	const entity = yield controls.select(
+		coreStoreName,
+		'getEntity',
+		kind,
+		name
+	);
 	if ( ! entity ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
@@ -254,14 +260,14 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
 	const record = yield controls.select(
-		'core',
+		coreStoreName,
 		'getRawEntityRecord',
 		kind,
 		name,
 		recordId
 	);
 	const editedRecord = yield controls.select(
-		'core',
+		coreStoreName,
 		'getEditedEntityRecord',
 		kind,
 		name,
@@ -306,7 +312,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
  * an entity record, if any.
  */
 export function* undo() {
-	const undoEdit = yield controls.select( 'core', 'getUndoEdit' );
+	const undoEdit = yield controls.select( coreStoreName, 'getUndoEdit' );
 	if ( ! undoEdit ) {
 		return;
 	}
@@ -324,7 +330,7 @@ export function* undo() {
  * edit to an entity record, if any.
  */
 export function* redo() {
-	const redoEdit = yield controls.select( 'core', 'getRedoEdit' );
+	const redoEdit = yield controls.select( coreStoreName, 'getRedoEdit' );
 	if ( ! redoEdit ) {
 		return;
 	}
@@ -374,7 +380,7 @@ export function* saveEntityRecord(
 	const recordId = record[ entityIdKey ];
 
 	const lock = yield* __unstableAcquireStoreLock(
-		'core',
+		coreStoreName,
 		[ 'entities', 'data', kind, name, recordId || uuid() ],
 		{ exclusive: true }
 	);
@@ -385,7 +391,7 @@ export function* saveEntityRecord(
 			if ( typeof value === 'function' ) {
 				const evaluatedValue = value(
 					yield controls.select(
-						'core',
+						coreStoreName,
 						'getEditedEntityRecord',
 						kind,
 						name,
@@ -419,7 +425,7 @@ export function* saveEntityRecord(
 				recordId ? '/' + recordId : ''
 			}`;
 			const persistedRecord = yield controls.select(
-				'core',
+				coreStoreName,
 				'getRawEntityRecord',
 				kind,
 				name,
@@ -432,12 +438,12 @@ export function* saveEntityRecord(
 				// but ideally this should all be handled in the back end,
 				// so the client just sends and receives objects.
 				const currentUser = yield controls.select(
-					'core',
+					coreStoreName,
 					'getCurrentUser'
 				);
 				const currentUserId = currentUser ? currentUser.id : undefined;
 				const autosavePost = yield controls.select(
-					'core',
+					coreStoreName,
 					'getAutosave',
 					persistedRecord.type,
 					persistedRecord.id,
@@ -608,15 +614,20 @@ export function* __experimentalBatch( requests ) {
 	const api = {
 		saveEntityRecord( kind, name, record, options ) {
 			return batch.add( ( add ) =>
-				dispatch( 'core' ).saveEntityRecord( kind, name, record, {
-					...options,
-					__unstableFetch: add,
-				} )
+				dispatch( coreStoreName ).saveEntityRecord(
+					kind,
+					name,
+					record,
+					{
+						...options,
+						__unstableFetch: add,
+					}
+				)
 			);
 		},
 		saveEditedEntityRecord( kind, name, recordId, options ) {
 			return batch.add( ( add ) =>
-				dispatch( 'core' ).saveEditedEntityRecord(
+				dispatch( coreStoreName ).saveEditedEntityRecord(
 					kind,
 					name,
 					recordId,
@@ -629,7 +640,7 @@ export function* __experimentalBatch( requests ) {
 		},
 		deleteEntityRecord( kind, name, recordId, query, options ) {
 			return batch.add( ( add ) =>
-				dispatch( 'core' ).deleteEntityRecord(
+				dispatch( coreStoreName ).deleteEntityRecord(
 					kind,
 					name,
 					recordId,
@@ -660,7 +671,7 @@ export function* __experimentalBatch( requests ) {
 export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	if (
 		! ( yield controls.select(
-			'core',
+			coreStoreName,
 			'hasEditsForEntityRecord',
 			kind,
 			name,
@@ -670,7 +681,7 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 		return;
 	}
 	const edits = yield controls.select(
-		'core',
+		coreStoreName,
 		'getEntityRecordNonTransientEdits',
 		kind,
 		name,
@@ -698,7 +709,7 @@ export function* __experimentalSaveSpecifiedEntityEdits(
 ) {
 	if (
 		! ( yield controls.select(
-			'core',
+			coreStoreName,
 			'hasEditsForEntityRecord',
 			kind,
 			name,
@@ -708,7 +719,7 @@ export function* __experimentalSaveSpecifiedEntityEdits(
 		return;
 	}
 	const edits = yield controls.select(
-		'core',
+		coreStoreName,
 		'getEntityRecordNonTransientEdits',
 		kind,
 		name,
