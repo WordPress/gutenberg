@@ -59,11 +59,11 @@
 	justify-content: space-between;
 	align-items: center;
 	height: $header-height;
-	width: 100%;
 	z-index: z-index(".components-modal__header");
 	position: absolute;
 	top: 0;
 	left: 0;
+	right: 0;
 
 	.components-modal__header-heading {
 		font-size: 1rem;
