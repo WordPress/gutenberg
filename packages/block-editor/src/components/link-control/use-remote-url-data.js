@@ -30,14 +30,11 @@ function useRemoteUrlData( url ) {
 		};
 	}, [] );
 
-	// Clear the data if the URL changes to avoid stale data in hook consumer.
-	// useEffect( () => {
-	// 	setRichData( null );
-	// }, [ url ] );
-
 	useEffect( () => {
 		const fetchRichData = async () => {
 			setIsFetching( true );
+
+			// Clear the data if the URL changes to avoid stale data in hook consumer.
 			setRichData( null );
 
 			try {
