@@ -68,7 +68,7 @@ export default function CalendarEdit( { attributes } ) {
 					{ ! hasPostsResolved ? (
 						<Spinner />
 					) : (
-						__( 'No posts found.' )
+						__( 'No published posts found.' )
 					) }
 				</Placeholder>
 			</div>
