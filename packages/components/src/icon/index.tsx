@@ -19,35 +19,39 @@ import { SVG } from '@wordpress/primitives';
  * Internal dependencies
  */
 import Dashicon from '../dashicon';
-import type { Icon as DashiconIcon } from '../dashicon/types';
+import type { IconKey as DashiconIconKey } from '../dashicon/types';
 
-type IconType< P > = DashiconIcon | ComponentType< P > | JSX.Element;
+type IconType< P > = DashiconIconKey | ComponentType< P > | JSX.Element;
 
 interface BaseProps< P > {
 	/**
 	 * The icon to render. Supported values are: Dashicons (specified as
-	 * strings), functions, WPComponent instances and `null`.
+	 * strings), functions, Component instances and `null`.
 	 *
 	 * @default null
 	 */
-	icon?: IconType< P >;
+	icon?: IconType< P > | null;
 	/**
 	 * The size (width and height) of the icon.
 	 *
-	 * @default `20` (when using Dashicon), `24` otherwise
+	 * @default 24
 	 */
 	size?: number;
 }
 
 type AdditionalProps< T > = T extends ComponentType< infer U >
 	? U
-	: T extends DashiconIcon
+	: T extends DashiconIconKey
 	? SVGProps< SVGSVGElement >
 	: {};
 
 export type Props< P > = BaseProps< P > & AdditionalProps< IconType< P > >;
 
-function Icon< P >( { icon, size, ...additionalProps }: Props< P > ) {
+function Icon< P >( {
+	icon = null,
+	size = 24,
+	...additionalProps
+}: Props< P > ) {
 	if ( 'string' === typeof icon ) {
 		return (
 			<Dashicon
@@ -63,26 +67,24 @@ function Icon< P >( { icon, size, ...additionalProps }: Props< P > ) {
 		} );
 	}
 
-	// Icons should be 24x24 by default.
-	const iconSize = size || 24;
 	if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
 			return createElement( icon, ( {
-				size: iconSize,
+				size,
 				...additionalProps,
 			} as unknown ) as P );
 		}
 
 		return ( icon as ( ...args: any[] ) => JSX.Element )( {
-			size: iconSize,
+			size,
 			...additionalProps,
 		} );
 	}
 
 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
 		const appliedProps = {
-			width: iconSize,
-			height: iconSize,
+			width: size,
+			height: size,
 			...icon.props,
 			...additionalProps,
 		};
@@ -93,7 +95,7 @@ function Icon< P >( { icon, size, ...additionalProps }: Props< P > ) {
 	if ( isValidElement( icon ) ) {
 		return cloneElement( icon, {
 			// @ts-ignore Just forwarding the size prop along
-			size: iconSize,
+			size,
 			...additionalProps,
 		} );
 	}
