@@ -1,5 +1,21 @@
 == Changelog ==
 
+= 10.6.2 =
+
+
+
+### Bug Fixes
+
+- Workflows: Fix "Stable tag:" readme.txt field in SVN upload. ([31897](https://github.com/WordPress/gutenberg/pull/31897))
+- Gallery: Fix Image Size regression. ([31884](https://github.com/WordPress/gutenberg/pull/31884))
+
+### Various
+
+- Plugin: Guard `construct_wp_query_args` with check if implemented in WordPress Core. ([32008](https://github.com/WordPress/gutenberg/pull/32008))
+
+
+
+
 = 10.6.1 =
 
 ### Bug Fixes

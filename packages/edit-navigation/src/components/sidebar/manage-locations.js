@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 import {
 	Button,
 	CheckboxControl,
@@ -17,18 +18,18 @@ import {
 import { useMenuLocations } from '../../hooks';
 
 export default function ManageLocations( {
-	onSelectMenu,
-	isModalOpen,
-	openModal,
-	closeModal,
 	menus,
 	selectedMenuId,
+	onSelectMenu,
 } ) {
 	const {
 		menuLocations,
 		assignMenuToLocation,
 		toggleMenuLocationAssignment,
 	} = useMenuLocations();
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const openModal = () => setIsModalOpen( true );
+	const closeModal = () => setIsModalOpen( false );
 
 	if ( ! menuLocations || ! menus?.length ) {
 		return <Spinner />;

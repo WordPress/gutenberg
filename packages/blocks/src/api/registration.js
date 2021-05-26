@@ -22,6 +22,7 @@ import {
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
@@ -193,17 +194,76 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 }
 
 /**
+ * Gets block settings from metadata loaded from `block.json` file.
+ *
+ * @param {Object} metadata            Block metadata loaded from `block.json`.
+ * @param {string} metadata.textdomain Textdomain to use with translations.
+ *
+ * @return {Object} Block settings.
+ */
+function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
+	const allowedFields = [
+		'apiVersion',
+		'title',
+		'category',
+		'parent',
+		'icon',
+		'description',
+		'keywords',
+		'attributes',
+		'providesContext',
+		'usesContext',
+		'supports',
+		'styles',
+		'example',
+		'variations',
+	];
+
+	const settings = pick( metadata, allowedFields );
+
+	if ( textdomain ) {
+		Object.keys( i18nBlockSchema ).forEach( ( key ) => {
+			if ( ! settings[ key ] ) {
+				return;
+			}
+			settings[ key ] = translateBlockSettingUsingI18nSchema(
+				i18nBlockSchema[ key ],
+				settings[ key ],
+				textdomain
+			);
+		} );
+	}
+
+	return settings;
+}
+
+/**
  * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
  *
- * @param {string} name     Block name.
- * @param {Object} settings Block settings.
+ * @param {string|Object} blockNameOrMetadata Block type name or its metadata.
+ * @param {Object}        settings            Block settings.
  *
  * @return {?WPBlock} The block, if it has been successfully registered;
  *                    otherwise `undefined`.
  */
-export function registerBlockType( name, settings ) {
+export function registerBlockType( blockNameOrMetadata, settings ) {
+	const name = isObject( blockNameOrMetadata )
+		? blockNameOrMetadata.name
+		: blockNameOrMetadata;
+
+	if ( typeof name !== 'string' ) {
+		console.error( 'Block names must be strings.' );
+		return;
+	}
+
+	if ( isObject( blockNameOrMetadata ) ) {
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: getBlockSettingsFromMetadata( blockNameOrMetadata ),
+		} );
+	}
+
 	settings = {
 		name,
 		icon: blockDefault,
@@ -218,10 +278,6 @@ export function registerBlockType( name, settings ) {
 		...settings,
 	};
 
-	if ( typeof name !== 'string' ) {
-		console.error( 'Block names must be strings.' );
-		return;
-	}
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
 		console.error(
 			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
@@ -370,59 +426,23 @@ function translateBlockSettingUsingI18nSchema(
 
 /**
  * Registers a new block provided from metadata stored in `block.json` file.
- * It uses `registerBlockType` internally.
  *
- * @see registerBlockType
+ * @deprecated Use `registerBlockType` instead.
  *
  * @param {Object} metadata            Block metadata loaded from `block.json`.
- * @param {string} metadata.name       Block name.
- * @param {string} metadata.textdomain Textdomain to use with translations.
  * @param {Object} additionalSettings  Additional block settings.
  *
  * @return {?WPBlock} The block, if it has been successfully registered;
  *                    otherwise `undefined`.
  */
-export function registerBlockTypeFromMetadata(
-	{ name, textdomain, ...metadata },
-	additionalSettings
-) {
-	const allowedFields = [
-		'apiVersion',
-		'title',
-		'category',
-		'parent',
-		'icon',
-		'description',
-		'keywords',
-		'attributes',
-		'providesContext',
-		'usesContext',
-		'supports',
-		'styles',
-		'example',
-		'variations',
-	];
-
-	const settings = pick( metadata, allowedFields );
-
-	if ( textdomain ) {
-		Object.keys( i18nBlockSchema ).forEach( ( key ) => {
-			if ( ! settings[ key ] ) {
-				return;
-			}
-			settings[ key ] = translateBlockSettingUsingI18nSchema(
-				i18nBlockSchema[ key ],
-				settings[ key ],
-				textdomain
-			);
-		} );
-	}
-
-	unstable__bootstrapServerSideBlockDefinitions( {
-		[ name ]: settings,
+export function registerBlockTypeFromMetadata( metadata, additionalSettings ) {
+	deprecated( 'wp.blocks.registerBlockTypeFromMetadata', {
+		since: '10.7',
+		plugin: 'Gutenberg',
+		alternative: 'wp.blocks.registerBlockType',
+		version: '11.0',
 	} );
-
-	return registerBlockType( name, additionalSettings );
+	return registerBlockType( metadata, additionalSettings );
 }
 
 /**

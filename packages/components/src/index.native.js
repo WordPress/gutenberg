@@ -65,6 +65,11 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
 export * from './text';
 
 // Mobile Components
+export {
+	__unstableAutocompletionItemsFill,
+	__unstableAutocompletionItemsSlot,
+} from './mobile/autocompletion-items';
+export { default as Autocomplete } from './autocomplete';
 export { default as BottomSheet } from './mobile/bottom-sheet';
 export {
 	BottomSheetConsumer,
