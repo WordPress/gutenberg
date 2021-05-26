@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	activateTheme,
 	createNewPost,
 	insertBlock,
 	pressKeyWithModifier,
@@ -10,14 +9,6 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Post Title block', () => {
-	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
-	} );
-
-	afterAll( async () => {
-		await activateTheme( 'twentytwentyone' );
-	} );
-
 	beforeEach( async () => {
 		await createNewPost();
 	} );
