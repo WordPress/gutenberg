@@ -20,6 +20,7 @@
 	background: $white;
 	box-shadow: $shadow-modal;
 	border-radius: $radius-block-ui;
+	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
 
@@ -51,7 +52,6 @@
 // if the content needs to be scrolled (for example, on the keyboard shortcuts
 // modal screen).
 .components-modal__header {
-	border-radius: $radius-block-ui $radius-block-ui 0 0;
 	border-bottom: $border-width solid $gray-300;
 	padding: 0 $grid-unit-40;
 	display: flex;
@@ -103,7 +103,6 @@
 // Modal contents.
 .components-modal__content {
 	flex: 1;
-	border-radius: 0 0 $radius-block-ui $radius-block-ui;
 	margin-top: $header-height;
 	padding: 0 $grid-unit-40 $grid-unit-30;
 	overflow: auto;
