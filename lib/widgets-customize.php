@@ -167,7 +167,11 @@ function gutenberg_widgets_customize_load_block_editor_scripts_and_styles( $is_b
 	return $is_block_editor_screen;
 }
 
-add_action( 'customize_register', 'gutenberg_widgets_customize_register' );
-add_filter( 'widget_customizer_setting_args', 'gutenberg_widgets_customize_add_unstable_instance', 10, 2 );
-add_action( 'customize_controls_enqueue_scripts', 'gutenberg_customize_widgets_init' );
-add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_customize_load_block_editor_scripts_and_styles' );
+// Test for wp_use_widgets_block_editor(), as the existence of this in core
+// implies that the Customizer already supports the widgets block editor.
+if ( ! function_exists( 'wp_use_widgets_block_editor' ) ) {
+	add_action( 'customize_register', 'gutenberg_widgets_customize_register' );
+	add_filter( 'widget_customizer_setting_args', 'gutenberg_widgets_customize_add_unstable_instance', 10, 2 );
+	add_action( 'customize_controls_enqueue_scripts', 'gutenberg_customize_widgets_init' );
+	add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_customize_load_block_editor_scripts_and_styles' );
+}
