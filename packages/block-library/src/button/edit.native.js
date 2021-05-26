@@ -141,7 +141,7 @@ const ButtonEdit = ( {
 			( ! wasEditorSidebarOpened && editorSidebarOpened ) ||
 			( ! wasLinkSheetVisible && isLinkSheetVisible )
 		) {
-			if ( Platform.OS === 'android' && richTextRef.current ) {
+			if ( Platform.OS === 'android' && richTextRef && richTextRef.current ) {
 				richTextRef.current.blur();
 				onToggleButtonFocus( false );
 			}
@@ -170,7 +170,13 @@ const ButtonEdit = ( {
 		wasSelected,
 		wasEditorSidebarOpened,
 		wasLinkSheetVisible,
+		richTextRef.current
 	] );
+
+	const setRef = ( nodeRef ) => {
+		richTextRef.current = nodeRef;
+	};
+
 
 	const getBackgroundColor = () => {
 		// Return named gradient value if available.
@@ -373,7 +379,7 @@ const ButtonEdit = ( {
 					/>
 				) }
 				<RichText
-					ref={ richTextRef }
+					setRef={ setRef }
 					placeholder={ placeholderText }
 					value={ text }
 					onChange={ onChangeText }
