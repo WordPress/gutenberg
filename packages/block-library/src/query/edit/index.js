@@ -25,7 +25,11 @@ import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
-export function QueryContent( { attributes, setAttributes } ) {
+export function QueryContent( {
+	attributes,
+	setAttributes,
+	context: { templateSlug } = {},
+} ) {
 	const {
 		queryId,
 		query,
@@ -83,12 +87,20 @@ export function QueryContent( { attributes, setAttributes } ) {
 			updateQuery( newQuery );
 		}
 	}, [ query.perPage ] );
-	// We need this for multi-query block pagination.
-	// Query parameters for each block are scoped to their ID.
+	/**
+	 * We need to perform some actions during insertion of a Query block.
+	 * 1. Set a unique `queryId` which is needed for multi-query block pagination.
+	 * Query parameters for each block are scoped to their ID.
+	 * 2. Detect the context in which the block is inserted and set the proper
+	 * value to `inherit` property.
+	 */
 	useEffect( () => {
 		if ( ! queryId ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { queryId: instanceId } );
+			setAttributes( {
+				queryId: instanceId,
+				query: { ...query, inherit: !! templateSlug },
+			} );
 		}
 	}, [ queryId, instanceId ] );
 	const updateQuery = ( newQuery ) =>
