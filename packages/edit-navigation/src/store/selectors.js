@@ -44,7 +44,7 @@ export const getNavigationPostForMenu = createRegistrySelector(
 		if ( ! hasResolvedNavigationPost( state, menuId ) ) {
 			return null;
 		}
-		return select( coreStore ).getEditedEntityRecord(
+		return select( coreStore.name ).getEditedEntityRecord(
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId )
@@ -60,7 +60,9 @@ export const getNavigationPostForMenu = createRegistrySelector(
  */
 export const hasResolvedNavigationPost = createRegistrySelector(
 	( select ) => ( state, menuId ) => {
-		return select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
+		return select(
+			coreStore.name
+		).hasFinishedResolution( 'getEntityRecord', [
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId ),
@@ -78,6 +80,6 @@ export const hasResolvedNavigationPost = createRegistrySelector(
 export const getMenuItemForClientId = createRegistrySelector(
 	( select ) => ( state, postId, clientId ) => {
 		const mapping = invert( state.mapping[ postId ] );
-		return select( coreStore ).getMenuItem( mapping[ clientId ] );
+		return select( coreStore.name ).getMenuItem( mapping[ clientId ] );
 	}
 );
