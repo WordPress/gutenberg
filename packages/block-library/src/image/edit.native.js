@@ -62,9 +62,10 @@ import { store as editPostStore } from '@wordpress/edit-post';
 import styles from './styles.scss';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import { LINK_DESTINATION_CUSTOM } from './constants';
-
-const MEDIA_ID_NO_FEATURED_IMAGE_SET = 0;
+import {
+	LINK_DESTINATION_CUSTOM,
+	MEDIA_ID_NO_FEATURED_IMAGE_SET,
+} from './constants';
 
 const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
