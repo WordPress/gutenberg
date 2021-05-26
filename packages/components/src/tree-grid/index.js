@@ -46,12 +46,7 @@ function getRowFocusables( rowElement ) {
  * @param {Object}    ref                 A ref to the underlying DOM table element.
  */
 function TreeGrid(
-	{
-		children,
-		onExpandRow = () => {},
-		onCollapseRow = () => {},
-		...props
-	},
+	{ children, onExpandRow = () => {}, onCollapseRow = () => {}, ...props },
 	ref
 ) {
 	const onKeyDown = useCallback( ( event ) => {
