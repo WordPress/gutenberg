@@ -35,10 +35,9 @@ const stylesMemo = {};
 const getStyles = (
 	isRootList,
 	isStackedHorizontally,
-	horizontalAlignment,
-	numColumns
+	horizontalAlignment
 ) => {
-	if ( isRootList || numColumns ) {
+	if ( isRootList ) {
 		return;
 	}
 	const styleName = `${ isStackedHorizontally }-${ horizontalAlignment }`;
@@ -216,7 +215,6 @@ export class BlockList extends Component {
 			contentResizeMode,
 			// eslint-disable-next-line no-unused-vars
 			blockWidth,
-			numColumns,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -279,14 +277,11 @@ export class BlockList extends Component {
 					style={ getStyles(
 						isRootList,
 						isStackedHorizontally,
-						horizontalAlignment,
-						numColumns
+						horizontalAlignment
 					) }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
-					numColumns={ numColumns }
-					key={ numColumns }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
 					}
