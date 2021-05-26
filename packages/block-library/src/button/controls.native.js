@@ -55,7 +55,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 	);
 }
 
-export default function Controls ( {
+export default function Controls( {
 	attributes,
 	setAttributes,
 	clientId,

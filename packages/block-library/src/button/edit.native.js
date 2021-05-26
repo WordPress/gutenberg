@@ -5,7 +5,7 @@ import { View, AccessibilityInfo, Platform, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { withInstanceId, compose } from '@wordpress/compose';
+import { withInstanceId, compose, usePrevious } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
@@ -35,16 +35,6 @@ const MIN_WIDTH_MARGINS = {
 	75: styles.button75?.marginLeft,
 	50: styles.button50?.marginLeft,
 	25: styles.button25?.marginLeft,
-};
-
-const usePrevious = ( value ) => {
-	const ref = useRef();
-
-	useEffect( () => {
-		ref.current = value;
-	}, [ value ] );
-
-	return ref.current;
 };
 
 const ButtonEdit = ( {
@@ -80,16 +70,6 @@ const ButtonEdit = ( {
 	const wasSelected = usePrevious( isSelected );
 	const wasEditorSidebarOpened = usePrevious( editorSidebarOpened );
 	const wasLinkSheetVisible = usePrevious( isLinkSheetVisible );
-
-	const onClearSettings = () => {
-		setAttributes( {
-			url: '',
-			rel: '',
-			linkTarget: '',
-		} );
-
-		onHideLinkSettings();
-	};
 
 	const linkSettingsActions = [
 		{
@@ -141,7 +121,11 @@ const ButtonEdit = ( {
 			( ! wasEditorSidebarOpened && editorSidebarOpened ) ||
 			( ! wasLinkSheetVisible && isLinkSheetVisible )
 		) {
-			if ( Platform.OS === 'android' && richTextRef && richTextRef.current ) {
+			if (
+				Platform.OS === 'android' &&
+				richTextRef &&
+				richTextRef.current
+			) {
 				richTextRef.current.blur();
 				onToggleButtonFocus( false );
 			}
@@ -170,13 +154,12 @@ const ButtonEdit = ( {
 		wasSelected,
 		wasEditorSidebarOpened,
 		wasLinkSheetVisible,
-		richTextRef.current
+		richTextRef.current,
 	] );
 
 	const setRef = ( nodeRef ) => {
 		richTextRef.current = nodeRef;
 	};
-
 
 	const getBackgroundColor = () => {
 		// Return named gradient value if available.
@@ -236,6 +219,16 @@ const ButtonEdit = ( {
 
 	const onHideLinkSettings = () => {
 		setIsLinkSheetVisible( false );
+	};
+
+	const onClearSettings = () => {
+		setAttributes( {
+			url: '',
+			rel: '',
+			linkTarget: '',
+		} );
+
+		onHideLinkSettings();
 	};
 
 	const onToggleButtonFocus = ( value ) => {
