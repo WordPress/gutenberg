@@ -626,13 +626,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * and the $to_append selector ".some-class" the result will be
 	 * "h1.some-class, h2.some-class, h3.some-class".
 	 *
-	 * @param string $selector
-	 * @param string $to_append
+	 * @param string $selector Original selector.
+	 * @param string $to_append Selector to append.
 	 *
 	 * @return string
 	 */
 	private static function append_to_selector( $selector, $to_append ) {
-		$new_selectors = [];
+		$new_selectors = array();
 		$selectors     = explode( ',', $selector );
 		foreach ( $selectors as $sel ) {
 			$new_selectors[] = $sel . $to_append;

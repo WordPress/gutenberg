@@ -177,7 +177,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	function test_get_stylesheet_preset_classes_work_with_compounded_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'blocks' => array(
 						'core/heading' => array(
