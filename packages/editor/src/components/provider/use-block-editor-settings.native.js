@@ -9,13 +9,14 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import useBlockEditorSettings from './use-block-editor-settings.js';
+import { store as editorStore } from '../../store';
 
 function useNativeBlockEditorSettings( settings, hasTemplate ) {
 	const capabilities = settings.capabilities ?? {};
 	const editorSettings = useBlockEditorSettings( settings, hasTemplate );
 
 	const supportReusableBlock = capabilities.reusableBlock === true;
-	const { reusableBlocks } = useSelect(
+	const { isTitleSelected, reusableBlocks } = useSelect(
 		( select ) => ( {
 			reusableBlocks: supportReusableBlock
 				? select( coreStore ).getEntityRecords(
@@ -26,6 +27,7 @@ function useNativeBlockEditorSettings( settings, hasTemplate ) {
 						{ per_page: 100 }
 				  )
 				: [],
+			isTitleSelected: select( editorStore ).isPostTitleSelected(),
 		} ),
 		[ supportReusableBlock ]
 	);
@@ -34,8 +36,9 @@ function useNativeBlockEditorSettings( settings, hasTemplate ) {
 		() => ( {
 			...editorSettings,
 			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalShouldInsertAtTheTop: isTitleSelected,
 		} ),
-		[ reusableBlocks ]
+		[ editorSettings, reusableBlocks, isTitleSelected ]
 	);
 }
 

@@ -19,11 +19,13 @@
 		"src/hooks/use-constrained-tabbing/**/*",
 		"src/hooks/use-debounce/**/*",
 		"src/hooks/use-instance-id/**/*",
+		"src/hooks/use-isomorphic-layout-effect/**/*",
 		"src/hooks/use-focus-return/**/*",
 		"src/hooks/use-previous/**/*",
 		"src/hooks/use-media-query/**/*",
 		"src/hooks/use-reduced-motion/**/*",
 		"src/hooks/use-merge-refs/**/*",
+		"src/hooks/use-resize-observer/**/*",
 		"src/utils/**/*"
 	]
 }

@@ -150,7 +150,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		$widget_id  = $request['id'];
-		$sidebar_id = gutenberg_find_widgets_sidebar( $widget_id );
+		$sidebar_id = wp_find_widgets_sidebar( $widget_id );
 
 		if ( is_null( $sidebar_id ) ) {
 			return new WP_Error(
@@ -192,7 +192,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			return $widget_id;
 		}
 
-		gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id );
+		wp_assign_widget_to_sidebar( $widget_id, $sidebar_id );
 
 		$request['context'] = 'edit';
 
@@ -229,10 +229,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 */
 	public function update_item( $request ) {
 		$widget_id  = $request['id'];
-		$sidebar_id = gutenberg_find_widgets_sidebar( $widget_id );
+		$sidebar_id = wp_find_widgets_sidebar( $widget_id );
 
 		// Allow sidebar to be unset or missing when widget is not a WP_Widget.
-		$parsed_id     = gutenberg_parse_widget_id( $widget_id );
+		$parsed_id     = wp_parse_widget_id( $widget_id );
 		$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
 		if ( is_null( $sidebar_id ) && $widget_object ) {
 			return new WP_Error(
@@ -255,7 +255,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		if ( $request->has_param( 'sidebar' ) ) {
 			if ( $sidebar_id !== $request['sidebar'] ) {
 				$sidebar_id = $request['sidebar'];
-				gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id );
+				wp_assign_widget_to_sidebar( $widget_id, $sidebar_id );
 			}
 		}
 
@@ -286,7 +286,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 */
 	public function delete_item( $request ) {
 		$widget_id  = $request['id'];
-		$sidebar_id = gutenberg_find_widgets_sidebar( $widget_id );
+		$sidebar_id = wp_find_widgets_sidebar( $widget_id );
 
 		if ( is_null( $sidebar_id ) ) {
 			return new WP_Error(
@@ -300,7 +300,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
 		if ( $request['force'] ) {
 			$prepared = $this->prepare_item_for_response( compact( 'widget_id', 'sidebar_id' ), $request );
-			gutenberg_assign_widget_to_sidebar( $widget_id, '' );
+			wp_assign_widget_to_sidebar( $widget_id, '' );
 			$prepared->set_data(
 				array(
 					'deleted'  => true,
@@ -308,7 +308,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				)
 			);
 		} else {
-			gutenberg_assign_widget_to_sidebar( $widget_id, 'wp_inactive_widgets' );
+			wp_assign_widget_to_sidebar( $widget_id, 'wp_inactive_widgets' );
 			$prepared = $this->prepare_item_for_response(
 				array(
 					'sidebar_id' => 'wp_inactive_widgets',
@@ -359,7 +359,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		if ( isset( $request['id'] ) ) {
 			// Saving an existing widget.
 			$id            = $request['id'];
-			$parsed_id     = gutenberg_parse_widget_id( $id );
+			$parsed_id     = wp_parse_widget_id( $id );
 			$id_base       = $parsed_id['id_base'];
 			$number        = isset( $parsed_id['number'] ) ? $parsed_id['number'] : null;
 			$widget_object = gutenberg_get_widget_object( $id_base );
@@ -495,7 +495,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		}
 
 		$widget    = $wp_registered_widgets[ $widget_id ];
-		$parsed_id = gutenberg_parse_widget_id( $widget_id );
+		$parsed_id = wp_parse_widget_id( $widget_id );
 		$fields    = $this->get_fields_for_response( $request );
 
 		$prepared = array(
@@ -511,11 +511,11 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			rest_is_field_included( 'rendered', $fields ) &&
 			'wp_inactive_widgets' !== $sidebar_id
 		) {
-			$prepared['rendered'] = trim( gutenberg_render_widget( $widget_id, $sidebar_id ) );
+			$prepared['rendered'] = trim( wp_render_widget( $widget_id, $sidebar_id ) );
 		}
 
 		if ( rest_is_field_included( 'rendered_form', $fields ) ) {
-			$rendered_form = gutenberg_render_widget_control( $widget_id );
+			$rendered_form = wp_render_widget_control( $widget_id );
 			if ( ! is_null( $rendered_form ) ) {
 				$prepared['rendered_form'] = trim( $rendered_form );
 			}

@@ -406,6 +406,13 @@ _Returns_
 Hook which allows to listen the resize event of any target element when it changes sizes.
 _Note: `useResizeObserver` will report `null` until after first render_
 
+Simply a re-export of `react-resize-aware` so refer to its documentation <https://github.com/FezVrasta/react-resize-aware>
+for more details.
+
+_Related_
+
+-   <https://github.com/FezVrasta/react-resize-aware>
+
 _Usage_
 
 ```js
@@ -420,10 +427,6 @@ const App = () => {
 	);
 };
 ```
-
-_Returns_
-
--   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
 
 <a name="useThrottle" href="#useThrottle">#</a> **useThrottle**
 

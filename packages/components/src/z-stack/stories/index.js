@@ -6,7 +6,7 @@ import { boolean, number } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import { Elevation } from '../../ui/elevation';
+import { Elevation } from '../../elevation';
 import { HStack } from '../../h-stack';
 import { View } from '../../view';
 import { ZStack } from '..';

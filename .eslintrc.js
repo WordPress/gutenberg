@@ -164,7 +164,11 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ '**/*.@(android|ios|native).js', ...developmentFiles ],
+			files: [
+				'**/*.@(android|ios|native).js',
+				'packages/react-native-*/**/*.js',
+				...developmentFiles,
+			],
 			rules: {
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
