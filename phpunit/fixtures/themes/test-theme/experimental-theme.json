@@ -1,0 +1,8 @@
+{
+	"templateParts": [
+		{
+			"name": "header",
+			"area": "header"
+		}
+	]
+}
