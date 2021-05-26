@@ -235,7 +235,7 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"left","isResponsive":true} /--></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"verticalAlignment":"center","width":"33.33%"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:site-title {"textAlign":"center"} /--></div>
+							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:site-title {"textAlign":"center","style":{"elements":{"link":{"color":{"text":"#000000"}}}}} /--></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"verticalAlignment":"center","width":"33.33%"} -->
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:social-links {"iconColor":"black","iconColorValue":"#000000","customIconBackgroundColor":"#e7ecde","iconBackgroundColorValue":"#e7ecde"} -->
@@ -257,7 +257,7 @@ function register_gutenberg_patterns() {
 			'content'    => '<!-- wp:cover {"url":"https://s.w.org/images/core/5.8/forest.jpg","id":2613,"minHeight":600,"contentPosition":"center center","align":"full"} -->
 							<div class="wp-block-cover alignfull has-background-dim" style="min-height:600px"><img class="wp-block-cover__image-background wp-image-2613" alt="" src="https://s.w.org/images/core/5.8/forest.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:columns {"align":"wide"} -->
 							<div class="wp-block-columns alignwide"><!-- wp:column {"verticalAlignment":"center"} -->
-							<div class="wp-block-column is-vertically-aligned-center"><!-- wp:site-title {"style":{"color":{"link":"#ffffff"}}} /--></div>
+							<div class="wp-block-column is-vertically-aligned-center"><!-- wp:site-title {"style":{"elements":{"link":{"color":{"text":"#FFFFFF"}}}}} /--></div>
 							<!-- /wp:column -->
 
 							<!-- wp:column -->
