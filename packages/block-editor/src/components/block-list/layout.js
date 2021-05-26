@@ -41,18 +41,22 @@ export function LayoutStyle( { selector, layout = {} } ) {
 	let style =
 		!! contentSize || !! wideSize
 			? `
+				${ selector } {
+					align-items: center;
+					display: flex;
+					flex-flow: column;
+				}
+
 				${ appendSelectors( selector, '> *' ) } {
-					max-width: ${ contentSize ?? wideSize };
-					margin-left: auto !important;
-					margin-right: auto !important;
+					width: ${ contentSize ?? wideSize };
 				}
 
 				${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
-					max-width: ${ wideSize ?? contentSize };
+					width: ${ wideSize ?? contentSize };
 				}
 
 				${ appendSelectors( selector, '> [data-align="full"]' ) } {
-					max-width: none;
+					width: 100%;
 				}
 			`
 			: '';
