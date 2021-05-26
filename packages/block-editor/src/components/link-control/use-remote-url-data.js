@@ -11,8 +11,9 @@ import { useState, useEffect, useRef } from '@wordpress/element';
 
 function useRemoteUrlData( url ) {
 	const isMounted = useRef( false );
-	const isFetching = useRef( false );
+
 	const [ richData, setRichData ] = useState( null );
+	const [ isFetching, setIsFetching ] = useState( false );
 
 	const { fetchRemoteUrlData } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -30,37 +31,34 @@ function useRemoteUrlData( url ) {
 	}, [] );
 
 	// Clear the data if the URL changes to avoid stale data in hook consumer.
-	useEffect( () => {
-		setRichData( null );
-	}, [ url ] );
+	// useEffect( () => {
+	// 	setRichData( null );
+	// }, [ url ] );
 
 	useEffect( () => {
 		const fetchRichData = async () => {
-			isFetching.current = true;
+			setIsFetching( true );
+			setRichData( null );
 
 			const urlData = await fetchRemoteUrlData( url ).catch( () => {
-				isFetching.current = false;
+				setIsFetching( false );
 			} );
 
-			isFetching.current = false;
-
 			if ( isMounted.current ) {
+				// console.log( 'Setting urlData', urlData );
 				setRichData( urlData );
+				setIsFetching( false );
 			}
 		};
 
 		if ( url?.length && isMounted.current && fetchRemoteUrlData ) {
 			fetchRichData();
 		}
-
-		return () => {
-			isFetching.current = false;
-		};
 	}, [ url ] );
 
 	return {
 		richData,
-		isFetching: isFetching.current,
+		isFetching,
 	};
 }
 
