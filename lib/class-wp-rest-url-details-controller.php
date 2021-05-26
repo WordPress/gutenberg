@@ -168,7 +168,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * Retrieves the document title from a remote URL.
 	 *
 	 * @param string $url The website url whose HTML we want to access.
-	 * @return array|WP_Error the HTTP response from the remote URL, or an error.
+	 * @return string|WP_Error The HTTP response from the remote URL, or an error.
 	 */
 	private function get_remote_url( $url ) {
 		$args = array(
