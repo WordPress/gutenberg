@@ -145,11 +145,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['color']['gradients'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['color']['custom'] ) ) {
-		$settings['disableCustomColors'] = $settings['__experimentalFeatures']['color']['custom'];
+		$settings['disableCustomColors'] = ! $settings['__experimentalFeatures']['color']['custom'];
 		unset( $settings['__experimentalFeatures']['color']['custom'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['color']['customGradient'] ) ) {
-		$settings['disableCustomGradients'] = $settings['__experimentalFeatures']['color']['customGradient'];
+		$settings['disableCustomGradients'] = ! $settings['__experimentalFeatures']['color']['customGradient'];
 		unset( $settings['__experimentalFeatures']['color']['customGradient'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
@@ -157,7 +157,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['typography']['fontSizes'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['customFontSize'] ) ) {
-		$settings['disableCustomFontSizes'] = $settings['__experimentalFeatures']['typography']['customFontSize'];
+		$settings['disableCustomFontSizes'] = ! $settings['__experimentalFeatures']['typography']['customFontSize'];
 		unset( $settings['__experimentalFeatures']['typography']['customFontSize'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['customLineHeight'] ) ) {
