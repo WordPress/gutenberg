@@ -17,6 +17,7 @@
 .components-modal__frame {
 	// Use the entire viewport on smaller screens.
 	margin: 0;
+	width: 100%;
 	background: $white;
 	box-shadow: $shadow-modal;
 	border-radius: $radius-block-ui;
@@ -27,15 +28,19 @@
 	// Show a centered modal on bigger screens.
 	@include break-small() {
 		margin: auto;
-		width: 50%;
+		width: auto;
 		min-width: $modal-min-width;
-		max-width: calc(100% - #{ $grid-unit-20 } - #{ $grid-unit-20 });
-		max-height: 90%;
+		max-width: calc(100% - #{ $grid-unit-20 * 2 });
+		max-height: calc(100% - #{ $header-height * 2 });
 
 		// Animate the modal frame/contents appearing on the page.
 		animation: components-modal__appear-animation 0.1s ease-out;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
+	}
+
+	@include break-large() {
+		max-height: 70%;
 	}
 }
 

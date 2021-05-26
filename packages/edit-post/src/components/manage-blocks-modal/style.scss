@@ -1,9 +1,3 @@
-.edit-post-manage-blocks-modal {
-	@include break-small() {
-		height: calc(100% - #{ $header-height } - #{ $header-height });
-	}
-}
-
 .edit-post-manage-blocks-modal__no-results {
 	font-style: italic;
 	padding: 24px 0;
