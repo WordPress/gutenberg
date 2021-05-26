@@ -173,7 +173,6 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	private function get_remote_url( $url ) {
 		$args = array(
 			'limit_response_size' => 150 * KB_IN_BYTES,
-			'user-agent'          => $this->get_random_user_agent(),
 		);
 
 		/**
