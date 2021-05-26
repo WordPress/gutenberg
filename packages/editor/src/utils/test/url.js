@@ -9,7 +9,7 @@ describe( 'cleanForSlug()', () => {
 	} );
 
 	it( 'Should allow unicode characters', () => {
-		expect( cleanForSlug( 'Καλημέρα Κόσμε' ) ).toBe( 'καλημέρα-κόσμε' )
+		expect( cleanForSlug( 'Καλημέρα Κόσμε' ) ).toBe( 'καλημέρα-κόσμε' );
 	} );
 
 	it( 'Should return an empty string for missing argument', () => {
