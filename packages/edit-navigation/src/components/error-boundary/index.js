@@ -37,7 +37,11 @@ class ErrorBoundary extends Component {
 			<Warning
 				className="navigation-editor-error-boundary"
 				actions={ [
-					<Button key="recovery" onClick={ this.reboot } isSecondary>
+					<Button
+						key="recovery"
+						onClick={ this.reboot }
+						variant="secondary"
+					>
 						{ __( 'Attempt Recovery' ) }
 					</Button>,
 				] }

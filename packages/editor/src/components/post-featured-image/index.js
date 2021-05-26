@@ -188,7 +188,7 @@ function PostFeaturedImage( {
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
-								<Button onClick={ open } isSecondary>
+								<Button onClick={ open } variant="secondary">
 									{ __( 'Replace Image' ) }
 								</Button>
 							) }
@@ -197,7 +197,11 @@ function PostFeaturedImage( {
 				) }
 				{ !! featuredImageId && (
 					<MediaUploadCheck>
-						<Button onClick={ onRemoveImage } isLink isDestructive>
+						<Button
+							onClick={ onRemoveImage }
+							variant="link"
+							isDestructive
+						>
 							{ postLabel.remove_featured_image ||
 								DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 						</Button>

@@ -54,7 +54,7 @@ function BlockBreadcrumb() {
 				{ hasSelection && (
 					<Button
 						className="block-editor-block-breadcrumb__button"
-						isTertiary
+						variant="tertiary"
 						onClick={ clearSelectedBlock }
 					>
 						{ __( 'Document' ) }
@@ -66,7 +66,7 @@ function BlockBreadcrumb() {
 				<li key={ parentClientId }>
 					<Button
 						className="block-editor-block-breadcrumb__button"
-						isTertiary
+						variant="tertiary"
 						onClick={ () => selectBlock( parentClientId ) }
 					>
 						<BlockTitle clientId={ parentClientId } />

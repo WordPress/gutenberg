@@ -291,10 +291,14 @@ throws a warning when using useLayoutEffect in that environment.
 
 Attach a keyboard shortcut handler.
 
+_Related_
+
+-   <https://craig.is/killing/mice#api.bind> for information about the `callback` parameter.
+
 _Parameters_
 
 -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `Function`: Shortcut callback.
+-   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
@@ -406,6 +410,13 @@ _Returns_
 Hook which allows to listen the resize event of any target element when it changes sizes.
 _Note: `useResizeObserver` will report `null` until after first render_
 
+Simply a re-export of `react-resize-aware` so refer to its documentation <https://github.com/FezVrasta/react-resize-aware>
+for more details.
+
+_Related_
+
+-   <https://github.com/FezVrasta/react-resize-aware>
+
 _Usage_
 
 ```js
@@ -420,10 +431,6 @@ const App = () => {
 	);
 };
 ```
-
-_Returns_
-
--   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
 
 <a name="useThrottle" href="#useThrottle">#</a> **useThrottle**
 

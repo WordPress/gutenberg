@@ -1,5 +1,9 @@
 # Elevation
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 `Elevation` is a core component that renders shadow, using the component system's shadow system.
 
 ## Usage
@@ -10,7 +14,7 @@ The shadow effect is generated using the `value` prop.
 import {
 	__experimentalElevation as Elevation,
 	__experimentalSurface as Surface,
-	__experimentalText as Text
+	__experimentalText as Text,
 } from '@wordpress/components';
 
 function Example() {

@@ -37,7 +37,7 @@ export default function WelcomeGuide( { sidebar } ) {
 			</p>
 			<Button
 				className="customize-widgets-welcome-guide__button"
-				isPrimary
+				variant="primary"
 				onClick={ () => toggleFeature( 'welcomeGuide' ) }
 			>
 				{ __( 'Got it' ) }

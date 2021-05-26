@@ -3,16 +3,18 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type * as React from 'react';
-import type { As, RenderProp, ExtractHTMLAttributes } from 'reakit-utils/types';
 import type { Interpolation } from 'create-emotion';
 
 /**
  * Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
+ *
+ * The `children` prop is being explicitely omitted since it is otherwise implicitly added
+ * by `ComponentPropsWithRef`. The context is that components should require the `children`
+ * prop explicitely when needed (see https://github.com/WordPress/gutenberg/pull/31817).
  */
-export type PolymorphicComponentProps< P, T extends As > = P &
-	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P > & {
+export type PolymorphicComponentProps< P, T extends React.ElementType > = P &
+	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P | 'children' > & {
 		as?: T | keyof JSX.IntrinsicElements;
-		children?: React.ReactNode | RenderProp< ExtractHTMLAttributes< any > >;
 	};
 
 export type ElementTypeFromPolymorphicComponentProps<
@@ -23,8 +25,8 @@ export type PropsFromPolymorphicComponentProps<
 	P
 > = P extends PolymorphicComponentProps< infer PP, any > ? PP : never;
 
-export type PolymorphicComponent< T extends As, O > = {
-	< TT extends As >(
+export type PolymorphicComponent< T extends React.ElementType, O > = {
+	< TT extends React.ElementType >(
 		props: PolymorphicComponentProps< O, TT > & { as: TT }
 	): JSX.Element | null;
 	( props: PolymorphicComponentProps< O, T > ): JSX.Element | null;
@@ -40,7 +42,7 @@ export type PolymorphicComponent< T extends As, O > = {
 	selector: `.${ string }`;
 };
 
-export type CreatePolymorphicComponent< T extends As, P > = (
+export type CreatePolymorphicComponent< T extends React.ElementType, P > = (
 	template: TemplateStringsArray,
 	...styles: (
 		| Interpolation< undefined >
@@ -62,5 +64,8 @@ type CreateStyledComponents = {
 };
 
 export type CreateStyled = CreateStyledComponents & {
-	< T extends As >( component: T ): CreatePolymorphicComponent< T, {} >;
+	< T extends React.ElementType >( component: T ): CreatePolymorphicComponent<
+		T,
+		{}
+	>;
 };

@@ -49,7 +49,11 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 						<Button
 							key={ widthValue }
 							isSmall
-							isPrimary={ widthValue === selectedWidth }
+							variant={
+								widthValue === selectedWidth
+									? 'primary'
+									: undefined
+							}
 							onClick={ () => handleChange( widthValue ) }
 						>
 							{ widthValue }%
