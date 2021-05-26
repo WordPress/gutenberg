@@ -450,7 +450,7 @@ export class ImageEdit extends Component {
 			styles.setFeaturedButtonDark
 		);
 
-		const setFeaturedButton = () => (
+		const removeFeaturedButton = () => (
 			<BottomSheet.Cell
 				label={ __( 'Remove as Featured Image ' ) }
 				labelStyle={ [
@@ -463,7 +463,7 @@ export class ImageEdit extends Component {
 			/>
 		);
 
-		const removeFeaturedButton = () => (
+		const setFeaturedButton = () => (
 			<BottomSheet.Cell
 				label={ __( 'Set as Featured Image ' ) }
 				labelStyle={ setFeaturedButtonStyle }
@@ -474,8 +474,8 @@ export class ImageEdit extends Component {
 		return (
 			<PanelBody>
 				{ isFeaturedImage
-					? setFeaturedButton()
-					: removeFeaturedButton() }
+					? removeFeaturedButton()
+					: setFeaturedButton() }
 			</PanelBody>
 		);
 	}
