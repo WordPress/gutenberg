@@ -147,8 +147,8 @@ function ColumnsEditContainer( {
 		const percentageWidths = innerBlocks.map( ( block ) =>
 			getEffectiveColumnWidth( block, innerBlocks.length )
 		);
-		const fractions = percentageWidths.map(
-			( width ) => ( width / 100 ) * innerBlocks.length
+		const fractions = percentageWidths.map( ( width ) =>
+			toWidthPrecision( ( width / 100 ) * innerBlocks.length )
 		);
 		let fractionsString = '';
 
