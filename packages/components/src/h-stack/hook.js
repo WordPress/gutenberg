@@ -8,7 +8,7 @@ import { getValidChildren } from '../ui/utils/get-valid-children';
 
 /**
  *
- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 export function useHStack( props ) {
 	const {

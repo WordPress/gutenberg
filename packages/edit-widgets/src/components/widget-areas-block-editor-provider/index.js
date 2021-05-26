@@ -20,7 +20,7 @@ import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
  * Internal dependencies
  */
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
@@ -38,12 +38,12 @@ export default function WidgetAreasBlockEditorProvider( {
 	} = useSelect(
 		( select ) => ( {
 			hasUploadPermissions: defaultTo(
-				select( 'core' ).canUser( 'create', 'media' ),
+				select( coreStore ).canUser( 'create', 'media' ),
 				true
 			),
 			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
 			widgets: select( editWidgetsStore ).getWidgets(),
-			reusableBlocks: select( 'core' ).getEntityRecords(
+			reusableBlocks: select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_block'
 			),

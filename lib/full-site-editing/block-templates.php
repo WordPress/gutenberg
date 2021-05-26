@@ -124,8 +124,8 @@ function _gutenberg_get_template_files( $template_type ) {
  * @return array Template.
  */
 function _gutenberg_add_template_part_area_info( $template_info ) {
-	if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
-		$theme_data = WP_Theme_JSON_Resolver::get_theme_data()->get_template_parts();
+	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		$theme_data = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_template_parts();
 	}
 
 	if ( isset( $theme_data[ $template_info['slug'] ]['area'] ) ) {
@@ -145,7 +145,7 @@ function _gutenberg_add_template_part_area_info( $template_info ) {
  *
  * @return array block references to the passed blocks and their inner blocks.
  */
-function _flatten_blocks( &$blocks ) {
+function _gutenberg_flatten_blocks( &$blocks ) {
 	$all_blocks = array();
 	$queue      = array();
 	foreach ( $blocks as &$block ) {
@@ -175,12 +175,12 @@ function _flatten_blocks( &$blocks ) {
  *
  * @return string Updated wp_template content.
  */
-function _inject_theme_attribute_in_content( $template_content ) {
+function _gutenberg_inject_theme_attribute_in_content( $template_content ) {
 	$has_updated_content = false;
 	$new_content         = '';
 	$template_blocks     = parse_blocks( $template_content );
 
-	$blocks = _flatten_blocks( $template_blocks );
+	$blocks = _gutenberg_flatten_blocks( $template_blocks );
 	foreach ( $blocks as &$block ) {
 		if (
 			'core/template-part' === $block['blockName'] &&
@@ -218,7 +218,7 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$template                 = new WP_Block_Template();
 	$template->id             = $theme . '//' . $template_file['slug'];
 	$template->theme          = $theme;
-	$template->content        = _inject_theme_attribute_in_content( $template_content );
+	$template->content        = _gutenberg_inject_theme_attribute_in_content( $template_content );
 	$template->slug           = $template_file['slug'];
 	$template->source         = 'theme';
 	$template->type           = $template_type;

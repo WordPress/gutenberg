@@ -14,7 +14,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { useSelect, store as dataStore } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
@@ -27,7 +27,7 @@ export default function CategoriesEdit( {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 	const { categories, isRequesting } = useSelect( ( select ) => {
 		const { getEntityRecords } = select( coreStore );
-		const { isResolving } = select( dataStore );
+		const { isResolving } = select( 'core/data' );
 		const query = { per_page: -1, hide_empty: true };
 		return {
 			categories: getEntityRecords( 'taxonomy', 'category', query ),

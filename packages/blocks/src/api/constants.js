@@ -13,8 +13,8 @@ export const DEPRECATED_ENTRY_KEYS = [
 ];
 
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
+	//kept for back-compatibility purposes.
 	'--wp--style--color--link': {
-		valueGlobal: [ 'elements', 'link', 'color', 'text' ],
 		value: [ 'color', 'link' ],
 		support: [ 'color', 'link' ],
 	},
@@ -45,6 +45,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	color: {
 		value: [ 'color', 'text' ],
 		support: [ 'color' ],
+	},
+	linkColor: {
+		value: [ 'elements', 'link', 'color', 'text' ],
+		support: [ 'color', 'link' ],
 	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
@@ -84,4 +88,14 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'typography', 'textTransform' ],
 		support: [ '__experimentalTextTransform' ],
 	},
+};
+
+export const __EXPERIMENTAL_ELEMENTS = {
+	link: 'a',
+	h1: 'h1',
+	h2: 'h2',
+	h3: 'h3',
+	h4: 'h4',
+	h5: 'h5',
+	h6: 'h6',
 };

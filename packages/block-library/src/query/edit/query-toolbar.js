@@ -13,27 +13,30 @@ import { __ } from '@wordpress/i18n';
 import { settings, list, grid } from '@wordpress/icons';
 
 export default function QueryToolbar( {
-	attributes: { query, layout },
+	attributes: { query, displayLayout },
 	setQuery,
-	setLayout,
+	setDisplayLayout,
 } ) {
 	const maxPageInputId = useInstanceId(
 		QueryToolbar,
 		'blocks-query-pagination-max-page-input'
 	);
-	const layoutControls = [
+	const displayLayoutControls = [
 		{
 			icon: list,
 			title: __( 'List view' ),
-			onClick: () => setLayout( { type: 'list' } ),
-			isActive: layout?.type === 'list',
+			onClick: () => setDisplayLayout( { type: 'list' } ),
+			isActive: displayLayout?.type === 'list',
 		},
 		{
 			icon: grid,
 			title: __( 'Grid view' ),
 			onClick: () =>
-				setLayout( { type: 'flex', columns: layout?.columns || 3 } ),
-			isActive: layout?.type === 'flex',
+				setDisplayLayout( {
+					type: 'flex',
+					columns: displayLayout?.columns || 3,
+				} ),
+			isActive: displayLayout?.type === 'flex',
 		},
 	];
 	return (
@@ -108,7 +111,7 @@ export default function QueryToolbar( {
 					/>
 				</ToolbarGroup>
 			) }
-			<ToolbarGroup controls={ layoutControls } />
+			<ToolbarGroup controls={ displayLayoutControls } />
 		</>
 	);
 }
