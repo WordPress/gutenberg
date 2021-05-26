@@ -487,7 +487,7 @@ class HierarchicalTermSelector extends Component {
 					onClick={ this.onToggleForm }
 					className="editor-post-taxonomies__hierarchical-terms-add"
 					aria-expanded={ showForm }
-					isLink
+					variant="link"
 				>
 					{ newTermButtonLabel }
 				</Button>
@@ -518,7 +518,7 @@ class HierarchicalTermSelector extends Component {
 						/>
 					) }
 					<Button
-						isSecondary
+						variant="secondary"
 						type="submit"
 						className="editor-post-taxonomies__hierarchical-terms-submit"
 					>

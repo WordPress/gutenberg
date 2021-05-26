@@ -29,6 +29,7 @@ export default function TemplatePartPlaceholder( {
 	area,
 	clientId,
 	setAttributes,
+	enableSelection,
 } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.initial );
@@ -85,26 +86,38 @@ export default function TemplatePartPlaceholder( {
 				<Placeholder
 					icon={ areaIcon }
 					label={ areaLabel }
-					instructions={ sprintf(
-						// Translators: %s as template part area title ("Header", "Footer", etc.).
-						'Choose an existing %s or create a new one.',
-						areaLabel.toLowerCase()
-					) }
+					instructions={
+						enableSelection
+							? sprintf(
+									// Translators: %s as template part area title ("Header", "Footer", etc.).
+									'Choose an existing %s or create a new one.',
+									areaLabel.toLowerCase()
+							  )
+							: sprintf(
+									// Translators: %s as template part area title ("Header", "Footer", etc.).
+									'Create a new %s.',
+									areaLabel.toLowerCase()
+							  )
+					}
 				>
 					<Dropdown
 						contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
 						position="bottom right left"
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<>
+								{ enableSelection && (
+									<Button
+										variant="primary"
+										onClick={ onToggle }
+										aria-expanded={ isOpen }
+									>
+										{ __( 'Choose existing' ) }
+									</Button>
+								) }
 								<Button
-									isPrimary
-									onClick={ onToggle }
-									aria-expanded={ isOpen }
-								>
-									{ __( 'Choose existing' ) }
-								</Button>
-								<Button
-									isTertiary
+									variant={
+										enableSelection ? 'tertiary' : 'primary'
+									}
 									onClick={ () =>
 										setStep( PLACEHOLDER_STEPS.patterns )
 									}

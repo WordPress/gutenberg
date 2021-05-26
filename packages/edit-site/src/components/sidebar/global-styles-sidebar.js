@@ -178,7 +178,7 @@ export default function GlobalStylesSidebar( {
 					<Button
 						className="edit-site-global-styles-sidebar__reset-button"
 						isSmall
-						isTertiary
+						variant="tertiary"
 						disabled={ ! canRestart }
 						onClick={ onReset }
 					>

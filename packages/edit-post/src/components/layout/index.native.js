@@ -16,6 +16,7 @@ import {
 	KeyboardAvoidingView,
 	NoticeList,
 	Tooltip,
+	__unstableAutocompletionItemsSlot as AutocompletionItemsSlot,
 } from '@wordpress/components';
 import { AutosaveMonitor, store as editorStore } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
@@ -152,11 +153,17 @@ class Layout extends Component {
 							style={ toolbarKeyboardAvoidingViewStyle }
 							withAnimatedHeight
 						>
-							{ Platform.OS === 'ios' && <FloatingToolbar /> }
+							{ Platform.OS === 'ios' && (
+								<>
+									<AutocompletionItemsSlot />
+									<FloatingToolbar />
+								</>
+							) }
 							<Header />
 							<BottomSheetSettings />
 						</KeyboardAvoidingView>
 					) }
+					{ Platform.OS === 'android' && <AutocompletionItemsSlot /> }
 				</SafeAreaView>
 			</Tooltip.Slot>
 		);

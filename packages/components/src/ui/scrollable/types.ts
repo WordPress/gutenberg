@@ -13,4 +13,8 @@ export type Props = {
 	 * @default false
 	 */
 	smoothScroll?: boolean;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 };

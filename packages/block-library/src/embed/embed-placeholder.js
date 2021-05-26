@@ -33,7 +33,7 @@ const EmbedPlaceholder = ( {
 					placeholder={ __( 'Enter URL to embed here…' ) }
 					onChange={ onChange }
 				/>
-				<Button isPrimary type="submit">
+				<Button variant="primary" type="submit">
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
 			</form>
@@ -51,10 +51,10 @@ const EmbedPlaceholder = ( {
 					<div className="components-placeholder__instructions">
 						{ __( 'Sorry, this content could not be embedded.' ) }
 					</div>
-					<Button isSecondary onClick={ tryAgain }>
+					<Button variant="secondary" onClick={ tryAgain }>
 						{ _x( 'Try again', 'button label' ) }
 					</Button>{ ' ' }
-					<Button isSecondary onClick={ fallback }>
+					<Button variant="secondary" onClick={ fallback }>
 						{ _x( 'Convert to link', 'button label' ) }
 					</Button>
 				</div>

@@ -6,6 +6,8 @@ import {
 	createPortal,
 	useCallback,
 	forwardRef,
+	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
@@ -133,21 +135,33 @@ function setBodyClassName( doc ) {
 	}
 }
 
-/**
- * Sets the document head and default styles.
- *
- * @param {Document} doc  Document to set the head for.
- * @param {string}   head HTML to set as the head.
- */
-function setHead( doc, head ) {
-	doc.head.innerHTML =
-		// Body margin must be overridable by themes.
-		'<style>body{margin:0}</style>' + head;
+function useParsedAssets( html ) {
+	return useMemo( () => {
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = html;
+		return Array.from( doc.body.children );
+	}, [ html ] );
 }
 
-function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
-	const [ iframeDocument, setIframeDocument ] = useState();
+async function loadScript( doc, { id, src } ) {
+	return new Promise( ( resolve, reject ) => {
+		const script = doc.createElement( 'script' );
+		script.id = id;
+		if ( src ) {
+			script.src = src;
+			script.onload = () => resolve();
+			script.onerror = () => reject();
+		} else {
+			resolve();
+		}
+		doc.head.appendChild( script );
+	} );
+}
 
+function Iframe( { contentRef, children, head, ...props }, ref ) {
+	const [ iframeDocument, setIframeDocument ] = useState();
+	const styles = useParsedAssets( window.__editorAssets.styles );
+	const scripts = useParsedAssets( window.__editorAssets.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const setRef = useCallback( ( node ) => {
 		if ( ! node ) {
@@ -168,14 +182,18 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 				contentRef.current = body;
 			}
 
-			setHead( contentDocument, headHTML );
 			setBodyClassName( contentDocument );
-			styleSheetsCompat( contentDocument );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
 			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
 			clearerRef( body );
+
+			scripts.reduce(
+				( promise, script ) =>
+					promise.then( () => loadScript( contentDocument, script ) ),
+				Promise.resolve()
+			);
 
 			return true;
 		}
@@ -189,6 +207,25 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 			setDocumentIfReady();
 		} );
 	}, [] );
+
+	useEffect( () => {
+		if ( iframeDocument ) {
+			styleSheetsCompat( iframeDocument );
+		}
+	}, [ iframeDocument ] );
+
+	head = (
+		<>
+			<style>{ 'body{margin:0}' }</style>
+			{ styles.map( ( { tagName, href, id, rel, media }, index ) => {
+				const TagName = tagName.toLowerCase();
+				return (
+					<TagName { ...{ href, id, rel, media } } key={ index } />
+				);
+			} ) }
+			{ head }
+		</>
+	);
 
 	return (
 		<iframe

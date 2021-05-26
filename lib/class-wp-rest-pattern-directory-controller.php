@@ -20,11 +20,12 @@
  * @see WP_REST_Controller
  */
 class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
+
 	/**
 	 * Constructs the controller.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'pattern-directory';
 	}
 
@@ -56,7 +57,7 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Method must match signature of parent class.
+	public function get_items_permissions_check( $request ) {
 		if ( current_user_can( 'edit_posts' ) ) {
 			return true;
 		}
@@ -158,7 +159,7 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response
 	 */
-	public function prepare_item_for_response( $raw_pattern, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Method must match signature of parent class.
+	public function prepare_item_for_response( $raw_pattern, $request ) {
 		$prepared_pattern = array(
 			'id'             => absint( $raw_pattern->id ),
 			'title'          => sanitize_text_field( $raw_pattern->title->rendered ),
@@ -167,7 +168,6 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 			'keywords'       => array_map( 'sanitize_title', $raw_pattern->keyword_slugs ),
 			'description'    => sanitize_text_field( $raw_pattern->meta->wpop_description ),
 			'viewport_width' => absint( $raw_pattern->meta->wpop_viewport_width ),
-
 		);
 
 		$prepared_pattern = $this->add_additional_fields_to_object( $prepared_pattern, $request );
@@ -183,7 +183,7 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 		 * @param object           $raw_pattern The unprepared pattern.
 		 * @param WP_REST_Request  $request     The request object.
 		 */
-		return apply_filters( 'rest_prepare_application_password', $response, $raw_pattern, $request );
+		return apply_filters( 'rest_prepare_block_pattern', $response, $raw_pattern, $request );
 	}
 
 	/**
@@ -261,7 +261,7 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves the search params for the patterns collection.
 	 *
-	 * @since 5.5.0
+	 * @since 5.8.0
 	 *
 	 * @return array Collection parameters.
 	 */
@@ -290,7 +290,7 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 		/**
 		 * Filter collection parameters for the pattern directory controller.
 		 *
-		 * @since 5.5.0
+		 * @since 5.8.0
 		 *
 		 * @param array $query_params JSON Schema-formatted collection parameters.
 		 */

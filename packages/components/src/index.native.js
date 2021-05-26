@@ -49,7 +49,10 @@ export { default as QueryControls } from './query-controls';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as RadioControl } from './radio-control';
-export { default as UnitControl } from './unit-control';
+export {
+	default as UnitControl,
+	useCustomUnits as __experimentalUseCustomUnits,
+} from './unit-control';
 export { default as Disabled } from './disabled';
 
 // Higher-Order Components
@@ -63,6 +66,11 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
 export * from './text';
 
 // Mobile Components
+export {
+	__unstableAutocompletionItemsFill,
+	__unstableAutocompletionItemsSlot,
+} from './mobile/autocompletion-items';
+export { default as Autocomplete } from './autocomplete';
 export { default as BottomSheet } from './mobile/bottom-sheet';
 export {
 	BottomSheetConsumer,

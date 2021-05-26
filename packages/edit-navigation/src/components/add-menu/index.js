@@ -92,7 +92,7 @@ export default function AddMenu( {
 			<Button
 				className="edit-navigation-add-menu__create-menu-button"
 				type="submit"
-				isPrimary
+				variant="primary"
 				disabled={ ! menuName.length }
 				isBusy={ isCreatingMenu }
 			>

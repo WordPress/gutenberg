@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { addEntities } from './actions';
+import { CORE_STORE_NAME as coreStoreName } from './utils/constants';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -247,7 +248,11 @@ export const getMethodName = (
  * @return {Array} Entities
  */
 export function* getKindEntities( kind ) {
-	let entities = yield controls.select( 'core', 'getEntitiesByKind', kind );
+	let entities = yield controls.select(
+		coreStoreName,
+		'getEntitiesByKind',
+		kind
+	);
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}
