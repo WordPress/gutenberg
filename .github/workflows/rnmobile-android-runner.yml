@@ -59,6 +59,3 @@ jobs:
               with:
                   name: appium-logs
                   path: packages/react-native-editor/appium-out.log
-            
-            - name: Setup tmate session
-              uses: mxschmitt/action-tmate@v3
