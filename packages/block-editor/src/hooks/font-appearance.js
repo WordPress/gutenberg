@@ -13,12 +13,12 @@ import { cleanEmptyObject } from './utils';
 /**
  * Key within block settings' support array indicating support for font style.
  */
-export const FONT_STYLE_SUPPORT_KEY = '__experimentalFontStyle';
+export const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 
 /**
  * Key within block settings' support array indicating support for font weight.
  */
-export const FONT_WEIGHT_SUPPORT_KEY = '__experimentalFontWeight';
+export const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
 
 /**
  * Inspector control panel containing the font appearance options.

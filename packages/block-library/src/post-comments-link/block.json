@@ -13,11 +13,13 @@
 	},
 	"supports": {
 		"html": false,
-		"fontSize": true,
 		"color": {
 			"link": true,
 			"text": false
 		},
-		"lineHeight": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
 	}
 }
