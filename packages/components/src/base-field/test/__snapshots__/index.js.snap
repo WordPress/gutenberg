@@ -1,0 +1,77 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render correctly 1`] = `
+.emotion-0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  width: 100%;
+  background: #fff;
+  border-radius: 2px;
+  border: 1px solid;
+  border-color: #757575;
+  box-shadow: transparent;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  font-size: 13px;
+  outline: none;
+  padding: 0 8px;
+  position: relative;
+  -webkit-transition: border-color 100ms ease;
+  transition: border-color 100ms ease;
+  width: 100%;
+}
+
+.emotion-0 > * + *:not(marquee) {
+  margin-left: calc(4px * 2);
+}
+
+.emotion-0 > * {
+  min-width: 0;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-0[disabled] {
+  opacity: 0.6;
+}
+
+.emotion-0:hover {
+  border-color: #757575;
+}
+
+.emotion-0:focus,
+.emotion-0[data-focused='true'] {
+  border-color: theme:var( --wp-admin-theme-color,#00669b);
+  theme-dark10: var( --wp-admin-theme-color-darker-10,#007cba);
+  box-shadow: 0 0 0,0.5px,[object Object];
+}
+
+<div
+  class="components-flex components-base-field emotion-0 emotion-1 emotion-2"
+  data-wp-c16t="true"
+  data-wp-component="BaseField"
+/>
+`;
