@@ -38,4 +38,8 @@ export type Props = {
 	 * * `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
 	 */
 	variant?: SurfaceVariant;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 };

@@ -68,9 +68,14 @@ export type Props = PopperProps & {
 	 * @see https://reakit.io/docs/popover/#usepopoverstate
 	 */
 	visible?: boolean;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 };
 
 export type ContentProps = {
 	elevation?: number;
 	maxWidth?: CSSProperties[ 'maxWidth' ];
+	children: React.ReactNode;
 };
