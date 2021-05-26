@@ -1,6 +1,28 @@
 name: Compressed Size
 
-on: [pull_request]
+on:
+    pull_request:
+        paths:
+            # Any change to a CSS, Sass, or JavaScript file should run checks.
+            - '**.js'
+            - '**.css'
+            - '**.scss'
+            # Changes to any NPM related files could affect the outcome.
+            - '**package*.json'
+            # These files configures ESLint. Changes could affect the outcome.
+            - '**.eslint*'
+            # These files configures JSHint. Changes could affect the outcome.
+            - '**.jshint*'
+            # These files configures Prettier. Changes could affect the outcome.
+            - '**.prettier*'
+            # These files configures stylelint. Changes could affect the outcome.
+            - '**.stylelint*'
+            # These files configures TypeScript. Changes could affect the outcome.
+            - '**.tsconfig*'
+            # This file configures Webpack. Changes could affect the outcome.
+            - 'webpack.config.js'
+            # Changes to this workflow file should always verify the changes are successful.
+            - '.github/workflows/bundle-size.yml'
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
