@@ -76,8 +76,10 @@
 			.wp-block-search__input {
 				width: 0 !important;
 				min-width: 0 !important;
-				padding: 0 !important;
+				padding-left: 0 !important;
+				padding-right: 0 !important;
 				border-left-width: 0 !important;
+				border-right-width: 0 !important;
 				flex-grow: 0;
 			}
 		}
