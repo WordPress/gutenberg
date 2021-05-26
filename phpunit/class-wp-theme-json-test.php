@@ -196,7 +196,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			'h1.has-white-color, h2.has-white-color, h3.has-white-color, h4.has-white-color, h5.has-white-color, h6.has-white-color {color: #fff !important;}h1.has-white-background-color, h2.has-white-background-color, h3.has-white-background-color, h4.has-white-background-color, h5.has-white-background-color, h6.has-white-background-color {background-color: #fff !important;}h1.has-white-border-color, h2.has-white-border-color, h3.has-white-border-color, h4.has-white-border-color, h5.has-white-border-color, h6.has-white-border-color {border-color: #fff !important;}',
+			'h1.has-white-color,h2.has-white-color,h3.has-white-color,h4.has-white-color,h5.has-white-color,h6.has-white-color{color: #fff !important;}h1.has-white-background-color,h2.has-white-background-color,h3.has-white-background-color,h4.has-white-background-color,h5.has-white-background-color,h6.has-white-background-color{background-color: #fff !important;}h1.has-white-border-color,h2.has-white-border-color,h3.has-white-border-color,h4.has-white-border-color,h5.has-white-border-color,h6.has-white-border-color{border-color: #fff !important;}',
 			$theme_json->get_stylesheet( 'block_styles' )
 		);
 	}
