@@ -99,7 +99,7 @@ function InserterTabs( {
 			onLayout={ onWrapperLayout }
 		>
 			<Animated.View style={ containerStyle }>
-				{ tabs.map( ( tab, index ) => (
+				{ tabs.map( ( { component: TabComponent }, index ) => (
 					<View
 						key={ `tab-${ index }` }
 						style={ [
@@ -107,11 +107,11 @@ function InserterTabs( {
 							{ left: index * wrapperWidth },
 						] }
 					>
-						{ tab.component( {
-							rootClientId,
-							onSelect,
-							listProps: { ...listProps, onScroll },
-						} ) }
+						<TabComponent
+							rootClientId={ rootClientId }
+							onSelect={ onSelect }
+							listProps={ { ...listProps, onScroll } }
+						/>
 					</View>
 				) ) }
 			</Animated.View>
