@@ -129,7 +129,6 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			contentStyle,
 			renderAppender,
-			blockProps,
 			gridProperties,
 		} = this.props;
 		const { blockWidth } = this.state;
@@ -140,7 +139,6 @@ export class BlockList extends Component {
 			this.extraData.contentStyle !== contentStyle ||
 			this.extraData.renderAppender !== renderAppender ||
 			this.extraData.blockWidth !== blockWidth ||
-			this.extraData.blockProps !== blockProps ||
 			this.extraData.gridProperties !== gridProperties
 		) {
 			this.extraData = {
@@ -150,7 +148,6 @@ export class BlockList extends Component {
 				contentStyle,
 				renderAppender,
 				blockWidth,
-				blockProps,
 				gridProperties,
 			};
 		}
@@ -321,7 +318,6 @@ export class BlockList extends Component {
 			parentWidth,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
-			blockProps,
 			gridProperties,
 		} = this.props;
 		const { blockWidth } = this.state;
@@ -341,7 +337,6 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
-				blockProps={ blockProps }
 				gridProperties={ gridProperties }
 				items={ blockClientIds }
 			/>

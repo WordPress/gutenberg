@@ -74,10 +74,6 @@ export const Gallery = ( props ) => {
 			marginHorizontal: TILE_SPACING,
 			marginVertical: TILE_SPACING,
 			__experimentalLayout: { type: 'default', alignments: [] },
-			blockProps: {
-				imageCrop,
-				isGallery: true,
-			},
 			gridProperties: {
 				numColumns: displayedColumns,
 			},
