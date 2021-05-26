@@ -40,13 +40,16 @@ function useRemoteUrlData( url ) {
 			setIsFetching( true );
 			setRichData( null );
 
-			const urlData = await fetchRemoteUrlData( url ).catch( () => {
-				setIsFetching( false );
-			} );
+			try {
+				const urlData = await fetchRemoteUrlData( url ).catch( () => {
+					setIsFetching( false );
+				} );
 
-			if ( isMounted.current ) {
-				// console.log( 'Setting urlData', urlData );
-				setRichData( urlData );
+				if ( isMounted.current ) {
+					setRichData( urlData );
+					setIsFetching( false );
+				}
+			} catch ( e ) {
 				setIsFetching( false );
 			}
 		};
