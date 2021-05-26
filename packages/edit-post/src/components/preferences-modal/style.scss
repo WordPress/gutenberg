@@ -81,8 +81,12 @@
 		}
 	}
 
-	&__section:not(:last-child) {
+	&__section {
 		margin: 0 0 2.5rem 0;
+
+		&:last-child {
+			margin: 0;
+		}
 	}
 
 	&__section-title {
