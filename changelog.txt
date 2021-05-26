@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 10.7.1 =
+
+
+
+### Bug Fixes
+
+- Latest Posts: Declare 'hasPosts' before 'inspectorControls'. ([32160](https://github.com/WordPress/gutenberg/pull/32160))
+- Fix image/cover transform duotone error. ([32006](https://github.com/WordPress/gutenberg/pull/32006))
+
+### Various
+
+- Block Patterns API: Update for core compatibility. ([32240](https://github.com/WordPress/gutenberg/pull/32240))
+- [Patterns]: Prepare GB bundled patterns for core back port. ([32086](https://github.com/WordPress/gutenberg/pull/32086))
+
+
+
+
 = 10.7.0 =
 
 ### Enhancements
