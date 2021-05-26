@@ -10,4 +10,4 @@ export const CORE_STORE_NAME = 'core';
  *
  * @type {string}
  */
-export const CORE_DATA_STORE_NAME = 'core';
+export const CORE_DATA_STORE_NAME = 'core/data';
