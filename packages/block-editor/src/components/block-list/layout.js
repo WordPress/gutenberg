@@ -48,6 +48,7 @@ export function LayoutStyle( { selector, layout = {} } ) {
 				}
 
 				${ appendSelectors( selector, '> *' ) } {
+					box-sizing: border-box;
 					width: ${ contentSize ?? wideSize };
 				}
 
