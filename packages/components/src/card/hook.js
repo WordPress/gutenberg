@@ -11,12 +11,12 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
-import { useSurface } from '../../surface';
+import { useContextSystem } from '../ui/context';
+import { useSurface } from '../surface';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').PolymorphicComponentProps<import('./types').CardProps, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').CardProps, 'div'>} props
  */
 export function useCard( props ) {
 	const {

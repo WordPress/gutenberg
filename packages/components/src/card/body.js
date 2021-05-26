@@ -1,32 +1,66 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import { cx } from 'emotion';
+
+/**
+ * WordPress dependencies
+ */
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { BodyUI } from './styles/card-styles';
-import { useCardContext } from './context';
+import { contextConnect, useContextSystem } from '../ui/context';
+import { Scrollable } from '../scrollable';
+import { View } from '../view';
+import * as styles from './styles';
 
-export const defaultProps = {
-	isShady: false,
-	size: 'medium',
-};
-
-export function CardBody( props ) {
-	const { className, isShady, ...additionalProps } = props;
-	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
-	const { size } = mergedProps;
-
-	const classes = classnames(
-		'components-card__body',
-		isShady && 'is-shady',
-		size && `is-size-${ size }`,
-		className
+/**
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').CardBodyProps, 'div'>} props
+ * @param {import('react').Ref<any>} forwardedRef
+ */
+function CardBody( props, forwardedRef ) {
+	const { className, scrollable = true, ...otherProps } = useContextSystem(
+		props,
+		'CardBody'
 	);
 
-	return <BodyUI { ...additionalProps } className={ classes } />;
+	const classes = useMemo(
+		() => cx( styles.Body, styles.borderRadius, className ),
+		[ className ]
+	);
+
+	if ( scrollable ) {
+		return (
+			<Scrollable
+				{ ...otherProps }
+				className={ classes }
+				ref={ forwardedRef }
+			/>
+		);
+	}
+
+	return (
+		<View { ...otherProps } className={ classes } ref={ forwardedRef } />
+	);
 }
 
-export default CardBody;
+/**
+ * `CardBody` is a layout component, rendering the contents of a `Card`.
+ * Multiple `CardBody` components can be used within `Card` if needed.
+ *
+ * @example
+ * ```jsx
+ * import { Card, CardBody } from `@wordpress/components/ui`;
+ *
+ * <Card>
+ * 	<CardBody>
+ * 		...
+ * 	</CardBody>
+ * </Card>
+ * ```
+ */
+const ConnectedCardBody = contextConnect( CardBody, 'CardBody' );
+
+export default ConnectedCardBody;

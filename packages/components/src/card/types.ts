@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
 /**
  * Internal dependencies
  */
-import type { Props as SurfaceProps } from '../../surface/types';
+import type { Props as SurfaceProps } from '../surface/types';
 
 export type CardProps = SurfaceProps & {
 	/**

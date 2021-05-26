@@ -7,38 +7,38 @@ import { boolean, text } from '@storybook/addon-knobs';
  * Internal dependencies
  */
 import Card from '../index';
-import CardFooter from '../footer';
+import CardHeader from '../header';
 import Button from '../../button';
 import { FlexBlock, FlexItem } from '../../flex';
 import { getCardStoryProps } from './_utils';
 
-export default { title: 'Components/Card/Footer', component: CardFooter };
+export default { title: 'Components/CardOld/Header', component: CardHeader };
 
 export const _default = () => {
 	const props = getCardStoryProps();
-	const content = text( 'Footer: children', 'Content' );
-	const isShady = boolean( 'Footer: isShady', false );
+	const content = text( 'Header: children', 'Content' );
+	const isShady = boolean( 'Header: isShady', false );
 
 	return (
 		<Card { ...props }>
-			<CardFooter isShady={ isShady }>{ content }</CardFooter>
+			<CardHeader isShady={ isShady }>{ content }</CardHeader>
 		</Card>
 	);
 };
 
 export const alignment = () => {
 	const props = getCardStoryProps();
-	const content = text( 'Footer: children', 'Content' );
-	const isShady = boolean( 'Footer: isShady', false );
+	const content = text( 'Header: children', 'Content' );
+	const isShady = boolean( 'Header: isShady', false );
 
 	return (
 		<Card { ...props }>
-			<CardFooter isShady={ isShady }>
+			<CardHeader isShady={ isShady }>
 				<FlexBlock>{ content }</FlexBlock>
 				<FlexItem>
 					<Button variant="primary">Action</Button>
 				</FlexItem>
-			</CardFooter>
+			</CardHeader>
 		</Card>
 	);
 };

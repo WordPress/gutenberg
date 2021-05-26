@@ -6,12 +6,12 @@ import { cx } from 'emotion';
 /**
  * Internal dependencies
  */
-import { View } from '../../view';
-import { contextConnect, useContextSystem } from '../context';
+import { View } from '../view';
+import { contextConnect, useContextSystem } from '../ui/context';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').PolymorphicComponentProps<{}, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<{}, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardInnerBody( props, forwardedRef ) {

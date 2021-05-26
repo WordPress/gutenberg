@@ -6,7 +6,7 @@ import { css } from 'emotion';
 /**
  * Internal dependencies
  */
-import CONFIG from '../../utils/config-values';
+import CONFIG from '../utils/config-values';
 
 export const Card = css`
 	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };

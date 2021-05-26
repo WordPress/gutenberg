@@ -1,107 +1,105 @@
 # Card
 
-Card provides a flexible and extensible content container.
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
+`Card` groups similar concepts and tasks together. `Card`'s background is rendered with a `Surface`.
 
 ## Usage
 
-```jsx
-import { Card, CardBody } from '@wordpress/components';
+`Card` provides convenient sub-components such as `CardBody`, `CardHeader`, and `CardFooter`.
 
-const Example = () => (
-	<Card>
-		<CardBody>...</CardBody>
-	</Card>
-);
+```jsx live
+import {
+	Card,
+	CardHeader,
+	CardBody,
+	CardFooter,
+	Text,
+	Heading,
+} from '@wordpress/components';
+
+function Example() {
+	return (
+		<Card>
+			<CardHeader>
+				<Heading size={ 4 }>Card Title</Heading>
+			</CardHeader>
+			<CardBody>
+				<Text>Card Content</Text>
+			</CardBody>
+			<CardFooter>
+				<Text>Card Footer</Text>
+			</CardFooter>
+		</Card>
+	);
+}
 ```
 
 ## Props
 
-### isBorderless
+##### backgroundSize
 
-Determines the border style of the card.
+**Type**: `number`
 
--   Type: `Boolean`
--   Required: No
--   Default: `false`
+Determines the grid size for "dotted" and "grid" variants.
 
-### isElevated
+##### border
 
-Determines the elevation style of the card.
+**Type**: `boolean`
 
--   Type: `Boolean`
--   Required: No
--   Default: `false`
+Renders a border around the entire `Surface`.
 
-### size
+##### borderBottom
 
-Determines the amount of padding within the component.
+**Type**: `boolean`
 
--   Type: `String`
--   Required: No
--   Default: `medium`
+Renders a bottom border.
 
-## Sub-Components
+##### borderLeft
 
-This component provides a collection of sub-component that can be used to compose various interfaces.
+**Type**: `boolean`
 
--   [`<CardBody />`](./docs/body.md)
--   [`<CardDivider />`](./docs/divider.md)
--   [`<CardFooter />`](./docs/footer.md)
--   [`<CardHeader />`](./docs/header.md)
--   [`<CardMedia />`](./docs/media.md)
+Renders a left border.
 
-### Sub-Components Example
+##### borderRight
 
-```jsx
-import {
-	Card,
-	CardBody,
-	CardDivider,
-	CardFooter,
-	CardHeader,
-	CardMedia,
-} from '@wordpress/components';
+**Type**: `boolean`
 
-const Example = () => (
-	<Card>
-		<CardHeader>...</CardHeader>
-		<CardBody>...</CardBody>
-		<CardDivider />
-		<CardBody>...</CardBody>
-		<CardMedia>
-			<img src="..." />
-		</CardMedia>
-		<CardHeader>...</CardHeader>
-	</Card>
-);
-```
+Renders a right border.
 
-### Context
+##### borderTop
 
-`<Card />`'s sub-components are connected to `<Card />` using [Context](https://reactjs.org/docs/context.html). Certain props like `size` and `variant` are passed through to the sub-components.
+**Type**: `boolean`
 
-In the following example, the `<CardBody />` will render with a size of `small`:
+Renders a top border.
 
-```jsx
-import { Card, CardBody } from '@wordpress/components';
+##### elevation
 
-const Example = () => (
-	<Card size="small">
-		<CardBody>...</CardBody>
-	</Card>
-);
-```
+**Type**: `number`
 
-These sub-components are designed to be flexible. The Context props can be overridden by the sub-component(s) as required. In the following example, the last `<CardBody />` will render it's specified size:
+Size of the elevation shadow, based on the Style system's elevation system.
+Elevating a `Card` can be done by adjusting the `elevation` prop. This may be helpful in highlighting certain content. For more information, check out `Elevation`.
 
-```jsx
-import { Card, CardBody } from '@wordpress/components';
+##### isBorderless
 
-const Example = () => (
-	<Card size="small">
-		<CardBody>...</CardBody>
-		<CardBody>...</CardBody>
-		<CardBody size="large">...</CardBody>
-	</Card>
-);
-```
+**Type**: `boolean`
+
+Renders without a border.
+
+##### isRounded
+
+**Type**: `boolean`
+
+Renders with rounded corners.
+
+##### variant
+
+**Type**: `"grid"`,`"primary"`,`"secondary"`,`"tertiary"`,`"dotted"`
+
+Modifies the background color of `Surface`.
+
+-   `primary`: Used for almost all cases.
+-   `secondary`: Used as a secondary background for inner `Surface` components.
+-   `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
