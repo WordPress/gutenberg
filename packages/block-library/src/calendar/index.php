@@ -18,6 +18,9 @@ function render_block_core_calendar( $attributes ) {
 	// Calendar shouldn't be rendered
 	// when there are no published posts on the site.
 	if ( ! block_core_calendar_has_published_posts() ) {
+		if ( is_user_logged_in() ) {
+			return '<div>' . __( 'The calendar block is hidden because there are no published posts.', 'gutenberg' ) . '</div>';
+		}
 		return '';
 	}
 
