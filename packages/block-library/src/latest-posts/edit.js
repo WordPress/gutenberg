@@ -229,6 +229,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		};
 	}, [] );
 
+	const hasPosts = !! latestPosts?.length;
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Post content settings' ) }>
@@ -412,7 +413,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		} ),
 	} );
 
-	const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 	if ( ! hasPosts ) {
 		return (
 			<div { ...blockProps }>
