@@ -25,6 +25,8 @@ function render_block_core_site_logo( $attributes ) {
 
 	$custom_logo = get_custom_logo();
 
+	remove_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
+
 	if ( empty( $custom_logo ) ) {
 		return ''; // Return early if no custom logo is set, avoiding extraneous wrapper div.
 	}
@@ -56,7 +58,6 @@ function render_block_core_site_logo( $attributes ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
 	$html               = sprintf( '<div %s>%s</div>', $wrapper_attributes, $custom_logo );
-	remove_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
 	return $html;
 }
 
