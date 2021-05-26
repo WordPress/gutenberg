@@ -71,7 +71,7 @@ add_action( 'init', 'register_block_core_calendar' );
 
 /**
  * Returns whether or not there are currently published posts.
- * 
+ *
  * Used to hide the calendar block when there are no published posts.
  * This compensates for a known Core bug: https://core.trac.wordpress.org/ticket/12016
  *
