@@ -8,7 +8,7 @@ describe( 'cleanForSlug()', () => {
 		expect( cleanForSlug( '/Is th@t Déjà_vu? ' ) ).toBe( 'is-tht-deja_vu' );
 	} );
 
-	it( 'Should allow unicode characters', () => {
+	it( 'Should allow non-latin characters', () => {
 		expect( cleanForSlug( 'Καλημέρα Κόσμε' ) ).toBe( 'καλημέρα-κόσμε' );
 	} );
 
