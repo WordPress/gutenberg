@@ -168,7 +168,7 @@ _Parameters_
 
 -   _ref_ `import('react').RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
 -   _text_ `string|Function`: The text to copy.
--   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+-   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
