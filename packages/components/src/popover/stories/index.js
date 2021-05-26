@@ -118,7 +118,7 @@ function DynamicHeightPopover() {
 		<div style={ { padding: '20px' } }>
 			<div>
 				<Button
-					isPrimary
+					variant="primary"
 					onClick={ increase }
 					style={ {
 						marginRight: '20px',
@@ -127,7 +127,7 @@ function DynamicHeightPopover() {
 					Increase Size
 				</Button>
 
-				<Button isPrimary onClick={ decrease }>
+				<Button variant="primary" onClick={ decrease }>
 					Decrease Size
 				</Button>
 			</div>

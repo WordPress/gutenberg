@@ -295,9 +295,11 @@ export default function SearchEdit( {
 									<Button
 										key={ widthValue }
 										isSmall
-										isPrimary={
+										variant={
 											`${ widthValue }%` ===
 											`${ width }${ widthUnit }`
+												? 'primary'
+												: undefined
 										}
 										onClick={ () =>
 											setAttributes( {

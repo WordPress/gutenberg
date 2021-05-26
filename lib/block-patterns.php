@@ -10,14 +10,14 @@
  */
 function register_gutenberg_patterns() {
 	// Register categories used for block patterns.
-	register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
-	register_block_pattern_category( 'page-header', array( 'label' => __( 'Page Header', 'gutenberg' ) ) );
-	register_block_pattern_category( 'page-footer', array( 'label' => __( 'Page Footer', 'gutenberg' ) ) );
+	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'query' ) ) {
+		register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
+		register_block_pattern_category( 'page-header', array( 'label' => __( 'Page Header', 'gutenberg' ) ) );
+		register_block_pattern_category( 'page-footer', array( 'label' => __( 'Page Footer', 'gutenberg' ) ) );
+	}
 
-	// Initial Query block patterns.
-	register_block_pattern(
-		'query/standard-posts',
-		array(
+	$patterns = array(
+		'query-standard-posts'                 => array(
 			'title'      => __( 'Standard', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -34,12 +34,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/medium-posts',
-		array(
+		),
+		'query-medium-posts'                   => array(
 			'title'      => __( 'Image at left', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -58,12 +54,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/small-posts',
-		array(
+		),
+		'query-small-posts'                    => array(
 			'title'      => __( 'Small image and title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -81,12 +73,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/grid-posts',
-		array(
+		),
+		'query-grid-posts'                     => array(
 			'title'      => __( 'Grid', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -101,12 +89,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/large-title-posts',
-		array(
+		),
+		'query-large-title-posts'              => array(
 			'title'      => __( 'Large title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -129,12 +113,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop --></div>
 							<!-- /wp:query --></div>
 							<!-- /wp:group -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/offset-posts',
-		array(
+		),
+		'query-offset-posts'                   => array(
 			'title'      => __( 'Offset', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -166,13 +146,9 @@ function register_gutenberg_patterns() {
 							<!-- /wp:column --></div>
 							<!-- /wp:columns --></main>
 							<!-- /wp:group -->',
-		)
-	);
-
-	// Initial block pattern to be used with block transformations with patterns.
-	register_block_pattern(
-		'social-links/shared-background-color',
-		array(
+		),
+		// Initial block pattern to be used with block transformations with patterns.
+		'social-links-shared-background-color' => array(
 			'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
 			'categories'    => array( 'buttons' ),
 			'blockTypes'    => array( 'core/social-links' ),
@@ -182,13 +158,8 @@ function register_gutenberg_patterns() {
 								<!-- wp:social-link {"url":"#","service":"chain"} /-->
 								<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
 								<!-- /wp:social-links -->',
-		)
-	);
-
-	// Initial Template Part block patterns.
-	register_block_pattern(
-		'template-part/header-site-title-navigation',
-		array(
+		),
+		'template-part/header-site-title-navigation' => array(
 			'title'      => __( 'Header with title and navigation', 'gutenberg' ),
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
@@ -201,12 +172,8 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-column is-vertically-aligned-center" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;flex-basis:66.66%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right","isResponsive":true} /--></div>
 							<!-- /wp:column --></div>
 							<!-- /wp:columns -->',
-		)
-	);
-
-	register_block_pattern(
-		'template-part/header-two-navigation-areas',
-		array(
+		),
+		'template-part/header-two-navigation-areas' => array(
 			'title'      => __( 'Header with two navigation areas and logo', 'gutenberg' ),
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
@@ -221,12 +188,8 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:50%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"left"} /--></div>
 							<!-- /wp:column --></div>
 							<!-- /wp:columns -->',
-		)
-	);
-
-	register_block_pattern(
-		'template-part/header-with-social-links',
-		array(
+		),
+		'template-part/header-with-social-links' => array(
 			'title'      => __( 'Header with social links', 'gutenberg' ),
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
@@ -245,12 +208,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:social-links --></div>
 							<!-- /wp:column --></div>
 							<!-- /wp:columns -->',
-		)
-	);
-
-	register_block_pattern(
-		'template-part/header-large-image',
-		array(
+		),
+		'template-part/header-large-image' => array(
 			'title'      => __( 'Header with large image', 'gutenberg' ),
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
@@ -285,12 +244,8 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-column"></div>
 							<!-- /wp:column --></div></div>
 							<!-- /wp:cover -->',
-		)
-	);
-
-	register_block_pattern(
-		'template-part/centered-header-background-color',
-		array(
+		),
+		'template-part/centered-header-background-color' => array(
 			'title'      => __( 'Centered page header with background color', 'gutenberg' ),
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
@@ -311,12 +266,8 @@ function register_gutenberg_patterns() {
 
 							<!-- wp:navigation {"orientation":"horizontal","itemsJustification":"center","style":{"color":{"text":"#000000"}},"isResponsive":true} /--></div>
 							<!-- /wp:group -->',
-		)
-	);
-
-	register_block_pattern(
-		'template-part/modern-header-with-image-on-the-right',
-		array(
+		),
+		'template-part/modern-header-with-image-on-the-right' => array(
 			'title'      => __( 'Modern header with image on the right', 'gutenberg' ),
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
@@ -339,12 +290,8 @@ function register_gutenberg_patterns() {
 							<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer --></div></div>
 							<!-- /wp:media-text -->',
-		)
-	);
-
-	register_block_pattern(
-		'template-part/footer-navigation-credit',
-		array(
+		),
+		'template-part/footer-navigation-credit' => array(
 			'title'      => __( 'Footer with navigation and credit line', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
@@ -359,12 +306,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:paragraph --></div>
 							<!-- /wp:column --></div>
 							<!-- /wp:columns -->',
-		)
-	);
-
-	register_block_pattern(
-		'template-part/footer-centered-navigation-social',
-		array(
+		),
+		'template-part/footer-centered-navigation-social' => array(
 			'title'      => __( 'Centered footer with navigation and social links', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
@@ -389,12 +332,8 @@ function register_gutenberg_patterns() {
 							<!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"16px"}}} -->
 							<p class="has-text-align-center" style="font-size:16px">' . esc_html__( 'Powered by WordPress', 'default' ) . '</p>
 							<!-- /wp:paragraph -->',
-		)
-	);
-
-	register_block_pattern(
-		'template-part/footer-latest-posts',
-		array(
+		),
+		'template-part/footer-latest-posts' => array(
 			'title'      => __( 'Footer with latest posts', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
@@ -420,12 +359,8 @@ function register_gutenberg_patterns() {
 							<div style="height:10px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer --></div>
 							<!-- /wp:group -->',
-		)
-	);
-
-	register_block_pattern(
-		'template-part/footer-modern',
-		array(
+		),
+		'template-part/footer-modern' => array(
 			'title'      => __( 'Modern footer with description and logo', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
@@ -451,13 +386,8 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-column is-vertically-aligned-bottom" style="flex-basis:33.33%"><!-- wp:site-logo {"align":"right","width":40} /--></div>
 							<!-- /wp:column --></div>
 							<!-- /wp:columns -->',
-		)
-	);
-
-	// Initial block pattern to be used with block transformations with patterns.
-	register_block_pattern(
-		'social-links/shared-background-color',
-		array(
+		),
+		'social-links/shared-background-color' => array(
 			'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
 			'categories'    => array( 'buttons' ),
 			'blockTypes'    => array( 'core/social-links' ),
@@ -469,6 +399,13 @@ function register_gutenberg_patterns() {
 								<!-- /wp:social-links -->',
 		)
 	);
+
+	foreach ( $patterns as $name => $pattern ) {
+		$pattern_name = 'core/' . $name;
+		if ( ! WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_name ) ) {
+			register_block_pattern( $pattern_name, $pattern );
+		}
+	}
 }
 
 /**
@@ -486,6 +423,13 @@ function remove_core_patterns() {
 		'three-buttons',
 		'heading-paragraph',
 		'quote',
+		'query-standard-posts',
+		'query-medium-posts',
+		'query-small-posts',
+		'query-grid-posts',
+		'query-large-title-posts',
+		'query-offset-posts',
+		'social-links-shared-background-color',
 	);
 
 	foreach ( $core_block_patterns as $core_block_pattern ) {
@@ -500,9 +444,13 @@ function remove_core_patterns() {
  * Import patterns from wordpress.org/patterns.
  */
 function load_remote_patterns() {
+	// This is the core function that provides the same feature.
+	if ( function_exists( '_load_remote_block_patterns' ) ) {
+		return;
+	}
 	$patterns = get_transient( 'gutenberg_remote_block_patterns' );
 	if ( ! $patterns ) {
-		$request         = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$core_keyword_id = 11; // 11 is the ID for "core".
 		$request->set_param( 'keyword', $core_keyword_id );
 		$response = rest_do_request( $request );

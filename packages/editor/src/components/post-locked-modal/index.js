@@ -194,7 +194,7 @@ export default function PostLockedModal() {
 					</div>
 
 					<div className="editor-post-locked-modal__buttons">
-						<Button isPrimary href={ allPostsUrl }>
+						<Button variant="primary" href={ allPostsUrl }>
 							{ allPostsLabel }
 						</Button>
 					</div>
@@ -217,11 +217,11 @@ export default function PostLockedModal() {
 					</div>
 
 					<div className="editor-post-locked-modal__buttons">
-						<Button isSecondary href={ allPostsUrl }>
+						<Button variant="secondary" href={ allPostsUrl }>
 							{ allPostsLabel }
 						</Button>
 						<PostPreviewButton />
-						<Button isPrimary href={ unlockUrl }>
+						<Button variant="primary" href={ unlockUrl }>
 							{ __( 'Take Over' ) }
 						</Button>
 					</div>

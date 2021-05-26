@@ -49,7 +49,7 @@ function TemplateTitle() {
 								<Button
 									{ ...toolbarItemHTMLProps }
 									isSmall
-									isTertiary
+									variant="tertiary"
 									onClick={ onToggle }
 									aria-label={ __( 'Template Options' ) }
 								>

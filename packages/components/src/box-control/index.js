@@ -126,7 +126,7 @@ export default function BoxControl( {
 				<FlexItem>
 					<Button
 						className="component-box-control__reset-button"
-						isSecondary
+						variant="secondary"
 						isSmall
 						onClick={ handleOnReset }
 						disabled={ ! isDirty }
