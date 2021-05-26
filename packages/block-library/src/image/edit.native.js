@@ -64,6 +64,8 @@ import { getUpdatedLinkTargetSettings } from './utils';
 
 import { LINK_DESTINATION_CUSTOM } from './constants';
 
+const MEDIA_ID_NO_FEATURED_IMAGE_SET = 0;
+
 const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
 };
@@ -441,8 +443,6 @@ export class ImageEdit extends Component {
 	}
 
 	getSetFeaturedButton( isFeaturedImage ) {
-		const MEDIA_ID_NO_FEATURED_IMAGE_SET = 0;
-
 		const { attributes, getStylesFromColorScheme } = this.props;
 
 		const setFeaturedButtonStyle = getStylesFromColorScheme(
