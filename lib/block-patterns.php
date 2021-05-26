@@ -192,12 +192,13 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Header with title and navigation', 'gutenberg' ),
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
-			'content'    => '<!-- wp:columns {"verticalAlignment":"center","align":"full","style":{"color":{"link":"#ffffff","text":"#ffffff","background":"#000000"}}} -->
-							<div class="wp-block-columns alignfull are-vertically-aligned-center has-text-color has-background has-link-color" style="--wp--style--color--link:#ffffff;background-color:#000000;color:#ffffff"><!-- wp:column {"verticalAlignment":"center","width":"33.33%"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:site-title {"fontSize":"normal"} /--></div>
+			'content'    => '<!-- wp:columns {"align":"full","className":"alignfull are-vertically-aligned-center"} -->
+							<div class="wp-block-columns alignfull are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"33.33%","style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;flex-basis:33.33%"><!-- wp:site-title {"fontSize":"normal"} /--></div>
 							<!-- /wp:column -->
-							<!-- wp:column {"verticalAlignment":"center","width":"66.66%"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:66.66%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right","isResponsive":true} /--></div>
+
+							<!-- wp:column {"verticalAlignment":"center","width":"66.66%","style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;flex-basis:66.66%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right","isResponsive":true} /--></div>
 							<!-- /wp:column --></div>
 							<!-- /wp:columns -->',
 		)
@@ -347,12 +348,13 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Footer with navigation and credit line', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
-			'content'    => '<!-- wp:columns {"verticalAlignment":"center","align":"full","style":{"color":{"background":"#000000","text":"#ffffff"}}} -->
-							<div class="wp-block-columns alignfull are-vertically-aligned-center has-text-color has-background" style="background-color:#000000;color:#ffffff"><!-- wp:column -->
-							<div class="wp-block-column"><!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /--></div>
+			'content'    => '<!-- wp:columns {"verticalAlignment":"center","align":"full"} -->
+							<div class="wp-block-columns alignfull are-vertically-aligned-center"><!-- wp:column {"style":{"spacing":{"padding":{"top":"20px","right":"10px","bottom":"20px","left":"10px"}}}} -->
+							<div class="wp-block-column" style="padding-top:20px;padding-right:10px;padding-bottom:20px;padding-left:10px"><!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /--></div>
 							<!-- /wp:column -->
-							<!-- wp:column -->
-							<div class="wp-block-column"><!-- wp:paragraph {"align":"right","fontSize":"normal"} -->
+
+							<!-- wp:column {"style":{"spacing":{"padding":{"top":"20px","right":"10px","bottom":"20px","left":"10px"}}}} -->
+							<div class="wp-block-column" style="padding-top:20px;padding-right:10px;padding-bottom:20px;padding-left:10px"><!-- wp:paragraph {"align":"right","fontSize":"normal"} -->
 							<p class="has-text-align-right has-normal-font-size">' . esc_html__( 'Proudly powered by WordPress', 'default' ) . '</p>
 							<!-- /wp:paragraph --></div>
 							<!-- /wp:column --></div>
