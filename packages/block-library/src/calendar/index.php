@@ -17,7 +17,7 @@ function render_block_core_calendar( $attributes ) {
 
 	// Calendar shouldn't be rendered
 	// when there are no published posts on the site.
-	if ( ! block_core_calendar_get_has_published_posts() ) {
+	if ( ! block_core_calendar_has_published_posts() ) {
 		return '';
 	}
 
@@ -72,12 +72,21 @@ add_action( 'init', 'register_block_core_calendar' );
  *
  * @return bool Has any published posts or not.
  */
-function block_core_calendar_get_has_published_posts() {
-	$has_published_posts = get_option( 'gutenberg_calendar_block_has_published_posts', null );
-	if ( null === $has_published_posts ) {
-		$has_published_posts = block_core_calendar_update_has_published_posts();
+function block_core_calendar_has_published_posts() {
+	// Multisite already has an option that stores the count of the published posts.
+	// Let's use that for multisites.
+	if ( is_multisite() ) {
+		return 0 < (int) get_option( 'post_count' );
 	}
-	return $has_published_posts;
+
+	// On single sites we try our own cached option first.
+	$has_published_posts = get_option( 'gutenberg_calendar_block_has_published_posts', null );
+	if ( null !== $has_published_posts ) {
+		return (bool) $has_published_posts;
+	}
+
+	// No cache hit, let's update the cache and return the cached value.
+	return block_core_calendar_update_has_published_posts();
 }
 
 /**
@@ -88,21 +97,50 @@ function block_core_calendar_get_has_published_posts() {
  */
 function block_core_calendar_update_has_published_posts() {
 	global $wpdb;
-	$has_published_posts = ! ! $wpdb->get_var( "SELECT 1 as test FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' LIMIT 1" );
+	$has_published_posts = (bool) $wpdb->get_var( "SELECT 1 as test FROM {$wpdb->posts} WHERE post_type = 'post' AND post_status = 'publish' LIMIT 1" );
 	update_option( 'gutenberg_calendar_block_has_published_posts', $has_published_posts );
 	return $has_published_posts;
 }
 
-/**
- * Update `has_published_posts` cached value
- * if the updated post's type is `post`.
- *
- * @param int     $post_ID     Updated post ID.
- * @param WP_Post $post_after  Post object after update.
- */
-function block_core_calendar_post_updated( $post_ID, $post_after ) {
-	if ( 'post' === $post_after->post_type ) {
+if ( ! is_multisite() ) {
+	/**
+	 * Handler for updating the has published posts flag when a post is deleted.
+	 *
+	 * @param int $post_id Deleted post ID.
+	 */
+	function block_core_calendar_update_has_published_post_on_delete( $post_id ) {
+		$post = get_post( $post_id );
+
+		if ( ! $post || 'publish' !== $post->post_status || 'post' !== $post->post_type ) {
+			return;
+		}
+
 		block_core_calendar_update_has_published_posts();
 	}
+
+	/**
+	 * Handler for updating the has published posts flag when a post status changes.
+	 *
+	 * @param string  $new_status The status the post is changing to.
+	 * @param string  $old_status The status the post is changing from.
+	 * @param WP_Post $post       Post object.
+	 */
+	function block_core_calendar_update_has_published_post_on_transition_post_status( $new_status, $old_status, $post ) {
+		if ( $new_status === $old_status ) {
+			return;
+		}
+
+		if ( 'post' !== get_post_type( $post ) ) {
+			return;
+		}
+
+		if ( 'publish' !== $new_status && 'publish' !== $old_status ) {
+			return;
+		}
+
+		block_core_calendar_update_has_published_posts();
+	}
+
+	add_action( 'delete_post', 'block_core_calendar_update_has_published_post_on_delete' );
+	add_action( 'transition_post_status', 'block_core_calendar_update_has_published_post_on_transition_post_status', 10, 3 );
 }
-add_action( 'post_updated', 'block_core_calendar_post_updated', 10, 2 );
