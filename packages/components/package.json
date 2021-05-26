@@ -33,7 +33,6 @@
 		"@emotion/cache": "^10.0.27",
 		"@emotion/core": "^10.1.1",
 		"@emotion/css": "^10.0.22",
-		"@emotion/native": "^10.0.22",
 		"@emotion/styled": "^10.0.23",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
