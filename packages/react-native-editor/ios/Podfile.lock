@@ -21,7 +21,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Gutenberg (1.53.0):
+  - Gutenberg (1.53.1):
     - React-Core (= 0.61.5)
     - React-CoreModules (= 0.61.5)
     - React-RCTImage (= 0.61.5)
@@ -253,7 +253,7 @@ PODS:
     - React-Core
   - RNSVG (9.13.6-gb):
     - React-Core
-  - RNTAztecView (1.53.0):
+  - RNTAztecView (1.53.1):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.4)
   - WordPress-Aztec-iOS (1.19.4)
@@ -402,7 +402,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  Gutenberg: 49f2a36d527ebb75dd53e060623f66b143256b1d
+  Gutenberg: 3092dedf559decdcec1a6a0733d010c9dc116051
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78
@@ -416,9 +416,9 @@ SPEC CHECKSUMS:
   react-native-get-random-values: 03edb8dcc2d3f43e55aa67ea13b61b6723bbf047
   react-native-keyboard-aware-scroll-view: 6cb84879bf07e4cc1caed18b11fb928e142adac6
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
-  react-native-safe-area-context: 133d77d86b13cf694e014ab03dc2944ee3125d97
+  react-native-safe-area-context: c8da723dcddabe15afe95c9d31c56a0cf2b0141c
   react-native-slider: 2e42dc91e7ab8b35a9c7f2eb3532729a41d0dbe2
-  react-native-video: e5dd0649534076cd6d09a0db51c617fa668d534a
+  react-native-video: b8767f54061e475ddd38c22375f46f4d93e5fdfd
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72
@@ -430,12 +430,12 @@ SPEC CHECKSUMS:
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeDarkMode: 6d807bc8373b872472c8541fc3341817d979a6fb
-  RNCMaskedView: dfeba59697c44d36abec79c062aeb1ea343d610d
+  RNCMaskedView: 66caacf33c86eaa7d22b43178dd998257d5c2e4d
   RNGestureHandler: 7a377d0580c9f07df99e590bbcefd616ee0e2626
   RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 46c4b680fe18237fa01eb7d7b311d77618fde31f
-  RNTAztecView: 3688e139f14ceee3639f8521bf98c8595cbb4970
+  RNTAztecView: 7b71ccb80dc84f3d783c9193209c164b4ee51a9d
   WordPress-Aztec-iOS: 870c93297849072aadfc2223e284094e73023e82
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
