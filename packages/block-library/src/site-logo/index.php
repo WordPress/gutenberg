@@ -60,52 +60,6 @@ function render_block_core_site_logo( $attributes ) {
 	return $html;
 }
 
-
-/**
- * Registers the `core/site-logo` block on the server.
- */
-function register_block_core_site_logo() {
-	register_block_type_from_metadata(
-		__DIR__ . '/site-logo',
-		array(
-			'render_callback' => 'render_block_core_site_logo',
-		)
-	);
-	add_filter( 'pre_set_theme_mod_custom_logo', 'sync_site_logo_to_theme_mod' );
-	add_filter( 'theme_mod_custom_logo', 'override_custom_logo_theme_mod' );
-}
-add_action( 'init', 'register_block_core_site_logo' );
-
-/**
- * Overrides the custom logo with a site logo, if the option is set.
- *
- * @param string $custom_logo The custom logo set by a theme.
- *
- * @return string The site logo if set.
- */
-function override_custom_logo_theme_mod( $custom_logo ) {
-	$site_logo = get_option( 'site_logo' );
-	return false === $site_logo ? $custom_logo : $site_logo;
-}
-
-/**
- * Syncs the site logo with the theme modified logo.
- *
- * @param string $custom_logo The custom logo set by a theme.
- *
- * @return string The custom logo.
- */
-function sync_site_logo_to_theme_mod( $custom_logo ) {
-	// Delete the option when the custom logo does not exist or was removed.
-	// This step ensures the option stays in sync.
-	if ( empty( $custom_logo ) ) {
-		delete_option( 'site_logo' );
-	} else {
-		update_option( 'site_logo', $custom_logo );
-	}
-	return $custom_logo;
-}
-
 /**
  * Register a core site setting for a site logo
  */
@@ -124,3 +78,71 @@ function register_block_core_site_logo_setting() {
 }
 
 add_action( 'rest_api_init', 'register_block_core_site_logo_setting', 10 );
+
+/**
+ * Registers the `core/site-logo` block on the server.
+ */
+function register_block_core_site_logo() {
+	register_block_type_from_metadata(
+		__DIR__ . '/site-logo',
+		array(
+			'render_callback' => 'render_block_core_site_logo',
+		)
+	);
+}
+
+add_action( 'init', 'register_block_core_site_logo' );
+
+/**
+ * Overrides the custom logo with a site logo, if the option is set.
+ *
+ * @param string $custom_logo The custom logo set by a theme.
+ *
+ * @return string The site logo if set.
+ */
+function _override_custom_logo_theme_mod( $custom_logo ) {
+	$site_logo = get_option( 'site_logo' );
+	return false === $site_logo ? $custom_logo : $site_logo;
+}
+
+add_filter( 'theme_mod_custom_logo', '_override_custom_logo_theme_mod' );
+
+/**
+ * Updates the site_logo option when the custom_logo theme-mod gets updated.
+ *
+ * @param string $custom_logo The custom logo set by a theme.
+ *
+ * @return string The custom logo.
+ */
+function _sync_site_logo_to_custom_logo( $custom_logo ) {
+	// Delete the option when the custom logo does not exist or was removed.
+	// This step ensures the option stays in sync.
+	if ( empty( $custom_logo ) ) {
+		delete_option( 'site_logo' );
+	} else {
+		update_option( 'site_logo', $custom_logo );
+	}
+	return $custom_logo;
+}
+
+add_filter( 'pre_set_theme_mod_custom_logo', '_sync_site_logo_to_custom_logo' );
+
+/**
+ * Updates the custom_logo theme-mod when the site_logo option gets updated.
+ *
+ * @param mixed $old_value The old option value.
+ * @param mixed $value     The new option value.
+ *
+ * @return void
+ */
+function _sync_custom_logo_to_site_logo( $old_value, $value ) {
+	// Delete the option when the custom logo does not exist or was removed.
+	// This step ensures the option stays in sync.
+	if ( empty( $value ) ) {
+		remove_theme_mod( 'custom_logo' );
+	} else {
+		set_theme_mod( 'custom_logo', $value );
+	}
+}
+
+add_action( 'update_option_site_logo', '_sync_custom_logo_to_site_logo', 10, 2 );
