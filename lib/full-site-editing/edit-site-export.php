@@ -18,7 +18,7 @@ function _remove_theme_attribute_from_content( $template_content ) {
 	$new_content         = '';
 	$template_blocks     = parse_blocks( $template_content );
 
-	$blocks = _flatten_blocks( $template_blocks );
+	$blocks = _gutenberg_flatten_blocks( $template_blocks );
 	foreach ( $blocks as $key => $block ) {
 		if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
 			unset( $blocks[ $key ]['attrs']['theme'] );
