@@ -1,4 +1,5 @@
-.components-placeholder.components-placeholder { // This needs specificity to override individual block styles.
+// This needs specificity to override individual block styles.
+.components-placeholder.components-placeholder {
 	box-sizing: border-box;
 	position: relative;
 	padding: 1em;
@@ -106,9 +107,9 @@
 	}
 }
 
-// Any `<Button />` component with `isLink` prop will need extra spacing if placed
-// immediately after a button which is *not* an `isLink` style button. This is because
-// `isLink` has no padding so we need to account for this to avoid the buttons butting
+// Any `<Button />` component with `variant="link"` prop will need extra spacing if placed
+// immediately after a button which is *not* an `variant="link"` style button. This is because
+// `variant="link"` has no padding so we need to account for this to avoid the buttons butting
 // up against each other. If it's the last item we don't need a right margin.
 .components-placeholder__fieldset .components-button:not(.is-link) ~ .components-button.is-link {
 	margin-left: 10px; // equal to standard button inner padding
@@ -121,7 +122,6 @@
 
 // Element queries to show different layouts at various sizes.
 .components-placeholder {
-
 	// Medium and large sizes.
 	&.is-large {
 		.components-placeholder__label {

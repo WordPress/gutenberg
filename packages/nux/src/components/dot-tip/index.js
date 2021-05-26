@@ -58,7 +58,7 @@ export function DotTip( {
 		>
 			<p>{ children }</p>
 			<p>
-				<Button isLink onClick={ onDismiss }>
+				<Button variant="link" onClick={ onDismiss }>
 					{ hasNextTip ? __( 'See next tip' ) : __( 'Got it' ) }
 				</Button>
 			</p>

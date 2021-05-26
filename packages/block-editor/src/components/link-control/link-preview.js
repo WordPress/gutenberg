@@ -43,7 +43,7 @@ export default function LinkPreview( { value, onEditClick } ) {
 			</span>
 
 			<Button
-				isSecondary
+				variant="secondary"
 				onClick={ () => onEditClick() }
 				className="block-editor-link-control__search-item-action"
 			>

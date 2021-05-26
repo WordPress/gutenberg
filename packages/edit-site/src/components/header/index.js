@@ -92,7 +92,7 @@ export default function Header( {
 				<div className="edit-site-header__toolbar">
 					<Button
 						ref={ inserterButton }
-						isPrimary
+						variant="primary"
 						isPressed={ isInserterOpen }
 						className="edit-site-header-toolbar__inserter-toggle"
 						onMouseDown={ ( event ) => {
