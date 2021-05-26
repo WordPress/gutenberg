@@ -4,6 +4,7 @@
 		"name": "core/columns",
 		"isValid": true,
 		"attributes": {
+			"backgroundColor": "secondary",
 			"gridGap": 2,
 			"gridGapUnit": "em",
 			"gridTemplateColumns": "1fr 1fr"
@@ -51,16 +52,27 @@
 						"name": "core/paragraph",
 						"isValid": true,
 						"attributes": {
-							"content": "Column Two, Paragraph Two",
+							"content": "Column Two, Paragraph One",
 							"dropCap": false
 						},
 						"innerBlocks": [],
-						"originalContent": "<p>Column Two, Paragraph Two</p>"
+						"originalContent": "<p>Column Two, Paragraph One</p>"
+					},
+					{
+						"clientId": "_clientId_1",
+						"name": "core/paragraph",
+						"isValid": true,
+						"attributes": {
+							"content": "Column Three, Paragraph One",
+							"dropCap": false
+						},
+						"innerBlocks": [],
+						"originalContent": "<p>Column Three, Paragraph One</p>"
 					}
 				],
-				"originalContent": "<div class=\"wp-block-column\">\n\t\t\n\t</div>"
+				"originalContent": "<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>"
 			}
 		],
-		"originalContent": "<div class=\"wp-block-columns\" style=\"gap:2em;grid-template-columns:1fr 1fr\">\n\t\n\t\n</div>"
+		"originalContent": "<div class=\"wp-block-columns has-background has-secondary-background-color\">\n\t\n\t\n</div>"
 	}
 ]

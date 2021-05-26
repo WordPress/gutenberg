@@ -3,6 +3,7 @@
  */
 import {
 	toWidthPrecision,
+	getColumnWidthsAsFrUnits,
 	getEffectiveColumnWidth,
 	getTotalColumnsWidth,
 	getColumnWidths,
@@ -279,5 +280,48 @@ describe( 'getMappedColumnWidths', () => {
 			{ clientId: 'a', attributes: { width: 25 } },
 			{ clientId: 'b', attributes: { width: 35 } },
 		] );
+	} );
+} );
+
+describe( 'getColumnWidthsAsFrUnits', () => {
+	it( 'returns equal widths when no width attributes are used', () => {
+		const blocks = [
+			{ clientId: 'a', attributes: {} },
+			{ clientId: 'b', attributes: {} },
+			{ clientId: 'c', attributes: {} },
+		];
+
+		const result = getColumnWidthsAsFrUnits( blocks );
+
+		expect( result ).toEqual( '1fr 1fr 1fr' );
+	} );
+
+	it( 'rounds percentages to nearest fr unit', () => {
+		const blocks = [
+			{ clientId: 'a', attributes: { width: 33.33 } },
+			{ clientId: 'b', attributes: { width: 33.33 } },
+			{ clientId: 'c', attributes: { width: 33.33 } },
+		];
+
+		const result = getColumnWidthsAsFrUnits( blocks );
+
+		expect( result ).toEqual( '1fr 1fr 1fr' );
+	} );
+
+	it( 'calculates fr units correctly from width attributes', () => {
+		const blocks = [
+			{ clientId: 'a', attributes: { width: 60 } },
+			{ clientId: 'b', attributes: { width: 20 } },
+			{ clientId: 'c', attributes: { width: 20 } },
+		];
+
+		const result = getColumnWidthsAsFrUnits( blocks );
+
+		expect( result ).toEqual( '1.8fr 0.6fr 0.6fr' );
+	} );
+
+	it( 'returns an empty string when called with an empty array', () => {
+		const result = getColumnWidthsAsFrUnits( [] );
+		expect( result ).toBe( '' );
 	} );
 } );

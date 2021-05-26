@@ -3,7 +3,11 @@
 		"clientId": "_clientId_0",
 		"name": "core/columns",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"gridGap": 2,
+			"gridGapUnit": "em",
+			"gridTemplateColumns": "1fr 1fr 1fr"
+		},
 		"innerBlocks": [
 			{
 				"clientId": "_clientId_0",

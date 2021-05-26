@@ -40,7 +40,7 @@ import {
  */
 import {
 	hasExplicitPercentColumnWidths,
-	getEffectiveColumnWidth,
+	getColumnWidthsAsFrUnits,
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
@@ -144,19 +144,8 @@ function ColumnsEditContainer( {
 	);
 
 	useEffect( () => {
-		const percentageWidths = innerBlocks.map( ( block ) =>
-			getEffectiveColumnWidth( block, innerBlocks.length )
-		);
-		const fractions = percentageWidths.map( ( width ) =>
-			toWidthPrecision( ( width / 100 ) * innerBlocks.length )
-		);
-		let fractionsString = '';
-
-		fractions.forEach( ( fraction ) => {
-			fractionsString += fraction + 'fr ';
-		} );
 		setAttributes( {
-			gridTemplateColumns: fractionsString.trim(),
+			gridTemplateColumns: getColumnWidthsAsFrUnits( innerBlocks ),
 		} );
 	}, [ count, innerBlocks ] );
 

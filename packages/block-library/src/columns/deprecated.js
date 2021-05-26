@@ -8,7 +8,16 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	getColorClassName,
+	useBlockProps,
+} from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { getColumnWidthsAsFrUnits } from './utils';
 
 /**
  * Given an HTML string for a deprecated columns inner block, returns the
@@ -38,7 +47,7 @@ function getDeprecatedLayoutColumn( originalContent ) {
 	}
 }
 
-const migrateCustomColors = ( attributes ) => {
+const migrateCustomColors = ( attributes, innerBlocks ) => {
 	if ( ! attributes.customTextColor && ! attributes.customBackgroundColor ) {
 		return attributes;
 	}
@@ -51,11 +60,49 @@ const migrateCustomColors = ( attributes ) => {
 	}
 	return {
 		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
+		gridGap: 2,
+		gridGapUnit: 'em',
+		gridTemplateColumns: getColumnWidthsAsFrUnits( innerBlocks ),
 		style,
 	};
 };
 
 export default [
+	{
+		attributes: {
+			verticalAlignment: {
+				type: 'string',
+			},
+		},
+		supports: {
+			anchor: true,
+			align: [ 'wide', 'full' ],
+			html: false,
+			color: {
+				gradients: true,
+				link: true,
+			},
+		},
+		migrate( attributes, innerBlocks ) {
+			return {
+				...attributes,
+				gridGap: 2,
+				gridGapUnit: 'em',
+				gridTemplateColumns: getColumnWidthsAsFrUnits( innerBlocks ),
+			};
+		},
+		save( { attributes } ) {
+			const { verticalAlignment } = attributes;
+			const className = classnames( {
+				[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+			} );
+			return (
+				<div { ...useBlockProps.save( { className } ) }>
+					<InnerBlocks.Content />
+				</div>
+			);
+		},
+	},
 	{
 		attributes: {
 			verticalAlignment: {
@@ -166,7 +213,17 @@ export default [
 				createBlock( 'core/column', {}, columnBlocks )
 			);
 
-			return [ omit( attributes, [ 'columns' ] ), migratedInnerBlocks ];
+			return [
+				{
+					...omit( attributes, [ 'columns' ] ),
+					gridGap: 2,
+					gridGapUnit: 'em',
+					gridTemplateColumns: getColumnWidthsAsFrUnits(
+						migratedInnerBlocks
+					),
+				},
+				migratedInnerBlocks,
+			];
 		},
 		save( { attributes } ) {
 			const { columns } = attributes;
@@ -186,7 +243,12 @@ export default [
 			},
 		},
 		migrate( attributes, innerBlocks ) {
-			attributes = omit( attributes, [ 'columns' ] );
+			attributes = {
+				...omit( attributes, [ 'columns' ] ),
+				gridGap: 2,
+				gridGapUnit: 'em',
+				gridTemplateColumns: getColumnWidthsAsFrUnits( innerBlocks ),
+			};
 
 			return [ attributes, innerBlocks ];
 		},
