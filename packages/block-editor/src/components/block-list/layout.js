@@ -42,22 +42,22 @@ export function LayoutStyle( { selector, layout = {} } ) {
 		!! contentSize || !! wideSize
 			? `
 				${ selector } {
-					align-items: center;
-					display: flex;
-					flex-flow: column;
+					display: grid;
 				}
 
 				${ appendSelectors( selector, '> *' ) } {
 					box-sizing: border-box;
-					width: ${ contentSize ?? wideSize };
+					justify-self: center;
+					width: 100%;
+					max-width: ${ contentSize ?? wideSize };
 				}
 
 				${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
-					width: ${ wideSize ?? contentSize };
+					max-width: ${ wideSize ?? contentSize };
 				}
 
 				${ appendSelectors( selector, '> [data-align="full"]' ) } {
-					width: 100%;
+					max-width: none;
 				}
 			`
 			: '';

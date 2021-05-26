@@ -65,19 +65,19 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	if ( $content_size || $wide_size ) {
 
 		$style  = ".wp-container-$id {";
-		$style .= 'display: flex;';
-		$style .= 'flex-flow: column;';
-		$style .= 'align-items: center;';
+		$style .= 'display: grid;';
 		$style .= '}';
 
 		$style .= ".wp-container-$id > * {";
 		$style .= 'box-sizing: border-box;';
-		$style .= 'width: ' . esc_html( $all_max_width_value ) . ';';
+		$style .= 'justify-self: center;';
+		$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
+		$style .= 'width: 100%;';
 		$style .= '}';
 
-		$style .= ".wp-container-$id > .alignwide { width: " . esc_html( $wide_max_width_value ) . ';}';
+		$style .= ".wp-container-$id > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
 
-		$style .= ".wp-container-$id .alignfull { width: 100%; }";
+		$style .= ".wp-container-$id .alignfull { max-width: none; }";
 	}
 
 	$style .= ".wp-container-$id .alignleft { float: left; margin-right: 2em; }";
