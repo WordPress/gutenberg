@@ -152,7 +152,7 @@ export class MediaUpload extends Component {
 					return source.mediaLibrary;
 				} else if (
 					allowedTypes.every(
-						( allowedType ) => allowedType === MEDIA_TYPE_AUDIO
+						( allowedType ) => allowedType === MEDIA_TYPE_AUDIO && source.types.includes( allowedType )
 					) &&
 					source.id !== URL_MEDIA_SOURCE
 				) {
