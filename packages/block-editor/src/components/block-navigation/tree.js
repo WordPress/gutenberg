@@ -93,14 +93,11 @@ export default function BlockNavigationTree( {
 		]
 	);
 
-	const toggleExpandCollapse = ( clientId ) => {
-		//TODO: this isn't quite right, see if we need to move toggle state to treegrid
-		setExpandedState( {
-			...expandedState,
-			...{
-				[ clientId ]: ! ( expandedState[ clientId ] ?? true ),
-			},
-		} );
+	const toggleExpandCollapse = ( clientId, activeRow ) => {
+		// TODO: expandedState is stale in the callback, we could alternatively use a data store here instead of context.
+		activeRow
+			.querySelector( '.block-editor-block-navigation__expander' )
+			.click();
 	};
 
 	return (
@@ -108,8 +105,8 @@ export default function BlockNavigationTree( {
 			className="block-editor-block-navigation-tree"
 			aria-label={ __( 'Block navigation structure' ) }
 			ref={ treeGridRef }
-			onExpandRow={ toggleExpandCollapse }
 			onCollapseRow={ toggleExpandCollapse }
+			onExpandRow={ toggleExpandCollapse }
 		>
 			<BlockNavigationContext.Provider value={ contextValue }>
 				<BlockNavigationBranch

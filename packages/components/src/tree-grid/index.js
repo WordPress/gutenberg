@@ -92,25 +92,33 @@ function TreeGrid(
 				if ( keyCode === LEFT ) {
 					// Left:
 					// If a row is focused, and it is expanded, collapses the current row.
-					if ( activeRow?.ariaExpanded ) {
-						onCollapseRow( activeRow?.dataset?.block );
+					if ( activeRow?.ariaExpanded === 'true' ) {
+						onCollapseRow( activeRow?.dataset?.block, activeRow );
 						event.preventDefault();
 						return;
 					}
 					// If a row is focused, and it is collapsed, moves to the parent row (if there is one).
 					const level = Math.max(
-						( activeRow?.ariaLevel ?? 1 ) - 1,
+						( parseInt( activeRow?.ariaLevel ?? 1, 10 ) ) - 1,
 						1
 					);
-					const parentRow = treeGridElement.querySelector(
-						`[aria-posinset="1"][aria-level="${ level }"]`
+					const rows = Array.from(
+						treeGridElement.querySelectorAll( '[role="row"]' )
 					);
+					let parentRow = activeRow;
+					const currentRowIndex = rows.indexOf( activeRow );
+					for ( let i = currentRowIndex; i >= 0; i-- ) {
+						if ( parseInt( rows[ i ].ariaLevel, 10 ) === level ) {
+							parentRow = rows[ i ];
+							break;
+						}
+					}
 					getRowFocusables( parentRow )?.[ 0 ]?.focus();
 				} else {
 					// Right:
 					// If a row is focused, and it is collapsed, expands the current row.
-					if ( activeRow?.ariaExpanded === false ) {
-						onExpandRow( activeRow?.dataset?.block );
+					if ( activeRow?.ariaExpanded === 'false' ) {
+						onExpandRow( activeRow?.dataset?.block, activeRow );
 						event.preventDefault();
 						return;
 					}
