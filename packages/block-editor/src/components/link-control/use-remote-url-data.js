@@ -10,7 +10,6 @@ import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 
 function useRemoteUrlData( url ) {
-	const isMounted = useRef( false );
 	const cancelableFetch = useRef();
 
 	const [ richData, setRichData ] = useState( null );
@@ -23,26 +22,18 @@ function useRemoteUrlData( url ) {
 		};
 	}, [] );
 
-	// Avoid fetching or state updates if not mounted.
-	useEffect( () => {
-		isMounted.current = true;
-		return () => {
-			isMounted.current = false;
-		};
-	}, [] );
-
 	const cancelPendingFetch = useCallback( () => {
 		if ( cancelableFetch.current ) {
 			cancelableFetch.current.cancel();
 		}
-	} );
+	}, [ cancelableFetch ] );
 
 	/**
 	 * Cancel any pending requests that were made for
 	 * stale URL values.
 	 */
 	useEffect( () => {
-		return cancelPendingFetch();
+		cancelPendingFetch();
 	}, [ url ] );
 
 	/**
@@ -69,21 +60,20 @@ function useRemoteUrlData( url ) {
 				);
 				const urlData = await cancelableFetch.current.promise;
 
-				if ( isMounted.current ) {
-					setRichData( urlData );
-					setIsFetching( false );
-				}
+				// If the promise is cancelled then this will never run
+				// as we should fall into the `catch` below.
+				setRichData( urlData );
+				setIsFetching( false );
 			} catch ( error ) {
-				if ( error && error.isCanceled ) {
+				if ( error?.isCanceled ) {
 					return; // bail if canceled to avoid setting state
 				}
-				if ( isMounted.current ) {
-					setIsFetching( false );
-				}
+
+				setIsFetching( false );
 			}
 		};
 
-		if ( url?.length && isMounted.current && fetchRemoteUrlData ) {
+		if ( url?.length && fetchRemoteUrlData ) {
 			fetchRichData();
 		}
 	}, [ url ] );
