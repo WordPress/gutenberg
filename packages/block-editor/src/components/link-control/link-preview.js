@@ -81,14 +81,14 @@ export default function LinkPreview( { value, onEditClick } ) {
 					</span>
 				</span>
 
-			<Button
-				variant="secondary"
-				onClick={ () => onEditClick() }
-				className="block-editor-link-control__search-item-action"
-			>
-				{ __( 'Edit' ) }
-			</Button>
-			<ViewerSlot fillProps={ value } />
+				<Button
+					variant="secondary"
+					onClick={ () => onEditClick() }
+					className="block-editor-link-control__search-item-action"
+				>
+					{ __( 'Edit' ) }
+				</Button>
+				<ViewerSlot fillProps={ value } />
 			</div>
 			{ ( richData?.image || richData?.description ) && (
 				<div className="block-editor-link-control__search-item-bottom">
