@@ -16,8 +16,8 @@ function navigationToggleModal( modal ) {
 	modal.classList.toggle( 'has-modal-open', ! isHidden );
 
 	// Add a class to indicate the modal is open.
-	const toggleClass = ( el, className ) => el.classList.toggle( className );
-	toggleClass( document.querySelector( 'html' ), 'has-modal-open' );
+	const htmlElement = document.querySelector( 'html' );
+	htmlElement.classList.toggle( 'has-modal-open' );
 }
 
 MicroModal.init( {
