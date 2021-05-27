@@ -19,7 +19,10 @@ jobs:
               with:
                   node-version: 16.x
 
+            - run: npm cache clean -force
             - run: npm install -g npm@6
+            - run: npm cache clean -force
+            - run: rm -rf ~/.npm
 
             # Changing into the action's directory and running `npm install` is much
             # faster than a full project-wide `npm ci`.
