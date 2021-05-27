@@ -8,7 +8,9 @@ import { size, map, without, omit } from 'lodash';
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 import {
+	store as editorStore,
 	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
@@ -55,10 +57,11 @@ function Editor( {
 			getEditedPostTemplate,
 		} = select( editPostStore );
 		const { getEntityRecord, getPostType, getEntityRecords } = select(
-			'core'
+			coreDataStore
 		);
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getEditorSettings } = select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
+
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postType
 		);
@@ -75,7 +78,6 @@ function Editor( {
 		}
 		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
 		const isViewable = getPostType( postType )?.viewable ?? false;
-
 		return {
 			hasFixedToolbar:
 				isFeatureActive( 'fixedToolbar' ) ||
@@ -171,7 +173,9 @@ function Editor( {
 						initialEdits={ initialEdits }
 						useSubRegistry={ false }
 						__unstableTemplate={
-							isTemplateMode ? template : undefined
+							isTemplateMode || 'page' === postType
+								? template
+								: undefined
 						}
 						{ ...props }
 					>

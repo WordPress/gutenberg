@@ -31,8 +31,9 @@ import {
 	__unstableIframe as Iframe,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { useRef } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Button, Spinner } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
@@ -84,18 +85,31 @@ export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
 		isTemplateMode,
+		postType,
 		wrapperBlockName,
 		wrapperUniqueId,
+		hasTemplateBeenFetched,
 	} = useSelect( ( select ) => {
 		const {
 			isEditingTemplate,
 			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const { getCurrentPostId, getCurrentPostType, getCurrentPost } = select(
+			editorStore
+		);
 		const _isTemplateMode = isEditingTemplate();
 		let _wrapperBlockName;
+		const currentPostType = getCurrentPostType();
+		const post = getCurrentPost();
 
-		if ( getCurrentPostType() === 'wp_block' ) {
+		const isTemplateFetchingResolved = select(
+			coreStore
+		).hasFinishedResolution( '__experimentalGetTemplateForLink', [
+			post.link,
+			post.status === 'auto-draft',
+		] );
+
+		if ( currentPostType === 'wp_block' ) {
 			_wrapperBlockName = 'core/block';
 		} else if ( ! _isTemplateMode ) {
 			_wrapperBlockName = 'core/post-content';
@@ -104,8 +118,10 @@ export default function VisualEditor( { styles } ) {
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isTemplateMode: _isTemplateMode,
+			postType: currentPostType,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
+			hasTemplateBeenFetched: isTemplateFetchingResolved,
 		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
@@ -224,25 +240,41 @@ export default function VisualEditor( { styles } ) {
 									animate={ { opacity: 1 } }
 								>
 									<WritingFlow>
-										{ ! isTemplateMode && (
-											<div className="edit-post-visual-editor__post-title-wrapper">
-												<PostTitle />
-											</div>
-										) }
+										{ ! isTemplateMode &&
+											'page' !== postType && (
+												<div className="edit-post-visual-editor__post-title-wrapper">
+													<PostTitle />
+												</div>
+											) }
 										<RecursionProvider>
-											<BlockList
-												__experimentalLayout={
-													themeSupportsLayout
-														? {
-																type: 'default',
-																// Find a way to inject this in the support flag code (hooks).
-																alignments: themeSupportsLayout
-																	? alignments
-																	: undefined,
-														  }
-														: undefined
-												}
-											/>
+											{ hasTemplateBeenFetched ? (
+												<BlockList
+													__experimentalLayout={
+														themeSupportsLayout
+															? {
+																	type:
+																		'default',
+																	// Find a way to inject this in the support flag code (hooks).
+																	alignments: themeSupportsLayout
+																		? alignments
+																		: undefined,
+															  }
+															: undefined
+													}
+												/>
+											) : (
+												<div
+													style={ {
+														height: '50vh',
+														display: 'flex',
+														justifyContent:
+															'center',
+														alignItems: 'center',
+													} }
+												>
+													<Spinner />
+												</div>
+											) }
 										</RecursionProvider>
 									</WritingFlow>
 								</motion.div>
