@@ -34,6 +34,7 @@ jobs:
               with:
                   node-version: 14.x
 
+            - run: npm cache clean -force
             - run: rm -rf ~/.npm
             
 
