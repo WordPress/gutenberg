@@ -21,7 +21,6 @@ import * as styles from './styles';
  * @property {boolean} [error=false] Renders an error.
  * @property {boolean} [disabled] Whether the field is disabled.
  * @property {boolean} [isClickable=false] Renders a `cursor: pointer` on hover.
- * @property {boolean} [isFocused=false] Renders focus styles.
  * @property {boolean} [isInline=false] Renders as an inline element (layout).
  * @property {boolean} [isSubtle=false] Renders a subtle variant.
  */
@@ -36,7 +35,6 @@ export function useBaseField( props ) {
 		className,
 		error = false,
 		isClickable = false,
-		isFocused = false,
 		isInline = false,
 		isSubtle = false,
 		// extract these because useFlex doesn't accept it
@@ -53,10 +51,8 @@ export function useBaseField( props ) {
 				styles.BaseField,
 				controlGroupStyles,
 				isClickable && styles.clickable,
-				isFocused && styles.focus,
 				isSubtle && styles.subtle,
 				error && styles.error,
-				error && isFocused && styles.errorFocus,
 				isInline && styles.inline,
 				className
 			),
@@ -66,7 +62,6 @@ export function useBaseField( props ) {
 			error,
 			isInline,
 			isClickable,
-			isFocused,
 			isSubtle,
 		]
 	);
