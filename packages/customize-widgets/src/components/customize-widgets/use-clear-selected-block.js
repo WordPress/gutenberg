@@ -10,6 +10,13 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * many root nodes rather than just one in the post editor.
  * We need to listen to the focus events in all those roots, and also in
  * the preview iframe.
+ * This hook will clear the selected block when focusing outside the editor,
+ * with a few exceptions:
+ * 1. Focusing on popovers.
+ * 2. Focusing on the inspector.
+ * 3. Focusing on any modals/dialogs.
+ * These cases are normally triggered by user interactions from the editor,
+ * not by explicitly focusing outside the editor, hence no need for clearing.
  *
  * @param {Object} sidebarControl The sidebar control instance.
  * @param {Object} popoverRef The ref object of the popover node container.
@@ -38,7 +45,8 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 					// 3. It should also not exist in the container, inspector, nor the popover.
 					! container.contains( element ) &&
 					! popoverRef.current.contains( element ) &&
-					! inspectorContainer.contains( element )
+					! inspectorContainer.contains( element ) &&
+					! element.closest( '[role="dialog"]' )
 				) {
 					clearSelectedBlock();
 				}
