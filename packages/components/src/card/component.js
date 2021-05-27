@@ -23,9 +23,14 @@ import CONFIG from '../utils/config-values';
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Card( props, forwardedRef ) {
-	const { children, elevation, isRounded, size, ...otherProps } = useCard(
-		props
-	);
+	const {
+		children,
+		elevation,
+		isBorderless,
+		isRounded,
+		size,
+		...otherProps
+	} = useCard( props );
 	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
 
 	const elevationClassName = useMemo(
@@ -36,12 +41,15 @@ function Card( props, forwardedRef ) {
 	const contextProviderValue = {
 		CardBody: {
 			size,
+			isBorderless,
 		},
 		CardHeader: {
 			size,
+			isBorderless,
 		},
 		CardFooter: {
 			size,
+			isBorderless,
 		},
 	};
 

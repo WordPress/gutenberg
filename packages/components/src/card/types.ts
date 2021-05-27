@@ -101,6 +101,12 @@ export type CardHeaderProps = {
 	 * @default 'medium'
 	 */
 	size?: CardSizeOptions;
+	/**
+	 * Renders without a border.
+	 *
+	 * @default false
+	 */
+	isBorderless?: boolean;
 };
 
 export type CardFooterProps = CardHeaderProps & {

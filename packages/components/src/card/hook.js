@@ -63,6 +63,7 @@ export function useCard( props ) {
 	return {
 		...surfaceProps,
 		elevation,
+		isBorderless,
 		isRounded,
 		size,
 	};
