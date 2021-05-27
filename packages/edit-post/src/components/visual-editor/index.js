@@ -220,8 +220,6 @@ export default function VisualEditor( { styles } ) {
 							<AnimatePresence>
 								<motion.div
 									key={ isTemplateMode ? 'template' : 'post' }
-									initial={ { opacity: 0 } }
-									animate={ { opacity: 1 } }
 								>
 									<WritingFlow>
 										{ ! isTemplateMode && (
