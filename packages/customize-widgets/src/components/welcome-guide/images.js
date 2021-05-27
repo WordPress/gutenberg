@@ -1,5 +1,5 @@
 export const EditorImage = ( props ) => (
-	<>
+	<div className="customize-widgets-welcome-guide__image__wrapper">
 		<img
 			className="customize-widgets-welcome-guide__image customize-widgets-welcome-guide__image__prm-np"
 			alt=""
@@ -12,5 +12,5 @@ export const EditorImage = ( props ) => (
 			src="data:image/svg+xml,%3Csvg fill='none' height='240' viewBox='0 0 312 240' width='312' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m0 0h312v240h-312z' fill='%2300a0d2'/%3E%3Crect fill='%23fff' height='108' rx='2' width='216' x='48' y='80'/%3E%3Cg stroke='%23000' stroke-width='1.5'%3E%3Cpath d='m158.917 142v-15.111'/%3E%3Cpath d='m154.472 142v-15.111'/%3E%3Cpath d='m162.333 126.75h-8.889'/%3E%3Cpath d='m153.139 130.889v4.071c-1.928-.353-3.389-2.041-3.389-4.071s1.461-3.718 3.389-4.071z' fill='%23000'/%3E%3C/g%3E%3Crect fill='%23fff' height='21' rx='1.5' stroke='%231e1e1e' width='117' x='48.5' y='53.5'/%3E%3Cpath d='m70.592 53v22' stroke='%231e1e1e'/%3E%3Cpath d='m144.432 53v22' stroke='%231e1e1e'/%3E%3Crect fill='%23333' height='8' rx='1' width='9' x='55' y='60'/%3E%3Cpath d='m150 63h2v2h-2z' fill='%23333'/%3E%3Cpath d='m154 63h2v2h-2z' fill='%23333'/%3E%3Cpath d='m158 63h2v2h-2z' fill='%23333'/%3E%3C/svg%3E"
 			{ ...props }
 		/>
-	</>
+	</div>
 );
