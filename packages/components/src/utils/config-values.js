@@ -5,6 +5,8 @@ import { space } from '../ui/utils/space';
 import { COLORS } from './colors-values';
 
 const CONTROL_HEIGHT = '30px';
+const CONTROL_PADDING_X = '12px';
+
 const CARD_PADDING_X = space( 3 );
 const CARD_PADDING_Y = space( 3 );
 
@@ -34,6 +36,10 @@ export default {
 	fontWeight: 'normal',
 	fontWeightHeading: '600',
 	gridBase: '4px',
+	controlPaddingX: CONTROL_PADDING_X,
+	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
+	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
+	controlBorderRadius: '2px',
 	controlHeight: CONTROL_HEIGHT,
 	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,

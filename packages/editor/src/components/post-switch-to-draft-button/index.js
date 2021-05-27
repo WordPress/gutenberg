@@ -40,7 +40,7 @@ function PostSwitchToDraftButton( {
 			className="editor-post-switch-to-draft"
 			onClick={ onSwitch }
 			disabled={ isSaving }
-			isTertiary
+			variant="tertiary"
 		>
 			{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
 		</Button>

@@ -45,3 +45,11 @@ The tooltip text to show on focus or hover.
 
 -   Type: `String`
 -   Required: No
+
+### visible (native only)
+
+Whether the tooltip should be displayed on initial render. This prop is currently only available for the native mobile app built with React Native.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`

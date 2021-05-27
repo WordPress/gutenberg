@@ -5,6 +5,7 @@ import { ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -79,9 +80,7 @@ import { store as editPostStore } from '../../../store';
 export default function PluginSidebarEditPost( { className, ...props } ) {
 	const { postTitle, shortcut, showIconLabels } = useSelect( ( select ) => {
 		return {
-			postTitle: select( 'core/editor' ).getEditedPostAttribute(
-				'title'
-			),
+			postTitle: select( editorStore ).getEditedPostAttribute( 'title' ),
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),

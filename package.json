@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "10.7.0-rc.1",
+	"version": "10.7.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -19,8 +19,7 @@
 		"npm": ">=6.9.0 <7"
 	},
 	"config": {
-		"GUTENBERG_PHASE": 2,
-		"COMPONENT_SYSTEM_PHASE": 1
+		"GUTENBERG_PHASE": 2
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
@@ -103,6 +102,7 @@
 		"@testing-library/react": "11.2.2",
 		"@testing-library/react-native": "7.1.0",
 		"@types/classnames": "2.2.10",
+		"@types/clipboard": "2.0.1",
 		"@types/eslint": "6.8.0",
 		"@types/estree": "0.0.44",
 		"@types/highlight-words-core": "1.2.0",

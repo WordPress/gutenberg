@@ -18,7 +18,7 @@ const MyScrollLock = withState( {
 	};
 	return (
 		<div>
-			<Button isSecondary onClick={ toggleLock }>
+			<Button variant="secondary" onClick={ toggleLock }>
 				Toggle scroll lock
 			</Button>
 			{ isScrollLocked && <ScrollLock /> }

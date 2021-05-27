@@ -166,9 +166,9 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `Object`: Reference with the element.
+-   _ref_ `import('react').RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
 -   _text_ `string|Function`: The text to copy.
--   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+-   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
@@ -180,12 +180,12 @@ Copies the given text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _text_ `text|Function`: The text to copy. Use a function if not already available and expensive to compute.
+-   _text_ `string | (() => string)`: The text to copy. Use a function if not already available and expensive to compute.
 -   _onSuccess_ `Function`: Called when to text is copied.
 
 _Returns_
 
--   `RefObject`: A ref to assign to the target element.
+-   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
 
 <a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
 
@@ -291,10 +291,14 @@ throws a warning when using useLayoutEffect in that environment.
 
 Attach a keyboard shortcut handler.
 
+_Related_
+
+-   <https://craig.is/killing/mice#api.bind> for information about the `callback` parameter.
+
 _Parameters_
 
 -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `Function`: Shortcut callback.
+-   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
@@ -394,12 +398,12 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _callback_ `Function`: Callback with ref as argument.
--   _dependencies_ `Array`: Dependencies of the callback.
+-   _callback_ `( node: TElement ) => ( () => void ) | undefined`: Callback with ref as argument.
+-   _dependencies_ `DependencyList`: Dependencies of the callback.
 
 _Returns_
 
--   `Function`: Ref callback.
+-   `RefCallback< TElement | null >`: Ref callback.
 
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 

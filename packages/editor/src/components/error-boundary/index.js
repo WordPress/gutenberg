@@ -11,7 +11,7 @@ import { useCopyToClipboard } from '@wordpress/compose';
 function CopyButton( { text, children } ) {
 	const ref = useCopyToClipboard( text );
 	return (
-		<Button isSecondary ref={ ref }>
+		<Button variant="secondary" ref={ ref }>
 			{ children }
 		</Button>
 	);
@@ -59,7 +59,11 @@ class ErrorBoundary extends Component {
 			<Warning
 				className="editor-error-boundary"
 				actions={ [
-					<Button key="recovery" onClick={ this.reboot } isSecondary>
+					<Button
+						key="recovery"
+						onClick={ this.reboot }
+						variant="secondary"
+					>
 						{ __( 'Attempt Recovery' ) }
 					</Button>,
 					<CopyButton key="copy-post" text={ this.getContent }>

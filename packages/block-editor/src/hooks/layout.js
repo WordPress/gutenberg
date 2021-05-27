@@ -113,7 +113,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 						</div>
 						<div className="block-editor-hooks__layout-controls-reset">
 							<Button
-								isSecondary
+								variant="secondary"
 								isSmall
 								disabled={ ! contentSize && ! wideSize }
 								onClick={ () =>

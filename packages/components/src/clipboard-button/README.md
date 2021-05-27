@@ -14,7 +14,7 @@ const MyClipboardButton = withState( {
 	hasCopied: false,
 } )( ( { hasCopied, setState } ) => (
 	<ClipboardButton
-		isPrimary
+		variant="primary"
 		text="Text to be copied."
 		onCopy={ () => setState( { hasCopied: true } ) }
 		onFinishCopy={ () => setState( { hasCopied: false } ) }

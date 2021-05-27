@@ -9,6 +9,7 @@ import {
 	showBlockToolbar,
 	clickBlockToolbarButton,
 	deleteAllWidgets,
+	createURL,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -43,12 +44,14 @@ describe( 'Widgets Customizer', () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
+		await activatePlugin( 'gutenberg-test-widgets' );
 	} );
 
 	afterAll( async () => {
 		await activatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
+		await deactivatePlugin( 'gutenberg-test-widgets' );
 		await activateTheme( 'twentytwentyone' );
 	} );
 
@@ -511,6 +514,192 @@ describe( 'Widgets Customizer', () => {
 			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
 		);
 	} );
+
+	it( 'should handle legacy widgets', async () => {
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /^Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
+
+		const legacyWidgetBlock = await addBlock( 'Legacy Widget' );
+		const selectLegacyWidgets = await find( {
+			role: 'combobox',
+			name: 'Select a legacy widget to display:',
+		} );
+		await selectLegacyWidgets.select( 'test_widget' );
+
+		await expect( {
+			role: 'heading',
+			name: 'Test Widget',
+			level: 3,
+		} ).toBeFound( { root: legacyWidgetBlock } );
+
+		let titleInput = await find(
+			{
+				role: 'textbox',
+				name: 'Title:',
+			},
+			{
+				root: legacyWidgetBlock,
+			}
+		);
+
+		await titleInput.type( 'Hello Title' );
+
+		// Unfocus the current legacy widget.
+		await page.keyboard.press( 'Tab' );
+
+		// Disable reason: Sometimes the preview just doesn't fully load,
+		// it's the only way I know for now to ensure that the iframe is ready.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 2000 );
+		await waitForPreviewIframe();
+
+		// Expect the legacy widget to show in the site preview frame.
+		await expect( {
+			role: 'heading',
+			name: 'Hello Title',
+		} ).toBeFound( {
+			root: await find( {
+				name: 'Site Preview',
+				selector: 'iframe',
+			} ),
+		} );
+
+		// Expect the preview in block to show when unfocusing the legacy widget block.
+		await expect( {
+			role: 'heading',
+			name: 'Hello Title',
+		} ).toBeFound( {
+			root: await find( {
+				selector: 'iframe',
+				name: 'Legacy Widget Preview',
+			} ),
+		} );
+
+		await legacyWidgetBlock.focus();
+		await showBlockToolbar();
+
+		// Testing removing the block.
+		await clickBlockToolbarButton( 'Options' );
+		const removeBlockButton = await find( {
+			role: 'menuitem',
+			name: /Remove block/,
+		} );
+		await removeBlockButton.click();
+
+		// Add it back again using the variant.
+		const testWidgetBlock = await addBlock( 'Test Widget' );
+
+		titleInput = await find(
+			{
+				role: 'textbox',
+				name: 'Title:',
+			},
+			{
+				root: testWidgetBlock,
+			}
+		);
+
+		await titleInput.type( 'Hello again!' );
+		// Unfocus the current legacy widget.
+		await page.keyboard.press( 'Tab' );
+
+		// Expect the preview in block to show when unfocusing the legacy widget block.
+		await expect( {
+			role: 'heading',
+			name: 'Hello again!',
+		} ).toBeFound( {
+			root: await find( {
+				selector: 'iframe',
+				name: 'Legacy Widget Preview',
+			} ),
+		} );
+
+		const publishButton = await find( {
+			role: 'button',
+			name: 'Publish',
+		} );
+		await publishButton.click();
+
+		// Wait for publishing to finish.
+		await page.waitForResponse( createURL( '/wp-admin/admin-ajax.php' ) );
+		await expect( publishButton ).toMatchQuery( {
+			disabled: true,
+		} );
+
+		expect( console ).toHaveWarned(
+			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
+		);
+
+		await page.goto( createURL( '/' ) );
+
+		// Expect the saved widgets to show on frontend.
+		await expect( {
+			role: 'heading',
+			name: 'Hello again!',
+		} ).toBeFound();
+	} );
+
+	it( 'should handle esc key events', async () => {
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /^Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
+
+		const paragraphBlock = await addBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+		await showBlockToolbar();
+
+		// Open the more menu dropdown in block toolbar.
+		await clickBlockToolbarButton( 'Options' );
+		await expect( {
+			role: 'menu',
+			name: 'Options',
+		} ).toBeFound();
+
+		// Expect pressing the Escape key to close the dropdown,
+		// but not close the editor.
+		await page.keyboard.press( 'Escape' );
+		await expect( {
+			role: 'menu',
+			name: 'Options',
+		} ).not.toBeFound();
+		await expect( paragraphBlock ).toBeVisible();
+
+		await paragraphBlock.focus();
+
+		// Expect pressing the Escape key to enter navigation mode,
+		// but not close the editor.
+		await page.keyboard.press( 'Escape' );
+		await expect( {
+			text: /^You are currently in navigation mode\./,
+			selector: '*[aria-live="polite"][aria-relevant="additions text"]',
+		} ).toBeFound();
+		await expect( paragraphBlock ).toBeVisible();
+
+		expect( console ).toHaveWarned(
+			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
+		);
+	} );
 } );
 
 /**
@@ -540,6 +729,20 @@ async function addBlock( blockName ) {
 		}
 	);
 	await addBlockButton.click();
+
+	const searchBox = await find( {
+		role: 'searchbox',
+		name: 'Search for blocks and patterns',
+	} );
+
+	// Clear the input.
+	await searchBox.evaluate( ( node ) => {
+		if ( node.value ) {
+			node.value = '';
+		}
+	} );
+
+	await searchBox.type( blockName );
 
 	// TODO - remove this timeout when the test plugin for disabling CSS
 	// animations in tests works properly.

@@ -88,6 +88,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'typography', 'textTransform' ],
 		support: [ '__experimentalTextTransform' ],
 	},
+	letterSpacing: {
+		value: [ 'typography', 'letterSpacing' ],
+		support: [ '__experimentalLetterSpacing' ],
+	},
 };
 
 export const __EXPERIMENTAL_ELEMENTS = {

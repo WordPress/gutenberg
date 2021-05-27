@@ -42,7 +42,7 @@ const getFuturePostUrl = ( post ) => {
 function CopyButton( { text, onCopy, children } ) {
 	const ref = useCopyToClipboard( text, onCopy );
 	return (
-		<Button isSecondary ref={ ref }>
+		<Button variant="secondary" ref={ ref }>
 			{ children }
 		</Button>
 	);
@@ -127,7 +127,7 @@ class PostPublishPanelPostpublish extends Component {
 					/>
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
-							<Button isSecondary href={ link }>
+							<Button variant="secondary" href={ link }>
 								{ viewPostLabel }
 							</Button>
 						) }
