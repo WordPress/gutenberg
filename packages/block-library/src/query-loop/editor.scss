@@ -1,7 +1,7 @@
-.editor-styles-wrapper {
-	ul.wp-block-query-loop {
-		padding-left: 0;
-		margin-left: 0;
-		list-style: none;
-	}
+.block-library-query-loop-toolbar__popover .components-popover__content {
+	min-width: 230px;
+}
+
+.wp-block-query-loop__create-new-link {
+	padding: 0 $grid-unit-20 $grid-unit-20 56px;
 }

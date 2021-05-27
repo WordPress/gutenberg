@@ -4,7 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useBlockProps,
-	__experimentalBlockVariationPicker,
+	__experimentalBlockVariationPicker as BlockVariationPicker,
 	__experimentalGetMatchingVariation as getMatchingVariation,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -13,7 +13,12 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 
-const QueryPlaceholder = ( { clientId, name, attributes, setAttributes } ) => {
+const QueryLoopPlaceholder = ( {
+	clientId,
+	name,
+	attributes,
+	setAttributes,
+} ) => {
 	const {
 		blockType,
 		defaultVariation,
@@ -43,7 +48,7 @@ const QueryPlaceholder = ( { clientId, name, attributes, setAttributes } ) => {
 	const label = matchingVariation?.title || blockType?.title;
 	return (
 		<div { ...blockProps }>
-			<__experimentalBlockVariationPicker
+			<BlockVariationPicker
 				icon={ icon }
 				label={ label }
 				variations={ scopeVariations }
@@ -66,4 +71,4 @@ const QueryPlaceholder = ( { clientId, name, attributes, setAttributes } ) => {
 	);
 };
 
-export default QueryPlaceholder;
+export default QueryLoopPlaceholder;

@@ -12,13 +12,13 @@ import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { settings, list, grid } from '@wordpress/icons';
 
-export default function QueryToolbar( {
+export default function QueryLoopToolbar( {
 	attributes: { query, displayLayout },
 	setQuery,
 	setDisplayLayout,
 } ) {
 	const maxPageInputId = useInstanceId(
-		QueryToolbar,
+		QueryLoopToolbar,
 		'blocks-query-pagination-max-page-input'
 	);
 	const displayLayoutControls = [

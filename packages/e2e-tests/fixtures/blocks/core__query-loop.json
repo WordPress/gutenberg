@@ -3,8 +3,28 @@
 		"clientId": "_clientId_0",
 		"name": "core/query-loop",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"query": {
+				"perPage": null,
+				"pages": 0,
+				"offset": 0,
+				"postType": "post",
+				"categoryIds": [],
+				"tagIds": [],
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": true
+			},
+			"tagName": "div",
+			"displayLayout": {
+				"type": "list"
+			}
+		},
 		"innerBlocks": [],
-		"originalContent": ""
+		"originalContent": "<div class=\"wp-block-query-loop\"></div>"
 	}
 ]

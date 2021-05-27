@@ -4,7 +4,7 @@
 import { terms } from './fixtures';
 import { getTermsInfo } from '../utils';
 
-describe( 'Query block utils', () => {
+describe( 'Query Loop block utils', () => {
 	describe( 'getTermsInfo', () => {
 		it( 'should return an empty object when no terms provided', () => {
 			expect( getTermsInfo() ).toEqual( { terms: undefined } );

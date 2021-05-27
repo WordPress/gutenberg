@@ -3,21 +3,54 @@
 	"name": "core/query-loop",
 	"title": "Query Loop",
 	"category": "design",
-	"parent": [ "core/query" ],
-	"description": "Query loop.",
+	"description": "Displays a list of posts as a result of a query.",
 	"textdomain": "default",
-	"usesContext": [
-		"queryId",
-		"query",
-		"queryContext",
-		"displayLayout",
-		"templateSlug"
-	],
-	"supports": {
-		"reusable": false,
-		"html": false,
-		"align": true
+	"attributes": {
+		"queryId": {
+			"type": "number"
+		},
+		"query": {
+			"type": "object",
+			"default": {
+				"perPage": null,
+				"pages": 0,
+				"offset": 0,
+				"postType": "post",
+				"categoryIds": [],
+				"tagIds": [],
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": true
+			}
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		},
+		"displayLayout": {
+			"type": "object",
+			"default": {
+				"type": "list"
+			}
+		}
 	},
-	"style": "wp-block-query-loop",
+	"providesContext": {
+		"queryId": "queryId",
+		"query": "query",
+		"displayLayout": "displayLayout"
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"__experimentalLayout": true
+	},
 	"editorStyle": "wp-block-query-loop-editor"
 }

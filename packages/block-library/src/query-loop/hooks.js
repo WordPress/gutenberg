@@ -15,7 +15,7 @@ const CreateNewPostLink = ( {
 		post_type: postType,
 	} );
 	return (
-		<div className="wp-block-query__create-new-link">
+		<div className="wp-block-query-loop__create-new-link">
 			{ createInterpolateElement(
 				__( '<a>Create a new post</a> for this feed.' ),
 				// eslint-disable-next-line jsx-a11y/anchor-has-content
@@ -31,10 +31,10 @@ const CreateNewPostLink = ( {
  * @param  {Function} BlockEdit Original component
  * @return {Function}           Wrapped component
  */
-const queryTopInspectorControls = createHigherOrderComponent(
+const queryLoopTopInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name, isSelected } = props;
-		if ( name !== 'core/query' || ! isSelected ) {
+		if ( name !== 'core/query-loop' || ! isSelected ) {
 			return <BlockEdit key="edit" { ...props } />;
 		}
 
@@ -50,4 +50,4 @@ const queryTopInspectorControls = createHigherOrderComponent(
 	'withInspectorControls'
 );
 
-export default queryTopInspectorControls;
+export default queryLoopTopInspectorControls;

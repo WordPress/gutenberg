@@ -56,7 +56,7 @@ const getTermIdByTermValue = ( termsMappedByName, termValue ) => {
 	}
 };
 
-export default function QueryInspectorControls( {
+export default function QueryLoopInspectorControls( {
 	attributes: { query, displayLayout },
 	setQuery,
 	setDisplayLayout,

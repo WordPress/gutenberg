@@ -29,7 +29,7 @@
 		"src/**/*.scss",
 		"src/navigation-link/index.js",
 		"src/template-part/index.js",
-		"src/query/index.js"
+		"src/query-loop/index.js"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",

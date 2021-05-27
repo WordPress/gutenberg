@@ -3,7 +3,7 @@
 	"name": "core/query-pagination",
 	"title": "Query Pagination",
 	"category": "design",
-	"parent": [ "core/query" ],
+	"parent": [ "core/query-loop" ],
 	"description": "Displays a paginated navigation to next/previous set of posts, when applicable.",
 	"textdomain": "default",
 	"usesContext": [ "queryId", "query" ],

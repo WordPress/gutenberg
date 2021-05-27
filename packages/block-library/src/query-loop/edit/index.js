@@ -19,13 +19,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import QueryToolbar from './query-toolbar';
-import QueryInspectorControls from './query-inspector-controls';
-import QueryPlaceholder from './query-placeholder';
+import QueryLoopToolbar from './query-loop-toolbar';
+import QueryLoopInspectorControls from './query-loop-inspector-controls';
+import QueryLoopPlaceholder from './query-loop-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
-const TEMPLATE = [ [ 'core/query-loop' ] ];
-export function QueryContent( { attributes, setAttributes } ) {
+const TEMPLATE = [ [ 'core/post-template' ] ];
+export function QueryLoopContent( { attributes, setAttributes } ) {
 	const {
 		queryId,
 		query,
@@ -36,7 +36,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
-	const instanceId = useInstanceId( QueryContent );
+	const instanceId = useInstanceId( QueryLoopContent );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return { themeSupportsLayout: getSettings()?.supportsLayout };
@@ -105,13 +105,13 @@ export function QueryContent( { attributes, setAttributes } ) {
 		} );
 	return (
 		<>
-			<QueryInspectorControls
+			<QueryLoopInspectorControls
 				attributes={ attributes }
 				setQuery={ updateQuery }
 				setDisplayLayout={ updateDisplayLayout }
 			/>
 			<BlockControls>
-				<QueryToolbar
+				<QueryLoopToolbar
 					attributes={ attributes }
 					setQuery={ updateQuery }
 					setDisplayLayout={ updateDisplayLayout }
@@ -137,7 +137,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 	);
 }
 
-function QueryPatternSetup( props ) {
+function QueryLoopPatternSetup( props ) {
 	const { clientId, name: blockName } = props;
 	const blockProps = useBlockProps();
 	// `startBlankComponent` is what to render when clicking `Start blank`
@@ -147,21 +147,21 @@ function QueryPatternSetup( props ) {
 			<BlockPatternSetup
 				blockName={ blockName }
 				clientId={ clientId }
-				startBlankComponent={ <QueryPlaceholder { ...props } /> }
+				startBlankComponent={ <QueryLoopPlaceholder { ...props } /> }
 			/>
 		</div>
 	);
 }
 
-const QueryEdit = ( props ) => {
+const QueryLoopEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
 		( select ) =>
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
-	const Component = hasInnerBlocks ? QueryContent : QueryPatternSetup;
+	const Component = hasInnerBlocks ? QueryLoopContent : QueryLoopPatternSetup;
 	return <Component { ...props } />;
 };
 
-export default QueryEdit;
+export default QueryLoopEdit;

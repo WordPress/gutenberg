@@ -69,8 +69,8 @@ import * as siteLogo from './site-logo';
 import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
-import * as query from './query';
 import * as queryLoop from './query-loop';
+import * as postTemplate from './post-template';
 import * as queryTitle from './query-title';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
@@ -174,8 +174,8 @@ export const __experimentalGetCoreBlocks = () => [
 	siteTagline,
 	siteTitle,
 
-	query,
 	queryLoop,
+	postTemplate,
 	queryTitle,
 	queryPagination,
 	queryPaginationNext,

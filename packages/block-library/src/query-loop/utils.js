@@ -23,7 +23,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 
 /**
- * The object used in Query block that contains info and helper mappings
+ * The object used in Query Loop block that contains info and helper mappings
  * from an array of WPTerm.
  *
  * @typedef {Object} QueryTermsInfo

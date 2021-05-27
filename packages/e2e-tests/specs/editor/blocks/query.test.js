@@ -17,12 +17,12 @@ const createDemoPosts = async () => {
 
 describe( 'Query block', () => {
 	beforeAll( async () => {
-		await activatePlugin( 'gutenberg-test-query-block' );
+		await activatePlugin( 'gutenberg-test-query-loop-block' );
 		await createDemoPosts();
 	} );
 	afterAll( async () => {
 		await trashAllPosts();
-		await deactivatePlugin( 'gutenberg-test-query-block' );
+		await deactivatePlugin( 'gutenberg-test-query-loop-block' );
 	} );
 	beforeEach( async () => {
 		await createNewPost( { postType: 'page', title: `Query Page` } );
@@ -30,9 +30,9 @@ describe( 'Query block', () => {
 	afterEach( async () => {
 		await trashAllPosts( 'page' );
 	} );
-	describe( 'Query block insertion', () => {
+	describe( 'Query Loop block insertion', () => {
 		it( 'Carousel', async () => {
-			await insertBlock( 'Query' );
+			await insertBlock( 'Query Loop' );
 			// Wait for pattern blocks to be loaded.
 			await page.waitForSelector(
 				'.block-editor-block-pattern-setup__container .wp-block-post-title'
@@ -42,14 +42,14 @@ describe( 'Query block', () => {
 			 * and navigating to the next pattern.
 			 */
 			await page.waitForSelector(
-				'li.pattern-slide.active-slide[aria-label="Query Test 1"]'
+				'li.pattern-slide.active-slide[aria-label="Query Loop Test 1"]'
 			);
 			const nextPatternButton = await page.waitForSelector(
 				'.block-editor-block-pattern-setup__navigation button[aria-label="Next pattern"]'
 			);
 			await nextPatternButton.click();
 			await page.waitForSelector(
-				'li.pattern-slide.active-slide[aria-label="Query Test 2"]'
+				'li.pattern-slide.active-slide[aria-label="Query Loop Test 2"]'
 			);
 			// Choose the selected pattern.
 			const chooseButton = await page.waitForXPath(
