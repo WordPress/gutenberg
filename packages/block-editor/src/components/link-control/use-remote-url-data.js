@@ -30,7 +30,9 @@ function useRemoteUrlData( url ) {
 
 	/**
 	 * Cancel any pending requests that were made for
-	 * stale URL values.
+	 * stale URL values. If the component does not unmount
+	 * we must handle cancelling the current request if
+	 * the URL changes otherwise we will see stale data.
 	 */
 	useEffect( () => {
 		cancelPendingFetch();
