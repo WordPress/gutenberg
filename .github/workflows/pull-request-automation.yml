@@ -1,0 +1,28 @@
+on:
+    pull_request_target:
+        types: [opened]
+    push:
+name: Pull request automation
+
+jobs:
+    pull-request-automation:
+        runs-on: ubuntu-latest
+        steps:
+            # Checkout defaults to using the branch which triggered the event, which
+            # isn't necessarily `trunk` (e.g. in the case of a merge).
+            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  ref: trunk
+
+            - name: Use Node.js 14.x
+              uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
+              with:
+                  node-version: 14.x
+
+            # Changing into the action's directory and running `npm install` is much
+            # faster than a full project-wide `npm ci`.
+            - run: cd packages/project-management-automation && npm install
+
+            - uses: ./packages/project-management-automation
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
