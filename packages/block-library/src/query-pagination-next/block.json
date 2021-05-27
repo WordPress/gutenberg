@@ -23,5 +23,7 @@
 			"fontSize": true,
 			"lineHeight": true
 		}
-	}
+	},
+	"editorStyle": "wp-block-query-pagination-next-editor",
+	"style": "wp-block-query-pagination-next"
 }

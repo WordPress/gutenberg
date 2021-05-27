@@ -23,5 +23,6 @@
 			"link": true
 		}
 	},
+	"editorStyle": "wp-block-post-comments-editor",
 	"style": "wp-block-post-comments"
 }

@@ -16,5 +16,6 @@
 		"customClassName": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-shortcode-editor"
+	"editorStyle": "wp-block-shortcode-editor",
+	"style": "wp-block-shortcode"
 }

@@ -17,5 +17,6 @@
 	"supports": {
 		"align": true
 	},
+	"editorStyle": "wp-block-calendar-editor",
 	"style": "wp-block-calendar"
 }

@@ -24,5 +24,7 @@
 	"supports": {
 		"reusable": false,
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-post-navigation-link-editor",
+	"style": "wp-block-post-navigation-link"
 }

@@ -14,5 +14,7 @@
 	"usesContext": [ "commentId" ],
 	"supports": {
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-post-comment-date-editor",
+	"style": "wp-block-post-comment-date"
 }

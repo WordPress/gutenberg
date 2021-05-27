@@ -21,5 +21,6 @@
 			"lineHeight": true
 		}
 	},
-	"editorStyle": "wp-block-term-description-editor"
+	"editorStyle": "wp-block-term-description-editor",
+	"style": "wp-block-term-description"
 }

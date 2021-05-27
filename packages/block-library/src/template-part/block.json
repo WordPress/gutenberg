@@ -31,5 +31,6 @@
 		},
 		"__experimentalLayout": true
 	},
-	"editorStyle": "wp-block-template-part-editor"
+	"editorStyle": "wp-block-template-part-editor",
+	"style": "wp-block-template-part"
 }

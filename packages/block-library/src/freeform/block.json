@@ -16,5 +16,6 @@
 		"customClassName": false,
 		"reusable": false
 	},
-	"editorStyle": "wp-block-freeform-editor"
+	"editorStyle": "wp-block-freeform-editor",
+	"style": "wp-block-freeform"
 }

@@ -12,5 +12,6 @@
 		"className": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-nextpage-editor"
+	"editorStyle": "wp-block-nextpage-editor",
+	"style": "wp-block-nextpage"
 }

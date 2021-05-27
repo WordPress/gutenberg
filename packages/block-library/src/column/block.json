@@ -28,5 +28,7 @@
 		"spacing": {
 			"padding": true
 		}
-	}
+	},
+	"editorStyle": "wp-block-column-editor",
+	"style": "wp-block-column"
 }

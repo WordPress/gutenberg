@@ -18,5 +18,6 @@
 			"fontSize": true
 		}
 	},
+	"editorStyle": "wp-block-code-editor",
 	"style": "wp-block-code"
 }
