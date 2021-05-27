@@ -1,4 +1,5 @@
 $block-editor-link-control-number-of-actions: 1;
+$preview-image-height: 140px;
 
 .block-editor-link-control {
 	position: relative;
@@ -243,8 +244,8 @@ $block-editor-link-control-number-of-actions: 1;
 		width: 100%;
 		background-color: $gray-100;
 		justify-content: center;
-		height: 180px; // limit height
-		max-height: 180px; // limit height
+		height: $preview-image-height; // limit height
+		max-height: $preview-image-height; // limit height
 		overflow: hidden;
 		border-radius: 2px;
 		margin-top: 12px;
@@ -252,8 +253,8 @@ $block-editor-link-control-number-of-actions: 1;
 		img {
 			display: block; // remove unwanted space below image
 			max-width: 100%;
-			height: 180px; // limit height
-			max-height: 180px; // limit height
+			height: $preview-image-height; // limit height
+			max-height: $preview-image-height; // limit height
 		}
 	}
 }
