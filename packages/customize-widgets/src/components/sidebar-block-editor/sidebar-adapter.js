@@ -182,8 +182,6 @@ export default class SidebarAdapter {
 			number = widgetModel.get( 'multi_number' );
 		}
 
-		widget.instance.is_widget_customizer_js_value = true;
-
 		const settingId = number
 			? `widget_${ widget.idBase }[${ number }]`
 			: `widget_${ widget.idBase }`;
