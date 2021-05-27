@@ -187,7 +187,7 @@ export function getColumnWidthsAsFrUnits( blocks ) {
 		getEffectiveColumnWidth( block, blocks.length )
 	);
 	const fractions = percentageWidths.map( ( width ) =>
-		toWidthPrecision( ( width / 100 ) * blocks.length )
+		width ? toWidthPrecision( ( width / 100 ) * blocks.length ) : 1
 	);
 	let fractionsString = '';
 

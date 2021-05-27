@@ -324,4 +324,15 @@ describe( 'getColumnWidthsAsFrUnits', () => {
 		const result = getColumnWidthsAsFrUnits( [] );
 		expect( result ).toBe( '' );
 	} );
+
+	it( 'treats 0 or empty widths as though no custom width is specified', () => {
+		const blocks = [
+			{ clientId: 'a', attributes: { width: 0 } },
+			{ clientId: 'b', attributes: { width: '' } },
+			{ clientId: 'c', attributes: { width: 33.33 } },
+		];
+
+		const result = getColumnWidthsAsFrUnits( blocks );
+		expect( result ).toBe( '1fr 1fr 1fr' );
+	} );
 } );
