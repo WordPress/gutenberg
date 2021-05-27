@@ -22,6 +22,7 @@ const config = require( '../config' );
  *
  * @property {boolean=} ci          Run on CI.
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
+ * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
 
 /**
@@ -260,6 +261,22 @@ async function runPerformanceTests( branches, options ) {
 	);
 
 	log( '>> Starting the WordPress environment' );
+	if ( options.wpVersion ) {
+		// Patch the environment's .wp-env.json config to use the specified WP version:
+		//
+		//     {
+		//         "core": "https://wordpress.org/wordpress-$VERSION",
+		//         ...
+		//     }
+		//
+		// Only use the major version, i.e. 5.7.2 becomes 5.7.
+		const major = options.wpVersion.split( '.' ).slice( 0, 2 ).join( '.' );
+		const zipUrl = `https:\\/\\/wordpress.org\\/wordpress-${ major }.zip`;
+		log( `Using WordPress version ${ major }` );
+		await runShellScript(
+			`sed -I '' -e '/"core":/s/WordPress\\/WordPress/${ zipUrl }/' "${ environmentDirectory }/.wp-env.json"`
+		);
+	}
 	await runShellScript( 'npm run wp-env start', environmentDirectory );
 
 	const testSuites = [ 'post-editor', 'site-editor' ];
