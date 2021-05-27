@@ -9,6 +9,8 @@ import type { CSSProperties } from 'react';
  */
 import type { Props as SurfaceProps } from '../surface/types';
 
+export type CardSizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
+
 export type CardProps = SurfaceProps & {
 	/**
 	 * Size of the elevation shadow, based on the Style system's elevation system.
@@ -42,6 +44,19 @@ export type CardProps = SurfaceProps & {
 	 * @default true
 	 */
 	isRounded?: boolean;
+	/**
+	 * Determines the amount of padding within the component.
+	 *
+	 * @default 'medium'
+	 */
+	size?: CardSizeOptions;
+	/**
+	 * Renders with elevation styles (box shadow).
+	 *
+	 * @default false
+	 * @deprecated
+	 */
+	isElevated?: boolean;
 };
 
 export type CardBodyProps = {
@@ -55,21 +70,43 @@ export type CardBodyProps = {
 	 * The children elements.
 	 */
 	children: React.ReactNode;
-};
-
-export type CardHeaderSize = 'medium' | 'small' | 'xSmall';
-
-export type CardHeaderProps = {
 	/**
-	 * Determines the size of `CardHeader`.
+	 * Renders with a light gray background color.
+	 *
+	 * @default false
+	 */
+	isShady?: boolean;
+	/**
+	 * Determines the amount of padding within the component.
 	 *
 	 * @default 'medium'
 	 */
-	size?: CardHeaderSize;
+	size?: CardSizeOptions;
+};
+
+export type CardHeaderProps = {
+	/**
+	 * Determines the minimum height of `CardHeader`.
+	 *
+	 * @default 'medium'
+	 */
+	minHeight?: CardSizeOptions;
 	/**
 	 * The children elements.
 	 */
 	children: React.ReactNode;
+	/**
+	 * Renders with a light gray background color.
+	 *
+	 * @default false
+	 */
+	isShady?: boolean;
+	/**
+	 * Determines the amount of padding within the component.
+	 *
+	 * @default 'medium'
+	 */
+	size?: CardSizeOptions;
 };
 
 export type CardFooterProps = CardHeaderProps & {

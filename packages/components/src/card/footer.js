@@ -23,6 +23,8 @@ function CardFooter( props, forwardedRef ) {
 	const {
 		className,
 		justify = 'flex-end',
+		minHeight = 'medium',
+		isShady = false,
 		size = 'medium',
 		...otherProps
 	} = useContextSystem( props, 'CardFooter' );
@@ -32,7 +34,9 @@ function CardFooter( props, forwardedRef ) {
 			cx(
 				styles.borderRadius,
 				styles.headerFooter,
-				styles[ size ],
+				styles.cardPaddings[ size ],
+				styles.minHeights[ minHeight ],
+				isShady ? styles.shady : undefined,
 				className
 			),
 		[ className, size ]

@@ -6,7 +6,7 @@ import { css } from 'emotion';
 /**
  * Internal dependencies
  */
-import CONFIG from '../utils/config-values';
+import { COLORS, CONFIG } from '../utils';
 
 export const Card = css`
 	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
@@ -24,21 +24,16 @@ export const Content = css`
 export const Body = css`
 	height: auto;
 	max-height: 100%;
-	padding: ${ CONFIG.cardPadding };
 `;
 
-export const InnerBody = css`
-	margin-left: calc( ${ CONFIG.cardPadding } * -1 );
-	margin-right: calc( ${ CONFIG.cardPadding } * -1 );
-`;
+// TODO: should we keep InnerBody?
+export const InnerBody = css``;
+//	margin-left: calc( ${ CONFIG.cardPadding } * -1 );
+//	margin-right: calc( ${ CONFIG.cardPadding } * -1 );
+//`;
 
 export const headerFooter = css`
 	border-color: ${ CONFIG.colorDivider };
-	min-height: ${ CONFIG.cardHeaderHeight };
-	padding-bottom: ${ CONFIG.cardHeaderFooterPaddingY };
-	padding-left: ${ CONFIG.cardPaddingX };
-	padding-right: ${ CONFIG.cardPaddingX };
-	padding-top: ${ CONFIG.cardHeaderFooterPaddingY };
 `;
 
 export const borderRadius = css`
@@ -61,12 +56,36 @@ export const rounded = css`
 	border-radius: ${ CONFIG.cardBorderRadius };
 `;
 
-export const small = css`
-	min-height: 30px;
-`;
+export const cardPaddings = {
+	large: css`
+		padding: ${ CONFIG.cardPaddingLarge };
+	`,
+	medium: css`
+		padding: ${ CONFIG.cardPaddingMedium };
+	`,
+	small: css`
+		padding: ${ CONFIG.cardPaddingSmall };
+	`,
+	xSmall: css`
+		padding: ${ CONFIG.cardPaddingXSmall };
+	`,
+};
 
-export const medium = css``;
+export const minHeights = {
+	large: css`
+		min-height: ${ CONFIG.cardHeaderHeightLarge };
+	`,
+	medium: css`
+		min-height: ${ CONFIG.cardHeaderHeightMedium };
+	`,
+	small: css`
+		min-height: ${ CONFIG.cardHeaderHeightSmall };
+	`,
+	xSmall: css`
+		min-height: ${ CONFIG.cardHeaderHeightXSmall };
+	`,
+};
 
-export const xSmall = css`
-	min-height: 24px;
+export const shady = css`
+	background-color: ${ COLORS.lightGray[ 200 ] };
 `;

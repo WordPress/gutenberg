@@ -21,13 +21,23 @@ import * as styles from './styles';
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardBody( props, forwardedRef ) {
-	const { className, scrollable = true, ...otherProps } = useContextSystem(
-		props,
-		'CardBody'
-	);
+	const {
+		className,
+		scrollable = true,
+		isShady = false,
+		size = 'medium',
+		...otherProps
+	} = useContextSystem( props, 'CardBody' );
 
 	const classes = useMemo(
-		() => cx( styles.Body, styles.borderRadius, className ),
+		() =>
+			cx(
+				styles.Body,
+				styles.borderRadius,
+				styles.cardPaddings[ size ],
+				isShady ? styles.shady : undefined,
+				className
+			),
 		[ className ]
 	);
 

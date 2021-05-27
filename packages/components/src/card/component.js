@@ -11,7 +11,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { contextConnect } from '../ui/context';
+import { contextConnect, ContextSystemProvider } from '../ui/context';
 import { Elevation } from '../elevation';
 import { View } from '../view';
 import * as styles from './styles';
@@ -23,7 +23,7 @@ import CONFIG from '../utils/config-values';
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Card( props, forwardedRef ) {
-	const { children, elevation, isRounded = true, ...otherProps } = useCard(
+	const { children, elevation, isRounded, size, ...otherProps } = useCard(
 		props
 	);
 	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
@@ -33,20 +33,34 @@ function Card( props, forwardedRef ) {
 		[ elevationBorderRadius ]
 	);
 
+	const contextProviderValue = {
+		CardBody: {
+			size,
+		},
+		CardHeader: {
+			size,
+		},
+		CardFooter: {
+			size,
+		},
+	};
+
 	return (
-		<View { ...otherProps } ref={ forwardedRef }>
-			<View className={ styles.Content }>{ children }</View>
-			<Elevation
-				className={ elevationClassName }
-				isInteractive={ false }
-				value={ elevation ? 1 : 0 }
-			/>
-			<Elevation
-				className={ elevationClassName }
-				isInteractive={ false }
-				value={ elevation }
-			/>
-		</View>
+		<ContextSystemProvider value={ contextProviderValue }>
+			<View { ...otherProps } ref={ forwardedRef }>
+				<View className={ styles.Content }>{ children }</View>
+				<Elevation
+					className={ elevationClassName }
+					isInteractive={ false }
+					value={ elevation ? 1 : 0 }
+				/>
+				<Elevation
+					className={ elevationClassName }
+					isInteractive={ false }
+					value={ elevation }
+				/>
+			</View>
+		</ContextSystemProvider>
 	);
 }
 

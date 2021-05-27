@@ -20,10 +20,13 @@ import * as styles from './styles';
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardHeader( props, forwardedRef ) {
-	const { className, size = 'medium', ...otherProps } = useContextSystem(
-		props,
-		'CardHeader'
-	);
+	const {
+		className,
+		minHeight = 'medium',
+		isShady = false,
+		size = 'medium',
+		...otherProps
+	} = useContextSystem( props, 'CardHeader' );
 
 	const classes = useMemo(
 		() =>
@@ -31,7 +34,9 @@ function CardHeader( props, forwardedRef ) {
 				styles.Header,
 				styles.borderRadius,
 				styles.headerFooter,
-				styles[ size ],
+				styles.cardPaddings[ size ],
+				styles.minHeights[ minHeight ],
+				isShady ? styles.shady : undefined,
 				className
 			),
 		[ className, size ]
