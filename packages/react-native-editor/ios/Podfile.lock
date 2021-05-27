@@ -424,7 +424,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 133d77d86b13cf694e014ab03dc2944ee3125d97
   react-native-slider: 2e42dc91e7ab8b35a9c7f2eb3532729a41d0dbe2
   react-native-video: e5dd0649534076cd6d09a0db51c617fa668d534a
-  react-native-webview: 1f56115845c98f0a59dfbbac685797c014a821be
+  react-native-webview: d78cb7d4e1ad2ce471965c2a9ed4f34d8ad7ddbd
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72
