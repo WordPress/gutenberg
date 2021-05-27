@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { DependencyList, RefCallback } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { useCallback, useRef } from '@wordpress/element';
@@ -17,14 +23,17 @@ import { useCallback, useRef } from '@wordpress/element';
  * to be removed. It *is* necessary if you add dependencies because the ref
  * callback will be called multiple times for the same node.
  *
- * @param {Function} callback     Callback with ref as argument.
- * @param {Array}    dependencies Dependencies of the callback.
+ * @param callback Callback with ref as argument.
+ * @param dependencies Dependencies of the callback.
  *
- * @return {Function} Ref callback.
+ * @return Ref callback.
  */
-export default function useRefEffect( callback, dependencies ) {
-	const cleanup = useRef();
-	return useCallback( ( node ) => {
+export default function useRefEffect< TElement = Node >(
+	callback: ( node: TElement ) => ( () => void ) | undefined,
+	dependencies: DependencyList
+): RefCallback< TElement | null > {
+	const cleanup = useRef< ( () => void ) | undefined >();
+	return useCallback( ( node: TElement | null ) => {
 		if ( node ) {
 			cleanup.current = callback( node );
 		} else if ( cleanup.current ) {
