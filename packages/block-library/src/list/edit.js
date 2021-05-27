@@ -137,6 +137,7 @@ export default function ListEdit( {
 	return (
 		<>
 			<RichText
+				className="wp-block-list"
 				identifier="values"
 				multiline="li"
 				tagName={ tagName }
