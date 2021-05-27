@@ -26,10 +26,13 @@ import { useBlockClassNames } from './use-block-class-names';
 import { useBlockDefaultClassName } from './use-block-default-class-name';
 import { useBlockCustomClassName } from './use-block-custom-class-name';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
-import { useEventHandlers } from './use-event-handlers';
+import { useFocusHandler } from './use-focus-handler';
+import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
-import { useBlockNodes } from './use-block-nodes';
 import { useScrollIntoView } from './use-scroll-into-view';
+import { useBlockRefProvider } from './use-block-refs';
+import { useMultiSelection } from './use-multi-selection';
+import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
 
 /**
@@ -55,10 +58,11 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
-	const { clientId, index, className, wrapperProps = {} } = useContext(
+	const { clientId, className, wrapperProps = {} } = useContext(
 		BlockListBlockContext
 	);
 	const {
+		index,
 		mode,
 		name,
 		blockTitle,
@@ -68,6 +72,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlockRootClientId,
+				getBlockIndex,
 				getBlockMode,
 				getBlockName,
 				isTyping,
@@ -82,7 +88,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
+			const rootClientId = getBlockRootClientId( clientId );
 			return {
+				index: getBlockIndex( clientId, rootClientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
 				blockTitle: getBlockType( blockName ).title,
@@ -105,10 +113,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusFirstElement( clientId ),
 		// Must happen after focus because we check for focus in the block.
 		useScrollIntoView( clientId ),
-		useBlockNodes( clientId ),
+		useBlockRefProvider( clientId ),
+		useFocusHandler( clientId ),
+		useMultiSelection( clientId ),
 		useEventHandlers( clientId ),
 		useNavModeExit( clientId ),
 		useIsHovered(),
+		useIntersectionObserver(),
 		useMovingAnimation( {
 			isSelected: isPartOfSelection,
 			adjustScrolling,
@@ -129,6 +140,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-type': name,
 		'data-title': blockTitle,
 		className: classnames(
+			// The wp-block className is important for editor styles.
+			'wp-block block-editor-block-list__block',
 			className,
 			props.className,
 			wrapperProps.className,

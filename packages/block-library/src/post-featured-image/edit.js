@@ -112,7 +112,7 @@ function PostFeaturedImageDisplay( {
 					/>
 				) }
 			</BlockControls>
-			<div { ...useBlockProps() }>{ image }</div>
+			<figure { ...useBlockProps() }>{ image }</figure>
 		</>
 	);
 }
@@ -120,8 +120,9 @@ function PostFeaturedImageDisplay( {
 const PostFeaturedImageWithNotices = withNotices( PostFeaturedImageDisplay );
 
 export default function PostFeaturedImageEdit( props ) {
+	const blockProps = useBlockProps();
 	if ( ! props.context?.postId ) {
-		return placeholderChip;
+		return <div { ...blockProps }>{ placeholderChip }</div>;
 	}
 	return <PostFeaturedImageWithNotices { ...props } />;
 }

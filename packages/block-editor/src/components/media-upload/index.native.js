@@ -5,6 +5,8 @@ import { Platform } from 'react-native';
 
 import { delay } from 'lodash';
 
+import prompt from 'react-native-prompt-android';
+
 /**
  * WordPress dependencies
  */
@@ -22,6 +24,7 @@ import {
 	image,
 	wordpress,
 	mobile,
+	globe,
 } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
@@ -111,11 +114,20 @@ export class MediaUpload extends Component {
 			mediaLibrary: true,
 		};
 
+		const urlSource = {
+			id: 'URL',
+			value: 'URL',
+			label: __( 'Insert from URL' ),
+			types: [ MEDIA_TYPE_AUDIO ],
+			icon: globe,
+		};
+
 		const internalSources = [
 			deviceLibrarySource,
 			cameraImageSource,
 			cameraVideoSource,
 			siteLibrarySource,
+			urlSource,
 		];
 
 		return internalSources.concat( this.state.otherMediaOptions );
@@ -166,7 +178,34 @@ export class MediaUpload extends Component {
 	}
 
 	onPickerSelect( value ) {
-		const { allowedTypes = [], onSelect, multiple = false } = this.props;
+		const {
+			allowedTypes = [],
+			onSelect,
+			onSelectURL,
+			multiple = false,
+		} = this.props;
+
+		if ( value === 'URL' ) {
+			prompt(
+				__( 'Type a URL' ), // title
+				undefined, // message
+				[
+					{
+						text: __( 'Cancel' ),
+						style: 'cancel',
+					},
+					{
+						text: __( 'Apply' ),
+						onPress: onSelectURL,
+					},
+				], // buttons
+				'plain-text', // type
+				undefined, // defaultValue
+				'url' // keyboardType
+			);
+			return;
+		}
+
 		const mediaSource = this.getAllSources()
 			.filter( ( source ) => source.value === value )
 			.shift();

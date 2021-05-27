@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### New Feature
+
+-   New `build/polyfill.js` (minified version – `build/polyfill.min.js`) file is available that polyfills ECMAScript features missing in the [browsers supported](https://make.wordpress.org/core/handbook/best-practices/browser-support/) by the WordPress project. It's a drop-in replacement for the deprecated `@babel/polyfill` package ([#31279](https://github.com/WordPress/gutenberg/pull/31279)).
+
+## 6.1.0 (2021-05-20)
+
+### Bug Fixes
+
+-   Configure `@babel/preset-env` preset to respect a local Browserslist configuration.
+
+## 6.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
 ## 5.2.0 (2021-04-06)
 
 ### Enhancements

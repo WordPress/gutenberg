@@ -1,0 +1,49 @@
+.customize-widgets-welcome-guide {
+	&__image__wrapper {
+		background: #00a0d2;
+		text-align: center;
+		margin-bottom: $grid-unit-10;
+	}
+
+	&__image {
+		height: 240px;
+
+		&__prm-r {
+			display: none;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			&__prm-r {
+				display: block;
+			}
+
+			&__prm-np {
+				display: none;
+			}
+		}
+	}
+
+	// Extra specificity to override `.wrap h1` styles.
+	.wrap &__heading {
+		font-size: 18px;
+		font-weight: 600;
+	}
+
+	&__text {
+		line-height: 1.7;
+	}
+
+	&__button {
+		justify-content: center;
+		margin: 1em 0;
+		width: 100%;
+	}
+
+	&__separator {
+		margin: 1em 0;
+	}
+
+	&__more-info {
+		line-height: 1.4;
+	}
+}

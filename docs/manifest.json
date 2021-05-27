@@ -72,6 +72,12 @@
 		"parent": "create-block"
 	},
 	{
+		"title": "Full Site Editing",
+		"slug": "full-site-editing",
+		"markdown_source": "../docs/getting-started/full-site-editing.md",
+		"parent": "handbook"
+	},
+	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
@@ -288,16 +294,28 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Feature Flags",
-		"slug": "feature-flags",
-		"markdown_source": "../docs/how-to-guides/feature-flags.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Theming for the Block Editor",
+		"title": "Themes",
 		"slug": "themes",
 		"markdown_source": "../docs/how-to-guides/themes/README.md",
 		"parent": "how-to-guides"
+	},
+	{
+		"title": "Block Theme",
+		"slug": "block-theme-overview",
+		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
+		"parent": "themes"
+	},
+	{
+		"title": "Create a block theme",
+		"slug": "create-block-theme",
+		"markdown_source": "../docs/how-to-guides/themes/create-block-theme.md",
+		"parent": "themes"
+	},
+	{
+		"title": "Global Settings & Styles (theme.json)",
+		"slug": "theme-json",
+		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
+		"parent": "themes"
 	},
 	{
 		"title": "Theme Support",
@@ -306,22 +324,10 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Themes & Block Editor: experimental theme.json",
-		"slug": "theme-json",
-		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Creating a block-based theme",
-		"slug": "block-based-theme",
-		"markdown_source": "../docs/how-to-guides/block-based-theme/README.md",
+		"title": "Feature Flags",
+		"slug": "feature-flags",
+		"markdown_source": "../docs/how-to-guides/feature-flags.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Adding blocks to your theme",
-		"slug": "block-based-themes-2-adding-blocks",
-		"markdown_source": "../docs/how-to-guides/block-based-theme/block-based-themes-2-adding-blocks.md",
-		"parent": "block-based-theme"
 	},
 	{
 		"title": "Backward Compatibility",
@@ -426,6 +432,30 @@
 		"parent": "how-to-guides"
 	},
 	{
+		"title": "Widgets",
+		"slug": "widgets",
+		"markdown_source": "../docs/how-to-guides/widgets/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Widgets Block Editor overview",
+		"slug": "overview",
+		"markdown_source": "../docs/how-to-guides/widgets/overview.md",
+		"parent": "widgets"
+	},
+	{
+		"title": "Restoring the classic Widgets Editor",
+		"slug": "opting-out",
+		"markdown_source": "../docs/how-to-guides/widgets/opting-out.md",
+		"parent": "widgets"
+	},
+	{
+		"title": "About the Legacy Widget block",
+		"slug": "legacy-widget-block",
+		"markdown_source": "../docs/how-to-guides/widgets/legacy-widget-block.md",
+		"parent": "widgets"
+	},
+	{
 		"title": "Reference Guides",
 		"slug": "reference-guides",
 		"markdown_source": "../docs/reference-guides/README.md",
@@ -489,6 +519,12 @@
 		"title": "Registration",
 		"slug": "block-registration",
 		"markdown_source": "../docs/reference-guides/block-api/block-registration.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Styles",
+		"slug": "block-styles",
+		"markdown_source": "../docs/reference-guides/block-api/block-styles.md",
 		"parent": "block-api"
 	},
 	{
@@ -738,6 +774,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Divider",
+		"slug": "divider",
+		"markdown_source": "../packages/components/src/divider/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Draggable",
 		"slug": "draggable",
 		"markdown_source": "../packages/components/src/draggable/README.md",
@@ -768,15 +810,33 @@
 		"parent": "components"
 	},
 	{
+		"title": "Elevation",
+		"slug": "elevation",
+		"markdown_source": "../packages/components/src/elevation/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ExternalLink",
 		"slug": "external-link",
 		"markdown_source": "../packages/components/src/external-link/README.md",
 		"parent": "components"
 	},
 	{
+		"title": "FlexBlock",
+		"slug": "flex-block",
+		"markdown_source": "../packages/components/src/flex/flex-block/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "FlexItem",
+		"slug": "flex-item",
+		"markdown_source": "../packages/components/src/flex/flex-item/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Flex",
 		"slug": "flex",
-		"markdown_source": "../packages/components/src/flex/README.md",
+		"markdown_source": "../packages/components/src/flex/flex/README.md",
 		"parent": "components"
 	},
 	{
@@ -816,9 +876,27 @@
 		"parent": "components"
 	},
 	{
+		"title": "Grid",
+		"slug": "grid",
+		"markdown_source": "../packages/components/src/grid/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Guide",
 		"slug": "guide",
 		"markdown_source": "../packages/components/src/guide/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "HStack",
+		"slug": "h-stack",
+		"markdown_source": "../packages/components/src/h-stack/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Heading",
+		"slug": "heading",
+		"markdown_source": "../packages/components/src/heading/README.md",
 		"parent": "components"
 	},
 	{
@@ -1038,6 +1116,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Spacer",
+		"slug": "spacer",
+		"markdown_source": "../packages/components/src/spacer/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Spinner",
 		"slug": "spinner",
 		"markdown_source": "../packages/components/src/spinner/README.md",
@@ -1086,6 +1170,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToolbarDropdownMenu",
+		"slug": "toolbar-dropdown-menu",
+		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToolbarGroup",
 		"slug": "toolbar-group",
 		"markdown_source": "../packages/components/src/toolbar-group/README.md",
@@ -1122,15 +1212,33 @@
 		"parent": "components"
 	},
 	{
+		"title": "Truncate",
+		"slug": "truncate",
+		"markdown_source": "../packages/components/src/truncate/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "UnitControl",
 		"slug": "unit-control",
 		"markdown_source": "../packages/components/src/unit-control/README.md",
 		"parent": "components"
 	},
 	{
+		"title": "VStack",
+		"slug": "v-stack",
+		"markdown_source": "../packages/components/src/v-stack/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "VisuallyHidden",
 		"slug": "visually-hidden",
 		"markdown_source": "../packages/components/src/visually-hidden/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ZStack",
+		"slug": "z-stack",
+		"markdown_source": "../packages/components/src/z-stack/README.md",
 		"parent": "components"
 	},
 	{
@@ -1635,6 +1743,12 @@
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/widgets",
+		"slug": "packages-widgets",
+		"markdown_source": "../packages/widgets/README.md",
 		"parent": "packages"
 	},
 	{

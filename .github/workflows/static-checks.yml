@@ -5,7 +5,15 @@ on:
     push:
         branches:
             - trunk
+            - 'release/**'
             - 'wp/**'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
 
 jobs:
     check:
@@ -41,9 +49,6 @@ jobs:
 
             - name: Lint JavaScript and Styles
               run: npm run lint
-
-            - name: Lint ES5 built files (IE11)
-              run: npx eslint --parser-options=ecmaVersion:5 --no-eslintrc --no-ignore ./build/**/*.js
 
             - name: Type checking
               run: npm run build:package-types

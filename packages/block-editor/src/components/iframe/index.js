@@ -6,10 +6,17 @@ import {
 	createPortal,
 	useCallback,
 	forwardRef,
+	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { useBlockSelectionClearer } from '../block-selection-clearer';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -49,6 +56,13 @@ function styleSheetsCompat( doc ) {
 		);
 
 		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Stylesheet ${ ownerNode.id } was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`,
+				ownerNode
+			);
 			doc.head.appendChild( ownerNode.cloneNode( true ) );
 		}
 	} );
@@ -117,25 +131,43 @@ function setBodyClassName( doc ) {
 	for ( const name of document.body.classList ) {
 		if ( name.startsWith( 'admin-color-' ) ) {
 			doc.body.classList.add( name );
+		} else if ( name === 'wp-embed-responsive' ) {
+			// Ideally ALL classes that are added through get_body_class should
+			// be added in the editor too, which we'll somehow have to get from
+			// the server in the future (which will run the PHP filters).
+			doc.body.classList.add( 'wp-embed-responsive' );
 		}
 	}
 }
 
-/**
- * Sets the document head and default styles.
- *
- * @param {Document} doc  Document to set the head for.
- * @param {string}   head HTML to set as the head.
- */
-function setHead( doc, head ) {
-	doc.head.innerHTML =
-		// Body margin must be overridable by themes.
-		'<style>body{margin:0}</style>' + head;
+function useParsedAssets( html ) {
+	return useMemo( () => {
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = html;
+		return Array.from( doc.body.children );
+	}, [ html ] );
 }
 
-function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
-	const [ iframeDocument, setIframeDocument ] = useState();
+async function loadScript( doc, { id, src } ) {
+	return new Promise( ( resolve, reject ) => {
+		const script = doc.createElement( 'script' );
+		script.id = id;
+		if ( src ) {
+			script.src = src;
+			script.onload = () => resolve();
+			script.onerror = () => reject();
+		} else {
+			resolve();
+		}
+		doc.head.appendChild( script );
+	} );
+}
 
+function Iframe( { contentRef, children, head, ...props }, ref ) {
+	const [ iframeDocument, setIframeDocument ] = useState();
+	const styles = useParsedAssets( window.__editorAssets.styles );
+	const scripts = useParsedAssets( window.__editorAssets.scripts );
+	const clearerRef = useBlockSelectionClearer();
 	const setRef = useCallback( ( node ) => {
 		if ( ! node ) {
 			return;
@@ -143,7 +175,7 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 
 		function setDocumentIfReady() {
 			const { contentDocument } = node;
-			const { readyState, body } = contentDocument;
+			const { readyState, body, documentElement } = contentDocument;
 
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
@@ -155,12 +187,18 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 				contentRef.current = body;
 			}
 
-			setHead( contentDocument, headHTML );
 			setBodyClassName( contentDocument );
-			styleSheetsCompat( contentDocument );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
 			setIframeDocument( contentDocument );
+			clearerRef( documentElement );
+			clearerRef( body );
+
+			scripts.reduce(
+				( promise, script ) =>
+					promise.then( () => loadScript( contentDocument, script ) ),
+				Promise.resolve()
+			);
 
 			return true;
 		}
@@ -175,6 +213,25 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 		} );
 	}, [] );
 
+	useEffect( () => {
+		if ( iframeDocument ) {
+			styleSheetsCompat( iframeDocument );
+		}
+	}, [ iframeDocument ] );
+
+	head = (
+		<>
+			<style>{ 'body{margin:0}' }</style>
+			{ styles.map( ( { tagName, href, id, rel, media }, index ) => {
+				const TagName = tagName.toLowerCase();
+				return (
+					<TagName { ...{ href, id, rel, media } } key={ index } />
+				);
+			} ) }
+			{ head }
+		</>
+	);
+
 	return (
 		<iframe
 			{ ...props }
@@ -185,7 +242,7 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 		>
 			{ iframeDocument &&
 				createPortal(
-					<StyleProvider iframeDocument={ iframeDocument }>
+					<StyleProvider document={ iframeDocument }>
 						{ children }
 					</StyleProvider>,
 					iframeDocument.body

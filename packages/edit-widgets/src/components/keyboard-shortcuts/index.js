@@ -8,6 +8,7 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { store as editWidgetsStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { redo, undo } = useDispatch( 'core' );
+	const { redo, undo } = useDispatch( coreStore );
 	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
 
 	useShortcut(
@@ -79,6 +80,16 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'primary',
 				character: 's',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-widgets/keyboard-shortcuts',
+			category: 'main',
+			description: __( 'Display these keyboard shortcuts.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'h',
 			},
 		} );
 	}, [ registerShortcut ] );

@@ -27,7 +27,10 @@ const PostFormatSuggestion = ( {
 	suggestionText,
 	onUpdatePostFormat,
 } ) => (
-	<Button isLink onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }>
+	<Button
+		variant="link"
+		onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }
+	>
 		{ suggestionText }
 	</Button>
 );

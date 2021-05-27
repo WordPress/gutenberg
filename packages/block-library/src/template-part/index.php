@@ -55,7 +55,7 @@ function render_block_core_template_part( $attributes ) {
 			// render the corresponding file content.
 			$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
 			if ( 0 === validate_file( $attributes['slug'] ) && file_exists( $template_part_file_path ) ) {
-				$content = _inject_theme_attribute_in_content( file_get_contents( $template_part_file_path ) );
+				$content = _gutenberg_inject_theme_attribute_in_content( file_get_contents( $template_part_file_path ) );
 			}
 		}
 	}
@@ -109,18 +109,45 @@ function render_block_core_template_part( $attributes ) {
 	$content = do_shortcode( $content );
 
 	if ( empty( $attributes['tagName'] ) ) {
-		$area_tags = array(
-			WP_TEMPLATE_PART_AREA_HEADER        => 'header',
-			WP_TEMPLATE_PART_AREA_FOOTER        => 'footer',
-			WP_TEMPLATE_PART_AREA_UNCATEGORIZED => 'div',
-		);
-		$html_tag  = null !== $area && isset( $area_tags[ $area ] ) ? $area_tags[ $area ] : $area_tags[ WP_TEMPLATE_PART_AREA_UNCATEGORIZED ];
+		$defined_areas = gutenberg_get_allowed_template_part_areas();
+		$area_tag      = 'div';
+		foreach ( $defined_areas as $defined_area ) {
+			if ( $defined_area['area'] === $area && isset( $defined_area['area_tag'] ) ) {
+				$area_tag = $defined_area['area_tag'];
+			}
+		}
+		$html_tag = $area_tag;
 	} else {
 		$html_tag = esc_attr( $attributes['tagName'] );
 	}
 	$wrapper_attributes = get_block_wrapper_attributes();
 
 	return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
+}
+
+/**
+ * Returns an array of variation objects for the template part block.
+ *
+ * @return array Array containing the block variation objects.
+ */
+function build_template_part_block_variations() {
+	$variations    = array();
+	$defined_areas = gutenberg_get_allowed_template_part_areas();
+	foreach ( $defined_areas as $area ) {
+		if ( 'uncategorized' !== $area['area'] ) {
+			$variations[] = array(
+				'name'        => $area['area'],
+				'title'       => $area['label'],
+				'description' => $area['description'],
+				'attributes'  => array(
+					'area' => $area['area'],
+				),
+				'scope'       => array( 'inserter' ),
+				'icon'        => $area['icon'],
+			);
+		}
+	}
+	return $variations;
 }
 
 /**
@@ -131,6 +158,7 @@ function register_block_core_template_part() {
 		__DIR__ . '/template-part',
 		array(
 			'render_callback' => 'render_block_core_template_part',
+			'variations'      => build_template_part_block_variations(),
 		)
 	);
 }

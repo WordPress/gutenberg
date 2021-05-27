@@ -1,0 +1,75 @@
+.wp-block-post-comments {
+	.commentlist {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		.comment {
+			min-height: 2.25em;
+			padding-left: 3.25em;
+
+			p {
+				font-size: 0.875em;
+				line-height: 1.8;
+				margin: 0.36em 0 1.4em;
+			}
+		}
+
+		.children {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+	}
+
+	.comment-author {
+		line-height: 1.5;
+		margin-left: -3.25em;
+
+		.avatar {
+			border-radius: 1.5em;
+			display: block;
+			float: left;
+			height: 2.5em;
+			margin-right: 0.75em;
+			width: 2.5em;
+		}
+
+		cite {
+			font-style: normal;
+		}
+	}
+
+	.comment-meta {
+		line-height: 1.5;
+		margin-left: -3.25em;
+	}
+
+	.comment-body .commentmetadata {
+		font-size: 0.75em;
+	}
+
+	.comment-form-comment,
+	.comment-form-author,
+	.comment-form-email,
+	.comment-form-url {
+		label {
+			display: block;
+		}
+	}
+
+	.comment-form-comment textarea {
+		box-sizing: border-box;
+		width: 100%;
+	}
+
+	.reply {
+		font-size: 0.75em;
+		margin-bottom: 1.4em;
+	}
+
+	textarea,
+	input {
+		border: 1px solid $gray-600;
+	}
+}

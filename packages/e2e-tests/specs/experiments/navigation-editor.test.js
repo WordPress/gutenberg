@@ -3,6 +3,7 @@
  */
 import {
 	createJSONResponse,
+	pressKeyTimes,
 	pressKeyWithModifier,
 	setUpResponseMocking,
 	visitAdminPage,
@@ -381,12 +382,12 @@ describe( 'Navigation editor', () => {
 			await pressKeyWithModifier( 'primary', 'A' );
 		}
 	} );
+
 	describe( 'Menu name editor', () => {
 		const initialMenuName = 'Main Menu';
-		const navigationNameEditorSelector =
-			'.block-editor-block-inspector .edit-navigation-name-editor__text-control';
-		const inputSelector = `${ navigationNameEditorSelector } input`;
-		let navigatorNameEditor, input;
+		const nameEditorSelector = '.edit-navigation-name-editor__text-control';
+		const inputSelector = `${ nameEditorSelector } input`;
+
 		beforeEach( async () => {
 			const menuPostResponse = {
 				id: 4,
@@ -406,15 +407,9 @@ describe( 'Navigation editor', () => {
 			] );
 
 			await visitNavigationEditor();
-			const navBlock = await page.waitForSelector(
-				'div[aria-label="Block: Navigation"]'
-			);
-			const boundingBox = await navBlock.boundingBox();
-			// click on the navigation editor placeholder.
-			await page.mouse.click( boundingBox.x + 25, boundingBox.y + 25 );
 
-			navigatorNameEditor = await page.$( navigationNameEditorSelector );
-			input = await page.$( inputSelector );
+			// Wait for the navigation setting sidebar.
+			await page.waitForSelector( '.edit-navigation-sidebar' );
 		} );
 
 		afterEach( async () => {
@@ -422,7 +417,8 @@ describe( 'Navigation editor', () => {
 		} );
 
 		it( 'is displayed in inspector additions', async () => {
-			expect( navigatorNameEditor ).toBeDefined();
+			const nameControl = await page.$( nameEditorSelector );
+			expect( nameControl ).toBeDefined();
 		} );
 
 		it( 'saves menu name upon clicking save button', async () => {
@@ -444,33 +440,26 @@ describe( 'Navigation editor', () => {
 				...getMenuItemMocks( { GET: [] } ),
 			] );
 
-			await input.focus();
-			// clear input
-			const oldName = await page.$eval(
-				inputSelector,
-				( el ) => el.value
-			);
-			for ( let i = 0; i < oldName.length; i++ ) {
-				await page.keyboard.press( 'Backspace' );
-			}
-			await input.type( newName );
+			// Ensure there is focus.
+			await page.focus( inputSelector );
+			await pressKeyTimes( 'Backspace', initialMenuName.length );
+			await page.keyboard.type( newName );
 
 			const saveButton = await page.$(
 				'.edit-navigation-toolbar__save-button'
 			);
 			await saveButton.click();
 			await page.waitForSelector( '.components-snackbar' );
-			const menuNameButton = await page.waitForXPath(
-				'//button[contains(@aria-label, "Edit menu name: ' +
-					newName +
-					'" ) ]'
+			const headerSubtitle = await page.waitForSelector(
+				'.edit-navigation-header__subtitle'
 			);
-			expect( menuNameButton ).toBeTruthy();
-			const menuNameButtonText = await menuNameButton.evaluate(
+			expect( headerSubtitle ).toBeTruthy();
+			const headerSubtitleText = await headerSubtitle.evaluate(
 				( element ) => element.innerText
 			);
-			expect( menuNameButtonText ).toBe( newName );
+			expect( headerSubtitleText ).toBe( `Editing: ${ newName }` );
 		} );
+
 		it( 'does not save a menu name upon clicking save button when name is empty', async () => {
 			const menuPostResponse = {
 				id: 4,
@@ -488,26 +477,86 @@ describe( 'Navigation editor', () => {
 				} ),
 				...getMenuItemMocks( { GET: [] } ),
 			] );
-			await input.focus();
-			const oldName = await page.$eval(
-				inputSelector,
-				( el ) => el.value
-			);
-			for ( let i = 0; i < oldName.length; i++ ) {
-				await page.keyboard.press( 'Backspace' );
-			}
+
+			// Ensure there is focus.
+			await page.focus( inputSelector );
+			await pressKeyTimes( 'Backspace', initialMenuName.length );
+
 			const saveButton = await page.$(
 				'.edit-navigation-toolbar__save-button'
 			);
 			await saveButton.click();
 			await page.waitForSelector( '.components-snackbar' );
-			const menuNameButton = await page.waitForXPath(
-				'//button[contains(@aria-label, "Edit menu name" ) ]'
+			const headerSubtitle = await page.waitForSelector(
+				'.edit-navigation-header__subtitle'
 			);
-			const menuNameButtonText = await menuNameButton.evaluate(
+			expect( headerSubtitle ).toBeTruthy();
+			const headerSubtitleText = await headerSubtitle.evaluate(
 				( element ) => element.innerText
 			);
-			expect( menuNameButtonText ).toBe( oldName );
+			expect( headerSubtitleText ).toBe(
+				`Editing: ${ initialMenuName }`
+			);
+		} );
+	} );
+
+	describe( 'Change detections', () => {
+		beforeEach( async () => {
+			const menuPostResponse = {
+				id: 4,
+				description: '',
+				name: 'Main',
+				slug: 'main-menu',
+				meta: [],
+				auto_add: false,
+			};
+
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ menuPostResponse ],
+					POST: menuPostResponse,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+
+			await visitNavigationEditor();
+		} );
+
+		afterEach( async () => {
+			await setUpResponseMocking( [] );
+		} );
+
+		async function assertIsDirty( isDirty ) {
+			let hadDialog = false;
+
+			function handleOnDialog() {
+				hadDialog = true;
+			}
+
+			try {
+				page.on( 'dialog', handleOnDialog );
+				await page.reload();
+
+				// Ensure whether it was expected that dialog was encountered.
+				expect( hadDialog ).toBe( isDirty );
+			} catch ( error ) {
+				throw error;
+			} finally {
+				page.removeListener( 'dialog', handleOnDialog );
+			}
+		}
+
+		it.skip( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
+			await assertIsDirty( false );
+		} );
+
+		it.skip( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
+			await page.type(
+				'.edit-navigation-name-editor__text-control input',
+				' Menu'
+			);
+
+			await assertIsDirty( true );
 		} );
 	} );
 } );

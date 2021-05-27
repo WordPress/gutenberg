@@ -18,7 +18,7 @@ import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import BoxControlIcon from './icon';
-import Text from '../text';
+import { Text } from '../text';
 import LinkedButton from './linked-button';
 import Visualizer from './visualizer';
 import {
@@ -126,7 +126,7 @@ export default function BoxControl( {
 				<FlexItem>
 					<Button
 						className="component-box-control__reset-button"
-						isSecondary
+						variant="secondary"
 						isSmall
 						onClick={ handleOnReset }
 						disabled={ ! isDirty }

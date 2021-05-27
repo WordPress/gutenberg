@@ -10,7 +10,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import SaveButton from './save-button';
 import MenuSwitcher from '../menu-switcher';
-import { useMenuEntity } from '../../hooks';
+import { useMenuEntityProp } from '../../hooks';
 
 export default function Header( {
 	isMenuSelected,
@@ -20,8 +20,7 @@ export default function Header( {
 	isPending,
 	navigationPost,
 } ) {
-	const { editedMenu: selectedMenu } = useMenuEntity( selectedMenuId );
-	const menuName = selectedMenu ? selectedMenu.name : undefined;
+	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
 	let actionHeaderText;
 
 	if ( menuName ) {
@@ -57,7 +56,7 @@ export default function Header( {
 								'Switch menu, or create a new menu'
 							),
 							showTooltip: false,
-							isTertiary: true,
+							variant: 'tertiary',
 							disabled: ! menus?.length,
 							__experimentalIsFocusable: true,
 						} }

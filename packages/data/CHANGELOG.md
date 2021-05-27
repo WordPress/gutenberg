@@ -1,7 +1,23 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 5.1.0 (2021-05-20)
+
+## 5.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
+### New Features
+
 -   Added new `startResolutions` and `finishResolutions` actions as batched variants of `startResolution` and `finishResolutions` actions.
+
+### Enhancements
+
+-   Updated `redux` dependency from requiring `^4.0.0` to `^4.1.0` (see changes at https://github.com/reduxjs/redux/releases/tag/v4.1.0).
 
 ## 4.27.0 (2021-03-17)
 

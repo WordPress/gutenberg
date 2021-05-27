@@ -14,7 +14,7 @@
 function gutenberg_register_border_support( $block_type ) {
 	// Determine if any border related features are supported.
 	$has_border_support       = gutenberg_block_has_support( $block_type, array( '__experimentalBorder' ) );
-	$has_border_color_support = gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'color' ) );
+	$has_border_color_support = gutenberg_has_border_feature_support( $block_type, 'color' );
 
 	// Setup attributes and styles within that if needed.
 	if ( ! $block_type->attributes ) {
@@ -53,7 +53,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Border radius.
 	if (
-		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'radius' ) ) &&
+		gutenberg_has_border_feature_support( $block_type, 'radius' ) &&
 		isset( $block_attributes['style']['border']['radius'] )
 	) {
 		$border_radius = (int) $block_attributes['style']['border']['radius'];
@@ -62,7 +62,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Border style.
 	if (
-		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'style' ) ) &&
+		gutenberg_has_border_feature_support( $block_type, 'style' ) &&
 		isset( $block_attributes['style']['border']['style'] )
 	) {
 		$border_style = $block_attributes['style']['border']['style'];
@@ -71,7 +71,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 
 	// Border width.
 	if (
-		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'width' ) ) &&
+		gutenberg_has_border_feature_support( $block_type, 'width' ) &&
 		isset( $block_attributes['style']['border']['width'] )
 	) {
 		$border_width = intval( $block_attributes['style']['border']['width'] );
@@ -79,7 +79,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	}
 
 	// Border color.
-	if ( gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'color' ) ) ) {
+	if ( gutenberg_has_border_feature_support( $block_type, 'color' ) ) {
 		$has_named_border_color  = array_key_exists( 'borderColor', $block_attributes );
 		$has_custom_border_color = isset( $block_attributes['style']['border']['color'] );
 
@@ -123,6 +123,34 @@ function gutenberg_skip_border_serialization( $block_type ) {
 	return is_array( $border_support ) &&
 		array_key_exists( '__experimentalSkipSerialization', $border_support ) &&
 		$border_support['__experimentalSkipSerialization'];
+}
+
+/**
+ * Checks whether the current block type supports the border feature requested.
+ *
+ * If the `__experimentalBorder` support flag is a boolean `true` all border
+ * support features are available. Otherwise, the specific feature's support
+ * flag nested under `experimentalBorder` must be enabled for the feature
+ * to be opted into.
+ *
+ * @param WP_Block_Type $block_type Block type to check for support.
+ * @param string        $feature    Name of the feature to check support for.
+ * @param mixed         $default    Fallback value for feature support, defaults to false.
+ *
+ * @return boolean                  Whether or not the feature is supported.
+ */
+function gutenberg_has_border_feature_support( $block_type, $feature, $default = false ) {
+	// Check if all border support features have been opted into via `"__experimentalBorder": true`.
+	if (
+		property_exists( $block_type, 'supports' ) &&
+		( true === _wp_array_get( $block_type->supports, array( '__experimentalBorder' ), $default ) )
+	) {
+		return true;
+	}
+
+	// Check if the specific feature has been opted into individually
+	// via nested flag under `__experimentalBorder`.
+	return gutenberg_block_has_support( $block_type, array( '__experimentalBorder', $feature ), $default );
 }
 
 // Register the block support.

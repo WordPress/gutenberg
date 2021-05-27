@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { mapping, processingQueue } from '../reducer';
+import { mapping, processingQueue, selectedMenuId } from '../reducer';
 
 describe( 'mapping', () => {
 	it( 'should initialize empty mapping when there is no original state', () => {
@@ -174,5 +174,17 @@ describe( 'processingQueue', () => {
 				pendingActions: [ 'first action', 'another action' ],
 			},
 		} );
+	} );
+} );
+
+describe( 'selectedMenuId', () => {
+	it( 'should apply default state', () => {
+		expect( selectedMenuId( undefined, {} ) ).toEqual( 0 );
+	} );
+
+	it( 'should update when a new menu is selected', () => {
+		expect(
+			selectedMenuId( 1, { type: 'SET_SELECTED_MENU_ID', menuId: 2 } )
+		).toBe( 2 );
 	} );
 } );

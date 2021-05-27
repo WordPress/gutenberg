@@ -199,7 +199,7 @@ function VideoEdit( {
 								}
 								render={ ( { open } ) => (
 									<Button
-										isPrimary
+										variant="primary"
 										onClick={ open }
 										ref={ posterImageButton }
 										aria-describedby={
@@ -226,7 +226,10 @@ function VideoEdit( {
 									  ) }
 							</p>
 							{ !! poster && (
-								<Button onClick={ onRemovePoster } isTertiary>
+								<Button
+									onClick={ onRemovePoster }
+									variant="tertiary"
+								>
 									{ __( 'Remove' ) }
 								</Button>
 							) }
@@ -236,10 +239,11 @@ function VideoEdit( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*
-					Disable the video tag so the user clicking on it won't play the
+					Disable the video tag if the block is not selected
+					so the user clicking on it won't play the
 					video when the controls are enabled.
 				*/ }
-				<Disabled>
+				<Disabled isDisabled={ ! isSelected }>
 					<video
 						controls={ controls }
 						poster={ poster }

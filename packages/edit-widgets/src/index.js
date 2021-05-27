@@ -12,6 +12,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
+import { registerLegacyWidgetVariations } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -20,7 +21,6 @@ import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
-import registerLegacyWidgetVariations from './register-legacy-widget-variations';
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -34,9 +34,7 @@ export function initialize( id, settings ) {
 	);
 	registerCoreBlocks( coreBlocks );
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableLegacyWidgetBlock: true,
-		} );
+		__experimentalRegisterExperimentalCoreBlocks();
 	}
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );

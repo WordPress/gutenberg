@@ -5,14 +5,18 @@ import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { BlockSettingsMenuControls } from '@wordpress/block-editor';
+import {
+	BlockSettingsMenuControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
 
 function ReusableBlocksManageButton( { clientId } ) {
 	const { isVisible } = useSelect(
 		( select ) => {
-			const { getBlock } = select( 'core/block-editor' );
-			const { canUser } = select( 'core' );
+			const { getBlock } = select( blockEditorStore );
+			const { canUser } = select( coreStore );
 			const reusableBlock = getBlock( clientId );
 
 			return {

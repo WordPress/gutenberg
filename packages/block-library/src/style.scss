@@ -3,6 +3,7 @@
 	display: none;
 }
 
+@import "./archives/style.scss";
 @import "./audio/style.scss";
 @import "./button/style.scss";
 @import "./buttons/style.scss";
@@ -23,9 +24,11 @@
 @import "./media-text/style.scss";
 @import "./navigation/style.scss";
 @import "./navigation-link/style.scss";
+@import "./home-link/style.scss";
 @import "./page-list/style.scss";
 @import "./paragraph/style.scss";
 @import "./post-author/style.scss";
+@import "./post-comments/style.scss";
 @import "./post-comments-form/style.scss";
 @import "./post-excerpt/style.scss";
 @import "./post-title/style.scss";

@@ -31,8 +31,9 @@
 	}
 
 	.edit-navigation-layout__content-area {
-		// Add some margin above the fixed mobile toolbar.
-		padding-top: $grid-unit-15;
+		// The 10px match that of similar settings pages.
+		padding: $grid-unit-15 10px 10px 10px;
+
 		@include break-medium() {
 			// Provide space for the floating block toolbar.
 			padding-top: $navigation-editor-spacing-top;
@@ -58,38 +59,18 @@
 		left: auto;
 
 		// Hide the toggle as the sidebar should be permanently open.
-		.interface-complementary-area-header {
+		.edit-navigation-sidebar__panel-tabs > button {
 			display: none;
 		}
 	}
-}
 
-.edit-navigation-layout__block-toolbar {
-	// Make the fixed toolbar appear in a similar position to the floating toolbar.
-	// Take the spacing for the floating toolbar, then subtract the toolbar height and
-	// the gap between the content area and the toolbar.
-	margin-top: $navigation-editor-spacing-top - $block-toolbar-height - $grid-unit-15;
-
-	.block-editor-block-toolbar {
+	.edit-navigation-header {
 		background: $white;
-		border: $border-width solid $gray-900;
-		border-radius: $radius-block-ui;
-		max-width: $navigation-editor-width;
-		margin: auto;
-		overflow-y: hidden;
-	}
 
-	.components-toolbar,
-	.components-toolbar-group {
-		border-right-color: $gray-900;
-
-		.components-toolbar,
-		.components-toolbar-group {
-			border-width: 0;
+		@include break-medium() {
+			background: transparent;
 		}
 	}
-
-	height: $block-toolbar-height;
 }
 
 .edit-navigation-empty-state {

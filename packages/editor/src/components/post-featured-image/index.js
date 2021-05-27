@@ -18,7 +18,11 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import {
+	MediaUpload,
+	MediaUploadCheck,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -184,7 +188,7 @@ function PostFeaturedImage( {
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
-								<Button onClick={ open } isSecondary>
+								<Button onClick={ open } variant="secondary">
 									{ __( 'Replace Image' ) }
 								</Button>
 							) }
@@ -193,7 +197,11 @@ function PostFeaturedImage( {
 				) }
 				{ !! featuredImageId && (
 					<MediaUploadCheck>
-						<Button onClick={ onRemoveImage } isLink isDestructive>
+						<Button
+							onClick={ onRemoveImage }
+							variant="link"
+							isDestructive
+						>
 							{ postLabel.remove_featured_image ||
 								DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 						</Button>
@@ -227,7 +235,7 @@ const applyWithDispatch = withDispatch(
 				editPost( { featured_media: image.id } );
 			},
 			onDropImage( filesList ) {
-				select( 'core/block-editor' )
+				select( blockEditorStore )
 					.getSettings()
 					.mediaUpload( {
 						allowedTypes: [ 'image' ],
