@@ -85,7 +85,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 								instance,
 							},
 						} ) }
-						height={ iframeHeight ?? 100 }
+						height={ iframeHeight || 100 }
 					/>
 				</Disabled>
 			</div>
