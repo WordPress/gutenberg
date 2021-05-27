@@ -46,9 +46,9 @@ jobs:
               with:
                   node-version: 16.x
 
-            - run: npm install -g npm@6
             - run: npm cache clean -force
             - run: rm -rf ~/.npm
+            - run: npm install -g npm@6
             
 
             - uses: preactjs/compressed-size-action@7d87f60a6b0c7d193b8183ce859ed00b356ea92f # v2.1.0

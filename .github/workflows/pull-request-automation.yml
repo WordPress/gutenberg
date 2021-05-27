@@ -19,9 +19,9 @@ jobs:
               with:
                   node-version: 16.x
 
-            - run: npm install -g npm@6
             - run: npm cache clean -force
             - run: rm -rf ~/.npm
+            - run: npm install -g npm@6
             
 
             # Changing into the action's directory and running `npm install` is much
