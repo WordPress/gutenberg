@@ -35,7 +35,7 @@ function CardBody( props, forwardedRef ) {
 				styles.Body,
 				styles.borderRadius,
 				styles.cardPaddings[ size ],
-				isShady ? styles.shady : undefined,
+				isShady && styles.shady,
 				className
 			),
 		[ className ]

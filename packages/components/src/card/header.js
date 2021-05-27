@@ -36,7 +36,7 @@ function CardHeader( props, forwardedRef ) {
 				styles.headerFooter,
 				styles.cardPaddings[ size ],
 				styles.minHeights[ minHeight ],
-				isShady ? styles.shady : undefined,
+				isShady && styles.shady,
 				className
 			),
 		[ className, size ]
