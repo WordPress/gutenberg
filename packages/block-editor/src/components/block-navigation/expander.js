@@ -4,7 +4,7 @@
 import { chevronRight, Icon } from '@wordpress/icons';
 export default function BlockNavigationExpander( { onClick } ) {
 	return (
-		//TODO: add keyboard events as noted in https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html
+		// Keyboard events are handled by TreeGrid see: components/src/tree-grid/index.js
 		// eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
 		<span
 			className="block-editor-block-navigation__expander"
