@@ -269,7 +269,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		array(
 			'class' => $css_classes,
 			'style' => $style_attribute,
-		):
+		)
 	);
 
 	return sprintf(
