@@ -30,8 +30,9 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - run: npm cache clean -force
-            - run: rm -rf ~/.npm
             - run: npm install -g npm@6
+            - run: npm cache clean -force
+            - run: rm -rf ~/.npm
 
             # - name: Cache node modules
             #   uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
