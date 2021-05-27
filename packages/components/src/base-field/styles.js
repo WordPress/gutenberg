@@ -44,15 +44,6 @@ export const clickable = css`
 	cursor: pointer;
 `;
 
-export const focus = css`
-	border-color: ${ COLORS.admin.theme };
-	box-shadow: ${ CONFIG.controlBoxShadowFocus };
-
-	&:hover {
-		border-color: ${ COLORS.admin.theme };
-	}
-`;
-
 export const subtle = css`
 	background-color: transparent;
 
