@@ -27,7 +27,15 @@ lodash.debounce = jest.fn( ( callback ) => {
 } );
 
 const mockFetchSearchSuggestions = jest.fn();
-const mockFetchRemoteUrlData = jest.fn();
+
+/**
+ * The call to the real method `fetchRemoteUrlData` is wrapped in a promise in order to make it cancellable.
+ * Therefore if we pass any value as the mock of `fetchRemoteUrlData` then ALL of the tests will require
+ * addition code to handle the async nature of `fetchRemoteUrlData`. This is unecessary. Instead we default
+ * to an undefined value which will ensure that the code under test does not call `fetchRemoteUrlData`. Only
+ * when we are testing the "rich previews" to we update this value with a true mock.
+ */
+let mockFetchRemoteUrlData;
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test
@@ -38,11 +46,6 @@ useSelect.mockImplementation( () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
 	fetchRemoteUrlData: mockFetchRemoteUrlData,
 } ) );
-
-// jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
-// 	fetchSearchSuggestions: mockFetchSearchSuggestions,
-// 	fetchRemoteUrlData: mockFetchRemoteUrlData,
-// } ) );
 
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
@@ -75,7 +78,7 @@ afterEach( () => {
 	container.remove();
 	container = null;
 	mockFetchSearchSuggestions.mockReset();
-	mockFetchRemoteUrlData.mockReset();
+	mockFetchRemoteUrlData?.mockReset(); // conditionally reset as it may NOT be a mock
 } );
 
 function getURLInput() {
@@ -1738,6 +1741,17 @@ describe( 'Rich link previews', () => {
 		url: 'https://www.wordpress.org',
 		type: 'URL',
 	};
+
+	beforeAll( () => {
+		/**
+		 * These tests require that we exercise the `fetchRemoteUrlData` function.
+		 * We are therefore overwriting the mock "placeholder" with a true jest mock
+		 * which will cause the code under test to execute the code which fetches
+		 * rich previews.
+		 */
+		mockFetchRemoteUrlData = jest.fn();
+	} );
+
 	it( 'should display a rich preview when data is available', async () => {
 		mockFetchRemoteUrlData.mockImplementation( () =>
 			Promise.resolve( {
@@ -1940,5 +1954,10 @@ describe( 'Rich link previews', () => {
 
 		expect( isFetchingRichPreview ).toBe( true );
 		expect( isRichLinkPreview ).toBe( false );
+	} );
+
+	afterAll( () => {
+		// Remove the mock to avoid edge cases in other tests.
+		mockFetchRemoteUrlData = undefined;
 	} );
 } );
