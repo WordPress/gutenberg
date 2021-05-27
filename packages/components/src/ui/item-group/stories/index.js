@@ -29,7 +29,7 @@ export const _default = () => (
 	</ItemGroup>
 );
 
-export const dropdownMenu = () => (
+export const dropdown = () => (
 	<Popover
 		css={ { width: '350px' } }
 		trigger={ <Button>Open Popover</Button> }
