@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { contextConnect } from '../context';
-import { Elevation } from '../elevation';
+import { Elevation } from '../../elevation';
 import { View } from '../../view';
 import * as styles from './styles';
 import { useCard } from './hook';

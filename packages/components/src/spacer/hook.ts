@@ -73,6 +73,10 @@ export interface SpacerProps {
 	 * Adjusts right padding.
 	 */
 	paddingRight?: number;
+	/**
+	 * The children elements.
+	 */
+	children?: React.ReactNode;
 }
 
 export function useSpacer(

@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { useElevation } from './hook';
-import { createComponent } from '../utils';
+import { createComponent } from '../ui/utils';
 
 /**
  * `Elevation` is a core component that renders shadow, using the library's shadow system.
@@ -11,7 +11,7 @@ import { createComponent } from '../utils';
  *
  * @example
  * ```jsx
- * import { Elevation, Surface, Text, View } from `@wordpress/components/ui`;
+ * import { Elevation, Surface, Text, View } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (

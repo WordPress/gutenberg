@@ -54,7 +54,7 @@ export function* setTemplate( templateId, templateSlug ) {
 	const pageContext = { templateSlug };
 	if ( ! templateSlug ) {
 		const template = yield controls.resolveSelect(
-			'core',
+			coreStore.name,
 			'getEntityRecord',
 			'postType',
 			'wp_template',
@@ -78,7 +78,7 @@ export function* setTemplate( templateId, templateSlug ) {
  */
 export function* addTemplate( template ) {
 	const newTemplate = yield controls.dispatch(
-		'core',
+		coreStore.name,
 		'saveEntityRecord',
 		'postType',
 		'wp_template',
@@ -87,7 +87,7 @@ export function* addTemplate( template ) {
 
 	if ( template.content ) {
 		yield controls.dispatch(
-			'core',
+			coreStore.name,
 			'editEntityRecord',
 			'postType',
 			'wp_template',
@@ -160,7 +160,7 @@ export function setHomeTemplateId( homeTemplateId ) {
 export function* setPage( page ) {
 	if ( ! page.path && page.context?.postId ) {
 		const entity = yield controls.resolveSelect(
-			'core',
+			coreStore.name,
 			'getEntityRecord',
 			'postType',
 			page.context.postType || 'post',
@@ -170,7 +170,7 @@ export function* setPage( page ) {
 		page.path = getPathAndQueryString( entity.link );
 	}
 	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
-		'core',
+		coreStore.name,
 		'__experimentalGetTemplateForLink',
 		page.path
 	);
@@ -198,7 +198,7 @@ export function* showHomepage() {
 		show_on_front: showOnFront,
 		page_on_front: frontpageId,
 	} = yield controls.resolveSelect(
-		'core',
+		coreStore.name,
 		'getEntityRecord',
 		'root',
 		'site'

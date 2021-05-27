@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Test WP_Theme_JSON_Resolver class.
+ * Test WP_Theme_JSON_Resolver_Gutenberg class.
  *
  * @package Gutenberg
  */
 
-class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
+class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 	function setUp() {
 		parent::setUp();
@@ -41,7 +41,7 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 	}
 
 	function test_fields_are_extracted() {
-		$actual = WP_Theme_JSON_Resolver::get_fields_to_translate();
+		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_fields_to_translate();
 
 		$expected = array(
 			array(
@@ -145,7 +145,7 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 
 		switch_theme( 'fse' );
 
-		$actual = WP_Theme_JSON_Resolver::get_theme_data();
+		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
 
 		unload_textdomain( 'fse' );
 		remove_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
@@ -198,11 +198,11 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 	function test_switching_themes_recalculates_data() {
 		// By default, the theme for unit tests is "default",
 		// which doesn't have theme.json support.
-		$default = WP_Theme_JSON_Resolver::theme_has_support();
+		$default = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 
 		// Switch to a theme that does have support.
 		switch_theme( 'fse' );
-		$fse = WP_Theme_JSON_Resolver::theme_has_support();
+		$fse = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 
 		$this->assertSame( false, $default );
 		$this->assertSame( true, $fse );

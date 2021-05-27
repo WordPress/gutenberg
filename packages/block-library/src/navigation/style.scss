@@ -330,17 +330,15 @@
 		display: none;
 	}
 
-	@include break-small() {
-		// Horizontal layout
-		display: flex;
-		flex-wrap: wrap;
+	// Horizontal layout
+	display: flex;
+	flex-wrap: wrap;
 
-		// Vertical layout
-		.is-vertical & {
-			display: block;
-			flex-direction: column;
-			align-items: flex-start;
-		}
+	// Vertical layout
+	.is-vertical & {
+		display: block;
+		flex-direction: column;
+		align-items: flex-start;
 	}
 }
 
