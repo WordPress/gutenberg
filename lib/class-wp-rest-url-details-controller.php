@@ -247,6 +247,12 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return '';
 		}
 
+		// If the icon is a data URL, return it.
+		$parsed_icon = parse_url( $icon );
+		if ( 'data' === $parsed_icon['scheme'] ) {
+			return $icon;
+		}
+
 		// Attempt to convert relative URLs to absolute.
 		$parsed_url = parse_url( $url );
 		$root_url   = $parsed_url['scheme'] . '://' . $parsed_url['host'] . '/';
