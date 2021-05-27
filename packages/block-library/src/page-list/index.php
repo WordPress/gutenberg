@@ -127,10 +127,10 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 /**
  * Outputs Page list markup from an array of pages with nested children.
  *
- * @param array $nested_pages The array of nested pages.
- * @param array $active_page_ancestor_ids An array of ancestor ids for active page.
- * @param array $colors Color information for overlay styles.
- * @param integer $depth The nesting depth
+ * @param array   $nested_pages The array of nested pages.
+ * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
+ * @param array   $colors Color information for overlay styles.
+ * @param integer $depth The nesting depth.
  *
  * @return string List markup.
  */
@@ -269,7 +269,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		array(
 			'class' => $css_classes,
 			'style' => $style_attribute,
-		)
+		):
 	);
 
 	return sprintf(
