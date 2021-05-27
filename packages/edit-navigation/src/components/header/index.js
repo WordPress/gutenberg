@@ -56,7 +56,7 @@ export default function Header( {
 								'Switch menu, or create a new menu'
 							),
 							showTooltip: false,
-							isTertiary: true,
+							variant: 'tertiary',
 							disabled: ! menus?.length,
 							__experimentalIsFocusable: true,
 						} }

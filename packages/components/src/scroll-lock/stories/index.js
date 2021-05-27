@@ -19,7 +19,7 @@ const Example = () => {
 		<StripedBackground>
 			<div>Start scrolling down...</div>
 			<ToggleContainer>
-				<Button isSecondary onClick={ toggleLock }>
+				<Button variant="secondary" onClick={ toggleLock }>
 					Toggle Scroll Lock
 				</Button>
 				{ isScrollLocked && <ScrollLock /> }

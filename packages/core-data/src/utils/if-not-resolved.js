@@ -4,6 +4,11 @@
 import { controls } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import { CORE_STORE_NAME as coreStoreName } from './constants';
+
+/**
  * Higher-order function which invokes the given resolver only if it has not
  * already been resolved with the arguments passed to the enhanced function.
  *
@@ -21,7 +26,7 @@ const ifNotResolved = ( resolver, selectorName ) =>
 	 */
 	function* resolveIfNotResolved( ...args ) {
 		const hasStartedResolution = yield controls.select(
-			'core',
+			coreStoreName,
 			'hasStartedResolution',
 			selectorName,
 			args

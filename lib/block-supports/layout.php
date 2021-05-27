@@ -41,7 +41,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$used_layout = $block['attrs']['layout'];
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
-		$tree           = WP_Theme_JSON_Resolver::get_merged_data( array(), 'theme' );
+		$tree           = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
 		$default_layout = _wp_array_get( $tree->get_settings(), array( 'layout' ) );
 		if ( ! $default_layout ) {
 			return $block_content;
@@ -112,7 +112,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 
 	if (
 		'core/group' !== $block['blockName'] ||
-		WP_Theme_JSON_Resolver::theme_has_support() ||
+		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content )
 	) {
 		return $block_content;

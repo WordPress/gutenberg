@@ -33,11 +33,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
-		isTitleSelected,
 	} = useSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML, isPostTitleSelected } = select(
-			editorStore
-		);
+		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
 		const { canUser } = select( coreStore );
 
@@ -54,8 +51,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				canUser( 'create', 'media' ),
 				true
 			),
-			// This selector is only defined on mobile.
-			isTitleSelected: isPostTitleSelected && isPostTitleSelected(),
 		};
 	}, [] );
 
@@ -111,7 +106,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				fetchRemoteUrlData( url ),
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
-			__experimentalShouldInsertAtTheTop: isTitleSelected,
 			outlineMode: hasTemplate,
 		} ),
 		[
@@ -120,7 +114,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			reusableBlocks,
 			canUseUnfilteredHTML,
 			undo,
-			isTitleSelected,
 			hasTemplate,
 		]
 	);

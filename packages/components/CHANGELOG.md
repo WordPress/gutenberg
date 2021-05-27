@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecation
+
+-   `isPrimary`, `isSecondary`, `isTertiary` and `isLink` props in `Button` have been deprecated. Use `variant` instead ([#31713](https://github.com/WordPress/gutenberg/pull/31713)).
+
 ## 14.1.0 (2021-05-20)
 
 ## 14.0.0 (2021-05-14)

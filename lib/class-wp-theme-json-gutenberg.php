@@ -9,7 +9,7 @@
  * Class that encapsulates the processing of
  * structures that adhere to the theme.json spec.
  */
-class WP_Theme_JSON {
+class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Container of data in theme.json format.
@@ -620,6 +620,28 @@ class WP_Theme_JSON {
 	}
 
 	/**
+	 * Function that appends a sub-selector to a existing one.
+	 *
+	 * Given the compounded $selector "h1, h2, h3"
+	 * and the $to_append selector ".some-class" the result will be
+	 * "h1.some-class, h2.some-class, h3.some-class".
+	 *
+	 * @param string $selector Original selector.
+	 * @param string $to_append Selector to append.
+	 *
+	 * @return string
+	 */
+	private static function append_to_selector( $selector, $to_append ) {
+		$new_selectors = array();
+		$selectors     = explode( ',', $selector );
+		foreach ( $selectors as $sel ) {
+			$new_selectors[] = $sel . $to_append;
+		}
+
+		return implode( ',', $new_selectors );
+	}
+
+	/**
 	 * Given a settings array, it returns the generated rulesets
 	 * for the preset classes.
 	 *
@@ -641,7 +663,7 @@ class WP_Theme_JSON {
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= self::to_ruleset(
-						$selector . '.has-' . $value['slug'] . '-' . $class['class_suffix'],
+						self::append_to_selector( $selector, '.has-' . $value['slug'] . '-' . $class['class_suffix'] ),
 						array(
 							array(
 								'name'  => $class['property_name'],
@@ -1075,9 +1097,9 @@ class WP_Theme_JSON {
 	/**
 	 * Merge new incoming data.
 	 *
-	 * @param WP_Theme_JSON $incoming Data to merge.
-	 * @param string        $update_or_remove Whether update or remove existing colors
-	 *                                 for which the incoming data has a duplicated slug.
+	 * @param WP_Theme_JSON_Gutenberg $incoming Data to merge.
+	 * @param string                  $update_or_remove Whether update or remove existing colors
+	 *                                                  for which the incoming data has a duplicated slug.
 	 */
 	public function merge( $incoming, $update_or_remove = 'remove' ) {
 		$incoming_data = $incoming->get_raw_data();

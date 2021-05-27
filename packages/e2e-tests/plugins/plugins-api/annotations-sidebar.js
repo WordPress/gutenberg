@@ -59,7 +59,7 @@
 				el(
 					Button,
 					{
-						isPrimary: true,
+						variant: "primary",
 						onClick: () => {
 							dispatch( 'core/annotations' ).__experimentalAddAnnotation( {
 								source: 'e2e-tests',
@@ -77,7 +77,7 @@
 				el(
 					Button,
 					{
-						isPrimary: true,
+						variant: "primary",
 						onClick: () => {
 							dispatch( 'core/annotations' ).__experimentalRemoveAnnotationsBySource( 'e2e-tests' );
 						}

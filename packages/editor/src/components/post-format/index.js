@@ -100,7 +100,7 @@ export default function PostFormat() {
 					<div className="editor-post-format__suggestion">
 						{ __( 'Suggestion:' ) }{ ' ' }
 						<Button
-							isLink
+							variant="link"
 							onClick={ () =>
 								onUpdatePostFormat( suggestion.id )
 							}

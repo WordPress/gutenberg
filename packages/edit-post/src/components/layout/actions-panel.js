@@ -65,7 +65,7 @@ export default function ActionsPanel( {
 		unmountableContent = (
 			<div className="edit-post-layout__toggle-entities-saved-states-panel">
 				<Button
-					isSecondary
+					variant="secondary"
 					className="edit-post-layout__toggle-entities-saved-states-panel-button"
 					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
@@ -78,7 +78,7 @@ export default function ActionsPanel( {
 		unmountableContent = (
 			<div className="edit-post-layout__toggle-publish-panel">
 				<Button
-					isSecondary
+					variant="secondary"
 					className="edit-post-layout__toggle-publish-panel-button"
 					onClick={ togglePublishSidebar }
 					aria-expanded={ false }

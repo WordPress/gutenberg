@@ -8,6 +8,7 @@ import {
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -19,7 +20,7 @@ import { store as editSiteStore } from '../../store';
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
 		( select ) =>
-			select( 'core/editor' ).__experimentalGetTemplateInfo( template ),
+			select( editorStore ).__experimentalGetTemplateInfo( template ),
 		[]
 	);
 	const { openNavigationPanelToMenu, revertTemplate } = useDispatch(
