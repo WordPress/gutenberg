@@ -5,7 +5,7 @@
  */
 import { ItemGroup, Item } from '..';
 import { Popover } from '../../popover';
-import { Button } from '../../button';
+import Button from '../../../button';
 
 export default {
 	component: ItemGroup,
