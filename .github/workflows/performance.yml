@@ -52,8 +52,7 @@ jobs:
                   CURRENT_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
                   PREVIOUS_VERSION_BASE_10=$(expr ${PLUGIN_VERSION_ARRAY[0]} \* 10 + ${PLUGIN_VERSION_ARRAY[1]} - 1)
                   PREVIOUS_RELEASE_BRANCH="release/$(expr $PREVIOUS_VERSION_BASE_10 / 10).$(expr $PREVIOUS_VERSION_BASE_10 % 10)"
-                  TESTED_UP_TO_REGEX="Tested up to: \K([0-9]+)\.([0-9]+)\.?([0-9]?)"
-                  WP_VERSION=$(grep -oP "$TESTED_UP_TO_REGEX" ./readme.txt)
+                  WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
                   IFS='.' read -r -a WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_BRANCH="wp/${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
                   ./bin/plugin/cli.js perf --ci $WP_BRANCH $PREVIOUS_RELEASE_BRANCH $CURRENT_RELEASE_BRANCH --tests-branch $WP_BRANCH
