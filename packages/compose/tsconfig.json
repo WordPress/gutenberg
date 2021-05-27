@@ -18,6 +18,7 @@
 		"src/hooks/use-async-list/**/*",
 		"src/hooks/use-constrained-tabbing/**/*",
 		"src/hooks/use-debounce/**/*",
+		"src/hooks/use-dragging/**/*",
 		"src/hooks/use-copy-on-click/**/*",
 		"src/hooks/use-copy-to-clipboard/**/*",
 		"src/hooks/use-focus-return/**/*",
