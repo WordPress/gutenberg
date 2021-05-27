@@ -115,7 +115,7 @@ add_filter( 'theme_mod_custom_logo', '_override_custom_logo_theme_mod' );
  *
  * @return string The custom logo.
  */
-function _sync_site_logo_to_custom_logo( $custom_logo ) {
+function _sync_custom_logo_to_site_logo( $custom_logo ) {
 	// Delete the option when the custom logo does not exist or was removed.
 	// This step ensures the option stays in sync.
 	if ( empty( $custom_logo ) ) {
@@ -126,7 +126,7 @@ function _sync_site_logo_to_custom_logo( $custom_logo ) {
 	return $custom_logo;
 }
 
-add_filter( 'pre_set_theme_mod_custom_logo', '_sync_site_logo_to_custom_logo' );
+add_filter( 'pre_set_theme_mod_custom_logo', '_sync_custom_logo_to_site_logo' );
 
 /**
  * Updates the custom_logo theme-mod when the site_logo option gets updated.
@@ -136,7 +136,7 @@ add_filter( 'pre_set_theme_mod_custom_logo', '_sync_site_logo_to_custom_logo' );
  *
  * @return void
  */
-function _sync_custom_logo_to_site_logo( $old_value, $value ) {
+function _sync_site_logo_to_custom_logo( $old_value, $value ) {
 	// Delete the option when the custom logo does not exist or was removed.
 	// This step ensures the option stays in sync.
 	if ( empty( $value ) ) {
@@ -146,4 +146,4 @@ function _sync_custom_logo_to_site_logo( $old_value, $value ) {
 	}
 }
 
-add_action( 'update_option_site_logo', '_sync_custom_logo_to_site_logo', 10, 2 );
+add_action( 'update_option_site_logo', '_sync_site_logo_to_custom_logo', 10, 2 );
