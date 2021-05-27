@@ -56,4 +56,4 @@ jobs:
                   WP_VERSION=$(grep -oP "$TESTED_UP_TO_REGEX" ./readme.txt)
                   IFS='.' read -r -a WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_BRANCH="wp/${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf --ci $WP_BRANCH $PREVIOUS_RELEASE_BRANCH $CURRENT_RELEASE_BRANCH
+                  ./bin/plugin/cli.js perf --ci $WP_BRANCH $PREVIOUS_RELEASE_BRANCH $CURRENT_RELEASE_BRANCH --tests-branch $WP_BRANCH
