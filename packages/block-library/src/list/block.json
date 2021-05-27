@@ -41,6 +41,7 @@
 		"color": {
 			"gradients": true
 		},
+		"__experimentalFontFamily": true,
 		"__unstablePasteTextInline": true
 	},
 	"editorStyle": "wp-block-list-editor",
