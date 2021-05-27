@@ -1,6 +1,123 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`props should render correctly 1`] = `
+exports[`base field props should render clickable styles 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -15,11 +15,10 @@
+      "background": "#fff",
+      "border": "1px solid",
+      "border-color": "#757575",
+      "border-radius": "2px",
+      "box-shadow": "transparent",
+-     "cursor": "pointer",
+      "display": "flex",
+      "flex": "1",
+      "flex-direction": "row",
+      "font-size": "13px",
+      "justify-content": "space-between",
+`;
+
+exports[`base field props should render error styles 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -12,11 +12,11 @@
+      "-webkit-justify-content": "space-between",
+      "-webkit-transition": "border-color 100ms ease",
+      "align-items": "center",
+      "background": "#fff",
+      "border": "1px solid",
+-     "border-color": "#d94f4f",
++     "border-color": "#757575",
+      "border-radius": "2px",
+      "box-shadow": "transparent",
+      "display": "flex",
+      "flex": "1",
+      "flex-direction": "row",
+`;
+
+exports[`base field props should render focused styles 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -12,21 +12,20 @@
+      "-webkit-justify-content": "space-between",
+      "-webkit-transition": "border-color 100ms ease",
+      "align-items": "center",
+      "background": "#fff",
+      "border": "1px solid",
+-     "border-color": "theme:var( --wp-admin-theme-color,#00669b)",
++     "border-color": "#757575",
+      "border-radius": "2px",
+-     "box-shadow": "0 0 0,0.5px,[object Object]",
++     "box-shadow": "transparent",
+      "display": "flex",
+      "flex": "1",
+      "flex-direction": "row",
+      "font-size": "13px",
+      "justify-content": "space-between",
+      "outline": "none",
+      "padding": "0 8px",
+      "position": "relative",
+-     "theme-dark10": "var( --wp-admin-theme-color-darker-10,#007cba)",
+      "transition": "border-color 100ms ease",
+      "width": "100%",
+    },
+  ]
+`;
+
+exports[`base field props should render inline styles 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -15,18 +15,17 @@
+      "background": "#fff",
+      "border": "1px solid",
+      "border-color": "#757575",
+      "border-radius": "2px",
+      "box-shadow": "transparent",
+-     "display": "inline-flex",
++     "display": "flex",
+      "flex": "1",
+      "flex-direction": "row",
+      "font-size": "13px",
+      "justify-content": "space-between",
+      "outline": "none",
+      "padding": "0 8px",
+      "position": "relative",
+      "transition": "border-color 100ms ease",
+-     "vertical-align": "baseline",
+-     "width": "auto",
++     "width": "100%",
+    },
+  ]
+`;
+
+exports[`base field props should render subtle styles 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -11,11 +11,10 @@
+      "-webkit-flex-direction": "row",
+      "-webkit-justify-content": "space-between",
+      "-webkit-transition": "border-color 100ms ease",
+      "align-items": "center",
+      "background": "#fff",
+-     "background-color": "transparent",
+      "border": "1px solid",
+      "border-color": "#757575",
+      "border-radius": "2px",
+      "box-shadow": "transparent",
+      "display": "flex",
+`;
+
+exports[`base field should render correctly 1`] = `
 .emotion-0 {
   display: -webkit-box;
   display: -webkit-flex;

@@ -8,21 +8,6 @@ import { css } from 'emotion';
  * @param {TemplateStringsArray} strings
  * @param  {import('create-emotion').Interpolation[]} interpolations
  */
-export function ieOnly( strings, ...interpolations ) {
-	const interpolatedStyles = css( strings, ...interpolations );
-
-	return css`
-		@media screen and ( -ms-high-contrast: active ),
-			( -ms-high-contrast: none ) {
-			${ interpolatedStyles };
-		}
-	`;
-}
-
-/**
- * @param {TemplateStringsArray} strings
- * @param  {import('create-emotion').Interpolation[]} interpolations
- */
 export function firefoxOnly( strings, ...interpolations ) {
 	const interpolatedStyles = css( strings, ...interpolations );
 

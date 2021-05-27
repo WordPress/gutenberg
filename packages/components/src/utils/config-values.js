@@ -39,7 +39,6 @@ export default {
 	controlPaddingX: CONTROL_PADDING_X,
 	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
-	controlBorderRadius: '2px',
 	controlBackgroundColor: COLORS.white,
 	controlBorderRadius: '2px',
 	controlBorderColor: COLORS.gray[ 700 ],

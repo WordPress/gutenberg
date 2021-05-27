@@ -26,10 +26,10 @@ import * as styles from './styles';
  * @property {boolean} [isSubtle=false] Renders a subtle variant.
  */
 
-/** @typedef {import('../Flex/useFlex').FlexProps & OwnProps} Props */
+/** @typedef {import('../flex/types').FlexProps & OwnProps} Props */
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<Props, 'div'>} props
  */
 export function useBaseField( props ) {
 	const {
@@ -41,6 +41,7 @@ export function useBaseField( props ) {
 		isSubtle = false,
 		// eslint-disable-next-line no-unused-vars
 		defaultValue, // extract this because useFlex doesn't accept it
+		disabled,
 		...flexProps
 	} = useContextSystem( props, 'BaseField' );
 
@@ -70,5 +71,9 @@ export function useBaseField( props ) {
 		]
 	);
 
-	return useFlex( { ...flexProps, className: classes } );
+	return {
+		...useFlex( { ...flexProps, className: classes } ),
+		disabled,
+		defaultValue,
+	};
 }
