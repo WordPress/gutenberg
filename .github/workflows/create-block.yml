@@ -30,6 +30,7 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - run: npm install -g npm@6
+            - run: npm cache clean -force
             - run: rm -rf ~/.npm
 
             # - name: Cache node modules
