@@ -10,15 +10,15 @@
  */
 function register_gutenberg_patterns() {
 	// Register categories used for block patterns.
-	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'query' ) ) {
-		register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
+	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'query-loop' ) ) {
+		register_block_pattern_category( 'query-loop', array( 'label' => __( 'Query Loop', 'gutenberg' ) ) );
 	}
 
 	$patterns = array(
-		'query-standard-posts'                 => array(
+		'query-loop-standard-posts'            => array(
 			'title'      => __( 'Standard', 'gutenberg' ),
 			'blockTypes' => array( 'core/query-loop' ),
-			'categories' => array( 'query' ),
+			'categories' => array( 'query-loop' ),
 			'content'    => '<!-- wp:query-loop {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query-loop">
 							<!-- wp:post-template -->
@@ -33,10 +33,10 @@ function register_gutenberg_patterns() {
 							</div>
 							<!-- /wp:query-loop -->',
 		),
-		'query-medium-posts'                   => array(
+		'query-loop-medium-posts'              => array(
 			'title'      => __( 'Image at left', 'gutenberg' ),
 			'blockTypes' => array( 'core/query-loop' ),
-			'categories' => array( 'query' ),
+			'categories' => array( 'query-loop' ),
 			'content'    => '<!-- wp:query-loop {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query-loop">
 							<!-- wp:post-template -->
@@ -53,10 +53,10 @@ function register_gutenberg_patterns() {
 							</div>
 							<!-- /wp:query-loop -->',
 		),
-		'query-small-posts'                    => array(
+		'query-loop-small-posts'               => array(
 			'title'      => __( 'Small image and title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query-loop' ),
-			'categories' => array( 'query' ),
+			'categories' => array( 'query-loop' ),
 			'content'    => '<!-- wp:query-loop {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query-loop">
 							<!-- wp:post-template -->
@@ -72,10 +72,10 @@ function register_gutenberg_patterns() {
 							</div>
 							<!-- /wp:query-loop -->',
 		),
-		'query-grid-posts'                     => array(
+		'query-loop-grid-posts'                => array(
 			'title'      => __( 'Grid', 'gutenberg' ),
 			'blockTypes' => array( 'core/query-loop' ),
-			'categories' => array( 'query' ),
+			'categories' => array( 'query-loop' ),
 			'content'    => '<!-- wp:query-loop {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
 							<div class="wp-block-query-loop">
 							<!-- wp:post-template -->
@@ -88,10 +88,10 @@ function register_gutenberg_patterns() {
 							</div>
 							<!-- /wp:query-loop -->',
 		),
-		'query-large-title-posts'              => array(
+		'query-loop-large-title-posts'         => array(
 			'title'      => __( 'Large title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query-loop' ),
-			'categories' => array( 'query' ),
+			'categories' => array( 'query-loop' ),
 			'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"100px","right":"100px","bottom":"100px","left":"100px"}},"color":{"text":"#ffffff","background":"#000000"}}} -->
 							<div class="wp-block-group alignfull has-text-color has-background" style="background-color:#000000;color:#ffffff;padding-top:100px;padding-right:100px;padding-bottom:100px;padding-left:100px"><!-- wp:query-loop {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query-loop"><!-- wp:post-template -->
@@ -112,10 +112,10 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop --></div>
 							<!-- /wp:group -->',
 		),
-		'query-offset-posts'                   => array(
+		'query-loop-offset-posts'              => array(
 			'title'      => __( 'Offset', 'gutenberg' ),
 			'blockTypes' => array( 'core/query-loop' ),
-			'categories' => array( 'query' ),
+			'categories' => array( 'query-loop' ),
 			'content'    => '<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
 							<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:columns -->
 							<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->
@@ -196,6 +196,11 @@ function remove_core_patterns() {
 		if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $name ) ) {
 			unregister_block_pattern( $name );
 		}
+	}
+
+	// This needs to be removed when changes are ported to core.
+	if ( WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'query' ) ) {
+		unregister_block_pattern_category( 'query' );
 	}
 }
 
