@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, Text } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
+import { WebView } from 'react-native-webview';
 
 /**
  * WordPress dependencies
@@ -39,10 +40,14 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				<Text style={ { color: 'blue', fontSize: 12 } }>
-					Embed Preview will be directly above the Block Caption
-					component when it is implemented.
-				</Text>
+				<View
+					style={ {
+						height: 200,
+						width: '100%',
+					} }
+				>
+					<WebView source={ { uri: 'https://reactnative.dev/' } } />
+				</View>
 				<BlockCaption
 					accessible={ true }
 					accessibilityLabelCreator={ ( caption ) =>
