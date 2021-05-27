@@ -181,8 +181,8 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-columns alignfull are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"50%"} -->
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:50%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right"} /--></div>
 							<!-- /wp:column -->
-							<!-- wp:column {"verticalAlignment":"center","width":"120px"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:120px"><!-- wp:site-logo {"align":"center","width":80,"className":"is-style-rounded"} /--></div>
+							<!-- wp:column {"verticalAlignment":"center","width":"120px","style":{"spacing":{"padding":{"top":"40px","bottom":"40px"}}}} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="padding-top:40px;padding-bottom:40px;flex-basis:120px"><!-- wp:site-logo {"align":"center","width":80,"className":"is-style-rounded"} /--></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"verticalAlignment":"center","width":"50%"} -->
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:50%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"left"} /--></div>
@@ -296,12 +296,12 @@ function register_gutenberg_patterns() {
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
 			'content'    => '<!-- wp:columns {"verticalAlignment":"center","align":"full"} -->
-							<div class="wp-block-columns alignfull are-vertically-aligned-center"><!-- wp:column {"style":{"spacing":{"padding":{"top":"20px","right":"10px","bottom":"20px","left":"10px"}}}} -->
-							<div class="wp-block-column" style="padding-top:20px;padding-right:10px;padding-bottom:20px;padding-left:10px"><!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /--></div>
+							<div class="wp-block-columns alignfull are-vertically-aligned-center"><!-- wp:column {"style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px"><!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /--></div>
 							<!-- /wp:column -->
 
-							<!-- wp:column {"style":{"spacing":{"padding":{"top":"20px","right":"10px","bottom":"20px","left":"10px"}}}} -->
-							<div class="wp-block-column" style="padding-top:20px;padding-right:10px;padding-bottom:20px;padding-left:10px"><!-- wp:paragraph {"align":"right","fontSize":"normal"} -->
+							<!-- wp:column {"style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px"><!-- wp:paragraph {"align":"right","fontSize":"normal"} -->
 							<p class="has-text-align-right has-normal-font-size">' . esc_html__( 'Proudly powered by WordPress', 'default' ) . '</p>
 							<!-- /wp:paragraph --></div>
 							<!-- /wp:column --></div>
