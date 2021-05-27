@@ -9,7 +9,7 @@ import type { CSSProperties } from 'react';
  */
 import type { Props as SurfaceProps } from '../surface/types';
 
-export type CardSizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
+export type CardSizeOptions = 'xSmall' | 'small' | 'medium' | 'large' | 'none';
 
 export type CardProps = SurfaceProps & {
 	/**
