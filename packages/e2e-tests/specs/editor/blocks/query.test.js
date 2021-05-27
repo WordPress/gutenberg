@@ -4,7 +4,6 @@
 import {
 	activatePlugin,
 	deactivatePlugin,
-	activateTheme,
 	createNewPost,
 	insertBlock,
 	publishPost,
@@ -19,11 +18,9 @@ const createDemoPosts = async () => {
 describe( 'Query block', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-query-block' );
-		await activateTheme( 'tt1-blocks' );
 		await createDemoPosts();
 	} );
 	afterAll( async () => {
-		await activateTheme( 'twentytwentyone' );
 		await trashAllPosts();
 		await deactivatePlugin( 'gutenberg-test-query-block' );
 	} );

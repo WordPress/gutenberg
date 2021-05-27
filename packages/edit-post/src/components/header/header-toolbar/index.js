@@ -80,7 +80,7 @@ function HeaderToolbar() {
 				hasOutlineItemsDisabled={ isTextModeEnabled }
 				repositionDropdown={ showIconLabels && ! isWideViewport }
 				showTooltip={ ! showIconLabels }
-				isTertiary={ showIconLabels }
+				variant={ showIconLabels ? 'tertiary' : undefined }
 			/>
 			<ToolbarItem
 				as={ Button }
@@ -107,7 +107,7 @@ function HeaderToolbar() {
 					ref={ inserterButton }
 					as={ Button }
 					className="edit-post-header-toolbar__inserter-toggle"
-					isPrimary
+					variant="primary"
 					isPressed={ isInserterOpened }
 					onMouseDown={ ( event ) => {
 						event.preventDefault();
@@ -138,19 +138,21 @@ function HeaderToolbar() {
 							<ToolbarItem
 								as={ ToolSelector }
 								showTooltip={ ! showIconLabels }
-								isTertiary={ showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
 								disabled={ isTextModeEnabled }
 							/>
 						) }
 						<ToolbarItem
 							as={ EditorHistoryUndo }
 							showTooltip={ ! showIconLabels }
-							isTertiary={ showIconLabels }
+							variant={ showIconLabels ? 'tertiary' : undefined }
 						/>
 						<ToolbarItem
 							as={ EditorHistoryRedo }
 							showTooltip={ ! showIconLabels }
-							isTertiary={ showIconLabels }
+							variant={ showIconLabels ? 'tertiary' : undefined }
 						/>
 						{ overflowItems }
 					</>

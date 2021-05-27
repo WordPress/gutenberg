@@ -28,7 +28,7 @@ const BlockView = ( {
 			</div>
 
 			<div className="block-editor-block-compare__action">
-				<Button isSecondary tabIndex="0" onClick={ action }>
+				<Button variant="secondary" tabIndex="0" onClick={ action }>
 					{ actionText }
 				</Button>
 			</div>

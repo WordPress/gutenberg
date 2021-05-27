@@ -32,6 +32,8 @@ function blockToWidget( block, existingWidget = null ) {
 				idBase: block.attributes.idBase,
 				instance: {
 					...existingWidget?.instance,
+					// Required only for the customizer.
+					is_widget_customizer_js_value: true,
 					encoded_serialized_instance: encoded,
 					instance_hash_key: hash,
 					raw_instance: raw,
