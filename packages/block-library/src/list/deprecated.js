@@ -8,7 +8,7 @@
   */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
- const blockAttributes = {
+const blockAttributes = {
 	ordered: {
 		type: 'boolean',
 		default: false,
