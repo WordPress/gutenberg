@@ -55,7 +55,6 @@ export const Gallery = ( props ) => {
 		imageCount,
 		align,
 		columns = defaultColumnsNumber( imageCount ),
-		imageCrop,
 	} = attributes;
 
 	const displayedColumns = Math.min(
