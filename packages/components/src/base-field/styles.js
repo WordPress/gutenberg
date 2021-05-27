@@ -35,7 +35,7 @@ export const BaseField = css`
 
 	&:focus,
 	&[data-focused='true'] {
-		border-color: ${ COLORS.admin };
+		border-color: ${ COLORS.admin.theme };
 		box-shadow: ${ CONFIG.controlBoxShadowFocus };
 	}
 `;
@@ -45,11 +45,11 @@ export const clickable = css`
 `;
 
 export const focus = css`
-	border-color: ${ COLORS.admin };
+	border-color: ${ COLORS.admin.theme };
 	box-shadow: ${ CONFIG.controlBoxShadowFocus };
 
 	&:hover {
-		border-color: ${ COLORS.admin };
+		border-color: ${ COLORS.admin.theme };
 	}
 `;
 
