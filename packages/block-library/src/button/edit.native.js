@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { View, AccessibilityInfo, Platform, Text } from 'react-native';
+import { get } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -14,8 +16,12 @@ import {
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
-import { LinkSettingsNavigation } from '@wordpress/components';
+import {
+	LinkSettingsNavigation,
+	useConvertUnitToMobile,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
 
@@ -35,6 +41,13 @@ const MIN_WIDTH_MARGINS = {
 	75: styles.button75?.marginLeft,
 	50: styles.button50?.marginLeft,
 	25: styles.button25?.marginLeft,
+};
+
+const DEFAULT_PADDING = {
+	top: '0px',
+	bottom: '0px',
+	left: richTextStyle.richText.paddingLeft + 'px',
+	right: richTextStyle.richText.paddingRight + 'px',
 };
 
 const ButtonEdit = ( {
@@ -314,11 +327,29 @@ const ButtonEdit = ( {
 		}
 	};
 
-	const { paddingTop: spacing, borderWidth } = styles.defaultButton;
+	const paddingStyles = getSpacingClassesAndStyles( attributes ).style;
+
+	// Convert units for mobile.
+	const convertedPadding = {
+		paddingTop: useConvertUnitToMobile(
+			get( paddingStyles, 'paddingTop', DEFAULT_PADDING.top )
+		),
+		paddingBottom: useConvertUnitToMobile(
+			get( paddingStyles, 'paddingBottom', DEFAULT_PADDING.bottom )
+		),
+		paddingLeft: useConvertUnitToMobile(
+			get( paddingStyles, 'paddingLeft', DEFAULT_PADDING.left )
+		),
+		paddingRight: useConvertUnitToMobile(
+			get( paddingStyles, 'paddingRight', DEFAULT_PADDING.right )
+		),
+	};
 
 	if ( parentWidth === 0 ) {
 		return null;
 	}
+
+	const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
 	const borderRadiusValue = Number.isInteger( borderRadius )
 		? borderRadius
@@ -378,12 +409,7 @@ const ButtonEdit = ( {
 					onChange={ onChangeText }
 					style={ {
 						...richTextStyle.richText,
-						paddingLeft: isFixedWidth
-							? 0
-							: richTextStyle.richText.paddingLeft,
-						paddingRight: isFixedWidth
-							? 0
-							: richTextStyle.richText.paddingRight,
+						...convertedPadding,
 						color: textColor,
 					} }
 					textAlign={ align }
@@ -416,6 +442,7 @@ const ButtonEdit = ( {
 					getLinkSettings={ getLinkSettings }
 					onShowLinkSettings={ onShowLinkSettings }
 					onChangeBorderRadius={ onChangeBorderRadius }
+					defaultPadding={ DEFAULT_PADDING }
 				/>
 			) }
 		</View>
