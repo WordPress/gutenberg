@@ -64,9 +64,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$style = '';
 	if ( $content_size || $wide_size ) {
 
-		$style  = ".wp-container-$id {";
-		$style .= 'display: grid;';
-		$style .= '}';
+		$style  = ".wp-container-$id { display: grid; }";
 
 		$style .= ".wp-container-$id > * {";
 		$style .= 'box-sizing: border-box;';
