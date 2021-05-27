@@ -18,7 +18,7 @@ import * as styles from './styles';
 
 /**
  * @typedef OwnProps
- * @property {boolean} [error=false] Renders an error.
+ * @property {boolean} [hasError=false] Renders an error.
  * @property {boolean} [disabled] Whether the field is disabled.
  * @property {boolean} [isClickable=false] Renders a `cursor: pointer` on hover.
  * @property {boolean} [isInline=false] Renders as an inline element (layout).
@@ -33,7 +33,7 @@ import * as styles from './styles';
 export function useBaseField( props ) {
 	const {
 		className,
-		error = false,
+		hasError = false,
 		isClickable = false,
 		isInline = false,
 		isSubtle = false,
@@ -52,14 +52,14 @@ export function useBaseField( props ) {
 				controlGroupStyles,
 				isClickable && styles.clickable,
 				isSubtle && styles.subtle,
-				error && styles.error,
+				hasError && styles.error,
 				isInline && styles.inline,
 				className
 			),
 		[
 			className,
 			controlGroupStyles,
-			error,
+			hasError,
 			isInline,
 			isClickable,
 			isSubtle,

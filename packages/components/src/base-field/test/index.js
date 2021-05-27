@@ -21,7 +21,7 @@ describe( 'base field', () => {
 
 	describe( 'props', () => {
 		it( 'should render error styles', () => {
-			const { container } = render( <BaseField error /> );
+			const { container } = render( <BaseField hasError /> );
 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
 				base.firstChild
 			);
@@ -29,13 +29,6 @@ describe( 'base field', () => {
 
 		it( 'should render clickable styles', () => {
 			const { container } = render( <BaseField isClickable /> );
-			expect( container.firstChild ).toMatchStyleDiffSnapshot(
-				base.firstChild
-			);
-		} );
-
-		it( 'should render focused styles', () => {
-			const { container } = render( <BaseField isFocused /> );
 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
 				base.firstChild
 			);
