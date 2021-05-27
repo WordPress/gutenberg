@@ -22,7 +22,6 @@ import * as styles from './styles';
 function CardHeader( props, forwardedRef ) {
 	const {
 		className,
-		minHeight = 'medium',
 		isShady = false,
 		size = 'medium',
 		...otherProps
@@ -35,7 +34,6 @@ function CardHeader( props, forwardedRef ) {
 				styles.borderRadius,
 				styles.headerFooter,
 				styles.cardPaddings[ size ],
-				styles.minHeights[ minHeight ],
 				isShady && styles.shady,
 				className
 			),

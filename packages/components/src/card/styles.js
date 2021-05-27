@@ -71,21 +71,6 @@ export const cardPaddings = {
 	`,
 };
 
-export const minHeights = {
-	large: css`
-		min-height: ${ CONFIG.cardHeaderHeightLarge };
-	`,
-	medium: css`
-		min-height: ${ CONFIG.cardHeaderHeightMedium };
-	`,
-	small: css`
-		min-height: ${ CONFIG.cardHeaderHeightSmall };
-	`,
-	xSmall: css`
-		min-height: ${ CONFIG.cardHeaderHeightXSmall };
-	`,
-};
-
 export const shady = css`
 	background-color: ${ COLORS.lightGray[ 200 ] };
 `;

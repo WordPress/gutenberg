@@ -86,12 +86,6 @@ export type CardBodyProps = {
 
 export type CardHeaderProps = {
 	/**
-	 * Determines the minimum height of `CardHeader`.
-	 *
-	 * @default 'medium'
-	 */
-	minHeight?: CardSizeOptions;
-	/**
 	 * The children elements.
 	 */
 	children: React.ReactNode;
