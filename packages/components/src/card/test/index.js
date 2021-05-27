@@ -6,13 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import {
-	Card,
-	CardBody,
-	CardFooter,
-	CardHeader,
-	CardInnerBody,
-} from '../index';
+import { Card, CardBody, CardFooter, CardHeader } from '../index';
 
 describe( 'props', () => {
 	let base;
@@ -40,21 +34,6 @@ describe( 'props', () => {
 		);
 		expect( container.firstChild ).toMatchDiffSnapshot(
 			withoutElevation.firstChild
-		);
-	} );
-
-	test( 'should render CardInnerBody', () => {
-		const { container } = render(
-			<Card>
-				<CardHeader title="WordPress.org" />
-				<CardInnerBody>Code is Poetry.</CardInnerBody>
-				<CardFooter>
-					<button>Agree</button>
-				</CardFooter>
-			</Card>
-		);
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
 		);
 	} );
 } );

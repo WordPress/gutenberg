@@ -26,12 +26,6 @@ export const Body = css`
 	max-height: 100%;
 `;
 
-// TODO: should we keep InnerBody?
-export const InnerBody = css``;
-//	margin-left: calc( ${ CONFIG.cardPadding } * -1 );
-//	margin-right: calc( ${ CONFIG.cardPadding } * -1 );
-//`;
-
 export const headerFooter = css`
 	border-color: ${ CONFIG.colorDivider };
 `;

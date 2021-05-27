@@ -1,28 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`props should render CardInnerBody 1`] = `
-Snapshot Diff:
-- First value
-+ Second value
-
-@@ -11,13 +11,13 @@
-        data-wp-c16t="true"
-        data-wp-component="CardHeader"
-        title="WordPress.org"
-      />
-      <div
--       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View em57xhy0"
-+       class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
-        data-wp-c16t="true"
--       data-wp-component="CardInnerBody"
-+       data-wp-component="CardBody"
-      >
-        Code is Poetry.
-      </div>
-      <div
-        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View em57xhy0"
-`;
-
 exports[`props should render correctly 1`] = `
 .emotion-9 {
   height: 100%;
