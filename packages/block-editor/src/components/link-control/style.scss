@@ -228,7 +228,7 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__search-item-description {
-		padding-top: $grid-unit-10;
+		padding-top: 12px;
 		margin: 0;
 		font-size: 0.9em;
 
@@ -239,8 +239,11 @@ $block-editor-link-control-number-of-actions: 1;
 		width: 100%;
 		background-color: $gray-100;
 		justify-content: center;
+		height: 180px; // limit height
+		max-height: 180px; // limit height
 		overflow: hidden;
 		border-radius: 2px;
+		margin-top: 12px;
 
 		img {
 			display: block; // remove unwanted space below image
@@ -258,7 +261,6 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__search-item-bottom {
-	padding-top: $grid-unit-20;
 	transition: opacity 1.5s;
 	min-height: 100px;
 	width: 100%;
