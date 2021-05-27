@@ -90,28 +90,13 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 	return getPresetMetadataFromStyleProperty.MAP[ styleProperty ];
 }
 
-const filterColorsFromCoreOrigin = ( path, setting ) => {
-	if ( path !== 'color.palette' && path !== 'color.gradients' ) {
-		return setting;
-	}
-
-	if ( ! Array.isArray( setting ) ) {
-		return setting;
-	}
-
-	const colors = setting.filter( ( color ) => color?.origin !== 'core' );
-
-	return colors.length > 0 ? colors : setting;
-};
-
 export function useSetting( path, blockName = '' ) {
 	const settings = useSelect( ( select ) => {
 		return select( editSiteStore ).getSettings();
 	} );
 	const topLevelPath = `__experimentalFeatures.${ path }`;
 	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
-	const setting = get( settings, blockPath ) ?? get( settings, topLevelPath );
-	return filterColorsFromCoreOrigin( path, setting );
+	return get( settings, blockPath ) ?? get( settings, topLevelPath );
 }
 
 export function getPresetVariable( styles, context, propertyName, value ) {

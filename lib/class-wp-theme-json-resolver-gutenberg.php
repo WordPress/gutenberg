@@ -419,7 +419,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$result->merge( self::get_theme_data( $theme_support_data ) );
 
 		if ( 'user' === $origin ) {
-			$result->merge( self::get_user_data(), 'update' );
+			$result->merge( self::get_user_data() );
 		}
 
 		return $result;
