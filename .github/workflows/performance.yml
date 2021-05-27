@@ -47,6 +47,7 @@ jobs:
               if: github.event_name == 'release'
               env:
                   PLUGIN_VERSION: ${{ github.event.release.name }}
+              shell: bash
               run: |
                   IFS=. read -ra PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
                   CURRENT_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
