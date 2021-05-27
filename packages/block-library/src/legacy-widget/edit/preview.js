@@ -7,12 +7,30 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function Preview( { idBase, instance, isVisible } ) {
-	const [ iframeHeight, setIframeHeight ] = useState( null );
+	const [ iframeHeight, setIframeHeight ] = useState();
+	const [ iframeContentDocument, setIframeContentDocument ] = useState();
+
+	useEffect( () => {
+		const intervalId = setInterval( () => {
+			if (
+				iframeContentDocument &&
+				iframeContentDocument.body.scrollHeight > 0
+			) {
+				setIframeHeight( iframeContentDocument.body.scrollHeight );
+				clearInterval( intervalId );
+			}
+		}, 100 );
+
+		return () => {
+			clearInterval( intervalId );
+		};
+	}, [ iframeContentDocument ] );
+
 	return (
 		<>
 			{ /*
@@ -55,8 +73,8 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						} ) }
 						height={ iframeHeight ?? 100 }
 						onLoad={ ( event ) => {
-							setIframeHeight(
-								event.target.contentDocument.body.scrollHeight
+							setIframeContentDocument(
+								event.target.contentDocument
 							);
 						} }
 					/>
