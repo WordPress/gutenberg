@@ -5,10 +5,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
 /**
  * External dependencies
  */
-import {
-	PanelBody,
-	__unstableComponentSystemProvider as ComponentSystemProvider,
-} from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -73,16 +70,12 @@ export function TypographyPanel( props ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Typography' ) }>
-				<ComponentSystemProvider
-					__unstableNextInclude={ [ 'WPComponentsFontSizePicker' ] }
-				>
-					<FontFamilyEdit { ...props } />
-					<FontSizeEdit { ...props } />
-					<FontAppearanceEdit { ...props } />
-					<LineHeightEdit { ...props } />
-					<TextDecorationAndTransformEdit { ...props } />
-					<LetterSpacingEdit { ...props } />
-				</ComponentSystemProvider>
+				<FontFamilyEdit { ...props } />
+				<FontSizeEdit { ...props } />
+				<FontAppearanceEdit { ...props } />
+				<LineHeightEdit { ...props } />
+				<TextDecorationAndTransformEdit { ...props } />
+				<LetterSpacingEdit { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);
