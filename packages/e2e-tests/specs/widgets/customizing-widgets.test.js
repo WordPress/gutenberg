@@ -511,6 +511,57 @@ describe( 'Widgets Customizer', () => {
 			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
 		);
 	} );
+
+	it( 'should handle esc key events', async () => {
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /^Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
+
+		const paragraphBlock = await addBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+		await showBlockToolbar();
+
+		// Open the more menu dropdown in block toolbar.
+		await clickBlockToolbarButton( 'Options' );
+		await expect( {
+			role: 'menu',
+			name: 'Options',
+		} ).toBeFound();
+
+		// Expect pressing the Escape key to close the dropdown,
+		// but not close the editor.
+		await page.keyboard.press( 'Escape' );
+		await expect( {
+			role: 'menu',
+			name: 'Options',
+		} ).not.toBeFound();
+		await expect( paragraphBlock ).toBeVisible();
+
+		await paragraphBlock.focus();
+
+		// Expect pressing the Escape key to enter navigation mode,
+		// but not close the editor.
+		await page.keyboard.press( 'Escape' );
+		await expect( {
+			text: /^You are currently in navigation mode\./,
+			selector: '*[aria-live="polite"][aria-relevant="additions text"]',
+		} ).toBeFound();
+		await expect( paragraphBlock ).toBeVisible();
+
+		expect( console ).toHaveWarned(
+			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
+		);
+	} );
 } );
 
 /**

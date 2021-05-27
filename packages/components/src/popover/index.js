@@ -23,6 +23,7 @@ import {
 	useConstrainedTabbing,
 	useFocusReturn,
 	useMergeRefs,
+	useRefEffect,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
@@ -237,7 +238,6 @@ const Popover = (
 	{
 		headerTitle,
 		onClose,
-		onKeyDown,
 		children,
 		className,
 		noArrow = true,
@@ -483,6 +483,26 @@ const Popover = (
 		__unstableBoundaryParent,
 	] );
 
+	// Event handlers for closing the popover.
+	const closeEventRef = useRefEffect(
+		( node ) => {
+			function maybeClose( event ) {
+				// Close on escape.
+				if ( event.keyCode === ESCAPE && onClose ) {
+					event.stopPropagation();
+					onClose();
+				}
+			}
+
+			node.addEventListener( 'keydown', maybeClose );
+
+			return () => {
+				node.removeEventListener( 'keydown', maybeClose );
+			};
+		},
+		[ onClose ]
+	);
+
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
@@ -490,24 +510,12 @@ const Popover = (
 	const mergedRefs = useMergeRefs( [
 		ref,
 		containerRef,
+		// Don't register the event at all if there's no onClose callback.
+		onClose ? closeEventRef : null,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
 		focusOnMount ? focusOnMountRef : null,
 	] );
-
-	// Event handlers
-	const maybeClose = ( event ) => {
-		// Close on escape
-		if ( event.keyCode === ESCAPE && onClose ) {
-			event.stopPropagation();
-			onClose();
-		}
-
-		// Preserve original content prop behavior
-		if ( onKeyDown ) {
-			onKeyDown( event );
-		}
-	};
 
 	/**
 	 * Shims an onFocusOutside callback to be compatible with a deprecated
@@ -593,7 +601,6 @@ const Popover = (
 				}
 			) }
 			{ ...contentProps }
-			onKeyDown={ maybeClose }
 			{ ...focusOutsideProps }
 			ref={ mergedRefs }
 			tabIndex="-1"
