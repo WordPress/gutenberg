@@ -141,17 +141,18 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	&.is-current {
+		flex-direction: column; // allow for stacking.
 		background: transparent;
 		border: 0;
 		width: 100%;
 		cursor: default;
 		padding: $grid-unit-20;
-		padding-left: $grid-unit-30;
 	}
 
 	.block-editor-link-control__search-item-header {
 		display: flex;
 		flex-direction: row;
+		align-items: center;
 		margin-right: $grid-unit-20;
 		overflow: hidden;
 		white-space: nowrap;
@@ -162,8 +163,8 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__search-item-icon {
-		margin-right: 1em;
-		min-width: 24px;
+		margin-right: $grid-unit-10;
+		width: 32px;
 	}
 
 	.block-editor-link-control__search-item-info,
@@ -212,6 +213,17 @@ $block-editor-link-control-number-of-actions: 1;
 		border-radius: 2px;
 	}
 }
+
+.block-editor-link-control__search-item-top {
+	display: flex;
+	flex-direction: row;
+	width: 100%; // clip.
+}
+
+.block-editor-link-control__search-item-bottom {
+	padding-top: $grid-unit-20;
+}
+
 
 .block-editor-link-control__loading {
 	margin: $grid-unit-20; // when only loading control is shown it requires it's own spacing.

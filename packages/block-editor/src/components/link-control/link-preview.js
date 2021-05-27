@@ -52,25 +52,34 @@ export default function LinkPreview( { value, onEditClick } ) {
 				'is-current': true,
 			} ) }
 		>
-			<span className="block-editor-link-control__search-item-header">
-				<Icon
-					className="block-editor-link-control__search-item-icon"
-					icon={ globe }
-				/>
-				<span className="block-editor-link-control__search-item-details">
-					<ExternalLink
-						className="block-editor-link-control__search-item-title"
-						href={ value.url }
-					>
-						{ richData?.title || value?.title || displayURL }
-					</ExternalLink>
-					{ value?.url && (
-						<span className="block-editor-link-control__search-item-info">
-							{ displayURL }
-						</span>
+			<div className="block-editor-link-control__search-item-top">
+				<span className="block-editor-link-control__search-item-header">
+					{ richData?.icon ? (
+						<img
+							className="block-editor-link-control__search-item-icon is-image"
+							src={ richData?.icon }
+							alt=""
+						/>
+					) : (
+						<Icon
+							className="block-editor-link-control__search-item-icon"
+							icon={ globe }
+						/>
 					) }
+					<span className="block-editor-link-control__search-item-details">
+						<ExternalLink
+							className="block-editor-link-control__search-item-title"
+							href={ value.url }
+						>
+							{ richData?.title || value?.title || displayURL }
+						</ExternalLink>
+						{ value?.url && (
+							<span className="block-editor-link-control__search-item-info">
+								{ displayURL }
+							</span>
+						) }
+					</span>
 				</span>
-			</span>
 
 			<Button
 				variant="secondary"
@@ -80,6 +89,15 @@ export default function LinkPreview( { value, onEditClick } ) {
 				{ __( 'Edit' ) }
 			</Button>
 			<ViewerSlot fillProps={ value } />
+			</div>
+			{ ( richData?.image || richData?.description ) && (
+				<div className="block-editor-link-control__search-item-bottom">
+					{ richData?.image && (
+						<img src={ richData?.image } alt="" />
+					) }
+					{ richData?.description && <p>{ richData.description }</p> }
+				</div>
+			) }
 		</div>
 	);
 }
