@@ -194,10 +194,6 @@ public class Gutenberg: NSObject {
             settingsUpdates["rawStyles"] = rawStyles
         }
 
-        if let rawFeatures = editorSettings?.rawFeatures {
-            settingsUpdates["rawFeatures"] = rawFeatures
-        }
-
         if let colors = editorSettings?.colors {
             settingsUpdates["colors"] = colors
         }
