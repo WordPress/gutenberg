@@ -27,6 +27,15 @@ function widgetIdToSettingId( widgetId ) {
 	return `widget_${ idBase }`;
 }
 
+/**
+ * This is a custom debounce function to call different callbacks depending on
+ * whether it's the _leading_ call or not.
+ *
+ * @param {Function} leading  The callback that gets called first.
+ * @param {Function} callback The callback that gets called after the first time.
+ * @param {number}   timeout  The debounced time in milliseconds.
+ * @return {Function} The debounced function.
+ */
 function debounce( leading, callback, timeout ) {
 	let isLeading = false;
 	let timerID;
@@ -200,6 +209,13 @@ export default class SidebarAdapter {
 
 	_removeWidget( widget ) {
 		const settingId = widgetIdToSettingId( widget.id );
+		const setting = this.api( settingId );
+
+		if ( setting ) {
+			const instance = setting.get();
+			this.widgetsCache.delete( instance );
+		}
+
 		this.api.remove( settingId );
 	}
 
@@ -277,7 +293,10 @@ export default class SidebarAdapter {
 			return widgetId;
 		} );
 
-		// TODO: We should in theory also handle delete widgets here too.
+		const deletedWidgets = this.getWidgets().filter(
+			( widget ) => ! nextWidgetIds.includes( widget.id )
+		);
+		deletedWidgets.forEach( ( widget ) => this._removeWidget( widget ) );
 
 		this.setting.set( nextWidgetIds );
 
