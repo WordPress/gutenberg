@@ -15,7 +15,7 @@ const createDemoPosts = async () => {
 	await publishPost();
 };
 
-describe( 'Query block', () => {
+describe( 'Query Loop block', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-query-loop-block' );
 		await createDemoPosts();
