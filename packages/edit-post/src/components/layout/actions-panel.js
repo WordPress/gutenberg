@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { EntitiesSavedStates, PostPublishPanel } from '@wordpress/editor';
+import {
+	EntitiesSavedStates,
+	PostPublishPanel,
+	store as editorStore,
+} from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -38,7 +42,7 @@ export default function ActionsPanel( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			isSavingMetaBoxes: select( editPostStore ).isSavingMetaBoxes(),
 			hasNonPostEntityChanges: select(
-				'core/editor'
+				editorStore
 			).hasNonPostEntityChanges(),
 		};
 	}, [] );
