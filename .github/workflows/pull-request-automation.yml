@@ -14,10 +14,12 @@ jobs:
               with:
                   ref: trunk
 
-            - name: Use Node.js 14.x
+            - name: Use Node.js 16.x
               uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
               with:
-                  node-version: 14.x
+                  node-version: 16.x
+
+            - run: npm install -g npm@6
 
             # Changing into the action's directory and running `npm install` is much
             # faster than a full project-wide `npm ci`.
