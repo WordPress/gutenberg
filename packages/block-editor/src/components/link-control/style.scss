@@ -153,13 +153,14 @@ $block-editor-link-control-number-of-actions: 1;
 		display: block;
 		flex-direction: row;
 		align-items: flex-start;
-		margin-right: $grid-unit-20;
+		margin-right: $grid-unit-10;
 		overflow: hidden;
 		white-space: nowrap;
 	}
 
 	&.is-preview .block-editor-link-control__search-item-header {
 		display: flex;
+		flex: 1; // fill available space.
 	}
 
 	.block-editor-link-control__search-item-details {
@@ -185,7 +186,6 @@ $block-editor-link-control-number-of-actions: 1;
 	.block-editor-link-control__search-item-title {
 		overflow: hidden;
 		text-overflow: ellipsis;
-		padding-right: $grid-unit-30;
 
 		.components-external-link__icon {
 			position: absolute;
@@ -208,6 +208,10 @@ $block-editor-link-control-number-of-actions: 1;
 
 		span {
 			font-weight: normal;
+		}
+
+		svg {
+			display: none; // specifically requested to be removed visually as well.
 		}
 	}
 
