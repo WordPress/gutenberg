@@ -47,7 +47,8 @@ function computeAnchorRect(
 	anchorRect,
 	getAnchorRect,
 	anchorRef = false,
-	shouldAnchorIncludePadding
+	shouldAnchorIncludePadding,
+	container
 ) {
 	if ( anchorRect ) {
 		return anchorRect;
@@ -61,7 +62,8 @@ function computeAnchorRect(
 		const rect = getAnchorRect( anchorRefFallback.current );
 		return offsetIframe(
 			rect,
-			rect.ownerDocument || anchorRefFallback.current.ownerDocument
+			rect.ownerDocument || anchorRefFallback.current.ownerDocument,
+			container
 		);
 	}
 
@@ -81,7 +83,8 @@ function computeAnchorRect(
 		if ( typeof anchorRef?.cloneRange === 'function' ) {
 			return offsetIframe(
 				getRectangleFromRange( anchorRef ),
-				anchorRef.endContainer.ownerDocument
+				anchorRef.endContainer.ownerDocument,
+				container
 			);
 		}
 
@@ -91,7 +94,8 @@ function computeAnchorRect(
 		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
 			const rect = offsetIframe(
 				anchorRef.getBoundingClientRect(),
-				anchorRef.ownerDocument
+				anchorRef.ownerDocument,
+				container
 			);
 
 			if ( shouldAnchorIncludePadding ) {
@@ -111,7 +115,8 @@ function computeAnchorRect(
 				topRect.width,
 				bottomRect.bottom - topRect.top
 			),
-			top.ownerDocument
+			top.ownerDocument,
+			container
 		);
 
 		if ( shouldAnchorIncludePadding ) {
@@ -294,7 +299,8 @@ const Popover = (
 				anchorRect,
 				getAnchorRect,
 				anchorRef,
-				shouldAnchorIncludePadding
+				shouldAnchorIncludePadding,
+				containerRef.current
 			);
 
 			if ( ! anchor ) {
