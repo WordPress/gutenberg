@@ -57,6 +57,7 @@
 // if the content needs to be scrolled (for example, on the keyboard shortcuts
 // modal screen).
 .components-modal__header {
+	box-sizing: border-box;
 	border-bottom: $border-width solid $gray-300;
 	padding: 0 $grid-unit-40;
 	display: flex;
@@ -64,11 +65,11 @@
 	justify-content: space-between;
 	align-items: center;
 	height: $header-height;
+	width: 100%;
 	z-index: z-index(".components-modal__header");
 	position: absolute;
 	top: 0;
 	left: 0;
-	right: 0;
 
 	.components-modal__header-heading {
 		font-size: 1rem;
