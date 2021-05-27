@@ -37,6 +37,7 @@ import com.horcrux.svg.SvgPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.linusu.RNGetRandomValuesPackage;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
@@ -490,6 +491,7 @@ public class WPAndroidGlueCode {
                 new RNCMaskedViewPackage(),
                 new ReanimatedPackage(),
                 new RNPromptPackage(),
+                new RNCWebViewPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 

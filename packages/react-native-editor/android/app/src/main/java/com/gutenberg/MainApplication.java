@@ -32,6 +32,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
@@ -261,6 +262,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new SafeAreaContextPackage(),
                         new RNScreensPackage(),
                         new RNPromptPackage(),
+                        new RNCWebViewPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 
