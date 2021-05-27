@@ -286,8 +286,8 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
+			.isAudioBlockMediaUploadEnabled: true,
             .reusableBlock: false,
-            .isAudioBlockMediaUploadEnabled: true,
             .canViewEditorOnboarding: false
         ]
     }
