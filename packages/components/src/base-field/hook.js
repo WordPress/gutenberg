@@ -39,8 +39,8 @@ export function useBaseField( props ) {
 		isFocused = false,
 		isInline = false,
 		isSubtle = false,
-		// eslint-disable-next-line no-unused-vars
-		defaultValue, // extract this because useFlex doesn't accept it
+		// extract these because useFlex doesn't accept it
+		defaultValue,
 		disabled,
 		...flexProps
 	} = useContextSystem( props, 'BaseField' );
