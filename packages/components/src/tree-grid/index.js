@@ -99,7 +99,7 @@ function TreeGrid(
 					}
 					// If a row is focused, and it is collapsed, moves to the parent row (if there is one).
 					const level = Math.max(
-						( parseInt( activeRow?.ariaLevel ?? 1, 10 ) ) - 1,
+						parseInt( activeRow?.ariaLevel ?? 1, 10 ) - 1,
 						1
 					);
 					const rows = Array.from(
