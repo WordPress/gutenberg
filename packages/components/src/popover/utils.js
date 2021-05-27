@@ -328,12 +328,14 @@ export function computePopoverPosition(
 }
 
 /**
- * Offsets the given rect by the position of the iframe that contains the element.
- * If the owner document is not in an iframe then it returns with the original rect.
+ * Offsets the given rect by the position of the iframe that contains the
+ * element. If the owner document is not in an iframe then it returns with the
+ * original rect. If the popover container document and the anchor document are
+ * the same, the original rect will also be returned.
  *
- * @param {DOMRect} rect bounds of the element
+ * @param {DOMRect}  rect          bounds of the element
  * @param {Document} ownerDocument document of the element
- * @param {Element}  container The positioned container.
+ * @param {Element}  container     The popover container to position.
  *
  * @return {DOMRect} offsetted bounds
  */
