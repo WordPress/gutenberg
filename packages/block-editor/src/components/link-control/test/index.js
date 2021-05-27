@@ -1734,7 +1734,7 @@ describe( 'Post types', () => {
 describe( 'Rich link previews', () => {
 	const selectedLink = {
 		id: '1',
-		title: 'https://www.wordpress.org',
+		title: 'Wordpress.org', // customize this for differentiation in assertions
 		url: 'https://www.wordpress.org',
 		type: 'URL',
 	};
@@ -1769,9 +1769,14 @@ describe( 'Rich link previews', () => {
 		expect( linkPreview ).toMatchSnapshot();
 	} );
 
-	it( 'should not display a rich preview when data is empty', async () => {
+	it( 'should display a fallback when title is missing from rich data', async () => {
 		mockFetchRemoteUrlData.mockImplementation( () =>
-			Promise.resolve( {} )
+			Promise.resolve( {
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
 		);
 
 		act( () => {
@@ -1788,9 +1793,127 @@ describe( 'Rich link previews', () => {
 		);
 
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+		expect( isRichLinkPreview ).toBe( true );
 
-		expect( isRichLinkPreview ).toBe( false );
+		const titlePreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-title'
+		);
+
+		expect( titlePreview.textContent ).toEqual(
+			expect.stringContaining( selectedLink.title )
+		);
 	} );
+
+	it( 'should display a fallback when icon is missing from rich data', async () => {
+		mockFetchRemoteUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title:
+					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		act( () => {
+			render( <LinkControl value={ selectedLink } />, container );
+		} );
+
+		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+		expect( isRichLinkPreview ).toBe( true );
+
+		const iconPreview = linkPreview.querySelector(
+			`.block-editor-link-control__search-item-icon`
+		);
+
+		const fallBackIcon = iconPreview.querySelector( 'svg' );
+		const richIcon = iconPreview.querySelector( 'img' );
+
+		expect( fallBackIcon ).toBeTruthy();
+		expect( richIcon ).toBeFalsy();
+	} );
+
+	it.each( [ 'image', 'description' ] )(
+		'should not display an %s fallback when it is missing from the rich data',
+		async ( dataItem ) => {
+			mockFetchRemoteUrlData.mockImplementation( () => {
+				const data = {
+					title:
+						'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+					icon: 'https://s.w.org/favicon.ico?2',
+					description:
+						'Open source software which you can use to easily create a beautiful website, blog, or app.',
+					image: 'https://s.w.org/images/home/screen-themes.png?3',
+				};
+				delete data[ dataItem ];
+				return Promise.resolve( data );
+			} );
+
+			act( () => {
+				render( <LinkControl value={ selectedLink } />, container );
+			} );
+
+			// mockFetchRemoteUrlData resolves on next "tick" of event loop
+			await act( async () => {
+				await eventLoopTick();
+			} );
+
+			const linkPreview = container.querySelector(
+				"[aria-label='Currently selected']"
+			);
+
+			const isRichLinkPreview = linkPreview.classList.contains(
+				'is-rich'
+			);
+			expect( isRichLinkPreview ).toBe( true );
+
+			const missingDataItem = linkPreview.querySelector(
+				`.block-editor-link-control__search-item-${ dataItem }`
+			);
+
+			expect( missingDataItem ).toBeFalsy();
+		}
+	);
+
+	it.each( [
+		[ 'empty', {} ],
+		[ 'null', null ],
+	] )(
+		'should not display a rich preview when data is %s',
+		async ( _descriptor, data ) => {
+			mockFetchRemoteUrlData.mockImplementation( () =>
+				Promise.resolve( data )
+			);
+
+			act( () => {
+				render( <LinkControl value={ selectedLink } />, container );
+			} );
+
+			// mockFetchRemoteUrlData resolves on next "tick" of event loop
+			await act( async () => {
+				await eventLoopTick();
+			} );
+
+			const linkPreview = container.querySelector(
+				"[aria-label='Currently selected']"
+			);
+
+			const isRichLinkPreview = linkPreview.classList.contains(
+				'is-rich'
+			);
+
+			expect( isRichLinkPreview ).toBe( false );
+		}
+	);
 
 	it( 'should display in loading state when rich data is being fetched', async () => {
 		const nonResolvingPromise = () => new Promise( () => {} );
