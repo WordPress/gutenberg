@@ -12,6 +12,7 @@ if ( ! class_exists( 'WP_Block_Editor_Context' ) ) {
 }
 
 require_once __DIR__ . '/block-editor.php';
+require_once __DIR__ . '/widgets.php';
 
 if ( ! function_exists( 'build_query_vars_from_query_block' ) ) {
 	/**

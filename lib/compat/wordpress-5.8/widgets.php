@@ -1,8 +1,8 @@
 <?php
 /**
- * Functions for working with widgets in WordPress. These should ultimately live
- * in wp-includes/widgets.php, wp-admin/includes/widgets.php, etc. when merged
- * to Core.
+ * Functions for working with widgets in WordPress. These exist in core and
+ * should be removed when WordPress 5.8.0 becomes the lowest supported version
+ * by this plugin.
  *
  * @package gutenberg
  */
@@ -240,5 +240,28 @@ if ( ! function_exists( 'gutenberg_get_widget_object' ) ) {
 		}
 
 		return null;
+	}
+}
+
+if ( ! function_exists( 'gutenberg_use_widgets_block_editor' ) ) {
+	/**
+	 * Whether or not to use the block editor to manage widgets. Defaults to true
+	 * unless a theme has removed support for widgets-block-editor or a plugin has
+	 * filtered the return value of this function.
+	 *
+	 * Can be removed when minimum WordPress version is 5.8.
+	 *
+	 * @return boolean Whether or not to use the block editor to manage widgets.
+	 */
+	function gutenberg_use_widgets_block_editor() {
+		/**
+		 * Filters whether or not to use the block editor to manage widgets.
+		 *
+		 * @param boolean $use_widgets_block_editor Whether or not to use the block editor to manage widgets.
+		 */
+		return apply_filters(
+			'gutenberg_use_widgets_block_editor',
+			get_theme_support( 'widgets-block-editor' )
+		);
 	}
 }

@@ -46,8 +46,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						// TODO: This chokes when the query param is too big.
 						// Ideally, we'd render a <ServerSideRender>. Maybe by
 						// rendering one in an iframe via a portal.
-						src={ addQueryArgs( 'themes.php', {
-							page: 'gutenberg-widgets',
+						src={ addQueryArgs( 'widgets.php', {
 							'legacy-widget-preview': {
 								idBase,
 								instance,
