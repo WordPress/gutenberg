@@ -121,7 +121,9 @@ function _sync_custom_logo_to_site_logo( $custom_logo ) {
 	if ( empty( $custom_logo ) ) {
 		delete_option( 'site_logo' );
 	} else {
+		remove_action( 'update_option_site_logo', '_sync_site_logo_to_custom_logo' );
 		update_option( 'site_logo', $custom_logo );
+		add_action( 'update_option_site_logo', '_sync_site_logo_to_custom_logo', 10, 2 );
 	}
 	return $custom_logo;
 }
@@ -142,7 +144,9 @@ function _sync_site_logo_to_custom_logo( $old_value, $value ) {
 	if ( empty( $value ) ) {
 		remove_theme_mod( 'custom_logo' );
 	} else {
+		remove_filter( 'pre_set_theme_mod_custom_logo', '_sync_custom_logo_to_site_logo' );
 		set_theme_mod( 'custom_logo', $value );
+		add_filter( 'pre_set_theme_mod_custom_logo', '_sync_custom_logo_to_site_logo' );
 	}
 }
 
