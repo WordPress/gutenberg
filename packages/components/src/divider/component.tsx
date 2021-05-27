@@ -23,7 +23,7 @@ import type { PolymorphicComponentProps } from '../ui/context';
 import * as styles from './styles';
 import { space } from '../ui/utils/space';
 
-export interface DividerProps extends SeparatorProps {
+export interface DividerProps extends Omit< SeparatorProps, 'children' > {
 	/**
 	 * Adjusts all margins.
 	 */

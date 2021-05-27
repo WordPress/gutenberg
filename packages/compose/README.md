@@ -291,10 +291,14 @@ throws a warning when using useLayoutEffect in that environment.
 
 Attach a keyboard shortcut handler.
 
+_Related_
+
+-   <https://craig.is/killing/mice#api.bind> for information about the `callback` parameter.
+
 _Parameters_
 
 -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `Function`: Shortcut callback.
+-   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**

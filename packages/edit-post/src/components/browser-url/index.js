@@ -4,6 +4,7 @@
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Returns the Post's Edit URL.
@@ -98,7 +99,7 @@ export class BrowserURL extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const { getCurrentPost, isSavingPost } = select( 'core/editor' );
+	const { getCurrentPost, isSavingPost } = select( editorStore );
 	const post = getCurrentPost();
 	let { id, status, type } = post;
 	const isTemplate = [ 'wp_template', 'wp_template_part' ].includes( type );
