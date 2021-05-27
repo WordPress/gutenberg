@@ -307,8 +307,8 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 
 	// Save metaboxes when performing a full save on the post.
 	saveMetaboxUnsubscribe = subscribe( () => {
-		const isSavingPost = select( editorStore ).isSavingPost();
-		const isAutosavingPost = select( editorStore ).isAutosavingPost();
+		const isSavingPost = select( editorStore.name ).isSavingPost();
+		const isAutosavingPost = select( editorStore.name ).isAutosavingPost();
 
 		// Save metaboxes on save completion, except for autosaves that are not a post preview.
 		const shouldTriggerMetaboxesSave =
