@@ -42,7 +42,5 @@ export function useCardBody( props ) {
 		...otherProps,
 		className: classes,
 		scrollable,
-		isShady,
-		size,
 	};
 }

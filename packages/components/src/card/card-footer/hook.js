@@ -45,8 +45,5 @@ export function useCardFooter( props ) {
 		...otherProps,
 		className: classes,
 		justify,
-		isBorderless,
-		isShady,
-		size,
 	};
 }

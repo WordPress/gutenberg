@@ -43,8 +43,5 @@ export function useCardHeader( props ) {
 	return {
 		...otherProps,
 		className: classes,
-		isBorderless,
-		isShady,
-		size,
 	};
 }
