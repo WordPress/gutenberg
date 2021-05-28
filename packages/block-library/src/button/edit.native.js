@@ -127,7 +127,7 @@ class ButtonEdit extends Component {
 			},
 			linkRel: {
 				label: __( 'Link Rel' ),
-				placeholder: __( 'None' ),
+				placeholder: _x( 'None', 'Rel attribute value' ),
 			},
 		};
 

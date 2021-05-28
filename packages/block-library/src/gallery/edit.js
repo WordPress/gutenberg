@@ -32,7 +32,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -55,7 +55,10 @@ const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
 	{ value: LINK_DESTINATION_MEDIA, label: __( 'Media File' ) },
-	{ value: LINK_DESTINATION_NONE, label: __( 'None' ) },
+	{
+		value: LINK_DESTINATION_NONE,
+		label: _x( 'None', 'Media item link option' ),
+	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 

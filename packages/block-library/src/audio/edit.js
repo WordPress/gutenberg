@@ -20,7 +20,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
@@ -169,7 +169,10 @@ function AudioEdit( {
 							{ value: '', label: __( 'Browser default' ) },
 							{ value: 'auto', label: __( 'Auto' ) },
 							{ value: 'metadata', label: __( 'Metadata' ) },
-							{ value: 'none', label: __( 'None' ) },
+							{
+								value: 'none',
+								label: _x( 'None', 'Preload value' ),
+							},
 						] }
 					/>
 				</PanelBody>

@@ -8,7 +8,7 @@ import { useMemo, useCallback, Platform } from '@wordpress/element';
 const options = [
 	{ value: 'auto', label: __( 'Auto' ) },
 	{ value: 'metadata', label: __( 'Metadata' ) },
-	{ value: 'none', label: __( 'None' ) },
+	{ value: 'none', label: _x( 'None', 'Preload value' ) },
 ];
 
 const VideoSettings = ( { setAttributes, attributes } ) => {
