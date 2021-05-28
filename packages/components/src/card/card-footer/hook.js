@@ -20,7 +20,7 @@ import * as styles from '../styles';
 export function useCardFooter( props ) {
 	const {
 		className,
-		justify = 'flex-end',
+		justify,
 		isBorderless = false,
 		isShady = false,
 		size = 'medium',
