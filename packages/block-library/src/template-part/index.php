@@ -96,6 +96,17 @@ function render_block_core_template_part( $attributes ) {
 
 	// Run through the actions that are typically taken on the_content.
 	$seen_ids[ $template_part_id ] = true;
+	/**
+	 * Fires before/after the template part is rendered.
+	 *
+	 * Allows extensions to follow template part processing.
+	 * Called before and after each template part is rendered.
+	 *
+	 * @param array|null $attributes The template part attributes. Null after rendering.
+	 * @param array $seen_ids The current template part nesting.
+	 */
+	do_action( 'rendering_template_part', $attributes, $seen_ids );
+
 	$content                       = do_blocks( $content );
 	unset( $seen_ids[ $template_part_id ] );
 	$content = wptexturize( $content );
@@ -121,6 +132,9 @@ function render_block_core_template_part( $attributes ) {
 		$html_tag = esc_attr( $attributes['tagName'] );
 	}
 	$wrapper_attributes = get_block_wrapper_attributes();
+
+	/** This action is documented in template-part.php */
+	do_action( 'rendering_template_part', null, $seen_ids );
 
 	return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
 }
