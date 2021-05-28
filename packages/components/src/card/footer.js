@@ -23,8 +23,7 @@ function CardFooter( props, forwardedRef ) {
 	const {
 		className,
 		justify = 'flex-end',
-		// TODO: add border styles + isBorderless mod to remove them
-		// isBorderless = false,
+		isBorderless = false,
 		isShady = false,
 		size = 'medium',
 		...otherProps
@@ -33,9 +32,11 @@ function CardFooter( props, forwardedRef ) {
 	const classes = useMemo(
 		() =>
 			cx(
+				styles.Footer,
 				styles.borderRadius,
 				styles.headerFooter,
 				styles.cardPaddings[ size ],
+				isBorderless && styles.borderless,
 				isShady ? styles.shady : undefined,
 				className
 			),

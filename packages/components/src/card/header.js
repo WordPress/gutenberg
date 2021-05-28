@@ -22,6 +22,7 @@ import * as styles from './styles';
 function CardHeader( props, forwardedRef ) {
 	const {
 		className,
+		isBorderless = false,
 		isShady = false,
 		size = 'medium',
 		...otherProps
@@ -34,6 +35,7 @@ function CardHeader( props, forwardedRef ) {
 				styles.borderRadius,
 				styles.headerFooter,
 				styles.cardPaddings[ size ],
+				isBorderless && styles.borderless,
 				isShady && styles.shady,
 				className
 			),

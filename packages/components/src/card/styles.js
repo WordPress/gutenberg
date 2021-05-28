@@ -15,6 +15,22 @@ export const Card = css`
 
 export const Header = css`
 	border-bottom: 1px solid;
+
+	&:last-child {
+		border-bottom: none;
+	}
+`;
+
+export const Footer = css`
+	border-top: 1px solid;
+
+	&:first-child {
+		border-top: none;
+	}
+`;
+
+export const headerFooter = css`
+	border-color: ${ CONFIG.colorDivider };
 `;
 
 export const Content = css`
@@ -24,10 +40,6 @@ export const Content = css`
 export const Body = css`
 	height: auto;
 	max-height: 100%;
-`;
-
-export const headerFooter = css`
-	border-color: ${ CONFIG.colorDivider };
 `;
 
 export const borderRadius = css`
@@ -42,8 +54,12 @@ export const borderRadius = css`
 	}
 `;
 
-export const borderless = css`
+export const boxShadowless = css`
 	box-shadow: none;
+`;
+
+export const borderless = css`
+	border: none;
 `;
 
 export const rounded = css`
