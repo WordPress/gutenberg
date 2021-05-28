@@ -26,7 +26,7 @@ import { isAppleOS } from './platform';
 
 /** @typedef {typeof ALT | CTRL | COMMAND | SHIFT } WPModifierPart */
 
-/** @typedef {'primary' | 'primaryShift' | 'primaryAlt' | 'secondary' | 'access' | 'ctrl' | 'alt' | 'ctrlShift' | 'shift' | 'shiftAlt'} WPKeycodeModifier */
+/** @typedef {'primary' | 'primaryShift' | 'primaryAlt' | 'secondary' | 'access' | 'ctrl' | 'alt' | 'ctrlShift' | 'shift' | 'shiftAlt' | 'undefined'} WPKeycodeModifier */
 
 /**
  * An object of handler functions for each of the possible modifier
@@ -144,6 +144,7 @@ export const modifiers = {
 	ctrlShift: () => [ CTRL, SHIFT ],
 	shift: () => [ SHIFT ],
 	shiftAlt: () => [ SHIFT, ALT ],
+	undefined: () => [],
 };
 
 /**
@@ -325,10 +326,17 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 			return false;
 		}
 
+		const key = event.key.toLowerCase();
+
 		if ( ! character ) {
-			return includes( mods, event.key.toLowerCase() );
+			return includes( mods, key );
 		}
 
-		return event.key === character;
+		// For backwards compatibility.
+		if ( character === 'del' ) {
+			character = 'delete';
+		}
+
+		return key === character;
 	};
 } );

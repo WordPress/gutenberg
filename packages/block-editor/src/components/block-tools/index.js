@@ -1,9 +1,15 @@
 /**
+ * External dependencies
+ */
+import { first, last } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
+import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -29,23 +35,98 @@ export default function BlockTools( { children, __unstableContentRef } ) {
 		( select ) => select( blockEditorStore ).getSettings().hasFixedToolbar,
 		[]
 	);
+	const isMatch = useShortcutEventMatch();
+	const { getSelectedBlockClientIds, getBlockRootClientId } = useSelect(
+		blockEditorStore
+	);
+	const {
+		duplicateBlocks,
+		removeBlocks,
+		insertAfterBlock,
+		insertBeforeBlock,
+		clearSelectedBlock,
+		moveBlocksUp,
+		moveBlocksDown,
+	} = useDispatch( blockEditorStore );
+
+	function onKeyDown( event ) {
+		if ( isMatch( 'core/block-editor/move-up', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				const rootClientId = getBlockRootClientId( first( clientIds ) );
+				moveBlocksUp( clientIds, rootClientId );
+			}
+		} else if ( isMatch( 'core/block-editor/move-down', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				const rootClientId = getBlockRootClientId( first( clientIds ) );
+				moveBlocksDown( clientIds, rootClientId );
+			}
+		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				duplicateBlocks( clientIds );
+			}
+		} else if ( isMatch( 'core/block-editor/remove', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				removeBlocks( clientIds );
+			}
+		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				insertAfterBlock( last( clientIds ) );
+			}
+		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				insertBeforeBlock( first( clientIds ) );
+			}
+		} else if (
+			isMatch( 'core/block-editor/delete-multi-selection', event )
+		) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length > 1 ) {
+				event.preventDefault();
+				removeBlocks( clientIds );
+			}
+		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length > 1 ) {
+				event.preventDefault();
+				clearSelectedBlock();
+				event.target.ownerDocument.defaultView
+					.getSelection()
+					.removeAllRanges();
+			}
+		}
+	}
 
 	return (
-		<InsertionPoint __unstableContentRef={ __unstableContentRef }>
-			{ ( hasFixedToolbar || ! isLargeViewport ) && (
-				<BlockContextualToolbar isFixed />
-			) }
-			{ /* Even if the toolbar is fixed, the block popover is still
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div onKeyDown={ onKeyDown }>
+			<InsertionPoint __unstableContentRef={ __unstableContentRef }>
+				{ ( hasFixedToolbar || ! isLargeViewport ) && (
+					<BlockContextualToolbar isFixed />
+				) }
+				{ /* Even if the toolbar is fixed, the block popover is still
                  needed for navigation mode. */ }
-			<BlockPopover __unstableContentRef={ __unstableContentRef } />
-			{ /* Used for the inline rich text toolbar. */ }
-			<Popover.Slot
-				name="block-toolbar"
-				ref={ usePopoverScroll( __unstableContentRef ) }
-			/>
-			{ children }
-			{ /* Forward compatibility: a place to render block tools behind the
+				<BlockPopover __unstableContentRef={ __unstableContentRef } />
+				{ /* Used for the inline rich text toolbar. */ }
+				<Popover.Slot
+					name="block-toolbar"
+					ref={ usePopoverScroll( __unstableContentRef ) }
+				/>
+				{ children }
+				{ /* Forward compatibility: a place to render block tools behind the
                  content so it can be tabbed to properly. */ }
-		</InsertionPoint>
+			</InsertionPoint>
+		</div>
 	);
 }
