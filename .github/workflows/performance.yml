@@ -56,4 +56,4 @@ jobs:
                   WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_BRANCH="wp/${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf --ci "$WP_BRANCH" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --tests-branch "$WP_BRANCH"
+                  ./bin/plugin/cli.js perf --ci "$WP_BRANCH" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --wp-version "$WP_BRANCH"
