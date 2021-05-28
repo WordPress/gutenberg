@@ -10,9 +10,9 @@ import { useCardFooter } from './hook';
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardFooter( props, forwardedRef ) {
-	const { justify = 'flex-end', ...otherProps } = useCardFooter( props );
+	const footerProps = useCardFooter( props );
 
-	return <Flex { ...otherProps } justify={ justify } ref={ forwardedRef } />;
+	return <Flex { ...footerProps } ref={ forwardedRef } />;
 }
 
 /**
