@@ -3,7 +3,7 @@
  */
 import {
 	toWidthPrecision,
-	getColumnWidthsAsFrUnits,
+	getColumnWidthsAsGridColumnsValues,
 	getEffectiveColumnWidth,
 	getTotalColumnsWidth,
 	getColumnWidths,
@@ -283,7 +283,7 @@ describe( 'getMappedColumnWidths', () => {
 	} );
 } );
 
-describe( 'getColumnWidthsAsFrUnits', () => {
+describe( 'getColumnWidthsAsGridColumnsValues', () => {
 	it( 'returns equal widths when no width attributes are used', () => {
 		const blocks = [
 			{ clientId: 'a', attributes: {} },
@@ -291,48 +291,60 @@ describe( 'getColumnWidthsAsFrUnits', () => {
 			{ clientId: 'c', attributes: {} },
 		];
 
-		const result = getColumnWidthsAsFrUnits( blocks );
+		const result = getColumnWidthsAsGridColumnsValues( blocks );
 
 		expect( result ).toEqual( '1fr 1fr 1fr' );
 	} );
 
-	it( 'rounds percentages to nearest fr unit', () => {
+	it( 'should round percentages to nearest fr unit', () => {
 		const blocks = [
-			{ clientId: 'a', attributes: { width: 33.33 } },
-			{ clientId: 'b', attributes: { width: 33.33 } },
-			{ clientId: 'c', attributes: { width: 33.33 } },
+			{ clientId: 'a', attributes: { width: '33.33%' } },
+			{ clientId: 'b', attributes: { width: '33.33%' } },
+			{ clientId: 'c', attributes: { width: '33.33%' } },
 		];
 
-		const result = getColumnWidthsAsFrUnits( blocks );
+		const result = getColumnWidthsAsGridColumnsValues( blocks );
 
 		expect( result ).toEqual( '1fr 1fr 1fr' );
 	} );
 
-	it( 'calculates fr units correctly from width attributes', () => {
+	it( 'should calculate fr units correctly from width attributes', () => {
 		const blocks = [
-			{ clientId: 'a', attributes: { width: 60 } },
-			{ clientId: 'b', attributes: { width: 20 } },
-			{ clientId: 'c', attributes: { width: 20 } },
+			{ clientId: 'a', attributes: { width: '60%' } },
+			{ clientId: 'b', attributes: { width: '20%' } },
+			{ clientId: 'c', attributes: { width: '20%' } },
 		];
 
-		const result = getColumnWidthsAsFrUnits( blocks );
+		const result = getColumnWidthsAsGridColumnsValues( blocks );
 
 		expect( result ).toEqual( '1.8fr 0.6fr 0.6fr' );
 	} );
 
 	it( 'returns an empty string when called with an empty array', () => {
-		const result = getColumnWidthsAsFrUnits( [] );
+		const result = getColumnWidthsAsGridColumnsValues( [] );
 		expect( result ).toBe( '' );
 	} );
 
-	it( 'treats 0 or empty widths as though no custom width is specified', () => {
+	it( 'should treat 0 or empty widths as though no custom width is specified', () => {
 		const blocks = [
-			{ clientId: 'a', attributes: { width: 0 } },
+			{ clientId: 'a', attributes: { width: '0' } },
 			{ clientId: 'b', attributes: { width: '' } },
-			{ clientId: 'c', attributes: { width: 33.33 } },
+			{ clientId: 'c', attributes: { width: '33.33%' } },
 		];
 
-		const result = getColumnWidthsAsFrUnits( blocks );
+		const result = getColumnWidthsAsGridColumnsValues( blocks );
 		expect( result ).toBe( '1fr 1fr 1fr' );
+	} );
+
+	it( 'should skip converting non-percentage values to fr units', () => {
+		const blocks = [
+			{ clientId: 'a', attributes: { width: '50px' } },
+			{ clientId: 'b', attributes: { width: '4em' } },
+			{ clientId: 'b', attributes: { width: '4rem' } },
+			{ clientId: 'c', attributes: { width: '25%' } },
+		];
+
+		const result = getColumnWidthsAsGridColumnsValues( blocks );
+		expect( result ).toBe( '50px 4em 4rem 1fr' );
 	} );
 } );

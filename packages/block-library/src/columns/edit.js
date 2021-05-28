@@ -40,7 +40,7 @@ import {
  */
 import {
 	hasExplicitPercentColumnWidths,
-	getColumnWidthsAsFrUnits,
+	getColumnWidthsAsGridColumnsValues,
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
@@ -145,7 +145,9 @@ function ColumnsEditContainer( {
 
 	useEffect( () => {
 		setAttributes( {
-			gridTemplateColumns: getColumnWidthsAsFrUnits( innerBlocks ),
+			gridTemplateColumns: getColumnWidthsAsGridColumnsValues(
+				innerBlocks
+			),
 		} );
 	}, [ count, innerBlocks ] );
 

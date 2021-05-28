@@ -17,7 +17,7 @@ import {
 /**
  * Internal dependencies
  */
-import { getColumnWidthsAsFrUnits } from './utils';
+import { getColumnWidthsAsGridColumnsValues } from './utils';
 
 /**
  * Given an HTML string for a deprecated columns inner block, returns the
@@ -62,7 +62,7 @@ const migrateCustomColors = ( attributes, innerBlocks ) => {
 		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
 		gridGap: 2,
 		gridGapUnit: 'em',
-		gridTemplateColumns: getColumnWidthsAsFrUnits( innerBlocks ),
+		gridTemplateColumns: getColumnWidthsAsGridColumnsValues( innerBlocks ),
 		style,
 	};
 };
@@ -88,7 +88,9 @@ export default [
 				...attributes,
 				gridGap: 2,
 				gridGapUnit: 'em',
-				gridTemplateColumns: getColumnWidthsAsFrUnits( innerBlocks ),
+				gridTemplateColumns: getColumnWidthsAsGridColumnsValues(
+					innerBlocks
+				),
 			};
 		},
 		save( { attributes } ) {
@@ -218,7 +220,7 @@ export default [
 					...omit( attributes, [ 'columns' ] ),
 					gridGap: 2,
 					gridGapUnit: 'em',
-					gridTemplateColumns: getColumnWidthsAsFrUnits(
+					gridTemplateColumns: getColumnWidthsAsGridColumnsValues(
 						migratedInnerBlocks
 					),
 				},
@@ -247,7 +249,9 @@ export default [
 				...omit( attributes, [ 'columns' ] ),
 				gridGap: 2,
 				gridGapUnit: 'em',
-				gridTemplateColumns: getColumnWidthsAsFrUnits( innerBlocks ),
+				gridTemplateColumns: getColumnWidthsAsGridColumnsValues(
+					innerBlocks
+				),
 			};
 
 			return [ attributes, innerBlocks ];
