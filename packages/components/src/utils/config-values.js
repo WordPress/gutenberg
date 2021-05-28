@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { space } from '../ui/utils/space';
+import { space } from './space';
 import { COLORS } from './colors-values';
 
 const CONTROL_HEIGHT = '30px';
