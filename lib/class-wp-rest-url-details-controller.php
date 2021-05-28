@@ -74,7 +74,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 				),
 				'icon'        => array(
 					'description' => __( 'The favicon image link of the <link rel="icon"> element from the URL.', 'gutenberg' ),
-					'type'        => 'uri',
+					'type'        => 'string',
+					'format'      => 'uri',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
@@ -86,7 +87,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 				),
 				'image'       => array(
 					'description' => __( 'The OG image link of the <meta property="og:image"> or <meta property="og:image:url"> element from the URL.', 'gutenberg' ),
-					'type'        => 'uri',
+					'type'        => 'string',
+					'format'      => 'uri',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
