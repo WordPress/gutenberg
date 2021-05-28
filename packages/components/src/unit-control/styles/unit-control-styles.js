@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { color, rtl } from '../../utils/style-mixins';
+import { COLORS, rtl } from '../../utils';
 import NumberControl from '../../number-control';
 
 export const Root = styled.div`
@@ -14,40 +14,24 @@ export const Root = styled.div`
 	position: relative;
 `;
 
-const fontSizeStyles = ( { size } ) => {
-	const sizes = {
-		default: null,
-		small: '11px',
-	};
-
-	const fontSize = sizes[ size ];
-
-	if ( ! fontSize ) return '';
+const paddingStyles = ( { disableUnits } ) => {
+	const value = disableUnits ? 3 : 24;
 
 	return css`
-		@media ( min-width: 600px ) {
-			font-size: ${fontSize};
-		}
+		${ rtl( { paddingRight: value } )() };
 	`;
 };
 
-const sizeStyles = ( { size } ) => {
-	const sizes = {
-		default: {
-			height: 30,
-			lineHeight: 30,
-			minHeight: 30,
-		},
-		small: {
-			height: 24,
-			lineHeight: 24,
-			minHeight: 24,
-		},
-	};
+const arrowStyles = ( { disableUnits } ) => {
+	if ( disableUnits ) return '';
 
-	const style = sizes[ size ] || sizes.default;
-
-	return css( style );
+	return css`
+		&::-webkit-outer-spin-button,
+		&::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+	`;
 };
 
 // TODO: Resolve need to use &&& to increase specificity
@@ -55,38 +39,31 @@ const sizeStyles = ( { size } ) => {
 
 export const ValueInput = styled( NumberControl )`
 	&&& {
-		appearance: none;
-		-moz-appearance: textfield;
-		box-sizing: border-box;
-		border: 1px solid ${color( 'ui.border' )};
-		border-radius: 2px;
-		padding: 3px 8px;
-		display: block;
-		width: 100%;
+		input {
+			appearance: none;
+			-moz-appearance: textfield;
+			display: block;
+			width: 100%;
 
-		&::-webkit-outer-spin-button,
-		&::-webkit-inner-spin-button {
-			-webkit-appearance: none;
-			margin: 0;
+			${ arrowStyles };
+			${ paddingStyles };
 		}
-
-		${rtl( { paddingRight: 20 } )}
-		${fontSizeStyles};
-		${sizeStyles};
 	}
 `;
 
 const unitSizeStyles = ( { size } ) => {
 	const sizes = {
 		default: {
-			top: 5,
-			height: 20,
-			minHeight: 20,
+			height: 28,
+			lineHeight: '24px',
+			minHeight: 28,
+			top: 1,
 		},
 		small: {
-			top: 4,
-			height: 16,
-			minHeight: 16,
+			height: 22,
+			lineHeight: '18px',
+			minHeight: 22,
+			top: 1,
 		},
 	};
 
@@ -96,58 +73,58 @@ const unitSizeStyles = ( { size } ) => {
 const baseUnitLabelStyles = ( props ) => {
 	return css`
 		appearance: none;
-		background: ${color( 'ui.background' )};
+		background: transparent;
 		border-radius: 2px;
 		border: none;
 		box-sizing: border-box;
-		color: ${color( 'darkGray.500' )};
+		color: ${ COLORS.darkGray[ 500 ] };
 		display: block;
 		font-size: 8px;
 		line-height: 1;
 		letter-spacing: -0.5px;
 		outline: none;
-		padding: 2px 2px;
+		padding: 2px 1px;
 		position: absolute;
 		text-align-last: center;
 		text-transform: uppercase;
-		width: 22px;
-		z-index: 1;
+		width: 20px;
 
-		${rtl( { right: 4 } )()}
-		${unitSizeStyles( props )}
+		${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
+		${ rtl( { right: 0 } )() }
+		${ unitSizeStyles( props ) }
 	`;
-};
-
-const unitLabelPaddingStyles = ( { size } ) => {
-	const sizes = {
-		default: '6px 2px',
-		small: '4px 2px',
-	};
-
-	return css( { padding: sizes[ size ] } );
 };
 
 export const UnitLabel = styled.div`
 	&&& {
-		${baseUnitLabelStyles};
-		${unitLabelPaddingStyles};
+		pointer-events: none;
+
+		${ baseUnitLabelStyles };
 	}
 `;
 
 export const UnitSelect = styled.select`
 	&&& {
-		${baseUnitLabelStyles};
+		${ baseUnitLabelStyles };
 		cursor: pointer;
 		border: 1px solid transparent;
 
 		&:hover {
-			background-color: ${color( 'lightGray.300' )};
+			background-color: ${ COLORS.lightGray[ 300 ] };
 		}
 
 		&:focus {
-			border-color: ${color( 'ui.borderFocus' )};
+			border-color: ${ COLORS.ui.borderFocus };
 			outline: 2px solid transparent;
 			outline-offset: 0;
+		}
+
+		&:disabled {
+			cursor: initial;
+
+			&:hover {
+				background-color: transparent;
+			}
 		}
 	}
 `;

@@ -1,29 +1,25 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
-
-/**
- * WordPress dependencies
- */
+} from '@wordpress/react-native-bridge';
 import {
 	Icon,
 	ToolbarButton,
 	ToolbarGroup,
 	PanelBody,
 } from '@wordpress/components';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { withPreferredColorScheme, compose } from '@wordpress/compose';
 import {
 	BlockCaption,
 	MediaPlaceholder,
@@ -34,11 +30,13 @@ import {
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { video as SvgIcon, replace } from '@wordpress/icons';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -53,7 +51,7 @@ const ICON_TYPE = {
 	UPLOAD: 'upload',
 };
 
-class VideoEdit extends React.Component {
+class VideoEdit extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -193,13 +191,19 @@ class VideoEdit extends React.Component {
 	}
 
 	render() {
-		const { setAttributes, attributes, isSelected } = this.props;
+		const {
+			setAttributes,
+			attributes,
+			isSelected,
+			wasBlockJustInserted,
+		} = this.props;
 		const { id, src } = attributes;
 		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+				isReplacingMedia={ true }
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
@@ -224,6 +228,9 @@ class VideoEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
+						autoOpenMediaUpload={
+							isSelected && wasBlockJustInserted
+						}
 					/>
 				</View>
 			);
@@ -239,14 +246,16 @@ class VideoEdit extends React.Component {
 					{ ! this.state.isCaptionSelected && (
 						<BlockControls>{ toolbarEditButton }</BlockControls>
 					) }
-					<InspectorControls>
-						<PanelBody title={ __( 'Video settings' ) }>
-							<VideoCommonSettings
-								setAttributes={ setAttributes }
-								attributes={ attributes }
-							/>
-						</PanelBody>
-					</InspectorControls>
+					{ isSelected && (
+						<InspectorControls>
+							<PanelBody title={ __( 'Video settings' ) }>
+								<VideoCommonSettings
+									setAttributes={ setAttributes }
+									attributes={ attributes }
+								/>
+							</PanelBody>
+						</InspectorControls>
+					) }
 					<MediaUploadProgress
 						mediaId={ id }
 						onFinishMediaUploadWithSuccess={
@@ -343,7 +352,7 @@ class VideoEdit extends React.Component {
 						accessibilityLabelCreator={ ( caption ) =>
 							isEmpty( caption )
 								? /* translators: accessibility text. Empty video caption. */
-								  'Video caption. Empty'
+								  __( 'Video caption. Empty' )
 								: sprintf(
 										/* translators: accessibility text. %s: video caption. */
 										__( 'Video caption. %s' ),
@@ -354,6 +363,7 @@ class VideoEdit extends React.Component {
 						isSelected={ this.state.isCaptionSelected }
 						onFocus={ this.onFocusCaption }
 						onBlur={ this.props.onBlur } // always assign onBlur as props
+						insertBlocksAfter={ this.props.insertBlocksAfter }
 					/>
 				</View>
 			</TouchableWithoutFeedback>
@@ -361,4 +371,12 @@ class VideoEdit extends React.Component {
 	}
 }
 
-export default withPreferredColorScheme( VideoEdit );
+export default compose( [
+	withSelect( ( select, { clientId } ) => ( {
+		wasBlockJustInserted: select( blockEditorStore ).wasBlockJustInserted(
+			clientId,
+			'inserter_menu'
+		),
+	} ) ),
+	withPreferredColorScheme,
+] )( VideoEdit );

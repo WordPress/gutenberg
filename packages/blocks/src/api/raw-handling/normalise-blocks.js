@@ -1,15 +1,9 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { isEmpty } from './utils';
-import { isPhrasingContent } from './phrasing-content';
+import { isEmpty, isPhrasingContent } from '@wordpress/dom';
 
-/**
- * Browser dependencies
- */
-const { ELEMENT_NODE, TEXT_NODE } = window.Node;
-
-export default function( HTML ) {
+export default function normaliseBlocks( HTML ) {
 	const decuDoc = document.implementation.createHTMLDocument( '' );
 	const accuDoc = document.implementation.createHTMLDocument( '' );
 
@@ -22,8 +16,8 @@ export default function( HTML ) {
 		const node = decu.firstChild;
 
 		// Text nodes: wrap in a paragraph, or append to previous.
-		if ( node.nodeType === TEXT_NODE ) {
-			if ( ! node.nodeValue.trim() ) {
+		if ( node.nodeType === node.TEXT_NODE ) {
+			if ( isEmpty( node ) ) {
 				decu.removeChild( node );
 			} else {
 				if ( ! accu.lastChild || accu.lastChild.nodeName !== 'P' ) {
@@ -33,7 +27,7 @@ export default function( HTML ) {
 				accu.lastChild.appendChild( node );
 			}
 			// Element nodes.
-		} else if ( node.nodeType === ELEMENT_NODE ) {
+		} else if ( node.nodeType === node.ELEMENT_NODE ) {
 			// BR nodes: create a new paragraph on double, or append to previous.
 			if ( node.nodeName === 'BR' ) {
 				if ( node.nextSibling && node.nextSibling.nodeName === 'BR' ) {

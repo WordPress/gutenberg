@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/viewport --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Usage
 
@@ -27,19 +27,25 @@ The standard set of breakpoint thresholds is as follows:
 
 ### Data Module
 
-The Viewport module registers itself under the `core/viewport` data namespace.
+The Viewport module registers itself under the `core/viewport` data namespace and is exposed from the package as `store`.
 
 ```js
-const isSmall = select( 'core/viewport' ).isViewportMatch( '< medium' );
+import { select } from '@wordpress/data';
+import { store } from '@wordpress/viewport';
+
+const isSmall = select( store ).isViewportMatch( '< medium' );
 ```
 
 The `isViewportMatch` selector accepts a single string argument `query`. It consists of an optional operator and breakpoint name, separated with a space. The operator can be `<` or `>=`, defaulting to `>=`.
 
 ```js
-const { isViewportMatch } = select( 'core/viewport' );
+import { select } from '@wordpress/data';
+import { store } from '@wordpress/viewport';
+
+const { isViewportMatch } = select( store );
 const isSmall = isViewportMatch( '< medium' );
 const isWideOrHuge = isViewportMatch( '>= wide' );
-// Equivalent: 
+// Equivalent:
 //  const isWideOrHuge = isViewportMatch( 'wide' );
 ```
 
@@ -75,6 +81,18 @@ _Parameters_
 _Returns_
 
 -   `Function`: Higher-order component.
+
+<a name="store" href="#store">#</a> **store**
+
+Store definition for the viewport namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object`
 
 <a name="withViewportMatch" href="#withViewportMatch">#</a> **withViewportMatch**
 

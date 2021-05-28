@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { Animated, Easing, View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { ToolbarButton, Toolbar } from '@wordpress/components';
+import { useEffect, useState } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -16,7 +17,14 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './styles.scss';
 import NavigateUpSVG from './nav-up-icon';
-import Breadcrumb from '../block-list/breadcrumb.native';
+import BlockSelectionButton from '../block-list/block-selection-button.native';
+import { store as blockEditorStore } from '../../store';
+
+const EASE_IN_DURATION = 250;
+const EASE_OUT_DURATION = 80;
+const TRANSLATION_RANGE = 8;
+
+const opacity = new Animated.Value( 0 );
 
 const FloatingToolbar = ( {
 	selectedClientId,
@@ -24,24 +32,74 @@ const FloatingToolbar = ( {
 	showFloatingToolbar,
 	onNavigateUp,
 	isRTL,
-} ) =>
-	!! showFloatingToolbar && (
-		<TouchableWithoutFeedback accessible={ false }>
-			<View style={ styles.floatingToolbar }>
-				{ !! parentId && (
+} ) => {
+	// Sustain old selection for proper block selection button rendering when exit animation is ongoing.
+	const [ previousSelection, setPreviousSelection ] = useState( {} );
+
+	useEffect( () => {
+		Animated.timing( opacity, {
+			toValue: showFloatingToolbar ? 1 : 0,
+			duration: showFloatingToolbar
+				? EASE_IN_DURATION
+				: EASE_OUT_DURATION,
+			easing: Easing.ease,
+			useNativeDriver: true,
+		} ).start();
+	}, [ showFloatingToolbar ] );
+
+	useEffect( () => {
+		if ( showFloatingToolbar )
+			setPreviousSelection( { clientId: selectedClientId, parentId } );
+	}, [ selectedClientId ] );
+
+	const translationRange =
+		( Platform.OS === 'android' ? -1 : 1 ) * TRANSLATION_RANGE;
+
+	const translation = opacity.interpolate( {
+		inputRange: [ 0, 1 ],
+		outputRange: [ translationRange, 0 ],
+	} );
+
+	const animationStyle = {
+		opacity,
+		transform: [ { translateY: translation } ],
+	};
+
+	const {
+		clientId: previousSelectedClientId,
+		parentId: previousSelectedParentId,
+	} = previousSelection;
+
+	const showPrevious = previousSelectedClientId && ! showFloatingToolbar;
+	const blockSelectionButtonClientId = showPrevious
+		? previousSelectedClientId
+		: selectedClientId;
+	const showNavUpButton =
+		!! parentId || ( showPrevious && !! previousSelectedParentId );
+
+	return (
+		!! opacity && (
+			<Animated.View style={ [ styles.floatingToolbar, animationStyle ] }>
+				{ showNavUpButton && (
 					<Toolbar passedStyle={ styles.toolbar }>
 						<ToolbarButton
 							title={ __( 'Navigate Up' ) }
-							onClick={ () => onNavigateUp( parentId ) }
+							onClick={
+								! showPrevious &&
+								( () => onNavigateUp( parentId ) )
+							}
 							icon={ <NavigateUpSVG isRTL={ isRTL } /> }
 						/>
 						<View style={ styles.pipe } />
 					</Toolbar>
 				) }
-				<Breadcrumb clientId={ selectedClientId } />
-			</View>
-		</TouchableWithoutFeedback>
+				<BlockSelectionButton
+					clientId={ blockSelectionButtonClientId }
+				/>
+			</Animated.View>
+		)
 	);
+};
 
 export default compose( [
 	withSelect( ( select ) => {
@@ -51,7 +109,7 @@ export default compose( [
 			getBlockRootClientId,
 			getBlockCount,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedClientId = getSelectedBlockClientId();
 
@@ -67,7 +125,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { selectBlock } = dispatch( 'core/block-editor' );
+		const { selectBlock } = dispatch( blockEditorStore );
 
 		return {
 			onNavigateUp( clientId, initialPosition ) {

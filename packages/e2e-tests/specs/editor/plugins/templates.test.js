@@ -40,6 +40,7 @@ describe( 'templates', () => {
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
 			await page.reload();
+			await page.waitForSelector( '.edit-post-layout' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -53,6 +54,7 @@ describe( 'templates', () => {
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
 			await page.reload();
+			await page.waitForSelector( '.edit-post-layout' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -103,6 +105,7 @@ describe( 'templates', () => {
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
 			await page.reload();
+			await page.waitForSelector( '.edit-post-layout' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );

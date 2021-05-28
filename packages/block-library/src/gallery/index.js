@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { gallery as icon } from '@wordpress/icons';
 
 /**
@@ -18,10 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Gallery' ),
-	description: __( 'Display multiple images in a rich gallery.' ),
 	icon,
-	keywords: [ __( 'images' ), __( 'photos' ) ],
 	example: {
 		attributes: {
 			columns: 2,
@@ -36,9 +32,6 @@ export const settings = {
 				},
 			],
 		},
-	},
-	supports: {
-		align: true,
 	},
 	transforms,
 	edit,

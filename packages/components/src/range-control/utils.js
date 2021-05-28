@@ -9,16 +9,21 @@ import { clamp, noop } from 'lodash';
 import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
 
 /**
+ * Internal dependencies
+ */
+import { useControlledState } from '../utils/hooks';
+
+/**
  * A float supported clamp function for a specific value.
  *
- * @param {number|null} value The value to clamp
- * @param {number} min The minimum value
- * @param {number} max The maxinum value
+ * @param {number|null} value The value to clamp.
+ * @param {number}      min   The minimum value.
+ * @param {number}      max   The maximum value.
  *
  * @return {number} A (float) number
  */
 export function floatClamp( value, min, max ) {
-	if ( ! isFinite( value ) ) {
+	if ( typeof value !== 'number' ) {
 		return null;
 	}
 
@@ -27,37 +32,58 @@ export function floatClamp( value, min, max ) {
 
 /**
  * Hook to store a clamped value, derived from props.
+ *
+ * @param {Object} settings         Hook settings.
+ * @param {number} settings.min     The minimum value.
+ * @param {number} settings.max     The maximum value.
+ * @param {number} settings.value  	The current value.
+ * @param {any}    settings.initial The initial value.
+ *
+ * @return {[*, Function]} The controlled value and the value setter.
  */
-export function useControlledRangeValue( { min, max, value: valueProp } ) {
-	const [ value, setValue ] = useState( floatClamp( valueProp, min, max ) );
-	const valueRef = useRef( value );
-
-	const setClampValue = useCallback(
-		( nextValue ) => {
-			setValue( floatClamp( nextValue, min, max ) );
-		},
-		[ setValue, min, max ]
+export function useControlledRangeValue( {
+	min,
+	max,
+	value: valueProp,
+	initial,
+} ) {
+	const [ state, setInternalState ] = useControlledState(
+		floatClamp( valueProp, min, max ),
+		{ initial, fallback: null }
 	);
 
-	useEffect( () => {
-		if ( valueRef.current !== valueProp ) {
-			setClampValue( valueProp );
-			valueRef.current = valueProp;
-		}
-	}, [ valueProp, setValue ] );
+	const setState = useCallback(
+		( nextValue ) => {
+			if ( nextValue === null ) {
+				setInternalState( null );
+			} else {
+				setInternalState( floatClamp( nextValue, min, max ) );
+			}
+		},
+		[ min, max ]
+	);
 
-	return [ value, setValue ];
+	return [ state, setState ];
 }
 
 /**
  * Hook to encapsulate the debouncing "hover" to better handle the showing
  * and hiding of the Tooltip.
+ *
+ * @param {Object}   settings                     Hook settings.
+ * @param {Function} [settings.onShow=noop]       A callback function invoked when the element is shown.
+ * @param {Function} [settings.onHide=noop]       A callback function invoked when the element is hidden.
+ * @param {Function} [settings.onMouseMove=noop]  A callback function invoked when the mouse is moved.
+ * @param {Function} [settings.onMouseLeave=noop] A callback function invoked when the mouse is moved out of the element.
+ * @param {number}   [settings.timeout=300]       Timeout before the element is shown or hidden.
+ *
+ * @return {Object} Bound properties for use on a React.Node.
  */
 export function useDebouncedHoverInteraction( {
-	onShow = noop,
 	onHide = noop,
-	onMouseMove = noop,
 	onMouseLeave = noop,
+	onMouseMove = noop,
+	onShow = noop,
 	timeout = 300,
 } ) {
 	const [ show, setShow ] = useState( false );

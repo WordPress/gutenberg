@@ -1,20 +1,21 @@
 /**
  * External dependencies
  */
-import Textarea from 'react-autosize-textarea';
+import TextareaAutosize from 'react-autosize-textarea';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { VisuallyHidden } from '@wordpress/components';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { pasteHandler } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -26,44 +27,93 @@ import PostTypeSupportCheck from '../post-type-support-check';
  */
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
-class PostTitle extends Component {
-	constructor() {
-		super( ...arguments );
+export default function PostTitle() {
+	const instanceId = useInstanceId( PostTitle );
+	const ref = useRef();
+	const [ isSelected, setIsSelected ] = useState( false );
+	const { editPost } = useDispatch( 'core/editor' );
+	const {
+		insertDefaultBlock,
+		clearSelectedBlock,
+		insertBlocks,
+	} = useDispatch( blockEditorStore );
+	const {
+		isCleanNewPost,
+		title,
+		placeholder,
+		isFocusMode,
+		hasFixedToolbar,
+	} = useSelect( ( select ) => {
+		const {
+			getEditedPostAttribute,
+			isCleanNewPost: _isCleanNewPost,
+		} = select( 'core/editor' );
+		const { getSettings } = select( blockEditorStore );
+		const {
+			titlePlaceholder,
+			focusMode,
+			hasFixedToolbar: _hasFixedToolbar,
+		} = getSettings();
 
-		this.onChange = this.onChange.bind( this );
-		this.onSelect = this.onSelect.bind( this );
-		this.onUnselect = this.onUnselect.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onPaste = this.onPaste.bind( this );
-
-		this.state = {
-			isSelected: false,
+		return {
+			isCleanNewPost: _isCleanNewPost(),
+			title: getEditedPostAttribute( 'title' ),
+			placeholder: titlePlaceholder,
+			isFocusMode: focusMode,
+			hasFixedToolbar: _hasFixedToolbar,
 		};
+	} );
+
+	useEffect( () => {
+		if ( ! ref.current ) {
+			return;
+		}
+
+		const { ownerDocument } = ref.current;
+		const { activeElement, body } = ownerDocument;
+
+		// Only autofocus the title when the post is entirely empty. This should
+		// only happen for a new post, which means we focus the title on new
+		// post so the author can start typing right away, without needing to
+		// click anything.
+		if ( isCleanNewPost && ( ! activeElement || body === activeElement ) ) {
+			ref.current.focus();
+		}
+	}, [ isCleanNewPost ] );
+
+	function onEnterPress() {
+		insertDefaultBlock( undefined, undefined, 0 );
 	}
 
-	onSelect() {
-		this.setState( { isSelected: true } );
-		this.props.clearSelectedBlock();
+	function onInsertBlockAfter( blocks ) {
+		insertBlocks( blocks, 0 );
 	}
 
-	onUnselect() {
-		this.setState( { isSelected: false } );
+	function onUpdate( newTitle ) {
+		editPost( { title: newTitle } );
 	}
 
-	onChange( event ) {
-		const newTitle = event.target.value.replace( REGEXP_NEWLINES, ' ' );
-		this.props.onUpdate( newTitle );
+	function onSelect() {
+		setIsSelected( true );
+		clearSelectedBlock();
 	}
 
-	onKeyDown( event ) {
+	function onUnselect() {
+		setIsSelected( false );
+	}
+
+	function onChange( event ) {
+		onUpdate( event.target.value.replace( REGEXP_NEWLINES, ' ' ) );
+	}
+
+	function onKeyDown( event ) {
 		if ( event.keyCode === ENTER ) {
 			event.preventDefault();
-			this.props.onEnterPress();
+			onEnterPress();
 		}
 	}
 
-	onPaste( event ) {
-		const { title, onInsertBlockAfter, onUpdate } = this.props;
+	function onPaste( event ) {
 		const clipboardData = event.clipboardData;
 
 		let plainText = '';
@@ -113,105 +163,41 @@ class PostTitle extends Component {
 		}
 	}
 
-	render() {
-		const {
-			hasFixedToolbar,
-			isCleanNewPost,
-			isFocusMode,
-			instanceId,
-			placeholder,
-			title,
-		} = this.props;
-		const { isSelected } = this.state;
-
-		// The wp-block className is important for editor styles.
-		// This same block is used in both the visual and the code editor.
-		const className = classnames(
-			'wp-block editor-post-title editor-post-title__block',
-			{
-				'is-selected': isSelected,
-				'is-focus-mode': isFocusMode,
-				'has-fixed-toolbar': hasFixedToolbar,
-			}
-		);
-		const decodedPlaceholder = decodeEntities( placeholder );
-
-		return (
-			<PostTypeSupportCheck supportKeys="title">
-				<div className={ className }>
-					<VisuallyHidden
-						as="label"
-						htmlFor={ `post-title-${ instanceId }` }
-					>
-						{ decodedPlaceholder || __( 'Add title' ) }
-					</VisuallyHidden>
-					<Textarea
-						id={ `post-title-${ instanceId }` }
-						className="editor-post-title__input"
-						value={ title }
-						onChange={ this.onChange }
-						placeholder={ decodedPlaceholder || __( 'Add title' ) }
-						onFocus={ this.onSelect }
-						onBlur={ this.onUnselect }
-						onKeyDown={ this.onKeyDown }
-						onKeyPress={ this.onUnselect }
-						onPaste={ this.onPaste }
-						/*
-							Only autofocus the title when the post is entirely empty.
-							This should only happen for a new post, which means we
-							focus the title on new post so the author can start typing
-							right away, without needing to click anything.
-						*/
-						/* eslint-disable jsx-a11y/no-autofocus */
-						autoFocus={
-							( document.body === document.activeElement ||
-								! document.activeElement ) &&
-							isCleanNewPost
-						}
-						/* eslint-enable jsx-a11y/no-autofocus */
-					/>
-				</div>
-			</PostTypeSupportCheck>
-		);
-	}
-}
-
-const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute, isCleanNewPost } = select( 'core/editor' );
-	const { getSettings } = select( 'core/block-editor' );
-	const { titlePlaceholder, focusMode, hasFixedToolbar } = getSettings();
-
-	return {
-		isCleanNewPost: isCleanNewPost(),
-		title: getEditedPostAttribute( 'title' ),
-		placeholder: titlePlaceholder,
-		isFocusMode: focusMode,
-		hasFixedToolbar,
-	};
-} );
-
-const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { insertDefaultBlock, clearSelectedBlock, insertBlocks } = dispatch(
-		'core/block-editor'
+	// The wp-block className is important for editor styles.
+	// This same block is used in both the visual and the code editor.
+	const className = classnames(
+		'wp-block editor-post-title editor-post-title__block',
+		{
+			'is-selected': isSelected,
+			'is-focus-mode': isFocusMode,
+			'has-fixed-toolbar': hasFixedToolbar,
+		}
 	);
-	const { editPost } = dispatch( 'core/editor' );
+	const decodedPlaceholder = decodeEntities( placeholder );
 
-	return {
-		onEnterPress() {
-			insertDefaultBlock( undefined, undefined, 0 );
-		},
-		onInsertBlockAfter( blocks ) {
-			insertBlocks( blocks, 0 );
-		},
-		onUpdate( title ) {
-			editPost( { title } );
-		},
-		clearSelectedBlock,
-	};
-} );
-
-export default compose(
-	applyWithSelect,
-	applyWithDispatch,
-	withInstanceId
-)( PostTitle );
+	return (
+		<PostTypeSupportCheck supportKeys="title">
+			<div className={ className }>
+				<VisuallyHidden
+					as="label"
+					htmlFor={ `post-title-${ instanceId }` }
+				>
+					{ decodedPlaceholder || __( 'Add title' ) }
+				</VisuallyHidden>
+				<TextareaAutosize
+					ref={ ref }
+					id={ `post-title-${ instanceId }` }
+					className="editor-post-title__input"
+					value={ title }
+					onChange={ onChange }
+					placeholder={ decodedPlaceholder || __( 'Add title' ) }
+					onFocus={ onSelect }
+					onBlur={ onUnselect }
+					onKeyDown={ onKeyDown }
+					onKeyPress={ onUnselect }
+					onPaste={ onPaste }
+				/>
+			</div>
+		</PostTypeSupportCheck>
+	);
+}

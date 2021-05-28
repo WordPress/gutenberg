@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 
 /**
@@ -18,21 +17,9 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Audio' ),
-	description: __( 'Embed a simple audio player.' ),
-	keywords: [
-		__( 'music' ),
-		__( 'sound' ),
-		__( 'podcast' ),
-		__( 'recording' ),
-	],
 	icon,
 	transforms,
 	deprecated,
-	supports: {
-		align: true,
-		lightBlockWrapper: true,
-	},
 	edit,
 	save,
 };

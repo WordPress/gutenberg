@@ -3,7 +3,6 @@
  */
 import memize from 'memize';
 import { size, map, without } from 'lodash';
-import { subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 import { I18nManager } from 'react-native';
 
 /**
@@ -11,15 +10,21 @@ import { I18nManager } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { EditorProvider } from '@wordpress/editor';
-import { parse, serialize } from '@wordpress/blocks';
+import { parse, serialize, store as blocksStore } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import {
+	subscribeSetFocusOnTitle,
+	subscribeFeaturedImageIdNativeUpdated,
+} from '@wordpress/react-native-bridge';
 import { SlotFillProvider } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import Layout from './components/layout';
+import { store as editPostStore } from './store';
 
 class Editor extends Component {
 	constructor( props ) {
@@ -53,6 +58,11 @@ class Editor extends Component {
 
 		// Omit hidden block types if exists and non-empty.
 		if ( size( hiddenBlockTypes ) > 0 ) {
+			if ( settings.allowedBlockTypes === undefined ) {
+				// if no specific flags for allowedBlockTypes are set, assume `true`
+				// meaning allow all block types
+				settings.allowedBlockTypes = true;
+			}
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
@@ -71,6 +81,8 @@ class Editor extends Component {
 	}
 
 	componentDidMount() {
+		const { editEntityRecord, postType, postId } = this.props;
+
 		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle(
 			() => {
 				if ( this.postTitleRef ) {
@@ -78,11 +90,23 @@ class Editor extends Component {
 				}
 			}
 		);
+
+		this.subscriptionParentFeaturedImageIdNativeUpdated = subscribeFeaturedImageIdNativeUpdated(
+			( payload ) => {
+				editEntityRecord( 'postType', postType, postId, {
+					featured_media: payload.featuredImageId,
+				} );
+			}
+		);
 	}
 
 	componentWillUnmount() {
 		if ( this.subscriptionParentSetFocusOnTitle ) {
 			this.subscriptionParentSetFocusOnTitle.remove();
+		}
+
+		if ( this.subscribeFeaturedImageIdNativeUpdated ) {
+			this.subscribeFeaturedImageIdNativeUpdated.remove();
 		}
 	}
 
@@ -99,7 +123,10 @@ class Editor extends Component {
 			hiddenBlockTypes,
 			blockTypes,
 			post,
+			postId,
 			postType,
+			featuredImageId,
+			initialHtml,
 			...props
 		} = this.props;
 
@@ -112,15 +139,16 @@ class Editor extends Component {
 		);
 
 		const normalizedPost = post || {
-			id: 1,
+			id: postId,
 			title: {
-				raw: props.initialTitle,
+				raw: props.initialTitle || '',
 			},
+			featured_media: featuredImageId,
 			content: {
 				// make sure the post content is in sync with gutenberg store
 				// to avoid marking the post as modified when simply loaded
 				// For now, let's assume: serialize( parse( html ) ) !== html
-				raw: serialize( parse( props.initialHtml || '' ) ),
+				raw: serialize( parse( initialHtml || '' ) ),
 			},
 			type: postType,
 			status: 'draft',
@@ -150,8 +178,8 @@ export default compose( [
 			getEditorMode,
 			getPreference,
 			__experimentalGetPreviewDeviceType,
-		} = select( 'core/edit-post' );
-		const { getBlockTypes } = select( 'core/blocks' );
+		} = select( editPostStore );
+		const { getBlockTypes } = select( blocksStore );
 
 		return {
 			hasFixedToolbar:
@@ -164,10 +192,11 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { switchEditorMode } = dispatch( 'core/edit-post' );
-
+		const { switchEditorMode } = dispatch( editPostStore );
+		const { editEntityRecord } = dispatch( coreStore );
 		return {
 			switchEditorMode,
+			editEntityRecord,
 		};
 	} ),
 ] )( Editor );

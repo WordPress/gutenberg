@@ -110,7 +110,7 @@ class SuggestionsList extends Component {
 							id={ `components-form-token-suggestions-${ this.props.instanceId }-${ index }` }
 							role="option"
 							className={ classeName }
-							key={ suggestion }
+							key={ this.props.displayTransform( suggestion ) }
 							onMouseDown={ this.handleMouseDown }
 							onClick={ this.handleClick( suggestion ) }
 							onMouseEnter={ this.handleHover( suggestion ) }

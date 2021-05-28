@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
-import { Dropdown, Button, MenuGroup, MenuItem } from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreHorizontal } from '@wordpress/icons';
 
@@ -29,18 +29,17 @@ function Warning( { className, actions, children, secondaryActions } ) {
 								</span>
 							) ) }
 						{ secondaryActions && (
-							<Dropdown
+							<DropdownMenu
 								className="block-editor-warning__secondary"
-								position="bottom left"
-								renderToggle={ ( { isOpen, onToggle } ) => (
-									<Button
-										icon={ moreHorizontal }
-										label={ __( 'More options' ) }
-										onClick={ onToggle }
-										aria-expanded={ isOpen }
-									/>
-								) }
-								renderContent={ () => (
+								icon={ moreHorizontal }
+								label={ __( 'More options' ) }
+								popoverProps={ {
+									position: 'bottom left',
+									className: 'block-editor-warning__dropdown',
+								} }
+								noIcons
+							>
+								{ () => (
 									<MenuGroup>
 										{ secondaryActions.map(
 											( item, pos ) => (
@@ -54,7 +53,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 										) }
 									</MenuGroup>
 								) }
-							/>
+							</DropdownMenu>
 						) }
 					</div>
 				) }
@@ -63,4 +62,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 	);
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/warning/README.md
+ */
 export default Warning;

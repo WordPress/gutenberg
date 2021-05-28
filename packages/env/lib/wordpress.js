@@ -3,6 +3,8 @@
  */
 const dockerCompose = require( 'docker-compose' );
 const util = require( 'util' );
+const fs = require( 'fs' ).promises;
+const path = require( 'path' );
 
 /**
  * Promisified dependencies
@@ -10,43 +12,17 @@ const util = require( 'util' );
 const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
- * @typedef {import('./config').Config} Config
+ * @typedef {import('./config').WPConfig} WPConfig
+ * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {'development'|'tests'} WPEnvironment
+ * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
  */
-
-/**
- * Makes the WordPress content directories (wp-content, wp-content/plugins,
- * wp-content/themes) owned by the www-data user. This ensures that WordPress
- * can write to these directories.
- *
- * This is necessary when running wp-env with `"core": null` because Docker
- * will automatically create these directories as the root user when binding
- * volumes during `docker-compose up`, and `docker-compose up` doesn't support
- * the `-u` option.
- *
- * See https://github.com/docker-library/wordpress/issues/436.
- *
- * @param {string} environment The environment to check. Either 'development' or 'tests'.
- * @param {Config} config The wp-env config object.
- */
-async function makeContentDirectoriesWritable(
-	environment,
-	{ dockerComposeConfigPath, debug }
-) {
-	await dockerCompose.exec(
-		environment === 'development' ? 'wordpress' : 'tests-wordpress',
-		'chown www-data:www-data wp-content wp-content/plugins wp-content/themes',
-		{
-			config: dockerComposeConfigPath,
-			log: debug,
-		}
-	);
-}
 
 /**
  * Checks a WordPress database connection. An error is thrown if the test is
  * unsuccessful.
  *
- * @param {Config} config The wp-env config object.
+ * @param {WPConfig} config The wp-env config object.
  */
 async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
 	await dockerCompose.run( 'cli', 'wp db check', {
@@ -61,73 +37,84 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  * activating all plugins, and activating the first theme. These steps are
  * performed sequentially so as to not overload the WordPress instance.
  *
- * @param {string} environment The environment to configure. Either 'development' or 'tests'.
- * @param {Config} config The wp-env config object.
+ * @param {WPEnvironment} environment The environment to configure. Either 'development' or 'tests'.
+ * @param {WPConfig}      config      The wp-env config object.
+ * @param {Object} spinner A CLI spinner which indicates progress.
  */
-async function configureWordPress( environment, config ) {
-	const options = {
-		config: config.dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
-		log: config.debug,
-	};
+async function configureWordPress( environment, config, spinner ) {
+	const installCommand = `wp core install --url="localhost:${ config.env[ environment ].port }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
-	const port = environment === 'development' ? config.port : config.testsPort;
-
-	// Install WordPress.
-	await dockerCompose.run(
-		environment === 'development' ? 'cli' : 'tests-cli',
-		[
-			'wp',
-			'core',
-			'install',
-			`--url=localhost:${ port }`,
-			`--title=${ config.name }`,
-			'--admin_user=admin',
-			'--admin_password=password',
-			'--admin_email=wordpress@example.com',
-			'--skip-email',
-		],
-		options
-	);
+	// -eo pipefail exits the command as soon as anything fails in bash.
+	const setupCommands = [ 'set -eo pipefail', installCommand ];
 
 	// Set wp-config.php values.
-	for ( const [ key, value ] of Object.entries( config.config ) ) {
-		const command = [ 'wp', 'config', 'set', key, value ];
-		if ( typeof value !== 'string' ) {
-			command.push( '--raw' );
-		}
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			command,
-			options
+	for ( let [ key, value ] of Object.entries(
+		config.env[ environment ].config
+	) ) {
+		// Add quotes around string values to work with multi-word strings better.
+		value = typeof value === 'string' ? `"${ value }"` : value;
+		setupCommands.push(
+			`wp config set ${ key } ${ value } --anchor="define( 'WP_DEBUG',"${
+				typeof value !== 'string' ? ' --raw' : ''
+			}`
 		);
 	}
 
 	// Activate all plugins.
-	for ( const pluginSource of config.pluginSources ) {
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			`wp plugin activate ${ pluginSource.basename }`,
-			options
+	for ( const pluginSource of config.env[ environment ].pluginSources ) {
+		setupCommands.push( `wp plugin activate ${ pluginSource.basename }` );
+	}
+
+	if ( config.debug ) {
+		spinner.info(
+			`Running the following setup commands on the ${ environment } instance:\n - ${ setupCommands.join(
+				'\n - '
+			) }\n`
 		);
 	}
 
-	// Activate the first theme.
-	const [ themeSource ] = config.themeSources;
-	if ( themeSource ) {
-		await dockerCompose.run(
-			environment === 'development' ? 'cli' : 'tests-cli',
-			`wp theme activate ${ themeSource.basename }`,
-			options
-		);
-	}
+	// Execute all setup commands in a batch.
+	await dockerCompose.run(
+		environment === 'development' ? 'cli' : 'tests-cli',
+		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
+		{
+			config: config.dockerComposeConfigPath,
+			log: config.debug,
+		}
+	);
+
+	/**
+	 * Since wp-phpunit loads wp-settings.php at the end of its wp-config.php
+	 * file, we need to avoid loading it too early in our own wp-config.php. If
+	 * we load it too early, then some things (like MULTISITE) will be defined
+	 * before wp-phpunit has a chance to configure them. To avoid this, create a
+	 * copy of wp-config.php for phpunit which doesn't require wp-settings.php.
+	 *
+	 * Note that This needs to be executed using `exec` on the wordpress service
+	 * so that file permissions work properly.
+	 *
+	 * This will be removed in the future. @see https://github.com/WordPress/gutenberg/issues/23171
+	 *
+	 */
+	await dockerCompose.exec(
+		environment === 'development' ? 'wordpress' : 'tests-wordpress',
+		[
+			'sh',
+			'-c',
+			'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php && chmod 777 /var/www/html/phpunit-wp-config.php',
+		],
+		{
+			config: config.dockerComposeConfigPath,
+			log: config.debug,
+		}
+	);
 }
 
 /**
  * Resets the development server's database, the tests server's database, or both.
  *
- * @param {string} environment The environment to clean. Either 'development', 'tests', or 'all'.
- * @param {Config} config The wp-env config object.
+ * @param {WPEnvironmentSelection} environment The environment to clean. Either 'development', 'tests', or 'all'.
+ * @param {WPConfig}               config      The wp-env config object.
  */
 async function resetDatabase(
 	environment,
@@ -152,6 +139,66 @@ async function resetDatabase(
 	}
 
 	await Promise.all( tasks );
+}
+
+async function setupWordPressDirectories( config ) {
+	if (
+		config.env.development.coreSource &&
+		hasSameCoreSource( [ config.env.development, config.env.tests ] )
+	) {
+		await copyCoreFiles(
+			config.env.development.coreSource.path,
+			config.env.development.coreSource.testsPath
+		);
+		await createUploadsDir( config.env.development.coreSource.testsPath );
+	}
+
+	const checkedPaths = {};
+	for ( const { coreSource } of Object.values( config.env ) ) {
+		if ( coreSource && ! checkedPaths[ coreSource.path ] ) {
+			await createUploadsDir( coreSource.path );
+			checkedPaths[ coreSource.path ] = true;
+		}
+	}
+}
+
+async function createUploadsDir( corePath ) {
+	// Ensure the tests uploads folder is writeable for travis,
+	// creating the folder if necessary.
+	const uploadPath = path.join( corePath, 'wp-content/uploads' );
+	await fs.mkdir( uploadPath, { recursive: true } );
+	await fs.chmod( uploadPath, 0o0767 );
+}
+
+/**
+ * Returns true if all given environment configs have the same core source.
+ *
+ * @param {WPServiceConfig[]} envs An array of environments to check.
+ *
+ * @return {boolean} True if all the environments have the same core source.
+ */
+function hasSameCoreSource( envs ) {
+	if ( envs.length < 2 ) {
+		return true;
+	}
+	return ! envs.some( ( env ) =>
+		areCoreSourcesDifferent( envs[ 0 ].coreSource, env.coreSource )
+	);
+}
+
+function areCoreSourcesDifferent( coreSource1, coreSource2 ) {
+	if (
+		( ! coreSource1 && coreSource2 ) ||
+		( coreSource1 && ! coreSource2 )
+	) {
+		return true;
+	}
+
+	if ( coreSource1 && coreSource2 && coreSource1.path !== coreSource2.path ) {
+		return true;
+	}
+
+	return false;
 }
 
 /**
@@ -182,9 +229,9 @@ async function copyCoreFiles( fromPath, toPath ) {
 }
 
 module.exports = {
-	makeContentDirectoriesWritable,
+	hasSameCoreSource,
 	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
-	copyCoreFiles,
+	setupWordPressDirectories,
 };

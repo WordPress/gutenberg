@@ -8,7 +8,6 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { paragraph as icon } from '@wordpress/icons';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,10 +23,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Paragraph' ),
-	description: __( 'Start with the building block of all narrative.' ),
 	icon,
-	keywords: [ __( 'text' ) ],
 	example: {
 		attributes: {
 			content: __(
@@ -40,14 +36,6 @@ export const settings = {
 			},
 			dropCap: true,
 		},
-	},
-	supports: {
-		className: false,
-		__unstablePasteTextInline: true,
-		lightBlockWrapper: true,
-		__experimentalColor: Platform.OS === 'web',
-		__experimentalLineHeight: true,
-		__experimentalFontSize: true,
 	},
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {

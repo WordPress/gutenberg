@@ -8,215 +8,179 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
+/**
+ * Determine if the current theme needs to load separate block styles or not.
+ *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ *
+ * @return bool
+ */
+function gutenberg_should_load_separate_block_assets() {
+	if ( function_exists( 'wp_should_load_separate_core_block_assets' ) ) {
+		return wp_should_load_separate_core_block_assets();
+	}
+
+	if ( is_admin() || is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return false;
+	}
+
+	// The `should_load_separate_core_block_assets` filter was added in WP 5.8.
+	$load_separate_styles = apply_filters( 'should_load_separate_core_block_assets', gutenberg_is_fse_theme() );
+
 	/**
-	 * Registers a block type from metadata stored in the `block.json` file.
+	 * Determine if separate styles will be loaded for blocks on-render or not.
 	 *
-	 * @since 7.9.0
+	 * @param bool $load_separate_styles Whether separate styles will be loaded or not.
 	 *
-	 * @param string $path Path to the folder where the `block.json` file is located.
-	 * @param array  $args {
-	 *     Optional. Array of block type arguments. Any arguments may be defined, however the
-	 *     ones described below are supported by default. Default empty array.
-	 *
-	 *     @type callable $render_callback Callback used to render blocks of this block type.
-	 * }
-	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
+	 * @return bool
 	 */
-	function register_block_type_from_metadata( $path, $args = array() ) {
-		$file = trailingslashit( $path ) . 'block.json';
-		if ( ! file_exists( $file ) ) {
-			return false;
+	return apply_filters( 'load_separate_block_assets', $load_separate_styles );
+}
+
+/**
+ * Opt-in to separate styles loading for block themes in WordPress 5.8.
+ *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ */
+add_filter(
+	'separate_core_block_assets',
+	function( $load_separate_styles ) {
+		if ( function_exists( 'gutenberg_is_fse_theme' ) && gutenberg_is_fse_theme() ) {
+			return true;
 		}
-
-		$metadata = json_decode( file_get_contents( $file ), true );
-		if ( ! is_array( $metadata ) ) {
-			return false;
-		}
-
-		return register_block_type(
-			$metadata['name'],
-			array_merge(
-				$metadata,
-				$args
-			)
-		);
+		return $load_separate_styles;
 	}
-}
+);
 
 /**
- * Extends block editor settings to determine whether to use drop cap feature.
+ * Remove the `wp_enqueue_registered_block_scripts_and_styles` hook if needed.
  *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
+ * @return void
  */
-function gutenberg_extend_settings_drop_cap( $settings ) {
-	$settings['__experimentalDisableDropCap'] = false;
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_drop_cap' );
-
-
-/**
- * Extends block editor settings to include a list of image dimensions per size.
- *
- * This can be removed when plugin support requires WordPress 5.4.0+.
- *
- * @see https://core.trac.wordpress.org/ticket/49389
- * @see https://core.trac.wordpress.org/changeset/47240
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_image_dimensions( $settings ) {
-	/*
-	 * Only filter settings if:
-	 * 1. `imageDimensions` is not already assigned, in which case it can be
-	 *    assumed to have been set from WordPress 5.4.0+ default settings.
-	 * 2. `imageSizes` is an array. Plugins may run `block_editor_settings`
-	 *    directly and not provide all properties of the settings array.
-	 */
-	if ( ! isset( $settings['imageDimensions'] ) && ! empty( $settings['imageSizes'] ) ) {
-		$image_dimensions = array();
-		$all_sizes        = wp_get_registered_image_subsizes();
-		foreach ( $settings['imageSizes'] as $size ) {
-			$key = $size['slug'];
-			if ( isset( $all_sizes[ $key ] ) ) {
-				$image_dimensions[ $key ] = $all_sizes[ $key ];
-			}
-		}
-		$settings['imageDimensions'] = $image_dimensions;
-	}
-
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
-
-/**
- * Adds a polyfill for the WHATWG URL in environments which do not support it.
- * The intention in how this action is handled is under the assumption that this
- * code would eventually be placed at `wp_default_packages_vendor`, which is
- * called as a result of `wp_default_packages` via the `wp_default_scripts`.
- *
- * This can be removed when plugin support requires WordPress 5.4.0+.
- *
- * The script registration occurs in `gutenberg_register_vendor_scripts`, which
- * should be removed in coordination with this function.
- *
- * @see gutenberg_register_vendor_scripts
- * @see https://core.trac.wordpress.org/ticket/49360
- * @see https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
- * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
- *
- * @since 7.3.0
- *
- * @param WP_Scripts $scripts WP_Scripts object.
- */
-function gutenberg_add_url_polyfill( $scripts ) {
-	did_action( 'init' ) && $scripts->add_inline_script(
-		'wp-polyfill',
-		wp_get_script_polyfill(
-			$scripts,
-			array(
-				'window.URL && window.URL.prototype && window.URLSearchParams' => 'wp-polyfill-url',
-			)
-		)
-	);
-}
-add_action( 'wp_default_scripts', 'gutenberg_add_url_polyfill', 20 );
-
-/**
- * Adds a polyfill for DOMRect in environments which do not support it.
- *
- * This can be removed when plugin support requires WordPress 5.4.0+.
- *
- * The script registration occurs in `gutenberg_register_vendor_scripts`, which
- * should be removed in coordination with this function.
- *
- * @see gutenberg_register_vendor_scripts
- * @see gutenberg_add_url_polyfill
- * @see https://core.trac.wordpress.org/ticket/49360
- * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMRect
- * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
- *
- * @since 7.5.0
- *
- * @param WP_Scripts $scripts WP_Scripts object.
- */
-function gutenberg_add_dom_rect_polyfill( $scripts ) {
-	did_action( 'init' ) && $scripts->add_inline_script(
-		'wp-polyfill',
-		wp_get_script_polyfill(
-			$scripts,
-			array(
-				'window.DOMRect' => 'wp-polyfill-dom-rect',
-			)
-		)
-	);
-}
-add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
-
-/**
- * Sets the current post for usage in template blocks.
- *
- * @return WP_Post|null The post if any, or null otherwise.
- */
-function gutenberg_get_post_from_context() {
-	// TODO: Without this temporary fix, an infinite loop can occur where
-	// posts with post content blocks render themselves recursively.
-	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
-		return null;
-	}
-	if ( ! in_the_loop() ) {
-		rewind_posts();
-		the_post();
-	}
-	return get_post();
-}
-
-/**
- * Shim that hooks into `pre_render_block` so as to override `render_block` with
- * a function that assigns block context.
- *
- * This can be removed when plugin support requires WordPress 5.5.0+.
- *
- * @see https://core.trac.wordpress.org/ticket/49927
- *
- * @param string|null $pre_render   The pre-rendered content. Defaults to null.
- * @param array       $parsed_block The parsed block being rendered.
- *
- * @return string String of rendered HTML.
- */
-function gutenberg_render_block_with_assigned_block_context( $pre_render, $parsed_block ) {
-	global $post;
-
-	/*
-	 * If a non-null value is provided, a filter has run at an earlier priority
-	 * and has already handled custom rendering and should take precedence.
-	 */
-	if ( null !== $pre_render ) {
-		return $pre_render;
-	}
-
-	$source_block = $parsed_block;
-
-	/** This filter is documented in src/wp-includes/blocks.php */
-	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
-	$context      = array(
-		'postId'   => $post->ID,
-
-		/*
-		 * The `postType` context is largely unnecessary server-side, since the
-		 * ID is usually sufficient on its own. That being said, since a block's
-		 * manifest is expected to be shared between the server and the client,
-		 * it should be included to consistently fulfill the expectation.
+function gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles() {
+	if ( gutenberg_should_load_separate_block_assets() ) {
+		/**
+		 * Avoid enqueueing block assets of all registered blocks for all posts, instead
+		 * deferring to block render mechanics to enqueue scripts, thereby ensuring only
+		 * blocks of the content have their assets enqueued.
+		 *
+		 * This can be removed once minimum support for the plugin is outside the range
+		 * of the version associated with closure of the following ticket.
+		 *
+		 * @see https://core.trac.wordpress.org/ticket/50328
+		 *
+		 * @see WP_Block::render
 		 */
-		'postType' => $post->post_type,
-	);
-	$block        = new WP_Block( $parsed_block, $context );
-
-	return $block->render();
+		remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
+	}
 }
-add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
+
+add_action( 'init', 'gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles' );
+
+/**
+ * Callback hooked to the register_block_type_args filter.
+ *
+ * This hooks into block registration to inject the default context into the block object.
+ * It can be removed once the default context is added into Core.
+ *
+ * @param array $args Block attributes.
+ * @return array Block attributes.
+ */
+function gutenberg_inject_default_block_context( $args ) {
+	if ( is_callable( $args['render_callback'] ) ) {
+		$block_render_callback   = $args['render_callback'];
+		$args['render_callback'] = function( $attributes, $content, $block = null ) use ( $block_render_callback ) {
+			global $post;
+
+			// Check for null for back compatibility with WP_Block_Type->render
+			// which is unused since the introduction of WP_Block class.
+			//
+			// See:
+			// - https://core.trac.wordpress.org/ticket/49927
+			// - commit 910de8f6890c87f93359c6f2edc6c27b9a3f3292 at wordpress-develop.
+
+			if ( null === $block ) {
+				return $block_render_callback( $attributes, $content );
+			}
+
+			$registry   = WP_Block_Type_Registry::get_instance();
+			$block_type = $registry->get_registered( $block->name );
+
+			// For WordPress versions that don't support the context API.
+			if ( ! $block->context ) {
+				$block->context = array();
+			}
+
+			// Inject the post context if not done by Core.
+			$needs_post_id = ! empty( $block_type->uses_context ) && in_array( 'postId', $block_type->uses_context, true );
+			if ( $post instanceof WP_Post && $needs_post_id && ! isset( $block->context['postId'] ) && 'wp_template' !== $post->post_type && 'wp_template_part' !== $post->post_type ) {
+				$block->context['postId'] = $post->ID;
+			}
+			$needs_post_type = ! empty( $block_type->uses_context ) && in_array( 'postType', $block_type->uses_context, true );
+			if ( $post instanceof WP_Post && $needs_post_type && ! isset( $block->context['postType'] ) && 'wp_template' !== $post->post_type && 'wp_template_part' !== $post->post_type ) {
+				/*
+				* The `postType` context is largely unnecessary server-side, since the
+				* ID is usually sufficient on its own. That being said, since a block's
+				* manifest is expected to be shared between the server and the client,
+				* it should be included to consistently fulfill the expectation.
+				*/
+				$block->context['postType'] = $post->post_type;
+			}
+
+			return $block_render_callback( $attributes, $content, $block );
+		};
+	}
+	return $args;
+}
+
+add_filter( 'register_block_type_args', 'gutenberg_inject_default_block_context' );
+
+/**
+ * Override post type labels for Reusable Block custom post type.
+ * The labels are different from the ones in Core.
+ *
+ * Remove this when Core receives the new labels (minimum supported version WordPress 5.8)
+ *
+ * @return array Array of new labels for Reusable Block post type.
+ */
+function gutenberg_override_reusable_block_post_type_labels() {
+	return array(
+		'name'                     => _x( 'Reusable blocks', 'post type general name', 'gutenberg' ),
+		'singular_name'            => _x( 'Reusable block', 'post type singular name', 'gutenberg' ),
+		'menu_name'                => _x( 'Reusable blocks', 'admin menu', 'gutenberg' ),
+		'name_admin_bar'           => _x( 'Reusable block', 'add new on admin bar', 'gutenberg' ),
+		'add_new'                  => _x( 'Add New', 'Reusable block', 'gutenberg' ),
+		'add_new_item'             => __( 'Add new Reusable block', 'gutenberg' ),
+		'new_item'                 => __( 'New Reusable block', 'gutenberg' ),
+		'edit_item'                => __( 'Edit Reusable block', 'gutenberg' ),
+		'view_item'                => __( 'View Reusable block', 'gutenberg' ),
+		'all_items'                => __( 'All Reusable blocks', 'gutenberg' ),
+		'search_items'             => __( 'Search Reusable blocks', 'gutenberg' ),
+		'not_found'                => __( 'No reusable blocks found.', 'gutenberg' ),
+		'not_found_in_trash'       => __( 'No reusable blocks found in Trash.', 'gutenberg' ),
+		'filter_items_list'        => __( 'Filter reusable blocks list', 'gutenberg' ),
+		'items_list_navigation'    => __( 'Reusable blocks list navigation', 'gutenberg' ),
+		'items_list'               => __( 'Reusable blocks list', 'gutenberg' ),
+		'item_published'           => __( 'Reusable block published.', 'gutenberg' ),
+		'item_published_privately' => __( 'Reusable block published privately.', 'gutenberg' ),
+		'item_reverted_to_draft'   => __( 'Reusable block reverted to draft.', 'gutenberg' ),
+		'item_scheduled'           => __( 'Reusable block scheduled.', 'gutenberg' ),
+		'item_updated'             => __( 'Reusable block updated.', 'gutenberg' ),
+	);
+}
+add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
+
+/**
+ * Update allowed inline style attributes list.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 5.8.
+ *
+ * @param string[] $attrs Array of allowed CSS attributes.
+ * @return string[] CSS attributes.
+ */
+function gutenberg_safe_style_attrs( $attrs ) {
+	$attrs[] = 'object-position';
+
+	return $attrs;
+}
+add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs' );

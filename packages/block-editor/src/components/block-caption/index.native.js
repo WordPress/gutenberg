@@ -14,6 +14,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import styles from './styles.scss';
+import { store as blockEditorStore } from '../../store';
 
 const BlockCaption = ( {
 	accessible,
@@ -24,6 +25,7 @@ const BlockCaption = ( {
 	isSelected,
 	shouldDisplay,
 	text,
+	insertBlocksAfter,
 } ) => (
 	<View style={ [ styles.container, shouldDisplay && styles.padding ] }>
 		<Caption
@@ -35,6 +37,7 @@ const BlockCaption = ( {
 			onFocus={ onFocus }
 			shouldDisplay={ shouldDisplay }
 			value={ text }
+			insertBlocksAfter={ insertBlocksAfter }
 		/>
 	</View>
 );
@@ -42,9 +45,9 @@ const BlockCaption = ( {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } = select(
-			'core/block-editor'
+			blockEditorStore
 		);
-		const { caption } = getBlockAttributes( clientId );
+		const { caption } = getBlockAttributes( clientId ) || {};
 		const isBlockSelected = getSelectedBlockClientId() === clientId;
 
 		// We'll render the caption so that the soft keyboard is not forced to close on Android
@@ -58,7 +61,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
-		const { updateBlockAttributes } = dispatch( 'core/block-editor' );
+		const { updateBlockAttributes } = dispatch( blockEditorStore );
 		return {
 			onChange: ( caption ) => {
 				updateBlockAttributes( clientId, { caption } );

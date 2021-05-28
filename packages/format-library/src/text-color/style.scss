@@ -12,7 +12,9 @@
 .components-inline-color-popover {
 
 	.components-popover__content {
-		padding: 20px 18px;
+		> div {
+			padding: 20px 18px;
+		}
 
 		.components-color-palette {
 			margin-top: 0.6rem;

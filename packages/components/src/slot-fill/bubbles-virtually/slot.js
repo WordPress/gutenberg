@@ -1,24 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useLayoutEffect, useContext } from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import {
+	useRef,
+	useLayoutEffect,
+	useContext,
+	forwardRef,
+} from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import SlotFillContext from './slot-fill-context';
-import useSlot from './use-slot';
 
-export default function Slot( {
-	name,
-	fillProps = {},
-	as: Component = 'div',
-	...props
-} ) {
+function Slot(
+	{ name, fillProps = {}, as: Component = 'div', ...props },
+	forwardedRef
+) {
 	const registry = useContext( SlotFillContext );
 	const ref = useRef();
-	const slot = useSlot( name );
 
 	useLayoutEffect( () => {
 		registry.registerSlot( name, ref, fillProps );
@@ -31,13 +32,15 @@ export default function Slot( {
 		// of fillProps.
 	}, [ registry.registerSlot, registry.unregisterSlot, name ] );
 
-	// fillProps may be an update that interact with the layout, so
-	// we useLayoutEffect
+	// fillProps may be an update that interacts with the layout, so we
+	// useLayoutEffect
 	useLayoutEffect( () => {
-		if ( slot.fillProps && ! isShallowEqual( slot.fillProps, fillProps ) ) {
-			registry.updateSlot( name, ref, fillProps );
-		}
+		registry.updateSlot( name, fillProps );
 	} );
 
-	return <Component ref={ ref } { ...props } />;
+	return (
+		<Component ref={ useMergeRefs( [ forwardedRef, ref ] ) } { ...props } />
+	);
 }
+
+export default forwardRef( Slot );

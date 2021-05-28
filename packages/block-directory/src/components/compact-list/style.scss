@@ -1,0 +1,28 @@
+.block-directory-compact-list {
+	margin: 0;
+	list-style: none;
+}
+
+.block-directory-compact-list__item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: $grid-unit-20;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.block-directory-compact-list__item-details {
+	margin-left: $grid-unit-10;
+}
+
+.block-directory-compact-list__item-title {
+	font-weight: 500;
+}
+
+.block-directory-compact-list__item-author {
+	color: $gray-700;
+	font-size: 11px;
+}

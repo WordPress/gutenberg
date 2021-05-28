@@ -1,24 +1,19 @@
 /**
- * WordPress dependencies
- */
-import { createSlotFill, Toolbar } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
-import { ifBlockEditSelected } from '../block-edit/context';
+import BlockControlsFill from './fill';
+import BlockControlsSlot from './slot';
 
-const { Fill, Slot } = createSlotFill( 'BlockControls' );
+const BlockControls = BlockControlsFill;
 
-const BlockControlsFill = ( { controls, children } ) => (
-	<Fill>
-		<Toolbar controls={ controls } />
-		{ children }
-	</Fill>
-);
+BlockControls.Slot = BlockControlsSlot;
 
-const BlockControls = ifBlockEditSelected( BlockControlsFill );
-
-BlockControls.Slot = Slot;
+// This is just here for backward compatibility
+export const BlockFormatControls = ( props ) => {
+	return <BlockControlsFill group="inline" { ...props } />;
+};
+BlockFormatControls.Slot = ( props ) => {
+	return <BlockControlsSlot group="inline" { ...props } />;
+};
 
 export default BlockControls;

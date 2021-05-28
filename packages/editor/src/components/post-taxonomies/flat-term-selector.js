@@ -2,14 +2,12 @@
  * External dependencies
  */
 import {
+	debounce,
 	escape as escapeString,
 	find,
 	get,
 	invoke,
 	isEmpty,
-	map,
-	throttle,
-	unescape as unescapeString,
 	uniqBy,
 } from 'lodash';
 
@@ -18,58 +16,53 @@ import {
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { FormTokenField, withFilters } from '@wordpress/components';
+import {
+	FormTokenField,
+	withFilters,
+	withSpokenMessages,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+import { unescapeString, unescapeTerm, unescapeTerms } from '../../utils/terms';
+import MostUsedTerms from './most-used-terms';
+
+/**
  * Module constants
  */
+const MAX_TERMS_SUGGESTIONS = 20;
 const DEFAULT_QUERY = {
-	per_page: -1,
+	per_page: MAX_TERMS_SUGGESTIONS,
 	orderby: 'count',
 	order: 'desc',
-	_fields: 'id,name',
+	_fields: 'id,name,count',
 };
-const MAX_TERMS_SUGGESTIONS = 20;
+
 const isSameTermName = ( termA, termB ) =>
-	termA.toLowerCase() === termB.toLowerCase();
+	unescapeString( termA ).toLowerCase() ===
+	unescapeString( termB ).toLowerCase();
 
-/**
- * Returns a term object with name unescaped.
- * The unescape of the name property is done using lodash unescape function.
- *
- * @param {Object} term The term object to unescape.
- *
- * @return {Object} Term object with name property unescaped.
- */
-const unescapeTerm = ( term ) => {
-	return {
-		...term,
-		name: unescapeString( term.name ),
-	};
-};
-
-/**
- * Returns an array of term objects with names unescaped.
- * The unescape of each term is performed using the unescapeTerm function.
- *
- * @param {Object[]} terms Array of term objects to unescape.
- *
- * @return {Object[]} Array of term objects unescaped.
- */
-const unescapeTerms = ( terms ) => {
-	return map( terms, unescapeTerm );
+const termNamesToIds = ( names, terms ) => {
+	return names.map(
+		( termName ) =>
+			find( terms, ( term ) => isSameTermName( term.name, termName ) ).id
+	);
 };
 
 class FlatTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
-		this.searchTerms = throttle( this.searchTerms.bind( this ), 500 );
+		this.searchTerms = debounce( this.searchTerms.bind( this ), 500 );
 		this.findOrCreateTerm = this.findOrCreateTerm.bind( this );
+		this.appendTerm = this.appendTerm.bind( this );
 		this.state = {
 			loading: ! isEmpty( this.props.terms ),
 			availableTerms: [],
@@ -191,14 +184,6 @@ class FlatTermSelector extends Component {
 					isSameTermName( term.name, termName )
 				)
 		);
-		const termNamesToIds = ( names, availableTerms ) => {
-			return names.map(
-				( termName ) =>
-					find( availableTerms, ( term ) =>
-						isSameTermName( term.name, termName )
-					).id
-			);
-		};
 
 		if ( newTermNames.length === 0 ) {
 			return this.props.onUpdateTerms(
@@ -222,7 +207,37 @@ class FlatTermSelector extends Component {
 
 	searchTerms( search = '' ) {
 		invoke( this.searchRequest, [ 'abort' ] );
-		this.searchRequest = this.fetchTerms( { search } );
+		if ( search.length >= 3 ) {
+			this.searchRequest = this.fetchTerms( { search } );
+		}
+	}
+
+	appendTerm( newTerm ) {
+		const { onUpdateTerms, taxonomy, terms = [], slug, speak } = this.props;
+
+		if ( terms.includes( newTerm.id ) ) {
+			return;
+		}
+
+		const newTerms = [ ...terms, newTerm.id ];
+
+		const termAddedMessage = sprintf(
+			/* translators: %s: term name. */
+			_x( '%s added', 'term' ),
+			get(
+				taxonomy,
+				[ 'labels', 'singular_name' ],
+				slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
+			)
+		);
+
+		speak( termAddedMessage, 'assertive' );
+
+		this.setState( {
+			availableTerms: [ ...this.state.availableTerms, newTerm ],
+		} );
+
+		onUpdateTerms( newTerms, taxonomy.rest_base );
 	}
 
 	render() {
@@ -261,28 +276,34 @@ class FlatTermSelector extends Component {
 		);
 
 		return (
-			<FormTokenField
-				value={ selectedTerms }
-				suggestions={ termNames }
-				onChange={ this.onChange }
-				onInputChange={ this.searchTerms }
-				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-				disabled={ loading }
-				label={ newTermLabel }
-				messages={ {
-					added: termAddedLabel,
-					removed: termRemovedLabel,
-					remove: removeTermLabel,
-				} }
-			/>
+			<>
+				<FormTokenField
+					value={ selectedTerms }
+					suggestions={ termNames }
+					onChange={ this.onChange }
+					onInputChange={ this.searchTerms }
+					maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+					disabled={ loading }
+					label={ newTermLabel }
+					messages={ {
+						added: termAddedLabel,
+						removed: termRemovedLabel,
+						remove: removeTermLabel,
+					} }
+				/>
+				<MostUsedTerms
+					taxonomy={ taxonomy }
+					onSelect={ this.appendTerm }
+				/>
+			</>
 		);
 	}
 }
 
 export default compose(
 	withSelect( ( select, { slug } ) => {
-		const { getCurrentPost } = select( 'core/editor' );
-		const { getTaxonomy } = select( 'core' );
+		const { getCurrentPost } = select( editorStore );
+		const { getTaxonomy } = select( coreStore );
 		const taxonomy = getTaxonomy( slug );
 		return {
 			hasCreateAction: taxonomy
@@ -300,7 +321,7 @@ export default compose(
 				  )
 				: false,
 			terms: taxonomy
-				? select( 'core/editor' ).getEditedPostAttribute(
+				? select( editorStore ).getEditedPostAttribute(
 						taxonomy.rest_base
 				  )
 				: [],
@@ -310,9 +331,10 @@ export default compose(
 	withDispatch( ( dispatch ) => {
 		return {
 			onUpdateTerms( terms, restBase ) {
-				dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
+				dispatch( editorStore ).editPost( { [ restBase ]: terms } );
 			},
 		};
 	} ),
+	withSpokenMessages,
 	withFilters( 'editor.PostTaxonomyType' )
 )( FlatTermSelector );

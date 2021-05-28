@@ -16,7 +16,7 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
-**Note**: This package requires `node` 10.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 12.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
 
 ## Setup
 
@@ -30,7 +30,7 @@ _Example:_
 		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses",
-		"format:js": "wp-scripts format-js",
+		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"lint:md:docs": "wp-scripts lint-md-docs",
@@ -44,13 +44,13 @@ _Example:_
 }
 ```
 
-It might also be a good idea to get familiar with the [JavaScript Build Setup tutorial](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
+It might also be a good idea to get familiar with the [JavaScript Build Setup tutorial](/docs/how-to-guides/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
 
 ## Updating to New Release
 
-To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
+To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
 
-In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
+In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
 
 We commit to keeping the breaking changes minimal so you can upgrade `@wordpress/scripts` as seamless as possible.
 
@@ -73,8 +73,13 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-* `npm run build` - builds the code for production.
-* `npm run build:custom` - builds the code for production with two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
+-   `npm run build` - builds the code for production.
+-   `npm run build:custom` - builds the code for production with two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
+
+This script automatically use the optimized config but sometimes you may want to specify some custom options:
+
+-   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
+-   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
 
 #### Advanced information
 
@@ -96,11 +101,11 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-* `npm run check-engines` - checks installed version of `node` and `npm`.
+-   `npm run check-engines` - checks installed version of `node` and `npm`.
 
 #### Advanced information
 
-It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. Similarly to this package, the default requirements are `node` 10.0.0 or later, and `npm` 6.9.0 or later. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. The default requirements are set to the same Node.js and npm versions as listed in the [installation](#installation) section for this package. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-licenses`
 
@@ -118,83 +123,34 @@ _Example:_
 
 _Flags_:
 
-- `--prod` (or `--production`): When present, validates only `dependencies` and not `devDependencies`
-- `--dev` (or `--development`): When present, validates only `devDependencies` and not `dependencies`
-- `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
-- `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency’s `license` field is malformed. It’s assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
+-   `--prod` (or `--production`): When present, validates only `dependencies` and not `devDependencies`
+-   `--dev` (or `--development`): When present, validates only `devDependencies` and not `dependencies`
+-   `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
+-   `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency’s `license` field is malformed. It’s assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
 
-### `env`
+### `format`
 
-`env` is a family of scripts for setting up a local Docker-based development environment that plugin contributors can work in.
-
-To get started, it requires some configuration in your `package.json`:
+It helps to enforce coding style guidelines for your files (JavaScript, YAML) by formatting source code in a consistent way.
 
 _Example:_
 
 ```json
 {
 	"scripts": {
-		"env": "wp-scripts env"
-	},
-	"wp-env": {
-		"plugin-dir": "gutenberg",
-		"plugin-name": "Gutenberg",
-		"docker-template": "./bin/docker-compose.override.yml.template",
-		"welcome-logo": [
-			",⁻⁻⁻·       .                 |",
-			"|  ،⁓’.   . |---  ,---. ,---. |---. ,---. ,---. ,---.",
-			"|   | |   | |     |---' |   | |   | |---' |     |   |",
-			"`---' `---' `---’ `---’ '   ` `---' `---’ `     `---|",
-			"                                                `---'"
-		],
-		"welcome-build-command": "npm run dev"
-	}
-}
-```
-
-In the `wp-env` config block, each entry can be configured like so:
-- `plugin-dir`: Required. The name of the plugin directory within `wp-content/plugins` that this plugin will be mounted in.
-- `plugin-name`: Required. The display name for this plugin.
-- `docker-template`: Optional. If you need to customize the default `docker-compose.override.yml.template`, this is the path to your customized version.
-- `welcome-logo`: Optional. An ASCII art logo to show after `npm run env install` finishes.
-- `welcome-build-command`: Optional. The build command to show after `npm run env install` finishes, helping contributors move on to the next step.
-
-#### Available Sub-Scripts
-
-- `install`: Automatically downloads, builds, and installs a copy of WordPress to work with. This will be installed in the `wordpress` folder inside your project. You should add `wordpress` to your `.gitignore` file.
-- `connect`: For contributors that have a WordPress respository already, they can define the `WP_DEVELOP_DIR` environment variable with the path to their repository, then run this command to add your plugin to it.
-- `start`: Starts the Docker containers.
-- `stop`: Stops the Docker containers.
-- `update`: For contributors that used `npm run env install` to setup WordPress, running this command will update it to the latest checkout.
-- `reinstall`: Resets the database and re-configures WordPress again.
-- `cli`: Runs WP-CLI commands against the WordPress install.
-- `lint-php`: Run PHPCS linting on your plugin. You will need to have `composer.json` configured to install PHPCS, with a `lint` script that runs your linting. You will also need to have an appropriately configured `phpcs.xml.dist` file.
-- `test-php`: Runs your plugin's PHPUnit tests. You will need to have an appropriately configured `phpunit.xml.dist` file.
-- `docker-run`: For more advanced debugging, contributors may sometimes need to run commands in the Docker containers. This is the equivalent of running `docker-compose run` within the WordPress directory.
-
-### `format-js`
-
-It helps to enforce coding style guidelines for your JavaScript files by formatting source code in a consistent way.
-
-_Example:_
-
-```json
-{
-	"scripts": {
-		"format:js": "wp-scripts format-js",
-		"format:js:src": "wp-scripts format-js ./src"
+		"format": "wp-scripts format",
+		"format:src": "wp-scripts format ./src"
 	}
 }
 ```
 
 This is how you execute the script with presented setup:
 
-* `npm run format:js` - formats JavaScript files in the entire project’s directories.
-* `npm run format:js:src` - formats JavaScript files in the project’s `src` subfolder’s directories.
+-   `npm run format` - formats files in the entire project’s directories.
+-   `npm run format:src` - formats files in the project’s `src` subfolder’s directories.
 
-When you run commands similar to the `npm run format:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
+When you run commands similar to the `npm run format:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
 
-By default, files located in `build` and `node_modules` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored. You can customize the list of ignored files and directories by adding them to a `.prettierignore` file in your project.
 
 ### `lint-js`
 
@@ -213,12 +169,12 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-* `npm run lint:js` - lints JavaScript files in the entire project’s directories.
-* `npm run lint:js:src` - lints JavaScript files in the project’s `src` subfolder’s directories.
+-   `npm run lint:js` - lints JavaScript files in the entire project’s directories.
+-   `npm run lint:js:src` - lints JavaScript files in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
 
-By default, files located in `build` and `node_modules` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
@@ -241,12 +197,12 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
-* `npm run lint:pkg-json` - lints `package.json` file in the entire project’s directories.
-* `npm run lint:pkg-json:src` - lints `package.json` file in the project’s `src` subfolder’s directories.
+-   `npm run lint:pkg-json` - lints `package.json` file in the entire project’s directories.
+-   `npm run lint:pkg-json:src` - lints `package.json` file in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:pkg-json:src` example above, you can provide one or multiple directories to scan as well. See [more examples](https://github.com/tclindner/npm-package-json-lint/blob/HEAD/README.md#examples).
 
-By default, files located in `build` and `node_modules` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
@@ -268,13 +224,13 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-* `npm run lint:md:docs` - lints markdown files in the entire project’s directories.
+-   `npm run lint:md:docs` - lints markdown files in the entire project’s directories.
 
-By default, files located in `build` and `node_modules` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
-It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
+It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
 
 ### `lint-md-js`
 
@@ -292,13 +248,13 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-* `npm run lint:md:js` - lints markdown files in the entire project’s directories.
+-   `npm run lint:md:js` - lints markdown files in the entire project’s directories.
 
-By default, files located in `build` and `node_modules` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
-It uses [eslint-plugin-markdown](https://github.com/eslint/eslint-plugin-markdown) with the [.eslintrc-md.js](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.eslintrc-md.js) configuration. This configuration tunes down the linting rules since documentation often includes just snippets of code. It is recommended to use the markdown linting as a check, but not necessarily a blocker since it might report more false errors.
+It uses [eslint-plugin-markdown](https://github.com/eslint/eslint-plugin-markdown) with the [.eslintrc-md.js](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/config/.eslintrc-md.js) configuration. This configuration tunes down the linting rules since documentation often includes just snippets of code. It is recommended to use the markdown linting as a check, but not necessarily a blocker since it might report more false errors.
 
 ### `lint-style`
 
@@ -317,16 +273,16 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-* `npm run lint:style` - lints CSS and SCSS files in the entire project’s directories.
-* `npm run lint:css:src` - lints only CSS files in the project’s `src` subfolder’s directories.
+-   `npm run lint:style` - lints CSS and SCSS files in the entire project’s directories.
+-   `npm run lint:css:src` - lints only CSS files in the project’s `src` subfolder’s directories.
 
 When you run commands similar to the `npm run lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that you can use the powers of [globby](https://github.com/sindresorhus/globby) (like the `**` globstar) regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
 
-By default, files located in `build` and `node_modules` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
-It uses [stylelint](https://github.com/stylelint/stylelint) with the [stylelint-config-wordpress](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress) configuration per the [WordPress CSS Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://github.com/stylelint/stylelint/docs/user-guide.md). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config](<(https://www.npmjs.com/package/@wordpress/stylelint-config)>) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `packages-update`
 
@@ -364,8 +320,14 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-* `npm start` - starts the build for development.
-* `npm run start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
+-   `npm start` - starts the build for development.
+-   `npm run start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
+
+This script automatically use the optimized config but sometimes you may want to specify some custom options:
+
+-   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
+-   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
+-   `--webpack--devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
 
 #### Advanced information
 
@@ -373,7 +335,7 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 ### `test-e2e`
 
-Launches the End-To-End (E2E) test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api) in combination with the [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md):
+Launches the End-To-End (E2E) test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api) in combination with the [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/HEAD/docs/api.md):
 
 > [Jest](https://jestjs.io/) is a delightful JavaScript Testing Framework with a focus on simplicity.
 
@@ -393,26 +355,33 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
-* `npm run test:e2e` - runs all e2e tests.
-* `npm run test:e2e:help` - prints all available options to configure e2e test runner.
-* `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
-* `npm run test-e2e FILE_NAME -- --puppeteer-interactive ` - runs one test file interactively.
-* `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
-* `npm run test-e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
+-   `npm run test:e2e` - runs all e2e tests.
+-   `npm run test:e2e:help` - prints all available options to configure e2e test runner.
+-   `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
+-   `npm run test-e2e FILE_NAME -- --puppeteer-interactive` - runs one test file interactively.
+-   `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
+-   `npm run test-e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
 
 Jest will look for test files with any of the following popular naming conventions:
 
-- Files with `.js` (or `.ts`) suffix at any level of depth in `spec` folders.
-- Files with `.spec.js` (or `.spec.ts`) suffix.
+-   Files with `.js` (or `.ts`) suffix at any level of depth in `spec` folders.
+-   Files with `.spec.js` (or `.spec.ts`) suffix.
 
 This script automatically detects the best config to start Puppeteer but sometimes you may need to specify custom options:
- - You can add a `jest-puppeteer.config.js` at the root of the project or define a custom path using `JEST_PUPPETEER_CONFIG` environment variable. Check [jest-puppeteer](https://github.com/smooth-code/jest-puppeteer#jest-puppeteerconfigjs) for more details.
+
+-   You can add a `jest-puppeteer.config.js` at the root of the project or define a custom path using `JEST_PUPPETEER_CONFIG` environment variable. Check [jest-puppeteer](https://github.com/smooth-code/jest-puppeteer#jest-puppeteerconfigjs) for more details.
 
 We enforce that all tests run serially in the current process using [--runInBand](https://jestjs.io/docs/en/cli#runinband) Jest CLI option to avoid conflicts between tests caused by the fact that they share the same WordPress instance.
 
 #### Advanced information
 
 It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as mentioned above) to view all of the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
+
+Should there be any situation where you want to provide your own Jest config, you can do so.
+
+-   the command receives a `--config` argument. Example: `wp-scripts test-e2e --config my-jest-config.js`.
+-   there is a file called `jest-e2e.config.js`, `jest-e2e.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
+-   a `jest` object can be provided in the `package.json` file with the test configuration.
 
 ### `test-unit-js`
 
@@ -435,20 +404,26 @@ _Example:_
 
 This is how you execute those scripts using the presented setup:
 
-* `npm run test:unit` - runs all unit tests.
-* `npm run test:unit:help` - prints all available options to configure unit tests runner.
-* `npm run test:unit:watch` - runs all unit tests in the watch mode.
-* `npm run test:unit:debug` - runs all unit tests in [debug mode](#debugging-tests).
+-   `npm run test:unit` - runs all unit tests.
+-   `npm run test:unit:help` - prints all available options to configure unit tests runner.
+-   `npm run test:unit:watch` - runs all unit tests in the watch mode.
+-   `npm run test:unit:debug` - runs all unit tests in [debug mode](#debugging-tests).
 
 Jest will look for test files with any of the following popular naming conventions:
 
-- Files with `.js` (or `.ts`) suffix located at any level of depth in `__tests__` folders.
-- Files with `.js` (or `.ts`) suffix directly located in `test` folders.
-- Files with `.test.js` (or `.test.ts`) suffix.
+-   Files with `.js` (or `.ts`) suffix located at any level of depth in `__tests__` folders.
+-   Files with `.js` (or `.ts`) suffix directly located in `test` folders.
+-   Files with `.test.js` (or `.test.ts`) suffix.
 
 #### Advanced information
 
 It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `npm run test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
+
+Should there be any situation where you want to provide your own Jest config, you can do so.
+
+-   the command receives a `--config` argument. Example: `wp-scripts test-unit --config my-jest-config.js`.
+-   there is a file called `jest-unit.config.js`, `jest-unit.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
+-   a `jest` object can be provided in the `package.json` file with the test configuration.
 
 ## Passing Node.js options
 
@@ -482,7 +457,7 @@ Debugging npm scripts is supported out of the box for Visual Studio Code as of [
 
 Make sure `wp-scripts --inspect-brk test-unit-js --runInBand --no-cache` is saved as `test:unit:debug` in your `package.json` file to run tests in Visual Studio Code.
 
-When debugging, set a breakpoint in your tests by clicking on a line in the editor's left margin by the line numbers.
+When debugging, set a breakpoint in your tests by clicking on a line in the editor’s left margin by the line numbers.
 
 Then open npm scripts in the explorer or run `Explorer: Focus on NPM Scripts View` in the command palette to see the npm scripts. To start the tests, click the debug icon next to `test:unit:debug`.
 
@@ -506,7 +481,7 @@ For more e2e debugging tips check out the [Puppeteer debugging docs](https://dev
 
 In general, this package should be used with the set of recommended config files. While it’s possible to override every single config file provided, if you have to do it, it means that your use case is far more complicated than anticipated. If that happens, it would be better to avoid using the whole abstraction layer and set up your project with full control over tooling used.
 
-### Webpack config
+### Working with build scripts
 
 The `build` and `start` commands use [webpack](https://webpack.js.org/) behind the scenes. webpack is a tool that helps you transform your code into something else. For example: it can take code written in ESNext and output ES5 compatible code that is minified for production.
 
@@ -514,43 +489,127 @@ The `build` and `start` commands use [webpack](https://webpack.js.org/) behind t
 
 `@wordpress/scripts` bundles the default webpack config used as a base by the WordPress editor. These are the defaults:
 
-* [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
-* [Output](https://webpack.js.org/configuration/output): `build/index.js`
-* [Plugins](https://webpack.js.org/configuration/plugins): The webpack plugin provided by
-[`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used
-with the default configuration to ensure that WordPress provided scripts are not included in the
-built bundle.
+-   [Entry](https://webpack.js.org/configuration/entry-context/#entry): `src/index.js`
+-   [Output](https://webpack.js.org/configuration/output): `build/index.js`
+-   [Loaders](https://webpack.js.org/loaders/):
+    -   [`babel-loader`](https://webpack.js.org/loaders/babel-loader/) allows transpiling JavaScript files using Babel and webpack.
+    -   [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://webpack.js.org/loaders/url-loader/) makes it possible to handle SVG files in JavaScript code.
+    -   [`css-loader`](https://webpack.js.org/loaders/css-loader/) chained with [`postcss-loader`](https://webpack.js.org/loaders/postcss-loader/) and [sass-loader](https://webpack.js.org/loaders/sass-loader/) let webpack process CSS, SASS or SCSS files referenced in JavaScript files.
+-   [Plugins](https://webpack.js.org/configuration/plugins) (among others):
+    -   [`MiniCssExtractPlugin`](https://webpack.js.org/plugins/mini-css-extract-plugin/) extracts CSS into separate files. It creates a CSS file per JavaScript entry point which contains CSS.
+    -   [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used with the default configuration to ensure that WordPress provided scripts are not included in the built bundle.
+
+#### Using CSS
+
+_Example:_
+
+```scss
+// index.scss
+$body-color: red;
+
+.wp-block-my-block {
+	color: $body-color;
+}
+```
+
+```css
+/* style.css */
+.wp-block-my-block {
+	background-color: black;
+}
+```
+
+```js
+// index.js
+import './index.scss';
+import './style.css';
+```
+
+When you run the build using the default command `wp-scripts build` (also applies to `start`) in addition to the JavaScript file `index.js` generated in the `build` folder, you should see two more files:
+
+1. `index.css` – all imported CSS files are bundled into one chunk named after the entry point, which defaults to `index.js`, and thus the file created becomes `index.css`. This is for styles used only in the editor.
+2. `style-index.css` – imported `style.css` file(s) (applies to SASS and SCSS extensions) get bundled into one `style-index.css` file that is meant to be used both on the front-end and in the editor.
+
+You can also have multiple entry points as described in the docs for the script:
+
+```bash
+wp-scripts start entry-one.js entry-two.js --output-path=custom
+```
+
+If you do so, then CSS files generated will follow the names of the entry points: `entry-one.css` and `entry-two.css`.
+
+Avoid using `style` keyword in an entry point name, this might break your build process.
+
+You can also bundle CSS modules by prefixing `.module` to the extension, e.g. `style.module.scss`. Otherwise, these files are handled like all other `style.scss`. They will also be extracted into `style-index.css`.
+
+#### Using fonts and images
+
+It is possible to reference font (`woff`, `woff2`, `eot`, `ttf` and `otf`) and image (`bmp`, `png`, `jpg`, `jpeg` and `gif`) files from CSS that is controlled by webpack as explained in the previous section.
+
+_Example:_
+
+```css
+/* style.css */
+@font-face {
+	font-family: Gilbert;
+	src: url( ../assets/gilbert-color.otf );
+}
+.wp-block-my-block {
+	background-color: url( ../assets/block-background.png );
+	font-family: Gilbert;
+}
+```
+
+#### Using SVG
+
+_Example:_
+
+```js
+import starUrl, { ReactComponent as Star } from './star.svg';
+
+const App = () => (
+	<div>
+		<img src={ starUrl } alt="star" />
+		<Star />
+	</div>
+);
+```
 
 #### Provide your own webpack config
 
 Should there be any situation where you want to provide your own webpack config, you can do so. The `build` and `start` commands will use your provided file when:
 
-* the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
-* there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your package (at the same level than your `package.json`).
+-   the command receives a `--config` argument. Example: `wp-scripts build --config my-own-webpack-config.js`.
+-   there is a file called `webpack.config.js` or `webpack.config.babel.js` in the top-level directory of your project (at the same level as `package.json`).
 
 ##### Extending the webpack config
 
 To extend the provided webpack config, or replace subsections within the provided webpack config, you can provide your own `webpack.config.js` file, `require` the provided `webpack.config.js` file, and use the [`spread` operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) to import all of or part of the provided configuration.
 
-In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include [`css-loader`](https://github.com/webpack-contrib/css-loader) and [`style-loader`](https://github.com/webpack-contrib/style-loader):
+In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include custom logic to parse module's source and convert it to a JavaScript object using [`toml`](https://www.npmjs.com/package/toml). It may be useful to import toml or other non-JSON files as JSON, without specific loaders:
 
 ```javascript
-const defaultConfig = require("@wordpress/scripts/config/webpack.config");
+const toml = require( 'toml' );
+const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 
 module.exports = {
-  ...defaultConfig,
-  module: {
-    ...defaultConfig.module,
-    rules: [
-      ...defaultConfig.module.rules,
-      {
-        test: /\.css$/,
-        use: [ 'style-loader', 'css-loader' ],
-      }
-    ]
-  }
+	...defaultConfig,
+	module: {
+		...defaultConfig.module,
+		rules: [
+			...defaultConfig.module.rules,
+			{
+				test: /.toml/,
+				type: 'json',
+				parser: {
+					parse: toml.parse,
+				},
+			},
+		],
+	},
 };
 ```
 
-If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

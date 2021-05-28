@@ -1,16 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
-const useIsomorphicLayoutEffect =
-	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+/**
+ * Internal dependencies
+ */
+import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
 export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	const [ isDragging, setIsDragging ] = useState( false );

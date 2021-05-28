@@ -40,6 +40,8 @@
 		},
 		icon: 'yes-alt',
 		scope: [ 'inserter' ],
+		isActive: ( { backgroundColor }, variationAttributes ) =>
+			backgroundColor === variationAttributes.backgroundColor,
 	} );
 
 	registerBlockVariation( 'core/paragraph', {
@@ -52,6 +54,8 @@
 		},
 		icon: 'warning',
 		scope: [ 'inserter' ],
+		isActive: ( { backgroundColor }, variationAttributes ) =>
+			backgroundColor === variationAttributes.backgroundColor,
 	} );
 
 	registerBlockVariation( 'core/columns', {

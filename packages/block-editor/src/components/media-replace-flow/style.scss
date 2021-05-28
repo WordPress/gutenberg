@@ -7,7 +7,7 @@
 
 // Forcing some space above the list of options in
 // the dropdown to visually balance them.
-.block-editor-media-replace-flow__options .components-popover__content {
+.block-editor-media-replace-flow__options .components-popover__content > div {
 	padding-top: $grid-unit-20;
 }
 
@@ -16,7 +16,11 @@
 }
 
 .block-editor-media-flow__url-input {
-	margin-top: $grid-unit-20;
+	border-top: $border-width solid $gray-900;
+	margin-top: $grid-unit-15;
+	margin-right: -$grid-unit-15;
+	margin-left: -$grid-unit-15;
+	padding: $grid-unit-15 $grid-unit-30 0;
 
 	.block-editor-media-replace-flow__image-url-label {
 		top: $grid-unit-20;

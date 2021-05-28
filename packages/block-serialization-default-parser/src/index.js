@@ -309,7 +309,7 @@ function nextToken() {
 	// we're also using a trick here because the only difference between a
 	// block opener and a block closer is the leading `/` before `wp:` (and
 	// a closer has no attributes). we can trap them both and process the
-	// match back in Javascript to see which one it was.
+	// match back in JavaScript to see which one it was.
 	const matches = tokenizer.exec( document );
 
 	// we have no more tokens

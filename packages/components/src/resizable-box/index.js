@@ -1,10 +1,30 @@
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * External dependencies
  */
 import classnames from 'classnames';
 import { Resizable } from 're-resizable';
 
-function ResizableBox( { className, showHandle = false, ...props } ) {
+/**
+ * Internal dependencies
+ */
+import ResizeTooltip from './resize-tooltip';
+
+function ResizableBox(
+	{
+		className,
+		children,
+		showHandle = true,
+		__experimentalShowTooltip: showTooltip = false,
+		__experimentalTooltipProps: tooltipProps = {},
+		...props
+	},
+	ref
+) {
 	// Removes the inline styles in the drag handles.
 	const handleStylesOverrides = {
 		width: null,
@@ -82,9 +102,13 @@ function ResizableBox( { className, showHandle = false, ...props } ) {
 				bottomRight: handleStylesOverrides,
 				bottomLeft: handleStylesOverrides,
 			} }
+			ref={ ref }
 			{ ...props }
-		/>
+		>
+			{ children }
+			{ showTooltip && <ResizeTooltip { ...tooltipProps } /> }
+		</Resizable>
 	);
 }
 
-export default ResizableBox;
+export default forwardRef( ResizableBox );

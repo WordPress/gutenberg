@@ -1,84 +1,30 @@
 /**
  * WordPress dependencies
  */
-import {
-	DropZoneProvider,
-	Popover,
-	SlotFillProvider,
-	FocusReturnProvider,
-} from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import {
-	BlockEditorKeyboardShortcuts,
-	Inserter as BlockEditorInserter,
-} from '@wordpress/block-editor';
-import { useViewportMatch } from '@wordpress/compose';
-import { InterfaceSkeleton } from '@wordpress/interface';
+import { Popover } from '@wordpress/components';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
  */
-import Header from '../header';
+import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import Sidebar from '../sidebar';
-import WidgetAreas from '../widget-areas';
-import Notices from '../notices';
-import KeyboardShortcuts from '../keyboard-shortcuts';
-import Inserter from '../inserter';
-
-const disabledInserterToggleProps = { isPrimary: true, disabled: true };
+import Interface from './interface';
+import UnsavedChangesWarning from './unsaved-changes-warning';
+import WelcomeGuide from '../welcome-guide';
 
 function Layout( { blockEditorSettings } ) {
-	const [ selectedArea, setSelectedArea ] = useState( null );
-	const isMobile = useViewportMatch( 'medium', '<' );
-
 	return (
-		<>
-			<BlockEditorKeyboardShortcuts.Register />
-			<KeyboardShortcuts.Register />
-			<SlotFillProvider>
-				<DropZoneProvider>
-					<FocusReturnProvider>
-						<InterfaceSkeleton
-							header={ <Header /> }
-							sidebar={ ! isMobile && <Sidebar /> }
-							content={
-								<>
-									<KeyboardShortcuts />
-									<Notices />
-									<Popover.Slot name="block-toolbar" />
-									<div
-										className="edit-widgets-layout__content"
-										tabIndex="-1"
-										onFocus={ () => {
-											setSelectedArea( null );
-										} }
-									>
-										<WidgetAreas
-											selectedArea={ selectedArea }
-											setSelectedArea={ setSelectedArea }
-											blockEditorSettings={
-												blockEditorSettings
-											}
-										/>
-									</div>
-									{ selectedArea === null && (
-										<Inserter>
-											<BlockEditorInserter
-												toggleProps={
-													disabledInserterToggleProps
-												}
-											/>
-										</Inserter>
-									) }
-								</>
-							}
-						/>
-
-						<Popover.Slot />
-					</FocusReturnProvider>
-				</DropZoneProvider>
-			</SlotFillProvider>
-		</>
+		<WidgetAreasBlockEditorProvider
+			blockEditorSettings={ blockEditorSettings }
+		>
+			<Interface blockEditorSettings={ blockEditorSettings } />
+			<Sidebar />
+			<Popover.Slot />
+			<PluginArea />
+			<UnsavedChangesWarning />
+			<WelcomeGuide />
+		</WidgetAreasBlockEditorProvider>
 	);
 }
 

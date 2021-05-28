@@ -5,12 +5,18 @@ import {
 	PostTextEditor,
 	PostTitle,
 	TextEditorGlobalKeyboardShortcuts,
+	store as editorStore,
 } from '@wordpress/editor';
 import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
 
 function TextEditor( { onExit, isRichEditingEnabled } ) {
 	return (
@@ -19,7 +25,7 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 				<div className="edit-post-text-editor__toolbar">
 					<h2>{ __( 'Editing code' ) }</h2>
 					<Button
-						isTertiary
+						variant="tertiary"
 						onClick={ onExit }
 						shortcut={ displayShortcut.secondary( 'm' ) }
 					>
@@ -38,13 +44,13 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 
 export default compose(
 	withSelect( ( select ) => ( {
-		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+		isRichEditingEnabled: select( editorStore ).getEditorSettings()
 			.richEditingEnabled,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		return {
 			onExit() {
-				dispatch( 'core/edit-post' ).switchEditorMode( 'visual' );
+				dispatch( editPostStore ).switchEditorMode( 'visual' );
 			},
 		};
 	} )

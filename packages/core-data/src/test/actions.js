@@ -1,15 +1,43 @@
 /**
+ * WordPress dependencies
+ */
+import { controls } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
 	editEntityRecord,
 	saveEntityRecord,
+	deleteEntityRecord,
 	receiveEntityRecords,
 	receiveUserPermission,
 	receiveAutosaves,
 	receiveCurrentUser,
+	__experimentalBatch,
 } from '../actions';
-import { select } from '../controls';
+
+jest.mock( '../locks/actions', () => ( {
+	__unstableAcquireStoreLock: jest.fn( () => [
+		{
+			type: 'MOCKED_ACQUIRE_LOCK',
+		},
+	] ),
+	__unstableReleaseStoreLock: jest.fn( () => [
+		{
+			type: 'MOCKED_RELEASE_LOCK',
+		},
+	] ),
+} ) );
+
+jest.mock( '../batch', () => {
+	const { createBatch } = jest.requireActual( '../batch' );
+	return {
+		createBatch() {
+			return createBatch( ( inputs ) => Promise.resolve( inputs ) );
+		},
+	};
+} );
 
 describe( 'editEntityRecord', () => {
 	it( 'throws when the edited entity does not have a loaded config.', () => {
@@ -21,12 +49,59 @@ describe( 'editEntityRecord', () => {
 			{}
 		);
 		expect( fulfillment.next().value ).toEqual(
-			select( 'getEntity', entity.kind, entity.name )
+			controls.select( 'core', 'getEntity', entity.kind, entity.name )
 		);
+
 		// Don't pass back an entity config.
 		expect( fulfillment.next.bind( fulfillment ) ).toThrow(
 			`The entity being edited (${ entity.kind }, ${ entity.name }) does not have a loaded config.`
 		);
+	} );
+} );
+
+describe( 'deleteEntityRecord', () => {
+	it( 'triggers a DELETE request for an existing record', async () => {
+		const post = 10;
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+		const fulfillment = deleteEntityRecord( 'postType', 'post', post );
+
+		// Trigger generator
+		fulfillment.next();
+
+		// Acquire lock
+		expect( fulfillment.next( entities ).value.type ).toBe(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+
+		// Start
+		expect( fulfillment.next().value.type ).toEqual(
+			'DELETE_ENTITY_RECORD_START'
+		);
+
+		// delete api call
+		const { value: apiFetchAction } = fulfillment.next();
+		expect( apiFetchAction.request ).toEqual( {
+			path: '/wp/v2/posts/10',
+			method: 'DELETE',
+		} );
+
+		expect( fulfillment.next().value.type ).toBe( 'REMOVE_ITEMS' );
+
+		expect( fulfillment.next().value.type ).toBe(
+			'DELETE_ENTITY_RECORD_FINISH'
+		);
+
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
+		);
+
+		expect( fulfillment.next() ).toMatchObject( {
+			done: true,
+			value: undefined,
+		} );
 	} );
 } );
 
@@ -39,19 +114,18 @@ describe( 'saveEntityRecord', () => {
 		const fulfillment = saveEntityRecord( 'postType', 'post', post );
 		// Trigger generator
 		fulfillment.next();
-		// Provide entities and trigger apiFetch
+
+		// Provide entities and acquire lock
 		expect( fulfillment.next( entities ).value.type ).toBe(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+
+		// Trigger apiFetch
+		expect( fulfillment.next().value.type ).toEqual(
 			'SAVE_ENTITY_RECORD_START'
 		);
 
-		// Should select __experimentalGetEntityRecordNoResolver selector (as opposed to getEntityRecord)
-		// see https://github.com/WordPress/gutenberg/pull/19752#discussion_r368498318.
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.selectorName ).toBe(
-			'__experimentalGetEntityRecordNoResolver'
-		);
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts',
@@ -67,12 +141,18 @@ describe( 'saveEntityRecord', () => {
 				'post',
 				updatedRecord,
 				undefined,
-				true
+				true,
+				{ title: 'new post' }
 			)
 		);
 		expect( fulfillment.next().value.type ).toBe(
 			'SAVE_ENTITY_RECORD_FINISH'
 		);
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
+		);
+
 		expect( fulfillment.next().value ).toBe( updatedRecord );
 	} );
 
@@ -84,14 +164,17 @@ describe( 'saveEntityRecord', () => {
 		const fulfillment = saveEntityRecord( 'postType', 'post', post );
 		// Trigger generator
 		fulfillment.next();
-		// Provide entities and trigger apiFetch
+
+		// Provide entities and acquire lock
 		expect( fulfillment.next( entities ).value.type ).toBe(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+
+		// Trigger apiFetch
+		expect( fulfillment.next().value.type ).toEqual(
 			'SAVE_ENTITY_RECORD_START'
 		);
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts/10',
@@ -101,10 +184,17 @@ describe( 'saveEntityRecord', () => {
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( post );
 		expect( received ).toEqual(
-			receiveEntityRecords( 'postType', 'post', post, undefined, true )
+			receiveEntityRecords( 'postType', 'post', post, undefined, true, {
+				title: 'new post',
+				id: 10,
+			} )
 		);
 		expect( fulfillment.next().value.type ).toBe(
 			'SAVE_ENTITY_RECORD_FINISH'
+		);
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
 		);
 	} );
 
@@ -121,14 +211,17 @@ describe( 'saveEntityRecord', () => {
 		const fulfillment = saveEntityRecord( 'root', 'postType', postType );
 		// Trigger generator
 		fulfillment.next();
-		// Provide entities and trigger apiFetch
+
+		// Provide entities and acquire lock
 		expect( fulfillment.next( entities ).value.type ).toBe(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+
+		// Trigger apiFetch
+		expect( fulfillment.next().value.type ).toEqual(
 			'SAVE_ENTITY_RECORD_START'
 		);
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/types/page',
@@ -143,11 +236,16 @@ describe( 'saveEntityRecord', () => {
 				'postType',
 				postType,
 				undefined,
-				true
+				true,
+				{ slug: 'page', title: 'Pages' }
 			)
 		);
 		expect( fulfillment.next().value.type ).toBe(
 			'SAVE_ENTITY_RECORD_FINISH'
+		);
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
 		);
 	} );
 } );
@@ -202,5 +300,79 @@ describe( 'receiveCurrentUser', () => {
 			type: 'RECEIVE_CURRENT_USER',
 			currentUser,
 		} );
+	} );
+} );
+
+describe( '__experimentalBatch', () => {
+	it( 'batches multiple actions together', async () => {
+		const generator = __experimentalBatch(
+			[
+				( { saveEntityRecord: _saveEntityRecord } ) =>
+					_saveEntityRecord( 'root', 'widget', {} ),
+				( { saveEditedEntityRecord: _saveEditedEntityRecord } ) =>
+					_saveEditedEntityRecord( 'root', 'widget', 123 ),
+				( { deleteEntityRecord: _deleteEntityRecord } ) =>
+					_deleteEntityRecord( 'root', 'widget', 123, {} ),
+			],
+			{ __unstableProcessor: ( inputs ) => Promise.resolve( inputs ) }
+		);
+		// Run generator up to `yield getDispatch()`.
+		const { value: getDispatchControl } = generator.next();
+		expect( getDispatchControl ).toEqual( { type: 'GET_DISPATCH' } );
+		const actions = {
+			saveEntityRecord: jest.fn(
+				( kind, name, record, { __unstableFetch } ) => {
+					__unstableFetch( {} );
+					return { id: 123, created: true };
+				}
+			),
+			saveEditedEntityRecord: jest.fn(
+				( kind, name, recordId, { __unstableFetch } ) => {
+					__unstableFetch( {} );
+					return { id: 123, updated: true };
+				}
+			),
+			deleteEntityRecord: jest.fn(
+				( kind, name, recordId, query, { __unstableFetch } ) => {
+					__unstableFetch( {} );
+					return { id: 123, deleted: true };
+				}
+			),
+		};
+		const dispatch = () => actions;
+		// Run generator up to `yield __unstableAwaitPromise( ... )`.
+		const { value: awaitPromiseControl } = generator.next( dispatch );
+		expect( actions.saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'widget',
+			{},
+			{ __unstableFetch: expect.any( Function ) }
+		);
+		expect( actions.saveEditedEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'widget',
+			123,
+			{ __unstableFetch: expect.any( Function ) }
+		);
+		expect( actions.deleteEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'widget',
+			123,
+			{},
+			{ __unstableFetch: expect.any( Function ) }
+		);
+		expect( awaitPromiseControl ).toEqual( {
+			type: 'AWAIT_PROMISE',
+			promise: expect.any( Promise ),
+		} );
+		// Run generator to the end.
+		const { value: results } = generator.next(
+			await awaitPromiseControl.promise
+		);
+		expect( results ).toEqual( [
+			{ id: 123, created: true },
+			{ id: 123, updated: true },
+			{ id: 123, deleted: true },
+		] );
 	} );
 } );

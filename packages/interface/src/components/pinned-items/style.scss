@@ -1,20 +1,22 @@
 .interface-pinned-items {
-	display: none;
+	display: flex;
 
-	@include break-small() {
-		display: flex;
+	// We intentionally hide pinned items (plugins) on mobile, and unhide them at desktop breakpoints.
+	// Otherwise the list can wreak havoc on the layout.
+	.components-button:not(:first-child) {
+		display: none;
+
+		@include break-small() {
+			display: flex;
+		}
 	}
 
 	.components-button {
-		margin-left: 4px;
-
-		&.is-pressed {
-			margin-left: 5px;
-		}
+		margin-left: $grid-unit-05;
 
 		svg {
-			max-width: 24px;
-			max-height: 24px;
+			max-width: $icon-size;
+			max-height: $icon-size;
 		}
 	}
 }

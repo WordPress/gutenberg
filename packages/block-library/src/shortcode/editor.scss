@@ -1,25 +1,13 @@
-.wp-block-shortcode {
-	display: flex;
-	flex-direction: column;
-	padding: $block-padding;
-	background-color: $dark-opacity-light-200;
-	font-size: $default-font-size;
-	font-family: $default-font;
-	margin-bottom: $default-block-margin;
-
-	label {
-		display: flex;
-		align-items: center;
-		white-space: nowrap;
-		font-weight: 600;
-		flex-shrink: 0;
-	}
-
+[data-type="core/shortcode"] {
 	.block-editor-plain-text {
 		max-height: 250px;
 	}
 
-	.dashicon {
-		margin-right: $grid-unit-10;
+	&.components-placeholder {
+		min-height: 0;
 	}
+}
+
+.blocks-shortcode__textarea {
+	@include input-control;
 }

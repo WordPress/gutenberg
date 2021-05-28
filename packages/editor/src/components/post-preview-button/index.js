@@ -180,7 +180,7 @@ export class PostPreviewButton extends Component {
 	}
 
 	render() {
-		const { previewLink, currentPostLink, isSaveable } = this.props;
+		const { previewLink, currentPostLink, isSaveable, role } = this.props;
 
 		// Link to the `?preview=true` URL if we have it, since this lets us see
 		// changes that were autosaved since the post was last published. Otherwise,
@@ -196,21 +196,28 @@ export class PostPreviewButton extends Component {
 
 		return (
 			<Button
-				isTertiary={ ! this.props.className }
+				variant={ ! this.props.className ? 'tertiary' : undefined }
 				className={ classNames }
 				href={ href }
 				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }
 				onClick={ this.openPreviewWindow }
 				ref={ this.buttonRef }
+				role={ role }
 			>
-				{ this.props.textContent
-					? this.props.textContent
-					: _x( 'Preview', 'imperative verb' ) }
-				<VisuallyHidden as="span">
-					{ /* translators: accessibility text */
-					__( '(opens in a new tab)' ) }
-				</VisuallyHidden>
+				{ this.props.textContent ? (
+					this.props.textContent
+				) : (
+					<>
+						{ _x( 'Preview', 'imperative verb' ) }
+						<VisuallyHidden as="span">
+							{
+								/* translators: accessibility text */
+								__( '(opens in a new tab)' )
+							}
+						</VisuallyHidden>
+					</>
+				) }
 			</Button>
 		);
 	}

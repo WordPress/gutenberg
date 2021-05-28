@@ -17,7 +17,7 @@
 }
 
 .edit-post-more-menu__content .components-popover__content {
-	min-width: 260px;
+	min-width: 280px;
 
 	// Let the menu scale to fit items.
 	@include break-mobile() {

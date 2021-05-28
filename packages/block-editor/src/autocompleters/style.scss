@@ -1,5 +1,7 @@
 .block-editor-autocompleters__block {
+	white-space: nowrap;
+
 	.block-editor-block-icon {
-		margin-right: 8px;
+		margin-right: $grid-unit-10;
 	}
 }

@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -25,7 +23,7 @@ import {
  * Default set of header values which should be sent with every request unless
  * explicitly provided through apiFetch options.
  *
- * @type {Object}
+ * @type {Record<string, string>}
  */
 const DEFAULT_HEADERS = {
 	// The backend uses the Accept header as a condition for considering an
@@ -45,6 +43,12 @@ const DEFAULT_OPTIONS = {
 	credentials: 'include',
 };
 
+/** @typedef {import('./types').APIFetchMiddleware} APIFetchMiddleware */
+/** @typedef {import('./types').APIFetchOptions} APIFetchOptions */
+
+/**
+ * @type {import('./types').APIFetchMiddleware[]}
+ */
 const middlewares = [
 	userLocaleMiddleware,
 	namespaceEndpointMiddleware,
@@ -52,10 +56,22 @@ const middlewares = [
 	fetchAllMiddleware,
 ];
 
+/**
+ * Register a middleware
+ *
+ * @param {import('./types').APIFetchMiddleware} middleware
+ */
 function registerMiddleware( middleware ) {
 	middlewares.unshift( middleware );
 }
 
+/**
+ * Checks the status of a response, throwing the Response as an error if
+ * it is outside the 200 range.
+ *
+ * @param {Response} response
+ * @return {Response} The response if the status is in the 200 range.
+ */
 const checkStatus = ( response ) => {
 	if ( response.status >= 200 && response.status < 300 ) {
 		return response;
@@ -64,6 +80,11 @@ const checkStatus = ( response ) => {
 	throw response;
 };
 
+/** @typedef {(options: import('./types').APIFetchOptions) => Promise<any>} FetchHandler*/
+
+/**
+ * @type {FetchHandler}
+ */
 const defaultFetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
@@ -77,12 +98,16 @@ const defaultFetchHandler = ( nextOptions ) => {
 		headers[ 'Content-Type' ] = 'application/json';
 	}
 
-	const responsePromise = window.fetch( url || path, {
-		...DEFAULT_OPTIONS,
-		...remainingOptions,
-		body,
-		headers,
-	} );
+	const responsePromise = window.fetch(
+		// fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed
+		url || path || window.location.href,
+		{
+			...DEFAULT_OPTIONS,
+			...remainingOptions,
+			body,
+			headers,
+		}
+	);
 
 	return (
 		responsePromise
@@ -109,95 +134,56 @@ const defaultFetchHandler = ( nextOptions ) => {
 	);
 };
 
+/** @type {FetchHandler} */
 let fetchHandler = defaultFetchHandler;
 
 /**
  * Defines a custom fetch handler for making the requests that will override
  * the default one using window.fetch
  *
- * @param {Function} newFetchHandler The new fetch handler
+ * @param {FetchHandler} newFetchHandler The new fetch handler
  */
 function setFetchHandler( newFetchHandler ) {
 	fetchHandler = newFetchHandler;
 }
 
+/**
+ * @template T
+ * @param {import('./types').APIFetchOptions} options
+ * @return {Promise<T>} A promise representing the request processed via the registered middlewares.
+ */
 function apiFetch( options ) {
-	const steps = [ ...middlewares, fetchHandler ];
+	// creates a nested function chain that calls all middlewares and finally the `fetchHandler`,
+	// converting `middlewares = [ m1, m2, m3 ]` into:
+	// ```
+	// opts1 => m1( opts1, opts2 => m2( opts2, opts3 => m3( opts3, fetchHandler ) ) );
+	// ```
+	const enhancedHandler = middlewares.reduceRight( (
+		/** @type {FetchHandler} */ next,
+		middleware
+	) => {
+		return ( workingOptions ) => middleware( workingOptions, next );
+	}, fetchHandler );
 
-	const createRunStep = ( index ) => ( workingOptions ) => {
-		const step = steps[ index ];
-		if ( index === steps.length - 1 ) {
-			return step( workingOptions );
+	return enhancedHandler( options ).catch( ( error ) => {
+		if ( error.code !== 'rest_cookie_invalid_nonce' ) {
+			return Promise.reject( error );
 		}
 
-		const next = createRunStep( index + 1 );
-		return step( workingOptions, next );
-	};
-
-	return new Promise( function( resolve, reject ) {
-		createRunStep( 0 )( options )
-			.then( resolve )
-			.catch( ( error ) => {
-				if ( error.code !== 'rest_cookie_invalid_nonce' ) {
-					return reject( error );
-				}
-
-				// If the nonce is invalid, refresh it and try again.
-				window
-					.fetch( apiFetch.nonceEndpoint )
-					.then( checkStatus )
-					.then( ( data ) => data.text() )
-					.then( ( text ) => {
-						apiFetch.nonceMiddleware.nonce = text;
-						apiFetch( options )
-							.then( resolve )
-							.catch( reject );
-					} )
-					.catch( reject );
-			} );
+		// If the nonce is invalid, refresh it and try again.
+		return (
+			window
+				// @ts-ignore
+				.fetch( apiFetch.nonceEndpoint )
+				.then( checkStatus )
+				.then( ( data ) => data.text() )
+				.then( ( text ) => {
+					// @ts-ignore
+					apiFetch.nonceMiddleware.nonce = text;
+					return apiFetch( options );
+				} )
+		);
 	} );
-}
-
-/**
- * Function that fetches data using apiFetch, and updates the status.
- *
- * @param {string} path Query path.
- */
-function useApiFetch( path ) {
-	deprecated( 'useApiFetch', {
-		version: '8.1.0',
-		alternative: 'apiFetch',
-		plugin: 'Gutenberg',
-	} );
-
-	// Indicate the fetching status
-	const [ isLoading, setIsLoading ] = useState( true );
-	const [ data, setData ] = useState( null );
-	const [ error, setError ] = useState( null );
-
-	useEffect( () => {
-		setIsLoading( true );
-		setData( null );
-		setError( null );
-
-		apiFetch( { path } )
-			.then( ( fetchedData ) => {
-				setData( fetchedData );
-				// We've stopped fetching
-				setIsLoading( false );
-			} )
-			.catch( ( err ) => {
-				setError( err );
-				// We've stopped fetching
-				setIsLoading( false );
-			} );
-	}, [ path ] );
-
-	return {
-		isLoading,
-		data,
-		error,
-	};
 }
 
 apiFetch.use = registerMiddleware;
@@ -208,7 +194,5 @@ apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
 apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
-
-apiFetch.useApiFetch = useApiFetch;
 
 export default apiFetch;

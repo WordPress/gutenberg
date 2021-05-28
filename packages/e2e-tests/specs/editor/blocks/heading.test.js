@@ -14,7 +14,7 @@ describe( 'Heading', () => {
 	const COLOR_INPUT_FIELD_SELECTOR =
 		'.components-color-palette__picker .components-text-control__input';
 	const COLOR_PANEL_TOGGLE_X_SELECTOR =
-		"//button[./span[contains(text(),'Color settings')]]";
+		"//button[./span[contains(text(),'Color')]]";
 
 	beforeEach( async () => {
 		await createNewPost();
@@ -67,19 +67,20 @@ describe( 'Heading', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'it should correctly apply custom colors', async () => {
+	it( 'should correctly apply custom colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '### Heading' );
-		const [ colorPanelToggle ] = await page.$x(
+		const colorPanelToggle = await page.waitForXPath(
 			COLOR_PANEL_TOGGLE_X_SELECTOR
 		);
 		await colorPanelToggle.click();
 
-		const [ customTextColorButton ] = await page.$x(
-			`${ CUSTOM_COLOR_BUTTON_X_SELECTOR }`
+		const customTextColorButton = await page.waitForXPath(
+			CUSTOM_COLOR_BUTTON_X_SELECTOR
 		);
 
 		await customTextColorButton.click();
+		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '#7700ff' );
@@ -90,7 +91,7 @@ describe( 'Heading', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'it should correctly apply named colors', async () => {
+	it( 'should correctly apply named colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '## Heading' );
 		const [ colorPanelToggle ] = await page.$x(

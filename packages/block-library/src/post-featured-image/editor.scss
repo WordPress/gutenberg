@@ -1,0 +1,27 @@
+div[data-type="core/post-featured-image"] {
+	img {
+		max-width: 100%;
+		height: auto;
+		display: block;
+	}
+}
+
+.editor-styles-wrapper {
+	.post-featured-image_placeholder {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		border-radius: $radius-block-ui;
+		background-color: $white;
+		box-shadow: inset 0 0 0 $border-width $gray-900;
+		padding: $grid-unit-15;
+		svg {
+			margin-right: $grid-unit-15;
+		}
+		p {
+			font-family: $default-font;
+			font-size: $default-font-size;
+			margin: 0;
+		}
+	}
+}

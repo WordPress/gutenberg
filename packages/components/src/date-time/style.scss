@@ -1,11 +1,14 @@
-// We can't reference this package with ~ because of how Lerna handles packages.
-// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
-/*rtl:begin:ignore*/
-@import "node_modules/react-dates/lib/css/_datepicker";
-/*rtl:end:ignore*/
+@import "./datepicker";
 
 .components-datetime {
-	padding: 0;
+	// This padding is leveraged when the component is used alone,
+	// usually inside popovers.
+	padding: $grid-unit-20;
+
+	// This rule removes the padding when used inside a panel.
+	.components-panel__body & {
+		padding: 0;
+	}
 
 	.components-datetime__calendar-help {
 		padding: $grid-unit-20;
@@ -15,7 +18,12 @@
 		}
 	}
 
-	.components-datetime__date-help-button {
+	.components-datetime__buttons {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.components-datetime__date-help-toggle {
 		display: block;
 		margin-left: auto;
 	}
@@ -43,11 +51,13 @@
 
 .components-datetime__date {
 	min-height: 236px;
-	border-top: 1px solid $light-gray-500;
+	border-top: 1px solid $gray-300;
 
 	// Override external DatePicker styles.
 	.DayPickerNavigation_leftButton__horizontalDefault {
-		left: 0;
+		/*!rtl:begin:ignore*/
+		left: 13px;
+		/*!rtl:end:ignore*/
 	}
 
 	.CalendarMonth_caption {
@@ -67,17 +77,17 @@
 		text-align: center;
 
 		&:focus {
-			box-shadow: inset 0 0 0 $border-width-focus theme(primary), inset 0 0 0 #{ $border-width-focus + $border-width } $white;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 #{ $border-width-focus + $border-width } $white;
 			outline: 2px solid transparent; // Shown in Windows 10 high contrast mode.
 		}
 	}
 
 	.CalendarDay__selected {
-		background: theme(primary);
+		background: var(--wp-admin-theme-color);
 		border: 2px solid transparent; // This indicates selection in Windows 10 high contrast mode.
 
 		&:hover {
-			background: color(theme(primary) shade(15%));
+			background: var(--wp-admin-theme-color-darker-20);
 		}
 
 		&:focus {
@@ -97,16 +107,40 @@
 	.DayPicker_weekHeader {
 		top: 50px;
 		.DayPicker_weekHeader_ul {
-			margin: 1px 0;
+			margin: 1px;
 			padding-left: 0;
 			padding-right: 0;
 		}
 	}
 
-	&.is-description-visible .DayPicker,
-	&.is-description-visible .components-datetime__date-help-button {
+	&.is-description-visible .DayPicker {
 		visibility: hidden;
 	}
+}
+
+.components-datetime__date .CalendarDay .components-datetime__date__day {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	flex-direction: column;
+	position: relative;
+
+	&.has-events::before {
+		content: " ";
+		width: 4px;
+		height: 4px;
+		border-radius: 2px;
+		position: absolute;
+		left: 50%;
+		margin-left: -2px;
+		bottom: 0;
+		background-color: $white;
+	}
+}
+
+.components-datetime__date .CalendarDay:not(.CalendarDay__selected) .components-datetime__date__day.has-events::before {
+	background: var(--wp-admin-theme-color);
 }
 
 .components-datetime__time {
@@ -131,7 +165,6 @@
 		.components-datetime__time-separator {
 			display: inline-block;
 			padding: 0 3px 0 0;
-			color: $dark-gray-500;
 		}
 
 		.components-datetime__time-field {
@@ -174,12 +207,18 @@
 	&.is-12-hour {
 		.components-datetime__time-field-day input {
 			margin: 0 -$grid-unit-05 0 0 !important;
-			border-radius: $radius-round-rectangle 0 0 $radius-round-rectangle !important;
+			border-radius: $radius-block-ui 0 0 $radius-block-ui !important;
 		}
 		.components-datetime__time-field-year input {
-			border-radius: 0 $radius-round-rectangle $radius-round-rectangle 0 !important;
+			border-radius: 0 $radius-block-ui $radius-block-ui 0 !important;
 		}
 	}
+}
+
+.components-datetime__timezone {
+	line-height: 30px;
+	margin-left: $grid-unit-05;
+	text-decoration: underline dotted;
 }
 
 .components-datetime__time-legend {

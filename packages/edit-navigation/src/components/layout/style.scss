@@ -1,12 +1,95 @@
-.edit-navigation-layout__tab-panel {
-	// Matches the padding-left applied by default to the `#wpcontent` element.
-	margin-right: 10px;
-
-	@include break-medium {
-		margin-right: 20px;
+// Overriding the wp-admin background and padding
+// to give the navigation editor more room to breathe.
+.gutenberg_page_gutenberg-navigation {
+	#wpcontent {
+		padding-left: 0;
 	}
 
-	.components-tab-panel__tabs {
-		margin-bottom: 10px;
+	// Ensure the entire layout is full-height, the background
+	// of the editing canvas needs to be full-height for block
+	// deselection to work.
+	#wpwrap,
+	#wpcontent,
+	#wpbody,
+	#wpbody-content,
+	.edit-navigation,
+	.components-drop-zone__provider,
+	.edit-navigation-layout {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
 	}
+}
+
+.edit-navigation-layout {
+	&.has-permanent-sidebar {
+		margin-right: $sidebar-width;
+	}
+
+	> .components-spinner {
+		margin: $navigation-editor-spacing-top auto 0;
+	}
+
+	.edit-navigation-layout__content-area {
+		// Reference element for the block popover position.
+		position: relative;
+
+		// The 10px match that of similar settings pages.
+		padding: $grid-unit-15 10px 10px 10px;
+
+		@include break-medium() {
+			// Provide space for the floating block toolbar.
+			padding-top: $navigation-editor-spacing-top;
+		}
+
+		// Ensure the entire layout is full-height, the background
+		// of the editing canvas needs to be full-height for block
+		// deselection to work.
+		flex-grow: 1;
+	}
+
+	.interface-interface-skeleton__header {
+		border-bottom-color: transparent;
+	}
+
+	// Force the sidebar to the right side of the screen on larger
+	// breakpoints.
+	&.has-permanent-sidebar .interface-interface-skeleton__sidebar {
+		position: fixed !important;
+		top: $grid-unit-40;
+		right: 0;
+		bottom: 0;
+		left: auto;
+
+		// Hide the toggle as the sidebar should be permanently open.
+		.edit-navigation-sidebar__panel-tabs > button {
+			display: none;
+		}
+	}
+
+	.edit-navigation-header {
+		background: $white;
+
+		@include break-medium() {
+			background: transparent;
+		}
+	}
+}
+
+.edit-navigation-empty-state {
+	max-width: $navigation-editor-width;
+	margin-left: auto;
+	margin-right: auto;
+	@include break-medium() {
+		// Match the padding top of the editor canvas.
+		margin-top: $navigation-editor-spacing-top;
+	}
+}
+
+.edit-navigation-layout__overlay {
+	z-index: z-index(".edit-navigation-layout__overlay");
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: rgba(86, 85, 85, 0.5);
 }

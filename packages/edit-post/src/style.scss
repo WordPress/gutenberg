@@ -1,15 +1,15 @@
-$footer-height: $button-size-small;
-
 @import "../../interface/src/style.scss";
-
 @import "./components/header/style.scss";
 @import "./components/header/fullscreen-mode-close/style.scss";
 @import "./components/header/header-toolbar/style.scss";
 @import "./components/header/more-menu/style.scss";
+@import "./components/header/template-title/style.scss";
 @import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/layout/style.scss";
 @import "./components/manage-blocks-modal/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
+@import "./components/preferences-modal/style.scss";
+@import "./components/secondary-sidebar/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/last-revision/style.scss";
 @import "./components/sidebar/post-author/style.scss";
@@ -19,11 +19,11 @@ $footer-height: $button-size-small;
 @import "./components/sidebar/post-status/style.scss";
 @import "./components/sidebar/post-visibility/style.scss";
 @import "./components/sidebar/settings-header/style.scss";
+@import "./components/sidebar/template/style.scss";
+@import "./components/sidebar/template-summary/style.scss";
 @import "./components/text-editor/style.scss";
 @import "./components/visual-editor/style.scss";
-@import "./components/options-modal/style.scss";
 @import "./components/welcome-guide/style.scss";
-
 
 /**
  * Animations
@@ -51,6 +51,14 @@ body.block-editor-page {
 	@include wp-admin-reset( ".block-editor" );
 }
 
+// Fix issue with wp-admin menu not scrolling between 170% and 200% zoom.
+.block-editor-page #wpwrap {
+	overflow-y: auto;
+	@include break-medium() {
+		overflow-y: initial;
+	}
+}
+
 // Target the editor UI excluding the metaboxes and custom fields areas.
 .edit-post-header,
 .edit-post-visual-editor,
@@ -58,7 +66,8 @@ body.block-editor-page {
 .edit-post-sidebar,
 .editor-post-publish-panel,
 .components-popover,
-.components-modal__frame {
+.components-modal__frame,
+.edit-post-editor__inserter-panel {
 	@include reset;
 }
 
@@ -71,12 +80,12 @@ body.block-editor-page {
 		right: 0;
 		bottom: 0;
 		left: 0;
-		min-height: calc(100vh - #{ $admin-bar-height-big });
+		min-height: calc(100vh - #{$admin-bar-height-big});
 	}
 
 	// The WP header height changes at this breakpoint.
 	@include break-medium {
-		min-height: calc(100vh - #{ $admin-bar-height });
+		min-height: calc(100vh - #{$admin-bar-height});
 
 		body.is-fullscreen-mode & {
 			min-height: 100vh;
@@ -91,22 +100,6 @@ body.block-editor-page {
 	iframe {
 		width: 100%;
 	}
-
-	.components-navigate-regions {
-		height: 100%;
-	}
 }
 
-
-// These are default block editor styles in case the theme doesn't provide them.
-.wp-block {
-	max-width: $content-width;
-
-	&[data-align="wide"] {
-		max-width: 1100px;
-	}
-
-	&[data-align="full"] {
-		max-width: none;
-	}
-}
+@include wordpress-admin-schemes();

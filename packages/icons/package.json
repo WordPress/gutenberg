@@ -1,15 +1,16 @@
 {
 	"name": "@wordpress/icons",
-	"version": "1.4.0",
+	"version": "4.0.0",
 	"description": "WordPress Icons package, based on dashicon.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
+		"wordpress",
+		"gutenberg",
 		"icons",
-		"dashicon",
-		"wordpress"
+		"dashicon"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/icons/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/icons/README.md",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/WordPress/gutenberg.git",
@@ -19,14 +20,17 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
-		"@wordpress/element": "../element",
-		"@wordpress/primitives": "../primitives"
+		"@babel/runtime": "^7.13.10",
+		"@wordpress/element": "file:../element",
+		"@wordpress/primitives": "file:../primitives"
 	},
 	"publishConfig": {
 		"access": "public"

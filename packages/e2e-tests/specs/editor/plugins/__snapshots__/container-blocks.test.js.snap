@@ -16,7 +16,7 @@ exports[`InnerBlocks Template Sync Ensure inner block writing flow works as expe
 <!-- /wp:test/test-inner-blocks-paragraph-placeholder -->"
 `;
 
-exports[`InnerBlocks Template Sync Ensures blocks without locking are kept intact even if they do not match the template  1`] = `
+exports[`InnerBlocks Template Sync Ensures blocks without locking are kept intact even if they do not match the template 1`] = `
 "<!-- wp:test/test-inner-blocks-no-locking -->
 <!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
 <p class=\\"has-large-font-size\\">Content…</p>
@@ -28,10 +28,30 @@ exports[`InnerBlocks Template Sync Ensures blocks without locking are kept intac
 <!-- /wp:test/test-inner-blocks-no-locking -->"
 `;
 
-exports[`InnerBlocks Template Sync Removes blocks that are not expected by the template if a lock all exists  1`] = `
+exports[`InnerBlocks Template Sync Removes blocks that are not expected by the template if a lock all exists 1`] = `
 "<!-- wp:test/test-inner-blocks-locking-all -->
 <!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
 <p class=\\"has-large-font-size\\">Content…</p>
 <!-- /wp:paragraph -->
 <!-- /wp:test/test-inner-blocks-locking-all -->"
+`;
+
+exports[`InnerBlocks Template Sync Synchronizes blocks if lock 'all' is set and the template prop is changed 1`] = `
+"<!-- wp:test/test-inner-blocks-update-locked-template -->
+<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-large-font-size\\">Content…</p>
+<!-- /wp:paragraph -->
+<!-- /wp:test/test-inner-blocks-update-locked-template -->"
+`;
+
+exports[`InnerBlocks Template Sync Synchronizes blocks if lock 'all' is set and the template prop is changed 2`] = `
+"<!-- wp:test/test-inner-blocks-update-locked-template {\\"hasUpdatedTemplate\\":true} -->
+<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-large-font-size\\">Content…</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
+<p class=\\"has-large-font-size\\">Two</p>
+<!-- /wp:paragraph -->
+<!-- /wp:test/test-inner-blocks-update-locked-template -->"
 `;

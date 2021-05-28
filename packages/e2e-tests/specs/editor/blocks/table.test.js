@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { capitalize } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -24,7 +19,7 @@ const createButtonLabel = 'Create Table';
  */
 async function changeCellAlignment( align ) {
 	await clickBlockToolbarButton( 'Change column alignment' );
-	await clickButton( `Align Column ${ capitalize( align ) }` );
+	await clickButton( `Align column ${ align.toLowerCase() }` );
 }
 
 describe( 'Table', () => {
@@ -37,7 +32,7 @@ describe( 'Table', () => {
 
 		// Check for existence of the column count field.
 		const columnCountLabel = await page.$x(
-			"//div[@data-type='core/table']//label[text()='Column Count']"
+			"//figure[@data-type='core/table']//label[text()='Column count']"
 		);
 		expect( columnCountLabel ).toHaveLength( 1 );
 
@@ -52,7 +47,7 @@ describe( 'Table', () => {
 
 		// Check for existence of the row count field.
 		const rowCountLabel = await page.$x(
-			"//div[@data-type='core/table']//label[text()='Row Count']"
+			"//figure[@data-type='core/table']//label[text()='Row count']"
 		);
 		expect( rowCountLabel ).toHaveLength( 1 );
 
@@ -82,16 +77,16 @@ describe( 'Table', () => {
 		await page.click( 'td' );
 		await page.keyboard.type( 'This' );
 
-		// Tab to the next cell and add some text.
-		await page.keyboard.press( 'Tab' );
+		// Navigate to the next cell and add some text.
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'is' );
 
-		// Tab to the next cell and add some text.
-		await page.keyboard.press( 'Tab' );
+		// Navigate to the next cell and add some text.
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'table' );
 
-		// Tab to the next cell and add some text.
-		await page.keyboard.press( 'Tab' );
+		// Navigate to the next cell and add some text.
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'block' );
 
 		// Expect the post to have the correct written content inside the table.
@@ -165,7 +160,7 @@ describe( 'Table', () => {
 
 		// Add a column.
 		await clickBlockToolbarButton( 'Edit table' );
-		await clickButton( 'Add Column After' );
+		await clickButton( 'Insert column after' );
 
 		// Expect the table to have 3 columns across the header, body and footer.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -174,7 +169,7 @@ describe( 'Table', () => {
 
 		// Delete a column.
 		await clickBlockToolbarButton( 'Edit table' );
-		await clickButton( 'Delete Column' );
+		await clickButton( 'Delete column' );
 
 		// Expect the table to have 2 columns across the header, body and footer.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -184,7 +179,7 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		const [ columnCountLabel ] = await page.$x(
-			"//div[@data-type='core/table']//label[text()='Column Count']"
+			"//figure[@data-type='core/table']//label[text()='Column count']"
 		);
 		await columnCountLabel.click();
 		await page.keyboard.press( 'Backspace' );

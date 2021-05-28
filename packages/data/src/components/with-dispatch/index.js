@@ -25,7 +25,7 @@ import { useDispatchWithMap } from '../use-dispatch';
  *     return <button type="button" onClick={ onClick }>{ children }</button>;
  * }
  *
- * const { withDispatch } = wp.data;
+ * import { withDispatch } from '@wordpress/data';
  *
  * const SaleButton = withDispatch( ( dispatch, ownProps ) => {
  *     const { startSale } = dispatch( 'my-shop' );
@@ -62,7 +62,7 @@ import { useDispatchWithMap } from '../use-dispatch';
  *     return <button type="button" onClick={ onClick }>{ children }</button>;
  * }
  *
- * const { withDispatch } = wp.data;
+ * import { withDispatch } from '@wordpress/data';
  *
  * const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
  *    // Stock number changes frequently.

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 
 /**
  * Return a label for the block movement controls depending on block position.
@@ -16,7 +16,6 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  *                                 down, < 0 is up).
  * @param {string}  orientation   The orientation of the block movers, vertical or
  * 								   horizontal.
- * @param {boolean} isRTL   	  True if current writing system is right to left.
  *
  * @return {string} Label for the block movement controls.
  */
@@ -27,20 +26,19 @@ export function getBlockMoverDescription(
 	isFirst,
 	isLast,
 	dir,
-	orientation,
-	isRTL
+	orientation
 ) {
 	const position = firstIndex + 1;
 
 	const getMovementDirection = ( moveDirection ) => {
 		if ( moveDirection === 'up' ) {
 			if ( orientation === 'horizontal' ) {
-				return isRTL ? 'right' : 'left';
+				return isRTL() ? 'right' : 'left';
 			}
 			return 'up';
 		} else if ( moveDirection === 'down' ) {
 			if ( orientation === 'horizontal' ) {
-				return isRTL ? 'left' : 'right';
+				return isRTL() ? 'left' : 'right';
 			}
 			return 'down';
 		}

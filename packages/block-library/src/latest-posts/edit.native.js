@@ -140,18 +140,12 @@ class LatestPostsEdit extends Component {
 						label={ __( 'Show post content' ) }
 						checked={ displayPostContent }
 						onChange={ this.onSetDisplayPostContent }
-						separatorType={
-							displayPostContent ? 'fullWidth' : 'none'
-						}
 					/>
 					{ displayPostContent && (
 						<ToggleControl
 							label={ __( 'Only show excerpt' ) }
 							checked={ displayExcerptPostContent }
 							onChange={ this.onSetDisplayPostContentRadio }
-							separatorType={
-								displayExcerptPostContent ? 'fullWidth' : 'none'
-							}
 						/>
 					) }
 					{ displayPostContent && displayExcerptPostContent && (
@@ -161,7 +155,6 @@ class LatestPostsEdit extends Component {
 							onChange={ this.onSetExcerptLength }
 							min={ MIN_EXCERPT_LENGTH }
 							max={ MAX_EXCERPT_LENGTH }
-							separatorType="none"
 						/>
 					) }
 				</PanelBody>
@@ -171,10 +164,8 @@ class LatestPostsEdit extends Component {
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
 						onChange={ this.onSetDisplayPostDate }
-						separatorType="none"
 					/>
 				</PanelBody>
-
 				<PanelBody title={ __( 'Sorting and filtering' ) }>
 					<QueryControls
 						{ ...{ order, orderBy } }
@@ -228,7 +219,7 @@ class LatestPostsEdit extends Component {
 				onPress={ openGeneralSidebar }
 			>
 				<View style={ blockStyle }>
-					{ this.getInspectorControls() }
+					{ isSelected && this.getInspectorControls() }
 					<Icon icon={ icon } { ...iconStyle } />
 					<Text style={ titleStyle }>
 						{ blockType.settings.title }

@@ -7,14 +7,22 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
-import { Platform } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
+import { View } from '@wordpress/primitives';
 
-const MIN_SPACER_HEIGHT = 20;
+const MIN_SPACER_HEIGHT = 1;
 const MAX_SPACER_HEIGHT = 500;
+
+const MIN_SPACER_WIDTH = 1;
+const MAX_SPACER_WIDTH = 500;
 
 const SpacerEdit = ( {
 	attributes,
@@ -22,16 +30,87 @@ const SpacerEdit = ( {
 	setAttributes,
 	onResizeStart,
 	onResizeStop,
+	context,
 } ) => {
-	const { height } = attributes;
+	const { orientation } = context;
+	const [ isResizing, setIsResizing ] = useState( false );
+	const { height, width } = attributes;
 	const updateHeight = ( value ) => {
 		setAttributes( {
 			height: value,
 		} );
 	};
+	const updateWidth = ( value ) => {
+		setAttributes( {
+			width: value,
+		} );
+	};
 
-	return (
-		<>
+	const handleOnResizeStart = ( ...args ) => {
+		onResizeStart( ...args );
+		setIsResizing( true );
+	};
+
+	const handleOnVerticalResizeStop = ( event, direction, elt, delta ) => {
+		onResizeStop();
+		const spacerHeight = Math.min(
+			parseInt( height + delta.height, 10 ),
+			MAX_SPACER_HEIGHT
+		);
+		updateHeight( spacerHeight );
+		setIsResizing( false );
+	};
+
+	const handleOnHorizontalResizeStop = ( event, direction, elt, delta ) => {
+		onResizeStop();
+		const spacerWidth = Math.min(
+			parseInt( width + delta.width, 10 ),
+			MAX_SPACER_WIDTH
+		);
+		updateWidth( spacerWidth );
+		setIsResizing( false );
+	};
+
+	const resizableBoxWithOrientation = ( blockOrientation ) => {
+		if ( blockOrientation === 'horizontal' ) {
+			return (
+				<ResizableBox
+					className={ classnames(
+						'block-library-spacer__resize-container',
+						'resize-horizontal',
+						{
+							'is-selected': isSelected,
+						}
+					) }
+					size={ {
+						width,
+						height: 24,
+					} }
+					minWidth={ MIN_SPACER_WIDTH }
+					enable={ {
+						top: false,
+						right: true,
+						bottom: false,
+						left: false,
+						topRight: false,
+						bottomRight: false,
+						bottomLeft: false,
+						topLeft: false,
+					} }
+					onResizeStart={ handleOnResizeStart }
+					onResizeStop={ handleOnHorizontalResizeStop }
+					showHandle={ isSelected }
+					__experimentalShowTooltip={ true }
+					__experimentalTooltipProps={ {
+						axis: 'x',
+						position: 'corner',
+						isVisible: isResizing,
+					} }
+				/>
+			);
+		}
+
+		return (
 			<ResizableBox
 				className={ classnames(
 					'block-library-spacer__resize-container',
@@ -53,28 +132,51 @@ const SpacerEdit = ( {
 					bottomLeft: false,
 					topLeft: false,
 				} }
-				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					onResizeStop();
-					const spacerHeight = Math.min(
-						parseInt( height + delta.height, 10 ),
-						MAX_SPACER_HEIGHT
-					);
-					updateHeight( spacerHeight );
-				} }
+				onResizeStart={ handleOnResizeStart }
+				onResizeStop={ handleOnVerticalResizeStop }
 				showHandle={ isSelected }
+				__experimentalShowTooltip={ true }
+				__experimentalTooltipProps={ {
+					axis: 'y',
+					position: 'bottom',
+					isVisible: isResizing,
+				} }
 			/>
+		);
+	};
+
+	useEffect( () => {
+		if ( orientation === 'horizontal' && ! width ) {
+			updateWidth( 72 );
+			updateHeight( 0 );
+		}
+	}, [] );
+
+	return (
+		<>
+			<View { ...useBlockProps() }>
+				{ resizableBoxWithOrientation( orientation ) }
+			</View>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
-					<RangeControl
-						label={ __( 'Height in pixels' ) }
-						min={ MIN_SPACER_HEIGHT }
-						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
-						separatorType={ 'none' }
-						value={ height }
-						onChange={ updateHeight }
-						step={ Platform.OS === 'web' ? 10 : 1 }
-					/>
+					{ orientation === 'horizontal' && (
+						<RangeControl
+							label={ __( 'Width in pixels' ) }
+							min={ MIN_SPACER_WIDTH }
+							max={ Math.max( MAX_SPACER_WIDTH, width ) }
+							value={ width }
+							onChange={ updateWidth }
+						/>
+					) }
+					{ orientation !== 'horizontal' && (
+						<RangeControl
+							label={ __( 'Height in pixels' ) }
+							min={ MIN_SPACER_HEIGHT }
+							max={ Math.max( MAX_SPACER_HEIGHT, height ) }
+							value={ height }
+							onChange={ updateHeight }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 		</>
@@ -83,7 +185,7 @@ const SpacerEdit = ( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( 'core/block-editor' );
+		const { toggleSelection } = dispatch( blockEditorStore );
 
 		return {
 			onResizeStart: () => toggleSelection( false ),

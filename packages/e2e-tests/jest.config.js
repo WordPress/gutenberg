@@ -6,10 +6,10 @@ module.exports = {
 		'@wordpress/jest-console',
 		'@wordpress/jest-puppeteer-axe',
 		'expect-puppeteer',
+		'puppeteer-testing-library/extend-expect',
 	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
-		'<rootDir>/wordpress/',
 		'e2e-tests/specs/performance/',
 	],
 };

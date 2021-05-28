@@ -17,6 +17,10 @@ export default function filterMessage( message ) {
 	 */
 	message = message.replace( /<[^<>]+>/g, ' ' );
 
+	/*
+	 * Safari + VoiceOver don't announce repeated, identical strings. We use
+	 * a `no-break space` to force them to think identical strings are different.
+	 */
 	if ( previousMessage === message ) {
 		message += '\u00A0';
 	}

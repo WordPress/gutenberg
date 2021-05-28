@@ -1,288 +1,221 @@
 /**
  * External dependencies
  */
-import {
-	FlatList,
-	View,
-	Text,
-	TouchableHighlight,
-	Dimensions,
-} from 'react-native';
+import { LayoutAnimation, TouchableHighlight } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { withDispatch, withSelect } from '@wordpress/data';
-import {
-	withInstanceId,
-	compose,
-	withPreferredColorScheme,
-} from '@wordpress/compose';
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import InserterSearchResults from './search-results';
+import InserterSearchForm from './search-form';
+import { store as blockEditorStore } from '../../store';
+import InserterTabs from './tabs';
 import styles from './style.scss';
 
-const MIN_COL_NUM = 3;
+const MIN_ITEMS_FOR_SEARCH = 2;
+const REUSABLE_BLOCKS_CATEGORY = 'reusable';
 
-export class InserterMenu extends Component {
-	constructor() {
-		super( ...arguments );
+function InserterMenu( {
+	onSelect,
+	onDismiss,
+	rootClientId,
+	clientId,
+	isAppender,
+	shouldReplaceBlock,
+	insertionIndex,
+} ) {
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ showTabs, setShowTabs ] = useState( true );
+	// eslint-disable-next-line no-undef
+	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
+	const [ tabIndex, setTabIndex ] = useState( 0 );
 
-		this.onClose = this.onClose.bind( this );
-		this.onLayout = this.onLayout.bind( this );
-		this.state = {
-			numberOfColumns: MIN_COL_NUM,
-		};
+	const {
+		showInsertionPoint,
+		hideInsertionPoint,
+		clearSelectedBlock,
+		insertBlock,
+		removeBlock,
+		resetBlocks,
+		insertDefaultBlock,
+	} = useDispatch( blockEditorStore );
 
-		Dimensions.addEventListener( 'change', this.onLayout );
-	}
+	const { items, destinationRootClientId, showReusableBlocks } = useSelect(
+		( select ) => {
+			const {
+				getInserterItems,
+				getBlockRootClientId,
+				getBlockSelectionEnd,
+			} = select( blockEditorStore );
 
-	componentDidMount() {
-		this.props.showInsertionPoint();
-	}
+			let targetRootClientId = rootClientId;
+			if ( ! targetRootClientId && ! clientId && ! isAppender ) {
+				const end = getBlockSelectionEnd();
+				if ( end ) {
+					targetRootClientId =
+						getBlockRootClientId( end ) || undefined;
+				}
+			}
 
-	componentWillUnmount() {
-		this.props.hideInsertionPoint();
-		Dimensions.removeEventListener( 'change', this.onLayout );
-	}
+			const allItems = getInserterItems( targetRootClientId );
+			const reusableBlockItems = allItems.filter(
+				( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
+			);
 
-	calculateMinItemWidth( bottomSheetWidth ) {
-		const { paddingLeft, paddingRight } = styles.columnPadding;
-		return (
-			( bottomSheetWidth - 2 * ( paddingLeft + paddingRight ) ) /
-			MIN_COL_NUM
-		);
-	}
-
-	calculateItemWidth() {
-		const {
-			paddingLeft: itemPaddingLeft,
-			paddingRight: itemPaddingRight,
-		} = styles.modalItem;
-		const { width: itemWidth } = styles.modalIconWrapper;
-		return itemWidth + itemPaddingLeft + itemPaddingRight;
-	}
-
-	calculateColumnsProperties() {
-		const bottomSheetWidth = BottomSheet.getWidth();
-		const { paddingLeft, paddingRight } = styles.columnPadding;
-		const itemTotalWidth = this.calculateItemWidth();
-		const containerTotalWidth =
-			bottomSheetWidth - ( paddingLeft + paddingRight );
-		const numofColumns = Math.floor( containerTotalWidth / itemTotalWidth );
-
-		if ( numofColumns < MIN_COL_NUM ) {
 			return {
-				numOfColumns: MIN_COL_NUM,
-				itemWidth: this.calculateMinItemWidth( bottomSheetWidth ),
-				maxWidth: containerTotalWidth / MIN_COL_NUM,
+				items: allItems,
+				destinationRootClientId: targetRootClientId,
+				showReusableBlocks: !! reusableBlockItems.length,
 			};
 		}
-		return {
-			numOfColumns: numofColumns,
-			maxWidth: containerTotalWidth / numofColumns,
-		};
-	}
+	);
 
-	onClose() {
-		// if should replace but didn't insert any block
-		// re-insert default block
-		if ( this.props.shouldReplaceBlock ) {
-			this.props.insertDefaultBlock();
-		}
-		this.props.onDismiss();
-	}
+	const { getBlockOrder, getBlockCount } = useSelect( blockEditorStore );
 
-	onLayout() {
-		const columnProperties = this.calculateColumnsProperties();
-		const numberOfColumns = columnProperties.numOfColumns;
-
-		this.setState( { numberOfColumns } );
-	}
-
-	render() {
-		const { getStylesFromColorScheme, items, onSelect } = this.props;
-		const { numberOfColumns } = this.state;
-
-		const bottomPadding = styles.contentBottomPadding;
-		const modalIconWrapperStyle = getStylesFromColorScheme(
-			styles.modalIconWrapper,
-			styles.modalIconWrapperDark
-		);
-		const modalIconStyle = getStylesFromColorScheme(
-			styles.modalIcon,
-			styles.modalIconDark
-		);
-		const modalItemLabelStyle = getStylesFromColorScheme(
-			styles.modalItemLabel,
-			styles.modalItemLabelDark
-		);
-
-		const columnProperties = this.calculateColumnsProperties();
-
-		return (
-			<BottomSheet
-				isVisible={ true }
-				onClose={ this.onClose }
-				contentStyle={ [ styles.content, bottomPadding ] }
-				hideHeader
-			>
-				<TouchableHighlight accessible={ false }>
-					<FlatList
-						onLayout={ this.onLayout }
-						scrollEnabled={ false }
-						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-						keyboardShouldPersistTaps="always"
-						numColumns={ numberOfColumns }
-						data={ items }
-						ItemSeparatorComponent={ () => (
-							<View style={ styles.rowSeparator } />
-						) }
-						keyExtractor={ ( item ) => item.name }
-						renderItem={ ( { item } ) => (
-							<TouchableHighlight
-								style={ styles.touchableArea }
-								underlayColor="transparent"
-								activeOpacity={ 0.5 }
-								accessibilityLabel={ item.title }
-								onPress={ () => onSelect( item ) }
-							>
-								<View
-									style={ [
-										styles.modalItem,
-										{ width: columnProperties.maxWidth },
-									] }
-								>
-									<View
-										style={ [
-											modalIconWrapperStyle,
-											columnProperties.itemWidth && {
-												width:
-													columnProperties.itemWidth,
-											},
-										] }
-									>
-										<View style={ modalIconStyle }>
-											<Icon
-												icon={ item.icon.src }
-												fill={ modalIconStyle.fill }
-												size={ modalIconStyle.width }
-											/>
-										</View>
-									</View>
-									<Text style={ modalItemLabelStyle }>
-										{ item.title }
-									</Text>
-								</View>
-							</TouchableHighlight>
-						) }
-					/>
-				</TouchableHighlight>
-			</BottomSheet>
-		);
-	}
-}
-
-export default compose(
-	withSelect( ( select, { clientId, isAppender, rootClientId } ) => {
-		const {
-			getInserterItems,
-			getBlockName,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-			getSettings,
-		} = select( 'core/block-editor' );
-		const { getChildBlockNames } = select( 'core/blocks' );
-
-		let destinationRootClientId = rootClientId;
-		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
-			const end = getBlockSelectionEnd();
-			if ( end ) {
-				destinationRootClientId =
-					getBlockRootClientId( end ) || undefined;
+	useEffect( () => {
+		// Show/Hide insertion point on Mount/Dismount
+		if ( shouldReplaceBlock ) {
+			const count = getBlockCount();
+			// Check if there is a rootClientId because that means it is a nested replaceable block
+			// and we don't want to clear/reset all blocks.
+			if ( count === 1 && ! rootClientId ) {
+				// Removing the last block is not possilble with `removeBlock` action.
+				// It always inserts a default block if the last of the blocks have been removed.
+				clearSelectedBlock();
+				resetBlocks( [] );
+			} else {
+				const blockToReplace = getBlockOrder( destinationRootClientId )[
+					insertionIndex
+				];
+				removeBlock( blockToReplace, false );
 			}
 		}
-		const destinationRootBlockName = getBlockName(
-			destinationRootClientId
-		);
+		showInsertionPoint( destinationRootClientId, insertionIndex );
 
-		const {
-			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-		} = getSettings();
+		// Show search form if there are enough items to filter.
+		if ( items.length < MIN_ITEMS_FOR_SEARCH ) {
+			setShowSearchForm( false );
+		}
 
-		return {
-			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items: getInserterItems( destinationRootClientId ),
-			destinationRootClientId,
-			shouldInsertAtTheTop,
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps, { select } ) => {
-		const {
-			showInsertionPoint,
-			hideInsertionPoint,
-			removeBlock,
-			resetBlocks,
-			clearSelectedBlock,
-			insertBlock,
-			insertDefaultBlock,
-		} = dispatch( 'core/block-editor' );
+		return hideInsertionPoint;
+	}, [] );
 
-		return {
-			showInsertionPoint() {
-				if ( ownProps.shouldReplaceBlock ) {
-					const { getBlockOrder, getBlockCount } = select(
-						'core/block-editor'
-					);
+	const onClose = useCallback( () => {
+		// if should replace but didn't insert any block
+		// re-insert default block
+		if ( shouldReplaceBlock ) {
+			insertDefaultBlock( {}, destinationRootClientId, insertionIndex );
+		}
+		onDismiss();
+	}, [ shouldReplaceBlock, destinationRootClientId, insertionIndex ] );
 
-					const count = getBlockCount();
-					// Check if there is a rootClientId because that means it is a nested replacable block and we don't want to clear/reset all blocks.
-					if ( count === 1 && ! ownProps.rootClientId ) {
-						// removing the last block is not possible with `removeBlock` action
-						// it always inserts a default block if the last of the blocks have been removed
-						clearSelectedBlock();
-						resetBlocks( [] );
-					} else {
-						const blockToReplace = getBlockOrder(
-							ownProps.destinationRootClientId
-						)[ ownProps.insertionIndex ];
+	const onInsert = useCallback(
+		( item ) => {
+			const { name, initialAttributes, innerBlocks } = item;
 
-						removeBlock( blockToReplace, false );
-					}
-				}
-				showInsertionPoint(
-					ownProps.destinationRootClientId,
-					ownProps.insertionIndex
+			const newBlock = createBlock(
+				name,
+				initialAttributes,
+				innerBlocks
+			);
+
+			insertBlock(
+				newBlock,
+				insertionIndex,
+				destinationRootClientId,
+				true,
+				{ source: 'inserter_menu' }
+			);
+		},
+		[ insertBlock, destinationRootClientId, insertionIndex ]
+	);
+
+	const onSelectItem = useCallback(
+		( item ) => {
+			onInsert( item );
+			onSelect( item );
+		},
+		[ onInsert, onSelect ]
+	);
+
+	const onChangeSearch = useCallback(
+		( value ) => {
+			if ( ! value ) {
+				LayoutAnimation.configureNext(
+					LayoutAnimation.Presets.easeInEaseOut
 				);
-			},
-			hideInsertionPoint,
-			onSelect( item ) {
-				const { name, initialAttributes } = item;
+			}
+			setFilterValue( value );
+		},
+		[ setFilterValue ]
+	);
 
-				const insertedBlock = createBlock( name, initialAttributes );
+	const onKeyboardShow = useCallback( () => setShowTabs( false ), [
+		setShowTabs,
+	] );
 
-				insertBlock(
-					insertedBlock,
-					ownProps.insertionIndex,
-					ownProps.destinationRootClientId
-				);
+	const onKeyboardHide = useCallback( () => setShowTabs( true ), [
+		setShowTabs,
+	] );
 
-				ownProps.onSelect();
-			},
-			insertDefaultBlock() {
-				insertDefaultBlock(
-					{},
-					ownProps.destinationRootClientId,
-					ownProps.insertionIndex
-				);
-			},
-		};
-	} ),
-	withInstanceId,
-	withPreferredColorScheme
-)( InserterMenu );
+	return (
+		<BottomSheet
+			isVisible={ true }
+			onClose={ onClose }
+			onKeyboardShow={ onKeyboardShow }
+			onKeyboardHide={ onKeyboardHide }
+			header={
+				<>
+					{ showSearchForm && (
+						<InserterSearchForm
+							onChange={ onChangeSearch }
+							value={ filterValue }
+						/>
+					) }
+					{ showTabs && ! filterValue && (
+						<InserterTabs.Control
+							onChangeTab={ setTabIndex }
+							showReusableBlocks={ showReusableBlocks }
+						/>
+					) }
+				</>
+			}
+			hasNavigation
+			setMinHeightToMaxHeight={ showSearchForm }
+			contentStyle={ styles.list }
+		>
+			<BottomSheetConsumer>
+				{ ( { listProps } ) => (
+					<TouchableHighlight accessible={ false }>
+						{ ! showTabs || filterValue ? (
+							<InserterSearchResults
+								rootClientId={ rootClientId }
+								filterValue={ filterValue }
+								onSelect={ onSelectItem }
+								listProps={ listProps }
+							/>
+						) : (
+							<InserterTabs
+								rootClientId={ rootClientId }
+								listProps={ listProps }
+								tabIndex={ tabIndex }
+								onSelect={ onSelectItem }
+								showReusableBlocks={ showReusableBlocks }
+							/>
+						) }
+					</TouchableHighlight>
+				) }
+			</BottomSheetConsumer>
+		</BottomSheet>
+	);
+}
+
+export default InserterMenu;

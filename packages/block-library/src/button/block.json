@@ -1,6 +1,12 @@
 {
+	"apiVersion": 2,
 	"name": "core/button",
-	"category": "layout",
+	"title": "Button",
+	"category": "design",
+	"parent": [ "core/buttons" ],
+	"description": "Prompt visitors to take action with a button-style link.",
+	"keywords": [ "link" ],
+	"textdomain": "default",
 	"attributes": {
 		"url": {
 			"type": "string",
@@ -34,12 +40,6 @@
 		"placeholder": {
 			"type": "string"
 		},
-		"borderRadius": {
-			"type": "number"
-		},
-		"style": {
-			"type": "object"
-		},
 		"backgroundColor": {
 			"type": "string"
 		},
@@ -48,6 +48,32 @@
 		},
 		"gradient": {
 			"type": "string"
+		},
+		"width": {
+			"type": "number"
 		}
-	}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"alignWide": false,
+		"color": {
+			"__experimentalSkipSerialization": true,
+			"gradients": true
+		},
+		"fontSize": true,
+		"reusable": false,
+		"__experimentalBorder": {
+			"radius": true,
+			"__experimentalSkipSerialization": true
+		},
+		"__experimentalFontFamily": true,
+		"__experimentalSelector": ".wp-block-button__link"
+	},
+	"styles": [
+		{ "name": "fill", "label": "Fill", "isDefault": true },
+		{ "name": "outline", "label": "Outline" }
+	],
+	"editorStyle": "wp-block-button-editor",
+	"style": "wp-block-button"
 }

@@ -1,55 +1,28 @@
 .edit-post-welcome-guide {
-	$image-height: 300px;
-	$image-width: 320px;
+	width: 312px;
 
-	&__page {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		position: relative;
-
-		@include break-small() {
-			min-height: $image-height;
-			padding-left: $image-width + $grid-unit-30;
-		}
+	&__image {
+		background: #00a0d2;
+		margin: 0 0 $grid-unit-20;
 	}
 
 	&__heading {
-		font-family: $editor-font;
-		font-size: 21px;
+		font-family: $default-font;
+		font-size: 24px;
 		line-height: 1.4;
-		margin: $grid-unit-10 0;
-	}
-
-	&__image {
-		background: #66c6e4;
-		border-radius: $radius-round-rectangle;
-		height: 200px;
-		margin: $grid-unit-10 0;
-
-		@include break-small() {
-			position: absolute;
-			left: 0;
-			top: 50%;
-			height: $image-height;
-			width: $image-width;
-			margin-top: -0.5 * $image-height;
-		}
+		margin: $grid-unit-20 0 $grid-unit-20 0;
+		padding: 0 $grid-unit-40;
 	}
 
 	&__text {
-		font-size: $editor-font-size;
+		font-size: $default-font-size;
 		line-height: 1.4;
-		margin: $grid-unit-10 0;
+		margin: 0 0 $grid-unit-30 0;
+		padding: 0 $grid-unit-40;
 	}
 
 	&__inserter-icon {
 		margin: 0 4px;
-		position: relative;
-		top: 4px;
-	}
-
-	@include break-small() {
-		width: 600px;
+		vertical-align: text-top;
 	}
 }

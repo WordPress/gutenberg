@@ -1,16 +1,33 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, createPortal } from '@wordpress/element';
+import { useRef, useState, useEffect, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import useSlot from './use-slot';
 
+function useForceUpdate() {
+	const [ , setState ] = useState( {} );
+	const mounted = useRef( true );
+
+	useEffect( () => {
+		return () => {
+			mounted.current = false;
+		};
+	}, [] );
+
+	return () => {
+		if ( mounted.current ) {
+			setState( {} );
+		}
+	};
+}
+
 export default function Fill( { name, children } ) {
 	const slot = useSlot( name );
-	const ref = useRef();
+	const ref = useRef( { rerender: useForceUpdate() } );
 
 	useEffect( () => {
 		// We register fills so we can keep track of their existance.

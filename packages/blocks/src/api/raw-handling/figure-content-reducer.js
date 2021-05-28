@@ -4,9 +4,9 @@
 import { has } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { isTextContent } from './phrasing-content';
+import { isTextContent } from '@wordpress/dom';
 
 /**
  * Whether or not the given node is figure content.
@@ -64,7 +64,7 @@ function wrapFigureContent( element, beforeElement = element ) {
  *
  * @return {void}
  */
-export default function( node, doc, schema ) {
+export default function figureContentReducer( node, doc, schema ) {
 	if ( ! isFigureContent( node, schema ) ) {
 		return;
 	}

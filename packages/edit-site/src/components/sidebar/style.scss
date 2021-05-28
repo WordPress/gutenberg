@@ -8,11 +8,19 @@
 		margin-top: -1px;
 
 		> .components-panel__header {
-			background: $light-gray-200;
+			background: $gray-100;
 		}
 	}
 
 	.block-editor-block-inspector__card {
 		margin: 0;
 	}
+}
+
+.edit-site-global-styles-sidebar .interface-complementary-area-header .components-button.has-icon {
+	margin-left: 0;
+}
+
+.edit-site-global-styles-sidebar__reset-button.components-button {
+	margin-left: auto;
 }

@@ -9,22 +9,21 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
  *
  * @return {WPElement} Block Breadcrumb.
  */
-const BlockBreadcrumb = function() {
-	const { selectBlock, clearSelectedBlock } = useDispatch(
-		'core/block-editor'
-	);
+function BlockBreadcrumb() {
+	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
 		const {
 			getSelectionStart,
 			getSelectedBlockClientId,
 			getBlockParents,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			parents: getBlockParents( selectedBlockClientId ),
@@ -55,7 +54,7 @@ const BlockBreadcrumb = function() {
 				{ hasSelection && (
 					<Button
 						className="block-editor-block-breadcrumb__button"
-						isTertiary
+						variant="tertiary"
 						onClick={ clearSelectedBlock }
 					>
 						{ __( 'Document' ) }
@@ -67,7 +66,7 @@ const BlockBreadcrumb = function() {
 				<li key={ parentClientId }>
 					<Button
 						className="block-editor-block-breadcrumb__button"
-						isTertiary
+						variant="tertiary"
 						onClick={ () => selectBlock( parentClientId ) }
 					>
 						<BlockTitle clientId={ parentClientId } />
@@ -85,6 +84,6 @@ const BlockBreadcrumb = function() {
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
-};
+}
 
 export default BlockBreadcrumb;

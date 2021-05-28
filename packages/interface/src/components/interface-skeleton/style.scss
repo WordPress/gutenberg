@@ -12,7 +12,7 @@ html.interface-interface-skeleton__html-container {
 
 .interface-interface-skeleton {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	height: auto;
 	max-height: 100%;
 
@@ -31,6 +31,13 @@ html.interface-interface-skeleton__html-container {
 			top: 0;
 		}
 	}
+}
+
+.interface-interface-skeleton__editor {
+	display: flex;
+	flex-direction: column;
+	flex: 0 1 100%;
+	overflow: hidden;
 }
 
 @include editor-left(".interface-interface-skeleton");
@@ -55,6 +62,13 @@ html.interface-interface-skeleton__html-container {
 	// it is added, it should take care of the issue.
 	// See also: https://drafts.csswg.org/css-overscroll/
 	overscroll-behavior-y: none;
+
+	// Footer overlap prevention
+	.has-footer & {
+		@include break-medium() {
+			padding-bottom: $button-size-small + $border-width;
+		}
+	}
 }
 
 .interface-interface-skeleton__content {
@@ -73,10 +87,9 @@ html.interface-interface-skeleton__html-container {
 
 }
 
-.interface-interface-skeleton__left-sidebar,
+.interface-interface-skeleton__secondary-sidebar,
 .interface-interface-skeleton__sidebar {
 	display: block;
-	width: auto; // Keep the sidebar width flexible.
 	flex-shrink: 0;
 	position: absolute;
 	z-index: z-index(".interface-interface-skeleton__sidebar");
@@ -85,56 +98,64 @@ html.interface-interface-skeleton__html-container {
 	bottom: 0;
 	left: 0;
 	background: $white;
-	color: $dark-gray-primary;
+	color: $gray-900;
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	@include break-medium() {
 		position: relative !important;
 		z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+		width: auto; // Keep the sidebar width flexible.
 	}
 }
 
 .interface-interface-skeleton__sidebar {
+	overflow: auto;
+
 	@include break-medium() {
-		overflow: auto;
-		border-left: $border-width solid $light-gray-500;
+		border-left: $border-width solid $gray-200;
 	}
 }
 
-.interface-interface-skeleton__left-sidebar {
+.interface-interface-skeleton__secondary-sidebar {
 	@include break-medium() {
-		border-right: $border-width solid $light-gray-500;
+		border-right: $border-width solid $gray-200;
 	}
 }
 
 .interface-interface-skeleton__header {
 	flex-shrink: 0;
 	height: auto;  // Keep the height flexible.
-	border-bottom: $border-width solid $light-gray-500;
+	border-bottom: $border-width solid $gray-200;
 	z-index: z-index(".interface-interface-skeleton__header");
-	color: $dark-gray-primary;
-
-	// On Mobile the header is sticky.
-	position: sticky;
-	top: 0;
-
-	// Cancel the fixed positioning used on Mobile.
-	@include break-small() {
-		position: initial;
-		top: 0;
-	}
+	color: $gray-900;
 }
 
 .interface-interface-skeleton__footer {
-	height: auto;  // Keep the height flexible.
+	height: auto; // Keep the height flexible.
 	flex-shrink: 0;
-	border-top: $border-width solid $light-gray-500;
-	color: $dark-gray-primary;
+	border-top: $border-width solid $gray-200;
+	color: $gray-900;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background-color: $white;
+	z-index: z-index(".interface-interface-skeleton__footer");
 
 	// On Mobile the footer is hidden
 	display: none;
 	@include break-medium() {
-		display: block;
+		display: flex;
+	}
+
+	.block-editor-block-breadcrumb {
+		z-index: z-index(".edit-post-layout__footer");
+		display: flex;
+		background: $white;
+		height: $button-size-small;
+		align-items: center;
+		font-size: $default-font-size;
+		padding: 0 ($grid-unit-15 + 6px);
 	}
 }
 
@@ -146,7 +167,7 @@ html.interface-interface-skeleton__html-container {
 	left: auto;
 	right: 0;
 	width: $sidebar-width;
-	color: $dark-gray-primary;
+	color: $gray-900;
 
 	&:focus {
 		top: auto;

@@ -1,15 +1,16 @@
 {
 	"name": "@wordpress/e2e-test-utils",
-	"version": "4.6.0",
+	"version": "5.2.0",
 	"description": "End-To-End (E2E) test utils for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"e2e",
 		"utils"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/e2e-test-utils/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/e2e-test-utils/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -19,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=12"
 	},
 	"files": [
 		"build",
@@ -28,14 +29,14 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.15",
-		"node-fetch": "^1.7.3"
+		"lodash": "^4.17.21",
+		"node-fetch": "^2.6.0"
 	},
 	"peerDependencies": {
-		"jest": ">=24",
+		"jest": ">=26",
 		"puppeteer": ">=1.19.0"
 	},
 	"publishConfig": {

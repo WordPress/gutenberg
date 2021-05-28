@@ -21,25 +21,28 @@ const transforms = {
 						),
 						multilineTag: 'p',
 					} ),
+					anchor: attributes.anchor,
 				} );
 			},
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/heading' ],
-			transform: ( { content } ) => {
+			transform: ( { content, anchor } ) => {
 				return createBlock( 'core/quote', {
 					value: `<p>${ content }</p>`,
+					anchor,
 				} );
 			},
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation } ) =>
+			transform: ( { value, citation, anchor } ) =>
 				createBlock( 'core/quote', {
 					value,
 					citation,
+					anchor,
 				} ),
 		},
 		{
@@ -172,10 +175,11 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation } ) => {
+			transform: ( { value, citation, anchor } ) => {
 				return createBlock( 'core/pullquote', {
 					value,
 					citation,
+					anchor,
 				} );
 			},
 		},

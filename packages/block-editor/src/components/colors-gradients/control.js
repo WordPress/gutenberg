@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty, pick } from 'lodash';
+import { every, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,13 +17,13 @@ import {
 	__experimentalGradientPicker as GradientPicker,
 } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
+import useSetting from '../use-setting';
 
 // translators: first %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(Color: %s)' );
@@ -88,6 +88,7 @@ function ColorGradientControlInner( {
 	onGradientChange,
 	colorValue,
 	gradientValue,
+	clearable,
 } ) {
 	const canChooseAColor =
 		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
@@ -125,16 +126,14 @@ function ColorGradientControlInner( {
 					<ButtonGroup className="block-editor-color-gradient-control__button-tabs">
 						<Button
 							isSmall
-							isPrimary={ currentTab === 'color' }
-							isSecondary={ currentTab !== 'color' }
+							isPressed={ currentTab === 'color' }
 							onClick={ () => setCurrentTab( 'color' ) }
 						>
 							{ __( 'Solid' ) }
 						</Button>
 						<Button
 							isSmall
-							isPrimary={ currentTab === 'gradient' }
-							isSecondary={ currentTab !== 'gradient' }
+							isPressed={ currentTab === 'gradient' }
 							onClick={ () => setCurrentTab( 'gradient' ) }
 						>
 							{ __( 'Gradient' ) }
@@ -153,6 +152,7 @@ function ColorGradientControlInner( {
 								: onColorChange
 						}
 						{ ...{ colors, disableCustomColors } }
+						clearable={ clearable }
 					/>
 				) }
 				{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
@@ -167,6 +167,7 @@ function ColorGradientControlInner( {
 								: onGradientChange
 						}
 						{ ...{ gradients, disableCustomGradients } }
+						clearable={ clearable }
 					/>
 				) }
 			</fieldset>
@@ -175,10 +176,14 @@ function ColorGradientControlInner( {
 }
 
 function ColorGradientControlSelect( props ) {
-	const colorGradientSettings = useSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
-		return pick( settings, colorsAndGradientKeys );
-	} );
+	const colorGradientSettings = {};
+	colorGradientSettings.colors = useSetting( 'color.palette' );
+	colorGradientSettings.gradients = useSetting( 'color.gradients' );
+	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
+	colorGradientSettings.disableCustomGradients = ! useSetting(
+		'color.customGradient'
+	);
+
 	return (
 		<ColorGradientControlInner
 			{ ...{ ...colorGradientSettings, ...props } }

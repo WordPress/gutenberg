@@ -20,8 +20,8 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
 /**
  * WordPress dependencies
  */
-import { CustomSelectControl } from "@wordpress/components";
-import { useState } from "@wordpress/compose";
+import { CustomSelectControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 const options = [
 	{
@@ -75,43 +75,51 @@ function MyControlledCustomSelectControl() {
 #### className
 
 A custom class name to append to the outer `<div>`.
-- Type: `String`
-- Required: No
+
+-   Type: `String`
+-   Required: No
 
 #### hideLabelFromVision
 
 Used to visually hide the label. It will always be visible to screen readers.
-- Type: `Boolean`
-- Required: No
+
+-   Type: `Boolean`
+-   Required: No
 
 #### label
 
 The label for the control.
-- Type: `String`
-- Required: Yes
+
+-   Type: `String`
+-   Required: Yes
 
 #### options
 
 The options that can be chosen from.
-- Type: `Array<{ key: String, name: String, style: ?{}, ...rest }>`
-- Required: Yes
+
+-   Type: `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
+-   Required: Yes
 
 #### onChange
 
 Function called with the control's internal state changes. The `selectedItem` property contains the next selected item.
-- Type: `Function`
-- Required: No
+
+-   Type: `Function`
+-   Required: No
 
 #### value
 
 Can be used to externally control the value of the control, like in the `MyControlledCustomSelectControl` example above.
-- Type: `Object`
-- Required: No
+
+-   Type: `Object`
+-   Required: No
 
 ## Related components
 
-- Like this component, but implemented using a native `<select>` for when custom styling is not necessary, the `SelectControl` component.
+-   Like this component, but implemented using a native `<select>` for when custom styling is not necessary, the `SelectControl` component.
 
-- To select one option from a set, when you want to show all the available options at once, use the `Radio` component.
-- To select one or more items from a set, use the `CheckboxControl` component.
-- To toggle a single setting on or off, use the `ToggleControl` component.
+-   To select one option from a set, when you want to show all the available options at once, use the `Radio` component.
+-   To select one or more items from a set, use the `CheckboxControl` component.
+-   To toggle a single setting on or off, use the `ToggleControl` component.
+
+-   If you have a lot of items, `ComboboxControl` might be a better fit.

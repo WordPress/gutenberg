@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { omit, startsWith, get } from 'lodash';
+import glob from 'fast-glob';
+import { fromPairs, omit, startsWith, get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -18,6 +19,7 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import prettierConfig from '@wordpress/prettier-config';
 //eslint-disable-next-line no-restricted-syntax
 import {
 	blockNameToFixtureBasename,
@@ -53,23 +55,36 @@ function normalizeParsedBlocks( blocks ) {
 }
 
 describe( 'full post content fixture', () => {
-	beforeAll( () => {
-		unstable__bootstrapServerSideBlockDefinitions(
-			require( './server-registered.json' )
+	beforeAll( async () => {
+		const blockMetadataFiles = await glob(
+			'packages/block-library/src/*/block.json'
 		);
-		const settings = {
-			__experimentalEnableLegacyWidgetBlock: true,
-			__experimentalEnableFullSiteEditing: true,
-		};
+		const blockDefinitions = fromPairs(
+			blockMetadataFiles.map( ( file ) => {
+				const { name, ...metadata } = require( file );
+				return [ name, metadata ];
+			} )
+		);
+		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
 		// Load all hooks that modify blocks
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		if ( process.env.GUTENBERG_PHASE === 2 ) {
-			__experimentalRegisterExperimentalCoreBlocks( settings );
+			__experimentalRegisterExperimentalCoreBlocks( {
+				enableFSEBlocks: true,
+			} );
 		}
 	} );
 
+	let spacer = 4;
+	if ( prettierConfig?.useTabs ) {
+		spacer = '\t';
+	} else if ( prettierConfig?.tabWidth ) {
+		spacer = prettierConfig?.tabWidth;
+	}
+
 	blockBasenames.forEach( ( basename ) => {
+		// eslint-disable-next-line jest/valid-title
 		it( basename, () => {
 			const {
 				filename: htmlFixtureFileName,
@@ -91,7 +106,7 @@ describe( 'full post content fixture', () => {
 				parserOutputExpectedString = parsedJSONFixtureContent;
 			} else if ( process.env.GENERATE_MISSING_FIXTURES ) {
 				parserOutputExpectedString =
-					JSON.stringify( parserOutputActual, null, 4 ) + '\n';
+					JSON.stringify( parserOutputActual, null, spacer ) + '\n';
 				writeBlockFixtureParsedJSON(
 					basename,
 					parserOutputExpectedString
@@ -145,7 +160,8 @@ describe( 'full post content fixture', () => {
 				blocksExpectedString = jsonFixtureContent;
 			} else if ( process.env.GENERATE_MISSING_FIXTURES ) {
 				blocksExpectedString =
-					JSON.stringify( blocksActualNormalized, null, 4 ) + '\n';
+					JSON.stringify( blocksActualNormalized, null, spacer ) +
+					'\n';
 				writeBlockFixtureJSON( basename, blocksExpectedString );
 			} else {
 				throw new Error(
@@ -209,9 +225,7 @@ describe( 'full post content fixture', () => {
 			// `save` functions and attributes.
 			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
 			.filter(
-				( name ) =>
-					name.indexOf( 'core-embed' ) !== 0 &&
-					name !== 'core/template'
+				( name ) => ! [ 'core/embed', 'core/template' ].includes( name )
 			)
 			.forEach( ( name ) => {
 				const nameToFilename = blockNameToFixtureBasename( name );

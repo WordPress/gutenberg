@@ -21,25 +21,15 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control .block-editor-link-control__search-input {
 	// Specificity override.
 	&.block-editor-link-control__search-input input[type="text"] {
+		@include input-control;
 		width: calc(100% - #{$grid-unit-20*2});
 		display: block;
 		padding: 11px $grid-unit-20;
 		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
 		margin: $grid-unit-20;
 		position: relative;
-		border: 1px solid $light-gray-500;
-		border-radius: $radius-round-rectangle;
-
-		/* Fonts smaller than 16px causes mobile safari to zoom. */
-		font-size: $mobile-text-min-font-size;
-
-		@include break-small {
-			font-size: $default-font-size;
-		}
-
-		&:focus {
-			@include input-style__focus();
-		}
+		border: 1px solid $gray-300;
+		border-radius: $radius-block-ui;
 	}
 
 	.components-base-control__field {
@@ -69,6 +59,10 @@ $block-editor-link-control-number-of-actions: 1;
 	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) / 2);
 }
 
+.components-button .block-editor-link-control__search-submit .has-icon {
+	margin: -1px;
+}
+
 .block-editor-link-control__search-results-wrapper {
 	position: relative;
 	margin-top: -$grid-unit-20 + 1px;
@@ -88,21 +82,19 @@ $block-editor-link-control-number-of-actions: 1;
 		height: $grid-unit-20/2;
 		top: 0;
 		bottom: auto;
-		background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
 	}
 
 	&::after {
 		height: $grid-unit-20;
 		bottom: 0;
 		top: auto;
-		background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
 	}
 }
 
 .block-editor-link-control__search-results-label {
-	padding: 15px 30px 0 30px;
+	padding: $grid-unit-20 $grid-unit-40 0;
 	display: block;
-	font-size: 1.1em;
+	font-weight: 600;
 }
 
 .block-editor-link-control__search-results {
@@ -126,17 +118,22 @@ $block-editor-link-control-number-of-actions: 1;
 	width: 100%;
 	border: none;
 	text-align: left;
-	padding: 10px 15px;
+	padding: $grid-unit-15 $grid-unit-20;
 	border-radius: 5px;
 	height: auto;
 
 	&:hover,
 	&:focus {
-		background-color: $light-gray-300;
+		background-color: $gray-300;
+	}
+
+	// The added specificity is needed to override.
+	&:focus:not(:disabled) {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
 	}
 
 	&.is-selected {
-		background: $light-gray-200;
+		background: $gray-100;
 
 		.block-editor-link-control__search-item-type {
 			background: $white;
@@ -154,7 +151,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.block-editor-link-control__search-item-header {
 		display: block;
-		margin-right: $grid-unit-30;
+		margin-right: $grid-unit-10;
 		overflow: hidden;
 		white-space: nowrap;
 	}
@@ -166,19 +163,22 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.block-editor-link-control__search-item-info,
 	.block-editor-link-control__search-item-title {
-		max-width: 230px;
 		overflow: hidden;
 		text-overflow: ellipsis;
-	}
+		padding-right: $grid-unit-30;
 
-	.block-editor-link-control__search-item-title mark {
-		color: $dark-gray-900;
+		.components-external-link__icon {
+			position: absolute;
+			right: 0;
+			margin-top: 0;
+		}
 	}
 
 	.block-editor-link-control__search-item-title {
 		display: block;
 		margin-bottom: 0.2em;
 		font-weight: 500;
+		position: relative;
 
 		mark {
 			font-weight: 700;
@@ -193,7 +193,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.block-editor-link-control__search-item-info {
 		display: block;
-		color: $dark-gray-300;
+		color: $gray-700;
 		font-size: 0.9em;
 		line-height: 1.3;
 	}
@@ -203,7 +203,7 @@ $block-editor-link-control-number-of-actions: 1;
 		padding: 3px 8px;
 		margin-left: auto;
 		font-size: 0.9em;
-		background-color: $light-gray-200;
+		background-color: $gray-100;
 		border-radius: 2px;
 	}
 }
@@ -220,9 +220,8 @@ $block-editor-link-control-number-of-actions: 1;
 
 // Separate Create button when following other suggestions.
 .components-button + .block-editor-link-control__search-create {
-	margin-top: 20px;
 	overflow: visible;
-	padding: 12px 15px;
+	padding: $grid-unit-15 $grid-unit-20;
 
 	// Create fake border. We cannot use border because the button has a border
 	// radius applied to it
@@ -233,7 +232,6 @@ $block-editor-link-control-number-of-actions: 1;
 		left: 0;
 		display: block;
 		width: 100%;
-		border-top: 1px solid $light-gray-500;
 	}
 }
 
@@ -243,12 +241,16 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__settings {
-	border-top: 1px solid $light-gray-500;
+	border-top: $border-width solid $gray-300;
 	margin: 0;
 	padding: $grid-unit-20 $grid-unit-30;
 
 	:last-child {
 		margin-bottom: 0;
+	}
+
+	.is-alternate & {
+		border-top: $border-width solid $gray-900;
 	}
 }
 

@@ -1,27 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { pullquote as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { SOLID_COLOR_STYLE_NAME } from './shared';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
+import transforms from './transforms';
 
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Pullquote' ),
-	description: __(
-		'Give special visual emphasis to a quote from your text.'
-	),
 	icon,
 	example: {
 		attributes: {
@@ -35,17 +31,7 @@ export const settings = {
 			citation: __( 'Matt Mullenweg' ),
 		},
 	},
-	styles: [
-		{
-			name: 'default',
-			label: _x( 'Default', 'block style' ),
-			isDefault: true,
-		},
-		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid color' ) },
-	],
-	supports: {
-		align: [ 'left', 'right', 'wide', 'full' ],
-	},
+	transforms,
 	edit,
 	save,
 	deprecated,

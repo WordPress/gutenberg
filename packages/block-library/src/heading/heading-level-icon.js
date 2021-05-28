@@ -3,6 +3,24 @@
  */
 import { Path, SVG } from '@wordpress/components';
 
+/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+
+/**
+ * HeadingLevelIcon props.
+ *
+ * @typedef WPHeadingLevelIconProps
+ *
+ * @property {number}   level     The heading level to show an icon for.
+ * @property {?boolean} isPressed Whether or not the icon should appear pressed; default: false.
+ */
+
+/**
+ * Heading level icon.
+ *
+ * @param {WPHeadingLevelIconProps} props Component props.
+ *
+ * @return {?WPComponent} The icon.
+ */
 export default function HeadingLevelIcon( { level, isPressed = false } ) {
 	const levelToPath = {
 		1: 'M9 5h2v10H9v-4H5v4H3V5h2v4h4V5zm6.6 0c-.6.9-1.5 1.7-2.6 2v1h2v7h2V5h-1.4z',

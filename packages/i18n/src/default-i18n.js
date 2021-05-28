@@ -3,7 +3,17 @@
  */
 import { createI18n } from './create-i18n';
 
-const i18n = createI18n();
+/**
+ * WordPress dependencies
+ */
+import { defaultHooks } from '@wordpress/hooks';
+
+const i18n = createI18n( undefined, undefined, defaultHooks );
+
+/**
+ * Default, singleton instance of `I18n`.
+ */
+export default i18n;
 
 /*
  * Comments in this file are duplicated from ./i18n due to
@@ -12,7 +22,19 @@ const i18n = createI18n();
 
 /**
  * @typedef {import('./create-i18n').LocaleData} LocaleData
+ * @typedef {import('./create-i18n').SubscribeCallback} SubscribeCallback
+ * @typedef {import('./create-i18n').UnsubscribeCallback} UnsubscribeCallback
  */
+
+/**
+ * Returns locale data by domain in a Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ *
+ * @param {string} [domain] Domain for which to get the data.
+ * @return {LocaleData} Locale data.
+ */
+export const getLocaleData = i18n.getLocaleData.bind( i18n );
 
 /**
  * Merges locale data into the Tannin instance by domain. Accepts data in a
@@ -24,6 +46,25 @@ const i18n = createI18n();
  * @param {string}     [domain] Domain for which configuration applies.
  */
 export const setLocaleData = i18n.setLocaleData.bind( i18n );
+
+/**
+ * Resets all current Tannin instance locale data and sets the specified
+ * locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ *
+ * @param {LocaleData} [data]   Locale data configuration.
+ * @param {string}     [domain] Domain for which configuration applies.
+ */
+export const resetLocaleData = i18n.resetLocaleData.bind( i18n );
+
+/**
+ * Subscribes to changes of locale data
+ *
+ * @param {SubscribeCallback} callback Subscription callback
+ * @return {UnsubscribeCallback} Unsubscribe callback
+ */
+export const subscribe = i18n.subscribe.bind( i18n );
 
 /**
  * Retrieve the translation of text.
@@ -94,3 +135,13 @@ export const _nx = i18n._nx.bind( i18n );
  * @return {boolean} Whether locale is RTL.
  */
 export const isRTL = i18n.isRTL.bind( i18n );
+
+/**
+ * Check if there is a translation for a given string (in singular form).
+ *
+ * @param {string} single Singular form of the string to look up.
+ * @param {string} [context] Context information for the translators.
+ * @param {string} [domain] Domain to retrieve the translated text.
+ * @return {boolean} Whether the translation exists or not.
+ */
+export const hasTranslation = i18n.hasTranslation.bind( i18n );

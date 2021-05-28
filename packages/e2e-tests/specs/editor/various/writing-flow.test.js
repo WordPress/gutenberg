@@ -8,12 +8,49 @@ import {
 	pressKeyTimes,
 	pressKeyWithModifier,
 	insertBlock,
+	clickBlockToolbarButton,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 const getActiveBlockName = async () =>
 	page.evaluate(
 		() => wp.data.select( 'core/block-editor' ).getSelectedBlock().name
 	);
+
+const addParagraphsAndColumnsDemo = async () => {
+	// Add demo content
+	await clickBlockAppender();
+	await page.keyboard.type( 'First paragraph' );
+	await page.keyboard.press( 'Enter' );
+	await page.keyboard.type( '/columns' );
+	await page.waitForXPath(
+		`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Columns')]`
+	);
+	await page.keyboard.press( 'Enter' );
+	await page.click( ':focus [aria-label="Two columns; equal split"]' );
+	await page.click( ':focus .block-editor-button-block-appender' );
+	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
+	await page.keyboard.type( 'Paragraph' );
+	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
+	await page.keyboard.press( 'Enter' ); // Insert paragraph.
+	await page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
+
+	// TODO: ArrowDown should traverse into the second column. In slower
+	// CPUs, it can sometimes remain in the first column paragraph. This
+	// is a temporary solution.
+	await page.focus( '.wp-block[data-type="core/column"]:nth-child(2)' );
+	await page.click( ':focus .block-editor-button-block-appender' );
+	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
+	await page.keyboard.type( 'Paragraph' );
+	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
+	await page.keyboard.press( 'Enter' ); // Insert paragraph.
+	await page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
+
+	// Arrow down from last of layouts exits nested context to default
+	// appender of root level.
+	await page.keyboard.press( 'ArrowDown' );
+	await page.keyboard.type( 'Second paragraph' );
+};
 
 describe( 'Writing Flow', () => {
 	beforeEach( async () => {
@@ -32,38 +69,7 @@ describe( 'Writing Flow', () => {
 		let activeElementText, activeBlockName;
 
 		// Add demo content
-		await clickBlockAppender();
-		await page.keyboard.type( 'First paragraph' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '/columns' );
-		await page.keyboard.press( 'Enter' );
-		await page.click( ':focus [aria-label="Two columns; equal split"]' );
-		await page.click( ':focus .block-editor-button-block-appender' );
-		await page.waitForSelector(
-			':focus.block-editor-inserter__search-input'
-		);
-		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
-		await page.keyboard.press( 'Enter' ); // Insert paragraph.
-		await page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
-
-		// TODO: ArrowDown should traverse into the second column. In slower
-		// CPUs, it can sometimes remain in the first column paragraph. This
-		// is a temporary solution.
-		await page.focus( '.wp-block[data-type="core/column"]:nth-child(2)' );
-		await page.click( ':focus .block-editor-button-block-appender' );
-		await page.waitForSelector(
-			':focus.block-editor-inserter__search-input'
-		);
-		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
-		await page.keyboard.press( 'Enter' ); // Insert paragraph.
-		await page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
-
-		// Arrow down from last of layouts exits nested context to default
-		// appender of root level.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.type( 'Second paragraph' );
+		await addParagraphsAndColumnsDemo();
 
 		// Arrow up into nested context focuses last text input
 		await page.keyboard.press( 'ArrowUp' );
@@ -98,6 +104,43 @@ describe( 'Writing Flow', () => {
 		expect( activeElementText ).toBe( 'First paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'Should navigate between inner and root blocks in navigation mode', async () => {
+		// In navigation mode the active element is the block name button, so we can't easily check the block content.
+		let activeBlockName;
+
+		// Add demo content
+		await addParagraphsAndColumnsDemo();
+
+		// Switch to navigation mode
+		await page.keyboard.press( 'Escape' );
+		// Arrow up to Columns block
+		await page.keyboard.press( 'ArrowUp' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/columns' );
+		// Arrow right into Column block
+		await page.keyboard.press( 'ArrowRight' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/column' );
+		// Arrow down to reach second Column block
+		await page.keyboard.press( 'ArrowDown' );
+		// Arrow right again into Paragraph block
+		await page.keyboard.press( 'ArrowRight' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/paragraph' );
+		// Arrow left back to Column block
+		await page.keyboard.press( 'ArrowLeft' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/column' );
+		// Arrow left back to Columns block
+		await page.keyboard.press( 'ArrowLeft' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/columns' );
+		// Arrow up to first paragraph
+		await page.keyboard.press( 'ArrowUp' );
+		activeBlockName = await getActiveBlockName();
+		expect( activeBlockName ).toBe( 'core/paragraph' );
 	} );
 
 	it( 'should navigate around inline boundaries', async () => {
@@ -354,6 +397,18 @@ describe( 'Writing Flow', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should navigate contenteditable with normal line height', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => {
+			document.activeElement.style.lineHeight = 'normal';
+		} );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should not prematurely multi-select', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
@@ -364,6 +419,17 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.down( 'Shift' );
 		await pressKeyTimes( 'ArrowLeft', '<<\n<<<'.length );
 		await page.keyboard.up( 'Shift' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should merge paragraphs', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -469,11 +535,11 @@ describe( 'Writing Flow', () => {
 
 		await page.mouse.move( x, y );
 		await page.waitForSelector(
-			'.block-editor-block-list__insertion-point-inserter'
+			'.block-editor-block-list__insertion-point'
 		);
 
 		const inserter = await page.$(
-			'.block-editor-block-list__insertion-point-inserter'
+			'.block-editor-block-list__insertion-point'
 		);
 		const inserterRect = await inserter.boundingBox();
 		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
@@ -484,11 +550,20 @@ describe( 'Writing Flow', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should not have a dead zone between blocks (upper)', async () => {
+	it( 'should not have a dead zone above an aligned block', async () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '2' );
+		await page.keyboard.type( '/image' );
+		await page.keyboard.press( 'Enter' );
+		await clickBlockToolbarButton( 'Align' );
+		await clickButton( 'Wide width' );
+
+		// Select the previous block.
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Confirm correct setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Find a point outside the paragraph between the blocks where it's
 		// expected that the sibling inserter would be placed.
@@ -499,18 +574,55 @@ describe( 'Writing Flow', () => {
 
 		await page.mouse.move( x, y );
 		await page.waitForSelector(
-			'.block-editor-block-list__insertion-point-inserter'
+			'.block-editor-block-list__insertion-point'
 		);
 
 		const inserter = await page.$(
-			'.block-editor-block-list__insertion-point-inserter'
+			'.block-editor-block-list__insertion-point'
 		);
 		const inserterRect = await inserter.boundingBox();
-		const upperInserterY = inserterRect.y + inserterRect.height / 3;
+		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
 
-		await page.mouse.click( x, upperInserterY );
-		await page.keyboard.type( '3' );
+		await page.mouse.click( x, lowerInserterY );
 
+		const type = await page.evaluate( () =>
+			document.activeElement.getAttribute( 'data-type' )
+		);
+
+		expect( type ).toBe( 'core/image' );
+	} );
+
+	it( 'should only consider the content as one tab stop', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/table' );
+		await page.keyboard.press( 'Enter' );
+		// Move into the placeholder UI.
+		await page.keyboard.press( 'ArrowDown' );
+		// Tab to the "Create table" button.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		// Create the table.
+		await page.keyboard.press( 'Space' );
+		// Return focus after focus loss. This should be fixed.
+		await page.keyboard.press( 'Tab' );
+		// Navigate to the second cell.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '2' );
+		// Confirm correct setup.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// The content should only have one tab stop.
+		await page.keyboard.press( 'Tab' );
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Post' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		expect(
+			await page.evaluate( () =>
+				document.activeElement.getAttribute( 'aria-label' )
+			)
+		).toBe( 'Table' );
 	} );
 } );

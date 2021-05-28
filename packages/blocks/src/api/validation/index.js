@@ -215,7 +215,7 @@ export function isValidCharacterReference( text ) {
  * implementation of `decodeEntities` from `html-entities`, in order to avoid
  * bundling a massive named character reference.
  *
- * @see https://github.com/tildeio/simple-html-tokenizer/tree/master/src/entity-parser.ts
+ * @see https://github.com/tildeio/simple-html-tokenizer/tree/HEAD/src/entity-parser.ts
  */
 export class DecodeEntityParser {
 	/**
@@ -326,6 +326,18 @@ export function isEquivalentTextTokens(
 }
 
 /**
+ * Given a CSS length value, returns a normalized CSS length value for strict equality
+ * comparison.
+ *
+ * @param {string} value CSS length value.
+ *
+ * @return {string} Normalized CSS length value.
+ */
+export function getNormalizedLength( value ) {
+	return 0 === parseFloat( value ) ? '0' : value;
+}
+
+/**
  * Given a style value, returns a normalized style value for strict equality
  * comparison.
  *
@@ -334,8 +346,12 @@ export function isEquivalentTextTokens(
  * @return {string} Normalized style value.
  */
 export function getNormalizedStyleValue( value ) {
+	const textPieces = getTextPiecesSplitOnWhitespace( value );
+	const normalizedPieces = textPieces.map( getNormalizedLength );
+	const result = normalizedPieces.join( ' ' );
+
 	return (
-		value
+		result
 			// Normalize URL type to omit whitespace or quotes
 			.replace( REGEXP_STYLE_URL_TYPE, 'url($1)' )
 	);
@@ -575,6 +591,11 @@ export function isClosedByToken( currentToken, nextToken ) {
  * @return {boolean} Whether HTML strings are equivalent.
  */
 export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
+	// Short-circuit if markup is identical.
+	if ( actual === expected ) {
+		return true;
+	}
+
 	// Tokenize input content and reserialized save content
 	const [ actualTokens, expectedTokens ] = [
 		actual,

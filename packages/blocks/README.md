@@ -14,7 +14,7 @@ Install the module
 npm install @wordpress/blocks --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Getting Started
 
@@ -36,11 +36,11 @@ function myplugin_enqueue_block_editor_assets() {
 add_action( 'enqueue_block_editor_assets', 'myplugin_enqueue_block_editor_assets' );
 ```
 
-The `enqueue_block_editor_assets` hook is only run in the Gutenberg editor context when the editor is ready to receive additional scripts and stylesheets. There is also an `enqueue_block_assets` hook which is run under **both** the editor and front-end contexts.  This should be used to enqueue stylesheets common to the front-end and the editor.  (The rules can be overridden in the editor-specific stylesheet if necessary.)
+The `enqueue_block_editor_assets` hook is only run in the Gutenberg editor context when the editor is ready to receive additional scripts and stylesheets. There is also an `enqueue_block_assets` hook which is run under **both** the editor and front-end contexts. This should be used to enqueue stylesheets common to the front-end and the editor. (The rules can be overridden in the editor-specific stylesheet if necessary.)
 
 The following sections will describe what you'll need to include in `block.js` to describe the behavior of your custom block.
 
-Note that all JavaScript code samples in this document are enclosed in a function that is evaluated immediately afterwards.  We recommend using either ES6 modules [as used in this project](/docs/contributors/develop/coding-guidelines.md#imports) (documentation on setting up a plugin with Webpack + ES6 modules coming soon) or these ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) as used in this document.  Both of these methods ensure that your plugin's variables will not pollute the global `window` object, which could cause incompatibilities with WordPress core or with other plugins.
+Note that all JavaScript code samples in this document are enclosed in a function that is evaluated immediately afterwards. We recommend using either ES6 modules [as used in this project](/docs/contributors/develop/coding-guidelines.md#imports) (documentation on setting up a plugin with Webpack + ES6 modules coming soon) or these ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) as used in this document. Both of these methods ensure that your plugin's variables will not pollute the global `window` object, which could cause incompatibilities with WordPress core or with other plugins.
 
 ## Example
 
@@ -48,7 +48,7 @@ Let's imagine you wanted to define a block to show a randomly generated image in
 
 Take a step back and consider the ideal workflow for adding a new random image:
 
--   Insert the block.  It should be shown in some empty state, with an option to choose a category in a select dropdown.
+-   Insert the block. It should be shown in some empty state, with an option to choose a category in a select dropdown.
 -   Upon confirming my selection, a preview of the image should be shown next to the dropdown.
 
 At this point, you might realize that while you'd want some controls to be shown when editing content, the markup included in the published post might not appear the same (your visitors should not see a dropdown field when reading your content).
@@ -73,7 +73,7 @@ function random_image_enqueue_block_editor_assets() {
 	wp_enqueue_script(
 		'random-image-block',
 		plugins_url( 'block.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element' )
+		array( 'wp-blocks', 'wp-element', 'wp-block-editor', )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_assets' );
@@ -81,25 +81,28 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 ```js
 // block.js
-( function( blocks, element ) {
+( function ( blocks, element, blockEditor ) {
 	var el = element.createElement,
-		source = blocks.source;
+		source = blocks.source,
+		useBlockProps = blockEditor.useBlockProps;
 
 	function RandomImage( props ) {
 		var src = 'http://lorempixel.com/400/200/' + props.category;
 
 		return el( 'img', {
 			src: src,
-			alt: props.category
+			alt: props.category,
 		} );
 	}
 
 	blocks.registerBlockType( 'myplugin/random-image', {
+		apiVersion: 2,
+
 		title: 'Random Image',
 
 		icon: 'format-image',
 
-		category: 'common',
+		category: 'text',
 
 		attributes: {
 			category: {
@@ -107,10 +110,11 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 				source: 'attribute',
 				attribute: 'alt',
 				selector: 'img',
-			}
+			},
 		},
 
-		edit: function( props ) {
+		edit: function ( props ) {
+			var blockProps = useBlockProps();
 			var category = props.attributes.category,
 				children;
 
@@ -126,7 +130,9 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 			}
 
 			children.push(
-				el( 'select', { value: category, onChange: setCategory },
+				el(
+					'select',
+					{ value: category, onChange: setCategory },
 					el( 'option', null, '- Select -' ),
 					el( 'option', { value: 'sports' }, 'Sports' ),
 					el( 'option', { value: 'animals' }, 'Animals' ),
@@ -134,17 +140,18 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 				)
 			);
 
-			return el( 'form', { onSubmit: setCategory }, children );
+			return el(
+				'form',
+				Object.assing( blockProps, { onSubmit: setCategory } ),
+				children
+			);
 		},
 
-		save: function( props ) {
+		save: function ( props ) {
 			return RandomImage( { category: props.attributes.category } );
-		}
+		},
 	} );
-} )(
-	window.wp.blocks,
-	window.wp.element
-);
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
 ```
 
 _[(Example in ES2015+, JSX)](https://gist.github.com/aduth/fb1cc9a2296110a62b96383e4b2e8a7c)_
@@ -178,8 +185,8 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 <a name="cloneBlock" href="#cloneBlock">#</a> **cloneBlock**
 
-Given a block object, returns a copy of the block object, optionally merging
-new attributes and/or replacing its inner blocks.
+Given a block object, returns a copy of the block object,
+optionally merging new attributes and/or replacing its inner blocks.
 
 _Parameters_
 
@@ -205,6 +212,21 @@ _Returns_
 
 -   `Object`: Block object.
 
+<a name="createBlocksFromInnerBlocksTemplate" href="#createBlocksFromInnerBlocksTemplate">#</a> **createBlocksFromInnerBlocksTemplate**
+
+Given an array of InnerBlocks templates or Block Objects,
+returns an array of created Blocks from them.
+It handles the case of having InnerBlocks as Blocks by
+converting them to the proper format to continue recursively.
+
+_Parameters_
+
+-   _innerBlocksOrTemplate_ `Array`: Nested blocks or InnerBlocks templates.
+
+_Returns_
+
+-   `Object[]`: Array of Block objects.
+
 <a name="doBlocksMatchTemplate" href="#doBlocksMatchTemplate">#</a> **doBlocksMatchTemplate**
 
 Checks whether a list of blocks matches a template by comparing the block names.
@@ -228,7 +250,7 @@ falsey value for all entries.
 
 _Parameters_
 
--   _transforms_ `Array<Object>`: Transforms to search.
+-   _transforms_ `Object[]`: Transforms to search.
 -   _predicate_ `Function`: Function returning true on matching transform.
 
 _Returns_
@@ -241,7 +263,7 @@ Returns the block attributes of a registered block node given its type.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _innerHTML_ `string`: Raw block content.
 -   _attributes_ `?Object`: Known block attributes (from delimiters).
 
@@ -322,7 +344,7 @@ transform object includes `blockName` as a property.
 _Parameters_
 
 -   _direction_ `string`: Transform direction ("to", "from").
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 
 _Returns_
 
@@ -348,13 +370,26 @@ _Returns_
 
 -   `Array`: Block settings.
 
+<a name="getBlockVariations" href="#getBlockVariations">#</a> **getBlockVariations**
+
+Returns an array with the variations of a given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of block (example: “core/columns”).
+-   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+
+_Returns_
+
+-   `(WPBlockVariation[]|void)`: Block variations.
+
 <a name="getCategories" href="#getCategories">#</a> **getCategories**
 
 Returns all the block categories.
 
 _Returns_
 
--   `Array<Object>`: Block categories.
+-   `WPBlockCategory[]`: Block categories.
 
 <a name="getChildBlockNames" href="#getChildBlockNames">#</a> **getChildBlockNames**
 
@@ -395,19 +430,7 @@ _Returns_
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
-Get schema of possible paths for phrasing content.
-
-_Related_
-
--   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
-
-_Parameters_
-
--   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
-
-_Returns_
-
--   `Object`: Schema.
+Undocumented declaration.
 
 <a name="getPossibleBlockTransformations" href="#getPossibleBlockTransformations">#</a> **getPossibleBlockTransformations**
 
@@ -429,7 +452,7 @@ static markup to be saved.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
 
@@ -444,13 +467,13 @@ enhanced element to be saved or string when raw HTML expected.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
 
 _Returns_
 
--   `(Object|string)`: Save element or raw HTML string.
+-   `Object|string`: Save element or raw HTML string.
 
 <a name="getUnregisteredTypeHandlerName" href="#getUnregisteredTypeHandlerName">#</a> **getUnregisteredTypeHandlerName**
 
@@ -513,6 +536,20 @@ _Returns_
 
 -   `boolean`: Whether the given block is a reusable block.
 
+<a name="isTemplatePart" href="#isTemplatePart">#</a> **isTemplatePart**
+
+Determines whether or not the given block is a template part. This is a
+special block type that allows composing a page template out of reusable
+design elements.
+
+_Parameters_
+
+-   _blockOrType_ `Object`: Block or Block Type to test.
+
+_Returns_
+
+-   `boolean`: Whether the given block is a template part.
+
 <a name="isUnmodifiedDefaultBlock" href="#isUnmodifiedDefaultBlock">#</a> **isUnmodifiedDefaultBlock**
 
 Determines whether the block is a default block
@@ -537,7 +574,7 @@ Logs to console in development environments when invalid.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type.
+-   _blockTypeOrName_ `string|Object`: Block type.
 -   _attributes_ `Object`: Parsed block attributes.
 -   _originalBlockContent_ `string`: Original block content.
 
@@ -573,7 +610,21 @@ _Returns_
 
 <a name="parse" href="#parse">#</a> **parse**
 
-Parses the post content with a PegJS grammar and returns a list of blocks.
+Utilizes an optimized token-driven parser based on the Gutenberg grammar spec
+defined through a parsing expression grammar to take advantage of the regular
+cadence provided by block delimiters -- composed syntactically through HTML
+comments -- which, given a general HTML document as an input, returns a block
+list array representation.
+
+This is a recursive-descent parser that scans linearly once through the input
+document. Instead of directly recursing it utilizes a trampoline mechanism to
+prevent stack overflow. This initial pass is mainly interested in separating
+and isolating the blocks serialized in the document and manifestly not in the
+content within the blocks.
+
+_Related_
+
+-   <https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/>
 
 _Parameters_
 
@@ -608,10 +659,11 @@ _Parameters_
 -   _options.plainText_ `[string]`: Plain text version.
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
 -   _options.tagName_ `[Array]`: The tag into which content will be inserted.
+-   _options.preserveWhiteSpace_ `[boolean]`: Whether or not to preserve consequent white space.
 
 _Returns_
 
--   `(Array|string)`: A list of blocks or a string, depending on `handlerMode`.
+-   `Array|string`: A list of blocks or a string, depending on `handlerMode`.
 
 <a name="rawHandler" href="#rawHandler">#</a> **rawHandler**
 
@@ -632,8 +684,10 @@ Registers a new block collection to group blocks in the same namespace in the in
 
 _Parameters_
 
--   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace
--   _settings_ `Object`: An object composed of a title to show in the inserter, and an icon to show in the inserter
+-   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace.
+-   _settings_ `Object`: The block collection settings.
+-   _settings.title_ `string`: The title to display in the block inserter.
+-   _settings.icon_ `[Object]`: The icon to display in the block inserter.
 
 <a name="registerBlockStyle" href="#registerBlockStyle">#</a> **registerBlockStyle**
 
@@ -652,8 +706,23 @@ editor interface where blocks are implemented.
 
 _Parameters_
 
--   _name_ `string`: Block name.
+-   _blockNameOrMetadata_ `string|Object`: Block type name or its metadata.
 -   _settings_ `Object`: Block settings.
+
+_Returns_
+
+-   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
+
+<a name="registerBlockTypeFromMetadata" href="#registerBlockTypeFromMetadata">#</a> **registerBlockTypeFromMetadata**
+
+> **Deprecated** Use `registerBlockType` instead.
+
+Registers a new block provided from metadata stored in `block.json` file.
+
+_Parameters_
+
+-   _metadata_ `Object`: Block metadata loaded from `block.json`.
+-   _additionalSettings_ `Object`: Additional block settings.
 
 _Returns_
 
@@ -687,7 +756,7 @@ Sets the block categories.
 
 _Parameters_
 
--   _categories_ `Array<Object>`: Block categories.
+-   _categories_ `WPBlockCategory[]`: Block categories.
 
 <a name="setDefaultBlockName" href="#setDefaultBlockName">#</a> **setDefaultBlockName**
 
@@ -721,13 +790,25 @@ _Parameters_
 
 -   _blockName_ `string`: Block name.
 
+<a name="store" href="#store">#</a> **store**
+
+Store definition for the blocks namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object`
+
 <a name="switchToBlockType" href="#switchToBlockType">#</a> **switchToBlockType**
 
 Switch one or more blocks into one or more blocks of the new block type.
 
 _Parameters_
 
--   _blocks_ `(Array|Object)`: Blocks array or block object.
+-   _blocks_ `Array|Object`: Blocks array or block object.
 -   _name_ `string`: Block name.
 
 _Returns_
@@ -789,7 +870,7 @@ Updates a category.
 _Parameters_
 
 -   _slug_ `string`: Block category slug.
--   _category_ `Object`: Object containing the category properties that should be updated.
+-   _category_ `WPBlockCategory`: Object containing the category properties that should be updated.
 
 <a name="withBlockContentContext" href="#withBlockContentContext">#</a> **withBlockContentContext**
 

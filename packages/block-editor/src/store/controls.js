@@ -4,27 +4,34 @@
 import { createRegistryControl } from '@wordpress/data';
 
 /**
- * Calls a selector using the current state.
- *
- * @param {string} storeName    Store name.
- * @param {string} selectorName Selector name.
- * @param  {Array} args         Selector arguments.
- *
- * @return {Object} control descriptor.
+ * Internal dependencies
  */
-export function select( storeName, selectorName, ...args ) {
+import { store as blockEditorStore } from '../store';
+
+export const __unstableMarkAutomaticChangeFinalControl = function () {
 	return {
-		type: 'SELECT',
-		storeName,
-		selectorName,
-		args,
+		type: 'MARK_AUTOMATIC_CHANGE_FINAL_CONTROL',
 	};
-}
+};
 
 const controls = {
-	SELECT: createRegistryControl(
-		( registry ) => ( { storeName, selectorName, args } ) => {
-			return registry.select( storeName )[ selectorName ]( ...args );
+	SLEEP( { duration } ) {
+		return new Promise( ( resolve ) => {
+			setTimeout( resolve, duration );
+		} );
+	},
+
+	MARK_AUTOMATIC_CHANGE_FINAL_CONTROL: createRegistryControl(
+		( registry ) => () => {
+			const {
+				requestIdleCallback = ( callback ) =>
+					setTimeout( callback, 100 ),
+			} = window;
+			requestIdleCallback( () =>
+				registry
+					.dispatch( blockEditorStore )
+					.__unstableMarkAutomaticChangeFinal()
+			);
 		}
 	),
 };

@@ -1,0 +1,13 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/post-navigation-link",
+		"isValid": true,
+		"attributes": {
+			"type": "next",
+			"showTitle": false
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

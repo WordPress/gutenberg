@@ -18,10 +18,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Verse' ),
-	description: __(
-		'Insert poetry. Use special spacing formats. Or quote song lyrics.'
-	),
 	icon,
 	example: {
 		attributes: {
@@ -33,10 +29,6 @@ export const settings = {
 			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
 		},
 	},
-	supports: {
-		lightBlockWrapper: true,
-	},
-	keywords: [ __( 'poetry' ), __( 'poem' ) ],
 	transforms,
 	deprecated,
 	merge( attributes, attributesToMerge ) {

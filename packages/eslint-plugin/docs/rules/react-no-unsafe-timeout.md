@@ -2,7 +2,7 @@
 
 `setTimeout` in a component must be cancelled when the component is unmounted. This rule disallows references to the `setTimeout` global which occur in a component, and which are not assigned to a variable. A variable assignment is considered an acceptable use on the assumption that the timeout ID will be later referenced for cancellation via `clearTimeout`.
 
-Consider using the [`withSafeTimeout` higher-order component](https://github.com/WordPress/gutenberg/tree/master/packages/compose/src/with-safe-timeout) from the [`@wordpress/compose` module](https://www.npmjs.com/package/@wordpress/compose).
+Consider using the [`withSafeTimeout` higher-order component](https://github.com/WordPress/gutenberg/tree/HEAD/packages/compose/src/with-safe-timeout) from the [`@wordpress/compose` module](https://www.npmjs.com/package/@wordpress/compose).
 
 ## Rule details
 
@@ -42,7 +42,7 @@ function MyComponent( props ) {
 	props.setTimeout( fn );
 }
 
-class MyNotComponent { 
+class MyNotComponent {
 	doAction() {
 		setTimeout( fn );
 	}

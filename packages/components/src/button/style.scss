@@ -1,6 +1,7 @@
 .components-button {
 	display: inline-flex;
 	text-decoration: none;
+	font-weight: normal;
 	font-size: $default-font-size;
 	margin: 0;
 	border: 0;
@@ -13,13 +14,12 @@
 	align-items: center;
 	box-sizing: border-box;
 	padding: 6px 12px;
-	overflow: hidden;
 	border-radius: $radius-block-ui;
-	color: $dark-gray-primary;
+	color: $gray-900;
 
 	&[aria-expanded="true"],
 	&:hover {
-		color: $theme-color;
+		color: var(--wp-admin-theme-color);
 	}
 
 	// Unset some hovers, instead of adding :not specificity.
@@ -30,10 +30,10 @@
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 $border-width-focus $theme-color;
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 1px solid transparent;
+		outline: 3px solid transparent;
 	}
 
 	/**
@@ -42,27 +42,27 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: color($theme-color);
+		background: var(--wp-admin-theme-color);
 		color: $white;
 		text-decoration: none;
 		text-shadow: none;
 
+		// Show the boundary of the button, in High Contrast Mode.
+		outline: 1px solid transparent;
+
 		&:hover:not(:disabled) {
-			background: color($theme-color shade(10%));
+			background: var(--wp-admin-theme-color-darker-10);
 			color: $white;
 		}
 
 		&:active:not(:disabled) {
-			background: color($theme-color shade(20%));
-			border-color: color($theme-color shade(20%));
+			background: var(--wp-admin-theme-color-darker-20);
+			border-color: var(--wp-admin-theme-color-darker-20);
 			color: $white;
 		}
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
-
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 1px solid transparent;
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 
 		&:disabled,
@@ -70,15 +70,16 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			color: color($theme-color tint(40%));
-			background: color($theme-color tint(10%));
-			border-color: color($theme-color tint(10%));
+			color: rgba($white, 0.4);
+			background: var(--wp-admin-theme-color);
+			border-color: var(--wp-admin-theme-color);
 			opacity: 1;
+			outline: none;
 
 			&:focus:enabled {
 				box-shadow:
 					0 0 0 $border-width $white,
-					0 0 0 3px color($theme-color);
+					0 0 0 3px var(--wp-admin-theme-color);
 			}
 		}
 
@@ -91,13 +92,13 @@
 			/* stylelint-disable */
 			background-image: linear-gradient(
 				-45deg,
-				$theme-color 28%,
-				color($theme-color shade(20%)) 28%,
-				color($theme-color shade(20%)) 72%,
-				$theme-color 72%
+				var(--wp-admin-theme-color) 33%,
+				var(--wp-admin-theme-color-darker-20) 33%,
+				var(--wp-admin-theme-color-darker-20) 70%,
+				var(--wp-admin-theme-color) 70%
 			);
 			/* stylelint-enable */
-			border-color: color($theme-color);
+			border-color: var(--wp-admin-theme-color);
 		}
 	}
 
@@ -107,25 +108,29 @@
 
 	&.is-secondary,
 	&.is-tertiary {
+		// Show the boundary of the button, in High Contrast Mode.
+		outline: 1px solid transparent;
+
 		&:active:not(:disabled) {
-			background: $light-gray-tertiary;
-			color: color($theme-color shade(10%));
+			background: $gray-300;
+			color: var(--wp-admin-theme-color-darker-10);
 			box-shadow: none;
 		}
 
 		&:hover:not(:disabled) {
-			color: color($theme-color shade(10%));
-			box-shadow: inset 0 0 0 $border-width color($theme-color shade(10%));
+			color: var(--wp-admin-theme-color-darker-10);
+			box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color-darker-10);
 		}
 
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
-			color: lighten($medium-gray-text, 5%);
-			background: lighten($light-gray-tertiary, 5%);
+			color: lighten($gray-700, 5%);
+			background: lighten($gray-300, 5%);
 			transform: none;
 			opacity: 1;
 			box-shadow: none;
+			outline: none;
 		}
 	}
 
@@ -134,10 +139,10 @@
 	 */
 
 	&.is-secondary {
-		box-shadow: inset 0 0 0 $border-width $theme-color;
+		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
 		outline: 1px solid transparent; // Shown in high contrast mode.
 		white-space: nowrap;
-		color: $theme-color;
+		color: var(--wp-admin-theme-color);
 		background: transparent;
 	}
 
@@ -147,7 +152,7 @@
 
 	&.is-tertiary {
 		white-space: nowrap;
-		color: $theme-color;
+		color: var(--wp-admin-theme-color);
 		background: transparent;
 		padding: 6px; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
 
@@ -156,6 +161,41 @@
 			flex: 0 0 auto;
 		}
 	}
+
+	/**
+	 * Destructive buttons.
+	 */
+
+	&.is-destructive {
+		color: $alert-red;
+		box-shadow: inset 0 0 0 $border-width $alert-red;
+
+		&:hover:not(:disabled) {
+			color: darken($alert-red, 20%);
+			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+		}
+
+		&:focus:not(:disabled) {
+			color: var(--wp-admin-theme-color);
+		}
+
+		&:active:not(:disabled) {
+			background: $gray-400;
+		}
+	}
+
+	&.is-destructive.is-primary {
+		color: #fff;
+		background: $alert-red;
+		box-shadow: inset 0 0 0 $border-width $alert-red;
+
+		&:hover:not(:disabled) {
+			color: #fff;
+			background: darken($alert-red, 20%);
+			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+		}
+	}
+
 
 	/**
 	 * Link buttons.
@@ -170,8 +210,7 @@
 		background: none;
 		outline: none;
 		text-align: left;
-		/* Mimics the default link style in common.css */
-		color: #0073aa;
+		color: var(--wp-admin-theme-color);
 		text-decoration: underline;
 		transition-property: border, background, color;
 		transition-duration: 0.05s;
@@ -179,22 +218,24 @@
 		@include reduce-motion("transition");
 		height: auto;
 
-		&:hover:not(:disabled),
-		&:active:not(:disabled) {
-			color: #00a0d2;
-		}
-
 		&:focus {
-			color: #124964;
-			box-shadow:
-				0 0 0 $border-width #5b9dd9,
-				0 0 $border-width-focus $border-width rgba(30, 140, 190, 0.8);
+			border-radius: $radius-block-ui;
 		}
-	}
 
-	// Link buttons that are red to indicate destructive behavior.
-	&.is-link.is-destructive {
-		color: $alert-red;
+		// Link buttons that are red to indicate destructive behavior.
+		&.is-destructive {
+			color: $alert-red;
+
+			&:active:not(:disabled),
+			&:hover:not(:disabled) {
+				color: darken($alert-red, 20%);
+				background: none;
+			}
+
+			&:focus:not(:disabled) {
+				color: var(--wp-admin-theme-color);
+			}
+		}
 	}
 
 	&:not([aria-disabled="true"]):active {
@@ -218,10 +259,10 @@
 		/* stylelint-disable */
 		background-image: linear-gradient(
 			-45deg,
-			color($white shade(2%)) 28%,
-			color($white shade(12%)) 28%,
-			color($white shade(12%)) 72%,
-			color($white shade(2%)) 72%
+			darken($white, 2%) 33%,
+			darken($white, 12%) 33%,
+			darken($white, 12%) 70%,
+			darken($white, 2%) 70%
 		);
 		/* stylelint-enable */
 	}
@@ -233,6 +274,7 @@
 		font-size: 11px;
 
 		&.has-icon:not(.has-text) {
+			padding: 0 8px;
 			width: 24px;
 		}
 	}
@@ -247,6 +289,8 @@
 		.dashicon {
 			display: inline-block;
 			flex: 0 0 auto;
+			margin-left: 2px;
+			margin-right: 2px;
 		}
 
 		&.has-text {
@@ -256,22 +300,27 @@
 		&.has-text svg {
 			margin-right: 8px;
 		}
+
+		&.has-text .dashicon {
+			margin-right: 10px;
+		}
 	}
 
 	// Toggled style.
 	&.is-pressed {
 		color: $white;
-		background: $dark-gray-primary;
+		background: $gray-900;
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
 		}
 
 		&:hover:not(:disabled) {
-			background: $dark-gray-primary;
+			color: $white;
+			background: $gray-900;
 		}
 	}
 

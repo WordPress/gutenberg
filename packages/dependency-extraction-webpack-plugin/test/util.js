@@ -5,7 +5,7 @@ const {
 	camelCaseDash,
 	defaultRequestToExternal,
 	defaultRequestToHandle,
-} = require( '../util' );
+} = require( '../lib/util' );
 
 describe( 'camelCaseDash', () => {
 	test( 'does not change a single word', () => {

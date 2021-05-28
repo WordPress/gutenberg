@@ -1,17 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-import { undo as undoIcon } from '@wordpress/icons';
+import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
+import { forwardRef } from '@wordpress/element';
 
-function EditorHistoryUndo( { hasUndo, undo } ) {
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+function EditorHistoryUndo( props, ref ) {
+	const hasUndo = useSelect(
+		( select ) => select( editorStore ).hasEditorUndo(),
+		[]
+	);
+	const { undo } = useDispatch( editorStore );
 	return (
 		<Button
-			icon={ undoIcon }
+			{ ...props }
+			ref={ ref }
+			icon={ ! isRTL() ? undoIcon : redoIcon }
+			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
 			// If there are no undo levels we don't want to actually disable this
@@ -24,11 +37,4 @@ function EditorHistoryUndo( { hasUndo, undo } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		hasUndo: select( 'core/editor' ).hasEditorUndo(),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		undo: dispatch( 'core/editor' ).undo,
-	} ) ),
-] )( EditorHistoryUndo );
+export default forwardRef( EditorHistoryUndo );

@@ -6,12 +6,13 @@ import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import {
 	PanelBody,
 	__experimentalUseSlot as useSlot,
 } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -23,16 +24,52 @@ import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
+import BlockVariationTransforms from '../block-variation-transforms';
+import useBlockDisplayInformation from '../use-block-display-information';
+import { store as blockEditorStore } from '../../store';
+
 const BlockInspector = ( {
-	blockType,
-	count,
-	hasBlockStyles,
-	selectedBlockClientId,
-	selectedBlockName,
 	showNoBlockSelectedMessage = true,
+	bubblesVirtually = true,
 } ) => {
+	const {
+		count,
+		hasBlockStyles,
+		selectedBlockName,
+		selectedBlockClientId,
+		blockType,
+	} = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientId,
+			getSelectedBlockCount,
+			getBlockName,
+		} = select( blockEditorStore );
+		const { getBlockStyles } = select( blocksStore );
+
+		const _selectedBlockClientId = getSelectedBlockClientId();
+		const _selectedBlockName =
+			_selectedBlockClientId && getBlockName( _selectedBlockClientId );
+		const _blockType =
+			_selectedBlockName && getBlockType( _selectedBlockName );
+		const blockStyles =
+			_selectedBlockName && getBlockStyles( _selectedBlockName );
+
+		return {
+			count: getSelectedBlockCount(),
+			selectedBlockClientId: _selectedBlockClientId,
+			selectedBlockName: _selectedBlockName,
+			blockType: _blockType,
+			hasBlockStyles: blockStyles && blockStyles.length > 0,
+		};
+	}, [] );
+
 	if ( count > 1 ) {
-		return <MultiSelectionInspector />;
+		return (
+			<div className="block-editor-block-inspector">
+				<MultiSelectionInspector />
+				<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+			</div>
+		);
 	}
 
 	const isSelectedBlockUnregistered =
@@ -56,28 +93,44 @@ const BlockInspector = ( {
 		}
 		return null;
 	}
+	return (
+		<BlockInspectorSingleBlock
+			clientId={ selectedBlockClientId }
+			blockName={ blockType.name }
+			hasBlockStyles={ hasBlockStyles }
+			bubblesVirtually={ bubblesVirtually }
+		/>
+	);
+};
 
+const BlockInspectorSingleBlock = ( {
+	clientId,
+	blockName,
+	hasBlockStyles,
+	bubblesVirtually,
+} ) => {
+	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard blockType={ blockType } />
+			<BlockCard { ...blockInformation } />
+			<BlockVariationTransforms blockClientId={ clientId } />
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
-						<BlockStyles clientId={ selectedBlockClientId } />
+						<BlockStyles clientId={ clientId } />
 						{ hasBlockSupport(
-							blockType.name,
+							blockName,
 							'defaultStylePicker',
 							true
-						) && (
-							<DefaultStylePicker blockName={ blockType.name } />
-						) }
+						) && <DefaultStylePicker blockName={ blockName } /> }
 					</PanelBody>
 				</div>
 			) }
-			<InspectorControls.Slot bubblesVirtually />
+			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			<div>
 				<AdvancedControls
 					slotName={ InspectorAdvancedControls.slotName }
+					bubblesVirtually={ bubblesVirtually }
 				/>
 			</div>
 			<SkipToSelectedBlock key="back" />
@@ -85,7 +138,7 @@ const BlockInspector = ( {
 	);
 };
 
-const AdvancedControls = ( { slotName } ) => {
+const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
 	const slot = useSlot( slotName );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
@@ -99,30 +152,11 @@ const AdvancedControls = ( { slotName } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ false }
 		>
-			<InspectorAdvancedControls.Slot bubblesVirtually />
+			<InspectorAdvancedControls.Slot
+				bubblesVirtually={ bubblesVirtually }
+			/>
 		</PanelBody>
 	);
 };
 
-export default withSelect( ( select ) => {
-	const {
-		getSelectedBlockClientId,
-		getSelectedBlockCount,
-		getBlockName,
-	} = select( 'core/block-editor' );
-	const { getBlockStyles } = select( 'core/blocks' );
-	const selectedBlockClientId = getSelectedBlockClientId();
-	const selectedBlockName =
-		selectedBlockClientId && getBlockName( selectedBlockClientId );
-	const blockType =
-		selectedBlockClientId && getBlockType( selectedBlockName );
-	const blockStyles =
-		selectedBlockClientId && getBlockStyles( selectedBlockName );
-	return {
-		count: getSelectedBlockCount(),
-		hasBlockStyles: blockStyles && blockStyles.length > 0,
-		selectedBlockName,
-		selectedBlockClientId,
-		blockType,
-	};
-} )( BlockInspector );
+export default BlockInspector;

@@ -1,16 +1,17 @@
 {
 	"name": "@wordpress/is-shallow-equal",
-	"version": "2.0.0",
+	"version": "4.1.0",
 	"description": "Test for shallow equality between two objects or arrays.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"shallow",
 		"shallow-equal",
 		"shallowequal"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/is-shallow-equal/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/is-shallow-equal/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -19,16 +20,23 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"files": [
-		"lib",
+		"build",
+		"build-module",
 		"build-types",
+		"src",
 		"*.md"
 	],
-	"main": "lib/index.js",
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.9.2"
+		"@babel/runtime": "^7.13.10"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -4,6 +4,13 @@
 import { __ } from '@wordpress/i18n';
 import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
 
 /**
  * Set of available mode options.
@@ -30,17 +37,17 @@ function ModeSwitcher() {
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+			isRichEditingEnabled: select( editorStore ).getEditorSettings()
 				.richEditingEnabled,
-			isCodeEditingEnabled: select( 'core/editor' ).getEditorSettings()
+			isCodeEditingEnabled: select( editorStore ).getEditorSettings()
 				.codeEditingEnabled,
-			mode: select( 'core/edit-post' ).getEditorMode(),
+			mode: select( editPostStore ).getEditorMode(),
 		} ),
 		[]
 	);
-	const { switchEditorMode } = useDispatch( 'core/edit-post' );
+	const { switchEditorMode } = useDispatch( editPostStore );
 
 	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
 		return null;

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, number } from '@storybook/addon-knobs';
+import { boolean, number, text } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -19,15 +19,28 @@ export default {
 };
 
 function Example() {
-	const [ value, setValue ] = useState( '' );
+	const [ value, setValue ] = useState( '0' );
 
 	const props = {
+		disabled: boolean( 'disabled', false ),
+		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
+		label: text( 'label', 'Number' ),
+		min: number( 'min', 0 ),
+		max: number( 'max', 100 ),
+		placeholder: text( 'placeholder', 0 ),
 		shiftStep: number( 'shiftStep', 10 ),
 		step: number( 'step', 1 ),
 	};
 
-	return <NumberControl { ...props } value={ value } onChange={ setValue } />;
+	return (
+		<NumberControl
+			{ ...props }
+			value={ value }
+			onChange={ ( v ) => setValue( v ) }
+		/>
+	);
 }
 
 export const _default = () => {

@@ -21,11 +21,11 @@ const { Consumer, Provider } = Context;
  *
  * @example
  * ```js
- * const {
+ * import {
  *   RegistryProvider,
  *   RegistryConsumer,
  *   createRegistry
- * } = wp.data;
+ * } from '@wordpress/data';
  *
  * const registry = createRegistry( {} );
  *

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { postCommentsCount as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,9 +13,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Post Comments Count' ),
-	supports: {
-		html: false,
-	},
+	icon,
 	edit,
 };

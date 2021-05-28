@@ -5,10 +5,17 @@ import {
 	createContext,
 	useContext,
 	useCallback,
-	useMemo,
+	useEffect,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { parse, serialize } from '@wordpress/blocks';
+import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { CORE_STORE_NAME as coreStoreName } from './utils/constants';
+
+const EMPTY_ARRAY = [];
 
 /**
  * Internal dependencies
@@ -74,19 +81,24 @@ export function useEntityId( kind, type ) {
  * specified property of the nearest provided
  * entity of the specified type.
  *
- * @param {string} kind The entity kind.
- * @param {string} type The entity type.
- * @param {string} prop The property name.
+ * @param {string} kind  The entity kind.
+ * @param {string} type  The entity type.
+ * @param {string} prop  The property name.
+ * @param {string} [_id] An entity ID to use instead of the context-provided one.
  *
  * @return {[*, Function]} A tuple where the first item is the
  *                          property value and the second is the
  *                          setter.
  */
-export function useEntityProp( kind, type, prop ) {
-	const id = useEntityId( kind, type );
+export function useEntityProp( kind, type, prop, _id ) {
+	const providerId = useEntityId( kind, type );
+	const id = _id ?? providerId;
+
 	const { value, fullValue } = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
+			const { getEntityRecord, getEditedEntityRecord } = select(
+				coreStoreName
+			);
 			const entity = getEntityRecord( kind, type, id ); // Trigger resolver.
 			const editedEntity = getEditedEntityRecord( kind, type, id );
 			return entity && editedEntity
@@ -98,7 +110,7 @@ export function useEntityProp( kind, type, prop ) {
 		},
 		[ kind, type, id, prop ]
 	);
-	const { editEntityRecord } = useDispatch( 'core' );
+	const { editEntityRecord } = useDispatch( coreStoreName );
 	const setValue = useCallback(
 		( newValue ) => {
 			editEntityRecord( kind, type, id, {
@@ -125,50 +137,75 @@ export function useEntityProp( kind, type, prop ) {
  * @param {string} kind                            The entity kind.
  * @param {string} type                            The entity type.
  * @param {Object} options
- * @param {Object} [options.initialEdits]          Initial edits object for the entity record.
- * @param {string} [options.blocksProp='blocks']   The name of the entity prop that holds the blocks array.
- * @param {string} [options.contentProp='content'] The name of the entity prop that holds the serialized blocks.
+ * @param {string} [options.id]                    An entity ID to use instead of the context-provided one.
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
-export function useEntityBlockEditor(
-	kind,
-	type,
-	{ initialEdits, blocksProp = 'blocks', contentProp = 'content' } = {}
-) {
-	const [ content, setContent ] = useEntityProp( kind, type, contentProp );
-
-	const { editEntityRecord } = useDispatch( 'core' );
-	const id = useEntityId( kind, type );
-	const initialBlocks = useMemo( () => {
-		if ( initialEdits ) {
-			editEntityRecord( kind, type, id, initialEdits, {
-				undoIgnore: true,
-			} );
-		}
-
-		// Guard against other instances that might have
-		// set content to a function already.
-		if ( typeof content !== 'function' ) {
-			const parsedContent = parse( content );
-			return parsedContent.length ? parsedContent : [];
-		}
-	}, [ id ] ); // Reset when the provided entity record changes.
-	const [ blocks = initialBlocks, onInput ] = useEntityProp(
-		kind,
-		type,
-		blocksProp
+export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
+	const providerId = useEntityId( kind, type );
+	const id = _id ?? providerId;
+	const { content, blocks } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord } = select( coreStoreName );
+			const editedEntity = getEditedEntityRecord( kind, type, id );
+			return {
+				blocks: editedEntity.blocks,
+				content: editedEntity.content,
+			};
+		},
+		[ kind, type, id ]
 	);
+	const { __unstableCreateUndoLevel, editEntityRecord } = useDispatch(
+		coreStoreName
+	);
+
+	useEffect( () => {
+		// Load the blocks from the content if not already in state
+		// Guard against other instances that might have
+		// set content to a function already or the blocks are already in state.
+		if ( content && typeof content !== 'function' && ! blocks ) {
+			const parsedContent = parse( content );
+			editEntityRecord(
+				kind,
+				type,
+				id,
+				{
+					blocks: parsedContent,
+				},
+				{ undoIgnore: true }
+			);
+		}
+	}, [ content ] );
 
 	const onChange = useCallback(
-		( nextBlocks ) => {
-			onInput( nextBlocks );
-			// Use a function edit to avoid serializing often.
-			setContent( ( { blocks: blocksToSerialize } ) =>
-				serialize( blocksToSerialize )
-			);
+		( newBlocks, options ) => {
+			const { selection } = options;
+			const edits = { blocks: newBlocks, selection };
+
+			const noChange = blocks === edits.blocks;
+			if ( noChange ) {
+				return __unstableCreateUndoLevel( kind, type, id );
+			}
+
+			// We create a new function here on every persistent edit
+			// to make sure the edit makes the post dirty and creates
+			// a new undo level.
+			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
+				__unstableSerializeAndClean( blocksForSerialization );
+
+			editEntityRecord( kind, type, id, edits );
 		},
-		[ onInput, setContent ]
+		[ kind, type, id, blocks ]
 	);
-	return [ blocks, onInput, onChange ];
+
+	const onInput = useCallback(
+		( newBlocks, options ) => {
+			const { selection } = options;
+			const edits = { blocks: newBlocks, selection };
+			editEntityRecord( kind, type, id, edits );
+		},
+		[ kind, type, id ]
+	);
+
+	return [ blocks ?? EMPTY_ARRAY, onInput, onChange ];
 }

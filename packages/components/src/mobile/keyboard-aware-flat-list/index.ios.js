@@ -3,6 +3,14 @@
  */
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { FlatList } from 'react-native';
+import { isEqual } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { memo } from '@wordpress/element';
+
+const List = memo( FlatList, isEqual );
 
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
@@ -55,7 +63,7 @@ export const KeyboardAwareFlatList = ( {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
 		} }
 	>
-		<FlatList { ...listProps } />
+		<List { ...listProps } />
 	</KeyboardAwareScrollView>
 );
 

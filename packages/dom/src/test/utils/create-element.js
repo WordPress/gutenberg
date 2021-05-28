@@ -10,7 +10,7 @@ export default function createElement( type ) {
 	const element = document.createElement( type );
 
 	const ifNotHidden = ( value, elseValue ) =>
-		function() {
+		function () {
 			let isHidden = false;
 			let node = this;
 			do {
@@ -22,7 +22,7 @@ export default function createElement( type ) {
 			} while (
 				! isHidden &&
 				node &&
-				node.nodeType === window.Node.ELEMENT_NODE
+				node.nodeType === node.ELEMENT_NODE
 			);
 
 			return isHidden ? elseValue : value;

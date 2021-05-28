@@ -19,6 +19,7 @@
 	}
 
 	// Borders around toolbar segments.
+	.components-toolbar-group,
 	.components-toolbar {
 		background: none;
 		// IE11 has thick paddings without this.
@@ -33,17 +34,69 @@
 		border: 0;
 
 		// Add a border after item groups to show as separator in the block toolbar.
-		border-right: $border-width solid $light-gray-500;
+		border-right: $border-width solid $gray-300;
 	}
 
 	> :last-child,
+	> :last-child .components-toolbar-group,
 	> :last-child .components-toolbar {
 		border-right: none;
 	}
 }
 
+.block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
+	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
+
+	.show-icon-labels & {
+		margin-left: 0;
+	}
+}
+
+.block-editor-block-parent-selector {
+	position: absolute;
+	top: -$border-width;
+	left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+	.show-icon-labels & {
+		position: relative;
+		left: auto;
+		top: auto;
+		margin-top: -$border-width;
+		margin-left: -$border-width;
+		margin-bottom: -$border-width;
+	}
+}
+
+// Block controls.
+.block-editor-block-toolbar__block-controls {
+	// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+	height: auto !important;
+	padding: 0 !important;
+
+	// Switcher.
+	.block-editor-block-switcher .components-dropdown-menu__toggle,
+	.block-editor-block-switcher__no-switcher-icon {
+		.block-editor-block-icon {
+			width: $button-size-small !important;
+			margin: 0 !important;
+		}
+
+		&:focus::before {
+			right: $grid-unit-05 !important;
+		}
+	}
+
+	// Match the parent selector button.
+	margin-left: -$border-width;
+
+	// Compensate for width of block switcher.
+	.block-editor-block-mover {
+		margin-left: -$grid-unit-15 / 2;
+	}
+}
+
 .block-editor-block-toolbar,
-.block-editor-format-toolbar {
+.block-editor-rich-text__inline-format-toolbar-group {
 	// Override Toolbar buttons size.
 	.components-toolbar-group,
 	.components-toolbar {
@@ -64,50 +117,99 @@
 	}
 }
 
-.block-editor-block-toolbar__mover-switcher-container {
-	display: flex;
-}
+.show-icon-labels {
+	.block-editor-block-toolbar {
+		.components-button.has-icon {
+			width: auto;
 
-.block-editor-block-toolbar__block-switcher-wrapper {
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+				font-size: $helptext-font-size;
+			}
+		}
+	}
+
+	// Padding overrides.
+
+	.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon {
+		padding-left: 6px;
+		padding-right: 6px;
+	}
+
+	// Switcher overrides.
 	.block-editor-block-switcher {
-		display: block;
-	}
-}
+		border-right: 1px solid $gray-900;
 
-.block-editor-block-toolbar.has-responsive-movers {
-	.block-editor-block-toolbar__mover-trigger-container {
-		@include break-medium() {
-			bottom: -1px;
-			left: -1px;
-			position: absolute;
-			top: -1px;
-			transform: translateX(-48px);
-			user-select: none;
+		.components-dropdown-menu__toggle {
+			margin-left: 0;
 		}
 	}
 
-	// Explicitly color the background of the switcher to "cover" the mover control as it animates out.
-	.block-editor-block-toolbar__block-switcher-wrapper {
-		background: $white;
-		border-left: $border-width solid;
-		border-radius: 0 0 $radius-block-ui $radius-block-ui;
-		position: relative;
-		z-index: 1;
-		margin-left: -$border-width;
-	}
-
-	.block-editor-block-toolbar__mover-trigger-wrapper:not(:empty) {
-		@include break-medium() {
-			background-color: $white;
-			border: 1px solid $black;
-			border-bottom-left-radius: 2px;
-			border-top-left-radius: 2px;
-			border-right: none;
-			height: 100%;
-			transition: all 60ms linear;
+	.block-editor-block-switcher .components-dropdown-menu__toggle,
+	.block-editor-block-switcher__no-switcher-icon {
+		.block-editor-block-icon {
+			width: 0 !important;
+			height: 0 !important;
 		}
 
-		@include reduce-motion("transition");
+		&:focus::before {
+			right: $grid-unit-05 !important;
+		}
+	}
+
+	// Parent selector overrides
+
+	.block-editor-block-parent-selector__button {
+		.block-editor-block-icon {
+			width: 0;
+		}
+	}
+
+	// Mover overrides.
+	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+		margin-left: 0;
+		white-space: nowrap;
+	}
+
+	.block-editor-block-mover-button {
+		// The specificity can be reduced once https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L34 is also dealt with.
+		padding-left: $grid-unit !important;
+		padding-right: $grid-unit !important;
+	}
+
+	.block-editor-block-mover__drag-handle.has-icon {
+		padding-left: 6px !important;
+		padding-right: 6px !important;
+		border-right: 1px solid $gray-900;
+	}
+
+	@include break-small() {
+		// Specificity override for https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L69
+		.is-up-button.is-up-button.is-up-button {
+			border-bottom: 1px solid $gray-900;
+			margin-right: 0;
+			border-radius: 0;
+		}
+	}
+
+	.block-editor-block-contextual-toolbar .block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
+		width: auto;
+	}
+
+	// Mobile adjustments
+	.components-toolbar,
+	.components-toolbar-group {
+		flex-shrink: 1;
+	}
+
+	.block-editor-rich-text__inline-format-toolbar-group {
+		.components-button + .components-button {
+			margin-left: 6px;
+		}
 	}
 }
-

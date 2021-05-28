@@ -46,11 +46,17 @@ const getSelection = async () => {
 		cloneStart.setStart( document.activeElement, 0 );
 		cloneEnd.setStart( document.activeElement, 0 );
 
+		/**
+		 * Zero width non-breaking space, used as padding in the editable DOM
+		 * tree when it is empty otherwise.
+		 */
+		const ZWNBSP = '\ufeff';
+
 		return {
 			blockIndex,
 			editableIndex,
-			startOffset: cloneStart.toString().length,
-			endOffset: cloneEnd.toString().length,
+			startOffset: cloneStart.toString().replace( ZWNBSP, '' ).length,
+			endOffset: cloneEnd.toString().replace( ZWNBSP, '' ).length,
 		};
 	} );
 };
@@ -173,6 +179,7 @@ describe( 'undo', () => {
 		await page.keyboard.type( 'test' );
 		await saveDraft();
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 		await page.click( '[data-type="core/paragraph"]' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'b' );
@@ -225,8 +232,8 @@ describe( 'undo', () => {
 		expect( await getSelection() ).toEqual( {
 			blockIndex: 2,
 			editableIndex: 0,
-			startOffset: 0,
-			endOffset: 0,
+			startOffset: 'is'.length,
+			endOffset: 'is'.length,
 		} );
 
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 2nd paragraph text.
@@ -245,8 +252,8 @@ describe( 'undo', () => {
 		expect( await getSelection() ).toEqual( {
 			blockIndex: 1,
 			editableIndex: 0,
-			startOffset: 0,
-			endOffset: 0,
+			startOffset: 'This'.length,
+			endOffset: 'This'.length,
 		} );
 
 		await pressKeyWithModifier( 'primary', 'z' ); // Undo 1st paragraph text.
@@ -345,6 +352,7 @@ describe( 'undo', () => {
 		await page.keyboard.type( 'original' );
 		await saveDraft();
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// Issue is demonstrated by forcing state merges (multiple inputs) on
 		// an existing text after a fresh reload.
@@ -391,6 +399,7 @@ describe( 'undo', () => {
 		await page.keyboard.type( '1' );
 		await saveDraft();
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// Expect undo button to be disabled.
 		expect(

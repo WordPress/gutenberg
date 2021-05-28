@@ -8,7 +8,12 @@ import { get } from 'lodash';
  */
 import { useViewportMatch, compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { PostPublishButton } from '@wordpress/editor';
+import { PostPublishButton, store as editorStore } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
 
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
@@ -79,23 +84,23 @@ export function PostPublishButtonOrToggle( {
 export default compose(
 	withSelect( ( select ) => ( {
 		hasPublishAction: get(
-			select( 'core/editor' ).getCurrentPost(),
+			select( editorStore ).getCurrentPost(),
 			[ '_links', 'wp:action-publish' ],
 			false
 		),
-		isBeingScheduled: select( 'core/editor' ).isEditedPostBeingScheduled(),
-		isPending: select( 'core/editor' ).isCurrentPostPending(),
-		isPublished: select( 'core/editor' ).isCurrentPostPublished(),
+		isBeingScheduled: select( editorStore ).isEditedPostBeingScheduled(),
+		isPending: select( editorStore ).isCurrentPostPending(),
+		isPublished: select( editorStore ).isCurrentPostPublished(),
 		isPublishSidebarEnabled: select(
-			'core/editor'
+			editorStore
 		).isPublishSidebarEnabled(),
 		isPublishSidebarOpened: select(
-			'core/edit-post'
+			editPostStore
 		).isPublishSidebarOpened(),
-		isScheduled: select( 'core/editor' ).isCurrentPostScheduled(),
+		isScheduled: select( editorStore ).isCurrentPostScheduled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { togglePublishSidebar } = dispatch( 'core/edit-post' );
+		const { togglePublishSidebar } = dispatch( editPostStore );
 		return {
 			togglePublishSidebar,
 		};

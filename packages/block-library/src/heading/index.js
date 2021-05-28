@@ -8,7 +8,6 @@ import { isEmpty } from 'lodash';
  */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,21 +23,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Heading' ),
-	description: __(
-		'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.'
-	),
 	icon,
-	keywords: [ __( 'title' ), __( 'subtitle' ) ],
-	supports: {
-		className: false,
-		anchor: true,
-		__unstablePasteTextInline: true,
-		lightBlockWrapper: true,
-		__experimentalColor: Platform.OS === 'web',
-		__experimentalLineHeight: true,
-		__experimentalFontSize: true,
-	},
 	example: {
 		attributes: {
 			content: __( 'Code is Poetry' ),

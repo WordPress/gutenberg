@@ -167,7 +167,68 @@ describe( 'Slot', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should render in expected order', () => {
+	it( 'should render in expected order when fills always mounted', () => {
+		const { container, rerender } = render(
+			<Provider>
+				<div key="slot">
+					<Slot name="egg" />
+				</div>
+			</Provider>
+		);
+
+		rerender(
+			<Provider>
+				<div key="slot">
+					<Slot name="egg" />
+				</div>
+				<Fill name="egg" key="first">
+					first
+				</Fill>
+				<Fill name="egg" key="second">
+					second
+				</Fill>
+			</Provider>
+		);
+
+		rerender(
+			<Provider>
+				<div key="slot">
+					<Slot name="egg" />
+				</div>
+				<Fill name="egg" key="first" />
+				<Fill name="egg" key="second">
+					second
+				</Fill>
+				<Fill name="egg" key="third">
+					third
+				</Fill>
+			</Provider>
+		);
+
+		rerender(
+			<Provider>
+				<div key="slot">
+					<Slot name="egg" />
+				</div>
+				<Fill name="egg" key="first">
+					first (rerendered)
+				</Fill>
+				<Fill name="egg" key="second">
+					second
+				</Fill>
+				<Fill name="egg" key="third">
+					third
+				</Fill>
+				<Fill name="egg" key="fourth">
+					fourth (new)
+				</Fill>
+			</Provider>
+		);
+
+		expect( container ).toMatchSnapshot();
+	} );
+
+	it( 'should render in expected order when fills unmounted', () => {
 		const { container, rerender } = render(
 			<Provider>
 				<div key="slot">
@@ -192,6 +253,7 @@ describe( 'Slot', () => {
 					<Slot name="egg" />
 				</div>
 				<Filler name="egg" key="second" text="second" />
+				<Filler name="egg" key="third" text="third" />
 			</Provider>
 		);
 
@@ -200,12 +262,28 @@ describe( 'Slot', () => {
 				<div key="slot">
 					<Slot name="egg" />
 				</div>
-				<Filler name="egg" key="first" text="first" />
+				<Filler name="egg" key="first" text="first (rerendered)" />
 				<Filler name="egg" key="second" text="second" />
+				<Filler name="egg" key="third" text="third" />
+				<Filler name="egg" key="fourth" text="fourth (new)" />
 			</Provider>
 		);
 
 		expect( container ).toMatchSnapshot();
+	} );
+
+	it( 'should warn without a Provider', () => {
+		const { container } = render(
+			<>
+				<div>
+					<Slot name="chicken" bubblesVirtually />
+				</div>
+				<Fill name="chicken" />
+			</>
+		);
+
+		expect( container ).toMatchSnapshot();
+		expect( console ).toHaveWarned();
 	} );
 
 	describe.each( [ false, true ] )(

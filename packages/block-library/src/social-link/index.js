@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { share as icon } from '@wordpress/icons';
 
 /**
@@ -16,17 +15,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Social Icon' ),
-	parent: [ 'core/social-links' ],
-	supports: {
-		reusable: false,
-		html: false,
-		lightBlockWrapper: true,
-	},
 	icon,
 	edit,
-	description: __(
-		'Display an icon linking to a social media profile or website.'
-	),
 	variations,
 };

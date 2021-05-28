@@ -6,23 +6,119 @@
 	}
 }
 
-// Reduce the paddings, margins, and UI of inner-blocks.
-// @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
-// When that happens, leverage that instead of the following overrides.
-.editor-styles-wrapper .wp-block-social-link {
-	margin: 0;
-	margin-right: 8px;
+// Prevent toolbar from jumping when selecting / hovering a link.
+.wp-social-link:hover {
+	transform: none;
 }
 
 .editor-styles-wrapper .wp-block-social-links {
 	padding: 0;
 }
 
+// Placeholder/setup state.
+.wp-block-social-links__social-placeholder {
+	display: flex;
+	opacity: 0.8;
+	list-style: none;
+
+	// Use the first link to set the height.
+	> .wp-social-link {
+		// Use !important to keep the selector simple.
+		padding-left: 0 !important;
+		margin-left: 0 !important;
+		padding-right: 0 !important;
+		margin-right: 0 !important;
+		width: 0 !important;
+		visibility: hidden;
+	}
+
+	// Wrap the remaining placeholders in a container so the plus can overlap.
+	> .wp-block-social-links__social-placeholder-icons {
+		display: flex;
+	}
+
+	& + .block-list-appender,
+	.wp-social-link {
+		padding: 0.25em;
+
+		.is-style-pill-shape & {
+			padding-left: calc((2/3) * 1em);
+			padding-right: calc((2/3) * 1em);
+		}
+	}
+
+	.wp-social-link::before {
+		content: "";
+		display: block;
+		width: 1em;
+		height: 1em;
+		border-radius: $radius-round;
+
+		.is-style-logos-only & {
+			background: currentColor;
+		}
+	}
+}
+
+// Selected placeholder state.
+.wp-block-social-links .wp-block-social-links__social-prompt {
+	list-style: none;
+	order: 2; // Move after the appender button. Because this element is non-interactive, it does not affect tab order.
+
+	// Show as block UI.
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $button-size-small;
+	margin-top: auto;
+	margin-bottom: auto;
+	cursor: default;
+	padding-right: $grid-unit-10;
+
+	& + .block-list-appender {
+		margin-right: $grid-unit-10;
+		padding: 0.25em;
+	}
+}
+
 // Polish the Appender.
 .wp-block-social-links .block-list-appender {
-	margin: 0;
-	display: flex;
-	align-items: center;
+	// Match the overall silhouette of social links.
+	margin: 4px auto 4px 0;
+	border-radius: 9999px; // This works as both circular and pill shapes.
+
+	// Treat just like a social icon.
+	.block-editor-inserter {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: inherit;
+		width: 1em;
+		height: 1em;
+	}
+
+	// Duplicate the font sizes from style.scss to size the appender.
+	.has-small-icon-size & {
+		font-size: 16px; // 16 makes for a quarter-padding that keeps the icon centered.
+	}
+
+	// Normal/default.
+	.has-normal-icon-size & {
+		font-size: 24px;
+	}
+
+	// Large.
+	.has-large-icon-size & {
+		font-size: 36px;
+	}
+
+	// Huge.
+	.has-huge-icon-size & {
+		font-size: 48px;
+	}
+
+	&::before {
+		content: none;
+	}
 }
 
 // Center flex items. This has an equivalent in style.scss.
@@ -32,30 +128,8 @@
 
 // Improve the preview, ensure buttons are fully opaque despite being disabled.
 // @todo: Look at improving the preview component to make this unnecessary.
-.block-editor-block-preview__content .wp-social-link:disabled {
+.block-editor-block-preview__content .components-button:disabled {
 	opacity: 1;
-}
-
-// Selected/unselected states.
-// Unselected block is preview, selected has additional options.
-[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) .wp-block-social-links {
-	min-height: 36px; // This height matches the height of the buttons and ensures an empty block doesn't collapse.
-}
-
-// Disappear but show on hover or nav mode focus.
-[data-type="core/social-links"] .wp-social-link__is-incomplete {
-	transition: transform 0.1s ease;
-	transform-origin: center center;
-}
-
-[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) {
-	.wp-social-link__is-incomplete {
-		opacity: 0;
-		transform: scale(0);
-		width: 0;
-		padding: 0;
-		margin-right: 0;
-	}
 }
 
 // Unconfigured placeholder links are semitransparent.
@@ -68,22 +142,4 @@
 .wp-social-link.wp-social-link__is-incomplete:hover,
 .wp-social-link.wp-social-link__is-incomplete:focus {
 	opacity: 1;
-}
-
-
-// Focus styles for the button inside the child block.
-// The child block itself has a more generic focus style, see line 55.
-[data-type="core/social-links"] .wp-social-link:focus { // This needs specificity.
-	opacity: 1;
-	box-shadow: 0 0 0 2px $white, 0 0 0 4px $blue-medium-focus;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-}
-
-// To ensure a better selection footprint when editing, attach the margin to the block container.
-// @todo: This can very probably be removed entirely when this block receives a lighter DOM.
-.is-navigate-mode .block-editor-block-list__layout .block-editor-block-list__block[data-type="core/social-link"].is-selected::after,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/social-link"]:not([contenteditable]):focus::after {
-	right: 8px;
 }

@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { get, isString, kebabCase, reduce, upperFirst } from 'lodash';
+import { isString, kebabCase, reduce, upperFirst } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -19,6 +18,7 @@ import {
 	getColorObjectByAttributeValues,
 	getMostReadableColor,
 } from './utils';
+import useSetting from '../use-setting';
 
 const DEFAULT_COLORS = [];
 
@@ -45,12 +45,13 @@ const withCustomColorPalette = ( colorsArray ) =>
  * @return {Function} The higher order component.
  */
 const withEditorColorPalette = () =>
-	withSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
-		return {
-			colors: get( settings, [ 'colors' ], DEFAULT_COLORS ),
-		};
-	} );
+	createHigherOrderComponent(
+		( WrappedComponent ) => ( props ) => {
+			const colors = useSetting( 'color.palette' ) || DEFAULT_COLORS;
+			return <WrappedComponent { ...props } colors={ colors } />;
+		},
+		'withEditorColorPalette'
+	);
 
 /**
  * Helper function used with `createHigherOrderComponent` to create
@@ -159,9 +160,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 
 							const previousColorObject =
 								previousState[ colorAttributeName ];
-							const previousColor = get( previousColorObject, [
-								'color',
-							] );
+							const previousColor = previousColorObject?.color;
 							/**
 							 * The "and previousColorObject" condition checks that a previous color object was already computed.
 							 * At the start previousColorObject and colorValue are both equal to undefined

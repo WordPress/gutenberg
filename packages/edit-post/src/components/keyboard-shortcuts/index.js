@@ -3,36 +3,41 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
+	const { getBlockSelectionStart } = useSelect( blockEditorStore );
 	const {
-		getBlockSelectionStart,
 		getEditorMode,
 		isEditorSidebarOpened,
-		richEditingEnabled,
-		codeEditingEnabled,
-	} = useSelect( ( select ) => {
-		const settings = select( 'core/editor' ).getEditorSettings();
-		return {
-			getBlockSelectionStart: select( 'core/block-editor' )
-				.getBlockSelectionStart,
-			getEditorMode: select( 'core/edit-post' ).getEditorMode,
-			isEditorSidebarOpened: select( 'core/edit-post' )
-				.isEditorSidebarOpened,
-			richEditingEnabled: settings.richEditingEnabled,
-			codeEditingEnabled: settings.codeEditingEnabled,
-		};
-	} );
+		isListViewOpened,
+	} = useSelect( editPostStore );
+	const isModeToggleDisabled = useSelect( ( select ) => {
+		const { richEditingEnabled, codeEditingEnabled } = select(
+			editorStore
+		).getEditorSettings();
+		return ! richEditingEnabled || ! codeEditingEnabled;
+	}, [] );
 
 	const {
 		switchEditorMode,
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		toggleFeature,
-	} = useDispatch( 'core/edit-post' );
-	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
+		setIsListViewOpened,
+	} = useDispatch( editPostStore );
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -58,7 +63,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-block-navigation',
 			category: 'global',
-			description: __( 'Open the block navigation menu.' ),
+			description: __( 'Open the block list view.' ),
 			keyCombination: {
 				modifier: 'access',
 				character: 'o',
@@ -127,7 +132,7 @@ function KeyboardShortcuts() {
 		},
 		{
 			bindGlobal: true,
-			isDisabled: ! richEditingEnabled || ! codeEditingEnabled,
+			isDisabled: isModeToggleDisabled,
 		}
 	);
 
@@ -157,6 +162,12 @@ function KeyboardShortcuts() {
 				openGeneralSidebar( sidebarToOpen );
 			}
 		},
+		{ bindGlobal: true }
+	);
+
+	useShortcut(
+		'core/edit-post/toggle-block-navigation',
+		() => setIsListViewOpened( ! isListViewOpened() ),
 		{ bindGlobal: true }
 	);
 

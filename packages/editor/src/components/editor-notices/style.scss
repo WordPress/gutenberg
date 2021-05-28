@@ -3,7 +3,7 @@
 	position: sticky;
 	top: 0;
 	right: 0;
-	color: $dark-gray-900;
+	color: $gray-900;
 }
 
 // Non-dismissible notices.
@@ -12,7 +12,7 @@
 	left: 0;
 	top: 0;
 	right: 0;
-	color: $dark-gray-900;
+	color: $gray-900;
 }
 
 .components-editor-notices__dismissible,
@@ -30,13 +30,5 @@
 		.components-notice__dismiss {
 			margin-top: $grid-unit-15;
 		}
-	}
-}
-
-.components-editor-notices__snackbar {
-	width: 100%;
-	@include break-medium() {
-		width: fit-content;
-		width: -moz-fit-content;
 	}
 }

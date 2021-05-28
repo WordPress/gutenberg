@@ -1,36 +1,27 @@
 /**
  * External dependencies
  */
-import { render, unmountComponentAtNode } from 'react-dom';
-import { act, Simulate } from 'react-dom/test-utils';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { UP, DOWN } from '@wordpress/keycodes';
+import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import NumberControl from '../';
+import BaseNumberControl from '../';
 
-let container = null;
+const getInput = () => screen.getByTestId( 'input' );
 
-function getInput() {
-	return container.querySelector( 'input' );
-}
+const fireKeyDown = ( data ) =>
+	fireEvent.keyDown( document.activeElement || document.body, data );
 
-beforeEach( () => {
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
-
-afterEach( () => {
-	unmountComponentAtNode( container );
-	container.remove();
-	container = null;
-} );
+const NumberControl = ( props ) => (
+	<BaseNumberControl { ...props } data-testid="input" />
+);
 
 function StatefulNumberControl( props ) {
 	const [ value, setValue ] = useState( props.value );
@@ -48,147 +39,141 @@ function StatefulNumberControl( props ) {
 describe( 'NumberControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
-			act( () => {
-				render( <NumberControl />, container );
-			} );
-
-			const input = getInput();
-
-			expect( input ).not.toBeNull();
+			render( <NumberControl /> );
+			expect( getInput() ).not.toBeNull();
 		} );
 
 		it( 'should render custom className', () => {
-			act( () => {
-				render( <NumberControl className="hello" />, container );
-			} );
-
-			const input = getInput();
-
-			expect( input.classList.contains( 'hello' ) ).toBe( true );
+			render( <NumberControl className="hello" /> );
+			expect( getInput() ).toBeTruthy();
 		} );
 	} );
 
 	describe( 'onChange handling', () => {
-		it( 'should provide onChange callback with string value', () => {
+		it( 'should provide onChange callback with number value', () => {
 			const spy = jest.fn();
-			act( () => {
-				render(
-					<NumberControl value={ 5 } onChange={ spy } />,
-					container
-				);
-			} );
+
+			render(
+				<NumberControl value={ 5 } onChange={ ( v ) => spy( v ) } />
+			);
 
 			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: 10 } } );
 
-			input.value = 10;
-			Simulate.change( input );
+			expect( spy ).toHaveBeenCalledWith( '10' );
+		} );
+	} );
 
-			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( '10' );
+	describe( 'Validation', () => {
+		it( 'should clamp value within range on ENTER keypress', () => {
+			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: -100 } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			/**
+			 * This is zero because the value has been adjusted to
+			 * respect the min/max range of the input.
+			 */
+
+			expect( input.value ).toBe( '0' );
+		} );
+
+		it( 'should parse to number value on ENTER keypress', () => {
+			render( <NumberControl value={ 5 } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '10 abc' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '0' );
 		} );
 	} );
 
 	describe( 'Key UP interactions', () => {
 		it( 'should fire onKeyDown callback', () => {
 			const spy = jest.fn();
-			act( () => {
-				render(
-					<StatefulNumberControl value={ 5 } onKeyDown={ spy } />,
-					container
-				);
-			} );
 
-			const input = getInput();
+			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
 
-			Simulate.keyDown( input, { keyCode: UP } );
+			getInput().focus();
+			fireKeyDown( { keyCode: UP } );
 
 			expect( spy ).toHaveBeenCalled();
 		} );
 
 		it( 'should increment by step on key UP press', () => {
-			act( () => {
-				render( <StatefulNumberControl value={ 5 } />, container );
-			} );
+			render( <StatefulNumberControl value={ 5 } /> );
 
 			const input = getInput();
-
-			Simulate.keyDown( input, { keyCode: UP } );
+			input.focus();
+			fireKeyDown( { keyCode: UP } );
 
 			expect( input.value ).toBe( '6' );
 		} );
 
 		it( 'should increment from a negative value', () => {
-			act( () => {
-				render( <StatefulNumberControl value={ -5 } />, container );
-			} );
+			render( <StatefulNumberControl value={ -5 } /> );
 
 			const input = getInput();
-
-			Simulate.keyDown( input, { keyCode: UP } );
+			input.focus();
+			fireKeyDown( { keyCode: UP } );
 
 			expect( input.value ).toBe( '-4' );
 		} );
 
 		it( 'should increment by shiftStep on key UP + shift press', () => {
-			act( () => {
-				render( <StatefulNumberControl value={ 5 } />, container );
-			} );
+			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
 
 			const input = getInput();
+			input.focus();
+			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
-
-			expect( input.value ).toBe( '15' );
+			expect( input.value ).toBe( '20' );
 		} );
 
 		it( 'should increment by custom shiftStep on key UP + shift press', () => {
-			act( () => {
-				render(
-					<StatefulNumberControl value={ 5 } shiftStep={ 100 } />,
-					container
-				);
-			} );
+			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
 
 			const input = getInput();
+			input.focus();
+			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
-
-			expect( input.value ).toBe( '105' );
+			expect( input.value ).toBe( '100' );
 		} );
 
 		it( 'should increment but be limited by max on shiftStep', () => {
-			act( () => {
-				render(
-					<StatefulNumberControl
-						value={ 5 }
-						shiftStep={ 100 }
-						max={ 99 }
-					/>,
-					container
-				);
-			} );
+			render(
+				<StatefulNumberControl
+					value={ 5 }
+					shiftStep={ 100 }
+					max={ 99 }
+				/>
+			);
 
 			const input = getInput();
-
-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			input.focus();
+			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
 			expect( input.value ).toBe( '99' );
 		} );
 
 		it( 'should not increment by shiftStep if disabled', () => {
-			act( () => {
-				render(
-					<StatefulNumberControl
-						value={ 5 }
-						shiftStep={ 100 }
-						isShiftStepEnabled={ false }
-					/>,
-					container
-				);
-			} );
+			render(
+				<StatefulNumberControl
+					value={ 5 }
+					shiftStep={ 100 }
+					isShiftStepEnabled={ false }
+				/>
+			);
 
 			const input = getInput();
-
-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			input.focus();
+			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
 			expect( input.value ).toBe( '6' );
 		} );
@@ -197,105 +182,82 @@ describe( 'NumberControl', () => {
 	describe( 'Key DOWN interactions', () => {
 		it( 'should fire onKeyDown callback', () => {
 			const spy = jest.fn();
-			act( () => {
-				render(
-					<StatefulNumberControl value={ 5 } onKeyDown={ spy } />,
-					container
-				);
-			} );
+			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
 
-			const input = getInput();
-
-			Simulate.keyDown( input, { keyCode: DOWN } );
+			getInput().focus();
+			fireKeyDown( { keyCode: DOWN } );
 
 			expect( spy ).toHaveBeenCalled();
 		} );
 
 		it( 'should decrement by step on key DOWN press', () => {
-			act( () => {
-				render( <StatefulNumberControl value={ 5 } />, container );
-			} );
+			render( <StatefulNumberControl value={ 5 } /> );
 
 			const input = getInput();
-
-			Simulate.keyDown( input, { keyCode: DOWN } );
+			input.focus();
+			fireKeyDown( { keyCode: DOWN } );
 
 			expect( input.value ).toBe( '4' );
 		} );
 
 		it( 'should decrement from a negative value', () => {
-			act( () => {
-				render( <StatefulNumberControl value={ -5 } />, container );
-			} );
+			render( <StatefulNumberControl value={ -5 } /> );
 
 			const input = getInput();
-
-			Simulate.keyDown( input, { keyCode: DOWN } );
+			input.focus();
+			fireKeyDown( { keyCode: DOWN } );
 
 			expect( input.value ).toBe( '-6' );
 		} );
 
 		it( 'should decrement by shiftStep on key DOWN + shift press', () => {
-			act( () => {
-				render( <StatefulNumberControl value={ 5 } />, container );
-			} );
+			render( <StatefulNumberControl value={ 5 } /> );
 
 			const input = getInput();
+			input.focus();
+			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
-
-			expect( input.value ).toBe( '-5' );
+			expect( input.value ).toBe( '0' );
 		} );
 
 		it( 'should decrement by custom shiftStep on key DOWN + shift press', () => {
-			act( () => {
-				render(
-					<StatefulNumberControl value={ 5 } shiftStep={ 100 } />,
-					container
-				);
-			} );
+			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
 
 			const input = getInput();
+			input.focus();
+			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
-
-			expect( input.value ).toBe( '-95' );
+			expect( input.value ).toBe( '-100' );
 		} );
 
 		it( 'should decrement but be limited by min on shiftStep', () => {
-			act( () => {
-				render(
-					<StatefulNumberControl
-						value={ 5 }
-						shiftStep={ 100 }
-						min={ 4 }
-					/>,
-					container
-				);
-			} );
+			render(
+				<StatefulNumberControl
+					value={ 5 }
+					shiftStep={ 100 }
+					min={ 4 }
+				/>
+			);
 
 			const input = getInput();
-
-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			input.focus();
+			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
 			expect( input.value ).toBe( '4' );
 		} );
 
 		it( 'should not decrement by shiftStep if disabled', () => {
-			act( () => {
-				render(
-					<StatefulNumberControl
-						value={ 5 }
-						shiftStep={ 100 }
-						isShiftStepEnabled={ false }
-					/>,
-					container
-				);
-			} );
+			render(
+				<StatefulNumberControl
+					value={ 5 }
+					shiftStep={ 100 }
+					isShiftStepEnabled={ false }
+				/>
+			);
 
 			const input = getInput();
-
-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			input.focus();
+			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
 			expect( input.value ).toBe( '4' );
 		} );

@@ -8,5 +8,6 @@ export async function openDocumentSettingsSidebar() {
 
 	if ( openButton ) {
 		await openButton.click();
+		await page.waitForSelector( '.edit-post-sidebar' );
 	}
 }

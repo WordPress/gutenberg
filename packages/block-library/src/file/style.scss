@@ -10,11 +10,15 @@
 		text-align: right;
 	}
 
+	.wp-block-file__embed {
+		margin-bottom: 1em;
+	}
+
 	.wp-block-file__button {
-		background: $dark-gray-700;
+		background: #32373c;
 		border-radius: 2em;
 		color: $white;
-		font-size: $default-font-size;
+		font-size: 0.8em;
 		padding: 0.5em 1em;
 	}
 

@@ -45,7 +45,6 @@ import {
 	MediaPlaceholder as RootMediaPlaceholder,
 	MediaUpload as RootMediaUpload,
 	MediaUploadCheck as RootMediaUploadCheck,
-	MultiBlocksSwitcher as RootMultiBlocksSwitcher,
 	MultiSelectScrollIntoView as RootMultiSelectScrollIntoView,
 	NavigableToolbar as RootNavigableToolbar,
 	ObserveTyping as RootObserveTyping,
@@ -66,6 +65,7 @@ export { default as ServerSideRender } from '@wordpress/server-side-render';
 function deprecateComponent( name, Wrapped, staticsToHoist = [] ) {
 	const Component = forwardRef( ( props, ref ) => {
 		deprecated( 'wp.editor.' + name, {
+			since: '5.3',
 			alternative: 'wp.blockEditor.' + name,
 		} );
 
@@ -85,6 +85,7 @@ function deprecateComponent( name, Wrapped, staticsToHoist = [] ) {
 function deprecateFunction( name, func ) {
 	return ( ...args ) => {
 		deprecated( 'wp.editor.' + name, {
+			since: '5.3',
 			alternative: 'wp.blockEditor.' + name,
 		} );
 
@@ -208,10 +209,6 @@ export const MediaUpload = deprecateComponent( 'MediaUpload', RootMediaUpload );
 export const MediaUploadCheck = deprecateComponent(
 	'MediaUploadCheck',
 	RootMediaUploadCheck
-);
-export const MultiBlocksSwitcher = deprecateComponent(
-	'MultiBlocksSwitcher',
-	RootMultiBlocksSwitcher
 );
 export const MultiSelectScrollIntoView = deprecateComponent(
 	'MultiSelectScrollIntoView',

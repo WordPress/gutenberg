@@ -2,19 +2,20 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import {
+	__unstableGetAnimateClassName as getAnimateClassName,
+	Button,
+} from '@wordpress/components';
+import { usePrevious, useViewportMatch } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Animate, Button } from '@wordpress/components';
-import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { displayShortcut } from '@wordpress/keycodes';
-import { withSafeTimeout, compose } from '@wordpress/compose';
-import { withViewportMatch } from '@wordpress/viewport';
 import { Icon, check, cloud, cloudUpload } from '@wordpress/icons';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -22,155 +23,155 @@ import { Icon, check, cloud, cloudUpload } from '@wordpress/icons';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 
 /**
- * Component showing whether the post is saved or not and displaying save links.
+ * Component showing whether the post is saved or not and providing save
+ * buttons.
  *
- * @param   {Object}    Props Component Props.
+ * @param {Object} props               Component props.
+ * @param {?boolean} props.forceIsDirty  Whether to force the post to be marked
+ * as dirty.
+ * @param {?boolean} props.forceIsSaving Whether to force the post to be marked
+ * as being saved.
+ * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
+ * @return {import('@wordpress/element').WPComponent} The component.
  */
-export class PostSavedState extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			forceSavedMessage: false,
-		};
-	}
+export default function PostSavedState( {
+	forceIsDirty,
+	forceIsSaving,
+	showIconLabels = false,
+} ) {
+	const [ forceSavedMessage, setForceSavedMessage ] = useState( false );
+	const isLargeViewport = useViewportMatch( 'small' );
 
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.isSaving && ! this.props.isSaving ) {
-			this.setState( { forceSavedMessage: true } );
-			this.props.setTimeout( () => {
-				this.setState( { forceSavedMessage: false } );
+	const {
+		isAutosaving,
+		isDirty,
+		isNew,
+		isPending,
+		isPublished,
+		isSaveable,
+		isSaving,
+		isScheduled,
+		hasPublishAction,
+	} = useSelect(
+		( select ) => {
+			const {
+				isEditedPostNew,
+				isCurrentPostPublished,
+				isCurrentPostScheduled,
+				isEditedPostDirty,
+				isSavingPost,
+				isEditedPostSaveable,
+				getCurrentPost,
+				isAutosavingPost,
+				getEditedPostAttribute,
+			} = select( 'core/editor' );
+
+			return {
+				isAutosaving: isAutosavingPost(),
+				isDirty: forceIsDirty || isEditedPostDirty(),
+				isNew: isEditedPostNew(),
+				isPending: 'pending' === getEditedPostAttribute( 'status' ),
+				isPublished: isCurrentPostPublished(),
+				isSaving: forceIsSaving || isSavingPost(),
+				isSaveable: isEditedPostSaveable(),
+				isScheduled: isCurrentPostScheduled(),
+				hasPublishAction:
+					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
+			};
+		},
+		[ forceIsDirty, forceIsSaving ]
+	);
+
+	const { savePost } = useDispatch( 'core/editor' );
+
+	const wasSaving = usePrevious( isSaving );
+
+	useEffect( () => {
+		let timeoutId;
+
+		if ( wasSaving && ! isSaving ) {
+			setForceSavedMessage( true );
+			timeoutId = setTimeout( () => {
+				setForceSavedMessage( false );
 			}, 1000 );
 		}
+
+		return () => clearTimeout( timeoutId );
+	}, [ isSaving ] );
+
+	if ( isSaving ) {
+		// TODO: Classes generation should be common across all return
+		// paths of this function, including proper naming convention for
+		// the "Save Draft" button.
+		const classes = classnames(
+			'editor-post-saved-state',
+			'is-saving',
+			getAnimateClassName( { type: 'loading' } ),
+			{
+				'is-autosaving': isAutosaving,
+			}
+		);
+
+		return (
+			<span className={ classes }>
+				<Icon icon={ cloud } />
+				{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
+			</span>
+		);
 	}
 
-	render() {
-		const {
-			post,
-			isNew,
-			isScheduled,
-			isPublished,
-			isDirty,
-			isSaving,
-			isSaveable,
-			onSave,
-			isAutosaving,
-			isPending,
-			isLargeViewport,
-		} = this.props;
-		const { forceSavedMessage } = this.state;
-		if ( isSaving ) {
-			// TODO: Classes generation should be common across all return
-			// paths of this function, including proper naming convention for
-			// the "Save Draft" button.
-			const classes = classnames(
-				'editor-post-saved-state',
-				'is-saving',
-				{
-					'is-autosaving': isAutosaving,
-				}
-			);
+	if ( isPublished || isScheduled ) {
+		return <PostSwitchToDraftButton />;
+	}
 
-			return (
-				<Animate type="loading">
-					{ ( { className: animateClassName } ) => (
-						<span
-							className={ classnames(
-								classes,
-								animateClassName
-							) }
-						>
-							<Icon icon={ cloud } />
-							{ isAutosaving
-								? __( 'Autosaving' )
-								: __( 'Saving' ) }
-						</span>
-					) }
-				</Animate>
-			);
-		}
+	if ( ! isSaveable ) {
+		return null;
+	}
 
-		if ( isPublished || isScheduled ) {
-			return <PostSwitchToDraftButton />;
-		}
-
-		if ( ! isSaveable ) {
-			return null;
-		}
-
-		if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
-			return (
-				<span className="editor-post-saved-state is-saved">
-					<Icon icon={ check } />
-					{ __( 'Saved' ) }
-				</span>
-			);
-		}
-
-		// Once the post has been submitted for review this button
-		// is not needed for the contributor role.
-		const hasPublishAction = get(
-			post,
-			[ '_links', 'wp:action-publish' ],
-			false
+	if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
+		return (
+			<span className="editor-post-saved-state is-saved">
+				<Icon icon={ check } />
+				{ __( 'Saved' ) }
+			</span>
 		);
-		if ( ! hasPublishAction && isPending ) {
-			return null;
-		}
+	}
 
-		const label = isPending ? __( 'Save as Pending' ) : __( 'Save Draft' );
-		if ( ! isLargeViewport ) {
-			return (
-				<Button
-					className="editor-post-save-draft"
-					label={ label }
-					onClick={ () => onSave() }
-					shortcut={ displayShortcut.primary( 's' ) }
-					icon={ cloudUpload }
-				/>
-			);
-		}
+	// Once the post has been submitted for review this button
+	// is not needed for the contributor role.
 
+	if ( ! hasPublishAction && isPending ) {
+		return null;
+	}
+
+	/* translators: button label text should, if possible, be under 16 characters. */
+	const label = isPending ? __( 'Save as pending' ) : __( 'Save draft' );
+
+	/* translators: button label text should, if possible, be under 16 characters. */
+	const shortLabel = __( 'Save' );
+
+	if ( ! isLargeViewport ) {
 		return (
 			<Button
 				className="editor-post-save-draft"
-				onClick={ () => onSave() }
+				label={ label }
+				onClick={ () => savePost() }
 				shortcut={ displayShortcut.primary( 's' ) }
-				isTertiary
+				icon={ cloudUpload }
 			>
-				{ label }
+				{ showIconLabels && shortLabel }
 			</Button>
 		);
 	}
-}
 
-export default compose( [
-	withSelect( ( select, { forceIsDirty, forceIsSaving } ) => {
-		const {
-			isEditedPostNew,
-			isCurrentPostPublished,
-			isCurrentPostScheduled,
-			isEditedPostDirty,
-			isSavingPost,
-			isEditedPostSaveable,
-			getCurrentPost,
-			isAutosavingPost,
-			getEditedPostAttribute,
-		} = select( 'core/editor' );
-		return {
-			post: getCurrentPost(),
-			isNew: isEditedPostNew(),
-			isPublished: isCurrentPostPublished(),
-			isScheduled: isCurrentPostScheduled(),
-			isDirty: forceIsDirty || isEditedPostDirty(),
-			isSaving: forceIsSaving || isSavingPost(),
-			isSaveable: isEditedPostSaveable(),
-			isAutosaving: isAutosavingPost(),
-			isPending: 'pending' === getEditedPostAttribute( 'status' ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onSave: dispatch( 'core/editor' ).savePost,
-	} ) ),
-	withSafeTimeout,
-	withViewportMatch( { isLargeViewport: 'small' } ),
-] )( PostSavedState );
+	return (
+		<Button
+			className="editor-post-save-draft"
+			onClick={ () => savePost() }
+			shortcut={ displayShortcut.primary( 's' ) }
+			variant="tertiary"
+		>
+			{ label }
+		</Button>
+	);
+}

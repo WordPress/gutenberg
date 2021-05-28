@@ -8,31 +8,30 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getBlockDOMNode } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
+import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
 const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
+	const ref = useBlockRef( selectedBlockClientId );
 	const onClick = () => {
-		const selectedBlockElement = getBlockDOMNode( selectedBlockClientId );
-		selectedBlockElement.focus();
+		ref.current.focus();
 	};
 
-	return (
-		selectedBlockClientId && (
-			<Button
-				isSecondary
-				className="block-editor-skip-to-selected-block"
-				onClick={ onClick }
-			>
-				{ __( 'Skip to the selected block' ) }
-			</Button>
-		)
-	);
+	return selectedBlockClientId ? (
+		<Button
+			variant="secondary"
+			className="block-editor-skip-to-selected-block"
+			onClick={ onClick }
+		>
+			{ __( 'Skip to the selected block' ) }
+		</Button>
+	) : null;
 };
 
 export default withSelect( ( select ) => {
 	return {
 		selectedBlockClientId: select(
-			'core/block-editor'
+			blockEditorStore
 		).getBlockSelectionStart(),
 	};
 } )( SkipToSelectedBlock );

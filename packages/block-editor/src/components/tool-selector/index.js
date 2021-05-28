@@ -11,18 +11,14 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+import { forwardRef } from '@wordpress/element';
+import { Icon, edit as editIcon } from '@wordpress/icons';
 
-const editIcon = (
-	<SVG
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
-		height="24"
-		viewBox="0 0 24 24"
-	>
-		<Path d="M20.1 5.1L16.9 2 6.2 12.7l-1.3 4.4 4.5-1.3L20.1 5.1zM4 20.8h8v-1.5H4v1.5z" />
-	</SVG>
-);
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 const selectIcon = (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
@@ -34,16 +30,12 @@ const selectIcon = (
 	</SVG>
 );
 
-function ToolSelector() {
+function ToolSelector( props, ref ) {
 	const isNavigationTool = useSelect(
-		( select ) => select( 'core/block-editor' ).isNavigationMode(),
+		( select ) => select( blockEditorStore ).isNavigationMode(),
 		[]
 	);
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
-	const isMediumViewport = useViewportMatch( 'medium' );
-	if ( ! isMediumViewport ) {
-		return null;
-	}
+	const { setNavigationMode } = useDispatch( blockEditorStore );
 
 	const onSwitchMode = ( mode ) => {
 		setNavigationMode( mode === 'edit' ? false : true );
@@ -53,9 +45,13 @@ function ToolSelector() {
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
+					{ ...props }
+					ref={ ref }
 					icon={ isNavigationTool ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
+					aria-haspopup="true"
 					onClick={ onToggle }
+					/* translators: button label text should, if possible, be under 16 characters. */
 					label={ __( 'Tools' ) }
 				/>
 			) }
@@ -71,7 +67,7 @@ function ToolSelector() {
 									value: 'edit',
 									label: (
 										<>
-											{ editIcon }
+											<Icon icon={ editIcon } />
 											{ __( 'Edit' ) }
 										</>
 									),
@@ -90,7 +86,7 @@ function ToolSelector() {
 					</NavigableMenu>
 					<div className="block-editor-tool-selector__help">
 						{ __(
-							'Tools offer different interactions for block selection & editing. To select, press Escape, to go back to editing, press Enter.'
+							'Tools provide different interactions for selecting, navigating, and editing blocks. Toggle between select and edit by pressing Escape and Enter.'
 						) }
 					</div>
 				</>
@@ -99,4 +95,4 @@ function ToolSelector() {
 	);
 }
 
-export default ToolSelector;
+export default forwardRef( ToolSelector );

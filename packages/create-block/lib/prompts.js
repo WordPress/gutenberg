@@ -70,7 +70,7 @@ const category = {
 	type: 'list',
 	name: 'category',
 	message: 'The category name to help users browse and discover your block:',
-	choices: [ 'common', 'embed', 'formatting', 'layout', 'widgets' ],
+	choices: [ 'text', 'media', 'design', 'widgets', 'theme', 'embed' ],
 };
 
 const author = {

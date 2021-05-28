@@ -6,24 +6,29 @@ Render a URL input button that pops up an input to search for and select a post 
 
 ### `url: String`
 
-*Required.* This should be set to the attribute (or component state) property used to store the URL.
+_Required._ This should be set to the attribute (or component state) property used to store the URL.
 
 ### `onChange( url: String, ?post: Object ): Function`
 
-*Required.* Called when the value changes. The second parameter is `null` unless the user selects a post from the suggestions dropdown. In those cases the `post` parameter will look like this:
+_Required._ Called when the value changes. The second parameter is `null` unless the user selects a post from the suggestions dropdown. In those cases the `post` parameter will look like this:
 
 ```json
 {
-  "id": 1,
-  "subtype": "page",
-  "title": "Sample Page",
-  "type": "post",
-  "url": "https://example.com/sample-page/",
-  "_links": {
-    "self": [ { "embeddable": true, "href": "https://example.com/wp-json/wp/v2/pages/1" } ],
-    "about": [ { "href": "https://example.com/wp-json/wp/v2/types/page" } ],
-    "collection": [ { "href": "https://example.com/wp-json/wp/v2/search" } ]
-  }
+	"id": 1,
+	"subtype": "page",
+	"title": "Sample Page",
+	"type": "post",
+	"url": "https://example.com/sample-page/",
+	"_links": {
+		"self": [
+			{
+				"embeddable": true,
+				"href": "https://example.com/wp-json/wp/v2/pages/1"
+			}
+		],
+		"about": [ { "href": "https://example.com/wp-json/wp/v2/types/page" } ],
+		"collection": [ { "href": "https://example.com/wp-json/wp/v2/search" } ]
+	}
 }
 ```
 
@@ -33,6 +38,7 @@ This prop is passed directly to the `URLInput` component.
 
 {% codetabs %}
 {% ES5 %}
+
 ```js
 wp.blocks.registerBlockType( /* ... */, {
 	// ...
@@ -63,7 +69,9 @@ wp.blocks.registerBlockType( /* ... */, {
 	}
 } );
 ```
+
 {% ESNext %}
+
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import { URLInputButton } from '@wordpress/block-editor';
@@ -94,6 +102,7 @@ registerBlockType( /* ... */, {
 	}
 } );
 ```
+
 {% end %}
 
 # `URLInput`
@@ -104,44 +113,43 @@ Renders the URL input field used by the `URLInputButton` component. It can be us
 
 ### `value: String`
 
-*Required.* This should be set to the attribute (or component state) property used to store the URL.
+_Required._ This should be set to the attribute (or component state) property used to store the URL.
 
 ### `onChange( url: String, ?post: Object ): Function`
 
-*Required.* Called when the value changes. The second parameter is `null` unless the user selects a post from the suggestions dropdown. In those cases the `post` parameter will look like this:
+_Required._ Called when the value changes. The second parameter is `null` unless the user selects a post from the suggestions dropdown. In those cases the `post` parameter will look like this:
 
 ```json
 {
-  "id": 1,
-  "subtype": "page",
-  "title": "Sample Page",
-  "type": "post",
-  "url": "https://example.com/sample-page/",
-  "_links": {
-    "self": [ { "embeddable": true, "href": "https://example.com/wp-json/wp/v2/pages/1" } ],
-    "about": [ { "href": "https://example.com/wp-json/wp/v2/types/page" } ],
-    "collection": [ { "href": "https://example.com/wp-json/wp/v2/search" } ]
-  }
+	"id": 1,
+	"subtype": "page",
+	"title": "Sample Page",
+	"type": "post",
+	"url": "https://example.com/sample-page/",
+	"_links": {
+		"self": [
+			{
+				"embeddable": true,
+				"href": "https://example.com/wp-json/wp/v2/pages/1"
+			}
+		],
+		"about": [ { "href": "https://example.com/wp-json/wp/v2/types/page" } ],
+		"collection": [ { "href": "https://example.com/wp-json/wp/v2/search" } ]
+	}
 }
 ```
 
 ### `label: String`
 
-*Optional.* If this property is added, a label will be generated using label property as the content.
-
-### `autoFocus: Boolean`
-
-*Optional.* By default, the input will gain focus when it is rendered, as typically it is displayed conditionally. For example when clicking on `URLInputButton` or editing a block.
-
-If you are not conditionally rendering this component set this property to `false`.
+_Optional._ If this property is added, a label will be generated using label property as the content.
 
 ### `className: String`
 
-*Optional.* Adds and optional class to the parent `div` that wraps the URLInput field and popover
+_Optional._ Adds and optional class to the parent `div` that wraps the URLInput field and popover
 
 ### `disableSuggestions: Boolean`
 
-*Optional.* Provides additional control over whether suggestions are disabled.
+_Optional._ Provides additional control over whether suggestions are disabled.
 
 When hiding the URLInput using CSS (as is sometimes done for accessibility purposes), the suggestions can still be displayed. This is because they're rendered in a popover in a different part of the DOM, so any styles applied to the URLInput's container won't affect the popover.
 
@@ -151,6 +159,7 @@ This prop allows the suggestions list to be programmatically not rendered by pas
 
 {% codetabs %}
 {% ES5 %}
+
 ```js
 wp.blocks.registerBlockType( /* ... */, {
 	// ...
@@ -181,7 +190,9 @@ wp.blocks.registerBlockType( /* ... */, {
 	}
 } );
 ```
+
 {% ESNext %}
+
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import { URLInput } from '@wordpress/block-editor';
@@ -213,4 +224,5 @@ registerBlockType( /* ... */, {
 	}
 } );
 ```
+
 {% end %}

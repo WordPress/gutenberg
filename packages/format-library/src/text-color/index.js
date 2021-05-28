@@ -1,15 +1,14 @@
 /**
  * External dependencies
  */
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
+import { RichTextToolbarButton, useSetting } from '@wordpress/block-editor';
 import { Icon, textColor as textColorIcon } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 
@@ -19,24 +18,19 @@ import { removeFormat } from '@wordpress/rich-text';
 import { default as InlineColorUI, getActiveColor } from './inline';
 
 const name = 'core/text-color';
-const title = __( 'Text Color' );
+const title = __( 'Text color' );
 
 const EMPTY_ARRAY = [];
 
-function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
-	const { colors, disableCustomColors } = useSelect( ( select ) => {
-		const blockEditorSelect = select( 'core/block-editor' );
-		let settings;
-		if ( blockEditorSelect && blockEditorSelect.getSettings ) {
-			settings = blockEditorSelect.getSettings();
-		} else {
-			settings = {};
-		}
-		return {
-			colors: get( settings, [ 'colors' ], EMPTY_ARRAY ),
-			disableCustomColors: settings.disableCustomColors,
-		};
-	} );
+function TextColorEdit( {
+	value,
+	onChange,
+	isActive,
+	activeAttributes,
+	contentRef,
+} ) {
+	const allowCustomControl = useSetting( 'color.custom' );
+	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
 		setIsAddingColor,
@@ -54,8 +48,7 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 		};
 	}, [ value, colors ] );
 
-	const hasColorsToChoose =
-		! isEmpty( colors ) || disableCustomColors !== true;
+	const hasColorsToChoose = ! isEmpty( colors ) || ! allowCustomControl;
 	if ( ! hasColorsToChoose && ! isActive ) {
 		return null;
 	}
@@ -88,12 +81,11 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 			{ isAddingColor && (
 				<InlineColorUI
 					name={ name }
-					addingColor={ isAddingColor }
 					onClose={ disableIsAddingColor }
-					isActive={ isActive }
 					activeAttributes={ activeAttributes }
 					value={ value }
 					onChange={ onChange }
+					contentRef={ contentRef }
 				/>
 			) }
 		</>

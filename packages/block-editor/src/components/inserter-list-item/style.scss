@@ -10,7 +10,7 @@
 	flex-direction: column;
 	width: 100%;
 	font-size: $default-font-size;
-	color: $dark-gray-700;
+	color: $gray-900;
 	padding: $grid-unit-10;
 	align-items: stretch;
 	justify-content: center;
@@ -31,13 +31,13 @@
 
 	&:not(:disabled) {
 		&:hover {
-			border-color: $theme-color;
-			color: $theme-color !important;
+			border-color: var(--wp-admin-theme-color);
+			color: var(--wp-admin-theme-color) !important;
 		}
 
 		&.is-active {
 			color: $white;
-			background: $dark-gray-primary;
+			background: $gray-900;
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
@@ -49,7 +49,7 @@
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
 	border-radius: $radius-block-ui;
-	color: $dark-gray-primary;
+	color: $gray-900;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 
@@ -61,6 +61,10 @@
 	svg {
 		transition: all 0.15s ease-out;
 		@include reduce-motion("transition");
+	}
+
+	.block-editor-block-types-list__list-item[draggable="true"] & {
+		cursor: grab;
 	}
 }
 

@@ -1,11 +1,20 @@
 .edit-post-visual-editor {
 	position: relative;
-	padding-top: 50px;
-	// Default background color so that grey .edit-post-editor-regions__content color doesn't show through.
-	background-color: $white;
+	display: flex;
+	flex-flow: column;
 
+	// The button element easily inherits styles that are meant for the editor style.
+	// These rules enhance the specificity to reduce that inheritance.
+	// This is duplicated in edit-site.
 	& .components-button {
 		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 12px;
+
+		&.is-tertiary,
+		&.has-icon {
+			padding: 6px;
+		}
 	}
 
 	flex: 1 1 auto;
@@ -16,47 +25,42 @@
 	@supports (position: sticky) {
 		flex-basis: 100%;
 	}
+
 }
 
-.edit-post-visual-editor > .block-editor__typewriter,
-.edit-post-visual-editor > .block-editor__typewriter > div,
-.edit-post-visual-editor > .block-editor__typewriter > div > .block-editor-writing-flow,
-.edit-post-visual-editor > .block-editor__typewriter > div > .block-editor-writing-flow > .block-editor-writing-flow__click-redirect {
-	height: 100%;
-}
-
-.edit-post-visual-editor .block-editor-writing-flow__click-redirect {
-	// Allow the page to be scrolled with the last block in the middle.
-	min-height: 40vh;
-	width: 100%;
-}
-
-// Hide the extra space when there are metaboxes.
-.has-metaboxes .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
-	height: 0;
-}
-
-// Ideally this wrapper div is not needed but if we waant to match the positionning of blocks
+// Ideally this wrapper div is not needed but if we want to match the positioning of blocks
 // .block-editor-block-list__layout and block-editor-block-list__block
 // We need to have two DOM elements.
 .edit-post-visual-editor__post-title-wrapper {
-	// This padding is needed to match the block root container padding
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	@include break-small() {
-		padding-left: $block-side-ui-width;
-		padding-right: $block-side-ui-width;
-	}
-
 	.editor-post-title {
+		// Add some top margin.
+		margin-top: 2em;
+
 		// Center.
 		margin-left: auto;
 		margin-right: auto;
 
-		// Apply default block margin below the post title.
-		// This ensures the first block on the page is in a good position.
-		// This rule can be retired once the title becomes an actual block.
-		margin-bottom: ($block-padding * 2) + $block-spacing; // This matches 2em in the vanilla style.
+		// Margins between the title and the first block, or appender, do not collapse.
+		// By explicitly setting this to zero, we avoid "double margin".
+		margin-bottom: 0;
 	}
+}
+
+.edit-post-visual-editor__exit-template-mode {
+	position: absolute;
+	top: $grid-unit-10;
+	left: $grid-unit-10;
+	color: $white;
+
+	&:active:not([aria-disabled="true"]),
+	&:focus:not([aria-disabled="true"]),
+	&:hover {
+		color: $gray-100;
+	}
+}
+
+.edit-post-visual-editor__content-area {
+	width: 100%;
+	height: 100%;
+	position: relative;
 }

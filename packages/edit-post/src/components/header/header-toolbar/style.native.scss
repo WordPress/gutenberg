@@ -2,13 +2,13 @@
 .container {
 	height: $mobile-header-toolbar-height;
 	flex-direction: row;
-	background-color: #fff;
+	background-color: $app-background;
 	border-top-color: #e9eff3;
 	border-top-width: 1px;
 }
 
 .containerDark {
-	background-color: $background-dark-elevated;
+	background-color: $app-background-dark-alt;
 	border-top-color: $background-dark-elevated;
 }
 

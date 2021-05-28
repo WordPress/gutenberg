@@ -1,51 +1,37 @@
 /**
- * External dependencies
- */
-import { filter, map, some, forEach } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editWidgetsStore } from '../../store';
+
 function SaveButton() {
-	const { editedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
-		const {
-			hasEditsForEntityRecord,
-			isSavingEntityRecord,
-			getEntityRecords,
-		} = select( 'core' );
-		const widgetAreas = getEntityRecords( 'root', 'widgetArea' );
-		const widgetAreaIds = map( widgetAreas, ( { id } ) => id );
+	const { hasEditedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
+		const { getEditedWidgetAreas, isSavingWidgetAreas } = select(
+			editWidgetsStore
+		);
+
 		return {
-			editedWidgetAreaIds: filter( widgetAreaIds, ( id ) =>
-				hasEditsForEntityRecord( 'root', 'widgetArea', id )
-			),
-			isSaving: some( widgetAreaIds, ( id ) =>
-				isSavingEntityRecord( 'root', 'widgetArea', id )
-			),
+			hasEditedWidgetAreaIds: getEditedWidgetAreas()?.length > 0,
+			isSaving: isSavingWidgetAreas(),
 		};
 	}, [] );
-	const { saveEditedEntityRecord } = useDispatch( 'core' );
-
-	const onClick = useCallback( () => {
-		forEach( editedWidgetAreaIds, ( id ) => {
-			saveEditedEntityRecord( 'root', 'widgetArea', id );
-		} );
-	}, [ editedWidgetAreaIds ] );
+	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
 
 	return (
 		<Button
-			isPrimary
+			variant="primary"
 			isBusy={ isSaving }
 			aria-disabled={ isSaving }
-			onClick={ isSaving ? undefined : onClick }
-			disabled={ editedWidgetAreaIds.length === 0 }
+			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
+			disabled={ ! hasEditedWidgetAreaIds }
 		>
-			{ __( 'Update' ) }
+			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
 		</Button>
 	);
 }

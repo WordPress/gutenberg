@@ -9,6 +9,7 @@ import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 import { Component, cloneElement, renderToString } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { removep } from '@wordpress/autop';
 
 /**
  * Internal dependencies
@@ -17,8 +18,9 @@ import {
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 } from './registration';
-import { normalizeBlockType } from './utils';
+import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
 
 /**
@@ -36,7 +38,7 @@ import BlockContentProvider from '../block-content-provider';
  */
 export function getBlockDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
-	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
 	const className =
 		'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 
@@ -56,7 +58,7 @@ export function getBlockDefaultClassName( blockName ) {
  */
 export function getBlockMenuDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `editor-block-list-item-{name}` nomenclature.
-	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
 	const className =
 		'editor-block-list-item-' +
 		blockName.replace( /\//, '-' ).replace( /^core-/, '' );
@@ -65,6 +67,23 @@ export function getBlockMenuDefaultClassName( blockName ) {
 		'blocks.getBlockMenuDefaultClassName',
 		className,
 		blockName
+	);
+}
+
+const blockPropsProvider = {};
+
+/**
+ * Call within a save function to get the props for the block wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+export function getBlockProps( props = {} ) {
+	const { blockType, attributes } = blockPropsProvider;
+	return applyFilters(
+		'blocks.getSaveContent.extraProps',
+		{ ...props },
+		blockType,
+		attributes
 	);
 }
 
@@ -94,11 +113,19 @@ export function getSaveElement(
 		save = instance.render.bind( instance );
 	}
 
+	blockPropsProvider.blockType = blockType;
+	blockPropsProvider.attributes = attributes;
+
 	let element = save( { attributes, innerBlocks } );
+
+	const hasLightBlockWrapper =
+		blockType.apiVersion > 1 ||
+		hasBlockSupport( blockType, 'lightBlockWrapper', false );
 
 	if (
 		isObject( element ) &&
-		hasFilter( 'blocks.getSaveContent.extraProps' )
+		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
+		! hasLightBlockWrapper
 	) {
 		/**
 		 * Filters the props applied to the block save result element.
@@ -240,9 +267,7 @@ export function serializeAttributes( attributes ) {
  *
  * @return {string} HTML.
  */
-export function getBlockContent( block ) {
-	// @todo why not getBlockInnerHtml?
-
+export function getBlockInnerHTML( block ) {
 	// If block was parsed as invalid or encounters an error while generating
 	// save content, use original content instead to avoid content loss. If a
 	// block contains nested content, exempt it from this condition because we
@@ -309,7 +334,7 @@ export function getCommentDelimitedContent(
  */
 export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	const blockName = block.name;
-	const saveContent = getBlockContent( block );
+	const saveContent = getBlockInnerHTML( block );
 
 	if (
 		blockName === getUnregisteredTypeHandlerName() ||
@@ -321,6 +346,28 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	const blockType = getBlockType( blockName );
 	const saveAttributes = getCommentAttributes( blockType, block.attributes );
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+}
+
+export function __unstableSerializeAndClean( blocks ) {
+	// A single unmodified default block is assumed to
+	// be equivalent to an empty post.
+	if ( blocks.length === 1 && isUnmodifiedDefaultBlock( blocks[ 0 ] ) ) {
+		blocks = [];
+	}
+
+	let content = serialize( blocks );
+
+	// For compatibility, treat a post consisting of a
+	// single freeform block as legacy content and apply
+	// pre-block-editor removep'd content formatting.
+	if (
+		blocks.length === 1 &&
+		blocks[ 0 ].name === getFreeformContentHandlerName()
+	) {
+		content = removep( content );
+	}
+
+	return content;
 }
 
 /**

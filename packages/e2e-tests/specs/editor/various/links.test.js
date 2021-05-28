@@ -7,6 +7,7 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Links', () => {
@@ -300,9 +301,7 @@ describe( 'Links', () => {
 		// Make a collapsed selection inside the link
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowRight' );
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
+		await showBlockToolbar();
 		const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
 		await editButton.click();
 		await waitForAutoFocus();
@@ -319,7 +318,7 @@ describe( 'Links', () => {
 		// Disable reason: Wait for the animation to complete, since otherwise the
 		// click attempt may occur at the wrong point.
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 100 );
+		await page.waitForTimeout( 100 );
 
 		// Publish the post
 		await page.click( '.editor-post-publish-button' );
@@ -510,6 +509,11 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
+		// Wait for Gutenberg to finish the job.
+		await page.waitForXPath(
+			'//a[contains(@href,"w.org") and @target="_blank"]'
+		);
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Regression Test: This verifies that the UI is updated according to
@@ -545,6 +549,11 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Tab' );
 		// Uncheck the checkbox.
 		await page.keyboard.press( 'Space' );
+
+		// Wait for Gutenberg to finish the job.
+		await page.waitForXPath(
+			'//a[contains(@href,"wordpress.org") and not(@target)]'
+		);
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

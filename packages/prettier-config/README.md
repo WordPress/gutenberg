@@ -10,12 +10,14 @@ Install the module
 $ npm install @wordpress/prettier-config --save-dev
 ```
 
+**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+
 ## Usage
 
 Add this to your `package.json` file:
 
 ```json
-prettier": "@wordpress/prettier-config"
+"prettier": "@wordpress/prettier-config"
 ```
 
 Alternatively, add this to `.prettierrc` file:

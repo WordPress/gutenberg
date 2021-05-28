@@ -7,6 +7,7 @@ import { forEach } from 'lodash';
  * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -29,6 +30,8 @@ const listener = new Listener();
  * manages unbinding when the component unmounts, and binding at most a single
  * event handler for the entire application.
  *
+ * @deprecated
+ *
  * @param {Object<string,string>} eventTypesToHandlers Object with keys of DOM
  *                                                     event type, the value a
  *                                                     name of the function on
@@ -38,7 +41,12 @@ const listener = new Listener();
  *
  * @return {Function} Higher-order component.
  */
-function withGlobalEvents( eventTypesToHandlers ) {
+export default function withGlobalEvents( eventTypesToHandlers ) {
+	deprecated( 'wp.compose.withGlobalEvents', {
+		since: '5.7',
+		alternative: 'useEffect',
+	} );
+
 	return createHigherOrderComponent( ( WrappedComponent ) => {
 		class Wrapper extends Component {
 			constructor() {
@@ -92,5 +100,3 @@ function withGlobalEvents( eventTypesToHandlers ) {
 		} );
 	}, 'withGlobalEvents' );
 }
-
-export default withGlobalEvents;

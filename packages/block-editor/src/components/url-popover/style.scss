@@ -1,5 +1,5 @@
 .block-editor-url-popover__additional-controls {
-	border-top: $border-width solid $light-gray-500;
+	border-top: $border-width solid $gray-300;
 }
 
 .block-editor-url-popover__additional-controls > div[role="menu"] .components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) > svg {
@@ -7,7 +7,7 @@
 }
 
 .block-editor-url-popover__additional-controls div[role="menu"] > .components-button {
-	padding-left: 2px;
+	padding-left: $grid-unit-15;
 }
 
 .block-editor-url-popover__row {
@@ -26,7 +26,7 @@
 
 	> svg {
 		padding: 5px;
-		border-radius: $radius-round-rectangle;
+		border-radius: $radius-block-ui;
 		height: 30px;
 		width: 30px;
 	}
@@ -45,7 +45,7 @@
 
 	// Add a left divider to the toggle button.
 	border-radius: 0;
-	border-left: $border-width solid $light-gray-500;
+	border-left: $border-width solid $gray-300;
 	margin-left: 1px;
 
 	&[aria-expanded="true"] .dashicon {
@@ -61,8 +61,8 @@
 
 .block-editor-url-popover__settings {
 	display: block;
-	padding: $panel-padding;
-	border-top: $border-width solid $light-gray-500;
+	padding: $grid-unit-20;
+	border-top: $border-width solid $gray-300;
 }
 
 .block-editor-url-popover__link-editor,

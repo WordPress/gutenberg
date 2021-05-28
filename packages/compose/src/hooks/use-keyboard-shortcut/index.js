@@ -8,7 +8,7 @@ import { includes, castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * A block selection object.
@@ -18,13 +18,13 @@ import { useEffect } from '@wordpress/element';
  * @property {boolean} [bindGlobal]  Handle keyboard events anywhere including inside textarea/input fields.
  * @property {string}  [eventName]   Event name used to trigger the handler, defaults to keydown.
  * @property {boolean} [isDisabled]  Disables the keyboard handler if the value is true.
- * @property {Object}  [target]      React reference to the DOM element used to catch the keyboard event.
+ * @property {import('react').RefObject<HTMLElement>}  [target]      React reference to the DOM element used to catch the keyboard event.
  */
 
 /**
  * Return true if platform is MacOS.
  *
- * @param {Object} _window   window object by default; used for DI testing.
+ * @param {Window} [_window]   window object by default; used for DI testing.
  *
  * @return {boolean} True if MacOS; false otherwise.
  */
@@ -37,14 +37,18 @@ function isAppleOS( _window = window ) {
 	);
 }
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Attach a keyboard shortcut handler.
  *
- * @param {string[]|string}         shortcuts  Keyboard Shortcuts.
- * @param {Function}                callback   Shortcut callback.
- * @param {WPKeyboardShortcutConfig} options    Shortcut options.
+ * @see https://craig.is/killing/mice#api.bind for information about the `callback` parameter.
+ *
+ * @param {string[]|string} shortcuts Keyboard Shortcuts.
+ * @param {(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void} callback Shortcut callback.
+ * @param {WPKeyboardShortcutConfig} options Shortcut options.
  */
 function useKeyboardShortcut(
+	/* eslint-enable jsdoc/valid-types */
 	shortcuts,
 	callback,
 	{
@@ -54,11 +58,23 @@ function useKeyboardShortcut(
 		target,
 	} = {}
 ) {
+	const currentCallback = useRef( callback );
+	useEffect( () => {
+		currentCallback.current = callback;
+	}, [ callback ] );
+
 	useEffect( () => {
 		if ( isDisabled ) {
 			return;
 		}
-		const mousetrap = new Mousetrap( target ? target.current : document );
+		const mousetrap = new Mousetrap(
+			target && target.current
+				? target.current
+				: // We were passing `document` here previously, so to successfully cast it to Element we must cast it first to `unknown`.
+				  // Not sure if this is a mistake but it was the behavior previous to the addition of types so we're just doing what's
+				  // necessary to maintain the existing behavior
+				  /** @type {Element} */ (/** @type {unknown} */ ( document ))
+		);
 		castArray( shortcuts ).forEach( ( shortcut ) => {
 			const keys = shortcut.split( '+' );
 			// Determines whether a key is a modifier by the length of the string.
@@ -82,13 +98,23 @@ function useKeyboardShortcut(
 			}
 
 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
-			mousetrap[ bindFn ]( shortcut, callback, eventName );
+			// @ts-ignore `bindGlobal` is an undocumented property
+			mousetrap[ bindFn ](
+				shortcut,
+				(
+					/* eslint-disable jsdoc/valid-types */
+					/** @type {[e: import('mousetrap').ExtendedKeyboardEvent, combo: string]} */ ...args
+				) =>
+					/* eslint-enable jsdoc/valid-types */
+					currentCallback.current( ...args ),
+				eventName
+			);
 		} );
 
 		return () => {
 			mousetrap.reset();
 		};
-	}, [ shortcuts, bindGlobal, eventName, callback, target, isDisabled ] );
+	}, [ shortcuts, bindGlobal, eventName, target, isDisabled ] );
 }
 
 export default useKeyboardShortcut;

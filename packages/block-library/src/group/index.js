@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { group as icon } from '@wordpress/icons';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,15 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Group' ),
 	icon,
-	description: __( 'A block that groups other blocks.' ),
-	keywords: [
-		__( 'container' ),
-		__( 'wrapper' ),
-		__( 'row' ),
-		__( 'section' ),
-	],
 	example: {
 		attributes: {
 			style: {
@@ -88,13 +79,6 @@ export const settings = {
 			},
 		],
 	},
-	supports: {
-		align: [ 'wide', 'full' ],
-		anchor: true,
-		html: false,
-		lightBlockWrapper: true,
-		__experimentalColor: Platform.OS === 'web' && { gradients: true },
-	},
 	transforms: {
 		from: [
 			{
@@ -148,7 +132,6 @@ export const settings = {
 			},
 		],
 	},
-
 	edit,
 	save,
 	deprecated,

@@ -6,17 +6,20 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { withWeakMapCache } from '../utils';
+import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
 
 /**
  * An object of properties describing a specific query.
  *
  * @typedef {Object} WPQueriedDataQueryParts
  *
- * @property {number} page      The query page (1-based index, default 1).
- * @property {number} perPage   Items per page for query (default 10).
- * @property {string} stableKey An encoded stable string of all non-pagination
- *                              query parameters.
+ * @property {number}      page      The query page (1-based index, default 1).
+ * @property {number}      perPage   Items per page for query (default 10).
+ * @property {string}      stableKey An encoded stable string of all non-
+ *                                   pagination, non-fields query parameters.
+ * @property {?(string[])} fields    Target subset of fields to derive from
+ *                                   item objects.
+ * @property {?(number[])} include   Specific item IDs to include.
  */
 
 /**
@@ -36,6 +39,8 @@ export function getQueryParts( query ) {
 		stableKey: '',
 		page: 1,
 		perPage: 10,
+		fields: null,
+		include: null,
 	};
 
 	// Ensure stable key by sorting keys. Also more efficient for iterating.
@@ -43,17 +48,35 @@ export function getQueryParts( query ) {
 
 	for ( let i = 0; i < keys.length; i++ ) {
 		const key = keys[ i ];
-		const value = query[ key ];
+		let value = query[ key ];
 
 		switch ( key ) {
 			case 'page':
 				parts[ key ] = Number( value );
 				break;
+
 			case 'per_page':
 				parts.perPage = Number( value );
 				break;
 
+			case 'include':
+				parts.include = getNormalizedCommaSeparable( value ).map(
+					Number
+				);
+				break;
+
 			default:
+				// While in theory, we could exclude "_fields" from the stableKey
+				// because two request with different fields have the same results
+				// We're not able to ensure that because the server can decide to omit
+				// fields from the response even if we explicitely asked for it.
+				// Example: Asking for titles in posts without title support.
+				if ( key === '_fields' ) {
+					parts.fields = getNormalizedCommaSeparable( value );
+					// Make sure to normalize value for `stableKey`
+					value = parts.fields.join();
+				}
+
 				// While it could be any deterministic string, for simplicity's
 				// sake mimic querystring encoding for stable key.
 				//

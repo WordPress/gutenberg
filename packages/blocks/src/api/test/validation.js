@@ -8,6 +8,7 @@ import {
 	getTextWithCollapsedWhitespace,
 	getMeaningfulAttributePairs,
 	isEquivalentTextTokens,
+	getNormalizedLength,
 	getNormalizedStyleValue,
 	getStyleProperties,
 	isEqualAttributesOfName,
@@ -18,6 +19,7 @@ import {
 	isValidBlockContent,
 	isClosedByToken,
 } from '../validation';
+import { createLogger } from '../validation/logger';
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -28,7 +30,7 @@ import {
 describe( 'validation', () => {
 	const defaultBlockSettings = {
 		save: ( { attributes } ) => attributes.fruit,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 	beforeAll( () => {
@@ -161,6 +163,32 @@ describe( 'validation', () => {
 		} );
 	} );
 
+	describe( 'getNormalizedLength()', () => {
+		it( 'omits unit from zero px length', () => {
+			const normalizedLength = getNormalizedLength( '0px' );
+
+			expect( normalizedLength ).toBe( '0' );
+		} );
+
+		it( 'retains unit in non-zero px length', () => {
+			const normalizedLength = getNormalizedLength( '50px' );
+
+			expect( normalizedLength ).toBe( '50px' );
+		} );
+
+		it( 'omits unit from zero percentage', () => {
+			const normalizedLength = getNormalizedLength( '0%' );
+
+			expect( normalizedLength ).toBe( '0' );
+		} );
+
+		it( 'retains unit in non-zero percentage', () => {
+			const normalizedLength = getNormalizedLength( '50%' );
+
+			expect( normalizedLength ).toBe( '50%' );
+		} );
+	} );
+
 	describe( 'getNormalizedStyleValue()', () => {
 		it( 'omits whitespace and quotes from url value', () => {
 			const normalizedValue = getNormalizedStyleValue(
@@ -170,6 +198,22 @@ describe( 'validation', () => {
 			expect( normalizedValue ).toBe(
 				'url(https://wordpress.org/img.png)'
 			);
+		} );
+
+		it( 'omits length units from zero values', () => {
+			const normalizedValue = getNormalizedStyleValue(
+				'44% 0% 18em 0em'
+			);
+
+			expect( normalizedValue ).toBe( '44% 0 18em 0' );
+		} );
+
+		it( 'leaves zero values in calc() expressions alone', () => {
+			const normalizedValue = getNormalizedStyleValue(
+				'calc(0em + 5px)'
+			);
+
+			expect( normalizedValue ).toBe( 'calc(0em + 5px)' );
 		} );
 	} );
 
@@ -458,6 +502,15 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'isEquivalentHTML()', () => {
+		it( 'should return true for identical markup', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<div>Hello <span class="b">World!</span></div>',
+				'<div>Hello <span class="b">World!</span></div>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
 		it( 'should return false for effectively inequivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
 				'<div>Hello <span class="b">World!</span></div>',
@@ -707,6 +760,14 @@ describe( 'validation', () => {
 			);
 
 			expect( isValid ).toBe( true );
+		} );
+	} );
+
+	describe( 'createLogger()', () => {
+		it( 'creates logger that pre-processes string substitutions', () => {
+			createLogger().warning( '%o', { foo: 'bar' } );
+
+			expect( console ).toHaveWarnedWith( "{ foo: 'bar' }" );
 		} );
 	} );
 } );

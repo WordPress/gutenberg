@@ -1,6 +1,6 @@
 # InspectorControls
 
-<img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/inspector.png" with="281" height="527" alt="inspector">
+<img src="https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/inspector.png" with="281" height="527" alt="inspector">
 
 Inspector Controls appear in the post settings sidebar when a block is being edited. The controls appear in both HTML and visual editing modes, and thus should contain settings that affect the entire block.
 
@@ -8,12 +8,14 @@ Inspector Controls appear in the post settings sidebar when a block is being edi
 
 {% codetabs %}
 {% ES5 %}
+
 ```js
 var el = wp.element.createElement,
 	Fragment = wp.element.Fragment,
 	registerBlockType = wp.blocks.registerBlockType,
 	RichText = wp.editor.RichText,
-	InspectorControls = wp.editor.InspectorControls,
+	InspectorControls = wp.blockEditor.InspectorControls,
+	useBlockProps = wp.blockEditor.useBlockProps,
 	CheckboxControl = wp.components.CheckboxControl,
 	RadioControl = wp.components.RadioControl,
 	TextControl = wp.components.TextControl,
@@ -21,11 +23,13 @@ var el = wp.element.createElement,
 	SelectControl = wp.components.SelectControl;
 
 registerBlockType( 'my-plugin/inspector-controls-example', {
+	apiVersion: 2,
+
 	title: 'Inspector controls example',
 
 	icon: 'universal-access-alt',
 
-	category: 'layout',
+	category: 'design',
 
 	attributes: {
 		content: {
@@ -52,7 +56,9 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 		},
 	},
 
-	edit: function( props ) {
+	edit: function ( props ) {
+		var blockProps = useBlockProps();
+
 		var content = props.attributes.content,
 			checkboxField = props.attributes.checkboxField,
 			radioField = props.attributes.radioField,
@@ -84,95 +90,79 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 			props.setAttributes( { selectField: newValue } );
 		}
 
-		return (
+		return el(
+			Fragment,
+			null,
 			el(
-				Fragment,
+				InspectorControls,
 				null,
-				el(
-					InspectorControls,
-					null,
-					el(
-						CheckboxControl,
+				el( CheckboxControl, {
+					heading: 'Checkbox Field',
+					label: 'Tick Me',
+					help: 'Additional help text',
+					checked: checkboxField,
+					onChange: onChangeCheckboxField,
+				} ),
+				el( RadioControl, {
+					label: 'Radio Field',
+					selected: radioField,
+					options: [
 						{
-							heading: 'Checkbox Field',
-							label: 'Tick Me',
-							help: 'Additional help text',
-							checked: checkboxField,
-							onChange: onChangeCheckboxField
-						}
-					),
-					el(
-						RadioControl,
+							label: 'Yes',
+							value: 'yes',
+						},
 						{
-							label: 'Radio Field',
-							selected: radioField,
-							options: [
-								{
-									label: 'Yes',
-									value: 'yes'
-								},
-								{
-									label: 'No',
-									value: 'no'
-								}
-							],
-							onChange: onChangeRadioField
-						}
-					),
-					el(
-						TextControl,
+							label: 'No',
+							value: 'no',
+						},
+					],
+					onChange: onChangeRadioField,
+				} ),
+				el( TextControl, {
+					label: 'Text Field',
+					help: 'Additional help text',
+					value: textField,
+					onChange: onChangeTextField,
+				} ),
+				el( ToggleControl, {
+					label: 'Toggle Field',
+					checked: toggleField,
+					onChange: onChangeToggleField,
+				} ),
+				el( SelectControl, {
+					label: 'Select Field',
+					value: selectField,
+					options: [
 						{
-							label: 'Text Field',
-							help: 'Additional help text',
-							value: textField,
-							onChange: onChangeTextField
-						}
-					),
-					el(
-						ToggleControl,
+							value: 'a',
+							label: 'Option A',
+						},
 						{
-							label: 'Toggle Field',
-							checked: toggleField,
-							onChange: onChangeToggleField
-						}
-					),
-					el(
-						SelectControl,
+							value: 'b',
+							label: 'Option B',
+						},
 						{
-							label: 'Select Field',
-							value: selectField,
-							options: [
-								{
-									value: 'a',
-									label: 'Option A'
-								},
-								{
-									value: 'b',
-									label: 'Option B'
-								},
-								{
-									value: 'c',
-									label: 'Option C'
-								}
-							],
-							onChange: onChangeSelectField
-						}
-					)
-				),
-				el(
-					RichText,
-					{
-						key: 'editable',
-						tagName: 'p',
-						onChange: onChangeContent,
-						value: content
-					}
-				)
+							value: 'c',
+							label: 'Option C',
+						},
+					],
+					onChange: onChangeSelectField,
+				} )
+			),
+			el(
+				RichText,
+				Object.assing( blockProps, {
+					key: 'editable',
+					tagName: 'p',
+					onChange: onChangeContent,
+					value: content,
+				} )
 			)
 		);
 	},
 
-	save: function( props ) {
+	save: function ( props ) {
+		var blockProps = useBlockProps.save();
 		var content = props.attributes.content,
 			checkboxField = props.attributes.checkboxField,
 			radioField = props.attributes.radioField,
@@ -182,78 +172,51 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 
 		return el(
 			'div',
-			null,
-			el(
-				RichText.Content,
-				{
-					value: content,
-					tagName: 'p'
-				}
-			),
-			el(
-				'h2',
-				null,
-				'Inspector Control Fields'
-			),
+			blockProps,
+			el( RichText.Content, {
+				value: content,
+				tagName: 'p',
+			} ),
+			el( 'h2', null, 'Inspector Control Fields' ),
 			el(
 				'ul',
 				null,
-				el(
-					'li',
-					null,
-					'Checkbox Field: ',
-					checkboxField
-				),
-				el(
-					'li',
-					null,
-					'Radio Field: ',
-					radioField
-				),
-				el(
-					'li',
-					null,
-					'Text Field: ',
-					textField
-				),
-				el(
-					'li',
-					null,
-					'Toggle Field: ',
-					toggleField
-				),
-				el(
-					'li',
-					null,
-					'Select Field: ',
-					selectField
-				)
+				el( 'li', null, 'Checkbox Field: ', checkboxField ),
+				el( 'li', null, 'Radio Field: ', radioField ),
+				el( 'li', null, 'Text Field: ', textField ),
+				el( 'li', null, 'Toggle Field: ', toggleField ),
+				el( 'li', null, 'Select Field: ', selectField )
 			)
 		);
 	},
 } );
 ```
+
 {% ESNext %}
+
 ```js
 import { registerBlockType } from '@wordpress/blocks';
-const {
+import {
 	CheckboxControl,
 	RadioControl,
 	TextControl,
 	ToggleControl,
 	SelectControl,
-} = wp.components;
-const {
+} from '@wordpress/components';
+import {
 	RichText,
 	InspectorControls,
-} = wp.editor;
+	useBlockProps,
+} from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/inspector-controls-example', {
+	apiVersion: 2,
+
 	title: 'Inspector controls example',
 
 	icon: 'universal-access-alt',
 
-	category: 'layout',
+	category: 'design',
 
 	attributes: {
 		content: {
@@ -281,7 +244,15 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 	},
 
 	edit( { attributes, setAttributes } ) {
-		const { content, checkboxField, radioField, textField, toggleField, selectField } = attributes;
+		const blockProps = useBlockProps();
+		const {
+			content,
+			checkboxField,
+			radioField,
+			textField,
+			toggleField,
+			selectField,
+		} = attributes;
 
 		function onChangeContent( newContent ) {
 			setAttributes( { content: newContent } );
@@ -310,7 +281,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 		return (
 			<>
 				<InspectorControls>
-
 					<CheckboxControl
 						heading="Checkbox Field"
 						label="Tick Me"
@@ -322,12 +292,10 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 					<RadioControl
 						label="Radio Field"
 						selected={ radioField }
-						options={
-							[
-								{ label: 'Yes', value: 'yes' },
-								{ label: 'No', value: 'no' },
-							]
-						}
+						options={ [
+							{ label: 'Yes', value: 'yes' },
+							{ label: 'No', value: 'no' },
+						] }
 						onChange={ onChangeRadioField }
 					/>
 
@@ -347,19 +315,17 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 					<SelectControl
 						label="Select Control"
 						value={ selectField }
-						options={
-							[
-								{ value: 'a', label: 'Option A' },
-								{ value: 'b', label: 'Option B' },
-								{ value: 'c', label: 'Option C' },
-							]
-						}
+						options={ [
+							{ value: 'a', label: 'Option A' },
+							{ value: 'b', label: 'Option B' },
+							{ value: 'c', label: 'Option C' },
+						] }
 						onChange={ onChangeSelectField }
 					/>
-
 				</InspectorControls>
 
 				<RichText
+					{ ...blockProps }
 					key="editable"
 					tagName="p"
 					onChange={ onChangeContent }
@@ -370,14 +336,19 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 	},
 
 	save( { attributes } ) {
-		const { content, checkboxField, radioField, textField, toggleField, selectField } = attributes;
+		const {
+			content,
+			checkboxField,
+			radioField,
+			textField,
+			toggleField,
+			selectField,
+		} = attributes;
+		const blockProps = useBlockProps.save();
 
 		return (
-			<div>
-				<RichText.Content
-					value={ content }
-					tagName="p"
-				/>
+			<div { ...blockProps }>
+				<RichText.Content value={ content } tagName="p" />
 
 				<h2>Inspector Control Fields</h2>
 				<ul>
@@ -392,4 +363,5 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 	},
 } );
 ```
+
 {% end %}

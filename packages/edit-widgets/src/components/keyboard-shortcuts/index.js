@@ -2,12 +2,22 @@
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editWidgetsStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { redo, undo } = useDispatch( 'core' );
+	const { redo, undo } = useDispatch( coreStore );
+	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
 
 	useShortcut(
 		'core/edit-widgets/undo',
@@ -27,11 +37,21 @@ function KeyboardShortcuts() {
 		{ bindGlobal: true }
 	);
 
+	useShortcut(
+		'core/edit-widgets/save',
+		( event ) => {
+			event.preventDefault();
+			saveEditedWidgetAreas();
+		},
+		{ bindGlobal: true }
+	);
+
 	return null;
 }
+
 function KeyboardShortcutsRegister() {
 	// Registering the shortcuts
-	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/edit-widgets/undo',
@@ -50,6 +70,26 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: 'z',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-widgets/save',
+			category: 'global',
+			description: __( 'Save your changes.' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 's',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-widgets/keyboard-shortcuts',
+			category: 'main',
+			description: __( 'Display these keyboard shortcuts.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'h',
 			},
 		} );
 	}, [ registerShortcut ] );

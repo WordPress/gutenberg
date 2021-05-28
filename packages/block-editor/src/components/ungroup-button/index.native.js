@@ -6,6 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -15,6 +16,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import UngroupIcon from './icon';
+import { store as blockEditorStore } from '../../store';
 
 export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 	if ( ! isUngroupable ) {
@@ -34,10 +36,10 @@ export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getSelectedBlockClientId, getBlock } = select(
-			'core/block-editor'
+			blockEditorStore
 		);
 
-		const { getGroupingBlockName } = select( 'core/blocks' );
+		const { getGroupingBlockName } = select( blocksStore );
 
 		const selectedId = getSelectedBlockClientId();
 		const selectedBlock = getBlock( selectedId );
@@ -58,7 +60,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, innerBlocks, onToggle = noop } ) => {
-		const { replaceBlocks } = dispatch( 'core/block-editor' );
+		const { replaceBlocks } = dispatch( blockEditorStore );
 
 		return {
 			onConvertFromGroup() {

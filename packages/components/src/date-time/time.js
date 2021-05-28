@@ -8,7 +8,12 @@ import moment from 'moment';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import {
+	createElement,
+	useState,
+	useMemo,
+	useEffect,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -16,333 +21,271 @@ import { __ } from '@wordpress/i18n';
  */
 import Button from '../button';
 import ButtonGroup from '../button-group';
+import TimeZone from './timezone';
 
 /**
  * Module Constants
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
-class TimePicker extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			day: '',
-			month: '',
-			year: '',
-			hours: '',
-			minutes: '',
-			am: true,
-			date: null,
-		};
-		this.changeDate = this.changeDate.bind( this );
-		this.updateMonth = this.updateMonth.bind( this );
-		this.onChangeMonth = this.onChangeMonth.bind( this );
-		this.updateDay = this.updateDay.bind( this );
-		this.onChangeDay = this.onChangeDay.bind( this );
-		this.updateYear = this.updateYear.bind( this );
-		this.onChangeYear = this.onChangeYear.bind( this );
-		this.updateHours = this.updateHours.bind( this );
-		this.updateMinutes = this.updateMinutes.bind( this );
-		this.onChangeHours = this.onChangeHours.bind( this );
-		this.onChangeMinutes = this.onChangeMinutes.bind( this );
-		this.renderMonth = this.renderMonth.bind( this );
-		this.renderDay = this.renderDay.bind( this );
-		this.renderDayMonthFormat = this.renderDayMonthFormat.bind( this );
-	}
+/**
+ * <UpdateOnBlurAsIntegerField>
+ * A shared component to parse, validate, and handle remounting of the underlying form field element like <input> and <select>.
+ *
+ * @param {Object}        props          Component props.
+ * @param {string}        props.as       Render the component as specific element tag, defaults to "input".
+ * @param {number|string} props.value    The default value of the component which will be parsed to integer.
+ * @param {Function}      props.onUpdate Call back when blurred and validated.
+ */
+function UpdateOnBlurAsIntegerField( { as, value, onUpdate, ...props } ) {
+	function handleBlur( event ) {
+		const { target } = event;
 
-	componentDidMount() {
-		this.syncState( this.props );
-	}
+		if ( value === target.value ) {
+			return;
+		}
 
-	componentDidUpdate( prevProps ) {
-		const { currentTime, is12Hour } = this.props;
+		const parsedValue = parseInt( target.value, 10 );
+
+		// Run basic number validation on the input.
 		if (
-			currentTime !== prevProps.currentTime ||
-			is12Hour !== prevProps.is12Hour
+			! isInteger( parsedValue ) ||
+			( typeof props.max !== 'undefined' && parsedValue > props.max ) ||
+			( typeof props.min !== 'undefined' && parsedValue < props.min )
 		) {
-			this.syncState( this.props );
+			// If validation failed, reset the value to the previous valid value.
+			target.value = value;
+		} else {
+			// Otherwise, it's valid, call onUpdate.
+			onUpdate( target.name, parsedValue );
 		}
 	}
+
+	return createElement( as || 'input', {
+		// Re-mount the input value to accept the latest value as the defaultValue.
+		key: value,
+		defaultValue: value,
+		onBlur: handleBlur,
+		...props,
+	} );
+}
+
+/**
+ * <TimePicker>
+ *
+ * @typedef {Date|string|number} WPValidDateTimeFormat
+ *
+ * @param {Object}                props             Component props.
+ * @param {boolean}               props.is12Hour    Should the time picker showed in 12 hour format or 24 hour format.
+ * @param {WPValidDateTimeFormat} props.currentTime The initial current time the time picker should render.
+ * @param {Function}              props.onChange    Callback function when the date changed.
+ */
+export function TimePicker( { is12Hour, currentTime, onChange } ) {
+	const [ date, setDate ] = useState( () =>
+		// Truncate the date at the minutes, see: #15495.
+		moment( currentTime ).startOf( 'minutes' )
+	);
+
+	// Reset the state when currentTime changed.
+	useEffect( () => {
+		setDate(
+			currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
+		);
+	}, [ currentTime ] );
+
+	const { day, month, year, minutes, hours, am } = useMemo(
+		() => ( {
+			day: date.format( 'DD' ),
+			month: date.format( 'MM' ),
+			year: date.format( 'YYYY' ),
+			minutes: date.format( 'mm' ),
+			hours: date.format( is12Hour ? 'hh' : 'HH' ),
+			am: date.format( 'H' ) <= 11 ? 'AM' : 'PM',
+		} ),
+		[ date, is12Hour ]
+	);
+
 	/**
 	 * Function that sets the date state and calls the onChange with a new date.
 	 * The date is truncated at the minutes.
 	 *
 	 * @param {Object} newDate The date object.
 	 */
-	changeDate( newDate ) {
-		const dateWithStartOfMinutes = newDate.clone().startOf( 'minute' );
-		this.setState( { date: dateWithStartOfMinutes } );
-		this.props.onChange( newDate.format( TIMEZONELESS_FORMAT ) );
+	function changeDate( newDate ) {
+		setDate( newDate );
+		onChange( newDate.format( TIMEZONELESS_FORMAT ) );
 	}
 
-	getMaxHours() {
-		return this.props.is12Hour ? 12 : 23;
+	function update( name, value ) {
+		// Clone the date and call the specific setter function according to `name`.
+		const newDate = date.clone()[ name ]( value );
+		changeDate( newDate );
 	}
 
-	getMinHours() {
-		return this.props.is12Hour ? 1 : 0;
-	}
-
-	syncState( { currentTime, is12Hour } ) {
-		const selected = currentTime ? moment( currentTime ) : moment();
-		const day = selected.format( 'DD' );
-		const month = selected.format( 'MM' );
-		const year = selected.format( 'YYYY' );
-		const minutes = selected.format( 'mm' );
-		const am = selected.format( 'A' );
-		const hours = selected.format( is12Hour ? 'hh' : 'HH' );
-		const date = currentTime ? moment( currentTime ) : moment();
-		this.setState( { day, month, year, minutes, hours, am, date } );
-	}
-
-	updateHours() {
-		const { is12Hour } = this.props;
-		const { am, hours, date } = this.state;
-		const value = parseInt( hours, 10 );
-		if (
-			! isInteger( value ) ||
-			( is12Hour && ( value < 1 || value > 12 ) ) ||
-			( ! is12Hour && ( value < 0 || value > 23 ) )
-		) {
-			this.syncState( this.props );
-			return;
-		}
-
-		const newDate = is12Hour
-			? date
-					.clone()
-					.hours(
-						am === 'AM' ? value % 12 : ( ( value % 12 ) + 12 ) % 24
-					)
-			: date.clone().hours( value );
-		this.changeDate( newDate );
-	}
-
-	updateMinutes() {
-		const { minutes, date } = this.state;
-		const value = parseInt( minutes, 10 );
-		if ( ! isInteger( value ) || value < 0 || value > 59 ) {
-			this.syncState( this.props );
-			return;
-		}
-		const newDate = date.clone().minutes( value );
-		this.changeDate( newDate );
-	}
-
-	updateDay() {
-		const { day, date } = this.state;
-		const value = parseInt( day, 10 );
-		if ( ! isInteger( value ) || value < 1 || value > 31 ) {
-			this.syncState( this.props );
-			return;
-		}
-		const newDate = date.clone().date( value );
-		this.changeDate( newDate );
-	}
-
-	updateMonth() {
-		const { month, date } = this.state;
-		const value = parseInt( month, 10 );
-		if ( ! isInteger( value ) || value < 1 || value > 12 ) {
-			this.syncState( this.props );
-			return;
-		}
-		const newDate = date.clone().month( value - 1 );
-		this.changeDate( newDate );
-	}
-
-	updateYear() {
-		const { year, date } = this.state;
-		const value = parseInt( year, 10 );
-		if ( ! isInteger( value ) || value < 0 || value > 9999 ) {
-			this.syncState( this.props );
-			return;
-		}
-		const newDate = date.clone().year( value );
-		this.changeDate( newDate );
-	}
-
-	updateAmPm( value ) {
+	function updateAmPm( value ) {
 		return () => {
-			const { am, date, hours } = this.state;
 			if ( am === value ) {
 				return;
 			}
-			let newDate;
-			if ( value === 'PM' ) {
-				newDate = date
-					.clone()
-					.hours( ( ( parseInt( hours, 10 ) % 12 ) + 12 ) % 24 );
-			} else {
-				newDate = date.clone().hours( parseInt( hours, 10 ) % 12 );
-			}
-			this.changeDate( newDate );
+
+			const parsedHours = parseInt( hours, 10 );
+
+			const newDate = date
+				.clone()
+				.hours(
+					value === 'PM'
+						? ( ( parsedHours % 12 ) + 12 ) % 24
+						: parsedHours % 12
+				);
+
+			changeDate( newDate );
 		};
 	}
 
-	onChangeDay( event ) {
-		this.setState( { day: event.target.value } );
-	}
+	const dayFormat = (
+		<div className="components-datetime__time-field components-datetime__time-field-day">
+			<UpdateOnBlurAsIntegerField
+				aria-label={ __( 'Day' ) }
+				className="components-datetime__time-field-day-input"
+				type="number"
+				// The correct function to call in moment.js is "date" not "day".
+				name="date"
+				value={ day }
+				step={ 1 }
+				min={ 1 }
+				max={ 31 }
+				onUpdate={ update }
+			/>
+		</div>
+	);
 
-	onChangeMonth( event ) {
-		this.setState( { month: event.target.value } );
-	}
-
-	onChangeYear( event ) {
-		this.setState( { year: event.target.value } );
-	}
-
-	onChangeHours( event ) {
-		this.setState( { hours: event.target.value } );
-	}
-
-	onChangeMinutes( event ) {
-		const minutes = event.target.value;
-		this.setState( {
-			minutes: minutes === '' ? '' : ( '0' + minutes ).slice( -2 ),
-		} );
-	}
-
-	renderMonth( month ) {
-		return (
-			<div
-				key="render-month"
-				className="components-datetime__time-field components-datetime__time-field-month"
+	const monthFormat = (
+		<div className="components-datetime__time-field components-datetime__time-field-month">
+			<UpdateOnBlurAsIntegerField
+				as="select"
+				aria-label={ __( 'Month' ) }
+				className="components-datetime__time-field-month-select"
+				name="month"
+				value={ month }
+				// The value starts from 0, so we have to -1 when setting month.
+				onUpdate={ ( key, value ) => update( key, value - 1 ) }
 			>
-				<select
-					aria-label={ __( 'Month' ) }
-					className="components-datetime__time-field-month-select"
-					value={ month }
-					onChange={ this.onChangeMonth }
-					onBlur={ this.updateMonth }
-				>
-					<option value="01">{ __( 'January' ) }</option>
-					<option value="02">{ __( 'February' ) }</option>
-					<option value="03">{ __( 'March' ) }</option>
-					<option value="04">{ __( 'April' ) }</option>
-					<option value="05">{ __( 'May' ) }</option>
-					<option value="06">{ __( 'June' ) }</option>
-					<option value="07">{ __( 'July' ) }</option>
-					<option value="08">{ __( 'August' ) }</option>
-					<option value="09">{ __( 'September' ) }</option>
-					<option value="10">{ __( 'October' ) }</option>
-					<option value="11">{ __( 'November' ) }</option>
-					<option value="12">{ __( 'December' ) }</option>
-				</select>
-			</div>
-		);
-	}
+				<option value="01">{ __( 'January' ) }</option>
+				<option value="02">{ __( 'February' ) }</option>
+				<option value="03">{ __( 'March' ) }</option>
+				<option value="04">{ __( 'April' ) }</option>
+				<option value="05">{ __( 'May' ) }</option>
+				<option value="06">{ __( 'June' ) }</option>
+				<option value="07">{ __( 'July' ) }</option>
+				<option value="08">{ __( 'August' ) }</option>
+				<option value="09">{ __( 'September' ) }</option>
+				<option value="10">{ __( 'October' ) }</option>
+				<option value="11">{ __( 'November' ) }</option>
+				<option value="12">{ __( 'December' ) }</option>
+			</UpdateOnBlurAsIntegerField>
+		</div>
+	);
 
-	renderDay( day ) {
-		return (
-			<div
-				key="render-day"
-				className="components-datetime__time-field components-datetime__time-field-day"
-			>
-				<input
-					aria-label={ __( 'Day' ) }
-					className="components-datetime__time-field-day-input"
-					type="number"
-					value={ day }
-					step={ 1 }
-					min={ 1 }
-					onChange={ this.onChangeDay }
-					onBlur={ this.updateDay }
-				/>
-			</div>
-		);
-	}
+	const dayMonthFormat = is12Hour ? (
+		<>
+			{ dayFormat }
+			{ monthFormat }
+		</>
+	) : (
+		<>
+			{ monthFormat }
+			{ dayFormat }
+		</>
+	);
 
-	renderDayMonthFormat( is12Hour ) {
-		const { day, month } = this.state;
-		const layout = [ this.renderDay( day ), this.renderMonth( month ) ];
-		return is12Hour ? layout : layout.reverse();
-	}
+	return (
+		<div className={ classnames( 'components-datetime__time' ) }>
+			<fieldset>
+				<legend className="components-datetime__time-legend invisible">
+					{ __( 'Date' ) }
+				</legend>
+				<div className="components-datetime__time-wrapper">
+					{ dayMonthFormat }
 
-	render() {
-		const { is12Hour } = this.props;
-		const { year, minutes, hours, am } = this.state;
-		return (
-			<div className={ classnames( 'components-datetime__time' ) }>
-				<fieldset>
-					<legend className="components-datetime__time-legend invisible">
-						{ __( 'Date' ) }
-					</legend>
-					<div className="components-datetime__time-wrapper">
-						{ this.renderDayMonthFormat( is12Hour ) }
-						<div className="components-datetime__time-field components-datetime__time-field-year">
-							<input
-								aria-label={ __( 'Year' ) }
-								className="components-datetime__time-field-year-input"
-								type="number"
-								step={ 1 }
-								value={ year }
-								onChange={ this.onChangeYear }
-								onBlur={ this.updateYear }
-							/>
-						</div>
+					<div className="components-datetime__time-field components-datetime__time-field-year">
+						<UpdateOnBlurAsIntegerField
+							aria-label={ __( 'Year' ) }
+							className="components-datetime__time-field-year-input"
+							type="number"
+							name="year"
+							step={ 1 }
+							min={ 0 }
+							max={ 9999 }
+							value={ year }
+							onUpdate={ update }
+						/>
 					</div>
-				</fieldset>
+				</div>
+			</fieldset>
 
-				<fieldset>
-					<legend className="components-datetime__time-legend invisible">
-						{ __( 'Time' ) }
-					</legend>
-					<div className="components-datetime__time-wrapper">
-						<div className="components-datetime__time-field components-datetime__time-field-time">
-							<input
-								aria-label={ __( 'Hours' ) }
-								className="components-datetime__time-field-hours-input"
-								type="number"
-								step={ 1 }
-								min={ this.getMinHours() }
-								max={ this.getMaxHours() }
-								value={ hours }
-								onChange={ this.onChangeHours }
-								onBlur={ this.updateHours }
-							/>
-							<span
-								className="components-datetime__time-separator"
-								aria-hidden="true"
+			<fieldset>
+				<legend className="components-datetime__time-legend invisible">
+					{ __( 'Time' ) }
+				</legend>
+				<div className="components-datetime__time-wrapper">
+					<div className="components-datetime__time-field components-datetime__time-field-time">
+						<UpdateOnBlurAsIntegerField
+							aria-label={ __( 'Hours' ) }
+							className="components-datetime__time-field-hours-input"
+							type="number"
+							name="hours"
+							step={ 1 }
+							min={ is12Hour ? 1 : 0 }
+							max={ is12Hour ? 12 : 23 }
+							value={ hours }
+							onUpdate={ update }
+						/>
+						<span
+							className="components-datetime__time-separator"
+							aria-hidden="true"
+						>
+							:
+						</span>
+						<UpdateOnBlurAsIntegerField
+							aria-label={ __( 'Minutes' ) }
+							className="components-datetime__time-field-minutes-input"
+							type="number"
+							name="minutes"
+							step={ 1 }
+							min={ 0 }
+							max={ 59 }
+							value={ minutes }
+							onUpdate={ update }
+						/>
+					</div>
+					{ is12Hour && (
+						<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
+							<Button
+								variant={
+									am === 'AM' ? 'primary' : 'secondary'
+								}
+								onClick={ updateAmPm( 'AM' ) }
+								className="components-datetime__time-am-button"
 							>
-								:
-							</span>
-							<input
-								aria-label={ __( 'Minutes' ) }
-								className="components-datetime__time-field-minutes-input"
-								type="number"
-								min={ 0 }
-								max={ 59 }
-								value={ minutes }
-								onChange={ this.onChangeMinutes }
-								onBlur={ this.updateMinutes }
-							/>
-						</div>
-						{ is12Hour && (
-							<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
-								<Button
-									isPrimary={ am === 'AM' }
-									isSecondary={ am !== 'AM' }
-									onClick={ this.updateAmPm( 'AM' ) }
-									className="components-datetime__time-am-button"
-								>
-									{ __( 'AM' ) }
-								</Button>
-								<Button
-									isPrimary={ am === 'PM' }
-									isSecondary={ am !== 'PM' }
-									onClick={ this.updateAmPm( 'PM' ) }
-									className="components-datetime__time-pm-button"
-								>
-									{ __( 'PM' ) }
-								</Button>
-							</ButtonGroup>
-						) }
-					</div>
-				</fieldset>
-			</div>
-		);
-	}
+								{ __( 'AM' ) }
+							</Button>
+							<Button
+								variant={
+									am === 'PM' ? 'primary' : 'secondary'
+								}
+								onClick={ updateAmPm( 'PM' ) }
+								className="components-datetime__time-pm-button"
+							>
+								{ __( 'PM' ) }
+							</Button>
+						</ButtonGroup>
+					) }
+
+					<TimeZone />
+				</div>
+			</fieldset>
+		</div>
+	);
 }
 
 export default TimePicker;

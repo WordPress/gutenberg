@@ -1,0 +1,55 @@
+{
+	"name": "@wordpress/stylelint-config",
+	"version": "19.0.4",
+	"description": "stylelint config for WordPress development.",
+	"author": "The WordPress Contributors",
+	"license": "MIT",
+	"keywords": [
+		"stylelint",
+		"stylelint-config",
+		"stylelint-config-wordpress",
+		"wordpress"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/stylelint-config/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/stylelint-config"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"files": [
+		"CHANGELOG.md",
+		"LICENSE",
+		"README.md",
+		"index.js",
+		"scss.js"
+	],
+	"main": "index.js",
+	"dependencies": {
+		"stylelint-config-recommended": "^3.0.0",
+		"stylelint-config-recommended-scss": "^4.2.0",
+		"stylelint-scss": "^3.17.2"
+	},
+	"peerDependencies": {
+		"stylelint": "^13.7.0"
+	},
+	"npmpackagejsonlint": {
+		"extends": "@wordpress/npm-package-json-lint-config",
+		"rules": {
+			"valid-values-license": [
+				"error",
+				[
+					"MIT"
+				]
+			]
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

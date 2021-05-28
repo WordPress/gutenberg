@@ -1,30 +1,34 @@
 .components-custom-select-control {
-	color: $dark-gray-500;
 	position: relative;
 }
 
 .components-custom-select-control__label {
 	display: block;
-	margin-bottom: 5px;
+	margin-bottom: $grid-unit-10;
 }
 
 .components-custom-select-control__button {
-	border: 1px solid $medium-gray-text;
+	border: 1px solid $gray-700;
 	border-radius: $radius-block-ui;
-	display: inline;
 	min-height: 30px;
 	min-width: 130px;
 	position: relative;
 	text-align: left;
 
-	&:focus:not(:disabled) {
-		border-color: $theme-color;
-		box-shadow: 0 0 0 ($border-width-focus - $border-width) $theme-color;
+	// For all button sizes allow sufficient space for the
+	// dropdown "arrow" icon to display.
+	&.components-custom-select-control__button {
+		padding-right: $icon-size;
 	}
 
-	&-icon {
+	&:focus:not(:disabled) {
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
+	}
+
+	.components-custom-select-control__button-icon {
 		height: 100%;
-		padding: 0 4px;
+		padding: 0;
 		position: absolute;
 		right: 0;
 		top: 0;
@@ -32,16 +36,17 @@
 }
 
 .components-custom-select-control__menu {
-	background-color: $white;
-
-	// Show border around the dropdown menu when open.
-	&:focus {
-		// Block UI appearance.
-		border: $border-width solid $dark-gray-primary;
-		border-radius: $radius-block-ui;
-		outline: none;
-		transition: none;
+	// Hide when collapsed.
+	&[aria-hidden="true"] {
+		display: none;
 	}
+
+	// Block UI appearance.
+	border: $border-width solid $gray-900;
+	background-color: $white;
+	border-radius: $radius-block-ui;
+	outline: none;
+	transition: none;
 
 	max-height: 400px;
 	min-width: 100%;
@@ -55,14 +60,21 @@
 	align-items: center;
 	display: flex;
 	list-style-type: none;
-	padding: 10px 5px 10px 25px;
+	padding: $grid-unit-10;
+	cursor: default;
+	line-height: $icon-size + $grid-unit-05;
+
 
 	&.is-highlighted {
-		background: $light-gray-500;
+		background: $gray-300;
 	}
 
-	&-icon {
-		margin-left: -20px;
+	.components-custom-select-control__item-icon {
 		margin-right: 0;
+		margin-left: auto;
+	}
+
+	&:last-child {
+		margin-bottom: 0;
 	}
 }

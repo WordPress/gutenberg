@@ -7,7 +7,7 @@
 // https://github.com/visionmedia/css-parse/pull/49#issuecomment-30088027
 const commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
 
-export default function( css, options ) {
+export default function ( css, options ) {
 	options = options || {};
 
 	/**
@@ -37,7 +37,7 @@ export default function( css, options ) {
 
 	function position() {
 		const start = { line: lineno, column };
-		return function( node ) {
+		return function ( node ) {
 			node.position = new Position( start );
 			whitespace();
 			return node;
@@ -224,11 +224,11 @@ export default function( css, options ) {
 		// FIXME: Remove all comments from selectors http://ostermiller.org/findcomment.html
 		return trim( m[ 0 ] )
 			.replace( /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*\/+/g, '' )
-			.replace( /"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function( matched ) {
+			.replace( /"(?:\\"|[^"])*"|'(?:\\'|[^'])*'/g, function ( matched ) {
 				return matched.replace( /,/g, '\u200C' );
 			} )
 			.split( /\s*(?![^(]*\)),\s*/ )
-			.map( function( s ) {
+			.map( function ( s ) {
 				return s.replace( /\u200C/g, ',' );
 			} );
 	}
@@ -600,7 +600,7 @@ export default function( css, options ) {
 
 	function _compileAtrule( name ) {
 		const re = new RegExp( '^@' + name + '\\s*([^;]+);' );
-		return function() {
+		return function () {
 			const pos = position();
 			const m = match( re );
 			if ( ! m ) {
@@ -678,7 +678,7 @@ function addParent( obj, parent ) {
 	for ( const k in obj ) {
 		const value = obj[ k ];
 		if ( Array.isArray( value ) ) {
-			value.forEach( function( v ) {
+			value.forEach( function ( v ) {
 				addParent( v, childParent );
 			} );
 		} else if ( value && typeof value === 'object' ) {

@@ -1,18 +1,23 @@
 /**
  * External dependencies
  */
+import { debounce } from 'lodash';
 import { View } from 'react-native';
+
 /**
  * WordPress dependencies
  */
 import {
+	BlockControls,
 	InnerBlocks,
-	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
+	JustifyContentControl,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { useState, useEffect } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import { alignmentHelpers } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,120 +28,126 @@ import styles from './editor.scss';
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
-function ButtonsEdit( {
+const layoutProp = { type: 'default', alignments: [] };
+
+export default function ButtonsEdit( {
+	attributes: { contentJustification, align },
+	clientId,
 	isSelected,
-	attributes,
-	onDelete,
-	onAddNextButton,
-	shouldDelete,
-	isInnerButtonSelected,
+	setAttributes,
+	blockWidth,
 } ) {
-	const { align } = attributes;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
-	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 	const { marginLeft: spacing } = styles.spacing;
 
+	const { isInnerButtonSelected, shouldDelete } = useSelect(
+		( select ) => {
+			const {
+				getBlockCount,
+				getBlockParents,
+				getSelectedBlockClientId,
+			} = select( blockEditorStore );
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const selectedBlockParents = getBlockParents(
+				selectedBlockClientId,
+				true
+			);
+
+			return {
+				isInnerButtonSelected: selectedBlockParents[ 0 ] === clientId,
+				// The purpose of `shouldDelete` check is giving the ability to
+				// pass to mobile toolbar function called `onDelete` which removes
+				// the whole `Buttons` container along with the last inner button
+				// when there is exactly one button.
+				shouldDelete: getBlockCount( clientId ) === 1,
+			};
+		},
+		[ clientId ]
+	);
+	const { getBlockOrder } = useSelect( blockEditorStore );
+	const { insertBlock, removeBlock, selectBlock } = useDispatch(
+		blockEditorStore
+	);
+
 	useEffect( () => {
-		const margins = 2 * styles.parent.marginRight;
 		const { width } = sizes || {};
+		const { isFullWidth } = alignmentHelpers;
+
 		if ( width ) {
-			setMaxWidth( width - margins );
+			const isFullWidthBlock = isFullWidth( align );
+			setMaxWidth( isFullWidthBlock ? blockWidth : width );
 		}
-	}, [ sizes ] );
+	}, [ sizes, align ] );
 
-	function renderFooterAppender() {
-		return (
-			<View style={ styles.appenderContainer }>
-				<InnerBlocks.ButtonBlockAppender
-					isFloating={ true }
-					onAddBlock={ onAddNextButton }
-				/>
-			</View>
-		);
-	}
+	const onAddNextButton = useCallback(
+		debounce( ( selectedId ) => {
+			const order = getBlockOrder( clientId );
+			const selectedButtonIndex = order.findIndex(
+				( i ) => i === selectedId
+			);
 
-	// Inside buttons block alignment options are not supported.
-	const alignmentHooksSetting = {
-		isEmbedButton: true,
-	};
+			const index =
+				selectedButtonIndex === -1
+					? order.length + 1
+					: selectedButtonIndex;
 
+			const insertedBlock = createBlock( 'core/button' );
+
+			insertBlock( insertedBlock, index, clientId );
+			selectBlock( insertedBlock.clientId );
+		}, 200 ),
+		[]
+	);
+
+	const renderFooterAppender = useRef( () => (
+		<View style={ styles.appenderContainer }>
+			<InnerBlocks.ButtonBlockAppender
+				isFloating={ true }
+				onAddBlock={ onAddNextButton }
+			/>
+		</View>
+	) );
+
+	const justifyControls = [ 'left', 'center', 'right' ];
+
+	const remove = useCallback( () => removeBlock( clientId ), [ clientId ] );
+	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 	return (
-		<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
+		<>
+			{ isSelected && (
+				<BlockControls group="block">
+					<JustifyContentControl
+						allowedControls={ justifyControls }
+						value={ contentJustification }
+						onChange={ ( value ) =>
+							setAttributes( { contentJustification: value } )
+						}
+						popoverProps={ {
+							position: 'bottom right',
+							isAlternate: true,
+						} }
+					/>
+				</BlockControls>
+			) }
 			{ resizeObserver }
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
 				template={ BUTTONS_TEMPLATE }
 				renderFooterAppender={
-					shouldRenderFooterAppender && renderFooterAppender
+					shouldRenderFooterAppender && renderFooterAppender.current
 				}
-				__experimentalMoverDirection="horizontal"
-				horizontalAlignment={ align }
-				onDeleteBlock={ shouldDelete ? onDelete : undefined }
+				orientation="horizontal"
+				horizontalAlignment={ contentJustification }
+				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
-				parentWidth={ maxWidth }
+				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
+				__experimentalLayout={ layoutProp }
+				templateInsertUpdatesSelection
+				blockWidth={ blockWidth }
 			/>
-		</AlignmentHookSettingsProvider>
+		</>
 	);
 }
-
-export default compose(
-	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlockCount,
-			getBlockParents,
-			getSelectedBlockClientId,
-		} = select( 'core/block-editor' );
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectedBlockParents = getBlockParents(
-			selectedBlockClientId,
-			true
-		);
-
-		return {
-			// The purpose of `shouldDelete` check is giving the ability to pass to
-			// mobile toolbar function called `onDelete` which removes the whole
-			// `Buttons` container along with the last inner button when
-			// there is exactly one button.
-			shouldDelete: getBlockCount( clientId ) === 1,
-			isInnerButtonSelected: selectedBlockParents[ 0 ] === clientId,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientId }, registry ) => {
-		const { replaceInnerBlocks, selectBlock, removeBlock } = dispatch(
-			'core/block-editor'
-		);
-		const { getBlocks, getBlockOrder } = registry.select(
-			'core/block-editor'
-		);
-		const innerBlocks = getBlocks( clientId );
-
-		return {
-			// The purpose of `onAddNextButton` is giving the ability to automatically
-			// adding `Button` inside `Buttons` block on the appender press event.
-			onAddNextButton: ( selectedId ) => {
-				const order = getBlockOrder( clientId );
-				const selectedButtonIndex = order.findIndex(
-					( i ) => i === selectedId
-				);
-
-				const index =
-					selectedButtonIndex === -1
-						? order.length + 1
-						: selectedButtonIndex;
-
-				const insertedBlock = createBlock( 'core/button' );
-
-				innerBlocks.splice( index + 1, 0, insertedBlock );
-
-				replaceInnerBlocks( clientId, innerBlocks, true );
-				selectBlock( insertedBlock.clientId );
-			},
-			onDelete: () => {
-				removeBlock( clientId );
-			},
-		};
-	} )
-)( ButtonsEdit );

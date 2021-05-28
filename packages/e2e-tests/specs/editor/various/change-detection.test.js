@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { first } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -10,6 +15,7 @@ import {
 	saveDraft,
 	openDocumentSettingsSidebar,
 	isCurrentURL,
+	pressKeyTimes,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Change detection', () => {
@@ -132,9 +138,11 @@ describe( 'Change detection', () => {
 		await page.type( '.editor-post-title__input', '!' );
 
 		await Promise.all( [
-			page.waitForSelector( '.editor-post-publish-button.is-busy' ),
 			page.waitForSelector(
-				'.editor-post-publish-button:not( .is-busy )'
+				'.editor-post-publish-button[aria-disabled="true"]'
+			),
+			page.waitForSelector(
+				'.editor-post-publish-button[aria-disabled="false"]'
 			),
 			page.evaluate( () =>
 				window.wp.data.dispatch( 'core/editor' ).autosave()
@@ -272,14 +280,17 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressKeyWithModifier( 'primary', 'S' );
 
+		// Start this check immediately after save since dirtying the post will
+		// remove the "Saved" with the Save button.
+		const savedPromise = page.waitForSelector(
+			'.editor-post-saved-state.is-saved'
+		);
+
 		// Dirty post while save is in-flight.
 		await page.type( '.editor-post-title__input', '!' );
 
 		// Allow save to complete. Disabling interception flushes pending.
-		await Promise.all( [
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-			releaseSaveIntercept(),
-		] );
+		await Promise.all( [ savedPromise, releaseSaveIntercept() ] );
 
 		await assertIsDirty( true );
 	} );
@@ -294,37 +305,19 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressKeyWithModifier( 'primary', 'S' );
 
+		// Start this check immediately after save since dirtying the post will
+		// remove the "Saved" with the Save button.
+		const savedPromise = page.waitForSelector(
+			'.editor-post-saved-state.is-saved'
+		);
+
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
 
 		// Allow save to complete. Disabling interception flushes pending.
-		await Promise.all( [
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-			releaseSaveIntercept(),
-		] );
+		await Promise.all( [ savedPromise, releaseSaveIntercept() ] );
 
 		await assertIsDirty( true );
-	} );
-
-	it( 'should not prompt when receiving reusable blocks', async () => {
-		// Regression Test: Verify that non-modifying behaviors does not incur
-		// dirtiness. Previously, this could occur as a result of either (a)
-		// selecting a block, (b) opening the inserter, or (c) editing a post
-		// which contained a reusable block. The root issue was changes in
-		// block editor state as a result of reusable blocks data having been
-		// received, reflected here in this test.
-		//
-		// TODO: This should be considered a temporary test, existing only so
-		// long as the experimental reusable blocks fetching data flow exists.
-		//
-		// See: https://github.com/WordPress/gutenberg/issues/14766
-		await page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/editor' )
-				.__experimentalReceiveReusableBlocks( [] )
-		);
-
-		await assertIsDirty( false );
 	} );
 
 	it( 'should save posts without titles and persist and overwrite the auto draft title', async () => {
@@ -377,6 +370,8 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
+		const FONT_SIZE_LABEL_SELECTOR =
+			"//label[contains(text(), 'Font size')]";
 		// Open the sidebar block settings.
 		await openDocumentSettingsSidebar();
 		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
@@ -393,10 +388,9 @@ describe( 'Change detection', () => {
 
 		// Increase the paragraph's font size.
 		await page.click( '[data-type="core/paragraph"]' );
-		await page.click( '.components-font-size-picker__select' );
-		await page.click(
-			'.components-custom-select-control__item:nth-child(3)'
-		);
+		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+		await pressKeyTimes( 'ArrowDown', 2 );
+		await page.keyboard.press( 'Enter' );
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.
@@ -410,10 +404,9 @@ describe( 'Change detection', () => {
 
 		// Increase the paragraph's font size again.
 		await page.click( '[data-type="core/paragraph"]' );
-		await page.click( '.components-font-size-picker__select' );
-		await page.click(
-			'.components-custom-select-control__item:nth-child(4)'
-		);
+		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+		await pressKeyTimes( 'ArrowDown', 3 );
+		await page.keyboard.press( 'Enter' );
 		await page.click( '[data-type="core/paragraph"]' );
 
 		// Check that the post is dirty.

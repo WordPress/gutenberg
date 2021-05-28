@@ -16,15 +16,18 @@ import {
 	getSaveContent,
 } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 function BlockHTML( { clientId } ) {
 	const [ html, setHtml ] = useState( '' );
-	const { block } = useSelect(
-		( select ) => ( {
-			block: select( 'core/block-editor' ).getBlock( clientId ),
-		} ),
+	const block = useSelect(
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
 	);
-	const { updateBlock } = useDispatch( 'core/block-editor' );
+	const { updateBlock } = useDispatch( blockEditorStore );
 	const onChange = () => {
 		const blockType = getBlockType( block.name );
 		const attributes = getBlockAttributes(

@@ -17,12 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Button' ),
-	description: __(
-		'Prompt visitors to take action with a button-style link.'
-	),
 	icon,
-	keywords: [ __( 'link' ) ],
 	example: {
 		attributes: {
 			className: 'is-style-fill',
@@ -30,18 +25,11 @@ export const settings = {
 			text: __( 'Call to Action' ),
 		},
 	},
-	supports: {
-		align: true,
-		alignWide: false,
-		reusable: false,
-		lightBlockWrapper: true,
-	},
-	parent: [ 'core/buttons' ],
-	styles: [
-		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
-		{ name: 'outline', label: __( 'Outline' ) },
-	],
 	edit,
 	save,
 	deprecated,
+	merge: ( a, { text = '' } ) => ( {
+		...a,
+		text: ( a.text || '' ) + text,
+	} ),
 };

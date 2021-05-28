@@ -11,13 +11,13 @@ import { getHTMLRootElementClasses } from '../custom-class-name';
 describe( 'custom className', () => {
 	const blockSettings = {
 		save: () => <div className="default" />,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 
 	const dynamicBlockSettings = {
 		save: () => null,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -15,7 +20,7 @@ class TokenInput extends Component {
 	}
 
 	hasFocus() {
-		return this.input === document.activeElement;
+		return this.input === this.input.ownerDocument.activeElement;
 	}
 
 	bindInput( ref ) {
@@ -34,9 +39,10 @@ class TokenInput extends Component {
 			isExpanded,
 			instanceId,
 			selectedSuggestionIndex,
+			className,
 			...props
 		} = this.props;
-		const size = value.length + 1;
+		const size = value ? value.length + 1 : 0;
 
 		return (
 			<input
@@ -44,10 +50,14 @@ class TokenInput extends Component {
 				id={ `components-form-token-input-${ instanceId }` }
 				type="text"
 				{ ...props }
-				value={ value }
+				value={ value || '' }
 				onChange={ this.onChange }
 				size={ size }
-				className="components-form-token-field__input"
+				className={ classnames(
+					className,
+					'components-form-token-field__input'
+				) }
+				autoComplete="off"
 				role="combobox"
 				aria-expanded={ isExpanded }
 				aria-autocomplete="list"

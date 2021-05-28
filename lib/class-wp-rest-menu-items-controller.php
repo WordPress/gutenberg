@@ -23,6 +23,83 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Overrides the route registration to support "allow_batch".
+	 *
+	 * @since 9.2.0
+	 */
+	public function register_routes() {
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base,
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => $this->get_collection_params(),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
+					'permission_callback' => array( $this, 'create_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
+				),
+				'allow_batch' => array( 'v1' => true ),
+				'schema'      => array( $this, 'get_public_item_schema' ),
+			)
+		);
+
+		$schema        = $this->get_item_schema();
+		$get_item_args = array(
+			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+		);
+		if ( isset( $schema['properties']['password'] ) ) {
+			$get_item_args['password'] = array(
+				'description' => __( 'The password for the post if it is password protected.', 'gutenberg' ),
+				'type'        => 'string',
+			);
+		}
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)',
+			array(
+				'args'        => array(
+					'id' => array(
+						'description' => __( 'Unique identifier for the object.', 'gutenberg' ),
+						'type'        => 'integer',
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => $get_item_args,
+				),
+				array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'update_item' ),
+					'permission_callback' => array( $this, 'update_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
+					'args'                => array(
+						'force' => array(
+							'type'        => 'boolean',
+							'default'     => false,
+							'description' => __( 'Whether to bypass Trash and force deletion.', 'gutenberg' ),
+						),
+					),
+				),
+				'allow_batch' => array( 'v1' => true ),
+				'schema'      => array( $this, 'get_public_item_schema' ),
+			)
+		);
+	}
+
+	/**
 	 * Get the post, if the ID is valid.
 	 *
 	 * @param int $id Supplied ID.
@@ -317,6 +394,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'menu-item-title'       => $menu_item_obj->title,
 				'menu-item-url'         => $menu_item_obj->url,
 				'menu-item-description' => $menu_item_obj->description,
+				'menu-item-content'     => $menu_item_obj->menu_item_content,
 				'menu-item-attr-title'  => $menu_item_obj->attr_title,
 				'menu-item-target'      => $menu_item_obj->target,
 				// Stored in the database as a string.
@@ -337,6 +415,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'menu-item-title'       => '',
 				'menu-item-url'         => '',
 				'menu-item-description' => '',
+				'menu-item-content'     => '',
 				'menu-item-attr-title'  => '',
 				'menu-item-target'      => '',
 				'menu-item-classes'     => '',
@@ -390,6 +469,15 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
+		// Nav menu content.
+		if ( ! empty( $schema['properties']['content'] ) && isset( $request['content'] ) ) {
+			if ( is_string( $request['content'] ) ) {
+				$prepared_nav_item['menu-item-content'] = $request['content'];
+			} elseif ( isset( $request['content']['raw'] ) ) {
+				$prepared_nav_item['menu-item-content'] = $request['content']['raw'];
+			}
+		}
+
 		// Check if object id exists before saving.
 		if ( ! $prepared_nav_item['menu-item-object'] ) {
 			// If taxonony, check if term exists.
@@ -429,6 +517,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
+		// If menu item is type block, then content is required.
+		if ( 'block' === $prepared_nav_item['menu-item-type'] ) {
+			if ( empty( $prepared_nav_item['menu-item-content'] ) ) {
+				return new WP_Error( 'rest_content_required', __( 'Content required if menu item of type block.', 'gutenberg' ), array( 'status' => 400 ) );
+			}
+		}
+
 		// If menu id is set, valid the value of menu item position and parent id.
 		if ( ! empty( $prepared_nav_item['menu-id'] ) ) {
 			// Check if nav menu is valid.
@@ -440,12 +535,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$menu_items = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
 			if ( 0 === (int) $prepared_nav_item['menu-item-position'] ) {
 				if ( $menu_items ) {
-					$last_item = array_pop( $menu_items );
+					$last_item = $menu_items[ count( $menu_items ) - 1 ];
 					if ( $last_item && isset( $last_item->menu_order ) ) {
 						$prepared_nav_item['menu-item-position'] = $last_item->menu_order + 1;
 					} else {
-						$prepared_nav_item['menu-item-position'] = count( $menu_items );
+						$prepared_nav_item['menu-item-position'] = count( $menu_items ) - 1;
 					}
+					array_push( $menu_items, $last_item );
 				} else {
 					$prepared_nav_item['menu-item-position'] = 1;
 				}
@@ -475,7 +571,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		foreach ( array( 'menu-item-object-id', 'menu-item-parent-id' ) as $key ) {
 			// Note we need to allow negative-integer IDs for previewed objects not inserted yet.
-			$prepared_nav_item[ $key ] = intval( $prepared_nav_item[ $key ] );
+			$prepared_nav_item[ $key ] = (int) $prepared_nav_item[ $key ];
 		}
 
 		foreach ( array( 'menu-item-type', 'menu-item-object', 'menu-item-target' ) as $key ) {
@@ -550,9 +646,15 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		if ( in_array( 'title', $fields, true ) ) {
 			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 
+			/** This filter is documented in wp-includes/post-template.php */
+			$title = apply_filters( 'the_title', $menu_item->title, $menu_item->ID );
+
+			/** This filter is documented in wp-includes/class-walker-nav-menu.php */
+			$title = apply_filters( 'nav_menu_item_title', $title, $menu_item, null, 0 );
+
 			$data['title'] = array(
-				'raw'      => $menu_item->post_title,
-				'rendered' => $menu_item->title,
+				'raw'      => $menu_item->title,
+				'rendered' => $title,
 			);
 
 			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
@@ -593,6 +695,20 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		if ( in_array( 'object_id', $fields, true ) ) {
 			// Usually is a string, but lets expose as an integer.
 			$data['object_id'] = absint( $menu_item->object_id );
+		}
+
+		if ( rest_is_field_included( 'content', $fields ) ) {
+			$data['content'] = array();
+		}
+		if ( rest_is_field_included( 'content.raw', $fields ) ) {
+			$data['content']['raw'] = $menu_item->content;
+		}
+		if ( rest_is_field_included( 'content.rendered', $fields ) ) {
+			/** This filter is documented in wp-includes/post-template.php */
+			$data['content']['rendered'] = apply_filters( 'the_content', $menu_item->content );
+		}
+		if ( rest_is_field_included( 'content.block_version', $fields ) ) {
+			$data['content']['block_version'] = block_version( $menu_item->content );
 		}
 
 		if ( in_array( 'parent', $fields, true ) ) {
@@ -786,7 +902,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		$schema['properties']['type'] = array(
 			'description' => __( 'The family of objects originally represented, such as "post_type" or "taxonomy".', 'gutenberg' ),
 			'type'        => 'string',
-			'enum'        => array( 'taxonomy', 'post_type', 'post_type_archive', 'custom' ),
+			'enum'        => array( 'taxonomy', 'post_type', 'post_type_archive', 'custom', 'block' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'default'     => 'custom',
 		);
@@ -858,6 +974,35 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			'type'        => 'integer',
 			'minimum'     => 0,
 			'default'     => 0,
+		);
+
+		$schema['properties']['content'] = array(
+			'description' => __( 'HTML content to display for this block menu item.', 'gutenberg' ),
+			'context'     => array( 'view', 'edit', 'embed' ),
+			'type'        => 'object',
+			'arg_options' => array(
+				'sanitize_callback' => null, // Note: sanitization implemented in self::prepare_item_for_database().
+				'validate_callback' => null, // Note: validation implemented in self::prepare_item_for_database().
+			),
+			'properties'  => array(
+				'raw'           => array(
+					'description' => __( 'HTML content, as it exists in the database.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'edit' ),
+				),
+				'rendered'      => array(
+					'description' => __( 'HTML content, transformed for display.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'block_version' => array(
+					'description' => __( 'Version of the block format used in the HTML content.', 'gutenberg' ),
+					'type'        => 'integer',
+					'context'     => array( 'edit' ),
+					'readonly'    => true,
+				),
+			),
 		);
 
 		$schema['properties']['target'] = array(
@@ -974,6 +1119,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'menu_order',
 			),
 		);
+		// Change default to 100 items.
+		$query_params['per_page']['default'] = 100;
 
 		return $query_params;
 	}
@@ -1032,7 +1179,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				// Invalid terms will be rejected later.
 				if ( ! get_term( $term_id, $taxonomy->name ) ) {
 					continue;
-				};
+				}
 
 				if ( ! current_user_can( 'assign_term', (int) $term_id ) ) {
 					return false;

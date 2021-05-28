@@ -1,0 +1,225 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation message when toggled on 1`] = `
+.emotion-2 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-0 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-0 {
+  margin-bottom: inherit;
+}
+
+<div
+  className="edit-post-preferences-modal__option"
+>
+  <div
+    className="components-base-control components-toggle-control emotion-2 emotion-3"
+  >
+    <div
+      className="components-base-control__field emotion-0 emotion-1"
+    >
+      <span
+        className="components-form-toggle is-checked"
+      >
+        <input
+          checked={true}
+          className="components-form-toggle__input"
+          id="inspector-toggle-control-3"
+          onChange={[Function]}
+          type="checkbox"
+        />
+        <span
+          className="components-form-toggle__track"
+        />
+        <span
+          className="components-form-toggle__thumb"
+        />
+      </span>
+      <label
+        className="components-toggle-control__label"
+        htmlFor="inspector-toggle-control-3"
+      />
+    </div>
+  </div>
+  <p
+    className="edit-post-preferences-modal__custom-fields-confirmation-message"
+  >
+    A page reload is required for this change. Make sure your content is saved before reloading.
+  </p>
+  <button
+    aria-describedby={null}
+    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Enable & Reload
+  </button>
+</div>
+`;
+
+exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields are enabled 1`] = `
+.emotion-2 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-0 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-0 {
+  margin-bottom: inherit;
+}
+
+<div
+  className="edit-post-preferences-modal__option"
+>
+  <div
+    className="components-base-control components-toggle-control emotion-2 emotion-3"
+  >
+    <div
+      className="components-base-control__field emotion-0 emotion-1"
+    >
+      <span
+        className="components-form-toggle is-checked"
+      >
+        <input
+          checked={true}
+          className="components-form-toggle__input"
+          id="inspector-toggle-control-0"
+          onChange={[Function]}
+          type="checkbox"
+        />
+        <span
+          className="components-form-toggle__track"
+        />
+        <span
+          className="components-form-toggle__thumb"
+        />
+      </span>
+      <label
+        className="components-toggle-control__label"
+        htmlFor="inspector-toggle-control-0"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmation message when toggled off 1`] = `
+.emotion-2 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-0 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-0 {
+  margin-bottom: inherit;
+}
+
+<div
+  className="edit-post-preferences-modal__option"
+>
+  <div
+    className="components-base-control components-toggle-control emotion-2 emotion-3"
+  >
+    <div
+      className="components-base-control__field emotion-0 emotion-1"
+    >
+      <span
+        className="components-form-toggle"
+      >
+        <input
+          checked={false}
+          className="components-form-toggle__input"
+          id="inspector-toggle-control-2"
+          onChange={[Function]}
+          type="checkbox"
+        />
+        <span
+          className="components-form-toggle__track"
+        />
+        <span
+          className="components-form-toggle__thumb"
+        />
+      </span>
+      <label
+        className="components-toggle-control__label"
+        htmlFor="inspector-toggle-control-2"
+      />
+    </div>
+  </div>
+  <p
+    className="edit-post-preferences-modal__custom-fields-confirmation-message"
+  >
+    A page reload is required for this change. Make sure your content is saved before reloading.
+  </p>
+  <button
+    aria-describedby={null}
+    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Disable & Reload
+  </button>
+</div>
+`;
+
+exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fields are disabled 1`] = `
+.emotion-2 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-0 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-0 {
+  margin-bottom: inherit;
+}
+
+<div
+  className="edit-post-preferences-modal__option"
+>
+  <div
+    className="components-base-control components-toggle-control emotion-2 emotion-3"
+  >
+    <div
+      className="components-base-control__field emotion-0 emotion-1"
+    >
+      <span
+        className="components-form-toggle"
+      >
+        <input
+          checked={false}
+          className="components-form-toggle__input"
+          id="inspector-toggle-control-1"
+          onChange={[Function]}
+          type="checkbox"
+        />
+        <span
+          className="components-form-toggle__track"
+        />
+        <span
+          className="components-form-toggle__thumb"
+        />
+      </span>
+      <label
+        className="components-toggle-control__label"
+        htmlFor="inspector-toggle-control-1"
+      />
+    </div>
+  </div>
+</div>
+`;

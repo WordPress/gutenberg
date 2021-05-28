@@ -1,15 +1,16 @@
 {
 	"name": "@wordpress/priority-queue",
-	"version": "1.6.0",
+	"version": "2.1.0",
 	"description": "Generic browser priority queue.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"browser",
 		"async"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/priority-queue/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/priority-queue/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,13 +19,16 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.9.2"
+		"@babel/runtime": "^7.13.10"
 	},
 	"publishConfig": {
 		"access": "public"

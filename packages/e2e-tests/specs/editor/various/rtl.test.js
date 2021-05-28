@@ -5,6 +5,8 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	pressKeyWithModifier,
+	activatePlugin,
+	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
 
 // Avoid using three, as it looks too much like two with some fonts.
@@ -13,12 +15,19 @@ const ARABIC_ONE = '١';
 const ARABIC_TWO = '٢';
 
 describe( 'RTL', () => {
+	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-plugin-activate-rtl' );
+	} );
+
 	beforeEach( async () => {
 		await createNewPost();
 	} );
 
+	afterAll( async () => {
+		await deactivatePlugin( 'gutenberg-test-plugin-activate-rtl' );
+	} );
+
 	it( 'should arrow navigate', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		// We need at least three characters as arrow navigation *from* the
@@ -36,7 +45,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should split', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -48,7 +56,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should merge backward', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -61,7 +68,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should merge forward', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -75,7 +81,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should arrow navigate between blocks', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -101,8 +106,10 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should navigate inline boundaries', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
+
+		// Wait for rich text editor to load.
+		await page.waitForSelector( '.block-editor-rich-text__editable' );
 
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( ARABIC_ONE );

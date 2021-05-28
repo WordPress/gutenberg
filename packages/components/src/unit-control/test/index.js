@@ -1,44 +1,32 @@
 /**
  * External dependencies
  */
-import { render, unmountComponentAtNode } from 'react-dom';
-import { act, Simulate } from 'react-dom/test-utils';
+import { render, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
-import { UP, DOWN } from '@wordpress/keycodes';
+import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import UnitControl from '../';
 
-let container = null;
-
-beforeEach( () => {
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
-
-afterEach( () => {
-	unmountComponentAtNode( container );
-	container.remove();
-	container = null;
-} );
-
-const getComponent = () => container.querySelector( '.component-unit-control' );
+const getComponent = () =>
+	document.body.querySelector( '.components-unit-control' );
 const getInput = () =>
-	container.querySelector( '.component-unit-control__input' );
+	document.body.querySelector( '.components-unit-control input' );
 const getSelect = () =>
-	container.querySelector( '.component-unit-control__select' );
+	document.body.querySelector( '.components-unit-control select' );
+
+const fireKeyDown = ( data ) =>
+	fireEvent.keyDown( document.activeElement || document.body, data );
 
 describe( 'UnitControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
-			act( () => {
-				render( <UnitControl />, container );
-			} );
+			render( <UnitControl /> );
 			const input = getInput();
 			const select = getSelect();
 
@@ -47,9 +35,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should render custom className', () => {
-			act( () => {
-				render( <UnitControl className="hello" />, container );
-			} );
+			render( <UnitControl className="hello" /> );
 
 			const el = getComponent();
 
@@ -57,9 +43,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should not render select, if units are disabled', () => {
-			act( () => {
-				render( <UnitControl unit="em" units={ false } />, container );
-			} );
+			render( <UnitControl unit="em" units={ false } /> );
 			const input = getInput();
 			const select = getSelect();
 
@@ -70,103 +54,65 @@ describe( 'UnitControl', () => {
 
 	describe( 'Value', () => {
 		it( 'should update value on change', () => {
-			let state = 50;
-			const setState = ( nextState ) => ( state = nextState );
+			let state = '50px';
+			const setState = jest.fn( ( value ) => ( state = value ) );
 
-			act( () => {
-				render(
-					<UnitControl value={ state } onChange={ setState } />,
-					container
-				);
-			} );
+			render( <UnitControl value={ state } onChange={ setState } /> );
 
 			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: 62 } } );
 
-			act( () => {
-				Simulate.change( input, { target: { value: 62 } } );
-			} );
-
-			expect( state ).toBe( 62 );
+			expect( setState ).toHaveBeenCalledTimes( 1 );
+			expect( state ).toBe( '62px' );
 		} );
 
 		it( 'should increment value on UP press', () => {
-			let state = 50;
+			let state = '50px';
 			const setState = ( nextState ) => ( state = nextState );
 
-			act( () => {
-				render(
-					<UnitControl value={ state } onChange={ setState } />,
-					container
-				);
-			} );
+			render( <UnitControl value={ state } onChange={ setState } /> );
 
-			const input = getInput();
+			getInput().focus();
+			fireKeyDown( { keyCode: UP } );
 
-			act( () => {
-				Simulate.keyDown( input, { keyCode: UP } );
-			} );
-
-			expect( state ).toBe( '51' );
+			expect( state ).toBe( '51px' );
 		} );
 
 		it( 'should increment value on UP + SHIFT press, with step', () => {
-			let state = 50;
+			let state = '50px';
 			const setState = ( nextState ) => ( state = nextState );
 
-			act( () => {
-				render(
-					<UnitControl value={ state } onChange={ setState } />,
-					container
-				);
-			} );
+			render( <UnitControl value={ state } onChange={ setState } /> );
 
-			const input = getInput();
+			getInput().focus();
+			fireKeyDown( { keyCode: UP, shiftKey: true } );
 
-			act( () => {
-				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
-			} );
-
-			expect( state ).toBe( '60' );
+			expect( state ).toBe( '60px' );
 		} );
 
 		it( 'should decrement value on DOWN press', () => {
 			let state = 50;
 			const setState = ( nextState ) => ( state = nextState );
 
-			act( () => {
-				render(
-					<UnitControl value={ state } onChange={ setState } />,
-					container
-				);
-			} );
+			render( <UnitControl value={ state } onChange={ setState } /> );
 
-			const input = getInput();
+			getInput().focus();
+			fireKeyDown( { keyCode: DOWN } );
 
-			act( () => {
-				Simulate.keyDown( input, { keyCode: DOWN } );
-			} );
-
-			expect( state ).toBe( '49' );
+			expect( state ).toBe( '49px' );
 		} );
 
 		it( 'should decrement value on DOWN + SHIFT press, with step', () => {
 			let state = 50;
 			const setState = ( nextState ) => ( state = nextState );
 
-			act( () => {
-				render(
-					<UnitControl value={ state } onChange={ setState } />,
-					container
-				);
-			} );
+			render( <UnitControl value={ state } onChange={ setState } /> );
 
-			const input = getInput();
+			getInput().focus();
+			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
 
-			act( () => {
-				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
-			} );
-
-			expect( state ).toBe( '40' );
+			expect( state ).toBe( '40px' );
 		} );
 	} );
 
@@ -175,18 +121,11 @@ describe( 'UnitControl', () => {
 			let state = 'px';
 			const setState = ( nextState ) => ( state = nextState );
 
-			act( () => {
-				render(
-					<UnitControl unit={ state } onUnitChange={ setState } />,
-					container
-				);
-			} );
+			render( <UnitControl unit={ state } onUnitChange={ setState } /> );
 
 			const select = getSelect();
-
-			act( () => {
-				Simulate.change( select, { target: { value: 'em' } } );
-			} );
+			select.focus();
+			fireEvent.change( select, { target: { value: 'em' } } );
 
 			expect( state ).toBe( 'em' );
 		} );
@@ -196,9 +135,8 @@ describe( 'UnitControl', () => {
 				{ value: 'pt', label: 'pt', default: 0 },
 				{ value: 'vmax', label: 'vmax', default: 10 },
 			];
-			act( () => {
-				render( <UnitControl units={ units } />, container );
-			} );
+
+			render( <UnitControl units={ units } /> );
 
 			const select = getSelect();
 			const options = select.querySelectorAll( 'option' );
@@ -219,30 +157,26 @@ describe( 'UnitControl', () => {
 				{ value: 'pt', label: 'pt', default: 25 },
 				{ value: 'vmax', label: 'vmax', default: 75 },
 			];
-			act( () => {
-				render(
-					<UnitControl
-						units={ units }
-						onChange={ setState }
-						value={ state }
-					/>,
-					container
-				);
-			} );
+
+			render(
+				<UnitControl
+					isResetValueOnUnitChange
+					units={ units }
+					onChange={ setState }
+					value={ state }
+				/>
+			);
 
 			const select = getSelect();
+			select.focus();
 
-			act( () => {
-				Simulate.change( select, { target: { value: 'vmax' } } );
-			} );
+			fireEvent.change( select, { target: { value: 'vmax' } } );
 
-			expect( state ).toBe( 75 );
+			expect( state ).toBe( '75vmax' );
 
-			act( () => {
-				Simulate.change( select, { target: { value: 'pt' } } );
-			} );
+			fireEvent.change( select, { target: { value: 'pt' } } );
 
-			expect( state ).toBe( 25 );
+			expect( state ).toBe( '25pt' );
 		} );
 
 		it( 'should not reset value on unit change, if disabled', () => {
@@ -253,31 +187,136 @@ describe( 'UnitControl', () => {
 				{ value: 'pt', label: 'pt', default: 25 },
 				{ value: 'vmax', label: 'vmax', default: 75 },
 			];
-			act( () => {
-				render(
-					<UnitControl
-						isResetValueOnUnitChange={ false }
-						value={ state }
-						units={ units }
-						onChange={ setState }
-					/>,
-					container
-				);
+
+			render(
+				<UnitControl
+					isResetValueOnUnitChange={ false }
+					value={ state }
+					units={ units }
+					onChange={ setState }
+				/>
+			);
+
+			const select = getSelect();
+			select.focus();
+
+			fireEvent.change( select, { target: { value: 'vmax' } } );
+
+			expect( state ).toBe( '50vmax' );
+
+			fireEvent.change( select, { target: { value: 'pt' } } );
+
+			expect( state ).toBe( '50pt' );
+		} );
+	} );
+
+	describe( 'Unit Parser', () => {
+		let state = '10px';
+		const setState = jest.fn( ( nextState ) => ( state = nextState ) );
+
+		it( 'should parse unit from input', () => {
+			render(
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					isPressEnterToChange
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '55 em' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( state ).toBe( '55em' );
+		} );
+
+		it( 'should parse PX unit from input', () => {
+			render(
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					isPressEnterToChange
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '61   PX' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( state ).toBe( '61px' );
+		} );
+
+		it( 'should parse EM unit from input', () => {
+			render(
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					isPressEnterToChange
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '55 em' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( state ).toBe( '55em' );
+		} );
+
+		it( 'should parse % unit from input', () => {
+			render(
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					isPressEnterToChange
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '-10  %' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( state ).toBe( '-10%' );
+		} );
+
+		it( 'should parse REM unit from input', () => {
+			render(
+				<UnitControl
+					value={ state }
+					onChange={ setState }
+					isPressEnterToChange
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, {
+				target: { value: '123       rEm  ' },
 			} );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( state ).toBe( '123rem' );
+		} );
+
+		it( 'should update unit after initial render and with new unit prop', () => {
+			const { rerender } = render( <UnitControl value={ '10%' } /> );
 
 			const select = getSelect();
 
-			act( () => {
-				Simulate.change( select, { target: { value: 'vmax' } } );
-			} );
+			expect( select.value ).toBe( '%' );
 
-			expect( state ).toBe( 50 );
+			rerender( <UnitControl value={ '20' } unit="em" /> );
 
-			act( () => {
-				Simulate.change( select, { target: { value: 'pt' } } );
-			} );
+			expect( select.value ).toBe( 'em' );
+		} );
 
-			expect( state ).toBe( 50 );
+		it( 'should fallback to default unit if parsed unit is invalid', () => {
+			render( <UnitControl value={ '10null' } /> );
+
+			expect( getSelect().value ).toBe( 'px' );
 		} );
 	} );
 } );

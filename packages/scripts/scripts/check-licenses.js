@@ -40,31 +40,28 @@ const ignored = hasArgInCLI( '--ignore' )
  * all the licenses in that string are GPL2 compatible.
  */
 const gpl2CompatibleLicenses = [
+	'0BSD',
 	'Apache-2.0 WITH LLVM-exception',
 	'Artistic-2.0',
-	'BSD',
 	'BSD-2-Clause',
-	'BSD-3-Clause',
 	'BSD-3-Clause-W3C',
-	'BSD-like',
+	'BSD-3-Clause',
+	'BSD',
 	'CC-BY-4.0',
 	'CC0-1.0',
+	'GPL-2.0-or-later',
 	'GPL-2.0',
 	'GPL-2.0+',
-	'GPL-2.0-or-later',
 	'ISC',
 	'LGPL-2.1',
 	'MIT',
 	'MIT/X11',
-	'MIT (http://mootools.net/license.txt)',
 	'MPL-2.0',
+	'ODC-By-1.0',
 	'Public Domain',
 	'Unlicense',
 	'WTFPL',
 	'Zlib',
-	'(MIT AND BSD-3-Clause)',
-	'(MIT AND Zlib)',
-	'(CC-BY-4.0 AND MIT)',
 ];
 
 /*
@@ -75,11 +72,11 @@ const gpl2CompatibleLicenses = [
  */
 const otherOssLicenses = [
 	'Apache-2.0',
-	'Apache 2.0',
 	'Apache License, Version 2.0',
-	'Apache version 2.0',
 	'CC-BY-3.0',
+	'CC-BY-SA-2.0',
 	'LGPL',
+	'Python-2.0',
 ];
 
 const licenses = [
@@ -177,10 +174,15 @@ const child = spawn.sync(
 		'ls',
 		'--json',
 		'--long',
+		'--all',
 		...( prod ? [ '--prod' ] : [] ),
 		...( dev ? [ '--dev' ] : [] ),
 	],
-	{ maxBuffer: 1024 * 1024 * 100 } // output size for prod is ~21 MB and dev is ~76 MB
+	/*
+	 * Set the max buffer to ~157MB, since the output size for
+	 * prod is ~21 MB and dev is ~110 MB
+	 */
+	{ maxBuffer: 1024 * 1024 * 150 }
 );
 
 const result = JSON.parse( child.stdout.toString() );
@@ -222,6 +224,40 @@ function traverseDepTree( deps ) {
 	}
 }
 
+function detectTypeFromLicenseFiles( path ) {
+	return licenseFiles.reduce( ( detectedType, licenseFile ) => {
+		if ( detectedType ) {
+			return detectedType;
+		}
+
+		const licensePath = path + '/' + licenseFile;
+
+		if ( existsSync( licensePath ) ) {
+			const licenseText = readFileSync( licensePath ).toString();
+
+			// Check if the file contains any of the strings in licenseFileStrings
+			return Object.keys( licenseFileStrings ).reduce(
+				( stringDetectedType, licenseStringType ) => {
+					const licenseFileString =
+						licenseFileStrings[ licenseStringType ];
+
+					return licenseFileString.reduce(
+						( currentDetectedType, fileString ) => {
+							if ( licenseText.includes( fileString ) ) {
+								return licenseStringType;
+							}
+							return currentDetectedType;
+						},
+						stringDetectedType
+					);
+				},
+				detectedType
+			);
+		}
+		return detectedType;
+	}, false );
+}
+
 function checkDepLicense( path ) {
 	if ( ! path ) {
 		return;
@@ -257,51 +293,28 @@ function checkDepLicense( path ) {
 		licenseType = undefined;
 	}
 
+	if ( licenseType ) {
+		const allowed = licenses.find( ( allowedLicense ) =>
+			checkLicense( allowedLicense, licenseType )
+		);
+		if ( allowed ) {
+			return;
+		}
+	}
+
 	/*
-	 * If we haven't been able to detect a license in the package.json file, try reading
-	 * it from the files defined in licenseFiles, instead.
+	 * If we haven't been able to detect a license in the package.json file,
+	 * or the type was invalid, try reading it from the files defined in
+	 * license files, instead.
 	 */
-	if ( licenseType === undefined ) {
-		licenseType = licenseFiles.reduce( ( detectedType, licenseFile ) => {
-			if ( detectedType ) {
-				return detectedType;
-			}
-
-			const licensePath = path + '/' + licenseFile;
-
-			if ( existsSync( licensePath ) ) {
-				const licenseText = readFileSync( licensePath ).toString();
-
-				// Check if the file contains any of the strings in licenseFileStrings
-				return Object.keys( licenseFileStrings ).reduce(
-					( stringDetectedType, licenseStringType ) => {
-						const licenseFileString =
-							licenseFileStrings[ licenseStringType ];
-
-						return licenseFileString.reduce(
-							( currentDetectedType, fileString ) => {
-								if ( licenseText.includes( fileString ) ) {
-									return licenseStringType;
-								}
-								return currentDetectedType;
-							},
-							stringDetectedType
-						);
-					},
-					detectedType
-				);
-			}
-			return detectedType;
-		}, false );
+	const detectedLicenseType = detectTypeFromLicenseFiles( path );
+	if ( ! licenseType && ! detectedLicenseType ) {
+		return;
 	}
 
-	if ( ! licenseType ) {
-		return false;
-	}
-
-	// Now that we finally have a license to check, see if any of the allowed licenses match.
+	// Now that we have a license to check, see if any of the allowed licenses match.
 	const allowed = licenses.find( ( allowedLicense ) =>
-		checkLicense( allowedLicense, licenseType )
+		checkLicense( allowedLicense, detectedLicenseType )
 	);
 
 	if ( ! allowed ) {

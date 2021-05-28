@@ -2,14 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty, pick } from 'lodash';
+import { every, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { PanelBody, ColorIndicator } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,6 +16,7 @@ import { useSelect } from '@wordpress/data';
 import ColorGradientControl from './control';
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
+import useSetting from '../use-setting';
 
 // translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(%s: color %s)' );
@@ -147,10 +147,13 @@ export const PanelColorGradientSettingsInner = ( {
 };
 
 const PanelColorGradientSettingsSelect = ( props ) => {
-	const colorGradientSettings = useSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
-		return pick( settings, colorsAndGradientKeys );
-	} );
+	const colorGradientSettings = {};
+	colorGradientSettings.colors = useSetting( 'color.palette' );
+	colorGradientSettings.gradients = useSetting( 'color.gradients' );
+	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
+	colorGradientSettings.disableCustomGradients = ! useSetting(
+		'color.customGradient'
+	);
 	return (
 		<PanelColorGradientSettingsInner
 			{ ...{ ...colorGradientSettings, ...props } }

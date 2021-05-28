@@ -9,7 +9,7 @@ import { orderBy } from 'lodash';
  */
 
 import { __ } from '@wordpress/i18n';
-import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
+import { ToolbarItem, DropdownMenu, Slot } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 
 const POPOVER_PROPS = {
@@ -19,33 +19,35 @@ const POPOVER_PROPS = {
 
 const FormatToolbar = () => {
 	return (
-		<div className="block-editor-format-toolbar">
-			<Toolbar>
-				{ [ 'bold', 'italic', 'link', 'text-color' ].map(
-					( format ) => (
-						<Slot
-							name={ `RichText.ToolbarControls.${ format }` }
-							key={ format }
-						/>
+		<>
+			{ [ 'bold', 'italic', 'link', 'text-color' ].map( ( format ) => (
+				<Slot
+					name={ `RichText.ToolbarControls.${ format }` }
+					key={ format }
+				/>
+			) ) }
+			<Slot name="RichText.ToolbarControls">
+				{ ( fills ) =>
+					fills.length !== 0 && (
+						<ToolbarItem>
+							{ ( toggleProps ) => (
+								<DropdownMenu
+									icon={ chevronDown }
+									/* translators: button label text should, if possible, be under 16 characters. */
+									label={ __( 'More' ) }
+									toggleProps={ toggleProps }
+									controls={ orderBy(
+										fills.map( ( [ { props } ] ) => props ),
+										'title'
+									) }
+									popoverProps={ POPOVER_PROPS }
+								/>
+							) }
+						</ToolbarItem>
 					)
-				) }
-				<Slot name="RichText.ToolbarControls">
-					{ ( fills ) =>
-						fills.length !== 0 && (
-							<DropdownMenu
-								icon={ chevronDown }
-								label={ __( 'More rich text controls' ) }
-								controls={ orderBy(
-									fills.map( ( [ { props } ] ) => props ),
-									'title'
-								) }
-								popoverProps={ POPOVER_PROPS }
-							/>
-						)
-					}
-				</Slot>
-			</Toolbar>
-		</div>
+				}
+			</Slot>
+		</>
 	);
 };
 

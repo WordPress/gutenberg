@@ -1,6 +1,6 @@
 .components-panel {
 	background: $white;
-	border: $border-width solid $light-gray-500;
+	border: $border-width solid $gray-200;
 
 	> .components-panel__header:first-child,
 	> .components-panel__body:first-child {
@@ -18,15 +18,15 @@
 }
 
 .components-panel__body {
-	border-top: $border-width solid $light-gray-500;
-	border-bottom: $border-width solid $light-gray-500;
+	border-top: $border-width solid $gray-200;
+	border-bottom: $border-width solid $gray-200;
 
 	h3 {
 		margin: 0 0 0.5em;
 	}
 
 	&.is-opened {
-		padding: $panel-padding;
+		padding: $grid-unit-20;
 	}
 }
 
@@ -34,10 +34,10 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 0 $panel-padding;
-	height: 50px;
-	border-top: $border-width solid $light-gray-500;
-	border-bottom: $border-width solid $light-gray-500;
+	padding: 0 $grid-unit-20;
+	height: $grid-unit-60;
+	border-top: $border-width solid $gray-300;
+	border-bottom: $border-width solid $gray-300;
 
 	h2 {
 		margin: 0;
@@ -63,25 +63,25 @@
 	@include reduce-motion("transition");
 }
 .components-panel__body.is-opened > .components-panel__body-title {
-	margin: -1 * $panel-padding;
+	margin: -1 * $grid-unit-20;
 	margin-bottom: 5px;
 }
 
 // Hover States
 .components-panel__body > .components-panel__body-title:hover {
 	// Override the default button hover style
-	background: $light-gray-200;
+	background: $gray-100;
 	border: none;
 }
 
 .components-panel__body-toggle.components-button {
 	position: relative;
-	padding: 15px;
+	padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
 	outline: none;
 	width: 100%;
-	font-weight: 600;
+	font-weight: 500;
 	text-align: left;
-	color: $dark-gray-900;
+	color: $gray-900;
 	border: none;
 	box-shadow: none;
 	transition: 0.1s background ease-in-out;
@@ -89,7 +89,7 @@
 	height: auto;
 
 	&:focus {
-		box-shadow: inset 0 0 0 $border-width-focus $theme-color;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		border-radius: 0;
 	}
 
@@ -98,7 +98,7 @@
 		right: $grid-unit-20;
 		top: 50%;
 		transform: translateY(-50%);
-		color: $dark-gray-900;
+		color: $gray-900;
 		fill: currentColor;
 		transition: 0.1s color ease-in-out;
 		@include reduce-motion("transition");
@@ -116,7 +116,7 @@
 }
 
 .components-panel__icon {
-	color: $dark-gray-500;
+	color: $gray-700;
 	margin: -2px 0 -2px 6px;
 }
 
@@ -133,7 +133,8 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-top: 20px;
+	margin-top: $grid-unit-10;
+	min-height: $button-size;
 
 	select {
 		// Necessary for select to respond to flexbox
@@ -141,7 +142,7 @@
 	}
 
 	label {
-		margin-right: 10px;
+		margin-right: $grid-unit-15;
 		flex-shrink: 0;
 		max-width: 75%;
 	}

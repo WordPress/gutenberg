@@ -1,68 +1,119 @@
-.block-editor-block-mover {
-	display: inline-flex;
-	flex-direction: row;
-}
-
-.block-editor-block-mover__description {
+.block-editor-block-mover-button__description {
 	display: none;
 }
 
-.block-editor-block-mover__control.has-icon {
+.block-editor-block-mover-button.has-icon {
 	padding: 0;
 }
 
 // Show the mover in a single button under the contextual toolbar.
 .block-editor-block-mover {
+	display: inline-flex;
+	flex-direction: row;
+
+	.block-editor-block-mover__move-button-container,
 	.components-toolbar {
-		flex-direction: column;
+		flex: 1;
+
+		// Increase touch targets on mobile.
+		flex-direction: row;
+		border-right: none !important;
+
+		@include break-small() {
+			flex-direction: column;
+		}
 	}
 
+	&.is-horizontal .block-editor-block-mover__move-button-container,
 	&.is-horizontal .components-toolbar {
 		flex-direction: row;
 	}
 
-	.block-editor-block-mover__control {
-		height: $block-toolbar-height/2;
+	.block-editor-block-mover-button {
+		&.block-editor-block-mover-button {
+			padding-right: 0;
+			padding-left: 0;
+			min-width: $button-size;
+		}
+
+		@include break-small() {
+			// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+			height: $block-toolbar-height/2;
+			width: $block-toolbar-height - $grid-unit-15 / 2;
+			padding-right: $grid-unit-15 - $border-width !important;
+			padding-left: $grid-unit-15 / 2 !important;
+
+			// Extra specificity to override standard toolbar button styles.
+			&.block-editor-block-mover-button {
+				min-width: $block-toolbar-height - $grid-unit-15 / 2;
+			}
+		}
+
+		// Focus style.
+		// Overrides .components-toolbar-group styles
+		&::before {
+			@include break-small() {
+				left: $grid-unit-10 !important;
+				right: $grid-unit-10 !important;
+			}
+		}
+	}
+
+	.block-editor-block-mover__drag-handle {
+		width: $button-size-small;
+		cursor: grab;
+
+		// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+		min-width: $button-size-small !important;
+		padding: 0 !important;
+
+		&:focus::before {
+			left: 0 !important;
+			right: 0 !important;
+		}
 	}
 
 	// Position the icons correctly.
-	.components-toolbar .block-editor-block-mover__control-up {
-		svg {
-			margin-bottom: -$grid-unit-10;
+	@include break-small() {
+		.components-toolbar-group .block-editor-block-mover-button,
+		.components-toolbar .block-editor-block-mover-button {
+			margin: 0 auto 0 0;
 		}
 
-		// Focus style.
-		&::before {
-			bottom: 0;
-			height: calc(100% - #{ $grid-unit-10 });
-		}
-	}
-
-	.components-toolbar .block-editor-block-mover__control-down {
-		svg {
-			margin-top: -$grid-unit-10;
+		// Up button.
+		.components-toolbar-group .block-editor-block-mover-button.is-up-button,
+		.components-toolbar .block-editor-block-mover-button.is-up-button {
+			// Focus style.
+			&::before {
+				bottom: 0;
+				height: calc(100% - #{ $border-width });
+			}
 		}
 
-		// Focus style.
-		&::before {
-			top: 0;
-			height: calc(100% - #{ $grid-unit-10 });
+		// Down button.
+		.components-toolbar-group .block-editor-block-mover-button.is-down-button,
+		.components-toolbar .block-editor-block-mover-button.is-down-button {
+			// Focus style.
+			&::before {
+				top: 0;
+				height: calc(100% - #{ $border-width });
+			}
 		}
 	}
 
 	// Mover is horizontal.
 	&.is-horizontal {
-		.block-editor-block-mover__control.has-icon {
+		.block-editor-block-mover-button.has-icon {
 			height: $block-toolbar-height;
-			width: $block-toolbar-height/2 !important;
-			min-width: $grid-unit-30;
+			// Overrides .components-toolbar-group styles
+			width: $block-toolbar-height / 2;
 			padding-left: 0;
 			padding-right: 0;
 
 			// Focus style.
 			&::before {
-				top: $grid-unit-10;
-				bottom: $grid-unit-10;
+				top: $border-width;
+				bottom: $border-width;
 				min-width: 0;
 				width: auto;
 				height: auto;
@@ -70,7 +121,7 @@
 		}
 
 		// Position the icons correctly.
-		.block-editor-block-mover__control-up.has-icon {
+		.block-editor-block-mover-button.is-up-button.has-icon {
 			svg {
 				margin-left: 0;
 				margin-right: -$grid-unit-10;
@@ -78,13 +129,14 @@
 			}
 
 			// Focus style.
+			// Overrides .components-toolbar-group styles
 			&::before {
-				left: $grid-unit-10;
-				right: 0;
+				left: 0 !important;
+				right: 0 !important;
 			}
 		}
 
-		.block-editor-block-mover__control-down.has-icon {
+		.block-editor-block-mover-button.is-down-button.has-icon {
 			svg {
 				margin-left: -$grid-unit-10;
 				margin-right: 0;
@@ -92,22 +144,11 @@
 			}
 
 			// Focus style.
+			// Overrides .components-toolbar-group styles
 			&::before {
-				left: 0;
-				right: $grid-unit-10;
-			}
-		}
-	}
-
-	// Drag and drop is only enabled in contextual toolbars.
-	&:not([draggable="false"]) {
-		cursor: grab;
-
-		.block-editor-block-mover__control {
-			cursor: grab !important;
-
-			&:not(:disabled):not([aria-disabled="true"]):active {
-				cursor: grabbing;
+				left: 0 !important;
+				right: 0 !important;
+				width: calc(100% + #{ $border-width });
 			}
 		}
 	}

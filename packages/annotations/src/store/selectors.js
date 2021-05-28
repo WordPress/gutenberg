@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { get, flatMap } from 'lodash';
+import { flatMap } from 'lodash';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -25,19 +25,19 @@ const EMPTY_ARRAY = [];
  */
 export const __experimentalGetAnnotationsForBlock = createSelector(
 	( state, blockClientId ) => {
-		return get( state, blockClientId, [] ).filter( ( annotation ) => {
+		return ( state?.[ blockClientId ] ?? [] ).filter( ( annotation ) => {
 			return annotation.selector === 'block';
 		} );
 	},
-	( state, blockClientId ) => [ get( state, blockClientId, EMPTY_ARRAY ) ]
+	( state, blockClientId ) => [ state?.[ blockClientId ] ?? EMPTY_ARRAY ]
 );
 
-export const __experimentalGetAllAnnotationsForBlock = function(
+export function __experimentalGetAllAnnotationsForBlock(
 	state,
 	blockClientId
 ) {
-	return get( state, blockClientId, EMPTY_ARRAY );
-};
+	return state?.[ blockClientId ] ?? EMPTY_ARRAY;
+}
 
 /**
  * Returns the annotations that apply to the given RichText instance.
@@ -53,7 +53,7 @@ export const __experimentalGetAllAnnotationsForBlock = function(
  */
 export const __experimentalGetAnnotationsForRichText = createSelector(
 	( state, blockClientId, richTextIdentifier ) => {
-		return get( state, blockClientId, [] )
+		return ( state?.[ blockClientId ] ?? [] )
 			.filter( ( annotation ) => {
 				return (
 					annotation.selector === 'range' &&
@@ -69,7 +69,7 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
 				};
 			} );
 	},
-	( state, blockClientId ) => [ get( state, blockClientId, EMPTY_ARRAY ) ]
+	( state, blockClientId ) => [ state?.[ blockClientId ] ?? EMPTY_ARRAY ]
 );
 
 /**

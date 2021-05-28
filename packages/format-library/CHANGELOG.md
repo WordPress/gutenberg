@@ -1,8 +1,23 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 2.1.0 (2021-05-20)
+
+## 2.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
+## 1.27.0 (2021-03-17)
+
 ## 1.8.0 (2019-08-29)
 
 ### Internal
 
-- The inline link component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
+-   The inline link component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
 
 ## 1.2.10 (2019-01-03)
 
@@ -22,8 +37,8 @@
 
 ### Bug fixes
 
-- Link URL validation now works correctly when a URL includes a fragment. Previously any URL containing a fragment failed validation.
-- Link URL validation catches an incorrect number of forward slashes following a url using the http protocol.
+-   Link URL validation now works correctly when a URL includes a fragment. Previously any URL containing a fragment failed validation.
+-   Link URL validation catches an incorrect number of forward slashes following a url using the http protocol.
 
 ## 1.2.2 (2018-11-15)
 
@@ -33,7 +48,7 @@
 
 ## New Feature
 
-- Add URL validation to links.
+-   Add URL validation to links.
 
 ## 1.1.1 (2018-11-09)
 
@@ -41,7 +56,7 @@
 
 ### New Features
 
-- Import Format API components instead of passing as props.
+-   Import Format API components instead of passing as props.
 
 ## 1.0.3 (2018-11-03)
 

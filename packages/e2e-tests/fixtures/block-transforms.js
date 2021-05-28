@@ -97,7 +97,7 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	core__embed: {
 		originalBlock: 'Embed',
-		availableTransforms: [ 'Group' ],
+		availableTransforms: [ 'Group', 'Paragraph' ],
 	},
 	'core__file__new-window': {
 		originalBlock: 'File',
@@ -221,6 +221,10 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Latest Posts',
 		availableTransforms: [ 'Group' ],
 	},
+	'core__latest-posts__displayAuthor': {
+		originalBlock: 'Latest Posts',
+		availableTransforms: [ 'Group' ],
+	},
 	'core__latest-posts__displayPostDate': {
 		originalBlock: 'Latest Posts',
 		availableTransforms: [ 'Group' ],
@@ -246,7 +250,7 @@ export const EXPECTED_TRANSFORMS = {
 		availableTransforms: [ 'Group' ],
 	},
 	'core__navigation-link': {
-		originalBlock: 'Navigation Link',
+		originalBlock: 'Link',
 		availableTransforms: [ 'Group' ],
 	},
 	core__nextpage: {
@@ -274,7 +278,7 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	core__preformatted: {
 		originalBlock: 'Preformatted',
-		availableTransforms: [ 'Group', 'Paragraph' ],
+		availableTransforms: [ 'Group', 'Paragraph', 'Code' ],
 	},
 	core__pullquote: {
 		originalBlock: 'Pullquote',
@@ -327,6 +331,10 @@ export const EXPECTED_TRANSFORMS = {
 	core__shortcode: {
 		originalBlock: 'Shortcode',
 		availableTransforms: [ 'Group' ],
+	},
+	'core__site-tagline': {
+		availableTransforms: [ 'Group' ],
+		originalBlock: 'Site Tagline',
 	},
 	'core__site-title': {
 		availableTransforms: [ 'Group' ],
@@ -506,6 +514,10 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	'core__table__scope-attribute': {
 		originalBlock: 'Table',
+		availableTransforms: [ 'Group' ],
+	},
+	'core__table-of-contents': {
+		originalBlock: 'Table of Contents',
 		availableTransforms: [ 'Group' ],
 	},
 	'core__tag-cloud': {

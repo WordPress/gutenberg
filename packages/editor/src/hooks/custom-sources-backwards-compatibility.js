@@ -6,6 +6,7 @@ import { pickBy, mapValues, isEmpty, mapKeys } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { select as globalSelect, useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
@@ -135,7 +136,7 @@ addFilter(
 //
 // In the future, we could support updating block settings, at which point this
 // implementation could use that mechanism instead.
-globalSelect( 'core/blocks' )
+globalSelect( blocksStore )
 	.getBlockTypes()
-	.map( ( { name } ) => globalSelect( 'core/blocks' ).getBlockType( name ) )
+	.map( ( { name } ) => globalSelect( blocksStore ).getBlockType( name ) )
 	.forEach( shimAttributeSource );

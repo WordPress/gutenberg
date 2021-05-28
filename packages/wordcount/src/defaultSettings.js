@@ -1,3 +1,40 @@
+/** @typedef {import('./index').WPWordCountStrategy} WPWordCountStrategy */
+
+/** @typedef {Partial<{type: WPWordCountStrategy, shortcodes: string[]}>} WPWordCountL10n */
+
+/**
+ * @typedef WPWordCountSettingsFields
+ * @property {RegExp}              HTMLRegExp                        Regular expression that matches HTML tags
+ * @property {RegExp}              HTMLcommentRegExp                 Regular expression that matches HTML comments
+ * @property {RegExp}              spaceRegExp                       Regular expression that matches spaces in HTML
+ * @property {RegExp}              HTMLEntityRegExp                  Regular expression that matches HTML entities
+ * @property {RegExp}              connectorRegExp                   Regular expression that matches word connectors, like em-dash
+ * @property {RegExp}              removeRegExp                      Regular expression that matches various characters to be removed when counting
+ * @property {RegExp}              astralRegExp                      Regular expression that matches astral UTF-16 code points
+ * @property {RegExp}              wordsRegExp                       Regular expression that matches words
+ * @property {RegExp}              characters_excluding_spacesRegExp Regular expression that matches characters excluding spaces
+ * @property {RegExp}              characters_including_spacesRegExp Regular expression that matches characters including spaces
+ * @property {RegExp}              shortcodesRegExp                  Regular expression that matches WordPress shortcodes
+ * @property {string[]}            shortcodes                        List of all shortcodes
+ * @property {WPWordCountStrategy} type                              Describes what and how are we counting
+ * @property {WPWordCountL10n}     l10n                              Object with human translations
+ */
+
+/**
+ * Lower-level settings for word counting that can be overridden.
+ *
+ * @typedef {Partial<WPWordCountSettingsFields>} WPWordCountUserSettings
+ */
+
+// Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly: https://github.com/jsdoc/jsdoc/issues/1285
+/* eslint-disable jsdoc/valid-types */
+/**
+ * Word counting settings that include non-optional values we set if missing
+ *
+ * @typedef {WPWordCountUserSettings & typeof defaultSettings} WPWordCountDefaultSettings
+ */
+/* eslint-enable jsdoc/valid-types */
+
 export const defaultSettings = {
 	HTMLRegExp: /<\/?[a-z][^>]*?>/gi,
 	HTMLcommentRegExp: /<!--[\s\S]*?-->/g,
@@ -13,7 +50,7 @@ export const defaultSettings = {
 			'[',
 
 			// Basic Latin (extract)
-			'\u0021-\u0040\u005B-\u0060\u007B-\u007E',
+			'\u0021-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u007E',
 
 			// Latin-1 Supplement (extract)
 			'\u0080-\u00BF\u00D7\u00F7',

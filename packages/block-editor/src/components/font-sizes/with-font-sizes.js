@@ -8,12 +8,14 @@ import { find, pickBy, reduce, some, upperFirst } from 'lodash';
  */
 import { createHigherOrderComponent, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { getFontSize, getFontSizeClass } from './utils';
+import useSetting from '../use-setting';
+
+const DEFAULT_FONT_SIZES = [];
 
 /**
  * Higher-order component, which handles font size logic for class generation,
@@ -44,14 +46,20 @@ export default ( ...fontSizeNames ) => {
 
 	return createHigherOrderComponent(
 		compose( [
-			withSelect( ( select ) => {
-				const { fontSizes } = select(
-					'core/block-editor'
-				).getSettings();
-				return {
-					fontSizes,
-				};
-			} ),
+			createHigherOrderComponent(
+				( WrappedComponent ) => ( props ) => {
+					const fontSizes =
+						useSetting( 'typography.fontSizes' ) ||
+						DEFAULT_FONT_SIZES;
+					return (
+						<WrappedComponent
+							{ ...props }
+							fontSizes={ fontSizes }
+						/>
+					);
+				},
+				'withFontSizes'
+			),
 			( WrappedComponent ) => {
 				return class extends Component {
 					constructor( props ) {

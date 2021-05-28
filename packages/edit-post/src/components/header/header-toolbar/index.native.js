@@ -1,28 +1,34 @@
 /**
  * External dependencies
  */
-import { useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
+import { useRef } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { __ } from '@wordpress/i18n';
-import { Inserter, BlockToolbar } from '@wordpress/block-editor';
+import {
+	Inserter,
+	BlockToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 import {
 	keyboardClose,
 	undo as undoIcon,
 	redo as redoIcon,
 } from '@wordpress/icons';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
+import { store as editPostStore } from '../../../store';
 
 function HeaderToolbar( {
 	hasRedo,
@@ -39,14 +45,13 @@ function HeaderToolbar( {
 	const scrollToStart = () => {
 		scrollViewRef.current.scrollTo( { x: 0 } );
 	};
-
 	const renderHistoryButtons = () => {
 		const buttons = [
 			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */
 			<ToolbarButton
 				key="undoButton"
 				title={ __( 'Undo' ) }
-				icon={ undoIcon }
+				icon={ ! isRTL ? undoIcon : redoIcon }
 				isDisabled={ ! hasUndo }
 				onClick={ undo }
 				extraProps={ {
@@ -56,7 +61,7 @@ function HeaderToolbar( {
 			<ToolbarButton
 				key="redoButton"
 				title={ __( 'Redo' ) }
-				icon={ redoIcon }
+				icon={ ! isRTL ? redoIcon : undoIcon }
 				isDisabled={ ! hasRedo }
 				onClick={ redo }
 				extraProps={ {
@@ -106,23 +111,22 @@ function HeaderToolbar( {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		hasRedo: select( 'core/editor' ).hasEditorRedo(),
-		hasUndo: select( 'core/editor' ).hasEditorUndo(),
+		hasRedo: select( editorStore ).hasEditorRedo(),
+		hasUndo: select( editorStore ).hasEditorUndo(),
 		// This setting (richEditingEnabled) should not live in the block editor's setting.
 		showInserter:
-			select( 'core/edit-post' ).getEditorMode() === 'visual' &&
-			select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-		isTextModeEnabled:
-			select( 'core/edit-post' ).getEditorMode() === 'text',
-		isRTL: select( 'core/block-editor' ).getSettings().isRTL,
+			select( editPostStore ).getEditorMode() === 'visual' &&
+			select( editorStore ).getEditorSettings().richEditingEnabled,
+		isTextModeEnabled: select( editPostStore ).getEditorMode() === 'text',
+		isRTL: select( blockEditorStore ).getSettings().isRTL,
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
-		const { togglePostTitleSelection } = dispatch( 'core/editor' );
+		const { clearSelectedBlock } = dispatch( blockEditorStore );
+		const { togglePostTitleSelection } = dispatch( editorStore );
 
 		return {
-			redo: dispatch( 'core/editor' ).redo,
-			undo: dispatch( 'core/editor' ).undo,
+			redo: dispatch( editorStore ).redo,
+			undo: dispatch( editorStore ).undo,
 			onHideKeyboard() {
 				clearSelectedBlock();
 				togglePostTitleSelection( false );

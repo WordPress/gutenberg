@@ -8,15 +8,13 @@ import { get } from 'lodash';
  */
 import {
 	activatePlugin,
+	activateTheme,
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
 	setBrowserViewport,
-	switchUserToAdmin,
-	switchUserToTest,
-	visitAdminPage,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Timeout, in seconds, that the test should be allowed to run.
@@ -37,7 +35,14 @@ const THROTTLE_CPU = process.env.THROTTLE_CPU;
  *
  * @type {string|undefined}
  */
-const DOWNLOAD_THROUGHPUT = process.env.DOWNLOAD_THROUGHPUT;
+const SLOW_NETWORK = process.env.SLOW_NETWORK;
+
+/**
+ * Emulate no internet connection.
+ *
+ * @type {string|undefined}
+ */
+const OFFLINE = process.env.OFFLINE;
 
 /**
  * Set of console logging types observed to protect against unexpected yet
@@ -65,40 +70,6 @@ jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 async function setupBrowser() {
 	await clearLocalStorage();
 	await setBrowserViewport( 'large' );
-}
-
-/**
- * Navigates to the post listing screen and bulk-trashes any posts which exist.
- *
- * @param {string} postType - String slug for type of post to trash.
- *
- * @return {Promise} Promise resolving once posts have been trashed.
- */
-export async function trashExistingPosts( postType = 'post' ) {
-	await switchUserToAdmin();
-	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
-	const query = addQueryArgs( '', {
-		post_type: postType,
-	} ).slice( 1 );
-	await visitAdminPage( 'edit.php', query );
-
-	// If this selector doesn't exist there are no posts for us to delete.
-	const bulkSelector = await page.$( '#bulk-action-selector-top' );
-	if ( ! bulkSelector ) {
-		return;
-	}
-
-	// Select all posts.
-	await page.waitForSelector( '[id^=cb-select-all-]' );
-	await page.click( '[id^=cb-select-all-]' );
-	// Select the "bulk actions" > "trash" option.
-	await page.select( '#bulk-action-selector-top', 'trash' );
-	// Submit the form to send all draft/scheduled/published posts to the trash.
-	await page.click( '#doaction' );
-	await page.waitForXPath(
-		'//*[contains(@class, "updated notice")]/p[contains(text(), "moved to the Trash.")]'
-	);
-	await switchUserToTest();
 }
 
 /**
@@ -174,14 +145,6 @@ function observeConsoleLogging() {
 			return;
 		}
 
-		// As of WordPress 5.3.2 in Chrome 79, navigating to the block editor
-		// (Posts > Add New) will display a console warning about
-		// non - unique IDs.
-		// See: https://core.trac.wordpress.org/ticket/23165
-		if ( text.includes( 'elements with non-unique id #_wpnonce' ) ) {
-			return;
-		}
-
 		const logFunction = OBSERVED_CONSOLE_MESSAGE_TYPES[ type ];
 
 		// As of Puppeteer 1.6.1, `message.text()` wrongly returns an object of
@@ -212,57 +175,27 @@ function observeConsoleLogging() {
 }
 
 /**
- * Runs Axe tests when the block editor is found on the current page.
- *
- * @return {?Promise} Promise resolving once Axe texts are finished.
- */
-async function runAxeTestsForBlockEditor() {
-	if ( ! ( await page.$( '.block-editor' ) ) ) {
-		return;
-	}
-
-	await expect( page ).toPassAxeTests( {
-		// Temporary disabled rules to enable initial integration.
-		// See: https://github.com/WordPress/gutenberg/pull/15018.
-		disabledRules: [
-			'aria-allowed-role',
-			'aria-hidden-focus',
-			'aria-input-field-name',
-			'aria-valid-attr-value',
-			'button-name',
-			'color-contrast',
-			'dlitem',
-			'duplicate-id',
-			'label',
-			'landmark-one-main',
-			'link-name',
-			'listitem',
-			'region',
-		],
-		exclude: [
-			// Ignores elements created by metaboxes.
-			'.edit-post-layout__metaboxes',
-			// Ignores elements created by TinyMCE.
-			'.mce-container',
-		],
-	} );
-}
-
-/**
  * Simulate slow network or throttled CPU if provided via environment variables.
  */
 async function simulateAdverseConditions() {
-	if ( ! DOWNLOAD_THROUGHPUT && ! THROTTLE_CPU ) {
+	if ( ! SLOW_NETWORK && ! OFFLINE && ! THROTTLE_CPU ) {
 		return;
 	}
 
 	const client = await page.target().createCDPSession();
 
-	if ( DOWNLOAD_THROUGHPUT ) {
+	if ( SLOW_NETWORK || OFFLINE ) {
 		// See: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+		// The values below simulate fast 3G conditions as per https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274
 		await client.send( 'Network.emulateNetworkConditions', {
-			// Simulated download speed (bytes/s)
-			downloadThroughput: Number( DOWNLOAD_THROUGHPUT ),
+			// Network connectivity is absent
+			offline: Boolean( OFFLINE || false ),
+			// Download speed (bytes/s)
+			downloadThroughput: ( ( 1.6 * 1024 * 1024 ) / 8 ) * 0.9,
+			// Upload speed (bytes/s)
+			uploadThroughput: ( ( 750 * 1024 ) / 8 ) * 0.9,
+			// Latency (ms)
+			latency: 150 * 3.75,
 		} );
 	}
 
@@ -282,14 +215,14 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
-
-	await trashExistingPosts();
+	await activateTheme( 'twentytwentyone' );
+	await trashAllPosts();
+	await trashAllPosts( 'wp_block' );
 	await setupBrowser();
 	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
 } );
 
 afterEach( async () => {
-	await runAxeTestsForBlockEditor();
 	await setupBrowser();
 } );
 

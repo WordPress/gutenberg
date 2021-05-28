@@ -10,7 +10,7 @@ import { useState, useCallback } from '@wordpress/element';
 /**
  * Hook which allows to listen the resize event of any target element when it changes sizes.
  *
- * @return {Array} An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
+ * @return {[JSX.Element, { width: number, height: number } | null]} An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
  *
  * @example
  *
@@ -39,7 +39,10 @@ const useResizeObserver = () => {
 				prevState.width !== width ||
 				prevState.height !== height
 			) {
-				return { width, height };
+				return {
+					width: Math.floor( width ),
+					height: Math.floor( height ),
+				};
 			}
 			return prevState;
 		} );

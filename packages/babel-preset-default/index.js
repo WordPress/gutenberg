@@ -1,4 +1,9 @@
-module.exports = function( api ) {
+/**
+ * External dependencies
+ */
+const browserslist = require( 'browserslist' );
+
+module.exports = ( api ) => {
 	let wpBuildOpts = {};
 	const isWPBuild = ( name ) =>
 		[ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
@@ -17,7 +22,7 @@ module.exports = function( api ) {
 
 	const getPresetEnv = () => {
 		const opts = {
-			shippedProposals: true,
+			include: [ 'proposal-nullish-coalescing-operator' ],
 		};
 
 		if ( isTestEnv ) {
@@ -26,8 +31,12 @@ module.exports = function( api ) {
 			};
 		} else {
 			opts.modules = false;
+			const localBrowserslistConfig =
+				browserslist.findConfig( '.' ) || {};
 			opts.targets = {
-				browsers: require( '@wordpress/browserslist-config' ),
+				browsers:
+					localBrowserslistConfig.defaults ||
+					require( '@wordpress/browserslist-config' ),
 			};
 		}
 
@@ -56,7 +65,10 @@ module.exports = function( api ) {
 	};
 
 	return {
-		presets: [ getPresetEnv() ],
+		presets: [
+			getPresetEnv(),
+			require.resolve( '@babel/preset-typescript' ),
+		],
 		plugins: [
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[

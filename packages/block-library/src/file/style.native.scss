@@ -1,0 +1,78 @@
+.container {
+	margin-top: 2px;
+}
+
+.defaultButton {
+	border-radius: $border-width * 4;
+	padding: $grid-unit-10;
+	margin-top: $grid-unit-20;
+	background-color: $button-fallback-bg;
+}
+
+.buttonText {
+	background-color: transparent;
+	color: $white;
+	padding: 0;
+	font-size: 16px;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+}
+
+.disabledButton {
+	opacity: 0.45;
+}
+
+.uploadFailedText {
+	color: #fff;
+	font-size: 14;
+	margin-top: 5;
+}
+
+.retryContainer {
+	flex: 1;
+	background-color: "rgba(0, 0, 0, 0.5)";
+}
+
+.actionButton {
+	color: $blue-50;
+}
+
+.actionButtonDark {
+	color: $blue-30;
+}
+
+.dimmedActionButton {
+	color: $blue-50;
+	opacity: 0.45;
+}
+
+.dimmedActionButtonDark {
+	opacity: 0.45;
+	color: $blue-30;
+}
+
+.errorContainer {
+	flex-direction: row;
+	align-items: center;
+	padding-top: 4px;
+}
+
+.errorIcon {
+	margin-left: -4px;
+}
+
+.uploadFailed {
+	padding: 0;
+	color: $alert-red;
+}
+
+.placeholderTextColor {
+	color: rgba($color: $white, $alpha: 0.43);
+}
+
+.placeholder {
+	font-family: $default-regular-font;
+	min-height: 22px;
+	font-size: 16px;
+	display: none;
+}

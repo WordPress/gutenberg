@@ -13,7 +13,7 @@ import { DOWN, ENTER, SPACE, UP } from '@wordpress/keycodes';
  */
 import { Input } from '../inputs';
 
-describe( 'Input ', () => {
+describe( 'Input', () => {
 	describe( 'calls onChange prop with commit state', () => {
 		test( 'onKeyDown = ENTER', () => {
 			const onChange = jest.fn();

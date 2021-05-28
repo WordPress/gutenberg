@@ -39,12 +39,12 @@ describe( 'block parser', () => {
 			},
 		},
 		save: ( { attributes } ) => attributes.fruit || null,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 
 	const unknownBlockSettings = {
-		category: 'common',
+		category: 'text',
 		title: 'unknown block',
 		attributes: {
 			content: {
@@ -777,14 +777,14 @@ describe( 'block parser', () => {
 					<!-- wp:column -->
 					<div class="wp-block-column">
 						<!-- wp:group -->
-						<div class="wp-block-group"><div class="wp-block-group__inner-container">
+						<div class="wp-block-group">
 							<!-- wp:list -->
 							<ul><li>B</li><li>C</li></ul>
 							<!-- /wp:list -->
 							<!-- wp:paragraph -->
 							<p>D</p>
 							<!-- /wp:paragraph -->
-						</div></div>
+						</div>
 						<!-- /wp:group -->
 					</div>
 					<!-- /wp:column -->
@@ -839,14 +839,13 @@ describe( 'block parser', () => {
 										innerContent: [ '<p>D</p>' ],
 									},
 								],
-								innerHTML:
-									'<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+								innerHTML: '<div class="wp-block-group"></div>',
 								innerContent: [
-									'<div class="wp-block-group"><div class="wp-block-group__inner-container">',
+									'<div class="wp-block-group">',
 									null,
 									'',
 									null,
-									'</div></div>',
+									'</div>',
 								],
 							},
 						],
@@ -892,7 +891,7 @@ describe( 'block parser', () => {
 					chicken: { type: 'string' },
 				},
 				save: ( { attributes } ) => attributes.content,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 
@@ -928,7 +927,7 @@ describe( 'block parser', () => {
 					},
 				},
 				save: ( { attributes } ) => attributes.content,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 
@@ -1054,7 +1053,7 @@ describe( 'block parser', () => {
 
 		it( 'should parse with unicode escaped returned to original representation', () => {
 			registerBlockType( 'core/code', {
-				category: 'common',
+				category: 'text',
 				title: 'Code Block',
 				attributes: {
 					content: {

@@ -1,14 +1,15 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "1.17.0",
+	"version": "2.1.0",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"formats"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/format-library/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/format-library/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -17,13 +18,18 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.13.10",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -33,7 +39,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.21"
 	},
 	"publishConfig": {
 		"access": "public"

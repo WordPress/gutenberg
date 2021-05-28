@@ -18,7 +18,7 @@ import { find as findFocusable } from './focusable';
  *
  * @param {Element} element Element from which to retrieve.
  *
- * @return {?number} Tab index of element (default 0).
+ * @return {number} Tab index of element (default 0).
  */
 function getTabIndex( element ) {
 	const tabIndex = element.getAttribute( 'tabindex' );
@@ -36,18 +36,24 @@ export function isTabbableIndex( element ) {
 	return getTabIndex( element ) !== -1;
 }
 
+/** @typedef {Element & { type?: string, checked?: boolean, name?: string }} MaybeHTMLInputElement */
+
 /**
  * Returns a stateful reducer function which constructs a filtered array of
  * tabbable elements, where at most one radio input is selected for a given
  * name, giving priority to checked input, falling back to the first
  * encountered.
  *
- * @return {Function} Radio group collapse reducer.
+ * @return {(acc: MaybeHTMLInputElement[], el: MaybeHTMLInputElement) => MaybeHTMLInputElement[]} Radio group collapse reducer.
  */
 function createStatefulCollapseRadioGroup() {
+	/** @type {Record<string, MaybeHTMLInputElement>} */
 	const CHOSEN_RADIO_BY_NAME = {};
 
-	return function collapseRadioGroup( result, element ) {
+	return function collapseRadioGroup(
+		/** @type {MaybeHTMLInputElement[]} */ result,
+		/** @type {MaybeHTMLInputElement} */ element
+	) {
 		const { nodeName, type, checked, name } = element;
 
 		// For all non-radio tabbables, construct to array by concatenating.
@@ -86,7 +92,7 @@ function createStatefulCollapseRadioGroup() {
  * @param {Element} element Element.
  * @param {number}  index   Array index of element.
  *
- * @return {Object} Mapped object with element, index.
+ * @return {{ element: Element, index: number }} Mapped object with element, index.
  */
 function mapElementToObjectTabbable( element, index ) {
 	return { element, index };
@@ -96,7 +102,7 @@ function mapElementToObjectTabbable( element, index ) {
  * An array map callback, returning an element of the given mapped object's
  * element value.
  *
- * @param {Object} object Mapped object with index.
+ * @param {{ element: Element }} object Mapped object with element.
  *
  * @return {Element} Mapped object element.
  */
@@ -109,8 +115,8 @@ function mapObjectTabbableToElement( object ) {
  *
  * @see mapElementToObjectTabbable
  *
- * @param {Object} a First object to compare.
- * @param {Object} b Second object to compare.
+ * @param {{ element: Element, index: number }} a First object to compare.
+ * @param {{ element: Element, index: number }} b Second object to compare.
  *
  * @return {number} Comparator result.
  */
@@ -128,9 +134,9 @@ function compareObjectTabbables( a, b ) {
 /**
  * Givin focusable elements, filters out tabbable element.
  *
- * @param {Array} focusables Focusable elements to filter.
+ * @param {Element[]} focusables Focusable elements to filter.
  *
- * @return {Array} Tabbable elements.
+ * @return {Element[]} Tabbable elements.
  */
 function filterTabbable( focusables ) {
 	return focusables
@@ -141,6 +147,10 @@ function filterTabbable( focusables ) {
 		.reduce( createStatefulCollapseRadioGroup(), [] );
 }
 
+/**
+ * @param {Element} context
+ * @return {Element[]} Tabbable elements within the context.
+ */
 export function find( context ) {
 	return filterTabbable( findFocusable( context ) );
 }
@@ -151,8 +161,8 @@ export function find( context ) {
  * @param {Element} element The focusable element before which to look. Defaults
  *                          to the active element.
  */
-export function findPrevious( element = document.activeElement ) {
-	const focusables = findFocusable( document.body );
+export function findPrevious( element ) {
+	const focusables = findFocusable( element.ownerDocument.body );
 	const index = focusables.indexOf( element );
 
 	// Remove all focusables after and including `element`.
@@ -167,8 +177,8 @@ export function findPrevious( element = document.activeElement ) {
  * @param {Element} element The focusable element after which to look. Defaults
  *                          to the active element.
  */
-export function findNext( element = document.activeElement ) {
-	const focusables = findFocusable( document.body );
+export function findNext( element ) {
+	const focusables = findFocusable( element.ownerDocument.body );
 	const index = focusables.indexOf( element );
 
 	// Remove all focusables before and inside `element`.

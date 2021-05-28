@@ -12,7 +12,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import WebPreformattedEdit from './edit.js';
 import styles from './styles.scss';
 
-function PreformattedEdit( props ) {
+export function PreformattedEdit( props ) {
 	const { getStylesFromColorScheme } = props;
 	const richTextStyle = getStylesFromColorScheme(
 		styles.wpRichTextLight,

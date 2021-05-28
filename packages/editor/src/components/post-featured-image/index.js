@@ -6,7 +6,7 @@ import { has, get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
 import {
 	DropZone,
@@ -18,7 +18,11 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import {
+	MediaUpload,
+	MediaUploadCheck,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -95,6 +99,28 @@ function PostFeaturedImage( {
 		<PostFeaturedImageCheck>
 			{ noticeUI }
 			<div className="editor-post-featured-image">
+				{ media && (
+					<div
+						id={ `editor-post-featured-image-${ featuredImageId }-describedby` }
+						className="hidden"
+					>
+						{ media.alt_text &&
+							sprintf(
+								// Translators: %s: The selected image alt text.
+								__( 'Current image: %s' ),
+								media.alt_text
+							) }
+						{ ! media.alt_text &&
+							sprintf(
+								// Translators: %s: The selected image filename.
+								__(
+									'The current image has no alternative text. The file name is: %s'
+								),
+								media.media_details.sizes?.full?.file ||
+									media.slug
+							) }
+					</div>
+				) }
 				<MediaUploadCheck fallback={ instructions }>
 					<MediaUpload
 						title={
@@ -104,11 +130,7 @@ function PostFeaturedImage( {
 						onSelect={ onUpdateImage }
 						unstableFeaturedImageFlow
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						modalClass={
-							! featuredImageId
-								? 'editor-post-featured-image__media-modal'
-								: 'editor-post-featured-image__media-modal'
-						}
+						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
 								<Button
@@ -122,6 +144,11 @@ function PostFeaturedImage( {
 										! featuredImageId
 											? null
 											: __( 'Edit or update the image' )
+									}
+									aria-describedby={
+										! featuredImageId
+											? null
+											: `editor-post-featured-image-${ featuredImageId }-describedby`
 									}
 								>
 									{ !! featuredImageId && media && (
@@ -161,7 +188,7 @@ function PostFeaturedImage( {
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
-								<Button onClick={ open } isSecondary>
+								<Button onClick={ open } variant="secondary">
 									{ __( 'Replace Image' ) }
 								</Button>
 							) }
@@ -170,7 +197,11 @@ function PostFeaturedImage( {
 				) }
 				{ !! featuredImageId && (
 					<MediaUploadCheck>
-						<Button onClick={ onRemoveImage } isLink isDestructive>
+						<Button
+							onClick={ onRemoveImage }
+							variant="link"
+							isDestructive
+						>
 							{ postLabel.remove_featured_image ||
 								DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 						</Button>
@@ -204,7 +235,7 @@ const applyWithDispatch = withDispatch(
 				editPost( { featured_media: image.id } );
 			},
 			onDropImage( filesList ) {
-				select( 'core/block-editor' )
+				select( blockEditorStore )
 					.getSettings()
 					.mediaUpload( {
 						allowedTypes: [ 'image' ],

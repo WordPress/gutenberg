@@ -14,6 +14,7 @@ import { withSelect } from '@wordpress/data';
  */
 import BaseDefaultBlockAppender from '../default-block-appender';
 import withClientId from './with-client-id';
+import { store as blockEditorStore } from '../../store';
 
 export const DefaultBlockAppender = ( { clientId, lastBlockClientId } ) => {
 	return (
@@ -27,7 +28,7 @@ export const DefaultBlockAppender = ( { clientId, lastBlockClientId } ) => {
 export default compose( [
 	withClientId,
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockOrder } = select( 'core/block-editor' );
+		const { getBlockOrder } = select( blockEditorStore );
 
 		const blockClientIds = getBlockOrder( clientId );
 

@@ -2,47 +2,57 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { debounce } from 'lodash';
+import { get, omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Button, Spinner } from '@wordpress/components';
+import { Button, Spinner, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { RichText } from '@wordpress/block-editor';
+import {
+	RichText,
+	MediaPlaceholder,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
-import { close, chevronLeft, chevronRight } from '@wordpress/icons';
+import {
+	closeSmall,
+	chevronLeft,
+	chevronRight,
+	edit,
+	image as imageIcon,
+} from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { pickRelevantMediaFiles } from './shared';
+import {
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA,
+} from './constants';
+
+const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
 class GalleryImage extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onBlur = this.onBlur.bind( this );
-		this.onFocus = this.onFocus.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
-		this.onSelectCaption = this.onSelectCaption.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
-
-		// The onDeselect prop is used to signal that the GalleryImage component
-		// has lost focus. We want to call it when focus has been lost
-		// by the figure element or any of its children but only if
-		// the element that gained focus isn't any of them.
-		//
-		// debouncedOnSelect is scheduled every time a figure's children
-		// is blurred and cancelled when any is focused. If none gain focus,
-		// the call to onDeselect will be executed.
-		//
-		// onBlur / onFocus events are quick operations (<5ms apart in my testing),
-		// so 50ms accounts for 10x lagging while feels responsive to the user.
-		this.debouncedOnDeselect = debounce( this.props.onDeselect, 50 );
-
+		this.onEdit = this.onEdit.bind( this );
+		this.onSelectImageFromLibrary = this.onSelectImageFromLibrary.bind(
+			this
+		);
+		this.onSelectCustomURL = this.onSelectCustomURL.bind( this );
 		this.state = {
-			captionSelected: false,
+			isEditing: false,
 		};
 	}
 
@@ -50,33 +60,15 @@ class GalleryImage extends Component {
 		this.container = ref;
 	}
 
-	onSelectCaption() {
-		if ( ! this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: true,
-			} );
-		}
-
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
-		}
-	}
-
 	onSelectImage() {
 		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
-		}
-
-		if ( this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: false,
-			} );
 		}
 	}
 
 	onRemoveImage( event ) {
 		if (
-			this.container === document.activeElement &&
+			this.container === this.container.ownerDocument.activeElement &&
 			this.props.isSelected &&
 			[ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
 		) {
@@ -86,9 +78,14 @@ class GalleryImage extends Component {
 		}
 	}
 
-	componentDidUpdate( prevProps ) {
+	onEdit() {
+		this.setState( {
+			isEditing: true,
+		} );
+	}
+
+	componentDidUpdate() {
 		const {
-			isSelected,
 			image,
 			url,
 			__unstableMarkNextChangeAsNotPersistent,
@@ -100,34 +97,51 @@ class GalleryImage extends Component {
 				alt: image.alt_text,
 			} );
 		}
+	}
 
-		// unselect the caption so when the user selects other image and comeback
-		// the caption is not immediately selected
-		if (
-			this.state.captionSelected &&
-			! isSelected &&
-			prevProps.isSelected
-		) {
+	deselectOnBlur() {
+		this.props.onDeselect();
+	}
+
+	onSelectImageFromLibrary( media ) {
+		const { setAttributes, id, url, alt, caption, sizeSlug } = this.props;
+		if ( ! media || ! media.url ) {
+			return;
+		}
+
+		let mediaAttributes = pickRelevantMediaFiles( media, sizeSlug );
+
+		// If the current image is temporary but an alt text was meanwhile
+		// written by the user, make sure the text is not overwritten.
+		if ( isTemporaryImage( id, url ) ) {
+			if ( alt ) {
+				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
+			}
+		}
+
+		// If a caption text was meanwhile written by the user,
+		// make sure the text is not overwritten by empty captions.
+		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
+			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+		}
+
+		setAttributes( mediaAttributes );
+		this.setState( {
+			isEditing: false,
+		} );
+	}
+
+	onSelectCustomURL( newURL ) {
+		const { setAttributes, url } = this.props;
+		if ( newURL !== url ) {
+			setAttributes( {
+				url: newURL,
+				id: undefined,
+			} );
 			this.setState( {
-				captionSelected: false,
+				isEditing: false,
 			} );
 		}
-	}
-
-	/**
-	 * Note that, unlike the DOM, all React events bubble,
-	 * so this will be called after the onBlur event of any figure's children.
-	 */
-	onBlur() {
-		this.debouncedOnDeselect();
-	}
-
-	/**
-	 * Note that, unlike the DOM, all React events bubble,
-	 * so this will be called after the onBlur event of any figure's children.
-	 */
-	onFocus() {
-		this.debouncedOnDeselect.cancel();
 	}
 
 	render() {
@@ -147,14 +161,15 @@ class GalleryImage extends Component {
 			setAttributes,
 			'aria-label': ariaLabel,
 		} = this.props;
+		const { isEditing } = this.state;
 
 		let href;
 
 		switch ( linkTo ) {
-			case 'media':
+			case LINK_DESTINATION_MEDIA:
 				href = url;
 				break;
-			case 'attachment':
+			case LINK_DESTINATION_ATTACHMENT:
 				href = link;
 				break;
 		}
@@ -168,8 +183,6 @@ class GalleryImage extends Component {
 					src={ url }
 					alt={ alt }
 					data-id={ id }
-					onClick={ this.onSelectImage }
-					onFocus={ this.onSelectImage }
 					onKeyDown={ this.onRemoveImage }
 					tabIndex="0"
 					aria-label={ ariaLabel }
@@ -186,17 +199,28 @@ class GalleryImage extends Component {
 		} );
 
 		return (
+			// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
 			<figure
 				className={ className }
-				onBlur={ this.onBlur }
-				onFocus={ this.onFocus }
+				onClick={ this.onSelectImage }
+				onFocus={ this.onSelectImage }
 			>
-				{ href ? <a href={ href }>{ img }</a> : img }
-				<div className="block-library-gallery-item__move-menu">
+				{ ! isEditing && ( href ? <a href={ href }>{ img }</a> : img ) }
+				{ isEditing && (
+					<MediaPlaceholder
+						labels={ { title: __( 'Edit gallery image' ) } }
+						icon={ imageIcon }
+						onSelect={ this.onSelectImageFromLibrary }
+						onSelectURL={ this.onSelectCustomURL }
+						accept="image/*"
+						allowedTypes={ [ 'image' ] }
+						value={ { id, src: url } }
+					/>
+				) }
+				<ButtonGroup className="block-library-gallery-item__inline-menu is-left">
 					<Button
 						icon={ chevronLeft }
 						onClick={ isFirstItem ? undefined : onMoveBackward }
-						className="blocks-gallery-item__move-backward"
 						label={ __( 'Move image backward' ) }
 						aria-disabled={ isFirstItem }
 						disabled={ ! isSelected }
@@ -204,33 +228,34 @@ class GalleryImage extends Component {
 					<Button
 						icon={ chevronRight }
 						onClick={ isLastItem ? undefined : onMoveForward }
-						className="blocks-gallery-item__move-forward"
 						label={ __( 'Move image forward' ) }
 						aria-disabled={ isLastItem }
 						disabled={ ! isSelected }
 					/>
-				</div>
-				<div className="block-library-gallery-item__inline-menu">
+				</ButtonGroup>
+				<ButtonGroup className="block-library-gallery-item__inline-menu is-right">
 					<Button
-						icon={ close }
+						icon={ edit }
+						onClick={ this.onEdit }
+						label={ __( 'Replace image' ) }
+						disabled={ ! isSelected }
+					/>
+					<Button
+						icon={ closeSmall }
 						onClick={ onRemove }
-						className="blocks-gallery-item__remove"
 						label={ __( 'Remove image' ) }
 						disabled={ ! isSelected }
 					/>
-				</div>
-				{ ( isSelected || caption ) && (
+				</ButtonGroup>
+				{ ! isEditing && ( isSelected || caption ) && (
 					<RichText
 						tagName="figcaption"
-						placeholder={
-							isSelected ? __( 'Write caption…' ) : null
-						}
+						aria-label={ __( 'Image caption text' ) }
+						placeholder={ isSelected ? __( 'Add caption' ) : null }
 						value={ caption }
-						isSelected={ this.state.captionSelected }
 						onChange={ ( newCaption ) =>
 							setAttributes( { caption: newCaption } )
 						}
-						unstableOnFocus={ this.onSelectCaption }
 						inlineToolbar
 					/>
 				) }
@@ -241,7 +266,7 @@ class GalleryImage extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getMedia } = select( 'core' );
+		const { getMedia } = select( coreStore );
 		const { id } = ownProps;
 
 		return {
@@ -250,7 +275,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { __unstableMarkNextChangeAsNotPersistent } = dispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 		return {
 			__unstableMarkNextChangeAsNotPersistent,

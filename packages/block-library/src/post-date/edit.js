@@ -1,23 +1,42 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useEntityProp, useEntityId } from '@wordpress/core-data';
+import { useEntityProp } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
-import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import {
-	ToolbarGroup,
+	AlignmentControl,
+	BlockControls,
+	InspectorControls,
+	useBlockProps,
+} from '@wordpress/block-editor';
+import {
 	ToolbarButton,
+	ToggleControl,
 	Popover,
 	DateTimePicker,
 	PanelBody,
 	CustomSelectControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { edit } from '@wordpress/icons';
 
-function PostDateEditor( { format, setAttributes } ) {
+export default function PostDateEdit( { attributes, context, setAttributes } ) {
+	const { textAlign, format, isLink } = attributes;
+	const { postId, postType } = context;
+
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
-	const [ date, setDate ] = useEntityProp( 'postType', 'post', 'date' );
+	const [ date, setDate ] = useEntityProp(
+		'postType',
+		postType,
+		'date',
+		postId
+	);
 	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
 	const settings = __experimentalGetSettings();
 	// To know if the current time format is a 12 hour time, look for "a".
@@ -37,21 +56,14 @@ function PostDateEditor( { format, setAttributes } ) {
 		} )
 	);
 	const resolvedFormat = format || siteFormat || settings.formats.date;
-	return date ? (
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
+	let postDate = date ? (
 		<time dateTime={ dateI18n( 'c', date ) }>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						icon="edit"
-						title={ __( 'Change Date' ) }
-						onClick={ () =>
-							setIsPickerOpen(
-								( _isPickerOpen ) => ! _isPickerOpen
-							)
-						}
-					/>
-				</ToolbarGroup>
-			</BlockControls>
 			{ dateI18n( resolvedFormat, date ) }
 			{ isPickerOpen && (
 				<Popover onClose={ setIsPickerOpen.bind( null, false ) }>
@@ -62,6 +74,43 @@ function PostDateEditor( { format, setAttributes } ) {
 					/>
 				</Popover>
 			) }
+		</time>
+	) : (
+		__( 'No Date' )
+	);
+	if ( isLink && date ) {
+		postDate = (
+			<a
+				href="#post-date-pseudo-link"
+				onClick={ ( event ) => event.preventDefault() }
+			>
+				{ postDate }
+			</a>
+		);
+	}
+	return (
+		<>
+			<BlockControls group="block">
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+
+				{ date && (
+					<ToolbarButton
+						icon={ edit }
+						title={ __( 'Change Date' ) }
+						onClick={ () =>
+							setIsPickerOpen(
+								( _isPickerOpen ) => ! _isPickerOpen
+							)
+						}
+					/>
+				) }
+			</BlockControls>
+
 			<InspectorControls>
 				<PanelBody title={ __( 'Format settings' ) }>
 					<CustomSelectControl
@@ -78,19 +127,19 @@ function PostDateEditor( { format, setAttributes } ) {
 						) }
 					/>
 				</PanelBody>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ sprintf(
+							// translators: %s: Name of the post type e.g: "post".
+							__( 'Link to %s' ),
+							postType
+						) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+				</PanelBody>
 			</InspectorControls>
-		</time>
-	) : (
-		__( 'No Date' )
+			<div { ...blockProps }>{ postDate }</div>
+		</>
 	);
-}
-
-export default function PostDateEdit( {
-	attributes: { format },
-	setAttributes,
-} ) {
-	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return <p>{ 'Jan 1st, 1440' }</p>;
-	}
-	return <PostDateEditor format={ format } setAttributes={ setAttributes } />;
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, object, text } from '@storybook/addon-knobs';
+import { boolean, object, select, text } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -31,29 +31,36 @@ const SelectControlWithState = ( props ) => {
 };
 
 export const _default = () => {
-	const label = text( 'Label', 'Label Text' );
-	const hideLabelFromVision = boolean( 'Hide Label From Vision', false );
-	const help = text(
-		'Help Text',
-		'Help text to explain the select control.'
-	);
-	const multiple = boolean( 'Allow Multiple Selection', false );
-	const options = object( 'Options', [
-		{ value: null, label: 'Select an Option', disabled: true },
-		{ value: 'a', label: 'Option A' },
-		{ value: 'b', label: 'Option B' },
-		{ value: 'c', label: 'Option C' },
-	] );
-	const className = text( 'Class Name', '' );
+	const props = {
+		disabled: boolean( 'disabled', false ),
+		help: text( 'help', 'Help text to explain the select control.' ),
+		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+		label: text( 'label', 'Value' ),
+		labelPosition: select(
+			'labelPosition',
+			{
+				top: 'top',
+				side: 'side',
+				bottom: 'bottom',
+			},
+			'top'
+		),
+		multiple: boolean( 'multiple', false ),
+		options: object( 'Options', [
+			{ value: null, label: 'Select an Option', disabled: true },
+			{ value: 'a', label: 'Option A' },
+			{ value: 'b', label: 'Option B' },
+			{ value: 'c', label: 'Option C' },
+		] ),
+		size: select(
+			'size',
+			{
+				default: 'default',
+				small: 'small',
+			},
+			'default'
+		),
+	};
 
-	return (
-		<SelectControlWithState
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
-			multiple={ multiple }
-			options={ options }
-			className={ className }
-		/>
-	);
+	return <SelectControlWithState { ...props } />;
 };

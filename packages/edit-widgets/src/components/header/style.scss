@@ -4,14 +4,65 @@
 	justify-content: space-between;
 	height: $header-height;
 	padding: 0 $grid-unit-20;
+	overflow: auto;
+
+	@include break-small {
+		overflow: visible;
+	}
 }
 
-.edit-widgets-inserter {
-	display: inline-block;
+.edit-widgets-header__navigable-toolbar-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .edit-widgets-header__title {
-	font-size: 16px;
-	padding: 0 20px;
-	margin: 0;
+	font-size: 20px;
+	padding: 0;
+	margin: 0 20px 0 0;
+}
+
+.edit-widgets-header__actions {
+	display: flex;
+}
+
+.edit-widgets-header-toolbar {
+	border: none;
+
+	// The Toolbar component adds different styles to buttons, so we reset them
+	// here to the original button styles
+	> .components-button.has-icon,
+	> .components-dropdown > .components-button.has-icon {
+		height: $button-size;
+		min-width: $button-size;
+		padding: 6px;
+
+		&.is-pressed {
+			background: $gray-900;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
+			outline: 1px solid transparent;
+		}
+
+		&::before {
+			display: none;
+		}
+	}
+}
+
+.edit-widgets-header-toolbar__inserter-toggle.edit-widgets-header-toolbar__inserter-toggle {
+	padding-left: $grid-unit;
+	padding-right: $grid-unit;
+
+	@include break-small {
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
+	}
+
+	&::after {
+		content: none;
+	}
 }

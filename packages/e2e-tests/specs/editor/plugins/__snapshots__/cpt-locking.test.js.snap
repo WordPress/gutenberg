@@ -1,5 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`cpt locking template_lock all should insert line breaks when using enter and shift-enter 1`] = `
+"<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p>First line<br>Second line<br>Third line</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"></div>
+<!-- /wp:columns -->"
+`;
+
 exports[`cpt locking template_lock all should not error when deleting the cotents of a paragraph 1`] = `
 "<!-- wp:image -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
@@ -11,7 +29,31 @@ exports[`cpt locking template_lock all should not error when deleting the cotent
 
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
-<!-- /wp:quote -->"
+<!-- /wp:quote -->
+
+<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`cpt locking template_lock all unlocked group should allow blocks to be moved 1`] = `
+"<!-- wp:group {\\"templateLock\\":false} -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<p>p1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<!-- /wp:quote --></div>
+<!-- /wp:group -->"
+`;
+
+exports[`cpt locking template_lock all unlocked group should allow blocks to be removed 1`] = `
+"<!-- wp:group {\\"templateLock\\":false} -->
+<div class=\\"wp-block-group\\"><!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
+<!-- /wp:quote --></div>
+<!-- /wp:group -->"
 `;
 
 exports[`cpt locking template_lock false should allow blocks to be inserted 1`] = `
@@ -26,6 +68,10 @@ exports[`cpt locking template_lock false should allow blocks to be inserted 1`] 
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
 <!-- /wp:quote -->
+
+<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"></div>
+<!-- /wp:columns -->
 
 <!-- wp:list -->
 <ul><li>List content</li></ul>
@@ -43,7 +89,11 @@ exports[`cpt locking template_lock false should allow blocks to be moved 1`] = `
 
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
-<!-- /wp:quote -->"
+<!-- /wp:quote -->
+
+<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"></div>
+<!-- /wp:columns -->"
 `;
 
 exports[`cpt locking template_lock false should allow blocks to be removed 1`] = `
@@ -53,7 +103,11 @@ exports[`cpt locking template_lock false should allow blocks to be removed 1`] =
 
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
-<!-- /wp:quote -->"
+<!-- /wp:quote -->
+
+<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"></div>
+<!-- /wp:columns -->"
 `;
 
 exports[`cpt locking template_lock insert should allow blocks to be moved 1`] = `
@@ -67,5 +121,9 @@ exports[`cpt locking template_lock insert should allow blocks to be moved 1`] = 
 
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
-<!-- /wp:quote -->"
+<!-- /wp:quote -->
+
+<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"></div>
+<!-- /wp:columns -->"
 `;

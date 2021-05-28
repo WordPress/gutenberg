@@ -1,73 +1,105 @@
 /**
  * External dependencies
  */
-import { Keyboard, View } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { ToolbarButton } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { trash } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 import BlockMover from '../block-mover';
+import BlockActionsMenu from './block-actions-menu';
 import { BlockSettingsButton } from '../block-settings';
+import { store as blockEditorStore } from '../../store';
 
+// Defined breakpoints are used to get a point when
+// `settings` and `mover` controls should be wrapped into `BlockActionsMenu`
+// and accessed through `BottomSheet`(Android)/`ActionSheet`(iOS).
+const BREAKPOINTS = {
+	wrapSettings: 65,
+	wrapMover: 150,
+};
 const BlockMobileToolbar = ( {
 	clientId,
 	onDelete,
-	order,
 	isStackedHorizontally,
-} ) => (
-	<View style={ styles.toolbar }>
-		<BlockMover
-			clientIds={ [ clientId ] }
-			isStackedHorizontally={ isStackedHorizontally }
-		/>
+	blockWidth,
+	anchorNodeRef,
+	isFullWidth,
+} ) => {
+	const [ fillsLength, setFillsLength ] = useState( null );
+	const [ appenderWidth, setAppenderWidth ] = useState( 0 );
+	const spacingValue = styles.toolbar.marginLeft * 2;
 
-		<View style={ styles.spacer } />
+	function onLayout( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const layoutWidth = Math.floor( layout.width );
+		if ( layoutWidth !== appenderWidth ) {
+			setAppenderWidth( nativeEvent.layout.width );
+		}
+	}
 
-		<BlockSettingsButton.Slot>
-			{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
-			{ ( fills = [ null ] ) => fills[ 0 ] }
-		</BlockSettingsButton.Slot>
+	const wrapBlockSettings =
+		blockWidth < BREAKPOINTS.wrapSettings ||
+		appenderWidth - spacingValue < BREAKPOINTS.wrapSettings;
+	const wrapBlockMover =
+		blockWidth <= BREAKPOINTS.wrapMover ||
+		appenderWidth - spacingValue <= BREAKPOINTS.wrapMover;
 
-		<ToolbarButton
-			title={ sprintf(
-				/* translators: accessibility text. %s: current block position (number). */
-				__( 'Remove block at row %s' ),
-				order + 1
+	return (
+		<View
+			style={ [ styles.toolbar, isFullWidth && styles.toolbarFullWidth ] }
+			onLayout={ onLayout }
+		>
+			{ ! wrapBlockMover && (
+				<BlockMover
+					clientIds={ [ clientId ] }
+					isStackedHorizontally={ isStackedHorizontally }
+				/>
 			) }
-			onClick={ onDelete }
-			icon={ trash }
-			extraProps={ { hint: __( 'Double tap to remove the block' ) } }
-		/>
-	</View>
-);
+
+			<View style={ styles.spacer } />
+
+			<BlockSettingsButton.Slot>
+				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
+				{ ( fills = [ null ] ) => {
+					setFillsLength( fills.length );
+					return wrapBlockSettings ? null : fills[ 0 ];
+				} }
+			</BlockSettingsButton.Slot>
+
+			<BlockActionsMenu
+				clientIds={ [ clientId ] }
+				wrapBlockMover={ wrapBlockMover }
+				wrapBlockSettings={ wrapBlockSettings && fillsLength }
+				isStackedHorizontally={ isStackedHorizontally }
+				onDelete={ onDelete }
+				anchorNodeRef={ anchorNodeRef }
+			/>
+		</View>
+	);
+};
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockIndex } = select( 'core/block-editor' );
+		const { getBlockIndex } = select( blockEditorStore );
 
 		return {
 			order: getBlockIndex( clientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, rootClientId, onDelete } ) => {
-		const { removeBlock } = dispatch( 'core/block-editor' );
+		const { removeBlock } = dispatch( blockEditorStore );
 		return {
 			onDelete:
-				onDelete ||
-				( () => {
-					Keyboard.dismiss();
-					removeBlock( clientId, rootClientId );
-				} ),
+				onDelete || ( () => removeBlock( clientId, rootClientId ) ),
 		};
 	} )
 )( BlockMobileToolbar );

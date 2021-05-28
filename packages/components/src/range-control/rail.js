@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { isRTL } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import RangeMark from './mark';
@@ -58,39 +63,37 @@ function Marks( {
 }
 
 function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
-	const isRTL = document.documentElement.dir === 'rtl';
-
 	if ( ! marks ) {
 		return [];
 	}
 
-	const isCustomMarks = Array.isArray( marks );
+	const range = max - min;
+	if ( ! Array.isArray( marks ) ) {
+		marks = [];
+		const count = 1 + Math.round( range / step );
+		while ( count > marks.push( { value: step * marks.length + min } ) );
+	}
 
-	const markCount = ( max - min ) / step;
-	const marksArray = isCustomMarks
-		? marks
-		: [ ...Array( markCount + 1 ) ].map( ( _, index ) => ( {
-				value: index,
-		  } ) );
-
-	const enhancedMarks = marksArray.map( ( mark, index ) => {
-		const markValue = mark.value !== undefined ? mark.value : value;
-
+	const placedMarks = [];
+	marks.forEach( ( mark, index ) => {
+		if ( mark.value < min || mark.value > max ) {
+			return;
+		}
 		const key = `mark-${ index }`;
-		const isFilled = markValue * step <= value;
-		const offset = `${ ( markValue / markCount ) * 100 }%`;
+		const isFilled = mark.value <= value;
+		const offset = `${ ( ( mark.value - min ) / range ) * 100 }%`;
 
 		const offsetStyle = {
-			[ isRTL ? 'right' : 'left' ]: offset,
+			[ isRTL() ? 'right' : 'left' ]: offset,
 		};
 
-		return {
+		placedMarks.push( {
 			...mark,
 			isFilled,
 			key,
 			style: offsetStyle,
-		};
+		} );
 	} );
 
-	return enhancedMarks;
+	return placedMarks;
 }

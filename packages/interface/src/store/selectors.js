@@ -10,14 +10,10 @@ import { get } from 'lodash';
  * @param {string} itemType Type of item.
  * @param {string} scope    Item scope.
  *
- * @return {string} The item that is enabled in the passed scope and type.
+ * @return {?string|null} The item that is enabled in the passed scope and type.
  */
 function getSingleEnableItem( state, itemType, scope ) {
-	return get(
-		state.enableItems.singleEnableItems,
-		[ itemType, scope ],
-		null
-	);
+	return get( state.enableItems.singleEnableItems, [ itemType, scope ] );
 }
 
 /**

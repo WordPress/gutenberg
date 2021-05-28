@@ -1,10 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { content } = attributes;
 
-	return <RichText.Content tagName="pre" value={ content } />;
+	return (
+		<pre { ...useBlockProps.save() }>
+			<RichText.Content value={ content } />
+		</pre>
+	);
 }

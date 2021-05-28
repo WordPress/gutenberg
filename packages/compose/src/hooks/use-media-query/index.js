@@ -11,7 +11,12 @@ import { useState, useEffect } from '@wordpress/element';
  */
 export default function useMediaQuery( query ) {
 	const [ match, setMatch ] = useState(
-		query && window.matchMedia( query ).matches
+		() =>
+			!! (
+				query &&
+				typeof window !== 'undefined' &&
+				window.matchMedia( query ).matches
+			)
 	);
 
 	useEffect( () => {
@@ -28,5 +33,5 @@ export default function useMediaQuery( query ) {
 		};
 	}, [ query ] );
 
-	return query && match;
+	return !! query && match;
 }

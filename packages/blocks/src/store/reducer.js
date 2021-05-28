@@ -20,13 +20,23 @@ import { combineReducers } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Module Constants
+ * @typedef {Object} WPBlockCategory
+ *
+ * @property {string} slug  Unique category slug.
+ * @property {string} title Category label, for display in user interface.
+ */
+
+/**
+ * Default set of categories.
+ *
+ * @type {WPBlockCategory[]}
  */
 export const DEFAULT_CATEGORIES = [
-	{ slug: 'common', title: __( 'Common blocks' ) },
-	{ slug: 'formatting', title: __( 'Formatting' ) },
-	{ slug: 'layout', title: __( 'Layout elements' ) },
+	{ slug: 'text', title: __( 'Text' ) },
+	{ slug: 'media', title: __( 'Media' ) },
+	{ slug: 'design', title: __( 'Design' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
+	{ slug: 'theme', title: __( 'Theme' ) },
 	{ slug: 'embed', title: __( 'Embeds' ) },
 	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
@@ -199,10 +209,10 @@ export const groupingBlockName = createBlockNameSetterReducer(
 /**
  * Reducer managing the categories
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {WPBlockCategory[]} state  Current state.
+ * @param {Object}            action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {WPBlockCategory[]} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
 	switch ( action.type ) {

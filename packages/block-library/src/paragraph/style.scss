@@ -1,17 +1,17 @@
 .is-small-text {
-	font-size: 14px;
+	font-size: 0.875em;
 }
 
 .is-regular-text {
-	font-size: 16px;
+	font-size: 1em;
 }
 
 .is-large-text {
-	font-size: 36px;
+	font-size: 2.25em;
 }
 
 .is-larger-text {
-	font-size: 48px;
+	font-size: 3em;
 }
 
 // Don't show the drop cap when editing the paragraph's content. It causes a
@@ -26,6 +26,11 @@
 	margin: 0.05em 0.1em 0 0;
 	text-transform: uppercase;
 	font-style: normal;
+}
+
+// Prevent the dropcap from breaking out of the box when a background is applied.
+p.has-drop-cap.has-background {
+	overflow: hidden;
 }
 
 p.has-background {

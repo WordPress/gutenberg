@@ -9,9 +9,7 @@
 // Disable reason: The current JSDoc tooling does not yet understand TypeScript
 // union types.
 
-/* eslint-disable jsdoc/valid-types */
 /** @type {PrettierOptions & WPPrettierOptions} */
-/* eslint-enable jsdoc/valid-types */
 const config = {
 	useTabs: true,
 	tabWidth: 4,

@@ -1,11 +1,20 @@
 /**
+ * External dependencies
+ */
+import { first } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
 	clickBlockAppender,
 	clickBlockToolbarButton,
+	clickMenuItem,
 	createNewPost,
+	getCurrentPostContent,
 	switchEditorModeTo,
+	pressKeyTimes,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
@@ -22,16 +31,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 		);
 		expect( visualBlock ).toHaveLength( 1 );
 
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
-
 		// Change editing mode from "Visual" to "HTML".
-		await clickBlockToolbarButton( 'More options' );
-		let changeModeButton = await page.waitForXPath(
-			'//button[text()="Edit as HTML"]'
-		);
-		await changeModeButton.click();
+		await clickBlockToolbarButton( 'Options' );
+		await clickMenuItem( 'Edit as HTML' );
 
 		// Wait for the block to be converted to HTML editing mode.
 		const htmlBlock = await page.$$(
@@ -39,16 +41,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 		);
 		expect( htmlBlock ).toHaveLength( 1 );
 
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
-
 		// Change editing mode from "HTML" back to "Visual".
-		await clickBlockToolbarButton( 'More options' );
-		changeModeButton = await page.waitForXPath(
-			'//button[text()="Edit visually"]'
-		);
-		await changeModeButton.click();
+		await clickBlockToolbarButton( 'Options' );
+		await clickMenuItem( 'Edit visually' );
 
 		// This block should be in "visual" mode by default.
 		visualBlock = await page.$$(
@@ -58,36 +53,22 @@ describe( 'Editing modes (visual/HTML)', () => {
 	} );
 
 	it( 'should display sidebar in HTML mode', async () => {
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
-
 		// Change editing mode from "Visual" to "HTML".
-		await clickBlockToolbarButton( 'More options' );
-		const changeModeButton = await page.waitForXPath(
-			'//button[text()="Edit as HTML"]'
-		);
-		await changeModeButton.click();
+		await clickBlockToolbarButton( 'Options' );
+		await clickMenuItem( 'Edit as HTML' );
 
 		// The font size picker for the paragraph block should appear, even in
 		// HTML editing mode.
-		const fontSizePicker = await page.$$(
-			'.edit-post-sidebar .components-font-size-picker__controls'
+		const fontSizePicker = await page.$x(
+			"//label[contains(text(), 'Font size')]"
 		);
 		expect( fontSizePicker ).toHaveLength( 1 );
 	} );
 
 	it( 'should update HTML in HTML mode when sidebar is used', async () => {
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
-
 		// Change editing mode from "Visual" to "HTML".
-		await clickBlockToolbarButton( 'More options' );
-		const changeModeButton = await page.waitForXPath(
-			'//button[text()="Edit as HTML"]'
-		);
-		await changeModeButton.click();
+		await clickBlockToolbarButton( 'Options' );
+		await clickMenuItem( 'Edit as HTML' );
 
 		// Make sure the paragraph content is rendered as expected.
 		let htmlBlockContent = await page.$eval(
@@ -97,13 +78,11 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
 
 		// Change the font size using the sidebar.
-		await page.click( '.components-font-size-picker__select' );
-		await page.click(
-			'.components-custom-select-control__item:nth-child(5)'
-		);
-		await page.waitForXPath(
-			`//button[contains(@class, "components-custom-select-control__button") and contains(text(), 'Large')]`
-		);
+		await first(
+			await page.$x( "//label[contains(text(), 'Font size')]" )
+		).click();
+		await pressKeyTimes( 'ArrowDown', 4 );
+		await page.keyboard.press( 'Enter' );
 
 		// Make sure the HTML content updated.
 		htmlBlockContent = await page.$eval(
@@ -149,5 +128,30 @@ describe( 'Editing modes (visual/HTML)', () => {
 			'.edit-post-header-toolbar__inserter-toggle:disabled, .edit-post-header-toolbar__inserter-toggle[aria-disabled="true"]'
 		);
 		expect( disabledInserter ).not.toBeNull();
+	} );
+
+	// Test for regressions of https://github.com/WordPress/gutenberg/issues/24054.
+	it( 'saves content when using the shortcut in the Code Editor', async () => {
+		await switchEditorModeTo( 'Code' );
+
+		const textContent = await page.evaluate(
+			() => document.querySelector( '.editor-post-text-editor' ).value
+		);
+		const editPosition = textContent.indexOf( 'Hello' );
+
+		// Replace the word 'Hello' with 'Hi'.
+		await page.click( '.editor-post-title__input' );
+		await page.keyboard.press( 'Tab' );
+		await pressKeyTimes( 'ArrowRight', editPosition );
+		await pressKeyTimes( 'Delete', 5 );
+		await page.keyboard.type( 'Hi' );
+
+		// Save the post using the shortcut.
+		await pressKeyWithModifier( 'primary', 's' );
+		await page.waitForSelector( '.editor-post-saved-state.is-saved' );
+
+		await switchEditorModeTo( 'Visual' );
+
+		expect( await getCurrentPostContent() ).toMatchSnapshot();
 	} );
 } );

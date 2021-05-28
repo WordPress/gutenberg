@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { safeDecodeURI } from '@wordpress/url';
+import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { Button, TextHighlight } from '@wordpress/components';
 import { Icon, globe } from '@wordpress/icons';
@@ -18,6 +18,7 @@ export const LinkControlSearchItem = ( {
 	onClick,
 	isURL = false,
 	searchTerm = '',
+	shouldShowType = false,
 } ) => {
 	return (
 		<Button
@@ -46,13 +47,18 @@ export const LinkControlSearchItem = ( {
 					aria-hidden={ ! isURL }
 					className="block-editor-link-control__search-item-info"
 				>
-					{ ! isURL && ( safeDecodeURI( suggestion.url ) || '' ) }
+					{ ! isURL &&
+						( filterURLForDisplay(
+							safeDecodeURI( suggestion.url )
+						) ||
+							'' ) }
 					{ isURL && __( 'Press ENTER to add this link' ) }
 				</span>
 			</span>
-			{ suggestion.type && (
+			{ shouldShowType && suggestion.type && (
 				<span className="block-editor-link-control__search-item-type">
-					{ suggestion.type }
+					{ /* Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label. */ }
+					{ suggestion.type === 'post_tag' ? 'tag' : suggestion.type }
 				</span>
 			) }
 		</Button>

@@ -29,7 +29,11 @@ $arrow-size: 8px;
 		margin-left: 2px;
 
 		&::before {
-			border: $arrow-size solid $dark-gray-primary;
+			border: $arrow-size solid $gray-400;
+		}
+
+		&.is-alternate::before {
+			border-color: $gray-900;
 		}
 
 		&::after {
@@ -162,13 +166,13 @@ $arrow-size: 8px;
 .components-popover__content {
 	height: 100%;
 	background: $white;
-	border: $border-width solid $light-gray-secondary;
+	border: $border-width solid $gray-400;
 	box-shadow: $shadow-popover;
 	border-radius: $radius-block-ui;
 
 	// Alternate treatment for popovers that put them at elevation zero with high contrast.
 	.is-alternate & {
-		border: $border-width solid $dark-gray-primary;
+		border: $border-width solid $gray-900;
 		box-shadow: none;
 	}
 
@@ -176,7 +180,6 @@ $arrow-size: 8px;
 		position: absolute;
 		height: auto;
 		overflow-y: auto;
-		min-width: 260px;
 	}
 
 	.components-popover.is-expanded & {
@@ -185,7 +188,7 @@ $arrow-size: 8px;
 		overflow-y: visible;
 		min-width: auto;
 		border: none;
-		border-top: $border-width solid $dark-gray-primary;
+		border-top: $border-width solid $gray-900;
 	}
 
 	.components-popover[data-y-axis="top"] & {
@@ -203,7 +206,7 @@ $arrow-size: 8px;
 	}
 
 	.components-popover:not([data-y-axis="middle"])[data-x-axis="right"] & {
-		margin-left: -24px;
+		margin-left: -($grid-unit-30 + $border-width);
 	}
 
 	.components-popover[data-x-axis="left"] & {
@@ -212,13 +215,8 @@ $arrow-size: 8px;
 	}
 
 	.components-popover:not([data-y-axis="middle"])[data-x-axis="left"] & {
-		margin-right: -24px;
+		margin-right: -($grid-unit-30 + $border-width);
 	}
-}
-
-// The withFocusReturn div
-.components-popover__content > div {
-	height: 100%;
 }
 
 .components-popover__header {
@@ -227,7 +225,7 @@ $arrow-size: 8px;
 	display: flex;
 	height: $panel-header-height;
 	justify-content: space-between;
-	padding: 0 8px 0 $panel-padding;
+	padding: 0 8px 0 $grid-unit-20;
 }
 
 .components-popover__header-title {

@@ -1,6 +1,11 @@
 {
+	"apiVersion": 2,
 	"name": "core/image",
-	"category": "common",
+	"title": "Image",
+	"category": "media",
+	"description": "Insert an image to make a visual statement.",
+	"keywords": [ "img", "photo", "picture" ],
+	"textdomain": "default",
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -60,8 +65,7 @@
 			"type": "string"
 		},
 		"linkDestination": {
-			"type": "string",
-			"default": "none"
+			"type": "string"
 		},
 		"linkTarget": {
 			"type": "string",
@@ -69,5 +73,26 @@
 			"selector": "figure > a",
 			"attribute": "target"
 		}
-	}
+	},
+	"supports": {
+		"anchor": true,
+		"color": {
+			"__experimentalDuotone": "img",
+			"text": false,
+			"background": false
+		},
+		"__experimentalBorder": {
+			"radius": true
+		}
+	},
+	"styles": [
+		{
+			"name": "default",
+			"label": "Default",
+			"isDefault": true
+		},
+		{ "name": "rounded", "label": "Rounded" }
+	],
+	"editorStyle": "wp-block-image-editor",
+	"style": "wp-block-image"
 }

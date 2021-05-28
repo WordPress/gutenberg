@@ -1,23 +1,148 @@
+$header-toolbar-min-width: 335px;
+
 .edit-site-header {
 	align-items: center;
+	background-color: $white;
 	display: flex;
 	height: $header-height;
-	justify-content: space-between;
 	box-sizing: border-box;
+	width: 100%;
+	justify-content: space-between;
+
+	body.is-fullscreen-mode & {
+		padding-left: 60px;
+		transition: padding-left 20ms linear;
+		transition-delay: 80ms;
+		@include reduce-motion("transition");
+	}
+
+	.edit-site-header_start,
+	.edit-site-header_end {
+		display: flex;
+	}
+
+	.edit-site-header_center {
+		display: flex;
+		align-items: center;
+		height: 100%;
+		// Flex items will, by default, refuse to shrink below a minimum
+		// intrinsic width. In order to shrink this flexbox item, and
+		// subsequently truncate child text, we set an explicit min-width.
+		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
+		min-width: 0;
+	}
+
+	.edit-site-header_end {
+		justify-content: flex-end;
+	}
+}
+
+// Keeps the document title centered when the sidebar is open
+body.is-navigation-sidebar-open {
+	.edit-site-header {
+		padding-left: 0;
+		transition: padding-left 20ms linear;
+		transition-delay: 0ms;
+		@include reduce-motion("transition");
+	}
+}
+
+// Centred document title on small screens with sidebar open
+@media ( max-width: #{ ($break-large - 1) } ) {
+	body.is-navigation-sidebar-open .edit-site-header {
+		.edit-site-header-toolbar__inserter-toggle ~ .components-button,
+		.edit-site-header_end .components-button:not(.is-primary) {
+			display: none;
+		}
+		.edit-site-save-button__button {
+			margin-right: 0;
+		}
+	}
 }
 
 .edit-site-header__toolbar {
 	display: flex;
-	flex-grow: 1;
+	align-items: center;
 	padding-left: $grid-unit-10;
 
-	& > * {
-		margin-left: 5px;
+	@include break-small() {
+		padding-left: $grid-unit-30;
+	}
+
+	@include break-wide() {
+		padding-right: $grid-unit-10;
+	}
+
+	.edit-site-header-toolbar__inserter-toggle {
+		margin-right: $grid-unit-10;
+		min-width: $grid-unit-40;
+		width: $grid-unit-40;
+		height: $grid-unit-40;
+		padding: 0;
+
+		svg {
+			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+			@include reduce-motion("transition");
+		}
+
+		&.is-pressed {
+			svg {
+				transform: rotate(45deg);
+			}
+		}
 	}
 }
-.edit-site-header__actions {
+
+.edit-site-header__toolbar-switchers {
+	align-items: center;
 	display: flex;
-	margin-right: 8px;
+}
+
+.edit-site-header__toolbar-switchers-separator {
+	margin: 0 -6px 0;
+}
+
+/**
+ * Buttons in the Toolbar
+ */
+
+.edit-site-header__actions {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	padding-right: $grid-unit-05;
+
+	.interface-pinned-items {
+		display: none;
+
+		@include break-medium() {
+			display: inline-flex;
+		}
+	}
+
+	// Adjust button paddings to scale better to mobile.
+	.editor-post-saved-state,
+	.components-button.components-button {
+		margin-right: $grid-unit-05;
+
+		@include break-small() {
+			margin-right: $grid-unit-15;
+		}
+	}
+
+	.editor-post-saved-state,
+	.components-button.is-tertiary {
+		padding: 0 #{$grid-unit-15 / 2};
+	}
+
+	.edit-site-more-menu .components-button,
+	.interface-pinned-items .components-button {
+		margin-right: 0;
+	}
+
+	@include break-small() {
+		padding-right: $grid-unit-20;
+	}
 }
 
 .edit-site-header__actions-more-menu {

@@ -1,15 +1,20 @@
 /**
  * External dependencies
  */
-import { flatMap, filter, compact } from 'lodash';
+import { flatMap, compact } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
-import { createBlock, getBlockTransforms, findTransform } from '../factory';
+import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
-import { getBlockContent } from '../serializer';
-import { getBlockAttributes, parseWithGrammar } from '../parser';
+import { getBlockInnerHTML } from '../serializer';
+import { parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import commentRemover from './comment-remover';
@@ -27,13 +32,7 @@ import iframeRemover from './iframe-remover';
 import googleDocsUIDRemover from './google-docs-uid-remover';
 import htmlFormattingRemover from './html-formatting-remover';
 import brRemover from './br-remover';
-import { getPhrasingContentSchema } from './phrasing-content';
-import {
-	deepFilterHTML,
-	isPlain,
-	removeInvalidHTML,
-	getBlockContentSchema,
-} from './utils';
+import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 
 /**
@@ -44,11 +43,12 @@ const { console } = window;
 /**
  * Filters HTML to only contain phrasing content.
  *
- * @param {string} HTML The HTML to filter.
+ * @param {string}  HTML The HTML to filter.
+ * @param {boolean} preserveWhiteSpace Whether or not to preserve consequent white space.
  *
  * @return {string} HTML only containing phrasing content.
  */
-function filterInlineHTML( HTML ) {
+function filterInlineHTML( HTML, preserveWhiteSpace ) {
 	HTML = deepFilterHTML( HTML, [
 		googleDocsUIDRemover,
 		phrasingContentReducer,
@@ -57,69 +57,15 @@ function filterInlineHTML( HTML ) {
 	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
 		inline: true,
 	} );
-	HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
+
+	if ( ! preserveWhiteSpace ) {
+		HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
+	}
 
 	// Allows us to ask for this information when we get a report.
 	console.log( 'Processed inline HTML:\n\n', HTML );
 
 	return HTML;
-}
-
-function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(
-		( transform ) => {
-			return transform.isMatch
-				? transform
-				: {
-						...transform,
-						isMatch: ( node ) =>
-							transform.selector &&
-							node.matches( transform.selector ),
-				  };
-		}
-	);
-}
-
-/**
- * Converts HTML directly to blocks. Looks for a matching transform for each
- * top-level tag. The HTML should be filtered to not have any text between
- * top-level tags and formatted in a way that blocks can handle the HTML.
- *
- * @param  {Object} $1               Named parameters.
- * @param  {string} $1.html          HTML to convert.
- * @param  {Array}  $1.rawTransforms Transforms that can be used.
- *
- * @return {Array} An array of blocks.
- */
-function htmlToBlocks( { html, rawTransforms } ) {
-	const doc = document.implementation.createHTMLDocument( '' );
-
-	doc.body.innerHTML = html;
-
-	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) =>
-			isMatch( node )
-		);
-
-		if ( ! rawTransform ) {
-			return createBlock(
-				// Should not be hardcoded.
-				'core/html',
-				getBlockAttributes( 'core/html', node.outerHTML )
-			);
-		}
-
-		const { transform, blockName } = rawTransform;
-
-		if ( transform ) {
-			return transform( node );
-		}
-
-		return createBlock(
-			blockName,
-			getBlockAttributes( blockName, node.outerHTML )
-		);
-	} );
 }
 
 /**
@@ -133,6 +79,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
  *                                      * 'INLINE': Always handle as inline content, and return string.
  *                                      * 'BLOCKS': Always handle as blocks, and return array of blocks.
  * @param {Array}   [options.tagName]   The tag into which content will be inserted.
+ * @param {boolean} [options.preserveWhiteSpace] Whether or not to preserve consequent white space.
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
@@ -141,6 +88,7 @@ export function pasteHandler( {
 	plainText = '',
 	mode = 'AUTO',
 	tagName,
+	preserveWhiteSpace,
 } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
@@ -179,7 +127,12 @@ export function pasteHandler( {
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
 	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
-		HTML = markdownConverter( plainText );
+		HTML = plainText;
+
+		// The markdown converter (Showdown) trims whitespace.
+		if ( ! /^\s+$/.test( plainText ) ) {
+			HTML = markdownConverter( HTML );
+		}
 
 		// Switch to inline mode if:
 		// * The current mode is AUTO.
@@ -197,7 +150,7 @@ export function pasteHandler( {
 	}
 
 	if ( mode === 'INLINE' ) {
-		return filterInlineHTML( HTML );
+		return filterInlineHTML( HTML, preserveWhiteSpace );
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched
@@ -214,16 +167,11 @@ export function pasteHandler( {
 		! hasShortcodes &&
 		isInlineContent( HTML, tagName )
 	) {
-		return filterInlineHTML( HTML );
+		return filterInlineHTML( HTML, preserveWhiteSpace );
 	}
 
-	const rawTransforms = getRawTransformations();
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
-	const blockContentSchema = getBlockContentSchema(
-		rawTransforms,
-		phrasingContentSchema,
-		true
-	);
+	const blockContentSchema = getBlockContentSchema( 'paste' );
 
 	const blocks = compact(
 		flatMap( pieces, ( piece ) => {
@@ -264,26 +212,27 @@ export function pasteHandler( {
 			// Allows us to ask for this information when we get a report.
 			console.log( 'Processed HTML piece:\n\n', piece );
 
-			return htmlToBlocks( { html: piece, rawTransforms } );
+			return htmlToBlocks( piece );
 		} )
 	);
 
-	// If we're allowed to return inline content, and there is only one inlineable block,
-	// and the original plain text content does not have any line breaks, then
-	// treat it as inline paste.
+	// If we're allowed to return inline content, and there is only one
+	// inlineable block, and the original plain text content does not have any
+	// line breaks, then treat it as inline paste.
 	if (
 		mode === 'AUTO' &&
 		blocks.length === 1 &&
 		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
 	) {
-		const trimmedPlainText = plainText.trim();
+		// Don't catch line breaks at the start or end.
+		const trimmedPlainText = plainText.replace( /^[\n]+|[\n]+$/g, '' );
 
 		if (
 			trimmedPlainText !== '' &&
 			trimmedPlainText.indexOf( '\n' ) === -1
 		) {
 			return removeInvalidHTML(
-				getBlockContent( blocks[ 0 ] ),
+				getBlockInnerHTML( blocks[ 0 ] ),
 				phrasingContentSchema
 			);
 		}

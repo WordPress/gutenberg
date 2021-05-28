@@ -1,5 +1,6 @@
-.components-autocomplete__popover .components-popover__content {
+.components-autocomplete__popover .components-popover__content > div {
 	padding: $grid-unit-20;
+	min-width: 220px;
 }
 
 .components-autocomplete__result.components-button {
@@ -10,6 +11,6 @@
 	width: 100%;
 
 	&.is-selected {
-		box-shadow: 0 0 0 2px color($theme-color);
+		box-shadow: 0 0 0 2px var(--wp-admin-theme-color);
 	}
 }

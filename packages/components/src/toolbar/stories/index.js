@@ -23,7 +23,7 @@ import {
 	Path,
 	ToolbarButton,
 	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	DropdownMenu,
 } from '../../';
 
@@ -41,10 +41,7 @@ function InlineImageIcon() {
 export const _default = () => {
 	return (
 		// id is required for server side rendering
-		<Toolbar
-			__experimentalAccessibilityLabel="Options"
-			id="options-toolbar"
-		>
+		<Toolbar label="Options" id="options-toolbar">
 			<ToolbarGroup>
 				<ToolbarButton icon={ paragraph } label="Paragraph" />
 			</ToolbarGroup>
@@ -54,7 +51,7 @@ export const _default = () => {
 						<DropdownMenu
 							hasArrowIndicator
 							icon={ alignLeft }
-							label="Change text alignment"
+							label="Align"
 							controls={ [
 								{
 									icon: alignLeft,
@@ -96,7 +93,7 @@ export const _default = () => {
 			</ToolbarGroup>
 			<ToolbarGroup
 				icon={ more }
-				label="Change text alignment"
+				label="Align"
 				isCollapsed
 				controls={ [
 					{
@@ -115,10 +112,7 @@ export const _default = () => {
 export const withoutGroup = () => {
 	return (
 		// id is required for server side rendering
-		<Toolbar
-			__experimentalAccessibilityLabel="Options"
-			id="options-toolbar-without-group"
-		>
+		<Toolbar label="Options" id="options-toolbar-without-group">
 			<ToolbarButton icon={ formatBold } label="Bold" isPressed />
 			<ToolbarButton icon={ formatItalic } label="Italic" />
 			<ToolbarButton icon={ link } label="Link" />

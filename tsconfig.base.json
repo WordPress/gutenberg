@@ -15,14 +15,13 @@
 
 		/* Strict Type-Checking Options */
 		"strict": true,
-		"strictNullChecks": true,
-		"noImplicitAny": true,
 
 		/* Additional Checks */
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
+		"importsNotUsedAsValues": "error",
 
 		/* Module Resolution Options */
 		"moduleResolution": "node",
@@ -31,15 +30,17 @@
 		"esModuleInterop": false,
 		"resolveJsonModule": true,
 
-		"typeRoots": [ "./node_modules/@types" ]
+		"typeRoots": [ "./typings", "./node_modules/@types" ],
+		"types": []
 	},
 	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/build/**",
-		"**/build-*/**",
 		"**/*.android.js",
 		"**/*.ios.js",
-		"**/*.native.js"
+		"**/*.native.js",
+		"**/benchmark",
+		"packages/*/build-*/**",
+		"packages/*/build/**",
+		"**/test/**",
+		"packages/**/react-native-*/**"
 	]
 }

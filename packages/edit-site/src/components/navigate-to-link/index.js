@@ -1,62 +1,49 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useMemo } from '@wordpress/element';
-import { addQueryArgs } from '@wordpress/url';
-import { select } from '@wordpress/data';
+import { getPathAndQueryString } from '@wordpress/url';
+import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
+import { edit } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Browser dependencies
- */
-const { fetch } = window;
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function NavigateToLink( {
-	url,
-	templateIds,
-	activeId,
-	onActiveIdChange,
+	type,
+	id,
+	activePage,
+	onActivePageChange,
 } ) {
-	const [ templateId, setTemplateId ] = useState();
-	useEffect( () => {
-		const effect = async () => {
-			try {
-				const { success, data } = await fetch(
-					addQueryArgs( url, { '_wp-find-template': true } )
-				).then( ( res ) => res.json() );
-				if ( success ) {
-					let newTemplateId = data.ID;
-					if ( newTemplateId === null ) {
-						const { getEntityRecord } = select( 'core' );
-						newTemplateId = templateIds
-							.map( ( id ) =>
-								getEntityRecord( 'postType', 'wp_template', id )
-							)
-							.find(
-								( template ) => template.slug === data.post_name
-							).id;
-					}
-					setTemplateId( newTemplateId );
-				} else {
-					throw new Error();
-				}
-			} catch ( err ) {
-				setTemplateId( null );
-			}
-		};
-		effect();
-	}, [ url, templateIds ] );
+	const post = useSelect(
+		( select ) =>
+			type &&
+			id &&
+			type !== 'URL' &&
+			select( coreStore ).getEntityRecord( 'postType', type, id ),
+		[ type, id ]
+	);
+
 	const onClick = useMemo( () => {
-		if ( ! templateId || templateId === activeId ) {
-			return null;
-		}
-		return () => onActiveIdChange( templateId );
-	}, [ templateId, activeId, onActiveIdChange ] );
+		if ( ! post?.link ) return null;
+		const path = getPathAndQueryString( post.link );
+		if ( path === activePage?.path ) return null;
+		return () =>
+			onActivePageChange( {
+				type,
+				slug: post.slug,
+				path,
+				context: {
+					postType: post.type,
+					postId: post.id,
+				},
+			} );
+	}, [ post, activePage?.path, onActivePageChange ] );
+
 	return (
 		onClick && (
 			<Button
-				icon="welcome-write-blog"
+				icon={ edit }
 				label={ __( 'Edit Page Template' ) }
 				onClick={ onClick }
 			/>

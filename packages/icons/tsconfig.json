@@ -5,5 +5,5 @@
 		"declarationDir": "build-types"
 	},
 	"include": [ "src/**/*" ],
-	"references": [ { "path": "../primitives" } ]
+	"references": [ { "path": "../element" }, { "path": "../primitives" } ]
 }

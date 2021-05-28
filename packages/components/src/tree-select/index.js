@@ -4,6 +4,10 @@
 import { unescape as unescapeString, repeat, flatMap, compact } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { useMemo } from '@wordpress/element';
+/**
  * Internal dependencies
  */
 import { SelectControl } from '../';
@@ -27,10 +31,13 @@ export default function TreeSelect( {
 	tree,
 	...props
 } ) {
-	const options = compact( [
-		noOptionLabel && { value: '', label: noOptionLabel },
-		...getSelectOptions( tree ),
-	] );
+	const options = useMemo( () => {
+		return compact( [
+			noOptionLabel && { value: '', label: noOptionLabel },
+			...getSelectOptions( tree ),
+		] );
+	}, [ noOptionLabel, tree ] );
+
 	return (
 		<SelectControl
 			{ ...{ label, options, onChange } }

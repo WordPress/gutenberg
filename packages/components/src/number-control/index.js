@@ -1,79 +1,188 @@
 /**
  * External dependencies
  */
-import { clamp, noop } from 'lodash';
 import classNames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { UP, DOWN } from '@wordpress/keycodes';
+import { forwardRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
-export default function NumberControl( {
-	className,
-	isShiftStepEnabled = true,
-	max = Infinity,
-	min = -Infinity,
-	onChange = noop,
-	onKeyDown = noop,
-	shiftStep = 10,
-	step = 1,
-	...props
-} ) {
-	const baseValue = clamp( 0, min, max );
+/**
+ * Internal dependencies
+ */
+import { Input } from './styles/number-control-styles';
+import {
+	inputControlActionTypes,
+	composeStateReducers,
+} from '../input-control/state';
+import { add, subtract, roundClamp } from '../utils/math';
+import { useJumpStep } from '../utils/hooks';
+import { isValueEmpty } from '../utils/values';
 
-	const handleOnKeyDown = ( event ) => {
-		onKeyDown( event );
-		const { value } = event.target;
+export function NumberControl(
+	{
+		__unstableStateReducer: stateReducer = ( state ) => state,
+		className,
+		dragDirection = 'n',
+		hideHTMLArrows = false,
+		isDragEnabled = true,
+		isShiftStepEnabled = true,
+		label,
+		max = Infinity,
+		min = -Infinity,
+		shiftStep = 10,
+		step = 1,
+		type: typeProp = 'number',
+		value: valueProp,
+		...props
+	},
+	ref
+) {
+	const baseValue = roundClamp( 0, min, max, step );
 
-		const isEmpty = value === '';
-		const enableShift = event.shiftKey && isShiftStepEnabled;
+	const jumpStep = useJumpStep( {
+		step,
+		shiftStep,
+		isShiftStepEnabled,
+	} );
 
-		const incrementalValue = enableShift
-			? parseFloat( shiftStep )
-			: parseFloat( step );
-		let nextValue = isEmpty ? baseValue : value;
+	const autoComplete = typeProp === 'number' ? 'off' : null;
+	const classes = classNames( 'components-number-control', className );
 
-		// Convert to a number to use math
-		nextValue = parseFloat( nextValue );
+	/**
+	 * "Middleware" function that intercepts updates from InputControl.
+	 * This allows us to tap into actions to transform the (next) state for
+	 * InputControl.
+	 *
+	 * @param {Object} state State from InputControl
+	 * @param {Object} action Action triggering state change
+	 * @return {Object} The updated state to apply to InputControl
+	 */
+	const numberControlStateReducer = ( state, action ) => {
+		const { type, payload } = action;
+		const event = payload?.event;
+		const currentValue = state.value;
 
-		switch ( event.keyCode ) {
-			case UP:
+		/**
+		 * Handles custom UP and DOWN Keyboard events
+		 */
+		if (
+			type === inputControlActionTypes.PRESS_UP ||
+			type === inputControlActionTypes.PRESS_DOWN
+		) {
+			const enableShift = event.shiftKey && isShiftStepEnabled;
+
+			const incrementalValue = enableShift
+				? parseFloat( shiftStep ) * parseFloat( step )
+				: parseFloat( step );
+			let nextValue = isValueEmpty( currentValue )
+				? baseValue
+				: currentValue;
+
+			if ( event?.preventDefault ) {
 				event.preventDefault();
+			}
 
-				nextValue = nextValue + incrementalValue;
-				nextValue = clamp( nextValue, min, max );
+			if ( type === inputControlActionTypes.PRESS_UP ) {
+				nextValue = add( nextValue, incrementalValue );
+			}
 
-				onChange( nextValue.toString(), { event } );
+			if ( type === inputControlActionTypes.PRESS_DOWN ) {
+				nextValue = subtract( nextValue, incrementalValue );
+			}
 
-				break;
+			nextValue = roundClamp( nextValue, min, max, incrementalValue );
 
-			case DOWN:
-				event.preventDefault();
-
-				nextValue = nextValue - incrementalValue;
-				nextValue = clamp( nextValue, min, max );
-
-				onChange( nextValue.toString(), { event } );
-
-				break;
+			state.value = nextValue;
 		}
-	};
 
-	const handleOnChange = ( event ) => {
-		onChange( event.target.value, { event } );
-	};
+		/**
+		 * Handles drag to update events
+		 */
+		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
+			const { delta, shiftKey } = payload;
+			const [ x, y ] = delta;
+			const modifier = shiftKey
+				? parseFloat( shiftStep ) * parseFloat( step )
+				: parseFloat( step );
 
-	const classes = classNames( 'component-number-control', className );
+			let directionModifier;
+			let directionBaseValue;
+
+			switch ( dragDirection ) {
+				case 'n':
+					directionBaseValue = y;
+					directionModifier = -1;
+					break;
+
+				case 'e':
+					directionBaseValue = x;
+					directionModifier = isRTL() ? -1 : 1;
+					break;
+
+				case 's':
+					directionBaseValue = y;
+					directionModifier = 1;
+					break;
+
+				case 'w':
+					directionBaseValue = x;
+					directionModifier = isRTL() ? 1 : -1;
+					break;
+			}
+
+			const distance = directionBaseValue * modifier * directionModifier;
+			let nextValue;
+
+			if ( distance !== 0 ) {
+				nextValue = roundClamp(
+					add( currentValue, distance ),
+					min,
+					max,
+					modifier
+				);
+
+				state.value = nextValue;
+			}
+		}
+
+		/**
+		 * Handles commit (ENTER key press or on blur if isPressEnterToChange)
+		 */
+		if (
+			type === inputControlActionTypes.PRESS_ENTER ||
+			type === inputControlActionTypes.COMMIT
+		) {
+			state.value = roundClamp( currentValue, min, max );
+		}
+
+		return state;
+	};
 
 	return (
-		<input
+		<Input
+			autoComplete={ autoComplete }
 			inputMode="numeric"
 			{ ...props }
 			className={ classes }
-			type="number"
-			onChange={ handleOnChange }
-			onKeyDown={ handleOnKeyDown }
+			dragDirection={ dragDirection }
+			hideHTMLArrows={ hideHTMLArrows }
+			isDragEnabled={ isDragEnabled }
+			label={ label }
+			max={ max }
+			min={ min }
+			ref={ ref }
+			step={ jumpStep }
+			type={ typeProp }
+			value={ valueProp }
+			__unstableStateReducer={ composeStateReducers(
+				numberControlStateReducer,
+				stateReducer
+			) }
 		/>
 	);
 }
+
+export default forwardRef( NumberControl );

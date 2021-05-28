@@ -15,8 +15,8 @@ import {
 } from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
-
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
+/** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
 
 /**
  * Given a block name or block type object, returns the corresponding
@@ -84,14 +84,66 @@ export function getBlockStyles( state, name ) {
  *
  * @return {(WPBlockVariation[]|void)} Block variations.
  */
-export function getBlockVariations( state, blockName, scope ) {
-	const variations = state.blockVariations[ blockName ];
-	if ( ! variations || ! scope ) {
-		return variations;
-	}
-	return variations.filter( ( variation ) => {
-		return ! variation.scope || variation.scope.includes( scope );
+export const getBlockVariations = createSelector(
+	( state, blockName, scope ) => {
+		const variations = state.blockVariations[ blockName ];
+		if ( ! variations || ! scope ) {
+			return variations;
+		}
+		return variations.filter( ( variation ) => {
+			// For backward compatibility reasons, variation's scope defaults to
+			// `block` and `inserter` when not set.
+			return ( variation.scope || [ 'block', 'inserter' ] ).includes(
+				scope
+			);
+		} );
+	},
+	( state, blockName ) => [ state.blockVariations[ blockName ] ]
+);
+
+/**
+ * Returns the active block variation for a given block based on its attributes.
+ * Variations are determined by their `isActive` property.
+ * Which is either an array of block attribute keys or a function.
+ *
+ * In case of an array of block attribute keys, the `attributes` are compared
+ * to the variation's attributes using strict equality check.
+ *
+ * In case of function type, the function should accept a block's attributes
+ * and the variation's attributes and determines if a variation is active.
+ * A function that accepts a block's attributes and the variation's attributes and determines if a variation is active.
+ *
+ * @param {Object}                state      Data state.
+ * @param {string}                blockName  Name of block (example: “core/columns”).
+ * @param {Object}                attributes Block attributes used to determine active variation.
+ * @param {WPBlockVariationScope} [scope]    Block variation scope name.
+ *
+ * @return {(WPBlockVariation|undefined)} Active block variation.
+ */
+export function getActiveBlockVariation( state, blockName, attributes, scope ) {
+	const variations = getBlockVariations( state, blockName, scope );
+
+	const match = variations?.find( ( variation ) => {
+		if ( Array.isArray( variation.isActive ) ) {
+			const blockType = getBlockType( state, blockName );
+			const attributeKeys = Object.keys( blockType.attributes || {} );
+			const definedAttributes = variation.isActive.filter(
+				( attribute ) => attributeKeys.includes( attribute )
+			);
+			if ( definedAttributes.length === 0 ) {
+				return false;
+			}
+			return definedAttributes.every(
+				( attribute ) =>
+					attributes[ attribute ] ===
+					variation.attributes[ attribute ]
+			);
+		}
+
+		return variation.isActive?.( attributes, variation.attributes );
 	} );
+
+	return match;
 }
 
 /**
@@ -117,7 +169,7 @@ export function getDefaultBlockVariation( state, blockName, scope ) {
  *
  * @param {Object} state Data state.
  *
- * @return {Array} Categories list.
+ * @return {WPBlockCategory[]} Categories list.
  */
 export function getCategories( state ) {
 	return state.categories;
@@ -217,7 +269,11 @@ export const getBlockSupport = (
 ) => {
 	const blockType = getNormalizedBlockType( state, nameOrType );
 
-	return get( blockType, [ 'supports', feature ], defaultSupports );
+	return get(
+		blockType,
+		[ 'supports', ...feature.split( '.' ) ],
+		defaultSupports
+	);
 };
 
 /**

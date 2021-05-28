@@ -16,7 +16,16 @@ import Icon from '../icon';
 /**
  * Renders a placeholder. Normally used by blocks to render their empty state.
  *
- * @param  {Object} props The component props.
+ * @param {Object}    props                The component props.
+ * @param {WPIcon}    props.icon           An icon rendered before the label.
+ * @param {WPElement} props.children       Children to be rendered.
+ * @param {string}    props.label          Title of the placeholder.
+ * @param {string}    props.instructions   Instructions of the placeholder.
+ * @param {string}    props.className      Class to set on the container div.
+ * @param {Object}    props.notices        A rendered notices list.
+ * @param {Object}    props.preview        Preview to be rendered in the placeholder.
+ * @param {boolean}   props.isColumnLayout Whether a column layout should be used.
+ *
  * @return {Object}       The rendered placeholder.
  */
 function Placeholder( {
@@ -37,8 +46,8 @@ function Placeholder( {
 	let modifierClassNames;
 	if ( typeof width === 'number' ) {
 		modifierClassNames = {
-			'is-large': width >= 320,
-			'is-medium': width >= 160 && width < 320,
+			'is-large': width >= 480,
+			'is-medium': width >= 160 && width < 480,
 			'is-small': width < 160,
 		};
 	}

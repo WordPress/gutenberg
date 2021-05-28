@@ -4,9 +4,9 @@
 import { difference } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { isTextContent } from './phrasing-content';
+import { isTextContent } from '@wordpress/dom';
 
 /**
  * Checks if the given node should be considered inline content, optionally
@@ -27,12 +27,12 @@ function isInline( node, contextTag ) {
 	}
 
 	const tag = node.nodeName.toLowerCase();
-	const inlineWhitelistTagGroups = [
+	const inlineAllowedTagGroups = [
 		[ 'ul', 'li', 'ol' ],
 		[ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 	];
 
-	return inlineWhitelistTagGroups.some(
+	return inlineAllowedTagGroups.some(
 		( tagGroup ) => difference( [ tag, contextTag ], tagGroup ).length === 0
 	);
 }
@@ -53,7 +53,7 @@ function isDoubleBR( node ) {
 	);
 }
 
-export default function( HTML, contextTag ) {
+export default function isInlineContent( HTML, contextTag ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = HTML;

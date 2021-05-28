@@ -1,0 +1,24 @@
+buildscript {
+    ext {
+        willPublishReactNativeBridgeBinary = properties["publishReactNativeBridgeVersion"]?.trim() as boolean
+    }
+    repositories {
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+    }
+}
+
+allprojects {
+    repositories {
+        if (willPublishReactNativeBridgeBinary) {
+            maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
+        } else {
+            maven { url "$rootDir/../../../node_modules/react-native/android" }
+        }
+    }
+}

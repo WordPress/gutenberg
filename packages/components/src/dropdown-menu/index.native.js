@@ -11,6 +11,7 @@ import { DOWN } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
 import { BottomSheet, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,7 +39,7 @@ function DropdownMenu( {
 	children,
 	className,
 	controls,
-	icon = 'menu',
+	icon = menu,
 	label,
 	popoverProps,
 	toggleProps,
@@ -123,7 +124,6 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						showTooltip
 					>
 						{ mergedToggleProps.children }
 					</Button>
@@ -163,8 +163,6 @@ function DropdownMenu( {
 												leftAlign={ true }
 												isSelected={ control.isActive }
 												separatorType={
-													indexOfControl ===
-														controlSet.length - 1 ||
 													Platform.OS === 'android'
 														? 'none'
 														: 'leftMargin'

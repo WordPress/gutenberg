@@ -1,0 +1,206 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PreferencesModal should match snapshot when the modal is active large viewports 1`] = `
+<WithInstanceId(Modal)
+  className="edit-post-preferences-modal"
+  closeLabel="Close"
+  onRequestClose={[Function]}
+  title="Preferences"
+>
+  <TabPanel
+    className="edit-post-preferences__tabs"
+    onSelect={[Function]}
+    orientation="vertical"
+    tabs={
+      Array [
+        Object {
+          "name": "general",
+          "title": "General",
+        },
+        Object {
+          "name": "appearance",
+          "title": "Appearance",
+        },
+        Object {
+          "name": "blocks",
+          "title": "Blocks",
+        },
+        Object {
+          "name": "panels",
+          "title": "Panels",
+        },
+      ]
+    }
+  >
+    <Component />
+  </TabPanel>
+</WithInstanceId(Modal)>
+`;
+
+exports[`PreferencesModal should match snapshot when the modal is active small viewports 1`] = `
+<WithInstanceId(Modal)
+  className="edit-post-preferences-modal"
+  closeLabel="Close"
+  onRequestClose={[Function]}
+  title="Preferences"
+>
+  <Navigation
+    activeMenu="preferences-menu"
+    onActivateMenu={[Function]}
+  >
+    <NavigationMenu
+      menu="preferences-menu"
+    >
+      <NavigationItem
+        key="general"
+        navigateToMenu="general"
+        title="General"
+      />
+      <NavigationItem
+        key="appearance"
+        navigateToMenu="appearance"
+        title="Appearance"
+      />
+      <NavigationItem
+        key="blocks"
+        navigateToMenu="blocks"
+        title="Blocks"
+      />
+      <NavigationItem
+        key="panels"
+        navigateToMenu="panels"
+        title="Panels"
+      />
+    </NavigationMenu>
+    <NavigationMenu
+      key="general-menu"
+      menu="general"
+      parentMenu="preferences-menu"
+      title="General"
+    >
+      <NavigationItem>
+        <Section
+          title="Decide what to focus on"
+        >
+          <WithSelect(WithDispatch(BaseOption))
+            featureName="reducedUI"
+            help="Compacts options and outlines in the toolbar."
+            label="Reduce the interface"
+          />
+          <WithSelect(WithDispatch(BaseOption))
+            featureName="focusMode"
+            help="Highlights the current block and fades other content."
+            label="Spotlight mode"
+          />
+          <WithSelect(WithDispatch(BaseOption))
+            featureName="showBlockBreadcrumbs"
+            help="Shows block breadcrumbs at the bottom of the editor."
+            label="Display block breadcrumbs"
+          />
+        </Section>
+      </NavigationItem>
+    </NavigationMenu>
+    <NavigationMenu
+      key="appearance-menu"
+      menu="appearance"
+      parentMenu="preferences-menu"
+      title="Appearance"
+    >
+      <NavigationItem>
+        <Section
+          title="Choose the way it looks"
+        >
+          <WithSelect(WithDispatch(BaseOption))
+            featureName="showIconLabels"
+            help="Shows text instead of icons in toolbar."
+            label="Display button labels"
+          />
+          <WithSelect(WithDispatch(BaseOption))
+            featureName="themeStyles"
+            help="Make the editor look like your theme."
+            label="Use theme styles"
+          />
+        </Section>
+      </NavigationItem>
+    </NavigationMenu>
+    <NavigationMenu
+      key="blocks-menu"
+      menu="blocks"
+      parentMenu="preferences-menu"
+      title="Blocks"
+    >
+      <NavigationItem>
+        <Section
+          title="Choose how you interact with blocks"
+        >
+          <WithSelect(WithDispatch(BaseOption))
+            featureName="mostUsedBlocks"
+            help="Places the most frequent blocks in the block library."
+            label="Show most used blocks"
+          />
+          <WithSelect(WithDispatch(BaseOption))
+            featureName="keepCaretInsideBlock"
+            help="Aids screen readers by stopping text caret from leaving blocks."
+            label="Contain text cursor inside block"
+          />
+        </Section>
+      </NavigationItem>
+    </NavigationMenu>
+    <NavigationMenu
+      key="panels-menu"
+      menu="panels"
+      parentMenu="preferences-menu"
+      title="Panels"
+    >
+      <NavigationItem>
+        <Section
+          description="Choose what displays in the panel."
+          title="Document settings"
+        >
+          <EnablePluginDocumentSettingPanelOptionSlot />
+          <WithSelect(PostTaxonomies)
+            taxonomyWrapper={[Function]}
+          />
+          <PostFeaturedImageCheck>
+            <WithSelect(IfCondition(WithDispatch(BaseOption)))
+              label="Featured image"
+              panelName="featured-image"
+            />
+          </PostFeaturedImageCheck>
+          <PostExcerptCheck>
+            <WithSelect(IfCondition(WithDispatch(BaseOption)))
+              label="Excerpt"
+              panelName="post-excerpt"
+            />
+          </PostExcerptCheck>
+          <WithSelect(PostTypeSupportCheck)
+            supportKeys={
+              Array [
+                "comments",
+                "trackbacks",
+              ]
+            }
+          >
+            <WithSelect(IfCondition(WithDispatch(BaseOption)))
+              label="Discussion"
+              panelName="discussion-panel"
+            />
+          </WithSelect(PostTypeSupportCheck)>
+          <PageAttributesCheck>
+            <WithSelect(IfCondition(WithDispatch(BaseOption)))
+              label="Page attributes"
+              panelName="page-attributes"
+            />
+          </PageAttributesCheck>
+        </Section>
+        <Section
+          description="Add extra areas to the editor."
+          title="Additional"
+        >
+          <WithSelect(MetaBoxesSection) />
+        </Section>
+      </NavigationItem>
+    </NavigationMenu>
+  </Navigation>
+</WithInstanceId(Modal)>
+`;

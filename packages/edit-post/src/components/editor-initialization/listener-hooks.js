@@ -3,12 +3,14 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import {
-	STORE_KEY,
+	STORE_NAME,
 	VIEW_AS_LINK_SELECTOR,
 	VIEW_AS_PREVIEW_LINK_SELECTOR,
 } from '../../store/constants';
@@ -23,14 +25,14 @@ export const useBlockSelectionListener = ( postId ) => {
 	const { hasBlockSelection, isEditorSidebarOpened } = useSelect(
 		( select ) => ( {
 			hasBlockSelection: !! select(
-				'core/block-editor'
+				blockEditorStore
 			).getBlockSelectionStart(),
-			isEditorSidebarOpened: select( STORE_KEY ).isEditorSidebarOpened(),
+			isEditorSidebarOpened: select( STORE_NAME ).isEditorSidebarOpened(),
 		} ),
 		[ postId ]
 	);
 
-	const { openGeneralSidebar } = useDispatch( STORE_KEY );
+	const { openGeneralSidebar } = useDispatch( STORE_NAME );
 
 	useEffect( () => {
 		if ( ! isEditorSidebarOpened ) {
@@ -45,51 +47,6 @@ export const useBlockSelectionListener = ( postId ) => {
 };
 
 /**
- * This listener hook is used to monitor viewport size and adjust the sidebar
- * accordingly.
- *
- * @param {number} postId  The current post id.
- */
-export const useAdjustSidebarListener = ( postId ) => {
-	const { isSmall, activeGeneralSidebarName } = useSelect(
-		( select ) => ( {
-			isSmall: select( 'core/viewport' ).isViewportMatch( '< medium' ),
-			activeGeneralSidebarName: select(
-				STORE_KEY
-			).getActiveGeneralSidebarName(),
-		} ),
-		[ postId ]
-	);
-
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		STORE_KEY
-	);
-
-	const previousIsSmall = useRef( null );
-	const sidebarToReOpenOnExpand = useRef( null );
-
-	useEffect( () => {
-		if ( previousIsSmall.current === isSmall ) {
-			return;
-		}
-		previousIsSmall.current = isSmall;
-
-		if ( isSmall ) {
-			sidebarToReOpenOnExpand.current = activeGeneralSidebarName;
-			if ( activeGeneralSidebarName ) {
-				closeGeneralSidebar();
-			}
-		} else if (
-			sidebarToReOpenOnExpand.current &&
-			! activeGeneralSidebarName
-		) {
-			openGeneralSidebar( sidebarToReOpenOnExpand.current );
-			sidebarToReOpenOnExpand.current = null;
-		}
-	}, [ isSmall, activeGeneralSidebarName ] );
-};
-
-/**
  * This listener hook monitors any change in permalink and updates the view
  * post link in the admin bar.
  *
@@ -98,7 +55,7 @@ export const useAdjustSidebarListener = ( postId ) => {
 export const useUpdatePostLinkListener = ( postId ) => {
 	const { newPermalink } = useSelect(
 		( select ) => ( {
-			newPermalink: select( 'core/editor' ).getCurrentPost().link,
+			newPermalink: select( editorStore ).getCurrentPost().link,
 		} ),
 		[ postId ]
 	);

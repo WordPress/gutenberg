@@ -17,10 +17,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Code' ),
-	description: __(
-		'Display code snippets that respect your spacing and tabs.'
-	),
 	icon,
 	example: {
 		attributes: {
@@ -31,10 +27,6 @@ export const settings = {
 			),
 			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
 		},
-	},
-	supports: {
-		html: false,
-		lightBlockWrapper: true,
 	},
 	transforms,
 	edit,

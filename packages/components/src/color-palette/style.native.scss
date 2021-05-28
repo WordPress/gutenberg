@@ -1,17 +1,17 @@
 .contentContainer {
-	flex-direction: row;
-	padding: 0 $panel-padding;
+	flex-direction: row-reverse;
+	padding: 0 $grid-unit-20;
 }
 
 .container {
-	padding-bottom: $panel-padding;
+	padding-bottom: $grid-unit-20;
 }
 
 .verticalSeparator {
 	border-width: $border-width / 2;
 	border-color: $light-gray-400;
 	height: 38px;
-	margin-right: $panel-padding / 2;
+	margin-right: $grid-unit-20 / 2;
 	align-self: center;
 }
 
@@ -22,4 +22,23 @@
 .colorIndicator {
 	margin-top: 12px;
 	margin-bottom: 12px;
+}
+
+.customIndicatorWrapper {
+	flex-direction: row;
+	align-items: center;
+}
+
+.customText {
+	font-size: 16px;
+	color: $gray-dark;
+}
+
+.customTextDark {
+	color: $white;
+}
+
+.customTextAndroid {
+	letter-spacing: 1.25;
+	font-weight: medium;
 }

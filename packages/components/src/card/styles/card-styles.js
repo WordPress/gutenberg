@@ -11,23 +11,24 @@ import { HorizontalRule } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import { color } from '../../utils/colors';
+import { Flex } from '../../flex';
+import { COLORS, space } from '../../utils';
 
 export const styleProps = {
-	borderColor: color( 'lightGray.500' ),
+	borderColor: COLORS.lightGray[ 500 ],
 	borderRadius: '3px',
-	backgroundShady: color( 'lightGray.200' ),
+	backgroundShady: COLORS.lightGray[ 200 ],
 };
 
 const { borderColor, borderRadius, backgroundShady } = styleProps;
 
 export const CardUI = styled.div`
-	background: ${color( 'white' )};
+	background: ${ COLORS.white };
 	box-sizing: border-box;
-	border-radius: ${borderRadius};
-	border: 1px solid ${borderColor};
+	border-radius: ${ borderRadius };
+	border: 1px solid ${ borderColor };
 
-	${handleBorderless};
+	${ handleBorderless };
 
 	&.is-elevated {
 		box-shadow: 0px 1px 3px 0px rgba( 0, 0, 0, 0.2 ),
@@ -36,19 +37,19 @@ export const CardUI = styled.div`
 	}
 `;
 
-export const HeaderUI = styled.div`
-	border-bottom: 1px solid ${borderColor};
-	border-top-left-radius: ${borderRadius};
-	border-top-right-radius: ${borderRadius};
+export const HeaderUI = styled( Flex )`
+	border-bottom: 1px solid ${ borderColor };
+	border-top-left-radius: ${ borderRadius };
+	border-top-right-radius: ${ borderRadius };
 	box-sizing: border-box;
 
 	&:last-child {
 		border-bottom: none;
 	}
 
-	${headerFooterSizes};
-	${handleBorderless};
-	${handleShady};
+	${ headerFooterSizes };
+	${ handleBorderless };
+	${ handleShady };
 `;
 
 export const MediaUI = styled.div`
@@ -64,41 +65,41 @@ export const MediaUI = styled.div`
 	}
 
 	&:first-of-type {
-		border-top-left-radius: ${borderRadius};
-		border-top-right-radius: ${borderRadius};
+		border-top-left-radius: ${ borderRadius };
+		border-top-right-radius: ${ borderRadius };
 	}
 
 	&:last-of-type {
-		border-bottom-left-radius: ${borderRadius};
-		border-bottom-right-radius: ${borderRadius};
+		border-bottom-left-radius: ${ borderRadius };
+		border-bottom-right-radius: ${ borderRadius };
 	}
 `;
 
 export const BodyUI = styled.div`
 	box-sizing: border-box;
 
-	${bodySize};
-	${handleShady};
+	${ bodySize };
+	${ handleShady };
 `;
 
-export const FooterUI = styled.div`
-	border-top: 1px solid ${borderColor};
-	border-bottom-left-radius: ${borderRadius};
-	border-bottom-right-radius: ${borderRadius};
+export const FooterUI = styled( Flex )`
+	border-top: 1px solid ${ borderColor };
+	border-bottom-left-radius: ${ borderRadius };
+	border-bottom-right-radius: ${ borderRadius };
 	box-sizing: border-box;
 
 	&:first-of-type {
 		border-top: none;
 	}
 
-	${headerFooterSizes};
-	${handleBorderless};
-	${handleShady};
+	${ headerFooterSizes };
+	${ handleBorderless };
+	${ handleShady };
 `;
 
 export const DividerUI = styled( HorizontalRule )`
 	all: unset;
-	border-top: 1px solid ${borderColor};
+	border-top: 1px solid ${ borderColor };
 	box-sizing: border-box;
 	display: block;
 	height: 0;
@@ -109,16 +110,16 @@ export function bodySize() {
 	return `
 		&.is-size {
 			&-large {
-				padding: 24px 32px;
+				padding: ${ space( 3 ) } ${ space( 4 ) };
 			}
 			&-medium {
-				padding: 16px 24px;
+				padding: ${ space( 2 ) } ${ space( 3 ) };
 			}
 			&-small {
-				padding: 16px;
+				padding: ${ space( 2 ) };
 			}
 			&-extraSmall {
-				padding: 8px;
+				padding: ${ space( 1 ) };
 			}
 		}
 	`;
@@ -128,16 +129,16 @@ export function headerFooterSizes() {
 	return `
 		&.is-size {
 			&-large {
-				padding: 24px 32px;
+				padding: ${ space( 3 ) } ${ space( 4 ) };
 			}
 			&-medium {
-				padding: 16px 24px;
+				padding: ${ space( 2 ) } ${ space( 3 ) };
 			}
 			&-small {
-				padding: 16px;
+				padding: ${ space( 2 ) };
 			}
 			&-extraSmall {
-				padding: 8px;
+				padding: ${ space( 1 ) };
 			}
 		}
 	`;

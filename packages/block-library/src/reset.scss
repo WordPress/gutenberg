@@ -1,0 +1,129 @@
+/**
+ * Editor Normalization Styles
+ *
+ * These are only output in the editor, but styles here are prefixed .editor-styles-wrapper and affect the theming
+ * of the editor by themes.
+ */
+
+.editor-styles-wrapper {
+	padding: 8px;
+
+	/**
+	* The following styles revert to the browser defaults overriding the WPAdmin styles.
+	* This is only needed while the block editor is not being loaded in an iframe.
+	*/
+	font-family: serif; // unfortunately initial doesn't work for font-family.
+	font-size: initial;
+	line-height: initial;
+	color: initial;
+
+	// For full-wide blocks, we compensate for the base padding.
+	// These margins should match the padding value above.
+	.block-editor-block-list__layout.is-root-container > .wp-block[data-align="full"] {
+		margin-left: -8px;
+		margin-right: -8px;
+	}
+
+	.wp-align-wrapper {
+		max-width: $content-width;
+
+		> .wp-block,
+		&.wp-align-full {
+			max-width: none;
+		}
+
+		&.wp-align-wide {
+			max-width: $content-width;
+		}
+	}
+
+	a {
+		// This inherits the blue link color set by wp-admin, which is unfortunate.
+		// However both inherit and unset properties set the color to black.
+		transition: none;
+	}
+
+	code,
+	kbd {
+		padding: 0;
+		margin: 0;
+		background: inherit;
+		font-size: inherit;
+		font-family: monospace;
+	}
+
+	p {
+		font-size: revert;
+		line-height: revert;
+		margin: revert;
+	}
+
+	ul,
+	ol {
+		margin: revert;
+		padding: revert;
+		list-style-type: revert;
+		box-sizing: revert;
+
+		// Remove bottom margin from nested lists.
+		ul,
+		ol {
+			margin: revert;
+		}
+
+		li {
+			margin: revert;
+		}
+	}
+
+	ul ul,
+	ol ul {
+		list-style-type: revert;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-size: revert;
+		margin: revert;
+		color: revert;
+		line-height: revert;
+		font-weight: revert;
+	}
+
+	select {
+		font-family: system-ui;
+		-webkit-appearance: revert;
+		color: revert;
+		border: revert;
+		border-radius: revert;
+		background: revert;
+		box-shadow: revert;
+		text-shadow: revert;
+		outline: revert;
+		cursor: revert;
+		transform: revert;
+		font-size: revert;
+		line-height: revert;
+		padding: revert;
+		margin: revert;
+		min-height: revert;
+		max-width: revert;
+		vertical-align: revert;
+		font-weight: revert;
+	}
+
+	select:disabled,
+	select:focus {
+		color: revert;
+		border-color: revert;
+		background: revert;
+		box-shadow: revert;
+		text-shadow: revert;
+		cursor: revert;
+		transform: revert;
+	}
+}

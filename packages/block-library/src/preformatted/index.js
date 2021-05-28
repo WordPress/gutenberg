@@ -17,10 +17,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Preformatted' ),
-	description: __(
-		'Add text that respects your spacing and tabs, and also allows styling.'
-	),
 	icon,
 	example: {
 		attributes: {
@@ -33,9 +29,6 @@ export const settings = {
 		},
 	},
 	transforms,
-	supports: {
-		lightBlockWrapper: true,
-	},
 	edit,
 	save,
 	merge( attributes, attributesToMerge ) {

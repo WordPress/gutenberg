@@ -4,17 +4,32 @@
 	background-color: $white;
 	flex-grow: 1;
 
-	// Always show outlines in code editor
-	.wp-block.editor-post-title {
+	// Post title.
+	.editor-post-title.editor-post-title__block {
 		max-width: none;
+		line-height: $default-line-height;
 
-		textarea {
-			border: $border-width solid $light-gray-secondary;
+		// This needs specificity to change the title block appearance on the code editor.
+		.editor-post-title__input.editor-post-title__input.editor-post-title__input {
+			font-family: $editor-html-font;
+			font-size: 2.5em;
+			font-weight: normal;
+		}
+
+		// Always show outlines in code editor
+		.editor-post-title__input {
+			border: $border-width solid $gray-600;
 			margin-bottom: -$border-width;
+
+			// Same padding as body.
 			padding: $grid-unit-20;
+			@include break-small() {
+				padding: $grid-unit-30;
+			}
 
 			&:focus {
-				border: $border-width solid $dark-gray-primary;
+				border-color: var(--wp-admin-theme-color);
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			}
 		}
 
@@ -22,19 +37,36 @@
 			padding: 0;
 		}
 	}
+}
 
-	// Make room for toolbar.
-	padding-top: $block-toolbar-height + $grid-unit-10;
+.edit-post-text-editor__body {
+	width: 100%;
+	padding: 0 $grid-unit-15 $grid-unit-15 $grid-unit-15;
+	max-width: $break-xlarge;
+	margin-left: auto;
+	margin-right: auto;
+
+	@include break-large() {
+		padding: $grid-unit-20 $grid-unit-30 #{ $grid-unit-60 * 2 } $grid-unit-30;
+		padding: 0 $grid-unit-30 $grid-unit-30 $grid-unit-30;
+	}
+
 }
 
 // Exit code editor toolbar.
 .edit-post-text-editor__toolbar {
-	position: absolute;
+	position: sticky;
+	z-index: z-index(".edit-post-text-editor__toolbar");
 	top: 0;
 	left: 0;
 	right: 0;
-	padding: $grid-unit-15;
 	display: flex;
+	background: rgba($white, 0.8);
+	padding: $grid-unit-05 $grid-unit-15;
+
+	@include break-small() {
+		padding: $grid-unit-15;
+	}
 
 	@include break-large() {
 		padding: $grid-unit-15 $grid-unit-30;
@@ -44,28 +76,10 @@
 		line-height: $button-size;
 		margin: 0 auto 0 0;
 		font-size: $default-font-size;
-		color: $dark-gray-primary;
+		color: $gray-900;
 	}
 
 	.components-button svg {
 		order: 1;
-	}
-}
-
-.edit-post-text-editor__body {
-	width: 100%;
-	padding: $grid-unit-20 $grid-unit-15 $grid-unit-60 $grid-unit-15;
-	max-width: $break-wide;
-	margin-left: auto;
-	margin-right: auto;
-
-	@include break-large() {
-		padding: $grid-unit-20 $grid-unit-30 #{ $grid-unit-60 * 2 } $grid-unit-30;
-	}
-
-	// This needs specificity to change the title block appearance on the code editor.
-	.editor-post-title__input.editor-post-title__input.editor-post-title__input {
-		font-family: $editor-html-font;
-		font-size: 2em;
 	}
 }

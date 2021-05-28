@@ -64,8 +64,9 @@ function DropdownLinkAction( {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					aria-expanded={ isOpen }
+					aria-haspopup="true"
 					onClick={ onToggle }
-					isLink
+					variant="link"
 					{ ...buttonProps }
 				>
 					{ linkText }
@@ -84,7 +85,7 @@ function ButtonAction( { className, children, ...additionalProps } ) {
 				className
 			) }
 			isSmall
-			isSecondary
+			variant="secondary"
 			{ ...additionalProps }
 		>
 			{ children }
@@ -105,7 +106,9 @@ export default function CircularOptionPicker( {
 				className
 			) }
 		>
-			{ options }
+			<div className="components-circular-option-picker__swatches">
+				{ options }
+			</div>
 			{ children }
 			{ actions && (
 				<div className="components-circular-option-picker__custom-clear-wrapper">

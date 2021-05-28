@@ -13,20 +13,11 @@
  * @return string Returns the tag cloud for selected taxonomy.
  */
 function render_block_core_tag_cloud( $attributes ) {
-	$class = isset( $attributes['align'] ) ?
-		"wp-block-tag-cloud align{$attributes['align']}" :
-		'wp-block-tag-cloud';
-
-	if ( isset( $attributes['className'] ) ) {
-		$class .= ' ' . $attributes['className'];
-	}
-
-	$args = array(
+	$args      = array(
 		'echo'       => false,
 		'taxonomy'   => $attributes['taxonomy'],
 		'show_count' => $attributes['showTagCounts'],
 	);
-
 	$tag_cloud = wp_tag_cloud( $args );
 
 	if ( ! $tag_cloud ) {
@@ -40,9 +31,11 @@ function render_block_core_tag_cloud( $attributes ) {
 		);
 	}
 
+	$wrapper_attributes = get_block_wrapper_attributes();
+
 	return sprintf(
-		'<p class="%1$s">%2$s</p>',
-		esc_attr( $class ),
+		'<p %1$s>%2$s</p>',
+		$wrapper_attributes,
 		$tag_cloud
 	);
 }

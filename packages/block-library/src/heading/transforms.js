@@ -13,12 +13,15 @@ const transforms = {
 	from: [
 		{
 			type: 'block',
+			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content } ) => {
-				return createBlock( name, {
-					content,
-				} );
-			},
+			transform: ( attributes ) =>
+				attributes.map( ( { content, anchor } ) =>
+					createBlock( name, {
+						content,
+						anchor,
+					} )
+				),
 		},
 		{
 			type: 'raw',
@@ -26,7 +29,7 @@ const transforms = {
 			schema: ( { phrasingContentSchema, isPaste } ) => {
 				const schema = {
 					children: phrasingContentSchema,
-					attributes: isPaste ? [] : [ 'style' ],
+					attributes: isPaste ? [] : [ 'style', 'id' ],
 				};
 				return {
 					h1: schema,
@@ -54,9 +57,19 @@ const transforms = {
 				return createBlock( name, attributes );
 			},
 		},
-		...[ 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'prefix',
 			prefix: Array( level + 1 ).join( '#' ),
+			transform( content ) {
+				return createBlock( name, {
+					level,
+					content,
+				} );
+			},
+		} ) ),
+		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+			type: 'enter',
+			regExp: new RegExp( `^/(h|H)${ level }$` ),
 			transform( content ) {
 				return createBlock( name, {
 					level,
@@ -68,12 +81,15 @@ const transforms = {
 	to: [
 		{
 			type: 'block',
+			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
-			transform: ( { content } ) => {
-				return createBlock( 'core/paragraph', {
-					content,
-				} );
-			},
+			transform: ( attributes ) =>
+				attributes.map( ( { content, anchor } ) =>
+					createBlock( 'core/paragraph', {
+						content,
+						anchor,
+					} )
+				),
 		},
 	],
 };

@@ -2,8 +2,8 @@
 	display: flex;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	background-color: $blue-medium-100;
-	border-left: 4px solid $blue-medium-500;
+	background-color: $white;
+	border-left: 4px solid var(--wp-admin-theme-color);
 	margin: 5px 15px 2px;
 	padding: 8px 12px;
 	align-items: center;
@@ -34,6 +34,11 @@
 	margin: $grid-unit-05 #{ $button-size-small + $border-width } $grid-unit-05 0;
 }
 
+.components-notice__actions {
+	display: flex;
+	flex-wrap: wrap;
+}
+
 .components-notice__action.components-button {
 	&,
 	&.is-link {
@@ -42,10 +47,14 @@
 	&.is-secondary {
 		vertical-align: initial;
 	}
+
+	// When it has better support, this can be replaced
+	// with column-gap since these are flex items.
+	margin-right: $grid-unit-10;
 }
 
 .components-notice__dismiss {
-	color: $dark-gray-300;
+	color: $gray-700;
 
 	// Place the dismiss button at the top of the container, even when text wraps onto two lines.
 	align-self: flex-start;
@@ -54,7 +63,7 @@
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		color: $dark-gray-900;
+		color: $gray-900;
 		background-color: transparent;
 	}
 

@@ -1,88 +1,74 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Webpack \`combine-assets\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('fileA.js' => array('dependencies' => array('lodash', 'wp-blob'), 'version' => '2ac177723ec97b400d9b7c46f5270974'), 'fileB.js' => array('dependencies' => array('wp-token-list'), 'version' => 'bddb08fb8608759738528b9de111454d'));"`;
+exports[`Webpack \`combine-assets\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('fileA.js' => array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'a3da22ced6876ec052d2861d383960fc'), 'fileB.js' => array('dependencies' => array('wp-token-list'), 'version' => '1a2b3802cc39dc1a607ecc4d0b23fcb0'));"`;
 
 exports[`Webpack \`combine-assets\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": Array [
-        "wp",
-        "blob",
-      ],
-    },
+    "externalType": "window",
+    "request": "lodash",
+    "userRequest": "lodash",
+  },
+  Object {
+    "externalType": "window",
+    "request": Array [
+      "wp",
+      "blob",
+    ],
     "userRequest": "@wordpress/blob",
   },
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": Array [
-        "wp",
-        "tokenList",
-      ],
-    },
+    "externalType": "window",
+    "request": Array [
+      "wp",
+      "tokenList",
+    ],
     "userRequest": "@wordpress/token-list",
-  },
-  Object {
-    "externalType": "this",
-    "request": Object {
-      "this": "lodash",
-    },
-    "userRequest": "lodash",
   },
 ]
 `;
 
-exports[`Webpack \`dynamic-import\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '5d8e58fe98bc4c6277a76ece11fcb8b7');"`;
+exports[`Webpack \`dynamic-import\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'd5c613274c346f46e16ab4d320fc01e6');"`;
 
 exports[`Webpack \`dynamic-import\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": Array [
-        "wp",
-        "blob",
-      ],
-    },
-    "userRequest": "@wordpress/blob",
+    "externalType": "window",
+    "request": "lodash",
+    "userRequest": "lodash",
   },
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": "lodash",
-    },
-    "userRequest": "lodash",
+    "externalType": "window",
+    "request": Array [
+      "wp",
+      "blob",
+    ],
+    "userRequest": "@wordpress/blob",
   },
 ]
 `;
 
-exports[`Webpack \`function-output-filename\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '407eacfb62231e58aaca5eec87e63725');"`;
+exports[`Webpack \`function-output-filename\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'f6dc46e27c3a9e7338ed4fa9fdf8f606');"`;
 
 exports[`Webpack \`function-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": Array [
-        "wp",
-        "blob",
-      ],
-    },
-    "userRequest": "@wordpress/blob",
+    "externalType": "window",
+    "request": "lodash",
+    "userRequest": "lodash",
   },
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": "lodash",
-    },
-    "userRequest": "lodash",
+    "externalType": "window",
+    "request": Array [
+      "wp",
+      "blob",
+    ],
+    "userRequest": "@wordpress/blob",
   },
 ]
 `;
 
-exports[`Webpack \`no-default\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'version' => '6e00af916c16fcb88817e1c13ec5f754');"`;
+exports[`Webpack \`no-default\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'version' => '7cedfbba436728640c2c4961b598ab32');"`;
 
 exports[`Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
 
@@ -90,140 +76,90 @@ exports[`Webpack \`no-deps\` should produce expected output: Asset file should m
 
 exports[`Webpack \`no-deps\` should produce expected output: External modules should match snapshot 1`] = `Array []`;
 
-exports[`Webpack \`output-format-json\` should produce expected output: Asset file should match snapshot 1`] = `"{\\"dependencies\\":[\\"lodash\\"],\\"version\\":\\"0e6d34ea09104a64e6184f524b48ad65\\"}"`;
+exports[`Webpack \`output-format-json\` should produce expected output: Asset file should match snapshot 1`] = `"{\\"dependencies\\":[\\"lodash\\"],\\"version\\":\\"aeb5066a5e17aea01932c77baf342372\\"}"`;
 
 exports[`Webpack \`output-format-json\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": "lodash",
-    },
+    "externalType": "window",
+    "request": "lodash",
     "userRequest": "lodash",
   },
 ]
 `;
 
-exports[`Webpack \`overrides\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('wp-blob', 'wp-script-handle-for-rxjs', 'wp-url'), 'version' => '2fd24c89b50c763f2e2dcc02a6933c16');"`;
+exports[`Webpack \`overrides\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('wp-blob', 'wp-script-handle-for-rxjs', 'wp-url'), 'version' => '67d711ce8940ddb82e7f264f61a5a3d9');"`;
 
 exports[`Webpack \`overrides\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": Array [
-        "wp",
-        "blob",
-      ],
-    },
-    "userRequest": "@wordpress/blob",
-  },
-  Object {
-    "externalType": "this",
-    "request": Object {
-      "this": Array [
-        "wp",
-        "url",
-      ],
-    },
-    "userRequest": "@wordpress/url",
-  },
-  Object {
-    "externalType": "this",
-    "request": Object {
-      "this": Array [
-        "rxjs",
-        "operators",
-      ],
-    },
-    "userRequest": "rxjs/operators",
-  },
-  Object {
-    "externalType": "this",
-    "request": Object {
-      "this": "rxjs",
-    },
-    "userRequest": "rxjs",
-  },
-]
-`;
-
-exports[`Webpack \`with-externs\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('wp-url'), 'version' => 'e987036543f42978608ac27e589b5fe3');"`;
-
-exports[`Webpack \`with-externs\` should produce expected output: External modules should match snapshot 1`] = `
-Array [
-  Object {
-    "externalType": "var",
-    "request": "wp.blob",
-    "userRequest": "@wordpress/blob",
-  },
-  Object {
-    "externalType": "this",
-    "request": Object {
-      "this": Array [
-        "wp",
-        "url",
-      ],
-    },
-    "userRequest": "@wordpress/url",
-  },
-  Object {
-    "externalType": "var",
-    "request": "rxjs.operators",
-    "userRequest": "rxjs/operators",
-  },
-  Object {
-    "externalType": "var",
+    "externalType": "window",
     "request": "rxjs",
     "userRequest": "rxjs",
   },
+  Object {
+    "externalType": "window",
+    "request": Array [
+      "rxjs",
+      "operators",
+    ],
+    "userRequest": "rxjs/operators",
+  },
+  Object {
+    "externalType": "window",
+    "request": Array [
+      "wp",
+      "blob",
+    ],
+    "userRequest": "@wordpress/blob",
+  },
+  Object {
+    "externalType": "window",
+    "request": Array [
+      "wp",
+      "url",
+    ],
+    "userRequest": "@wordpress/url",
+  },
 ]
 `;
 
-exports[`Webpack \`wordpress\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'f6f0d227edbcb02382070c0efac33b51');"`;
+exports[`Webpack \`wordpress\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '202b3ce17cfd72799ce45e7efa04d83c');"`;
 
 exports[`Webpack \`wordpress\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": Array [
-        "wp",
-        "blob",
-      ],
-    },
-    "userRequest": "@wordpress/blob",
+    "externalType": "window",
+    "request": "lodash",
+    "userRequest": "lodash",
   },
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": "lodash",
-    },
-    "userRequest": "lodash",
+    "externalType": "window",
+    "request": Array [
+      "wp",
+      "blob",
+    ],
+    "userRequest": "@wordpress/blob",
   },
 ]
 `;
 
-exports[`Webpack \`wordpress-require\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '31a7631b4838830b14b5ab10e17f3e0f');"`;
+exports[`Webpack \`wordpress-require\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '47b0c1540a1caf08b8931e4a4328db04');"`;
 
 exports[`Webpack \`wordpress-require\` should produce expected output: External modules should match snapshot 1`] = `
 Array [
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": Array [
-        "wp",
-        "blob",
-      ],
-    },
-    "userRequest": "@wordpress/blob",
+    "externalType": "window",
+    "request": "lodash",
+    "userRequest": "lodash",
   },
   Object {
-    "externalType": "this",
-    "request": Object {
-      "this": "lodash",
-    },
-    "userRequest": "lodash",
+    "externalType": "window",
+    "request": Array [
+      "wp",
+      "blob",
+    ],
+    "userRequest": "@wordpress/blob",
   },
 ]
 `;

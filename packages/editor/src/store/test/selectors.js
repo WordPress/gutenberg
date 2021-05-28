@@ -16,13 +16,13 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
+import { layout, footer, header } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import * as _selectors from '../selectors';
 import { PREFERENCES_DEFAULTS } from '../defaults';
-import { POST_UPDATE_TRANSACTION_ID } from '../constants';
 
 const selectors = { ..._selectors };
 const selectorNames = Object.keys( selectors );
@@ -161,12 +161,6 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getEditedPostContent,
-	__experimentalGetReusableBlock: getReusableBlock,
-	__experimentalIsSavingReusableBlock: isSavingReusableBlock,
-	__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
-	__experimentalGetReusableBlocks: getReusableBlocks,
-	getStateBeforeOptimisticTransaction,
-	isPublishingPost,
 	isPublishSidebarEnabled,
 	isPermalinkEditable,
 	getPermalink,
@@ -175,7 +169,39 @@ const {
 	isPostSavingLocked,
 	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
+	__experimentalGetDefaultTemplateType,
+	__experimentalGetDefaultTemplateTypes,
+	__experimentalGetTemplateInfo,
+	__experimentalGetDefaultTemplatePartAreas,
 } = selectors;
+
+const defaultTemplateTypes = [
+	{
+		title: 'Default (Index)',
+		description: 'Main template',
+		slug: 'index',
+	},
+	{
+		title: '404 (Not Found)',
+		description: 'Applied when content cannot be found',
+		slug: '404',
+	},
+];
+
+const defaultTemplatePartAreas = [
+	{
+		area: 'header',
+		label: 'Header',
+		description: 'Some description of a header',
+		icon: 'header',
+	},
+	{
+		area: 'footer',
+		label: 'Footer',
+		description: 'Some description of a footer',
+		icon: 'footer',
+	},
+];
 
 describe( 'selectors', () => {
 	let cachedSelectors;
@@ -196,7 +222,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-a', {
 			save: ( props ) => props.attributes.text,
-			category: 'formatting',
+			category: 'design',
 			title: 'Test Block A',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -204,7 +230,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-b', {
 			save: ( props ) => props.attributes.text,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block B',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -215,7 +241,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-c', {
 			save: ( props ) => props.attributes.text,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block C',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -224,7 +250,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
-			category: 'common',
+			category: 'text',
 			title: 'Test Freeform Content Handler',
 			icon: 'test',
 			supports: {
@@ -238,7 +264,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-default', {
-			category: 'common',
+			category: 'text',
 			title: 'default',
 			attributes: {
 				modified: {
@@ -403,7 +429,6 @@ describe( 'selectors', () => {
 	describe( 'isEditedPostDirty', () => {
 		it( 'should return false when blocks state not dirty nor edits exist', () => {
 			const state = {
-				optimist: [],
 				editor: {
 					present: {
 						blocks: {
@@ -420,7 +445,6 @@ describe( 'selectors', () => {
 
 		it( 'should return true when blocks state dirty', () => {
 			const state = {
-				optimist: [],
 				editor: {
 					present: {
 						blocks: {
@@ -437,7 +461,6 @@ describe( 'selectors', () => {
 
 		it( 'should return true when edits exist', () => {
 			const state = {
-				optimist: [],
 				editor: {
 					present: {
 						blocks: {
@@ -456,26 +479,9 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'hasNonPostEntityChanges', () => {
-		it( 'should return false if the full site editing experiment is disabled.', () => {
-			const state = {
-				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: false,
-				},
-				__experimentalGetDirtyEntityRecords() {
-					return [
-						{ kind: 'someKind', name: 'someName', key: 'someKey' },
-					];
-				},
-			};
-			expect( hasNonPostEntityChanges( state ) ).toBe( false );
-		} );
 		it( 'should return true if there are changes to an arbitrary entity', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [
 						{ kind: 'someKind', name: 'someName', key: 'someKey' },
@@ -487,9 +493,6 @@ describe( 'selectors', () => {
 		it( 'should return false if there are only changes for the current post', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [ { kind: 'postType', name: 'post', key: 1 } ];
 				},
@@ -499,9 +502,6 @@ describe( 'selectors', () => {
 		it( 'should return true if there are changes to multiple posts', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [
 						{ kind: 'postType', name: 'post', key: 1 },
@@ -514,9 +514,6 @@ describe( 'selectors', () => {
 		it( 'should return true if there are changes to multiple posts of different post types', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [
 						{ kind: 'postType', name: 'post', key: 1 },
@@ -2030,6 +2027,26 @@ describe( 'selectors', () => {
 
 			expect( isEditedPostDateFloating( state ) ).toBe( true );
 		} );
+
+		it( 'should return false for private posts even if the edited status is "draft"', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'private',
+				},
+				editor: {
+					present: {
+						edits: {
+							status: 'draft',
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'isSavingPost', () => {
@@ -2116,6 +2133,52 @@ describe( 'selectors', () => {
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
 		} );
 
+		it( 'return null if only one block of type `core/embed` and provider not matched', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 567,
+									name: 'core/embed',
+									attributes: {
+										providerNameSlug: 'instagram',
+									},
+								},
+							],
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+			};
+			expect( getSuggestedPostFormat( state ) ).toBeNull();
+		} );
+
+		it( 'return null if only one block of type `core/embed` and provider not exists', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 567,
+									name: 'core/embed',
+									attributes: {},
+								},
+							],
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+			};
+			expect( getSuggestedPostFormat( state ) ).toBeNull();
+		} );
+
 		it( 'returns null if there is more than one block in the post', () => {
 			const state = {
 				editor: {
@@ -2190,7 +2253,7 @@ describe( 'selectors', () => {
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
 		} );
 
-		it( 'returns Video if the first block is of type `core-embed/youtube`', () => {
+		it( 'returns Video if the first block is of type `core/embed from youtube`', () => {
 			const state = {
 				editor: {
 					present: {
@@ -2198,8 +2261,10 @@ describe( 'selectors', () => {
 							value: [
 								{
 									clientId: 567,
-									name: 'core-embed/youtube',
-									attributes: {},
+									name: 'core/embed',
+									attributes: {
+										providerNameSlug: 'youtube',
+									},
 								},
 							],
 						},
@@ -2211,6 +2276,31 @@ describe( 'selectors', () => {
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'video' );
+		} );
+
+		it( 'returns Audio if the first block is of type `core/embed from soundcloud`', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 567,
+									name: 'core/embed',
+									attributes: {
+										providerNameSlug: 'soundcloud',
+									},
+								},
+							],
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+			};
+
+			expect( getSuggestedPostFormat( state ) ).toBe( 'audio' );
 		} );
 
 		it( 'returns Quote if the first block is of type `core/quote` and second is of type `core/paragraph`', () => {
@@ -2249,7 +2339,7 @@ describe( 'selectors', () => {
 			originalDefaultBlockName = getDefaultBlockName();
 
 			registerBlockType( 'core/default', {
-				category: 'common',
+				category: 'text',
 				title: 'default',
 				attributes: {
 					modified: {
@@ -2411,87 +2501,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getReusableBlock', () => {
-		it( 'should return a reusable block', () => {
-			const state = {
-				reusableBlocks: {
-					data: {
-						8109: {
-							clientId: 'foo',
-							title: 'My cool block',
-						},
-					},
-				},
-			};
-
-			const actualReusableBlock = getReusableBlock( state, 8109 );
-			expect( actualReusableBlock ).toEqual( {
-				id: 8109,
-				isTemporary: false,
-				clientId: 'foo',
-				title: 'My cool block',
-			} );
-		} );
-
-		it( 'should return a temporary reusable block', () => {
-			const state = {
-				reusableBlocks: {
-					data: {
-						reusable1: {
-							clientId: 'foo',
-							title: 'My cool block',
-						},
-					},
-				},
-			};
-
-			const actualReusableBlock = getReusableBlock( state, 'reusable1' );
-			expect( actualReusableBlock ).toEqual( {
-				id: 'reusable1',
-				isTemporary: true,
-				clientId: 'foo',
-				title: 'My cool block',
-			} );
-		} );
-
-		it( 'should return null when no reusable block exists', () => {
-			const state = {
-				reusableBlocks: {
-					data: {},
-				},
-			};
-
-			const reusableBlock = getReusableBlock( state, 123 );
-			expect( reusableBlock ).toBeNull();
-		} );
-	} );
-
-	describe( 'isSavingReusableBlock', () => {
-		it( 'should return false when the block is not being saved', () => {
-			const state = {
-				reusableBlocks: {
-					isSaving: {},
-				},
-			};
-
-			const isSaving = isSavingReusableBlock( state, 5187 );
-			expect( isSaving ).toBe( false );
-		} );
-
-		it( 'should return true when the block is being saved', () => {
-			const state = {
-				reusableBlocks: {
-					isSaving: {
-						5187: true,
-					},
-				},
-			};
-
-			const isSaving = isSavingReusableBlock( state, 5187 );
-			expect( isSaving ).toBe( true );
-		} );
-	} );
-
 	describe( 'isPublishSidebarEnabled', () => {
 		it( 'should return the value on state if it is thruthy', () => {
 			const state = {
@@ -2522,219 +2531,6 @@ describe( 'selectors', () => {
 			expect( isPublishSidebarEnabled( state ) ).toBe(
 				PREFERENCES_DEFAULTS.isPublishSidebarEnabled
 			);
-		} );
-	} );
-
-	describe( 'isFetchingReusableBlock', () => {
-		it( 'should return false when the block is not being fetched', () => {
-			const state = {
-				reusableBlocks: {
-					isFetching: {},
-				},
-			};
-
-			const isFetching = isFetchingReusableBlock( state, 5187 );
-			expect( isFetching ).toBe( false );
-		} );
-
-		it( 'should return true when the block is being fetched', () => {
-			const state = {
-				reusableBlocks: {
-					isFetching: {
-						5187: true,
-					},
-				},
-			};
-
-			const isFetching = isFetchingReusableBlock( state, 5187 );
-			expect( isFetching ).toBe( true );
-		} );
-	} );
-
-	describe( 'getReusableBlocks', () => {
-		it( 'should return an array of reusable blocks', () => {
-			const state = {
-				reusableBlocks: {
-					data: {
-						123: { clientId: 'carrot' },
-						reusable1: { clientId: 'broccoli' },
-					},
-				},
-			};
-
-			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [
-				{ id: 123, isTemporary: false, clientId: 'carrot' },
-				{ id: 'reusable1', isTemporary: true, clientId: 'broccoli' },
-			] );
-		} );
-
-		it( 'should return an empty array when no reusable blocks exist', () => {
-			const state = {
-				reusableBlocks: {
-					data: {},
-				},
-			};
-
-			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [] );
-		} );
-	} );
-
-	describe( 'getStateBeforeOptimisticTransaction', () => {
-		it( 'should return null if no transaction can be found', () => {
-			const beforeState = getStateBeforeOptimisticTransaction(
-				{
-					optimist: [],
-				},
-				'foo'
-			);
-
-			expect( beforeState ).toBe( null );
-		} );
-
-		it( 'should return null if a transaction with ID can be found, but lacks before state', () => {
-			const beforeState = getStateBeforeOptimisticTransaction(
-				{
-					optimist: [
-						{
-							action: {
-								optimist: {
-									id: 'foo',
-								},
-							},
-						},
-					],
-				},
-				'foo'
-			);
-
-			expect( beforeState ).toBe( null );
-		} );
-
-		it( 'should return the before state matching the given transaction id', () => {
-			const expectedBeforeState = {};
-			const beforeState = getStateBeforeOptimisticTransaction(
-				{
-					optimist: [
-						{
-							beforeState: expectedBeforeState,
-							action: {
-								optimist: {
-									id: 'foo',
-								},
-							},
-						},
-					],
-				},
-				'foo'
-			);
-
-			expect( beforeState ).toBe( expectedBeforeState );
-		} );
-	} );
-
-	describe( 'isPublishingPost', () => {
-		it( 'should return false if the post is not being saved', () => {
-			const isPublishing = isPublishingPost( {
-				optimist: [],
-				saving: {
-					requesting: false,
-				},
-				currentPost: {
-					status: 'publish',
-				},
-			} );
-
-			expect( isPublishing ).toBe( false );
-		} );
-
-		it( 'should return false if the current post is not considered published', () => {
-			const isPublishing = isPublishingPost( {
-				optimist: [],
-				saving: {
-					requesting: true,
-				},
-				currentPost: {
-					status: 'draft',
-				},
-			} );
-
-			expect( isPublishing ).toBe( false );
-		} );
-
-		it( 'should return false if the optimistic transaction cannot be found', () => {
-			const isPublishing = isPublishingPost( {
-				optimist: [],
-				saving: {
-					requesting: true,
-				},
-				currentPost: {
-					status: 'publish',
-				},
-			} );
-
-			expect( isPublishing ).toBe( false );
-		} );
-
-		it( 'should return false if the current post prior to request was already published', () => {
-			const isPublishing = isPublishingPost( {
-				optimist: [
-					{
-						beforeState: {
-							saving: {
-								requesting: false,
-							},
-							currentPost: {
-								status: 'publish',
-							},
-						},
-						action: {
-							optimist: {
-								id: POST_UPDATE_TRANSACTION_ID,
-							},
-						},
-					},
-				],
-				saving: {
-					requesting: true,
-				},
-				currentPost: {
-					status: 'publish',
-				},
-			} );
-
-			expect( isPublishing ).toBe( false );
-		} );
-
-		it( 'should return true if the current post prior to request was not published', () => {
-			const isPublishing = isPublishingPost( {
-				optimist: [
-					{
-						beforeState: {
-							saving: {
-								requesting: false,
-							},
-							currentPost: {
-								status: 'draft',
-							},
-						},
-						action: {
-							optimist: {
-								id: POST_UPDATE_TRANSACTION_ID,
-							},
-						},
-					},
-				],
-				saving: {
-					requesting: true,
-				},
-				currentPost: {
-					status: 'publish',
-				},
-			} );
-
-			expect( isPublishing ).toBe( true );
 		} );
 	} );
 
@@ -3004,6 +2800,229 @@ describe( 'selectors', () => {
 				},
 			};
 			expect( canUserUseUnfilteredHTML( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( '__experimentalGetDefaultTemplateTypes', () => {
+		const state = { editorSettings: { defaultTemplateTypes } };
+
+		it( 'returns undefined if there are no default template types', () => {
+			const emptyState = { editorSettings: {} };
+			expect(
+				__experimentalGetDefaultTemplateTypes( emptyState )
+			).toBeUndefined();
+		} );
+
+		it( 'returns a list of default template types if present in state', () => {
+			expect(
+				__experimentalGetDefaultTemplateTypes( state )
+			).toHaveLength( 2 );
+		} );
+	} );
+
+	describe( '__experimentalGetDefaultTemplatePartAreas', () => {
+		const state = { editorSettings: { defaultTemplatePartAreas } };
+
+		it( 'returns empty array if there are no default template part areas', () => {
+			const emptyState = { editorSettings: {} };
+			expect(
+				__experimentalGetDefaultTemplatePartAreas( emptyState )
+			).toHaveLength( 0 );
+		} );
+
+		it( 'returns a list of default template part areas if present in state', () => {
+			expect(
+				__experimentalGetDefaultTemplatePartAreas( state )
+			).toHaveLength( 2 );
+		} );
+
+		it( 'assigns an icon to each area', () => {
+			const templatePartAreas = __experimentalGetDefaultTemplatePartAreas(
+				state
+			);
+			templatePartAreas.forEach( ( area ) =>
+				expect( area.icon ).not.toBeNull()
+			);
+		} );
+	} );
+
+	describe( '__experimentalGetDefaultTemplateType', () => {
+		const state = { editorSettings: { defaultTemplateTypes } };
+
+		it( 'returns an empty object if there are no default template types', () => {
+			const emptyState = { editorSettings: {} };
+			expect(
+				__experimentalGetDefaultTemplateType( emptyState, 'slug' )
+			).toEqual( {} );
+		} );
+
+		it( 'returns an empty object if the requested slug is not found', () => {
+			expect(
+				__experimentalGetDefaultTemplateType( state, 'foobar' )
+			).toEqual( {} );
+		} );
+
+		it( 'returns the requested default template type', () => {
+			expect(
+				__experimentalGetDefaultTemplateType( state, 'index' )
+			).toEqual( {
+				title: 'Default (Index)',
+				description: 'Main template',
+				slug: 'index',
+			} );
+		} );
+
+		it( 'returns the requested default template type even when the slug is numeric', () => {
+			expect(
+				__experimentalGetDefaultTemplateType( state, '404' )
+			).toEqual( {
+				title: '404 (Not Found)',
+				description: 'Applied when content cannot be found',
+				slug: '404',
+			} );
+		} );
+	} );
+
+	describe( '__experimentalGetTemplateInfo', () => {
+		const state = {
+			editorSettings: { defaultTemplateTypes, defaultTemplatePartAreas },
+		};
+
+		it( 'should return an empty object if no template is passed', () => {
+			expect( __experimentalGetTemplateInfo( state, null ) ).toEqual(
+				{}
+			);
+			expect( __experimentalGetTemplateInfo( state, undefined ) ).toEqual(
+				{}
+			);
+			expect( __experimentalGetTemplateInfo( state, false ) ).toEqual(
+				{}
+			);
+		} );
+
+		it( 'should return the default title if none is defined on the template', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, { slug: 'index' } ).title
+			).toEqual( 'Default (Index)' );
+		} );
+
+		it( 'should return the rendered title if defined on the template', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'index',
+					title: { rendered: 'test title' },
+				} ).title
+			).toEqual( 'test title' );
+		} );
+
+		it( 'should return the slug if no title is found', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'not a real template',
+				} ).title
+			).toEqual( 'not a real template' );
+		} );
+
+		it( 'should return the default description if none is defined on the template', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, { slug: 'index' } )
+					.description
+			).toEqual( 'Main template' );
+		} );
+
+		it( 'should return the raw excerpt as description if defined on the template', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'index',
+					excerpt: { raw: 'test description' },
+				} ).description
+			).toEqual( 'test description' );
+		} );
+
+		it( 'should return a title, description, and icon', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, { slug: 'index' } )
+			).toEqual( {
+				title: 'Default (Index)',
+				description: 'Main template',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'index',
+					title: { rendered: 'test title' },
+				} )
+			).toEqual( {
+				title: 'test title',
+				description: 'Main template',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'index',
+					excerpt: { raw: 'test description' },
+				} )
+			).toEqual( {
+				title: 'Default (Index)',
+				description: 'test description',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'index',
+					title: { rendered: 'test title' },
+					excerpt: { raw: 'test description' },
+				} )
+			).toEqual( {
+				title: 'test title',
+				description: 'test description',
+				icon: layout,
+			} );
+		} );
+
+		it( 'should return correct icon based on area', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = uncategorized',
+					area: 'uncategorized',
+				} )
+			).toEqual( {
+				title: 'template part, area = uncategorized',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = invalid',
+					area: 'invalid',
+				} )
+			).toEqual( {
+				title: 'template part, area = invalid',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = header',
+					area: 'header',
+				} )
+			).toEqual( {
+				title: 'template part, area = header',
+				icon: header,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = footer',
+					area: 'footer',
+				} )
+			).toEqual( {
+				title: 'template part, area = footer',
+				icon: footer,
+			} );
 		} );
 	} );
 } );

@@ -10,7 +10,8 @@
 		padding: 0;
 	}
 
-	.editor-post-visibility__dialog-radio {
+	.editor-post-visibility__dialog-radio[type="radio"] {
+		@include radio-control;
 		margin-top: 2px;
 	}
 
@@ -20,15 +21,19 @@
 
 	.editor-post-visibility__dialog-info {
 		margin-top: 0;
-		margin-left: 28px;
+		margin-left: $grid-unit-40;
 	}
 
 	// Remove bottom margin on the last label only.
 	.editor-post-visibility__choice:last-child .editor-post-visibility__dialog-info {
 		margin-bottom: 0;
 	}
+}
 
-	.editor-post-visibility__dialog-password-input {
-		margin-left: 28px;
+.editor-post-visibility__dialog-password {
+	.editor-post-visibility__dialog-password-input[type="text"] {
+		@include input-control;
+		margin-left: $grid-unit * 4.5;
+		margin-top: $grid-unit-10;
 	}
 }

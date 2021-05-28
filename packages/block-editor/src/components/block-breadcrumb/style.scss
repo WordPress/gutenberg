@@ -8,7 +8,7 @@
 		margin: 0;
 
 		&:not(:last-child)::after {
-			content: "\2192"; // This becomes →.
+			content: "\2192" #{'/*rtl:"\2190"*/'}; // This becomes → for LTR and ← for RTL.
 		}
 	}
 }
@@ -37,7 +37,7 @@
 		right: $border-width;
 		bottom: $border-width;
 		left: $border-width;
-		box-shadow: inset 0 0 0 $border-width-focus $theme-color;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 }
 
@@ -47,7 +47,7 @@
 
 .block-editor-block-breadcrumb__button.components-button,
 .block-editor-block-breadcrumb__current {
-	color: $dark-gray-primary;
+	color: $gray-900;
 	padding: 0 $grid-unit-10;
 	font-size: inherit;
 }

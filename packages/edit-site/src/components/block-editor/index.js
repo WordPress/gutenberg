@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
-import { uploadMedia } from '@wordpress/media-utils';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -11,55 +10,54 @@ import {
 	__experimentalLinkControl,
 	BlockInspector,
 	WritingFlow,
-	ObserveTyping,
 	BlockList,
-	ButtonBlockerAppender,
+	BlockTools,
+	__unstableBlockSettingsMenuFirstItem,
+	__experimentalUseResizeCanvas as useResizeCanvas,
+	__unstableUseTypingObserver as useTypingObserver,
+	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
+	__unstableEditorStyles as EditorStyles,
+	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { useEditorContext } from '../editor';
+import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
-import Sidebar from '../sidebar';
+import { SidebarInspectorFill } from '../sidebar';
+import { store as editSiteStore } from '../../store';
+import BlockInspectorButton from './block-inspector-button';
 
-export default function BlockEditor() {
-	const { settings: _settings, setSettings } = useEditorContext();
-	const canUserCreateMedia = useSelect( ( select ) => {
-		const _canUserCreateMedia = select( 'core' ).canUser(
-			'create',
-			'media'
-		);
-		return _canUserCreateMedia || _canUserCreateMedia !== false;
-	}, [] );
-	const settings = useMemo( () => {
-		if ( ! canUserCreateMedia ) {
-			return _settings;
-		}
-		return {
-			..._settings,
-			mediaUpload( { onError, ...rest } ) {
-				uploadMedia( {
-					wpAllowedMimeTypes: _settings.allowedMimeTypes,
-					onError: ( { message } ) => onError( message ),
-					...rest,
-				} );
-			},
-		};
-	}, [ canUserCreateMedia, _settings ] );
+export default function BlockEditor( { setIsInserterOpen } ) {
+	const { settings, templateType, page, deviceType } = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				getEditedPostType,
+				getPage,
+				__experimentalGetPreviewDeviceType,
+			} = select( editSiteStore );
+			return {
+				settings: getSettings( setIsInserterOpen ),
+				templateType: getEditedPostType(),
+				page: getPage(),
+				deviceType: __experimentalGetPreviewDeviceType(),
+			};
+		},
+		[ setIsInserterOpen ]
+	);
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		settings.templateType
+		templateType
 	);
-	const setActiveTemplateId = useCallback(
-		( newTemplateId ) =>
-			setSettings( ( prevSettings ) => ( {
-				...prevSettings,
-				templateId: newTemplateId,
-				templateType: 'wp_template',
-			} ) ),
-		[]
-	);
+	const { setPage } = useDispatch( editSiteStore );
+	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
+	const ref = useMouseMoveTypingReset();
+	const contentRef = useRef();
+	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
+
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -69,35 +67,47 @@ export default function BlockEditor() {
 			useSubRegistry={ false }
 		>
 			<BlockEditorKeyboardShortcuts />
+			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
 					( fillProps ) => (
 						<NavigateToLink
 							{ ...fillProps }
-							templateIds={ settings.templateIds }
-							activeId={ settings.templateId }
-							onActiveIdChange={ setActiveTemplateId }
+							activePage={ page }
+							onActivePageChange={ setPage }
 						/>
 					),
-					[
-						settings.templateIds,
-						settings.templateId,
-						setActiveTemplateId,
-					]
+					[ page ]
 				) }
 			</__experimentalLinkControl.ViewerFill>
-			<Sidebar.InspectorFill>
+			<SidebarInspectorFill>
 				<BlockInspector />
-			</Sidebar.InspectorFill>
-			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							renderAppender={ ButtonBlockerAppender }
-						/>
-					</ObserveTyping>
-				</WritingFlow>
+			</SidebarInspectorFill>
+			<div className="edit-site-visual-editor">
+				<BlockTools __unstableContentRef={ contentRef }>
+					<Iframe
+						style={ resizedCanvasStyles }
+						head={ <EditorStyles styles={ settings.styles } /> }
+						ref={ ref }
+						contentRef={ mergedRefs }
+					>
+						<WritingFlow>
+							<BlockList
+								className="edit-site-block-editor__block-list"
+								__experimentalLayout={ {
+									type: 'default',
+									// At the root level of the site editor, no alignments should be allowed.
+									alignments: [],
+								} }
+							/>
+						</WritingFlow>
+					</Iframe>
+				</BlockTools>
+				<__unstableBlockSettingsMenuFirstItem>
+					{ ( { onClose } ) => (
+						<BlockInspectorButton onClick={ onClose } />
+					) }
+				</__unstableBlockSettingsMenuFirstItem>
 			</div>
 		</BlockEditorProvider>
 	);

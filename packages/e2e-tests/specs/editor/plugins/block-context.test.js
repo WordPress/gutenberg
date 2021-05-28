@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -12,28 +7,8 @@ import {
 	deactivatePlugin,
 	insertBlock,
 	saveDraft,
+	openPreviewPage,
 } from '@wordpress/e2e-test-utils';
-
-async function openPreviewPage( editorPage ) {
-	let openTabs = await browser.pages();
-	const expectedTabsCount = openTabs.length + 1;
-	await editorPage.click( '.block-editor-post-preview__button-toggle' );
-	await editorPage.waitFor( '.edit-post-header-preview__button-external' );
-	await editorPage.click( '.edit-post-header-preview__button-external' );
-
-	// Wait for the new tab to open.
-	while ( openTabs.length < expectedTabsCount ) {
-		await editorPage.waitFor( 1 );
-		openTabs = await browser.pages();
-	}
-
-	const previewPage = last( openTabs );
-	// Wait for the preview to load. We can't do interstitial detection here,
-	// because it might load too quickly for us to pick up, so we wait for
-	// the preview to load by waiting for the content to appear.
-	await previewPage.waitForSelector( '.entry-content' );
-	return previewPage;
-}
 
 describe( 'Block context', () => {
 	beforeAll( async () => {
@@ -70,22 +45,18 @@ describe( 'Block context', () => {
 		expect( innerBlockText ).toBe( 'The record ID is: 123' );
 	} );
 
-	// Disable reason: Block context PHP implementation is temporarily reverted.
-	// This will be unskipped once the implementation is restored. Skipping was
-	// the most direct option for revert given time constraints.
-
-	/* eslint-disable-next-line jest/no-disabled-tests */
-	test.skip( 'Block context is reflected in the preview', async () => {
+	test( 'Block context is reflected in the preview', async () => {
 		await insertBlock( 'Test Context Provider' );
 		const editorPage = page;
 		const previewPage = await openPreviewPage( editorPage );
+		await previewPage.waitForSelector( '.entry-content' );
 
 		// Check default context values are populated.
 		let content = await previewPage.$eval(
 			'.entry-content',
 			( contentWrapper ) => contentWrapper.textContent.trim()
 		);
-		expect( content ).toBe( 'The record ID is: 0' );
+		expect( content ).toMatch( /^0,\d+,post$/ );
 
 		// Return to editor to change context value to non-default.
 		await editorPage.bringToFront();
@@ -104,7 +75,7 @@ describe( 'Block context', () => {
 			'.entry-content',
 			( contentWrapper ) => contentWrapper.textContent.trim()
 		);
-		expect( content ).toBe( 'The record ID is: 123' );
+		expect( content ).toMatch( /^123,\d+,post$/ );
 
 		// Clean up
 		await editorPage.bringToFront();

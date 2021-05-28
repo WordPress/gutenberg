@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { RichText } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,7 +20,6 @@ import { defaultColumnsNumber } from './shared';
 export const Gallery = ( props ) => {
 	const {
 		attributes,
-		className,
 		isSelected,
 		setAttributes,
 		selectedImage,
@@ -30,7 +30,8 @@ export const Gallery = ( props ) => {
 		onSelectImage,
 		onDeselectImage,
 		onSetImageAttributes,
-		onFocusGalleryCaption,
+		insertBlocksAfter,
+		blockProps,
 	} = props;
 
 	const {
@@ -43,7 +44,8 @@ export const Gallery = ( props ) => {
 
 	return (
 		<figure
-			className={ classnames( className, {
+			{ ...blockProps }
+			className={ classnames( blockProps.className, {
 				[ `align${ align }` ]: align,
 				[ `columns-${ columns }` ]: columns,
 				'is-cropped': imageCrop,
@@ -61,7 +63,7 @@ export const Gallery = ( props ) => {
 					return (
 						<li
 							className="blocks-gallery-item"
-							key={ img.id || img.url }
+							key={ img.id ? `${ img.id }-${ index }` : img.url }
 						>
 							<GalleryImage
 								url={ img.url }
@@ -82,6 +84,7 @@ export const Gallery = ( props ) => {
 								}
 								caption={ img.caption }
 								aria-label={ ariaLabel }
+								sizeSlug={ attributes.sizeSlug }
 							/>
 						</li>
 					);
@@ -92,11 +95,14 @@ export const Gallery = ( props ) => {
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				tagName="figcaption"
 				className="blocks-gallery-caption"
+				aria-label={ __( 'Gallery caption text' ) }
 				placeholder={ __( 'Write gallery caption…' ) }
 				value={ caption }
-				unstableOnFocus={ onFocusGalleryCaption }
 				onChange={ ( value ) => setAttributes( { caption: value } ) }
 				inlineToolbar
+				__unstableOnSplitAtEnd={ () =>
+					insertBlocksAfter( createBlock( 'core/paragraph' ) )
+				}
 			/>
 		</figure>
 	);

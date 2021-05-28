@@ -1,21 +1,18 @@
 /**
- * External dependencies
- */
-import {
-	subscribePreferredColorScheme,
-	isInitialColorSchemeDark,
-} from 'react-native-gutenberg-bridge';
-/**
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
+import {
+	subscribePreferredColorScheme,
+	isInitialColorSchemeDark,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Returns the color scheme value when it changes. Possible values: [ 'light', 'dark' ]
  *
  * @return {string} return current color scheme.
  */
-const usePreferredColorScheme = function() {
+function usePreferredColorScheme() {
 	const [ currentColorScheme, setCurrentColorScheme ] = useState(
 		isInitialColorSchemeDark ? 'dark' : 'light'
 	);
@@ -28,6 +25,6 @@ const usePreferredColorScheme = function() {
 		} );
 	} );
 	return currentColorScheme;
-};
+}
 
 export default usePreferredColorScheme;

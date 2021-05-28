@@ -1,12 +1,8 @@
 .interface-complementary-area {
 	background: $white;
-	color: $dark-gray-500;
-	overflow: visible;
+	color: $gray-900;
 
 	@include break-small() {
-		z-index: auto;
-		height: 100%;
-		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 	}
 
@@ -14,37 +10,24 @@
 		width: $sidebar-width;
 	}
 
-	> .components-panel {
-		border-left: none;
-		border-right: none;
-		overflow: auto;
-		-webkit-overflow-scrolling: touch;
-		height: auto;
-		max-height: calc(100vh - #{ $admin-bar-height-big + $panel-header-height + $panel-header-height });
-		margin-top: -1px;
-		margin-bottom: -1px;
+	.components-panel {
+		border: none;
+		// Make a stacking context that keeps all descendents behind the sticky header
 		position: relative;
-
-		@include break-small() {
-			overflow: visible;
-			height: auto;
-			max-height: none;
-		}
+		z-index: z-index(".interface-complementary-area .components-panel");
 	}
 
-	> .components-panel .components-panel__header {
-		position: fixed;
-		z-index: z-index(".components-panel__header");
+	.components-panel__header {
+		position: sticky;
 		top: 0;
-		left: 0;
-		right: 0;
-		height: $panel-header-height;
+		z-index: z-index(".interface-complementary-area .components-panel__header");
 
-		@include break-small() {
-			position: inherit;
-			top: auto;
-			left: auto;
-			right: auto;
+		&.edit-post-sidebar__panel-tabs {
+			top: $panel-header-height;
+
+			@include break-medium() {
+				top: 0;
+			}
 		}
 	}
 
@@ -55,16 +38,17 @@
 	h2,
 	h3 {
 		font-size: $default-font-size;
-		color: $dark-gray-500;
+		color: $gray-900;
 		margin-bottom: 1.5em;
 	}
 
 	hr {
 		border-top: none;
-		border-bottom: 1px solid $light-gray-500;
+		border-bottom: 1px solid $gray-100;
 		margin: 1.5em 0;
 	}
 
+	div.components-toolbar-group,
 	div.components-toolbar {
 		box-shadow: none;
 		margin-bottom: 1.5em;

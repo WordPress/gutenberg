@@ -16,7 +16,7 @@
 }
 
 .innerBlocksBottomSpace {
-	margin-bottom: $block-selected-to-content;
+	margin-bottom: $block-edge-to-content;
 }
 
 .is-vertically-aligned-top {
@@ -33,4 +33,37 @@
 
 .flexBase {
 	flex: 1;
+}
+
+.columnsPreview {
+	min-height: 18px;
+	min-width: 24px;
+	border-color: $toolbar-button;
+	flex-direction: row;
+	align-self: center;
+	margin-right: 10px;
+	border-width: $border-width;
+	border-radius: $radius-block-ui;
+}
+
+.columnsPreviewDark {
+	border-color: $gray-20;
+}
+
+.columnIndicator {
+	background-color: $toolbar-button;
+}
+
+.columnIndicatorDark {
+	background-color: $gray-20;
+}
+
+.columnAppender {
+	margin-left: $grid-unit-20;
+	margin-right: $grid-unit-20;
+}
+
+.wideColumnAppender {
+	margin-left: $grid-unit-10;
+	margin-right: $grid-unit-10;
 }

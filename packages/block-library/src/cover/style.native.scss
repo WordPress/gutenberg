@@ -22,10 +22,26 @@
 }
 
 .overlay {
+	z-index: 2;
+	color: $black;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+
+.overlaySelected {
+	width: auto;
+	height: auto;
+	top: 2;
+	left: 2;
+	right: 2;
+	bottom: 2;
+}
+
+.overlayContainer {
 	width: 100%;
 	height: 100%;
 	z-index: 2;
-	color: $black;
 	position: absolute;
 }
 
@@ -39,12 +55,12 @@
 	position: absolute;
 }
 
-.backgroundSolid {
-	background-color: $gray-lighten-30;
+.mediaBackground {
+	background-color: $light-ultra-dim;
 }
 
-.backgroundSolidDark {
-	background-color: $background-dark-secondary;
+.mediaBackgroundDark {
+	background-color: $dark-ultra-dim;
 }
 
 .uploadFailedContainer {
@@ -70,4 +86,120 @@
 	fill: $red-40;
 	width: 100%;
 	height: 100%;
+}
+
+.selectImageContainer {
+	position: absolute;
+	padding: 8px;
+	justify-self: flex-start;
+	align-self: flex-end;
+	justify-content: flex-start;
+	align-items: flex-end;
+	z-index: 3;
+	width: $grid-unit-40;
+	height: $grid-unit-40;
+}
+
+.selectImage {
+	width: 30px;
+	height: 30px;
+	background-color: $gray-dark;
+	border-radius: 22px;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+
+.selectImageIcon {
+	fill: $white;
+	position: absolute;
+	top: 7px;
+	left: 7px;
+}
+
+.addMediaButton {
+	color: $blue-50;
+}
+
+.addMediaButtonDark {
+	color: $blue-30;
+}
+
+.clearMediaButton {
+	color: $alert-red;
+}
+
+.imageContainer {
+	height: 100%;
+	position: absolute;
+	width: 100%;
+}
+
+.imageEditButton {
+	height: 60px;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 60px;
+	z-index: 4;
+}
+
+.image {
+	width: 100%;
+}
+
+.mediaPreview {
+	flex-direction: row;
+	justify-content: center;
+}
+
+.mediaInner {
+	max-height: 150px;
+	position: relative;
+}
+
+.imagePlaceholder {
+	min-width: 100%;
+}
+
+.video {
+	height: 100%;
+	max-width: 100%;
+}
+
+.focalPointHint {
+	box-shadow: 0 0 0.5px rgba(0, 0, 0, 0.5);
+	fill: $white;
+	left: 50%;
+	margin: -16px 0 0 -16px;
+	opacity: 0.8;
+	position: absolute;
+	top: 50%;
+	width: 32px;
+}
+
+.dimmedActionButton {
+	opacity: 0.45;
+}
+
+.colorPaletteWrapper {
+	min-height: 50px;
+}
+
+.paletteColorIndicator {
+	margin-top: 0;
+	margin-bottom: 0;
+	width: $grid-unit-40;
+	height: $grid-unit-40;
+}
+
+.paletteCustomIndicatorWrapper {
+	flex-direction: row;
+	align-items: baseline;
+	width: $grid-unit-40;
+	height: $grid-unit-40;
+}
+
+.mediaPlaceholderEmptyStateContainer {
+	height: 300;
 }

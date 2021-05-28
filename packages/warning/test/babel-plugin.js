@@ -20,7 +20,7 @@ function compare( input, output, options = {} ) {
 	expect( code ).toEqual( output );
 }
 
-describe( 'babel-plugin', function() {
+describe( 'babel-plugin', () => {
 	it( 'should replace warning calls with import declaration', () => {
 		compare(
 			join(
@@ -80,7 +80,7 @@ describe( 'babel-plugin', function() {
 		);
 	} );
 
-	it( 'should identify warning callee name by ', () => {
+	it( 'should identify warning callee name by', () => {
 		compare(
 			join(
 				'import warn from "@wordpress/warning";',

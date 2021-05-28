@@ -22,19 +22,112 @@ const DEFAULT_LOCALE_DATA = {
 	},
 };
 
+/*
+ * Regular expression that matches i18n hooks like `i18n.gettext`, `i18n.ngettext`,
+ * `i18n.gettext_domain` or `i18n.ngettext_with_context` or `i18n.has_translation`.
+ */
+const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
+
+/**
+ * @typedef {(domain?: string) => LocaleData} GetLocaleData
+ *
+ * Returns locale data by domain in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+/**
+ * @typedef {(data?: LocaleData, domain?: string) => void} SetLocaleData
+ *
+ * Merges locale data into the Tannin instance by domain. Accepts data in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+/**
+ * @typedef {(data?: LocaleData, domain?: string) => void} ResetLocaleData
+ *
+ * Resets all current Tannin instance locale data and sets the specified
+ * locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+/** @typedef {() => void} SubscribeCallback */
+/** @typedef {() => void} UnsubscribeCallback */
+/**
+ * @typedef {(callback: SubscribeCallback) => UnsubscribeCallback} Subscribe
+ *
+ * Subscribes to changes of locale data
+ */
+/**
+ * @typedef {(domain?: string) => string} GetFilterDomain
+ * Retrieve the domain to use when calling domain-specific filters.
+ */
+/**
+ * @typedef {(text: string, domain?: string) => string} __
+ *
+ * Retrieve the translation of text.
+ *
+ * @see https://developer.wordpress.org/reference/functions/__/
+ */
+/**
+ * @typedef {(text: string, context: string, domain?: string) => string} _x
+ *
+ * Retrieve translated string with gettext context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_x/
+ */
+/**
+ * @typedef {(single: string, plural: string, number: number, domain?: string) => string} _n
+ *
+ * Translates and retrieves the singular or plural form based on the supplied
+ * number.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_n/
+ */
+/**
+ * @typedef {(single: string, plural: string, number: number, context: string, domain?: string) => string} _nx
+ *
+ * Translates and retrieves the singular or plural form based on the supplied
+ * number, with gettext context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_nx/
+ */
+/**
+ * @typedef {() => boolean} IsRtl
+ *
+ * Check if current locale is RTL.
+ *
+ * **RTL (Right To Left)** is a locale property indicating that text is written from right to left.
+ * For example, the `he` locale (for Hebrew) specifies right-to-left. Arabic (ar) is another common
+ * language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages,
+ * including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
+ */
+/**
+ * @typedef {(single: string, context?: string, domain?: string) => boolean} HasTranslation
+ *
+ * Check if there is a translation for a given string in singular form.
+ */
+/** @typedef {import('@wordpress/hooks').Hooks} Hooks */
+
 /**
  * An i18n instance
  *
- * @typedef {Object} I18n
- * @property {Function} setLocaleData Merges locale data into the Tannin instance by domain. Accepts data in a
- *                                    Jed-formatted JSON object shape.
- * @property {Function} __            Retrieve the translation of text.
- * @property {Function} _x            Retrieve translated string with gettext context.
- * @property {Function} _n            Translates and retrieves the singular or plural form based on the supplied
- *                                    number.
- * @property {Function} _nx           Translates and retrieves the singular or plural form based on the supplied
- *                                    number, with gettext context.
- * @property {Function} isRTL         Check if current locale is RTL.
+ * @typedef I18n
+ * @property {GetLocaleData} getLocaleData     Returns locale data by domain in a Jed-formatted JSON object shape.
+ * @property {SetLocaleData} setLocaleData     Merges locale data into the Tannin instance by domain. Accepts data in a
+ *                                             Jed-formatted JSON object shape.
+ * @property {ResetLocaleData} resetLocaleData Resets all current Tannin instance locale data and sets the specified
+ *                                             locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
+ * @property {Subscribe} subscribe             Subscribes to changes of Tannin locale data.
+ * @property {__} __                           Retrieve the translation of text.
+ * @property {_x} _x                           Retrieve translated string with gettext context.
+ * @property {_n} _n                           Translates and retrieves the singular or plural form based on the supplied
+ *                                             number.
+ * @property {_nx} _nx                         Translates and retrieves the singular or plural form based on the supplied
+ *                                             number, with gettext context.
+ * @property {IsRtl} isRTL                     Check if current locale is RTL.
+ * @property {HasTranslation} hasTranslation   Check if there is a translation for a given string.
  */
 
 /**
@@ -42,9 +135,10 @@ const DEFAULT_LOCALE_DATA = {
  *
  * @param {LocaleData} [initialData]    Locale data configuration.
  * @param {string}     [initialDomain]  Domain for which configuration applies.
+ * @param {Hooks} [hooks]     Hooks implementation.
  * @return {I18n}                       I18n instance
  */
-export const createI18n = ( initialData, initialDomain ) => {
+export const createI18n = ( initialData, initialDomain, hooks ) => {
 	/**
 	 * The underlying instance of Tannin to which exported functions interface.
 	 *
@@ -52,16 +146,31 @@ export const createI18n = ( initialData, initialDomain ) => {
 	 */
 	const tannin = new Tannin( {} );
 
+	const listeners = new Set();
+
+	const notifyListeners = () => {
+		listeners.forEach( ( listener ) => listener() );
+	};
+
 	/**
-	 * Merges locale data into the Tannin instance by domain. Accepts data in a
-	 * Jed-formatted JSON object shape.
+	 * Subscribe to changes of locale data.
 	 *
-	 * @see http://messageformat.github.io/Jed/
-	 *
-	 * @param {LocaleData} [data]   Locale data configuration.
-	 * @param {string}     [domain] Domain for which configuration applies.
+	 * @param {SubscribeCallback} callback Subscription callback.
+	 * @return {UnsubscribeCallback} Unsubscribe callback.
 	 */
-	const setLocaleData = ( data, domain = 'default' ) => {
+	const subscribe = ( callback ) => {
+		listeners.add( callback );
+		return () => listeners.delete( callback );
+	};
+
+	/** @type {GetLocaleData} */
+	const getLocaleData = ( domain = 'default' ) => tannin.data[ domain ];
+
+	/**
+	 * @param {LocaleData} [data]
+	 * @param {string} [domain]
+	 */
+	const doSetLocaleData = ( data, domain = 'default' ) => {
 		tannin.data[ domain ] = {
 			...DEFAULT_LOCALE_DATA,
 			...tannin.data[ domain ],
@@ -74,6 +183,23 @@ export const createI18n = ( initialData, initialDomain ) => {
 			...DEFAULT_LOCALE_DATA[ '' ],
 			...tannin.data[ domain ][ '' ],
 		};
+	};
+
+	/** @type {SetLocaleData} */
+	const setLocaleData = ( data, domain ) => {
+		doSetLocaleData( data, domain );
+		notifyListeners();
+	};
+
+	/** @type {ResetLocaleData} */
+	const resetLocaleData = ( data, domain ) => {
+		// Reset all current Tannin locale data.
+		tannin.data = {};
+
+		// Reset cached plural forms functions cache.
+		tannin.pluralForms = {};
+
+		setLocaleData( data, domain );
 	};
 
 	/**
@@ -99,102 +225,244 @@ export const createI18n = ( initialData, initialDomain ) => {
 		number
 	) => {
 		if ( ! tannin.data[ domain ] ) {
-			setLocaleData( undefined, domain );
+			// use `doSetLocaleData` to set silently, without notifying listeners
+			doSetLocaleData( undefined, domain );
 		}
 
 		return tannin.dcnpgettext( domain, context, single, plural, number );
 	};
 
-	/**
-	 * Retrieve the translation of text.
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/__/
-	 *
-	 * @param {string} text     Text to translate.
-	 * @param {string} [domain] Domain to retrieve the translated text.
-	 *
-	 * @return {string} Translated text.
-	 */
+	/** @type {GetFilterDomain} */
+	const getFilterDomain = ( domain = 'default' ) => domain;
+
+	/** @type {__} */
 	const __ = ( text, domain ) => {
-		return dcnpgettext( domain, undefined, text );
+		let translation = dcnpgettext( domain, undefined, text );
+		if ( ! hooks ) {
+			return translation;
+		}
+
+		/**
+		 * Filters text with its translation.
+		 *
+		 * @param {string} translation Translated text.
+		 * @param {string} text        Text to translate.
+		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+		 */
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.gettext',
+				translation,
+				text,
+				domain
+			)
+		);
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.gettext_' + getFilterDomain( domain ),
+				translation,
+				text,
+				domain
+			)
+		);
 	};
 
-	/**
-	 * Retrieve translated string with gettext context.
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/_x/
-	 *
-	 * @param {string} text     Text to translate.
-	 * @param {string} context  Context information for the translators.
-	 * @param {string} [domain] Domain to retrieve the translated text.
-	 *
-	 * @return {string} Translated context string without pipe.
-	 */
+	/** @type {_x} */
 	const _x = ( text, context, domain ) => {
-		return dcnpgettext( domain, context, text );
+		let translation = dcnpgettext( domain, context, text );
+		if ( ! hooks ) {
+			return translation;
+		}
+
+		/**
+		 * Filters text with its translation based on context information.
+		 *
+		 * @param {string} translation Translated text.
+		 * @param {string} text        Text to translate.
+		 * @param {string} context     Context information for the translators.
+		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+		 */
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.gettext_with_context',
+				translation,
+				text,
+				context,
+				domain
+			)
+		);
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.gettext_with_context_' + getFilterDomain( domain ),
+				translation,
+				text,
+				context,
+				domain
+			)
+		);
 	};
 
-	/**
-	 * Translates and retrieves the singular or plural form based on the supplied
-	 * number.
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/_n/
-	 *
-	 * @param {string} single   The text to be used if the number is singular.
-	 * @param {string} plural   The text to be used if the number is plural.
-	 * @param {number} number   The number to compare against to use either the
-	 *                          singular or plural form.
-	 * @param {string} [domain] Domain to retrieve the translated text.
-	 *
-	 * @return {string} The translated singular or plural form.
-	 */
+	/** @type {_n} */
 	const _n = ( single, plural, number, domain ) => {
-		return dcnpgettext( domain, undefined, single, plural, number );
+		let translation = dcnpgettext(
+			domain,
+			undefined,
+			single,
+			plural,
+			number
+		);
+		if ( ! hooks ) {
+			return translation;
+		}
+
+		/**
+		 * Filters the singular or plural form of a string.
+		 *
+		 * @param {string} translation Translated text.
+		 * @param {string} single      The text to be used if the number is singular.
+		 * @param {string} plural      The text to be used if the number is plural.
+		 * @param {string} number      The number to compare against to use either the singular or plural form.
+		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+		 */
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.ngettext',
+				translation,
+				single,
+				plural,
+				number,
+				domain
+			)
+		);
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.ngettext_' + getFilterDomain( domain ),
+				translation,
+				single,
+				plural,
+				number,
+				domain
+			)
+		);
 	};
 
-	/**
-	 * Translates and retrieves the singular or plural form based on the supplied
-	 * number, with gettext context.
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/_nx/
-	 *
-	 * @param {string} single   The text to be used if the number is singular.
-	 * @param {string} plural   The text to be used if the number is plural.
-	 * @param {number} number   The number to compare against to use either the
-	 *                          singular or plural form.
-	 * @param {string} context  Context information for the translators.
-	 * @param {string} [domain] Domain to retrieve the translated text.
-	 *
-	 * @return {string} The translated singular or plural form.
-	 */
+	/** @type {_nx} */
 	const _nx = ( single, plural, number, context, domain ) => {
-		return dcnpgettext( domain, context, single, plural, number );
+		let translation = dcnpgettext(
+			domain,
+			context,
+			single,
+			plural,
+			number
+		);
+		if ( ! hooks ) {
+			return translation;
+		}
+
+		/**
+		 * Filters the singular or plural form of a string with gettext context.
+		 *
+		 * @param {string} translation Translated text.
+		 * @param {string} single      The text to be used if the number is singular.
+		 * @param {string} plural      The text to be used if the number is plural.
+		 * @param {string} number      The number to compare against to use either the singular or plural form.
+		 * @param {string} context     Context information for the translators.
+		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+		 */
+		translation = /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.ngettext_with_context',
+				translation,
+				single,
+				plural,
+				number,
+				context,
+				domain
+			)
+		);
+
+		return /** @type {string} */ (
+			/** @type {*} */ hooks.applyFilters(
+				'i18n.ngettext_with_context_' + getFilterDomain( domain ),
+				translation,
+				single,
+				plural,
+				number,
+				context,
+				domain
+			)
+		);
 	};
 
-	/**
-	 * Check if current locale is RTL.
-	 *
-	 * **RTL (Right To Left)** is a locale property indicating that text is written from right to left.
-	 * For example, the `he` locale (for Hebrew) specifies right-to-left. Arabic (ar) is another common
-	 * language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages,
-	 * including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
-	 *
-	 * @return {boolean} Whether locale is RTL.
-	 */
+	/** @type {IsRtl} */
 	const isRTL = () => {
 		return 'rtl' === _x( 'ltr', 'text direction' );
+	};
+
+	/** @type {HasTranslation} */
+	const hasTranslation = ( single, context, domain ) => {
+		const key = context ? context + '\u0004' + single : single;
+		let result = !! tannin.data?.[ domain ?? 'default' ]?.[ key ];
+		if ( hooks ) {
+			/**
+			 * Filters the presence of a translation in the locale data.
+			 *
+			 * @param {boolean} hasTranslation Whether the translation is present or not..
+			 * @param {string} single The singular form of the translated text (used as key in locale data)
+			 * @param {string} context Context information for the translators.
+			 * @param {string} domain Text domain. Unique identifier for retrieving translated strings.
+			 */
+			result = /** @type { boolean } */ (
+				/** @type {*} */ hooks.applyFilters(
+					'i18n.has_translation',
+					result,
+					single,
+					context,
+					domain
+				)
+			);
+
+			result = /** @type { boolean } */ (
+				/** @type {*} */ hooks.applyFilters(
+					'i18n.has_translation_' + getFilterDomain( domain ),
+					result,
+					single,
+					context,
+					domain
+				)
+			);
+		}
+		return result;
 	};
 
 	if ( initialData ) {
 		setLocaleData( initialData, initialDomain );
 	}
 
+	if ( hooks ) {
+		/**
+		 * @param {string} hookName
+		 */
+		const onHookAddedOrRemoved = ( hookName ) => {
+			if ( I18N_HOOK_REGEXP.test( hookName ) ) {
+				notifyListeners();
+			}
+		};
+
+		hooks.addAction( 'hookAdded', 'core/i18n', onHookAddedOrRemoved );
+		hooks.addAction( 'hookRemoved', 'core/i18n', onHookAddedOrRemoved );
+	}
+
 	return {
+		getLocaleData,
 		setLocaleData,
+		resetLocaleData,
+		subscribe,
 		__,
 		_x,
 		_n,
 		_nx,
 		isRTL,
+		hasTranslation,
 	};
 };

@@ -1,15 +1,16 @@
 {
 	"name": "@wordpress/create-block",
-	"version": "0.12.0",
+	"version": "2.3.1",
 	"description": "Generates PHP, JS and CSS code for registering a block for a WordPress plugin.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"block",
 		"scaffold"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/create-block/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -19,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=10",
+		"node": ">=12",
 		"npm": ">=6.9"
 	},
 	"files": [
@@ -30,14 +31,18 @@
 		"wp-create-block": "./index.js"
 	},
 	"dependencies": {
+		"@wordpress/lazy-import": "file:../lazy-import",
 		"chalk": "^4.0.0",
-		"check-node-version": "^3.1.1",
+		"check-node-version": "^4.1.0",
 		"commander": "^4.1.0",
-		"execa": "^4.0.0",
+		"execa": "^4.0.2",
+		"fast-glob": "^2.2.7",
 		"inquirer": "^7.1.0",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.21",
 		"make-dir": "^3.0.0",
 		"mustache": "^4.0.0",
+		"npm-package-arg": "^8.0.1",
+		"rimraf": "^3.0.2",
 		"write-pkg": "^4.0.0"
 	},
 	"publishConfig": {

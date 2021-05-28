@@ -1,5 +1,5 @@
 .components-dropdown-menu__popover .components-popover__content {
-	width: 200px;
+	min-width: 200px;
 }
 
 .components-dropdown-menu__menu {
@@ -14,7 +14,7 @@
 		padding: 6px;
 		outline: none;
 		cursor: pointer;
-		margin-bottom: $grid-unit-05;
+		white-space: nowrap;
 
 		&.has-separator {
 			margin-top: 6px;
@@ -26,7 +26,7 @@
 			display: block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $light-gray-500;
+			background-color: $gray-300;
 			position: absolute;
 			top: -3px;
 			left: 0;
@@ -37,8 +37,8 @@
 		&.is-active svg {
 			// Block UI appearance.
 			color: $white;
-			background: $dark-gray-primary;
-			box-shadow: 0 0 0 $border-width $dark-gray-primary;
+			background: $gray-900;
+			box-shadow: 0 0 0 $border-width $gray-900;
 			border-radius: $border-width;
 		}
 
@@ -54,12 +54,9 @@
 	.components-menu-item__button.components-button {
 		min-height: $button-size;
 		height: auto;
-		padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
 		text-align: left;
-
-		&.has-icon {
-			padding-left: $grid-unit-10;
-		}
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
 	}
 
 	.components-menu-group {
@@ -80,11 +77,11 @@
 
 	.components-menu-group + .components-menu-group {
 		margin-top: 0;
-		border-top: $border-width solid $light-gray-secondary;
+		border-top: $border-width solid $gray-400;
 		padding: $grid-unit-15;
-	}
-}
 
-.components-dropdown-menu__menu.no-icons  .components-menu-item__button.components-button {
-	padding: 0 $grid-unit-15;
+		.is-alternate & {
+			border-color: $gray-900;
+		}
+	}
 }

@@ -5,157 +5,307 @@ import {
 	createNewPost,
 	insertBlock,
 	disablePrePublishChecks,
-	visitAdminPage,
+	trashAllPosts,
+	activateTheme,
+	getAllBlocks,
+	selectBlockByClientId,
+	clickBlockToolbarButton,
+	canvas,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import {
-	enableExperimentalFeatures,
-	disableExperimentalFeatures,
-} from '../../experimental-features';
-import { trashExistingPosts } from '../../config/setup-test-framework';
+import { navigationPanel, siteEditor } from '../../experimental-features';
+
+const templatePartNameInput =
+	'.edit-site-template-part-converter__modal .components-text-control__input';
 
 describe( 'Template Part', () => {
 	beforeAll( async () => {
-		await enableExperimentalFeatures( [
-			'#gutenberg-full-site-editing',
-			'#gutenberg-full-site-editing-demo',
-		] );
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await activateTheme( 'tt1-blocks' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
-		await disableExperimentalFeatures( [
-			'#gutenberg-full-site-editing',
-			'#gutenberg-full-site-editing-demo',
-		] );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	describe( 'Template part block', () => {
-		beforeEach( () =>
-			visitAdminPage(
-				'admin.php',
-				addQueryArgs( '', {
-					page: 'gutenberg-edit-site',
-				} ).slice( 1 )
-			)
-		);
+		beforeEach( async () => {
+			await siteEditor.visit();
+		} );
 
-		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
+		async function navigateToHeader() {
 			// Switch to editing the header template part.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
-			);
-			const [ switchToHeaderTemplatePartButton ] = await page.$x(
-				'//button[contains(text(), "header")]'
-			);
-			await switchToHeaderTemplatePartButton.click();
+			await navigationPanel.open();
+			await navigationPanel.backToRoot();
+			await navigationPanel.navigate( [ 'Template Parts', 'Headers' ] );
+			await navigationPanel.clickItemByText( 'header' );
+		}
+
+		async function updateHeader( content ) {
+			await navigateToHeader();
 
 			// Edit it.
 			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Header Template Part 123' );
+			await page.keyboard.type( content );
 
-			// Save it, without saving the front page template.
+			// Save it.
 			await page.click( '.edit-site-save-button__button' );
-			const [ frontPageCheckbox ] = await page.$x(
-				'//strong[contains(text(),"Front Page")]/../preceding-sibling::span/input'
-			);
-			await frontPageCheckbox.click();
 			await page.click( '.editor-entities-saved-states__save-button' );
 			await page.waitForSelector(
 				'.edit-site-save-button__button:not(.is-busy)'
 			);
 
-			// Switch back to the front page template.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
+			// Switch back to the Index template.
+			await navigationPanel.open();
+			await navigationPanel.backToRoot();
+			await navigationPanel.navigate( 'Templates' );
+			await navigationPanel.clickItemByText( 'Index' );
+		}
+
+		async function triggerEllipsisMenuItem( textPrompt ) {
+			await clickBlockToolbarButton( 'Options' );
+			const button = await page.waitForXPath(
+				`//span[contains(text(), "${ textPrompt }")]`
 			);
-			const [ switchToFrontPageTemplateButton ] = await page.$x(
-				'//button[contains(text(), "front-page")]'
+			await button.click();
+		}
+
+		async function createParagraphAndGetClientId( content ) {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( content );
+			const allBlocks = await getAllBlocks();
+			const paragraphBlock = allBlocks.find(
+				( block ) =>
+					block.name === 'core/paragraph' &&
+					block.attributes.content === content
 			);
-			await switchToFrontPageTemplateButton.click();
+			return paragraphBlock.clientId;
+		}
+
+		async function assertParagraphInTemplatePart( content ) {
+			const paragraphInTemplatePart = await canvas().waitForXPath(
+				`//*[@data-type="core/template-part"][//p[text()="${ content }"]]`
+			);
+			expect( paragraphInTemplatePart ).not.toBeNull();
+		}
+
+		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
+			await updateHeader( 'Header Template Part 123' );
 
 			// Verify that the header template part is updated.
-			const [ headerTemplatePart ] = await page.$x(
-				'//*[@data-type="core/template-part"][//p[text()="Header Template Part123"]]'
+			await assertParagraphInTemplatePart( 'Header Template Part 123' );
+		} );
+
+		it( 'Should detach blocks from template part', async () => {
+			await updateHeader( 'Header Template Part 456' );
+
+			const initialTemplateParts = await canvas().$$(
+				'.wp-block-template-part'
 			);
-			expect( headerTemplatePart ).not.toBeNull();
+
+			// Select the header template part block.
+			const allBlocks = await getAllBlocks();
+			const headerBlock = allBlocks.find(
+				( block ) => block.name === 'core/template-part'
+			);
+			await selectBlockByClientId( headerBlock.clientId );
+
+			// Detach blocks from template part using ellipsis menu.
+			await triggerEllipsisMenuItem( 'Detach blocks from template part' );
+
+			// Verify there is one less template part on the page.
+			const finalTemplateParts = await canvas().$$(
+				'.wp-block-template-part'
+			);
+			expect(
+				initialTemplateParts.length - finalTemplateParts.length
+			).toBe( 1 );
+
+			// Verify content of the template part is still present.
+			const [ expectedContent ] = await canvas().$x(
+				'//p[contains(text(), "Header Template Part 456")]'
+			);
+			expect( expectedContent ).not.toBeUndefined();
+		} );
+
+		it( 'Should load navigate-to-links properly', async () => {
+			await navigateToHeader();
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'Header Template Part 789' );
+
+			// Select the paragraph block
+			const text = await canvas().waitForXPath(
+				'//p[contains(text(), "Header Template Part 789")]'
+			);
+
+			// Highlight all the text in the paragraph block
+			await text.click( { clickCount: 3 } );
+
+			// Click the convert to link toolbar button
+			await page.waitForSelector( 'button[aria-label="Link"]' );
+			await page.click( 'button[aria-label="Link"]' );
+
+			// Enter url for link
+			await page.keyboard.type( 'https://google.com' );
+			await page.keyboard.press( 'Enter' );
+
+			// Verify that there is no error
+			await canvas().click( 'p[data-type="core/paragraph"] a' );
+			const expectedContent = await canvas().$x(
+				'//p[contains(text(), "Header Template Part 789")]'
+			);
+
+			expect( expectedContent ).not.toBeUndefined();
+		} );
+
+		it( 'Should convert selected block to template part', async () => {
+			await canvas().waitForSelector(
+				'.wp-block-template-part.block-editor-block-list__layout'
+			);
+			const initialTemplateParts = await canvas().$$(
+				'.wp-block-template-part'
+			);
+
+			// Add some block and select it.
+			const clientId = await createParagraphAndGetClientId(
+				'Some block...'
+			);
+			await selectBlockByClientId( clientId );
+
+			// Convert block to a template part.
+			await triggerEllipsisMenuItem( 'Make template part' );
+			const nameInput = await page.waitForSelector(
+				templatePartNameInput
+			);
+			await nameInput.click();
+			await page.keyboard.type( 'My template part' );
+			await page.keyboard.press( 'Enter' );
+
+			// Wait for creation to finish
+			await page.waitForXPath(
+				'//*[contains(@class, "components-snackbar")]/*[text()="Template part created."]'
+			);
+
+			// Verify new template part is created with expected content.
+			await assertParagraphInTemplatePart( 'Some block...' );
+
+			// Verify there is 1 more template part on the page than previously.
+			const finalTemplateParts = await canvas().$$(
+				'.wp-block-template-part'
+			);
+			expect(
+				finalTemplateParts.length - initialTemplateParts.length
+			).toBe( 1 );
+		} );
+
+		it( 'Should convert multiple selected blocks to template part', async () => {
+			await canvas().waitForSelector(
+				'.wp-block-template-part.block-editor-block-list__layout'
+			);
+			const initialTemplateParts = await canvas().$$(
+				'.wp-block-template-part'
+			);
+
+			// Add two blocks and select them.
+			const block1Id = await createParagraphAndGetClientId(
+				'Some block #1'
+			);
+			const block2Id = await createParagraphAndGetClientId(
+				'Some block #2'
+			);
+			await page.evaluate(
+				( id1, id2 ) => {
+					wp.data
+						.dispatch( 'core/block-editor' )
+						.multiSelect( id1, id2 );
+				},
+				block1Id,
+				block2Id
+			);
+
+			// Convert block to a template part.
+			await triggerEllipsisMenuItem( 'Make template part' );
+			const nameInput = await page.waitForSelector(
+				templatePartNameInput
+			);
+			await nameInput.click();
+			await page.keyboard.type( 'My multi  template part' );
+			await page.keyboard.press( 'Enter' );
+
+			// Wait for creation to finish
+			await page.waitForXPath(
+				'//*[contains(@class, "components-snackbar")]/*[text()="Template part created."]'
+			);
+
+			// Verify new template part is created with expected content.
+			await assertParagraphInTemplatePart( 'Some block #1' );
+			await assertParagraphInTemplatePart( 'Some block #2' );
+
+			// Verify there is 1 more template part on the page than previously.
+			const finalTemplateParts = await canvas().$$(
+				'.wp-block-template-part'
+			);
+			expect(
+				finalTemplateParts.length - initialTemplateParts.length
+			).toBe( 1 );
 		} );
 	} );
 
 	describe( 'Template part placeholder', () => {
 		// Test constants for template part.
-		const testSlug = 'test-template-part';
-		const testTheme = 'test-theme';
 		const testContent = 'some words...';
 
 		// Selectors
-		const chooseButtonSelector =
-			'//div[contains(@class,"is-selected")]//button[text()="Choose"]';
 		const entitiesSaveSelector =
 			'.editor-entities-saved-states__save-button';
 		const savePostSelector = '.editor-post-publish-button__button';
 		const templatePartSelector = '*[data-type="core/template-part"]';
-		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
-		const templatePartButtonSelector = `${ templatePartSelector } button`;
+		const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
+		const createNewButtonSelector =
+			'//button[contains(text(), "New template part")]';
+		const chooseExistingButtonSelector =
+			'//button[contains(text(), "Choose existing")]';
 
-		it( 'Should prompt to create when no match found', async () => {
+		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
-			await page.keyboard.type( testSlug );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testTheme );
-			// Should say 'Create'
-			const placeholderButton = await page.$(
-				templatePartButtonSelector
+			await page.waitForXPath( chooseExistingButtonSelector );
+			const [ createNewButton ] = await page.$x(
+				createNewButtonSelector
 			);
-			const text = await page.evaluate(
-				( element ) => element.textContent,
-				placeholderButton
+			await createNewButton.click();
+
+			const newTemplatePart = await page.waitForSelector(
+				activatedTemplatePartSelector
 			);
-			expect( text ).toBe( 'Create' );
+			expect( newTemplatePart ).toBeTruthy();
 
 			// Finish creating template part, insert some text, and save.
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Enter' );
-			await page.waitForSelector( activatedTemplatePartSelector );
-			await page.click( templatePartSelector );
+			await page.click( '.block-editor-button-block-appender' );
+			await page.click( '.editor-block-list-item-paragraph' );
 			await page.keyboard.type( testContent );
 			await page.click( savePostSelector );
 			await page.click( entitiesSaveSelector );
-		} );
 
-		it( 'Should prompt to Choose when match found', async () => {
 			await createNewPost();
-			await disablePrePublishChecks();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			await page.keyboard.type( testSlug );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( testTheme );
-			// Should say 'Choose'
-			const placeholderButton = await page.waitForXPath(
-				chooseButtonSelector
+			const chooseExistingButton = await page.waitForXPath(
+				chooseExistingButtonSelector
 			);
-			expect( placeholderButton ).not.toBeNull();
-		} );
-
-		it( 'Should dispaly a preview when match is found', async () => {
-			const [ preview ] = await page.$x( testContentSelector );
+			await chooseExistingButton.click();
+			const preview = await page.waitForXPath( testContentSelector );
 			expect( preview ).toBeTruthy();
-		} );
 
-		it( 'Should insert the desired template part', async () => {
-			const [ placeholderButton ] = await page.$x( chooseButtonSelector );
-			await placeholderButton.click();
+			await preview.click();
 			await page.waitForSelector( activatedTemplatePartSelector );
 			const templatePartContent = await page.waitForXPath(
 				testContentSelector

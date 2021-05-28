@@ -21,8 +21,8 @@
 
 .emptyStateTitle {
 	text-align: center;
-	margin-top: 8;
-	margin-bottom: 10;
+	margin-top: 4;
+	margin-bottom: 16;
 	font-size: 14;
 	color: #2e4453;
 }
@@ -32,6 +32,7 @@
 }
 
 .emptyStateDescription {
+	width: 100%;
 	text-align: center;
 	color: $blue-wordpress;
 	font-size: 14;

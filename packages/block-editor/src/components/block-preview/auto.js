@@ -10,7 +10,7 @@ import { useResizeObserver, pure } from '@wordpress/compose';
 import BlockList from '../block-list';
 
 // This is used to avoid rendering the block list if the sizes change.
-const MemoizedBlockList = pure( BlockList );
+let MemoizedBlockList;
 
 function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	const [
@@ -21,6 +21,9 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 		containtResizeListener,
 		{ height: contentHeight },
 	] = useResizeObserver();
+
+	// Initialize on render instead of module top level, to avoid circular dependency issues.
+	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
 
 	const scale =
 		( containerWidth - 2 * __experimentalPadding ) / viewportWidth;

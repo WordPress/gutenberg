@@ -25,12 +25,19 @@ import {
 	withNotices,
 	RangeControl,
 } from '@wordpress/components';
-import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
-import { Component, Platform } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
+import {
+	MediaPlaceholder,
+	InspectorControls,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
+import { View } from '@wordpress/primitives';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -38,12 +45,17 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
+import {
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
+} from './constants';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
-	{ value: 'attachment', label: __( 'Attachment Page' ) },
-	{ value: 'media', label: __( 'Media File' ) },
-	{ value: 'none', label: _x( 'None', 'Media item link option' ) },
+	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
+	{ value: LINK_DESTINATION_MEDIA, label: __( 'Media File' ) },
+	{ value: LINK_DESTINATION_NONE, label: __( 'None' ) },
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -54,413 +66,55 @@ const PLACEHOLDER_TEXT = Platform.select( {
 	native: __( 'ADD MEDIA' ),
 } );
 
-// currently this is needed for consistent controls UI on mobile
-// this can be removed after control components settle on consistent defaults
-const MOBILE_CONTROL_PROPS = Platform.select( {
-	web: {},
-	native: { separatorType: 'fullWidth' },
-} );
-const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
-	web: {},
-	native: { separatorType: 'none' },
-} );
-
 const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
 	web: {},
 	native: { type: 'stepper' },
 } );
 
-class GalleryEdit extends Component {
-	constructor() {
-		super( ...arguments );
+function GalleryEdit( props ) {
+	const {
+		attributes,
+		clientId,
+		isSelected,
+		noticeUI,
+		noticeOperations,
+		onFocus,
+	} = props;
+	const {
+		columns = defaultColumnsNumber( attributes ),
+		imageCrop,
+		images,
+		linkTo,
+		sizeSlug,
+	} = attributes;
+	const [ selectedImage, setSelectedImage ] = useState();
+	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
 
-		this.onSelectImage = this.onSelectImage.bind( this );
-		this.onSelectImages = this.onSelectImages.bind( this );
-		this.onDeselectImage = this.onDeselectImage.bind( this );
-		this.setLinkTo = this.setLinkTo.bind( this );
-		this.setColumnsNumber = this.setColumnsNumber.bind( this );
-		this.toggleImageCrop = this.toggleImageCrop.bind( this );
-		this.onMove = this.onMove.bind( this );
-		this.onMoveForward = this.onMoveForward.bind( this );
-		this.onMoveBackward = this.onMoveBackward.bind( this );
-		this.onRemoveImage = this.onRemoveImage.bind( this );
-		this.onUploadError = this.onUploadError.bind( this );
-		this.setImageAttributes = this.setImageAttributes.bind( this );
-		this.setAttributes = this.setAttributes.bind( this );
-		this.onFocusGalleryCaption = this.onFocusGalleryCaption.bind( this );
-		this.getImagesSizeOptions = this.getImagesSizeOptions.bind( this );
-		this.updateImagesSize = this.updateImagesSize.bind( this );
+	const {
+		imageSizes,
+		mediaUpload,
+		getMedia,
+		wasBlockJustInserted,
+	} = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
 
-		this.state = {
-			selectedImage: null,
-			attachmentCaptions: null,
+		return {
+			imageSizes: settings.imageSizes,
+			mediaUpload: settings.mediaUpload,
+			getMedia: select( coreStore ).getMedia,
+			wasBlockJustInserted: select(
+				blockEditorStore
+			).wasBlockJustInserted( clientId, 'inserter_menu' ),
 		};
-	}
+	} );
 
-	setAttributes( attributes ) {
-		if ( attributes.ids ) {
-			throw new Error(
-				'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes'
-			);
-		}
-
-		if ( attributes.images ) {
-			attributes = {
-				...attributes,
-				// Unlike images[ n ].id which is a string, always ensure the
-				// ids array contains numbers as per its attribute type.
-				ids: map( attributes.images, ( { id } ) => parseInt( id, 10 ) ),
-			};
-		}
-
-		this.props.setAttributes( attributes );
-	}
-
-	onSelectImage( index ) {
-		return () => {
-			if ( this.state.selectedImage !== index ) {
-				this.setState( {
-					selectedImage: index,
-				} );
-			}
-		};
-	}
-
-	onDeselectImage( index ) {
-		return () => {
-			if ( this.state.selectedImage === index ) {
-				this.setState( {
-					selectedImage: null,
-				} );
-			}
-		};
-	}
-
-	onMove( oldIndex, newIndex ) {
-		const images = [ ...this.props.attributes.images ];
-		images.splice( newIndex, 1, this.props.attributes.images[ oldIndex ] );
-		images.splice( oldIndex, 1, this.props.attributes.images[ newIndex ] );
-		this.setState( { selectedImage: newIndex } );
-		this.setAttributes( { images } );
-	}
-
-	onMoveForward( oldIndex ) {
-		return () => {
-			if ( oldIndex === this.props.attributes.images.length - 1 ) {
-				return;
-			}
-			this.onMove( oldIndex, oldIndex + 1 );
-		};
-	}
-
-	onMoveBackward( oldIndex ) {
-		return () => {
-			if ( oldIndex === 0 ) {
-				return;
-			}
-			this.onMove( oldIndex, oldIndex - 1 );
-		};
-	}
-
-	onRemoveImage( index ) {
-		return () => {
-			const images = filter(
-				this.props.attributes.images,
-				( img, i ) => index !== i
-			);
-			const { columns } = this.props.attributes;
-			this.setState( { selectedImage: null } );
-			this.setAttributes( {
-				images,
-				columns: columns ? Math.min( images.length, columns ) : columns,
-			} );
-		};
-	}
-
-	selectCaption( newImage, images, attachmentCaptions ) {
-		// The image id in both the images and attachmentCaptions arrays is a
-		// string, so ensure comparison works correctly by converting the
-		// newImage.id to a string.
-		const newImageId = toString( newImage.id );
-		const currentImage = find( images, { id: newImageId } );
-
-		const currentImageCaption = currentImage
-			? currentImage.caption
-			: newImage.caption;
-
-		if ( ! attachmentCaptions ) {
-			return currentImageCaption;
-		}
-
-		const attachment = find( attachmentCaptions, {
-			id: newImageId,
-		} );
-
-		// if the attachment caption is updated
-		if ( attachment && attachment.caption !== newImage.caption ) {
-			return newImage.caption;
-		}
-
-		return currentImageCaption;
-	}
-
-	onSelectImages( newImages ) {
-		const { columns, images, sizeSlug } = this.props.attributes;
-		const { attachmentCaptions } = this.state;
-		this.setState( {
-			attachmentCaptions: newImages.map( ( newImage ) => ( {
-				// Store the attachmentCaption id as a string for consistency
-				// with the type of the id in the images attribute.
-				id: toString( newImage.id ),
-				caption: newImage.caption,
-			} ) ),
-		} );
-		this.setAttributes( {
-			images: newImages.map( ( newImage ) => ( {
-				...pickRelevantMediaFiles( newImage, sizeSlug ),
-				caption: this.selectCaption(
-					newImage,
-					images,
-					attachmentCaptions
-				),
-				// The id value is stored in a data attribute, so when the
-				// block is parsed it's converted to a string. Converting
-				// to a string here ensures it's type is consistent.
-				id: toString( newImage.id ),
-			} ) ),
-			columns: columns ? Math.min( newImages.length, columns ) : columns,
-		} );
-	}
-
-	onUploadError( message ) {
-		const { noticeOperations } = this.props;
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
-	}
-
-	setLinkTo( value ) {
-		this.setAttributes( { linkTo: value } );
-	}
-
-	setColumnsNumber( value ) {
-		this.setAttributes( { columns: value } );
-	}
-
-	toggleImageCrop() {
-		this.setAttributes( { imageCrop: ! this.props.attributes.imageCrop } );
-	}
-
-	getImageCropHelp( checked ) {
-		return checked
-			? __( 'Thumbnails are cropped to align.' )
-			: __( 'Thumbnails are not cropped.' );
-	}
-
-	onFocusGalleryCaption() {
-		this.setState( {
-			selectedImage: null,
-		} );
-	}
-
-	setImageAttributes( index, attributes ) {
-		const {
-			attributes: { images },
-		} = this.props;
-		const { setAttributes } = this;
-		if ( ! images[ index ] ) {
-			return;
-		}
-		setAttributes( {
-			images: [
-				...images.slice( 0, index ),
-				{
-					...images[ index ],
-					...attributes,
-				},
-				...images.slice( index + 1 ),
-			],
-		} );
-	}
-
-	getImagesSizeOptions() {
-		const { imageSizes, resizedImages } = this.props;
-		return map(
-			filter( imageSizes, ( { slug } ) =>
-				some( resizedImages, ( sizes ) => sizes[ slug ] )
-			),
-			( { name, slug } ) => ( { value: slug, label: name } )
-		);
-	}
-
-	updateImagesSize( sizeSlug ) {
-		const {
-			attributes: { images },
-			resizedImages,
-		} = this.props;
-
-		const updatedImages = map( images, ( image ) => {
-			if ( ! image.id ) {
-				return image;
-			}
-			const url = get( resizedImages, [
-				parseInt( image.id, 10 ),
-				sizeSlug,
-			] );
-			return {
-				...image,
-				...( url && { url } ),
-			};
-		} );
-
-		this.setAttributes( { images: updatedImages, sizeSlug } );
-	}
-
-	componentDidMount() {
-		const { attributes, mediaUpload } = this.props;
-		const { images } = attributes;
-		if (
-			Platform.OS === 'web' &&
-			images &&
-			images.length > 0 &&
-			every( images, ( { url } ) => isBlobURL( url ) )
-		) {
-			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
-			forEach( images, ( { url } ) => revokeBlobURL( url ) );
-			mediaUpload( {
-				filesList,
-				onFileChange: this.onSelectImages,
-				allowedTypes: [ 'image' ],
-			} );
-		}
-	}
-
-	componentDidUpdate( prevProps ) {
-		// Deselect images when deselecting the block
-		if ( ! this.props.isSelected && prevProps.isSelected ) {
-			this.setState( {
-				selectedImage: null,
-				captionSelected: false,
-			} );
-		}
-	}
-
-	render() {
-		const { attributes, className, isSelected, noticeUI } = this.props;
-		const {
-			columns = defaultColumnsNumber( attributes ),
-			imageCrop,
-			images,
-			linkTo,
-			sizeSlug,
-		} = attributes;
-
-		const hasImages = !! images.length;
-		const hasImagesWithId = hasImages && some( images, ( { id } ) => id );
-
-		const mediaPlaceholder = (
-			<MediaPlaceholder
-				addToGallery={ hasImagesWithId }
-				isAppender={ hasImages }
-				className={ className }
-				disableMediaButtons={ hasImages && ! isSelected }
-				icon={ ! hasImages && sharedIcon }
-				labels={ {
-					title: ! hasImages && __( 'Gallery' ),
-					instructions: ! hasImages && PLACEHOLDER_TEXT,
-				} }
-				onSelect={ this.onSelectImages }
-				accept="image/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				multiple
-				value={ hasImagesWithId ? images : undefined }
-				onError={ this.onUploadError }
-				notices={ hasImages ? undefined : noticeUI }
-				onFocus={ this.props.onFocus }
-			/>
-		);
-
-		if ( ! hasImages ) {
-			return mediaPlaceholder;
-		}
-
-		const imageSizeOptions = this.getImagesSizeOptions();
-		const shouldShowSizeOptions =
-			hasImages && ! isEmpty( imageSizeOptions );
-		// This is needed to fix a separator fence-post issue on mobile.
-		const mobileLinkToProps = shouldShowSizeOptions
-			? MOBILE_CONTROL_PROPS
-			: MOBILE_CONTROL_PROPS_SEPARATOR_NONE;
-
-		return (
-			<>
-				<InspectorControls>
-					<PanelBody title={ __( 'Gallery settings' ) }>
-						{ images.length > 1 && (
-							<RangeControl
-								label={ __( 'Columns' ) }
-								value={ columns }
-								onChange={ this.setColumnsNumber }
-								min={ 1 }
-								max={ Math.min( MAX_COLUMNS, images.length ) }
-								{ ...MOBILE_CONTROL_PROPS }
-								{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
-								required
-							/>
-						) }
-
-						<ToggleControl
-							label={ __( 'Crop images' ) }
-							{ ...MOBILE_CONTROL_PROPS }
-							checked={ !! imageCrop }
-							onChange={ this.toggleImageCrop }
-							help={ this.getImageCropHelp }
-						/>
-						<SelectControl
-							label={ __( 'Link to' ) }
-							{ ...mobileLinkToProps }
-							value={ linkTo }
-							onChange={ this.setLinkTo }
-							options={ linkOptions }
-						/>
-						{ shouldShowSizeOptions && (
-							<SelectControl
-								label={ __( 'Images size' ) }
-								{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
-								value={ sizeSlug }
-								options={ imageSizeOptions }
-								onChange={ this.updateImagesSize }
-							/>
-						) }
-					</PanelBody>
-				</InspectorControls>
-				{ noticeUI }
-				<Gallery
-					{ ...this.props }
-					selectedImage={ this.state.selectedImage }
-					mediaPlaceholder={ mediaPlaceholder }
-					onMoveBackward={ this.onMoveBackward }
-					onMoveForward={ this.onMoveForward }
-					onRemoveImage={ this.onRemoveImage }
-					onSelectImage={ this.onSelectImage }
-					onDeselectImage={ this.onDeselectImage }
-					onSetImageAttributes={ this.setImageAttributes }
-					onFocusGalleryCaption={ this.onFocusGalleryCaption }
-				/>
-			</>
-		);
-	}
-}
-export default compose( [
-	withSelect( ( select, { attributes: { ids }, isSelected } ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
-		const { imageSizes, mediaUpload } = getSettings();
-
-		let resizedImages = {};
-
+	const resizedImages = useMemo( () => {
 		if ( isSelected ) {
-			resizedImages = reduce(
-				ids,
+			return reduce(
+				attributes.ids,
 				( currentResizedImages, id ) => {
 					if ( ! id ) {
 						return currentResizedImages;
@@ -495,13 +149,332 @@ export default compose( [
 				{}
 			);
 		}
+		return {};
+	}, [ isSelected, attributes.ids, imageSizes ] );
 
-		return {
-			imageSizes,
-			mediaUpload,
-			resizedImages,
+	function onFocusGalleryCaption() {
+		setSelectedImage();
+	}
+
+	function setAttributes( newAttrs ) {
+		if ( newAttrs.ids ) {
+			throw new Error(
+				'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes'
+			);
+		}
+
+		if ( newAttrs.images ) {
+			newAttrs = {
+				...newAttrs,
+				// Unlike images[ n ].id which is a string, always ensure the
+				// ids array contains numbers as per its attribute type.
+				ids: map( newAttrs.images, ( { id } ) => parseInt( id, 10 ) ),
+			};
+		}
+
+		props.setAttributes( newAttrs );
+	}
+
+	function onSelectImage( index ) {
+		return () => {
+			setSelectedImage( index );
 		};
-	} ),
+	}
+
+	function onDeselectImage() {
+		return () => {
+			setSelectedImage();
+		};
+	}
+
+	function onMove( oldIndex, newIndex ) {
+		const newImages = [ ...images ];
+		newImages.splice( newIndex, 1, images[ oldIndex ] );
+		newImages.splice( oldIndex, 1, images[ newIndex ] );
+		setSelectedImage( newIndex );
+		setAttributes( { images: newImages } );
+	}
+
+	function onMoveForward( oldIndex ) {
+		return () => {
+			if ( oldIndex === images.length - 1 ) {
+				return;
+			}
+			onMove( oldIndex, oldIndex + 1 );
+		};
+	}
+
+	function onMoveBackward( oldIndex ) {
+		return () => {
+			if ( oldIndex === 0 ) {
+				return;
+			}
+			onMove( oldIndex, oldIndex - 1 );
+		};
+	}
+
+	function onRemoveImage( index ) {
+		return () => {
+			const newImages = filter( images, ( img, i ) => index !== i );
+			setSelectedImage();
+			setAttributes( {
+				images: newImages,
+				columns: attributes.columns
+					? Math.min( newImages.length, attributes.columns )
+					: attributes.columns,
+			} );
+		};
+	}
+
+	function selectCaption( newImage ) {
+		// The image id in both the images and attachmentCaptions arrays is a
+		// string, so ensure comparison works correctly by converting the
+		// newImage.id to a string.
+		const newImageId = toString( newImage.id );
+		const currentImage = find( images, { id: newImageId } );
+		const currentImageCaption = currentImage
+			? currentImage.caption
+			: newImage.caption;
+
+		if ( ! attachmentCaptions ) {
+			return currentImageCaption;
+		}
+
+		const attachment = find( attachmentCaptions, {
+			id: newImageId,
+		} );
+
+		// if the attachment caption is updated
+		if ( attachment && attachment.caption !== newImage.caption ) {
+			return newImage.caption;
+		}
+
+		return currentImageCaption;
+	}
+
+	function onSelectImages( newImages ) {
+		setAttachmentCaptions(
+			newImages.map( ( newImage ) => ( {
+				// Store the attachmentCaption id as a string for consistency
+				// with the type of the id in the images attribute.
+				id: toString( newImage.id ),
+				caption: newImage.caption,
+			} ) )
+		);
+		setAttributes( {
+			images: newImages.map( ( newImage ) => ( {
+				...pickRelevantMediaFiles( newImage, sizeSlug ),
+				caption: selectCaption( newImage, images, attachmentCaptions ),
+				// The id value is stored in a data attribute, so when the
+				// block is parsed it's converted to a string. Converting
+				// to a string here ensures it's type is consistent.
+				id: toString( newImage.id ),
+			} ) ),
+			columns: attributes.columns
+				? Math.min( newImages.length, attributes.columns )
+				: attributes.columns,
+		} );
+	}
+
+	function onUploadError( message ) {
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
+	function setLinkTo( value ) {
+		setAttributes( { linkTo: value } );
+	}
+
+	function setColumnsNumber( value ) {
+		setAttributes( { columns: value } );
+	}
+
+	function toggleImageCrop() {
+		setAttributes( { imageCrop: ! imageCrop } );
+	}
+
+	function getImageCropHelp( checked ) {
+		return checked
+			? __( 'Thumbnails are cropped to align.' )
+			: __( 'Thumbnails are not cropped.' );
+	}
+
+	function setImageAttributes( index, newAttributes ) {
+		if ( ! images[ index ] ) {
+			return;
+		}
+
+		setAttributes( {
+			images: [
+				...images.slice( 0, index ),
+				{
+					...images[ index ],
+					...newAttributes,
+				},
+				...images.slice( index + 1 ),
+			],
+		} );
+	}
+
+	function getImagesSizeOptions() {
+		return map(
+			filter( imageSizes, ( { slug } ) =>
+				some( resizedImages, ( sizes ) => sizes[ slug ] )
+			),
+			( { name, slug } ) => ( { value: slug, label: name } )
+		);
+	}
+
+	function updateImagesSize( newSizeSlug ) {
+		const updatedImages = map( images, ( image ) => {
+			if ( ! image.id ) {
+				return image;
+			}
+			const url = get( resizedImages, [
+				parseInt( image.id, 10 ),
+				newSizeSlug,
+			] );
+			return {
+				...image,
+				...( url && { url } ),
+			};
+		} );
+
+		setAttributes( { images: updatedImages, sizeSlug: newSizeSlug } );
+	}
+
+	useEffect( () => {
+		if (
+			Platform.OS === 'web' &&
+			images &&
+			images.length > 0 &&
+			every( images, ( { url } ) => isBlobURL( url ) )
+		) {
+			const filesList = map( images, ( { url } ) => getBlobByURL( url ) );
+			forEach( images, ( { url } ) => revokeBlobURL( url ) );
+			mediaUpload( {
+				filesList,
+				onFileChange: onSelectImages,
+				allowedTypes: [ 'image' ],
+			} );
+		}
+	}, [] );
+
+	useEffect( () => {
+		// Deselect images when deselecting the block
+		if ( ! isSelected ) {
+			setSelectedImage();
+		}
+	}, [ isSelected ] );
+
+	useEffect( () => {
+		// linkTo attribute must be saved so blocks don't break when changing
+		// image_default_link_type in options.php
+		if ( ! linkTo ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				linkTo:
+					window?.wp?.media?.view?.settings?.defaultProps?.link ||
+					LINK_DESTINATION_NONE,
+			} );
+		}
+	}, [ linkTo ] );
+
+	const hasImages = !! images.length;
+	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
+
+	const mediaPlaceholder = (
+		<MediaPlaceholder
+			addToGallery={ hasImageIds }
+			isAppender={ hasImages }
+			disableMediaButtons={ hasImages && ! isSelected }
+			icon={ ! hasImages && sharedIcon }
+			labels={ {
+				title: ! hasImages && __( 'Gallery' ),
+				instructions: ! hasImages && PLACEHOLDER_TEXT,
+			} }
+			onSelect={ onSelectImages }
+			accept="image/*"
+			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			multiple
+			value={ hasImageIds ? images : {} }
+			onError={ onUploadError }
+			notices={ hasImages ? undefined : noticeUI }
+			onFocus={ onFocus }
+			autoOpenMediaUpload={
+				! hasImages && isSelected && wasBlockJustInserted
+			}
+		/>
+	);
+
+	const blockProps = useBlockProps();
+
+	if ( ! hasImages ) {
+		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
+	}
+
+	const imageSizeOptions = getImagesSizeOptions();
+	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+
+	return (
+		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Gallery settings' ) }>
+					{ images.length > 1 && (
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ setColumnsNumber }
+							min={ 1 }
+							max={ Math.min( MAX_COLUMNS, images.length ) }
+							{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
+							required
+						/>
+					) }
+					<ToggleControl
+						label={ __( 'Crop images' ) }
+						checked={ !! imageCrop }
+						onChange={ toggleImageCrop }
+						help={ getImageCropHelp }
+					/>
+					<SelectControl
+						label={ __( 'Link to' ) }
+						value={ linkTo }
+						onChange={ setLinkTo }
+						options={ linkOptions }
+						hideCancelButton={ true }
+					/>
+					{ shouldShowSizeOptions && (
+						<SelectControl
+							label={ __( 'Image size' ) }
+							value={ sizeSlug }
+							options={ imageSizeOptions }
+							onChange={ updateImagesSize }
+							hideCancelButton={ true }
+						/>
+					) }
+				</PanelBody>
+			</InspectorControls>
+			{ noticeUI }
+			<Gallery
+				{ ...props }
+				selectedImage={ selectedImage }
+				mediaPlaceholder={ mediaPlaceholder }
+				onMoveBackward={ onMoveBackward }
+				onMoveForward={ onMoveForward }
+				onRemoveImage={ onRemoveImage }
+				onSelectImage={ onSelectImage }
+				onDeselectImage={ onDeselectImage }
+				onSetImageAttributes={ setImageAttributes }
+				blockProps={ blockProps }
+				// This prop is used by gallery.native.js.
+				onFocusGalleryCaption={ onFocusGalleryCaption }
+			/>
+		</>
+	);
+}
+
+export default compose( [
 	withNotices,
 	withViewportMatch( { isNarrow: '< small' } ),
 ] )( GalleryEdit );

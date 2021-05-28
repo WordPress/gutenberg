@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping the Gutenberg Navigation page.
+ * Bootstrapping the Gutenberg Navigation page.
  *
  * @package gutenberg
  */
@@ -32,70 +32,43 @@ function gutenberg_navigation_init( $hook ) {
 			return;
 	}
 
-	// Media settings.
-	$max_upload_size = wp_max_upload_size();
-	if ( ! $max_upload_size ) {
-		$max_upload_size = 0;
-	}
-
-	/** This filter is documented in wp-admin/includes/media.php */
-	$image_size_names = apply_filters(
-		'image_size_names_choose',
+	$settings = array_merge(
+		gutenberg_get_default_block_editor_settings(),
 		array(
-			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
-			'medium'    => __( 'Medium', 'gutenberg' ),
-			'large'     => __( 'Large', 'gutenberg' ),
-			'full'      => __( 'Full Size', 'gutenberg' ),
+			'blockNavMenus' => get_theme_support( 'block-nav-menus' ),
 		)
 	);
+	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
-	$available_image_sizes = array();
-	foreach ( $image_size_names as $image_size_slug => $image_size_name ) {
-		$available_image_sizes[] = array(
-			'slug' => $image_size_slug,
-			'name' => $image_size_name,
-		);
-	}
-
-	$settings = array(
-		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
-		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
-		'imageSizes'             => $available_image_sizes,
-		'isRTL'                  => is_rtl(),
-		'maxUploadFileSize'      => $max_upload_size,
-	);
-
-	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
-	list( $font_sizes, )    = (array) get_theme_support( 'editor-font-sizes' );
-
-	if ( false !== $color_palette ) {
-		$settings['colors'] = $color_palette;
-	}
-
-	if ( false !== $font_sizes ) {
-		$settings['fontSizes'] = $font_sizes;
-	}
-
-	wp_add_inline_script(
-		'wp-edit-navigation',
-		sprintf(
-			'wp.domReady( function() {
-				wp.editNavigation.initialize( "navigation-editor", %s );
-			} );',
-			wp_json_encode( gutenberg_experiments_editor_settings( $settings ) )
+	gutenberg_initialize_editor(
+		'navigation_editor',
+		'edit-navigation',
+		array(
+			'initializer_name' => 'initialize',
+			'editor_settings'  => $settings,
 		)
-	);
-
-	// Preload server-registered block schemas.
-	wp_add_inline_script(
-		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
 	);
 
 	wp_enqueue_script( 'wp-edit-navigation' );
 	wp_enqueue_style( 'wp-edit-navigation' );
-	wp_enqueue_style( 'wp-block-library' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-format-library' );
+	do_action( 'enqueue_block_editor_assets' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_navigation_init' );
+
+/**
+ * Tells the script loader to load the scripts and styles of custom block on navigation editor screen.
+ *
+ * @param bool $is_block_editor_screen Current decision about loading block assets.
+ * @return bool Filtered decision about loading block assets.
+ */
+function gutenberg_navigation_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
+	if ( is_callable( 'get_current_screen' ) && 'gutenberg_page_gutenberg-navigation' === get_current_screen()->base ) {
+		return true;
+	}
+
+	return $is_block_editor_screen;
+}
+
+add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_navigation_editor_load_block_editor_scripts_and_styles' );

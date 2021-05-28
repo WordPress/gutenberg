@@ -1,14 +1,15 @@
 {
 	"name": "@wordpress/components",
-	"version": "9.5.0",
+	"version": "14.1.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"components"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/components/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -17,20 +18,25 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"sideEffects": [
-		"build-style/**"
+		"build-style/**",
+		"src/**/*.scss"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
-		"@emotion/core": "^10.0.22",
+		"@babel/runtime": "^7.13.10",
+		"@emotion/cache": "^10.0.27",
+		"@emotion/core": "^10.1.1",
 		"@emotion/css": "^10.0.22",
-		"@emotion/native": "^10.0.22",
 		"@emotion/styled": "^10.0.23",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -43,20 +49,26 @@
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/warning": "file:../warning",
 		"classnames": "^2.2.5",
-		"clipboard": "^2.0.1",
 		"dom-scroll-into-view": "^1.2.1",
-		"downshift": "^4.0.5",
+		"downshift": "^6.0.15",
+		"emotion": "^10.0.23",
 		"gradient-parser": "^0.1.5",
-		"lodash": "^4.17.15",
+		"highlight-words-core": "^1.2.2",
+		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"moment": "^2.22.1",
-		"re-resizable": "^6.0.0",
+		"re-resizable": "^6.4.0",
 		"react-dates": "^17.1.1",
+		"react-resize-aware": "^3.1.0",
 		"react-spring": "^8.0.20",
-		"reakit": "^1.0.0-rc.0",
+		"react-use-gesture": "^9.0.0",
+		"reakit": "^1.3.5",
 		"rememo": "^3.0.0",
-		"tinycolor2": "^1.4.1",
-		"uuid": "^7.0.2"
+		"tinycolor2": "^1.4.2",
+		"uuid": "^8.3.0"
+	},
+	"peerDependencies": {
+		"reakit-utils": "^0.15.1"
 	},
 	"publishConfig": {
 		"access": "public"

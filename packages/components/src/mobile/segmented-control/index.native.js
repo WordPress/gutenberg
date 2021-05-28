@@ -6,7 +6,6 @@ import {
 	TouchableWithoutFeedback,
 	Text,
 	Platform,
-	LayoutAnimation,
 	Animated,
 	Easing,
 } from 'react-native';
@@ -20,13 +19,14 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { performLayoutAnimation } from '../layout-animation';
 import styles from './style.scss';
 
 const ANIMATION_DURATION = 200;
 
 const isIOS = Platform.OS === 'ios';
 
-const Segment = ( { isSelected, title, onPress, onLayout } ) => {
+const Segment = ( { isSelected, title, onPress, onLayout, ...props } ) => {
 	const isSelectedIOS = isIOS && isSelected;
 
 	const segmentStyle = [ styles.segment, isIOS && styles.segmentIOS ];
@@ -44,7 +44,7 @@ const Segment = ( { isSelected, title, onPress, onLayout } ) => {
 	return (
 		<View style={ isSelectedIOS && shadowStyle }>
 			<TouchableWithoutFeedback onPress={ onPress }>
-				<View style={ segmentStyle } onLayout={ onLayout }>
+				<View style={ segmentStyle } onLayout={ onLayout } { ...props }>
 					<Text
 						style={ [ textStyle, isSelected && selectedTextStyle ] }
 						maxFontSizeMultiplier={ 2 }
@@ -89,7 +89,7 @@ const SegmentedControls = ( {
 		styles.containerDark
 	);
 
-	function performAnimation( index ) {
+	function performSwatchAnimation( index ) {
 		Animated.timing( positionAnimationValue, {
 			toValue: calculateEndValue( index ),
 			duration: ANIMATION_DURATION,
@@ -113,16 +113,10 @@ const SegmentedControls = ( {
 	}
 
 	function onHandlePress( segment, index ) {
-		LayoutAnimation.configureNext(
-			LayoutAnimation.create(
-				ANIMATION_DURATION,
-				LayoutAnimation.Types.easeInEaseOut,
-				LayoutAnimation.Properties.opacity
-			)
-		);
+		performLayoutAnimation( ANIMATION_DURATION );
 		setActiveSegmentIndex( index );
 		segmentHandler( segment );
-		performAnimation( index, segment );
+		performSwatchAnimation( index );
 	}
 
 	function segmentOnLayout( event, index ) {
@@ -158,6 +152,14 @@ const SegmentedControls = ( {
 							onLayout={ ( event ) =>
 								segmentOnLayout( event, index )
 							}
+							accessibilityState={ {
+								selected: activeSegmentIndex === index,
+							} }
+							accessibilityRole={ 'button' }
+							accessibilityLabel={ segment }
+							accessibilityHint={ `${ index + 1 } on ${
+								segments.length
+							}` }
 						/>
 					);
 				} ) }

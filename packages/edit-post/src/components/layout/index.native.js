@@ -3,22 +3,23 @@
  */
 import { Platform, SafeAreaView, View } from 'react-native';
 import SafeArea from 'react-native-safe-area';
-import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import {
-	BottomSheetSettings,
-	__experimentalPageTemplatePicker,
-	__experimentalWithPageTemplatePicker,
-	FloatingToolbar,
-} from '@wordpress/block-editor';
+import { BottomSheetSettings, FloatingToolbar } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { HTMLTextInput, KeyboardAvoidingView } from '@wordpress/components';
-import { AutosaveMonitor } from '@wordpress/editor';
+import {
+	HTMLTextInput,
+	KeyboardAvoidingView,
+	NoticeList,
+	Tooltip,
+	__unstableAutocompletionItemsSlot as AutocompletionItemsSlot,
+} from '@wordpress/components';
+import { AutosaveMonitor, store as editorStore } from '@wordpress/editor';
+import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -27,6 +28,7 @@ import styles from './style.scss';
 import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
+import { store as editPostStore } from '../../store';
 
 class Layout extends Component {
 	constructor() {
@@ -76,7 +78,12 @@ class Layout extends Component {
 
 	setHeightState( event ) {
 		const { height } = event.nativeEvent.layout;
-		this.setState( { rootViewHeight: height }, sendNativeEditorDidLayout );
+		if ( height !== this.state.rootViewHeight ) {
+			this.setState(
+				{ rootViewHeight: height },
+				sendNativeEditorDidLayout
+			);
+		}
 	}
 
 	renderHTML() {
@@ -94,12 +101,7 @@ class Layout extends Component {
 	}
 
 	render() {
-		const {
-			getStylesFromColorScheme,
-			isTemplatePickerAvailable,
-			isTemplatePickerVisible,
-			mode,
-		} = this.props;
+		const { getStylesFromColorScheme, mode } = this.props;
 
 		const isHtmlView = mode === 'text';
 
@@ -117,48 +119,53 @@ class Layout extends Component {
 		};
 
 		return (
-			<SafeAreaView
-				style={ getStylesFromColorScheme(
-					styles.container,
-					styles.containerDark
-				) }
-				onLayout={ this.onRootViewLayout }
-			>
-				<AutosaveMonitor />
-				<View
+			<Tooltip.Slot>
+				<SafeAreaView
 					style={ getStylesFromColorScheme(
-						styles.background,
-						styles.backgroundDark
+						styles.container,
+						styles.containerDark
 					) }
+					onLayout={ this.onRootViewLayout }
 				>
-					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
-					{ ! isHtmlView && Platform.OS === 'android' && (
-						<FloatingToolbar />
-					) }
-				</View>
-				<View
-					style={ {
-						flex: 0,
-						flexBasis: marginBottom,
-						height: marginBottom,
-					} }
-				/>
-				{ ! isHtmlView && (
-					<KeyboardAvoidingView
-						parentHeight={ this.state.rootViewHeight }
-						style={ toolbarKeyboardAvoidingViewStyle }
-					>
-						{ isTemplatePickerAvailable && (
-							<__experimentalPageTemplatePicker
-								visible={ isTemplatePickerVisible }
-							/>
+					<AutosaveMonitor disableIntervalChecks />
+					<View
+						style={ getStylesFromColorScheme(
+							styles.background,
+							styles.backgroundDark
 						) }
-						{ Platform.OS === 'ios' && <FloatingToolbar /> }
-						<Header />
-						<BottomSheetSettings />
-					</KeyboardAvoidingView>
-				) }
-			</SafeAreaView>
+					>
+						{ isHtmlView ? this.renderHTML() : this.renderVisual() }
+						{ ! isHtmlView && Platform.OS === 'android' && (
+							<FloatingToolbar />
+						) }
+						<NoticeList />
+					</View>
+					<View
+						style={ {
+							flex: 0,
+							flexBasis: marginBottom,
+							height: marginBottom,
+						} }
+					/>
+					{ ! isHtmlView && (
+						<KeyboardAvoidingView
+							parentHeight={ this.state.rootViewHeight }
+							style={ toolbarKeyboardAvoidingViewStyle }
+							withAnimatedHeight
+						>
+							{ Platform.OS === 'ios' && (
+								<>
+									<AutocompletionItemsSlot />
+									<FloatingToolbar />
+								</>
+							) }
+							<Header />
+							<BottomSheetSettings />
+						</KeyboardAvoidingView>
+					) }
+					{ Platform.OS === 'android' && <AutocompletionItemsSlot /> }
+				</SafeAreaView>
+			</Tooltip.Slot>
 		);
 	}
 }
@@ -166,15 +173,13 @@ class Layout extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { __unstableIsEditorReady: isEditorReady } = select(
-			'core/editor'
+			editorStore
 		);
-		const { getEditorMode } = select( 'core/edit-post' );
-
+		const { getEditorMode } = select( editPostStore );
 		return {
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
 		};
 	} ),
 	withPreferredColorScheme,
-	__experimentalWithPageTemplatePicker,
 ] )( Layout );

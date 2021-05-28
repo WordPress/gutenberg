@@ -14,26 +14,67 @@
 
 .editor-post-publish-panel__header {
 	background: $white;
-	padding-left: $grid-unit-10;
-	padding-right: $grid-unit-10;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
 	height: $header-height + $border-width;
-	border-bottom: $border-width solid $light-gray-500;
+	border-bottom: $border-width solid $gray-300;
 	display: flex;
 	align-items: center;
 	align-content: space-between;
 
-	.components-button.has-icon {
-		position: absolute;
-		right: $grid-unit-10;
+	.components-button {
+		width: 100%;
+		justify-content: center;
+	}
+
+	.has-icon {
+		margin-left: auto;
+		width: auto;
+	}
+}
+
+.components-site-card {
+	display: flex;
+	align-items: center;
+	margin: $grid-unit-20 0;
+}
+
+.components-site-icon {
+	border: none;
+	border-radius: $radius-block-ui;
+	margin-right: $grid-unit-15;
+
+	// Same size as in the Site menu.
+	height: 36px;
+	width: 36px;
+}
+
+.components-site-name {
+	display: block;
+	font-size: 14px;
+}
+
+.components-site-home {
+	display: block;
+	color: $gray-700;
+	font-size: $helptext-font-size;
+}
+
+.editor-post-publish-panel__header-publish-button,
+.editor-post-publish-panel__header-cancel-button {
+	flex-grow: 1;
+
+	@include break-mobile() {
+		max-width: $admin-sidebar-width;
 	}
 }
 
 .editor-post-publish-panel__header-publish-button {
-	display: flex;
-	justify-content: flex-end;
-	flex-grow: 1;
-	text-align: right;
-	flex-wrap: nowrap;
+	padding-right: $grid-unit-05;
+}
+
+.editor-post-publish-panel__header-cancel-button {
+	padding-left: $grid-unit-05;
 }
 
 .editor-post-publish-panel__header-published {
@@ -66,7 +107,7 @@
 	padding: 16px;
 
 	strong {
-		color: $dark-gray-900;
+		color: $gray-900;
 	}
 
 	.components-panel__body {
@@ -81,7 +122,7 @@
 }
 
 .post-publish-panel__postpublish .components-panel__body {
-	border-bottom: $border-width solid $light-gray-500;
+	border-bottom: $border-width solid $gray-200;
 	border-top: none;
 }
 
@@ -115,7 +156,7 @@
 
 	input[readonly] {
 		padding: 10px;
-		background: $light-gray-400;
+		background: $gray-300;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}

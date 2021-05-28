@@ -1,19 +1,26 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/notices';
+import {
+	registerBlockType,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+} from '@wordpress/blocks';
 import { render } from '@wordpress/element';
 import {
 	registerCoreBlocks,
+	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
+import { registerLegacyWidgetVariations } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
  */
-import './hooks';
-import EditWidgetsInitializer from './components/edit-widgets-initializer';
-import CustomizerEditWidgetsInitializer from './components/customizer-edit-widgets-initializer';
+import './store';
+import './filters';
+import * as widgetArea from './blocks/widget-area';
+import Layout from './components/layout';
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -22,29 +29,36 @@ import CustomizerEditWidgetsInitializer from './components/customizer-edit-widge
  * @param {Object} settings Block editor settings.
  */
 export function initialize( id, settings ) {
-	registerCoreBlocks();
+	const coreBlocks = __experimentalGetCoreBlocks().filter(
+		( block ) => ! [ 'core/more' ].includes( block.name )
+	);
+	registerCoreBlocks( coreBlocks );
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks();
 	}
+	registerLegacyWidgetVariations( settings );
+	registerBlock( widgetArea );
+	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
+		fetchLinkSuggestions( search, searchOptions, settings );
 	render(
-		<EditWidgetsInitializer settings={ settings } />,
+		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
 	);
 }
 
 /**
- * Initializes the block editor in the widgets Customizer section.
+ * Function to register an individual block.
  *
- * @param {string} id       ID of the root element to render the section in.
- * @param {Object} settings Block editor settings.
+ * @param {Object} block The block to be registered.
+ *
  */
-export function customizerInitialize( id, settings ) {
-	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+const registerBlock = ( block ) => {
+	if ( ! block ) {
+		return;
 	}
-	render(
-		<CustomizerEditWidgetsInitializer settings={ settings } />,
-		document.getElementById( id )
-	);
-}
+	const { metadata, settings, name } = block;
+	if ( metadata ) {
+		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } );
+	}
+	registerBlockType( name, settings );
+};

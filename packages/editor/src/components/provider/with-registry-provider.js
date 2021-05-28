@@ -14,7 +14,6 @@ import { storeConfig as blockEditorStoreConfig } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { storeConfig } from '../../store';
-import applyMiddlewares from '../../store/middlewares';
 
 const withRegistryProvider = createHigherOrderComponent(
 	( WrappedComponent ) =>
@@ -36,12 +35,7 @@ const withRegistryProvider = createHigherOrderComponent(
 					},
 					registry
 				);
-				const store = newRegistry.registerStore(
-					'core/editor',
-					storeConfig
-				);
-				// This should be removed after the refactoring of the effects to controls.
-				applyMiddlewares( store );
+				newRegistry.registerStore( 'core/editor', storeConfig );
 				setSubRegistry( newRegistry );
 			}, [ registry ] );
 

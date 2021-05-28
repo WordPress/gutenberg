@@ -31,7 +31,7 @@ const addThreeParagraphsToNewPost = async () => {
  * see: https://github.com/WordPress/gutenberg/pull/14908#discussion_r284725956
  */
 const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
-	await clickBlockToolbarButton( 'More options' );
+	await clickBlockToolbarButton( 'Options' );
 
 	let isRemoveButton = false;
 
@@ -45,7 +45,7 @@ const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
 		await page.keyboard.press( 'Tab' );
 
 		isRemoveButton = await page.evaluate( () => {
-			return document.activeElement.innerText.includes( 'Remove Block' );
+			return document.activeElement.innerText.includes( 'Remove block' );
 		} );
 
 		// Stop looping once we find the button
@@ -66,11 +66,6 @@ describe( 'block deletion -', () => {
 		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
 			// The blocks can't be empty to trigger the toolbar
 			await page.keyboard.type( 'Paragraph to remove' );
-
-			// Move the mouse to show the block toolbar
-			await page.mouse.move( 0, 0 );
-			await page.mouse.move( 10, 10 );
-
 			await clickOnBlockSettingsMenuRemoveBlockButton();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -109,6 +104,9 @@ describe( 'block deletion -', () => {
 		it( 'results in three remaining blocks and positions the caret at the end of the third block', async () => {
 			// Add an image block since it's easier to click the wrapper on non-textual blocks.
 			await page.keyboard.type( '/image' );
+			await page.waitForXPath(
+				`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Image')]`
+			);
 			await page.keyboard.press( 'Enter' );
 
 			// Click on something that's not a block.
@@ -156,11 +154,6 @@ describe( 'deleting all blocks', () => {
 	it( 'results in the default block getting selected', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
-
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
-
 		await clickOnBlockSettingsMenuRemoveBlockButton();
 
 		// There is a default block:
@@ -196,6 +189,7 @@ describe( 'deleting all blocks', () => {
 
 		// Add and remove a block.
 		await insertBlock( 'Image' );
+		await page.waitForSelector( 'figure[data-type="core/image"]' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Verify there is no selected block.

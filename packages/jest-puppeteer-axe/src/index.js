@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import AxePuppeteer from 'axe-puppeteer';
+import AxePuppeteer from '@axe-core/puppeteer';
 
 /** @typedef {import('puppeteer').Page} Page */
 
@@ -60,7 +60,7 @@ function formatViolations( violations ) {
  * @see https://www.deque.com/axe/
  * It is possible to pass optional Axe API options to perform customized check.
  *
- * @see https://github.com/dequelabs/axe-puppeteer
+ * @see https://github.com/dequelabs/axe-core-npm/tree/develop/packages/puppeteer
  *
  * @param {Page}          page                 Puppeteer's page instance.
  * @param {?Object}       params               Optional params that allow better control over Axe API.
@@ -70,9 +70,9 @@ function formatViolations( violations ) {
  *                                             to exclude from analysis.
  * @param {?Array}        params.disabledRules The list of Axe rules to skip from verification.
  * @param {?RunOptions}   params.options       A flexible way to configure how Axe run operates,
- *                                             see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter.
+ *                                             see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#options-parameter.
  * @param {?Spec}         params.config        Axe configuration object,
- *                                             see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#api-name-axeconfigure.
+ *                                             see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#api-name-axeconfigure.
  *
  * @return {Object} A matcher object with two keys `pass` and `message`.
  */

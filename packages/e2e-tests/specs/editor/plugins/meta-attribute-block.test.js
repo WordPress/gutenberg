@@ -41,6 +41,7 @@ describe( 'Block with a meta attribute', () => {
 
 				await saveDraft();
 				await page.reload();
+				await page.waitForSelector( '.edit-post-layout' );
 
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 				const persistedValue = await page.evaluate(
@@ -86,6 +87,7 @@ describe( 'Block with a meta attribute', () => {
 
 				await saveDraft();
 				await page.reload();
+				await page.waitForSelector( '.edit-post-layout' );
 
 				expect( await getEditedPostContent() ).toMatchSnapshot();
 				const persistedValue = await page.evaluate(

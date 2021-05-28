@@ -118,7 +118,7 @@
  */
 
 @mixin block-toolbar-button-style__focus() {
-	box-shadow: inset 0 0 0 $border-width-focus $theme-color, inset 0 0 0 4px $white;
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 4px $white;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
@@ -129,14 +129,14 @@
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $medium-gray-text;
+	border: $border-width solid $gray-700;
 	@include reduce-motion("transition");
 }
 
 
 @mixin input-style__focus() {
-	border-color: color($theme-color);
-	box-shadow: 0 0 0 ($border-width-focus - $border-width) $theme-color;
+	border-color: var(--wp-admin-theme-color);
+	box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
@@ -175,20 +175,6 @@
 		}
 	}
 
-	/* Mobile menu opened. */
-	@media (max-width: #{ ($break-medium + 1) }) {
-		.auto-fold .wp-responsive-open #{$selector} {
-			left: $admin-sidebar-width-big;
-		}
-	}
-
-	/* In small screens with responsive menu expanded there is small white space. */
-	@media (max-width: #{ ($break-small) }) {
-		.auto-fold .wp-responsive-open #{$selector} {
-			margin-left: -18px;
-		}
-	}
-
 	body.is-fullscreen-mode #{$selector} {
 		left: 0 !important;
 	}
@@ -205,9 +191,13 @@
 }
 
 @mixin caption-style-theme() {
-	color: $dark-gray-500;
+	color: #555;
 	font-size: $default-font-size;
 	text-align: center;
+
+	.is-dark-theme & {
+		color: $light-gray-placeholder;
+	}
 }
 
 
@@ -220,22 +210,179 @@
 	@if $property == "transition" {
 		@media (prefers-reduced-motion: reduce) {
 			transition-duration: 0s;
+			transition-delay: 0s;
 		}
 	}
 
 	@else if $property == "animation" {
 		@media (prefers-reduced-motion: reduce) {
 			animation-duration: 1ms;
+			animation-delay: 0s;
 		}
 	}
 
 	@else {
 		@media (prefers-reduced-motion: reduce) {
 			transition-duration: 0s;
+			transition-delay: 0s;
 			animation-duration: 1ms;
+			animation-delay: 0s;
 		}
 	}
 
+}
+
+@mixin input-control {
+	font-family: $default-font;
+	padding: 6px 8px;
+	@include input-style__neutral();
+
+	/* Fonts smaller than 16px causes mobile safari to zoom. */
+	font-size: $mobile-text-min-font-size;
+	/* Override core line-height. To be reviewed. */
+	line-height: normal;
+	@include break-small {
+		font-size: $default-font-size;
+		/* Override core line-height. To be reviewed. */
+		line-height: normal;
+	}
+
+	&:focus {
+		@include input-style__focus();
+	}
+
+	// Use opacity to work in various editor styles.
+	&::-webkit-input-placeholder {
+		color: $dark-gray-placeholder;
+	}
+
+	&::-moz-placeholder {
+		opacity: 1; // Necessary because Firefox reduces this from 1.
+		color: $dark-gray-placeholder;
+	}
+
+	&:-ms-input-placeholder {
+		color: $dark-gray-placeholder;
+	}
+
+	.is-dark-theme & {
+		&::-webkit-input-placeholder {
+			color: $light-gray-placeholder;
+		}
+
+		&::-moz-placeholder {
+			opacity: 1; // Necessary because Firefox reduces this from 1.
+			color: $light-gray-placeholder;
+		}
+
+		&:-ms-input-placeholder {
+			color: $light-gray-placeholder;
+		}
+	}
+}
+
+@mixin checkbox-control {
+	@include input-control;
+	border: $border-width solid $gray-900;
+	margin-right: $grid-unit-15;
+	transition: none;
+	border-radius: $radius-block-ui;
+
+	&:focus {
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	&:checked {
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+
+		// Hide default checkbox styles in IE.
+		&::-ms-check {
+			opacity: 0;
+		}
+	}
+
+	&:checked::before,
+	&[aria-checked="mixed"]::before {
+		margin: -3px -5px;
+		color: $white;
+
+		@include break-medium() {
+			margin: -4px 0 0 -5px;
+		}
+	}
+
+	&[aria-checked="mixed"] {
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+
+		&::before {
+			// Inherited from `forms.css`.
+			// See: https://github.com/WordPress/wordpress-develop/tree/5.1.1/src/wp-admin/css/forms.css#L122-L132
+			content: "\f460";
+			float: left;
+			display: inline-block;
+			vertical-align: middle;
+			width: 16px;
+			/* stylelint-disable */
+			font: normal 30px/1 dashicons;
+			/* stylelint-enable */
+			speak: none;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+
+			@include break-medium() {
+				float: none;
+				font-size: 21px;
+			}
+		}
+	}
+}
+
+@mixin radio-control {
+	@include input-control;
+	border: $border-width solid $gray-900;
+	margin-right: $grid-unit-15;
+	transition: none;
+	border-radius: $radius-round;
+	width: $radio-input-size-sm;
+	height: $radio-input-size-sm;
+
+	@include break-small() {
+		height: $radio-input-size;
+		width: $radio-input-size;
+	}
+
+	&:checked::before {
+		box-sizing: inherit;
+		width: 8px;
+		height: 8px;
+		transform: translate(7px, 7px);
+		margin: 0;
+		background-color: $white;
+
+		// This border serves as a background color in Windows High Contrast mode.
+		border: 4px solid $white;
+
+		@include break-small() {
+			transform: translate(5px, 5px);
+		}
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus) var(--wp-admin-theme-color);
+
+		// Only visible in Windows High Contrast mode.
+		outline: 2px solid transparent;
+	}
+
+	&:checked {
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+	}
 }
 
 /**
@@ -249,177 +396,6 @@
 	*::before,
 	*::after {
 		box-sizing: inherit;
-	}
-
-	.input-control, // Upstream name is `.regular-text`.
-	input[type="text"],
-	input[type="search"],
-	input[type="radio"],
-	input[type="tel"],
-	input[type="time"],
-	input[type="url"],
-	input[type="week"],
-	input[type="password"],
-	input[type="checkbox"],
-	input[type="color"],
-	input[type="date"],
-	input[type="datetime"],
-	input[type="datetime-local"],
-	input[type="email"],
-	input[type="month"],
-	input[type="number"],
-	select,
-	textarea {
-		font-family: $default-font;
-		padding: 6px 8px;
-		@include input-style__neutral();
-
-		/* Fonts smaller than 16px causes mobile safari to zoom. */
-		font-size: $mobile-text-min-font-size;
-		/* Override core line-height. To be reviewed. */
-		line-height: normal;
-		@include break-small {
-			font-size: $default-font-size;
-			/* Override core line-height. To be reviewed. */
-			line-height: normal;
-		}
-
-		&:focus {
-			@include input-style__focus();
-		}
-	}
-
-	input[type="number"] {
-		padding-left: 4px;
-		padding-right: 4px;
-	}
-
-	select {
-		padding: 3px 24px 3px 8px;
-		font-size: $default-font-size;
-		color: $dark-gray-500;
-
-		&:focus {
-			border-color: $blue-medium-600;
-			// Windows High Contrast mode will show this outline
-			outline: 2px solid transparent;
-			outline-offset: 0;
-		}
-	}
-
-	input[type="checkbox"],
-	input[type="radio"] {
-		border: $border-width + 1 solid $medium-gray-text;
-		margin-right: $grid-unit-15;
-		transition: none;
-
-		&:focus {
-			border-color: $medium-gray-text;
-			box-shadow: 0 0 0 1px $medium-gray-text;
-		}
-
-		&:checked {
-			background: theme(toggle);
-			border-color: theme(toggle);
-		}
-
-		&:checked:focus {
-			box-shadow: 0 0 0 $border-width-focus $medium-gray-text;
-		}
-	}
-
-	input[type="checkbox"] {
-		border-radius: $radius-block-ui;
-
-		&:checked::before,
-		&[aria-checked="mixed"]::before {
-			margin: -3px -5px;
-			color: $white;
-
-			@include break-medium() {
-				margin: -4px 0 0 -5px;
-			}
-		}
-
-		&[aria-checked="mixed"] {
-			background: theme(toggle);
-			border-color: theme(toggle);
-
-			&::before {
-				// Inherited from `forms.css`.
-				// See: https://github.com/WordPress/wordpress-develop/tree/5.1.1/src/wp-admin/css/forms.css#L122-L132
-				content: "\f460";
-				float: left;
-				display: inline-block;
-				vertical-align: middle;
-				width: 16px;
-				/* stylelint-disable */
-				font: normal 30px/1 dashicons;
-				/* stylelint-enable */
-				speak: none;
-				-webkit-font-smoothing: antialiased;
-				-moz-osx-font-smoothing: grayscale;
-
-				@include break-medium() {
-					float: none;
-					font-size: 21px;
-				}
-			}
-
-			&:focus {
-				box-shadow: 0 0 0 $border-width-focus $dark-gray-500;
-			}
-		}
-	}
-
-	// We provide explicit pixel dimensions to ensure a crisp appearance.
-	// This radio button style should be ported upstream.
-	input[type="radio"] {
-		border-radius: $radius-round;
-
-		&:checked::before {
-			width: 6px;
-			height: 6px;
-			margin: 6px 0 0 6px;
-			background-color: $white;
-
-			@include break-medium() {
-				margin: 3px 0 0 3px;
-			}
-		}
-	}
-
-	// Placeholder colors
-	input,
-	textarea {
-		// Use opacity to work in various editor styles.
-		&::-webkit-input-placeholder {
-			color: $dark-opacity-300;
-		}
-
-		&::-moz-placeholder {
-			opacity: 1; // Necessary because Firefox reduces this from 1.
-			color: $dark-opacity-300;
-		}
-
-		&:-ms-input-placeholder {
-			color: $dark-opacity-300;
-		}
-
-		.is-dark-theme & {
-			&::-webkit-input-placeholder {
-				color: $light-opacity-300;
-			}
-
-			&::-moz-placeholder {
-				opacity: 1; // Necessary because Firefox reduces this from 1.
-				color: $light-opacity-300;
-			}
-
-			&:-ms-input-placeholder {
-				color: $light-opacity-300;
-			}
-		}
 	}
 }
 
@@ -461,4 +437,251 @@
 		width: auto;
 		max-width: 100%;
 	}
+}
+
+@mixin admin-scheme($color-primary) {
+	--wp-admin-theme-color: #{$color-primary};
+
+	// Darker shades.
+	--wp-admin-theme-color-darker-10: #{darken($color-primary, 5%)};
+	--wp-admin-theme-color-darker-20: #{darken($color-primary, 10%)};
+
+	// Focus style width.
+	// Avoid rounding issues by showing a whole 2px for 1x screens, and 1.5px on high resolution screens.
+	--wp-admin-border-width-focus: 2px;
+	@media ( -webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+		--wp-admin-border-width-focus: 1.5px;
+	}
+}
+
+@mixin wordpress-admin-schemes() {
+	body.admin-color-light {
+		@include admin-scheme(#0085ba);
+	}
+
+	body.admin-color-modern {
+		@include admin-scheme(#3858e9);
+	}
+
+	body.admin-color-blue {
+		@include admin-scheme(#096484);
+	}
+
+	body.admin-color-coffee {
+		@include admin-scheme(#46403c);
+	}
+
+	body.admin-color-ectoplasm {
+		@include admin-scheme(#523f6d);
+	}
+
+	body.admin-color-midnight {
+		@include admin-scheme(#e14d43);
+	}
+
+	body.admin-color-ocean {
+		@include admin-scheme(#627c83);
+	}
+
+	body.admin-color-sunrise {
+		@include admin-scheme(#dd823b);
+	}
+}
+
+@mixin background-colors() {
+	.has-pale-pink-background-color {
+		background-color: #f78da7;
+	}
+
+	.has-vivid-red-background-color {
+		background-color: #cf2e2e;
+	}
+
+	.has-luminous-vivid-orange-background-color {
+		background-color: #ff6900;
+	}
+
+	.has-luminous-vivid-amber-background-color {
+		background-color: #fcb900;
+	}
+
+	.has-light-green-cyan-background-color {
+		background-color: #7bdcb5;
+	}
+
+	.has-vivid-green-cyan-background-color {
+		background-color: #00d084;
+	}
+
+	.has-pale-cyan-blue-background-color {
+		background-color: #8ed1fc;
+	}
+
+	.has-vivid-cyan-blue-background-color {
+		background-color: #0693e3;
+	}
+
+	.has-vivid-purple-background-color {
+		background-color: #9b51e0;
+	}
+
+	.has-white-background-color {
+		background-color: #fff;
+	}
+
+	// Deprecated from UI, kept for back-compat.
+	.has-very-light-gray-background-color {
+		background-color: #eee;
+	}
+
+	.has-cyan-bluish-gray-background-color {
+		background-color: #abb8c3;
+	}
+
+	// Deprecated from UI, kept for back-compat.
+	.has-very-dark-gray-background-color {
+		background-color: #313131;
+	}
+
+	.has-black-background-color {
+		background-color: #000;
+	}
+}
+
+@mixin foreground-colors() {
+	.has-pale-pink-color {
+		color: #f78da7;
+	}
+
+	.has-vivid-red-color {
+		color: #cf2e2e;
+	}
+
+	.has-luminous-vivid-orange-color {
+		color: #ff6900;
+	}
+
+	.has-luminous-vivid-amber-color {
+		color: #fcb900;
+	}
+
+	.has-light-green-cyan-color {
+		color: #7bdcb5;
+	}
+
+	.has-vivid-green-cyan-color {
+		color: #00d084;
+	}
+
+	.has-pale-cyan-blue-color {
+		color: #8ed1fc;
+	}
+
+	.has-vivid-cyan-blue-color {
+		color: #0693e3;
+	}
+
+	.has-vivid-purple-color {
+		color: #9b51e0;
+	}
+
+	.has-white-color {
+		color: #fff;
+	}
+
+	// Deprecated from UI, kept for back-compat.
+	.has-very-light-gray-color {
+		color: #eee;
+	}
+
+	.has-cyan-bluish-gray-color {
+		color: #abb8c3;
+	}
+
+	// Deprecated from UI, kept for back-compat.
+	.has-very-dark-gray-color {
+		color: #313131;
+	}
+
+	.has-black-color {
+		color: #000;
+	}
+}
+
+@mixin gradient-colors() {
+	// Our classes uses the same values we set for gradient value attributes, and we can not use spacing because of WP multi site kses rule.
+
+	/* stylelint-disable function-comma-space-after */
+	.has-vivid-cyan-blue-to-vivid-purple-gradient-background {
+		background: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);
+	}
+
+	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
+		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
+	}
+
+	.has-light-green-cyan-to-vivid-green-cyan-gradient-background {
+		background: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);
+	}
+
+	.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background {
+		background: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);
+	}
+
+	.has-luminous-vivid-orange-to-vivid-red-gradient-background {
+		background: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);
+	}
+
+	.has-very-light-gray-to-cyan-bluish-gray-gradient-background {
+		background: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);
+	}
+
+	.has-cool-to-warm-spectrum-gradient-background {
+		background: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);
+	}
+
+	.has-blush-light-purple-gradient-background {
+		background: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);
+	}
+
+	.has-blush-bordeaux-gradient-background {
+		background: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);
+	}
+
+	.has-purple-crush-gradient-background {
+		background: linear-gradient(135deg,rgb(52,226,228) 0%,rgb(71,33,251) 50%,rgb(171,29,254) 100%);
+	}
+
+	.has-luminous-dusk-gradient-background {
+		background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);
+	}
+
+	.has-hazy-dawn-gradient-background {
+		background: linear-gradient(135deg,rgb(250,172,168) 0%,rgb(218,208,236) 100%);
+	}
+
+	.has-pale-ocean-gradient-background {
+		background: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);
+	}
+
+	.has-electric-grass-gradient-background {
+		background: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);
+	}
+
+	.has-subdued-olive-gradient-background {
+		background: linear-gradient(135deg,rgb(250,250,225) 0%,rgb(103,166,113) 100%);
+	}
+
+	.has-atomic-cream-gradient-background {
+		background: linear-gradient(135deg,rgb(253,215,154) 0%,rgb(0,74,89) 100%);
+	}
+
+	.has-nightshade-gradient-background {
+		background: linear-gradient(135deg,rgb(51,9,104) 0%,rgb(49,205,207) 100%);
+	}
+
+	.has-midnight-gradient-background {
+		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
+	}
+	/* stylelint-enable function-comma-space-after */
 }

@@ -26,6 +26,10 @@ const { Consumer, Provider } = createContext( () => {} );
  * </BlockContentProvider>
  * ```
  *
+ * @param {Object}    props             Component props.
+ * @param {WPElement} props.children    Block save result.
+ * @param {Array}     props.innerBlocks Block(s) to serialize.
+ *
  * @return {WPComponent} Element with BlockContent injected via context.
  */
 const BlockContentProvider = ( { children, innerBlocks } ) => {

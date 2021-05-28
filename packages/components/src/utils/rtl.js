@@ -4,28 +4,15 @@
 import { css } from '@emotion/core';
 import { mapKeys } from 'lodash';
 
+/**
+ * WordPress dependencies
+ */
+import { isRTL } from '@wordpress/i18n';
+
 const LOWER_LEFT_REGEXP = new RegExp( /-left/g );
 const LOWER_RIGHT_REGEXP = new RegExp( /-right/g );
 const UPPER_LEFT_REGEXP = new RegExp( /Left/g );
 const UPPER_RIGHT_REGEXP = new RegExp( /Right/g );
-
-/**
- * Checks to see whether the document is set to rtl.
- *
- * @return {boolean} Whether document is RTL.
- */
-function getRtl() {
-	return !! ( document && document.documentElement.dir === 'rtl' );
-}
-
-/**
- * Simple hook to retrieve RTL direction value
- *
- * @return {boolean} Whether document is RTL.
- */
-export function useRtl() {
-	return getRtl();
-}
 
 /**
  * Flips a CSS property from left <-> right.
@@ -65,9 +52,9 @@ function getConvertedKey( key ) {
 /**
  * An incredibly basic ltr -> rtl converter for style properties
  *
- * @param {Object} ltrStyles
+ * @param {import('react').CSSProperties} ltrStyles
  *
- * @return {Object} Converted ltr -> rtl styles
+ * @return {import('react').CSSProperties} Converted ltr -> rtl styles
  */
 export const convertLTRToRTL = ( ltrStyles = {} ) => {
 	return mapKeys( ltrStyles, ( _value, key ) => getConvertedKey( key ) );
@@ -76,19 +63,19 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
 /**
  * A higher-order function that create an incredibly basic ltr -> rtl style converter for CSS objects.
  *
- * @param {Object} ltrStyles Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
- * @param {null|Object} rtlStyles Rtl styles. Renders if provided.
+ * @param {import('react').CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
+ * @param {import('react').CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
  *
  * @return {Function} A function to output CSS styles for Emotion's renderer
  */
 export function rtl( ltrStyles = {}, rtlStyles ) {
 	return () => {
-		const isRtl = getRtl();
-
 		if ( rtlStyles ) {
-			return isRtl ? css( rtlStyles ) : css( ltrStyles );
+			// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+			return isRTL() ? css( rtlStyles ) : css( ltrStyles );
 		}
 
-		return isRtl ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
+		// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+		return isRTL() ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
 	};
 }

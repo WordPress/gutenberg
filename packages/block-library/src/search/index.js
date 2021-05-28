@@ -1,25 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { search as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import metadata from './block.json';
 import edit from './edit';
+import variations from './variations';
 
-export const name = 'core/search';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
-	title: __( 'Search' ),
-	description: __( 'Help visitors find your content.' ),
 	icon,
-	category: 'widgets',
-	keywords: [ __( 'find' ) ],
-	supports: {
-		align: true,
-	},
 	example: {},
+	variations,
 	edit,
 };

@@ -8,17 +8,12 @@
 	border-color: $gray-70;
 }
 
-.colorIndicator {
-	width: 24px;
-	height: 24px;
-}
-
 .footer {
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
 	align-content: center;
-	padding: 12px $panel-padding;
+	padding: 12px $grid-unit-20;
 }
 
 .colorIndicator {

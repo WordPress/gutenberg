@@ -11,70 +11,273 @@
  */
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.
-	$blocks_dir = dirname( __FILE__ ) . '/../build/block-library/blocks/';
-	if ( ! file_exists( $blocks_dir ) ) {
-		return;
-	}
-
-	$block_names = array(
-		'archives.php'        => 'core/archives',
-		'block.php'           => 'core/block',
-		'calendar.php'        => 'core/calendar',
-		'categories.php'      => 'core/categories',
-		'latest-comments.php' => 'core/latest-comments',
-		'latest-posts.php'    => 'core/latest-posts',
-		'legacy-widget.php'   => 'core/legacy-widget',
-		'navigation.php'      => 'core/navigation',
-		'rss.php'             => 'core/rss',
-		'shortcode.php'       => 'core/shortcode',
-		'search.php'          => 'core/search',
-		'social-link.php'     => 'core/social-link',
-		'tag-cloud.php'       => 'core/tag-cloud',
+	$blocks_dirs = array(
+		__DIR__ . '/../build/block-library/blocks/' => array(
+			'block_folders' => array(
+				'audio',
+				'button',
+				'buttons',
+				'freeform',
+				'code',
+				'column',
+				'columns',
+				'cover',
+				'gallery',
+				'group',
+				'heading',
+				'html',
+				'home-link',
+				'image',
+				'list',
+				'media-text',
+				'missing',
+				'more',
+				'navigation-link',
+				'nextpage',
+				'paragraph',
+				'preformatted',
+				'pullquote',
+				'quote',
+				'separator',
+				'social-links',
+				'spacer',
+				'table',
+				// 'table-of-contents',
+				'text-columns',
+				'verse',
+				'video',
+				'embed',
+			),
+			'block_names'   => array(
+				'archives.php'                  => 'core/archives',
+				'block.php'                     => 'core/block',
+				'calendar.php'                  => 'core/calendar',
+				'categories.php'                => 'core/categories',
+				'file.php'                      => 'core/file',
+				'latest-comments.php'           => 'core/latest-comments',
+				'latest-posts.php'              => 'core/latest-posts',
+				'legacy-widget.php'             => 'core/legacy-widget',
+				'loginout.php'                  => 'core/loginout',
+				'navigation.php'                => 'core/navigation',
+				'navigation-link.php'           => 'core/navigation-link',
+				'home-link.php'                 => 'core/home-link',
+				'rss.php'                       => 'core/rss',
+				'search.php'                    => 'core/search',
+				'shortcode.php'                 => 'core/shortcode',
+				'social-link.php'               => 'core/social-link',
+				'tag-cloud.php'                 => 'core/tag-cloud',
+				'page-list.php'                 => 'core/page-list',
+				'post-author.php'               => 'core/post-author',
+				'post-comment.php'              => 'core/post-comment',
+				'post-comment-author.php'       => 'core/post-comment-author',
+				'post-comment-content.php'      => 'core/post-comment-content',
+				'post-comment-date.php'         => 'core/post-comment-date',
+				'post-comments.php'             => 'core/post-comments',
+				'post-comments-count.php'       => 'core/post-comments-count',
+				'post-comments-form.php'        => 'core/post-comments-form',
+				'post-comments-link.php'        => 'core/post-comments-link',
+				'post-content.php'              => 'core/post-content',
+				'post-date.php'                 => 'core/post-date',
+				'post-excerpt.php'              => 'core/post-excerpt',
+				'post-featured-image.php'       => 'core/post-featured-image',
+				'post-terms.php'                => 'core/post-terms',
+				'post-navigation-link.php'      => 'core/post-navigation-link',
+				'post-title.php'                => 'core/post-title',
+				'query.php'                     => 'core/query',
+				'query-loop.php'                => 'core/query-loop',
+				'query-title.php'               => 'core/query-title',
+				'query-pagination.php'          => 'core/query-pagination',
+				'query-pagination-next.php'     => 'core/query-pagination-next',
+				'query-pagination-numbers.php'  => 'core/query-pagination-numbers',
+				'query-pagination-previous.php' => 'core/query-pagination-previous',
+				'site-logo.php'                 => 'core/site-logo',
+				'site-tagline.php'              => 'core/site-tagline',
+				'site-title.php'                => 'core/site-title',
+				// 'table-of-contents.php'         => 'core/table-of-contents',
+				'template-part.php'             => 'core/template-part',
+				'term-description.php'          => 'core/term-description',
+			),
+		),
+		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
+			'block_folders' => array(
+				'widget-area',
+			),
+			'block_names'   => array(
+				'widget-area.php' => 'core/widget-area',
+			),
+		),
 	);
+	foreach ( $blocks_dirs as $blocks_dir => $details ) {
+		$block_folders = $details['block_folders'];
+		$block_names   = $details['block_names'];
 
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
-		$block_names = array_merge(
-			$block_names,
-			array(
-				'post-title.php'          => 'core/post-title',
-				'post-content.php'        => 'core/post-content',
-				'post-author.php'         => 'core/post-author',
-				'post-comments.php'       => 'core/post-comments',
-				'post-comments-count.php' => 'core/post-comments-count',
-				'post-comments-form.php'  => 'core/post-comments-form',
-				'post-date.php'           => 'core/post-date',
-				'post-excerpt.php'        => 'core/post-excerpt',
-				'post-featured-image.php' => 'core/post-featured-image',
-				'post-tags.php'           => 'core/post-tags',
-				'site-title.php'          => 'core/site-title',
-				'template-part.php'       => 'core/template-part',
-			)
-		);
-	}
+		$registry = WP_Block_Type_Registry::get_instance();
 
-	$registry = WP_Block_Type_Registry::get_instance();
+		foreach ( $block_folders as $folder_name ) {
+			$block_json_file = $blocks_dir . $folder_name . '/block.json';
 
-	foreach ( $block_names as $file => $block_names ) {
-		if ( ! file_exists( $blocks_dir . $file ) ) {
-			return;
+			// Ideally, all paths to block metadata files should be listed in
+			// WordPress core. In this place we should rather use filter
+			// to replace paths with overrides defined by the plugin.
+			$metadata = json_decode( file_get_contents( $block_json_file ), true );
+			if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
+				return false;
+			}
+
+			if ( $registry->is_registered( $metadata['name'] ) ) {
+				$registry->unregister( $metadata['name'] );
+			}
+
+			gutenberg_register_core_block_styles( $folder_name );
+			register_block_type_from_metadata( $block_json_file );
 		}
 
-		if ( is_string( $block_names ) ) {
-			if ( $registry->is_registered( $block_names ) ) {
-				$registry->unregister( $block_names );
+		foreach ( $block_names as $file => $sub_block_names ) {
+			if ( ! file_exists( $blocks_dir . $file ) ) {
+				return;
 			}
-		} elseif ( is_array( $block_names ) ) {
-			foreach ( $block_names as $block_name ) {
+
+			$sub_block_names_normalized = is_string( $sub_block_names ) ? array( $sub_block_names ) : $sub_block_names;
+			foreach ( $sub_block_names_normalized as $block_name ) {
 				if ( $registry->is_registered( $block_name ) ) {
 					$registry->unregister( $block_name );
 				}
+				gutenberg_register_core_block_styles( $block_name );
 			}
-		}
 
-		require $blocks_dir . $file;
+			require_once $blocks_dir . $file;
+		}
 	}
 }
+
 add_action( 'init', 'gutenberg_reregister_core_block_types' );
+
+/**
+ * Registers block styles for a core block.
+ *
+ * @param string $block_name The block-name.
+ *
+ * @return void
+ */
+function gutenberg_register_core_block_styles( $block_name ) {
+	if ( ! gutenberg_should_load_separate_block_assets() ) {
+		return;
+	}
+
+	$block_name = str_replace( 'core/', '', $block_name );
+
+	$style_path        = "build/block-library/blocks/$block_name/style.css";
+	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
+
+	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+		wp_deregister_style( "wp-block-{$block_name}" );
+		wp_register_style(
+			"wp-block-{$block_name}",
+			gutenberg_url( $style_path ),
+			array(),
+			filemtime( gutenberg_dir_path() . $style_path )
+		);
+		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
+
+		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
+		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
+	}
+
+	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
+		wp_deregister_style( "wp-block-{$block_name}-editor" );
+		wp_register_style(
+			"wp-block-{$block_name}-editor",
+			gutenberg_url( $editor_style_path ),
+			array(),
+			filemtime( gutenberg_dir_path() . $editor_style_path )
+		);
+		wp_style_add_data( "wp-block-{$block_name}-editor", 'rtl', 'replace' );
+	}
+}
+
+/**
+ * Change the way styles get loaded depending on their size.
+ *
+ * Optimizes performance and sustainability of styles by inlining smaller stylesheets.
+ *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ *
+ * @return void
+ */
+function gutenberg_maybe_inline_styles() {
+
+	// Early exit if the "wp_maybe_inline_styles" function exists.
+	if ( function_exists( 'wp_maybe_inline_styles' ) ) {
+		return;
+	}
+
+	$total_inline_limit = 20000;
+	/**
+	 * The maximum size of inlined styles in bytes.
+	 *
+	 * @param int $total_inline_limit The file-size threshold, in bytes. Defaults to 20000.
+	 * @return int                    The file-size threshold, in bytes.
+	 */
+	$total_inline_limit = apply_filters( 'styles_inline_size_limit', $total_inline_limit );
+
+	global $wp_styles;
+	$styles = array();
+
+	// Build an array of styles that have a path defined.
+	foreach ( $wp_styles->queue as $handle ) {
+		if ( wp_styles()->get_data( $handle, 'path' ) && file_exists( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
+			$styles[] = array(
+				'handle' => $handle,
+				'path'   => $wp_styles->registered[ $handle ]->extra['path'],
+				'size'   => filesize( $wp_styles->registered[ $handle ]->extra['path'] ),
+			);
+		}
+	}
+
+	if ( ! empty( $styles ) ) {
+		// Reorder styles array based on size.
+		usort(
+			$styles,
+			function( $a, $b ) {
+				return ( $a['size'] <= $b['size'] ) ? -1 : 1;
+			}
+		);
+
+		/**
+		 * The total inlined size.
+		 *
+		 * On each iteration of the loop, if a style gets added inline the value of this var increases
+		 * to reflect the total size of inlined styles.
+		 */
+		$total_inline_size = 0;
+
+		// Loop styles.
+		foreach ( $styles as $style ) {
+
+			// Size check. Since styles are ordered by size, we can break the loop.
+			if ( $total_inline_size + $style['size'] > $total_inline_limit ) {
+				break;
+			}
+
+			// Get the styles if we don't already have them.
+			$style['css'] = file_get_contents( $style['path'] );
+
+			// Set `src` to `false` and add styles inline.
+			$wp_styles->registered[ $style['handle'] ]->src = false;
+			if ( empty( $wp_styles->registered[ $style['handle'] ]->extra['after'] ) ) {
+				$wp_styles->registered[ $style['handle'] ]->extra['after'] = array();
+			}
+			array_unshift( $wp_styles->registered[ $style['handle'] ]->extra['after'], $style['css'] );
+
+			// Add the styles size to the $total_inline_size var.
+			$total_inline_size += (int) $style['size'];
+		}
+	}
+}
+// Run for styles enqueued in <head>.
+add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
+// Run for late-loaded styles in the footer.
+add_action( 'wp_footer', 'gutenberg_maybe_inline_styles', 1 );
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it
@@ -155,84 +358,57 @@ function gutenberg_register_legacy_social_link_blocks() {
 		);
 	}
 }
+
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
 
-if ( ! function_exists( 'register_block_style' ) ) {
-	/**
-	 * Registers a new block style.
-	 *
-	 * @param string $block_name       Block type name including namespace.
-	 * @param array  $style_properties Array containing the properties of the style name, label, style (name of the stylesheet to be enqueued), inline_style (string containing the CSS to be added).
-	 *
-	 * @return boolean True if the block style was registered with success and false otherwise.
-	 */
-	function register_block_style( $block_name, $style_properties ) {
-		return WP_Block_Styles_Registry::get_instance()->register( $block_name, $style_properties );
-	}
-}
-
-if ( ! function_exists( 'unregister_block_style' ) ) {
-	/**
-	 * Unregisters a block style.
-	 *
-	 * @param string $block_name       Block type name including namespace.
-	 * @param array  $block_style_name Block style name.
-	 *
-	 * @return boolean True if the block style was unregistered with success and false otherwise.
-	 */
-	function unregister_block_style( $block_name, $block_style_name ) {
-		return WP_Block_Styles_Registry::get_instance()->unregister( $block_name, $block_style_name );
-	}
-}
-
-if ( ! has_action( 'enqueue_block_assets', 'enqueue_block_styles_assets' ) ) {
-	/**
-	 * Function responsible for enqueuing the styles required for block styles functionality on the editor and on the frontend.
-	 */
-	function gutenberg_enqueue_block_styles_assets() {
-		$block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
-
-		foreach ( $block_styles as $styles ) {
-			foreach ( $styles as $style_properties ) {
-				if ( isset( $style_properties['style_handle'] ) ) {
-					wp_enqueue_style( $style_properties['style_handle'] );
-				}
-				if ( isset( $style_properties['inline_style'] ) ) {
-					wp_add_inline_style( 'wp-block-library', $style_properties['inline_style'] );
-				}
-			}
+/**
+ * Filters the default block categories array to add a new one for themes.
+ *
+ * This can be removed when plugin support requires WordPress 5.8.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/52883
+ *
+ * @param array[] $categories The list of default block categories.
+ *
+ * @return array[] Filtered block categories.
+ */
+function gutenberg_register_theme_block_category( $categories ) {
+	foreach ( $categories as $category ) {
+		// Skip when the category is already set in WordPress core.
+		if (
+			isset( $category['slug'] ) &&
+			'theme' === $category['slug']
+		) {
+			return $categories;
 		}
 	}
-	add_action( 'enqueue_block_assets', 'gutenberg_enqueue_block_styles_assets', 30 );
+
+	$categories[] = array(
+		'slug'  => 'theme',
+		'title' => _x( 'Theme', 'block category', 'gutenberg' ),
+		'icon'  => null,
+	);
+	return $categories;
 }
-if ( ! has_action( 'enqueue_block_editor_assets', 'enqueue_editor_block_styles_assets' ) ) {
-	/**
-	 * Function responsible for enqueuing the assets required for block styles functionality on the editor.
-	 */
-	function gutenberg_enqueue_editor_block_styles_assets() {
-		$block_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( ! function_exists( 'get_default_block_categories' ) ) {
+	add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+}
 
-		$register_script_lines = array( '( function() {' );
-		foreach ( $block_styles as $block_name => $styles ) {
-			foreach ( $styles as $style_properties ) {
-				$register_script_lines[] = sprintf(
-					'	wp.blocks.registerBlockStyle( \'%s\', %s );',
-					$block_name,
-					wp_json_encode(
-						array(
-							'name'  => $style_properties['name'],
-							'label' => $style_properties['label'],
-						)
-					)
-				);
-			}
-		}
-		$register_script_lines[] = '} )();';
-		$inline_script           = implode( "\n", $register_script_lines );
-
-		wp_register_script( 'wp-block-styles', false, array( 'wp-blocks' ), true, true );
-		wp_add_inline_script( 'wp-block-styles', $inline_script );
-		wp_enqueue_script( 'wp-block-styles' );
+/**
+ * Checks whether the current block type supports the feature requested.
+ *
+ * @param WP_Block_Type $block_type Block type to check for support.
+ * @param array         $feature    Path of the feature to check support for.
+ * @param mixed         $default    Fallback value for feature support, defaults to false.
+ *
+ * @return boolean                  Whether or not the feature is supported.
+ */
+function gutenberg_block_has_support( $block_type, $feature, $default = false ) {
+	$block_support = $default;
+	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
+		$block_support = _wp_array_get( $block_type->supports, $feature, $default );
 	}
-	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_editor_block_styles_assets' );
+
+	return true === $block_support || is_array( $block_support );
 }

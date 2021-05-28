@@ -8,12 +8,11 @@ import { get } from 'lodash';
  */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { withSpokenMessages } from '@wordpress/components';
-import { getRectangleFromRange } from '@wordpress/dom';
 import {
 	applyFormat,
 	removeFormat,
 	getActiveFormat,
+	useAnchorRef,
 } from '@wordpress/rich-text';
 import {
 	ColorPalette,
@@ -21,7 +20,13 @@ import {
 	getColorClassName,
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { textColor as settings } from './index';
 
 export function getActiveColor( formatName, formatValue, colors ) {
 	const activeColorFormat = getActiveFormat( formatValue, formatName );
@@ -34,52 +39,17 @@ export function getActiveColor( formatName, formatValue, colors ) {
 	}
 	const currentClass = activeColorFormat.attributes.class;
 	if ( currentClass ) {
-		const colorSlug = currentClass.replace( /.*has-(.*?)-color.*/, '$1' );
+		const colorSlug = currentClass.replace(
+			/.*has-([^\s]*)-color.*/,
+			'$1'
+		);
 		return getColorObjectByAttributeValues( colors, colorSlug ).color;
 	}
 }
 
-const ColorPopoverAtLink = ( { addingColor, ...props } ) => {
-	// There is no way to open a text formatter popover when another one is mounted.
-	// The first popover will always be dismounted when a click outside happens, so we can store the
-	// anchor Rect during the lifetime of the component.
-	const anchorRect = useMemo( () => {
-		const selection = window.getSelection();
-		const range =
-			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
-		if ( ! range ) {
-			return;
-		}
-
-		if ( addingColor ) {
-			return getRectangleFromRange( range );
-		}
-
-		let element = range.startContainer;
-
-		// If the caret is right before the element, select the next element.
-		element = element.nextElementSibling || element;
-
-		while ( element.nodeType !== window.Node.ELEMENT_NODE ) {
-			element = element.parentNode;
-		}
-
-		const closest = element.closest( 'span' );
-		if ( closest ) {
-			return closest.getBoundingClientRect();
-		}
-	}, [] );
-
-	if ( ! anchorRect ) {
-		return null;
-	}
-
-	return <URLPopover anchorRect={ anchorRect } { ...props } />;
-};
-
 const ColorPicker = ( { name, value, onChange } ) => {
 	const colors = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return get( getSettings(), [ 'colors' ], [] );
 	} );
 	const onColorChange = useCallback(
@@ -116,25 +86,22 @@ const ColorPicker = ( { name, value, onChange } ) => {
 	return <ColorPalette value={ activeColor } onChange={ onColorChange } />;
 };
 
-const InlineColorUI = ( {
+export default function InlineColorUI( {
 	name,
 	value,
 	onChange,
 	onClose,
-	isActive,
-	addingColor,
-} ) => {
+	contentRef,
+} ) {
+	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
 	return (
-		<ColorPopoverAtLink
+		<URLPopover
 			value={ value }
-			isActive={ isActive }
-			addingColor={ addingColor }
 			onClose={ onClose }
 			className="components-inline-color-popover"
+			anchorRef={ anchorRef }
 		>
 			<ColorPicker name={ name } value={ value } onChange={ onChange } />
-		</ColorPopoverAtLink>
+		</URLPopover>
 	);
-};
-
-export default withSpokenMessages( InlineColorUI );
+}

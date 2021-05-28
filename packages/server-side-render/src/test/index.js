@@ -3,8 +3,8 @@
  */
 import { rendererPath } from '../server-side-render';
 
-describe( 'rendererPath', function() {
-	test( 'should return an base path for empty input', function() {
+describe( 'rendererPath', () => {
+	test( 'should return an base path for empty input', () => {
 		expect( rendererPath( 'core/test-block', null ) ).toBe(
 			'/wp/v2/block-renderer/core/test-block?context=edit'
 		);
@@ -13,7 +13,7 @@ describe( 'rendererPath', function() {
 		);
 	} );
 
-	test( 'should format basic url params ', function() {
+	test( 'should format basic url params', () => {
 		expect(
 			rendererPath( 'core/test-block', {
 				stringArg: 'test',
@@ -26,7 +26,7 @@ describe( 'rendererPath', function() {
 		);
 	} );
 
-	test( 'should format object params ', function() {
+	test( 'should format object params', () => {
 		expect(
 			rendererPath( 'core/test-block', {
 				objectArg: {
@@ -39,7 +39,7 @@ describe( 'rendererPath', function() {
 		);
 	} );
 
-	test( 'should format an array of objects', function() {
+	test( 'should format an array of objects', () => {
 		expect(
 			rendererPath( 'core/test-block', {
 				children: [
@@ -60,7 +60,7 @@ describe( 'rendererPath', function() {
 		);
 	} );
 
-	test( 'should include urlQueryArgs', function() {
+	test( 'should include urlQueryArgs', () => {
 		expect(
 			rendererPath(
 				'core/test-block',

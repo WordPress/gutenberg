@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, number, select } from '@storybook/addon-knobs';
+import { boolean, number, select, text } from '@storybook/addon-knobs';
 import styled from '@emotion/styled';
 
 /**
@@ -20,12 +20,17 @@ export default {
 };
 
 function Example() {
-	const [ value, setValue ] = useState( '' );
-	const [ unit, setUnit ] = useState( 'px' );
+	const [ value, setValue ] = useState( '10px' );
 
 	const props = {
+		disableUnits: boolean( 'disableUnits', false ),
+		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+		isPressEnterToChange: boolean( 'isPressEnterToChange', true ),
 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
 		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
+		label: text( 'label', 'Value' ),
+		min: number( 'min', 0 ),
+		max: number( 'max', 100 ),
 		shiftStep: number( 'shiftStep', 10 ),
 		size: select(
 			'size',
@@ -43,9 +48,7 @@ function Example() {
 			<UnitControl
 				{ ...props }
 				value={ value }
-				onChange={ setValue }
-				unit={ unit }
-				onUnitChange={ setUnit }
+				onChange={ ( v ) => setValue( v ) }
 			/>
 		</ControlWrapperView>
 	);

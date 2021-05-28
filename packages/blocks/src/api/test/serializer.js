@@ -12,7 +12,7 @@ import serialize, {
 	serializeAttributes,
 	getCommentDelimitedContent,
 	serializeBlock,
-	getBlockContent,
+	getBlockInnerHTML,
 } from '../serializer';
 import {
 	getBlockTypes,
@@ -245,7 +245,7 @@ describe( 'block serializer', () => {
 	describe( 'serializeBlock()', () => {
 		it( 'serializes the freeform content fallback block without comment delimiters', () => {
 			registerBlockType( 'core/freeform-block', {
-				category: 'common',
+				category: 'text',
 				title: 'freeform block',
 				attributes: {
 					fruit: {
@@ -265,7 +265,7 @@ describe( 'block serializer', () => {
 		} );
 		it( 'serializes the freeform content fallback block with comment delimiters in nested context', () => {
 			registerBlockType( 'core/freeform-block', {
-				category: 'common',
+				category: 'text',
 				title: 'freeform block',
 				attributes: {
 					fruit: {
@@ -289,7 +289,7 @@ describe( 'block serializer', () => {
 		} );
 		it( 'serializes the unregistered fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unregistered-block', {
-				category: 'common',
+				category: 'text',
 				title: 'unregistered block',
 				attributes: {
 					fruit: {
@@ -335,7 +335,7 @@ describe( 'block serializer', () => {
 
 					return <p>{ attributes.content }</p>;
 				},
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 			};
 			registerBlockType( 'core/test-block', blockType );
@@ -380,7 +380,7 @@ describe( 'block serializer', () => {
 		} );
 	} );
 
-	describe( 'getBlockContent', () => {
+	describe( 'getBlockInnerHTML', () => {
 		it( "should return the block's serialized inner HTML", () => {
 			const blockType = {
 				attributes: {
@@ -392,7 +392,7 @@ describe( 'block serializer', () => {
 				save( { attributes } ) {
 					return attributes.content;
 				},
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 			};
 			registerBlockType( 'core/chicken', blockType );
@@ -403,7 +403,7 @@ describe( 'block serializer', () => {
 				},
 				isValid: true,
 			};
-			expect( getBlockContent( block ) ).toBe( 'chicken' );
+			expect( getBlockInnerHTML( block ) ).toBe( 'chicken' );
 		} );
 	} );
 } );

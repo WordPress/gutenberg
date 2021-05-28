@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
@@ -7,6 +12,7 @@ import {
 	Button,
 	Disabled,
 	PanelBody,
+	Spinner,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -18,42 +24,47 @@ import {
 	MediaUploadCheck,
 	MediaReplaceFlow,
 	RichText,
-	__experimentalBlock as Block,
+	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Component, createRef } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { compose, withInstanceId } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import VideoCommonSettings from './edit-common-settings';
+import TracksEditor from './tracks-editor';
+import Tracks from './tracks';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
-class VideoEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		this.videoPlayer = createRef();
-		this.posterImageButton = createRef();
-		this.onSelectURL = this.onSelectURL.bind( this );
-		this.onSelectPoster = this.onSelectPoster.bind( this );
-		this.onRemovePoster = this.onRemovePoster.bind( this );
-		this.onUploadError = this.onUploadError.bind( this );
-	}
+function VideoEdit( {
+	isSelected,
+	noticeUI,
+	attributes,
+	className,
+	setAttributes,
+	insertBlocksAfter,
+	onReplace,
+	noticeOperations,
+} ) {
+	const instanceId = useInstanceId( VideoEdit );
+	const videoPlayer = useRef();
+	const posterImageButton = useRef();
+	const { id, caption, controls, poster, src, tracks } = attributes;
+	const isTemporaryVideo = ! id && isBlobURL( src );
+	const mediaUpload = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload
+	);
 
-	componentDidMount() {
-		const {
-			attributes,
-			mediaUpload,
-			noticeOperations,
-			setAttributes,
-		} = this.props;
-		const { id, src = '' } = attributes;
+	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
 			if ( file ) {
@@ -69,196 +80,198 @@ class VideoEdit extends Component {
 				} );
 			}
 		}
-	}
+	}, [] );
 
-	componentDidUpdate( prevProps ) {
-		if ( this.props.attributes.poster !== prevProps.attributes.poster ) {
-			this.videoPlayer.current.load();
+	useEffect( () => {
+		// Placeholder may be rendered.
+		if ( videoPlayer.current ) {
+			videoPlayer.current.load();
 		}
+	}, [ poster ] );
+
+	function onSelectVideo( media ) {
+		if ( ! media || ! media.url ) {
+			// in this case there was an error
+			// previous attributes should be removed
+			// because they may be temporary blob urls
+			setAttributes( { src: undefined, id: undefined } );
+			return;
+		}
+		// sets the block's attribute and updates the edit component from the
+		// selected media
+		setAttributes( { src: media.url, id: media.id } );
 	}
 
-	onSelectURL( newSrc ) {
-		const { attributes, setAttributes } = this.props;
-		const { src } = attributes;
-
+	function onSelectURL( newSrc ) {
 		if ( newSrc !== src ) {
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url: newSrc },
 			} );
 			if ( undefined !== embedBlock ) {
-				this.props.onReplace( embedBlock );
+				onReplace( embedBlock );
 				return;
 			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
 	}
 
-	onSelectPoster( image ) {
-		const { setAttributes } = this.props;
+	function onUploadError( message ) {
+		noticeOperations.removeAllNotices();
+		noticeOperations.createErrorNotice( message );
+	}
+
+	const classes = classnames( className, {
+		'is-transient': isTemporaryVideo,
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
+
+	if ( ! src ) {
+		return (
+			<div { ...blockProps }>
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectVideo }
+					onSelectURL={ onSelectURL }
+					accept="video/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ attributes }
+					notices={ noticeUI }
+					onError={ onUploadError }
+				/>
+			</div>
+		);
+	}
+
+	function onSelectPoster( image ) {
 		setAttributes( { poster: image.url } );
 	}
 
-	onRemovePoster() {
-		const { setAttributes } = this.props;
+	function onRemovePoster() {
 		setAttributes( { poster: '' } );
 
 		// Move focus back to the Media Upload button.
 		this.posterImageButton.current.focus();
 	}
 
-	onUploadError( message ) {
-		const { noticeOperations } = this.props;
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
-	}
+	const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
 
-	render() {
-		const { id, caption, controls, poster, src } = this.props.attributes;
-		const {
-			instanceId,
-			isSelected,
-			noticeUI,
-			attributes,
-			setAttributes,
-		} = this.props;
-		const onSelectVideo = ( media ) => {
-			if ( ! media || ! media.url ) {
-				// in this case there was an error
-				// previous attributes should be removed
-				// because they may be temporary blob urls
-				setAttributes( { src: undefined, id: undefined } );
-				return;
-			}
-			// sets the block's attribute and updates the edit component from the
-			// selected media
-			setAttributes( { src: media.url, id: media.id } );
-		};
-
-		if ( ! src ) {
-			return (
-				<Block.div>
-					<MediaPlaceholder
-						icon={ <BlockIcon icon={ icon } /> }
-						onSelect={ onSelectVideo }
-						onSelectURL={ this.onSelectURL }
-						accept="video/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ this.props.attributes }
-						notices={ noticeUI }
-						onError={ this.onUploadError }
+	return (
+		<>
+			<BlockControls group="block">
+				<TracksEditor
+					tracks={ tracks }
+					onChange={ ( newTracks ) => {
+						setAttributes( { tracks: newTracks } );
+					} }
+				/>
+			</BlockControls>
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ src }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="video/*"
+					onSelect={ onSelectVideo }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+				/>
+			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Video settings' ) }>
+					<VideoCommonSettings
+						setAttributes={ setAttributes }
+						attributes={ attributes }
 					/>
-				</Block.div>
-			);
-		}
-		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
-
-		return (
-			<>
-				<BlockControls>
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ src }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="video/*"
-						onSelect={ onSelectVideo }
-						onSelectURL={ this.onSelectURL }
-						onError={ this.onUploadError }
-					/>
-				</BlockControls>
-				<InspectorControls>
-					<PanelBody title={ __( 'Video settings' ) }>
-						<VideoCommonSettings
-							setAttributes={ setAttributes }
-							attributes={ attributes }
-						/>
-						<MediaUploadCheck>
-							<BaseControl className="editor-video-poster-control">
-								<BaseControl.VisualLabel>
-									{ __( 'Poster image' ) }
-								</BaseControl.VisualLabel>
-								<MediaUpload
-									title={ __( 'Select poster image' ) }
-									onSelect={ this.onSelectPoster }
-									allowedTypes={
-										VIDEO_POSTER_ALLOWED_MEDIA_TYPES
-									}
-									render={ ( { open } ) => (
-										<Button
-											isPrimary
-											onClick={ open }
-											ref={ this.posterImageButton }
-											aria-describedby={
-												videoPosterDescription
-											}
-										>
-											{ ! this.props.attributes.poster
-												? __( 'Select' )
-												: __( 'Replace' ) }
-										</Button>
-									) }
-								/>
-								<p id={ videoPosterDescription } hidden>
-									{ this.props.attributes.poster
-										? sprintf(
-												/* translators: %s: poster image URL. */
-												__(
-													'The current poster image url is %s'
-												),
-												this.props.attributes.poster
-										  )
-										: __(
-												'There is no poster image currently selected'
-										  ) }
-								</p>
-								{ !! this.props.attributes.poster && (
+					<MediaUploadCheck>
+						<BaseControl className="editor-video-poster-control">
+							<BaseControl.VisualLabel>
+								{ __( 'Poster image' ) }
+							</BaseControl.VisualLabel>
+							<MediaUpload
+								title={ __( 'Select poster image' ) }
+								onSelect={ onSelectPoster }
+								allowedTypes={
+									VIDEO_POSTER_ALLOWED_MEDIA_TYPES
+								}
+								render={ ( { open } ) => (
 									<Button
-										onClick={ this.onRemovePoster }
-										isTertiary
+										variant="primary"
+										onClick={ open }
+										ref={ posterImageButton }
+										aria-describedby={
+											videoPosterDescription
+										}
 									>
-										{ __( 'Remove' ) }
+										{ ! poster
+											? __( 'Select' )
+											: __( 'Replace' ) }
 									</Button>
 								) }
-							</BaseControl>
-						</MediaUploadCheck>
-					</PanelBody>
-				</InspectorControls>
-				<Block.figure>
-					{ /*
-						Disable the video tag so the user clicking on it won't play the
-						video when the controls are enabled.
-					*/ }
-					<Disabled>
-						<video
-							controls={ controls }
-							poster={ poster }
-							src={ src }
-							ref={ this.videoPlayer }
-						/>
-					</Disabled>
-					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-						<RichText
-							tagName="figcaption"
-							placeholder={ __( 'Write caption…' ) }
-							value={ caption }
-							onChange={ ( value ) =>
-								setAttributes( { caption: value } )
-							}
-							inlineToolbar
-						/>
-					) }
-				</Block.figure>
-			</>
-		);
-	}
+							/>
+							<p id={ videoPosterDescription } hidden>
+								{ poster
+									? sprintf(
+											/* translators: %s: poster image URL. */
+											__(
+												'The current poster image url is %s'
+											),
+											poster
+									  )
+									: __(
+											'There is no poster image currently selected'
+									  ) }
+							</p>
+							{ !! poster && (
+								<Button
+									onClick={ onRemovePoster }
+									variant="tertiary"
+								>
+									{ __( 'Remove' ) }
+								</Button>
+							) }
+						</BaseControl>
+					</MediaUploadCheck>
+				</PanelBody>
+			</InspectorControls>
+			<figure { ...blockProps }>
+				{ /*
+					Disable the video tag if the block is not selected
+					so the user clicking on it won't play the
+					video when the controls are enabled.
+				*/ }
+				<Disabled isDisabled={ ! isSelected }>
+					<video
+						controls={ controls }
+						poster={ poster }
+						src={ src }
+						ref={ videoPlayer }
+					>
+						<Tracks tracks={ tracks } />
+					</video>
+				</Disabled>
+				{ isTemporaryVideo && <Spinner /> }
+				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
+					<RichText
+						tagName="figcaption"
+						aria-label={ __( 'Video caption text' ) }
+						placeholder={ __( 'Add caption' ) }
+						value={ caption }
+						onChange={ ( value ) =>
+							setAttributes( { caption: value } )
+						}
+						inlineToolbar
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						}
+					/>
+				) }
+			</figure>
+		</>
+	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		const { mediaUpload } = getSettings();
-		return { mediaUpload };
-	} ),
-	withNotices,
-	withInstanceId,
-] )( VideoEdit );
+export default withNotices( VideoEdit );

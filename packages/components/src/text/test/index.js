@@ -1,94 +1,145 @@
 /**
  * External dependencies
  */
-import { render, unmountComponentAtNode } from 'react-dom';
-import { act } from 'react-dom/test-utils';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
-import Text from '../';
-
-let container = null;
-
-beforeEach( () => {
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
-
-afterEach( () => {
-	unmountComponentAtNode( container );
-	container.remove();
-	container = null;
-} );
-
-function getTextStyle( node ) {
-	const text = node || container.children[ 0 ];
-	return window.getComputedStyle( text );
-}
+import { getFontSize } from '../../ui/utils/font-size';
+import { COLORS } from '../../utils';
+import { Text } from '../';
 
 describe( 'Text', () => {
-	describe( 'Basic rendering', () => {
-		it( 'should render', () => {
-			act( () => {
-				render( <Text>Hello</Text>, container );
-			} );
-
-			const [ text ] = container.children;
-
-			expect( text.innerHTML ).toBe( 'Hello' );
-		} );
-
-		it( 'should render as a <p>, by default', () => {
-			act( () => {
-				render( <Text />, container );
-			} );
-
-			const [ text ] = container.children;
-
-			expect( text.tagName ).toBe( 'P' );
-		} );
-
-		it( 'should render as another selector, if specified', () => {
-			act( () => {
-				render(
-					<>
-						<Text as="h1" />
-						<Text as="h2" />
-						<Text as="span" />
-						<Text as="div" />
-					</>,
-					container
-				);
-			} );
-
-			const [ h1, h2, span, div ] = container.children;
-
-			expect( h1.tagName ).toBe( 'H1' );
-			expect( h2.tagName ).toBe( 'H2' );
-			expect( span.tagName ).toBe( 'SPAN' );
-			expect( div.tagName ).toBe( 'DIV' );
+	describe( 'snapshot tests', () => {
+		test( 'should render correctly', () => {
+			const { container } = render( <Text>Lorem ipsum.</Text> );
+			expect( container.firstChild ).toMatchSnapshot();
 		} );
 	} );
 
-	describe( 'Variants', () => {
-		it( 'should render with specified variantion styles', () => {
-			act( () => {
-				render(
-					<>
-						<Text>Base</Text>
-						<Text variant="title.large">Title Large</Text>
-						<Text variant="caption">Caption</Text>
-					</>,
-					container
-				);
-			} );
-
-			const [ base, title, caption ] = container.children;
-
-			expect( getTextStyle( base ).fontSize ).toBeFalsy();
-			expect( getTextStyle( title ).fontSize ).toBe( '32px' );
-			expect( getTextStyle( caption ).fontSize ).toBe( '12px' );
+	test( 'should render optimizeReadabilityFor', () => {
+		const { container } = render(
+			<Text optimizeReadabilityFor="blue">Lorem ipsum.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( {
+			color: COLORS.white,
 		} );
+	} );
+
+	test( 'should render truncate', () => {
+		const { container } = render( <Text truncate>Lorem ipsum.</Text> );
+		expect( container.firstChild ).toHaveStyle( {
+			textOverflow: 'ellipsis',
+		} );
+	} );
+
+	test( 'should render size', () => {
+		const { container } = render( <Text size="title">Lorem ipsum.</Text> );
+		expect( container.firstChild ).toHaveStyle( {
+			fontSize: getFontSize( 'title' ),
+		} );
+	} );
+
+	test( 'should render custom size', () => {
+		const { container } = render( <Text size={ 15 }>Lorem ipsum.</Text> );
+		expect( container.firstChild ).toHaveStyle( {
+			fontSize: getFontSize( 15 ),
+		} );
+	} );
+
+	test( 'should render variant', () => {
+		const { container } = render(
+			<Text variant="muted">Lorem ipsum.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( {
+			color: COLORS.mediumGray.text,
+		} );
+	} );
+
+	test( 'should render as another element', () => {
+		const { container } = render( <Text as="div">Lorem ipsum.</Text> );
+		expect( container.firstChild.nodeName ).toBe( 'DIV' );
+	} );
+
+	test( 'should render align', () => {
+		const { container } = render(
+			<Text align="center">Lorem ipsum.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( { textAlign: 'center' } );
+	} );
+
+	test( 'should render color', () => {
+		const { container } = render(
+			<Text color="orange">Lorem ipsum.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( { color: 'orange' } );
+	} );
+
+	test( 'should render display', () => {
+		const { container } = render(
+			<Text display="inline-flex">Lorem ipsum.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'inline-flex',
+		} );
+	} );
+
+	test( 'should render highlighted words', async () => {
+		const wrapper = render(
+			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
+		);
+		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 5 );
+		const words = await wrapper.findAllByText( 'm' );
+		expect( words ).toHaveLength( 2 );
+		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
+	} );
+
+	test( 'should render highlighted words with undefined passed', () => {
+		const { container } = render(
+			<Text highlightWords={ undefined }>Lorem ipsum.</Text>
+		);
+		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered
+		expect( container.firstChild.childNodes ).toHaveLength( 1 );
+	} );
+
+	test( 'should render highlighted words with highlightCaseSensitive', () => {
+		const { container } = render(
+			<Text highlightCaseSensitive highlightWords={ [ 'IPSUM' ] }>
+				Lorem ipsum.
+			</Text>
+		);
+
+		expect( container.firstChild ).toMatchSnapshot();
+		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered
+		expect( container.firstChild.childNodes ).toHaveLength( 1 );
+	} );
+
+	test( 'should render isBlock', () => {
+		const { container } = render( <Text isBlock>Lorem ipsum.</Text> );
+		expect( container.firstChild ).toHaveStyle( {
+			display: 'block',
+		} );
+	} );
+
+	test( 'should render lineHeight', () => {
+		const { container } = render(
+			<Text lineHeight={ 1.5 }>Lorem ipsum.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( { lineHeight: '1.5' } );
+	} );
+
+	test( 'should render upperCase', () => {
+		const { container } = render( <Text upperCase>Lorem ipsum.</Text> );
+		expect( container.firstChild ).toHaveStyle( {
+			textTransform: 'uppercase',
+		} );
+	} );
+
+	test( 'should render weight', () => {
+		const { container } = render(
+			<Text weight={ 700 }>Lorem ipsum.</Text>
+		);
+		expect( container.firstChild ).toHaveStyle( { fontWeight: '700' } );
 	} );
 } );
