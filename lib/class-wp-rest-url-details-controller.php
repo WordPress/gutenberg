@@ -66,8 +66,26 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			'title'      => 'url-details',
 			'type'       => 'object',
 			'properties' => array(
-				'title' => array(
-					'description' => __( 'The contents of the <title> tag from the URL.', 'gutenberg' ),
+				'title'       => array(
+					'description' => __( 'The contents of the <title> element from the URL.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'readonly'    => true,
+				),
+				'icon'        => array(
+					'description' => __( 'The favicon image link of the <link rel="icon"> element from the URL.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'readonly'    => true,
+				),
+				'description' => array(
+					'description' => __( 'The content of the <meta name="description"> element from the URL.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'readonly'    => true,
+				),
+				'image'       => array(
+					'description' => __( 'The OG image link of the <meta property="og:image"> or <meta property="og:image:url"> element from the URL.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
