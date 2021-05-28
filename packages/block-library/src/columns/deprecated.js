@@ -11,11 +11,6 @@ import { createBlock } from '@wordpress/blocks';
 import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 /**
- * Internal dependencies
- */
-import { getColumnWidthsAsGridColumnsValues } from './utils';
-
-/**
  * Given an HTML string for a deprecated columns inner block, returns the
  * column index to which the migrated inner block should be assigned. Returns
  * undefined if the inner block was not assigned to a column.
@@ -43,7 +38,7 @@ function getDeprecatedLayoutColumn( originalContent ) {
 	}
 }
 
-const migrateCustomColors = ( attributes, innerBlocks ) => {
+const migrateCustomColors = ( attributes ) => {
 	if ( ! attributes.customTextColor && ! attributes.customBackgroundColor ) {
 		return attributes;
 	}
@@ -58,7 +53,6 @@ const migrateCustomColors = ( attributes, innerBlocks ) => {
 		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
 		gridGap: 2,
 		gridGapUnit: 'em',
-		gridTemplateColumns: getColumnWidthsAsGridColumnsValues( innerBlocks ),
 		style,
 	};
 };
@@ -179,9 +173,6 @@ export default [
 					...omit( attributes, [ 'columns' ] ),
 					gridGap: 2,
 					gridGapUnit: 'em',
-					gridTemplateColumns: getColumnWidthsAsGridColumnsValues(
-						migratedInnerBlocks
-					),
 				},
 				migratedInnerBlocks,
 			];
@@ -208,9 +199,6 @@ export default [
 				...omit( attributes, [ 'columns' ] ),
 				gridGap: 2,
 				gridGapUnit: 'em',
-				gridTemplateColumns: getColumnWidthsAsGridColumnsValues(
-					innerBlocks
-				),
 			};
 
 			return [ attributes, innerBlocks ];
