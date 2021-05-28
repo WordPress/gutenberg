@@ -59,13 +59,7 @@ export type Props = SurfaceProps & {
 	isElevated?: boolean;
 };
 
-export type BodyProps = {
-	/**
-	 * Determines if `CardBody` is scrollable.
-	 *
-	 * @default true
-	 */
-	scrollable?: boolean;
+type BaseSubComponentProps = {
 	/**
 	 * The children elements.
 	 */
@@ -84,23 +78,16 @@ export type BodyProps = {
 	size?: SizeOptions;
 };
 
-export type HeaderProps = {
+export type BodyProps = BaseSubComponentProps & {
 	/**
-	 * The children elements.
-	 */
-	children: React.ReactNode;
-	/**
-	 * Renders with a light gray background color.
+	 * Determines if `CardBody` is scrollable.
 	 *
-	 * @default false
+	 * @default true
 	 */
-	isShady?: boolean;
-	/**
-	 * Determines the amount of padding within the component.
-	 *
-	 * @default 'medium'
-	 */
-	size?: SizeOptions;
+	scrollable?: boolean;
+};
+
+export type HeaderProps = BaseSubComponentProps & {
 	/**
 	 * Renders without a border.
 	 *
