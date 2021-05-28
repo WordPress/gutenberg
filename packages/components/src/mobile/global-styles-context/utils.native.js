@@ -91,13 +91,11 @@ export function getGlobalStyles( rawStyles, colors, gradients ) {
 	const globalStyles = parseColorVariables( rawStyles, colors );
 
 	return {
-		...( colors || gradients
-			? {
-					__experimentalFeatures: {
-						color: { palette: colors, gradients: parsedGradients },
-					},
-			  }
-			: {} ),
+		colors,
+		gradients: parsedGradients,
+		__experimentalFeatures: {
+			color: { palette: colors, gradients: parsedGradients },
+		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};
 }
