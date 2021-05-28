@@ -485,7 +485,7 @@ function MyComponent(props) {
 
 _Parameters_
 
--   _object_ `Object`: Object which changes to compare.
+-   _object_ `object`: Object which changes to compare.
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
