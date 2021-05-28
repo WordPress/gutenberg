@@ -12,7 +12,6 @@ import { useCardMedia } from './hook';
 function CardMedia( props, forwardedRef ) {
 	const mediaProps = useCardMedia( props );
 
-	// Should it add the `components-card__media` className ?
 	return <View { ...mediaProps } ref={ forwardedRef } />;
 }
 

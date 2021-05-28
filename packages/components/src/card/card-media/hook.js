@@ -21,7 +21,13 @@ export function useCardMedia( props ) {
 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
 
 	const classes = useMemo(
-		() => cx( styles.Media, styles.borderRadius, className ),
+		() =>
+			cx(
+				styles.Media,
+				styles.borderRadius,
+				'components-card__media',
+				className
+			),
 		[ className ]
 	);
 
