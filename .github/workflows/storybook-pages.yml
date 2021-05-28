@@ -14,9 +14,7 @@ jobs:
               with:
                   ref: trunk
 
-            - run: nvm install 16
-            - run: npm cache clean -force
-            - run: rm -rf ~/.npm
+
             
 
             # - name: Cache node modules
@@ -29,7 +27,11 @@ jobs:
             #       key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
             - name: Install Dependencies
-              run: npm ci --loglevel verbose
+            - run: |
+                export NVM_DIR=~/.nvm
+                source ~/.nvm/nvm.sh
+                nvm install ${{ matrix.node }}
+                npm ci --loglevel verbose
 
             - name: Build Storybook
               run: npm run storybook:build

@@ -21,9 +21,7 @@ jobs:
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-            - run: nvm install 16
-            - run: npm cache clean -force
-            - run: rm -rf ~/.npm
+
             
 
             # - name: Cache node modules
@@ -37,6 +35,9 @@ jobs:
 
             - name: Npm install
               run: |
+                  export NVM_DIR=~/.nvm
+                  source ~/.nvm/nvm.sh
+                  nvm install ${{ matrix.node }}
                   npm ci --loglevel verbose
 
             - name: Compare performance with trunk

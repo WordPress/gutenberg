@@ -117,9 +117,7 @@ jobs:
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
-            - run: nvm install 16
-            - run: npm cache clean -force
-            - run: rm -rf ~/.npm
+
             
 
             # - name: Cache node modules

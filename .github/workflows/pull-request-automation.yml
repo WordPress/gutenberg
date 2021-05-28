@@ -14,14 +14,17 @@ jobs:
               with:
                   ref: trunk
 
-            - run: nvm install 16
-            - run: npm cache clean -force
-            - run: rm -rf ~/.npm
+
             
 
             # Changing into the action's directory and running `npm install` is much
             # faster than a full project-wide `npm ci`.
-            - run: cd packages/project-management-automation && npm install --loglevel verbose
+            - run: |
+                export NVM_DIR=~/.nvm
+                source ~/.nvm/nvm.sh
+                nvm install ${{ matrix.node }}
+                cd packages/project-management-automation 
+                npm install --loglevel verbose
 
             - uses: ./packages/project-management-automation
               with:
