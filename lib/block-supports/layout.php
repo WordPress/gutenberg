@@ -72,9 +72,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		$style .= ".wp-container-$id > * {";
 		$style .= 'box-sizing: border-box;';
+		$style .= 'box-sizing: border-box;';
 		$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
-		$style .= 'margin-left: auto !important;';
-		$style .= 'margin-right: auto !important;';
+		$style .= 'width: 100%;';
 		$style .= '}';
 
 		$style .= ".wp-container-$id > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
