@@ -6,13 +6,18 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { BaseField, useBaseField } from '../index';
+import { useBaseField } from '../index';
+import { View } from '../../view';
+
+const TestField = ( props ) => {
+	return <View { ...useBaseField( props ) } />;
+};
 
 describe( 'base field', () => {
 	let base;
 
 	beforeEach( () => {
-		base = render( <BaseField /> ).container;
+		base = render( <TestField /> ).container;
 	} );
 
 	it( 'should render correctly', () => {
@@ -21,28 +26,28 @@ describe( 'base field', () => {
 
 	describe( 'props', () => {
 		it( 'should render error styles', () => {
-			const { container } = render( <BaseField hasError /> );
+			const { container } = render( <TestField hasError /> );
 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
 				base.firstChild
 			);
 		} );
 
 		it( 'should render clickable styles', () => {
-			const { container } = render( <BaseField isClickable /> );
+			const { container } = render( <TestField isClickable /> );
 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
 				base.firstChild
 			);
 		} );
 
 		it( 'should render inline styles', () => {
-			const { container } = render( <BaseField isInline /> );
+			const { container } = render( <TestField isInline /> );
 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
 				base.firstChild
 			);
 		} );
 
 		it( 'should render subtle styles', () => {
-			const { container } = render( <BaseField isSubtle /> );
+			const { container } = render( <TestField isSubtle /> );
 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
 				base.firstChild
 			);

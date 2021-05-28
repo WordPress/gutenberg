@@ -39,37 +39,6 @@ Snapshot Diff:
       "flex-direction": "row",
 `;
 
-exports[`base field props should render focused styles 1`] = `
-Snapshot Diff:
-- Received styles
-+ Base styles
-
-@@ -12,21 +12,20 @@
-      "-webkit-justify-content": "space-between",
-      "-webkit-transition": "border-color 100ms ease",
-      "align-items": "center",
-      "background": "#fff",
-      "border": "1px solid",
--     "border-color": "theme:var( --wp-admin-theme-color,#00669b)",
-+     "border-color": "#757575",
-      "border-radius": "2px",
--     "box-shadow": "0 0 0,0.5px,[object Object]",
-+     "box-shadow": "transparent",
-      "display": "flex",
-      "flex": "1",
-      "flex-direction": "row",
-      "font-size": "13px",
-      "justify-content": "space-between",
-      "outline": "none",
-      "padding": "0 8px",
-      "position": "relative",
--     "theme-dark10": "var( --wp-admin-theme-color-darker-10,#007cba)",
-      "transition": "border-color 100ms ease",
-      "width": "100%",
-    },
-  ]
-`;
-
 exports[`base field props should render inline styles 1`] = `
 Snapshot Diff:
 - Received styles
@@ -181,8 +150,7 @@ exports[`base field should render correctly 1`] = `
 
 .emotion-0:focus,
 .emotion-0[data-focused='true'] {
-  border-color: theme:var( --wp-admin-theme-color,#00669b);
-  theme-dark10: var( --wp-admin-theme-color-darker-10,#007cba);
+  border-color: var( --wp-admin-theme-color,#00669b);
   box-shadow: 0 0 0,0.5px,[object Object];
 }
 
