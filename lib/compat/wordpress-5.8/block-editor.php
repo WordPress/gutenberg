@@ -69,26 +69,30 @@ function gutenberg_get_default_block_categories() {
  *
  * @since 10.5.0
  *
- * @param string|WP_Post $editor_name_or_post The name of the editor (e.g. 'post-editor')
- *                                            or the post object.
- *
+ * @param WP_Post|WP_Block_Editor_Context $post_or_block_editor_context The current post object or
+ *                                                                      the block editor context.
  * @return array[] Array of categories for block types.
  */
-function gutenberg_get_block_categories( $editor_name_or_post ) {
-	// Assume the post editor when the WP_Post object passed.
-	$editor_name        = is_object( $editor_name_or_post ) ? 'post-editor' : $editor_name_or_post;
-	$default_categories = gutenberg_get_default_block_categories();
+function gutenberg_get_block_categories( $post_or_block_editor_context ) {
+	$block_categories     = gutenberg_get_default_block_categories();
+	$block_editor_context = $post_or_block_editor_context instanceof WP_Post ?
+		new WP_Block_Editor_Context(
+			array(
+				'post' => $post_or_block_editor_context,
+			)
+		) : $post_or_block_editor_context;
 
 	/**
 	 * Filters the default array of categories for block types.
 	 *
 	 * @since 5.8.0
 	 *
-	 * @param array[] $default_categories Array of categories for block types.
+	 * @param array[]                 $block_categories     Array of categories for block types.
+	 * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
 	 */
-	$block_categories = apply_filters( 'block_categories_all', $default_categories );
-	if ( 'post-editor' === $editor_name ) {
-		$post = is_object( $editor_name_or_post ) ? $editor_name_or_post : get_post();
+	$block_categories = apply_filters( 'block_categories_all', $block_categories, $block_editor_context );
+	if ( ! empty( $block_editor_context->post ) ) {
+		$post = $block_editor_context->post;
 
 		/**
 		 * Filters the default array of categories for block types.
@@ -115,25 +119,26 @@ function gutenberg_get_block_categories( $editor_name_or_post ) {
  *
  * @since 10.5.0
  *
- * @param string $editor_name The name of the editor (e.g. 'post-editor').
+ * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
  *
  * @return bool|array Array of block type slugs, or boolean to enable/disable all.
  */
-function gutenberg_get_allowed_block_types( $editor_name ) {
+function gutenberg_get_allowed_block_types( $block_editor_context ) {
 	$allowed_block_types = true;
 
 	/**
-	 * Filters the allowed block types for the given editor, defaulting to true (all
-	 * registered block types supported).
+	 * Filters the allowed block types for all editor types, defaulting to `true`
+	 * (all registered block types supported).
 	 *
 	 * @since 5.8.0
 	 *
-	 * @param bool|array $allowed_block_types Array of block type slugs, or
-	 *                                        boolean to enable/disable all.
+	 * @param bool|array              $allowed_block_types  Array of block type slugs, or
+	 *                                                      boolean to enable/disable all.
+	 * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
 	 */
-	$allowed_block_types = apply_filters( 'allowed_block_types_all', $allowed_block_types );
-	if ( 'post-editor' === $editor_name ) {
-		$post = get_post();
+	$allowed_block_types = apply_filters( 'allowed_block_types_all', $allowed_block_types, $block_editor_context );
+	if ( ! empty( $block_editor_context->post ) ) {
+		$post = $block_editor_context->post;
 
 		/**
 		 * Filters the allowed block types for the editor, defaulting to true (all
@@ -251,31 +256,32 @@ function gutenberg_get_default_block_editor_settings() {
  *
  * @since 10.5.0
  *
- * @param string $editor_name     The name of the editor (e.g. 'post-editor').
- * @param array  $custom_settings Optional custom settings to use with the editor type.
+ * @param array                   $custom_settings      Custom settings to use with the given editor type.
+ * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
  *
  * @return array The contextualized block editor settings.
  */
-function gutenberg_get_block_editor_settings( $editor_name, $custom_settings = array() ) {
+function gutenberg_get_block_editor_settings( $custom_settings, $block_editor_context ) {
 	$editor_settings = array_merge(
-		gutenberg_get_default_block_editor_settings( $editor_name ),
+		gutenberg_get_default_block_editor_settings(),
 		array(
-			'allowedBlockTypes' => gutenberg_get_allowed_block_types( $editor_name ),
-			'blockCategories'   => gutenberg_get_block_categories( $editor_name ),
+			'allowedBlockTypes' => gutenberg_get_allowed_block_types( $block_editor_context ),
+			'blockCategories'   => gutenberg_get_block_categories( $block_editor_context ),
 		),
 		$custom_settings
 	);
 
 	/**
-	 * Filters the settings to pass to the block editor for all editor types.
+	 * Filters the settings to pass to the block editor for all editor type.
 	 *
 	 * @since 5.8.0
 	 *
-	 * @param array $editor_settings Default editor settings.
+	 * @param array                   $editor_settings      Default editor settings.
+	 * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
 	 */
-	$editor_settings = apply_filters( 'block_editor_settings_all', $editor_settings );
-	if ( 'post-editor' === $editor_name ) {
-		$post = get_post();
+	$editor_settings = apply_filters( 'block_editor_settings_all', $editor_settings, $block_editor_context );
+	if ( ! empty( $block_editor_context->post ) ) {
+		$post = $block_editor_context->post;
 
 		/**
 		 * Filters the settings to pass to the block editor.
@@ -290,4 +296,78 @@ function gutenberg_get_block_editor_settings( $editor_name, $custom_settings = a
 	}
 
 	return $editor_settings;
+}
+
+/**
+ * Preloads common data used with the block editor by specifying an array of
+ * REST API paths that will be preloaded for a given block editor context.
+ *
+ * @see https://core.trac.wordpress.org/ticket/52920
+ *
+ * @since 10.7.0
+ *
+ * @global WP_Post $post Global post object.
+ *
+ * @param array                   $preload_paths        List of paths to preload.
+ * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
+ *
+ * @return void
+ */
+function gutenberg_block_editor_rest_api_preload( array $preload_paths, $block_editor_context ) {
+	global $post;
+
+	/**
+	 * Filters the array of REST API paths that will be used to preloaded common data
+	 * to use with the block editor.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param string[] $preload_paths Array of paths to preload.
+	 */
+	$preload_paths = apply_filters( 'block_editor_rest_api_preload_paths', $preload_paths, $block_editor_context );
+	if ( ! empty( $block_editor_context->post ) ) {
+		$selected_post = $block_editor_context->post;
+
+		/**
+		 * Preload common data by specifying an array of REST API paths that will be preloaded.
+		 *
+		 * Filters the array of paths that will be preloaded.
+		 *
+		 * @since 5.0.0
+		 * @deprecated 5.8.0 The hook transitioned to support also screens that don't contain $post instance.
+		 *
+		 * @param string[] $preload_paths Array of paths to preload.
+		 * @param WP_Post  $selected_post Post being edited.
+		 */
+		$preload_paths = apply_filters_deprecated( 'block_editor_preload_paths', array( $preload_paths, $selected_post ), '5.8.0', 'block_editor_rest_api_preload_paths' );
+	}
+
+	if ( empty( $preload_paths ) ) {
+		return;
+	}
+
+	/*
+	 * Ensure the global $post remains the same after API data is preloaded.
+	 * Because API preloading can call the_content and other filters, plugins
+	 * can unexpectedly modify $post.
+	 */
+	$backup_global_post = ! empty( $post ) ? clone $post : $post;
+
+	$preload_data = array_reduce(
+		$preload_paths,
+		'rest_preload_api_request',
+		array()
+	);
+
+	// Restore the global $post as it was before API preloading.
+	$post = $backup_global_post;
+
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf(
+			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+			wp_json_encode( $preload_data )
+		),
+		'after'
+	);
 }

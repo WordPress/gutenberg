@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added `deleteAllWidgets` - Delete all widgets in the widgets screen.
+
 ## 5.0.0 (2021-01-21)
 
 ### Breaking Changes
@@ -12,7 +16,7 @@
 
 ## 4.16.0 (2020-12-17)
 
-### Nee Features
+### New Features
 
 -   Added `clickMenuItem` - clicks the item that matches the label in the opened menu.
 

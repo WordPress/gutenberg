@@ -810,6 +810,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Elevation",
+		"slug": "elevation",
+		"markdown_source": "../packages/components/src/elevation/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ExternalLink",
 		"slug": "external-link",
 		"markdown_source": "../packages/components/src/external-link/README.md",
@@ -1227,6 +1233,12 @@
 		"title": "VisuallyHidden",
 		"slug": "visually-hidden",
 		"markdown_source": "../packages/components/src/visually-hidden/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ZStack",
+		"slug": "z-stack",
+		"markdown_source": "../packages/components/src/z-stack/README.md",
 		"parent": "components"
 	},
 	{

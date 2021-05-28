@@ -194,13 +194,19 @@ be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to debounce, so please wrap functions created on
 render in components in `useCallback`.
 
+_Related_
+
+-   <https://docs-lodash.com/v4/debounce/>
+
 _Parameters_
 
--   _args_ `...any`: Arguments passed to Lodash's `debounce`.
+-   _fn_ `TFunc`: The function to debounce.
+-   _wait_ `[number]`: The number of milliseconds to delay.
+-   _options_ `[import('lodash').DebounceSettings]`: The options object.
 
 _Returns_
 
--   `Function`: Debounced function.
+-   `TFunc & import('lodash').Cancelable`: Debounced function.
 
 <a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
 
@@ -255,11 +261,11 @@ const WithFocusReturn = () => {
 
 _Parameters_
 
--   _onFocusReturn_ `Function?`: Overrides the default return behavior.
+-   _onFocusReturn_ `[() => void]`: Overrides the default return behavior.
 
 _Returns_
 
--   `Function`: Element Ref.
+-   `import('react').RefCallback<HTMLElement>`: Element Ref.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
@@ -344,11 +350,11 @@ return <div ref={ mergedRefs } />;
 
 _Parameters_
 
--   _refs_ `Array<RefObject|RefCallback>`: The refs to be merged.
+-   _refs_ `Array<TRef>`: The refs to be merged.
 
 _Returns_
 
--   `RefCallback`: The merged ref callback.
+-   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
 
 <a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
 
@@ -361,7 +367,7 @@ _Parameters_
 
 _Returns_
 
--   `T|undefined`: The value from the previous render.
+-   `T | undefined`: The value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
@@ -400,6 +406,13 @@ _Returns_
 Hook which allows to listen the resize event of any target element when it changes sizes.
 _Note: `useResizeObserver` will report `null` until after first render_
 
+Simply a re-export of `react-resize-aware` so refer to its documentation <https://github.com/FezVrasta/react-resize-aware>
+for more details.
+
+_Related_
+
+-   <https://github.com/FezVrasta/react-resize-aware>
+
 _Usage_
 
 ```js
@@ -414,10 +427,6 @@ const App = () => {
 	);
 };
 ```
-
-_Returns_
-
--   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
 
 <a name="useThrottle" href="#useThrottle">#</a> **useThrottle**
 

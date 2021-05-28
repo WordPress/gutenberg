@@ -81,13 +81,11 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities, colors, gradients } = this.props;
+		const { capabilities, updateSettings } = this.props;
 
-		this.props.updateSettings( {
+		updateSettings( {
 			...capabilities,
-			// Set theme colors for the editor
-			...( colors ? { colors } : {} ),
-			...( gradients ? { gradients } : {} ),
+			...this.getThemeColors( this.props ),
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
@@ -136,22 +134,8 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
 			( editorSettings ) => {
-				const {
-					colors: updatedColors,
-					gradients: updatedGradients,
-					rawFeatures,
-					rawStyles,
-				} = editorSettings;
-				const updatedSettings = {
-					// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
-					colors: validateThemeColors( updatedColors ),
-					gradients: validateThemeGradients( updatedGradients ),
-					...( rawStyles
-						? getGlobalStyles( rawStyles, rawFeatures )
-						: {} ),
-				};
-
-				this.props.updateSettings( updatedSettings );
+				const themeColors = this.getThemeColors( editorSettings );
+				updateSettings( themeColors );
 			}
 		);
 
@@ -204,6 +188,17 @@ class NativeEditorProvider extends Component {
 		if ( this.subscriptionParentShowNotice ) {
 			this.subscriptionParentShowNotice.remove();
 		}
+	}
+
+	getThemeColors( { colors, gradients, rawStyles } ) {
+		return {
+			...( rawStyles
+				? getGlobalStyles( rawStyles, colors, gradients )
+				: {
+						colors: validateThemeColors( colors ),
+						gradients: validateThemeGradients( gradients ),
+				  } ),
+		};
 	}
 
 	componentDidUpdate( prevProps ) {

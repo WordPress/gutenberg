@@ -83,21 +83,19 @@ export function parseColorVariables( styles, colorPalette ) {
 		: styles;
 }
 
-export function getGlobalStyles( rawStyles, rawFeatures ) {
-	const features = JSON.parse( rawFeatures );
-	const palette = features?.color?.palette;
-	const gradients = parseColorVariables( rawFeatures, palette )?.color
-		?.gradients;
-	const globalStyles = parseColorVariables( rawStyles, palette );
+export function getGlobalStyles( rawStyles, colors, gradients ) {
+	const parsedGradients = parseColorVariables(
+		JSON.stringify( gradients ),
+		colors
+	);
+	const globalStyles = parseColorVariables( rawStyles, colors );
 
 	return {
-		...( palette || gradients
-			? {
-					__experimentalFeatures: {
-						color: { palette, gradients },
-					},
-			  }
-			: {} ),
+		colors,
+		gradients: parsedGradients,
+		__experimentalFeatures: {
+			color: { palette: colors, gradients: parsedGradients },
+		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};
 }
