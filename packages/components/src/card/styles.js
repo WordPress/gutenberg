@@ -42,6 +42,19 @@ export const Body = css`
 	max-height: 100%;
 `;
 
+export const Media = css`
+	box-sizing: border-box;
+	overflow: hidden;
+
+	& > img,
+	& > iframe {
+		display: block;
+		height: auto;
+		max-width: 100%;
+		width: 100%;
+	}
+`;
+
 export const borderRadius = css`
 	&:first-of-type {
 		border-top-left-radius: ${ CONFIG.cardBorderRadius };

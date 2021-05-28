@@ -18,7 +18,7 @@ export type Props = SurfaceProps & {
 	 *
 	 * @example
 	 * ```jsx
-	 * import { Card, CardBody, Text } from `@wordpress/components/ui`
+	 * import { Card, CardBody, Text } from `@wordpress/components`
 	 *
 	 * function Example() {
 	 *   return (
@@ -98,4 +98,11 @@ export type HeaderProps = BaseSubComponentProps & {
 
 export type FooterProps = HeaderProps & {
 	justify: CSSProperties[ 'justifyContent' ];
+};
+
+export type MediaProps = {
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 };
