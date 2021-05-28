@@ -32,13 +32,6 @@ describe( 'base field', () => {
 			);
 		} );
 
-		it( 'should render clickable styles', () => {
-			const { container } = render( <TestField isClickable /> );
-			expect( container.firstChild ).toMatchStyleDiffSnapshot(
-				base.firstChild
-			);
-		} );
-
 		it( 'should render inline styles', () => {
 			const { container } = render( <TestField isInline /> );
 			expect( container.firstChild ).toMatchStyleDiffSnapshot(

@@ -1,24 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`base field props should render clickable styles 1`] = `
-Snapshot Diff:
-- Received styles
-+ Base styles
-
-@@ -15,11 +15,10 @@
-      "background": "#fff",
-      "border": "1px solid",
-      "border-color": "#757575",
-      "border-radius": "2px",
-      "box-shadow": "transparent",
--     "cursor": "pointer",
-      "display": "flex",
-      "flex": "1",
-      "flex-direction": "row",
-      "font-size": "13px",
-      "justify-content": "space-between",
-`;
-
 exports[`base field props should render error styles 1`] = `
 Snapshot Diff:
 - Received styles

@@ -33,7 +33,6 @@ export function useBaseField( props ) {
 	const {
 		className,
 		hasError = false,
-		isClickable = false,
 		isInline = false,
 		isSubtle = false,
 		// extract these because useFlex doesn't accept it
@@ -49,20 +48,12 @@ export function useBaseField( props ) {
 			cx(
 				styles.BaseField,
 				controlGroupStyles,
-				isClickable && styles.clickable,
 				isSubtle && styles.subtle,
 				hasError && styles.error,
 				isInline && styles.inline,
 				className
 			),
-		[
-			className,
-			controlGroupStyles,
-			hasError,
-			isInline,
-			isClickable,
-			isSubtle,
-		]
+		[ className, controlGroupStyles, hasError, isInline, isSubtle ]
 	);
 
 	return {

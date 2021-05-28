@@ -40,10 +40,6 @@ export const BaseField = css`
 	}
 `;
 
-export const clickable = css`
-	cursor: pointer;
-`;
-
 export const subtle = css`
 	background-color: transparent;
 
