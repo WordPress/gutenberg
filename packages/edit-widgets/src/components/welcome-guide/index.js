@@ -54,22 +54,10 @@ export default function WelcomeGuide() {
 			pages={ [
 				{
 					image: (
-						<>
-							<img
-								className="edit-widgets-welcome-guide__image edit-widgets-welcome-guide__image__prm-np"
-								alt=""
-								src="https://s.w.org/images/block-editor/welcome-canvas.gif"
-								width="312"
-								height="240"
-							/>
-							<img
-								className="edit-widgets-welcome-guide__image edit-widgets-welcome-guide__image__prm-r"
-								alt=""
-								src="https://s.w.org/images/block-editor/welcome-canvas.svg"
-								width="312"
-								height="240"
-							/>
-						</>
+						<WelcomeGuideImage
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-canvas.svg"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-canvas.gif"
+						/>
 					),
 					content: (
 						<>
@@ -120,22 +108,10 @@ export default function WelcomeGuide() {
 				},
 				{
 					image: (
-						<>
-							<img
-								className="edit-widgets-welcome-guide__image edit-widgets-welcome-guide__image__prm-np"
-								alt=""
-								src="https://s.w.org/images/block-editor/welcome-editor.gif"
-								width="312"
-								height="240"
-							/>
-							<img
-								className="edit-widgets-welcome-guide__image edit-widgets-welcome-guide__image__prm-r"
-								alt=""
-								src="https://s.w.org/images/block-editor/welcome-editor.svg"
-								width="312"
-								height="240"
-							/>
-						</>
+						<WelcomeGuideImage
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-editor.svg"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-editor.gif"
+						/>
 					),
 					content: (
 						<>
@@ -152,22 +128,10 @@ export default function WelcomeGuide() {
 				},
 				{
 					image: (
-						<>
-							<img
-								className="edit-widgets-welcome-guide__image edit-widgets-welcome-guide__image__prm-np"
-								alt=""
-								src="https://s.w.org/images/block-editor/welcome-library.gif"
-								width="312"
-								height="240"
-							/>
-							<img
-								className="edit-widgets-welcome-guide__image edit-widgets-welcome-guide__image__prm-r"
-								alt=""
-								src="https://s.w.org/images/block-editor/welcome-library.svg"
-								width="312"
-								height="240"
-							/>
-						</>
+						<WelcomeGuideImage
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-library.svg"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-library.gif"
+						/>
 					),
 					content: (
 						<>
@@ -195,22 +159,10 @@ export default function WelcomeGuide() {
 				},
 				{
 					image: (
-						<>
-							<img
-								className="edit-widgets-welcome-guide__image edit-widgets-welcome-guide__image__prm-np"
-								alt=""
-								src="https://s.w.org/images/block-editor/welcome-documentation.gif"
-								width="312"
-								height="240"
-							/>
-							<img
-								className="edit-widgets-welcome-guide__image edit-widgets-welcome-guide__image__prm-r"
-								alt=""
-								src="https://s.w.org/images/block-editor/welcome-documentation.svg"
-								width="312"
-								height="240"
-							/>
-						</>
+						<WelcomeGuideImage
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-documentation.svg"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-documentation.gif"
+						/>
 					),
 					content: (
 						<>
@@ -234,5 +186,17 @@ export default function WelcomeGuide() {
 				},
 			] }
 		/>
+	);
+}
+
+function WelcomeGuideImage( { nonAnimatedSrc, animatedSrc } ) {
+	return (
+		<picture className="edit-widgets-welcome-guide__image">
+			<source
+				srcSet={ nonAnimatedSrc }
+				media="(prefers-reduced-motion: reduce)"
+			/>
+			<img src={ animatedSrc } width="312" height="240" alt="" />
+		</picture>
 	);
 }

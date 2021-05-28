@@ -21,20 +21,18 @@ export default function WelcomeGuide( { sidebar } ) {
 
 	return (
 		<div className="customize-widgets-welcome-guide">
-			<img
-				className="customize-widgets-welcome-guide__image customize-widgets-welcome-guide__image__prm-np"
-				alt=""
-				src="https://s.w.org/images/block-editor/welcome-editor.gif"
-				width="312"
-				height="240"
-			/>
-			<img
-				className="customize-widgets-welcome-guide__image customize-widgets-welcome-guide__image__prm-r"
-				alt=""
-				src="https://s.w.org/images/block-editor/welcome-editor.svg"
-				width="312"
-				height="240"
-			/>
+			<picture className="customize-widgets-welcome-guide__image">
+				<source
+					srcSet="https://s.w.org/images/block-editor/welcome-editor.svg"
+					media="(prefers-reduced-motion: reduce)"
+				/>
+				<img
+					src="https://s.w.org/images/block-editor/welcome-editor.gif"
+					width="312"
+					height="240"
+					alt=""
+				/>
+			</picture>
 			<h1 className="customize-widgets-welcome-guide__heading">
 				{ __( 'Welcome to block Widgets' ) }
 			</h1>
