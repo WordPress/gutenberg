@@ -20,7 +20,6 @@ import * as styles from './styles';
  * @typedef OwnProps
  * @property {boolean} [hasError=false] Renders an error.
  * @property {boolean} [disabled] Whether the field is disabled.
- * @property {boolean} [isClickable=false] Renders a `cursor: pointer` on hover.
  * @property {boolean} [isInline=false] Renders as an inline element (layout).
  * @property {boolean} [isSubtle=false] Renders a subtle variant.
  */
