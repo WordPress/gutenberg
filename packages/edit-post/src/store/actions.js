@@ -488,12 +488,20 @@ export function* __unstableSwitchToTemplateMode( template ) {
 
 	yield setIsEditingTemplate( true );
 
-	const message = !! template
-		? __( "Custom template created. You're in template mode now." )
-		: __(
-				'Editing template. Changes made here affect all posts and pages that use the template.'
-		  );
-	yield controls.dispatch( noticesStore, 'createSuccessNotice', message, {
-		type: 'snackbar',
-	} );
+	const isWelcomeGuideActive = yield controls.select(
+		'core/edit-post',
+		'isFeatureActive',
+		'welcomeGuideTemplate'
+	);
+
+	if ( ! isWelcomeGuideActive ) {
+		const message = !! template
+			? __( "Custom template created. You're in template mode now." )
+			: __(
+					'Editing template. Changes made here affect all posts and pages that use the template.'
+			  );
+		yield controls.dispatch( noticesStore, 'createSuccessNotice', message, {
+			type: 'snackbar',
+		} );
+	}
 }
