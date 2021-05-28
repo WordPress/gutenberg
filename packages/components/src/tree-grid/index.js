@@ -93,7 +93,7 @@ function TreeGrid(
 					// Left:
 					// If a row is focused, and it is expanded, collapses the current row.
 					if ( activeRow?.ariaExpanded === 'true' ) {
-						onCollapseRow( activeRow?.dataset?.block, activeRow );
+						onCollapseRow( activeRow?.dataset?.block );
 						event.preventDefault();
 						return;
 					}
@@ -118,7 +118,7 @@ function TreeGrid(
 					// Right:
 					// If a row is focused, and it is collapsed, expands the current row.
 					if ( activeRow?.ariaExpanded === 'false' ) {
-						onExpandRow( activeRow?.dataset?.block, activeRow );
+						onExpandRow( activeRow?.dataset?.block );
 						event.preventDefault();
 						return;
 					}

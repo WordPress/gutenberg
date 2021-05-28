@@ -44,7 +44,7 @@ export default function BlockNavigationBranch( props ) {
 	const rowCount = hasAppender ? blockCount + 1 : blockCount;
 	const appenderPosition = rowCount;
 
-	const { expandedState, setExpandedState } = useBlockNavigationContext();
+	const { expandedState, expand, collapse } = useBlockNavigationContext();
 
 	return (
 		<>
@@ -84,13 +84,13 @@ export default function BlockNavigationBranch( props ) {
 					{ forceToggle } = { forceToggle: false }
 				) => {
 					event.stopPropagation();
-					const toggle = () =>
-						setExpandedState( {
-							...expandedState,
-							...{
-								[ clientId ]: ! isExpanded,
-							},
-						} );
+					const toggle = () => {
+						if ( isExpanded === true ) {
+							collapse( clientId );
+						} else if ( isExpanded === false ) {
+							expand( clientId );
+						}
+					};
 					if ( forceToggle ) {
 						return toggle();
 					}

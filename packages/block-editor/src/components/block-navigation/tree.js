@@ -9,7 +9,7 @@ import {
 	useEffect,
 	useMemo,
 	useRef,
-	useState,
+	useReducer,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -23,6 +23,16 @@ import useBlockNavigationDropZone from './use-block-navigation-drop-zone';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
+const expanded = ( state, action ) => {
+	switch ( action.type ) {
+		case 'expand':
+			return { ...state, ...{ [ action.clientId ]: true } };
+		case 'collapse':
+			return { ...state, ...{ [ action.clientId ]: false } };
+		default:
+			return state;
+	}
+};
 
 /**
  * Wrap `BlockNavigationRows` with `TreeGrid`. BlockNavigationRows is a
@@ -58,7 +68,7 @@ export default function BlockNavigationTree( {
 		},
 		[ selectBlock, onSelect ]
 	);
-	const [ expandedState, setExpandedState ] = useState( {} );
+	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
 	let {
 		ref: treeGridRef,
@@ -74,6 +84,11 @@ export default function BlockNavigationTree( {
 		blockDropTarget = undefined;
 	}
 
+	const expand = ( clientId ) =>
+		setExpandedState( { type: 'expand', clientId } );
+	const collapse = ( clientId ) =>
+		setExpandedState( { type: 'collapse', clientId } );
+
 	const contextValue = useMemo(
 		() => ( {
 			__experimentalFeatures,
@@ -81,7 +96,8 @@ export default function BlockNavigationTree( {
 			blockDropTarget,
 			isTreeGridMounted: isMounted.current,
 			expandedState,
-			setExpandedState,
+			expand,
+			collapse,
 		} ),
 		[
 			__experimentalFeatures,
@@ -89,24 +105,18 @@ export default function BlockNavigationTree( {
 			blockDropTarget,
 			isMounted.current,
 			expandedState,
-			setExpandedState,
+			expand,
+			collapse,
 		]
 	);
-
-	const toggleExpandCollapse = ( clientId, activeRow ) => {
-		// TODO: expandedState is stale in the callback, we could alternatively use a data store here instead of context.
-		activeRow
-			.querySelector( '.block-editor-block-navigation__expander' )
-			.click();
-	};
 
 	return (
 		<TreeGrid
 			className="block-editor-block-navigation-tree"
 			aria-label={ __( 'Block navigation structure' ) }
 			ref={ treeGridRef }
-			onCollapseRow={ toggleExpandCollapse }
-			onExpandRow={ toggleExpandCollapse }
+			onCollapseRow={ collapse }
+			onExpandRow={ expand }
 		>
 			<BlockNavigationContext.Provider value={ contextValue }>
 				<BlockNavigationBranch
