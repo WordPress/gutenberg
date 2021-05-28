@@ -18,6 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import AutosaveMonitor from '../autosave-monitor';
 import { localAutosaveGet, localAutosaveClear } from '../../store/controls';
+import { store as editorStore } from '../../store';
 
 const requestIdleCallback = window.requestIdleCallback
 	? window.requestIdleCallback
@@ -47,20 +48,23 @@ const hasSessionStorageSupport = once( () => {
  */
 function useAutosaveNotice() {
 	const { postId, isEditedPostNew, hasRemoteAutosave } = useSelect(
-		( select ) => ( {
-			postId: select( 'core/editor' ).getCurrentPostId(),
-			isEditedPostNew: select( 'core/editor' ).isEditedPostNew(),
-			getEditedPostAttribute: select( 'core/editor' )
-				.getEditedPostAttribute,
-			hasRemoteAutosave: !! select( 'core/editor' ).getEditorSettings()
-				.autosave,
-		} ),
+		( select ) => {
+			const {
+				getCurrentPostId,
+				_isEditedPostNew,
+				getEditorSettings,
+			} = select( editorStore );
+			return {
+				postId: getCurrentPostId(),
+				isEditedPostNew: _isEditedPostNew(),
+				hasRemoteAutosave: !! getEditorSettings().autosave,
+			};
+		},
 		[]
 	);
-	const { getEditedPostAttribute } = useSelect( 'core/editor' );
-
+	const { getEditedPostAttribute } = useSelect( editorStore );
 	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
-	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
+	const { editPost, resetEditorBlocks } = useDispatch( editorStore );
 
 	useEffect( () => {
 		let localAutosave = localAutosaveGet( postId, isEditedPostNew );
@@ -128,16 +132,22 @@ function useAutosavePurge() {
 		isDirty,
 		isAutosaving,
 		didError,
-	} = useSelect(
-		( select ) => ( {
-			postId: select( 'core/editor' ).getCurrentPostId(),
-			isEditedPostNew: select( 'core/editor' ).isEditedPostNew(),
-			isDirty: select( 'core/editor' ).isEditedPostDirty(),
-			isAutosaving: select( 'core/editor' ).isAutosavingPost(),
-			didError: select( 'core/editor' ).didPostSaveRequestFail(),
-		} ),
-		[]
-	);
+	} = useSelect( ( select ) => {
+		const {
+			getCurrentPostId,
+			_isEditedPostNew,
+			isEditedPostDirty,
+			isAutosavingPost,
+			didPostSaveRequestFail,
+		} = select( editorStore );
+		return {
+			postId: getCurrentPostId(),
+			isEditedPostNew: _isEditedPostNew(),
+			isDirty: isEditedPostDirty(),
+			isAutosaving: isAutosavingPost(),
+			didError: didPostSaveRequestFail(),
+		};
+	}, [] );
 
 	const lastIsDirty = useRef( isDirty );
 	const lastIsAutosaving = useRef( isAutosaving );
@@ -166,18 +176,17 @@ function useAutosavePurge() {
 }
 
 function LocalAutosaveMonitor() {
-	const { autosave } = useDispatch( 'core/editor' );
+	const { autosave } = useDispatch( editorStore );
 	const deferedAutosave = useCallback( () => {
 		requestIdleCallback( () => autosave( { local: true } ) );
 	}, [] );
 	useAutosaveNotice();
 	useAutosavePurge();
 
-	const { localAutosaveInterval } = useSelect(
-		( select ) => ( {
-			localAutosaveInterval: select( 'core/editor' ).getEditorSettings()
+	const localAutosaveInterval = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings()
 				.__experimentalLocalAutosaveInterval,
-		} ),
 		[]
 	);
 
