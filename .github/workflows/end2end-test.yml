@@ -45,7 +45,7 @@ jobs:
               run: |
                 export NVM_DIR=~/.nvm
                 source ~/.nvm/nvm.sh
-                nvm install
+                nvm install ${{ matrix.node }} && npm cache clean --force && rm -rf ~/.npm
                 npm ci --loglevel verbose
                 FORCE_REDUCED_MOTION=true npm run build
 

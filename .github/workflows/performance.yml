@@ -37,7 +37,7 @@ jobs:
               run: |
                   export NVM_DIR=~/.nvm
                   source ~/.nvm/nvm.sh
-                  nvm install ${{ matrix.node }}
+                  nvm install ${{ matrix.node }} && npm cache clean --force && rm -rf ~/.npm
                   npm ci --loglevel verbose
 
             - name: Compare performance with trunk
