@@ -4,8 +4,35 @@
 	align-content: space-between;
 	width: 100%;
 	align-items: center;
-	.components-button.is-small {
-		height: $button-size-small;
+
+	.edit-post-template-title,
+	.edit-post-template-post-title {
+		padding: 0;
+		text-decoration: none;
+
+		&.has-icon {
+			svg {
+				order: 1;
+				margin-right: 0;
+			}
+		}
+	}
+
+	.edit-post-template-title {
+		color: $gray-900;
+	}
+
+	.edit-post-template-post-title {
+		margin-top: $grid-unit-05;
+		max-width: 160px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: block;
+
+		@include break-xlarge() {
+			max-width: none;
+		}
 	}
 }
 
