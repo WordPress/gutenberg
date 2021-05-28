@@ -58,6 +58,18 @@ function gutenberg_override_query_template( $template, $type, array $templates )
 
 	$block_template = gutenberg_resolve_template( $type, $templates );
 
+	/**
+	 * Fires before the template is rendered.
+	 *
+	 * Allows extensions to follow template processing.
+	 * Called before the template is rendered.
+	 *
+	 * @param object $current_template The current template object.
+	 * @param string $type      Sanitized filename without extension.
+	 * @param array  $templates A list of template candidates, in descending order of priority.
+	 */
+	do_action( 'rendering_template', $block_template, $type, $templates );
+
 	if ( $block_template ) {
 		if ( empty( $block_template->content ) && is_user_logged_in() ) {
 			$_wp_current_template_content =
