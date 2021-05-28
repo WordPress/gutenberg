@@ -24,6 +24,8 @@ export default function Form( {
 } ) {
 	const ref = useRef();
 
+	const isMediumLargeViewport = useViewportMatch( 'small' );
+
 	// We only want to remount the control when the instance changes
 	// *externally*. For example, if the user performs an undo. To do this, we
 	// keep track of changes made to instance by the control itself and then
@@ -70,9 +72,14 @@ export default function Form( {
 
 			control.destroy();
 		};
-	}, [ id, idBase, instance, onChangeInstance, onChangeHasPreview ] );
-
-	const isMediumLargeViewport = useViewportMatch( 'small' );
+	}, [
+		id,
+		idBase,
+		instance,
+		onChangeInstance,
+		onChangeHasPreview,
+		isMediumLargeViewport,
+	] );
 
 	if ( isWide && isMediumLargeViewport ) {
 		return (
