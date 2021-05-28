@@ -30,7 +30,10 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	if ( gutenberg_use_widgets_block_editor() ) {
+	if (
+		gutenberg_use_widgets_block_editor() &&
+		! function_exists( 'wp_use_widgets_block_editor' )
+	) {
 		add_theme_page(
 			__( 'Widgets', 'gutenberg' ),
 			__( 'Widgets', 'gutenberg' ),
@@ -113,7 +116,11 @@ add_action( 'admin_menu', 'gutenberg_site_editor_menu', 9 );
  * @param WP_Admin_Bar $wp_admin_bar Core class used to implement the Toolbar API.
  */
 function modify_admin_bar( $wp_admin_bar ) {
-	if ( gutenberg_use_widgets_block_editor() && $wp_admin_bar->get_node( 'widgets' ) !== null ) {
+	if (
+		gutenberg_use_widgets_block_editor() &&
+		! function_exists( 'wp_use_widgets_block_editor' ) &&
+		$wp_admin_bar->get_node( 'widgets' ) !== null
+	) {
 		$wp_admin_bar->add_menu(
 			array(
 				'id'   => 'widgets',
@@ -137,7 +144,10 @@ function modify_welcome_panel() {
 	ob_start();
 	wp_welcome_panel();
 	$welcome_panel = ob_get_clean();
-	if ( gutenberg_use_widgets_block_editor() ) {
+	if (
+		gutenberg_use_widgets_block_editor() &&
+		! function_exists( 'wp_use_widgets_block_editor' )
+	) {
 		echo str_replace(
 			admin_url( 'widgets.php' ),
 			admin_url( 'themes.php?page=gutenberg-widgets' ),
@@ -177,5 +187,4 @@ function register_site_icon_url( $response ) {
 
 add_filter( 'rest_index', 'register_site_icon_url' );
 
-add_theme_support( 'widgets-block-editor' );
 add_theme_support( 'block-templates' );
