@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -217,36 +217,28 @@ export default function VisualEditor( { styles } ) {
 									layout={ defaultLayout }
 								/>
 							) }
-							<AnimatePresence>
-								<motion.div
-									key={ isTemplateMode ? 'template' : 'post' }
-									initial={ { opacity: 0 } }
-									animate={ { opacity: 1 } }
-								>
-									<WritingFlow>
-										{ ! isTemplateMode && (
-											<div className="edit-post-visual-editor__post-title-wrapper">
-												<PostTitle />
-											</div>
-										) }
-										<RecursionProvider>
-											<BlockList
-												__experimentalLayout={
-													themeSupportsLayout
-														? {
-																type: 'default',
-																// Find a way to inject this in the support flag code (hooks).
-																alignments: themeSupportsLayout
-																	? alignments
-																	: undefined,
-														  }
-														: undefined
-												}
-											/>
-										</RecursionProvider>
-									</WritingFlow>
-								</motion.div>
-							</AnimatePresence>
+							<WritingFlow>
+								{ ! isTemplateMode && (
+									<div className="edit-post-visual-editor__post-title-wrapper">
+										<PostTitle />
+									</div>
+								) }
+								<RecursionProvider>
+									<BlockList
+										__experimentalLayout={
+											themeSupportsLayout
+												? {
+														type: 'default',
+														// Find a way to inject this in the support flag code (hooks).
+														alignments: themeSupportsLayout
+															? alignments
+															: undefined,
+												  }
+												: undefined
+										}
+									/>
+								</RecursionProvider>
+							</WritingFlow>
 						</MaybeIframe>
 					</motion.div>
 				</motion.div>
