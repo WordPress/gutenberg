@@ -51,6 +51,15 @@ export const Media = css`
 	}
 `;
 
+export const Divider = css`
+	all: unset;
+	border-top: 1px solid;
+	box-sizing: border-box;
+	display: block;
+	height: 0;
+	width: 100%;
+`;
+
 export const borderRadius = css`
 	&:first-of-type {
 		border-top-left-radius: ${ CONFIG.cardBorderRadius };
