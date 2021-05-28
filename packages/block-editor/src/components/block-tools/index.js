@@ -29,7 +29,11 @@ import { usePopoverScroll } from './use-popover-scroll';
  * @param {Object} $0.children             The block content and style container.
  * @param {Object} $0.__unstableContentRef Ref holding the content scroll container.
  */
-export default function BlockTools( { children, __unstableContentRef } ) {
+export default function BlockTools( {
+	children,
+	__unstableContentRef,
+	...props
+} ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const hasFixedToolbar = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().hasFixedToolbar,
@@ -110,7 +114,7 @@ export default function BlockTools( { children, __unstableContentRef } ) {
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div onKeyDown={ onKeyDown }>
+		<div { ...props } onKeyDown={ onKeyDown }>
 			<InsertionPoint __unstableContentRef={ __unstableContentRef }>
 				{ ( hasFixedToolbar || ! isLargeViewport ) && (
 					<BlockContextualToolbar isFixed />

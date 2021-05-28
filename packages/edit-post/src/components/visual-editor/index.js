@@ -192,20 +192,37 @@ export default function VisualEditor( { styles } ) {
 	}, [ isTemplateMode, themeSupportsLayout, contentSize, wideSize ] );
 
 	return (
-		<div
+		<BlockTools
+			__unstableContentRef={ ref }
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }
 		>
 			<VisualEditorGlobalKeyboardShortcuts />
-			<BlockTools __unstableContentRef={ ref }>
+			<motion.div
+				className="edit-post-visual-editor__content-area"
+				animate={ {
+					padding: isTemplateMode ? '48px 48px 0' : '0',
+				} }
+				ref={ blockSelectionClearerRef }
+			>
+				{ isTemplateMode && (
+					<Button
+						className="edit-post-visual-editor__exit-template-mode"
+						icon={ arrowLeft }
+						onClick={ () => {
+							clearSelectedBlock();
+							setIsEditingTemplate( false );
+						} }
+					>
+						{ __( 'Back' ) }
+					</Button>
+				) }
 				<motion.div
-					className="edit-post-visual-editor__content-area"
-					animate={ {
-						padding: isTemplateMode ? '48px 48px 0' : '0',
-					} }
-					ref={ blockSelectionClearerRef }
+					animate={ animatedStyles }
+					initial={ desktopCanvasStyles }
 				>
+<<<<<<< HEAD
 					{ isTemplateMode && (
 						<Button
 							className="edit-post-visual-editor__exit-template-mode"
@@ -245,13 +262,50 @@ export default function VisualEditor( { styles } ) {
 							</RecursionProvider>
 						</MaybeIframe>
 					</motion.div>
+=======
+					<MaybeIframe
+						isTemplateMode={ isTemplateMode }
+						contentRef={ contentRef }
+						styles={ styles }
+						style={ { paddingBottom } }
+					>
+						{ themeSupportsLayout && (
+							<LayoutStyle
+								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+								layout={ defaultLayout }
+							/>
+						) }
+						<WritingFlow>
+							{ ! isTemplateMode && (
+								<div className="edit-post-visual-editor__post-title-wrapper">
+									<PostTitle />
+								</div>
+							) }
+							<RecursionProvider>
+								<BlockList
+									__experimentalLayout={
+										themeSupportsLayout
+											? {
+													type: 'default',
+													// Find a way to inject this in the support flag code (hooks).
+													alignments: themeSupportsLayout
+														? alignments
+														: undefined,
+											  }
+											: undefined
+									}
+								/>
+							</RecursionProvider>
+						</WritingFlow>
+					</MaybeIframe>
+>>>>>>> 4c1f6c502b (Reduce divs)
 				</motion.div>
-			</BlockTools>
+			</motion.div>
 			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__unstableBlockSettingsMenuFirstItem>
-		</div>
+		</BlockTools>
 	);
 }
