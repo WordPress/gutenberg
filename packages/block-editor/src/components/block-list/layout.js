@@ -41,7 +41,15 @@ export function LayoutStyle( { selector, layout = {} } ) {
 	let style =
 		!! contentSize || !! wideSize
 			? `
+				${ selector } {
+					display: flex;
+					flex-flow: column;
+					align-items: center;
+				}
+
 				${ appendSelectors( selector, '> *' ) } {
+					box-sizing: border-box;
+					width: 100%;
 					max-width: ${ contentSize ?? wideSize };
 					margin-left: auto !important;
 					margin-right: auto !important;

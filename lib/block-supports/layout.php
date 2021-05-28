@@ -63,7 +63,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$style = '';
 	if ( $content_size || $wide_size ) {
-		$style  = ".wp-container-$id > * {";
+
+		$style  = ".wp-container-$id {";
+		$style .= 'display: flex;';
+		$style .= 'flex-flow: column;';
+		$style .= 'align-items: center;';
+		$style .= '}';
+
+		$style .= ".wp-container-$id > * {";
+		$style .= 'box-sizing: border-box;';
 		$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 		$style .= 'margin-left: auto !important;';
 		$style .= 'margin-right: auto !important;';
