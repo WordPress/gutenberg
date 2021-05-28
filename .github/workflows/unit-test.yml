@@ -47,7 +47,7 @@ jobs:
               run: |
                   export NVM_DIR=~/.nvm
                   source ~/.nvm/nvm.sh
-                  nvm install ${{ matrix.node }} && npm cache clean --force && rm -rf ~/.npm
+                  nvm install 16 && npm install -g npm@6
                   npm ci --loglevel verbose
                   npx lerna run build
 
@@ -81,7 +81,7 @@ jobs:
               run: |
                   export NVM_DIR=~/.nvm
                   source ~/.nvm/nvm.sh
-                  nvm install ${{ matrix.node }} && npm cache clean --force && rm -rf ~/.npm
+                  nvm install 16 && npm install -g npm@6
                   npm ci --loglevel verbose
                   npm run build
 
@@ -127,7 +127,7 @@ jobs:
               run: |
                   export NVM_DIR=~/.nvm
                   source ~/.nvm/nvm.sh
-                  nvm install ${{ matrix.node }} && npm cache clean --force && rm -rf ~/.npm
+                  nvm install 16 && npm install -g npm@6
                   npm ci --loglevel verbose
                   npx lerna run build
 
