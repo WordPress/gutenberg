@@ -54,7 +54,7 @@ function ReusableBlocksManageButton( { clientId } ) {
 				{ __( 'Manage Reusable blocks' ) }
 			</MenuItem>
 			<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
-				{ __( 'Convert to Regular Blocks' ) }
+				{ __( 'Convert to regular blocks' ) }
 			</MenuItem>
 		</BlockSettingsMenuControls>
 	);
