@@ -47,6 +47,10 @@ export default function useNavigationEditor() {
 	useEffect( () => {
 		if ( hasLoadedMenus ) {
 			setHasFinishedInitialLoad( true );
+
+			if ( ! menus?.length ) {
+				setSelectedMenuId( 0 );
+			}
 		}
 	}, [ hasLoadedMenus ] );
 
