@@ -47,12 +47,22 @@ export default function useNavigationEditor() {
 	useEffect( () => {
 		if ( hasLoadedMenus ) {
 			setHasFinishedInitialLoad( true );
-
-			if ( ! menus?.length ) {
-				setSelectedMenuId( 0 );
-			}
 		}
 	}, [ hasLoadedMenus ] );
+
+	useEffect( () => {
+		// Don't reset selected menu before we can check whether
+		// it is still available.
+		if ( ! hasLoadedMenus ) {
+			return;
+		}
+
+		const selectedMenu = menus?.find( ( { id } ) => id === selectedMenuId );
+
+		if ( ! menus?.length || ! selectedMenu ) {
+			setSelectedMenuId( 0 );
+		}
+	}, [ hasLoadedMenus, menus, selectedMenuId ] );
 
 	const navigationPost = useSelect(
 		( select ) => {
