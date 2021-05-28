@@ -84,12 +84,13 @@ class URLInput extends Component {
 			}, 100 );
 		}
 
-		// Only attempt an update on suggestions if the input value has actually changed.
 		if (
 			prevProps.value !== value &&
-			this.shouldShowInitialSuggestions()
+			! this.props.disableSuggestions &&
+			! this.isUpdatingSuggestions &&
+			! this.props.__experimentalShowInitialSuggestions
 		) {
-			this.updateSuggestions();
+			this.updateSuggestions( value.trim() );
 		}
 	}
 
