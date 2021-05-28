@@ -48,7 +48,7 @@ jobs:
 
             - name: Npm install and build
               run: |
-                  npm ci
+                  npm ci --loglevel verbose
                   FORCE_REDUCED_MOTION=true npm run build
 
             - name: Install WordPress

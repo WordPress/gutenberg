@@ -37,7 +37,7 @@ jobs:
             #       path: ~/.npm
             #       key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
 
-            - run: npm ci
+            - run: npm ci --loglevel verbose
 
             - name: Prepare build cache key
               run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
