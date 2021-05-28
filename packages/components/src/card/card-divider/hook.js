@@ -15,7 +15,7 @@ import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<{}, 'div'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr'>} props
  */
 export function useCardDivider( props ) {
 	const { className, ...otherProps } = useContextSystem(

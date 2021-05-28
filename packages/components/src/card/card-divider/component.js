@@ -2,18 +2,17 @@
  * Internal dependencies
  */
 import { contextConnect } from '../../ui/context';
-import { View } from '../../view';
+import { Divider } from '../../divider';
 import { useCardDivider } from './hook';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<{}, 'hr'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardDivider( props, forwardedRef ) {
-	const { as = 'hr', ...otherProps } = useCardDivider( props );
+	const dividerProps = useCardDivider( props );
 
-	// Should it add the `components-card__divider` className ?
-	return <View { ...otherProps } as={ as } ref={ forwardedRef } />;
+	return <Divider { ...dividerProps } ref={ forwardedRef } />;
 }
 
 /**
