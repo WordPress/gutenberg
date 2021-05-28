@@ -5,8 +5,7 @@
 		"isValid": true,
 		"attributes": {
 			"gridGap": 2,
-			"gridGapUnit": "em",
-			"gridTemplateColumns": "1fr 1fr 1fr"
+			"gridGapUnit": "em"
 		},
 		"innerBlocks": [
 			{
