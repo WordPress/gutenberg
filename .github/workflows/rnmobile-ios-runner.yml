@@ -28,12 +28,6 @@ jobs:
               with:
                   node-version: 14.x
 
-            - name: Restore npm cache
-              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
-              with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
-
             - run: npm ci
 
             - name: Prepare build cache key
