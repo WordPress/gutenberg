@@ -16,7 +16,7 @@ jobs:
 
             - name: try out nvm
               shell: bash -l {0}
-              run: nvm install
+              run: nvm install 16
             - run: node --version && npm --version
             - run: npm cache clean -force
             - run: rm -rf ~/.npm
