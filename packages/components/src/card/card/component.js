@@ -11,15 +11,15 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { contextConnect, ContextSystemProvider } from '../ui/context';
-import { Elevation } from '../elevation';
-import { View } from '../view';
-import * as styles from './styles';
+import { contextConnect, ContextSystemProvider } from '../../ui/context';
+import { Elevation } from '../../elevation';
+import { View } from '../../view';
+import * as styles from '../styles';
 import { useCard } from './hook';
-import CONFIG from '../utils/config-values';
+import CONFIG from '../../utils/config-values';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Card( props, forwardedRef ) {

@@ -12,12 +12,12 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
-import { useSurface } from '../surface';
-import * as styles from './styles';
+import { useContextSystem } from '../../ui/context';
+import { useSurface } from '../../surface';
+import * as styles from '../styles';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
  */
 function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 	let computedElevation = elevation;
@@ -32,12 +32,13 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 
 	return {
 		...otherProps,
+		isElevated,
 		elevation: computedElevation,
 	};
 }
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
  */
 export function useCard( props ) {
 	const {
