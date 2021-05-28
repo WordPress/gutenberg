@@ -50,21 +50,13 @@ function ExampleField( props, forwardRef ) {
 
 ## Props
 
-### `error`: `boolean`
+### `hasError`: `boolean`
 
 Renders an error style around the component.
 
 ### `disabled`: `boolean`
 
 Whether the field is disabled.
-
-### `isClickable`: `boolean`
-
-Renders a `cursor: pointer` on hover;
-
-### `isFocused`: `boolean`
-
-Renders focus styles around the component.
 
 ### `isInline`: `boolean`
 
