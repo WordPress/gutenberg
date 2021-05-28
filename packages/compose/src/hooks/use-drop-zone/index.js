@@ -19,7 +19,14 @@ function useFreshRef( value ) {
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {import('react').MutableRefObject<T>} */
 	/* eslint-enable jsdoc/no-undefined-types */
-	const ref = useRef( value );
+	// Disable reason: We're doing something pretty JavaScript-y here where the
+	// ref will always have a current value that is not null or undefined but it
+	// needs to start as undefined. We don't want to change the return type so
+	// it's easier to just ts-ignore this specific line that's complaining about
+	// undefined not being part of T.
+	// @ts-ignore
+	const ref = useRef();
+	ref.current = value;
 	return ref;
 }
 
