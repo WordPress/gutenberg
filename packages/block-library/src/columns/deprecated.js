@@ -8,11 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import {
-	InnerBlocks,
-	getColorClassName,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -68,43 +64,6 @@ const migrateCustomColors = ( attributes, innerBlocks ) => {
 };
 
 export default [
-	{
-		attributes: {
-			verticalAlignment: {
-				type: 'string',
-			},
-		},
-		supports: {
-			anchor: true,
-			align: [ 'wide', 'full' ],
-			html: false,
-			color: {
-				gradients: true,
-				link: true,
-			},
-		},
-		migrate( attributes, innerBlocks ) {
-			return {
-				...attributes,
-				gridGap: 2,
-				gridGapUnit: 'em',
-				gridTemplateColumns: getColumnWidthsAsGridColumnsValues(
-					innerBlocks
-				),
-			};
-		},
-		save( { attributes } ) {
-			const { verticalAlignment } = attributes;
-			const className = classnames( {
-				[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-			} );
-			return (
-				<div { ...useBlockProps.save( { className } ) }>
-					<InnerBlocks.Content />
-				</div>
-			);
-		},
-	},
 	{
 		attributes: {
 			verticalAlignment: {

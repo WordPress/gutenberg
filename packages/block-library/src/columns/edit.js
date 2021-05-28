@@ -126,12 +126,11 @@ function ColumnsEditContainer( {
 	updateAlignment,
 	updateColumns,
 } ) {
-	const {
-		gridGap,
-		gridGapUnit,
-		gridTemplateColumns,
-		verticalAlignment,
-	} = attributes;
+	const { gridGap, gridGapUnit, verticalAlignment } = attributes;
+
+	const [ gridTemplateColumns, setGridTemplateColumns ] = useState(
+		undefined
+	);
 
 	const { count, innerBlocks } = useSelect(
 		( select ) => {
@@ -144,11 +143,9 @@ function ColumnsEditContainer( {
 	);
 
 	useEffect( () => {
-		setAttributes( {
-			gridTemplateColumns: getColumnWidthsAsGridColumnsValues(
-				innerBlocks
-			),
-		} );
+		setGridTemplateColumns(
+			getColumnWidthsAsGridColumnsValues( innerBlocks )
+		);
 	}, [ count, innerBlocks ] );
 
 	const gridGapWithUnit = gridGapUnit

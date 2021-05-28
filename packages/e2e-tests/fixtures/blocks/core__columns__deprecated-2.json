@@ -4,10 +4,9 @@
 		"name": "core/columns",
 		"isValid": true,
 		"attributes": {
-			"backgroundColor": "secondary",
 			"gridGap": 2,
 			"gridGapUnit": "em",
-			"gridTemplateColumns": "1fr 1fr"
+			"backgroundColor": "secondary"
 		},
 		"innerBlocks": [
 			{

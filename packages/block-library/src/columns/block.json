@@ -14,9 +14,6 @@
 			"type": "string",
 			"default": "em"
 		},
-		"gridTemplateColumns": {
-			"type": "string"
-		},
 		"verticalAlignment": {
 			"type": "string"
 		}
