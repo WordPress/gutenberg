@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { chevronRight, Icon } from '@wordpress/icons';
+import { chevronRightSmall, Icon } from '@wordpress/icons';
 export default function BlockNavigationExpander( { onClick } ) {
 	return (
 		// Keyboard events are handled by TreeGrid see: components/src/tree-grid/index.js
@@ -10,7 +10,7 @@ export default function BlockNavigationExpander( { onClick } ) {
 			className="block-editor-block-navigation__expander"
 			onClick={ ( event ) => onClick( event, { forceToggle: true } ) }
 		>
-			<Icon icon={ chevronRight } />
+			<Icon icon={ chevronRightSmall } />
 		</span>
 	);
 }

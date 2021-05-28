@@ -60,7 +60,7 @@
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: ($grid-unit-15 / 2) $grid-unit-15;
+		padding: ($grid-unit-15 / 2) $grid-unit-15 ($grid-unit-15 / 2) 0;
 		text-align: left;
 		color: $gray-900;
 		border-radius: 2px;
@@ -121,8 +121,8 @@
 
 	.block-editor-block-icon {
 		align-self: flex-start;
-		margin-right: ( $grid-unit-05 * 2.5 ); // 10px is off the 4px grid, but required for visual alignment between block name and subsequent nested icon
-		width: 20px;
+		margin-right: $grid-unit-10;
+		width: $icon-size;
 	}
 
 	.block-editor-block-navigation-block__menu-cell,
@@ -272,6 +272,13 @@
 	.block-editor-block-navigation-appender__container {
 		display: flex;
 	}
+}
+
+// Chevron container metrics.
+.block-editor-block-navigation__expander {
+	height: $icon-size;
+	margin-left: $grid-unit-05;
+	width: $icon-size - $grid-unit-05;
 }
 
 // First level of indentation is aria-level 2, max indent is 8.
