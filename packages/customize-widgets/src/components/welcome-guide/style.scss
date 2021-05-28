@@ -5,6 +5,10 @@
 		margin-bottom: $grid-unit-10;
 	}
 
+	&__image {
+		height: auto;
+	}
+
 	// Extra specificity to override `.wrap h1` styles.
 	.wrap &__heading {
 		font-size: 18px;
