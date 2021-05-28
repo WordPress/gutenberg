@@ -44,7 +44,7 @@ jobs:
               #
               # See: https://github.com/WordPress/gutenberg/issues/16157
               run: |
-                  npm cache verify && npm install --loglevel verbose
+                  npm install
                   npm run build
 
             - name: Lint JavaScript and Styles

@@ -37,7 +37,7 @@ jobs:
 
             - name: Npm install
               run: |
-                  npm cache verify && npm ci --loglevel verbose
+                  npm ci
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'
