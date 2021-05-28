@@ -7,6 +7,9 @@ name: Pull request automation
 jobs:
     pull-request-automation:
         runs-on: ubuntu-latest
+        defaults:
+          run:
+            shell: bash -l {0}
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
@@ -14,10 +17,7 @@ jobs:
               with:
                   ref: trunk
 
-            - name: try out nvm
-              shell: bash -l {0}
-              run: nvm install 16
-            - run: node --version && npm --version
+            - run: nvm install 16
             - run: npm cache clean -force
             - run: rm -rf ~/.npm
             

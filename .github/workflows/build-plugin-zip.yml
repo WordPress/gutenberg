@@ -109,6 +109,9 @@ jobs:
     build:
         name: Build Release Artifact
         runs-on: ubuntu-latest
+        defaults:
+          run:
+            shell: bash -l {0}
         needs: bump-version
         if: always()
         steps:
@@ -117,10 +120,7 @@ jobs:
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
-            - name: try out nvm
-              shell: bash -l {0}
-              run: nvm install 16
-            - run: node --version && npm --version
+            - run: nvm install 16
             - run: npm cache clean -force
             - run: rm -rf ~/.npm
             
