@@ -26,7 +26,7 @@ function CardBody( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Card, CardBody } from `@wordpress/components/ui`;
+ * import { Card, CardBody } from `@wordpress/components`;
  *
  * <Card>
  * 	<CardBody>
