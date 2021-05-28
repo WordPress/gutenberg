@@ -109,9 +109,6 @@ jobs:
     build:
         name: Build Release Artifact
         runs-on: ubuntu-latest
-        defaults:
-          run:
-            shell: bash -l {0}
         needs: bump-version
         if: always()
         steps:

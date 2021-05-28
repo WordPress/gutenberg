@@ -7,9 +7,6 @@ name: Pull request automation
 jobs:
     pull-request-automation:
         runs-on: ubuntu-latest
-        defaults:
-          run:
-            shell: bash -l {0}
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).

@@ -15,9 +15,6 @@ concurrency:
 jobs:
     test:
         runs-on: macos-latest
-        defaults:
-          run:
-            shell: bash -l {0}
         strategy:
             matrix:
                 xcode: [12.2]
