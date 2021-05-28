@@ -41,13 +41,7 @@ jobs:
               with:
                   fetch-depth: 1
 
-            - name: Use Node.js 16.x
-              uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
-              with:
-                  node-version: 16.x
-
-            - run: npm cache clean -force
-            - run: npm install -g npm@6
+            - run: nvm install
             - run: npm cache clean -force
             - run: rm -rf ~/.npm
             
