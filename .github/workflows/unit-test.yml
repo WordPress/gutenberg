@@ -48,7 +48,7 @@ jobs:
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: |
-                  npm ci
+                  npm cache verify && npm ci --loglevel verbose
                   npx lerna run build
 
             - name: Running the tests
@@ -81,7 +81,7 @@ jobs:
 
             - name: Npm install and build
               run: |
-                  npm ci
+                  npm cache verify && npm ci --loglevel verbose
                   npm run build
 
             - name: Install WordPress
@@ -126,7 +126,7 @@ jobs:
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: |
-                  npm ci
+                  npm cache verify && npm ci --loglevel verbose
                   npx lerna run build
 
             - name: Running the tests
