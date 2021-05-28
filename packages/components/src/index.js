@@ -25,9 +25,14 @@ export { default as BaseControl } from './base-control';
 export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
-export { Card, CardBody, CardFooter, CardHeader } from './card';
-export { default as CardDivider } from './card-old/divider';
-export { default as CardMedia } from './card-old/media';
+export {
+	Card,
+	CardBody,
+	CardFooter,
+	CardHeader,
+	CardDivider,
+	useCardMedia,
+} from './card';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as __experimentalColorEdit } from './color-edit';
