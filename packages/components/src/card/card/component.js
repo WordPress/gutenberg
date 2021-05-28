@@ -38,19 +38,14 @@ function Card( props, forwardedRef ) {
 		[ elevationBorderRadius ]
 	);
 
+	const contexProps = {
+		size,
+		isBorderless,
+	};
 	const contextProviderValue = {
-		CardBody: {
-			size,
-			isBorderless,
-		},
-		CardHeader: {
-			size,
-			isBorderless,
-		},
-		CardFooter: {
-			size,
-			isBorderless,
-		},
+		CardBody: contexProps,
+		CardHeader: contexProps,
+		CardFooter: contexProps,
 	};
 
 	return (
