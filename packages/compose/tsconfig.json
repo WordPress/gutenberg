@@ -12,6 +12,7 @@
 		{ "path": "../keycodes" }
 	],
 	"include": [
+		"src/higher-order/compose.js",
 		"src/higher-order/if-condition/**/*",
 		"src/higher-order/pure/**/*",
 		"src/higher-order/with-instance-id/**/*",
