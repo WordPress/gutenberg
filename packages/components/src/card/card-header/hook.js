@@ -31,7 +31,7 @@ export function useCardHeader( props ) {
 			cx(
 				styles.Header,
 				styles.borderRadius,
-				styles.headerFooter,
+				styles.borderColor,
 				styles.cardPaddings[ size ],
 				isBorderless && styles.borderless,
 				isShady && styles.shady,

@@ -32,7 +32,7 @@ export function useCardFooter( props ) {
 			cx(
 				styles.Footer,
 				styles.borderRadius,
-				styles.headerFooter,
+				styles.borderColor,
 				styles.cardPaddings[ size ],
 				isBorderless && styles.borderless,
 				isShady && styles.shady,

@@ -29,10 +29,6 @@ export const Footer = css`
 	}
 `;
 
-export const headerFooter = css`
-	border-color: ${ CONFIG.colorDivider };
-`;
-
 export const Content = css`
 	height: 100%;
 `;
@@ -65,6 +61,10 @@ export const borderRadius = css`
 		border-bottom-left-radius: ${ CONFIG.cardBorderRadius };
 		border-bottom-right-radius: ${ CONFIG.cardBorderRadius };
 	}
+`;
+
+export const borderColor = css`
+	border-color: ${ CONFIG.colorDivider };
 `;
 
 export const boxShadowless = css`
