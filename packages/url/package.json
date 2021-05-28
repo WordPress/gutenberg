@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/url",
-	"version": "2.22.2",
+	"version": "3.1.0",
 	"description": "WordPress URL utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,7 +28,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"react-native-url-polyfill": "^1.1.2"
 	},
 	"publishConfig": {

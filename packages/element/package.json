@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/element",
-	"version": "2.20.3",
+	"version": "3.1.0",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,7 +32,7 @@
 		"@types/react": "^16.9.0",
 		"@types/react-dom": "^16.9.0",
 		"@wordpress/escape-html": "file:../escape-html",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1"
 	},

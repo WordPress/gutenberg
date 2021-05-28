@@ -10,7 +10,7 @@ import {
 	MenuItem,
 	Spinner,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+
 import {
 	forwardRef,
 	useCallback,
@@ -19,30 +19,13 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { navigation, chevronDown, Icon } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import createDataTree from './create-data-tree';
-import mapMenuItemsToBlocks from './map-menu-items-to-blocks';
+import useNavigationEntities from './use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
-
-/**
- * Convert a flat menu item structure to a nested blocks structure.
- *
- * @param {Object[]} menuItems An array of menu items.
- *
- * @return {WPBlock[]} An array of blocks.
- */
-function convertMenuItemsToBlocks( menuItems ) {
-	if ( ! menuItems ) {
-		return null;
-	}
-
-	const menuTree = createDataTree( menuItems );
-	return mapMenuItemsToBlocks( menuTree );
-}
+import menuItemsToBlocks from './menu-items-to-blocks';
 
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
@@ -50,80 +33,19 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
 
 	const {
-		pages,
 		isResolvingPages,
-		hasResolvedPages,
 		menus,
 		isResolvingMenus,
-		hasResolvedMenus,
 		menuItems,
 		hasResolvedMenuItems,
-	} = useSelect(
-		( select ) => {
-			const {
-				getEntityRecords,
-				getMenus,
-				getMenuItems,
-				isResolving,
-				hasFinishedResolution,
-			} = select( coreStore );
-			const pagesParameters = [
-				'postType',
-				'page',
-				{
-					parent: 0,
-					order: 'asc',
-					orderby: 'id',
-					per_page: -1,
-				},
-			];
-			const menusParameters = [ { per_page: -1 } ];
-			const hasSelectedMenu = selectedMenu !== undefined;
-			const menuItemsParameters = hasSelectedMenu
-				? [
-						{
-							menus: selectedMenu,
-							per_page: -1,
-						},
-				  ]
-				: undefined;
+		hasPages,
+		hasMenus,
+	} = useNavigationEntities( selectedMenu );
 
-			return {
-				pages: getEntityRecords( ...pagesParameters ),
-				isResolvingPages: isResolving(
-					'getEntityRecords',
-					pagesParameters
-				),
-				hasResolvedPages: hasFinishedResolution(
-					'getEntityRecords',
-					pagesParameters
-				),
-				menus: getMenus( ...menusParameters ),
-				isResolvingMenus: isResolving( 'getMenus', menusParameters ),
-				hasResolvedMenus: hasFinishedResolution(
-					'getMenus',
-					menusParameters
-				),
-				menuItems: hasSelectedMenu
-					? getMenuItems( ...menuItemsParameters )
-					: undefined,
-				hasResolvedMenuItems: hasSelectedMenu
-					? hasFinishedResolution(
-							'getMenuItems',
-							menuItemsParameters
-					  )
-					: false,
-			};
-		},
-		[ selectedMenu ]
-	);
-
-	const hasPages = !! ( hasResolvedPages && pages?.length );
-	const hasMenus = !! ( hasResolvedMenus && menus?.length );
 	const isLoading = isResolvingPages || isResolvingMenus;
 
 	const createFromMenu = useCallback( () => {
-		const blocks = convertMenuItemsToBlocks( menuItems );
+		const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
 		const selectNavigationBlock = true;
 		onCreate( blocks, selectNavigationBlock );
 	} );
@@ -159,7 +81,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	}, [ isCreatingFromMenu, hasResolvedMenuItems ] );
 
 	const toggleProps = {
-		isPrimary: true,
+		variant: 'primary',
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
 	return (
@@ -210,14 +132,16 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						) : undefined }
 						{ hasPages ? (
 							<Button
-								isPrimary={ hasMenus ? false : true }
-								isTertiary={ hasMenus ? true : false }
+								variant={ hasMenus ? 'tertiary' : 'primary' }
 								onClick={ onCreateAllPages }
 							>
 								{ __( 'Add all pages' ) }
 							</Button>
 						) : undefined }
-						<Button isTertiary onClick={ onCreateEmptyMenu }>
+						<Button
+							variant="tertiary"
+							onClick={ onCreateEmptyMenu }
+						>
 							{ __( 'Start empty' ) }
 						</Button>
 					</div>

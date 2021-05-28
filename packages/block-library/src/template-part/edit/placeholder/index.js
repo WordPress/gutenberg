@@ -1,13 +1,18 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Placeholder, Dropdown, Button } from '@wordpress/components';
-import { blockDefault } from '@wordpress/icons';
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -24,9 +29,27 @@ export default function TemplatePartPlaceholder( {
 	area,
 	clientId,
 	setAttributes,
+	enableSelection,
 } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.initial );
+
+	const { areaIcon, areaLabel } = useSelect(
+		( select ) => {
+			const definedAreas = select(
+				editorStore
+			).__experimentalGetDefaultTemplatePartAreas();
+
+			const selectedArea = find( definedAreas, { area } );
+			const defaultArea = find( definedAreas, { area: 'uncategorized' } );
+
+			return {
+				areaIcon: selectedArea?.icon || defaultArea?.icon,
+				areaLabel: selectedArea?.label || __( 'Template Part' ),
+			};
+		},
+		[ area ]
+	);
 
 	const onCreate = useCallback(
 		async ( startingBlocks = [] ) => {
@@ -61,31 +84,49 @@ export default function TemplatePartPlaceholder( {
 		<>
 			{ step === PLACEHOLDER_STEPS.initial && (
 				<Placeholder
-					icon={ blockDefault }
-					label={ __( 'Template Part' ) }
-					instructions={ __(
-						'Create a new template part or pick an existing one from the list.'
-					) }
+					icon={ areaIcon }
+					label={ areaLabel }
+					instructions={
+						enableSelection
+							? sprintf(
+									// Translators: %s as template part area title ("Header", "Footer", etc.).
+									'Choose an existing %s or create a new one.',
+									areaLabel.toLowerCase()
+							  )
+							: sprintf(
+									// Translators: %s as template part area title ("Header", "Footer", etc.).
+									'Create a new %s.',
+									areaLabel.toLowerCase()
+							  )
+					}
 				>
 					<Dropdown
 						contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
 						position="bottom right left"
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<>
+								{ enableSelection && (
+									<Button
+										variant="primary"
+										onClick={ onToggle }
+										aria-expanded={ isOpen }
+									>
+										{ __( 'Choose existing' ) }
+									</Button>
+								) }
 								<Button
-									isPrimary
-									onClick={ onToggle }
-									aria-expanded={ isOpen }
-								>
-									{ __( 'Choose existing' ) }
-								</Button>
-								<Button
-									isTertiary
+									variant={
+										enableSelection ? 'tertiary' : 'primary'
+									}
 									onClick={ () =>
 										setStep( PLACEHOLDER_STEPS.patterns )
 									}
 								>
-									{ __( 'New template part' ) }
+									{ sprintf(
+										// Translators: %s as template part area title ("Header", "Footer", etc.).
+										'New %s',
+										areaLabel.toLowerCase()
+									) }
 								</Button>
 							</>
 						) }
@@ -93,6 +134,7 @@ export default function TemplatePartPlaceholder( {
 							<TemplatePartSelection
 								setAttributes={ setAttributes }
 								onClose={ onClose }
+								area={ area }
 							/>
 						) }
 					/>

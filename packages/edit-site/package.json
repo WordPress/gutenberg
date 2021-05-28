@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "1.17.3",
+	"version": "2.1.2",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -54,7 +54,7 @@
 		"downloadjs": "^1.4.7",
 		"file-saver": "^2.0.2",
 		"jszip": "^3.2.2",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

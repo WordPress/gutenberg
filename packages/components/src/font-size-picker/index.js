@@ -8,38 +8,20 @@ import { isNumber, isString } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { textColor } from '@wordpress/icons';
-import { useMemo, forwardRef, Platform } from '@wordpress/element';
+import { useMemo, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import RangeControl from '../range-control';
-import UnitControl from '../unit-control';
+import { default as UnitControl, useCustomUnits } from '../unit-control';
 import CustomSelectControl from '../custom-select-control';
-import { VisuallyHidden } from '../visually-hidden';
+import VisuallyHidden from '../visually-hidden';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
 const MAX_FONT_SIZE_DISPLAY = '25px';
-const isWeb = Platform.OS === 'web';
-const CSS_UNITS = [
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-];
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
@@ -95,6 +77,10 @@ function FontSizePicker(
 	const isPixelValue =
 		isNumber( value ) || ( isString( value ) && value.endsWith( 'px' ) );
 
+	const units = useCustomUnits( {
+		availableUnits: [ 'px', 'em', 'rem' ],
+	} );
+
 	const options = useMemo(
 		() => getSelectOptions( fontSizes, disableCustomFontSizes ),
 		[ fontSizes, disableCustomFontSizes ]
@@ -143,7 +129,7 @@ function FontSizePicker(
 								onChange( nextSize );
 							}
 						} }
-						units={ CSS_UNITS }
+						units={ units }
 					/>
 				) }
 				<Button
@@ -153,7 +139,7 @@ function FontSizePicker(
 						onChange( undefined );
 					} }
 					isSmall
-					isSecondary
+					variant="secondary"
 				>
 					{ __( 'Reset' ) }
 				</Button>

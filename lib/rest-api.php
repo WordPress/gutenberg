@@ -65,15 +65,6 @@ function gutenberg_register_sidebars_and_widgets_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
 
 /**
- * Registers the Batch REST API routes.
- */
-function gutenberg_register_batch_endpoint() {
-	$batch = new WP_REST_Batch_Controller();
-	$batch->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
-
-/**
  * Registers the Block editor settings REST API routes.
  */
 function gutenberg_register_block_editor_settings() {

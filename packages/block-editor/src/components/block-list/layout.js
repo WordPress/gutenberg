@@ -41,10 +41,15 @@ export function LayoutStyle( { selector, layout = {} } ) {
 	let style =
 		!! contentSize || !! wideSize
 			? `
+				${ selector } {
+					display: grid;
+				}
+
 				${ appendSelectors( selector, '> *' ) } {
+					box-sizing: border-box;
+					justify-self: center;
+					width: 100%;
 					max-width: ${ contentSize ?? wideSize };
-					margin-left: auto;
-					margin-right: auto;
 				}
 
 				${ appendSelectors( selector, '> [data-align="wide"]' ) }  {

@@ -2,9 +2,12 @@
 
 @import "./blocks/widget-area/editor.scss";
 @import "./components/header/style.scss";
+@import "./components/keyboard-shortcut-help-modal/style.scss";
+@import "./components/more-menu/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/notices/style.scss";
 @import "./components/layout/style.scss";
+@import "./components/welcome-guide/style.scss";
 @import "./components/widget-areas-block-editor-content/style.scss";
 
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color

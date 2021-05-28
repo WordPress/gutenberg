@@ -5,6 +5,13 @@ on:
     release:
         types: [published]
 
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
 jobs:
     performance:
         name: Run performance tests
@@ -40,13 +47,13 @@ jobs:
               if: github.event_name == 'release'
               env:
                   PLUGIN_VERSION: ${{ github.event.release.name }}
+              shell: bash
               run: |
-                  IFS='.' read -r -a PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
+                  IFS=. read -ra PLUGIN_VERSION_ARRAY <<< "$PLUGIN_VERSION"
                   CURRENT_RELEASE_BRANCH="release/${PLUGIN_VERSION_ARRAY[0]}.${PLUGIN_VERSION_ARRAY[1]}"
-                  PREVIOUS_VERSION_BASE_10=$(expr ${PLUGIN_VERSION_ARRAY[0]} \* 10 + ${PLUGIN_VERSION_ARRAY[1]} - 1)
-                  PREVIOUS_RELEASE_BRANCH="release/$(expr $PREVIOUS_VERSION_BASE_10 / 10).$(expr $PREVIOUS_VERSION_BASE_10 % 10)"
-                  TESTED_UP_TO_REGEX="Tested up to: \K([0-9]+)\.([0-9]+)\.?([0-9]?)"
-                  WP_VERSION=$(grep -oP "$TESTED_UP_TO_REGEX" ./readme.txt)
-                  IFS='.' read -r -a WP_VERSION_ARRAY <<< "$WP_VERSION"
+                  PREVIOUS_VERSION_BASE_10=$((PLUGIN_VERSION_ARRAY[0] * 10 + PLUGIN_VERSION_ARRAY[1] - 1))
+                  PREVIOUS_RELEASE_BRANCH="release/$((PREVIOUS_VERSION_BASE_10 / 10)).$((PREVIOUS_VERSION_BASE_10 % 10))"
+                  WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
+                  IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_BRANCH="wp/${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf --ci $WP_BRANCH $PREVIOUS_RELEASE_BRANCH $CURRENT_RELEASE_BRANCH
+                  ./bin/plugin/cli.js perf --ci "$WP_BRANCH" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --tests-branch "$WP_BRANCH"

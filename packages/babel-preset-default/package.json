@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/babel-preset-default",
-	"version": "5.2.2",
+	"version": "6.1.0",
 	"description": "Default Babel preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,6 +24,7 @@
 		"node": ">=12"
 	},
 	"files": [
+		"build",
 		"index.js"
 	],
 	"main": "index.js",
@@ -38,9 +39,13 @@
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/element": "file:../element",
 		"@wordpress/warning": "file:../warning",
-		"core-js": "^3.6.4"
+		"browserslist": "^4.16.6",
+		"core-js": "^3.12.1"
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"build": "./bin/index.js"
 	}
 }

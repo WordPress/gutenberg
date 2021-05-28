@@ -31,6 +31,7 @@ import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -75,8 +76,14 @@ function AudioEdit( {
 		};
 	}
 
-	function onSelectURL() {
-		// TODO: Set up add audio from URL flow
+	function onSelectURL( newSrc ) {
+		if ( newSrc !== src ) {
+			if ( isURL( newSrc ) ) {
+				setAttributes( { src: newSrc, id: undefined } );
+			} else {
+				createErrorNotice( __( 'Invalid URL. Audio file not found.' ) );
+			}
+		}
 	}
 
 	function onSelectAudio( media ) {
@@ -136,7 +143,6 @@ function AudioEdit( {
 		return (
 			<MediaUploadProgress
 				mediaId={ id }
-				onUpdateMediaProgress={ this.updateMediaProgress }
 				onFinishMediaUploadWithSuccess={ onFileChange }
 				onFinishMediaUploadWithFailure={ onError }
 				onMediaUploadStateReset={ onFileChange }
@@ -150,7 +156,9 @@ function AudioEdit( {
 				} ) => {
 					return (
 						<>
-							{ ! isCaptionSelected && getBlockControls( open ) }
+							{ ! isCaptionSelected &&
+								! isUploadInProgress &&
+								getBlockControls( open ) }
 							{ getMediaOptions() }
 							<AudioPlayer
 								isUploadInProgress={ isUploadInProgress }
@@ -179,6 +187,9 @@ function AudioEdit( {
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ __(
+								'Autoplay may cause usability issues for some users.'
+							) }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
@@ -208,6 +219,7 @@ function AudioEdit( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					isReplacingMedia={ true }
 					onSelect={ onSelectAudio }
+					onSelectURL={ onSelectURL }
 					render={ ( { open, getMediaOptions } ) => {
 						return getBlockUI( open, getMediaOptions );
 					} }

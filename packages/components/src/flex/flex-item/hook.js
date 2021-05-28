@@ -11,7 +11,7 @@ import { useFlexContext } from '../context';
 import * as styles from '../styles';
 
 /**
- * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexItemProps, 'div'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexItemProps, 'div'>} props
  */
 export function useFlexItem( props ) {
 	const {

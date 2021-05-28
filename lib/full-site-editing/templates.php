@@ -6,25 +6,6 @@
  */
 
 /**
- * Returns all block template file path of the current theme and its parent theme.
- * Includes demo block template files if demo experiment is enabled.
- *
- * @return array $block_template_files A list of paths to all template files.
- */
-function gutenberg_get_template_paths() {
-	$block_template_files = glob( get_stylesheet_directory() . '/block-templates/*.html' );
-	$block_template_files = is_array( $block_template_files ) ? $block_template_files : array();
-
-	if ( is_child_theme() ) {
-		$child_block_template_files = glob( get_template_directory() . '/block-templates/*.html' );
-		$child_block_template_files = is_array( $child_block_template_files ) ? $child_block_template_files : array();
-		$block_template_files       = array_merge( $block_template_files, $child_block_template_files );
-	}
-
-	return $block_template_files;
-}
-
-/**
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
@@ -64,7 +45,7 @@ function gutenberg_register_template_post_type() {
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
 		'rest_base'             => 'templates',
-		'rest_controller_class' => 'WP_REST_Templates_Controller',
+		'rest_controller_class' => 'Gutenberg_REST_Templates_Controller',
 		'capability_type'       => array( 'template', 'templates' ),
 		'map_meta_cap'          => true,
 		'supports'              => array(
@@ -84,13 +65,13 @@ add_action( 'init', 'gutenberg_register_template_post_type' );
  * Registers block editor 'wp_theme' taxonomy.
  */
 function gutenberg_register_wp_theme_taxonomy() {
-	if ( ! gutenberg_supports_block_templates() ) {
+	if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		return;
 	}
 
 	register_taxonomy(
 		'wp_theme',
-		array( 'wp_template', 'wp_template_part' ),
+		array( 'wp_template', 'wp_template_part', 'wp_global_styles' ),
 		array(
 			'public'            => false,
 			'hierarchical'      => false,

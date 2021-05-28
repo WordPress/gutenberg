@@ -4,44 +4,17 @@
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+import {
+	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalBoxControl as BoxControl,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
 import { cleanEmptyObject } from './utils';
-import { useCustomUnits } from '../components/unit-control';
-
-const isWeb = Platform.OS === 'web';
-const CSS_UNITS = [
-	{
-		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
-		default: '',
-	},
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
-		default: '',
-	},
-];
 
 /**
  * Determines if there is padding support.
@@ -61,7 +34,7 @@ export function hasPaddingSupport( blockType ) {
  * @return {boolean}                 Whether padding setting is disabled.
  */
 export function useIsPaddingDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useEditorFeature( 'spacing.customPadding' );
+	const isDisabled = ! useSetting( 'spacing.customPadding' );
 	return ! hasPaddingSupport( blockName ) || isDisabled;
 }
 
@@ -79,10 +52,18 @@ export function PaddingEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits( CSS_UNITS );
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
+	} );
 	const sides = useCustomSides( blockName, 'padding' );
 
-	if ( ! hasPaddingSupport( blockName ) ) {
+	if ( useIsPaddingDisabled( props ) ) {
 		return null;
 	}
 

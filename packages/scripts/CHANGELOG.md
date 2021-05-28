@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 16.1.0 (2021-05-20)
+
+### Bug Fix
+
+-   The default Babel configuration has changed to respect a local Browserslist configuration.
+
+## 16.0.0 (2021-05-14)
+
 ### Breaking Changes
 
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
@@ -13,6 +21,12 @@
 -   Include a Jest Reporter that formats test results for GitHub Actions annotations ([#31041](https://github.com/WordPress/gutenberg/pull/31041)).
 -   Have the `format` command ignore files listed in a `.prettierignore` file, add a fallback `.prettierignore` to the package ([30844](https://github.com/WordPress/gutenberg/pull/30844)).
 -   The e2e tests are now using [`jest-circus`](https://github.com/facebook/jest/tree/master/packages/jest-circus) as the test runner. This enable us to capture screenshots at the time the tests failed. The unit tests are also using the same test runner for consistency ([#28449](https://github.com/WordPress/gutenberg/pull/28449), [#31178](https://github.com/WordPress/gutenberg/pull/31178)).
+
+### Security Fix
+
+-   Update `postcss` dependency to the latest patch version. Versions before 8.2.10 are vulnerable to Regular Expression Denial of Service (ReDoS) during source map parsing ([#31685](https://github.com/WordPress/gutenberg/pull/31685)).
+
+## 15.0.1 (2021-04-30)
 
 ### Bug Fix
 

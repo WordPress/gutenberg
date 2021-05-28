@@ -6,7 +6,6 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-
 import {
 	PanelBody,
 	QueryControls,
@@ -20,13 +19,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { addQueryArgs } from '@wordpress/url';
-import {
-	useEffect,
-	useState,
-	useCallback,
-	createInterpolateElement,
-} from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -41,25 +34,32 @@ const stickyOptions = [
 	{ label: __( 'Only' ), value: 'only' },
 ];
 
-const CreateNewPostLink = ( { type } ) => {
-	const newPostUrl = addQueryArgs( 'post-new.php', {
-		post_type: type,
-	} );
-	return (
-		<div className="wp-block-query__create-new-link">
-			{ createInterpolateElement(
-				__( '<a>Create a new post</a> for this feed.' ),
-				// eslint-disable-next-line jsx-a11y/anchor-has-content
-				{ a: <a href={ newPostUrl } /> }
-			) }
-		</div>
-	);
+// Helper function to get the term id based on user input in terms `FormTokenField`.
+const getTermIdByTermValue = ( termsMappedByName, termValue ) => {
+	// First we check for exact match by `term.id` or case sensitive `term.name` match.
+	const termId = termValue?.id || termsMappedByName[ termValue ]?.id;
+	if ( termId ) return termId;
+	/**
+	 * Here we make an extra check for entered terms in a non case sensitive way,
+	 * to match user expectations, due to `FormTokenField` behaviour that shows
+	 * suggestions which are case insensitive.
+	 *
+	 * Although WP tries to discourage users to add terms with the same name (case insensitive),
+	 * it's still possible if you manually change the name, as long as the terms have different slugs.
+	 * In this edge case we always apply the first match from the terms list.
+	 */
+	const termValueLower = termValue.toLocaleLowerCase();
+	for ( const term in termsMappedByName ) {
+		if ( term.toLocaleLowerCase() === termValueLower ) {
+			return termsMappedByName[ term ].id;
+		}
+	}
 };
 
 export default function QueryInspectorControls( {
-	attributes: { query, layout },
+	attributes: { query, displayLayout },
 	setQuery,
-	setLayout,
+	setDisplayLayout,
 } ) {
 	const {
 		order,
@@ -114,11 +114,16 @@ export default function QueryInspectorControls( {
 	};
 	// Handles categories and tags changes.
 	const onTermsChange = ( terms, queryProperty ) => ( newTermValues ) => {
-		const termIds = newTermValues.reduce( ( accumulator, termValue ) => {
-			const termId = termValue?.id || terms.mapByName[ termValue ]?.id;
-			if ( termId ) accumulator.push( termId );
-			return accumulator;
-		}, [] );
+		const termIds = Array.from(
+			newTermValues.reduce( ( accumulator, termValue ) => {
+				const termId = getTermIdByTermValue(
+					terms.mapByName,
+					termValue
+				);
+				if ( termId ) accumulator.add( termId );
+				return accumulator;
+			}, new Set() )
+		);
 		setQuery( { [ queryProperty ]: termIds } );
 	};
 	const onCategoriesChange = onTermsChange( categories, 'categoryIds' );
@@ -171,7 +176,6 @@ export default function QueryInspectorControls( {
 
 	return (
 		<InspectorControls>
-			<CreateNewPostLink type={ postType } />
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
 					label={ __( 'Inherit query from URL' ) }
@@ -189,18 +193,18 @@ export default function QueryInspectorControls( {
 						onChange={ onPostTypeChange }
 					/>
 				) }
-				{ layout?.type === 'flex' && (
+				{ displayLayout?.type === 'flex' && (
 					<>
 						<RangeControl
 							label={ __( 'Columns' ) }
-							value={ layout.columns }
+							value={ displayLayout.columns }
 							onChange={ ( value ) =>
-								setLayout( { columns: value } )
+								setDisplayLayout( { columns: value } )
 							}
 							min={ 2 }
-							max={ Math.max( 6, layout.columns ) }
+							max={ Math.max( 6, displayLayout.columns ) }
 						/>
-						{ layout.columns > 6 && (
+						{ displayLayout.columns > 6 && (
 							<Notice status="warning" isDismissible={ false }>
 								{ __(
 									'This column count exceeds the recommended amount and may cause visual breakage.'

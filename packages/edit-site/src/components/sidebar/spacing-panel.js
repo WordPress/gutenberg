@@ -1,75 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalBoxControl as BoxControl,
 	PanelBody,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useEditorFeature } from '../editor/utils';
-
-const isWeb = Platform.OS === 'web';
-const CSS_UNITS = [
-	{
-		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
-		default: '',
-	},
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
-		default: '',
-	},
-];
+import { useSetting } from '../editor/utils';
 
 export function useHasSpacingPanel( context ) {
 	const hasPadding = useHasPadding( context );
+	const hasMargin = useHasMargin( context );
 
-	return hasPadding;
+	return hasPadding || hasMargin;
 }
 
-export function useHasPadding( { name, supports } ) {
-	return (
-		useEditorFeature( 'spacing.customPadding', name ) &&
-		supports.includes( 'padding' )
-	);
+function useHasPadding( { name, supports } ) {
+	const settings = useSetting( 'spacing.customPadding', name );
+
+	return settings && supports.includes( 'padding' );
 }
 
-function filterUnitsWithSettings( settings = [], units = [] ) {
-	return units.filter( ( unit ) => {
-		return settings.includes( unit.value );
-	} );
-}
+function useHasMargin( { name, supports } ) {
+	const settings = useSetting( 'spacing.customMargin', name );
 
-function useCustomUnits( { units, contextName } ) {
-	const availableUnits = useEditorFeature( 'spacing.units', contextName );
-	const usedUnits = filterUnitsWithSettings(
-		! availableUnits ? [] : availableUnits,
-		units
-	);
-
-	return usedUnits.length === 0 ? false : usedUnits;
+	return settings && supports.includes( 'margin' );
 }
 
 function filterValuesBySides( values, sides ) {
@@ -88,7 +49,16 @@ function filterValuesBySides( values, sides ) {
 export default function SpacingPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
 	const showPaddingControl = useHasPadding( context );
-	const units = useCustomUnits( { contextName: name, units: CSS_UNITS } );
+	const showMarginControl = useHasMargin( context );
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units', name ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
+	} );
 
 	const paddingValues = getStyle( name, 'padding' );
 	const paddingSides = useCustomSides( name, 'padding' );
@@ -96,6 +66,14 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 	const setPaddingValues = ( newPaddingValues ) => {
 		const padding = filterValuesBySides( newPaddingValues, paddingSides );
 		setStyle( name, 'padding', padding );
+	};
+
+	const marginValues = getStyle( name, 'margin' );
+	const marginSides = useCustomSides( name, 'margin' );
+
+	const setMarginValues = ( newMarginValues ) => {
+		const margin = filterValuesBySides( newMarginValues, marginSides );
+		setStyle( name, 'margin', margin );
 	};
 
 	return (
@@ -106,6 +84,15 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 					onChange={ setPaddingValues }
 					label={ __( 'Padding' ) }
 					sides={ paddingSides }
+					units={ units }
+				/>
+			) }
+			{ showMarginControl && (
+				<BoxControl
+					values={ marginValues }
+					onChange={ setMarginValues }
+					label={ __( 'Margin' ) }
+					sides={ marginSides }
 					units={ units }
 				/>
 			) }

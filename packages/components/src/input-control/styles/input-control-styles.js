@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
  */
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
-import { color, rtl } from '../../utils/style-mixins';
+import { COLORS, rtl } from '../../utils';
 
 const rootFloatLabelStyles = () => {
 	return css( { paddingTop: 0 } );
@@ -53,8 +53,8 @@ export const Root = styled( Flex )`
 
 const containerDisabledStyles = ( { disabled } ) => {
 	const backgroundColor = disabled
-		? color( 'ui.backgroundDisabled' )
-		: color( 'ui.background' );
+		? COLORS.ui.backgroundDisabled
+		: COLORS.ui.background;
 
 	return css( { backgroundColor } );
 };
@@ -95,7 +95,7 @@ const disabledStyles = ( { disabled } ) => {
 	if ( ! disabled ) return '';
 
 	return css( {
-		color: color( 'ui.textDisabled' ),
+		color: COLORS.ui.textDisabled,
 	} );
 };
 
@@ -186,7 +186,7 @@ export const Input = styled.input`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ color( 'black' ) };
+		color: ${ COLORS.black };
 		display: block;
 		margin: 0;
 		outline: none;
@@ -242,18 +242,16 @@ export const LabelWrapper = styled( FlexItem )`
 `;
 
 const backdropFocusedStyles = ( { disabled, isFocused } ) => {
-	let borderColor = isFocused
-		? color( 'ui.borderFocus' )
-		: color( 'ui.border' );
+	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
 
 	let boxShadow = null;
 
 	if ( isFocused ) {
-		boxShadow = `0 0 0 1px ${ color( 'ui.borderFocus' ) } inset`;
+		boxShadow = `0 0 0 1px ${ COLORS.ui.borderFocus } inset`;
 	}
 
 	if ( disabled ) {
-		borderColor = color( 'ui.borderDisabled' );
+		borderColor = COLORS.ui.borderDisabled;
 	}
 
 	return css( {

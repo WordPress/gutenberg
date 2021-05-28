@@ -149,7 +149,7 @@ export class PostPublishButton extends Component {
 			'aria-disabled': isButtonDisabled && ! hasNonPostEntityChanges,
 			className: 'editor-post-publish-button',
 			isBusy: ! isAutoSaving && isSaving && isPublished,
-			isPrimary: true,
+			variant: 'primary',
 			onClick: this.createOnClick( onClickButton ),
 		};
 
@@ -158,7 +158,7 @@ export class PostPublishButton extends Component {
 			'aria-expanded': isOpen,
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,
-			isPrimary: true,
+			variant: 'primary',
 			onClick: this.createOnClick( onClickToggle ),
 		};
 

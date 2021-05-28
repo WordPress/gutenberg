@@ -32,6 +32,8 @@ function blockToWidget( block, existingWidget = null ) {
 				idBase: block.attributes.idBase,
 				instance: {
 					...existingWidget?.instance,
+					// Required only for the customizer.
+					is_widget_customizer_js_value: true,
 					encoded_serialized_instance: encoded,
 					instance_hash_key: hash,
 					raw_instance: raw,
@@ -171,6 +173,11 @@ export default function useSidebarBlockEditor( sidebar ) {
 					// Add a new widget.
 					return blockToWidget( nextBlock );
 				} );
+
+				// Bail out updates if the updated widgets are the same.
+				if ( isShallowEqual( sidebar.getWidgets(), nextWidgets ) ) {
+					return prevBlocks;
+				}
 
 				const addedWidgetIds = sidebar.setWidgets( nextWidgets );
 

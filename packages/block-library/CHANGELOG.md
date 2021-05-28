@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 3.2.0 (2021-05-24)
+
+### New Features
+
+-   Marks the `core/legacy-widget` block as stable.
+
+## 3.1.0 (2021-05-20)
+
+## 3.0.0 (2021-05-14)
+
 ### Breaking Changes
 
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.8.6",
+	"version": "1.9.1",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
@@ -49,7 +49,7 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"rememo": "^3.0.0",
 		"uuid": "^8.3.0"
 	},

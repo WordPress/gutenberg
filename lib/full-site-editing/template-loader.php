@@ -24,35 +24,6 @@ function gutenberg_add_template_loader_filters() {
 add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
 
 /**
- * Get the template hierarchy for a given template type.
- *
- * Internally, this filters into the "{$type}_template_hierarchy" hook to record the type-specific template hierarchy.
- *
- * @param string $template_type A template type.
- * @return string[] A list of template candidates, in descending order of priority.
- */
-function get_template_hierarchy( $template_type ) {
-	if ( ! in_array( $template_type, gutenberg_get_template_type_slugs(), true ) ) {
-		return array();
-	}
-
-	$get_template_function     = 'get_' . str_replace( '-', '_', $template_type ) . '_template'; // front-page -> get_front_page_template.
-	$template_hierarchy_filter = str_replace( '-', '', $template_type ) . '_template_hierarchy'; // front-page -> frontpage_template_hierarchy.
-
-	$result                             = array();
-	$template_hierarchy_filter_function = function( $templates ) use ( &$result ) {
-		$result = $templates;
-		return $templates;
-	};
-
-	add_filter( $template_hierarchy_filter, $template_hierarchy_filter_function, 20, 1 );
-	call_user_func( $get_template_function ); // This invokes template_hierarchy_filter.
-	remove_filter( $template_hierarchy_filter, $template_hierarchy_filter_function, 20 );
-
-	return $result;
-}
-
-/**
  * Filters into the "{$type}_template" hooks to redirect them to the Full Site Editing template canvas.
  *
  * Internally, this communicates the block content that needs to be used by the template canvas through a global variable.
@@ -62,74 +33,50 @@ function get_template_hierarchy( $template_type ) {
  * @param array  $templates A list of template candidates, in descending order of priority.
  * @return string The path to the Full Site Editing template canvas file.
  */
-function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
+function gutenberg_override_query_template( $template, $type, array $templates ) {
 	global $_wp_current_template_content;
-	$current_template = gutenberg_resolve_template( $type, $templates );
 
-	// Allow falling back to a PHP template if it has a higher priority than the block template.
-	$current_template_slug       = str_replace(
-		array( trailingslashit( get_stylesheet_directory() ), trailingslashit( get_template_directory() ), '.php' ),
-		'',
-		$template
-	);
-	$current_block_template_slug = is_object( $current_template ) ? $current_template->slug : false;
-	foreach ( $templates as $template_item ) {
+	if ( $template ) {
+		// locate_template() has found a PHP template at the path specified by $template.
+		// That means that we have a fallback candidate if we cannot find a block template
+		// with higher specificity.
+		// Thus, before looking for matching block themes, we shorten our list of candidate
+		// templates accordingly.
 
-		$template_item_slug = gutenberg_strip_php_suffix( $template_item );
+		// Locate the index of $template (without the theme directory path) in $templates.
+		$relative_template_path = str_replace(
+			array( get_stylesheet_directory() . '/', get_template_directory() . '/' ),
+			'',
+			$template
+		);
+		$index                  = array_search( $relative_template_path, $templates, true );
 
-		// Break the loop if the block-template matches the template slug.
-		if ( $current_block_template_slug === $template_item_slug ) {
-
-			// if the theme is a child theme we want to check if a php template exists.
-			if ( is_child_theme() ) {
-
-				$has_php_template   = file_exists( get_stylesheet_directory() . '/' . $current_template_slug . '.php' );
-				$block_template     = _gutenberg_get_template_file( 'wp_template', $current_block_template_slug );
-				$has_block_template = false;
-
-				if ( null !== $block_template && wp_get_theme()->get_stylesheet() === $block_template['theme'] ) {
-					$has_block_template = true;
-				}
-				// and that a corresponding block template from the theme and not the parent doesn't exist.
-				if ( $has_php_template && ! $has_block_template ) {
-					return $template;
-				}
-			}
-
-			break;
-		}
-
-		// Is this a custom template?
-		// This check should be removed when merged in core.
-		// Instead, wp_templates should be considered valid in locate_template.
-		$is_custom_template = 0 === strpos( $current_block_template_slug, 'wp-custom-template-' );
-
-		// Don't override the template if we find a template matching the slug we look for
-		// and which does not match a block template slug.
-		if (
-			! $is_custom_template &&
-			$current_template_slug !== $current_block_template_slug &&
-			$current_template_slug === $template_item_slug
-		) {
-			return $template;
-		}
+		// If the template hiearchy algorithm has successfully located a PHP template file,
+		// we will only consider block templates with higher or equal specificity.
+		$templates = array_slice( $templates, 0, $index + 1 );
 	}
 
-	if ( $current_template ) {
-		if ( empty( $current_template->content ) && is_user_logged_in() ) {
+	$block_template = gutenberg_resolve_template( $type, $templates );
+
+	if ( $block_template ) {
+		if ( empty( $block_template->content ) && is_user_logged_in() ) {
 			$_wp_current_template_content =
 			sprintf(
 				/* translators: %s: Template title */
 				__( 'Empty template: %s', 'gutenberg' ),
-				$current_template->title
+				$block_template->title
 			);
-		} elseif ( ! empty( $current_template->content ) ) {
-			$_wp_current_template_content = $current_template->content;
+		} elseif ( ! empty( $block_template->content ) ) {
+			$_wp_current_template_content = $block_template->content;
 		}
 		if ( isset( $_GET['_wp-find-template'] ) ) {
-			wp_send_json_success( $current_template );
+			wp_send_json_success( $block_template );
 		}
 	} else {
+		if ( $template ) {
+			return $template;
+		}
+
 		if ( 'index' === $type ) {
 			if ( isset( $_GET['_wp-find-template'] ) ) {
 				wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
@@ -163,17 +110,13 @@ function gutenberg_override_query_template( $template, $type, array $templates =
  *  @type int[] A list of template parts IDs for the template.
  * }
  */
-function gutenberg_resolve_template( $template_type, $template_hierarchy = array() ) {
+function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 	if ( ! $template_type ) {
 		return null;
 	}
 
 	if ( empty( $template_hierarchy ) ) {
-		if ( 'index' === $template_type ) {
-			$template_hierarchy = get_template_hierarchy( 'index' );
-		} else {
-			$template_hierarchy = array_merge( get_template_hierarchy( $template_type ), get_template_hierarchy( 'index' ) );
-		}
+		$template_hierarchy = array( $template_type );
 	}
 
 	$slugs = array_map(

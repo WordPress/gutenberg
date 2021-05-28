@@ -1,33 +1,27 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { LayoutAnimation, TouchableHighlight } from 'react-native';
+
 /**
  * WordPress dependencies
  */
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	createBlock,
-	rawHandler,
-	store as blocksStore,
-} from '@wordpress/blocks';
-import {
-	BottomSheet,
-	BottomSheetConsumer,
-	getClipboard,
-} from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
+import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-
 import InserterSearchResults from './search-results';
 import InserterSearchForm from './search-form';
 import { store as blockEditorStore } from '../../store';
-import { searchItems } from './search-items';
+import InserterTabs from './tabs';
+import styles from './style.scss';
 
 const MIN_ITEMS_FOR_SEARCH = 2;
+const REUSABLE_BLOCKS_CATEGORY = 'reusable';
 
 function InserterMenu( {
 	onSelect,
@@ -39,8 +33,10 @@ function InserterMenu( {
 	insertionIndex,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ showTabs, setShowTabs ] = useState( true );
 	// eslint-disable-next-line no-undef
 	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
+	const [ tabIndex, setTabIndex ] = useState( 0 );
 
 	const {
 		showInsertionPoint,
@@ -52,30 +48,37 @@ function InserterMenu( {
 		insertDefaultBlock,
 	} = useDispatch( blockEditorStore );
 
-	const { items, destinationRootClientId } = useSelect( ( select ) => {
-		const {
-			getInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-		} = select( blockEditorStore );
+	const { items, destinationRootClientId, showReusableBlocks } = useSelect(
+		( select ) => {
+			const {
+				getInserterItems,
+				getBlockRootClientId,
+				getBlockSelectionEnd,
+			} = select( blockEditorStore );
 
-		let targetRootClientId = rootClientId;
-		if ( ! targetRootClientId && ! clientId && ! isAppender ) {
-			const end = getBlockSelectionEnd();
-			if ( end ) {
-				targetRootClientId = getBlockRootClientId( end ) || undefined;
+			let targetRootClientId = rootClientId;
+			if ( ! targetRootClientId && ! clientId && ! isAppender ) {
+				const end = getBlockSelectionEnd();
+				if ( end ) {
+					targetRootClientId =
+						getBlockRootClientId( end ) || undefined;
+				}
 			}
-		}
 
-		return {
-			items: getInserterItems( targetRootClientId ),
-			destinationRootClientId: targetRootClientId,
-		};
-	} );
-	const { getBlockOrder, getBlockCount, canInsertBlockType } = useSelect(
-		blockEditorStore
+			const allItems = getInserterItems( targetRootClientId );
+			const reusableBlockItems = allItems.filter(
+				( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
+			);
+
+			return {
+				items: allItems,
+				destinationRootClientId: targetRootClientId,
+				showReusableBlocks: !! reusableBlockItems.length,
+			};
+		}
 	);
-	const { getBlockType } = useSelect( blocksStore );
+
+	const { getBlockOrder, getBlockCount } = useSelect( blockEditorStore );
 
 	useEffect( () => {
 		// Show/Hide insertion point on Mount/Dismount
@@ -98,7 +101,7 @@ function InserterMenu( {
 		showInsertionPoint( destinationRootClientId, insertionIndex );
 
 		// Show search form if there are enough items to filter.
-		if ( getItems()?.length < MIN_ITEMS_FOR_SEARCH ) {
+		if ( items.length < MIN_ITEMS_FOR_SEARCH ) {
 			setShowSearchForm( false );
 		}
 
@@ -135,77 +138,80 @@ function InserterMenu( {
 		[ insertBlock, destinationRootClientId, insertionIndex ]
 	);
 
-	/**
-	 * Processes the inserter items to check
-	 * if there's any copied block in the clipboard
-	 * to add it as an extra item
-	 */
-	function getItems() {
-		// Filter out reusable blocks (they will be added in another tab)
-		let itemsToDisplay = items.filter(
-			( { name } ) => name !== 'core/block'
-		);
+	const onSelectItem = useCallback(
+		( item ) => {
+			onInsert( item );
+			onSelect( item );
+		},
+		[ onInsert, onSelect ]
+	);
 
-		itemsToDisplay = searchItems( itemsToDisplay, filterValue );
+	const onChangeSearch = useCallback(
+		( value ) => {
+			if ( ! value ) {
+				LayoutAnimation.configureNext(
+					LayoutAnimation.Presets.easeInEaseOut
+				);
+			}
+			setFilterValue( value );
+		},
+		[ setFilterValue ]
+	);
 
-		const clipboard = getClipboard();
-		let clipboardBlock = rawHandler( { HTML: clipboard } )[ 0 ];
+	const onKeyboardShow = useCallback( () => setShowTabs( false ), [
+		setShowTabs,
+	] );
 
-		const canAddClipboardBlock = canInsertBlockType(
-			clipboardBlock?.name,
-			destinationRootClientId
-		);
-
-		if ( ! canAddClipboardBlock ) {
-			return itemsToDisplay;
-		}
-
-		const { icon, name } = getBlockType( clipboardBlock.name );
-		const { attributes: initialAttributes, innerBlocks } = clipboardBlock;
-
-		clipboardBlock = {
-			id: 'clipboard',
-			name,
-			icon,
-			initialAttributes,
-			innerBlocks,
-		};
-
-		return [ clipboardBlock, ...itemsToDisplay ];
-	}
+	const onKeyboardHide = useCallback( () => setShowTabs( true ), [
+		setShowTabs,
+	] );
 
 	return (
 		<BottomSheet
 			isVisible={ true }
 			onClose={ onClose }
+			onKeyboardShow={ onKeyboardShow }
+			onKeyboardHide={ onKeyboardHide }
 			header={
-				showSearchForm && (
-					<InserterSearchForm
-						onChange={ ( value ) => {
-							setFilterValue( value );
-						} }
-						value={ filterValue }
-					/>
-				)
+				<>
+					{ showSearchForm && (
+						<InserterSearchForm
+							onChange={ onChangeSearch }
+							value={ filterValue }
+						/>
+					) }
+					{ showTabs && ! filterValue && (
+						<InserterTabs.Control
+							onChangeTab={ setTabIndex }
+							showReusableBlocks={ showReusableBlocks }
+						/>
+					) }
+				</>
 			}
 			hasNavigation
 			setMinHeightToMaxHeight={ showSearchForm }
+			contentStyle={ styles.list }
 		>
 			<BottomSheetConsumer>
-				{ ( { listProps, safeAreaBottomInset } ) => (
-					<View>
-						<InserterSearchResults
-							items={ getItems() }
-							onSelect={ ( item ) => {
-								onInsert( item );
-								onSelect( item );
-							} }
-							{ ...{
-								listProps,
-								safeAreaBottomInset,
-							} }
-						/>
-					</View>
+				{ ( { listProps } ) => (
+					<TouchableHighlight accessible={ false }>
+						{ ! showTabs || filterValue ? (
+							<InserterSearchResults
+								rootClientId={ rootClientId }
+								filterValue={ filterValue }
+								onSelect={ onSelectItem }
+								listProps={ listProps }
+							/>
+						) : (
+							<InserterTabs
+								rootClientId={ rootClientId }
+								listProps={ listProps }
+								tabIndex={ tabIndex }
+								onSelect={ onSelectItem }
+								showReusableBlocks={ showReusableBlocks }
+							/>
+						) }
+					</TouchableHighlight>
 				) }
 			</BottomSheetConsumer>
 		</BottomSheet>

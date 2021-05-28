@@ -43,6 +43,7 @@
 	&.is-selected,
 	&.has-child-selected {
 		> .wp-block-navigation-link__container {
+			display: flex;
 			opacity: 1;
 			visibility: visible;
 		}
@@ -181,6 +182,13 @@ $color-control-label-height: 20px;
 	.components-placeholder__fieldset .components-button {
 		margin-bottom: 0;
 	}
+
+	// For the placeholder indicators to colorize correctly, colors need to be inherited unless selected.
+	color: inherit;
+
+	.is-selected & {
+		color: $gray-900;
+	}
 }
 
 // Spinner.
@@ -225,19 +233,23 @@ $color-control-label-height: 20px;
 		opacity: 0.3;
 	}
 
-	// Don't show the preview boxes for an empty nav block.
-	// Needs specificity to work for the navigation screen.
-	.wp-block-navigation.is-selected &.wp-block-navigation-placeholder__preview {
-		display: none;
-	}
-
-	// ... but be present in larger contexts to size it correctly.
-	.wp-block-navigation.is-selected .is-large & {
+	// Don't show the preview boxes for an empty nav block,
+	// but be technically present to help size the empty state.
+	.wp-block-navigation.is-selected & {
 		display: flex;
 		opacity: 0;
 		width: 0;
 		overflow: hidden;
 		flex-wrap: nowrap;
+	}
+
+	// .. but hide entirely when the placeholder can still be toggled.
+	.wp-block-navigation.is-selected .is-small & {
+		display: none;
+	}
+
+	.wp-block-navigation.is-selected .is-medium & {
+		display: none;
 	}
 }
 
@@ -281,6 +293,7 @@ $color-control-label-height: 20px;
 	// Both selected and vertical.
 	.is-selected.is-vertical & {
 		display: inline-flex; // This makes the white box not take up all available space.
+		padding: $grid-unit-15;
 	}
 
 	.wp-block-navigation-placeholder__icon {
@@ -344,5 +357,78 @@ $color-control-label-height: 20px;
 	.components-dropdown,
 	> .components-button {
 		margin-right: $grid-unit-15;
+	}
+}
+
+
+/**
+ * Mobile menu.
+ */
+
+// These needs extra specificity in the editor.
+.wp-block-navigation__responsive-container:not(.is-menu-open) {
+	.components-button.wp-block-navigation__responsive-container-close {
+		@include break-small {
+			display: none;
+		}
+	}
+}
+.components-button.wp-block-navigation__responsive-container-open {
+	@include break-small {
+		display: none;
+	}
+}
+
+// Emulate the fullscreen editing inside the editor.
+.wp-block-navigation__responsive-container.is-menu-open {
+	position: fixed;
+
+	// Handle top position.
+	// For now, the editing of menu items in the mobile view only happens <600px.
+	// That means we only have to consider the big adminbar height (<783px).
+	// And in that view we also know that the toolbar is stacked.
+	body.admin-bar & {
+		top: $admin-bar-height-big + $header-height + $block-toolbar-height + $border-width;
+
+		@include break-medium() {
+			top: $header-height + $border-width;
+		}
+	}
+}
+
+// Without this, the block cannot be selected, nor does the right container get focus.
+// @todo: this is disruptive. Ideally we can retire a few of the containers,
+// so focus is applied naturally on the block container.
+// It's important the right container has focus, otherwise you can't press
+// "Delete" to remove the block.
+.wp-block-navigation__responsive-close {
+	@include break-small() {
+		pointer-events: none;
+
+		.wp-block-navigation__responsive-container-close,
+		.block-editor-block-list__layout * {
+			pointer-events: all;
+		}
+	}
+
+	// Page List items should remain inert.
+	.wp-block-pages-list__item__link {
+		pointer-events: none;
+	}
+}
+
+// The menu and close buttons need higher specificity in the editor.
+.components-button.wp-block-navigation__responsive-container-open.wp-block-navigation__responsive-container-open,
+.components-button.wp-block-navigation__responsive-container-close.wp-block-navigation__responsive-container-close {
+	padding: 0;
+	height: auto;
+	color: inherit;
+}
+
+// Customize the mobile editing.
+// This can be revisited in the future, but for now, inherit design from the parent.
+.is-menu-open .wp-block-navigation__responsive-container-content * {
+	.block-list-appender {
+		margin-top: $grid-unit-20;
 	}
 }

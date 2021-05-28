@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.29.3",
+	"version": "3.2.1",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,9 @@
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"src/navigation-link/index.js"
+		"src/navigation-link/index.js",
+		"src/template-part/index.js",
+		"src/query/index.js"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
@@ -61,8 +63,9 @@
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
 		"fast-average-color": "4.3.0",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
+		"micromodal": "^0.4.6",
 		"moment": "^2.22.1",
 		"react-easy-crop": "^3.0.0",
 		"tinycolor2": "^1.4.2"

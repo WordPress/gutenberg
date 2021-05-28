@@ -75,8 +75,8 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$context  = ! empty( $request['context'] ) ? $request['context'] : 'post-editor';
-		$settings = gutenberg_get_block_editor_settings( $context );
+		$editor_context = new WP_Block_Editor_Context();
+		$settings       = gutenberg_get_block_editor_settings( array(), $editor_context );
 
 		return rest_ensure_response( $settings );
 	}
@@ -129,9 +129,9 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				),
 
 				'__experimentalFeatures'                 => array(
-					'description' => __( 'Active theme settings and default values.', 'gutenberg' ),
+					'description' => __( 'Settings consolidated from core, theme, and user origins.', 'gutenberg' ),
 					'type'        => 'object',
-					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor', 'mobile' ),
 				),
 
 				'__experimentalGlobalStylesUserEntityId' => array(
@@ -144,6 +144,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'description' => __( 'Global styles settings.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'site-editor' ),
+				),
+
+				'__experimentalStyles'                   => array(
+					'description' => __( 'Styles consolidated from core, theme, and user origins.', 'gutenberg' ),
+					'type'        => 'object',
+					'context'     => array( 'mobile' ),
 				),
 
 				'alignWide'                              => array(

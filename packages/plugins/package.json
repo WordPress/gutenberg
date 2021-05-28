@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "2.25.3",
+	"version": "3.1.0",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,7 +30,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/icons": "file:../icons",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"memize": "^1.1.0"
 	},
 	"publishConfig": {

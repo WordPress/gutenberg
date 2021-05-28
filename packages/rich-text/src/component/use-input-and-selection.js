@@ -63,7 +63,6 @@ export function useInputAndSelection( props ) {
 
 		let isComposing = false;
 		let rafId;
-		let timeout;
 
 		function onInput( event ) {
 			// Do not trigger a change if characters are being composed.
@@ -81,21 +80,11 @@ export function useInputAndSelection( props ) {
 				inputType = event.inputType;
 			}
 
-			if ( ! inputType && event && event.nativeEvent ) {
-				inputType = event.nativeEvent.inputType;
-			}
-
 			const {
 				record,
 				applyRecord,
 				createRecord,
 				handleChange,
-				createUndoLevel,
-				allowPrefixTransformations,
-				inputRule,
-				valueToFormat,
-				formatTypes,
-				markAutomaticChange,
 			} = propsRef.current;
 
 			// The browser formatted something or tried to insert HTML.
@@ -124,40 +113,7 @@ export function useInputAndSelection( props ) {
 				formats: oldActiveFormats,
 			} );
 
-			handleChange( change, { withoutHistory: true } );
-
-			// Create an undo level when input stops for over a second.
-			defaultView.clearTimeout( timeout );
-			timeout = defaultView.setTimeout( createUndoLevel, 1000 );
-
-			// Only run input rules when inserting text.
-			if ( inputType !== 'insertText' ) {
-				return;
-			}
-
-			if ( allowPrefixTransformations && inputRule ) {
-				inputRule( change, valueToFormat );
-			}
-
-			const transformed = formatTypes.reduce(
-				( accumlator, { __unstableInputRule } ) => {
-					if ( __unstableInputRule ) {
-						accumlator = __unstableInputRule( accumlator );
-					}
-
-					return accumlator;
-				},
-				change
-			);
-
-			if ( transformed !== change ) {
-				createUndoLevel();
-				handleChange( {
-					...transformed,
-					activeFormats: oldActiveFormats,
-				} );
-				markAutomaticChange();
-			}
+			handleChange( change );
 		}
 
 		/**
@@ -177,19 +133,17 @@ export function useInputAndSelection( props ) {
 				applyRecord,
 				createRecord,
 				isSelected,
-				disabled,
-				isCaretWithinFormattedText,
-				onEnterFormattedText,
-				onExitFormattedText,
 				onSelectionChange,
-				setActiveFormats,
 			} = propsRef.current;
 
 			if ( event.type !== 'selectionchange' && ! isSelected ) {
 				return;
 			}
 
-			if ( disabled ) {
+			// Check if the implementor disabled editing. `contentEditable`
+			// does disable input, but not text selection, so we must ignore
+			// selection changes.
+			if ( element.contentEditable !== 'true' ) {
 				return;
 			}
 
@@ -239,21 +193,11 @@ export function useInputAndSelection( props ) {
 			// Update the value with the new active formats.
 			newValue.activeFormats = newActiveFormats;
 
-			if ( ! isCaretWithinFormattedText && newActiveFormats.length ) {
-				onEnterFormattedText();
-			} else if (
-				isCaretWithinFormattedText &&
-				! newActiveFormats.length
-			) {
-				onExitFormattedText();
-			}
-
 			// It is important that the internal value is updated first,
 			// otherwise the value will be wrong on render!
 			record.current = newValue;
 			applyRecord( newValue, { domOnly: true } );
 			onSelectionChange( start, end );
-			setActiveFormats( newActiveFormats );
 		}
 
 		function onCompositionStart() {
@@ -280,12 +224,7 @@ export function useInputAndSelection( props ) {
 		}
 
 		function onFocus() {
-			const {
-				record,
-				isSelected,
-				onSelectionChange,
-				setActiveFormats,
-			} = propsRef.current;
+			const { record, isSelected, onSelectionChange } = propsRef.current;
 
 			if ( ! isSelected ) {
 				// We know for certain that on focus, the old selection is invalid.
@@ -300,18 +239,8 @@ export function useInputAndSelection( props ) {
 					activeFormats: EMPTY_ACTIVE_FORMATS,
 				};
 				onSelectionChange( index, index );
-				setActiveFormats( EMPTY_ACTIVE_FORMATS );
 			} else {
 				onSelectionChange( record.current.start, record.current.end );
-				setActiveFormats(
-					getActiveFormats(
-						{
-							...record.current,
-							activeFormats: undefined,
-						},
-						EMPTY_ACTIVE_FORMATS
-					)
-				);
 			}
 
 			// Update selection as soon as possible, which is at the next animation
@@ -362,7 +291,6 @@ export function useInputAndSelection( props ) {
 				handleSelectionChange
 			);
 			defaultView.cancelAnimationFrame( rafId );
-			defaultView.clearTimeout( timeout );
 		};
 	}, [] );
 }
