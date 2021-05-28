@@ -29,7 +29,9 @@ jobs:
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-            - run: nvm install
+            - name: try out nvm
+              shell: bash -l {0}
+              run: nvm install
             - run: npm cache clean -force
             - run: rm -rf ~/.npm
             

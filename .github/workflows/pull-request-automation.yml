@@ -14,7 +14,9 @@ jobs:
               with:
                   ref: trunk
 
-            - run: nvm install
+            - name: try out nvm
+              shell: bash -l {0}
+              run: nvm install
             - run: npm cache clean -force
             - run: rm -rf ~/.npm
             
