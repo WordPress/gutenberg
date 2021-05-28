@@ -37,7 +37,7 @@ jobs:
 
             - name: Npm install
               run: |
-                  npm ci
+                  npm install
 
             - name: Compare performance with trunk
               if: github.event_name == 'pull_request'

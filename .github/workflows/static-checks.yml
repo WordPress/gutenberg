@@ -45,6 +45,7 @@ jobs:
               # See: https://github.com/WordPress/gutenberg/issues/16157
               run: |
                   npm install
+                  git diff --no-ext-diff --exit-code --quiet || >&2 echo "Probably package-lock.json has changed. Please run npm install and commit the diff"
                   npm run build
 
             - name: Lint JavaScript and Styles
