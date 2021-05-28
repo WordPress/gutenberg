@@ -17,7 +17,7 @@ import { useSurface } from '../surface';
 import * as styles from './styles';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').CardProps, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 	let computedElevation = elevation;
@@ -37,7 +37,7 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 }
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').CardProps, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 export function useCard( props ) {
 	const {

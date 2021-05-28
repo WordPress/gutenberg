@@ -9,9 +9,9 @@ import type { CSSProperties } from 'react';
  */
 import type { Props as SurfaceProps } from '../surface/types';
 
-export type CardSizeOptions = 'xSmall' | 'small' | 'medium' | 'large' | 'none';
+export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large' | 'none';
 
-export type CardProps = SurfaceProps & {
+export type Props = SurfaceProps & {
 	/**
 	 * Size of the elevation shadow, based on the Style system's elevation system.
 	 * Elevating a `Card` can be done by adjusting the `elevation` prop. This may be helpful in highlighting certain content. For more information, check out `Elevation`.
@@ -49,7 +49,7 @@ export type CardProps = SurfaceProps & {
 	 *
 	 * @default 'medium'
 	 */
-	size?: CardSizeOptions;
+	size?: SizeOptions;
 	/**
 	 * Renders with elevation styles (box shadow).
 	 *
@@ -59,7 +59,7 @@ export type CardProps = SurfaceProps & {
 	isElevated?: boolean;
 };
 
-export type CardBodyProps = {
+export type BodyProps = {
 	/**
 	 * Determines if `CardBody` is scrollable.
 	 *
@@ -81,10 +81,10 @@ export type CardBodyProps = {
 	 *
 	 * @default 'medium'
 	 */
-	size?: CardSizeOptions;
+	size?: SizeOptions;
 };
 
-export type CardHeaderProps = {
+export type HeaderProps = {
 	/**
 	 * The children elements.
 	 */
@@ -100,7 +100,7 @@ export type CardHeaderProps = {
 	 *
 	 * @default 'medium'
 	 */
-	size?: CardSizeOptions;
+	size?: SizeOptions;
 	/**
 	 * Renders without a border.
 	 *
@@ -109,6 +109,6 @@ export type CardHeaderProps = {
 	isBorderless?: boolean;
 };
 
-export type CardFooterProps = CardHeaderProps & {
+export type FooterProps = HeaderProps & {
 	justify: CSSProperties[ 'justifyContent' ];
 };

@@ -16,7 +16,7 @@ import { Flex } from '../flex';
 import * as styles from './styles';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').CardHeaderProps, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').HeaderProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardHeader( props, forwardedRef ) {

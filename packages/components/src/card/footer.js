@@ -16,13 +16,15 @@ import { Flex } from '../flex';
 import * as styles from './styles';
 
 /**
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').CardFooterProps, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').FooterProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardFooter( props, forwardedRef ) {
 	const {
 		className,
 		justify = 'flex-end',
+		// TODO: add border styles + isBorderless mod to remove them
+		// isBorderless = false,
 		isShady = false,
 		size = 'medium',
 		...otherProps
