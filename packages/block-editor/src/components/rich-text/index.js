@@ -7,7 +7,13 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, useRef, useCallback, forwardRef } from '@wordpress/element';
+import {
+	RawHTML,
+	useRef,
+	useCallback,
+	forwardRef,
+	createContext,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { children as childrenSource } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
@@ -20,6 +26,8 @@ import {
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+
+export const shortcuts = createContext();
 
 /**
  * Internal dependencies
@@ -36,6 +44,7 @@ import { useInputRules } from './use-input-rules';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
 import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
+import { useKeyboardShortcuts } from './use-keyboard-shortcuts';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
 
@@ -283,6 +292,8 @@ function RichTextWrapper(
 		}
 	}
 
+	const shortcutsRef = useRef( new Set() );
+
 	const TagName = tagName;
 	const content = (
 		<>
@@ -291,13 +302,15 @@ function RichTextWrapper(
 				children( { value, onChange, onFocus } ) }
 			{ isSelected && autocompleteProps.children }
 			{ isSelected && (
-				<FormatEdit
-					value={ value }
-					onChange={ onChange }
-					onFocus={ onFocus }
-					formatTypes={ formatTypes }
-					forwardedRef={ anchorRef }
-				/>
+				<shortcuts.Provider value={ shortcutsRef }>
+					<FormatEdit
+						value={ value }
+						onChange={ onChange }
+						onFocus={ onFocus }
+						formatTypes={ formatTypes }
+						forwardedRef={ anchorRef }
+					/>
+				</shortcuts.Provider>
 			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
@@ -324,6 +337,7 @@ function RichTextWrapper(
 						onReplace,
 					} ),
 					useRemoveBrowserShortcuts(),
+					useKeyboardShortcuts( shortcutsRef ),
 					useUndoAutomaticChange(),
 					usePasteHandler( {
 						isSelected,
