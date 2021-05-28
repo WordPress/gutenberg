@@ -9,6 +9,11 @@
 	.edit-post-template-post-title {
 		padding: 0;
 		text-decoration: none;
+		height: auto;
+
+		&::before {
+			height: 100%;
+		}
 
 		&.has-icon {
 			svg {
@@ -29,6 +34,11 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		display: block;
+
+		&::before {
+			left: 0;
+			right: 0;
+		}
 
 		@include break-xlarge() {
 			max-width: none;
