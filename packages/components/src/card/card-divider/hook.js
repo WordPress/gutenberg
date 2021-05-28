@@ -23,9 +23,16 @@ export function useCardDivider( props ) {
 		'CardDivider'
 	);
 
-	const classes = useMemo( () => cx( styles.Divider, styles.borderColor ), [
-		className,
-	] );
+	const classes = useMemo(
+		() =>
+			cx(
+				styles.Divider,
+				styles.borderColor,
+				'components-card__divider',
+				className
+			),
+		[ className ]
+	);
 
 	return {
 		...otherProps,
