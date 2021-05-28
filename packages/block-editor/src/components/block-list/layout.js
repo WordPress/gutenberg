@@ -51,8 +51,6 @@ export function LayoutStyle( { selector, layout = {} } ) {
 					box-sizing: border-box;
 					width: 100%;
 					max-width: ${ contentSize ?? wideSize };
-					margin-left: auto !important;
-					margin-right: auto !important;
 				}
 
 				${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
