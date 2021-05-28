@@ -83,6 +83,9 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		},
+		"minHeight": {
+			"type": "string"
 		}
 	},
 	"supports": {
