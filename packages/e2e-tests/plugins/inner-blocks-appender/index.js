@@ -54,7 +54,7 @@
 		);
 	}
 
-	registerBlockType( 'test/inner-blocks-render-appender', {
+	registerBlockType( 'test/inner-blocks-appender', {
 		title: 'InnerBlocks appender',
 		icon: 'carrot',
 		category: 'text',
