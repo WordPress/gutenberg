@@ -20,7 +20,12 @@ import Notice from './';
  * @return {Object}                The rendered notices list.
  */
 function NoticeList( { notices, onRemove = noop, className, children } ) {
-	const removeNotice = ( id ) => () => onRemove( id );
+	const removeNotice = ( notice ) => () => {
+		if ( notice.onDismiss ) {
+			notice.onDismiss( notice.id );
+		}
+		onRemove( notice.id );
+	};
 
 	className = classnames( 'components-notice-list', className );
 
@@ -31,7 +36,7 @@ function NoticeList( { notices, onRemove = noop, className, children } ) {
 				<Notice
 					{ ...omit( notice, [ 'content' ] ) }
 					key={ notice.id }
-					onRemove={ removeNotice( notice.id ) }
+					onRemove={ removeNotice( notice ) }
 				>
 					{ notice.content }
 				</Notice>
