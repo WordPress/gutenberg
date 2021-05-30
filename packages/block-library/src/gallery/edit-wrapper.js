@@ -23,10 +23,15 @@ export default function GalleryEditWrapper( props ) {
 		return settings.__experimentalGalleryRefactor;
 	}, [] );
 
+	// This logic is used to infer version information from content with higher
+	// precedence than the flag. New galleries (and existing empty galleries) will
+	// honor the flag.
+	const hasNewVersionContent = !! attributes?.imageCount;
+	const hasOldVersionContent =
+		0 < attributes?.ids?.length || 0 < attributes?.images?.length;
 	if (
-		! __experimentalGalleryRefactor ||
-		attributes?.ids?.length > 0 ||
-		attributes?.images?.length > 0
+		hasOldVersionContent ||
+		( ! hasNewVersionContent && ! __experimentalGalleryRefactor )
 	) {
 		return <GalleryEditV1 { ...props } />;
 	}
