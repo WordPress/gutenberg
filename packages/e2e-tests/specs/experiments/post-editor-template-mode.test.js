@@ -35,6 +35,8 @@ const disableTemplateWelcomeGuide = async () => {
 };
 
 const switchToTemplateMode = async () => {
+	await disableTemplateWelcomeGuide();
+
 	// Switch to template mode.
 	await openDocumentSettingsSidebar();
 	await openSidebarPanelWithTitle( 'Template' );
@@ -51,12 +53,12 @@ const switchToTemplateMode = async () => {
 		'.edit-post-template-top-area',
 		( el ) => el.innerText
 	);
-	expect( title ).toContain( 'About\n' );
-
-	await disableTemplateWelcomeGuide();
+	expect( title ).toContain( 'Just an FSE Post\n' );
 };
 
 const createNewTemplate = async ( templateName ) => {
+	await disableTemplateWelcomeGuide();
+
 	// Create a new custom template.
 	await openDocumentSettingsSidebar();
 	await openSidebarPanelWithTitle( 'Template' );
@@ -76,8 +78,6 @@ const createNewTemplate = async ( templateName ) => {
 	await page.waitForXPath(
 		'//*[contains(@class, "components-snackbar")]/*[text()="Custom template created. You\'re in template mode now."]'
 	);
-
-	await disableTemplateWelcomeGuide();
 };
 
 describe( 'Post Editor Template mode', () => {

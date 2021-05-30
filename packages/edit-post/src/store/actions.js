@@ -13,6 +13,8 @@ import { controls, dispatch, select, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -172,7 +174,7 @@ export function* switchEditorMode( mode ) {
 
 	// Unselect blocks when we switch to the code editor.
 	if ( mode !== 'visual' ) {
-		yield controls.dispatch( 'core/block-editor', 'clearSelectedBlock' );
+		yield controls.dispatch( blockEditorStore.name, 'clearSelectedBlock' );
 	}
 
 	const message =
@@ -273,16 +275,19 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 	};
 
 	const postType = yield controls.select(
-		'core/editor',
+		editorStore.name,
 		'getCurrentPostType'
 	);
 	if ( window.postboxes.page !== postType ) {
 		window.postboxes.add_postbox_toggles( postType );
 	}
 
-	let wasSavingPost = yield controls.select( 'core/editor', 'isSavingPost' );
+	let wasSavingPost = yield controls.select(
+		editorStore.name,
+		'isSavingPost'
+	);
 	let wasAutosavingPost = yield controls.select(
-		'core/editor',
+		editorStore.name,
 		'isAutosavingPost'
 	);
 
@@ -302,8 +307,8 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 
 	// Save metaboxes when performing a full save on the post.
 	saveMetaboxUnsubscribe = subscribe( () => {
-		const isSavingPost = select( 'core/editor' ).isSavingPost();
-		const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+		const isSavingPost = select( editorStore.name ).isSavingPost();
+		const isAutosavingPost = select( editorStore.name ).isAutosavingPost();
 
 		// Save metaboxes on save completion, except for autosaves that are not a post preview.
 		const shouldTriggerMetaboxesSave =
@@ -339,7 +344,7 @@ export function* requestMetaBoxUpdates() {
 
 	// Additional data needed for backward compatibility.
 	// If we do not provide this data, the post will be overridden with the default values.
-	const post = yield controls.select( 'core/editor', 'getCurrentPost' );
+	const post = yield controls.select( editorStore.name, 'getCurrentPost' );
 	const additionalData = [
 		post.comment_status ? [ 'comment_status', post.comment_status ] : false,
 		post.ping_status ? [ 'ping_status', post.ping_status ] : false,
@@ -472,7 +477,10 @@ export function* __unstableSwitchToTemplateMode( template ) {
 			'wp_template',
 			template
 		);
-		const post = yield controls.select( 'core/editor', 'getCurrentPost' );
+		const post = yield controls.select(
+			editorStore.name,
+			'getCurrentPost'
+		);
 
 		yield controls.dispatch(
 			coreStore,
@@ -488,12 +496,20 @@ export function* __unstableSwitchToTemplateMode( template ) {
 
 	yield setIsEditingTemplate( true );
 
-	const message = !! template
-		? __( "Custom template created. You're in template mode now." )
-		: __(
-				'Editing template. Changes made here affect all posts and pages that use the template.'
-		  );
-	yield controls.dispatch( noticesStore, 'createSuccessNotice', message, {
-		type: 'snackbar',
-	} );
+	const isWelcomeGuideActive = yield controls.select(
+		'core/edit-post',
+		'isFeatureActive',
+		'welcomeGuideTemplate'
+	);
+
+	if ( ! isWelcomeGuideActive ) {
+		const message = !! template
+			? __( "Custom template created. You're in template mode now." )
+			: __(
+					'Editing template. Changes made here affect all posts and pages that use the template.'
+			  );
+		yield controls.dispatch( noticesStore, 'createSuccessNotice', message, {
+			type: 'snackbar',
+		} );
+	}
 }
