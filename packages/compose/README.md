@@ -66,13 +66,11 @@ For more details, you can refer to each Higher Order Component's README file. [A
 Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
 composition, where each successive invocation is supplied the return value of the previous.
 
-_Parameters_
+This is just a re-export of `lodash`'s `flowRight` function.
 
--   _hocs_ `...Function`: The HOC functions to invoke.
+_Related_
 
-_Returns_
-
--   `Function`: Returns the new composite function.
+-   <https://docs-lodash.com/v4/flow-right/>
 
 <a name="createHigherOrderComponent" href="#createHigherOrderComponent">#</a> **createHigherOrderComponent**
 
@@ -166,9 +164,9 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `Object`: Reference with the element.
+-   _ref_ `import('react').RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
 -   _text_ `string|Function`: The text to copy.
--   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+-   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
@@ -180,12 +178,12 @@ Copies the given text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _text_ `text|Function`: The text to copy. Use a function if not already available and expensive to compute.
+-   _text_ `string | (() => string)`: The text to copy. Use a function if not already available and expensive to compute.
 -   _onSuccess_ `Function`: Called when to text is copied.
 
 _Returns_
 
--   `RefObject`: A ref to assign to the target element.
+-   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
 
 <a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
 
@@ -398,12 +396,12 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _callback_ `Function`: Callback with ref as argument.
--   _dependencies_ `Array`: Dependencies of the callback.
+-   _callback_ `( node: TElement ) => ( () => void ) | undefined`: Callback with ref as argument.
+-   _dependencies_ `DependencyList`: Dependencies of the callback.
 
 _Returns_
 
--   `Function`: Ref callback.
+-   `RefCallback< TElement | null >`: Ref callback.
 
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 
@@ -485,7 +483,7 @@ function MyComponent(props) {
 
 _Parameters_
 
--   _object_ `Object`: Object which changes to compare.
+-   _object_ `object`: Object which changes to compare.
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
@@ -501,11 +499,11 @@ event handler for the entire application.
 
 _Parameters_
 
--   _eventTypesToHandlers_ `Object<string,string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
+-   _eventTypesToHandlers_ `Record<keyof GlobalEventHandlersEventMap, string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
 
 _Returns_
 
--   `Function`: Higher-order component.
+-   `any`: Higher-order component.
 
 <a name="withInstanceId" href="#withInstanceId">#</a> **withInstanceId**
 

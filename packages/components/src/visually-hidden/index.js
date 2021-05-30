@@ -12,7 +12,6 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { renderAsRenderProps } from './utils';
-import { withNextComponent } from './next';
 
 /**
  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
@@ -43,4 +42,4 @@ function VisuallyHidden( { as = 'div', className, ...props }, forwardedRef ) {
 	} );
 }
 
-export default withNextComponent( forwardRef( VisuallyHidden ) );
+export default forwardRef( VisuallyHidden );

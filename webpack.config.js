@@ -178,13 +178,6 @@ module.exports = {
 					10
 				) || 1
 			),
-			// Inject the `COMPONENT_SYSTEM_PHASE` global, used for controlling Component System roll-out.
-			'process.env.COMPONENT_SYSTEM_PHASE': JSON.stringify(
-				parseInt(
-					process.env.npm_package_config_COMPONENT_SYSTEM_PHASE,
-					10
-				) || 0
-			),
 			'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
 				process.env.FORCE_REDUCED_MOTION
 			),

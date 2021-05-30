@@ -3,6 +3,8 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -23,7 +25,7 @@ export const useBlockSelectionListener = ( postId ) => {
 	const { hasBlockSelection, isEditorSidebarOpened } = useSelect(
 		( select ) => ( {
 			hasBlockSelection: !! select(
-				'core/block-editor'
+				blockEditorStore
 			).getBlockSelectionStart(),
 			isEditorSidebarOpened: select( STORE_NAME ).isEditorSidebarOpened(),
 		} ),
@@ -53,7 +55,7 @@ export const useBlockSelectionListener = ( postId ) => {
 export const useUpdatePostLinkListener = ( postId ) => {
 	const { newPermalink } = useSelect(
 		( select ) => ( {
-			newPermalink: select( 'core/editor' ).getCurrentPost().link,
+			newPermalink: select( editorStore ).getCurrentPost().link,
 		} ),
 		[ postId ]
 	);
