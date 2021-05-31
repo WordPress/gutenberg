@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase, map } from 'lodash';
+import { find, map } from 'lodash';
 import tinycolor from 'tinycolor2';
 
 /**
@@ -60,7 +60,7 @@ export function getColorClassName( colorContextName, colorSlug ) {
 		return undefined;
 	}
 
-	return `has-${ kebabCase( colorSlug ) }-${ colorContextName }`;
+	return `has-${ colorSlug }-${ colorContextName }`;
 }
 
 /**
