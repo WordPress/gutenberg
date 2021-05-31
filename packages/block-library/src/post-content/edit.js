@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { RawHTML } from '@wordpress/element';
 import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -11,9 +12,38 @@ import {
 	store as blockEditorStore,
 	Warning,
 } from '@wordpress/block-editor';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import {
+	useEntityProp,
+	useEntityBlockEditor,
+	store as coreStore,
+} from '@wordpress/core-data';
 
-function Content( { layout, postType, postId } ) {
+function useUserCanEdit( id, type ) {
+	return useSelect(
+		( select ) => {
+			const { getPostType, canUser } = select( coreStore );
+			const postType = getPostType( type );
+			const resource = postType?.rest_base || '';
+			return canUser( 'update', resource, id );
+		},
+		[ id, type ]
+	);
+}
+
+const ReadOnlyContent = ( { content } ) => {
+	const blockProps = useBlockProps();
+	return content?.protected ? (
+		<div { ...blockProps }>
+			<Warning>{ __( 'This content is password protected.' ) }</Warning>
+		</div>
+	) : (
+		<div { ...blockProps }>
+			<RawHTML key="html">{ content?.rendered }</RawHTML>
+		</div>
+	);
+};
+
+const EditableContent = ( { layout, postType, postId } ) => {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
@@ -30,20 +60,34 @@ function Content( { layout, postType, postId } ) {
 		postType,
 		{ id: postId }
 	);
-	const props = useInnerBlocksProps(
-		useBlockProps( { className: 'entry-content' } ),
-		{
-			value: blocks,
-			onInput,
-			onChange,
-			__experimentalLayout: {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments: themeSupportsLayout ? alignments : undefined,
-			},
-		}
-	);
+	const blockProps = useBlockProps( { className: 'entry-content' } );
+	const props = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput,
+		onChange,
+		__experimentalLayout: {
+			type: 'default',
+			// Find a way to inject this in the support flag code (hooks).
+			alignments: themeSupportsLayout ? alignments : undefined,
+		},
+	} );
 	return <div { ...props } />;
+};
+
+function Content( props ) {
+	const { postType, postId } = props;
+	const [ , , content ] = useEntityProp(
+		'postType',
+		postType,
+		'content',
+		postId
+	);
+	const userCanEdit = useUserCanEdit( postId, postType );
+	return userCanEdit ? (
+		<EditableContent { ...props } />
+	) : (
+		<ReadOnlyContent content={ content } />
+	);
 }
 
 function Placeholder() {

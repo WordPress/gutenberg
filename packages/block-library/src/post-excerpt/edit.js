@@ -6,7 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
@@ -40,18 +41,29 @@ function usePostContentExcerpt( wordCount, postId, postType ) {
 	}, [ rawPostContent, wordCount ] );
 }
 
+function useUserCanEdit( id, type ) {
+	return useSelect(
+		( select ) => {
+			const { getPostType, canUser } = select( coreStore );
+			const postType = getPostType( type );
+			const resource = postType?.rest_base || '';
+			return canUser( 'update', resource, id );
+		},
+		[ id, type ]
+	);
+}
+
 export default function PostExcerptEditor( {
 	attributes: { textAlign, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
 	context: { postId, postType },
 } ) {
-	const [ excerpt, setExcerpt ] = useEntityProp(
-		'postType',
-		postType,
-		'excerpt',
-		postId
-	);
+	const [
+		excerpt,
+		setExcerpt,
+		{ protected: isProtected } = {},
+	] = useEntityProp( 'postType', postType, 'excerpt', postId );
 	const postContentExcerpt = usePostContentExcerpt(
 		wordCount,
 		postId,
@@ -62,7 +74,7 @@ export default function PostExcerptEditor( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-
+	const userCanEdit = useUserCanEdit( postId, postType );
 	if ( ! postType || ! postId ) {
 		return (
 			<div { ...blockProps }>
@@ -70,6 +82,15 @@ export default function PostExcerptEditor( {
 					{ __( 'Post excerpt block: no post found.' ) }
 				</Warning>
 			</div>
+		);
+	}
+	if ( isProtected && ! userCanEdit ) {
+		return (
+			<p { ...blockProps }>
+				<Warning>
+					{ __( 'This content is password protected.' ) }
+				</Warning>
+			</p>
 		);
 	}
 	const readMoreLink = (
@@ -119,19 +140,25 @@ export default function PostExcerptEditor( {
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
-				<RichText
-					className={
-						! showMoreOnNewLine &&
-						'wp-block-post-excerpt__excerpt is-inline'
-					}
-					aria-label={ __( 'Post excerpt text' ) }
-					value={
-						excerpt ||
+				{ userCanEdit && (
+					<RichText
+						className={
+							! showMoreOnNewLine &&
+							'wp-block-post-excerpt__excerpt is-inline'
+						}
+						aria-label={ __( 'Post excerpt text' ) }
+						value={
+							excerpt ||
+							postContentExcerpt ||
+							( isSelected ? '' : __( 'No post excerpt found' ) )
+						}
+						onChange={ setExcerpt }
+					/>
+				) }
+				{ ! userCanEdit &&
+					( excerpt ||
 						postContentExcerpt ||
-						( isSelected ? '' : __( 'No post excerpt found' ) )
-					}
-					onChange={ setExcerpt }
-				/>
+						__( 'No post excerpt found' ) ) }
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
