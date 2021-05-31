@@ -55,37 +55,72 @@ class PluginArea extends Component {
 		super( ...arguments );
 
 		this.setPlugins = this.setPlugins.bind( this );
+		this.memoizedContext = memoize( ( name, icon, priority ) => {
+			return {
+				name,
+				icon,
+				priority,
+			};
+		} );
 		this.state = this.getCurrentPluginsState();
 	}
 
 	getCurrentPluginsState() {
 		const plugins = compose(
-			( list ) => map( list, ( { icon, name, render, priority } ) => {
-				return {
-					Plugin: render,
-					context: {
-						name,
-						icon,
-						priority,
-					},
-				};
-			} ),
-			( list ) => sortBy( list, [ 'priority' ] ),
+			( list ) =>
+				map( list, ( { icon, name, render, priority } ) => {
+					return {
+						Plugin: render,
+						context: {
+							name,
+							icon,
+							priority,
+						},
+					};
+				} ),
+			( list ) => sortBy( list, [ 'priority' ] )
 		)( getPlugins() );
 
 		return {
-			plugins,
+			plugins: compose(
+				( list ) =>
+					map( list, ( { icon, name, render, priority } ) => {
+						return {
+							Plugin: render,
+							context: this.memoizedContext(
+								name,
+								icon,
+								priority
+							),
+						};
+					} ),
+				( list ) => sortBy( list, [ 'priority' ] )
+			)( getPlugins( this.props.scope ) ),
 		};
 	}
 
 	componentDidMount() {
-		addAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area/plugins-registered', this.setPlugins );
-		addAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area/plugins-unregistered', this.setPlugins );
+		addAction(
+			'plugins.pluginRegistered',
+			'core/plugins/plugin-area/plugins-registered',
+			this.setPlugins
+		);
+		addAction(
+			'plugins.pluginUnregistered',
+			'core/plugins/plugin-area/plugins-unregistered',
+			this.setPlugins
+		);
 	}
 
 	componentWillUnmount() {
-		removeAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area/plugins-registered' );
-		removeAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area/plugins-unregistered' );
+		removeAction(
+			'plugins.pluginRegistered',
+			'core/plugins/plugin-area/plugins-registered'
+		);
+		removeAction(
+			'plugins.pluginUnregistered',
+			'core/plugins/plugin-area/plugins-unregistered'
+		);
 	}
 
 	setPlugins() {
