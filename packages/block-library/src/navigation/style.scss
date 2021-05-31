@@ -5,6 +5,7 @@
 // Page List block inside your navigation block.
 .wp-block-navigation {
 	position: relative;
+
 	// Normalize list styles.
 	ul,
 	ul li {
@@ -28,7 +29,8 @@
 
 	// Menu item link.
 	// By targetting the markup directly we enable greater global styles compatibility.
-	a {
+	// The extra container specificity is due to global styles outputting link styles that need overriding.
+	&.wp-block-navigation a {
 		// Inherit colors set by the block color definition.
 		color: inherit;
 		display: block;
@@ -225,11 +227,17 @@
 
 // When the menu has a background, items have paddings, reduce margins to compensate.
 // Treat margins and paddings differently when the block has a background.
+// @todo: refactor this to use gap.
 .wp-block-navigation.has-background {
 	.wp-block-page-list,
 	.wp-block-page-list > .wp-block-pages-list__item,
 	.wp-block-navigation__container > .wp-block-navigation-link {
 		margin: 0 0.5em 0 0;
+
+		// Don't show right margin on the last child.
+		&:last-child {
+			margin: 0;
+		}
 	}
 
 	a {
