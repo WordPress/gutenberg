@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set, get, mergeWith } from 'lodash';
+import { set, get, mergeWith, mapValues, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,6 +30,7 @@ import {
 	ROOT_BLOCK_SUPPORTS,
 	getValueFromVariable,
 	getPresetVariable,
+	PRESET_METADATA,
 } from './utils';
 import { toCustomProperties, toStyles } from './global-styles-renderer';
 import { store as editSiteStore } from '../../store';
@@ -111,6 +112,10 @@ const getBlockMetadata = ( blockTypes ) => {
 	return result;
 };
 
+function immutableSet( object, path, value ) {
+	return setWith( object ? clone( object ) : {}, path, value, clone );
+}
+
 export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
 	const { blockTypes, settings } = useSelect( ( select ) => {
@@ -150,12 +155,41 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 			newUserStyles = EMPTY_CONTENT;
 		}
 
+		const addUserToSettings = ( settingsToAdd ) => {
+			PRESET_METADATA.forEach( ( { path } ) => {
+				const presetData = get( settingsToAdd, path );
+				if ( presetData ) {
+					settingsToAdd = immutableSet( settingsToAdd, path, {
+						user: presetData,
+					} );
+				}
+			} );
+			return settingsToAdd;
+		};
+
+		let userStylesWithOrigin = newUserStyles;
+		if ( userStylesWithOrigin.settings ) {
+			userStylesWithOrigin = {
+				...userStylesWithOrigin,
+				settings: addUserToSettings( userStylesWithOrigin.settings ),
+			};
+			if ( userStylesWithOrigin.settings.blocks ) {
+				userStylesWithOrigin.settings = {
+					...userStylesWithOrigin.settings,
+					blocks: mapValues(
+						userStylesWithOrigin.settings.blocks,
+						addUserToSettings
+					),
+				};
+			}
+		}
+
 		// At this point, the version schema of the theme & user
 		// is the same, so we can merge them.
 		const newMergedStyles = mergeWith(
 			{},
 			baseStyles,
-			newUserStyles,
+			userStylesWithOrigin,
 			mergeTreesCustomizer
 		);
 
