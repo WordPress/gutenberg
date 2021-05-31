@@ -90,10 +90,6 @@ export default function SearchEdit( {
 	} );
 
 	useEffect( () => {
-		if ( 'button-only' !== buttonPosition ) {
-			return;
-		}
-
 		if ( isSearchFieldHidden ) {
 			hideSearchField(
 				searchFieldRef.current.offsetParent,
@@ -108,7 +104,7 @@ export default function SearchEdit( {
 				widthUnit
 			);
 		}
-	}, [ buttonPosition, isSearchFieldHidden, buttonUseIcon ] );
+	}, [ isSearchFieldHidden, buttonUseIcon ] );
 
 	useEffect( () => {
 		if ( 'button-only' === buttonPosition && ! isSelected ) {
@@ -216,9 +212,14 @@ export default function SearchEdit( {
 						className="wp-block-search__button"
 						style={ { borderRadius } }
 						onClick={ () => {
-							setAttributes( {
-								isSearchFieldHidden: ! isSearchFieldHidden,
-							} );
+							if (
+								'button-only' === buttonPosition &&
+								BUTTON_BEHAVIOR_EXPAND === buttonBehavior
+							) {
+								setAttributes( {
+									isSearchFieldHidden: ! isSearchFieldHidden,
+								} );
+							}
 						} }
 						ref={ buttonRef }
 					/>
@@ -236,9 +237,14 @@ export default function SearchEdit( {
 							setAttributes( { buttonText: html } )
 						}
 						onClick={ () => {
-							setAttributes( {
-								isSearchFieldHidden: ! isSearchFieldHidden,
-							} );
+							if (
+								'button-only' === buttonPosition &&
+								BUTTON_BEHAVIOR_EXPAND === buttonBehavior
+							) {
+								setAttributes( {
+									isSearchFieldHidden: ! isSearchFieldHidden,
+								} );
+							}
 						} }
 						ref={ buttonRef }
 					/>
@@ -272,6 +278,7 @@ export default function SearchEdit( {
 									onClick={ () => {
 										setAttributes( {
 											buttonPosition: 'no-button',
+											isSearchFieldHidden: false,
 										} );
 										onClose();
 									} }
@@ -283,6 +290,7 @@ export default function SearchEdit( {
 									onClick={ () => {
 										setAttributes( {
 											buttonPosition: 'button-outside',
+											isSearchFieldHidden: false,
 										} );
 										onClose();
 									} }
@@ -294,6 +302,7 @@ export default function SearchEdit( {
 									onClick={ () => {
 										setAttributes( {
 											buttonPosition: 'button-inside',
+											isSearchFieldHidden: false,
 										} );
 										onClose();
 									} }
