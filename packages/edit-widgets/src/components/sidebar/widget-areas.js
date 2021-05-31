@@ -59,7 +59,7 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 						<Button
 							href={ addQueryArgs( 'customize.php', {
 								'autofocus[panel]': 'widgets',
-								return: 'themes.php?page=gutenberg-widgets',
+								return: window.location.pathname,
 							} ) }
 							isTertiary
 						>
