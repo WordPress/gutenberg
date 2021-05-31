@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody } from '@wordpress/components';
+import { __experimentalBlockSupportPanel as BlockSupportPanel } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
@@ -10,10 +10,18 @@ import { getBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import { MarginEdit, hasMarginSupport, useIsMarginDisabled } from './margin';
+import {
+	MarginEdit,
+	hasMarginSupport,
+	hasMarginValue,
+	resetMargin,
+	useIsMarginDisabled,
+} from './margin';
 import {
 	PaddingEdit,
 	hasPaddingSupport,
+	hasPaddingValue,
+	resetPadding,
 	useIsPaddingDisabled,
 } from './padding';
 
@@ -34,12 +42,43 @@ export function SpacingPanel( props ) {
 		return null;
 	}
 
+	// Callback to reset all block support attributes controlled via this panel.
+	const resetAll = () => {
+		const { style } = props.attributes;
+
+		props.setAttributes( {
+			style: {
+				...style,
+				spacing: {
+					...style?.spacing,
+					margin: undefined,
+					padding: undefined,
+				},
+			},
+		} );
+	};
+
 	return (
-		<InspectorControls key="spacing">
-			<PanelBody title={ __( 'Spacing' ) }>
-				<PaddingEdit { ...props } />
-				<MarginEdit { ...props } />
-			</PanelBody>
+		<InspectorControls key="dimensions">
+			<BlockSupportPanel
+				label={ __( 'Dimensions options' ) }
+				title={ __( 'Dimensions' ) }
+				resetAll={ resetAll }
+			>
+				<PaddingEdit
+					{ ...props }
+					hasValue={ hasPaddingValue }
+					label={ __( 'Padding' ) }
+					reset={ resetPadding }
+					className="test-test-test"
+				/>
+				<MarginEdit
+					{ ...props }
+					hasValue={ hasMarginValue }
+					label={ __( 'Margin' ) }
+					reset={ resetMargin }
+				/>
+			</BlockSupportPanel>
 		</InspectorControls>
 	);
 }
