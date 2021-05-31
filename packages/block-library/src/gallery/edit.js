@@ -63,17 +63,13 @@ const linkOptions = [
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
-const PLACEHOLDER_TEXT = Platform.select( {
-	web: __(
-		'Drag images, upload new ones or select files from your library.'
-	),
-	native: __( 'ADD MEDIA' ),
-} );
+const PLACEHOLDER_TEXT = Platform.isNative
+	? __( 'ADD MEDIA' )
+	: __( 'Drag images, upload new ones or select files from your library.' );
 
-const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
-	web: {},
-	native: { type: 'stepper' },
-} );
+const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
+	? { type: 'stepper' }
+	: {};
 
 function GalleryEdit( props ) {
 	const {
