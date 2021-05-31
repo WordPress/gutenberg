@@ -128,7 +128,9 @@ describe( 'getPlugins', () => {
 			render: () => {},
 			priority: '',
 		} );
-		expect( console ).toHaveErroredWith( 'The "priority" property must be a number' );
+		expect( console ).toHaveErroredWith(
+			'The "priority" property must be a number'
+		);
 	} );
 
 	it( 'fails to register a plugin with a priority set to boolean true', () => {
@@ -136,7 +138,9 @@ describe( 'getPlugins', () => {
 			render: () => {},
 			priority: true,
 		} );
-		expect( console ).toHaveErroredWith( 'The "priority" property must be a number' );
+		expect( console ).toHaveErroredWith(
+			'The "priority" property must be a number'
+		);
 	} );
 
 	it( 'fails to register a plugin with a priority set to boolean false', () => {
@@ -144,7 +148,9 @@ describe( 'getPlugins', () => {
 			render: () => {},
 			priority: false,
 		} );
-		expect( console ).toHaveErroredWith( 'The "priority" property must be a number' );
+		expect( console ).toHaveErroredWith(
+			'The "priority" property must be a number'
+		);
 	} );
 
 	it( 'fails to register a plugin with a priority set to an empty string', () => {
