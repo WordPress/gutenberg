@@ -20,36 +20,45 @@ const wpBlockSearch = ( block ) => {
 	}
 	attributeContainer.remove();
 
-	block
-		.querySelector( '.wp-block-search__button' )
-		.addEventListener( 'click', ( e ) => {
-			e.preventDefault();
+	const wrapper = block.querySelector( '.wp-block-search__inside-wrapper' );
+	const searchField = block.querySelector( '.wp-block-search__input' );
+	const button = block.querySelector( '.wp-block-search__button' );
 
-			const wrapper = block.querySelector(
-				'.wp-block-search__inside-wrapper'
-			);
-			const searchField = block.querySelector(
-				'.wp-block-search__input'
-			);
-			const button = block.querySelector( '.wp-block-search__button' );
+	const toggleSearchField = ( e ) => {
+		e.preventDefault();
 
-			if (
-				block.classList.contains(
-					'wp-block-search__searchfield-hidden'
-				)
-			) {
-				showSearchField(
-					wrapper,
-					searchField,
-					attributes.width,
-					attributes.widthUnit
-				);
-				block.classList.remove( 'wp-block-search__searchfield-hidden' );
-			} else {
-				hideSearchField( wrapper, searchField, button );
-				block.classList.add( 'wp-block-search__searchfield-hidden' );
-			}
-		} );
+		if (
+			block.classList.contains( 'wp-block-search__searchfield-hidden' )
+		) {
+			showSearchField(
+				wrapper,
+				searchField,
+				attributes.width,
+				attributes.widthUnit
+			);
+			block.classList.remove( 'wp-block-search__searchfield-hidden' );
+			searchField.focus();
+
+			button.removeEventListener( 'click', toggleSearchField );
+			document.body.addEventListener( 'click', doSearch );
+		} else {
+			hideSearchField( wrapper, searchField, button );
+			block.classList.add( 'wp-block-search__searchfield-hidden' );
+		}
+	};
+
+	const doSearch = ( e ) => {
+		if ( e.target === button || e.target === searchField ) {
+			return false;
+		}
+
+		toggleSearchField( e );
+
+		document.body.removeEventListener( 'click', doSearch );
+		button.addEventListener( 'click', toggleSearchField );
+	};
+
+	button.addEventListener( 'click', toggleSearchField );
 };
 
 // eslint-disable-next-line @wordpress/no-global-event-listener

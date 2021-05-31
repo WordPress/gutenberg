@@ -66,14 +66,6 @@
 			min-width: 0 !important;
 		}
 
-		.wp-block-search__input {
-			width: inherit;
-			padding-left: inherit;
-			padding-right: inherit;
-			border-left-width: inherit;
-			border-right-width: inherit;
-		}
-
 		// !important here to override inline styles on button only deselected view.
 		&.wp-block-search__searchfield-hidden {
 			overflow: hidden;
