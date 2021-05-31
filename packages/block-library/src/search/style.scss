@@ -6,6 +6,7 @@
 		color: #32373c;
 		margin-left: 0.625em;
 		word-break: normal;
+		flex-shrink: 0;
 
 		&.has-icon {
 			line-height: 0;
@@ -63,6 +64,14 @@
 		.wp-block-search__inside-wrapper {
 			transition-property: width;
 			min-width: 0 !important;
+		}
+
+		.wp-block-search__input {
+			width: inherit;
+			padding-left: inherit;
+			padding-right: inherit;
+			border-left-width: inherit;
+			border-right-width: inherit;
 		}
 
 		// !important here to override inline styles on button only deselected view.
