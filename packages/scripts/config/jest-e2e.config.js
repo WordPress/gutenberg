@@ -24,6 +24,7 @@ const jestE2EConfig = {
 		'default',
 		path.join( __dirname, 'jest-github-actions-reporter.js' ),
 	],
+	resolver: require.resolve( './jest-e2e-resolver' ),
 };
 
 if ( ! hasBabelConfig() ) {
