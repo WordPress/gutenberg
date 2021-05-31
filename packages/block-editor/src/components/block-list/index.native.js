@@ -210,7 +210,6 @@ export class BlockList extends Component {
 			isStackedHorizontally,
 			horizontalAlignment,
 			contentResizeMode,
-			// eslint-disable-next-line no-unused-vars
 			blockWidth,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
@@ -229,11 +228,8 @@ export class BlockList extends Component {
 			marginHorizontal: isRootList ? 0 : -marginHorizontal,
 		};
 
-		// eslint-disable-next-line no-unused-vars
 		const isContentStretch = contentResizeMode === 'stretch';
-		// eslint-disable-next-line no-unused-vars
 		const isMultiBlocks = blockClientIds.length > 1;
-		// eslint-disable-next-line no-unused-vars
 		const { isWider } = alignmentHelpers;
 
 		return (
@@ -268,9 +264,13 @@ export class BlockList extends Component {
 					horizontal={ horizontal }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
-					contentContainerStyle={
-						horizontal && styles.horizontalContentContainer
-					}
+					contentContainerStyle={ [
+						horizontal && styles.horizontalContentContainer,
+						isWider( blockWidth, 'medium' ) &&
+							( isContentStretch && isMultiBlocks
+								? styles.horizontalContentContainerStretch
+								: styles.horizontalContentContainerCenter ),
+					] }
 					style={ getStyles(
 						isRootList,
 						isStackedHorizontally,
