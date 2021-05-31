@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const fs = require( 'fs' );
 const path = require( 'path' );
 const { pickBy, mapValues } = require( 'lodash' );
 
@@ -22,6 +23,7 @@ const config = require( '../config' );
  *
  * @property {boolean=} ci          Run on CI.
  * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
+ * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
  */
 
 /**
@@ -260,6 +262,33 @@ async function runPerformanceTests( branches, options ) {
 	);
 
 	log( '>> Starting the WordPress environment' );
+	if ( options.wpVersion ) {
+		// In order to match the topology of ZIP files at wp.org, remap .0
+		// patch versions to major versions:
+		//
+		//     5.7   -> 5.7   (unchanged)
+		//     5.7.0 -> 5.7   (changed)
+		//     5.7.2 -> 5.7.2 (unchanged)
+		const zipVersion = options.wpVersion.replace( /^(\d+\.\d+).0/, '$1' );
+		const zipUrl = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
+
+		log( `Using WordPress version ${ zipVersion }` );
+
+		// Patch the environment's .wp-env.json config to use the specified WP
+		// version:
+		//
+		//     {
+		//         "core": "https://wordpress.org/wordpress-$VERSION.zip",
+		//         ...
+		//     }
+		const confPath = `${ environmentDirectory }/.wp-env.json`;
+		const conf = { ...readJSONFile( confPath ), core: zipUrl };
+		await fs.writeFileSync(
+			confPath,
+			JSON.stringify( conf, null, 2 ),
+			'utf8'
+		);
+	}
 	await runShellScript( 'npm run wp-env start', environmentDirectory );
 
 	const testSuites = [ 'post-editor', 'site-editor' ];
