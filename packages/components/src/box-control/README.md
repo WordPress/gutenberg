@@ -103,6 +103,7 @@ If this property is true, a button to reset the box control is rendered.
 
 - Type: `Boolean`
 - Required: No
+- Default: `true`
 
 ### inputProps
 
