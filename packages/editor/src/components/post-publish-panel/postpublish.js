@@ -13,11 +13,13 @@ import { withSelect } from '@wordpress/data';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useCopyToClipboard } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import PostScheduleLabel from '../post-schedule/label';
+import { store as editorStore } from '../../store';
 
 const POSTNAME = '%postname%';
 
@@ -149,8 +151,8 @@ export default withSelect( ( select ) => {
 		getEditedPostAttribute,
 		getCurrentPost,
 		isCurrentPostScheduled,
-	} = select( 'core/editor' );
-	const { getPostType } = select( 'core' );
+	} = select( editorStore );
+	const { getPostType } = select( coreStore );
 
 	return {
 		post: getCurrentPost(),

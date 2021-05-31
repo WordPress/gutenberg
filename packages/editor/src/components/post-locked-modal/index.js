@@ -13,17 +13,19 @@ import { addQueryArgs } from '@wordpress/url';
 import { useEffect } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { getWPAdminURL } from '../../utils/url';
 import PostPreviewButton from '../post-preview-button';
+import { store as editorStore } from '../../store';
 
 export default function PostLockedModal() {
 	const instanceId = useInstanceId( PostLockedModal );
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
-	const { autosave, updatePostLock } = useDispatch( 'core/editor' );
+	const { autosave, updatePostLock } = useDispatch( editorStore );
 	const {
 		isLocked,
 		isTakeover,
@@ -41,8 +43,8 @@ export default function PostLockedModal() {
 			getActivePostLock,
 			getEditedPostAttribute,
 			getEditorSettings,
-		} = select( 'core/editor' );
-		const { getPostType } = select( 'core' );
+		} = select( editorStore );
+		const { getPostType } = select( coreStore );
 		return {
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),

@@ -26,11 +26,13 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { buildTermsTree } from '../../utils/terms';
+import { store as editorStore } from '../../store';
 
 /**
  * Module Constants
@@ -532,8 +534,8 @@ class HierarchicalTermSelector extends Component {
 
 export default compose( [
 	withSelect( ( select, { slug } ) => {
-		const { getCurrentPost } = select( 'core/editor' );
-		const { getTaxonomy } = select( 'core' );
+		const { getCurrentPost } = select( editorStore );
+		const { getTaxonomy } = select( coreStore );
 		const taxonomy = getTaxonomy( slug );
 		return {
 			hasCreateAction: taxonomy
@@ -551,7 +553,7 @@ export default compose( [
 				  )
 				: false,
 			terms: taxonomy
-				? select( 'core/editor' ).getEditedPostAttribute(
+				? select( editorStore ).getEditedPostAttribute(
 						taxonomy.rest_base
 				  )
 				: [],
@@ -560,7 +562,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		onUpdateTerms( terms, restBase ) {
-			dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
+			dispatch( editorStore ).editPost( { [ restBase ]: terms } );
 		},
 	} ) ),
 	withSpokenMessages,

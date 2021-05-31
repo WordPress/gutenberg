@@ -7,6 +7,12 @@ import { some, castArray } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 /**
  * A component which renders its own children only if the current editor post
@@ -38,8 +44,8 @@ export function PostTypeSupportCheck( { postType, children, supportKeys } ) {
 }
 
 export default withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
-	const { getPostType } = select( 'core' );
+	const { getEditedPostAttribute } = select( editorStore );
+	const { getPostType } = select( coreStore );
 	return {
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 	};

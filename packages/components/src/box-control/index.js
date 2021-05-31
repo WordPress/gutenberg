@@ -52,6 +52,7 @@ export default function BoxControl( {
 	values: valuesProp,
 	units,
 	sides,
+	allowReset = true,
 	resetValues = DEFAULT_VALUES,
 } ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
@@ -123,17 +124,19 @@ export default function BoxControl( {
 						{ label }
 					</Text>
 				</FlexItem>
-				<FlexItem>
-					<Button
-						className="component-box-control__reset-button"
-						variant="secondary"
-						isSmall
-						onClick={ handleOnReset }
-						disabled={ ! isDirty }
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</FlexItem>
+				{ allowReset && (
+					<FlexItem>
+						<Button
+							className="component-box-control__reset-button"
+							isSecondary
+							isSmall
+							onClick={ handleOnReset }
+							disabled={ ! isDirty }
+						>
+							{ __( 'Reset' ) }
+						</Button>
+					</FlexItem>
+				) }
 			</Header>
 			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
 				<FlexItem>

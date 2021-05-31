@@ -66,13 +66,11 @@ For more details, you can refer to each Higher Order Component's README file. [A
 Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
 composition, where each successive invocation is supplied the return value of the previous.
 
-_Parameters_
+This is just a re-export of `lodash`'s `flowRight` function.
 
--   _hocs_ `...Function`: The HOC functions to invoke.
+_Related_
 
-_Returns_
-
--   `Function`: Returns the new composite function.
+-   <https://docs-lodash.com/v4/flow-right/>
 
 <a name="createHigherOrderComponent" href="#createHigherOrderComponent">#</a> **createHigherOrderComponent**
 
@@ -485,7 +483,7 @@ function MyComponent(props) {
 
 _Parameters_
 
--   _object_ `Object`: Object which changes to compare.
+-   _object_ `object`: Object which changes to compare.
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
@@ -501,11 +499,11 @@ event handler for the entire application.
 
 _Parameters_
 
--   _eventTypesToHandlers_ `Object<string,string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
+-   _eventTypesToHandlers_ `Record<keyof GlobalEventHandlersEventMap, string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
 
 _Returns_
 
--   `Function`: Higher-order component.
+-   `any`: Higher-order component.
 
 <a name="withInstanceId" href="#withInstanceId">#</a> **withInstanceId**
 

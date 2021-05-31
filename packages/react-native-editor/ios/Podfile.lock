@@ -12,7 +12,7 @@ PODS:
     - React-jsi (= 0.64.0)
     - ReactCommon/turbomodule/core (= 0.64.0)
   - glog (0.3.5)
-  - Gutenberg (1.53.0):
+  - Gutenberg (1.54.0):
     - React-Core (= 0.64.0)
     - React-CoreModules (= 0.64.0)
     - React-RCTImage (= 0.64.0)
@@ -303,7 +303,7 @@ PODS:
     - React-Core
   - RNSVG (9.13.6-gb):
     - React-Core
-  - RNTAztecView (1.53.1):
+  - RNTAztecView (1.54.0):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.4)
   - WordPress-Aztec-iOS (1.19.4)
@@ -459,7 +459,7 @@ SPEC CHECKSUMS:
   FBLazyVector: 49cbe4b43e445b06bf29199b6ad2057649e4c8f5
   FBReactNativeSpec: 420ad7ff87adc491b45199891c72ea531fa4926e
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
-  Gutenberg: d0c794f58f3e690b089ef4616b855ac9d8a29ea1
+  Gutenberg: 10bf13e46ce02676fa0b7bc6fe8c9bb0e1f79bce
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: 2f8cb5b7533219bf4218a045f92768129cf7050a
   RCTTypeSafety: 512728b73549e72ad7330b92f3d42936f2a4de5b
@@ -475,7 +475,7 @@ SPEC CHECKSUMS:
   react-native-get-random-values: 03edb8dcc2d3f43e55aa67ea13b61b6723bbf047
   react-native-keyboard-aware-scroll-view: 6cb84879bf07e4cc1caed18b11fb928e142adac6
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
-  react-native-safe-area-context: c8da723dcddabe15afe95c9d31c56a0cf2b0141c
+  react-native-safe-area-context: 133d77d86b13cf694e014ab03dc2944ee3125d97
   react-native-slider: 2e42dc91e7ab8b35a9c7f2eb3532729a41d0dbe2
   react-native-video: e5dd0649534076cd6d09a0db51c617fa668d534a
   React-perflogger: 9c547d8f06b9bf00cb447f2b75e8d7f19b7e02af
@@ -496,7 +496,7 @@ SPEC CHECKSUMS:
   RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 46c4b680fe18237fa01eb7d7b311d77618fde31f
-  RNTAztecView: 7b71ccb80dc84f3d783c9193209c164b4ee51a9d
+  RNTAztecView: c5491bca29f7ff3da92f4a82cae82cc751d67aa7
   WordPress-Aztec-iOS: 870c93297849072aadfc2223e284094e73023e82
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf
 
