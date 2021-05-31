@@ -25,7 +25,6 @@ import {
 	PanelBody,
 	BaseControl,
 	__experimentalUseCustomUnits as useCustomUnits,
-	SelectControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { search } from '@wordpress/icons';
@@ -56,7 +55,6 @@ import {
 // button is placed inside wrapper.
 const DEFAULT_INNER_PADDING = 4;
 const BUTTON_BEHAVIOR_EXPAND = 'expand-searchfield';
-const BUTTON_BEHAVIOR_LINK = 'search-page-link';
 
 export default function SearchEdit( {
 	className,
@@ -148,10 +146,6 @@ export default function SearchEdit( {
 			'button-only' === buttonPosition &&
 				BUTTON_BEHAVIOR_EXPAND === buttonBehavior
 				? 'wp-block-search__button-behavior-expand'
-				: undefined,
-			'button-only' === buttonPosition &&
-				BUTTON_BEHAVIOR_LINK === buttonBehavior
-				? 'wp-block-search__button-behavior-link'
 				: undefined,
 			'button-only' === buttonPosition && isSearchFieldHidden
 				? 'wp-block-search__searchfield-hidden'
@@ -343,7 +337,7 @@ export default function SearchEdit( {
 
 			<InspectorControls>
 				<PanelBody title={ __( 'Display Settings' ) }>
-					{ 'button-only' === buttonPosition && (
+					{ /* { 'button-only' === buttonPosition && (
 						<SelectControl
 							label={ __( 'On button click' ) }
 							value={ buttonBehavior }
@@ -355,14 +349,10 @@ export default function SearchEdit( {
 									value: BUTTON_BEHAVIOR_EXPAND,
 									label: __( 'Show and expand search field' ),
 								},
-								{
-									value: BUTTON_BEHAVIOR_LINK,
-									label: __( 'Navigate to search page' ),
-								},
 								//{ value: 'search-modal', 'label': __( 'Show search modal') },
 							] }
 						/>
-					) }
+					) } */ }
 
 					<BaseControl
 						label={ __( 'Width' ) }
@@ -488,7 +478,7 @@ export default function SearchEdit( {
 				{ ( 'button-inside' === buttonPosition ||
 					'button-outside' === buttonPosition ||
 					( 'button-only' === buttonPosition &&
-						BUTTON_BEHAVIOR_LINK !== buttonBehavior ) ) && (
+						BUTTON_BEHAVIOR_EXPAND === buttonBehavior ) ) && (
 					<>
 						{ renderTextField() }
 						{ renderButton() }
@@ -496,7 +486,7 @@ export default function SearchEdit( {
 				) }
 
 				{ 'button-only' === buttonPosition &&
-					BUTTON_BEHAVIOR_LINK === buttonBehavior &&
+					BUTTON_BEHAVIOR_EXPAND !== buttonBehavior &&
 					renderButton() }
 				{ 'no-button' === buttonPosition && renderTextField() }
 			</ResizableBox>
