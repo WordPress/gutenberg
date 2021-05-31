@@ -31,7 +31,6 @@ function render_block_core_search( $attributes ) {
 	$classnames      = classnames_for_block_core_search( $attributes );
 	$show_label      = ( ! empty( $attributes['showLabel'] ) ) ? true : false;
 	$use_icon_button = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
-	$show_input      = ( ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'] ) ? false : true;
 	$show_button     = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
 	$label_markup    = '';
 	$input_markup    = '';
@@ -92,12 +91,15 @@ function render_block_core_search( $attributes ) {
 		$input_markup . $button_markup
 	);
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
-	$block_attributes = '';
+	$block_attributes   = '';
 
 	if ( ! empty( $attributes['buttonPosition'] ) && ! empty( $attributes['buttonBehavior'] ) ) {
 		if ( 'button-only' === $attributes['buttonPosition'] && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
 			$block_attributes = '<script type="application/json" class="wp-block-search__attributes">' .
-				wp_json_encode( (object) [ "width" => $attributes['width'], 'widthUnit' => $attributes['widthUnit'] ] ) .
+				wp_json_encode( (object) array(
+					'width' => $attributes['width'],
+					'widthUnit' => $attributes['widthUnit']
+				) ) .
 			'</script>';
 
 			wp_enqueue_script( 'wp-block-library-search', plugins_url( 'search/frontend.js', __FILE__ ) );
