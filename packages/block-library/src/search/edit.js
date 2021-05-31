@@ -346,23 +346,6 @@ export default function SearchEdit( {
 
 			<InspectorControls>
 				<PanelBody title={ __( 'Display Settings' ) }>
-					{ /* { 'button-only' === buttonPosition && (
-						<SelectControl
-							label={ __( 'On button click' ) }
-							value={ buttonBehavior }
-							onChange={ ( behavior ) =>
-								setAttributes( { buttonBehavior: behavior } )
-							}
-							options={ [
-								{
-									value: BUTTON_BEHAVIOR_EXPAND,
-									label: __( 'Show and expand search field' ),
-								},
-								//{ value: 'search-modal', 'label': __( 'Show search modal') },
-							] }
-						/>
-					) } */ }
-
 					<BaseControl
 						label={ __( 'Width' ) }
 						id={ unitControlInputId }
