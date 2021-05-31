@@ -97,6 +97,13 @@ const Example = () => {
 ```
 
 ## Props
+### allowReset
+
+If this property is true, a button to reset the box control is rendered.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`
 
 ### inputProps
 
@@ -126,6 +133,13 @@ A callback function for visualizer changes, based on input hover interactions.
 
 -   Type: `Function`
 -   Required: Yes
+
+### resetValues
+
+The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
+
+-   Type: `Object`
+-   Required: No
 
 ### sides
 
