@@ -70,6 +70,7 @@
 	.wp-block-page-list__submenu-icon,
 	.wp-block-navigation-link__submenu-icon {
 		height: inherit;
+		margin-left: 6px;
 
 		svg {
 			stroke: currentColor;
@@ -102,15 +103,19 @@
 		transition: opacity 0.1s linear;
 		visibility: hidden;
 
+		// Submenu items.
 		> .wp-block-pages-list__item,
 		> .wp-block-navigation-link {
 			> a {
+				display: flex;
 				flex-grow: 1;
-			}
 
-			> .wp-block-page-list__submenu-icon,
-			> .wp-block-navigation-link__submenu-icon {
-				padding-right: 0.5em;
+				// Right-align the chevron in submenus.
+				.wp-block-page-list__submenu-icon,
+				.wp-block-navigation-link__submenu-icon {
+					margin-right: 0;
+					margin-left: auto;
+				}
 			}
 		}
 
