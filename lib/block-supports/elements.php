@@ -15,7 +15,7 @@
 function gutenberg_render_elements_support( $block_content, $block ) {
 	$link_color = null;
 	if ( ! empty( $block['attrs'] ) ) {
-		$link_color = _wp_array_get( $block_attrs, array( 'style', 'elements', 'link', 'color', 'text' ), null );
+		$link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', 'color', 'text' ), null );
 	}
 
 	/*
