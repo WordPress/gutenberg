@@ -690,6 +690,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BlockSupportPanel",
+		"slug": "block-support-panel",
+		"markdown_source": "../packages/components/src/block-support-panel/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "BoxControl",
 		"slug": "box-control",
 		"markdown_source": "../packages/components/src/box-control/README.md",
