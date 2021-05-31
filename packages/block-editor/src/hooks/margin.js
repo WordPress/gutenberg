@@ -29,6 +29,38 @@ export function hasMarginSupport( blockType ) {
 }
 
 /**
+ * Checks if there is a current value in the margin block support attributes.
+ *
+ * @param  {Object} props Block props.
+ * @return {boolean}      Whether or not the block has a margin value set.
+ */
+export function hasMarginValue( props ) {
+	return props.attributes.style?.spacing?.margin !== undefined;
+}
+
+/**
+ * Resets the margin block support attributes. This can be used when disabling
+ * the margin support controls for a block via a progressive discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetMargin( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		style: {
+			...style,
+			spacing: {
+				...style?.spacing,
+				margin: undefined,
+			},
+		},
+	} );
+}
+
+/**
  * Custom hook that checks if margin settings have been disabled.
  *
  * @param {string} name The name of the block.
@@ -106,6 +138,7 @@ export function MarginEdit( props ) {
 					label={ __( 'Margin' ) }
 					sides={ sides }
 					units={ units }
+					allowReset={ false }
 				/>
 			</>
 		),

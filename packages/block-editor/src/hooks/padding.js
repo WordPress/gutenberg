@@ -29,6 +29,38 @@ export function hasPaddingSupport( blockType ) {
 }
 
 /**
+ * Checks if there is a current value in the padding block support attributes.
+ *
+ * @param  {Object} props Block props.
+ * @return {boolean}      Whether or not the block has a padding value set.
+ */
+export function hasPaddingValue( props ) {
+	return props.attributes.style?.spacing?.padding !== undefined;
+}
+
+/**
+ * Resets the padding block support attributes. This can be used when disabling
+ * the padding support controls for a block via a progressive discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetPadding( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		style: {
+			...style,
+			spacing: {
+				...style?.spacing,
+				padding: undefined,
+			},
+		},
+	} );
+}
+
+/**
  * Custom hook that checks if padding settings have been disabled.
  *
  * @param {string} name The name of the block.
@@ -106,6 +138,7 @@ export function PaddingEdit( props ) {
 					label={ __( 'Padding' ) }
 					sides={ sides }
 					units={ units }
+					allowReset={ false }
 				/>
 			</>
 		),
