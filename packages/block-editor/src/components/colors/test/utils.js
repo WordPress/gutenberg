@@ -108,5 +108,11 @@ describe( 'color utils', () => {
 				getColorClassName( 'background', undefined )
 			).toBeUndefined();
 		} );
+
+		it( 'should return a class name with the color slug without spaces', () => {
+			expect(
+				getColorClassName( 'background', 'Light   Purple veryDark' )
+			).toBe( 'has-Light-Purple-veryDark-background' );
+		} );
 	} );
 } );
