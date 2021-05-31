@@ -18,6 +18,7 @@ import {
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { closeSmall } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -25,6 +26,7 @@ import { closeSmall } from '@wordpress/icons';
 import PostPublishButton from '../post-publish-button';
 import PostPublishPanelPrepublish from './prepublish';
 import PostPublishPanelPostpublish from './postpublish';
+import { store as editorStore } from '../../store';
 
 export class PostPublishPanel extends Component {
 	constructor() {
@@ -129,7 +131,7 @@ export class PostPublishPanel extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getPostType } = select( 'core' );
+		const { getPostType } = select( coreStore );
 		const {
 			getCurrentPost,
 			getEditedPostAttribute,
@@ -138,8 +140,8 @@ export default compose( [
 			isEditedPostBeingScheduled,
 			isEditedPostDirty,
 			isSavingPost,
-		} = select( 'core/editor' );
-		const { isPublishSidebarEnabled } = select( 'core/editor' );
+		} = select( editorStore );
+		const { isPublishSidebarEnabled } = select( editorStore );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
@@ -159,7 +161,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
 		const { disablePublishSidebar, enablePublishSidebar } = dispatch(
-			'core/editor'
+			editorStore
 		);
 		return {
 			onTogglePublishSidebar: () => {
