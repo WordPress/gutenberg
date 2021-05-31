@@ -82,13 +82,10 @@
 // Styles for submenu flyout.
 // These are separated out with reduced specificity to allow better inheritance from Global Styles.
 .has-child {
-	// This adds a little space between the link and the dropdown icon.
-	> a {
-		margin-right: 0.5em;
-	}
-
-	.submenu-container,
-	.wp-block-navigation-link__container {
+	// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
+	// That way if padding is set in theme.json, it still wins.
+	// https://css-tricks.com/almanac/selectors/w/where/
+	:where(.submenu-container, .wp-block-navigation-link__container) {
 		background-color: inherit;
 		color: inherit;
 		position: absolute;
@@ -121,7 +118,6 @@
 
 		// Spacing in all submenus.
 		a {
-			padding: 0.5em 1em;
 			margin: 0;
 		}
 
@@ -251,6 +247,10 @@
  * Paddings
  */
 
+// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
+// That way if padding is set in theme.json, it still wins.
+// https://css-tricks.com/almanac/selectors/w/where/
+
 // Set the default menu item padding to zero, to allow text-only buttons.
 .wp-block-navigation a {
 	padding: 0;
@@ -258,10 +258,12 @@
 
 // When the menu has a background, items have paddings, reduce margins to compensate.
 // Treat margins and paddings differently when the block has a background.
-// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
-// That way if padding is set in theme.json, it still wins.
-// https://css-tricks.com/almanac/selectors/w/where/
 .wp-block-navigation:where(.has-background) a {
+	padding: 0.5em 1em;
+}
+
+// Provide a default padding for submenus who should always have some, regardless of the top level menu items.
+.wp-block-navigation :where(.submenu-container, .wp-block-navigation-link__container) a {
 	padding: 0.5em 1em;
 }
 
