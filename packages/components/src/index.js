@@ -22,6 +22,7 @@ export {
 	useAutocompleteProps as __unstableUseAutocompleteProps,
 } from './autocomplete';
 export { default as BaseControl } from './base-control';
+export { default as __experimentalBlockSupportPanel } from './block-support-panel';
 export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
