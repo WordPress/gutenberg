@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const fs = require( 'fs' );
 const path = require( 'path' );
 const { pickBy, mapValues } = require( 'lodash' );
 
@@ -269,7 +270,7 @@ async function runPerformanceTests( branches, options ) {
 		//     5.7.0 -> 5.7   (changed)
 		//     5.7.2 -> 5.7.2 (unchanged)
 		const zipVersion = options.wpVersion.replace( /^(\d+\.\d+).0/, '$1' );
-		const zipUrl = `https:\\/\\/wordpress.org\\/wordpress-${ zipVersion }.zip`;
+		const zipUrl = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
 
 		log( `Using WordPress version ${ zipVersion }` );
 
@@ -280,8 +281,12 @@ async function runPerformanceTests( branches, options ) {
 		//         "core": "https://wordpress.org/wordpress-$VERSION.zip",
 		//         ...
 		//     }
-		await runShellScript(
-			`sed -I '' -e '/"core":/s/WordPress\\/WordPress/${ zipUrl }/' "${ environmentDirectory }/.wp-env.json"`
+		const confPath = `${ environmentDirectory }/.wp-env.json`;
+		const conf = { ...readJSONFile( confPath ), core: zipUrl };
+		await fs.writeFileSync(
+			confPath,
+			JSON.stringify( conf, null, 2 ),
+			'utf8'
 		);
 	}
 	await runShellScript( 'npm run wp-env start', environmentDirectory );
