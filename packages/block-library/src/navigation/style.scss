@@ -75,12 +75,6 @@
 			stroke: currentColor;
 		}
 	}
-
-	// Set the default menu item padding to zero, to allow text-only buttons.
-	.wp-block-pages-list__item a,
-	.wp-block-navigation-link a { // This allows the custom menu item to inherit global styles.
-		padding: 0;
-	}
 }
 
 
@@ -212,7 +206,12 @@
 	}
 }
 
-// Margins, paddings, and submenu positions.
+
+/**
+ * Margins
+ * @todo: refactor this to use gap.
+ */
+
 // Menu items with no background.
 .wp-block-page-list,
 .wp-block-page-list > .wp-block-pages-list__item,
@@ -225,10 +224,11 @@
 	}
 }
 
-// When the menu has a background, items have paddings, reduce margins to compensate.
-// Treat margins and paddings differently when the block has a background.
-// @todo: refactor this to use gap.
-.wp-block-navigation.has-background {
+// Menu items with background.
+// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
+// That way if padding is set in theme.json, it still wins.
+// https://css-tricks.com/almanac/selectors/w/where/
+.wp-block-navigation:where(.has-background) {
 	.wp-block-page-list,
 	.wp-block-page-list > .wp-block-pages-list__item,
 	.wp-block-navigation__container > .wp-block-navigation-link {
@@ -239,11 +239,31 @@
 			margin: 0;
 		}
 	}
-
-	a {
-		padding: 0.5em 1em;
-	}
 }
+
+
+/**
+ * Paddings
+ */
+
+// Set the default menu item padding to zero, to allow text-only buttons.
+.wp-block-navigation a {
+	padding: 0;
+}
+
+// When the menu has a background, items have paddings, reduce margins to compensate.
+// Treat margins and paddings differently when the block has a background.
+// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
+// That way if padding is set in theme.json, it still wins.
+// https://css-tricks.com/almanac/selectors/w/where/
+.wp-block-navigation:where(.has-background) a {
+	padding: 0.5em 1em;
+}
+
+
+/**
+ * Justifications.
+ */
 
 // When justified space-between, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
