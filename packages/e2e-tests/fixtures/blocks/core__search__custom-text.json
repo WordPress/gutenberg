@@ -7,9 +7,13 @@
 			"label": "Custom label",
 			"showLabel": true,
 			"placeholder": "Custom placeholder",
+			"width": 100,
+			"widthUnit": "%",
 			"buttonText": "Custom button text",
 			"buttonPosition": "button-outside",
-			"buttonUseIcon": false
+			"buttonUseIcon": false,
+			"buttonBehavior": "expand-searchfield",
+			"isSearchFieldHidden": false
 		},
 		"innerBlocks": [],
 		"originalContent": ""
