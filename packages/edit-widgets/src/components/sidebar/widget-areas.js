@@ -59,7 +59,7 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 						<Button
 							href={ addQueryArgs( 'customize.php', {
 								'autofocus[panel]': 'widgets',
-								return: 'widgets.php',
+								return: window.location.pathname,
 							} ) }
 							variant="tertiary"
 						>
