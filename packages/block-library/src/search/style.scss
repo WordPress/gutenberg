@@ -7,6 +7,8 @@
 		margin-left: 0.625em;
 		word-break: normal;
 		flex-shrink: 0;
+		font-size: inherit;
+		line-height: inherit;
 
 		&.has-icon {
 			line-height: 0;

@@ -22,7 +22,6 @@
 		// This needs high specificity because it otherwise inherits styles from `components-button`.
 		// stylelint-disable-line no-duplicate-selectors
 		&.wp-block-search__button.wp-block-search__button {
-			padding: 6px 10px;
 			display: flex;
 			align-items: center;
 		}
