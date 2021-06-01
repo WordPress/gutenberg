@@ -35,6 +35,8 @@ export const SPACING_SUPPORT_KEY = 'spacing';
  * @return {WPElement} Inspector controls for spacing support features.
  */
 export function SpacingPanel( props ) {
+	const isPaddingDisabled = useIsPaddingDisabled( props );
+	const isMarginDisabled = useIsMarginDisabled( props );
 	const isDisabled = useIsSpacingDisabled( props );
 	const isSupported = hasSpacingSupport( props.name );
 
@@ -65,19 +67,22 @@ export function SpacingPanel( props ) {
 				title={ __( 'Dimensions' ) }
 				resetAll={ resetAll }
 			>
-				<PaddingEdit
-					{ ...props }
-					hasValue={ hasPaddingValue }
-					label={ __( 'Padding' ) }
-					reset={ resetPadding }
-					className="test-test-test"
-				/>
-				<MarginEdit
-					{ ...props }
-					hasValue={ hasMarginValue }
-					label={ __( 'Margin' ) }
-					reset={ resetMargin }
-				/>
+				{ ! isPaddingDisabled && (
+					<PaddingEdit
+						{ ...props }
+						hasValue={ hasPaddingValue }
+						label={ __( 'Padding' ) }
+						reset={ resetPadding }
+					/>
+				) }
+				{ ! isMarginDisabled && (
+					<MarginEdit
+						{ ...props }
+						hasValue={ hasMarginValue }
+						label={ __( 'Margin' ) }
+						reset={ resetMargin }
+					/>
+				) }
 			</BlockSupportPanel>
 		</InspectorControls>
 	);
