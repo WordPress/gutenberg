@@ -235,6 +235,10 @@ function gutenberg_load_remote_core_patterns() {
 				$settings['blockTypes'] = $settings['block_types'];
 				unset( $settings['block_types'] );
 			}
+			if ( isset( $settings['viewport_width'] ) ) {
+				$settings['viewportWidth'] = $settings['viewport_width'];
+				unset( $settings['viewport_width'] );
+			}
 			register_block_pattern( $pattern_name, (array) $settings );
 		}
 	}
