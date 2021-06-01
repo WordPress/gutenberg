@@ -89,7 +89,6 @@ function Content( props ) {
 		'content',
 		postId
 	);
-	// const userCanEdit = useUserCanEdit( postId, postType );
 	return userCanEdit ? (
 		<EditableContent { ...props } />
 	) : (
