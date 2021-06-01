@@ -130,6 +130,14 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			'__experimentalNoWrapper' => true,
 		);
 
+		// Reset existing global styles.
+		foreach( $settings['styles'] as $key => $style ) {
+			if ( isset( $style['__experimentalGlobalStyles'] ) ) {
+				unset( $settings['styles'][ $key ] );
+			}
+		}
+
+		// Add the new ones.
 		$settings['styles'][] = $css_variables;
 		$settings['styles'][] = $block_styles;
 	}
