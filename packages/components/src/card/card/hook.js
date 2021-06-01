@@ -24,7 +24,7 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 
 	if ( isElevated ) {
 		deprecated( 'Card isElevated prop', {
-			since: '5.8',
+			since: '5.9',
 			alternative: 'elevation"',
 		} );
 		computedElevation ??= 2;
