@@ -47,7 +47,7 @@ export default function DeleteTemplate() {
 			<MenuItem
 				className="edit-post-template-top-area__delete-template-button"
 				isDestructive
-				variant="tertiary"
+				variant="secondary"
 				aria-label={ __( 'Delete template' ) }
 				onClick={ () => {
 					if (
