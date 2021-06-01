@@ -34,7 +34,7 @@ export default function SaveButton( {
 	return (
 		<>
 			<Button
-				isPrimary
+				variant="primary"
 				className="edit-site-save-button__button"
 				aria-disabled={ disabled }
 				aria-expanded={ isEntitiesSavedStatesOpen }

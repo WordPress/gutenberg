@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-data",
-	"version": "2.26.2",
+	"version": "3.1.2",
 	"description": "Access to and manipulation of core WordPress entities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -18,6 +18,9 @@
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -37,7 +40,7 @@
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/url": "file:../url",
 		"equivalent-key-map": "^0.2.2",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"rememo": "^3.0.0",
 		"uuid": "^8.3.0"
 	},

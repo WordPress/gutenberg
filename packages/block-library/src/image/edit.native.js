@@ -48,7 +48,7 @@ import { withSelect } from '@wordpress/data';
 import {
 	image as placeholderIcon,
 	replace,
-	expand,
+	fullscreen,
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -448,7 +448,9 @@ export class ImageEdit extends Component {
 			imageDefaultSize,
 		] );
 
-		const isFeaturedImage = featuredImageId === attributes.id;
+		const isFeaturedImage =
+			typeof featuredImageId !== 'undefined' &&
+			featuredImageId === attributes.id;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -475,7 +477,7 @@ export class ImageEdit extends Component {
 				<PanelBody>
 					{ image && sizeOptionsValid && (
 						<CycleSelectControl
-							icon={ expand }
+							icon={ fullscreen }
 							label={ __( 'Size' ) }
 							value={ sizeSlug || imageDefaultSize }
 							onChangeValue={ this.onSizeChangeValue }

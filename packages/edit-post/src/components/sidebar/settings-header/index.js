@@ -4,6 +4,8 @@
 import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -17,8 +19,8 @@ const SettingsHeader = ( { sidebarName } ) => {
 	const openBlockSettings = () => openGeneralSidebar( 'edit-post/block' );
 
 	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
-		const currentPostType = select( 'core/editor' ).getCurrentPostType();
-		const postType = select( 'core' ).getPostType( currentPostType );
+		const currentPostType = select( editorStore ).getCurrentPostType();
+		const postType = select( coreStore ).getPostType( currentPostType );
 
 		return {
 			documentLabel:

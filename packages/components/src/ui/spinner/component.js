@@ -16,7 +16,7 @@ import { COLORS } from '../../utils/colors-values';
 
 /**
  *
- * @param {import('../context').ViewOwnProps<Props, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<Props, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Spinner( props, forwardedRef ) {
@@ -63,7 +63,7 @@ function Spinner( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Spinner } from `@wp-g2/components/ui`;
+ * import { Spinner } from `@wordpress/components/ui`;
  *
  * function Example() {
  * 	return (

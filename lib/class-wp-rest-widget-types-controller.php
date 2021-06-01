@@ -207,7 +207,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		$widgets = array();
 
 		foreach ( $wp_registered_widgets as $widget ) {
-			$parsed_id     = gutenberg_parse_widget_id( $widget['id'] );
+			$parsed_id     = wp_parse_widget_id( $widget['id'] );
 			$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
 
 			$widget['id']       = $parsed_id['id_base'];
@@ -419,9 +419,13 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			);
 		}
 
-		// Set the widget's number to 1 so that the `id` attributes in the HTML
-		// that we return are predictable.
-		$widget_object->_set( 1 );
+		// Set the widget's number so that the id attributes in the HTML that we
+		// return are predictable.
+		if ( isset( $request['number'] ) && is_numeric( $request['number'] ) ) {
+			$widget_object->_set( (int) $request['number'] );
+		} else {
+			$widget_object->_set( -1 );
+		}
 
 		if ( isset( $request['instance']['encoded'], $request['instance']['hash'] ) ) {
 			$serialized_instance = base64_decode( $request['instance']['encoded'] );

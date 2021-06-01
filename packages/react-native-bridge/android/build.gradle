@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:4.0.2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
@@ -16,7 +16,7 @@ buildscript {
 allprojects {
     repositories {
         if (willPublishReactNativeBridgeBinary) {
-            maven { url "https://dl.bintray.com/wordpress-mobile/react-native-mirror/" }
+            maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
         } else {
             maven { url "$rootDir/../../../node_modules/react-native/android" }
         }

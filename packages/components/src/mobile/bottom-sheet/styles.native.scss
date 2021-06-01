@@ -284,3 +284,12 @@
 .flex {
 	flex: 1;
 }
+
+.cellHelpLabel {
+	font-size: $default-font-size;
+	padding-bottom: $grid-unit-15;
+}
+
+.cellHelpLabelIOS {
+	padding-bottom: $grid-unit-10;
+}

@@ -6,13 +6,13 @@ import { __experimentalGradientPicker as GradientPicker } from '@wordpress/compo
 /**
  * Internal dependencies
  */
-import useEditorFeature from '../use-editor-feature';
+import useSetting from '../use-setting';
 
 const EMPTY_ARRAY = [];
 
 function GradientPickerWithGradients( props ) {
-	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
-	const disableCustomGradients = ! useEditorFeature( 'color.customGradient' );
+	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
+	const disableCustomGradients = ! useSetting( 'color.customGradient' );
 
 	return (
 		<GradientPicker

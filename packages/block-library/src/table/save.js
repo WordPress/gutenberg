@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import {
 	RichText,
 	useBlockProps,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 
@@ -21,8 +22,9 @@ export default function save( { attributes } ) {
 	}
 
 	const colorProps = getColorClassesAndStyles( attributes );
+	const borderProps = getBorderClassesAndStyles( attributes );
 
-	const classes = classnames( colorProps.className, {
+	const classes = classnames( colorProps.className, borderProps.className, {
 		'has-fixed-layout': hasFixedLayout,
 	} );
 
@@ -73,7 +75,7 @@ export default function save( { attributes } ) {
 		<figure { ...useBlockProps.save() }>
 			<table
 				className={ classes === '' ? undefined : classes }
-				style={ colorProps.style }
+				style={ { ...colorProps.style, ...borderProps.style } }
 			>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />

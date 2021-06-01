@@ -2,13 +2,13 @@
  * Internal dependencies
  */
 import { contextConnect } from '../context';
-import { Grid } from '../grid';
-import { View } from '../view';
+import { Grid } from '../../grid';
+import { View } from '../../view';
 import FormGroupContent from './form-group-content';
 import { useFormGroup } from './use-form-group';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function FormGroup( props, forwardedRef ) {

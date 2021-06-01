@@ -21,7 +21,7 @@ import { useUpdateEffect } from '../../utils/hooks';
 
 /**
  *
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Popover( props, forwardedRef ) {
@@ -111,14 +111,12 @@ function Popover( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Button, Popover, View, Text } from `@wordpress/components/ui`;
- 
+ * import { Button, Popover, Text } from `@wordpress/components/ui`;
+ *
  * function Example() {
  * 	return (
  * 		<Popover trigger={ <Button>Popover</Button> }>
- * 			<View>
- * 				<Text>Code is Poetry</Text>
- * 			</View>
+ *			<Text>Code is Poetry</Text>
  * 		</Popover>
  * 	);
  * }

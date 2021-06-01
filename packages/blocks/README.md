@@ -14,7 +14,7 @@ Install the module
 npm install @wordpress/blocks --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Getting Started
 
@@ -706,7 +706,7 @@ editor interface where blocks are implemented.
 
 _Parameters_
 
--   _name_ `string`: Block name.
+-   _blockNameOrMetadata_ `string|Object`: Block type name or its metadata.
 -   _settings_ `Object`: Block settings.
 
 _Returns_
@@ -715,18 +715,13 @@ _Returns_
 
 <a name="registerBlockTypeFromMetadata" href="#registerBlockTypeFromMetadata">#</a> **registerBlockTypeFromMetadata**
 
+> **Deprecated** Use `registerBlockType` instead.
+
 Registers a new block provided from metadata stored in `block.json` file.
-It uses `registerBlockType` internally.
-
-_Related_
-
--   registerBlockType
 
 _Parameters_
 
 -   _metadata_ `Object`: Block metadata loaded from `block.json`.
--   _metadata.name_ `string`: Block name.
--   _metadata.textdomain_ `string`: Textdomain to use with translations.
 -   _additionalSettings_ `Object`: Additional block settings.
 
 _Returns_
@@ -805,7 +800,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="switchToBlockType" href="#switchToBlockType">#</a> **switchToBlockType**
 

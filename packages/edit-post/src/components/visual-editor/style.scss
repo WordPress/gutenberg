@@ -1,6 +1,7 @@
 .edit-post-visual-editor {
 	position: relative;
-
+	display: flex;
+	flex-flow: column;
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
@@ -25,22 +26,6 @@
 		flex-basis: 100%;
 	}
 
-}
-
-.editor-styles-wrapper {
-	// Default background color so that grey .edit-post-editor-regions__content
-	// color doesn't show through.
-	background-color: $white;
-
-	cursor: text;
-
-	> * {
-		cursor: auto;
-	}
-
-	> div {
-		min-height: 100%;
-	}
 }
 
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks
@@ -72,4 +57,10 @@
 	&:hover {
 		color: $gray-100;
 	}
+}
+
+.edit-post-visual-editor__content-area {
+	width: 100%;
+	height: 100%;
+	position: relative;
 }

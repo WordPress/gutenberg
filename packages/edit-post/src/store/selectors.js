@@ -313,7 +313,7 @@ export function isSavingMetaBoxes( state ) {
  * @return {string} Device type.
  */
 export function __experimentalGetPreviewDeviceType( state ) {
-	return state.isEditingTemplate ? 'Desktop' : state.deviceType;
+	return state.deviceType;
 }
 
 /**
@@ -340,6 +340,17 @@ export function __experimentalGetInsertionPoint( state ) {
 }
 
 /**
+ * Returns true if the list view is opened.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether the list view is opened.
+ */
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
+}
+
+/**
  * Returns true if the template editing mode is enabled.
  *
  * @param  {Object}  state Global application state.
@@ -361,9 +372,17 @@ export const getEditedPostTemplate = createRegistrySelector(
 			'template'
 		);
 		if ( currentTemplate ) {
-			return select( coreStore )
+			const templateWithSameSlug = select( coreStore )
 				.getEntityRecords( 'postType', 'wp_template' )
 				?.find( ( template ) => template.slug === currentTemplate );
+			if ( ! templateWithSameSlug ) {
+				return templateWithSameSlug;
+			}
+			return select( coreStore ).getEditedEntityRecord(
+				'postType',
+				'wp_template',
+				templateWithSameSlug.id
+			);
 		}
 
 		const post = select( editorStore ).getCurrentPost();

@@ -20,6 +20,7 @@ import {
 	Spinner,
 	ToggleControl,
 	withNotices,
+	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
@@ -32,6 +33,7 @@ import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
+	useSetting,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
@@ -41,7 +43,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
 
@@ -54,7 +56,6 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
-	CSS_UNITS,
 	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
@@ -97,6 +98,17 @@ function CoverHeightInput( {
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
 
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'px',
+			'em',
+			'rem',
+			'vw',
+			'vh',
+		],
+		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
+	} );
+
 	const handleOnChange = ( unprocessedValue ) => {
 		const inputValue =
 			unprocessedValue !== ''
@@ -135,7 +147,7 @@ function CoverHeightInput( {
 				step="1"
 				style={ { maxWidth: 80 } }
 				unit={ unit }
-				units={ CSS_UNITS }
+				units={ units }
 				value={ inputValue }
 			/>
 		</BaseControl>
@@ -253,7 +265,7 @@ function mediaPosition( { x, y } ) {
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 
 function CoverPlaceholder( {
-	hasBackground = false,
+	disableMediaButtons = false,
 	children,
 	noticeUI,
 	noticeOperations,
@@ -273,7 +285,7 @@ function CoverPlaceholder( {
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			notices={ noticeUI }
-			disableMediaButtons={ hasBackground }
+			disableMediaButtons={ disableMediaButtons }
 			onError={ ( message ) => {
 				removeAllNotices();
 				createErrorNotice( message );
@@ -286,6 +298,7 @@ function CoverPlaceholder( {
 
 function CoverEdit( {
 	attributes,
+	clientId,
 	isSelected,
 	noticeUI,
 	noticeOperations,
@@ -409,6 +422,13 @@ function CoverEdit( {
 		styleOfRef[ property ] = mediaPosition( value );
 	};
 
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
+			0,
+		[ clientId ]
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -420,12 +440,12 @@ function CoverEdit( {
 							contentPosition: nextPosition,
 						} )
 					}
-					isDisabled={ ! hasBackground }
+					isDisabled={ ! hasInnerBlocks }
 				/>
 				<FullHeightAlignmentControl
 					isActive={ isMinFullHeight }
 					onToggle={ toggleMinFullHeight }
-					isDisabled={ ! hasBackground }
+					isDisabled={ ! hasInnerBlocks }
 				/>
 			</BlockControls>
 			<BlockControls group="other">
@@ -472,7 +492,7 @@ function CoverEdit( {
 						) }
 						<PanelRow>
 							<Button
-								isSecondary
+								variant="secondary"
 								isSmall
 								className="block-library-cover__reset-button"
 								onClick={ () =>
@@ -551,7 +571,7 @@ function CoverEdit( {
 		}
 	);
 
-	if ( ! hasBackground ) {
+	if ( ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
 				{ controls }
@@ -658,7 +678,7 @@ function CoverEdit( {
 				) }
 				{ isUploadingMedia && <Spinner /> }
 				<CoverPlaceholder
-					hasBackground={ hasBackground }
+					disableMediaButtons
 					noticeUI={ noticeUI }
 					onSelectMedia={ onSelectMedia }
 					noticeOperations={ noticeOperations }

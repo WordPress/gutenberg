@@ -12,20 +12,19 @@ import {
 	BlockControls,
 	RichText,
 	BlockIcon,
-	AlignmentToolbar,
+	AlignmentControl,
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	DropdownMenu,
 	PanelBody,
 	Placeholder,
 	TextControl,
 	ToggleControl,
-	ToolbarGroup,
-	ToolbarItem,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -103,6 +102,7 @@ function TableEdit( {
 	const [ selectedCell, setSelectedCell ] = useState();
 
 	const colorProps = useColorProps( attributes );
+	const borderProps = useBorderProps( attributes );
 
 	/**
 	 * Updates the initial column count used for table creation.
@@ -427,29 +427,26 @@ function TableEdit( {
 	return (
 		<figure { ...useBlockProps() }>
 			{ ! isEmpty && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<DropdownMenu
-									hasArrowIndicator
-									icon={ table }
-									toggleProps={ toggleProps }
-									label={ __( 'Edit table' ) }
-									controls={ tableControls }
-								/>
-							) }
-						</ToolbarItem>
-					</ToolbarGroup>
-					<AlignmentToolbar
-						label={ __( 'Change column alignment' ) }
-						alignmentControls={ ALIGNMENT_CONTROLS }
-						value={ getCellAlignment() }
-						onChange={ ( nextAlign ) =>
-							onChangeColumnAlignment( nextAlign )
-						}
-					/>
-				</BlockControls>
+				<>
+					<BlockControls group="block">
+						<AlignmentControl
+							label={ __( 'Change column alignment' ) }
+							alignmentControls={ ALIGNMENT_CONTROLS }
+							value={ getCellAlignment() }
+							onChange={ ( nextAlign ) =>
+								onChangeColumnAlignment( nextAlign )
+							}
+						/>
+					</BlockControls>
+					<BlockControls group="other">
+						<ToolbarDropdownMenu
+							hasArrowIndicator
+							icon={ table }
+							label={ __( 'Edit table' ) }
+							controls={ tableControls }
+						/>
+					</BlockControls>
+				</>
 			) }
 			{ ! isEmpty && (
 				<InspectorControls>
@@ -477,10 +474,12 @@ function TableEdit( {
 			) }
 			{ ! isEmpty && (
 				<table
-					className={ classnames( colorProps.className, {
-						'has-fixed-layout': hasFixedLayout,
-					} ) }
-					style={ colorProps.style }
+					className={ classnames(
+						colorProps.className,
+						borderProps.className,
+						{ 'has-fixed-layout': hasFixedLayout }
+					) }
+					style={ { ...colorProps.style, ...borderProps.style } }
 				>
 					{ renderedSections }
 				</table>
@@ -529,7 +528,7 @@ function TableEdit( {
 						/>
 						<Button
 							className="blocks-table__placeholder-button"
-							isPrimary
+							variant="primary"
 							type="submit"
 						>
 							{ __( 'Create Table' ) }

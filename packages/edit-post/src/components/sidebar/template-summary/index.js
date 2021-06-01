@@ -29,7 +29,7 @@ function TemplateSummary() {
 
 				<FlexBlock>
 					<h2 className="edit-post-template-summary__title">
-						{ template?.title?.raw || template?.slug }
+						{ template?.title || template?.slug }
 					</h2>
 					<p>{ template?.description }</p>
 				</FlexBlock>
