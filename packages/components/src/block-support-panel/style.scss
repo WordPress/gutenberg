@@ -7,6 +7,10 @@
 		margin-top: -1px;
 	}
 
+	&:first-child {
+		margin-top: -1px;
+	}
+
 	.components-block-support-panel__title {
 		margin: 0;
 		display: flex;
@@ -14,6 +18,7 @@
 		justify-content: space-between;
 		font-weight: 500;
 		line-height: normal;
+		font-size: inherit;
 
 		.components-dropdown-menu {
 			height: $grid-unit-30;
