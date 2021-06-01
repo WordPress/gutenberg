@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Icon, search } from '@wordpress/icons';
+import { memo } from '@wordpress/element';
 
 const PlaceholderPreview = () => {
 	return (
@@ -14,4 +15,4 @@ const PlaceholderPreview = () => {
 	);
 };
 
-export default PlaceholderPreview;
+export default memo( PlaceholderPreview );
