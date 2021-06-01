@@ -531,7 +531,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		self::$theme_json_i18n          = null;
 	}
 
-	public function _js_v_json_decoding_error_noticears() {
+	public function _json_decoding_error_notice() {
 		echo "Error message";
 	}
 
