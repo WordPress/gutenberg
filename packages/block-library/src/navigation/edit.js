@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -25,7 +25,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
@@ -78,6 +77,8 @@ function Navigation( {
 		clientId
 	);
 
+	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
@@ -98,8 +99,7 @@ function Navigation( {
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
-			// Placeholder component is wrapped with memo HoC to avoid unneeded re-renders
-			placeholder: <PlaceholderPreview />,
+			placeholder,
 		}
 	);
 
