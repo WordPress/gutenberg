@@ -24,7 +24,7 @@ exports[`props should render correctly 1`] = `
   overflow-y: auto;
   height: auto;
   max-height: 100%;
-  padding: calc(4px * 3) calc(4px * 3);
+  padding: 16px 24px;
 }
 
 @media only screen and ( min-device-width:40em ) {
@@ -103,7 +103,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface components-card emotion-12 emotion-1 emotion-2"
+  class="components-surface components-card components-card emotion-12 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
@@ -118,7 +118,7 @@ exports[`props should render correctly 1`] = `
       tabindex="-1"
     />
     <div
-      class="components-scrollable components-card-body emotion-0 emotion-1 emotion-2"
+      class="components-scrollable components-card__body components-card-body emotion-0 emotion-1 emotion-2"
       data-wp-c16t="true"
       data-wp-component="CardBody"
     >
@@ -159,7 +159,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
+      class="components-surface components-card components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
 `;
 
 exports[`props should render without content 1`] = `
@@ -181,7 +181,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
+      class="components-surface components-card components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
 @@ -21,10 +21,17 @@
           frameborder="0"
           src="about:blank"
@@ -189,7 +189,7 @@ Snapshot Diff:
           tabindex="-1"
         />
 +       <div
-+         class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
++         class="components-scrollable components-card__body components-card-body css-1nbtbsj-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
 +         data-wp-c16t="true"
 +         data-wp-component="CardBody"
 +       >
