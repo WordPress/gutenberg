@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+/**
  * WordPress dependencies
  */
 import { useRef, useEffect } from '@wordpress/element';
@@ -83,7 +87,11 @@ export default function Form( {
 
 	if ( isWide && isMediumLargeViewport ) {
 		return (
-			<div className="wp-block-legacy-widget__container">
+			<div
+				className={ classnames( {
+					'wp-block-legacy-widget__container': isVisible,
+				} ) }
+			>
 				{ isVisible && (
 					<h3 className="wp-block-legacy-widget__edit-form-title">
 						{ title }
