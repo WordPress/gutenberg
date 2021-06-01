@@ -48,6 +48,10 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
+	// Gutenberg will take care of enqueuing the corresponding styles,
+	// so we tell core not to enqueue its own.
+	wp_deregister_style( 'global-styles' );
+
 	if (
 		! get_theme_support( 'experimental-link-color' ) && // link color support needs the presets CSS variables regardless of the presence of theme.json file.
 		! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
@@ -62,9 +66,9 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	wp_register_style( 'global-styles', false, array(), true, true );
-	wp_add_inline_style( 'global-styles', $stylesheet );
-	wp_enqueue_style( 'global-styles' );
+	wp_register_style( 'global-styles-gutenberg', false, array(), true, true );
+	wp_add_inline_style( 'global-styles-gutenberg', $stylesheet );
+	wp_enqueue_style( 'global-styles-gutenberg' );
 }
 
 /**
