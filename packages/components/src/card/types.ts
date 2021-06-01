@@ -84,7 +84,7 @@ export type BodyProps = BaseSubComponentProps & {
 	 *
 	 * @default true
 	 */
-	scrollable?: boolean;
+	isScrollable?: boolean;
 };
 
 export type HeaderProps = BaseSubComponentProps & {

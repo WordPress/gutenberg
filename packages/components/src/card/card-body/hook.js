@@ -20,7 +20,7 @@ import * as styles from '../styles';
 export function useCardBody( props ) {
 	const {
 		className,
-		scrollable = true,
+		isScrollable = true,
 		isShady = false,
 		size = 'medium',
 		...otherProps
@@ -42,6 +42,6 @@ export function useCardBody( props ) {
 	return {
 		...otherProps,
 		className: classes,
-		scrollable,
+		isScrollable,
 	};
 }

@@ -185,7 +185,7 @@ describe( 'Card', () => {
 					<CardBody>Body</CardBody>
 				);
 				const { container } = render(
-					<CardBody scrollable={ false }>Body</CardBody>
+					<CardBody isScrollable={ false }>Body</CardBody>
 				);
 				expect( container ).toMatchDiffSnapshot( containerScrollable );
 			} );

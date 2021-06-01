@@ -11,9 +11,9 @@ import { useCardBody } from './hook';
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardBody( props, forwardedRef ) {
-	const { scrollable, ...otherProps } = useCardBody( props );
+	const { isScrollable, ...otherProps } = useCardBody( props );
 
-	if ( scrollable ) {
+	if ( isScrollable ) {
 		return <Scrollable { ...otherProps } ref={ forwardedRef } />;
 	}
 
