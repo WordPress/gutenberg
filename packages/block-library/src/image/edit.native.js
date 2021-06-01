@@ -456,7 +456,7 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
-			context: { isGrouped = false, imageCrop = false },
+			context: { isGrouped = false, imageCrop = false } = {},
 			featuredImageId,
 			wasBlockJustInserted,
 		} = this.props;
