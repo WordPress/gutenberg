@@ -64,6 +64,17 @@ async function configureWordPress( environment, config, spinner ) {
 	for ( const pluginSource of config.env[ environment ].pluginSources ) {
 		setupCommands.push( `wp plugin activate ${ pluginSource.basename }` );
 	}
+	const phpConfig = Object.entries( config.env[ environment ].phpConfig )
+		.map( ( [ key, value ] ) => {
+			const phpConfigValue =
+				typeof value === 'string' ? `"${ value }"` : value;
+			return `php_value ${ key } ${ phpConfigValue }`;
+		} )
+		.join( '\n' );
+
+	setupCommands.push(
+		`wp eval "insert_with_markers( get_home_path().'.htaccess', 'wp-env', '${ phpConfig }' );"`
+	);
 
 	if ( config.debug ) {
 		spinner.info(

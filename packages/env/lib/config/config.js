@@ -86,6 +86,7 @@ module.exports = async function readConfig( configPath ) {
 			WP_SITEURL: 'http://localhost',
 			WP_HOME: 'http://localhost',
 		},
+		phpConfig: {},
 		env: {
 			development: {}, // No overrides needed, but it should exist.
 			tests: {
