@@ -30,7 +30,6 @@ import {
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
-import { parse as parseBlocks } from '@wordpress/block-serialization-default-parser';
 
 /**
  * A block selection object.
@@ -1837,10 +1836,14 @@ const getAllAllowedPatterns = createSelector(
 			// the raw blocks parser, also known as the "stage I" block parser.
 			// This is about 250x faster than the full parse that the Block API
 			// offers.
-			blockNodes: parseBlocks( pattern.content ),
+			__unstableBlockNodes: parse( pattern.content ),
 		} ) );
-		const allowedPatterns = parsedPatterns.filter( ( { blockNodes } ) =>
-			checkAllowListRecursive( blockNodes, allowedBlockTypes )
+		const allowedPatterns = parsedPatterns.filter(
+			( { __unstableBlockNodes } ) =>
+				checkAllowListRecursive(
+					__unstableBlockNodes,
+					allowedBlockTypes
+				)
 		);
 		return allowedPatterns;
 	},
@@ -1863,11 +1866,12 @@ export const __experimentalGetAllowedPatterns = createSelector(
 		const availableParsedPatterns = getAllAllowedPatterns( state );
 		const patternsAllowed = filter(
 			availableParsedPatterns,
-			( { blockNodes } ) =>
-				blockNodes.every( ( { blockName } ) =>
-					canInsertBlockType( state, blockName, rootClientId )
+			( { __unstableBlockNodes } ) =>
+				__unstableBlockNodes.every( ( { name } ) =>
+					canInsertBlockType( state, name, rootClientId )
 				)
 		);
+
 		return patternsAllowed;
 	},
 	( state, rootClientId ) => [
