@@ -21,10 +21,7 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  */
 export default function withState( initialState = {} ) {
 	deprecated( 'wp.compose.withState', {
-		since: '10.8',
-		plugin: 'Gutenberg',
 		alternative: 'wp.element.useState',
-		version: '11.1',
 	} );
 
 	return createHigherOrderComponent( ( OriginalComponent ) => {
