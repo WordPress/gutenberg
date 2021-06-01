@@ -75,7 +75,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
 				error_log( 'Error when decoding file schema: ' . json_last_error_msg() );
-				add_action( 'admin_footer', array( $this, '_json_decoding_error_notice' ) );
+				add_action( 'admin_footer', array( __CLASS__, '_json_decoding_error_notice' ) );
 				return $config;
 			}
 
@@ -531,8 +531,25 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		self::$theme_json_i18n          = null;
 	}
 
-	public function _json_decoding_error_notice() {
-		echo "Error message";
+	/**
+	 * Print a notice if there was an error decoding the theme.json file.
+	 *
+	 * @return void
+	 */
+	public static function _json_decoding_error_notice() {
+		?>
+		<div id="theme-json-notice" class="notice notice-error is-dismissible">
+			<p>
+				<?php
+				printf(
+					/* translators: theme.json. */
+					esc_html__( 'There was an error decoding the %s file from your theme.', 'gutenberg' ),
+					'<code>theme.json</code>'
+				);
+				?>
+			</p>
+		</div>
+		<?php
 	}
 
 }
