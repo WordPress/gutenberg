@@ -16,6 +16,7 @@ import {
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
+	canUserEditPost,
 	getAutosave,
 	getAutosaves,
 	getCurrentUser,
@@ -441,6 +442,72 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( canUser( state, 'create', 'media', 123 ) ).toBe( false );
+	} );
+} );
+
+describe( 'canUserEditPost', () => {
+	it( 'returns undefined by default', () => {
+		const state = deepFreeze( {
+			userPermissions: {},
+			entities: { data: {} },
+		} );
+		expect( canUserEditPost( state, 'post' ) ).toBe( undefined );
+	} );
+
+	it( 'returns whether the user can edit', () => {
+		const state = deepFreeze( {
+			userPermissions: {
+				'create/posts': false,
+				'update/posts': true,
+			},
+			entities: {
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {
+									post: { slug: 'post', rest_base: 'posts' },
+								},
+								itemIsComplete: {
+									post: true,
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( canUserEditPost( state, 'post' ) ).toBe( true );
+	} );
+
+	it( 'returns whether whether the user can edit a given resource', () => {
+		const state = deepFreeze( {
+			userPermissions: {
+				'create/posts': false,
+				'update/pages': false,
+				'update/pages/2010': true,
+				'update/posts/2010': false,
+			},
+			entities: {
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {
+									page: { slug: 'page', rest_base: 'pages' },
+								},
+								itemIsComplete: {
+									page: true,
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( canUserEditPost( state, 'page', 2010 ) ).toBe( true );
 	} );
 } );
 

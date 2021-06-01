@@ -268,6 +268,26 @@ _Returns_
 
 -   `boolean|undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
 
+<a name="canUserEditPost" href="#canUserEditPost">#</a> **canUserEditPost**
+
+Returns whether the current user can edit the given
+REST resource.
+
+Calling this may trigger an OPTIONS request to the REST API via the
+`canUser()` resolver.
+
+<https://developer.wordpress.org/rest-api/reference/>
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+-   _name_ `string`: Entity name to extract the REST resource that will be used for the check.
+-   _id_ `string`: ID of the rest resource to check.
+
+_Returns_
+
+-   `boolean|undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
+
 <a name="getAuthors" href="#getAuthors">#</a> **getAuthors**
 
 Returns all available authors.
