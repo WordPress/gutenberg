@@ -35,6 +35,7 @@ export function useCardHeader( props ) {
 				styles.cardPaddings[ size ],
 				isBorderless && styles.borderless,
 				isShady && styles.shady,
+				'components-card__header',
 				className
 			),
 		[ className, isBorderless, isShady, size ]

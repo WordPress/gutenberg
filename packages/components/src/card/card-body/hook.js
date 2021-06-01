@@ -33,6 +33,7 @@ export function useCardBody( props ) {
 				styles.borderRadius,
 				styles.cardPaddings[ size ],
 				isShady && styles.shady,
+				'components-card__body',
 				className
 			),
 		[ className, isShady, size ]

@@ -55,6 +55,7 @@ export function useCard( props ) {
 			styles.Card,
 			isBorderless && styles.boxShadowless,
 			isRounded && styles.rounded,
+			'components-card',
 			className
 		);
 	}, [ className, isBorderless, isRounded ] );
