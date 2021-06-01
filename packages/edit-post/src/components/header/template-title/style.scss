@@ -47,5 +47,22 @@
 }
 
 .edit-post-template-top-area__popover .components-popover__content {
-	min-width: 360px;
+	min-width: 280px;
+}
+
+.edit-post-template-top-area__second-menu-group {
+	margin-left: -$grid-unit-15;
+	margin-right: -$grid-unit-15;
+	padding: $grid-unit-15;
+	padding-bottom: 0;
+	border-top: $border-width solid $gray-300;
+
+	.edit-post-template-top-area__delete-template-button {
+		display: flex;
+		justify-content: center;
+
+		.components-menu-item__item {
+			margin-right: 0;
+		}
+	}
 }
