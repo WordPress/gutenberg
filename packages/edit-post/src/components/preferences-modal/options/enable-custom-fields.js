@@ -5,6 +5,7 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -58,6 +59,6 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 }
 
 export default withSelect( ( select ) => ( {
-	areCustomFieldsEnabled: !! select( 'core/editor' ).getEditorSettings()
+	areCustomFieldsEnabled: !! select( editorStore ).getEditorSettings()
 		.enableCustomFields,
 } ) )( EnableCustomFieldsOption );

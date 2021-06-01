@@ -684,6 +684,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BaseField",
+		"slug": "base-field",
+		"markdown_source": "../packages/components/src/base-field/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "BoxControl",
 		"slug": "box-control",
 		"markdown_source": "../packages/components/src/box-control/README.md",

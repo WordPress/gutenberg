@@ -255,7 +255,7 @@ export const getChildBlockNames = createSelector(
  *
  * @param  {Object}          state           Data state.
  * @param  {(string|Object)} nameOrType      Block name or type object
- * @param  {string}          feature         Feature to retrieve
+ * @param  {Array|string}    feature         Feature to retrieve
  * @param  {*}               defaultSupports Default value to return if not
  *                                           explicitly defined
  *
@@ -268,12 +268,11 @@ export const getBlockSupport = (
 	defaultSupports
 ) => {
 	const blockType = getNormalizedBlockType( state, nameOrType );
+	if ( ! blockType?.supports ) {
+		return defaultSupports;
+	}
 
-	return get(
-		blockType,
-		[ 'supports', ...feature.split( '.' ) ],
-		defaultSupports
-	);
+	return get( blockType.supports, feature, defaultSupports );
 };
 
 /**

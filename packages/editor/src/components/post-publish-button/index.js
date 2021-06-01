@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import PublishButtonLabel from './label';
+import { store as editorStore } from '../../store';
 
 export class PostPublishButton extends Component {
 	constructor( props ) {
@@ -209,7 +210,7 @@ export default compose( [
 			getCurrentPostType,
 			getCurrentPostId,
 			hasNonPostEntityChanges,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 		const _isAutoSaving = isAutosavingPost();
 		return {
 			isSaving: isSavingPost() || _isAutoSaving,
@@ -231,7 +232,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( 'core/editor' );
+		const { editPost, savePost } = dispatch( editorStore );
 		return {
 			onStatusChange: ( status ) =>
 				editPost( { status }, { undoIgnore: true } ),

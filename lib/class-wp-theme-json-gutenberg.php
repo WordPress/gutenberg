@@ -73,6 +73,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontSize'       => null,
 			'fontStyle'      => null,
 			'fontWeight'     => null,
+			'letterSpacing'  => null,
 			'lineHeight'     => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
@@ -105,6 +106,7 @@ class WP_Theme_JSON_Gutenberg {
 			'customFontSize'        => null,
 			'customFontStyle'       => null,
 			'customFontWeight'      => null,
+			'customLetterSpacing'   => null,
 			'customLineHeight'      => null,
 			'customTextDecorations' => null,
 			'customTextTransforms'  => null,
@@ -237,6 +239,9 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'font-weight'      => array(
 			'value' => array( 'typography', 'fontWeight' ),
+		),
+		'letter-spacing'   => array(
+			'value' => array( 'typography', 'letterSpacing' ),
 		),
 		'line-height'      => array(
 			'value' => array( 'typography', 'lineHeight' ),

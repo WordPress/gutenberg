@@ -13,8 +13,11 @@ import { useRef } from '@wordpress/element';
  */
 import useRefEffect from '../use-ref-effect';
 
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
-
+/**
+ * @template T
+ * @param {T} value
+ * @return {import('react').RefObject<T>} The updated ref
+ */
 function useUpdatedRef( value ) {
 	const ref = useRef( value );
 	ref.current = value;
@@ -24,24 +27,24 @@ function useUpdatedRef( value ) {
 /**
  * Copies the given text to the clipboard when the element is clicked.
  *
- * @param {text|Function} text      The text to copy. Use a function if not
+ * @param {string | (() => string)} text The text to copy. Use a function if not
  *                                  already available and expensive to compute.
- * @param {Function}      onSuccess Called when to text is copied.
+ * @param {Function} onSuccess Called when to text is copied.
  *
- * @return {RefObject} A ref to assign to the target element.
+ * @return {import('react').Ref<HTMLElement>} A ref to assign to the target element.
  */
 export default function useCopyToClipboard( text, onSuccess ) {
 	// Store the dependencies as refs and continuesly update them so they're
 	// fresh when the callback is called.
 	const textRef = useUpdatedRef( text );
-	const onSuccesRef = useUpdatedRef( onSuccess );
+	const onSuccessRef = useUpdatedRef( onSuccess );
 	return useRefEffect( ( node ) => {
 		// Clipboard listens to click events.
 		const clipboard = new Clipboard( node, {
 			text() {
 				return typeof textRef.current === 'function'
 					? textRef.current()
-					: textRef.current;
+					: textRef.current || '';
 			},
 		} );
 
@@ -54,8 +57,8 @@ export default function useCopyToClipboard( text, onSuccess ) {
 			// https://github.com/zenorocha/clipboard.js/issues/680
 			node.focus();
 
-			if ( onSuccesRef.current ) {
-				onSuccesRef.current();
+			if ( onSuccessRef.current ) {
+				onSuccessRef.current();
 			}
 		} );
 
