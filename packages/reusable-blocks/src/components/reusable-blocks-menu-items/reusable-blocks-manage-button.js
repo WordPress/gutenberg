@@ -10,12 +10,13 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
 
 function ReusableBlocksManageButton( { clientId } ) {
 	const { isVisible } = useSelect(
 		( select ) => {
 			const { getBlock } = select( blockEditorStore );
-			const { canUser } = select( 'core' );
+			const { canUser } = select( coreStore );
 			const reusableBlock = getBlock( clientId );
 
 			return {

@@ -65,15 +65,6 @@ function gutenberg_register_sidebars_and_widgets_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
 
 /**
- * Registers the Batch REST API routes.
- */
-function gutenberg_register_batch_endpoint() {
-	$batch = new WP_REST_Batch_Controller();
-	$batch->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
-
-/**
  * Registers the Block editor settings REST API routes.
  */
 function gutenberg_register_block_editor_settings() {
@@ -192,81 +183,3 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 	return $permalink;
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
-
-/**
- * Expose the custom_logo theme-mod in the settings REST API.
- */
-register_setting(
-	'general',
-	'theme_mods_' . get_option( 'stylesheet' ),
-	array(
-		'type'         => 'object',
-		'show_in_rest' => array(
-			'name'   => 'theme_mods_' . get_option( 'stylesheet' ),
-			'schema' => array(
-				'type'       => 'object',
-				'properties' => array(
-					'custom_logo' => array( 'type' => 'integer' ),
-				),
-			),
-		),
-	)
-);
-
-/**
- * Expose the "stylesheet" setting in the REST API.
- */
-register_setting(
-	'general',
-	'stylesheet',
-	array(
-		'type'         => 'string',
-		'show_in_rest' => true,
-	)
-);
-
-/**
- * Filters the value of a setting recognized by the REST API.
- *
- * Hijacks the value for custom_logo theme-mod.
- *
- * @param mixed  $result Value to use for the requested setting. Can be a scalar
- *                       matching the registered schema for the setting, or null to
- *                       follow the default get_option() behavior.
- * @param string $name   Setting name (as shown in REST API responses).
- *
- * @return null|array
- */
-function gutenberg_rest_pre_get_setting_filter_custom_logo( $result, $name ) {
-	if ( 'theme_mods_' . get_option( 'stylesheet' ) === $name ) {
-		return array(
-			'custom_logo' => get_theme_mod( 'custom_logo' ),
-		);
-	}
-}
-add_filter( 'rest_pre_get_setting', 'gutenberg_rest_pre_get_setting_filter_custom_logo', 10, 2 );
-
-/**
- * Filters whether to preempt a setting value update via the REST API.
- *
- * Hijacks the saving method for theme-mods.
- *
- * @param bool   $result Whether to override the default behavior for updating the
- *                       value of a setting.
- * @param string $name   Setting name (as shown in REST API responses).
- * @param mixed  $value  Updated setting value.
- *
- * @return bool
- */
-function gutenberg_rest_pre_set_setting_filter_theme_mods( $result, $name, $value ) {
-	$theme_mods_setting_name = 'theme_mods_' . get_option( 'stylesheet' );
-	if ( $theme_mods_setting_name === $name ) {
-		$value = (array) $value;
-		$value = wp_parse_args( $value, get_option( $theme_mods_setting_name, array() ) );
-
-		update_option( $theme_mods_setting_name, $value );
-		return true;
-	}
-}
-
-add_filter( 'rest_pre_update_setting', 'gutenberg_rest_pre_set_setting_filter_theme_mods', 10, 3 );

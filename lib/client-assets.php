@@ -361,7 +361,7 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 
 	// Only load the default layout and margin styles for themes without theme.json file.
-	if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) {
+	if ( ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		$wp_edit_blocks_dependencies[] = 'wp-editor-classic-layout-styles';
 	}
 
@@ -663,7 +663,7 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 	}
 
 	// Remove the default font editor styles for FSE themes.
-	if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
+	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		foreach ( $settings['styles'] as $j => $style ) {
 			if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
 				unset( $settings['styles'][ $j ] );
@@ -693,7 +693,7 @@ function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings )
 	$settings['supportsTemplateMode'] = gutenberg_supports_block_templates();
 
 	// Enable the new layout options for themes with a theme.json file.
-	$settings['supportsLayout'] = WP_Theme_JSON_Resolver::theme_has_support();
+	$settings['supportsLayout'] = WP_Theme_JSON_Resolver_Gutenberg::theme_has_support();
 
 	return $settings;
 }

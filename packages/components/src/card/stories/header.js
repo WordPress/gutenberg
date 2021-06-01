@@ -36,7 +36,7 @@ export const alignment = () => {
 			<CardHeader isShady={ isShady }>
 				<FlexBlock>{ content }</FlexBlock>
 				<FlexItem>
-					<Button isPrimary>Action</Button>
+					<Button variant="primary">Action</Button>
 				</FlexItem>
 			</CardHeader>
 		</Card>

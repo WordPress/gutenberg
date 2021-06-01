@@ -15,6 +15,7 @@ import { compose, withState } from '@wordpress/compose';
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 
 export const PageAttributesOrder = withState( {
 	orderInput: null,
@@ -60,14 +61,12 @@ function PageAttributesOrderWithChecks( props ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			order: select( 'core/editor' ).getEditedPostAttribute(
-				'menu_order'
-			),
+			order: select( editorStore ).getEditedPostAttribute( 'menu_order' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		onUpdateOrder( order ) {
-			dispatch( 'core/editor' ).editPost( {
+			dispatch( editorStore ).editPost( {
 				menu_order: order,
 			} );
 		},

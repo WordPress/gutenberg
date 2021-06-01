@@ -5,6 +5,24 @@
  * @package gutenberg
  */
 
+/*
+ * Fixes the priority of register_block_core_legacy_widget().
+ *
+ * This hook was incorrectly added to Core with priority 20. #32300 fixes this
+ * but causes block registration warnings in the Gutenberg plugin until the
+ * changes are made in Core.
+ *
+ * This temporary fix can be removed after the changes to
+ * @wordpress/block-library in #32300 have been published to npm and updated in
+ * Core.
+ *
+ * See https://github.com/WordPress/gutenberg/pull/32300.
+ */
+if ( 20 === has_action( 'init', 'register_block_core_legacy_widget' ) ) {
+	remove_action( 'init', 'register_block_core_legacy_widget', 20 );
+	add_action( 'init', 'register_block_core_legacy_widget', 10 );
+}
+
 /**
  * Substitutes the implementation of a core-registered block type, if exists,
  * with the built result from the plugin.

@@ -12,13 +12,16 @@ import { contextConnect } from '../context';
 // eslint-disable-next-line no-duplicate-imports
 import type {
 	PolymorphicComponent,
-	PropsFromViewOwnProps,
-	ElementTypeFromViewOwnProps,
-	ViewOwnProps,
+	PropsFromPolymorphicComponentProps,
+	ElementTypeFromPolymorphicComponentProps,
+	PolymorphicComponentProps,
 } from '../context';
 import { View } from '../../view';
 
-interface Options< A extends As, P extends ViewOwnProps< {}, A > > {
+interface Options<
+	A extends As,
+	P extends PolymorphicComponentProps< {}, A >
+> {
 	as: A;
 	name: string;
 	useHook: ( props: P ) => any;
@@ -37,15 +40,15 @@ interface Options< A extends As, P extends ViewOwnProps< {}, A > > {
  */
 export const createComponent = <
 	A extends As,
-	P extends ViewOwnProps< {}, A >
+	P extends PolymorphicComponentProps< {}, A >
 >( {
 	as,
 	name,
 	useHook,
 	memo = false,
 }: Options< A, P > ): PolymorphicComponent<
-	ElementTypeFromViewOwnProps< P >,
-	PropsFromViewOwnProps< P >
+	ElementTypeFromPolymorphicComponentProps< P >,
+	PropsFromPolymorphicComponentProps< P >
 > => {
 	function Component( props: P, forwardedRef: Ref< any > ) {
 		const otherProps = useHook( props );

@@ -1,6 +1,8 @@
 # VStack
 
-> **Experimental!**
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 `VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
 
@@ -93,7 +95,7 @@ function Example() {
 		<VStack>
 			<Text>Code</Text>
 			<Spacer>
-			<Text>is</Text>
+				<Text>is</Text>
 			</Spacer>
 			<Text>Poetry</Text>
 		</VStack>

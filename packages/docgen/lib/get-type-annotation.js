@@ -43,7 +43,9 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 			typeAnnotation.typeAnnotation.typeAnnotation
 	);
 
-	return `( ${ params } )${ returnIndicator }${ returnType }`;
+	const paramsWithParens = params.length ? `( ${ params } )` : `()`;
+
+	return `${ paramsWithParens }${ returnIndicator }${ returnType }`;
 }
 
 /**
@@ -376,6 +378,10 @@ function getTypeAnnotation( typeAnnotation ) {
  */
 function getFunctionToken( token ) {
 	let resolvedToken = token;
+	if ( babelTypes.isExportDefaultDeclaration( resolvedToken ) ) {
+		resolvedToken = resolvedToken.declaration;
+	}
+
 	if ( babelTypes.isExportNamedDeclaration( resolvedToken ) ) {
 		resolvedToken = resolvedToken.declaration;
 	}
