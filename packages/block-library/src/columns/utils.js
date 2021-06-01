@@ -122,7 +122,7 @@ export function getMappedColumnWidths( blocks, widths ) {
 	return blocks.map( ( block ) =>
 		merge( {}, block, {
 			attributes: {
-				width: widths[ block.clientId ],
+				width: `${ widths[ block.clientId ] }%`,
 			},
 		} )
 	);
