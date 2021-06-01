@@ -119,6 +119,10 @@ const Tooltip = ( {
 
 	// Manage tooltip visibility and position in relation to keyboard
 	useEffect( () => {
+		if ( ! visible ) {
+			return;
+		}
+
 		// Update tooltip position if keyboard is visible
 		if ( keyboardVisible ) {
 			getReferenceElementPosition();
@@ -129,7 +133,7 @@ const Tooltip = ( {
 			setAnimating( true );
 			setVisible( false );
 		}
-	}, [ keyboardVisible ] );
+	}, [ visible, keyboardVisible ] );
 
 	// Manage tooltip position during keyboard frame changes
 	useEffect( () => {
