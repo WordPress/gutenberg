@@ -75,6 +75,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
 				error_log( 'Error when decoding file schema: ' . json_last_error_msg() );
+				add_action( 'admin_footer', array( $this, '_json_decoding_error_notice' ) );
 				return $config;
 			}
 
@@ -528,6 +529,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		self::$user_custom_post_type_id = null;
 		self::$theme_has_support        = null;
 		self::$theme_json_i18n          = null;
+	}
+
+	public function _js_v_json_decoding_error_noticears() {
+		echo "Error message";
 	}
 
 }
