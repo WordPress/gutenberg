@@ -16,12 +16,13 @@ import BlockSupportPanelTitle from './title';
 const BlockSupportPanel = ( props ) => {
 	const { children, className, label: menuLabel, resetAll, title } = props;
 	const [ menuItems, setMenuItems ] = useState( {} );
-	const classes = classnames( 'components-block-support-panel', className );
 
 	// If a block support UI has been disabled via theme.json a boolean `false`
 	// will be passed as a child. This panel is only interested in the children
 	// to be displayed.
-	const filteredChildren = children.filter( Boolean );
+	const filteredChildren = Array.isArray( children )
+		? children.filter( Boolean )
+		: [];
 
 	// Collect data to manage control visibility via the panel's dropdown menu.
 	useEffect( () => {
@@ -33,6 +34,10 @@ const BlockSupportPanel = ( props ) => {
 
 		setMenuItems( items );
 	}, [] );
+
+	if ( filteredChildren.length === 0 ) {
+		return null;
+	}
 
 	const getControlByMenuLabel = ( label ) => {
 		return filteredChildren.find(
@@ -71,6 +76,8 @@ const BlockSupportPanel = ( props ) => {
 
 		setMenuItems( resetMenuItems );
 	};
+
+	const classes = classnames( 'components-block-support-panel', className );
 
 	return (
 		<div className={ classes }>
