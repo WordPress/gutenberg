@@ -18,21 +18,25 @@ export function isPercentageUnit( unit ) {
 	return unit === '%';
 }
 
-export function hideSearchField( wrapper, searchField, button ) {
-	searchField.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
-	wrapper.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
+export function hideSearchField( wrapper, searchField, button, animate = true ) {
+	const duration = animate ? SEARCHFIELD_ANIMATION_DURATION : 0;
+
+	searchField.style.transitionDuration = `${ duration }ms`;
+	wrapper.style.transitionDuration = `${ duration }ms`;
 	wrapper.style.width = `${ button.offsetWidth }px`;
 
 	const removeTransitions = setTimeout( () => {
 		wrapper.style.transitionDuration = 'unset';
 
 		clearTimeout( removeTransitions );
-	}, SEARCHFIELD_ANIMATION_DURATION );
+	}, duration );
 }
 
-export function showSearchField( wrapper, searchField, width, widthUnit ) {
-	searchField.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
-	wrapper.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
+export function showSearchField( wrapper, searchField, width, widthUnit, animate = true ) {
+	const duration = animate ? SEARCHFIELD_ANIMATION_DURATION : 0;
+
+	searchField.style.transitionDuration = `${ duration }ms`;
+	wrapper.style.transitionDuration = `${ duration }ms`;
 	wrapper.style.width = `${ width }${ widthUnit }`;
 
 	const removeTransitions = setTimeout( () => {
@@ -40,5 +44,5 @@ export function showSearchField( wrapper, searchField, width, widthUnit ) {
 		wrapper.style.transitionDuration = 'unset';
 
 		clearTimeout( removeTransitions );
-	}, SEARCHFIELD_ANIMATION_DURATION );
+	}, duration );
 }

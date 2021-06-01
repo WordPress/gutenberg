@@ -51,26 +51,26 @@ const wpBlockSearch = ( block ) => {
 		searchField.focus();
 
 		wrapper.removeEventListener( 'click', toggleSearchField );
-		document.body.addEventListener( 'click', doSearch );
+		document.body.addEventListener( 'click', doBlur );
 	};
 
-	const doHideSearchField = () => {
-		hideSearchField( wrapper, searchField, button );
+	const doHideSearchField = ( animate = true ) => {
+		hideSearchField( wrapper, searchField, button, animate );
 		block.classList.add( hiddenClass );
 	};
 
-	const doSearch = ( e ) => {
+	const doBlur = ( e ) => {
 		if ( e.target.closest( wrapperClass ) ) {
 			return false;
 		}
 
 		doHideSearchField();
-
-		document.body.removeEventListener( 'click', doSearch );
+		document.body.removeEventListener( 'click', doBlur );
 		wrapper.addEventListener( 'click', toggleSearchField );
 	};
 
 	wrapper.addEventListener( 'click', toggleSearchField );
+	doHideSearchField( false );
 };
 
 // eslint-disable-next-line @wordpress/no-global-event-listener
