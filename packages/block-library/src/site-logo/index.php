@@ -111,24 +111,27 @@ add_filter( 'theme_mod_custom_logo', '_override_custom_logo_theme_mod' );
 /**
  * Updates the site_logo option when the custom_logo theme-mod gets updated.
  *
- * @param string $custom_logo The custom logo set by a theme.
+ * This function is hooked on "update_option_theme_mods_$theme" and not
+ * "pre_set_theme_mod_custom_logo" because by hooking in `update_option`
+ * the function accounts for remove_theme_mod() as well.
  *
- * @return string The custom logo.
+ * @param mixed $old_value The old option value.
+ * @param mixed $value     The new option value.
  */
-function _sync_custom_logo_to_site_logo( $custom_logo ) {
+function _sync_custom_logo_to_site_logo( $old_value, $value ) {
 	// Delete the option when the custom logo does not exist or was removed.
 	// This step ensures the option stays in sync.
-	if ( empty( $custom_logo ) ) {
+	if ( empty( $value['custom_logo'] ) ) {
 		delete_option( 'site_logo' );
 	} else {
 		remove_action( 'update_option_site_logo', '_sync_site_logo_to_custom_logo' );
-		update_option( 'site_logo', $custom_logo );
+		update_option( 'site_logo', $value['custom_logo'] );
 		add_action( 'update_option_site_logo', '_sync_site_logo_to_custom_logo', 10, 2 );
 	}
-	return $custom_logo;
 }
 
-add_filter( 'pre_set_theme_mod_custom_logo', '_sync_custom_logo_to_site_logo' );
+$theme = get_option( 'stylesheet' );
+add_action( "update_option_theme_mods_$theme", '_sync_custom_logo_to_site_logo', 10, 2 );
 
 /**
  * Updates the custom_logo theme-mod when the site_logo option gets updated.
