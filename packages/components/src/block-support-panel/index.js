@@ -18,11 +18,16 @@ const BlockSupportPanel = ( props ) => {
 	const [ menuItems, setMenuItems ] = useState( {} );
 	const classes = classnames( 'components-block-support-panel', className );
 
+	// If a block support UI has been disabled via theme.json a boolean `false`
+	// will be passed as a child. This panel is only interested in the children
+	// to be displayed.
+	const filteredChildren = children.filter( Boolean );
+
 	// Collect data to manage control visibility via the panel's dropdown menu.
 	useEffect( () => {
 		const items = {};
 
-		children.forEach( ( child ) => {
+		filteredChildren.forEach( ( child ) => {
 			items[ child.props.label ] = child.props.hasValue( child.props );
 		} );
 
@@ -30,7 +35,9 @@ const BlockSupportPanel = ( props ) => {
 	}, [] );
 
 	const getControlByMenuLabel = ( label ) => {
-		return children.find( ( child ) => child.props.label === label );
+		return filteredChildren.find(
+			( child ) => child.props.label === label
+		);
 	};
 
 	// Toggles display of a block support control resetting the attributes if
@@ -58,7 +65,7 @@ const BlockSupportPanel = ( props ) => {
 		// Turn off all the controls in menu.
 		const resetMenuItems = {};
 
-		children.forEach( ( child ) => {
+		filteredChildren.forEach( ( child ) => {
 			resetMenuItems[ child.props.label ] = false;
 		} );
 
@@ -74,8 +81,8 @@ const BlockSupportPanel = ( props ) => {
 				toggleControl={ toggleControl }
 				resetAll={ resetAllControls }
 			/>
-			{ children.map( ( child ) => {
-				const { label, hasValue } = child.props;
+			{ filteredChildren.map( ( child ) => {
+				const { label, hasValue } = child?.props || {};
 
 				// Only display the block support controls if the support
 				// attributes have a value or the controls have be chosen for
