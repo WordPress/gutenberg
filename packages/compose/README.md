@@ -535,6 +535,8 @@ _Returns_
 
 <a name="withState" href="#withState">#</a> **withState**
 
+> **Deprecated** Use `useState` instead.
+
 A Higher Order Component used to provide and manage internal component state
 via props.
 
