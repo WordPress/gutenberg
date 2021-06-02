@@ -2,13 +2,17 @@
  * External dependencies
  */
 import { css } from 'emotion';
+
+/**
+ * Internal dependencies
+ */
 import CONFIG from '../utils/config-values';
 import COLORS from '../utils/colors-values';
 
 export { scrollableScrollbar } from '../ui/scrollable/styles';
 
 export const focus = css`
-	border-color: ${ COLORS.G2.blue.medium.focus };
+	border-color: ${ COLORS.blue };
 `;
 
 export const multiline = css`
@@ -22,7 +26,7 @@ export const inputMultiline = css`
 `;
 
 export const inputFontSize = css`
-	font-size: CONFIG.fontSizeInputMobile;
+	font-size: ${ CONFIG.fontSizeInputMobile };
 	@media ( min-width: 36em ) {
 		font-size: ${ CONFIG.fontSize };
 	}
@@ -32,10 +36,10 @@ export const Input = css`
 	appearance: none;
 	background: transparent;
 	border: none;
-	border-radius: CONFIG.controlBorderRadius;
+	border-radius: ${ CONFIG.controlBorderRadius };
 	box-shadow: none;
 	box-sizing: border-box;
-	color: CONFIG.controlTextColor;
+	color: ${ CONFIG.controlTextColor };
 	display: block;
 	flex: 1;
 	line-height: 18px;
@@ -62,19 +66,18 @@ export const Input = css`
 	}
 `;
 
-// TODO: determine styles for Input wrapper.
-export const TextInputWrapper = css``;
-
-// TODO: determine styles for Text Input Arrows.
-export const TextInputArrows = css``;
-
-// TODO: determine styles for Text Input Arrow Up.
-export const TextInputArrowUp = css``;
-
 export const large = css`
 	min-height: calc( ${ CONFIG.controlHeightLarge } - 2px );
 	padding-bottom: calc( ( ${ CONFIG.controlHeightLarge } - 2px - 18px ) / 2 );
 	padding-top: calc( ( ${ CONFIG.controlHeightLarge } - 2px - 18px ) / 2 );
+`;
+
+export const medium = css`
+	min-height: calc( ${ CONFIG.controlHeightMedium } - 2px );
+	padding-bottom: calc(
+		( ${ CONFIG.controlHeightMedium } - 2px - 18px ) / 2
+	);
+	padding-top: calc( ( ${ CONFIG.controlHeightMedium } - 2px - 18px ) / 2 );
 `;
 
 export const small = css`
@@ -146,7 +149,7 @@ export const StepperButton = css`
 
 	&:focus {
 		background-color: ${ CONFIG.controlBackgroundColorHover };
-		border-color: ${ COLORS.G2.blue.medium.focus };
+		border-color: ${ COLORS.blue };
 	}
 
 	&[disabled] {

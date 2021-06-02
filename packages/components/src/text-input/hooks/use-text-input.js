@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { cx } from 'emotion';
-import TextareaAutosize from 'react-textarea-autosize';
+import TextareaAutosize from 'react-autosize-textarea';
 
 /**
  * WordPress dependencies
@@ -12,12 +12,23 @@ import { useCallback, useEffect, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
-import { useBaseField } from '../base-field';
-import { useFormGroupContextId } from '../ui/form-group';
-import * as styles from './styles';
+import { useContextSystem } from '../../ui/context';
+import { useBaseField } from '../../base-field';
+import { useFormGroupContextId } from '../../ui/form-group';
+import * as styles from '../styles';
 import { useTextInputState } from './use-text-input-state';
 
+/**
+ * @typedef Props
+ * @property {import('react').MutableRefObject<any>} [dragHandlersRef] Drag handlers ref.
+ * @property {import('react').MutableRefObject<undefined | HTMLElement>} [inputRef] The input element ref.
+ * @property {boolean} [isFocused] Renders focus styles.
+ * @property {boolean} [isTypeNumeric] Whether the type is numeric.
+ */
+
+/**
+ * @param {Props} props
+ */
 const useRootEventHandlers = ( {
 	dragHandlersRef,
 	inputRef,
@@ -25,25 +36,23 @@ const useRootEventHandlers = ( {
 	isTypeNumeric,
 } ) => {
 	const canScroll = isTypeNumeric && isFocused;
-	const dragHandlers = dragHandlersRef.current;
+	const dragHandlers = dragHandlersRef?.current;
 
 	useEffect( () => {
-		const handleOnWheel = () => {
-			if ( ! canScroll ) return;
-		};
-		if ( inputRef.current.addEventListener ) {
-			inputRef.current.addEventListener( 'wheel', handleOnWheel, {
+		const handleOnWheel = () => {};
+		if ( inputRef?.current?.addEventListener ) {
+			inputRef?.current.addEventListener( 'wheel', handleOnWheel, {
 				passive: false,
 			} );
 		}
 	}, [ inputRef, canScroll ] );
 
 	const handleOnClick = useCallback( () => {
-		inputRef.current.focus();
+		inputRef?.current?.focus();
 	}, [ inputRef ] );
 
 	const handleOnTouchStart = useCallback( () => {
-		inputRef.current.focus();
+		inputRef?.current?.focus();
 	}, [ inputRef ] );
 
 	return {
@@ -55,11 +64,10 @@ const useRootEventHandlers = ( {
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'input'>} props
+ * @param  {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'input'>} props
  */
 export function useTextInput( props ) {
 	const {
-		align,
 		arrows = true,
 		className,
 		defaultValue = '',
@@ -67,7 +75,6 @@ export function useTextInput( props ) {
 		dragAxis,
 		error = false,
 		format,
-		gap = 2.5,
 		id: idProp,
 		incrementFromNonNumericValue = false,
 		isCommitOnBlurOrEnter = false,
@@ -75,14 +82,13 @@ export function useTextInput( props ) {
 		isInline = false,
 		isResizable = false,
 		isShiftStepEnabled = true,
-		justify,
 		max,
 		min,
 		multiline = false,
 		prefix,
 		shiftStep = 10,
 		size = 'medium',
-		step,
+		step = 1,
 		suffix,
 		type = 'text',
 		validate,
@@ -127,14 +133,11 @@ export function useTextInput( props ) {
 		isFocused,
 	} );
 
+	// @ts-ignore To check: incompatible with PolymorphicComponentProps and missing children
 	const baseFieldProps = useBaseField( {
-		align,
 		disabled,
-		error,
-		gap,
-		isFocused,
+		hasError: error,
 		isInline,
-		justify,
 	} );
 
 	const InputComponent = multiline ? TextareaAutosize : 'input';
@@ -190,6 +193,7 @@ export function useTextInput( props ) {
 		isTypeNumeric,
 		isInputTypeNumeric,
 		prefix,
+		// @ts-ignore This method might need typing: useScrollHandlers packages/components/src/text-input/hooks/use-text-input-state.js
 		scrollHandlers,
 		suffix,
 	};

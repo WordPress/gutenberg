@@ -10,12 +10,12 @@ import { contextConnect } from '../ui/context';
 import { View } from '../view';
 import TextInputArrows from './text-input-arrows';
 import TextInputSteppers from './text-input-steppers';
-import { useTextInput } from './use-text-input';
+import { useTextInput } from './hooks/use-text-input';
 import * as styles from './styles';
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'input'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'input'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function TextInput( props, forwardedRef ) {
@@ -38,11 +38,8 @@ function TextInput( props, forwardedRef ) {
 	const mergedRefs = useMergeRefs( [ inputRef, forwardedRef ] );
 
 	return (
-		<View
-			{ ...otherProps }
-			disabled={ disabled }
-			{ ...styles.TextInputWrapper }
-		>
+		// @ts-ignore Will we have to update View types?
+		<View { ...otherProps } disabled={ disabled }>
 			{ prefix }
 			<View
 				{ ...styles.Input }
@@ -77,7 +74,7 @@ function TextInput( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { TextInput } from `@wp-g2/components`
+ * import { TextInput } from `@wordpress/components`
  *
  * function Example() {
  *   return <TextInput placeholder="First name" />

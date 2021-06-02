@@ -1,38 +1,54 @@
-import { minus, plus } from '@wordpress/icons';
-import { ui } from '@wp-g2/styles';
+/**
+ * External dependencies
+ */
 import { clamp, noop } from 'lodash';
-import React, { useCallback, useEffect, useRef } from 'react';
 
-import { HStack } from '../HStack';
-import { Icon } from '../Icon';
-import { View } from '../View';
+/**
+ * WordPress dependencies
+ */
+import {
+	forwardRef,
+	memo,
+	useCallback,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
+import { minus, plus } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import Icon from '../icon';
+import { HStack } from '../h-stack';
+import { View } from '../view';
 import * as styles from './styles';
 
 /**
  * @typedef Props
- * @property {import('./use-text-input-state').TextInputState} __store
- * @property {boolean} disabled
- * @property {(int: number) => void} decrement
- * @property {(int: number) => void} increment
+ * @property {boolean} [disabled] Whether the stepper controls are disabled.
+ * @property {import('react').MutableRefObject<null | HTMLElement>} [dragHandlersRef] Drag handler React ref.
+ * @property {() => void} [increment] Increment text input number value callback.
+ * @property {() => void} [decrement] Decrement text input number value callback.
  */
 
 /**
  *
  * @param {Props} props
  * @param {import('react').Ref<any>} forwardedRef
+ * @return {import('react').ReactElement} The text input stepper component.
  */
 function TextInputSteppers( props, forwardedRef ) {
 	const { decrement, disabled, dragHandlersRef, increment } = props;
-	const dragHandlers = dragHandlersRef.current;
+	const dragHandlers = dragHandlersRef?.current;
 
 	return (
 		<View className={ styles.SpinnerWrapper }>
+			{ /* @ts-ignore Check PolymorphicComponent. No overload matches this call. */ }
 			<HStack
 				{ ...dragHandlers }
 				className={ styles.Steppers }
 				expanded={ true }
 				spacing={ 0 }
-				{ ...ui.$( 'TextInputArrows' ) }
 				ref={ forwardedRef }
 			>
 				<UpDownArrows
@@ -47,10 +63,16 @@ function TextInputSteppers( props, forwardedRef ) {
 
 /**
  *
- * @param {object} props
- * @param {boolean} props.disabled
- * @param {(event?: import('react').KeyboardEvent) => void} props.onIncrement
- * @param {(event?: import('react').KeyboardEvent) => void} props.onDecrement
+ * @typedef UpDownArrowsProps
+ * @property {boolean | undefined} disabled Whether the controls are disabled.
+ * @property {() => void} [onIncrement] Increment text input number value callback.
+ * @property {() => void} [onDecrement] Decrement text input number value callback.
+ */
+
+/**
+ *
+ * @param {UpDownArrowsProps} props
+ * @return {import('react').ReactElement} The _UpDownArrows component.
  */
 const _UpDownArrows = ( {
 	disabled,
@@ -137,7 +159,6 @@ const _UpDownArrows = ( {
 				onMouseLeave={ handleOnClearTimers }
 				onMouseUp={ handleOnClearTimers }
 				type="button"
-				{ ...ui.$( 'TextInputStepperUp' ) }
 				height={ `calc(100% - 4px)` }
 				icon={ plus }
 				size={ 12 }
@@ -152,7 +173,6 @@ const _UpDownArrows = ( {
 				onMouseLeave={ handleOnClearTimers }
 				onMouseUp={ handleOnClearTimers }
 				type="button"
-				{ ...ui.$( 'TextInputStepperDown' ) }
 				height={ `calc(100% - 4px)` }
 				icon={ minus }
 				size={ 12 }
@@ -162,6 +182,6 @@ const _UpDownArrows = ( {
 	);
 };
 
-const UpDownArrows = React.memo( _UpDownArrows );
+const UpDownArrows = memo( _UpDownArrows );
 
-export default React.memo( React.forwardRef( TextInputSteppers ) );
+export default memo( forwardRef( TextInputSteppers ) );

@@ -18,16 +18,16 @@ import {
 /**
  * Internal dependencies
  */
-import { Icon } from '../icon';
+import Icon from '../icon';
 import { View } from '../view';
 import { VStack } from '../v-stack';
 import * as styles from './styles';
 
 /**
  * @typedef Props
- * @property {import('./use-text-input-state').TextInputState} __store The state store for the text input.
- * @property {(int: number) => void} decrement                         Increment text input number value callback.
- * @property {(int: number) => void} increment                         Decrement text input number value callback.
+ * @property {import('react').MutableRefObject<null | HTMLElement>} [dragHandlersRef] Drag handler React ref.
+ * @property {() => void} [increment] Increment text input number value callback.
+ * @property {() => void} [decrement] Decrement text input number value callback.
  */
 
 /**
@@ -37,16 +37,16 @@ import * as styles from './styles';
  */
 function TextInputArrows( props, forwardedRef ) {
 	const { decrement, dragHandlersRef, increment } = props;
-	const dragHandlers = dragHandlersRef.current;
+	const dragHandlers = dragHandlersRef?.current;
 
 	return (
 		<View className={ styles.SpinnerWrapper }>
+			{ /* @ts-ignore Check PolymorphicComponent. No overload matches this call. */ }
 			<VStack
 				{ ...dragHandlers }
 				className={ styles.Spinner }
 				expanded={ true }
 				spacing={ 0 }
-				{ ...styles.TextInputArrows }
 				ref={ forwardedRef }
 			>
 				<UpDownArrows
@@ -121,7 +121,6 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 				onMouseLeave={ handleOnClearTimers }
 				onMouseUp={ handleOnClearTimers }
 				tabIndex={ -1 }
-				{ ...styles.TextInputArrowUp }
 				icon={ chevronUp }
 				size={ 12 }
 				width={ 16 }
@@ -133,7 +132,6 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 				onMouseLeave={ handleOnClearTimers }
 				onMouseUp={ handleOnClearTimers }
 				tabIndex={ -1 }
-				{ ...styles.TextInputArrows }
 				icon={ chevronDown }
 				size={ 12 }
 				width={ 16 }

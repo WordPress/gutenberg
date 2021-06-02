@@ -42,6 +42,7 @@ export function getDefinedValue( values = [], fallbackValue ) {
 }
 
 /**
+ *
  * @param {string} [locale]
  * @return {[RegExp, RegExp]} The delimiter and decimal regexp
  */
@@ -98,5 +99,11 @@ export function isValueNumeric( value, locale = window.navigator.language ) {
 					.replace( decimalRegexp, '.' )
 					.replace( INTERNATIONAL_THOUSANDS_DELIMITER, '' )
 			: value;
-	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
+	return (
+		! isNaN( parseFloat( valueToCheck ) ) &&
+		! isNaN( Number( valueToCheck ) ) &&
+		isFinite( valueToCheck ) &&
+		Object.prototype.toString.call( valueToCheck ).toLowerCase() !==
+			'[object array]'
+	);
 }

@@ -1,14 +1,37 @@
-import { clearSelection } from '@wp-g2/utils';
+/**
+ * External dependencies
+ */
 import { noop } from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
 import { useDrag } from 'react-use-gesture';
 
-import * as styles from './styles';
+/**
+ * WordPress dependencies
+ */
+import { useCallback, useEffect, useState } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+
+import { clearSelection } from '../../utils/clear-selection';
+
+import * as styles from '../styles';
+
+/**
+ * @typedef Props
+ * @property {(int: number|undefined) => void} [increment] Increment text input number value callback.
+ * @property {(int: number|undefined) => void} [decrement] Decrement text input number value callback.
+ * @property {boolean} [isTypeNumeric] Whether the type is numeric.
+ * @property {string} [dragAxis] The drag axis, e.g., `x` or `y`.
+ */
+
+/**
+ * @param {Props} props
+ */
 export function useBaseDragHandlers( {
-	decrement,
+	decrement = noop,
 	dragAxis,
-	increment,
+	increment = noop,
 	isTypeNumeric = true,
 } ) {
 	const [ dragState, setDragState ] = useState(
@@ -51,7 +74,7 @@ export function useBaseDragHandlers( {
 			setDragState( state.dragging ? state.axis : undefined );
 
 			const isMovementY = state.axis === 'y';
-			let movement = isMovementY ? y * -1 : x;
+			const movement = isMovementY ? y * -1 : x;
 
 			if ( Math.abs( movement ) === 0 ) return;
 
@@ -70,7 +93,7 @@ export function useBaseDragHandlers( {
 		{ axis: dragAxis, threshold }
 	);
 
-	const handleOnMouseUp = useCallback( () => setDragState( false ), [] );
+	const handleOnMouseUp = useCallback( () => setDragState( undefined ), [] );
 
 	const baseGestures = isTypeNumeric
 		? dragGestures()
