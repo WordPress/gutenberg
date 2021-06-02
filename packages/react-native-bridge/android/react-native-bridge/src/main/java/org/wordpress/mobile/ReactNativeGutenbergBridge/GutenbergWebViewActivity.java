@@ -14,7 +14,10 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -41,7 +44,10 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private static final String JAVA_SCRIPT_INTERFACE_NAME = "wpwebkit";
 
     protected WebView mWebView;
-    protected View mForegroundView;
+    protected LinearLayout mForegroundView;
+    protected ImageView mForegroundViewImage;
+    protected TextView mForegroundViewTitle;
+    protected TextView mForegroundViewSubtitle;
     protected boolean mIsRedirected;
 
     private ProgressBar mProgressBar;
@@ -75,6 +81,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
         mWebView = findViewById(R.id.gutenberg_web_view);
         mForegroundView = findViewById(R.id.foreground_view);
+        mForegroundViewImage = findViewById(R.id.foreground_view_image);
+        mForegroundViewTitle = findViewById(R.id.foreground_view_title);
+        mForegroundViewSubtitle = findViewById(R.id.foreground_view_subtitle);
         mProgressBar = findViewById(R.id.progress_bar);
 
         // Set settings
@@ -271,7 +280,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             }
             // We need some extra time to hide all unwanted html elements
             // like NUX (new user experience) modal is.
-            mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
+            mForegroundView.postDelayed(() -> mForegroundView.setVisibility(LinearLayout.INVISIBLE), 1500);
         }, 2000);
     }
 
