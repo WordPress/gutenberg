@@ -1,11 +1,16 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+/**
  * WordPress dependencies
  */
 import { useRef, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-
+import { Popover } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -17,10 +22,13 @@ export default function Form( {
 	id,
 	idBase,
 	instance,
+	isWide,
 	onChangeInstance,
 	onChangeHasPreview,
 } ) {
 	const ref = useRef();
+
+	const isMediumLargeViewport = useViewportMatch( 'small' );
 
 	// We only want to remount the control when the instance changes
 	// *externally*. For example, if the user performs an undo. To do this, we
@@ -68,7 +76,41 @@ export default function Form( {
 
 			control.destroy();
 		};
-	}, [ id, idBase, instance, onChangeInstance, onChangeHasPreview ] );
+	}, [
+		id,
+		idBase,
+		instance,
+		onChangeInstance,
+		onChangeHasPreview,
+		isMediumLargeViewport,
+	] );
+
+	if ( isWide && isMediumLargeViewport ) {
+		return (
+			<div
+				className={ classnames( {
+					'wp-block-legacy-widget__container': isVisible,
+				} ) }
+			>
+				{ isVisible && (
+					<h3 className="wp-block-legacy-widget__edit-form-title">
+						{ title }
+					</h3>
+				) }
+				<Popover
+					focusOnMount={ false }
+					position="middle right"
+					__unstableForceXAlignment
+				>
+					<div
+						ref={ ref }
+						className="wp-block-legacy-widget__edit-form"
+						hidden={ ! isVisible }
+					></div>
+				</Popover>
+			</div>
+		);
+	}
 
 	return (
 		<div
