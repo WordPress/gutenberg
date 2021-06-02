@@ -4,6 +4,11 @@
 import { __unstableAwaitPromise } from '@wordpress/data-controls';
 import { controls } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { CORE_STORE_NAME as coreStoreName } from '../utils/constants';
+
 export function* __unstableAcquireStoreLock( store, path, { exclusive } ) {
 	const promise = yield* __unstableEnqueueLockRequest( store, path, {
 		exclusive,
@@ -37,13 +42,13 @@ export function* __unstableProcessPendingLockRequests() {
 		type: 'PROCESS_PENDING_LOCK_REQUESTS',
 	};
 	const lockRequests = yield controls.select(
-		'core',
+		coreStoreName,
 		'__unstableGetPendingLockRequests'
 	);
 	for ( const request of lockRequests ) {
 		const { store, path, exclusive, notifyAcquired } = request;
 		const isAvailable = yield controls.select(
-			'core',
+			coreStoreName,
 			'__unstableIsLockAvailable',
 			store,
 			path,

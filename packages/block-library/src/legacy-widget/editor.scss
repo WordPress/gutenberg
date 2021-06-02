@@ -86,3 +86,11 @@
 	margin: 0 0 5px;
 	font-weight: 500;
 }
+
+// When wide widget is selected it opens in a popover but its container should still have a bit of height.
+.is-selected {
+	.wp-block-legacy-widget__container {
+		padding: $grid-unit-10 $grid-unit-15;
+		min-height: 50px;
+	}
+}

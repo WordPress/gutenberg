@@ -91,6 +91,7 @@ export default function useTabNav() {
 	const ref = useRefEffect( ( node ) => {
 		function onKeyDown( event ) {
 			if ( event.keyCode === ESCAPE && ! hasMultiSelection() ) {
+				event.stopPropagation();
 				setNavigationMode( true );
 				return;
 			}

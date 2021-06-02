@@ -62,9 +62,13 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	wp_register_style( 'global-styles', false, array(), true, true );
-	wp_add_inline_style( 'global-styles', $stylesheet );
-	wp_enqueue_style( 'global-styles' );
+	if ( isset( wp_styles()->registered['global-styles'] ) ) {
+		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
+	} else {
+		wp_register_style( 'global-styles', false, array(), true, true );
+		wp_add_inline_style( 'global-styles', $stylesheet );
+		wp_enqueue_style( 'global-styles' );
+	}
 }
 
 /**
@@ -145,11 +149,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['color']['gradients'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['color']['custom'] ) ) {
-		$settings['disableCustomColors'] = $settings['__experimentalFeatures']['color']['custom'];
+		$settings['disableCustomColors'] = ! $settings['__experimentalFeatures']['color']['custom'];
 		unset( $settings['__experimentalFeatures']['color']['custom'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['color']['customGradient'] ) ) {
-		$settings['disableCustomGradients'] = $settings['__experimentalFeatures']['color']['customGradient'];
+		$settings['disableCustomGradients'] = ! $settings['__experimentalFeatures']['color']['customGradient'];
 		unset( $settings['__experimentalFeatures']['color']['customGradient'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
@@ -157,7 +161,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['typography']['fontSizes'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['customFontSize'] ) ) {
-		$settings['disableCustomFontSizes'] = $settings['__experimentalFeatures']['typography']['customFontSize'];
+		$settings['disableCustomFontSizes'] = ! $settings['__experimentalFeatures']['typography']['customFontSize'];
 		unset( $settings['__experimentalFeatures']['typography']['customFontSize'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['customLineHeight'] ) ) {

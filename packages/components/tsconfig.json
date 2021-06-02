@@ -19,6 +19,7 @@
 	"include": [
 		"src/animate/**/*",
 		"src/base-control/**/*",
+		"src/base-field/**/*",
 		"src/dashicon/**/*",
 		"src/disabled/**/*",
 		"src/divider/**/*",
@@ -27,6 +28,7 @@
 		"src/flex/**/*",
 		"src/form-group/**/*",
 		"src/heading/**/*",
+		"src/icon/**/*",
 		"src/scroll-lock/**/*",
 		"src/shortcut/**/*",
 		"src/spinner/**/*",

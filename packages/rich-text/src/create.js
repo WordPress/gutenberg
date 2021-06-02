@@ -6,7 +6,7 @@ import { select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-
+import { store as richTextStore } from './store';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
@@ -56,7 +56,7 @@ function toFormat( { type, attributes } ) {
 	let formatType;
 
 	if ( attributes && attributes.class ) {
-		formatType = select( 'core/rich-text' ).getFormatTypeForClassName(
+		formatType = select( richTextStore ).getFormatTypeForClassName(
 			attributes.class
 		);
 
@@ -73,7 +73,7 @@ function toFormat( { type, attributes } ) {
 	}
 
 	if ( ! formatType ) {
-		formatType = select( 'core/rich-text' ).getFormatTypeForBareElement(
+		formatType = select( richTextStore ).getFormatTypeForBareElement(
 			type
 		);
 	}

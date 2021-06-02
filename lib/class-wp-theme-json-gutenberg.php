@@ -73,6 +73,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontSize'       => null,
 			'fontStyle'      => null,
 			'fontWeight'     => null,
+			'letterSpacing'  => null,
 			'lineHeight'     => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
@@ -105,6 +106,7 @@ class WP_Theme_JSON_Gutenberg {
 			'customFontSize'        => null,
 			'customFontStyle'       => null,
 			'customFontWeight'      => null,
+			'customLetterSpacing'   => null,
 			'customLineHeight'      => null,
 			'customTextDecorations' => null,
 			'customTextTransforms'  => null,
@@ -237,6 +239,9 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'font-weight'      => array(
 			'value' => array( 'typography', 'fontWeight' ),
+		),
+		'letter-spacing'   => array(
+			'value' => array( 'typography', 'letterSpacing' ),
 		),
 		'line-height'      => array(
 			'value' => array( 'typography', 'lineHeight' ),
@@ -663,7 +668,11 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= self::to_ruleset(
-						self::append_to_selector( $selector, '.has-' . $value['slug'] . '-' . $class['class_suffix'] ),
+						// We don't want to use kebabCase here,
+						// see https://github.com/WordPress/gutenberg/issues/32347
+						// However, we need to make sure the generated class
+						// doesn't contain spaces.
+						self::append_to_selector( $selector, '.has-' . preg_replace( '/\s+/', '-', $value['slug'] ) . '-' . $class['class_suffix'] ),
 						array(
 							array(
 								'name'  => $class['property_name'],
