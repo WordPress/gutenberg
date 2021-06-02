@@ -70,9 +70,9 @@ function Card( props, forwardedRef ) {
 }
 
 /**
- * `Card` is a layout component, providing a flexible and extensible content container.
- *
- * `Card` provides convenient sub-components such as `CardBody`, `CardHeader`, and `CardFooter`.
+ * `Card` provides a flexible and extensible content container.
+ * `Card` also provides a convenient set of sub-components such as `CardBody`,
+ * `CardHeader`, `CardFooter`, and more.
  *
  * @example
  * ```jsx
