@@ -2,10 +2,19 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { formatStrikethrough, formatUnderline } from '@wordpress/icons';
+import {
+	formatStrikethrough,
+	formatUnderline,
+	textColor,
+} from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEXT_DECORATIONS = [
+	{
+		name: __( 'None' ),
+		value: 'none',
+		icon: textColor,
+	},
 	{
 		name: __( 'Underline' ),
 		value: 'underline',
