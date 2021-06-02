@@ -1,6 +1,6 @@
 <?php
 /**
- * Spacing block support flag.
+ * Dimensions block support flag.
  *
  * @package gutenberg
  */
@@ -10,19 +10,41 @@
  *
  * @param WP_Block_Type $block_type Block Type.
  */
-function gutenberg_register_spacing_support( $block_type ) {
-	$has_spacing_support = gutenberg_block_has_support( $block_type, array( 'spacing' ), false );
-
+function gutenberg_register_dimensions_support( $block_type ) {
 	// Setup attributes and styles within that if needed.
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
 	}
 
-	if ( $has_spacing_support && ! array_key_exists( 'style', $block_type->attributes ) ) {
+	// Check for existing style attribute definition e.g. from block.json.
+	if ( array_key_exists( 'style', $block_type->attributes ) ) {
+		return;
+	}
+
+	$has_spacing_support = gutenberg_block_has_support( $block_type, array( 'spacing' ), false );
+	// Future block supports such as height & width will be added here.
+
+	if ( $has_spacing_support ) {
 		$block_type->attributes['style'] = array(
 			'type' => 'object',
 		);
 	}
+}
+
+/**
+ * Add CSS classes for block dimensions to the incoming attributes array.
+ * This will be applied to the block markup in the front-end.
+ *
+ * @param WP_Block_Type $block_type       Block Type.
+ * @param array         $block_attributes Block attributes.
+ *
+ * @return array Block spacing CSS classes and inline styles.
+ */
+function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) {
+	$spacing_styles = gutenberg_apply_spacing_support( $block_type, $block_attributes );
+	// Future block supports such as height and width will be added here.
+
+	return $spacing_styles;
 }
 
 /**
@@ -82,9 +104,9 @@ function gutenberg_skip_spacing_serialization( $block_type ) {
 
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
-	'spacing',
+	'dimensions',
 	array(
-		'register_attribute' => 'gutenberg_register_spacing_support',
-		'apply'              => 'gutenberg_apply_spacing_support',
+		'register_attribute' => 'gutenberg_register_dimensions_support',
+		'apply'              => 'gutenberg_apply_dimensions_support',
 	)
 );
