@@ -47,8 +47,6 @@ import {
 	PX_WIDTH_DEFAULT,
 	MIN_WIDTH,
 	MIN_WIDTH_UNIT,
-	showSearchField,
-	hideSearchField,
 } from './utils.js';
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
@@ -88,23 +86,6 @@ export default function SearchEdit( {
 		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
 	} );
-
-	useEffect( () => {
-		if ( isSearchFieldHidden ) {
-			hideSearchField(
-				searchFieldRef.current.offsetParent,
-				searchFieldRef.current,
-				buttonRef.current
-			);
-		} else {
-			showSearchField(
-				searchFieldRef.current.offsetParent,
-				searchFieldRef.current,
-				width,
-				widthUnit
-			);
-		}
-	}, [ isSearchFieldHidden, buttonUseIcon ] );
 
 	useEffect( () => {
 		if ( 'button-only' === buttonPosition && ! isSelected ) {
