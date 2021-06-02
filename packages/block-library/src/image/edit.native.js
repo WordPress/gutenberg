@@ -439,7 +439,7 @@ export class ImageEdit extends Component {
 		setFeaturedImage( mediaId );
 	}
 
-	getSetFeaturedButton( isFeaturedImage ) {
+	getFeaturedButtonPanel( isFeaturedImage ) {
 		const { attributes, getStylesFromColorScheme } = this.props;
 
 		const featuredButtonStyle = getStylesFromColorScheme(
@@ -540,7 +540,7 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ this.getSetFeaturedButton( isFeaturedImage ) }
+				{ this.getFeaturedButtonPanel( isFeaturedImage ) }
 			</InspectorControls>
 		);
 
