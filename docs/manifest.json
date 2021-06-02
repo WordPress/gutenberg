@@ -750,12 +750,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "Card",
-		"slug": "card",
-		"markdown_source": "../packages/components/src/card/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "CheckboxControl",
 		"slug": "checkbox-control",
 		"markdown_source": "../packages/components/src/checkbox-control/README.md",
