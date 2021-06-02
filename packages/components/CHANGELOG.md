@@ -2,9 +2,19 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Add `none` as one of the possible values for the `size` prop in `Card`, `CardBody`, `CardHeader`, and `CardFooter` ([#32243](https://github.com/WordPress/gutenberg/pull/32243)).
+-   Update the border color used in `CardBody`, `CardHeader`, `CardFooter`, and `CardDivider` to a different shade of gray, in order to match the color used in other components ([#32243](https://github.com/WordPress/gutenberg/pull/32243)).
+
 ### Deprecation
 
 -   `isPrimary`, `isSecondary`, `isTertiary` and `isLink` props in `Button` have been deprecated. Use `variant` instead ([#31713](https://github.com/WordPress/gutenberg/pull/31713)).
+-   `isElevated` prop in `Card` has been deprecated. Use `elevation` instead ([#32243](https://github.com/WordPress/gutenberg/pull/32243)).
+
+### Internal
+
+-   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, and `CardDivider` components have been re-written from the ground up ([#32243](https://github.com/WordPress/gutenberg/pull/32243)).
 
 ## 14.1.0 (2021-05-20)
 
