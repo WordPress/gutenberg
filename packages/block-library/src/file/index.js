@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 
 /**
@@ -22,8 +22,7 @@ export const settings = {
 		attributes: {
 			href:
 				'https://upload.wikimedia.org/wikipedia/commons/d/dd/Armstrong_Small_Step.ogg',
-			// translators: Name of the file, which serves as an example for the File block.
-			fileName: __( 'Armstrong_Small_Step' ),
+			fileName: _x( 'Armstrong_Small_Step', 'Name of the file' ),
 		},
 	},
 	transforms,
