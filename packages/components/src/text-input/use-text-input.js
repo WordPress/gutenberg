@@ -1,12 +1,22 @@
-import { useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
-import { useCallback, useEffect, useMemo } from 'react';
+/**
+ * External dependencies
+ */
+import { cx } from 'emotion';
 import TextareaAutosize from 'react-textarea-autosize';
 
-import { useBaseField } from '../BaseField';
-import { useFormGroupContextId } from '../FormGroup';
+/**
+ * WordPress dependencies
+ */
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { useContextSystem } from '../ui/context';
+import { useBaseField } from '../base-field';
+import { useFormGroupContextId } from '../ui/form-group';
 import * as styles from './styles';
-import { useTextInputState } from './useTextInputState';
+import { useTextInputState } from './use-text-input-state';
 
 const useRootEventHandlers = ( {
 	dragHandlersRef,
@@ -178,7 +188,9 @@ export function useTextInput( props ) {
 		inputProps,
 		inputRef,
 		isTypeNumeric,
+		isInputTypeNumeric,
 		prefix,
+		scrollHandlers,
 		suffix,
 	};
 }

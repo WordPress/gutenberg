@@ -1,12 +1,14 @@
 /**
  * External dependencies
  */
-import { css, ui } from '@wp-g2/styles';
+import { css } from 'emotion';
+import CONFIG from '../utils/config-values';
+import COLORS from '../utils/colors-values';
 
 export { scrollableScrollbar } from '../ui/scrollable/styles';
 
 export const focus = css`
-	border-color: ${ ui.color.admin };
+	border-color: ${ COLORS.G2.blue.medium.focus };
 `;
 
 export const multiline = css`
@@ -20,9 +22,9 @@ export const inputMultiline = css`
 `;
 
 export const inputFontSize = css`
-	font-size: ${ ui.get( 'fontSizeInputMobile' ) };
+	font-size: CONFIG.fontSizeInputMobile;
 	@media ( min-width: 36em ) {
-		font-size: ${ ui.get( 'fontSize' ) };
+		font-size: ${ CONFIG.fontSize };
 	}
 `;
 
@@ -30,18 +32,18 @@ export const Input = css`
 	appearance: none;
 	background: transparent;
 	border: none;
-	border-radius: ${ ui.get( 'controlBorderRadius' ) };
+	border-radius: CONFIG.controlBorderRadius;
 	box-shadow: none;
 	box-sizing: border-box;
-	color: ${ ui.color.text };
+	color: CONFIG.controlTextColor;
 	display: block;
 	flex: 1;
 	line-height: 18px;
-	min-height: calc( ${ ui.get( 'controlHeight' ) } - 2px );
+	min-height: calc( ${ CONFIG.controlHeight } - 2px );
 	outline: none;
 	padding: 0;
-	padding-bottom: calc( ( ${ ui.get( 'controlHeight' ) } - 2px - 18px ) / 2 );
-	padding-top: calc( ( ${ ui.get( 'controlHeight' ) } - 2px - 18px ) / 2 );
+	padding-bottom: calc( ( ${ CONFIG.controlHeight } - 2px - 18px ) / 2 );
+	padding-top: calc( ( ${ CONFIG.controlHeight } - 2px - 18px ) / 2 );
 	resize: none;
 	text-align: left;
 	width: 100%;
@@ -60,24 +62,25 @@ export const Input = css`
 	}
 `;
 
+// TODO: determine styles for Input wrapper.
+export const TextInputWrapper = css``;
+
+// TODO: determine styles for Text Input Arrows.
+export const TextInputArrows = css``;
+
+// TODO: determine styles for Text Input Arrow Up.
+export const TextInputArrowUp = css``;
+
 export const large = css`
-	min-height: calc( ${ ui.get( 'controlHeightLarge' ) } - 2px );
-	padding-bottom: calc(
-		( ${ ui.get( 'controlHeightLarge' ) } - 2px - 18px ) / 2
-	);
-	padding-top: calc(
-		( ${ ui.get( 'controlHeightLarge' ) } - 2px - 18px ) / 2
-	);
+	min-height: calc( ${ CONFIG.controlHeightLarge } - 2px );
+	padding-bottom: calc( ( ${ CONFIG.controlHeightLarge } - 2px - 18px ) / 2 );
+	padding-top: calc( ( ${ CONFIG.controlHeightLarge } - 2px - 18px ) / 2 );
 `;
 
 export const small = css`
-	min-height: calc( ${ ui.get( 'controlHeightSmall' ) } - 2px );
-	padding-bottom: calc(
-		( ${ ui.get( 'controlHeightSmall' ) } - 2px - 18px ) / 2
-	);
-	padding-top: calc(
-		( ${ ui.get( 'controlHeightSmall' ) } - 2px - 18px ) / 2
-	);
+	min-height: calc( ${ CONFIG.controlHeightSmall } - 2px );
+	padding-bottom: calc( ( ${ CONFIG.controlHeightSmall } - 2px - 18px ) / 2 );
+	padding-top: calc( ( ${ CONFIG.controlHeightSmall } - 2px - 18px ) / 2 );
 `;
 
 export const resizable = css`
@@ -102,13 +105,13 @@ export const Spinner = css`
 
 export const SpinnerArrow = css`
 	background-color: transparent;
-	border-radius: ${ ui.get( 'controlBorderRadius' ) };
-	color: ${ ui.get( 'colorText' ) };
+	border-radius: ${ CONFIG.controlBorderRadius };
+	color: ${ COLORS.darkGray };
 	cursor: pointer;
 	padding: 0 2px;
 
 	&:hover:active {
-		background-color: ${ ui.get( 'controlBackgroundColorHover' ) };
+		background-color: ${ CONFIG.controlBackgroundColorHover };
 	}
 `;
 
@@ -131,19 +134,19 @@ export const Steppers = css`
 export const StepperButton = css`
 	${ SpinnerArrow };
 	border: 1px solid transparent;
-	color: ${ ui.get( 'controlInnerControltextColor' ) };
+	color: ${ CONFIG.controlInnerControlTextColor };
 	cursor: pointer;
 	display: block;
 	outline: none;
 	padding: 3px;
 
 	&:hover {
-		background-color: ${ ui.get( 'controlBackgroundColorHover' ) };
+		background-color: ${ CONFIG.controlBackgroundColorHover };
 	}
 
 	&:focus {
-		background-color: ${ ui.get( 'controlBackgroundColorHover' ) };
-		border-color: ${ ui.get( 'colorAdmin' ) };
+		background-color: ${ CONFIG.controlBackgroundColorHover };
+		border-color: ${ COLORS.G2.blue.medium.focus };
 	}
 
 	&[disabled] {

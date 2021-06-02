@@ -8,10 +8,27 @@ import {
 	useControlledValue,
 	usePropRef,
 } from '@wp-g2/utils';
+/**
+ * External dependencies
+ */
 import { isNil, noop } from 'lodash';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { useBaseDragHandlers } from './useTextInputState.utils';
+/**
+ * WordPress dependencies
+ */
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+ import { useBaseDragHandlers } from './useTextInputState.utils';
+
 
 function useCommitValue( { value } ) {
 	const [ commitValue, setCommitValue ] = useState( null );
