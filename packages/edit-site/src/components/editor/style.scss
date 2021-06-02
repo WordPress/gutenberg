@@ -42,4 +42,8 @@
 	padding-left: 16px;
 	padding-right: 16px;
 }
-@include editor-left(".edit-site .components-editor-notices__snackbar")
+@include editor-left(".edit-site .components-editor-notices__snackbar");
+
+#theme-json-notice {
+	margin: 0;
+}
