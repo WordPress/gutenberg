@@ -3,4 +3,10 @@
 
     <string name="menu_save">Save</string>
 
+    <string name="block_editor_loading_title">Loading the block editor...</string>
+    <string name="block_editor_loading_subtitle">Please ensure the block editor is enabled on your site. If it is not enabled, it will not load.</string>
+
+    <string name="block_editor_failed_title">Unable to load the block editor right now.</string>
+    <string name="block_editor_failed_subtitle">Please ensure the block editor is enabled on your site and try again.</string>
+
 </resources>
