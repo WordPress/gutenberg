@@ -62,19 +62,19 @@
 	}
 
 	&.is-navigate-mode .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 	}
 
 	.block-editor-block-list__block.is-highlighted::after {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		outline: var(--wp-admin-border-width-focus) solid transparent;
+		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+		outline: $border-width solid transparent;
 	}
 
 	.block-editor-block-list__block.is-multi-selected::after,
 	&.is-navigate-mode .block-editor-block-list__block.is-selected::after,
 	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected {
-		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
-		outline: $border-width solid transparent;
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		outline: var(--wp-admin-border-width-focus) solid transparent;
 	}
 
 	& .is-block-moving-mode.block-editor-block-list__block.is-selected {
@@ -270,7 +270,7 @@
 			left: $border-width;
 			right: $border-width;
 			bottom: $border-width;
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
 		}
 	}
@@ -279,7 +279,7 @@
 		cursor: unset;
 
 		&::after {
-			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color); // Selected not focussed.
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color); // Selected not focussed.
 			top: $border-width;
 			left: $border-width;
 			right: $border-width;
