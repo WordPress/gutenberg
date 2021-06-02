@@ -16,8 +16,8 @@ function CardDivider( props, forwardedRef ) {
 }
 
 /**
- * CardDivider renders an optional divider within a `<Card />`.
- * It is typically used to divide `<CardBody />`'s from each other.
+ * `CardDivider` renders an optional divider within a `Card`.
+ * It is typically used to divide multiple `CardBody` components from each other.
  *
  * @example
  * ```jsx

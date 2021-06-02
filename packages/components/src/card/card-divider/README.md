@@ -1,7 +1,23 @@
 # CardDivider
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+`CardDivider` renders an optional divider within a [`Card`](../card/README.md). It is typically used to divide multiple `CardBody` components from each other.
 
-TBD
+## Usage
+
+```jsx
+import { Card, CardBody, CardDivider } from '@wordpress/components';
+
+const Example = () => (
+	<Card>
+		<CardBody>...</CardBody>
+		<CardDivider />
+		<CardBody>...</CardBody>
+	</Card>
+);
+```
+
+## Props
+
+### Inherited props
+
+`CardDivider` inherits all of the [`Divider` props](../../divider/README.md#props).
