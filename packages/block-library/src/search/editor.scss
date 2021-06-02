@@ -30,4 +30,10 @@
 	&__components-button-group {
 		margin-top: 10px;
 	}
+
+	&.wp-block-search__button-behavior-expand {
+		.wp-block-search__input {
+			transition-duration: 300ms;
+		}
+	}
 }
