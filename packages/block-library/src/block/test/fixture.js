@@ -1,4 +1,4 @@
-export const getReusableBlock = ( id ) => ( {
+export const getMockedReusableBlock = ( id ) => ( {
 	content: {
 		raw: `
     <!-- wp:heading -->
