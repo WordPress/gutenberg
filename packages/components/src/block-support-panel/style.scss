@@ -2,14 +2,7 @@
 	border: none;
 	border-top: $border-width solid $gray-200;
 	padding: $grid-unit-20;
-
-	& + .components-block-support-panel {
-		margin-top: -1px;
-	}
-
-	&:first-child {
-		margin-top: -1px;
-	}
+	margin-top: -1px;
 
 	.components-block-support-panel__title {
 		margin: 0;
@@ -46,5 +39,15 @@
 		&:last-child {
 			margin-bottom: $grid-unit-10;
 		}
+	}
+}
+
+.edit-site {
+	.components-block-support-panel {
+		border-bottom: $border-width solid $gray-200;
+	}
+
+	.components-block-support-panel + .components-panel__body {
+		margin-top: -1px;
 	}
 }

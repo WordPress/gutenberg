@@ -3,8 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	__experimentalBlockSupportPanel as BlockSupportPanel,
 	__experimentalBoxControl as BoxControl,
-	PanelBody,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
@@ -67,6 +67,9 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 		const padding = filterValuesBySides( newPaddingValues, paddingSides );
 		setStyle( name, 'padding', padding );
 	};
+	const resetPaddingValue = () => setPaddingValues( {} );
+	const hasPaddingValue = () =>
+		paddingValues && Object.keys( paddingValues ).length;
 
 	const marginValues = getStyle( name, 'margin' );
 	const marginSides = useCustomSides( name, 'margin' );
@@ -75,9 +78,21 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 		const margin = filterValuesBySides( newMarginValues, marginSides );
 		setStyle( name, 'margin', margin );
 	};
+	const resetMarginValue = () => setMarginValues( {} );
+	const hasMarginValue = () =>
+		marginValues && Object.keys( marginValues ).length;
+
+	const resetAll = () => {
+		resetPaddingValue();
+		resetMarginValue();
+	};
 
 	return (
-		<PanelBody title={ __( 'Dimensions' ) }>
+		<BlockSupportPanel
+			label={ __( 'Dimensions options' ) }
+			title={ __( 'Dimensions' ) }
+			resetAll={ resetAll }
+		>
 			{ showPaddingControl && (
 				<BoxControl
 					values={ paddingValues }
@@ -85,6 +100,9 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 					label={ __( 'Padding' ) }
 					sides={ paddingSides }
 					units={ units }
+					hasValue={ hasPaddingValue }
+					reset={ resetPaddingValue }
+					allowReset={ false }
 				/>
 			) }
 			{ showMarginControl && (
@@ -94,8 +112,11 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 					label={ __( 'Margin' ) }
 					sides={ marginSides }
 					units={ units }
+					hasValue={ hasMarginValue }
+					reset={ resetMarginValue }
+					allowReset={ false }
 				/>
 			) }
-		</PanelBody>
+		</BlockSupportPanel>
 	);
 }
