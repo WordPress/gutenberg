@@ -41,7 +41,7 @@ const InnerCard = memo( () => {
 	return (
 		<View style={ { padding: 40 } }>
 			<Card>
-				<CardBody style={ { border: '3px solid green' } }>
+				<CardBody as="div" style={ { border: '3px solid green' } }>
 					<InnerContent />
 				</CardBody>
 			</Card>
@@ -61,6 +61,9 @@ export const Default = () => {
 		CardBody: {
 			as: 'a',
 			href: 'https://wordpress.org',
+			style: {
+				display: 'block',
+			},
 		},
 	};
 
