@@ -159,9 +159,13 @@ export class PostPreviewButton extends Component {
 		// https://html.spec.whatwg.org/multipage/interaction.html#dom-window-focus
 		this.previewWindow.focus();
 
-		// If we don't need to autosave the post before previewing, then we simply
-		// load the Preview URL in the Preview tab.
-		if ( ! this.props.isAutosaveable ) {
+		if (
+			// If we don't need to autosave the post before previewing, then we simply
+			// load the Preview URL in the Preview tab.
+			! this.props.isAutosaveable ||
+			// Do not save or overwrite the post, if the post is already locked.
+			this.props.isPostLocked
+		) {
 			this.setPreviewWindowLink( event.target.href );
 			return;
 		}
@@ -232,6 +236,7 @@ export default compose( [
 			isEditedPostSaveable,
 			isEditedPostAutosaveable,
 			getEditedPostPreviewLink,
+			isPostLocked,
 		} = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 
@@ -250,6 +255,7 @@ export default compose( [
 				[ 'draft', 'auto-draft' ].indexOf(
 					getEditedPostAttribute( 'status' )
 				) !== -1,
+			isPostLocked: isPostLocked(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
