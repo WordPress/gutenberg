@@ -1,7 +1,18 @@
 /**
  * External dependencies
  */
-import { render, fireEvent } from '@testing-library/react-native';
+import { act, render, fireEvent } from '@testing-library/react-native';
+
+// Set up the mocks for getting the HTML output of the editor
+let triggerHtmlSerialization = () => {};
+let serializedHtml;
+const bridgeMock = jest.requireMock( '@wordpress/react-native-bridge' );
+bridgeMock.subscribeParentGetHtml = jest.fn( ( callback ) => {
+	triggerHtmlSerialization = callback;
+} );
+bridgeMock.provideToNative_Html = jest.fn( ( html ) => {
+	serializedHtml = html;
+} );
 
 export async function initializeEditor( { initialHtml } ) {
 	const Editor = require( '@wordpress/edit-post/src/editor' ).default;
@@ -13,8 +24,12 @@ export async function initializeEditor( { initialHtml } ) {
 			initialHtml={ initialHtml }
 		/>
 	);
-	const { findByLabelText } = renderResult;
-	const blockListWrapper = await findByLabelText( 'block-list-wrapper' );
+	const { getByTestId } = renderResult;
+
+	const blockListWrapper = await waitFor( () =>
+		getByTestId( 'block-list-wrapper' )
+	);
+
 	// onLayout event has to be explicitly dispatched in BlockList component,
 	// otherwise the inner blocks are not rendered.
 	fireEvent( blockListWrapper, 'layout', {
@@ -25,50 +40,41 @@ export async function initializeEditor( { initialHtml } ) {
 		},
 	} );
 
-	const extraMethods = [
-		getByTextInAztec,
-		getBlockAtPosition,
-		addBlock,
-	].reduce( ( carry, func ) => {
-		return {
-			...carry,
-			[ func.name ]: ( ...props ) => func( renderResult, ...props ),
-		};
-	}, {} );
+	return renderResult;
+}
 
-	return {
-		...renderResult,
-		...extraMethods,
+export * from '@testing-library/react-native';
+
+// Custom implementation of the waitFor utility to prevent the issue: https://git.io/JYYGE
+export function waitFor( cb, timeout = 150 ) {
+	let result;
+	const check = ( resolve, reject, times = 0 ) => {
+		try {
+			result = cb();
+		} catch ( e ) {
+			//NOOP
+		}
+		if ( ! result && times < 5 ) {
+			setTimeout( () => check( resolve, reject, times + 1 ), timeout );
+			return;
+		}
+		resolve( result );
 	};
-}
-
-async function getBlockAtPosition(
-	{ findAllByRole },
-	blockName,
-	position = 1
-) {
-	const instances = await findAllByRole( 'button' );
-	const result = instances.filter( ( instance ) =>
-		instance.props.accessibilityLabel.startsWith(
-			`${ blockName } Block. Row ${ position }`
-		)
+	return new Promise( ( resolve, reject ) =>
+		act(
+			() => new Promise( ( internalResolve ) => check( internalResolve ) )
+		).then( () => {
+			if ( ! result ) {
+				reject( `waitFor timed out for callback:\n${ cb }` );
+				return;
+			}
+			resolve( result );
+		} )
 	);
-	return result.length ? result[ 0 ] : undefined;
 }
 
-async function addBlock( { findByLabelText }, blockName ) {
-	const button = await findByLabelText( 'Add block' );
-	fireEvent.press( button );
-	const blockButton = await findByLabelText( `${ blockName } block` );
-	fireEvent.press( blockButton );
-}
-
-// eslint-disable-next-line camelcase
-async function getByTextInAztec( { UNSAFE_queryAllByType }, value ) {
-	const instances = await UNSAFE_queryAllByType( 'RCTAztecView' );
-	const result = instances.filter( ( instance ) => {
-		const text = instance.props.text.text;
-		return text === value;
-	} );
-	return result.length ? result[ 0 ] : undefined;
+// Helper for getting the current HTML output of the editor
+export function getEditorHtml() {
+	triggerHtmlSerialization();
+	return serializedHtml;
 }

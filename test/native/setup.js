@@ -20,17 +20,14 @@ jest.mock( '@wordpress/element', () => {
 	};
 } );
 
-let triggerHtmlSerialization = () => {};
-let serializedHtml;
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
 		mediaUploadSync: jest.fn(),
 		removeEventListener: jest.fn(),
 		requestFocalPointPickerTooltipShown: jest.fn( () => true ),
-		subscribeParentGetHtml: jest.fn( ( callback ) => {
-			triggerHtmlSerialization = callback;
-		} ),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
 		subscribeSetFocusOnTitle: jest.fn(),
@@ -51,9 +48,6 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		requestMediaPicker: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
 		subscribeReplaceBlock: jest.fn(),
-		provideToNative_Html: jest.fn( ( html ) => {
-			serializedHtml = html;
-		} ),
 		mediaSources: {
 			deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 			deviceCamera: 'DEVICE_CAMERA',
@@ -169,9 +163,3 @@ jest.mock(
 		} ) ),
 	} )
 );
-
-// Helpers for integration tests
-global.getEditorHtml = () => {
-	triggerHtmlSerialization();
-	return serializedHtml;
-};
