@@ -130,8 +130,7 @@ function _sync_custom_logo_to_site_logo( $old_value, $value ) {
 	}
 }
 
-$theme = get_option( 'stylesheet' );
-add_action( "update_option_theme_mods_$theme", '_sync_custom_logo_to_site_logo', 10, 2 );
+add_action( 'update_option_theme_mods_' . get_option('stylesheet'), '_sync_custom_logo_to_site_logo', 10, 2 );
 
 /**
  * Updates the custom_logo theme-mod when the site_logo option gets updated.
