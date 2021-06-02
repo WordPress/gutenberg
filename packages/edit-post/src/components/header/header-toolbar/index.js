@@ -29,6 +29,7 @@ import { store as editPostStore } from '../../../store';
 const preventDefault = ( event ) => {
 	event.preventDefault();
 };
+
 function HeaderToolbar() {
 	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } = useDispatch(
