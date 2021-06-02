@@ -95,6 +95,7 @@ function ColumnsEditContainer( {
 	isSelected,
 	onDeleteBlock,
 	innerWidths,
+	setAttributes,
 	updateInnerColumnWidth,
 	editorSidebarOpened,
 } ) {
@@ -103,7 +104,12 @@ function ColumnsEditContainer( {
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 	const globalStyles = useContext( GlobalStylesContext );
 
-	const { verticalAlignment, align } = attributes;
+	const {
+		verticalAlignment,
+		align,
+		gridGap,
+		gridGapUnit = 'em',
+	} = attributes;
 	const { width } = sizes || {};
 
 	const units = useCustomUnits( {
@@ -189,6 +195,14 @@ function ColumnsEditContainer( {
 		onChangeWidth( nextWidth, valueUnit, columnId );
 	};
 
+	const onGridGapChange = ( value ) => {
+		setAttributes( { gridGap: value } );
+	};
+
+	const onGridGapUnitChange = ( value ) => {
+		setAttributes( { gridGapUnit: value } );
+	};
+
 	const getColumnsSliders = useMemo( () => {
 		if ( ! editorSidebarOpened || ! isSelected ) {
 			return null;
@@ -257,6 +271,17 @@ function ColumnsEditContainer( {
 								type="stepper"
 							/>
 							{ getColumnsSliders }
+							<UnitControl
+								label={ __( 'Gap' ) }
+								min={ 0 }
+								max={ 30 }
+								unit={ gridGapUnit }
+								value={ gridGap }
+								onChange={ onGridGapChange }
+								onUnitChange={ onGridGapUnitChange }
+								units={ units }
+								key={ gridGapUnit }
+							/>
 						</PanelBody>
 						<PanelBody>
 							<FooterMessageControl
