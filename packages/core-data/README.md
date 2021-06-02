@@ -268,7 +268,7 @@ _Returns_
 
 -   `boolean|undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
 
-<a name="canUserEditEntity" href="#canUserEditEntity">#</a> **canUserEditEntity**
+<a name="canUserEditEntityRecord" href="#canUserEditEntityRecord">#</a> **canUserEditEntityRecord**
 
 Returns whether the current user can edit the given entity.
 

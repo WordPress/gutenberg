@@ -16,7 +16,7 @@ import {
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
-	canUserEditEntity,
+	canUserEditEntityRecord,
 	getAutosave,
 	getAutosaves,
 	getCurrentUser,
@@ -445,15 +445,15 @@ describe( 'canUser', () => {
 	} );
 } );
 
-describe( 'canUserEditEntity', () => {
+describe( 'canUserEditEntityRecord', () => {
 	it( 'returns undefined by default', () => {
 		const state = deepFreeze( {
 			userPermissions: {},
 			entities: { data: {} },
 		} );
-		expect( canUserEditEntity( state, 'root', 'postType', 'post' ) ).toBe(
-			undefined
-		);
+		expect(
+			canUserEditEntityRecord( state, 'root', 'postType', 'post' )
+		).toBe( undefined );
 	} );
 
 	it( 'returns whether the user can edit', () => {
@@ -480,9 +480,9 @@ describe( 'canUserEditEntity', () => {
 				},
 			},
 		} );
-		expect( canUserEditEntity( state, 'root', 'postType', 'post' ) ).toBe(
-			true
-		);
+		expect(
+			canUserEditEntityRecord( state, 'root', 'postType', 'post' )
+		).toBe( true );
 	} );
 
 	it( 'returns whether whether the user can edit a given resource', () => {
@@ -512,7 +512,7 @@ describe( 'canUserEditEntity', () => {
 			},
 		} );
 		expect(
-			canUserEditEntity( state, 'root', 'postType', 'page', 2010 )
+			canUserEditEntityRecord( state, 'root', 'postType', 'page', 2010 )
 		).toBe( true );
 	} );
 } );

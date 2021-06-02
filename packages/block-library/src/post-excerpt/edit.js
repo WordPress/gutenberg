@@ -55,7 +55,13 @@ export default function PostExcerptEditor( {
 } ) {
 	const isEditable = useIsEditablePostBlock( clientId );
 	const userCanEdit = useSelect(
-		( select ) => select( coreStore ).canUserEditPost( postType, postId ),
+		( select ) =>
+			select( coreStore ).canUserEditEntityRecord(
+				'root',
+				'postType',
+				postType,
+				postId
+			),
 		[ postType, postId ]
 	);
 	const [

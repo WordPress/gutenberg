@@ -352,7 +352,7 @@ export function* canUser( action, resource, id ) {
  * @param {number} key Record's key.
  * @param {string} recordId Record's id.
  */
-export function* canUserEditEntity( kind, name, key, recordId ) {
+export function* canUserEditEntityRecord( kind, name, key, recordId ) {
 	const entity = yield controls.select(
 		coreStoreName,
 		'getEntityRecord',
