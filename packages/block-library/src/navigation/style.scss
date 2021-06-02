@@ -5,6 +5,7 @@
 // Page List block inside your navigation block.
 .wp-block-navigation {
 	position: relative;
+
 	// Normalize list styles.
 	ul,
 	ul li {
@@ -27,8 +28,9 @@
 	}
 
 	// Menu item link.
-	.wp-block-pages-list__item__link,
-	.wp-block-navigation-link__content {
+	// By targetting the markup directly we enable greater global styles compatibility.
+	// The extra container specificity is due to global styles outputting link styles that need overriding.
+	&.wp-block-navigation a {
 		// Inherit colors set by the block color definition.
 		color: inherit;
 		display: block;
@@ -43,8 +45,7 @@
 			text-decoration: inherit;
 		}
 
-		.wp-block-pages-list__item__link,
-		.wp-block-navigation-link__content {
+		a {
 			text-decoration: inherit;
 
 			&:focus,
@@ -55,8 +56,7 @@
 	}
 
 	&:not([style*="text-decoration"]) {
-		.wp-block-pages-list__item__link,
-		.wp-block-navigation-link__content {
+		a {
 			text-decoration: none;
 
 			&:focus,
@@ -70,233 +70,227 @@
 	.wp-block-page-list__submenu-icon,
 	.wp-block-navigation-link__submenu-icon {
 		height: inherit;
+		margin-left: 6px;
 
 		svg {
 			stroke: currentColor;
 		}
 	}
-
-	// Some themes have added custom padding to the link, which does not consider the Page List block.
-	// Unfortunately we now need to add extra specificity and undo that, so that the block still works.
-	.wp-block-pages-list__item .wp-block-pages-list__item__link,
-	.wp-block-navigation-link .wp-block-navigation-link__content.wp-block-navigation-link__content.wp-block-navigation-link__content {
-		padding: 0;
-	}
-
-	// Styles for submenu flyout.
-	.has-child {
-		// This adds a little space between the link and the dropdown icon.
-		> .wp-block-pages-list__item__link,
-		> .wp-block-navigation-link__content {
-			margin-right: 0.5em;
-		}
-
-		.submenu-container,
-		.wp-block-navigation-link__container {
-			background-color: inherit;
-			color: inherit;
-			position: absolute;
-			z-index: 2;
-			flex-direction: column;
-			align-items: normal;
-			min-width: 200px;
-
-			// Hide until hover or focus within.
-			display: none;
-			opacity: 0;
-			transition: opacity 0.1s linear;
-			visibility: hidden;
-
-			> .wp-block-pages-list__item,
-			> .wp-block-navigation-link {
-				> .wp-block-pages-list__item__link,
-				> .wp-block-navigation-link__content {
-					flex-grow: 1;
-				}
-
-				> .wp-block-page-list__submenu-icon,
-				> .wp-block-navigation-link__submenu-icon {
-					padding-right: 0.5em;
-				}
-			}
-
-			// Nested submenus sit to the left on large breakpoints.
-			// On smaller breakpoints, they open vertically, accordion-style.
-			@include break-medium {
-				.submenu-container,
-				.wp-block-navigation-link__container {
-					// Prevent the menu from disappearing when the mouse is over the gap
-					&::before {
-						content: "";
-						position: absolute;
-						right: 100%;
-						height: 100%;
-						display: block;
-						width: 0.5em;
-						background: transparent;
-					}
-				}
-
-				// Reset the submenu indicator for horizontal flyouts.
-				.wp-block-page-list__submenu-icon svg,
-				.wp-block-navigation-link__submenu-icon svg {
-					transform: rotate(-90deg);
-				}
-			}
-		}
-
-		// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
-		// We don't actually have to support this anymore, but it's easy to keep for now.
-
-		// Custom menu items.
-		// Show submenus on hover.
-		&:hover > .wp-block-navigation-link__container {
-			display: flex;
-			visibility: visible;
-			opacity: 1;
-		}
-
-		// Keep submenus open when focus is within.
-		&:focus-within > .wp-block-navigation-link__container {
-			display: flex;
-			visibility: visible;
-			opacity: 1;
-		}
-
-		// Page list menu items.
-		&:hover {
-			cursor: pointer;
-
-			> .submenu-container {
-				display: flex;
-				visibility: visible;
-				opacity: 1;
-			}
-		}
-
-		&:focus-within {
-			cursor: pointer;
-
-			> .submenu-container {
-				display: flex;
-				visibility: visible;
-				opacity: 1;
-			}
-		}
-	}
-
-
-	// When justified space-between, open submenus leftward for last menu item.
-	// When justified right, open all submenus leftwards.
-	// This needs high specificity.
-	&.wp-block-navigation.items-justified-space-between > .submenu-container > .has-child:last-child,
-	&.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
-	&.wp-block-navigation.items-justified-right > .submenu-container .has-child,
-	&.wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child {
-
-		// First submenu.
-		.submenu-container,
-		.wp-block-navigation-link__container {
-			left: auto;
-			right: 0;
-
-			// Nested submenus.
-			.submenu-container,
-			.wp-block-navigation-link__container {
-				left: auto;
-				right: 100%;
-			}
-		}
-	}
 }
 
-// Margins, paddings, and submenu positions.
-// These need extra specificity to override potentially inherited properties.
-.wp-block-navigation.wp-block-navigation {
 
-	// Menu items with no background.
-	.wp-block-page-list,
-	.wp-block-page-list > .wp-block-pages-list__item,
-	.wp-block-navigation__container > .wp-block-navigation-link {
-		margin: 0 2em 0 0;
+// Styles for submenu flyout.
+// These are separated out with reduced specificity to allow better inheritance from Global Styles.
+.wp-block-navigation .has-child {
+	// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
+	// That way if padding is set in theme.json, it still wins.
+	// https://css-tricks.com/almanac/selectors/w/where/
+	:where(.submenu-container, .wp-block-navigation-link__container) {
+		background-color: inherit;
+		color: inherit;
+		position: absolute;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		align-items: normal;
+		min-width: 200px;
 
-		// Margin of right-most margin should be zero, for right aligned or justified items.
-		&:last-child {
-			margin-right: 0;
+		// Hide until hover or focus within.
+		opacity: 0;
+		transition: opacity 0.1s linear;
+		visibility: hidden;
+
+		// Submenu items.
+		> .wp-block-pages-list__item,
+		> .wp-block-navigation-link {
+			> a {
+				display: flex;
+				flex-grow: 1;
+
+				// Right-align the chevron in submenus.
+				.wp-block-page-list__submenu-icon,
+				.wp-block-navigation-link__submenu-icon {
+					margin-right: 0;
+					margin-left: auto;
+				}
+			}
 		}
-	}
 
-	// When the menu has a background, items have paddings, reduce margins to compensate.
-	// Treat margins and paddings differently when the block has a background.
-	&.has-background {
-		.wp-block-page-list,
-		.wp-block-page-list > .wp-block-pages-list__item,
-		.wp-block-navigation__container > .wp-block-navigation-link {
-			margin: 0 0.5em 0 0;
-		}
-
-		.wp-block-page-list .wp-block-pages-list__item__link,
-		.wp-block-navigation__container .wp-block-navigation-link__content {
-			padding: 0.5em 1em;
-		}
-	}
-
-	// Spacing in all submenus.
-	.has-child .submenu-container,
-	.has-child .wp-block-navigation-link__container {
-		.wp-block-pages-list__item,
-		.wp-block-navigation-link {
+		// Spacing in all submenus.
+		a {
 			margin: 0;
 		}
 
-		.wp-block-pages-list__item__link,
-		.wp-block-navigation-link__content {
-			padding: 0.5em 1em;
-		}
-
 		// Submenu indentation when there's no background.
-		// It should align with the text above.
 		left: -1em;
 		top: 100%;
 
-		// Indentation when no background on small viewports.
-		// It should align with the parent menu above.
-		.submenu-container,
-		.wp-block-navigation-link__container {
-			left: -1px;
-		}
-
-		// Indentation for all submenus on large viewports.
+		// Indentation for all submenus.
+		// Nested submenus sit to the left on large breakpoints.
+		// On smaller breakpoints, they open vertically, accordion-style.
 		@include break-medium {
 			.submenu-container,
 			.wp-block-navigation-link__container {
 				left: 100%;
 				top: -1px; // Border width.
+
+				// Prevent the menu from disappearing when the mouse is over the gap
+				&::before {
+					content: "";
+					position: absolute;
+					right: 100%;
+					height: 100%;
+					display: block;
+					width: 0.5em;
+					background: transparent;
+				}
+			}
+
+			// Reset the submenu indicator for horizontal flyouts.
+			.wp-block-page-list__submenu-icon svg,
+			.wp-block-navigation-link__submenu-icon svg {
+				transform: rotate(-90deg);
 			}
 		}
 	}
 
-	// Submenu indentation when there's a background.
-	// It should align with menu item itself.
-	&.has-background .has-child .submenu-container,
-	&.has-background .has-child .wp-block-navigation-link__container {
-		left: 0;
-		top: 100%;
 
-		// Indentation when there's a background on small viewports.
-		// It should align with the parent menu above.
+	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
+	// We will need to replace focus-within with a JS solution for IE keyboard support.
+
+	// Custom menu items.
+	// Show submenus on hover.
+	&:hover > .wp-block-navigation-link__container {
+		visibility: visible;
+		opacity: 1;
+	}
+
+	// Keep submenus open when focus is within.
+	&:focus-within > .wp-block-navigation-link__container {
+		visibility: visible;
+		opacity: 1;
+	}
+
+	// Page list menu items.
+	&:hover {
+		cursor: pointer;
+
+		> .submenu-container {
+			visibility: visible;
+			opacity: 1;
+		}
+	}
+
+	&:focus-within {
+		cursor: pointer;
+
+		> .submenu-container {
+			visibility: visible;
+			opacity: 1;
+		}
+	}
+}
+
+// Submenu indentation when there's a background.
+.wp-block-navigation.has-background .has-child .submenu-container,
+.wp-block-navigation.has-background .has-child .wp-block-navigation-link__container {
+	left: 0;
+	top: 100%;
+
+	// There's no border on submenus when there are backgrounds.
+	@include break-medium {
 		.submenu-container,
 		.wp-block-navigation-link__container {
-			left: 0;
+			left: 100%;
+			top: 0;
 		}
+	}
+}
 
-		// There's no border on submenus when there are backgrounds.
-		@include break-medium {
-			.submenu-container,
-			.wp-block-navigation-link__container {
-				left: 100%;
-				top: 0;
-			}
+
+/**
+ * Margins
+ * @todo: refactor this to use gap.
+ */
+
+// Menu items with no background.
+.wp-block-page-list,
+.wp-block-page-list > .wp-block-pages-list__item,
+.wp-block-navigation__container > .wp-block-navigation-link {
+	margin: 0 2em 0 0;
+
+	// Margin of right-most margin should be zero, for right aligned or justified items.
+	&:last-child {
+		margin-right: 0;
+	}
+}
+
+// Menu items with background.
+// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
+// That way if padding is set in theme.json, it still wins.
+// https://css-tricks.com/almanac/selectors/w/where/
+.wp-block-navigation:where(.has-background) {
+	.wp-block-page-list,
+	.wp-block-page-list > .wp-block-pages-list__item,
+	.wp-block-navigation__container > .wp-block-navigation-link {
+		margin: 0 0.5em 0 0;
+
+		// Don't show right margin on the last child.
+		&:last-child {
+			margin: 0;
+		}
+	}
+}
+
+
+/**
+ * Paddings
+ */
+
+// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
+// That way if padding is set in theme.json, it still wins.
+// https://css-tricks.com/almanac/selectors/w/where/
+
+// Set the default menu item padding to zero, to allow text-only buttons.
+.wp-block-navigation a {
+	padding: 0;
+}
+
+// When the menu has a background, items have paddings, reduce margins to compensate.
+// Treat margins and paddings differently when the block has a background.
+.wp-block-navigation:where(.has-background) a {
+	padding: 0.5em 1em;
+}
+
+// Provide a default padding for submenus who should always have some, regardless of the top level menu items.
+.wp-block-navigation :where(.submenu-container, .wp-block-navigation-link__container) a {
+	padding: 0.5em 1em;
+}
+
+
+/**
+ * Justifications.
+ */
+
+// When justified space-between, open submenus leftward for last menu item.
+// When justified right, open all submenus leftwards.
+// This needs high specificity.
+.wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
+.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
+.wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
+.wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child {
+
+	// First submenu.
+	.submenu-container,
+	.wp-block-navigation-link__container {
+		left: auto;
+		right: 0;
+
+		// Nested submenus.
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			left: auto;
+			right: 100%;
 		}
 	}
 }

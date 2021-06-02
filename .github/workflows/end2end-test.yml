@@ -18,9 +18,8 @@ concurrency:
 jobs:
     admin:
         name: Admin - ${{ matrix.part }}
-
         runs-on: ubuntu-latest
-
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:

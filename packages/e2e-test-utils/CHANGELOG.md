@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.3.0 (2021-05-31)
+
 ### New Features
 
 -   Added `deleteAllWidgets` - Delete all widgets in the widgets screen.
