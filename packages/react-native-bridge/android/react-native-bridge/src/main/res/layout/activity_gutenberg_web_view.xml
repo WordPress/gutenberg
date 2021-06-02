@@ -32,11 +32,45 @@
         android:layout_height="match_parent"
         android:visibility="visible"/>
 
-    <View
+    <LinearLayout
         android:id="@+id/foreground_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"/>
+        android:background="@color/white"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:paddingStart="@dimen/foreground_view_padding_large"
+        android:paddingEnd="@dimen/foreground_view_padding_large"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/foreground_view_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/foreground_view_padding_medium"
+            android:layout_marginTop="@dimen/foreground_view_padding_medium"
+            android:src="@drawable/ube_failed"
+            android:contentDescription="@null" 
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/foreground_view_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/foreground_view_padding_small"
+            android:text="@string/block_editor_loading_title"
+            android:textSize="@dimen/foreground_view_text_size_large" />
+
+        <TextView
+            android:id="@+id/foreground_view_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/foreground_view_padding_medium"
+            android:text="@string/block_editor_loading_subtitle"
+            android:textSize="@dimen/foreground_view_text_size_medium" />
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progress_bar"
