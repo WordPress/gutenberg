@@ -29,8 +29,7 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 
 	useEffect( () => {
 		if ( popoverRef.current && sidebarControl ) {
-			const inspectorContainer =
-				sidebarControl.inspector.contentContainer[ 0 ];
+			const inspector = sidebarControl.inspector;
 			const container = sidebarControl.container[ 0 ];
 			const ownerDocument = container.ownerDocument;
 			const ownerWindow = ownerDocument.defaultView;
@@ -42,11 +41,12 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 					// 2. The element should exist in the DOM (not deleted).
 					element &&
 					ownerDocument.contains( element ) &&
-					// 3. It should also not exist in the container, inspector, nor the popover.
+					// 3. It should also not exist in the container, the popover, nor the dialog.
 					! container.contains( element ) &&
 					! popoverRef.current.contains( element ) &&
-					! inspectorContainer.contains( element ) &&
-					! element.closest( '[role="dialog"]' )
+					! element.closest( '[role="dialog"]' ) &&
+					// 4. The inspector should not be opened.
+					! inspector.expanded()
 				) {
 					clearSelectedBlock();
 				}

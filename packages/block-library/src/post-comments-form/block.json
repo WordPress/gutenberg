@@ -17,8 +17,10 @@
 			"gradients": true,
 			"link": true
 		},
-		"fontSize": true,
-		"lineHeight": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
 	},
 	"style": "wp-block-post-comments-form"
 }
