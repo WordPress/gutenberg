@@ -49,11 +49,12 @@ export function useBlockClassNames( clientId ) {
 			const activeEntityBlockId = getActiveBlockIdByBlockNames(
 				spotlightEntityBlocks
 			);
+			const blockType = getBlockType( name );
 			return classnames( {
 				'is-selected': isSelected,
 				'is-highlighted': isBlockHighlighted( clientId ),
 				'is-multi-selected': isBlockMultiSelected( clientId ),
-				'is-reusable': isReusableBlock( getBlockType( name ) ),
+				'is-reusable': blockType && isReusableBlock( blockType ),
 				'is-dragging': isDragging,
 				'has-child-selected': isAncestorOfSelectedBlock,
 				'has-active-entity': activeEntityBlockId,

@@ -26,6 +26,10 @@ export function useBlockDefaultClassName( clientId ) {
 		( select ) => {
 			const name = select( blockEditorStore ).getBlockName( clientId );
 			const blockType = getBlockType( name );
+			if ( ! blockType ) {
+				return;
+			}
+
 			const hasLightBlockWrapper =
 				blockType.apiVersion > 1 ||
 				hasBlockSupport( blockType, 'lightBlockWrapper', false );
