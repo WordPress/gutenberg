@@ -1829,21 +1829,11 @@ const getAllAllowedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
 		const { allowedBlockTypes } = getSettings( state );
-		const parsedPatterns = patterns.map( ( pattern ) => ( {
-			...pattern,
-			// We only need the overall block structure of the pattern. So, for
-			// performance reasons, we can parse the pattern's content using
-			// the raw blocks parser, also known as the "stage I" block parser.
-			// This is about 250x faster than the full parse that the Block API
-			// offers.
-			__unstableBlockNodes: parse( pattern.content ),
-		} ) );
-		const allowedPatterns = parsedPatterns.filter(
-			( { __unstableBlockNodes } ) =>
-				checkAllowListRecursive(
-					__unstableBlockNodes,
-					allowedBlockTypes
-				)
+		const parsedPatterns = patterns.map( ( { name } ) =>
+			__experimentalGetParsedPattern( state, name )
+		);
+		const allowedPatterns = parsedPatterns.filter( ( { blocks } ) =>
+			checkAllowListRecursive( blocks, allowedBlockTypes )
 		);
 		return allowedPatterns;
 	},
@@ -1866,8 +1856,8 @@ export const __experimentalGetAllowedPatterns = createSelector(
 		const availableParsedPatterns = getAllAllowedPatterns( state );
 		const patternsAllowed = filter(
 			availableParsedPatterns,
-			( { __unstableBlockNodes } ) =>
-				__unstableBlockNodes.every( ( { name } ) =>
+			( { blocks } ) =>
+				blocks.every( ( { name } ) =>
 					canInsertBlockType( state, name, rootClientId )
 				)
 		);
