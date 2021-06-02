@@ -62,9 +62,13 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	wp_register_style( 'global-styles', false, array(), true, true );
-	wp_add_inline_style( 'global-styles', $stylesheet );
-	wp_enqueue_style( 'global-styles' );
+	if ( isset( wp_styles()->registered['global-styles'] ) ) {
+		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
+	} else {
+		wp_register_style( 'global-styles', false, array(), true, true );
+		wp_add_inline_style( 'global-styles', $stylesheet );
+		wp_enqueue_style( 'global-styles' );
+	}
 }
 
 /**
