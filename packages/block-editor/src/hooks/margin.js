@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
+import { SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**

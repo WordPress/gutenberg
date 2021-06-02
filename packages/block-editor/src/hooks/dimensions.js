@@ -28,17 +28,17 @@ import {
 export const SPACING_SUPPORT_KEY = 'spacing';
 
 /**
- * Inspector controls for spacing support.
+ * Inspector controls for dimensions support.
  *
  * @param {Object} props Block props.
  *
  * @return {WPElement} Inspector controls for spacing support features.
  */
-export function SpacingPanel( props ) {
+export function DimensionsPanel( props ) {
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
-	const isDisabled = useIsSpacingDisabled( props );
-	const isSupported = hasSpacingSupport( props.name );
+	const isDisabled = useIsDimensionsDisabled( props );
+	const isSupported = hasDimensionsSupport( props.name );
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
@@ -89,13 +89,13 @@ export function SpacingPanel( props ) {
 }
 
 /**
- * Determine whether there is block support for padding or margins.
+ * Determine whether there is dimensions related block support.
  *
  * @param {string} blockName Block name.
  *
  * @return {boolean} Whether there is support.
  */
-export function hasSpacingSupport( blockName ) {
+export function hasDimensionsSupport( blockName ) {
 	if ( Platform.OS !== 'web' ) {
 		return false;
 	}
@@ -104,13 +104,13 @@ export function hasSpacingSupport( blockName ) {
 }
 
 /**
- * Determines whether spacing support has been disabled.
+ * Determines whether dimensions support has been disabled.
  *
  * @param {Object} props Block properties.
  *
  * @return {boolean} If spacing support is completely disabled.
  */
-const useIsSpacingDisabled = ( props = {} ) => {
+const useIsDimensionsDisabled = ( props = {} ) => {
 	const paddingDisabled = useIsPaddingDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
 
