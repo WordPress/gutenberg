@@ -14,22 +14,11 @@ export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large' | 'none';
 export type Props = SurfaceProps & {
 	/**
 	 * Size of the elevation shadow, based on the Style system's elevation system.
-	 * Elevating a `Card` can be done by adjusting the `elevation` prop. This may be helpful in highlighting certain content. For more information, check out `Elevation`.
+	 * Elevating a `Card` can be done by adjusting the `elevation` prop. This may
+	 * be helpful in highlighting certain content. For more information, check out
+	 * `Elevation`.
 	 *
-	 * @example
-	 * ```jsx
-	 * import { Card, CardBody, Text } from `@wordpress/components`
-	 *
-	 * function Example() {
-	 *   return (
-	 *     <Card elevation={ 8 }>
-	 *       <CardBody>
-	 *         <Text>Card Content</Text>
-	 *       </CardBody>
-	 *     </Card>
-	 *   );
-	 * }
-	 *```
+	 * @default 2
 	 */
 	elevation?: number;
 	/**
