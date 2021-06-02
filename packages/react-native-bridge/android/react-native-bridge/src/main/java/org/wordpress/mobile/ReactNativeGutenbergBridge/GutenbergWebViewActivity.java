@@ -80,6 +80,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     };
 
     private void showTroubleshootingInstructions() {
+        mForegroundViewTitle.setText(R.string.block_editor_failed_title);
+        mForegroundViewSubtitle.setText(R.string.block_editor_failed_subtitle);
+        mForegroundViewImage.setVisibility(ImageView.VISIBLE);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
