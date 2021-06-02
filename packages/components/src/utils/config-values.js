@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { space } from '../ui/utils/space';
-import { COLORS } from './colors-values';
+import COLORS from './colors-values';
 
 const CONTROL_HEIGHT = '36px';
 const CONTROL_PADDING_X = '12px';
@@ -63,6 +63,23 @@ export default {
 	fontWeight: 'normal',
 	fontWeightHeading: '600',
 	gridBase: '4px',
+	controlPaddingX: CONTROL_PADDING_X,
+	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
+	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
+	controlBackgroundColor: COLORS.white,
+	controlBackgroundColorHover: 'rgba(0, 0, 0, 0.5)',
+	controlBorderRadius: '2px',
+	controlBorderColor: COLORS.gray[ 700 ],
+	controlBoxShadow: 'transparent',
+	controlBorderColorHover: COLORS.gray[ 700 ],
+	controlBoxShadowFocus: `0 0 0, 0.5px, ${ COLORS.admin }`,
+	controlDestructiveBorderColor: COLORS.alert.red,
+	controlHeight: CONTROL_HEIGHT,
+	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
+	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
+	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
+	controlInnerControlTextColor: COLORS.darkGray,
+	controlTextColor: COLORS.darkGray,
 	cardBorderRadius: '2px',
 	cardPaddingXSmall: `${ space( 2 ) }`,
 	cardPaddingSmall: `${ space( 4 ) }`,

@@ -1,12 +1,17 @@
-import { contextConnect } from '@wp-g2/context';
-import { ui } from '@wp-g2/styles';
-import { mergeRefs } from '@wp-g2/utils';
-import React from 'react';
+/**
+ * WordPress dependencies
+ */
+import { useMergeRefs } from '@wordpress/compose';
 
-import { View } from '../View';
+/**
+ * Internal dependencies
+ */
+import { contextConnect } from '../ui/context';
+import { View } from '../view';
 import TextInputArrows from './text-input-arrows';
 import TextInputSteppers from './text-input-steppers';
-import { useTextInput } from './useTextInput';
+import { useTextInput } from './use-text-input';
+import * as styles from './styles';
 
 /**
  *
@@ -15,7 +20,6 @@ import { useTextInput } from './useTextInput';
  */
 function TextInput( props, forwardedRef ) {
 	const {
-		__store,
 		arrows,
 		decrement,
 		disabled,
@@ -31,21 +35,22 @@ function TextInput( props, forwardedRef ) {
 
 	const showTextInputArrows = arrows === true && isTypeNumeric;
 	const showTextInputSteppers = arrows === 'stepper' && isTypeNumeric;
+	const mergedRefs = useMergeRefs( [ inputRef, forwardedRef ] );
 
 	return (
 		<View
 			{ ...otherProps }
 			disabled={ disabled }
-			{ ...ui.$( 'TextInputWrapper' ) }
+			{ ...styles.TextInputWrapper }
 		>
 			{ prefix }
 			<View
-				{ ...ui.$( 'TextInput' ) }
+				{ ...styles.Input }
 				autoComplete="off"
 				spellCheck={ false }
 				{ ...inputProps }
 				disabled={ disabled }
-				ref={ mergeRefs( [ inputRef, forwardedRef ] ) }
+				ref={ mergedRefs }
 			/>
 			{ suffix }
 			{ showTextInputArrows && (

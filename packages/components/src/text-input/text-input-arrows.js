@@ -1,18 +1,33 @@
-import { chevronDown, chevronUp } from '@wordpress/icons';
-import { ui } from '@wp-g2/styles';
+/**
+ * External dependencies
+ */
 import { clamp, noop } from 'lodash';
-import React, { useCallback, useEffect, useRef } from 'react';
 
-import { Icon } from '../Icon';
-import { View } from '../View';
-import { VStack } from '../VStack';
+/**
+ * WordPress dependencies
+ */
+import { chevronDown, chevronUp } from '@wordpress/icons';
+import {
+	useCallback,
+	useEffect,
+	memo,
+	forwardRef,
+	useRef,
+} from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { Icon } from '../icon';
+import { View } from '../view';
+import { VStack } from '../v-stack';
 import * as styles from './styles';
 
 /**
  * @typedef Props
- * @property {import('./useTextInputState').TextInputState} __store
- * @property {(int: number) => void} decrement
- * @property {(int: number) => void} increment
+ * @property {import('./use-text-input-state').TextInputState} __store The state store for the text input.
+ * @property {(int: number) => void} decrement                         Increment text input number value callback.
+ * @property {(int: number) => void} increment                         Decrement text input number value callback.
  */
 
 /**
@@ -31,7 +46,7 @@ function TextInputArrows( props, forwardedRef ) {
 				className={ styles.Spinner }
 				expanded={ true }
 				spacing={ 0 }
-				{ ...ui.$( 'TextInputArrows' ) }
+				{ ...styles.TextInputArrows }
 				ref={ forwardedRef }
 			>
 				<UpDownArrows
@@ -106,7 +121,7 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 				onMouseLeave={ handleOnClearTimers }
 				onMouseUp={ handleOnClearTimers }
 				tabIndex={ -1 }
-				{ ...ui.$( 'TextInputArrowUp' ) }
+				{ ...styles.TextInputArrowUp }
 				icon={ chevronUp }
 				size={ 12 }
 				width={ 16 }
@@ -118,7 +133,7 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 				onMouseLeave={ handleOnClearTimers }
 				onMouseUp={ handleOnClearTimers }
 				tabIndex={ -1 }
-				{ ...ui.$( 'TextInputArrowDown' ) }
+				{ ...styles.TextInputArrows }
 				icon={ chevronDown }
 				size={ 12 }
 				width={ 16 }
@@ -127,6 +142,6 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 	);
 };
 
-const UpDownArrows = React.memo( _UpDownArrows );
+const UpDownArrows = memo( _UpDownArrows );
 
-export default React.memo( React.forwardRef( TextInputArrows ) );
+export default memo( forwardRef( TextInputArrows ) );

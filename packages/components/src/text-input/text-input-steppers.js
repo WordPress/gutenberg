@@ -10,7 +10,7 @@ import * as styles from './styles';
 
 /**
  * @typedef Props
- * @property {import('./useTextInputState').TextInputState} __store
+ * @property {import('./use-text-input-state').TextInputState} __store
  * @property {boolean} disabled
  * @property {(int: number) => void} decrement
  * @property {(int: number) => void} increment
