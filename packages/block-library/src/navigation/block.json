@@ -63,14 +63,16 @@
 		"anchor": true,
 		"html": false,
 		"inserter": true,
-		"fontSize": true,
-		"lineHeight": true,
-		"__experimentalFontStyle": true,
-		"__experimentalFontWeight": true,
-		"__experimentalTextTransform": true,
-		"color": true,
-		"__experimentalFontFamily": true,
-		"__experimentalTextDecoration": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalTextTransform": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true
+		},
+		"color": true
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"

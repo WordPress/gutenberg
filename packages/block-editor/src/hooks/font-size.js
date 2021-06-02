@@ -18,7 +18,7 @@ import {
 import { cleanEmptyObject } from './utils';
 import useSetting from '../components/use-setting';
 
-export const FONT_SIZE_SUPPORT_KEY = 'fontSize';
+export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
 /**
  * Filters registered block settings, extending attributes to include

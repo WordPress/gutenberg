@@ -430,3 +430,41 @@ function gutenberg_block_has_support( $block_type, $feature, $default = false ) 
 
 	return true === $block_support || is_array( $block_support );
 }
+
+/**
+ * Updates the shape of supports for declaring fontSize and lineHeight.
+ *
+ * @param array $metadata Metadata for registering a block type.
+ * @return array          Metadata for registering a block type with the supports shape updated.
+ */
+function gutenberg_migrate_old_typography_shape( $metadata ) {
+	// Temporarily disable migrations from core blocks until core block.json are updated.
+	if ( isset( $metadata['supports'] ) && false === strpos( $metadata['file'], '/wp-includes/blocks/' ) ) {
+		$typography_keys = array(
+			'__experimentalFontFamily',
+			'__experimentalFontStyle',
+			'__experimentalFontWeight',
+			'__experimentalLetterSpacing',
+			'__experimentalTextDecoration',
+			'__experimentalTextTransform',
+			'fontSize',
+			'lineHeight',
+		);
+		foreach ( $typography_keys as $typography_key ) {
+			$support_for_key = _wp_array_get( $metadata['supports'], array( $typography_key ), null );
+			if ( null !== $support_for_key ) {
+				trigger_error(
+					/* translators: %1$s: Block type, %2$s: typography supports key e.g: fontSize, lineHeight etc... */
+					sprintf( __( 'Block %1$s is declaring %2$s support on block.json under supports.%2$s. %2$s support is now declared under supports.typography.%2$s.', 'gutenberg' ), $metadata['name'], $typography_key ),
+					headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
+				);
+				gutenberg_experimental_set( $metadata['supports'], array( 'typography', $typography_key ), $support_for_key );
+				unset( $metadata['supports'][ $typography_key ] );
+			}
+		}
+	}
+	return $metadata;
+}
+
+
+add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
