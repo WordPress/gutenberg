@@ -150,10 +150,10 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template_part->area );
 	}
 
-	function test_inject_theme_attribute_in_content() {
+	function test_gutenberg_inject_theme_attribute_in_content() {
 		$theme                           = get_stylesheet();
 		$content_without_theme_attribute = '<!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /-->';
-		$template_content                = _inject_theme_attribute_in_content(
+		$template_content                = _gutenberg_inject_theme_attribute_in_content(
 			$content_without_theme_attribute,
 			$theme
 		);
@@ -164,7 +164,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( $expected, $template_content );
 
 		$content_without_theme_attribute_nested = '<!-- wp:group --><!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /--><!-- /wp:group -->';
-		$template_content                       = _inject_theme_attribute_in_content(
+		$template_content                       = _gutenberg_inject_theme_attribute_in_content(
 			$content_without_theme_attribute_nested,
 			$theme
 		);
@@ -176,7 +176,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 
 		// Does not inject theme when there is an existing theme attribute.
 		$content_with_existing_theme_attribute = '<!-- wp:template-part {"slug":"header","theme":"fake-theme","align":"full", "tagName":"header","className":"site-header"} /-->';
-		$template_content                      = _inject_theme_attribute_in_content(
+		$template_content                      = _gutenberg_inject_theme_attribute_in_content(
 			$content_with_existing_theme_attribute,
 			$theme
 		);
@@ -184,7 +184,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 
 		// Does not inject theme when there is no template part.
 		$content_with_no_template_part = '<!-- wp:post-content /-->';
-		$template_content              = _inject_theme_attribute_in_content(
+		$template_content              = _gutenberg_inject_theme_attribute_in_content(
 			$content_with_no_template_part,
 			$theme
 		);
@@ -213,8 +213,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'publish', $template->status );
 		$this->assertEquals( 'theme', $template->source );
 		$this->assertEquals( 'wp_template_part', $template->type );
-		// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
-		$this->assertEquals( WP_TEMPLATE_PART_AREA_UNCATEGORIZED, $template->area );
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template->area );
 	}
 
 	/**
@@ -276,29 +275,34 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		// Filter template part by area.
 		$templates    = gutenberg_get_block_templates( array( 'area' => WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part' );
 		$template_ids = get_template_ids( $templates );
-		// TODO - update following array result once tt1-blocks theme.json is updated for area info.
-		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template_part' ), $template_ids );
+		$this->assertEquals(
+			array(
+				get_stylesheet() . '//' . 'my_template_part',
+				get_stylesheet() . '//' . 'header',
+			),
+			$template_ids
+		);
 	}
 
 	/**
 	 * Should flatten nested blocks
 	 */
-	function test_flatten_blocks() {
+	function test_gutenberg_flatten_blocks() {
 		$content_template_part_inside_group = '<!-- wp:group --><!-- wp:template-part {"slug":"header"} /--><!-- /wp:group -->';
 		$blocks                             = parse_blocks( $content_template_part_inside_group );
-		$actual                             = _flatten_blocks( $blocks );
+		$actual                             = _gutenberg_flatten_blocks( $blocks );
 		$expected                           = array( $blocks[0], $blocks[0]['innerBlocks'][0] );
 		$this->assertEquals( $expected, $actual );
 
 		$content_template_part_inside_group_inside_group = '<!-- wp:group --><!-- wp:group --><!-- wp:template-part {"slug":"header"} /--><!-- /wp:group --><!-- /wp:group -->';
 		$blocks   = parse_blocks( $content_template_part_inside_group_inside_group );
-		$actual   = _flatten_blocks( $blocks );
+		$actual   = _gutenberg_flatten_blocks( $blocks );
 		$expected = array( $blocks[0], $blocks[0]['innerBlocks'][0], $blocks[0]['innerBlocks'][0]['innerBlocks'][0] );
 		$this->assertEquals( $expected, $actual );
 
 		$content_without_inner_blocks = '<!-- wp:group /-->';
 		$blocks                       = parse_blocks( $content_without_inner_blocks );
-		$actual                       = _flatten_blocks( $blocks );
+		$actual                       = _gutenberg_flatten_blocks( $blocks );
 		$expected                     = array( $blocks[0] );
 		$this->assertEquals( $expected, $actual );
 	}

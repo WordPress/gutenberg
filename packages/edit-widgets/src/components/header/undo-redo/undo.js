@@ -1,19 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { __, isRTL } from '@wordpress/i18n';
+import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { undo as undoIcon } from '@wordpress/icons';
+import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
+import { store as coreStore } from '@wordpress/core-data';
 
-function UndoButton( props, ref ) {
-	const hasUndo = useSelect( ( select ) => select( 'core' ).hasUndo() );
-	const { undo } = useDispatch( 'core' );
+export default function UndoButton() {
+	const hasUndo = useSelect( ( select ) => select( coreStore ).hasUndo() );
+	const { undo } = useDispatch( coreStore );
 	return (
-		<Button
-			icon={ undoIcon }
+		<ToolbarButton
+			icon={ ! isRTL() ? undoIcon : redoIcon }
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
 			// If there are no undo levels we don't want to actually disable this
@@ -21,10 +21,6 @@ function UndoButton( props, ref ) {
 			// See: https://github.com/WordPress/gutenberg/issues/3486
 			aria-disabled={ ! hasUndo }
 			onClick={ hasUndo ? undo : undefined }
-			ref={ ref }
-			{ ...props }
 		/>
 	);
 }
-
-export default forwardRef( UndoButton );

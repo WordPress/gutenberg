@@ -10,7 +10,7 @@ import { useSurface } from './hook';
  * In the example below, notice how the `Surface` renders in white (or dark gray if in dark mode).
  *
  * ```jsx
- * import { Surface, Text } from `@wp-g2/components/ui`;
+ * import { Surface, Text } from `@wordpress/components/ui`;
  *
  * function Example() {
  * 	return (

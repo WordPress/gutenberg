@@ -24,7 +24,11 @@
 					"caption": ""
 				}
 			],
-			"ids": [ 1421, 1440, 1362 ],
+			"ids": [
+				1421,
+				1440,
+				1362
+			],
 			"caption": "",
 			"imageCrop": true,
 			"linkTo": "none",

@@ -43,7 +43,9 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 			typeAnnotation.typeAnnotation.typeAnnotation
 	);
 
-	return `( ${ params } )${ returnIndicator }${ returnType }`;
+	const paramsWithParens = params.length ? `( ${ params } )` : `()`;
+
+	return `${ paramsWithParens }${ returnIndicator }${ returnType }`;
 }
 
 /**
@@ -376,6 +378,10 @@ function getTypeAnnotation( typeAnnotation ) {
  */
 function getFunctionToken( token ) {
 	let resolvedToken = token;
+	if ( babelTypes.isExportDefaultDeclaration( resolvedToken ) ) {
+		resolvedToken = resolvedToken.declaration;
+	}
+
 	if ( babelTypes.isExportNamedDeclaration( resolvedToken ) ) {
 		resolvedToken = resolvedToken.declaration;
 	}
@@ -511,6 +517,33 @@ function getReturnTypeAnnotation( declarationToken ) {
 	}
 }
 
+/**
+ * @param {ASTNode} declarationToken
+ * @return {string} The type annotation for the variable.
+ */
+function getVariableTypeAnnotation( declarationToken ) {
+	let resolvedToken = declarationToken;
+	if ( babelTypes.isExportNamedDeclaration( resolvedToken ) ) {
+		resolvedToken = resolvedToken.declaration;
+	}
+
+	if ( babelTypes.isClassDeclaration( resolvedToken ) ) {
+		// just use the classname if we're exporting a class
+		return resolvedToken.id.name;
+	}
+
+	if ( babelTypes.isVariableDeclaration( resolvedToken ) ) {
+		resolvedToken = resolvedToken.declarations[ 0 ].id;
+	}
+
+	try {
+		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
+	} catch ( e ) {
+		// assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
+		return '';
+	}
+}
+
 module.exports =
 	/**
 	 * @param {CommentTag} tag A comment tag.
@@ -530,6 +563,9 @@ module.exports =
 			}
 			case 'return': {
 				return getReturnTypeAnnotation( token );
+			}
+			case 'type': {
+				return getVariableTypeAnnotation( token );
 			}
 			default: {
 				return '';

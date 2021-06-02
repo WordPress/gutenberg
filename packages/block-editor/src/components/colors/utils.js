@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase, map } from 'lodash';
+import { find, map } from 'lodash';
 import tinycolor from 'tinycolor2';
 
 /**
@@ -60,7 +60,14 @@ export function getColorClassName( colorContextName, colorSlug ) {
 		return undefined;
 	}
 
-	return `has-${ kebabCase( colorSlug ) }-${ colorContextName }`;
+	// We don't want to use kebabCase from lodash here
+	// see https://github.com/WordPress/gutenberg/issues/32347
+	// However, we need to make sure the generated class
+	// doesn't contain spaces.
+	return `has-${ colorSlug.replace(
+		/\s+/g,
+		'-'
+	) }-${ colorContextName.replace( /\s+/g, '-' ) }`;
 }
 
 /**

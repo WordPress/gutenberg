@@ -21,6 +21,7 @@ const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
  * @param {string}  chosenYAxis           yAxis to be used.
  * @param {Element} boundaryElement       Boundary element.
  * @param {boolean} forcePosition         Don't adjust position based on anchor.
+ * @param {boolean} forceXAlignment       Don't adjust alignment based on YAxis
  *
  * @return {Object} Popover xAxis position and constraints.
  */
@@ -32,7 +33,8 @@ export function computePopoverXAxisPosition(
 	stickyBoundaryElement,
 	chosenYAxis,
 	boundaryElement,
-	forcePosition
+	forcePosition,
+	forceXAlignment
 ) {
 	const { width } = contentSize;
 
@@ -64,7 +66,7 @@ export function computePopoverXAxisPosition(
 
 	if ( corner === 'right' ) {
 		leftAlignmentX = anchorRect.right;
-	} else if ( chosenYAxis !== 'middle' ) {
+	} else if ( chosenYAxis !== 'middle' && ! forceXAlignment ) {
 		leftAlignmentX = anchorMidPoint;
 	}
 
@@ -72,7 +74,7 @@ export function computePopoverXAxisPosition(
 
 	if ( corner === 'left' ) {
 		rightAlignmentX = anchorRect.left;
-	} else if ( chosenYAxis !== 'middle' ) {
+	} else if ( chosenYAxis !== 'middle' && ! forceXAlignment ) {
 		rightAlignmentX = anchorMidPoint;
 	}
 
@@ -138,6 +140,12 @@ export function computePopoverXAxisPosition(
 	if ( boundaryElement ) {
 		const boundaryRect = boundaryElement.getBoundingClientRect();
 		popoverLeft = Math.min( popoverLeft, boundaryRect.right - width );
+
+		// Avoid the popover being position beyond the left boundary if the
+		// direction is left to right.
+		if ( ! isRTL() ) {
+			popoverLeft = Math.max( popoverLeft, 0 );
+		}
 	}
 
 	return {
@@ -279,6 +287,7 @@ export function computePopoverYAxisPosition(
  *                                        relative positioned parent container.
  * @param {Element} boundaryElement       Boundary element.
  * @param {boolean} forcePosition         Don't adjust position based on anchor.
+ *  @param {boolean} forceXAlignment       Don't adjust alignment based on YAxis
  *
  * @return {Object} Popover position and constraints.
  */
@@ -290,7 +299,8 @@ export function computePopoverPosition(
 	anchorRef,
 	relativeOffsetTop,
 	boundaryElement,
-	forcePosition
+	forcePosition,
+	forceXAlignment
 ) {
 	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
 
@@ -312,7 +322,8 @@ export function computePopoverPosition(
 		stickyBoundaryElement,
 		yAxisPosition.yAxis,
 		boundaryElement,
-		forcePosition
+		forcePosition,
+		forceXAlignment
 	);
 
 	return {
@@ -322,19 +333,22 @@ export function computePopoverPosition(
 }
 
 /**
- * Offsets the given rect by the position of the iframe that contains the element.
- * If the owner document is not in an iframe then it returns with the original rect.
+ * Offsets the given rect by the position of the iframe that contains the
+ * element. If the owner document is not in an iframe then it returns with the
+ * original rect. If the popover container document and the anchor document are
+ * the same, the original rect will also be returned.
  *
- * @param {DOMRect} rect bounds of the element
+ * @param {DOMRect}  rect          bounds of the element
  * @param {Document} ownerDocument document of the element
+ * @param {Element}  container     The popover container to position.
  *
  * @return {DOMRect} offsetted bounds
  */
-export function offsetIframe( rect, ownerDocument ) {
+export function offsetIframe( rect, ownerDocument, container ) {
 	const { defaultView } = ownerDocument;
 	const { frameElement } = defaultView;
 
-	if ( ! frameElement ) {
+	if ( ! frameElement || ownerDocument === container.ownerDocument ) {
 		return rect;
 	}
 

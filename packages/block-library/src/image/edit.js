@@ -80,6 +80,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
+	clientId,
 } ) {
 	const {
 		url = '',
@@ -300,6 +301,7 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
 					containerRef={ ref }
+					clientId={ clientId }
 				/>
 			) }
 			{ ! url && (
@@ -320,7 +322,7 @@ export function ImageEdit( {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
-				disableMediaButtons={ url }
+				disableMediaButtons={ temporaryURL || url }
 			/>
 		</figure>
 	);

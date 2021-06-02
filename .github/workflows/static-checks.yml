@@ -5,13 +5,21 @@ on:
     push:
         branches:
             - trunk
+            - 'release/**'
             - 'wp/**'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
 
 jobs:
     check:
         name: All
-
         runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
@@ -19,7 +27,7 @@ jobs:
             - name: Use Node.js 14.x
               uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
               with:
-                node-version: 14.x
+                  node-version: 14.x
 
             - name: Cache node modules
               uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
@@ -41,9 +49,6 @@ jobs:
 
             - name: Lint JavaScript and Styles
               run: npm run lint
-
-            - name: Lint ES5 built files (IE11)
-              run: npx eslint --parser-options=ecmaVersion:5 --no-eslintrc --no-ignore ./build/**/*.js
 
             - name: Type checking
               run: npm run build:package-types

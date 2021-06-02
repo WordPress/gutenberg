@@ -1,0 +1,29 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/query",
+		"isValid": true,
+		"attributes": {
+			"query": {
+				"perPage": null,
+				"pages": 0,
+				"offset": 0,
+				"postType": "post",
+				"categoryIds": [],
+				"tagIds": [],
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": true
+			},
+			"layout": {
+				"type": "list"
+			}
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

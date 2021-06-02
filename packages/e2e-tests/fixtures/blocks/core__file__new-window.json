@@ -9,7 +9,8 @@
 			"textLinkHref": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
 			"textLinkTarget": "_blank",
 			"showDownloadButton": true,
-			"downloadButtonText": "Download"
+			"downloadButtonText": "Download",
+			"previewHeight": 600
 		},
 		"innerBlocks": [],
 		"originalContent": "<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" target=\"_blank\" rel=\"noreferrer noopener\">6546</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" class=\"wp-block-file__button\" download>Download</a></div>"

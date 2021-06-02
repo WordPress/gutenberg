@@ -17,7 +17,10 @@ export {
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
-export { default as Autocomplete } from './autocomplete';
+export {
+	default as Autocomplete,
+	useAutocompleteProps as __unstableUseAutocompleteProps,
+} from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
@@ -47,22 +50,16 @@ export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
+export { Divider as __experimentalDivider } from './divider';
 export { default as Draggable } from './draggable';
-export {
-	default as DropZone,
-	useDropZone as __unstableUseDropZone,
-} from './drop-zone';
-export {
-	default as DropZoneProvider,
-	DropZoneContextProvider as __unstableDropZoneContextProvider,
-	useDrop as __unstableUseDrop,
-} from './drop-zone/provider';
+export { default as DropZone } from './drop-zone';
+export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
+export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
+export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
-export { default as Flex } from './flex';
-export { default as FlexBlock } from './flex/block';
-export { default as FlexItem } from './flex/item';
+export { Flex, FlexBlock, FlexItem } from './flex';
 export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';
 export { default as FontSizePicker } from './font-size-picker';
@@ -71,8 +68,11 @@ export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as __experimentalCustomGradientPicker } from './custom-gradient-picker';
+export { Grid as __experimentalGrid } from './grid';
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
+export { Heading as __experimentalHeading } from './heading';
+export { HStack as __experimentalHStack } from './h-stack';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
 export { default as __experimentalInputControl } from './input-control';
@@ -108,9 +108,10 @@ export { default as SandBox } from './sandbox';
 export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
+export { Spacer as __experimentalSpacer } from './spacer';
 export { default as Spinner } from './spinner';
 export { default as TabPanel } from './tab-panel';
-export { default as __experimentalText } from './text';
+export { Text as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as TextHighlight } from './text-highlight';
@@ -118,6 +119,7 @@ export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
+export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
@@ -129,8 +131,13 @@ export {
 	TreeGridItem as __experimentalTreeGridItem,
 } from './tree-grid';
 export { default as TreeSelect } from './tree-select';
-export { default as __experimentalUnitControl } from './unit-control';
+export { Truncate as __experimentalTruncate } from './truncate';
+export {
+	default as __experimentalUnitControl,
+	useCustomUnits as __experimentalUseCustomUnits,
+} from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';
+export { VStack as __experimentalVStack } from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {
 	createSlotFill,
@@ -139,6 +146,8 @@ export {
 	Provider as SlotFillProvider,
 	useSlot as __experimentalUseSlot,
 } from './slot-fill';
+export { default as __experimentalStyleProvider } from './style-provider';
+export { ZStack as __experimentalZStack } from './z-stack';
 
 // Higher-Order Components
 export {
@@ -155,9 +164,3 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
-
-// Component System
-export {
-	withNext as __unstableWithNext,
-	ComponentSystemProvider as __unstableComponentSystemProvider,
-} from './ui/context';

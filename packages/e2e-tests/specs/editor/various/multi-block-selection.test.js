@@ -36,8 +36,9 @@ async function getSelectedFlatIndices() {
  * Tests if the native selection matches the block selection.
  */
 async function testNativeSelection() {
-	// Wait for the selection to update.
-	await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
+	// Wait for the selection to update and async mode to update classes of
+	// deselected blocks.
+	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 	await page.evaluate( () => {
 		const selection = window.getSelection();
 		const elements = Array.from(
@@ -587,6 +588,57 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyWithModifier( 'primary', 'v' );
 
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	// Previously we would unexpectedly duplicate the block on Enter.
+	it( 'should not multi select single block', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should gradually multi-select', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '/columns' );
+		await page.keyboard.press( 'Enter' );
+		// Select two columns.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		// Navigate to appender.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		// Select a paragraph.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		// Confirm correct setup: two columns with two paragraphs in the first.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		await page.waitForSelector(
+			'[data-type="core/paragraph"].is-multi-selected'
+		);
+
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		await page.waitForSelector(
+			'[data-type="core/column"].is-multi-selected'
+		);
+
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect both columns to be deleted.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

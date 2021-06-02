@@ -20,7 +20,8 @@ import { focus } from '@wordpress/dom';
  */
 import { StyledWrapper } from './styles/disabled-styles';
 
-const { Consumer, Provider } = createContext( false );
+const Context = createContext( false );
+const { Consumer, Provider } = Context;
 
 /**
  * Names of control nodes which qualify for disabled behavior.
@@ -41,10 +42,26 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
 	'TEXTAREA',
 ];
 
+/**
+ * @typedef OwnProps
+ * @property {string} [className] Classname for the disabled element.
+ * @property {import('react').ReactNode} children Children to disable.
+ * @property {boolean} [isDisabled=true] Whether to disable the children.
+ */
+
+/**
+ * @param {OwnProps & import('react').HTMLAttributes<HTMLDivElement>} props
+ * @return {JSX.Element} Element wrapping the children to disable them when isDisabled is true.
+ */
 function Disabled( { className, children, isDisabled = true, ...props } ) {
-	const node = useRef();
+	/** @type {import('react').RefObject<HTMLDivElement>} */
+	const node = useRef( null );
 
 	const disable = () => {
+		if ( ! node.current ) {
+			return;
+		}
+
 		focus.focusable.find( node.current ).forEach( ( focusable ) => {
 			if (
 				includes( DISABLED_ELIGIBLE_NODE_NAMES, focusable.nodeName )
@@ -53,7 +70,7 @@ function Disabled( { className, children, isDisabled = true, ...props } ) {
 			}
 
 			if ( focusable.nodeName === 'A' ) {
-				focusable.setAttribute( 'tabindex', -1 );
+				focusable.setAttribute( 'tabindex', '-1' );
 			}
 
 			const tabIndex = focusable.getAttribute( 'tabindex' );
@@ -70,7 +87,7 @@ function Disabled( { className, children, isDisabled = true, ...props } ) {
 	// Debounce re-disable since disabling process itself will incur
 	// additional mutations which should be ignored.
 	const debouncedDisable = useCallback(
-		debounce( disable, { leading: true } ),
+		debounce( disable, undefined, { leading: true } ),
 		[]
 	);
 
@@ -81,15 +98,21 @@ function Disabled( { className, children, isDisabled = true, ...props } ) {
 
 		disable();
 
-		const observer = new window.MutationObserver( debouncedDisable );
-		observer.observe( node.current, {
-			childList: true,
-			attributes: true,
-			subtree: true,
-		} );
+		/** @type {MutationObserver | undefined} */
+		let observer;
+		if ( node.current ) {
+			observer = new window.MutationObserver( debouncedDisable );
+			observer.observe( node.current, {
+				childList: true,
+				attributes: true,
+				subtree: true,
+			} );
+		}
 
 		return () => {
-			observer.disconnect();
+			if ( observer ) {
+				observer.disconnect();
+			}
 			debouncedDisable.cancel();
 		};
 	}, [] );
@@ -111,6 +134,7 @@ function Disabled( { className, children, isDisabled = true, ...props } ) {
 	);
 }
 
+Disabled.Context = Context;
 Disabled.Consumer = Consumer;
 
 export default Disabled;

@@ -2,7 +2,7 @@
 
 This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
-To release a stable version of the Gutenberg plugin, you need approval from a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core) for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release.
+To release a stable version of the Gutenberg plugin, you need approval from a member of the Gutenberg Core team for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release. You can ping in the [#core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7).
 
 To release Gutenberg's npm packages, you need to be part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
 
@@ -41,7 +41,7 @@ Only once you're happy with the shape of the release notes should you press the 
 1. Use the release notes that you just edited to update `changelog.txt`, and
 2. upload the new plugin version to the WordPress.org plugin repository (SVN) (only if you're releasing a stable version).
 
-The latter step needs approval by a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core). Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
+The latter step needs approval by a member of the Gutenberg Core team. Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
 This will cause the new version to be available to users of WordPress all over the globe! 💃
 You should check that folks are able to install the new version from their Dashboard.
@@ -67,7 +67,7 @@ You should also include a performance audit at the end of the release post. You 
 
 Compile this to a draft post on [make.wordpress.org/core](https://make.wordpress.org/core/); this post should be published after the actual release.
 
-If you don't have access to [make.wordpress.org/core](https://make.wordpress.org/core/), ping [someone on the Gutenberg Core team](https://github.com/orgs/WordPress/teams/gutenberg-core) in the [WordPress #core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7) to publish the post.
+If you don't have access to [make.wordpress.org/core](https://make.wordpress.org/core/), ping someone on the Gutenberg Core team in the [WordPress #core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7) to publish the post.
 
 ### Creating Release Candidate Patches (done via `git cherry-pick`)
 
@@ -112,7 +112,7 @@ The first step is automated via `./bin/plugin/cli.js npm-latest` command. You on
 7. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch. Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number after every major WordPress release. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version. This is important as the patch version numbers should be reserved in case bug fixes are needed for a minor WordPress release (see below).
 8. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
 9. From the `wp/trunk` branch, install npm dependencies with `npm ci`.
-10. Run the script `npm run publish:prod`.
+10. Run the script `npm run publish:latest`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
     - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
@@ -215,11 +215,11 @@ Now that the changes have been committed to the `wp/trunk` branch and the Travis
     > @wordpress/scripts
     > lerna success found 3 packages ready to publish
     > ```
-2. Run the `npm run publish:prod` command (see more in [package release process]) but when asked for the version numbers to choose for each package use the versions you made note of above when updating each packages `CHANGELOG.md` file.
+2. Run the `npm run publish:latest` command (see more in [package release process]) but when asked for the version numbers to choose for each package use the versions you made note of above when updating each packages `CHANGELOG.md` file.
     > Truncated example of publishing process output
     >
     > ```
-    > npm run publish:prod
+    > npm run publish:latest
     >
     > Build Progress: [==============================] 100%
     > lerna notice cli v3.18.2

@@ -10,14 +10,18 @@
 				"attrs": {},
 				"innerBlocks": [],
 				"innerHTML": "\n\t<p>Column One, Paragraph One</p>\n\t",
-				"innerContent": [ "\n\t<p>Column One, Paragraph One</p>\n\t" ]
+				"innerContent": [
+					"\n\t<p>Column One, Paragraph One</p>\n\t"
+				]
 			},
 			{
 				"blockName": "core/paragraph",
 				"attrs": {},
 				"innerBlocks": [],
 				"innerHTML": "\n\t<p>Column One, Paragraph Two</p>\n\t",
-				"innerContent": [ "\n\t<p>Column One, Paragraph Two</p>\n\t" ]
+				"innerContent": [
+					"\n\t<p>Column One, Paragraph Two</p>\n\t"
+				]
 			}
 		],
 		"innerHTML": "\n<div class=\"wp-block-column\" style=\"flex-basis:33.33%\">\n\t\n\t\n</div>\n",
@@ -28,12 +32,5 @@
 			null,
 			"\n</div>\n"
 		]
-	},
-	{
-		"blockName": null,
-		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n",
-		"innerContent": [ "\n" ]
 	}
 ]

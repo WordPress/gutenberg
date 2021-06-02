@@ -181,6 +181,10 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="deleteAllWidgets" href="#deleteAllWidgets">#</a> **deleteAllWidgets**
+
+Delete all the widgets in the widgets screen.
+
 <a name="deleteTheme" href="#deleteTheme">#</a> **deleteTheme**
 
 Deletes a theme from the site, activating another theme if necessary.
@@ -716,6 +720,19 @@ _Parameters_
 <a name="wpDataSelect" href="#wpDataSelect">#</a> **wpDataSelect**
 
 Queries the WordPress data module.
+
+`page.evaluate` - used in the function - returns `undefined`
+when it encounters a non-serializable value.
+Since we store many different values in the data module,
+you can end up with an `undefined` result. Before using
+this function, make sure the data you are querying
+doesn't contain non-serializable values, for example,
+functions, DOM element handles, etc.
+
+_Related_
+
+-   <https://pptr.dev/#?product=Puppeteer&version=v9.0.0&show=api-pageevaluatepagefunction-args>
+-   <https://github.com/WordPress/gutenberg/pull/31199>
 
 _Parameters_
 

@@ -10,6 +10,7 @@ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	withNotices,
+	ResizableBox,
 	ToolbarButton,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -33,6 +34,10 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import FileBlockInspector from './inspector';
+import { browserSupportsPdfs } from './utils';
+
+export const MIN_PREVIEW_HEIGHT = 200;
+export const MAX_PREVIEW_HEIGHT = 2000;
 
 function ClipboardToolbarButton( { text, disabled } ) {
 	const { createNotice } = useDispatch( noticesStore );
@@ -54,7 +59,13 @@ function ClipboardToolbarButton( { text, disabled } ) {
 	);
 }
 
-function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
+function FileEdit( {
+	attributes,
+	isSelected,
+	setAttributes,
+	noticeUI,
+	noticeOperations,
+} ) {
 	const {
 		id,
 		fileName,
@@ -63,6 +74,8 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 		textLinkTarget,
 		showDownloadButton,
 		downloadButtonText,
+		displayPreview,
+		previewHeight,
 	} = attributes;
 	const [ hasError, setHasError ] = useState( false );
 	const { media, mediaUpload } = useSelect(
@@ -75,6 +88,8 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 		} ),
 		[ id ]
 	);
+
+	const { toggleSelection } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		// Upload a file drag-and-dropped into the editor
@@ -101,11 +116,14 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 	function onSelectFile( newMedia ) {
 		if ( newMedia && newMedia.url ) {
 			setHasError( false );
+			const isPdf = newMedia.url.endsWith( '.pdf' );
 			setAttributes( {
 				href: newMedia.url,
 				fileName: newMedia.title,
 				textLinkHref: newMedia.url,
 				id: newMedia.id,
+				displayPreview: isPdf ? true : undefined,
+				previewHeight: isPdf ? 600 : undefined,
 			} );
 		}
 	}
@@ -138,6 +156,25 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 		} );
 	}
 
+	function changeDisplayPreview( newValue ) {
+		setAttributes( { displayPreview: newValue } );
+	}
+
+	function handleOnResizeStop( event, direction, elt, delta ) {
+		toggleSelection( true );
+
+		const newHeight = parseInt( previewHeight + delta.height, 10 );
+		setAttributes( { previewHeight: newHeight } );
+	}
+
+	function changePreviewHeight( newValue ) {
+		const newHeight = Math.max(
+			parseInt( newValue, 10 ),
+			MIN_PREVIEW_HEIGHT
+		);
+		setAttributes( { previewHeight: newHeight } );
+	}
+
 	const attachmentPage = media && media.link;
 
 	const blockProps = useBlockProps( {
@@ -148,6 +185,8 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 			}
 		),
 	} );
+
+	const displayPreviewInEditor = browserSupportsPdfs() && displayPreview;
 
 	if ( ! href || hasError ) {
 		return (
@@ -179,6 +218,10 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 					changeLinkDestinationOption,
 					changeOpenInNewWindow,
 					changeShowDownloadButton,
+					displayPreview,
+					changeDisplayPreview,
+					previewHeight,
+					changePreviewHeight,
 				} }
 			/>
 			<BlockControls group="other">
@@ -195,10 +238,43 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
+				{ displayPreviewInEditor && (
+					<ResizableBox
+						size={ { height: previewHeight } }
+						minHeight={ MIN_PREVIEW_HEIGHT }
+						maxHeight={ MAX_PREVIEW_HEIGHT }
+						minWidth="100%"
+						grid={ [ 10, 10 ] }
+						enable={ {
+							top: false,
+							right: false,
+							bottom: true,
+							left: false,
+							topRight: false,
+							bottomRight: false,
+							bottomLeft: false,
+							topLeft: false,
+						} }
+						onResizeStart={ () => toggleSelection( false ) }
+						onResizeStop={ handleOnResizeStop }
+						showHandle={ isSelected }
+					>
+						<object
+							className="wp-block-file__preview"
+							data={ href }
+							type="application/pdf"
+							aria-label={ __(
+								'Embed of the selected PDF file.'
+							) }
+						/>
+						{ ! isSelected && (
+							<div className="wp-block-file__preview-overlay" />
+						) }
+					</ResizableBox>
+				) }
 				<div className={ 'wp-block-file__content-wrapper' }>
 					<RichText
-						style={ { display: 'inline-block' } }
-						tagName="a" // must be block-level or else cursor disappears
+						tagName="a"
 						value={ fileName }
 						placeholder={ __( 'Write file name…' ) }
 						withoutInteractiveFormatting

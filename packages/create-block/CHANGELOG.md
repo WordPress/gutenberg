@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 2.3.0 (2021-04-29)
+
 ### Enhancement
 
+-   Rename `format:js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
 -   Updated `.editorconfig` template files to work with automatic file formatting ([#30794](https://github.com/WordPress/gutenberg/pull/30794)).
 
 ## 2.2.0 (2021-04-06)

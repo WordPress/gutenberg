@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "13.0.1",
+	"version": "14.1.1",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -18,6 +18,9 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
@@ -27,10 +30,9 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
+		"@emotion/cache": "^10.0.27",
 		"@emotion/core": "^10.1.1",
 		"@emotion/css": "^10.0.22",
-		"@emotion/hash": "^0.8.0",
-		"@emotion/native": "^10.0.22",
 		"@emotion/styled": "^10.0.23",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
@@ -46,20 +48,14 @@
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/warning": "file:../warning",
-		"@wp-g2/components": "^0.0.160",
-		"@wp-g2/context": "^0.0.160",
-		"@wp-g2/styles": "^0.0.160",
-		"@wp-g2/utils": "^0.0.160",
 		"classnames": "^2.2.5",
-		"create-emotion": "^10.0.27",
 		"dom-scroll-into-view": "^1.2.1",
 		"downshift": "^6.0.15",
+		"emotion": "^10.0.23",
 		"gradient-parser": "^0.1.5",
 		"highlight-words-core": "^1.2.2",
-		"hoist-non-react-statics": "^3.3.2",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
-		"mitt": "^2.1.0",
 		"moment": "^2.22.1",
 		"re-resizable": "^6.4.0",
 		"react-dates": "^17.1.1",
@@ -68,12 +64,10 @@
 		"react-use-gesture": "^9.0.0",
 		"reakit": "^1.3.5",
 		"rememo": "^3.0.0",
-		"styled-griddie": "^0.1.3",
 		"tinycolor2": "^1.4.2",
 		"uuid": "^8.3.0"
 	},
 	"peerDependencies": {
-		"@wp-g2/create-styles": "^0.0.154",
 		"reakit-utils": "^0.15.1"
 	},
 	"publishConfig": {

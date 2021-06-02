@@ -8,6 +8,8 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -15,30 +17,25 @@ import { __ } from '@wordpress/i18n';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
+	const { getBlockSelectionStart } = useSelect( blockEditorStore );
 	const {
-		getBlockSelectionStart,
 		getEditorMode,
 		isEditorSidebarOpened,
-		richEditingEnabled,
-		codeEditingEnabled,
-	} = useSelect( ( select ) => {
-		const settings = select( 'core/editor' ).getEditorSettings();
-		return {
-			getBlockSelectionStart: select( 'core/block-editor' )
-				.getBlockSelectionStart,
-			getEditorMode: select( editPostStore ).getEditorMode,
-			isEditorSidebarOpened: select( editPostStore )
-				.isEditorSidebarOpened,
-			richEditingEnabled: settings.richEditingEnabled,
-			codeEditingEnabled: settings.codeEditingEnabled,
-		};
-	} );
+		isListViewOpened,
+	} = useSelect( editPostStore );
+	const isModeToggleDisabled = useSelect( ( select ) => {
+		const { richEditingEnabled, codeEditingEnabled } = select(
+			editorStore
+		).getEditorSettings();
+		return ! richEditingEnabled || ! codeEditingEnabled;
+	}, [] );
 
 	const {
 		switchEditorMode,
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		toggleFeature,
+		setIsListViewOpened,
 	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
@@ -135,7 +132,7 @@ function KeyboardShortcuts() {
 		},
 		{
 			bindGlobal: true,
-			isDisabled: ! richEditingEnabled || ! codeEditingEnabled,
+			isDisabled: isModeToggleDisabled,
 		}
 	);
 
@@ -165,6 +162,12 @@ function KeyboardShortcuts() {
 				openGeneralSidebar( sidebarToOpen );
 			}
 		},
+		{ bindGlobal: true }
+	);
+
+	useShortcut(
+		'core/edit-post/toggle-block-navigation',
+		() => setIsListViewOpened( ! isListViewOpened() ),
 		{ bindGlobal: true }
 	);
 

@@ -16,7 +16,7 @@ import {
 	FontSizePicker,
 } from '../components/font-sizes';
 import { cleanEmptyObject } from './utils';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 
 export const FONT_SIZE_SUPPORT_KEY = 'fontSize';
 
@@ -54,6 +54,12 @@ function addAttributes( settings ) {
  */
 function addSaveProps( props, blockType, attributes ) {
 	if ( ! hasBlockSupport( blockType, FONT_SIZE_SUPPORT_KEY ) ) {
+		return props;
+	}
+
+	if (
+		hasBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
+	) {
 		return props;
 	}
 
@@ -103,7 +109,7 @@ export function FontSizeEdit( props ) {
 		setAttributes,
 	} = props;
 	const isDisabled = useIsFontSizeDisabled( props );
-	const fontSizes = useEditorFeature( 'typography.fontSizes' );
+	const fontSizes = useSetting( 'typography.fontSizes' );
 
 	const onChange = ( value ) => {
 		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
@@ -143,7 +149,7 @@ export function FontSizeEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
-	const fontSizes = useEditorFeature( 'typography.fontSizes' );
+	const fontSizes = useSetting( 'typography.fontSizes' );
 	const hasFontSizes = !! fontSizes?.length;
 
 	return (
@@ -161,37 +167,45 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
  */
 const withFontSizeInlineStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const fontSizes = useEditorFeature( 'typography.fontSizes' );
+		const fontSizes = useSetting( 'typography.fontSizes' );
 		const {
 			name: blockName,
 			attributes: { fontSize, style },
 			wrapperProps,
 		} = props;
 
-		const newProps = { ...props };
-
-		// Only add inline styles if the block supports font sizes, doesn't
-		// already have an inline font size, and does have a class to extract
-		// the font size from.
+		// Only add inline styles if the block supports font sizes,
+		// doesn't skip serialization of font sizes,
+		// doesn't already have an inline font size,
+		// and does have a class to extract the font size from.
 		if (
-			hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) &&
-			fontSize &&
-			! style?.typography?.fontSize
+			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
+			hasBlockSupport(
+				blockName,
+				'__experimentalSkipFontSizeSerialization'
+			) ||
+			! fontSize ||
+			style?.typography?.fontSize
 		) {
-			const fontSizeValue = getFontSize(
-				fontSizes,
-				fontSize,
-				style?.typography?.fontSize
-			).size;
+			return <BlockListBlock { ...props } />;
+		}
 
-			newProps.wrapperProps = {
+		const fontSizeValue = getFontSize(
+			fontSizes,
+			fontSize,
+			style?.typography?.fontSize
+		).size;
+
+		const newProps = {
+			...props,
+			wrapperProps: {
 				...wrapperProps,
 				style: {
 					fontSize: fontSizeValue,
 					...wrapperProps?.style,
 				},
-			};
-		}
+			},
+		};
 
 		return <BlockListBlock { ...newProps } />;
 	},

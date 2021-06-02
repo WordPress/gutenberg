@@ -23,21 +23,14 @@ import {
 	InspectorAdvancedControls,
 	RichText,
 	useBlockProps,
+	__experimentalUseColorProps as useColorProps,
 	__experimentalLinkControl as LinkControl,
-	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import getColorAndStyleProps from './color-props';
-
 const NEW_TAB_REL = 'noreferrer noopener';
-
-const EMPTY_ARRAY = [];
 
 function WidthPanel( { selectedWidth, setAttributes } ) {
 	function handleChange( newWidth ) {
@@ -56,7 +49,11 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 						<Button
 							key={ widthValue }
 							isSmall
-							isPrimary={ widthValue === selectedWidth }
+							variant={
+								widthValue === selectedWidth
+									? 'primary'
+									: undefined
+							}
 							onClick={ () => handleChange( widthValue ) }
 						>
 							{ widthValue }%
@@ -174,7 +171,6 @@ function ButtonEdit( props ) {
 		},
 		[ setAttributes ]
 	);
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -201,7 +197,7 @@ function ButtonEdit( props ) {
 	};
 
 	const borderRadius = style?.border?.radius;
-	const colorProps = getColorAndStyleProps( attributes, colors, true );
+	const colorProps = useColorProps( attributes );
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
 

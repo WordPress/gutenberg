@@ -41,11 +41,10 @@ export default function ButtonsEdit( {
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const { marginLeft: spacing } = styles.spacing;
 
-	const { getBlockOrder, isInnerButtonSelected, shouldDelete } = useSelect(
+	const { isInnerButtonSelected, shouldDelete } = useSelect(
 		( select ) => {
 			const {
 				getBlockCount,
-				getBlockOrder: _getBlockOrder,
 				getBlockParents,
 				getSelectedBlockClientId,
 			} = select( blockEditorStore );
@@ -56,7 +55,6 @@ export default function ButtonsEdit( {
 			);
 
 			return {
-				getBlockOrder: _getBlockOrder,
 				isInnerButtonSelected: selectedBlockParents[ 0 ] === clientId,
 				// The purpose of `shouldDelete` check is giving the ability to
 				// pass to mobile toolbar function called `onDelete` which removes
@@ -67,7 +65,7 @@ export default function ButtonsEdit( {
 		},
 		[ clientId ]
 	);
-
+	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { insertBlock, removeBlock, selectBlock } = useDispatch(
 		blockEditorStore
 	);

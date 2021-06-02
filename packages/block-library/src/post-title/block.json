@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-title",
+	"title": "Post Title",
 	"category": "design",
+	"description": "Displays the title of a post, page, or any other content-type.",
+	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {
 		"textAlign": {
@@ -34,51 +37,7 @@
 		},
 		"fontSize": true,
 		"lineHeight": true,
-		"__experimentalFontFamily": true,
-		"__experimentalSelector": {
-			"core/post-title/h1": {
-				"title": "h1",
-				"selector": "h1.wp-block-post-title",
-				"attributes": {
-					"level": 1
-				}
-			},
-			"core/post-title/h2": {
-				"title": "h2",
-				"selector": "h2.wp-block-post-title",
-				"attributes": {
-					"level": 2
-				}
-			},
-			"core/post-title/h3": {
-				"title": "h3",
-				"selector": "h3.wp-block-post-title",
-				"attributes": {
-					"level": 3
-				}
-			},
-			"core/post-title/h4": {
-				"title": "h4",
-				"selector": "h4.wp-block-post-title",
-				"attributes": {
-					"level": 4
-				}
-			},
-			"core/post-title/h5": {
-				"title": "h5",
-				"selector": "h5.wp-block-post-title",
-				"attributes": {
-					"level": 5
-				}
-			},
-			"core/post-title/h6": {
-				"title": "h6",
-				"selector": "h6.wp-block-post-title",
-				"attributes": {
-					"level": 6
-				}
-			}
-		}
+		"__experimentalFontFamily": true
 	},
 	"style": "wp-block-post-title"
 }

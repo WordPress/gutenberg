@@ -90,9 +90,8 @@ function gutenberg_edit_site_init( $hook ) {
 	$current_screen->is_block_editor( true );
 
 	$settings = array_merge(
-		gutenberg_get_common_block_editor_settings(),
+		gutenberg_get_default_block_editor_settings(),
 		array(
-			'alignWide'                            => get_theme_support( 'align-wide' ),
 			'siteUrl'                              => site_url(),
 			'postsPerPage'                         => get_option( 'posts_per_page' ),
 			'styles'                               => gutenberg_get_editor_styles(),
@@ -110,7 +109,7 @@ function gutenberg_edit_site_init( $hook ) {
 		array(
 			'preload_paths'    => array(
 				array( '/wp/v2/media', 'OPTIONS' ),
-				'/?context=edit',
+				'/',
 				'/wp/v2/types?context=edit',
 				'/wp/v2/taxonomies?context=edit',
 				'/wp/v2/pages?context=edit',

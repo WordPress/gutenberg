@@ -16,7 +16,10 @@
 					"caption": ""
 				}
 			],
-			"ids": [ null, null ],
+			"ids": [
+				null,
+				null
+			],
 			"caption": "",
 			"imageCrop": true,
 			"linkTo": "none",

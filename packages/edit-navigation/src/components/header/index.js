@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { DropdownMenu } from '@wordpress/components';
@@ -15,6 +10,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import SaveButton from './save-button';
 import MenuSwitcher from '../menu-switcher';
+import { useMenuEntityProp } from '../../hooks';
 
 export default function Header( {
 	isMenuSelected,
@@ -24,8 +20,7 @@ export default function Header( {
 	isPending,
 	navigationPost,
 } ) {
-	const selectedMenu = find( menus, { id: selectedMenuId } );
-	const menuName = selectedMenu ? selectedMenu.name : undefined;
+	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
 	let actionHeaderText;
 
 	if ( menuName ) {
@@ -61,7 +56,7 @@ export default function Header( {
 								'Switch menu, or create a new menu'
 							),
 							showTooltip: false,
-							isTertiary: true,
+							variant: 'tertiary',
 							disabled: ! menus?.length,
 							__experimentalIsFocusable: true,
 						} }

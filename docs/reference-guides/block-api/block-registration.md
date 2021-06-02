@@ -1,4 +1,8 @@
-# Block Registration
+# Registration
+
+Block registration API reference.
+
+**Note:** You can use the functions documented on this page, but a flexible method to register new block types is to use the block.json metadata file. See [metadata documentation for complete information](/docs/reference-guides/block-api/block-metadata.md).
 
 ## `registerBlockType`
 
@@ -117,7 +121,7 @@ keywords: [ __( 'image' ), __( 'photo' ), __( 'pics' ) ],
 
 -   **Type:** `Array`
 
-Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the style variation if it is selected.
+Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.
 
 ```js
 // Register block styles.
@@ -139,7 +143,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-style-variations) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-styles) for existing blocks.
 
 #### attributes (optional)
 
@@ -225,7 +229,7 @@ example: {
 
 -   **Type:** `Object[]`
 
-Similarly to how the block's style variations can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted. See the [Block Variations API](/docs/reference-guides/block-api/block-variations.md) for more details.
+Similarly to how the block's styles can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted. See the [Block Variations API](/docs/reference-guides/block-api/block-variations.md) for more details.
 
 #### supports (optional)
 

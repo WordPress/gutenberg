@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/hooks --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ### Usage
 
@@ -29,7 +29,7 @@ In the above example, we are creating a custom instance of the `Hooks` object an
 
 In the WordPress context, that enables API functions to be called via the global `wp.hooks` object, like `wp.hooks.addAction()`, etc.
 
-One notable difference between the JS and PHP hooks API is that in the JS version, `addAction()` and `addFilter()` also need to include a namespace as the second argument.
+One notable difference between the JS and PHP hooks API is that in the JS version, `addAction()` and `addFilter()` also need to include a namespace as the second argument. Namespace uniquely identifies a callback in the form `vendor/plugin/function`.
 
 ### API Usage
 

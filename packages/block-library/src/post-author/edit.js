@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -117,8 +117,8 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );

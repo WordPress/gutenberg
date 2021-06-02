@@ -27,6 +27,9 @@ import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
+import { layout } from '@wordpress/icons';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -40,7 +43,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { cleanForSlug } from '../utils/url';
-import { getTemplatePartIconByArea } from './utils/get-template-part-icon';
+import { getTemplatePartIcon } from './utils/get-template-part-icon';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -68,7 +71,7 @@ const EMPTY_ARRAY = [];
  * @return {boolean} Whether undo history exists.
  */
 export const hasEditorUndo = createRegistrySelector( ( select ) => () => {
-	return select( 'core' ).hasUndo();
+	return select( coreStore ).hasUndo();
 } );
 
 /**
@@ -80,7 +83,7 @@ export const hasEditorUndo = createRegistrySelector( ( select ) => () => {
  * @return {boolean} Whether redo history exists.
  */
 export const hasEditorRedo = createRegistrySelector( ( select ) => () => {
-	return select( 'core' ).hasRedo();
+	return select( coreStore ).hasRedo();
 } );
 
 /**
@@ -132,7 +135,7 @@ export const isEditedPostDirty = createRegistrySelector(
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
 		if (
-			select( 'core' ).hasEditsForEntityRecord(
+			select( coreStore ).hasEditsForEntityRecord(
 				'postType',
 				postType,
 				postId
@@ -155,7 +158,7 @@ export const isEditedPostDirty = createRegistrySelector(
 export const hasNonPostEntityChanges = createRegistrySelector(
 	( select ) => ( state ) => {
 		const dirtyEntityRecords = select(
-			'core'
+			coreStore
 		).__experimentalGetDirtyEntityRecords();
 		const { type, id } = getCurrentPost( state );
 		return some(
@@ -194,7 +197,7 @@ export const getCurrentPost = createRegistrySelector(
 		const postId = getCurrentPostId( state );
 		const postType = getCurrentPostType( state );
 
-		const post = select( 'core' ).getRawEntityRecord(
+		const post = select( coreStore ).getRawEntityRecord(
 			'postType',
 			postType,
 			postId
@@ -276,8 +279,11 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
 	return (
-		select( 'core' ).getEntityRecordEdits( 'postType', postType, postId ) ||
-		EMPTY_OBJECT
+		select( coreStore ).getEntityRecordEdits(
+			'postType',
+			postType,
+			postId
+		) || EMPTY_OBJECT
 	);
 } );
 
@@ -312,7 +318,7 @@ export const getReferenceByDistinctEdits = createRegistrySelector(
 			}
 		);
 
-		return select( 'core' ).getReferenceByDistinctEdits();
+		return select( coreStore ).getReferenceByDistinctEdits();
 	}
 );
 
@@ -420,10 +426,10 @@ export const getAutosaveAttribute = createRegistrySelector(
 
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		const currentUserId = get( select( 'core' ).getCurrentUser(), [
+		const currentUserId = get( select( coreStore ).getCurrentUser(), [
 			'id',
 		] );
-		const autosave = select( 'core' ).getAutosave(
+		const autosave = select( coreStore ).getAutosave(
 			postType,
 			postId,
 			currentUserId
@@ -626,11 +632,11 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		const hasFetchedAutosave = select( 'core' ).hasFetchedAutosaves(
+		const hasFetchedAutosave = select( coreStore ).hasFetchedAutosaves(
 			postType,
 			postId
 		);
-		const currentUserId = get( select( 'core' ).getCurrentUser(), [
+		const currentUserId = get( select( coreStore ).getCurrentUser(), [
 			'id',
 		] );
 
@@ -638,7 +644,7 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		// via a resolver, moving below the return would result in the autosave never
 		// being fetched.
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const autosave = select( 'core' ).getAutosave(
+		const autosave = select( coreStore ).getAutosave(
 			postType,
 			postId,
 			currentUserId
@@ -693,8 +699,8 @@ export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
 
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
-	const autosave = select( 'core' ).getAutosave(
+	const currentUserId = get( select( coreStore ).getCurrentUser(), [ 'id' ] );
+	const autosave = select( coreStore ).getAutosave(
 		postType,
 		postId,
 		currentUserId
@@ -721,8 +727,12 @@ export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
 
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
-	return !! select( 'core' ).getAutosave( postType, postId, currentUserId );
+	const currentUserId = get( select( coreStore ).getCurrentUser(), [ 'id' ] );
+	return !! select( coreStore ).getAutosave(
+		postType,
+		postId,
+		currentUserId
+	);
 } );
 
 /**
@@ -785,7 +795,7 @@ export function isEditedPostDateFloating( state ) {
 export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	return select( 'core' ).isSavingEntityRecord(
+	return select( coreStore ).isSavingEntityRecord(
 		'postType',
 		postType,
 		postId
@@ -804,7 +814,7 @@ export const didPostSaveRequestSucceed = createRegistrySelector(
 	( select ) => ( state ) => {
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		return ! select( 'core' ).getLastEntitySaveError(
+		return ! select( coreStore ).getLastEntitySaveError(
 			'postType',
 			postType,
 			postId
@@ -824,7 +834,7 @@ export const didPostSaveRequestFail = createRegistrySelector(
 	( select ) => ( state ) => {
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		return !! select( 'core' ).getLastEntitySaveError(
+		return !! select( coreStore ).getLastEntitySaveError(
 			'postType',
 			postType,
 			postId
@@ -989,7 +999,7 @@ export const getEditedPostContent = createRegistrySelector(
 	( select ) => ( state ) => {
 		const postId = getCurrentPostId( state );
 		const postType = getCurrentPostType( state );
-		const record = select( 'core' ).getEditedEntityRecord(
+		const record = select( coreStore ).getEditedEntityRecord(
 			'postType',
 			postType,
 			postId
@@ -1330,7 +1340,7 @@ function getBlockEditorSelector( name ) {
 			alternative: "`wp.data.select( 'core/block-editor' )." + name + '`',
 		} );
 
-		return select( 'core/block-editor' )[ name ]( ...args );
+		return select( blockEditorStore )[ name ]( ...args );
 	} );
 }
 
@@ -1680,9 +1690,10 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
  */
 export const __experimentalGetDefaultTemplatePartAreas = createSelector(
 	( state ) => {
-		const areas = getEditorSettings( state )?.defaultTemplatePartAreas;
+		const areas =
+			getEditorSettings( state )?.defaultTemplatePartAreas || [];
 		return areas?.map( ( item ) => {
-			return { ...item, icon: getTemplatePartIconByArea( item.area ) };
+			return { ...item, icon: getTemplatePartIcon( item.icon ) };
 		} );
 	},
 	( state ) => [ getEditorSettings( state )?.defaultTemplatePartAreas ]
@@ -1723,7 +1734,10 @@ export function __experimentalGetTemplateInfo( state, template ) {
 
 	const templateTitle = isString( title ) ? title : title?.rendered;
 	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
-	const templateIcon = getTemplatePartIconByArea( area );
+	const templateIcon =
+		__experimentalGetDefaultTemplatePartAreas( state ).find(
+			( item ) => area === item.area
+		)?.icon || layout;
 
 	return {
 		title:

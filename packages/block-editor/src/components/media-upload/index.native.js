@@ -1,7 +1,16 @@
 /**
+ * External dependencies
+ */
+import { Platform } from 'react-native';
+
+import { delay } from 'lodash';
+
+import prompt from 'react-native-prompt-android';
+
+/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, React } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
 import {
@@ -15,6 +24,7 @@ import {
 	image,
 	wordpress,
 	mobile,
+	globe,
 } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
@@ -26,20 +36,21 @@ export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
 
+const PICKER_OPENING_DELAY = 200;
+
 export class MediaUpload extends Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
 		this.getAllSources = this.getAllSources.bind( this );
-
 		this.state = {
 			otherMediaOptions: [],
 		};
 	}
 
 	componentDidMount() {
-		const { allowedTypes = [] } = this.props;
+		const { allowedTypes = [], autoOpen } = this.props;
 		getOtherMediaOptions( allowedTypes, ( otherMediaOptions ) => {
 			const otherMediaOptionsWithIcons = otherMediaOptions.map(
 				( option ) => {
@@ -54,6 +65,10 @@ export class MediaUpload extends Component {
 
 			this.setState( { otherMediaOptions: otherMediaOptionsWithIcons } );
 		} );
+
+		if ( autoOpen ) {
+			this.onPickerPresent();
+		}
 	}
 
 	getAllSources() {
@@ -99,11 +114,20 @@ export class MediaUpload extends Component {
 			mediaLibrary: true,
 		};
 
+		const urlSource = {
+			id: 'URL',
+			value: 'URL',
+			label: __( 'Insert from URL' ),
+			types: [ MEDIA_TYPE_AUDIO ],
+			icon: globe,
+		};
+
 		const internalSources = [
 			deviceLibrarySource,
 			cameraImageSource,
 			cameraVideoSource,
 			siteLibrarySource,
+			urlSource,
 		];
 
 		return internalSources.concat( this.state.otherMediaOptions );
@@ -136,13 +160,52 @@ export class MediaUpload extends Component {
 	}
 
 	onPickerPresent() {
+		const { autoOpen } = this.props;
+		const isIOS = Platform.OS === 'ios';
+
 		if ( this.picker ) {
-			this.picker.presentPicker();
+			// the delay below is required because on iOS this action sheet gets dismissed by the close event of the Inserter
+			// so this delay allows the Inserter to be closed fully before presenting action sheet.
+			if ( autoOpen && isIOS ) {
+				delay(
+					() => this.picker.presentPicker(),
+					PICKER_OPENING_DELAY
+				);
+			} else {
+				this.picker.presentPicker();
+			}
 		}
 	}
 
 	onPickerSelect( value ) {
-		const { allowedTypes = [], onSelect, multiple = false } = this.props;
+		const {
+			allowedTypes = [],
+			onSelect,
+			onSelectURL,
+			multiple = false,
+		} = this.props;
+
+		if ( value === 'URL' ) {
+			prompt(
+				__( 'Type a URL' ), // title
+				undefined, // message
+				[
+					{
+						text: __( 'Cancel' ),
+						style: 'cancel',
+					},
+					{
+						text: __( 'Apply' ),
+						onPress: onSelectURL,
+					},
+				], // buttons
+				'plain-text', // type
+				undefined, // defaultValue
+				'url' // keyboardType
+			);
+			return;
+		}
+
 		const mediaSource = this.getAllSources()
 			.filter( ( source ) => source.value === value )
 			.shift();
