@@ -7,4 +7,11 @@
     <dimen name="toolbar_content_offset">72dp</dimen>
     <dimen name="toolbar_content_offset_end">0dp</dimen>
 
+    <dimen name="foreground_view_padding_large">30dp</dimen>
+    <dimen name="foreground_view_padding_medium">16dp</dimen>
+    <dimen name="foreground_view_padding_small">8dp</dimen>
+
+    <dimen name="foreground_view_text_size_large">20sp</dimen>
+    <dimen name="foreground_view_text_size_medium">16sp</dimen>
+
 </resources>
