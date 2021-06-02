@@ -16,7 +16,7 @@ function CardFooter( props, forwardedRef ) {
 }
 
 /**
- * `CardFooter` is a layout component, rendering the footer content of a `Card`.
+ * `CardFooter` renders an optional footer within a `Card`.
  *
  * @example
  * ```jsx
