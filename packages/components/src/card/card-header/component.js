@@ -16,7 +16,7 @@ function CardHeader( props, forwardedRef ) {
 }
 
 /**
- * `CardHeader` is a layout component, rendering the header contents of a `Card`.
+ * `CardHeader` renders an optional header within a `Card`.
  *
  * @example
  * ```jsx

@@ -1,7 +1,42 @@
 # CardHeader
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+`CardHeader` renders an optional header within a [`Card`](../card/README.md).
 
-TBD
+## Usage
+
+```jsx
+import { Card, CardHeader } from '@wordpress/components';
+
+const Example = () => (
+	<Card>
+ 		<CardHeader>...</CardHeader>
+ 		<CardBody>...</CardBody>
+	</Card>
+);
+```
+
+## Props
+
+Note: This component is connected to [`Card`'s Context](../card/README.md#context). Passing the `size` and `isBorderless` props directly to this component will override the value derived from context.
+
+### `isBorderless`: `boolean`
+
+Renders without a border.
+
+- Required: No
+- Default: `false`
+
+### `isShady`: `boolean`
+
+Renders with a light gray background color.
+
+-   Required: No
+-   Default: `false`
+
+### `size`: `string`
+
+Determines the amount of padding within the component.
+
+- Required: No
+- Default: `medium`
+- Allowed values: `none`, `xSmall`, `small`, `medium`, `large`
