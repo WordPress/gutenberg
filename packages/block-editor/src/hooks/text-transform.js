@@ -14,7 +14,8 @@ import { cleanEmptyObject } from './utils';
  * Key within block settings' supports array indicating support for text
  * transforms e.g. settings found in `block.json`.
  */
-export const TEXT_TRANSFORM_SUPPORT_KEY = '__experimentalTextTransform';
+export const TEXT_TRANSFORM_SUPPORT_KEY =
+	'typography.__experimentalTextTransform';
 
 /**
  * Inspector control panel containing the text transform options.
