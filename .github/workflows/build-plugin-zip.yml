@@ -22,6 +22,7 @@ jobs:
         name: Bump version
         runs-on: ubuntu-latest
         if: |
+            github.repository == 'WordPress/gutenberg' &&
             github.event_name == 'workflow_dispatch' &&
             github.ref == 'refs/heads/trunk' && (
               github.event.inputs.version == 'rc' ||
@@ -169,6 +170,8 @@ jobs:
         name: Create Release Draft and Attach Asset
         needs: [bump-version, build]
         runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
+
         steps:
             - name: Set Release Version
               id: get_release_version

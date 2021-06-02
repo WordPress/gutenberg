@@ -16,7 +16,7 @@ function navigationToggleModal( modal ) {
 	modal.classList.toggle( 'has-modal-open', ! isHidden );
 
 	// Add a class to indicate the modal is open.
-	const htmlElement = document.querySelector( 'html' );
+	const htmlElement = document.documentElement;
 	htmlElement.classList.toggle( 'has-modal-open' );
 }
 

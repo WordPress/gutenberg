@@ -8,7 +8,6 @@ import { useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { EditorImage } from './images';
 import { store as customizeWidgetsStore } from '../../store';
 
 export default function WelcomeGuide( { sidebar } ) {
@@ -22,7 +21,21 @@ export default function WelcomeGuide( { sidebar } ) {
 
 	return (
 		<div className="customize-widgets-welcome-guide">
-			<EditorImage />
+			<div className="customize-widgets-welcome-guide__image__wrapper">
+				<picture>
+					<source
+						srcSet="https://s.w.org/images/block-editor/welcome-editor.svg"
+						media="(prefers-reduced-motion: reduce)"
+					/>
+					<img
+						className="customize-widgets-welcome-guide__image"
+						src="https://s.w.org/images/block-editor/welcome-editor.gif"
+						width="312"
+						height="240"
+						alt=""
+					/>
+				</picture>
+			</div>
 			<h1 className="customize-widgets-welcome-guide__heading">
 				{ __( 'Welcome to block Widgets' ) }
 			</h1>

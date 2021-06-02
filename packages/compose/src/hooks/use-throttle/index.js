@@ -15,12 +15,21 @@ import { useEffect } from '@wordpress/element';
  * including the function to throttle, so please wrap functions created on
  * render in components in `useCallback`.
  *
- * @param {...any} args Arguments passed to Lodash's `throttle`.
+ * @see https://docs-lodash.com/v4/throttle/
  *
- * @return {Function} Throttled function.
+ * @template {(...args: any[]) => void} TFunc TFunc
+ *
+ * @param {TFunc} fn The function to throttle.
+ * @param {number} [wait] The number of milliseconds to throttle invocations to.
+ * @param {import('lodash').ThrottleSettings} [options] The options object. See linked documentation for details.
+ * @return {TFunc & import('lodash').Cancelable} Throttled function.
  */
-export default function useThrottle( ...args ) {
-	const throttled = useMemoOne( () => throttle( ...args ), args );
+export default function useThrottle( fn, wait, options ) {
+	const throttled = useMemoOne( () => throttle( fn, wait, options ), [
+		fn,
+		wait,
+		options,
+	] );
 	useEffect( () => () => throttled.cancel(), [ throttled ] );
 	return throttled;
 }
