@@ -74,7 +74,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
-				error_log( 'Error when decoding file schema: ' . json_last_error_msg() );
+				trigger_error( "Error when decoding a theme.json schema at path $file_path " . json_last_error_msg() );
 				return $config;
 			}
 
@@ -367,7 +367,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
-				error_log( 'Error when decoding user schema: ' . json_last_error_msg() );
+				trigger_error( "Error when decoding a theme.json schema for user data. " . json_last_error_msg() );
 				return new WP_Theme_JSON_Gutenberg( $config );
 			}
 
