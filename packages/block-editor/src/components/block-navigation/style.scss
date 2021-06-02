@@ -40,6 +40,12 @@
 	&.is-branch-selected.is-selected .block-editor-block-navigation-block-contents {
 		border-radius: 2px 2px 0 0;
 	}
+
+	&[aria-expanded="false"] {
+		&.is-branch-selected.is-selected .block-editor-block-navigation-block-contents {
+			border-radius: 2px;
+		}
+	}
 	&.is-branch-selected:not(.is-selected) .block-editor-block-navigation-block-contents {
 		// Lighten a CSS variable without introducing a new SASS variable
 		background:
