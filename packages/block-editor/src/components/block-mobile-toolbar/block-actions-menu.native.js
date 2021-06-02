@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Platform, findNodeHandle } from 'react-native';
-import { partial, first, castArray, last, compact } from 'lodash';
+import { partial, first, castArray, last, compact, every } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -15,6 +15,7 @@ import {
 import {
 	getBlockType,
 	getDefaultBlockName,
+	hasBlockSupport,
 	serialize,
 	rawHandler,
 	createBlock,
@@ -43,6 +44,8 @@ const BlockActionsMenu = ( {
 	canInsertBlockType,
 	getBlocksByClientId,
 	isEmptyDefaultBlock,
+	isLocked,
+	canDuplicate,
 	isFirst,
 	isLast,
 	isReusableBlockType,
@@ -203,15 +206,21 @@ const BlockActionsMenu = ( {
 		wrapBlockMover && allOptions.backwardButton,
 		wrapBlockMover && allOptions.forwardButton,
 		wrapBlockSettings && allOptions.settings,
-		selectedBlockPossibleTransformations.length &&
+		! isLocked &&
+			selectedBlockPossibleTransformations.length &&
 			allOptions.transformButton,
-		allOptions.copyButton,
-		allOptions.cutButton,
-		isPasteEnabled && allOptions.pasteButton,
-		allOptions.duplicateButton,
+		canDuplicate && allOptions.copyButton,
+		canDuplicate && allOptions.cutButton,
+		canDuplicate && isPasteEnabled && allOptions.pasteButton,
+		canDuplicate && allOptions.duplicateButton,
 		isReusableBlockType && allOptions.convertToRegularBlocks,
-		allOptions.delete,
+		! isLocked && allOptions.delete,
 	] );
+
+	// End early if there are no options to show.
+	if ( ! options.length ) {
+		return null;
+	}
 
 	function onPasteBlock() {
 		if ( ! clipboard ) {
@@ -290,6 +299,7 @@ export default compose(
 			getBlocksByClientId,
 			getSelectedBlockClientIds,
 			canInsertBlockType,
+			getTemplateLock,
 		} = select( blockEditorStore );
 		const normalizedClientIds = castArray( clientIds );
 		const block = getBlock( normalizedClientIds );
@@ -306,11 +316,22 @@ export default compose(
 			rootClientId
 		);
 
+		const innerBlocks = getBlocksByClientId( clientIds );
+
+		const canDuplicate = every( innerBlocks, ( innerBlock ) => {
+			return (
+				!! innerBlock &&
+				hasBlockSupport( innerBlock.name, 'multiple', true ) &&
+				canInsertBlockType( innerBlock.name, rootClientId )
+			);
+		} );
+
 		const isDefaultBlock = blockName === getDefaultBlockName();
 		const isEmptyContent = block?.attributes.content === '';
 		const isExactlyOneBlock = blockOrder.length === 1;
 		const isEmptyDefaultBlock =
 			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
+		const isLocked = !! getTemplateLock( rootClientId );
 
 		const selectedBlockClientId = first( getSelectedBlockClientIds() );
 		const selectedBlock = selectedBlockClientId
@@ -335,6 +356,8 @@ export default compose(
 			currentIndex: firstIndex,
 			getBlocksByClientId,
 			isEmptyDefaultBlock,
+			isLocked,
+			canDuplicate,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 			isReusableBlockType,
