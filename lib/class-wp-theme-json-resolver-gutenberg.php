@@ -538,7 +538,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function _json_decoding_error_notice() {
 		?>
-		<div id="theme-json-notice" class="notice notice-error is-dismissible">
+		<div id="theme-json-notice" class="notice notice-error is-dismissible hidden">
 			<p>
 				<?php
 				printf(
@@ -549,6 +549,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				?>
 			</p>
 		</div>
+		<script>
+			setTimeout( function() {
+				document.getElementById( 'theme-json-notice' ).classList.remove( 'hidden' );
+				document.querySelector( '.interface-interface-skeleton__header' )
+					.insertAdjacentElement('afterend', document.getElementById( 'theme-json-notice' ) );
+			}, 3000 );
+		</script>
 		<?php
 	}
 
