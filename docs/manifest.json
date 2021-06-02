@@ -708,12 +708,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "CardOld",
-		"slug": "card-old",
-		"markdown_source": "../packages/components/src/card-old/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "CardBody",
 		"slug": "card-body",
 		"markdown_source": "../packages/components/src/card/card-body/README.md",
