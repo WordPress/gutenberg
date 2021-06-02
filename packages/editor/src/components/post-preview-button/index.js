@@ -169,7 +169,6 @@ export class PostPreviewButton extends Component {
 			// If we don't need to autosave the post before previewing, then we simply
 			// load the Preview URL in the Preview tab.
 			! this.props.isAutosaveable ||
-			// Also, save the post only if user has the post lock.
 			// Do not save or overwrite the post, if the post is already locked.
 			this.props.isPostLocked
 		) {
