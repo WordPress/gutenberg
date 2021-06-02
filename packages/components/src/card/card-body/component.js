@@ -21,7 +21,7 @@ function CardBody( props, forwardedRef ) {
 }
 
 /**
- * `CardBody` is a layout component, rendering the contents of a `Card`.
+ * `CardBody` renders an optional content area for a `Card`.
  * Multiple `CardBody` components can be used within `Card` if needed.
  *
  * @example

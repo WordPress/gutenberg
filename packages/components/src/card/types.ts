@@ -69,7 +69,7 @@ type BaseSubComponentProps = {
 
 export type BodyProps = BaseSubComponentProps & {
 	/**
-	 * Determines if `CardBody` is scrollable.
+	 * Determines if the component is scrollable.
 	 *
 	 * @default true
 	 */
