@@ -7,6 +7,7 @@ name: Pull request automation
 jobs:
     pull-request-automation:
         runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).

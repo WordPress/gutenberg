@@ -19,6 +19,7 @@ concurrency:
 jobs:
     test:
         runs-on: macos-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
                 native-test-name: [gutenberg-editor-gallery]
