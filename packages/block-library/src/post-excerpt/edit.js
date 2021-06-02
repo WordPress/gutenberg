@@ -84,11 +84,11 @@ export default function PostExcerptEditor( {
 	}
 	if ( isProtected && ! userCanEdit ) {
 		return (
-			<p { ...blockProps }>
+			<div { ...blockProps }>
 				<Warning>
 					{ __( 'This content is password protected.' ) }
 				</Warning>
-			</p>
+			</div>
 		);
 	}
 	const readMoreLink = (

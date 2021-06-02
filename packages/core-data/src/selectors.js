@@ -639,8 +639,7 @@ export function canUser( state, action, resource, id ) {
 }
 
 /**
- * Returns whether the current user can edit the given
- * REST resource.
+ * Returns whether the current user can edit the given entity.
  *
  * Calling this may trigger an OPTIONS request to the REST API via the
  * `canUser()` resolver.
@@ -648,15 +647,17 @@ export function canUser( state, action, resource, id ) {
  * https://developer.wordpress.org/rest-api/reference/
  *
  * @param {Object} state Data state.
- * @param {string} name Entity name to extract the REST resource that will be used for the check.
- * @param {string} id ID of the rest resource to check.
+ * @param {string} kind Entity kind.
+ * @param {string} name Entity name.
+ * @param {number} key Record's key.
+ * @param {string} recordId Record's id.
  * @return {boolean|undefined} Whether or not the user can edit,
  * or `undefined` if the OPTIONS request is still being made.
  */
-export function canUserEditPost( state, name, id ) {
-	const entity = getEntityRecord( state, 'root', 'postType', name );
+export function canUserEditEntity( state, kind, name, key, recordId ) {
+	const entity = getEntityRecord( state, kind, name, key );
 	const resource = entity?.rest_base || '';
-	return canUser( state, 'update', resource, id );
+	return canUser( state, 'update', resource, recordId );
 }
 
 /**

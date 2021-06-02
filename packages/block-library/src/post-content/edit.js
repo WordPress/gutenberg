@@ -80,19 +80,19 @@ function EditableContent( { layout, postType, postId } ) {
 function Content( props ) {
 	const { postType, postId } = props;
 	const userCanEdit = useSelect(
-		( select ) => select( coreStore ).canUserEditPost( postType, postId ),
+		( select ) =>
+			select( coreStore ).canUserEditEntity(
+				'root',
+				'postType',
+				postType,
+				postId
+			),
 		[ postType, postId ]
-	);
-	const [ , , content ] = useEntityProp(
-		'postType',
-		postType,
-		'content',
-		postId
 	);
 	return userCanEdit ? (
 		<EditableContent { ...props } />
 	) : (
-		<ReadOnlyContent content={ content } />
+		<ReadOnlyContent postType={ postType } postId={ postId } />
 	);
 }
 

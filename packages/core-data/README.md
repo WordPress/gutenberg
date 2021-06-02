@@ -268,10 +268,9 @@ _Returns_
 
 -   `boolean|undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
 
-<a name="canUserEditPost" href="#canUserEditPost">#</a> **canUserEditPost**
+<a name="canUserEditEntity" href="#canUserEditEntity">#</a> **canUserEditEntity**
 
-Returns whether the current user can edit the given
-REST resource.
+Returns whether the current user can edit the given entity.
 
 Calling this may trigger an OPTIONS request to the REST API via the
 `canUser()` resolver.
@@ -281,8 +280,10 @@ Calling this may trigger an OPTIONS request to the REST API via the
 _Parameters_
 
 -   _state_ `Object`: Data state.
--   _name_ `string`: Entity name to extract the REST resource that will be used for the check.
--   _id_ `string`: ID of the rest resource to check.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `number`: Record's key.
+-   _recordId_ `string`: Record's id.
 
 _Returns_
 
