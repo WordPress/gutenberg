@@ -68,9 +68,19 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                         insertBlockScript();
                     }, 200);
                 }
+
+                final Handler handler = new Handler();
+                handler.postDelayed(() -> {
+                    if (!mIsGutenbergReady) {
+                        showTroubleshootingInstructions();
+                    }
+                }, 10000);
             }
         }
     };
+
+    private void showTroubleshootingInstructions() {
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
