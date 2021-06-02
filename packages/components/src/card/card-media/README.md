@@ -1,7 +1,22 @@
 # CardMedia
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+`CardMedia` provides a container for media elements within a [`Card`](../card/README.md).
 
-TBD
+## Usage
+
+```jsx
+import { Card, CardBody, CardMedia } from '@wordpress/components';
+
+const Example = () => (
+	<Card>
+		<CardMedia>
+			<img src="..." />
+		</CardMedia>
+		<CardBody>...</CardBody>
+	</Card>
+);
+```
+
+## Placement
+
+`CardMedia` can be placed in any order as a direct child of a `Card` (it can also exist as the only child component). The styles will automatically round the corners of the inner media element.

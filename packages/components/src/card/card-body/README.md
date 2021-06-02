@@ -16,7 +16,7 @@ const Example = () => (
 
 ## Props
 
-Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing the `size` prop directly to this component will override the value derived from context.
+Note: This component is connected to [`Card`'s Context](../card/README.md#context). Passing the `size` prop directly to this component will override the value derived from context.
 
 ### `isScrollable`: `boolean`
 
