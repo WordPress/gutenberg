@@ -80,7 +80,7 @@ function MaybeIframe( {
 	);
 }
 
-export default function VisualEditor( { styles } ) {
+export default function VisualEditor( { styles, __experimentalStickyTop } ) {
 	const {
 		deviceType,
 		isTemplateMode,
@@ -186,6 +186,7 @@ export default function VisualEditor( { styles } ) {
 	return (
 		<BlockTools
 			__unstableContentRef={ ref }
+			__experimentalStickyTop={ __experimentalStickyTop }
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }

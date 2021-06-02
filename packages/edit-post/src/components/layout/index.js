@@ -184,6 +184,9 @@ function Layout( { styles } ) {
 		return null;
 	};
 
+	const [ contentStickyTop, setContentStickyTop ] = useState( 0 );
+	const onNoticesResize = ( { height } ) => setContentStickyTop( height );
+
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -229,12 +232,15 @@ function Layout( { styles } ) {
 				notices={ <EditorSnackbars /> }
 				content={
 					<>
-						<EditorNotices />
+						<EditorNotices onResize={ onNoticesResize } />
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditor styles={ styles } />
+							<VisualEditor
+								styles={ styles }
+								__experimentalStickyTop={ contentStickyTop }
+							/>
 						) }
 						{ ! isTemplateMode && (
 							<div className="edit-post-layout__metaboxes">
