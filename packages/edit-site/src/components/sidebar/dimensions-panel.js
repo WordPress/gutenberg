@@ -14,7 +14,7 @@ import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block
  */
 import { useSetting } from '../editor/utils';
 
-export function useHasSpacingPanel( context ) {
+export function useHasDimensionsPanel( context ) {
 	const hasPadding = useHasPadding( context );
 	const hasMargin = useHasMargin( context );
 
@@ -61,7 +61,7 @@ function splitStyleValue( value ) {
 	return value;
 }
 
-export default function SpacingPanel( { context, getStyle, setStyle } ) {
+export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
 	const showPaddingControl = useHasPadding( context );
 	const showMarginControl = useHasMargin( context );
@@ -92,7 +92,7 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 	};
 
 	return (
-		<PanelBody title={ __( 'Spacing' ) }>
+		<PanelBody title={ __( 'Dimensions' ) }>
 			{ showPaddingControl && (
 				<BoxControl
 					values={ paddingValues }
