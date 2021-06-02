@@ -210,6 +210,9 @@
 				}
 			]
 		},
+		"dimensions": {
+			"customHeight": false
+		},
 		"spacing": {
 			"customMargin": false,
 			"customPadding": false,

@@ -21,10 +21,10 @@ function gutenberg_register_dimensions_support( $block_type ) {
 		return;
 	}
 
-	$has_spacing_support = gutenberg_block_has_support( $block_type, array( 'spacing' ), false );
-	// Future block supports such as height & width will be added here.
+	$has_dimensions_support = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions' ), false );
+	$has_spacing_support    = gutenberg_block_has_support( $block_type, array( 'spacing' ), false );
 
-	if ( $has_spacing_support ) {
+	if ( $has_dimensions_support || $has_spacing_support ) {
 		$block_type->attributes['style'] = array(
 			'type' => 'object',
 		);
@@ -41,22 +41,53 @@ function gutenberg_register_dimensions_support( $block_type ) {
  * @return array Block spacing CSS classes and inline styles.
  */
 function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) {
-	$spacing_styles = gutenberg_apply_spacing_support( $block_type, $block_attributes );
-	// Future block supports such as height and width will be added here.
+	$dimensions_styles = gutenberg_get_dimensions_styles( $block_type, $block_attributes );
+	$spacing_styles    = gutenberg_get_spacing_styles( $block_type, $block_attributes );
+	$styles            = $dimensions_styles . $spacing_styles;
 
-	return $spacing_styles;
+	return empty( $styles ) ? array() : array( 'style' => $styles );
 }
 
 /**
- * Add CSS classes for block spacing to the incoming attributes array.
+ * Add inline styles for block dimensions to the incoming attributes array.
  * This will be applied to the block markup in the front-end.
  *
  * @param WP_Block_Type $block_type       Block Type.
  * @param array         $block_attributes Block attributes.
  *
- * @return array Block spacing CSS classes and inline styles.
+ * @return array Block dimensions inline styles.
  */
-function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
+function gutenberg_get_dimensions_styles( $block_type, $block_attributes ) {
+	if ( gutenberg_skip_dimensions_serialization( $block_type ) ) {
+		return array();
+	}
+
+	$has_height_support = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions', 'height' ), false );
+	$styles             = array();
+
+	if ( $has_height_support ) {
+		$height_value = _wp_array_get( $block_attributes, array( 'style', 'dimensions', 'height' ), null );
+
+		if ( null !== $height_value ) {
+			$styles[] = sprintf( 'height: %s;', $height_value );
+		}
+	}
+
+	// Width support to be added in near future.
+
+	return empty( $styles ) ? null : implode( ' ', $styles );
+}
+
+/**
+ * Add inline styles for block spacing to the incoming attributes array.
+ * This will be applied to the block markup in the front-end.
+ *
+ * @param WP_Block_Type $block_type       Block Type.
+ * @param array         $block_attributes Block attributes.
+ *
+ * @return array Block spacing inline styles.
+ */
+function gutenberg_get_spacing_styles( $block_type, $block_attributes ) {
 	if ( gutenberg_skip_spacing_serialization( $block_type ) ) {
 		return array();
 	}
@@ -89,7 +120,23 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	return empty( $styles ) ? array() : array( 'style' => implode( ' ', $styles ) );
+	return empty( $styles ) ? null : implode( ' ', $styles );
+}
+
+/**
+ * Checks whether serialization of the current block's dimensions properties
+ * should occur.
+ *
+ * @param WP_Block_type $block_type Block type.
+ *
+ * @return boolean Whether to serialize dimensions support styles & classes.
+ */
+function gutenberg_skip_dimensions_serialization( $block_type ) {
+	$dimensions_support = _wp_array_get( $block_type->supports, array( '__experimentalDimensions' ), false );
+
+	return is_array( $dimensions_support ) &&
+		array_key_exists( '__experimentalSkipSerialization', $dimensions_support ) &&
+		$dimensions_support['__experimentalSkipSerialization'];
 }
 
 /**
