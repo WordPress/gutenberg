@@ -40,3 +40,20 @@ export function isValueEmpty( value ) {
 export function getDefinedValue( values = [], fallbackValue ) {
 	return values.find( isValueDefined ) ?? fallbackValue;
 }
+
+/**
+ * Checks to see if a value is a numeric value (`number` or `string`).
+ *
+ * @param {any} value
+ *
+ * @return {boolean} Whether value is numeric.
+ */
+export function isValueNumeric( value ) {
+	const obj = typeof value === 'string' ? value.replace( /,/g, '' ) : value;
+	return (
+		! isNaN( parseFloat( obj ) ) &&
+		! isNaN( Number( obj ) ) &&
+		isFinite( obj ) &&
+		Object.prototype.toString.call( obj ).toLowerCase() !== '[object array]'
+	);
+}

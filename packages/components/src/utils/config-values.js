@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { space } from '../ui/utils/space';
-import COLORS from './colors-values';
+import { COLORS } from './colors-values';
 
 const CONTROL_HEIGHT = '30px';
 const CONTROL_PADDING_X = '12px';
@@ -49,6 +49,7 @@ export default {
 	controlDestructiveBorderColor: COLORS.alert.red,
 	controlHeight: CONTROL_HEIGHT,
 	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
+	controlHeightMedium: `calc( ${ CONTROL_HEIGHT } * 0.1 )`,
 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
 	controlInnerControlTextColor: COLORS.darkGray,

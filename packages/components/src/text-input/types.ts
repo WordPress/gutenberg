@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { Props as BaseFieldProps } from '../base-field/hook';
-import { FormElementProps, SizeRangeReduced } from '../utils/types';
+import type { Props as BaseFieldProps } from '../base-field/hook';
+import type { FormElementProps, SizeRangeReduced } from '../utils/types';
 
 export type TextInputArrow = 'stepper' | boolean;
 type TextInputFormat = 'number' | 'type';
@@ -55,6 +55,12 @@ export type Props = Omit< BaseFieldProps, 'isClickable' | 'isSubtle' > &
 		 * @default false
 		 */
 		isCommitOnBlurOrEnter?: boolean;
+		/**
+		 * Renders focus styles.
+		 *
+		 * @default false
+		 */
+		isFocused?: boolean;
 		/**
 		 * Renders with rounded corners.
 		 *

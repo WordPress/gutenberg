@@ -1,13 +1,3 @@
-import {
-	add,
-	is,
-	mergeEventHandlers,
-	normalizeArrowKey,
-	roundClampString,
-	subtract,
-	useControlledValue,
-	usePropRef,
-} from '@wp-g2/utils';
 /**
  * External dependencies
  */
@@ -27,9 +17,19 @@ import {
 /**
  * Internal dependencies
  */
- import { useBaseDragHandlers } from './useTextInputState.utils';
+import { useBaseDragHandlers } from './use-text-input-state-utils';
+import { isValueNumeric } from '../../utils/values';
+import { add, roundClampString, subtract } from '../../utils/math';
+import { mergeEventHandlers } from '../../utils/events';
+import { normalizeArrowKey } from '../../utils/keyboard';
+import { useControlledValue, usePropRef } from '../../utils';
 
-
+/**
+ * @template T
+ * @param {Object} props
+ * @param {T} [props.value]
+ * @return {[T | null, (value: any) => void, () => void]} The controlled value and the value setter.
+ */
 function useCommitValue( { value } ) {
 	const [ commitValue, setCommitValue ] = useState( null );
 	const resetCommitValue = useCallback( () => setCommitValue( null ), [] );
@@ -39,16 +39,30 @@ function useCommitValue( { value } ) {
 	return [ commitValue, setCommitValue, resetCommitValue ];
 }
 
+/**
+ * @param {Object} props
+ * @param {boolean} [props.isShiftStepEnabled]
+ * @param {number} [props.shiftStep]
+ * @return {number} The shift step value.
+ */
 function useShiftStep( { isShiftStepEnabled = true, shiftStep = 10 } ) {
 	const [ on, setOn ] = useState( false );
 	useEffect( () => {
-		const handleOnKeyDown = ( event ) => {
-			if ( ! isShiftStepEnabled ) return;
-			if ( event.shiftKey ) setOn( true );
+		const handleOnKeyDown = ( /** @type {KeyboardEvent}} */ event ) => {
+			if ( ! isShiftStepEnabled ) {
+				return;
+			}
+			if ( event.shiftKey ) {
+				setOn( true );
+			}
 		};
-		const handleOnKeyUp = ( event ) => {
-			if ( ! isShiftStepEnabled ) return;
-			if ( ! event.shiftKey ) setOn( false );
+		const handleOnKeyUp = ( /** @type {KeyboardEvent}} */ event ) => {
+			if ( ! isShiftStepEnabled ) {
+				return;
+			}
+			if ( event.shiftKey ) {
+				setOn( false );
+			}
 		};
 
 		window.addEventListener( 'keydown', handleOnKeyDown );
@@ -63,6 +77,11 @@ function useShiftStep( { isShiftStepEnabled = true, shiftStep = 10 } ) {
 	return isShiftStepEnabled && on ? shiftStep : 1;
 }
 
+/**
+ * @param {Object} useFocusedStateProps
+ * @param {boolean} useFocusedStateProps.isFocused
+ * @return {[boolean, (value: boolean) => void]} A collection of change handlers.
+ */
 function useFocusedState( { isFocused: isFocusedProp = false } ) {
 	const [ isFocused, setFocused ] = useState( isFocusedProp );
 
@@ -73,6 +92,10 @@ function useFocusedState( { isFocused: isFocusedProp = false } ) {
 	return [ isFocused, setFocused ];
 }
 
+/**
+ * @param {Object} useChangeHandlersProps
+ * @param {(value: string) => void} useChangeHandlersProps.onChange
+ */
 function useChangeHandlers( { onChange } ) {
 	const handleOnChange = useCallback(
 		( event ) => {
@@ -86,7 +109,12 @@ function useChangeHandlers( { onChange } ) {
 	};
 }
 
-function useFocusHandlers( { onChange, setFocused } ) {
+/**
+ * @param {Object} [useFocusHandlersProps]
+ * @param {(value: string) => void} [useFocusHandlersProps.onChange]
+ * @param {(value: boolean) => void} [useFocusHandlersProps.setFocused]
+ */
+function useFocusHandlers( { onChange = noop, setFocused = noop } ) {
 	const handleOnBlur = useCallback(
 		( event ) => {
 			onChange( event.target.value );
@@ -105,19 +133,30 @@ function useFocusHandlers( { onChange, setFocused } ) {
 	};
 }
 
-function useKeyboardHandlers( { onChange } ) {
+/**
+ * @param {Object} [useKeyboardHandlersProps]
+ * @param {(value: string) => void} [useKeyboardHandlersProps.onChange]
+ */
+function useKeyboardHandlers( { onChange = noop } ) {
+	/** @type {Record<string, (event: import('react').KeyboardEvent<HTMLInputElement>) => void>} */
 	const keyboardHandlers = useMemo(
 		() => ( {
-			Enter( /** @type {import('react').KeyboardEvent} */ event ) {
-				if ( event.isDefaultPrevented() ) return;
-				onChange( event.target.value );
+			Enter(
+				/** @type {import('react').KeyboardEvent<HTMLInputElement>} */ event
+			) {
+				if ( event.isDefaultPrevented() ) {
+					return;
+				}
+				onChange( event.currentTarget.value );
 			},
 		} ),
 		[ onChange ]
 	);
 
 	const handleOnKeyDown = useCallback(
-		( /** @type {import('react').KeyboardEvent}} */ event ) => {
+		(
+			/** @type {import('react').KeyboardEvent<HTMLInputElement>}} */ event
+		) => {
 			const key = normalizeArrowKey( event );
 			if ( key && keyboardHandlers[ key ] ) {
 				keyboardHandlers[ key ]( event );
@@ -131,6 +170,22 @@ function useKeyboardHandlers( { onChange } ) {
 	};
 }
 
+/**
+ * @typedef Props
+ * @property {number|string|undefined|null} [value] On change callback.
+ * @property {Function} [onChange] On change callback.
+ * @property {string} [type] Value type.
+ * @property {string | number | undefined} [max] Max value.
+ * @property {string | number | undefined} [min] Min value.
+ * @property {number} [shiftStep] Shift step value.
+ * @property {number} [step] Step value.
+ * @property {boolean} [isShiftStepEnabled] Is shift step enabled?
+ * @property {boolean} [incrementFromNonNumericValue] Increment from non-numeric value.
+ */
+
+/**
+ * @param {Props} props
+ */
 function useNumberActions( {
 	incrementFromNonNumericValue,
 	isShiftStepEnabled,
@@ -150,18 +205,15 @@ function useNumberActions( {
 	const shiftStep = stepMultiplier * step;
 
 	const isInputTypeNumeric = type === 'number';
-	const isValueNumeric = is.numeric( value );
+	const isNumeric = isValueNumeric( value );
 
 	const skipAction =
-		! isInputTypeNumeric &&
-		! isValueNumeric &&
-		! incrementFromNonNumericValue;
+		! isInputTypeNumeric && ! isNumeric && ! incrementFromNonNumericValue;
 
 	/**
 	 * Create (synced) references to avoid recreating increment and decrement
 	 * callbacks.
 	 */
-
 	const propRefs = usePropRef( {
 		min,
 		max,
@@ -171,14 +223,14 @@ function useNumberActions( {
 	} );
 
 	const increment = useCallback(
-		( /** @type {number} */ jumpStep = 0 ) => {
+		( /** @type {number|undefined} */ jumpStep = 0 ) => {
 			if ( skipAction ) return;
-
+			/* eslint-disable no-shadow */
+			// @ts-ignore Declaring type here doesn't seem to work, e.g., /** @type {{[key:string]:any}|undefined} */
 			const { max, min, onChange, shiftStep, value } = propRefs.current;
-
-			const baseValue = is.numeric( value ) ? value : 0;
+			/* eslint-enable no-shadow */
+			const baseValue = isValueNumeric( value ) ? value : 0;
 			const nextValue = add( jumpStep * step, shiftStep );
-
 			const next = roundClampString(
 				add( baseValue, nextValue ),
 				min,
@@ -192,14 +244,14 @@ function useNumberActions( {
 	);
 
 	const decrement = useCallback(
-		( /** @type {number} */ jumpStep = 0 ) => {
+		( /** @type {number|undefined} */ jumpStep = 0 ) => {
 			if ( skipAction ) return;
-
+			/* eslint-disable no-shadow */
+			// @ts-ignore Declaring type here doesn't seem to work, e.g., /** @type {{[key:string]:any}|undefined} */
 			const { max, min, onChange, shiftStep, value } = propRefs.current;
-
-			const baseValue = is.numeric( value ) ? value : 0;
+			/* eslint-enable no-shadow */
+			const baseValue = isValueNumeric( value ) ? value : 0;
 			const nextValue = add( jumpStep * step, shiftStep );
-
 			const next = roundClampString(
 				subtract( baseValue, nextValue ),
 				min,
@@ -215,15 +267,30 @@ function useNumberActions( {
 	return { increment, decrement };
 }
 
+/**
+ * @typedef UseNumberKeyboardHandlersProps
+ * @property {boolean} [isTypeNumeric] Whether the type is numeric.
+ * @property {boolean} [stopIfEventDefaultPrevented] Stop if event default prevented.
+ * @property {() => void} [increment] Increment text input number value callback.
+ * @property {() => void} [decrement] Decrement text input number value callback.
+ */
+
+/**
+ *
+ * @param {UseNumberKeyboardHandlersProps} props
+ */
 function useNumberKeyboardHandlers( {
-	decrement,
-	increment,
+	decrement = noop,
+	increment = noop,
 	isTypeNumeric,
 	stopIfEventDefaultPrevented = true,
 } ) {
+	/** @type {Record<string, (event: import('react').KeyboardEvent<HTMLInputElement>) => void>} */
 	const keyboardHandlers = useMemo(
 		() => ( {
-			ArrowUp( event ) {
+			ArrowUp(
+				/** @type {import('react').KeyboardEvent<HTMLInputElement>}} */ event
+			) {
 				if ( ! isTypeNumeric ) return;
 
 				if ( stopIfEventDefaultPrevented && event.isDefaultPrevented() )
@@ -233,7 +300,9 @@ function useNumberKeyboardHandlers( {
 
 				increment();
 			},
-			ArrowDown( event ) {
+			ArrowDown(
+				/** @type {import('react').KeyboardEvent<HTMLInputElement>}} */ event
+			) {
 				if ( ! isTypeNumeric ) return;
 
 				if ( stopIfEventDefaultPrevented && event.isDefaultPrevented() )
@@ -248,7 +317,9 @@ function useNumberKeyboardHandlers( {
 	);
 
 	const handleOnKeyDown = useCallback(
-		( event ) => {
+		(
+			/** @type {import('react').KeyboardEvent<HTMLInputElement>}} */ event
+		) => {
 			const key = normalizeArrowKey( event );
 			if ( key && keyboardHandlers[ key ] ) {
 				keyboardHandlers[ key ]( event );
@@ -262,9 +333,21 @@ function useNumberKeyboardHandlers( {
 	};
 }
 
+/**
+ * @typedef UseScrollHandlersProps
+ * @property {boolean} [isTypeNumeric] Whether the type is numeric.
+ * @property {boolean} [isFocused] Is the field focussed.
+ * @property {() => void} [increment] Increment text input number value callback.
+ * @property {() => void} [decrement] Decrement text input number value callback.
+ */
+
+/**
+ *
+ * @param {UseScrollHandlersProps} props
+ */
 const useScrollHandlers = ( {
-	decrement,
-	increment,
+	decrement = noop,
+	increment = noop,
 	isFocused,
 	isTypeNumeric,
 } ) => {
@@ -292,6 +375,30 @@ const useScrollHandlers = ( {
 	};
 };
 
+/**
+ * @typedef UseTextInputStateProps
+ * @property {string} [defaultValue] A default value.
+ * @property {string} [dragAxis]  The drag axis.
+ * @property {boolean} [incrementFromNonNumericValue] Should increment from non-numeric value.
+ * @property {boolean} [isCommitOnBlurOrEnter] If commit value is to be set onBlur or Enter.
+ * @property {boolean} [isFocused] Is the field focussed.
+ * @property {(value: string) => void} [onChange] Text input onChange callback.
+ * @property {string} [value] Field value.
+ * @property {number | string | undefined} [max] Max value.
+ * @property {number | string | undefined} [min] Min value.
+ * @property {number} [step] Step value.
+ * @property {( currentValue: string ) => boolean} [validate] Is the field focussed.
+ * @property {boolean} [isShiftStepEnabled] Is shift step enabled?
+ * @property {number} [shiftStep] Shift step value.
+ * @property {string} [type] Input type.
+ * @property {string} [format] Input format.
+ * @property {Record<string, (event: Event) => void>} [scrollHandlers] Input format.
+ */
+
+/**
+ *
+ * @param {UseTextInputStateProps} props
+ */
 export function useTextInputState( props ) {
 	const {
 		defaultValue,
@@ -329,7 +436,7 @@ export function useTextInputState( props ) {
 	const inputValue = isNil( commitValue ) ? value : commitValue;
 
 	const [ isFocused, setFocused ] = useFocusedState( {
-		value: isFocusedProp,
+		isFocused: isFocusedProp,
 	} );
 
 	const handleOnCommit = useCallback(
