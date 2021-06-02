@@ -654,7 +654,7 @@ export function canUser( state, action, resource, id ) {
  * @return {boolean|undefined} Whether or not the user can edit,
  * or `undefined` if the OPTIONS request is still being made.
  */
-export function canUserEditEntity( state, kind, name, key, recordId ) {
+export function canUserEditEntityRecord( state, kind, name, key, recordId ) {
 	const entity = getEntityRecord( state, kind, name, key );
 	const resource = entity?.rest_base || '';
 	return canUser( state, 'update', resource, recordId );

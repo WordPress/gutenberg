@@ -81,7 +81,7 @@ function Content( props ) {
 	const { postType, postId } = props;
 	const userCanEdit = useSelect(
 		( select ) =>
-			select( coreStore ).canUserEditEntity(
+			select( coreStore ).canUserEditEntityRecord(
 				'root',
 				'postType',
 				postType,
