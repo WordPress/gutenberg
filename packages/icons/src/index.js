@@ -121,7 +121,6 @@ export { default as moreHorizontalMobile } from './library/more-horizontal-mobil
 export { default as moreVertical } from './library/more-vertical';
 export { default as moveTo } from './library/move-to';
 export { default as navigation } from './library/navigation';
-export { default as noBug } from './library/no-bug';
 export { default as overlayText } from './library/overlay-text';
 export { default as pageBreak } from './library/page-break';
 export { default as customLink } from './library/custom-link';
@@ -164,6 +163,7 @@ export { default as queryPaginationPrevious } from './library/query-pagination-p
 export { default as quote } from './library/quote';
 export { default as receipt } from './library/receipt';
 export { default as redo } from './library/redo';
+export { default as removeBug } from './library/remove-bug';
 export { default as replace } from './library/replace';
 export { default as resizeCornerNE } from './library/resize-corner-n-e';
 export { default as reusableBlock } from './library/reusable-block';
