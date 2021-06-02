@@ -26,7 +26,6 @@ function gutenberg_register_dimensions_support( $block_type ) {
 	}
 
 	$has_dimensions_support = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions' ), false );
-	// Future block supports such as height & width will be added here.
 
 	if ( $has_dimensions_support ) {
 		$block_type->attributes['style'] = array(
@@ -44,14 +43,24 @@ function gutenberg_register_dimensions_support( $block_type ) {
  *
  * @return array Block dimensions CSS classes and inline styles.
  */
-function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) {
 	if ( gutenberg_skip_dimensions_serialization( $block_type ) ) {
 		return array();
 	}
 
 	$styles = array();
 
-	// Height support to be added in near future.
+	// Height.
+	$has_height_support = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions', 'height' ), false );
+
+	if ( $has_height_support ) {
+		$height_value = _wp_array_get( $block_attributes, array( 'style', 'dimensions', 'height' ), null );
+
+		if ( null !== $height_value ) {
+			$styles[] = sprintf( 'height: %s;', $height_value );
+		}
+	}
+
 	// Width support to be added in near future.
 
 	return empty( $styles ) ? array() : array( 'style' => implode( ' ', $styles ) );
@@ -63,10 +72,11 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
  *
  * @param WP_Block_type $block_type Block type.
  *
- * @return boolean Whether to serialize spacing support styles & classes.
+ * @return boolean Whether to serialize dimensions support styles & classes.
  */
 function gutenberg_skip_dimensions_serialization( $block_type ) {
 	$dimensions_support = _wp_array_get( $block_type->supports, array( '__experimentalDimensions' ), false );
+
 	return is_array( $dimensions_support ) &&
 		array_key_exists( '__experimentalSkipSerialization', $dimensions_support ) &&
 		$dimensions_support['__experimentalSkipSerialization'];

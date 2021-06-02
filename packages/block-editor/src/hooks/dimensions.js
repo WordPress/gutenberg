@@ -14,6 +14,13 @@ import { getBlockSupport } from '@wordpress/blocks';
  */
 import InspectorControls from '../components/inspector-controls';
 import {
+	HeightEdit,
+	hasHeightSupport,
+	hasHeightValue,
+	resetHeight,
+	useIsHeightDisabled,
+} from './height';
+import {
 	MarginEdit,
 	hasMarginSupport,
 	hasMarginValue,
@@ -29,6 +36,7 @@ import {
 } from './padding';
 import { cleanEmptyObject } from './utils';
 
+export const DIMENSIONS_SUPPORT_KEY = '__experimentalDimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
@@ -37,18 +45,23 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
  * Inspector controls for dimensions support.
  *
  * @param {Object} props Block props.
- *
- * @return {WPElement} Inspector controls for spacing support features.
+ * @return {WPElement} Inspector controls for dimensions support features.
  */
 export function DimensionsPanel( props ) {
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
+	const isHeightDisabled = useIsHeightDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
 	}
+
+	const defaultDimensionsControls = getBlockSupport( props.name, [
+		DIMENSIONS_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
 
 	const defaultSpacingControls = getBlockSupport( props.name, [
 		SPACING_SUPPORT_KEY,
@@ -62,6 +75,10 @@ export function DimensionsPanel( props ) {
 		props.setAttributes( {
 			style: cleanEmptyObject( {
 				...style,
+				dimensions: {
+					...style?.dimensions,
+					height: undefined,
+				},
 				spacing: {
 					...style?.spacing,
 					margin: undefined,
@@ -78,6 +95,17 @@ export function DimensionsPanel( props ) {
 				header={ __( 'Dimensions' ) }
 				resetAll={ resetAll }
 			>
+				{ ! isHeightDisabled && (
+					<ToolsPanelItem
+						className="single-column"
+						hasValue={ () => hasHeightValue( props ) }
+						label={ __( 'Height' ) }
+						onDeselect={ () => resetHeight( props ) }
+						isShownByDefault={ defaultDimensionsControls?.height }
+					>
+						<HeightEdit { ...props } />
+					</ToolsPanelItem>
+				) }
 				{ ! isPaddingDisabled && (
 					<ToolsPanelItem
 						hasValue={ () => hasPaddingValue( props ) }
@@ -115,21 +143,25 @@ export function hasDimensionsSupport( blockName ) {
 		return false;
 	}
 
-	return hasPaddingSupport( blockName ) || hasMarginSupport( blockName );
+	return (
+		hasHeightSupport( blockName ) ||
+		hasPaddingSupport( blockName ) ||
+		hasMarginSupport( blockName )
+	);
 }
 
 /**
  * Determines whether dimensions support has been disabled.
  *
  * @param {Object} props Block properties.
- *
- * @return {boolean} If spacing support is completely disabled.
+ * @return {boolean} If dimensions support is completely disabled.
  */
 const useIsDimensionsDisabled = ( props = {} ) => {
+	const heightDisabled = useIsHeightDisabled( props );
 	const paddingDisabled = useIsPaddingDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
 
-	return paddingDisabled && marginDisabled;
+	return heightDisabled && paddingDisabled && marginDisabled;
 };
 
 /**
