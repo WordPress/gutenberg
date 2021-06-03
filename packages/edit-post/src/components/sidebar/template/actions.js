@@ -97,17 +97,32 @@ function PostTemplateActions() {
 							setIsModalOpen( false );
 						} }
 					>
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
-							help={ __(
-								'Give the template a name that describes its purpose, e.g. "Full Width". If you\'re unsure don\'t worry – the name can be changed later.'
-							) }
-						/>
+						<Flex align="flex-start" gap={ 8 }>
+							<FlexItem>
+								<div className="edit-post-template-modal__tip">
+									<Tip>
+										{ __(
+											'A custom template can be applied to any post or page on your site.'
+										) }
+									</Tip>
+								</div>
+							</FlexItem>
+							<FlexItem>
+								<TextControl
+									label={ __( 'Name' ) }
+									value={ title }
+									onChange={ setTitle }
+									help={ __(
+										'Give the template a name that describes its purpose, e.g. "Full Width". If you\'re unsure don\'t worry – the name can be changed later.'
+									) }
+								/>
+							</FlexItem>
+						</Flex>
+						
 						<Flex
 							className="edit-post-template__modal-actions"
 							justify="flex-end"
+							expanded={ false }
 						>
 							<FlexItem>
 								<Button
@@ -126,13 +141,6 @@ function PostTemplateActions() {
 								</Button>
 							</FlexItem>
 						</Flex>
-						<div className="edit-post-template-modal__tip">
-							<Tip>
-								{ __(
-									'A custom template can be applied to any post or page on your site.'
-								) }
-							</Tip>
-						</div>
 					</form>
 				</Modal>
 			) }

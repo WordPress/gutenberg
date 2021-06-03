@@ -1,23 +1,27 @@
 .edit-post-template__modal {
-	.components-modal__frame {
-		max-width: $grid-unit * 40;
+	.components-base-control {
+		@include break-medium() {
+			width: $grid-unit * 40;
+		}
 	}
 }
 
 .edit-post-template__modal-actions {
-	padding-top: $grid-unit-15;
-}
-
-.edit-post-template-modal__tip {
 	margin-bottom: -$grid-unit-30;
 	margin-top: $grid-unit-30;
 	margin-left: -$grid-unit-40;
 	margin-right: -$grid-unit-40;
 	padding: $grid-unit-20 $grid-unit-40;
 	border-top: $border-width solid $gray-300;
+}
 
-	.components-tip {
-		align-items: center;
+.edit-post-template-modal__tip {
+	padding: $grid-unit-20 $grid-unit-30;
+	background: $gray-100;
+	border-radius: 2px;
+
+	@include break-medium() {
+		width: $grid-unit * 30;
 	}
 }
 
