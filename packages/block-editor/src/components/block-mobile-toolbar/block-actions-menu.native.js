@@ -219,7 +219,11 @@ const BlockActionsMenu = ( {
 
 	// End early if there are no options to show.
 	if ( ! options.length ) {
-		return null;
+		return <ToolbarButton
+			title={ __( 'Open Block Actions Menu' ) }
+			icon={ moreHorizontalMobile }
+			disabled={ true }
+		/>
 	}
 
 	function onPasteBlock() {
