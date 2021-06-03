@@ -506,9 +506,6 @@ export class ImageEdit extends Component {
 		const isFeaturedImage =
 			canImageBeFeatured && featuredImageId === attributes.id;
 
-		// eslint-disable-next-line no-unused-vars
-		const androidOnly = Platform.OS === 'android';
-
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<ToolbarGroup>
