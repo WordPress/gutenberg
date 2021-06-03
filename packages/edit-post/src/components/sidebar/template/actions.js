@@ -84,7 +84,9 @@ function PostTemplateActions() {
 								createBlock( 'core/site-tagline' ),
 								createBlock( 'core/separator' ),
 								createBlock( 'core/post-title' ),
-								createBlock( 'core/post-content' ),
+								createBlock( 'core/post-content', {
+									layout: { inherit: true },
+								} ),
 							];
 							__unstableSwitchToTemplateMode( {
 								slug:
