@@ -23,6 +23,7 @@ import {
 	useConstrainedTabbing,
 	useFocusReturn,
 	useMergeRefs,
+	useRefEffect,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
@@ -47,7 +48,8 @@ function computeAnchorRect(
 	anchorRect,
 	getAnchorRect,
 	anchorRef = false,
-	shouldAnchorIncludePadding
+	shouldAnchorIncludePadding,
+	container
 ) {
 	if ( anchorRect ) {
 		return anchorRect;
@@ -61,7 +63,8 @@ function computeAnchorRect(
 		const rect = getAnchorRect( anchorRefFallback.current );
 		return offsetIframe(
 			rect,
-			rect.ownerDocument || anchorRefFallback.current.ownerDocument
+			rect.ownerDocument || anchorRefFallback.current.ownerDocument,
+			container
 		);
 	}
 
@@ -81,7 +84,8 @@ function computeAnchorRect(
 		if ( typeof anchorRef?.cloneRange === 'function' ) {
 			return offsetIframe(
 				getRectangleFromRange( anchorRef ),
-				anchorRef.endContainer.ownerDocument
+				anchorRef.endContainer.ownerDocument,
+				container
 			);
 		}
 
@@ -91,7 +95,8 @@ function computeAnchorRect(
 		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
 			const rect = offsetIframe(
 				anchorRef.getBoundingClientRect(),
-				anchorRef.ownerDocument
+				anchorRef.ownerDocument,
+				container
 			);
 
 			if ( shouldAnchorIncludePadding ) {
@@ -111,7 +116,8 @@ function computeAnchorRect(
 				topRect.width,
 				bottomRect.bottom - topRect.top
 			),
-			top.ownerDocument
+			top.ownerDocument,
+			container
 		);
 
 		if ( shouldAnchorIncludePadding ) {
@@ -232,7 +238,6 @@ const Popover = (
 	{
 		headerTitle,
 		onClose,
-		onKeyDown,
 		children,
 		className,
 		noArrow = true,
@@ -256,6 +261,7 @@ const Popover = (
 		__unstableObserveElement,
 		__unstableBoundaryParent,
 		__unstableForcePosition,
+		__unstableForceXAlignment,
 		/* eslint-enable no-unused-vars */
 		...contentProps
 	},
@@ -294,7 +300,8 @@ const Popover = (
 				anchorRect,
 				getAnchorRect,
 				anchorRef,
-				shouldAnchorIncludePadding
+				shouldAnchorIncludePadding,
+				containerRef.current
 			);
 
 			if ( ! anchor ) {
@@ -348,7 +355,8 @@ const Popover = (
 				containerRef.current,
 				relativeOffsetTop,
 				boundaryElement,
-				__unstableForcePosition
+				__unstableForcePosition,
+				__unstableForceXAlignment
 			);
 
 			if (
@@ -477,6 +485,26 @@ const Popover = (
 		__unstableBoundaryParent,
 	] );
 
+	// Event handlers for closing the popover.
+	const closeEventRef = useRefEffect(
+		( node ) => {
+			function maybeClose( event ) {
+				// Close on escape.
+				if ( event.keyCode === ESCAPE && onClose ) {
+					event.stopPropagation();
+					onClose();
+				}
+			}
+
+			node.addEventListener( 'keydown', maybeClose );
+
+			return () => {
+				node.removeEventListener( 'keydown', maybeClose );
+			};
+		},
+		[ onClose ]
+	);
+
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
@@ -484,24 +512,12 @@ const Popover = (
 	const mergedRefs = useMergeRefs( [
 		ref,
 		containerRef,
+		// Don't register the event at all if there's no onClose callback.
+		onClose ? closeEventRef : null,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
 		focusOnMount ? focusOnMountRef : null,
 	] );
-
-	// Event handlers
-	const maybeClose = ( event ) => {
-		// Close on escape
-		if ( event.keyCode === ESCAPE && onClose ) {
-			event.stopPropagation();
-			onClose();
-		}
-
-		// Preserve original content prop behavior
-		if ( onKeyDown ) {
-			onKeyDown( event );
-		}
-	};
 
 	/**
 	 * Shims an onFocusOutside callback to be compatible with a deprecated
@@ -587,7 +603,6 @@ const Popover = (
 				}
 			) }
 			{ ...contentProps }
-			onKeyDown={ maybeClose }
 			{ ...focusOutsideProps }
 			ref={ mergedRefs }
 			tabIndex="-1"

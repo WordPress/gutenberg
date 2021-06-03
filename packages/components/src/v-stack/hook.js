@@ -6,7 +6,7 @@ import { useHStack } from '../h-stack';
 
 /**
  *
- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 export function useVStack( props ) {
 	const { expanded = false, ...otherProps } = useContextSystem(

@@ -55,13 +55,13 @@ function PostTemplateActions() {
 			<div className="edit-post-template__actions">
 				{ !! template && (
 					<Button
-						isLink
+						variant="link"
 						onClick={ () => __unstableSwitchToTemplateMode() }
 					>
 						{ __( 'Edit' ) }
 					</Button>
 				) }
-				<Button isLink onClick={ () => setIsModalOpen( true ) }>
+				<Button variant="link" onClick={ () => setIsModalOpen( true ) }>
 					{ __( 'New' ) }
 				</Button>
 			</div>
@@ -107,7 +107,7 @@ function PostTemplateActions() {
 						>
 							<FlexItem>
 								<Button
-									isSecondary
+									variant="secondary"
 									onClick={ () => {
 										setIsModalOpen( false );
 										setTitle( '' );
@@ -117,7 +117,7 @@ function PostTemplateActions() {
 								</Button>
 							</FlexItem>
 							<FlexItem>
-								<Button isPrimary type="submit">
+								<Button variant="primary" type="submit">
 									{ __( 'Create' ) }
 								</Button>
 							</FlexItem>

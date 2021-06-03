@@ -12,7 +12,6 @@ export default function QueryPaginationNextEdit( {
 		<PlainText
 			__experimentalVersion={ 2 }
 			tagName="a"
-			style={ { display: 'inline-block' } }
 			aria-label={ __( 'Next page link' ) }
 			placeholder={ __( 'Next Page' ) }
 			value={ label }

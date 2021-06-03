@@ -43,6 +43,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
+import im.shimo.react.prompt.RNPromptPackage;
+
 public class MainApplication extends Application implements ReactApplication, GutenbergBridgeInterface {
 
     private static final String TAG = "MainApplication";
@@ -258,6 +260,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new ReanimatedPackage(),
                         new SafeAreaContextPackage(),
                         new RNScreensPackage(),
+                        new RNPromptPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 

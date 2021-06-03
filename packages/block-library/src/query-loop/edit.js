@@ -30,7 +30,7 @@ export default function QueryLoopEdit( {
 		query: {
 			perPage,
 			offset,
-			categoryIds,
+			categoryIds = [],
 			postType,
 			tagIds = [],
 			order,

@@ -87,30 +87,34 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
+<<<<<<< HEAD
 	context,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
 	const { allowResize = true, isGrouped = false } = context;
 	const { block, currentId, image, multiImageSelection } = useSelect(
+=======
+	clientId,
+} ) {
+	const captionRef = useRef();
+	const prevUrl = usePrevious( url );
+	const { getBlock } = useSelect( blockEditorStore );
+	const { image, multiImageSelection } = useSelect(
+>>>>>>> trunk
 		( select ) => {
 			const { getMedia } = select( coreStore );
-			const {
-				getMultiSelectedBlockClientIds,
-				getBlockName,
-				getSelectedBlock,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+			const { getMultiSelectedBlockClientIds, getBlockName } = select(
+				blockEditorStore
+			);
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
-				block: getSelectedBlock(),
-				currentId: getSelectedBlockClientId(),
 				image: id && isSelected ? getMedia( id ) : null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
-						( clientId ) =>
-							getBlockName( clientId ) === 'core/image'
+						( _clientId ) =>
+							getBlockName( _clientId ) === 'core/image'
 					),
 			};
 		},
@@ -262,6 +266,13 @@ export default function Image( {
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
 
+	function switchToCover() {
+		replaceBlocks(
+			clientId,
+			switchToBlockType( getBlock( clientId ), 'core/cover' )
+		);
+	}
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -299,12 +310,7 @@ export default function Image( {
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }
-						onClick={ () =>
-							replaceBlocks(
-								currentId,
-								switchToBlockType( block, 'core/cover' )
-							)
-						}
+						onClick={ switchToCover }
 					/>
 				) }
 			</BlockControls>

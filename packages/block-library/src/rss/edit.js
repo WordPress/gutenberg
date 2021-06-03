@@ -72,7 +72,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 							}
 							className="wp-block-rss__placeholder-input"
 						/>
-						<Button isPrimary type="submit">
+						<Button variant="primary" type="submit">
 							{ __( 'Use URL' ) }
 						</Button>
 					</form>

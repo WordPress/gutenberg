@@ -80,7 +80,11 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
+<<<<<<< HEAD
 	context,
+=======
+	clientId,
+>>>>>>> trunk
 } ) {
 	const {
 		url = '',
@@ -300,7 +304,11 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
 					containerRef={ ref }
+<<<<<<< HEAD
 					context={ context }
+=======
+					clientId={ clientId }
+>>>>>>> trunk
 				/>
 			) }
 			{ ! url && (

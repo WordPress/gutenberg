@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Warns the user if there are unsaved changes before leaving the editor.
@@ -14,7 +15,7 @@ import { useSelect } from '@wordpress/data';
 export default function UnsavedChangesWarning() {
 	const isDirty = useSelect( ( select ) => {
 		return () => {
-			const { __experimentalGetDirtyEntityRecords } = select( 'core' );
+			const { __experimentalGetDirtyEntityRecords } = select( coreStore );
 			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 			return dirtyEntityRecords.length > 0;
 		};
