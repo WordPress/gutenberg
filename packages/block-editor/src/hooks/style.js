@@ -265,11 +265,12 @@ const withElementsStyles = createHigherOrderComponent(
 				<BlockListBlock
 					{ ...props }
 					className={
-						elements &&
-						classnames(
-							props.classname,
-							blockElementsContainerIdentifier
-						)
+						elements
+							? classnames(
+									props.className,
+									blockElementsContainerIdentifier
+							  )
+							: props.className
 					}
 				/>
 			</>
