@@ -50,8 +50,7 @@
 			"radius": true,
 			"__experimentalSkipSerialization": true
 		},
-		"html": false,
-		"__experimentalSelector": ".wp-block-search__button"
+		"html": false
 	},
 	"editorStyle": "wp-block-search-editor",
 	"style": "wp-block-search"
