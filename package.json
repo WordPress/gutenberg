@@ -115,8 +115,8 @@
 		"@types/sprintf-js": "1.1.2",
 		"@types/tinycolor2": "1.4.2",
 		"@types/uuid": "8.3.0",
-		"@types/webpack": "4.41.16",
-		"@types/webpack-sources": "0.1.7",
+		"@types/webpack": "5.28.0",
+		"@types/webpack-sources": "2.1.0",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
@@ -211,7 +211,7 @@
 		"uuid": "8.3.0",
 		"wd": "1.12.1",
 		"webpack": "5.38.1",
-		"webpack-bundle-analyzer": "4.2.0",
+		"webpack-bundle-analyzer": "4.4.2",
 		"worker-farm": "1.7.0"
 	},
 	"scripts": {
