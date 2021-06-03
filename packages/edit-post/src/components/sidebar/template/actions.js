@@ -13,6 +13,7 @@ import {
 	TextControl,
 	Flex,
 	FlexItem,
+	Tip,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -100,9 +101,12 @@ function PostTemplateActions() {
 							label={ __( 'Name' ) }
 							value={ title }
 							onChange={ setTitle }
+							help={ __(
+								'Give the template a name that describes its purpose, e.g. "Full Width". If you\'re unsure don\'t worry – the name can be changed later.'
+							) }
 						/>
 						<Flex
-							className="edit-post-post-template__modal-actions"
+							className="edit-post-template__modal-actions"
 							justify="flex-end"
 						>
 							<FlexItem>
@@ -122,6 +126,13 @@ function PostTemplateActions() {
 								</Button>
 							</FlexItem>
 						</Flex>
+						<div className="edit-post-template-modal__tip">
+							<Tip>
+								{__(
+									'A custom template can be applied to any post or page on your site.'
+								)}
+							</Tip>
+						</div>
 					</form>
 				</Modal>
 			) }
