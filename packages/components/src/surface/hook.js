@@ -20,11 +20,11 @@ import * as styles from './styles';
 export function useSurface( props ) {
 	const {
 		backgroundSize = 12,
-		border,
-		borderBottom,
-		borderLeft,
-		borderRight,
-		borderTop,
+		border = false,
+		borderBottom = false,
+		borderLeft = false,
+		borderRight = false,
+		borderTop = false,
 		className,
 		variant = 'primary',
 		...otherProps
