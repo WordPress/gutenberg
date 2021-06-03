@@ -254,6 +254,11 @@ function _gutenberg_build_template_result_from_post( $post, $template_type = 'wp
 	$ids    = get_theme_mod( $template_type, array() );
 	$active = in_array( $post->ID, $ids, true );
 
+	// Temporarily disable inactive access for 5.8 version.
+	if ( ! $active ) {
+		return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
+	}
+
 	$theme          = $active ? wp_get_theme()->get_stylesheet() : '';
 	$slug           = $active ? array_search( $post->ID, $ids, true ) : '';
 	$has_theme_file = $active &&
@@ -297,6 +302,11 @@ function _gutenberg_build_template_result_from_post( $post, $template_type = 'wp
  * @return array Templates.
  */
 function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_template', $active = true ) {
+	// Temporarily disable inactive access for 5.8 version.
+	if ( ! $active ) {
+		return array();
+	}
+
 	$theme_slugs = get_theme_mod( $template_type, array() );
 	$post__in    = $active ? 'post__in' : 'post__not_in';
 
@@ -386,6 +396,11 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	list( $theme, $slug ) = $parts;
 
 	$active = wp_get_theme()->get_stylesheet() === $theme;
+
+	// Temporarily disable inactive access for 5.8 version.
+	if ( ! $active ) {
+		return null;
+	}
 
 	if ( $active ) {
 		$ids = get_theme_mod( $template_type, array() );
