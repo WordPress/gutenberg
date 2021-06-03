@@ -201,7 +201,16 @@ export function useRichText( {
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;
-		}, [ placeholder, ...__unstableDependencies, value ] ),
+		}, [
+			placeholder,
+			...__unstableDependencies,
+			value,
+			multilineTag,
+			disableFormats,
+			__unstableAfterParse,
+			selectionStart,
+			selectionEnd,
+		] ),
 	] );
 
 	return {
