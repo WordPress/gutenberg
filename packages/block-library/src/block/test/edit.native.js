@@ -72,11 +72,8 @@ describe( 'Reusable block', () => {
 			getByA11yLabel( /Reusable block Block\. Row 1/ )
 		);
 
-		// Wait for the block to be fetched.
-		const reusableBlockRequest = await waitFor( () =>
-			fetchRequest.mock.calls.find( ( call ) =>
-				call[ 0 ].path.startsWith( endpoint )
-			)
+		const reusableBlockRequest = fetchRequest.mock.calls.find( ( call ) =>
+			call[ 0 ].path.startsWith( endpoint )
 		);
 
 		const blockDeleted = await waitFor( () =>
@@ -108,15 +105,12 @@ describe( 'Reusable block', () => {
 			initialHtml,
 		} );
 
-		// Wait for the block to be fetched.
-		const reusableBlockRequest = await waitFor( () =>
-			fetchRequest.mock.calls.find( ( call ) =>
-				call[ 0 ].path.startsWith( endpoint )
-			)
-		);
-
 		const reusableBlock = await waitFor( () =>
 			getByA11yLabel( /Reusable block Block\. Row 1/ )
+		);
+
+		const reusableBlockRequest = fetchRequest.mock.calls.find( ( call ) =>
+			call[ 0 ].path.startsWith( endpoint )
 		);
 
 		const innerBlockListWrapper = await waitFor( () =>
