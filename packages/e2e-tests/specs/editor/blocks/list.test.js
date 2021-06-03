@@ -522,7 +522,7 @@ describe( 'List', () => {
 			( el ) => el.innerHTML
 		);
 		expect( content ).toMatchSnapshot();
-	});
+	} );
 
 	it( 'should not change the contents when you change the list type to Unordered', async () => {
 		await clickBlockAppender();
@@ -538,5 +538,5 @@ describe( 'List', () => {
 			( el ) => el.innerHTML
 		);
 		expect( content ).toMatchSnapshot();
-	});
+	} );
 } );
