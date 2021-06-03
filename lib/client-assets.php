@@ -243,8 +243,8 @@ function gutenberg_register_packages_scripts( $scripts ) {
 		// For example, `…/build/a11y/index.min.js` becomes `wp-a11y`.
 		$handle = 'wp-' . basename( dirname( $path ) );
 
-		// Replace `.js` extension with `.asset.php` to find the generated dependencies file.
-		$asset_file   = substr( $path, 0, -3 ) . '.asset.php';
+		// Replace suffix and extension with `.asset.php` to find the generated dependencies file.
+		$asset_file   = substr( $path, 0, -( strlen( $suffix ) ) ) . '.asset.php';
 		$asset        = file_exists( $asset_file )
 			? require( $asset_file )
 			: null;

@@ -178,10 +178,13 @@ class DependencyExtractionWebpackPlugin {
 					continue;
 				}
 
-				const assetFilename = buildFilename.replace(
-					/\.js$/i,
-					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
-				);
+				// We assume that anything after the first period is
+				// the extension. This is in order to ignore suffixes
+				// like .min.js, for example.
+				const assetFilename =
+					buildFilename.split( '.' )[ 0 ] +
+					'.asset.' +
+					( outputFormat === 'php' ? 'php' : 'json' );
 
 				// Add source and file into compilation for webpack to output.
 				compilation.assets[ assetFilename ] = new RawSource(
