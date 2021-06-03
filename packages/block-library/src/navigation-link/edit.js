@@ -605,12 +605,12 @@ export default function NavigationLinkEdit( {
 							/>
 						</Popover>
 					) }
+					{ hasDescendants && showSubmenuIcon && (
+						<span className="wp-block-navigation-link__submenu-icon">
+							<ItemSubmenuIcon />
+						</span>
+					) }
 				</a>
-				{ hasDescendants && showSubmenuIcon && (
-					<span className="wp-block-navigation-link__submenu-icon">
-						<ItemSubmenuIcon />
-					</span>
-				) }
 				<ul { ...innerBlocksProps } />
 			</li>
 		</Fragment>

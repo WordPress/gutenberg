@@ -18,6 +18,12 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	example: {
+		attributes: {
+			src:
+				'https://upload.wikimedia.org/wikipedia/commons/d/dd/Armstrong_Small_Step.ogg',
+		},
+	},
 	transforms,
 	deprecated,
 	edit,

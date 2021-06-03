@@ -15,21 +15,28 @@ function gutenberg_register_typography_support( $block_type ) {
 		return;
 	}
 
-	$has_font_size_support       = _wp_array_get( $block_type->supports, array( 'fontSize' ), false );
-	$has_font_style_support      = _wp_array_get( $block_type->supports, array( '__experimentalFontStyle' ), false );
-	$has_font_weight_support     = _wp_array_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
-	$has_line_height_support     = _wp_array_get( $block_type->supports, array( 'lineHeight' ), false );
-	$has_text_decoration_support = _wp_array_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
-	$has_text_transform_support  = _wp_array_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
-	$has_letter_spacing_support  = _wp_array_get( $block_type->supports, array( '__experimentalLetterSpacing' ), false );
+	$typography_supports = _wp_array_get( $block_type->supports, array( 'typography' ), false );
+	if ( ! $typography_supports ) {
+		return;
+	}
 
-	$has_typography_support = $has_font_size_support
-		|| $has_font_weight_support
+	$has_font_family_support     = _wp_array_get( $typography_supports, array( '__experimentalFontFamily' ), false );
+	$has_font_size_support       = _wp_array_get( $typography_supports, array( 'fontSize' ), false );
+	$has_font_style_support      = _wp_array_get( $typography_supports, array( '__experimentalFontStyle' ), false );
+	$has_font_weight_support     = _wp_array_get( $typography_supports, array( '__experimentalFontWeight' ), false );
+	$has_letter_spacing_support  = _wp_array_get( $typography_supports, array( '__experimentalLetterSpacing' ), false );
+	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
+	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
+	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
+
+	$has_typography_support = $has_font_family_support
+		|| $has_font_size_support
 		|| $has_font_style_support
+		|| $has_font_weight_support
+		|| $has_letter_spacing_support
 		|| $has_line_height_support
-		|| $has_text_transform_support
 		|| $has_text_decoration_support
-		|| $has_letter_spacing_support;
+		|| $has_text_transform_support;
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
@@ -67,14 +74,19 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$classes    = array();
 	$styles     = array();
 
-	$has_font_family_support     = _wp_array_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
-	$has_font_style_support      = _wp_array_get( $block_type->supports, array( '__experimentalFontStyle' ), false );
-	$has_font_weight_support     = _wp_array_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
-	$has_font_size_support       = _wp_array_get( $block_type->supports, array( 'fontSize' ), false );
-	$has_line_height_support     = _wp_array_get( $block_type->supports, array( 'lineHeight' ), false );
-	$has_text_decoration_support = _wp_array_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
-	$has_text_transform_support  = _wp_array_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
-	$has_letter_spacing_support  = _wp_array_get( $block_type->supports, array( '__experimentalLetterSpacing' ), false );
+	$typography_supports = _wp_array_get( $block_type->supports, array( 'typography' ), false );
+	if ( ! $typography_supports ) {
+		return array();
+	}
+
+	$has_font_family_support     = _wp_array_get( $typography_supports, array( '__experimentalFontFamily' ), false );
+	$has_font_size_support       = _wp_array_get( $typography_supports, array( 'fontSize' ), false );
+	$has_font_style_support      = _wp_array_get( $typography_supports, array( '__experimentalFontStyle' ), false );
+	$has_font_weight_support     = _wp_array_get( $typography_supports, array( '__experimentalFontWeight' ), false );
+	$has_letter_spacing_support  = _wp_array_get( $typography_supports, array( '__experimentalLetterSpacing' ), false );
+	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
+	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
+	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
 
 	$skip_font_size_support_serialization = _wp_array_get( $block_type->supports, array( '__experimentalSkipFontSizeSerialization' ), false );
 

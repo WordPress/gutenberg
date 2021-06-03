@@ -20,10 +20,12 @@
 			"margin": true,
 			"padding": true
 		},
-		"fontSize": true,
-		"lineHeight": true,
-		"__experimentalFontFamily": true,
-		"__experimentalTextTransform": true,
-		"__experimentalLetterSpacing": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextTransform": true,
+			"__experimentalLetterSpacing": true
+		}
 	}
 }
