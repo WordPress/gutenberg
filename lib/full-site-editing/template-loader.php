@@ -255,8 +255,14 @@ add_filter( 'render_block_context', 'gutenberg_template_render_without_post_bloc
 function gutenberg_resolve_template_for_new_post( $wp_query ) {
 	remove_filter( 'pre_get_posts', 'gutenberg_resolve_template_for_new_post' );
 
-	$p    = isset( $wp_query->query['p'] ) ? $wp_query->query['p'] : null;
-	$post = get_post( $p );
+	// Pages.
+	$page_id = isset( $wp_query->query['page_id'] ) ? $wp_query->query['page_id'] : null;
+
+	// Posts, including custom post types.
+	$p = isset( $wp_query->query['p'] ) ? $wp_query->query['p'] : null;
+
+	$post_id = $page_id ? $page_id : $p;
+	$post    = get_post( $post_id );
 
 	if (
 		$post &&
