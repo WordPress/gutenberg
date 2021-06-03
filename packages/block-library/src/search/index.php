@@ -301,20 +301,22 @@ function get_color_classes_for_block_core_search( $attributes ) {
 	$classnames = array();
 
 	// Text color.
+	$has_preset_text_color = ! empty( $attributes['textColor'] );
 	$has_custom_text_color = ! empty( $attributes['style']['color']['text'] );
-	if ( ! empty( $attributes['textColor'] ) ) {
+	if ( $has_preset_text_color ) {
 		$classnames[] = sprintf( 'has-text-color has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
-		// If there's no 'textColor' text string but there is a custom text color style, still add the generic `has-text-color` class.
+		// If a custom 'textColor' was selected instead of a preset, still add the generic `has-text-color` class.
 		$classnames[] = 'has-text-color';
 	}
 
 	// Background color.
+	$has_preset_background_color = ! empty( $attributes['backgroundColor'] );
 	$has_custom_background_color = ! empty( $attributes['style']['color']['background'] );
-	if ( ! empty( $attributes['backgroundColor'] ) ) {
+	if ( $has_preset_background_color ) {
 		$classnames[] = sprintf( 'has-background has-%s-background-color', $attributes['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
-		// If there's no 'backgroundColor' text string but there is a custom background color style, still add the generic `has-background` class.
+		// If a custom 'backgroundColor' was selected instead of a preset, still add the generic `has-background` class.
 		$classnames[] = 'has-background';
 	}
 
