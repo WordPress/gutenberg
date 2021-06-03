@@ -16,7 +16,9 @@
 		"color": {
 			"gradients": true
 		},
-		"fontSize": true,
-		"lineHeight": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
 	}
 }
