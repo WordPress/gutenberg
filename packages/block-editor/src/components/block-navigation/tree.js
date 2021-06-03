@@ -105,6 +105,7 @@ export function BlockNavigationTree( {
 		</TreeGrid>
 	);
 }
-export default memo( BlockNavigationTree, () => {
-	return true;
-} );
+function blockNavigationTreeIsEqual( prevProps, nextProps ) {
+	return prevProps?.blocks === nextProps?.blocks;
+}
+export default memo( BlockNavigationTree, blockNavigationTreeIsEqual );
