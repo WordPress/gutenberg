@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { View } from '../../../index';
+import { View } from '../../../view';
 import { Scrollable } from '../index';
 
 export default {
