@@ -72,7 +72,15 @@
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true
 		},
-		"color": true
+		"color": true,
+		"__experimentalAllowedBlocks": [
+			"core/navigation-link",
+			"core/search",
+			"core/social-links",
+			"core/page-list",
+			"core/spacer",
+			"core/home-link"
+		]
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
