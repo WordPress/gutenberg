@@ -31,22 +31,16 @@
 	padding-bottom: $grid-unit;
 }
 
-.featuredButton {
+.setFeaturedButton {
 	border-top-width: $border-width;
 	border-top-color: $light-gray-400;
 	padding: $grid-unit-20;
 	text-align: center;
-}
-
-.featuredButtonDark {
-	border-top-color: $gray-70;
-}
-
-.setFeaturedButton {
 	color: $blue-50;
 }
 
 .setFeaturedButtonDark {
+	border-top-color: $gray-70;
 	color: $blue-30;
 }
 

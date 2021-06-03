@@ -54,6 +54,7 @@ import {
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -61,7 +62,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import styles from './styles.scss';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import { LINK_DESTINATION_CUSTOM } from './constants';
+import {
+	LINK_DESTINATION_CUSTOM,
+	MEDIA_ID_NO_FEATURED_IMAGE_SET,
+} from './constants';
 
 const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
@@ -435,49 +439,45 @@ export class ImageEdit extends Component {
 
 	onSetFeatured( mediaId ) {
 		const { closeSettingsBottomSheet } = this.props;
-		closeSettingsBottomSheet();
 		setFeaturedImage( mediaId );
+		closeSettingsBottomSheet();
 	}
 
 	getFeaturedButtonPanel( isFeaturedImage ) {
 		const { attributes, getStylesFromColorScheme } = this.props;
-
-		const featuredButtonStyle = getStylesFromColorScheme(
-			styles.featuredButton,
-			styles.featuredButtonDark
-		);
 
 		const setFeaturedButtonStyle = getStylesFromColorScheme(
 			styles.setFeaturedButton,
 			styles.setFeaturedButtonDark
 		);
 
+		const removeFeaturedButton = () => (
+			<BottomSheet.Cell
+				label={ __( 'Remove as Featured Image ' ) }
+				labelStyle={ [
+					setFeaturedButtonStyle,
+					styles.removeFeaturedButton,
+				] }
+				onPress={ () =>
+					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
+				}
+			/>
+		);
+
+		const setFeaturedButton = () => (
+			<BottomSheet.Cell
+				label={ __( 'Set as Featured Image ' ) }
+				labelStyle={ setFeaturedButtonStyle }
+				onPress={ () => this.onSetFeatured( attributes.id ) }
+			/>
+		);
+
 		return (
-			<>
-				<PanelBody>
-					{ isFeaturedImage ? (
-						<BottomSheet.Cell
-							label={ __( 'Remove as Featured Image ' ) }
-							labelStyle={ [
-								featuredButtonStyle,
-								styles.removeFeaturedButton,
-							] }
-							onPress={ () => this.onSetFeatured( 0 ) }
-						/>
-					) : (
-						<BottomSheet.Cell
-							label={ __( 'Set as Featured Image ' ) }
-							labelStyle={ [
-								featuredButtonStyle,
-								setFeaturedButtonStyle,
-							] }
-							onPress={ () =>
-								this.onSetFeatured( attributes.id )
-							}
-						/>
-					) }
-				</PanelBody>
-			</>
+			<PanelBody>
+				{ isFeaturedImage
+					? removeFeaturedButton()
+					: setFeaturedButton() }
+			</PanelBody>
 		);
 	}
 
@@ -499,9 +499,15 @@ export class ImageEdit extends Component {
 			imageDefaultSize,
 		] );
 
+		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
+		// Images that haven't been uploaded to a site's library have an id of 'undefined', which the 'canImageBeFeatured' check filters out.
+		const canImageBeFeatured = typeof attributes.id !== 'undefined';
+
 		const isFeaturedImage =
-			typeof featuredImageId !== 'undefined' &&
-			featuredImageId === attributes.id;
+			canImageBeFeatured && featuredImageId === attributes.id;
+
+		// eslint-disable-next-line no-unused-vars
+		const androidOnly = Platform.OS === 'android';
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -540,7 +546,8 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ this.getFeaturedButtonPanel( isFeaturedImage ) }
+				{ canImageBeFeatured &&
+					this.getFeaturedButtonPanel( isFeaturedImage ) }
 			</InspectorControls>
 		);
 
@@ -688,7 +695,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		return {
 			closeSettingsBottomSheet() {
-				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+				dispatch( editPostStore ).closeGeneralSidebar();
 			},
 		};
 	} ),
