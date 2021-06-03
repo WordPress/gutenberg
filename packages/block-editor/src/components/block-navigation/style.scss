@@ -243,6 +243,21 @@
 			color: $white;
 		}
 	}
+
+	.block-editor-block-navigation-block-select-button__anchor {
+		background: rgba($black, 0.1);
+		border-radius: $radius-block-ui;
+		display: inline-block;
+		padding: 2px 6px;
+		margin: 0 $grid-unit-10;
+		max-width: 120px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	&.is-selected .block-editor-block-navigation-block-select-button__anchor {
+		background: rgba($black, 0.3);
+	}
 }
 
 .block-editor-block-navigation-block-slot__description,
@@ -259,7 +274,15 @@
 	}
 }
 
-.block-editor-block-navigator-indentation {
-	flex-shrink: 0;
-	width: $grid-unit-30 + $grid-unit-05; // Indent a full icon size, plus 4px which optically aligns child icons to the text label above.
+// First level of indentation is aria-level 2, max indent is 8.
+// Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
+$block-navigation-max-indent: 8;
+.block-editor-block-navigation-leaf[aria-level] .block-editor-block-icon {
+	margin-left: ( $grid-unit-30 + $grid-unit-05 ) * $block-navigation-max-indent;
 }
+@for $i from 0 through $block-navigation-max-indent {
+	.block-editor-block-navigation-leaf[aria-level="#{ $i + 1 }"] .block-editor-block-icon {
+		margin-left: ( $grid-unit-30 + $grid-unit-05 ) * $i;
+	}
+}
+

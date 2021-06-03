@@ -8,4 +8,9 @@
 		max-width: 100%;
 		height: auto;
 	}
+
+	&.alignwide img,
+	&.alignfull img {
+		width: 100%;
+	}
 }

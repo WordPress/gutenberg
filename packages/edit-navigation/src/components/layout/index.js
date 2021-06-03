@@ -35,11 +35,10 @@ import {
 } from '../../hooks';
 import ErrorBoundary from '../error-boundary';
 import NavigationEditorShortcuts from './shortcuts';
-import Sidebar from './sidebar';
+import Sidebar from '../sidebar';
 import Header from '../header';
 import Notices from '../notices';
 import Editor from '../editor';
-import InspectorAdditions from '../inspector-additions';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
 
@@ -70,9 +69,6 @@ export default function Layout( { blockEditorSettings } ) {
 		isMenuBeingDeleted,
 		selectMenu,
 		deleteMenu,
-		openManageLocationsModal,
-		closeManageLocationsModal,
-		isManageLocationsModalOpen,
 		isMenuSelected,
 	} = useNavigationEditor();
 
@@ -98,7 +94,7 @@ export default function Layout( { blockEditorSettings } ) {
 	useMenuNotifications( selectedMenuId );
 
 	const hasMenus = !! menus?.length;
-	const hasPermanentSidebar = isLargeViewport && hasMenus;
+	const hasPermanentSidebar = isLargeViewport && isMenuSelected;
 
 	const isBlockEditorReady = !! (
 		hasMenus &&
@@ -164,37 +160,19 @@ export default function Layout( { blockEditorSettings } ) {
 											/>
 										) }
 									{ isBlockEditorReady && (
-										<BlockTools>
-											<div
-												className="edit-navigation-layout__content-area"
-												ref={ contentAreaRef }
-											>
+										<div
+											className="edit-navigation-layout__content-area"
+											ref={ contentAreaRef }
+										>
+											<BlockTools>
 												<Editor
 													isPending={
 														! hasLoadedMenus
 													}
 													blocks={ blocks }
 												/>
-												<InspectorAdditions
-													isManageLocationsModalOpen={
-														isManageLocationsModalOpen
-													}
-													openManageLocationsModal={
-														openManageLocationsModal
-													}
-													closeManageLocationsModal={
-														closeManageLocationsModal
-													}
-													onSelectMenu={ selectMenu }
-													menus={ menus }
-													menuId={ selectedMenuId }
-													onDeleteMenu={ deleteMenu }
-													isMenuBeingDeleted={
-														isMenuBeingDeleted
-													}
-												/>
-											</div>
-										</BlockTools>
+											</BlockTools>
+										</div>
 									) }
 								</>
 							}
@@ -205,7 +183,16 @@ export default function Layout( { blockEditorSettings } ) {
 								)
 							}
 						/>
-						<Sidebar hasPermanentSidebar={ hasPermanentSidebar } />
+						{ isMenuSelected && (
+							<Sidebar
+								menus={ menus }
+								menuId={ selectedMenuId }
+								onSelectMenu={ selectMenu }
+								onDeleteMenu={ deleteMenu }
+								isMenuBeingDeleted={ isMenuBeingDeleted }
+								hasPermanentSidebar={ hasPermanentSidebar }
+							/>
+						) }
 					</IsMenuNameControlFocusedContext.Provider>
 					<UnsavedChangesWarning />
 				</BlockEditorProvider>

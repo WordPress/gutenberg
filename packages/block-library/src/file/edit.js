@@ -274,8 +274,7 @@ function FileEdit( {
 				) }
 				<div className={ 'wp-block-file__content-wrapper' }>
 					<RichText
-						style={ { display: 'inline-block' } }
-						tagName="a" // must be block-level or else cursor disappears
+						tagName="a"
 						value={ fileName }
 						placeholder={ __( 'Write file name…' ) }
 						withoutInteractiveFormatting

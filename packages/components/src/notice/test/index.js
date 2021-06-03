@@ -31,7 +31,7 @@ describe( 'Notice', () => {
 				actions={ [
 					{ label: 'More information', url: 'https://example.com' },
 					{ label: 'Cancel', onClick() {} },
-					{ label: 'Submit', onClick() {}, isPrimary: true },
+					{ label: 'Submit', onClick() {}, variant: 'primary' },
 				] }
 			>
 				Example

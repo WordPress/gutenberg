@@ -57,6 +57,7 @@ export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
+export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
 export { default as FocalPointPicker } from './focal-point-picker';
@@ -146,6 +147,7 @@ export {
 	useSlot as __experimentalUseSlot,
 } from './slot-fill';
 export { default as __experimentalStyleProvider } from './style-provider';
+export { ZStack as __experimentalZStack } from './z-stack';
 
 // Higher-Order Components
 export {
@@ -162,9 +164,3 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
-
-// Component System
-export {
-	withNext as __unstableWithNext,
-	ComponentSystemProvider as __unstableComponentSystemProvider,
-} from './ui/context';

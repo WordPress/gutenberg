@@ -11,7 +11,7 @@ import * as styles from './form-group-styles';
 import { useInstanceId } from '../utils';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
  */
 export function useFormGroup( props ) {
 	const {

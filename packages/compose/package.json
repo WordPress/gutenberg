@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "4.0.0",
+	"version": "4.1.1",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,6 +29,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
+		"@types/mousetrap": "^1.6.8",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",

@@ -1,0 +1,18 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/legacy-widget",
+		"isValid": true,
+		"attributes": {
+			"id": null,
+			"idBase": "search",
+			"instance": {
+				"encoded": "YTowOnt9",
+				"hash": "b9b82f721929717273108125217fbcd9",
+				"raw": {}
+			}
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

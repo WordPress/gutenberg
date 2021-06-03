@@ -13,16 +13,22 @@
  * @return string Rendered block.
  */
 function render_block_core_legacy_widget( $attributes ) {
+	global $wp_widget_factory;
+
 	if ( isset( $attributes['id'] ) ) {
-		$sidebar_id = gutenberg_find_widgets_sidebar( $attributes['id'] );
-		return gutenberg_render_widget( $attributes['id'], $sidebar_id );
+		$sidebar_id = wp_find_widgets_sidebar( $attributes['id'] );
+		return wp_render_widget( $attributes['id'], $sidebar_id );
 	}
 
 	if ( ! isset( $attributes['idBase'] ) ) {
 		return '';
 	}
 
-	$widget_object = gutenberg_get_widget_object( $attributes['idBase'] );
+	if ( method_exists( $wp_widget_factory, 'get_widget_object' ) ) {
+		$widget_object = $wp_widget_factory->get_widget_object( $attributes['idBase'] );
+	} else {
+		$widget_object = gutenberg_get_widget_object( $attributes['idBase'] );
+	}
 
 	if ( ! $widget_object ) {
 		return '';
@@ -55,7 +61,7 @@ function register_block_core_legacy_widget() {
 	);
 }
 
-add_action( 'init', 'register_block_core_legacy_widget', 20 );
+add_action( 'init', 'register_block_core_legacy_widget' );
 
 /**
  * Intercepts any request with legacy-widget-preview in the query param and, if
@@ -108,4 +114,7 @@ function handle_legacy_widget_preview_iframe() {
 	exit;
 }
 
+// Ensure handle_legacy_widget_preview_iframe() is called after Core's
+// register_block_core_legacy_widget() (priority = 10) and after Gutenberg's
+// register_block_core_legacy_widget() (priority = 20).
 add_action( 'init', 'handle_legacy_widget_preview_iframe', 21 );

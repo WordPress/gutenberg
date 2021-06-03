@@ -100,7 +100,7 @@ function MenuTitleSearch( {
 
 			<Button
 				isSmall
-				isTertiary
+				variant="tertiary"
 				label={ __( 'Close search' ) }
 				onClick={ onClose }
 			>
