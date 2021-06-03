@@ -1335,6 +1335,12 @@ const canInsertBlockTypeUnmemoized = (
 		blockName
 	);
 
+	// If the parent has indicated is does not support the block
+	// then it should not be allowed.
+	if ( false === hasParentAllowedBlock ) {
+		return false;
+	}
+
 	const blockAllowedParentBlocks = blockType.parent;
 	const parentName = getBlockName( state, rootClientId );
 	const hasBlockAllowedParent = checkAllowList(
