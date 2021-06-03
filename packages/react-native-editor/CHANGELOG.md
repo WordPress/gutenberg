@@ -10,12 +10,13 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Gallery block - Fix gallery images caption text formatting [#32351]
 
+## 1.54.0
 -   [***] Slash inserter [#29772]
 -   [*] Audio block: Add Insert from URL functionality. [#27817]
 -   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
 -   [***] Enable reusable block only in WP.com sites [#31744]
--   [*] Gallery block - Fix gallery images caption text formatting [#32351]
 
 ## 1.53.1
 
