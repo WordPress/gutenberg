@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import { View } from '../../../view';
-import { Scrollable } from '../index';
+import { View } from '../../view';
+import { Scrollable } from '../';
 
 export default {
 	component: Scrollable,
-	title: 'G2 Components (Experimental)/Scrollable',
+	title: 'Components (Experimental)/Scrollable',
 };
 
 export const _default = () => {

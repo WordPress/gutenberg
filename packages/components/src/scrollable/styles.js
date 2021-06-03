@@ -5,7 +5,7 @@ import { css } from 'emotion';
 /**
  * Internal dependencies
  */
-import CONFIG from '../../utils/config-values';
+import { CONFIG } from '../utils';
 
 export const scrollableScrollbar = css`
 	@media only screen and ( min-device-width: 40em ) {
