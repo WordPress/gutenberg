@@ -87,21 +87,14 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
-<<<<<<< HEAD
 	context,
-} ) {
-	const captionRef = useRef();
-	const prevUrl = usePrevious( url );
-	const { allowResize = true, isGrouped = false } = context;
-	const { block, currentId, image, multiImageSelection } = useSelect(
-=======
 	clientId,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
+	const { allowResize = true, isGrouped = false } = context;
 	const { getBlock } = useSelect( blockEditorStore );
 	const { image, multiImageSelection } = useSelect(
->>>>>>> trunk
 		( select ) => {
 			const { getMedia } = select( coreStore );
 			const { getMultiSelectedBlockClientIds, getBlockName } = select(
