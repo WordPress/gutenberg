@@ -243,9 +243,7 @@ export const withBlockControls = createHigherOrderComponent(
 const withElementsStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const elements = props.attributes.style?.elements;
-		if ( ! elements ) {
-			return <BlockListBlock { ...props } />;
-		}
+
 		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 			BlockListBlock
 		) }`;
@@ -256,17 +254,23 @@ const withElementsStyles = createHigherOrderComponent(
 
 		return (
 			<>
-				<style
-					dangerouslySetInnerHTML={ {
-						__html: styles,
-					} }
-				/>
+				{ elements && (
+					<style
+						dangerouslySetInnerHTML={ {
+							__html: styles,
+						} }
+					/>
+				) }
+
 				<BlockListBlock
 					{ ...props }
-					className={ classnames(
-						props.classname,
-						blockElementsContainerIdentifier
-					) }
+					className={
+						elements &&
+						classnames(
+							props.classname,
+							blockElementsContainerIdentifier
+						)
+					}
 				/>
 			</>
 		);
