@@ -10,12 +10,12 @@
  */
 function register_gutenberg_patterns() {
 	// Register categories used for block patterns.
-	register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
+	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'query' ) ) {
+		register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
+	}
 
-	// Initial Query block patterns.
-	register_block_pattern(
-		'query/standard-posts',
-		array(
+	$patterns = array(
+		'query-standard-posts'                 => array(
 			'title'      => __( 'Standard', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -32,12 +32,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/medium-posts',
-		array(
+		),
+		'query-medium-posts'                   => array(
 			'title'      => __( 'Image at left', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -56,12 +52,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/small-posts',
-		array(
+		),
+		'query-small-posts'                    => array(
 			'title'      => __( 'Small image and title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -79,12 +71,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/grid-posts',
-		array(
+		),
+		'query-grid-posts'                     => array(
 			'title'      => __( 'Grid', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -99,12 +87,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop -->
 							</div>
 							<!-- /wp:query -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/large-title-posts',
-		array(
+		),
+		'query-large-title-posts'              => array(
 			'title'      => __( 'Large title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -127,12 +111,8 @@ function register_gutenberg_patterns() {
 							<!-- /wp:query-loop --></div>
 							<!-- /wp:query --></div>
 							<!-- /wp:group -->',
-		)
-	);
-
-	register_block_pattern(
-		'query/offset-posts',
-		array(
+		),
+		'query-offset-posts'                   => array(
 			'title'      => __( 'Offset', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
@@ -164,13 +144,9 @@ function register_gutenberg_patterns() {
 							<!-- /wp:column --></div>
 							<!-- /wp:columns --></main>
 							<!-- /wp:group -->',
-		)
-	);
-
-	// Initial block pattern to be used with block transformations with patterns.
-	register_block_pattern(
-		'social-links/shared-background-color',
-		array(
+		),
+		// Initial block pattern to be used with block transformations with patterns.
+		'social-links-shared-background-color' => array(
 			'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
 			'categories'    => array( 'buttons' ),
 			'blockTypes'    => array( 'core/social-links' ),
@@ -180,15 +156,21 @@ function register_gutenberg_patterns() {
 								<!-- wp:social-link {"url":"#","service":"chain"} /-->
 								<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
 								<!-- /wp:social-links -->',
-		)
+		),
 	);
+
+	foreach ( $patterns as $name => $pattern ) {
+		$pattern_name = 'core/' . $name;
+		if ( ! WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_name ) ) {
+			register_block_pattern( $pattern_name, $pattern );
+		}
+	}
 }
 
 /**
- * Deactivate the legacy patterns bundled with WordPress, and add new block patterns for testing.
- * More details in the trac issue (https://core.trac.wordpress.org/ticket/52846).
+ * Deactivate the legacy patterns bundled with WordPress.
  */
-function update_core_patterns() {
+function remove_core_patterns() {
 	$core_block_patterns = array(
 		'text-two-columns',
 		'two-buttons',
@@ -200,24 +182,13 @@ function update_core_patterns() {
 		'three-buttons',
 		'heading-paragraph',
 		'quote',
-	);
-
-	$new_core_block_patterns = array(
-		'media-text-nature',
-		'two-images-gallery',
-		'three-columns-media-text',
-		'quote',
-		'large-header-left',
-		'large-header-text-button',
-		'media-text-art',
-		'text-two-columns-title',
-		'three-columns-text',
-		'text-two-columns-title-offset',
-		'heading',
-		'three-images-gallery',
-		'text-two-columns',
-		'media-text-arquitecture',
-		'two-buttons',
+		'query-standard-posts',
+		'query-medium-posts',
+		'query-small-posts',
+		'query-grid-posts',
+		'query-large-title-posts',
+		'query-offset-posts',
+		'social-links-shared-background-color',
 	);
 
 	foreach ( $core_block_patterns as $core_block_pattern ) {
@@ -226,12 +197,32 @@ function update_core_patterns() {
 			unregister_block_pattern( $name );
 		}
 	}
+}
 
-	foreach ( $new_core_block_patterns as $core_block_pattern ) {
-		register_block_pattern(
-			'core/' . $core_block_pattern,
-			require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
-		);
+/**
+ * Import patterns from wordpress.org/patterns.
+ */
+function load_remote_patterns() {
+	// This is the core function that provides the same feature.
+	if ( function_exists( '_load_remote_block_patterns' ) ) {
+		return;
+	}
+	$patterns = get_transient( 'gutenberg_remote_block_patterns' );
+	if ( ! $patterns ) {
+		$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+		$core_keyword_id = 11; // 11 is the ID for "core".
+		$request->set_param( 'keyword', $core_keyword_id );
+		$response = rest_do_request( $request );
+		if ( $response->is_error() ) {
+			return;
+		}
+		$patterns = $response->get_data();
+		set_transient( 'gutenberg_remote_block_patterns', $patterns, HOUR_IN_SECONDS );
+	}
+
+	foreach ( $patterns as $settings ) {
+		$pattern_name = 'core/' . sanitize_title( $settings['title'] );
+		register_block_pattern( $pattern_name, (array) $settings );
 	}
 }
 
@@ -242,7 +233,21 @@ add_action(
 		if ( ! get_theme_support( 'core-block-patterns' ) || ! function_exists( 'unregister_block_pattern' ) ) {
 			return;
 		}
+		remove_core_patterns();
 		register_gutenberg_patterns();
-		update_core_patterns();
+	}
+);
+
+add_action(
+	'current_screen',
+	function( $current_screen ) {
+		if ( ! get_theme_support( 'core-block-patterns' ) ) {
+			return;
+		}
+
+		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
+		if ( $current_screen->is_block_editor || $is_site_editor ) {
+			load_remote_patterns();
+		}
 	}
 );

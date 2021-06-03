@@ -50,6 +50,7 @@ function MediaPlaceholder( props ) {
 		backgroundColor,
 		hideContent,
 		autoOpenMediaUpload,
+		onSelectURL,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -157,6 +158,7 @@ function MediaPlaceholder( props ) {
 			<MediaUpload
 				allowedTypes={ allowedTypes }
 				onSelect={ setMedia }
+				onSelectURL={ onSelectURL }
 				__experimentalOnlyMediaLibrary={
 					__experimentalOnlyMediaLibrary
 				}

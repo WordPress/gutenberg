@@ -153,6 +153,10 @@ function GalleryEdit( props ) {
 		return {};
 	}, [ isSelected, attributes.ids, imageSizes ] );
 
+	function onFocusGalleryCaption() {
+		setSelectedImage();
+	}
+
 	function setAttributes( newAttrs ) {
 		if ( newAttrs.ids ) {
 			throw new Error(
@@ -464,6 +468,8 @@ function GalleryEdit( props ) {
 				onDeselectImage={ onDeselectImage }
 				onSetImageAttributes={ setImageAttributes }
 				blockProps={ blockProps }
+				// This prop is used by gallery.native.js.
+				onFocusGalleryCaption={ onFocusGalleryCaption }
 			/>
 		</>
 	);

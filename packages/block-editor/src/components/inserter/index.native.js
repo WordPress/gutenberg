@@ -31,9 +31,19 @@ import { store as blockEditorStore } from '../../store';
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
-const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
+const defaultRenderToggle = ( {
+	canViewEditorOnboarding,
+	onToggle,
+	disabled,
+	style,
+	onLongPress,
+} ) => (
 	<ToolbarButton
-		title={ __( 'Add block' ) }
+		title={
+			canViewEditorOnboarding
+				? __( 'Tap to add content' )
+				: __( 'Add block' )
+		}
 		icon={
 			<Icon
 				icon={ plusCircleFilled }
@@ -41,6 +51,8 @@ const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 				color={ style.color }
 			/>
 		}
+		showTooltip={ canViewEditorOnboarding }
+		tooltipPosition="top right"
 		onClick={ onToggle }
 		extraProps={ {
 			hint: __( 'Double tap to add a block' ),
@@ -58,7 +70,7 @@ export class Inserter extends Component {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
-		this.renderToggle = this.renderToggle.bind( this );
+		this.renderInserterToggle = this.renderInserterToggle.bind( this );
 		this.renderContent = this.renderContent.bind( this );
 	}
 
@@ -186,8 +198,9 @@ export class Inserter extends Component {
 	 *
 	 * @return {WPElement} Dropdown toggle element.
 	 */
-	renderToggle( { onToggle, isOpen } ) {
+	renderInserterToggle( { onToggle, isOpen } ) {
 		const {
+			canViewEditorOnboarding,
 			disabled,
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
@@ -234,6 +247,7 @@ export class Inserter extends Component {
 		return (
 			<>
 				{ renderToggle( {
+					canViewEditorOnboarding,
 					onToggle: onPress,
 					isOpen,
 					disabled,
@@ -286,7 +300,7 @@ export class Inserter extends Component {
 			<Dropdown
 				onToggle={ this.onToggle }
 				headerTitle={ __( 'Add a block' ) }
-				renderToggle={ this.renderToggle }
+				renderToggle={ this.renderInserterToggle }
 				renderContent={ this.renderContent }
 			/>
 		);
@@ -301,6 +315,7 @@ export default compose( [
 			getBlockOrder,
 			getBlockIndex,
 			getBlock,
+			getSettings: getBlockEditorSettings,
 		} = select( blockEditorStore );
 
 		const end = getBlockSelectionEnd();
@@ -321,11 +336,9 @@ export default compose( [
 			: undefined;
 
 		function getDefaultInsertionIndex() {
-			const { getSettings } = select( blockEditorStore );
-
 			const {
 				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-			} = getSettings();
+			} = getBlockEditorSettings();
 
 			// if post title is selected insert as first block
 			if ( shouldInsertAtTheTop ) {
@@ -365,6 +378,8 @@ export default compose( [
 		const insertionIndexEnd = endOfRootIndex;
 
 		return {
+			canViewEditorOnboarding: getBlockEditorSettings()
+				.canViewEditorOnboarding,
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,

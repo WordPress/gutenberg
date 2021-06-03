@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalBoxControl as BoxControl,
 	PanelBody,
-	useCustomUnits,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
 

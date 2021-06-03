@@ -47,7 +47,31 @@ const GlobalStylesContext = createContext( {
 	/* eslint-enable no-unused-vars */
 } );
 
-const mergeTreesCustomizer = ( objValue, srcValue ) => {
+const mergeTreesCustomizer = ( objValue, srcValue, key ) => {
+	// Users can add their own colors.
+	// We want to append them when they don't
+	// have the same slug as an existing color,
+	// otherwise we want to update the existing color instead.
+	if ( 'palette' === key ) {
+		const indexTable = {};
+		const existingSlugs = [];
+		const result = [ ...( objValue ?? [] ) ];
+		result.forEach( ( { slug }, index ) => {
+			indexTable[ slug ] = index;
+			existingSlugs.push( slug );
+		} );
+
+		( srcValue ?? [] ).forEach( ( element ) => {
+			if ( existingSlugs.includes( element?.slug ) ) {
+				result[ indexTable[ element?.slug ] ] = element;
+			} else {
+				result.push( element );
+			}
+		} );
+
+		return result;
+	}
+
 	// We only pass as arrays the presets,
 	// in which case we want the new array of values
 	// to override the old array (no merging).

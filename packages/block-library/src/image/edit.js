@@ -81,6 +81,7 @@ export function ImageEdit( {
 	noticeOperations,
 	onReplace,
 	context,
+	clientId,
 } ) {
 	const {
 		url = '',
@@ -301,6 +302,7 @@ export function ImageEdit( {
 					onUploadError={ onUploadError }
 					containerRef={ ref }
 					context={ context }
+					clientId={ clientId }
 				/>
 			) }
 			{ ! url && (

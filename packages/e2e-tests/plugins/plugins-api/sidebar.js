@@ -42,7 +42,7 @@
 				el(
 					Button,
 					{
-						isPrimary: true,
+						variant:"primary",
 						onClick: props.resetTitle,
 					},
 					__( 'Reset' )

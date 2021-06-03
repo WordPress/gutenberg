@@ -9,13 +9,6 @@ import { createInterpolateElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	CanvasImage,
-	EditorImage,
-	BlockLibraryImage,
-	DocumentationImage,
-	InserterIconImage,
-} from './images';
 import { store as editWidgetsStore } from '../../store';
 
 export default function WelcomeGuide() {
@@ -60,7 +53,12 @@ export default function WelcomeGuide() {
 			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
 			pages={ [
 				{
-					image: <CanvasImage />,
+					image: (
+						<WelcomeGuideImage
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-canvas.svg"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-canvas.gif"
+						/>
+					),
 					content: (
 						<>
 							<h1 className="edit-widgets-welcome-guide__heading">
@@ -109,7 +107,12 @@ export default function WelcomeGuide() {
 					),
 				},
 				{
-					image: <EditorImage />,
+					image: (
+						<WelcomeGuideImage
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-editor.svg"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-editor.gif"
+						/>
+					),
 					content: (
 						<>
 							<h1 className="edit-widgets-welcome-guide__heading">
@@ -124,7 +127,12 @@ export default function WelcomeGuide() {
 					),
 				},
 				{
-					image: <BlockLibraryImage />,
+					image: (
+						<WelcomeGuideImage
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-library.svg"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-library.gif"
+						/>
+					),
 					content: (
 						<>
 							<h1 className="edit-widgets-welcome-guide__heading">
@@ -137,7 +145,11 @@ export default function WelcomeGuide() {
 									),
 									{
 										InserterIconImage: (
-											<InserterIconImage className="edit-widgets-welcome-guide__inserter-icon" />
+											<img
+												className="edit-widgets-welcome-guide__inserter-icon"
+												alt={ __( 'inserter' ) }
+												src="data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='18' height='18' rx='2' fill='%231E1E1E'/%3E%3Cpath d='M9.22727 4V14M4 8.77273H14' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E%0A"
+											/>
 										),
 									}
 								) }
@@ -146,7 +158,12 @@ export default function WelcomeGuide() {
 					),
 				},
 				{
-					image: <DocumentationImage />,
+					image: (
+						<WelcomeGuideImage
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-documentation.svg"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-documentation.gif"
+						/>
+					),
 					content: (
 						<>
 							<h1 className="edit-widgets-welcome-guide__heading">
@@ -169,5 +186,17 @@ export default function WelcomeGuide() {
 				},
 			] }
 		/>
+	);
+}
+
+function WelcomeGuideImage( { nonAnimatedSrc, animatedSrc } ) {
+	return (
+		<picture className="edit-widgets-welcome-guide__image">
+			<source
+				srcSet={ nonAnimatedSrc }
+				media="(prefers-reduced-motion: reduce)"
+			/>
+			<img src={ animatedSrc } width="312" height="240" alt="" />
+		</picture>
 	);
 }

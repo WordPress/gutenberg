@@ -35,6 +35,8 @@ const disableTemplateWelcomeGuide = async () => {
 };
 
 const switchToTemplateMode = async () => {
+	await disableTemplateWelcomeGuide();
+
 	// Switch to template mode.
 	await openDocumentSettingsSidebar();
 	await openSidebarPanelWithTitle( 'Template' );
@@ -48,15 +50,15 @@ const switchToTemplateMode = async () => {
 		'//*[contains(@class, "components-snackbar")]/*[text()="Editing template. Changes made here affect all posts and pages that use the template."]'
 	);
 	const title = await page.$eval(
-		'.edit-post-template-title',
+		'.edit-post-template-top-area',
 		( el ) => el.innerText
 	);
-	expect( title ).toContain( 'Editing template:' );
-
-	await disableTemplateWelcomeGuide();
+	expect( title ).toContain( 'Just an FSE Post\n' );
 };
 
 const createNewTemplate = async ( templateName ) => {
+	await disableTemplateWelcomeGuide();
+
 	// Create a new custom template.
 	await openDocumentSettingsSidebar();
 	await openSidebarPanelWithTitle( 'Template' );
@@ -76,11 +78,9 @@ const createNewTemplate = async ( templateName ) => {
 	await page.waitForXPath(
 		'//*[contains(@class, "components-snackbar")]/*[text()="Custom template created. You\'re in template mode now."]'
 	);
-
-	await disableTemplateWelcomeGuide();
 };
 
-describe.skip( 'Post Editor Template mode', () => {
+describe( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
