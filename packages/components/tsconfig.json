@@ -44,7 +44,8 @@
 		"src/h-stack/**/*",
 		"src/v-stack/**/*",
 		"src/z-stack/**/*",
-		"src/view/**/*"
+		"src/view/**/*",
+		"src/scrollable/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",
