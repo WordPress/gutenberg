@@ -118,7 +118,7 @@ function PostTemplateActions() {
 								/>
 							</FlexItem>
 						</Flex>
-						
+
 						<Flex
 							className="edit-post-template__modal-actions"
 							justify="flex-end"
