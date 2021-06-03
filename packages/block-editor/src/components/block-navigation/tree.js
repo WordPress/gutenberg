@@ -4,7 +4,13 @@
 
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	memo,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -31,7 +37,7 @@ const noop = () => {};
  * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
  */
-export default function BlockNavigationTree( {
+export function BlockNavigationTree( {
 	blocks,
 	showOnlyCurrentHierarchy,
 	onSelect = noop,
@@ -50,7 +56,7 @@ export default function BlockNavigationTree( {
 			selectBlock( clientId );
 			onSelect( clientId );
 		},
-		[ selectBlock, onSelect ]
+		[ selectBlock ]
 	);
 
 	let {
@@ -99,3 +105,6 @@ export default function BlockNavigationTree( {
 		</TreeGrid>
 	);
 }
+export default memo( BlockNavigationTree, () => {
+	return true;
+} );
