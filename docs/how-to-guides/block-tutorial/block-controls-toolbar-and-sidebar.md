@@ -14,6 +14,15 @@ You can also customize the toolbar to include controls specific to your block ty
 {% ESNext %}
 
 ```jsx
+import { registerBlockType } from '@wordpress/blocks';
+
+import {
+	useBlockProps,
+	RichText,
+	AlignmentToolbar,
+	BlockControls,
+} from '@wordpress/block-editor';
+
 registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 	apiVersion: 2,
 	title: 'Example: Controls (esnext)',
