@@ -92,7 +92,9 @@ export default function PostExcerptEditor( {
 		return (
 			<div { ...blockProps }>
 				<Warning>
-					{ __( 'This content is password protected.' ) }
+					{ __(
+						'There is no excerpt because this is a protected post.'
+					) }
 				</Warning>
 			</div>
 		);

@@ -86,9 +86,12 @@ export function useEntityId( kind, type ) {
  * @param {string} prop  The property name.
  * @param {string} [_id] An entity ID to use instead of the context-provided one.
  *
- * @return {[*, Function]} A tuple where the first item is the
- *                          property value and the second is the
- *                          setter.
+ * @return {[*, Function, *]} An array where the first item is the
+ *                            property value, the second is the
+ *                            setter and the third is the full value
+ * 							  object from REST API containing more
+ * 							  information like `raw`, `rendered` and
+ * 							  `protected` props.
  */
 export function useEntityProp( kind, type, prop, _id ) {
 	const providerId = useEntityId( kind, type );
