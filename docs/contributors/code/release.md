@@ -73,7 +73,7 @@ Guidelines for proof-reading include:
 #### 2. Selecting the release highlights
 Once you have cleaned up the changelog, the next step is to choose a few changes to highlight in the release post. These highlights usually focus on new features and enhancements, including performance and accessibility ones, but can also include important API changes or critical bug fixes.
 
-Given the big scope of Gutenberg and the high number of pull requests merged in each milestone, it is not uncommon to oversee impactful changes worth highlighting; it is recommended to make this step a collaborative effort and share your picks with the Gutenberg Core team.
+Given the big scope of Gutenberg and the high number of pull requests merged in each milestone, it is not uncommon to overlook impactful changes worth highlighting; it is recommended to make this step a collaborative effort and share your picks with the Gutenberg Core team.
 
 #### 3. Drafting the release post
 
