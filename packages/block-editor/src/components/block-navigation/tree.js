@@ -56,7 +56,7 @@ export function BlockNavigationTree( {
 			selectBlock( clientId );
 			onSelect( clientId );
 		},
-		[ selectBlock ]
+		[ selectBlock, onSelect ]
 	);
 
 	let {
