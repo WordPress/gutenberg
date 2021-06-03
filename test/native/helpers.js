@@ -3,6 +3,15 @@
  */
 import { act, render, fireEvent } from '@testing-library/react-native';
 
+/**
+ * WordPress dependencies
+ */
+// Editor component is not exposed in the pacakge because is meant to be consumed
+// internally, however we require it for rendering the editor in integration tests,
+// for this reason it's imported with path access.
+// eslint-disable-next-line no-restricted-syntax
+import Editor from '@wordpress/edit-post/src/editor';
+
 // Set up the mocks for getting the HTML output of the editor
 let triggerHtmlSerialization = () => {};
 let serializedHtml;
@@ -15,7 +24,6 @@ bridgeMock.provideToNative_Html = jest.fn( ( html ) => {
 } );
 
 export async function initializeEditor( { initialHtml } ) {
-	const Editor = require( '@wordpress/edit-post/src/editor' ).default;
 	const renderResult = render(
 		<Editor
 			postId={ 0 }
