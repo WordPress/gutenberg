@@ -263,6 +263,16 @@ function styles_for_block_core_search( $attributes ) {
 			$wrapper_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
 		} else {
 			$shared_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
+
+	// Add color styles.
+	$has_colors = ! empty( $attributes['style']['color'] );
+
+	if ( $has_colors ) {
+		if ( ! empty( $attributes['style']['color']['text'] ) ) {
+			$button_styles[] = sprintf( 'color: %s;', esc_attr( $attributes['style']['color']['text'] ) );
+		}
+		if ( ! empty( $attributes['style']['color']['background'] ) ) {
+			$button_styles[] = sprintf( 'background-color: %s;', esc_attr( $attributes['style']['color']['background'] ) );
 		}
 	}
 
