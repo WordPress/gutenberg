@@ -6,6 +6,10 @@ import { act, render, fireEvent } from '@testing-library/react-native';
 /**
  * WordPress dependencies
  */
+import {
+	subscribeParentGetHtml,
+	provideToNative_Html as provideToNativeHtml,
+} from '@wordpress/react-native-bridge';
 // Editor component is not exposed in the pacakge because is meant to be consumed
 // internally, however we require it for rendering the editor in integration tests,
 // for this reason it's imported with path access.
@@ -13,13 +17,19 @@ import { act, render, fireEvent } from '@testing-library/react-native';
 import Editor from '@wordpress/edit-post/src/editor';
 
 // Set up the mocks for getting the HTML output of the editor
-let triggerHtmlSerialization = () => {};
+let triggerHtmlSerialization;
 let serializedHtml;
-const bridgeMock = jest.requireMock( '@wordpress/react-native-bridge' );
-bridgeMock.subscribeParentGetHtml = jest.fn( ( callback ) => {
-	triggerHtmlSerialization = callback;
+subscribeParentGetHtml.mockImplementation( ( callback ) => {
+	if ( ! triggerHtmlSerialization ) {
+		triggerHtmlSerialization = callback;
+		return {
+			remove: () => {
+				triggerHtmlSerialization = undefined;
+			},
+		};
+	}
 } );
-bridgeMock.provideToNative_Html = jest.fn( ( html ) => {
+provideToNativeHtml.mockImplementation( ( html ) => {
 	serializedHtml = html;
 } );
 
@@ -83,6 +93,9 @@ export function waitFor( cb, timeout = 150 ) {
 
 // Helper for getting the current HTML output of the editor
 export function getEditorHtml() {
+	if ( ! triggerHtmlSerialization ) {
+		throw new Error( 'HTML serialization trigger is not defined.' );
+	}
 	triggerHtmlSerialization();
 	return serializedHtml;
 }
