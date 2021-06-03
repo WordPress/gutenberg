@@ -224,7 +224,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 		);
 		const selectorsGroup = selectorsScoped.join( ', ' );
 
-		const className = classnames( props?.classname, id );
+		const className = classnames( props?.className, id );
 
 		return (
 			<>
