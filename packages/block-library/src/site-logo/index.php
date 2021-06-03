@@ -130,7 +130,16 @@ function _sync_custom_logo_to_site_logo( $old_value, $value ) {
 	}
 }
 
-add_action( 'update_option_theme_mods_' . get_option( 'stylesheet' ), '_sync_custom_logo_to_site_logo', 10, 2 );
+/**
+ * Hooks `_sync_custom_logo_to_site_logo` in `update_option_theme_mods_$theme`.
+ *
+ * Runs on `setup_theme` to account for dynamically-switched themes in the Customizer.
+ */
+function _sync_custom_logo_to_site_logo_on_setup_theme() {
+	$theme = get_option( 'stylesheet' );
+	add_action( "update_option_theme_mods_$theme", '_sync_custom_logo_to_site_logo', 10, 2 );
+}
+add_action( 'setup_theme', '_sync_custom_logo_to_site_logo_on_setup_theme', 11 );
 
 /**
  * Updates the custom_logo theme-mod when the site_logo option gets updated.
