@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] Gallery block - Fix gallery images caption text formatting [#32351]
+-   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]
 -   [***] Audio block now available on WP.com sites on the free plan. [#31966]
 
 ## 1.54.0
