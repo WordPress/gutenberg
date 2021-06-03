@@ -1104,6 +1104,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Scrollable",
+		"slug": "scrollable",
+		"markdown_source": "../packages/components/src/scrollable/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "SelectControl",
 		"slug": "select-control",
 		"markdown_source": "../packages/components/src/select-control/README.md",
