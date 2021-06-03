@@ -23,7 +23,7 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 
-registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
+registerBlockType('gutenberg-examples/example-04-controls-esnext', {
 	apiVersion: 2,
 	title: 'Example: Controls (esnext)',
 	icon: 'universal-access-alt',
@@ -45,51 +45,51 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 			alignment: 'right',
 		},
 	},
-	edit: ( { attributes, setAttributes } ) => {
-		const onChangeContent = ( newContent ) => {
-			setAttributes( { content: newContent } );
+	edit: ({ attributes, setAttributes }) => {
+		const onChangeContent = (newContent) => {
+			setAttributes({ content: newContent });
 		};
 
-		const onChangeAlignment = ( newAlignment ) => {
-			setAttributes( {
+		const onChangeAlignment = (newAlignment) => {
+			setAttributes({
 				alignment: newAlignment === undefined ? 'none' : newAlignment,
-			} );
+			});
 		};
 
 		return (
-			<div { ...useBlockProps() }>
+			<div {...useBlockProps()}>
 				{
 					<BlockControls>
 						<AlignmentToolbar
-							value={ alignment }
-							onChange={ onChangeAlignment }
+							value={attributes.alignment}
+							onChange={onChangeAlignment}
 						/>
 					</BlockControls>
 				}
 				<RichText
-					className={ className }
-					style={ { textAlign: alignment } }
+					className={attributes.className}
+					style={{ textAlign: attributes.alignment }}
 					tagName="p"
-					onChange={ onChangeContent }
-					value={ content }
+					onChange={onChangeContent}
+					value={attributes.content}
 				/>
 			</div>
 		);
 	},
-	save: ( props ) => {
+	save: (props) => {
 		const blockProps = useBlockProps.save();
 
 		return (
-			<div { ...blockProps }>
+			<div {...blockProps}>
 				<RichText.Content
-					className={ `gutenberg-examples-align-${ attributes.alignment }` }
+					className={`gutenberg-examples-align-${props.attributes.alignment}`}
 					tagName="p"
-					value={ attributes.content }
+					value={props.attributes.content}
 				/>
 			</div>
 		);
 	},
-} );
+});
 ```
 
 {% ES5 %}
