@@ -127,9 +127,7 @@ function gutenberg_override_translation_file( $file, $handle ) {
 	}
 
 	// Ignore scripts that are not found in the expected `build/` location.
-	$suffix = ( defined( 'SCRIPT_DEBUG') && SCRIPT_DEBUG ) ? '.js' : '.min.js';
-
-	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . "/index$suffix";
+	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.min.js';
 	if ( ! file_exists( $script_path ) ) {
 		return $file;
 	}
