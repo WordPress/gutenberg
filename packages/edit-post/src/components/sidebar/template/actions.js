@@ -128,9 +128,9 @@ function PostTemplateActions() {
 						</Flex>
 						<div className="edit-post-template-modal__tip">
 							<Tip>
-								{__(
+								{ __(
 									'A custom template can be applied to any post or page on your site.'
-								)}
+								) }
 							</Tip>
 						</div>
 					</form>
