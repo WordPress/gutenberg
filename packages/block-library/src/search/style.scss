@@ -68,6 +68,12 @@
 			min-width: 0 !important;
 		}
 
+		.wp-block-search__input {
+			transition-property: all;
+			transition-duration: 0;
+			flex-basis: 100%;
+		}
+
 		// !important here to override inline styles on button only deselected view.
 		&.wp-block-search__searchfield-hidden {
 			overflow: hidden;
@@ -85,6 +91,7 @@
 				border-right-width: 0 !important;
 				flex-grow: 0;
 				margin: 0;
+				flex-basis: 0 !important;
 			}
 		}
 	}
