@@ -28,15 +28,7 @@ import useBlockNavigator from './use-block-navigator';
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
-
-const ALLOWED_BLOCKS = [
-	'core/navigation-link',
-	'core/search',
-	'core/social-links',
-	'core/page-list',
-	'core/spacer',
-	'core/home-link',
-];
+import { store as blocksStore } from '@wordpress/blocks';
 
 const LAYOUT = {
 	type: 'default',
@@ -55,6 +47,7 @@ function Navigation( {
 	className,
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
+	allowBlocksList,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -84,7 +77,7 @@ function Navigation( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			allowedBlocks: ALLOWED_BLOCKS,
+			allowedBlocks: allowBlocksList,
 			orientation: attributes.orientation || 'horizontal',
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
@@ -183,6 +176,13 @@ function Navigation( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
+		const { getBlockSupport } = select( blocksStore );
+		const allowBlocksList = getBlockSupport(
+			'core/navigation',
+			'__experimentalAllowedBlocks',
+			[ 'core/navigation-link' ] // default to the basic link block only.
+		);
+
 		const innerBlocks = select( blockEditorStore ).getBlocks( clientId );
 		const {
 			getClientIdsOfDescendants,
@@ -202,7 +202,7 @@ export default compose( [
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
-
+            allowBlocksList,
 			// This prop is already available but computing it here ensures it's
 			// fresh compared to isImmediateParentOfSelectedBlock
 			isSelected: selectedBlockId === clientId,
