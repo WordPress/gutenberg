@@ -9,10 +9,11 @@ import { get } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, ifCondition, withState } from '@wordpress/compose';
+import { compose, ifCondition } from '@wordpress/compose';
 import { cleanForSlug, store as editorStore } from '@wordpress/editor';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,11 +33,11 @@ function PostLink( {
 	permalinkPrefix,
 	permalinkSuffix,
 	editPermalink,
-	forceEmptyField,
-	setState,
 	postSlug,
 	postTypeLabel,
 } ) {
+	const [ forceEmptyField, setForceEmptyField ] = useState( false );
+
 	let prefixElement, postNameElement, suffixElement;
 	if ( isEditable ) {
 		prefixElement = permalinkPrefix && (
@@ -75,24 +76,18 @@ function PostLink( {
 							// the field temporarily empty while typing.
 							if ( ! newValue ) {
 								if ( ! forceEmptyField ) {
-									setState( {
-										forceEmptyField: true,
-									} );
+									setForceEmptyField( true );
 								}
 								return;
 							}
 							if ( forceEmptyField ) {
-								setState( {
-									forceEmptyField: false,
-								} );
+								setForceEmptyField( false );
 							}
 						} }
 						onBlur={ ( event ) => {
 							editPermalink( cleanForSlug( event.target.value ) );
 							if ( forceEmptyField ) {
-								setState( {
-									forceEmptyField: false,
-								} );
+								setForceEmptyField( false );
 							}
 						} }
 					/>
@@ -175,8 +170,5 @@ export default compose( [
 				editPost( { slug: newSlug } );
 			},
 		};
-	} ),
-	withState( {
-		forceEmptyField: false,
 	} ),
 ] )( PostLink );

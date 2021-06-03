@@ -16,6 +16,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
 -   [***] Enable reusable block only in WP.com sites [#31744]
 -   [***] Audio block now available on WP.com sites on the free plan. [#31966]
+-   [*] Gallery block - Fix gallery images caption text formatting [#32351]
 
 ## 1.53.1
 
@@ -55,10 +56,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.50.1
 
--   [x] Truncate rangecell screenreader decimals] [#30678]
--   [x] Fix Quote block citation [#30548]
--   [xx] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
--   [xx] Fix Unsupported Block Editor on Android [#30650]
+-   [*] Truncate rangecell screenreader decimals] [#30678]
+-   [*] Fix Quote block citation [#30548]
+-   [**] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
+-   [**] Fix Unsupported Block Editor on Android [#30650]
 
 ## 1.50.0
 
