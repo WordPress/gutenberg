@@ -115,6 +115,7 @@
 
 .block-editor-block-contextual-toolbar {
 	// Block UI appearance.
+	display: inline-flex;
 	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 	background-color: $white;
