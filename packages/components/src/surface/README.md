@@ -11,7 +11,10 @@ This feature is still experimental. “Experimental” means this is an early im
 In the example below, notice how the `Surface` renders in white (or dark gray if in dark mode).
 
 ```jsx
-import { Surface, Text } from '@wordpress/components/ui';
+import {
+	__experimentalSurface as Surface,
+	__experimentalText as Text
+} from '@wordpress/components/ui';
 
 function Example() {
 	return (

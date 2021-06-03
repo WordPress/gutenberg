@@ -6,12 +6,12 @@ import { boolean, number, select } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import { Surface } from '../index';
-import { Text } from '../../../text';
+import { Surface } from '../';
+import { Text } from '../../text';
 
 export default {
 	component: Surface,
-	title: 'G2 Components (Experimental)/Surface',
+	title: 'Components (Experimental)/Surface',
 };
 
 const variantOptions = {

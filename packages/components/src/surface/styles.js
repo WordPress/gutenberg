@@ -6,8 +6,7 @@ import { css } from 'emotion';
 /**
  * Internal dependencies
  */
-import CONFIG from '../../utils/config-values';
-import { COLORS } from '../../utils/colors-values';
+import { CONFIG, COLORS } from '../utils';
 
 export const Surface = css`
 	background-color: ${ CONFIG.surfaceColor };
