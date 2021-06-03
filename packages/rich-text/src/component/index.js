@@ -201,7 +201,7 @@ export function useRichText( {
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;
-		}, [ placeholder, ...__unstableDependencies ] ),
+		}, [ placeholder, ...__unstableDependencies, value ] ),
 	] );
 
 	return {
