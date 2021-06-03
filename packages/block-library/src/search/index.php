@@ -189,7 +189,7 @@ function styles_for_block_core_search( $attributes ) {
 	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
 	$button_only = ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'];
 
-	if ( $has_width && ! $button_only ) {
+	if ( $has_width ) {
 		$wrapper_styles[] = sprintf(
 			'width: %d%s;',
 			esc_attr( $attributes['width'] ),
