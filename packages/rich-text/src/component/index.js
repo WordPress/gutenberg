@@ -75,16 +75,17 @@ export function useRichText( {
 	const record = useRef();
 
 	function setRecordFromProps() {
+		_value.current = value;
 		record.current = create( {
-			html: _value.current,
+			html: value,
 			multilineTag,
 			multilineWrapperTags:
 				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
 			preserveWhiteSpace,
 		} );
 		if ( disableFormats ) {
-			record.current.formats = Array( _value.current.length );
-			record.current.replacements = Array( _value.current.length );
+			record.current.formats = Array( value.length );
+			record.current.replacements = Array( value.length );
 		}
 		record.current.formats = __unstableAfterParse( record.current );
 		record.current.start = selectionStart;
