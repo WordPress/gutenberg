@@ -171,6 +171,7 @@ export { default as settings } from './library/settings';
 export { default as share } from './library/share';
 export { default as siteLogo } from './library/site-logo';
 export { default as shortcode } from './library/shortcode';
+export { default as smallDash } from './library/small-dash';
 export { default as stack } from './library/stack';
 export { default as starEmpty } from './library/star-empty';
 export { default as starFilled } from './library/star-filled';
