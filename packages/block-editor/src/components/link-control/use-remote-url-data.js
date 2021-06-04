@@ -2,16 +2,17 @@
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import makeCancelable from './make-cancelable';
 
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 
 function useRemoteUrlData( url ) {
-	const cancelableFetch = useRef();
+	// eslint-disable-next-line no-undef
+	let controller;
+	let signal;
 
 	const [ richData, setRichData ] = useState( null );
 	const [ isFetching, setIsFetching ] = useState( false );
@@ -24,10 +25,8 @@ function useRemoteUrlData( url ) {
 	}, [] );
 
 	const cancelPendingFetch = useCallback( () => {
-		if ( cancelableFetch.current ) {
-			cancelableFetch.current.cancel();
-		}
-	}, [ cancelableFetch ] );
+		controller?.abort();
+	}, [ controller ] );
 
 	/**
 	 * Cancel any pending requests that were made for
@@ -56,17 +55,20 @@ function useRemoteUrlData( url ) {
 			setRichData( null );
 
 			try {
-				cancelableFetch.current = makeCancelable(
-					fetchRemoteUrlData( url )
-				);
-				const urlData = await cancelableFetch.current.promise;
+				// eslint-disable-next-line no-undef
+				controller = new AbortController();
+				signal = controller.signal;
+
+				const urlData = await fetchRemoteUrlData( url, {
+					signal,
+				} );
 
 				// If the promise is cancelled then this will never run
 				// as we should fall into the `catch` below.
 				setRichData( urlData );
 				setIsFetching( false );
 			} catch ( error ) {
-				if ( error?.isCanceled ) {
+				if ( signal?.aborted ) {
 					return; // bail if canceled to avoid setting state
 				}
 
