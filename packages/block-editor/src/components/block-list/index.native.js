@@ -69,9 +69,6 @@ export class BlockList extends Component {
 		);
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
-		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind(
-			this
-		);
 		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind(
 			this
 		);
@@ -104,10 +101,6 @@ export class BlockList extends Component {
 
 	scrollViewInnerRef( ref ) {
 		this.scrollViewRef = ref;
-	}
-
-	shouldFlatListPreventAutomaticScroll() {
-		return false;
 	}
 
 	shouldShowInnerBlockAppender() {
@@ -329,9 +322,6 @@ export class BlockList extends Component {
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
-					shouldPreventAutomaticScroll={
-						this.shouldFlatListPreventAutomaticScroll
-					}
 					title={ title }
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }

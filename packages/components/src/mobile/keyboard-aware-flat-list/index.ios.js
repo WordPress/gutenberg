@@ -14,7 +14,6 @@ const List = memo( FlatList, isEqual );
 
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
-	shouldPreventAutomaticScroll,
 	innerRef,
 	autoScroll,
 	scrollViewStyle,
@@ -41,8 +40,7 @@ export const KeyboardAwareFlatList = ( {
 			setTimeout( () => {
 				if (
 					! this.keyboardWillShowIndicator &&
-					this.latestContentOffsetY !== undefined &&
-					! shouldPreventAutomaticScroll()
+					this.latestContentOffsetY !== undefined
 				) {
 					// Reset the content position if keyboard is still closed
 					if ( this.scrollViewRef ) {
