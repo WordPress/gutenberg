@@ -1,5 +1,3 @@
-// Consider the block appender to be a child block of its own, which also has
-// this class.
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
 
 /**
