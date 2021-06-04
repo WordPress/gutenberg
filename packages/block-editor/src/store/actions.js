@@ -16,6 +16,7 @@ import {
 	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
+	getBlockSupport,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -914,7 +915,24 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		'getTemplateLock',
 		rootClientId
 	);
-	if ( isLocked ) {
+
+	const blocks = yield controls.select(
+		blockEditorStoreName,
+		'getBlocksByClientId',
+		clientIds
+	);
+
+	clientIds = blocks
+		.filter( ( block ) => {
+			const lock = getBlockSupport( block.name, 'lock', null );
+			// false is a valid value, so we need to be string on checking.
+			if ( lock === null || lock?.remove === undefined ) {
+				return ! isLocked;
+			}
+			return ! lock;
+		} )
+		.map( ( block ) => block.clientId );
+	if ( ! clientIds.length ) {
 		return;
 	}
 
