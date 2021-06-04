@@ -249,6 +249,7 @@ function LinkControl( {
 
 			{ value && ! isEditingLink && ! isCreatingPage && (
 				<LinkPreview
+					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
 					value={ value }
 					onEditClick={ () => setIsEditingLink( true ) }
 				/>
