@@ -58,7 +58,10 @@ function addSaveProps( props, blockType, attributes ) {
 	}
 
 	if (
-		hasBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
+		hasBlockSupport(
+			blockType,
+			'typography.__experimentalSkipSerialization'
+		)
 	) {
 		return props;
 	}
@@ -182,7 +185,7 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
 			hasBlockSupport(
 				blockName,
-				'__experimentalSkipFontSizeSerialization'
+				'typography.__experimentalSkipSerialization'
 			) ||
 			! fontSize ||
 			style?.typography?.fontSize
