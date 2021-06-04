@@ -14,6 +14,7 @@ import { Component } from '@wordpress/element';
  */
 import { getFontSize, getFontSizeClass } from './utils';
 import useSetting from '../use-setting';
+import { __experimentalGetHighestPriorityPreset } from '../../utils';
 
 const DEFAULT_FONT_SIZES = [];
 
@@ -49,8 +50,9 @@ export default ( ...fontSizeNames ) => {
 			createHigherOrderComponent(
 				( WrappedComponent ) => ( props ) => {
 					const fontSizes =
-						useSetting( 'typography.fontSizes' ) ||
-						DEFAULT_FONT_SIZES;
+						__experimentalGetHighestPriorityPreset(
+							useSetting( 'typography.fontSizes' )
+						) || DEFAULT_FONT_SIZES;
 					return (
 						<WrappedComponent
 							{ ...props }

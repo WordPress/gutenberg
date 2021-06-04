@@ -14,9 +14,12 @@ import { __ } from '@wordpress/i18n';
  */
 import GradientPicker from './control';
 import useSetting from '../use-setting';
+import { __experimentalGetHighestPriorityPreset } from '../../utils';
 
 export default function GradientPanel( props ) {
-	const gradients = useSetting( 'color.gradients' );
+	const gradients = __experimentalGetHighestPriorityPreset(
+		useSetting( 'color.gradients' )
+	);
 	if ( isEmpty( gradients ) ) {
 		return null;
 	}

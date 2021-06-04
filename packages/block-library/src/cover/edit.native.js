@@ -44,6 +44,7 @@ import {
 	__experimentalUseGradient,
 	useSetting,
 	store as blockEditorStore,
+	__experimentalGetHighestPriorityPreset,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -139,7 +140,10 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
-	const colorsDefault = useSetting( 'color.palette' ) || [];
+	const colorsDefault =
+		__experimentalGetHighestPriorityPreset(
+			useSetting( 'color.palette' )
+		) || [];
 	const coverDefaultPalette = {
 		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 	};

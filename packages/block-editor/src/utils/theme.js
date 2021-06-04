@@ -3,6 +3,16 @@
  */
 import { SETTINGS_DEFAULTS } from '../store/defaults';
 
+export function __experimentalGetHighestPriorityPreset(
+	presetSettingByOrigin = {}
+) {
+	return (
+		presetSettingByOrigin.user ??
+		presetSettingByOrigin.theme ??
+		presetSettingByOrigin.core
+	);
+}
+
 /**
  * Given an array of theme colors checks colors for validity
  *

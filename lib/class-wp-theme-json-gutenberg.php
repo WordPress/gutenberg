@@ -646,6 +646,16 @@ class WP_Theme_JSON_Gutenberg {
 		return implode( ',', $new_selectors );
 	}
 
+	/**
+	 * Function that given an array of presets keyed by origin
+	 * and the value key of the preset returns an array where each key is
+	 * the a preset slug and each value is the preset value.
+	 *
+	 * @param array  $preset_per_origin Array of presets keyed by origin.
+	 * @param string $value_key         The property of the preset that contains its value.
+	 *
+	 * @return array Array of presets where each key is a slug and each value is the preset value.
+	 */
 	private static function get_merged_preset_by_slug( $preset_per_origin, $value_key ) {
 		$origins = array( 'core', 'theme', 'user' );
 		$result  = array();

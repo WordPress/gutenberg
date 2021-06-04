@@ -13,6 +13,7 @@ import {
 	getGradientSlugByValue,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	useSetting,
+	__experimentalGetHighestPriorityPreset,
 } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 
@@ -24,8 +25,14 @@ function OverlayColorSettings( {
 	setAttributes,
 } ) {
 	const EMPTY_ARRAY = [];
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
+	const colors =
+		__experimentalGetHighestPriorityPreset(
+			useSetting( 'color.palette' )
+		) || EMPTY_ARRAY;
+	const gradients =
+		__experimentalGetHighestPriorityPreset(
+			useSetting( 'color.gradients' )
+		) || EMPTY_ARRAY;
 
 	const gradientValue =
 		customGradient || getGradientValueBySlug( gradients, gradient );

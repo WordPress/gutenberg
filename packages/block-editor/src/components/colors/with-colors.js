@@ -19,6 +19,7 @@ import {
 	getMostReadableColor,
 } from './utils';
 import useSetting from '../use-setting';
+import { __experimentalGetHighestPriorityPreset } from '../../utils';
 
 const DEFAULT_COLORS = [];
 
@@ -47,7 +48,10 @@ const withCustomColorPalette = ( colorsArray ) =>
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( props ) => {
-			const colors = useSetting( 'color.palette' ) || DEFAULT_COLORS;
+			const colors =
+				__experimentalGetHighestPriorityPreset(
+					useSetting( 'color.palette' )
+				) || DEFAULT_COLORS;
 			return <WrappedComponent { ...props } colors={ colors } />;
 		},
 		'withEditorColorPalette'

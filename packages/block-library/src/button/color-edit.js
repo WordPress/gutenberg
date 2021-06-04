@@ -27,6 +27,7 @@ import {
 	ContrastChecker,
 	InspectorControls,
 	useSetting,
+	__experimentalGetHighestPriorityPreset,
 } from '@wordpress/block-editor';
 
 const EMPTY_ARRAY = [];
@@ -125,8 +126,14 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
  */
 function ColorEdit( props ) {
 	const { attributes } = props;
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
+	const colors =
+		__experimentalGetHighestPriorityPreset(
+			useSetting( 'color.palette' )
+		) || EMPTY_ARRAY;
+	const gradients =
+		__experimentalGetHighestPriorityPreset(
+			useSetting( 'color.gradients' )
+		) || EMPTY_ARRAY;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground

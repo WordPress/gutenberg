@@ -4,6 +4,7 @@
 import {
 	__experimentalBorderStyleControl as BorderStyleControl,
 	__experimentalColorGradientControl as ColorGradientControl,
+	__experimentalGetHighestPriorityPreset,
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -85,7 +86,10 @@ export default function BorderPanel( {
 	);
 
 	// Border color.
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const colors =
+		__experimentalGetHighestPriorityPreset(
+			useSetting( 'color.palette' )
+		) || EMPTY_ARRAY;
 	const disableCustomColors = ! useSetting( 'color.custom' );
 	const disableCustomGradients = ! useSetting( 'color.customGradient' );
 	const hasBorderColor = useHasBorderColorControl( { supports, name } );

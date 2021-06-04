@@ -16,9 +16,11 @@ import { store as blockEditorStore } from '../../store';
 
 const deprecatedFlags = {
 	'color.palette': ( settings ) =>
-		settings.colors === undefined ? undefined : settings.colors,
+		settings.colors === undefined ? undefined : { theme: settings.colors },
 	'color.gradients': ( settings ) =>
-		settings.gradients === undefined ? undefined : settings.gradients,
+		settings.gradients === undefined
+			? undefined
+			: { theme: settings.gradients },
 	'color.custom': ( settings ) =>
 		settings.disableCustomColors === undefined
 			? undefined
@@ -28,7 +30,9 @@ const deprecatedFlags = {
 			? undefined
 			: ! settings.disableCustomGradients,
 	'typography.fontSizes': ( settings ) =>
-		settings.fontSizes === undefined ? undefined : settings.fontSizes,
+		settings.fontSizes === undefined
+			? undefined
+			: { theme: settings.fontSizes },
 	'typography.customFontSize': ( settings ) =>
 		settings.disableCustomFontSizes === undefined
 			? undefined

@@ -9,6 +9,7 @@ import { get } from 'lodash';
 import { __experimentalColorEdit as ColorEdit } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { __experimentalGetHighestPriorityPreset } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -32,7 +33,9 @@ export default function ColorPalettePanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useSetting( 'color.palette', contextName );
+	const colors = __experimentalGetHighestPriorityPreset(
+		useSetting( 'color.palette', contextName )
+	);
 	const userColors = getSetting( contextName, 'color.palette' );
 	const immutableColorSlugs = useSelect(
 		( select ) => {

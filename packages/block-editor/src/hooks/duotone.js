@@ -20,6 +20,7 @@ import {
 	__experimentalDuotoneControl as DuotoneControl,
 	useSetting,
 } from '../components';
+import { __experimentalGetHighestPriorityPreset } from '../utils';
 
 /**
  * Convert a list of colors to an object of R, G, and B values.
@@ -124,7 +125,9 @@ function DuotonePanel( { attributes, setAttributes } ) {
 	const duotone = style?.color?.duotone;
 
 	const duotonePalette = useSetting( 'color.duotone' );
-	const colorPalette = useSetting( 'color.palette' );
+	const colorPalette = __experimentalGetHighestPriorityPreset(
+		useSetting( 'color.palette' )
+	);
 	const disableCustomColors = ! useSetting( 'color.custom' );
 
 	return (

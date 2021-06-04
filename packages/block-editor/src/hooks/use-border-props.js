@@ -12,6 +12,7 @@ import {
 	getColorObjectByAttributeValues,
 } from '../components/colors';
 import useSetting from '../components/use-setting';
+import { __experimentalGetHighestPriorityPreset } from '../utils';
 
 // This utility is intended to assist where the serialization of the border
 // block support is being skipped for a block but the border related CSS classes
@@ -55,7 +56,10 @@ export function getBorderClassesAndStyles( { borderColor, style } ) {
  * @return {Object}            ClassName & style props from border block support.
  */
 export function useBorderProps( attributes ) {
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const colors =
+		__experimentalGetHighestPriorityPreset(
+			useSetting( 'color.palette' )
+		) || EMPTY_ARRAY;
 	const borderProps = getBorderClassesAndStyles( attributes );
 
 	// Force inline style to apply border color when themes do not load their

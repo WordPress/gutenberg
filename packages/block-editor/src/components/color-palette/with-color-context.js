@@ -12,10 +12,13 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * Internal dependencies
  */
 import useSetting from '../use-setting';
+import { __experimentalGetHighestPriorityPreset } from '../../utils';
 
 export default createHigherOrderComponent( ( WrappedComponent ) => {
 	return ( props ) => {
-		const colorsFeature = useSetting( 'color.palette' );
+		const colorsFeature = __experimentalGetHighestPriorityPreset(
+			useSetting( 'color.palette' )
+		);
 		const disableCustomColorsFeature = ! useSetting( 'color.custom' );
 		const colors =
 			props.colors === undefined ? colorsFeature : props.colors;

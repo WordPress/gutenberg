@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
+import {
+	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+	__experimentalGetHighestPriorityPreset,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -27,9 +30,13 @@ export default function ColorPanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useSetting( 'color.palette', name );
+	const colors = __experimentalGetHighestPriorityPreset(
+		useSetting( 'color.palette', name )
+	);
 	const disableCustomColors = ! useSetting( 'color.custom', name );
-	const gradients = useSetting( 'color.gradients', name );
+	const gradients = __experimentalGetHighestPriorityPreset(
+		useSetting( 'color.gradients', name )
+	);
 	const disableCustomGradients = ! useSetting( 'color.customGradient', name );
 
 	const settings = [];

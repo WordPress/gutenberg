@@ -29,6 +29,7 @@ import {
 import { cleanEmptyObject } from './utils';
 import ColorPanel from './color-panel';
 import useSetting from '../components/use-setting';
+import { __experimentalGetHighestPriorityPreset } from '../utils';
 
 export const COLOR_SUPPORT_KEY = 'color';
 const EMPTY_ARRAY = [];
@@ -219,8 +220,14 @@ function immutableSet( object, path, value ) {
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
 	const isLinkColorEnabled = useSetting( 'color.link' );
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
+	const colors =
+		__experimentalGetHighestPriorityPreset(
+			useSetting( 'color.palette' )
+		) || EMPTY_ARRAY;
+	const gradients =
+		__experimentalGetHighestPriorityPreset(
+			useSetting( 'color.gradients' )
+		) || EMPTY_ARRAY;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -388,7 +395,10 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+		const colors =
+			__experimentalGetHighestPriorityPreset(
+				useSetting( 'color.palette' )
+			) || EMPTY_ARRAY;
 		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}
