@@ -19,6 +19,7 @@ import {
 	useRef,
 	useState,
 	useCallback,
+	useMemo,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -49,7 +50,11 @@ export function getAutoCompleterUI( autocompleter ) {
 		value,
 		reset,
 	} ) {
-		const [ items ] = useItems( filterValue );
+		const [ allItems ] = useItems( filterValue );
+		const items = useMemo(
+			() => allItems.filter( ( item ) => ! item.isDisabled ),
+			[ allItems ]
+		);
 		const scrollViewRef = useRef();
 		const animationValue = useRef( new Animated.Value( 0 ) ).current;
 		const [ isVisible, setIsVisible ] = useState( false );
