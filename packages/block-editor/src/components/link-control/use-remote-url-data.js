@@ -7,13 +7,9 @@ import { store as blockEditorStore } from '../../store';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 function useRemoteUrlData( url ) {
-	// eslint-disable-next-line no-undef
-	let controller;
-	let signal;
-
 	const [ richData, setRichData ] = useState( null );
 	const [ isFetching, setIsFetching ] = useState( false );
 
@@ -24,61 +20,60 @@ function useRemoteUrlData( url ) {
 		};
 	}, [] );
 
-	const cancelPendingFetch = useCallback( () => {
-		controller?.abort();
-	}, [ controller ] );
+	function abortableFetch( theUrl, signal ) {
+		return new Promise( ( resolve, reject ) => {
+			// Listen once on the AbortController signal
+			// and reject the promise if abort is triggered.
+			signal.addEventListener(
+				'abort',
+				() => {
+					reject();
+				},
+				{ once: true }
+			);
 
-	/**
-	 * Cancel any pending requests that were made for
-	 * stale URL values. If the component does not unmount
-	 * we must handle cancelling the current request if
-	 * the URL changes otherwise we will see stale data.
-	 */
-	useEffect( () => {
-		cancelPendingFetch();
-	}, [ url ] );
-
-	/**
-	 * Cancel any pending requests on "unmount"
-	 */
-	useEffect( () => {
-		return () => {
-			cancelPendingFetch();
-		};
-	}, [] );
+			return fetchRemoteUrlData( theUrl, {
+				signal,
+			} )
+				.then( ( data ) => resolve( data ) )
+				.catch( () => reject( 'aborted' ) );
+		} );
+	}
 
 	useEffect( () => {
-		const fetchRichData = async () => {
+		// eslint-disable-next-line no-undef
+		let controller;
+
+		const fetchRichData = () => {
 			setIsFetching( true );
 
-			// Clear the data if the URL changes to avoid stale data in hook consumer.
-			setRichData( null );
+			// eslint-disable-next-line no-undef
+			controller = new AbortController();
 
-			try {
-				// eslint-disable-next-line no-undef
-				controller = new AbortController();
-				signal = controller.signal;
-
-				const urlData = await fetchRemoteUrlData( url, {
-					signal,
+			abortableFetch( url, controller.signal )
+				.then( ( urlData ) => {
+					setRichData( urlData );
+					setIsFetching( false );
+				} )
+				.catch( ( error ) => {
+					// Avoid setting state on unmounted component
+					if ( ! 'aborted' === error ) {
+						setIsFetching( false );
+					}
 				} );
-
-				// If the promise is cancelled then this will never run
-				// as we should fall into the `catch` below.
-				setRichData( urlData );
-				setIsFetching( false );
-			} catch ( error ) {
-				if ( signal?.aborted ) {
-					return; // bail if canceled to avoid setting state
-				}
-
-				setIsFetching( false );
-			}
 		};
 
+		// Only make the request if we have an actual URL
+		// and the fetching util is available. In some editors
+		// there may not be such a util.
 		if ( url?.length && fetchRemoteUrlData ) {
 			fetchRichData();
 		}
+
+		// When the URL changes the abort the current request
+		return () => {
+			controller?.abort();
+		};
 	}, [ url ] );
 
 	return {
