@@ -646,6 +646,24 @@ class WP_Theme_JSON_Gutenberg {
 		return implode( ',', $new_selectors );
 	}
 
+	private static function get_merged_preset_by_slug( $preset_per_origin, $value_key ) {
+		$origins = array( 'core', 'theme', 'user' );
+		$result  = array();
+		foreach ( $origins as $origin ) {
+			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
+				continue;
+			}
+			foreach ( $preset_per_origin[ $origin ] as $preset ) {
+				// We don't want to use kebabCase here,
+				// see https://github.com/WordPress/gutenberg/issues/32347
+				// However, we need to make sure the generated class or css variable
+				// doesn't contain spaces.
+				$result[ preg_replace( '/\s+/', '-', $preset['slug'] ) ] = $preset[ $value_key ];
+			}
+		}
+		return $result;
+	}
+
 	/**
 	 * Given a settings array, it returns the generated rulesets
 	 * for the preset classes.
@@ -664,28 +682,19 @@ class WP_Theme_JSON_Gutenberg {
 
 		$stylesheet = '';
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values_per_origin = _wp_array_get( $settings, $preset['path'], array() );
-			foreach ( $origins as $origin ) {
-				if ( ! isset( $values_per_origin[ $origin ] ) ) {
-					continue;
-				}
-				$values = $values_per_origin[ $origin ];
-				foreach ( $values as $value ) {
-					foreach ( $preset['classes'] as $class ) {
-						$stylesheet .= self::to_ruleset(
-							// We don't want to use kebabCase here,
-							// see https://github.com/WordPress/gutenberg/issues/32347
-							// However, we need to make sure the generated class
-							// doesn't contain spaces.
-							self::append_to_selector( $selector, '.has-' . preg_replace( '/\s+/', '-', $value['slug'] ) . '-' . $class['class_suffix'] ),
+			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
+			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
+			foreach ( $preset['classes'] as $class ) {
+				foreach ( $preset_by_slug as $slug => $value ) {
+					$stylesheet .= self::to_ruleset(
+						self::append_to_selector( $selector, '.has-' . $slug . '-' . $class['class_suffix'] ),
+						array(
 							array(
-								array(
-									'name'  => $class['property_name'],
-									'value' => $value[ $preset['value_key'] ] . ' !important',
-								),
-							)
-						);
-					}
+								'name'  => $class['property_name'],
+								'value' => $value . ' !important',
+							),
+						)
+					);
 				}
 			}
 		}
@@ -711,20 +720,14 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	private static function compute_preset_vars( $settings ) {
 		$declarations = array();
-		$origins      = array( 'core', 'theme', 'user' );
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values_per_origin = _wp_array_get( $settings, $preset['path'], array() );
-			foreach ( $origins as $origin ) {
-				if ( ! isset( $values_per_origin[ $origin ] ) ) {
-					continue;
-				}
-				$values = $values_per_origin[ $origin ];
-				foreach ( $values as $value ) {
-					$declarations[] = array(
-						'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],
-						'value' => $value[ $preset['value_key'] ],
-					);
-				}
+			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
+			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
+			foreach ( $preset_by_slug as $slug => $value ) {
+				$declarations[] = array(
+					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $slug,
+					'value' => $value,
+				);
 			}
 		}
 
