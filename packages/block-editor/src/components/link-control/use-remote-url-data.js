@@ -27,7 +27,7 @@ function useRemoteUrlData( url ) {
 			signal.addEventListener(
 				'abort',
 				() => {
-					reject();
+					reject( 'aborted' );
 				},
 				{ once: true }
 			);
@@ -36,7 +36,7 @@ function useRemoteUrlData( url ) {
 				signal,
 			} )
 				.then( ( data ) => resolve( data ) )
-				.catch( () => reject( 'aborted' ) );
+				.catch( () => reject() );
 		} );
 	}
 
@@ -57,8 +57,9 @@ function useRemoteUrlData( url ) {
 				} )
 				.catch( ( error ) => {
 					// Avoid setting state on unmounted component
-					if ( ! 'aborted' === error ) {
+					if ( 'aborted' !== error ) {
 						setIsFetching( false );
+						setRichData( null );
 					}
 				} );
 		};
