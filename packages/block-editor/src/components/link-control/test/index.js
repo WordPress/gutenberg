@@ -1956,6 +1956,34 @@ describe( 'Rich link previews', () => {
 		expect( isRichLinkPreview ).toBe( false );
 	} );
 
+	it( 'should remove fetching UI indicators and fallback to standard preview if request for rich preview results in an error', async () => {
+		const simulateFailedFetch = () => Promise.reject();
+
+		mockFetchRemoteUrlData.mockImplementation( simulateFailedFetch );
+
+		act( () => {
+			render( <LinkControl value={ selectedLink } />, container );
+		} );
+
+		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isFetchingRichPreview = linkPreview.classList.contains(
+			'is-fetching'
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( isFetchingRichPreview ).toBe( false );
+		expect( isRichLinkPreview ).toBe( false );
+	} );
+
 	afterAll( () => {
 		// Remove the mock to avoid edge cases in other tests.
 		mockFetchRemoteUrlData = undefined;
