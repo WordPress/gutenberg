@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { createContext, useState, useMemo } from '@wordpress/element';
+import { createContext, useState, useMemo, memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -144,7 +144,7 @@ function Items( {
 	);
 }
 
-export function BlockListItems( props ) {
+function _BlockListItems( props ) {
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
 	return (
@@ -153,3 +153,5 @@ export function BlockListItems( props ) {
 		</AsyncModeProvider>
 	);
 }
+
+export const BlockListItems = memo( _BlockListItems );
