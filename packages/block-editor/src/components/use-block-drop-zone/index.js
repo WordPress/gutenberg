@@ -113,7 +113,7 @@ export default function useBlockDropZone( {
 	);
 
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );

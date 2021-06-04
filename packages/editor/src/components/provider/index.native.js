@@ -1,6 +1,8 @@
 /**
  * External dependencies
  */
+import memize from 'memize';
+
 /**
  * WordPress dependencies
  */
@@ -33,6 +35,7 @@ import { applyFilters } from '@wordpress/hooks';
 import {
 	validateThemeColors,
 	validateThemeGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 const postTypeEntities = [
@@ -68,6 +71,15 @@ class NativeEditorProvider extends Component {
 			'postType',
 			this.post.type,
 			this.post
+		);
+		this.getEditorSettings = memize(
+			( settings, capabilities ) => ( {
+				...settings,
+				capabilities,
+			} ),
+			{
+				maxSize: 1,
+			}
 		);
 	}
 
@@ -266,11 +278,18 @@ class NativeEditorProvider extends Component {
 		const {
 			children,
 			post, // eslint-disable-line no-unused-vars
+			capabilities,
+			settings,
 			...props
 		} = this.props;
+		const editorSettings = this.getEditorSettings( settings, capabilities );
 
 		return (
-			<EditorProvider post={ this.post } { ...props }>
+			<EditorProvider
+				post={ this.post }
+				settings={ editorSettings }
+				{ ...props }
+			>
 				{ children }
 			</EditorProvider>
 		);
@@ -291,7 +310,7 @@ export default compose( [
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
@@ -312,7 +331,7 @@ export default compose( [
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
-		} = dispatch( 'core/block-editor' );
+		} = dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 		const { createSuccessNotice } = dispatch( 'core/notices' );

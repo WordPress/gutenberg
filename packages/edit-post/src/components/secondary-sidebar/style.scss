@@ -1,0 +1,50 @@
+.edit-post-editor__inserter-panel,
+.edit-post-editor__list-view-panel {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.edit-post-editor__list-view-panel {
+	// Same width as the Inserter.
+	// @see packages/block-editor/src/components/inserter/style.scss
+	min-width: 350px;
+}
+
+.edit-post-editor__inserter-panel-header {
+	padding-top: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	display: flex;
+	justify-content: flex-end;
+
+	@include break-medium() {
+		display: none;
+	}
+}
+
+.edit-post-editor__inserter-panel-content,
+.edit-post-editor__list-view-panel-content {
+	// Leave space for the close button
+	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+}
+
+.edit-post-editor__inserter-panel-content {
+	@include break-medium() {
+		height: 100%;
+	}
+}
+
+.edit-post-editor__list-view-panel-header {
+	align-items: center;
+	border-bottom: $border-width solid $gray-300;
+	display: flex;
+	justify-content: space-between;
+	height: $grid-unit-60;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-05;
+}
+
+.edit-post-editor__list-view-panel-content {
+	overflow-y: auto;
+	padding: $grid-unit-10;
+}

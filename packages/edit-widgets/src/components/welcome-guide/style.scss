@@ -1,0 +1,28 @@
+.edit-widgets-welcome-guide {
+	width: 312px;
+
+	&__image {
+		background: #00a0d2;
+		margin: 0 0 $grid-unit-20;
+	}
+
+	&__heading {
+		font-family: $default-font;
+		font-size: 24px;
+		line-height: 1.4;
+		margin: $grid-unit-20 0 $grid-unit-20 0;
+		padding: 0 $grid-unit-40;
+	}
+
+	&__text {
+		font-size: $default-font-size;
+		line-height: 1.4;
+		margin: 0 0 $grid-unit-30 0;
+		padding: 0 $grid-unit-40;
+	}
+
+	&__inserter-icon {
+		margin: 0 4px;
+		vertical-align: text-top;
+	}
+}

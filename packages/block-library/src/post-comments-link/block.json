@@ -1,11 +1,11 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-comments-link",
+	"title": "Post Comments Link",
 	"category": "design",
-	"usesContext": [
-		"postType",
-		"postId"
-	],
+	"description": "Displays the link to the current post comments.",
+	"textdomain": "default",
+	"usesContext": [ "postType", "postId" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"
@@ -13,11 +13,13 @@
 	},
 	"supports": {
 		"html": false,
-		"fontSize": true,
 		"color": {
 			"link": true,
 			"text": false
 		},
-		"lineHeight": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
 	}
 }

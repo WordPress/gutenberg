@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import {
+	useRef,
+	useState,
+	useLayoutEffect,
+	forwardRef,
+} from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
@@ -18,6 +23,7 @@ import {
 	useConstrainedTabbing,
 	useFocusReturn,
 	useMergeRefs,
+	useRefEffect,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
@@ -42,7 +48,8 @@ function computeAnchorRect(
 	anchorRect,
 	getAnchorRect,
 	anchorRef = false,
-	shouldAnchorIncludePadding
+	shouldAnchorIncludePadding,
+	container
 ) {
 	if ( anchorRect ) {
 		return anchorRect;
@@ -53,9 +60,11 @@ function computeAnchorRect(
 			return;
 		}
 
+		const rect = getAnchorRect( anchorRefFallback.current );
 		return offsetIframe(
-			getAnchorRect( anchorRefFallback.current ),
-			anchorRefFallback.current.ownerDocument
+			rect,
+			rect.ownerDocument || anchorRefFallback.current.ownerDocument,
+			container
 		);
 	}
 
@@ -75,7 +84,8 @@ function computeAnchorRect(
 		if ( typeof anchorRef?.cloneRange === 'function' ) {
 			return offsetIframe(
 				getRectangleFromRange( anchorRef ),
-				anchorRef.endContainer.ownerDocument
+				anchorRef.endContainer.ownerDocument,
+				container
 			);
 		}
 
@@ -85,7 +95,8 @@ function computeAnchorRect(
 		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
 			const rect = offsetIframe(
 				anchorRef.getBoundingClientRect(),
-				anchorRef.ownerDocument
+				anchorRef.ownerDocument,
+				container
 			);
 
 			if ( shouldAnchorIncludePadding ) {
@@ -105,7 +116,8 @@ function computeAnchorRect(
 				topRect.width,
 				bottomRect.bottom - topRect.top
 			),
-			top.ownerDocument
+			top.ownerDocument,
+			container
 		);
 
 		if ( shouldAnchorIncludePadding ) {
@@ -222,36 +234,39 @@ function getAnchorDocument( anchor ) {
 	return anchor.ownerDocument;
 }
 
-const Popover = ( {
-	headerTitle,
-	onClose,
-	onKeyDown,
-	children,
-	className,
-	noArrow = true,
-	isAlternate,
-	// Disable reason: We generate the `...contentProps` rest as remainder
-	// of props which aren't explicitly handled by this component.
-	/* eslint-disable no-unused-vars */
-	position = 'bottom right',
-	range,
-	focusOnMount = 'firstElement',
-	anchorRef,
-	shouldAnchorIncludePadding,
-	anchorRect,
-	getAnchorRect,
-	expandOnMobile,
-	animate = true,
-	onClickOutside,
-	onFocusOutside,
-	__unstableStickyBoundaryElement,
-	__unstableSlotName = SLOT_NAME,
-	__unstableObserveElement,
-	__unstableBoundaryParent,
-	__unstableForcePosition,
-	/* eslint-enable no-unused-vars */
-	...contentProps
-} ) => {
+const Popover = (
+	{
+		headerTitle,
+		onClose,
+		children,
+		className,
+		noArrow = true,
+		isAlternate,
+		// Disable reason: We generate the `...contentProps` rest as remainder
+		// of props which aren't explicitly handled by this component.
+		/* eslint-disable no-unused-vars */
+		position = 'bottom right',
+		range,
+		focusOnMount = 'firstElement',
+		anchorRef,
+		shouldAnchorIncludePadding,
+		anchorRect,
+		getAnchorRect,
+		expandOnMobile,
+		animate = true,
+		onClickOutside,
+		onFocusOutside,
+		__unstableStickyBoundaryElement,
+		__unstableSlotName = SLOT_NAME,
+		__unstableObserveElement,
+		__unstableBoundaryParent,
+		__unstableForcePosition,
+		__unstableForceXAlignment,
+		/* eslint-enable no-unused-vars */
+		...contentProps
+	},
+	ref
+) => {
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
@@ -285,7 +300,8 @@ const Popover = ( {
 				anchorRect,
 				getAnchorRect,
 				anchorRef,
-				shouldAnchorIncludePadding
+				shouldAnchorIncludePadding,
+				containerRef.current
 			);
 
 			if ( ! anchor ) {
@@ -339,7 +355,8 @@ const Popover = ( {
 				containerRef.current,
 				relativeOffsetTop,
 				boundaryElement,
-				__unstableForcePosition
+				__unstableForcePosition,
+				__unstableForceXAlignment
 			);
 
 			if (
@@ -468,30 +485,39 @@ const Popover = ( {
 		__unstableBoundaryParent,
 	] );
 
+	// Event handlers for closing the popover.
+	const closeEventRef = useRefEffect(
+		( node ) => {
+			function maybeClose( event ) {
+				// Close on escape.
+				if ( event.keyCode === ESCAPE && onClose ) {
+					event.stopPropagation();
+					onClose();
+				}
+			}
+
+			node.addEventListener( 'keydown', maybeClose );
+
+			return () => {
+				node.removeEventListener( 'keydown', maybeClose );
+			};
+		},
+		[ onClose ]
+	);
+
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
 	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
 	const mergedRefs = useMergeRefs( [
+		ref,
 		containerRef,
+		// Don't register the event at all if there's no onClose callback.
+		onClose ? closeEventRef : null,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
 		focusOnMount ? focusOnMountRef : null,
 	] );
-
-	// Event handlers
-	const maybeClose = ( event ) => {
-		// Close on escape
-		if ( event.keyCode === ESCAPE && onClose ) {
-			event.stopPropagation();
-			onClose();
-		}
-
-		// Preserve original content prop behavior
-		if ( onKeyDown ) {
-			onKeyDown( event );
-		}
-	};
 
 	/**
 	 * Shims an onFocusOutside callback to be compatible with a deprecated
@@ -577,7 +603,6 @@ const Popover = ( {
 				}
 			) }
 			{ ...contentProps }
-			onKeyDown={ maybeClose }
 			{ ...focusOutsideProps }
 			ref={ mergedRefs }
 			tabIndex="-1"
@@ -615,10 +640,19 @@ const Popover = ( {
 	return <span ref={ anchorRefFallback }>{ content }</span>;
 };
 
-const PopoverContainer = Popover;
+const PopoverContainer = forwardRef( Popover );
 
-PopoverContainer.Slot = ( { name = SLOT_NAME } ) => (
-	<Slot bubblesVirtually name={ name } className="popover-slot" />
-);
+function PopoverSlot( { name = SLOT_NAME }, ref ) {
+	return (
+		<Slot
+			bubblesVirtually
+			name={ name }
+			className="popover-slot"
+			ref={ ref }
+		/>
+	);
+}
+
+PopoverContainer.Slot = forwardRef( PopoverSlot );
 
 export default PopoverContainer;

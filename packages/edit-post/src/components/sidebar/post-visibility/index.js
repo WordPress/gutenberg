@@ -29,7 +29,7 @@ export function PostVisibility() {
 									aria-expanded={ isOpen }
 									className="edit-post-post-visibility__toggle"
 									onClick={ onToggle }
-									isTertiary
+									variant="tertiary"
 								>
 									<PostVisibilityLabel />
 								</Button>

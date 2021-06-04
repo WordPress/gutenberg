@@ -4,12 +4,6 @@
  *
  * @package Gutenberg
  */
-
-/**
- * Test WP_Theme_JSON class.
- *
- * @package Gutenberg
- */
 class Gutenberg_Utils_Test extends WP_UnitTestCase {
 	/**
 	 * Test gutenberg_experimental_set() with simple non subtree path.

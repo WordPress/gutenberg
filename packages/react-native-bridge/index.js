@@ -246,6 +246,10 @@ export function requestImageUploadCancel( mediaId ) {
 	return RNReactNativeGutenbergBridge.requestImageUploadCancel( mediaId );
 }
 
+export function setFeaturedImage( mediaId ) {
+	return RNReactNativeGutenbergBridge.setFeaturedImage( mediaId );
+}
+
 export function getOtherMediaOptions( filter, callback ) {
 	return RNReactNativeGutenbergBridge.getOtherMediaOptions(
 		filter,
@@ -275,7 +279,10 @@ export function requestMediaEditor( mediaUrl, callback ) {
 	);
 }
 
-export function fetchRequest( path ) {
+export function fetchRequest( path, enableCaching = true ) {
+	if ( isAndroid ) {
+		return RNReactNativeGutenbergBridge.fetchRequest( path, enableCaching );
+	}
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
 }
 

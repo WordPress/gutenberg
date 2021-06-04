@@ -7,7 +7,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { LINK_COLOR, useEditorFeature } from '../editor/utils';
+
+import { useSetting } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
 export function useHasColorPanel( { supports } ) {
@@ -15,7 +16,7 @@ export function useHasColorPanel( { supports } ) {
 		supports.includes( 'color' ) ||
 		supports.includes( 'backgroundColor' ) ||
 		supports.includes( 'background' ) ||
-		supports.includes( LINK_COLOR )
+		supports.includes( 'linkColor' )
 	);
 }
 
@@ -26,13 +27,10 @@ export default function ColorPanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useEditorFeature( 'color.palette', name );
-	const disableCustomColors = ! useEditorFeature( 'color.custom', name );
-	const gradients = useEditorFeature( 'color.gradients', name );
-	const disableCustomGradients = ! useEditorFeature(
-		'color.customGradient',
-		name
-	);
+	const colors = useSetting( 'color.palette', name );
+	const disableCustomColors = ! useSetting( 'color.custom', name );
+	const gradients = useSetting( 'color.gradients', name );
+	const disableCustomGradients = ! useSetting( 'color.customGradient', name );
 
 	const settings = [];
 
@@ -87,12 +85,12 @@ export default function ColorPanel( {
 		} );
 	}
 
-	if ( supports.includes( LINK_COLOR ) ) {
-		const color = getStyle( name, LINK_COLOR );
-		const userColor = getStyle( name, LINK_COLOR, 'user' );
+	if ( supports.includes( 'linkColor' ) ) {
+		const color = getStyle( name, 'linkColor' );
+		const userColor = getStyle( name, 'linkColor', 'user' );
 		settings.push( {
 			colorValue: color,
-			onColorChange: ( value ) => setStyle( name, LINK_COLOR, value ),
+			onColorChange: ( value ) => setStyle( name, 'linkColor', value ),
 			label: __( 'Link color' ),
 			clearable: color === userColor,
 		} );

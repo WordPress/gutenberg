@@ -1260,6 +1260,22 @@ export function getTemplateLock( state, rootClientId ) {
 	return blockListSettings.templateLock;
 }
 
+const checkAllowList = ( list, item, defaultResult = null ) => {
+	if ( isBoolean( list ) ) {
+		return list;
+	}
+	if ( isArray( list ) ) {
+		// TODO: when there is a canonical way to detect that we are editing a post
+		// the following check should be changed to something like:
+		// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
+		if ( list.includes( 'core/post-content' ) && item === null ) {
+			return true;
+		}
+		return list.includes( item );
+	}
+	return defaultResult;
+};
+
 /**
  * Determines if the given block type is allowed to be inserted into the block list.
  * This function is not exported and not memoized because using a memoized selector
@@ -1278,22 +1294,6 @@ const canInsertBlockTypeUnmemoized = (
 	blockName,
 	rootClientId = null
 ) => {
-	const checkAllowList = ( list, item, defaultResult = null ) => {
-		if ( isBoolean( list ) ) {
-			return list;
-		}
-		if ( isArray( list ) ) {
-			// TODO: when there is a canonical way to detect that we are editing a post
-			// the following check should be changed to something like:
-			// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
-			if ( list.includes( 'core/post-content' ) && item === null ) {
-				return true;
-			}
-			return list.includes( item );
-		}
-		return defaultResult;
-	};
-
 	let blockType;
 	if ( blockName && 'object' === typeof blockName ) {
 		blockType = blockName;
@@ -1784,6 +1784,32 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
+const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
+	if ( isBoolean( allowedBlockTypes ) ) {
+		return allowedBlockTypes;
+	}
+
+	const blocksQueue = [ ...blocks ];
+	while ( blocksQueue.length > 0 ) {
+		const block = blocksQueue.shift();
+
+		const isAllowed = checkAllowList(
+			allowedBlockTypes,
+			block.name || block.blockName,
+			true
+		);
+		if ( ! isAllowed ) {
+			return false;
+		}
+
+		block.innerBlocks?.forEach( ( innerBlock ) => {
+			blocksQueue.push( innerBlock );
+		} );
+	}
+
+	return true;
+};
+
 export const __experimentalGetParsedPattern = createSelector(
 	( state, patternName ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
@@ -1799,24 +1825,41 @@ export const __experimentalGetParsedPattern = createSelector(
 	( state ) => [ state.settings.__experimentalBlockPatterns ]
 );
 
+const getAllAllowedPatterns = createSelector(
+	( state ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const { allowedBlockTypes } = getSettings( state );
+		const parsedPatterns = patterns.map( ( { name } ) =>
+			__experimentalGetParsedPattern( state, name )
+		);
+		const allowedPatterns = parsedPatterns.filter( ( { blocks } ) =>
+			checkAllowListRecursive( blocks, allowedBlockTypes )
+		);
+		return allowedPatterns;
+	},
+	( state ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+	]
+);
+
 /**
- * Returns the list of allowed patterns for inner blocks children
+ * Returns the list of allowed patterns for inner blocks children.
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional target root client ID.
  *
- * @return {Array?} The list of allowed block types.
+ * @return {Array?} The list of allowed patterns.
  */
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
-		const patterns = state.settings.__experimentalBlockPatterns;
-		const parsedPatterns = patterns.map( ( { name } ) =>
-			__experimentalGetParsedPattern( state, name )
-		);
-		const patternsAllowed = filter( parsedPatterns, ( { blocks } ) =>
-			blocks.every( ( { name } ) =>
-				canInsertBlockType( state, name, rootClientId )
-			)
+		const availableParsedPatterns = getAllAllowedPatterns( state );
+		const patternsAllowed = filter(
+			availableParsedPatterns,
+			( { blocks } ) =>
+				blocks.every( ( { name } ) =>
+					canInsertBlockType( state, name, rootClientId )
+				)
 		);
 
 		return patternsAllowed;
@@ -1884,7 +1927,6 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
  *
  * @return {WPBlockPattern[]} Items that are eligible for a pattern transformation.
  */
-// TODO tests
 export const __experimentalGetPatternTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
 		if ( ! blocks ) return EMPTY_ARRAY;

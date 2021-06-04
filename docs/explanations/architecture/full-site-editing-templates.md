@@ -2,13 +2,15 @@
 
 ## Template and template part flows
 
-> This is the documentation for the current implementation of the block-based templates and template parts themes. This is part of the Full Site Editing project. These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors, and theme authors.
+<div class="callout callout-alert">
+This is the documentation for the current implementation of the block templates and template parts themes. This is part of the Full Site Editing project. These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors, and theme authors.
+</div>
 
-This document will explain the internals of how templates and templates parts are rendered in the frontend and edited in the backend. For an introduction about block-based themes and Full site editing templates, refer to the [block-based themes documentation](/docs/how-to-guides/themes/block-based-themes.md).
+This document will explain the internals of how templates and templates parts are rendered in the frontend and edited in the backend. For an introduction about block themes and Full site editing templates, refer to the [block theme documentation](/docs/how-to-guides/themes/block-theme-overview.md).
 
 ## Storage
 
-Just like the regular templates, the block-based templates live initially as files in the theme folder but the main difference is that the user can edit these templates in the UI in the Site Editor.
+Just like the regular templates, the block templates live initially as files in the theme folder but the main difference is that the user can edit these templates in the UI in the Site Editor.
 
 When a user edits a template (or template-part), the initial theme template file is kept as is but a forked version of the template is saved to the `wp_template` custom post type (or `wp_template_part` for template parts).
 
@@ -30,11 +32,11 @@ The synchronization is important for two different flows:
 
 -   When editing the template and template parts, the site editor frontend fetches the edited and available templates through the REST API. This means that for all `GET` API requests performed to the `wp-templates` and `wp-template-parts` endpoint synchronization is required.
 -   When rendering a template (sometimes referred to as "resolving a template"): this is the algorithm that WordPress follows to traverse the template hierarchy and find the right template to render for the current page being loaded.
--   When exporting a block-based theme, we need to export all its templates back as files. The synchronization is required to simplify the operation and only export the CPT templates.
+-   When exporting a block theme, we need to export all its templates back as files. The synchronization is required to simplify the operation and only export the CPT templates.
 
 ## Switching themes
 
-Since block-based themes make use of templates that can refer to each other and that can be saved to a custom post type, it becomes possible to mix templates and template parts from different themes. For example:
+Since block themes make use of templates that can refer to each other and that can be saved to a custom post type, it becomes possible to mix templates and template parts from different themes. For example:
 
 -   A user might like the "header" template part of theme A and would like to use it in theme B.
 -   A user might like the "contact" template from theme A and would like to use it in theme B.

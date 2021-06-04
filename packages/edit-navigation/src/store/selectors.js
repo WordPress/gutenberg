@@ -7,13 +7,24 @@ import { invert } from 'lodash';
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
-
 import { buildNavigationPostId } from './utils';
+
+/**
+ * Returns the selected menu ID.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number} The selected menu ID.
+ */
+export function getSelectedMenuId( state ) {
+	return state.selectedMenuId ?? null;
+}
 
 /**
  * Returns a "stub" navigation post reflecting the contents of menu with id=menuId. The
@@ -33,7 +44,7 @@ export const getNavigationPostForMenu = createRegistrySelector(
 		if ( ! hasResolvedNavigationPost( state, menuId ) ) {
 			return null;
 		}
-		return select( 'core' ).getEditedEntityRecord(
+		return select( coreStore.name ).getEditedEntityRecord(
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId )
@@ -49,7 +60,9 @@ export const getNavigationPostForMenu = createRegistrySelector(
  */
 export const hasResolvedNavigationPost = createRegistrySelector(
 	( select ) => ( state, menuId ) => {
-		return select( 'core' ).hasFinishedResolution( 'getEntityRecord', [
+		return select(
+			coreStore.name
+		).hasFinishedResolution( 'getEntityRecord', [
 			NAVIGATION_POST_KIND,
 			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId ),
@@ -67,6 +80,6 @@ export const hasResolvedNavigationPost = createRegistrySelector(
 export const getMenuItemForClientId = createRegistrySelector(
 	( select ) => ( state, postId, clientId ) => {
 		const mapping = invert( state.mapping[ postId ] );
-		return select( 'core' ).getMenuItem( mapping[ clientId ] );
+		return select( coreStore.name ).getMenuItem( mapping[ clientId ] );
 	}
 );

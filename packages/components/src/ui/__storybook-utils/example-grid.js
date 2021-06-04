@@ -1,16 +1,24 @@
 /**
- * External dependencies
- */
-import { Container } from '@wp-g2/components';
-
-/**
  * Internal dependencies
  */
-import { Grid } from '../grid';
+import { Grid } from '../../grid';
 import { Surface } from '../surface';
-import { Text } from '../text';
-import { View } from '../view';
-import { VStack } from '../v-stack';
+import { Text } from '../../text';
+import { View } from '../../view';
+import { VStack } from '../../v-stack';
+
+const Container = ( { children } ) => (
+	<div
+		style={ {
+			maxWidth: 1280,
+			width: '100%',
+			marginLeft: 'auto',
+			marginRight: 'auto',
+		} }
+	>
+		{ children }
+	</div>
+);
 
 export const ExampleGrid = ( { children } ) => (
 	<Container>
@@ -23,7 +31,7 @@ export const ExampleGrid = ( { children } ) => (
 export const ExampleGridItem = ( { children } ) => (
 	<Surface
 		variant="secondary"
-		css={ {
+		style={ {
 			padding: 20,
 		} }
 	>

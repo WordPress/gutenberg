@@ -7,14 +7,15 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import TextTransformControl from '../components/text-transform-control';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 import { cleanEmptyObject } from './utils';
 
 /**
  * Key within block settings' supports array indicating support for text
  * transforms e.g. settings found in `block.json`.
  */
-export const TEXT_TRANSFORM_SUPPORT_KEY = '__experimentalTextTransform';
+export const TEXT_TRANSFORM_SUPPORT_KEY =
+	'typography.__experimentalTextTransform';
 
 /**
  * Inspector control panel containing the text transform options.
@@ -64,8 +65,6 @@ export function useIsTextTransformDisabled( { name: blockName } = {} ) {
 		blockName,
 		TEXT_TRANSFORM_SUPPORT_KEY
 	);
-	const hasTextTransforms = useEditorFeature(
-		'typography.customTextTransforms'
-	);
+	const hasTextTransforms = useSetting( 'typography.customTextTransforms' );
 	return notSupported || ! hasTextTransforms;
 }

@@ -1,0 +1,199 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render correctly 1`] = `
+.emotion-0 {
+  margin-bottom: calc(4px * 2);
+}
+
+<div
+  class="emotion-0 components-spacer emotion-1 emotion-2"
+  data-wp-c16t="true"
+  data-wp-component="Spacer"
+/>
+`;
+
+exports[`props should render margin 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+-     "margin": "calc(4px * 5)",
+      "margin-bottom": "calc(4px * 2)",
+    },
+  ]
+`;
+
+exports[`props should render marginBottom 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+-     "margin-bottom": "calc(4px * 5)",
++     "margin-bottom": "calc(4px * 2)",
+    },
+  ]
+`;
+
+exports[`props should render marginLeft 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "margin-left": "calc(4px * 5)",
+    },
+  ]
+`;
+
+exports[`props should render marginRight 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "margin-right": "calc(4px * 5)",
+    },
+  ]
+`;
+
+exports[`props should render marginTop 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "margin-top": "calc(4px * 5)",
+    },
+  ]
+`;
+
+exports[`props should render marginX 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "margin-left": "calc(4px * 5)",
+-     "margin-right": "calc(4px * 5)",
+    },
+  ]
+`;
+
+exports[`props should render marginY 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+-     "margin-bottom": "calc(4px * 5)",
+-     "margin-top": "calc(4px * 5)",
++     "margin-bottom": "calc(4px * 2)",
+    },
+  ]
+`;
+
+exports[`props should render padding 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "padding": "calc(4px * 5)",
+    },
+  ]
+`;
+
+exports[`props should render paddingBottom 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "padding-bottom": "calc(4px * 5)",
+    },
+  ]
+`;
+
+exports[`props should render paddingLeft 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "padding-left": "calc(4px * 5)",
+    },
+  ]
+`;
+
+exports[`props should render paddingRight 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "padding-right": "calc(4px * 5)",
+    },
+  ]
+`;
+
+exports[`props should render paddingTop 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "padding-top": "calc(4px * 5)",
+    },
+  ]
+`;
+
+exports[`props should render paddingX 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "padding-left": "calc(4px * 5)",
+-     "padding-right": "calc(4px * 5)",
+    },
+  ]
+`;
+
+exports[`props should render paddingY 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "margin-bottom": "calc(4px * 2)",
+-     "padding-bottom": "calc(4px * 5)",
+-     "padding-top": "calc(4px * 5)",
+    },
+  ]
+`;

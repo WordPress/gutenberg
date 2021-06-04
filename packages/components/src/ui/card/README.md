@@ -1,5 +1,9 @@
 # Card
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 `Card` groups similar concepts and tasks together. `Card`'s background is rendered with a `Surface`.
 
 ## Usage
@@ -13,7 +17,8 @@ import {
 	CardBody,
 	CardFooter,
 	Text,
-} from '@wordpress/components/ui';
+	Heading,
+} from '@wordpress/components';
 
 function Example() {
 	return (

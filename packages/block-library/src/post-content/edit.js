@@ -6,23 +6,36 @@ import { useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useSetting,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	store as blockEditorStore,
+	Warning,
 } from '@wordpress/block-editor';
 import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 function Content( { layout, postType, postId } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
 	}, [] );
-	const defaultLayout = useEditorFeature( 'layout' ) || {};
+	const defaultLayout = useSetting( 'layout' ) || {};
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const { contentSize, wideSize } = usedLayout;
-	const alignments =
-		contentSize || wideSize
-			? [ 'wide', 'full' ]
-			: [ 'left', 'center', 'right' ];
+	const _layout = useMemo( () => {
+		if ( themeSupportsLayout ) {
+			const alignments =
+				contentSize || wideSize
+					? [ 'wide', 'full' ]
+					: [ 'left', 'center', 'right' ];
+			return {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments,
+			};
+		}
+		return undefined;
+	}, [ themeSupportsLayout, contentSize, wideSize ] );
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -34,11 +47,7 @@ function Content( { layout, postType, postId } ) {
 			value: blocks,
 			onInput,
 			onChange,
-			__experimentalLayout: {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments: themeSupportsLayout ? alignments : undefined,
-			},
+			__experimentalLayout: _layout,
 		}
 	);
 	return <div { ...props } />;
@@ -55,19 +64,41 @@ function Placeholder() {
 	);
 }
 
+function RecursionError() {
+	const blockProps = useBlockProps();
+	return (
+		<div { ...blockProps }>
+			<Warning>
+				{ __( 'Block cannot be rendered inside itself.' ) }
+			</Warning>
+		</div>
+	);
+}
+
 export default function PostContentEdit( {
 	context: { postId: contextPostId, postType: contextPostType },
 	attributes,
 } ) {
 	const { layout = {} } = attributes;
+	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+		contextPostId
+	);
 
-	return contextPostId && contextPostType ? (
-		<Content
-			postType={ contextPostType }
-			postId={ contextPostId }
-			layout={ layout }
-		/>
-	) : (
-		<Placeholder />
+	if ( contextPostId && contextPostType && hasAlreadyRendered ) {
+		return <RecursionError />;
+	}
+
+	return (
+		<RecursionProvider>
+			{ contextPostId && contextPostType ? (
+				<Content
+					postType={ contextPostType }
+					postId={ contextPostId }
+					layout={ layout }
+				/>
+			) : (
+				<Placeholder />
+			) }
+		</RecursionProvider>
 	);
 }

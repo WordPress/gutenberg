@@ -19,11 +19,12 @@
 				"sticky": "",
 				"inherit": true
 			},
-			"layout": {
+			"tagName": "div",
+			"displayLayout": {
 				"type": "list"
 			}
 		},
 		"innerBlocks": [],
-		"originalContent": ""
+		"originalContent": "<div class=\"wp-block-query\"></div>"
 	}
 ]

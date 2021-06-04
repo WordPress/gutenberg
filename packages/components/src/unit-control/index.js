@@ -158,6 +158,17 @@ function UnitControl(
 		/>
 	) : null;
 
+	let step = props.step;
+
+	/*
+	 * If no step prop has been passed, lookup the active unit and
+	 * try to get step from `units`, or default to a value of `1`
+	 */
+	if ( ! step && units ) {
+		const activeUnit = units.find( ( option ) => option.value === unit );
+		step = activeUnit?.step ?? 1;
+	}
+
 	return (
 		<Root className="components-unit-control-wrapper" style={ style }>
 			<ValueInput
@@ -177,6 +188,7 @@ function UnitControl(
 				size={ size }
 				suffix={ inputSuffix }
 				value={ value }
+				step={ step }
 				__unstableStateReducer={ composeStateReducers(
 					unitControlStateReducer,
 					stateReducer
@@ -188,4 +200,5 @@ function UnitControl(
 
 const ForwardedUnitControl = forwardRef( UnitControl );
 
+export { useCustomUnits } from './utils';
 export default ForwardedUnitControl;

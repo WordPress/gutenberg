@@ -18,7 +18,7 @@ import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import BoxControlIcon from './icon';
-import Text from '../text';
+import { Text } from '../text';
 import LinkedButton from './linked-button';
 import Visualizer from './visualizer';
 import {
@@ -52,6 +52,7 @@ export default function BoxControl( {
 	values: valuesProp,
 	units,
 	sides,
+	allowReset = true,
 	resetValues = DEFAULT_VALUES,
 } ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
@@ -123,17 +124,19 @@ export default function BoxControl( {
 						{ label }
 					</Text>
 				</FlexItem>
-				<FlexItem>
-					<Button
-						className="component-box-control__reset-button"
-						isSecondary
-						isSmall
-						onClick={ handleOnReset }
-						disabled={ ! isDirty }
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</FlexItem>
+				{ allowReset && (
+					<FlexItem>
+						<Button
+							className="component-box-control__reset-button"
+							isSecondary
+							isSmall
+							onClick={ handleOnReset }
+							disabled={ ! isDirty }
+						>
+							{ __( 'Reset' ) }
+						</Button>
+					</FlexItem>
+				) }
 			</Header>
 			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
 				<FlexItem>

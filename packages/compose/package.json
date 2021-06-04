@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "3.25.2",
+	"version": "4.1.1",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,12 +20,16 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
+		"@types/mousetrap": "^1.6.8",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -33,7 +37,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/priority-queue": "file:../priority-queue",
 		"clipboard": "^2.0.1",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"mousetrap": "^1.6.5",
 		"react-resize-aware": "^3.1.0",

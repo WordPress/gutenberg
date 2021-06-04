@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import { css, ui } from '@wp-g2/styles';
+import { css } from 'emotion';
+/**
+ * Internal dependencies
+ */
+import { COLORS } from '../../utils/colors-values';
 
 export const VisuallyHidden = css`
 	border: 0;
@@ -17,7 +21,7 @@ export const VisuallyHidden = css`
 	word-wrap: normal !important;
 
 	&:focus {
-		background-color: ${ ui.get( 'lightGray300' ) };
+		background-color: ${ COLORS.lightGray[ '300' ] };
 		clip: auto !important;
 		clip-path: none;
 		color: #444;

@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
+import { cx } from 'emotion';
 
 /**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
 import * as styles from './form-group-styles';
 import { useInstanceId } from '../utils';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
  */
 export function useFormGroup( props ) {
 	const {

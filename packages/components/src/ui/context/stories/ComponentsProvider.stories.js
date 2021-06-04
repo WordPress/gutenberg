@@ -6,7 +6,9 @@ import { createContext, useContext, memo, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Card, CardBody, Text, View } from '../../';
+import { Card, CardBody } from '../../';
+import { View } from '../../../view';
+import { Text } from '../../../text';
 import { ContextSystemProvider } from '../index';
 
 const SomeContext = createContext();
@@ -39,7 +41,7 @@ const InnerCard = memo( () => {
 	return (
 		<View style={ { padding: 40 } }>
 			<Card>
-				<CardBody style={ { border: '3px solid green' } }>
+				<CardBody as="div" style={ { border: '3px solid green' } }>
 					<InnerContent />
 				</CardBody>
 			</Card>
@@ -59,6 +61,9 @@ export const Default = () => {
 		CardBody: {
 			as: 'a',
 			href: 'https://wordpress.org',
+			style: {
+				display: 'block',
+			},
 		},
 	};
 

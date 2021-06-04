@@ -2,16 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock, parse, serialize } from '@wordpress/blocks';
-
-function addWidgetIdToBlock( block, widgetId ) {
-	return {
-		...block,
-		attributes: {
-			...( block.attributes || {} ),
-			__internalWidgetId: widgetId,
-		},
-	};
-}
+import { addWidgetIdToBlock } from '@wordpress/widgets';
 
 export function transformWidgetToBlock( widget ) {
 	if ( widget.id_base === 'block' ) {
@@ -46,7 +37,11 @@ export function transformWidgetToBlock( widget ) {
 export function transformBlockToWidget( block, relatedWidget = {} ) {
 	let widget;
 
-	if ( block.name === 'core/legacy-widget' ) {
+	const isValidLegacyWidgetBlock =
+		block.name === 'core/legacy-widget' &&
+		( block.attributes.id || block.attributes.instance );
+
+	if ( isValidLegacyWidgetBlock ) {
 		widget = {
 			...relatedWidget,
 			id: block.attributes.id ?? relatedWidget.id,
@@ -64,13 +59,6 @@ export function transformBlockToWidget( block, relatedWidget = {} ) {
 			},
 		};
 	}
-
-	// Delete deprecated properties.
-	delete widget.description;
-	delete widget.name;
-	delete widget.number;
-	delete widget.settings;
-	delete widget.widget_class;
 
 	// Delete read-only properties.
 	delete widget.rendered;
