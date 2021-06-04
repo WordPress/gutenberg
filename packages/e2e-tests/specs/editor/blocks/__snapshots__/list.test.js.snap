@@ -202,7 +202,7 @@ exports[`List should insert a line break on shift+enter in a non trailing list i
 
 exports[`List should not change the contents when you change the list type to Unordered 1`] = `"<li>a</li><li>b</li><li>c</li>"`;
 
-exports[`List should not change the contents when you change the list type. 1`] = `"<li>1</li><li>2</li><li>3</li>"`;
+exports[`List should not change the contents when you change the list type to Ordered 1`] = `"<li>1</li><li>2</li><li>3</li>"`;
 
 exports[`List should not indent list on space with modifier 1`] = `
 "<!-- wp:list -->
