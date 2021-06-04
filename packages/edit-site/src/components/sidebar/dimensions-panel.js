@@ -118,6 +118,7 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 					hasValue={ hasPaddingValue }
 					reset={ resetPaddingValue }
 					allowReset={ false }
+					isShownByDefault={ true }
 				/>
 			) }
 			{ showMarginControl && (
@@ -130,6 +131,7 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 					hasValue={ hasMarginValue }
 					reset={ resetMarginValue }
 					allowReset={ false }
+					isShownByDefault={ true }
 				/>
 			) }
 		</BlockSupportPanel>
