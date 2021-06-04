@@ -16,7 +16,6 @@ import {
 	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
-	getBlockSupport,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -465,8 +464,20 @@ export function replaceBlock( clientId, block ) {
  *
  * @return {Function} Action creator.
  */
-function createOnMove( type ) {
-	return ( clientIds, rootClientId ) => {
+function* createOnMove( type ) {
+	return function* ( clientIds, rootClientId ) {
+		const canMoveBlocks = yield controls.select(
+			blockEditorStoreName,
+			'canMoveBlocks',
+			clientIds,
+			rootClientId
+		);
+
+		// If one of the blocks is locked or the parent is locked, we cannot move any block.
+		if ( ! canMoveBlocks ) {
+			return;
+		}
+
 		return {
 			clientIds: castArray( clientIds ),
 			type,
@@ -495,15 +506,15 @@ export function* moveBlocksToPosition(
 	toRootClientId = '',
 	index
 ) {
-	const templateLock = yield controls.select(
+	const canMoveBlocks = yield controls.select(
 		blockEditorStoreName,
-		'getTemplateLock',
+		'canMoveBlocks',
+		clientIds,
 		fromRootClientId
 	);
 
-	// If locking is equal to all on the original clientId (fromRootClientId),
-	// it is not possible to move the block to any other position.
-	if ( templateLock === 'all' ) {
+	// If one of the blocks is locked or the parent is locked, we cannot move any block.
+	if ( ! canMoveBlocks ) {
 		return;
 	}
 
@@ -518,13 +529,6 @@ export function* moveBlocksToPosition(
 	// If moving inside the same root block the move is always possible.
 	if ( fromRootClientId === toRootClientId ) {
 		yield action;
-		return;
-	}
-
-	// If templateLock is insert we can not remove the block from the parent.
-	// Given that here we know that we are moving the block to a different
-	// parent, the move should not be possible if the condition is true.
-	if ( templateLock === 'insert' ) {
 		return;
 	}
 
@@ -910,29 +914,14 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		'getBlockRootClientId',
 		clientIds[ 0 ]
 	);
-	const isLocked = yield controls.select(
+	const canRemoveBlocks = yield controls.select(
 		blockEditorStoreName,
-		'getTemplateLock',
+		'canRemoveBlocks',
+		clientIds,
 		rootClientId
 	);
 
-	const blocks = yield controls.select(
-		blockEditorStoreName,
-		'getBlocksByClientId',
-		clientIds
-	);
-
-	clientIds = blocks
-		.filter( ( block ) => {
-			const lock = getBlockSupport( block.name, 'lock', null );
-			// false is a valid value, so we need to be string on checking.
-			if ( lock === null || lock?.remove === undefined ) {
-				return ! isLocked;
-			}
-			return ! lock;
-		} )
-		.map( ( block ) => block.clientId );
-	if ( ! clientIds.length ) {
+	if ( ! canRemoveBlocks ) {
 		return;
 	}
 
