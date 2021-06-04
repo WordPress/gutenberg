@@ -2,7 +2,6 @@
  * External dependencies
  */
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const path = require( 'path' );
 
 /**
  * Internal dependencies
