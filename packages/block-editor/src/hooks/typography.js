@@ -48,6 +48,7 @@ import {
 	useIsTextTransformDisabled,
 } from './text-transform';
 
+export const TYPOGRAPHY_SUPPORT_KEY = 'typography';
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,

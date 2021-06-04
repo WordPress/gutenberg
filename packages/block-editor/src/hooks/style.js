@@ -3,18 +3,15 @@
  */
 import {
 	capitalize,
-	find,
 	first,
 	forEach,
 	get,
 	has,
 	isEmpty,
-	isEqual,
 	kebabCase,
 	map,
 	omit,
 	startsWith,
-	without,
 } from 'lodash';
 import classnames from 'classnames';
 
@@ -35,8 +32,11 @@ import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
  */
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
-import { FONT_SIZE_SUPPORT_KEY } from './font-size';
-import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
+import {
+	TypographyPanel,
+	TYPOGRAPHY_SUPPORT_KEY,
+	TYPOGRAPHY_SUPPORT_KEYS,
+} from './typography';
 import { SPACING_SUPPORT_KEY, SpacingPanel } from './spacing';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 
@@ -140,16 +140,9 @@ const skipSerializationPaths = {
 	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		COLOR_SUPPORT_KEY,
 	],
-	[ `__experimentalSkipFontSizeSerialization` ]: [ 'typography', 'fontSize' ],
-	[ `__experimentalSkipTypographySerialization` ]: without(
-		TYPOGRAPHY_SUPPORT_KEYS,
-		FONT_SIZE_SUPPORT_KEY
-	).map(
-		( feature ) =>
-			find( STYLE_PROPERTY, ( property ) =>
-				isEqual( property.support, [ feature ] )
-			)?.value
-	),
+	[ `${ TYPOGRAPHY_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		TYPOGRAPHY_SUPPORT_KEY,
+	],
 };
 
 /**
