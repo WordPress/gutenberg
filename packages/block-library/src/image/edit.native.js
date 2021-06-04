@@ -500,8 +500,11 @@ export class ImageEdit extends Component {
 		] );
 
 		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
-		// Images that haven't been uploaded to a site's library have an id of 'undefined', which the 'canImageBeFeatured' check filters out.
-		const canImageBeFeatured = typeof attributes.id !== 'undefined';
+		// The 'canImageBeFeatured' check filters out images that haven't been uploaded based on the following:
+		// - Images that are embedded in a post but are uploaded elsewhere have an id of 'undefined'.
+		// - Image that are uploading or have failed to upload are given a temporary negative ID.
+		const canImageBeFeatured =
+			typeof attributes.id !== 'undefined' && attributes.id > 0;
 
 		const isFeaturedImage =
 			canImageBeFeatured && featuredImageId === attributes.id;
