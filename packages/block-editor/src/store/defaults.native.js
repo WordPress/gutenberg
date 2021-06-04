@@ -8,8 +8,8 @@ import {
 
 const SETTINGS_DEFAULTS = {
 	...SETTINGS,
-	// eslint-disable-next-line no-undef
-	__experimentalGalleryRefactor: __DEV__,
+	// FOR TESTING ONLY - Later, this will come from a REST API
+	__experimentalGalleryRefactor: true,
 	alignWide: true,
 };
 
