@@ -14,7 +14,8 @@ import { cleanEmptyObject } from './utils';
  * Key within block settings' supports array indicating support for text
  * decorations e.g. settings found in `block.json`.
  */
-export const TEXT_DECORATION_SUPPORT_KEY = '__experimentalTextDecoration';
+export const TEXT_DECORATION_SUPPORT_KEY =
+	'typography.__experimentalTextDecoration';
 
 /**
  * Inspector control panel containing the text decoration options.
