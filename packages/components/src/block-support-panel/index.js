@@ -16,6 +16,7 @@ import BlockSupportPanelTitle from './title';
 const BlockSupportPanel = ( props ) => {
 	const { children, className, label: menuLabel, resetAll, title } = props;
 	const [ menuItems, setMenuItems ] = useState( {} );
+	const [ defaultControls, setDefaultControls ] = useState( {} );
 
 	// If a block support UI has been disabled via theme.json a boolean `false`
 	// will be passed as a child. This panel is only interested in the children
@@ -24,16 +25,47 @@ const BlockSupportPanel = ( props ) => {
 		? children.filter( Boolean )
 		: [];
 
-	// Collect data to manage control visibility via the panel's dropdown menu.
+	// Collect which controls have custom values. Used to update menu state to
+	// reflect customization for controls that display by default / always show.
+	const customizedChildren = filteredChildren.map( ( child ) =>
+		child.props.hasValue( child.props ) ? child.props.label : undefined
+	);
+
+	// On first render determine initial menu state and which controls should
+	// always display by default.
 	useEffect( () => {
 		const items = {};
+		const defaults = {};
 
 		filteredChildren.forEach( ( child ) => {
 			items[ child.props.label ] = child.props.hasValue( child.props );
+			defaults[ child.props.label ] = child.props.isShownByDefault;
 		} );
 
 		setMenuItems( items );
+		setDefaultControls( defaults );
 	}, [] );
+
+	// As the default controls are visible all the time. Reflect their
+	// customizations in the menu items' selected state.
+	useEffect( () => {
+		const menuLabels = Object.keys( menuItems );
+
+		// Skip if no children or menu state not initialized.
+		if ( menuLabels.length === 0 ) {
+			return;
+		}
+
+		const updatedItems = { ...menuItems };
+
+		menuLabels.forEach( ( label ) => {
+			if ( defaultControls[ label ] ) {
+				updatedItems[ label ] = customizedChildren.includes( label );
+			}
+		} );
+
+		setMenuItems( updatedItems );
+	}, customizedChildren );
 
 	if ( filteredChildren.length === 0 ) {
 		return null;
@@ -45,8 +77,9 @@ const BlockSupportPanel = ( props ) => {
 		);
 	};
 
-	// Toggles display of a block support control resetting the attributes if
-	// being turned off.
+	// Toggles the customized state of the block support control and its display
+	// if it isn't to be displayed by default. When toggling off a control its
+	// associated block attribute is reset.
 	const toggleControl = ( label ) => {
 		const isSelected = menuItems[ label ];
 
@@ -89,16 +122,13 @@ const BlockSupportPanel = ( props ) => {
 				resetAll={ resetAllControls }
 			/>
 			{ filteredChildren.map( ( child ) => {
-				const { label, hasValue } = child?.props || {};
+				// Only display the block support control if it is toggled
+				// on in the menu or is set to display by default.
+				const isShown =
+					menuItems[ child.props.label ] ||
+					defaultControls[ child.props.label ];
 
-				// Only display the block support controls if the support
-				// attributes have a value or the controls have be chosen for
-				// display by the user.
-				if ( menuItems[ label ] || hasValue( child.props ) ) {
-					return child;
-				}
-
-				return null;
+				return isShown ? child : null;
 			} ) }
 		</div>
 	);
