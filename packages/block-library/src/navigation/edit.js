@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { useState, useMemo } from '@wordpress/element';
 import {
-	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	JustifyToolbar,
@@ -44,13 +43,10 @@ const LAYOUT = {
 };
 
 function Navigation( {
-	selectedBlockHasDescendants,
 	attributes,
 	setAttributes,
 	clientId,
 	hasExistingNavItems,
-	isImmediateParentOfSelectedBlock,
-	isSelected,
 	updateInnerBlocks,
 	className,
 	hasSubmenuIndicatorSetting = true,
@@ -86,12 +82,6 @@ function Navigation( {
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: attributes.orientation || 'horizontal',
-			renderAppender:
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
-				isSelected
-					? InnerBlocks.DefaultAppender
-					: false,
 			__experimentalAppenderTagName: 'li',
 			__experimentalCaptureToolbars: true,
 			// Template lock set to false here so that the Nav
@@ -184,22 +174,7 @@ function Navigation( {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( blockEditorStore ).getBlocks( clientId );
-		const {
-			getClientIdsOfDescendants,
-			hasSelectedInnerBlock,
-			getSelectedBlockClientId,
-		} = select( blockEditorStore );
-		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
-			clientId,
-			false
-		);
-		const selectedBlockId = getSelectedBlockClientId();
-		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
-			selectedBlockId,
-		] )?.length;
 		return {
-			isImmediateParentOfSelectedBlock,
-			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
 		};
 	} ),
