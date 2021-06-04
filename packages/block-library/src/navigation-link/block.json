@@ -48,6 +48,10 @@
 		},
 		"customBackgroundColor": {
 			"type": "string"
+		},
+		"isTopLevelLink": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"usesContext": [
