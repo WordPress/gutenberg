@@ -13,7 +13,6 @@ import {
 	TextControl,
 	Flex,
 	FlexItem,
-	Tip,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -68,7 +67,7 @@ function PostTemplateActions() {
 			</div>
 			{ isModalOpen && (
 				<Modal
-					title={ __( 'Create a custom template' ) }
+					title={ __( 'Create custom template' ) }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
@@ -99,21 +98,12 @@ function PostTemplateActions() {
 					>
 						<Flex align="flex-start" gap={ 8 }>
 							<FlexItem>
-								<div className="edit-post-template-modal__tip">
-									<Tip>
-										{ __(
-											'A custom template can be applied to any post or page on your site.'
-										) }
-									</Tip>
-								</div>
-							</FlexItem>
-							<FlexItem>
 								<TextControl
 									label={ __( 'Name' ) }
 									value={ title }
 									onChange={ setTitle }
 									help={ __(
-										'Give the template a name that describes its purpose, e.g. "Full Width". If you\'re unsure don\'t worry – the name can be changed later.'
+										'Describe the purpose of the template, e.g. "Full Width". Custom templates can be applied to any post or page.'
 									) }
 								/>
 							</FlexItem>
@@ -126,7 +116,7 @@ function PostTemplateActions() {
 						>
 							<FlexItem>
 								<Button
-									variant="secondary"
+									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
 										setTitle( '' );
