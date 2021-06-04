@@ -13,6 +13,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { wordpress } from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -85,4 +86,4 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 	);
 }
 
-export default FullscreenModeClose;
+export default memo( FullscreenModeClose );

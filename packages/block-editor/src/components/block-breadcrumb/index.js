@@ -4,6 +4,7 @@
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -89,4 +90,9 @@ function BlockBreadcrumb( { rootLabelText } ) {
 	);
 }
 
-export default BlockBreadcrumb;
+/**
+ * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
+ *
+ * @return {WPElement} Block Breadcrumb.
+ */
+export default memo( BlockBreadcrumb );

@@ -6,6 +6,7 @@ import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { ActionItem, PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -65,4 +66,4 @@ const MoreMenu = ( { showIconLabels } ) => {
 	);
 };
 
-export default MoreMenu;
+export default memo( MoreMenu );

@@ -8,6 +8,7 @@ import { omit } from 'lodash';
  */
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -48,4 +49,4 @@ function ComplementaryAreaToggle( {
 	);
 }
 
-export default complementaryAreaContext( ComplementaryAreaToggle );
+export default memo( complementaryAreaContext( ComplementaryAreaToggle ) );

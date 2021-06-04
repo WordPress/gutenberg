@@ -17,7 +17,7 @@ import {
 } from '@wordpress/editor';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
-import { useRef, useCallback } from '@wordpress/element';
+import { useRef, useCallback, memo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
@@ -170,4 +170,4 @@ function HeaderToolbar() {
 	);
 }
 
-export default HeaderToolbar;
+export default memo( HeaderToolbar );

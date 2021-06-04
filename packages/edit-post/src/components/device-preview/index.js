@@ -7,13 +7,14 @@ import { external } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { __experimentalPreviewOptions as PreviewOptions } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
 
-export default function DevicePreview() {
+export function DevicePreview() {
 	const {
 		hasActiveMetaboxes,
 		isPostSaveable,
@@ -62,3 +63,5 @@ export default function DevicePreview() {
 		</PreviewOptions>
 	);
 }
+
+export default memo( DevicePreview );

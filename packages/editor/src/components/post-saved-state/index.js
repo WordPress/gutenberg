@@ -12,7 +12,7 @@ import {
 } from '@wordpress/components';
 import { usePrevious, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Icon, check, cloud, cloudUpload } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
@@ -35,7 +35,7 @@ import { store as editorStore } from '../../store';
  * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
  * @return {import('@wordpress/element').WPComponent} The component.
  */
-export default function PostSavedState( {
+export function PostSavedState( {
 	forceIsDirty,
 	forceIsSaving,
 	showIconLabels = false,
@@ -176,3 +176,4 @@ export default function PostSavedState( {
 		</Button>
 	);
 }
+export default memo( PostSavedState );

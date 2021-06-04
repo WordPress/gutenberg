@@ -21,6 +21,7 @@ import {
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { stack } from '@wordpress/icons';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -227,4 +228,4 @@ export const BlockSwitcher = ( { clientIds } ) => {
 	);
 };
 
-export default BlockSwitcher;
+export default memo( BlockSwitcher );

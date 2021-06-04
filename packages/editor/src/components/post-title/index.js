@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState, memo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -28,7 +28,7 @@ import { store as editorStore } from '../../store';
  */
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
-export default function PostTitle() {
+function PostTitle() {
 	const instanceId = useInstanceId( PostTitle );
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );
@@ -202,3 +202,4 @@ export default function PostTitle() {
 		</PostTypeSupportCheck>
 	);
 }
+export default memo( PostTitle );
