@@ -464,7 +464,7 @@ export function replaceBlock( clientId, block ) {
  *
  * @return {Function} Action creator.
  */
-function* createOnMove( type ) {
+function createOnMove( type ) {
 	return function* ( clientIds, rootClientId ) {
 		const canMoveBlocks = yield controls.select(
 			blockEditorStoreName,
@@ -478,7 +478,7 @@ function* createOnMove( type ) {
 			return;
 		}
 
-		return {
+		yield {
 			clientIds: castArray( clientIds ),
 			type,
 			rootClientId,
