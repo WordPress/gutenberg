@@ -21,10 +21,12 @@
 			"__experimentalRole": "content"
 		},
 		"width": {
-			"type": "number"
+			"type": "number",
+			"default": 100
 		},
 		"widthUnit": {
-			"type": "string"
+			"type": "string",
+			"default": "%"
 		},
 		"buttonText": {
 			"type": "string",
@@ -35,6 +37,14 @@
 			"default": "button-outside"
 		},
 		"buttonUseIcon": {
+			"type": "boolean",
+			"default": false
+		},
+		"buttonBehavior": {
+			"type": "string",
+			"default": "expand-searchfield"
+		},
+		"isSearchFieldHidden": {
 			"type": "boolean",
 			"default": false
 		}

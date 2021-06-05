@@ -29,6 +29,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -51,6 +52,7 @@ import {
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
 const DEFAULT_INNER_PADDING = 4;
+const BUTTON_BEHAVIOR_EXPAND = 'expand-searchfield';
 
 export default function SearchEdit( {
 	className,
@@ -69,17 +71,39 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
+		buttonBehavior,
+		isSearchFieldHidden,
 		style,
 	} = attributes;
 
 	const borderRadius = style?.border?.radius;
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
+	const searchFieldRef = useRef();
+	const buttonRef = useRef();
 
 	const units = useCustomUnits( {
 		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
 	} );
+
+	useEffect( () => {
+		if ( 'button-only' === buttonPosition && ! isSelected ) {
+			setAttributes( {
+				isSearchFieldHidden: true,
+			} );
+		}
+	}, [ isSelected ] );
+
+	useEffect( () => {
+		if ( 'button-only' !== buttonPosition || ! isSelected ) {
+			return;
+		}
+
+		setAttributes( {
+			isSearchFieldHidden: false,
+		} );
+	}, [ width ] );
 
 	const getBlockClassNames = () => {
 		return classnames(
@@ -95,6 +119,13 @@ export default function SearchEdit( {
 				: undefined,
 			'button-only' === buttonPosition
 				? 'wp-block-search__button-only'
+				: undefined,
+			'button-only' === buttonPosition &&
+				BUTTON_BEHAVIOR_EXPAND === buttonBehavior
+				? 'wp-block-search__button-behavior-expand'
+				: undefined,
+			'button-only' === buttonPosition && isSearchFieldHidden
+				? 'wp-block-search__searchfield-hidden'
 				: undefined,
 			! buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__text-button'
@@ -119,7 +150,10 @@ export default function SearchEdit( {
 	};
 
 	const getResizableSides = () => {
-		if ( 'button-only' === buttonPosition ) {
+		if (
+			'button-only' === buttonPosition &&
+			( 'search-page-link' === buttonBehavior || isSearchFieldHidden )
+		) {
 			return {};
 		}
 
@@ -145,6 +179,7 @@ export default function SearchEdit( {
 				onChange={ ( event ) =>
 					setAttributes( { placeholder: event.target.value } )
 				}
+				ref={ searchFieldRef }
 			/>
 		);
 	};
@@ -157,6 +192,17 @@ export default function SearchEdit( {
 						icon={ search }
 						className="wp-block-search__button"
 						style={ { borderRadius } }
+						onClick={ () => {
+							if (
+								'button-only' === buttonPosition &&
+								BUTTON_BEHAVIOR_EXPAND === buttonBehavior
+							) {
+								setAttributes( {
+									isSearchFieldHidden: ! isSearchFieldHidden,
+								} );
+							}
+						} }
+						ref={ buttonRef }
 					/>
 				) }
 
@@ -171,6 +217,17 @@ export default function SearchEdit( {
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
+						onClick={ () => {
+							if (
+								'button-only' === buttonPosition &&
+								BUTTON_BEHAVIOR_EXPAND === buttonBehavior
+							) {
+								setAttributes( {
+									isSearchFieldHidden: ! isSearchFieldHidden,
+								} );
+							}
+						} }
+						ref={ buttonRef }
 					/>
 				) }
 			</>
@@ -202,6 +259,7 @@ export default function SearchEdit( {
 									onClick={ () => {
 										setAttributes( {
 											buttonPosition: 'no-button',
+											isSearchFieldHidden: false,
 										} );
 										onClose();
 									} }
@@ -213,6 +271,7 @@ export default function SearchEdit( {
 									onClick={ () => {
 										setAttributes( {
 											buttonPosition: 'button-outside',
+											isSearchFieldHidden: false,
 										} );
 										onClose();
 									} }
@@ -224,11 +283,25 @@ export default function SearchEdit( {
 									onClick={ () => {
 										setAttributes( {
 											buttonPosition: 'button-inside',
+											isSearchFieldHidden: false,
 										} );
 										onClose();
 									} }
 								>
 									{ __( 'Button Inside' ) }
+								</MenuItem>
+								<MenuItem
+									icon={ buttonOnly }
+									onClick={ () => {
+										setAttributes( {
+											buttonPosition: 'button-only',
+											isSearchFieldHidden: true,
+										} );
+
+										onClose();
+									} }
+								>
+									{ __( 'Button Only' ) }
 								</MenuItem>
 							</MenuGroup>
 						) }
@@ -241,6 +314,7 @@ export default function SearchEdit( {
 							onClick={ () => {
 								setAttributes( {
 									buttonUseIcon: ! buttonUseIcon,
+									isSearchFieldHidden: true,
 								} );
 							} }
 							className={
@@ -375,14 +449,18 @@ export default function SearchEdit( {
 				showHandle={ isSelected }
 			>
 				{ ( 'button-inside' === buttonPosition ||
-					'button-outside' === buttonPosition ) && (
+					'button-outside' === buttonPosition ||
+					( 'button-only' === buttonPosition &&
+						BUTTON_BEHAVIOR_EXPAND === buttonBehavior ) ) && (
 					<>
 						{ renderTextField() }
 						{ renderButton() }
 					</>
 				) }
 
-				{ 'button-only' === buttonPosition && renderButton() }
+				{ 'button-only' === buttonPosition &&
+					BUTTON_BEHAVIOR_EXPAND !== buttonBehavior &&
+					renderButton() }
 				{ 'no-button' === buttonPosition && renderTextField() }
 			</ResizableBox>
 		</div>

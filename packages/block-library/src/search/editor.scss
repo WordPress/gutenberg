@@ -22,7 +22,6 @@
 		// This needs high specificity because it otherwise inherits styles from `components-button`.
 		// stylelint-disable-line no-duplicate-selectors
 		&.wp-block-search__button.wp-block-search__button {
-			padding: 6px 10px;
 			display: flex;
 			align-items: center;
 		}
@@ -30,5 +29,11 @@
 
 	&__components-button-group {
 		margin-top: 10px;
+	}
+
+	&.wp-block-search__button-behavior-expand {
+		.wp-block-search__input {
+			transition-duration: 300ms;
+		}
 	}
 }

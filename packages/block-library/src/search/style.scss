@@ -1,5 +1,4 @@
 .wp-block-search {
-
 	.wp-block-search__button {
 		background: #f7f7f7;
 		border: 1px solid #ccc;
@@ -7,6 +6,9 @@
 		color: #32373c;
 		margin-left: 0.625em;
 		word-break: normal;
+		flex-shrink: 0;
+		font-size: inherit;
+		line-height: inherit;
 
 		&.has-icon {
 			line-height: 0;
@@ -60,8 +62,47 @@
 		}
 	}
 
+	&.wp-block-search__button-behavior-expand {
+		.wp-block-search__inside-wrapper {
+			transition-property: width;
+			min-width: 0 !important;
+		}
+
+		.wp-block-search__input {
+			transition-property: all;
+			transition-duration: 0;
+			flex-basis: 100%;
+		}
+
+		// !important here to override inline styles on button only deselected view.
+		&.wp-block-search__searchfield-hidden {
+			overflow: hidden;
+
+			.wp-block-search__inside-wrapper {
+				overflow: hidden;
+			}
+
+			.wp-block-search__input {
+				width: 0 !important;
+				min-width: 0 !important;
+				padding-left: 0 !important;
+				padding-right: 0 !important;
+				border-left-width: 0 !important;
+				border-right-width: 0 !important;
+				flex-grow: 0;
+				margin: 0;
+				flex-basis: 0 !important;
+			}
+		}
+	}
+
 	&.aligncenter .wp-block-search__inside-wrapper {
 		margin: auto;
 	}
 }
 
+.wp-block[data-align="right"] .wp-block-search__button-behavior-expand {
+	.wp-block-search__inside-wrapper {
+		float: right;
+	}
+}

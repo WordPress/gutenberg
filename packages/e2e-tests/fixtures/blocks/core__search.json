@@ -6,8 +6,12 @@
 		"attributes": {
 			"showLabel": true,
 			"placeholder": "",
+			"width": 100,
+			"widthUnit": "%",
 			"buttonPosition": "button-outside",
-			"buttonUseIcon": false
+			"buttonUseIcon": false,
+			"buttonBehavior": "expand-searchfield",
+			"isSearchFieldHidden": false
 		},
 		"innerBlocks": [],
 		"originalContent": ""

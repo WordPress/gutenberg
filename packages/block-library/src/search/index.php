@@ -31,7 +31,6 @@ function render_block_core_search( $attributes ) {
 	$classnames      = classnames_for_block_core_search( $attributes );
 	$show_label      = ( ! empty( $attributes['showLabel'] ) ) ? true : false;
 	$use_icon_button = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
-	$show_input      = ( ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'] ) ? false : true;
 	$show_button     = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
 	$label_markup    = '';
 	$input_markup    = '';
@@ -54,15 +53,13 @@ function render_block_core_search( $attributes ) {
 		}
 	}
 
-	if ( $show_input ) {
-		$input_markup = sprintf(
-			'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" %s required />',
-			$input_id,
-			esc_attr( get_search_query() ),
-			esc_attr( $attributes['placeholder'] ),
-			$inline_styles['shared']
-		);
-	}
+	$input_markup = sprintf(
+		'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" %s required />',
+		$input_id,
+		esc_attr( get_search_query() ),
+		esc_attr( $attributes['placeholder'] ),
+		$inline_styles['shared']
+	);
 
 	if ( $show_button ) {
 		$button_internal_markup = '';
@@ -94,6 +91,12 @@ function render_block_core_search( $attributes ) {
 		$input_markup . $button_markup
 	);
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+
+	if ( ! empty( $attributes['buttonPosition'] ) && ! empty( $attributes['buttonBehavior'] ) ) {
+		if ( 'button-only' === $attributes['buttonPosition'] && 'expand-searchfield' === $attributes['buttonBehavior'] ) {
+			wp_enqueue_script( 'wp-block-library-search', plugins_url( 'search/frontend.js', __FILE__ ) );
+		}
+	}
 
 	return sprintf(
 		'<form role="search" method="get" action="%s" %s>%s</form>',
@@ -141,6 +144,16 @@ function classnames_for_block_core_search( $attributes ) {
 
 		if ( 'button-only' === $attributes['buttonPosition'] ) {
 			$classnames[] = 'wp-block-search__button-only';
+
+			if ( ! empty( $attributes['buttonBehavior'] ) ) {
+				if ( 'expand-searchfield' === $attributes['buttonBehavior'] ) {
+					$classnames[] = 'wp-block-search__button-behavior-expand';
+				}
+
+				if ( 'search-page-link' === $attributes['buttonBehavior'] ) {
+					$classnames[] = 'wp-block-search__button-behavior-link';
+				}
+			}
 		}
 	}
 
@@ -176,7 +189,7 @@ function styles_for_block_core_search( $attributes ) {
 	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
 	$button_only = ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'];
 
-	if ( $has_width && ! $button_only ) {
+	if ( $has_width ) {
 		$wrapper_styles[] = sprintf(
 			'width: %d%s;',
 			esc_attr( $attributes['width'] ),
