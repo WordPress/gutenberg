@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__unstableGetBlockProps as getBlockProps,
@@ -128,6 +128,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		} ),
 	] );
 
+	const updatedStyle = { ...wrapperProps.style, ...props.style };
+	const style = useMemo( () => updatedStyle, [
+		JSON.stringify( updatedStyle ),
+	] );
+
 	return {
 		...wrapperProps,
 		...props,
@@ -152,7 +157,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			useBlockCustomClassName( clientId ),
 			useBlockMovingModeClassNames( clientId )
 		),
-		style: { ...wrapperProps.style, ...props.style },
+		style,
 	};
 }
 
