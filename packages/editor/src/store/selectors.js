@@ -1035,7 +1035,7 @@ export function getPermalinkParts( state ) {
  * @return {boolean} Is locked.
  */
 export function isPostLocked( state ) {
-	return state.postLock.isLocked;
+	return state.postLock?.isLocked ?? false;
 }
 
 /**

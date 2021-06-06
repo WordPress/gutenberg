@@ -139,22 +139,6 @@ describe( 'PostPreviewButton', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should be disabled if post is not saveable.', () => {
-		mockUseSelect( { isEditedPostSaveable: () => false } );
-
-		render( <PostPreviewButton /> );
-
-		expect( screen.getByRole( 'button' ) ).toBeDisabled();
-	} );
-
-	it( 'should not be disabled if post is saveable.', () => {
-		mockUseSelect( { isEditedPostSaveable: () => true } );
-
-		render( <PostPreviewButton /> );
-
-		expect( screen.getByRole( 'button' ) ).toBeEnabled();
-	} );
-
 	it( 'should set `href` to edited post preview link if specified.', () => {
 		const url = 'https://wordpress.org';
 		mockUseSelect( {
