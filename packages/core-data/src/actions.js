@@ -58,6 +58,20 @@ export function receiveCurrentUser( currentUser ) {
 }
 
 /**
+ * Returns an action object used to lock the editor.
+ *
+ * @param {Object} currentUserSession Meta information about the login session for current user.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalUpdateCurrentUserSession( currentUserSession ) {
+	return {
+		type: 'UPDATE_CURRENT_USER_SESSION',
+		currentUserSession,
+	};
+}
+
+/**
  * Returns an action object used in adding new entities.
  *
  * @param {Array} entities Entities received.

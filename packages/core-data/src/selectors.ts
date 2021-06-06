@@ -36,6 +36,7 @@ export interface State {
 	currentGlobalStylesId: string;
 	currentTheme: string;
 	currentUser: ET.User< 'edit' >;
+	currentUserSession: { isActive: boolean };
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
@@ -183,6 +184,21 @@ export function getAuthors(
  */
 export function getCurrentUser( state: State ): ET.User< 'edit' > {
 	return state.currentUser;
+}
+
+/**
+ *Returns a boolean flag for current user's active login session.
+ *
+ * By default this returns true, because we assume that by default the user session is active.
+ * If the block editor is already being loaded for user and if the data store is already being initialised for the user,
+ * it means user is already logged in.
+ *
+ * @param {Object} state Current state data.
+ *
+ * @return {boolean} Whether the current user has active login maintained or not.
+ */
+export function __experimentalIsCurrentUserSessionActive( state: State ) {
+	return state.currentUserSession?.isActive ?? true;
 }
 
 /**
