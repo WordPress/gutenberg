@@ -244,7 +244,10 @@ _Parameters_
 -   _$0_ `Object`: Props.
 -   _$0.children_ `Object`: The block content and style container.
 -   _$0.\_\_unstableContentRef_ `Object`: Ref holding the content scroll container.
--   _$0.\_\_experimentalStickyTop_ `Object`: Offset for the top position of toolbars.
+-   _$0.\_\_experimentalStickyBottom_ `number`: Bottom sticky position of floating toolbar.
+-   _$0.\_\_experimentalStickyTop_ `number`: Top sticky position of floating and top toolbar.
+-   _$0.\_\_experimentalStickyAreaBottom_ `number`: Offset of bottom side of sticky area.
+-   _$0.\_\_experimentalStickyAreaTop_ `number`: Offset of top side of sticky area.
 
 <a name="BlockVerticalAlignmentControl" href="#BlockVerticalAlignmentControl">#</a> **BlockVerticalAlignmentControl**
 

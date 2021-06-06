@@ -178,9 +178,6 @@ $z-layers: (
 
 	// Appear under the customizer heading UI, but over anything else.
 	".customize-widgets__topbar": 8,
-
-	// Appear over the topbar of both editor and customizer.
-	".customize-widgets__block-toolbar": 10,
 );
 
 @function z-index( $key ) {

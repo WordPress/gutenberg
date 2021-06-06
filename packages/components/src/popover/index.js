@@ -257,7 +257,10 @@ const Popover = (
 		__unstableBoundaryParent,
 		__unstableForcePosition,
 		__unstableForceXAlignment,
+		__experimentalStickyBottom: stickyBottom = 0,
 		__experimentalStickyTop: stickyTop = 0,
+		__experimentalStickyAreaBottom: stickyAreaBottom = 0,
+		__experimentalStickyAreaTop: stickyAreaTop = 0,
 		/* eslint-enable no-unused-vars */
 		...contentProps
 	},
@@ -306,7 +309,7 @@ const Popover = (
 
 			const { offsetParent, ownerDocument } = containerRef.current;
 
-			let relativeOffsetTop = -stickyTop;
+			let relativeOffsetTop = 0;
 
 			// If there is a positioned ancestor element that is not the body,
 			// subtract the position from the anchor rect. If the position of
@@ -316,7 +319,7 @@ const Popover = (
 			if ( offsetParent && offsetParent !== ownerDocument.body ) {
 				const offsetParentRect = offsetParent.getBoundingClientRect();
 
-				relativeOffsetTop += offsetParentRect.top;
+				relativeOffsetTop = offsetParentRect.top;
 				anchor = new window.DOMRect(
 					anchor.left - offsetParentRect.left,
 					anchor.top - offsetParentRect.top,
@@ -352,7 +355,9 @@ const Popover = (
 				relativeOffsetTop,
 				boundaryElement,
 				__unstableForcePosition,
-				__unstableForceXAlignment
+				__unstableForceXAlignment,
+				{ top: stickyTop, bottom: stickyBottom },
+				{ top: stickyAreaTop, bottom: stickyAreaBottom }
 			);
 
 			if (
@@ -477,7 +482,10 @@ const Popover = (
 		position,
 		contentSize,
 		__unstableStickyBoundaryElement,
+		stickyBottom,
 		stickyTop,
+		stickyAreaBottom,
+		stickyAreaTop,
 		__unstableObserveElement,
 		__unstableBoundaryParent,
 	] );

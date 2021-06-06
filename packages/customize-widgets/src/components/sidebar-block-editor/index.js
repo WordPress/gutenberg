@@ -116,7 +116,16 @@ export default function SidebarBlockEditor( {
 					isFixedToolbarActive={ isFixedToolbarActive }
 				/>
 
+<<<<<<< HEAD
 				<BlockTools __experimentalStickyTop={ headerHeight }>
+=======
+				<BlockTools
+					__experimentalStickyTop={ blockToolbarOffset }
+					__experimentalStickyAreaBottom={ Infinity }
+					__experimentalStickyBottom={ 0 }
+					__experimentalStickyAreaTop={ -Infinity }
+				>
+>>>>>>> 1cdc726440... Have floating block toolbar remain in view when block is out of view
 					<BlockSelectionClearer>
 						<WritingFlow>
 							<ObserveTyping>
