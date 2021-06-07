@@ -140,7 +140,7 @@ function InlineLinkUI( {
 				value={ linkValue }
 				onChange={ onChangeLink }
 				forceIsEditingLink={ addingLink }
-				richPreviews
+				hasRichPreviews
 			/>
 		</Popover>
 	);
