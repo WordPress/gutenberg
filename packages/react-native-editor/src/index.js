@@ -25,8 +25,9 @@ const reactNativeSetup = () => {
 	// eslint-disable-next-line no-console
 	console.disableYellowBox = true;
 
-	UIManager.setLayoutAnimationEnabledExperimental &&
+	if ( UIManager.setLayoutAnimationEnabledExperimental ) {
 		UIManager.setLayoutAnimationEnabledExperimental( true );
+	}
 
 	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
 };
