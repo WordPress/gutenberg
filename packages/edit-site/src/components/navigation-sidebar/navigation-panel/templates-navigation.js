@@ -19,7 +19,7 @@ import MainDashboardButton from '../../main-dashboard-button';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
 import { store as editSiteStore } from '../../../store';
 
-export default function TemplatesNavigation() {
+export default function TemplatesNavigation( { skipAnimation } ) {
 	const { postId, postType, activeMenu } = useSelect( ( select ) => {
 		const {
 			getEditedPostType,
@@ -41,6 +41,7 @@ export default function TemplatesNavigation() {
 			activeItem={ `${ postType }-${ postId }` }
 			activeMenu={ activeMenu }
 			onActivateMenu={ setNavigationPanelActiveMenu }
+			skipAnimation={ skipAnimation }
 		>
 			{ activeMenu === MENU_ROOT && (
 				<MainDashboardButton.Slot>

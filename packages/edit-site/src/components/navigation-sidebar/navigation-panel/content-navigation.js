@@ -23,7 +23,7 @@ import {
 } from './constants';
 import { store as editSiteStore } from '../../../store';
 
-export default function ContentNavigation( { onActivateMenu } ) {
+export default function ContentNavigation( { onActivateMenu, skipAnimation } ) {
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
 	const page = useSelect(
@@ -41,6 +41,7 @@ export default function ContentNavigation( { onActivateMenu } ) {
 			activeItem={ page && `content-${ page.path }` }
 			activeMenu={ activeMenu }
 			onActivateMenu={ handleActivateMenu }
+			skipAnimation={ skipAnimation }
 		>
 			<NavigationMenu title={ __( 'Content' ) }>
 				<NavigationItem

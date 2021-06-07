@@ -44,16 +44,22 @@ const NavigationPanel = ( { isOpen } ) => {
 		}
 	}, [ templatesActiveMenu ] );
 
-	// Resets the content menu to its root whenever the navigation opens to avoid
-	// having it stuck on a sub-menu, interfering with the normal navigation behavior.
-	const prevIsOpen = usePrevious( isOpen );
-	useEffect( () => {
-		if ( contentActiveMenu !== MENU_ROOT && isOpen && ! prevIsOpen ) {
-			setContentActiveMenu( MENU_ROOT );
-		}
-	}, [ contentActiveMenu, isOpen ] );
+	const {
+		setIsNavigationPanelOpened,
+		setNavigationPanelActiveMenu,
+	} = useDispatch( editSiteStore );
 
-	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+	// Sets active menu to root after the closing transition ends
+	const onTransitionEnd = ( event ) => {
+		if ( event.target === panelRef.current && ! isOpen ) {
+			setContentActiveMenu( MENU_ROOT );
+			setNavigationPanelActiveMenu( MENU_ROOT );
+		}
+	};
+
+	// Skips menu slide animation if the panel has just opened or is closed
+	const wasOpen = usePrevious( isOpen );
+	const skipAnimation = ( isOpen && ! wasOpen ) || ! isOpen;
 
 	const closeOnEscape = ( event ) => {
 		if ( event.keyCode === ESCAPE ) {
@@ -71,6 +77,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			ref={ panelRef }
 			tabIndex="-1"
 			onKeyDown={ closeOnEscape }
+			onTransitionEnd={ onTransitionEnd }
 		>
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
@@ -81,10 +88,11 @@ const NavigationPanel = ( { isOpen } ) => {
 
 				<div className="edit-site-navigation-panel__scroll-container">
 					{ contentActiveMenu === MENU_ROOT && (
-						<TemplatesNavigation />
+						<TemplatesNavigation skipAnimation={ skipAnimation } />
 					) }
 					{ templatesActiveMenu === MENU_ROOT && (
 						<ContentNavigation
+							skipAnimation={ skipAnimation }
 							onActivateMenu={ setContentActiveMenu }
 						/>
 					) }

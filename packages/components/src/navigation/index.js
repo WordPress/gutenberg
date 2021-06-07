@@ -24,6 +24,7 @@ export default function Navigation( {
 	activeMenu = ROOT_MENU,
 	children,
 	className,
+	skipAnimation,
 	onActivateMenu = noop,
 } ) {
 	const [ menu, setMenu ] = useState( activeMenu );
@@ -73,7 +74,8 @@ export default function Navigation( {
 			<div
 				key={ menu }
 				className={ classnames( {
-					[ animateClassName ]: isMounted.current && slideOrigin,
+					[ animateClassName ]:
+						isMounted.current && ! skipAnimation && slideOrigin,
 				} ) }
 			>
 				<NavigationContext.Provider value={ context }>
