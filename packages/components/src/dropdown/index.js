@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import {
+	forwardRef,
+	useImperativeHandle,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,21 +32,25 @@ function useObservableState( initialState, onStateChange ) {
 	];
 }
 
-export default function Dropdown( {
-	renderContent,
-	renderToggle,
-	position = 'bottom right',
-	className,
-	contentClassName,
-	expandOnMobile,
-	headerTitle,
-	focusOnMount,
-	popoverProps,
-	onClose,
-	onToggle,
-} ) {
+function Dropdown(
+	{
+		className,
+		contentClassName,
+		expandOnMobile,
+		focusOnMount,
+		headerTitle,
+		onClose,
+		onToggle,
+		openOnMount = false,
+		popoverProps,
+		position = 'bottom right',
+		renderContent,
+		renderToggle,
+	},
+	ref
+) {
 	const containerRef = useRef();
-	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+	const [ isOpen, setIsOpen ] = useObservableState( openOnMount, onToggle );
 
 	useEffect(
 		() => () => {
@@ -81,6 +91,8 @@ export default function Dropdown( {
 
 	const args = { isOpen, onToggle: toggle, onClose: close };
 
+	useImperativeHandle( ref, () => ( { toggle, close } ), [] );
+
 	return (
 		<div
 			className={ classnames( 'components-dropdown', className ) }
@@ -111,3 +123,5 @@ export default function Dropdown( {
 		</div>
 	);
 }
+
+export default forwardRef( Dropdown );

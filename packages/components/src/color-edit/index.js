@@ -8,7 +8,7 @@ import { isEmpty, kebabCase } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { edit, close, chevronDown, chevronUp, plus } from '@wordpress/icons';
 
 /**
@@ -20,15 +20,6 @@ import ColorPicker from '../color-picker';
 import Button from '../button';
 import TextControl from '../text-control';
 import BaseControl from '../base-control';
-
-function DropdownOpenOnMount( { shouldOpen, isOpen, onToggle } ) {
-	useEffect( () => {
-		if ( shouldOpen && ! isOpen ) {
-			onToggle();
-		}
-	}, [] );
-	return null;
-}
 
 function ColorOption( {
 	color,
@@ -77,21 +68,15 @@ function ColorOption( {
 		>
 			<div className="components-color-edit__color-option-main-area">
 				<Dropdown
+					openOnMount={ isEditingColorOnMount }
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<>
-							<DropdownOpenOnMount
-								shouldOpen={ isEditingColorOnMount }
-								isOpen={ isOpen }
-								onToggle={ onToggle }
-							/>
-							<CircularOptionPicker.Option
-								style={ { backgroundColor: color, color } }
-								aria-expanded={ isOpen }
-								aria-haspopup="true"
-								onClick={ onToggle }
-								aria-label={ __( 'Edit color value' ) }
-							/>
-						</>
+						<CircularOptionPicker.Option
+							style={ { backgroundColor: color, color } }
+							aria-expanded={ isOpen }
+							aria-haspopup="true"
+							onClick={ onToggle }
+							aria-label={ __( 'Edit color value' ) }
+						/>
 					) }
 					renderContent={ () => (
 						<ColorPicker

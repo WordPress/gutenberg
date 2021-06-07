@@ -7,22 +7,24 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState, useRef } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
+	Dropdown,
 	KeyboardShortcuts,
 	PanelBody,
 	TextControl,
 	ToolbarButton,
-	Popover,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
 	InspectorAdvancedControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
@@ -66,83 +68,93 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 }
 
 function URLPicker( {
-	isSelected,
-	url,
-	setAttributes,
-	opensInNewTab,
-	onToggleOpenInNewTab,
 	anchorRef,
+	isSelected,
+	onToggleOpenInNewTab,
+	opensInNewTab,
+	setAttributes,
+	url,
 } ) {
-	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const urlIsSet = !! url;
 	const urlIsSetandSelected = urlIsSet && isSelected;
-	const openLinkControl = () => {
-		setIsURLPickerOpen( true );
-		return false; // prevents default behaviour for event
-	};
-	const unlinkButton = () => {
+	const dropdownRef = useRef();
+	const { stopTyping } = useDispatch( blockEditorStore );
+	const removeLink = () => {
 		setAttributes( {
 			url: undefined,
 			linkTarget: undefined,
 			rel: undefined,
 		} );
-		setIsURLPickerOpen( false );
 	};
-	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
-		<Popover
-			position="bottom center"
-			onClose={ () => setIsURLPickerOpen( false ) }
-			anchorRef={ anchorRef?.current }
-		>
-			<LinkControl
-				className="wp-block-navigation-link__inline-link-input"
-				value={ { url, opensInNewTab } }
-				onChange={ ( {
-					url: newURL = '',
-					opensInNewTab: newOpensInNewTab,
-				} ) => {
-					setAttributes( { url: newURL } );
-
-					if ( opensInNewTab !== newOpensInNewTab ) {
-						onToggleOpenInNewTab( newOpensInNewTab );
-					}
-				} }
+	const renderToggle = ( { isOpen, onToggle, onClose } ) => {
+		return ! urlIsSet ? (
+			<ToolbarButton
+				aria-expanded={ isOpen }
+				name="link"
+				icon={ link }
+				title={ __( 'Link' ) }
+				shortcut={ displayShortcut.primary( 'k' ) }
+				onClick={ onToggle }
 			/>
-		</Popover>
+		) : (
+			<ToolbarButton
+				aria-expanded="true"
+				name="link"
+				icon={ linkOff }
+				title={ __( 'Unlink' ) }
+				shortcut={ displayShortcut.primaryShift( 'k' ) }
+				onClick={ () => {
+					removeLink();
+					onClose();
+				} }
+				isActive={ true }
+			/>
+		);
+	};
+	const renderContent = () => (
+		<LinkControl
+			className="wp-block-navigation-link__inline-link-input"
+			value={ { url, opensInNewTab } }
+			onChange={ ( {
+				url: newURL = '',
+				opensInNewTab: newOpensInNewTab,
+			} ) => {
+				setAttributes( { url: newURL } );
+
+				if ( opensInNewTab !== newOpensInNewTab ) {
+					onToggleOpenInNewTab( newOpensInNewTab );
+				}
+			} }
+		/>
 	);
 	return (
 		<>
 			<BlockControls group="block">
-				{ ! urlIsSet && (
-					<ToolbarButton
-						name="link"
-						icon={ link }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
-					/>
-				) }
-				{ urlIsSetandSelected && (
-					<ToolbarButton
-						name="link"
-						icon={ linkOff }
-						title={ __( 'Unlink' ) }
-						shortcut={ displayShortcut.primaryShift( 'k' ) }
-						onClick={ unlinkButton }
-						isActive={ true }
-					/>
-				) }
+				<Dropdown
+					ref={ dropdownRef }
+					openOnMount={ urlIsSetandSelected }
+					popoverProps={ { anchorRef: anchorRef?.current } }
+					position="bottom center"
+					renderContent={ renderContent }
+					renderToggle={ renderToggle }
+				/>
 			</BlockControls>
 			{ isSelected && (
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
-						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
+						[ rawShortcut.primary( 'k' ) ]: () => {
+							stopTyping();
+							dropdownRef.current.toggle();
+							return false; // prevents default for event
+						},
+						[ rawShortcut.primaryShift( 'k' ) ]: () => {
+							removeLink();
+							dropdownRef.current?.close();
+						},
 					} }
 				/>
 			) }
-			{ linkControl }
 		</>
 	);
 }
@@ -240,12 +252,12 @@ function ButtonEdit( props ) {
 				/>
 			</div>
 			<URLPicker
-				url={ url }
-				setAttributes={ setAttributes }
-				isSelected={ isSelected }
-				opensInNewTab={ linkTarget === '_blank' }
-				onToggleOpenInNewTab={ onToggleOpenInNewTab }
 				anchorRef={ ref }
+				isSelected={ isSelected }
+				onToggleOpenInNewTab={ onToggleOpenInNewTab }
+				opensInNewTab={ linkTarget === '_blank' }
+				setAttributes={ setAttributes }
+				url={ url }
 			/>
 			<InspectorControls>
 				<WidthPanel
