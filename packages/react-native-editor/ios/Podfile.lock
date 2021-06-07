@@ -454,7 +454,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BVLinearGradient: 48f1964a78bddfae412d1aac5f386c2949fe0306
+  BVLinearGradient: b2d297a15cf094d1947df4f0519779bb3a7f2392
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 49cbe4b43e445b06bf29199b6ad2057649e4c8f5
   FBReactNativeSpec: 420ad7ff87adc491b45199891c72ea531fa4926e
