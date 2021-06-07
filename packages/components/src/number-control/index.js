@@ -18,7 +18,7 @@ import {
 	inputControlActionTypes,
 	composeStateReducers,
 } from '../input-control/state';
-import { add, subtract, roundClamp } from '../utils/math';
+import { add, getNumber, subtract, roundClamp } from '../utils/math';
 import { useJumpStep } from '../utils/hooks';
 import { isValueEmpty } from '../utils/values';
 
@@ -160,7 +160,7 @@ export function NumberControl(
 			if ( round ) {
 				state.value = roundClamp( currentValue, min, max );
 			} else {
-				state.value = clamp( currentValue, min, max );
+				state.value = clamp( getNumber( currentValue ), min, max );
 			}
 		}
 
