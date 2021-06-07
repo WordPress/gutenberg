@@ -9,7 +9,5 @@
 	"usesContext": [ "commentId" ],
 	"supports": {
 		"html": false
-	},
-	"editorStyle": "wp-block-post-comment-content-editor",
-	"style": "wp-block-post-comment-content"
+	}
 }

@@ -26,6 +26,5 @@
 		"reusable": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-social-link-editor",
-	"style": "wp-block-social-link"
+	"editorStyle": "wp-block-social-link-editor"
 }

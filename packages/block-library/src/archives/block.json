@@ -19,6 +19,5 @@
 		"align": true,
 		"html": false
 	},
-	"editorStyle": "wp-block-archives-editor",
-	"style": "wp-block-archives"
+	"editorStyle": "wp-block-archives-editor"
 }

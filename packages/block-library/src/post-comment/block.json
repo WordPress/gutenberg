@@ -15,7 +15,5 @@
 	},
 	"supports": {
 		"html": false
-	},
-	"editorStyle": "wp-block-post-comment-editor",
-	"style": "wp-block-post-comment"
+	}
 }

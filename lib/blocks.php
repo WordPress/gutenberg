@@ -470,5 +470,26 @@ function gutenberg_migrate_old_typography_shape( $metadata ) {
 	return $metadata;
 }
 
-
 add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
+
+/**
+ * Filters the content of a single block.
+ *
+ * @param array $metadata Metadata for registering a block type.
+ *
+ * @return array Returns the $metadata with any missing `style` and `editorStyle` added.
+ */
+function gutenberg_add_missing_styles_to_core_block_json( $metadata ) {
+	if ( ! empty( $metadata['name'] ) && 0 === strpos( $metadata['name'], 'core/' ) ) {
+		$block_name = str_replace( 'core/', '', $metadata['name'] );
+
+		if ( ! isset( $metadata['style'] ) ) {
+			$metadata['style'] = "wp-block-$block_name";
+		}
+		if ( ! isset( $metadata['editorStyle'] ) ) {
+			$metadata['editorStyle'] = "wp-block-$block_name-editor";
+		}
+	}
+	return $metadata;
+}
+add_filter( 'block_type_metadata', 'gutenberg_add_missing_styles_to_core_block_json' );

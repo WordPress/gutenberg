@@ -20,7 +20,5 @@
 			"fontSize": true,
 			"lineHeight": true
 		}
-	},
-	"editorStyle": "wp-block-post-comments-count-editor",
-	"style": "wp-block-post-comments-count"
+	}
 }

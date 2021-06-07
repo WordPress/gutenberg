@@ -24,7 +24,5 @@
 			"lineHeight": true,
 			"fontSize": true
 		}
-	},
-	"editorStyle": "wp-block-post-terms-editor",
-	"style": "wp-block-post-terms"
+	}
 }

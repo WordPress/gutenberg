@@ -24,6 +24,5 @@
 			"fontSize": true
 		}
 	},
-	"editorStyle": "wp-block-preformatted-editor",
 	"style": "wp-block-preformatted"
 }

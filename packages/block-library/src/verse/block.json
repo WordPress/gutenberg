@@ -33,6 +33,6 @@
 			"padding": true
 		}
 	},
-	"editorStyle": "wp-block-verse-editor",
-	"style": "wp-block-verse"
+	"style": "wp-block-verse",
+	"editorStyle": "wp-block-verse-editor"
 }

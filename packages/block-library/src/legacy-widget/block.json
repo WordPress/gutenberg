@@ -24,6 +24,5 @@
 		"customClassName": false,
 		"reusable": false
 	},
-	"editorStyle": "wp-block-legacy-widget-editor",
-	"style": "wp-block-legacy-widget"
+	"editorStyle": "wp-block-legacy-widget-editor"
 }

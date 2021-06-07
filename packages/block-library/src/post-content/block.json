@@ -11,6 +11,5 @@
 		"html": false,
 		"__experimentalLayout": true
 	},
-	"editorStyle": "wp-block-post-content-editor",
-	"style": "wp-block-post-content"
+	"editorStyle": "wp-block-post-content-editor"
 }

@@ -29,6 +29,5 @@
 			"__experimentalFontFamily": true
 		}
 	},
-	"editorStyle": "wp-block-query-title-editor",
-	"style": "wp-block-query-title"
+	"editorStyle": "wp-block-query-title-editor"
 }

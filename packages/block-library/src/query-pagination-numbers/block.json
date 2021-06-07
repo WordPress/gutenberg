@@ -11,6 +11,5 @@
 		"reusable": false,
 		"html": false
 	},
-	"editorStyle": "wp-block-query-pagination-numbers-editor",
-	"style": "wp-block-query-pagination-numbers"
+	"editorStyle": "query-pagination-numbers-editor"
 }

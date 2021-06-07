@@ -28,7 +28,5 @@
 			"fontSize": true,
 			"lineHeight": true
 		}
-	},
-	"editorStyle": "wp-block-post-date-editor",
-	"style": "wp-block-post-date"
+	}
 }
