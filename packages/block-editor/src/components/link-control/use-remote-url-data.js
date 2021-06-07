@@ -24,11 +24,15 @@ function useRemoteUrlData( url ) {
 		// Only make the request if we have an actual URL
 		// and the fetching util is available. In some editors
 		// there may not be such a util.
-		if ( url?.length && fetchRemoteUrlData ) {
+		if (
+			url?.length &&
+			fetchRemoteUrlData &&
+			typeof AbortController !== 'undefined'
+		) {
 			setIsFetching( true );
 
-			// eslint-disable-next-line no-undef
-			const controller = new AbortController();
+			const controller = new window.AbortController();
+
 			const signal = controller.signal;
 
 			fetchRemoteUrlData( url, {
@@ -40,7 +44,7 @@ function useRemoteUrlData( url ) {
 				} )
 				.catch( () => {
 					// Avoid setting state on unmounted component
-					if ( ! signal?.aborted ) {
+					if ( ! signal.aborted ) {
 						setIsFetching( false );
 						setRichData( null );
 					}
