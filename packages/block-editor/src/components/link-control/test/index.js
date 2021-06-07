@@ -1798,7 +1798,7 @@ describe( 'Rich link previews', () => {
 
 		act( () => {
 			render(
-				<LinkControl value={ selectedLink } richPreviews />,
+				<LinkControl value={ selectedLink } hasRichPreviews />,
 				container
 			);
 		} );
@@ -1830,7 +1830,7 @@ describe( 'Rich link previews', () => {
 
 		act( () => {
 			render(
-				<LinkControl value={ selectedLink } richPreviews />,
+				<LinkControl value={ selectedLink } hasRichPreviews />,
 				container
 			);
 		} );
@@ -1869,7 +1869,7 @@ describe( 'Rich link previews', () => {
 
 		act( () => {
 			render(
-				<LinkControl value={ selectedLink } richPreviews />,
+				<LinkControl value={ selectedLink } hasRichPreviews />,
 				container
 			);
 		} );
@@ -1915,7 +1915,7 @@ describe( 'Rich link previews', () => {
 
 			act( () => {
 				render(
-					<LinkControl value={ selectedLink } richPreviews />,
+					<LinkControl value={ selectedLink } hasRichPreviews />,
 					container
 				);
 			} );
@@ -1954,7 +1954,7 @@ describe( 'Rich link previews', () => {
 
 			act( () => {
 				render(
-					<LinkControl value={ selectedLink } richPreviews />,
+					<LinkControl value={ selectedLink } hasRichPreviews />,
 					container
 				);
 			} );
@@ -1983,7 +1983,7 @@ describe( 'Rich link previews', () => {
 
 		act( () => {
 			render(
-				<LinkControl value={ selectedLink } richPreviews />,
+				<LinkControl value={ selectedLink } hasRichPreviews />,
 				container
 			);
 		} );
@@ -2013,7 +2013,7 @@ describe( 'Rich link previews', () => {
 
 		act( () => {
 			render(
-				<LinkControl value={ selectedLink } richPreviews />,
+				<LinkControl value={ selectedLink } hasRichPreviews />,
 				container
 			);
 		} );

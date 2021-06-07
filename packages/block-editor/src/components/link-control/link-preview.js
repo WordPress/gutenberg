@@ -25,10 +25,10 @@ import useRemoteUrlData from './use-remote-url-data';
 export default function LinkPreview( {
 	value,
 	onEditClick,
-	richPreviews = false,
+	hasRichPreviews = false,
 } ) {
 	// Avoid fetching if rich previews are not desired.
-	const maybeRemoteURL = richPreviews ? value?.url : null;
+	const maybeRemoteURL = hasRichPreviews ? value?.url : null;
 
 	const { richData, isFetching } = useRemoteUrlData( maybeRemoteURL );
 
