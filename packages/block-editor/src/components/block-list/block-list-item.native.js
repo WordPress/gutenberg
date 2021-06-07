@@ -104,7 +104,7 @@ export class BlockListItem extends Component {
 		];
 	}
 
-	setAnimation = () => {
+	setAnimation() {
 		LayoutAnimation.configureNext( {
 			duration: 250,
 			update: {
@@ -120,7 +120,7 @@ export class BlockListItem extends Component {
 				springDamping: 0.7,
 			},
 		} );
-	};
+	}
 
 	componentDidMount() {
 		this.setAnimation();
