@@ -92,7 +92,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 	);
 	try {
 		if ( query !== undefined && query._fields ) {
-			// If requesting specific fields, items and query assocation to said
+			// If requesting specific fields, items and query association to said
 			// records are stored by ID reference. Thus, fields must always include
 			// the ID.
 			query = {
@@ -181,7 +181,7 @@ export function* getEntityRecords( kind, name, query = {} ) {
 	);
 	try {
 		if ( query._fields ) {
-			// If requesting specific fields, items and query assocation to said
+			// If requesting specific fields, items and query association to said
 			// records are stored by ID reference. Thus, fields must always include
 			// the ID.
 			query = {
