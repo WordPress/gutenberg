@@ -34,13 +34,6 @@ function Example() {
 
 Determines the grid size for "dotted" and "grid" variants.
 
-### `border`: `boolean`
-
-- Required: No
-- Default: `false`
-
-Renders a border around the entire `Surface`.
-
 ### `borderBottom`: `boolean`
 
 - Required: No

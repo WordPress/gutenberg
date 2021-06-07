@@ -13,12 +13,6 @@ export type Props = {
 	 */
 	backgroundSize?: number;
 	/**
-	 * Renders a border around the entire `Surface`.
-	 *
-	 * @default false
-	 */
-	border?: boolean;
-	/**
 	 * Renders a bottom border.
 	 *
 	 * @default false

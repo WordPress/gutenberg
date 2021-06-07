@@ -20,14 +20,12 @@ export const background = css`
 
 /**
  * @param {Object} props
- * @param {boolean} [props.border]
  * @param {boolean} [props.borderBottom]
  * @param {boolean} [props.borderLeft]
  * @param {boolean} [props.borderRight]
  * @param {boolean} [props.borderTop]
  */
 export function getBorders( {
-	border,
 	borderBottom,
 	borderLeft,
 	borderRight,
@@ -36,7 +34,6 @@ export function getBorders( {
 	const borderStyle = `1px solid ${ CONFIG.surfaceBorderColor }`;
 
 	return css( {
-		border: border ? borderStyle : undefined,
 		borderBottom: borderBottom ? borderStyle : undefined,
 		borderLeft: borderLeft ? borderStyle : undefined,
 		borderRight: borderRight ? borderStyle : undefined,

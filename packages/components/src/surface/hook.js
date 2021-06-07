@@ -20,7 +20,6 @@ import * as styles from './styles';
 export function useSurface( props ) {
 	const {
 		backgroundSize = 12,
-		border = false,
 		borderBottom = false,
 		borderLeft = false,
 		borderRight = false,
@@ -34,7 +33,6 @@ export function useSurface( props ) {
 		const sx = {};
 
 		sx.borders = styles.getBorders( {
-			border,
 			borderBottom,
 			borderLeft,
 			borderRight,
@@ -53,7 +51,6 @@ export function useSurface( props ) {
 		);
 	}, [
 		backgroundSize,
-		border,
 		borderBottom,
 		borderLeft,
 		borderRight,
