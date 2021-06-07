@@ -19,59 +19,57 @@ function block_core_navigation_link_build_css_colors( $context, $attributes ) {
 		'inline_styles' => '',
 	);
 
-	$is_sub_menu = isset($attributes['isTopLevelLink']) ? ( ! $attributes['isTopLevelLink'] ) : false;
+	$is_sub_menu = isset( $attributes['isTopLevelLink'] ) ? ( ! $attributes['isTopLevelLink'] ) : false;
 
 	// Text color.
-	$has_named_text_color  = array_key_exists( 'textColor', $context ) || ( $is_sub_menu && array_key_exists( 'overlayTextColor', $context ) );
-	$has_custom_text_color = isset( $context['style']['color']['text'] ) || array_key_exists( 'customTextColor', $context ) || ( $is_sub_menu && array_key_exists( 'customOverlayTextColor', $context ) );
+	$named_text_color      = null;
+	$custom_text_color     = null;
 
-	// If has text color.
-	if ( $has_custom_text_color || $has_named_text_color ) {
-		// Add has-text-color class.
-		$colors['css_classes'][] = 'has-text-color';
+	if ( $is_sub_menu && array_key_exists( 'overlayTextColor', $context ) ) {
+		$named_text_color = $context['overlayTextColor'];
+	} elseif ( $is_sub_menu && array_key_exists( 'customOverlayTextColor', $context ) ) {
+		$custom_text_color = $context['customOverlayTextColor'];
+	} elseif ( array_key_exists( 'textColor', $context ) ) {
+		$named_text_color = $context['textColor'];
+	} elseif ( array_key_exists( 'customTextColor', $context ) ) {
+		$custom_text_color = $context['customTextColor'];
+	} elseif (  isset( $context['style']['color']['text'] ) ) {
+		$custom_text_color = $context['style']['color']['text'];
 	}
 
-	if ( $has_named_text_color ) {
+	// If has text color.
+	if ( ! is_null( $named_text_color ) ) {
 		// Add the color class.
-		$named_text_color = ( $is_sub_menu && array_key_exists( 'overlayTextColor', $context ) ) ? $context['overlayTextColor'] : $context['textColor'];
-		$colors['css_classes'][] = sprintf( 'has-%s-color', $named_text_color );
-	} elseif ( $has_custom_text_color ) {
+		array_push( $colors['css_classes'], 'has-text-color', sprintf( 'has-%s-color', $named_text_color ) );
+	} elseif ( ! is_null( $custom_text_color ) ) {
 		// Add the custom color inline style.
-		$custom_text_color = '';
-		if ( $is_sub_menu && array_key_exists( 'customOverlayTextColor', $context ) ) {
-			$custom_text_color = $context['customOverlayTextColor'];
-		} else if ( array_key_exists( 'customTextColor', $context ) ) {
-			$custom_text_color = $context['customTextColor'];
-		} else if (  isset( $context['style']['color']['text'] ) ) {
-			$custom_text_color = $context['style']['color']['text'];
-		}
+		$colors['css_classes'][] = 'has-text-color';
 		$colors['inline_styles'] .= sprintf( 'color: %s;', $custom_text_color );
 	}
 
 	// Background color.
-	$has_named_background_color  = array_key_exists( 'backgroundColor', $context ) || ( $is_sub_menu && array_key_exists( 'overlayBackgroundColor', $context ) );
-	$has_custom_background_color = isset( $context['style']['color']['background'] ) || array_key_exists( 'customBackgroundColor', $context ) || ( $is_sub_menu && array_key_exists( 'customOverlayBackgroundColor', $context ) );
+	$named_background_color  = null;
+	$custom_background_color = null;
 
-	// If has background color.
-	if ( $has_custom_background_color || $has_named_background_color ) {
-		// Add has-background class.
-		$colors['css_classes'][] = 'has-background';
+	if ( $is_sub_menu && array_key_exists( 'overlayBackgroundColor', $context ) ) {
+		$named_background_color = $context['overlayBackgroundColor'];
+	} elseif ( $is_sub_menu && array_key_exists( 'customOverlayBackgroundColor', $context ) ) {
+		$custom_background_color = $context['customOverlayBackgroundColor'];
+	} elseif ( array_key_exists( 'backgroundColor', $context ) ) {
+		$named_background_color = $context['backgroundColor'];
+	} elseif ( array_key_exists( 'customBackgroundColor', $context ) ) {
+		$custom_background_color = $context['customBackgroundColor'];
+	} elseif ( isset( $context['style']['color']['background'] ) ) {
+		$custom_background_color = $context['style']['color']['background'];
 	}
 
-	if ( $has_named_background_color ) {
+	// If has background color.
+	if ( ! is_null( $named_background_color ) ) {
 		// Add the background-color class.
-		$named_background_color = ( $is_sub_menu && array_key_exists( 'overlayBackgroundColor', $context ) ) ? $context['overlayBackgroundColor'] : $context['backgroundColor'];
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $named_background_color );
-	} elseif ( $has_custom_background_color ) {
+		array_push( $colors['css_classes'], 'has-background', sprintf( 'has-%s-background-color', $named_background_color ) );
+	} elseif ( ! is_null( $custom_background_color ) ) {
 		// Add the custom background-color inline style.
-		$custom_background_color = '';
-		if ( $is_sub_menu && array_key_exists( 'customOverlayBackgroundColor', $context ) ) {
-			$custom_background_color = $context['customOverlayBackgroundColor'];
-		} else if ( array_key_exists( 'customBackgroundColor', $context ) ) {
-			$custom_background_color = $context['customBackgroundColor'];
-		} else if ( isset( $context['style']['color']['background'] ) ) {
-			$custom_background_color = $context['style']['color']['background'];
-		}
+		$colors['css_classes'][] = 'has-background';
 		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $custom_background_color );
 	}
 
