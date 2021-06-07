@@ -294,7 +294,6 @@ _Parameters_
 -   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: True for bottom, false for top.
 -   _rect_ `[DOMRect]`: The rectangle to position the caret with.
--   _mayUseScroll_ `[boolean]`: True to allow scrolling, false to disallow.
 
 <a name="remove" href="#remove">#</a> **remove**
 
