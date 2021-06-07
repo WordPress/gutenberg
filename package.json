@@ -276,7 +276,8 @@
 		"prestorybook:dev": "npm run build:packages",
 		"storybook:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./storybook -p 50240\"",
 		"env": "wp-scripts env",
-		"wp-env": "wp-env"
+		"wp-env": "wp-env",
+		"prepare": "husky install"
 	},
 	"lint-staged": {
 		"package-lock.json": [
