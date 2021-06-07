@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { basename, join } from 'path';
-import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
+import { writeFileSync } from 'fs';
 
 /**
  * WordPress dependencies
@@ -15,91 +15,30 @@ import {
 	closeGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
-function readFile( filePath ) {
-	return existsSync( filePath )
-		? readFileSync( filePath, 'utf8' ).trim()
-		: '';
-}
-
-function deleteFile( filePath ) {
-	if ( existsSync( filePath ) ) {
-		unlinkSync( filePath );
-	}
-}
-
-function isKeyEvent( item ) {
-	return (
-		item.cat === 'devtools.timeline' &&
-		item.name === 'EventDispatch' &&
-		item.dur &&
-		item.args &&
-		item.args.data
-	);
-}
-
-function isKeyDownEvent( item ) {
-	return isKeyEvent( item ) && item.args.data.type === 'keydown';
-}
-
-function isKeyPressEvent( item ) {
-	return isKeyEvent( item ) && item.args.data.type === 'keypress';
-}
-
-function isKeyUpEvent( item ) {
-	return isKeyEvent( item ) && item.args.data.type === 'keyup';
-}
-
-function isFocusEvent( item ) {
-	return isKeyEvent( item ) && item.args.data.type === 'focus';
-}
-
-function isClickEvent( item ) {
-	return isKeyEvent( item ) && item.args.data.type === 'click';
-}
-
-function isMouseOverEvent( item ) {
-	return isKeyEvent( item ) && item.args.data.type === 'mouseover';
-}
-
-function isMouseOutEvent( item ) {
-	return isKeyEvent( item ) && item.args.data.type === 'mouseout';
-}
-
-function getEventDurationsForType( trace, filterFunction ) {
-	return trace.traceEvents
-		.filter( filterFunction )
-		.map( ( item ) => item.dur / 1000 );
-}
-
-function getTypingEventDurations( trace ) {
-	return [
-		getEventDurationsForType( trace, isKeyDownEvent ),
-		getEventDurationsForType( trace, isKeyPressEvent ),
-		getEventDurationsForType( trace, isKeyUpEvent ),
-	];
-}
-
-function getSelectionEventDurations( trace ) {
-	return [ getEventDurationsForType( trace, isFocusEvent ) ];
-}
-
-function getClickEventDurations( trace ) {
-	return [ getEventDurationsForType( trace, isClickEvent ) ];
-}
-
-function getHoverEventDurations( trace ) {
-	return [
-		getEventDurationsForType( trace, isMouseOverEvent ),
-		getEventDurationsForType( trace, isMouseOutEvent ),
-	];
-}
+/**
+ * Internal dependencies
+ */
+import {
+	readFile,
+	deleteFile,
+	getClickEventDurations,
+	getHoverEventDurations,
+	getTypingEventDurations,
+	getSelectionEventDurations,
+	getLoadingDurations,
+} from './utils';
 
 jest.setTimeout( 1000000 );
 
 describe( 'Post Editor Performance', () => {
 	it( 'Loading, typing and selecting blocks', async () => {
 		const results = {
-			load: [],
+			serverResponse: [],
+			firstPaint: [],
+			domContentLoaded: [],
+			loaded: [],
+			firstContentfulPaint: [],
+			firstBlock: [],
 			type: [],
 			focus: [],
 			inserterOpen: [],
@@ -131,10 +70,23 @@ describe( 'Post Editor Performance', () => {
 
 		// Measuring loading time
 		while ( i-- ) {
-			const startTime = new Date();
 			await page.reload();
 			await page.waitForSelector( '.wp-block' );
-			results.load.push( new Date() - startTime );
+			const {
+				serverResponse,
+				firstPaint,
+				domContentLoaded,
+				loaded,
+				firstContentfulPaint,
+				firstBlock,
+			} = await getLoadingDurations();
+
+			results.serverResponse.push( serverResponse );
+			results.firstPaint.push( firstPaint );
+			results.domContentLoaded.push( domContentLoaded );
+			results.loaded.push( loaded );
+			results.firstContentfulPaint.push( firstContentfulPaint );
+			results.firstBlock.push( firstBlock );
 		}
 
 		// Measure time to open inserter

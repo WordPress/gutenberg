@@ -29,7 +29,12 @@ const config = require( '../config' );
 /**
  * @typedef WPRawPerformanceResults
  *
- * @property {number[]} load             Load Time.
+ * @property {number[]} serverResponse       Represents the time the server takes to respond.
+ * @property {number[]} firstPaint           Represents the time when the user agent first rendered after navigation.
+ * @property {number[]} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number[]} loaded               Represents the time when the load event of the current document is completed.
+ * @property {number[]} firstContentfulPaint Represents the time when the browser first renders any text or media.
+ * @property {number[]} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
  * @property {number[]} type             Average type time.
  * @property {number[]} focus            Average block selection time.
  * @property {number[]} inserterOpen     Average time to open global inserter.
@@ -39,7 +44,12 @@ const config = require( '../config' );
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number} load              Load Time.
+ * @property {number} serverResponse       Represents the time the server takes to respond.
+ * @property {number} firstPaint           Represents the time when the user agent first rendered after navigation.
+ * @property {number} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {number} loaded               Represents the time when the load event of the current document is completed.
+ * @property {number} firstContentfulPaint Represents the time when the browser first renders any text or media.
+ * @property {number} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
  * @property {number} type              Average type time.
  * @property {number} minType           Minium type time.
  * @property {number} maxType           Maximum type time.
@@ -56,7 +66,12 @@ const config = require( '../config' );
 /**
  * @typedef WPFormattedPerformanceResults
  *
- * @property {string=} load              Load Time.
+ * @property {string=} serverResponse       Represents the time the server takes to respond.
+ * @property {string=} firstPaint           Represents the time when the user agent first rendered after navigation.
+ * @property {string=} domContentLoaded     Represents the time immediately after the document's DOMContentLoaded event completes.
+ * @property {string=} loaded               Represents the time when the load event of the current document is completed.
+ * @property {string=} firstContentfulPaint Represents the time when the browser first renders any text or media.
+ * @property {string=} firstBlock           Represents the time when Puppeteer first sees a block selector in the DOM.
  * @property {string=} type              Average type time.
  * @property {string=} minType           Minium type time.
  * @property {string=} maxType           Maximum type time.
@@ -118,7 +133,12 @@ function formatTime( number ) {
  */
 function curateResults( results ) {
 	return {
-		load: average( results.load ),
+		serverResponse: average( results.serverResponse ),
+		firstPaint: average( results.firstPaint ),
+		domContentLoaded: average( results.domContentLoaded ),
+		loaded: average( results.loaded ),
+		firstContentfulPaint: average( results.firstContentfulPaint ),
+		firstBlock: average( results.firstBlock ),
 		type: average( results.type ),
 		minType: Math.min( ...results.type ),
 		maxType: Math.max( ...results.type ),
@@ -181,7 +201,14 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 
 	const medians = mapValues(
 		{
-			load: results.map( ( r ) => r.load ),
+			serverResponse: results.map( ( r ) => r.serverResponse ),
+			firstPaint: results.map( ( r ) => r.firstPaint ),
+			domContentLoaded: results.map( ( r ) => r.domContentLoaded ),
+			loaded: results.map( ( r ) => r.loaded ),
+			firstContentfulPaint: results.map(
+				( r ) => r.firstContentfulPaint
+			),
+			firstBlock: results.map( ( r ) => r.firstBlock ),
 			type: results.map( ( r ) => r.type ),
 			minType: results.map( ( r ) => r.minType ),
 			maxType: results.map( ( r ) => r.maxType ),
@@ -321,6 +348,11 @@ async function runPerformanceTests( branches, options ) {
 	await runShellScript( 'npm run wp-env stop', environmentDirectory );
 
 	log( '\n>> 🎉 Results.\n' );
+
+	log(
+		'\nPlease note that client side metrics EXCLUDE the server response time.\n'
+	);
+
 	for ( const testSuite of testSuites ) {
 		log( `\n>> ${ testSuite }\n` );
 
