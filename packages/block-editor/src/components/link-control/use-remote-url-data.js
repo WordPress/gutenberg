@@ -7,11 +7,37 @@ import { store as blockEditorStore } from '../../store';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect, useReducer } from '@wordpress/element';
+
+function reducer( state, action ) {
+	switch ( action.type ) {
+		case 'RESOLVED':
+			return {
+				...state,
+				isFetching: false,
+				richData: action.richData,
+			};
+		case 'ERROR':
+			return {
+				...state,
+				isFetching: false,
+				richData: null,
+			};
+		case 'LOADING':
+			return {
+				...state,
+				isFetching: true,
+			};
+		default:
+			throw new Error( `Unexpected action type ${ action.type }` );
+	}
+}
 
 function useRemoteUrlData( url ) {
-	const [ richData, setRichData ] = useState( null );
-	const [ isFetching, setIsFetching ] = useState( false );
+	const [ state, dispatch ] = useReducer( reducer, {
+		richData: null,
+		isFetching: false,
+	} );
 
 	const { fetchRemoteUrlData } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -29,7 +55,9 @@ function useRemoteUrlData( url ) {
 			fetchRemoteUrlData &&
 			typeof AbortController !== 'undefined'
 		) {
-			setIsFetching( true );
+			dispatch( {
+				type: 'LOADING',
+			} );
 
 			const controller = new window.AbortController();
 
@@ -39,14 +67,17 @@ function useRemoteUrlData( url ) {
 				signal,
 			} )
 				.then( ( urlData ) => {
-					setRichData( urlData );
-					setIsFetching( false );
+					dispatch( {
+						type: 'RESOLVED',
+						richData: urlData,
+					} );
 				} )
 				.catch( () => {
 					// Avoid setting state on unmounted component
 					if ( ! signal.aborted ) {
-						setIsFetching( false );
-						setRichData( null );
+						dispatch( {
+							type: 'ERROR',
+						} );
 					}
 				} );
 			// Cleanup: when the URL changes the abort the current request
@@ -56,10 +87,7 @@ function useRemoteUrlData( url ) {
 		}
 	}, [ url ] );
 
-	return {
-		richData,
-		isFetching,
-	};
+	return state;
 }
 
 export default useRemoteUrlData;
