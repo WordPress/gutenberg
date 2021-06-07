@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions } from 'react-native';
+import { View, Dimensions, LayoutAnimation } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -102,6 +102,28 @@ export class BlockListItem extends Component {
 					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
 				},
 		];
+	}
+
+	setAnimation = () => {
+		LayoutAnimation.configureNext( {
+			duration: 250,
+			update: {
+				type: LayoutAnimation.Types.easeInEaseOut,
+				springDamping: 0.7,
+			},
+		} );
+		LayoutAnimation.configureNext( {
+			duration: 250,
+			create: {
+				type: LayoutAnimation.Types.easeIn,
+				property: LayoutAnimation.Properties.scaleY,
+				springDamping: 0.7,
+			},
+		} );
+	};
+
+	componentDidMount() {
+		this.setAnimation();
 	}
 
 	render() {
