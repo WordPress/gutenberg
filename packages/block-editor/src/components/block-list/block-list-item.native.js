@@ -117,8 +117,9 @@ export class BlockListItem extends Component {
 			duration: ANIMATION_DURATION,
 			create: {
 				type: LayoutAnimation.Types.easeIn,
-				property: LayoutAnimation.Properties.scaleY,
+				property: LayoutAnimation.Properties.opacity,
 				springDamping: 0.7,
+				delay: ANIMATION_DURATION,
 			},
 		} );
 	}
