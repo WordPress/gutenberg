@@ -128,6 +128,10 @@ export class BlockListItem extends Component {
 		this.setAnimation();
 	}
 
+	componentWillUnmount() {
+		this.setAnimation();
+	}
+
 	render() {
 		const {
 			blockAlignment,
