@@ -82,6 +82,42 @@ describe( 'NumberControl', () => {
 			expect( input.value ).toBe( '0' );
 		} );
 
+		it( 'should round clamped value on ENTER keypress when round is set to true', () => {
+			render(
+				<NumberControl
+					value={ 5 }
+					min={ 0 }
+					max={ 10 }
+					round={ true }
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '1.125' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '1' );
+		} );
+
+		it( 'should not round clamped value on ENTER keypress when round is set to false', () => {
+			render(
+				<NumberControl
+					value={ 5 }
+					min={ 0 }
+					max={ 10 }
+					round={ false }
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '1.125' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '1.125' );
+		} );
+
 		it( 'should parse to number value on ENTER keypress', () => {
 			render( <NumberControl value={ 5 } /> );
 
