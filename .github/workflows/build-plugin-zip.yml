@@ -111,7 +111,7 @@ jobs:
         name: Build Release Artifact
         runs-on: ubuntu-latest
         needs: bump-version
-        if: always()
+        if: ${{ ( github.repository == 'WordPress/gutenberg' && always() ) || ( github.event_name == 'pull_request' && always() ) }}
 
         steps:
             - name: Checkout code
