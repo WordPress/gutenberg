@@ -47,7 +47,7 @@ export const BorderWidthEdit = ( props ) => {
 			newStyle = cleanEmptyObject( newStyle );
 		}
 
-		setAttributes( { style: cleanEmptyObject( newStyle ) } );
+		setAttributes( { style: newStyle } );
 	};
 
 	return (
