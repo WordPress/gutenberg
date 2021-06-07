@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import {
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	Dimensions,
+	LayoutAnimation,
+} from 'react-native';
 import { pick } from 'lodash';
 
 /**
@@ -108,6 +114,27 @@ class BlockListBlock extends Component {
 		};
 
 		this.anchorNodeRef = createRef();
+	}
+
+	setAnimation() {
+		const ANIMATION_DURATION = 50;
+		LayoutAnimation.configureNext( {
+			duration: ANIMATION_DURATION,
+			update: {
+				type: LayoutAnimation.Types.easeInEaseOut,
+			},
+			create: {
+				type: LayoutAnimation.Types.easeIn,
+				property: LayoutAnimation.Properties.opacity,
+				delay: ANIMATION_DURATION,
+			},
+		} );
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.isSelected !== prevProps.isSelected ) {
+			this.setAnimation();
+		}
 	}
 
 	onFocus() {
