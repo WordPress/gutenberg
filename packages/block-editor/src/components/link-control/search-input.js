@@ -9,6 +9,8 @@ import { noop, omit } from 'lodash';
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,6 +24,7 @@ const noopSearchHandler = Promise.resolve( [] );
 const LinkControlSearchInput = forwardRef(
 	(
 		{
+			subject,
 			value,
 			children,
 			currentLink = {},
@@ -57,6 +60,12 @@ const LinkControlSearchInput = forwardRef(
 		const instanceId = useInstanceId( LinkControlSearchInput );
 		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
 
+		const [ editSubject, setEditSubject ] = useState( subject || '' );
+
+		const subjectChangeHandler = ( e ) => {
+			setEditSubject( e );
+		};
+
 		/**
 		 * Handles the user moving between different suggestions. Does not handle
 		 * choosing an individual item.
@@ -71,6 +80,7 @@ const LinkControlSearchInput = forwardRef(
 
 		const onFormSubmit = ( event ) => {
 			event.preventDefault();
+			value = value + '?subject=' + editSubject;
 			onSuggestionSelected( focusedSuggestion || { url: value } );
 		};
 
@@ -134,6 +144,21 @@ const LinkControlSearchInput = forwardRef(
 					}
 					ref={ ref }
 				/>
+				<div className="subject-url-group">
+					<URLInput
+						className={ className }
+						value={ editSubject }
+						onChange={ subjectChangeHandler }
+						placeholder={ __( 'Email subject' ) }
+						ref={ ref }
+					/>
+					<Button
+						type="submit"
+						label={ __( 'Submit' ) }
+						icon={ keyboardReturn }
+						className="block-editor-link-control__search-submit subject-submit-button"
+					/>
+				</div>
 				{ children }
 			</form>
 		);

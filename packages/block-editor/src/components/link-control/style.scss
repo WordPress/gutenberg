@@ -290,3 +290,13 @@ $block-editor-link-control-number-of-actions: 1;
 	margin-left: auto; // push to far right hand side
 	flex-shrink: 0;
 }
+
+.subject-url-group {
+	position: relative;
+	
+	.subject-submit-button { 
+		position: absolute;
+		top: 24%;
+		right: 5%;
+	}
+}

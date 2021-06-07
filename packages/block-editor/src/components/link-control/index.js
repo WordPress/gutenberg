@@ -120,6 +120,18 @@ function LinkControl( {
 		withCreateSuggestion = true;
 	}
 
+	const [ emailSubject, setEmailSubject ] = useState( ' ' );
+
+	useEffect( () => {
+		const getSubjectFromUrl = ( url ) => {
+			const newURL = new URL( url );
+			const params = new URLSearchParams( newURL.search );
+			setEmailSubject( params.get( 'subject' ) );
+			setInternalInputValue( 'mailto:' + newURL.pathname );
+		};
+		getSubjectFromUrl( value.url );
+	}, [] );
+
 	const isMounting = useRef( true );
 	const wrapperNode = useRef();
 	const [ internalInputValue, setInternalInputValue ] = useState(
@@ -224,6 +236,7 @@ function LinkControl( {
 							createSuggestionButtonText={
 								createSuggestionButtonText
 							}
+							subject={ emailSubject }
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button
