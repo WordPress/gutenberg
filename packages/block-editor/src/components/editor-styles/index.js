@@ -30,12 +30,16 @@ function useDarkThemeBodyClassName( styles ) {
 			const backgroundColor = defaultView
 				.getComputedStyle( canvas, null )
 				.getPropertyValue( 'background-color' );
+			const color = tinycolor( backgroundColor );
+			const isLight =
+				// The default color is "transparent", which is
+				// "rgba(0, 0, 0, 0)" through `getComputedStyle`.
+				// `tinycolor` considers this te be be low luminance because it
+				// is black and it doesn't seem to consider the opacity.
+				color.getAlpha() === 0 || color.getLuminance() > 0.5;
+			const action = isLight ? 'remove' : 'add';
 
-			if ( tinycolor( backgroundColor ).getLuminance() > 0.5 ) {
-				body.classList.remove( 'is-dark-theme' );
-			} else {
-				body.classList.add( 'is-dark-theme' );
-			}
+			body.classList[ action ]( 'is-dark-theme' );
 		},
 		[ styles ]
 	);
