@@ -60,7 +60,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 		__unstableHTML,
 		icon = null,
 		explicitDismiss = false,
-		onDismiss = null,
+		onDismiss,
 	} = options;
 
 	// The supported value shape of content is currently limited to plain text

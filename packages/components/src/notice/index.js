@@ -88,12 +88,8 @@ function Notice( {
 		children = <RawHTML>{ children }</RawHTML>;
 	}
 
-	onDismiss = onDismiss || noop;
-
-	const dismissMe = ( event ) => {
-		if ( event && event.preventDefault ) {
-			event.preventDefault();
-		}
+	const onDismissNotice = ( event ) => {
+		event?.preventDefault?.();
 		onDismiss();
 		onRemove();
 	};
@@ -150,7 +146,7 @@ function Notice( {
 					className="components-notice__dismiss"
 					icon={ close }
 					label={ __( 'Dismiss this notice' ) }
-					onClick={ dismissMe }
+					onClick={ onDismissNotice }
 					showTooltip={ false }
 				/>
 			) }
