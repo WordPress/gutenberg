@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 10.7.4 =
+
+### Bug Fixes
+
+- Site Logo block: Use option instead of theme-mod. ([32229](https://github.com/WordPress/gutenberg/pull/32229))
+
+
 = 10.7.3 =
 
 ### Bug Fixes
