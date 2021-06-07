@@ -80,6 +80,7 @@ export default function AllInputControl( {
 			onHoverOn={ handleOnHoverOn }
 			onHoverOff={ handleOnHoverOff }
 			placeholder={ allPlaceholder }
+			round={ false }
 		/>
 	);
 }

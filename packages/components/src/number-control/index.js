@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classNames from 'classnames';
+import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,6 +35,7 @@ export function NumberControl(
 		min = -Infinity,
 		shiftStep = 10,
 		step = 1,
+		round = true,
 		type: typeProp = 'number',
 		value: valueProp,
 		...props
@@ -155,7 +157,11 @@ export function NumberControl(
 			type === inputControlActionTypes.PRESS_ENTER ||
 			type === inputControlActionTypes.COMMIT
 		) {
-			state.value = roundClamp( currentValue, min, max );
+			if ( round ) {
+				state.value = roundClamp( currentValue, min, max );
+			} else {
+				state.value = clamp( currentValue, min, max );
+			}
 		}
 
 		return state;
