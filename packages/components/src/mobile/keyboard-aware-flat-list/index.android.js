@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { FlatList, Animated } from 'react-native';
+import { Animated } from 'react-native';
 
 /**
  * Internal dependencies
