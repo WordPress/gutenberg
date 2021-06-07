@@ -16,6 +16,7 @@ import BlockSupportPanelTitle from './title';
 const BlockSupportPanel = ( props ) => {
 	const { children, className, label: menuLabel, resetAll, title } = props;
 	const [ menuItems, setMenuItems ] = useState( {} );
+	const [ defaultControls, setDefaultControls ] = useState( {} );
 
 	// If a block support UI has been disabled via theme.json a boolean `false`
 	// will be passed as a child. This panel is only interested in the children
@@ -29,13 +30,16 @@ const BlockSupportPanel = ( props ) => {
 	// of whether they have a value.
 	useEffect( () => {
 		const items = {};
+		const defaults = {};
 
 		filteredChildren.forEach( ( child ) => {
 			const { hasValue, isShownByDefault, label } = child.props;
 			items[ label ] = isShownByDefault || hasValue( child.props );
+			defaults[ label ] = isShownByDefault;
 		} );
 
 		setMenuItems( items );
+		setDefaultControls( defaults );
 	}, [] );
 
 	if ( filteredChildren.length === 0 ) {
@@ -70,11 +74,11 @@ const BlockSupportPanel = ( props ) => {
 		// Reset the block support attributes.
 		resetAll();
 
-		// Turn off all the controls in menu.
+		// Turn off menu items unless they are to display by default.
 		const resetMenuItems = {};
 
-		filteredChildren.forEach( ( child ) => {
-			resetMenuItems[ child.props.label ] = false;
+		filteredChildren.forEach( ( { props: { label } } ) => {
+			resetMenuItems[ label ] = defaultControls[ label ];
 		} );
 
 		setMenuItems( resetMenuItems );
