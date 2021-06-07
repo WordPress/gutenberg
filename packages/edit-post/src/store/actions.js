@@ -383,14 +383,19 @@ export function* requestMetaBoxUpdates() {
 		formData.append( key, value )
 	);
 
-	// Save the metaboxes
-	yield apiFetch( {
-		url: window._wpMetaBoxUrl,
-		method: 'POST',
-		body: formData,
-		parse: false,
-	} );
-	yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
+	try {
+		// Save the metaboxes
+		yield apiFetch( {
+			url: window._wpMetaBoxUrl,
+			method: 'POST',
+			body: formData,
+			parse: false,
+		} );
+	} finally {
+		// Update meta box isSaving state even if apiFetch fails.
+		// This prevents locking the post editor in a saving state.
+		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
+	}
 }
 
 /**
