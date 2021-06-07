@@ -263,6 +263,8 @@ function styles_for_block_core_search( $attributes ) {
 			$wrapper_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
 		} else {
 			$shared_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
+		}
+	}
 
 	// Add color styles.
 	$has_colors = ! empty( $attributes['style']['color'] );
