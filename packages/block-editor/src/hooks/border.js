@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { PanelBody } from '@wordpress/components';
+import { PanelBody, ALL_CSS_UNITS } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -16,29 +16,7 @@ import { BorderRadiusEdit } from './border-radius';
 import { BorderStyleEdit } from './border-style';
 import { BorderWidthEdit } from './border-width';
 
-const isWeb = Platform.OS === 'web';
-
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
-export const CSS_UNITS = [
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-		a11yLabel: __( 'Pixels (px)' ),
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-		a11yLabel: __( 'Relative to parent font size (em)' ),
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-		a11yLabel: __( 'Relative to root font size (rem)' ),
-	},
-];
 
 /**
  * Parses a CSS unit from a border CSS value.
@@ -50,7 +28,7 @@ export function parseUnit( cssValue ) {
 	const value = String( cssValue ).trim();
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
 	const unit = unitMatch !== undefined ? unitMatch.toLowerCase() : '';
-	const currentUnit = CSS_UNITS.find( ( item ) => item.value === unit );
+	const currentUnit = ALL_CSS_UNITS.find( ( item ) => item.value === unit );
 
 	return currentUnit?.value || 'px';
 }
