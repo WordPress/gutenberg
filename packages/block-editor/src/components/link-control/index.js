@@ -115,6 +115,7 @@ function LinkControl( {
 	suggestionsQuery = {},
 	noURLSuggestion = false,
 	createSuggestionButtonText,
+	richPreviews = false,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -252,6 +253,7 @@ function LinkControl( {
 					key={ value?.url } // force remount when URL changes to avoid race conditions for rich previews
 					value={ value }
 					onEditClick={ () => setIsEditingLink( true ) }
+					richPreviews={ richPreviews }
 				/>
 			) }
 

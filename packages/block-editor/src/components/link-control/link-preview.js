@@ -22,8 +22,15 @@ import { ViewerSlot } from './viewer-slot';
 
 import useRemoteUrlData from './use-remote-url-data';
 
-export default function LinkPreview( { value, onEditClick } ) {
-	const { richData, isFetching } = useRemoteUrlData( value?.url );
+export default function LinkPreview( {
+	value,
+	onEditClick,
+	richPreviews = false,
+} ) {
+	// Avoid fetching if rich previews are not desired.
+	const maybeRemoteURL = richPreviews ? value?.url : null;
+
+	const { richData, isFetching } = useRemoteUrlData( maybeRemoteURL );
 
 	// Rich data may be an empty object so test for that.
 	const hasRichData = richData && Object.keys( richData ).length;

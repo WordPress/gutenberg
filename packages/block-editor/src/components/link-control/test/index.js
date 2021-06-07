@@ -1752,7 +1752,7 @@ describe( 'Rich link previews', () => {
 		mockFetchRemoteUrlData = jest.fn();
 	} );
 
-	it( 'should display a rich preview when data is available', async () => {
+	it( 'should not fetch or display rich previews by default', async () => {
 		mockFetchRemoteUrlData.mockImplementation( () =>
 			Promise.resolve( {
 				title:
@@ -1766,6 +1766,41 @@ describe( 'Rich link previews', () => {
 
 		act( () => {
 			render( <LinkControl value={ selectedLink } />, container );
+		} );
+
+		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( mockFetchRemoteUrlData ).not.toHaveBeenCalled();
+		expect( isRichLinkPreview ).toBe( false );
+		expect( linkPreview ).toMatchSnapshot();
+	} );
+
+	it( 'should display a rich preview when data is available', async () => {
+		mockFetchRemoteUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title:
+					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } richPreviews />,
+				container
+			);
 		} );
 
 		// mockFetchRemoteUrlData resolves on next "tick" of event loop
@@ -1794,7 +1829,10 @@ describe( 'Rich link previews', () => {
 		);
 
 		act( () => {
-			render( <LinkControl value={ selectedLink } />, container );
+			render(
+				<LinkControl value={ selectedLink } richPreviews />,
+				container
+			);
 		} );
 
 		// mockFetchRemoteUrlData resolves on next "tick" of event loop
@@ -1830,7 +1868,10 @@ describe( 'Rich link previews', () => {
 		);
 
 		act( () => {
-			render( <LinkControl value={ selectedLink } />, container );
+			render(
+				<LinkControl value={ selectedLink } richPreviews />,
+				container
+			);
 		} );
 
 		// mockFetchRemoteUrlData resolves on next "tick" of event loop
@@ -1873,7 +1914,10 @@ describe( 'Rich link previews', () => {
 			} );
 
 			act( () => {
-				render( <LinkControl value={ selectedLink } />, container );
+				render(
+					<LinkControl value={ selectedLink } richPreviews />,
+					container
+				);
 			} );
 
 			// mockFetchRemoteUrlData resolves on next "tick" of event loop
@@ -1909,7 +1953,10 @@ describe( 'Rich link previews', () => {
 			);
 
 			act( () => {
-				render( <LinkControl value={ selectedLink } />, container );
+				render(
+					<LinkControl value={ selectedLink } richPreviews />,
+					container
+				);
 			} );
 
 			// mockFetchRemoteUrlData resolves on next "tick" of event loop
@@ -1935,7 +1982,10 @@ describe( 'Rich link previews', () => {
 		mockFetchRemoteUrlData.mockImplementation( nonResolvingPromise );
 
 		act( () => {
-			render( <LinkControl value={ selectedLink } />, container );
+			render(
+				<LinkControl value={ selectedLink } richPreviews />,
+				container
+			);
 		} );
 
 		// mockFetchRemoteUrlData resolves on next "tick" of event loop
@@ -1962,7 +2012,10 @@ describe( 'Rich link previews', () => {
 		mockFetchRemoteUrlData.mockImplementation( simulateFailedFetch );
 
 		act( () => {
-			render( <LinkControl value={ selectedLink } />, container );
+			render(
+				<LinkControl value={ selectedLink } richPreviews />,
+				container
+			);
 		} );
 
 		// mockFetchRemoteUrlData resolves on next "tick" of event loop
