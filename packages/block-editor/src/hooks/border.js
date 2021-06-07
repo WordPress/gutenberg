@@ -24,16 +24,19 @@ export const CSS_UNITS = [
 		value: 'px',
 		label: isWeb ? 'px' : __( 'Pixels (px)' ),
 		default: '',
+		a11yLabel: __( 'Pixels (px)' ),
 	},
 	{
 		value: 'em',
 		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
 		default: '',
+		a11yLabel: __( 'Relative to parent font size (em)' ),
 	},
 	{
 		value: 'rem',
 		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
 		default: '',
+		a11yLabel: __( 'Relative to root font size (rem)' ),
 	},
 ];
 
