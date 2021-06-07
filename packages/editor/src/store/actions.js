@@ -169,7 +169,7 @@ export function __experimentalRequestPostUpdateFinish( options = {} ) {
 export function updatePost() {
 	deprecated( "wp.data.dispatch( 'core/editor' ).updatePost", {
 		since: '5.7',
-		alternative: 'User the core entitires store instead',
+		alternative: 'Use the core entities store instead',
 	} );
 	return {
 		type: 'DO_NOTHING',

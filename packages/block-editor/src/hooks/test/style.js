@@ -18,8 +18,8 @@ describe( 'getInlineStyles', () => {
 				color: { text: 'red', background: 'black' },
 				typography: { lineHeight: 1.5, fontSize: 10 },
 				border: {
-					radius: 10,
-					width: 3,
+					radius: '10px',
+					width: '1em',
 					style: 'dotted',
 					color: '#21759b',
 				},
@@ -31,9 +31,9 @@ describe( 'getInlineStyles', () => {
 		).toEqual( {
 			backgroundColor: 'black',
 			borderColor: '#21759b',
-			borderRadius: 10,
+			borderRadius: '10px',
 			borderStyle: 'dotted',
-			borderWidth: 3,
+			borderWidth: '1em',
 			color: 'red',
 			lineHeight: 1.5,
 			fontSize: 10,

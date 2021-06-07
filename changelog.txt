@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 10.7.3 =
+
+### Bug Fixes
+
+- Fix alligned blocks. ([32454](https://github.com/WordPress/gutenberg/pull/32454))
+
+
 = 10.7.2 =
 
 ### Bug Fixes
