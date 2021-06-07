@@ -9,12 +9,12 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
-import { Scrollable, View } from '@wordpress/components/ui';
+import {__experimentalScrollable as Scrollable } from '@wordpress/components/ui';
 
 function Example() {
 	return (
 		<Scrollable style={ { maxHeight: 200 } }>
-			<View style={ { height: 500 } }>...</View>
+			<div style={ { height: 500 } }>...</div>
 		</Scrollable>
 	);
 }
@@ -22,14 +22,17 @@ function Example() {
 
 ## Props
 
-##### scrollDirection
+### `scrollDirection`: `string`
 
-**Type**: `x` | `y` | `auto`
+- Required: No
+- Default: `y`
+- Allowed values: `x`, `y`, `auto`
 
 Renders a scrollbar for a specific axis when content overflows.
 
-##### smoothScroll
+### `smoothScroll`: `boolean`
 
-**Type**: `boolean`
+- Required: No
+- Default: `false`
 
 Enables (CSS) smooth scrolling.
