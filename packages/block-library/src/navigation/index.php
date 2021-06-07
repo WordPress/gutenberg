@@ -86,6 +86,36 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 }
 
 /**
+ * Renders a Navigation Block derived from data from the theme_location assigned
+ * via the block attribute 'location'.
+ *
+ * If the theme doesn't explicity support 'block-nav-menus' or no location was provided
+ * as a block attribute then an empty string is returned.
+ *
+ * @param  array $attributes Navigation block attributes.
+ * @return string HTML markup of a generated Navigation Block.
+ */
+function get_classic_navigation_elements( $attributes ) {
+	if ( ! array_key_exists( '__unstable__location', $attributes ) ) {
+		return '';
+	}
+
+	$block_attributes = $attributes;
+	unset( $block_attributes['__unstable__location'] );
+
+	return wp_nav_menu(
+		array(
+			'theme_location'   => $attributes['__unstable__location'],
+			'block_attributes' => $block_attributes,
+			'container'        => '',
+			'items_wrap'       => '%3$s',
+			'fallback_cb'      => false,
+			'echo'             => false,
+		)
+	);
+}
+
+/**
  * Returns the top-level submenu SVG chevron icon.
  *
  * @return string
@@ -133,7 +163,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	if ( empty( $block->inner_blocks ) ) {
-		return '';
+		return get_classic_navigation_elements( $attributes );
 	}
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
