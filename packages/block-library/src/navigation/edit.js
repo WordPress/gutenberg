@@ -196,10 +196,15 @@ export default compose( [
 		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
 			selectedBlockId,
 		] )?.length;
+
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
+
+			// This prop is already available but computing it here ensures it's
+			// fresh compared to isImmediateParentOfSelectedBlock
+			isSelected: selectedBlockId === clientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {

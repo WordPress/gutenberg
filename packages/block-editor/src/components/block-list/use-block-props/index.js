@@ -58,7 +58,7 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
-	const { clientId, className, wrapperProps = {} } = useContext(
+	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
 		BlockListBlockContext
 	);
 	const {
@@ -141,7 +141,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-title': blockTitle,
 		className: classnames(
 			// The wp-block className is important for editor styles.
-			'wp-block block-editor-block-list__block',
+			classnames( 'block-editor-block-list__block', {
+				'wp-block': ! isAligned,
+			} ),
 			className,
 			props.className,
 			wrapperProps.className,
