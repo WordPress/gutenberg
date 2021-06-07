@@ -772,7 +772,7 @@ export function isEditedPostDateFloating( state ) {
 
 	// This should be the status of the persisted post
 	// It shouldn't use the "edited" status otherwise it breaks the
-	// infered post data floating status
+	// inferred post data floating status
 	// See https://github.com/WordPress/gutenberg/issues/28083
 	const status = getCurrentPost( state ).status;
 	if (
