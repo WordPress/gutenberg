@@ -1,15 +1,15 @@
 // eslint-disable-next-line @wordpress/no-global-event-listener
 document.addEventListener( 'DOMContentLoaded', () => {
 	const transitionDuration = 300;
+	const hiddenClass = 'wp-block-search__searchfield-hidden';
+	const wrapperClass = '.wp-block-search__inside-wrapper';
+	const buttonClass = '.wp-block-search__button';
 
 	Array.from(
 		document.getElementsByClassName(
 			'wp-block-search__button-behavior-expand'
 		)
 	).forEach( ( block ) => {
-		const hiddenClass = 'wp-block-search__searchfield-hidden';
-		const wrapperClass = '.wp-block-search__inside-wrapper';
-		const buttonClass = '.wp-block-search__button';
 
 		const wrapper = block.querySelector( wrapperClass );
 		const searchField = block.querySelector( '.wp-block-search__input' );
