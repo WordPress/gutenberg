@@ -12,7 +12,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
-	PlainText,
+	RichText,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -53,6 +53,14 @@ export default function PostTitleEdit( {
 
 	const { title = '', link } = post;
 
+	const allowedFormats = [
+		'core/bold',
+		'core/italic',
+		'core/strikethrough',
+		'core/subscript',
+		'core/superscript',
+	];
+
 	let titleElement = (
 		<TagName { ...( isLink ? {} : blockProps ) }>
 			{ __( 'An example title' ) }
@@ -61,9 +69,10 @@ export default function PostTitleEdit( {
 
 	if ( postType && postId ) {
 		titleElement = (
-			<PlainText
+			<RichText
 				tagName={ TagName }
 				placeholder={ __( 'No Title' ) }
+				allowedFormats={ allowedFormats }
 				value={ title }
 				onChange={ ( value ) =>
 					editEntityRecord( 'postType', postType, postId, {
@@ -79,7 +88,7 @@ export default function PostTitleEdit( {
 	if ( isLink ) {
 		titleElement = (
 			<TagName { ...blockProps }>
-				<PlainText
+				<RichText
 					tagName="a"
 					href={ link }
 					target={ linkTarget }
