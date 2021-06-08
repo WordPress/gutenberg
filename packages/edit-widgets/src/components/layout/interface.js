@@ -47,21 +47,12 @@ function Interface( { blockEditorSettings } ) {
 	);
 	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
 
-	const {
-		hasSidebarEnabled,
-		isInserterOpened,
-		/*		mode,
-		showBlockBreadcrumbs,*/
-	} = useSelect(
+	const { hasSidebarEnabled, isInserterOpened } = useSelect(
 		( select ) => ( {
 			hasSidebarEnabled: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( editWidgetsStore.name ),
 			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
-			/*			showBlockBreadcrumbs: select( interfaceStore ).isFeatureActive(
-				'showBlockBreadcrumbs'
-			),
-			mode: select( interfaceStore ).getEditorMode(),*/
 		} ),
 		[]
 	);
@@ -82,7 +73,7 @@ function Interface( { blockEditorSettings } ) {
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
-	console.log( 'isMobileViewport', isMobileViewport );
+
 	return (
 		<InterfaceSkeleton
 			labels={ interfaceLabels }
@@ -122,8 +113,6 @@ function Interface( { blockEditorSettings } ) {
 				/>
 			}
 			footer={
-				/*				showBlockBreadcrumbs &&
-				mode === 'visual' &&*/
 				! isMobileViewport && (
 					<div className="edit-widgets-layout__footer">
 						<BlockBreadcrumb />
