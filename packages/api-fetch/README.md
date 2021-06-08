@@ -54,6 +54,29 @@ Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the par
 
 Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
 
+### Aborting a request
+
+Aborting a request can be done by using [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) as the same as in `fetch`. For legacy browsers that don't support `AbortController`, you should provide your own polyfill of `AbortController` if you still want it to be abort-able, or simply ignore it as shown in the example below.
+
+**Example**
+
+```js
+const controller = typeof AbortController === 'undefined'
+	? undefined
+	: new AbortController();
+
+apiFetch( { path: '/wp/v2/posts', signal: controller?.signal } )
+	.catch( ( error ) => {
+		// If the browser doesn't support AbortController then it will never log.
+		// It should be fine in most cases when it's considered to be a progressive improvement.
+		if (error.name === 'AbortError') {
+			console.log( 'Request has been aborted' );
+		}
+	} );
+
+controller?.abort();
+```
+
 ### Middlewares
 
 the `api-fetch` package supports middlewares. Middlewares are functions you can use to wrap the `apiFetch` calls to perform any pre/post process to the API requests.
