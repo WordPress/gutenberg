@@ -80,49 +80,19 @@
 .wp-block-navigation-link__placeholder {
 	position: relative;
 
-	// Provide a little margin to show each placeholder as a separate unit.
-	margin: 2px;
-
 	.wp-block-navigation-link__placeholder-text {
-		font-family: $default-font;
-		font-size: $default-font-size;
-		padding-left: 4px;
-		padding-right: 4px;
-
+		background-image:
+			linear-gradient(135deg, transparent 10%, currentColor 10%, currentColor 30%, transparent 30%),
+			linear-gradient(45deg,  transparent 30%, currentColor 30%, currentColor 50%, transparent 50%),
+			linear-gradient(135deg, transparent 50%, currentColor 50%, currentColor 70%, transparent 70%),
+			linear-gradient(45deg,  transparent 70%, currentColor 70%, currentColor 90%, transparent 90%);
+		background-size: 10px 3px;
+		background-repeat: repeat-x;
+		background-position: 0 100%;
 	}
 
 	// This needs extra specificity.
 	&.wp-block-navigation-link__content {
 		cursor: pointer;
 	}
-
-	&::before {
-		content: "";
-		display: block;
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		border-radius: $radius-block-ui;
-		opacity: 0.1;
-
-		.is-dark-theme & {
-			opacity: 0.2;
-		}
-
-		.is-editing & {
-			background: currentColor;
-		}
-	}
-}
-
-// We had to add extra classes to override the color from
-// .editor-styles-wrapper .wp-block-navigation:not(.has-text-color) .wp-block-navigation-link__content
-.wp-block-navigation
-.wp-block-navigation-link:not(.is-editing)
-.wp-block-navigation-link__content.wp-block-navigation-link__placeholder {
-	box-shadow: inset 0 0 0 $border-width $gray-700;
-	border-radius: $radius-block-ui;
-	color: var(--wp-admin-theme-color);
 }
