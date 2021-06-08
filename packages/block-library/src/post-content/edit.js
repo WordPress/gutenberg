@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useMemo, RawHTML } from '@wordpress/element';
 import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -11,10 +12,29 @@ import {
 	store as blockEditorStore,
 	Warning,
 } from '@wordpress/block-editor';
-import { useEntityBlockEditor } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 
-function Content( { layout, postType, postId } ) {
+/**
+ * Internal dependencies
+ */
+import { useIsEditablePostBlock } from '../utils/hooks';
+
+function ReadOnlyContent( { postType, postId } ) {
+	const [ , , content ] = useEntityProp(
+		'postType',
+		postType,
+		'content',
+		postId
+	);
+	const blockProps = useBlockProps();
+	return (
+		<div { ...blockProps }>
+			<RawHTML key="html">{ content?.rendered }</RawHTML>
+		</div>
+	);
+}
+
+function EditableContent( { layout, postType, postId } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
@@ -53,6 +73,16 @@ function Content( { layout, postType, postId } ) {
 	return <div { ...props } />;
 }
 
+function Content( props ) {
+	const { clientId, postType, postId } = props;
+	const isEditable = useIsEditablePostBlock( clientId );
+	return isEditable ? (
+		<EditableContent { ...props } />
+	) : (
+		<ReadOnlyContent postType={ postType } postId={ postId } />
+	);
+}
+
 function Placeholder() {
 	const blockProps = useBlockProps();
 	return (
@@ -76,6 +106,7 @@ function RecursionError() {
 }
 
 export default function PostContentEdit( {
+	clientId,
 	context: { postId: contextPostId, postType: contextPostType },
 	attributes,
 } ) {
@@ -95,6 +126,7 @@ export default function PostContentEdit( {
 					postType={ contextPostType }
 					postId={ contextPostId }
 					layout={ layout }
+					clientId={ clientId }
 				/>
 			) : (
 				<Placeholder />
