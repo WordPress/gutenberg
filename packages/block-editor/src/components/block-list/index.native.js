@@ -233,6 +233,7 @@ export class BlockList extends Component {
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 				onLayout={ this.onLayout }
+				testID="block-list-wrapper"
 			>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android'
