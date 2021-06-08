@@ -3,6 +3,6 @@
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function QueryLoopSave() {
+export default function PostTemplateSave() {
 	return <InnerBlocks.Content />;
 }

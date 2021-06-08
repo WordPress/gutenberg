@@ -454,6 +454,11 @@ export function convertLegacyBlocks( name, attributes ) {
 		}
 		name = 'core/embed';
 	}
+
+	// Convert 'core/query-loop' blocks in existing content to 'core/post-template'.
+	if ( name === 'core/query-loop' ) {
+		name = 'core/post-template';
+	}
 	return { name, attributes: newAttributes };
 }
 

@@ -1,12 +1,12 @@
 <?php
 /**
- * Server-side rendering of the `core/query-loop` block.
+ * Server-side rendering of the `core/post-template` block.
  *
  * @package WordPress
  */
 
 /**
- * Renders the `core/query-loop` block on the server.
+ * Renders the `core/post-template` block on the server.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
@@ -14,7 +14,7 @@
  *
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
-function render_block_core_query_loop( $attributes, $content, $block ) {
+function render_block_core_post_template( $attributes, $content, $block ) {
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
@@ -74,15 +74,15 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 }
 
 /**
- * Registers the `core/query-loop` block on the server.
+ * Registers the `core/post-template` block on the server.
  */
-function register_block_core_query_loop() {
+function register_block_core_post_template() {
 	register_block_type_from_metadata(
-		__DIR__ . '/query-loop',
+		__DIR__ . '/post-template',
 		array(
-			'render_callback'   => 'render_block_core_query_loop',
+			'render_callback'   => 'render_block_core_post_template',
 			'skip_inner_blocks' => true,
 		)
 	);
 }
-add_action( 'init', 'register_block_core_query_loop' );
+add_action( 'init', 'register_block_core_post_template' );
