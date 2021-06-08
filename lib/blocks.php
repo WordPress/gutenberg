@@ -475,21 +475,21 @@ add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
 /**
  * Filters the content of a single block.
  *
- * @param array $metadata Metadata for registering a block type.
+ * @param array $args Array of arguments for registering a block type.
  *
  * @return array Returns the $metadata with any missing `style` and `editorStyle` added.
  */
-function gutenberg_add_missing_styles_to_core_block_json( $metadata ) {
-	if ( ! empty( $metadata['name'] ) && 0 === strpos( $metadata['name'], 'core/' ) ) {
-		$block_name = str_replace( 'core/', '', $metadata['name'] );
+function gutenberg_add_missing_styles_to_core_block_json( $args ) {
+	if ( ! empty( $args['name'] ) && 0 === strpos( $args['name'], 'core/' ) ) {
+		$block_name = str_replace( 'core/', '', $args['name'] );
 
-		if ( ! isset( $metadata['style'] ) ) {
-			$metadata['style'] = "wp-block-$block_name";
+		if ( ! isset( $args['style'] ) ) {
+			$args['style'] = "wp-block-$block_name";
 		}
-		if ( ! isset( $metadata['editorStyle'] ) ) {
-			$metadata['editorStyle'] = "wp-block-$block_name-editor";
+		if ( ! isset( $args['editor_style'] ) ) {
+			$args['editor_style'] = "wp-block-$block_name-editor";
 		}
 	}
-	return $metadata;
+	return $args;
 }
-add_filter( 'block_type_metadata', 'gutenberg_add_missing_styles_to_core_block_json' );
+add_filter( 'register_block_type_args', 'gutenberg_add_missing_styles_to_core_block_json' );
