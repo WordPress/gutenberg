@@ -33,13 +33,14 @@ jest.mock( '@wordpress/element', () => {
 	};
 } );
 
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
 		mediaUploadSync: jest.fn(),
 		removeEventListener: jest.fn(),
 		requestFocalPointPickerTooltipShown: jest.fn( () => true ),
-		subscribeParentGetHtml: jest.fn(),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
 		subscribeSetFocusOnTitle: jest.fn(),
@@ -51,11 +52,13 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribePreferredColorScheme: () => 'light',
 		subscribeUpdateCapabilities: jest.fn(),
 		subscribeShowNotice: jest.fn(),
+		subscribeParentGetHtml: jest.fn(),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
 		subscribeMediaSave: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
+		provideToNative_Html: jest.fn(),
 		requestMediaEditor: jest.fn(),
 		requestMediaPicker: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
@@ -65,6 +68,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 			deviceCamera: 'DEVICE_CAMERA',
 			siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 		},
+		fetchRequest: jest.fn(),
 	};
 } );
 
@@ -169,5 +173,8 @@ jest.mock(
 		announceForAccessibility: jest.fn(),
 		removeEventListener: jest.fn(),
 		isScreenReaderEnabled: jest.fn( () => Promise.resolve( false ) ),
+		fetch: jest.fn( () => ( {
+			done: jest.fn(),
+		} ) ),
 	} )
 );

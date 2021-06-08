@@ -11,12 +11,12 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
+import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 /* eslint-enable jsdoc/valid-types */
 export function useScrollable( props ) {

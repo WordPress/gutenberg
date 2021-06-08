@@ -55,6 +55,7 @@ module.exports = {
 		[ `@wordpress\\/(${ transpiledPackageNames.join(
 			'|'
 		) })$` ]: '<rootDir>/packages/$1/src',
+		'test/helpers$': '<rootDir>/test/native/helpers.js',
 	},
 	modulePathIgnorePatterns: [
 		'<rootDir>/packages/react-native-editor/node_modules',

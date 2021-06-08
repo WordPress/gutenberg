@@ -32,7 +32,8 @@ function gutenberg_menu() {
 
 	if (
 		gutenberg_use_widgets_block_editor() &&
-		! function_exists( 'wp_use_widgets_block_editor' )
+		! function_exists( 'wp_use_widgets_block_editor' ) &&
+		current_theme_supports( 'widgets' )
 	) {
 		add_theme_page(
 			__( 'Widgets', 'gutenberg' ),

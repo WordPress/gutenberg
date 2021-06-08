@@ -168,7 +168,7 @@ function useAutosavePurge() {
 
 function LocalAutosaveMonitor() {
 	const { autosave } = useDispatch( editorStore );
-	const deferedAutosave = useCallback( () => {
+	const deferredAutosave = useCallback( () => {
 		requestIdleCallback( () => autosave( { local: true } ) );
 	}, [] );
 	useAutosaveNotice();
@@ -185,7 +185,7 @@ function LocalAutosaveMonitor() {
 	return (
 		<AutosaveMonitor
 			interval={ localAutosaveInterval }
-			autosave={ deferedAutosave }
+			autosave={ deferredAutosave }
 		/>
 	);
 }

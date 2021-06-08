@@ -18,7 +18,6 @@ import {
 	validateThemeColors,
 	validateThemeGradients,
 } from '@wordpress/block-editor';
-import { dispatch } from '@wordpress/data';
 import { unregisterBlockType } from '@wordpress/blocks';
 
 const reactNativeSetup = () => {
@@ -105,21 +104,6 @@ const setupInitHooks = () => {
 				colors,
 				gradients,
 			};
-		}
-	);
-
-	wpHooks.addAction(
-		'native.render',
-		'core/react-native-editor',
-		( props ) => {
-			const isAudioBlockEnabled =
-				props.capabilities && props.capabilities.audioBlock;
-
-			if ( isAudioBlockEnabled === true ) {
-				dispatch( 'core/edit-post' ).showBlockTypes( [ 'core/audio' ] );
-			} else {
-				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/audio' ] );
-			}
 		}
 	);
 };

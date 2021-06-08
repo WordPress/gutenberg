@@ -81,7 +81,7 @@
 
 // Styles for submenu flyout.
 // These are separated out with reduced specificity to allow better inheritance from Global Styles.
-.has-child {
+.wp-block-navigation .has-child {
 	// We use :where to keep specificity minimal, yet still scope it to only the navigation block.
 	// That way if padding is set in theme.json, it still wins.
 	// https://css-tricks.com/almanac/selectors/w/where/

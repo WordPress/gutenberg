@@ -229,7 +229,7 @@ function RichTextWrapper(
 		__unstableMultilineTag: multilineTag,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
-		__unstableDependencies: dependencies,
+		__unstableDependencies: [ ...dependencies, tagName ],
 		__unstableAfterParse: addEditorOnlyFormats,
 		__unstableBeforeSerialize: removeEditorOnlyFormats,
 		__unstableAddInvisibleFormats: addInvisibleFormats,

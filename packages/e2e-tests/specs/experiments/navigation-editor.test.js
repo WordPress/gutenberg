@@ -83,6 +83,11 @@ const REST_SEARCH_ROUTES = [
 	`rest_route=${ encodeURIComponent( '/wp/v2/search' ) }`,
 ];
 
+const REST_PAGES_ROUTES = [
+	'/wp/v2/pages',
+	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
+];
+
 /**
  * Determines if a given URL matches any of a given collection of
  * routes (expressed as substrings).
@@ -135,6 +140,10 @@ function getSearchMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_SEARCH_ROUTES, responsesByMethod );
 }
 
+function getPagesMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod );
+}
+
 async function visitNavigationEditor() {
 	const query = addQueryArgs( '', {
 		page: 'gutenberg-navigation',
@@ -184,6 +193,7 @@ describe( 'Navigation editor', () => {
 				POST: menuPostResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
+			...getPagesMocks( { GET: [ {} ] } ), // mock a single page
 		] );
 
 		await page.keyboard.type( 'Main Menu' );

@@ -31,7 +31,7 @@ import {
 	__unstableIframe as Iframe,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
@@ -137,10 +137,6 @@ export default function VisualEditor( { styles } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
 	const defaultLayout = useSetting( 'layout' );
 	const { contentSize, wideSize } = defaultLayout || {};
-	const alignments =
-		contentSize || wideSize
-			? [ 'wide', 'full' ]
-			: [ 'left', 'center', 'right' ];
 
 	let animatedStyles = isTemplateMode
 		? templateModeStyles
@@ -173,6 +169,25 @@ export default function VisualEditor( { styles } ) {
 		wrapperUniqueId,
 		wrapperBlockName
 	);
+
+	const layout = useMemo( () => {
+		if ( isTemplateMode ) {
+			return { type: 'default' };
+		}
+
+		if ( themeSupportsLayout ) {
+			const alignments =
+				contentSize || wideSize
+					? [ 'wide', 'full' ]
+					: [ 'left', 'center', 'right' ];
+			return {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments,
+			};
+		}
+		return undefined;
+	}, [ isTemplateMode, themeSupportsLayout, contentSize, wideSize ] );
 
 	return (
 		<div
@@ -211,7 +226,7 @@ export default function VisualEditor( { styles } ) {
 							styles={ styles }
 							style={ { paddingBottom } }
 						>
-							{ themeSupportsLayout && (
+							{ themeSupportsLayout && ! isTemplateMode && (
 								<LayoutStyle
 									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
 									layout={ defaultLayout }
@@ -225,17 +240,7 @@ export default function VisualEditor( { styles } ) {
 								) }
 								<RecursionProvider>
 									<BlockList
-										__experimentalLayout={
-											themeSupportsLayout
-												? {
-														type: 'default',
-														// Find a way to inject this in the support flag code (hooks).
-														alignments: themeSupportsLayout
-															? alignments
-															: undefined,
-												  }
-												: undefined
-										}
+										__experimentalLayout={ layout }
 									/>
 								</RecursionProvider>
 							</WritingFlow>
