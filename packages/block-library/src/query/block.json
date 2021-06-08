@@ -43,6 +43,7 @@
 		"query": "query",
 		"displayLayout": "displayLayout"
 	},
+	"usesContext": [ "templateSlug" ],
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
