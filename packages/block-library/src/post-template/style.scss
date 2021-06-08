@@ -3,6 +3,7 @@
 // compatibility with existing `QueryLoop` blocks that haven't been
 // updated, after the renaming of the block to `Post Template`.
 // See: https://github.com/WordPress/gutenberg/pull/32514.
+// TODO: Remove this class when WordPress 5.9 is released.
 .wp-block-query-loop {
 	max-width: 100%;
 	list-style: none;
