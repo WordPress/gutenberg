@@ -145,4 +145,4 @@ function gutenberg_register_legacy_query_loop_block() {
 		)
 	);
 }
-add_action( 'wp_loaded', 'gutenberg_register_legacy_query_loop_block' );
+add_action( 'init', 'gutenberg_register_legacy_query_loop_block' );
