@@ -7,15 +7,11 @@ import { __experimentalGradientPicker as GradientPicker } from '@wordpress/compo
  * Internal dependencies
  */
 import useSetting from '../use-setting';
-import { __experimentalGetHighestPriorityPreset } from '../../utils';
 
 const EMPTY_ARRAY = [];
 
 function GradientPickerWithGradients( props ) {
-	const gradients =
-		__experimentalGetHighestPriorityPreset(
-			useSetting( 'color.gradients' )
-		) || EMPTY_ARRAY;
+	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
 	const disableCustomGradients = ! useSetting( 'color.customGradient' );
 
 	return (

@@ -24,7 +24,6 @@ import { sprintf, __ } from '@wordpress/i18n';
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useSetting from '../use-setting';
-import { __experimentalGetHighestPriorityPreset } from '../../utils';
 
 // translators: first %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(Color: %s)' );
@@ -178,12 +177,8 @@ function ColorGradientControlInner( {
 
 function ColorGradientControlSelect( props ) {
 	const colorGradientSettings = {};
-	colorGradientSettings.colors = __experimentalGetHighestPriorityPreset(
-		useSetting( 'color.palette' )
-	);
-	colorGradientSettings.gradients = __experimentalGetHighestPriorityPreset(
-		useSetting( 'color.gradients' )
-	);
+	colorGradientSettings.colors = useSetting( 'color.palette' );
+	colorGradientSettings.gradients = useSetting( 'color.gradients' );
 	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
 	colorGradientSettings.disableCustomGradients = ! useSetting(
 		'color.customGradient'

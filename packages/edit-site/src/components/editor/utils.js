@@ -90,13 +90,29 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 	return getPresetMetadataFromStyleProperty.MAP[ styleProperty ];
 }
 
+function getHighestPriorityOrigin( presetByOrigin, path ) {
+	if ( presetByOrigin && presetPaths[ path ] ) {
+		const origins = [ 'user', 'theme', 'core' ];
+		for ( const origin of origins ) {
+			if ( presetByOrigin[ origin ] ) {
+				return presetByOrigin[ origin ];
+			}
+		}
+		return undefined;
+	}
+	return presetByOrigin;
+}
+
 export function useSetting( path, blockName = '' ) {
 	const settings = useSelect( ( select ) => {
 		return select( editSiteStore ).getSettings();
 	} );
 	const topLevelPath = `__experimentalFeatures.${ path }`;
 	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
-	return get( settings, blockPath ) ?? get( settings, topLevelPath );
+	return (
+		getHighestPriorityOrigin( get( settings, blockPath ), path ) ??
+		getHighestPriorityOrigin( get( settings, topLevelPath ), path )
+	);
 }
 
 export function getPresetVariable( styles, context, propertyName, value ) {

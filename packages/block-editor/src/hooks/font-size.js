@@ -17,7 +17,6 @@ import {
 } from '../components/font-sizes';
 import { cleanEmptyObject } from './utils';
 import useSetting from '../components/use-setting';
-import { __experimentalGetHighestPriorityPreset } from '../utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -113,9 +112,7 @@ export function FontSizeEdit( props ) {
 		setAttributes,
 	} = props;
 	const isDisabled = useIsFontSizeDisabled( props );
-	const fontSizes = __experimentalGetHighestPriorityPreset(
-		useSetting( 'typography.fontSizes' )
-	);
+	const fontSizes = useSetting( 'typography.fontSizes' );
 
 	const onChange = ( value ) => {
 		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
@@ -155,9 +152,7 @@ export function FontSizeEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
-	const fontSizes = __experimentalGetHighestPriorityPreset(
-		useSetting( 'typography.fontSizes' )
-	);
+	const fontSizes = useSetting( 'typography.fontSizes' );
 	const hasFontSizes = !! fontSizes?.length;
 
 	return (
@@ -175,9 +170,7 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
  */
 const withFontSizeInlineStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const fontSizes = __experimentalGetHighestPriorityPreset(
-			useSetting( 'typography.fontSizes' )
-		);
+		const fontSizes = useSetting( 'typography.fontSizes' );
 		const {
 			name: blockName,
 			attributes: { fontSize, style },

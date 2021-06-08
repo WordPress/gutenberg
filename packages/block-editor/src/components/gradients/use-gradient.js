@@ -15,7 +15,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useBlockEditContext } from '../block-edit';
 import useSetting from '../use-setting';
 import { store as blockEditorStore } from '../../store';
-import { __experimentalGetHighestPriorityPreset } from '../../utils';
 
 const EMPTY_ARRAY = [];
 
@@ -68,10 +67,7 @@ export function __experimentalUseGradient( {
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const gradients =
-		__experimentalGetHighestPriorityPreset(
-			useSetting( 'color.gradients' )
-		) || EMPTY_ARRAY;
+	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
 	const { gradient, customGradient } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );

@@ -6,7 +6,6 @@ import {
 	__experimentalFontFamilyControl as FontFamilyControl,
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 	__experimentalLetterSpacingControl as LetterSpacingControl,
-	__experimentalGetHighestPriorityPreset,
 } from '@wordpress/block-editor';
 import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -57,16 +56,12 @@ export default function TypographyPanel( {
 	getStyle,
 	setStyle,
 } ) {
-	const fontSizes = __experimentalGetHighestPriorityPreset(
-		useSetting( 'typography.fontSizes', name )
-	);
+	const fontSizes = useSetting( 'typography.fontSizes', name );
 	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
 		name
 	);
-	const fontFamilies = __experimentalGetHighestPriorityPreset(
-		useSetting( 'typography.fontFamilies', name )
-	);
+	const fontFamilies = useSetting( 'typography.fontFamilies', name );
 	const hasFontStyles =
 		useSetting( 'typography.customFontStyle', name ) &&
 		supports.includes( 'fontStyle' );

@@ -20,10 +20,7 @@ import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
-import {
-	useSetting,
-	__experimentalGetHighestPriorityPreset,
-} from '@wordpress/block-editor';
+import { useSetting } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -52,10 +49,7 @@ function BlockForType( {
 	wrapperProps,
 	blockWidth,
 } ) {
-	const defaultColors =
-		__experimentalGetHighestPriorityPreset(
-			useSetting( 'color.palette' )
-		) || emptyArray;
+	const defaultColors = useSetting( 'color.palette' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(

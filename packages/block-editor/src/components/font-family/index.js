@@ -13,7 +13,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useSetting from '../use-setting';
-import { __experimentalGetHighestPriorityPreset } from '../../utils';
 
 export default function FontFamilyControl( {
 	value = '',
@@ -21,9 +20,7 @@ export default function FontFamilyControl( {
 	fontFamilies,
 	...props
 } ) {
-	const blockLevelFontFamilies = __experimentalGetHighestPriorityPreset(
-		useSetting( 'typography.fontFamilies' )
-	);
+	const blockLevelFontFamilies = useSetting( 'typography.fontFamilies' );
 	if ( ! fontFamilies ) {
 		fontFamilies = blockLevelFontFamilies;
 	}

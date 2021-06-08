@@ -16,7 +16,6 @@ import {
 	getGradientValueBySlug,
 } from '../components/gradients';
 import useSetting from '../components/use-setting';
-import { __experimentalGetHighestPriorityPreset } from '../utils';
 
 // The code in this file has largely been lifted from the color block support
 // hook.
@@ -83,14 +82,8 @@ export function getColorClassesAndStyles( attributes ) {
 export function useColorProps( attributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;
 
-	const colors =
-		__experimentalGetHighestPriorityPreset(
-			useSetting( 'color.palette' )
-		) || EMPTY_ARRAY;
-	const gradients =
-		__experimentalGetHighestPriorityPreset(
-			useSetting( 'color.gradients' )
-		) || EMPTY_ARRAY;
+	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
 
 	const colorProps = getColorClassesAndStyles( attributes );
 

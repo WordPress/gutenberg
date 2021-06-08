@@ -17,7 +17,6 @@ import ColorGradientControl from './control';
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useSetting from '../use-setting';
-import { __experimentalGetHighestPriorityPreset } from '../../utils';
 
 // translators: first %s: The type of color or gradient (e.g. background, overlay...), second %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(%s: color %s)' );
@@ -149,12 +148,8 @@ export const PanelColorGradientSettingsInner = ( {
 
 const PanelColorGradientSettingsSelect = ( props ) => {
 	const colorGradientSettings = {};
-	colorGradientSettings.colors = __experimentalGetHighestPriorityPreset(
-		useSetting( 'color.palette' )
-	);
-	colorGradientSettings.gradients = __experimentalGetHighestPriorityPreset(
-		useSetting( 'color.gradients' )
-	);
+	colorGradientSettings.colors = useSetting( 'color.palette' );
+	colorGradientSettings.gradients = useSetting( 'color.gradients' );
 	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
 	colorGradientSettings.disableCustomGradients = ! useSetting(
 		'color.customGradient'

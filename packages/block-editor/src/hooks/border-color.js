@@ -22,7 +22,6 @@ import {
 import useSetting from '../components/use-setting';
 import { hasBorderSupport, shouldSkipSerialization } from './border';
 import { cleanEmptyObject } from './utils';
-import { __experimentalGetHighestPriorityPreset } from '../utils';
 
 // Defining empty array here instead of inline avoids unnecessary re-renders of
 // color control.
@@ -45,10 +44,7 @@ export function BorderColorEdit( props ) {
 		attributes: { borderColor, style },
 		setAttributes,
 	} = props;
-	const colors =
-		__experimentalGetHighestPriorityPreset(
-			useSetting( 'color.palette' )
-		) || EMPTY_ARRAY;
+	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const disableCustomColors = ! useSetting( 'color.custom' );
 	const disableCustomGradients = ! useSetting( 'color.customGradient' );
 
@@ -184,10 +180,7 @@ export const withBorderColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { borderColor } = attributes;
-		const colors =
-			__experimentalGetHighestPriorityPreset(
-				useSetting( 'color.palette' )
-			) || EMPTY_ARRAY;
+		const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 
 		if (
 			! hasBorderSupport( name, 'color' ) ||

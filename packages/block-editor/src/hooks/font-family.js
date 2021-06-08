@@ -14,7 +14,6 @@ import { hasBlockSupport } from '@wordpress/blocks';
 import { cleanEmptyObject } from './utils';
 import useSetting from '../components/use-setting';
 import FontFamilyControl from '../components/font-family';
-import { __experimentalGetHighestPriorityPreset } from '../utils';
 
 export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
 
@@ -36,13 +35,12 @@ export function FontFamilyEdit( {
 	setAttributes,
 	attributes: { style = {} },
 } ) {
-	let fontFamilies = useSetting( 'typography.fontFamilies' );
+	const fontFamilies = useSetting( 'typography.fontFamilies' );
 	const isDisable = useIsFontFamilyDisabled( { name } );
 
 	if ( isDisable ) {
 		return null;
 	}
-	fontFamilies = __experimentalGetHighestPriorityPreset( fontFamilies );
 
 	const value = getFontFamilyFromAttributeValue(
 		fontFamilies,
@@ -84,9 +82,7 @@ export function FontFamilyEdit( {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontFamilyDisabled( { name } ) {
-	const fontFamilies = __experimentalGetHighestPriorityPreset(
-		useSetting( 'typography.fontFamilies' )
-	);
+	const fontFamilies = useSetting( 'typography.fontFamilies' );
 	return (
 		! fontFamilies ||
 		fontFamilies.length === 0 ||
