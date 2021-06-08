@@ -24,7 +24,7 @@ const TEMPLATE = [
 	[ 'core/post-date' ],
 	[ 'core/post-excerpt' ],
 ];
-export default function QueryLoopEdit( {
+export default function PostTemplateEdit( {
 	clientId,
 	context: {
 		query: {
