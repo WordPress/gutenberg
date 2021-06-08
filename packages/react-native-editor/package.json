@@ -66,7 +66,7 @@
 		"react-native-prompt-android": "git+https://github.com/wordpress-mobile/react-native-prompt-android.git#6c5122664d25b7f1cdeefc119e69329493a077a8",
 		"react-native-reanimated": "git+https://github.com/wordpress-mobile/react-native-reanimated.git#ed48f510fba751cd75da7629e92276166766be91",
 		"react-native-safe-area": "^0.5.0",
-		"react-native-safe-area-context": "git+https://github.com/wordpress-mobile/react-native-safe-area-context.git#caf3ee8b9a3c27fb9f3e4b074eeb380620c87fa3",
+		"react-native-safe-area-context": "git+https://github.com/wordpress-mobile/react-native-safe-area-context.git#31a722064f1de59c0354407e5d157513503e3e6e",
 		"react-native-sass-transformer": "^1.1.1",
 		"react-native-screens": "git+https://github.com/wordpress-mobile/react-native-screens.git#b3d907bda2695743f35fd874261dcd27e0912eca",
 		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#83c4e7c16b704c7706339341b22434b29f0b27d6",
