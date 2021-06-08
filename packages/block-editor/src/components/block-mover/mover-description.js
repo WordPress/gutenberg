@@ -51,7 +51,8 @@ export function getBlockMoverDescription(
 			firstIndex,
 			isFirst,
 			isLast,
-			dir
+			dir,
+			getMovementDirection
 		);
 	}
 
@@ -217,12 +218,14 @@ export function getBlockMoverDescription(
 /**
  * Return a label for the block movement controls depending on block position.
  *
- * @param {number}  selectedCount Number of blocks selected.
- * @param {number}  firstIndex    The index (position - 1) of the first block selected.
- * @param {boolean} isFirst       This is the first block.
- * @param {boolean} isLast        This is the last block.
- * @param {number}  dir           Direction of movement (> 0 is considered to be going
- *                                 down, < 0 is up).
+ * @param {number}  selectedCount 				Number of blocks selected.
+ * @param {number}  firstIndex    				The index (position - 1) of the first block selected.
+ * @param {boolean} isFirst       				This is the first block.
+ * @param {boolean} isLast        				This is the last block.
+ * @param {number}  dir           				Direction of movement (> 0 is considered to be going
+ *                                				 down, < 0 is up).
+ * @param {Function} getMovementDirection  		Returns movement direction (string) based on the orientation
+ * 												 of the selected blocks
  *
  * @return {string} Label for the block movement controls.
  */
@@ -231,43 +234,104 @@ export function getMultiBlockMoverDescription(
 	firstIndex,
 	isFirst,
 	isLast,
-	dir
+	dir,
+	getMovementDirection
 ) {
 	const position = firstIndex + 1;
 
-	if ( dir < 0 && isFirst ) {
-		return __( 'Blocks cannot be moved up as they are already at the top' );
-	}
-
-	if ( dir > 0 && isLast ) {
-		return __(
-			'Blocks cannot be moved down as they are already at the bottom'
-		);
-	}
-
 	if ( dir < 0 && ! isFirst ) {
-		return sprintf(
-			// translators: 1: Number of selected blocks, 2: Position of selected blocks
-			_n(
-				'Move %1$d block from position %2$d up by one place',
-				'Move %1$d blocks from position %2$d up by one place',
-				selectedCount
-			),
-			selectedCount,
-			position
-		);
+		// moving up
+		const movementDirection = getMovementDirection( 'up' );
+
+		if ( movementDirection === 'up' ) {
+			return sprintf(
+				// translators: 1: Number of selected blocks, 2: Position of selected blocks
+				_n(
+					'Move %1$d block from position %2$d up by one place',
+					'Move %1$d blocks from position %2$d up by one place',
+					selectedCount
+				),
+				selectedCount,
+				position
+			);
+		}
+
+		if ( movementDirection === 'left' ) {
+			return sprintf(
+				// translators: 1: Number of selected blocks, 2: Position of selected blocks
+				_n(
+					'Move %1$d block from position %2$d left by one place',
+					'Move %1$d blocks from position %2$d left by one place',
+					selectedCount
+				),
+				selectedCount,
+				position
+			);
+		}
+	}
+
+	if ( dir < 0 && isFirst ) {
+		// moving up, and the selected blocks are the first item
+		const movementDirection = getMovementDirection( 'up' );
+
+		if ( movementDirection === 'up' ) {
+			return __(
+				'Blocks cannot be moved up as they are already at the top'
+			);
+		}
+
+		if ( movementDirection === 'left' ) {
+			return __(
+				'Blocks cannot be moved left as they are already are at the leftmost position'
+			);
+		}
 	}
 
 	if ( dir > 0 && ! isLast ) {
-		return sprintf(
-			// translators: 1: Number of selected blocks, 2: Position of selected blocks
-			_n(
-				'Move %1$d block from position %2$d down by one place',
-				'Move %1$d blocks from position %2$d down by one place',
-				selectedCount
-			),
-			selectedCount,
-			position
-		);
+		// moving down
+		const movementDirection = getMovementDirection( 'down' );
+
+		if ( movementDirection === 'down' ) {
+			return sprintf(
+				// translators: 1: Number of selected blocks, 2: Position of selected blocks
+				_n(
+					'Move %1$d block from position %2$d down by one place',
+					'Move %1$d blocks from position %2$d down by one place',
+					selectedCount
+				),
+				selectedCount,
+				position
+			);
+		}
+
+		if ( movementDirection === 'right' ) {
+			return sprintf(
+				// translators: 1: Number of selected blocks, 2: Position of selected blocks
+				_n(
+					'Move %1$d block from position %2$d right by one place',
+					'Move %1$d blocks from position %2$d right by one place',
+					selectedCount
+				),
+				selectedCount,
+				position
+			);
+		}
+	}
+
+	if ( dir > 0 && isLast ) {
+		// moving down, and the selected blocks are the last item
+		const movementDirection = getMovementDirection( 'down' );
+
+		if ( movementDirection === 'down' ) {
+			return __(
+				'Blocks cannot be moved down as they are already at the bottom'
+			);
+		}
+
+		if ( movementDirection === 'right' ) {
+			return __(
+				'Blocks cannot be moved right as they are already are at the rightmost position'
+			);
+		}
 	}
 }
