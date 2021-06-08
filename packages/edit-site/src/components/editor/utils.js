@@ -70,11 +70,6 @@ export const PRESET_METADATA = [
 	},
 ];
 
-const presetPaths = {};
-forEach( PRESET_METADATA, ( { path } ) => {
-	presetPaths[ path.join( '.' ) ] = true;
-} );
-
 const STYLE_PROPERTIES_TO_CSS_VAR_INFIX = {
 	backgroundColor: 'color',
 	background: 'gradient',

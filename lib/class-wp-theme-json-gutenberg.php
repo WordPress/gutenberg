@@ -1145,10 +1145,11 @@ class WP_Theme_JSON_Gutenberg {
 		//
 		// These are the cases that have array values at the leaf levels.
 		$properties   = array();
-
 		$properties[] = array( 'custom' );
 		$properties[] = array( 'spacing', 'units' );
+		$properties[] = array( 'color', 'duotone' );
 
+		$to_append   = array();
 		$to_append[] = array( 'color', 'palette' );
 		$to_append[] = array( 'color', 'gradients' );
 		$to_append[] = array( 'typography', 'fontSizes' );

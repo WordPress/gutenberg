@@ -53,6 +53,13 @@ const deprecatedFlags = {
 	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
 };
 
+const PATHS_WITH_MERGE = {
+	'color.gradients': true,
+	'color.palette': true,
+	'typography.fontFamilies': true,
+	'typography.fontSizes': true,
+};
+
 /**
  * Hook that retrieves the editor setting.
  * It works with nested objects using by finding the value at path.
@@ -80,6 +87,13 @@ export default function useSetting( path ) {
 			const experimentalFeaturesResult =
 				get( settings, blockPath ) ?? get( settings, defaultsPath );
 			if ( experimentalFeaturesResult !== undefined ) {
+				if ( PATHS_WITH_MERGE[ path ] ) {
+					return (
+						experimentalFeaturesResult.user ??
+						experimentalFeaturesResult.theme ??
+						experimentalFeaturesResult.core
+					);
+				}
 				return experimentalFeaturesResult;
 			}
 
