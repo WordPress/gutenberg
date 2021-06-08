@@ -24,7 +24,7 @@ import QueryInspectorControls from './query-inspector-controls';
 import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
-const TEMPLATE = [ [ 'core/query-loop' ] ];
+const TEMPLATE = [ [ 'core/post-template' ] ];
 export function QueryContent( { attributes, setAttributes } ) {
 	const {
 		queryId,
