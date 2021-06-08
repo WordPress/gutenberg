@@ -53,6 +53,44 @@ class WP_REST_Menu_Custom_Items_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Retrieves the menu custom items' schema, conforming to JSON Schema.
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		$this->schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'menu-custom-items',
+			'type'       => 'object',
+			'properties' => array(
+
+				'id'         => array(
+					'description' => __( 'Unique identifier for the menu item.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+				'title'      => array(
+					'description' => __( 'Human-readable name identifying the menu item.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+				'type_label' => array(
+					'description' => __( 'Type of link.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+				'url'        => array(
+					'description' => __( 'URL of the link.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+				),
+			),
+		);
+
+		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
 	 * Returns the menu items added via the
 	 * `customize_nav_menu_available_item_types` filter.
 	 *
@@ -66,13 +104,25 @@ class WP_REST_Menu_Custom_Items_Controller extends WP_REST_Controller {
 		if ( is_array( $item_types ) ) {
 			foreach ( $item_types as $item_type ) {
 				if ( $item_type['type'] === $requested_type ) {
-					return rest_ensure_response(
-						apply_filters( 'customize_nav_menu_available_items', array(), $item_type['type'], $item_type['object'], 0 )
-					);
+					return $this->prepare_item_for_response( $item_type, $request );
 				}
 			}
 		}
 
 		return new WP_Error( 'rest_invalid_menu_item_type', __( 'This item type could not be found.', 'gutenberg' ), array( 'status' => 404 ) );
+	}
+
+	/**
+	 * Prepares a menu list of items for serialization.
+	 *
+	 * @param stdClass        $item_type Item type data.
+	 * @param WP_REST_Request $request   Full details about the request.
+	 *
+	 * @return WP_REST_Response List of menu items.
+	 */
+	public function prepare_item_for_response( $item_type, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		return rest_ensure_response(
+			apply_filters( 'customize_nav_menu_available_items', array(), $item_type['type'], $item_type['object'], 0 )
+		);
 	}
 }
