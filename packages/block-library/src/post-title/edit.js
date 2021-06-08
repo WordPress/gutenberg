@@ -22,7 +22,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
-import { useIsEditable } from '../utils/hooks';
+import { useIsEditablePostBlock } from '../utils/hooks';
 
 export default function PostTitleEdit( {
 	clientId,
@@ -31,7 +31,7 @@ export default function PostTitleEdit( {
 	context: { postType, postId },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
-	const isEditable = useIsEditable( clientId );
+	const isEditable = useIsEditablePostBlock( clientId );
 	const post = useSelect(
 		( select ) =>
 			select( coreStore ).getEditedEntityRecord(

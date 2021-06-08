@@ -10,7 +10,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import queryMetaData from '../query/block.json';
 const { name: queryBlockName } = queryMetaData;
 
-export function useIsEditable( clientId ) {
+export function useIsEditablePostBlock( clientId ) {
 	return useSelect(
 		( select ) => {
 			const { getBlockParents, getBlockName } = select(
@@ -27,4 +27,4 @@ export function useIsEditable( clientId ) {
 	);
 }
 
-export default { useIsEditable };
+export default { useIsEditablePostBlock };
