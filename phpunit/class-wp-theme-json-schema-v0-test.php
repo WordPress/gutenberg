@@ -335,129 +335,132 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 	function test_get_stylesheet() {
 		$root_name       = WP_Theme_JSON_Schema_V0::ROOT_BLOCK_NAME;
 		$all_blocks_name = WP_Theme_JSON_Schema_V0::ALL_BLOCKS_NAME;
-
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'settings' => array(
-					$all_blocks_name => array(
-						'color'      => array(
-							'text'    => 'value',
-							'palette' => array(
-								array(
-									'slug'  => 'white',
-									'color' => 'white',
+		$theme_json      = new WP_Theme_JSON_Gutenberg( array() );
+		$theme_json->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'settings' => array(
+						$all_blocks_name => array(
+							'color'      => array(
+								'text'    => 'value',
+								'palette' => array(
+									array(
+										'slug'  => 'white',
+										'color' => 'white',
+									),
+									array(
+										'slug'  => 'black',
+										'color' => 'black',
+									),
 								),
-								array(
-									'slug'  => 'black',
-									'color' => 'black',
+							),
+							'typography' => array(
+								'fontFamilies' => array(
+									array(
+										'slug'       => 'small',
+										'fontFamily' => '14px',
+									),
+									array(
+										'slug'       => 'big',
+										'fontFamily' => '41px',
+									),
+								),
+							),
+							'misc'       => 'value',
+						),
+						$root_name       => array(
+							'color' => array(
+								'palette' => array(
+									array(
+										'slug'  => 'grey',
+										'color' => 'grey',
+									),
 								),
 							),
 						),
-						'typography' => array(
-							'fontFamilies' => array(
-								array(
-									'slug'       => 'small',
-									'fontFamily' => '14px',
-								),
-								array(
-									'slug'       => 'big',
-									'fontFamily' => '41px',
-								),
-							),
-						),
-						'misc'       => 'value',
-					),
-					$root_name       => array(
-						'color' => array(
-							'palette' => array(
-								array(
-									'slug'  => 'grey',
-									'color' => 'grey',
+						'core/group'     => array(
+							'custom' => array(
+								'base-font'   => 16,
+								'line-height' => array(
+									'small'  => 1.2,
+									'medium' => 1.4,
+									'large'  => 1.8,
 								),
 							),
 						),
 					),
-					'core/group'     => array(
-						'custom' => array(
-							'base-font'   => 16,
-							'line-height' => array(
-								'small'  => 1.2,
-								'medium' => 1.4,
-								'large'  => 1.8,
+					'styles'   => array(
+						$root_name            => array(
+							'color' => array(
+								'link' => '#111',
+								'text' => 'var:preset|color|grey',
+							),
+							'misc'  => 'value',
+						),
+						'core/group'          => array(
+							'color'   => array(
+								'link' => '#333',
+							),
+							'spacing' => array(
+								'padding' => array(
+									'top'    => '12px',
+									'bottom' => '24px',
+								),
+							),
+						),
+						'core/heading/h1'     => array(
+							'color'      => array(
+								'link' => '#111',
+							),
+							'typography' => array(
+								'fontSize' => '1em',
+							),
+						),
+						'core/heading/h2'     => array(
+							'color'      => array(
+								'link' => '#222',
+							),
+							'typography' => array(
+								'fontSize' => '2em',
+							),
+						),
+						'core/post-title/h2'  => array(
+							'color'      => array(
+								'link' => '#222',
+							),
+							'typography' => array(
+								'fontSize' => '2em',
+							),
+						),
+						'core/post-title/h5'  => array(
+							'color'      => array(
+								'link' => '#555',
+							),
+							'typography' => array(
+								'fontSize' => '5em',
+							),
+						),
+						'core/query-title/h4' => array(
+							'color'      => array(
+								'link' => '#444',
+							),
+							'typography' => array(
+								'fontSize' => '4em',
+							),
+						),
+						'core/query-title/h5' => array(
+							'color'      => array(
+								'link' => '#555',
+							),
+							'typography' => array(
+								'fontSize' => '5em',
 							),
 						),
 					),
-				),
-				'styles'   => array(
-					$root_name            => array(
-						'color' => array(
-							'link' => '#111',
-							'text' => 'var:preset|color|grey',
-						),
-						'misc'  => 'value',
-					),
-					'core/group'          => array(
-						'color'   => array(
-							'link' => '#333',
-						),
-						'spacing' => array(
-							'padding' => array(
-								'top'    => '12px',
-								'bottom' => '24px',
-							),
-						),
-					),
-					'core/heading/h1'     => array(
-						'color'      => array(
-							'link' => '#111',
-						),
-						'typography' => array(
-							'fontSize' => '1em',
-						),
-					),
-					'core/heading/h2'     => array(
-						'color'      => array(
-							'link' => '#222',
-						),
-						'typography' => array(
-							'fontSize' => '2em',
-						),
-					),
-					'core/post-title/h2'  => array(
-						'color'      => array(
-							'link' => '#222',
-						),
-						'typography' => array(
-							'fontSize' => '2em',
-						),
-					),
-					'core/post-title/h5'  => array(
-						'color'      => array(
-							'link' => '#555',
-						),
-						'typography' => array(
-							'fontSize' => '5em',
-						),
-					),
-					'core/query-title/h4' => array(
-						'color'      => array(
-							'link' => '#444',
-						),
-						'typography' => array(
-							'fontSize' => '4em',
-						),
-					),
-					'core/query-title/h5' => array(
-						'color'      => array(
-							'link' => '#555',
-						),
-						'typography' => array(
-							'fontSize' => '5em',
-						),
-					),
-				),
-				'misc'     => 'value',
-			)
+					'misc'     => 'value',
+				)
+			),
+			'core'
 		);
 
 		$this->assertEquals(

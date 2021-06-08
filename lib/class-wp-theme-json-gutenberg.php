@@ -1133,6 +1133,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Merge new incoming data.
 	 *
 	 * @param WP_Theme_JSON $incoming Data to merge.
+	 * @param string        $origin origin of the incoming data (e.g: core, theme, or user).
 	 */
 	public function merge( $incoming, $origin ) {
 
