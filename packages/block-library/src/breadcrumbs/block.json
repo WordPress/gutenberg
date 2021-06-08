@@ -1,0 +1,38 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "core/breadcrumbs",
+	"title": "Breadcrumbs",
+	"category": "design",
+	"description": "Displays breadcrumbs of a page's hierarchy",
+	"textdomain": "default",
+	"usesContext": [ "postId", "postType" ],
+	"attributes": {
+		"nestingLevel": {
+			"type": "number",
+			"default": 0
+		},
+		"separator": {
+			"type": "string",
+			"default": "/"
+		},
+		"textAlign": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"align": true,
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true
+		}
+	},
+	"style": "wp-block-breadcrumbs"
+}

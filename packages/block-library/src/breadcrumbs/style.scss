@@ -1,0 +1,12 @@
+.wp-block-breadcrumbs {
+	list-style-type: none;
+	padding-left: 0;
+
+	.wp-block-breadcrumbs__item {
+		display: inline;
+	}
+
+	.wp-block-breadcrumbs__separator {
+		padding: 0 0.5em;
+	}
+}
