@@ -120,7 +120,7 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object} blockStyles   Block styles.
+ * @param {Object} blockStyles Block styles.
  *
  * @return {Array} An array of style declarations.
  */

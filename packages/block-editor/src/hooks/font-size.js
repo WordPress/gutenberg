@@ -24,7 +24,7 @@ export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
  * Filters registered block settings, extending attributes to include
  * `fontSize` and `fontWeight` attributes.
  *
- * @param  {Object} settings Original block settings.
+ * @param {Object} settings Original block settings.
  *
  * @return {Object} Filtered block settings.
  */
@@ -48,9 +48,9 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject font size.
  *
- * @param  {Object} props      Additional props applied to save element.
- * @param  {Object} blockType  Block type.
- * @param  {Object} attributes Block attributes.
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  *
  * @return {Object} Filtered props applied to save element.
  */
@@ -81,7 +81,7 @@ function addSaveProps( props, blockType, attributes ) {
  * Filters registered block settings to expand the block edit wrapper
  * by applying the desired styles and classnames.
  *
- * @param  {Object} settings Original block settings.
+ * @param {Object} settings Original block settings.
  *
  * @return {Object} Filtered block settings.
  */
@@ -168,7 +168,7 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
  * Ideally, this is not needed and themes load the font-size classes on the
  * editor.
  *
- * @param  {Function} BlockListBlock Original component.
+ * @param {Function} BlockListBlock Original component.
  *
  * @return {Function} Wrapped component.
  */

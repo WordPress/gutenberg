@@ -121,11 +121,11 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
  * the identifier declaration will be looked up in the file or dependency
  * if an `ast` and `parseDependency` callback are provided.
  *
- * @param {string} path Path to file being processed.
- * @param {Object} token Espree export token.
- * @param {Object} [ast] Espree ast of the file being parsed.
+ * @param {string}   path              Path to file being processed.
+ * @param {Object}   token             Espree export token.
+ * @param {Object}   [ast]             Espree ast of the file being parsed.
  * @param {Function} [parseDependency] Function that takes a path
- * and returns the intermediate representation of the dependency file.
+ *                                     and returns the intermediate representation of the dependency file.
  *
  * @return {Object} Intermediate Representation in JSON.
  */

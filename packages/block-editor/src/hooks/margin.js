@@ -19,7 +19,7 @@ import { cleanEmptyObject } from './utils';
 /**
  * Determines if there is margin support.
  *
- * @param  {string|Object} blockType Block name or Block Type object.
+ * @param {string|Object} blockType Block name or Block Type object.
  *
  * @return {boolean} Whether there is support.
  */
@@ -31,7 +31,7 @@ export function hasMarginSupport( blockType ) {
 /**
  * Custom hook that checks if margin settings have been disabled.
  *
- * @param  {string} name The name of the block.
+ * @param {string} name The name of the block.
  *
  * @return {boolean} Whether margin setting is disabled.
  */
@@ -43,7 +43,7 @@ export function useIsMarginDisabled( { name: blockName } = {} ) {
 /**
  * Inspector control panel containing the margin related configuration
  *
- * @param  {Object} props Block props.
+ * @param {Object} props Block props.
  *
  * @return {WPElement} Margin edit element.
  */

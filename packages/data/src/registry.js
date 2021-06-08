@@ -61,7 +61,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Subscribe to changes to any data.
 	 *
-	 * @param {Function}   listener Listener function.
+	 * @param {Function} listener Listener function.
 	 *
 	 * @return {Function} Unsubscribe function.
 	 */
@@ -229,8 +229,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a standard `@wordpress/data` store.
 	 *
-	 * @param {string} storeName  Unique namespace identifier.
-	 * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
+	 * @param {string} storeName Unique namespace identifier.
+	 * @param {Object} options   Store description (reducer, actions, selectors, resolvers).
 	 *
 	 * @return {Object} Registered store object.
 	 */

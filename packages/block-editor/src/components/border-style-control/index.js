@@ -37,9 +37,9 @@ const BORDER_STYLES = [
 /**
  * Control to display border style options.
  *
- * @param  {Object}   props          Component props.
- * @param  {Object}   props.onChange Handler for changing border style selection.
- * @param  {Object}   props.value    Currently selected border style value.
+ * @param {Object} props          Component props.
+ * @param {Object} props.onChange Handler for changing border style selection.
+ * @param {Object} props.value    Currently selected border style value.
  *
  * @return {WPElement} Custom border style select control.
  */

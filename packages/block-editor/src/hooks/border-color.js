@@ -36,7 +36,7 @@ const EMPTY_ARRAY = [];
  * inspector controls. If they share the same block attributes it should not
  * matter.
  *
- * @param  {Object} props Block properties.
+ * @param {Object} props Block properties.
  *
  * @return {WPElement} Border color edit element.
  */
@@ -85,7 +85,7 @@ export function BorderColorEdit( props ) {
  * Filters registered block settings, extending attributes to include
  * `borderColor` if needed.
  *
- * @param  {Object} settings Original block settings.
+ * @param {Object} settings Original block settings.
  *
  * @return {Object} Updated block settings.
  */
@@ -114,9 +114,9 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject border color.
  *
- * @param  {Object} props      Additional props applied to save element.
- * @param  {Object} blockType  Block type definition.
- * @param  {Object} attributes Block's attributes.
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type definition.
+ * @param {Object} attributes Block's attributes.
  *
  * @return {Object} Filtered props to apply to save element.
  */
@@ -177,7 +177,7 @@ function addEditProps( settings ) {
  * This adds inline styles for color palette colors.
  * Ideally, this is not needed and themes should load their palettes on the editor.
  *
- * @param  {Function} BlockListBlock Original component.
+ * @param {Function} BlockListBlock Original component.
  *
  * @return {Function} Wrapped component.
  */

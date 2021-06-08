@@ -51,7 +51,7 @@ const htmlSplitRegex = ( () => {
 /**
  * Separate HTML elements and comments from the text.
  *
- * @param  {string} input The text which has to be formatted.
+ * @param {string} input The text which has to be formatted.
  *
  * @return {string[]} The formatted text.
  */
@@ -82,8 +82,8 @@ function htmlSplit( input ) {
 /**
  * Replace characters or phrases within HTML elements only.
  *
- * @param  {string}                haystack     The text which has to be formatted.
- * @param  {Record<string,string>} replacePairs In the form {from: 'to', …}.
+ * @param {string}                haystack     The text which has to be formatted.
+ * @param {Record<string,string>} replacePairs In the form {from: 'to', …}.
  *
  * @return {string} The formatted text.
  */
@@ -125,9 +125,9 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  * replace double line-breaks with HTML paragraph tags. The remaining line-
  * breaks after conversion become `<br />` tags, unless br is set to 'false'.
  *
- * @param  {string}    text The text which has to be formatted.
- * @param  {boolean}   br   Optional. If set, will convert all remaining line-
- *                          breaks after paragraphing. Default true.
+ * @param {string}  text The text which has to be formatted.
+ * @param {boolean} br   Optional. If set, will convert all remaining line-
+ *                       breaks after paragraphing. Default true.
  *
  * @example
  *```js
@@ -330,7 +330,7 @@ export function autop( text, br = true ) {
  * Replaces `<p>` tags with two line breaks except where the `<p>` has attributes.
  * Unifies whitespace. Indents `<li>`, `<dt>` and `<dd>` for better readability.
  *
- * @param  {string} html The content from the editor.
+ * @param {string} html The content from the editor.
  *
  * @example
  * ```js

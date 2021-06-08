@@ -25,8 +25,8 @@ import { STORE_NAME as editWidgetsStoreName } from './constants';
  * Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
  * shouldn't be saved via the API.
  *
- * @param  {string} id Post ID.
- * @param  {Array}  blocks Blocks the post should consist of.
+ * @param {string} id     Post ID.
+ * @param {Array}  blocks Blocks the post should consist of.
  * @return {Object} The post object.
  */
 export const persistStubPost = function* ( id, blocks ) {
@@ -288,8 +288,8 @@ function* trySaveWidgetArea( widgetAreaId ) {
 /**
  * Sets the clientId stored for a particular widgetId.
  *
- * @param  {number} clientId  Client id.
- * @param  {number} widgetId  Widget id.
+ * @param {number} clientId Client id.
+ * @param {number} widgetId Widget id.
  *
  * @return {Object} Action.
  */
@@ -304,7 +304,7 @@ export function setWidgetIdForClientId( clientId, widgetId ) {
 /**
  * Sets the open state of all the widget areas.
  *
- * @param  {Object} widgetAreasOpenState The open states of all the widget areas.
+ * @param {Object} widgetAreasOpenState The open states of all the widget areas.
  *
  * @return {Object} Action.
  */
@@ -318,8 +318,8 @@ export function setWidgetAreasOpenState( widgetAreasOpenState ) {
 /**
  * Sets the open state of the widget area.
  *
- * @param  {string}  clientId   The clientId of the widget area.
- * @param  {boolean} isOpen     Whether the widget area should be opened.
+ * @param {string}  clientId The clientId of the widget area.
+ * @param {boolean} isOpen   Whether the widget area should be opened.
  *
  * @return {Object} Action.
  */

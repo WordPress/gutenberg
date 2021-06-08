@@ -18,7 +18,7 @@ import * as styles from './styles';
 
 /**
  * @param {import('../context').PolymorphicComponentProps<import('./types').CardBodyProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('react').Ref<any>}                                                               forwardedRef
  */
 function CardBody( props, forwardedRef ) {
 	const { className, scrollable = true, ...otherProps } = useContextSystem(

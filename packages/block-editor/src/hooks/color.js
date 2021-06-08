@@ -86,7 +86,7 @@ const hasTextColorSupport = ( blockType ) => {
  * Filters registered block settings, extending attributes to include
  * `backgroundColor` and `textColor` attribute.
  *
- * @param  {Object} settings Original block settings.
+ * @param {Object} settings Original block settings.
  *
  * @return {Object} Filtered block settings.
  */
@@ -125,9 +125,9 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject colors classnames.
  *
- * @param  {Object} props      Additional props applied to save element.
- * @param  {Object} blockType  Block type.
- * @param  {Object} attributes Block attributes.
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  *
  * @return {Object} Filtered props applied to save element.
  */
@@ -176,7 +176,7 @@ export function addSaveProps( props, blockType, attributes ) {
  * Filters registered block settings to extand the block edit wrapper
  * to apply the desired styles and classnames properly.
  *
- * @param  {Object} settings Original block settings.
+ * @param {Object} settings Original block settings.
  *
  * @return {Object} Filtered block settings.
  */
@@ -384,7 +384,7 @@ export function ColorEdit( props ) {
  * This adds inline styles for color palette colors.
  * Ideally, this is not needed and themes should load their palettes on the editor.
  *
- * @param  {Function} BlockListBlock Original component.
+ * @param {Function} BlockListBlock Original component.
  *
  * @return {Function} Wrapped component.
  */

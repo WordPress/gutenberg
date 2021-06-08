@@ -54,7 +54,7 @@ const renderSass = promisify( sass.render );
 /**
  * Get the package name for a specified file
  *
- * @param  {string} file File name.
+ * @param {string} file File name.
  *
  * @return {string} Package name.
  */
@@ -65,8 +65,8 @@ function getPackageName( file ) {
 /**
  * Get Build Path for a specified file.
  *
- * @param  {string} file        File to build.
- * @param  {string} buildFolder Output folder.
+ * @param {string} file        File to build.
+ * @param {string} buildFolder Output folder.
  *
  * @return {string} Build path.
  */

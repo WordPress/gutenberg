@@ -23,7 +23,7 @@ export const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
 /**
  * Inspector control panel containing the font appearance options.
  *
- * @param  {Object} props Block properties.
+ * @param {Object} props Block properties.
  *
  * @return {WPElement} Font appearance edit element.
  */
@@ -71,8 +71,8 @@ export function FontAppearanceEdit( props ) {
  * Checks if font style support has been disabled either by not opting in for
  * support or by failing to provide preset styles.
  *
- * @param  {Object} props      Block properties.
- * @param  {string} props.name Name for the block type.
+ * @param {Object} props      Block properties.
+ * @param {string} props.name Name for the block type.
  *
  * @return {boolean} Whether font style support has been disabled.
  */
@@ -87,8 +87,8 @@ export function useIsFontStyleDisabled( { name: blockName } = {} ) {
  * Checks if font weight support has been disabled either by not opting in for
  * support or by failing to provide preset weights.
  *
- * @param  {Object} props      Block properties.
- * @param  {string} props.name Name for the block type.
+ * @param {Object} props      Block properties.
+ * @param {string} props.name Name for the block type.
  *
  * @return {boolean} Whether font weight support has been disabled.
  */
@@ -102,7 +102,7 @@ export function useIsFontWeightDisabled( { name: blockName } = {} ) {
 /**
  * Checks if font appearance support has been disabled.
  *
- * @param  {Object} props      Block properties.
+ * @param {Object} props Block properties.
  *
  * @return {boolean} Whether font appearance support has been disabled.
  */

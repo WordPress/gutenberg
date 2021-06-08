@@ -19,7 +19,7 @@ import { cleanEmptyObject } from './utils';
 /**
  * Determines if there is padding support.
  *
- * @param  {string|Object} blockType Block name or Block Type object.
+ * @param {string|Object} blockType Block name or Block Type object.
  *
  * @return {boolean} Whether there is support.
  */
@@ -31,7 +31,7 @@ export function hasPaddingSupport( blockType ) {
 /**
  * Custom hook that checks if padding settings have been disabled.
  *
- * @param  {string} name The name of the block.
+ * @param {string} name The name of the block.
  *
  * @return {boolean} Whether padding setting is disabled.
  */

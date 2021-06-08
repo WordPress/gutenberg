@@ -1,8 +1,8 @@
 /**
  * Validate a namespace string.
  *
- * @param  {string} namespace The namespace to validate - should take the form
- *                            `vendor/plugin/function`.
+ * @param {string} namespace The namespace to validate - should take the form
+ *                           `vendor/plugin/function`.
  *
  * @return {boolean} Whether the namespace is valid.
  */

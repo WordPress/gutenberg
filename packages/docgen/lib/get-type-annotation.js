@@ -448,9 +448,9 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 }
 
 /**
- * @param {CommentTag} tag The documented parameter.
- * @param {ASTNode} declarationToken The function the parameter is documented on.
- * @param {number} paramIndex The parameter index.
+ * @param {CommentTag} tag              The documented parameter.
+ * @param {ASTNode}    declarationToken The function the parameter is documented on.
+ * @param {number}     paramIndex       The parameter index.
  * @return {null | string} The parameter's type annotation.
  */
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
@@ -547,8 +547,8 @@ function getVariableTypeAnnotation( declarationToken ) {
 
 module.exports =
 	/**
-	 * @param {CommentTag} tag A comment tag.
-	 * @param {ASTNode} token A function token.
+	 * @param {CommentTag}    tag   A comment tag.
+	 * @param {ASTNode}       token A function token.
 	 * @param {number | null} index The index of the parameter or `null` if not a param tag.
 	 * @return {null | string} The type annotation for the given tag or null if the tag has no type annotation.
 	 */

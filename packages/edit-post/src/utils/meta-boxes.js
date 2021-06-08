@@ -3,7 +3,7 @@
  * whether the meta box area is opened or not.
  * If the MetaBox Area is visible returns it, and returns the original container instead.
  *
- * @param   {string} location Meta Box location.
+ * @param {string} location Meta Box location.
  *
  * @return {string} HTML content.
  */

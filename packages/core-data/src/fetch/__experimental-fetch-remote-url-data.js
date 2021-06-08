@@ -7,7 +7,7 @@ import { addQueryArgs, prependHTTP } from '@wordpress/url';
 /**
  * @typedef WPRemoteUrlData
  *
- * @property {string} title     contents of the remote URL's `<title>` tag.
+ * @property {string} title contents of the remote URL's `<title>` tag.
  */
 
 /**
@@ -15,7 +15,7 @@ import { addQueryArgs, prependHTTP } from '@wordpress/url';
  * eg: <title> tag, favicon...etc.
  *
  * @async
- * @param {string}              url
+ * @param {string} url
  *
  * @example
  * ```js

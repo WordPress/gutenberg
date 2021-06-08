@@ -70,10 +70,10 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @param {string}                 key      Unique namespace identifier.
- * @param {WPDataReduxStoreConfig} options  Registered store options, with properties
- *                                          describing reducer, actions, selectors,
- *                                          and resolvers.
+ * @param {string}                 key     Unique namespace identifier.
+ * @param {WPDataReduxStoreConfig} options Registered store options, with properties
+ *                                         describing reducer, actions, selectors,
+ *                                         and resolvers.
  *
  * @return {WPDataStore} Store Object.
  */
@@ -197,12 +197,12 @@ export default function createReduxStore( key, options ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string}         key      Unique namespace identifier.
- * @param {Object}         options  Registered store options, with properties
- *                                  describing reducer, actions, selectors,
- *                                  and resolvers.
- * @param {WPDataRegistry} registry Registry reference.
- * @param {Object} thunkArgs        Argument object for the thunk middleware.
+ * @param {string}         key       Unique namespace identifier.
+ * @param {Object}         options   Registered store options, with properties
+ *                                   describing reducer, actions, selectors,
+ *                                   and resolvers.
+ * @param {WPDataRegistry} registry  Registry reference.
+ * @param {Object}         thunkArgs Argument object for the thunk middleware.
  * @return {Object} Newly created redux store.
  */
 function instantiateReduxStore( key, options, registry, thunkArgs ) {
@@ -289,8 +289,8 @@ function mapSelectors( selectors, store ) {
 /**
  * Maps actions to dispatch from a given store.
  *
- * @param {Object} actions    Actions to register.
- * @param {Object} store      The redux store to which the actions should be mapped.
+ * @param {Object} actions Actions to register.
+ * @param {Object} store   The redux store to which the actions should be mapped.
  *
  * @return {Object} Actions mapped to the redux store provided.
  */
@@ -434,7 +434,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
  * @param {Object} store        Store reference, for fulfilling via resolvers
  * @param {Object} resolvers    Store Resolvers
  * @param {string} selectorName Selector name to fulfill.
- * @param {Array} args          Selector Arguments.
+ * @param {Array}  args         Selector Arguments.
  */
 async function fulfillResolver( store, resolvers, selectorName, ...args ) {
 	const resolver = get( resolvers, [ selectorName ] );

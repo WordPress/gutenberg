@@ -17,7 +17,7 @@ import * as styles from './styles';
 
 /**
  * @param {import('../context').PolymorphicComponentProps<import('./types').CardFooterProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('react').Ref<any>}                                                                 forwardedRef
  */
 function CardFooter( props, forwardedRef ) {
 	const {

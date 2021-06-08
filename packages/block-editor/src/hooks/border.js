@@ -43,7 +43,7 @@ export const CSS_UNITS = [
 /**
  * Parses a CSS unit from a border CSS value.
  *
- * @param  {string} cssValue CSS value to parse e.g. `10px` or `1.5em`.
+ * @param {string} cssValue CSS value to parse e.g. `10px` or `1.5em`.
  * @return {string}          CSS unit from provided value or default 'px'.
  */
 export function parseUnit( cssValue ) {
@@ -98,8 +98,8 @@ export function BorderPanel( props ) {
 /**
  * Determine whether there is block support for border properties.
  *
- * @param  {string} blockName Block name.
- * @param  {string} feature   Border feature to check support for.
+ * @param {string} blockName Block name.
+ * @param {string} feature   Border feature to check support for.
  *
  * @return {boolean} Whether there is support.
  */
@@ -129,7 +129,7 @@ export function hasBorderSupport( blockName, feature = 'any' ) {
 /**
  * Check whether serialization of border classes and styles should be skipped.
  *
- * @param  {string|Object} blockType Block name or block type object.
+ * @param {string|Object} blockType Block name or block type object.
  *
  * @return {boolean} Whether serialization of border properties should occur.
  */

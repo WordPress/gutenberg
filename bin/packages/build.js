@@ -24,7 +24,7 @@ const stylesheetEntryPoints = glob.sync(
 /**
  * Get the package name for a specified file
  *
- * @param  {string} file File name.
+ * @param {string} file File name.
  *
  * @return {string} Package name.
  */
@@ -35,7 +35,7 @@ function getPackageName( file ) {
 /**
  * Parses all Sass import statements in a given file
  *
- * @param  {string} file File name.
+ * @param {string} file File name.
  *
  * @return {Array} List of Import Statements in a file.
  */
@@ -60,7 +60,7 @@ function isFileImportedInStyleEntry( file, importStatements ) {
  * Finds all stylesheet entry points that contain import statements
  * that include the given file name
  *
- * @param  {string} file File name.
+ * @param {string} file File name.
  *
  * @return {Array} List of entry points that import the styles from the file.
  */
