@@ -1,4 +1,9 @@
-.wp-block-post-template {
+.wp-block-post-template,
+// We have kept `wp-block-query-loop` class as well for backwards
+// compatibility with existing `QueryLoop` blocks that haven't been
+// updated, after the renaming of the block to `Post Template`.
+// See: https://github.com/WordPress/gutenberg/pull/32514.
+.wp-block-query-loop {
 	max-width: 100%;
 	list-style: none;
 	padding: 0;
