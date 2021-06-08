@@ -1,5 +1,9 @@
 # Surface
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 `Surface` is a core component that renders a primary background color.
 
 ## Usage

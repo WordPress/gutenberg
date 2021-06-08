@@ -12,6 +12,7 @@ import {
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
@@ -29,10 +30,21 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const { contentSize, wideSize } = usedLayout;
-	const alignments =
-		contentSize || wideSize
-			? [ 'wide', 'full' ]
-			: [ 'left', 'center', 'right' ];
+	const _layout = useMemo( () => {
+		if ( themeSupportsLayout ) {
+			const alignments =
+				contentSize || wideSize
+					? [ 'wide', 'full' ]
+					: [ 'left', 'center', 'right' ];
+			return {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments,
+			};
+		}
+		return undefined;
+	}, [ themeSupportsLayout, contentSize, wideSize ] );
+
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps(
 		themeSupportsLayout
@@ -43,11 +55,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments: themeSupportsLayout ? alignments : undefined,
-			},
+			__experimentalLayout: _layout,
 		}
 	);
 

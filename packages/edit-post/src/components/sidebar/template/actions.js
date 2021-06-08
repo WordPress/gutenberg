@@ -55,13 +55,13 @@ function PostTemplateActions() {
 			<div className="edit-post-template__actions">
 				{ !! template && (
 					<Button
-						isLink
+						variant="link"
 						onClick={ () => __unstableSwitchToTemplateMode() }
 					>
 						{ __( 'Edit' ) }
 					</Button>
 				) }
-				<Button isLink onClick={ () => setIsModalOpen( true ) }>
+				<Button variant="link" onClick={ () => setIsModalOpen( true ) }>
 					{ __( 'New' ) }
 				</Button>
 			</div>
@@ -84,7 +84,9 @@ function PostTemplateActions() {
 								createBlock( 'core/site-tagline' ),
 								createBlock( 'core/separator' ),
 								createBlock( 'core/post-title' ),
-								createBlock( 'core/post-content' ),
+								createBlock( 'core/post-content', {
+									layout: { inherit: true },
+								} ),
 							];
 							__unstableSwitchToTemplateMode( {
 								slug:
@@ -107,7 +109,7 @@ function PostTemplateActions() {
 						>
 							<FlexItem>
 								<Button
-									isSecondary
+									variant="secondary"
 									onClick={ () => {
 										setIsModalOpen( false );
 										setTitle( '' );
@@ -117,7 +119,7 @@ function PostTemplateActions() {
 								</Button>
 							</FlexItem>
 							<FlexItem>
-								<Button isPrimary type="submit">
+								<Button variant="primary" type="submit">
 									{ __( 'Create' ) }
 								</Button>
 							</FlexItem>

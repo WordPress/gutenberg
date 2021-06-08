@@ -89,7 +89,7 @@ export function processingQueue( state, action ) {
  *
  * @return {Object} Updated state.
  */
-export function selectedMenuId( state = 0, action ) {
+export function selectedMenuId( state = null, action ) {
 	switch ( action.type ) {
 		case 'SET_SELECTED_MENU_ID':
 			return action.menuId;

@@ -10,6 +10,19 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Gallery block - Fix gallery images caption text formatting [#32351]
+-   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]
+-   [***] Audio block now available on WP.com sites on the free plan. [#31966]
+
+## 1.54.0
+-   [***] Slash inserter [#29772]
+-   [*] Audio block: Add Insert from URL functionality. [#27817]
+-   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
+-   [***] Enable reusable block only in WP.com sites [#31744]
+
+## 1.53.1
+
+-   [*] Fix missing title for some unsupported blocks [#31743]
 
 ## 1.53.0
 
@@ -17,19 +30,6 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fixes color picker rendering bug when scrolling [#30994]
 -   [*] Add enableCaching param to fetch request on Android [#31186]
 -   [***] Add reusable blocks to the inserter menu. [#28495]
--   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
-
-
-## 1.52.2
-
--   [*] Disabled featured image banner on iOS. [#31681]
--   [*] Fix missing title for some unsupported blocks [#31743]
-
-## 1.52.1
-
--   [*] Fixes for the generated localized strings files.
-
-## 1.52.0
 
 ## 1.52.2
 
@@ -58,10 +58,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.50.1
 
--   [x] Truncate rangecell screenreader decimals] [#30678]
--   [x] Fix Quote block citation [#30548]
--   [xx] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
--   [xx] Fix Unsupported Block Editor on Android [#30650]
+-   [*] Truncate rangecell screenreader decimals] [#30678]
+-   [*] Fix Quote block citation [#30548]
+-   [**] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
+-   [**] Fix Unsupported Block Editor on Android [#30650]
 
 ## 1.50.0
 

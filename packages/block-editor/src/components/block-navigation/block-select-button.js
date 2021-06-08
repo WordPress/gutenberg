@@ -15,7 +15,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import Indentation from './indentation';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { getBlockPositionDescription } from './utils';
 import BlockTitle from '../block-title';
@@ -62,7 +61,6 @@ function BlockNavigationBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 			>
-				<Indentation level={ level } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
 				<BlockTitle clientId={ clientId } />
 				{ blockInformation?.anchor && (

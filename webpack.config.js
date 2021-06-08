@@ -135,16 +135,19 @@ module.exports = {
 	entry: createEntrypoints(),
 	output: {
 		devtoolNamespace: 'wp',
-		filename: ( data ) => {
-			const { chunk } = data;
+		filename: ( pathData ) => {
+			const { chunk } = pathData;
 			const { entryModule } = chunk;
-			const { rawRequest } = entryModule;
+			const { rawRequest, rootModule } = entryModule;
 
-			/*
-			 * If the file being built is a Core Block's frontend file,
-			 * we build it in the block's directory.
-			 */
-			if ( rawRequest && rawRequest.includes( '/frontend.js' ) ) {
+			// When processing ESM files, the requested path
+			// is defined in `entryModule.rootModule.rawRequest`, instead of
+			// being present in `entryModule.rawRequest`.
+			// In the context of frontend files, they would be processed
+			// as ESM if they use `import` or `export` within it.
+			const request = rootModule?.rawRequest || rawRequest;
+
+			if ( request.includes( '/frontend.js' ) ) {
 				return `./build/block-library/blocks/[name]/frontend.js`;
 			}
 
@@ -174,13 +177,6 @@ module.exports = {
 					process.env.npm_package_config_GUTENBERG_PHASE,
 					10
 				) || 1
-			),
-			// Inject the `COMPONENT_SYSTEM_PHASE` global, used for controlling Component System roll-out.
-			'process.env.COMPONENT_SYSTEM_PHASE': JSON.stringify(
-				parseInt(
-					process.env.npm_package_config_COMPONENT_SYSTEM_PHASE,
-					10
-				) || 0
 			),
 			'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
 				process.env.FORCE_REDUCED_MOTION

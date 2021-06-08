@@ -8,21 +8,19 @@ Render a ImageSizeControl.
 
 ```jsx
 import { __experimentalImageSizeControl as ImageSizeControl } from '@wordpress/block-editor';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyImageSizeControl = withState( {
-	width: null,
-	height: null,
-} )( ( { width, height, setState } ) => {
+const MyImageSizeControl = () => {
+	const [ size, setSize ] = useState( { width: null, height: null } );
 	// In this example, we have one image with a fixed size of 600x600.
 	const imageWidth = 600;
 	const imageHeight = 600;
 
 	return (
 		<ImageSizeControl
-			onChange={ ( value ) => setState( value ) }
-			width={ width }
-			height={ height }
+			onChange={ ( value ) => setSize( value ) }
+			width={ size.width }
+			height={ size.height }
 			imageWidth={ imageWidth }
 			imageHeight={ imageHeight }
 		/>

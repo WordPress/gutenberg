@@ -24,35 +24,6 @@ function gutenberg_add_template_loader_filters() {
 add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
 
 /**
- * Get the template hierarchy for a given template type.
- *
- * Internally, this filters into the "{$type}_template_hierarchy" hook to record the type-specific template hierarchy.
- *
- * @param string $template_type A template type.
- * @return string[] A list of template candidates, in descending order of priority.
- */
-function get_template_hierarchy( $template_type ) {
-	if ( ! in_array( $template_type, gutenberg_get_template_type_slugs(), true ) ) {
-		return array();
-	}
-
-	$get_template_function     = 'get_' . str_replace( '-', '_', $template_type ) . '_template'; // front-page -> get_front_page_template.
-	$template_hierarchy_filter = str_replace( '-', '', $template_type ) . '_template_hierarchy'; // front-page -> frontpage_template_hierarchy.
-
-	$result                             = array();
-	$template_hierarchy_filter_function = function( $templates ) use ( &$result ) {
-		$result = $templates;
-		return $templates;
-	};
-
-	add_filter( $template_hierarchy_filter, $template_hierarchy_filter_function, 20, 1 );
-	call_user_func( $get_template_function ); // This invokes template_hierarchy_filter.
-	remove_filter( $template_hierarchy_filter, $template_hierarchy_filter_function, 20 );
-
-	return $result;
-}
-
-/**
  * Filters into the "{$type}_template" hooks to redirect them to the Full Site Editing template canvas.
  *
  * Internally, this communicates the block content that needs to be used by the template canvas through a global variable.

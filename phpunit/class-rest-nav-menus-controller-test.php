@@ -197,8 +197,8 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->register_nav_menu_locations( array( 'primary' ) );
 		set_theme_mod( 'nav_menu_locations', array( 'primary' => $nav_menu_id ) );
 
-		$request     = new WP_REST_Request( 'GET', '/__experimental/menus/' . $nav_menu_id );
-		$response    = rest_get_server()->dispatch( $request );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/menus/' . $nav_menu_id );
+		$response = rest_get_server()->dispatch( $request );
 		$this->check_get_taxonomy_term_response( $response, $nav_menu_id );
 	}
 

@@ -31,7 +31,11 @@ function useDarkThemeBodyClassName( styles ) {
 				.getComputedStyle( canvas, null )
 				.getPropertyValue( 'background-color' );
 
-			if ( tinycolor( backgroundColor ).getLuminance() > 0.5 ) {
+			// If background is transparent, it should be treated as light color.
+			if (
+				tinycolor( backgroundColor ).getLuminance() > 0.5 ||
+				tinycolor( backgroundColor ).getAlpha() === 0
+			) {
 				body.classList.remove( 'is-dark-theme' );
 			} else {
 				body.classList.add( 'is-dark-theme' );

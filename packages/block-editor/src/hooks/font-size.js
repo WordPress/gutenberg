@@ -18,7 +18,7 @@ import {
 import { cleanEmptyObject } from './utils';
 import useSetting from '../components/use-setting';
 
-export const FONT_SIZE_SUPPORT_KEY = 'fontSize';
+export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -58,7 +58,10 @@ function addSaveProps( props, blockType, attributes ) {
 	}
 
 	if (
-		hasBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
+		hasBlockSupport(
+			blockType,
+			'typography.__experimentalSkipSerialization'
+		)
 	) {
 		return props;
 	}
@@ -182,7 +185,7 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
 			hasBlockSupport(
 				blockName,
-				'__experimentalSkipFontSizeSerialization'
+				'typography.__experimentalSkipSerialization'
 			) ||
 			! fontSize ||
 			style?.typography?.fontSize
