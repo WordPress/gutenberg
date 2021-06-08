@@ -1,6 +1,18 @@
 $block-editor-link-control-number-of-actions: 1;
 $preview-image-height: 140px;
 
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
 .block-editor-link-control {
 	position: relative;
 	min-width: $modal-min-width;
@@ -235,8 +247,29 @@ $preview-image-height: 140px;
 	.block-editor-link-control__search-item-description {
 		padding-top: 12px;
 		margin: 0;
-		font-size: 0.9em;
 
+		&.is-placeholder {
+			margin-top: 12px;
+			padding-top: 0;
+			height: 28px;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
+
+			&::before,
+			&::after {
+				display: block;
+				content: "";
+				height: 0.7em;
+				width: 100%;
+				background-color: $gray-100;
+				border-radius: 3px;
+			}
+		}
+
+		.components-text {
+			font-size: 0.9em;
+		}
 	}
 
 	.block-editor-link-control__search-item-image {
@@ -249,6 +282,11 @@ $preview-image-height: 140px;
 		overflow: hidden;
 		border-radius: 2px;
 		margin-top: 12px;
+
+		&.is-placeholder {
+			background-color: $gray-100;
+			border-radius: 3px;
+		}
 
 		img {
 			display: block; // remove unwanted space below image
@@ -271,10 +309,21 @@ $preview-image-height: 140px;
 	width: 100%;
 }
 
+
 .block-editor-link-control__search-item.is-fetching {
 
-	.block-editor-link-control__search-item-bottom {
-		opacity: 0;
+	.block-editor-link-control__search-item-description {
+		&::before,
+		&::after {
+			animation: loadingpulse 1s linear infinite;
+			animation-delay: 0.5s; // avoid animating for fast network responses
+		}
+
+	}
+
+	.block-editor-link-control__search-item-image {
+		animation: loadingpulse 1s linear infinite;
+		animation-delay: 0.5s; // avoid animating for fast network responses
 	}
 
 	.block-editor-link-control__search-item-icon {
@@ -286,7 +335,7 @@ $preview-image-height: 140px;
 		&::before {
 			content: "";
 			display: block;
-			background-color: #999;
+			background-color: $gray-100;
 			position: absolute;
 			top: 0;
 			left: 0;
@@ -294,18 +343,7 @@ $preview-image-height: 140px;
 			bottom: 0;
 			border-radius: 100%;
 			animation: loadingpulse 1s linear infinite;
-		}
-	}
-
-	@keyframes loadingpulse {
-		0% {
-			opacity: 1;
-		}
-		50% {
-			opacity: 0;
-		}
-		100% {
-			opacity: 1;
+			animation-delay: 0.5s; // avoid animating for fast network responses
 		}
 	}
 }
