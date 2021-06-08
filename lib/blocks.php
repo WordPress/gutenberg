@@ -512,3 +512,43 @@ function gutenberg_migrate_old_typography_shape( $metadata ) {
 if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
 	add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
 }
+
+/**
+ * Allow multiple block styles.
+ *
+ * @param array $metadata Metadata for registering a block type.
+ *
+ * @return array
+ */
+function gutenberg_multiple_block_styles( $metadata ) {
+	foreach ( array( 'style', 'editorStyle' ) as $key ) {
+		if ( isset( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
+
+			// Enqueue multiple styles on block render.
+			add_filter(
+				"render_block_{$metadata['name']}",
+				/**
+				 * Filters the content of a single block.
+				 *
+				 * @since 5.0.0
+				 *
+				 * @param string $block_content The block content about to be appended.
+				 * @param array  $block         The full block, including name and attributes.
+				 */
+				function( $block_content, $block ) use ( $metadata, $key ) {
+					foreach ( $metadata[ $key ] as $handle ) {
+						wp_enqueue_style( $handle );
+					}
+					return $block_content;
+				},
+				10,
+				2
+			);
+
+			// Only return the 1st item in the array.
+			$metadata[ $key ] = $metadata[ $key ][0];
+		}
+	}
+	return $metadata;
+}
+add_filter( 'block_type_metadata', 'gutenberg_multiple_block_styles' );
