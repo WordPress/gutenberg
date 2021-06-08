@@ -1140,6 +1140,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Surface",
+		"slug": "surface",
+		"markdown_source": "../packages/components/src/surface/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TabPanel",
 		"slug": "tab-panel",
 		"markdown_source": "../packages/components/src/tab-panel/README.md",

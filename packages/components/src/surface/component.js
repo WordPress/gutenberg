@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../utils';
+import { createComponent } from '../ui/utils';
 import { useSurface } from './hook';
 
 /**
@@ -10,7 +10,10 @@ import { useSurface } from './hook';
  * In the example below, notice how the `Surface` renders in white (or dark gray if in dark mode).
  *
  * ```jsx
- * import { Surface, Text } from `@wordpress/components/ui`;
+ * import {
+ *	__experimentalSurface as Surface,
+ *	__experimentalText as Text,
+ * } from '@wordpress/components';
  *
  * function Example() {
  * 	return (
