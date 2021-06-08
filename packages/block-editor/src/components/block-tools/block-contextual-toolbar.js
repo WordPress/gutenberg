@@ -17,7 +17,13 @@ import NavigableToolbar from '../navigable-toolbar';
 import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 
-function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
+function BlockContextualToolbar( {
+	focusOnMount,
+	isFixed,
+	__experimentalStickyTop,
+	style = {},
+	...props
+} ) {
 	const { blockType, hasParents, showParentSelector } = useSelect(
 		( select ) => {
 			const {
@@ -59,12 +65,17 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 		'is-fixed': isFixed,
 	} );
 
+	if ( __experimentalStickyTop ) {
+		style.top = __experimentalStickyTop;
+	}
+
 	return (
 		<NavigableToolbar
 			focusOnMount={ focusOnMount }
 			className={ classes }
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
+			style={ style }
 			{ ...props }
 		>
 			<BlockToolbar hideDragHandle={ isFixed } />

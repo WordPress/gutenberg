@@ -7,8 +7,9 @@ import { filter } from 'lodash';
  * WordPress dependencies
  */
 import { NoticeList, SnackbarList } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useResizeObserver } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -16,7 +17,17 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import TemplateValidationNotice from '../template-validation-notice';
 
-export function EditorNotices( { notices, onRemove } ) {
+export default function EditorNotices( { onResize } ) {
+	const notices = useSelect( ( select ) => {
+		return select( noticesStore ).getNotices();
+	}, [] );
+	const { removeNotice: onRemove } = useDispatch( noticesStore );
+
+	const [ resizeListener, size ] = useResizeObserver();
+	useEffect( () => {
+		onResize?.( size );
+	}, [ size.width, size.height ] );
+
 	const dismissibleNotices = filter( notices, {
 		isDismissible: true,
 		type: 'default',
@@ -40,6 +51,7 @@ export function EditorNotices( { notices, onRemove } ) {
 				className="components-editor-notices__dismissible"
 				onRemove={ onRemove }
 			>
+				{ resizeListener }
 				<TemplateValidationNotice />
 			</NoticeList>
 			<SnackbarList
@@ -50,12 +62,3 @@ export function EditorNotices( { notices, onRemove } ) {
 		</>
 	);
 }
-
-export default compose( [
-	withSelect( ( select ) => ( {
-		notices: select( noticesStore ).getNotices(),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( noticesStore ).removeNotice,
-	} ) ),
-] )( EditorNotices );

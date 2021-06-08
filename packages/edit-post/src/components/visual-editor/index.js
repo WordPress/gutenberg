@@ -80,7 +80,7 @@ function MaybeIframe( {
 	);
 }
 
-export default function VisualEditor( { styles } ) {
+export default function VisualEditor( { styles, __experimentalStickyTop } ) {
 	const {
 		deviceType,
 		isTemplateMode,
@@ -196,7 +196,10 @@ export default function VisualEditor( { styles } ) {
 			} ) }
 		>
 			<VisualEditorGlobalKeyboardShortcuts />
-			<BlockTools __unstableContentRef={ ref }>
+			<BlockTools
+				__experimentalStickyTop={ __experimentalStickyTop }
+				__unstableContentRef={ ref }
+			>
 				<motion.div
 					className="edit-post-visual-editor__content-area"
 					animate={ {
