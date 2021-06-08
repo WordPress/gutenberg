@@ -10,11 +10,13 @@ import { __ } from '@wordpress/i18n';
 import { Button, SelectControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import PostFormatCheck from './check';
+import { store as editorStore } from '../../store';
 
 // All WP post formats, sorted alphabetically by translated name.
 export const POST_FORMATS = [
@@ -48,10 +50,10 @@ export default function PostFormat() {
 	const { postFormat, suggestedFormat, supportedFormats } = useSelect(
 		( select ) => {
 			const { getEditedPostAttribute, getSuggestedPostFormat } = select(
-				'core/editor'
+				editorStore
 			);
 			const _postFormat = getEditedPostAttribute( 'format' );
-			const themeSupports = select( 'core' ).getThemeSupports();
+			const themeSupports = select( coreStore ).getThemeSupports();
 			return {
 				postFormat: _postFormat ?? 'standard',
 				suggestedFormat: getSuggestedPostFormat(),
@@ -74,7 +76,7 @@ export default function PostFormat() {
 		( format ) => format.id === suggestedFormat
 	);
 
-	const { editPost } = useDispatch( 'core/editor' );
+	const { editPost } = useDispatch( editorStore );
 
 	const onUpdatePostFormat = ( format ) => editPost( { format } );
 
@@ -100,7 +102,7 @@ export default function PostFormat() {
 					<div className="editor-post-format__suggestion">
 						{ __( 'Suggestion:' ) }{ ' ' }
 						<Button
-							isLink
+							variant="link"
 							onClick={ () =>
 								onUpdatePostFormat( suggestion.id )
 							}

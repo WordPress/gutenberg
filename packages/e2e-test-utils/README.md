@@ -181,6 +181,10 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="deleteAllWidgets" href="#deleteAllWidgets">#</a> **deleteAllWidgets**
+
+Delete all the widgets in the widgets screen.
+
 <a name="deleteTheme" href="#deleteTheme">#</a> **deleteTheme**
 
 Deletes a theme from the site, activating another theme if necessary.

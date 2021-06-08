@@ -64,16 +64,22 @@ export async function initializeEditor( { initialHtml } ) {
 export * from '@testing-library/react-native';
 
 // Custom implementation of the waitFor utility to prevent the issue: https://git.io/JYYGE
-export function waitFor( cb, timeout = 150 ) {
+export function waitFor(
+	cb,
+	{ timeout, interval } = { timeout: 1000, interval: 50 }
+) {
 	let result;
-	const check = ( resolve, reject, times = 0 ) => {
+	const check = ( resolve, reject, time = 0 ) => {
 		try {
 			result = cb();
 		} catch ( e ) {
 			//NOOP
 		}
-		if ( ! result && times < 5 ) {
-			setTimeout( () => check( resolve, reject, times + 1 ), timeout );
+		if ( ! result && time < timeout ) {
+			setTimeout(
+				() => check( resolve, reject, time + interval ),
+				interval
+			);
 			return;
 		}
 		resolve( result );
@@ -83,7 +89,9 @@ export function waitFor( cb, timeout = 150 ) {
 			() => new Promise( ( internalResolve ) => check( internalResolve ) )
 		).then( () => {
 			if ( ! result ) {
-				reject( `waitFor timed out for callback:\n${ cb }` );
+				reject(
+					`waitFor timed out after ${ timeout }ms for callback:\n${ cb }`
+				);
 				return;
 			}
 			resolve( result );

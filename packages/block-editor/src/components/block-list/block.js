@@ -161,6 +161,7 @@ function BlockListBlock( {
 		clientId,
 		className,
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
+		isAligned,
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 

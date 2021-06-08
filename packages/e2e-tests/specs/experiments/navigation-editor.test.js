@@ -3,6 +3,7 @@
  */
 import {
 	createJSONResponse,
+	pressKeyTimes,
 	pressKeyWithModifier,
 	setUpResponseMocking,
 	visitAdminPage,
@@ -82,6 +83,11 @@ const REST_SEARCH_ROUTES = [
 	`rest_route=${ encodeURIComponent( '/wp/v2/search' ) }`,
 ];
 
+const REST_PAGES_ROUTES = [
+	'/wp/v2/pages',
+	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
+];
+
 /**
  * Determines if a given URL matches any of a given collection of
  * routes (expressed as substrings).
@@ -134,6 +140,10 @@ function getSearchMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_SEARCH_ROUTES, responsesByMethod );
 }
 
+function getPagesMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod );
+}
+
 async function visitNavigationEditor() {
 	const query = addQueryArgs( '', {
 		page: 'gutenberg-navigation',
@@ -183,6 +193,7 @@ describe( 'Navigation editor', () => {
 				POST: menuPostResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
+			...getPagesMocks( { GET: [ {} ] } ), // mock a single page
 		] );
 
 		await page.keyboard.type( 'Main Menu' );
@@ -384,10 +395,9 @@ describe( 'Navigation editor', () => {
 
 	describe( 'Menu name editor', () => {
 		const initialMenuName = 'Main Menu';
-		const navigationNameEditorSelector =
-			'.edit-navigation-name-editor__text-control';
-		const inputSelector = `${ navigationNameEditorSelector } input`;
-		let navigatorNameEditor, input;
+		const nameEditorSelector = '.edit-navigation-name-editor__text-control';
+		const inputSelector = `${ nameEditorSelector } input`;
+
 		beforeEach( async () => {
 			const menuPostResponse = {
 				id: 4,
@@ -408,8 +418,8 @@ describe( 'Navigation editor', () => {
 
 			await visitNavigationEditor();
 
-			navigatorNameEditor = await page.$( navigationNameEditorSelector );
-			input = await page.$( inputSelector );
+			// Wait for the navigation setting sidebar.
+			await page.waitForSelector( '.edit-navigation-sidebar' );
 		} );
 
 		afterEach( async () => {
@@ -417,10 +427,11 @@ describe( 'Navigation editor', () => {
 		} );
 
 		it( 'is displayed in inspector additions', async () => {
-			expect( navigatorNameEditor ).toBeDefined();
+			const nameControl = await page.$( nameEditorSelector );
+			expect( nameControl ).toBeDefined();
 		} );
 
-		it.skip( 'saves menu name upon clicking save button', async () => {
+		it( 'saves menu name upon clicking save button', async () => {
 			const newName = 'newName';
 			const menuPostResponse = {
 				id: 4,
@@ -439,17 +450,10 @@ describe( 'Navigation editor', () => {
 				...getMenuItemMocks( { GET: [] } ),
 			] );
 
-			await input.focus();
-
-			// clear input
-			const oldName = await page.$eval(
-				inputSelector,
-				( el ) => el.value
-			);
-			for ( let i = 0; i < oldName.length; i++ ) {
-				await page.keyboard.press( 'Backspace' );
-			}
-			await input.type( newName );
+			// Ensure there is focus.
+			await page.focus( inputSelector );
+			await pressKeyTimes( 'Backspace', initialMenuName.length );
+			await page.keyboard.type( newName );
 
 			const saveButton = await page.$(
 				'.edit-navigation-toolbar__save-button'
@@ -483,14 +487,11 @@ describe( 'Navigation editor', () => {
 				} ),
 				...getMenuItemMocks( { GET: [] } ),
 			] );
-			await input.focus();
-			const oldName = await page.$eval(
-				inputSelector,
-				( el ) => el.value
-			);
-			for ( let i = 0; i < oldName.length; i++ ) {
-				await page.keyboard.press( 'Backspace' );
-			}
+
+			// Ensure there is focus.
+			await page.focus( inputSelector );
+			await pressKeyTimes( 'Backspace', initialMenuName.length );
+
 			const saveButton = await page.$(
 				'.edit-navigation-toolbar__save-button'
 			);
@@ -503,7 +504,9 @@ describe( 'Navigation editor', () => {
 			const headerSubtitleText = await headerSubtitle.evaluate(
 				( element ) => element.innerText
 			);
-			expect( headerSubtitleText ).toBe( `Editing: ${ oldName }` );
+			expect( headerSubtitleText ).toBe(
+				`Editing: ${ initialMenuName }`
+			);
 		} );
 	} );
 
@@ -554,7 +557,7 @@ describe( 'Navigation editor', () => {
 		}
 
 		it.skip( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
-			assertIsDirty( false );
+			await assertIsDirty( false );
 		} );
 
 		it.skip( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
@@ -563,7 +566,7 @@ describe( 'Navigation editor', () => {
 				' Menu'
 			);
 
-			assertIsDirty( true );
+			await assertIsDirty( true );
 		} );
 	} );
 } );

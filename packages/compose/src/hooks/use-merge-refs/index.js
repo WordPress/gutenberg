@@ -3,33 +3,77 @@
  */
 import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
 
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
-/** @typedef {import('@wordpress/element').RefCallback} RefCallback */
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @template T
+ * @typedef {T extends import('react').Ref<infer R> ? R : never} TypeFromRef
+ */
+/* eslint-enable jsdoc/valid-types */
 
+/**
+ * @template T
+ * @param {import('react').Ref<T>} ref
+ * @param {T} value
+ */
 function assignRef( ref, value ) {
 	if ( typeof ref === 'function' ) {
 		ref( value );
 	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
-		ref.current = value;
+		/* eslint-disable jsdoc/no-undefined-types */
+		/** @type {import('react').MutableRefObject<T>} */ ( ref ).current = value;
+		/* eslint-enable jsdoc/no-undefined-types */
 	}
 }
 
 /**
- * Merges refs into one ref callback. Ensures the merged ref callbacks are only
- * called when it changes (as a result of a `useCallback` dependency update) or
- * when the ref value changes. If you don't wish a ref callback to be called on
- * every render, wrap it with `useCallback( ref, [] )`.
- * Dependencies can be added, but when a dependency changes, the old ref
- * callback will be called with `null` and the new ref callback will be called
- * with the same node.
+ * Merges refs into one ref callback.
  *
- * @param {Array<RefObject|RefCallback>} refs The refs to be merged.
+ * It also ensures that the merged ref callbacks are only called when they
+ * change (as a result of a `useCallback` dependency update) OR when the ref
+ * value changes, just as React does when passing a single ref callback to the
+ * component.
  *
- * @return {RefCallback} The merged ref callback.
+ * As expected, if you pass a new function on every render, the ref callback
+ * will be called after every render.
+ *
+ * If you don't wish a ref callback to be called after every render, wrap it
+ * with `useCallback( callback, dependencies )`. When a dependency changes, the
+ * old ref callback will be called with `null` and the new ref callback will be
+ * called with the same value.
+ *
+ * To make ref callbacks easier to use, you can also pass the result of
+ * `useRefEffect`, which makes cleanup easier by allowing you to return a
+ * cleanup function instead of handling `null`.
+ *
+ * It's also possible to _disable_ a ref (and its behaviour) by simply not
+ * passing the ref.
+ *
+ * ```jsx
+ * const ref = useRefEffect( ( node ) => {
+ *   node.addEventListener( ... );
+ *   return () => {
+ *     node.removeEventListener( ... );
+ *   };
+ * }, [ ...dependencies ] );
+ * const otherRef = useRef();
+ * const mergedRefs useMergeRefs( [
+ *   enabled && ref,
+ *   otherRef,
+ * ] );
+ * return <div ref={ mergedRefs } />;
+ * ```
+ *
+ * @template {import('react').Ref<any>} TRef
+ * @param {Array<TRef>} refs The refs to be merged.
+ *
+ * @return {import('react').RefCallback<TypeFromRef<TRef>>} The merged ref callback.
  */
 export default function useMergeRefs( refs ) {
 	const element = useRef();
 	const didElementChange = useRef( false );
+	/* eslint-disable jsdoc/no-undefined-types */
+	/** @type {import('react').MutableRefObject<TRef[]>} */
+	/* eslint-enable jsdoc/no-undefined-types */
 	const previousRefs = useRef( [] );
 	const currentRefs = useRef( refs );
 

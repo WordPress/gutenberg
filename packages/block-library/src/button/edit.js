@@ -49,7 +49,11 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 						<Button
 							key={ widthValue }
 							isSmall
-							isPrimary={ widthValue === selectedWidth }
+							variant={
+								widthValue === selectedWidth
+									? 'primary'
+									: undefined
+							}
 							onClick={ () => handleChange( widthValue ) }
 						>
 							{ widthValue }%
@@ -221,9 +225,7 @@ function ButtonEdit( props ) {
 						}
 					) }
 					style={ {
-						borderRadius: borderRadius
-							? borderRadius + 'px'
-							: undefined,
+						borderRadius: borderRadius ? borderRadius : undefined,
 						...colorProps.style,
 					} }
 					onSplit={ ( value ) =>

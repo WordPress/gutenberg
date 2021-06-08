@@ -21,6 +21,7 @@ export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
 export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
+export { default as Tooltip } from './tooltip';
 export { default as Icon } from './icon';
 export { default as Spinner } from './spinner';
 export {
@@ -65,6 +66,11 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
 export * from './text';
 
 // Mobile Components
+export {
+	__unstableAutocompletionItemsFill,
+	__unstableAutocompletionItemsSlot,
+} from './mobile/autocompletion-items';
+export { default as Autocomplete } from './autocomplete';
 export { default as BottomSheet } from './mobile/bottom-sheet';
 export {
 	BottomSheetConsumer,

@@ -18,7 +18,7 @@ import { VIEWMODES } from './constants';
 const Actions = ( { onStartBlank, onBlockPatternSelect } ) => (
 	<div className="block-editor-block-pattern-setup__actions">
 		<Button onClick={ onStartBlank }>{ __( 'Start blank' ) }</Button>
-		<Button isPrimary onClick={ onBlockPatternSelect }>
+		<Button variant="primary" onClick={ onBlockPatternSelect }>
 			{ __( 'Choose' ) }
 		</Button>
 	</div>

@@ -10,6 +10,11 @@ import { select } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
 
 /**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+/**
  * Upload a media file when the file upload button is activated.
  * Wrapper around mediaUpload() that injects the current post ID.
  *
@@ -29,7 +34,7 @@ export default function mediaUpload( {
 	onError = noop,
 	onFileChange,
 } ) {
-	const { getCurrentPostId, getEditorSettings } = select( 'core/editor' );
+	const { getCurrentPostId, getEditorSettings } = select( editorStore );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;

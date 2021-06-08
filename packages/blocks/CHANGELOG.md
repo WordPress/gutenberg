@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.1.0 (2021-05-20)
+
 ### New API
 
 -   `registerBlockType` method can be used to register a block type using the metadata loaded from `block.json` file ([#32030](https://github.com/WordPress/gutenberg/pull/32030)).

@@ -4,6 +4,12 @@
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 /**
  * AutosaveMonitor invokes `props.autosave()` within at most `interval` seconds after an unsaved change is detected.
@@ -82,14 +88,14 @@ export class AutosaveMonitor extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getReferenceByDistinctEdits } = select( 'core' );
+		const { getReferenceByDistinctEdits } = select( coreStore );
 
 		const {
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
 			isAutosavingPost,
 			getEditorSettings,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 
 		const { interval = getEditorSettings().autosaveInterval } = ownProps;
 
@@ -103,7 +109,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		autosave() {
-			const { autosave = dispatch( 'core/editor' ).autosave } = ownProps;
+			const { autosave = dispatch( editorStore ).autosave } = ownProps;
 			autosave();
 		},
 	} ) ),

@@ -10,6 +10,11 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import { CORE_STORE_NAME as coreStoreName } from './utils/constants';
+
 const EMPTY_ARRAY = [];
 
 /**
@@ -91,7 +96,9 @@ export function useEntityProp( kind, type, prop, _id ) {
 
 	const { value, fullValue } = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
+			const { getEntityRecord, getEditedEntityRecord } = select(
+				coreStoreName
+			);
 			const entity = getEntityRecord( kind, type, id ); // Trigger resolver.
 			const editedEntity = getEditedEntityRecord( kind, type, id );
 			return entity && editedEntity
@@ -103,7 +110,7 @@ export function useEntityProp( kind, type, prop, _id ) {
 		},
 		[ kind, type, id, prop ]
 	);
-	const { editEntityRecord } = useDispatch( 'core' );
+	const { editEntityRecord } = useDispatch( coreStoreName );
 	const setValue = useCallback(
 		( newValue ) => {
 			editEntityRecord( kind, type, id, {
@@ -139,7 +146,7 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 	const id = _id ?? providerId;
 	const { content, blocks } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord } = select( 'core' );
+			const { getEditedEntityRecord } = select( coreStoreName );
 			const editedEntity = getEditedEntityRecord( kind, type, id );
 			return {
 				blocks: editedEntity.blocks,
@@ -149,7 +156,7 @@ export function useEntityBlockEditor( kind, type, { id: _id } = {} ) {
 		[ kind, type, id ]
 	);
 	const { __unstableCreateUndoLevel, editEntityRecord } = useDispatch(
-		'core'
+		coreStoreName
 	);
 
 	useEffect( () => {

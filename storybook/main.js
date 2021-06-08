@@ -5,9 +5,7 @@ const stories = [
 	'../packages/icons/src/**/stories/*.js',
 ].filter( Boolean );
 
-const customEnvVariables = {
-	COMPONENT_SYSTEM_PHASE: 1,
-};
+const customEnvVariables = {};
 
 module.exports = {
 	stories,

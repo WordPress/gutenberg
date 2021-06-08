@@ -69,9 +69,6 @@ export default function Layout( { blockEditorSettings } ) {
 		isMenuBeingDeleted,
 		selectMenu,
 		deleteMenu,
-		openManageLocationsModal,
-		closeManageLocationsModal,
-		isManageLocationsModalOpen,
 		isMenuSelected,
 	} = useNavigationEditor();
 
@@ -97,7 +94,7 @@ export default function Layout( { blockEditorSettings } ) {
 	useMenuNotifications( selectedMenuId );
 
 	const hasMenus = !! menus?.length;
-	const hasPermanentSidebar = isLargeViewport && hasMenus;
+	const hasPermanentSidebar = isLargeViewport && isMenuSelected;
 
 	const isBlockEditorReady = !! (
 		hasMenus &&
@@ -163,19 +160,19 @@ export default function Layout( { blockEditorSettings } ) {
 											/>
 										) }
 									{ isBlockEditorReady && (
-										<BlockTools>
-											<div
-												className="edit-navigation-layout__content-area"
-												ref={ contentAreaRef }
-											>
+										<div
+											className="edit-navigation-layout__content-area"
+											ref={ contentAreaRef }
+										>
+											<BlockTools>
 												<Editor
 													isPending={
 														! hasLoadedMenus
 													}
 													blocks={ blocks }
 												/>
-											</div>
-										</BlockTools>
+											</BlockTools>
+										</div>
 									) }
 								</>
 							}
@@ -186,23 +183,16 @@ export default function Layout( { blockEditorSettings } ) {
 								)
 							}
 						/>
-						<Sidebar
-							onSelectMenu={ selectMenu }
-							menus={ menus }
-							menuId={ selectedMenuId }
-							onDeleteMenu={ deleteMenu }
-							isMenuBeingDeleted={ isMenuBeingDeleted }
-							hasPermanentSidebar={ hasPermanentSidebar }
-							isManageLocationsModalOpen={
-								isManageLocationsModalOpen
-							}
-							openManageLocationsModal={
-								openManageLocationsModal
-							}
-							closeManageLocationsModal={
-								closeManageLocationsModal
-							}
-						/>
+						{ isMenuSelected && (
+							<Sidebar
+								menus={ menus }
+								menuId={ selectedMenuId }
+								onSelectMenu={ selectMenu }
+								onDeleteMenu={ deleteMenu }
+								isMenuBeingDeleted={ isMenuBeingDeleted }
+								hasPermanentSidebar={ hasPermanentSidebar }
+							/>
+						) }
 					</IsMenuNameControlFocusedContext.Provider>
 					<UnsavedChangesWarning />
 				</BlockEditorProvider>
