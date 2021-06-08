@@ -87,7 +87,6 @@ function register_block_core_post_template() {
 }
 add_action( 'init', 'register_block_core_post_template' );
 
-
 /**
  * Renders the legacy `core/query-loop` block on the server.
  * It triggers a developer warning and then calls the renamed
