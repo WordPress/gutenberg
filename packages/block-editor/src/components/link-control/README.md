@@ -105,13 +105,6 @@ Whether to present suggestions when typing the URL.
 
 Whether to present initial suggestions immediately.
 
-### fetchSuggestions
-
--   Type: `Function`
--   Required: No
-
-Custom search handler for suggestions. If specified, it's passed to `LinkControlSearchInput` which later passes it to `URLInput`. Refer to [`LinkControlSearchInput` docs below](#linkcontrolsearchinput) or `URLInput`'s README.md for more details about it.
-
 ### noDirectEntry
 
 -   Type: `boolean`

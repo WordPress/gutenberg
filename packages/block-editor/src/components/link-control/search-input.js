@@ -35,7 +35,6 @@ const LinkControlSearchInput = forwardRef(
 			renderSuggestions = ( props ) => (
 				<LinkControlSearchResults { ...props } />
 			),
-			fetchSuggestions = null,
 			allowDirectEntry = true,
 			showInitialSuggestions = false,
 			suggestionsQuery = {},
@@ -51,7 +50,7 @@ const LinkControlSearchInput = forwardRef(
 			withURLSuggestion
 		);
 		const searchHandler = showSuggestions
-			? fetchSuggestions || genericSearchHandler
+			? genericSearchHandler
 			: noopSearchHandler;
 
 		const instanceId = useInstanceId( LinkControlSearchInput );

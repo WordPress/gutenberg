@@ -129,7 +129,7 @@ function getSuggestionsQuery( type, kind ) {
 			if ( kind === 'post-type' ) {
 				return { type: 'post', subtype: type };
 			}
-			return {};
+			return { type };
 	}
 }
 
@@ -242,18 +242,6 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
-	const isCustomItemType =
-		typeof type !== 'undefined' &&
-		! [
-			'post',
-			'page',
-			'category',
-			'tag',
-			'post_format',
-			'custom',
-		].includes( type ) &&
-		! [ 'taxonomy', 'post-type' ].includes( kind );
-
 	const {
 		isAtMaxNesting,
 		isParentOfSelectedBlock,
@@ -263,7 +251,6 @@ export default function NavigationLinkEdit( {
 		numberOfDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
-		fetchMenuCustomItems,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -271,7 +258,6 @@ export default function NavigationLinkEdit( {
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
-				getSettings,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -304,8 +290,6 @@ export default function NavigationLinkEdit( {
 					'create',
 					'posts'
 				),
-				fetchMenuCustomItems: getSettings()
-					.__experimentalFetchMenuCustomItems,
 			};
 		},
 		[ clientId ]
@@ -465,19 +449,6 @@ export default function NavigationLinkEdit( {
 			missingText = __( 'Add a link' );
 	}
 
-	const fetchCustomItemTypeSuggestions = ( search ) => {
-		return fetchMenuCustomItems( search, { type } ).then(
-			( customItems ) => {
-				return customItems.map( ( item ) => ( {
-					id: item.id,
-					title: item.title,
-					url: item.url,
-					type: 'URL',
-				} ) );
-			}
-		);
-	};
-
 	return (
 		<Fragment>
 			<BlockControls>
@@ -598,9 +569,7 @@ export default function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
-								withCreateSuggestion={
-									isCustomItemType ? false : userCanCreate
-								}
+								withCreateSuggestion={ userCanCreate }
 								createSuggestion={ handleCreate }
 								createSuggestionButtonText={ ( searchTerm ) => {
 									let format;
@@ -626,11 +595,6 @@ export default function NavigationLinkEdit( {
 									type,
 									kind
 								) }
-								fetchSuggestions={
-									isCustomItemType
-										? fetchCustomItemTypeSuggestions
-										: null
-								}
 								onChange={ ( updatedValue ) =>
 									updateNavigationLinkBlockAttributes(
 										updatedValue,
