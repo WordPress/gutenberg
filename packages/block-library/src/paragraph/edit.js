@@ -22,7 +22,6 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
-import { useCallback } from '@wordpress/element';
 
 const name = 'core/paragraph';
 
@@ -65,54 +64,20 @@ function ParagraphBlock( {
 		style: { direction },
 	} );
 
-	const updateContent = useCallback(
-		( newContent ) => setAttributes( { content: newContent } ),
-		[ setAttributes ]
-	);
-
-	const splitParagraph = useCallback(
-		( value, isOriginal ) => {
-			let newAttributes;
-
-			if ( isOriginal || value ) {
-				newAttributes = {
-					...attributes,
-					content: value,
-				};
-			}
-
-			const block = createBlock( name, newAttributes );
-
-			if ( isOriginal ) {
-				block.clientId = clientId;
-			}
-
-			return block;
-		},
-		[ attributes, createBlock ]
-	);
-
-	const updateAlign = useCallback( ( newAlign ) =>
-		setAttributes( { align: newAlign }, [ setAttributes ] )
-	);
-
-	const setDirection = useCallback(
-		( newDirection ) => setAttributes( { direction: newDirection } ),
-		[]
-	);
-
-	const setDropCap = useCallback(
-		() => setAttributes( { dropCap: ! dropCap } ),
-		[ setAttributes ]
-	);
-
 	return (
 		<>
 			<BlockControls group="block">
-				<AlignmentControl value={ align } onChange={ updateAlign } />
+				<AlignmentControl
+					value={ align }
+					onChange={ ( newAlign ) =>
+						setAttributes( { align: newAlign } )
+					}
+				/>
 				<ParagraphRTLControl
 					direction={ direction }
-					setDirection={ setDirection }
+					setDirection={ ( newDirection ) =>
+						setAttributes( { direction: newDirection } )
+					}
 				/>
 			</BlockControls>
 			{ isDropCapFeatureEnabled && (
@@ -121,7 +86,9 @@ function ParagraphBlock( {
 						<ToggleControl
 							label={ __( 'Drop cap' ) }
 							checked={ !! dropCap }
-							onChange={ setDropCap }
+							onChange={ () =>
+								setAttributes( { dropCap: ! dropCap } )
+							}
 							help={
 								dropCap
 									? __( 'Showing large initial letter.' )
@@ -138,8 +105,27 @@ function ParagraphBlock( {
 				tagName="p"
 				{ ...blockProps }
 				value={ content }
-				onChange={ updateContent }
-				onSplit={ splitParagraph }
+				onChange={ ( newContent ) =>
+					setAttributes( { content: newContent } )
+				}
+				onSplit={ ( value, isOriginal ) => {
+					let newAttributes;
+
+					if ( isOriginal || value ) {
+						newAttributes = {
+							...attributes,
+							content: value,
+						};
+					}
+
+					const block = createBlock( name, newAttributes );
+
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
+				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
 				onRemove={ onRemove }
