@@ -1,6 +1,8 @@
 .wp-block-breadcrumbs {
-	list-style-type: none;
-	padding-left: 0;
+	ol {
+		list-style-type: none;
+		padding-left: 0;
+	}
 
 	.wp-block-breadcrumbs__item {
 		display: inline;

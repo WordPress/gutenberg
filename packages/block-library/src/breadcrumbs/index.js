@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { postTitle as icon } from '@wordpress/icons';
+import { listView as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

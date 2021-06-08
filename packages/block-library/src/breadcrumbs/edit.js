@@ -15,9 +15,9 @@ import {
 } from '@wordpress/block-editor';
 import {
 	RangeControl,
-	Notice,
 	PanelBody,
 	TextControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -27,7 +27,13 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 
 export default function BreadcrumbsEdit( {
-	attributes: { nestingLevel, separator, textAlign },
+	attributes: {
+		nestingLevel,
+		separator,
+		showCurrentPageTitle,
+		showLeadingSeparator,
+		textAlign,
+	},
 	setAttributes,
 	context: { postType, postId },
 } ) {
@@ -41,8 +47,6 @@ export default function BreadcrumbsEdit( {
 		[ postType, postId ]
 	);
 
-	// const { editEntityRecord } = useDispatch( coreStore );
-
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -53,50 +57,44 @@ export default function BreadcrumbsEdit( {
 		return null;
 	}
 
-	// const { title = '', link } = post;
-
-	console.log( post );
-
-	// if ( postType && postId ) {
-	// 	titleElement = (
-	// 		<PlainText
-	// 			tagName={ TagName }
-	// 			placeholder={ __( 'No Title' ) }
-	// 			value={ title }
-	// 			onChange={ ( value ) =>
-	// 				editEntityRecord( 'postType', postType, postId, {
-	// 					title: value,
-	// 				} )
-	// 			}
-	// 			__experimentalVersion={ 2 }
-	// 			{ ...( isLink ? {} : blockProps ) }
-	// 		/>
-	// 	);
-	// }
+	const postTitle = post.title || '';
 
 	const placeholderItems = [
 		__( 'Root' ),
-		__( 'Top level page' ),
+		__( 'Top-level page' ),
 		__( 'Child page' ),
 	];
 
-	const placeholder = placeholderItems.map( ( item, index ) => {
-		const inner = [];
-		inner.push(
-			<a href="#" className="wp-block-breadcrumbs__separator">
-				{ item }
-			</a>
-		);
-		if ( index !== placeholderItems.length - 1 && separator ) {
-			inner.push( <span>{ separator }</span> );
+	const buildBreadcrumb = ( crumbTitle, showSeparator, key ) => {
+		let separatorSpan;
+
+		if ( showSeparator && separator ) {
+			separatorSpan = (
+				<span className="wp-block-breadcrumbs__separator">
+					{ separator }
+				</span>
+			);
 		}
+
 		return (
-			<li className="wp-block-breadcrumbs__item" key={ index }>
-				{ ' ' }
-				{ inner }
+			<li className="wp-block-breadcrumbs__item" key={ key }>
+				{ separatorSpan }
+				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
+				<a href="#">{ crumbTitle }</a>
+				{ /* eslint-enable */ }
 			</li>
 		);
-	} );
+	};
+
+	const placeholder = placeholderItems.map( ( item, index ) =>
+		buildBreadcrumb( item, index !== 0 || showLeadingSeparator, index )
+	);
+
+	if ( showCurrentPageTitle && postTitle ) {
+		placeholder.push(
+			buildBreadcrumb( postTitle, true, placeholderItems.length )
+		);
+	}
 
 	return (
 		<>
@@ -112,6 +110,9 @@ export default function BreadcrumbsEdit( {
 				<PanelBody title={ __( 'Breadcrumbs settings' ) }>
 					<RangeControl
 						label={ __( 'Nesting level' ) }
+						help={ __(
+							'Control how many levels of nesting to display. Set to 0 to show all nesting levels.'
+						) }
 						value={ nestingLevel }
 						onChange={ ( value ) =>
 							setAttributes( { nestingLevel: value } )
@@ -119,17 +120,10 @@ export default function BreadcrumbsEdit( {
 						min={ 0 }
 						max={ Math.max( 10, nestingLevel ) }
 					/>
-					{ nestingLevel === 0 && (
-						<Notice status="warning" isDismissible={ false }>
-							{ __(
-								'All nesting levels will be displayed. Update this setting to reduce nesting level.'
-							) }
-						</Notice>
-					) }
 					<TextControl
 						label={ __( 'Separator character' ) }
 						help={ __(
-							'Enter a character to display between page items.'
+							'Enter a character to display between items.'
 						) }
 						value={ separator || '' }
 						placeholder={ __( 'e.g. /' ) }
@@ -141,9 +135,29 @@ export default function BreadcrumbsEdit( {
 						autoCapitalize="none"
 						autoComplete="off"
 					/>
+					<ToggleControl
+						label={ __( 'Show leading separator' ) }
+						checked={ showLeadingSeparator }
+						onChange={ () =>
+							setAttributes( {
+								showLeadingSeparator: ! showLeadingSeparator,
+							} )
+						}
+					/>
+					<ToggleControl
+						label={ __( 'Show current page title' ) }
+						checked={ showCurrentPageTitle }
+						onChange={ () =>
+							setAttributes( {
+								showCurrentPageTitle: ! showCurrentPageTitle,
+							} )
+						}
+					/>
 				</PanelBody>
 			</InspectorControls>
-			<ol { ...blockProps }>{ placeholder }</ol>
+			<nav { ...blockProps }>
+				<ol>{ placeholder }</ol>
+			</nav>
 		</>
 	);
 }

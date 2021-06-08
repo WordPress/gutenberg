@@ -19,7 +19,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$post_ID = $block->context['postId'];
+	$post_id = $block->context['postId'];
 
 	$separator = '';
 
@@ -27,51 +27,79 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		$separator = $attributes['separator'];
 	}
 
-	$ancestor_ids = get_post_ancestors( $post_ID );
+	$ancestor_ids = get_post_ancestors( $post_id );
 
 	if ( empty( $ancestor_ids ) ) {
 		return '';
 	}
 
-	$breadcrumbs_inner = array();
+	$inner_markup = '';
 
 	foreach( array_reverse( $ancestor_ids ) as $index => $ancestor_id ) {
-		$li_class = 'wp-block-breadcrumbs__item';
-		$separator_class = 'wp-block-breadcrumbs__separator';
-
-		$markup = sprintf(
-			'<a href="%s">%s</a>',
-			get_the_permalink( $ancestor_id ),
-			get_the_title( $ancestor_id )
-		);
-
-		if (
-			isset( $attributes['separator'] ) &&
-			$index !== count( $ancestor_ids ) - 1
-		) {
-			$markup .= sprintf(
-				'<span class="%1$s">%2$s</span>',
-				$separator_class,
-				esc_html( $attributes['separator'] )
-			);
-		}
-
-		$breadcrumbs_inner[] = sprintf(
-			'<li class="%1$s">%2$s</li>',
-			$li_class,
-			$markup
+		$show_separator = 0 !== $index || ! empty( $attributes['showLeadingSeparator'] );
+		$inner_markup .= build_block_core_breadcrumbs_inner_markup_item(
+			$ancestor_id,
+			$attributes,
+			$show_separator
 		);
 	}
 
-	$inner_markup = implode( '', $breadcrumbs_inner );
+	if ( ! empty( $attributes['showCurrentPageTitle'] ) ) {
+		$show_separator = true;
+		$inner_markup .= build_block_core_breadcrumbs_inner_markup_item(
+			$post_id,
+			$attributes,
+			$show_separator
+		);
+	}
 
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
 	return sprintf(
-		'<ol %1$s>%2$s</ol>',
+		'<nav %1$s><ol>%2$s</ol></nav>',
 		$wrapper_attributes,
 		$inner_markup
+	);
+}
+
+/**
+ * Builds the markup for a single Breadcrumb item.
+ *
+ * Used when iterating over a list of ancestor post ids.
+ * @param int      $post_id        The post id for this item.
+ * @param array    $attributes     Block attributes.
+ * @param bool     $show_separator Whether to show the separator character where available.
+ *
+ * @return string The markup for a single breadcrumb item wrapped in an `li` element.
+ */
+function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, $show_separator = true ) {
+	$li_class        = 'wp-block-breadcrumbs__item';
+	$separator_class = 'wp-block-breadcrumbs__separator';
+
+	$markup = '';
+
+	if (
+		$show_separator &&
+		! empty( $attributes['separator'] )
+	) {
+		$markup .= sprintf(
+			'<span class="%1$s">%2$s</span>',
+			$separator_class,
+			esc_html( $attributes['separator'] )
+		);
+	}
+
+	$markup .= sprintf(
+		'<a href="%s">%s</a>',
+		get_the_permalink( $post_id ),
+		get_the_title( $post_id )
+	);
+
+	return sprintf(
+		'<li class="%1$s">%2$s</li>',
+		$li_class,
+		$markup
 	);
 }
 
