@@ -33,6 +33,8 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.facebook.react.bridge.JSIModulePackage;
+import com.swmansion.reanimated.ReanimatedJSIModulePackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
@@ -267,6 +269,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             protected String getJSMainModuleName() {
                 return "index";
+            }
+            @Override
+            protected JSIModulePackage getJSIModulePackage() {
+            return new ReanimatedJSIModulePackage();
             }
         };
     }
