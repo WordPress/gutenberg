@@ -56,7 +56,12 @@ export default function ImageSizeControl( {
 							value={ width ?? imageWidth ?? '' }
 							min={ 1 }
 							onChange={ ( value ) =>
-								onChange( { width: parseInt( value, 10 ) } )
+								onChange( {
+									width:
+										value === ''
+											? null
+											: parseInt( value, 10 ),
+								} )
 							}
 						/>
 						<TextControl
@@ -67,7 +72,10 @@ export default function ImageSizeControl( {
 							min={ 1 }
 							onChange={ ( value ) =>
 								onChange( {
-									height: parseInt( value, 10 ),
+									height:
+										value === ''
+											? null
+											: parseInt( value, 10 ),
 								} )
 							}
 						/>
