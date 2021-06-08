@@ -83,6 +83,7 @@ describe( 'Reusable block', () => {
 			getByText,
 		} = await initializeEditor( {
 			initialHtml: '',
+			capabilities: { reusableBlock: true },
 		} );
 
 		// Open the inserter menu
