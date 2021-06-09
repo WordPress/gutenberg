@@ -113,7 +113,6 @@ describe( 'Basic rendering', () => {
 		const searchInput = getURLInput();
 
 		expect( searchInput ).not.toBeNull();
-		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 
 	it( 'should not render protocol in links', async () => {
@@ -947,7 +946,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const searchResultElements = container.querySelectorAll(
 			'[role="listbox"] [role="option"]'
 		);
-		const form = container.querySelector( 'form' );
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
 				result.innerHTML.includes( 'Create:' )
@@ -964,7 +962,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		} );
 
 		await act( async () => {
-			Simulate.submit( form );
+			Simulate.keyDown( searchInput, { keyCode: ENTER } );
 		} );
 
 		await eventLoopTick();
@@ -1394,7 +1392,6 @@ describe( 'Selecting links', () => {
 				// Search Input UI
 				const searchInput = getURLInput();
 				searchInput.focus();
-				const form = container.querySelector( 'form' );
 
 				// Simulate searching for a term
 				act( () => {
@@ -1459,9 +1456,6 @@ describe( 'Selecting links', () => {
 				// Commit the selected item as the current link
 				act( () => {
 					Simulate.keyDown( searchInput, { keyCode: ENTER } );
-				} );
-				act( () => {
-					Simulate.submit( form );
 				} );
 
 				// Check that the suggestion selected via is now shown as selected

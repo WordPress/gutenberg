@@ -127,10 +127,8 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
-					onSubmit={ () => {
-						onSuggestionSelected(
-							focusedSuggestion || { url: value }
-						);
+					onSubmit={ ( suggestion ) => {
+						onSuggestionSelected( suggestion || focusedSuggestion || { url: value } );
 					} }
 					ref={ ref }
 				/>

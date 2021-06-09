@@ -332,11 +332,14 @@ class URLInput extends Component {
 				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
 					this.selectLink( suggestion );
-				}
 
-				if ( this.props.onSubmit ) {
+					if ( this.props.onSubmit ) {
+						this.props.onSubmit( suggestion );
+					}
+				} else if ( this.props.onSubmit ) {
 					this.props.onSubmit();
 				}
+
 				break;
 			}
 		}
