@@ -128,7 +128,9 @@ const LinkControlSearchInput = forwardRef(
 						showInitialSuggestions
 					}
 					onSubmit={ ( suggestion ) => {
-						onSuggestionSelected( suggestion || focusedSuggestion || { url: value } );
+						onSuggestionSelected(
+							suggestion || focusedSuggestion || { url: value }
+						);
 					} }
 					ref={ ref }
 				/>
