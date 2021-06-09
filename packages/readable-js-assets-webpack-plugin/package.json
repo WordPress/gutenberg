@@ -9,7 +9,7 @@
 		"gutenberg",
 		"webpack",
 		"readable",
-    "minimizer"
+		"minimizer"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/readable-js-assets-webpack-plugin/README.md",
 	"repository": {
