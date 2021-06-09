@@ -42,14 +42,14 @@ function DragAndSnap( { children } ) {
 	};
 
 	const dragHandler = useAnimatedGestureHandler( {
-		onStart: ( { x, y }, ctx ) => {
+		onStart: ( { absoluteX: x, absoluteY: y }, ctx ) => {
 			ctx.startX = x;
 			ctx.startY = y;
 			console.log( `Start: (${ x }, ${ y })` );
 		},
 		// For the long press gesture, we don't get translation, so we have to
 		// calculate it.
-		onActive: ( { x, y }, ctx ) => {
+		onActive: ( { absoluteX: x, absoluteY: y }, ctx ) => {
 			translation.x.value = x - ctx.startX;
 			translation.y.value = y - ctx.startY;
 			console.log( `Active: (${ x }, ${ y })` );
