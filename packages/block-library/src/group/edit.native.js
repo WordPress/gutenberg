@@ -49,7 +49,7 @@ function GroupEdit( {
 						styles.fullwidthGroupAppender,
 					isFullWidth( align ) &&
 						hasInnerBlocks &&
-						styles.fullwidthMobileGroupAppender,
+						styles.fullwidthHasInnerGroupAppender,
 				] }
 			>
 				<InnerBlocks.ButtonBlockAppender />
