@@ -40,11 +40,7 @@ const EMPTY_ARRAY = [];
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
 	( select ) => ( state, url ) => {
-		return select( 'core/data' ).isResolving(
-			STORE_NAME,
-			'getEmbedPreview',
-			[ url ]
-		);
+		return select( STORE_NAME ).isResolving( 'getEmbedPreview', [ url ] );
 	}
 );
 
