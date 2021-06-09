@@ -383,14 +383,20 @@ export function* requestMetaBoxUpdates() {
 		formData.append( key, value )
 	);
 
-	// Save the metaboxes
-	yield apiFetch( {
-		url: window._wpMetaBoxUrl,
-		method: 'POST',
-		body: formData,
-		parse: false,
-	} );
-	yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
+	try {
+		// Save the metaboxes
+		yield apiFetch( {
+			url: window._wpMetaBoxUrl,
+			method: 'POST',
+			body: formData,
+			parse: false,
+		} );
+	} finally {
+		// The "metaBoxUpdatesSuccess" action sets isSavingMetaBoxes state to "false."
+		// This indicates that the meta boxes saving request is complete, regardless of whether it has succeeded or failed.
+		// Updating this state prevents locking the editor in the saving state.
+		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
+	}
 }
 
 /**
