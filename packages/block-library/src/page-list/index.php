@@ -9,10 +9,11 @@
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the pages markup in the front-end when it is a descendant of navigation.
  *
- * @param  array $context Navigation block context.
+ * @param  array $attributes Block attributes.
+ * @param  array $context    Navigation block context.
  * @return array Colors CSS classes and inline styles.
  */
-function block_core_page_list_build_css_colors( $context ) {
+function block_core_page_list_build_css_colors( $attributes, $context ) {
 	$colors = array(
 		'css_classes'           => array(),
 		'inline_styles'         => '',
@@ -21,8 +22,8 @@ function block_core_page_list_build_css_colors( $context ) {
 	);
 
 	// Text color.
-	$has_named_text_color  = array_key_exists( 'textColor', $context );
-	$has_picked_text_color = array_key_exists( 'customTextColor', $context );
+	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
+	$has_picked_text_color = array_key_exists( 'customTextColor', $attributes );
 	$has_custom_text_color = isset( $context['style']['color']['text'] );
 
 	// If has text color.
@@ -33,17 +34,17 @@ function block_core_page_list_build_css_colors( $context ) {
 
 	if ( $has_named_text_color ) {
 		// Add the color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-color', $context['textColor'] );
+		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_picked_text_color ) {
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['customTextColor'] );
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
 		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['style']['color']['text'] );
 	}
 
 	// Background color.
-	$has_named_background_color  = array_key_exists( 'backgroundColor', $context );
-	$has_picked_background_color = array_key_exists( 'customBackgroundColor', $context );
+	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
+	$has_picked_background_color = array_key_exists( 'customBackgroundColor', $attributes );
 	$has_custom_background_color = isset( $context['style']['color']['background'] );
 
 	// If has background color.
@@ -54,17 +55,17 @@ function block_core_page_list_build_css_colors( $context ) {
 
 	if ( $has_named_background_color ) {
 		// Add the background-color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $context['backgroundColor'] );
+		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
 	} elseif ( $has_picked_background_color ) {
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['customBackgroundColor'] );
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
 		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['style']['color']['background'] );
 	}
 
 	// Overlay text color.
-	$has_named_overlay_text_color  = array_key_exists( 'overlayTextColor', $context );
-	$has_picked_overlay_text_color = array_key_exists( 'customOverlayTextColor', $context );
+	$has_named_overlay_text_color  = array_key_exists( 'overlayTextColor', $attributes );
+	$has_picked_overlay_text_color = array_key_exists( 'customOverlayTextColor', $attributes );
 
 	// If it has a text color.
 	if ( $has_named_overlay_text_color || $has_picked_overlay_text_color ) {
@@ -73,14 +74,14 @@ function block_core_page_list_build_css_colors( $context ) {
 
 	// Give overlay colors priority, fall back to Navigation block colors, then global styles.
 	if ( $has_named_overlay_text_color ) {
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', $context['overlayTextColor'] );
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', $attributes['overlayTextColor'] );
 	} elseif ( $has_picked_overlay_text_color ) {
-		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $context['customOverlayTextColor'] );
+		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
 	}
 
 	// Overlay background colors.
-	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $context );
-	$has_picked_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $context );
+	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $attributes );
+	$has_picked_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $attributes );
 
 	// If has background color.
 	if ( $has_named_overlay_background_color || $has_picked_overlay_background_color ) {
@@ -88,9 +89,9 @@ function block_core_page_list_build_css_colors( $context ) {
 	}
 
 	if ( $has_named_overlay_background_color ) {
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', $context['overlayBackgroundColor'] );
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', $attributes['overlayBackgroundColor'] );
 	} elseif ( $has_picked_overlay_background_color ) {
-		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $context['customOverlayBackgroundColor'] );
+		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customOverlayBackgroundColor'] );
 	}
 
 	return $colors;
@@ -246,7 +247,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		}
 	}
 
-	$colors          = block_core_page_list_build_css_colors( $block->context );
+	$colors          = block_core_page_list_build_css_colors( $attributes, $block->context );
 	$font_sizes      = block_core_page_list_build_css_font_sizes( $block->context );
 	$classes         = array_merge(
 		$colors['css_classes'],

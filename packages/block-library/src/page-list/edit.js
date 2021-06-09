@@ -28,7 +28,46 @@ import ConvertToLinksModal from './convert-to-links-modal';
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 
-export default function PageListEdit( { context, clientId } ) {
+export default function PageListEdit( {
+	context,
+	clientId,
+	attributes,
+	setAttributes,
+} ) {
+		// Copy context to attributes to make it accessible in the editor's
+	// ServerSideRender
+	useEffect( () => {
+		const {
+			textColor,
+			customTextColor,
+			backgroundColor,
+			customBackgroundColor,
+			overlayTextColor,
+			customOverlayTextColor,
+			overlayBackgroundColor,
+			customOverlayBackgroundColor,
+		} = context;
+		setAttributes( {
+			textColor,
+			customTextColor,
+			backgroundColor,
+			customBackgroundColor,
+			overlayTextColor,
+			customOverlayTextColor,
+			overlayBackgroundColor,
+			customOverlayBackgroundColor,
+		} );
+	}, [
+		context.textColor,
+		context.customTextColor,
+		context.backgroundColor,
+		context.customBackgroundColor,
+		context.overlayTextColor,
+		context.customOverlayTextColor,
+		context.overlayBackgroundColor,
+		context.customOverlayBackgroundColor,
+	] );
+
 	const { textColor, backgroundColor, showSubmenuIcon, style } =
 		context || {};
 
@@ -74,6 +113,7 @@ export default function PageListEdit( { context, clientId } ) {
 		}
 	}, [ isParentNavigation ] );
 
+
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
@@ -94,7 +134,10 @@ export default function PageListEdit( { context, clientId } ) {
 				/>
 			) }
 			<div { ...blockProps }>
-				<ServerSideRender block="core/page-list" />
+				<ServerSideRender
+					block="core/page-list"
+					attributes={ attributes }
+				/>
 			</div>
 		</>
 	);
