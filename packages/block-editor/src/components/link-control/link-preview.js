@@ -85,11 +85,9 @@ export default function LinkPreview( { value, onEditClick } ) {
 			{ ( richData?.image || richData?.description ) && (
 				<div className="block-editor-link-control__search-item-bottom">
 					{ richData?.image && (
-						<img
-							className="block-editor-link-control__search-item-image"
-							src={ richData?.image }
-							alt=""
-						/>
+						<div className="block-editor-link-control__search-item-image">
+							<img src={ richData?.image } alt="" />
+						</div>
 					) }
 					{ richData?.description && (
 						<Text
