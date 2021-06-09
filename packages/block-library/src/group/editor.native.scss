@@ -33,13 +33,18 @@
 }
 
 .groupAppender {
-	margin-left: $grid-unit-20;
-	margin-right: $grid-unit-20;
-}
-
-.wideGroupAppender {
 	margin-left: $grid-unit-10;
 	margin-right: $grid-unit-10;
+}
+
+.fullwidthGroupAppender {
+	margin-left: $grid-unit * 2.5;
+	margin-right: $grid-unit * 2.5;
+}
+
+.fullwidthMobileGroupAppender {
+	margin-left: $grid-unit-15;
+	margin-right: $grid-unit-15;
 }
 
 .hasBackgroundAppender {
