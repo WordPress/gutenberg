@@ -59,7 +59,7 @@ export default function ImageSizeControl( {
 								onChange( {
 									width:
 										value === ''
-											? null
+											? undefined
 											: parseInt( value, 10 ),
 								} )
 							}
@@ -74,7 +74,7 @@ export default function ImageSizeControl( {
 								onChange( {
 									height:
 										value === ''
-											? null
+											? undefined
 											: parseInt( value, 10 ),
 								} )
 							}
