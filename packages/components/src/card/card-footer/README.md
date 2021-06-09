@@ -1,6 +1,6 @@
 # CardFooter
 
-CardFooter renders an optional footer within a [`<Card />`](../card/README.md).
+`CardFooter` renders an optional footer within a [`Card`](../card/README.md).
 
 ## Usage
 
@@ -9,14 +9,15 @@ import { Card, CardFooter } from '@wordpress/components';
 
 const Example = () => (
 	<Card>
-		<CardFooter>...</CardFooter>
+ 		<CardBody>...</CardBody>
+ 		<CardFooter>...</CardFooter>
 	</Card>
 );
 ```
 
 ### Flex
 
-Underneath, CardFooter uses the layout component [`<Flex/>`](../../flex/flex/README.md). This improves the alignment of child items within the component.
+Underneath, `CardFooter` uses the [`Flex` layout component](../../flex/flex/README.md). This improves the alignment of child items within the component.
 
 ```jsx
 import {
@@ -29,6 +30,7 @@ import {
 
 const Example = () => (
 	<Card>
+		<CardBody>...</CardBody>
 		<CardFooter>
 			<FlexBlock>Content</FlexBlock>
 			<FlexItem>
@@ -39,40 +41,34 @@ const Example = () => (
 );
 ```
 
-Check out [the documentation](../../flex/flex/README.md) on `<Flex/>` for more details on layout composition.
+Check out [the documentation](../..//flex/flex/README.md) on `Flex` for more details on layout composition.
 
 ## Props
 
-### isBorderless
+Note: This component is connected to [`Card`'s Context](../card/README.md#context). Passing the `size` and `isBorderless` props directly to this component will override the value derived from context.
 
-Determines the border style of the card.
+### `isBorderless`: `boolean`
 
--   Type: `Boolean`
--   Required: No
--   Default: `false`
+Renders without a border.
 
-### isElevated
+- Required: No
+- Default: `false`
 
-Determines the elevation style of the card.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-### isShady
+### `isShady`: `boolean`
 
 Renders with a light gray background color.
 
--   Type: `Boolean`
 -   Required: No
 -   Default: `false`
 
-### size
+### `justify`: `CSSProperties[ 'justifyContent' ]`
+
+See the documentation for the `justify` prop for the [`Flex` component](../..//flex/flex/README.md#justify)
+
+### `size`: `string`
 
 Determines the amount of padding within the component.
 
--   Type: `String`
--   Required: No
--   Default: `medium`
-
-Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.
+- Required: No
+- Default: `medium`
+- Allowed values: `xSmall`, `small`, `medium`, `large`

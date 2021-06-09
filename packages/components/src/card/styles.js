@@ -7,7 +7,6 @@ import { css } from 'emotion';
 /**
  * Internal dependencies
  */
-import { Flex } from '../flex';
 import { COLORS, CONFIG, space } from '../utils';
 
 export const styleProps = {
@@ -44,41 +43,7 @@ export const BodyUI = styled.div`
 	${ handleShady };
 `;
 
-export const FooterUI = styled( Flex )`
-	border-top: 1px solid ${ borderColorInternal };
-	border-bottom-left-radius: ${ borderRadiusInternal };
-	border-bottom-right-radius: ${ borderRadiusInternal };
-	box-sizing: border-box;
-
-	&:first-of-type {
-		border-top: none;
-	}
-
-	${ headerFooterSizes };
-	${ handleBorderless };
-	${ handleShady };
-`;
-
 export function bodySize() {
-	return `
-		&.is-size {
-			&-large {
-				padding: ${ space( 3 ) } ${ space( 4 ) };
-			}
-			&-medium {
-				padding: ${ space( 2 ) } ${ space( 3 ) };
-			}
-			&-small {
-				padding: ${ space( 2 ) };
-			}
-			&-extraSmall {
-				padding: ${ space( 1 ) };
-			}
-		}
-	`;
-}
-
-export function headerFooterSizes() {
 	return `
 		&.is-size {
 			&-large {
@@ -118,6 +83,14 @@ export const Header = css`
 
 	&:last-child {
 		border-bottom: none;
+	}
+`;
+
+export const Footer = css`
+	border-top: 1px solid;
+
+	&:first-child {
+		border-top: none;
 	}
 `;
 
