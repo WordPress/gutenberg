@@ -69,7 +69,7 @@ apiFetch( { path: '/wp/v2/posts', signal: controller?.signal } )
 	.catch( ( error ) => {
 		// If the browser doesn't support AbortController then it will never log.
 		// It should be fine in most cases when it's considered to be a progressive improvement.
-		if (error.name === 'AbortError') {
+		if ( error.name === 'AbortError' ) {
 			console.log( 'Request has been aborted' );
 		}
 	} );
