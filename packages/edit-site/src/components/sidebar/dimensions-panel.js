@@ -6,6 +6,7 @@ import {
 	__experimentalBlockSupportPanel as BlockSupportPanel,
 	__experimentalBoxControl as BoxControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
 
@@ -15,10 +16,17 @@ import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block
 import { useSetting } from '../editor/utils';
 
 export function useHasDimensionsPanel( context ) {
+	const hasHeight = useHasHeight( context );
 	const hasPadding = useHasPadding( context );
 	const hasMargin = useHasMargin( context );
 
-	return hasPadding || hasMargin;
+	return hasHeight || hasPadding || hasMargin;
+}
+
+function useHasHeight( { name, supports } ) {
+	const settings = useSetting( 'dimensions.customHeight', name );
+
+	return settings && supports.includes( 'height' );
 }
 
 function useHasPadding( { name, supports } ) {
@@ -48,6 +56,7 @@ function filterValuesBySides( values, sides ) {
 
 export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
+	const showHeightControl = useHasHeight( context );
 	const showPaddingControl = useHasPadding( context );
 	const showMarginControl = useHasMargin( context );
 	const units = useCustomUnits( {
@@ -60,6 +69,13 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 		],
 	} );
 
+	// Height.
+	const heightValue = getStyle( name, 'height' );
+	const setHeightValue = ( next ) => setStyle( name, 'height', next );
+	const resetHeightValue = () => setHeightValue( undefined );
+	const hasHeightValue = () => !! heightValue;
+
+	// Padding.
 	const paddingValues = getStyle( name, 'padding' );
 	const paddingSides = useCustomSides( name, 'padding' );
 
@@ -71,6 +87,7 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const hasPaddingValue = () =>
 		paddingValues && Object.keys( paddingValues ).length;
 
+	// Margin.
 	const marginValues = getStyle( name, 'margin' );
 	const marginSides = useCustomSides( name, 'margin' );
 
@@ -93,6 +110,18 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 			title={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 		>
+			{ showHeightControl && (
+				<UnitControl
+					label={ __( 'Height' ) }
+					value={ heightValue }
+					hasValue={ hasHeightValue }
+					onChange={ setHeightValue }
+					reset={ resetHeightValue }
+					isShownByDefault={ true }
+					units={ units }
+					min={ 0 }
+				/>
+			) }
 			{ showPaddingControl && (
 				<BoxControl
 					values={ paddingValues }

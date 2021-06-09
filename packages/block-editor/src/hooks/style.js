@@ -37,13 +37,18 @@ import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
-import { SPACING_SUPPORT_KEY, DimensionsPanel } from './dimensions';
+import {
+	DIMENSIONS_SUPPORT_KEY,
+	SPACING_SUPPORT_KEY,
+	DimensionsPanel,
+} from './dimensions';
 import useDisplayBlockControls from '../components/use-display-block-controls';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
+	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 ];
 
@@ -139,6 +144,9 @@ const skipSerializationPaths = {
 	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
 	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		COLOR_SUPPORT_KEY,
+	],
+	[ `${ DIMENSIONS_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		'dimensions',
 	],
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		'spacing',

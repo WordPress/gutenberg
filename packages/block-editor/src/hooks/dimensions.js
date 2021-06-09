@@ -11,6 +11,13 @@ import { getBlockSupport } from '@wordpress/blocks';
  */
 import InspectorControls from '../components/inspector-controls';
 import {
+	HeightEdit,
+	hasHeightSupport,
+	hasHeightValue,
+	resetHeight,
+	useIsHeightDisabled,
+} from './height';
+import {
 	MarginEdit,
 	hasMarginSupport,
 	hasMarginValue,
@@ -25,6 +32,7 @@ import {
 	useIsPaddingDisabled,
 } from './padding';
 
+export const DIMENSIONS_SUPPORT_KEY = '__experimentalDimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
 
 /**
@@ -36,12 +44,18 @@ export const SPACING_SUPPORT_KEY = 'spacing';
 export function DimensionsPanel( props ) {
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
+	const isHeightDisabled = useIsHeightDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
 	}
+
+	const defaultDimensionsControls = getBlockSupport( props.name, [
+		DIMENSIONS_SUPPORT_KEY,
+		'__experimentalDefaultControls',
+	] );
 
 	const defaultSpacingControls = getBlockSupport( props.name, [
 		SPACING_SUPPORT_KEY,
@@ -55,6 +69,10 @@ export function DimensionsPanel( props ) {
 		props.setAttributes( {
 			style: {
 				...style,
+				dimensions: {
+					...style?.dimensions,
+					height: undefined,
+				},
 				spacing: {
 					...style?.spacing,
 					margin: undefined,
@@ -71,6 +89,15 @@ export function DimensionsPanel( props ) {
 				title={ __( 'Dimensions' ) }
 				resetAll={ resetAll }
 			>
+				{ ! isHeightDisabled && (
+					<HeightEdit
+						{ ...props }
+						hasValue={ hasHeightValue }
+						label={ __( 'Height' ) }
+						reset={ resetHeight }
+						isShownByDefault={ defaultDimensionsControls?.height }
+					/>
+				) }
 				{ ! isPaddingDisabled && (
 					<PaddingEdit
 						{ ...props }
@@ -105,7 +132,11 @@ export function hasDimensionsSupport( blockName ) {
 		return false;
 	}
 
-	return hasPaddingSupport( blockName ) || hasMarginSupport( blockName );
+	return (
+		hasHeightSupport( blockName ) ||
+		hasPaddingSupport( blockName ) ||
+		hasMarginSupport( blockName )
+	);
 }
 
 /**
@@ -115,10 +146,11 @@ export function hasDimensionsSupport( blockName ) {
  * @return {boolean}      If dimensions support is completely disabled.
  */
 const useIsDimensionsDisabled = ( props = {} ) => {
+	const heightDisabled = useIsHeightDisabled( props );
 	const paddingDisabled = useIsPaddingDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
 
-	return paddingDisabled && marginDisabled;
+	return heightDisabled && paddingDisabled && marginDisabled;
 };
 
 /**
