@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { FooterUI } from './styles';
-import { useCardContext } from './context';
+import { FooterUI } from '../styles';
+import { useCardContext } from '../context';
 
 export const defaultProps = {
 	isBorderless: false,

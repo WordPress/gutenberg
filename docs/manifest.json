@@ -720,6 +720,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "CardFooter",
+		"slug": "card-footer",
+		"markdown_source": "../packages/components/src/card/card-footer/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Card",
 		"slug": "card",
 		"markdown_source": "../packages/components/src/card/card/README.md",
