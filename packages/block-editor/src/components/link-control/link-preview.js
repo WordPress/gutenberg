@@ -22,6 +22,9 @@ import useRemoteUrlData from './use-remote-url-data';
 export default function LinkPreview( { value, onEditClick } ) {
 	const { richData, isFetching } = useRemoteUrlData( value?.url );
 
+	// Rich data may be an empty object so test for that.
+	const hasRichData = richData && Object.keys( richData ).length;
+
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
@@ -31,8 +34,8 @@ export default function LinkPreview( { value, onEditClick } ) {
 			aria-selected="true"
 			className={ classnames( 'block-editor-link-control__search-item', {
 				'is-current': true,
-				'is-rich': richData,
-				'is-fetching': isFetching,
+				'is-rich': hasRichData,
+				'is-fetching': !! isFetching,
 				'is-preview': true,
 			} ) }
 		>
