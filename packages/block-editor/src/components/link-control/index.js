@@ -260,11 +260,25 @@ function LinkControl( {
 				/>
 			) }
 
-			<LinkControlSettingsDrawer
-				value={ value }
-				settings={ settings }
-				onChange={ onChange }
-			/>
+			<div className="block-editor-link-control__tools">
+				<LinkControlSettingsDrawer
+					value={ value }
+					settings={ settings }
+					onChange={ onChange }
+				/>
+				{ value && ! isEditingLink && ! isCreatingPage && (
+					<Button
+						className="block-editor-link-control__unlink"
+						isDestructive
+						variant="link"
+						onClick={ () => {
+							onChange( null );
+						} }
+					>
+						{ __( 'Unlink' ) }
+					</Button>
+				) }
+			</div>
 		</div>
 	);
 }

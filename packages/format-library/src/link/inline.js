@@ -11,6 +11,7 @@ import {
 	isCollapsed,
 	applyFormat,
 	useAnchorRef,
+	removeFormat,
 } from '@wordpress/rich-text';
 import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
 
@@ -49,6 +50,15 @@ function InlineLinkUI( {
 	};
 
 	function onChangeLink( nextValue ) {
+		// null values trigger removal of link format.
+		if ( null === nextValue ) {
+			const newValue = removeFormat( value, 'core/link' );
+			onChange( newValue );
+			stopAddingLink();
+			speak( __( 'Link removed.' ), 'assertive' );
+			return;
+		}
+
 		// Merge with values from state, both for the purpose of assigning the
 		// next state value, and for use in constructing the new link format if
 		// the link is ready to be applied.
