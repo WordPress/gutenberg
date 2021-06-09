@@ -23,8 +23,10 @@ jobs:
         runs-on: ubuntu-latest
         if: |
             github.repository == 'WordPress/gutenberg' &&
-            github.event_name == 'workflow_dispatch' &&
-            github.ref == 'refs/heads/trunk' && (
+            github.event_name == 'workflow_dispatch' && (
+              github.ref == 'refs/heads/trunk' ||
+              startsWith( github.ref, 'refs/heads/release/' )
+            ) && (
               github.event.inputs.version == 'rc' ||
               github.event.inputs.version == 'stable'
             )
