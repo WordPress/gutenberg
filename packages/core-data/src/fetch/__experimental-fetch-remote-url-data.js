@@ -15,7 +15,7 @@ import { addQueryArgs, prependHTTP } from '@wordpress/url';
  * eg: <title> tag, favicon...etc.
  *
  * @async
- * @param {string} url the URL to request details from.
+ * @param {string}  url     the URL to request details from.
  * @param {Object?} options any options to pass to the underlying fetch.
  * @example
  * ```js
