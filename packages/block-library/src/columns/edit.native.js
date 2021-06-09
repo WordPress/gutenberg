@@ -85,7 +85,7 @@ const DEFAULT_COLUMNS_NUM = 2;
  */
 const MIN_COLUMNS_NUM = 1;
 
-const { isWider, isFullWidth } = alignmentHelpers;
+const { isFullWidth } = alignmentHelpers;
 
 function ColumnsEditContainer( {
 	attributes,
@@ -132,16 +132,9 @@ function ColumnsEditContainer( {
 	}, [ width, columnCount ] );
 
 	const renderAppender = () => {
-		const isEqualWidth = width === screenWidth;
-
 		if ( isSelected ) {
 			return (
-				<View
-					style={
-						( isWider( screenWidth, 'mobile' ) || isEqualWidth ) &&
-						styles.columnAppender
-					}
-				>
+				<View style={ isFullWidth( align ) && styles.columnAppender }>
 					<InnerBlocks.ButtonBlockAppender
 						onAddBlock={ onAddBlock }
 					/>
