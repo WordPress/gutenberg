@@ -50,8 +50,7 @@
 			"type": "string"
 		},
 		"isTopLevelLink": {
-			"type": "boolean",
-			"default": true
+			"type": "boolean"
 		}
 	},
 	"usesContext": [
