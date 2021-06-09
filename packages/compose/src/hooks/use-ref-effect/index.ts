@@ -23,8 +23,8 @@ import { useCallback, useRef } from '@wordpress/element';
  * to be removed. It *is* necessary if you add dependencies because the ref
  * callback will be called multiple times for the same node.
  *
- * @param callback Callback with ref as argument.
- * @param dependencies Dependencies of the callback.
+ * @param  callback     Callback with ref as argument.
+ * @param  dependencies Dependencies of the callback.
  *
  * @return Ref callback.
  */

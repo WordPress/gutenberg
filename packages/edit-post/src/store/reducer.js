@@ -188,8 +188,8 @@ export function publishSidebarActive( state = false, action ) {
  * A "true" value means the meta boxes saving request is in-flight.
  *
  *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
+ * @param {boolean} state  Previous state.
+ * @param {Object}  action Action Object.
  *
  * @return {Object} Updated state.
  */
@@ -207,8 +207,8 @@ export function isSavingMetaBoxes( state = false, action ) {
 /**
  * Reducer keeping track of the meta boxes per location.
  *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
+ * @param {boolean} state  Previous state.
+ * @param {Object}  action Action Object.
  *
  * @return {Object} Updated state.
  */
@@ -244,7 +244,7 @@ export function deviceType( state = 'Desktop', action ) {
  * Note: this reducer interacts with the list view panel reducer
  * to make sure that only one of the two panels is open at the same time.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
 export function blockInserterPanel( state = false, action ) {
@@ -263,7 +263,7 @@ export function blockInserterPanel( state = false, action ) {
  * Note: this reducer interacts with the inserter panel reducer
  * to make sure that only one of the two panels is open at the same time.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
 export function listViewPanel( state = false, action ) {

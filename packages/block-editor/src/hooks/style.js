@@ -67,8 +67,9 @@ function compileStyleValue( uncompiledValue ) {
 /**
  * Returns the inline styles to add depending on the style object
  *
- * @param  {Object} styles Styles configuration
- * @return {Object}        Flattened CSS variables declaration
+ * @param {Object} styles Styles configuration.
+ *
+ * @return {Object} Flattened CSS variables declaration.
  */
 export function getInlineStyles( styles = {} ) {
 	const output = {};
@@ -115,8 +116,9 @@ function compileElementsStyles( selector, elements = {} ) {
 /**
  * Filters registered block settings, extending attributes to include `style` attribute.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 function addAttribute( settings ) {
 	if ( ! hasStyleSupport( settings ) ) {
@@ -151,10 +153,11 @@ const skipSerializationPaths = {
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
- * @param  {Object} props      Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {Object}            Filtered props applied to save element
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( props, blockType, attributes ) {
 	if ( ! hasStyleSupport( blockType ) ) {
@@ -181,8 +184,9 @@ export function addSaveProps( props, blockType, attributes ) {
  * Filters registered block settings to extend the block edit wrapper
  * to apply the desired styles and classnames properly.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object}.Filtered block settings.
  */
 export function addEditProps( settings ) {
 	if ( ! hasStyleSupport( settings ) ) {
@@ -206,8 +210,9 @@ export function addEditProps( settings ) {
  * Override the default edit UI to include new inspector controls for
  * all the custom styles configs.
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
@@ -233,7 +238,7 @@ export const withBlockControls = createHigherOrderComponent(
 /**
  * Override the default block element to include duotone styles.
  *
- * @param  {Function} BlockListBlock Original component
+ * @param {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
  */
 const withElementsStyles = createHigherOrderComponent(

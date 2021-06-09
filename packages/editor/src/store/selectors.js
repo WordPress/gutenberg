@@ -1703,7 +1703,7 @@ export const __experimentalGetDefaultTemplatePartAreas = createSelector(
  * Returns a default template type searched by slug.
  *
  * @param {Object} state Global application state.
- * @param {string} slug The template type slug.
+ * @param {string} slug  The template type slug.
  *
  * @return {Object} The template type.
  */
@@ -1717,7 +1717,7 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  * Given a template entity, return information about it which is ready to be
  * rendered, such as the title, description, and icon.
  *
- * @param {Object} state Global application state.
+ * @param {Object} state    Global application state.
  * @param {Object} template The template for which we need information.
  * @return {Object} Information about the template, including title, description, and icon.
  */
