@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount, shallow } from 'enzyme';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -14,184 +14,181 @@ import {
 	CardHeader,
 	CardMedia,
 } from '../';
+import { CONFIG } from '../../utils';
 
 describe( 'Card', () => {
-	describe( 'basic rendering', () => {
-		test( 'should have components-card className', () => {
-			const wrapper = shallow( <Card /> );
-			const card = wrapper.find( '.components-card' );
-
-			expect( card.length ).toBeTruthy();
-		} );
-
-		test( 'should be able to render content', () => {
-			const card = shallow(
+	describe( 'Card component', () => {
+		it( 'should render correctly', () => {
+			const wrapper = render(
 				<Card>
-					<div className="content">Hello</div>
+					<CardHeader>Card Header</CardHeader>
+					<CardBody>Card Body 1</CardBody>
+					<CardBody>Card Body 2</CardBody>
+					<CardDivider />
+					<CardBody>Card Body 3</CardBody>
+					<CardMedia>
+						<img
+							alt="Card Media"
+							src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
+						/>
+					</CardMedia>
+					<CardFooter>Card Footer</CardFooter>
 				</Card>
 			);
-			const content = card.find( '.content' );
-
-			expect( content.length ).toBe( 1 );
-			expect( content.text() ).toBe( 'Hello' );
-		} );
-	} );
-
-	describe( 'styles', () => {
-		test( 'should render borderless', () => {
-			const wrapper = shallow( <Card isBorderless /> );
-			const card = wrapper.find( '.components-card' );
-
-			expect( card.hasClass( 'is-borderless' ) ).toBe( true );
+			expect( wrapper ).toMatchSnapshot();
 		} );
 
-		test( 'should render elevated styles', () => {
-			const wrapper = shallow( <Card isElevated /> );
-			const card = wrapper.find( '.components-card' );
+		it( 'should remove borders when the isBorderless prop is true', () => {
+			const { rerender, container } = render(
+				<Card>Code is Poetry</Card>
+			);
+			expect( container.firstChild ).not.toHaveStyle(
+				'box-shadow: none'
+			);
 
-			expect( card.hasClass( 'is-elevated' ) ).toBe( true );
+			rerender( <Card isBorderless={ true }>Code is Poetry</Card> );
+			expect( container.firstChild ).toHaveStyle( 'box-shadow: none' );
 		} );
-	} );
 
-	describe( 'CardBody', () => {
-		test( 'should be able to render', () => {
-			const card = mount(
+		it( 'should add rounded border when the isRounded prop is true', () => {
+			const { container } = render(
+				<Card isRounded={ true }>Code is Poetry</Card>
+			);
+			expect( container.firstChild ).toHaveStyle( {
+				borderRadius: CONFIG.cardBorderRadius,
+			} );
+		} );
+
+		it( 'should show a box shadow when the elevation prop is greater than 0', () => {
+			// The `elevation` prop has a default value of "2"
+			const { container: withElevation } = render(
+				<Card>Code is Poetry</Card>
+			);
+			const { container: withoutElevation } = render(
+				<Card elevation={ 0 }>Code is Poetry</Card>
+			);
+
+			expect( withElevation.firstChild ).toMatchDiffSnapshot(
+				withoutElevation.firstChild
+			);
+		} );
+
+		it( 'should add different amounts of white space when using the size prop', () => {
+			// The `size` prop has a default value of "medium"
+			const { container: withSize } = render(
 				<Card>
-					<CardBody>Hello</CardBody>
+					<CardHeader>Header</CardHeader>
+					<CardBody>Code is Poetry</CardBody>
 				</Card>
 			);
-			const cardBody = card.find( 'CardBody' );
-
-			expect( cardBody.length ).toBe( 1 );
-			expect( cardBody.text() ).toBe( 'Hello' );
-		} );
-
-		test( 'should receive modifier props from context', () => {
-			const card = mount(
-				<Card size="extraSmall">
-					<CardBody>Hello</CardBody>
+			const { container: withSizeNone } = render(
+				<Card size="none">
+					<CardHeader>Header</CardHeader>
+					<CardBody>Code is Poetry</CardBody>
 				</Card>
 			);
-			const cardBody = card.find( '.components-card__body' ).first();
 
-			expect( cardBody.hasClass( 'is-size-extraSmall' ) ).toBe( true );
+			expect( withSize.firstChild ).toMatchDiffSnapshot(
+				withSizeNone.firstChild
+			);
 		} );
 
-		test( 'should be able to override props from context', () => {
-			const card = mount(
-				<Card size="extraSmall">
-					<CardBody size="large">Hello</CardBody>
+		it( 'should warn when the isElevated prop is passed', () => {
+			// `isElevated` is automatically converted to `elevation="2"`
+			const { container } = render(
+				<Card isElevated={ true }>Code is Poetry</Card>
+			);
+			expect( container ).toMatchSnapshot();
+
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should pass the isBorderless and isSize props from its context to its sub-components', () => {
+			const { container: withoutBorderLarge } = render(
+				<Card isBorderless={ true } size="large">
+					<CardHeader>Header</CardHeader>
+					<CardBody>Body</CardBody>
+					<CardFooter>Footer</CardFooter>
 				</Card>
 			);
-			const cardBody = card.find( '.components-card__body' ).first();
-
-			expect( cardBody.hasClass( 'is-size-large' ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'CardHeader', () => {
-		test( 'should be able to render', () => {
-			const card = mount(
-				<Card>
-					<CardHeader>Hello</CardHeader>
+			const { container: withBorderSmall } = render(
+				<Card isBorderless={ false } size="small">
+					<CardHeader>Header</CardHeader>
+					<CardBody>Body</CardBody>
+					<CardFooter>Footer</CardFooter>
 				</Card>
 			);
-			const cardHeader = card.find( 'CardHeader' );
-
-			expect( cardHeader.length ).toBe( 1 );
-			expect( cardHeader.text() ).toBe( 'Hello' );
+			expect( withoutBorderLarge ).toMatchDiffSnapshot( withBorderSmall );
 		} );
 
-		test( 'should receive modifier props from context', () => {
-			const card = mount(
-				<Card size="extraSmall" isBorderless={ true }>
-					<CardHeader>Hello</CardHeader>
+		it( 'should get the isBorderless and isSize props (passed from its context) overriddenwhen the same props is specified directly on the component', () => {
+			const { container: withoutBorder } = render(
+				<Card isBorderless={ true } size="large">
+					<CardHeader>Header</CardHeader>
+					<CardBody>Body</CardBody>
+					<CardFooter>Footer</CardFooter>
 				</Card>
 			);
-			const cardHeader = card.find( '.components-card__header' ).first();
-
-			expect( cardHeader.hasClass( 'is-size-extraSmall' ) ).toBe( true );
-			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( true );
-		} );
-
-		test( 'should be able to override props from context', () => {
-			const card = mount(
-				<Card size="extraSmall" isBorderless={ true }>
-					<CardHeader size="large" isBorderless={ false }>
-						Hello
+			const { container: withBorder } = render(
+				<Card isBorderless={ true } size="large">
+					<CardHeader isBorderless={ false } size="small">
+						Header
 					</CardHeader>
-				</Card>
-			);
-			const cardHeader = card.find( '.components-card__header' ).first();
-
-			expect( cardHeader.hasClass( 'is-size-large' ) ).toBe( true );
-			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'CardFooter', () => {
-		test( 'should be able to render', () => {
-			const card = mount(
-				<Card>
-					<CardFooter>Hello</CardFooter>
-				</Card>
-			);
-			const cardFooter = card.find( 'CardFooter' );
-
-			expect( cardFooter.length ).toBe( 1 );
-			expect( cardFooter.text() ).toBe( 'Hello' );
-		} );
-
-		test( 'should receive modifier props from context', () => {
-			const card = mount(
-				<Card size="extraSmall" isBorderless={ true }>
-					<CardFooter>Hello</CardFooter>
-				</Card>
-			);
-			const cardFooter = card.find( '.components-card__footer' ).first();
-
-			expect( cardFooter.hasClass( 'is-size-extraSmall' ) ).toBe( true );
-			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( true );
-		} );
-
-		test( 'should be able to override props from context', () => {
-			const card = mount(
-				<Card size="extraSmall" isBorderless={ true }>
-					<CardFooter size="large" isBorderless={ false }>
-						Hello
+					<CardBody size="medium">Body</CardBody>
+					<CardFooter isBorderless={ false } size="xSmall">
+						Footer
 					</CardFooter>
 				</Card>
 			);
-			const cardFooter = card.find( '.components-card__footer' ).first();
-
-			expect( cardFooter.hasClass( 'is-size-large' ) ).toBe( true );
-			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( false );
+			expect( withoutBorder ).toMatchDiffSnapshot( withBorder );
 		} );
-	} );
 
-	describe( 'CardDivider', () => {
-		test( 'should be able to render', () => {
-			const card = mount(
-				<Card>
-					<CardDivider />
-				</Card>
-			);
-			const cardBody = card.find( 'CardDivider' );
-
-			expect( cardBody.length ).toBe( 1 );
+		describe( 'CardHeader', () => {
+			it( 'should render with a darker background color when isShady is true', () => {
+				const { container } = render( <CardHeader>Header</CardHeader> );
+				const { container: containerShady } = render(
+					<CardHeader isShady={ true }>Header</CardHeader>
+				);
+				expect( container ).toMatchDiffSnapshot( containerShady );
+			} );
 		} );
-	} );
 
-	describe( 'CardMedia', () => {
-		test( 'should be able to render', () => {
-			const card = mount(
-				<Card>
-					<CardMedia />
-				</Card>
-			);
-			const cardBody = card.find( 'CardMedia' );
+		describe( 'CardFooter', () => {
+			it( 'should render with a darker background color when isShady is true', () => {
+				const { container } = render( <CardFooter>Footer</CardFooter> );
+				const { container: containerShady } = render(
+					<CardFooter isShady={ true }>Footer</CardFooter>
+				);
+				expect( container ).toMatchDiffSnapshot( containerShady );
+			} );
 
-			expect( cardBody.length ).toBe( 1 );
+			it( 'should use the justify prop to align its content, like a Flex container', () => {
+				const { container } = render( <CardFooter>Footer</CardFooter> );
+				const { container: containerWithFlexEnd } = render(
+					<CardFooter justify="flex-end">Footer</CardFooter>
+				);
+				expect( container ).toMatchDiffSnapshot( containerWithFlexEnd );
+			} );
+		} );
+
+		describe( 'CardBody', () => {
+			it( 'should render with a darker background color when isShady is true', () => {
+				const { container } = render( <CardBody>Body</CardBody> );
+				const { container: containerShady } = render(
+					<CardBody isShady={ true }>Body</CardBody>
+				);
+				expect( container ).toMatchDiffSnapshot( containerShady );
+			} );
+
+			it( 'should allow scrolling content with the scrollable prop is true', () => {
+				const { container: containerScrollable } = render(
+					<CardBody>Body</CardBody>
+				);
+				const { container } = render(
+					<CardBody isScrollable={ false }>Body</CardBody>
+				);
+				expect( container ).toMatchDiffSnapshot( containerScrollable );
+			} );
 		} );
 	} );
 } );
