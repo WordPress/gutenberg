@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
 import { css } from 'emotion';
 
 /**
@@ -9,35 +8,10 @@ import { css } from 'emotion';
  */
 import { COLORS, CONFIG } from '../utils';
 
-export const styleProps = {
-	borderColorInternal: COLORS.lightGray[ 500 ],
-	borderRadiusInternal: '3px',
-};
-
-const { borderColorInternal, borderRadiusInternal } = styleProps;
-
-export const CardUI = styled.div`
-	background: ${ COLORS.white };
-	box-sizing: border-box;
-	border-radius: ${ borderRadiusInternal };
-	border: 1px solid ${ borderColorInternal };
-
-	${ handleBorderless };
-
-	&.is-elevated {
-		box-shadow: 0px 1px 3px 0px rgba( 0, 0, 0, 0.2 ),
-			0px 1px 1px 0px rgba( 0, 0, 0, 0.14 ),
-			0px 2px 1px -1px rgba( 0, 0, 0, 0.12 );
-	}
+export const Card = css`
+	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
+	outline: none;
 `;
-
-export function handleBorderless() {
-	return `
-		&.is-borderless {
-			border: none;
-		}
-	`;
-}
 
 export const Header = css`
 	border-bottom: 1px solid;
@@ -53,6 +27,10 @@ export const Footer = css`
 	&:first-child {
 		border-top: none;
 	}
+`;
+
+export const Content = css`
+	height: 100%;
 `;
 
 export const Body = css`
@@ -95,8 +73,16 @@ export const borderColor = css`
 	border-color: ${ CONFIG.colorDivider };
 `;
 
+export const boxShadowless = css`
+	box-shadow: none;
+`;
+
 export const borderless = css`
 	border: none;
+`;
+
+export const rounded = css`
+	border-radius: ${ CONFIG.cardBorderRadius };
 `;
 
 export const cardPaddings = {

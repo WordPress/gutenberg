@@ -1,44 +1,73 @@
 # Card
 
-Card provides a flexible and extensible content container.
+`Card` provides a flexible and extensible content container.
 
 ## Usage
 
-```jsx
-import { Card, CardBody } from '@wordpress/components';
+`Card` also provides a convenient set of [sub-components](#sub-components) such as `CardBody`, `CardHeader`, `CardFooter`, and more (see below).
 
-const Example = () => (
-	<Card>
-		<CardBody>...</CardBody>
-	</Card>
-);
+```jsx live
+import {
+	Card,
+	CardHeader,
+	CardBody,
+	CardFooter,
+	Text,
+	Heading,
+} from '@wordpress/components';
+
+function Example() {
+	return (
+		<Card>
+			<CardHeader>
+				<Heading size={ 4 }>Card Title</Heading>
+			</CardHeader>
+			<CardBody>
+				<Text>Card Content</Text>
+			</CardBody>
+			<CardFooter>
+				<Text>Card Footer</Text>
+			</CardFooter>
+		</Card>
+	);
+}
 ```
 
 ## Props
 
-### isBorderless
+### `elevation`: `number`
 
-Determines the border style of the card.
+Size of the elevation shadow, based on the Style system's elevation system.
+Elevating a `Card` can be done by adjusting the `elevation` prop. This may be helpful in highlighting certain content. For more information, check out `Elevation`.
 
--   Type: `Boolean`
--   Required: No
--   Default: `false`
+- Required: No
+- Default: `2`
 
-### isElevated
+### `isBorderless`: `boolean`
 
-Determines the elevation style of the card.
+Renders without a border.
 
--   Type: `Boolean`
--   Required: No
--   Default: `false`
+- Required: No
+- Default: `false`
 
-### size
+### `isRounded`: `boolean`
+
+Renders with rounded corners.
+
+- Required: No
+- Default: `true`
+
+### `size`: `string`
 
 Determines the amount of padding within the component.
 
--   Type: `String`
--   Required: No
--   Default: `medium`
+- Required: No
+- Default: `medium`
+- Allowed values: `xSmall`, `small`, `medium`, `large`
+
+### Inherited props
+
+`Card` also inherits all of the [`Surface` props](../../ui/surface/README.md#props).
 
 ## Sub-Components
 
@@ -46,9 +75,9 @@ This component provides a collection of sub-component that can be used to compos
 
 -   [`<CardBody />`](../card-body/README.md)
 -   [`<CardDivider />`](../card-divider/README.md)
--   [`<CardFooter />`](../card-footer/README.md)
--   [`<CardHeader />`](../card-header/README.md)
--   [`<CardMedia />`](../card-media/README.md)
+-   [`<CardFooter />`](../card-footer/README.md))
+-   [`<CardHeader />`](../card-header/README.md))
+-   [`<CardMedia />`](../card-media/README.md))
 
 ### Sub-Components Example
 
@@ -78,7 +107,7 @@ const Example = () => (
 
 ### Context
 
-`<Card />`'s sub-components are connected to `<Card />` using [Context](https://reactjs.org/docs/context.html). Certain props like `size` and `variant` are passed through to the sub-components.
+`<Card />`'s sub-components are connected to `<Card />` using [Context](https://reactjs.org/docs/context.html). Certain props like `size` and `isBorderless` are passed through to some of the sub-components.
 
 In the following example, the `<CardBody />` will render with a size of `small`:
 
