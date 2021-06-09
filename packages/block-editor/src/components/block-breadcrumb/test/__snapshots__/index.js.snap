@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockBreadcrumb should match snapshot 1`] = `
+<ul
+  aria-label="Block breadcrumb"
+  className="block-editor-block-breadcrumb"
+  role="list"
+>
+  <li
+    aria-current="true"
+    className="block-editor-block-breadcrumb__current"
+  >
+    Document
+  </li>
+</ul>
+`;
+
+exports[`BlockBreadcrumb should match snapshot with root label 1`] = `
+<ul
+  aria-label="Block breadcrumb"
+  className="block-editor-block-breadcrumb"
+  role="list"
+>
+  <li
+    aria-current="true"
+    className="block-editor-block-breadcrumb__current"
+  >
+    Tuhinga
+  </li>
+</ul>
+`;
