@@ -333,6 +333,10 @@ class URLInput extends Component {
 					event.stopPropagation();
 					this.selectLink( suggestion );
 				}
+
+				if ( this.props.onSubmit ) {
+					this.props.onSubmit();
+				}
 				break;
 			}
 		}
