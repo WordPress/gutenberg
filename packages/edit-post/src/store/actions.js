@@ -497,7 +497,7 @@ export function* __unstableSwitchToTemplateMode( template ) {
 	yield setIsEditingTemplate( true );
 
 	const isWelcomeGuideActive = yield controls.select(
-		'core/edit-post',
+		editPostStore.name,
 		'isFeatureActive',
 		'welcomeGuideTemplate'
 	);
