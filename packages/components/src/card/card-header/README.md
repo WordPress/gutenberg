@@ -39,4 +39,4 @@ Determines the amount of padding within the component.
 
 - Required: No
 - Default: `medium`
-- Allowed values: `xSmall`, `small`, `medium`, `large`
+- Allowed values: `none`, `xSmall`, `small`, `medium`, `large`

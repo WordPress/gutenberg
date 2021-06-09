@@ -9,7 +9,7 @@ import type { CSSProperties } from 'react';
  */
 import type { Props as SurfaceProps } from '../surface/types';
 
-export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
+export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large' | 'none';
 
 type SizeableProps = {
 	/**
