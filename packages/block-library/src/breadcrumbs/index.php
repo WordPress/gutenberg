@@ -19,21 +19,27 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$post_id = $block->context['postId'];
-
-	$separator = '';
-
-	if ( isset( $attributes['separator'] ) ) {
-		$separator = $attributes['separator'];
-	}
-
+	$post_id      = $block->context['postId'];
 	$ancestor_ids = get_post_ancestors( $post_id );
 
 	if ( empty( $ancestor_ids ) ) {
 		return '';
 	}
 
+	if ( ! empty( $attributes['nestingLevel'] ) ) {
+		$ancestor_ids = array_slice(
+			$ancestor_ids,
+			0,
+			intval( $attributes['nestingLevel'] )
+		);
+	}
+
+	$separator    = '';
 	$inner_markup = '';
+
+	if ( isset( $attributes['separator'] ) ) {
+		$separator = $attributes['separator'];
+	}
 
 	foreach( array_reverse( $ancestor_ids ) as $index => $ancestor_id ) {
 		$show_separator = 0 !== $index || ! empty( $attributes['showLeadingSeparator'] );

@@ -31,15 +31,24 @@
 	},
 	"supports": {
 		"align": true,
-		"html": false,
 		"color": {
 			"gradients": true,
 			"link": true
+		},
+		"html": false,
+		"spacing": {
+			"padding": true
 		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
 		}
 	},
 	"editorStyle": "wp-block-breadcrumbs-editor",

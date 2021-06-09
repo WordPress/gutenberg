@@ -81,9 +81,13 @@ export default function BreadcrumbsEdit( {
 
 	// Set breadcrumb page titles to real titles if available, and
 	// fall back to placeholder content.
-	const breadcrumbTitles = parents.length
+	let breadcrumbTitles = parents.length
 		? parents.map( ( parent ) => parent?.title?.rendered || ' ' )
 		: [ __( 'Root' ), __( 'Top-level page' ), __( 'Child page' ) ];
+
+	if ( nestingLevel > 0 ) {
+		breadcrumbTitles = breadcrumbTitles.slice( -nestingLevel );
+	}
 
 	const buildBreadcrumb = ( crumbTitle, showSeparator, key ) => {
 		let separatorSpan;
@@ -100,7 +104,9 @@ export default function BreadcrumbsEdit( {
 			<li className="wp-block-breadcrumbs__item" key={ key }>
 				{ separatorSpan }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
-				<a href="#">{ crumbTitle }</a>
+				<a href="#" onClick={ ( event ) => event.preventDefault() }>
+					{ crumbTitle }
+				</a>
 				{ /* eslint-enable */ }
 			</li>
 		);
