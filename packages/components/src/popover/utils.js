@@ -169,12 +169,10 @@ export function computePopoverXAxisPosition(
  * @param {number}  relativeOffsetTop     If applicable, top offset of the
  *                                        relative positioned parent container.
  * @param {boolean} forcePosition         Don't adjust position based on anchor.
- * @param {Object}  sticky                Sticky positions per side.
- * @param {number}  sticky.top            Top sticky position.
- * @param {number}  sticky.bottom         Bottom sticky position.
- * @param {Object}  stickyArea            Offsets relative to anchorRect.
- * @param {number}  stickyArea.top        Offset from top.
- * @param {number}  stickyArea.bottom     Offset from bottom.
+ * @param {number}  stickyTop             Sticky top position offset from the
+ *                                        boundaryElement.
+ * @param {boolean} stickier              Favor sticky position even if the
+ *                                        anchor is out of view.
  *
  * @return {Object} Popover xAxis position and constraints.
  */
@@ -187,23 +185,23 @@ export function computePopoverYAxisPosition(
 	anchorRef,
 	relativeOffsetTop,
 	forcePosition,
-	{ top, bottom },
-	{ top: start, bottom: end }
+	stickyTop,
+	stickier
 ) {
 	const { height } = contentSize;
 
 	if ( stickyBoundaryElement ) {
 		const stickyRect = stickyBoundaryElement.getBoundingClientRect();
-		top += stickyRect.top + height - relativeOffsetTop;
-		bottom = -bottom + stickyRect.bottom - relativeOffsetTop;
+		const top = stickyTop + stickyRect.top + height - relativeOffsetTop;
+		const bottom = stickyRect.bottom - relativeOffsetTop;
 		if ( anchorRect.top < top ) {
-			end += anchorRect.bottom;
+			const end = stickier ? Infinity : anchorRect.bottom;
 			return {
 				yAxis,
 				popoverTop: Math.min( end, top ),
 			};
 		} else if ( anchorRect.top > bottom ) {
-			start += anchorRect.top;
+			const start = stickier ? -Infinity : anchorRect.top;
 			return {
 				yAxis,
 				popoverTop: Math.max( start, bottom ),
@@ -303,8 +301,10 @@ export function computePopoverYAxisPosition(
  * @param {Element} boundaryElement       Boundary element.
  * @param {boolean} forcePosition         Don't adjust position based on anchor.
  * @param {boolean} forceXAlignment       Don't adjust alignment based on YAxis.
- * @param {Object}  sticky                Sticky positions per side.
- * @param {Object}  stickyBounds          Boundary offsets relative to anchorRect.
+ * @param {number}  stickyTop             Sticky top position offset from the
+ *                                        boundaryElement.
+ * @param {boolean} stickier              Favor sticky position even if the
+ *                                        anchor is out of view.
  *
  * @return {Object} Popover position and constraints.
  */
@@ -318,8 +318,8 @@ export function computePopoverPosition(
 	boundaryElement,
 	forcePosition,
 	forceXAlignment,
-	sticky,
-	stickyBounds
+	stickyTop = 0,
+	stickier = false
 ) {
 	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
 
@@ -332,8 +332,8 @@ export function computePopoverPosition(
 		anchorRef,
 		relativeOffsetTop,
 		forcePosition,
-		sticky,
-		stickyBounds
+		stickyTop,
+		stickier
 	);
 	const xAxisPosition = computePopoverXAxisPosition(
 		anchorRect,

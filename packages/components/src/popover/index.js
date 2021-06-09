@@ -257,10 +257,8 @@ const Popover = (
 		__unstableBoundaryParent,
 		__unstableForcePosition,
 		__unstableForceXAlignment,
-		__experimentalStickyBottom: stickyBottom = 0,
-		__experimentalStickyTop: stickyTop = 0,
-		__experimentalStickyAreaBottom: stickyAreaBottom = 0,
-		__experimentalStickyAreaTop: stickyAreaTop = 0,
+		__experimentalStickyTop,
+		__experimentalStickier,
 		/* eslint-enable no-unused-vars */
 		...contentProps
 	},
@@ -356,8 +354,8 @@ const Popover = (
 				boundaryElement,
 				__unstableForcePosition,
 				__unstableForceXAlignment,
-				{ top: stickyTop, bottom: stickyBottom },
-				{ top: stickyAreaTop, bottom: stickyAreaBottom }
+				__experimentalStickyTop,
+				__experimentalStickier
 			);
 
 			if (
@@ -482,10 +480,8 @@ const Popover = (
 		position,
 		contentSize,
 		__unstableStickyBoundaryElement,
-		stickyBottom,
-		stickyTop,
-		stickyAreaBottom,
-		stickyAreaTop,
+		__experimentalStickyTop,
+		__experimentalStickier,
 		__unstableObserveElement,
 		__unstableBoundaryParent,
 	] );

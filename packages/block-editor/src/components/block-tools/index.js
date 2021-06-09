@@ -19,21 +19,19 @@ import { usePopoverScroll } from './use-popover-scroll';
  * insertion point and a slot for the inline rich text toolbar). Must be wrapped
  * around the block content and editor styles wrapper or iframe.
  *
- * @param {Object} $0                                Props.
- * @param {Object} $0.children                       The block content and style container.
- * @param {Object} $0.__unstableContentRef           Ref holding the content scroll container.
- * @param {number} $0.__experimentalStickyBottom     Bottom sticky position of floating toolbar.
- * @param {number} $0.__experimentalStickyTop        Top sticky position of floating and top toolbar.
- * @param {number} $0.__experimentalStickyAreaBottom Offset of bottom side of sticky area.
- * @param {number} $0.__experimentalStickyAreaTop    Offset of top side of sticky area.
+ * @param {Object}  $0                         Props.
+ * @param {Object}  $0.children                The block content and style container.
+ * @param {Object}  $0.__unstableContentRef    Ref holding the content scroll container.
+ * @param {number}  $0.__experimentalStickyTop Top sticky position offset of floating and
+ *                                             top toolbar.
+ * @param {boolean} $0.__experimentalStickier  Favor sticky position even if the block is
+                                               out of view.
  */
 export default function BlockTools( {
 	children,
 	__unstableContentRef,
-	__experimentalStickyBottom,
 	__experimentalStickyTop,
-	__experimentalStickyAreaBottom: stickyAreaBottom,
-	__experimentalStickyAreaTop: stickyAreaTop,
+	__experimentalStickier,
 } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const hasFixedToolbar = useSelect(
@@ -53,10 +51,8 @@ export default function BlockTools( {
                  needed for navigation mode. */ }
 			<BlockPopover
 				__unstableContentRef={ __unstableContentRef }
-				__experimentalStickyBottom={ __experimentalStickyBottom }
 				__experimentalStickyTop={ __experimentalStickyTop }
-				__experimentalStickyAreaBottom={ stickyAreaBottom }
-				__experimentalStickyAreaTop={ stickyAreaTop }
+				__experimentalStickier={ __experimentalStickier }
 			/>
 			{ /* Used for the inline rich text toolbar. */ }
 			<Popover.Slot
