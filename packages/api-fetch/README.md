@@ -56,7 +56,12 @@ Shorthand to be used in place of `body`, accepts an object value to be stringifi
 
 ### Aborting a request
 
-Aborting a request can be done by using [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) as the same as in `fetch`. For legacy browsers that don't support `AbortController`, you should provide your own polyfill of `AbortController` if you still want it to be abort-able, or simply ignore it as shown in the example below.
+Aborting a request can be achieved through the use of [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) in the same way as you would when using the native `fetch` API. 
+
+For legacy browsers that don't support `AbortController`, you can either:
+
+* Provide your own polyfill of `AbortController` if you still want it to be abortable. 
+* Ignore it as shown in the example below.
 
 **Example**
 
@@ -67,8 +72,8 @@ const controller = typeof AbortController === 'undefined'
 
 apiFetch( { path: '/wp/v2/posts', signal: controller?.signal } )
 	.catch( ( error ) => {
-		// If the browser doesn't support AbortController then it will never log.
-		// It should be fine in most cases when it's considered to be a progressive improvement.
+		// If the browser doesn't support AbortController then the code below will never log.
+		// However, in most cases this should be fine as it can be considered to be a progressive enhancement.
 		if ( error.name === 'AbortError' ) {
 			console.log( 'Request has been aborted' );
 		}
