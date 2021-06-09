@@ -63,4 +63,9 @@
 	width: 100%;
 	height: 100%;
 	position: relative;
+
+	// Safari flickering fix.
+	> div {
+		transform: translateZ(0);
+	}
 }
