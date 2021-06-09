@@ -34,4 +34,6 @@ module.exports = {
 
 **Note:**
 - Multiple instances of the plugin are not supported and may produced unexpected results;
-- It assumes your WebPack pipeline is already generating a `.min.js` JS asset file for each JS entry-point.
+- It assumes your webpack pipeline is already generating a `.min.js` JS asset file for each JS entry-point.
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
