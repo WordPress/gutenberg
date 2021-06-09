@@ -514,6 +514,61 @@ if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
 }
 
 /**
+ * Enqueue a stylesheet for a specific block.
+ *
+ * If the theme has opted-in to separate-styles loading,
+ * then the stylesheet will be enqueued on-render,
+ * otherwise when the block inits.
+ *
+ * @param string $block_name The block-name, including namespace.
+ * @param array  $args       An array of arguments [handle,src,deps,ver,media].
+ * @param bool   $register   Whether the stylesheet should be registered.
+ *                           If set to false, then assume it has already been registered,
+ *                           and only enqueue it.
+ */
+function gutenberg_enqueue_block_style( $block_name, $args, $register = true ) {
+	$args = wp_parse_args(
+		$args,
+		array(
+			'handle' => '',
+			'src'    => '',
+			'deps'   => array(),
+			'ver'    => false,
+			'media'  => 'all',
+		)
+	);
+
+	// Register the stylesheet.
+	if ( $register ) {
+		wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
+	}
+
+	// Add `path` data if provided.
+	if ( isset( $args['path'] ) ) {
+		wp_style_add_data( $args['handle'], 'path', $args['path'] );
+	}
+
+	// Enqueue asset.
+	if ( ! gutenberg_should_load_separate_block_assets() ) {
+		wp_enqueue_style( $args['handle'] );
+	} else {
+		add_filter(
+			"render_block_$block_name",
+			/**
+			 * Filters the content of a single block.
+			 *
+			 * @param string $block_content The block content about to be appended.
+			 * @param array  $block         The full block, including name and attributes.
+			 */
+			function( $block_content ) use ( $args ) {
+				wp_enqueue_style( $args['handle'] );
+				return $block_content;
+			}
+		);
+	}
+}
+
+/**
  * Allow multiple block styles.
  *
  * @param array $metadata Metadata for registering a block type.
@@ -523,27 +578,13 @@ if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
 function gutenberg_multiple_block_styles( $metadata ) {
 	foreach ( array( 'style', 'editorStyle' ) as $key ) {
 		if ( isset( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
-
-			// Enqueue multiple styles on block render.
-			add_filter(
-				"render_block_{$metadata['name']}",
-				/**
-				 * Filters the content of a single block.
-				 *
-				 * @since 5.0.0
-				 *
-				 * @param string $block_content The block content about to be appended.
-				 * @param array  $block         The full block, including name and attributes.
-				 */
-				function( $block_content, $block ) use ( $metadata, $key ) {
-					foreach ( $metadata[ $key ] as $handle ) {
-						wp_enqueue_style( $handle );
-					}
-					return $block_content;
-				},
-				10,
-				2
-			);
+			foreach ( $metadata[ $key ] as $handle ) {
+				gutenberg_enqueue_block_style(
+					$metadata['name'],
+					array( 'handle' => $handle ),
+					false
+				);
+			}
 
 			// Only return the 1st item in the array.
 			$metadata[ $key ] = $metadata[ $key ][0];
