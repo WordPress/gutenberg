@@ -392,8 +392,9 @@ export function* requestMetaBoxUpdates() {
 			parse: false,
 		} );
 	} finally {
-		// Update meta box isSaving state even if apiFetch fails.
-		// This prevents locking the post editor in a saving state.
+		// The "metaBoxUpdatesSuccess" action sets isSavingMetaBoxes state to "false."
+		// This indicates that the meta boxes saving request is complete, regardless of whether it has succeeded or failed.
+		// Updating this state prevents locking the editor in the saving state.
 		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
 	}
 }
