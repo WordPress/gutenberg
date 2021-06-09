@@ -34,7 +34,7 @@ export default function PageListEdit( {
 	attributes,
 	setAttributes,
 } ) {
-		// Copy context to attributes to make it accessible in the editor's
+	// Copy context to attributes to make it accessible in the editor's
 	// ServerSideRender
 	useEffect( () => {
 		const {
@@ -112,7 +112,6 @@ export default function PageListEdit( {
 			setAllowConvertToLinks( false );
 		}
 	}, [ isParentNavigation ] );
-
 
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
