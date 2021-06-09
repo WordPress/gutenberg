@@ -5,8 +5,8 @@
 		display: block;
 		position: absolute;
 		width: 100%;
-		height: $button-size-small;
-		transform: translateY(-#{$button-size-small / 2});
+		height: $grid-unit-10;
+		z-index: 1;
 	}
 }
 
