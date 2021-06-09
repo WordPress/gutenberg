@@ -30,9 +30,9 @@ describe( 'CardDivider', () => {
 
 		test( 'should have role of separator', () => {
 			const wrapper = shallow( <CardDivider /> );
-			const cardDivider = wrapper.find( '.components-card__divider' );
+			const separators = wrapper.find( '[role="separator"]' );
 
-			expect( cardDivider.prop( 'role' ) ).toBe( 'separator' );
+			expect( separators.length ).toBe( 0 );
 		} );
 	} );
 } );

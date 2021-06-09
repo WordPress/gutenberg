@@ -2,31 +2,27 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-
-/**
- * WordPress dependencies
- */
-import { HorizontalRule } from '@wordpress/primitives';
+import { css } from 'emotion';
 
 /**
  * Internal dependencies
  */
 import { Flex } from '../flex';
-import { COLORS, space } from '../utils';
+import { COLORS, CONFIG, space } from '../utils';
 
 export const styleProps = {
-	borderColor: COLORS.lightGray[ 500 ],
+	borderColorInternal: COLORS.lightGray[ 500 ],
 	borderRadius: '3px',
 	backgroundShady: COLORS.lightGray[ 200 ],
 };
 
-const { borderColor, borderRadius, backgroundShady } = styleProps;
+const { borderColorInternal, borderRadius, backgroundShady } = styleProps;
 
 export const CardUI = styled.div`
 	background: ${ COLORS.white };
 	box-sizing: border-box;
 	border-radius: ${ borderRadius };
-	border: 1px solid ${ borderColor };
+	border: 1px solid ${ borderColorInternal };
 
 	${ handleBorderless };
 
@@ -38,7 +34,7 @@ export const CardUI = styled.div`
 `;
 
 export const HeaderUI = styled( Flex )`
-	border-bottom: 1px solid ${ borderColor };
+	border-bottom: 1px solid ${ borderColorInternal };
 	border-top-left-radius: ${ borderRadius };
 	border-top-right-radius: ${ borderRadius };
 	box-sizing: border-box;
@@ -83,7 +79,7 @@ export const BodyUI = styled.div`
 `;
 
 export const FooterUI = styled( Flex )`
-	border-top: 1px solid ${ borderColor };
+	border-top: 1px solid ${ borderColorInternal };
 	border-bottom-left-radius: ${ borderRadius };
 	border-bottom-right-radius: ${ borderRadius };
 	box-sizing: border-box;
@@ -95,15 +91,6 @@ export const FooterUI = styled( Flex )`
 	${ headerFooterSizes };
 	${ handleBorderless };
 	${ handleShady };
-`;
-
-export const DividerUI = styled( HorizontalRule )`
-	all: unset;
-	border-top: 1px solid ${ borderColor };
-	box-sizing: border-box;
-	display: block;
-	height: 0;
-	width: 100%;
 `;
 
 export function bodySize() {
@@ -159,3 +146,13 @@ export function handleShady() {
 		}
 	`;
 }
+
+export const Divider = css`
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+`;
+
+export const borderColor = css`
+	border-color: ${ CONFIG.colorDivider };
+`;
