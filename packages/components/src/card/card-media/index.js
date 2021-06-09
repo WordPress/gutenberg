@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { MediaUI } from './styles';
+import { MediaUI } from '../styles';
 
 export function CardMedia( props ) {
 	const { className, ...additionalProps } = props;
