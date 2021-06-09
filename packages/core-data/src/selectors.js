@@ -17,7 +17,6 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable } from './utils';
-import { CORE_DATA_STORE_NAME as coreDataStoreName } from './utils/constants';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -41,7 +40,7 @@ const EMPTY_ARRAY = [];
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
 	( select ) => ( state, url ) => {
-		return select( coreDataStoreName ).isResolving(
+		return select( 'core/data' ).isResolving(
 			STORE_NAME,
 			'getEmbedPreview',
 			[ url ]
