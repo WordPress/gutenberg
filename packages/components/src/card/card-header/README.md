@@ -1,6 +1,6 @@
 # CardHeader
 
-CardHeader renders an optional header within a [`<Card />`](../).
+CardHeader renders an optional header within a [`<Card />`](../card/README.md).
 
 ## Usage
 
@@ -16,7 +16,7 @@ const Example = () => (
 
 ### Flex
 
-Underneath, CardHeader uses the layout component [`<Flex/>`](../../flex/README.md). This improves the alignment of child items within the component.
+Underneath, CardHeader uses the layout component [`<Flex/>`](../../flex/flex/README.md). This improves the alignment of child items within the component.
 
 ```jsx
 import {
@@ -39,7 +39,7 @@ const Example = () => (
 );
 ```
 
-Check out [the documentation](../../flex/README.md) on `<Flex/>` for more details on layout composition.
+Check out [the documentation](../../flex/flex/README.md) on `<Flex/>` for more details on layout composition.
 
 ## Props
 
@@ -75,4 +75,4 @@ Determines the amount of padding within the component.
 -   Required: No
 -   Default: `medium`
 
-Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
+Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.

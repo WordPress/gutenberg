@@ -1,6 +1,6 @@
 # CardMedia
 
-CardMedia provides a container for media elements, and renders within a [`<Card />`](../).
+CardMedia provides a container for media elements, and renders within a [`<Card />`](../card/README.md).
 
 ## Usage
 
