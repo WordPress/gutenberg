@@ -7,9 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, ExternalLink } from '@wordpress/components';
+import {
+	Button,
+	ExternalLink,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-
 import { Icon, globe } from '@wordpress/icons';
 
 /**
@@ -89,9 +92,13 @@ export default function LinkPreview( { value, onEditClick } ) {
 						/>
 					) }
 					{ richData?.description && (
-						<p className="block-editor-link-control__search-item-description">
+						<Text
+							className="block-editor-link-control__search-item-description"
+							truncate
+							numberOfLines="2"
+						>
 							{ richData.description }
-						</p>
+						</Text>
 					) }
 				</div>
 			) }
