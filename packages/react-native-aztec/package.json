@@ -1,15 +1,19 @@
 {
 	"name": "@wordpress/react-native-aztec",
 	"version": "1.54.0",
-	"description": "Aztec view for react-native.",
+	"description": "Aztec Native HTML editor view for React Native.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"react-native"
+    "rich-text",
+    "editor",
+		"react-native",
+    "ios",
+    "android"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-aztec/README.md",
-	"repository": {
+	"repository": { 
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
 		"directory": "packages/react-native-aztec"
