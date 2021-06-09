@@ -22,8 +22,8 @@ function block_core_navigation_link_build_css_colors( $context, $attributes ) {
 	$is_sub_menu = isset( $attributes['isTopLevelLink'] ) ? ( ! $attributes['isTopLevelLink'] ) : false;
 
 	// Text color.
-	$named_text_color      = null;
-	$custom_text_color     = null;
+	$named_text_color  = null;
+	$custom_text_color = null;
 
 	if ( $is_sub_menu && array_key_exists( 'overlayTextColor', $context ) ) {
 		$named_text_color = $context['overlayTextColor'];
@@ -33,7 +33,7 @@ function block_core_navigation_link_build_css_colors( $context, $attributes ) {
 		$named_text_color = $context['textColor'];
 	} elseif ( array_key_exists( 'customTextColor', $context ) ) {
 		$custom_text_color = $context['customTextColor'];
-	} elseif (  isset( $context['style']['color']['text'] ) ) {
+	} elseif ( isset( $context['style']['color']['text'] ) ) {
 		$custom_text_color = $context['style']['color']['text'];
 	}
 
@@ -43,7 +43,7 @@ function block_core_navigation_link_build_css_colors( $context, $attributes ) {
 		array_push( $colors['css_classes'], 'has-text-color', sprintf( 'has-%s-color', $named_text_color ) );
 	} elseif ( ! is_null( $custom_text_color ) ) {
 		// Add the custom color inline style.
-		$colors['css_classes'][] = 'has-text-color';
+		$colors['css_classes'][]  = 'has-text-color';
 		$colors['inline_styles'] .= sprintf( 'color: %s;', $custom_text_color );
 	}
 
@@ -69,7 +69,7 @@ function block_core_navigation_link_build_css_colors( $context, $attributes ) {
 		array_push( $colors['css_classes'], 'has-background', sprintf( 'has-%s-background-color', $named_background_color ) );
 	} elseif ( ! is_null( $custom_background_color ) ) {
 		// Add the custom background-color inline style.
-		$colors['css_classes'][] = 'has-background';
+		$colors['css_classes'][]  = 'has-background';
 		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $custom_background_color );
 	}
 
