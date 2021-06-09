@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { DividerUI } from './styles';
+import { DividerUI } from '../styles';
 
 export function CardDivider( props ) {
 	const { className, ...additionalProps } = props;

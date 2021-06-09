@@ -714,6 +714,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "CardDivider",
+		"slug": "card-divider",
+		"markdown_source": "../packages/components/src/card/card-divider/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Card",
 		"slug": "card",
 		"markdown_source": "../packages/components/src/card/card/README.md",

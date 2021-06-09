@@ -1,8 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Card, CardBody } from '../';
-import CardDivider from '../divider';
+import { Card, CardBody, CardDivider } from '../';
 import { getCardStoryProps } from './_utils';
 
 export default { title: 'Components/Card/Divider', component: CardDivider };

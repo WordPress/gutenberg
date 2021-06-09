@@ -6,8 +6,7 @@ import { mount, shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { Card, CardBody } from '../';
-import CardDivider from '../divider';
+import { Card, CardBody, CardDivider } from '../';
 import CardFooter from '../footer';
 import CardHeader from '../header';
 import CardMedia from '../media';
