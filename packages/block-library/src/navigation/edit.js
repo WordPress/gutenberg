@@ -47,7 +47,7 @@ function Navigation( {
 	className,
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
-	allowBlocksList,
+	allowedBlocks,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -77,7 +77,7 @@ function Navigation( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			allowedBlocks: allowBlocksList,
+			allowedBlocks,
 			orientation: attributes.orientation || 'horizontal',
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
@@ -177,7 +177,7 @@ function Navigation( {
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlockSupport } = select( blocksStore );
-		const allowBlocksList = getBlockSupport(
+		const allowedBlocks = getBlockSupport(
 			'core/navigation',
 			'__experimentalAllowedBlocks',
 			[ 'core/navigation-link' ] // default to the basic link block only.
@@ -202,7 +202,7 @@ export default compose( [
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
-            allowBlocksList,
+			allowedBlocks,
 			// This prop is already available but computing it here ensures it's
 			// fresh compared to isImmediateParentOfSelectedBlock
 			isSelected: selectedBlockId === clientId,
