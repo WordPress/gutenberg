@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { BodyUI } from './styles/card-styles';
+import { BodyUI } from './styles';
 import { useCardContext } from './context';
 
 export const defaultProps = {

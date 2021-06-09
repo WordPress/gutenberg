@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { HeaderUI } from './styles/card-styles';
+import { HeaderUI } from './styles';
 import { useCardContext } from './context';
 
 export const defaultProps = {

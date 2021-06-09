@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import { CardContext } from './context';
-import { CardUI } from './styles/card-styles';
+import { CardUI } from './styles';
 
 export const defaultProps = {
 	isBorderless: false,
