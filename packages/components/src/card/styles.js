@@ -16,7 +16,11 @@ export const styleProps = {
 	backgroundShady: COLORS.lightGray[ 200 ],
 };
 
-const { borderColorInternal, borderRadiusInternal, backgroundShady } = styleProps;
+const {
+	borderColorInternal,
+	borderRadiusInternal,
+	backgroundShady,
+} = styleProps;
 
 export const CardUI = styled.div`
 	background: ${ COLORS.white };
@@ -31,21 +35,6 @@ export const CardUI = styled.div`
 			0px 1px 1px 0px rgba( 0, 0, 0, 0.14 ),
 			0px 2px 1px -1px rgba( 0, 0, 0, 0.12 );
 	}
-`;
-
-export const HeaderUI = styled( Flex )`
-	border-bottom: 1px solid ${ borderColorInternal };
-	border-top-left-radius: ${ borderRadiusInternal };
-	border-top-right-radius: ${ borderRadiusInternal };
-	box-sizing: border-box;
-
-	&:last-child {
-		border-bottom: none;
-	}
-
-	${ headerFooterSizes };
-	${ handleBorderless };
-	${ handleShady };
 `;
 
 export const BodyUI = styled.div`
@@ -124,6 +113,14 @@ export function handleShady() {
 	`;
 }
 
+export const Header = css`
+	border-bottom: 1px solid;
+
+	&:last-child {
+		border-bottom: none;
+	}
+`;
+
 export const Media = css`
 	box-sizing: border-box;
 	overflow: hidden;
@@ -157,4 +154,27 @@ export const borderRadius = css`
 
 export const borderColor = css`
 	border-color: ${ CONFIG.colorDivider };
+`;
+
+export const borderless = css`
+	border: none;
+`;
+
+export const cardPaddings = {
+	large: css`
+		padding: ${ CONFIG.cardPaddingLarge };
+	`,
+	medium: css`
+		padding: ${ CONFIG.cardPaddingMedium };
+	`,
+	small: css`
+		padding: ${ CONFIG.cardPaddingSmall };
+	`,
+	xSmall: css`
+		padding: ${ CONFIG.cardPaddingXSmall };
+	`,
+};
+
+export const shady = css`
+	background-color: ${ COLORS.lightGray[ 200 ] };
 `;
