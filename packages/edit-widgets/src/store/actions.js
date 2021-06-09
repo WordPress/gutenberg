@@ -140,7 +140,9 @@ export function* saveWidgetArea( widgetAreaId ) {
 		// since order is important.
 		sidebarWidgetsIds.push( widgetId );
 
-		if ( widgetId ) {
+		// We need to check for the id in the widget object here, because a deleted
+		// and restored widget won't have this id.
+		if ( widget.id ) {
 			yield dispatch(
 				'core',
 				'editEntityRecord',
