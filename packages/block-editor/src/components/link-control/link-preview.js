@@ -90,36 +90,38 @@ export default function LinkPreview( {
 				<ViewerSlot fillProps={ value } />
 			</div>
 
-			<div className="block-editor-link-control__search-item-bottom">
-				<div
-					aria-hidden={ ! richData?.image }
-					className={ classnames(
-						'block-editor-link-control__search-item-image',
-						{
-							'is-placeholder': ! richData?.image,
-						}
-					) }
-				>
-					{ richData?.image && (
-						<img src={ richData?.image } alt="" />
-					) }
+			{ ( hasRichData || isFetching ) && (
+				<div className="block-editor-link-control__search-item-bottom">
+					<div
+						aria-hidden={ ! richData?.image }
+						className={ classnames(
+							'block-editor-link-control__search-item-image',
+							{
+								'is-placeholder': ! richData?.image,
+							}
+						) }
+					>
+						{ richData?.image && (
+							<img src={ richData?.image } alt="" />
+						) }
+					</div>
+					<div
+						aria-hidden={ ! richData?.description }
+						className={ classnames(
+							'block-editor-link-control__search-item-description',
+							{
+								'is-placeholder': ! richData?.description,
+							}
+						) }
+					>
+						{ richData?.description && (
+							<Text truncate numberOfLines="2">
+								{ richData.description }
+							</Text>
+						) }
+					</div>
 				</div>
-				<div
-					aria-hidden={ ! richData?.description }
-					className={ classnames(
-						'block-editor-link-control__search-item-description',
-						{
-							'is-placeholder': ! richData?.description,
-						}
-					) }
-				>
-					{ richData?.description && (
-						<Text truncate numberOfLines="2">
-							{ richData.description }
-						</Text>
-					) }
-				</div>
-			</div>
+			) }
 		</div>
 	);
 }

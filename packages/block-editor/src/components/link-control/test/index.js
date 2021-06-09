@@ -1898,7 +1898,7 @@ describe( 'Rich link previews', () => {
 	} );
 
 	it.each( [ 'image', 'description' ] )(
-		'should not display an %s fallback when it is missing from the rich data',
+		'should display a fallback placeholder when %s it is missing from the rich data',
 		async ( dataItem ) => {
 			mockFetchRemoteUrlData.mockImplementation( () => {
 				const data = {
@@ -1935,10 +1935,10 @@ describe( 'Rich link previews', () => {
 			expect( isRichLinkPreview ).toBe( true );
 
 			const missingDataItem = linkPreview.querySelector(
-				`.block-editor-link-control__search-item-${ dataItem }`
+				`.block-editor-link-control__search-item-${ dataItem }.is-placeholder`
 			);
 
-			expect( missingDataItem ).toBeFalsy();
+			expect( missingDataItem ).toBeTruthy();
 		}
 	);
 
