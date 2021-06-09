@@ -25,7 +25,7 @@ export { default as BaseControl } from './base-control';
 export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
-export { default as Card } from './card';
+export { Card } from './card';
 export { default as CardBody } from './card/body';
 export { default as CardDivider } from './card/divider';
 export { default as CardFooter } from './card/footer';

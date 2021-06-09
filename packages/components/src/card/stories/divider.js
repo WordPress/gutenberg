@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import Card from '../index';
+import { Card } from '../';
 import CardBody from '../body';
 import CardDivider from '../divider';
 import { getCardStoryProps } from './_utils';

@@ -6,7 +6,7 @@ import { boolean, text } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import Card from '../index';
+import { Card } from '../';
 import CardHeader from '../header';
 import Button from '../../button';
 import { FlexBlock, FlexItem } from '../../flex';

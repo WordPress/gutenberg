@@ -710,7 +710,7 @@
 	{
 		"title": "Card",
 		"slug": "card",
-		"markdown_source": "../packages/components/src/card/README.md",
+		"markdown_source": "../packages/components/src/card/card/README.md",
 		"parent": "components"
 	},
 	{
