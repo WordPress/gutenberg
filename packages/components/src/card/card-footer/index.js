@@ -15,6 +15,9 @@ export const defaultProps = {
 	size: 'medium',
 };
 
+/**
+ * @param { import('../types').FooterProps & { className: string } } props
+ */
 export function CardFooter( props ) {
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
