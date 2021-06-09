@@ -7,19 +7,14 @@ import { css } from 'emotion';
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG, space } from '../utils';
+import { COLORS, CONFIG } from '../utils';
 
 export const styleProps = {
 	borderColorInternal: COLORS.lightGray[ 500 ],
 	borderRadiusInternal: '3px',
-	backgroundShady: COLORS.lightGray[ 200 ],
 };
 
-const {
-	borderColorInternal,
-	borderRadiusInternal,
-	backgroundShady,
-} = styleProps;
+const { borderColorInternal, borderRadiusInternal } = styleProps;
 
 export const CardUI = styled.div`
 	background: ${ COLORS.white };
@@ -36,44 +31,10 @@ export const CardUI = styled.div`
 	}
 `;
 
-export const BodyUI = styled.div`
-	box-sizing: border-box;
-
-	${ bodySize };
-	${ handleShady };
-`;
-
-export function bodySize() {
-	return `
-		&.is-size {
-			&-large {
-				padding: ${ space( 3 ) } ${ space( 4 ) };
-			}
-			&-medium {
-				padding: ${ space( 2 ) } ${ space( 3 ) };
-			}
-			&-small {
-				padding: ${ space( 2 ) };
-			}
-			&-extraSmall {
-				padding: ${ space( 1 ) };
-			}
-		}
-	`;
-}
-
 export function handleBorderless() {
 	return `
 		&.is-borderless {
 			border: none;
-		}
-	`;
-}
-
-export function handleShady() {
-	return `
-		&.is-shady {
-			background: ${ backgroundShady };
 		}
 	`;
 }
@@ -92,6 +53,11 @@ export const Footer = css`
 	&:first-child {
 		border-top: none;
 	}
+`;
+
+export const Body = css`
+	height: auto;
+	max-height: 100%;
 `;
 
 export const Media = css`
