@@ -102,7 +102,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-navigation-link.php'      => 'core/post-navigation-link',
 				'post-title.php'                => 'core/post-title',
 				'query.php'                     => 'core/query',
-				'query-loop.php'                => 'core/query-loop',
+				'post-template.php'             => 'core/post-template',
 				'query-title.php'               => 'core/query-title',
 				'query-pagination.php'          => 'core/query-pagination',
 				'query-pagination-next.php'     => 'core/query-pagination-next',
@@ -199,6 +199,8 @@ function gutenberg_register_core_block_styles( $block_name ) {
 
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
 		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
+	} else {
+		wp_register_style( "wp-block-{$block_name}", false );
 	}
 
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
@@ -210,6 +212,8 @@ function gutenberg_register_core_block_styles( $block_name ) {
 			filemtime( gutenberg_dir_path() . $editor_style_path )
 		);
 		wp_style_add_data( "wp-block-{$block_name}-editor", 'rtl', 'replace' );
+	} else {
+		wp_register_style( "wp-block-{$block_name}-editor", false );
 	}
 }
 
@@ -465,6 +469,5 @@ function gutenberg_migrate_old_typography_shape( $metadata ) {
 	}
 	return $metadata;
 }
-
 
 add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
