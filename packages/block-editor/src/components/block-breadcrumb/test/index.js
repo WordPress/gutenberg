@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -9,13 +9,29 @@ import { shallow } from 'enzyme';
 import BlockBreadcrumb from '../';
 
 describe( 'BlockBreadcrumb', () => {
-	test( 'should match snapshot', () => {
-		const wrapper = shallow( <BlockBreadcrumb /> );
-		expect( wrapper ).toMatchSnapshot();
+	it( 'should render correctly', () => {
+		const { container } = render( <BlockBreadcrumb /> );
+
+		expect( container.firstChild ).toMatchSnapshot();
 	} );
 
-	test( 'should match snapshot with root label', () => {
-		const wrapper = shallow( <BlockBreadcrumb rootLabelText="Tuhinga" /> );
-		expect( wrapper ).toMatchSnapshot();
+	describe( 'Root label text', () => {
+		test( 'should display default label of "Document"', () => {
+			render( <BlockBreadcrumb /> );
+
+			const rootLabelTextDefault = screen.getByText( 'Document' );
+
+			expect( rootLabelTextDefault ).toBeDefined();
+		} );
+
+		test( 'should display `rootLabelText` value', () => {
+			render( <BlockBreadcrumb rootLabelText="Tuhinga" /> );
+
+			const rootLabelText = screen.getByText( 'Tuhinga' );
+			const rootLabelTextDefault = screen.queryByText( 'Document' );
+
+			expect( rootLabelTextDefault ).toBeNull();
+			expect( rootLabelText ).toBeDefined();
+		} );
 	} );
 } );
