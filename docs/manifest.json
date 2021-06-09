@@ -726,6 +726,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "CardHeader",
+		"slug": "card-header",
+		"markdown_source": "../packages/components/src/card/card-header/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Card",
 		"slug": "card",
 		"markdown_source": "../packages/components/src/card/card/README.md",

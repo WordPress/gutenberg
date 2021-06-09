@@ -6,8 +6,7 @@ import { text, boolean } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import { Card, CardBody, CardFooter } from '../';
-import CardHeader from '../header';
+import { Card, CardBody, CardFooter, CardHeader } from '../';
 import { getCardStoryProps } from './_utils';
 
 export default { title: 'Components/Card', component: Card };

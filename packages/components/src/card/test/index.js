@@ -6,8 +6,7 @@ import { mount, shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { Card, CardBody, CardDivider, CardFooter } from '../';
-import CardHeader from '../header';
+import { Card, CardBody, CardDivider, CardFooter, CardHeader } from '../';
 import CardMedia from '../media';
 
 describe( 'Card', () => {
