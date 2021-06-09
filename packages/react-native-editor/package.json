@@ -68,7 +68,7 @@
 		"react-native-safe-area": "^0.5.0",
 		"react-native-safe-area-context": "git+https://github.com/wordpress-mobile/react-native-safe-area-context.git#d348552cebf914944e76c2dbfcd79cf649744edb",
 		"react-native-sass-transformer": "^1.1.1",
-		"react-native-screens": "git+https://github.com/wordpress-mobile/react-native-screens.git#b3d907bda2695743f35fd874261dcd27e0912eca",
+		"react-native-screens": "git+https://github.com/wordpress-mobile/react-native-screens.git#3e34c75622bb6f142868c19b04f72afbc23554d8",
 		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#83c4e7c16b704c7706339341b22434b29f0b27d6",
 		"react-native-url-polyfill": "^1.1.2",
 		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#e74bb901f37f86a8842232468b43c9cbaedb6aa4"
