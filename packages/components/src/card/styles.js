@@ -12,16 +12,16 @@ import { COLORS, CONFIG, space } from '../utils';
 
 export const styleProps = {
 	borderColorInternal: COLORS.lightGray[ 500 ],
-	borderRadius: '3px',
+	borderRadiusInternal: '3px',
 	backgroundShady: COLORS.lightGray[ 200 ],
 };
 
-const { borderColorInternal, borderRadius, backgroundShady } = styleProps;
+const { borderColorInternal, borderRadiusInternal, backgroundShady } = styleProps;
 
 export const CardUI = styled.div`
 	background: ${ COLORS.white };
 	box-sizing: border-box;
-	border-radius: ${ borderRadius };
+	border-radius: ${ borderRadiusInternal };
 	border: 1px solid ${ borderColorInternal };
 
 	${ handleBorderless };
@@ -35,8 +35,8 @@ export const CardUI = styled.div`
 
 export const HeaderUI = styled( Flex )`
 	border-bottom: 1px solid ${ borderColorInternal };
-	border-top-left-radius: ${ borderRadius };
-	border-top-right-radius: ${ borderRadius };
+	border-top-left-radius: ${ borderRadiusInternal };
+	border-top-right-radius: ${ borderRadiusInternal };
 	box-sizing: border-box;
 
 	&:last-child {
@@ -48,29 +48,6 @@ export const HeaderUI = styled( Flex )`
 	${ handleShady };
 `;
 
-export const MediaUI = styled.div`
-	box-sizing: border-box;
-	overflow: hidden;
-
-	& > img,
-	& > iframe {
-		display: block;
-		height: auto;
-		max-width: 100%;
-		width: 100%;
-	}
-
-	&:first-of-type {
-		border-top-left-radius: ${ borderRadius };
-		border-top-right-radius: ${ borderRadius };
-	}
-
-	&:last-of-type {
-		border-bottom-left-radius: ${ borderRadius };
-		border-bottom-right-radius: ${ borderRadius };
-	}
-`;
-
 export const BodyUI = styled.div`
 	box-sizing: border-box;
 
@@ -80,8 +57,8 @@ export const BodyUI = styled.div`
 
 export const FooterUI = styled( Flex )`
 	border-top: 1px solid ${ borderColorInternal };
-	border-bottom-left-radius: ${ borderRadius };
-	border-bottom-right-radius: ${ borderRadius };
+	border-bottom-left-radius: ${ borderRadiusInternal };
+	border-bottom-right-radius: ${ borderRadiusInternal };
 	box-sizing: border-box;
 
 	&:first-of-type {
@@ -147,10 +124,35 @@ export function handleShady() {
 	`;
 }
 
+export const Media = css`
+	box-sizing: border-box;
+	overflow: hidden;
+
+	& > img,
+	& > iframe {
+		display: block;
+		height: auto;
+		max-width: 100%;
+		width: 100%;
+	}
+`;
+
 export const Divider = css`
 	box-sizing: border-box;
 	display: block;
 	width: 100%;
+`;
+
+export const borderRadius = css`
+	&:first-of-type {
+		border-top-left-radius: ${ CONFIG.cardBorderRadius };
+		border-top-right-radius: ${ CONFIG.cardBorderRadius };
+	}
+
+	&:last-of-type {
+		border-bottom-left-radius: ${ CONFIG.cardBorderRadius };
+		border-bottom-right-radius: ${ CONFIG.cardBorderRadius };
+	}
 `;
 
 export const borderColor = css`

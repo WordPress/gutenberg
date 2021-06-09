@@ -79,3 +79,10 @@ export type HeaderProps = MarginalSubComponentProps;
 export type FooterProps = MarginalSubComponentProps & {
 	justify: CSSProperties[ 'justifyContent' ];
 };
+
+export type MediaProps = {
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
+};
