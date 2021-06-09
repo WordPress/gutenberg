@@ -17,7 +17,7 @@ import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
- import { useIsEditablePostBlock } from '../utils/hooks';
+import { useIsEditablePostBlock } from '../utils/hooks';
 
 function ReadOnlyContent( { postType, postId } ) {
 	const [ , , content ] = useEntityProp(
@@ -75,10 +75,11 @@ function EditableContent( { layout, postType, postId } ) {
 		}
 	);
 	return <div { ...props } />;
-};
+}
 
 function Content( props ) {
-	const { postType, postId } = props;
+	const { clientId, postType, postId } = props;
+	const isEditable = useIsEditablePostBlock( clientId );
 	const userCanEdit = useSelect(
 		( select ) =>
 			select( coreStore ).canUserEditEntityRecord(
@@ -89,17 +90,7 @@ function Content( props ) {
 			),
 		[ postType, postId ]
 	);
-	return userCanEdit ? (
-		<EditableContent { ...props } />
-	) : (
-		<ReadOnlyContent postType={ postType } postId={ postId } />
-	);
-}
-
-function Content( props ) {
-	const { clientId, postType, postId } = props;
-	const isEditable = useIsEditablePostBlock( clientId );
-	return isEditable ? (
+	return isEditable && userCanEdit ? (
 		<EditableContent { ...props } />
 	) : (
 		<ReadOnlyContent postType={ postType } postId={ postId } />
