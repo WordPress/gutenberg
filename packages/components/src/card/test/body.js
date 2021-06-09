@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import CardBody from '../body';
+import { CardBody } from '../';
 
 describe( 'CardBody', () => {
 	describe( 'basic rendering', () => {

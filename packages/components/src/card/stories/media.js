@@ -7,8 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { Card } from '../';
-import CardBody from '../body';
+import { Card, CardBody } from '../';
 import CardFooter from '../footer';
 import CardHeader from '../header';
 import CardMedia from '../media';
