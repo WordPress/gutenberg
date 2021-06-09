@@ -525,6 +525,8 @@ if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
  * @param bool   $register   Whether the stylesheet should be registered.
  *                           If set to false, then assume it has already been registered,
  *                           and only enqueue it.
+ *
+ * @return void
  */
 function gutenberg_enqueue_block_style( $block_name, $args, $register = true ) {
 	$args = wp_parse_args(
@@ -538,34 +540,42 @@ function gutenberg_enqueue_block_style( $block_name, $args, $register = true ) {
 		)
 	);
 
-	// Register the stylesheet.
-	if ( $register ) {
-		wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
-	}
+	/**
+	 * Callback function to register and enqueue styles.
+	 *
+	 * @param string $content When the callback is used for the render_block filter,
+	 *                        the content needs to be returned so the function parameter
+	 *                        is to ensure the content exists.
+	 *
+	 * @return string
+	 */
+	$callback = function( $content ) use ( $args, $register ) {
+		// Register the stylesheet.
+		if ( $register ) {
+			wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
+		}
 
-	// Add `path` data if provided.
-	if ( isset( $args['path'] ) ) {
-		wp_style_add_data( $args['handle'], 'path', $args['path'] );
-	}
+		// Add `path` data if provided.
+		if ( isset( $args['path'] ) ) {
+			wp_style_add_data( $args['handle'], 'path', $args['path'] );
+		}
 
-	// Enqueue asset.
-	if ( ! gutenberg_should_load_separate_block_assets() ) {
+		// Enqueue the stylesheet.
 		wp_enqueue_style( $args['handle'] );
-	} else {
-		add_filter(
-			"render_block_$block_name",
-			/**
-			 * Filters the content of a single block.
-			 *
-			 * @param string $block_content The block content about to be appended.
-			 * @param array  $block         The full block, including name and attributes.
-			 */
-			function( $block_content ) use ( $args ) {
-				wp_enqueue_style( $args['handle'] );
-				return $block_content;
-			}
-		);
+
+		return $content;
+	};
+
+	$hook = did_action( 'wp_enqueue_scripts' ) ? 'wp_footer' : 'wp_enqueue_scripts';
+	if ( gutenberg_should_load_separate_block_assets() ) {
+		$hook = "render_block_$block_name";
 	}
+
+	// Enqueue assets in the frontend.
+	add_filter( $hook, $callback );
+
+	// Enqueue assets in the editor.
+	add_action( 'enqueue_block_editor_assets', $callback );
 }
 
 /**
