@@ -21,7 +21,7 @@ describe( 'BlockBreadcrumb', () => {
 
 			const rootLabelTextDefault = screen.getByText( 'Document' );
 
-			expect( rootLabelTextDefault ).toBeDefined();
+			expect( rootLabelTextDefault ).toBeInTheDocument();
 		} );
 
 		test( 'should display `rootLabelText` value', () => {
@@ -31,7 +31,7 @@ describe( 'BlockBreadcrumb', () => {
 			const rootLabelTextDefault = screen.queryByText( 'Document' );
 
 			expect( rootLabelTextDefault ).toBeNull();
-			expect( rootLabelText ).toBeDefined();
+			expect( rootLabelText ).toBeInTheDocument();
 		} );
 	} );
 } );
