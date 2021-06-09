@@ -13,6 +13,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 import {
 	RangeControl,
 	PanelBody,
@@ -27,43 +28,62 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 
 export default function BreadcrumbsEdit( {
-	attributes: {
+	attributes,
+	setAttributes,
+	context: { postType, postId },
+} ) {
+	const {
 		nestingLevel,
 		separator,
 		showCurrentPageTitle,
 		showLeadingSeparator,
 		textAlign,
-	},
-	setAttributes,
-	context: { postType, postId },
-} ) {
-	const post = useSelect(
-		( select ) =>
-			select( coreStore ).getEditedEntityRecord(
+	} = attributes;
+
+	const { parents, post } = useSelect(
+		( select ) => {
+			const { getEntityRecord, getEditedEntityRecord } = select(
+				coreStore
+			);
+			const { getEditedPostAttribute } = select( editorStore );
+			const parentEntities = [];
+
+			const currentPost = getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
-			),
-		[ postType, postId ]
+			);
+
+			let currentParentId = getEditedPostAttribute( 'parent' );
+
+			while ( currentParentId ) {
+				const nextParent = getEntityRecord(
+					'postType',
+					postType,
+					currentParentId
+				);
+
+				currentParentId = null;
+
+				if ( nextParent ) {
+					parentEntities.push( nextParent );
+					currentParentId = nextParent?.parent || null;
+				}
+			}
+
+			return {
+				post: currentPost,
+				parents: parentEntities.reverse(),
+			};
+		},
+		[ postId, postType ]
 	);
 
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
-
-	if ( ! post ) {
-		return null;
-	}
-
-	const postTitle = post.title || '';
-
-	const placeholderItems = [
-		__( 'Root' ),
-		__( 'Top-level page' ),
-		__( 'Child page' ),
-	];
+	// Set breadcrumb page titles to real titles if available, and
+	// fall back to placeholder content.
+	const breadcrumbTitles = parents.length
+		? parents.map( ( parent ) => parent?.title?.rendered || ' ' )
+		: [ __( 'Root' ), __( 'Top-level page' ), __( 'Child page' ) ];
 
 	const buildBreadcrumb = ( crumbTitle, showSeparator, key ) => {
 		let separatorSpan;
@@ -86,15 +106,26 @@ export default function BreadcrumbsEdit( {
 		);
 	};
 
-	const placeholder = placeholderItems.map( ( item, index ) =>
+	// Add a useMemo on this one?
+	const breadcrumbs = breadcrumbTitles.map( ( item, index ) =>
 		buildBreadcrumb( item, index !== 0 || showLeadingSeparator, index )
 	);
 
-	if ( showCurrentPageTitle && postTitle ) {
-		placeholder.push(
-			buildBreadcrumb( postTitle, true, placeholderItems.length )
+	if ( showCurrentPageTitle ) {
+		breadcrumbs.push(
+			buildBreadcrumb(
+				post?.title || __( 'Current page' ),
+				true,
+				breadcrumbTitles.length
+			)
 		);
 	}
+
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	return (
 		<>
@@ -156,7 +187,7 @@ export default function BreadcrumbsEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<nav { ...blockProps }>
-				<ol>{ placeholder }</ol>
+				<ol>{ breadcrumbs }</ol>
 			</nav>
 		</>
 	);
