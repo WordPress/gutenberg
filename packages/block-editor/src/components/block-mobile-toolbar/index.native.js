@@ -2,13 +2,15 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { State, LongPressGestureHandler } from 'react-native-gesture-handler';
 
 /**
  * WordPress dependencies
  */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,6 +20,7 @@ import BlockMover from '../block-mover';
 import BlockActionsMenu from './block-actions-menu';
 import { BlockSettingsButton } from '../block-settings';
 import { store as blockEditorStore } from '../../store';
+import { DragContext } from '../block-list/block-list-item';
 
 // Defined breakpoints are used to get a point when
 // `settings` and `mover` controls should be wrapped into `BlockActionsMenu`
@@ -34,6 +37,7 @@ const BlockMobileToolbar = ( {
 	anchorNodeRef,
 	isFullWidth,
 } ) => {
+	const { dragHandler } = useContext( DragContext );
 	const [ fillsLength, setFillsLength ] = useState( null );
 	const [ appenderWidth, setAppenderWidth ] = useState( 0 );
 	const spacingValue = styles.toolbar.marginLeft * 2;
@@ -54,36 +58,50 @@ const BlockMobileToolbar = ( {
 		appenderWidth - spacingValue <= BREAKPOINTS.wrapMover;
 
 	return (
-		<View
-			style={ [ styles.toolbar, isFullWidth && styles.toolbarFullWidth ] }
-			onLayout={ onLayout }
+		<LongPressGestureHandler
+			onHandlerStateChange={ dragHandler }
+			shouldCancelWhenOutside={ false }
+			// This was also needed, otherwise the event ended immediately
+			maxDist={ 1000 }
 		>
-			{ ! wrapBlockMover && (
-				<BlockMover
-					clientIds={ [ clientId ] }
-					isStackedHorizontally={ isStackedHorizontally }
-				/>
-			) }
+			{ /* This was needed for some reason, otherwise the handler was erroring
+					 with an object instead of a function */ }
+			<Animated.View>
+				<View
+					style={ [
+						styles.toolbar,
+						isFullWidth && styles.toolbarFullWidth,
+					] }
+					onLayout={ onLayout }
+				>
+					{ ! wrapBlockMover && (
+						<BlockMover
+							clientIds={ [ clientId ] }
+							isStackedHorizontally={ isStackedHorizontally }
+						/>
+					) }
 
-			<View style={ styles.spacer } />
+					<View style={ styles.spacer } />
 
-			<BlockSettingsButton.Slot>
-				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
-				{ ( fills = [ null ] ) => {
-					setFillsLength( fills.length );
-					return wrapBlockSettings ? null : fills[ 0 ];
-				} }
-			</BlockSettingsButton.Slot>
+					<BlockSettingsButton.Slot>
+						{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
+						{ ( fills = [ null ] ) => {
+							setFillsLength( fills.length );
+							return wrapBlockSettings ? null : fills[ 0 ];
+						} }
+					</BlockSettingsButton.Slot>
 
-			<BlockActionsMenu
-				clientIds={ [ clientId ] }
-				wrapBlockMover={ wrapBlockMover }
-				wrapBlockSettings={ wrapBlockSettings && fillsLength }
-				isStackedHorizontally={ isStackedHorizontally }
-				onDelete={ onDelete }
-				anchorNodeRef={ anchorNodeRef }
-			/>
-		</View>
+					<BlockActionsMenu
+						clientIds={ [ clientId ] }
+						wrapBlockMover={ wrapBlockMover }
+						wrapBlockSettings={ wrapBlockSettings && fillsLength }
+						isStackedHorizontally={ isStackedHorizontally }
+						onDelete={ onDelete }
+						anchorNodeRef={ anchorNodeRef }
+					/>
+				</View>
+			</Animated.View>
+		</LongPressGestureHandler>
 	);
 };
 

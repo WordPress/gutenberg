@@ -2,11 +2,19 @@
  * External dependencies
  */
 import { View, Dimensions } from 'react-native';
+import Animated, {
+	useSharedValue,
+	withSpring,
+	useAnimatedStyle,
+	useAnimatedGestureHandler,
+	interpolate,
+	Extrapolate,
+} from 'react-native-reanimated';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { createContext, Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { ReadableContentView, alignmentHelpers } from '@wordpress/components';
@@ -22,6 +30,63 @@ import { store as blockEditorStore } from '../../store';
 const stretchStyle = {
 	flex: 1,
 };
+
+// TODO: This probably belongs in its own component / directory
+// Maybe we can do something similar block-draggable for web
+export const DragContext = createContext( { dragHandler: () => null } );
+
+function DragAndSnap( { children } ) {
+	const translation = {
+		x: useSharedValue( 0 ),
+		y: useSharedValue( 0 ),
+	};
+
+	const dragHandler = useAnimatedGestureHandler( {
+		onStart: ( { x, y }, ctx ) => {
+			ctx.startX = x;
+			ctx.startY = y;
+			console.log( `Start: (${ x }, ${ y })` );
+		},
+		// For the long press gesture, we don't get translation, so we have to
+		// calculate it.
+		onActive: ( { x, y }, ctx ) => {
+			translation.x.value = x - ctx.startX;
+			translation.y.value = y - ctx.startY;
+			console.log( `Active: (${ x }, ${ y })` );
+			console.log(
+				`Translation: (${ translation.x.value }, ${ translation.y.value })`
+			);
+		},
+		onEnd: ( _ ) => {
+			translation.x.value = withSpring( 0 );
+			translation.y.value = withSpring( 0 );
+			console.log( 'ended' );
+		},
+	} );
+
+	const dragStyles = useAnimatedStyle( () => {
+		return {
+			transform: [
+				{
+					translateX: translation.x.value,
+				},
+				{
+					translateY: translation.y.value,
+				},
+			],
+		};
+	} );
+
+	return (
+		<DragContext.Provider value={ { dragHandler } }>
+			{ /* I'm not sure why a View was required here.. but I was getting errors
+					 about unwrapped Text without it */ }
+			<View>
+				<Animated.View style={ dragStyles }>{ children }</Animated.View>
+			</View>
+		</DragContext.Provider>
+	);
+}
 
 export class BlockListItem extends Component {
 	getMarginHorizontal() {
@@ -145,15 +210,17 @@ export class BlockListItem extends Component {
 					{ shouldShowInsertionPointBefore && (
 						<BlockInsertionPoint />
 					) }
-					<BlockListBlock
-						key={ clientId }
-						showTitle={ false }
-						clientId={ clientId }
-						parentWidth={ parentWidth }
-						{ ...restProps }
-						marginHorizontal={ this.getMarginHorizontal() }
-						blockWidth={ blockWidth }
-					/>
+					<DragAndSnap>
+						<BlockListBlock
+							key={ clientId }
+							showTitle={ false }
+							clientId={ clientId }
+							parentWidth={ parentWidth }
+							{ ...restProps }
+							marginHorizontal={ this.getMarginHorizontal() }
+							blockWidth={ blockWidth }
+						/>
+					</DragAndSnap>
 					{ ! shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter && (
 							<BlockInsertionPoint />
