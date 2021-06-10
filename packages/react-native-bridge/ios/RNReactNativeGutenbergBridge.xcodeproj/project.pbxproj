@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1D6BF0B0266F7F9300265FA5 /* RNSentry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6BF0AF266F7F9300265FA5 /* RNSentry.swift */; };
+		1D6BF0E5266F862600265FA5 /* RNSentry.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D6BF0E4266F862600265FA5 /* RNSentry.m */; };
 		7EA30CEF21AC8C250092F894 /* Gutenberg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA30CEE21AC8C250092F894 /* Gutenberg.swift */; };
 		7EA30CF321AC91E20092F894 /* RNReactNativeGutenbergBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA30CF221AC91E20092F894 /* RNReactNativeGutenbergBridge.swift */; };
 		7EA30DA721AD7A100092F894 /* GutenbergBridgeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA30DA621AD7A100092F894 /* GutenbergBridgeDelegate.swift */; };
@@ -28,6 +30,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNReactNativeGutenbergBridge.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNReactNativeGutenbergBridge.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6BF0AF266F7F9300265FA5 /* RNSentry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNSentry.swift; sourceTree = "<group>"; };
+		1D6BF0E4266F862600265FA5 /* RNSentry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNSentry.m; sourceTree = "<group>"; };
 		7EA30CED21AC8C240092F894 /* RNReactNativeGutenbergBridge-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNReactNativeGutenbergBridge-Bridging-Header.h"; sourceTree = "<group>"; };
 		7EA30CEE21AC8C250092F894 /* Gutenberg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gutenberg.swift; sourceTree = "<group>"; };
 		7EA30CF221AC91E20092F894 /* RNReactNativeGutenbergBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNReactNativeGutenbergBridge.swift; sourceTree = "<group>"; };
@@ -61,6 +65,8 @@
 			isa = PBXGroup;
 			children = (
 				B3E7B5891CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m */,
+				1D6BF0E4266F862600265FA5 /* RNSentry.m */,
+				1D6BF0AF266F7F9300265FA5 /* RNSentry.swift */,
 				7EA30CF221AC91E20092F894 /* RNReactNativeGutenbergBridge.swift */,
 				7EA30DA821AD7A2F0092F894 /* GutenbergBridgeDataSource.swift */,
 				7EA30DA621AD7A100092F894 /* GutenbergBridgeDelegate.swift */,
@@ -140,9 +146,11 @@
 			files = (
 				7EA30DA921AD7A2F0092F894 /* GutenbergBridgeDataSource.swift in Sources */,
 				B3E7B58A1CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m in Sources */,
+				1D6BF0B0266F7F9300265FA5 /* RNSentry.swift in Sources */,
 				7EA30CEF21AC8C250092F894 /* Gutenberg.swift in Sources */,
 				7EA30CF321AC91E20092F894 /* RNReactNativeGutenbergBridge.swift in Sources */,
 				7EA30DA721AD7A100092F894 /* GutenbergBridgeDelegate.swift in Sources */,
+				1D6BF0E5266F862600265FA5 /* RNSentry.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
