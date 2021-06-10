@@ -49,6 +49,9 @@ public class Gutenberg: NSObject {
     private let bridgeModule = RNReactNativeGutenbergBridge()
     private unowned let dataSource: GutenbergBridgeDataSource
 
+    // Additional modules
+    private let sentryModule = RNSentry()
+    
     private lazy var bridge: RCTBridge = {
         return RCTBridge(delegate: self, launchOptions: [:])
     }()
@@ -226,9 +229,16 @@ extension Gutenberg: RCTBridgeDelegate {
     }
 
     public func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {
+        // Aztec
         let aztecManager = RCTAztecViewManager()
         aztecManager.attachmentDelegate = dataSource.aztecAttachmentDelegate()
-        let baseModules:[RCTBridgeModule] = [bridgeModule, aztecManager]
+        
+        // Sentry
+        let sentryModule = RNSentry()
+        sentryModule.gutenbergBridge = bridgeModule
+        sentryModule.dataSource = dataSource
+        
+        let baseModules:[RCTBridgeModule] = [bridgeModule, aztecManager, sentryModule]
         return baseModules + extraModules
     }
 }
