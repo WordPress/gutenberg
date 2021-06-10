@@ -101,9 +101,7 @@ function gutenberg_reregister_core_block_types() {
 			'block_folders' => array(
 				'widget-area',
 			),
-			'block_names'   => array(
-				'widget-area.php' => 'core/widget-area',
-			),
+			'block_names'   => array(),
 		),
 		__DIR__ . '/../build/widgets/blocks/'       => array(
 			'block_folders' => array(
