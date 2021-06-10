@@ -10,7 +10,7 @@ import { MediaUI } from '../styles';
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param { import('../types').MediaProps & JSX.IntrinsicElements['div']} props
+ * @param { JSX.IntrinsicElements['div'] } props
  */
 export function CardMedia( props ) {
 	/* eslint-enable jsdoc/valid-types */
