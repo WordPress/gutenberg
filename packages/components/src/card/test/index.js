@@ -6,7 +6,14 @@ import { mount, shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { Card, CardBody, CardDivider, CardFooter, CardHeader, CardMedia } from '../';
+import {
+	Card,
+	CardBody,
+	CardDivider,
+	CardFooter,
+	CardHeader,
+	CardMedia,
+} from '../';
 
 describe( 'Card', () => {
 	describe( 'basic rendering', () => {
