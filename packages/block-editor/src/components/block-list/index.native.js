@@ -79,9 +79,11 @@ export class BlockList extends Component {
 		this.getExtraData = this.getExtraData.bind( this );
 
 		this.onLayout = this.onLayout.bind( this );
+		this.onSetItemPosition = this.onSetItemPosition.bind( this );
 
 		this.state = {
 			blockWidth: this.props.blockWidth || 0,
+			positionList: {},
 		};
 	}
 
@@ -129,14 +131,15 @@ export class BlockList extends Component {
 			contentStyle,
 			renderAppender,
 		} = this.props;
-		const { blockWidth } = this.state;
+		const { blockWidth, positionList } = this.state;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
 			this.extraData.renderAppender !== renderAppender ||
-			this.extraData.blockWidth !== blockWidth
+			this.extraData.blockWidth !== blockWidth ||
+			this.extraData.positionList !== positionList
 		) {
 			this.extraData = {
 				parentWidth,
@@ -145,6 +148,7 @@ export class BlockList extends Component {
 				contentStyle,
 				renderAppender,
 				blockWidth,
+				positionList,
 			};
 		}
 		return this.extraData;
@@ -163,6 +167,14 @@ export class BlockList extends Component {
 		} else if ( ! isRootList && ! blockWidth ) {
 			this.setState( { blockWidth: Math.min( layoutWidth, maxWidth ) } );
 		}
+	}
+
+	onSetItemPosition( id, value ) {
+		const { positionList } = this.state;
+		const newList = Object.assign( {}, positionList );
+		newList[ id ] = value;
+
+		this.setState( { positionList: newList } );
 	}
 
 	render() {
@@ -275,11 +287,12 @@ export class BlockList extends Component {
 					) }
 					data={ blockClientIds }
 					keyExtractor={ identity }
-					renderItem={ this.renderItem }
+					// renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
 					}
 					title={ title }
+					CellRendererComponent={ this.renderItem }
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
@@ -315,7 +328,7 @@ export class BlockList extends Component {
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
-		const { blockWidth } = this.state;
+		const { blockWidth, positionList } = this.state;
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
@@ -332,6 +345,8 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
+				positionList={ positionList }
+				onSetItemPosition={ this.onSetItemPosition }
 			/>
 		);
 	}
