@@ -22,10 +22,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	useIsDescendentOfQueryLoopBlock,
-	useCanEditEntity,
-} from '../utils/hooks';
+import { useCanEditEntity } from '../utils/hooks';
 
 function usePostContentExcerpt( wordCount, postId, postType ) {
 	// Don't destrcuture items from content here, it can be undefined.
@@ -49,13 +46,12 @@ function usePostContentExcerpt( wordCount, postId, postType ) {
 }
 
 export default function PostExcerptEditor( {
-	clientId,
 	attributes: { textAlign, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
-	context: { postId, postType },
+	context: { postId, postType, queryId },
 } ) {
-	const isDescendentOfQueryLoop = useIsDescendentOfQueryLoopBlock( clientId );
+	const isDescendentOfQueryLoop = !! queryId;
 	const userCanEdit = useCanEditEntity(
 		'root',
 		'postType',

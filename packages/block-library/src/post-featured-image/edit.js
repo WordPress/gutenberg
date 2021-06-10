@@ -20,11 +20,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import { useIsDescendentOfQueryLoopBlock } from '../utils/hooks';
-
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const placeholderChip = (
 	<div className="post-featured-image_placeholder">
@@ -34,14 +29,13 @@ const placeholderChip = (
 );
 
 function PostFeaturedImageDisplay( {
-	clientId,
 	attributes: { isLink },
 	setAttributes,
-	context: { postId, postType },
+	context: { postId, postType, queryId },
 	noticeUI,
 	noticeOperations,
 } ) {
-	const isDescendentOfQueryLoop = useIsDescendentOfQueryLoopBlock( clientId );
+	const isDescendentOfQueryLoop = !! queryId;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postType,
