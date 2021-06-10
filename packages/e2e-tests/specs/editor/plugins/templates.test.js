@@ -102,15 +102,14 @@ describe( 'templates', () => {
 			await page.type( '.editor-post-title__input', 'My Image Format' );
 			await clickBlockAppender();
 			await page.keyboard.press( 'Backspace' );
+			// Wait for the selection to update.
+			await page.evaluate(
+				() => new Promise( window.requestAnimationFrame )
+			);
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
 			await page.reload();
 			await page.waitForSelector( '.edit-post-layout' );
-
-			// Wait a bit more for getEditedPostContent to be correct
-			await page.waitForSelector(
-				'.block-editor-default-block-appender__content'
-			);
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
