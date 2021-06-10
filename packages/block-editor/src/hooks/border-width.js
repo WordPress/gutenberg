@@ -4,6 +4,7 @@
 import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	parseUnit,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -11,7 +12,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { parseUnit } from './border';
 import { cleanEmptyObject } from './utils';
 import useSetting from '../components/use-setting';
 
@@ -32,7 +32,8 @@ export const BorderWidthEdit = ( props ) => {
 
 	// Step value is maintained in state so step is appropriate for current unit
 	// even when current radius value is undefined.
-	const initialStep = parseUnit( style?.border?.width ) === 'px' ? 1 : 0.25;
+	const initialStep =
+		parseUnit( style?.border?.width )[ 1 ] === 'px' ? 1 : 0.25;
 	const [ step, setStep ] = useState( initialStep );
 
 	const onUnitChange = ( newUnit ) => {

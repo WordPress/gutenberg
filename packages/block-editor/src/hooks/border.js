@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { PanelBody, ALL_CSS_UNITS } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -17,21 +17,6 @@ import { BorderStyleEdit } from './border-style';
 import { BorderWidthEdit } from './border-width';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
-
-/**
- * Parses a CSS unit from a border CSS value.
- *
- * @param {string} cssValue CSS value to parse e.g. `10px` or `1.5em`.
- * @return {string}          CSS unit from provided value or default 'px'.
- */
-export function parseUnit( cssValue ) {
-	const value = String( cssValue ).trim();
-	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
-	const unit = unitMatch !== undefined ? unitMatch.toLowerCase() : '';
-	const currentUnit = ALL_CSS_UNITS.find( ( item ) => item.value === unit );
-
-	return currentUnit?.value || 'px';
-}
 
 export function BorderPanel( props ) {
 	const isDisabled = useIsBorderDisabled( props );

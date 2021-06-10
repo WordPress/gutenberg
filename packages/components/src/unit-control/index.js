@@ -200,5 +200,5 @@ function UnitControl(
 
 const ForwardedUnitControl = forwardRef( UnitControl );
 
-export { ALL_CSS_UNITS, useCustomUnits } from './utils';
+export { parseUnit, useCustomUnits } from './utils';
 export default ForwardedUnitControl;
