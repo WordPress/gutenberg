@@ -31,7 +31,7 @@ export default function PostTitleEdit( {
 	context: { postType, postId },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
-	const isEditable = useIsEditablePostBlock( clientId );
+	const isEditable = useIsEditablePostBlock( clientId, postId, postType );
 	const post = useSelect(
 		( select ) =>
 			select( coreStore ).getEditedEntityRecord(

@@ -3,6 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -11,17 +12,21 @@ import queryMetaData from '../query/block.json';
 const { name: queryBlockName } = queryMetaData;
 
 /**
- * Hook that determines if a Post block is editable or not.
- * The returned value is used to determine if the specific
- * Post block will be rendered in `readonly` mode or not.
+ * Hook that determines if a Post block will be rendered in
+ * `readonly` mode or not.
  *
- * For now this is checking if a Post block is nested in
- * a Query block. If it is, the block should not be editable.
+ * Is checking if the current user has edit rights and if the
+ * Post block is nested in a Query Loop block (if it is, the
+ * block should not be editable).
  *
  * @param {string} clientId The ID of the block to be checked.
- * @return {boolean} Whether the block can be edited or not.
+ * @param {number} postId   The id of the post.
+ * @param {string} postType The type of the post.
+ *
+ * @return {boolean} Whether the block will be rendered in `readonly` mode.
  */
-export function useIsEditablePostBlock( clientId ) {
+export function useIsEditablePostBlock( clientId, postId, postType ) {
+	const userCanEdit = useCanUserEditPostBlock( postId, postType );
 	return useSelect(
 		( select ) => {
 			const { getBlockParents, getBlockName } = select(
@@ -32,10 +37,34 @@ export function useIsEditablePostBlock( clientId ) {
 				( parentClientId ) =>
 					getBlockName( parentClientId ) === queryBlockName
 			);
-			return ! hasQueryParent;
+			return userCanEdit && ! hasQueryParent;
 		},
-		[ clientId ]
+		[ clientId, userCanEdit ]
 	);
 }
 
-export default { useIsEditablePostBlock };
+/**
+ * Hook that determines if current user has edit rights to the
+ * Post block. This is different from `useIsEditablePostBlock`
+ * hook which incoorporates more checks about the `readonOnly`
+ * mode and we have to take account for protected content.
+ *
+ * @param {number} postId   The id of the post.
+ * @param {string} postType The type of the post.
+ *
+ * @return {boolean} Whether the user has edit rights.
+ */
+export function useCanUserEditPostBlock( postId, postType ) {
+	return useSelect(
+		( select ) =>
+			select( coreStore ).canUserEditEntityRecord(
+				'root',
+				'postType',
+				postType,
+				postId
+			),
+		[ postId, postType ]
+	);
+}
+
+export default { useIsEditablePostBlock, useCanUserEditPostBlock };

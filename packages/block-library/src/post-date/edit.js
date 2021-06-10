@@ -40,7 +40,7 @@ export default function PostDateEdit( {
 	const { textAlign, format, isLink } = attributes;
 	const { postId, postType } = context;
 
-	const isEditable = useIsEditablePostBlock( clientId );
+	const isEditable = useIsEditablePostBlock( clientId, postId, postType );
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
 	const [ date, setDate ] = useEntityProp(
 		'postType',

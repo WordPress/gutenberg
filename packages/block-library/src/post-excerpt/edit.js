@@ -6,8 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useEntityProp } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
 	AlignmentToolbar,
@@ -23,7 +22,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useIsEditablePostBlock } from '../utils/hooks';
+import {
+	useIsEditablePostBlock,
+	useCanUserEditPostBlock,
+} from '../utils/hooks';
 
 function usePostContentExcerpt( wordCount, postId, postType ) {
 	// Don't destrcuture items from content here, it can be undefined.
@@ -33,17 +35,17 @@ function usePostContentExcerpt( wordCount, postId, postType ) {
 		'content',
 		postId
 	);
-	const rawPostContent = content?.raw;
+	const renderedPostContent = content?.rendered;
 	return useMemo( () => {
-		if ( ! rawPostContent ) {
+		if ( ! renderedPostContent ) {
 			return '';
 		}
 		const excerptElement = document.createElement( 'div' );
-		excerptElement.innerHTML = rawPostContent;
+		excerptElement.innerHTML = renderedPostContent;
 		const excerpt =
 			excerptElement.textContent || excerptElement.innerText || '';
 		return excerpt.trim().split( ' ', wordCount ).join( ' ' );
-	}, [ rawPostContent, wordCount ] );
+	}, [ renderedPostContent, wordCount ] );
 }
 
 export default function PostExcerptEditor( {
@@ -53,17 +55,8 @@ export default function PostExcerptEditor( {
 	isSelected,
 	context: { postId, postType },
 } ) {
-	const isEditable = useIsEditablePostBlock( clientId );
-	const userCanEdit = useSelect(
-		( select ) =>
-			select( coreStore ).canUserEditEntityRecord(
-				'root',
-				'postType',
-				postType,
-				postId
-			),
-		[ postType, postId ]
-	);
+	const isEditable = useIsEditablePostBlock( clientId, postId, postType );
+	const userHasEditRights = useCanUserEditPostBlock( postId, postType );
 	const [
 		excerpt,
 		setExcerpt,
@@ -88,7 +81,7 @@ export default function PostExcerptEditor( {
 			</div>
 		);
 	}
-	if ( isProtected && ! userCanEdit ) {
+	if ( isProtected && ! userHasEditRights ) {
 		return (
 			<div { ...blockProps }>
 				<Warning>
@@ -111,24 +104,23 @@ export default function PostExcerptEditor( {
 			}
 		/>
 	);
-	const excerptContent =
-		isEditable && userCanEdit ? (
-			<RichText
-				className={
-					! showMoreOnNewLine &&
-					'wp-block-post-excerpt__excerpt is-inline'
-				}
-				aria-label={ __( 'Post excerpt text' ) }
-				value={
-					excerpt ||
-					postContentExcerpt ||
-					( isSelected ? '' : __( 'No post excerpt found' ) )
-				}
-				onChange={ setExcerpt }
-			/>
-		) : (
-			excerpt || postContentExcerpt || __( 'No post excerpt found' )
-		);
+	const excerptContent = isEditable ? (
+		<RichText
+			className={
+				! showMoreOnNewLine &&
+				'wp-block-post-excerpt__excerpt is-inline'
+			}
+			aria-label={ __( 'Post excerpt text' ) }
+			value={
+				excerpt ||
+				postContentExcerpt ||
+				( isSelected ? '' : __( 'No post excerpt found' ) )
+			}
+			onChange={ setExcerpt }
+		/>
+	) : (
+		excerpt || postContentExcerpt || __( 'No post excerpt found' )
+	);
 	return (
 		<>
 			<BlockControls>
