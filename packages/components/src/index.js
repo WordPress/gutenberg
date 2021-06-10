@@ -137,7 +137,7 @@ export { Truncate as __experimentalTruncate } from './truncate';
 export {
 	default as __experimentalUnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
-	parseUnit,
+	parseUnit as __experimentalParseUnit,
 } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';

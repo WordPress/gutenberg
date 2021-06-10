@@ -4,7 +4,7 @@
 import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
-	parseUnit,
+	__experimentalParseUnit as parseUnit,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
