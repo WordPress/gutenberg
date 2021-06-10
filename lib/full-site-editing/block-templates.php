@@ -72,7 +72,7 @@ function _gutenberg_get_template_file( $template_type, $slug ) {
  * @access private
  * @internal
  *
- * @param array $template_type wp_template or wp_template_part.
+ * @param string $template_type wp_template or wp_template_part.
  *
  * @return array Template.
  */
@@ -396,7 +396,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	 * }
 	 * @param array $template_type wp_template or wp_template_part.
 	 */
-	return apply_filters( 'queried_block_templates', $query_result, $query, $template_type );
+	return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 }
 
 /**
@@ -498,17 +498,20 @@ function gutenberg_get_block_file_template( $id, $template_type = 'wp_template' 
 
 	$parts = explode( '//', $id, 2 );
 	if ( count( $parts ) < 2 ) {
-		return null;
+		/** This filter is documented at the end of this function */
+		return apply_filters( 'get_block_file_template', null, $id, $template_type );
 	}
 	list( $theme, $slug ) = $parts;
 
 	if ( wp_get_theme()->get_stylesheet() !== $theme ) {
-		return null;
+		/** This filter is documented at the end of this function */
+		return apply_filters( 'get_block_file_template', null, $id, $template_type );
 	}
 
 	$template_file = _gutenberg_get_template_file( $template_type, $slug );
 	if ( null === $template_file ) {
-		return null;
+		/** This filter is documented at the end of this function */
+		return apply_filters( 'get_block_file_template', null, $id, $template_type );
 	}
 
 	$block_template = _gutenberg_build_template_result_from_file( $template_file, $template_type );
@@ -518,7 +521,7 @@ function gutenberg_get_block_file_template( $id, $template_type = 'wp_template' 
 	 *
 	 * @since 5.8
 	 *
-	 * @param WP_Block_Template $block_template The found block template.
+	 * @param null|WP_Block_Template $block_template The found block template.
 	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
 	 * @param array  $template_type wp_template or wp_template_part.
 	 */
