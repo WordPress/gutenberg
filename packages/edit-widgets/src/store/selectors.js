@@ -238,5 +238,5 @@ export const canInsertBlockInWidgetArea = createRegistrySelector(
  * @return {boolean} Is active.
  */
 export function __unstableIsFeatureActive( state, feature ) {
-	return get( state.preferences.features, [ feature ], false );
+	return get( state.preferences, [ 'features', feature ], false );
 }

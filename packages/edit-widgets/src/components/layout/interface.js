@@ -47,12 +47,19 @@ function Interface( { blockEditorSettings } ) {
 	);
 	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
 
-	const { hasSidebarEnabled, isInserterOpened } = useSelect(
+	const {
+		hasBlockBreadCrumbsEnabled,
+		hasSidebarEnabled,
+		isInserterOpened,
+	} = useSelect(
 		( select ) => ( {
 			hasSidebarEnabled: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( editWidgetsStore.name ),
 			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
+			hasBlockBreadCrumbsEnabled: select(
+				editWidgetsStore
+			).__unstableIsFeatureActive( 'showBlockBreadcrumbs' ),
 		} ),
 		[]
 	);
