@@ -1686,6 +1686,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/readable-js-assets-webpack-plugin",
+		"slug": "packages-readable-js-assets-webpack-plugin",
+		"markdown_source": "../packages/readable-js-assets-webpack-plugin/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/redux-routine",
 		"slug": "packages-redux-routine",
 		"markdown_source": "../packages/redux-routine/README.md",

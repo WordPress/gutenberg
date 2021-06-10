@@ -16,6 +16,11 @@ const fastGlob = require( 'fast-glob' );
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
+ * Internal dependencies
+ */
+const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 const {
 	camelCaseDash,
 } = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
@@ -148,10 +153,10 @@ module.exports = {
 			const request = rootModule?.rawRequest || rawRequest;
 
 			if ( request.includes( '/frontend.js' ) ) {
-				return `./build/block-library/blocks/[name]/frontend.js`;
+				return `./build/block-library/blocks/[name]/frontend.min.js`;
 			}
 
-			return './build/[name]/index.js';
+			return `./build/[name]/index.min.js`;
 		},
 		path: __dirname,
 		library: [ 'wp', '[camelName]' ],
@@ -297,6 +302,7 @@ module.exports = {
 			] )
 		),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+		new ReadableJsAssetsWebpackPlugin(),
 	].filter( Boolean ),
 	watchOptions: {
 		ignored: [ '**/node_modules', '**/packages/*/src' ],
