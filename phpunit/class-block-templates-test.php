@@ -16,7 +16,6 @@ class Block_Templates_Test extends WP_UnitTestCase {
 	public static function wpSetUpBeforeClass() {
 		gutenberg_register_template_post_type();
 		gutenberg_register_template_part_post_type();
-		// gutenberg_register_wp_theme_taxonomy();
 		gutenberg_register_wp_template_part_area_taxonomy();
 
 		// Set up a template post corresponding to a different theme.

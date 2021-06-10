@@ -246,11 +246,11 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
  * @return WP_Block_Template|WP_Error Template.
  */
 function _gutenberg_build_template_result_from_post( $post ) {
-	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part', true ) ) ) {
+	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part' ), true ) ) {
 		return new WP_Error( 'template_wrong_post_type', __( 'An invalid post was provided for this template.', 'gutenberg' ) );
 	}
 
-	$ids    = get_theme_mod( $template_type, array() );
+	$ids    = get_theme_mod( $post->post_type, array() );
 	$active = in_array( $post->ID, $ids, true );
 
 	// Temporarily disable inactive access for 5.8 version.
