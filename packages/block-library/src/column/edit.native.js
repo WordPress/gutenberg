@@ -113,18 +113,18 @@ function ColumnEdit( {
 
 	const renderAppender = useCallback( () => {
 		const { width: columnWidth } = contentStyle[ clientId ];
-		const isScreenWidthEqual = columnWidth === screenWidth; // full width??
+		const isFullWidth = columnWidth === screenWidth;
 
 		if ( isSelected ) {
 			return (
 				<View
 					style={ [
 						styles.columnAppender,
-						isScreenWidthEqual && styles.fullwidthColumnAppender,
-						isScreenWidthEqual &&
+						isFullWidth && styles.fullwidthColumnAppender,
+						isFullWidth &&
 							hasChildren &&
 							styles.fullwidthHasInnerColumnAppender,
-						! isScreenWidthEqual &&
+						! isFullWidth &&
 							hasChildren &&
 							styles.hasInnerColumnAppender,
 					] }
