@@ -20,6 +20,7 @@ import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { getBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -53,8 +54,6 @@ function Navigation( {
 	isSelected,
 	updateInnerBlocks,
 	className,
-	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = true,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -101,6 +100,16 @@ function Navigation( {
 			__experimentalLayout: LAYOUT,
 			placeholder,
 		}
+	);
+
+	const hasSubmenuIndicatorSetting = getBlockSupport(
+		'core/navigation',
+		'__experimentalSubmenuIndicatorSetting'
+	);
+
+	const hasItemJustificationControls = getBlockSupport(
+		'core/navigation',
+		'__experimentalItemJustificationControls'
 	);
 
 	if ( isPlaceholderShown ) {

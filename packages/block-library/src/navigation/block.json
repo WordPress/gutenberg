@@ -72,7 +72,9 @@
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true
 		},
-		"color": true
+		"color": true,
+		"__experimentalSubmenuIndicatorSetting": true,
+		"__experimentalItemJustificationControls": true
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
