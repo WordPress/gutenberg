@@ -86,7 +86,14 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		1
 	);
 
-	return $content . '<style>' . $style . '</style>';
+	add_action(
+		'wp_head',
+		function () use ( $style ) {
+			echo '<style>' . $style . '</style>';
+		}
+	);
+
+	return $content;
 }
 
 // This can be removed when plugin support requires WordPress 5.8.0+.
