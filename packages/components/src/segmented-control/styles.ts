@@ -67,7 +67,7 @@ export const ButtonView = styled.button`
 	background: transparent;
 	border: none;
 	border-radius: ${ CONFIG.controlBorderRadius };
-	color: ${ CONFIG.controlTextActiveColor }; // ui.color.text
+	color: ${ CONFIG.controlTextActiveColor };
 	cursor: pointer;
 	display: flex;
 	height: 100%;
@@ -77,7 +77,7 @@ export const ButtonView = styled.button`
 	padding: 0 12px;
 	position: relative;
 	text-align: center;
-	transition: background-color ${ CONFIG.transitionDurationFast } linear,
+	transition: background ${ CONFIG.transitionDurationFast } linear,
 		color ${ CONFIG.transitionDurationFast } linear, font-weight 60ms linear;
 	user-select: none;
 	width: 100%;

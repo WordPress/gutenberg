@@ -13,37 +13,32 @@ import { memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import * as styles from './styles';
-import { CONFIG, COLORS } from '../utils';
-
-const {
+import {
 	ButtonContentView,
 	ButtonView,
 	LabelPlaceholderView,
 	LabelView,
 	SeparatorView,
-} = styles;
+} from './styles';
+// eslint-disable-next-line no-duplicate-imports
+import * as styles from './styles';
+import type { SegmentedControlButtonProps } from './types';
 
-function SegmentedControlButton( {
-	className,
-	forwardedRef,
-	isBlock = false,
-	label,
-	showSeparator,
-	value,
-	...props
-} ) {
+function SegmentedControlButton( allProps: SegmentedControlButtonProps ) {
+	const {
+		className,
+		forwardedRef,
+		isBlock = false,
+		label,
+		showSeparator,
+		value,
+		...props
+	} = allProps;
 	const isActive = props.state === value;
-
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
 	const classes = cx( isActive && styles.buttonActive, className );
-
 	return (
-		<LabelView
-			className={ labelViewClasses }
-			data-active={ isActive }
-			{ ...ui.$( 'SegmentedControlButtonLabel' ) }
-		>
+		<LabelView className={ labelViewClasses } data-active={ isActive }>
 			<Radio
 				{ ...props }
 				as={ ButtonView }
@@ -52,15 +47,8 @@ function SegmentedControlButton( {
 				ref={ forwardedRef }
 				value={ value }
 			>
-				<ButtonContentView
-					{ ...ui.$( 'SegmentedControlButtonContent' ) }
-				>
-					{ label }
-				</ButtonContentView>
-				<LabelPlaceholderView
-					aria-hidden
-					{ ...ui.$( 'SegmentedControlButtonContentPlaceholder' ) }
-				>
+				<ButtonContentView>{ label }</ButtonContentView>
+				<LabelPlaceholderView aria-hidden>
 					{ label }
 				</LabelPlaceholderView>
 			</Radio>
@@ -69,16 +57,9 @@ function SegmentedControlButton( {
 	);
 }
 
-const SegmentedControlSeparator = memo( ( { isActive } ) => {
+const SegmentedControlSeparator = memo( ( { isActive: boolean } ) => {
 	const classes = cx( isActive && styles.separatorActive );
-
-	return (
-		<SeparatorView
-			aria-hidden
-			className={ classes }
-			{ ...ui.$( 'SegmentedControlButtonSeparator' ) }
-		/>
-	);
+	return <SeparatorView aria-hidden className={ classes } />;
 } );
 
 export default memo( SegmentedControlButton );

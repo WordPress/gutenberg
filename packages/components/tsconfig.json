@@ -15,7 +15,8 @@
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../primitives" },
 		{ "path": "../react-i18n" },
-		{ "path": "../warning" }
+		{ "path": "../warning" },
+		{ "path": "../compose" }
 	],
 	"include": [
 		"src/__next/**/*",

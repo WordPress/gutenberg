@@ -4,17 +4,15 @@
 import { cx } from 'emotion';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
+import useResizeAware from 'react-resize-aware';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
-import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
+import { useRef, useMemo } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
-/**
- * Internal dependencies
- */
 /**
  * Internal dependencies
  */
@@ -24,25 +22,30 @@ import * as styles from './styles';
 import { useUpdateEffect } from '../utils/hooks';
 import Backdrop from './segmented-control-backdrop';
 import Button from './segmented-control-button';
-import type { SegmentedControlProps } from './types';
 
-function SegmentControl( props: any, forwardedRef: any ) {
+const noop = () => {};
+
+/**
+ * @param {import('./types').SegmentedControlProps} props
+ * @param {import('react').Ref<any>}                forwardedRef
+ */
+function SegmentControl( props, forwardedRef ) {
 	const {
 		className,
 		baseId,
 		isAdaptiveWidth = false,
 		isBlock = false,
 		id,
-		label = __( 'SegmentControl' ),
+		label,
 		options = [],
-		onChange = () => {},
+		onChange = noop,
 		size = 'medium',
 		value,
 		...otherProps
 	} = useContextSystem( props, 'SegmentedControl' );
 
 	const containerRef = useRef();
-	const [ resizeListener, sizes ] = useResizeObserver();
+	const [ resizeListener, sizes ] = useResizeAware();
 
 	const radio = useRadioState( {
 		baseId: baseId || id,
@@ -62,13 +65,16 @@ function SegmentControl( props: any, forwardedRef: any ) {
 		}
 	}, [ value ] );
 
-	const classes = cx(
-		styles.SegmentedControl,
-		isBlock && styles.block,
-		styles[ size ],
-		className
+	const classes = useMemo(
+		() =>
+			cx(
+				styles.SegmentedControl,
+				isBlock && styles.block,
+				styles[ size ],
+				className
+			),
+		[ className, size ]
 	);
-	const mergedRefs = useMergeRefs( [ containerRef, forwardedRef ] );
 	return (
 		<RadioGroup
 			{ ...radio }
@@ -76,7 +82,7 @@ function SegmentControl( props: any, forwardedRef: any ) {
 			as={ View }
 			className={ classes }
 			{ ...otherProps }
-			ref={ mergedRefs }
+			ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
 		>
 			{ resizeListener }
 			<Backdrop
@@ -84,7 +90,7 @@ function SegmentControl( props: any, forwardedRef: any ) {
 				containerRef={ containerRef }
 				containerWidth={ sizes.width }
 			/>
-			{ options.map( ( option, index: number ) => {
+			{ options.map( ( option: any, index: number ) => {
 				const showSeparator = getShowSeparator( radio, index );
 				return (
 					<Button
@@ -100,7 +106,7 @@ function SegmentControl( props: any, forwardedRef: any ) {
 	);
 }
 
-function getShowSeparator( radio, index: number ) {
+function getShowSeparator( radio: any, index: number ) {
 	const { currentId, items } = radio;
 	const isLast = index === items.length - 1;
 	const isActive = items[ index ]?.id === currentId;

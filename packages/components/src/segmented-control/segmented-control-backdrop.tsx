@@ -6,10 +6,11 @@ import { useState, useEffect, memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import type { SegmentedControlBackdropProps } from './types';
 import { BackdropView } from './styles';
-import { CONFIG, COLORS } from '../utils';
 
-function SegmentedControlBackdrop( { containerRef, containerWidth, state } ) {
+function SegmentedControlBackdrop( props: SegmentedControlBackdropProps ) {
+	const { containerRef, containerWidth, state } = props;
 	const [ left, setLeft ] = useState( 0 );
 	const [ width, setWidth ] = useState( 0 );
 	const [ canAnimate, setCanAnimate ] = useState( false );
@@ -44,10 +45,9 @@ function SegmentedControlBackdrop( { containerRef, containerWidth, state } ) {
 	return (
 		<BackdropView
 			role="presentation"
-			{ ...ui.$( 'SegmentedControlBackdrop' ) }
 			style={ {
 				transform: `translateX(${ left }px)`,
-				transition: canAnimate ? null : 'none',
+				transition: canAnimate ? undefined : 'none',
 				width,
 			} }
 		/>
