@@ -64,7 +64,7 @@ export type BodyProps = BaseSubComponentProps & {
 	isScrollable?: boolean;
 };
 
-export type HeaderProps = BaseSubComponentProps & {
+type MarginalSubComponentProps = BaseSubComponentProps & {
 	/**
 	 * Renders without a border.
 	 *
@@ -73,7 +73,9 @@ export type HeaderProps = BaseSubComponentProps & {
 	isBorderless?: boolean;
 };
 
-export type FooterProps = HeaderProps & {
+export type HeaderProps = MarginalSubComponentProps;
+
+export type FooterProps = MarginalSubComponentProps & {
 	justify: CSSProperties[ 'justifyContent' ];
 };
 
