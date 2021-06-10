@@ -241,13 +241,12 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 /**
  * Build a unified template object based a post Object.
  *
- * @param WP_Post $post          Template post.
- * @param string  $template_type wp_template or wp_template_part.
+ * @param WP_Post $post Template post.
  *
  * @return WP_Block_Template|WP_Error Template.
  */
-function _gutenberg_build_template_result_from_post( $post, $template_type = 'wp_template' ) {
-	if ( $template_type !== $post->post_type ) {
+function _gutenberg_build_template_result_from_post( $post ) {
+	if ( ! in_array( $post->post_type, array( 'wp_template', 'wp_template_part', true ) ) ) {
 		return new WP_Error( 'template_wrong_post_type', __( 'An invalid post was provided for this template.', 'gutenberg' ) );
 	}
 
@@ -350,7 +349,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	if ( ! isset( $wp_query_args['post__in'] ) || array() !== $wp_query_args['post__in'] ) {
 		$template_query = new WP_Query( $wp_query_args );
 		foreach ( $template_query->get_posts() as $post ) {
-			$template = _gutenberg_build_template_result_from_post( $post, $template_type );
+			$template = _gutenberg_build_template_result_from_post( $post );
 
 			if ( ! is_wp_error( $template ) ) {
 				$query_result[] = $template;
@@ -416,7 +415,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	}
 
 	if ( $post && $template_type === $post->post_type ) {
-		$template = _gutenberg_build_template_result_from_post( $post, $template_type );
+		$template = _gutenberg_build_template_result_from_post( $post );
 
 		if ( ! is_wp_error( $template ) ) {
 			return $template;
