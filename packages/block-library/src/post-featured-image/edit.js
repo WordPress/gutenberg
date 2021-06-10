@@ -41,7 +41,7 @@ function PostFeaturedImageDisplay( {
 	noticeUI,
 	noticeOperations,
 } ) {
-	const isEditable = useIsEditablePostBlock( clientId );
+	const isEditable = useIsEditablePostBlock( clientId, postId, postType );
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postType,

@@ -12,18 +12,18 @@ import {
 	store as blockEditorStore,
 	Warning,
 } from '@wordpress/block-editor';
-import {
-	useEntityProp,
-	useEntityBlockEditor,
-	store as coreStore,
-} from '@wordpress/core-data';
+import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { useIsEditablePostBlock } from '../utils/hooks';
+import {
+	useIsEditablePostBlock,
+	useCanUserEditPostBlock,
+} from '../utils/hooks';
 
 function ReadOnlyContent( { postType, postId } ) {
+	const userHasEditRights = useCanUserEditPostBlock( postId, postType );
 	const [ , , content ] = useEntityProp(
 		'postType',
 		postType,
@@ -31,7 +31,7 @@ function ReadOnlyContent( { postType, postId } ) {
 		postId
 	);
 	const blockProps = useBlockProps();
-	return content?.protected ? (
+	return content?.protected && ! userHasEditRights ? (
 		<div { ...blockProps }>
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
 		</div>
@@ -83,18 +83,8 @@ function EditableContent( { layout, postType, postId } ) {
 
 function Content( props ) {
 	const { clientId, postType, postId } = props;
-	const isEditable = useIsEditablePostBlock( clientId );
-	const userCanEdit = useSelect(
-		( select ) =>
-			select( coreStore ).canUserEditEntityRecord(
-				'root',
-				'postType',
-				postType,
-				postId
-			),
-		[ postType, postId ]
-	);
-	return isEditable && userCanEdit ? (
+	const isEditable = useIsEditablePostBlock( clientId, postId, postType );
+	return isEditable ? (
 		<EditableContent { ...props } />
 	) : (
 		<ReadOnlyContent postType={ postType } postId={ postId } />

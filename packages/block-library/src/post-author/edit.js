@@ -33,7 +33,7 @@ function PostAuthorEdit( {
 } ) {
 	const { postType, postId } = context;
 
-	const isEditable = useIsEditablePostBlock( clientId );
+	const isEditable = useIsEditablePostBlock( clientId, postId, postType );
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getUsers } = select(
