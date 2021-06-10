@@ -75,13 +75,16 @@ export function getInlineStyles( styles = {} ) {
 	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
 		const path = STYLE_PROPERTY[ propKey ].value;
 		const subPaths = STYLE_PROPERTY[ propKey ].properties;
+		const isReversedProperty = STYLE_PROPERTY[ propKey ].isReversedProperty;
 		// Ignore styles on elements because they are handled on the server.
 		if ( has( styles, path ) && 'elements' !== first( path ) ) {
 			if ( !! subPaths ) {
-				subPaths.forEach( ( suffix ) => {
-					output[
-						propKey + capitalize( suffix )
-					] = compileStyleValue( get( styles, [ ...path, suffix ] ) );
+				subPaths.forEach( ( property ) => {
+					const prefix = isReversedProperty ? property : propKey;
+					const suffix = isReversedProperty ? propKey : property;
+					output[ prefix + capitalize( suffix ) ] = compileStyleValue(
+						get( styles, [ ...path, property ] )
+					);
 				} );
 			} else {
 				output[ propKey ] = compileStyleValue( get( styles, path ) );

@@ -15,10 +15,17 @@ import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block
 import { useSetting } from '../editor/utils';
 
 export function useHasDimensionsPanel( context ) {
+	const hasGap = useHasGap( context );
 	const hasPadding = useHasPadding( context );
 	const hasMargin = useHasMargin( context );
 
-	return hasPadding || hasMargin;
+	return hasGap || hasPadding || hasMargin;
+}
+
+function useHasGap( { name, supports } ) {
+	const settings = useSetting( 'spacing.customGap', name );
+
+	return settings && supports.includes( 'gap' );
 }
 
 function useHasPadding( { name, supports } ) {
@@ -48,6 +55,7 @@ function filterValuesBySides( values, sides ) {
 
 export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
+	const showGapControl = useHasGap( context );
 	const showPaddingControl = useHasPadding( context );
 	const showMarginControl = useHasMargin( context );
 	const units = useCustomUnits( {
@@ -59,6 +67,18 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 			'vw',
 		],
 	} );
+
+	// Gap.
+	const gapValues = getStyle( name, 'gap' );
+	const gapSides = useCustomSides( name, 'gap' );
+
+	const setGapValues = ( newGapValues ) => {
+		const gap = filterValuesBySides( newGapValues, gapSides );
+		// TODO: This is currently broken, it'll need to convert the sides to `row` and `column` values.
+		setStyle( name, 'gap', gap );
+	};
+	const resetGapValue = () => setGapValues( {} );
+	const hasGapValue = () => gapValues && Object.keys( gapValues ).length;
 
 	const paddingValues = getStyle( name, 'padding' );
 	const paddingSides = useCustomSides( name, 'padding' );
@@ -115,6 +135,19 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 					units={ units }
 					hasValue={ hasMarginValue }
 					reset={ resetMarginValue }
+					allowReset={ false }
+					isShownByDefault={ true }
+				/>
+			) }
+			{ showGapControl && (
+				<BoxControl
+					values={ gapValues }
+					onChange={ setGapValues }
+					label={ __( 'Gap' ) }
+					sides={ gapSides }
+					units={ units }
+					hasValue={ hasGapValue }
+					reset={ resetGapValue }
 					allowReset={ false }
 					isShownByDefault={ true }
 				/>

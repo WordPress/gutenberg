@@ -24,6 +24,7 @@ describe( 'getInlineStyles', () => {
 					color: '#21759b',
 				},
 				spacing: {
+					gap: '1em',
 					padding: { top: '10px' },
 					margin: { bottom: '15px' },
 				},
@@ -35,6 +36,7 @@ describe( 'getInlineStyles', () => {
 			borderStyle: 'dotted',
 			borderWidth: 3,
 			color: 'red',
+			gap: '1em',
 			lineHeight: 1.5,
 			fontSize: 10,
 			marginBottom: '15px',
