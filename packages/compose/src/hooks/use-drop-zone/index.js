@@ -70,6 +70,30 @@ export default function useDropZone( {
 
 			const { ownerDocument } = element;
 
+			/**
+			 * Checks if an element is in the drop zone.
+			 *
+			 * @param {HTMLElement|null} elementToCheck
+			 *
+			 * @return {boolean} True if in drop zone, false if not.
+			 */
+			function isElementInZone( elementToCheck ) {
+				if (
+					! elementToCheck ||
+					! element.contains( elementToCheck )
+				) {
+					return false;
+				}
+
+				do {
+					if ( elementToCheck.dataset.isDropZone ) {
+						return elementToCheck === element;
+					}
+				} while ( ( elementToCheck = elementToCheck.parentElement ) );
+
+				return false;
+			}
+
 			function maybeDragStart( /** @type {DragEvent} */ event ) {
 				if ( isDragging ) {
 					return;
@@ -132,8 +156,8 @@ export default function useDropZone( {
 				// (element that has been entered) should be outside the drop
 				// zone.
 				if (
-					element.contains(
-						/** @type {Node} */ ( event.relatedTarget )
+					isElementInZone(
+						/** @type {HTMLElement|null} */ ( event.relatedTarget )
 					)
 				) {
 					return;
@@ -183,6 +207,7 @@ export default function useDropZone( {
 				}
 			}
 
+			element.dataset.isDropZone = 'true';
 			element.addEventListener( 'drop', onDrop );
 			element.addEventListener( 'dragenter', onDragEnter );
 			element.addEventListener( 'dragover', onDragOver );
@@ -192,6 +217,7 @@ export default function useDropZone( {
 			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 
 			return () => {
+				delete element.dataset.isDropZone;
 				element.removeEventListener( 'drop', onDrop );
 				element.removeEventListener( 'dragenter', onDragEnter );
 				element.removeEventListener( 'dragover', onDragOver );
