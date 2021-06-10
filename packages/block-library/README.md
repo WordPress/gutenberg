@@ -36,7 +36,7 @@ function render_my_block() {
 }
 
 function register_block_my_block() {
-	register_block_type_from_metadata(
+	register_block_type(
 		__DIR__ . '/block-name',
 		array(
 			'render_callback' => 'render_my_block',
