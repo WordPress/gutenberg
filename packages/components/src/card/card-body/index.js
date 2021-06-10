@@ -14,7 +14,12 @@ export const defaultProps = {
 	size: 'medium',
 };
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param { import('../types').BodyProps & JSX.IntrinsicElements['div'] } props
+ */
 export function CardBody( props ) {
+	/* eslint-enable jsdoc/valid-types */
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
 	const { size } = mergedProps;

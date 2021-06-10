@@ -15,7 +15,12 @@ export const defaultProps = {
 	size: 'medium',
 };
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param { import('../types').Props & JSX.IntrinsicElements['div'] } props
+ */
 export function Card( props ) {
+	/* eslint-enable jsdoc/valid-types */
 	const {
 		className,
 		isBorderless,

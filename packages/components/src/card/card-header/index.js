@@ -15,6 +15,9 @@ export const defaultProps = {
 	size: 'medium',
 };
 
+/**
+ * @param { import('../types').HeaderProps } props
+ */
 export function CardHeader( props ) {
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
