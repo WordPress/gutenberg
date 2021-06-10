@@ -11,34 +11,38 @@ import type { Props as SurfaceProps } from '../surface/types';
 
 export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
 
-export type Props = SurfaceProps & {
-	/**
-	 * Renders without a border.
-	 *
-	 * @default false
-	 */
-	isBorderless?: boolean;
-	/**
-	 * Renders with rounded corners.
-	 *
-	 * @default true
-	 */
-	isRounded?: boolean;
+type SizeableProps = {
 	/**
 	 * Determines the amount of padding within the component.
 	 *
 	 * @default 'medium'
 	 */
 	size?: SizeOptions;
-	/**
-	 * Renders with elevation styles (box shadow).
-	 *
-	 * @default false
-	 */
-	isElevated?: boolean;
 };
 
-type BaseSubComponentProps = {
+export type Props = SurfaceProps &
+	SizeableProps & {
+		/**
+		 * Renders without a border.
+		 *
+		 * @default false
+		 */
+		isBorderless?: boolean;
+		/**
+		 * Renders with rounded corners.
+		 *
+		 * @default true
+		 */
+		isRounded?: boolean;
+		/**
+		 * Renders with elevation styles (box shadow).
+		 *
+		 * @default false
+		 */
+		isElevated?: boolean;
+	};
+
+type BaseSubComponentProps = SizeableProps & {
 	/**
 	 * The children elements.
 	 */
@@ -49,12 +53,6 @@ type BaseSubComponentProps = {
 	 * @default false
 	 */
 	isShady?: boolean;
-	/**
-	 * Determines the amount of padding within the component.
-	 *
-	 * @default 'medium'
-	 */
-	size?: SizeOptions;
 };
 
 export type BodyProps = BaseSubComponentProps & {
