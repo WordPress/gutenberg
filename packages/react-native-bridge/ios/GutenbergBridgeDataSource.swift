@@ -70,6 +70,24 @@ public extension GutenbergBridgeDataSource {
     }
 }
 
+// MARK: - Crash logging - Sentry
+public extension GutenbergBridgeDataSource {
+    /// Asks the data source for the Sentry SDK options to initialize the SDK in the React native side.
+    ///
+    /// - Returns: Sentry SDK options.
+    func getSentryOptions() -> [String: Any]? { return [:] }
+    
+    /// Asks the data source for the current Sentry scope and includes it to an event.
+    ///
+    /// - Returns: Event object with attached scope.
+    func attachScopeToSentryEvent(_ event: [String: Any]) -> [String: Any]? { return event }
+    
+    /// Asks the data source to know if the app should send Sentry events depending on user preferences.
+    ///
+    /// - Returns: True if Sentry events can be sent.
+    func shouldSendSentryEvent() -> Bool? { return false }
+}
+
 public protocol GutenbergEditorTheme {
     var colors: [[String: String]]? { get }
     var gradients: [[String: String]]? { get }
