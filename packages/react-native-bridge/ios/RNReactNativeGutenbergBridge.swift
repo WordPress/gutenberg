@@ -350,6 +350,9 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
+    func logSentryEnvelope(_ envelope: [String: Any]) {
+        self.delegate?.gutenbergDidLogSentryEnvelope(envelope)
+    }
 }
 
 // MARK: - RCTBridgeModule delegate

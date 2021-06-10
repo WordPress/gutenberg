@@ -250,4 +250,7 @@ public extension GutenbergBridgeDelegate {
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) { }
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) { }
     func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {}
+    
+    // Crash logging - Sentry
+    func gutenbergDidLogSentryEnvelope(_ envelope: [String: Any]) { }
 }
