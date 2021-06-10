@@ -77,52 +77,35 @@
  * Menu item setup state. Is shown when a menu item has no URL configured.
  */
 
-.wp-block-navigation-link__placeholder {
+a.wp-block-navigation-link__placeholder.wp-block-navigation-link__placeholder {
 	position: relative;
-
-	// Provide a little margin to show each placeholder as a separate unit.
-	margin: 2px;
-
-	.wp-block-navigation-link__placeholder-text {
-		font-family: $default-font;
-		font-size: $default-font-size;
-		padding-left: 4px;
-		padding-right: 4px;
-
-	}
-
-	// This needs extra specificity.
-	&.wp-block-navigation-link__content {
-		cursor: pointer;
-	}
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
 
 	&::before {
-		content: "";
+		content: "\200b"; // Zero width space.
 		display: block;
 		position: absolute;
-		top: 0;
+		z-index: 0;
 		right: 0;
-		bottom: 0;
 		left: 0;
-		border-radius: $radius-block-ui;
-		opacity: 0.1;
+		opacity: 0.3;
+		background: currentColor;
+		line-height: 1;
+
+		// Tweak the currentcolor to give some highlighting.
+		$color-filter: sepia() saturate(10000%) hue-rotate(315deg); // Yellowish.
+		filter: invert(100%) $color-filter;
 
 		.is-dark-theme & {
-			opacity: 0.2;
-		}
-
-		.is-editing & {
-			background: currentColor;
+			filter: $color-filter;
 		}
 	}
-}
 
-// We had to add extra classes to override the color from
-// .editor-styles-wrapper .wp-block-navigation:not(.has-text-color) .wp-block-navigation-link__content
-.wp-block-navigation
-.wp-block-navigation-link:not(.is-editing)
-.wp-block-navigation-link__content.wp-block-navigation-link__placeholder {
-	box-shadow: inset 0 0 0 $border-width $gray-700;
-	border-radius: $radius-block-ui;
-	color: var(--wp-admin-theme-color);
+	.wp-block-navigation-link__placeholder-text {
+		position: relative;
+		z-index: 1;
+	}
 }
