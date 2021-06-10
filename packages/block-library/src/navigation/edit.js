@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -20,6 +20,7 @@ import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { getBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -55,6 +56,7 @@ function Navigation( {
 	className,
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
+	allowedOrientations,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -78,6 +80,14 @@ function Navigation( {
 	);
 
 	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
+
+	useEffect( () => {
+		if ( ! allowedOrientations?.includes( attributes.orientation ) ) {
+			setAttributes( {
+				orientation: allowedOrientations[ 0 ],
+			} );
+		}
+	}, [ allowedOrientations ] );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -183,6 +193,11 @@ function Navigation( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
+		const allowedOrientations = getBlockSupport(
+			'core/navigation',
+			'__experimentalAllowedOrientations'
+		);
+
 		const innerBlocks = select( blockEditorStore ).getBlocks( clientId );
 		const {
 			getClientIdsOfDescendants,
@@ -206,6 +221,7 @@ export default compose( [
 			// This prop is already available but computing it here ensures it's
 			// fresh compared to isImmediateParentOfSelectedBlock
 			isSelected: selectedBlockId === clientId,
+			allowedOrientations,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
