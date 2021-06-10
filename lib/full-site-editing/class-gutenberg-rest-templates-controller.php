@@ -337,15 +337,15 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 	protected function prepare_item_for_database( $request ) {
 		$template = $request['id'] ? gutenberg_get_block_template( $request['id'], $this->post_type ) : null;
 		$changes  = new stdClass();
-		if ( null === $template ) {
-			$changes->post_type   = $this->post_type;
-			$changes->post_status = 'publish';
-		} elseif ( 'custom' !== $template->source ) {
+		if ( null === $template || 'custom' !== $template->source ) {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
 		} else {
 			$changes->ID          = $template->wp_id;
 			$changes->post_status = 'publish';
+		}
+		if ( null !== $template && $template->has_theme_file ) {
+			$changes->post_name = $template->slug;
 		}
 		if ( isset( $request['content'] ) ) {
 			$changes->post_content = $request['content'];
