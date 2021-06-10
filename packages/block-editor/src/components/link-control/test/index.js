@@ -11,6 +11,10 @@ import { default as lodash, first, last, nth, uniqueId } from 'lodash';
 import { useState } from '@wordpress/element';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+/**
  * Internal dependencies
  */
 import LinkControl from '../';
@@ -24,8 +28,23 @@ lodash.debounce = jest.fn( ( callback ) => {
 
 const mockFetchSearchSuggestions = jest.fn();
 
-jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
+/**
+ * The call to the real method `fetchRemoteUrlData` is wrapped in a promise in order to make it cancellable.
+ * Therefore if we pass any value as the mock of `fetchRemoteUrlData` then ALL of the tests will require
+ * addition code to handle the async nature of `fetchRemoteUrlData`. This is unecessary. Instead we default
+ * to an undefined value which will ensure that the code under test does not call `fetchRemoteUrlData`. Only
+ * when we are testing the "rich previews" to we update this value with a true mock.
+ */
+let mockFetchRemoteUrlData;
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
+useSelect.mockImplementation( () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
+	fetchRemoteUrlData: mockFetchRemoteUrlData,
 } ) );
 
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
@@ -59,6 +78,7 @@ afterEach( () => {
 	container.remove();
 	container = null;
 	mockFetchSearchSuggestions.mockReset();
+	mockFetchRemoteUrlData?.mockReset(); // conditionally reset as it may NOT be a mock
 } );
 
 function getURLInput() {
@@ -1712,4 +1732,313 @@ describe( 'Post types', () => {
 			} );
 		}
 	);
+} );
+
+describe( 'Rich link previews', () => {
+	const selectedLink = {
+		id: '1',
+		title: 'Wordpress.org', // customize this for differentiation in assertions
+		url: 'https://www.wordpress.org',
+		type: 'URL',
+	};
+
+	beforeAll( () => {
+		/**
+		 * These tests require that we exercise the `fetchRemoteUrlData` function.
+		 * We are therefore overwriting the mock "placeholder" with a true jest mock
+		 * which will cause the code under test to execute the code which fetches
+		 * rich previews.
+		 */
+		mockFetchRemoteUrlData = jest.fn();
+	} );
+
+	it( 'should not fetch or display rich previews by default', async () => {
+		mockFetchRemoteUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title:
+					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		act( () => {
+			render( <LinkControl value={ selectedLink } />, container );
+		} );
+
+		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( mockFetchRemoteUrlData ).not.toHaveBeenCalled();
+		expect( isRichLinkPreview ).toBe( false );
+		expect( linkPreview ).toMatchSnapshot();
+	} );
+
+	it( 'should display a rich preview when data is available', async () => {
+		mockFetchRemoteUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title:
+					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( isRichLinkPreview ).toBe( true );
+		expect( linkPreview ).toMatchSnapshot();
+	} );
+
+	it( 'should display a fallback when title is missing from rich data', async () => {
+		mockFetchRemoteUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+		expect( isRichLinkPreview ).toBe( true );
+
+		const titlePreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-title'
+		);
+
+		expect( titlePreview.textContent ).toEqual(
+			expect.stringContaining( selectedLink.title )
+		);
+	} );
+
+	it( 'should display a fallback when icon is missing from rich data', async () => {
+		mockFetchRemoteUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title:
+					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+		expect( isRichLinkPreview ).toBe( true );
+
+		const iconPreview = linkPreview.querySelector(
+			`.block-editor-link-control__search-item-icon`
+		);
+
+		const fallBackIcon = iconPreview.querySelector( 'svg' );
+		const richIcon = iconPreview.querySelector( 'img' );
+
+		expect( fallBackIcon ).toBeTruthy();
+		expect( richIcon ).toBeFalsy();
+	} );
+
+	it.each( [ 'image', 'description' ] )(
+		'should display a fallback placeholder when %s it is missing from the rich data',
+		async ( dataItem ) => {
+			mockFetchRemoteUrlData.mockImplementation( () => {
+				const data = {
+					title:
+						'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+					icon: 'https://s.w.org/favicon.ico?2',
+					description:
+						'Open source software which you can use to easily create a beautiful website, blog, or app.',
+					image: 'https://s.w.org/images/home/screen-themes.png?3',
+				};
+				delete data[ dataItem ];
+				return Promise.resolve( data );
+			} );
+
+			act( () => {
+				render(
+					<LinkControl value={ selectedLink } hasRichPreviews />,
+					container
+				);
+			} );
+
+			// mockFetchRemoteUrlData resolves on next "tick" of event loop
+			await act( async () => {
+				await eventLoopTick();
+			} );
+
+			const linkPreview = container.querySelector(
+				"[aria-label='Currently selected']"
+			);
+
+			const isRichLinkPreview = linkPreview.classList.contains(
+				'is-rich'
+			);
+			expect( isRichLinkPreview ).toBe( true );
+
+			const missingDataItem = linkPreview.querySelector(
+				`.block-editor-link-control__search-item-${ dataItem }.is-placeholder`
+			);
+
+			expect( missingDataItem ).toBeTruthy();
+		}
+	);
+
+	it.each( [
+		[ 'empty', {} ],
+		[ 'null', null ],
+	] )(
+		'should not display a rich preview when data is %s',
+		async ( _descriptor, data ) => {
+			mockFetchRemoteUrlData.mockImplementation( () =>
+				Promise.resolve( data )
+			);
+
+			act( () => {
+				render(
+					<LinkControl value={ selectedLink } hasRichPreviews />,
+					container
+				);
+			} );
+
+			// mockFetchRemoteUrlData resolves on next "tick" of event loop
+			await act( async () => {
+				await eventLoopTick();
+			} );
+
+			const linkPreview = container.querySelector(
+				"[aria-label='Currently selected']"
+			);
+
+			const isRichLinkPreview = linkPreview.classList.contains(
+				'is-rich'
+			);
+
+			expect( isRichLinkPreview ).toBe( false );
+		}
+	);
+
+	it( 'should display in loading state when rich data is being fetched', async () => {
+		const nonResolvingPromise = () => new Promise( () => {} );
+
+		mockFetchRemoteUrlData.mockImplementation( nonResolvingPromise );
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isFetchingRichPreview = linkPreview.classList.contains(
+			'is-fetching'
+		);
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( isFetchingRichPreview ).toBe( true );
+		expect( isRichLinkPreview ).toBe( false );
+	} );
+
+	it( 'should remove fetching UI indicators and fallback to standard preview if request for rich preview results in an error', async () => {
+		const simulateFailedFetch = () => Promise.reject();
+
+		mockFetchRemoteUrlData.mockImplementation( simulateFailedFetch );
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		const isFetchingRichPreview = linkPreview.classList.contains(
+			'is-fetching'
+		);
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( isFetchingRichPreview ).toBe( false );
+		expect( isRichLinkPreview ).toBe( false );
+	} );
+
+	afterAll( () => {
+		// Remove the mock to avoid edge cases in other tests.
+		mockFetchRemoteUrlData = undefined;
+	} );
 } );
