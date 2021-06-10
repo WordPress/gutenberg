@@ -97,7 +97,7 @@ export function resolveMenuItems( menuId ) {
  *
  * @param {string} registryName Registry name.
  * @param {string} selectorName Selector name.
- * @param {Array} args          Selector arguments.
+ * @param {Array}  args         Selector arguments.
  * @return {Object} control descriptor.
  */
 export function select( registryName, selectorName, ...args ) {
@@ -114,7 +114,7 @@ export function select( registryName, selectorName, ...args ) {
  *
  * @param {string} registryName Registry name.
  * @param {string} actionName   Action name.
- * @param {Array} args          Selector arguments.
+ * @param {Array}  args         Selector arguments.
  * @return {Object} control descriptor.
  */
 export function dispatch( registryName, actionName, ...args ) {

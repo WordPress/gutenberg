@@ -56,7 +56,7 @@ function mergeInitialState( initialState = initialInputControlState ) {
  * Composes multiple stateReducers into a single stateReducer, building
  * the pipeline to control the flow for state and actions.
  *
- * @param  {...Function} fns State reducers.
+ * @param {...Function} fns State reducers.
  * @return {Function} The single composed stateReducer.
  */
 export const composeStateReducers = ( ...fns ) => {
@@ -167,7 +167,7 @@ function inputControlStateReducer( composedStateReducers ) {
  * https://kentcdodds.com/blog/the-state-reducer-pattern/
  *
  * @param {Function} stateReducer An external state reducer.
- * @param {Object} initialState The initial state for the reducer.
+ * @param {Object}   initialState The initial state for the reducer.
  * @return {Object} State, dispatch, and a collection of actions.
  */
 export function useInputControlStateReducer(

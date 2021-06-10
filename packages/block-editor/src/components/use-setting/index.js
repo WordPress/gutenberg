@@ -49,18 +49,11 @@ const deprecatedFlags = {
 	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
 };
 
-const filterColorsFromCoreOrigin = ( path, setting ) => {
-	if ( path !== 'color.palette' && path !== 'color.gradients' ) {
-		return setting;
-	}
-
-	if ( ! Array.isArray( setting ) ) {
-		return setting;
-	}
-
-	const colors = setting.filter( ( color ) => color?.origin !== 'core' );
-
-	return colors.length > 0 ? colors : setting;
+const PATHS_WITH_MERGE = {
+	'color.gradients': true,
+	'color.palette': true,
+	'typography.fontFamilies': true,
+	'typography.fontSizes': true,
 };
 
 /**
@@ -90,10 +83,14 @@ export default function useSetting( path ) {
 			const experimentalFeaturesResult =
 				get( settings, blockPath ) ?? get( settings, defaultsPath );
 			if ( experimentalFeaturesResult !== undefined ) {
-				return filterColorsFromCoreOrigin(
-					path,
-					experimentalFeaturesResult
-				);
+				if ( PATHS_WITH_MERGE[ path ] ) {
+					return (
+						experimentalFeaturesResult.user ??
+						experimentalFeaturesResult.theme ??
+						experimentalFeaturesResult.core
+					);
+				}
+				return experimentalFeaturesResult;
 			}
 
 			// 2 - Use deprecated settings, otherwise.
@@ -101,10 +98,7 @@ export default function useSetting( path ) {
 				? deprecatedFlags[ path ]( settings )
 				: undefined;
 			if ( deprecatedSettingsValue !== undefined ) {
-				return filterColorsFromCoreOrigin(
-					path,
-					deprecatedSettingsValue
-				);
+				return deprecatedSettingsValue;
 			}
 
 			// 3 - Fall back for typography.dropCap:

@@ -73,8 +73,8 @@ export const hasResolvedNavigationPost = createRegistrySelector(
 /**
  * Returns a menu item represented by the block with id clientId.
  *
- * @param {number} postId    Navigation post id
- * @param {number} clientId  Block clientId
+ * @param {number} postId   Navigation post id
+ * @param {number} clientId Block clientId
  * @return {Object|null} Menu item entity
  */
 export const getMenuItemForClientId = createRegistrySelector(

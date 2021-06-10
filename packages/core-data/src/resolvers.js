@@ -163,9 +163,9 @@ export const getEditedEntityRecord = ifNotResolved(
 /**
  * Requests the entity's records from the REST API.
  *
- * @param {string}  kind   Entity kind.
- * @param {string}  name   Entity name.
- * @param {Object?} query  Query Object.
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {Object?} query Query Object.
  */
 export function* getEntityRecords( kind, name, query = {} ) {
 	const entities = yield getKindEntities( kind );
@@ -272,7 +272,7 @@ export function* getThemeSupports() {
 /**
  * Requests a preview from the from the Embed API.
  *
- * @param {string} url   URL to get the preview for.
+ * @param {string} url URL to get the preview for.
  */
 export function* getEmbedPreview( url ) {
 	try {
@@ -385,7 +385,7 @@ export function* getAutosave( postType, postId ) {
 /**
  * Retrieve the frontend template used for a given link.
  *
- * @param {string} link  Link.
+ * @param {string} link Link.
  */
 export function* __experimentalGetTemplateForLink( link ) {
 	// Ideally this should be using an apiFetch call

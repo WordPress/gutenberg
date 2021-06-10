@@ -214,10 +214,20 @@ describe( 'global styles renderer', () => {
 			const tree = {
 				settings: {
 					color: {
-						palette: [
-							{ name: 'White', slug: 'white', color: 'white' },
-							{ name: 'Black', slug: 'black', color: 'black' },
-						],
+						palette: {
+							user: [
+								{
+									name: 'White',
+									slug: 'white',
+									color: 'white',
+								},
+								{
+									name: 'Black',
+									slug: 'black',
+									color: 'black',
+								},
+							],
+						},
 					},
 					custom: {
 						'font-primary': 'value',
@@ -229,18 +239,20 @@ describe( 'global styles renderer', () => {
 					blocks: {
 						'core/heading': {
 							typography: {
-								fontSizes: [
-									{
-										name: 'small',
-										slug: 'small',
-										size: '12px',
-									},
-									{
-										name: 'medium',
-										slug: 'medium',
-										size: '23px',
-									},
-								],
+								fontSizes: {
+									theme: [
+										{
+											name: 'small',
+											slug: 'small',
+											size: '12px',
+										},
+										{
+											name: 'medium',
+											slug: 'medium',
+											size: '23px',
+										},
+									],
+								},
 							},
 						},
 					},
@@ -264,10 +276,20 @@ describe( 'global styles renderer', () => {
 			const tree = {
 				settings: {
 					color: {
-						palette: [
-							{ name: 'White', slug: 'white', color: 'white' },
-							{ name: 'Black', slug: 'black', color: 'black' },
-						],
+						palette: {
+							core: [
+								{
+									name: 'White',
+									slug: 'white',
+									color: 'white',
+								},
+								{
+									name: 'Black',
+									slug: 'black',
+									color: 'black',
+								},
+							],
+						},
 					},
 				},
 				styles: {

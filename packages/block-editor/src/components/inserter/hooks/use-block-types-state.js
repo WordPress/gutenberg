@@ -17,8 +17,8 @@ import { store as blockEditorStore } from '../../../store';
 /**
  * Retrieves the block types inserter state.
  *
- * @param {string=}  rootClientId        Insertion's root client ID.
- * @param {Function} onInsert            function called when inserter a list of blocks.
+ * @param {string=}  rootClientId Insertion's root client ID.
+ * @param {Function} onInsert     function called when inserter a list of blocks.
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
 const useBlockTypesState = ( rootClientId, onInsert ) => {

@@ -117,7 +117,7 @@ function getNodeAsString( node ) {
  *
  * @param {Object} path              Traversal path.
  * @param {number} _originalNodeLine Private: In recursion, line number of
- *                                     the original node passed.
+ *                                   the original node passed.
  *
  * @return {?string} Extracted comment.
  */
