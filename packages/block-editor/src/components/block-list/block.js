@@ -15,12 +15,7 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import {
-	withDispatch,
-	withSelect,
-	useDispatch,
-	useSelect,
-} from '@wordpress/data';
+import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 
 /**
@@ -87,15 +82,6 @@ function BlockListBlock( {
 } ) {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
-
-	const removeBlockOutline = useSelect(
-		( select ) => {
-			const { isTyping, getSettings } = select( blockEditorStore );
-			const isOutlineMode = getSettings().outlineMode;
-			return isOutlineMode && isSelected && isTyping();
-		},
-		[ clientId, isSelected ]
-	);
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -173,9 +159,7 @@ function BlockListBlock( {
 
 	const value = {
 		clientId,
-		className: removeBlockOutline
-			? classnames( className, 'remove-outline' )
-			: className,
+		className,
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 		isAligned,
 	};
