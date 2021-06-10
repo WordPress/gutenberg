@@ -104,6 +104,11 @@ Undocumented declaration.
 
 Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
 
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
+
 _Returns_
 
 -   `WPElement`: Block Breadcrumb.
