@@ -22,7 +22,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { useIsEditablePostBlock } from '../utils/hooks';
+import { useIsDescendentOfQueryLoopBlock } from '../utils/hooks';
 
 function PostAuthorEdit( {
 	clientId,
@@ -33,7 +33,7 @@ function PostAuthorEdit( {
 } ) {
 	const { postType, postId } = context;
 
-	const isEditable = useIsEditablePostBlock( clientId, postId, postType );
+	const isDescendentOfQueryLoop = useIsDescendentOfQueryLoopBlock( clientId );
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getUsers } = select(
@@ -78,7 +78,7 @@ function PostAuthorEdit( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Author Settings' ) }>
-					{ isEditable && !! authors?.length && (
+					{ ! isDescendentOfQueryLoop && !! authors?.length && (
 						<SelectControl
 							label={ __( 'Author' ) }
 							value={ authorId }

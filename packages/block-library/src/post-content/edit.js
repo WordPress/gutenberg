@@ -18,12 +18,11 @@ import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
  * Internal dependencies
  */
 import {
-	useIsEditablePostBlock,
-	useCanUserEditPostBlock,
+	useIsDescendentOfQueryLoopBlock,
+	useCanEditEntity,
 } from '../utils/hooks';
 
-function ReadOnlyContent( { postType, postId } ) {
-	const userHasEditRights = useCanUserEditPostBlock( postId, postType );
+function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 	const [ , , content ] = useEntityProp(
 		'postType',
 		postType,
@@ -31,7 +30,7 @@ function ReadOnlyContent( { postType, postId } ) {
 		postId
 	);
 	const blockProps = useBlockProps();
-	return content?.protected && ! userHasEditRights ? (
+	return content?.protected && ! userCanEdit ? (
 		<div { ...blockProps }>
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
 		</div>
@@ -83,11 +82,22 @@ function EditableContent( { layout, postType, postId } ) {
 
 function Content( props ) {
 	const { clientId, postType, postId } = props;
-	const isEditable = useIsEditablePostBlock( clientId, postId, postType );
+	const isDescendentOfQueryLoop = useIsDescendentOfQueryLoopBlock( clientId );
+	const userCanEdit = useCanEditEntity(
+		'root',
+		'postType',
+		postType,
+		postId
+	);
+	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 	return isEditable ? (
 		<EditableContent { ...props } />
 	) : (
-		<ReadOnlyContent postType={ postType } postId={ postId } />
+		<ReadOnlyContent
+			userCanEdit={ userCanEdit }
+			postType={ postType }
+			postId={ postId }
+		/>
 	);
 }
 

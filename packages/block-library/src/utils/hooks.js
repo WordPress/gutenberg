@@ -12,21 +12,14 @@ import queryMetaData from '../query/block.json';
 const { name: queryBlockName } = queryMetaData;
 
 /**
- * Hook that determines if a Post block will be rendered in
- * `readonly` mode or not.
- *
- * Is checking if the current user has edit rights and if the
- * Post block is nested in a Query Loop block (if it is, the
- * block should not be editable).
+ * Hook that determines if a Post block is descendent
+ * of Query Loop block. If it is, the block should
+ * not be rendered in `readonly` mode.
  *
  * @param {string} clientId The ID of the block to be checked.
- * @param {number} postId   The id of the post.
- * @param {string} postType The type of the post.
- *
- * @return {boolean} Whether the block will be rendered in `readonly` mode.
+ * @return {boolean} Whether the block is descendent of Query Loop block.
  */
-export function useIsEditablePostBlock( clientId, postId, postType ) {
-	const userCanEdit = useCanUserEditPostBlock( postId, postType );
+export function useIsDescendentOfQueryLoopBlock( clientId ) {
 	return useSelect(
 		( select ) => {
 			const { getBlockParents, getBlockName } = select(
@@ -37,34 +30,34 @@ export function useIsEditablePostBlock( clientId, postId, postType ) {
 				( parentClientId ) =>
 					getBlockName( parentClientId ) === queryBlockName
 			);
-			return userCanEdit && ! hasQueryParent;
+			return hasQueryParent;
 		},
-		[ clientId, userCanEdit ]
+		[ clientId ]
 	);
 }
 
 /**
- * Hook that determines if current user has edit rights to the
- * Post block. This is different from `useIsEditablePostBlock`
- * hook which incoorporates more checks about the `readonOnly`
- * mode and we have to take account for protected content.
+ * Returns whether the current user can edit the given entity.
  *
- * @param {number} postId   The id of the post.
- * @param {string} postType The type of the post.
- *
- * @return {boolean} Whether the user has edit rights.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} key      Record's key.
+ * @param {string} recordId Record's id.
  */
-export function useCanUserEditPostBlock( postId, postType ) {
+export function useCanEditEntity( kind, name, key, recordId ) {
 	return useSelect(
 		( select ) =>
 			select( coreStore ).canUserEditEntityRecord(
-				'root',
-				'postType',
-				postType,
-				postId
+				kind,
+				name,
+				key,
+				recordId
 			),
-		[ postId, postType ]
+		[ kind, name, key, recordId ]
 	);
 }
 
-export default { useIsEditablePostBlock, useCanUserEditPostBlock };
+export default {
+	useIsDescendentOfQueryLoopBlock,
+	useCanEditEntity,
+};

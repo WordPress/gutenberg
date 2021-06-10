@@ -23,8 +23,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	useIsEditablePostBlock,
-	useCanUserEditPostBlock,
+	useIsDescendentOfQueryLoopBlock,
+	useCanEditEntity,
 } from '../utils/hooks';
 
 function usePostContentExcerpt( wordCount, postId, postType ) {
@@ -55,8 +55,14 @@ export default function PostExcerptEditor( {
 	isSelected,
 	context: { postId, postType },
 } ) {
-	const isEditable = useIsEditablePostBlock( clientId, postId, postType );
-	const userHasEditRights = useCanUserEditPostBlock( postId, postType );
+	const isDescendentOfQueryLoop = useIsDescendentOfQueryLoopBlock( clientId );
+	const userCanEdit = useCanEditEntity(
+		'root',
+		'postType',
+		postType,
+		postId
+	);
+	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 	const [
 		excerpt,
 		setExcerpt,
@@ -81,7 +87,7 @@ export default function PostExcerptEditor( {
 			</div>
 		);
 	}
-	if ( isProtected && ! userHasEditRights ) {
+	if ( isProtected && ! userCanEdit ) {
 		return (
 			<div { ...blockProps }>
 				<Warning>
