@@ -11,6 +11,7 @@ import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
+import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -181,6 +182,13 @@ function LinkControl( {
 		stopEditing();
 	};
 
+	const handleSubmitButton = () => {
+		if ( currentInputValue !== value?.url ) {
+			onChange( { url: currentInputValue } );
+		}
+		stopEditing();
+	};
+
 	return (
 		<div
 			tabIndex={ -1 }
@@ -216,7 +224,14 @@ function LinkControl( {
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button
-									onClick={ () => stopEditing() }
+									onClick={ () => handleSubmitButton() }
+									onKeyDown={ ( event ) => {
+										const { keyCode } = event;
+										if ( keyCode === ENTER ) {
+											event.preventDefault();
+											handleSubmitButton();
+										}
+									} }
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
 									className="block-editor-link-control__search-submit"
