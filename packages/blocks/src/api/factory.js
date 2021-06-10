@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import {
 	every,
 	castArray,
-	findIndex,
+	some,
 	isObjectLike,
 	filter,
 	first,
@@ -538,28 +538,18 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	const firstSwitchedBlock = findIndex(
+	const hasSwitchedBlock = some(
 		transformationResults,
 		( result ) => result.name === name
 	);
 
 	// Ensure that at least one block object returned by the transformation has
 	// the expected "destination" block type.
-	if ( firstSwitchedBlock < 0 ) {
+	if ( ! hasSwitchedBlock ) {
 		return null;
 	}
 
-	return transformationResults.map( ( result, index ) => {
-		const transformedBlock = {
-			...result,
-			// The first transformed block whose type matches the "destination"
-			// type gets to keep the existing client ID of the first block.
-			clientId:
-				index === firstSwitchedBlock
-					? firstBlock.clientId
-					: result.clientId,
-		};
-
+	const ret = transformationResults.map( ( result ) => {
 		/**
 		 * Filters an individual transform result from block transformation.
 		 * All of the original blocks are passed, since transformations are
@@ -570,10 +560,12 @@ export function switchToBlockType( blocks, name ) {
 		 */
 		return applyFilters(
 			'blocks.switchToBlockType.transformedBlock',
-			transformedBlock,
+			result,
 			blocks
 		);
 	} );
+
+	return ret;
 }
 
 /**

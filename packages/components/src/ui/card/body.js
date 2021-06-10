@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { contextConnect, useContextSystem } from '../context';
-import { Scrollable } from '../scrollable';
+import { Scrollable } from '../../scrollable';
 import { View } from '../../view';
 import * as styles from './styles';
 

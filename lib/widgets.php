@@ -145,7 +145,6 @@ function gutenberg_get_legacy_widget_settings() {
 			'recent-comments',
 			'rss',
 			'tag_cloud',
-			'nav_menu',
 			'custom_html',
 			'block',
 		)
@@ -181,7 +180,6 @@ function gutenberg_get_legacy_widget_settings() {
 				'WP_Widget_Recent_Comments',
 				'WP_Widget_RSS',
 				'WP_Widget_Tag_Cloud',
-				'WP_Nav_Menu_Widget',
 				'WP_Widget_Custom_HTML',
 			)
 		);
@@ -276,7 +274,7 @@ add_action( 'widgets_init', 'gutenberg_register_block_widget' );
 
 /**
  * Sets show_instance_in_rest to true on all of the core WP_Widget subclasses.
- * When merge dto Core, this property should be added to WP_Widget and set to
+ * When merged to Core, this property should be added to WP_Widget and set to
  * true on each WP_Widget subclass.
  */
 function gutenberg_set_show_instance_in_rest_on_core_widgets() {

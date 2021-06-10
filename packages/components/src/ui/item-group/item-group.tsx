@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+
+/**
  * Internal dependencies
  */
 import type { PolymorphicComponentProps } from '../context';
@@ -10,7 +16,10 @@ import type { Props } from './use-item-group';
 import { ItemGroupContext, useItemGroupContext } from './context';
 import { View } from '../../view';
 
-function ItemGroup( props: PolymorphicComponentProps< Props, 'div' > ) {
+function ItemGroup(
+	props: PolymorphicComponentProps< Props, 'div' >,
+	forwardedRef: Ref< any >
+) {
 	const { bordered, separated, size: sizeProp, ...otherProps } = useItemGroup(
 		props
 	);
@@ -27,7 +36,7 @@ function ItemGroup( props: PolymorphicComponentProps< Props, 'div' > ) {
 
 	return (
 		<ItemGroupContext.Provider value={ contextValue }>
-			<View { ...otherProps } />
+			<View { ...otherProps } ref={ forwardedRef } />
 		</ItemGroupContext.Provider>
 	);
 }

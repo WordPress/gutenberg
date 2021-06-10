@@ -11,7 +11,10 @@ This feature is still experimental. “Experimental” means this is an early im
 In the example below, notice how the `Surface` renders in white (or dark gray if in dark mode).
 
 ```jsx
-import { Surface, Text } from '@wordpress/components/ui';
+import {
+	__experimentalSurface as Surface,
+	__experimentalText as Text
+} from '@wordpress/components/ui';
 
 function Example() {
 	return (
@@ -24,48 +27,51 @@ function Example() {
 
 ## Props
 
-##### backgroundSize
+### `backgroundSize`: number
 
-**Type**: `number`
+- Required: No
+- Default: `12`
 
 Determines the grid size for "dotted" and "grid" variants.
 
-##### border
+### `borderBottom`: `boolean`
 
-**Type**: `boolean`
-
-Renders a border around the entire `Surface`.
-
-##### borderBottom
-
-**Type**: `boolean`
+- Required: No
+- Default: `false`
 
 Renders a bottom border.
 
-##### borderLeft
+### `borderLeft`: `boolean`
 
-**Type**: `boolean`
+- Required: No
+- Default: `false`
 
 Renders a left border.
 
-##### borderRight
+### `borderRight`: `boolean`
 
-**Type**: `boolean`
+- Required: No
+- Default: `false`
 
 Renders a right border.
 
-##### borderTop
+### `borderTop`: `boolean`
 
-**Type**: `boolean`
+- Required: No
+- Default: `false`
 
 Renders a top border.
 
-##### variant
+### `variant`: `string`
 
-**Type**: `"grid"`,`"primary"`,`"secondary"`,`"tertiary"`,`"dotted"`
+- Required: No
+- Default: `false`
+- Allowed values: `primary`, `secondary`, `tertiary`, `dotted`, `grid`
 
 Modifies the background color of `Surface`.
 
 -   `primary`: Used for almost all cases.
 -   `secondary`: Used as a secondary background for inner `Surface` components.
 -   `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
+-   `grid`: Used to show a grid.
+-   `dotted`: Used to show a dots grid.

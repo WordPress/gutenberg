@@ -23,7 +23,7 @@ import { buildNavigationPostId } from './utils';
  * @return {number} The selected menu ID.
  */
 export function getSelectedMenuId( state ) {
-	return state.selectedMenuId ?? 0;
+	return state.selectedMenuId ?? null;
 }
 
 /**

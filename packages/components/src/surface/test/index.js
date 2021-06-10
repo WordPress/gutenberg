@@ -27,13 +27,6 @@ describe( 'props', () => {
 		);
 	} );
 
-	test( 'should render borders', () => {
-		const { container } = render( <Surface border>Surface</Surface> );
-		expect( container.firstChild ).toMatchDiffSnapshot(
-			base.container.firstChild
-		);
-	} );
-
 	test( 'should render borderLeft', () => {
 		const { container } = render( <Surface borderLeft>Surface</Surface> );
 		expect( container.firstChild ).toMatchDiffSnapshot(
