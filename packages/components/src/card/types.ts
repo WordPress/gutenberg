@@ -71,6 +71,7 @@ type MarginalSubComponentProps = BaseSubComponentProps & {
 	 * @default false
 	 */
 	isBorderless?: boolean;
+	className?: string;
 };
 
 export type HeaderProps = MarginalSubComponentProps;

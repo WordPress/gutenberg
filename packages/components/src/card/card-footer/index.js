@@ -16,7 +16,7 @@ export const defaultProps = {
 };
 
 /**
- * @param { import('../types').FooterProps & { className: string } } props
+ * @param { import('../types').FooterProps } props
  */
 export function CardFooter( props ) {
 	const { className, isShady, ...additionalProps } = props;

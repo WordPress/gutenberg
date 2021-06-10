@@ -16,7 +16,7 @@ export const defaultProps = {
 };
 
 /**
- * @param { import('../types').HeaderProps & { className: string } } props
+ * @param { import('../types').HeaderProps } props
  */
 export function CardHeader( props ) {
 	const { className, isShady, ...additionalProps } = props;
