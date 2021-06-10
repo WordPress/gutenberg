@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { BodyUI } from './styles/card-styles';
-import { useCardContext } from './context';
+import { BodyUI } from '../styles';
+import { useCardContext } from '../context';
 
 export const defaultProps = {
 	isShady: false,

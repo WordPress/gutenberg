@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { HeaderUI } from './styles/card-styles';
-import { useCardContext } from './context';
+import { FooterUI } from '../styles';
+import { useCardContext } from '../context';
 
 export const defaultProps = {
 	isBorderless: false,
@@ -15,20 +15,20 @@ export const defaultProps = {
 	size: 'medium',
 };
 
-export function CardHeader( props ) {
+export function CardFooter( props ) {
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
 	const { isBorderless, size } = mergedProps;
 
 	const classes = classnames(
-		'components-card__header',
+		'components-card__footer',
 		isBorderless && 'is-borderless',
 		isShady && 'is-shady',
 		size && `is-size-${ size }`,
 		className
 	);
 
-	return <HeaderUI { ...additionalProps } className={ classes } />;
+	return <FooterUI { ...additionalProps } className={ classes } />;
 }
 
-export default CardHeader;
+export default CardFooter;

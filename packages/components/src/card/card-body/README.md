@@ -32,4 +32,4 @@ Determines the amount of padding within the component.
 -   Required: No
 -   Default: `medium`
 
-Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
+Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.

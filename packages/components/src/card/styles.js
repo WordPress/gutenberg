@@ -11,8 +11,8 @@ import { HorizontalRule } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import { Flex } from '../../flex';
-import { COLORS, space } from '../../utils';
+import { Flex } from '../flex';
+import { COLORS, space } from '../utils';
 
 export const styleProps = {
 	borderColor: COLORS.lightGray[ 500 ],
