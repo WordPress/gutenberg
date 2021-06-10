@@ -126,4 +126,9 @@
 		cursor: revert;
 		transform: revert;
 	}
+
+	// Safari has trouble rendering items without flickering.
+	// This renders it on the GPU, avoiding that.
+	// @todo: this should be retired if a future version makes it unnecessary.
+	transform: translate3d(0, 0, 0);
 }
