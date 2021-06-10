@@ -258,14 +258,13 @@ function _gutenberg_build_template_result_from_post( $post ) {
 		return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
 	}
 
-	$theme          = $active ? wp_get_theme()->get_stylesheet() : '';
-	$slug           = $active ? array_search( $post->ID, $ids, true ) : '';
-	$has_theme_file = $active &&
-		null !== _gutenberg_get_template_file( $post->post_type, $slug );
+	$theme          = wp_get_theme()->get_stylesheet();
+	$slug           = array_search( $post->ID, $ids, true );
+	$has_theme_file = null !== _gutenberg_get_template_file( $post->post_type, $slug );
 
 	$template                 = new WP_Block_Template();
 	$template->wp_id          = $post->ID;
-	$template->id             = $active ? $theme . '//' . $slug : '//' . $post->ID;
+	$template->id             = $theme . '//' . $slug;
 	$template->theme          = $theme;
 	$template->content        = $post->post_content;
 	$template->slug           = $slug;
@@ -296,18 +295,12 @@ function _gutenberg_build_template_result_from_post( $post ) {
  *     @type int    $wp_id Post ID of customized template.
  * }
  * @param string $template_type wp_template or wp_template_part.
- * @param bool   $active        Whether to fetch active templates (default) or inactive.
  *
  * @return array Templates.
  */
-function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_template', $active = true ) {
-	// Temporarily disable inactive access for 5.8 version.
-	if ( ! $active ) {
-		return array();
-	}
-
-	$ids = get_theme_mod( $template_type, array() );
-	$post__in    = $active ? 'post__in' : 'post__not_in';
+function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_template' ) {
+	$ids      = get_theme_mod( $template_type, array() );
+	$post__in = 'post__in';
 
 	$wp_query_args = array(
 		'post_status'    => array( 'auto-draft', 'draft', 'publish' ),
@@ -327,7 +320,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$wp_query_args['tax_query']['relation'] = 'AND';
 	}
 
-	if ( isset( $query['slug__in'] ) && $active ) {
+	if ( isset( $query['slug__in'] ) ) {
 		$wp_query_args['post__in'] = array();
 		foreach ( $query['slug__in'] as $slug ) {
 			if ( ! empty( $ids[ $slug ] ) ) {
@@ -401,17 +394,10 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		return null;
 	}
 
-	if ( $active ) {
-		$ids = get_theme_mod( $template_type, array() );
+	$ids = get_theme_mod( $template_type, array() );
 
-		if ( ! empty( $ids[ $slug ] ) ) {
-			$post = get_post( $ids[ $slug ] );
-		}
-	} elseif ( '' === $theme ) {
-		// This is not actually a slug but a numeric ID.
-		$post = get_post( $slug );
-	} else {
-		return null;
+	if ( ! empty( $ids[ $slug ] ) ) {
+		$post = get_post( $ids[ $slug ] );
 	}
 
 	if ( $post && $template_type === $post->post_type ) {
@@ -422,7 +408,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		}
 	}
 
-	return $active ? gutenberg_get_block_file_template( $id, $template_type ) : null;
+	return gutenberg_get_block_file_template( $id, $template_type );
 }
 
 /**
