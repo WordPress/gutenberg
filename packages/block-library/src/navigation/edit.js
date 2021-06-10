@@ -16,6 +16,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { getBlockSupport } from '@wordpress/blocks';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -28,7 +29,6 @@ import useBlockNavigator from './use-block-navigator';
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 import ResponsiveWrapper from './responsive-wrapper';
-import { store as blocksStore } from '@wordpress/blocks';
 
 const LAYOUT = {
 	type: 'default',
@@ -176,11 +176,9 @@ function Navigation( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockSupport } = select( blocksStore );
 		const allowedBlocks = getBlockSupport(
 			'core/navigation',
-			'__experimentalAllowedBlocks',
-			[ 'core/navigation-link' ] // default to the basic link block only.
+			'__experimentalAllowedBlocks'
 		);
 
 		const innerBlocks = select( blockEditorStore ).getBlocks( clientId );
