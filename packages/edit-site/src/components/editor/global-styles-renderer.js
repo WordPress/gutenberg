@@ -52,12 +52,17 @@ function getPresetsDeclarations( blockPresets = {} ) {
 	return reduce(
 		PRESET_METADATA,
 		( declarations, { path, valueKey, cssVarInfix } ) => {
-			const preset = get( blockPresets, path, [] );
-			preset.forEach( ( value ) => {
-				declarations.push(
-					`--wp--preset--${ cssVarInfix }--${ value.slug }: ${ value[ valueKey ] }`
-				);
+			const presetByOrigin = get( blockPresets, path, [] );
+			[ 'core', 'theme', 'user' ].forEach( ( origin ) => {
+				if ( presetByOrigin[ origin ] ) {
+					presetByOrigin[ origin ].forEach( ( value ) => {
+						declarations.push(
+							`--wp--preset--${ cssVarInfix }--${ value.slug }: ${ value[ valueKey ] }`
+						);
+					} );
+				}
 			} );
+
 			return declarations;
 		},
 		[]
@@ -78,15 +83,26 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 			if ( ! classes ) {
 				return declarations;
 			}
-			const presets = get( blockPresets, path, [] );
-			presets.forEach( ( preset ) => {
-				classes.forEach( ( { classSuffix, propertyName } ) => {
-					const slug = preset.slug;
-					const value = preset[ valueKey ];
-					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
-					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-					declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
-				} );
+			const presetByOrigin = get( blockPresets, path, [] );
+			[ 'core', 'theme', 'user' ].forEach( ( origin ) => {
+				if ( presetByOrigin[ origin ] ) {
+					presetByOrigin[ origin ].forEach( ( preset ) => {
+						classes.forEach( ( { classSuffix, propertyName } ) => {
+							const slug = preset.slug;
+							const value = preset[ valueKey ];
+							// We don't want to use kebabCase from lodash here
+							// see https://github.com/WordPress/gutenberg/issues/32347
+							// However, we need to make sure the generated class
+							// doesn't contain spaces.
+							const classSelectorToUse = `.has-${ slug.replace(
+								/\s+/g,
+								'-'
+							) }-${ classSuffix }`;
+							const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
+							declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
+						} );
+					} );
+				}
 			} );
 			return declarations;
 		},
@@ -113,7 +129,7 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object} blockStyles   Block styles.
+ * @param {Object} blockStyles Block styles.
  *
  * @return {Array} An array of style declarations.
  */

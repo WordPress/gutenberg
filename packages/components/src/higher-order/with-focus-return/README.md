@@ -34,7 +34,7 @@ const MyComponentWithFocusReturn = withState( {
 			/>
 			{ text && <EnhancedComponent /> }
 			{ text && (
-				<Button isSecondary onClick={ unmount }>
+				<Button variant="secondary" onClick={ unmount }>
 					Unmount
 				</Button>
 			) }

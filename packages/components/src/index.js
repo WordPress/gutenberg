@@ -25,12 +25,14 @@ export { default as BaseControl } from './base-control';
 export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
-export { default as Card } from './card';
-export { default as CardBody } from './card/body';
-export { default as CardDivider } from './card/divider';
-export { default as CardFooter } from './card/footer';
-export { default as CardHeader } from './card/header';
-export { default as CardMedia } from './card/media';
+export {
+	Card,
+	CardBody,
+	CardDivider,
+	CardFooter,
+	CardHeader,
+	CardMedia,
+} from './card';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as __experimentalColorEdit } from './color-edit';
@@ -57,6 +59,7 @@ export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
+export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
 export { default as FocalPointPicker } from './focal-point-picker';
@@ -108,7 +111,9 @@ export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { Spacer as __experimentalSpacer } from './spacer';
+export { Scrollable as __experimentalScrollable } from './scrollable';
 export { default as Spinner } from './spinner';
+export { Surface as __experimentalSurface } from './surface';
 export { default as TabPanel } from './tab-panel';
 export { Text as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
@@ -134,6 +139,7 @@ export { Truncate as __experimentalTruncate } from './truncate';
 export {
 	default as __experimentalUnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
+	parseUnit as __experimentalParseUnit,
 } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
@@ -146,6 +152,7 @@ export {
 	useSlot as __experimentalUseSlot,
 } from './slot-fill';
 export { default as __experimentalStyleProvider } from './style-provider';
+export { ZStack as __experimentalZStack } from './z-stack';
 
 // Higher-Order Components
 export {
@@ -162,9 +169,3 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
-
-// Component System
-export {
-	withNext as __unstableWithNext,
-	ComponentSystemProvider as __unstableComponentSystemProvider,
-} from './ui/context';

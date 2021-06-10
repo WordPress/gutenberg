@@ -52,23 +52,23 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
-		support: [ '__experimentalFontFamily' ],
+		support: [ 'typography', '__experimentalFontFamily' ],
 	},
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
-		support: [ 'fontSize' ],
+		support: [ 'typography', 'fontSize' ],
 	},
 	fontStyle: {
 		value: [ 'typography', 'fontStyle' ],
-		support: [ '__experimentalFontStyle' ],
+		support: [ 'typography', '__experimentalFontStyle' ],
 	},
 	fontWeight: {
 		value: [ 'typography', 'fontWeight' ],
-		support: [ '__experimentalFontWeight' ],
+		support: [ 'typography', '__experimentalFontWeight' ],
 	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
-		support: [ 'lineHeight' ],
+		support: [ 'typography', 'lineHeight' ],
 	},
 	margin: {
 		value: [ 'spacing', 'margin' ],
@@ -82,11 +82,15 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
-		support: [ '__experimentalTextDecoration' ],
+		support: [ 'typography', '__experimentalTextDecoration' ],
 	},
 	textTransform: {
 		value: [ 'typography', 'textTransform' ],
-		support: [ '__experimentalTextTransform' ],
+		support: [ 'typography', '__experimentalTextTransform' ],
+	},
+	letterSpacing: {
+		value: [ 'typography', 'letterSpacing' ],
+		support: [ '__experimentalLetterSpacing' ],
 	},
 };
 

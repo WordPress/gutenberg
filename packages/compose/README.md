@@ -66,13 +66,11 @@ For more details, you can refer to each Higher Order Component's README file. [A
 Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
 composition, where each successive invocation is supplied the return value of the previous.
 
-_Parameters_
+This is just a re-export of `lodash`'s `flowRight` function.
 
--   _hocs_ `...Function`: The HOC functions to invoke.
+_Related_
 
-_Returns_
-
--   `Function`: Returns the new composite function.
+-   <https://docs-lodash.com/v4/flow-right/>
 
 <a name="createHigherOrderComponent" href="#createHigherOrderComponent">#</a> **createHigherOrderComponent**
 
@@ -166,9 +164,9 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `Object`: Reference with the element.
+-   _ref_ `import('react').RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
 -   _text_ `string|Function`: The text to copy.
--   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+-   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
@@ -180,12 +178,12 @@ Copies the given text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _text_ `text|Function`: The text to copy. Use a function if not already available and expensive to compute.
+-   _text_ `string | (() => string)`: The text to copy. Use a function if not already available and expensive to compute.
 -   _onSuccess_ `Function`: Called when to text is copied.
 
 _Returns_
 
--   `RefObject`: A ref to assign to the target element.
+-   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
 
 <a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
 
@@ -194,13 +192,19 @@ be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to debounce, so please wrap functions created on
 render in components in `useCallback`.
 
+_Related_
+
+-   <https://docs-lodash.com/v4/debounce/>
+
 _Parameters_
 
--   _args_ `...any`: Arguments passed to Lodash's `debounce`.
+-   _fn_ `TFunc`: The function to debounce.
+-   _wait_ `[number]`: The number of milliseconds to delay.
+-   _options_ `[import('lodash').DebounceSettings]`: The options object.
 
 _Returns_
 
--   `Function`: Debounced function.
+-   `TFunc & import('lodash').Cancelable`: Debounced function.
 
 <a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
 
@@ -255,11 +259,11 @@ const WithFocusReturn = () => {
 
 _Parameters_
 
--   _onFocusReturn_ `Function?`: Overrides the default return behavior.
+-   _onFocusReturn_ `[() => void]`: Overrides the default return behavior.
 
 _Returns_
 
--   `Function`: Element Ref.
+-   `import('react').RefCallback<HTMLElement>`: Element Ref.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
@@ -285,10 +289,14 @@ throws a warning when using useLayoutEffect in that environment.
 
 Attach a keyboard shortcut handler.
 
+_Related_
+
+-   <https://craig.is/killing/mice#api.bind> for information about the `callback` parameter.
+
 _Parameters_
 
 -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `Function`: Shortcut callback.
+-   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
@@ -344,11 +352,11 @@ return <div ref={ mergedRefs } />;
 
 _Parameters_
 
--   _refs_ `Array<RefObject|RefCallback>`: The refs to be merged.
+-   _refs_ `Array<TRef>`: The refs to be merged.
 
 _Returns_
 
--   `RefCallback`: The merged ref callback.
+-   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
 
 <a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
 
@@ -361,7 +369,7 @@ _Parameters_
 
 _Returns_
 
--   `T|undefined`: The value from the previous render.
+-   `T | undefined`: The value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
@@ -388,17 +396,24 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _callback_ `Function`: Callback with ref as argument.
--   _dependencies_ `Array`: Dependencies of the callback.
+-   _callback_ `( node: TElement ) => ( () => void ) | undefined`: Callback with ref as argument.
+-   _dependencies_ `DependencyList`: Dependencies of the callback.
 
 _Returns_
 
--   `Function`: Ref callback.
+-   `RefCallback< TElement | null >`: Ref callback.
 
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 
 Hook which allows to listen the resize event of any target element when it changes sizes.
 _Note: `useResizeObserver` will report `null` until after first render_
+
+Simply a re-export of `react-resize-aware` so refer to its documentation <https://github.com/FezVrasta/react-resize-aware>
+for more details.
+
+_Related_
+
+-   <https://github.com/FezVrasta/react-resize-aware>
 
 _Usage_
 
@@ -415,10 +430,6 @@ const App = () => {
 };
 ```
 
-_Returns_
-
--   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
-
 <a name="useThrottle" href="#useThrottle">#</a> **useThrottle**
 
 Throttles a function with Lodash's `throttle`. A new throttled function will
@@ -426,13 +437,19 @@ be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to throttle, so please wrap functions created on
 render in components in `useCallback`.
 
+_Related_
+
+-   <https://docs-lodash.com/v4/throttle/>
+
 _Parameters_
 
--   _args_ `...any`: Arguments passed to Lodash's `throttle`.
+-   _fn_ `TFunc`: The function to throttle.
+-   _wait_ `[number]`: The number of milliseconds to throttle invocations to.
+-   _options_ `[import('lodash').ThrottleSettings]`: The options object. See linked documentation for details.
 
 _Returns_
 
--   `Function`: Throttled function.
+-   `TFunc & import('lodash').Cancelable`: Throttled function.
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
@@ -472,7 +489,7 @@ function MyComponent(props) {
 
 _Parameters_
 
--   _object_ `Object`: Object which changes to compare.
+-   _object_ `object`: Object which changes to compare.
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
@@ -488,11 +505,11 @@ event handler for the entire application.
 
 _Parameters_
 
--   _eventTypesToHandlers_ `Object<string,string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
+-   _eventTypesToHandlers_ `Record<keyof GlobalEventHandlersEventMap, string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
 
 _Returns_
 
--   `Function`: Higher-order component.
+-   `any`: Higher-order component.
 
 <a name="withInstanceId" href="#withInstanceId">#</a> **withInstanceId**
 
@@ -517,6 +534,8 @@ _Returns_
 -   `WPComponent`: Wrapped component.
 
 <a name="withState" href="#withState">#</a> **withState**
+
+> **Deprecated** Use `useState` instead.
 
 A Higher Order Component used to provide and manage internal component state
 via props.

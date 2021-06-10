@@ -12,20 +12,20 @@ const bodyClass = 'is-dragging-components-draggable';
 /**
  * @typedef RenderProp
  * @property {(event: import('react').DragEvent) => void} onDraggableStart `onDragStart` handler.
- * @property {(event: import('react').DragEvent) => void} onDraggableEnd `onDragEnd` handler.
+ * @property {(event: import('react').DragEvent) => void} onDraggableEnd   `onDragEnd` handler.
  */
 
 /**
  * @typedef Props
- * @property {(props: RenderProp) => JSX.Element | null} children Children.
- * @property {(event: import('react').DragEvent) => void} [onDragStart] Callback when dragging starts.
- * @property {(event: import('react').DragEvent) => void} [onDragOver] Callback when dragging happens over the document.
- * @property {(event: import('react').DragEvent) => void} [onDragEnd] Callback when dragging ends.
- * @property {string} [cloneClassname] Classname for the cloned element.
- * @property {string} [elementId] ID for the element.
- * @property {any} [transferData] Transfer data for the drag event.
- * @property {string} [__experimentalTransferDataType] The transfer data type to set.
- * @property {import('react').ReactNode} __experimentalDragComponent Component to show when dragging.
+ * @property {(props: RenderProp) => JSX.Element | null}  children                         Children.
+ * @property {(event: import('react').DragEvent) => void} [onDragStart]                    Callback when dragging starts.
+ * @property {(event: import('react').DragEvent) => void} [onDragOver]                     Callback when dragging happens over the document.
+ * @property {(event: import('react').DragEvent) => void} [onDragEnd]                      Callback when dragging ends.
+ * @property {string}                                     [cloneClassname]                 Classname for the cloned element.
+ * @property {string}                                     [elementId]                      ID for the element.
+ * @property {any}                                        [transferData]                   Transfer data for the drag event.
+ * @property {string}                                     [__experimentalTransferDataType] The transfer data type to set.
+ * @property {import('react').ReactNode}                  __experimentalDragComponent      Component to show when dragging.
  */
 
 /**

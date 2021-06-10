@@ -12,7 +12,6 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { renderAsRenderProps } from './utils';
-import { withNextComponent } from './next';
 
 /**
  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
@@ -29,8 +28,8 @@ import { withNextComponent } from './next';
  * VisuallyHidden component to render text out non-visually
  * for use in devices such as a screen reader.
  *
- * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T T
- * @param {Props<T>} props
+ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+ * @param {Props<T>}                 props
  * @param {import('react').Ref<any>} forwardedRef
  * @return {JSX.Element} Element
  */
@@ -43,4 +42,4 @@ function VisuallyHidden( { as = 'div', className, ...props }, forwardedRef ) {
 	} );
 }
 
-export default withNextComponent( forwardRef( VisuallyHidden ) );
+export default forwardRef( VisuallyHidden );

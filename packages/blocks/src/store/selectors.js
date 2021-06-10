@@ -55,7 +55,7 @@ export const getBlockTypes = createSelector(
  * Returns a block type by name.
  *
  * @param {Object} state Data state.
- * @param {string} name Block type name.
+ * @param {string} name  Block type name.
  *
  * @return {Object?} Block Type.
  */
@@ -84,16 +84,22 @@ export function getBlockStyles( state, name ) {
  *
  * @return {(WPBlockVariation[]|void)} Block variations.
  */
-export function getBlockVariations( state, blockName, scope ) {
-	const variations = state.blockVariations[ blockName ];
-	if ( ! variations || ! scope ) {
-		return variations;
-	}
-	return variations.filter( ( variation ) => {
-		// For backward compatibility reasons, variation's scope defaults to `block` and `inserter` when not set.
-		return ( variation.scope || [ 'block', 'inserter' ] ).includes( scope );
-	} );
-}
+export const getBlockVariations = createSelector(
+	( state, blockName, scope ) => {
+		const variations = state.blockVariations[ blockName ];
+		if ( ! variations || ! scope ) {
+			return variations;
+		}
+		return variations.filter( ( variation ) => {
+			// For backward compatibility reasons, variation's scope defaults to
+			// `block` and `inserter` when not set.
+			return ( variation.scope || [ 'block', 'inserter' ] ).includes(
+				scope
+			);
+		} );
+	},
+	( state, blockName ) => [ state.blockVariations[ blockName ] ]
+);
 
 /**
  * Returns the active block variation for a given block based on its attributes.
@@ -247,11 +253,11 @@ export const getChildBlockNames = createSelector(
 /**
  * Returns the block support value for a feature, if defined.
  *
- * @param  {Object}          state           Data state.
- * @param  {(string|Object)} nameOrType      Block name or type object
- * @param  {string}          feature         Feature to retrieve
- * @param  {*}               defaultSupports Default value to return if not
- *                                           explicitly defined
+ * @param {Object}          state           Data state.
+ * @param {(string|Object)} nameOrType      Block name or type object
+ * @param {Array|string}    feature         Feature to retrieve
+ * @param {*}               defaultSupports Default value to return if not
+ *                                          explicitly defined
  *
  * @return {?*} Block support value
  */
@@ -262,18 +268,17 @@ export const getBlockSupport = (
 	defaultSupports
 ) => {
 	const blockType = getNormalizedBlockType( state, nameOrType );
+	if ( ! blockType?.supports ) {
+		return defaultSupports;
+	}
 
-	return get(
-		blockType,
-		[ 'supports', ...feature.split( '.' ) ],
-		defaultSupports
-	);
+	return get( blockType.supports, feature, defaultSupports );
 };
 
 /**
  * Returns true if the block defines support for a feature, or false otherwise.
  *
- * @param  {Object}         state           Data state.
+ * @param {Object}          state           Data state.
  * @param {(string|Object)} nameOrType      Block name or type object.
  * @param {string}          feature         Feature to test.
  * @param {boolean}         defaultSupports Whether feature is supported by

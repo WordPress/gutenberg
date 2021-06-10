@@ -2,7 +2,7 @@
 
 exports[`Shortcut should render a span with the shortcut text 1`] = `
 <span
-  class="components-shortcut"
+  class="components-shortcut css-1mm2cvy-View emotion-0"
   data-wp-c16t="true"
   data-wp-component="Shortcut"
 >

@@ -12,13 +12,13 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { contextConnect, useContextSystem } from '../context';
-import { Scrollable } from '../scrollable';
+import { Scrollable } from '../../scrollable';
 import { View } from '../../view';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').CardBodyProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<import('./types').CardBodyProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                               forwardedRef
  */
 function CardBody( props, forwardedRef ) {
 	const { className, scrollable = true, ...otherProps } = useContextSystem(

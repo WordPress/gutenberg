@@ -9,6 +9,7 @@ import {
 	getEditedPostContent,
 	clickBlockToolbarButton,
 	clickButton,
+	clickMenuItem,
 } from '@wordpress/e2e-test-utils';
 
 async function getSelectedFlatIndices() {
@@ -272,6 +273,19 @@ describe( 'Multi-block selection', () => {
 
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
+
+		// Group the blocks and test that multiselection also works for nested
+		// blocks. Checks for regressions of
+		// https://github.com/WordPress/gutenberg/issues/32056
+
+		await clickBlockToolbarButton( 'Options' );
+		await clickMenuItem( 'Group' );
+		await page.click( '[data-type="core/paragraph"]' );
+		await page.keyboard.down( 'Shift' );
+		await page.click( '[data-type="core/paragraph"]:nth-child(2)' );
+		await page.keyboard.up( 'Shift' );
+		await testNativeSelection();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3 ] );
 	} );
 
 	it( 'should select by dragging', async () => {
@@ -591,7 +605,7 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	// Previously we would unexpectedly duplicated the block on Enter.
+	// Previously we would unexpectedly duplicate the block on Enter.
 	it( 'should not multi select single block', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
@@ -599,6 +613,46 @@ describe( 'Multi-block selection', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.press( 'Enter' );
 
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should gradually multi-select', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '/columns' );
+		await page.keyboard.press( 'Enter' );
+		// Select two columns.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		// Navigate to appender.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		// Select a paragraph.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		// Confirm correct setup: two columns with two paragraphs in the first.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		await page.waitForSelector(
+			'[data-type="core/paragraph"].is-multi-selected'
+		);
+
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		await page.waitForSelector(
+			'[data-type="core/column"].is-multi-selected'
+		);
+
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect both columns to be deleted.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

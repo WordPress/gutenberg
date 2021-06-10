@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import {
 	BlockControls,
 	InspectorAdvancedControls,
@@ -24,7 +24,7 @@ import QueryInspectorControls from './query-inspector-controls';
 import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
-const TEMPLATE = [ [ 'core/query-loop' ] ];
+const TEMPLATE = [ [ 'core/post-template' ] ];
 export function QueryContent( { attributes, setAttributes } ) {
 	const {
 		queryId,
@@ -44,18 +44,24 @@ export function QueryContent( { attributes, setAttributes } ) {
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const { contentSize, wideSize } = usedLayout;
-	const alignments =
-		contentSize || wideSize
-			? [ 'wide', 'full' ]
-			: [ 'left', 'center', 'right' ];
 	const blockProps = useBlockProps();
+	const _layout = useMemo( () => {
+		if ( themeSupportsLayout ) {
+			const alignments =
+				contentSize || wideSize
+					? [ 'wide', 'full' ]
+					: [ 'left', 'center', 'right' ];
+			return {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments,
+			};
+		}
+		return undefined;
+	}, [ themeSupportsLayout, contentSize, wideSize ] );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		__experimentalLayout: {
-			type: 'default',
-			// Find a way to inject this in the support flag code (hooks).
-			alignments: themeSupportsLayout ? alignments : undefined,
-		},
+		__experimentalLayout: _layout,
 	} );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );

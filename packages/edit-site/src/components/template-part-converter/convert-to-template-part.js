@@ -140,7 +140,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 																icon={ icon }
 															/>
 														</FlexItem>
-														<FlexBlock>
+														<FlexBlock className="edit-site-template-part-converter__option-label">
 															{ label }
 															<div>
 																{ description }
@@ -169,7 +169,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 								>
 									<FlexItem>
 										<Button
-											isSecondary
+											variant="secondary"
 											onClick={ () => {
 												setIsModalOpen( false );
 												setTitle( '' );
@@ -179,7 +179,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 										</Button>
 									</FlexItem>
 									<FlexItem>
-										<Button isPrimary type="submit">
+										<Button variant="primary" type="submit">
 											{ __( 'Create' ) }
 										</Button>
 									</FlexItem>

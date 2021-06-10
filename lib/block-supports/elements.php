@@ -13,12 +13,15 @@
  * @return string                Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content, $block ) {
-	$link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', 'color', 'text' ), null );
+	$link_color = null;
+	if ( ! empty( $block['attrs'] ) ) {
+		$link_color = _wp_array_get( $block['attrs'], array( 'style', 'elements', 'link', 'color', 'text' ), null );
+	}
 
 	/*
 	* For now we only care about link color.
 	* This code in the future when we have a public API
-	* should take advantage of WP_Theme_JSON::compute_style_properties
+	* should take advantage of WP_Theme_JSON_Gutenberg::compute_style_properties
 	* and work for any element and style.
 	*/
 	if ( null === $link_color ) {

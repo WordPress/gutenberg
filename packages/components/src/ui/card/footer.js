@@ -16,8 +16,8 @@ import { Flex } from '../../flex';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').CardFooterProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<import('./types').CardFooterProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                                 forwardedRef
  */
 function CardFooter( props, forwardedRef ) {
 	const {

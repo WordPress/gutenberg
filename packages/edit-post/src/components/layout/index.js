@@ -85,9 +85,11 @@ function Layout( { styles } ) {
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
+		isTemplateMode,
 	} = useSelect( ( select ) => {
 		const editorSettings = select( editorStore ).getEditorSettings();
 		return {
+			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
 			),
@@ -203,7 +205,7 @@ function Layout( { styles } ) {
 							{ ! isMobileViewport && ! sidebarIsOpened && (
 								<div className="edit-post-layout__toggle-sidebar-panel">
 									<Button
-										isSecondary
+										variant="secondary"
 										className="edit-post-layout__toggle-sidebar-panel-button"
 										onClick={ openSidebarPanel }
 										aria-expanded={ false }
@@ -227,10 +229,12 @@ function Layout( { styles } ) {
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
-						<div className="edit-post-layout__metaboxes">
-							<MetaBoxes location="normal" />
-							<MetaBoxes location="advanced" />
-						</div>
+						{ ! isTemplateMode && (
+							<div className="edit-post-layout__metaboxes">
+								<MetaBoxes location="normal" />
+								<MetaBoxes location="advanced" />
+							</div>
+						) }
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />
 						) }

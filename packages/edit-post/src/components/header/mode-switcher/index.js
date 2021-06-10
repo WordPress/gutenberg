@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -38,9 +39,9 @@ function ModeSwitcher() {
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-mode' ),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+			isRichEditingEnabled: select( editorStore ).getEditorSettings()
 				.richEditingEnabled,
-			isCodeEditingEnabled: select( 'core/editor' ).getEditorSettings()
+			isCodeEditingEnabled: select( editorStore ).getEditorSettings()
 				.codeEditingEnabled,
 			mode: select( editPostStore ).getEditorMode(),
 		} ),

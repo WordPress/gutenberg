@@ -288,7 +288,7 @@ function RangeControl(
 						<Button
 							className="components-range-control__reset"
 							disabled={ disabled || value === undefined }
-							isSecondary
+							variant="secondary"
 							isSmall
 							onClick={ handleOnReset }
 						>

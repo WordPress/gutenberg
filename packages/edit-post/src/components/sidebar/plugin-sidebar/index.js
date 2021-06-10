@@ -5,6 +5,7 @@ import { ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -22,11 +23,11 @@ import { store as editPostStore } from '../../../store';
  *
  * @see PluginSidebarMoreMenuItem
  *
- * @param {Object} props Element props.
- * @param {string} props.name A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
- * @param {string} [props.className] An optional class name added to the sidebar body.
- * @param {string} props.title Title displayed at the top of the sidebar.
- * @param {boolean} [props.isPinnable=true] Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
+ * @param {Object}                props                                 Element props.
+ * @param {string}                props.name                            A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
+ * @param {string}                [props.className]                     An optional class name added to the sidebar body.
+ * @param {string}                props.title                           Title displayed at the top of the sidebar.
+ * @param {boolean}               [props.isPinnable=true]               Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example
@@ -79,9 +80,7 @@ import { store as editPostStore } from '../../../store';
 export default function PluginSidebarEditPost( { className, ...props } ) {
 	const { postTitle, shortcut, showIconLabels } = useSelect( ( select ) => {
 		return {
-			postTitle: select( 'core/editor' ).getEditedPostAttribute(
-				'title'
-			),
+			postTitle: select( editorStore ).getEditedPostAttribute( 'title' ),
 			shortcut: select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),

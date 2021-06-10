@@ -381,7 +381,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 					...getMappedColumnWidths( innerBlocks, widths ),
 					...times( newColumns - previousColumns, () => {
 						return createBlock( 'core/column', {
-							width: newColumnWidth,
+							width: `${ newColumnWidth }%`,
 							verticalAlignment,
 						} );
 					} ),

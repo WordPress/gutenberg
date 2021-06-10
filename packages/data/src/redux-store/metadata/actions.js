@@ -38,7 +38,7 @@ export function finishResolution( selectorName, args ) {
  *
  * @param {string} selectorName Name of selector for which resolver triggered.
  * @param {...*}   args         Array of arguments to associate for uniqueness, each item
- * 								is associated to a resolution.
+ *                              is associated to a resolution.
  *
  * @return {Object} Action object.
  */
@@ -56,7 +56,7 @@ export function startResolutions( selectorName, args ) {
  *
  * @param {string} selectorName Name of selector for which resolver triggered.
  * @param {...*}   args         Array of arguments to associate for uniqueness, each item
- * 								is associated to a resolution.
+ *                              is associated to a resolution.
  *
  * @return {Object} Action object.
  */

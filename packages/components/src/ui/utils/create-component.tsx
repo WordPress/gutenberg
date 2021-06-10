@@ -12,13 +12,16 @@ import { contextConnect } from '../context';
 // eslint-disable-next-line no-duplicate-imports
 import type {
 	PolymorphicComponent,
-	PropsFromViewOwnProps,
-	ElementTypeFromViewOwnProps,
-	ViewOwnProps,
+	PropsFromPolymorphicComponentProps,
+	ElementTypeFromPolymorphicComponentProps,
+	PolymorphicComponentProps,
 } from '../context';
 import { View } from '../../view';
 
-interface Options< A extends As, P extends ViewOwnProps< {}, A > > {
+interface Options<
+	A extends As,
+	P extends PolymorphicComponentProps< {}, A >
+> {
 	as: A;
 	name: string;
 	useHook: ( props: P ) => any;
@@ -28,24 +31,24 @@ interface Options< A extends As, P extends ViewOwnProps< {}, A > > {
 /**
  * Factory that creates a React component from a hook
  *
- * @param options
- * @param options.as The element to render for the component.
- * @param options.name The name of the component.
- * @param options.useHook The hook to use for the component
- * @param options.memo Whether to memo the component.
+ * @param  options
+ * @param  options.as      The element to render for the component.
+ * @param  options.name    The name of the component.
+ * @param  options.useHook The hook to use for the component
+ * @param  options.memo    Whether to memo the component.
  * @return A polymorphic component that uses the hook to process props.
  */
 export const createComponent = <
 	A extends As,
-	P extends ViewOwnProps< {}, A >
+	P extends PolymorphicComponentProps< {}, A >
 >( {
 	as,
 	name,
 	useHook,
 	memo = false,
 }: Options< A, P > ): PolymorphicComponent<
-	ElementTypeFromViewOwnProps< P >,
-	PropsFromViewOwnProps< P >
+	ElementTypeFromPolymorphicComponentProps< P >,
+	PropsFromPolymorphicComponentProps< P >
 > => {
 	function Component( props: P, forwardedRef: Ref< any > ) {
 		const otherProps = useHook( props );

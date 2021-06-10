@@ -20,6 +20,7 @@ export default function RadioControl( {
 	selected,
 	help,
 	onChange,
+	hideLabelFromVision,
 	options = [],
 	...props
 } ) {
@@ -32,6 +33,7 @@ export default function RadioControl( {
 			<BaseControl
 				label={ label }
 				id={ id }
+				hideLabelFromVision={ hideLabelFromVision }
 				help={ help }
 				className={ classnames(
 					className,
