@@ -17,10 +17,7 @@ import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import {
-	useIsDescendentOfQueryLoopBlock,
-	useCanEditEntity,
-} from '../utils/hooks';
+import { useCanEditEntity } from '../utils/hooks';
 
 function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 	const [ , , content ] = useEntityProp(
@@ -81,8 +78,8 @@ function EditableContent( { layout, postType, postId } ) {
 }
 
 function Content( props ) {
-	const { clientId, postType, postId } = props;
-	const isDescendentOfQueryLoop = useIsDescendentOfQueryLoopBlock( clientId );
+	const { context: { queryId, postType, postId } = {} } = props;
+	const isDescendentOfQueryLoop = !! queryId;
 	const userCanEdit = useCanEditEntity(
 		'root',
 		'postType',
@@ -123,11 +120,8 @@ function RecursionError() {
 	);
 }
 
-export default function PostContentEdit( {
-	clientId,
-	context: { postId: contextPostId, postType: contextPostType },
-	attributes,
-} ) {
+export default function PostContentEdit( { context, attributes } ) {
+	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		contextPostId
@@ -140,12 +134,7 @@ export default function PostContentEdit( {
 	return (
 		<RecursionProvider>
 			{ contextPostId && contextPostType ? (
-				<Content
-					postType={ contextPostType }
-					postId={ contextPostId }
-					layout={ layout }
-					clientId={ clientId }
-				/>
+				<Content context={ context } layout={ layout } />
 			) : (
 				<Placeholder />
 			) }

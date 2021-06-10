@@ -41,6 +41,7 @@ export default function QueryLoopEdit( {
 			sticky,
 			inherit,
 		} = {},
+		queryId,
 		queryContext = [ { page: 1 } ],
 		templateSlug,
 		displayLayout: { type: layoutType = 'flex', columns = 1 } = {},
@@ -115,6 +116,7 @@ export default function QueryLoopEdit( {
 			posts?.map( ( post ) => ( {
 				postType: post.type,
 				postId: post.id,
+				queryId,
 			} ) ),
 		[ posts ]
 	);

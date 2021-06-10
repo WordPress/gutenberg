@@ -19,21 +19,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
-/**
- * Internal dependencies
- */
-import { useIsDescendentOfQueryLoopBlock } from '../utils/hooks';
-
 function PostAuthorEdit( {
-	clientId,
 	isSelected,
-	context,
+	context: { postType, postId, queryId },
 	attributes,
 	setAttributes,
 } ) {
-	const { postType, postId } = context;
-
-	const isDescendentOfQueryLoop = useIsDescendentOfQueryLoopBlock( clientId );
+	const isDescendentOfQueryLoop = !! queryId;
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getUsers } = select(

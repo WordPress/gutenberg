@@ -22,16 +22,14 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
-import { useIsDescendentOfQueryLoopBlock } from '../utils/hooks';
 
 export default function PostTitleEdit( {
-	clientId,
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
-	context: { postType, postId },
+	context: { postType, postId, queryId },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
-	const isDescendentOfQueryLoop = useIsDescendentOfQueryLoopBlock( clientId );
+	const isDescendentOfQueryLoop = !! queryId;
 	const post = useSelect(
 		( select ) =>
 			select( coreStore ).getEditedEntityRecord(
