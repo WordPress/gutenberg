@@ -12,7 +12,11 @@ import {
 	store as blockEditorStore,
 	Warning,
 } from '@wordpress/block-editor';
-import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
+import {
+	useEntityProp,
+	useEntityBlockEditor,
+	store as coreStore,
+} from '@wordpress/core-data';
 
 /**
  * Internal dependencies
