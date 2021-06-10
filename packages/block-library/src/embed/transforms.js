@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { toHTMLString, removeFormat, create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -35,24 +34,15 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			isMatch: ( { url } ) => !! url,
 			transform: ( { url, caption } ) => {
-				let linkText = url;
+				const values = [ `<a href="${ url }">${ url }</a>` ];
 				if ( caption?.trim() ) {
-					const captionEl = create( { html: caption } );
-					linkText = toHTMLString( {
-						value: removeFormat(
-							captionEl,
-							'core/link',
-							0,
-							captionEl.text.length
-						),
-					} );
+					values.push( caption );
 				}
-				const link = create( {
-					html: `<a href="${ url }">${ linkText }</a>`,
-				} );
-				return createBlock( 'core/paragraph', {
-					content: toHTMLString( { value: link } ),
-				} );
+				return values.map( ( value ) =>
+					createBlock( 'core/paragraph', {
+						content: value,
+					} )
+				);
 			},
 		},
 	],
