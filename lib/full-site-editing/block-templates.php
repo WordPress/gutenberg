@@ -306,7 +306,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		return array();
 	}
 
-	$theme_slugs = get_theme_mod( $template_type, array() );
+	$ids = get_theme_mod( $template_type, array() );
 	$post__in    = $active ? 'post__in' : 'post__not_in';
 
 	$wp_query_args = array(
@@ -314,7 +314,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		'post_type'      => $template_type,
 		'posts_per_page' => -1,
 		'no_found_rows'  => true,
-		$post__in        => array_values( $theme_slugs ),
+		$post__in        => array_values( $ids ),
 	);
 
 	if ( 'wp_template_part' === $template_type && isset( $query['area'] ) ) {
@@ -330,8 +330,8 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	if ( isset( $query['slug__in'] ) && $active ) {
 		$wp_query_args['post__in'] = array();
 		foreach ( $query['slug__in'] as $slug ) {
-			if ( ! empty( $theme_slugs[ $slug ] ) ) {
-				$wp_query_args['post__in'][] = $theme_slugs[ $slug ];
+			if ( ! empty( $ids[ $slug ] ) ) {
+				$wp_query_args['post__in'][] = $ids[ $slug ];
 			}
 		}
 	}
