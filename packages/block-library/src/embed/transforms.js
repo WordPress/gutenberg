@@ -34,15 +34,13 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			isMatch: ( { url } ) => !! url,
 			transform: ( { url, caption } ) => {
-				const values = [ `<a href="${ url }">${ url }</a>` ];
+				let value = `<a href="${ url }">${ url }</a>`;
 				if ( caption?.trim() ) {
-					values.push( caption );
+					value += `<br />${ caption }`;
 				}
-				return values.map( ( value ) =>
-					createBlock( 'core/paragraph', {
-						content: value,
-					} )
-				);
+				return createBlock( 'core/paragraph', {
+					content: value,
+				} );
 			},
 		},
 	],
