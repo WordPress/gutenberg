@@ -41,6 +41,10 @@ export function useInBetweenInserter() {
 					return;
 				}
 
+				if ( isMultiSelecting() ) {
+					return;
+				}
+
 				if (
 					! event.target.classList.contains(
 						'block-editor-block-list__layout'
