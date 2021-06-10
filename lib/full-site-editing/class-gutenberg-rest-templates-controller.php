@@ -344,7 +344,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			$changes->ID          = $template->wp_id;
 			$changes->post_status = 'publish';
 		}
-		if ( null !== $template && $template->has_theme_file ) {
+		if ( null !== $template && 'custom' !== $template->source ) {
 			$changes->post_name = $template->slug;
 		}
 		if ( isset( $request['content'] ) ) {
