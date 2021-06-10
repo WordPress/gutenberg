@@ -261,7 +261,7 @@
 	}
 }
 
-.is-outline-mode:not(.is-typing) .block-editor-block-list__block {
+.is-outline-mode .block-editor-block-list__block:not(:focus-within) {
 	&.is-hovered {
 		cursor: default;
 
@@ -285,12 +285,6 @@
 			right: $border-width;
 			bottom: $border-width;
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
-		}
-
-		&:focus {
-			&::after {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			}
 		}
 	}
 }
