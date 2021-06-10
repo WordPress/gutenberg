@@ -22,7 +22,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
-import { useIsEditablePostBlock } from '../utils/hooks';
+import { useIsDescendentOfQueryLoopBlock } from '../utils/hooks';
 
 export default function PostTitleEdit( {
 	clientId,
@@ -31,7 +31,7 @@ export default function PostTitleEdit( {
 	context: { postType, postId },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
-	const isEditable = useIsEditablePostBlock( clientId, postId, postType );
+	const isDescendentOfQueryLoop = useIsDescendentOfQueryLoopBlock( clientId );
 	const post = useSelect(
 		( select ) =>
 			select( coreStore ).getEditedEntityRecord(
@@ -62,7 +62,7 @@ export default function PostTitleEdit( {
 	);
 
 	if ( postType && postId ) {
-		titleElement = isEditable ? (
+		titleElement = ! isDescendentOfQueryLoop ? (
 			<PlainText
 				tagName={ TagName }
 				placeholder={ __( 'No Title' ) }
@@ -81,7 +81,7 @@ export default function PostTitleEdit( {
 	}
 
 	if ( isLink ) {
-		titleElement = isEditable ? (
+		titleElement = ! isDescendentOfQueryLoop ? (
 			<TagName { ...blockProps }>
 				<PlainText
 					tagName="a"
