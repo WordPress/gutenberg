@@ -28,6 +28,7 @@ import {
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -86,8 +87,13 @@ function Layout( { styles } ) {
 		hasReducedUI,
 		showBlockBreadcrumbs,
 		isTemplateMode,
+		documentLabel,
 	} = useSelect( ( select ) => {
-		const editorSettings = select( editorStore ).getEditorSettings();
+		const { getEditorSettings, getCurrentPostType } = select( editorStore );
+		const editorSettings = getEditorSettings();
+		const currentPostType = getCurrentPostType();
+		const postType = select( coreStore ).getPostType( currentPostType );
+
 		return {
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
@@ -123,6 +129,12 @@ function Layout( { styles } ) {
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
+			documentLabel:
+				// Disable reason: Post type labels object is shaped like this.
+				// eslint-disable-next-line camelcase
+				postType?.labels?.singular_name ??
+				// translators: Default label for the Document sidebar tab, not selected.
+				__( 'Document' ),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -247,7 +259,7 @@ function Layout( { styles } ) {
 					isRichEditingEnabled &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">
-							<BlockBreadcrumb />
+							<BlockBreadcrumb rootLabelText={ documentLabel } />
 						</div>
 					)
 				}
