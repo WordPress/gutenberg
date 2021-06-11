@@ -70,7 +70,9 @@ export default function BoxControl( {
 		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
 	);
 
-	const [ side, setSide ] = useState( getInitialSide( isLinked, groupedDirections) );
+	const [ side, setSide ] = useState(
+		getInitialSide( isLinked, groupedDirections )
+	);
 
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
