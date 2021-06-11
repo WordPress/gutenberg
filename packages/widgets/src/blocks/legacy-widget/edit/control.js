@@ -361,7 +361,24 @@ async function encodeWidget( { idBase, instance, number, formData = null } ) {
 function isEmptyHTML( html ) {
 	const element = document.createElement( 'div' );
 	element.innerHTML = html;
-	return element.innerText.trim() === '';
+	return isEmptyNode( element );
+}
+
+function isEmptyNode( node ) {
+	switch ( node.nodeType ) {
+		case node.TEXT_NODE:
+			return node.nodeValue.trim() === '';
+		case node.ELEMENT_NODE:
+			if ( node.tagName === 'IMG' ) {
+				return false;
+			}
+			if ( ! node.hasChildNodes() ) {
+				return true;
+			}
+			return Array.from( node.childNodes ).every( isEmptyNode );
+		default:
+			return true;
+	}
 }
 
 function serializeForm( form ) {
