@@ -91,6 +91,19 @@ export function useInBetweenInserter() {
 							? [ 'left', 'right' ]
 							: [ 'top', 'bottom' ];
 					const elementRect = blockEl.getBoundingClientRect();
+
+					// Check cursor is between blocks.
+					if (
+						( orientation === 'horizontal' &&
+							( event.clientY > elementRect.bottom ||
+								event.clientY < elementRect.top ) ) ||
+						( orientation === 'vertical' &&
+							( event.clientX > elementRect.right ||
+								event.clientX < elementRect.left ) )
+					) {
+						return;
+					}
+
 					const [ distance, edge ] = getDistanceToNearestEdge(
 						position,
 						elementRect,
