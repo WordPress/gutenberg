@@ -1763,6 +1763,5 @@ export const getPostTypeLabel = createRegistrySelector(
 		// Disable reason: Post type labels object is shaped like this.
 		// eslint-disable-next-line camelcase
 		return postType?.labels?.singular_name || null;
-		// translators: Default label for the Document sidebar tab, not selected.
 	}
 );

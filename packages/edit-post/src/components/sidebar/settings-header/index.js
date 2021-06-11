@@ -21,6 +21,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 		const postTypeLabel = select( editorStore ).getPostTypeLabel();
 
 		return {
+			// translators: Default label for the Document sidebar tab, not selected.
 			documentLabel: postTypeLabel || __( 'Document' ),
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		};

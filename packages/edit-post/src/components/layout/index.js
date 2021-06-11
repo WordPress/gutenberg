@@ -127,6 +127,7 @@ function Layout( { styles } ) {
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
+			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || __( 'Document' ),
 		};
 	}, [] );
