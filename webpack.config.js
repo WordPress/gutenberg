@@ -249,6 +249,7 @@ module.exports = {
 				'./packages/block-library/src/': 'build/block-library/blocks/',
 				'./packages/edit-widgets/src/blocks/':
 					'build/edit-widgets/blocks/',
+				'./packages/widgets/src/blocks/': 'build/widgets/blocks/',
 			} ).flatMap( ( [ from, to ] ) => [
 				{
 					from: `${ from }/**/index.php`,
