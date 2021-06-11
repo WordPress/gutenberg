@@ -73,7 +73,7 @@
 			"__experimentalTextDecoration": true
 		},
 		"color": true,
-		"__experimentalAllowedOrientations": ["horiztonal", "vertical"]
+		"__experimentalAllowedOrientations": ["horizontal", "vertical"]
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
