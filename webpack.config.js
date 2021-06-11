@@ -243,6 +243,22 @@ module.exports = {
 				to: 'build/block-library/blocks/[1]/editor-rtl.css',
 				transform: stylesTransform,
 			},
+			{
+				from: './packages/block-library/build-style/*/theme.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }theme\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/theme.css',
+				transform: stylesTransform,
+			},
+			{
+				from: './packages/block-library/build-style/*/theme-rtl.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }theme-rtl\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/theme-rtl.css',
+				transform: stylesTransform,
+			},
 		] ),
 		new CopyWebpackPlugin(
 			Object.entries( {
