@@ -19,14 +19,6 @@ class WP_Theme_JSON_Gutenberg {
 	private $theme_json = null;
 
 	/**
-	 * What source of data this object represents.
-	 * One of VALID_ORIGINS.
-	 *
-	 * @var string
-	 */
-	private $origin = null;
-
-	/**
 	 * Holds block metadata extracted from block.json
 	 * to be shared among all instances so we don't
 	 * process it twice.
@@ -295,10 +287,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $origin What source of data this object represents. One of core, theme, or user. Default: theme.
 	 */
 	public function __construct( $theme_json = array(), $origin = 'theme' ) {
-		if ( in_array( $origin, self::VALID_ORIGINS, true ) ) {
-			$this->origin = $origin;
-		} else {
-			$this->origin = 'theme';
+		if ( ! in_array( $origin, self::VALID_ORIGINS, true ) ) {
+			$origin = 'theme';
 		}
 
 		// The old format is not meant to be ported to core.
@@ -322,16 +312,6 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Returns the origin of data.
-	 * One of the valid origins: core, theme, user.
-	 *
-	 * @return string
-	 */
-	private function get_origin() {
-		return $this->origin;
 	}
 
 	/**
@@ -1177,7 +1157,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param WP_Theme_JSON $incoming Data to merge.
 	 */
 	public function merge( $incoming ) {
-		$origin           = $incoming->get_origin();
 		$incoming_data    = $incoming->get_raw_data();
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
