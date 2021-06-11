@@ -27,25 +27,20 @@ export const IntersectionObserver = createContext();
 
 function Root( { className, children } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const {
-		isTyping,
-		isOutlineMode,
-		isFocusMode,
-		isNavigationMode,
-	} = useSelect( ( select ) => {
-		const {
-			isTyping: _isTyping,
-			getSettings,
-			isNavigationMode: _isNavigationMode,
-		} = select( blockEditorStore );
-		const { outlineMode, focusMode } = getSettings();
-		return {
-			isTyping: _isTyping(),
-			isOutlineMode: outlineMode,
-			isFocusMode: focusMode,
-			isNavigationMode: _isNavigationMode(),
-		};
-	}, [] );
+	const { isOutlineMode, isFocusMode, isNavigationMode } = useSelect(
+		( select ) => {
+			const { getSettings, isNavigationMode: _isNavigationMode } = select(
+				blockEditorStore
+			);
+			const { outlineMode, focusMode } = getSettings();
+			return {
+				isOutlineMode: outlineMode,
+				isFocusMode: focusMode,
+				isNavigationMode: _isNavigationMode(),
+			};
+		},
+		[]
+	);
 	return (
 		<div
 			ref={ useMergeRefs( [
@@ -57,7 +52,6 @@ function Root( { className, children } ) {
 				'block-editor-block-list__layout is-root-container',
 				className,
 				{
-					'is-typing': isTyping,
 					'is-outline-mode': isOutlineMode,
 					'is-focus-mode': isFocusMode && isLargeViewport,
 					'is-navigate-mode': isNavigationMode,

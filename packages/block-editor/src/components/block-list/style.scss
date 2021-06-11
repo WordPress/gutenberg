@@ -257,7 +257,7 @@
 	}
 }
 
-.is-outline-mode:not(.is-typing) .block-editor-block-list__block {
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
 	&.is-hovered {
 		cursor: default;
 
