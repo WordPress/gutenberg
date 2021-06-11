@@ -303,7 +303,7 @@ module.exports = {
 			] )
 		),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
-		new ReadableJsAssetsWebpackPlugin(),
+		mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 	].filter( Boolean ),
 	watchOptions: {
 		ignored: [ '**/node_modules', '**/packages/*/src' ],

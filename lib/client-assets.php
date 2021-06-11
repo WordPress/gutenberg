@@ -236,7 +236,7 @@ function gutenberg_register_packages_scripts( $scripts ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
-	$suffix          = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.js' : '.min.js';
+	$suffix          = '.min.js';
 
 	foreach ( glob( gutenberg_dir_path() . "build/*/index$suffix" ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
