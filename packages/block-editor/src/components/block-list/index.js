@@ -8,13 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import {
-	createContext,
-	useState,
-	useMemo,
-	createPortal,
-} from '@wordpress/element';
-import { createSlotFill } from '@wordpress/components';
+import { createContext, useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,16 +22,11 @@ import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 import BlockToolsBackCompat from '../block-tools/back-compat';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { Head } from './head';
 
 export const IntersectionObserver = createContext();
-const { Fill: BlockHeadFill, Slot: BlockHeadSlot } = createSlotFill(
-	'__unstableBlockHead'
-);
-
-export { BlockHeadFill };
 
 function Root( { className, children } ) {
-	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isOutlineMode, isFocusMode, isNavigationMode } = useSelect(
 		( select ) => {
@@ -54,27 +43,26 @@ function Root( { className, children } ) {
 		[]
 	);
 	return (
-		<div
-			ref={ useMergeRefs( [
-				useBlockSelectionClearer(),
-				useBlockDropZone(),
-				useInBetweenInserter(),
-				setElement,
-			] ) }
-			className={ classnames(
-				'block-editor-block-list__layout is-root-container',
-				className,
-				{
-					'is-outline-mode': isOutlineMode,
-					'is-focus-mode': isFocusMode && isLargeViewport,
-					'is-navigate-mode': isNavigationMode,
-				}
-			) }
-		>
-			{ element &&
-				createPortal( <BlockHeadSlot />, element.ownerDocument.head ) }
-			{ children }
-		</div>
+		<Head>
+			<div
+				ref={ useMergeRefs( [
+					useBlockSelectionClearer(),
+					useBlockDropZone(),
+					useInBetweenInserter(),
+				] ) }
+				className={ classnames(
+					'block-editor-block-list__layout is-root-container',
+					className,
+					{
+						'is-outline-mode': isOutlineMode,
+						'is-focus-mode': isFocusMode && isLargeViewport,
+						'is-navigate-mode': isNavigationMode,
+					}
+				) }
+			>
+				{ children }
+			</div>
+		</Head>
 	);
 }
 

@@ -11,6 +11,7 @@ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { SVG } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
+import { useContext, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,6 +21,7 @@ import {
 	__experimentalDuotoneControl as DuotoneControl,
 	useSetting,
 } from '../components';
+import { Head } from '../components/block-list/head';
 
 const EMPTY_ARRAY = [];
 
@@ -240,13 +242,18 @@ const withDuotoneStyles = createHigherOrderComponent(
 
 		const className = classnames( props?.className, id );
 
+		const element = useContext( Head.context );
+
 		return (
 			<>
-				<DuotoneFilter
-					selector={ selectorsGroup }
-					id={ id }
-					values={ getValuesFromColors( values ) }
-				/>
+				{ createPortal(
+					<DuotoneFilter
+						selector={ selectorsGroup }
+						id={ id }
+						values={ getValuesFromColors( values ) }
+					/>,
+					element
+				) }
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
