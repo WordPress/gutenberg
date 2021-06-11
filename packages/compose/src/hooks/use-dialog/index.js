@@ -23,14 +23,22 @@ import useMergeRefs from '../use-merge-refs';
  * @param {Object} options Dialog Options.
  */
 function useDialog( options ) {
-	const onClose = useRef();
+	const currentOptions = useRef();
 	useEffect( () => {
-		onClose.current = options.onClose;
-	}, [ options.onClose ] );
+		currentOptions.current = options;
+	}, Object.values( options ) );
 	const constrainedTabbingRef = useConstrainedTabbing();
-	const focusOnMountRef = useFocusOnMount();
+	const focusOnMountRef = useFocusOnMount( options.focusOnMount );
 	const focusReturnRef = useFocusReturn();
-	const focusOutsideProps = useFocusOutside( options.onClose );
+	const focusOutsideProps = useFocusOutside( ( event ) => {
+		// This unstable prop  is here only to manage backward compatibility
+		// for the Popover component otherwise, the onClose should be enough.
+		if ( currentOptions.current.__unstableOnClose ) {
+			currentOptions.current.__unstableOnClose( 'focus-outside', event );
+		} else if ( currentOptions.current.onClose ) {
+			currentOptions.current.onClose();
+		}
+	} );
 	const closeOnEscapeRef = useCallback( ( node ) => {
 		if ( ! node ) {
 			return;
@@ -38,18 +46,18 @@ function useDialog( options ) {
 
 		node.addEventListener( 'keydown', ( event ) => {
 			// Close on escape
-			if ( event.keyCode === ESCAPE && onClose.current ) {
+			if ( event.keyCode === ESCAPE && currentOptions.current.onClose ) {
 				event.stopPropagation();
-				onClose.current();
+				currentOptions.current.onClose();
 			}
 		} );
 	}, [] );
 
 	return [
 		useMergeRefs( [
-			constrainedTabbingRef,
-			focusReturnRef,
-			focusOnMountRef,
+			options.focusOnMount !== false ? constrainedTabbingRef : null,
+			options.focusOnMount !== false ? focusReturnRef : null,
+			options.focusOnMount !== false ? focusOnMountRef : null,
 			closeOnEscapeRef,
 		] ),
 		{
