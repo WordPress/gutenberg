@@ -105,6 +105,14 @@ If this property is true, a button to reset the box control is rendered.
 - Required: No
 - Default: `true`
 
+### isGroupedDirections
+
+If this property is true, when the box control is unlinked, vertical and horizontal controls can be used instead of updating individual sides.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
 ### inputProps
 
 Props for the internal [InputControl](../input-control) components.
