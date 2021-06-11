@@ -115,7 +115,8 @@ export function __experimentalCloneSanitizedBlock(
 		{
 			...block.attributes,
 			...mergeAttributes,
-		}
+		},
+		true
 	);
 
 	return {
