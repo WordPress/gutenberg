@@ -45,7 +45,7 @@ class WP_Theme_JSON_Gutenberg {
 	const VALID_ORIGINS = array(
 		'core',
 		'theme',
-		'user '
+		'user',
 	);
 
 	const VALID_TOP_LEVEL_KEYS = array(
@@ -291,11 +291,11 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $theme_json A structure that follows the theme.json schema.
+	 * @param array  $theme_json A structure that follows the theme.json schema.
 	 * @param string $origin What source of data this object represents. One of core, theme, or user. Default: theme.
 	 */
 	public function __construct( $theme_json = array(), $origin = 'theme' ) {
-		if ( in_array( $origin, self::VALID_ORIGINS ) ) {
+		if ( in_array( $origin, self::VALID_ORIGINS, true ) ) {
 			$this->origin = $origin;
 		} else {
 			$this->origin = 'theme';
@@ -700,7 +700,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array Array of presets where each key is a slug and each value is the preset value.
 	 */
 	private static function get_merged_preset_by_slug( $preset_per_origin, $value_key ) {
-		$result  = array();
+		$result = array();
 		foreach ( self::VALID_ORIGINS as $origin ) {
 			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
