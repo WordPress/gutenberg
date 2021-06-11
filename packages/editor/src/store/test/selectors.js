@@ -3062,11 +3062,11 @@ describe( 'selectors', () => {
 			);
 		} );
 
-		it( 'should return null when the post type label does not exist', () => {
+		it( 'should return `undefined` when the post type label does not exist', () => {
 			const postTypes = [ {}, { postType: 'humpty' } ];
 
 			postTypes.forEach( ( state ) =>
-				expect( getPostTypeLabel( state ) ).toBeNull()
+				expect( getPostTypeLabel( state ) ).toBeUndefined()
 			);
 		} );
 	} );

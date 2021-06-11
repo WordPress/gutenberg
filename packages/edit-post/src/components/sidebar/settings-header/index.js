@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 
@@ -22,7 +22,7 @@ const SettingsHeader = ( { sidebarName } ) => {
 
 		return {
 			// translators: Default label for the Document sidebar tab, not selected.
-			documentLabel: postTypeLabel || __( 'Document' ),
+			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		};
 	}, [] );

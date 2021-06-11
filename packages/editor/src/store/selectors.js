@@ -1754,7 +1754,7 @@ export function __experimentalGetTemplateInfo( state, template ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {string|null} The post type label if available, otherwise null.
+ * @return {string|undefined} The post type label if available, otherwise undefined.
  */
 export const getPostTypeLabel = createRegistrySelector(
 	( select ) => ( state ) => {
@@ -1762,6 +1762,6 @@ export const getPostTypeLabel = createRegistrySelector(
 		const postType = select( coreStore ).getPostType( currentPostType );
 		// Disable reason: Post type labels object is shaped like this.
 		// eslint-disable-next-line camelcase
-		return postType?.labels?.singular_name || null;
+		return postType?.labels?.singular_name;
 	}
 );

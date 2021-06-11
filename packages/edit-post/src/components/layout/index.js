@@ -19,7 +19,7 @@ import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	ComplementaryArea,
 	FullscreenMode,
@@ -128,7 +128,7 @@ function Layout( { styles } ) {
 				'showBlockBreadcrumbs'
 			),
 			// translators: Default label for the Document in the Block Breadcrumb.
-			documentLabel: postTypeLabel || __( 'Document' ),
+			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
