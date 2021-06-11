@@ -58,7 +58,7 @@ function BlockNavigationBlockSlot( props, ref ) {
 					level,
 					tabIndex,
 					onFocus,
-					onClick,
+					onToggleExpanded,
 				} = props;
 
 				const blockType = getBlockType( name );
@@ -88,7 +88,9 @@ function BlockNavigationBlockSlot( props, ref ) {
 								className
 							) }
 						>
-							<BlockNavigationExpander onClick={ onClick } />
+							<BlockNavigationExpander
+								onClick={ onToggleExpanded }
+							/>
 							<BlockIcon icon={ blockType.icon } showColors />
 							{ Children.map( fills, ( fill ) =>
 								cloneElement( fill, {

@@ -79,29 +79,26 @@ export default function BlockNavigationBranch( props ) {
 					? expandedState[ clientId ] ?? true
 					: undefined;
 
-				const toggleExpandOrSelectBlock = (
-					event,
-					{ forceToggle } = { forceToggle: false }
-				) => {
+				const selectBlockWithClientId = ( event ) => {
 					event.stopPropagation();
-					const toggle = () => {
-						if ( isExpanded === true ) {
-							collapse( clientId );
-						} else if ( isExpanded === false ) {
-							expand( clientId );
-						}
-					};
-					if ( forceToggle ) {
-						return toggle();
-					}
 					selectBlock( clientId );
+				};
+
+				const toggleExpanded = ( event ) => {
+					event.stopPropagation();
+					if ( isExpanded === true ) {
+						collapse( clientId );
+					} else if ( isExpanded === false ) {
+						expand( clientId );
+					}
 				};
 
 				return (
 					<Fragment key={ clientId }>
 						<BlockNavigationBlock
 							block={ block }
-							onClick={ toggleExpandOrSelectBlock }
+							onClick={ selectBlockWithClientId }
+							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							isBranchSelected={ isSelectedBranch }
 							isLastOfSelectedBranch={ isLastOfSelectedBranch }

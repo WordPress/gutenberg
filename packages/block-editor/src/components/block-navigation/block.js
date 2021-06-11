@@ -36,6 +36,7 @@ export default function BlockNavigationBlock( {
 	isBranchSelected,
 	isLastOfSelectedBranch,
 	onClick,
+	onToggleExpanded,
 	position,
 	level,
 	rowCount,
@@ -155,6 +156,7 @@ export default function BlockNavigationBlock( {
 						<BlockNavigationBlockContents
 							block={ block }
 							onClick={ onClick }
+							onToggleExpanded={ onToggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }

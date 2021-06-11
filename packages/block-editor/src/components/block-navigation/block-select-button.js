@@ -26,6 +26,7 @@ function BlockNavigationBlockSelectButton(
 		block: { clientId },
 		isSelected,
 		onClick,
+		onToggleExpanded,
 		position,
 		siblingBlockCount,
 		level,
@@ -62,7 +63,7 @@ function BlockNavigationBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 			>
-				<BlockNavigationExpander onClick={ onClick } />
+				<BlockNavigationExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
 				<BlockTitle clientId={ clientId } />
 				{ blockInformation?.anchor && (
