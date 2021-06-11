@@ -483,34 +483,12 @@ const Popover = (
 	const onDialogClose = ( type, event ) => {
 		// Ideally the popover should have just a single onClose prop and
 		// not three props that potentially do the same thing.
-		if ( type === 'focusoutside' && onFocusOutside ) {
+		if ( type === 'focus-outside' && onFocusOutside ) {
 			onFocusOutside( event );
-		} else if ( type === 'focusoutside' && onClickOutside ) {
+		} else if ( type === 'focus-outside' && onClickOutside ) {
 			// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click
 			// target. MouseEvent constructor is unsupported in Internet Explorer.
-			let clickEvent;
-			try {
-				clickEvent = new window.MouseEvent( 'click' );
-			} catch ( error ) {
-				clickEvent = document.createEvent( 'MouseEvent' );
-				clickEvent.initMouseEvent(
-					'click',
-					true,
-					true,
-					window,
-					0,
-					0,
-					0,
-					0,
-					0,
-					false,
-					false,
-					false,
-					false,
-					0,
-					null
-				);
-			}
+			const clickEvent = new window.MouseEvent( 'click' );
 
 			Object.defineProperty( clickEvent, 'target', {
 				get: () => event.relatedTarget,
