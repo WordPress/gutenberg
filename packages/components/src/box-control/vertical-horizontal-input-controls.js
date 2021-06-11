@@ -8,6 +8,7 @@ import { noop } from 'lodash';
  */
 import UnitControl from './unit-control';
 import { LABELS } from './utils';
+import { Layout } from './styles/box-control-styles';
 
 const groupedSides = [ 'vertical', 'horizontal' ];
 
@@ -21,7 +22,6 @@ export default function VerticalHorizontalInputControls( {
 	...props
 } ) {
 	const createHandleOnFocus = ( side ) => ( event ) => {
-		// TODO: Check if this is okay.
 		onFocus( event, { side } );
 	};
 
@@ -30,13 +30,9 @@ export default function VerticalHorizontalInputControls( {
 			onHoverOn( {
 				top: true,
 				bottom: true,
-				left: false,
-				right: false,
 			} );
 		} else {
 			onHoverOn( {
-				top: false,
-				bottom: false,
 				left: true,
 				right: true,
 			} );
@@ -46,23 +42,15 @@ export default function VerticalHorizontalInputControls( {
 	const createHandleOnHoverOff = ( side ) => () => {
 		if ( side === 'vertical' ) {
 			onHoverOff( {
-				top: true,
-				bottom: true,
-				left: false,
-				right: false,
+				top: false,
+				bottom: false,
 			} );
 		} else {
 			onHoverOff( {
-				top: false,
-				bottom: false,
-				left: true,
-				right: true,
+				left: false,
+				right: false,
 			} );
 		}
-	};
-
-	const handleOnChange = ( nextValues ) => {
-		onChange( nextValues );
 	};
 
 	const createHandleOnChange = ( side ) => ( next ) => {
@@ -77,24 +65,24 @@ export default function VerticalHorizontalInputControls( {
 			nextValues.right = next;
 		}
 
-		handleOnChange( nextValues );
+		onChange( nextValues );
 	};
 
 	// Filter sides if custom configuration provided, maintaining default order.
-	// const filteredSides = sides?.length
-	// 	? allSides.filter( ( side ) => sides.includes( side ) )
-	// 	: allSides;
-
-	// TODO: Allow filtering of sides so that you can have it be just vertical or just horizontal
-
-	const filteredSides = groupedSides;
+	const filteredSides = sides?.length
+		? groupedSides.filter( ( side ) => sides.includes( side ) )
+		: groupedSides;
 
 	const first = filteredSides[ 0 ];
 	const last = filteredSides[ filteredSides.length - 1 ];
 	const only = first === last && first;
 
 	return (
-		<>
+		<Layout
+			gap={ 0 }
+			align="top"
+			className="component-box-control__vertical-horizontal-input-controls"
+		>
 			{ filteredSides.map( ( side ) => (
 				<UnitControl
 					{ ...props }
@@ -110,6 +98,6 @@ export default function VerticalHorizontalInputControls( {
 					key={ `box-control-${ side }` }
 				/>
 			) ) }
-		</>
+		</Layout>
 	);
 }

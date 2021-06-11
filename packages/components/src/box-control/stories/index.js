@@ -27,7 +27,11 @@ const defaultSideValues = {
 	left: '10px',
 };
 
-function DemoExample( { sides, defaultValues = defaultSideValues } ) {
+function DemoExample( {
+	sides,
+	defaultValues = defaultSideValues,
+	isGroupedDirections = false,
+} ) {
 	const [ values, setValues ] = useState( defaultValues );
 	const [ showVisualizer, setShowVisualizer ] = useState( {} );
 
@@ -41,6 +45,7 @@ function DemoExample( { sides, defaultValues = defaultSideValues } ) {
 						sides={ sides }
 						onChange={ setValues }
 						onChangeShowVisualizer={ setShowVisualizer }
+						isGroupedDirections={ isGroupedDirections }
 					/>
 				</Content>
 			</FlexBlock>
@@ -78,6 +83,20 @@ export const singleSide = () => {
 		<DemoExample
 			sides={ [ 'bottom' ] }
 			defaultValues={ { bottom: '10px' } }
+		/>
+	);
+};
+
+export const groupedDirections = () => {
+	return <DemoExample isGroupedDirections={ true } />;
+};
+
+export const groupedDirectionsWithSingleSide = () => {
+	return (
+		<DemoExample
+			sides={ [ 'horizontal' ] }
+			defaultValues={ { left: '10px', right: '10px' } }
+			isGroupedDirections={ true }
 		/>
 	);
 };
