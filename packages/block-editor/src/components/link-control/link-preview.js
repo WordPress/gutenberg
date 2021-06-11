@@ -90,7 +90,7 @@ export default function LinkPreview( {
 				<ViewerSlot fillProps={ value } />
 			</div>
 
-			{ ( hasRichData || isFetching ) && (
+			{ hasRichPreviews && ( hasRichData || isFetching ) && (
 				<div className="block-editor-link-control__search-item-bottom">
 					<div
 						aria-hidden={ ! richData?.image }
