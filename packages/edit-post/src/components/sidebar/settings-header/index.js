@@ -4,7 +4,6 @@
 import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
@@ -19,16 +18,10 @@ const SettingsHeader = ( { sidebarName } ) => {
 	const openBlockSettings = () => openGeneralSidebar( 'edit-post/block' );
 
 	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
-		const currentPostType = select( editorStore ).getCurrentPostType();
-		const postType = select( coreStore ).getPostType( currentPostType );
+		const postTypeLabel = select( editorStore ).getPostTypeLabel();
 
 		return {
-			documentLabel:
-				// Disable reason: Post type labels object is shaped like this.
-				// eslint-disable-next-line camelcase
-				postType?.labels?.singular_name ??
-				// translators: Default label for the Document sidebar tab, not selected.
-				__( 'Document' ),
+			documentLabel: postTypeLabel || __( 'Document' ),
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		};
 	}, [] );

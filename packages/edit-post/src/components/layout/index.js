@@ -28,7 +28,6 @@ import {
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -89,10 +88,9 @@ function Layout( { styles } ) {
 		isTemplateMode,
 		documentLabel,
 	} = useSelect( ( select ) => {
-		const { getEditorSettings, getCurrentPostType } = select( editorStore );
+		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
 		const editorSettings = getEditorSettings();
-		const currentPostType = getCurrentPostType();
-		const postType = select( coreStore ).getPostType( currentPostType );
+		const postTypeLabel = getPostTypeLabel();
 
 		return {
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
@@ -129,12 +127,7 @@ function Layout( { styles } ) {
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
-			documentLabel:
-				// Disable reason: Post type labels object is shaped like this.
-				// eslint-disable-next-line camelcase
-				postType?.labels?.singular_name ??
-				// translators: Default label for the Document sidebar tab, not selected.
-				__( 'Document' ),
+			documentLabel: postTypeLabel || __( 'Document' ),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
