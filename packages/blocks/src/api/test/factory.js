@@ -448,6 +448,34 @@ describe( 'block factory', () => {
 
 			expect( clonedBlock.attributes ).toEqual( {} );
 		} );
+
+		it( 'should not duplicate unique attributes, but fallback to available defaults', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					uniqueAttribute: {
+						type: 'string',
+						unique: true,
+					},
+					uniqueAttributeWithDefault: {
+						type: 'string',
+						unique: true,
+						default: 'default-value',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block', {
+				uniqueAttribute: 'unique-value',
+				uniqueAttributeWithDefault: 'unique-non-default-value',
+			} );
+
+			const clonedBlock = __experimentalCloneSanitizedBlock( block, {} );
+
+			expect( clonedBlock.attributes ).toEqual( {
+				uniqueAttribueWithDefault: 'default-value',
+			} );
+		} );
 	} );
 
 	describe( 'getPossibleBlockTransformations()', () => {

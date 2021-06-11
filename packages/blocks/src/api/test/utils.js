@@ -280,6 +280,59 @@ describe( 'sanitizeBlockAttributes', () => {
 		} );
 	} );
 
+	it( 'does not strip unique attributes by default', () => {
+		registerBlockType( 'core/test-block', {
+			attributes: {
+				uniqueAttr: {
+					type: 'string',
+					unique: true,
+				},
+			},
+			title: 'Test block',
+		} );
+
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{
+				uniqueAttr: 'unique-value',
+			}
+		);
+
+		expect( attributes ).toEqual( {
+			uniqueAttr: 'unique-value',
+		} );
+	} );
+
+	it( 'sanitizes unique attributes and falls back to defaults when sanitizeUniqueAttributes is true', () => {
+		registerBlockType( 'core/test-block', {
+			attributes: {
+				uniqueAttr: {
+					type: 'string',
+					unique: true,
+				},
+				uniqueAttrWithDefault: {
+					type: 'string',
+					unique: true,
+					default: 'default-value',
+				},
+			},
+			title: 'Test block',
+		} );
+
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{
+				uniqueAttr: 'unique-value',
+				uniqueAttrWithDefault: 'unique-non-default-value',
+			},
+			true
+		);
+
+		expect( attributes ).toEqual( {
+			uniqueAttrWithDefault: 'default-value',
+		} );
+	} );
+
 	it( 'handles node and children sources as arrays', () => {
 		registerBlockType( 'core/test-block', {
 			attributes: {
