@@ -154,7 +154,7 @@
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
 		"browserslist": "4.16.6",
-		"chalk": "4.0.0",
+		"chalk": "4.1.1",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "5.1.2",
