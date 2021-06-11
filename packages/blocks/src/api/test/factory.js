@@ -473,7 +473,7 @@ describe( 'block factory', () => {
 			const clonedBlock = __experimentalCloneSanitizedBlock( block, {} );
 
 			expect( clonedBlock.attributes ).toEqual( {
-				uniqueAttribueWithDefault: 'default-value',
+				uniqueAttributeWithDefault: 'default-value',
 			} );
 		} );
 	} );
