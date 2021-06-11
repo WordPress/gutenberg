@@ -165,7 +165,7 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  * @return void
  */
 function gutenberg_register_core_block_styles( $block_name ) {
-	if ( ! gutenberg_should_load_separate_block_assets() ) {
+	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;
 	}
 
