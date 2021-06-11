@@ -130,6 +130,16 @@ describe( 'Widgets screen', () => {
 	}
 
 	it( 'Should insert content using the global inserter', async () => {
+		const updateButton = await find( {
+			role: 'button',
+			name: 'Update',
+		} );
+
+		// Update button should start out disabled.
+		expect(
+			await updateButton.evaluate( ( button ) => button.disabled )
+		).toBe( true );
+
 		const widgetAreas = await findAll( {
 			role: 'group',
 			name: 'Block: Widget Area',
@@ -145,6 +155,11 @@ describe( 'Widgets screen', () => {
 		// );
 
 		await addParagraphBlock.click();
+
+		// Adding content should enable the Update button.
+		expect(
+			await updateButton.evaluate( ( button ) => button.disabled )
+		).toBe( false );
 
 		let addedParagraphBlockInFirstWidgetArea = await find(
 			{
@@ -215,6 +230,12 @@ describe( 'Widgets screen', () => {
 		// await page.keyboard.type( 'Third Paragraph' );
 
 		await saveWidgets();
+
+		// The Update button should be disabled again after saving.
+		expect(
+			await updateButton.evaluate( ( button ) => button.disabled )
+		).toBe( true );
+
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
