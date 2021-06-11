@@ -25,12 +25,5 @@ describe( 'selectors', () => {
 				__unstableIsFeatureActive( state, 'didILeaveTheOvenOn' )
 			).toBe( false );
 		} );
-
-		it( 'should return false where the state is empty', () => {
-			const state = {};
-			expect(
-				__unstableIsFeatureActive( state, 'didILeaveTheOvenOn' )
-			).toBe( false );
-		} );
 	} );
 } );
