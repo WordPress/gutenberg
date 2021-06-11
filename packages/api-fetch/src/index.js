@@ -118,18 +118,17 @@ const defaultFetchHandler = ( nextOptions ) => {
 					parseResponseAndNormalizeError( response, parse )
 				),
 		( err ) => {
-			// Return early if fetch throws a TypeError, there is most likely no network connection.
-			// Unfortunately the message might depend on the browser.
-			if ( err instanceof TypeError ) {
-				throw {
-					code: 'fetch_error',
-					message: __( 'You are probably offline.' ),
-				};
+			// Re-throw AbortError for the users to handle it themselves.
+			if ( err && err.name === 'AbortError' ) {
+				throw err;
 			}
 
-			// Otherwise, it could be an AbortError.
-			// Simply re-throw it to let the user handle it.
-			throw err;
+			// Otherwise, there is most likely no network connection.
+			// Unfortunately the message might depend on the browser.
+			throw {
+				code: 'fetch_error',
+				message: __( 'You are probably offline.' ),
+			};
 		}
 	);
 };

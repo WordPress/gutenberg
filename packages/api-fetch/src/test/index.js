@@ -168,7 +168,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return offline error when fetch errors', () => {
-		window.fetch.mockReturnValue( Promise.reject( new TypeError() ) );
+		window.fetch.mockReturnValue( Promise.reject() );
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
 			expect( body ).toEqual( {
