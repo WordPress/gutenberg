@@ -69,12 +69,12 @@ function Root( { className, children } ) {
 	);
 }
 
-export default function BlockList( { className, __experimentalLayout } ) {
+export default function BlockList( { className, ...props } ) {
 	usePreParsePatterns();
 	return (
 		<BlockToolsBackCompat>
 			<Root className={ className }>
-				<BlockListItems __experimentalLayout={ __experimentalLayout } />
+				<BlockListItems { ...props } />
 			</Root>
 		</BlockToolsBackCompat>
 	);
