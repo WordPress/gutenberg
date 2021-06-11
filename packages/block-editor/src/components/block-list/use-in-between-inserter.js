@@ -86,10 +86,6 @@ export function useInBetweenInserter() {
 				let indexOffset;
 
 				children.forEach( ( blockEl ) => {
-					const allowedEdges =
-						orientation === 'horizontal'
-							? [ 'left', 'right' ]
-							: [ 'top', 'bottom' ];
 					const elementRect = blockEl.getBoundingClientRect();
 
 					// Check cursor is between blocks.
@@ -104,12 +100,19 @@ export function useInBetweenInserter() {
 						return;
 					}
 
+					// Find the nearest block 'edge' for the orientation.
+					const allowedEdges =
+						orientation === 'horizontal'
+							? [ 'left', 'right' ]
+							: [ 'top', 'bottom' ];
+
 					const [ distance, edge ] = getDistanceToNearestEdge(
 						position,
 						elementRect,
 						allowedEdges
 					);
 
+					// If this block is nearest, set is as the target.
 					if ( ! elementDistance || distance < elementDistance ) {
 						element = blockEl;
 						elementDistance = distance;
