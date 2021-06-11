@@ -152,7 +152,8 @@ export function* saveWidgetArea( widgetAreaId ) {
 				{
 					...widget,
 					sidebar: widgetAreaId,
-				}
+				},
+				{ undoIgnore: true }
 			);
 
 			const hasEdits = yield select(
@@ -242,7 +243,8 @@ export function* saveWidgetArea( widgetAreaId ) {
 		widgetAreaId,
 		{
 			widgets: sidebarWidgetsIds,
-		}
+		},
+		{ undoIgnore: true }
 	);
 
 	yield* trySaveWidgetArea( widgetAreaId );
