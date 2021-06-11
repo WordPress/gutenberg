@@ -123,6 +123,15 @@ describe( 'Post Editor Performance', () => {
 		await closeGlobalBlockInserter();
 
 		// Measuring typing performance
+		// TODO: temporary: open persistent list view
+		await page.waitForSelector(
+			'.edit-post-header-toolbar__list-view-toggle[aria-pressed="false"]'
+		);
+		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
+		await page.waitForSelector(
+			'.edit-post-editor__list-view-panel-header'
+		);
+		// -- end of temporary script
 		await insertBlock( 'Paragraph' );
 		i = 200;
 		await page.tracing.start( {
