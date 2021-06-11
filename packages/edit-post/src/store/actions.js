@@ -391,22 +391,31 @@ export function* requestMetaBoxUpdates() {
 			body: formData,
 			parse: false,
 		} );
-	} finally {
-		// The "metaBoxUpdatesSuccess" action sets isSavingMetaBoxes state to "false."
-		// This indicates that the meta boxes saving request is complete, regardless of whether it has succeeded or failed.
-		// Updating this state prevents locking the editor in the saving state.
 		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
+	} catch {
+		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesFailure' );
 	}
 }
 
 /**
- * Returns an action object used signal a successful meta box update.
+ * Returns an action object used to signal a successful meta box update.
  *
  * @return {Object} Action object.
  */
 export function metaBoxUpdatesSuccess() {
 	return {
 		type: 'META_BOX_UPDATES_SUCCESS',
+	};
+}
+
+/**
+ * Returns an action object used to signal a failed meta box update.
+ *
+ * @return {Object} Action object.
+ */
+export function metaBoxUpdatesFailure() {
+	return {
+		type: 'META_BOX_UPDATES_FAILURE',
 	};
 }
 
