@@ -89,20 +89,15 @@ export default function useBlockDropZone( {
 } = {} ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
-	const { isLockedAll, orientation } = useSelect(
+	const isLockedAll = useSelect(
 		( select ) => {
-			const { getBlockListSettings, getTemplateLock } = select(
-				blockEditorStore
-			);
-			return {
-				isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
-				orientation: getBlockListSettings( targetRootClientId )
-					?.orientation,
-			};
+			const { getTemplateLock } = select( blockEditorStore );
+			return getTemplateLock( targetRootClientId ) === 'all';
 		},
 		[ targetRootClientId ]
 	);
 
+	const { getBlockListSettings } = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
 		blockEditorStore
 	);
@@ -114,7 +109,7 @@ export default function useBlockDropZone( {
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
 				{ x: event.clientX, y: event.clientY },
-				orientation
+				getBlockListSettings( targetRootClientId )?.orientation
 			);
 
 			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
