@@ -9,6 +9,7 @@ import {
 	showBlockToolbar,
 	visitAdminPage,
 	deleteAllWidgets,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -691,6 +692,63 @@ describe( 'Widgets screen', () => {
 		  "sidebar-2": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>",
+		}
+	` );
+	} );
+
+	it( 'Allows widget deletion to be undone', async () => {
+		const [ firstWidgetArea ] = await findAll( {
+			role: 'group',
+			name: 'Block: Widget Area',
+		} );
+
+		let addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
+
+		let addedParagraphBlockInFirstWidgetArea = await find(
+			{
+				name: /^Empty block/,
+				selector: '[data-block][data-type="core/paragraph"]',
+			},
+			{
+				root: firstWidgetArea,
+			}
+		);
+		await addedParagraphBlockInFirstWidgetArea.focus();
+		await page.keyboard.type( 'First Paragraph' );
+
+		addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
+
+		addedParagraphBlockInFirstWidgetArea = await firstWidgetArea.$(
+			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		);
+		await addedParagraphBlockInFirstWidgetArea.focus();
+		await page.keyboard.type( 'Second Paragraph' );
+
+		await saveWidgets();
+
+		// Delete the last block and save again.
+		await pressKeyWithModifier( 'access', 'z' );
+		await saveWidgets();
+
+		// Undo block deletion and save again
+		await pressKeyWithModifier( 'primary', 'z' );
+		await saveWidgets();
+
+		// Reload the page to make sure changes were actually saved.
+		await page.reload();
+
+		const serializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
+		</div></div>
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>Second Paragraph</p>
+		</div></div>",
+		  "wp_inactive_widgets": "",
 		}
 	` );
 	} );
