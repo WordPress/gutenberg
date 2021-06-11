@@ -31,7 +31,7 @@ export default function AllInputControl( {
 		const nextValues = { ...values };
 
 		if ( sides?.length ) {
-			sides.forEach( side => {
+			sides.forEach( ( side ) => {
 				if ( side === 'vertical' ) {
 					nextValues.top = next;
 					nextValues.bottom = next;
@@ -43,7 +43,9 @@ export default function AllInputControl( {
 				}
 			} );
 		} else {
-			[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => ( nextValues[ side ] = next ) );
+			[ 'top', 'right', 'bottom', 'left' ].forEach(
+				( side ) => ( nextValues[ side ] = next )
+			);
 		}
 
 		onChange( nextValues );

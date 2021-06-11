@@ -157,7 +157,9 @@ export default function BoxControl( {
 				) }
 				{ ! isLinked && isGroupedDirections && (
 					<FlexBlock>
-					<VerticalHorizontalInputControls { ...inputControlProps } />
+						<VerticalHorizontalInputControls
+							{ ...inputControlProps }
+						/>
 					</FlexBlock>
 				) }
 				{ ! hasOneSide && (
