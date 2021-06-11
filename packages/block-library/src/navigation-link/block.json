@@ -37,20 +37,14 @@
 		"kind": {
 			"type": "string"
 		},
-		"textColor": {
-			"type": "string"
-		},
-		"customTextColor": {
-			"type": "string"
-		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
-		},
-		"isTopLevelLink": {
-			"type": "boolean"
+		"colors": {
+			"type": "object",
+			"default": {
+				"textColor": null,
+				"customTextColor": null,
+				"backgroundColor": null,
+				"customBackgroundColor": null
+			}
 		}
 	},
 	"usesContext": [

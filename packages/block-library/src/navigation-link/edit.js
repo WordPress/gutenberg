@@ -229,10 +229,12 @@ export default function NavigationLinkEdit( {
 		rel,
 		title,
 		kind,
-		textColor,
-		customTextColor,
-		backgroundColor,
-		customBackgroundColor,
+		colors: {
+			textColor,
+			customTextColor,
+			backgroundColor,
+			customBackgroundColor,
+		},
 	} = attributes;
 	const link = {
 		url,
@@ -305,36 +307,29 @@ export default function NavigationLinkEdit( {
 
 	// Store the colors from context as attributes for rendering
 	useEffect( () => {
-		let textColorAttr = context.textColor,
-			backgroundColorAttr = context.backgroundColor,
-			customTextColorAttr = context.customTextColor || style?.color?.text,
-			customBackgroundAttr =
-				context.customBackgroundColor || style?.color?.background;
+		const colors = {
+			textColor: context.textColor,
+			backgroundColor: context.backgroundColor,
+			customTextColor: context.customTextColor ?? style?.color?.text,
+			customBackgroundColor:
+				context.customBackgroundColor ?? style?.color?.background,
+		};
 
 		// Override colors for submenus if they have been set by the parent Navigation block
 		if ( ! isTopLevelLink ) {
-			if ( context.overlayTextColor ) {
-				textColorAttr = context.overlayTextColor;
-			}
-			if ( context.overlayBackgroundColor ) {
-				backgroundColorAttr = context.overlayBackgroundColor;
-			}
-
-			if ( context.customOverlayTextColor ) {
-				customTextColorAttr = context.customOverlayTextColor;
-			}
-
-			if ( context.customOverlayBackgroundColor ) {
-				customBackgroundAttr = context.customOverlayBackgroundColor;
-			}
+			colors.textColor = context.overlayTextColor ?? colors.textColor;
+			colors.backgroundColor =
+				context.overlayBackgroundColor ?? colors.backgroundColor;
+			colors.customTextColor =
+				context.customOverlayTextColor ?? colors.customTextColor;
+			colors.customBackgroundColor =
+				context.customOverlayBackgroundColor ??
+				colors.customBackgroundColor;
 		}
 
 		setAttributes( {
-			textColor: textColorAttr,
-			backgroundColor: backgroundColorAttr,
-			customTextColor: customTextColorAttr,
-			customBackgroundColor: customBackgroundAttr,
 			isTopLevelLink,
+			colors,
 		} );
 	}, [
 		isTopLevelLink,
