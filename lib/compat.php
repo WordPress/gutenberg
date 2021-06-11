@@ -8,6 +8,11 @@
  * @package gutenberg
  */
 
+/**
+ * Backporting wp_should_load_separate_core_block_assets from WP-Core.
+ *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ */
 if ( ! function_exists( 'wp_should_load_separate_core_block_assets' ) ) {
 	/**
 	 * Checks whether separate assets should be loaded for core blocks on-render.
