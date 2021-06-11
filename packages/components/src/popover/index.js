@@ -486,8 +486,7 @@ const Popover = (
 		if ( type === 'focus-outside' && onFocusOutside ) {
 			onFocusOutside( event );
 		} else if ( type === 'focus-outside' && onClickOutside ) {
-			// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click
-			// target. MouseEvent constructor is unsupported in Internet Explorer.
+			// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click target.
 			const clickEvent = new window.MouseEvent( 'click' );
 
 			Object.defineProperty( clickEvent, 'target', {

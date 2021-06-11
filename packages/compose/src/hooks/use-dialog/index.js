@@ -26,7 +26,7 @@ function useDialog( options ) {
 	const currentOptions = useRef();
 	useEffect( () => {
 		currentOptions.current = options;
-	}, [ options.onClose ] );
+	}, Object.values( options ) );
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusOnMountRef = useFocusOnMount( options.focusOnMount );
 	const focusReturnRef = useFocusReturn();
