@@ -19,6 +19,14 @@ class WP_Theme_JSON_Gutenberg {
 	private $theme_json = null;
 
 	/**
+	 * What source of data this object represents.
+	 * One of VALID_ORIGINS.
+	 *
+	 * @var string
+	 */
+	private $origin = null;
+
+	/**
 	 * Holds block metadata extracted from block.json
 	 * to be shared among all instances so we don't
 	 * process it twice.
@@ -33,6 +41,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var string
 	 */
 	const ROOT_BLOCK_SELECTOR = 'body';
+
+	const VALID_ORIGINS = array(
+		'core',
+		'theme',
+		'user '
+	);
 
 	const VALID_TOP_LEVEL_KEYS = array(
 		'customTemplates',
@@ -278,8 +292,15 @@ class WP_Theme_JSON_Gutenberg {
 	 * Constructor.
 	 *
 	 * @param array $theme_json A structure that follows the theme.json schema.
+	 * @param string $origin What source of data this object represents. One of core, theme, or user. Default: theme.
 	 */
-	public function __construct( $theme_json = array() ) {
+	public function __construct( $theme_json = array(), $origin = 'theme' ) {
+		if ( in_array( $origin, self::VALID_ORIGINS ) ) {
+			$this->origin = $origin;
+		} else {
+			$this->origin = 'theme';
+		}
+
 		// The old format is not meant to be ported to core.
 		// We can remove it at that point.
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
@@ -289,6 +310,28 @@ class WP_Theme_JSON_Gutenberg {
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
 		$this->theme_json    = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+
+		// Internally, presets are keyed by origin.
+		$nodes = self::get_setting_nodes( $this->theme_json );
+		foreach ( $nodes as $node ) {
+			foreach ( self::PRESETS_METADATA as $preset ) {
+				$path   = array_merge( $node['path'], $preset['path'] );
+				$preset = _wp_array_get( $this->theme_json, $path, array() );
+				if ( ! empty( $preset ) ) {
+					gutenberg_experimental_set( $this->theme_json, $path, array( $origin => $preset ) );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Returns the origin of data.
+	 * One of the valid origins: core, theme, user.
+	 *
+	 * @return string
+	 */
+	private function get_origin() {
+		return $this->origin;
 	}
 
 	/**
@@ -657,9 +700,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array Array of presets where each key is a slug and each value is the preset value.
 	 */
 	private static function get_merged_preset_by_slug( $preset_per_origin, $value_key ) {
-		$origins = array( 'core', 'theme', 'user' );
 		$result  = array();
-		foreach ( $origins as $origin ) {
+		foreach ( self::VALID_ORIGINS as $origin ) {
 			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
 				continue;
 			}
@@ -1133,57 +1175,33 @@ class WP_Theme_JSON_Gutenberg {
 	 * Merge new incoming data.
 	 *
 	 * @param WP_Theme_JSON $incoming Data to merge.
-	 * @param string        $origin origin of the incoming data (e.g: core, theme, or user).
 	 */
-	public function merge( $incoming, $origin ) {
-
+	public function merge( $incoming ) {
+		$origin           = $incoming->get_origin();
 		$incoming_data    = $incoming->get_raw_data();
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
 		// The array_replace_recursive algorithm merges at the leaf level.
 		// For leaf values that are arrays it will use the numeric indexes for replacement.
-		// In those cases, what we want is to use the incoming value, if it exists.
-		//
-		// These are the cases that have array values at the leaf levels.
-		$properties   = array();
-		$properties[] = array( 'custom' );
-		$properties[] = array( 'spacing', 'units' );
-		$properties[] = array( 'color', 'duotone' );
-
-		$to_append   = array();
-		$to_append[] = array( 'color', 'palette' );
-		$to_append[] = array( 'color', 'gradients' );
-		$to_append[] = array( 'typography', 'fontSizes' );
-		$to_append[] = array( 'typography', 'fontFamilies' );
+		// In those cases, we want to replace the existing with the incoming value, if it exists.
+		$to_replace   = array();
+		$to_replace[] = array( 'custom' );
+		$to_replace[] = array( 'spacing', 'units' );
+		$to_replace[] = array( 'color', 'duotone' );
+		foreach ( self::VALID_ORIGINS as $origin ) {
+			$to_replace[] = array( 'color', 'palette', $origin );
+			$to_replace[] = array( 'color', 'gradients', $origin );
+			$to_replace[] = array( 'typography', 'fontSizes', $origin );
+			$to_replace[] = array( 'typography', 'fontFamilies', $origin );
+		}
 
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
-			foreach ( $properties as $property_path ) {
+			foreach ( $to_replace as $property_path ) {
 				$path = array_merge( $metadata['path'], $property_path );
 				$node = _wp_array_get( $incoming_data, $path, array() );
 				if ( ! empty( $node ) ) {
 					gutenberg_experimental_set( $this->theme_json, $path, $node );
-				}
-			}
-
-			foreach ( $to_append as $property_path ) {
-				$path = array_merge( $metadata['path'], $property_path );
-				$node = _wp_array_get( $incoming_data, $path, null );
-				if ( null !== $node ) {
-					$existing_node = _wp_array_get( $this->theme_json, $path, null );
-					$new_node      = array_filter(
-						$existing_node,
-						function ( $key ) {
-							return in_array( $key, array( 'core', 'theme', 'user ' ), true );
-						},
-						ARRAY_FILTER_USE_KEY
-					);
-					if ( isset( $node[ $origin ] ) ) {
-						$new_node[ $origin ] = $node[ $origin ];
-					} else {
-						$new_node[ $origin ] = $node;
-					}
-					gutenberg_experimental_set( $this->theme_json, $path, $new_node );
 				}
 			}
 		}
@@ -1201,40 +1219,45 @@ class WP_Theme_JSON_Gutenberg {
 	private static function remove_insecure_settings( $input ) {
 		$output = array();
 		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-			$current_preset = _wp_array_get( $input, $preset_metadata['path'], null );
-			if ( null === $current_preset ) {
+			$preset_by_origin = _wp_array_get( $input, $preset_metadata['path'], null );
+			if ( null === $preset_by_origin ) {
 				continue;
 			}
 
-			$escaped_preset = array();
-			foreach ( $current_preset as $single_preset ) {
-				if (
-					esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
-					sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
-				) {
-					$value                  = $single_preset[ $preset_metadata['value_key'] ];
-					$single_preset_is_valid = null;
-					if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
-						$single_preset_is_valid = true;
-						foreach ( $preset_metadata['classes'] as $class_meta_data ) {
-							$property = $class_meta_data['property_name'];
-							if ( ! self::is_safe_css_declaration( $property, $value ) ) {
-								$single_preset_is_valid = false;
-								break;
+			foreach ( self::VALID_ORIGINS as $origin ) {
+				if ( ! isset( $preset_by_origin[ $origin ] ) ) {
+					continue;
+				}
+
+				$escaped_preset = array();
+				foreach ( $preset_by_origin[ $origin ] as $single_preset ) {
+					if (
+						esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
+						sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
+					) {
+						$value                  = $single_preset[ $preset_metadata['value_key'] ];
+						$single_preset_is_valid = null;
+						if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
+							$single_preset_is_valid = true;
+							foreach ( $preset_metadata['classes'] as $class_meta_data ) {
+								$property = $class_meta_data['property_name'];
+								if ( ! self::is_safe_css_declaration( $property, $value ) ) {
+									$single_preset_is_valid = false;
+									break;
+								}
 							}
+						} else {
+							$property               = $preset_metadata['css_var_infix'];
+							$single_preset_is_valid = self::is_safe_css_declaration( $property, $value );
 						}
-					} else {
-						$property               = $preset_metadata['css_var_infix'];
-						$single_preset_is_valid = self::is_safe_css_declaration( $property, $value );
-					}
-					if ( $single_preset_is_valid ) {
-						$escaped_preset[] = $single_preset;
+						if ( $single_preset_is_valid ) {
+							$escaped_preset[] = $single_preset;
+						}
 					}
 				}
-			}
-
-			if ( ! empty( $escaped_preset ) ) {
-				gutenberg_experimental_set( $output, $preset_metadata['path'], $escaped_preset );
+				if ( ! empty( $escaped_preset ) ) {
+					gutenberg_experimental_set( $output, array_merge( $preset_metadata['path'], array( $origin ) ), $escaped_preset );
+				}
 			}
 		}
 

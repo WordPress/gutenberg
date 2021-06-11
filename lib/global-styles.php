@@ -240,7 +240,7 @@ function gutenberg_global_styles_filter_post( $content ) {
 		$decoded_data['isGlobalStylesUserThemeJSON']
 	) {
 		unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
-		$theme_json = new WP_Theme_JSON_Gutenberg( $decoded_data );
+		$theme_json = new WP_Theme_JSON_Gutenberg( $decoded_data, 'user' );
 		$theme_json->remove_insecure_properties();
 		$data_to_encode                                = $theme_json->get_raw_data();
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
