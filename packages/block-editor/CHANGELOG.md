@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `ButtonBlockerAppender` is now `ButtonBlockAppender`, the original name was a typo, but is being still exported for backward compatibility.
+-   `ButtonBlockerAppender` is now `ButtonBlockAppender`, the original name was a typo, but is still being exported for backward compatibility.
 
 ## 6.1.0 (2021-05-20)
 
