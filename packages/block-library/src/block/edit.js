@@ -43,77 +43,77 @@ export default function ReusableBlockEdit({ attributes: { ref }, clientId }) {
 			};
 		},
 		[ref, clientId]
-		);
-		
-		const { __experimentalConvertBlockToStatic: convertBlockToStatic } = useDispatch(reusableBlocksStore);
-		
-		const [blocks, onInput, onChange] = useEntityBlockEditor('postType', 'wp_block', { id: ref });
-		const [title, setTitle] = useEntityProp('postType', 'wp_block', 'title', ref);
-		
-		const blockProps = useBlockProps();
-		
-		const innerBlocksProps = useInnerBlocksProps(
-			{},
-			{
-				value: blocks,
-				onInput,
-				onChange,
-				renderAppender: blocks?.length ? undefined : InnerBlocks.ButtonBlockAppender,
-			}
-			);
-			
-			// local states for gudie modal
-			const [isGudieOpen, setIsGudieOpen] = useState(false);
-			
-			const { saveEditedEntityRecord } = useDispatch(coreStore);
-			const { createNotice } = useDispatch(noticesStore);
-			
-			// save the unsaved records
-			const saveEditedRecords = () => {
-				saveEditedEntityRecord('postType', 'wp_block', ref);
-				showSnackbar();
-			};
-			
-			const showSnackbar = () => {
-				createNotice('success', __('Reusable block saved.'), {
-					type: 'snackbar',
-					isDismissible: true,
-					actions: [
-						{
-							label: __('Learn more'),
-							onClick: () => setIsGudieOpen(true),
-						},
-					],
-				});
-			};
-			
-			if (hasAlreadyRendered) {
-				return (
-					<div {...blockProps}>
+	);
+
+	const { __experimentalConvertBlockToStatic: convertBlockToStatic } = useDispatch(reusableBlocksStore);
+
+	const [blocks, onInput, onChange] = useEntityBlockEditor('postType', 'wp_block', { id: ref });
+	const [title, setTitle] = useEntityProp('postType', 'wp_block', 'title', ref);
+
+	const blockProps = useBlockProps();
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			value: blocks,
+			onInput,
+			onChange,
+			renderAppender: blocks?.length ? undefined : InnerBlocks.ButtonBlockAppender,
+		}
+	);
+
+	// local states for gudie modal
+	const [isGudieOpen, setIsGudieOpen] = useState(false);
+
+	const { saveEditedEntityRecord } = useDispatch(coreStore);
+	const { createNotice } = useDispatch(noticesStore);
+
+	// save the unsaved records
+	const saveEditedRecords = () => {
+		saveEditedEntityRecord('postType', 'wp_block', ref);
+		showSnackbar();
+	};
+
+	const showSnackbar = () => {
+		createNotice('success', __('Reusable block saved.'), {
+			type: 'snackbar',
+			isDismissible: true,
+			actions: [
+				{
+					label: __('Learn more'),
+					onClick: () => setIsGudieOpen(true),
+				},
+			],
+		});
+	};
+
+	if (hasAlreadyRendered) {
+		return (
+			<div {...blockProps}>
 				<Warning>{__('Block cannot be rendered inside itself.')}</Warning>
 			</div>
 		);
-		}
-		
-		if (isMissing) {
-			return (
-				<div {...blockProps}>
+	}
+
+	if (isMissing) {
+		return (
+			<div {...blockProps}>
 				<Warning>{__('Block has been deleted or is unavailable.')}</Warning>
 			</div>
 		);
-		}
-		
-		if (!hasResolved) {
-			return (
-				<div {...blockProps}>
+	}
+
+	if (!hasResolved) {
+		return (
+			<div {...blockProps}>
 				<Placeholder>
 					<Spinner />
 				</Placeholder>
 			</div>
 		);
-		}
-		
-		return (
+	}
+
+	return (
 		<RecursionProvider>
 			<div {...blockProps}>
 				<BlockControls>
@@ -123,7 +123,7 @@ export default function ReusableBlockEdit({ attributes: { ref }, clientId }) {
 							label={__('Convert to regular blocks')}
 							icon={ungroup}
 							showTooltip
-							/>
+						/>
 					</ToolbarGroup>
 					<ToolbarGroup>
 						<ToolbarButton
@@ -131,11 +131,11 @@ export default function ReusableBlockEdit({ attributes: { ref }, clientId }) {
 							style={{
 								margin: '7px',
 								height: '34px',
-								}}
-								onClick={saveEditedRecords}
-								label={__('Save Globally')}
-								showTooltip
-								isDisabled={!hasEdits}>
+							}}
+							onClick={saveEditedRecords}
+							label={__('Save Globally')}
+							showTooltip
+							isDisabled={!hasEdits}>
 							{__('Save')}
 						</ToolbarButton>
 					</ToolbarGroup>
@@ -149,7 +149,7 @@ export default function ReusableBlockEdit({ attributes: { ref }, clientId }) {
 					clientId={clientId}
 					wrapperProps={innerBlocksProps}
 					className='block-library-block__reusable-block-container'
-					/>
+				/>
 				{isGudieOpen && <ReusableBlockWelcomeGuide isGudieOpen={isGudieOpen} setIsGudieOpen={setIsGudieOpen} />}
 			</div>
 		</RecursionProvider>
