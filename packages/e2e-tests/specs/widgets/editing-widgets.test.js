@@ -123,13 +123,6 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 	}
 
-	async function getInlineInserterButton() {
-		return await find( {
-			role: 'combobox',
-			name: 'Add block',
-		} );
-	}
-
 	it( 'Should insert content using the global inserter', async () => {
 		const updateButton = await find( {
 			role: 'button',
@@ -274,7 +267,10 @@ describe( 'Widgets screen', () => {
 				10
 		);
 
-		let inlineInserterButton = await getInlineInserterButton();
+		let inlineInserterButton = await find( {
+			role: 'combobox',
+			name: 'Add block',
+		} );
 		await inlineInserterButton.click();
 
 		let inlineQuickInserter = await find( {
@@ -334,7 +330,13 @@ describe( 'Widgets screen', () => {
 			secondParagraphBlockBoundingBox.y - 10
 		);
 
-		inlineInserterButton = await getInlineInserterButton();
+		// There will be 2 matches here.
+		// One is the in-between inserter,
+		// and the other one is the button block appender.
+		[ inlineInserterButton ] = await findAll( {
+			role: 'combobox',
+			name: 'Add block',
+		} );
 		await inlineInserterButton.click();
 
 		// TODO: Convert to find() API from puppeteer-testing-library.

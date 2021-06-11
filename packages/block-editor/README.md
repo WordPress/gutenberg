@@ -253,11 +253,17 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-<a name="ButtonBlockerAppender" href="#ButtonBlockerAppender">#</a> **ButtonBlockerAppender**
+<a name="ButtonBlockAppender" href="#ButtonBlockAppender">#</a> **ButtonBlockAppender**
 
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md>
+
+<a name="ButtonBlockerAppender" href="#ButtonBlockerAppender">#</a> **ButtonBlockerAppender**
+
+> **Deprecated** 
+
+Use `ButtonBlockAppender` instead.
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
 
