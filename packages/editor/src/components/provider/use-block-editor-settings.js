@@ -33,10 +33,11 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
+		baseUrl,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser } = select( coreStore );
+		const { canUser, getUnstableBase } = select( coreStore );
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -51,6 +52,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				canUser( 'create', 'media' ),
 				true
 			),
+			baseUrl: getUnstableBase()?.url,
 		};
 	}, [] );
 
@@ -106,6 +108,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
+			__experimentalBaseUrl: baseUrl,
 		} ),
 		[
 			settings,
