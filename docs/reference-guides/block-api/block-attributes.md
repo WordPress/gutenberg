@@ -167,6 +167,21 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 // }
 ```
 
+## Unique Attributes
+
+The `unique` key is used to mark block attributes that should not be copied when a block is duplicated. By default all attribute values will be cloned to the duplicate block. If an attribute sets the `unique` key to `true`, its value will not be copied, and it will instead fall back to the default value if one is supplied.
+
+_Example_: A `resourceId` attribute is marked as `unique` so that it will not be copied to duplicate blocks.
+
+```js
+{
+	resourceId: {
+		type: 'string',
+		unique: true
+	}
+}
+```
+
 ## Meta (deprecated)
 
 <div class="callout callout-alert">
