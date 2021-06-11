@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Update markdownlint package to 0.23.1
+- Update markdownlint-cli package to 0.27.1
+- Add .markdownlintignore config and reference from lint-md-docs script
+
 ## 16.1.0 (2021-05-20)
 
 ### Bug Fix
