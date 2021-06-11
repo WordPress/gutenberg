@@ -33,11 +33,10 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
-		baseUrl,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser, getUnstableBase } = select( coreStore );
+		const { canUser } = select( coreStore );
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -52,7 +51,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				canUser( 'create', 'media' ),
 				true
 			),
-			baseUrl: getUnstableBase()?.url,
 		};
 	}, [] );
 
@@ -69,6 +67,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
+				'__experimentalBaseUrl',
 				'alignWide',
 				'allowedBlockTypes',
 				'bodyPlaceholder',
@@ -108,7 +107,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
-			__experimentalBaseUrl: baseUrl,
 		} ),
 		[
 			settings,
