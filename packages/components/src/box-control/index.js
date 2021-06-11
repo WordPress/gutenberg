@@ -17,6 +17,7 @@ import Button from '../button';
 import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
+import VerticalHorizontalInputControls from './vertical-horizontal-input-controls';
 import BoxControlIcon from './icon';
 import { Text } from '../text';
 import LinkedButton from './linked-button';
@@ -29,6 +30,7 @@ import {
 import {
 	DEFAULT_VALUES,
 	DEFAULT_VISUALIZER_VALUES,
+	getInitialSide,
 	isValuesMixed,
 	isValuesDefined,
 } from './utils';
@@ -52,6 +54,7 @@ export default function BoxControl( {
 	values: valuesProp,
 	units,
 	sides,
+	groupedDirections = true,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
 } ) {
@@ -67,14 +70,14 @@ export default function BoxControl( {
 		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
 	);
 
-	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
+	const [ side, setSide ] = useState( getInitialSide( isLinked, groupedDirections) );
 
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
 
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
-		setSide( ! isLinked ? 'all' : 'top' );
+		setSide( getInitialSide( ! isLinked, groupedDirections ) );
 	};
 
 	const handleOnFocus = ( event, { side: nextSide } ) => {
@@ -150,6 +153,9 @@ export default function BoxControl( {
 						/>
 					</FlexBlock>
 				) }
+				{ ! isLinked && groupedDirections && (
+					<VerticalHorizontalInputControls { ...inputControlProps } />
+				) }
 				{ ! hasOneSide && (
 					<FlexItem>
 						<LinkedButton
@@ -159,7 +165,9 @@ export default function BoxControl( {
 					</FlexItem>
 				) }
 			</HeaderControlWrapper>
-			{ ! isLinked && <InputControls { ...inputControlProps } /> }
+			{ ! isLinked && ! groupedDirections && (
+				<InputControls { ...inputControlProps } />
+			) }
 		</Root>
 	);
 }

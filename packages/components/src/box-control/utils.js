@@ -20,6 +20,8 @@ export const LABELS = {
 	left: __( 'Left' ),
 	right: __( 'Right' ),
 	mixed: __( 'Mixed' ),
+	vertical: __( 'Vertical' ),
+	horizontal: __( 'Horizontal' ),
 };
 
 export const DEFAULT_VALUES = {
@@ -118,4 +120,22 @@ export function isValuesDefined( values ) {
 			)
 		)
 	);
+}
+
+/**
+ * Get initial selected side, factoring in whether the sides are linked,
+ * and whether or not the vertical / horizontal directions are grouped.
+ *
+ * @param {boolean} isLinked
+ * @param {boolean} isGroupedDirections
+ * @return {string} The initial side.
+ */
+export function getInitialSide( isLinked, isGroupedDirections ) {
+	let initialSide = 'all';
+
+	if ( ! isLinked ) {
+		initialSide = isGroupedDirections ? 'vertical' : 'top';
+	}
+
+	return initialSide;
 }

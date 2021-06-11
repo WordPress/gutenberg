@@ -29,10 +29,10 @@ export default function BoxControlIcon( {
 		return side === 'all' || side === value;
 	};
 
-	const top = getSide( 'top' );
-	const right = getSide( 'right' );
-	const bottom = getSide( 'bottom' );
-	const left = getSide( 'left' );
+	const top = getSide( 'top' ) || getSide( 'vertical' );
+	const right = getSide( 'right' ) || getSide( 'horizontal' );
+	const bottom = getSide( 'bottom' ) || getSide( 'vertical' );
+	const left = getSide( 'left' ) || getSide( 'horizontal' );
 
 	// Simulates SVG Icon scaling
 	const scale = size / BASE_ICON_SIZE;
