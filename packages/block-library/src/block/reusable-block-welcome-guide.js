@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Guide, ExternalLink } from '@wordpress/components';
+import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 function ReusableBlockWelcomeGuide( { isGudieOpen, setIsGudieOpen } ) {
@@ -13,7 +13,7 @@ function ReusableBlockWelcomeGuide( { isGudieOpen, setIsGudieOpen } ) {
 		<Guide
 			className="edit-reusable-block-welcome-guide"
 			contentLabel={ __( 'Get familiar with Reusable blocks' ) }
-			finishButtonText={ __( 'Get started' ) }
+			finishButtonText={ __( 'Got it' ) }
 			onFinish={ () => setIsGudieOpen( false ) }
 			pages={ [
 				{
@@ -29,13 +29,6 @@ function ReusableBlockWelcomeGuide( { isGudieOpen, setIsGudieOpen } ) {
 								{ __(
 									'You just saved a Reusable block. Any other documents that include this block have been updated to reflect this change. '
 								) }
-								<ExternalLink
-									href={ __(
-										'https://wordpress.com/support/wordpress-editor/blocks/reusable-block/'
-									) }
-								>
-									{ __( 'Learn More.' ) }
-								</ExternalLink>
 							</p>
 						</>
 					),
