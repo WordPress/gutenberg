@@ -748,7 +748,6 @@ describe( 'Widgets screen', () => {
 		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
 		</div></div>",
-		  "wp_inactive_widgets": "",
 		}
 	` );
 	} );
