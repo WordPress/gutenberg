@@ -39,12 +39,19 @@ function useRemoteUrlData( url ) {
 		isFetching: false,
 	} );
 
-	const { fetchRemoteUrlData } = useSelect( ( select ) => {
+	const { fetchRemoteUrlData, baseUrl } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
+			baseUrl: getSettings().__experimentalBaseUrl,
 			fetchRemoteUrlData: getSettings().__experimentalFetchRemoteUrlData,
 		};
 	}, [] );
+
+	// We only want to fetch info for remote (external) URLS.
+	// URL is considered internal if:
+	// 1. We haven't got a base URL (yet).
+	// 2. The URL is being requested includes the base URL.
+	const isInternal = !! ( baseUrl && url?.includes( baseUrl ) );
 
 	useEffect( () => {
 		// Only make the request if we have an actual URL
@@ -52,6 +59,7 @@ function useRemoteUrlData( url ) {
 		// there may not be such a util.
 		if (
 			url?.length &&
+			! isInternal &&
 			fetchRemoteUrlData &&
 			typeof AbortController !== 'undefined'
 		) {
