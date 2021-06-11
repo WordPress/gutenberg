@@ -1775,7 +1775,6 @@ describe( 'Rich link previews', () => {
 
 		expect( mockFetchRemoteUrlData ).not.toHaveBeenCalled();
 		expect( isRichLinkPreview ).toBe( false );
-		expect( linkPreview ).toMatchSnapshot();
 	} );
 
 	it( 'should display a rich preview when data is available', async () => {
@@ -1809,7 +1808,6 @@ describe( 'Rich link previews', () => {
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
 
 		expect( isRichLinkPreview ).toBe( true );
-		expect( linkPreview ).toMatchSnapshot();
 	} );
 
 	it( 'should display a fallback when title is missing from rich data', async () => {
