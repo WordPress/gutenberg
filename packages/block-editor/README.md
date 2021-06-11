@@ -127,7 +127,7 @@ _Related_
 
 _Parameters_
 
--   _props_ `BlockContextProviderProps`:
+-   _props_ `BlockContextProviderProps`: 
 
 <a name="BlockControls" href="#BlockControls">#</a> **BlockControls**
 
@@ -222,7 +222,7 @@ _Usage_
 
 _Parameters_
 
--   _props_ `Object`:
+-   _props_ `Object`: 
 -   _props.clientId_ `string`: Client ID of block.
 
 _Returns_
@@ -258,6 +258,12 @@ Undocumented declaration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md>
+
+<a name="ButtonBlockerAppender" href="#ButtonBlockerAppender">#</a> **ButtonBlockerAppender**
+
+> **Deprecated** 
+
+Use `ButtonBlockAppender` instead.
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
 
@@ -475,7 +481,7 @@ _Related_
 
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
 
-> **Deprecated**
+> **Deprecated** 
 
 Scrolls the multi block selection end into view if not in view already. This
 is important to do after selection by keyboard.
@@ -653,7 +659,7 @@ _Parameters_
 
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Options for internal use only.
--   _options.\_\_unstableIsHtml_ `boolean`:
+-   _options.\_\_unstableIsHtml_ `boolean`: 
 
 _Returns_
 

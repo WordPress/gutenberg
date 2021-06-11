@@ -36,7 +36,7 @@ export {
 export { default as __experimentalBorderStyleControl } from './border-style-control';
 export {
 	// This is a typo, but kept here for back-compat.
-	default as ButtonBlockerAppender,
+	ButtonBlockerAppender,
 	default as ButtonBlockAppender,
 } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
