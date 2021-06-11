@@ -1219,45 +1219,40 @@ class WP_Theme_JSON_Gutenberg {
 	private static function remove_insecure_settings( $input ) {
 		$output = array();
 		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-			$preset_by_origin = _wp_array_get( $input, $preset_metadata['path'], null );
-			if ( null === $preset_by_origin ) {
+			$current_preset = _wp_array_get( $input, $preset_metadata['path'], null );
+			if ( null === $current_preset ) {
 				continue;
 			}
 
-			foreach ( self::VALID_ORIGINS as $origin ) {
-				if ( ! isset( $preset_by_origin[ $origin ] ) ) {
-					continue;
-				}
-
-				$escaped_preset = array();
-				foreach ( $preset_by_origin[ $origin ] as $single_preset ) {
-					if (
-						esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
-						sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
-					) {
-						$value                  = $single_preset[ $preset_metadata['value_key'] ];
-						$single_preset_is_valid = null;
-						if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
-							$single_preset_is_valid = true;
-							foreach ( $preset_metadata['classes'] as $class_meta_data ) {
-								$property = $class_meta_data['property_name'];
-								if ( ! self::is_safe_css_declaration( $property, $value ) ) {
-									$single_preset_is_valid = false;
-									break;
-								}
+			$escaped_preset = array();
+			foreach ( $current_preset as $single_preset ) {
+				if (
+					esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
+					sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
+				) {
+					$value                  = $single_preset[ $preset_metadata['value_key'] ];
+					$single_preset_is_valid = null;
+					if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
+						$single_preset_is_valid = true;
+						foreach ( $preset_metadata['classes'] as $class_meta_data ) {
+							$property = $class_meta_data['property_name'];
+							if ( ! self::is_safe_css_declaration( $property, $value ) ) {
+								$single_preset_is_valid = false;
+								break;
 							}
-						} else {
-							$property               = $preset_metadata['css_var_infix'];
-							$single_preset_is_valid = self::is_safe_css_declaration( $property, $value );
 						}
-						if ( $single_preset_is_valid ) {
-							$escaped_preset[] = $single_preset;
-						}
+					} else {
+						$property               = $preset_metadata['css_var_infix'];
+						$single_preset_is_valid = self::is_safe_css_declaration( $property, $value );
+					}
+					if ( $single_preset_is_valid ) {
+						$escaped_preset[] = $single_preset;
 					}
 				}
-				if ( ! empty( $escaped_preset ) ) {
-					gutenberg_experimental_set( $output, array_merge( $preset_metadata['path'], array( $origin ) ), $escaped_preset );
-				}
+			}
+
+			if ( ! empty( $escaped_preset ) ) {
+				gutenberg_experimental_set( $output, $preset_metadata['path'], $escaped_preset );
 			}
 		}
 
@@ -1305,14 +1300,26 @@ class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Removes insecure data from theme.json.
+	 *
+	 * @param array $theme_json Structure to sanitize.
+	 *
+	 * @return array Sanitized structure.
 	 */
-	public function remove_insecure_properties() {
+	public static function remove_insecure_properties( $theme_json ) {
 		$sanitized = array();
 
+		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
+		}
+
+		$valid_block_names   = array_keys( self::get_blocks_metadata() );
+		$valid_element_names = array_keys( self::ELEMENTS );
+		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+
 		$blocks_metadata = self::get_blocks_metadata();
-		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
+		$style_nodes     = self::get_style_nodes( $theme_json, $blocks_metadata );
 		foreach ( $style_nodes as $metadata ) {
-			$input = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
 			if ( empty( $input ) ) {
 				continue;
 			}
@@ -1323,9 +1330,9 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		$setting_nodes = self::get_setting_nodes( $this->theme_json );
+		$setting_nodes = self::get_setting_nodes( $theme_json );
 		foreach ( $setting_nodes as $metadata ) {
-			$input = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
 			if ( empty( $input ) ) {
 				continue;
 			}
@@ -1337,17 +1344,18 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		if ( empty( $sanitized['styles'] ) ) {
-			unset( $this->theme_json['styles'] );
+			unset( $theme_json['styles'] );
 		} else {
-			$this->theme_json['styles'] = $sanitized['styles'];
+			$theme_json['styles'] = $sanitized['styles'];
 		}
 
 		if ( empty( $sanitized['settings'] ) ) {
-			unset( $this->theme_json['settings'] );
+			unset( $theme_json['settings'] );
 		} else {
-			$this->theme_json['settings'] = $sanitized['settings'];
+			$theme_json['settings'] = $sanitized['settings'];
 		}
 
+		return $theme_json;
 	}
 
 	/**
