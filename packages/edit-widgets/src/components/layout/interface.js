@@ -7,7 +7,10 @@ import {
 	useViewportMatch,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
-import { __experimentalLibrary as Library } from '@wordpress/block-editor';
+import {
+	__experimentalLibrary as Library,
+	BlockBreadcrumb,
+} from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -32,6 +35,8 @@ const interfaceLabels = {
 	body: __( 'Widgets and blocks' ),
 	/* translators: accessibility text for the widgets screen settings landmark region. */
 	sidebar: __( 'Widgets settings' ),
+	/* translators: accessibility text for the widgets screen footer landmark region. */
+	footer: __( 'Widgets footer' ),
 };
 
 function Interface( { blockEditorSettings } ) {
@@ -106,6 +111,13 @@ function Interface( { blockEditorSettings } ) {
 				<WidgetAreasBlockEditorContent
 					blockEditorSettings={ blockEditorSettings }
 				/>
+			}
+			footer={
+				! isMobileViewport && (
+					<div className="edit-widgets-layout__footer">
+						<BlockBreadcrumb rootLabelText={ __( 'Widgets' ) } />
+					</div>
+				)
 			}
 		/>
 	);

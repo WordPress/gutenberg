@@ -13,7 +13,7 @@ import { plusCircle } from '@wordpress/icons';
  * Internal dependencies
  */
 import ButtonWithForwardedRef, { Button } from '../';
-import { VisuallyHidden } from '../../visually-hidden';
+import VisuallyHidden from '../../visually-hidden';
 
 describe( 'Button', () => {
 	describe( 'basic rendering', () => {
@@ -30,19 +30,41 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should render a button element with is-primary class', () => {
-			const button = shallow( <Button isPrimary /> ).find( 'button' );
+			const button = shallow( <Button variant="primary" /> ).find(
+				'button'
+			);
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-primary' ) ).toBe( true );
 		} );
 
-		it( 'should render a button element with is-small class', () => {
-			const button = shallow( <Button isSecondary isSmall /> ).find(
-				'button'
-			);
+		it( 'should render a button element with is-secondary and is-small class', () => {
+			const button = shallow(
+				<Button variant="secondary" isSmall />
+			).find( 'button' );
 			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-small' ) ).toBe( true );
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+		} );
+
+		it( 'should render a button element with is-tertiary class', () => {
+			const button = shallow( <Button variant="tertiary" /> ).find(
+				'button'
+			);
+			expect( button.hasClass( 'is-large' ) ).toBe( false );
+			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( false );
+			expect( button.hasClass( 'is-tertiary' ) ).toBe( true );
+		} );
+
+		it( 'should render a button element with is-link class', () => {
+			const button = shallow( <Button variant="link" /> ).find(
+				'button'
+			);
+			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( false );
+			expect( button.hasClass( 'is-tertiary' ) ).toBe( false );
+			expect( button.hasClass( 'is-link' ) ).toBe( true );
 		} );
 
 		it( 'should render a button element with is-pressed without button class', () => {
@@ -228,6 +250,35 @@ describe( 'Button', () => {
 				<ButtonWithForwardedRef ref={ ref } />
 			);
 			expect( ref.current.type ).toBe( 'button' );
+		} );
+	} );
+
+	describe( 'deprecated props', () => {
+		it( 'should not break when the legacy isPrimary prop is passed', () => {
+			const button = shallow( <Button isPrimary /> ).find( 'button' );
+			expect( button.hasClass( 'is-primary' ) ).toBe( true );
+		} );
+
+		it( 'should not break when the legacy isSecondary prop is passed', () => {
+			const button = shallow( <Button isSecondary /> ).find( 'button' );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
+		} );
+
+		it( 'should not break when the legacy isTertiary prop is passed', () => {
+			const button = shallow( <Button isTertiary /> ).find( 'button' );
+			expect( button.hasClass( 'is-tertiary' ) ).toBe( true );
+		} );
+
+		it( 'should not break when the legacy isLink prop is passed', () => {
+			const button = shallow( <Button isLink /> ).find( 'button' );
+			expect( button.hasClass( 'is-link' ) ).toBe( true );
+		} );
+
+		it( 'should warn when the isDefault prop is passed', () => {
+			const button = shallow( <Button isDefault /> ).find( 'button' );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
+
+			expect( console ).toHaveWarned();
 		} );
 	} );
 } );

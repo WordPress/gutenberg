@@ -20,7 +20,7 @@ import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
  * Internal dependencies
  */
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
@@ -30,18 +30,29 @@ export default function WidgetAreasBlockEditorProvider( {
 	children,
 	...props
 } ) {
-	const { hasUploadPermissions, reusableBlocks } = useSelect(
+	const {
+		hasUploadPermissions,
+		reusableBlocks,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
+	} = useSelect(
 		( select ) => ( {
 			hasUploadPermissions: defaultTo(
-				select( 'core' ).canUser( 'create', 'media' ),
+				select( coreStore ).canUser( 'create', 'media' ),
 				true
 			),
 			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
 			widgets: select( editWidgetsStore ).getWidgets(),
-			reusableBlocks: select( 'core' ).getEntityRecords(
+			reusableBlocks: select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_block'
 			),
+			isFixedToolbarActive: select(
+				editWidgetsStore
+			).__unstableIsFeatureActive( 'fixedToolbar' ),
+			keepCaretInsideBlock: select(
+				editWidgetsStore
+			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
 		} ),
 		[]
 	);
@@ -61,12 +72,16 @@ export default function WidgetAreasBlockEditorProvider( {
 		return {
 			...blockEditorSettings,
 			__experimentalReusableBlocks: reusableBlocks,
+			hasFixedToolbar: isFixedToolbarActive,
+			keepCaretInsideBlock,
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		};
 	}, [
 		blockEditorSettings,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
 		hasUploadPermissions,
 		reusableBlocks,
 		setIsInserterOpened,

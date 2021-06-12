@@ -16,8 +16,8 @@ import { Flex } from '../../flex';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').CardHeaderProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<import('./types').CardHeaderProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                                 forwardedRef
  */
 function CardHeader( props, forwardedRef ) {
 	const { className, size = 'medium', ...otherProps } = useContextSystem(

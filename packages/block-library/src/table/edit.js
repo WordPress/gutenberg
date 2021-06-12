@@ -12,7 +12,7 @@ import {
 	BlockControls,
 	RichText,
 	BlockIcon,
-	AlignmentToolbar,
+	AlignmentControl,
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
@@ -20,13 +20,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	DropdownMenu,
 	PanelBody,
 	Placeholder,
 	TextControl,
 	ToggleControl,
-	ToolbarGroup,
-	ToolbarItem,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -429,29 +427,26 @@ function TableEdit( {
 	return (
 		<figure { ...useBlockProps() }>
 			{ ! isEmpty && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<DropdownMenu
-									hasArrowIndicator
-									icon={ table }
-									toggleProps={ toggleProps }
-									label={ __( 'Edit table' ) }
-									controls={ tableControls }
-								/>
-							) }
-						</ToolbarItem>
-					</ToolbarGroup>
-					<AlignmentToolbar
-						label={ __( 'Change column alignment' ) }
-						alignmentControls={ ALIGNMENT_CONTROLS }
-						value={ getCellAlignment() }
-						onChange={ ( nextAlign ) =>
-							onChangeColumnAlignment( nextAlign )
-						}
-					/>
-				</BlockControls>
+				<>
+					<BlockControls group="block">
+						<AlignmentControl
+							label={ __( 'Change column alignment' ) }
+							alignmentControls={ ALIGNMENT_CONTROLS }
+							value={ getCellAlignment() }
+							onChange={ ( nextAlign ) =>
+								onChangeColumnAlignment( nextAlign )
+							}
+						/>
+					</BlockControls>
+					<BlockControls group="other">
+						<ToolbarDropdownMenu
+							hasArrowIndicator
+							icon={ table }
+							label={ __( 'Edit table' ) }
+							controls={ tableControls }
+						/>
+					</BlockControls>
+				</>
 			) }
 			{ ! isEmpty && (
 				<InspectorControls>
@@ -533,7 +528,7 @@ function TableEdit( {
 						/>
 						<Button
 							className="blocks-table__placeholder-button"
-							isPrimary
+							variant="primary"
 							type="submit"
 						>
 							{ __( 'Create Table' ) }

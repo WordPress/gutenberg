@@ -14,7 +14,6 @@ import {
 	BlockTools,
 	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableEditorStyles as EditorStyles,
@@ -30,6 +29,12 @@ import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
+
+const LAYOUT = {
+	type: 'default',
+	// At the root level of the site editor, no alignments should be allowed.
+	alignments: [],
+};
 
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page, deviceType } = useSelect(
@@ -57,11 +62,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
 	const ref = useMouseMoveTypingReset();
 	const contentRef = useRef();
-	const mergedRefs = useMergeRefs( [
-		contentRef,
-		useBlockSelectionClearer(),
-		useTypingObserver(),
-	] );
+	const mergedRefs = useMergeRefs( [ contentRef, useTypingObserver() ] );
 
 	return (
 		<BlockEditorProvider
@@ -92,7 +93,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<BlockTools __unstableContentRef={ contentRef }>
 					<Iframe
 						style={ resizedCanvasStyles }
-						headHTML={ window.__editorStyles.html }
 						head={ <EditorStyles styles={ settings.styles } /> }
 						ref={ ref }
 						contentRef={ mergedRefs }
@@ -100,11 +100,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						<WritingFlow>
 							<BlockList
 								className="edit-site-block-editor__block-list"
-								__experimentalLayout={ {
-									type: 'default',
-									// At the root level of the site editor, no alignments should be allowed.
-									alignments: [],
-								} }
+								__experimentalLayout={ LAYOUT }
 							/>
 						</WritingFlow>
 					</Iframe>

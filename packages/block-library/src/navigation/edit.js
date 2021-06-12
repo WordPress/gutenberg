@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -25,9 +25,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
+import ResponsiveWrapper from './responsive-wrapper';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -59,6 +59,9 @@ function Navigation( {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
+	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
+		false
+	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
@@ -66,12 +69,15 @@ function Navigation( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
+			'is-responsive': attributes.isResponsive,
 		} ),
 	} );
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
+
+	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
@@ -93,7 +99,7 @@ function Navigation( {
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
 			__experimentalLayout: LAYOUT,
-			placeholder: <PlaceholderPreview />,
+			placeholder,
 		}
 	);
 
@@ -149,11 +155,27 @@ function Navigation( {
 							} }
 							label={ __( 'Show submenu indicator icons' ) }
 						/>
+						<ToggleControl
+							checked={ attributes.isResponsive }
+							onChange={ ( value ) => {
+								setAttributes( {
+									isResponsive: value,
+								} );
+							} }
+							label={ __( 'Enable responsive menu' ) }
+						/>
 					</PanelBody>
 				) }
 			</InspectorControls>
 			<nav { ...blockProps }>
-				<ul { ...innerBlocksProps } />
+				<ResponsiveWrapper
+					id={ clientId }
+					onToggle={ setResponsiveMenuVisibility }
+					isOpen={ isResponsiveMenuOpen }
+					isResponsive={ attributes.isResponsive }
+				>
+					<ul { ...innerBlocksProps }></ul>
+				</ResponsiveWrapper>
 			</nav>
 		</>
 	);
@@ -175,10 +197,15 @@ export default compose( [
 		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
 			selectedBlockId,
 		] )?.length;
+
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
+
+			// This prop is already available but computing it here ensures it's
+			// fresh compared to isImmediateParentOfSelectedBlock
+			isSelected: selectedBlockId === clientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {

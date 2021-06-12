@@ -38,14 +38,23 @@ export default function ColorPalettePanel( {
 		( select ) => {
 			const baseStyles = select( editSiteStore ).getSettings()
 				.__experimentalGlobalStylesBaseStyles;
+			const contextualBasePalette = get( baseStyles, [
+				'settings',
+				'blocks',
+				contextName,
+				'color',
+				'palette',
+			] );
+			const globalPalette = get( baseStyles, [
+				'settings',
+				'color',
+				'palette',
+			] );
 			const basePalette =
-				get( baseStyles, [
-					'settings',
-					'blocks',
-					contextName,
-					'color',
-					'palette',
-				] ) ?? get( baseStyles, [ 'settings', 'color', 'palette' ] );
+				contextualBasePalette?.theme ??
+				contextualBasePalette?.core ??
+				globalPalette?.theme ??
+				globalPalette?.core;
 			if ( ! basePalette ) {
 				return EMPTY_ARRAY;
 			}

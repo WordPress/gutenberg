@@ -140,7 +140,7 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 			$new['styles'] = self::process_styles( $old['styles'] );
 		}
 
-		$new['version'] = WP_Theme_JSON::LATEST_SCHEMA;
+		$new['version'] = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
 
 		return $new;
 	}

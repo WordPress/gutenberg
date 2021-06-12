@@ -20,6 +20,11 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { useIsEditablePostBlock } from '../utils/hooks';
+
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const placeholderChip = (
 	<div className="post-featured-image_placeholder">
@@ -29,12 +34,14 @@ const placeholderChip = (
 );
 
 function PostFeaturedImageDisplay( {
+	clientId,
 	attributes: { isLink },
 	setAttributes,
 	context: { postId, postType },
 	noticeUI,
 	noticeOperations,
 } ) {
+	const isEditable = useIsEditablePostBlock( clientId );
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postType,
@@ -46,6 +53,7 @@ function PostFeaturedImageDisplay( {
 			featuredImage && select( coreStore ).getMedia( featuredImage ),
 		[ featuredImage ]
 	);
+	const blockProps = useBlockProps();
 	const onSelectImage = ( value ) => {
 		if ( value?.id ) {
 			setFeaturedImage( value.id );
@@ -56,6 +64,9 @@ function PostFeaturedImageDisplay( {
 		noticeOperations.createErrorNotice( message );
 	}
 	let image;
+	if ( ! featuredImage && ! isEditable ) {
+		return <div { ...blockProps }>{ placeholderChip }</div>;
+	}
 	if ( ! featuredImage ) {
 		image = (
 			<MediaPlaceholder
@@ -100,8 +111,8 @@ function PostFeaturedImageDisplay( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls group="other">
-				{ !! media && (
+			{ !! media && isEditable && (
+				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ featuredImage }
 						mediaURL={ media.source_url }
@@ -110,23 +121,19 @@ function PostFeaturedImageDisplay( {
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
 					/>
-				) }
-			</BlockControls>
-			<figure { ...useBlockProps() }>{ image }</figure>
+				</BlockControls>
+			) }
+			<figure { ...blockProps }>{ image }</figure>
 		</>
 	);
 }
 
 const PostFeaturedImageWithNotices = withNotices( PostFeaturedImageDisplay );
 
-const OutofContextPlaceholder = () => {
-	const blockProps = useBlockProps();
-	return <div { ...blockProps }>{ placeholderChip }</div>;
-};
-
 export default function PostFeaturedImageEdit( props ) {
+	const blockProps = useBlockProps();
 	if ( ! props.context?.postId ) {
-		return <OutofContextPlaceholder />;
+		return <div { ...blockProps }>{ placeholderChip }</div>;
 	}
 	return <PostFeaturedImageWithNotices { ...props } />;
 }

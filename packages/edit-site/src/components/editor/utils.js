@@ -15,10 +15,10 @@ import { store as editSiteStore } from '../../store';
 export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
 export const ROOT_BLOCK_SUPPORTS = [
-	'--wp--style--color--link',
 	'background',
 	'backgroundColor',
 	'color',
+	'linkColor',
 	'fontFamily',
 	'fontSize',
 	'fontStyle',
@@ -27,15 +27,6 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'textDecoration',
 	'textTransform',
 ];
-export const ELEMENTS = {
-	link: 'a',
-	h1: 'h1',
-	h2: 'h2',
-	h3: 'h3',
-	h4: 'h4',
-	h5: 'h5',
-	h6: 'h6',
-};
 
 export const PRESET_METADATA = [
 	{
@@ -81,7 +72,6 @@ export const PRESET_METADATA = [
 
 const STYLE_PROPERTIES_TO_CSS_VAR_INFIX = {
 	backgroundColor: 'color',
-	LINK_COLOR: 'color',
 	background: 'gradient',
 };
 
@@ -100,8 +90,12 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 	return getPresetMetadataFromStyleProperty.MAP[ styleProperty ];
 }
 
-export const LINK_COLOR = '--wp--style--color--link';
-export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;
+const PATHS_WITH_MERGE = {
+	'color.gradients': true,
+	'color.palette': true,
+	'typography.fontFamilies': true,
+	'typography.fontSizes': true,
+};
 
 export function useSetting( path, blockName = '' ) {
 	const settings = useSelect( ( select ) => {
@@ -109,7 +103,11 @@ export function useSetting( path, blockName = '' ) {
 	} );
 	const topLevelPath = `__experimentalFeatures.${ path }`;
 	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
-	return get( settings, blockPath ) ?? get( settings, topLevelPath );
+	const result = get( settings, blockPath ) ?? get( settings, topLevelPath );
+	if ( PATHS_WITH_MERGE[ path ] ) {
+		return result.user ?? result.theme ?? result.core;
+	}
+	return result;
 }
 
 export function getPresetVariable( styles, context, propertyName, value ) {

@@ -64,6 +64,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import im.shimo.react.prompt.RNPromptPackage;
 import okhttp3.OkHttpClient;
 
 
@@ -84,6 +85,7 @@ public class WPAndroidGlueCode {
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachMediaUploadQueryListener mOnReattachMediaUploadQueryListener;
     private OnReattachMediaSavingQueryListener mOnReattachMediaSavingQueryListener;
+    private OnSetFeaturedImageListener mOnSetFeaturedImageListener;
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
@@ -169,6 +171,10 @@ public class WPAndroidGlueCode {
 
     public interface OnReattachMediaSavingQueryListener {
         void onQueryCurrentProgressForSavingMedia();
+    }
+
+    public interface OnSetFeaturedImageListener {
+        void onSetFeaturedImageButtonClicked(int mediaId);
     }
 
     public interface OnEditorMountListener {
@@ -317,6 +323,11 @@ public class WPAndroidGlueCode {
             }
 
             @Override
+            public void setFeaturedImage(int mediaId) {
+                mOnSetFeaturedImageListener.onSetFeaturedImageButtonClicked(mediaId);
+            }
+
+            @Override
             public void editorDidMount(ReadableArray unsupportedBlockNames) {
                 mOnEditorMountListener.onEditorDidMount(unsupportedBlockNames.toArrayList());
                 mDeferredEventEmitter.setEmitter(mRnReactNativeGutenbergBridgePackage
@@ -388,8 +399,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<Bundle> onError) {
-                mRequestExecutor.performRequest(pathFromJS, onSuccess, onError);
+            public void performRequest(String pathFromJS, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {
+                mRequestExecutor.performRequest(pathFromJS, enableCaching, onSuccess, onError);
             }
 
             @Override
@@ -488,6 +499,7 @@ public class WPAndroidGlueCode {
                 new SafeAreaContextPackage(),
                 new RNCMaskedViewPackage(),
                 new ReanimatedPackage(),
+                new RNPromptPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
@@ -537,6 +549,7 @@ public class WPAndroidGlueCode {
                                   OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                                   OnReattachMediaUploadQueryListener onReattachMediaUploadQueryListener,
                                   OnReattachMediaSavingQueryListener onReattachMediaSavingQueryListener,
+                                  OnSetFeaturedImageListener onSetFeaturedImageListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
@@ -555,6 +568,7 @@ public class WPAndroidGlueCode {
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
         mOnReattachMediaUploadQueryListener = onReattachMediaUploadQueryListener;
         mOnReattachMediaSavingQueryListener = onReattachMediaSavingQueryListener;
+        mOnSetFeaturedImageListener = onSetFeaturedImageListener;
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;

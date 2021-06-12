@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { addEntities } from './actions';
+import { CORE_STORE_NAME as coreStoreName } from './utils/constants';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -135,7 +136,7 @@ export const kinds = [
  * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
  *
  * @param {Object} persistedRecord Already persisted Post
- * @param {Object} edits Edits.
+ * @param {Object} edits           Edits.
  * @return {Object} Updated edits.
  */
 export const prePersistPostType = ( persistedRecord, edits ) => {
@@ -242,12 +243,16 @@ export const getMethodName = (
 /**
  * Loads the kind entities into the store.
  *
- * @param {string} kind  Kind
+ * @param {string} kind Kind
  *
  * @return {Array} Entities
  */
 export function* getKindEntities( kind ) {
-	let entities = yield controls.select( 'core', 'getEntitiesByKind', kind );
+	let entities = yield controls.select(
+		coreStoreName,
+		'getEntitiesByKind',
+		kind
+	);
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}

@@ -6,7 +6,7 @@ import { select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-
+import { store as richTextStore } from './store';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
 import { mergePair } from './concat';
@@ -56,7 +56,7 @@ function toFormat( { type, attributes } ) {
 	let formatType;
 
 	if ( attributes && attributes.class ) {
-		formatType = select( 'core/rich-text' ).getFormatTypeForClassName(
+		formatType = select( richTextStore ).getFormatTypeForClassName(
 			attributes.class
 		);
 
@@ -73,7 +73,7 @@ function toFormat( { type, attributes } ) {
 	}
 
 	if ( ! formatType ) {
-		formatType = select( 'core/rich-text' ).getFormatTypeForBareElement(
+		formatType = select( richTextStore ).getFormatTypeForBareElement(
 			type
 		);
 	}
@@ -141,17 +141,17 @@ function toFormat( { type, attributes } ) {
  * `start` and `end` state which text indices are selected. They are only
  * provided if a `Range` was given.
  *
- * @param {Object}  [$1]                      Optional named arguments.
- * @param {Element} [$1.element]              Element to create value from.
- * @param {string}  [$1.text]                 Text to create value from.
- * @param {string}  [$1.html]                 HTML to create value from.
- * @param {Range}   [$1.range]                Range to create value from.
- * @param {string}  [$1.multilineTag]         Multiline tag if the structure is
- *                                            multiline.
- * @param {Array}   [$1.multilineWrapperTags] Tags where lines can be found if
- *                                            nesting is possible.
- * @param {boolean} [$1.preserveWhiteSpace]   Whether or not to collapse white
- *                                            space characters.
+ * @param {Object}  [$1]                          Optional named arguments.
+ * @param {Element} [$1.element]                  Element to create value from.
+ * @param {string}  [$1.text]                     Text to create value from.
+ * @param {string}  [$1.html]                     HTML to create value from.
+ * @param {Range}   [$1.range]                    Range to create value from.
+ * @param {string}  [$1.multilineTag]             Multiline tag if the structure is
+ *                                                multiline.
+ * @param {Array}   [$1.multilineWrapperTags]     Tags where lines can be found if
+ *                                                nesting is possible.
+ * @param {boolean} [$1.preserveWhiteSpace]       Whether or not to collapse white
+ *                                                space characters.
  * @param {boolean} [$1.__unstableIsEditableTree]
  *
  * @return {RichTextValue} A rich text value.

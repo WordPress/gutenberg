@@ -4,7 +4,7 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import {
-	registerBlockTypeFromMetadata,
+	registerBlockType,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -38,7 +38,6 @@ import * as navigationLink from './navigation-link';
 import * as homeLink from './home-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
-import * as legacyWidget from './legacy-widget';
 import * as logInOut from './loginout';
 import * as list from './list';
 import * as missing from './missing';
@@ -70,7 +69,7 @@ import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
-import * as queryLoop from './query-loop';
+import * as postTemplate from './post-template';
 import * as queryTitle from './query-title';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
@@ -105,7 +104,7 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	registerBlockTypeFromMetadata( { name, ...metadata }, settings );
+	registerBlockType( { name, ...metadata }, settings );
 };
 
 /**
@@ -174,7 +173,7 @@ export const __experimentalGetCoreBlocks = () => [
 	siteTitle,
 
 	query,
-	queryLoop,
+	postTemplate,
 	queryTitle,
 	queryPagination,
 	queryPaginationNext,
@@ -183,7 +182,6 @@ export const __experimentalGetCoreBlocks = () => [
 
 	postTitle,
 	postContent,
-	postAuthor,
 	postDate,
 	postExcerpt,
 	postFeaturedImage,
@@ -230,19 +228,17 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( { enableLegacyWidgetBlock, enableFSEBlocks } = {} ) => {
+		? ( { enableFSEBlocks } = {} ) => {
 				[
 					navigation,
 					navigationLink,
 					homeLink,
 
-					// Register Legacy Widget block.
-					...( enableLegacyWidgetBlock ? [ legacyWidget ] : [] ),
-
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks
 						? [
 								templatePart,
+								postAuthor,
 								postComment,
 								postCommentAuthor,
 								postCommentContent,

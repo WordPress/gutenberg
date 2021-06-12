@@ -8,9 +8,9 @@ import { filter, includes, isArray } from 'lodash';
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { withSelect } from '@wordpress/data';
-import { compose, withState } from '@wordpress/compose';
 import { TextControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,14 +19,14 @@ import BlockManagerCategory from './category';
 import { store as editPostStore } from '../../store';
 
 function BlockManager( {
-	search,
-	setState,
 	blockTypes,
 	categories,
 	hasBlockSupport,
 	isMatchingSearchTerm,
 	numberOfHiddenBlocks,
 } ) {
+	const [ search, setSearch ] = useState( '' );
+
 	// Filtering occurs here (as opposed to `withSelect`) to avoid
 	// wasted renders by consequence of `Array#filter` producing
 	// a new value reference on each call.
@@ -44,11 +44,7 @@ function BlockManager( {
 				type="search"
 				label={ __( 'Search for a block' ) }
 				value={ search }
-				onChange={ ( nextSearch ) =>
-					setState( {
-						search: nextSearch,
-					} )
-				}
+				onChange={ ( nextSearch ) => setSearch( nextSearch ) }
 				className="edit-post-manage-blocks-modal__search"
 			/>
 			{ !! numberOfHiddenBlocks && (
@@ -96,26 +92,23 @@ function BlockManager( {
 	);
 }
 
-export default compose( [
-	withState( { search: '' } ),
-	withSelect( ( select ) => {
-		const {
-			getBlockTypes,
-			getCategories,
-			hasBlockSupport,
-			isMatchingSearchTerm,
-		} = select( blocksStore );
-		const { getPreference } = select( editPostStore );
-		const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
-		const numberOfHiddenBlocks =
-			isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
+export default withSelect( ( select ) => {
+	const {
+		getBlockTypes,
+		getCategories,
+		hasBlockSupport,
+		isMatchingSearchTerm,
+	} = select( blocksStore );
+	const { getPreference } = select( editPostStore );
+	const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
+	const numberOfHiddenBlocks =
+		isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 
-		return {
-			blockTypes: getBlockTypes(),
-			categories: getCategories(),
-			hasBlockSupport,
-			isMatchingSearchTerm,
-			numberOfHiddenBlocks,
-		};
-	} ),
-] )( BlockManager );
+	return {
+		blockTypes: getBlockTypes(),
+		categories: getCategories(),
+		hasBlockSupport,
+		isMatchingSearchTerm,
+		numberOfHiddenBlocks,
+	};
+} )( BlockManager );

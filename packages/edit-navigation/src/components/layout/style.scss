@@ -31,6 +31,9 @@
 	}
 
 	.edit-navigation-layout__content-area {
+		// Reference element for the block popover position.
+		position: relative;
+
 		// The 10px match that of similar settings pages.
 		padding: $grid-unit-15 10px 10px 10px;
 
@@ -59,7 +62,7 @@
 		left: auto;
 
 		// Hide the toggle as the sidebar should be permanently open.
-		.interface-complementary-area-header {
+		.edit-navigation-sidebar__panel-tabs > button {
 			display: none;
 		}
 	}

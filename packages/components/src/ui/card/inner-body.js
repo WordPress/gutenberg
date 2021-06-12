@@ -11,8 +11,8 @@ import { contextConnect, useContextSystem } from '../context';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<{}, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<{}, 'div'>} props
+ * @param {import('react').Ref<any>}                                  forwardedRef
  */
 function CardInnerBody( props, forwardedRef ) {
 	const { className, ...otherProps } = useContextSystem(

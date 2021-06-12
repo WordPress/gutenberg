@@ -238,7 +238,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the list of blocks matches a templates
+-   `boolean`: Whether the list of blocks matches a templates.
 
 <a name="findTransform" href="#findTransform">#</a> **findTransform**
 
@@ -706,7 +706,7 @@ editor interface where blocks are implemented.
 
 _Parameters_
 
--   _name_ `string`: Block name.
+-   _blockNameOrMetadata_ `string|Object`: Block type name or its metadata.
 -   _settings_ `Object`: Block settings.
 
 _Returns_
@@ -715,18 +715,13 @@ _Returns_
 
 <a name="registerBlockTypeFromMetadata" href="#registerBlockTypeFromMetadata">#</a> **registerBlockTypeFromMetadata**
 
+> **Deprecated** Use `registerBlockType` instead.
+
 Registers a new block provided from metadata stored in `block.json` file.
-It uses `registerBlockType` internally.
-
-_Related_
-
--   registerBlockType
 
 _Parameters_
 
 -   _metadata_ `Object`: Block metadata loaded from `block.json`.
--   _metadata.name_ `string`: Block name.
--   _metadata.textdomain_ `string`: Textdomain to use with translations.
 -   _additionalSettings_ `Object`: Additional block settings.
 
 _Returns_

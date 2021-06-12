@@ -8,18 +8,13 @@ import classnames from 'classnames';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	PlainText,
 } from '@wordpress/block-editor';
-import {
-	ToolbarGroup,
-	ToggleControl,
-	TextControl,
-	PanelBody,
-} from '@wordpress/components';
+import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -27,14 +22,16 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
+import { useIsEditablePostBlock } from '../utils/hooks';
 
 export default function PostTitleEdit( {
+	clientId,
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
 	context: { postType, postId },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
-
+	const isEditable = useIsEditablePostBlock( clientId );
 	const post = useSelect(
 		( select ) =>
 			select( coreStore ).getEditedEntityRecord(
@@ -65,7 +62,7 @@ export default function PostTitleEdit( {
 	);
 
 	if ( postType && postId ) {
-		titleElement = (
+		titleElement = isEditable ? (
 			<PlainText
 				tagName={ TagName }
 				placeholder={ __( 'No Title' ) }
@@ -78,11 +75,13 @@ export default function PostTitleEdit( {
 				__experimentalVersion={ 2 }
 				{ ...( isLink ? {} : blockProps ) }
 			/>
+		) : (
+			<TagName { ...( isLink ? {} : blockProps ) }>{ title }</TagName>
 		);
 	}
 
 	if ( isLink ) {
-		titleElement = (
+		titleElement = isEditable ? (
 			<TagName { ...blockProps }>
 				<PlainText
 					tagName="a"
@@ -99,21 +98,30 @@ export default function PostTitleEdit( {
 					__experimentalVersion={ 2 }
 				/>
 			</TagName>
+		) : (
+			<TagName { ...blockProps }>
+				<a
+					href={ link }
+					target={ linkTarget }
+					rel={ rel }
+					onClick={ ( event ) => event.preventDefault() }
+				>
+					{ title }
+				</a>
+			</TagName>
 		);
 	}
 
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<HeadingLevelDropdown
-						selectedLevel={ level }
-						onChange={ ( newLevel ) =>
-							setAttributes( { level: newLevel } )
-						}
-					/>
-				</ToolbarGroup>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<HeadingLevelDropdown
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
+				/>
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );

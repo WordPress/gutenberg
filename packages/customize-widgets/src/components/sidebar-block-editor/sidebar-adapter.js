@@ -27,6 +27,41 @@ function widgetIdToSettingId( widgetId ) {
 	return `widget_${ idBase }`;
 }
 
+/**
+ * This is a custom debounce function to call different callbacks depending on
+ * whether it's the _leading_ call or not.
+ *
+ * @param {Function} leading  The callback that gets called first.
+ * @param {Function} callback The callback that gets called after the first time.
+ * @param {number}   timeout  The debounced time in milliseconds.
+ * @return {Function} The debounced function.
+ */
+function debounce( leading, callback, timeout ) {
+	let isLeading = false;
+	let timerID;
+
+	function debounced( ...args ) {
+		const result = ( isLeading ? callback : leading ).apply( this, args );
+
+		isLeading = true;
+
+		clearTimeout( timerID );
+
+		timerID = setTimeout( () => {
+			isLeading = false;
+		}, timeout );
+
+		return result;
+	}
+
+	debounced.cancel = () => {
+		isLeading = false;
+		clearTimeout( timerID );
+	};
+
+	return debounced;
+}
+
 export default class SidebarAdapter {
 	constructor( setting, api ) {
 		this.setting = setting;
@@ -42,14 +77,20 @@ export default class SidebarAdapter {
 			),
 		];
 		this.historyIndex = 0;
+		this.historySubscribers = new Set();
+		// Debounce the input for 1 second.
+		this._debounceSetHistory = debounce(
+			this._pushHistory,
+			this._replaceHistory,
+			1000
+		);
 
 		this.setting.bind( this._handleSettingChange.bind( this ) );
 		this.api.bind( 'change', this._handleAllSettingsChange.bind( this ) );
 
-		this.canUndo = this.canUndo.bind( this );
-		this.canRedo = this.canRedo.bind( this );
 		this.undo = this.undo.bind( this );
 		this.redo = this.redo.bind( this );
+		this.save = this.save.bind( this );
 	}
 
 	subscribe( callback ) {
@@ -82,6 +123,16 @@ export default class SidebarAdapter {
 			),
 		];
 		this.historyIndex += 1;
+
+		this.historySubscribers.forEach( ( listener ) => listener() );
+	}
+
+	_replaceHistory() {
+		this.history[
+			this.historyIndex
+		] = this._getWidgetIds().map( ( widgetId ) =>
+			this.getWidget( widgetId )
+		);
 	}
 
 	_handleSettingChange() {
@@ -158,6 +209,13 @@ export default class SidebarAdapter {
 
 	_removeWidget( widget ) {
 		const settingId = widgetIdToSettingId( widget.id );
+		const setting = this.api( settingId );
+
+		if ( setting ) {
+			const instance = setting.get();
+			this.widgetsCache.delete( instance );
+		}
+
 		this.api.remove( settingId );
 	}
 
@@ -235,7 +293,10 @@ export default class SidebarAdapter {
 			return widgetId;
 		} );
 
-		// TODO: We should in theory also handle delete widgets here too.
+		const deletedWidgets = this.getWidgets().filter(
+			( widget ) => ! nextWidgetIds.includes( widget.id )
+		);
+		deletedWidgets.forEach( ( widget ) => this._removeWidget( widget ) );
 
 		this.setting.set( nextWidgetIds );
 
@@ -247,7 +308,7 @@ export default class SidebarAdapter {
 	setWidgets( nextWidgets ) {
 		const addedWidgetIds = this._updateWidgets( nextWidgets );
 
-		this._pushHistory();
+		this._debounceSetHistory();
 
 		return addedWidgetIds;
 	}
@@ -255,11 +316,11 @@ export default class SidebarAdapter {
 	/**
 	 * Undo/Redo related features
 	 */
-	canUndo() {
+	hasUndo() {
 		return this.historyIndex > 0;
 	}
 
-	canRedo() {
+	hasRedo() {
 		return this.historyIndex < this.history.length - 1;
 	}
 
@@ -273,10 +334,13 @@ export default class SidebarAdapter {
 		this._updateWidgets( widgets );
 
 		this._emit( currentWidgets, this.getWidgets() );
+
+		this.historySubscribers.forEach( ( listener ) => listener() );
+		this._debounceSetHistory.cancel();
 	}
 
 	undo() {
-		if ( ! this.canUndo() ) {
+		if ( ! this.hasUndo() ) {
 			return;
 		}
 
@@ -284,10 +348,22 @@ export default class SidebarAdapter {
 	}
 
 	redo() {
-		if ( ! this.canRedo() ) {
+		if ( ! this.hasRedo() ) {
 			return;
 		}
 
 		this._seek( this.historyIndex + 1 );
+	}
+
+	subscribeHistory( listener ) {
+		this.historySubscribers.add( listener );
+
+		return () => {
+			this.historySubscribers.delete( listener );
+		};
+	}
+
+	save() {
+		this.api.previewer.save();
 	}
 }

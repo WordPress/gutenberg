@@ -15,7 +15,7 @@ import { ESCAPE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import Button from '../../button';
-import { VisuallyHidden } from '../../visually-hidden';
+import VisuallyHidden from '../../visually-hidden';
 import withSpokenMessages from '../../higher-order/with-spoken-messages';
 import { useNavigationMenuContext } from './context';
 import { useNavigationContext } from '../context';
@@ -100,7 +100,7 @@ function MenuTitleSearch( {
 
 			<Button
 				isSmall
-				isTertiary
+				variant="tertiary"
 				label={ __( 'Close search' ) }
 				onClick={ onClose }
 			>

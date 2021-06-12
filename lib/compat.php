@@ -9,32 +9,34 @@
  */
 
 /**
- * Determine if the current theme needs to load separate block styles or not.
+ * Backporting wp_should_load_separate_core_block_assets from WP-Core.
  *
  * @todo Remove this function when the minimum supported version is WordPress 5.8.
- *
- * @return bool
  */
-function gutenberg_should_load_separate_block_assets() {
-	if ( function_exists( 'should_load_separate_core_block_assets' ) ) {
-		return should_load_separate_core_block_assets();
-	}
-
-	if ( is_admin() || is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-		return false;
-	}
-
-	// The `separate_core_block_assets` filter was added in WP 5.8.
-	$load_separate_styles = apply_filters( 'separate_core_block_assets', gutenberg_is_fse_theme() );
-
+if ( ! function_exists( 'wp_should_load_separate_core_block_assets' ) ) {
 	/**
-	 * Determine if separate styles will be loaded for blocks on-render or not.
+	 * Checks whether separate assets should be loaded for core blocks on-render.
 	 *
-	 * @param bool $load_separate_styles Whether separate styles will be loaded or not.
+	 * @since 5.8.0
 	 *
-	 * @return bool
+	 * @return bool Whether separate assets will be loaded.
 	 */
-	return apply_filters( 'load_separate_block_assets', $load_separate_styles );
+	function wp_should_load_separate_core_block_assets() {
+		if ( is_admin() || is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return false;
+		}
+
+		/**
+		 * Filters the flag that decides whether separate scripts and styles
+		 * will be loaded for core blocks on-render.
+		 *
+		 * @since 5.8.0
+		 *
+		 * @param bool $load_separate_assets Whether separate assets will be loaded.
+		 *                                   Default false.
+		 */
+		return apply_filters( 'should_load_separate_core_block_assets', false );
+	}
 }
 
 /**
@@ -58,7 +60,7 @@ add_filter(
  * @return void
  */
 function gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles() {
-	if ( gutenberg_should_load_separate_block_assets() ) {
+	if ( wp_should_load_separate_core_block_assets() ) {
 		/**
 		 * Avoid enqueueing block assets of all registered blocks for all posts, instead
 		 * deferring to block render mechanics to enqueue scripts, thereby ensuring only
@@ -90,7 +92,7 @@ function gutenberg_inject_default_block_context( $args ) {
 	if ( is_callable( $args['render_callback'] ) ) {
 		$block_render_callback   = $args['render_callback'];
 		$args['render_callback'] = function( $attributes, $content, $block = null ) use ( $block_render_callback ) {
-			global $post, $wp_query;
+			global $post;
 
 			// Check for null for back compatibility with WP_Block_Type->render
 			// which is unused since the introduction of WP_Block class.
@@ -125,39 +127,6 @@ function gutenberg_inject_default_block_context( $args ) {
 				* it should be included to consistently fulfill the expectation.
 				*/
 				$block->context['postType'] = $post->post_type;
-			}
-
-			// Inject the query context if not done by Core.
-			$needs_query = ! empty( $block_type->uses_context ) && in_array( 'query', $block_type->uses_context, true );
-			if ( ! isset( $block->context['query'] ) && $needs_query ) {
-				if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
-					$block->context['query'] = array( 'categoryIds' => array() );
-
-					foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_slug_or_id ) {
-						$block->context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
-					}
-				}
-
-				if ( isset( $wp_query->tax_query->queried_terms['post_tag'] ) ) {
-					if ( isset( $block->context['query'] ) ) {
-						$block->context['query']['tagIds'] = array();
-					} else {
-						$block->context['query'] = array( 'tagIds' => array() );
-					}
-
-					foreach ( $wp_query->tax_query->queried_terms['post_tag']['terms'] as $tag_slug_or_id ) {
-						$tag_ID = $tag_slug_or_id;
-
-						if ( 'slug' === $wp_query->tax_query->queried_terms['post_tag']['field'] ) {
-							$tag = get_term_by( 'slug', $tag_slug_or_id, 'post_tag' );
-
-							if ( $tag ) {
-								$tag_ID = $tag->term_id;
-							}
-						}
-						$block->context['query']['tagIds'][] = $tag_ID;
-					}
-				}
 			}
 
 			return $block_render_callback( $attributes, $content, $block );

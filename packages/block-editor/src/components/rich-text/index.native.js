@@ -241,8 +241,8 @@ function RichTextWrapper(
 	 * blocks as a result of splitting the block by pasting block content in the
 	 * instance.
 	 *
-	 * @param  {Object} record       The rich text value to split.
-	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
+	 * @param {Object} record       The rich text value to split.
+	 * @param {Array}  pastedBlocks The pasted blocks to insert, if any.
 	 */
 	const splitValue = useCallback(
 		( record, pastedBlocks = [] ) => {
