@@ -448,6 +448,76 @@ const Popover = (
 			observer.observe( __unstableObserveElement, { attributes: true } );
 		}
 
+		let inViewObserver;
+
+		// Cleans stickier related attributes.
+		setClass( contentRef.current, 'is-away', false );
+		setAttribute( contentRef.current, 'data-away' );
+
+		// When stickier, observes the anchor’s intersection with the sticky
+		// boundary element and sets attributes for styling.
+		if ( __experimentalStickier ) {
+			const isAnchorCompound = anchorRef.constructor === Object;
+			let spaceBetween;
+			let inViewMap;
+			inViewObserver = new defaultView.IntersectionObserver(
+				( [ one, two ] ) => {
+					let isInView;
+					if ( ! isAnchorCompound ) {
+						isInView = one.isIntersecting;
+					} else {
+						inViewMap.set( one.target, one.isIntersecting );
+						if ( two ) {
+							inViewMap.set( two.target, two.isIntersecting );
+						}
+						// If either element of the anchor is intersecting the
+						// anchor is in view. If both aren’t intersecting and
+						// the space between them is less than the height of
+						// the bounds the anchor is out of view. Otherwise both
+						// must be outside the same end of the boundary or the
+						// anchor is still in view.
+						if (
+							inViewMap.get( anchorRef.top ) ||
+							inViewMap.get( anchorRef.bottom )
+						) {
+							isInView = true;
+						} else if ( spaceBetween < one.rootBounds.height ) {
+							isInView = false;
+						} else {
+							const rect = one.boundingClientRect;
+							isInView =
+								one.target === anchorRef.top
+									? rect.top < one.rootBounds.bottom
+									: rect.bottom > one.rootBounds.top;
+						}
+					}
+					const { current } = contentRef;
+					setClass( current, 'is-away', ! isInView );
+					if ( ! isInView ) {
+						const side =
+							one.boundingClientRect.top < one.rootBounds.top
+								? 'top'
+								: 'bottom';
+						setAttribute( current, 'data-away', side );
+					}
+				},
+				{
+					root: __unstableStickyBoundaryElement,
+					rootMargin: `-${ __experimentalStickyTop }px 0px 0px 0px`,
+				}
+			);
+			if ( isAnchorCompound ) {
+				inViewMap = new WeakMap();
+				spaceBetween =
+					anchorRef.bottom.getBoundingClientRect().top -
+					anchorRef.top.getBoundingClientRect().bottom;
+				inViewObserver.observe( anchorRef.top );
+				inViewObserver.observe( anchorRef.bottom );
+			} else {
+				inViewObserver.observe( anchorRef );
+			}
+		}
+
 		return () => {
 			defaultView.clearInterval( intervalHandle );
 			defaultView.removeEventListener( 'resize', refresh );
@@ -470,6 +540,8 @@ const Popover = (
 			if ( observer ) {
 				observer.disconnect();
 			}
+
+			inViewObserver?.disconnect();
 		};
 	}, [
 		isExpanded,

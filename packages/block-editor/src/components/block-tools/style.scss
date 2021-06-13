@@ -319,6 +319,28 @@
 			margin-top: $grid-unit-15;
 			margin-bottom: $grid-unit-15;
 		}
+
+		// The class is-away and attribute data-away are used to hide 'stickier'
+		// toolbars when their block is out of view.
+		&[data-away] {
+			transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1);
+		}
+
+		&[data-away="top"] {
+			transform-origin: center top;
+
+			&.is-away {
+				transform: perspective(1000px) rotateX(-90deg);
+			}
+		}
+
+		&[data-away="bottom"] {
+			transform-origin: center bottom;
+
+			&.is-away {
+				transform: perspective(1000px) rotateX(90deg);
+			}
+		}
 	}
 
 	// Hide the block toolbar if the insertion point is shown.
