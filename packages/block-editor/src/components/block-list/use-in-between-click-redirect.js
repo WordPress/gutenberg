@@ -46,6 +46,13 @@ export function useInBetweenClickRedirect() {
 				isReverse = clientY - beforeY < afterY - clientY;
 			}
 
+			const closestChild = isReverse ? beforeChild : afterChild;
+			const closestRect = closestChild.getBoundingClientRect();
+
+			if ( clientX < closestRect.left || clientX > closestRect.right ) {
+				return;
+			}
+
 			const container = isReverse ? node : afterChild;
 			const closest =
 				getClosestTabbable( afterChild, true, container ) || afterChild;
