@@ -19,7 +19,7 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  *
  * @return {any} A higher order component wrapper accepting a component that takes the state props + its own props + `setState` and returning a component that only accepts the own props.
  */
-export default function withState( initialState ) {
+export default function withState( initialState = {} ) {
 	deprecated( 'wp.compose.withState', {
 		alternative: 'wp.element.useState',
 	} );
