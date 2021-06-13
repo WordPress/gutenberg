@@ -12,44 +12,37 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
 /**
  * A Higher Order Component used to provide and manage internal component state
  * via props.
- * 
+ *
  * @deprecated Use `useState` instead.
  *
  * @param {any} initialState Optional initial state of the component.
  *
  * @return {any} A higher order component wrapper accepting a component that takes the state props + its own props + `setState` and returning a component that only accepts the own props.
  */
-export default function withState(
-	initialState
-) {
+export default function withState( initialState ) {
 	deprecated( 'wp.compose.withState', {
 		alternative: 'wp.element.useState',
 	} );
 
-	return createHigherOrderComponent(
-		(
-			OriginalComponent
-		) => {
-			return class WrappedComponent extends Component {
-				constructor( /** @type {any} */ props ) {
-					super( props );
+	return createHigherOrderComponent( ( OriginalComponent ) => {
+		return class WrappedComponent extends Component {
+			constructor( /** @type {any} */ props ) {
+				super( props );
 
-					this.setState = this.setState.bind( this );
+				this.setState = this.setState.bind( this );
 
-					this.state = initialState;
-				}
+				this.state = initialState;
+			}
 
-				render() {
-					return (
-						<OriginalComponent
-							{ ...this.props }
-							{ ...this.state }
-							setState={ this.setState }
-						/>
-					);
-				}
-			};
-		},
-		'withState'
-	);
+			render() {
+				return (
+					<OriginalComponent
+						{ ...this.props }
+						{ ...this.state }
+						setState={ this.setState }
+					/>
+				);
+			}
+		};
+	}, 'withState' );
 }
