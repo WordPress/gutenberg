@@ -57,6 +57,7 @@ function gutenberg_reregister_core_block_types() {
 				'pullquote',
 				'quote',
 				'separator',
+				'shape-divider',
 				'social-links',
 				'spacer',
 				'table',

@@ -1,0 +1,26 @@
+.wp-block-shape-divider {
+	display: flex;
+
+	svg {
+		max-height: 100%;
+	}
+
+	// Target SVG rather than the block for editor compatibility.
+	&.flip-horizontal {
+		svg {
+			transform: scaleX(-1);
+		}
+	}
+
+	&.flip-vertical {
+		svg {
+			transform: scaleY(-1);
+		}
+	}
+
+	&.flip-horizontal.flip-vertical {
+		svg {
+			transform: scale(-1);
+		}
+	}
+}
