@@ -1,6 +1,6 @@
 # CardBody
 
-`CardBody` renders an optional content area for a [`Card`](../card/README.md). Multiple `CardBody` components can be used within `Card` if needed.
+`CardBody` renders an optional content area for a [`Card`](/packages/componnents/src/card/card/README.md). Multiple `CardBody` components can be used within `Card` if needed.
 
 ## Usage
 
@@ -16,7 +16,7 @@ const Example = () => (
 
 ## Props
 
-Note: This component is connected to [`Card`'s Context](../card/README.md#context). Passing the `size` prop directly to this component will override the value derived from context.
+Note: This component is connected to [`Card`'s Context](/packages/componnents/src/card/card/README.md#context). Passing the `size` prop directly to this component will override the value derived from context.
 
 ### `isScrollable`: `boolean`
 

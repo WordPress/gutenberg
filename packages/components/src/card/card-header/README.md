@@ -1,6 +1,6 @@
 # CardHeader
 
-`CardHeader` renders an optional header within a [`Card`](../card/README.md).
+`CardHeader` renders an optional header within a [`Card`](/packages/componnents/src/card/card/README.md).
 
 ## Usage
 
@@ -17,7 +17,7 @@ const Example = () => (
 
 ## Props
 
-Note: This component is connected to [`Card`'s Context](../card/README.md#context). Passing the `size` and `isBorderless` props directly to this component will override the value derived from context.
+Note: This component is connected to [`Card`'s Context](/packages/componnents/src/card/card/README.md#context). Passing the `size` and `isBorderless` props directly to this component will override the value derived from context.
 
 ### `isBorderless`: `boolean`
 

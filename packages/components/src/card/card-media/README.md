@@ -1,6 +1,6 @@
 # CardMedia
 
-`CardMedia` provides a container for media elements within a [`Card`](../card/README.md).
+`CardMedia` provides a container for media elements within a [`Card`](/packages/componnents/src/card/card/README.md).
 
 ## Usage
 

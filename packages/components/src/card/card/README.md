@@ -37,7 +37,7 @@ function Example() {
 
 ### `elevation`: `number`
 
-Size of the elevation shadow, based on the Style system's elevation system. This may be helpful in highlighting certain content. For more information, check out [`Elevation`](../../elevation/README.md).
+Size of the elevation shadow, based on the Style system's elevation system. This may be helpful in highlighting certain content. For more information, check out [`Elevation`](/packages/componnents/src/elevation/README.md).
 
 - Required: No
 - Default: `0`
@@ -66,17 +66,17 @@ Determines the amount of padding within the component.
 
 ### Inherited props
 
-`Card` also inherits all of the [`Surface` props](../../ui/surface/README.md#props).
+`Card` also inherits all of the [`Surface` props](/packages/componnents/src/ui/surface/README.md#props).
 
 ## Sub-Components
 
 This component provides a collection of sub-component that can be used to compose various interfaces.
 
--   [`<CardBody />`](../card-body/README.md)
--   [`<CardDivider />`](../card-divider/README.md)
--   [`<CardFooter />`](../card-footer/README.md))
--   [`<CardHeader />`](../card-header/README.md))
--   [`<CardMedia />`](../card-media/README.md))
+-   [`<CardBody />`](/packages/componnents/src/card/card-body/README.md)
+-   [`<CardDivider />`](/packages/componnents/src/card/card-divider/README.md)
+-   [`<CardFooter />`](/packages/componnents/src/card/card-footer/README.md))
+-   [`<CardHeader />`](/packages/componnents/src/card/card-header/README.md))
+-   [`<CardMedia />`](/packages/componnents/src/card/card-media/README.md))
 
 ### Sub-Components Example
 
