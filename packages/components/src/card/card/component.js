@@ -39,14 +39,14 @@ function Card( props, forwardedRef ) {
 	);
 
 	const contextProviderValue = useMemo( () => {
-		const contexProps = {
+		const contextProps = {
 			size,
 			isBorderless,
 		};
 		return {
-			CardBody: contexProps,
-			CardHeader: contexProps,
-			CardFooter: contexProps,
+			CardBody: contextProps,
+			CardHeader: contextProps,
+			CardFooter: contextProps,
 		};
 	}, [ isBorderless, size ] );
 
