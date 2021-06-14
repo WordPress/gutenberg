@@ -15,7 +15,7 @@ import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').MediaProps, 'div'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
  */
 export function useCardMedia( props ) {
 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
