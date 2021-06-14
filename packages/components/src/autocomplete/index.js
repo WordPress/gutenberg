@@ -162,7 +162,7 @@ function useAutocomplete( {
 			if ( 'replace' === action ) {
 				onReplace( [ value ] );
 				// When replacing, the component will unmount, so don't reset
-				// state (below) on an unmounting component.
+				// state (below) on an unmounted component.
 				return;
 			} else if ( 'insert-at-caret' === action ) {
 				insertCompletion( value );
