@@ -311,11 +311,8 @@ describe( 'Widgets screen', () => {
 
 		// Click outside the block to move the focus back to the widget area.
 		await page.mouse.click(
-			secondParagraphBlockBoundingBox.x +
-				firstWidgetAreaBoundingBox.width / 2,
-			secondParagraphBlockBoundingBox.y +
-				secondParagraphBlockBoundingBox.height +
-				10
+			secondParagraphBlockBoundingBox.x - 1,
+			secondParagraphBlockBoundingBox.y
 		);
 
 		// Hover above the last block to trigger the inline inserter between blocks.

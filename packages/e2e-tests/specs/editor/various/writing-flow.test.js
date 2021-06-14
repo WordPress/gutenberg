@@ -578,10 +578,10 @@ describe( 'Writing Flow', () => {
 
 		// Find a point outside the paragraph between the blocks where it's
 		// expected that the sibling inserter would be placed.
-		const paragraph = await page.$( '[data-type="core/paragraph"]' );
-		const paragraphRect = await paragraph.boundingBox();
-		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
-		const y = paragraphRect.y + paragraphRect.height + 1;
+		const image = await page.$( '[data-type="core/image"]' );
+		const imageRect = await image.boundingBox();
+		const x = imageRect.x + ( 2 * imageRect.width ) / 3;
+		const y = imageRect.y - 1;
 
 		await page.mouse.click( x, y );
 
