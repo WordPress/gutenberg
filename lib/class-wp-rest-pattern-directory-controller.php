@@ -57,7 +57,7 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
 		if ( current_user_can( 'edit_posts' ) ) {
 			return true;
 		}

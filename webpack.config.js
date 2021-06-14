@@ -16,6 +16,11 @@ const fastGlob = require( 'fast-glob' );
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
+ * Internal dependencies
+ */
+const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 const {
 	camelCaseDash,
 } = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
@@ -148,10 +153,10 @@ module.exports = {
 			const request = rootModule?.rawRequest || rawRequest;
 
 			if ( request.includes( '/frontend.js' ) ) {
-				return `./build/block-library/blocks/[name]/frontend.js`;
+				return `./build/block-library/blocks/[name]/frontend.min.js`;
 			}
 
-			return './build/[name]/index.js';
+			return `./build/[name]/index.min.js`;
 		},
 		path: __dirname,
 		library: [ 'wp', '[camelName]' ],
@@ -238,12 +243,29 @@ module.exports = {
 				to: 'build/block-library/blocks/[1]/editor-rtl.css',
 				transform: stylesTransform,
 			},
+			{
+				from: './packages/block-library/build-style/*/theme.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }theme\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/theme.css',
+				transform: stylesTransform,
+			},
+			{
+				from: './packages/block-library/build-style/*/theme-rtl.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }theme-rtl\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/theme-rtl.css',
+				transform: stylesTransform,
+			},
 		] ),
 		new CopyWebpackPlugin(
 			Object.entries( {
 				'./packages/block-library/src/': 'build/block-library/blocks/',
 				'./packages/edit-widgets/src/blocks/':
 					'build/edit-widgets/blocks/',
+				'./packages/widgets/src/blocks/': 'build/widgets/blocks/',
 			} ).flatMap( ( [ from, to ] ) => [
 				{
 					from: `${ from }/**/index.php`,
@@ -297,6 +319,7 @@ module.exports = {
 			] )
 		),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+		mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 	].filter( Boolean ),
 	watchOptions: {
 		ignored: [ '**/node_modules', '**/packages/*/src' ],

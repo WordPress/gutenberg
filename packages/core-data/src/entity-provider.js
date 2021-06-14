@@ -134,10 +134,10 @@ export function useEntityProp( kind, type, prop, _id ) {
  * `BlockEditorProvider` and are intended to be used with it,
  * or similar components or hooks.
  *
- * @param {string} kind                            The entity kind.
- * @param {string} type                            The entity type.
+ * @param {string} kind         The entity kind.
+ * @param {string} type         The entity type.
  * @param {Object} options
- * @param {string} [options.id]                    An entity ID to use instead of the context-provided one.
+ * @param {string} [options.id] An entity ID to use instead of the context-provided one.
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */

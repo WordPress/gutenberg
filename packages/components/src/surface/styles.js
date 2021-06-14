@@ -19,7 +19,7 @@ export const background = css`
 `;
 
 /**
- * @param {Object} props
+ * @param {Object}  props
  * @param {boolean} [props.borderBottom]
  * @param {boolean} [props.borderLeft]
  * @param {boolean} [props.borderRight]
@@ -137,8 +137,8 @@ export const getGrid = ( surfaceBackgroundSize ) => {
 
 /**
  * @param {'dotted' | 'grid' | 'primary' | 'secondary' | 'tertiary'} variant
- * @param {string} surfaceBackgroundSize
- * @param {string} surfaceBackgroundSizeDotted
+ * @param {string}                                                   surfaceBackgroundSize
+ * @param {string}                                                   surfaceBackgroundSizeDotted
  */
 export const getVariant = (
 	variant,

@@ -10,7 +10,7 @@ import { useScrollable } from './hook';
  * @example
  * ```jsx
  * import { __experimentalScrollable as Scrollable } from `@wordpress/components/ui`;
- 
+ *
  * function Example() {
  * 	return (
  * 		<Scrollable style={ { maxHeight: 200 } }>

@@ -233,7 +233,13 @@ describe( 'Links', () => {
 		await createAndReselectLink();
 
 		// Click on the Unlink button
-		await page.click( 'button[aria-label="Unlink"]' );
+		// await page.click( 'button[aria-label="Unlink"]' );
+
+		// Unlick via shortcut
+		// we do this to avoid an layout edge case whereby
+		// the rich link preview popover will obscure the block toolbar
+		// under very specific circumstances and screensizes.
+		await pressKeyWithModifier( 'primaryShift', 'K' );
 
 		// The link should have been removed
 		expect( await getEditedPostContent() ).toMatchSnapshot();

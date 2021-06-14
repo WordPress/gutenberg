@@ -1,23 +1,28 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+import {
+	__experimentalUnitControl as UnitControl,
+	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalParseUnit as parseUnit,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { CSS_UNITS, parseUnit } from './border';
 import { cleanEmptyObject } from './utils';
+import useSetting from '../components/use-setting';
 
 const MIN_BORDER_WIDTH = 0;
 
 /**
  * Inspector control for configuring border width property.
  *
- * @param  {Object} props  Block properties.
- * @return {WPElement}     Border width edit element.
+ * @param {Object} props Block properties.
+ *
+ * @return {WPElement} Border width edit element.
  */
 export const BorderWidthEdit = ( props ) => {
 	const {
@@ -27,7 +32,8 @@ export const BorderWidthEdit = ( props ) => {
 
 	// Step value is maintained in state so step is appropriate for current unit
 	// even when current radius value is undefined.
-	const initialStep = parseUnit( style?.border?.width ) === 'px' ? 1 : 0.25;
+	const initialStep =
+		parseUnit( style?.border?.width )[ 1 ] === 'px' ? 1 : 0.25;
 	const [ step, setStep ] = useState( initialStep );
 
 	const onUnitChange = ( newUnit ) => {
@@ -50,6 +56,10 @@ export const BorderWidthEdit = ( props ) => {
 		setAttributes( { style: newStyle } );
 	};
 
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'layout.units' ) || [ 'px', 'em', 'rem' ],
+	} );
+
 	return (
 		<UnitControl
 			value={ style?.border?.width }
@@ -58,7 +68,7 @@ export const BorderWidthEdit = ( props ) => {
 			onChange={ onChange }
 			onUnitChange={ onUnitChange }
 			step={ step }
-			units={ CSS_UNITS }
+			units={ units }
 		/>
 	);
 };
