@@ -79,17 +79,16 @@ function getPresetsDeclarations( blockPresets = {} ) {
 function getPresetsClasses( blockSelector, blockPresets = {} ) {
 	return reduce(
 		PRESET_METADATA,
-		( declarations, { path, valueKey, classes } ) => {
+		( declarations, { path, cssVarInfix, classes } ) => {
 			if ( ! classes ) {
 				return declarations;
 			}
+
 			const presetByOrigin = get( blockPresets, path, [] );
 			[ 'core', 'theme', 'user' ].forEach( ( origin ) => {
 				if ( presetByOrigin[ origin ] ) {
-					presetByOrigin[ origin ].forEach( ( preset ) => {
+					presetByOrigin[ origin ].forEach( ( { slug } ) => {
 						classes.forEach( ( { classSuffix, propertyName } ) => {
-							const slug = preset.slug;
-							const value = preset[ valueKey ];
 							// We don't want to use kebabCase from lodash here
 							// see https://github.com/WordPress/gutenberg/issues/32347
 							// However, we need to make sure the generated class
@@ -99,6 +98,7 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 								'-'
 							) }-${ classSuffix }`;
 							const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
+							const value = `var(--wp--preset--${ cssVarInfix }--${ slug })`;
 							declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
 						} );
 					} );

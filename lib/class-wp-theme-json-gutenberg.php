@@ -718,7 +718,7 @@ class WP_Theme_JSON_Gutenberg {
 						array(
 							array(
 								'name'  => $class['property_name'],
-								'value' => $value . ' !important',
+								'value' => 'var(--wp--preset--' . $preset['css_var_infix'] . "--$slug) !important",
 							),
 						)
 					);
