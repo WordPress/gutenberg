@@ -122,8 +122,11 @@ function TreeGrid(
 						event.preventDefault();
 						return;
 					}
-					// If a row is focused, and it is expanded, focuses the first cell in the row.
-					getRowFocusables( activeRow )?.[ 0 ]?.focus();
+					// If a row is focused, and it is expanded, focuses the rightmost cell in the row.
+					const focusableItems = getRowFocusables( activeRow );
+					if ( focusableItems.length > 0 ) {
+						focusableItems[ focusableItems.length - 1 ]?.focus();
+					}
 				}
 				// Prevent key use for anything else. For example, Voiceover
 				// will start reading text on continued use of left/right arrow
