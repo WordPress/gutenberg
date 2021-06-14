@@ -17,7 +17,7 @@ import { contextConnect, useContextSystem } from '../context';
 /**
  *
  * @param {import('../context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('react').Ref<any>}                                                              forwardedRef
  */
 function PopoverContent( props, forwardedRef ) {
 	const {

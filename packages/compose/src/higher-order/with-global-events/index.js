@@ -32,11 +32,11 @@ const listener = new Listener();
  * @deprecated
  *
  * @param {Record<keyof GlobalEventHandlersEventMap, string>} eventTypesToHandlers Object with keys of DOM
- *                                                     event type, the value a
- *                                                     name of the function on
- *                                                     the original component's
- *                                                     instance which handles
- *                                                     the event.
+ *                                                                                 event type, the value a
+ *                                                                                 name of the function on
+ *                                                                                 the original component's
+ *                                                                                 instance which handles
+ *                                                                                 the event.
  *
  * @return {any} Higher-order component.
  */

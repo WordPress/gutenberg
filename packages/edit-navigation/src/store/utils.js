@@ -28,16 +28,16 @@ import { NEW_TAB_TARGET_ATTRIBUTE } from '../constants';
  *
  * @typedef WPNavMenuItem
  *
- * @property {Object} title stores the raw and rendered versions of the title/label for this menu item.
- * @property {Array} xfn the XFN relationships expressed in the link of this menu item.
- * @property {Array} classes the HTML class attributes for this menu item.
- * @property {string} attr_title the HTML title attribute for this menu item.
- * @property {string} object The type of object originally represented, such as 'category', 'post', or 'attachment'.
- * @property {string} object_id The DB ID of the original object this menu item represents, e.g. ID for posts and term_id for categories.
+ * @property {Object} title       stores the raw and rendered versions of the title/label for this menu item.
+ * @property {Array}  xfn         the XFN relationships expressed in the link of this menu item.
+ * @property {Array}  classes     the HTML class attributes for this menu item.
+ * @property {string} attr_title  the HTML title attribute for this menu item.
+ * @property {string} object      The type of object originally represented, such as 'category', 'post', or 'attachment'.
+ * @property {string} object_id   The DB ID of the original object this menu item represents, e.g. ID for posts and term_id for categories.
  * @property {string} description The description of this menu item.
- * @property {string} url The URL to which this menu item points.
- * @property {string} type The family of objects originally represented, such as 'post_type' or 'taxonomy'.
- * @property {string} target The target attribute of the link element for this menu item.
+ * @property {string} url         The URL to which this menu item points.
+ * @property {string} type        The family of objects originally represented, such as 'post_type' or 'taxonomy'.
+ * @property {string} target      The target attribute of the link element for this menu item.
  */
 
 /**
@@ -189,16 +189,16 @@ export function computeCustomizedAttribute(
  *
  * See: https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L438.
  *
- * @param {Object} blockAttributes the block attributes of the block to be converted into menu item fields.
- * @param {string} blockAttributes.label the visual name of the block shown in the UI.
- * @param {string} blockAttributes.url the URL for the link.
- * @param {string} blockAttributes.description a link description.
- * @param {string} blockAttributes.rel the XFN relationship expressed in the link of this menu item.
- * @param {string} blockAttributes.className the custom CSS classname attributes for this block.
- * @param {string} blockAttributes.title the HTML title attribute for the block's link.
- * @param {string} blockAttributes.type the type of variation of the block used (eg: 'Post', 'Custom', 'Category'...etc).
- * @param {number} blockAttributes.id the ID of the entity optionally associated with the block's link (eg: the Post ID).
- * @param {string} blockAttributes.kind the family of objects originally represented, such as 'post-type' or 'taxonomy'.
+ * @param {Object}  blockAttributes               the block attributes of the block to be converted into menu item fields.
+ * @param {string}  blockAttributes.label         the visual name of the block shown in the UI.
+ * @param {string}  blockAttributes.url           the URL for the link.
+ * @param {string}  blockAttributes.description   a link description.
+ * @param {string}  blockAttributes.rel           the XFN relationship expressed in the link of this menu item.
+ * @param {string}  blockAttributes.className     the custom CSS classname attributes for this block.
+ * @param {string}  blockAttributes.title         the HTML title attribute for the block's link.
+ * @param {string}  blockAttributes.type          the type of variation of the block used (eg: 'Post', 'Custom', 'Category'...etc).
+ * @param {number}  blockAttributes.id            the ID of the entity optionally associated with the block's link (eg: the Post ID).
+ * @param {string}  blockAttributes.kind          the family of objects originally represented, such as 'post-type' or 'taxonomy'.
  * @param {boolean} blockAttributes.opensInNewTab whether or not the block's link should open in a new tab.
  * @return {Object} the menu item (converted from block attributes).
  */

@@ -772,7 +772,7 @@ export function isEditedPostDateFloating( state ) {
 
 	// This should be the status of the persisted post
 	// It shouldn't use the "edited" status otherwise it breaks the
-	// infered post data floating status
+	// inferred post data floating status
 	// See https://github.com/WordPress/gutenberg/issues/28083
 	const status = getCurrentPost( state ).status;
 	if (
@@ -1703,7 +1703,7 @@ export const __experimentalGetDefaultTemplatePartAreas = createSelector(
  * Returns a default template type searched by slug.
  *
  * @param {Object} state Global application state.
- * @param {string} slug The template type slug.
+ * @param {string} slug  The template type slug.
  *
  * @return {Object} The template type.
  */
@@ -1717,7 +1717,7 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  * Given a template entity, return information about it which is ready to be
  * rendered, such as the title, description, and icon.
  *
- * @param {Object} state Global application state.
+ * @param {Object} state    Global application state.
  * @param {Object} template The template for which we need information.
  * @return {Object} Information about the template, including title, description, and icon.
  */
@@ -1748,3 +1748,20 @@ export function __experimentalGetTemplateInfo( state, template ) {
 		icon: templateIcon,
 	};
 }
+
+/**
+ * Returns a post type label depending on the current post.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string|undefined} The post type label if available, otherwise undefined.
+ */
+export const getPostTypeLabel = createRegistrySelector(
+	( select ) => ( state ) => {
+		const currentPostType = getCurrentPostType( state );
+		const postType = select( coreStore ).getPostType( currentPostType );
+		// Disable reason: Post type labels object is shaped like this.
+		// eslint-disable-next-line camelcase
+		return postType?.labels?.singular_name;
+	}
+);

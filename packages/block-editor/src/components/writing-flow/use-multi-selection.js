@@ -32,7 +32,7 @@ function toggleRichText( container, toggle ) {
  * any text nodes that only contain HTML formatting whitespace.
  *
  * @param {Element} node Container to search.
- * @param {string} type 'start' or 'end'.
+ * @param {string}  type 'start' or 'end'.
  */
 function getDeepestNode( node, type ) {
 	const child = type === 'start' ? 'firstChild' : 'lastChild';

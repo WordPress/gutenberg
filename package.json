@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "10.7.1",
+	"version": "10.8.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -141,6 +141,7 @@
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/prettier-config": "file:packages/prettier-config",
 		"@wordpress/project-management-automation": "file:packages/project-management-automation",
+		"@wordpress/readable-js-assets-webpack-plugin": "file:packages/readable-js-assets-webpack-plugin",
 		"@wordpress/scripts": "file:packages/scripts",
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
 		"appium": "1.20.2",
@@ -153,7 +154,7 @@
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
 		"browserslist": "4.16.6",
-		"chalk": "4.0.0",
+		"chalk": "4.1.1",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "5.1.2",
@@ -164,12 +165,13 @@
 		"deep-freeze": "0.0.1",
 		"enzyme": "3.11.0",
 		"equivalent-key-map": "0.2.2",
+		"eslint-import-resolver-node": "0.3.4",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.22.1",
 		"execa": "4.0.2",
 		"fast-glob": "2.2.7",
 		"glob": "7.1.2",
-		"husky": "3.0.5",
+		"husky": "6.0.0",
 		"inquirer": "7.1.0",
 		"jest": "26.6.3",
 		"jest-emotion": "10.0.32",
@@ -279,12 +281,8 @@
 		"prestorybook:dev": "npm run build:packages",
 		"storybook:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./storybook -p 50240\"",
 		"env": "wp-scripts env",
-		"wp-env": "wp-env"
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
+		"wp-env": "wp-env",
+		"prepare": "husky install"
 	},
 	"lint-staged": {
 		"package-lock.json": [

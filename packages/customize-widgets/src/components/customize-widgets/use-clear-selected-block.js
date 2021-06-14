@@ -19,7 +19,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * not by explicitly focusing outside the editor, hence no need for clearing.
  *
  * @param {Object} sidebarControl The sidebar control instance.
- * @param {Object} popoverRef The ref object of the popover node container.
+ * @param {Object} popoverRef     The ref object of the popover node container.
  */
 export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 	const { hasSelectedBlock, hasMultiSelection } = useSelect(

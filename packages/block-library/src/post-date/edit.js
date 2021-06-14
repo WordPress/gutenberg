@@ -26,10 +26,21 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
 
-export default function PostDateEdit( { attributes, context, setAttributes } ) {
+/**
+ * Internal dependencies
+ */
+import { useIsEditablePostBlock } from '../utils/hooks';
+
+export default function PostDateEdit( {
+	clientId,
+	attributes,
+	context,
+	setAttributes,
+} ) {
 	const { textAlign, format, isLink } = attributes;
 	const { postId, postType } = context;
 
+	const isEditable = useIsEditablePostBlock( clientId );
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
 	const [ date, setDate ] = useEntityProp(
 		'postType',
@@ -98,7 +109,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 					} }
 				/>
 
-				{ date && (
+				{ date && isEditable && (
 					<ToolbarButton
 						icon={ edit }
 						title={ __( 'Change Date' ) }

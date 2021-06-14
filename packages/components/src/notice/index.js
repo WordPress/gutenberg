@@ -68,6 +68,10 @@ function Notice( {
 	actions = [],
 	politeness = getDefaultPoliteness( status ),
 	__unstableHTML,
+	// onDismiss is a callback executed when the notice is dismissed.
+	// It is distinct from onRemove, which _looks_ like a callback but is
+	// actually the function to call to remove the notice from the UI.
+	onDismiss = noop,
 } ) {
 	useSpokenMessage( spokenMessage, politeness );
 
@@ -83,6 +87,12 @@ function Notice( {
 	if ( __unstableHTML ) {
 		children = <RawHTML>{ children }</RawHTML>;
 	}
+
+	const onDismissNotice = ( event ) => {
+		event?.preventDefault?.();
+		onDismiss();
+		onRemove();
+	};
 
 	return (
 		<div className={ classes }>
@@ -136,7 +146,7 @@ function Notice( {
 					className="components-notice__dismiss"
 					icon={ close }
 					label={ __( 'Dismiss this notice' ) }
-					onClick={ onRemove }
+					onClick={ onDismissNotice }
 					showTooltip={ false }
 				/>
 			) }
