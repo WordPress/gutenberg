@@ -71,7 +71,7 @@ const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
 /**
  * Get the text shade optimized for readability, based on a background color.
  *
- * @param {string | unknown} backgroundColor  The background color.
+ * @param {string | unknown} backgroundColor The background color.
  *
  * @return {string} The optimized text color (black or white).
  */

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { difference, get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,14 +38,23 @@ export default function ColorPalettePanel( {
 		( select ) => {
 			const baseStyles = select( editSiteStore ).getSettings()
 				.__experimentalGlobalStylesBaseStyles;
+			const contextualBasePalette = get( baseStyles, [
+				'settings',
+				'blocks',
+				contextName,
+				'color',
+				'palette',
+			] );
+			const globalPalette = get( baseStyles, [
+				'settings',
+				'color',
+				'palette',
+			] );
 			const basePalette =
-				get( baseStyles, [
-					'settings',
-					'blocks',
-					contextName,
-					'color',
-					'palette',
-				] ) ?? get( baseStyles, [ 'settings', 'color', 'palette' ] );
+				contextualBasePalette?.theme ??
+				contextualBasePalette?.core ??
+				globalPalette?.theme ??
+				globalPalette?.core;
 			if ( ! basePalette ) {
 				return EMPTY_ARRAY;
 			}
@@ -58,21 +67,7 @@ export default function ColorPalettePanel( {
 			immutableColorSlugs={ immutableColorSlugs }
 			colors={ colors }
 			onChange={ ( newColors ) => {
-				const existingUserColors = ( newColors ?? [] ).filter(
-					( color ) => color.origin === 'user'
-				);
-				const differentUserColors = difference( newColors, colors );
-				if ( differentUserColors.length === 1 ) {
-					differentUserColors[ 0 ] = {
-						...differentUserColors[ 0 ],
-						origin: 'user',
-					};
-				}
-
-				setSetting( contextName, 'color.palette', [
-					...existingUserColors,
-					...differentUserColors,
-				] );
+				setSetting( contextName, 'color.palette', newColors );
 			} }
 			emptyUI={ __(
 				'Colors are empty! Add some colors to create your own color palette.'

@@ -30,8 +30,8 @@ export function getDragCursor( dragDirection ) {
 /**
  * Custom hook that renders a drag cursor when dragging.
  *
- * @param {boolean} isDragging The dragging state.
- * @param {string} dragDirection The drag direction.
+ * @param {boolean} isDragging    The dragging state.
+ * @param {string}  dragDirection The drag direction.
  *
  * @return {string} The CSS cursor value.
  */

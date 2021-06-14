@@ -13,8 +13,8 @@ import { isActionOfType, isAction } from './is-action';
 /**
  * Create a co-routine runtime.
  *
- * @param {Object}    controls Object of control handlers.
- * @param {Function}  dispatch Unhandled action dispatch.
+ * @param {Object}   controls Object of control handlers.
+ * @param {Function} dispatch Unhandled action dispatch.
  *
  * @return {Function} co-routine runtime
  */

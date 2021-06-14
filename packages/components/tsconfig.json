@@ -20,6 +20,7 @@
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/base-field/**/*",
+		"src/card/**/*",
 		"src/dashicon/**/*",
 		"src/disabled/**/*",
 		"src/divider/**/*",
@@ -44,7 +45,9 @@
 		"src/h-stack/**/*",
 		"src/v-stack/**/*",
 		"src/z-stack/**/*",
-		"src/view/**/*"
+		"src/view/**/*",
+		"src/scrollable/**/*",
+		"src/surface/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",
