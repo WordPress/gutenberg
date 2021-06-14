@@ -84,10 +84,24 @@ export default function BlockNavigationTree( {
 		blockDropTarget = undefined;
 	}
 
-	const expand = ( clientId ) =>
+	const expand = ( clientId ) => {
+		if ( ! clientId ) {
+			return;
+		}
 		setExpandedState( { type: 'expand', clientId } );
-	const collapse = ( clientId ) =>
+	};
+	const collapse = ( clientId ) => {
+		if ( ! clientId ) {
+			return;
+		}
 		setExpandedState( { type: 'collapse', clientId } );
+	};
+	const expandRow = ( row ) => {
+		expand( row?.dataset?.block );
+	};
+	const collapseRow = ( row ) => {
+		collapse( row?.dataset?.block );
+	};
 
 	const contextValue = useMemo(
 		() => ( {
@@ -115,8 +129,8 @@ export default function BlockNavigationTree( {
 			className="block-editor-block-navigation-tree"
 			aria-label={ __( 'Block navigation structure' ) }
 			ref={ treeGridRef }
-			onCollapseRow={ collapse }
-			onExpandRow={ expand }
+			onCollapseRow={ collapseRow }
+			onExpandRow={ expandRow }
 		>
 			<BlockNavigationContext.Provider value={ contextValue }>
 				<BlockNavigationBranch
