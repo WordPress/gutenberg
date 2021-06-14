@@ -26,6 +26,7 @@
 		"src/hooks/use-debounce/**/*",
 		"src/hooks/use-dragging/**/*",
 		"src/hooks/use-drop-zone/**/*",
+		"src/hooks/use-focus-on-mount/**/*",
 		"src/hooks/use-focus-outside/**/*",
 		"src/hooks/use-focus-return/**/*",
 		"src/hooks/use-instance-id/**/*",
