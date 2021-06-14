@@ -20,6 +20,16 @@ import {
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 
+function fetchRichUrlData( url, options = {} ) {
+	const emptyDataSet = {};
+
+	if ( url.includes( 'localhost' ) ) {
+		return Promise.resolve( emptyDataSet );
+	}
+
+	return fetchRemoteUrlData( url, options );
+}
+
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
@@ -102,7 +112,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
-			__experimentalFetchRemoteUrlData: fetchRemoteUrlData,
+			__experimentalFetchRichUrlData: fetchRichUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,
