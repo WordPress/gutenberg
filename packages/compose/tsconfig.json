@@ -24,6 +24,7 @@
 		"src/hooks/use-copy-on-click/**/*",
 		"src/hooks/use-copy-to-clipboard/**/*",
 		"src/hooks/use-debounce/**/*",
+		"src/hooks/use-dialog/**/*",
 		"src/hooks/use-dragging/**/*",
 		"src/hooks/use-drop-zone/**/*",
 		"src/hooks/use-focus-on-mount/**/*",

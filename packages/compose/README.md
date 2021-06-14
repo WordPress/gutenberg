@@ -154,7 +154,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `Object|Function`: Element Ref.
+-   `import('react').RefCallback<Element>`: Element Ref.
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
