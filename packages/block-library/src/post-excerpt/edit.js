@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, RawHTML } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
@@ -60,9 +60,9 @@ export default function PostExcerptEditor( {
 	);
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 	const [
-		excerpt,
+		rawExcerpt,
 		setExcerpt,
-		{ protected: isProtected } = {},
+		{ rendered: renderedExcerpt, protected: isProtected } = {},
 	] = useEntityProp( 'postType', postType, 'excerpt', postId );
 	const postContentExcerpt = usePostContentExcerpt(
 		wordCount,
@@ -114,14 +114,18 @@ export default function PostExcerptEditor( {
 			}
 			aria-label={ __( 'Post excerpt text' ) }
 			value={
-				excerpt ||
+				rawExcerpt ||
 				postContentExcerpt ||
 				( isSelected ? '' : __( 'No post excerpt found' ) )
 			}
 			onChange={ setExcerpt }
 		/>
 	) : (
-		excerpt || postContentExcerpt || __( 'No post excerpt found' )
+		( renderedExcerpt && (
+			<RawHTML key="html">{ renderedExcerpt }</RawHTML>
+		) ) ||
+		postContentExcerpt ||
+		__( 'No post excerpt found' )
 	);
 	return (
 		<>
@@ -135,7 +139,7 @@ export default function PostExcerptEditor( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Post Excerpt Settings' ) }>
-					{ ! excerpt && (
+					{ ! renderedExcerpt && (
 						<RangeControl
 							label={ __( 'Max words' ) }
 							value={ wordCount }
