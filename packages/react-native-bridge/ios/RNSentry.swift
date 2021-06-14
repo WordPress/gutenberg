@@ -60,7 +60,7 @@ extension RNSentry {
         resolve({});
     }
     
-    // Disabled
+    // Disabled as it's set by the main apps.
     @objc
     func setLogLevel(_ level: Int) { }
     
