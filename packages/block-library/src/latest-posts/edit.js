@@ -52,6 +52,7 @@ const CATEGORIES_LIST_QUERY = {
 };
 const USERS_LIST_QUERY = {
 	per_page: -1,
+	who: 'has_published_posts',
 };
 
 export default function LatestPostsEdit( { attributes, setAttributes } ) {
