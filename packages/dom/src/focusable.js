@@ -44,6 +44,8 @@ function buildSelector( sequential ) {
 	].join( ',' );
 }
 
+export { buildSelector as __unstableBuildSelector };
+
 /**
  * Returns true if the specified element is visible (i.e. neither display: none
  * nor visibility: hidden).

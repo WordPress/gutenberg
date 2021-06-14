@@ -583,18 +583,7 @@ describe( 'Writing Flow', () => {
 		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
 		const y = paragraphRect.y + paragraphRect.height + 1;
 
-		await page.mouse.move( x, y );
-		await page.waitForSelector(
-			'.block-editor-block-list__insertion-point'
-		);
-
-		const inserter = await page.$(
-			'.block-editor-block-list__insertion-point'
-		);
-		const inserterRect = await inserter.boundingBox();
-		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
-
-		await page.mouse.click( x, lowerInserterY );
+		await page.mouse.click( x, y );
 
 		const type = await page.evaluate( () =>
 			document.activeElement.getAttribute( 'data-type' )
