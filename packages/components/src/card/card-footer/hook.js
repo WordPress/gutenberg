@@ -36,6 +36,7 @@ export function useCardFooter( props ) {
 				styles.cardPaddings[ size ],
 				isBorderless && styles.borderless,
 				isShady && styles.shady,
+				// This classname is added for legacy compatibility reasons.
 				'components-card__footer',
 				className
 			),

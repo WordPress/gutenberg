@@ -33,6 +33,7 @@ export function useCardBody( props ) {
 				styles.borderRadius,
 				styles.cardPaddings[ size ],
 				isShady && styles.shady,
+				// This classname is added for legacy compatibility reasons.
 				'components-card__body',
 				className
 			),

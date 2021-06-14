@@ -28,6 +28,7 @@ export function useCardDivider( props ) {
 			cx(
 				styles.Divider,
 				styles.borderColor,
+				// This classname is added for legacy compatibility reasons.
 				'components-card__divider',
 				className
 			),

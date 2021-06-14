@@ -25,6 +25,7 @@ export function useCardMedia( props ) {
 			cx(
 				styles.Media,
 				styles.borderRadius,
+				// This classname is added for legacy compatibility reasons.
 				'components-card__media',
 				className
 			),

@@ -55,6 +55,7 @@ export function useCard( props ) {
 			styles.Card,
 			isBorderless && styles.boxShadowless,
 			isRounded && styles.rounded,
+			// This classname is added for legacy compatibility reasons.
 			'components-card',
 			className
 		);
