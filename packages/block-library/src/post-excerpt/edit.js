@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, RawHTML } from '@wordpress/element';
 import {
 	AlignmentToolbar,
 	BlockControls,
@@ -22,7 +22,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useIsEditablePostBlock } from '../utils/hooks';
+import { useCanEditEntity } from '../utils/hooks';
 
 function usePostContentExcerpt( wordCount, postId, postType ) {
 	// Don't destrcuture items from content here, it can be undefined.
@@ -32,33 +32,38 @@ function usePostContentExcerpt( wordCount, postId, postType ) {
 		'content',
 		postId
 	);
-	const rawPostContent = content?.raw;
+	const renderedPostContent = content?.rendered;
 	return useMemo( () => {
-		if ( ! rawPostContent ) {
+		if ( ! renderedPostContent ) {
 			return '';
 		}
 		const excerptElement = document.createElement( 'div' );
-		excerptElement.innerHTML = rawPostContent;
+		excerptElement.innerHTML = renderedPostContent;
 		const excerpt =
 			excerptElement.textContent || excerptElement.innerText || '';
 		return excerpt.trim().split( ' ', wordCount ).join( ' ' );
-	}, [ rawPostContent, wordCount ] );
+	}, [ renderedPostContent, wordCount ] );
 }
 
 export default function PostExcerptEditor( {
-	clientId,
 	attributes: { textAlign, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
-	context: { postId, postType },
+	context: { postId, postType, queryId },
 } ) {
-	const isEditable = useIsEditablePostBlock( clientId );
-	const [ excerpt, setExcerpt ] = useEntityProp(
+	const isDescendentOfQueryLoop = !! queryId;
+	const userCanEdit = useCanEditEntity(
+		'root',
 		'postType',
 		postType,
-		'excerpt',
 		postId
 	);
+	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
+	const [
+		rawExcerpt,
+		setExcerpt,
+		{ rendered: renderedExcerpt, protected: isProtected } = {},
+	] = useEntityProp( 'postType', postType, 'excerpt', postId );
 	const postContentExcerpt = usePostContentExcerpt(
 		wordCount,
 		postId,
@@ -69,12 +74,22 @@ export default function PostExcerptEditor( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-
 	if ( ! postType || ! postId ) {
 		return (
 			<div { ...blockProps }>
 				<Warning>
 					{ __( 'Post excerpt block: no post found.' ) }
+				</Warning>
+			</div>
+		);
+	}
+	if ( isProtected && ! userCanEdit ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __(
+						'There is no excerpt because this is a protected post.'
+					) }
 				</Warning>
 			</div>
 		);
@@ -99,14 +114,18 @@ export default function PostExcerptEditor( {
 			}
 			aria-label={ __( 'Post excerpt text' ) }
 			value={
-				excerpt ||
+				rawExcerpt ||
 				postContentExcerpt ||
 				( isSelected ? '' : __( 'No post excerpt found' ) )
 			}
 			onChange={ setExcerpt }
 		/>
 	) : (
-		excerpt || postContentExcerpt || __( 'No post excerpt found' )
+		( renderedExcerpt && (
+			<RawHTML key="html">{ renderedExcerpt }</RawHTML>
+		) ) ||
+		postContentExcerpt ||
+		__( 'No post excerpt found' )
 	);
 	return (
 		<>
@@ -120,7 +139,7 @@ export default function PostExcerptEditor( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Post Excerpt Settings' ) }>
-					{ ! excerpt && (
+					{ ! renderedExcerpt && (
 						<RangeControl
 							label={ __( 'Max words' ) }
 							value={ wordCount }
