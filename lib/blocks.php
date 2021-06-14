@@ -500,4 +500,6 @@ function gutenberg_migrate_old_typography_shape( $metadata ) {
 	return $metadata;
 }
 
-add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
+if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
+	add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
+}
