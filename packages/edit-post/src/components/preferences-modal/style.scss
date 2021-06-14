@@ -31,6 +31,8 @@ $vertical-tabs-width: 160px;
 	.components-navigation {
 		background-color: $white;
 		padding: 0;
+		max-height: 100%;
+		overflow-y: auto;
 
 		> * {
 			// Matches spacing cleared from the modal content element.
