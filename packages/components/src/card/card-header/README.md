@@ -17,7 +17,7 @@ const Example = () => (
 
 ## Props
 
-Note: This component is connected to [`Card`'s Context](/packages/componnents/src/card/card/README.md#context). Passing the `size` and `isBorderless` props directly to this component will override the value derived from context.
+Note: This component is connected to [`Card`'s Context](/packages/componnents/src/card/card/README.md#context). The value of the `size` and `isBorderless` props is derived from the `Card` parent component (if there is one). Setting these props directly on this component will override any derived values.
 
 ### `isBorderless`: `boolean`
 
