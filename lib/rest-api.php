@@ -195,7 +195,6 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
  * @return array Returns modified $prepared_args.
  */
 function gutenberg_rest_user_query_has_published_posts( $prepared_args, $request ) {
-	error_log( print_r( $prepared_args, true ) );
 	if ( ! empty( $request['who'] ) && 'has_published_posts' === $request['who'] ) {
 		$prepared_args['has_published_posts'] = get_post_types( array( 'show_in_rest' => true ), 'names' );
 	}
