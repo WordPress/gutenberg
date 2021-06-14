@@ -187,7 +187,7 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
 /**
  * Filters WP_User_Query arguments when querying users via the REST API.
  *
- * Allow who=has_published_post.
+ * Allow using the has_published_post argument.
  *
  * @param array           $prepared_args Array of arguments for WP_User_Query.
  * @param WP_REST_Request $request       The REST API request.
