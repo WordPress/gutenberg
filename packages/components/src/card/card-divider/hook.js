@@ -38,6 +38,5 @@ export function useCardDivider( props ) {
 	return {
 		...otherProps,
 		className: classes,
-		children: null,
 	};
 }
