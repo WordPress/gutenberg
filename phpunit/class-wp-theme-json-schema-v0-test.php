@@ -283,9 +283,11 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 				'custom'         => false,
 				'customGradient' => false,
 				'palette'        => array(
-					array(
-						'slug'  => 'grey',
-						'color' => 'grey',
+					'theme' => array(
+						array(
+							'slug'  => 'grey',
+							'color' => 'grey',
+						),
 					),
 				),
 			),
@@ -295,9 +297,11 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 						'customGradient' => false,
 						'custom'         => false,
 						'palette'        => array(
-							array(
-								'slug'  => 'grey',
-								'color' => 'grey',
+							'theme' => array(
+								array(
+									'slug'  => 'grey',
+									'color' => 'grey',
+								),
 							),
 						),
 					),
@@ -307,9 +311,11 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 						'customGradient' => false,
 						'custom'         => false,
 						'palette'        => array(
-							array(
-								'slug'  => 'grey',
-								'color' => 'grey',
+							'theme' => array(
+								array(
+									'slug'  => 'grey',
+									'color' => 'grey',
+								),
 							),
 						),
 					),
@@ -319,9 +325,11 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 						'customGradient' => false,
 						'custom'         => false,
 						'palette'        => array(
-							array(
-								'slug'  => 'grey',
-								'color' => 'grey',
+							'theme' => array(
+								array(
+									'slug'  => 'grey',
+									'color' => 'grey',
+								),
 							),
 						),
 					),
@@ -459,8 +467,7 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 					),
 					'misc'     => 'value',
 				)
-			),
-			'core'
+			)
 		);
 
 		$this->assertEquals(
