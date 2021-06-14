@@ -385,26 +385,7 @@ Object {
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
-  opacity: 1;
-  left: 0;
-  right: 0;
-  top: 0;
-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
-  border-radius: 2px;
-}
-
-.emotion-25 {
-  background: transparent;
-  display: block;
-  margin: 0 !important;
-  pointer-events: none;
-  position: absolute;
-  will-change: box-shadow;
-  border-radius: inherit;
-  bottom: 0;
-  box-shadow: 0 2px 4px 0 rgba(0 ,0,0,0.1);
+  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
   opacity: 1;
   left: 0;
   right: 0;
@@ -485,7 +466,7 @@ Object {
         />
         <div
           aria-hidden="true"
-          class="components-elevation emotion-25 emotion-1 emotion-2"
+          class="components-elevation emotion-22 emotion-1 emotion-2"
           data-wp-c16t="true"
           data-wp-component="Elevation"
         />
@@ -683,26 +664,7 @@ Object {
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
-  opacity: 1;
-  left: 0;
-  right: 0;
-  top: 0;
-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
-  border-radius: 2px;
-}
-
-.emotion-25 {
-  background: transparent;
-  display: block;
-  margin: 0 !important;
-  pointer-events: none;
-  position: absolute;
-  will-change: box-shadow;
-  border-radius: inherit;
-  bottom: 0;
-  box-shadow: 0 2px 4px 0 rgba(0 ,0,0,0.1);
+  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
   opacity: 1;
   left: 0;
   right: 0;
@@ -782,7 +744,7 @@ Object {
       />
       <div
         aria-hidden="true"
-        class="components-elevation emotion-25 emotion-1 emotion-2"
+        class="components-elevation emotion-22 emotion-1 emotion-2"
         data-wp-c16t="true"
         data-wp-component="Elevation"
       />

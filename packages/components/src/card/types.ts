@@ -28,7 +28,7 @@ export type Props = SurfaceProps &
 		 * be helpful in highlighting certain content. For more information, check out
 		 * `Elevation`.
 		 *
-		 * @default 2
+		 * @default 0
 		 */
 		elevation?: number;
 		/**

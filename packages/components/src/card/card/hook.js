@@ -43,7 +43,7 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 export function useCard( props ) {
 	const {
 		className,
-		elevation = 2,
+		elevation = 0,
 		isBorderless = false,
 		isRounded = true,
 		size = 'medium',

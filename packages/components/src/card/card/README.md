@@ -37,11 +37,10 @@ function Example() {
 
 ### `elevation`: `number`
 
-Size of the elevation shadow, based on the Style system's elevation system.
-Elevating a `Card` can be done by adjusting the `elevation` prop. This may be helpful in highlighting certain content. For more information, check out `Elevation`.
+Size of the elevation shadow, based on the Style system's elevation system. This may be helpful in highlighting certain content. For more information, check out [`Elevation`](../../elevation/README.md).
 
 - Required: No
-- Default: `2`
+- Default: `0`
 
 ### `isBorderless`: `boolean`
 

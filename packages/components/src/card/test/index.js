@@ -60,12 +60,12 @@ describe( 'Card', () => {
 		} );
 
 		it( 'should show a box shadow when the elevation prop is greater than 0', () => {
-			// The `elevation` prop has a default value of "2"
 			const { container: withElevation } = render(
-				<Card>Code is Poetry</Card>
+				<Card elevation={ 2 }>Code is Poetry</Card>
 			);
+			// The `elevation` prop has a default value of "0"
 			const { container: withoutElevation } = render(
-				<Card elevation={ 0 }>Code is Poetry</Card>
+				<Card>Code is Poetry</Card>
 			);
 
 			expect( withElevation.firstChild ).toMatchDiffSnapshot(
