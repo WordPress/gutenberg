@@ -43,7 +43,7 @@ const withSafeTimeout: PropInjectingHigherOrderComponent< TimeoutProps > = creat
 		> {
 			timeouts: number[];
 
-			constructor( props ) {
+			constructor( props: any ) {
 				super( props );
 				this.timeouts = [];
 				this.setTimeout = this.setTimeout.bind( this );
