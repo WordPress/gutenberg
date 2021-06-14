@@ -17,6 +17,7 @@
 		"src/higher-order/pure/**/*",
 		"src/higher-order/with-instance-id/**/*",
 		"src/higher-order/with-global-events/**/*",
+		"src/higher-order/with-safe-timeout/**/*",
 		"src/higher-order/with-state/**/*",
 		"src/hooks/use-async-list/**/*",
 		"src/hooks/use-constrained-tabbing/**/*",
