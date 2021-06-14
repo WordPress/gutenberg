@@ -32,7 +32,6 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 
 	return {
 		...otherProps,
-		isElevated,
 		elevation: computedElevation,
 	};
 }
