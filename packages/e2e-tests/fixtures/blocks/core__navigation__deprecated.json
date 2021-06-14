@@ -23,7 +23,13 @@
 				"attributes": {
 					"label": "WordPress",
 					"opensInNewTab": false,
-					"url": "https://www.wordpress.org/"
+					"url": "https://www.wordpress.org/",
+					"colors": {
+						"textColor": null,
+						"customTextColor": null,
+						"backgroundColor": null,
+						"customBackgroundColor": null
+					}
 				},
 				"innerBlocks": [],
 				"originalContent": ""

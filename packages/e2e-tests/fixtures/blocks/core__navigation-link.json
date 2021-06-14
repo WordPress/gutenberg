@@ -6,7 +6,13 @@
 		"attributes": {
 			"label": "WordPress",
 			"opensInNewTab": false,
-			"url": "https://wordpress.org/"
+			"url": "https://wordpress.org/",
+			"colors": {
+				"textColor": null,
+				"customTextColor": null,
+				"backgroundColor": null,
+				"customBackgroundColor": null
+			}
 		},
 		"innerBlocks": [],
 		"originalContent": ""
