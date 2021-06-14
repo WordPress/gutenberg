@@ -20,16 +20,6 @@ import {
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 
-function fetchRichUrlData( url, options = {} ) {
-	const emptyDataSet = {};
-
-	if ( url.includes( 'localhost' ) ) {
-		return Promise.resolve( emptyDataSet );
-	}
-
-	return fetchRemoteUrlData( url, options );
-}
-
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
@@ -43,10 +33,11 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
+		baseUrl,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser } = select( coreStore );
+		const { canUser, getUnstableBase } = select( coreStore );
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -61,10 +52,32 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				canUser( 'create', 'media' ),
 				true
 			),
+			baseUrl: getUnstableBase()?.url,
 		};
 	}, [] );
 
 	const { undo } = useDispatch( editorStore );
+
+	function fetchRichUrlData( url, options = {} ) {
+		const emptyDataSet = {};
+
+		const hasBaseUrl = !! baseUrl;
+
+		// If we don't yet have the baseUrl setting then bail.
+		if ( ! hasBaseUrl ) {
+			return Promise.resolve( emptyDataSet );
+		}
+
+		const isInternal = url?.includes( baseUrl );
+
+		// Don't handle internal URLs (yet).
+		if ( isInternal ) {
+			return Promise.resolve( emptyDataSet );
+		}
+
+		// If external then attempt fetch.
+		return fetchRemoteUrlData( url, options );
+	}
 
 	return useMemo(
 		() => ( {
