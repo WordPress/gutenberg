@@ -13,6 +13,7 @@ import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchRemoteUrlData as fetchRemoteUrlData,
 } from '@wordpress/core-data';
+import { getAuthority } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -52,31 +53,39 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				canUser( 'create', 'media' ),
 				true
 			),
-			baseUrl: getUnstableBase()?.url,
+			baseUrl: getUnstableBase()?.url || '',
 		};
 	}, [] );
 
 	const { undo } = useDispatch( editorStore );
 
-	function fetchRichUrlData( url, options = {} ) {
+	// Temporary home - should this live in `core-data`?
+	function fetchRichUrlData( url, fetchOptions = {} ) {
 		const emptyDataSet = {};
 
-		const hasBaseUrl = !! baseUrl;
+		const fetchingBaseUrl = '' === baseUrl;
 
-		// If we don't yet have the baseUrl setting then bail.
-		if ( ! hasBaseUrl ) {
+		// If the baseUrl is still resolving then return
+		// empty data for this request.
+		if ( fetchingBaseUrl ) {
 			return Promise.resolve( emptyDataSet );
 		}
 
-		const isInternal = url?.includes( baseUrl );
+		// More accurate test for internal URLs to avoid edge cases
+		// such as baseURL being included as part of a query string
+		// on the target url.
+		const baseUrlAuthority = getAuthority( baseUrl );
+		const urlAuthority = getAuthority( url );
 
-		// Don't handle internal URLs (yet).
+		const isInternal = urlAuthority === baseUrlAuthority;
+
+		// Don't handle internal URLs (yet...).
 		if ( isInternal ) {
 			return Promise.resolve( emptyDataSet );
 		}
 
-		// If external then attempt fetch.
-		return fetchRemoteUrlData( url, options );
+		// If external then attempt fetch of data.
+		return fetchRemoteUrlData( url, fetchOptions );
 	}
 
 	return useMemo(
