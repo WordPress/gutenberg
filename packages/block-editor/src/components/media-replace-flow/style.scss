@@ -44,6 +44,14 @@
 			padding: 0;
 		}
 
+		.block-editor-link-control__search-item-icon {
+			top: 1em;
+		}
+
+		.block-editor-link-control__search-input {
+			min-width: $modal-min-width;
+		}
+
 		.block-editor-link-control__search-input.block-editor-link-control__search-input input[type="text"] {
 			margin: 16px 0 0 0;
 			width: 100%;
