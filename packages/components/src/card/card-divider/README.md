@@ -1,6 +1,6 @@
 # CardDivider
 
-CardDivider renders an optional divider within a [`<Card />`](../).
+CardDivider renders an optional divider within a [`<Card />`](../card/README.md).
 
 ## Usage
 

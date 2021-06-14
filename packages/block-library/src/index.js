@@ -38,7 +38,6 @@ import * as navigationLink from './navigation-link';
 import * as homeLink from './home-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
-import * as legacyWidget from './legacy-widget';
 import * as logInOut from './loginout';
 import * as list from './list';
 import * as missing from './missing';
@@ -148,7 +147,6 @@ export const __experimentalGetCoreBlocks = () => [
 	mediaText,
 	latestComments,
 	latestPosts,
-	legacyWidget,
 	missing,
 	more,
 	nextpage,

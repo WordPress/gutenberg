@@ -35,7 +35,7 @@ export default function WelcomeGuideTemplate() {
 							</h1>
 							<p className="edit-post-welcome-guide__text">
 								{ __(
-									'Templates express the layout of the site. Customize all aspects of your posts and pages using the tools of blocks and patterns.'
+									'Templates help define the layout of the site. You can customize all aspects of your posts and pages using blocks and patterns in this editor.'
 								) }
 							</p>
 						</>

@@ -205,6 +205,8 @@ export { default as tablet } from './library/tablet';
 export { default as title } from './library/title';
 export { default as tool } from './library/tool';
 export { default as trash } from './library/trash';
+export { default as trendingDown } from './library/trending-down';
+export { default as trendingUp } from './library/trending-up';
 export { default as typography } from './library/typography';
 export { default as undo } from './library/undo';
 export { default as ungroup } from './library/ungroup';

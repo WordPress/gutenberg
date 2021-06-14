@@ -152,7 +152,8 @@ export function* saveWidgetArea( widgetAreaId ) {
 				{
 					...widget,
 					sidebar: widgetAreaId,
-				}
+				},
+				{ undoIgnore: true }
 			);
 
 			const hasEdits = yield select(
@@ -204,12 +205,9 @@ export function* saveWidgetArea( widgetAreaId ) {
 		const widget = preservedRecords[ i ];
 		const { block, position } = batchMeta[ i ];
 
-		yield dispatch(
-			'core/block-editor',
-			'updateBlockAttributes',
-			block.clientId,
-			{ __internalWidgetId: widget.id }
-		);
+		// Set __internalWidgetId on the block. This will be persisted to the
+		// store when we dispatch receiveEntityRecords( post ) below.
+		post.blocks[ position ].attributes.__internalWidgetId = widget.id;
 
 		const error = yield select(
 			'core',
@@ -245,7 +243,8 @@ export function* saveWidgetArea( widgetAreaId ) {
 		widgetAreaId,
 		{
 			widgets: sidebarWidgetsIds,
-		}
+		},
+		{ undoIgnore: true }
 	);
 
 	yield* trySaveWidgetArea( widgetAreaId );

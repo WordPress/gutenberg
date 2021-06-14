@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { FooterUI } from './styles/card-styles';
-import { useCardContext } from './context';
+import { FooterUI } from '../styles';
+import { useCardContext } from '../context';
 
 export const defaultProps = {
 	isBorderless: false,
@@ -15,6 +15,9 @@ export const defaultProps = {
 	size: 'medium',
 };
 
+/**
+ * @param { import('../types').FooterProps } props
+ */
 export function CardFooter( props ) {
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
