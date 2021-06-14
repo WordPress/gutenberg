@@ -102,6 +102,10 @@ describe( 'templates', () => {
 			await page.type( '.editor-post-title__input', 'My Image Format' );
 			await clickBlockAppender();
 			await page.keyboard.press( 'Backspace' );
+			// Wait for the selection to update.
+			await page.evaluate(
+				() => new Promise( window.requestAnimationFrame )
+			);
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
 			await page.reload();
