@@ -1,9 +1,7 @@
 [
 	{
 		"blockName": "core/home-link",
-		"attrs": {
-			"label": "Home"
-		},
+		"attrs": {},
 		"innerBlocks": [],
 		"innerHTML": "",
 		"innerContent": []

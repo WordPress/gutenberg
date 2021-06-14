@@ -6,20 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { useBlockProps } from '@wordpress/block-editor';
+import { _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect } from '@wordpress/element';
 
 const preventDefault = ( event ) => event.preventDefault();
 
-export default function HomeEdit( {
-	attributes,
-	setAttributes,
-	context,
-	clientId,
-} ) {
+export default function HomeEdit( { context, clientId } ) {
 	const { homeUrl } = useSelect(
 		( select ) => {
 			const {
@@ -46,14 +40,6 @@ export default function HomeEdit( {
 		},
 	} );
 
-	const { label } = attributes;
-
-	useEffect( () => {
-		if ( label === undefined ) {
-			setAttributes( { label: __( 'Home' ) } );
-		}
-	}, [ clientId, label ] );
-
 	return (
 		<>
 			<li { ...blockProps }>
@@ -62,23 +48,10 @@ export default function HomeEdit( {
 					href={ homeUrl }
 					onClick={ preventDefault }
 				>
-					<RichText
-						identifier="label"
-						className="wp-block-home-link__label"
-						value={ label }
-						onChange={ ( labelValue ) => {
-							setAttributes( { label: labelValue } );
-						} }
-						aria-label={ __( 'Home link text' ) }
-						placeholder={ __( 'Add home link' ) }
-						withoutInteractiveFormatting
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
-					/>
+					{ _x(
+						'Home',
+						'Label for a link that points at the website home, home_url()'
+					) }
 				</a>
 			</li>
 		</>

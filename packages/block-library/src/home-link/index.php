@@ -121,43 +121,14 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
  * @return string Returns the post content with the home url added.
  */
 function render_block_core_home_link( $attributes, $content, $block ) {
-	if ( empty( $attributes['label'] ) ) {
-		return '';
-	}
 
 	$wrapper_attributes = block_core_home_link_build_li_wrapper_attributes( $block->context );
-
-	$html = '<li ' . $wrapper_attributes . '><a class="wp-block-home-link__content"';
-
-	// Start appending HTML attributes to anchor tag.
-	$html .= ' href="' . esc_url( home_url() ) . '"';
-
-	// End appending HTML attributes to anchor tag.
-	$html .= '>';
-
-	if ( isset( $attributes['label'] ) ) {
-		$html .= wp_kses(
-			$attributes['label'],
-			array(
-				'code'   => array(),
-				'em'     => array(),
-				'img'    => array(
-					'scale' => array(),
-					'class' => array(),
-					'style' => array(),
-					'src'   => array(),
-					'alt'   => array(),
-				),
-				's'      => array(),
-				'span'   => array(
-					'style' => array(),
-				),
-				'strong' => array(),
-			)
-		);
-	}
-
-	$html .= '</a></li>';
+	$html               = sprintf(
+		'<li %1$s><a href="%2$s" class="wp-block-home-link__content">%3$s</a></li>',
+		$wrapper_attributes,
+		esc_url( home_url() ),
+		_x( 'Home', 'Label for a link that points at the website home, home_url().' )
+	);
 	return $html;
 }
 
