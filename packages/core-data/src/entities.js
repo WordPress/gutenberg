@@ -188,6 +188,7 @@ function* loadPostTypeEntities() {
 				record?.title ||
 				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
+			__unstable_rest_base: postType.rest_base,
 		};
 	} );
 }
