@@ -5,23 +5,28 @@ import UnitControl from './unit-control';
 import { LABELS } from './utils';
 import { Layout } from './styles/box-control-styles';
 
-const noop = () => {};
 const groupedSides = [ 'vertical', 'horizontal' ];
 
 export default function VerticalHorizontalInputControls( {
-	onChange = noop,
-	onFocus = noop,
-	onHoverOn = noop,
-	onHoverOff = noop,
+	onChange,
+	onFocus,
+	onHoverOn,
+	onHoverOff,
 	values,
 	sides,
 	...props
 } ) {
 	const createHandleOnFocus = ( side ) => ( event ) => {
+		if ( ! onFocus ) {
+			return;
+		}
 		onFocus( event, { side } );
 	};
 
 	const createHandleOnHoverOn = ( side ) => () => {
+		if ( ! onHoverOn ) {
+			return;
+		}
 		if ( side === 'vertical' ) {
 			onHoverOn( {
 				top: true,
@@ -37,6 +42,9 @@ export default function VerticalHorizontalInputControls( {
 	};
 
 	const createHandleOnHoverOff = ( side ) => () => {
+		if ( ! onHoverOff ) {
+			return;
+		}
 		if ( side === 'vertical' ) {
 			onHoverOff( {
 				top: false,
@@ -52,6 +60,9 @@ export default function VerticalHorizontalInputControls( {
 	};
 
 	const createHandleOnChange = ( side ) => ( next ) => {
+		if ( ! onChange ) {
+			return;
+		}
 		const nextValues = { ...values };
 
 		if ( side === 'vertical' ) {
