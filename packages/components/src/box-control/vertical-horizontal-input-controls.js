@@ -71,7 +71,7 @@ export default function VerticalHorizontalInputControls( {
 
 	const first = filteredSides[ 0 ];
 	const last = filteredSides[ filteredSides.length - 1 ];
-	const only = first === last && first;
+	const only = first === last;
 
 	return (
 		<Layout
