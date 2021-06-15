@@ -41,17 +41,14 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser, getEntityRecord, hasFinishedResolution } = select(
+		const { canUser, getUnstableBase, hasFinishedResolution } = select(
 			coreStore
 		);
 
-		const siteDataArgs = [ 'root', '__unstableBase', undefined ];
-
-		const siteData = getEntityRecord( ...siteDataArgs ) || {};
+		const siteData = getUnstableBase();
 
 		const hasFinishedResolvingSiteData = hasFinishedResolution(
-			'getEntityRecord',
-			[ ...siteDataArgs ]
+			'getUnstableBase'
 		);
 
 		return {
