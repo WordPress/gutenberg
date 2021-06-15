@@ -84,6 +84,14 @@ describe( 'DOM', () => {
 			expect( isHorizontalEdge( div, true ) ).toBe( true );
 			expect( isHorizontalEdge( div, false ) ).toBe( true );
 		} );
+
+		it( 'should return true for input types that do not have selection ranges', () => {
+			const input = document.createElement( 'input' );
+			input.setAttribute( 'type', 'checkbox' );
+			parent.appendChild( input );
+			expect( isHorizontalEdge( input, true ) ).toBe( true );
+			expect( isHorizontalEdge( input, false ) ).toBe( true );
+		} );
 	} );
 
 	describe( 'placeCaretAtHorizontalEdge', () => {
