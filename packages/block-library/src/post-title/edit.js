@@ -31,12 +31,7 @@ export default function PostTitleEdit( {
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
 	const isDescendentOfQueryLoop = !! queryId;
-	const userCanEdit = useCanEditEntity(
-		'root',
-		'postType',
-		postType,
-		postId
-	);
+	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
 		postType,

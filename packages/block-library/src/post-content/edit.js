@@ -82,12 +82,7 @@ function EditableContent( { layout, context = {} } ) {
 function Content( props ) {
 	const { context: { queryId, postType, postId } = {} } = props;
 	const isDescendentOfQueryLoop = !! queryId;
-	const userCanEdit = useCanEditEntity(
-		'root',
-		'postType',
-		postType,
-		postId
-	);
+	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 
 	return isEditable ? (

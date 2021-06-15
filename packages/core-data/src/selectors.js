@@ -646,17 +646,20 @@ export function canUser( state, action, resource, id ) {
  *
  * https://developer.wordpress.org/rest-api/reference/
  *
- * @param {Object} state Data state.
- * @param {string} kind Entity kind.
- * @param {string} name Entity name.
- * @param {number} key Record's key.
+ * @param {Object} state    Data state.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
  * @param {string} recordId Record's id.
  * @return {boolean|undefined} Whether or not the user can edit,
  * or `undefined` if the OPTIONS request is still being made.
  */
-export function canUserEditEntityRecord( state, kind, name, key, recordId ) {
-	const entity = getEntityRecord( state, kind, name, key );
-	const resource = entity?.rest_base || '';
+export function canUserEditEntityRecord( state, kind, name, recordId ) {
+	const entity = getEntity( state, kind, name );
+	if ( ! entity ) {
+		return false;
+	}
+	const resource = entity.__unstable_rest_base;
+
 	return canUser( state, 'update', resource, recordId );
 }
 
