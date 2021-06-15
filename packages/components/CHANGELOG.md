@@ -4,7 +4,7 @@
 
 ### New Feature
 
--   Add `none` as one of the possible values for the `size` prop in `Card`, `CardBody`, `CardHeader`, and `CardFooter` ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
+-   Add `minimal` as one of the possible values for the `size` prop in `Card`, `CardBody`, `CardHeader`, and `CardFooter` ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
 -   Update the border color used in `CardBody`, `CardHeader`, `CardFooter`, and `CardDivider` to a different shade of gray, in order to match the color used in other components ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
 
 ### Deprecation

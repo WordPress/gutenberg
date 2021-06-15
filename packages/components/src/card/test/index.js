@@ -81,15 +81,15 @@ describe( 'Card', () => {
 					<CardBody>Code is Poetry</CardBody>
 				</Card>
 			);
-			const { container: withSizeNone } = render(
-				<Card size="none">
+			const { container: withSizeMinimal } = render(
+				<Card size="minimal">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Code is Poetry</CardBody>
 				</Card>
 			);
 
 			expect( withSize.firstChild ).toMatchDiffSnapshot(
-				withSizeNone.firstChild
+				withSizeMinimal.firstChild
 			);
 		} );
 
