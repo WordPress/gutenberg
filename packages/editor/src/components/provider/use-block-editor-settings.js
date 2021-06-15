@@ -13,13 +13,15 @@ import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchRemoteUrlData as fetchRemoteUrlData,
 } from '@wordpress/core-data';
-import { getAuthority } from '@wordpress/url';
+import { getAuthority, isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+
+const EMPTY_DATA = {};
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -61,14 +63,18 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 
 	// Temporary home - should this live in `core-data`?
 	function fetchRichUrlData( url, fetchOptions = {} ) {
-		const emptyDataSet = {};
+		if ( ! isURL( url ) ) {
+			return Promise.reject(
+				new TypeError( `${ url } is not a valid URL.` )
+			);
+		}
 
 		const fetchingBaseUrl = '' === baseUrl;
 
 		// If the baseUrl is still resolving then return
 		// empty data for this request.
 		if ( fetchingBaseUrl ) {
-			return Promise.resolve( emptyDataSet );
+			return Promise.resolve( EMPTY_DATA );
 		}
 
 		// More accurate test for internal URLs to avoid edge cases
@@ -81,7 +87,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 
 		// Don't handle internal URLs (yet...).
 		if ( isInternal ) {
-			return Promise.resolve( emptyDataSet );
+			return Promise.resolve( EMPTY_DATA );
 		}
 
 		// If external then attempt fetch of data.
