@@ -117,7 +117,7 @@ class BlockListBlock extends Component {
 	}
 
 	setAnimation() {
-		const ANIMATION_DURATION = 50;
+		const ANIMATION_DURATION = 150;
 		LayoutAnimation.configureNext( {
 			duration: ANIMATION_DURATION,
 			update: {
@@ -126,7 +126,6 @@ class BlockListBlock extends Component {
 			create: {
 				type: LayoutAnimation.Types.easeIn,
 				property: LayoutAnimation.Properties.opacity,
-				delay: ANIMATION_DURATION,
 			},
 		} );
 	}

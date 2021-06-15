@@ -105,18 +105,15 @@ export class BlockListItem extends Component {
 	}
 
 	setAnimation() {
-		const ANIMATION_DURATION = 50;
+		const ANIMATION_DURATION = 150;
 		LayoutAnimation.configureNext( {
 			duration: ANIMATION_DURATION,
 			update: {
 				type: LayoutAnimation.Types.easeInEaseOut,
-				springDamping: 0.7,
 			},
 			create: {
 				type: LayoutAnimation.Types.easeIn,
 				property: LayoutAnimation.Properties.opacity,
-				springDamping: 0.7,
-				delay: ANIMATION_DURATION,
 			},
 		} );
 	}
