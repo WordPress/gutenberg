@@ -71,7 +71,7 @@ function InputField(
 	const dragCursor = useDragCursor( isDragging, dragDirection );
 
 	/*
-	 * Handles syncronization of external and internal value state.
+	 * Handles synchronization of external and internal value state.
 	 * If not focused and did not hold a dirty value[1] on blur
 	 * updates the value from the props. Otherwise if not holding
 	 * a dirty value[1] propagates the value and event through onChange.
@@ -155,6 +155,9 @@ function InputField(
 	const dragGestureProps = useDrag(
 		( dragProps ) => {
 			const { distance, dragging, event } = dragProps;
+			// The event is persisted to prevent errors in components using this
+			// to check if a modifier key was held while dragging.
+			event.persist();
 
 			if ( ! distance ) return;
 			event.stopPropagation();
@@ -184,6 +187,19 @@ function InputField(
 	);
 
 	const dragProps = isDragEnabled ? dragGestureProps() : {};
+	/*
+	 * Works around the odd UA (e.g. Firefox) that does not focus inputs of
+	 * type=number when their spinner arrows are pressed.
+	 */
+	let handleOnMouseDown;
+	if ( type === 'number' ) {
+		handleOnMouseDown = ( event ) => {
+			props.onMouseDown?.( event );
+			if ( event.target !== event.target.ownerDocument.activeElement ) {
+				event.target.focus();
+			}
+		};
+	}
 
 	return (
 		<Input
@@ -198,6 +214,7 @@ function InputField(
 			onChange={ handleOnChange }
 			onFocus={ handleOnFocus }
 			onKeyDown={ handleOnKeyDown }
+			onMouseDown={ handleOnMouseDown }
 			ref={ ref }
 			size={ size }
 			value={ value }

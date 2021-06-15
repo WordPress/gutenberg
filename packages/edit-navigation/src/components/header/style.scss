@@ -1,18 +1,19 @@
 .edit-navigation-header {
 	display: flex;
 	align-items: center;
-	padding: $grid-unit-15;
+	padding: $grid-unit-15 $grid-unit-30 $grid-unit-15 20px;
 }
 
 .edit-navigation-header__title-subtitle {
 	flex-grow: 1;
-	padding-left: $grid-unit-10;
 }
 
 .edit-navigation-header__title {
-	font-size: $default-font-size;
-	line-height: $default-line-height;
+	font-size: 23px;
+	font-weight: 400;
 	margin: 0;
+	padding: 7px 0 4px 0;
+	line-height: 1.3;
 }
 
 .edit-navigation-header__subtitle {
@@ -23,8 +24,25 @@
 
 .edit-navigation-header__actions {
 	display: flex;
+
+	> .components-dropdown,
+	> .components-button,
+	> .interface-pinned-items .components-button {
+		&:not(:last-child) {
+			margin-right: $grid-unit-15;
+		}
+	}
 }
 
-.edit-navigation-header__add-menu {
-	min-width: 220px;
+.edit-navigation-header__menu-switcher-dropdown {
+	// Appear below the modal overlay.
+	z-index: z-index(".components-popover.edit-navigation-header__menu-switcher-dropdown");
+}
+
+// Hide notices.
+.gutenberg_page_gutenberg-navigation {
+	.notice,
+	#wpfooter {
+		display: none;
+	}
 }

@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import CardDivider from '../divider';
+import { CardDivider } from '../';
 
 describe( 'CardDivider', () => {
 	describe( 'basic rendering', () => {

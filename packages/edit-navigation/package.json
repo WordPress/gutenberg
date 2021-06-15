@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.8.6",
+	"version": "1.9.5",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
@@ -20,11 +20,14 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
@@ -40,12 +43,13 @@
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/interface": "file:../interface",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"rememo": "^3.0.0",
 		"uuid": "^8.3.0"
 	},

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -13,10 +14,8 @@ const minimumUsersForCombobox = 25;
 
 function PostAuthor() {
 	const showCombobox = useSelect( ( select ) => {
-		const authors = select( 'core' ).getUsers( {
-			who: 'authors',
-			per_page: minimumUsersForCombobox + 1,
-		} );
+		// Not using `getUsers()` because it requires `list_users` capability.
+		const authors = select( coreStore ).getAuthors();
 		return authors?.length >= minimumUsersForCombobox;
 	}, [] );
 

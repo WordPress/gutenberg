@@ -12,10 +12,7 @@
 			"column": 29
 		}
 	},
-	"range": [
-		38,
-		67
-	],
+	"range": [ 38, 67 ],
 	"declaration": {
 		"type": "Identifier",
 		"start": 53,
@@ -30,10 +27,7 @@
 				"column": 28
 			}
 		},
-		"range": [
-			53,
-			66
-		],
+		"range": [ 53, 66 ],
 		"name": "myDeclaration"
 	}
 }

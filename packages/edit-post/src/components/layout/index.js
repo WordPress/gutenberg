@@ -12,32 +12,21 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
+	store as editorStore,
 } from '@wordpress/editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	BlockBreadcrumb,
-	__experimentalLibrary as Library,
-} from '@wordpress/block-editor';
-import {
-	Button,
-	ScrollLock,
-	Popover,
-	__unstableUseDrop as useDrop,
-} from '@wordpress/components';
-import {
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
+import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
+import { Button, ScrollLock, Popover } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	ComplementaryArea,
 	FullscreenMode,
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
-import { close } from '@wordpress/icons';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
@@ -51,6 +40,8 @@ import ManageBlocksModal from '../manage-blocks-modal';
 import PreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
+import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
+import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
@@ -89,13 +80,20 @@ function Layout( { styles } ) {
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
-		showMostUsedBlocks,
 		isInserterOpened,
+		isListViewOpened,
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
+		isTemplateMode,
+		documentLabel,
 	} = useSelect( ( select ) => {
+		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const editorSettings = getEditorSettings();
+		const postTypeLabel = getPostTypeLabel();
+
 		return {
+			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
 			),
@@ -107,13 +105,10 @@ function Layout( { styles } ) {
 			isFullscreenActive: select( editPostStore ).isFeatureActive(
 				'fullscreenMode'
 			),
-			showMostUsedBlocks: select( editPostStore ).isFeatureActive(
-				'mostUsedBlocks'
-			),
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
+			isListViewOpened: select( editPostStore ).isListViewOpened(),
 			mode: select( editPostStore ).getEditorMode(),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
-				.richEditingEnabled,
+			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
@@ -132,6 +127,8 @@ function Layout( { styles } ) {
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
+			// translators: Default label for the Document in the Block Breadcrumb.
+			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -172,12 +169,20 @@ function Layout( { styles } ) {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
-	const ref = useRef();
 
-	useDrop( ref );
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
-	} );
+	const secondarySidebar = () => {
+		if ( mode === 'visual' && isInserterOpened ) {
+			return <InserterSidebar />;
+		}
+		if ( mode === 'visual' && isListViewOpened ) {
+			return (
+				<AsyncModeProvider value="true">
+					<ListViewSidebar />
+				</AsyncModeProvider>
+			);
+		}
+		return null;
+	};
 
 	return (
 		<>
@@ -190,7 +195,6 @@ function Layout( { styles } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
-				ref={ ref }
 				className={ className }
 				labels={ interfaceLabels }
 				header={
@@ -200,44 +204,15 @@ function Layout( { styles } ) {
 						}
 					/>
 				}
-				secondarySidebar={
-					mode === 'visual' &&
-					isInserterOpened && (
-						<div
-							ref={ inserterDialogRef }
-							{ ...inserterDialogProps }
-							className="edit-post-layout__inserter-panel"
-						>
-							<div className="edit-post-layout__inserter-panel-header">
-								<Button
-									icon={ close }
-									onClick={ () =>
-										setIsInserterOpened( false )
-									}
-								/>
-							</div>
-							<div className="edit-post-layout__inserter-panel-content">
-								<Library
-									showMostUsedBlocks={ showMostUsedBlocks }
-									showInserterHelpPanel
-									onSelect={ () => {
-										if ( isMobileViewport ) {
-											setIsInserterOpened( false );
-										}
-									} }
-								/>
-							</div>
-						</div>
-					)
-				}
+				secondarySidebar={ secondarySidebar() }
 				sidebar={
 					( ! isMobileViewport || sidebarIsOpened ) && (
 						<>
 							{ ! isMobileViewport && ! sidebarIsOpened && (
-								<div className="edit-post-layout__toogle-sidebar-panel">
+								<div className="edit-post-layout__toggle-sidebar-panel">
 									<Button
-										isSecondary
-										className="edit-post-layout__toogle-sidebar-panel-button"
+										variant="secondary"
+										className="edit-post-layout__toggle-sidebar-panel-button"
 										onClick={ openSidebarPanel }
 										aria-expanded={ false }
 									>
@@ -260,10 +235,12 @@ function Layout( { styles } ) {
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
-						<div className="edit-post-layout__metaboxes">
-							<MetaBoxes location="normal" />
-							<MetaBoxes location="advanced" />
-						</div>
+						{ ! isTemplateMode && (
+							<div className="edit-post-layout__metaboxes">
+								<MetaBoxes location="normal" />
+								<MetaBoxes location="advanced" />
+							</div>
+						) }
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />
 						) }
@@ -276,7 +253,7 @@ function Layout( { styles } ) {
 					isRichEditingEnabled &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">
-							<BlockBreadcrumb />
+							<BlockBreadcrumb rootLabelText={ documentLabel } />
 						</div>
 					)
 				}

@@ -6,12 +6,20 @@
 		width: 600px;
 	}
 
-	.components-modal__header {
-		background: none;
-		border-bottom: none;
-		width: 100%;
+	.components-modal__content {
 		padding: 0;
-		margin: 0;
+		margin-top: 0;
+		border-radius: $radius-block-ui;
+
+		&::before {
+			content: none;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+		padding: 0;
+		position: sticky;
 
 		.components-button {
 			align-self: flex-start;
@@ -62,21 +70,19 @@
 	}
 
 	&__page-control {
-		margin: $grid-unit-10 0 $grid-unit-10 0;
+		margin: 0;
 		text-align: center;
 
 		li {
 			display: inline-block;
+			margin: 0;
 		}
 
 		.components-button {
 			height: 30px;
 			min-width: 20px;
+			margin: -6px 0;
 		}
-	}
-
-	.components-modal__content {
-		padding: 0;
 	}
 }
 

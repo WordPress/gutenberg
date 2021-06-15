@@ -6,8 +6,9 @@ const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
-const { get, escapeRegExp, compact } = require( 'lodash' );
-const { basename, sep } = require( 'path' );
+const { escapeRegExp, compact } = require( 'lodash' );
+const { sep } = require( 'path' );
+const fastGlob = require( 'fast-glob' );
 
 /**
  * WordPress dependencies
@@ -15,6 +16,11 @@ const { basename, sep } = require( 'path' );
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
+ * Internal dependencies
+ */
+const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 const {
 	camelCaseDash,
 } = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
@@ -64,6 +70,47 @@ const stylesTransform = ( content ) => {
 	return content;
 };
 
+/*
+ * Matches a block's name in paths in the form
+ * build-module/<blockName>/frontend.js
+ */
+const blockNameRegex = new RegExp( /(?<=build-module\/).*(?=(\/frontend))/g );
+
+const createEntrypoints = () => {
+	/*
+	 * Returns an array of paths to frontend.js files within the block-directory package.
+	 * These paths can be matched by the regex `blockNameRegex` in order to extract
+	 * the block's name.
+	 *
+	 * Returns an empty array if no files were found.
+	 */
+	const scriptPaths = fastGlob.sync(
+		'./packages/block-library/build-module/**/frontend.js'
+	);
+
+	/*
+	 * Go through the paths found above, in order to define webpack entry points for
+	 * each block's frontend.js file.
+	 */
+	const scriptEntries = scriptPaths.reduce( ( entries, scriptPath ) => {
+		const [ blockName ] = scriptPath.match( blockNameRegex );
+
+		return {
+			...entries,
+			[ blockName ]: scriptPath,
+		};
+	}, {} );
+
+	const packageEntries = gutenbergPackages.reduce( ( memo, packageName ) => {
+		return {
+			...memo,
+			[ packageName ]: `./packages/${ packageName }`,
+		};
+	}, {} );
+
+	return { ...packageEntries, ...scriptEntries };
+};
+
 module.exports = {
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -90,16 +137,29 @@ module.exports = {
 		],
 	},
 	mode,
-	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
-		const name = camelCaseDash( packageName );
-		memo[ name ] = `./packages/${ packageName }`;
-		return memo;
-	}, {} ),
+	entry: createEntrypoints(),
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './build/[basename]/index.js',
+		filename: ( pathData ) => {
+			const { chunk } = pathData;
+			const { entryModule } = chunk;
+			const { rawRequest, rootModule } = entryModule;
+
+			// When processing ESM files, the requested path
+			// is defined in `entryModule.rootModule.rawRequest`, instead of
+			// being present in `entryModule.rawRequest`.
+			// In the context of frontend files, they would be processed
+			// as ESM if they use `import` or `export` within it.
+			const request = rootModule?.rawRequest || rawRequest;
+
+			if ( request.includes( '/frontend.js' ) ) {
+				return `./build/block-library/blocks/[name]/frontend.min.js`;
+			}
+
+			return `./build/[name]/index.min.js`;
+		},
 		path: __dirname,
-		library: [ 'wp', '[name]' ],
+		library: [ 'wp', '[camelName]' ],
 		libraryTarget: 'window',
 	},
 	module: {
@@ -123,51 +183,25 @@ module.exports = {
 					10
 				) || 1
 			),
-			// Inject the `COMPONENT_SYSTEM_PHASE` global, used for controlling Component System roll-out.
-			'process.env.COMPONENT_SYSTEM_PHASE': JSON.stringify(
-				parseInt(
-					process.env.npm_package_config_COMPONENT_SYSTEM_PHASE,
-					10
-				) || 0
-			),
 			'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
 				process.env.FORCE_REDUCED_MOTION
 			),
 		} ),
 		new CustomTemplatedPathPlugin( {
-			basename( path, data ) {
-				let rawRequest;
-
-				const entryModule = get( data, [ 'chunk', 'entryModule' ], {} );
-				switch ( entryModule.type ) {
-					case 'javascript/auto':
-						rawRequest = entryModule.rawRequest;
-						break;
-
-					case 'javascript/esm':
-						rawRequest = entryModule.rootModule.rawRequest;
-						break;
-				}
-
-				if ( rawRequest ) {
-					return basename( rawRequest );
-				}
-
-				return path;
+			camelName( path, data ) {
+				return camelCaseDash( data.chunk.name );
 			},
 		} ),
-		new LibraryExportDefaultPlugin(
-			[
-				'api-fetch',
-				'deprecated',
-				'dom-ready',
-				'redux-routine',
-				'token-list',
-				'server-side-render',
-				'shortcode',
-				'warning',
-			].map( camelCaseDash )
-		),
+		new LibraryExportDefaultPlugin( [
+			'api-fetch',
+			'deprecated',
+			'dom-ready',
+			'redux-routine',
+			'token-list',
+			'server-side-render',
+			'shortcode',
+			'warning',
+		] ),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
 				from: `./packages/${ packageName }/build-style/*.css`,
@@ -209,12 +243,29 @@ module.exports = {
 				to: 'build/block-library/blocks/[1]/editor-rtl.css',
 				transform: stylesTransform,
 			},
+			{
+				from: './packages/block-library/build-style/*/theme.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }theme\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/theme.css',
+				transform: stylesTransform,
+			},
+			{
+				from: './packages/block-library/build-style/*/theme-rtl.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }theme-rtl\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/theme-rtl.css',
+				transform: stylesTransform,
+			},
 		] ),
 		new CopyWebpackPlugin(
 			Object.entries( {
 				'./packages/block-library/src/': 'build/block-library/blocks/',
 				'./packages/edit-widgets/src/blocks/':
 					'build/edit-widgets/blocks/',
+				'./packages/widgets/src/blocks/': 'build/widgets/blocks/',
 			} ).flatMap( ( [ from, to ] ) => [
 				{
 					from: `${ from }/**/index.php`,
@@ -268,9 +319,10 @@ module.exports = {
 			] )
 		),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+		mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 	].filter( Boolean ),
 	watchOptions: {
-		ignored: '!packages/*/!(src)/**/*',
+		ignored: [ '**/node_modules', '**/packages/*/src' ],
 		aggregateTimeout: 500,
 	},
 	devtool,

@@ -13,12 +13,12 @@ import { Fragment } from '@wordpress/element';
  */
 import BlockNavigationBlock from './block';
 import BlockNavigationAppender from './appender';
-
+import { isClientIdSelected } from './utils';
 export default function BlockNavigationBranch( props ) {
 	const {
 		blocks,
 		selectBlock,
-		selectedBlockClientId,
+		selectedBlockClientIds,
 		showAppender,
 		showBlockMovers,
 		showNestedBlocks,
@@ -26,6 +26,8 @@ export default function BlockNavigationBranch( props ) {
 		level = 1,
 		terminatedLevels = [],
 		path = [],
+		isBranchSelected = false,
+		isLastOfBranch = false,
 	} = props;
 
 	const isTreeRoot = ! parentBlockClientId;
@@ -33,7 +35,7 @@ export default function BlockNavigationBranch( props ) {
 	const itemHasAppender = ( parentClientId ) =>
 		showAppender &&
 		! isTreeRoot &&
-		selectedBlockClientId === parentClientId;
+		isClientIdSelected( parentClientId, selectedBlockClientIds );
 	const hasAppender = itemHasAppender( parentBlockClientId );
 	// Add +1 to the rowCount to take the block appender into account.
 	const blockCount = filteredBlocks.length;
@@ -53,13 +55,30 @@ export default function BlockNavigationBranch( props ) {
 				const hasNestedBlocks =
 					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 				const hasNestedAppender = itemHasAppender( clientId );
+				const hasNestedBranch = hasNestedBlocks || hasNestedAppender;
+
+				const isSelected = isClientIdSelected(
+					clientId,
+					selectedBlockClientIds
+				);
+				const isSelectedBranch =
+					isBranchSelected || ( isSelected && hasNestedBranch );
+
+				// Logic needed to target the last item of a selected branch which might be deeply nested.
+				// This is currently only needed for styling purposes. See: `.is-last-of-selected-branch`.
+				const isLastBlock = index === blockCount - 1;
+				const isLast = isSelected || ( isLastOfBranch && isLastBlock );
+				const isLastOfSelectedBranch =
+					isLastOfBranch && ! hasNestedBranch && isLastBlock;
 
 				return (
 					<Fragment key={ clientId }>
 						<BlockNavigationBlock
 							block={ block }
 							onClick={ selectBlock }
-							isSelected={ selectedBlockClientId === clientId }
+							isSelected={ isSelected }
+							isBranchSelected={ isSelectedBranch }
+							isLastOfSelectedBranch={ isLastOfSelectedBranch }
 							level={ level }
 							position={ position }
 							rowCount={ rowCount }
@@ -68,11 +87,15 @@ export default function BlockNavigationBranch( props ) {
 							terminatedLevels={ terminatedLevels }
 							path={ updatedPath }
 						/>
-						{ ( hasNestedBlocks || hasNestedAppender ) && (
+						{ hasNestedBranch && (
 							<BlockNavigationBranch
 								blocks={ innerBlocks }
-								selectedBlockClientId={ selectedBlockClientId }
+								selectedBlockClientIds={
+									selectedBlockClientIds
+								}
 								selectBlock={ selectBlock }
+								isBranchSelected={ isSelectedBranch }
+								isLastOfBranch={ isLast }
 								showAppender={ showAppender }
 								showBlockMovers={ showBlockMovers }
 								showNestedBlocks={ showNestedBlocks }

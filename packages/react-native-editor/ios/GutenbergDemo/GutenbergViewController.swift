@@ -210,10 +210,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback([MediaInfo(id: 1, url: "https://cldup.com/Fz-ASbo2s3.jpg", type: "image")])
     }
 
-    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent) {
-        print("Gutenberg loged user event")
-    }
-
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) {
         print("Requesting Fallback for \(block)")
         let controller = try! WebViewController(block: block, userId: "0")
@@ -236,22 +232,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {
         print(#function)
     }
-
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
-        print(#function)
-    }
-
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) {
-        print(#function)
-    }
-
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) {
-        print(#function)
-    }
-
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
-        print(#function)
-	}
 
     func gutenbergDidRequestFocalPointPickerTooltipShown() -> Bool {
         return false;
@@ -283,10 +263,6 @@ extension GutenbergViewController: GutenbergWebDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
-    var isPreview: Bool {
-        return false
-    }
-
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"
     }
@@ -310,7 +286,9 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
-            .audioBlock: true
+            .isAudioBlockMediaUploadEnabled: true,
+            .reusableBlock: false,
+            .canViewEditorOnboarding: false
         ]
     }
 

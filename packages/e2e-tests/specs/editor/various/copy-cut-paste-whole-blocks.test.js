@@ -31,6 +31,17 @@ describe( 'Copy/cut/paste of whole blocks', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should copy blocks when non textual elements are focused  (image, spacer)', async () => {
+		await insertBlock( 'Spacer' );
+		// At this point the spacer wrapper should be focused.
+		await pressKeyWithModifier( 'primary', 'c' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'v' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should cut and paste individual blocks', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Yet another unique string.' );

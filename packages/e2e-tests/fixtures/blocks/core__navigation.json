@@ -1,12 +1,13 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/navigation",
-        "isValid": true,
-        "attributes": {
-            "showSubmenuIcon": true
-        },
-        "innerBlocks": [],
-        "originalContent": ""
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/navigation",
+		"isValid": true,
+		"attributes": {
+			"showSubmenuIcon": true,
+			"isResponsive": false
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
 ]

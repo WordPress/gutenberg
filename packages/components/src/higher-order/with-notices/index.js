@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef, useState, useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -17,7 +17,7 @@ import NoticeList from '../../notice/list';
 /**
  * Override the default edit UI to include notices if supported.
  *
- * @param  {WPComponent} OriginalComponent Original component.
+ * @param {WPComponent} OriginalComponent Original component.
  *
  * @return {WPComponent} Wrapped component.
  */
@@ -25,49 +25,53 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 	function Component( props, ref ) {
 		const [ noticeList, setNoticeList ] = useState( [] );
 
-		const noticeOperations = {
+		const noticeOperations = useMemo( () => {
 			/**
 			 * Function passed down as a prop that adds a new notice.
 			 *
-			 * @param {Object} notice  Notice to add.
+			 * @param {Object} notice Notice to add.
 			 */
-			createNotice: ( notice ) => {
+			const createNotice = ( notice ) => {
 				const noticeToAdd = notice.id
 					? notice
 					: { ...notice, id: uuid() };
 				setNoticeList( ( current ) => [ ...current, noticeToAdd ] );
-			},
+			};
 
-			/**
-			 * Function passed as a prop that adds a new error notice.
-			 *
-			 * @param {string} msg  Error message of the notice.
-			 */
-			createErrorNotice: ( msg ) => {
-				noticeOperations.createNotice( {
-					status: 'error',
-					content: msg,
-				} );
-			},
+			return {
+				createNotice,
 
-			/**
-			 * Removes a notice by id.
-			 *
-			 * @param {string} id  Id of the notice to remove.
-			 */
-			removeNotice: ( id ) => {
-				setNoticeList( ( current ) =>
-					current.filter( ( notice ) => notice.id !== id )
-				);
-			},
+				/**
+				 * Function passed as a prop that adds a new error notice.
+				 *
+				 * @param {string} msg Error message of the notice.
+				 */
+				createErrorNotice: ( msg ) => {
+					createNotice( {
+						status: 'error',
+						content: msg,
+					} );
+				},
 
-			/**
-			 * Removes all notices
-			 */
-			removeAllNotices: () => {
-				setNoticeList( [] );
-			},
-		};
+				/**
+				 * Removes a notice by id.
+				 *
+				 * @param {string} id Id of the notice to remove.
+				 */
+				removeNotice: ( id ) => {
+					setNoticeList( ( current ) =>
+						current.filter( ( notice ) => notice.id !== id )
+					);
+				},
+
+				/**
+				 * Removes all notices
+				 */
+				removeAllNotices: () => {
+					setNoticeList( [] );
+				},
+			};
+		}, [] );
 
 		const propsOut = {
 			...props,

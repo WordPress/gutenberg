@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { store as noticesStore } from '@wordpress/notices';
@@ -96,6 +96,19 @@ export function* installBlockType( block ) {
 			);
 		}
 
+		yield controls.dispatch(
+			noticesStore,
+			'createInfoNotice',
+			sprintf(
+				// translators: %s is the block title.
+				__( 'Block %s installed and added.' ),
+				block.title
+			),
+			{
+				speak: true,
+				type: 'snackbar',
+			}
+		);
 		success = true;
 	} catch ( error ) {
 		let message = error.message || __( 'An error occurred.' );
@@ -119,6 +132,10 @@ export function* installBlockType( block ) {
 		}
 
 		yield setErrorNotice( id, message, isFatal );
+		yield controls.dispatch( noticesStore, 'createErrorNotice', message, {
+			speak: true,
+			isDismissible: true,
+		} );
 	}
 	yield setIsInstalling( block.id, false );
 	return success;
@@ -185,7 +202,7 @@ export function removeInstalledBlockType( item ) {
 /**
  * Returns an action object used to indicate install in progress.
  *
- * @param {string} blockId
+ * @param {string}  blockId
  * @param {boolean} isInstalling
  *
  * @return {Object} Action object.
@@ -201,8 +218,8 @@ export function setIsInstalling( blockId, isInstalling ) {
 /**
  * Sets an error notice to be displayed to the user for a given block.
  *
- * @param {string} blockId  The ID of the block plugin. eg: my-block
- * @param {string} message  The message shown in the notice.
+ * @param {string}  blockId The ID of the block plugin. eg: my-block
+ * @param {string}  message The message shown in the notice.
  * @param {boolean} isFatal Whether the user can recover from the error.
  *
  * @return {Object} Action object.

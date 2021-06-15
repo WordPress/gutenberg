@@ -122,6 +122,7 @@ class Modal extends Component {
 
 		if ( isDismissable ) {
 			deprecated( 'isDismissable prop of the Modal component', {
+				since: '5.4',
 				alternative:
 					'isDismissible prop (renamed) of the Modal component',
 			} );

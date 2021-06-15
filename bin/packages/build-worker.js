@@ -54,8 +54,9 @@ const renderSass = promisify( sass.render );
 /**
  * Get the package name for a specified file
  *
- * @param  {string} file File name
- * @return {string}      Package name
+ * @param {string} file File name.
+ *
+ * @return {string} Package name.
  */
 function getPackageName( file ) {
 	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
@@ -64,9 +65,10 @@ function getPackageName( file ) {
 /**
  * Get Build Path for a specified file.
  *
- * @param  {string} file        File to build
- * @param  {string} buildFolder Output folder
- * @return {string}             Build path
+ * @param {string} file        File to build.
+ * @param {string} buildFolder Output folder.
+ *
+ * @return {string} Build path.
  */
 function getBuildPath( file, buildFolder ) {
 	const pkgName = getPackageName( file );
@@ -105,8 +107,7 @@ async function buildCSS( file ) {
 				// Editor styles should be excluded from the default CSS vars output.
 				.concat(
 					file.includes( 'common.scss' ) ||
-						( ! file.includes( 'block-library' ) &&
-							! file.includes( 'editor-styles.scss' ) )
+						! file.includes( 'block-library' )
 						? [ 'default-custom-properties' ]
 						: []
 				)

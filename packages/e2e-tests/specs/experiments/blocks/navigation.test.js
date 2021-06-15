@@ -7,9 +7,12 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	setUpResponseMocking,
-	clickBlockToolbarButton,
 	pressKeyWithModifier,
+	saveDraft,
 	showBlockToolbar,
+	openPreviewPage,
+	selectBlockByClientId,
+	getAllBlocks,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -53,7 +56,7 @@ const REST_PAGES_ROUTES = [
  * routes (extressed as substrings).
  *
  * @param {string} reqUrl the full URL to be tested for matches.
- * @param {Array} routes array of strings to match against the URL.
+ * @param {Array}  routes array of strings to match against the URL.
  */
 function matchUrlToRoute( reqUrl, routes ) {
 	return routes.some( ( route ) => reqUrl.includes( route ) );
@@ -104,7 +107,7 @@ async function mockSearchResponse( items ) {
  * Note: this needs to be within a single call to
  * `setUpResponseMocking` as you can only setup response mocking once per test run.
  *
- * @param {Array} menus menus to provide as mocked responses to menus entity API requests.
+ * @param {Array} menus     menus to provide as mocked responses to menus entity API requests.
  * @param {Array} menuItems menu items to provide as mocked responses to menu-items entity API requests.
  */
 async function mockAllMenusResponses(
@@ -171,10 +174,10 @@ async function mockCreatePageResponse( title, slug ) {
 /**
  * Interacts with the LinkControl to perform a search and select a returned suggestion
  *
- * @param {Object} link link object to be tested
- * @param {string} link.url What will be typed in the search input
+ * @param {Object} link       link object to be tested
+ * @param {string} link.url   What will be typed in the search input
  * @param {string} link.label What the resulting label will be in the creating Link Block after the block is created.
- * @param {string} link.type What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
+ * @param {string} link.type  What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
  */
 async function updateActiveNavigationLink( { url, label, type } ) {
 	const typeClasses = {
@@ -218,35 +221,29 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 }
 
 async function selectDropDownOption( optionText ) {
-	const selectToggle = await page.waitForSelector(
-		'.wp-block-navigation-placeholder__select-control button'
+	const dropdown = await page.waitForXPath(
+		"//*[contains(@class, 'wp-block-navigation-placeholder__actions__dropdown')]"
 	);
-	await selectToggle.click();
+	await dropdown.click();
 	const theOption = await page.waitForXPath(
-		`//li[text()="${ optionText }"]`
+		`//*[contains(@class, 'components-menu-item__item')][ text()="${ optionText }" ]`
 	);
 	await theOption.click();
 }
 
-async function clickCreateButton() {
-	const buttonText = 'Create';
-	// Wait for button to become available
-	await page.waitForXPath(
-		`//button[text()="${ buttonText }"][not(@disabled)]`
-	);
+const PLACEHOLDER_ACTIONS_CLASS = 'wp-block-navigation-placeholder__actions';
+const PLACEHOLDER_ACTIONS_XPATH = `//*[contains(@class, '${ PLACEHOLDER_ACTIONS_CLASS }')]`;
+const START_EMPTY_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Start empty']`;
+const ADD_ALL_PAGES_XPATH = `${ PLACEHOLDER_ACTIONS_XPATH }//button[text()='Add all pages']`;
 
-	// Then locate...
-	const createNavigationButton = await page.waitForXPath(
-		`//button[text()="${ buttonText }"][not(@disabled)]`
-	);
-
-	// Then click
-	await createNavigationButton.click();
+async function createNavBlockWithAllPages() {
+	const allPagesButton = await page.waitForXPath( ADD_ALL_PAGES_XPATH );
+	await allPagesButton.click();
 }
 
 async function createEmptyNavBlock() {
-	await selectDropDownOption( 'Create empty Navigation' );
-	await clickCreateButton();
+	const startEmptyButton = await page.waitForXPath( START_EMPTY_XPATH );
+	await startEmptyButton.click();
 }
 
 async function addLinkBlock() {
@@ -255,9 +252,30 @@ async function addLinkBlock() {
 	await page.click( '.wp-block-navigation .block-list-appender' );
 
 	const [ linkButton ] = await page.$x(
-		"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Link']"
+		"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Custom Link']"
 	);
 	await linkButton.click();
+}
+
+async function toggleSidebar() {
+	await page.click(
+		'.edit-post-header__settings button[aria-label="Settings"]'
+	);
+}
+
+async function turnResponsivenessOn() {
+	const blocks = await getAllBlocks();
+
+	await selectBlockByClientId( blocks[ 0 ].clientId );
+	await toggleSidebar();
+
+	const [ responsivenessToggleButton ] = await page.$x(
+		'//label[text()[contains(.,"Enable responsive menu")]]'
+	);
+
+	await responsivenessToggleButton.click();
+
+	await saveDraft();
 }
 
 beforeEach( async () => {
@@ -268,8 +286,7 @@ afterEach( async () => {
 	await setUpResponseMocking( [] );
 } );
 
-// Skip reason: https://github.com/WordPress/gutenberg/issues/27588.
-describe.skip( 'Navigation', () => {
+describe( 'Navigation', () => {
 	describe( 'Creating from existing Pages', () => {
 		it( 'allows a navigation block to be created using existing pages', async () => {
 			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
@@ -292,9 +309,7 @@ describe.skip( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			await selectDropDownOption( 'Create from all top-level pages' );
-
-			await clickCreateButton();
+			await createNavBlockWithAllPages();
 
 			// Snapshot should contain the mocked pages.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -307,26 +322,15 @@ describe.skip( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			await page.waitForSelector(
-				'.wp-block-navigation-placeholder__select-control button'
-			);
-			await page.click(
-				'.wp-block-navigation-placeholder__select-control button'
-			);
+			await page.waitForXPath( START_EMPTY_XPATH );
 
-			const dropDownItemsLength = await page.$$eval(
-				'ul[role="listbox"] li[role="option"]',
+			const placeholderActionsLength = await page.$$eval(
+				`.${ PLACEHOLDER_ACTIONS_CLASS } button`,
 				( els ) => els.length
 			);
 
-			// Should only be showing
-			// 1. Create empty menu.
-			expect( dropDownItemsLength ).toEqual( 1 );
-
-			await page.waitForXPath( '//li[text()="Create empty Navigation"]' );
-
-			// Snapshot should contain the mocked menu items.
-			expect( await getEditedPostContent() ).toMatchSnapshot();
+			// Should only be showing "Start empty"
+			expect( placeholderActionsLength ).toEqual( 1 );
 		} );
 	} );
 
@@ -339,14 +343,12 @@ describe.skip( 'Navigation', () => {
 
 			await selectDropDownOption( 'Test Menu 2' );
 
-			await clickCreateButton();
-
 			await page.waitForSelector( '.wp-block-navigation__container' );
 
 			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
 			// block previews.
 			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Editor content"][role="region"] li[aria-label="Block: Link"]',
+				'[aria-label="Editor content"][role="region"] li[aria-label="Block: Custom Link"]',
 				( els ) => els.length
 			);
 
@@ -366,8 +368,6 @@ describe.skip( 'Navigation', () => {
 			await insertBlock( 'Navigation' );
 
 			await selectDropDownOption( 'Test Menu 1' );
-
-			await clickCreateButton();
 
 			// Scope element selector to the "Editor content" as otherwise it picks up on
 			// Block Style live previews.
@@ -390,26 +390,15 @@ describe.skip( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			await page.waitForSelector(
-				'.wp-block-navigation-placeholder__select-control button'
-			);
-			await page.click(
-				'.wp-block-navigation-placeholder__select-control button'
-			);
+			await page.waitForXPath( START_EMPTY_XPATH );
 
-			const dropDownItemsLength = await page.$$eval(
-				'ul[role="listbox"] li[role="option"]',
+			const placeholderActionsLength = await page.$$eval(
+				`.${ PLACEHOLDER_ACTIONS_CLASS } button`,
 				( els ) => els.length
 			);
 
-			// Should only be showing
-			// 1. Create empty menu.
-			expect( dropDownItemsLength ).toEqual( 1 );
-
-			await page.waitForXPath( '//li[text()="Create empty Navigation"]' );
-
-			// Snapshot should contain the mocked menu items.
-			expect( await getEditedPostContent() ).toMatchSnapshot();
+			// Should only be showing create empty menu.
+			expect( placeholderActionsLength ).toEqual( 1 );
 		} );
 	} );
 
@@ -452,17 +441,12 @@ describe.skip( 'Navigation', () => {
 		);
 		expect( isInURLInput ).toBe( true );
 		await page.keyboard.press( 'Escape' );
-		const isInLinkRichText = await page.evaluate(
-			() =>
-				document.activeElement.classList.contains( 'rich-text' ) &&
-				!! document.activeElement.closest(
-					'.block-editor-block-list__block'
-				)
-		);
-		expect( isInLinkRichText ).toBe( true );
 
-		// Now, trigger the link dialog once more.
-		await clickBlockToolbarButton( 'Link' );
+		//click the link placeholder
+		const placeholder = await page.waitForSelector(
+			'.wp-block-navigation-link__placeholder'
+		);
+		await placeholder.click();
 
 		// For the second nav link block use an existing internal page.
 		// Mock the api response so that it's consistent.
@@ -539,23 +523,119 @@ describe.skip( 'Navigation', () => {
 
 		await createPageButton.click();
 
-		// wait for the creating confirmation to go away, and we should now be focused on our text input
-		await page.waitForSelector( ':focus.rich-text' );
-
-		// Confirm the new link is focused.
-		const isInLinkRichText = await page.evaluate(
-			() =>
-				document.activeElement.classList.contains( 'rich-text' ) &&
-				!! document.activeElement.closest(
-					'.block-editor-block-list__block'
-				) &&
-				document.activeElement.innerText ===
-					'A really long page name that will not exist'
+		const draftLink = await page.waitForSelector(
+			'.wp-block-navigation-link__content'
 		);
-
-		expect( isInLinkRichText ).toBe( true );
+		await draftLink.click();
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'loads frontend code only if the block is present', async () => {
+		// Mock the response from the Pages endpoint. This is done so that the pages returned are always
+		// consistent and to test the feature more rigorously than the single default sample page.
+		await mockPagesResponse( [
+			{
+				title: 'Home',
+				slug: 'home',
+			},
+			{
+				title: 'About',
+				slug: 'about',
+			},
+			{
+				title: 'Contact Us',
+				slug: 'contact',
+			},
+		] );
+
+		// Create first block at the start in order to enable preview.
+		await insertBlock( 'Navigation' );
+		await saveDraft();
+
+		const previewPage = await openPreviewPage();
+		const isScriptLoaded = await previewPage.evaluate(
+			() =>
+				null !==
+				document.querySelector(
+					'script[src*="navigation/frontend.js"]'
+				)
+		);
+
+		expect( isScriptLoaded ).toBe( false );
+
+		await createNavBlockWithAllPages();
+		await insertBlock( 'Navigation' );
+		await createNavBlockWithAllPages();
+		await turnResponsivenessOn();
+
+		await previewPage.reload( {
+			waitFor: [ 'networkidle0', 'domcontentloaded' ],
+		} );
+
+		/*
+			Count instances of the tag to make sure that it's been loaded only once,
+			regardless of the number of navigation blocks present.
+		*/
+		const tagCount = await previewPage.evaluate(
+			() =>
+				Array.from(
+					document.querySelectorAll(
+						'script[src*="navigation/frontend.js"]'
+					)
+				).length
+		);
+
+		expect( tagCount ).toBe( 1 );
+	} );
+
+	it( 'loads frontend code only if responsiveness is turned on', async () => {
+		await mockPagesResponse( [
+			{
+				title: 'Home',
+				slug: 'home',
+			},
+			{
+				title: 'About',
+				slug: 'about',
+			},
+			{
+				title: 'Contact Us',
+				slug: 'contact',
+			},
+		] );
+
+		await insertBlock( 'Navigation' );
+		await saveDraft();
+
+		const previewPage = await openPreviewPage();
+		let isScriptLoaded = await previewPage.evaluate(
+			() =>
+				null !==
+				document.querySelector(
+					'script[src*="navigation/frontend.js"]'
+				)
+		);
+
+		expect( isScriptLoaded ).toBe( false );
+
+		await createNavBlockWithAllPages();
+
+		await turnResponsivenessOn();
+
+		await previewPage.reload( {
+			waitFor: [ 'networkidle0', 'domcontentloaded' ],
+		} );
+
+		isScriptLoaded = await previewPage.evaluate(
+			() =>
+				null !==
+				document.querySelector(
+					'script[src*="navigation/frontend.js"]'
+				)
+		);
+
+		expect( isScriptLoaded ).toBe( true );
 	} );
 } );

@@ -140,7 +140,7 @@ class EmbedPreview extends Component {
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
+						placeholder={ __( 'Add caption' ) }
 						value={ caption }
 						onChange={ onCaptionChange }
 						inlineToolbar

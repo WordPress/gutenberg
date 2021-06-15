@@ -1,4 +1,17 @@
 $block-editor-link-control-number-of-actions: 1;
+$preview-image-height: 140px;
+
+@keyframes loadingpulse {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
 
 .block-editor-link-control {
 	position: relative;
@@ -141,31 +154,51 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	&.is-current {
+		flex-direction: column; // allow for stacking.
 		background: transparent;
 		border: 0;
 		width: 100%;
 		cursor: default;
 		padding: $grid-unit-20;
-		padding-left: $grid-unit-30;
 	}
 
 	.block-editor-link-control__search-item-header {
 		display: block;
+		flex-direction: row;
+		align-items: flex-start;
 		margin-right: $grid-unit-10;
 		overflow: hidden;
 		white-space: nowrap;
 	}
 
-	.block-editor-link-control__search-item-icon {
-		margin-right: 1em;
-		min-width: 24px;
+	&.is-preview .block-editor-link-control__search-item-header {
+		display: flex;
+		flex: 1; // fill available space.
 	}
+
+	.block-editor-link-control__search-item-details {
+		overflow: hidden; // clip to force text ellipsis.
+	}
+
+	.block-editor-link-control__search-item-icon {
+		position: relative;
+		top: 0.2em;
+		margin-right: $grid-unit-10;
+		width: 18px; // half of 32px to improve perceived resolution.
+		height: 18px; // half of 32px to improve perceived resolution.
+
+		svg,
+		img {
+			max-width: none;
+			width: 18px; // half of 32px to improve perceived resolution.
+		}
+	}
+
 
 	.block-editor-link-control__search-item-info,
 	.block-editor-link-control__search-item-title {
 		overflow: hidden;
 		text-overflow: ellipsis;
-		padding-right: $grid-unit-30;
 
 		.components-external-link__icon {
 			position: absolute;
@@ -189,6 +222,10 @@ $block-editor-link-control-number-of-actions: 1;
 		span {
 			font-weight: normal;
 		}
+
+		svg {
+			display: none; // specifically requested to be removed visually as well.
+		}
 	}
 
 	.block-editor-link-control__search-item-info {
@@ -205,6 +242,109 @@ $block-editor-link-control-number-of-actions: 1;
 		font-size: 0.9em;
 		background-color: $gray-100;
 		border-radius: 2px;
+	}
+
+	.block-editor-link-control__search-item-description {
+		padding-top: 12px;
+		margin: 0;
+
+		&.is-placeholder {
+			margin-top: 12px;
+			padding-top: 0;
+			height: 28px;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
+
+			&::before,
+			&::after {
+				display: block;
+				content: "";
+				height: 0.7em;
+				width: 100%;
+				background-color: $gray-100;
+				border-radius: 3px;
+			}
+		}
+
+		.components-text {
+			font-size: 0.9em;
+		}
+	}
+
+	.block-editor-link-control__search-item-image {
+		display: flex;
+		width: 100%;
+		background-color: $gray-100;
+		justify-content: center;
+		height: $preview-image-height; // limit height
+		max-height: $preview-image-height; // limit height
+		overflow: hidden;
+		border-radius: 2px;
+		margin-top: 12px;
+
+		&.is-placeholder {
+			background-color: $gray-100;
+			border-radius: 3px;
+		}
+
+		img {
+			display: block; // remove unwanted space below image
+			max-width: 100%;
+			height: $preview-image-height; // limit height
+			max-height: $preview-image-height; // limit height
+		}
+	}
+}
+
+.block-editor-link-control__search-item-top {
+	display: flex;
+	flex-direction: row;
+	width: 100%; // clip.
+}
+
+.block-editor-link-control__search-item-bottom {
+	transition: opacity 1.5s;
+	min-height: 100px;
+	width: 100%;
+}
+
+
+.block-editor-link-control__search-item.is-fetching {
+
+	.block-editor-link-control__search-item-description {
+		&::before,
+		&::after {
+			animation: loadingpulse 1s linear infinite;
+			animation-delay: 0.5s; // avoid animating for fast network responses
+		}
+
+	}
+
+	.block-editor-link-control__search-item-image {
+		animation: loadingpulse 1s linear infinite;
+		animation-delay: 0.5s; // avoid animating for fast network responses
+	}
+
+	.block-editor-link-control__search-item-icon {
+		svg,
+		img {
+			opacity: 0;
+		}
+
+		&::before {
+			content: "";
+			display: block;
+			background-color: $gray-100;
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			border-radius: 100%;
+			animation: loadingpulse 1s linear infinite;
+			animation-delay: 0.5s; // avoid animating for fast network responses
+		}
 	}
 }
 
@@ -241,12 +381,16 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__settings {
-	border-top: 1px solid $gray-300;
+	border-top: $border-width solid $gray-300;
 	margin: 0;
 	padding: $grid-unit-20 $grid-unit-30;
 
 	:last-child {
 		margin-bottom: 0;
+	}
+
+	.is-alternate & {
+		border-top: $border-width solid $gray-900;
 	}
 }
 

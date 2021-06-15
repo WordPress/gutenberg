@@ -12,10 +12,7 @@
 			"column": 29
 		}
 	},
-	"range": [
-		62,
-		91
-	],
+	"range": [ 62, 91 ],
 	"declaration": {
 		"type": "Identifier",
 		"start": 77,
@@ -30,10 +27,7 @@
 				"column": 28
 			}
 		},
-		"range": [
-			77,
-			90
-		],
+		"range": [ 77, 90 ],
 		"name": "fnDeclaration"
 	}
 }

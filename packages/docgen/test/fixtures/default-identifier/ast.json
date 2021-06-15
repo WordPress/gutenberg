@@ -12,10 +12,7 @@
 			"column": 32
 		}
 	},
-	"range": [
-		38,
-		97
-	],
+	"range": [ 38, 97 ],
 	"body": [
 		{
 			"type": "ClassDeclaration",
@@ -31,10 +28,7 @@
 					"column": 25
 				}
 			},
-			"range": [
-				38,
-				63
-			],
+			"range": [ 38, 63 ],
 			"id": {
 				"type": "Identifier",
 				"start": 44,
@@ -49,10 +43,7 @@
 						"column": 22
 					}
 				},
-				"range": [
-					44,
-					60
-				],
+				"range": [ 44, 60 ],
 				"name": "ClassDeclaration"
 			},
 			"superClass": null,
@@ -70,10 +61,7 @@
 						"column": 25
 					}
 				},
-				"range": [
-					61,
-					63
-				],
+				"range": [ 61, 63 ],
 				"body": []
 			},
 			"leadingComments": [
@@ -82,10 +70,7 @@
 					"value": "*\n * Class declaration example.\n ",
 					"start": 0,
 					"end": 37,
-					"range": [
-						0,
-						37
-					],
+					"range": [ 0, 37 ],
 					"loc": {
 						"start": {
 							"line": 1,
@@ -113,10 +98,7 @@
 					"column": 32
 				}
 			},
-			"range": [
-				65,
-				97
-			],
+			"range": [ 65, 97 ],
 			"declaration": {
 				"type": "Identifier",
 				"start": 80,
@@ -131,10 +113,7 @@
 						"column": 31
 					}
 				},
-				"range": [
-					80,
-					96
-				],
+				"range": [ 80, 96 ],
 				"name": "ClassDeclaration"
 			}
 		}
@@ -146,10 +125,7 @@
 			"value": "*\n * Class declaration example.\n ",
 			"start": 0,
 			"end": 37,
-			"range": [
-				0,
-				37
-			],
+			"range": [ 0, 37 ],
 			"loc": {
 				"start": {
 					"line": 1,

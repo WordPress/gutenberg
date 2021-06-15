@@ -19,8 +19,8 @@ function getSingleEnableItem( state, itemType, scope ) {
 /**
  * Returns the complementary area that is active in a given scope.
  *
- * @param {Object} state    Global application state.
- * @param {string} scope    Item scope.
+ * @param {Object} state Global application state.
+ * @param {string} scope Item scope.
  *
  * @return {string} The complementary area that is active in the given scope.
  */
@@ -49,9 +49,9 @@ function isMultipleEnabledItemEnabled( state, itemType, scope, item ) {
 /**
  * Returns a boolean indicating if an item is pinned or not.
  *
- * @param {Object} state    Global application state.
- * @param {string} scope    Scope.
- * @param {string} item     Item to check.
+ * @param {Object} state Global application state.
+ * @param {string} scope Scope.
+ * @param {string} item  Item to check.
  *
  * @return {boolean} True if the item is pinned and false otherwise.
  */

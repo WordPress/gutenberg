@@ -5,9 +5,24 @@
 }
 
 .wp-block-site-logo {
-	&.is-resized {
+	// Make the block selectable.
+	a {
+		pointer-events: none;
+	}
+
+	&:not(.is-default-size) {
 		display: table;
 	}
+
+	// Provide a sane starting point for the size.
+	&.is-default-size {
+		width: 120px;
+
+		img {
+			width: 100%;
+		}
+	}
+
 
 	.custom-logo-link {
 		cursor: inherit;
@@ -24,5 +39,44 @@
 	img {
 		display: block;
 		max-width: 100%;
+	}
+
+	// Placeholder improvements.
+	.components-placeholder {
+		min-height: auto;
+		height: 120px;
+		padding: $grid-unit-10;
+
+		// Massage the label.
+		.components-placeholder__label {
+			white-space: nowrap;
+		}
+
+		.components-placeholder__label .block-editor-block-icon {
+			margin-right: $grid-unit-05;
+		}
+
+		// Hide the upload button, as it's also available in the media library.
+		.components-form-file-upload {
+			display: none;
+		}
+
+		// Position the spinner.
+		.components-placeholder__preview {
+			position: absolute;
+			top: $grid-unit-05;
+			right: $grid-unit-05;
+			bottom: $grid-unit-05;
+			left: $grid-unit-05;
+			background: rgba($white, 0.8);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		// Hide drag and drop text.
+		.components-drop-zone__content-text {
+			display: none;
+		}
 	}
 }

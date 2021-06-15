@@ -10,14 +10,12 @@ export function createLogger() {
 		let log = ( message, ...args ) =>
 			logger( 'Block validation: ' + message, ...args );
 
-		// In test environments, pre-process the sprintf message to improve
+		// In test environments, pre-process string substitutions to improve
 		// readability of error messages. We'd prefer to avoid pulling in this
 		// dependency in runtime environments, and it can be dropped by a combo
 		// of Webpack env substitution + UglifyJS dead code elimination.
 		if ( process.env.NODE_ENV === 'test' ) {
-			log = ( ...args ) =>
-				// eslint-disable-next-line import/no-extraneous-dependencies
-				logger( require( 'sprintf-js' ).sprintf( ...args ) );
+			log = ( ...args ) => logger( require( 'util' ).format( ...args ) );
 		}
 
 		return log;

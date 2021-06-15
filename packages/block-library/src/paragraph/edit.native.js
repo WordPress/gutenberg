@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	RichText,
 	store as blockEditorStore,
@@ -39,8 +39,8 @@ function ParagraphBlock( {
 	}, [] );
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ align }
 					isRTL={ isRTL }
 					onChange={ onAlignmentChange }

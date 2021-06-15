@@ -41,9 +41,9 @@ function select( storeKey, selectorName, ...args ) {
  * selectors that may have a resolver. In such case, it will return a `Promise` that resolves
  * after the selector finishes resolving, with the final result value.
  *
- * @param {string} storeKey      The key for the store the selector belongs to
- * @param {string} selectorName  The name of the selector
- * @param {Array}  args          Arguments for the selector.
+ * @param {string} storeKey     The key for the store the selector belongs to
+ * @param {string} selectorName The name of the selector
+ * @param {Array}  args         Arguments for the selector.
  *
  * @example
  * ```js
@@ -65,9 +65,9 @@ function resolveSelect( storeKey, selectorName, ...args ) {
 /**
  * Dispatches a control action for triggering a registry dispatch.
  *
- * @param {string} storeKey    The key for the store the action belongs to
- * @param {string} actionName  The name of the action to dispatch
- * @param {Array}  args        Arguments for the dispatch action.
+ * @param {string} storeKey   The key for the store the action belongs to
+ * @param {string} actionName The name of the action to dispatch
+ * @param {Array}  args       Arguments for the dispatch action.
  *
  * @example
  * ```js

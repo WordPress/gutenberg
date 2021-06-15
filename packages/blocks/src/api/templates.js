@@ -18,10 +18,10 @@ import { getBlockType } from './registration';
 /**
  * Checks whether a list of blocks matches a template by comparing the block names.
  *
- * @param {Array} blocks    Block list.
- * @param {Array} template  Block template.
+ * @param {Array} blocks   Block list.
+ * @param {Array} template Block template.
  *
- * @return {boolean}        Whether the list of blocks matches a templates
+ * @return {boolean} Whether the list of blocks matches a templates.
  */
 export function doBlocksMatchTemplate( blocks = [], template = [] ) {
 	return (
@@ -44,10 +44,10 @@ export function doBlocksMatchTemplate( blocks = [], template = [] ) {
  * (If it has the same name) and if doesn't match, we create a new block based on the template.
  * Extra blocks not present in the template are removed.
  *
- * @param {Array} blocks    Block list.
- * @param {Array} template  Block template.
+ * @param {Array} blocks   Block list.
+ * @param {Array} template Block template.
  *
- * @return {Array}          Updated Block list.
+ * @return {Array} Updated Block list.
  */
 export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 	// If no template is provided, return blocks unmodified.

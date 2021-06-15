@@ -65,3 +65,49 @@
 	// Important is used to have higher specificity than the inline style set by re-resizable library.
 	height: auto !important;
 }
+
+// Only target direct dropzone.
+.wp-block-cover > .components-drop-zone {
+	&.is-active {
+		transition: 0.2s opacity, 0.2s border;
+		@include reduce-motion("transition");
+	}
+
+	&.is-dragging-over-element {
+		background-color: transparent;
+		border: $grid-unit-60 solid var(--wp-admin-theme-color);
+
+		.components-drop-zone__content {
+			transform: none;
+		}
+	}
+
+	.components-drop-zone__content {
+		display: flex;
+		align-items: center;
+		top: -($grid-unit-15 * 3);
+		left: -($grid-unit-15 * 3);
+		transform: none;
+	}
+
+	.components-drop-zone__content-icon,
+	.components-drop-zone__content-text {
+		display: inline;
+	}
+
+	.components-drop-zone__content-icon {
+		// Reset margin.
+		margin: 0;
+		margin-right: $grid-unit;
+	}
+
+	.components-drop-zone__content-text {
+		font-size: $default-font-size;
+	}
+}
+
+// Remove the parallax fixed background when in the patterns preview panel as it
+// doesn't work with the transforms that are applied to resize the block in that context.
+.block-editor-block-patterns-list__list-item .has-parallax.wp-block-cover {
+	background-attachment: scroll;
+}

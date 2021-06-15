@@ -3,16 +3,16 @@
  */
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import SaveShortcut from './save-shortcut';
+import { store as editorStore } from '../../store';
 
 function VisualEditorGlobalKeyboardShortcuts() {
-	const { redo, undo } = useDispatch( 'core/editor' );
+	const { redo, undo } = useDispatch( editorStore );
 
 	useShortcut(
 		'core/editor/undo',
@@ -41,12 +41,3 @@ function VisualEditorGlobalKeyboardShortcuts() {
 }
 
 export default VisualEditorGlobalKeyboardShortcuts;
-
-export function EditorGlobalKeyboardShortcuts() {
-	deprecated( 'EditorGlobalKeyboardShortcuts', {
-		alternative: 'VisualEditorGlobalKeyboardShortcuts',
-		plugin: 'Gutenberg',
-	} );
-
-	return <VisualEditorGlobalKeyboardShortcuts />;
-}

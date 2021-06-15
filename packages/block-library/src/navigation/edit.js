@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -25,9 +25,23 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
+import ResponsiveWrapper from './responsive-wrapper';
+
+const ALLOWED_BLOCKS = [
+	'core/navigation-link',
+	'core/search',
+	'core/social-links',
+	'core/page-list',
+	'core/spacer',
+	'core/home-link',
+];
+
+const LAYOUT = {
+	type: 'default',
+	alignments: [],
+};
 
 function Navigation( {
 	selectedBlockHasDescendants,
@@ -40,11 +54,13 @@ function Navigation( {
 	updateInnerBlocks,
 	className,
 	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = attributes.orientation === 'horizontal',
-	hasListViewModal = true,
+	hasItemJustificationControls = true,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
+	);
+	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
+		false
 	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
@@ -53,6 +69,7 @@ function Navigation( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
+			'is-responsive': attributes.isResponsive,
 		} ),
 	} );
 
@@ -60,17 +77,14 @@ function Navigation( {
 		clientId
 	);
 
+	const placeholder = useMemo( () => <PlaceholderPreview />, [] );
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
 		},
 		{
-			allowedBlocks: [
-				'core/navigation-link',
-				'core/search',
-				'core/social-links',
-				'core/page-list',
-			],
+			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: attributes.orientation || 'horizontal',
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
@@ -84,11 +98,8 @@ function Navigation( {
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
-			__experimentalLayout: {
-				type: 'default',
-				alignments: [],
-			},
-			placeholder: <PlaceholderPreview />,
+			__experimentalLayout: LAYOUT,
+			placeholder,
 		}
 	);
 
@@ -108,12 +119,18 @@ function Navigation( {
 		);
 	}
 
+	const justifyAllowedControls =
+		attributes.orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
+
 	return (
 		<>
 			<BlockControls>
 				{ hasItemJustificationControls && (
 					<JustifyToolbar
 						value={ attributes.itemsJustification }
+						allowedControls={ justifyAllowedControls }
 						onChange={ ( value ) =>
 							setAttributes( { itemsJustification: value } )
 						}
@@ -123,11 +140,9 @@ function Navigation( {
 						} }
 					/>
 				) }
-				{ hasListViewModal && (
-					<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
-				) }
+				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
 			</BlockControls>
-			{ hasListViewModal && navigatorModal }
+			{ navigatorModal }
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>
@@ -140,11 +155,27 @@ function Navigation( {
 							} }
 							label={ __( 'Show submenu indicator icons' ) }
 						/>
+						<ToggleControl
+							checked={ attributes.isResponsive }
+							onChange={ ( value ) => {
+								setAttributes( {
+									isResponsive: value,
+								} );
+							} }
+							label={ __( 'Enable responsive menu' ) }
+						/>
 					</PanelBody>
 				) }
 			</InspectorControls>
 			<nav { ...blockProps }>
-				<ul { ...innerBlocksProps } />
+				<ResponsiveWrapper
+					id={ clientId }
+					onToggle={ setResponsiveMenuVisibility }
+					isOpen={ isResponsiveMenuOpen }
+					isResponsive={ attributes.isResponsive }
+				>
+					<ul { ...innerBlocksProps }></ul>
+				</ResponsiveWrapper>
 			</nav>
 		</>
 	);
@@ -166,10 +197,15 @@ export default compose( [
 		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
 			selectedBlockId,
 		] )?.length;
+
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
+
+			// This prop is already available but computing it here ensures it's
+			// fresh compared to isImmediateParentOfSelectedBlock
+			isSelected: selectedBlockId === clientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {

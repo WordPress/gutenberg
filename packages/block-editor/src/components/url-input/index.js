@@ -100,6 +100,7 @@ class URLInput extends Component {
 	}
 
 	componentWillUnmount() {
+		this.suggestionsRequest?.cancel?.();
 		delete this.suggestionsRequest;
 	}
 
@@ -285,6 +286,15 @@ class URLInput extends Component {
 					}
 					break;
 				}
+
+				// Submitting while loading should trigger onSubmit
+				case ENTER: {
+					if ( this.props.onSubmit ) {
+						this.props.onSubmit();
+					}
+
+					break;
+				}
 			}
 
 			return;
@@ -331,7 +341,14 @@ class URLInput extends Component {
 				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
 					this.selectLink( suggestion );
+
+					if ( this.props.onSubmit ) {
+						this.props.onSubmit( suggestion );
+					}
+				} else if ( this.props.onSubmit ) {
+					this.props.onSubmit();
 				}
+
 				break;
 			}
 		}

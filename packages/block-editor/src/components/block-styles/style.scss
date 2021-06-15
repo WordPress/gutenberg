@@ -36,6 +36,10 @@
 			border: 2px solid $gray-900;
 		}
 	}
+
+	.block-editor-block-preview__container {
+		cursor: inherit;
+	}
 }
 
 // Show a little preview thumbnail for style variations.

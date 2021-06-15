@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  */
 import { Flex } from '../../flex';
 import BaseUnitControl from '../../unit-control';
-import { color, rtl } from '../../utils/style-mixins';
+import { COLORS, rtl } from '../../utils';
 
 export const Root = styled.div`
 	box-sizing: border-box;
@@ -18,7 +18,7 @@ export const Root = styled.div`
 `;
 
 export const Header = styled( Flex )`
-	color: ${ color( 'ui.label' ) };
+	color: ${ COLORS.ui.label };
 	padding-bottom: 8px;
 `;
 
@@ -40,6 +40,7 @@ export const Layout = styled( Flex )`
 	position: relative;
 	height: 100%;
 	width: 100%;
+	justify-content: flex-start;
 `;
 
 const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {

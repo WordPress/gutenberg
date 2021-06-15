@@ -1,0 +1,45 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ],
+	},
+	"references": [
+		{ "path": "../element" },
+		{ "path": "../priority-queue" },
+		{ "path": "../dom" },
+		{ "path": "../keycodes" }
+	],
+	"include": [
+		"src/higher-order/compose.js",
+		"src/higher-order/if-condition/**/*",
+		"src/higher-order/pure/**/*",
+		"src/higher-order/with-instance-id/**/*",
+		"src/higher-order/with-global-events/**/*",
+		"src/higher-order/with-safe-timeout/**/*",
+		"src/higher-order/with-state/**/*",
+		"src/hooks/use-async-list/**/*",
+		"src/hooks/use-constrained-tabbing/**/*",
+		"src/hooks/use-copy-on-click/**/*",
+		"src/hooks/use-copy-to-clipboard/**/*",
+		"src/hooks/use-debounce/**/*",
+		"src/hooks/use-dragging/**/*",
+		"src/hooks/use-drop-zone/**/*",
+		"src/hooks/use-focus-outside/**/*",
+		"src/hooks/use-focus-return/**/*",
+		"src/hooks/use-instance-id/**/*",
+		"src/hooks/use-isomorphic-layout-effect/**/*",
+		"src/hooks/use-keyboard-shortcut/**/*",
+		"src/hooks/use-media-query/**/*",
+		"src/hooks/use-merge-refs/**/*",
+		"src/hooks/use-previous/**/*",
+		"src/hooks/use-reduced-motion/**/*",
+		"src/hooks/use-ref-effect/**/*",
+		"src/hooks/use-resize-observer/**/*",
+		"src/hooks/use-throttle/**/*",
+		"src/hooks/use-viewport-match/**/*",
+		"src/hooks/use-warn-on-change/**/*",
+		"src/utils/**/*"
+	]
+}

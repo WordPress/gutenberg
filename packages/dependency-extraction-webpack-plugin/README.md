@@ -3,11 +3,9 @@
 This webpack plugin serves two purposes:
 
 -   Externalize dependencies that are available as script dependencies on modern WordPress sites.
--   Add an asset file for each entry point that declares an object with the list of WordPress script dependencies for the
-    entry point. The asset file also contains the current version calculated for the current source code.
+-   Add an asset file for each entry point that declares an object with the list of WordPress script dependencies for the entry point. The asset file also contains the current version calculated for the current source code.
 
-This allows JavaScript bundles produced by webpack to leverage WordPress style dependency sharing
-without an error-prone process of manually maintaining a dependency list.
+This allows JavaScript bundles produced by webpack to leverage WordPress style dependency sharing without an error-prone process of manually maintaining a dependency list.
 
 Consult the [webpack website](https://webpack.js.org) for additional information on webpack concepts.
 
@@ -37,9 +35,7 @@ module.exports = {
 };
 ```
 
-**Note:** Multiple instances of the plugin are not supported and may produced unexpected results. If
-you plan to extend the webpack configuration from `@wordpress/scripts` with your own `DependencyExtractionWebpackPlugin`, be sure to
-remove the default instance of the plugin:
+**Note:** Multiple instances of the plugin are not supported and may produced unexpected results. If you plan to extend the webpack configuration from `@wordpress/scripts` with your own `DependencyExtractionWebpackPlugin`, be sure to remove the default instance of the plugin:
 
 ```js
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
@@ -88,15 +84,9 @@ By default, the following module requests are handled:
 | `react-dom`                  | `ReactDOM`           | `react-dom`   |
 | `react`                      | `React`              | `react`       |
 
-**Note:** This plugin overlaps with the functionality provided by [webpack
-`externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract
-script handles from bundle compilation so that a list of script dependencies does not need to be
-manually maintained. If you don't need to extract a list of script dependencies, use the `externals`
-option directly.
+**Note:** This plugin overlaps with the functionality provided by [webpack `externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract script handles from bundle compilation so that a list of script dependencies does not need to be manually maintained. If you don't need to extract a list of script dependencies, use the `externals` option directly.
 
-This plugin is compatible with `externals`, but they may conflict. For example, adding
-`{ externals: { '@wordpress/blob': 'wp.blob' } }` to webpack configuration will effectively hide the
-`@wordpress/blob` module from the plugin and it will not be included in dependency lists.
+This plugin is compatible with `externals`, but they may conflict. For example, adding `{ externals: { '@wordpress/blob': 'wp.blob' } }` to webpack configuration will effectively hide the `@wordpress/blob` module from the plugin and it will not be included in dependency lists.
 
 #### Options
 
@@ -143,19 +133,15 @@ Pass `useDefaults: false` to disable the default request handling.
 -   Type: boolean
 -   Default: `false`
 
-Force `wp-polyfill` to be included in each entry point's dependency list. This would be the same as
-adding `import '@wordpress/polyfill';` to each entry point.
+Force `wp-polyfill` to be included in each entry point's dependency list. This would be the same as adding `import '@wordpress/polyfill';` to each entry point.
 
 ##### `requestToExternal`
 
 -   Type: function
 
-`requestToExternal` allows the module handling to be customized. The function should accept a
-module request string and may return a string representing the global variable to use. An array of
-strings may be used to access globals via an object path, e.g. `wp.i18n` may be represented as `[ 'wp', 'i18n' ]`.
+`requestToExternal` allows the module handling to be customized. The function should accept a module request string and may return a string representing the global variable to use. An array of strings may be used to access globals via an object path, e.g. `wp.i18n` may be represented as `[ 'wp', 'i18n' ]`.
 
-`requestToExternal` provided via configuration has precedence over default external handling.
-Unhandled requests will be handled by the default unless `useDefaults` is set to `false`.
+`requestToExternal` provided via configuration has precedence over default external handling. Unhandled requests will be handled by the default unless `useDefaults` is set to `false`.
 
 ```js
 /**
@@ -212,10 +198,11 @@ module.exports = {
 
 ##### `requestToExternal` and `requestToHandle`
 
-The functions `requestToExternal` and `requestToHandle` allow this module to handle arbitrary
-modules. `requestToExternal` is necessary to handle any module and maps a module request to a global
-name. `requestToHandle` maps the same module request to a script handle, the strings that will be
-included in the `entrypoint.asset.php` files.
+The functions `requestToExternal` and `requestToHandle` allow this module to handle arbitrary modules.
+
+`requestToExternal` is necessary to handle any module and maps a module request to a global name.
+
+`requestToHandle` maps the same module request to a script handle, the strings that will be included in the `entrypoint.asset.php` files.
 
 ### WordPress
 

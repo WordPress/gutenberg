@@ -22,6 +22,7 @@ function InserterLibrary( {
 	showMostUsedBlocks = false,
 	__experimentalInsertionIndex,
 	onSelect = noop,
+	shouldFocusBlock = false,
 } ) {
 	const destinationRootClientId = useSelect(
 		( select ) => {
@@ -43,7 +44,7 @@ function InserterLibrary( {
 			showInserterHelpPanel={ showInserterHelpPanel }
 			showMostUsedBlocks={ showMostUsedBlocks }
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
-			shouldFocusBlock={ false }
+			shouldFocusBlock={ shouldFocusBlock }
 		/>
 	);
 }

@@ -397,9 +397,11 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
+		// Dismiss color picker popover
+		await page.keyboard.press( 'Escape' );
+
 		// Navigate to the block.
 		await page.keyboard.press( 'Tab' );
-		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Copy the colored text.
 		await pressKeyWithModifier( 'primary', 'c' );
@@ -414,5 +416,39 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'primary', 'v' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate arround emoji', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '🍓' );
+		// Only one press on arrow left should be required to move in front of
+		// the emoji.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( '1' );
+
+		// Expect '1🍓'.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should show/hide toolbar when entering/exiting format', async () => {
+		const blockToolbarSelector = '.block-editor-block-toolbar';
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await pressKeyWithModifier( 'primary', 'b' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.keyboard.type( '2' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await pressKeyWithModifier( 'primary', 'b' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( blockToolbarSelector ) ).toBe( null );
 	} );
 } );

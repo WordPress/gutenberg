@@ -3,11 +3,12 @@
  */
 import {
 	createNewPost,
+	disablePrePublishChecks,
 	insertBlock,
 	publishPost,
 	trashAllPosts,
 	activateTheme,
-	canvas,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -21,7 +22,7 @@ describe( 'Multi-entity save flow', () => {
 	const checkboxInputSelector = '.components-checkbox-control__input';
 	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
 	const templatePartSelector = '*[data-type="core/template-part"]';
-	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
+	const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector =
 		'.editor-post-publish-panel__header-cancel-button button';
@@ -169,6 +170,48 @@ describe( 'Multi-entity save flow', () => {
 			await assertMultiSaveEnabled();
 			await assertExistance( saveA11ySelector, true );
 		} );
+
+		it( 'Site blocks should save individually', async () => {
+			await createNewPost();
+			await disablePrePublishChecks();
+
+			await insertBlock( 'Site Title' );
+			// Ensure title is retrieved before typing.
+			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' );
+			await page.keyboard.type( '...' );
+			await insertBlock( 'Site Tagline' );
+			// Ensure tagline is retrieved before typing.
+			await page.waitForXPath(
+				'//p[contains(text(), "Just another WordPress site")]'
+			);
+			await page.keyboard.type( '...' );
+
+			await clickButton( 'Publish' );
+			await page.waitForSelector( savePanelSelector );
+			let checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 3 );
+
+			await checkboxInputs[ 1 ].click();
+			await page.click( entitiesSaveSelector );
+
+			await clickButton( 'Update…' );
+			await page.waitForSelector( savePanelSelector );
+			checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 1 );
+
+			// Reset site entity to default value to not affect other tests.
+			await page.evaluate( () => {
+				wp.data
+					.dispatch( 'core' )
+					.editEntityRecord( 'root', 'site', undefined, {
+						title: 'gutenberg',
+						description: 'Just another WordPress site',
+					} );
+				wp.data
+					.dispatch( 'core' )
+					.saveEditedEntityRecord( 'root', 'site', undefined );
+			} );
+		} );
 	} );
 
 	describe( 'Site Editor', () => {
@@ -187,11 +230,14 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Index' );
-			await navigationPanel.close();
 
-			// Click the first block so that the template part inserts in the right place.
-			const firstBlock = await canvas().$( '.wp-block' );
-			await firstBlock.click();
+			// Select the header template part via list view.
+			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
+			const headerTemplatePartListViewButton = await page.waitForXPath(
+				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
+			);
+			headerTemplatePartListViewButton.click();
+			await page.click( 'button[aria-label="Close list view sidebar"]' );
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );

@@ -11,10 +11,8 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_custom_classname_support( $block_type ) {
-	$has_custom_classname_support = true;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_custom_classname_support = gutenberg_experimental_get( $block_type->supports, array( 'customClassName' ), true );
-	}
+	$has_custom_classname_support = gutenberg_block_has_support( $block_type, array( 'customClassName' ), true );
+
 	if ( $has_custom_classname_support ) {
 		if ( ! $block_type->attributes ) {
 			$block_type->attributes = array();
@@ -37,11 +35,8 @@ function gutenberg_register_custom_classname_support( $block_type ) {
  * @return array Block CSS classes and inline styles.
  */
 function gutenberg_apply_custom_classname_support( $block_type, $block_attributes ) {
-	$has_custom_classname_support = true;
+	$has_custom_classname_support = gutenberg_block_has_support( $block_type, array( 'customClassName' ), true );
 	$attributes                   = array();
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_custom_classname_support = gutenberg_experimental_get( $block_type->supports, array( 'customClassName' ), true );
-	}
 	if ( $has_custom_classname_support ) {
 		$has_custom_classnames = array_key_exists( 'className', $block_attributes );
 

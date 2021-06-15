@@ -157,22 +157,14 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-
 dependencies {
-    implementation project(':@wordpress_react-native-aztec')
-    implementation project(':@wordpress_react-native-bridge')
-    implementation project(':react-native-linear-gradient')
-    implementation project(':@react-native-community_slider')
-    implementation project(':react-native-video')
-    implementation project(':react-native-svg')
-    implementation project(':react-native-get-random-values')
-    implementation project(':@react-native-community_masked-view')
-    implementation project(':react-native-gesture-handler')
-    implementation project(':react-native-screens')
-    implementation project(':react-native-safe-area-context')
-    implementation project(':react-native-reanimated')
-    implementation "org.wordpress:utils:$wordpressUtilsVersion"
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
+        exclude group: 'org.wordpress', module: 'utils'
+    })
+    implementation("org.wordpress:utils:$wordpressUtilsVersion", {
+        exclude group: 'com.android.support'
+    })
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation "com.facebook.react:react-native:+"  // From node_modules
 }
 

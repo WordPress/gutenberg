@@ -21,6 +21,7 @@ import {
 	MediaUpload,
 	InspectorControls,
 	MEDIA_TYPE_ANY,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -286,6 +287,7 @@ export class FileEdit extends Component {
 						value={ textLinkHref }
 						onChange={ this.onChangeLinkDestinationOption }
 						options={ linkDestinationOptions }
+						hideCancelButton={ true }
 					/>
 					<ToggleControl
 						icon={ external }
@@ -551,7 +553,7 @@ export class FileEdit extends Component {
 	}
 
 	render() {
-		const { attributes } = this.props;
+		const { attributes, wasBlockJustInserted, isSelected } = this.props;
 		const { href } = attributes;
 
 		if ( ! href ) {
@@ -565,6 +567,7 @@ export class FileEdit extends Component {
 					onSelect={ this.onSelectFile }
 					onFocus={ this.props.onFocus }
 					allowedTypes={ [ MEDIA_TYPE_ANY ] }
+					autoOpenMediaUpload={ isSelected && wasBlockJustInserted }
 				/>
 			);
 		}
@@ -584,7 +587,7 @@ export class FileEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, props ) => {
-		const { attributes, isSelected } = props;
+		const { attributes, isSelected, clientId } = props;
 		const { id, href } = attributes;
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const isNotFileHref = id && getProtocol( href ) !== 'file:';
@@ -593,6 +596,9 @@ export default compose( [
 				? select( coreStore ).getMedia( id )
 				: undefined,
 			isSidebarOpened: isSelected && isEditorSidebarOpened(),
+			wasBlockJustInserted: select(
+				blockEditorStore
+			).wasBlockJustInserted( clientId, 'inserter_menu' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

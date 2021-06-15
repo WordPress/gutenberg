@@ -56,7 +56,7 @@ export function NumberControl(
 	 * This allows us to tap into actions to transform the (next) state for
 	 * InputControl.
 	 *
-	 * @param {Object} state State from InputControl
+	 * @param {Object} state  State from InputControl
 	 * @param {Object} action Action triggering state change
 	 * @return {Object} The updated state to apply to InputControl
 	 */

@@ -7,7 +7,6 @@ import {
 	MenuItem,
 	FormFileUpload,
 	MenuGroup,
-	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
 	SVG,
@@ -74,7 +73,7 @@ function TrackList( { tracks, onEditPress } ) {
 				>
 					<span>{ track.label } </span>
 					<Button
-						isTertiary
+						variant="tertiary"
 						onClick={ () => onEditPress( index ) }
 						aria-label={ sprintf(
 							/* translators: %s: Label of the video text track e.g: "French subtitles" */
@@ -145,9 +144,6 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					value={ kind }
 					label={ __( 'Kind' ) }
 					onChange={ ( newKind ) => {
-						if ( newKind === DEFAULT_KIND ) {
-							newKind = undefined;
-						}
 						onChange( {
 							...track,
 							kind: newKind,
@@ -156,7 +152,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 				/>
 				<div className="block-library-video-tracks-editor__single-track-editor-buttons-container">
 					<Button
-						isSecondary
+						variant="secondary"
 						onClick={ () => {
 							const changes = {};
 							let hasChanges = false;
@@ -166,6 +162,10 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 							}
 							if ( srcLang === '' ) {
 								changes.srcLang = 'en';
+								hasChanges = true;
+							}
+							if ( track.kind === undefined ) {
+								changes.kind = DEFAULT_KIND;
 								hasChanges = true;
 							}
 							if ( hasChanges ) {
@@ -179,7 +179,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					>
 						{ __( 'Close' ) }
 					</Button>
-					<Button isDestructive isLink onClick={ onRemove }>
+					<Button isDestructive variant="link" onClick={ onRemove }>
 						{ __( 'Remove track' ) }
 					</Button>
 				</div>
@@ -201,16 +201,14 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 		<Dropdown
 			contentClassName="block-library-video-tracks-editor"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarGroup>
-					<ToolbarButton
-						label={ __( 'Text tracks' ) }
-						showTooltip
-						aria-expanded={ isOpen }
-						aria-haspopup="true"
-						onClick={ onToggle }
-						icon={ captionIcon }
-					/>
-				</ToolbarGroup>
+				<ToolbarButton
+					label={ __( 'Text tracks' ) }
+					showTooltip
+					aria-expanded={ isOpen }
+					aria-haspopup="true"
+					onClick={ onToggle }
+					icon={ captionIcon }
+				/>
 			) }
 			renderContent={ ( {} ) => {
 				if ( trackBeingEdited !== null ) {

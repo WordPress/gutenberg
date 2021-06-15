@@ -17,14 +17,28 @@ describe( 'getInlineStyles', () => {
 			getInlineStyles( {
 				color: { text: 'red', background: 'black' },
 				typography: { lineHeight: 1.5, fontSize: 10 },
-				border: { radius: 10 },
+				border: {
+					radius: '10px',
+					width: '1em',
+					style: 'dotted',
+					color: '#21759b',
+				},
+				spacing: {
+					padding: { top: '10px' },
+					margin: { bottom: '15px' },
+				},
 			} )
 		).toEqual( {
 			backgroundColor: 'black',
-			borderRadius: 10,
+			borderColor: '#21759b',
+			borderRadius: '10px',
+			borderStyle: 'dotted',
+			borderWidth: '1em',
 			color: 'red',
 			lineHeight: 1.5,
 			fontSize: 10,
+			marginBottom: '15px',
+			paddingTop: '10px',
 		} );
 	} );
 } );

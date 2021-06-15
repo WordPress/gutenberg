@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -9,6 +14,7 @@ import {
 } from '@wordpress/blocks';
 import { createRegistryControl } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -18,7 +24,7 @@ import { store as reusableBlocksStore } from './index.js';
 /**
  * Convert a reusable block to a static block effect handler
  *
- * @param {string}  clientId Block ID.
+ * @param {string} clientId Block ID.
  * @return {Object} control descriptor.
  */
 export function convertBlockToStatic( clientId ) {
@@ -31,8 +37,8 @@ export function convertBlockToStatic( clientId ) {
 /**
  * Convert a static block to a reusable block effect handler
  *
- * @param {Array} clientIds Block IDs.
- * @param {string} title    Reusable block title.
+ * @param {Array}  clientIds Block IDs.
+ * @param {string} title     Reusable block title.
  * @return {Object} control descriptor.
  */
 export function convertBlocksToReusable( clientIds, title ) {
@@ -60,7 +66,7 @@ const controls = {
 	CONVERT_BLOCK_TO_STATIC: createRegistryControl(
 		( registry ) => ( { clientId } ) => {
 			const oldBlock = registry
-				.select( 'core/block-editor' )
+				.select( blockEditorStore )
 				.getBlock( clientId );
 			const reusableBlock = registry
 				.select( 'core' )
@@ -70,9 +76,13 @@ const controls = {
 					oldBlock.attributes.ref
 				);
 
-			const newBlocks = parse( reusableBlock.content );
+			const newBlocks = parse(
+				isFunction( reusableBlock.content )
+					? reusableBlock.content( reusableBlock )
+					: reusableBlock.content
+			);
 			registry
-				.dispatch( 'core/block-editor' )
+				.dispatch( blockEditorStore )
 				.replaceBlocks( oldBlock.clientId, newBlocks );
 		}
 	),
@@ -84,7 +94,7 @@ const controls = {
 					title: title || __( 'Untitled Reusable block' ),
 					content: serialize(
 						registry
-							.select( 'core/block-editor' )
+							.select( blockEditorStore )
 							.getBlocksByClientId( clientIds )
 					),
 					status: 'publish',
@@ -98,7 +108,7 @@ const controls = {
 					ref: updatedRecord.id,
 				} );
 				registry
-					.dispatch( 'core/block-editor' )
+					.dispatch( blockEditorStore )
 					.replaceBlocks( clientIds, newBlock );
 				registry
 					.dispatch( reusableBlocksStore )
@@ -123,7 +133,7 @@ const controls = {
 
 				// Remove any other blocks that reference this reusable block
 				const allBlocks = registry
-					.select( 'core/block-editor' )
+					.select( blockEditorStore )
 					.getBlocks();
 				const associatedBlocks = allBlocks.filter(
 					( block ) =>
@@ -136,7 +146,7 @@ const controls = {
 				// Remove the parsed block.
 				if ( associatedBlockClientIds.length ) {
 					registry
-						.dispatch( 'core/block-editor' )
+						.dispatch( blockEditorStore )
 						.removeBlocks( associatedBlockClientIds );
 				}
 

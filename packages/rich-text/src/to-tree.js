@@ -14,17 +14,17 @@ import {
  * Converts a format object to information that can be used to create an element
  * from (type, attributes and object).
  *
- * @param  {Object}  $1                        Named parameters.
- * @param  {string}  $1.type                   The format type.
- * @param  {Object}  $1.attributes             The format attributes.
- * @param  {Object}  $1.unregisteredAttributes The unregistered format
- *                                             attributes.
- * @param  {boolean} $1.object                 Whether or not it is an object
- *                                             format.
- * @param  {boolean} $1.boundaryClass          Whether or not to apply a boundary
- *                                             class.
- * @return {Object}                            Information to be used for
- *                                             element creation.
+ * @param {Object}  $1                        Named parameters.
+ * @param {string}  $1.type                   The format type.
+ * @param {Object}  $1.attributes             The format attributes.
+ * @param {Object}  $1.unregisteredAttributes The unregistered format
+ *                                            attributes.
+ * @param {boolean} $1.object                 Whether or not it is an object
+ *                                            format.
+ * @param {boolean} $1.boundaryClass          Whether or not to apply a boundary
+ *                                            class.
+ *
+ * @return {Object} Information to be used for element creation.
  */
 function fromFormat( {
 	type,
@@ -305,6 +305,8 @@ export function toTree( {
 						// selection. The placeholder is also not editable after
 						// all.
 						contenteditable: 'false',
+						style:
+							'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
 					},
 				} );
 			}

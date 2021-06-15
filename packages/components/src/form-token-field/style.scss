@@ -2,7 +2,7 @@
 	@include input-control();
 	display: flex;
 	flex-wrap: wrap;
-	align-items: flex-start;
+	align-items: center;
 	width: 100%;
 	margin: 0 0 $grid-unit-10 0;
 	padding: $grid-unit-05/2 $grid-unit-05;

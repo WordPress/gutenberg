@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        gradlePluginVersion = '3.4.2'
+        gradlePluginVersion = '4.0.2'
         kotlinVersion = '1.3.61'
         buildToolsVersion = "29.0.2"
         minSdkVersion = 21
@@ -19,9 +19,6 @@ buildscript {
     }
 }
 
-// Load the "build from source" flag value but default to `true` since this is the demo gutenberg-mobile project so
-project.ext.buildGutenbergFromSource = project.properties.getOrDefault('wp.BUILD_GUTENBERG_FROM_SOURCE', true).toBoolean()
-
 allprojects {
     repositories {
         mavenLocal()
@@ -33,5 +30,6 @@ allprojects {
         google()
         jcenter()
         maven { url 'https://jitpack.io' }
+        maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
     }
 }

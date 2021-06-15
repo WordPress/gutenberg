@@ -14,13 +14,12 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { BlockControls, BlockAlignmentToolbar } from '../components';
-import { store as blockEditorStore } from '../store';
+import { BlockControls, BlockAlignmentControl } from '../components';
+import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
 
 /**
  * An array which includes all possible valid alignments,
@@ -82,8 +81,9 @@ export function getValidAlignments(
 /**
  * Filters registered block settings, extending attributes to include `align`.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	// allow blocks to specify their own attribute definition with default values if needed.
@@ -110,19 +110,23 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include new toolbar controls for block
  * alignment, if block defines support.
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		// Compute valid alignments without taking into account,
+		// Compute the block allowed alignments without taking into account,
 		// if the theme supports wide alignments or not
 		// and without checking the layout for availble alignments.
 		// BlockAlignmentToolbar takes both of these into account.
-		const validAlignments = getValidAlignments(
+		const blockAllowedAlignments = getValidAlignments(
 			getBlockSupport( blockName, 'align' ),
 			hasBlockSupport( blockName, 'alignWide', true )
+		);
+		const validAlignments = useAvailableAlignments(
+			blockAllowedAlignments
 		);
 
 		const updateAlignment = ( nextAlign ) => {
@@ -138,8 +142,8 @@ export const withToolbarControls = createHigherOrderComponent(
 
 		return [
 			validAlignments.length > 0 && props.isSelected && (
-				<BlockControls key="align-controls">
-					<BlockAlignmentToolbar
+				<BlockControls key="align-controls" group="block">
+					<BlockAlignmentControl
 						value={ props.attributes.align }
 						onChange={ updateAlignment }
 						controls={ validAlignments }
@@ -155,16 +159,20 @@ export const withToolbarControls = createHigherOrderComponent(
 /**
  * Override the default block element to add alignment wrapper props.
  *
- * @param  {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
+ * @param {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withDataAlign = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { align } = attributes;
-		const hasWideEnabled = useSelect(
-			( select ) => !! select( blockEditorStore ).getSettings().alignWide,
-			[]
+		const blockAllowedAlignments = getValidAlignments(
+			getBlockSupport( name, 'align' ),
+			hasBlockSupport( name, 'alignWide', true )
+		);
+		const validAlignments = useAvailableAlignments(
+			blockAllowedAlignments
 		);
 
 		// If an alignment is not assigned, there's no need to go through the
@@ -172,12 +180,6 @@ export const withDataAlign = createHigherOrderComponent(
 		if ( align === undefined ) {
 			return <BlockListBlock { ...props } />;
 		}
-
-		const validAlignments = getValidAlignments(
-			getBlockSupport( name, 'align' ),
-			hasBlockSupport( name, 'alignWide', true ),
-			hasWideEnabled
-		);
 
 		let wrapperProps = props.wrapperProps;
 		if ( validAlignments.includes( align ) ) {
@@ -192,10 +194,11 @@ export const withDataAlign = createHigherOrderComponent(
  * Override props assigned to save component to inject alignment class name if
  * block supports it.
  *
- * @param  {Object} props      Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {Object}            Filtered props applied to save element
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} Filtered props applied to save element.
  */
 export function addAssignedAlign( props, blockType, attributes ) {
 	const { align } = attributes;

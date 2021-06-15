@@ -6,8 +6,11 @@
 	display: flex;
 	flex-grow: 1;
 	width: 100%;
-	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
+
+	// Allow horizontal scrolling on mobile.
+	overflow-y: hidden;
+	overflow-x: auto;
 
 	// Animation
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
@@ -44,7 +47,7 @@
 	}
 }
 
-.block-editor-block-contextual-toolbar.has-parent {
+.block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
 	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
 
 	.show-icon-labels & {
@@ -86,6 +89,9 @@
 		}
 	}
 
+	// Match the parent selector button.
+	margin-left: -$border-width;
+
 	// Compensate for width of block switcher.
 	.block-editor-block-mover {
 		margin-left: -$grid-unit-15 / 2;
@@ -93,7 +99,7 @@
 }
 
 .block-editor-block-toolbar,
-.block-editor-format-toolbar {
+.block-editor-rich-text__inline-format-toolbar-group {
 	// Override Toolbar buttons size.
 	.components-toolbar-group,
 	.components-toolbar {
@@ -204,7 +210,7 @@
 		flex-shrink: 1;
 	}
 
-	.block-editor-format-toolbar {
+	.block-editor-rich-text__inline-format-toolbar-group {
 		.components-button + .components-button {
 			margin-left: 6px;
 		}

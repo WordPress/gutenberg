@@ -48,6 +48,12 @@ exports[`RichText should make bold after split and merge 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should navigate arround emoji 1`] = `
+"<!-- wp:paragraph -->
+<p>1🍓</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should not format text after code backtick 1`] = `
 "<!-- wp:paragraph -->
 <p>A <code>backtick</code> and more.</p>

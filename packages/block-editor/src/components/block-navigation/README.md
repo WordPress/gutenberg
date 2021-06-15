@@ -23,9 +23,7 @@ Renders a block navigation with default syles.
 ```jsx
 import { BlockNavigation } from '@wordpress/block-editor';
 
-const MyNavigation = () => <BlockNavigation
-	onSelect={ onClose }
-/>;
+const MyNavigation = () => <BlockNavigation onSelect={ onClose } />;
 ```
 
 ## Related components

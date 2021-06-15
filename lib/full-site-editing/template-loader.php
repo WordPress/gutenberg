@@ -9,7 +9,7 @@
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
  */
 function gutenberg_add_template_loader_filters() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
 	}
 
@@ -19,37 +19,14 @@ function gutenberg_add_template_loader_filters() {
 		}
 		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
 	}
-}
-add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
 
-/**
- * Get the template hierarchy for a given template type.
- *
- * Internally, this filters into the "{$type}_template_hierarchy" hook to record the type-specific template hierarchy.
- *
- * @param string $template_type A template type.
- * @return string[] A list of template candidates, in descending order of priority.
- */
-function get_template_hierarchy( $template_type ) {
-	if ( ! in_array( $template_type, gutenberg_get_template_type_slugs(), true ) ) {
-		return array();
+	// Request to resolve a template.
+	if ( isset( $_GET['_wp-find-template'] ) ) {
+		add_filter( 'pre_get_posts', 'gutenberg_resolve_template_for_new_post' );
 	}
-
-	$get_template_function     = 'get_' . str_replace( '-', '_', $template_type ) . '_template'; // front-page -> get_front_page_template.
-	$template_hierarchy_filter = str_replace( '-', '', $template_type ) . '_template_hierarchy'; // front-page -> frontpage_template_hierarchy.
-
-	$result                             = array();
-	$template_hierarchy_filter_function = function( $templates ) use ( &$result ) {
-		$result = $templates;
-		return $templates;
-	};
-
-	add_filter( $template_hierarchy_filter, $template_hierarchy_filter_function, 20, 1 );
-	call_user_func( $get_template_function ); // This invokes template_hierarchy_filter.
-	remove_filter( $template_hierarchy_filter, $template_hierarchy_filter_function, 20 );
-
-	return $result;
 }
+
+add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
 
 /**
  * Filters into the "{$type}_template" hooks to redirect them to the Full Site Editing template canvas.
@@ -61,17 +38,50 @@ function get_template_hierarchy( $template_type ) {
  * @param array  $templates A list of template candidates, in descending order of priority.
  * @return string The path to the Full Site Editing template canvas file.
  */
-function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
+function gutenberg_override_query_template( $template, $type, array $templates ) {
 	global $_wp_current_template_content;
-	$current_template = gutenberg_resolve_template( $type, $templates );
 
-	if ( $current_template ) {
-		$_wp_current_template_content = empty( $current_template->content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template->content;
+	if ( $template ) {
+		// locate_template() has found a PHP template at the path specified by $template.
+		// That means that we have a fallback candidate if we cannot find a block template
+		// with higher specificity.
+		// Thus, before looking for matching block themes, we shorten our list of candidate
+		// templates accordingly.
 
+		// Locate the index of $template (without the theme directory path) in $templates.
+		$relative_template_path = str_replace(
+			array( get_stylesheet_directory() . '/', get_template_directory() . '/' ),
+			'',
+			$template
+		);
+		$index                  = array_search( $relative_template_path, $templates, true );
+
+		// If the template hiearchy algorithm has successfully located a PHP template file,
+		// we will only consider block templates with higher or equal specificity.
+		$templates = array_slice( $templates, 0, $index + 1 );
+	}
+
+	$block_template = gutenberg_resolve_template( $type, $templates );
+
+	if ( $block_template ) {
+		if ( empty( $block_template->content ) && is_user_logged_in() ) {
+			$_wp_current_template_content =
+			sprintf(
+				/* translators: %s: Template title */
+				__( 'Empty template: %s', 'gutenberg' ),
+				$block_template->title
+			);
+		} elseif ( ! empty( $block_template->content ) ) {
+			$_wp_current_template_content = $block_template->content;
+		}
 		if ( isset( $_GET['_wp-find-template'] ) ) {
-			wp_send_json_success( $current_template );
+			wp_send_json_success( $block_template );
 		}
 	} else {
+		if ( $template ) {
+			return $template;
+		}
+
 		if ( 'index' === $type ) {
 			if ( isset( $_GET['_wp-find-template'] ) ) {
 				wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
@@ -94,7 +104,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 }
 
 /**
- * Return the correct 'wp_template' to render fot the request template type.
+ * Return the correct 'wp_template' to render for the request template type.
  *
  * Accepts an optional $template_hierarchy argument as a hint.
  *
@@ -105,17 +115,13 @@ function gutenberg_override_query_template( $template, $type, array $templates =
  *  @type int[] A list of template parts IDs for the template.
  * }
  */
-function gutenberg_resolve_template( $template_type, $template_hierarchy = array() ) {
+function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 	if ( ! $template_type ) {
 		return null;
 	}
 
 	if ( empty( $template_hierarchy ) ) {
-		if ( 'index' === $template_type ) {
-			$template_hierarchy = get_template_hierarchy( 'index' );
-		} else {
-			$template_hierarchy = array_merge( get_template_hierarchy( $template_type ), get_template_hierarchy( 'index' ) );
-		}
+		$template_hierarchy = array( $template_type );
 	}
 
 	$slugs = array_map(
@@ -161,7 +167,10 @@ function gutenberg_get_the_template_html() {
 	global $wp_embed;
 
 	if ( ! $_wp_current_template_content ) {
-		return '<h1>' . esc_html__( 'No matching template found', 'gutenberg' ) . '</h1>';
+		if ( is_user_logged_in() ) {
+			return '<h1>' . esc_html__( 'No matching template found', 'gutenberg' ) . '</h1>';
+		}
+		return;
 	}
 
 	$content = $wp_embed->run_shortcode( $_wp_current_template_content );
@@ -232,3 +241,34 @@ function gutenberg_template_render_without_post_block_context( $context ) {
 	return $context;
 }
 add_filter( 'render_block_context', 'gutenberg_template_render_without_post_block_context' );
+
+
+/**
+ * Sets the current WP_Query to return auto-draft posts.
+ *
+ * The auto-draft status indicates a new post, so allow the the WP_Query instance to
+ * return an auto-draft post for template resolution when editing a new post.
+ *
+ * @param WP_Query $wp_query Current WP_Query instance, passed by reference.
+ * @return void
+ */
+function gutenberg_resolve_template_for_new_post( $wp_query ) {
+	remove_filter( 'pre_get_posts', 'gutenberg_resolve_template_for_new_post' );
+
+	// Pages.
+	$page_id = isset( $wp_query->query['page_id'] ) ? $wp_query->query['page_id'] : null;
+
+	// Posts, including custom post types.
+	$p = isset( $wp_query->query['p'] ) ? $wp_query->query['p'] : null;
+
+	$post_id = $page_id ? $page_id : $p;
+	$post    = get_post( $post_id );
+
+	if (
+		$post &&
+		'auto-draft' === $post->post_status &&
+		current_user_can( 'edit_post', $post->ID )
+	) {
+		$wp_query->set( 'post_status', 'auto-draft' );
+	}
+}

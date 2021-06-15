@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/api-fetch --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Usage
 
@@ -18,7 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 import apiFetch from '@wordpress/api-fetch';
 
 // GET
-apiFetch( { path: '/wp/v2/posts' } ).then( posts => {
+apiFetch( { path: '/wp/v2/posts' } ).then( ( posts ) => {
 	console.log( posts );
 } );
 
@@ -27,7 +27,7 @@ apiFetch( {
 	path: '/wp/v2/posts/1',
 	method: 'POST',
 	data: { title: 'New Post Title' },
-} ).then( res => {
+} ).then( ( res ) => {
 	console.log( res );
 } );
 ```
@@ -67,7 +67,7 @@ apiFetch.use( ( options, next ) => {
 	const start = Date.now();
 	const result = next( options );
 	result.then( () => {
-		console.log( 'The request took ' + Date.now() - start );
+		console.log( 'The request took ' + ( Date.now() - start ) + 'ms' );
 	} );
 	return result;
 } );
@@ -82,7 +82,7 @@ The `api-fetch` package provides built-in middlewares you can use to provide a `
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-const nonce = "nonce value";
+const nonce = 'nonce value';
 apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 ```
 
@@ -93,7 +93,7 @@ The function returned by `createNonceMiddleware` includes a `nonce` property cor
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-const rootURL = "http://my-wordpress-site/wp-json/";
+const rootURL = 'http://my-wordpress-site/wp-json/';
 apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
 ```
 

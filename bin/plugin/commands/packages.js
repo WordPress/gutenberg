@@ -32,9 +32,9 @@ const git = require( '../lib/git' );
  * Checks out the WordPress release branch and syncs it with the changes from
  * the last plugin release.
  *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
- * @param {string} abortMessage            Abort Message.
+ * @param {string}  gitWorkingDirectoryPath Git working directory path.
+ * @param {boolean} isPrerelease            Whether the package version to publish is a prerelease.
+ * @param {string}  abortMessage            Abort Message.
  *
  * @return {Promise<Object>} WordPress release branch.
  */
@@ -97,10 +97,10 @@ async function runWordPressReleaseBranchSyncStep(
  * Update CHANGELOG files with the new version number for those packages that
  * contain new entries.
  *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {SemVer} minimumVersionBump      Minimum version bump for the packages.
- * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
- * @param {string} abortMessage            Abort Message.
+ * @param {string}  gitWorkingDirectoryPath Git working directory path.
+ * @param {SemVer}  minimumVersionBump      Minimum version bump for the packages.
+ * @param {boolean} isPrerelease            Whether the package version to publish is a prerelease.
+ * @param {string}  abortMessage            Abort Message.
  */
 async function updatePackages(
 	gitWorkingDirectoryPath,
@@ -121,6 +121,10 @@ async function updatePackages(
 		}
 	);
 
+	const productionPackageNames = Object.keys(
+		require( '../../../package.json' ).dependencies
+	);
+
 	const processedPackages = await Promise.all(
 		changelogFilesPublicPackages.map( async ( changelogPath ) => {
 			const fileStream = fs.createReadStream( changelogPath );
@@ -133,13 +137,23 @@ async function updatePackages(
 				lines.push( line );
 			}
 
-			const versionBump = calculateVersionBumpFromChangelog(
+			let versionBump = calculateVersionBumpFromChangelog(
 				lines,
 				minimumVersionBump
 			);
 			const packageName = `@wordpress/${
 				changelogPath.split( '/' ).reverse()[ 1 ]
 			}`;
+			// Enforce version bump for production packages when
+			// the stable minor or major version bump requested.
+			if (
+				! versionBump &&
+				! isPrerelease &&
+				minimumVersionBump !== 'patch' &&
+				productionPackageNames.includes( packageName )
+			) {
+				versionBump = minimumVersionBump;
+			}
 			const packageJSONPath = changelogPath.replace(
 				'CHANGELOG.md',
 				'package.json'
@@ -260,9 +274,9 @@ async function runPushGitChangesStep(
 /**
  * Publishes all changed packages to npm.
  *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {SemVer} minimumVersionBump      Minimum version bump for the packages.
- * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
+ * @param {string}  gitWorkingDirectoryPath Git working directory path.
+ * @param {SemVer}  minimumVersionBump      Minimum version bump for the packages.
+ * @param {boolean} isPrerelease            Whether the package version to publish is a prerelease.
  */
 async function publishPackagesToNpm(
 	gitWorkingDirectoryPath,
@@ -275,14 +289,23 @@ async function publishPackagesToNpm(
 	} );
 
 	if ( isPrerelease ) {
-		log( '>> Publishing modified packages to npm.' );
+		log(
+			'>> Bumping version of public packages changed since the last release.'
+		);
+		const { stdout: sha } = await command( 'git rev-parse --short HEAD' );
 		await command(
-			`npx lerna publish --canary ${ minimumVersionBump } --preid next`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.${ sha } --no-private`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
 			}
 		);
+
+		log( '>> Publishing modified packages to npm.' );
+		await command( 'npx lerna publish from-package --dist-tag next', {
+			cwd: gitWorkingDirectoryPath,
+			stdio: 'inherit',
+		} );
 	} else {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
@@ -375,8 +398,11 @@ async function publishNpmLatestDistTag() {
 	await prepareForPackageRelease();
 
 	log(
-		'\n>> 🎉 WordPress packages are now published!\n',
-		'Let also people know on WordPress Slack.\n'
+		'\n>> 🎉 WordPress packages are now published!\n\n',
+		'Please remember to run `git cherry-pick` in the `trunk` branch for the newly created commits during the release with labels:\n',
+		' - Update changelog files (if exists)\n',
+		' - chore(release): publish\n\n',
+		'Finally, let also people know on WordPress Slack and celebrate together.'
 	);
 }
 

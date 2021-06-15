@@ -5,7 +5,6 @@ The component renders a user interface that allows the user to select predefined
 
 ## Usage
 
-
 ```jsx
 import { FontSizePicker } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
@@ -54,16 +53,16 @@ The component accepts the following props:
 
 If `true`, it will not be possible to choose a custom fontSize. The user will be forced to pick one of the pre-defined sizes passed in fontSizes.
 
-- Type: `Boolean`
-- Required: no
-- Default: `false`
+-   Type: `Boolean`
+-   Required: no
+-   Default: `false`
 
 ### fallbackFontSize
 
 If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.
 
-- Type: `Number`
-- Required: No
+-   Type: `Number`
+-   Required: No
 
 ### fontSizes
 
@@ -74,28 +73,28 @@ The `slug` property is a string with a unique identifier for the font size. Used
 
 **Note:** The slugs `default` and `custom` are reserved and cannot be used.
 
-- Type: `Array`
-- Required: No
+-   Type: `Array`
+-   Required: No
 
 ### onChange
 
 A function that receives the new font size value.
 If onChange is called without any parameter, it should reset the value, attending to what reset means in that context, e.g., set the font size to undefined or set the font size a starting value.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes
 
 ### value
 
 The current font size value.
 
-- Type: `Number | String`
-- Required: No
+-   Type: `Number | String`
+-   Required: No
 
 ### withSlider
 
 If `true`, the UI will contain a slider, instead of a numeric text input field. If `false`, no slider will be present.
 
-- Type: `Boolean`
-- Required: no
-- Default: `false`
+-   Type: `Boolean`
+-   Required: no
+-   Default: `false`

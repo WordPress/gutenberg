@@ -89,9 +89,7 @@ export const withInspectorControl = createHigherOrderComponent(
 							</>
 						}
 						value={ props.attributes.anchor || '' }
-						valuePlaceholder={
-							! isWeb ? __( 'Add an anchor' ) : null
-						}
+						placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
 						onChange={ ( nextValue ) => {
 							nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
 							props.setAttributes( {

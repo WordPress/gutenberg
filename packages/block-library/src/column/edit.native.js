@@ -15,13 +15,14 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	store as blockEditorStore,
+	useSetting,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	FooterMessageControl,
 	UnitControl,
 	getValueAndUnit,
-	alignmentHelpers,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -33,10 +34,7 @@ import {
 	getWidths,
 	getWidthWithUnit,
 	isPercentageUnit,
-	CSS_UNITS,
 } from '../columns/utils';
-
-const { isWider } = alignmentHelpers;
 
 function ColumnEdit( {
 	attributes,
@@ -52,12 +50,26 @@ function ColumnEdit( {
 	clientId,
 	blockWidth,
 } ) {
+	if ( ! contentStyle ) {
+		contentStyle = { [ clientId ]: {} };
+	}
+
 	const { verticalAlignment, width } = attributes;
 	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
 
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
 	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
+
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'layout.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
+	} );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -101,18 +113,21 @@ function ColumnEdit( {
 
 	const renderAppender = useCallback( () => {
 		const { width: columnWidth } = contentStyle[ clientId ];
-		const isScreenWidthEqual = columnWidth === screenWidth;
+		const isFullWidth = columnWidth === screenWidth;
 
 		if ( isSelected ) {
 			return (
 				<View
-					style={
-						( isWider( screenWidth, 'mobile' ) ||
-							isScreenWidthEqual ) &&
-						( hasChildren
-							? styles.columnAppender
-							: styles.wideColumnAppender )
-					}
+					style={ [
+						styles.columnAppender,
+						isFullWidth && styles.fullwidthColumnAppender,
+						isFullWidth &&
+							hasChildren &&
+							styles.fullwidthHasInnerColumnAppender,
+						! isFullWidth &&
+							hasChildren &&
+							styles.hasInnerColumnAppender,
+					] }
 				>
 					<InnerBlocks.ButtonBlockAppender />
 				</View>
@@ -165,7 +180,7 @@ function ColumnEdit( {
 									getWidths( columns )[ selectedColumnIndex ]
 								}
 								unit={ widthUnit }
-								units={ CSS_UNITS }
+								units={ units }
 								preview={
 									<ColumnsPreview
 										columnWidths={ getWidths(

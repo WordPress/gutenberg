@@ -10,7 +10,7 @@ import {
 	BlockControls,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	JustifyToolbar,
+	JustifyContentControl,
 } from '@wordpress/block-editor';
 
 /**
@@ -20,6 +20,17 @@ import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
+const LAYOUT = {
+	type: 'default',
+	alignments: [],
+};
+const VERTICAL_JUSTIFY_CONTROLS = [ 'left', 'center', 'right' ];
+const HORIZONTAL_JUSTIFY_CONTROLS = [
+	'left',
+	'center',
+	'right',
+	'space-between',
+];
 
 function ButtonsEdit( {
 	attributes: { contentJustification, orientation },
@@ -35,22 +46,19 @@ function ButtonsEdit( {
 		allowedBlocks: ALLOWED_BLOCKS,
 		template: BUTTONS_TEMPLATE,
 		orientation,
-		__experimentalLayout: {
-			type: 'default',
-			alignments: [],
-		},
+		__experimentalLayout: LAYOUT,
 		templateInsertUpdatesSelection: true,
 	} );
 
 	const justifyControls =
 		orientation === 'vertical'
-			? [ 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right', 'space-between' ];
+			? VERTICAL_JUSTIFY_CONTROLS
+			: HORIZONTAL_JUSTIFY_CONTROLS;
 
 	return (
 		<>
-			<BlockControls>
-				<JustifyToolbar
+			<BlockControls group="block">
+				<JustifyContentControl
 					allowedControls={ justifyControls }
 					value={ contentJustification }
 					onChange={ ( value ) =>

@@ -8,7 +8,7 @@ import { noop, get, omit, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { addFilter, removeAllFilters } from '@wordpress/hooks';
+import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
 import { blockDefault as blockIcon } from '@wordpress/icons';
 
@@ -379,6 +379,43 @@ describe( 'blocks', () => {
 					fontSize: 'fontSize',
 				},
 				usesContext: [ 'textColor' ],
+				keywords: [],
+				supports: {},
+				styles: [],
+			} );
+		} );
+
+		// This test can be removed once the polyfill for apiVersion gets removed.
+		it( 'should apply apiVersion on the client when not set on the server', () => {
+			const blockName = 'core/test-block-back-compat';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					category: 'widgets',
+				},
+			} );
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					apiVersion: 2,
+					category: 'ignored',
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				apiVersion: 2,
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				category: 'widgets',
+				icon: {
+					src: blockIcon,
+				},
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
 				supports: {},
 				styles: [],
@@ -761,6 +798,125 @@ describe( 'blocks', () => {
 				);
 				// Only attributes of block1 are supposed to be edited by the filter thus it must differ from block2.
 				expect( block1.attributes ).not.toEqual( block2.attributes );
+			} );
+		} );
+
+		test( 'registers block from metadata', () => {
+			const Edit = () => 'test';
+			const block = registerBlockType(
+				{
+					name: 'test/block-from-metadata',
+					title: 'Block from metadata',
+					category: 'text',
+					icon: 'palmtree',
+					variations: [
+						{
+							name: 'variation',
+							title: 'Variation Title',
+							description: 'Variation description',
+							keywords: [ 'variation' ],
+						},
+					],
+				},
+				{
+					edit: Edit,
+					save: noop,
+				}
+			);
+			expect( block ).toEqual( {
+				name: 'test/block-from-metadata',
+				title: 'Block from metadata',
+				category: 'text',
+				icon: {
+					src: 'palmtree',
+				},
+				keywords: [],
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				supports: {},
+				styles: [],
+				variations: [
+					{
+						name: 'variation',
+						title: 'Variation Title',
+						description: 'Variation description',
+						keywords: [ 'variation' ],
+					},
+				],
+				edit: Edit,
+				save: noop,
+			} );
+		} );
+		test( 'registers block from metadata with translation', () => {
+			addFilter(
+				'i18n.gettext_with_context_test',
+				'test/mark-as-translated',
+				( value ) => value + ' (translated)'
+			);
+
+			const Edit = () => 'test';
+			const block = registerBlockType(
+				{
+					name: 'test/block-from-metadata-i18n',
+					title: 'I18n title from metadata',
+					description: 'I18n description from metadata',
+					keywords: [ 'i18n', 'metadata' ],
+					styles: [
+						{
+							name: 'i18n-style',
+							label: 'I18n Style Label',
+						},
+					],
+					variations: [
+						{
+							name: 'i18n-variation',
+							title: 'I18n Variation Title',
+							description: 'I18n variation description',
+							keywords: [ 'variation' ],
+						},
+					],
+					textdomain: 'test',
+					icon: 'palmtree',
+				},
+				{
+					edit: Edit,
+					save: noop,
+				}
+			);
+			removeFilter(
+				'i18n.gettext_with_context_test',
+				'test/mark-as-translated'
+			);
+
+			expect( block ).toEqual( {
+				name: 'test/block-from-metadata-i18n',
+				title: 'I18n title from metadata (translated)',
+				description: 'I18n description from metadata (translated)',
+				icon: {
+					src: 'palmtree',
+				},
+				keywords: [ 'i18n (translated)', 'metadata (translated)' ],
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				supports: {},
+				styles: [
+					{
+						name: 'i18n-style',
+						label: 'I18n Style Label (translated)',
+					},
+				],
+				variations: [
+					{
+						name: 'i18n-variation',
+						title: 'I18n Variation Title (translated)',
+						description: 'I18n variation description (translated)',
+						keywords: [ 'variation (translated)' ],
+					},
+				],
+				edit: Edit,
+				save: noop,
 			} );
 		} );
 	} );

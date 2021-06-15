@@ -4,12 +4,6 @@
  *
  * @package Gutenberg
  */
-
-/**
- * Test WP_Theme_JSON class.
- *
- * @package Gutenberg
- */
 class Gutenberg_Utils_Test extends WP_UnitTestCase {
 	/**
 	 * Test gutenberg_experimental_set() with simple non subtree path.
@@ -126,36 +120,5 @@ class Gutenberg_Utils_Test extends WP_UnitTestCase {
 			$test_array,
 			array( 'a' => 2 )
 		);
-	}
-
-	/**
-	 * Test gutenberg_get_minified_styles().
-	 */
-	public function test_gutenberg_get_minified_styles() {
-		$cases = array(
-			array(
-				'in' => '
-/**
- * Comment
- */
-          .foo      {
-			  bar:  		1;
-		  }
-			',
-				'out' => '.foo{bar:1}',
-			),
-			array(
-				'in' => '/* Comment */#foo{content:" ";  bar:   0;
-				  }',
-				'out' => '#foo{content:" ";bar:0}',
-			),
-		);
-
-		foreach ( $cases as $case ) {
-			$this->assertSame(
-				gutenberg_get_minified_styles( $case['in'] ),
-				$case['out']
-			);
-		}
 	}
 }

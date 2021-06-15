@@ -6,7 +6,7 @@ import tinycolor from 'tinycolor2';
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,7 +31,11 @@ function useDarkThemeBodyClassName( styles ) {
 				.getComputedStyle( canvas, null )
 				.getPropertyValue( 'background-color' );
 
-			if ( tinycolor( backgroundColor ).getLuminance() > 0.5 ) {
+			// If background is transparent, it should be treated as light color.
+			if (
+				tinycolor( backgroundColor ).getLuminance() > 0.5 ||
+				tinycolor( backgroundColor ).getAlpha() === 0
+			) {
 				body.classList.remove( 'is-dark-theme' );
 			} else {
 				body.classList.add( 'is-dark-theme' );
@@ -42,16 +46,18 @@ function useDarkThemeBodyClassName( styles ) {
 }
 
 export default function EditorStyles( { styles } ) {
+	const transformedStyles = useMemo(
+		() => transformStyles( styles, EDITOR_STYLES_SELECTOR ),
+		[ styles ]
+	);
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
 			<style ref={ useDarkThemeBodyClassName( styles ) } />
-			{ transformStyles( styles, EDITOR_STYLES_SELECTOR ).map(
-				( css, index ) => (
-					<style key={ index }>{ css }</style>
-				)
-			) }
+			{ transformedStyles.map( ( css, index ) => (
+				<style key={ index }>{ css }</style>
+			) ) }
 		</>
 	);
 }

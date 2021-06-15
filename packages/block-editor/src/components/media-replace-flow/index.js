@@ -13,7 +13,6 @@ import {
 	FormFileUpload,
 	NavigableMenu,
 	MenuItem,
-	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
 	withFilters,
@@ -119,17 +118,15 @@ const MediaReplaceFlow = ( {
 			popoverProps={ POPOVER_PROPS }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarGroup className="media-replace-flow">
-					<ToolbarButton
-						ref={ editMediaButtonRef }
-						aria-expanded={ isOpen }
-						aria-haspopup="true"
-						onClick={ onToggle }
-						onKeyDown={ openOnArrowDown }
-					>
-						{ name }
-					</ToolbarButton>
-				</ToolbarGroup>
+				<ToolbarButton
+					ref={ editMediaButtonRef }
+					aria-expanded={ isOpen }
+					aria-haspopup="true"
+					onClick={ onToggle }
+					onKeyDown={ openOnArrowDown }
+				>
+					{ name }
+				</ToolbarButton>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<>

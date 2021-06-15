@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -17,7 +19,7 @@ import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../store/utils';
 const useLastSelectedWidgetArea = () =>
 	useSelect( ( select ) => {
 		const { getBlockSelectionEnd, getBlockParents, getBlockName } = select(
-			'core/block-editor'
+			blockEditorStore
 		);
 		const blockSelectionEndClientId = getBlockSelectionEnd();
 
@@ -41,7 +43,7 @@ const useLastSelectedWidgetArea = () =>
 
 		// If no widget area has been selected, return the clientId of the first
 		// area.
-		const { getEntityRecord } = select( 'core' );
+		const { getEntityRecord } = select( coreStore );
 		const widgetAreasPost = getEntityRecord(
 			KIND,
 			POST_TYPE,

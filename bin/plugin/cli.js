@@ -19,25 +19,12 @@ const catchException = ( command ) => {
 /**
  * Internal dependencies
  */
-const { releaseRC, releaseStable } = require( './commands/release' );
 const {
 	publishNpmLatestDistTag,
 	publishNpmNextDistTag,
 } = require( './commands/packages' );
 const { getReleaseChangelog } = require( './commands/changelog' );
 const { runPerformanceTests } = require( './commands/performance' );
-
-program
-	.command( 'release-plugin-rc' )
-	.alias( 'rc' )
-	.description( 'Release an RC version of the plugin' )
-	.action( catchException( releaseRC ) );
-
-program
-	.command( 'release-plugin-stable' )
-	.alias( 'stable' )
-	.description( 'Release a stable version of the plugin' )
-	.action( catchException( releaseStable ) );
 
 program
 	.command( 'publish-npm-packages-latest' )
@@ -74,6 +61,10 @@ program
 	.option(
 		'--tests-branch <branch>',
 		"Use this branch's performance test files"
+	)
+	.option(
+		'--wp-version <version>',
+		'Specify a WordPress version on which to test all branches'
 	)
 	.description(
 		'Runs performance tests on two separate branches and outputs the result'

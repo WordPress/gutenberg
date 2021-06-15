@@ -15,6 +15,7 @@ import {
 	getValueAndUnit,
 	GlobalStylesContext,
 	alignmentHelpers,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -22,6 +23,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	BlockVariationPicker,
+	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
@@ -49,7 +51,6 @@ import {
 	getWidths,
 	getWidthWithUnit,
 	isPercentageUnit,
-	CSS_UNITS,
 } from './utils';
 import {
 	getColumnsInRow,
@@ -84,7 +85,7 @@ const DEFAULT_COLUMNS_NUM = 2;
  */
 const MIN_COLUMNS_NUM = 1;
 
-const { isWider, isFullWidth } = alignmentHelpers;
+const { isFullWidth } = alignmentHelpers;
 
 function ColumnsEditContainer( {
 	attributes,
@@ -105,6 +106,16 @@ function ColumnsEditContainer( {
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
 
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'layout.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
+	} );
+
 	useEffect( () => {
 		if ( columnCount === 0 ) {
 			const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
@@ -121,16 +132,9 @@ function ColumnsEditContainer( {
 	}, [ width, columnCount ] );
 
 	const renderAppender = () => {
-		const isEqualWidth = width === screenWidth;
-
 		if ( isSelected ) {
 			return (
-				<View
-					style={
-						( isWider( screenWidth, 'mobile' ) || isEqualWidth ) &&
-						styles.columnAppender
-					}
-				>
+				<View style={ isFullWidth( align ) && styles.columnAppender }>
 					<InnerBlocks.ButtonBlockAppender
 						onAddBlock={ onAddBlock }
 					/>
@@ -189,6 +193,7 @@ function ColumnsEditContainer( {
 			return (
 				<UnitControl
 					label={ `Column ${ index + 1 }` }
+					settingLabel="Width"
 					key={ `${ column.clientId }-${
 						getWidths( innerWidths ).length
 					}` }
@@ -210,7 +215,7 @@ function ColumnsEditContainer( {
 						onChangeWidth( nextWidth, valueUnit, column.clientId );
 					} }
 					unit={ valueUnit }
-					units={ CSS_UNITS }
+					units={ units }
 					preview={
 						<ColumnsPreview
 							columnWidths={ getWidths( innerWidths, false ) }
@@ -369,7 +374,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 					...getMappedColumnWidths( innerBlocks, widths ),
 					...times( newColumns - previousColumns, () => {
 						return createBlock( 'core/column', {
-							width: newColumnWidth,
+							width: `${ newColumnWidth }%`,
 							verticalAlignment,
 						} );
 					} ),

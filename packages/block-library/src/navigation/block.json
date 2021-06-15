@@ -1,7 +1,15 @@
 {
 	"apiVersion": 2,
 	"name": "core/navigation",
+	"title": "Navigation",
 	"category": "design",
+	"description": "A collection of blocks that allow visitors to get around your site.",
+	"keywords": [
+		"menu",
+		"navigation",
+		"links"
+	],
+	"textdomain": "default",
 	"attributes": {
 		"orientation": {
 			"type": "string"
@@ -30,6 +38,10 @@
 		"showSubmenuIcon": {
 			"type": "boolean",
 			"default": true
+		},
+		"isResponsive": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"providesContext": {
@@ -40,7 +52,8 @@
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
-		"style": "style"
+		"style": "style",
+		"orientation": "orientation"
 	},
 	"supports": {
 		"align": [
@@ -50,13 +63,16 @@
 		"anchor": true,
 		"html": false,
 		"inserter": true,
-		"fontSize": true,
-		"__experimentalFontStyle": true,
-		"__experimentalFontWeight": true,
-		"__experimentalTextTransform": true,
-		"color": true,
-		"__experimentalFontFamily": true,
-		"__experimentalTextDecoration": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalTextTransform": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true
+		},
+		"color": true
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"

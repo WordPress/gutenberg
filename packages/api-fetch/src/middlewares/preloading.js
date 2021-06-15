@@ -33,11 +33,15 @@ export function getStablePath( path ) {
 	);
 }
 
+/**
+ * @param {Record<string, any>} preloadedData
+ * @return {import('../types').APIFetchMiddleware} Preloading middleware.
+ */
 function createPreloadingMiddleware( preloadedData ) {
 	const cache = Object.keys( preloadedData ).reduce( ( result, path ) => {
 		result[ getStablePath( path ) ] = preloadedData[ path ];
 		return result;
-	}, {} );
+	}, /** @type {Record<string, any>} */ ( {} ) );
 
 	return ( options, next ) => {
 		const { parse = true } = options;
@@ -68,7 +72,11 @@ function createPreloadingMiddleware( preloadedData ) {
 				cache[ method ] &&
 				cache[ method ][ path ]
 			) {
-				return Promise.resolve( cache[ method ][ path ] );
+				return Promise.resolve(
+					parse
+						? cache[ method ][ path ].body
+						: cache[ method ][ path ]
+				);
 			}
 		}
 

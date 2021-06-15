@@ -1,17 +1,18 @@
 /**
  * External dependencies
  */
-import { cx } from '@wp-g2/styles';
+import { cx } from 'emotion';
 
 /**
  * Internal dependencies
  */
 import * as styles from './styles';
 
-/** @typedef {import('@wp-g2/create-styles').ViewOwnProps<{}, 'div'>} Props */
+// duplicate this for the sake of being able to export it, it'll be removed when we replace VisuallyHidden in components/src anyway
+/** @typedef {import('../context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} Props */
 
 /**
- * @param {Props} props
+ * @param {import('../context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
  */
 export function useVisuallyHidden( { className, ...props } ) {
 	// circumvent the context system and write the classnames ourselves

@@ -36,7 +36,12 @@ describe( 'useMergeRefs', () => {
 
 	renderCallback.history = [];
 
-	function MergedRefs( { count, tagName: TagName = 'div' } ) {
+	function MergedRefs( {
+		count,
+		tagName: TagName = 'div',
+		disable1,
+		disable2,
+	} ) {
 		function refCallback1( value ) {
 			refCallback1.history.push( value );
 		}
@@ -51,14 +56,14 @@ describe( 'useMergeRefs', () => {
 
 		renderCallback( [ refCallback1.history, refCallback2.history ] );
 
-		return (
-			<TagName
-				ref={ useMergeRefs( [
-					useCallback( refCallback1, [] ),
-					useCallback( refCallback2, [ count ] ),
-				] ) }
-			/>
-		);
+		const ref1 = useCallback( refCallback1, [] );
+		const ref2 = useCallback( refCallback2, [ count ] );
+		const mergedRefs = useMergeRefs( [
+			! disable1 && ref1,
+			! disable2 && ref2,
+		] );
+
+		return <TagName ref={ mergedRefs } />;
 	}
 
 	beforeEach( () => {
@@ -216,6 +221,110 @@ describe( 'useMergeRefs', () => {
 				[ originalElement, null ],
 			],
 			[ [], [ newElement, null ] ],
+		] );
+	} );
+
+	it( 'should work for dependency change after node change', () => {
+		const rootElement = document.getElementById( 'root' );
+
+		ReactDOM.render( <MergedRefs />, rootElement );
+
+		const originalElement = rootElement.firstElementChild;
+
+		ReactDOM.render( <MergedRefs tagName="button" />, rootElement );
+
+		const newElement = rootElement.firstElementChild;
+
+		// After a render with the original element and a second render with the
+		// new element, expect the initial callback functions to be called with
+		// the original element, then null, then the new element.
+		// Again, the new callback functions should not be called! There has
+		// been no dependency change.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null, newElement ],
+				[ originalElement, null, newElement ],
+			],
+			[ [], [] ],
+		] );
+
+		ReactDOM.render(
+			<MergedRefs tagName="button" count={ 1 } />,
+			rootElement
+		);
+
+		// After a third render with a dependency change, expect the inital
+		// callback function to be called with null and the new callback
+		// function to be called with the new element. Note that for callback
+		// one no dependencies have changed.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null, newElement ],
+				[ originalElement, null, newElement, null ],
+			],
+			[ [], [] ],
+			[ [], [ newElement ] ],
+		] );
+
+		ReactDOM.render( null, rootElement );
+
+		// Unmount: current callback functions should be called with null.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null, newElement, null ],
+				[ originalElement, null, newElement, null ],
+			],
+			[ [], [] ],
+			[ [], [ newElement, null ] ],
+		] );
+	} );
+
+	it( 'should allow disabling a ref', () => {
+		const rootElement = document.getElementById( 'root' );
+
+		ReactDOM.render( <MergedRefs disable1 />, rootElement );
+
+		const originalElement = rootElement.firstElementChild;
+
+		// Render 1: ref 1 should be disabled.
+		expect( renderCallback.history ).toEqual( [
+			[ [], [ originalElement ] ],
+		] );
+
+		ReactDOM.render( <MergedRefs disable2 />, rootElement );
+
+		// Render 2: ref 1 should be enabled and receive the ref. Note that the
+		// callback hasn't changed, so the original callback function will be
+		// called. Ref 2 should be disabled, so called with null.
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement ], [ originalElement, null ] ],
+			[ [], [] ],
+		] );
+
+		ReactDOM.render( <MergedRefs disable1 count={ 1 } />, rootElement );
+
+		// Render 3: ref 1 should again be disabled. Ref 2 to should receive a
+		// ref with the new callback function because the count has been
+		// changed.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null ],
+				[ originalElement, null ],
+			],
+			[ [], [] ],
+			[ [], [ originalElement ] ],
+		] );
+
+		ReactDOM.render( null, rootElement );
+
+		// Unmount: current callback functions should receive null.
+		expect( renderCallback.history ).toEqual( [
+			[
+				[ originalElement, null ],
+				[ originalElement, null ],
+			],
+			[ [], [] ],
+			[ [], [ originalElement, null ] ],
 		] );
 	} );
 } );

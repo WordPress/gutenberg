@@ -18,6 +18,7 @@ export default function VerseEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
+	onRemove,
 } ) {
 	const { textAlign, content } = attributes;
 	const blockProps = useBlockProps( {
@@ -48,6 +49,7 @@ export default function VerseEdit( {
 				} }
 				aria-label={ __( 'Verse text' ) }
 				placeholder={ __( 'Write verse…' ) }
+				onRemove={ onRemove }
 				onMerge={ mergeBlocks }
 				textAlign={ textAlign }
 				{ ...blockProps }

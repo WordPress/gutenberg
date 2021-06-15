@@ -42,7 +42,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
-		await page.keyboard.press( 'Tab' ); // Tab to inserter.
+		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -50,7 +50,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
-		await page.click( '[aria-label="Outline"]' );
+		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
 		const columnsBlockMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Columns')]"
@@ -68,8 +68,13 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.up( 'Shift' );
 		await page.keyboard.type( '3' );
 
+		// Wait for the new column block to appear in the list view
+		// 5 = Columns, Column, Paragraph, Column, *Column*
+		await page.waitForSelector(
+			'tr.block-editor-block-navigation-leaf:nth-of-type(5)'
+		);
+
 		// Navigate to the last column block.
-		await page.click( '[aria-label="Outline"]' );
 		const lastColumnsBlockMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Column')]"
@@ -78,7 +83,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await lastColumnsBlockMenuItem.click();
 
 		// Insert text in the last column block.
-		await page.keyboard.press( 'Tab' ); // Tab to inserter.
+		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -94,7 +99,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
-		await page.keyboard.press( 'Tab' ); // Tab to inserter.
+		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -103,6 +108,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the columns blocks using the keyboard.
 		await openBlockNavigator();
+		await pressKeyTimes( 'ArrowUp', 2 );
 		await page.keyboard.press( 'Enter' );
 
 		// Move focus to the sidebar area.
@@ -115,13 +121,15 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the last column in the columns block.
-		await openBlockNavigator();
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyTimes( 'Tab', 2 );
 		await pressKeyTimes( 'ArrowDown', 4 );
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 
 		// Insert text in the last column block
-		await page.keyboard.press( 'Tab' ); // Tab to inserter.
+		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -145,6 +153,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Return to first block.
 		await openBlockNavigator();
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
@@ -175,7 +184,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '.editor-post-title' );
 
 		// Try selecting the group block using the Outline
-		await page.click( '[aria-label="Outline"]' );
+		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
 		const groupMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Group')]"

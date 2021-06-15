@@ -8,6 +8,9 @@ import testData from './helpers/test-data';
 describe( 'Gutenberg Editor Image Block tests', () => {
 	it( 'should be able to add an image block', async () => {
 		await editorPage.addNewBlock( blockNames.image );
+		await editorPage.driver.sleep( 1000 );
+		await editorPage.closePicker();
+
 		let imageBlock = await editorPage.getBlockAtPosition(
 			blockNames.image
 		);

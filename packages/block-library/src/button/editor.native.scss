@@ -56,3 +56,15 @@ $block-spacing: 4px;
 	padding-left: 0;
 	padding-right: 0;
 }
+
+.button75 {
+	margin: $solid-border-space - $block-selected-border-width;
+}
+
+.button50 {
+	margin: $solid-border-space * 2 - $block-selected-border-width * 2;
+}
+
+.button25 {
+	margin: $block-edge-to-content * 2 + $block-selected-border-width;
+}

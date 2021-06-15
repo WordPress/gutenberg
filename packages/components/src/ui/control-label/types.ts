@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Props as TextProps } from '../text/types';
+import type { Props as TextProps } from '../../text/types';
 
 export type Props = TextProps & {
 	isBlock?: boolean;

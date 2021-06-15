@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-directory",
-	"version": "1.18.8",
+	"version": "2.1.7",
 	"description": "Extend editor with block directory features to search, download and install blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -18,11 +18,14 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
@@ -42,7 +45,7 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.19"
+		"lodash": "^4.17.21"
 	},
 	"publishConfig": {
 		"access": "public"

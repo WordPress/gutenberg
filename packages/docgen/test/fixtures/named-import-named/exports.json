@@ -12,10 +12,7 @@
 			"column": 29
 		}
 	},
-	"range": [
-		0,
-		101
-	],
+	"range": [ 0, 101 ],
 	"declaration": null,
 	"specifiers": [
 		{
@@ -32,10 +29,7 @@
 					"column": 20
 				}
 			},
-			"range": [
-				10,
-				29
-			],
+			"range": [ 10, 29 ],
 			"local": {
 				"type": "Identifier",
 				"start": 10,
@@ -50,10 +44,7 @@
 						"column": 20
 					}
 				},
-				"range": [
-					10,
-					29
-				],
+				"range": [ 10, 29 ],
 				"name": "functionDeclaration"
 			},
 			"exported": {
@@ -70,10 +61,7 @@
 						"column": 20
 					}
 				},
-				"range": [
-					10,
-					29
-				],
+				"range": [ 10, 29 ],
 				"name": "functionDeclaration"
 			}
 		},
@@ -91,10 +79,7 @@
 					"column": 20
 				}
 			},
-			"range": [
-				32,
-				51
-			],
+			"range": [ 32, 51 ],
 			"local": {
 				"type": "Identifier",
 				"start": 32,
@@ -109,10 +94,7 @@
 						"column": 20
 					}
 				},
-				"range": [
-					32,
-					51
-				],
+				"range": [ 32, 51 ],
 				"name": "variableDeclaration"
 			},
 			"exported": {
@@ -129,10 +111,7 @@
 						"column": 20
 					}
 				},
-				"range": [
-					32,
-					51
-				],
+				"range": [ 32, 51 ],
 				"name": "variableDeclaration"
 			}
 		},
@@ -150,10 +129,7 @@
 					"column": 17
 				}
 			},
-			"range": [
-				54,
-				70
-			],
+			"range": [ 54, 70 ],
 			"local": {
 				"type": "Identifier",
 				"start": 54,
@@ -168,10 +144,7 @@
 						"column": 17
 					}
 				},
-				"range": [
-					54,
-					70
-				],
+				"range": [ 54, 70 ],
 				"name": "ClassDeclaration"
 			},
 			"exported": {
@@ -188,10 +161,7 @@
 						"column": 17
 					}
 				},
-				"range": [
-					54,
-					70
-				],
+				"range": [ 54, 70 ],
 				"name": "ClassDeclaration"
 			}
 		}
@@ -210,10 +180,7 @@
 				"column": 28
 			}
 		},
-		"range": [
-			79,
-			100
-		],
+		"range": [ 79, 100 ],
 		"value": "./named-identifiers",
 		"raw": "'./named-identifiers'"
 	}

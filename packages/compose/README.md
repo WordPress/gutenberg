@@ -17,7 +17,7 @@ Using compose:
 
 ```js
 const applyWithSelect = withSelect( ( select, ownProps ) => {
-	return doSomething( select, ownProps);
+	return doSomething( select, ownProps );
 } );
 const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	return doSomethingElse( dispatch, ownProps );
@@ -26,7 +26,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 export default compose(
 	withPluginContext,
 	applyWithSelect,
-	applyWithDispatch,
+	applyWithDispatch
 )( PluginSidebarMoreMenuItem );
 ```
 
@@ -34,18 +34,14 @@ Without `compose`, the code would look like this:
 
 ```js
 const applyWithSelect = withSelect( ( select, ownProps ) => {
-	return doSomething( select, ownProps);
+	return doSomething( select, ownProps );
 } );
 const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	return doSomethingElse( dispatch, ownProps );
 } );
 
 export default withPluginContext(
-	applyWithSelect(
-		applyWithDispatch(
-			PluginSidebarMoreMenuItem
-		)
-	)
+	applyWithSelect( applyWithDispatch( PluginSidebarMoreMenuItem ) )
 );
 ```
 
@@ -57,7 +53,7 @@ Install the module
 npm install @wordpress/compose --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## API
 
@@ -70,13 +66,11 @@ For more details, you can refer to each Higher Order Component's README file. [A
 Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
 composition, where each successive invocation is supplied the return value of the previous.
 
-_Parameters_
+This is just a re-export of `lodash`'s `flowRight` function.
 
--   _hocs_ `...Function`: The HOC functions to invoke.
+_Related_
 
-_Returns_
-
--   `Function`: Returns the new composite function.
+-   <https://docs-lodash.com/v4/flow-right/>
 
 <a name="createHigherOrderComponent" href="#createHigherOrderComponent">#</a> **createHigherOrderComponent**
 
@@ -85,39 +79,44 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
+-   _mapComponentToEnhancedComponent_ `HigherOrderComponent< TInnerProps, TOuterProps >`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
--   `WPComponent`: Component class with generated display name assigned.
+-   `HigherOrderComponent< TInnerProps, TOuterProps >`: Component class with generated display name assigned.
 
 <a name="ifCondition" href="#ifCondition">#</a> **ifCondition**
 
 Higher-order component creator, creating a new component which renders if
 the given condition is satisfied or with the given optional prop name.
 
+_Usage_
+
+```ts
+type Props = { foo: string };
+const Component = ( props: Props ) => <div>{ props.foo }</div>;
+const ConditionalComponent = ifCondition( ( props: Props ) => props.foo.length !== 0 )( Component );
+<ConditionalComponent foo="" />; // => null
+<ConditionalComponent foo="bar" />; // => <div>bar</div>;
+```
+
 _Parameters_
 
--   _predicate_ `Function`: Function to test condition.
+-   _predicate_ `( props: TProps ) => boolean`: Function to test condition.
 
 _Returns_
 
--   `Function`: Higher-order component.
+-   `HigherOrderComponent< TProps, TProps >`: Higher-order component.
 
 <a name="pure" href="#pure">#</a> **pure**
 
 Given a component returns the enhanced component augmented with a component
 only rerendering when its props/state change
 
-_Parameters_
+_Type_
 
--   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
--   _modifierName_ `string`: Seed name from which to generated display name.
-
-_Returns_
-
--   `WPComponent`: Component class with generated display name assigned.
+-   `SimpleHigherOrderComponent`
 
 <a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
 
@@ -126,11 +125,11 @@ This behavior is useful if we want to render a list of items asynchronously for 
 
 _Parameters_
 
--   _list_ `Array`: Source array.
+-   _list_ `T[]`: Source array.
 
 _Returns_
 
--   `Array`: Async array.
+-   `T[]`: Async array.
 
 <a name="useConstrainedTabbing" href="#useConstrainedTabbing">#</a> **useConstrainedTabbing**
 
@@ -159,17 +158,32 @@ _Returns_
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
+> **Deprecated** 
+
 Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `Object`: Reference with the element.
+-   _ref_ `import('react').RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
 -   _text_ `string|Function`: The text to copy.
--   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+-   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
 -   `boolean`: Whether or not the text has been copied. Resets after the timeout.
+
+<a name="useCopyToClipboard" href="#useCopyToClipboard">#</a> **useCopyToClipboard**
+
+Copies the given text to the clipboard when the element is clicked.
+
+_Parameters_
+
+-   _text_ `string | (() => string)`: The text to copy. Use a function if not already available and expensive to compute.
+-   _onSuccess_ `Function`: Called when to text is copied.
+
+_Returns_
+
+-   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
 
 <a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
 
@@ -178,13 +192,19 @@ be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to debounce, so please wrap functions created on
 render in components in `useCallback`.
 
+_Related_
+
+-   <https://docs-lodash.com/v4/debounce/>
+
 _Parameters_
 
--   _args_ `...any`: Arguments passed to Lodash's `debounce`.
+-   _fn_ `TFunc`: The function to debounce.
+-   _wait_ `[number]`: The number of milliseconds to delay.
+-   _options_ `[import('lodash').DebounceSettings]`: The options object.
 
 _Returns_
 
--   `Function`: Debounced function.
+-   `TFunc & import('lodash').Cancelable`: Debounced function.
 
 <a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
 
@@ -239,11 +259,11 @@ const WithFocusReturn = () => {
 
 _Parameters_
 
--   _onFocusReturn_ `Function?`: Overrides the default return behavior.
+-   _onFocusReturn_ `[() => void]`: Overrides the default return behavior.
 
 _Returns_
 
--   `Function`: Element Ref.
+-   `import('react').RefCallback<HTMLElement>`: Element Ref.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
@@ -251,9 +271,9 @@ Provides a unique instance ID.
 
 _Parameters_
 
--   _object_ `Object`: Object reference to create an id for.
--   _prefix_ `string`: Prefix for the unique id.
--   _preferredId_ `string`: Default ID to use.
+-   _object_ `object`: Object reference to create an id for.
+-   _prefix_ `[string]`: Prefix for the unique id.
+-   _preferredId_ `[string]`: Default ID to use.
 
 _Returns_
 
@@ -269,10 +289,14 @@ throws a warning when using useLayoutEffect in that environment.
 
 Attach a keyboard shortcut handler.
 
+_Related_
+
+-   <https://craig.is/killing/mice#api.bind> for information about the `callback` parameter.
+
 _Parameters_
 
 -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `Function`: Shortcut callback.
+-   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
@@ -289,21 +313,50 @@ _Returns_
 
 <a name="useMergeRefs" href="#useMergeRefs">#</a> **useMergeRefs**
 
-Merges refs into one ref callback. Ensures the merged ref callbacks are only
-called when it changes (as a result of a `useCallback` dependency update) or
-when the ref value changes. If you don't wish a ref callback to be called on
-every render, wrap it with `useCallback( ref, [] )`.
-Dependencies can be added, but when a dependency changes, the old ref
-callback will be called with `null` and the new ref callback will be called
-with the same node.
+Merges refs into one ref callback.
+
+It also ensures that the merged ref callbacks are only called when they
+change (as a result of a `useCallback` dependency update) OR when the ref
+value changes, just as React does when passing a single ref callback to the
+component.
+
+As expected, if you pass a new function on every render, the ref callback
+will be called after every render.
+
+If you don't wish a ref callback to be called after every render, wrap it
+with `useCallback( callback, dependencies )`. When a dependency changes, the
+old ref callback will be called with `null` and the new ref callback will be
+called with the same value.
+
+To make ref callbacks easier to use, you can also pass the result of
+`useRefEffect`, which makes cleanup easier by allowing you to return a
+cleanup function instead of handling `null`.
+
+It's also possible to _disable_ a ref (and its behaviour) by simply not
+passing the ref.
+
+```jsx
+const ref = useRefEffect( ( node ) => {
+  node.addEventListener( ... );
+  return () => {
+    node.removeEventListener( ... );
+  };
+}, [ ...dependencies ] );
+const otherRef = useRef();
+const mergedRefs useMergeRefs( [
+  enabled && ref,
+  otherRef,
+] );
+return <div ref={ mergedRefs } />;
+```
 
 _Parameters_
 
--   _refs_ `Array<RefObject|RefCallback>`: The refs to be merged.
+-   _refs_ `Array<TRef>`: The refs to be merged.
 
 _Returns_
 
--   `RefCallback`: The merged ref callback.
+-   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
 
 <a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
 
@@ -316,7 +369,7 @@ _Parameters_
 
 _Returns_
 
--   `T|undefined`: The value from the previous render.
+-   `T | undefined`: The value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
@@ -343,17 +396,24 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _calllback_ `Function`: Callback with ref as argument.
--   _dependencies_ `Array`: Dependencies of the callback.
+-   _callback_ `( node: TElement ) => ( () => void ) | undefined`: Callback with ref as argument.
+-   _dependencies_ `DependencyList`: Dependencies of the callback.
 
 _Returns_
 
--   `Function`: Ref callback.
+-   `RefCallback< TElement | null >`: Ref callback.
 
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 
 Hook which allows to listen the resize event of any target element when it changes sizes.
 _Note: `useResizeObserver` will report `null` until after first render_
+
+Simply a re-export of `react-resize-aware` so refer to its documentation <https://github.com/FezVrasta/react-resize-aware>
+for more details.
+
+_Related_
+
+-   <https://github.com/FezVrasta/react-resize-aware>
 
 _Usage_
 
@@ -370,10 +430,6 @@ const App = () => {
 };
 ```
 
-_Returns_
-
--   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
-
 <a name="useThrottle" href="#useThrottle">#</a> **useThrottle**
 
 Throttles a function with Lodash's `throttle`. A new throttled function will
@@ -381,13 +437,19 @@ be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to throttle, so please wrap functions created on
 render in components in `useCallback`.
 
+_Related_
+
+-   <https://docs-lodash.com/v4/throttle/>
+
 _Parameters_
 
--   _args_ `...any`: Arguments passed to Lodash's `throttle`.
+-   _fn_ `TFunc`: The function to throttle.
+-   _wait_ `[number]`: The number of milliseconds to throttle invocations to.
+-   _options_ `[import('lodash').ThrottleSettings]`: The options object. See linked documentation for details.
 
 _Returns_
 
--   `Function`: Throttled function.
+-   `TFunc & import('lodash').Cancelable`: Throttled function.
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
@@ -427,7 +489,7 @@ function MyComponent(props) {
 
 _Parameters_
 
--   _object_ `Object`: Object which changes to compare.
+-   _object_ `object`: Object which changes to compare.
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
@@ -443,50 +505,44 @@ event handler for the entire application.
 
 _Parameters_
 
--   _eventTypesToHandlers_ `Object<string,string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
+-   _eventTypesToHandlers_ `Record<keyof GlobalEventHandlersEventMap, string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
 
 _Returns_
 
--   `Function`: Higher-order component.
+-   `any`: Higher-order component.
 
 <a name="withInstanceId" href="#withInstanceId">#</a> **withInstanceId**
 
 A Higher Order Component used to be provide a unique instance ID by
 component.
 
-_Parameters_
+_Type_
 
--   _WrappedComponent_ `WPComponent`: The wrapped component.
-
-_Returns_
-
--   `WPComponent`: Component with an instanceId prop.
+-   `PropInjectingHigherOrderComponent< { instanceId: string | number; } >`
 
 <a name="withSafeTimeout" href="#withSafeTimeout">#</a> **withSafeTimeout**
 
 A higher-order component used to provide and manage delayed function calls
 that ought to be bound to a component's lifecycle.
 
-_Parameters_
+_Type_
 
--   _OriginalComponent_ `WPComponent`: Component requiring setTimeout
-
-_Returns_
-
--   `WPComponent`: Wrapped component.
+-   `PropInjectingHigherOrderComponent< TimeoutProps >`
 
 <a name="withState" href="#withState">#</a> **withState**
+
+> **Deprecated** Use `useState` instead.
 
 A Higher Order Component used to provide and manage internal component state
 via props.
 
 _Parameters_
 
--   _initialState_ `?Object`: Optional initial state of the component.
+-   _initialState_ `any`: Optional initial state of the component.
 
 _Returns_
 
--   `WPComponent`: Wrapped component.
+-   `any`: A higher order component wrapper accepting a component that takes the state props + its own props + `setState` and returning a component that only accepts the own props.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

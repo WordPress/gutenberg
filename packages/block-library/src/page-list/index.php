@@ -89,27 +89,29 @@ function block_core_page_list_build_css_font_sizes( $context ) {
  * Outputs Page list markup from an array of pages with nested children.
  *
  * @param array $nested_pages The array of nested pages.
+ * @param array $active_page_ancestor_ids An array of ancestor ids for active page.
  *
  * @return string List markup.
  */
-function render_nested_page_list( $nested_pages ) {
+function render_nested_page_list( $nested_pages, $active_page_ancestor_ids = array() ) {
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
 	$markup = '';
 	foreach ( (array) $nested_pages as $page ) {
-		$css_class = 'wp-block-pages-list__item';
+		$css_class  = $page['is_active'] ? ' current-menu-item' : '';
+		$css_class .= in_array( $page['page_id'], $active_page_ancestor_ids, true ) ? ' current-menu-ancestor' : '';
 		if ( isset( $page['children'] ) ) {
 			$css_class .= ' has-child';
 		}
-		$markup .= '<li class="' . $css_class . '">';
+		$markup .= '<li class="wp-block-pages-list__item' . $css_class . '">';
 		$markup .= '<a class="wp-block-pages-list__item__link" href="' . esc_url( $page['link'] ) . '">' . wp_kses(
 			$page['title'],
 			wp_kses_allowed_html( 'post' )
 		) . '</a>';
 		if ( isset( $page['children'] ) ) {
-			$markup .= '<span class="wp-block-page-list__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" transform="rotate(90)"><path d="M8 5v14l11-7z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span>';
-			$markup .= '<ul class="submenu-container">' . render_nested_page_list( $page['children'] ) . '</ul>';
+			$markup .= '<span class="wp-block-page-list__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
+			$markup .= '<ul class="submenu-container">' . render_nested_page_list( $page['children'], $active_page_ancestor_ids ) . '</ul>';
 		}
 		$markup .= '</li>';
 	}
@@ -149,22 +151,44 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	$block_id++;
 
-	$all_pages = get_pages( array( 'sort_column' => 'menu_order' ) );
+	// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby values is resolved,
+	// update 'sort_column' to 'menu_order, post_title'. Sorting by both menu_order and post_title ensures a stable sort.
+	// Otherwise with pages that have the same menu_order value, we can see different ordering depending on how DB
+	// queries are constructed internally. For example we might see a different order when a limit is set to <499
+	// versus >= 500.
+	$all_pages = get_pages(
+		array(
+			'sort_column' => 'menu_order',
+			'order'       => 'asc',
+		)
+	);
 
 	$top_level_pages = array();
 
 	$pages_with_children = array();
 
+	$active_page_ancestor_ids = array();
+
 	foreach ( (array) $all_pages as $page ) {
+		$is_active = ! empty( $page->ID ) && ( get_the_ID() === $page->ID );
+
+		if ( $is_active ) {
+			$active_page_ancestor_ids = get_post_ancestors( $page->ID );
+		}
+
 		if ( $page->post_parent ) {
 			$pages_with_children[ $page->post_parent ][ $page->ID ] = array(
-				'title' => $page->post_title,
-				'link'  => get_permalink( $page->ID ),
+				'page_id'   => $page->ID,
+				'title'     => $page->post_title,
+				'link'      => get_permalink( $page->ID ),
+				'is_active' => $is_active,
 			);
 		} else {
 			$top_level_pages[ $page->ID ] = array(
-				'title' => $page->post_title,
-				'link'  => get_permalink( $page->ID ),
+				'page_id'   => $page->ID,
+				'title'     => $page->post_title,
+				'link'      => get_permalink( $page->ID ),
+				'is_active' => $is_active,
 			);
 
 		}
@@ -174,7 +198,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$wrapper_markup = '<ul %1$s>%2$s</ul>';
 
-	$items_markup = render_nested_page_list( $nested_pages );
+	$items_markup = render_nested_page_list( $nested_pages, $active_page_ancestor_ids );
 
 	$colors          = block_core_page_list_build_css_colors( $block->context );
 	$font_sizes      = block_core_page_list_build_css_font_sizes( $block->context );

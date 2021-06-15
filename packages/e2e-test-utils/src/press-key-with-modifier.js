@@ -137,7 +137,7 @@ async function emulateClipboard( type ) {
  * is normalized to platform-specific modifier.
  *
  * @param {string} modifier Modifier key.
- * @param {string} key Key to press while modifier held.
+ * @param {string} key      Key to press while modifier held.
  */
 export async function pressKeyWithModifier( modifier, key ) {
 	if ( modifier.toLowerCase() === 'primary' && key.toLowerCase() === 'a' ) {

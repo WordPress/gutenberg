@@ -25,7 +25,7 @@ function render_block_core_post_comments_count( $attributes, $content, $block ) 
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	return sprintf(
-		'<div class="%1$s">%2$s</div>',
+		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
 		get_comments_number( $block->context['postId'] )
 	);
@@ -38,11 +38,6 @@ function register_block_core_post_comments_count() {
 	register_block_type_from_metadata(
 		__DIR__ . '/post-comments-count',
 		array(
-			'attributes'      => array(
-				'className' => array(
-					'type' => 'string',
-				),
-			),
 			'render_callback' => 'render_block_core_post_comments_count',
 		)
 	);

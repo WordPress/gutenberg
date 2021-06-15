@@ -1,32 +1,16 @@
 .edit-post-welcome-guide {
-	$image-height: 240px;
-	$image-width: 312px;
 	width: 312px;
 
 	&__image {
 		background: #00a0d2;
-		height: 240px;
-
-		&__prm-r {
-			display: none;
-		}
-
-		@media (prefers-reduced-motion: reduce) {
-			&__prm-r {
-				display: block;
-			}
-
-			&__prm-np {
-				display: none;
-			}
-		}
+		margin: 0 0 $grid-unit-20;
 	}
 
 	&__heading {
 		font-family: $default-font;
 		font-size: 24px;
 		line-height: 1.4;
-		margin: 0 0 $grid-unit-20 0;
+		margin: $grid-unit-20 0 $grid-unit-20 0;
 		padding: 0 $grid-unit-40;
 	}
 

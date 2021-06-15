@@ -1,43 +1,34 @@
 [
-    {
-        "blockName": "core/navigation",
-        "attrs": {
-            "orientation": "horizontal",
-            "style": {
-                "typography": {
-                    "textTransform": "var:preset|text-transform|lowercase",
-                    "textDecoration": "var:preset|text-decoration|strikethrough",
-                    "fontStyle": "var:preset|font-style|italic",
-                    "fontWeight": "var:preset|font-weight|100"
-                }
-            }
-        },
-        "innerBlocks": [
-            {
-                "blockName": "core/navigation-link",
-                "attrs": {
-                    "label": "WordPress",
-                    "url": "https://www.wordpress.org/"
-                },
-                "innerBlocks": [],
-                "innerHTML": "",
-                "innerContent": []
-            }
-        ],
-        "innerHTML": "\n\n",
-        "innerContent": [
-            "\n",
-            null,
-            "\n"
-        ]
-    },
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
-        ]
-    }
+	{
+		"blockName": "core/navigation",
+		"attrs": {
+			"orientation": "horizontal",
+			"style": {
+				"typography": {
+					"textTransform": "var:preset|text-transform|lowercase",
+					"textDecoration": "var:preset|text-decoration|strikethrough",
+					"fontStyle": "var:preset|font-style|italic",
+					"fontWeight": "var:preset|font-weight|100"
+				}
+			}
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/navigation-link",
+				"attrs": {
+					"label": "WordPress",
+					"url": "https://www.wordpress.org/"
+				},
+				"innerBlocks": [],
+				"innerHTML": "",
+				"innerContent": []
+			}
+		],
+		"innerHTML": "\n\n",
+		"innerContent": [
+			"\n",
+			null,
+			"\n"
+		]
+	}
 ]

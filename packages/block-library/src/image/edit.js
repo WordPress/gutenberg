@@ -11,14 +11,14 @@ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withNotices } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
-	BlockAlignmentToolbar,
+	BlockAlignmentControl,
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
@@ -38,14 +38,13 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
-	DEFAULT_SIZE_SLUG,
 } from './constants';
 
-export const pickRelevantMediaFiles = ( image ) => {
+export const pickRelevantMediaFiles = ( image, size ) => {
 	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
 	imageProps.url =
-		get( image, [ 'sizes', 'large', 'url' ] ) ||
-		get( image, [ 'media_details', 'sizes', 'large', 'source_url' ] ) ||
+		get( image, [ 'sizes', size, 'url' ] ) ||
+		get( image, [ 'media_details', 'sizes', size, 'source_url' ] ) ||
 		image.url;
 	return imageProps;
 };
@@ -54,7 +53,7 @@ export const pickRelevantMediaFiles = ( image ) => {
  * Is the URL a temporary blob URL? A blob URL is one that is used temporarily
  * while the image is being uploaded and will not have an id yet allocated.
  *
- * @param {number=} id The id of the image.
+ * @param {number=} id  The id of the image.
  * @param {string=} url The url of the image.
  *
  * @return {boolean} Is the URL a Blob URL
@@ -81,6 +80,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
+	clientId,
 } ) {
 	const {
 		url = '',
@@ -92,6 +92,7 @@ export function ImageEdit( {
 		height,
 		sizeSlug,
 	} = attributes;
+	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -104,10 +105,10 @@ export function ImageEdit( {
 	}, [ caption ] );
 
 	const ref = useRef();
-	const mediaUpload = useSelect( ( select ) => {
+	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().mediaUpload;
-	} );
+		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
+	}, [] );
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
@@ -126,15 +127,14 @@ export function ImageEdit( {
 			return;
 		}
 
-		let mediaAttributes = pickRelevantMediaFiles( media );
-
-		// If the current image is temporary but an alt text was meanwhile
-		// written by the user, make sure the text is not overwritten.
-		if ( isTemporaryImage( id, url ) ) {
-			if ( altRef.current ) {
-				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
-			}
+		if ( isBlobURL( media.url ) ) {
+			setTemporaryURL( media.url );
+			return;
 		}
+
+		setTemporaryURL();
+
+		let mediaAttributes = pickRelevantMediaFiles( media, imageDefaultSize );
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
@@ -148,7 +148,7 @@ export function ImageEdit( {
 			additionalAttributes = {
 				width: undefined,
 				height: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				sizeSlug: imageDefaultSize,
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size"
@@ -207,7 +207,9 @@ export function ImageEdit( {
 			setAttributes( {
 				url: newURL,
 				id: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				width: undefined,
+				height: undefined,
+				sizeSlug: imageDefaultSize,
 			} );
 		}
 	}
@@ -254,14 +256,14 @@ export function ImageEdit( {
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is
 	// no longer temporary).
 	useEffect( () => {
-		if ( ! isTemp ) {
+		if ( ! temporaryURL ) {
 			return;
 		}
 
 		return () => {
-			revokeBlobURL( url );
+			revokeBlobURL( temporaryURL );
 		};
-	}, [ isTemp ] );
+	}, [ temporaryURL ] );
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
@@ -275,9 +277,8 @@ export function ImageEdit( {
 	);
 
 	const classes = classnames( className, {
-		'is-transient': isBlobURL( url ),
+		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
-		'is-focused': isSelected,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
@@ -288,8 +289,9 @@ export function ImageEdit( {
 
 	return (
 		<figure { ...blockProps }>
-			{ url && (
+			{ ( temporaryURL || url ) && (
 				<Image
+					temporaryURL={ temporaryURL }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					isSelected={ isSelected }
@@ -299,11 +301,12 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
 					containerRef={ ref }
+					clientId={ clientId }
 				/>
 			) }
 			{ ! url && (
-				<BlockControls>
-					<BlockAlignmentToolbar
+				<BlockControls group="block">
+					<BlockAlignmentControl
 						value={ align }
 						onChange={ updateAlignment }
 					/>
@@ -319,7 +322,7 @@ export function ImageEdit( {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
-				disableMediaButtons={ url }
+				disableMediaButtons={ temporaryURL || url }
 			/>
 		</figure>
 	);

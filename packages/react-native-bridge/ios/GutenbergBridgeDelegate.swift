@@ -22,7 +22,9 @@ public enum Capabilities: String {
     case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
-    case audioBlock
+    case isAudioBlockMediaUploadEnabled
+    case reusableBlock
+    case canViewEditorOnboarding
 }
 
 /// Wrapper for single block data
@@ -84,7 +86,7 @@ extension Gutenberg.MediaSource {
     }
 }
 
-/// Ref. https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
+/// Ref. https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
 public enum LogLevel: Int {
     case trace
     case info
@@ -117,25 +119,6 @@ extension RCTLogLevel {
         case .warn: self = .warning
         case .error: self = .error
         case .fatal: self = .fatal
-        }
-    }
-}
-
-public enum GutenbergUserEvent {
-
-    case editorSessionTemplateApply(_ template: String)
-    case editorSessionTemplatePreview(_ template: String)
-
-    init?(event: String, properties:[AnyHashable: Any]?) {
-        switch event {
-        case "editor_session_template_apply":
-            guard let template = properties?["template"] as? String else { return nil }
-            self = .editorSessionTemplateApply(template)
-        case "editor_session_template_preview":
-            guard let template = properties?["template"] as? String else { return nil }
-            self = .editorSessionTemplatePreview(template)
-        default:
-            return nil
         }
     }
 }
@@ -215,10 +198,6 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate to display the media editor from a given URL
     ///
     func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback)
-
-    /// Tells the delegate that the editor needs to log a custom event
-    /// - Parameter event: The event key to be logged
-    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent)
 
     /// Tells the delegate that the editor needs to render an unsupported block
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block)

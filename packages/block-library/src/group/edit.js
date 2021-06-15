@@ -7,35 +7,55 @@ import {
 	useBlockProps,
 	InspectorAdvancedControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	SelectControl,
-	__experimentalBoxControl as BoxControl,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-const { __Visualizer: BoxControlVisualizer } = BoxControl;
+import { useMemo } from '@wordpress/element';
 
 function GroupEdit( { attributes, setAttributes, clientId } ) {
-	const hasInnerBlocks = useSelect(
+	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
-			const { getBlock } = select( blockEditorStore );
+			const { getBlock, getSettings } = select( blockEditorStore );
 			const block = getBlock( clientId );
-			return !! ( block && block.innerBlocks.length );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				themeSupportsLayout: getSettings()?.supportsLayout,
+			};
 		},
 		[ clientId ]
 	);
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { contentSize, wideSize } = usedLayout;
+	const _layout = useMemo( () => {
+		if ( themeSupportsLayout ) {
+			const alignments =
+				contentSize || wideSize
+					? [ 'wide', 'full' ]
+					: [ 'left', 'center', 'right' ];
+			return {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments,
+			};
+		}
+		return undefined;
+	}, [ themeSupportsLayout, contentSize, wideSize ] );
+
 	const blockProps = useBlockProps();
-	const { tagName: TagName = 'div', templateLock } = attributes;
 	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'wp-block-group__inner-container',
-		},
+		themeSupportsLayout
+			? blockProps
+			: { className: 'wp-block-group__inner-container' },
 		{
 			templateLock,
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
+			__experimentalLayout: _layout,
 		}
 	);
 
@@ -59,13 +79,14 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 					}
 				/>
 			</InspectorAdvancedControls>
-			<TagName { ...blockProps }>
-				<BoxControlVisualizer
-					values={ attributes.style?.spacing?.padding }
-					showValues={ attributes.style?.visualizers?.padding }
-				/>
-				<div { ...innerBlocksProps } />
-			</TagName>
+			{ themeSupportsLayout && <TagName { ...innerBlocksProps } /> }
+			{ /* Ideally this is not needed but it's there for backward compatibility reason
+				to keep this div for themes that might rely on its presence */ }
+			{ ! themeSupportsLayout && (
+				<TagName { ...blockProps }>
+					<div { ...innerBlocksProps } />
+				</TagName>
+			) }
 		</>
 	);
 }

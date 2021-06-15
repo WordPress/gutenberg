@@ -65,13 +65,13 @@ function gutenberg_register_sidebars_and_widgets_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
 
 /**
- * Registers the Batch REST API routes.
+ * Registers the Block editor settings REST API routes.
  */
-function gutenberg_register_batch_endpoint() {
-	$batch = new WP_REST_Batch_Controller();
-	$batch->register_routes();
+function gutenberg_register_block_editor_settings() {
+	$editor_settings = new WP_REST_Block_Editor_Settings_Controller();
+	$editor_settings->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
+add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
@@ -183,32 +183,3 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 	return $permalink;
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
-
-/**
- * Registers the post format search handler.
- *
- * @param string $search_handlers     Title list of current handlers.
- *
- * @return array Title updated list of handlers.
- */
-function gutenberg_post_format_search_handler( $search_handlers ) {
-	if ( current_theme_supports( 'post-formats' ) ) {
-		$search_handlers[] = new WP_REST_Post_Format_Search_Handler();
-	}
-
-	return $search_handlers;
-}
-add_filter( 'wp_rest_search_handlers', 'gutenberg_post_format_search_handler', 10, 5 );
-
-/**
- * Registers the terms search handler.
- *
- * @param string $search_handlers Title list of current handlers.
- *
- * @return array Title updated list of handlers.
- */
-function gutenberg_term_search_handler( $search_handlers ) {
-	$search_handlers[] = new WP_REST_Term_Search_Handler();
-	return $search_handlers;
-}
-add_filter( 'wp_rest_search_handlers', 'gutenberg_term_search_handler', 10, 5 );

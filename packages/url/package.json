@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/url",
-	"version": "2.21.2",
+	"version": "3.1.1",
 	"description": "WordPress URL utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -18,14 +18,17 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
-		"lodash": "^4.17.19",
+		"@babel/runtime": "^7.13.10",
+		"lodash": "^4.17.21",
 		"react-native-url-polyfill": "^1.1.2"
 	},
 	"publishConfig": {

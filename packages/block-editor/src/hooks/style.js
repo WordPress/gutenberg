@@ -1,26 +1,44 @@
 /**
  * External dependencies
  */
-import { capitalize, has, get, startsWith } from 'lodash';
+import {
+	capitalize,
+	first,
+	forEach,
+	get,
+	has,
+	isEmpty,
+	kebabCase,
+	map,
+	omit,
+	startsWith,
+} from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
 import {
+	getBlockSupport,
 	hasBlockSupport,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
-import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
-import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
-import SpacingPanelControl from '../components/spacing-panel-control';
+import {
+	TypographyPanel,
+	TYPOGRAPHY_SUPPORT_KEY,
+	TYPOGRAPHY_SUPPORT_KEYS,
+} from './typography';
+import { SPACING_SUPPORT_KEY, SpacingPanel } from './spacing';
+import useDisplayBlockControls from '../components/use-display-block-controls';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -49,15 +67,17 @@ function compileStyleValue( uncompiledValue ) {
 /**
  * Returns the inline styles to add depending on the style object
  *
- * @param  {Object} styles Styles configuration
- * @return {Object}        Flattened CSS variables declaration
+ * @param {Object} styles Styles configuration.
+ *
+ * @return {Object} Flattened CSS variables declaration.
  */
 export function getInlineStyles( styles = {} ) {
 	const output = {};
 	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
 		const path = STYLE_PROPERTY[ propKey ].value;
 		const subPaths = STYLE_PROPERTY[ propKey ].properties;
-		if ( has( styles, path ) ) {
+		// Ignore styles on elements because they are handled on the server.
+		if ( has( styles, path ) && 'elements' !== first( path ) ) {
 			if ( !! subPaths ) {
 				subPaths.forEach( ( suffix ) => {
 					output[
@@ -73,11 +93,32 @@ export function getInlineStyles( styles = {} ) {
 	return output;
 }
 
+function compileElementsStyles( selector, elements = {} ) {
+	return map( elements, ( styles, element ) => {
+		const elementStyles = getInlineStyles( styles );
+		if ( ! isEmpty( elementStyles ) ) {
+			return [
+				`.${ selector } ${ ELEMENTS[ element ] }{`,
+				...map(
+					elementStyles,
+					( value, property ) =>
+						`\t${ kebabCase( property ) }: ${ value }${
+							element === 'link' ? '!important' : ''
+						};`
+				),
+				'}',
+			].join( '\n' );
+		}
+		return '';
+	} ).join( '\n' );
+}
+
 /**
  * Filters registered block settings, extending attributes to include `style` attribute.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 function addAttribute( settings ) {
 	if ( ! hasStyleSupport( settings ) ) {
@@ -96,20 +137,41 @@ function addAttribute( settings ) {
 	return settings;
 }
 
+const skipSerializationPaths = {
+	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
+	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		COLOR_SUPPORT_KEY,
+	],
+	[ `${ TYPOGRAPHY_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		TYPOGRAPHY_SUPPORT_KEY,
+	],
+	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		'spacing',
+	],
+};
+
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
- * @param  {Object} props      Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {Object}            Filtered props applied to save element
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( props, blockType, attributes ) {
 	if ( ! hasStyleSupport( blockType ) ) {
 		return props;
 	}
 
-	const { style } = attributes;
+	let { style } = attributes;
+
+	forEach( skipSerializationPaths, ( path, indicator ) => {
+		if ( getBlockSupport( blockType, indicator ) ) {
+			style = omit( style, path );
+		}
+	} );
+
 	props.style = {
 		...getInlineStyles( style ),
 		...props.style,
@@ -119,11 +181,12 @@ export function addSaveProps( props, blockType, attributes ) {
 }
 
 /**
- * Filters registered block settings to extand the block edit wrapper
+ * Filters registered block settings to extend the block edit wrapper
  * to apply the desired styles and classnames properly.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object}.Filtered block settings.
  */
 export function addEditProps( settings ) {
 	if ( ! hasStyleSupport( settings ) ) {
@@ -147,31 +210,73 @@ export function addEditProps( settings ) {
  * Override the default edit UI to include new inspector controls for
  * all the custom styles configs.
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
+		const shouldDisplayControls = useDisplayBlockControls();
 
-		const hasSpacingSupport = hasBlockSupport(
-			blockName,
-			SPACING_SUPPORT_KEY
+		return (
+			<>
+				{ shouldDisplayControls && (
+					<>
+						<TypographyPanel { ...props } />
+						<BorderPanel { ...props } />
+						<ColorEdit { ...props } />
+						<SpacingPanel { ...props } />
+					</>
+				) }
+				<BlockEdit { ...props } />
+			</>
 		);
-
-		return [
-			<TypographyPanel key="typography" { ...props } />,
-			<BorderPanel key="border" { ...props } />,
-			<ColorEdit key="colors" { ...props } />,
-			<BlockEdit key="edit" { ...props } />,
-			hasSpacingSupport && (
-				<SpacingPanelControl key="spacing">
-					<PaddingEdit { ...props } />
-				</SpacingPanelControl>
-			),
-		];
 	},
 	'withToolbarControls'
+);
+
+/**
+ * Override the default block element to include duotone styles.
+ *
+ * @param {Function} BlockListBlock Original component
+ * @return {Function}                Wrapped component
+ */
+const withElementsStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const elements = props.attributes.style?.elements;
+
+		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
+			BlockListBlock
+		) }`;
+		const styles = compileElementsStyles(
+			blockElementsContainerIdentifier,
+			props.attributes.style?.elements
+		);
+
+		return (
+			<>
+				{ elements && (
+					<style
+						dangerouslySetInnerHTML={ {
+							__html: styles,
+						} }
+					/>
+				) }
+
+				<BlockListBlock
+					{ ...props }
+					className={
+						elements
+							? classnames(
+									props.className,
+									blockElementsContainerIdentifier
+							  )
+							: props.className
+					}
+				/>
+			</>
+		);
+	}
 );
 
 addFilter(
@@ -196,4 +301,10 @@ addFilter(
 	'editor.BlockEdit',
 	'core/style/with-block-controls',
 	withBlockControls
+);
+
+addFilter(
+	'editor.BlockListBlock',
+	'core/editor/with-elements-styles',
+	withElementsStyles
 );
