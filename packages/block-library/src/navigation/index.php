@@ -92,12 +92,13 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
  * If the theme doesn't explicity support 'block-nav-menus' or no location was provided
  * as a block attribute then an empty string is returned.
  *
+ * @param  array $location The location of the classic menu to display
  * @param  array $attributes Navigation block attributes.
- * @return string HTML markup of a generated Navigation Block.
+ * @return string|false HTML markup of a generated Navigation Block or false if no location is specified.
  */
-function get_classic_navigation_elements( $attributes ) {
-	if ( ! array_key_exists( '__unstable__location', $attributes ) ) {
-		return '';
+function render_classic_location_menu( $location, $attributes ) {
+	if ( empty( $location ) ) {
+		return false;
 	}
 
 	$block_attributes = $attributes;
@@ -163,7 +164,15 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	if ( empty( $block->inner_blocks ) ) {
-		return get_classic_navigation_elements( $attributes );
+		if ( array_key_exists( '__unstable__location', $attributes ) ) {
+			$location = $attributes['__unstable__location'];
+			$maybe_classic_navigation = render_classic_location_menu( $location, $attributes );
+			if ( $maybe_classic_navigation ) {
+				return $maybe_classic_navigation;
+			}
+		}
+
+		return '';
 	}
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
