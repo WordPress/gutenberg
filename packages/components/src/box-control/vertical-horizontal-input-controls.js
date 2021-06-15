@@ -1,15 +1,11 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import UnitControl from './unit-control';
 import { LABELS } from './utils';
 import { Layout } from './styles/box-control-styles';
 
+const noop = () => {};
 const groupedSides = [ 'vertical', 'horizontal' ];
 
 export default function VerticalHorizontalInputControls( {
