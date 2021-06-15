@@ -225,7 +225,22 @@ export const getRawEntityRecord = createSelector(
 			}, {} )
 		);
 	},
-	( state ) => [ state.entities.data ]
+	( state, kind, name, recordId ) => [
+		get( state.entities.data, [
+			kind,
+			name,
+			'queriedData',
+			'items',
+			recordId,
+		] ),
+		get( state.entities.data, [
+			kind,
+			name,
+			'queriedData',
+			'itemIsComplete',
+			recordId,
+		] ),
+	]
 );
 
 /**
@@ -362,7 +377,10 @@ export const getEntityRecordNonTransientEdits = createSelector(
 			return acc;
 		}, {} );
 	},
-	( state ) => [ state.entities.config, state.entities.data ]
+	( state, kind, name, recordId ) => [
+		state.entities.config,
+		get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+	]
 );
 
 /**
@@ -400,7 +418,23 @@ export const getEditedEntityRecord = createSelector(
 		...getRawEntityRecord( state, kind, name, recordId ),
 		...getEntityRecordEdits( state, kind, name, recordId ),
 	} ),
-	( state ) => [ state.entities.data ]
+	( state, kind, name, recordId ) => [
+		get( state.entities.data, [
+			kind,
+			name,
+			'queriedData',
+			'items',
+			recordId,
+		] ),
+		get( state.entities.data, [
+			kind,
+			name,
+			'queriedData',
+			'itemIsComplete',
+			recordId,
+		] ),
+		get( state.entities.data, [ kind, name, 'edits', recordId ] ),
+	]
 );
 
 /**
