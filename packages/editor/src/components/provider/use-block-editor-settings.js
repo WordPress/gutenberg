@@ -37,10 +37,22 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
 		baseUrl,
+		hasResolvedLocalSiteData,
 	} = useSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML } = select( editorStore );
 		const isWeb = Platform.OS === 'web';
-		const { canUser, getUnstableBase } = select( coreStore );
+		const { canUser, getEntityRecord, hasFinishedResolution } = select(
+			coreStore
+		);
+
+		const siteDataArgs = [ 'root', '__unstableBase', undefined ];
+
+		const siteData = getEntityRecord( ...siteDataArgs ) || {};
+
+		const hasFinishedResolvingSiteData = hasFinishedResolution(
+			'getEntityRecord',
+			[ ...siteDataArgs ]
+		);
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
@@ -55,7 +67,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				canUser( 'create', 'media' ),
 				true
 			),
-			baseUrl: getUnstableBase()?.url || '',
+			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
+			baseUrl: siteData?.url || '',
 		};
 	}, [] );
 
@@ -69,11 +82,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			);
 		}
 
-		const fetchingBaseUrl = '' === baseUrl;
-
 		// If the baseUrl is still resolving then return
 		// empty data for this request.
-		if ( fetchingBaseUrl ) {
+		if ( ! hasResolvedLocalSiteData ) {
 			return Promise.resolve( EMPTY_DATA );
 		}
 
