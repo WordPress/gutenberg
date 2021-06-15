@@ -45,14 +45,20 @@ body.widgets-php {
 		min-height: calc(100vh - #{ $admin-bar-height });
 	}
 
-	// Widget areas should inherit the theme background color if it exists
-	.edit-widgets-block-editor {
-		background-color: transparent;
-	}
+	// Widget areas should inherit the theme background color if it exists.
+	.edit-widgets-block-editor,
 	.components-panel {
 		background-color: transparent;
-		border-color: $gray-900;
 	}
+	// The widget area heading should always have a white background.
+	.components-panel__body-title {
+		background-color: $white;
+	}
+}
+
+// Light background specific styles
+:not(.is-dark-theme) .block-widgets-container {
+	.components-panel,
 	.components-panel__body {
 		border-color: $gray-900;
 	}
