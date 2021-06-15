@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -14,46 +13,42 @@ import {
 	useBlockProps,
 	PlainText,
 } from '@wordpress/block-editor';
+import { RawHTML } from '@wordpress/element';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
-import { useIsEditablePostBlock } from '../utils/hooks';
+import { useCanEditEntity } from '../utils/hooks';
 
 export default function PostTitleEdit( {
-	clientId,
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
-	context: { postType, postId },
+	context: { postType, postId, queryId },
 } ) {
 	const TagName = 0 === level ? 'p' : 'h' + level;
-	const isEditable = useIsEditablePostBlock( clientId );
-	const post = useSelect(
-		( select ) =>
-			select( coreStore ).getEditedEntityRecord(
-				'postType',
-				postType,
-				postId
-			),
-		[ postType, postId ]
+	const isDescendentOfQueryLoop = !! queryId;
+	const userCanEdit = useCanEditEntity(
+		'root',
+		'postType',
+		postType,
+		postId
 	);
-	const { editEntityRecord } = useDispatch( coreStore );
-
+	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
+		'postType',
+		postType,
+		'title',
+		postId
+	);
+	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-
-	if ( ! post ) {
-		return null;
-	}
-
-	const { title = '', link } = post;
 
 	let titleElement = (
 		<TagName { ...( isLink ? {} : blockProps ) }>
@@ -62,54 +57,52 @@ export default function PostTitleEdit( {
 	);
 
 	if ( postType && postId ) {
-		titleElement = isEditable ? (
-			<PlainText
-				tagName={ TagName }
-				placeholder={ __( 'No Title' ) }
-				value={ title }
-				onChange={ ( value ) =>
-					editEntityRecord( 'postType', postType, postId, {
-						title: value,
-					} )
-				}
-				__experimentalVersion={ 2 }
-				{ ...( isLink ? {} : blockProps ) }
-			/>
-		) : (
-			<TagName { ...( isLink ? {} : blockProps ) }>{ title }</TagName>
-		);
+		titleElement =
+			userCanEdit && ! isDescendentOfQueryLoop ? (
+				<PlainText
+					tagName={ TagName }
+					placeholder={ __( 'No Title' ) }
+					value={ rawTitle }
+					onChange={ setTitle }
+					__experimentalVersion={ 2 }
+					{ ...( isLink ? {} : blockProps ) }
+				/>
+			) : (
+				<TagName { ...( isLink ? {} : blockProps ) }>
+					<RawHTML key="html">{ fullTitle.rendered }</RawHTML>
+				</TagName>
+			);
 	}
 
 	if ( isLink ) {
-		titleElement = isEditable ? (
-			<TagName { ...blockProps }>
-				<PlainText
-					tagName="a"
-					href={ link }
-					target={ linkTarget }
-					rel={ rel }
-					placeholder={ title.length === 0 ? __( 'No Title' ) : null }
-					value={ title }
-					onChange={ ( value ) =>
-						editEntityRecord( 'postType', postType, postId, {
-							title: value,
-						} )
-					}
-					__experimentalVersion={ 2 }
-				/>
-			</TagName>
-		) : (
-			<TagName { ...blockProps }>
-				<a
-					href={ link }
-					target={ linkTarget }
-					rel={ rel }
-					onClick={ ( event ) => event.preventDefault() }
-				>
-					{ title }
-				</a>
-			</TagName>
-		);
+		titleElement =
+			userCanEdit && ! isDescendentOfQueryLoop ? (
+				<TagName { ...blockProps }>
+					<PlainText
+						tagName="a"
+						href={ link }
+						target={ linkTarget }
+						rel={ rel }
+						placeholder={
+							! rawTitle.length ? __( 'No Title' ) : null
+						}
+						value={ rawTitle }
+						onChange={ setTitle }
+						__experimentalVersion={ 2 }
+					/>
+				</TagName>
+			) : (
+				<TagName { ...blockProps }>
+					<a
+						href={ link }
+						target={ linkTarget }
+						rel={ rel }
+						onClick={ ( event ) => event.preventDefault() }
+					>
+						<RawHTML key="html">{ fullTitle.rendered }</RawHTML>
+					</a>
+				</TagName>
+			);
 	}
 
 	return (
