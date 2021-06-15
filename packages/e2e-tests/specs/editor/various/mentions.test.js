@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import {
+	clickBlockAppender,
 	createNewPost,
 	createUser,
 	deleteUser,
 	getEditedPostContent,
-	clickBlockAppender,
+	pressKeyTimes,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'autocomplete mentions', () => {
@@ -31,9 +32,20 @@ describe( 'autocomplete mentions', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should insert mention between two other words', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'Stuck in the middle with you.' );
+		await pressKeyTimes( 'ArrowLeft', 'you.'.length );
+		await page.keyboard.type( '@j' );
+		await page.waitForSelector( '.components-autocomplete__result' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ' ' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should insert two subsequent mentions', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( 'I am @ja' );
+		await page.keyboard.type( 'I am @j' );
 		await page.waitForSelector( '.components-autocomplete__result' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' @a' );
