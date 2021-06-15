@@ -306,6 +306,12 @@ export default function NavigationLinkEdit( {
 	);
 
 	// Store the colors from context as attributes for rendering
+	// Priority goes:
+	// 1: Overlay custom colors (if submenu)
+	// 2: Overlay theme colors (if submenu)
+	// 3: Custom colors
+	// 4: Theme colors
+	// 5: Global styles
 	useEffect( () => {
 		const colors = {
 			textColor: context.textColor,
@@ -438,9 +444,9 @@ export default function NavigationLinkEdit( {
 			'has-link': !! url,
 			'has-child': hasDescendants,
 			'has-text-color': !! textColor || !! customTextColor,
-			[ `has-${ textColor }-color` ]: !! textColor,
+			[ `has-${ textColor }-color` ]: !! textColor && ! customTextColor,
 			'has-background': !! backgroundColor || customBackgroundColor,
-			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor && ! customBackgroundColor,
 		} ),
 		style: {
 			color: customTextColor,

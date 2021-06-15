@@ -37,6 +37,9 @@
 		"kind": {
 			"type": "string"
 		},
+		"isTopLevelLink": {
+			"type": "boolean"
+		},
 		"colors": {
 			"type": "object",
 			"default": {

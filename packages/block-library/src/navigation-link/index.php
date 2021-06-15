@@ -25,14 +25,14 @@ function block_core_navigation_link_build_css_colors( $context, $attributes ) {
 	$named_text_color  = null;
 	$custom_text_color = null;
 
-	if ( $is_sub_menu && array_key_exists( 'overlayTextColor', $context ) ) {
-		$named_text_color = $context['overlayTextColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'customOverlayTextColor', $context ) ) {
+	if ( $is_sub_menu && array_key_exists( 'customOverlayTextColor', $context ) ) {
 		$custom_text_color = $context['customOverlayTextColor'];
-	} elseif ( array_key_exists( 'textColor', $context ) ) {
-		$named_text_color = $context['textColor'];
+	} elseif ( $is_sub_menu && array_key_exists( 'overlayTextColor', $context ) ) {
+		$named_text_color = $context['overlayTextColor'];
 	} elseif ( array_key_exists( 'customTextColor', $context ) ) {
 		$custom_text_color = $context['customTextColor'];
+	} elseif ( array_key_exists( 'textColor', $context ) ) {
+		$named_text_color = $context['textColor'];
 	} elseif ( isset( $context['style']['color']['text'] ) ) {
 		$custom_text_color = $context['style']['color']['text'];
 	}
@@ -51,14 +51,14 @@ function block_core_navigation_link_build_css_colors( $context, $attributes ) {
 	$named_background_color  = null;
 	$custom_background_color = null;
 
-	if ( $is_sub_menu && array_key_exists( 'overlayBackgroundColor', $context ) ) {
-		$named_background_color = $context['overlayBackgroundColor'];
-	} elseif ( $is_sub_menu && array_key_exists( 'customOverlayBackgroundColor', $context ) ) {
+	if ( $is_sub_menu && array_key_exists( 'customOverlayBackgroundColor', $context ) ) {
 		$custom_background_color = $context['customOverlayBackgroundColor'];
-	} elseif ( array_key_exists( 'backgroundColor', $context ) ) {
-		$named_background_color = $context['backgroundColor'];
+	} elseif ( $is_sub_menu && array_key_exists( 'overlayBackgroundColor', $context ) ) {
+		$named_background_color = $context['overlayBackgroundColor'];
 	} elseif ( array_key_exists( 'customBackgroundColor', $context ) ) {
 		$custom_background_color = $context['customBackgroundColor'];
+	} elseif ( array_key_exists( 'backgroundColor', $context ) ) {
+		$named_background_color = $context['backgroundColor'];
 	} elseif ( isset( $context['style']['color']['background'] ) ) {
 		$custom_background_color = $context['style']['color']['background'];
 	}
