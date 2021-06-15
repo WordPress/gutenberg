@@ -13,7 +13,12 @@ import {
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchRemoteUrlData as fetchRemoteUrlData,
 } from '@wordpress/core-data';
-import { getAuthority, isURL } from '@wordpress/url';
+import {
+	getAuthority,
+	isURL,
+	getProtocol,
+	isValidProtocol,
+} from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -77,6 +82,20 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			if ( ! isURL( url ) ) {
 				return Promise.reject(
 					new TypeError( `${ url } is not a valid URL.` )
+				);
+			}
+
+			// Test for "http" based URL as it is possible for valid
+			// yet unusable URLs such as `tel:123456` to be passed.
+			const protocol = getProtocol( url );
+
+			if (
+				! isValidProtocol( protocol ) ||
+				! protocol.startsWith( 'http' ) ||
+				! /^https?:\/\/[^\/\s]/i.test( url )
+			) {
+				return Promise.reject(
+					new TypeError( `${ url } does not have a valid protocol.` )
 				);
 			}
 
