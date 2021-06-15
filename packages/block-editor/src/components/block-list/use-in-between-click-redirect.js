@@ -82,6 +82,11 @@ export function useInBetweenClickRedirect() {
 	return useRefEffect( ( node ) => {
 		function onMouseMove( event ) {
 			const { clientX, clientY, target } = event;
+
+			if ( target !== node ) {
+				return;
+			}
+
 			const closestElement = getClosestChildElementFromPoint(
 				target,
 				clientX,
