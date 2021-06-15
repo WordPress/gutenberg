@@ -29,10 +29,7 @@ export async function createUser( username, firstName, lastName ) {
 	if ( lastName ) {
 		await page.type( '#last_name', lastName );
 	}
-	await page.$eval(
-		'#send_user_notification',
-		( check ) => ( check.checked = true )
-	);
+	await page.click( '#send_user_notification' );
 
 	await Promise.all( [
 		page.click( '#createusersub' ),
