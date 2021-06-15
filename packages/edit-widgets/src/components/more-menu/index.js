@@ -122,19 +122,21 @@ export default function MoreMenu() {
 									'Contain text cursor inside block deactivated'
 								) }
 							/>
-							<FeatureToggle
-								feature="showBlockBreadcrumbs"
-								label={ __( 'Display block breadcrumbs' ) }
-								info={ __(
-									'Shows block breadcrumbs at the bottom of the editor.'
-								) }
-								messageActivated={ __(
-									'Display block breadcrumbs activated'
-								) }
-								messageDeactivated={ __(
-									'Display block breadcrumbs deactivated'
-								) }
-							/>
+							{ isLargeViewport && (
+								<FeatureToggle
+									feature="showBlockBreadcrumbs"
+									label={ __( 'Display block breadcrumbs' ) }
+									info={ __(
+										'Shows block breadcrumbs at the bottom of the editor.'
+									) }
+									messageActivated={ __(
+										'Display block breadcrumbs activated'
+									) }
+									messageDeactivated={ __(
+										'Display block breadcrumbs deactivated'
+									) }
+								/>
+							) }
 						</MenuGroup>
 					</>
 				) }
