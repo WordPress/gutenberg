@@ -306,8 +306,8 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $nodes as $node ) {
 			foreach ( self::PRESETS_METADATA as $preset ) {
 				$path   = array_merge( $node['path'], $preset['path'] );
-				$preset = _wp_array_get( $this->theme_json, $path, array() );
-				if ( ! empty( $preset ) ) {
+				$preset = _wp_array_get( $this->theme_json, $path, null );
+				if ( null !== $preset ) {
 					gutenberg_experimental_set( $this->theme_json, $path, array( $origin => $preset ) );
 				}
 			}
