@@ -4,11 +4,15 @@
 import { cx } from 'emotion';
 
 /**
+ * WordPress dependencies
+ */
+import { useInstanceId } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
 import * as styles from './form-group-styles';
-import { useInstanceId } from '../utils';
 
 /**
  * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props

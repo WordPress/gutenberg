@@ -30,6 +30,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
+		"@types/lodash": "^4.14.169",
 		"@types/mousetrap": "^1.6.8",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",

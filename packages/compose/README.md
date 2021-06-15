@@ -72,6 +72,10 @@ _Related_
 
 -   <https://docs-lodash.com/v4/flow-right/>
 
+_Type_
+
+-   `import('lodash').LoDashStatic['flowRight']`
+
 <a name="createHigherOrderComponent" href="#createHigherOrderComponent">#</a> **createHigherOrderComponent**
 
 Given a function mapping a component to an enhanced component and modifier
@@ -204,7 +208,7 @@ _Parameters_
 
 _Returns_
 
--   `TFunc & import('lodash').Cancelable`: Debounced function.
+-   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
 
 <a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
 
@@ -273,7 +277,7 @@ _Parameters_
 
 -   _object_ `object`: Object reference to create an id for.
 -   _prefix_ `[string]`: Prefix for the unique id.
--   _preferredId_ `[string]`: Default ID to use.
+-   _preferredId_ `[string | number]`: Default ID to use.
 
 _Returns_
 
@@ -449,7 +453,7 @@ _Parameters_
 
 _Returns_
 
--   `TFunc & import('lodash').Cancelable`: Throttled function.
+-   `import('lodash').DebouncedFunc<TFunc>`: Throttled function.
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
