@@ -128,8 +128,8 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 						<ToolbarButton
 							label={
 								isLocked
-								? __( 'Unlock inner blocks' )
-								: __( 'Lock inner blocks' ) 
+									? __( 'Unlock inner blocks' )
+									: __( 'Lock inner blocks' )
 							}
 							showTooltip
 							onClick={ () => setIsLocked( ! isLocked ) }
