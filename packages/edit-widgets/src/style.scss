@@ -51,7 +51,9 @@ body.widgets-php {
 		background-color: transparent;
 	}
 	// The widget area heading should always have a white background.
-	.components-panel__body-title {
+	// Needs additional specificity on hover to override default styles.
+	.components-panel__body-title,
+	.components-panel__body-title.components-panel__body-title.components-panel__body-title:hover {
 		background-color: $white;
 	}
 }
