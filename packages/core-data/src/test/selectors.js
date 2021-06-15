@@ -467,8 +467,8 @@ describe( 'canUserEditEntityRecord', () => {
 					{
 						kind: 'postType',
 						name: 'post',
-						__unstable_rest_base: 'posts'
-					}
+						__unstable_rest_base: 'posts',
+					},
 				],
 				data: {
 					root: {
