@@ -195,8 +195,10 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
  * @return array Returns modified $prepared_args.
  */
 function gutenberg_rest_user_query_has_published_posts( $prepared_args, $request ) {
-	if ( ! empty( $request['has_published_posts'] ) && true === $request['has_published_posts'] ) {
-		$prepared_args['has_published_posts'] = get_post_types( array( 'show_in_rest' => true ), 'names' );
+	if ( ! empty( $request['has_published_posts'] ) ) {
+		$prepared_args['has_published_posts'] = ( true === $request['has_published_posts'] )
+			? get_post_types( array( 'show_in_rest' => true ), 'names' )
+			: (array) $request['has_published_posts'];
 	}
 	return $prepared_args;
 }
@@ -213,7 +215,10 @@ add_filter( 'rest_user_query', 'gutenberg_rest_user_query_has_published_posts', 
 function gutenberg_rest_user_collection_params_has_published_posts( $query_params ) {
 	$query_params['has_published_posts'] = array(
 		'description' => __( 'Limit result set to users who have published posts.', 'gutenberg' ),
-		'type'        => 'boolean',
+		'type'        => array( 'boolean', 'array' ),
+		'items'       => array(
+			'type' => 'string',
+		),
 	);
 	return $query_params;
 }
