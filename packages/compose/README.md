@@ -154,7 +154,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `Object|Function`: Element Ref.
+-   `import('react').RefCallback<Element>`: Element Ref.
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
@@ -228,11 +228,11 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `boolean|string`: Focus on mount mode.
+-   _focusOnMount_ `boolean | 'firstElement'`: Focus on mount mode.
 
 _Returns_
 
--   `Function`: Ref callback.
+-   `import('react').RefCallback<HTMLElement>`: Ref callback.
 
 <a name="useFocusReturn" href="#useFocusReturn">#</a> **useFocusReturn**
 
