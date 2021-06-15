@@ -16,6 +16,7 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
@@ -84,6 +85,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	const blockProps = useBlockProps();
 
+	// states for lock
+	const [ isLocked, setIsLocked ] = useState( true );
+
+	const lockContainerClass = isLocked && 'is-locked';
+
 	if ( hasAlreadyRendered ) {
 		return (
 			<div { ...blockProps }>
@@ -120,6 +126,21 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
+							label={
+								isLocked
+								? __( 'Unlock inner blocks' )
+								: __( 'Lock inner blocks' ) 
+							}
+							showTooltip
+							onClick={ () => setIsLocked( ! isLocked ) }
+						>
+							{ isLocked
+								? __( 'Unlock inner blocks' )
+								: __( 'Lock inner blocks' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+					<ToolbarGroup>
+						<ToolbarButton
 							onClick={ () => convertBlockToStatic( clientId ) }
 							label={ __( 'Convert to regular blocks' ) }
 							icon={ ungroup }
@@ -137,7 +158,14 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 					</PanelBody>
 				</InspectorControls>
 				<div className="block-library-block__reusable-block-container">
-					{ <div { ...innerBlocksProps } /> }
+					{
+						<>
+							<div
+								className={ `reusable-block-lock-container ${ lockContainerClass }` }
+							></div>
+							<div { ...innerBlocksProps } />
+						</>
+					}
 				</div>
 			</div>
 		</RecursionProvider>
