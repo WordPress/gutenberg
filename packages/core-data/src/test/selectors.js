@@ -446,29 +446,36 @@ describe( 'canUser', () => {
 } );
 
 describe( 'canUserEditEntityRecord', () => {
-	it( 'returns undefined by default', () => {
+	it( 'returns false by default', () => {
 		const state = deepFreeze( {
 			userPermissions: {},
 			entities: { data: {} },
 		} );
-		expect(
-			canUserEditEntityRecord( state, 'root', 'postType', 'post' )
-		).toBe( undefined );
+		expect( canUserEditEntityRecord( state, 'postType', 'post' ) ).toBe(
+			false
+		);
 	} );
 
 	it( 'returns whether the user can edit', () => {
 		const state = deepFreeze( {
 			userPermissions: {
 				'create/posts': false,
-				'update/posts': true,
+				'update/posts/1': true,
 			},
 			entities: {
+				config: [
+					{
+						kind: 'postType',
+						name: 'post',
+						__unstable_rest_base: 'posts'
+					}
+				],
 				data: {
 					root: {
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post', rest_base: 'posts' },
+									post: { slug: 'post', __unstable: 'posts' },
 								},
 								itemIsComplete: {
 									post: true,
@@ -481,38 +488,7 @@ describe( 'canUserEditEntityRecord', () => {
 			},
 		} );
 		expect(
-			canUserEditEntityRecord( state, 'root', 'postType', 'post' )
-		).toBe( true );
-	} );
-
-	it( 'returns whether whether the user can edit a given resource', () => {
-		const state = deepFreeze( {
-			userPermissions: {
-				'create/posts': false,
-				'update/pages': false,
-				'update/pages/2010': true,
-				'update/posts/2010': false,
-			},
-			entities: {
-				data: {
-					root: {
-						postType: {
-							queriedData: {
-								items: {
-									page: { slug: 'page', rest_base: 'pages' },
-								},
-								itemIsComplete: {
-									page: true,
-								},
-								queries: {},
-							},
-						},
-					},
-				},
-			},
-		} );
-		expect(
-			canUserEditEntityRecord( state, 'root', 'postType', 'page', 2010 )
+			canUserEditEntityRecord( state, 'postType', 'post', '1' )
 		).toBe( true );
 	} );
 } );
