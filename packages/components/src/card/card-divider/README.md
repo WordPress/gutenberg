@@ -1,6 +1,6 @@
 # CardDivider
 
-`CardDivider` renders an optional divider within a [`Card`](/packages/componnents/src/card/card/README.md). It is typically used to divide multiple `CardBody` components from each other.
+`CardDivider` renders an optional divider within a [`Card`](/packages/components/src/card/card/README.md). It is typically used to divide multiple `CardBody` components from each other.
 
 ## Usage
 
@@ -20,4 +20,4 @@ const Example = () => (
 
 ### Inherited props
 
-`CardDivider` inherits all of the [`Divider` props](/packages/componnents/src/divider/README.md#props).
+`CardDivider` inherits all of the [`Divider` props](/packages/components/src/divider/README.md#props).

@@ -1,6 +1,6 @@
 # CardFooter
 
-`CardFooter` renders an optional footer within a [`Card`](/packages/componnents/src/card/card/README.md).
+`CardFooter` renders an optional footer within a [`Card`](/packages/components/src/card/card/README.md).
 
 ## Usage
 
@@ -17,7 +17,7 @@ const Example = () => (
 
 ### Flex
 
-Underneath, `CardFooter` uses the [`Flex` layout component](/packages/componnents/src/flex/flex/README.md). This improves the alignment of child items within the component.
+Underneath, `CardFooter` uses the [`Flex` layout component](/packages/components/src/flex/flex/README.md). This improves the alignment of child items within the component.
 
 ```jsx
 import {
@@ -41,11 +41,11 @@ const Example = () => (
 );
 ```
 
-Check out [the documentation](/packages/componnents/src/flex/flex/README.md) on `Flex` for more details on layout composition.
+Check out [the documentation](/packages/components/src/flex/flex/README.md) on `Flex` for more details on layout composition.
 
 ## Props
 
-Note: This component is connected to [`Card`'s Context](/packages/componnents/src/card/card/README.md#context). The value of the `size` and `isBorderless` props is derived from the `Card` parent component (if there is one). Setting these props directly on this component will override any derived values.
+Note: This component is connected to [`Card`'s Context](/packages/components/src/card/card/README.md#context). The value of the `size` and `isBorderless` props is derived from the `Card` parent component (if there is one). Setting these props directly on this component will override any derived values.
 
 ### `isBorderless`: `boolean`
 
@@ -63,7 +63,7 @@ Renders with a light gray background color.
 
 ### `justify`: `CSSProperties[ 'justifyContent' ]`
 
-See the documentation for the `justify` prop for the [`Flex` component](/packages/componnents/src/flex/flex/README.md#justify)
+See the documentation for the `justify` prop for the [`Flex` component](/packages/components/src/flex/flex/README.md#justify)
 
 ### `size`: `string`
 
