@@ -72,10 +72,6 @@ _Related_
 
 -   <https://docs-lodash.com/v4/flow-right/>
 
-_Type_
-
--   `import('lodash').LoDashStatic['flowRight']`
-
 <a name="createHigherOrderComponent" href="#createHigherOrderComponent">#</a> **createHigherOrderComponent**
 
 Given a function mapping a component to an enhanced component and modifier
