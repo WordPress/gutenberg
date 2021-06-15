@@ -525,13 +525,9 @@ _Type_
 A higher-order component used to provide and manage delayed function calls
 that ought to be bound to a component's lifecycle.
 
-_Parameters_
+_Type_
 
--   _OriginalComponent_ `WPComponent`: Component requiring setTimeout
-
-_Returns_
-
--   `WPComponent`: Wrapped component.
+-   `PropInjectingHigherOrderComponent< TimeoutProps >`
 
 <a name="withState" href="#withState">#</a> **withState**
 
