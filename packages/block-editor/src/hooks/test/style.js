@@ -61,4 +61,48 @@ describe( 'getInlineStyles', () => {
 			borderBottomRightRadius: '1em',
 		} );
 	} );
+
+	it( 'should support longhand spacing styles', () => {
+		expect(
+			getInlineStyles( {
+				spacing: {
+					margin: {
+						top: '10px',
+						right: '0.5rem',
+						bottom: '0.5em',
+						left: '1em',
+					},
+					padding: {
+						top: '20px',
+						right: '25px',
+						bottom: '30px',
+						left: '35px',
+					},
+				},
+			} )
+		).toEqual( {
+			marginTop: '10px',
+			marginRight: '0.5rem',
+			marginBottom: '0.5em',
+			marginLeft: '1em',
+			paddingTop: '20px',
+			paddingRight: '25px',
+			paddingBottom: '30px',
+			paddingLeft: '35px',
+		} );
+	} );
+
+	it( 'should support shorthand spacing styles', () => {
+		expect(
+			getInlineStyles( {
+				spacing: {
+					margin: '10px',
+					padding: '20px',
+				},
+			} )
+		).toEqual( {
+			margin: '10px',
+			padding: '20px',
+		} );
+	} );
 } );

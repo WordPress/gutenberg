@@ -182,6 +182,10 @@ add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post
  */
 function gutenberg_safe_style_attrs( $attrs ) {
 	$attrs[] = 'object-position';
+	$attrs[] = 'border-top-left-radius';
+	$attrs[] = 'border-top-right-radius';
+	$attrs[] = 'border-bottom-right-radius';
+	$attrs[] = 'border-bottom-left-radius';
 
 	return $attrs;
 }

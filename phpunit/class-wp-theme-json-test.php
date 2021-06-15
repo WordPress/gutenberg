@@ -181,6 +181,52 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected_no_origin, $actual_no_origin );
 	}
 
+	function test_get_stylesheet_support_for_shorthand_and_longhand_values() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'border'  => array(
+								'radius' => '10px',
+							),
+							'spacing' => array(
+								'padding' => '24px',
+								'margin'  => '1em',
+							),
+						),
+						'core/image' => array(
+							'border'  => array(
+								'radius' => array(
+									'topLeft'     => '10px',
+									'bottomRight' => '1em',
+								),
+							),
+							'spacing' => array(
+								'padding' => array(
+									'top' => '15px',
+								),
+								'margin'  => array(
+									'bottom' => '30px',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertEquals(
+			'.wp-block-group{border-radius: 10px;margin: 1em;padding: 24px;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;padding-top: 15px;}',
+			$theme_json->get_stylesheet()
+		);
+		$this->assertEquals(
+			'.wp-block-group{border-radius: 10px;margin: 1em;padding: 24px;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;padding-top: 15px;}',
+			$theme_json->get_stylesheet( 'block_styles' )
+		);
+	}
+
 	function test_get_stylesheet() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -247,10 +293,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 							'spacing'  => array(
-								'padding' => array(
-									'top'    => '12px',
-									'bottom' => '24px',
-								),
+								'padding' => '24px',
 							),
 						),
 						'core/heading'   => array(
@@ -283,10 +326,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 						'core/image'     => array(
-							'border' => array(
+							'border'  => array(
 								'radius' => array(
 									'topLeft'     => '10px',
 									'bottomRight' => '1em',
+								),
+							),
+							'spacing' => array(
+								'margin' => array(
+									'bottom' => '30px',
 								),
 							),
 						),
@@ -297,11 +345,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			'body{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}body{color: var(--wp--preset--color--grey);}a{background-color: #333;color: #111;}.wp-block-group{border-radius: 10px;padding-top: 12px;padding-bottom: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}',
+			'body{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}body{color: var(--wp--preset--color--grey);}a{background-color: #333;color: #111;}.wp-block-group{border-radius: 10px;padding: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}',
 			$theme_json->get_stylesheet()
 		);
 		$this->assertEquals(
-			'body{color: var(--wp--preset--color--grey);}a{background-color: #333;color: #111;}.wp-block-group{border-radius: 10px;padding-top: 12px;padding-bottom: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}',
+			'body{color: var(--wp--preset--color--grey);}a{background-color: #333;color: #111;}.wp-block-group{border-radius: 10px;padding: 24px;}.wp-block-group a{color: #111;}h1,h2,h3,h4,h5,h6{color: #123456;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{background-color: #333;color: #111;font-size: 60px;}.wp-block-post-date{color: #123456;}.wp-block-post-date a{background-color: #777;color: #555;}.wp-block-image{border-top-left-radius: 10px;border-bottom-right-radius: 1em;margin-bottom: 30px;}.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}',
 			$theme_json->get_stylesheet( 'block_styles' )
 		);
 		$this->assertEquals(
@@ -739,6 +787,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
+					'border'   => array(
+						'radius' => array(
+							'topLeft'     => '6px',
+							'topRight'    => 'var(--top-right, var(--unsafe-fallback))',
+							'bottomRight' => '6px',
+							'bottomLeft'  => '6px',
+						),
+					),
 					'spacing'  => array(
 						'padding' => array(
 							'top'    => '1px',
@@ -761,6 +817,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 					'blocks'   => array(
 						'core/group' => array(
+							'border'   => array(
+								'radius' => array(
+									'topLeft'     => '5px',
+									'topRight'    => 'var(--top-right, var(--unsafe-fallback))',
+									'bottomRight' => '5px',
+									'bottomLeft'  => '5px',
+								),
+							),
 							'spacing'  => array(
 								'padding' => array(
 									'top'    => '3px',
@@ -791,6 +855,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
+				'border'   => array(
+					'radius' => array(
+						'topLeft'     => '6px',
+						'bottomRight' => '6px',
+						'bottomLeft'  => '6px',
+					),
+				),
 				'spacing'  => array(
 					'padding' => array(
 						'top'   => '1px',
@@ -811,6 +882,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'blocks'   => array(
 					'core/group' => array(
+						'border'   => array(
+							'radius' => array(
+								'topLeft'     => '5px',
+								'bottomRight' => '5px',
+								'bottomLeft'  => '5px',
+							),
+						),
 						'spacing'  => array(
 							'padding' => array(
 								'top'   => '3px',

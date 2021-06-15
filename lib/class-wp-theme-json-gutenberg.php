@@ -61,18 +61,8 @@ class WP_Theme_JSON_Gutenberg {
 			'text'       => null,
 		),
 		'spacing'    => array(
-			'margin'  => array(
-				'top'    => null,
-				'right'  => null,
-				'bottom' => null,
-				'left'   => null,
-			),
-			'padding' => array(
-				'bottom' => null,
-				'left'   => null,
-				'right'  => null,
-				'top'    => null,
-			),
+			'margin'  => null,
+			'padding' => null,
 		),
 		'typography' => array(
 			'fontFamily'     => null,
@@ -213,20 +203,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * - 'value': path to the value in theme.json and block attributes.
 	 */
 	const PROPERTIES_METADATA = array(
-		'background'           => array(
+		'background'       => array(
 			'value' => array( 'color', 'gradient' ),
 		),
-		'background-color'     => array(
+		'background-color' => array(
 			'value' => array( 'color', 'background' ),
 		),
-		'border-radius'        => array(
-			'value' => array( 'border', 'radius' ),
-		),
-		// This is deliberately separate to the border-radius entry above.
-		// It allows for backwards compatible shorthand e.g. border-radius: 10px
-		// while below provides a means to explicitly set the CSS property name
-		// where the flat array configuration approach builds an incorrect name.
-		'corner-border-radius' => array(
+		'border-radius'    => array(
 			'value'      => array( 'border', 'radius' ),
 			'properties' => array(
 				'border-top-left-radius'     => 'topLeft',
@@ -235,48 +218,58 @@ class WP_Theme_JSON_Gutenberg {
 				'border-bottom-right-radius' => 'bottomRight',
 			),
 		),
-		'border-color'         => array(
+		'border-color'     => array(
 			'value' => array( 'border', 'color' ),
 		),
-		'border-width'         => array(
+		'border-width'     => array(
 			'value' => array( 'border', 'width' ),
 		),
-		'border-style'         => array(
+		'border-style'     => array(
 			'value' => array( 'border', 'style' ),
 		),
-		'color'                => array(
+		'color'            => array(
 			'value' => array( 'color', 'text' ),
 		),
-		'font-family'          => array(
+		'font-family'      => array(
 			'value' => array( 'typography', 'fontFamily' ),
 		),
-		'font-size'            => array(
+		'font-size'        => array(
 			'value' => array( 'typography', 'fontSize' ),
 		),
-		'font-style'           => array(
+		'font-style'       => array(
 			'value' => array( 'typography', 'fontStyle' ),
 		),
-		'font-weight'          => array(
+		'font-weight'      => array(
 			'value' => array( 'typography', 'fontWeight' ),
 		),
-		'letter-spacing'       => array(
+		'letter-spacing'   => array(
 			'value' => array( 'typography', 'letterSpacing' ),
 		),
-		'line-height'          => array(
+		'line-height'      => array(
 			'value' => array( 'typography', 'lineHeight' ),
 		),
-		'margin'               => array(
+		'margin'           => array(
 			'value'      => array( 'spacing', 'margin' ),
-			'properties' => array( 'top', 'right', 'bottom', 'left' ),
+			'properties' => array(
+				'margin-top'    => 'top',
+				'margin-right'  => 'right',
+				'margin-bottom' => 'bottom',
+				'margin-left'   => 'left',
+			),
 		),
-		'padding'              => array(
+		'padding'          => array(
 			'value'      => array( 'spacing', 'padding' ),
-			'properties' => array( 'top', 'right', 'bottom', 'left' ),
+			'properties' => array(
+				'padding-top'    => 'top',
+				'padding-right'  => 'right',
+				'padding-bottom' => 'bottom',
+				'padding-left'   => 'left',
+			),
 		),
-		'text-decoration'      => array(
+		'text-decoration'  => array(
 			'value' => array( 'typography', 'textDecoration' ),
 		),
-		'text-transform'       => array(
+		'text-transform'   => array(
 			'value' => array( 'typography', 'textTransform' ),
 		),
 	);
@@ -402,11 +395,7 @@ class WP_Theme_JSON_Gutenberg {
 				$to_property[ $key ] = $key;
 				if ( self::has_properties( $metadata ) ) {
 					foreach ( $metadata['properties'] as $name => $property ) {
-						if ( is_numeric( $name ) ) {
-							$to_property[ $key . '-' . $property ] = $key;
-						} else {
-							$to_property[ $name ] = $key;
-						}
+						$to_property[ $name ] = $key;
 					}
 				}
 			}
@@ -631,22 +620,21 @@ class WP_Theme_JSON_Gutenberg {
 
 		$properties = array();
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
+			$properties[] = array(
+				'name'  => $name,
+				'value' => $metadata['value'],
+			);
+
 			// Some properties can be shorthand properties, meaning that
 			// they contain multiple values instead of a single one.
 			// An example of this is the padding property.
 			if ( self::has_properties( $metadata ) ) {
 				foreach ( $metadata['properties'] as $key => $property ) {
-					$property_name = is_numeric( $key ) ? $name . '-' . $property : $key;
-					$properties[]  = array(
-						'name'  => $property_name,
+					$properties[] = array(
+						'name'  => $key,
 						'value' => array_merge( $metadata['value'], array( $property ) ),
 					);
 				}
-			} else {
-				$properties[] = array(
-					'name'  => $name,
-					'value' => $metadata['value'],
-				);
 			}
 		}
 
@@ -1272,11 +1260,23 @@ class WP_Theme_JSON_Gutenberg {
 			if ( self::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
 				$property = self::to_property( $declaration['name'] );
 				$path     = self::PROPERTIES_METADATA[ $property ]['value'];
-				if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
-					$declaration_divided = explode( '-', $declaration['name'] );
-					$path[]              = $declaration_divided[1];
+
+				// Add shorthand declaration e.g. `margin`.
+				$value = _wp_array_get( $input, $path, array() );
+				if ( ! is_array( $value ) ) {
+					gutenberg_experimental_set( $output, $path, $value );
 				}
-				gutenberg_experimental_set( $output, $path, _wp_array_get( $input, $path, array() ) );
+
+				// Handle longhand css properties e.g. `margin-left`, `border-top-left-radius` etc.
+				if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
+					$properties = self::PROPERTIES_METADATA[ $property ]['properties'];
+					$sub_path   = _wp_array_get( $properties, array( $declaration['name'] ), null );
+
+					if ( $sub_path ) {
+						$path[] = $sub_path;
+						gutenberg_experimental_set( $output, $path, _wp_array_get( $input, $path, array() ) );
+					}
+				}
 			}
 		}
 		return $output;

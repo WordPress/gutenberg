@@ -2,7 +2,6 @@
  * External dependencies
  */
 import {
-	capitalize,
 	first,
 	forEach,
 	get,
@@ -84,20 +83,12 @@ export function getInlineStyles( styles = {} ) {
 			const styleValue = get( styles, path );
 
 			if ( !! subPaths && ! isString( styleValue ) ) {
-				if ( Array.isArray( subPaths ) ) {
-					subPaths.forEach( ( suffix ) => {
-						output[
-							propKey + capitalize( suffix )
-						] = compileStyleValue( get( styleValue, [ suffix ] ) );
-					} );
-				} else {
-					Object.entries( subPaths ).forEach( ( entry ) => {
-						const [ name, suffix ] = entry;
-						output[ name ] = compileStyleValue(
-							get( styleValue, [ suffix ] )
-						);
-					} );
-				}
+				Object.entries( subPaths ).forEach( ( entry ) => {
+					const [ name, suffix ] = entry;
+					output[ name ] = compileStyleValue(
+						get( styleValue, [ suffix ] )
+					);
+				} );
 			} else {
 				output[ propKey ] = compileStyleValue( get( styles, path ) );
 			}
