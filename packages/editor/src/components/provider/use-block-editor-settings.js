@@ -6,7 +6,7 @@ import { pick, defaultTo } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Platform, useMemo } from '@wordpress/element';
+import { Platform, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
@@ -72,35 +72,38 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 	const { undo } = useDispatch( editorStore );
 
 	// Temporary home - should this live in `core-data`?
-	function fetchRichUrlData( url, fetchOptions = {} ) {
-		if ( ! isURL( url ) ) {
-			return Promise.reject(
-				new TypeError( `${ url } is not a valid URL.` )
-			);
-		}
+	const fetchRichUrlData = useCallback(
+		function ( url, fetchOptions = {} ) {
+			if ( ! isURL( url ) ) {
+				return Promise.reject(
+					new TypeError( `${ url } is not a valid URL.` )
+				);
+			}
 
-		// If the baseUrl is still resolving then return
-		// empty data for this request.
-		if ( ! hasResolvedLocalSiteData ) {
-			return Promise.resolve( EMPTY_DATA );
-		}
+			// If the baseUrl is still resolving then return
+			// empty data for this request.
+			if ( ! hasResolvedLocalSiteData ) {
+				return Promise.resolve( EMPTY_DATA );
+			}
 
-		// More accurate test for internal URLs to avoid edge cases
-		// such as baseURL being included as part of a query string
-		// on the target url.
-		const baseUrlAuthority = getAuthority( baseUrl );
-		const urlAuthority = getAuthority( url );
+			// More accurate test for internal URLs to avoid edge cases
+			// such as baseURL being included as part of a query string
+			// on the target url.
+			const baseUrlAuthority = getAuthority( baseUrl );
+			const urlAuthority = getAuthority( url );
 
-		const isInternal = urlAuthority === baseUrlAuthority;
+			const isInternal = urlAuthority === baseUrlAuthority;
 
-		// Don't handle internal URLs (yet...).
-		if ( isInternal ) {
-			return Promise.resolve( EMPTY_DATA );
-		}
+			// Don't handle internal URLs (yet...).
+			if ( isInternal ) {
+				return Promise.resolve( EMPTY_DATA );
+			}
 
-		// If external then attempt fetch of data.
-		return fetchRemoteUrlData( url, fetchOptions );
-	}
+			// If external then attempt fetch of data.
+			return fetchRemoteUrlData( url, fetchOptions );
+		},
+		[ baseUrl, hasResolvedLocalSiteData ]
+	);
 
 	return useMemo(
 		() => ( {
