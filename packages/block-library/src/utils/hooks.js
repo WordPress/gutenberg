@@ -9,19 +9,13 @@ import { store as coreStore } from '@wordpress/core-data';
  *
  * @param {string} kind     Entity kind.
  * @param {string} name     Entity name.
- * @param {number} key      Record's key.
  * @param {string} recordId Record's id.
  */
-export function useCanEditEntity( kind, name, key, recordId ) {
+export function useCanEditEntity( kind, name, recordId ) {
 	return useSelect(
 		( select ) =>
-			select( coreStore ).canUserEditEntityRecord(
-				kind,
-				name,
-				key,
-				recordId
-			),
-		[ kind, name, key, recordId ]
+			select( coreStore ).canUserEditEntityRecord( kind, name, recordId ),
+		[ kind, name, recordId ]
 	);
 }
 

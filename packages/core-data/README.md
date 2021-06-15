@@ -282,7 +282,6 @@ _Parameters_
 -   _state_ `Object`: Data state.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `number`: Record's key.
 -   _recordId_ `string`: Record's id.
 
 _Returns_
