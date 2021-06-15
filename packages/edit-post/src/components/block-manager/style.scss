@@ -42,7 +42,7 @@
 }
 
 .edit-post-block-manager__category {
-	margin: 0 0 2rem 0;
+	margin: 0 0 $grid-unit-30 0;
 }
 
 .edit-post-block-manager__category-title {
@@ -52,12 +52,7 @@
 	background-color: $white;
 	z-index: z-index(".edit-post-block-manager__category-title");
 
-	.components-base-control__field {
-		margin-bottom: 0;
-	}
-
 	.components-checkbox-control__label {
-		font-size: 0.9rem;
 		font-weight: 600;
 	}
 }
@@ -73,17 +68,17 @@
 .edit-post-block-manager__category-title,
 .edit-post-block-manager__checklist-item {
 	border-bottom: 1px solid $gray-300;
-}
-
-.edit-post-block-manager__checklist-item {
-	margin-bottom: 0;
-	padding-left: $grid-unit-20;
 
 	.components-base-control__field {
 		align-items: center;
 		display: flex;
 		margin: 0;
 	}
+}
+
+.edit-post-block-manager__checklist-item {
+	margin-bottom: 0;
+	padding-left: $grid-unit-20;
 
 	.components-modal__content &.components-checkbox-control__input-container {
 		margin: 0 $grid-unit-10;
