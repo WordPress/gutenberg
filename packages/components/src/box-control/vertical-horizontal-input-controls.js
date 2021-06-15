@@ -27,7 +27,8 @@ export default function VerticalHorizontalInputControls( {
 				top: true,
 				bottom: true,
 			} );
-		} else {
+		}
+		if ( side === 'horizontal' ) {
 			onHoverOn( {
 				left: true,
 				right: true,
@@ -41,7 +42,8 @@ export default function VerticalHorizontalInputControls( {
 				top: false,
 				bottom: false,
 			} );
-		} else {
+		}
+		if ( side === 'horizontal' ) {
 			onHoverOff( {
 				left: false,
 				right: false,
