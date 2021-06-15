@@ -319,26 +319,18 @@
 			margin-top: $grid-unit-15;
 			margin-bottom: $grid-unit-15;
 		}
+	}
 
-		// The class is-away and attribute data-away are used to hide 'stickier'
-		// toolbars when their block is out of view.
-		&[data-away] {
-			transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1);
-		}
+	// The data-away attribute is used to hide the toolbar when its block is out of view.
+	&[data-away] {
+		transition: opacity 0.1s linear;
 
-		&[data-away="top"] {
-			transform-origin: center top;
+		&[data-away="true"] {
+			opacity: 0;
 
-			&.is-away {
-				transform: perspective(1000px) rotateX(-90deg);
-			}
-		}
-
-		&[data-away="bottom"] {
-			transform-origin: center bottom;
-
-			&.is-away {
-				transform: perspective(1000px) rotateX(90deg);
+			// Allow clicking through the transparent toolbar
+			.block-editor-block-contextual-toolbar {
+				pointer-events: none;
 			}
 		}
 	}
