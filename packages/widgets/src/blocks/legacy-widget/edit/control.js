@@ -367,14 +367,31 @@ function isEmptyHTML( html ) {
 function isEmptyNode( node ) {
 	switch ( node.nodeType ) {
 		case node.TEXT_NODE:
+			// Text nodes are empty if it's entirely whitespace.
 			return node.nodeValue.trim() === '';
 		case node.ELEMENT_NODE:
-			if ( node.tagName === 'IMG' ) {
+			// Elements that are "embedded content" are not empty.
+			// https://dev.w3.org/html5/spec-LC/content-models.html#embedded-content-0
+			if (
+				[
+					'AUDIO',
+					'CANVAS',
+					'EMBED',
+					'IFRAME',
+					'IMG',
+					'MATH',
+					'OBJECT',
+					'SVG',
+					'VIDEO',
+				].includes( node.tagName )
+			) {
 				return false;
 			}
+			// Elements with no children are empty.
 			if ( ! node.hasChildNodes() ) {
 				return true;
 			}
+			// Elements with children are empty if all their children are empty.
 			return Array.from( node.childNodes ).every( isEmptyNode );
 		default:
 			return true;
