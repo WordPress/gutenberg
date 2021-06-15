@@ -20,7 +20,7 @@ import { Icon, globe } from '@wordpress/icons';
  */
 import { ViewerSlot } from './viewer-slot';
 
-import useRemoteUrlData from './use-remote-url-data';
+import useRichUrlData from './use-rich-url-data';
 
 export default function LinkPreview( {
 	value,
@@ -30,7 +30,7 @@ export default function LinkPreview( {
 	// Avoid fetching if rich previews are not desired.
 	const maybeRemoteURL = hasRichPreviews ? value?.url : null;
 
-	const { richData, isFetching } = useRemoteUrlData( maybeRemoteURL );
+	const { richData, isFetching } = useRichUrlData( maybeRemoteURL );
 
 	// Rich data may be an empty object so test for that.
 	const hasRichData = richData && Object.keys( richData ).length;
