@@ -178,6 +178,12 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/react-native-*/**/*.js' ],
+			settings: {
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
+			},
+		},
+		{
 			files: [ 'packages/**/*.js' ],
 			excludedFiles: [
 				'packages/block-library/src/*/save.js',
