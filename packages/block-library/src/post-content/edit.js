@@ -38,7 +38,8 @@ function ReadOnlyContent( { userCanEdit, postType, postId } ) {
 	);
 }
 
-function EditableContent( { layout, postType, postId } ) {
+function EditableContent( { layout, context = {} } ) {
+	const { postType, postId } = context;
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
@@ -65,6 +66,7 @@ function EditableContent( { layout, postType, postId } ) {
 		postType,
 		{ id: postId }
 	);
+
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
@@ -87,6 +89,7 @@ function Content( props ) {
 		postId
 	);
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
+
 	return isEditable ? (
 		<EditableContent { ...props } />
 	) : (
