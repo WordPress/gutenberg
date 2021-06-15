@@ -88,6 +88,9 @@ describe( 'Site Editor Performance', () => {
 		}
 
 		// Measuring typing performance inside the post content.
+		await canvas().waitForSelector(
+			'[data-type="core/post-content"] [data-type="core/paragraph"]'
+		);
 		await canvas().click(
 			'[data-type="core/post-content"] [data-type="core/paragraph"]'
 		);
