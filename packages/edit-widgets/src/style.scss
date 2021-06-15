@@ -45,8 +45,16 @@ body.widgets-php {
 		min-height: calc(100vh - #{ $admin-bar-height });
 	}
 
-	.interface-interface-skeleton__content {
-		background-color: $gray-100;
+	// Widget areas should inherit the theme background color if it exists
+	.edit-widgets-block-editor {
+		background-color: transparent;
+	}
+	.components-panel {
+		background-color: transparent;
+		border-color: $gray-900;
+	}
+	.components-panel__body {
+		border-color: $gray-900;
 	}
 }
 
