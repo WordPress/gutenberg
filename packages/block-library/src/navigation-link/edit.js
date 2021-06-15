@@ -446,7 +446,8 @@ export default function NavigationLinkEdit( {
 			'has-text-color': !! textColor || !! customTextColor,
 			[ `has-${ textColor }-color` ]: !! textColor && ! customTextColor,
 			'has-background': !! backgroundColor || customBackgroundColor,
-			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor && ! customBackgroundColor,
+			[ `has-${ backgroundColor }-background-color` ]:
+				!! backgroundColor && ! customBackgroundColor,
 		} ),
 		style: {
 			color: customTextColor,
