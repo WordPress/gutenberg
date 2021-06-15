@@ -18,6 +18,11 @@ export async function deleteUser( username ) {
 		`//td[@data-colname="Username"]//a[contains(text(), "${ username }")]`
 	);
 
+	if ( ! userLink ) {
+		await switchUserToTest();
+		return;
+	}
+
 	// Focus to unveil actions
 	await userLink.focus();
 
