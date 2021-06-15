@@ -54,7 +54,7 @@ export default function BoxControl( {
 	values: valuesProp,
 	units,
 	sides,
-	isGroupedDirections = false,
+	splitOnAxis = false,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
 } ) {
@@ -71,7 +71,7 @@ export default function BoxControl( {
 	);
 
 	const [ side, setSide ] = useState(
-		getInitialSide( isLinked, isGroupedDirections )
+		getInitialSide( isLinked, splitOnAxis )
 	);
 
 	const id = useUniqueId( idProp );
@@ -79,7 +79,7 @@ export default function BoxControl( {
 
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
-		setSide( getInitialSide( ! isLinked, isGroupedDirections ) );
+		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
 	};
 
 	const handleOnFocus = ( event, { side: nextSide } ) => {
@@ -155,7 +155,7 @@ export default function BoxControl( {
 						/>
 					</FlexBlock>
 				) }
-				{ ! isLinked && isGroupedDirections && (
+				{ ! isLinked && splitOnAxis && (
 					<FlexBlock>
 						<VerticalHorizontalInputControls
 							{ ...inputControlProps }
@@ -171,7 +171,7 @@ export default function BoxControl( {
 					</FlexItem>
 				) }
 			</HeaderControlWrapper>
-			{ ! isLinked && ! isGroupedDirections && (
+			{ ! isLinked && ! splitOnAxis && (
 				<InputControls { ...inputControlProps } />
 			) }
 		</Root>

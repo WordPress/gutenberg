@@ -124,17 +124,17 @@ export function isValuesDefined( values ) {
 
 /**
  * Get initial selected side, factoring in whether the sides are linked,
- * and whether or not the vertical / horizontal directions are grouped.
+ * and whether the vertical / horizontal directions are grouped via splitOnAxis.
  *
  * @param {boolean} isLinked
- * @param {boolean} isGroupedDirections
+ * @param {boolean} splitOnAxis
  * @return {string} The initial side.
  */
-export function getInitialSide( isLinked, isGroupedDirections ) {
+export function getInitialSide( isLinked, splitOnAxis ) {
 	let initialSide = 'all';
 
 	if ( ! isLinked ) {
-		initialSide = isGroupedDirections ? 'vertical' : 'top';
+		initialSide = splitOnAxis ? 'vertical' : 'top';
 	}
 
 	return initialSide;

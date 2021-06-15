@@ -30,7 +30,7 @@ const defaultSideValues = {
 function DemoExample( {
 	sides,
 	defaultValues = defaultSideValues,
-	isGroupedDirections = false,
+	splitOnAxis = false,
 } ) {
 	const [ values, setValues ] = useState( defaultValues );
 	const [ showVisualizer, setShowVisualizer ] = useState( {} );
@@ -45,7 +45,7 @@ function DemoExample( {
 						sides={ sides }
 						onChange={ setValues }
 						onChangeShowVisualizer={ setShowVisualizer }
-						isGroupedDirections={ isGroupedDirections }
+						splitOnAxis={ splitOnAxis }
 					/>
 				</Content>
 			</FlexBlock>
@@ -87,16 +87,16 @@ export const singleSide = () => {
 	);
 };
 
-export const groupedDirections = () => {
-	return <DemoExample isGroupedDirections={ true } />;
+export const verticalHorizontalControls = () => {
+	return <DemoExample splitOnAxis={ true } />;
 };
 
-export const groupedDirectionsWithSingleSide = () => {
+export const verticalHorizontalControlsWithSingleSide = () => {
 	return (
 		<DemoExample
 			sides={ [ 'horizontal' ] }
 			defaultValues={ { left: '10px', right: '10px' } }
-			isGroupedDirections={ true }
+			splitOnAxis={ true }
 		/>
 	);
 };
