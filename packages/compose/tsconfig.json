@@ -12,6 +12,6 @@
 		{ "path": "../keycodes" }
 	],
 	"include": [
-		"**/*"
+		"src/**/*"
 	]
 }
