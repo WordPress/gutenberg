@@ -13,9 +13,6 @@ $vertical-tabs-width: 160px;
 	@include break-large() {
 		height: 70%;
 	}
-	@include break-huge() {
-		height: 50%;
-	}
 
 	// Clears spacing to flush fit the navigation component to the modal edges.
 	@media (max-width: #{ ($break-medium - 1) }) {
