@@ -44,11 +44,10 @@ describe( 'scroll-lock', () => {
 
 		// Running cleanup functions now works asynchronously. the unofficial
 		// enzyme adapter for react 17 we're currently using does not account
-		// for this, yet. So for now, we'll use setTimeout to wait for cleanup.
+		// for this, yet. So for now, we'll use jest.advanceTimersByTime to wait for cleanup.
 		//
 		// @see https://reactjs.org/blog/2020/08/10/react-v17-rc.html#effect-cleanup-timing
-		setTimeout( () => {
-			expectLocked( false );
-		} );
+		jest.advanceTimersByTime( 1 );
+		expectLocked( false );
 	} );
 } );
