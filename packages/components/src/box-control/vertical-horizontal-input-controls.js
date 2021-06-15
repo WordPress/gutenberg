@@ -91,7 +91,7 @@ export default function VerticalHorizontalInputControls( {
 					onHoverOn={ createHandleOnHoverOn( side ) }
 					onHoverOff={ createHandleOnHoverOff( side ) }
 					label={ LABELS[ side ] }
-					key={ `box-control-${ side }` }
+					key={ side }
 				/>
 			) ) }
 		</Layout>
