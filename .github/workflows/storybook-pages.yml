@@ -32,7 +32,7 @@ jobs:
                   key: ${{ runner.os }}-node-${{ matrix.node }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
 
             - name: Install Dependencies
-              run: npm install
+              run: npm ci
 
             - name: Build Storybook
               run: npm run storybook:build

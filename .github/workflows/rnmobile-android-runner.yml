@@ -37,7 +37,7 @@ jobs:
                   path: ~/.npm
                   key: ${{ runner.os }}-node-${{ matrix.node }}-npm-cache-${{ hashFiles('**/package-lock.json') }}
 
-            - run: npm install
+            - run: npm ci
 
             - name: Restore Gradle cache
               uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6

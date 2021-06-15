@@ -34,7 +34,7 @@ jobs:
             # Changing into the action's directory and running `npm install` is much
             # faster than a full project-wide `npm ci`.
             - name: Install NPM dependencies
-              run: npm install
+              run: npm ci
               working-directory: packages/project-management-automation
 
             - uses: ./packages/project-management-automation
