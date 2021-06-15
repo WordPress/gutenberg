@@ -14,6 +14,11 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import useDimensionHandler from './use-dimension-handler';
+
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
 
 export default function ImageSizeControl( {
@@ -27,6 +32,12 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
+	const {
+		currentHeight,
+		currentWidth,
+		updateDimension,
+	} = useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
+
 	function updateDimensions( nextWidth, nextHeight ) {
 		return () => {
 			onChange( { width: nextWidth, height: nextHeight } );
@@ -53,30 +64,20 @@ export default function ImageSizeControl( {
 							type="number"
 							className="block-editor-image-size-control__width"
 							label={ __( 'Width' ) }
-							value={ width ?? imageWidth ?? '' }
+							value={ currentWidth }
 							min={ 1 }
 							onChange={ ( value ) =>
-								onChange( {
-									width:
-										value === ''
-											? undefined
-											: parseInt( value, 10 ),
-								} )
+								updateDimension( 'width', value )
 							}
 						/>
 						<TextControl
 							type="number"
 							className="block-editor-image-size-control__height"
 							label={ __( 'Height' ) }
-							value={ height ?? imageHeight ?? '' }
+							value={ currentHeight }
 							min={ 1 }
 							onChange={ ( value ) =>
-								onChange( {
-									height:
-										value === ''
-											? undefined
-											: parseInt( value, 10 ),
-								} )
+								updateDimension( 'height', value )
 							}
 						/>
 					</div>
