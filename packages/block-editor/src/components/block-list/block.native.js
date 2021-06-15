@@ -249,6 +249,7 @@ class BlockListBlock extends Component {
 								pointerEvents="box-none"
 								style={ [
 									styles.solidBorder,
+									isSelected && styles.solidBorderSelected,
 									isFullWidth( align ) &&
 										isScreenWidthWider &&
 										styles.borderFullWidth,
@@ -285,6 +286,7 @@ class BlockListBlock extends Component {
 						<View
 							style={ [
 								styles.neutralToolbar,
+								isSelected && styles.neutralToolbarSelected,
 								! isFullWidthToolbar &&
 									isContainerRelated( name ) &&
 									isWider( screenWidth, 'mobile' ) &&

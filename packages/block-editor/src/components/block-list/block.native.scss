@@ -56,6 +56,10 @@
 	margin-right: -$block-edge-to-content;
 }
 
+.neutralToolbarSelected {
+	margin-bottom: -$block-edge-to-content;
+}
+
 .containerToolbar {
 	width: 100%;
 	align-self: center;
@@ -71,6 +75,10 @@
 	border-radius: 4px;
 	border-style: solid;
 	z-index: 1;
+}
+
+.solidBorderSelected {
+	bottom: -$solid-border-space;
 }
 
 .dashedBorder {
