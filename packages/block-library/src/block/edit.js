@@ -28,7 +28,7 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
-import { ungroup, lock } from '@wordpress/icons';
+import { ungroup } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
