@@ -7,7 +7,7 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,7 +32,7 @@ function toggleRichText( container, toggle ) {
  * any text nodes that only contain HTML formatting whitespace.
  *
  * @param {Element} node Container to search.
- * @param {string} type 'start' or 'end'.
+ * @param {string}  type 'start' or 'end'.
  */
 function getDeepestNode( node, type ) {
 	const child = type === 'start' ? 'firstChild' : 'lastChild';
@@ -77,7 +77,6 @@ export default function useMultiSelection() {
 		hasMultiSelection,
 		selectedBlockClientId,
 	} = useSelect( selector, [] );
-	const { selectBlock } = useDispatch( blockEditorStore );
 	const selectedRef = useBlockRef( selectedBlockClientId );
 	// These must be in the right DOM order.
 	const startRef = useBlockRef( first( multiSelectedBlockClientIds ) );
@@ -149,7 +148,6 @@ export default function useMultiSelection() {
 		hasMultiSelection,
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
-		selectBlock,
 		selectedBlockClientId,
 	] );
 

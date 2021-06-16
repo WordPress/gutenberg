@@ -17,10 +17,10 @@ import { useEffect } from '@wordpress/element';
  *
  * @see https://docs-lodash.com/v4/throttle/
  *
- * @template {(...args: any[]) => void} TFunc TFunc
+ * @template {(...args: any[]) => void} TFunc
  *
- * @param {TFunc} fn The function to throttle.
- * @param {number} [wait] The number of milliseconds to throttle invocations to.
+ * @param {TFunc}                             fn        The function to throttle.
+ * @param {number}                            [wait]    The number of milliseconds to throttle invocations to.
  * @param {import('lodash').ThrottleSettings} [options] The options object. See linked documentation for details.
  * @return {TFunc & import('lodash').Cancelable} Throttled function.
  */

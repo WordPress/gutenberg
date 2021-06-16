@@ -70,14 +70,19 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$attributes = array();
-	$classes    = array();
-	$styles     = array();
-
 	$typography_supports = _wp_array_get( $block_type->supports, array( 'typography' ), false );
 	if ( ! $typography_supports ) {
 		return array();
 	}
+
+	$skip_typography_serialization = _wp_array_get( $typography_supports, array( '__experimentalSkipSerialization' ), false );
+	if ( $skip_typography_serialization ) {
+		return array();
+	}
+
+	$attributes = array();
+	$classes    = array();
+	$styles     = array();
 
 	$has_font_family_support     = _wp_array_get( $typography_supports, array( '__experimentalFontFamily' ), false );
 	$has_font_size_support       = _wp_array_get( $typography_supports, array( 'fontSize' ), false );
@@ -88,17 +93,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
 
-	$skip_font_size_support_serialization = _wp_array_get( $block_type->supports, array( '__experimentalSkipFontSizeSerialization' ), false );
-
-	// Covers all typography features _except_ font size.
-	$skip_typography_serialization = _wp_array_get( $block_type->supports, array( '__experimentalSkipTypographySerialization' ), false );
-
-	// Font Size.
-	if ( $has_font_size_support && ! $skip_font_size_support_serialization ) {
+	if ( $has_font_size_support ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $block_attributes );
 		$has_custom_font_size = isset( $block_attributes['style']['typography']['fontSize'] );
 
-		// Apply required class or style.
 		if ( $has_named_font_size ) {
 			$classes[] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
 		} elseif ( $has_custom_font_size ) {
@@ -106,10 +104,8 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	// Font Family.
-	if ( $has_font_family_support && ! $skip_typography_serialization ) {
+	if ( $has_font_family_support ) {
 		$has_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
-		// Apply required class and style.
 		if ( $has_font_family ) {
 			$font_family = $block_attributes['style']['typography']['fontFamily'];
 			if ( strpos( $font_family, 'var:preset|font-family' ) !== false ) {
@@ -123,43 +119,35 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	// Font style.
-	if ( $has_font_style_support && ! $skip_typography_serialization ) {
-		// Apply font style.
+	if ( $has_font_style_support ) {
 		$font_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontStyle', 'font-style' );
 		if ( $font_style ) {
 			$styles[] = $font_style;
 		}
 	}
 
-	// Font weight.
-	if ( $has_font_weight_support && ! $skip_typography_serialization ) {
-		// Apply font weight.
+	if ( $has_font_weight_support ) {
 		$font_weight = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontWeight', 'font-weight' );
 		if ( $font_weight ) {
 			$styles[] = $font_weight;
 		}
 	}
 
-	// Line Height.
-	if ( $has_line_height_support && ! $skip_typography_serialization ) {
+	if ( $has_line_height_support ) {
 		$has_line_height = isset( $block_attributes['style']['typography']['lineHeight'] );
-		// Add the style (no classes for line-height).
 		if ( $has_line_height ) {
 			$styles[] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
 		}
 	}
 
-	// Text Decoration.
-	if ( $has_text_decoration_support && ! $skip_typography_serialization ) {
+	if ( $has_text_decoration_support ) {
 		$text_decoration_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textDecoration', 'text-decoration' );
 		if ( $text_decoration_style ) {
 			$styles[] = $text_decoration_style;
 		}
 	}
 
-	// Text Transform.
-	if ( $has_text_transform_support && ! $skip_typography_serialization ) {
+	if ( $has_text_transform_support ) {
 		$text_transform_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textTransform', 'text-transform' );
 		if ( $text_transform_style ) {
 			$styles[] = $text_transform_style;

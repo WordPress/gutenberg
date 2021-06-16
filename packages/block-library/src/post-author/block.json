@@ -24,7 +24,7 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [ "postType", "postId" ],
+	"usesContext": [ "postType", "postId", "queryId" ],
 	"supports": {
 		"html": false,
 		"typography": {

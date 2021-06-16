@@ -35,3 +35,20 @@
 	height: 150;
 	overflow: visible;
 }
+
+.setFeaturedButton {
+	border-top-width: $border-width;
+	border-top-color: $light-gray-400;
+	padding: $grid-unit-20;
+	text-align: center;
+	color: $blue-50;
+}
+
+.setFeaturedButtonDark {
+	border-top-color: $gray-70;
+	color: $blue-30;
+}
+
+.removeFeaturedButton {
+	color: $alert-red;
+}
