@@ -35,7 +35,7 @@ const outerContext = {
 
 const innerContext = {
 	Card: {
-		css: {
+		style: {
 			background: 'white',
 		},
 	},
@@ -48,7 +48,7 @@ const InnerContent = memo( () => {
 	const state = useSomeContext();
 	const isEven = state % 2 === 0;
 	return (
-		<View css={ { background: isEven ? 'red' : 'initial' } }>
+		<View style={ { background: isEven ? 'red' : 'initial' } }>
 			<Text>Card (inside innerContext)</Text>
 			<br />
 			<Text>Counter:{ state }</Text>
