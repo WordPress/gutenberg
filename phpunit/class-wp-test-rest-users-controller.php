@@ -203,21 +203,31 @@ class WP_Test_REST_Users_Controller extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
 		$request->set_param( 'has_published_posts', true );
 		$response = rest_get_server()->dispatch( $request );
+		// Make sure the response status is successful.
 		$this->assertSame( 200, $response->get_status() );
+		// Make sure we have 3 authors.
 		$this->assertCount( 3, $response->get_data() );
+		// Make sure we have the right author IDs.
+		$this->assertSame( 4, $response->get_data()[0]['id'] );
+		$this->assertSame( 7, $response->get_data()[1]['id'] );
+		$this->assertSame( 8, $response->get_data()[2]['id'] );
 
 		// Test users for a specific post-type.
 		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
 		$request->set_param( 'has_published_posts', array( 'r_true_p_true' ) );
 		$response = rest_get_server()->dispatch( $request );
+		// Make sure the response status is successful.
 		$this->assertSame( 200, $response->get_status() );
+		// Make sure we only have 1 author.
 		$this->assertCount( 1, $response->get_data() );
+		// Make sure we got the correct author.
+		$this->assertSame( 7, $response->get_data()[0]['id'] );
 
-		// Test users for non-existent post-type.
+		// Test invalid post-type.
 		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
 		$request->set_param( 'has_published_posts', array( 'dummy' ) );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertCount( 0, $response->get_data() );
+		// Make sure the response has a status of 400.
+		$this->assertSame( 400, $response->get_status() );
 	}
 }
