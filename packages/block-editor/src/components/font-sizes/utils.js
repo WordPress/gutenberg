@@ -65,6 +65,8 @@ export function getFontSizeClass( fontSizeSlug ) {
 	// We don't want to use kebabCase from lodash here
 	// see https://github.com/WordPress/gutenberg/issues/32347
 	// However, we need to make sure the generated class
-	// doesn't contain spaces.
-	return `has-${ fontSizeSlug.replace( /\s+/g, '-' ) }-font-size`;
+	// doesn't contain spaces. The method used to accept numbers
+	// so we need to make sure we are working with a string for the
+	// sake of backwards compat.
+	return `has-${ fontSizeSlug.toString().replace( /\s+/g, '-' ) }-font-size`;
 }
