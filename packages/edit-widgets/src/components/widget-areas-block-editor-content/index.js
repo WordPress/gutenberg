@@ -10,16 +10,29 @@ import {
 	ObserveTyping,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import { store as editWidgetsStore } from '../../store';
 
 export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
 } ) {
+	const { hasThemeStyles } = useSelect( ( select ) => ( {
+		hasThemeStyles: select( editWidgetsStore ).__unstableIsFeatureActive(
+			'themeStyles'
+		),
+	} ) );
+
+	const styles = useMemo( () => {
+		return hasThemeStyles ? blockEditorSettings.styles : [];
+	}, [ blockEditorSettings, hasThemeStyles ] );
+
 	return (
 		<div className="edit-widgets-block-editor">
 			<Notices />
@@ -27,7 +40,7 @@ export default function WidgetAreasBlockEditorContent( {
 				<KeyboardShortcuts />
 				<BlockEditorKeyboardShortcuts />
 				<div className="editor-styles-wrapper">
-					<EditorStyles styles={ blockEditorSettings.styles } />
+					<EditorStyles styles={ styles } />
 					<BlockSelectionClearer>
 						<WritingFlow>
 							<ObserveTyping>

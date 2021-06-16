@@ -47,7 +47,7 @@ body.widgets-php {
 
 	// Widget areas should inherit the theme background color if it exists,
 	// but the editor background shouldn't.
-	.edit-widgets-block-editor > .editor-style-wrapper {
+	.edit-widgets-block-editor > .editor-styles-wrapper {
 		background-color: transparent;
 	}
 	// The widget area heading should always have a white background.
@@ -58,7 +58,7 @@ body.widgets-php {
 	}
 }
 
-.blocks-widgets-container .editor-style-wrapper {
+.blocks-widgets-container .editor-styles-wrapper {
 	max-width: $widget-area-width;
 	margin: auto;
 }
