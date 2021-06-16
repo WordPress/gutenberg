@@ -5,6 +5,11 @@ import { find, map } from 'lodash';
 import tinycolor from 'tinycolor2';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Provided an array of color objects as set by the theme or by the editor defaults,
  * and the values of the defined color or custom color returns a color object describing the color.
  *
@@ -60,11 +65,26 @@ export function getColorClassName( colorContextName, colorSlug ) {
 		return undefined;
 	}
 
+	// In the past, we used lodash's kebabCase to process slugs.
+	// By doing so, this method also accepted and converted non string values
+	// into strings. Some plugins relied on this behavior.
+	if ( 'string' !== typeof colorSlug ) {
+		colorSlug = String( colorSlug );
+		deprecated( 'The color slug should be a string.' );
+	}
+
+	// In the past, we used lodash's kebabCase to process slugs.
+	// By doing so, this method also stripped special characters
+	// such as the # in "#FFFFF". Some plugins relied on this behavior.
+	const slug = colorSlug.replace( /[^a-zA-Z0-9\-]/g, '' );
+	if ( slug !== colorSlug ) {
+		deprecated( 'The color slug should not have any special character.' );
+	}
+
 	// We don't want to use kebabCase from lodash here
 	// see https://github.com/WordPress/gutenberg/issues/32347
 	// However, we need to make sure the generated class
-	// doesn't contain spaces, or any special characters.
-	const slug = colorSlug.replace( /[^a-zA-Z0-9\- ]/g, '' );
+	// doesn't contain spaces.
 	return `has-${ slug.replace( /\s+/g, '-' ) }-${ colorContextName.replace(
 		/\s+/g,
 		'-'
