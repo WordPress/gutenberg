@@ -64,6 +64,7 @@ const defaultRenderToggle = ( {
 		isDisabled={ disabled }
 	/>
 );
+
 export class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
