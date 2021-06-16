@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Animated } from 'react-native';
+import { FlatList } from 'react-native';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
 export const KeyboardAwareFlatList = ( props ) => (
 	<KeyboardAvoidingView style={ { flex: 1 } }>
-		<Animated.FlatList { ...props } />
+		<FlatList { ...props } />
 	</KeyboardAvoidingView>
 );
 
