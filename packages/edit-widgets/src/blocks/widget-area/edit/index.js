@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+/**
  * WordPress dependencies
  */
 import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
@@ -54,7 +58,10 @@ export default function WidgetAreaEdit( {
 	}, [ isOpen, isDragging, isDraggingWithin, openedWhileDragging ] );
 
 	return (
-		<Panel className={ className } ref={ wrapper }>
+		<Panel
+			className={ classnames( className, 'editor-styles-wrapper' ) }
+			ref={ wrapper }
+		>
 			<PanelBody
 				title={ name }
 				opened={ isOpen }
