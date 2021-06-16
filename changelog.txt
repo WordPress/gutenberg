@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 10.8.2 =
+
+### Bug fixes
+
+- Revert removal of lodash's kebabCase function https://github.com/WordPress/gutenberg/pull/32742
+
+
 = 10.8.1 =
 
 
