@@ -19,6 +19,20 @@ export default {
 	title: 'G2 Components (Experimental)/ContextSystemProvider',
 };
 
+const outerContext = {
+	Card: {
+		isRounded: false,
+		elevation: 100,
+	},
+	CardBody: {
+		as: 'a',
+		href: 'https://wordpress.org',
+		style: {
+			display: 'block',
+		},
+	},
+};
+
 const innerContext = {
 	Card: {
 		css: {
@@ -53,25 +67,11 @@ export const Default = () => {
 	const [ state, update ] = useState( 0 );
 	const forceUpdate = () => update( ( prev ) => prev + 1 );
 
-	const value = {
-		Card: {
-			isRounded: false,
-			elevation: 100,
-		},
-		CardBody: {
-			as: 'a',
-			href: 'https://wordpress.org',
-			style: {
-				display: 'block',
-			},
-		},
-	};
-
 	return (
 		<>
 			<SomeContext.Provider value={ state }>
 				<button onClick={ forceUpdate }>Force Update</button>
-				<ContextSystemProvider value={ value }>
+				<ContextSystemProvider value={ outerContext }>
 					<Card>
 						<CardBody>
 							<Text optimizeReadabilityFor="blue">Card</Text>
