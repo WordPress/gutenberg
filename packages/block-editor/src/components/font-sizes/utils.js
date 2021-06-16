@@ -68,9 +68,7 @@ export function getFontSizeClass( fontSizeSlug ) {
 	if ( 'string' !== typeof fontSizeSlug ) {
 		fontSizeSlug = String( fontSizeSlug );
 		// eslint-disable-next-line no-console
-		console.warn(
-			'The font size slug to be used in generated a font size class should be a string.'
-		);
+		console.warn( 'The font size slug should be a string.' );
 	}
 
 	// We don't want to use kebabCase from lodash here
