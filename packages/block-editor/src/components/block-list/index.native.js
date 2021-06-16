@@ -152,6 +152,7 @@ export class BlockList extends Component {
 		const { blockWidth } = this.state;
 		const { isRootList, maxWidth } = this.props;
 
+		// update the known list height. Using it to compute how much empty space to reserve in the footer
 		this.listHeight = layout.height;
 
 		const layoutWidth = Math.floor( layout.width );
@@ -164,8 +165,11 @@ export class BlockList extends Component {
 		}
 	}
 
+	/**
+	 * Computes the offset of a block in pixels, by adding up all the block heights before it.
+	 */
 	offsetOfIndex( heights, blockClientIds, index ) {
-		const ITEM_HEIGHT = 30; // just an kinda arbitrary default height, just to have it non zero.
+		const ITEM_HEIGHT = 30; // just a kinda arbitrary default height, just to have it non zero.
 		const offset = blockClientIds
 			.slice( 0, index + 1 ) // only add up to the index we want (adding 1 to include the indexed item itself too)
 			.reduce(
@@ -186,7 +190,7 @@ export class BlockList extends Component {
 			blockClientIds,
 		} = this.props;
 
-		// Typical usage (don't forget to compare props):
+		// if we're now showing the new-block indicator, trigger a scroll to it
 		if (
 			isBlockInsertionPointVisible !==
 			prevProps.isBlockInsertionPointVisible
@@ -376,9 +380,10 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
-				onLayout={ ( object ) =>
-					( this.itemHeights[ clientId ] =
-						object.nativeEvent.layout.height )
+				onLayout={
+					( object ) =>
+						( this.itemHeights[ clientId ] =
+							object.nativeEvent.layout.height ) // Capture the block height. We'll use the list of heights to compute offsets.
 				}
 			/>
 		);
@@ -394,7 +399,7 @@ export class BlockList extends Component {
 
 		if ( ! isReadOnly && withFooter ) {
 			const footerHeight = Math.max(
-				( this.listHeight * 3 ) / 4, // set the footer to 3 quarters of the list height to give room for the inserter and the insertion point
+				( this.listHeight * 3 ) / 4, // set the footer to 3 quarters of the list height to give room for the inserter *plus* the insertion point
 				styles.blockListFooter.minHeight
 			);
 
