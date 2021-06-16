@@ -22,7 +22,7 @@ export default {
 const outerContext = {
 	Card: {
 		isRounded: false,
-		elevation: 100,
+		elevation: 10,
 	},
 	CardBody: {
 		as: 'a',
