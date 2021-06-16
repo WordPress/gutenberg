@@ -120,13 +120,20 @@ export function* saveWidgetArea( widgetAreaId ) {
 		return true;
 	} );
 
-	// Get all widgets that have been deleted
-	const deletedWidgets = areaWidgets.filter(
-		( { id } ) =>
-			! widgetsBlocks.some(
-				( widgetBlock ) => getWidgetIdFromBlock( widgetBlock ) === id
-			)
-	);
+	// Determine which widgets have been deleted. We can tell if a widget is
+	// deleted and not just moved to a different area by looking to see if
+	// getWidgetAreaForWidgetId() finds something.
+	const deletedWidgets = [];
+	for ( const widget of areaWidgets ) {
+		const widgetsNewArea = yield select(
+			editWidgetsStoreName,
+			'getWidgetAreaForWidgetId',
+			widget.id
+		);
+		if ( ! widgetsNewArea ) {
+			deletedWidgets.push( widget );
+		}
+	}
 
 	const batchMeta = [];
 	const batchTasks = [];
