@@ -81,7 +81,7 @@ public class Gutenberg: NSObject {
 
         let editorSettings = dataSource.gutenbergEditorSettings()
         let settingsUpdates = properties(from: editorSettings)
-        initialProps.merge(properties(from: editorSettings)) { (intialProp, settingsUpdates) -> Any in
+        initialProps.merge(settingsUpdates) { (intialProp, settingsUpdates) -> Any in
             settingsUpdates
         }
 
@@ -192,6 +192,10 @@ public class Gutenberg: NSObject {
 
         if let rawStyles = editorSettings?.rawStyles {
             settingsUpdates["rawStyles"] = rawStyles
+        }
+
+        if let rawFeatures = editorSettings?.rawFeatures {
+            settingsUpdates["rawFeatures"] = rawFeatures
         }
 
         if let colors = editorSettings?.colors {
