@@ -56,6 +56,10 @@ body.widgets-php {
 	.components-panel__body-title.components-panel__body-title.components-panel__body-title:hover {
 		background-color: $white;
 	}
+	// Remove unwanted styles from .editor-styles-wrapper in the widget area.
+	.wp-block-widget-area.editor-styles-wrapper {
+		padding: 0;
+	}
 }
 
 .blocks-widgets-container .editor-styles-wrapper {
