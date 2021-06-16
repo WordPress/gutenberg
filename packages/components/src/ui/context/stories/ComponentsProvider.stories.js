@@ -70,27 +70,25 @@ export const Default = () => {
 	const forceUpdate = () => update( ( prev ) => prev + 1 );
 
 	return (
-		<>
-			<SomeContext.Provider value={ state }>
-				<button onClick={ forceUpdate }>
-					Force Update (increment counter)
-				</button>
-				<ContextSystemProvider value={ outerContext }>
-					<Card>
-						<CardBody>
-							<Text>Card (inside outerContext)</Text>
-							<ContextSystemProvider value={ innerContext }>
-								<InnerCard />
-							</ContextSystemProvider>
-						</CardBody>
-					</Card>
-				</ContextSystemProvider>
+		<SomeContext.Provider value={ state }>
+			<button onClick={ forceUpdate }>
+				Force Update (increment counter)
+			</button>
+			<ContextSystemProvider value={ outerContext }>
 				<Card>
 					<CardBody>
-						<Text>Card (outside of outerContext)</Text>
+						<Text>Card (inside outerContext)</Text>
+						<ContextSystemProvider value={ innerContext }>
+							<InnerCard />
+						</ContextSystemProvider>
 					</CardBody>
 				</Card>
-			</SomeContext.Provider>
-		</>
+			</ContextSystemProvider>
+			<Card>
+				<CardBody>
+					<Text>Card (outside of outerContext)</Text>
+				</CardBody>
+			</Card>
+		</SomeContext.Provider>
 	);
 };
