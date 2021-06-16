@@ -63,11 +63,12 @@ export function getColorClassName( colorContextName, colorSlug ) {
 	// We don't want to use kebabCase from lodash here
 	// see https://github.com/WordPress/gutenberg/issues/32347
 	// However, we need to make sure the generated class
-	// doesn't contain spaces.
-	return `has-${ colorSlug.replace(
+	// doesn't contain spaces, or any special characters.
+	const slug = colorSlug.replace( /[^a-zA-Z0-9 ]/g, '' );
+	return `has-${ slug.replace( /\s+/g, '-' ) }-${ colorContextName.replace(
 		/\s+/g,
 		'-'
-	) }-${ colorContextName.replace( /\s+/g, '-' ) }`;
+	) }`;
 }
 
 /**
