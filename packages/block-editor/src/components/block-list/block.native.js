@@ -121,10 +121,11 @@ class BlockListBlock extends Component {
 		LayoutAnimation.configureNext( {
 			duration: ANIMATION_DURATION,
 			update: {
-				type: LayoutAnimation.Types.easeInEaseOut,
+				type: LayoutAnimation.Types.linear,
+				property: LayoutAnimation.Properties.opacity,
 			},
 			create: {
-				type: LayoutAnimation.Types.easeIn,
+				type: LayoutAnimation.Types.linear,
 				property: LayoutAnimation.Properties.opacity,
 			},
 		} );
