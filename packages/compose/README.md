@@ -204,7 +204,7 @@ _Parameters_
 
 _Returns_
 
--   `import('lodash').DebouncedFunc<TFunc>`: Debounced function.
+-   `TFunc & import('lodash').Cancelable`: Debounced function.
 
 <a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
 
@@ -449,7 +449,7 @@ _Parameters_
 
 _Returns_
 
--   `import('lodash').DebouncedFunc<TFunc>`: Throttled function.
+-   `TFunc & import('lodash').Cancelable`: Throttled function.
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import compose from 'lodash/flowRight';
+import { flowRight as compose } from 'lodash';
 
 /**
  * Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
