@@ -18,7 +18,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val translations: Bundle,
     val isDarkMode: Boolean,
     val htmlModeEnabled: Boolean,
-    val editorOnboarding: Boolean
+    val enableEditorOnboarding: Boolean
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
@@ -47,7 +47,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
         putBoolean(PROP_CAPABILITIES_REUSABLE_BLOCK, enableReusableBlock)
-        putBoolean(PROP_CAPABILITIES_EDITOR_ONBOARDING, editorOnboarding)
+        putBoolean(PROP_CAPABILITIES_EDITOR_ONBOARDING, enableEditorOnboarding)
     }
 
     companion object {
