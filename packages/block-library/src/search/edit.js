@@ -50,7 +50,7 @@ import {
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
-const DEFAULT_INNER_PADDING = 4;
+const DEFAULT_INNER_PADDING = '4px';
 
 export default function SearchEdit( {
 	className,
@@ -323,10 +323,16 @@ export default function SearchEdit( {
 		if ( 'button-inside' === buttonPosition && style?.border?.radius ) {
 			// We have button inside wrapper and a border radius value to apply.
 			// Add default padding so we don't get "fat" corners.
-			const outerRadius =
-				parseInt( style?.border?.radius, 10 ) + DEFAULT_INNER_PADDING;
+			//
+			// CSS calc() is used here to support non-pixel units. The inline
+			// style using calc() will only apply if both values have units.
+			const radius = Number.isInteger( borderRadius )
+				? `${ borderRadius }px`
+				: borderRadius;
 
-			return { borderRadius: `${ outerRadius }px` };
+			return {
+				borderRadius: `calc(${ radius } + ${ DEFAULT_INNER_PADDING })`,
+			};
 		}
 
 		return undefined;

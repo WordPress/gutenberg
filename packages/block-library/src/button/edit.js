@@ -225,9 +225,7 @@ function ButtonEdit( props ) {
 						}
 					) }
 					style={ {
-						borderRadius: borderRadius
-							? borderRadius + 'px'
-							: undefined,
+						borderRadius: borderRadius ? borderRadius : undefined,
 						...colorProps.style,
 					} }
 					onSplit={ ( value ) =>

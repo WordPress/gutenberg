@@ -14,6 +14,7 @@
 	},
 	"supports": {
 		"anchor": true,
+		"__experimentalSelector": ".wp-block-code > code",
 		"typography": {
 			"fontSize": true
 		}

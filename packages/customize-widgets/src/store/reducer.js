@@ -28,8 +28,8 @@ const createWithInitialState = ( initialState ) => ( reducer ) => {
 /**
  * Reducer returning the user preferences.
  *
- * @param {Object}  state                           Current state.
- * @param {Object}  action                          Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */

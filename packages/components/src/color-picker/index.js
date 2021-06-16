@@ -90,27 +90,27 @@ const isValidColor = ( colors ) =>
  * Function that creates the new color object
  * from old data and the new value.
  *
- * @param {Object} oldColors The old color object.
- * @param {string} oldColors.hex
- * @param {Object} oldColors.rgb
- * @param {number} oldColors.rgb.r
- * @param {number} oldColors.rgb.g
- * @param {number} oldColors.rgb.b
- * @param {number} oldColors.rgb.a
- * @param {Object} oldColors.hsl
- * @param {number} oldColors.hsl.h
- * @param {number} oldColors.hsl.s
- * @param {number} oldColors.hsl.l
- * @param {number} oldColors.hsl.a
- * @param {string} oldColors.draftHex Same format as oldColors.hex
- * @param {Object} oldColors.draftRgb Same format as oldColors.rgb
- * @param {Object} oldColors.draftHsl Same format as oldColors.hsl
- * @param {Object} data Data containing the new value to update.
- * @param {Object} data.source One of `hex`, `rgb`, `hsl`.
- * @param {string|number} data.value Value to update.
- * @param {string} data.valueKey Depends on `data.source` values:
- *   - when source = `rgb`, valuKey can be `r`, `g`, `b`, or `a`.
- *   - when source = `hsl`, valuKey can be `h`, `s`, `l`, or `a`.
+ * @param {Object}        oldColors          The old color object.
+ * @param {string}        oldColors.hex
+ * @param {Object}        oldColors.rgb
+ * @param {number}        oldColors.rgb.r
+ * @param {number}        oldColors.rgb.g
+ * @param {number}        oldColors.rgb.b
+ * @param {number}        oldColors.rgb.a
+ * @param {Object}        oldColors.hsl
+ * @param {number}        oldColors.hsl.h
+ * @param {number}        oldColors.hsl.s
+ * @param {number}        oldColors.hsl.l
+ * @param {number}        oldColors.hsl.a
+ * @param {string}        oldColors.draftHex Same format as oldColors.hex
+ * @param {Object}        oldColors.draftRgb Same format as oldColors.rgb
+ * @param {Object}        oldColors.draftHsl Same format as oldColors.hsl
+ * @param {Object}        data               Data containing the new value to update.
+ * @param {Object}        data.source        One of `hex`, `rgb`, `hsl`.
+ * @param {string|number} data.value         Value to update.
+ * @param {string}        data.valueKey      Depends on `data.source` values:
+ *                                           - when source = `rgb`, valuKey can be `r`, `g`, `b`, or `a`.
+ *                                           - when source = `hsl`, valuKey can be `h`, `s`, `l`, or `a`.
  * @return {Object} A new color object for a specific source. For example:
  * { source: 'rgb', r: 1, g: 2, b:3, a:0 }
  */

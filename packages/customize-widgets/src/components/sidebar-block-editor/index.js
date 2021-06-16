@@ -18,6 +18,7 @@ import {
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
+	ButtonBlockAppender,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 
@@ -116,7 +117,9 @@ export default function SidebarBlockEditor( {
 					<BlockSelectionClearer>
 						<WritingFlow>
 							<ObserveTyping>
-								<BlockList />
+								<BlockList
+									renderAppender={ ButtonBlockAppender }
+								/>
 							</ObserveTyping>
 						</WritingFlow>
 					</BlockSelectionClearer>

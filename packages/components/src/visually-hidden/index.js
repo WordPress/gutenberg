@@ -28,8 +28,8 @@ import { renderAsRenderProps } from './utils';
  * VisuallyHidden component to render text out non-visually
  * for use in devices such as a screen reader.
  *
- * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T T
- * @param {Props<T>} props
+ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+ * @param {Props<T>}                 props
  * @param {import('react').Ref<any>} forwardedRef
  * @return {JSX.Element} Element
  */

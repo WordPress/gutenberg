@@ -17,8 +17,8 @@ const { log, formats } = require( './logger' );
 /**
  * Utility to run a child script
  *
- * @param {string} script Script to run.
- * @param {string=} cwd   Working directory.
+ * @param {string}  script Script to run.
+ * @param {string=} cwd    Working directory.
  */
 function runShellScript( script, cwd ) {
 	childProcess.execSync( script, {
@@ -45,9 +45,9 @@ function readJSONFile( fileName ) {
 /**
  * Common logic wrapping a step in the process.
  *
- * @param {string} name         Step name.
- * @param {string} abortMessage Abort message.
- * @param {Function} handler    Step logic.
+ * @param {string}   name         Step name.
+ * @param {string}   abortMessage Abort message.
+ * @param {Function} handler      Step logic.
  */
 async function runStep( name, abortMessage, handler ) {
 	try {
@@ -70,9 +70,9 @@ async function runStep( name, abortMessage, handler ) {
 /**
  * Asks the user for a confirmation to continue or abort otherwise.
  *
- * @param {string} message      Confirmation message.
- * @param {boolean} isDefault   Default reply.
- * @param {string} abortMessage Abort message.
+ * @param {string}  message      Confirmation message.
+ * @param {boolean} isDefault    Default reply.
+ * @param {string}  abortMessage Abort message.
  */
 async function askForConfirmation(
 	message,

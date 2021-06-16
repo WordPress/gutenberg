@@ -12,7 +12,7 @@ import * as styles from './styles';
 
 /**
  * @param {import('../context').PolymorphicComponentProps<{}, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('react').Ref<any>}                                  forwardedRef
  */
 function CardInnerBody( props, forwardedRef ) {
 	const { className, ...otherProps } = useContextSystem(
