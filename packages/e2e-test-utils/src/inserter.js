@@ -196,7 +196,7 @@ export async function insertReusableBlock( searchTerm ) {
 	await waitForInserterCloseAndContentFocus();
 	// We should wait until the block is loaded
 	await page.waitForXPath(
-		'//*[@class="block-library-block__reusable-block-container"]'
+		'//*[contains(@class,"block-library-block__reusable-block-container")]'
 	);
 }
 
