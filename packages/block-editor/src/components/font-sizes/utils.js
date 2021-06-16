@@ -62,11 +62,20 @@ export function getFontSizeClass( fontSizeSlug ) {
 		return;
 	}
 
+	// In the past, we used lodash's kebabCase to process slugs.
+	// By doing so, this method also accepted and converted non string values
+	// into strings. Some plugins relied on this behavior.
+	if ( 'string' !== typeof fontSizeSlug ) {
+		fontSizeSlug = String( fontSizeSlug );
+		// eslint-disable-next-line no-console
+		console.warn(
+			'The font size slug to be used in generated a font size class should be a string.'
+		);
+	}
+
 	// We don't want to use kebabCase from lodash here
 	// see https://github.com/WordPress/gutenberg/issues/32347
 	// However, we need to make sure the generated class
-	// doesn't contain spaces. The method used to accept numbers
-	// so we need to make sure we are working with a string for the
-	// sake of backwards compat.
-	return `has-${ fontSizeSlug.toString().replace( /\s+/g, '-' ) }-font-size`;
+	// doesn't contain spaces.
+	return `has-${ fontSizeSlug.replace( /\s+/g, '-' ) }-font-size`;
 }
