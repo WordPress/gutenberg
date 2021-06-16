@@ -113,12 +113,12 @@ export const ALL_CSS_UNITS = Object.values( allUnits );
  * Units of measurements. `a11yLabel` is used by screenreaders.
  */
 export const CSS_UNITS = [
-	allUnits.px,
-	allUnits.percent,
-	allUnits.em,
-	allUnits.rem,
-	allUnits.vw,
-	allUnits.vh,
+	{ ...allUnits.px, default: 0 },
+	{ ...allUnits.percent, default: 0 },
+	{ ...allUnits.em, default: 0 },
+	{ ...allUnits.rem, default: 0 },
+	{ ...allUnits.vw, default: 10 },
+	{ ...allUnits.vh, default: 10 },
 ];
 
 export const DEFAULT_UNIT = allUnits.px;
