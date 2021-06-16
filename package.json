@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "10.8.0",
+	"version": "10.8.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -83,8 +83,8 @@
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
-		"@actions/core": "1.2.6",
-		"@actions/github": "1.0.0",
+		"@actions/core": "1.4.0",
+		"@actions/github": "5.0.0",
 		"@babel/core": "7.13.10",
 		"@babel/plugin-syntax-jsx": "7.12.13",
 		"@babel/runtime-corejs3": "7.13.10",

@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 10.8.1 =
+
+
+
+### Bug Fixes
+
+- Fix Post Content block regression. ([32693](https://github.com/WordPress/gutenberg/pull/32693))
+- Fix Safari 13 issue. ([32581](https://github.com/WordPress/gutenberg/pull/32581))
+
+### Performance
+
+- Site editor: Add typing performance test. ([32553](https://github.com/WordPress/gutenberg/pull/32553))
+
+### Tools
+
+- Fix Post Title end-to-end test. ([32686](https://github.com/WordPress/gutenberg/pull/32686))
+
+
+
+
 = 10.8.0 =
 
 

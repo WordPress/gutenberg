@@ -347,20 +347,18 @@ export function* canUser( action, resource, id ) {
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string} kind Entity kind.
- * @param {string} name Entity name.
- * @param {number} key Record's key.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
  * @param {string} recordId Record's id.
  */
-export function* canUserEditEntityRecord( kind, name, key, recordId ) {
-	const entity = yield controls.select(
-		coreStoreName,
-		'getEntityRecord',
-		kind,
-		name,
-		key
-	);
-	const resource = entity?.rest_base || '';
+export function* canUserEditEntityRecord( kind, name, recordId ) {
+	const entities = yield getKindEntities( kind );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
+
+	const resource = entity.__unstable_rest_base;
 	yield canUser( 'update', resource, recordId );
 }
 

@@ -11,135 +11,117 @@ import { Platform } from '@wordpress/element';
 
 const isWeb = Platform.OS === 'web';
 
-/**
- * An array of all available CSS length units.
- */
-export const ALL_CSS_UNITS = [
-	{
+const allUnits = {
+	px: {
 		value: 'px',
 		label: isWeb ? 'px' : __( 'Pixels (px)' ),
 		default: '',
 		a11yLabel: __( 'Pixels (px)' ),
 	},
-	{
+	percent: {
 		value: '%',
 		label: isWeb ? '%' : __( 'Percentage (%)' ),
 		default: '',
 		a11yLabel: __( 'Percent (%)' ),
 	},
-	{
+	em: {
 		value: 'em',
 		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
 		default: '',
-		a11yLabel: __( 'Relative to parent font size (em)' ),
+		a11yLabel: _x( 'ems', 'Relative to parent font size (em)' ),
 	},
-	{
+	rem: {
 		value: 'rem',
 		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
 		default: '',
-		a11yLabel: __( 'Relative to root font size (rem)' ),
+		a11yLabel: _x( 'rems', 'Relative to root font size (rem)' ),
 	},
-	{
+	vw: {
 		value: 'vw',
 		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
 		default: '',
 		a11yLabel: __( 'Viewport width (vw)' ),
 	},
-	{
+	vh: {
 		value: 'vh',
 		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
 		default: '',
 		a11yLabel: __( 'Viewport height (vh)' ),
 	},
-	{
+	vmin: {
 		value: 'vmin',
 		label: isWeb ? 'vmin' : __( 'Viewport smallest dimension (vmin)' ),
 		default: '',
 		a11yLabel: __( 'Viewport smallest dimension (vmin)' ),
 	},
-	{
+	vmax: {
 		value: 'vmax',
 		label: isWeb ? 'vmax' : __( 'Viewport largest dimension (vmax)' ),
 		default: '',
 		a11yLabel: __( 'Viewport largest dimension (vmax)' ),
 	},
-	{
+	ch: {
 		value: 'ch',
 		label: isWeb ? 'ch' : __( 'Width of the zero (0) character (ch)' ),
 		default: '',
 		a11yLabel: __( 'Width of the zero (0) character (ch)' ),
 	},
-	{
+	ex: {
 		value: 'ex',
 		label: isWeb ? 'ex' : __( 'x-height of the font (ex)' ),
 		default: '',
 		a11yLabel: __( 'x-height of the font (ex)' ),
 	},
-	{
+	cm: {
 		value: 'cm',
 		label: isWeb ? 'cm' : __( 'Centimeters (cm)' ),
 		default: '',
 		a11yLabel: __( 'Centimeters (cm)' ),
 	},
-	{
+	mm: {
 		value: 'mm',
 		label: isWeb ? 'mm' : __( 'Millimeters (mm)' ),
 		default: '',
 		a11yLabel: __( 'Millimeters (mm)' ),
 	},
-	{
+	in: {
 		value: 'in',
 		label: isWeb ? 'in' : __( 'Inches (in)' ),
 		default: '',
 		a11yLabel: __( 'Inches (in)' ),
 	},
-	{
+	pc: {
 		value: 'pc',
 		label: isWeb ? 'pc' : __( 'Picas (pc)' ),
 		default: '',
 		a11yLabel: __( 'Picas (pc)' ),
 	},
-	{
+	pt: {
 		value: 'pt',
 		label: isWeb ? 'pt' : __( 'Points (pt)' ),
 		default: '',
 		a11yLabel: __( 'Points (pt)' ),
 	},
-];
+};
+
+/**
+ * An array of all available CSS length units.
+ */
+export const ALL_CSS_UNITS = Object.values( allUnits );
 
 /**
  * Units of measurements. `a11yLabel` is used by screenreaders.
  */
 export const CSS_UNITS = [
-	{ value: 'px', label: 'px', default: 0, a11yLabel: __( 'pixels' ) },
-	{ value: '%', label: '%', default: 10, a11yLabel: __( 'percent' ) },
-	{
-		value: 'em',
-		label: 'em',
-		default: 0,
-		a11yLabel: _x( 'ems', 'Relative to parent font size (em)' ),
-	},
-	{
-		value: 'rem',
-		label: 'rem',
-		default: 0,
-		a11yLabel: _x( 'rems', 'Relative to root font size (rem)' ),
-	},
-	{
-		value: 'vw',
-		label: 'vw',
-		default: 10,
-		a11yLabel: __( 'viewport widths' ),
-	},
-	{
-		value: 'vh',
-		label: 'vh',
-		default: 10,
-		a11yLabel: __( 'viewport heights' ),
-	},
+	allUnits.px,
+	allUnits.percent,
+	allUnits.em,
+	allUnits.rem,
+	allUnits.vw,
+	allUnits.vh,
 ];
 
-export const DEFAULT_UNIT = CSS_UNITS[ 0 ];
+export const DEFAULT_UNIT = allUnits.px;
 
 /**
  * Handles legacy value + unit handling.

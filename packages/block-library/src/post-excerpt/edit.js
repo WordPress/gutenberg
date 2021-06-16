@@ -52,12 +52,7 @@ export default function PostExcerptEditor( {
 	context: { postId, postType, queryId },
 } ) {
 	const isDescendentOfQueryLoop = !! queryId;
-	const userCanEdit = useCanEditEntity(
-		'root',
-		'postType',
-		postType,
-		postId
-	);
+	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 	const [
 		rawExcerpt,

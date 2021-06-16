@@ -13,6 +13,14 @@ import useFocusReturn from '../use-focus-return';
 import useFocusOutside from '../use-focus-outside';
 import useMergeRefs from '../use-merge-refs';
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @typedef DialogOptions
+ * @property {Parameters<useFocusOnMount>[0]} focusOnMount Focus on mount arguments.
+ * @property {() => void}                     onClose      Function to call when the dialog is closed.
+ */
+/* eslint-enable jsdoc/valid-types */
+
 /**
  * Returns a ref and props to apply to a dialog wrapper to enable the following behaviors:
  *  - constrained tabbing.
@@ -20,9 +28,12 @@ import useMergeRefs from '../use-merge-refs';
  *  - return focus on unmount.
  *  - focus outside.
  *
- * @param {Object} options Dialog Options.
+ * @param {DialogOptions} options Dialog Options.
  */
 function useDialog( options ) {
+	/**
+	 * @type {import('react').MutableRefObject<DialogOptions | undefined>}
+	 */
 	const currentOptions = useRef();
 	useEffect( () => {
 		currentOptions.current = options;
@@ -33,9 +44,11 @@ function useDialog( options ) {
 	const focusOutsideProps = useFocusOutside( ( event ) => {
 		// This unstable prop  is here only to manage backward compatibility
 		// for the Popover component otherwise, the onClose should be enough.
-		if ( currentOptions.current.__unstableOnClose ) {
+		// @ts-ignore unstable property
+		if ( currentOptions.current?.__unstableOnClose ) {
+			// @ts-ignore unstable property
 			currentOptions.current.__unstableOnClose( 'focus-outside', event );
-		} else if ( currentOptions.current.onClose ) {
+		} else if ( currentOptions.current?.onClose ) {
 			currentOptions.current.onClose();
 		}
 	} );
@@ -44,9 +57,11 @@ function useDialog( options ) {
 			return;
 		}
 
-		node.addEventListener( 'keydown', ( event ) => {
+		node.addEventListener( 'keydown', (
+			/** @type {KeyboardEvent} */ event
+		) => {
 			// Close on escape
-			if ( event.keyCode === ESCAPE && currentOptions.current.onClose ) {
+			if ( event.keyCode === ESCAPE && currentOptions.current?.onClose ) {
 				event.stopPropagation();
 				currentOptions.current.onClose();
 			}
