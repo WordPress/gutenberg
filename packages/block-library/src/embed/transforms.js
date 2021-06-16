@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -33,10 +32,14 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
+			isMatch: ( { url } ) => !! url,
 			transform: ( { url, caption } ) => {
-				const link = <a href={ url }>{ caption || url }</a>;
+				let value = `<a href="${ url }">${ url }</a>`;
+				if ( caption?.trim() ) {
+					value += `<br />${ caption }`;
+				}
 				return createBlock( 'core/paragraph', {
-					content: renderToString( link ),
+					content: value,
 				} );
 			},
 		},

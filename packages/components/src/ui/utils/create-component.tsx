@@ -31,11 +31,11 @@ interface Options<
 /**
  * Factory that creates a React component from a hook
  *
- * @param options
- * @param options.as The element to render for the component.
- * @param options.name The name of the component.
- * @param options.useHook The hook to use for the component
- * @param options.memo Whether to memo the component.
+ * @param  options
+ * @param  options.as      The element to render for the component.
+ * @param  options.name    The name of the component.
+ * @param  options.useHook The hook to use for the component
+ * @param  options.memo    Whether to memo the component.
  * @return A polymorphic component that uses the hook to process props.
  */
 export const createComponent = <

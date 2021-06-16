@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useMemo, RawHTML } from '@wordpress/element';
 import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -11,10 +12,34 @@ import {
 	store as blockEditorStore,
 	Warning,
 } from '@wordpress/block-editor';
-import { useEntityBlockEditor } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 
-function Content( { layout, postType, postId } ) {
+/**
+ * Internal dependencies
+ */
+import { useCanEditEntity } from '../utils/hooks';
+
+function ReadOnlyContent( { userCanEdit, postType, postId } ) {
+	const [ , , content ] = useEntityProp(
+		'postType',
+		postType,
+		'content',
+		postId
+	);
+	const blockProps = useBlockProps();
+	return content?.protected && ! userCanEdit ? (
+		<div { ...blockProps }>
+			<Warning>{ __( 'This content is password protected.' ) }</Warning>
+		</div>
+	) : (
+		<div { ...blockProps }>
+			<RawHTML key="html">{ content?.rendered }</RawHTML>
+		</div>
+	);
+}
+
+function EditableContent( { layout, context = {} } ) {
+	const { postType, postId } = context;
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
@@ -41,6 +66,7 @@ function Content( { layout, postType, postId } ) {
 		postType,
 		{ id: postId }
 	);
+
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
@@ -51,6 +77,23 @@ function Content( { layout, postType, postId } ) {
 		}
 	);
 	return <div { ...props } />;
+}
+
+function Content( props ) {
+	const { context: { queryId, postType, postId } = {} } = props;
+	const isDescendentOfQueryLoop = !! queryId;
+	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
+	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
+
+	return isEditable ? (
+		<EditableContent { ...props } />
+	) : (
+		<ReadOnlyContent
+			userCanEdit={ userCanEdit }
+			postType={ postType }
+			postId={ postId }
+		/>
+	);
 }
 
 function Placeholder() {
@@ -75,10 +118,8 @@ function RecursionError() {
 	);
 }
 
-export default function PostContentEdit( {
-	context: { postId: contextPostId, postType: contextPostType },
-	attributes,
-} ) {
+export default function PostContentEdit( { context, attributes } ) {
+	const { postId: contextPostId, postType: contextPostType } = context;
 	const { layout = {} } = attributes;
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		contextPostId
@@ -91,11 +132,7 @@ export default function PostContentEdit( {
 	return (
 		<RecursionProvider>
 			{ contextPostId && contextPostType ? (
-				<Content
-					postType={ contextPostType }
-					postId={ contextPostId }
-					layout={ layout }
-				/>
+				<Content context={ context } layout={ layout } />
 			) : (
 				<Placeholder />
 			) }

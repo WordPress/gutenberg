@@ -8,6 +8,10 @@ jobs:
     pull-request-automation:
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' }}
+        strategy:
+            matrix:
+                node: ['14']
+
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
@@ -15,14 +19,23 @@ jobs:
               with:
                   ref: trunk
 
-            - name: Use Node.js 14.x
+            - name: Use desired version of NodeJS
               uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
               with:
-                  node-version: 14.x
+                  node-version: ${{ matrix.node }}
+
+            - name: Cache NPM packages
+              uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v2.1.6
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ matrix.node }}-npm-pr-automation-cache-${{ hashFiles('**/package-lock.json') }}
 
             # Changing into the action's directory and running `npm install` is much
             # faster than a full project-wide `npm ci`.
-            - run: cd packages/project-management-automation && npm install
+            - name: Install NPM dependencies
+              run: npm install
+              working-directory: packages/project-management-automation
 
             - uses: ./packages/project-management-automation
               with:

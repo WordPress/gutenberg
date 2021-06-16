@@ -4,9 +4,15 @@
 		content: "";
 		display: block;
 		position: absolute;
+		z-index: 1;
+
+		// Horizontal spacer: span the full width, and provide a min-height for when it's 1px tall.
 		width: 100%;
-		height: $button-size-small;
-		transform: translateY(-#{$button-size-small / 2});
+		min-height: $grid-unit-10;
+
+		// Vertical spacer: span the height width, and provide a min-width for when it's 1px wide.
+		min-width: $grid-unit-10;
+		height: 100%;
 	}
 }
 

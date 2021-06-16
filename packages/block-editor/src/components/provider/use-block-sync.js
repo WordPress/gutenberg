@@ -46,25 +46,25 @@ import { store as blockEditorStore } from '../../store';
  *   controllers.
  * - Passes selection state from the block-editor store to the controlling entity.
  *
- * @param {Object} props Props for the block sync hook
- * @param {string} props.clientId The client ID of the inner block controller.
- *                                If none is passed, then it is assumed to be a
- *                                root controller rather than an inner block
- *                                controller.
- * @param {Object[]} props.value  The control value for the blocks. This value
- *                                is used to initalize the block-editor store
- *                                and for resetting the blocks to incoming
- *                                changes like undo.
- * @param {Object} props.selection The selection state responsible to restore the selection on undo/redo.
- * @param {onBlockUpdate} props.onChange Function to call when a persistent
- *                                change has been made in the block-editor blocks
- *                                for the given clientId. For example, after
- *                                this function is called, an entity is marked
- *                                dirty because it has changes to save.
- * @param {onBlockUpdate} props.onInput Function to call when a non-persistent
- *                                change has been made in the block-editor blocks
- *                                for the given clientId. When this is called,
- *                                controlling sources do not become dirty.
+ * @param {Object}        props           Props for the block sync hook
+ * @param {string}        props.clientId  The client ID of the inner block controller.
+ *                                        If none is passed, then it is assumed to be a
+ *                                        root controller rather than an inner block
+ *                                        controller.
+ * @param {Object[]}      props.value     The control value for the blocks. This value
+ *                                        is used to initalize the block-editor store
+ *                                        and for resetting the blocks to incoming
+ *                                        changes like undo.
+ * @param {Object}        props.selection The selection state responsible to restore the selection on undo/redo.
+ * @param {onBlockUpdate} props.onChange  Function to call when a persistent
+ *                                        change has been made in the block-editor blocks
+ *                                        for the given clientId. For example, after
+ *                                        this function is called, an entity is marked
+ *                                        dirty because it has changes to save.
+ * @param {onBlockUpdate} props.onInput   Function to call when a non-persistent
+ *                                        change has been made in the block-editor blocks
+ *                                        for the given clientId. When this is called,
+ *                                        controlling sources do not become dirty.
  */
 export default function useBlockSync( {
 	clientId = null,

@@ -24,7 +24,7 @@ import { store as reusableBlocksStore } from './index.js';
 /**
  * Convert a reusable block to a static block effect handler
  *
- * @param {string}  clientId Block ID.
+ * @param {string} clientId Block ID.
  * @return {Object} control descriptor.
  */
 export function convertBlockToStatic( clientId ) {
@@ -37,8 +37,8 @@ export function convertBlockToStatic( clientId ) {
 /**
  * Convert a static block to a reusable block effect handler
  *
- * @param {Array} clientIds Block IDs.
- * @param {string} title    Reusable block title.
+ * @param {Array}  clientIds Block IDs.
+ * @param {string} title     Reusable block title.
  * @return {Object} control descriptor.
  */
 export function convertBlocksToReusable( clientIds, title ) {
