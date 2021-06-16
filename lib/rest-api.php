@@ -218,6 +218,7 @@ function gutenberg_rest_user_collection_params_has_published_posts( $query_param
 		'type'        => array( 'boolean', 'array' ),
 		'items'       => array(
 			'type' => 'string',
+			'enum' => get_post_types( array( 'show_in_rest' => true ), 'names' ),
 		),
 	);
 	return $query_params;
