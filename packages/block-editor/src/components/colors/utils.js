@@ -76,7 +76,7 @@ export function getColorClassName( colorContextName, colorSlug ) {
 	// In the past, we used lodash's kebabCase to process slugs.
 	// By doing so, this method also stripped special characters
 	// such as the # in "#FFFFF". Some plugins relied on this behavior.
-	const slug = colorSlug.replace( /[^a-zA-Z0-9\-]/g, '' );
+	const slug = colorSlug.replace( /[^a-zA-Z0-9\-\s]/g, '' );
 	if ( slug !== colorSlug ) {
 		deprecated( 'The color slug should not have any special character.' );
 	}
