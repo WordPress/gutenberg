@@ -13,11 +13,7 @@ import {
 	useState,
 	memo,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { useIsomorphicLayoutEffect } from '../utils';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
 export const ComponentsContext = createContext(
 	/** @type {Record<string, any>} */ ( {} )
