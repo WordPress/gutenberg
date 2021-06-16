@@ -235,11 +235,18 @@ class ButtonEdit extends Component {
 		setAttributes( { text: value } );
 	}
 
-	onChangeBorderRadius( value ) {
-		const { setAttributes } = this.props;
-		setAttributes( {
-			borderRadius: value,
-		} );
+	onChangeBorderRadius( newRadius ) {
+		const { setAttributes, attributes } = this.props;
+		const { style } = attributes;
+		const newStyle = {
+			...style,
+			border: {
+				...style?.border,
+				radius: newRadius,
+			},
+		};
+
+		setAttributes( { style: newStyle } );
 	}
 
 	onShowLinkSettings() {
@@ -373,7 +380,7 @@ class ButtonEdit extends Component {
 		const {
 			placeholder,
 			text,
-			borderRadius,
+			style,
 			url,
 			align = 'center',
 			width,
@@ -384,6 +391,8 @@ class ButtonEdit extends Component {
 		if ( parentWidth === 0 ) {
 			return null;
 		}
+
+		const borderRadius = style?.border?.radius;
 
 		const borderRadiusValue = Number.isInteger( borderRadius )
 			? borderRadius
