@@ -6,7 +6,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
- import deprecated from '@wordpress/deprecated';
+import deprecated from '@wordpress/deprecated';
 
 /**
  *  Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
