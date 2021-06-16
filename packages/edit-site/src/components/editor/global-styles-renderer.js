@@ -89,14 +89,7 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( { slug } ) => {
 						classes.forEach( ( { classSuffix, propertyName } ) => {
-							// We don't want to use kebabCase from lodash here
-							// see https://github.com/WordPress/gutenberg/issues/32347
-							// However, we need to make sure the generated class
-							// doesn't contain spaces.
-							const classSelectorToUse = `.has-${ slug.replace(
-								/\s+/g,
-								'-'
-							) }-${ classSuffix }`;
+							const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
 							const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
 							const value = `var(--wp--preset--${ cssVarInfix }--${ slug })`;
 							declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
