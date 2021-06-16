@@ -42,6 +42,11 @@ const innerContext = {
 	CardBody: {
 		as: 'div',
 	},
+	Text: {
+		style: {
+			outline: '4px dashed purple',
+		},
+	},
 };
 
 const InnerContent = memo( () => {
