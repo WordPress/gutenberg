@@ -21,7 +21,7 @@ export default function BoxControlIcon( {
 	const isSideDisabled = ( value ) =>
 		sides?.length && ! sides.includes( value );
 
-	const getSide = ( value ) => {
+	const hasSide = ( value ) => {
 		if ( isSideDisabled( value ) ) {
 			return false;
 		}
@@ -29,10 +29,10 @@ export default function BoxControlIcon( {
 		return side === 'all' || side === value;
 	};
 
-	const top = getSide( 'top' ) || getSide( 'vertical' );
-	const right = getSide( 'right' ) || getSide( 'horizontal' );
-	const bottom = getSide( 'bottom' ) || getSide( 'vertical' );
-	const left = getSide( 'left' ) || getSide( 'horizontal' );
+	const top = hasSide( 'top' ) || hasSide( 'vertical' );
+	const right = hasSide( 'right' ) || hasSide( 'horizontal' );
+	const bottom = hasSide( 'bottom' ) || hasSide( 'vertical' );
+	const left = hasSide( 'left' ) || hasSide( 'horizontal' );
 
 	// Simulates SVG Icon scaling
 	const scale = size / BASE_ICON_SIZE;
