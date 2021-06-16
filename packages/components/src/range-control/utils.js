@@ -36,7 +36,7 @@ export function floatClamp( value, min, max ) {
  * @param {Object} settings         Hook settings.
  * @param {number} settings.min     The minimum value.
  * @param {number} settings.max     The maximum value.
- * @param {number} settings.value  	The current value.
+ * @param {number} settings.value   The current value.
  * @param {any}    settings.initial The initial value.
  *
  * @return {[*, Function]} The controlled value and the value setter.

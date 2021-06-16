@@ -1,22 +1,28 @@
 /**
  * WordPress dependencies
  */
-import { RangeControl } from '@wordpress/components';
+import {
+	__experimentalUnitControl as UnitControl,
+	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalParseUnit as parseUnit,
+} from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
+import useSetting from '../components/use-setting';
 
 const MIN_BORDER_WIDTH = 0;
-const MAX_BORDER_WIDTH = 50;
 
 /**
  * Inspector control for configuring border width property.
  *
- * @param  {Object} props  Block properties.
- * @return {WPElement}     Border width edit element.
+ * @param {Object} props Block properties.
+ *
+ * @return {WPElement} Border width edit element.
  */
 export const BorderWidthEdit = ( props ) => {
 	const {
@@ -24,8 +30,18 @@ export const BorderWidthEdit = ( props ) => {
 		setAttributes,
 	} = props;
 
+	// Step value is maintained in state so step is appropriate for current unit
+	// even when current radius value is undefined.
+	const initialStep =
+		parseUnit( style?.border?.width )[ 1 ] === 'px' ? 1 : 0.25;
+	const [ step, setStep ] = useState( initialStep );
+
+	const onUnitChange = ( newUnit ) => {
+		setStep( newUnit === 'px' ? 1 : 0.25 );
+	};
+
 	const onChange = ( newWidth ) => {
-		const newStyle = {
+		let newStyle = {
 			...style,
 			border: {
 				...style?.border,
@@ -33,18 +49,26 @@ export const BorderWidthEdit = ( props ) => {
 			},
 		};
 
-		setAttributes( { style: cleanEmptyObject( newStyle ) } );
+		if ( newWidth === undefined || newWidth === '' ) {
+			newStyle = cleanEmptyObject( newStyle );
+		}
+
+		setAttributes( { style: newStyle } );
 	};
 
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'layout.units' ) || [ 'px', 'em', 'rem' ],
+	} );
+
 	return (
-		<RangeControl
+		<UnitControl
 			value={ style?.border?.width }
 			label={ __( 'Border width' ) }
 			min={ MIN_BORDER_WIDTH }
-			max={ MAX_BORDER_WIDTH }
-			initialPosition={ 0 }
-			allowReset
 			onChange={ onChange }
+			onUnitChange={ onUnitChange }
+			step={ step }
+			units={ units }
 		/>
 	);
 };

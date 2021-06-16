@@ -8,6 +8,12 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
  */
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
+/**
+ * @param {Object}                  props
+ * @param {(e: MouseEvent) => void} props.onDragStart
+ * @param {(e: MouseEvent) => void} props.onDragMove
+ * @param {(e: MouseEvent) => void} props.onDragEnd
+ */
 export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 
@@ -23,22 +29,22 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	}, [ onDragStart, onDragMove, onDragEnd ] );
 
 	const onMouseMove = useCallback(
-		( ...args ) =>
+		( /** @type {MouseEvent} */ event ) =>
 			eventsRef.current.onDragMove &&
-			eventsRef.current.onDragMove( ...args ),
+			eventsRef.current.onDragMove( event ),
 		[]
 	);
-	const endDrag = useCallback( ( ...args ) => {
+	const endDrag = useCallback( ( /** @type {MouseEvent} */ event ) => {
 		if ( eventsRef.current.onDragEnd ) {
-			eventsRef.current.onDragEnd( ...args );
+			eventsRef.current.onDragEnd( event );
 		}
 		document.removeEventListener( 'mousemove', onMouseMove );
 		document.removeEventListener( 'mouseup', endDrag );
 		setIsDragging( false );
 	}, [] );
-	const startDrag = useCallback( ( ...args ) => {
+	const startDrag = useCallback( ( /** @type {MouseEvent} */ event ) => {
 		if ( eventsRef.current.onDragStart ) {
-			eventsRef.current.onDragStart( ...args );
+			eventsRef.current.onDragStart( event );
 		}
 		document.addEventListener( 'mousemove', onMouseMove );
 		document.addEventListener( 'mouseup', endDrag );

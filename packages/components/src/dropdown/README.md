@@ -15,7 +15,11 @@ const MyDropdown = () => (
 		contentClassName="my-popover-content-classname"
 		position="bottom right"
 		renderToggle={ ( { isOpen, onToggle } ) => (
-			<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
+			<Button
+				variant="primary"
+				onClick={ onToggle }
+				aria-expanded={ isOpen }
+			>
 				Toggle Popover!
 			</Button>
 		) }

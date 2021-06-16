@@ -34,7 +34,11 @@ export {
 	BlockVerticalAlignmentControl,
 } from './block-vertical-alignment-control';
 export { default as __experimentalBorderStyleControl } from './border-style-control';
-export { default as ButtonBlockerAppender } from './button-block-appender';
+export {
+	// This is a typo, but kept here for back-compat.
+	ButtonBlockerAppender,
+	default as ButtonBlockAppender,
+} from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
 export { default as ContrastChecker } from './contrast-checker';
@@ -44,6 +48,7 @@ export { default as __experimentalGradientPickerControl } from './gradient-picke
 export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';
 export { default as __experimentalFontAppearanceControl } from './font-appearance-control';
 export { default as __experimentalFontFamilyControl } from './font-family';
+export { default as __experimentalLetterSpacingControl } from './letter-spacing-control';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as __experimentalImageSizeControl } from './image-size-control';

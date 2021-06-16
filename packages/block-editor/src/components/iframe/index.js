@@ -131,6 +131,11 @@ function setBodyClassName( doc ) {
 	for ( const name of document.body.classList ) {
 		if ( name.startsWith( 'admin-color-' ) ) {
 			doc.body.classList.add( name );
+		} else if ( name === 'wp-embed-responsive' ) {
+			// Ideally ALL classes that are added through get_body_class should
+			// be added in the editor too, which we'll somehow have to get from
+			// the server in the future (which will run the PHP filters).
+			doc.body.classList.add( 'wp-embed-responsive' );
 		}
 	}
 }

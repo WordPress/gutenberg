@@ -21,15 +21,17 @@
 			"default": true
 		}
 	},
-	"usesContext": [ "postId", "postType" ],
+	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
 		"html": false,
-		"fontSize": true,
 		"color": {
 			"gradients": true,
 			"link": true
 		},
-		"lineHeight": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
 	},
 	"editorStyle": "wp-block-post-excerpt-editor",
 	"style": "wp-block-post-excerpt"

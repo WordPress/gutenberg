@@ -5,7 +5,7 @@
 	"category": "design",
 	"description": "Displays the title of a post, page, or any other content-type.",
 	"textdomain": "default",
-	"usesContext": [ "postId", "postType" ],
+	"usesContext": [ "postId", "postType", "queryId" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"
@@ -35,9 +35,11 @@
 			"gradients": true,
 			"link": true
 		},
-		"fontSize": true,
-		"lineHeight": true,
-		"__experimentalFontFamily": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true
+		}
 	},
 	"style": "wp-block-post-title"
 }

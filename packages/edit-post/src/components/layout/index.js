@@ -19,7 +19,7 @@ import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	ComplementaryArea,
 	FullscreenMode,
@@ -85,9 +85,15 @@ function Layout( { styles } ) {
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
+		isTemplateMode,
+		documentLabel,
 	} = useSelect( ( select ) => {
-		const editorSettings = select( editorStore ).getEditorSettings();
+		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const editorSettings = getEditorSettings();
+		const postTypeLabel = getPostTypeLabel();
+
 		return {
+			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
 			),
@@ -121,6 +127,8 @@ function Layout( { styles } ) {
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
+			// translators: Default label for the Document in the Block Breadcrumb.
+			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -203,7 +211,7 @@ function Layout( { styles } ) {
 							{ ! isMobileViewport && ! sidebarIsOpened && (
 								<div className="edit-post-layout__toggle-sidebar-panel">
 									<Button
-										isSecondary
+										variant="secondary"
 										className="edit-post-layout__toggle-sidebar-panel-button"
 										onClick={ openSidebarPanel }
 										aria-expanded={ false }
@@ -227,10 +235,12 @@ function Layout( { styles } ) {
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
-						<div className="edit-post-layout__metaboxes">
-							<MetaBoxes location="normal" />
-							<MetaBoxes location="advanced" />
-						</div>
+						{ ! isTemplateMode && (
+							<div className="edit-post-layout__metaboxes">
+								<MetaBoxes location="normal" />
+								<MetaBoxes location="advanced" />
+							</div>
+						) }
 						{ isMobileViewport && sidebarIsOpened && (
 							<ScrollLock />
 						) }
@@ -243,7 +253,7 @@ function Layout( { styles } ) {
 					isRichEditingEnabled &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">
-							<BlockBreadcrumb />
+							<BlockBreadcrumb rootLabelText={ documentLabel } />
 						</div>
 					)
 				}

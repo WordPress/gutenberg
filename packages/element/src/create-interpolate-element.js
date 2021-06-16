@@ -29,17 +29,17 @@ const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
  *
  * @typedef Frame
  *
- * @property {WPElement} element            A parent element which may still have
- * @property {number}    tokenStart         Offset at which parent element first
- *                                          appears.
- * @property {number}    tokenLength        Length of string marking start of parent
- *                                          element.
- * @property {number}    [prevOffset]       Running offset at which parsing should
- *                                          continue.
- * @property {number}    [leadingTextStart] Offset at which last closing element
- *                                          finished, used for finding text between
- *                                          elements.
- * @property {WPElement[]} children         Children.
+ * @property {WPElement}   element            A parent element which may still have
+ * @property {number}      tokenStart         Offset at which parent element first
+ *                                            appears.
+ * @property {number}      tokenLength        Length of string marking start of parent
+ *                                            element.
+ * @property {number}      [prevOffset]       Running offset at which parsing should
+ *                                            continue.
+ * @property {number}      [leadingTextStart] Offset at which last closing element
+ *                                            finished, used for finding text between
+ *                                            elements.
+ * @property {WPElement[]} children           Children.
  */
 
 /**
@@ -101,9 +101,9 @@ function createFrame(
  * }
  * ```
  *
- * @param {string}  interpolatedString  The interpolation string to be parsed.
- * @param {Object}  conversionMap       The map used to convert the string to
- *                                      a react element.
+ * @param {string} interpolatedString The interpolation string to be parsed.
+ * @param {Object} conversionMap      The map used to convert the string to
+ *                                    a react element.
  * @throws {TypeError}
  * @return {WPElement}  A wp element.
  */
@@ -134,7 +134,7 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
  *
  * @private
  *
- * @param {Object} conversionMap  The map being validated.
+ * @param {Object} conversionMap The map being validated.
  *
  * @return {boolean}  True means the map is valid.
  */
@@ -293,8 +293,8 @@ function addText() {
  *
  * @private
  *
- * @param {Frame}    frame       The Frame containing the child element and it's
- *                               token information.
+ * @param {Frame} frame The Frame containing the child element and it's
+ *                      token information.
  */
 function addChild( frame ) {
 	const { element, tokenStart, tokenLength, prevOffset, children } = frame;

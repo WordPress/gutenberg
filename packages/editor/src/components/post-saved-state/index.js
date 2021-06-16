@@ -21,16 +21,17 @@ import { displayShortcut } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
+import { store as editorStore } from '../../store';
 
 /**
  * Component showing whether the post is saved or not and providing save
  * buttons.
  *
- * @param {Object} props               Component props.
- * @param {?boolean} props.forceIsDirty  Whether to force the post to be marked
- * as dirty.
- * @param {?boolean} props.forceIsSaving Whether to force the post to be marked
- * as being saved.
+ * @param {Object}   props                Component props.
+ * @param {?boolean} props.forceIsDirty   Whether to force the post to be marked
+ *                                        as dirty.
+ * @param {?boolean} props.forceIsSaving  Whether to force the post to be marked
+ *                                        as being saved.
  * @param {?boolean} props.showIconLabels Whether interface buttons show labels instead of icons
  * @return {import('@wordpress/element').WPComponent} The component.
  */
@@ -64,7 +65,7 @@ export default function PostSavedState( {
 				getCurrentPost,
 				isAutosavingPost,
 				getEditedPostAttribute,
-			} = select( 'core/editor' );
+			} = select( editorStore );
 
 			return {
 				isAutosaving: isAutosavingPost(),
@@ -82,7 +83,7 @@ export default function PostSavedState( {
 		[ forceIsDirty, forceIsSaving ]
 	);
 
-	const { savePost } = useDispatch( 'core/editor' );
+	const { savePost } = useDispatch( editorStore );
 
 	const wasSaving = usePrevious( isSaving );
 
@@ -169,7 +170,7 @@ export default function PostSavedState( {
 			className="editor-post-save-draft"
 			onClick={ () => savePost() }
 			shortcut={ displayShortcut.primary( 's' ) }
-			isTertiary
+			variant="tertiary"
 		>
 			{ label }
 		</Button>

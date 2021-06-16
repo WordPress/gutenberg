@@ -21,6 +21,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 
 /**
  * Constants
@@ -31,7 +32,7 @@ export default function PostTitle() {
 	const instanceId = useInstanceId( PostTitle );
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );
-	const { editPost } = useDispatch( 'core/editor' );
+	const { editPost } = useDispatch( editorStore );
 	const {
 		insertDefaultBlock,
 		clearSelectedBlock,
@@ -47,7 +48,7 @@ export default function PostTitle() {
 		const {
 			getEditedPostAttribute,
 			isCleanNewPost: _isCleanNewPost,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 		const { getSettings } = select( blockEditorStore );
 		const {
 			titlePlaceholder,

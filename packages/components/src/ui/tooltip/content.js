@@ -17,8 +17,8 @@ const { TooltipPopoverView } = styles;
 
 /**
  *
- * @param {import('../context').PolymorphicComponentProps<import('reakit').TooltipProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                              forwardedRef
  */
 function TooltipContent( props, forwardedRef ) {
 	const { children, className, ...otherProps } = useContextSystem(

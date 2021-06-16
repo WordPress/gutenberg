@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
 /**
  * Internal dependencies
  */
-import type { Props as SurfaceProps } from '../surface/types';
+import type { Props as SurfaceProps } from '../../surface/types';
 
 export type CardProps = SurfaceProps & {
 	/**
@@ -51,6 +51,10 @@ export type CardBodyProps = {
 	 * @default true
 	 */
 	scrollable?: boolean;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 };
 
 export type CardHeaderSize = 'medium' | 'small' | 'xSmall';
@@ -62,6 +66,10 @@ export type CardHeaderProps = {
 	 * @default 'medium'
 	 */
 	size?: CardHeaderSize;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 };
 
 export type CardFooterProps = CardHeaderProps & {

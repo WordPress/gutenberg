@@ -234,6 +234,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void setFeaturedImage(final int mediaId) {
+        mGutenbergBridgeJS2Parent.setFeaturedImage(mediaId);
+    }
+
+    @ReactMethod
     public void requestImageFullscreenPreview(String mediaUrl) {
         mGutenbergBridgeJS2Parent.requestImageFullscreenPreview(mediaUrl);
     }

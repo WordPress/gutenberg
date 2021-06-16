@@ -9,7 +9,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableXPosts: Boolean,
     val enableUnsupportedBlockEditor: Boolean,
     val canEnableUnsupportedBlockEditor: Boolean,
-    val enableAudioBlock: Boolean,
+    val isAudioBlockMediaUploadEnabled: Boolean,
     val enableReusableBlock: Boolean,
     val localeSlug: String,
     val postType: String,
@@ -47,7 +47,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_MEDIAFILES_COLLECTION_BLOCK, enableMediaFilesCollectionBlocks)
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
-        putBoolean(PROP_CAPABILITIES_AUDIO_BLOCK, enableAudioBlock)
+        putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
         putBoolean(PROP_CAPABILITIES_REUSABLE_BLOCK, enableReusableBlock)
         putBoolean(PROP_CAPABILITIES_CAN_VIEW_EDITOR_ONBOARDING, canViewEditorOnboarding)
     }
@@ -78,7 +78,7 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_XPOSTS = "xposts"
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
         const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
-        const val PROP_CAPABILITIES_AUDIO_BLOCK = "audioBlock"
+        const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
         const val PROP_CAPABILITIES_CAN_VIEW_EDITOR_ONBOARDING = "canViewEditorOnboarding"
     }

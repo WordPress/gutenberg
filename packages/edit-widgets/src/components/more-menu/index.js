@@ -12,6 +12,7 @@ import { __, _x } from '@wordpress/i18n';
 import { external, moreVertical } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -43,6 +44,8 @@ export default function MoreMenu() {
 		}
 	);
 
+	const isLargeViewport = useViewportMatch( 'medium' );
+
 	return (
 		<>
 			<DropdownMenu
@@ -55,21 +58,23 @@ export default function MoreMenu() {
 			>
 				{ () => (
 					<>
-						<MenuGroup label={ _x( 'View', 'noun' ) }>
-							<FeatureToggle
-								feature="fixedToolbar"
-								label={ __( 'Top toolbar' ) }
-								info={ __(
-									'Access all block and document tools in a single place'
-								) }
-								messageActivated={ __(
-									'Top toolbar activated'
-								) }
-								messageDeactivated={ __(
-									'Top toolbar deactivated'
-								) }
-							/>
-						</MenuGroup>
+						{ isLargeViewport && (
+							<MenuGroup label={ _x( 'View', 'noun' ) }>
+								<FeatureToggle
+									feature="fixedToolbar"
+									label={ __( 'Top toolbar' ) }
+									info={ __(
+										'Access all block and document tools in a single place'
+									) }
+									messageActivated={ __(
+										'Top toolbar activated'
+									) }
+									messageDeactivated={ __(
+										'Top toolbar deactivated'
+									) }
+								/>
+							</MenuGroup>
+						) }
 						<MenuGroup label={ __( 'Tools' ) }>
 							<MenuItem
 								onClick={ () => {
@@ -101,7 +106,7 @@ export default function MoreMenu() {
 								</VisuallyHidden>
 							</MenuItem>
 						</MenuGroup>
-						<MenuGroup>
+						<MenuGroup label={ __( 'Preferences' ) }>
 							<FeatureToggle
 								feature="keepCaretInsideBlock"
 								label={ __(
@@ -117,6 +122,21 @@ export default function MoreMenu() {
 									'Contain text cursor inside block deactivated'
 								) }
 							/>
+							{ isLargeViewport && (
+								<FeatureToggle
+									feature="showBlockBreadcrumbs"
+									label={ __( 'Display block breadcrumbs' ) }
+									info={ __(
+										'Shows block breadcrumbs at the bottom of the editor.'
+									) }
+									messageActivated={ __(
+										'Display block breadcrumbs activated'
+									) }
+									messageDeactivated={ __(
+										'Display block breadcrumbs deactivated'
+									) }
+								/>
+							) }
 						</MenuGroup>
 					</>
 				) }

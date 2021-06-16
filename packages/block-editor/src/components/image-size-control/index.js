@@ -90,7 +90,9 @@ export default function ImageSizeControl( {
 									<Button
 										key={ scale }
 										isSmall
-										isPrimary={ isCurrent }
+										variant={
+											isCurrent ? 'primary' : undefined
+										}
 										isPressed={ isCurrent }
 										onClick={ updateDimensions(
 											scaledWidth,
