@@ -113,6 +113,23 @@ export class BlockListItem extends Component {
 		performLayoutAnimation();
 	}
 
+	componentDidUpdate( prevProps ) {
+		if (
+			this.willShowInsertionPoint( prevProps ) !==
+			this.willShowInsertionPoint( this.props )
+		) {
+			performLayoutAnimation();
+		}
+	}
+
+	willShowInsertionPoint( props ) {
+		return (
+			props.shouldShowInsertionPointBefore ||
+			( ! props.shouldShowInnerBlockAppender() &&
+				props.shouldShowInsertionPointAfter )
+		);
+	}
+
 	render() {
 		const {
 			blockAlignment,
