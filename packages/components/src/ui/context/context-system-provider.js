@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, merge } from 'lodash';
+import { isEqual, merge, cloneDeep } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,7 +30,7 @@ export const useComponentsContext = () => useContext( ComponentsContext );
 function useContextSystemBridge( { value } ) {
 	const parentContext = useComponentsContext();
 	const parentContextRef = useRef( parentContext );
-	const valueRef = useRef( merge( parentContext, value ) );
+	const valueRef = useRef( merge( cloneDeep( parentContext ), value ) );
 
 	const [ config, setConfig ] = useState( valueRef.current );
 
@@ -43,7 +43,10 @@ function useContextSystemBridge( { value } ) {
 		}
 
 		if ( ! isEqual( parentContext, parentContextRef.current ) ) {
-			valueRef.current = merge( parentContext, valueRef.current );
+			valueRef.current = merge(
+				cloneDeep( parentContext ),
+				valueRef.current
+			);
 			parentContextRef.current = parentContext;
 			hasChange = true;
 		}
