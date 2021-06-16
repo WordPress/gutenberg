@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	View,
-	Text,
-	TouchableWithoutFeedback,
-	Dimensions,
-	LayoutAnimation,
-} from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import { pick } from 'lodash';
 
 /**
@@ -35,6 +29,7 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
+import { performLayoutAnimation } from './layout-animation';
 import { store as blockEditorStore } from '../../store';
 
 const emptyArray = [];
@@ -116,24 +111,9 @@ class BlockListBlock extends Component {
 		this.anchorNodeRef = createRef();
 	}
 
-	setAnimation() {
-		const ANIMATION_DURATION = 150;
-		LayoutAnimation.configureNext( {
-			duration: ANIMATION_DURATION,
-			update: {
-				type: LayoutAnimation.Types.linear,
-				property: LayoutAnimation.Properties.opacity,
-			},
-			create: {
-				type: LayoutAnimation.Types.linear,
-				property: LayoutAnimation.Properties.opacity,
-			},
-		} );
-	}
-
 	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected !== prevProps.isSelected ) {
-			this.setAnimation();
+			performLayoutAnimation();
 		}
 	}
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions, LayoutAnimation } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ import { ReadableContentView, alignmentHelpers } from '@wordpress/components';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
+import { performLayoutAnimation } from './layout-animation';
 import { store as blockEditorStore } from '../../store';
 
 const stretchStyle = {
@@ -104,27 +105,12 @@ export class BlockListItem extends Component {
 		];
 	}
 
-	setAnimation() {
-		const ANIMATION_DURATION = 150;
-		LayoutAnimation.configureNext( {
-			duration: ANIMATION_DURATION,
-			update: {
-				type: LayoutAnimation.Types.linear,
-				property: LayoutAnimation.Properties.opacity,
-			},
-			create: {
-				type: LayoutAnimation.Types.linear,
-				property: LayoutAnimation.Properties.opacity,
-			},
-		} );
-	}
-
 	componentDidMount() {
-		this.setAnimation();
+		performLayoutAnimation();
 	}
 
 	componentWillUnmount() {
-		this.setAnimation();
+		performLayoutAnimation();
 	}
 
 	render() {
