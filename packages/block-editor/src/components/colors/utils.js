@@ -5,11 +5,6 @@ import { find, map } from 'lodash';
 import tinycolor from 'tinycolor2';
 
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Provided an array of color objects as set by the theme or by the editor defaults,
  * and the values of the defined color or custom color returns a color object describing the color.
  *
@@ -70,7 +65,8 @@ export function getColorClassName( colorContextName, colorSlug ) {
 	// into strings. Some plugins relied on this behavior.
 	if ( 'string' !== typeof colorSlug ) {
 		colorSlug = String( colorSlug );
-		deprecated( 'The color slug should be a string.' );
+		// eslint-disable-next-line no-console
+		console.warn( 'The color slug should be a string.' );
 	}
 
 	// In the past, we used lodash's kebabCase to process slugs.
@@ -78,7 +74,8 @@ export function getColorClassName( colorContextName, colorSlug ) {
 	// such as the # in "#FFFFF". Some plugins relied on this behavior.
 	const slug = colorSlug.replace( /[^a-zA-Z0-9\-\s]/g, '' );
 	if ( slug !== colorSlug ) {
-		deprecated( 'The color slug should not have any special character.' );
+		// eslint-disable-next-line no-console
+		console.warn( 'The color slug should not have any special character.' );
 	}
 
 	// We don't want to use kebabCase from lodash here
