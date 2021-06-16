@@ -81,6 +81,30 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'will not pre-populate URL input if selected text is not a link', async () => {
+		// Create a block with some text
+		await clickBlockAppender();
+		await page.keyboard.type( 'This: is not a link' );
+
+		// Select some text
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+
+		// Click on the Link button
+		await page.click( 'button[aria-label="Link"]' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
+
+		const urlInputValue = await page.evaluate(
+			() =>
+				document.querySelector(
+					'.components-popover__content .block-editor-link-control .block-editor-url-input__input'
+				).value
+		);
+
+		expect( urlInputValue ).toBe( '' );
+	} );
+
 	it( 'can be created by selecting text and using keyboard shortcuts', async () => {
 		// Create a block with some text
 		await clickBlockAppender();
