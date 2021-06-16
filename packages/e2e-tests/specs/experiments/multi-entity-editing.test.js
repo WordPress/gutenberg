@@ -276,10 +276,10 @@ describe( 'Multi-entity editor states', () => {
 			await canvas().click( '.wp-block-template-part' );
 			// Select child TP to unlock selecting content.
 			await canvas().click(
-				'.wp-block-template-part.block-editor-block-list__layout .wp-block-template-part'
+				'.wp-block-template-part .wp-block-template-part'
 			);
 			await canvas().click(
-				'.wp-block-template-part.block-editor-block-list__layout .wp-block-template-part .wp-block[data-type="core/paragraph"]'
+				'.wp-block-template-part .wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Nested test words!' );
 

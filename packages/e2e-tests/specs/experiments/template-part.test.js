@@ -114,7 +114,7 @@ describe( 'Template Part', () => {
 			await updateHeader( 'Header Template Part 456' );
 
 			const initialTemplateParts = await canvas().$$(
-				'.wp-block-template-part.block-editor-block-list__layout'
+				'.wp-block-template-part'
 			);
 
 			// Select the header template part block.
@@ -129,7 +129,7 @@ describe( 'Template Part', () => {
 
 			// Verify there is one less template part on the page.
 			const finalTemplateParts = await canvas().$$(
-				'.wp-block-template-part.block-editor-block-list__layout'
+				'.wp-block-template-part'
 			);
 			expect(
 				initialTemplateParts.length - finalTemplateParts.length
@@ -175,7 +175,7 @@ describe( 'Template Part', () => {
 		it( 'Should convert selected block to template part', async () => {
 			await awaitHeaderAndFooterLoad();
 			const initialTemplateParts = await canvas().$$(
-				'.wp-block-template-part.block-editor-block-list__layout'
+				'.wp-block-template-part'
 			);
 
 			// Add some block and select it.
@@ -203,7 +203,7 @@ describe( 'Template Part', () => {
 
 			// Verify there is 1 more template part on the page than previously.
 			const finalTemplateParts = await canvas().$$(
-				'.wp-block-template-part.block-editor-block-list__layout'
+				'.wp-block-template-part'
 			);
 			expect(
 				finalTemplateParts.length - initialTemplateParts.length
@@ -213,7 +213,7 @@ describe( 'Template Part', () => {
 		it( 'Should convert multiple selected blocks to template part', async () => {
 			await awaitHeaderAndFooterLoad();
 			const initialTemplateParts = await canvas().$$(
-				'.wp-block-template-part.block-editor-block-list__layout'
+				'.wp-block-template-part'
 			);
 
 			// Add two blocks and select them.
@@ -253,7 +253,7 @@ describe( 'Template Part', () => {
 
 			// Verify there is 1 more template part on the page than previously.
 			const finalTemplateParts = await canvas().$$(
-				'.wp-block-template-part.block-editor-block-list__layout'
+				'.wp-block-template-part'
 			);
 			expect(
 				finalTemplateParts.length - initialTemplateParts.length
