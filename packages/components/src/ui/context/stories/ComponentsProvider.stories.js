@@ -46,7 +46,9 @@ const InnerContent = memo( () => {
 	const isEven = state % 2 === 0;
 	return (
 		<View css={ { background: isEven ? 'red' : 'initial' } }>
-			{ state }
+			<Text>Card (inside innerContext)</Text>
+			<br />
+			<Text>Counter:{ state }</Text>
 		</View>
 	);
 } );
@@ -70,11 +72,13 @@ export const Default = () => {
 	return (
 		<>
 			<SomeContext.Provider value={ state }>
-				<button onClick={ forceUpdate }>Force Update</button>
+				<button onClick={ forceUpdate }>
+					Force Update (increment counter)
+				</button>
 				<ContextSystemProvider value={ outerContext }>
 					<Card>
 						<CardBody>
-							<Text optimizeReadabilityFor="blue">Card</Text>
+							<Text>Card (inside outerContext)</Text>
 							<ContextSystemProvider value={ innerContext }>
 								<InnerCard />
 							</ContextSystemProvider>
@@ -83,7 +87,7 @@ export const Default = () => {
 				</ContextSystemProvider>
 				<Card>
 					<CardBody>
-						<Text>Card</Text>
+						<Text>Card (outside of outerContext)</Text>
 					</CardBody>
 				</Card>
 			</SomeContext.Provider>
