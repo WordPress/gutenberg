@@ -96,7 +96,7 @@ export default function BoxInputControls( {
 						onHoverOff={ createHandleOnHoverOff( side ) }
 						label={ LABELS[ side ] }
 						key={ `box-control-${ side }` }
-						round={ false }
+						allowDecimal={ true }
 					/>
 				) ) }
 			</Layout>

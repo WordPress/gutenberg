@@ -82,13 +82,13 @@ describe( 'NumberControl', () => {
 			expect( input.value ).toBe( '0' );
 		} );
 
-		it( 'should round clamped value on ENTER keypress when round is set to true', () => {
+		it( 'should round clamped value on ENTER keypress when allowDecimal is set to false', () => {
 			render(
 				<NumberControl
 					value={ 5 }
 					min={ 0 }
 					max={ 10 }
-					round={ true }
+					allowDecimal={ false }
 				/>
 			);
 
@@ -100,13 +100,13 @@ describe( 'NumberControl', () => {
 			expect( input.value ).toBe( '1' );
 		} );
 
-		it( 'should not round clamped value on ENTER keypress when round is set to false', () => {
+		it( 'should not round clamped value on ENTER keypress when allowDecimal is set to true', () => {
 			render(
 				<NumberControl
 					value={ 5 }
 					min={ 0 }
 					max={ 10 }
-					round={ false }
+					allowDecimal={ true }
 				/>
 			);
 
@@ -116,6 +116,24 @@ describe( 'NumberControl', () => {
 			fireKeyDown( { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '1.125' );
+		} );
+
+		it( 'should limit to five decimal places on ENTER keypress when allowDecimal is set to true', () => {
+			render(
+				<NumberControl
+					value={ 5 }
+					min={ 0 }
+					max={ 10 }
+					allowDecimal={ true }
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '1.123456789' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '1.12346' );
 		} );
 
 		it( 'should parse to number value on ENTER keypress', () => {

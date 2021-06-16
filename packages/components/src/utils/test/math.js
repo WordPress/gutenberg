@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { add, subtract, roundClamp } from '../math';
+import { add, decimalClamp, subtract, roundClamp } from '../math';
 
 describe( 'add', () => {
 	it( 'should add string and number values', () => {
@@ -76,5 +76,39 @@ describe( 'roundClamp', () => {
 		expect( roundClamp( 40.05, 1, 100, 0.01 ) ).toBe( 40.05 );
 		expect( roundClamp( 40.06, 1, 100, 0.1 ) ).toBe( 40.1 );
 		expect( roundClamp( 40.123005, 1, 100, 0.001 ) ).toBe( 40.123 );
+	} );
+} );
+
+describe( 'decimalClamp', () => {
+	it( 'should clamp a value between min and max', () => {
+		expect( decimalClamp( 10, 1, 10 ) ).toBe( 10 );
+		expect( decimalClamp( 1, 1, 10 ) ).toBe( 1 );
+		expect( decimalClamp( 0, 1, 10 ) ).toBe( 1 );
+
+		expect( decimalClamp( 50, 1, 10 ) ).toBe( 10 );
+		expect( decimalClamp( 50, -10, 10 ) ).toBe( 10 );
+		expect( decimalClamp( -50, -10, 10 ) ).toBe( -10 );
+
+		expect( decimalClamp( '50', 1, 10 ) ).toBe( 10 );
+		expect( decimalClamp( '50', -10, 10 ) ).toBe( 10 );
+		expect( decimalClamp( -50, -10, '10' ) ).toBe( -10 );
+	} );
+
+	it( 'should clamp number or string values', () => {
+		expect( decimalClamp( '50', 1, 10 ) ).toBe( 10 );
+		expect( decimalClamp( '50', -10, 10 ) ).toBe( 10 );
+		expect( decimalClamp( -50, -10, '10' ) ).toBe( -10 );
+	} );
+
+	it( 'should allow decimal values without steps rounded to 5 places', () => {
+		expect( decimalClamp( 3.12345, 1, 10 ) ).toBe( 3.12345 );
+		expect( decimalClamp( -2.12, -10, 10 ) ).toBe( -2.12 );
+		expect( decimalClamp( 25.1234567, 0, 30 ) ).toBe( 25.12346 );
+	} );
+
+	it( 'should allow specifying a custom precision', () => {
+		expect( decimalClamp( 3.12345, 1, 10, 2 ) ).toBe( 3.12 );
+		expect( decimalClamp( -2.12, -10, 10, 1 ) ).toBe( -2.1 );
+		expect( decimalClamp( 25.123456789, 0, 30, 9 ) ).toBe( 25.123456789 );
 	} );
 } );

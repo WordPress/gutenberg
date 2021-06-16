@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classNames from 'classnames';
-import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,7 +17,13 @@ import {
 	inputControlActionTypes,
 	composeStateReducers,
 } from '../input-control/state';
-import { add, getNumber, subtract, roundClamp } from '../utils/math';
+import {
+	add,
+	decimalClamp,
+	getNumber,
+	roundClamp,
+	subtract,
+} from '../utils/math';
 import { useJumpStep } from '../utils/hooks';
 import { isValueEmpty } from '../utils/values';
 
@@ -35,7 +40,7 @@ export function NumberControl(
 		min = -Infinity,
 		shiftStep = 10,
 		step = 1,
-		round = true,
+		allowDecimal = false,
 		type: typeProp = 'number',
 		value: valueProp,
 		...props
@@ -157,10 +162,10 @@ export function NumberControl(
 			type === inputControlActionTypes.PRESS_ENTER ||
 			type === inputControlActionTypes.COMMIT
 		) {
-			if ( round ) {
-				state.value = roundClamp( currentValue, min, max );
+			if ( allowDecimal ) {
+				state.value = decimalClamp( currentValue, min, max, 5 );
 			} else {
-				state.value = clamp( getNumber( currentValue ), min, max );
+				state.value = roundClamp( currentValue, min, max );
 			}
 		}
 

@@ -98,3 +98,25 @@ export function roundClamp(
 export function roundClampString( ...args ) {
 	return roundClamp( ...args ).toString();
 }
+
+/**
+ * Clamps a value based on a min/max range without step value and
+ * with allowed decimal places.
+ *
+ * @param {number} value The value.
+ * @param {number} min The minimum range.
+ * @param {number} max The maximum range.
+ * @param {number} precision Number of decimal places allowed.
+ *
+ * @return {number} The rounded and clamped value.
+ */
+export function decimalClamp(
+	value = 0,
+	min = Infinity,
+	max = Infinity,
+	precision = 5
+) {
+	return getNumber(
+		clamp( getNumber( value ), min, max ).toFixed( precision )
+	);
+}
