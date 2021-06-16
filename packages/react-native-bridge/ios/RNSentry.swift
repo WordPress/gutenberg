@@ -37,6 +37,13 @@ public class RNSentry: NSObject, RCTBridgeModule {
             resolve(self.dataSource?.getSentryOptions())
         }
     }
+    
+    @objc
+    func getUser(_ resolve: @escaping RCTPromiseResolveBlock, rejecter:@escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+            resolve(self.dataSource?.getSentryUser())
+        }
+    }
 
     @objc
     func captureEnvelope(_ envelopeDict: [String: Any], resolve: @escaping RCTPromiseResolveBlock, rejecter:@escaping RCTPromiseRejectBlock) {
