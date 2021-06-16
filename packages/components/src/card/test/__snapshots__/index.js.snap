@@ -97,7 +97,7 @@ Snapshot Diff:
     >
       <div
 -       class="components-flex components-card__header components-card-header css-z1wxd8-Flex-ItemsRow-Header-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
-+       class="components-flex components-card__header components-card-header css-15dwmv7-Flex-ItemsRow-Header-borderRadius-borderColor css-1mm2cvy-View em57xhy0"
++       class="components-flex components-card__header components-card-header css-xx0c0v-Flex-ItemsRow-Header-borderRadius-borderColor-large css-1mm2cvy-View em57xhy0"
         data-wp-c16t="true"
         data-wp-component="CardHeader"
       >
@@ -105,7 +105,7 @@ Snapshot Diff:
       </div>
       <div
 -       class="components-scrollable components-card__body components-card-body css-1s8bpb2-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
-+       class="components-scrollable components-card__body components-card-body css-1h3akp0-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
++       class="components-scrollable components-card__body components-card-body css-ocisz3-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large css-1mm2cvy-View em57xhy0"
         data-wp-c16t="true"
         data-wp-component="CardBody"
       >

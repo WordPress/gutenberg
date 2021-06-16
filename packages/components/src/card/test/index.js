@@ -75,21 +75,21 @@ describe( 'Card', () => {
 
 		it( 'should add different amounts of white space when using the size prop', () => {
 			// The `size` prop has a default value of "medium"
-			const { container: withSize } = render(
+			const { container: withSizeDefault } = render(
 				<Card>
 					<CardHeader>Header</CardHeader>
 					<CardBody>Code is Poetry</CardBody>
 				</Card>
 			);
-			const { container: withSizeMinimal } = render(
-				<Card size="minimal">
+			const { container: withSizeLarge } = render(
+				<Card size="large">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Code is Poetry</CardBody>
 				</Card>
 			);
 
-			expect( withSize.firstChild ).toMatchDiffSnapshot(
-				withSizeMinimal.firstChild
+			expect( withSizeDefault.firstChild ).toMatchDiffSnapshot(
+				withSizeLarge.firstChild
 			);
 		} );
 

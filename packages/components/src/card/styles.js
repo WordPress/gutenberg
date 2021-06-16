@@ -98,7 +98,6 @@ export const cardPaddings = {
 	xSmall: css`
 		padding: ${ CONFIG.cardPaddingXSmall };
 	`,
-	minimal: '',
 };
 
 export const shady = css`
