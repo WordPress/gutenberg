@@ -492,6 +492,22 @@ export function* __unstableSwitchToTemplateMode( template ) {
 			'wp_template',
 			template
 		);
+
+		const settings = yield controls.select(
+			editorStore.name,
+			'getEditorSettings'
+		);
+
+		const newAvailableTemplates = {
+			...settings.availableTemplates,
+			[ savedTemplate.slug ]: savedTemplate.title.rendered,
+		};
+
+		yield controls.dispatch( editorStore, 'updateEditorSettings', {
+			...settings,
+			availableTemplates: newAvailableTemplates,
+		} );
+
 		const post = yield controls.select(
 			editorStore.name,
 			'getCurrentPost'
