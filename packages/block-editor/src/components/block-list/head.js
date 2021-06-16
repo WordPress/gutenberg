@@ -10,7 +10,7 @@ export function Head( { children } ) {
 	return (
 		<context.Provider value={ element }>
 			<div ref={ setElement } style={ { display: 'none' } } />
-			{ element && children }
+			{ children }
 		</context.Provider>
 	);
 }
