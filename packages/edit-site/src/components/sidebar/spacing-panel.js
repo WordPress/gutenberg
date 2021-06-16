@@ -46,6 +46,21 @@ function filterValuesBySides( values, sides ) {
 	return filteredValues;
 }
 
+function splitStyleValue( value ) {
+	// Check for shorthand value ( a string value ).
+	if ( value && typeof value === 'string' ) {
+		// Convert to value for individual sides for BoxControl.
+		return {
+			top: value,
+			right: value,
+			bottom: value,
+			left: value,
+		};
+	}
+
+	return value;
+}
+
 export default function SpacingPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
 	const showPaddingControl = useHasPadding( context );
@@ -60,7 +75,7 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 		],
 	} );
 
-	const paddingValues = getStyle( name, 'padding' );
+	const paddingValues = splitStyleValue( getStyle( name, 'padding' ) );
 	const paddingSides = useCustomSides( name, 'padding' );
 
 	const setPaddingValues = ( newPaddingValues ) => {
@@ -68,7 +83,7 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 		setStyle( name, 'padding', padding );
 	};
 
-	const marginValues = getStyle( name, 'margin' );
+	const marginValues = splitStyleValue( getStyle( name, 'margin' ) );
 	const marginSides = useCustomSides( name, 'margin' );
 
 	const setMarginValues = ( newMarginValues ) => {
