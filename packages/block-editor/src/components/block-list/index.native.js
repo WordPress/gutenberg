@@ -165,6 +165,7 @@ export class BlockList extends Component {
 		}
 	}
 
+	/* eslint-disable jsdoc/require-param */
 	/**
 	 * Computes the offset of a block in pixels, by adding up all the block heights before it.
 	 */
