@@ -39,6 +39,9 @@ const innerContext = {
 			background: 'white',
 		},
 	},
+	CardBody: {
+		as: 'div',
+	},
 };
 
 const InnerContent = memo( () => {
@@ -57,7 +60,7 @@ const InnerCard = memo( () => {
 	return (
 		<View style={ { padding: 40 } }>
 			<Card>
-				<CardBody as="div" style={ { border: '3px solid green' } }>
+				<CardBody style={ { border: '3px solid green' } }>
 					<InnerContent />
 				</CardBody>
 			</Card>
