@@ -4,6 +4,11 @@
 import { find } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+ import deprecated from '@wordpress/deprecated';
+
+/**
  *  Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
  * 	If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
  *
@@ -67,8 +72,17 @@ export function getFontSizeClass( fontSizeSlug ) {
 	// into strings. Some plugins relied on this behavior.
 	if ( 'string' !== typeof fontSizeSlug ) {
 		fontSizeSlug = String( fontSizeSlug );
-		// eslint-disable-next-line no-console
-		console.warn( 'The font size slug should be a string.' );
+		deprecated( 'The font size slug should be a string.' );
+	}
+
+	// In the past, we used lodash's kebabCase to process slugs.
+	// By doing so, this method also stripped special characters
+	// such as the # in "#FFFFF". Some plugins relied on this behavior.
+	const slug = fontSizeSlug.replace( /[^a-zA-Z0-9\-\s]/g, '' );
+	if ( slug !== fontSizeSlug ) {
+		deprecated(
+			'The font size slug should not have any special character.'
+		);
 	}
 
 	// We don't want to use kebabCase from lodash here
