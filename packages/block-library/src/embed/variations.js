@@ -24,6 +24,7 @@ import {
 	embedAmazonIcon,
 	embedAnimotoIcon,
 	embedDailymotionIcon,
+	embedLottieFilesIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -336,6 +337,15 @@ const variations = [
 			/^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+/i,
 		],
 		attributes: { providerNameSlug: 'amazon-kindle' },
+	},
+	{
+		name: 'lottie',
+		title: 'LottieFiles',
+		icon: embedLottieFilesIcon,
+		keywords: [ __( 'lottie' ) ],
+		description: __( 'Embed a Lottie file.' ),
+		patterns: [ /^https?:\/\/lottiefiles\.com\/.+/i ],
+		attributes: { providerNameSlug: 'lottie-file' },
 	},
 ];
 
