@@ -169,6 +169,7 @@ export class BlockList extends Component {
 	/**
 	 * Computes the offset of a block in pixels, by adding up all the block heights before it.
 	 */
+	/* eslint-enable jsdoc/require-param */
 	offsetOfIndex( heights, blockClientIds, index ) {
 		const ITEM_HEIGHT = 30; // just a kinda arbitrary default height, just to have it non zero.
 		const offset = blockClientIds
