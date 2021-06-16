@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { partial, isEmpty, map } from 'lodash';
+import { partial, isEmpty, map, fromPairs } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,18 +43,32 @@ export function TemplatePanel() {
 			getEditorSettings,
 			getCurrentPostType,
 		} = select( editorStore );
-		const { getPostType } = select( coreStore );
+		const { getPostType, getEntityRecords } = select( coreStore );
 		const _isViewable =
 			getPostType( getCurrentPostType() )?.viewable ?? false;
 		const _supportsTemplateMode =
 			select( editorStore ).getEditorSettings().supportsTemplateMode &&
 			_isViewable;
 
+		const templates = getEntityRecords( 'postType', 'wp_template', {
+			per_page: -1,
+		} );
+
+		const newAvailableTemplates = fromPairs(
+			( templates || [] ).map( ( { slug, title } ) => [
+				slug,
+				title.rendered,
+			] )
+		);
+
 		return {
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 			selectedTemplate: getEditedPostAttribute( 'template' ),
-			availableTemplates: getEditorSettings().availableTemplates,
+			availableTemplates: {
+				...getEditorSettings().availableTemplates,
+				...newAvailableTemplates,
+			},
 			template: _supportsTemplateMode && getEditedPostTemplate(),
 			isViewable: _isViewable,
 			supportsTemplateMode: _supportsTemplateMode,
@@ -75,6 +89,7 @@ export function TemplatePanel() {
 	const onTogglePanel = partial( toggleEditorPanelOpened, PANEL_NAME );
 
 	let panelTitle = __( 'Template' );
+
 	if ( !! template ) {
 		panelTitle = sprintf(
 			/* translators: %s: template title */
