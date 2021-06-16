@@ -302,7 +302,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	 *
 	 * Return a non-null value to bypass the WordPress quries.
 	 *
-	 * @since 5.8
+	 * @since 10.8
 	 *
 	 * @param WP_Block_Template[]|null $block_templates Return an array of block templates to short-circuit the default query,
 	 *                                                  or null to allow WP to run it's normal queries.
@@ -385,7 +385,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	/**
 	 * Filters the array of queried block templates array after they've been fetched.
 	 *
-	 * @since 5.8
+	 * @since 10.8
 	 *
 	 * @param WP_Block_Template[] $query_result Array of found block templates.
 	 * @param array $query {
@@ -413,7 +413,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	 *
 	 * Return a non-null value to bypass the WordPress quries.
 	 *
-	 * @since 5.8
+	 * @since 10.8
 	 *
 	 * @param WP_Block_Template|null $block_template Return block template object to short-circuit the default query,
 	 *                                               or null to allow WP to run it's normal queries.
@@ -460,7 +460,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	/**
 	 * Filters the array of queried block templates array after they've been fetched.
 	 *
-	 * @since 5.8
+	 * @since 10.8
 	 *
 	 * @param WP_Block_Template $block_template The found block template.
 	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
@@ -484,7 +484,7 @@ function gutenberg_get_block_file_template( $id, $template_type = 'wp_template' 
 	 *
 	 * Return a non-null value to bypass the WordPress quries.
 	 *
-	 * @since 5.8
+	 * @since 10.8
 	 *
 	 * @param WP_Block_Template|null $block_template Return block template object to short-circuit the default query,
 	 *                                               or null to allow WP to run it's normal queries.
@@ -519,7 +519,7 @@ function gutenberg_get_block_file_template( $id, $template_type = 'wp_template' 
 	/**
 	 * Filters the array of queried block templates array after they've been fetched.
 	 *
-	 * @since 5.8
+	 * @since 10.8
 	 *
 	 * @param null|WP_Block_Template $block_template The found block template.
 	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
