@@ -199,7 +199,7 @@ function VideoEdit( {
 								}
 								render={ ( { open } ) => (
 									<Button
-										isPrimary
+										variant="primary"
 										onClick={ open }
 										ref={ posterImageButton }
 										aria-describedby={
@@ -226,7 +226,10 @@ function VideoEdit( {
 									  ) }
 							</p>
 							{ !! poster && (
-								<Button onClick={ onRemovePoster } isTertiary>
+								<Button
+									onClick={ onRemovePoster }
+									variant="tertiary"
+								>
 									{ __( 'Remove' ) }
 								</Button>
 							) }

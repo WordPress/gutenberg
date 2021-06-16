@@ -130,12 +130,12 @@ const MyModal = () => {
 
 	return (
 		<>
-			<Button isSecondary onClick={ openModal }>
+			<Button variant="secondary" onClick={ openModal }>
 				Open Modal
 			</Button>
 			{ isOpen && (
 				<Modal title="This is my modal" onRequestClose={ closeModal }>
-					<Button isSecondary onClick={ closeModal }>
+					<Button variant="secondary" onClick={ closeModal }>
 						My custom close button
 					</Button>
 				</Modal>

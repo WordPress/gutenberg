@@ -684,6 +684,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BaseField",
+		"slug": "base-field",
+		"markdown_source": "../packages/components/src/base-field/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "BoxControl",
 		"slug": "box-control",
 		"markdown_source": "../packages/components/src/box-control/README.md",
@@ -702,9 +708,39 @@
 		"parent": "components"
 	},
 	{
+		"title": "CardBody",
+		"slug": "card-body",
+		"markdown_source": "../packages/components/src/card/card-body/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CardDivider",
+		"slug": "card-divider",
+		"markdown_source": "../packages/components/src/card/card-divider/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CardFooter",
+		"slug": "card-footer",
+		"markdown_source": "../packages/components/src/card/card-footer/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CardHeader",
+		"slug": "card-header",
+		"markdown_source": "../packages/components/src/card/card-header/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CardMedia",
+		"slug": "card-media",
+		"markdown_source": "../packages/components/src/card/card-media/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Card",
 		"slug": "card",
-		"markdown_source": "../packages/components/src/card/README.md",
+		"markdown_source": "../packages/components/src/card/card/README.md",
 		"parent": "components"
 	},
 	{
@@ -807,6 +843,12 @@
 		"title": "DuotonePicker",
 		"slug": "duotone-picker",
 		"markdown_source": "../packages/components/src/duotone-picker/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Elevation",
+		"slug": "elevation",
+		"markdown_source": "../packages/components/src/elevation/README.md",
 		"parent": "components"
 	},
 	{
@@ -1092,6 +1134,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Scrollable",
+		"slug": "scrollable",
+		"markdown_source": "../packages/components/src/scrollable/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "SelectControl",
 		"slug": "select-control",
 		"markdown_source": "../packages/components/src/select-control/README.md",
@@ -1119,6 +1167,12 @@
 		"title": "Spinner",
 		"slug": "spinner",
 		"markdown_source": "../packages/components/src/spinner/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Surface",
+		"slug": "surface",
+		"markdown_source": "../packages/components/src/surface/README.md",
 		"parent": "components"
 	},
 	{
@@ -1227,6 +1281,12 @@
 		"title": "VisuallyHidden",
 		"slug": "visually-hidden",
 		"markdown_source": "../packages/components/src/visually-hidden/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ZStack",
+		"slug": "z-stack",
+		"markdown_source": "../packages/components/src/z-stack/README.md",
 		"parent": "components"
 	},
 	{
@@ -1665,6 +1725,12 @@
 		"title": "@wordpress/react-native-editor",
 		"slug": "packages-react-native-editor",
 		"markdown_source": "../packages/react-native-editor/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/readable-js-assets-webpack-plugin",
+		"slug": "packages-readable-js-assets-webpack-plugin",
+		"markdown_source": "../packages/readable-js-assets-webpack-plugin/README.md",
 		"parent": "packages"
 	},
 	{

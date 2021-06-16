@@ -14,7 +14,10 @@
 	},
 	"supports": {
 		"anchor": true,
-		"fontSize": true
+		"__experimentalSelector": ".wp-block-code > code",
+		"typography": {
+			"fontSize": true
+		}
 	},
 	"style": "wp-block-code"
 }

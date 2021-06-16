@@ -18,7 +18,7 @@ import wrap from './transforms/wrap';
 /**
  * Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
  *
- * @param {Array} styles CSS rules.
+ * @param {Array}  styles           CSS rules.
  * @param {string} wrapperClassName Wrapper Class Name.
  * @return {Array} converted rules.
  */

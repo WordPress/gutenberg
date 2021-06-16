@@ -26,8 +26,8 @@ function createId( object ) {
 /**
  * Provides a unique instance ID.
  *
- * @param {object} object Object reference to create an id for.
- * @param {string} [prefix] Prefix for the unique id.
+ * @param {object} object           Object reference to create an id for.
+ * @param {string} [prefix]         Prefix for the unique id.
  * @param {string} [preferredId=''] Default ID to use.
  * @return {string | number} The unique instance id.
  */

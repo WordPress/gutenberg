@@ -1,3 +1,5 @@
+const BLOCK_SELECTOR = '.block-editor-block-list__block';
+
 /**
  * Returns true if two elements are contained within the same block.
  *
@@ -7,10 +9,7 @@
  * @return {boolean} Whether elements are in the same block.
  */
 export function isInSameBlock( a, b ) {
-	return (
-		a.closest( '.block-editor-block-list__block' ) ===
-		b.closest( '.block-editor-block-list__block' )
-	);
+	return a.closest( BLOCK_SELECTOR ) === b.closest( BLOCK_SELECTOR );
 }
 
 /**
@@ -24,7 +23,7 @@ export function isInSameBlock( a, b ) {
  *                   children.
  */
 export function isInsideRootBlock( blockElement, element ) {
-	const parentBlock = element.closest( '.block-editor-block-list__block' );
+	const parentBlock = element.closest( BLOCK_SELECTOR );
 	return parentBlock === blockElement;
 }
 
@@ -46,7 +45,7 @@ export function getBlockClientId( node ) {
 	}
 
 	const elementNode = /** @type {Element} */ ( node );
-	const blockNode = elementNode.closest( '.block-editor-block-list__block' );
+	const blockNode = elementNode.closest( BLOCK_SELECTOR );
 
 	if ( ! blockNode ) {
 		return;

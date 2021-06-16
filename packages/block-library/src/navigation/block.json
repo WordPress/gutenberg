@@ -4,7 +4,11 @@
 	"title": "Navigation",
 	"category": "design",
 	"description": "A collection of blocks that allow visitors to get around your site.",
-	"keywords": [ "menu", "navigation", "links" ],
+	"keywords": [
+		"menu",
+		"navigation",
+		"links"
+	],
 	"textdomain": "default",
 	"attributes": {
 		"orientation": {
@@ -34,6 +38,10 @@
 		"showSubmenuIcon": {
 			"type": "boolean",
 			"default": true
+		},
+		"isResponsive": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"providesContext": {
@@ -48,18 +56,23 @@
 		"orientation": "orientation"
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": [
+			"wide",
+			"full"
+		],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
-		"fontSize": true,
-		"lineHeight": true,
-		"__experimentalFontStyle": true,
-		"__experimentalFontWeight": true,
-		"__experimentalTextTransform": true,
-		"color": true,
-		"__experimentalFontFamily": true,
-		"__experimentalTextDecoration": true
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalTextTransform": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true
+		},
+		"color": true
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"

@@ -7,6 +7,12 @@ import { castArray, includes, isArray, get, some } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 export function ThemeSupportCheck( {
 	themeSupports,
@@ -34,8 +40,8 @@ export function ThemeSupportCheck( {
 }
 
 export default withSelect( ( select ) => {
-	const { getThemeSupports } = select( 'core' );
-	const { getEditedPostAttribute } = select( 'core/editor' );
+	const { getThemeSupports } = select( coreStore );
+	const { getEditedPostAttribute } = select( editorStore );
 	return {
 		postType: getEditedPostAttribute( 'type' ),
 		themeSupports: getThemeSupports(),

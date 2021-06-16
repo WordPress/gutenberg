@@ -14,4 +14,7 @@
 // level toolbar.
 .block-library-heading-level-toolbar {
 	border: none;
+	.components-toolbar-group {
+		flex-wrap: nowrap;
+	}
 }

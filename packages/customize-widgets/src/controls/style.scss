@@ -1,6 +1,24 @@
-// Adds a white background to the block based widget section.
-// #customize-theme-controls id is required to add specificity.
-#customize-theme-controls .customize-widgets__sidebar-section {
+// Additional ids and class names are used in the selector for
+// added specificity.
+#customize-theme-controls .customize-pane-child.customize-widgets__sidebar-section {
+	// Override the default 'overflow' to allow the
+	// editor toolbars to be sticky.
+	overflow: unset;
+
+	// Make the entire sidebar background white.
 	min-height: 100%;
 	background-color: $white;
+
+	// Override the inline styles added via JS that make the section title
+	// sticky feature work. The customize widget block-editor disables this
+	// sticky title.
+	padding-top: 10px !important;
+
+	.customize-section-title {
+		// Disable the sticky title. `!important` as this overrides inline
+		// styles added via JavaScript.
+		position: static !important;
+		top: 0 !important;
+		width: unset !important;
+	}
 }

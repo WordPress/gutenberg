@@ -28,22 +28,6 @@
 
 }
 
-.editor-styles-wrapper {
-	// Default background color so that grey .edit-post-editor-regions__content
-	// color doesn't show through.
-	background-color: $white;
-
-	cursor: text;
-
-	> * {
-		cursor: auto;
-	}
-
-	> div {
-		min-height: 100%;
-	}
-}
-
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks
 // .block-editor-block-list__layout and block-editor-block-list__block
 // We need to have two DOM elements.
@@ -73,4 +57,13 @@
 	&:hover {
 		color: $gray-100;
 	}
+}
+
+.edit-post-visual-editor__content-area {
+	width: 100%;
+	// If this is set to height: 100%; it breaks in Safari 13, which calculates the height relatively to the incorrect flex container.
+	// By setting it as a min-height instead, it appears to work in all cases.
+	min-height: 100%;
+	position: relative;
+	display: flex;
 }

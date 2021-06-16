@@ -8,7 +8,11 @@ import {
 	insertBlock,
 	setUpResponseMocking,
 	pressKeyWithModifier,
+	saveDraft,
 	showBlockToolbar,
+	openPreviewPage,
+	selectBlockByClientId,
+	getAllBlocks,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -52,7 +56,7 @@ const REST_PAGES_ROUTES = [
  * routes (extressed as substrings).
  *
  * @param {string} reqUrl the full URL to be tested for matches.
- * @param {Array} routes array of strings to match against the URL.
+ * @param {Array}  routes array of strings to match against the URL.
  */
 function matchUrlToRoute( reqUrl, routes ) {
 	return routes.some( ( route ) => reqUrl.includes( route ) );
@@ -103,7 +107,7 @@ async function mockSearchResponse( items ) {
  * Note: this needs to be within a single call to
  * `setUpResponseMocking` as you can only setup response mocking once per test run.
  *
- * @param {Array} menus menus to provide as mocked responses to menus entity API requests.
+ * @param {Array} menus     menus to provide as mocked responses to menus entity API requests.
  * @param {Array} menuItems menu items to provide as mocked responses to menu-items entity API requests.
  */
 async function mockAllMenusResponses(
@@ -170,10 +174,10 @@ async function mockCreatePageResponse( title, slug ) {
 /**
  * Interacts with the LinkControl to perform a search and select a returned suggestion
  *
- * @param {Object} link link object to be tested
- * @param {string} link.url What will be typed in the search input
+ * @param {Object} link       link object to be tested
+ * @param {string} link.url   What will be typed in the search input
  * @param {string} link.label What the resulting label will be in the creating Link Block after the block is created.
- * @param {string} link.type What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
+ * @param {string} link.type  What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
  */
 async function updateActiveNavigationLink( { url, label, type } ) {
 	const typeClasses = {
@@ -251,6 +255,27 @@ async function addLinkBlock() {
 		"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Custom Link']"
 	);
 	await linkButton.click();
+}
+
+async function toggleSidebar() {
+	await page.click(
+		'.edit-post-header__settings button[aria-label="Settings"]'
+	);
+}
+
+async function turnResponsivenessOn() {
+	const blocks = await getAllBlocks();
+
+	await selectBlockByClientId( blocks[ 0 ].clientId );
+	await toggleSidebar();
+
+	const [ responsivenessToggleButton ] = await page.$x(
+		'//label[text()[contains(.,"Enable responsive menu")]]'
+	);
+
+	await responsivenessToggleButton.click();
+
+	await saveDraft();
 }
 
 beforeEach( async () => {
@@ -505,5 +530,112 @@ describe( 'Navigation', () => {
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'loads frontend code only if the block is present', async () => {
+		// Mock the response from the Pages endpoint. This is done so that the pages returned are always
+		// consistent and to test the feature more rigorously than the single default sample page.
+		await mockPagesResponse( [
+			{
+				title: 'Home',
+				slug: 'home',
+			},
+			{
+				title: 'About',
+				slug: 'about',
+			},
+			{
+				title: 'Contact Us',
+				slug: 'contact',
+			},
+		] );
+
+		// Create first block at the start in order to enable preview.
+		await insertBlock( 'Navigation' );
+		await saveDraft();
+
+		const previewPage = await openPreviewPage();
+		const isScriptLoaded = await previewPage.evaluate(
+			() =>
+				null !==
+				document.querySelector(
+					'script[src*="navigation/frontend.js"]'
+				)
+		);
+
+		expect( isScriptLoaded ).toBe( false );
+
+		await createNavBlockWithAllPages();
+		await insertBlock( 'Navigation' );
+		await createNavBlockWithAllPages();
+		await turnResponsivenessOn();
+
+		await previewPage.reload( {
+			waitFor: [ 'networkidle0', 'domcontentloaded' ],
+		} );
+
+		/*
+			Count instances of the tag to make sure that it's been loaded only once,
+			regardless of the number of navigation blocks present.
+		*/
+		const tagCount = await previewPage.evaluate(
+			() =>
+				Array.from(
+					document.querySelectorAll(
+						'script[src*="navigation/frontend.js"]'
+					)
+				).length
+		);
+
+		expect( tagCount ).toBe( 1 );
+	} );
+
+	it( 'loads frontend code only if responsiveness is turned on', async () => {
+		await mockPagesResponse( [
+			{
+				title: 'Home',
+				slug: 'home',
+			},
+			{
+				title: 'About',
+				slug: 'about',
+			},
+			{
+				title: 'Contact Us',
+				slug: 'contact',
+			},
+		] );
+
+		await insertBlock( 'Navigation' );
+		await saveDraft();
+
+		const previewPage = await openPreviewPage();
+		let isScriptLoaded = await previewPage.evaluate(
+			() =>
+				null !==
+				document.querySelector(
+					'script[src*="navigation/frontend.js"]'
+				)
+		);
+
+		expect( isScriptLoaded ).toBe( false );
+
+		await createNavBlockWithAllPages();
+
+		await turnResponsivenessOn();
+
+		await previewPage.reload( {
+			waitFor: [ 'networkidle0', 'domcontentloaded' ],
+		} );
+
+		isScriptLoaded = await previewPage.evaluate(
+			() =>
+				null !==
+				document.querySelector(
+					'script[src*="navigation/frontend.js"]'
+				)
+		);
+
+		expect( isScriptLoaded ).toBe( true );
 	} );
 } );

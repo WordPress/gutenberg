@@ -10,13 +10,12 @@ import { useEntityProp } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
-	ToolbarGroup,
 	ToolbarButton,
 	ToggleControl,
 	Popover,
@@ -27,10 +26,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
 
-export default function PostDateEdit( { attributes, context, setAttributes } ) {
-	const { textAlign, format, isLink } = attributes;
-	const { postId, postType } = context;
-
+export default function PostDateEdit( {
+	attributes: { textAlign, format, isLink },
+	context: { postId, postType, queryId },
+	setAttributes,
+} ) {
+	const isDescendentOfQueryLoop = !! queryId;
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
 	const [ date, setDate ] = useEntityProp(
 		'postType',
@@ -91,26 +92,24 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 	}
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 
-				{ date && (
-					<ToolbarGroup>
-						<ToolbarButton
-							icon={ edit }
-							title={ __( 'Change Date' ) }
-							onClick={ () =>
-								setIsPickerOpen(
-									( _isPickerOpen ) => ! _isPickerOpen
-								)
-							}
-						/>
-					</ToolbarGroup>
+				{ date && ! isDescendentOfQueryLoop && (
+					<ToolbarButton
+						icon={ edit }
+						title={ __( 'Change Date' ) }
+						onClick={ () =>
+							setIsPickerOpen(
+								( _isPickerOpen ) => ! _isPickerOpen
+							)
+						}
+					/>
 				) }
 			</BlockControls>
 

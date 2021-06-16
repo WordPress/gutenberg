@@ -65,15 +65,6 @@ function gutenberg_register_sidebars_and_widgets_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
 
 /**
- * Registers the Batch REST API routes.
- */
-function gutenberg_register_batch_endpoint() {
-	$batch = new WP_REST_Batch_Controller();
-	$batch->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
-
-/**
  * Registers the Block editor settings REST API routes.
  */
 function gutenberg_register_block_editor_settings() {
@@ -192,3 +183,44 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 	return $permalink;
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
+
+/**
+ * Filters WP_User_Query arguments when querying users via the REST API.
+ *
+ * Allow using the has_published_post argument.
+ *
+ * @param array           $prepared_args Array of arguments for WP_User_Query.
+ * @param WP_REST_Request $request       The REST API request.
+ *
+ * @return array Returns modified $prepared_args.
+ */
+function gutenberg_rest_user_query_has_published_posts( $prepared_args, $request ) {
+	if ( ! empty( $request['has_published_posts'] ) ) {
+		$prepared_args['has_published_posts'] = ( true === $request['has_published_posts'] )
+			? get_post_types( array( 'show_in_rest' => true ), 'names' )
+			: (array) $request['has_published_posts'];
+	}
+	return $prepared_args;
+}
+add_filter( 'rest_user_query', 'gutenberg_rest_user_query_has_published_posts', 10, 2 );
+
+
+/**
+ * Filters REST API collection parameters for the users controller.
+ *
+ * @param array $query_params JSON Schema-formatted collection parameters.
+ *
+ * @return array Returns the $query_params with "has_published_posts".
+ */
+function gutenberg_rest_user_collection_params_has_published_posts( $query_params ) {
+	$query_params['has_published_posts'] = array(
+		'description' => __( 'Limit result set to users who have published posts.', 'gutenberg' ),
+		'type'        => array( 'boolean', 'array' ),
+		'items'       => array(
+			'type' => 'string',
+			'enum' => get_post_types( array( 'show_in_rest' => true ), 'names' ),
+		),
+	);
+	return $query_params;
+}
+add_filter( 'rest_user_collection_params', 'gutenberg_rest_user_collection_params_has_published_posts' );

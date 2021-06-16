@@ -59,16 +59,7 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 			// If the user is dropping to the trailing edge of the block
 			// add 1 to the index to represent dragging after.
 			const isTrailingEdge = edge === 'bottom' || edge === 'right';
-			let offset = isTrailingEdge ? 1 : 0;
-
-			// If the target is the dragged block itself and another 1 to
-			// index as the dragged block is set to `display: none` and
-			// should be skipped in the calculation.
-			const isTargetDraggedBlock =
-				isTrailingEdge &&
-				elements[ index + 1 ] &&
-				elements[ index + 1 ].classList.contains( 'is-dragging' );
-			offset += isTargetDraggedBlock ? 1 : 0;
+			const offset = isTrailingEdge ? 1 : 0;
 
 			// Update the currently known best candidate.
 			candidateDistance = distance;
@@ -98,22 +89,17 @@ export default function useBlockDropZone( {
 } = {} ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
-	const { isLockedAll, orientation } = useSelect(
+	const isLockedAll = useSelect(
 		( select ) => {
-			const { getBlockListSettings, getTemplateLock } = select(
-				blockEditorStore
-			);
-			return {
-				isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
-				orientation: getBlockListSettings( targetRootClientId )
-					?.orientation,
-			};
+			const { getTemplateLock } = select( blockEditorStore );
+			return getTemplateLock( targetRootClientId ) === 'all';
 		},
 		[ targetRootClientId ]
 	);
 
+	const { getBlockListSettings } = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
@@ -123,7 +109,7 @@ export default function useBlockDropZone( {
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
 				{ x: event.clientX, y: event.clientY },
-				orientation
+				getBlockListSettings( targetRootClientId )?.orientation
 			);
 
 			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
@@ -143,6 +129,11 @@ export default function useBlockDropZone( {
 			// handled, so get it now and pass it to the thottled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget );
+		},
+		onDragLeave() {
+			throttled.cancel();
+			hideInsertionPoint();
+			setTargetBlockIndex( null );
 		},
 		onDragEnd() {
 			throttled.cancel();

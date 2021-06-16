@@ -6,6 +6,11 @@ import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 function PostTrash( { isNew, postId, postType, ...props } ) {
 	if ( isNew || ! postId ) {
 		return null;
@@ -17,7 +22,7 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 		<Button
 			className="editor-post-trash"
 			isDestructive
-			isTertiary
+			variant="tertiary"
 			onClick={ onClick }
 		>
 			{ __( 'Move to trash' ) }
@@ -31,7 +36,7 @@ export default compose( [
 			isEditedPostNew,
 			getCurrentPostId,
 			getCurrentPostType,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 		return {
 			isNew: isEditedPostNew(),
 			postId: getCurrentPostId(),
@@ -39,6 +44,6 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
-		trashPost: dispatch( 'core/editor' ).trashPost,
+		trashPost: dispatch( editorStore ).trashPost,
 	} ) ),
 ] )( PostTrash );

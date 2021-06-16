@@ -6,25 +6,6 @@
  */
 
 /**
- * Returns all block template file path of the current theme and its parent theme.
- * Includes demo block template files if demo experiment is enabled.
- *
- * @return array $block_template_files A list of paths to all template files.
- */
-function gutenberg_get_template_paths() {
-	$block_template_files = glob( get_stylesheet_directory() . '/block-templates/*.html' );
-	$block_template_files = is_array( $block_template_files ) ? $block_template_files : array();
-
-	if ( is_child_theme() ) {
-		$child_block_template_files = glob( get_template_directory() . '/block-templates/*.html' );
-		$child_block_template_files = is_array( $child_block_template_files ) ? $child_block_template_files : array();
-		$block_template_files       = array_merge( $block_template_files, $child_block_template_files );
-	}
-
-	return $block_template_files;
-}
-
-/**
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
@@ -64,7 +45,7 @@ function gutenberg_register_template_post_type() {
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
 		'rest_base'             => 'templates',
-		'rest_controller_class' => 'WP_REST_Templates_Controller',
+		'rest_controller_class' => 'Gutenberg_REST_Templates_Controller',
 		'capability_type'       => array( 'template', 'templates' ),
 		'map_meta_cap'          => true,
 		'supports'              => array(
@@ -84,7 +65,7 @@ add_action( 'init', 'gutenberg_register_template_post_type' );
  * Registers block editor 'wp_theme' taxonomy.
  */
 function gutenberg_register_wp_theme_taxonomy() {
-	if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver::theme_has_support() ) {
+	if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		return;
 	}
 
@@ -196,12 +177,25 @@ add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template' );
 /**
  * Print the skip-link script & styles.
  *
+ * @todo Remove this when WP 5.8 is the minimum required version.
+ *
  * @return void
  */
 function gutenberg_the_skip_link() {
 
-	// Early exit if not an FSE theme.
+	// Early exit if on WP 5.8+.
+	if ( function_exists( 'the_block_template_skip_link' ) ) {
+		return;
+	}
+
+	// Early exit if not a block theme.
 	if ( ! gutenberg_supports_block_templates() ) {
+		return;
+	}
+
+	// Early exit if not a block template.
+	global $_wp_current_template_content;
+	if ( ! $_wp_current_template_content ) {
 		return;
 	}
 	?>
@@ -261,7 +255,12 @@ function gutenberg_the_skip_link() {
 
 		// Get the site wrapper.
 		// The skip-link will be injected in the beginning of it.
-		parentEl = document.querySelector( '.wp-site-blocks' ) || document.body,
+		parentEl = document.querySelector( '.wp-site-blocks' );
+
+		// Early exit if the root element was not found.
+		if ( ! parentEl ) {
+			return;
+		}
 
 		// Get the skip-link target's ID, and generate one if it doesn't exist.
 		skipLinkTargetID = skipLinkTarget.id;

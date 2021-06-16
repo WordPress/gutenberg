@@ -36,7 +36,7 @@ export default function Edit( { attributes, setAttributes } ) {
 					/>
 
 					<Button
-						isPrimary
+						variant="primary"
 						onClick={ () => {
 							setAttributes( { commentId: commentIdInput } );
 						} }

@@ -32,10 +32,12 @@ export function useBlockClassNames( clientId ) {
 				getBlockName,
 				getSettings,
 				hasSelectedInnerBlock,
+				isTyping,
 				__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 			} = select( blockEditorStore );
 			const {
 				__experimentalSpotlightEntityBlocks: spotlightEntityBlocks,
+				outlineMode,
 			} = getSettings();
 			const isDragging = isBlockBeingDragged( clientId );
 			const isSelected = isBlockSelected( clientId );
@@ -49,7 +51,7 @@ export function useBlockClassNames( clientId ) {
 			const activeEntityBlockId = getActiveBlockIdByBlockNames(
 				spotlightEntityBlocks
 			);
-			return classnames( 'block-editor-block-list__block', {
+			return classnames( {
 				'is-selected': isSelected,
 				'is-highlighted': isBlockHighlighted( clientId ),
 				'is-multi-selected': isBlockMultiSelected( clientId ),
@@ -59,6 +61,7 @@ export function useBlockClassNames( clientId ) {
 				'has-active-entity': activeEntityBlockId,
 				// Determine if there is an active entity area to spotlight.
 				'is-active-entity': activeEntityBlockId === clientId,
+				'remove-outline': isSelected && outlineMode && isTyping(),
 			} );
 		},
 		[ clientId ]

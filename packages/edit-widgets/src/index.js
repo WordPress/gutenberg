@@ -12,7 +12,10 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
-import { registerLegacyWidgetVariations } from '@wordpress/widgets';
+import {
+	registerLegacyWidgetBlock,
+	registerLegacyWidgetVariations,
+} from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -33,10 +36,9 @@ export function initialize( id, settings ) {
 		( block ) => ! [ 'core/more' ].includes( block.name )
 	);
 	registerCoreBlocks( coreBlocks );
+	registerLegacyWidgetBlock();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableLegacyWidgetBlock: true,
-		} );
+		__experimentalRegisterExperimentalCoreBlocks();
 	}
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );

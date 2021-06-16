@@ -9,9 +9,9 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  * Places the caret at the top or bottom of a given element.
  *
  * @param {HTMLElement} container           Focusable element.
- * @param {boolean} isReverse           True for bottom, false for top.
- * @param {DOMRect} [rect]              The rectangle to position the caret with.
- * @param {boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
+ * @param {boolean}     isReverse           True for bottom, false for top.
+ * @param {DOMRect}     [rect]              The rectangle to position the caret with.
+ * @param {boolean}     [mayUseScroll=true] True to allow scrolling, false to disallow.
  */
 export default function placeCaretAtVerticalEdge(
 	container,
@@ -27,6 +27,8 @@ export default function placeCaretAtVerticalEdge(
 		placeCaretAtHorizontalEdge( container, isReverse );
 		return;
 	}
+
+	container.focus();
 
 	// Offset by a buffer half the height of the caret rect. This is needed
 	// because caretRangeFromPoint may default to the end of the selection if
@@ -66,11 +68,6 @@ export default function placeCaretAtVerticalEdge(
 	assertIsDefined( defaultView, 'defaultView' );
 	const selection = defaultView.getSelection();
 	assertIsDefined( selection, 'selection' );
-	selection.removeAllRanges();
-	selection.addRange( range );
-	container.focus();
-	// Editable was already focussed, it goes back to old range...
-	// This fixes it.
 	selection.removeAllRanges();
 	selection.addRange( range );
 }

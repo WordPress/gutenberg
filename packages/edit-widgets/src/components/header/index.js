@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { Button, ToolbarItem, VisuallyHidden } from '@wordpress/components';
 import {
 	BlockNavigationDropdown,
 	NavigableToolbar,
@@ -12,6 +12,7 @@ import {
 import { PinnedItems } from '@wordpress/interface';
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,10 +20,12 @@ import { useRef } from '@wordpress/element';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
+import MoreMenu from '../more-menu';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
 
 function Header() {
+	const isMediumViewport = useViewportMatch( 'medium' );
 	const inserterButton = useRef();
 	const widgetAreaClientId = useLastSelectedWidgetArea();
 	const isLastSelectedWidgetAreaOpen = useSelect(
@@ -63,9 +66,19 @@ function Header() {
 		<>
 			<div className="edit-widgets-header">
 				<div className="edit-widgets-header__navigable-toolbar-wrapper">
-					<h1 className="edit-widgets-header__title">
-						{ __( 'Widgets' ) }
-					</h1>
+					{ isMediumViewport && (
+						<h1 className="edit-widgets-header__title">
+							{ __( 'Widgets' ) }
+						</h1>
+					) }
+					{ ! isMediumViewport && (
+						<VisuallyHidden
+							as="h1"
+							className="edit-widgets-header__title"
+						>
+							{ __( 'Widgets' ) }
+						</VisuallyHidden>
+					) }
 					<NavigableToolbar
 						className="edit-widgets-header-toolbar"
 						aria-label={ __( 'Document tools' ) }
@@ -74,7 +87,7 @@ function Header() {
 							ref={ inserterButton }
 							as={ Button }
 							className="edit-widgets-header-toolbar__inserter-toggle"
-							isPrimary
+							variant="primary"
 							isPressed={ isInserterOpened }
 							onMouseDown={ ( event ) => {
 								event.preventDefault();
@@ -88,14 +101,19 @@ function Header() {
 								'Generic label for block inserter button'
 							) }
 						/>
-						<UndoButton />
-						<RedoButton />
-						<ToolbarItem as={ BlockNavigationDropdown } />
+						{ isMediumViewport && (
+							<>
+								<UndoButton />
+								<RedoButton />
+								<ToolbarItem as={ BlockNavigationDropdown } />
+							</>
+						) }
 					</NavigableToolbar>
 				</div>
 				<div className="edit-widgets-header__actions">
 					<SaveButton />
 					<PinnedItems.Slot scope="core/edit-widgets" />
+					<MoreMenu />
 				</div>
 			</div>
 		</>

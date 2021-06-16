@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set, get, mergeWith } from 'lodash';
+import { set, get, mergeWith, mapValues, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import {
 } from '@wordpress/element';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useEntityProp } from '@wordpress/core-data';
@@ -24,12 +25,12 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	ELEMENTS,
 	ROOT_BLOCK_NAME,
 	ROOT_BLOCK_SELECTOR,
 	ROOT_BLOCK_SUPPORTS,
 	getValueFromVariable,
 	getPresetVariable,
+	PRESET_METADATA,
 } from './utils';
 import { toCustomProperties, toStyles } from './global-styles-renderer';
 import { store as editSiteStore } from '../../store';
@@ -111,6 +112,10 @@ const getBlockMetadata = ( blockTypes ) => {
 	return result;
 };
 
+function immutableSet( object, path, value ) {
+	return setWith( object ? clone( object ) : {}, path, value, clone );
+}
+
 export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
 	const { blockTypes, settings } = useSelect( ( select ) => {
@@ -150,12 +155,41 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 			newUserStyles = EMPTY_CONTENT;
 		}
 
+		const addUserToSettings = ( settingsToAdd ) => {
+			PRESET_METADATA.forEach( ( { path } ) => {
+				const presetData = get( settingsToAdd, path );
+				if ( presetData ) {
+					settingsToAdd = immutableSet( settingsToAdd, path, {
+						user: presetData,
+					} );
+				}
+			} );
+			return settingsToAdd;
+		};
+
+		let userStylesWithOrigin = newUserStyles;
+		if ( userStylesWithOrigin.settings ) {
+			userStylesWithOrigin = {
+				...userStylesWithOrigin,
+				settings: addUserToSettings( userStylesWithOrigin.settings ),
+			};
+			if ( userStylesWithOrigin.settings.blocks ) {
+				userStylesWithOrigin.settings = {
+					...userStylesWithOrigin.settings,
+					blocks: mapValues(
+						userStylesWithOrigin.settings.blocks,
+						addUserToSettings
+					),
+				};
+			}
+		}
+
 		// At this point, the version schema of the theme & user
 		// is the same, so we can merge them.
 		const newMergedStyles = mergeWith(
 			{},
 			baseStyles,
-			newUserStyles,
+			userStylesWithOrigin,
 			mergeTreesCustomizer
 		);
 
@@ -198,9 +232,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				setContent( JSON.stringify( newContent ) );
 			},
 			getStyle: ( context, propertyName, origin = 'merged' ) => {
-				const propertyPath =
-					STYLE_PROPERTY[ propertyName ].valueGlobal ??
-					STYLE_PROPERTY[ propertyName ].value;
+				const propertyPath = STYLE_PROPERTY[ propertyName ].value;
 				const path =
 					context === ROOT_BLOCK_NAME
 						? propertyPath
@@ -230,9 +262,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					ROOT_BLOCK_NAME === context
 						? [ 'styles' ]
 						: [ 'styles', 'blocks', context ];
-				const propertyPath =
-					STYLE_PROPERTY[ propertyName ].valueGlobal ??
-					STYLE_PROPERTY[ propertyName ].value;
+				const propertyPath = STYLE_PROPERTY[ propertyName ].value;
 
 				let newStyles = get( newContent, path );
 				if ( ! newStyles ) {

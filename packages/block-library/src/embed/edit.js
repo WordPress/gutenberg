@@ -23,7 +23,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, Platform } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -52,6 +52,7 @@ const EmbedEdit = ( props ) => {
 		onReplace,
 		setAttributes,
 		insertBlocksAfter,
+		onFocus,
 	} = props;
 
 	const defaultEmbedInfo = {
@@ -186,9 +187,11 @@ const EmbedEdit = ( props ) => {
 		);
 	}
 
-	// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
-	const label = sprintf( __( '%s URL' ), title );
-
+	const label = Platform.select( {
+		// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
+		web: sprintf( __( '%s URL' ), title ),
+		native: title,
+	} );
 	// No preview, or we can't embed the current URL, or we've clicked the edit button.
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
 	if ( showEmbedPlaceholder ) {
@@ -197,6 +200,7 @@ const EmbedEdit = ( props ) => {
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
+					onFocus={ onFocus }
 					onSubmit={ ( event ) => {
 						if ( event ) {
 							event.preventDefault();

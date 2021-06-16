@@ -68,10 +68,8 @@
 		margin-bottom: 1.4em;
 	}
 
-	.comment-form {
-		textarea,
-		input {
-			border: 1px solid $gray-600;
-		}
+	textarea,
+	input {
+		border: 1px solid $gray-600;
 	}
 }

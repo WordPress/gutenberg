@@ -15,7 +15,7 @@ import { cleanEmptyObject } from './utils';
 import useSetting from '../components/use-setting';
 import FontFamilyControl from '../components/font-family';
 
-export const FONT_FAMILY_SUPPORT_KEY = '__experimentalFontFamily';
+export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
 
 const getFontFamilyFromAttributeValue = ( fontFamilies, value ) => {
 	const attributeParsed = /var:preset\|font-family\|(.+)/.exec( value );

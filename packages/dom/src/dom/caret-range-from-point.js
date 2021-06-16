@@ -4,9 +4,9 @@
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/caretRangeFromPoint
  *
- * @param {Document} doc  The document of the range.
- * @param {number}   x    Horizontal position within the current viewport.
- * @param {number}   y    Vertical position within the current viewport.
+ * @param {Document} doc The document of the range.
+ * @param {number}   x   Horizontal position within the current viewport.
+ * @param {number}   y   Vertical position within the current viewport.
  *
  * @return {Range | null} The best range for the given point.
  */

@@ -6,8 +6,11 @@
 	display: flex;
 	flex-grow: 1;
 	width: 100%;
-	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
+
+	// Allow horizontal scrolling on mobile.
+	overflow-y: hidden;
+	overflow-x: auto;
 
 	// Animation
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
@@ -85,6 +88,9 @@
 			right: $grid-unit-05 !important;
 		}
 	}
+
+	// Match the parent selector button.
+	margin-left: -$border-width;
 
 	// Compensate for width of block switcher.
 	.block-editor-block-mover {

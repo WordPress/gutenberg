@@ -13,10 +13,12 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
-		"fontSize": true,
-		"lineHeight": true,
 		"color": {
 			"link": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
 		}
 	},
 	"editorStyle": "wp-block-term-description-editor"

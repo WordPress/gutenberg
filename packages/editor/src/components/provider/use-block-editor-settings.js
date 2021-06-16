@@ -6,19 +6,27 @@ import { pick, defaultTo } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Platform, useMemo } from '@wordpress/element';
+import { Platform, useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchRemoteUrlData as fetchRemoteUrlData,
 } from '@wordpress/core-data';
+import {
+	getAuthority,
+	isURL,
+	getProtocol,
+	isValidProtocol,
+} from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+
+const EMPTY_DATA = {};
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -33,34 +41,88 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		reusableBlocks,
 		hasUploadPermissions,
 		canUseUnfilteredHTML,
-		isTitleSelected,
+		baseUrl,
+		hasResolvedLocalSiteData,
 	} = useSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML, isPostTitleSelected } = select(
-			editorStore
+		const { canUserUseUnfilteredHTML } = select( editorStore );
+		const isWeb = Platform.OS === 'web';
+		const { canUser, getUnstableBase, hasFinishedResolution } = select(
+			coreStore
 		);
-		const { canUser } = select( coreStore );
+
+		const siteData = getUnstableBase();
+
+		const hasFinishedResolvingSiteData = hasFinishedResolution(
+			'getUnstableBase'
+		);
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			reusableBlocks: select( coreStore ).getEntityRecords(
-				'postType',
-				'wp_block',
-				/**
-				 * Unbounded queries are not supported on native so as a workaround, we set per_page with the maximum value that native version can handle.
-				 * Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
-				 */
-				{ per_page: Platform.select( { web: -1, native: 10 } ) }
-			),
+			reusableBlocks: isWeb
+				? select( coreStore ).getEntityRecords(
+						'postType',
+						'wp_block',
+						{ per_page: -1 }
+				  )
+				: [], // Reusable blocks are fetched in the native version of this hook.
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),
 				true
 			),
-			// This selector is only defined on mobile.
-			isTitleSelected: isPostTitleSelected && isPostTitleSelected(),
+			hasResolvedLocalSiteData: hasFinishedResolvingSiteData,
+			baseUrl: siteData?.url || '',
 		};
 	}, [] );
 
 	const { undo } = useDispatch( editorStore );
+
+	// Temporary home - should this live in `core-data`?
+	const fetchRichUrlData = useCallback(
+		function ( url, fetchOptions = {} ) {
+			if ( ! isURL( url ) ) {
+				return Promise.reject(
+					new TypeError( `${ url } is not a valid URL.` )
+				);
+			}
+
+			// Test for "http" based URL as it is possible for valid
+			// yet unusable URLs such as `tel:123456` to be passed.
+			const protocol = getProtocol( url );
+
+			if (
+				! isValidProtocol( protocol ) ||
+				! protocol.startsWith( 'http' ) ||
+				! /^https?:\/\/[^\/\s]/i.test( url )
+			) {
+				return Promise.reject(
+					new TypeError( `${ url } does not have a valid protocol.` )
+				);
+			}
+
+			// If the baseUrl is still resolving then return
+			// empty data for this request.
+			if ( ! hasResolvedLocalSiteData ) {
+				return Promise.resolve( EMPTY_DATA );
+			}
+
+			// More accurate test for internal URLs to avoid edge cases
+			// such as baseURL being included as part of a query string
+			// on the target url.
+			const baseUrlAuthority = getAuthority( baseUrl );
+			const urlAuthority = getAuthority( url );
+
+			const isInternal = urlAuthority === baseUrlAuthority;
+
+			// Don't handle internal URLs (yet...).
+			if ( isInternal ) {
+				return Promise.resolve( EMPTY_DATA );
+			}
+
+			// If external then attempt fetch of data.
+			return fetchRemoteUrlData( url, fetchOptions );
+		},
+		[ baseUrl, hasResolvedLocalSiteData ]
+	);
 
 	return useMemo(
 		() => ( {
@@ -108,11 +170,9 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
-			__experimentalFetchRemoteUrlData: ( url ) =>
-				fetchRemoteUrlData( url ),
+			__experimentalFetchRichUrlData: fetchRichUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
-			__experimentalShouldInsertAtTheTop: isTitleSelected,
 			outlineMode: hasTemplate,
 		} ),
 		[
@@ -121,7 +181,6 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			reusableBlocks,
 			canUseUnfilteredHTML,
 			undo,
-			isTitleSelected,
 			hasTemplate,
 		]
 	);

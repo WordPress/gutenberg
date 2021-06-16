@@ -90,11 +90,6 @@ class BottomSheet extends Component {
 			isMaxHeightSet: true,
 			isFullScreen: this.props.isFullScreen || false,
 		};
-
-		SafeArea.getSafeAreaInsetsForRootView().then(
-			this.onSafeAreaInsetsUpdate
-		);
-		Dimensions.addEventListener( 'change', this.onDimensionsChange );
 	}
 
 	keyboardShow( e ) {
@@ -177,6 +172,10 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
+		SafeArea.getSafeAreaInsetsForRootView().then(
+			this.onSafeAreaInsetsUpdate
+		);
+
 		if ( Platform.OS === 'android' ) {
 			this.androidModalClosedSubscription = subscribeAndroidModalClosed(
 				() => {
@@ -184,6 +183,8 @@ class BottomSheet extends Component {
 				}
 			);
 		}
+
+		Dimensions.addEventListener( 'change', this.onDimensionsChange );
 
 		// 'Will' keyboard events are not available on Android.
 		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener
@@ -204,6 +205,7 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		Dimensions.removeEventListener( 'change', this.onDimensionsChange );
 		this.keyboardShowListener.remove();
 		this.keyboardHideListener.remove();
 		if ( this.androidModalClosedSubscription ) {
@@ -299,7 +301,7 @@ class BottomSheet extends Component {
 	onScroll( { nativeEvent } ) {
 		if ( this.isCloseToTop( nativeEvent ) ) {
 			this.setState( { bounces: false } );
-		} else if ( this.isCloseToBottom( nativeEvent ) ) {
+		} else {
 			this.setState( { bounces: true } );
 		}
 	}

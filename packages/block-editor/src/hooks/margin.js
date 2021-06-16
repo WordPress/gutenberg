@@ -4,7 +4,10 @@
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+import {
+	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalBoxControl as BoxControl,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -12,13 +15,13 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 import useSetting from '../components/use-setting';
 import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
 import { cleanEmptyObject } from './utils';
-import { useCustomUnits } from '../components/unit-control';
 
 /**
  * Determines if there is margin support.
  *
- * @param  {string|Object} blockType Block name or Block Type object.
- * @return {boolean}                 Whether there is support.
+ * @param {string|Object} blockType Block name or Block Type object.
+ *
+ * @return {boolean} Whether there is support.
  */
 export function hasMarginSupport( blockType ) {
 	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
@@ -28,8 +31,9 @@ export function hasMarginSupport( blockType ) {
 /**
  * Custom hook that checks if margin settings have been disabled.
  *
- * @param  {string} name The name of the block.
- * @return {boolean}     Whether margin setting is disabled.
+ * @param {string} name The name of the block.
+ *
+ * @return {boolean} Whether margin setting is disabled.
  */
 export function useIsMarginDisabled( { name: blockName } = {} ) {
 	const isDisabled = ! useSetting( 'spacing.customMargin' );
@@ -39,8 +43,9 @@ export function useIsMarginDisabled( { name: blockName } = {} ) {
 /**
  * Inspector control panel containing the margin related configuration
  *
- * @param  {Object} props Block props.
- * @return {WPElement}    Margin edit element.
+ * @param {Object} props Block props.
+ *
+ * @return {WPElement} Margin edit element.
  */
 export function MarginEdit( props ) {
 	const {
@@ -49,10 +54,18 @@ export function MarginEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits();
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
+	} );
 	const sides = useCustomSides( blockName, 'margin' );
 
-	if ( ! hasMarginSupport( blockName ) ) {
+	if ( useIsMarginDisabled( props ) ) {
 		return null;
 	}
 

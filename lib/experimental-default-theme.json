@@ -180,6 +180,7 @@
 			"customFontWeight": true,
 			"customTextTransforms": true,
 			"customTextDecorations": true,
+			"customLetterSpacing": true,
 			"fontSizes": [
 				{
 					"name": "Small",
@@ -223,15 +224,6 @@
 			"core/button": {
 				"border": {
 					"customRadius": true
-				}
-			}
-		}
-	},
-	"styles": {
-		"elements": {
-			"link": {
-				"color": {
-					"text": "#00E"
 				}
 			}
 		}

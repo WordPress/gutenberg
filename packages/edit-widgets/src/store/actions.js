@@ -25,8 +25,8 @@ import { STORE_NAME as editWidgetsStoreName } from './constants';
  * Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
  * shouldn't be saved via the API.
  *
- * @param  {string} id Post ID.
- * @param  {Array}  blocks Blocks the post should consist of.
+ * @param {string} id     Post ID.
+ * @param {Array}  blocks Blocks the post should consist of.
  * @return {Object} The post object.
  */
 export const persistStubPost = function* ( id, blocks ) {
@@ -120,13 +120,20 @@ export function* saveWidgetArea( widgetAreaId ) {
 		return true;
 	} );
 
-	// Get all widgets that have been deleted
-	const deletedWidgets = areaWidgets.filter(
-		( { id } ) =>
-			! widgetsBlocks.some(
-				( widgetBlock ) => getWidgetIdFromBlock( widgetBlock ) === id
-			)
-	);
+	// Determine which widgets have been deleted. We can tell if a widget is
+	// deleted and not just moved to a different area by looking to see if
+	// getWidgetAreaForWidgetId() finds something.
+	const deletedWidgets = [];
+	for ( const widget of areaWidgets ) {
+		const widgetsNewArea = yield select(
+			editWidgetsStoreName,
+			'getWidgetAreaForWidgetId',
+			widget.id
+		);
+		if ( ! widgetsNewArea ) {
+			deletedWidgets.push( widget );
+		}
+	}
 
 	const batchMeta = [];
 	const batchTasks = [];
@@ -140,7 +147,9 @@ export function* saveWidgetArea( widgetAreaId ) {
 		// since order is important.
 		sidebarWidgetsIds.push( widgetId );
 
-		if ( widgetId ) {
+		// We need to check for the id in the widget object here, because a deleted
+		// and restored widget won't have this id.
+		if ( widget.id ) {
 			yield dispatch(
 				'core',
 				'editEntityRecord',
@@ -150,7 +159,8 @@ export function* saveWidgetArea( widgetAreaId ) {
 				{
 					...widget,
 					sidebar: widgetAreaId,
-				}
+				},
+				{ undoIgnore: true }
 			);
 
 			const hasEdits = yield select(
@@ -202,12 +212,9 @@ export function* saveWidgetArea( widgetAreaId ) {
 		const widget = preservedRecords[ i ];
 		const { block, position } = batchMeta[ i ];
 
-		yield dispatch(
-			'core/block-editor',
-			'updateBlockAttributes',
-			block.clientId,
-			{ __internalWidgetId: widget.id }
-		);
+		// Set __internalWidgetId on the block. This will be persisted to the
+		// store when we dispatch receiveEntityRecords( post ) below.
+		post.blocks[ position ].attributes.__internalWidgetId = widget.id;
 
 		const error = yield select(
 			'core',
@@ -243,7 +250,8 @@ export function* saveWidgetArea( widgetAreaId ) {
 		widgetAreaId,
 		{
 			widgets: sidebarWidgetsIds,
-		}
+		},
+		{ undoIgnore: true }
 	);
 
 	yield* trySaveWidgetArea( widgetAreaId );
@@ -288,9 +296,10 @@ function* trySaveWidgetArea( widgetAreaId ) {
 /**
  * Sets the clientId stored for a particular widgetId.
  *
- * @param  {number} clientId  Client id.
- * @param  {number} widgetId  Widget id.
- * @return {Object}           Action.
+ * @param {number} clientId Client id.
+ * @param {number} widgetId Widget id.
+ *
+ * @return {Object} Action.
  */
 export function setWidgetIdForClientId( clientId, widgetId ) {
 	return {
@@ -303,8 +312,9 @@ export function setWidgetIdForClientId( clientId, widgetId ) {
 /**
  * Sets the open state of all the widget areas.
  *
- * @param  {Object} widgetAreasOpenState The open states of all the widget areas.
- * @return {Object}                      Action.
+ * @param {Object} widgetAreasOpenState The open states of all the widget areas.
+ *
+ * @return {Object} Action.
  */
 export function setWidgetAreasOpenState( widgetAreasOpenState ) {
 	return {
@@ -316,9 +326,10 @@ export function setWidgetAreasOpenState( widgetAreasOpenState ) {
 /**
  * Sets the open state of the widget area.
  *
- * @param  {string}  clientId   The clientId of the widget area.
- * @param  {boolean} isOpen     Whether the widget area should be opened.
- * @return {Object}             Action.
+ * @param {string}  clientId The clientId of the widget area.
+ * @param {boolean} isOpen   Whether the widget area should be opened.
+ *
+ * @return {Object} Action.
  */
 export function setIsWidgetAreaOpen( clientId, isOpen ) {
 	return {
@@ -415,4 +426,22 @@ export function* moveBlockToWidgetArea( clientId, widgetAreaId ) {
 		destinationRootClientId,
 		destinationIndex
 	);
+}
+
+/**
+ * Returns an action object used to toggle a feature flag.
+ *
+ * This function is unstable, as it is mostly copied from the edit-post
+ * package. Editor features and preferences have a lot of scope for
+ * being generalized and refactored.
+ *
+ * @param {string} feature Feature name.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableToggleFeature( feature ) {
+	return {
+		type: 'TOGGLE_FEATURE',
+		feature,
+	};
 }
