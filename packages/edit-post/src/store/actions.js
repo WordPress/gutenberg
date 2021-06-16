@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, reduce } from 'lodash';
+import { castArray, reduce, fromPairs } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -493,19 +493,26 @@ export function* __unstableSwitchToTemplateMode( template ) {
 			template
 		);
 
+		const templates = yield controls.resolveSelect(
+			coreStore.name,
+			'getEntityRecords',
+			'postType',
+			'wp_template',
+			{ per_page: -1 }
+		);
+
+		const availableTemplates = fromPairs(
+			templates.map( ( { slug, title } ) => [ slug, title.rendered ] )
+		);
+
 		const settings = yield controls.select(
 			editorStore.name,
 			'getEditorSettings'
 		);
 
-		const newAvailableTemplates = {
-			...settings.availableTemplates,
-			[ savedTemplate.slug ]: savedTemplate.title.rendered,
-		};
-
 		yield controls.dispatch( editorStore, 'updateEditorSettings', {
 			...settings,
-			availableTemplates: newAvailableTemplates,
+			availableTemplates,
 		} );
 
 		const post = yield controls.select(
