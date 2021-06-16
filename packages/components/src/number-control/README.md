@@ -27,6 +27,14 @@ const Example = () => {
 
 ## Props
 
+### allowDecimal
+
+Allow committing custom decimal values, rounded to 5 decimal places.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ### dragDirection
 
 Determines the drag axis to increment/decrement the value.
