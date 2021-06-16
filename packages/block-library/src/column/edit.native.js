@@ -22,7 +22,6 @@ import {
 	FooterMessageControl,
 	UnitControl,
 	getValueAndUnit,
-	alignmentHelpers,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -36,8 +35,6 @@ import {
 	getWidthWithUnit,
 	isPercentageUnit,
 } from '../columns/utils';
-
-const { isWider } = alignmentHelpers;
 
 function ColumnEdit( {
 	attributes,
@@ -116,18 +113,21 @@ function ColumnEdit( {
 
 	const renderAppender = useCallback( () => {
 		const { width: columnWidth } = contentStyle[ clientId ];
-		const isScreenWidthEqual = columnWidth === screenWidth;
+		const isFullWidth = columnWidth === screenWidth;
 
 		if ( isSelected ) {
 			return (
 				<View
-					style={
-						( isWider( screenWidth, 'mobile' ) ||
-							isScreenWidthEqual ) &&
-						( hasChildren
-							? styles.columnAppender
-							: styles.wideColumnAppender )
-					}
+					style={ [
+						styles.columnAppender,
+						isFullWidth && styles.fullwidthColumnAppender,
+						isFullWidth &&
+							hasChildren &&
+							styles.fullwidthHasInnerColumnAppender,
+						! isFullWidth &&
+							hasChildren &&
+							styles.hasInnerColumnAppender,
+					] }
 				>
 					<InnerBlocks.ButtonBlockAppender />
 				</View>

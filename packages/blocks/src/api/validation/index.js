@@ -556,8 +556,8 @@ function getHTMLTokens( html, logger = createLogger() ) {
 /**
  * Returns true if the next HTML token closes the current token.
  *
- * @param {Object} currentToken Current token to compare with.
- * @param {Object|undefined} nextToken Next token to compare against.
+ * @param {Object}           currentToken Current token to compare with.
+ * @param {Object|undefined} nextToken    Next token to compare against.
  *
  * @return {boolean} true if `nextToken` closes `currentToken`, false otherwise
  */
@@ -677,7 +677,7 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  * @param {string|Object} blockTypeOrName      Block type.
  * @param {Object}        attributes           Parsed block attributes.
  * @param {string}        originalBlockContent Original block content.
- * @param {Object}        logger           	   Validation logger object.
+ * @param {Object}        logger               Validation logger object.
  *
  * @return {Object} Whether block is valid and contains validation messages.
  */

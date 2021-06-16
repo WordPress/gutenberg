@@ -44,9 +44,9 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
 
 /**
  * @typedef OwnProps
- * @property {string} [className] Classname for the disabled element.
- * @property {import('react').ReactNode} children Children to disable.
- * @property {boolean} [isDisabled=true] Whether to disable the children.
+ * @property {string}                    [className]       Classname for the disabled element.
+ * @property {import('react').ReactNode} children          Children to disable.
+ * @property {boolean}                   [isDisabled=true] Whether to disable the children.
  */
 
 /**

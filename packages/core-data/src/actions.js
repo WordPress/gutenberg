@@ -57,7 +57,7 @@ export function receiveCurrentUser( currentUser ) {
 /**
  * Returns an action object used in adding new entities.
  *
- * @param {Array} entities  Entities received.
+ * @param {Array} entities Entities received.
  *
  * @return {Object} Action object.
  */
@@ -141,8 +141,8 @@ export function receiveThemeSupports( themeSupports ) {
  * Returns an action object used in signalling that the preview data for
  * a given URl has been received.
  *
- * @param {string}  url     URL to preview the embed for.
- * @param {*}       preview Preview data.
+ * @param {string} url     URL to preview the embed for.
+ * @param {*}      preview Preview data.
  *
  * @return {Object} Action object.
  */
@@ -237,11 +237,11 @@ export function* deleteEntityRecord(
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string} kind     Kind of the edited entity record.
- * @param {string} name     Name of the edited entity record.
- * @param {number} recordId Record ID of the edited entity record.
- * @param {Object} edits    The edits.
- * @param {Object} options  Options for the edit.
+ * @param {string}  kind               Kind of the edited entity record.
+ * @param {string}  name               Name of the edited entity record.
+ * @param {number}  recordId           Record ID of the edited entity record.
+ * @param {Object}  edits              The edits.
+ * @param {Object}  options            Options for the edit.
  * @param {boolean} options.undoIgnore Whether to ignore the edit in undo history or not.
  *
  * @return {Object} Action object.
@@ -694,11 +694,11 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 /**
  * Action triggered to save only specified properties for the entity.
  *
- * @param {string} kind     Kind of the entity.
- * @param {string} name     Name of the entity.
- * @param {Object} recordId ID of the record.
- * @param {Array} itemsToSave List of entity properties to save.
- * @param {Object} options  Saving options.
+ * @param {string} kind        Kind of the entity.
+ * @param {string} name        Name of the entity.
+ * @param {Object} recordId    ID of the record.
+ * @param {Array}  itemsToSave List of entity properties to save.
+ * @param {Object} options     Saving options.
  */
 export function* __experimentalSaveSpecifiedEntityEdits(
 	kind,

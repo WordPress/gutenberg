@@ -220,7 +220,7 @@ class BlockListBlock extends Component {
 			attributes,
 			order + 1
 		);
-		const { isFullWidth, isWider, isContainerRelated } = alignmentHelpers;
+		const { isFullWidth, isContainerRelated } = alignmentHelpers;
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
@@ -288,10 +288,6 @@ class BlockListBlock extends Component {
 							style={ [
 								styles.neutralToolbar,
 								isSelected && styles.neutralToolbarSelected,
-								! isFullWidthToolbar &&
-									isContainerRelated( name ) &&
-									isWider( screenWidth, 'mobile' ) &&
-									styles.containerToolbar,
 							] }
 							ref={ this.anchorNodeRef }
 						>

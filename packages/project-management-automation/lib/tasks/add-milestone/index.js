@@ -4,10 +4,9 @@
 const debug = require( '../../debug' );
 const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 
-/** @typedef {import('@octokit/rest').HookError} HookError */
-/** @typedef {import('@actions/github').GitHub} GitHub */
+/** @typedef {import('@octokit/request-error').RequestError} RequestError */
+/** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
-/** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
 
 /**
  * Number of expected days elapsed between releases.
@@ -18,20 +17,18 @@ const DAYS_PER_RELEASE = 14;
 
 /**
  * Returns true if the given error object represents a duplicate entry error, or
- * false otherwise. The error is expected to be (though not verified explicitly
- * as) an instance of Octokit's RequestError (`@octokit/request-error`).
+ * false otherwise.
  *
- * @see https://github.com/octokit/rest.js/issues/684
- * @see https://developer.github.com/v3/#client-errors
- * @see https://github.com/octokit/request.js/blob/2a1d768/src/fetch-wrapper.ts#L79-L80
- *
- * @param {HookError} error Error to test.
+ * @param {RequestError} requestError Error to test.
  *
  * @return {boolean} Whether error is a duplicate validation request error.
  */
-const isDuplicateValidationError = ( error ) =>
-	Array.isArray( error.errors ) &&
-	error.errors.some( ( { code } ) => code === 'already_exists' );
+const isDuplicateValidationError = ( requestError ) => {
+	// The included version of RequestError provides no way to access the
+	// full 'errors' array that the github REST API returns. Hopefully they
+	// resolve this soon!
+	return requestError.message.includes( 'already_exists' );
+};
 
 /**
  * Returns a promise resolving to a milestone by a given title, if exists.
@@ -41,26 +38,19 @@ const isDuplicateValidationError = ( error ) =>
  * @param {string} repo    Repository name.
  * @param {string} title   Milestone title.
  *
- * @return {Promise<OktokitIssuesListMilestonesForRepoResponseItem|void>} Promise resolving to milestone, if exists.
+ * @return {Promise<any|void>} Promise resolving to milestone, if exists.
  */
 async function getMilestoneByTitle( octokit, owner, repo, title ) {
-	/** @type {Partial<import('@octokit/rest').IssuesListMilestonesForRepoParams>} */
-	const params = {
-		state: 'all',
-		sort: 'due_on',
-		direction: 'desc',
-	};
-
-	const options = octokit.issues.listMilestonesForRepo.endpoint.merge( {
-		owner,
-		repo,
-		...params,
-	} );
-
-	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListMilestonesForRepoResponse>>}
-	 */
-	const responses = octokit.paginate.iterator( options );
+	const responses = octokit.paginate.iterator(
+		octokit.rest.issues.listMilestones,
+		{
+			owner,
+			repo,
+			state: 'all',
+			sort: 'due_on',
+			direction: 'desc',
+		}
+	);
 
 	for await ( const response of responses ) {
 		const milestones = response.data;
@@ -96,7 +86,11 @@ async function addMilestone( payload, octokit ) {
 
 	const {
 		data: { milestone: pullMilestone },
-	} = await octokit.issues.get( { owner, repo, issue_number: prNumber } );
+	} = await octokit.rest.issues.get( {
+		owner,
+		repo,
+		issue_number: prNumber,
+	} );
 
 	if ( pullMilestone ) {
 		debug(
@@ -108,8 +102,11 @@ async function addMilestone( payload, octokit ) {
 	debug( 'add-milestone: Fetching `package.json` contents' );
 
 	const {
+		// The types for the `getContent` response are incorrect.
+		// see https://github.com/octokit/rest.js/issues/32
+		// @ts-ignore
 		data: { content, encoding },
-	} = await octokit.repos.getContents( {
+	} = await octokit.rest.repos.getContent( {
 		owner,
 		repo,
 		path: 'package.json',
@@ -153,7 +150,7 @@ async function addMilestone( payload, octokit ) {
 	);
 
 	try {
-		await octokit.issues.createMilestone( {
+		await octokit.rest.issues.createMilestone( {
 			owner,
 			repo,
 			title: `Gutenberg ${ major }.${ minor }`,
@@ -190,7 +187,7 @@ async function addMilestone( payload, octokit ) {
 		`add-milestone: Adding issue #${ prNumber } to milestone #${ milestone.number }`
 	);
 
-	await octokit.issues.update( {
+	await octokit.rest.issues.update( {
 		owner,
 		repo,
 		issue_number: prNumber,

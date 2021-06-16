@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
-import { useSurface } from '../surface';
+import { useSurface } from '../../surface';
 import * as styles from './styles';
 
 /**

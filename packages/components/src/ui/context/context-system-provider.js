@@ -27,7 +27,7 @@ export const useComponentsContext = () => useContext( ComponentsContext );
 /**
  * Consolidates incoming ContextSystem values with a (potential) parent ContextSystem value.
  *
- * @param {Object} props
+ * @param {Object}              props
  * @param {Record<string, any>} props.value
  * @return {Record<string, any>} The consolidated value.
  */
@@ -72,9 +72,9 @@ function useContextSystemBridge( { value } ) {
  * ```
  *
  * @template {Record<string, any>} T
- * @param {Object} options
+ * @param {Object}                    options
  * @param {import('react').ReactNode} options.children Children to render.
- * @param {T} options.value Props to render into connected components.
+ * @param {T}                         options.value    Props to render into connected components.
  * @return {JSX.Element} A Provider wrapped component.
  */
 const BaseContextSystemProvider = ( { children, value } ) => {
