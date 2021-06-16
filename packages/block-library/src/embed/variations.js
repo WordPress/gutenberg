@@ -343,7 +343,7 @@ const variations = [
 		title: 'LottieFiles',
 		icon: embedLottieFilesIcon,
 		keywords: [ __( 'lottie' ) ],
-		description: __( 'Embed a Lottie file.' ),
+		description: __( 'Embed a Lottie animation.' ),
 		patterns: [ /^https?:\/\/lottiefiles\.com\/.+/i ],
 		attributes: { providerNameSlug: 'lottie-file' },
 	},
