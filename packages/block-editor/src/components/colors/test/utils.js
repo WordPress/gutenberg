@@ -114,5 +114,23 @@ describe( 'color utils', () => {
 				getColorClassName( 'background', 'Light   Purple veryDark' )
 			).toBe( 'has-Light-Purple-veryDark-background' );
 		} );
+
+		it( 'should throw a warning if the color slug is not a string', () => {
+			expect( getColorClassName( 'background', 123456 ) ).toBe(
+				'has-123456-background'
+			);
+			expect( console ).toHaveWarnedWith(
+				'The color slug should be a string.'
+			);
+		} );
+
+		it( 'should throw a warning if the color slug contains special characters', () => {
+			expect( getColorClassName( 'background', '#abcdef' ) ).toBe(
+				'has-abcdef-background'
+			);
+			expect( console ).toHaveWarnedWith(
+				'The color slug should not have any special character.'
+			);
+		} );
 	} );
 } );
