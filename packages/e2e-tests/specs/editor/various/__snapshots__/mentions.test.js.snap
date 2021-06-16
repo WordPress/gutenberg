@@ -5,3 +5,15 @@ exports[`autocomplete mentions should insert mention 1`] = `
 <p>I am @admin.</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`autocomplete mentions should insert mention between two other words 1`] = `
+"<!-- wp:paragraph -->
+<p>Stuck in the middle with @testuser you.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`autocomplete mentions should insert two subsequent mentions 1`] = `
+"<!-- wp:paragraph -->
+<p>I am @testuser @admin.</p>
+<!-- /wp:paragraph -->"
+`;

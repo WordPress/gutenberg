@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added `createUser` and `deleteUser` - Create and delete a user account, respectively.
+
 ## 5.3.0 (2021-05-31)
 
 ### New Features
