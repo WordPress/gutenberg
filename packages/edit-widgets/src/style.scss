@@ -58,14 +58,6 @@ body.widgets-php {
 	}
 }
 
-// Light background specific styles
-:not(.is-dark-theme) .block-widgets-container {
-	.components-panel,
-	.components-panel__body {
-		border-color: $gray-900;
-	}
-}
-
 .blocks-widgets-container .editor-style-wrapper {
 	max-width: $widget-area-width;
 	margin: auto;
