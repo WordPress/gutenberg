@@ -56,7 +56,7 @@ const REST_PAGES_ROUTES = [
  * routes (extressed as substrings).
  *
  * @param {string} reqUrl the full URL to be tested for matches.
- * @param {Array} routes array of strings to match against the URL.
+ * @param {Array}  routes array of strings to match against the URL.
  */
 function matchUrlToRoute( reqUrl, routes ) {
 	return routes.some( ( route ) => reqUrl.includes( route ) );
@@ -107,7 +107,7 @@ async function mockSearchResponse( items ) {
  * Note: this needs to be within a single call to
  * `setUpResponseMocking` as you can only setup response mocking once per test run.
  *
- * @param {Array} menus menus to provide as mocked responses to menus entity API requests.
+ * @param {Array} menus     menus to provide as mocked responses to menus entity API requests.
  * @param {Array} menuItems menu items to provide as mocked responses to menu-items entity API requests.
  */
 async function mockAllMenusResponses(
@@ -174,10 +174,10 @@ async function mockCreatePageResponse( title, slug ) {
 /**
  * Interacts with the LinkControl to perform a search and select a returned suggestion
  *
- * @param {Object} link link object to be tested
- * @param {string} link.url What will be typed in the search input
+ * @param {Object} link       link object to be tested
+ * @param {string} link.url   What will be typed in the search input
  * @param {string} link.label What the resulting label will be in the creating Link Block after the block is created.
- * @param {string} link.type What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
+ * @param {string} link.type  What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
  */
 async function updateActiveNavigationLink( { url, label, type } ) {
 	const typeClasses = {

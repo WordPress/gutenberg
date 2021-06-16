@@ -127,7 +127,7 @@ function gutenberg_override_translation_file( $file, $handle ) {
 	}
 
 	// Ignore scripts that are not found in the expected `build/` location.
-	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.js';
+	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.min.js';
 	if ( ! file_exists( $script_path ) ) {
 		return $file;
 	}
@@ -236,14 +236,15 @@ function gutenberg_register_packages_scripts( $scripts ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
+	$suffix          = '.min.js';
 
-	foreach ( glob( gutenberg_dir_path() . 'build/*/index.js' ) as $path ) {
+	foreach ( glob( gutenberg_dir_path() . "build/*/index$suffix" ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
-		// For example, `…/build/a11y/index.js` becomes `wp-a11y`.
+		// For example, `…/build/a11y/index.min.js` becomes `wp-a11y`.
 		$handle = 'wp-' . basename( dirname( $path ) );
 
-		// Replace `.js` extension with `.asset.php` to find the generated dependencies file.
-		$asset_file   = substr( $path, 0, -3 ) . '.asset.php';
+		// Replace suffix and extension with `.asset.php` to find the generated dependencies file.
+		$asset_file   = substr( $path, 0, -( strlen( $suffix ) ) ) . '.asset.php';
 		$asset        = file_exists( $asset_file )
 			? require( $asset_file )
 			: null;
@@ -330,7 +331,7 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
 
-	$block_library_filename = gutenberg_should_load_separate_block_assets() ? 'common' : 'style';
+	$block_library_filename = wp_should_load_separate_core_block_assets() ? 'common' : 'style';
 	gutenberg_override_style(
 		$styles,
 		'wp-block-library',
@@ -447,7 +448,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks', 'wp-reusable-blocks' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks', 'wp-reusable-blocks', 'wp-widgets' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );
@@ -465,7 +466,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-customize-widgets',
 		gutenberg_url( 'build/customize-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks', 'wp-widgets' ),
 		$version
 	);
 	$styles->add_data( 'wp-customize-widgets', 'rtl', 'replace' );
@@ -478,6 +479,14 @@ function gutenberg_register_packages_styles( $styles ) {
 		$version
 	);
 	$styles->add_data( 'wp-reusable-block', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-widgets',
+		gutenberg_url( 'build/widgets/style.css' ),
+		array( 'wp-components' )
+	);
+	$styles->add_data( 'wp-widgets', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
 

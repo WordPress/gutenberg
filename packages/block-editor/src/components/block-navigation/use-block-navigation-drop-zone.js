@@ -41,11 +41,11 @@ import { store as blockEditorStore } from '../../store';
  * An object containing details of a drop target.
  *
  * @typedef {Object} WPBlockNavigationDropZoneTarget
- * @property {string}                   blockIndex   The insertion index.
- * @property {string}                   rootClientId The root client id for the block.
- * @property {string|undefined}         clientId     The client id for the block.
- * @property {'top'|'bottom'|'inside'}  dropPosition The position relative to the block that the user is dropping to.
- *                                                   'inside' refers to nesting as an inner block.
+ * @property {string}                  blockIndex   The insertion index.
+ * @property {string}                  rootClientId The root client id for the block.
+ * @property {string|undefined}        clientId     The client id for the block.
+ * @property {'top'|'bottom'|'inside'} dropPosition The position relative to the block that the user is dropping to.
+ *                                                  'inside' refers to nesting as an inner block.
  */
 
 /**
@@ -88,7 +88,7 @@ const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
  * Given blocks data and the cursor position, compute the drop target.
  *
  * @param {WPBlockNavigationDropZoneBlocks} blocksData Data about the blocks in block navigation.
- * @param {WPPoint} position The point representing the cursor position when dragging.
+ * @param {WPPoint}                         position   The point representing the cursor position when dragging.
  *
  * @return {WPBlockNavigationDropZoneTarget} An object containing data about the drop target.
  */

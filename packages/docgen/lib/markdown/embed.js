@@ -15,8 +15,8 @@ const getHeadingIndex = ( ast, index ) => {
 /**
  * Inserts new contents within the token boundaries.
  *
- * @param {string} token String to embed in the start/end tokens.
- * @param {Object} targetAst The remark AST of the file where the new contents are to be embedded.
+ * @param {string} token         String to embed in the start/end tokens.
+ * @param {Object} targetAst     The remark AST of the file where the new contents are to be embedded.
  * @param {Object} newContentAst The new contents to be embedded in remark AST format.
  * @return {boolean} Whether the contents were embedded or not.
  */

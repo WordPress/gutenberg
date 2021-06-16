@@ -19,7 +19,7 @@ export const LETTER_SPACING_SUPPORT_KEY = '__experimentalLetterSpacing';
 /**
  * Inspector control panel containing the letter-spacing options.
  *
- * @param  {Object} props Block properties.
+ * @param {Object} props Block properties.
  * @return {WPElement}    Letter-spacing edit element.
  */
 export function LetterSpacingEdit( props ) {
@@ -57,7 +57,7 @@ export function LetterSpacingEdit( props ) {
 /**
  * Checks if letter-spacing settings have been disabled.
  *
- * @param  {string} name Name of the block.
+ * @param {string} name Name of the block.
  * @return {boolean}     Whether or not the setting is disabled.
  */
 export function useIsLetterSpacingDisabled( { name: blockName } = {} ) {

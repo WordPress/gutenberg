@@ -103,8 +103,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
-			__experimentalFetchRemoteUrlData: ( url ) =>
-				fetchRemoteUrlData( url ),
+			__experimentalFetchRemoteUrlData: fetchRemoteUrlData,
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			outlineMode: hasTemplate,

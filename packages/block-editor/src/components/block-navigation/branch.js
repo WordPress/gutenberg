@@ -14,6 +14,8 @@ import { Fragment } from '@wordpress/element';
 import BlockNavigationBlock from './block';
 import BlockNavigationAppender from './appender';
 import { isClientIdSelected } from './utils';
+import { useBlockNavigationContext } from './context';
+
 export default function BlockNavigationBranch( props ) {
 	const {
 		blocks,
@@ -41,6 +43,8 @@ export default function BlockNavigationBranch( props ) {
 	const blockCount = filteredBlocks.length;
 	const rowCount = hasAppender ? blockCount + 1 : blockCount;
 	const appenderPosition = rowCount;
+
+	const { expandedState, expand, collapse } = useBlockNavigationContext();
 
 	return (
 		<>
@@ -71,11 +75,30 @@ export default function BlockNavigationBranch( props ) {
 				const isLastOfSelectedBranch =
 					isLastOfBranch && ! hasNestedBranch && isLastBlock;
 
+				const isExpanded = hasNestedBranch
+					? expandedState[ clientId ] ?? true
+					: undefined;
+
+				const selectBlockWithClientId = ( event ) => {
+					event.stopPropagation();
+					selectBlock( clientId );
+				};
+
+				const toggleExpanded = ( event ) => {
+					event.stopPropagation();
+					if ( isExpanded === true ) {
+						collapse( clientId );
+					} else if ( isExpanded === false ) {
+						expand( clientId );
+					}
+				};
+
 				return (
 					<Fragment key={ clientId }>
 						<BlockNavigationBlock
 							block={ block }
-							onClick={ selectBlock }
+							onClick={ selectBlockWithClientId }
+							onToggleExpanded={ toggleExpanded }
 							isSelected={ isSelected }
 							isBranchSelected={ isSelectedBranch }
 							isLastOfSelectedBranch={ isLastOfSelectedBranch }
@@ -86,8 +109,9 @@ export default function BlockNavigationBranch( props ) {
 							showBlockMovers={ showBlockMovers }
 							terminatedLevels={ terminatedLevels }
 							path={ updatedPath }
+							isExpanded={ isExpanded }
 						/>
-						{ hasNestedBranch && (
+						{ hasNestedBranch && isExpanded && (
 							<BlockNavigationBranch
 								blocks={ innerBlocks }
 								selectedBlockClientIds={

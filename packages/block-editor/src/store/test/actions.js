@@ -147,14 +147,58 @@ describe( 'actions', () => {
 		} );
 	} );
 	describe( 'multiSelect', () => {
-		it( 'should return MULTI_SELECT action', () => {
+		it( 'should return MULTI_SELECT action if blocks have the same root client id', () => {
 			const start = 'start';
 			const end = 'end';
-			const fulfillment = multiSelect( start, end );
-			expect( fulfillment.next().value ).toEqual( {
+			const multiSelectGenerator = multiSelect( start, end );
+
+			expect( multiSelectGenerator.next().value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'getBlockRootClientId',
+					start
+				)
+			);
+
+			expect( multiSelectGenerator.next( 'parent' ).value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'getBlockRootClientId',
+					end
+				)
+			);
+
+			expect( multiSelectGenerator.next( 'parent' ).value ).toEqual( {
 				type: 'MULTI_SELECT',
 				start,
 				end,
+			} );
+		} );
+
+		it( 'should return undefined if blocks have different root client ids', () => {
+			const start = 'start';
+			const end = 'end';
+			const multiSelectGenerator = multiSelect( start, end );
+
+			expect( multiSelectGenerator.next().value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'getBlockRootClientId',
+					start
+				)
+			);
+
+			expect( multiSelectGenerator.next( 'parent' ).value ).toEqual(
+				controls.select(
+					blockEditorStoreName,
+					'getBlockRootClientId',
+					end
+				)
+			);
+
+			expect( multiSelectGenerator.next( 'another parent' ) ).toEqual( {
+				done: true,
+				value: undefined,
 			} );
 		} );
 	} );

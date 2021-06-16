@@ -149,7 +149,7 @@ export const DEFAULT_UNIT = CSS_UNITS[ 0 ];
  * the value and unit, example: '10px'
  *
  * @param {number|string} value Value
- * @param {string} unit Unit value
+ * @param {string}        unit  Unit value
  * @param {Array<Object>} units Units to derive from.
  * @return {Array<number, string>} The extracted number and unit.
  */
@@ -172,8 +172,8 @@ export function hasUnits( units ) {
 /**
  * Parses a number and unit from a value.
  *
- * @param {string} initialValue Value to parse
- * @param {Array<Object>} units Units to derive from.
+ * @param {string}        initialValue Value to parse
+ * @param {Array<Object>} units        Units to derive from.
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function parseUnit( initialValue, units = ALL_CSS_UNITS ) {
@@ -201,10 +201,10 @@ export function parseUnit( initialValue, units = ALL_CSS_UNITS ) {
  * Parses a number and unit from a value. Validates parsed value, using fallback
  * value if invalid.
  *
- * @param {number|string} next The next value.
- * @param {Array<Object>} units Units to derive from.
+ * @param {number|string} next          The next value.
+ * @param {Array<Object>} units         Units to derive from.
  * @param {number|string} fallbackValue The fallback value.
- * @param {string} fallbackUnit The fallback value.
+ * @param {string}        fallbackUnit  The fallback value.
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function getValidParsedUnit( next, units, fallbackValue, fallbackUnit ) {
@@ -245,7 +245,7 @@ export function parseA11yLabelForUnit( unit ) {
  * Filters available units based on values defined by settings.
  *
  * @param {Array} settings Collection of preferred units.
- * @param {Array} units Collection of available units.
+ * @param {Array} units    Collection of available units.
  *
  * @return {Array} Filtered units based on settings.
  */
