@@ -90,7 +90,6 @@ function handle_legacy_widget_preview_iframe() {
 		<style>
 			/* Reset theme styles */
 			html, body, #page, #content {
-				background: #FFF !important;
 				padding: 0 !important;
 				margin: 0 !important;
 			}
