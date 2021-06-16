@@ -109,7 +109,7 @@ describe( 'color utils', () => {
 			).toBeUndefined();
 		} );
 
-		it( 'should return a class name with the color slug without spaces', () => {
+		it( 'should return a class name with the color slug in kebab case', () => {
 			expect(
 				getColorClassName( 'background', 'Light   Purple veryDark' )
 			).toBe( 'has-light-purple-very-dark-background' );
