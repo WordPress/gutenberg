@@ -14,6 +14,7 @@ import {
 	ToolbarButton,
 	TextControl,
 	PanelBody,
+	Disabled,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -88,7 +89,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	// states for lock
 	const [ isLocked, setIsLocked ] = useState( true );
 
-	const lockContainerClass = isLocked && 'is-locked';
+	let innerBlocks = <div { ...innerBlocksProps } />;
+
+	if ( isLocked ) {
+		innerBlocks = <Disabled> { innerBlocks } </Disabled>;
+	}
 
 	if ( hasAlreadyRendered ) {
 		return (
@@ -158,14 +163,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 					</PanelBody>
 				</InspectorControls>
 				<div className="block-library-block__reusable-block-container">
-					{
-						<>
-							<div
-								className={ `reusable-block-lock-container ${ lockContainerClass }` }
-							></div>
-							<div { ...innerBlocksProps } />
-						</>
-					}
+					{ innerBlocks }
 				</div>
 			</div>
 		</RecursionProvider>
