@@ -198,80 +198,39 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Metadata for style properties.
 	 *
-	 * Each property declares:
-	 *
-	 * - 'value': path to the value in theme.json and block attributes.
+	 * Each element is a direct mapping from the CSS property name to the
+	 * path to the value in theme.json & block attributes.
 	 */
 	const PROPERTIES_METADATA = array(
-		'background'       => array(
-			'value' => array( 'color', 'gradient' ),
-		),
-		'background-color' => array(
-			'value' => array( 'color', 'background' ),
-		),
-		'border-radius'    => array(
-			'value'      => array( 'border', 'radius' ),
-			'properties' => array(
-				'border-top-left-radius'     => 'topLeft',
-				'border-top-right-radius'    => 'topRight',
-				'border-bottom-left-radius'  => 'bottomLeft',
-				'border-bottom-right-radius' => 'bottomRight',
-			),
-		),
-		'border-color'     => array(
-			'value' => array( 'border', 'color' ),
-		),
-		'border-width'     => array(
-			'value' => array( 'border', 'width' ),
-		),
-		'border-style'     => array(
-			'value' => array( 'border', 'style' ),
-		),
-		'color'            => array(
-			'value' => array( 'color', 'text' ),
-		),
-		'font-family'      => array(
-			'value' => array( 'typography', 'fontFamily' ),
-		),
-		'font-size'        => array(
-			'value' => array( 'typography', 'fontSize' ),
-		),
-		'font-style'       => array(
-			'value' => array( 'typography', 'fontStyle' ),
-		),
-		'font-weight'      => array(
-			'value' => array( 'typography', 'fontWeight' ),
-		),
-		'letter-spacing'   => array(
-			'value' => array( 'typography', 'letterSpacing' ),
-		),
-		'line-height'      => array(
-			'value' => array( 'typography', 'lineHeight' ),
-		),
-		'margin'           => array(
-			'value'      => array( 'spacing', 'margin' ),
-			'properties' => array(
-				'margin-top'    => 'top',
-				'margin-right'  => 'right',
-				'margin-bottom' => 'bottom',
-				'margin-left'   => 'left',
-			),
-		),
-		'padding'          => array(
-			'value'      => array( 'spacing', 'padding' ),
-			'properties' => array(
-				'padding-top'    => 'top',
-				'padding-right'  => 'right',
-				'padding-bottom' => 'bottom',
-				'padding-left'   => 'left',
-			),
-		),
-		'text-decoration'  => array(
-			'value' => array( 'typography', 'textDecoration' ),
-		),
-		'text-transform'   => array(
-			'value' => array( 'typography', 'textTransform' ),
-		),
+		'background'                 => array( 'color', 'gradient' ),
+		'background-color'           => array( 'color', 'background' ),
+		'border-radius'              => array( 'border', 'radius' ),
+		'border-top-left-radius'     => array( 'border', 'radius', 'topLeft' ),
+		'border-top-right-radius'    => array( 'border', 'radius', 'topRight' ),
+		'border-bottom-left-radius'  => array( 'border', 'radius', 'bottomLeft' ),
+		'border-bottom-right-radius' => array( 'border', 'radius', 'bottomRight' ),
+		'border-color'               => array( 'border', 'color' ),
+		'border-width'               => array( 'border', 'width' ),
+		'border-style'               => array( 'border', 'style' ),
+		'color'                      => array( 'color', 'text' ),
+		'font-family'                => array( 'typography', 'fontFamily' ),
+		'font-size'                  => array( 'typography', 'fontSize' ),
+		'font-style'                 => array( 'typography', 'fontStyle' ),
+		'font-weight'                => array( 'typography', 'fontWeight' ),
+		'letter-spacing'             => array( 'typography', 'letterSpacing' ),
+		'line-height'                => array( 'typography', 'lineHeight' ),
+		'margin'                     => array( 'spacing', 'margin' ),
+		'margin-top'                 => array( 'spacing', 'margin', 'top' ),
+		'margin-right'               => array( 'spacing', 'margin', 'right' ),
+		'margin-bottom'              => array( 'spacing', 'margin', 'bottom' ),
+		'margin-left'                => array( 'spacing', 'margin', 'left' ),
+		'padding'                    => array( 'spacing', 'padding' ),
+		'padding-top'                => array( 'spacing', 'padding', 'top' ),
+		'padding-right'              => array( 'spacing', 'padding', 'right' ),
+		'padding-bottom'             => array( 'spacing', 'padding', 'bottom' ),
+		'padding-left'               => array( 'spacing', 'padding', 'left' ),
+		'text-decoration'            => array( 'typography', 'textDecoration' ),
+		'text-transform'             => array( 'typography', 'textTransform' ),
 	);
 
 	const ELEMENTS = array(
@@ -378,29 +337,6 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $output;
-	}
-
-	/**
-	 * Given a CSS property name, returns the property it belongs
-	 * within the self::PROPERTIES_METADATA map.
-	 *
-	 * @param string $css_name The CSS property name.
-	 *
-	 * @return string The property name.
-	 */
-	private static function to_property( $css_name ) {
-		static $to_property;
-		if ( null === $to_property ) {
-			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				$to_property[ $key ] = $key;
-				if ( self::has_properties( $metadata ) ) {
-					foreach ( $metadata['properties'] as $name => $property ) {
-						$to_property[ $name ] = $key;
-					}
-				}
-			}
-		}
-		return $to_property[ $css_name ];
 	}
 
 	/**
@@ -618,34 +554,16 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		$properties = array();
-		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
-			$properties[] = array(
-				'name'  => $name,
-				'value' => $metadata['value'],
-			);
+		foreach ( self::PROPERTIES_METADATA as $css_property => $value_path ) {
+			$value = self::get_property_value( $styles, $value_path );
 
-			// Some properties can be shorthand properties, meaning that
-			// they contain multiple values instead of a single one.
-			// An example of this is the padding property.
-			if ( self::has_properties( $metadata ) ) {
-				foreach ( $metadata['properties'] as $key => $property ) {
-					$properties[] = array(
-						'name'  => $key,
-						'value' => array_merge( $metadata['value'], array( $property ) ),
-					);
-				}
-			}
-		}
-
-		foreach ( $properties as $prop ) {
-			$value = self::get_property_value( $styles, $prop['value'] );
+			// Skip if empty or value represents array of longhand values.
 			if ( empty( $value ) || is_array( $value ) ) {
 				continue;
 			}
 
 			$declarations[] = array(
-				'name'  => $prop['name'],
+				'name'  => $css_property,
 				'value' => $value,
 			);
 		}
@@ -1258,24 +1176,13 @@ class WP_Theme_JSON_Gutenberg {
 
 		foreach ( $declarations as $declaration ) {
 			if ( self::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
-				$property = self::to_property( $declaration['name'] );
-				$path     = self::PROPERTIES_METADATA[ $property ]['value'];
+				$path = self::PROPERTIES_METADATA[ $declaration['name'] ];
 
-				// Add shorthand declaration e.g. `margin`.
+				// Check the value isn't an array before adding so as to not
+				// double up shorthand and longhand styles.
 				$value = _wp_array_get( $input, $path, array() );
 				if ( ! is_array( $value ) ) {
 					gutenberg_experimental_set( $output, $path, $value );
-				}
-
-				// Handle longhand css properties e.g. `margin-left`, `border-top-left-radius` etc.
-				if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
-					$properties = self::PROPERTIES_METADATA[ $property ]['properties'];
-					$sub_path   = _wp_array_get( $properties, array( $declaration['name'] ), null );
-
-					if ( $sub_path ) {
-						$path[] = $sub_path;
-						gutenberg_experimental_set( $output, $path, _wp_array_get( $input, $path, array() ) );
-					}
 				}
 			}
 		}
