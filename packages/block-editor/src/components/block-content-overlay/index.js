@@ -14,7 +14,12 @@ import { store as blockEditorStore } from '../../store';
  */
 import classnames from 'classnames';
 
-export default function BlockContentOverlay( { clientId, children } ) {
+export default function BlockContentOverlay( {
+	clientId,
+	tagName: TagName = 'div',
+	wrapperProps,
+	className,
+} ) {
 	const baseClassName = 'block-editor-block-content-overlay';
 	const [ isOverlayActive, setIsOverlayActive ] = useState( true );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -42,11 +47,16 @@ export default function BlockContentOverlay( { clientId, children } ) {
 		[ clientId ]
 	);
 
-	const classes = classnames( baseClassName, {
-		'overlay-active': isOverlayActive,
-		'parent-highlighted': isParentHighlighted,
-		'is-dragging-blocks': isDraggingBlocks,
-	} );
+	const classes = classnames(
+		baseClassName,
+		wrapperProps?.className,
+		className,
+		{
+			'overlay-active': isOverlayActive,
+			'parent-highlighted': isParentHighlighted,
+			'is-dragging-blocks': isDraggingBlocks,
+		}
+	);
 
 	useEffect( () => {
 		// Reenable when blocks are not in use.
@@ -72,7 +82,8 @@ export default function BlockContentOverlay( { clientId, children } ) {
 	// the block can be selected without interacting with its contents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div
+		<TagName
+			{ ...wrapperProps }
 			className={ classes }
 			onMouseEnter={ () => setIsHovered( true ) }
 			onMouseLeave={ () => setIsHovered( false ) }
@@ -83,10 +94,8 @@ export default function BlockContentOverlay( { clientId, children } ) {
 					onMouseUp={ () => setIsOverlayActive( false ) }
 				/>
 			) }
-			<div className={ `${ baseClassName }__content-wrapper` }>
-				{ children }
-			</div>
-		</div>
+			{ wrapperProps?.children }
+		</TagName>
 	);
 }
 /* eslint-enable jsx-a11y/no-static-element-interactions */

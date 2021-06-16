@@ -1,13 +1,11 @@
 // Specificity required to ensure overlay width is not restricted to that
 // of standard block content.  The overlay's width should be as wide as
 // its children require.
-.editor-styles-wrapper .wp-block .block-editor-block-content-overlay {
+.editor-styles-wrapper .wp-block .block-editor-block-content-overlay__overlay {
 	max-width: none;
 }
 
 .block-editor-block-content-overlay {
-	position: relative;
-
 	.block-editor-block-content-overlay__overlay {
 		position: absolute;
 		top: 0;
@@ -28,8 +26,8 @@
 		}
 	}
 
-	&.overlay-active:not(.is-dragging-blocks) .block-editor-block-content-overlay__content-wrapper {
-		* {
+	&.overlay-active:not(.is-dragging-blocks) {
+		*:not(.block-editor-block-content-overlay__overlay) {
 			pointer-events: none;
 		}
 	}

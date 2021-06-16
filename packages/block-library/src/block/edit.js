@@ -73,11 +73,8 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	const blockProps = useBlockProps();
 
-	const { className, 'data-type': dataType, style } = blockProps;
-	// Use classnames, common selectors, and style from blockProps in the
-	// innerBlockProps to ensure the overlay does not cause style and layout regressions.
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className, 'data-type': dataType, style },
+		{},
 		{
 			value: blocks,
 			onInput,
@@ -140,11 +137,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<BlockContentOverlay clientId={ clientId }>
-					<div className="block-library-block__reusable-block-container">
-						{ <div { ...innerBlocksProps } /> }
-					</div>
-				</BlockContentOverlay>
+				<BlockContentOverlay
+					clientId={ clientId }
+					wrapperProps={ innerBlocksProps }
+					className="block-library-block__reusable-block-container"
+				/>
 			</div>
 		</RecursionProvider>
 	);

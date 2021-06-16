@@ -16,7 +16,7 @@ export default function TemplatePartInnerBlocks( {
 	postId: id,
 	hasInnerBlocks,
 	layout,
-	tagName: TagName,
+	tagName,
 	blockProps,
 	clientId,
 } ) {
@@ -48,31 +48,21 @@ export default function TemplatePartInnerBlocks( {
 		{ id }
 	);
 
-	const { className, 'data-type': dataType, style } = blockProps;
-	// Use classnames, common selectors, and style from blockProps in the
-	// innerBlockProps to ensure the overlay does not cause style and layout regressions.
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className,
-			'data-type': dataType,
-			style,
-		},
-		{
-			value: blocks,
-			onInput,
-			onChange,
-			renderAppender: hasInnerBlocks
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: _layout,
-		}
-	);
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput,
+		onChange,
+		renderAppender: hasInnerBlocks
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+		__experimentalLayout: _layout,
+	} );
 
 	return (
-		<TagName { ...blockProps }>
-			<BlockContentOverlay clientId={ clientId }>
-				<div { ...innerBlocksProps } />
-			</BlockContentOverlay>
-		</TagName>
+		<BlockContentOverlay
+			clientId={ clientId }
+			tagName={ tagName }
+			wrapperProps={ innerBlocksProps }
+		/>
 	);
 }
