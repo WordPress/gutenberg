@@ -71,7 +71,7 @@ function gutenberg_register_wp_theme_taxonomy() {
 
 	register_taxonomy(
 		'wp_theme',
-		array( 'wp_template', 'wp_template_part', 'wp_global_styles' ),
+		array( 'wp_global_styles' ),
 		array(
 			'public'            => false,
 			'hierarchical'      => false,
@@ -146,33 +146,54 @@ add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template
 add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
 
 /**
- * Sets a custom slug when creating auto-draft templates.
- * This is only needed for auto-drafts created by the regular WP editor.
- * If this page is to be removed, this won't be necessary.
+ * Finds whether a template or template part slug is customized for the currently active theme.
  *
- * @param int $post_id Post ID.
+ * @param string $slug          Template or template part slug.
+ * @param string $template_type wp_template or wp_template_part.
+ *
+ * @return bool Whether the template is customized for the currently active theme.
  */
-function set_unique_slug_on_create_template( $post_id ) {
-	$post = get_post( $post_id );
-	if ( 'auto-draft' !== $post->post_status ) {
-		return;
+function template_is_customized( $slug, $template_type = 'wp_template' ) {
+	$templates = get_theme_mod( $template_type, array() );
+
+	if ( ! isset( $templates[ $slug ] ) ) {
+		return false;
 	}
 
-	if ( ! $post->post_name ) {
-		wp_update_post(
-			array(
-				'ID'        => $post_id,
-				'post_name' => 'custom_slug_' . uniqid(),
-			)
-		);
-	}
-
-	$terms = get_the_terms( $post_id, 'wp_theme' );
-	if ( ! $terms || ! count( $terms ) ) {
-		wp_set_post_terms( $post_id, wp_get_theme()->get_stylesheet(), 'wp_theme' );
+	$customized = get_post( $templates[ $slug ] );
+	if ( $customized && $customized->post_type === $template_type ) {
+		return true;
+	} else {
+		return false;
 	}
 }
-add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template' );
+	
+/**
+ * Sets a custom slug when creating new templates and template parts.
+ *
+ * @param int     $post_id Post ID.
+ * @param WP_Post $post    Post object.
+ * @param bool    $update  Update post or new post.
+ */
+function set_unique_slug_on_create_template( $post_id, $post, $update ) {
+	if ( ! $update && $post->post_name ) {
+		$templates = get_theme_mod( $post->post_type, array() );
+		$slug      = $post->post_name;
+
+		if ( template_is_customized( $slug, $post->post_type ) ) {
+			$suffix = 2;
+			do {
+				$slug = _truncate_post_slug( $post->post_name, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
+				$suffix++;
+			} while ( template_is_customized( $slug, $post->post_type ) );
+		}
+
+		$templates[ $slug ] = $post->ID;
+		set_theme_mod( $post->post_type, $templates );
+	}
+}
+add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template', 10, 3 );
+add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template', 10, 3 );
 
 /**
  * Print the skip-link script & styles.
