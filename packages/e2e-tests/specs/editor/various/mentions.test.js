@@ -29,7 +29,11 @@ describe( 'autocomplete mentions', () => {
 		await page.waitForSelector( '.components-autocomplete__result' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '.' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>I am @admin.</p>
+			<!-- /wp:paragraph -->"
+		` );
 	} );
 
 	it( 'should insert mention between two other words', async () => {
@@ -40,7 +44,11 @@ describe( 'autocomplete mentions', () => {
 		await page.waitForSelector( '.components-autocomplete__result' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' ' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>Stuck in the middle with @testuser you.</p>
+			<!-- /wp:paragraph -->"
+		` );
 	} );
 
 	it( 'should insert two subsequent mentions', async () => {
@@ -52,6 +60,10 @@ describe( 'autocomplete mentions', () => {
 		await page.waitForSelector( '.components-autocomplete__result' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '.' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+			"<!-- wp:paragraph -->
+			<p>I am @testuser @admin.</p>
+			<!-- /wp:paragraph -->"
+		` );
 	} );
 } );
