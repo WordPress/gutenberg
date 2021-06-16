@@ -16,8 +16,8 @@ describe( 'getFontSizeClass()', () => {
 	} );
 
 	it( 'Should return the correct font size class when given a string', () => {
-		const fontSizeClass = getFontSizeClass( '14' );
-		expect( fontSizeClass ).toBe( 'has-14-font-size' );
+		const fontSizeClass = getFontSizeClass( '14px' );
+		expect( fontSizeClass ).toBe( 'has-14-px-font-size' );
 	} );
 
 	it( 'Should throw a warning when given a number', () => {
