@@ -29,7 +29,7 @@ export default function PreviewOptions( {
 		position: 'bottom left',
 	};
 	const toggleProps = {
-		isTertiary: true,
+		variant: 'tertiary',
 		className: 'block-editor-post-preview__button-toggle',
 		disabled: ! isEnabled,
 		/* translators: button label text should, if possible, be under 16 characters. */

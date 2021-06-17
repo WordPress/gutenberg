@@ -5,6 +5,7 @@ import {
 	LineHeightControl,
 	__experimentalFontFamilyControl as FontFamilyControl,
 	__experimentalFontAppearanceControl as FontAppearanceControl,
+	__experimentalLetterSpacingControl as LetterSpacingControl,
 } from '@wordpress/block-editor';
 import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -17,8 +18,12 @@ import { useSetting } from '../editor/utils';
 export function useHasTypographyPanel( { supports, name } ) {
 	const hasLineHeight = useHasLineHeightControl( { supports, name } );
 	const hasFontAppearance = useHasAppearanceControl( { supports, name } );
+	const hasLetterSpacing = useHasLetterSpacingControl( { supports, name } );
 	return (
-		hasLineHeight || hasFontAppearance || supports.includes( 'fontSize' )
+		hasLineHeight ||
+		hasFontAppearance ||
+		hasLetterSpacing ||
+		supports.includes( 'fontSize' )
 	);
 }
 
@@ -37,6 +42,13 @@ function useHasAppearanceControl( { supports, name } ) {
 		useSetting( 'typography.customFontWeight', name ) &&
 		supports.includes( 'fontWeight' );
 	return hasFontStyles || hasFontWeights;
+}
+
+function useHasLetterSpacingControl( { supports, name } ) {
+	return (
+		useSetting( 'typography.customLetterSpacing', name ) &&
+		supports.includes( 'letterSpacing' )
+	);
 }
 
 export default function TypographyPanel( {
@@ -58,6 +70,10 @@ export default function TypographyPanel( {
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
 	const hasAppearanceControl = useHasAppearanceControl( { supports, name } );
+	const hasLetterSpacingControl = useHasLetterSpacingControl( {
+		supports,
+		name,
+	} );
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
@@ -100,6 +116,14 @@ export default function TypographyPanel( {
 					} }
 					hasFontStyles={ hasFontStyles }
 					hasFontWeights={ hasFontWeights }
+				/>
+			) }
+			{ hasLetterSpacingControl && (
+				<LetterSpacingControl
+					value={ getStyle( name, 'letterSpacing' ) }
+					onChange={ ( value ) =>
+						setStyle( name, 'letterSpacing', value )
+					}
 				/>
 			) }
 		</PanelBody>

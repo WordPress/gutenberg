@@ -124,8 +124,8 @@ export function template( state = { isValid: true }, action ) {
 /**
  * Reducer returning the user preferences.
  *
- * @param {Object}  state                 Current state.
- * @param {Object}  action                Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {string} Updated state.
  */
@@ -174,7 +174,7 @@ export function saving( state = {}, action ) {
  *
  * @typedef {Object} PostLockState
  *
- * @property {boolean} isLocked       Whether the post is locked.
+ * @property {boolean}  isLocked       Whether the post is locked.
  * @property {?boolean} isTakeover     Whether the post editing has been taken over.
  * @property {?boolean} activePostLock Active post lock value.
  * @property {?Object}  user           User that took over the post.
@@ -184,7 +184,7 @@ export function saving( state = {}, action ) {
  * Reducer returning the post lock status.
  *
  * @param {PostLockState} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Object}        action Dispatched action.
  *
  * @return {PostLockState} Updated state.
  */
@@ -245,7 +245,7 @@ export function postAutosavingLock( state = {}, action ) {
  * the post object is loaded properly and the initial blocks parsed.
  *
  * @param {boolean} state
- * @param {Object} action
+ * @param {Object}  action
  *
  * @return {boolean} Updated state.
  */

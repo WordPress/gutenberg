@@ -8,7 +8,7 @@ const getStyleSheets = () =>
 
 /**
  *
- * @param {Element} element
+ * @param {Element}            element
  * @param {HTMLStyleElement[]} styleSheets
  */
 const getStyleRulesForElement = ( element, styleSheets ) => {
@@ -60,7 +60,7 @@ const cleanStyleRule = ( rule ) => {
 /**
  * @param {Element} received
  * @param {Element} expected
- * @param {string} testName
+ * @param {string}  testName
  */
 function toMatchStyleDiffSnapshot( received, expected, testName ) {
 	const styleSheets = getStyleSheets();

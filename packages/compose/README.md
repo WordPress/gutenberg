@@ -66,13 +66,11 @@ For more details, you can refer to each Higher Order Component's README file. [A
 Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
 composition, where each successive invocation is supplied the return value of the previous.
 
-_Parameters_
+This is just a re-export of `lodash`'s `flowRight` function.
 
--   _hocs_ `...Function`: The HOC functions to invoke.
+_Related_
 
-_Returns_
-
--   `Function`: Returns the new composite function.
+-   <https://docs-lodash.com/v4/flow-right/>
 
 <a name="createHigherOrderComponent" href="#createHigherOrderComponent">#</a> **createHigherOrderComponent**
 
@@ -156,7 +154,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `Object|Function`: Element Ref.
+-   `import('react').RefCallback<Element>`: Element Ref.
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
@@ -166,9 +164,9 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `Object`: Reference with the element.
+-   _ref_ `import('react').RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
 -   _text_ `string|Function`: The text to copy.
--   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+-   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
@@ -180,12 +178,12 @@ Copies the given text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _text_ `text|Function`: The text to copy. Use a function if not already available and expensive to compute.
+-   _text_ `string | (() => string)`: The text to copy. Use a function if not already available and expensive to compute.
 -   _onSuccess_ `Function`: Called when to text is copied.
 
 _Returns_
 
--   `RefObject`: A ref to assign to the target element.
+-   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
 
 <a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
 
@@ -230,11 +228,11 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `boolean|string`: Focus on mount mode.
+-   _focusOnMount_ `boolean | 'firstElement'`: Focus on mount mode.
 
 _Returns_
 
--   `Function`: Ref callback.
+-   `import('react').RefCallback<HTMLElement>`: Ref callback.
 
 <a name="useFocusReturn" href="#useFocusReturn">#</a> **useFocusReturn**
 
@@ -275,7 +273,7 @@ _Parameters_
 
 -   _object_ `object`: Object reference to create an id for.
 -   _prefix_ `[string]`: Prefix for the unique id.
--   _preferredId_ `[string]`: Default ID to use.
+-   _preferredId_ `[string | number]`: Default ID to use.
 
 _Returns_
 
@@ -291,10 +289,14 @@ throws a warning when using useLayoutEffect in that environment.
 
 Attach a keyboard shortcut handler.
 
+_Related_
+
+-   <https://craig.is/killing/mice#api.bind> for information about the `callback` parameter.
+
 _Parameters_
 
 -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `Function`: Shortcut callback.
+-   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
@@ -394,12 +396,12 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _callback_ `Function`: Callback with ref as argument.
--   _dependencies_ `Array`: Dependencies of the callback.
+-   _callback_ `( node: TElement ) => ( () => void ) | undefined`: Callback with ref as argument.
+-   _dependencies_ `DependencyList`: Dependencies of the callback.
 
 _Returns_
 
--   `Function`: Ref callback.
+-   `RefCallback< TElement | null >`: Ref callback.
 
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 
@@ -435,13 +437,19 @@ be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to throttle, so please wrap functions created on
 render in components in `useCallback`.
 
+_Related_
+
+-   <https://docs-lodash.com/v4/throttle/>
+
 _Parameters_
 
--   _args_ `...any`: Arguments passed to Lodash's `throttle`.
+-   _fn_ `TFunc`: The function to throttle.
+-   _wait_ `[number]`: The number of milliseconds to throttle invocations to.
+-   _options_ `[import('lodash').ThrottleSettings]`: The options object. See linked documentation for details.
 
 _Returns_
 
--   `Function`: Throttled function.
+-   `TFunc & import('lodash').Cancelable`: Throttled function.
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
@@ -481,7 +489,7 @@ function MyComponent(props) {
 
 _Parameters_
 
--   _object_ `Object`: Object which changes to compare.
+-   _object_ `object`: Object which changes to compare.
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
@@ -497,11 +505,11 @@ event handler for the entire application.
 
 _Parameters_
 
--   _eventTypesToHandlers_ `Object<string,string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
+-   _eventTypesToHandlers_ `Record<keyof GlobalEventHandlersEventMap, string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
 
 _Returns_
 
--   `Function`: Higher-order component.
+-   `any`: Higher-order component.
 
 <a name="withInstanceId" href="#withInstanceId">#</a> **withInstanceId**
 
@@ -517,26 +525,24 @@ _Type_
 A higher-order component used to provide and manage delayed function calls
 that ought to be bound to a component's lifecycle.
 
-_Parameters_
+_Type_
 
--   _OriginalComponent_ `WPComponent`: Component requiring setTimeout
-
-_Returns_
-
--   `WPComponent`: Wrapped component.
+-   `PropInjectingHigherOrderComponent< TimeoutProps >`
 
 <a name="withState" href="#withState">#</a> **withState**
+
+> **Deprecated** Use `useState` instead.
 
 A Higher Order Component used to provide and manage internal component state
 via props.
 
 _Parameters_
 
--   _initialState_ `?Object`: Optional initial state of the component.
+-   _initialState_ `any`: Optional initial state of the component.
 
 _Returns_
 
--   `WPComponent`: Wrapped component.
+-   `any`: A higher order component wrapper accepting a component that takes the state props + its own props + `setState` and returning a component that only accepts the own props.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

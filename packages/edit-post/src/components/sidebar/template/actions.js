@@ -55,19 +55,19 @@ function PostTemplateActions() {
 			<div className="edit-post-template__actions">
 				{ !! template && (
 					<Button
-						isLink
+						variant="link"
 						onClick={ () => __unstableSwitchToTemplateMode() }
 					>
 						{ __( 'Edit' ) }
 					</Button>
 				) }
-				<Button isLink onClick={ () => setIsModalOpen( true ) }>
+				<Button variant="link" onClick={ () => setIsModalOpen( true ) }>
 					{ __( 'New' ) }
 				</Button>
 			</div>
 			{ isModalOpen && (
 				<Modal
-					title={ __( 'Create a custom template' ) }
+					title={ __( 'Create custom template' ) }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
@@ -84,7 +84,9 @@ function PostTemplateActions() {
 								createBlock( 'core/site-tagline' ),
 								createBlock( 'core/separator' ),
 								createBlock( 'core/post-title' ),
-								createBlock( 'core/post-content' ),
+								createBlock( 'core/post-content', {
+									layout: { inherit: true },
+								} ),
 							];
 							__unstableSwitchToTemplateMode( {
 								slug:
@@ -96,18 +98,27 @@ function PostTemplateActions() {
 							setIsModalOpen( false );
 						} }
 					>
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
-						/>
+						<Flex align="flex-start" gap={ 8 }>
+							<FlexItem>
+								<TextControl
+									label={ __( 'Name' ) }
+									value={ title }
+									onChange={ setTitle }
+									help={ __(
+										'Describe the purpose of the template, e.g. "Full Width". Custom templates can be applied to any post or page.'
+									) }
+								/>
+							</FlexItem>
+						</Flex>
+
 						<Flex
-							className="edit-post-post-template__modal-actions"
+							className="edit-post-template__modal-actions"
 							justify="flex-end"
+							expanded={ false }
 						>
 							<FlexItem>
 								<Button
-									isSecondary
+									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
 										setTitle( '' );
@@ -117,7 +128,7 @@ function PostTemplateActions() {
 								</Button>
 							</FlexItem>
 							<FlexItem>
-								<Button isPrimary type="submit">
+								<Button variant="primary" type="submit">
 									{ __( 'Create' ) }
 								</Button>
 							</FlexItem>

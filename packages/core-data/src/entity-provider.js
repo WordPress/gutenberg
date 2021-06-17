@@ -86,9 +86,12 @@ export function useEntityId( kind, type ) {
  * @param {string} prop  The property name.
  * @param {string} [_id] An entity ID to use instead of the context-provided one.
  *
- * @return {[*, Function]} A tuple where the first item is the
- *                          property value and the second is the
- *                          setter.
+ * @return {[*, Function, *]} An array where the first item is the
+ *                            property value, the second is the
+ *                            setter and the third is the full value
+ * 							  object from REST API containing more
+ * 							  information like `raw`, `rendered` and
+ * 							  `protected` props.
  */
 export function useEntityProp( kind, type, prop, _id ) {
 	const providerId = useEntityId( kind, type );
@@ -134,10 +137,10 @@ export function useEntityProp( kind, type, prop, _id ) {
  * `BlockEditorProvider` and are intended to be used with it,
  * or similar components or hooks.
  *
- * @param {string} kind                            The entity kind.
- * @param {string} type                            The entity type.
+ * @param {string} kind         The entity kind.
+ * @param {string} type         The entity type.
  * @param {Object} options
- * @param {string} [options.id]                    An entity ID to use instead of the context-provided one.
+ * @param {string} [options.id] An entity ID to use instead of the context-provided one.
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */

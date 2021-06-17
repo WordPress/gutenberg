@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render borderBottom 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+  <div
+-   class="components-surface css-1xmxoxz-Surface-primary css-1mm2cvy-View em57xhy0"
++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
+  >
+    Surface
+  </div>
+`;
+
+exports[`props should render borderLeft 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+  <div
+-   class="components-surface css-ttbcem-Surface-primary css-1mm2cvy-View em57xhy0"
++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
+  >
+    Surface
+  </div>
+`;
+
+exports[`props should render borderRight 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+  <div
+-   class="components-surface css-xn6qe9-Surface-primary css-1mm2cvy-View em57xhy0"
++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
+  >
+    Surface
+  </div>
+`;
+
+exports[`props should render borderTop 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+  <div
+-   class="components-surface css-1ql02am-Surface-primary css-1mm2cvy-View em57xhy0"
++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
+  >
+    Surface
+  </div>
+`;
+
+exports[`props should render correctly 1`] = `
+.emotion-0 {
+  background-color: #fff;
+  color: #000;
+  position: relative;
+}
+
+<div
+  class="components-surface emotion-0 emotion-1 emotion-2"
+  data-wp-c16t="true"
+  data-wp-component="Surface"
+>
+  Surface
+</div>
+`;
+
+exports[`props should render variants 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+  <div
+-   class="components-surface css-1h2jxd6-Surface-secondary css-1mm2cvy-View em57xhy0"
++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
+  >
+    Surface
+  </div>
+`;

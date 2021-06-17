@@ -87,7 +87,7 @@ function Header() {
 							ref={ inserterButton }
 							as={ Button }
 							className="edit-widgets-header-toolbar__inserter-toggle"
-							isPrimary
+							variant="primary"
 							isPressed={ isInserterOpened }
 							onMouseDown={ ( event ) => {
 								event.preventDefault();

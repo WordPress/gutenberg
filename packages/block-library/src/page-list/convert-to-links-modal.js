@@ -103,11 +103,11 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 				) }
 			</p>
 			<div className="wp-block-page-list-modal-buttons">
-				<Button isTertiary onClick={ onClose }>
+				<Button variant="tertiary" onClick={ onClose }>
 					{ __( 'Cancel' ) }
 				</Button>
 				<Button
-					isPrimary
+					variant="primary"
 					disabled={ ! pagesFinished }
 					onClick={ convertSelectedBlockToNavigationLinks( {
 						pages,

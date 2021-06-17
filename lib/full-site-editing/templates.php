@@ -177,12 +177,25 @@ add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template' );
 /**
  * Print the skip-link script & styles.
  *
+ * @todo Remove this when WP 5.8 is the minimum required version.
+ *
  * @return void
  */
 function gutenberg_the_skip_link() {
 
-	// Early exit if not an FSE theme.
+	// Early exit if on WP 5.8+.
+	if ( function_exists( 'the_block_template_skip_link' ) ) {
+		return;
+	}
+
+	// Early exit if not a block theme.
 	if ( ! gutenberg_supports_block_templates() ) {
+		return;
+	}
+
+	// Early exit if not a block template.
+	global $_wp_current_template_content;
+	if ( ! $_wp_current_template_content ) {
 		return;
 	}
 	?>
@@ -242,7 +255,12 @@ function gutenberg_the_skip_link() {
 
 		// Get the site wrapper.
 		// The skip-link will be injected in the beginning of it.
-		parentEl = document.querySelector( '.wp-site-blocks' ) || document.body,
+		parentEl = document.querySelector( '.wp-site-blocks' );
+
+		// Early exit if the root element was not found.
+		if ( ! parentEl ) {
+			return;
+		}
 
 		// Get the skip-link target's ID, and generate one if it doesn't exist.
 		skipLinkTargetID = skipLinkTarget.id;

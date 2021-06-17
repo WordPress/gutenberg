@@ -61,17 +61,12 @@ const LinkControlSearchInput = forwardRef(
 		 * Handles the user moving between different suggestions. Does not handle
 		 * choosing an individual item.
 		 *
-		 * @param {string} selection the url of the selected suggestion.
+		 * @param {string} selection  the url of the selected suggestion.
 		 * @param {Object} suggestion the suggestion object.
 		 */
 		const onInputChange = ( selection, suggestion ) => {
 			onChange( selection );
 			setFocusedSuggestion( suggestion );
-		};
-
-		const onFormSubmit = ( event ) => {
-			event.preventDefault();
-			onSuggestionSelected( focusedSuggestion || { url: value } );
 		};
 
 		const handleRenderSuggestions = ( props ) =>
@@ -118,7 +113,7 @@ const LinkControlSearchInput = forwardRef(
 		};
 
 		return (
-			<form onSubmit={ onFormSubmit }>
+			<div>
 				<URLInput
 					className={ className }
 					value={ value }
@@ -132,10 +127,15 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
+					onSubmit={ ( suggestion ) => {
+						onSuggestionSelected(
+							suggestion || focusedSuggestion || { url: value }
+						);
+					} }
 					ref={ ref }
 				/>
 				{ children }
-			</form>
+			</div>
 		);
 	}
 );
