@@ -61,7 +61,7 @@ function useContextSystemBridge( { value } ) {
 		) {
 			warn( `Please memoize your context: ${ JSON.stringify( value ) }` );
 		}
-	}, [ parentContext, value ] );
+	}, [ value ] );
 
 	// parent context will always be memoized or the default value (which will not change)
 	// so this memoization will prevent `merge` and `cloneDeep` from rerunning unless
