@@ -43,11 +43,6 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 	let candidateDistance;
 
 	elements.forEach( ( element, index ) => {
-		// Ensure the element is a block. It should have the `wp-block` class.
-		if ( ! element.classList.contains( 'wp-block' ) ) {
-			return;
-		}
-
 		const rect = element.getBoundingClientRect();
 		const [ distance, edge ] = getDistanceToNearestEdge(
 			position,
@@ -106,9 +101,8 @@ export default function useBlockDropZone( {
 	const throttled = useThrottle(
 		useCallback( ( event, currentTarget ) => {
 			const blockElements = Array.from( currentTarget.children ).filter(
-				( element ) => {
-					return element.nodeName !== 'STYLE';
-				}
+				// Ensure the element is a block. It should have the `wp-block` class.
+				( element ) => element.classList.contains( 'wp-block' )
 			);
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
