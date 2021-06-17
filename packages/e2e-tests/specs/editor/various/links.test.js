@@ -81,7 +81,7 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'will not pre-populate URL input if selected text is not a link', async () => {
+	it( 'will not automatically create a link if selected text is not a valid HTTP based URL', async () => {
 		// Create a block with some text
 		await clickBlockAppender();
 		await page.keyboard.type( 'This: is not a link' );
@@ -96,10 +96,7 @@ describe( 'Links', () => {
 		await waitForAutoFocus();
 
 		const urlInputValue = await page.evaluate(
-			() =>
-				document.querySelector(
-					'.components-popover__content .block-editor-link-control .block-editor-url-input__input'
-				).value
+			() => document.querySelector( '[aria-label="URL"]' ).value
 		);
 
 		expect( urlInputValue ).toBe( '' );
