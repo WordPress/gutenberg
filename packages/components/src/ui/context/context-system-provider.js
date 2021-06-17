@@ -75,6 +75,7 @@ function useContextSystemBridge( { value } ) {
 
 	return config;
 }
+
 /**
  * A Provider component that can modify props for connected components within
  * the Context system.
