@@ -20,7 +20,11 @@ describe( 'props', () => {
 
 		act( () => {
 			const result = render(
-				<SegmentedControl baseId="segmented" options={ options } />
+				<SegmentedControl
+					baseId="segmented"
+					options={ options }
+					label="Test Segmented Control"
+				/>
 			);
 			container = result.container;
 		} );

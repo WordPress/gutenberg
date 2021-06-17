@@ -24,16 +24,15 @@ import {
 import * as styles from './styles';
 import type { SegmentedControlButtonProps } from './types';
 
-function SegmentedControlButton( allProps: SegmentedControlButtonProps ) {
-	const {
-		className,
-		forwardedRef,
-		isBlock = false,
-		label,
-		showSeparator,
-		value,
-		...props
-	} = allProps;
+function SegmentedControlButton( {
+	className,
+	forwardedRef,
+	isBlock = false,
+	label,
+	showSeparator,
+	value,
+	...props
+}: SegmentedControlButtonProps ) {
 	const isActive = props.state === value;
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
 	const classes = cx( isActive && styles.buttonActive, className );
@@ -42,6 +41,7 @@ function SegmentedControlButton( allProps: SegmentedControlButtonProps ) {
 			<Radio
 				{ ...props }
 				as={ ButtonView }
+				aria-label={ label }
 				className={ classes }
 				data-value={ value }
 				ref={ forwardedRef }
