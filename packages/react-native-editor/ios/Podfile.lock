@@ -457,7 +457,7 @@ SPEC CHECKSUMS:
   BVLinearGradient: b2d297a15cf094d1947df4f0519779bb3a7f2392
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 49cbe4b43e445b06bf29199b6ad2057649e4c8f5
-  FBReactNativeSpec: 420ad7ff87adc491b45199891c72ea531fa4926e
+  FBReactNativeSpec: c59a3cde8d0336ac8239c33e89e70a0daa170d2b
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   Gutenberg: 829c1db189c6f47728327bb1503026f42698cdb6
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
@@ -475,9 +475,9 @@ SPEC CHECKSUMS:
   react-native-get-random-values: 03edb8dcc2d3f43e55aa67ea13b61b6723bbf047
   react-native-keyboard-aware-scroll-view: 6cb84879bf07e4cc1caed18b11fb928e142adac6
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
-  react-native-safe-area-context: e471852c5ed67eea4b10c5d9d43c1cebae3b231d
+  react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   react-native-slider: 2e42dc91e7ab8b35a9c7f2eb3532729a41d0dbe2
-  react-native-video: e5dd0649534076cd6d09a0db51c617fa668d534a
+  react-native-video: b8767f54061e475ddd38c22375f46f4d93e5fdfd
   React-perflogger: 9c547d8f06b9bf00cb447f2b75e8d7f19b7e02af
   React-RCTActionSheet: 3080b6e12e0e1a5b313c8c0050699b5c794a1b11
   React-RCTAnimation: 3f96f21a497ae7dabf4d2f150ee43f906aaf516f
@@ -491,7 +491,7 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: cad74a1eaa53ee6e7a3620231939d8fe2c6afcf0
   ReactCommon: cfe2b7fd20e0dbd2d1185cd7d8f99633fbc5ff05
   ReactNativeDarkMode: 6d807bc8373b872472c8541fc3341817d979a6fb
-  RNCMaskedView: dfeba59697c44d36abec79c062aeb1ea343d610d
+  RNCMaskedView: 66caacf33c86eaa7d22b43178dd998257d5c2e4d
   RNGestureHandler: 5e58135436aacc1c5d29b75547d3d2b9430d052c
   RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
