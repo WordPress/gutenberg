@@ -87,13 +87,40 @@ function PostTemplateActions() {
 							const newTemplateContent =
 								defaultTemplate ??
 								serialize( [
-									createBlock( 'core/site-title' ),
-									createBlock( 'core/site-tagline' ),
+									createBlock(
+										'core/group',
+										{
+											tagName: 'header',
+											layout: { inherit: true },
+										},
+										[
+											createBlock( 'core/site-title' ),
+											createBlock( 'core/site-tagline' ),
+										]
+									),
 									createBlock( 'core/separator' ),
-									createBlock( 'core/post-title' ),
-									createBlock( 'core/post-content', {
-										layout: { inherit: true },
-									} ),
+									createBlock(
+										'core/group',
+										{
+											tagName: 'main',
+										},
+										[
+											createBlock(
+												'core/group',
+												{
+													layout: { inherit: true },
+												},
+												[
+													createBlock(
+														'core/post-title'
+													),
+												]
+											),
+											createBlock( 'core/post-content', {
+												layout: { inherit: true },
+											} ),
+										]
+									),
 								] );
 
 							__unstableSwitchToTemplateMode( {
