@@ -567,7 +567,7 @@ function gutenberg_enqueue_block_style( $block_name, $args, $register = true ) {
 	};
 
 	$hook = did_action( 'wp_enqueue_scripts' ) ? 'wp_footer' : 'wp_enqueue_scripts';
-	if ( gutenberg_should_load_separate_block_assets() ) {
+	if ( wp_should_load_separate_core_block_assets() ) {
 		$hook = "render_block_$block_name";
 	}
 
