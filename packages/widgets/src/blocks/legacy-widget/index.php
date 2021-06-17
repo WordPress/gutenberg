@@ -38,7 +38,6 @@ function render_block_core_legacy_widget( $attributes ) {
 	 * @param string $widget_key Key in the widget area.
 	 * @param string $base_id Base id used to look key.
 	 * @param array $attributes Attributes array for extra context.
-	 *
 	 */
 	$widget_key = apply_filters( 'wp_get_legacy_widget_key', $widget_key, $base_id, $attributes );
 	if ( ! $widget_key ) {
