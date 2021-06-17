@@ -168,7 +168,9 @@ const fetchLinkSuggestions = async (
 				const customItems = results.filter(
 					( result ) =>
 						search === '' ||
-						result.title.match( new RegExp( search, 'i' ) )
+						result.title
+							.toLowerCase()
+							.includes( search.toLowerCase() )
 				);
 				return customItems.map( ( item ) => ( {
 					id: item.id,
