@@ -757,7 +757,7 @@ class WP_Theme_JSON_Gutenberg {
 			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
 			foreach ( $preset_by_slug as $slug => $value ) {
 				$declarations[] = array(
-					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . gutenbeng_experimental_to_kebab_case( $slug ),
+					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ),
 					'value' => $value,
 				);
 			}
