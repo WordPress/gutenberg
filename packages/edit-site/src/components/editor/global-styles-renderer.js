@@ -89,7 +89,9 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( { slug } ) => {
 						classes.forEach( ( { classSuffix, propertyName } ) => {
-							const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
+							const classSelectorToUse = `.has-${ kebabCase(
+								slug
+							) }-${ classSuffix }`;
 							const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
 							const value = `var(--wp--preset--${ cssVarInfix }--${ slug })`;
 							declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
