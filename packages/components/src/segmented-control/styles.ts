@@ -17,9 +17,9 @@ export const SegmentedControl = css`
 	display: inline-flex;
 	min-height: ${ CONFIG.controlHeight };
 	min-width: 0;
-	padding: 1px;
+	padding: 2px;
 	position: relative;
-	transition: all ${ CONFIG.transitionDurationFastest } linear;
+	transition: transform ${ CONFIG.transitionDurationFastest } linear;
 	${ reduceMotion( 'transition' ) }
 	&:hover {
 		border-color: ${ COLORS.ui.borderHover };
@@ -39,14 +39,14 @@ export const block = css`
 `;
 
 export const BackdropView = styled.div`
-	background: ${ COLORS.ui.background };
-	border: 1px solid ${ CONFIG.segmentedControlBackdropBorderColor };
+	background: ${ COLORS.gray[ 900 ] };
 	border-radius: ${ CONFIG.controlBorderRadius };
 	box-shadow: ${ CONFIG.segmentedControlBackdropBoxShadow };
-	height: calc( ${ CONFIG.controlHeight } - 4px );
 	left: 0;
 	position: absolute;
-	transition: all ${ CONFIG.transitionDurationFast } ease;
+	top: 2px;
+	bottom: 2px;
+	transition: transform ${ CONFIG.transitionDurationFast } ease;
 	${ reduceMotion( 'transition' ) }
 	z-index: 1;
 `;
@@ -73,7 +73,7 @@ export const ButtonView = styled.button`
 	background: transparent;
 	border: none;
 	border-radius: ${ CONFIG.controlBorderRadius };
-	color: ${ CONFIG.controlTextActiveColor };
+	color: ${ COLORS.gray[ 700 ] };
 	cursor: pointer;
 	display: flex;
 	height: 100%;

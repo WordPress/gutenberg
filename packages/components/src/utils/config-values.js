@@ -4,7 +4,7 @@
 import { space } from '../ui/utils/space';
 import { COLORS } from './colors-values';
 
-const CONTROL_HEIGHT = '30px';
+const CONTROL_HEIGHT = '36px';
 const CONTROL_PADDING_X = '12px';
 
 const CONTROL_PROPS = {
