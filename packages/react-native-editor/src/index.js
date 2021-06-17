@@ -82,6 +82,7 @@ const setupInitHooks = () => {
 				colors,
 				gradients,
 				rawStyles,
+				rawFeatures,
 			} = props;
 
 			if ( initialData === undefined && __DEV__ ) {
@@ -108,6 +109,7 @@ const setupInitHooks = () => {
 				colors,
 				gradients,
 				rawStyles,
+				rawFeatures,
 			};
 		}
 	);
