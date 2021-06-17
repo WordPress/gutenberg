@@ -107,7 +107,6 @@ function render_classic_location_menu( $location, $attributes ) {
 	return wp_nav_menu(
 		array(
 			'theme_location'   => $location,
-			'block_attributes' => $block_attributes,
 			'container'        => '',
 			'items_wrap'       => '%3$s',
 			'fallback_cb'      => false,
