@@ -43,7 +43,6 @@ function SegmentControl(
 		label,
 		options = [],
 		onChange = noop,
-		size = 'medium',
 		value,
 		...otherProps
 	} = useContextSystem( props, 'SegmentedControl' );
@@ -74,10 +73,10 @@ function SegmentControl(
 			cx(
 				styles.SegmentedControl,
 				isBlock && styles.block,
-				styles[ size ],
+				'medium',
 				className
 			),
-		[ className, size ]
+		[ className ]
 	);
 	return (
 		<RadioGroup

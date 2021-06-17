@@ -7,7 +7,7 @@ import type { MutableRefObject, Ref } from 'react';
 /**
  * Internal dependencies
  */
-import type { FormElementProps, SizeRangeDefault } from '../utils/types';
+import type { FormElementProps } from '../utils/types';
 
 /**
  * Option to render within `SegmentedControl`.
@@ -67,12 +67,6 @@ export type SegmentedControlProps = Omit<
 	 * Callback when a segment is selected.
 	 */
 	onChange?: ( ...args: any ) => void;
-	/**
-	 * Determines the size of `SegmentedControl`.
-	 *
-	 * @default 'medium'
-	 */
-	size?: SizeRangeDefault;
 	/**
 	 * The value of `SegmentedControl`
 	 */

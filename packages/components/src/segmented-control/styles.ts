@@ -131,22 +131,6 @@ export const LabelPlaceholderView = styled.div`
 	visibility: hidden;
 `;
 
-export const xSmall = css`
-	min-height: ${ CONFIG.controlHeightXSmall };
-`;
-
-export const small = css`
-	min-height: ${ CONFIG.controlHeightSmall };
-`;
-
 export const medium = css`
 	min-height: ${ CONFIG.controlHeight };
-`;
-
-export const large = css`
-	min-height: ${ CONFIG.controlHeightLarge };
-`;
-
-export const xLarge = css`
-	min-height: ${ CONFIG.controlHeightXLarge };
 `;
