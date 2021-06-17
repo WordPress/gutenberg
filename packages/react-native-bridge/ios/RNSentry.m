@@ -3,8 +3,6 @@
 @interface RCT_EXTERN_MODULE(RNSentry, NSObject)
 
 // Extra methods to extract data from the Sentry SDK configured in the main apps.
-RCT_EXTERN_METHOD(getOptions:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)rejecter)
 RCT_EXTERN_METHOD(getUser:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)rejecter)
 RCT_EXTERN_METHOD(attachScopeToEvent:(NSDictionary * _Nonnull)event resolve:(RCTPromiseResolveBlock)resolve

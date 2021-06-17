@@ -91,6 +91,8 @@ public class Gutenberg: NSObject {
             initialProps["gradients"] = gradients
         }
 
+        initialProps["sentryOptions"] = dataSource.getSentryOptions()
+        
         return initialProps
     }
 
