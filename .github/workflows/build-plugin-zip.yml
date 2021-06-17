@@ -180,11 +180,14 @@ jobs:
               env:
                   NO_CHECKS: 'true'
 
+            - name: Unzip Gutenberg plugin files
+              run: unzip gutenberg.zip -d gutenberg
+
             - name: Upload artifact
               uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
               with:
-                  name: gutenberg-plugin
-                  path: ./gutenberg.zip
+                  name: gutenberg
+                  path: gutenberg/
 
             - name: Build release notes draft
               if: ${{ needs.bump-version.outputs.new_version }}
@@ -266,10 +269,13 @@ jobs:
                   VERSION: ${{ needs.bump-version.outputs.new_version }}
               run: echo ::set-output name=version::$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )
 
-            - name: Download Plugin Zip Artifact
+            - name: Download Plugin Artifact Files
               uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
               with:
-                  name: gutenberg-plugin
+                  name: gutenberg
+
+            - name: Create Plugin Zip
+              run: zip -r gutenberg.zip *
 
             - name: Download Release Notes Artifact
               uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
