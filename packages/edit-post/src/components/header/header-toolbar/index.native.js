@@ -94,7 +94,10 @@ function HeaderToolbar( {
 				<BlockToolbar />
 			</ScrollView>
 			{ showKeyboardHideButton && (
-				<Toolbar passedStyle={ styles.keyboardHideContainer }>
+				<Toolbar
+					label={ __( 'Options' ) }
+					passedStyle={ styles.keyboardHideContainer }
+				>
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
 						icon={ keyboardClose }

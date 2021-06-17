@@ -83,7 +83,10 @@ const FloatingToolbar = ( {
 				pointerEvents={ showFloatingToolbar ? 'auto' : 'none' }
 			>
 				{ showNavUpButton && (
-					<Toolbar passedStyle={ styles.toolbar }>
+					<Toolbar
+						label={ __( 'Options' ) }
+						passedStyle={ styles.toolbar }
+					>
 						<ToolbarButton
 							title={ __( 'Navigate Up' ) }
 							onClick={
