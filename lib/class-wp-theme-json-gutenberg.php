@@ -519,21 +519,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Whether the metadata contains a key named properties.
-	 *
-	 * @param array $metadata Description of the style property.
-	 *
-	 * @return boolean True if properties exists, false otherwise.
-	 */
-	private static function has_properties( $metadata ) {
-		if ( array_key_exists( 'properties', $metadata ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
