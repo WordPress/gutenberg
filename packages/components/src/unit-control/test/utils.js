@@ -11,6 +11,7 @@ describe( 'UnitControl utils', () => {
 				availableUnits: [ 'em', 'px' ],
 				units: cssUnits,
 			} );
+
 			expect( units ).toEqual( [ { value: 'px' } ] );
 		} );
 
@@ -21,6 +22,7 @@ describe( 'UnitControl utils', () => {
 				defaultValues: { '%': 10, px: 10 },
 				units: cssUnits,
 			} );
+
 			expect( units ).toEqual( [
 				{ value: 'px', default: 10 },
 				{ value: '%', default: 10 },
@@ -34,6 +36,7 @@ describe( 'UnitControl utils', () => {
 				defaultValues: { '%': 10, px: 10 },
 				units: cssUnits,
 			} );
+
 			expect( units ).toBe( false );
 		} );
 	} );
@@ -42,6 +45,7 @@ describe( 'UnitControl utils', () => {
 		it( 'should return filtered units array', () => {
 			const preferredUnits = [ '%', 'px' ];
 			const availableUnits = [ { value: 'px' }, { value: 'em' } ];
+
 			expect(
 				filterUnitsWithSettings( preferredUnits, availableUnits )
 			).toEqual( [ { value: 'px' } ] );
@@ -50,6 +54,7 @@ describe( 'UnitControl utils', () => {
 		it( 'should return empty array where preferred units match no available css unit', () => {
 			const preferredUnits = [ '%', 'px' ];
 			const availableUnits = [ { value: 'em' } ];
+
 			expect(
 				filterUnitsWithSettings( preferredUnits, availableUnits )
 			).toEqual( [] );
