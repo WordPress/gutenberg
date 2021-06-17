@@ -15,7 +15,7 @@
 		}
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": true,
 		"html": false,
 		"color": {
 			"gradients": true,

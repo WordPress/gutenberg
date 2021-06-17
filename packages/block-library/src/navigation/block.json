@@ -59,10 +59,7 @@
 		"orientation": "orientation"
 	},
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": true,
 		"anchor": true,
 		"html": false,
 		"inserter": true,
