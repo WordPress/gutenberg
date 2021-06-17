@@ -22,8 +22,8 @@
 		z-index: 1;
 		border: 0;
 		&:hover {
-			background-color: rgba( $color: #bbffe4, $alpha: 0.3 );
-			border: 1px solid #00b06f;
+			background-color: rgba(#bbffe4, 0.3);
+			border: 1px solid#00b06f;
 		}
 	}
 }

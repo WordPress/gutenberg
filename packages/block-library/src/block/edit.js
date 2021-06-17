@@ -7,7 +7,6 @@ import {
 	useEntityProp,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	Placeholder,
 	Spinner,
@@ -27,6 +26,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
@@ -108,11 +108,11 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		innerBlocks = <Disabled> { innerBlocks } </Disabled>;
 	}
 
-	let lockContainerClass = isLocked ? 'is-locked' : 'is-unlocked';
+	const lockContainerClass = isLocked ? 'is-locked' : 'is-unlocked';
 
 	// lock the blocks when deselected
 	useEffect( () => {
-		let isInnerBlock = parentBlockName === 'core/block'; // first check if selectedblock is inner block
+		const isInnerBlock = parentBlockName === 'core/block'; // first check if selectedblock is inner block
 		if ( ! isInnerBlock ) {
 			setIsLocked( true );
 		}
@@ -172,7 +172,14 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				</InspectorControls>
 				<div
 					className="block-library-block__reusable-block-container"
+					role="button"
+					tabIndex={ 0 }
 					onClick={ () => setIsLocked( false ) }
+					onKeyDown={ ( e ) => {
+						if ( e.key === 85 ) {
+							setIsLocked( false );
+						}
+					} }
 				>
 					<div
 						className={ `reusable-block-lock-container ${ lockContainerClass }` }
