@@ -39,10 +39,10 @@ function useRemoteUrlData( url ) {
 		isFetching: false,
 	} );
 
-	const { fetchRemoteUrlData } = useSelect( ( select ) => {
+	const { fetchRichUrlData } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
-			fetchRemoteUrlData: getSettings().__experimentalFetchRemoteUrlData,
+			fetchRichUrlData: getSettings().__experimentalFetchRichUrlData,
 		};
 	}, [] );
 
@@ -52,7 +52,7 @@ function useRemoteUrlData( url ) {
 		// there may not be such a util.
 		if (
 			url?.length &&
-			fetchRemoteUrlData &&
+			fetchRichUrlData &&
 			typeof AbortController !== 'undefined'
 		) {
 			dispatch( {
@@ -63,7 +63,7 @@ function useRemoteUrlData( url ) {
 
 			const signal = controller.signal;
 
-			fetchRemoteUrlData( url, {
+			fetchRichUrlData( url, {
 				signal,
 			} )
 				.then( ( urlData ) => {

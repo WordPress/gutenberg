@@ -165,7 +165,7 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  * @return void
  */
 function gutenberg_register_core_block_styles( $block_name ) {
-	if ( ! gutenberg_should_load_separate_block_assets() ) {
+	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;
 	}
 
@@ -188,6 +188,50 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
 	} else {
 		wp_register_style( "wp-block-{$block_name}", false );
+	}
+
+	// If the current theme supports wp-block-styles, dequeue the full stylesheet
+	// and instead attach each block's theme-styles to their block styles stylesheet.
+	if ( current_theme_supports( 'wp-block-styles' ) ) {
+
+		// Dequeue the full stylesheet.
+		// Make sure this only runs once, it doesn't need to run for every block.
+		static $stylesheet_removed;
+		if ( ! $stylesheet_removed ) {
+			add_action(
+				'wp_enqueue_scripts',
+				function() {
+					wp_dequeue_style( 'wp-block-library-theme' );
+				}
+			);
+			$stylesheet_removed = true;
+		}
+
+		// Get the path to the block's stylesheet.
+		$theme_style_path = is_rtl()
+			? "build/block-library/blocks/$block_name/theme-rtl.css"
+			: "build/block-library/blocks/$block_name/theme.css";
+
+		// If the file exists, enqueue it.
+		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
+
+			if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+				// If there is a main stylesheet for this block, append the theme styles to main styles.
+				wp_add_inline_style(
+					"wp-block-{$block_name}",
+					file_get_contents( gutenberg_dir_path() . $theme_style_path )
+				);
+			} else {
+				// If there is no main stylesheet for this block, register theme style.
+				wp_register_style(
+					"wp-block-{$block_name}",
+					gutenberg_url( $theme_style_path ),
+					array(),
+					filemtime( gutenberg_dir_path() . $theme_style_path )
+				);
+				wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $theme_style_path );
+			}
+		}
 	}
 
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
@@ -429,7 +473,7 @@ function gutenberg_block_has_support( $block_type, $feature, $default = false ) 
  * @return array          Metadata for registering a block type with the supports shape updated.
  */
 function gutenberg_migrate_old_typography_shape( $metadata ) {
-	// Temporarily disable migrations from core blocks until core block.json are updated.
+	// Temporarily disable migrations from core blocks to avoid warnings on versions older than 5.8.
 	if ( isset( $metadata['supports'] ) && false === strpos( $metadata['file'], '/wp-includes/blocks/' ) ) {
 		$typography_keys = array(
 			'__experimentalFontFamily',
@@ -457,4 +501,6 @@ function gutenberg_migrate_old_typography_shape( $metadata ) {
 	return $metadata;
 }
 
-add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
+if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
+	add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
+}

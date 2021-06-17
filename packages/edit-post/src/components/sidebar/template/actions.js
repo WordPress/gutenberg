@@ -67,7 +67,7 @@ function PostTemplateActions() {
 			</div>
 			{ isModalOpen && (
 				<Modal
-					title={ __( 'Create a custom template' ) }
+					title={ __( 'Create custom template' ) }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ () => {
 						setIsModalOpen( false );
@@ -98,18 +98,27 @@ function PostTemplateActions() {
 							setIsModalOpen( false );
 						} }
 					>
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
-						/>
+						<Flex align="flex-start" gap={ 8 }>
+							<FlexItem>
+								<TextControl
+									label={ __( 'Name' ) }
+									value={ title }
+									onChange={ setTitle }
+									help={ __(
+										'Describe the purpose of the template, e.g. "Full Width". Custom templates can be applied to any post or page.'
+									) }
+								/>
+							</FlexItem>
+						</Flex>
+
 						<Flex
-							className="edit-post-post-template__modal-actions"
+							className="edit-post-template__modal-actions"
 							justify="flex-end"
+							expanded={ false }
 						>
 							<FlexItem>
 								<Button
-									variant="secondary"
+									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
 										setTitle( '' );

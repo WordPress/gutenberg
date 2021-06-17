@@ -4,36 +4,28 @@
 import { shallow } from 'enzyme';
 
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import { HTMLTextInput } from '..';
 
 // Utility to find a TextInput in a ShallowWrapper
-const findTextInputInWrapper = ( wrapper, matchingProps ) => {
+const findTextInputInWrapper = ( wrapper, accessibilityLabel ) => {
 	return wrapper
 		.dive()
 		.findWhere( ( node ) => {
-			return node.name() === 'TextInput' && node.is( matchingProps );
+			return node.prop( 'accessibilityLabel' ) === accessibilityLabel;
 		} )
 		.first();
 };
 
 // Finds the Content TextInput in our HTMLInputView
 const findContentTextInput = ( wrapper ) => {
-	const placeholder = __( 'Start writing…' );
-	const matchingProps = { multiline: true, placeholder };
-	return findTextInputInWrapper( wrapper, matchingProps );
+	return findTextInputInWrapper( wrapper, 'html-view-content' );
 };
 
 // Finds the Title TextInput in our HTMLInputView
 const findTitleTextInput = ( wrapper ) => {
-	const placeholder = __( 'Add title' );
-	return findTextInputInWrapper( wrapper, { placeholder } );
+	return findTextInputInWrapper( wrapper, 'html-view-title' );
 };
 
 const getStylesFromColorScheme = () => {

@@ -344,6 +344,25 @@ export function* canUser( action, resource, id ) {
 }
 
 /**
+ * Checks whether the current user can perform the given action on the given
+ * REST resource.
+ *
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {string} recordId Record's id.
+ */
+export function* canUserEditEntityRecord( kind, name, recordId ) {
+	const entities = yield getKindEntities( kind );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
+
+	const resource = entity.__unstable_rest_base;
+	yield canUser( 'update', resource, recordId );
+}
+
+/**
  * Request autosave data from the REST API.
  *
  * @param {string} postType The type of the parent post.

@@ -200,13 +200,13 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	gutenberg_register_vendor_script(
 		$scripts,
 		'react',
-		'https://unpkg.com/react@16.13.1/umd/react' . $react_suffix . '.js',
+		'https://unpkg.com/react@17.0.1/umd/react' . $react_suffix . '.js',
 		array( 'wp-polyfill' )
 	);
 	gutenberg_register_vendor_script(
 		$scripts,
 		'react-dom',
-		'https://unpkg.com/react-dom@16.13.1/umd/react-dom' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@17.0.1/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
 
@@ -236,7 +236,7 @@ function gutenberg_register_packages_scripts( $scripts ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
-	$suffix          = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '.js' : '.min.js';
+	$suffix          = '.min.js';
 
 	foreach ( glob( gutenberg_dir_path() . "build/*/index$suffix" ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
@@ -331,7 +331,7 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
 
-	$block_library_filename = gutenberg_should_load_separate_block_assets() ? 'common' : 'style';
+	$block_library_filename = wp_should_load_separate_core_block_assets() ? 'common' : 'style';
 	gutenberg_override_style(
 		$styles,
 		'wp-block-library',
