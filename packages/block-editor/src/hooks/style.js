@@ -84,10 +84,12 @@ export function getInlineStyles( styles = {} ) {
 
 			if ( !! subPaths && ! isString( styleValue ) ) {
 				Object.entries( subPaths ).forEach( ( entry ) => {
-					const [ name, suffix ] = entry;
-					output[ name ] = compileStyleValue(
-						get( styleValue, [ suffix ] )
-					);
+					const [ name, subPath ] = entry;
+					const value = get( styleValue, [ subPath ] );
+
+					if ( value ) {
+						output[ name ] = compileStyleValue( value );
+					}
 				} );
 			} else {
 				output[ propKey ] = compileStyleValue( get( styles, path ) );
