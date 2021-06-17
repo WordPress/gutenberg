@@ -14,7 +14,10 @@ export default function BoxInputControls( {
 	...props
 } ) {
 	const createHandleOnChange = ( corner ) => ( next ) => {
-		onChange( { ...values, [ corner ]: next } );
+		onChange( {
+			...values,
+			[ corner ]: next ? next : undefined,
+		} );
 	};
 
 	// For backwards compatibility, handle possible flat string value.
