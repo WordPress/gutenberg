@@ -70,8 +70,12 @@ body.widgets-php {
 		}
 	}
 	// Remove unwanted styles from .editor-styles-wrapper in the widget area.
-	.wp-block-widget-area.editor-styles-wrapper {
+	.components-panel__body.editor-styles-wrapper {
 		padding: 0;
+
+		.block-editor-block-list__layout {
+			padding: $grid-unit-20;
+		}
 	}
 }
 
