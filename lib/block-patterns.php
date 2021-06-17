@@ -201,8 +201,8 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:site-title {"textAlign":"center"} /--></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"verticalAlignment":"center","width":"33.33%"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:social-links -->
-							<ul class="wp-block-social-links items-justified-right"><!-- wp:social-link {"url":"#","service":"twitter"} /-->
+							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:social-links {"className":"items-justified-right is-style-logos-only"} -->
+							<ul class="wp-block-social-links items-justified-right is-style-logos-only"><!-- wp:social-link {"url":"#","service":"twitter"} /-->
 							<!-- wp:social-link {"url":"#","service":"instagram"} /-->
 							<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
 							<!-- /wp:social-links --></div>
@@ -214,9 +214,7 @@ function register_gutenberg_patterns() {
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
 			'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"2em","right":"2em","bottom":"2em","left":"2em"}}}} -->
-							<div class="wp-block-group alignfull" style="padding-top:2em;padding-right:2em;padding-bottom:2em;padding-left:2em"><!-- wp:spacer {"height":100} -->
-							<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
-							<!-- /wp:spacer -->
+							<div class="wp-block-group alignfull" style="padding-top:2em;padding-right:2em;padding-bottom:2em;padding-left:2em">
 
 							<!-- wp:site-logo {"align":"center"} /-->
 
@@ -224,8 +222,8 @@ function register_gutenberg_patterns() {
 
 							<!-- wp:site-tagline {"textAlign":"center"} /-->
 
-							<!-- wp:spacer {"height":100} -->
-							<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- wp:spacer {"height":40} -->
+							<div style="height:40px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
 
 							<!-- wp:navigation {"orientation":"horizontal","itemsJustification":"center","isResponsive":true} /--></div>
@@ -271,8 +269,8 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Modern header with image on the right', 'gutenberg' ),
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
-			'content'    => '<!-- wp:media-text {"align":"full","mediaPosition":"right","mediaId":2589,"mediaLink":"https://s.w.org/images/core/5.8/nature-above-02.jpg","mediaType":"image","imageFill":true,"style":{"color":{"background":"#fffbee","text":"#000000"}}} -->
-							<div class="wp-block-media-text alignfull has-media-on-the-right is-stacked-on-mobile is-image-fill has-text-color has-background" style="background-color:#fffbee;color:#000000"><figure class="wp-block-media-text__media" style="background-image:url(https://s.w.org/images/core/5.8/nature-above-02.jpg);background-position:50% 50%"><img src="https://s.w.org/images/core/5.8/nature-above-02.jpg" alt="" class="wp-image-2589 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:spacer {"height":50} -->
+			'content'    => '<!-- wp:media-text {"align":"full","mediaPosition":"right","mediaId":2589,"mediaLink":"https://s.w.org/images/core/5.8/nature-above-02.jpg","mediaType":"image","imageFill":true,"style":{"color":{"background":"#d7e4d9","text":"#000000"},"elements":{"link":{"color":{"text":"#000000"}}}}} -->
+							<div class="wp-block-media-text alignfull has-media-on-the-right is-stacked-on-mobile is-image-fill has-text-color has-background has-link-color" style="background-color:#d7e4d9;color:#000000"><figure class="wp-block-media-text__media" style="background-image:url(https://s.w.org/images/core/5.8/nature-above-02.jpg);background-position:50% 50%"><img src="https://s.w.org/images/core/5.8/nature-above-02.jpg" alt="" class="wp-image-2589 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:spacer {"height":50} -->
 							<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
 
@@ -282,7 +280,7 @@ function register_gutenberg_patterns() {
 							<div style="height:400px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
 
-							<!-- wp:site-title {"style":{"typography":{"textTransform":"capitalize","fontSize":"84px","lineHeight":"1.0"}}} /-->
+							<!-- wp:site-title {"style":{"typography":{"textTransform":"capitalize","fontSize":"48px","lineHeight":"1.0"}}} /-->
 
 							<!-- wp:navigation {"orientation":"horizontal","color":{"text":"#161616"}},"style":{"typography":{"textTransform":"uppercase"}},"fontSize":"normal"} /-->
 
@@ -311,14 +309,13 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Centered footer with social links', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
-			'content'    => '<!-- wp:spacer {"height":30} --><div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div><!-- /wp:spacer --><!-- wp:social-links {"customIconColor":"#FFFFFF","iconColorValue":"#FFFFFF","customIconBackgroundColor":"#2a2a2a","iconBackgroundColorValue":"#2a2a2a","className":"items-justified-center"} --><ul class="wp-block-social-links has-icon-color has-icon-background-color items-justified-center"><!-- wp:social-link {"url":"#","service":"twitter"} /--><!-- wp:social-link {"url":"#","service":"instagram"} /--><!-- wp:social-link {"url":"#","service":"mail"} /--></ul><!-- /wp:social-links --><!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"16px"}}} --><p class="has-text-align-center" style="font-size:16px">' . esc_html__( 'Powered by WordPress', 'default' ) . '</p><!-- /wp:paragraph -->',
-		),
+			'content'    => '<!-- wp:spacer {"height":30} --><div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div><!-- /wp:spacer --><!-- wp:social-links {"className":"items-justified-center is-style-logos-only"} --> <ul class="wp-block-social-links items-justified-center is-style-logos-only"><!-- wp:social-link {"url":"#","service":"twitter"} /--> <!-- wp:social-link {"url":"#","service":"instagram"} /--> <!-- wp:social-link {"url":"#","service":"mail"} /--></ul> <!-- /wp:social-links --><!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"16px"}}} --><p class="has-text-align-center" style="font-size:16px">' . esc_html__( 'Powered by WordPress', 'default' ) . '</p><!-- /wp:paragraph -->', ),
 		'template-part/footer-latest-posts' => array(
 			'title'      => __( 'Footer with latest posts', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
-			'content'    => '<!-- wp:group {"align":"full","style":{"color":{"background":"#e7ecde"}}} -->
-							<div class="wp-block-group alignfull has-background" style="background-color:#e7ecde"><!-- wp:spacer {"height":10} -->
+			'content'    => '<!-- wp:group {"align":"full","style":{"color":{"background":"#121212","text":"#f1f1f1"},"elements":{"link":{"color":{"text":"#f1f1f1"}}}}} -->
+							<div class="wp-block-group alignfull has-text-color has-background has-link-color" style="background-color:#121212;color:#f1f1f1"><!-- wp:spacer {"height":10} -->
 							<div style="height:10px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
 							<!-- wp:latest-posts {"postsToShow":3,"displayPostContent":true,"excerptLength":12,"postLayout":"grid","displayFeaturedImage":true,"featuredImageSizeSlug":"large","addLinkToFeaturedImage":true} /-->
@@ -344,8 +341,8 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Modern footer with description and logo', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
-			'content'    => '<!-- wp:columns {"align":"full","style":{"color":{"background":"#fffbee"}}} -->
-							<div class="wp-block-columns alignfull has-background" style="background-color:#fffbee"><!-- wp:column {"width":"33%"} -->
+			'content'    => '<!-- wp:columns {"align":"full","style":{"color":{"background":"#d7e4d9"}}} -->
+							<div class="wp-block-columns alignfull has-background" style="background-color:#d7e4d9"><!-- wp:column {"width":"33%"} -->
 							<div class="wp-block-column" style="flex-basis:33%"><!-- wp:paragraph -->
 							<p><strong>' . esc_html__( 'ABOUT US', 'default' ) . '</strong></p>
 							<!-- /wp:paragraph -->
