@@ -21,9 +21,10 @@ const CONTROL_PROPS = {
 	controlBoxShadowFocus: `0 0 0, 0.5px, ${ COLORS.admin }`,
 	controlDestructiveBorderColor: COLORS.alert.red,
 	controlHeight: CONTROL_HEIGHT,
-	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
-	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
+	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
+	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
+	controlHeightXLarge: `calc( ${ CONTROL_HEIGHT } * 1.4 )`,
 };
 const SEGMENTED_CONTROL_PROPS = {
 	segmentedControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,

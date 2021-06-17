@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/core';
+import { css } from 'emotion';
 import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS } from '../utils';
+import { CONFIG, COLORS, reduceMotion } from '../utils';
 
 export const SegmentedControl = css`
 	background: ${ COLORS.ui.background };
@@ -20,7 +20,7 @@ export const SegmentedControl = css`
 	padding: 1px;
 	position: relative;
 	transition: all ${ CONFIG.transitionDurationFastest } linear;
-
+	${ reduceMotion( 'transition' ) }
 	&:hover {
 		border-color: ${ COLORS.ui.borderHover };
 	}
@@ -47,6 +47,7 @@ export const BackdropView = styled.div`
 	left: 0;
 	position: absolute;
 	transition: all ${ CONFIG.transitionDurationFast } ease;
+	${ reduceMotion( 'transition' ) }
 	z-index: 1;
 `;
 
@@ -79,6 +80,7 @@ export const ButtonView = styled.button`
 	text-align: center;
 	transition: background ${ CONFIG.transitionDurationFast } linear,
 		color ${ CONFIG.transitionDurationFast } linear, font-weight 60ms linear;
+	${ reduceMotion( 'transition' ) }
 	user-select: none;
 	width: 100%;
 	z-index: 2;
@@ -94,10 +96,10 @@ export const ButtonView = styled.button`
 
 export const ButtonContentView = styled.div`
 	font-size: ${ CONFIG.fontSize };
-	left: 50%;
 	line-height: 1;
 	position: absolute;
 	top: 50%;
+	left: 50%;
 	transform: translate( -50%, -50% );
 `;
 
@@ -113,6 +115,7 @@ export const SeparatorView = styled.div`
 	right: 0;
 	top: 4px;
 	transition: background ${ CONFIG.transitionDuration } linear;
+	${ reduceMotion( 'transition' ) }
 	width: 1px;
 `;
 
@@ -128,10 +131,22 @@ export const LabelPlaceholderView = styled.div`
 	visibility: hidden;
 `;
 
-export const large = css`
-	min-height: ${ CONFIG.controlHeightLarge };
+export const xSmall = css`
+	min-height: ${ CONFIG.controlHeightXSmall };
 `;
 
 export const small = css`
 	min-height: ${ CONFIG.controlHeightSmall };
+`;
+
+export const medium = css`
+	min-height: ${ CONFIG.controlHeight };
+`;
+
+export const large = css`
+	min-height: ${ CONFIG.controlHeightLarge };
+`;
+
+export const xLarge = css`
+	min-height: ${ CONFIG.controlHeightXLarge };
 `;

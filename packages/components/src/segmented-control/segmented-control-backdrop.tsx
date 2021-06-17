@@ -9,8 +9,11 @@ import { useState, useEffect, memo } from '@wordpress/element';
 import type { SegmentedControlBackdropProps } from './types';
 import { BackdropView } from './styles';
 
-function SegmentedControlBackdrop( props: SegmentedControlBackdropProps ) {
-	const { containerRef, containerWidth, state } = props;
+function SegmentedControlBackdrop( {
+	containerRef,
+	containerWidth,
+	state,
+}: SegmentedControlBackdropProps ) {
 	const [ left, setLeft ] = useState( 0 );
 	const [ width, setWidth ] = useState( 0 );
 	const [ canAnimate, setCanAnimate ] = useState( false );

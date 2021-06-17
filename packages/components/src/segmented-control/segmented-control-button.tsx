@@ -57,9 +57,11 @@ function SegmentedControlButton( allProps: SegmentedControlButtonProps ) {
 	);
 }
 
-const SegmentedControlSeparator = memo( ( { isActive: boolean } ) => {
-	const classes = cx( isActive && styles.separatorActive );
-	return <SeparatorView aria-hidden className={ classes } />;
-} );
+const SegmentedControlSeparator = memo(
+	( { isActive }: { isActive: boolean } ) => {
+		const classes = cx( isActive && styles.separatorActive );
+		return <SeparatorView aria-hidden className={ classes } />;
+	}
+);
 
 export default memo( SegmentedControlButton );

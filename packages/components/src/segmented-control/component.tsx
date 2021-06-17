@@ -16,20 +16,24 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '../ui/context';
+import {
+	contextConnect,
+	useContextSystem,
+	PolymorphicComponentProps,
+} from '../ui/context';
 import { View } from '../view';
 import * as styles from './styles';
 import { useUpdateEffect } from '../utils/hooks';
 import Backdrop from './segmented-control-backdrop';
 import Button from './segmented-control-button';
+import type { SegmentedControlProps } from './types';
 
 const noop = () => {};
 
-/**
- * @param {import('./types').SegmentedControlProps} props
- * @param {import('react').Ref<any>}                forwardedRef
- */
-function SegmentControl( props, forwardedRef ) {
+function SegmentControl(
+	props: PolymorphicComponentProps< SegmentedControlProps, 'input' >,
+	forwardedRef: import('react').Ref< any >
+) {
 	const {
 		className,
 		baseId,

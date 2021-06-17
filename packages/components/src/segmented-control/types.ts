@@ -2,13 +2,12 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { Ref, RefObject } from 'react';
+import type { MutableRefObject, Ref } from 'react';
 
 /**
  * Internal dependencies
  */
 import type { FormElementProps, SizeRangeDefault } from '../utils/types';
-import type { PolymorphicComponent } from '../ui/context';
 
 /**
  * Option to render within `SegmentedControl`.
@@ -80,19 +79,6 @@ export type SegmentedControlProps = Omit<
 	value?: string | number;
 };
 
-/**
- * `SegmentedControl` is a form component that lets users choose options represented in horizontal segments.
- *
- * @example
- * ```jsx
- * <SegmentedControl options={[...]} />
- * ```
- */
-export type SegmentedControl = PolymorphicComponent<
-	'input',
-	SegmentedControlProps
->;
-
 export type SegmentedControlButtonProps = {
 	className?: string;
 	forwardedRef?: Ref< any >;
@@ -109,7 +95,7 @@ export type SegmentedControlButtonProps = {
 };
 
 export type SegmentedControlBackdropProps = {
-	containerRef: RefObject< any >;
+	containerRef: MutableRefObject< HTMLElement | undefined >;
 	containerWidth?: number | null;
 	state?: any;
 };
