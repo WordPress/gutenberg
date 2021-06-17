@@ -72,6 +72,7 @@ export default function AllInputControl( {
 	return (
 		<UnitControl
 			{ ...props }
+			allowDecimal={ true }
 			disableUnits={ isMixed }
 			isOnly
 			value={ allValue }
@@ -80,7 +81,6 @@ export default function AllInputControl( {
 			onHoverOn={ handleOnHoverOn }
 			onHoverOff={ handleOnHoverOff }
 			placeholder={ allPlaceholder }
-			allowDecimal={ true }
 		/>
 	);
 }

@@ -86,6 +86,7 @@ export default function BoxInputControls( {
 				{ filteredSides.map( ( side ) => (
 					<UnitControl
 						{ ...props }
+						allowDecimal={ true }
 						isFirst={ first === side }
 						isLast={ last === side }
 						isOnly={ only === side }
@@ -96,7 +97,6 @@ export default function BoxInputControls( {
 						onHoverOff={ createHandleOnHoverOff( side ) }
 						label={ LABELS[ side ] }
 						key={ `box-control-${ side }` }
-						allowDecimal={ true }
 					/>
 				) ) }
 			</Layout>

@@ -17,13 +17,7 @@ import {
 	inputControlActionTypes,
 	composeStateReducers,
 } from '../input-control/state';
-import {
-	add,
-	decimalClamp,
-	getNumber,
-	roundClamp,
-	subtract,
-} from '../utils/math';
+import { add, decimalClamp, roundClamp, subtract } from '../utils/math';
 import { useJumpStep } from '../utils/hooks';
 import { isValueEmpty } from '../utils/values';
 

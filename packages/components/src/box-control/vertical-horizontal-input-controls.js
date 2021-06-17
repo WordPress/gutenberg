@@ -95,6 +95,7 @@ export default function VerticalHorizontalInputControls( {
 			{ filteredSides.map( ( side ) => (
 				<UnitControl
 					{ ...props }
+					allowDecimal={ true }
 					isFirst={ first === side }
 					isLast={ last === side }
 					isOnly={ only === side }
