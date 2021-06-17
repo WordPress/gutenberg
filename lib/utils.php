@@ -63,3 +63,30 @@ function gutenberg_experimental_set( &$array, $path, $value = null ) {
 	}
 	$array[ $path[ $i ] ] = $value;
 }
+
+/**
+ * This function is trying to replicate what
+ * lodash's kebabCase (JS library) does in the client.
+ *
+ * The reason for that is that we do some processing
+ * in both the client and the server (e.g.: we generate
+ * preset classes from preset slugs) that needs to
+ * behave the same.
+ *
+ * Due to backward compatibility we need to keep the
+ * client's library as it is, hence, we have to
+ * make the server behave like the client.
+ *
+ * @param string $string The string to kebab-case.
+ *
+ * @return string kebab-cased-string.
+ */
+function gutenberg_experimental_to_kebab_case( $string ) {
+	$regexp = '#'.implode('|', [
+		'[a-z]?[A-Z]+',
+		'[A-Z]?[a-z]+',
+		'\d+',
+	]).'#';
+	preg_match_all( $regexp, $string, $matches );
+	return implode( '-', $matches[0] );
+}

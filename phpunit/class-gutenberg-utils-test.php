@@ -121,4 +121,11 @@ class Gutenberg_Utils_Test extends WP_UnitTestCase {
 			array( 'a' => 2 )
 		);
 	}
+
+	public function test_gutenberg_experimental_to_kebab_case() {
+		$this->assertEquals( 'white', gutenberg_experimental_to_kebab_case( 'white' ) );
+		$this->assertEquals( 'white-2-white', gutenberg_experimental_to_kebab_case( 'white2white' ) );
+		$this->assertEquals( 'white-2nd', gutenberg_experimental_to_kebab_case( 'white2nd' ) );
+		$this->assertEquals( 'white-to-white', gutenberg_experimental_to_kebab_case( 'whiteToWhite' ) );
+	}
 }

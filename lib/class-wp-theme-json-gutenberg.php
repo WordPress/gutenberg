@@ -719,7 +719,7 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( $preset['classes'] as $class ) {
 				foreach ( $preset_by_slug as $slug => $value ) {
 					$stylesheet .= self::to_ruleset(
-						self::append_to_selector( $selector, '.has-' . $slug . '-' . $class['class_suffix'] ),
+						self::append_to_selector( $selector, '.has-' . gutenberg_experimental_to_kebab_case( $slug ) . '-' . $class['class_suffix'] ),
 						array(
 							array(
 								'name'  => $class['property_name'],
