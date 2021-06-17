@@ -97,15 +97,11 @@ function NotEmpty( {
 	const { widgetType, hasResolvedWidgetType, isNavigationMode } = useSelect(
 		( select ) => {
 			const widgetTypeId = id ?? idBase;
-			const hiddenIds =
-				select( blockEditorStore ).getSettings()
-					?.widgetTypesToHideFromLegacyWidgetBlock ?? [];
 			return {
 				widgetType: select( coreStore ).getWidgetType( widgetTypeId ),
 				hasResolvedWidgetType: select(
 					coreStore
 				).hasFinishedResolution( 'getWidgetType', [ widgetTypeId ] ),
-				isWidgetTypeHidden: hiddenIds.includes( widgetTypeId ),
 				isNavigationMode: select( blockEditorStore ).isNavigationMode(),
 			};
 		},
