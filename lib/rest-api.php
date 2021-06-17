@@ -185,42 +185,79 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
 
 /**
- * Filters WP_User_Query arguments when querying users via the REST API.
- *
- * Allow using the has_published_post argument.
- *
- * @param array           $prepared_args Array of arguments for WP_User_Query.
- * @param WP_REST_Request $request       The REST API request.
- *
- * @return array Returns modified $prepared_args.
+ * Expose the custom_logo theme-mod in the settings REST API.
  */
-function gutenberg_rest_user_query_has_published_posts( $prepared_args, $request ) {
-	if ( ! empty( $request['has_published_posts'] ) ) {
-		$prepared_args['has_published_posts'] = ( true === $request['has_published_posts'] )
-			? get_post_types( array( 'show_in_rest' => true ), 'names' )
-			: (array) $request['has_published_posts'];
-	}
-	return $prepared_args;
-}
-add_filter( 'rest_user_query', 'gutenberg_rest_user_query_has_published_posts', 10, 2 );
-
+register_setting(
+	'general',
+	'theme_mods_' . get_option( 'stylesheet' ),
+	array(
+		'type'         => 'object',
+		'show_in_rest' => array(
+			'name'   => 'theme_mods_' . get_option( 'stylesheet' ),
+			'schema' => array(
+				'type'       => 'object',
+				'properties' => array(
+					'custom_logo' => array( 'type' => 'integer' ),
+				),
+			),
+		),
+	)
+);
 
 /**
- * Filters REST API collection parameters for the users controller.
- *
- * @param array $query_params JSON Schema-formatted collection parameters.
- *
- * @return array Returns the $query_params with "has_published_posts".
+ * Expose the "stylesheet" setting in the REST API.
  */
-function gutenberg_rest_user_collection_params_has_published_posts( $query_params ) {
-	$query_params['has_published_posts'] = array(
-		'description' => __( 'Limit result set to users who have published posts.', 'gutenberg' ),
-		'type'        => array( 'boolean', 'array' ),
-		'items'       => array(
-			'type' => 'string',
-			'enum' => get_post_types( array( 'show_in_rest' => true ), 'names' ),
-		),
-	);
-	return $query_params;
+register_setting(
+	'general',
+	'stylesheet',
+	array(
+		'type'         => 'string',
+		'show_in_rest' => true,
+	)
+);
+
+/**
+ * Filters the value of a setting recognized by the REST API.
+ *
+ * Hijacks the value for custom_logo theme-mod.
+ *
+ * @param mixed  $result Value to use for the requested setting. Can be a scalar
+ *                       matching the registered schema for the setting, or null to
+ *                       follow the default get_option() behavior.
+ * @param string $name   Setting name (as shown in REST API responses).
+ *
+ * @return null|array
+ */
+function gutenberg_rest_pre_get_setting_filter_custom_logo( $result, $name ) {
+	if ( 'theme_mods_' . get_option( 'stylesheet' ) === $name ) {
+		return array(
+			'custom_logo' => get_theme_mod( 'custom_logo' ),
+		);
+	}
 }
-add_filter( 'rest_user_collection_params', 'gutenberg_rest_user_collection_params_has_published_posts' );
+add_filter( 'rest_pre_get_setting', 'gutenberg_rest_pre_get_setting_filter_custom_logo', 10, 2 );
+
+/**
+ * Filters whether to preempt a setting value update via the REST API.
+ *
+ * Hijacks the saving method for theme-mods.
+ *
+ * @param bool   $result Whether to override the default behavior for updating the
+ *                       value of a setting.
+ * @param string $name   Setting name (as shown in REST API responses).
+ * @param mixed  $value  Updated setting value.
+ *
+ * @return bool
+ */
+function gutenberg_rest_pre_set_setting_filter_theme_mods( $result, $name, $value ) {
+	$theme_mods_setting_name = 'theme_mods_' . get_option( 'stylesheet' );
+	if ( $theme_mods_setting_name === $name ) {
+		$value = (array) $value;
+		$value = wp_parse_args( $value, get_option( $theme_mods_setting_name, array() ) );
+
+		update_option( $theme_mods_setting_name, $value );
+		return true;
+	}
+}
+
+add_filter( 'rest_pre_update_setting', 'gutenberg_rest_pre_set_setting_filter_theme_mods', 10, 3 );
