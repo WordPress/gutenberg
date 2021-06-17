@@ -723,7 +723,7 @@ class WP_Theme_JSON_Gutenberg {
 						array(
 							array(
 								'name'  => $class['property_name'],
-								'value' => 'var(--wp--preset--' . $preset['css_var_infix'] . "--" . gutenberg_experimental_to_kebab_case( $slug ) . ") !important",
+								'value' => 'var(--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ) . ') !important',
 							),
 						)
 					);
