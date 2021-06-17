@@ -13,7 +13,7 @@ export const SegmentedControl = css`
 	background: ${ COLORS.ui.background };
 	border: 1px solid;
 	border-color: ${ COLORS.ui.border };
-	border-radius: calc( ${ CONFIG.controlBorderRadius } + 1px );
+	border-radius: ${ CONFIG.controlBorderRadius };
 	display: inline-flex;
 	min-height: ${ CONFIG.controlHeight };
 	min-width: 0;
@@ -62,6 +62,11 @@ export const labelBlock = css`
 	flex: 1;
 `;
 
+export const buttonActive = css`
+	color: ${ COLORS.white } !important;
+	background: ${ COLORS.gray[ 900 ] } !important;
+`;
+
 export const ButtonView = styled.button`
 	align-items: center;
 	appearance: none;
@@ -90,7 +95,7 @@ export const ButtonView = styled.button`
 	}
 
 	&:active {
-		background: ${ CONFIG.segmentedControlButtonColorActive };
+		background: ${ CONFIG.segmentedControlBackgroundColor };
 	}
 `;
 
@@ -101,11 +106,6 @@ export const ButtonContentView = styled.div`
 	top: 50%;
 	left: 50%;
 	transform: translate( -50%, -50% );
-`;
-
-export const buttonActive = css`
-	color: ${ CONFIG.controlTextActiveColor };
-	font-weight: bold;
 `;
 
 export const SeparatorView = styled.div`

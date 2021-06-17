@@ -28,9 +28,9 @@ const CONTROL_PROPS = {
 };
 const SEGMENTED_CONTROL_PROPS = {
 	segmentedControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
-	segmentedControlBorderColor: COLORS.ui.border, // get( 'controlBorderColor' )
+	segmentedControlBorderColor: COLORS.ui.border,
 	segmentedControlBackdropBackgroundColor: CONTROL_PROPS.controlSurfaceColor,
-	segmentedControlBackdropBorderColor: COLORS.ui.border, // get( 'controlBorderColor' ),
+	segmentedControlBackdropBorderColor: COLORS.ui.border,
 	segmentedControlBackdropBoxShadow: 'transparent',
 	segmentedControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
 };
