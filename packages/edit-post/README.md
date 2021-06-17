@@ -484,6 +484,7 @@ an initial state from prior to the crash.
 
 _Parameters_
 
+-   _root_ `Object`: React Root.
 -   _postType_ `Object`: Post type of the post to edit.
 -   _postId_ `Object`: ID of the post to edit.
 -   _target_ `Element`: DOM node in which editor is rendered.

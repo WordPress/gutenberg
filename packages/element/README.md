@@ -198,6 +198,10 @@ _Returns_
 
 -   `Object`: Ref object.
 
+### createRoot
+
+Undocumented declaration.
+
 ### findDOMNode
 
 Finds the dom node of a React component.

@@ -6,7 +6,7 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { render, unmountComponentAtNode } from '@wordpress/element';
+import { createRoot, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -24,6 +24,7 @@ import { store as editPostStore } from './store';
  * an unhandled error occurs, replacing previously mounted editor element using
  * an initial state from prior to the crash.
  *
+ * @param {Object}  root         React Root.
  * @param {Object}  postType     Post type of the post to edit.
  * @param {Object}  postId       ID of the post to edit.
  * @param {Element} target       DOM node in which editor is rendered.
@@ -33,6 +34,7 @@ import { store as editPostStore } from './store';
  *                               unsaved changes prompt).
  */
 export function reinitializeEditor(
+	root,
 	postType,
 	postId,
 	target,
@@ -42,6 +44,7 @@ export function reinitializeEditor(
 	unmountComponentAtNode( target );
 	const reboot = reinitializeEditor.bind(
 		null,
+		root,
 		postType,
 		postId,
 		target,
@@ -49,7 +52,7 @@ export function reinitializeEditor(
 		initialEdits
 	);
 
-	render(
+	root.render(
 		<Editor
 			settings={ settings }
 			onError={ reboot }
@@ -57,8 +60,7 @@ export function reinitializeEditor(
 			postType={ postType }
 			initialEdits={ initialEdits }
 			recovery
-		/>,
-		target
+		/>
 	);
 }
 
@@ -97,8 +99,10 @@ export function initializeEditor(
 	);
 
 	const target = document.getElementById( id );
+	const root = createRoot( target );
 	const reboot = reinitializeEditor.bind(
 		null,
+		root,
 		postType,
 		postId,
 		target,
@@ -170,15 +174,14 @@ export function initializeEditor(
 		} );
 	}
 
-	render(
+	root.render(
 		<Editor
 			settings={ settings }
 			onError={ reboot }
 			postId={ postId }
 			postType={ postType }
 			initialEdits={ initialEdits }
-		/>,
-		target
+		/>
 	);
 }
 
