@@ -28,22 +28,27 @@ import { createBlock, serialize } from '@wordpress/blocks';
 function PostTemplateActions() {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
-	const { template, supportsTemplateMode } = useSelect( ( select ) => {
-		const { getCurrentPostType } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const { getEditedPostTemplate } = select( editPostStore );
+	const { template, supportsTemplateMode, defaultTemplate } = useSelect(
+		( select ) => {
+			const { getCurrentPostType, getEditorSettings } = select(
+				editorStore
+			);
+			const { getPostType } = select( coreStore );
+			const { getEditedPostTemplate } = select( editPostStore );
 
-		const isViewable =
-			getPostType( getCurrentPostType() )?.viewable ?? false;
-		const _supportsTemplateMode =
-			select( editorStore ).getEditorSettings().supportsTemplateMode &&
-			isViewable;
+			const isViewable =
+				getPostType( getCurrentPostType() )?.viewable ?? false;
+			const _supportsTemplateMode =
+				getEditorSettings().supportsTemplateMode && isViewable;
 
-		return {
-			template: _supportsTemplateMode && getEditedPostTemplate(),
-			supportsTemplateMode: _supportsTemplateMode,
-		};
-	}, [] );
+			return {
+				template: _supportsTemplateMode && getEditedPostTemplate(),
+				supportsTemplateMode: _supportsTemplateMode,
+				defaultTemplate: getEditorSettings().defaultBlockTemplate,
+			};
+		},
+		[]
+	);
 	const { __unstableSwitchToTemplateMode } = useDispatch( editPostStore );
 
 	if ( ! supportsTemplateMode ) {
@@ -79,20 +84,23 @@ function PostTemplateActions() {
 						onSubmit={ ( event ) => {
 							event.preventDefault();
 							const defaultTitle = __( 'Custom Template' );
-							const templateContent = [
-								createBlock( 'core/site-title' ),
-								createBlock( 'core/site-tagline' ),
-								createBlock( 'core/separator' ),
-								createBlock( 'core/post-title' ),
-								createBlock( 'core/post-content', {
-									layout: { inherit: true },
-								} ),
-							];
+							const newTemplateContent =
+								defaultTemplate ??
+								serialize( [
+									createBlock( 'core/site-title' ),
+									createBlock( 'core/site-tagline' ),
+									createBlock( 'core/separator' ),
+									createBlock( 'core/post-title' ),
+									createBlock( 'core/post-content', {
+										layout: { inherit: true },
+									} ),
+								] );
+
 							__unstableSwitchToTemplateMode( {
 								slug:
 									'wp-custom-template-' +
 									kebabCase( title ?? defaultTitle ),
-								content: serialize( templateContent ),
+								content: newTemplateContent,
 								title: title ?? defaultTitle,
 							} );
 							setIsModalOpen( false );
