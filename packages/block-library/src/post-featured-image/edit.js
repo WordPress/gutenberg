@@ -8,6 +8,8 @@ import {
 	ToggleControl,
 	PanelBody,
 	withNotices,
+	BaseControl,
+	__experimentalSegmentedControl as SegmentedControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -27,6 +29,26 @@ const placeholderChip = (
 		<p> { __( 'Featured Image' ) }</p>
 	</div>
 );
+
+function Example() {
+	return (
+		<SegmentedControl
+			label="my label"
+			value="vertical"
+			options={ [
+				{
+					label: 'Horizontal',
+					value: 'horizontal',
+				},
+				{
+					label: 'Vertical',
+					value: 'vertical',
+				},
+			] }
+			isBlock
+		/>
+	);
+}
 
 function PostFeaturedImageDisplay( {
 	attributes: { isLink },
@@ -94,6 +116,9 @@ function PostFeaturedImageDisplay( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
+					<BaseControl>
+						<Example />
+					</BaseControl>
 					<ToggleControl
 						label={ sprintf(
 							// translators: %s: Name of the post type e.g: "post".
