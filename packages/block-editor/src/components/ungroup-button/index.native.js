@@ -23,7 +23,7 @@ export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 		return null;
 	}
 	return (
-		<Toolbar label={ __( 'Options' ) }>
+		<Toolbar>
 			<ToolbarButton
 				title={ __( 'Ungroup' ) }
 				icon={ UngroupIcon }
