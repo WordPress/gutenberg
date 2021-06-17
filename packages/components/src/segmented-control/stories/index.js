@@ -12,8 +12,9 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Icon, Spacer, View } from '../../index';
+import { Icon, __experimentalSpacer as Spacer } from '../../';
 import { SegmentedControl } from '../index';
+import { View } from '../../view';
 
 export default {
 	component: SegmentedControl,
@@ -41,7 +42,7 @@ const align = [
 
 export const _default = () => {
 	const [ alignState, setAlignState ] = useState( align[ 0 ].value );
-
+	const label = 'Segmented Control';
 	const xy = [
 		{
 			label: 'Horizontal',
@@ -66,27 +67,33 @@ export const _default = () => {
 
 	return (
 		<View>
-			<Spacer css={ { width: [ null, 300 ] } }>
+			<Spacer>
 				<SegmentedControl
 					isBlock
 					onChange={ setAlignState }
 					options={ align }
 					value={ alignState }
+					label={ label }
 				/>
 			</Spacer>
-			<Spacer css={ { width: [ null, 300 ] } }>
+			<Spacer>
 				<SegmentedControl
 					isBlock
 					onChange={ setAlignState }
 					options={ align }
 					value={ alignState }
+					label={ label }
 				/>
 			</Spacer>
 			<Spacer>
-				<SegmentedControl options={ xy } />
+				<SegmentedControl options={ xy } label={ label } />
 			</Spacer>
 			<Spacer>
-				<SegmentedControl isAdaptiveWidth options={ shortLong } />
+				<SegmentedControl
+					isAdaptiveWidth
+					options={ shortLong }
+					label={ label }
+				/>
 			</Spacer>
 		</View>
 	);
