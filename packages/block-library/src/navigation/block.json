@@ -42,6 +42,9 @@
 		"isResponsive": {
 			"type": "boolean",
 			"default": false
+		},
+		"__unstable__location": {
+			"type": "string"
 		}
 	},
 	"providesContext": {
