@@ -86,7 +86,7 @@ supports: {
 -   Default value: null
 -   Subproperties:
     -   `background`: type `boolean`, default value `true`
-    -   `duotone`: type `string`, default value undefined
+    -   `__experimentalDuotone`: type `string`, default value undefined
     -   `gradients`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
 
@@ -196,7 +196,7 @@ supports: {
 
 Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
 
-When the block declares support for `color.duotone`, the attributes definition is extended to include the attribute `style`:
+When the block declares support for `color.__experimentalDuotone`, the attributes definition is extended to include the attribute `style`:
 
 - `style`: attribute of `object` type with no default assigned.
 
@@ -210,7 +210,7 @@ When the block declares support for `color.duotone`, the attributes definition i
               color: {
                   duotone: [
                       '#FFF',
-                      '#000
+                      '#000'
                   ]
               }
           }

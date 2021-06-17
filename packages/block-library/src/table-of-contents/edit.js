@@ -35,11 +35,11 @@ import { getHeadingsFromContent, linearToNestedHeadingList } from './utils';
 /**
  * Table of Contents block edit component.
  *
- * @param {Object}                       props            The props.
- * @param {Object}                       props.attributes The block attributes.
+ * @param {Object}                       props                                   The props.
+ * @param {Object}                       props.attributes                        The block attributes.
  * @param {boolean}                      props.attributes.onlyIncludeCurrentPage
- * Whether to only include headings from the current page (if the post is
- * paginated).
+ *                                                                               Whether to only include headings from the current page (if the post is
+ *                                                                               paginated).
  * @param {string}                       props.clientId
  * @param {(attributes: Object) => void} props.setAttributes
  *

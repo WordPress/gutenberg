@@ -11,6 +11,12 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.55.0
+-   [*] Gallery block - Fix gallery images caption text formatting [#32351]
+-   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]
+-   [***] Audio block now available on WP.com sites on the free plan. [#31966]
+
+## 1.54.0
 -   [***] Slash inserter [#29772]
 -   [*] Audio block: Add Insert from URL functionality. [#27817]
 -   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
@@ -54,10 +60,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.50.1
 
--   [x] Truncate rangecell screenreader decimals] [#30678]
--   [x] Fix Quote block citation [#30548]
--   [xx] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
--   [xx] Fix Unsupported Block Editor on Android [#30650]
+-   [*] Truncate rangecell screenreader decimals] [#30678]
+-   [*] Fix Quote block citation [#30548]
+-   [**] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
+-   [**] Fix Unsupported Block Editor on Android [#30650]
 
 ## 1.50.0
 

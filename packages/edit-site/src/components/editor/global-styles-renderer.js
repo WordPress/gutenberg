@@ -52,12 +52,17 @@ function getPresetsDeclarations( blockPresets = {} ) {
 	return reduce(
 		PRESET_METADATA,
 		( declarations, { path, valueKey, cssVarInfix } ) => {
-			const preset = get( blockPresets, path, [] );
-			preset.forEach( ( value ) => {
-				declarations.push(
-					`--wp--preset--${ cssVarInfix }--${ value.slug }: ${ value[ valueKey ] }`
-				);
+			const presetByOrigin = get( blockPresets, path, [] );
+			[ 'core', 'theme', 'user' ].forEach( ( origin ) => {
+				if ( presetByOrigin[ origin ] ) {
+					presetByOrigin[ origin ].forEach( ( value ) => {
+						declarations.push(
+							`--wp--preset--${ cssVarInfix }--${ value.slug }: ${ value[ valueKey ] }`
+						);
+					} );
+				}
 			} );
+
 			return declarations;
 		},
 		[]
@@ -74,19 +79,23 @@ function getPresetsDeclarations( blockPresets = {} ) {
 function getPresetsClasses( blockSelector, blockPresets = {} ) {
 	return reduce(
 		PRESET_METADATA,
-		( declarations, { path, valueKey, classes } ) => {
+		( declarations, { path, cssVarInfix, classes } ) => {
 			if ( ! classes ) {
 				return declarations;
 			}
-			const presets = get( blockPresets, path, [] );
-			presets.forEach( ( preset ) => {
-				classes.forEach( ( { classSuffix, propertyName } ) => {
-					const slug = preset.slug;
-					const value = preset[ valueKey ];
-					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
-					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-					declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
-				} );
+
+			const presetByOrigin = get( blockPresets, path, [] );
+			[ 'core', 'theme', 'user' ].forEach( ( origin ) => {
+				if ( presetByOrigin[ origin ] ) {
+					presetByOrigin[ origin ].forEach( ( { slug } ) => {
+						classes.forEach( ( { classSuffix, propertyName } ) => {
+							const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
+							const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
+							const value = `var(--wp--preset--${ cssVarInfix }--${ slug })`;
+							declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
+						} );
+					} );
+				}
 			} );
 			return declarations;
 		},
@@ -113,7 +122,7 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object} blockStyles   Block styles.
+ * @param {Object} blockStyles Block styles.
  *
  * @return {Array} An array of style declarations.
  */

@@ -26,10 +26,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
 
-export default function PostDateEdit( { attributes, context, setAttributes } ) {
-	const { textAlign, format, isLink } = attributes;
-	const { postId, postType } = context;
-
+export default function PostDateEdit( {
+	attributes: { textAlign, format, isLink },
+	context: { postId, postType, queryId },
+	setAttributes,
+} ) {
+	const isDescendentOfQueryLoop = !! queryId;
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
 	const [ date, setDate ] = useEntityProp(
 		'postType',
@@ -98,7 +100,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 					} }
 				/>
 
-				{ date && (
+				{ date && ! isDescendentOfQueryLoop && (
 					<ToolbarButton
 						icon={ edit }
 						title={ __( 'Change Date' ) }

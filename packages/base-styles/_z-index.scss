@@ -114,10 +114,6 @@ $z-layers: (
 	// Show the FSE template previews above the editor and any open block toolbars
 	".edit-site-navigation-panel__preview": 32,
 
-	// Show notices below expanded editor bar
-	// .edit-post-header { z-index: 30 }
-	".components-notice-list": 29,
-
 	// Above the block list and the header.
 	".block-editor-block-list__block-popover": 31,
 
@@ -167,7 +163,9 @@ $z-layers: (
 	".components-resizable-box__corner-handle": 2,
 
 	// Make sure block manager sticky category titles appear above the options
-	".edit-post-manage-blocks-modal__category-title": 1,
+	".edit-post-block-manager__category-title": 1,
+	// And block manager sticky disabled block count is higher still
+	".edit-post-block-manager__disabled-blocks-count": 2,
 
 	// Needs to be higher than any other element as this is an overlay to catch all events
 	".components-tooltip .event-catcher": 100002,

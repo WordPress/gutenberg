@@ -12,10 +12,21 @@ export default function useMenuEntity( menuId ) {
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const menuEntityData = [ MENU_KIND, MENU_POST_TYPE, menuId ];
-	const editedMenu = useSelect(
-		( select ) =>
-			menuId &&
-			select( coreStore ).getEditedEntityRecord( ...menuEntityData ),
+	const { editedMenu, hasLoadedEditedMenu } = useSelect(
+		( select ) => {
+			return {
+				editedMenu:
+					menuId &&
+					select( coreStore ).getEditedEntityRecord(
+						...menuEntityData
+					),
+				hasLoadedEditedMenu: select(
+					coreStore
+				).hasFinishedResolution( 'getEditedEntityRecord', [
+					...menuEntityData,
+				] ),
+			};
+		},
 		[ menuId ]
 	);
 
@@ -23,5 +34,6 @@ export default function useMenuEntity( menuId ) {
 		editedMenu,
 		menuEntityData,
 		editMenuEntityRecord: editEntityRecord,
+		hasLoadedEditedMenu,
 	};
 }

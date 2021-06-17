@@ -11,6 +11,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { visibilityOptions } from './utils';
+import { store as editorStore } from '../../store';
 
 export class PostVisibility extends Component {
 	constructor( props ) {
@@ -151,7 +152,7 @@ export class PostVisibility extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getEditedPostAttribute, getEditedPostVisibility } = select(
-			'core/editor'
+			editorStore
 		);
 		return {
 			status: getEditedPostAttribute( 'status' ),
@@ -160,7 +161,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { savePost, editPost } = dispatch( 'core/editor' );
+		const { savePost, editPost } = dispatch( editorStore );
 		return {
 			onSave: savePost,
 			onUpdateVisibility( status, password = '' ) {

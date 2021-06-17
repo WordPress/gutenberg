@@ -87,37 +87,37 @@ import { store as blocksStore } from '../store';
  *
  * @typedef {Object} WPBlockVariation
  *
- * @property {string}   name                   The unique and machine-readable name.
- * @property {string}   title                  A human-readable variation title.
- * @property {string}   [description]          A detailed variation description.
- * @property {string}   [category]             Block type category classification,
- *                                             used in search interfaces to arrange
- *                                             block types by category.
- * @property {WPIcon}   [icon]                 An icon helping to visualize the variation.
- * @property {boolean}  [isDefault]            Indicates whether the current variation is
- *                                             the default one. Defaults to `false`.
- * @property {Object}   [attributes]           Values which override block attributes.
- * @property {Array[]}  [innerBlocks]          Initial configuration of nested blocks.
- * @property {Object}   [example]              Example provides structured data for
- *                                             the block preview. You can set to
- *                                             `undefined` to disable the preview shown
- *                                             for the block type.
- * @property {WPBlockVariationScope[]} [scope] The list of scopes where the variation
- *                                             is applicable. When not provided, it
- *                                             assumes all available scopes.
- * @property {string[]} [keywords]             An array of terms (which can be translated)
- *                                             that help users discover the variation
- *                                             while searching.
- * @property {Function|string[]} [isActive]    This can be a function or an array of block attributes.
- *                                             Function that accepts a block's attributes and the
- *                                             variation's attributes and determines if a variation is active.
- *                                             This function doesn't try to find a match dynamically based
- *                                             on all block's attributes, as in many cases some attributes are irrelevant.
- *                                             An example would be for `embed` block where we only care
- *                                             about `providerNameSlug` attribute's value.
- *                                             We can also use a `string[]` to tell which attributes
- *                                             should be compared as a shorthand. Each attributes will
- *                                             be matched and the variation will be active if all of them are matching.
+ * @property {string}                  name          The unique and machine-readable name.
+ * @property {string}                  title         A human-readable variation title.
+ * @property {string}                  [description] A detailed variation description.
+ * @property {string}                  [category]    Block type category classification,
+ *                                                   used in search interfaces to arrange
+ *                                                   block types by category.
+ * @property {WPIcon}                  [icon]        An icon helping to visualize the variation.
+ * @property {boolean}                 [isDefault]   Indicates whether the current variation is
+ *                                                   the default one. Defaults to `false`.
+ * @property {Object}                  [attributes]  Values which override block attributes.
+ * @property {Array[]}                 [innerBlocks] Initial configuration of nested blocks.
+ * @property {Object}                  [example]     Example provides structured data for
+ *                                                   the block preview. You can set to
+ *                                                   `undefined` to disable the preview shown
+ *                                                   for the block type.
+ * @property {WPBlockVariationScope[]} [scope]       The list of scopes where the variation
+ *                                                   is applicable. When not provided, it
+ *                                                   assumes all available scopes.
+ * @property {string[]}                [keywords]    An array of terms (which can be translated)
+ *                                                   that help users discover the variation
+ *                                                   while searching.
+ * @property {Function|string[]}       [isActive]    This can be a function or an array of block attributes.
+ *                                                   Function that accepts a block's attributes and the
+ *                                                   variation's attributes and determines if a variation is active.
+ *                                                   This function doesn't try to find a match dynamically based
+ *                                                   on all block's attributes, as in many cases some attributes are irrelevant.
+ *                                                   An example would be for `embed` block where we only care
+ *                                                   about `providerNameSlug` attribute's value.
+ *                                                   We can also use a `string[]` to tell which attributes
+ *                                                   should be compared as a shorthand. Each attributes will
+ *                                                   be matched and the variation will be active if all of them are matching.
  */
 
 /**
@@ -375,9 +375,9 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 /**
  * Translates block settings provided with metadata using the i18n schema.
  *
- * @param {string|string[]|Object[]} i18nSchema    I18n schema for the block setting.
- * @param {string|string[]|Object[]} settingValue  Value for the block setting.
- * @param {string}                   textdomain    Textdomain to use with translations.
+ * @param {string|string[]|Object[]} i18nSchema   I18n schema for the block setting.
+ * @param {string|string[]|Object[]} settingValue Value for the block setting.
+ * @param {string}                   textdomain   Textdomain to use with translations.
  *
  * @return {string|string[]|Object[]} Translated setting.
  */
@@ -429,8 +429,8 @@ function translateBlockSettingUsingI18nSchema(
  *
  * @deprecated Use `registerBlockType` instead.
  *
- * @param {Object} metadata            Block metadata loaded from `block.json`.
- * @param {Object} additionalSettings  Additional block settings.
+ * @param {Object} metadata           Block metadata loaded from `block.json`.
+ * @param {Object} additionalSettings Additional block settings.
  *
  * @return {?WPBlock} The block, if it has been successfully registered;
  *                    otherwise `undefined`.
@@ -582,10 +582,10 @@ export function getBlockTypes() {
 /**
  * Returns the block support value for a feature, if defined.
  *
- * @param  {(string|Object)} nameOrType      Block name or type object
- * @param  {string}          feature         Feature to retrieve
- * @param  {*}               defaultSupports Default value to return if not
- *                                           explicitly defined
+ * @param {(string|Object)} nameOrType      Block name or type object
+ * @param {string}          feature         Feature to retrieve
+ * @param {*}               defaultSupports Default value to return if not
+ *                                          explicitly defined
  *
  * @return {?*} Block support value
  */

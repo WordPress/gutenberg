@@ -15,7 +15,7 @@ export default function WidgetAreaInnerBlocks() {
 			onInput={ onInput }
 			onChange={ onChange }
 			templateLock={ false }
-			renderAppender={ InnerBlocks.DefaultBlockAppender }
+			renderAppender={ InnerBlocks.ButtonBlockAppender }
 		/>
 	);
 }

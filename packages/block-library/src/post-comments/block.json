@@ -2,7 +2,7 @@
 	"apiVersion": 2,
 	"name": "core/post-comments",
 	"title": "Post Comments",
-	"category": "design",
+	"category": "theme",
 	"description": "Display a post's comments.",
 	"textdomain": "default",
 	"attributes": {
@@ -14,12 +14,14 @@
 	"supports": {
 		"html": false,
 		"align": [ "wide", "full" ],
-		"fontSize": true,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		},
 		"color": {
 			"gradients": true,
 			"link": true
-		},
-		"lineHeight": true
+		}
 	},
 	"style": "wp-block-post-comments"
 }

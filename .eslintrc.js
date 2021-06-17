@@ -49,6 +49,7 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/resolver': require.resolve( './test/lint/import-resolver' ),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
@@ -174,6 +175,12 @@ module.exports = {
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
 				'@wordpress/data-no-store-string-literals': 'off',
+			},
+		},
+		{
+			files: [ 'packages/react-native-*/**/*.js' ],
+			settings: {
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
 			},
 		},
 		{

@@ -136,7 +136,7 @@ export const kinds = [
  * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
  *
  * @param {Object} persistedRecord Already persisted Post
- * @param {Object} edits Edits.
+ * @param {Object} edits           Edits.
  * @return {Object} Updated edits.
  */
 export const prePersistPostType = ( persistedRecord, edits ) => {
@@ -189,6 +189,7 @@ function* loadPostTypeEntities() {
 				record?.title ||
 				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
+			__unstable_rest_base: postType.rest_base,
 		};
 	} );
 }
@@ -243,7 +244,7 @@ export const getMethodName = (
 /**
  * Loads the kind entities into the store.
  *
- * @param {string} kind  Kind
+ * @param {string} kind Kind
  *
  * @return {Array} Entities
  */
