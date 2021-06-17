@@ -105,7 +105,11 @@ export default function useBlockDropZone( {
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 	const throttled = useThrottle(
 		useCallback( ( event, currentTarget ) => {
-			const blockElements = Array.from( currentTarget.children );
+			const blockElements = Array.from( currentTarget.children ).filter(
+				( element ) => {
+					return element.nodeName !== 'STYLE';
+				}
+			);
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
 				{ x: event.clientX, y: event.clientY },
