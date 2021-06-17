@@ -14,11 +14,10 @@ import type { FormElementProps } from '../utils/types';
  *
  * @example
  * ```jsx
- * const option = { id: 'elsa', value: 'elsa', label: 'Elsa' };
+ * const option = { value: 'elsa', label: 'Elsa' };
  * ```
  */
 export type SegmentedControlOption = {
-	id: string | number;
 	value: string | number;
 	label: string;
 };
@@ -44,7 +43,7 @@ export type SegmentedControlProps = Omit<
 	 */
 	isAdaptiveWidth?: boolean;
 	/**
-	 * Renders `SegmentedControl` is a (CSS) block element.
+	 * Renders `SegmentedControl` as a (CSS) block element.
 	 *
 	 * @default false
 	 */
@@ -55,8 +54,8 @@ export type SegmentedControlProps = Omit<
 	 * @example
 	 * ```jsx
 	 * const options = [
-	 *  { id: 'elsa', value: 'elsa', label: 'Elsa' },
-	 *  { id: 'ana', value: 'ana', label: 'Ana' },
+	 *  { value: 'elsa', label: 'Elsa' },
+	 *  { value: 'ana', label: 'Ana' },
 	 * ]
 	 *
 	 * const Heroes = <SegmentedControl options={options} />
