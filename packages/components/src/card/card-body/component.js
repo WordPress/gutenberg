@@ -8,7 +8,7 @@ import { useCardBody } from './hook';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('react').Ref<any>}                                                                  forwardedRef
  */
 function CardBody( props, forwardedRef ) {
 	const { isScrollable, ...otherProps } = useCardBody( props );

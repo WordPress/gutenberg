@@ -20,7 +20,7 @@ import CONFIG from '../../utils/config-values';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('react').Ref<any>}                                                              forwardedRef
  */
 function Card( props, forwardedRef ) {
 	const {
