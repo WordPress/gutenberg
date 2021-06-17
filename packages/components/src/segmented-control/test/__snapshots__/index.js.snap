@@ -1,37 +1,22 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-12 {
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.emotion-6 {
-  color: var( --wp-admin-theme-color,#00669b);
-  font-weight: bold;
-}
-
-.emotion-9 {
-  background: transparent;
-}
-
 .emotion-27 {
   background: #fff;
   border: 1px solid;
   border-color: #757575;
-  border-radius: calc( 2px + 1px );
+  border-radius: 2px;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
   display: inline-flex;
-  min-height: 30px;
+  min-height: 36px;
   min-width: 0;
-  padding: 1px;
+  padding: 2px;
   position: relative;
-  -webkit-transition: all 100ms linear;
-  transition: all 100ms linear;
-  min-height: 30px;
+  -webkit-transition: -webkit-transform 100ms linear;
+  -webkit-transition: transform 100ms linear;
+  transition: transform 100ms linear;
 }
 
 @media ( prefers-reduced-motion:reduce ) {
@@ -47,21 +32,37 @@ exports[`props should render correctly 1`] = `
 
 .emotion-27:focus {
   border-color: var( --wp-admin-theme-color-darker-10,#007cba);
-  box-shadow: 0 0 0,0.5px,[object Object];
+  box-shadow: 0 0 0,0.5px,var( --wp-admin-theme-color,#00669b);
   outline: none;
   z-index: 1;
 }
 
+.emotion-12 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-6 {
+  color: #fff !important;
+  background: #1e1e1e !important;
+}
+
+.emotion-9 {
+  background: transparent;
+}
+
 .emotion-0 {
-  background: #fff;
-  border: 1px solid #757575;
+  background: #1e1e1e;
   border-radius: 2px;
   box-shadow: transparent;
-  height: calc( 30px - 4px );
   left: 0;
   position: absolute;
-  -webkit-transition: all 160ms ease;
-  transition: all 160ms ease;
+  top: 2px;
+  bottom: 2px;
+  -webkit-transition: -webkit-transform 160ms ease;
+  -webkit-transition: transform 160ms ease;
+  transition: transform 160ms ease;
   z-index: 1;
 }
 
@@ -93,7 +94,7 @@ exports[`props should render correctly 1`] = `
   background: transparent;
   border: none;
   border-radius: 2px;
-  color: var( --wp-admin-theme-color,#00669b);
+  color: #757575;
   cursor: pointer;
   display: -webkit-box;
   display: -webkit-flex;
@@ -174,7 +175,7 @@ exports[`props should render correctly 1`] = `
 <div
   aria-activedescendant="segmented-1"
   aria-label="Test Segmented Control"
-  class="components-segmented-control emotion-27 emotion-28 emotion-29"
+  class="emotion-27 medium components-segmented-control emotion-28 emotion-29"
   data-wp-c16t="true"
   data-wp-component="SegmentedControl"
   id="segmented"
