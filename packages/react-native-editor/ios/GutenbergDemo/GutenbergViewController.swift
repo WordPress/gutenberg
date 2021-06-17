@@ -240,6 +240,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestSetFocalPointPickerTooltipShown(_ tooltipShown: Bool) {
         print("Gutenberg requested setting tooltip flag")
     }
+    
+    func gutenbergDidLogSentryEnvelope(_ envelope: [String : Any]) {
+        print(#function)
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -302,6 +306,22 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
 
     func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
         return [.filesApp, .otherApps]
+    }
+    
+    func getSentryOptions() -> [String: Any]? {
+        return nil
+    }
+    
+    func getSentryUser() -> [String: Any]? {
+        return nil
+    }
+    
+    func attachScopeToSentryEvent(_ event: [String: Any]) -> [String: Any]? {
+        return nil
+    }
+    
+    func shouldSendSentryEvent() -> Bool? {
+        return nil
     }
 }
 
