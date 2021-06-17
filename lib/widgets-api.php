@@ -217,6 +217,32 @@ if ( ! function_exists( 'gutenberg_get_widget_instance' ) ) {
 	}
 }
 
+if ( ! function_exists( 'gutenberg_get_widget_key' ) ) {
+	/**
+	 * Returns the registered key for the given widget type.
+	 *
+	 * Belongs in WP_Widget_Factory when merged to Core.
+	 *
+	 * Can be removed when minimum WordPress version is 5.8.
+	 *
+	 * @since 10.3.0
+	 *
+	 * @param string $id_base Widget type ID.
+	 * @return string
+	 */
+	function gutenberg_get_widget_key( $id_base ) {
+		global $wp_widget_factory;
+
+		foreach ( $wp_widget_factory->widgets as $key => $widget_object ) {
+			if ( $widget_object->id_base === $id_base ) {
+				return $key;
+			}
+		}
+
+		return null;
+	}
+}
+
 if ( ! function_exists( 'gutenberg_get_widget_object' ) ) {
 	/**
 	 * Returns the registered WP_Widget object for the given widget type.
@@ -233,12 +259,11 @@ if ( ! function_exists( 'gutenberg_get_widget_object' ) ) {
 	function gutenberg_get_widget_object( $id_base ) {
 		global $wp_widget_factory;
 
-		foreach ( $wp_widget_factory->widgets as $widget_object ) {
-			if ( $widget_object->id_base === $id_base ) {
-				return $widget_object;
-			}
+		$key = gutenberg_get_widget_key( $id_base );
+		if ( ! $key ) {
+			return null;
 		}
 
-		return null;
+		return $wp_widget_factory->widgets[ $key ];
 	}
 }
