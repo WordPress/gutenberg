@@ -102,12 +102,11 @@ function render_classic_location_menu( $location, $attributes ) {
 	}
 
 	$block_attributes = $attributes;
-	unset( $block_attributes['__unstable__location'] );
+	unset( $block_attributes['__unstableLocation'] );
 
 	return wp_nav_menu(
 		array(
 			'theme_location'   => $location,
-			'block_attributes' => $block_attributes,
 			'container'        => '',
 			'items_wrap'       => '%3$s',
 			'fallback_cb'      => false,
@@ -164,8 +163,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	if ( empty( $block->inner_blocks ) ) {
-		if ( array_key_exists( '__unstable__location', $attributes ) ) {
-			$location                 = $attributes['__unstable__location'];
+		if ( array_key_exists( '__unstableLocation', $attributes ) ) {
+			$location                 = $attributes['__unstableLocation'];
 			$maybe_classic_navigation = render_classic_location_menu( $location, $attributes );
 			if ( $maybe_classic_navigation ) {
 				return $maybe_classic_navigation;
