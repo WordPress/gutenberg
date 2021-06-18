@@ -438,7 +438,7 @@ describe( 'Widgets Customizer', () => {
 		await editHeadingWidget.click();
 
 		const headingBlock = await find( {
-			role: 'group',
+			role: undefined,
 			name: 'Block: Heading',
 			text: 'First Heading',
 		} );

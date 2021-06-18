@@ -248,7 +248,7 @@ describe( 'Widgets screen', () => {
 
 	it( 'Should insert content using the inline inserter', async () => {
 		const [ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: undefined,
 			name: 'Block: Widget Area',
 		} );
 
@@ -573,7 +573,7 @@ describe( 'Widgets screen', () => {
 
 		// Focus the Legacy Widget block.
 		const legacyWidget = await find( {
-			role: 'group',
+			role: undefined,
 			name: 'Block: Legacy Widget',
 		} );
 		await legacyWidget.focus();
@@ -632,7 +632,7 @@ describe( 'Widgets screen', () => {
 
 	it( 'allows widgets to be moved between widget areas using the dropdown in the block toolbar', async () => {
 		const widgetAreas = await findAll( {
-			role: 'group',
+			role: undefined,
 			name: 'Block: Widget Area',
 		} );
 		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
@@ -700,7 +700,7 @@ describe( 'Widgets screen', () => {
 
 	it( 'Allows widget deletion to be undone', async () => {
 		const [ firstWidgetArea ] = await findAll( {
-			role: 'group',
+			role: undefined,
 			name: 'Block: Widget Area',
 		} );
 
