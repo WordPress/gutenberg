@@ -101,7 +101,7 @@ describe( 'Widgets Customizer', () => {
 		await searchOption.click();
 
 		const addedSearchBlock = await find( {
-			role: 'group',
+			role: undefined,
 			name: 'Block: Search',
 		} );
 
