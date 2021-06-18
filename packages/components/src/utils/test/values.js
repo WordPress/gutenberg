@@ -18,6 +18,7 @@ describe( 'isValueNumeric', () => {
 		expect( isValueNumeric( null ) ).toBe( false );
 		expect( isValueNumeric() ).toBe( false );
 		expect( isValueNumeric( 'Stringy' ) ).toBe( false );
-		expect( isValueNumeric( '10px' ) ).toBe( false );
+		expect( isValueNumeric( {} ) ).toBe( false );
+		expect( isValueNumeric( [] ) ).toBe( false );
 	} );
 } );

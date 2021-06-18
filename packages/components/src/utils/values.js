@@ -49,11 +49,7 @@ export function getDefinedValue( values = [], fallbackValue ) {
  * @return {boolean} Whether value is numeric.
  */
 export function isValueNumeric( value ) {
-	const obj = typeof value === 'string' ? value.replace( /,/g, '' ) : value;
-	return (
-		! isNaN( parseFloat( obj ) ) &&
-		! isNaN( Number( obj ) ) &&
-		isFinite( obj ) &&
-		Object.prototype.toString.call( obj ).toLowerCase() !== '[object array]'
-	);
+	const valueToCheck =
+		typeof value === 'string' ? value.replace( /,/g, '' ) : value;
+	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
 }
