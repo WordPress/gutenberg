@@ -2,8 +2,11 @@
  * External dependencies
  */
 import { create } from 'rungen';
+// eslint-disable-next-line no-duplicate-imports
+import type { Control } from 'rungen';
 import { map } from 'lodash';
 import isPromise from 'is-promise';
+import type { Dispatch, AnyAction } from 'redux';
 
 /**
  * Internal dependencies
@@ -13,18 +16,22 @@ import { isActionOfType, isAction } from './is-action';
 /**
  * Create a co-routine runtime.
  *
- * @param {Object}   controls Object of control handlers.
- * @param {Function} dispatch Unhandled action dispatch.
- *
- * @return {Function} co-routine runtime
+ * @param  controls Object of control handlers.
+ * @param  dispatch Unhandled action dispatch.
  */
-export default function createRuntime( controls = {}, dispatch ) {
+export default function createRuntime(
+	controls: Record<
+		string,
+		( value: any ) => Promise< boolean > | boolean
+	> = {},
+	dispatch: Dispatch
+) {
 	const rungenControls = map(
 		controls,
-		( control, actionType ) => (
+		( control, actionType ): Control => (
 			value,
-			next,
-			iterate,
+			_,
+			__,
 			yieldNext,
 			yieldError
 		) => {
@@ -42,7 +49,10 @@ export default function createRuntime( controls = {}, dispatch ) {
 		}
 	);
 
-	const unhandledActionControl = ( value, next ) => {
+	const unhandledActionControl = (
+		value: AnyAction | unknown,
+		next: () => void
+	) => {
 		if ( ! isAction( value ) ) {
 			return false;
 		}
@@ -54,7 +64,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 
 	const rungenRuntime = create( rungenControls );
 
-	return ( action ) =>
+	return ( action: AnyAction | Generator ) =>
 		new Promise( ( resolve, reject ) =>
 			rungenRuntime(
 				action,
