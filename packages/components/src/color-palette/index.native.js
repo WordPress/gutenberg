@@ -19,7 +19,6 @@ import { map, uniq } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { useRef, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { __experimentalUseEditorFeature as useEditorFeature } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -62,17 +61,9 @@ function ColorPalette( {
 	const scale = useRef( new Animated.Value( 1 ) ).current;
 	const opacity = useRef( new Animated.Value( 1 ) ).current;
 
-	const defaultColors = uniq(
-		map(
-			useEditorFeature( 'color.palette' ) || defaultSettings.colors,
-			'color'
-		)
-	);
+	const defaultColors = uniq( map( defaultSettings.colors, 'color' ) );
 	const defaultGradientColors = uniq(
-		map(
-			useEditorFeature( 'color.gradients' ) || defaultSettings.gradients,
-			'gradient'
-		)
+		map( defaultSettings.gradients, 'gradient' )
 	);
 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
 
