@@ -96,7 +96,6 @@ export function TemplatePanel() {
 	const onTogglePanel = partial( toggleEditorPanelOpened, PANEL_NAME );
 
 	let panelTitle = __( 'Template' );
-
 	if ( !! template ) {
 		panelTitle = sprintf(
 			/* translators: %s: template title */
@@ -114,7 +113,11 @@ export function TemplatePanel() {
 			<SelectControl
 				hideLabelFromVision
 				label={ __( 'Template:' ) }
-				value={ selectedTemplate }
+				value={
+					Object.keys( templates ).includes( selectedTemplate )
+						? selectedTemplate
+						: ''
+				}
 				onChange={ ( templateSlug ) => {
 					editPost( {
 						template: templateSlug || '',
