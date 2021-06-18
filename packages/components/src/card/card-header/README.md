@@ -16,7 +16,7 @@ const Example = () => (
 
 ### Flex
 
-Underneath, CardHeader uses the layout component [`<Flex/>`](../../flex/flex/README.md). This improves the alignment of child items within the component.
+Underneath, CardHeader uses the layout component [`<Flex/>`](/packages/components/src/flex/flex/README.md). This improves the alignment of child items within the component.
 
 ```jsx
 import {
@@ -39,7 +39,7 @@ const Example = () => (
 );
 ```
 
-Check out [the documentation](../../flex/flex/README.md) on `<Flex/>` for more details on layout composition.
+Check out [the documentation](/packages/components/src/flex/flex/README.md) on `<Flex/>` for more details on layout composition.
 
 ## Props
 
