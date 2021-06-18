@@ -39,6 +39,7 @@ import {
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 import { store as editPostStore } from '../../store';
+import BlockManager from '../block-manager';
 
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
@@ -147,24 +148,37 @@ export default function PreferencesModal() {
 				name: 'blocks',
 				tabLabel: __( 'Blocks' ),
 				content: (
-					<Section
-						title={ __( 'Choose how you interact with blocks' ) }
-					>
-						<EnableFeature
-							featureName="mostUsedBlocks"
-							help={ __(
-								'Places the most frequent blocks in the block library.'
+					<>
+						<Section
+							title={ __(
+								'Choose how you interact with blocks'
 							) }
-							label={ __( 'Show most used blocks' ) }
-						/>
-						<EnableFeature
-							featureName="keepCaretInsideBlock"
-							help={ __(
-								'Aids screen readers by stopping text caret from leaving blocks.'
+						>
+							<EnableFeature
+								featureName="mostUsedBlocks"
+								help={ __(
+									'Places the most frequent blocks in the block library.'
+								) }
+								label={ __( 'Show most used blocks' ) }
+							/>
+							<EnableFeature
+								featureName="keepCaretInsideBlock"
+								help={ __(
+									'Aids screen readers by stopping text caret from leaving blocks.'
+								) }
+								label={ __(
+									'Contain text cursor inside block'
+								) }
+							/>
+						</Section>
+						<Section
+							title={ __(
+								'Manage visibility of blocks in the inserter'
 							) }
-							label={ __( 'Contain text cursor inside block' ) }
-						/>
-					</Section>
+						>
+							<BlockManager />
+						</Section>
+					</>
 				),
 			},
 			{
