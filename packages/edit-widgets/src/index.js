@@ -33,7 +33,7 @@ import Layout from './components/layout';
  */
 export function initialize( id, settings ) {
 	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( block ) => ! [ 'core/more' ].includes( block.name )
+		( block ) => ! [ 'core/more', 'core/freeform' ].includes( block.name )
 	);
 	registerCoreBlocks( coreBlocks );
 	registerLegacyWidgetBlock();
