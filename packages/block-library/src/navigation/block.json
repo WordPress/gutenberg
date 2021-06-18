@@ -2,7 +2,7 @@
 	"apiVersion": 2,
 	"name": "core/navigation",
 	"title": "Navigation",
-	"category": "design",
+	"category": "theme",
 	"description": "A collection of blocks that allow visitors to get around your site.",
 	"keywords": [
 		"menu",
@@ -42,6 +42,9 @@
 		"isResponsive": {
 			"type": "boolean",
 			"default": false
+		},
+		"__unstable__location": {
+			"type": "string"
 		}
 	},
 	"providesContext": {
