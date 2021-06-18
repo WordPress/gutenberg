@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { Platform, UIManager } from 'react-native';
-/**
  * WordPress dependencies
  */
 import { createContext } from '@wordpress/element';
