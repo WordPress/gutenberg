@@ -64,7 +64,6 @@ export const labelBlock = css`
 
 export const buttonActive = css`
 	color: ${ COLORS.white } !important;
-	background: ${ COLORS.gray[ 900 ] } !important;
 `;
 
 export const ButtonView = styled.button`
