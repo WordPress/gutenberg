@@ -11,6 +11,9 @@
 		},
 		"textAlign": {
 			"type": "string"
+		},
+		"separator": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
