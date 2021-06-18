@@ -47,23 +47,42 @@ import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
 
 const toLowerCase = ( value ) => String( value ).toLowerCase();
 const isValueEmpty = ( data ) => {
-	if ( data.source === 'hex' && ! data.hex ) {
+	if ( data.source === 'hex' && data.hex === undefined ) {
 		return true;
-	} else if (
+	}
+
+	if (
 		data.source === 'hsl' &&
-		( ! data.h || ! data.s || ! data.l )
-	) {
-		return true;
-	} else if (
-		data.source === 'rgb' &&
-		( ! data.r || ! data.g || ! data.b ) &&
-		( ! data.h || ! data.s || ! data.v || ! data.a ) &&
-		( ! data.h || ! data.s || ! data.l || ! data.a )
+		( data.h === undefined || data.s === undefined || data.l === undefined )
 	) {
 		return true;
 	}
-	return false;
+
+	/**
+	 * Check that if source is `rgb`:
+	 * `r`, `g` or `b` properties are not undefined
+	 * OR (||) `h`, `s`, `v` or `a` properties are not undefined
+	 * OR (||) `h`, `s`, `l` or `a` properties are not undefined
+	 *
+	 * before it was checking with NOT(!) statement witch for `0` (bool|int) values returns `true`
+	 * this is a typecasting issue only visible for hex values that derive from #000000
+	 */
+	return (
+		data.source === 'rgb' &&
+		( data.r === undefined ||
+			data.g === undefined ||
+			data.b === undefined ) &&
+		( data.h === undefined ||
+			data.s === undefined ||
+			data.v === undefined ||
+			data.a === undefined ) &&
+		( data.h === undefined ||
+			data.s === undefined ||
+			data.l === undefined ||
+			data.a === undefined )
+	);
 };
+
 const isValidColor = ( colors ) =>
 	colors.hex ? isValidHex( colors.hex ) : simpleCheckForValidColor( colors );
 
@@ -71,27 +90,27 @@ const isValidColor = ( colors ) =>
  * Function that creates the new color object
  * from old data and the new value.
  *
- * @param {Object} oldColors The old color object.
- * @param {string} oldColors.hex
- * @param {Object} oldColors.rgb
- * @param {number} oldColors.rgb.r
- * @param {number} oldColors.rgb.g
- * @param {number} oldColors.rgb.b
- * @param {number} oldColors.rgb.a
- * @param {Object} oldColors.hsl
- * @param {number} oldColors.hsl.h
- * @param {number} oldColors.hsl.s
- * @param {number} oldColors.hsl.l
- * @param {number} oldColors.hsl.a
- * @param {string} oldColors.draftHex Same format as oldColors.hex
- * @param {Object} oldColors.draftRgb Same format as oldColors.rgb
- * @param {Object} oldColors.draftHsl Same format as oldColors.hsl
- * @param {Object} data Data containing the new value to update.
- * @param {Object} data.source One of `hex`, `rgb`, `hsl`.
- * @param {string|number} data.value Value to update.
- * @param {string} data.valueKey Depends on `data.source` values:
- *   - when source = `rgb`, valuKey can be `r`, `g`, `b`, or `a`.
- *   - when source = `hsl`, valuKey can be `h`, `s`, `l`, or `a`.
+ * @param {Object}        oldColors          The old color object.
+ * @param {string}        oldColors.hex
+ * @param {Object}        oldColors.rgb
+ * @param {number}        oldColors.rgb.r
+ * @param {number}        oldColors.rgb.g
+ * @param {number}        oldColors.rgb.b
+ * @param {number}        oldColors.rgb.a
+ * @param {Object}        oldColors.hsl
+ * @param {number}        oldColors.hsl.h
+ * @param {number}        oldColors.hsl.s
+ * @param {number}        oldColors.hsl.l
+ * @param {number}        oldColors.hsl.a
+ * @param {string}        oldColors.draftHex Same format as oldColors.hex
+ * @param {Object}        oldColors.draftRgb Same format as oldColors.rgb
+ * @param {Object}        oldColors.draftHsl Same format as oldColors.hsl
+ * @param {Object}        data               Data containing the new value to update.
+ * @param {Object}        data.source        One of `hex`, `rgb`, `hsl`.
+ * @param {string|number} data.value         Value to update.
+ * @param {string}        data.valueKey      Depends on `data.source` values:
+ *                                           - when source = `rgb`, valuKey can be `r`, `g`, `b`, or `a`.
+ *                                           - when source = `hsl`, valuKey can be `h`, `s`, `l`, or `a`.
  * @return {Object} A new color object for a specific source. For example:
  * { source: 'rgb', r: 1, g: 2, b:3, a:0 }
  */

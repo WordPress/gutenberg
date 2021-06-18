@@ -22,6 +22,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 
 Quit and restart terminal
 Install the long-term support (lts) version of node.
+
 ```
 nvm install --lts
 ```
@@ -30,7 +31,7 @@ nvm install --lts
 
 First download, install, and start [Docker Desktop](https://www.docker.com/products/docker-desktop) following the instructions for your OS.
 
-- Install WordPress environment tool
+-   Install WordPress environment tool
 
 ```
 npm -g install @wordpress/env
@@ -38,17 +39,15 @@ npm -g install @wordpress/env
 
 Start the environment from an existing plugin or theme directory, or a new working directory:
 
- ```
- wp-env start
- ```
+```
+wp-env start
+```
 
 You will have a full WordPress site installed, navigate to: http://localhost:8888/ using your browser, log in to the WordPress dashboard at http://localhost:8888/wp-admin/ using Username "admin" and Password "password", without the quotes.
-
 
 **3. Code Editor**
 
 You can use any text editor to write code. For example, [Visual Studio Code](https://code.visualstudio.com/) is a popular open-source editor. You can follow instructions on their site to install it for your OS.
-
 
 ## Node Development Tools
 
@@ -115,7 +114,7 @@ There are several ways to run WordPress locally on your own computer, or you cou
 
 The WordPress [wp-env package](https://www.npmjs.com/package/@wordpress/env) lets you set up a local WordPress environment for building and testing plugins and themes, without any additional configuration.
 
-The `wp-env` tool uses Docker to create a virtual machine to that runs the WordPress site. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If using Ubuntu, see our additional notes for [help installing Docker on Ubuntu](/docs/getting-started/tutorials/devenv/docker-ubuntu.md).
+The `wp-env` tool uses Docker to create a virtual machine to that runs the WordPress site. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [other versions of Windows 10](https://docs.docker.com/docker-for-windows/wsl/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If using Ubuntu, see our additional notes for [help installing Docker on Ubuntu](/docs/getting-started/tutorials/devenv/docker-ubuntu.md).
 
 After you have installed Docker, go ahead and install the `wp-env` tool. This command will install the tool globally, which means you can run it from any directory:
 
@@ -150,18 +149,16 @@ If you run `wp-env start` from a directory that is not a plugin or theme, a gene
 
 You can use the `.wp-env.json` configuration file to create an environment that works with multiple plugins and/or themes. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson).
 
-
 #### Troubleshooting
 
 A common issue when running `wp-env` is `Error while running docker-compose command.`
 
-- Check that Docker Desktop is started and running.
-- Check Docker Desktop dashboard for logs, restart, or remove existing VMs.
+-   Check that Docker Desktop is started and running.
+-   Check Docker Desktop dashboard for logs, restart, or remove existing VMs.
 
 If you see the error: `Host is already in use by another container`
 
-- The container is already running, or another one is. You can stop an existing container running use `wp-env stop` from the directory you started it.
-
+-   The container is already running, or another one is. You can stop an existing container running use `wp-env stop` from the directory you started it.
 
 ### Alternative to Docker
 
@@ -189,28 +186,27 @@ Here are a few instructions if you need to start over, or want to remove what wa
 
 ### Local Environment
 
-* If you just want to reset and clean the WordPress database:
+-   If you just want to reset and clean the WordPress database:
 
 ```
 wp-env clean all
 ```
 
-* To remove the local environment completely for a specific project:
+-   To remove the local environment completely for a specific project:
 
 ```
 wp-env destroy
 ```
 
-* To completely uninstall wp-env tool:
+-   To completely uninstall wp-env tool:
 
 ```
 npm -g uninstall @wordpress/env
 ```
 
-* To uninstall Docker, or Visual Studio Code use your OS method to remove packages. For example, on Windows run "Add or remove programs". You can additionally uninstall from the Docker Desktop app, click the bug icon at the top to switch to this Troubleshoot screen. Click Uninstall or remove.
+-   To uninstall Docker, or Visual Studio Code use your OS method to remove packages. For example, on Windows run "Add or remove programs". You can additionally uninstall from the Docker Desktop app, click the bug icon at the top to switch to this Troubleshoot screen. Click Uninstall or remove.
 
 ![Docker Troubleshoot Screenshot](https://developer.wordpress.org/files/2020/08/docker-uninstall-screen.png)
-
 
 ### Uninstall Node/NVM
 

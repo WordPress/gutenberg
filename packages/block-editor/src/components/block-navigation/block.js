@@ -36,12 +36,14 @@ export default function BlockNavigationBlock( {
 	isBranchSelected,
 	isLastOfSelectedBranch,
 	onClick,
+	onToggleExpanded,
 	position,
 	level,
 	rowCount,
 	siblingBlockCount,
 	showBlockMovers,
 	path,
+	isExpanded,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -78,6 +80,7 @@ export default function BlockNavigationBlock( {
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
+		isTreeGridMounted,
 	} = useBlockNavigationContext();
 	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
@@ -88,7 +91,11 @@ export default function BlockNavigationBlock( {
 	// only focus the selected list item on mount; otherwise the list would always
 	// try to steal the focus from the editor canvas.
 	useEffect( () => {
-		if ( withExperimentalPersistentListViewFeatures && isSelected ) {
+		if (
+			withExperimentalPersistentListViewFeatures &&
+			! isTreeGridMounted &&
+			isSelected
+		) {
 			cellRef.current.focus();
 		}
 	}, [] );
@@ -137,6 +144,7 @@ export default function BlockNavigationBlock( {
 			path={ path }
 			id={ `block-navigation-block-${ clientId }` }
 			data-block={ clientId }
+			isExpanded={ isExpanded }
 		>
 			<TreeGridCell
 				className="block-editor-block-navigation-block__contents-cell"
@@ -147,7 +155,8 @@ export default function BlockNavigationBlock( {
 					<div className="block-editor-block-navigation-block__contents-container">
 						<BlockNavigationBlockContents
 							block={ block }
-							onClick={ () => onClick( block.clientId ) }
+							onClick={ onClick }
+							onToggleExpanded={ onToggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }

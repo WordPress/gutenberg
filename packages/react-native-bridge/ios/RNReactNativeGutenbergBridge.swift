@@ -369,7 +369,7 @@ extension RNReactNativeGutenbergBridge {
         case mediaUpload
         case setFocusOnTitle
         case mediaAppend
-        case updateTheme
+        case updateEditorSettings
         case replaceBlock
         case updateCapabilities
         case showNotice

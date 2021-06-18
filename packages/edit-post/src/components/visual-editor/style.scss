@@ -1,5 +1,7 @@
 .edit-post-visual-editor {
 	position: relative;
+	display: flex;
+	flex-flow: column;
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
@@ -23,18 +25,7 @@
 	@supports (position: sticky) {
 		flex-basis: 100%;
 	}
-}
 
-.editor-styles-wrapper {
-	// Default background color so that grey .edit-post-editor-regions__content
-	// color doesn't show through.
-	background-color: $white;
-
-	cursor: text;
-
-	> * {
-		cursor: auto;
-	}
 }
 
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks
@@ -49,9 +40,30 @@
 		margin-left: auto;
 		margin-right: auto;
 
-		// Apply default block margin below the post title.
-		// This ensures the first block on the page is in a good position.
-		// This rule can be retired once the title becomes an actual block.
-		margin-bottom: $default-block-margin;
+		// Margins between the title and the first block, or appender, do not collapse.
+		// By explicitly setting this to zero, we avoid "double margin".
+		margin-bottom: 0;
 	}
+}
+
+.edit-post-visual-editor__exit-template-mode {
+	position: absolute;
+	top: $grid-unit-10;
+	left: $grid-unit-10;
+	color: $white;
+
+	&:active:not([aria-disabled="true"]),
+	&:focus:not([aria-disabled="true"]),
+	&:hover {
+		color: $gray-100;
+	}
+}
+
+.edit-post-visual-editor__content-area {
+	width: 100%;
+	// If this is set to height: 100%; it breaks in Safari 13, which calculates the height relatively to the incorrect flex container.
+	// By setting it as a min-height instead, it appears to work in all cases.
+	min-height: 100%;
+	position: relative;
+	display: flex;
 }

@@ -19,7 +19,7 @@ import * as children from './children';
  * corresponds to that type, false otherwise.
  *
  * @param {WPBlockNode} node Block node to test
- * @param {string} type      Node to type to test against.
+ * @param {string}      type Node to type to test against.
  *
  * @return {boolean} Whether node is of intended type.
  */

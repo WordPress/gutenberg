@@ -1,4 +1,4 @@
-# Block Type Metadata
+# Metadata
 
 To register a new block type using metadata that can be shared between codebase that uses JavaScript and PHP, start by creating a `block.json` file. This file:
 
@@ -54,11 +54,11 @@ The same file is also used when [submitting block to Block Directory](/docs/gett
 
 ## Server-side registration
 
-There is also [`register_block_type_from_metadata`](https://developer.wordpress.org/reference/functions/register_block_type_from_metadata/) function that aims to simplify the block type registration on the server from metadata stored in the `block.json` file.
+The [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function that aims to simplify the block type registration on the server, can read metadata stored in the `block.json` file.
 
-This function takes two params:
+This function takes two params relevant in this context (`$block_type` accepts more types and variants):
 
--   `$path` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
+-   `$block_type` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
 -   `$args` (`array`) – an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
     -   `$render_callback` (`callable`) – callback used to render blocks of this block type.
 
@@ -67,7 +67,7 @@ It returns the registered block type (`WP_Block_Type`) on success or `false` on 
 **Example:**
 
 ```php
-register_block_type_from_metadata(
+register_block_type(
 	__DIR__ . '/notice',
 	array(
 		'render_callback' => 'render_block_core_notice',
@@ -283,7 +283,7 @@ See [the block context documentation](/docs/reference-guides/block-api/block-con
 
 It contains as set of options to control features used in the editor. See the [the supports documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
 
-### Style Variations
+### Block Styles
 
 -   Type: `array`
 -   Optional
@@ -300,9 +300,9 @@ It contains as set of options to control features used in the editor. See the [t
 }
 ```
 
-Block styles can be used to provide alternative styles to block. It works by adding a class name to the block's wrapper. Using CSS, a theme developer can target the class name for the style variation if it is selected.
+Block styles can be used to provide alternative styles to block. It works by adding a class name to the block's wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.
 
-Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-style-variations) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/reference-guides/filters/block-filters.md#block-styles) for existing blocks.
 
 ### Example
 
@@ -438,7 +438,7 @@ return array(
 
 ## Internationalization
 
-WordPress string discovery automatically will translate fields marked in the documentation as translatable using the `textdomain` property when specified in the `block.json` file. In that case, localized properties will be automatically wrapped in `_x` function calls on the backend of WordPress when executing `register_block_type_from_metadata`. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle.
+WordPress string discovery system can automatically translate fields marked in this document as translatable. First, you need to set the `textdomain` property in the `block.json` file that provides block metadata.
 
 **Example:**
 
@@ -451,18 +451,39 @@ WordPress string discovery automatically will translate fields marked in the doc
 }
 ```
 
-The way `register_block_type_from_metadata` processes translatable values is roughly equivalent to:
+### PHP
+
+In PHP, localized properties will be automatically wrapped in `_x` function calls on the backend of WordPress when executing `register_block_type`. These translations get added as an inline script to the plugin's script handle or to the `wp-block-library` script handle in WordPress core.
+
+The way `register_block_type` processes translatable values is roughly equivalent to the following code snippet:
 
 ```php
 <?php
 $metadata = array(
 	'title'       => _x( 'My block', 'block title', 'my-plugin' ),
 	'description' => _x( 'My block is fantastic!', 'block description', 'my-plugin' ),
-	'keywords'    => array( _x( 'fantastic', 'block keywords', 'my-plugin' ) ),
+	'keywords'    => array( _x( 'fantastic', 'block keyword', 'my-plugin' ) ),
 );
 ```
 
 Implementation follows the existing [get_plugin_data](https://codex.wordpress.org/Function_Reference/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
+
+### JavaScript
+
+In JavaScript, you can use `registerBlockType` method from `@wordpress/blocks` package and pass the metadata object loaded from `block.json` as the first param. All localized properties get automatically wrapped in `_x` (from `@wordpress/i18n` package) function calls similar to how it works in PHP.
+
+**Example:**
+
+```js
+import { registerBlockType } from '@wordpress/blocks';
+import Edit from './edit';
+import metadata from './block.json';
+
+registerBlockType( metadata, {
+	edit: Edit,
+	// ...other client-side settings
+} );
+```
 
 ## Backward Compatibility
 
@@ -482,7 +503,9 @@ The following properties are going to be supported for backward compatibility re
 **Example**:
 
 ```js
-wp.blocks.registerBlockType( 'my-block/name', {
+import { registerBlockType } from '@wordpress/blocks';
+
+registerBlockType( 'my-plugin/block-name', {
 	edit: function () {
 		// Edit definition goes here.
 	},
@@ -495,4 +518,4 @@ wp.blocks.registerBlockType( 'my-block/name', {
 } );
 ```
 
-In the case of [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should be still possible to register `render_callback` property using both [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) and `register_block_type_from_metadata` functions on the server.
+In the case of [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should be still possible to register `render_callback` property using both [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function on the server.

@@ -16,20 +16,22 @@ import { withState } from '@wordpress/compose';
 
 const MyKeyboardShortcuts = withState( {
 	isAllSelected: false,
-} )( ( { isAllSelected, setState } ) => { 
+} )( ( { isAllSelected, setState } ) => {
 	const selectAll = () => {
-		setState( { isAllSelected: true } )
+		setState( { isAllSelected: true } );
 	};
-	
+
 	return (
 		<div>
-			<KeyboardShortcuts shortcuts={ {
-				'mod+a': selectAll,
-			} } />
+			<KeyboardShortcuts
+				shortcuts={ {
+					'mod+a': selectAll,
+				} }
+			/>
 			[cmd/ctrl + A] Combination pressed? { isAllSelected ? 'Yes' : 'No' }
 		</div>
-	) 
-} )
+	);
+} );
 ```
 
 ## Props
@@ -40,26 +42,26 @@ The component accepts the following props:
 
 Elements to render, upon whom key events are to be monitored.
 
-- Type: `Element` | `Element[]`
-- Required: No
+-   Type: `Element` | `Element[]`
+-   Required: No
 
 ### shortcuts
 
 An object of shortcut bindings, where each key is a keyboard combination, the value of which is the callback to be invoked when the key combination is pressed.
 
-- Type: `Object`
-- Required: Yes
+-   Type: `Object`
+-   Required: Yes
 
-__Note:__ The value of each shortcut should be a consistent function reference, not an anonymous function. Otherwise, the callback will not be correctly unbound when the component unmounts.
+**Note:** The value of each shortcut should be a consistent function reference, not an anonymous function. Otherwise, the callback will not be correctly unbound when the component unmounts.
 
-__Note:__ The `KeyboardShortcuts` component will not update to reflect a changed `shortcuts` prop. If you need to change shortcuts, mount a separate `KeyboardShortcuts` element, which can be achieved by assigning a unique `key` prop.
+**Note:** The `KeyboardShortcuts` component will not update to reflect a changed `shortcuts` prop. If you need to change shortcuts, mount a separate `KeyboardShortcuts` element, which can be achieved by assigning a unique `key` prop.
 
 ### bindGlobal
 
 By default, a callback will not be invoked if the key combination occurs in an editable field. Pass `bindGlobal` as `true` if the key events should be observed globally, including within editable fields.
 
-- Type: `Boolean`
-- Required: No
+-   Type: `Boolean`
+-   Required: No
 
 _Tip:_ If you need some but not all keyboard events to be observed globally, simply render two distinct `KeyboardShortcuts` elements, one with and one without the `bindGlobal` prop.
 
@@ -67,9 +69,9 @@ _Tip:_ If you need some but not all keyboard events to be observed globally, sim
 
 By default, a callback is invoked in response to the `keydown` event. To override this, pass `eventName` with the name of a specific keyboard event.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ## References
 
-- [Mousetrap documentation](https://craig.is/killing/mice)
+-   [Mousetrap documentation](https://craig.is/killing/mice)

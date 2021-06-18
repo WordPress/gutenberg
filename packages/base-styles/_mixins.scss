@@ -357,6 +357,7 @@
 	}
 
 	&:checked::before {
+		box-sizing: inherit;
 		width: 8px;
 		height: 8px;
 		transform: translate(7px, 7px);

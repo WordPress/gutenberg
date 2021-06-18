@@ -1,7 +1,20 @@
 /**
  * External dependencies
  */
-import 'react-native-gesture-handler/jestSetup';
+import { NativeModules as RNNativeModules } from 'react-native';
+
+RNNativeModules.UIManager = RNNativeModules.UIManager || {};
+RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
+RNNativeModules.RNGestureHandlerModule = RNNativeModules.RNGestureHandlerModule || {
+	State: { BEGAN: 'BEGAN', FAILED: 'FAILED', ACTIVE: 'ACTIVE', END: 'END' },
+	attachGestureHandler: jest.fn(),
+	createGestureHandler: jest.fn(),
+	dropGestureHandler: jest.fn(),
+	updateGestureHandler: jest.fn(),
+};
+RNNativeModules.PlatformConstants = RNNativeModules.PlatformConstants || {
+	forceTouchAvailable: false,
+};
 
 // Mock component to render with props rather than merely a string name so that
 // we may assert against it. ...args is used avoid warnings about ignoring
@@ -20,26 +33,33 @@ jest.mock( '@wordpress/element', () => {
 	};
 } );
 
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
+
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
+		mediaUploadSync: jest.fn(),
 		removeEventListener: jest.fn(),
-		subscribeParentGetHtml: jest.fn(),
+		requestFocalPointPickerTooltipShown: jest.fn( () => true ),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
+		subscribeFeaturedImageIdNativeUpdated: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
 		subscribeAndroidModalClosed: jest.fn(),
-		subscribeUpdateTheme: jest.fn(),
+		subscribeUpdateEditorSettings: jest.fn(),
 		subscribePreferredColorScheme: () => 'light',
 		subscribeUpdateCapabilities: jest.fn(),
 		subscribeShowNotice: jest.fn(),
+		subscribeParentGetHtml: jest.fn(),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
 		subscribeMediaSave: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
+		provideToNative_Html: jest.fn(),
+		requestMediaEditor: jest.fn(),
 		requestMediaPicker: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
 		subscribeReplaceBlock: jest.fn(),
@@ -48,6 +68,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 			deviceCamera: 'DEVICE_CAMERA',
 			siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 		},
+		fetchRequest: jest.fn(),
 	};
 } );
 
@@ -61,7 +82,9 @@ jest.mock( 'react-native-dark-mode', () => {
 	};
 } );
 
-jest.mock( 'react-native-modal', () => () => 'Modal' );
+jest.mock( 'react-native-modal', () => ( props ) =>
+	props.isVisible ? mockComponent( 'Modal' )( props ) : null
+);
 
 jest.mock( 'react-native-hr', () => () => 'Hr' );
 
@@ -132,7 +155,7 @@ jest.mock( 'react-native-reanimated', () => {
 // Silence the warning: Animated: `useNativeDriver` is not supported because the
 // native animated module is missing. This was added per React Navigation docs.
 // https://reactnavigation.org/docs/testing/#mocking-native-modules
-jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
+jest.mock( 'react-native/Libraries/Animated/NativeAnimatedHelper' );
 
 // We currently reference TextStateInput (a private module) within
 // react-native-aztec/src/AztecView. Doing so requires that we mock it via its
@@ -142,6 +165,7 @@ jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
 jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
 
 // Mock native modules incompatible with testing environment
+jest.mock( 'react-native/Libraries/LayoutAnimation/LayoutAnimation' );
 jest.mock(
 	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',
 	() => ( {
@@ -149,5 +173,8 @@ jest.mock(
 		announceForAccessibility: jest.fn(),
 		removeEventListener: jest.fn(),
 		isScreenReaderEnabled: jest.fn( () => Promise.resolve( false ) ),
+		fetch: jest.fn( () => ( {
+			done: jest.fn(),
+		} ) ),
 	} )
 );

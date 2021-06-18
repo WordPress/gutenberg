@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { addEntities } from './actions';
+import { CORE_STORE_NAME as coreStoreName } from './utils/constants';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -39,11 +40,13 @@ export const defaultEntities = [
 		kind: 'root',
 		key: 'slug',
 		baseURL: '/wp/v2/types',
+		baseURLParams: { context: 'edit' },
 	},
 	{
 		name: 'media',
 		kind: 'root',
 		baseURL: '/wp/v2/media',
+		baseURLParams: { context: 'edit' },
 		plural: 'mediaItems',
 		label: __( 'Media' ),
 	},
@@ -52,6 +55,7 @@ export const defaultEntities = [
 		kind: 'root',
 		key: 'slug',
 		baseURL: '/wp/v2/taxonomies',
+		baseURLParams: { context: 'edit' },
 		plural: 'taxonomies',
 		label: __( 'Taxonomy' ),
 	},
@@ -67,6 +71,7 @@ export const defaultEntities = [
 		name: 'widget',
 		kind: 'root',
 		baseURL: '/wp/v2/widgets',
+		baseURLParams: { context: 'edit' },
 		plural: 'widgets',
 		transientEdits: { blocks: true },
 		label: __( 'Widgets' ),
@@ -75,6 +80,7 @@ export const defaultEntities = [
 		name: 'widgetType',
 		kind: 'root',
 		baseURL: '/wp/v2/widget-types',
+		baseURLParams: { context: 'edit' },
 		plural: 'widgetTypes',
 		label: __( 'Widget types' ),
 	},
@@ -83,12 +89,14 @@ export const defaultEntities = [
 		name: 'user',
 		kind: 'root',
 		baseURL: '/wp/v2/users',
+		baseURLParams: { context: 'edit' },
 		plural: 'users',
 	},
 	{
 		name: 'comment',
 		kind: 'root',
 		baseURL: '/wp/v2/comments',
+		baseURLParams: { context: 'edit' },
 		plural: 'comments',
 		label: __( 'Comment' ),
 	},
@@ -96,6 +104,7 @@ export const defaultEntities = [
 		name: 'menu',
 		kind: 'root',
 		baseURL: '/__experimental/menus',
+		baseURLParams: { context: 'edit' },
 		plural: 'menus',
 		label: __( 'Menu' ),
 	},
@@ -103,6 +112,7 @@ export const defaultEntities = [
 		name: 'menuItem',
 		kind: 'root',
 		baseURL: '/__experimental/menu-items',
+		baseURLParams: { context: 'edit' },
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
 	},
@@ -110,6 +120,7 @@ export const defaultEntities = [
 		name: 'menuLocation',
 		kind: 'root',
 		baseURL: '/__experimental/menu-locations',
+		baseURLParams: { context: 'edit' },
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
@@ -125,7 +136,7 @@ export const kinds = [
  * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
  *
  * @param {Object} persistedRecord Already persisted Post
- * @param {Object} edits Edits.
+ * @param {Object} edits           Edits.
  * @return {Object} Updated edits.
  */
 export const prePersistPostType = ( persistedRecord, edits ) => {
@@ -165,6 +176,7 @@ function* loadPostTypeEntities() {
 		return {
 			kind: 'postType',
 			baseURL: '/wp/v2/' + postType.rest_base,
+			baseURLParams: { context: 'edit' },
 			name,
 			label: postType.labels.singular_name,
 			transientEdits: {
@@ -177,6 +189,7 @@ function* loadPostTypeEntities() {
 				record?.title ||
 				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
+			__unstable_rest_base: postType.rest_base,
 		};
 	} );
 }
@@ -194,6 +207,7 @@ function* loadTaxonomyEntities() {
 		return {
 			kind: 'taxonomy',
 			baseURL: '/wp/v2/' + taxonomy.rest_base,
+			baseURLParams: { context: 'edit' },
 			name,
 			label: taxonomy.labels.singular_name,
 		};
@@ -230,12 +244,16 @@ export const getMethodName = (
 /**
  * Loads the kind entities into the store.
  *
- * @param {string} kind  Kind
+ * @param {string} kind Kind
  *
  * @return {Array} Entities
  */
 export function* getKindEntities( kind ) {
-	let entities = yield controls.select( 'core', 'getEntitiesByKind', kind );
+	let entities = yield controls.select(
+		coreStoreName,
+		'getEntitiesByKind',
+		kind
+	);
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}

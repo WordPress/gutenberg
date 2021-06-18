@@ -42,7 +42,7 @@ import {
 	MediaUploadProgress,
 	withColors,
 	__experimentalUseGradient,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -50,6 +50,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -106,6 +107,8 @@ const Cover = ( {
 	);
 
 	useEffect( () => {
+		let isCurrent = true;
+
 		// sync with local media store
 		mediaUploadSync();
 		AccessibilityInfo.addEventListener(
@@ -113,11 +116,14 @@ const Cover = ( {
 			setIsScreenReaderEnabled
 		);
 
-		AccessibilityInfo.isScreenReaderEnabled().then(
-			setIsScreenReaderEnabled
-		);
+		AccessibilityInfo.isScreenReaderEnabled().then( () => {
+			if ( isCurrent ) {
+				setIsScreenReaderEnabled();
+			}
+		} );
 
 		return () => {
+			isCurrent = false;
 			AccessibilityInfo.removeEventListener(
 				'screenReaderChanged',
 				setIsScreenReaderEnabled
@@ -133,7 +139,7 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
-	const colorsDefault = useEditorFeature( 'color.palette' ) || [];
+	const colorsDefault = useSetting( 'color.palette' ) || [];
 	const coverDefaultPalette = {
 		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 	};
@@ -245,7 +251,7 @@ const Cover = ( {
 				customOverlayColor ||
 				overlayColor?.color ||
 				style?.color?.background ||
-				styles.overlay.color,
+				styles.overlay?.color,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url ? backgroundColor : {},
@@ -399,7 +405,7 @@ const Cover = ( {
 							onSelectMediaUploadOption={ onSelectMedia }
 							openMediaOptions={ openMediaOptionsRef.current }
 							url={ url }
-							width={ styles.image.width }
+							width={ styles.image?.width }
 						/>
 					</View>
 				) }
@@ -429,7 +435,9 @@ const Cover = ( {
 			<View>
 				{ isCustomColorPickerShowing && colorPickerControls }
 				<MediaPlaceholder
-					height={ styles.mediaPlaceholderEmptyStateContainer.height }
+					height={
+						styles.mediaPlaceholderEmptyStateContainer?.height
+					}
 					backgroundColor={ customOverlayColor }
 					hideContent={
 						customOverlayColor !== '' &&
@@ -478,15 +486,17 @@ const Cover = ( {
 	return (
 		<View style={ styles.backgroundContainer }>
 			{ isSelected && (
-				<Controls
-					attributes={ attributes }
-					didUploadFail={ didUploadFail }
-					hasOnlyColorBackground={ hasOnlyColorBackground }
-					isUploadInProgress={ isUploadInProgress }
-					onClearMedia={ onClearMedia }
-					onSelectMedia={ onSelectMedia }
-					setAttributes={ setAttributes }
-				/>
+				<InspectorControls>
+					<Controls
+						attributes={ attributes }
+						didUploadFail={ didUploadFail }
+						hasOnlyColorBackground={ hasOnlyColorBackground }
+						isUploadInProgress={ isUploadInProgress }
+						onClearMedia={ onClearMedia }
+						onSelectMedia={ onSelectMedia }
+						setAttributes={ setAttributes }
+					/>
+				</InspectorControls>
 			) }
 
 			<View
@@ -575,13 +585,13 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
-		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+		const { openGeneralSidebar } = dispatch( editPostStore );
 		const { selectBlock } = dispatch( blockEditorStore );
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 			closeSettingsBottomSheet() {
-				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+				dispatch( editPostStore ).closeGeneralSidebar();
 			},
 			selectBlock: () => selectBlock( clientId ),
 		};

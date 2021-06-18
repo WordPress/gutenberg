@@ -1,9 +1,9 @@
-# Deprecated Blocks
+# Deprecation
 
 When updating static blocks markup and attributes, block authors need to consider existing posts using the old versions of their block. To provide a good upgrade path, you can choose one of the following strategies:
 
- - Do not deprecate the block and create a new one (a different name)
- - Provide a "deprecated" version of the block allowing users opening these in the block editor to edit them using the updated block.
+-   Do not deprecate the block and create a new one (a different name)
+-   Provide a "deprecated" version of the block allowing users opening these in the block editor to edit them using the updated block.
 
 A block can have several deprecated versions. A deprecation will be tried if the current state of a parsed block is invalid, or if the deprecation defines an `isEligible` function that returns true.
 
@@ -17,31 +17,34 @@ For blocks with multiple deprecations, it may be easier to save each deprecation
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 const v1 = {};
 const v2 = {};
 const v3 = {};
 const deprecated = [ v3, v2, v1 ];
-
 ```
+
 {% ES5 %}
+
 ```js
 var v1 = {};
 var v2 = {};
 var v3 = {};
 var deprecated = [ v3, v2, v1 ];
 ```
+
 {% end %}
 
 It is also recommended to keep [fixtures](https://github.com/WordPress/gutenberg/blob/HEAD/packages/e2e-tests/fixtures/blocks/README.md) which contain the different versions of the block content to allow you to easily test that new deprecations and migrations are working across all previous versions of the block.
 
 Deprecations are defined on a block type as its `deprecated` property, an array of deprecation objects where each object takes the form:
 
-- `attributes` (Object): The [attributes definition](/docs/reference-guides/block-api/block-attributes.md) of the deprecated form of the block.
-- `supports` (Object): The [supports definition](/docs/reference-guides/block-api/block-registration.md) of the deprecated form of the block.
-- `save` (Function): The [save implementation](/docs/reference-guides/block-api/block-edit-save.md) of the deprecated form of the block.
-- `migrate` (Function, Optional): A function which, given the old attributes and inner blocks is expected to return either the new attributes or a tuple array of `[ attributes, innerBlocks ]` compatible with the block. As mentioned above, a deprecation's `migrate` will not be run if its `save` function does not return a valid block so you will need to make sure your migrations are available in all the deprecations where they are relevant.
-- `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration even if the block is valid. This is particularly useful in cases where a block is technically valid even once deprecated, and requires updates to its attributes or inner blocks. This function is not called when the results of all previous deprecations' `save` functions were invalid.
+-   `attributes` (Object): The [attributes definition](/docs/reference-guides/block-api/block-attributes.md) of the deprecated form of the block.
+-   `supports` (Object): The [supports definition](/docs/reference-guides/block-api/block-registration.md) of the deprecated form of the block.
+-   `save` (Function): The [save implementation](/docs/reference-guides/block-api/block-edit-save.md) of the deprecated form of the block.
+-   `migrate` (Function, Optional): A function which, given the old attributes and inner blocks is expected to return either the new attributes or a tuple array of `[ attributes, innerBlocks ]` compatible with the block. As mentioned above, a deprecation's `migrate` will not be run if its `save` function does not return a valid block so you will need to make sure your migrations are available in all the deprecations where they are relevant.
+-   `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration even if the block is valid. This is particularly useful in cases where a block is technically valid even once deprecated, and requires updates to its attributes or inner blocks. This function is not called when the results of all previous deprecations' `save` functions were invalid.
 
 It's important to note that `attributes`, `supports`, and `save` are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
 
@@ -49,17 +52,17 @@ It's important to note that `attributes`, `supports`, and `save` are not automat
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 const { registerBlockType } = wp.blocks;
 const attributes = {
 	text: {
 		type: 'string',
 		default: 'some random value',
-	}
+	},
 };
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
-
 	// ... other block properties go here
 
 	attributes,
@@ -75,11 +78,13 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 			save( props ) {
 				return <p>{ props.attributes.text }</p>;
 			},
-		}
-	]
+		},
+	],
 } );
 ```
+
 {% ES5 %}
+
 ```js
 var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
@@ -87,16 +92,15 @@ var el = wp.element.createElement,
 		text: {
 			type: 'string',
 			default: 'some random value',
-		}
+		},
 	};
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
-
 	// ... other block properties go here
 
 	attributes: attributes,
 
-	save: function( props ) {
+	save: function ( props ) {
 		return el( 'div', {}, props.attributes.text );
 	},
 
@@ -104,17 +108,17 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 		{
 			attributes: attributes,
 
-			save: function( props ) {
+			save: function ( props ) {
 				return el( 'p', {}, props.attributes.text );
 			},
-		}
-	]
+		},
+	],
 } );
 ```
+
 {% end %}
 
 In the example above we updated the markup of the block to use a `div` instead of `p`.
-
 
 ## Changing the attributes set
 
@@ -124,18 +128,18 @@ Sometimes, you need to update the attributes set to rename or modify old attribu
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 const { registerBlockType } = wp.blocks;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
-
 	// ... other block properties go here
 
 	attributes: {
 		content: {
 			type: 'string',
 			default: 'some random value',
-		}
+		},
 	},
 
 	save( props ) {
@@ -148,39 +152,40 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 				text: {
 					type: 'string',
 					default: 'some random value',
-				}
+				},
 			},
 
 			migrate( { text } ) {
 				return {
-					content: text
+					content: text,
 				};
 			},
 
 			save( props ) {
 				return <p>{ props.attributes.text }</p>;
 			},
-		}
-	]
+		},
+	],
 } );
 ```
+
 {% ES5 %}
+
 ```js
 var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
-
 	// ... other block properties go here
 
 	attributes: {
 		content: {
 			type: 'string',
 			default: 'some random value',
-		}
+		},
 	},
 
-	save: function( props ) {
+	save: function ( props ) {
 		return el( 'div', {}, props.attributes.content );
 	},
 
@@ -190,26 +195,26 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 				text: {
 					type: 'string',
 					default: 'some random value',
-				}
+				},
 			},
 
-			migrate: function( attributes ) {
+			migrate: function ( attributes ) {
 				return {
-					content: attributes.text
+					content: attributes.text,
 				};
 			},
 
-			save: function( props ) {
+			save: function ( props ) {
 				return el( 'p', {}, props.attributes.text );
 			},
-		}
-	]
+		},
+	],
 } );
 ```
+
 {% end %}
 
 In the example above we updated the markup of the block to use a `div` instead of `p` and rename the `text` attribute to `content`.
-
 
 ## Changing the innerBlocks
 
@@ -220,12 +225,12 @@ E.g: a block wants to migrate a title attribute to a paragraph innerBlock.
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 const { registerBlockType } = wp.blocks;
 const { omit } = lodash;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
-
 	// ... block properties go here
 
 	save( props ) {
@@ -242,7 +247,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 				},
 			},
 
-			migrate( attributes, innerBlocks  ) {
+			migrate( attributes, innerBlocks ) {
 				return [
 					omit( attributes, 'title' ),
 					[
@@ -258,18 +263,19 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 			save( props ) {
 				return <p>{ props.attributes.title }</p>;
 			},
-		}
-	]
+		},
+	],
 } );
 ```
+
 {% ES5 %}
+
 ```js
 var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
 	omit = lodash.omit;
 
 registerBlockType( 'gutenberg/block-with-deprecated-version', {
-
 	// ... block properties go here
 
 	deprecated: [
@@ -282,7 +288,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 				},
 			},
 
-			migrate: function( attributes, innerBlocks ) {
+			migrate: function ( attributes, innerBlocks ) {
 				return [
 					omit( attributes, 'title' ),
 					[
@@ -294,15 +300,16 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 				];
 			},
 
-			save: function( props ) {
+			save: function ( props ) {
 				return el( 'p', {}, props.attributes.title );
 			},
-		}
-	]
+		},
+	],
 } );
 ```
+
 {% end %}
 
 In the example above we updated the block to use an inner Paragraph block with a title instead of a title attribute.
 
-*Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src). Core blocks have been updated across releases and contain simple and complex deprecations.*
+_Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src). Core blocks have been updated across releases and contain simple and complex deprecations._

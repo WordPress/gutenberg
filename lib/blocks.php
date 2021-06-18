@@ -21,11 +21,12 @@ function gutenberg_reregister_core_block_types() {
 				'code',
 				'column',
 				'columns',
-				'file',
+				'cover',
 				'gallery',
 				'group',
 				'heading',
 				'html',
+				'home-link',
 				'image',
 				'list',
 				'media-text',
@@ -52,13 +53,13 @@ function gutenberg_reregister_core_block_types() {
 				'block.php'                     => 'core/block',
 				'calendar.php'                  => 'core/calendar',
 				'categories.php'                => 'core/categories',
-				'cover.php'                     => 'core/cover',
+				'file.php'                      => 'core/file',
 				'latest-comments.php'           => 'core/latest-comments',
 				'latest-posts.php'              => 'core/latest-posts',
-				'legacy-widget.php'             => 'core/legacy-widget',
 				'loginout.php'                  => 'core/loginout',
 				'navigation.php'                => 'core/navigation',
 				'navigation-link.php'           => 'core/navigation-link',
+				'home-link.php'                 => 'core/home-link',
 				'rss.php'                       => 'core/rss',
 				'search.php'                    => 'core/search',
 				'shortcode.php'                 => 'core/shortcode',
@@ -73,16 +74,16 @@ function gutenberg_reregister_core_block_types() {
 				'post-comments.php'             => 'core/post-comments',
 				'post-comments-count.php'       => 'core/post-comments-count',
 				'post-comments-form.php'        => 'core/post-comments-form',
+				'post-comments-link.php'        => 'core/post-comments-link',
 				'post-content.php'              => 'core/post-content',
 				'post-date.php'                 => 'core/post-date',
 				'post-excerpt.php'              => 'core/post-excerpt',
 				'post-featured-image.php'       => 'core/post-featured-image',
-				'post-hierarchical-terms.php'   => 'core/post-hierarchical-terms',
+				'post-terms.php'                => 'core/post-terms',
 				'post-navigation-link.php'      => 'core/post-navigation-link',
-				'post-tags.php'                 => 'core/post-tags',
 				'post-title.php'                => 'core/post-title',
 				'query.php'                     => 'core/query',
-				'query-loop.php'                => 'core/query-loop',
+				'post-template.php'             => 'core/post-template',
 				'query-title.php'               => 'core/query-title',
 				'query-pagination.php'          => 'core/query-pagination',
 				'query-pagination-next.php'     => 'core/query-pagination-next',
@@ -100,8 +101,14 @@ function gutenberg_reregister_core_block_types() {
 			'block_folders' => array(
 				'widget-area',
 			),
+			'block_names'   => array(),
+		),
+		__DIR__ . '/../build/widgets/blocks/'       => array(
+			'block_folders' => array(
+				'legacy-widget',
+			),
 			'block_names'   => array(
-				'widget-area.php' => 'core/widget-area',
+				'legacy-widget.php' => 'core/legacy-widget',
 			),
 		),
 	);
@@ -143,7 +150,7 @@ function gutenberg_reregister_core_block_types() {
 				gutenberg_register_core_block_styles( $block_name );
 			}
 
-			require $blocks_dir . $file;
+			require_once $blocks_dir . $file;
 		}
 	}
 }
@@ -158,7 +165,7 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  * @return void
  */
 function gutenberg_register_core_block_styles( $block_name ) {
-	if ( ! gutenberg_should_load_separate_block_assets() ) {
+	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;
 	}
 
@@ -168,6 +175,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 
 	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+		wp_deregister_style( "wp-block-{$block_name}" );
 		wp_register_style(
 			"wp-block-{$block_name}",
 			gutenberg_url( $style_path ),
@@ -178,9 +186,56 @@ function gutenberg_register_core_block_styles( $block_name ) {
 
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
 		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
+	} else {
+		wp_register_style( "wp-block-{$block_name}", false );
+	}
+
+	// If the current theme supports wp-block-styles, dequeue the full stylesheet
+	// and instead attach each block's theme-styles to their block styles stylesheet.
+	if ( current_theme_supports( 'wp-block-styles' ) ) {
+
+		// Dequeue the full stylesheet.
+		// Make sure this only runs once, it doesn't need to run for every block.
+		static $stylesheet_removed;
+		if ( ! $stylesheet_removed ) {
+			add_action(
+				'wp_enqueue_scripts',
+				function() {
+					wp_dequeue_style( 'wp-block-library-theme' );
+				}
+			);
+			$stylesheet_removed = true;
+		}
+
+		// Get the path to the block's stylesheet.
+		$theme_style_path = is_rtl()
+			? "build/block-library/blocks/$block_name/theme-rtl.css"
+			: "build/block-library/blocks/$block_name/theme.css";
+
+		// If the file exists, enqueue it.
+		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
+
+			if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+				// If there is a main stylesheet for this block, append the theme styles to main styles.
+				wp_add_inline_style(
+					"wp-block-{$block_name}",
+					file_get_contents( gutenberg_dir_path() . $theme_style_path )
+				);
+			} else {
+				// If there is no main stylesheet for this block, register theme style.
+				wp_register_style(
+					"wp-block-{$block_name}",
+					gutenberg_url( $theme_style_path ),
+					array(),
+					filemtime( gutenberg_dir_path() . $theme_style_path )
+				);
+				wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $theme_style_path );
+			}
+		}
 	}
 
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
+		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(
 			"wp-block-{$block_name}-editor",
 			gutenberg_url( $editor_style_path ),
@@ -188,6 +243,8 @@ function gutenberg_register_core_block_styles( $block_name ) {
 			filemtime( gutenberg_dir_path() . $editor_style_path )
 		);
 		wp_style_add_data( "wp-block-{$block_name}-editor", 'rtl', 'replace' );
+	} else {
+		wp_register_style( "wp-block-{$block_name}-editor", false );
 	}
 }
 
@@ -196,9 +253,16 @@ function gutenberg_register_core_block_styles( $block_name ) {
  *
  * Optimizes performance and sustainability of styles by inlining smaller stylesheets.
  *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ *
  * @return void
  */
 function gutenberg_maybe_inline_styles() {
+
+	// Early exit if the "wp_maybe_inline_styles" function exists.
+	if ( function_exists( 'wp_maybe_inline_styles' ) ) {
+		return;
+	}
 
 	$total_inline_limit = 20000;
 	/**
@@ -252,15 +316,21 @@ function gutenberg_maybe_inline_styles() {
 			$style['css'] = file_get_contents( $style['path'] );
 
 			// Set `src` to `false` and add styles inline.
-			$wp_styles->registered[ $style['handle'] ]->src              = false;
-			$wp_styles->registered[ $style['handle'] ]->extra['after'][] = $style['css'];
+			$wp_styles->registered[ $style['handle'] ]->src = false;
+			if ( empty( $wp_styles->registered[ $style['handle'] ]->extra['after'] ) ) {
+				$wp_styles->registered[ $style['handle'] ]->extra['after'] = array();
+			}
+			array_unshift( $wp_styles->registered[ $style['handle'] ]->extra['after'], $style['css'] );
 
 			// Add the styles size to the $total_inline_size var.
 			$total_inline_size += (int) $style['size'];
 		}
 	}
 }
+// Run for styles enqueued in <head>.
 add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
+// Run for late-loaded styles in the footer.
+add_action( 'wp_footer', 'gutenberg_maybe_inline_styles', 1 );
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it
@@ -373,14 +443,16 @@ function gutenberg_register_theme_block_category( $categories ) {
 	);
 	return $categories;
 }
-
-add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( ! function_exists( 'get_default_block_categories' ) ) {
+	add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+}
 
 /**
  * Checks whether the current block type supports the feature requested.
  *
  * @param WP_Block_Type $block_type Block type to check for support.
- * @param string        $feature    Name of the feature to check support for.
+ * @param array         $feature    Path of the feature to check support for.
  * @param mixed         $default    Fallback value for feature support, defaults to false.
  *
  * @return boolean                  Whether or not the feature is supported.
@@ -392,4 +464,43 @@ function gutenberg_block_has_support( $block_type, $feature, $default = false ) 
 	}
 
 	return true === $block_support || is_array( $block_support );
+}
+
+/**
+ * Updates the shape of supports for declaring fontSize and lineHeight.
+ *
+ * @param array $metadata Metadata for registering a block type.
+ * @return array          Metadata for registering a block type with the supports shape updated.
+ */
+function gutenberg_migrate_old_typography_shape( $metadata ) {
+	// Temporarily disable migrations from core blocks to avoid warnings on versions older than 5.8.
+	if ( isset( $metadata['supports'] ) && false === strpos( $metadata['file'], '/wp-includes/blocks/' ) ) {
+		$typography_keys = array(
+			'__experimentalFontFamily',
+			'__experimentalFontStyle',
+			'__experimentalFontWeight',
+			'__experimentalLetterSpacing',
+			'__experimentalTextDecoration',
+			'__experimentalTextTransform',
+			'fontSize',
+			'lineHeight',
+		);
+		foreach ( $typography_keys as $typography_key ) {
+			$support_for_key = _wp_array_get( $metadata['supports'], array( $typography_key ), null );
+			if ( null !== $support_for_key ) {
+				trigger_error(
+					/* translators: %1$s: Block type, %2$s: typography supports key e.g: fontSize, lineHeight etc... */
+					sprintf( __( 'Block %1$s is declaring %2$s support on block.json under supports.%2$s. %2$s support is now declared under supports.typography.%2$s.', 'gutenberg' ), $metadata['name'], $typography_key ),
+					headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
+				);
+				gutenberg_experimental_set( $metadata['supports'], array( 'typography', $typography_key ), $support_for_key );
+				unset( $metadata['supports'][ $typography_key ] );
+			}
+		}
+	}
+	return $metadata;
+}
+
+if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
+	add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
 }

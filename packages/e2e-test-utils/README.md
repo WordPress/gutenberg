@@ -173,6 +173,16 @@ _Returns_
 
 -   `Function`: Function that determines if a request's URL contains substring.
 
+<a name="createUser" href="#createUser">#</a> **createUser**
+
+Create a new user account.
+
+_Parameters_
+
+-   _username_ `string`: User name.
+-   _firstName_ `string?`: First name.
+-   _lastName_ `string?`: Larst name.
+
 <a name="deactivatePlugin" href="#deactivatePlugin">#</a> **deactivatePlugin**
 
 Deactivates an active plugin.
@@ -180,6 +190,10 @@ Deactivates an active plugin.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
+
+<a name="deleteAllWidgets" href="#deleteAllWidgets">#</a> **deleteAllWidgets**
+
+Delete all the widgets in the widgets screen.
 
 <a name="deleteTheme" href="#deleteTheme">#</a> **deleteTheme**
 
@@ -191,6 +205,14 @@ _Parameters_
 -   _settings_ `Object?`: Optional settings object.
 -   _settings.newThemeSlug_ `string?`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
 -   _settings.newThemeSearchTerm_ `string?`: A search term to use if the new theme is not findable by its slug.
+
+<a name="deleteUser" href="#deleteUser">#</a> **deleteUser**
+
+Delete a user account.
+
+_Parameters_
+
+-   _username_ `string`: User name.
 
 <a name="disableFocusLossObservation" href="#disableFocusLossObservation">#</a> **disableFocusLossObservation**
 
@@ -716,6 +738,19 @@ _Parameters_
 <a name="wpDataSelect" href="#wpDataSelect">#</a> **wpDataSelect**
 
 Queries the WordPress data module.
+
+`page.evaluate` - used in the function - returns `undefined`
+when it encounters a non-serializable value.
+Since we store many different values in the data module,
+you can end up with an `undefined` result. Before using
+this function, make sure the data you are querying
+doesn't contain non-serializable values, for example,
+functions, DOM element handles, etc.
+
+_Related_
+
+-   <https://pptr.dev/#?product=Puppeteer&version=v9.0.0&show=api-pageevaluatepagefunction-args>
+-   <https://github.com/WordPress/gutenberg/pull/31199>
 
 _Parameters_
 

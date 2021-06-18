@@ -110,7 +110,7 @@ export const Gallery = ( props ) => {
 
 					return (
 						<GalleryImage
-							key={ img.id || img.url }
+							key={ img.id ? `${ img.id }-${ index }` : img.url }
 							url={ img.url }
 							alt={ img.alt }
 							id={ parseInt( img.id, 10 ) } // make id an integer explicitly

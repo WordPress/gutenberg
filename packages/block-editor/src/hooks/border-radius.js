@@ -1,25 +1,28 @@
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
-import { RangeControl } from '@wordpress/components';
+import {
+	__experimentalUnitControl as UnitControl,
+	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalParseUnit as parseUnit,
+} from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import useEditorFeature from '../components/use-editor-feature';
-import { BORDER_SUPPORT_KEY } from './border';
 import { cleanEmptyObject } from './utils';
+import useSetting from '../components/use-setting';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
-const MAX_BORDER_RADIUS_VALUE = 50;
 
 /**
  * Inspector control panel containing the border radius related configuration.
  *
- * @param  {Object} props Block properties.
- * @return {WPElement}    Border radius edit element.
+ * @param {Object} props Block properties.
+ *
+ * @return {WPElement} Border radius edit element.
  */
 export function BorderRadiusEdit( props ) {
 	const {
@@ -27,9 +30,15 @@ export function BorderRadiusEdit( props ) {
 		setAttributes,
 	} = props;
 
-	if ( useIsBorderRadiusDisabled( props ) ) {
-		return null;
-	}
+	// Step value is maintained in state so step is appropriate for current unit
+	// even when current radius value is undefined.
+	const initialStep =
+		parseUnit( style?.border?.radius )[ 1 ] === 'px' ? 1 : 0.25;
+	const [ step, setStep ] = useState( initialStep );
+
+	const onUnitChange = ( newUnit ) => {
+		setStep( newUnit === 'px' ? 1 : 0.25 );
+	};
 
 	const onChange = ( newRadius ) => {
 		let newStyle = {
@@ -40,44 +49,26 @@ export function BorderRadiusEdit( props ) {
 			},
 		};
 
-		if ( newRadius === undefined ) {
+		if ( newRadius === undefined || newRadius === '' ) {
 			newStyle = cleanEmptyObject( newStyle );
 		}
 
 		setAttributes( { style: newStyle } );
 	};
 
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'layout.units' ) || [ 'px', 'em', 'rem' ],
+	} );
+
 	return (
-		<RangeControl
+		<UnitControl
 			value={ style?.border?.radius }
 			label={ __( 'Border radius' ) }
 			min={ MIN_BORDER_RADIUS_VALUE }
-			max={ MAX_BORDER_RADIUS_VALUE }
-			initialPosition={ 0 }
-			allowReset
 			onChange={ onChange }
+			onUnitChange={ onUnitChange }
+			step={ step }
+			units={ units }
 		/>
 	);
-}
-
-/**
- * Determines if there is border radius support.
- *
- * @param  {string|Object} blockType Block name or Block Type object.
- * @return {boolean}                 Whether there is support.
- */
-export function hasBorderRadiusSupport( blockType ) {
-	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
-	return !! ( true === support || support?.radius );
-}
-
-/**
- * Custom hook that checks if border radius settings have been disabled.
- *
- * @param  {string} name The name of the block.
- * @return {boolean}                 Whether border radius setting is disabled.
- */
-export function useIsBorderRadiusDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useEditorFeature( 'border.customRadius' );
-	return ! hasBorderRadiusSupport( blockName ) || isDisabled;
 }

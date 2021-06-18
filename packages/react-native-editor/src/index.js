@@ -18,7 +18,7 @@ import {
 	validateThemeColors,
 	validateThemeGradients,
 } from '@wordpress/block-editor';
-import { dispatch } from '@wordpress/data';
+import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
 
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
@@ -56,6 +56,14 @@ const setupInitHooks = () => {
 		'core/react-native-editor',
 		( props ) => {
 			setupLocale( props.locale, props.translations );
+
+			const capabilities = props.capabilities ?? {};
+			if (
+				getBlockType( 'core/block' ) !== undefined &&
+				capabilities.reusableBlock !== true
+			) {
+				unregisterBlockType( 'core/block' );
+			}
 		}
 	);
 
@@ -70,8 +78,11 @@ const setupInitHooks = () => {
 				initialData,
 				initialTitle,
 				postType,
+				featuredImageId,
 				colors,
 				gradients,
+				rawStyles,
+				rawFeatures,
 			} = props;
 
 			if ( initialData === undefined && __DEV__ ) {
@@ -93,25 +104,13 @@ const setupInitHooks = () => {
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
 				initialTitle,
 				postType,
+				featuredImageId,
 				capabilities,
 				colors,
 				gradients,
+				rawStyles,
+				rawFeatures,
 			};
-		}
-	);
-
-	wpHooks.addAction(
-		'native.render',
-		'core/react-native-editor',
-		( props ) => {
-			const isAudioBlockEnabled =
-				props.capabilities && props.capabilities.audioBlock;
-
-			if ( isAudioBlockEnabled === true ) {
-				dispatch( 'core/edit-post' ).showBlockTypes( [ 'core/audio' ] );
-			} else {
-				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/audio' ] );
-			}
 		}
 	);
 };

@@ -1,17 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-2 {
   z-index: 1000002;
   box-sizing: border-box;
   opacity: 0;
@@ -20,68 +10,31 @@ exports[`props should render correctly 1`] = `
   -ms-transform-origin: top center;
   transform-origin: top center;
   -webkit-transition: opacity 100ms ease;
-  -webkit-transition: opacity var(--wp-g2-transition-duration-fastest) ease;
   transition: opacity 100ms ease;
-  transition: opacity var(--wp-g2-transition-duration-fastest) ease;
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1[data-enter] {
+.emotion-2[data-enter] {
   opacity: 1;
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-0 {
   background: rgba( 0,0,0,0.8 );
   border-radius: 6px;
   box-shadow: 0 0 0 1px rgba( 255,255,255,0.04 );
-  color: #ffffff;
-  color: var(--wp-g2-white);
+  color: #fff;
   padding: 4px 8px;
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
 <div
-  class="components-tooltip-content wp-components-tooltip-content ic-1av77e4 ic-192yz5d emotion-1"
-  data-g2-c16t="true"
-  data-g2-component="TooltipContent"
+  class="emotion-2 components-tooltip-content emotion-3 emotion-4"
+  data-wp-c16t="true"
+  data-wp-component="TooltipContent"
   id="base-tooltip"
   role="tooltip"
-  style="pointer-events: none;"
+  style="position: fixed; left: 100%; top: 100%; pointer-events: none;"
 >
   <div
-    class="ic-otytyz ic-192yz5d emotion-0"
+    class="emotion-0 emotion-1"
   >
     Code is Poetry
   </div>

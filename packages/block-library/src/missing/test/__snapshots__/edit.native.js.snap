@@ -21,7 +21,6 @@ exports[`Missing block renders without crashing 1`] = `
     accessibilityRole="button"
     accessible={true}
     focusable={true}
-    isTVSelectable={true}
     onClick={[Function]}
     onResponderGrant={[Function]}
     onResponderMove={[Function]}
@@ -29,7 +28,6 @@ exports[`Missing block renders without crashing 1`] = `
     onResponderTerminate={[Function]}
     onResponderTerminationRequest={[Function]}
     onStartShouldSetResponder={[Function]}
-    style={null}
   >
     Svg
   </View>
@@ -40,6 +38,5 @@ exports[`Missing block renders without crashing 1`] = `
   <Text>
     Unsupported
   </Text>
-  Modal
 </View>
 `;

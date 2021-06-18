@@ -46,7 +46,7 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
 /**
  * Returns an action object used to set a template.
  *
- * @param {number} templateId The template ID.
+ * @param {number} templateId   The template ID.
  * @param {string} templateSlug The template slug.
  * @return {Object} Action object.
  */
@@ -54,7 +54,7 @@ export function* setTemplate( templateId, templateSlug ) {
 	const pageContext = { templateSlug };
 	if ( ! templateSlug ) {
 		const template = yield controls.resolveSelect(
-			'core',
+			coreStore.name,
 			'getEntityRecord',
 			'postType',
 			'wp_template',
@@ -78,7 +78,7 @@ export function* setTemplate( templateId, templateSlug ) {
  */
 export function* addTemplate( template ) {
 	const newTemplate = yield controls.dispatch(
-		'core',
+		coreStore.name,
 		'saveEntityRecord',
 		'postType',
 		'wp_template',
@@ -87,7 +87,7 @@ export function* addTemplate( template ) {
 
 	if ( template.content ) {
 		yield controls.dispatch(
-			'core',
+			coreStore.name,
 			'editEntityRecord',
 			'postType',
 			'wp_template',
@@ -149,18 +149,18 @@ export function setHomeTemplateId( homeTemplateId ) {
  * Resolves the template for a page and displays both. If no path is given, attempts
  * to use the postId to generate a path like `?p=${ postId }`.
  *
- * @param {Object}  page         The page object.
- * @param {string}  page.type    The page type.
- * @param {string}  page.slug    The page slug.
- * @param {string}  page.path    The page path.
- * @param {Object}  page.context The page context.
+ * @param {Object} page         The page object.
+ * @param {string} page.type    The page type.
+ * @param {string} page.slug    The page slug.
+ * @param {string} page.path    The page path.
+ * @param {Object} page.context The page context.
  *
  * @return {number} The resolved template ID for the page route.
  */
 export function* setPage( page ) {
 	if ( ! page.path && page.context?.postId ) {
 		const entity = yield controls.resolveSelect(
-			'core',
+			coreStore.name,
 			'getEntityRecord',
 			'postType',
 			page.context.postType || 'post',
@@ -170,7 +170,7 @@ export function* setPage( page ) {
 		page.path = getPathAndQueryString( entity.link );
 	}
 	const { id: templateId, slug: templateSlug } = yield controls.resolveSelect(
-		'core',
+		coreStore.name,
 		'__experimentalGetTemplateForLink',
 		page.path
 	);
@@ -198,7 +198,7 @@ export function* showHomepage() {
 		show_on_front: showOnFront,
 		page_on_front: frontpageId,
 	} = yield controls.resolveSelect(
-		'core',
+		coreStore.name,
 		'getEntityRecord',
 		'root',
 		'site'
@@ -264,15 +264,21 @@ export function setIsNavigationPanelOpened( isOpen ) {
 }
 
 /**
- * Sets whether the block inserter panel should be open.
+ * Returns an action object used to open/close the inserter.
  *
- * @param {boolean} isOpen If true, opens the inserter. If false, closes it. It
- *                         does not toggle the state, but sets it directly.
+ * @param {boolean|Object} value                Whether the inserter should be
+ *                                              opened (true) or closed (false).
+ *                                              To specify an insertion point,
+ *                                              use an object.
+ * @param {string}         value.rootClientId   The root client ID to insert at.
+ * @param {number}         value.insertionIndex The index to insert at.
+ *
+ * @return {Object} Action object.
  */
-export function setIsInserterOpened( isOpen ) {
+export function setIsInserterOpened( value ) {
 	return {
 		type: 'SET_IS_INSERTER_OPENED',
-		isOpen,
+		value,
 	};
 }
 

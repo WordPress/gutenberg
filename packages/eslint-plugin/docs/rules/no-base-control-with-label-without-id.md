@@ -8,38 +8,29 @@ If a label is provided but the id is omitted it means that the developer missed 
 Examples of **incorrect** code for this rule:
 
 ```jsx
-	<BaseControl
-		label="ok"
-	>
-		<input id="my-id" />
-	</BaseControl>
+<BaseControl label="ok">
+	<input id="my-id" />
+</BaseControl>
 ```
 
-
 ```jsx
-	<BaseControl label="ok" />
+<BaseControl label="ok" />
 ```
 
 Examples of **correct** code for this rule:
 
-
 ```jsx
-	<BaseControl />
+<BaseControl />
 ```
 
 ```jsx
-	<BaseControl
-		id="my-id"
-	>
-		<input id="my-id" />
-	</BaseControl>
+<BaseControl id="my-id">
+	<input id="my-id" />
+</BaseControl>
 ```
 
 ```jsx
-	<BaseControl
-		label="ok"
-		id="my-id"
-	>
-		<input id="my-id" />
-	</BaseControl>
+<BaseControl label="ok" id="my-id">
+	<input id="my-id" />
+</BaseControl>
 ```

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "10.4.0-rc.1",
+	"version": "10.8.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -19,8 +19,7 @@
 		"npm": ">=6.9.0 <7"
 	},
 	"config": {
-		"GUTENBERG_PHASE": 2,
-		"COMPONENT_SYSTEM_PHASE": 1
+		"GUTENBERG_PHASE": 2
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
@@ -80,15 +79,17 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
+		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
-		"@actions/core": "1.2.6",
-		"@actions/github": "1.0.0",
+		"@actions/core": "1.4.0",
+		"@actions/github": "5.0.0",
 		"@babel/core": "7.13.10",
 		"@babel/plugin-syntax-jsx": "7.12.13",
 		"@babel/runtime-corejs3": "7.13.10",
 		"@babel/traverse": "7.13.0",
+		"@emotion/native": "10.0.27",
 		"@octokit/rest": "16.26.0",
 		"@octokit/webhooks": "7.1.0",
 		"@storybook/addon-a11y": "6.2.5",
@@ -99,7 +100,9 @@
 		"@storybook/react": "6.2.5",
 		"@testing-library/jest-dom": "5.11.9",
 		"@testing-library/react": "11.2.2",
+		"@testing-library/react-native": "7.1.0",
 		"@types/classnames": "2.2.10",
+		"@types/clipboard": "2.0.1",
 		"@types/eslint": "6.8.0",
 		"@types/estree": "0.0.44",
 		"@types/highlight-words-core": "1.2.0",
@@ -138,6 +141,7 @@
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/prettier-config": "file:packages/prettier-config",
 		"@wordpress/project-management-automation": "file:packages/project-management-automation",
+		"@wordpress/readable-js-assets-webpack-plugin": "file:packages/readable-js-assets-webpack-plugin",
 		"@wordpress/scripts": "file:packages/scripts",
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
 		"appium": "1.20.2",
@@ -149,23 +153,25 @@
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
-		"browserslist": "4.15.0",
-		"chalk": "4.0.0",
+		"browserslist": "4.16.6",
+		"chalk": "4.1.1",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "5.1.2",
+		"core-js-builder": "3.11.0",
 		"cross-env": "3.2.4",
 		"css-loader": "5.1.3",
 		"cssnano": "4.1.10",
 		"deep-freeze": "0.0.1",
 		"enzyme": "3.11.0",
 		"equivalent-key-map": "0.2.2",
+		"eslint-import-resolver-node": "0.3.4",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.22.1",
 		"execa": "4.0.2",
 		"fast-glob": "2.2.7",
 		"glob": "7.1.2",
-		"husky": "3.0.5",
+		"husky": "6.0.0",
 		"inquirer": "7.1.0",
 		"jest": "26.6.3",
 		"jest-emotion": "10.0.32",
@@ -175,22 +181,22 @@
 		"jsdom": "16.4.0",
 		"lerna": "3.22.1",
 		"lint-staged": "9.2.5",
-		"lodash": "4.17.19",
+		"lodash": "4.17.21",
 		"make-dir": "3.0.0",
-		"metro-react-native-babel-preset": "0.57.0",
-		"metro-react-native-babel-transformer": "0.56.0",
+		"metro-react-native-babel-preset": "0.64.0",
+		"metro-react-native-babel-transformer": "0.64.0",
 		"mkdirp": "0.5.1",
 		"nock": "12.0.3",
 		"node-watch": "0.7.0",
 		"patch-package": "6.2.2",
-		"postcss": "8.2.2",
+		"postcss": "8.2.15",
 		"postcss-loader": "4.2.0",
 		"prettier": "npm:wp-prettier@2.2.1-beta-1",
 		"progress": "2.0.3",
-		"react": "16.13.1",
-		"react-dom": "16.13.1",
-		"react-native": "0.61.5",
-		"react-test-renderer": "16.13.1",
+		"react": "17.0.1",
+		"react-dom": "17.0.1",
+		"react-native": "0.64.0",
+		"react-test-renderer": "17.0.1",
 		"rimraf": "3.0.2",
 		"rtlcss": "2.6.2",
 		"sass": "1.26.12",
@@ -203,6 +209,7 @@
 		"style-loader": "2.0.0",
 		"terser-webpack-plugin": "3.0.3",
 		"typescript": "4.1.3",
+		"uglify-js": "3.13.7",
 		"uuid": "8.3.0",
 		"wd": "1.12.1",
 		"webpack": "4.46.0",
@@ -229,6 +236,7 @@
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
+		"format": "wp-scripts format",
 		"format-js": "wp-scripts format-js",
 		"format-php": "wp-env run composer run-script format",
 		"lint": "concurrently \"npm run lint-lockfile\" \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
@@ -248,7 +256,7 @@
 		"prepublishOnly": "npm run clean:package-types && npm run build:packages",
 		"publish:check": "lerna updated",
 		"publish:patch": "lerna publish --dist-tag patch",
-		"publish:prod": "lerna publish",
+		"publish:latest": "lerna publish",
 		"test": "npm run lint && npm run test-unit",
 		"test:create-block": "./bin/test-create-block.sh",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
@@ -273,12 +281,8 @@
 		"prestorybook:dev": "npm run build:packages",
 		"storybook:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./storybook -p 50240\"",
 		"env": "wp-scripts env",
-		"wp-env": "wp-env"
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
+		"wp-env": "wp-env",
+		"prepare": "husky install"
 	},
 	"lint-staged": {
 		"package-lock.json": [
@@ -291,8 +295,8 @@
 		"*.scss": [
 			"wp-scripts lint-style"
 		],
-		"*.{js,ts,tsx}": [
-			"wp-scripts format-js",
+		"*.{js,ts,tsx,yml}": [
+			"wp-scripts format",
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [

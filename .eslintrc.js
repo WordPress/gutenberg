@@ -28,6 +28,7 @@ const developmentFiles = [
 	'**/benchmark/**/*.js',
 	'**/@(__mocks__|__tests__|test)/**/*.js',
 	'**/@(storybook|stories)/**/*.js',
+	'packages/babel-preset-default/bin/**/*.js',
 ];
 
 // All files from packages that have types provided with TypeScript.
@@ -48,6 +49,7 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/resolver': require.resolve( './test/lint/import-resolver' ),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
@@ -88,6 +90,11 @@ module.exports = {
 						importNames: [ 'combineReducers' ],
 						message:
 							'Please use `combineReducers` from `@wordpress/data` instead.',
+					},
+					{
+						name: 'puppeteer-testing-library',
+						message:
+							'`puppeteer-testing-library` is still experimental.',
 					},
 				],
 			},
@@ -158,11 +165,22 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ '**/*.@(android|ios|native).js', ...developmentFiles ],
+			files: [
+				'**/*.@(android|ios|native).js',
+				'packages/react-native-*/**/*.js',
+				...developmentFiles,
+			],
 			rules: {
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
+				'@wordpress/data-no-store-string-literals': 'off',
+			},
+		},
+		{
+			files: [ 'packages/react-native-*/**/*.js' ],
+			settings: {
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
 			},
 		},
 		{
@@ -204,7 +222,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js' ],
+			files: [ 'bin/**/*.js', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},

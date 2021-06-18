@@ -15,8 +15,13 @@ import com.android.build.OutputFile
  *   // the name of the generated asset file containing your JS bundle
  *   bundleAssetName: "index.android.bundle",
  *
- *   // the entry file for bundle generation
+ *   // the entry file for bundle generation. If none specified and
+ *   // "index.android.js" exists, it will be used. Otherwise "index.js" is
+ *   // default. Can be overridden with ENTRY_FILE environment variable.
  *   entryFile: "index.android.js",
+ *
+ *   // https://reactnative.dev/docs/performance#enable-the-ram-format
+ *   bundleCommand: "ram-bundle",
  *
  *   // whether to bundle JS and assets in debug mode
  *   bundleInDebug: false,
@@ -73,7 +78,6 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    entryFile: "index.js",
     enableHermes: true,  // clean and rebuild if changing
 ]
 
@@ -104,6 +108,7 @@ def enableProguardInReleaseBuilds = false
 def enableHermes = project.ext.react.get("enableHermes", false);
 
 android {
+
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     compileOptions {
@@ -117,6 +122,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        ndk { 
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips" 
+            
+        } 
     }
     splits {
         abi {
@@ -158,7 +167,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
+    implementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
         exclude group: 'org.wordpress', module: 'utils'
     })
     implementation("org.wordpress:utils:$wordpressUtilsVersion", {
@@ -166,6 +175,7 @@ dependencies {
     })
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 }
 
 // Run this once to be able to run the application with BUCK

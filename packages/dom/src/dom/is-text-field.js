@@ -11,7 +11,7 @@ import isHTMLInputElement from './is-html-input-element';
  * See: https://html.spec.whatwg.org/#textFieldSelection
  *
  * @param {Node} node The HTML element.
- * @return {element is HTMLElement} True if the element is an text field, false if not.
+ * @return {node is HTMLElement} True if the element is an text field, false if not.
  */
 export default function isTextField( node ) {
 	/* eslint-enable jsdoc/valid-types */

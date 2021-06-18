@@ -6,9 +6,8 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import Text from '../../../text';
-import { text } from '../../../text/styles/text-mixins';
-import { color } from '../../../utils/style-mixins';
+import { Text } from '../../../text';
+import { COLORS } from '../../../utils';
 
 export const Root = styled.div`
 	bottom: 0;
@@ -31,11 +30,11 @@ export const TooltipWrapper = styled.div`
 `;
 
 export const Tooltip = styled.div`
-	background: ${ color( 'ui.border' ) };
+	background: ${ COLORS.ui.border };
 	border-radius: 2px;
 	box-sizing: border-box;
 	font-size: 12px;
-	color: ${ color( 'ui.textDark' ) };
+	color: ${ COLORS.ui.textDark };
 	padding: 4px 8px;
 	position: relative;
 `;
@@ -45,7 +44,7 @@ export const Tooltip = styled.div`
 
 export const LabelText = styled( Text )`
 	&&& {
-		${ text };
+		color: white;
 		display: block;
 		font-size: 13px;
 		line-height: 1.4;

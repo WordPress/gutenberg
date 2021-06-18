@@ -12,10 +12,7 @@
 			"column": 35
 		}
 	},
-	"range": [
-		0,
-		35
-	],
+	"range": [ 0, 35 ],
 	"source": {
 		"type": "Literal",
 		"start": 14,
@@ -30,10 +27,7 @@
 				"column": 34
 			}
 		},
-		"range": [
-			14,
-			34
-		],
+		"range": [ 14, 34 ],
 		"value": "./namespace-module",
 		"raw": "'./namespace-module'"
 	}

@@ -3,8 +3,14 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
-import type { ViewOwnProps } from '@wp-g2/create-styles';
-import { useContextSystem, contextConnect } from '@wp-g2/context';
+
+/**
+ * Internal dependencies
+ */
+import { useContextSystem, contextConnect } from '../context';
+// eslint-disable-next-line no-duplicate-imports
+import type { PolymorphicComponentProps } from '../context';
+import { View } from '../../view';
 
 export interface ShortcutDescription {
 	display: string;
@@ -17,13 +23,15 @@ export interface Props {
 }
 
 function Shortcut(
-	props: ViewOwnProps< Props, 'span' >,
+	props: PolymorphicComponentProps< Props, 'span' >,
 	forwardedRef: Ref< any >
 ): JSX.Element | null {
-	const { shortcut, className, ...otherProps } = useContextSystem(
-		props,
-		'Shortcut'
-	);
+	const {
+		as: asProp = 'span',
+		shortcut,
+		className,
+		...otherProps
+	} = useContextSystem( props, 'Shortcut' );
 	if ( ! shortcut ) {
 		return null;
 	}
@@ -39,14 +47,15 @@ function Shortcut(
 	}
 
 	return (
-		<span
+		<View
+			as={ asProp }
 			className={ className }
 			aria-label={ ariaLabel }
 			ref={ forwardedRef }
 			{ ...otherProps }
 		>
 			{ displayText }
-		</span>
+		</View>
 	);
 }
 

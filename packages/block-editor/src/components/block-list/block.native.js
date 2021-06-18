@@ -20,7 +20,7 @@ import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
-import { __experimentalUseEditorFeature as useEditorFeature } from '@wordpress/block-editor';
+import { useSetting } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -50,7 +50,7 @@ function BlockForType( {
 	blockWidth,
 	baseGlobalStyles,
 } ) {
-	const defaultColors = useEditorFeature( 'color.palette' ) || emptyArray;
+	const defaultColors = useSetting( 'color.palette' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
@@ -196,7 +196,7 @@ class BlockListBlock extends Component {
 			attributes,
 			order + 1
 		);
-		const { isFullWidth, isWider, isContainerRelated } = alignmentHelpers;
+		const { isFullWidth, isContainerRelated } = alignmentHelpers;
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
@@ -260,13 +260,7 @@ class BlockListBlock extends Component {
 							/>
 						) }
 						<View
-							style={ [
-								styles.neutralToolbar,
-								! isFullWidthToolbar &&
-									isContainerRelated( name ) &&
-									isWider( screenWidth, 'mobile' ) &&
-									styles.containerToolbar,
-							] }
+							style={ styles.neutralToolbar }
 							ref={ this.anchorNodeRef }
 						>
 							{ isSelected && (

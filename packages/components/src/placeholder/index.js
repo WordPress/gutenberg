@@ -26,7 +26,7 @@ import Icon from '../icon';
  * @param {Object}    props.preview        Preview to be rendered in the placeholder.
  * @param {boolean}   props.isColumnLayout Whether a column layout should be used.
  *
- * @return {Object}       The rendered placeholder.
+ * @return {Object} The rendered placeholder.
  */
 function Placeholder( {
 	icon,
@@ -46,8 +46,8 @@ function Placeholder( {
 	let modifierClassNames;
 	if ( typeof width === 'number' ) {
 		modifierClassNames = {
-			'is-large': width >= 320,
-			'is-medium': width >= 160 && width < 320,
+			'is-large': width >= 480,
+			'is-medium': width >= 160 && width < 480,
 			'is-small': width < 160,
 		};
 	}

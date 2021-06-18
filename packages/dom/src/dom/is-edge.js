@@ -1,30 +1,27 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * Internal dependencies
  */
-import getComputedStyle from './get-computed-style';
+import isRTL from './is-rtl';
 import getRangeHeight from './get-range-height';
 import getRectangleFromRange from './get-rectangle-from-range';
 import isSelectionForward from './is-selection-forward';
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
+import { assertIsDefined } from '../utils/assert-is-defined';
+import isInputOrTextArea from './is-input-or-text-area';
 
 /**
  * Check whether the selection is at the edge of the container. Checks for
  * horizontal position by default. Set `onlyVertical` to true to check only
  * vertically.
  *
- * @param {Element} container    Focusable element.
- * @param {boolean} isReverse    Set to true to check left, false to check right.
- * @param {boolean} onlyVertical Set to true to check only vertical position.
+ * @param {Element} container            Focusable element.
+ * @param {boolean} isReverse            Set to true to check left, false to check right.
+ * @param {boolean} [onlyVertical=false] Set to true to check only vertical position.
  *
  * @return {boolean} True if at the edge, false if not.
  */
-export default function isEdge( container, isReverse, onlyVertical ) {
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
+export default function isEdge( container, isReverse, onlyVertical = false ) {
+	if ( isInputOrTextArea( container ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
 		}
@@ -36,16 +33,17 @@ export default function isEdge( container, isReverse, onlyVertical ) {
 		return container.value.length === container.selectionStart;
 	}
 
-	if ( ! container.isContentEditable ) {
+	if ( ! (/** @type {HTMLElement} */ ( container ).isContentEditable) ) {
 		return true;
 	}
 
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
 
+	assertIsDefined( defaultView, 'defaultView' );
 	const selection = defaultView.getSelection();
 
-	if ( ! selection.rangeCount ) {
+	if ( ! selection || ! selection.rangeCount ) {
 		return false;
 	}
 
@@ -69,18 +67,18 @@ export default function isEdge( container, isReverse, onlyVertical ) {
 	// Only consider the multiline selection at the edge if the direction is
 	// towards the edge. The selection is multiline if it is taller than the
 	// collapsed  selection.
+	const rangeHeight = getRangeHeight( range );
 	if (
 		! isCollapsed &&
-		getRangeHeight( range ) > collapsedRangeRect.height &&
+		rangeHeight &&
+		rangeHeight > collapsedRangeRect.height &&
 		isForward === isReverse
 	) {
 		return false;
 	}
 
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
-	const { direction } = getComputedStyle( container );
-	const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
-
+	const isReverseDir = isRTL( container ) ? ! isReverse : isReverse;
 	const containerRect = container.getBoundingClientRect();
 
 	// To check if a selection is at the edge, we insert a test selection at the
@@ -99,7 +97,7 @@ export default function isEdge( container, isReverse, onlyVertical ) {
 		ownerDocument,
 		x,
 		y,
-		container
+		/** @type {HTMLElement} */ ( container )
 	);
 
 	if ( ! testRange ) {

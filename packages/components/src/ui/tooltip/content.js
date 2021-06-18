@@ -1,15 +1,15 @@
 /**
  * External dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
+import { cx } from 'emotion';
 // eslint-disable-next-line no-restricted-imports
 import { Tooltip as ReakitTooltip } from 'reakit';
 
 /**
  * Internal dependencies
  */
-import { View } from '../view';
+import { contextConnect, useContextSystem } from '../context';
+import { View } from '../../view';
 import { useTooltipContext } from './context';
 import * as styles from './styles';
 
@@ -17,8 +17,8 @@ const { TooltipPopoverView } = styles;
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('reakit').TooltipProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                              forwardedRef
  */
 function TooltipContent( props, forwardedRef ) {
 	const { children, className, ...otherProps } = useContextSystem(

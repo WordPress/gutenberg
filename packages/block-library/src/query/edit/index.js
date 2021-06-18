@@ -3,31 +3,66 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import {
 	BlockControls,
+	InspectorAdvancedControls,
 	useBlockProps,
+	useSetting,
 	store as blockEditorStore,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalBlockPatternSetup as BlockPatternSetup,
 } from '@wordpress/block-editor';
+import { SelectControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './query-inspector-controls';
-import QueryBlockSetup from './query-block-setup';
+import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
-const TEMPLATE = [ [ 'core/query-loop' ] ];
+const TEMPLATE = [ [ 'core/post-template' ] ];
 export function QueryContent( { attributes, setAttributes } ) {
-	const { queryId, query, layout } = attributes;
+	const {
+		queryId,
+		query,
+		displayLayout,
+		tagName: TagName = 'div',
+		layout = {},
+	} = attributes;
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
 	const instanceId = useInstanceId( QueryContent );
+	const { themeSupportsLayout } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return { themeSupportsLayout: getSettings()?.supportsLayout };
+	}, [] );
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { contentSize, wideSize } = usedLayout;
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
+	const _layout = useMemo( () => {
+		if ( themeSupportsLayout ) {
+			const alignments =
+				contentSize || wideSize
+					? [ 'wide', 'full' ]
+					: [ 'left', 'center', 'right' ];
+			return {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments,
+			};
+		}
+		return undefined;
+	}, [ themeSupportsLayout, contentSize, wideSize ] );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+		__experimentalLayout: _layout,
+	} );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
@@ -64,26 +99,57 @@ export function QueryContent( { attributes, setAttributes } ) {
 	}, [ queryId, instanceId ] );
 	const updateQuery = ( newQuery ) =>
 		setAttributes( { query: { ...query, ...newQuery } } );
-	const updateLayout = ( newLayout ) =>
-		setAttributes( { layout: { ...layout, ...newLayout } } );
+	const updateDisplayLayout = ( newDisplayLayout ) =>
+		setAttributes( {
+			displayLayout: { ...displayLayout, ...newDisplayLayout },
+		} );
 	return (
 		<>
 			<QueryInspectorControls
 				attributes={ attributes }
 				setQuery={ updateQuery }
-				setLayout={ updateLayout }
+				setDisplayLayout={ updateDisplayLayout }
 			/>
 			<BlockControls>
 				<QueryToolbar
 					attributes={ attributes }
 					setQuery={ updateQuery }
-					setLayout={ updateLayout }
+					setDisplayLayout={ updateDisplayLayout }
 				/>
 			</BlockControls>
-			<div { ...blockProps }>
-				<div { ...innerBlocksProps } />
-			</div>
+			<InspectorAdvancedControls>
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<aside>', value: 'aside' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+				/>
+			</InspectorAdvancedControls>
+			<TagName { ...innerBlocksProps } />
 		</>
+	);
+}
+
+function QueryPatternSetup( props ) {
+	const { clientId, name: blockName } = props;
+	const blockProps = useBlockProps();
+	// `startBlankComponent` is what to render when clicking `Start blank`
+	// or if no matched patterns are found.
+	return (
+		<div { ...blockProps }>
+			<BlockPatternSetup
+				blockName={ blockName }
+				clientId={ clientId }
+				startBlankComponent={ <QueryPlaceholder { ...props } /> }
+			/>
+		</div>
 	);
 }
 
@@ -94,7 +160,7 @@ const QueryEdit = ( props ) => {
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
-	const Component = hasInnerBlocks ? QueryContent : QueryBlockSetup;
+	const Component = hasInnerBlocks ? QueryContent : QueryPatternSetup;
 	return <Component { ...props } />;
 };
 

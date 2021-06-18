@@ -33,6 +33,42 @@ export function finishResolution( selectorName, args ) {
 }
 
 /**
+ * Returns an action object used in signalling that a batch of selector resolutions has
+ * started.
+ *
+ * @param {string} selectorName Name of selector for which resolver triggered.
+ * @param {...*}   args         Array of arguments to associate for uniqueness, each item
+ *                              is associated to a resolution.
+ *
+ * @return {Object} Action object.
+ */
+export function startResolutions( selectorName, args ) {
+	return {
+		type: 'START_RESOLUTIONS',
+		selectorName,
+		args,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that a batch of selector resolutions has
+ * completed.
+ *
+ * @param {string} selectorName Name of selector for which resolver triggered.
+ * @param {...*}   args         Array of arguments to associate for uniqueness, each item
+ *                              is associated to a resolution.
+ *
+ * @return {Object} Action object.
+ */
+export function finishResolutions( selectorName, args ) {
+	return {
+		type: 'FINISH_RESOLUTIONS',
+		selectorName,
+		args,
+	};
+}
+
+/**
  * Returns an action object used in signalling that we should invalidate the resolution cache.
  *
  * @param {string} selectorName Name of selector for which resolver should be invalidated.

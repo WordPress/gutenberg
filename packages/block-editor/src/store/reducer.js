@@ -21,8 +21,8 @@ import {
 /**
  * WordPress dependencies
  */
-import { combineReducers } from '@wordpress/data';
-import { getBlockVariations } from '@wordpress/blocks';
+import { combineReducers, select } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -79,7 +79,7 @@ function mapBlockParents( blocks, rootClientId = '' ) {
  * applying a transformation function to each one.
  * Returns a flattened object with the transformed blocks.
  *
- * @param {Array} blocks Blocks to flatten.
+ * @param {Array}    blocks    Blocks to flatten.
  * @param {Function} transform Transforming function to be applied to each block.
  *
  * @return {Object} Flattened object.
@@ -137,9 +137,9 @@ function getFlattenedBlockAttributes( blocks ) {
  * an inner block controller. To do so, it must be excluded from the list of
  * client IDs which are considered to be part of the top-level entity.
  *
- * @param {Object}  blocksOrder  Object that maps block client IDs to a list of
- *                               nested block client IDs.
- * @param {?string} rootClientId The root client ID to search. Defaults to ''.
+ * @param {Object}  blocksOrder           Object that maps block client IDs to a list of
+ *                                        nested block client IDs.
+ * @param {?string} rootClientId          The root client ID to search. Defaults to ''.
  * @param {?Object} controlledInnerBlocks The InnerBlocks controller state.
  *
  * @return {Array} List of descendant client IDs.
@@ -1131,7 +1131,7 @@ export function isTyping( state = false, action ) {
  * Reducer returning dragged block client id.
  *
  * @param {string[]} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object}   action Dispatched action.
  *
  * @return {string[]} Updated state.
  */
@@ -1393,32 +1393,9 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * A helper for resetting the insertion point state.
- *
- * @param {Object} state        Current state.
- * @param {Object} action       Dispatched action.
- * @param {*}      defaultValue The default value for the reducer.
- *
- * @return {*} Either the default value if a reset is required, or the state.
- */
-function resetInsertionPoint( state, action, defaultValue ) {
-	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
-		case 'SELECT_BLOCK':
-		case 'SELECTION_CHANGE':
-		case 'REPLACE_INNER_BLOCKS':
-		case 'INSERT_BLOCKS':
-		case 'REMOVE_BLOCKS':
-		case 'REPLACE_BLOCKS':
-			return defaultValue;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the insertion point position, consisting of the
- * rootClientId and an index.
+ * Reducer returning the block insertion point visibility, either null if there
+ * is not an explicit insertion point assigned, or an object of its `index` and
+ * `rootClientId`.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -1427,33 +1404,15 @@ function resetInsertionPoint( state, action, defaultValue ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SET_INSERTION_POINT':
-		case 'SHOW_INSERTION_POINT': {
-			const { rootClientId, index } = action;
-			return { rootClientId, index };
-		}
-	}
-
-	return resetInsertionPoint( state, action, null );
-}
-
-/**
- * Reducer returning the visibility of the insertion point.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function insertionPointVisibility( state = false, action ) {
-	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
-			return true;
+			const { rootClientId, index, __unstableWithInserter } = action;
+			return { rootClientId, index, __unstableWithInserter };
+
 		case 'HIDE_INSERTION_POINT':
-			return false;
+			return null;
 	}
 
-	return resetInsertionPoint( state, action, false );
+	return state;
 }
 
 /**
@@ -1499,8 +1458,8 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 /**
  * Reducer returning the user preferences.
  *
- * @param {Object}  state                 Current state.
- * @param {Object}  action                Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {string} Updated state.
  */
@@ -1510,9 +1469,9 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
 				const { attributes, name: blockName } = block;
-				const variations = getBlockVariations( blockName );
-				const match = variations?.find( ( variation ) =>
-					variation.isActive?.( attributes, variation.attributes )
+				const match = select( blocksStore ).getActiveBlockVariation(
+					blockName,
+					attributes
 				);
 				// If a block variation match is found change the name to be the same with the
 				// one that is used for block variations in the Inserter (`getItemFromVariation`).
@@ -1609,7 +1568,7 @@ export function isNavigationMode( state = false, action ) {
  * Reducer returning whether the block moving mode is enabled or not.
  *
  * @param {string|null} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Object}      action Dispatched action.
  *
  * @return {string|null} Updated state.
  */
@@ -1727,6 +1686,31 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the block insertion event list state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function lastBlockInserted( state = {}, action ) {
+	switch ( action.type ) {
+		case 'INSERT_BLOCKS':
+			if ( ! action.blocks.length ) {
+				return state;
+			}
+
+			const clientId = action.blocks[ 0 ].clientId;
+			const source = action.meta?.source;
+
+			return { clientId, source };
+		case 'RESET_BLOCKS':
+			return {};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1739,7 +1723,6 @@ export default combineReducers( {
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
-	insertionPointVisibility,
 	template,
 	settings,
 	preferences,
@@ -1748,4 +1731,5 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
+	lastBlockInserted,
 } );

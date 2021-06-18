@@ -16,11 +16,11 @@ Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find 
 
 ## Contributor Resources
 
-* [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) documents getting your development environment setup, this includes your test site and developer tools suggestions.
-* [Git Workflow](/docs/contributors/code/git-workflow.md) documents the git process for deploying changes using pull requests.
-* [Coding Guidelines](/docs/contributors/code/coding-guidelines.md) outline additional patterns and conventions used in the Gutenberg project.
-* [Testing Overview](/docs/contributors/code/testing-overview.md) for PHP and JavaScript development in Gutenberg.
-* [Accessibility Testing](/docs/contributors/accessibility-testing.md) documents the process of testing accessibility in Gutenberg.
-* [Managing Packages](/docs/contributors/code/managing-packages.md) documents the process for managing the npm packages.
-* [Gutenberg Release Process](/docs/contributors/code/release.md) - a checklist for the different types of releases for the Gutenberg project.
-* [React Native mobile Gutenberg](/docs/contributors/code/native-mobile.md) - a guide on the React Native based mobile Gutenberg editor.
+-   [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) documents getting your development environment setup, this includes your test site and developer tools suggestions.
+-   [Git Workflow](/docs/contributors/code/git-workflow.md) documents the git process for deploying changes using pull requests.
+-   [Coding Guidelines](/docs/contributors/code/coding-guidelines.md) outline additional patterns and conventions used in the Gutenberg project.
+-   [Testing Overview](/docs/contributors/code/testing-overview.md) for PHP and JavaScript development in Gutenberg.
+-   [Accessibility Testing](/docs/contributors/accessibility-testing.md) documents the process of testing accessibility in Gutenberg.
+-   [Managing Packages](/docs/contributors/code/managing-packages.md) documents the process for managing the npm packages.
+-   [Gutenberg Release Process](/docs/contributors/code/release.md) - a checklist for the different types of releases for the Gutenberg project.
+-   [React Native mobile Gutenberg](/docs/contributors/code/native-mobile.md) - a guide on the React Native based mobile Gutenberg editor.

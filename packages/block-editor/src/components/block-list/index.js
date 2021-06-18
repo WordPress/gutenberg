@@ -7,8 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, createContext, useState } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
+import { createContext, useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,69 +16,61 @@ import { useViewportMatch } from '@wordpress/compose';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
-import useInsertionPoint from './insertion-point';
-import BlockPopover from './block-popover';
+import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
-import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
+import BlockToolsBackCompat from '../block-tools/back-compat';
+import { useBlockSelectionClearer } from '../block-selection-clearer';
 
-export const BlockNodes = createContext();
-export const SetBlockNodes = createContext();
+export const IntersectionObserver = createContext();
 
-export default function BlockList( { className, __experimentalLayout } ) {
-	const ref = useRef();
-	const [ blockNodes, setBlockNodes ] = useState( {} );
-	const insertionPoint = useInsertionPoint( ref );
-	useScrollSelectionIntoView( ref );
-	usePreParsePatterns();
-
+function Root( { className, children } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const {
-		isTyping,
-		isOutlineMode,
-		isFocusMode,
-		isNavigationMode,
-	} = useSelect( ( select ) => {
-		const {
-			isTyping: _isTyping,
-			getSettings,
-			isNavigationMode: _isNavigationMode,
-		} = select( blockEditorStore );
-		const { outlineMode, focusMode } = getSettings();
-		return {
-			isTyping: _isTyping(),
-			isOutlineMode: outlineMode,
-			isFocusMode: focusMode,
-			isNavigationMode: _isNavigationMode(),
-		};
-	}, [] );
-
+	const { isOutlineMode, isFocusMode, isNavigationMode } = useSelect(
+		( select ) => {
+			const { getSettings, isNavigationMode: _isNavigationMode } = select(
+				blockEditorStore
+			);
+			const { outlineMode, focusMode } = getSettings();
+			return {
+				isOutlineMode: outlineMode,
+				isFocusMode: focusMode,
+				isNavigationMode: _isNavigationMode(),
+			};
+		},
+		[]
+	);
 	return (
-		<BlockNodes.Provider value={ blockNodes }>
-			{ insertionPoint }
-			<BlockPopover />
-			<div
-				ref={ ref }
-				className={ classnames(
-					'block-editor-block-list__layout is-root-container',
-					className,
-					{
-						'is-typing': isTyping,
-						'is-outline-mode': isOutlineMode,
-						'is-focus-mode': isFocusMode && isLargeViewport,
-						'is-navigate-mode': isNavigationMode,
-					}
-				) }
-			>
-				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems
-						wrapperRef={ ref }
-						__experimentalLayout={ __experimentalLayout }
-					/>
-				</SetBlockNodes.Provider>
-			</div>
-		</BlockNodes.Provider>
+		<div
+			ref={ useMergeRefs( [
+				useBlockSelectionClearer(),
+				useBlockDropZone(),
+				useInBetweenInserter(),
+			] ) }
+			className={ classnames(
+				'block-editor-block-list__layout is-root-container',
+				className,
+				{
+					'is-outline-mode': isOutlineMode,
+					'is-focus-mode': isFocusMode && isLargeViewport,
+					'is-navigate-mode': isNavigationMode,
+				}
+			) }
+		>
+			{ children }
+		</div>
+	);
+}
+
+export default function BlockList( { className, ...props } ) {
+	usePreParsePatterns();
+	return (
+		<BlockToolsBackCompat>
+			<Root className={ className }>
+				<BlockListItems { ...props } />
+			</Root>
+		</BlockToolsBackCompat>
 	);
 }
 
@@ -88,59 +80,61 @@ function Items( {
 	renderAppender,
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
-	wrapperRef,
 } ) {
-	function selector( select ) {
-		const {
-			getBlockOrder,
-			getSelectedBlockClientId,
-			getMultiSelectedBlockClientIds,
-			hasMultiSelection,
-		} = select( blockEditorStore );
-		return {
-			blockClientIds: getBlockOrder( rootClientId ),
-			selectedBlockClientId: getSelectedBlockClientId(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			hasMultiSelection: hasMultiSelection(),
-		};
-	}
+	const [ intersectingBlocks, setIntersectingBlocks ] = useState( new Set() );
+	const intersectionObserver = useMemo( () => {
+		const { IntersectionObserver: Observer } = window;
 
-	const {
-		blockClientIds,
-		selectedBlockClientId,
-		multiSelectedBlockClientIds,
-		hasMultiSelection,
-	} = useSelect( selector, [ rootClientId ] );
+		if ( ! Observer ) {
+			return;
+		}
 
-	useBlockDropZone( {
-		element: wrapperRef,
-		rootClientId,
-	} );
+		return new Observer( ( entries ) => {
+			setIntersectingBlocks( ( oldIntersectingBlocks ) => {
+				const newIntersectingBlocks = new Set( oldIntersectingBlocks );
+				for ( const entry of entries ) {
+					const clientId = entry.target.getAttribute( 'data-block' );
+					const action = entry.isIntersecting ? 'add' : 'delete';
+					newIntersectingBlocks[ action ]( clientId );
+				}
+				return newIntersectingBlocks;
+			} );
+		} );
+	}, [ setIntersectingBlocks ] );
+	const { order, selectedBlocks } = useSelect(
+		( select ) => {
+			const { getBlockOrder, getSelectedBlockClientIds } = select(
+				blockEditorStore
+			);
+			return {
+				order: getBlockOrder( rootClientId ),
+				selectedBlocks: getSelectedBlockClientIds(),
+			};
+		},
+		[ rootClientId ]
+	);
 
 	return (
 		<LayoutProvider value={ layout }>
-			{ blockClientIds.map( ( clientId, index ) => {
-				const isBlockInSelection = hasMultiSelection
-					? multiSelectedBlockClientIds.includes( clientId )
-					: selectedBlockClientId === clientId;
-
-				return (
+			<IntersectionObserver.Provider value={ intersectionObserver }>
+				{ order.map( ( clientId ) => (
 					<AsyncModeProvider
 						key={ clientId }
-						value={ ! isBlockInSelection }
+						value={
+							// Only provide data asynchronously if the block is
+							// not visible and not selected.
+							! intersectingBlocks.has( clientId ) &&
+							! selectedBlocks.includes( clientId )
+						}
 					>
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							// This prop is explicitely computed and passed down
-							// to avoid being impacted by the async mode
-							// otherwise there might be a small delay to trigger the animation.
-							index={ index }
 						/>
 					</AsyncModeProvider>
-				);
-			} ) }
-			{ blockClientIds.length < 1 && placeholder }
+				) ) }
+			</IntersectionObserver.Provider>
+			{ order.length < 1 && placeholder }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }

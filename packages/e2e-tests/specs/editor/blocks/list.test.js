@@ -113,6 +113,7 @@ describe( 'List', () => {
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
@@ -505,5 +506,37 @@ describe( 'List', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not change the contents when you change the list type to Ordered', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '* 1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+		await clickBlockToolbarButton( 'Ordered' );
+
+		const content = await page.$eval(
+			'.wp-block-list',
+			( el ) => el.innerHTML
+		);
+		expect( content ).toMatchSnapshot();
+	} );
+
+	it( 'should not change the contents when you change the list type to Unordered', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1. a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+		await clickBlockToolbarButton( 'Unordered' );
+
+		const content = await page.$eval(
+			'.wp-block-list',
+			( el ) => el.innerHTML
+		);
+		expect( content ).toMatchSnapshot();
 	} );
 } );

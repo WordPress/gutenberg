@@ -348,6 +348,13 @@ export class RichText extends Component {
 			return;
 		}
 
+		// Add stubs for conformance in downstream autocompleters logic
+		this.customEditableOnKeyDown?.( {
+			preventDefault: () => undefined,
+			stopPropagation: () => undefined,
+			...event,
+		} );
+
 		this.handleDelete( event );
 		this.handleEnter( event );
 		this.handleTriggerKeyCodes( event );
@@ -833,9 +840,18 @@ export class RichText extends Component {
 					extraAttributes += ` start=${ this.props.start }`;
 				}
 			}
-			value = `<${ tagName } ${ extraAttributes }>${ value }</${ tagName }>`;
+			value = `<${ tagName }${ extraAttributes }>${ value }</${ tagName }>`;
 		}
 		return value;
+	}
+
+	getEditableProps() {
+		return {
+			// Overridable props.
+			style: {},
+			className: 'rich-text',
+			onKeyDown: () => null,
+		};
 	}
 
 	render() {
@@ -855,6 +871,7 @@ export class RichText extends Component {
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
+		const editableProps = this.getEditableProps();
 
 		const placeholderStyle = getStylesFromColorScheme(
 			styles.richTextPlaceholder,
@@ -924,6 +941,12 @@ export class RichText extends Component {
 				backgroundColor: style.backgroundColor,
 			};
 
+		const EditableView = ( props ) => {
+			this.customEditableOnKeyDown = props?.onKeyDown;
+
+			return <></>;
+		};
+
 		return (
 			<View style={ containerStyles }>
 				{ children &&
@@ -932,6 +955,8 @@ export class RichText extends Component {
 						value: record,
 						onChange: this.onFormatChange,
 						onFocus: () => {},
+						editableProps,
+						editableTagName: EditableView,
 					} ) }
 				<RCTAztecView
 					accessibilityLabel={ accessibilityLabel }
@@ -968,9 +993,13 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
-					triggerKeyCodes={ this.suggestionOptions().map(
-						( op ) => op.triggerChar
-					) }
+					triggerKeyCodes={
+						disableEditingMenu
+							? []
+							: this.suggestionOptions().map(
+									( op ) => op.triggerChar
+							  )
+					}
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }

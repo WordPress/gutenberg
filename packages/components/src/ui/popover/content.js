@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
-import { css, cx } from '@wp-g2/styles';
+import { css, cx } from 'emotion';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as ReakitPopover } from 'reakit';
 
@@ -10,14 +9,15 @@ import { Popover as ReakitPopover } from 'reakit';
  * Internal dependencies
  */
 import { Card } from '../card';
-import { View } from '../view';
+import { View } from '../../view';
 import { usePopoverContext } from './context';
 import * as styles from './styles';
+import { contextConnect, useContextSystem } from '../context';
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').ContentProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                              forwardedRef
  */
 function PopoverContent( props, forwardedRef ) {
 	const {

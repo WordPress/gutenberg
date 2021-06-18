@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
+import { cx } from 'emotion';
 
 /**
  * WordPress dependencies
@@ -12,13 +11,14 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Scrollable } from '../scrollable';
-import { View } from '../view';
+import { contextConnect, useContextSystem } from '../context';
+import { Scrollable } from '../../scrollable';
+import { View } from '../../view';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').CardBodyProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<import('./types').CardBodyProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                               forwardedRef
  */
 function CardBody( props, forwardedRef ) {
 	const { className, scrollable = true, ...otherProps } = useContextSystem(

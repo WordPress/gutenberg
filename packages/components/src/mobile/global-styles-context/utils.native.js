@@ -120,9 +120,8 @@ export function getBlockColors(
 	return blockStyles;
 }
 
-// To-do add tests
 export function parseColorVariables( styles, colorPalette ) {
-	const stylesBase = JSON.stringify( styles );
+	const stylesBase = styles;
 	const colorPrefixRegex = /var\(--wp--preset--color--(.*?)\)/g;
 
 	return stylesBase
@@ -137,20 +136,26 @@ export function parseColorVariables( styles, colorPalette ) {
 		: styles;
 }
 
-export function getGlobalStyles( baseStyles ) {
-	const colorSettings = baseStyles?.settings?.color;
-	const palette = colorSettings?.palette;
-	const globalStyles = parseColorVariables( baseStyles, palette );
-	const gradients = globalStyles?.settings?.color?.gradients;
+export function getGlobalStyles( rawStyles, rawFeatures, colors, gradients ) {
+	const parsedGradients = parseColorVariables(
+		JSON.stringify( gradients ),
+		colors
+	);
+	const globalStyles = parseColorVariables( rawStyles, colors );
+	const parsedExperimentalFeatures = parseColorVariables(
+		rawFeatures,
+		colors
+	);
 
 	return {
-		...( palette || gradients
-			? {
-					__experimentalFeatures: {
-						defaults: { color: { palette, gradients } },
-					},
-			  }
-			: {} ),
+		colors,
+		gradients: parsedGradients,
+		__experimentalFeatures: {
+			color: {
+				palette: parsedExperimentalFeatures?.color?.palette,
+				gradients: parsedExperimentalFeatures?.color?.gradients,
+			},
+		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};
 }

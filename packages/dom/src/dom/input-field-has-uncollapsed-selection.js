@@ -13,7 +13,7 @@ import isNumberInput from './is-number-input';
  *
  * See: https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects.
  *
- * @param {HTMLElement} element The HTML element.
+ * @param {Element} element The HTML element.
  *
  * @return {boolean} Whether the input/textareaa element has some "selection".
  */
@@ -22,7 +22,10 @@ export default function inputFieldHasUncollapsedSelection( element ) {
 		return false;
 	}
 	try {
-		const { selectionStart, selectionEnd } = element;
+		const {
+			selectionStart,
+			selectionEnd,
+		} = /** @type {HTMLInputElement | HTMLTextAreaElement} */ ( element );
 
 		return selectionStart !== null && selectionStart !== selectionEnd;
 	} catch ( error ) {

@@ -30,7 +30,7 @@ export const getMergedGlobalStyles = (
 	blockName
 ) => {
 	const baseGlobalColors = {
-		baseColors: baseGlobalStyles?.styles || {},
+		baseColors: baseGlobalStyles || {},
 	};
 	const blockStyleAttributes = pick(
 		blockAttributes,

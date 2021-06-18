@@ -180,7 +180,7 @@ export default compose(
 		const selectedId = getSelectedBlockClientId();
 		const selectionIsNested = !! getBlockRootClientId( selectedId );
 		const globalStyles = getSettings()?.__experimentalGlobalStylesBaseStyles
-			?.styles?.color;
+			?.color;
 
 		return {
 			postType: getEditedPostAttribute( 'type' ),

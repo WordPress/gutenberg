@@ -5,59 +5,97 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalBoxControl as BoxControl,
 	PanelBody,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
+import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useEditorFeature } from '../editor/utils';
+import { useSetting } from '../editor/utils';
 
-export function useHasSpacingPanel( { supports, name } ) {
-	return (
-		useEditorFeature( 'spacing.customPadding', name ) &&
-		supports.includes( 'padding' )
-	);
+export function useHasSpacingPanel( context ) {
+	const hasPadding = useHasPadding( context );
+	const hasMargin = useHasMargin( context );
+
+	return hasPadding || hasMargin;
 }
 
-function filterUnitsWithSettings( settings = [], units = [] ) {
-	return units.filter( ( unit ) => {
-		return settings.includes( unit.value );
+function useHasPadding( { name, supports } ) {
+	const settings = useSetting( 'spacing.customPadding', name );
+
+	return settings && supports.includes( 'padding' );
+}
+
+function useHasMargin( { name, supports } ) {
+	const settings = useSetting( 'spacing.customMargin', name );
+
+	return settings && supports.includes( 'margin' );
+}
+
+function filterValuesBySides( values, sides ) {
+	if ( ! sides ) {
+		// If no custom side configuration all sides are opted into by default.
+		return values;
+	}
+
+	// Only include sides opted into within filtered values.
+	const filteredValues = {};
+	sides.forEach( ( side ) => ( filteredValues[ side ] = values[ side ] ) );
+
+	return filteredValues;
+}
+
+export default function SpacingPanel( { context, getStyle, setStyle } ) {
+	const { name } = context;
+	const showPaddingControl = useHasPadding( context );
+	const showMarginControl = useHasMargin( context );
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units', name ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
 	} );
-}
 
-function useCustomUnits( { units, contextName } ) {
-	const availableUnits = useEditorFeature( 'spacing.units', contextName );
-	const usedUnits = filterUnitsWithSettings(
-		! availableUnits ? [] : availableUnits,
-		units
-	);
-
-	return usedUnits.length === 0 ? false : usedUnits;
-}
-
-export default function SpacingPanel( {
-	context: { name },
-	getStyle,
-	setStyle,
-} ) {
-	const units = useCustomUnits( { contextName: name } );
 	const paddingValues = getStyle( name, 'padding' );
-	const setPaddingValues = ( { top, right, bottom, left } ) => {
-		setStyle( name, 'padding', {
-			top: top || paddingValues?.top,
-			right: right || paddingValues?.right,
-			bottom: bottom || paddingValues?.bottom,
-			left: left || paddingValues?.left,
-		} );
+	const paddingSides = useCustomSides( name, 'padding' );
+
+	const setPaddingValues = ( newPaddingValues ) => {
+		const padding = filterValuesBySides( newPaddingValues, paddingSides );
+		setStyle( name, 'padding', padding );
 	};
+
+	const marginValues = getStyle( name, 'margin' );
+	const marginSides = useCustomSides( name, 'margin' );
+
+	const setMarginValues = ( newMarginValues ) => {
+		const margin = filterValuesBySides( newMarginValues, marginSides );
+		setStyle( name, 'margin', margin );
+	};
+
 	return (
 		<PanelBody title={ __( 'Spacing' ) }>
-			<BoxControl
-				values={ paddingValues }
-				onChange={ setPaddingValues }
-				label={ __( 'Padding' ) }
-				units={ units }
-			/>
+			{ showPaddingControl && (
+				<BoxControl
+					values={ paddingValues }
+					onChange={ setPaddingValues }
+					label={ __( 'Padding' ) }
+					sides={ paddingSides }
+					units={ units }
+				/>
+			) }
+			{ showMarginControl && (
+				<BoxControl
+					values={ marginValues }
+					onChange={ setMarginValues }
+					label={ __( 'Margin' ) }
+					sides={ marginSides }
+					units={ units }
+				/>
+			) }
 		</PanelBody>
 	);
 }

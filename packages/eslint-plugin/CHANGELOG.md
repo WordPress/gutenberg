@@ -2,17 +2,21 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Adds JSDoc alignment check ([#25300](https://github.com/WordPress/gutenberg/pull/25300)).
+
 ## 9.0.1 (2021-03-19)
 
 ### Bug Fix
 
-- Adds TypeScript as a peer dependency and makes it optional when not installed ([#29942](https://github.com/WordPress/gutenberg/pull/29942)).
+-   Adds TypeScript as a peer dependency and makes it optional when not installed ([#29942](https://github.com/WordPress/gutenberg/pull/29942)).
 
 ## 9.0.0 (2021-03-17)
 
 ### Breaking Changes
 
-- Add support and configuration for TypeScript files. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
+-   Add support and configuration for TypeScript files. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
 
 ### New Features
 

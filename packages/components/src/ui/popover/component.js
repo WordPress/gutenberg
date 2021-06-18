@@ -1,10 +1,9 @@
 /**
  * External dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
-import { noop, useUpdateEffect } from '@wp-g2/utils';
+import { noop } from 'lodash';
 // eslint-disable-next-line no-restricted-imports
-import { PopoverDisclosure, usePopoverState } from 'reakit';
+import { PopoverDisclosure, usePopoverState, Portal } from 'reakit';
 
 /**
  * WordPress dependencies
@@ -14,15 +13,16 @@ import { useCallback, useMemo, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Portal } from '../portal';
+import { contextConnect, useContextSystem } from '../context';
 import { PopoverContext } from './context';
 import { usePopoverResizeUpdater } from './utils';
 import PopoverContent from './content';
+import { useUpdateEffect } from '../../utils/hooks';
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                       forwardedRef
  */
 function Popover( props, forwardedRef ) {
 	const {
@@ -111,14 +111,12 @@ function Popover( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Button, Popover, View, Text } from `@wordpress/components/ui`;
- 
+ * import { Button, Popover, Text } from `@wordpress/components/ui`;
+ *
  * function Example() {
  * 	return (
  * 		<Popover trigger={ <Button>Popover</Button> }>
- * 			<View>
- * 				<Text>Code is Poetry</Text>
- * 			</View>
+ *			<Text>Code is Poetry</Text>
  * 		</Popover>
  * 	);
  * }
