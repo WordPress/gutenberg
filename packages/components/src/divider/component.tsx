@@ -39,7 +39,7 @@ export interface DividerProps extends Omit< SeparatorProps, 'children' > {
 }
 
 function Divider(
-	props: PolymorphicComponentProps< DividerProps, 'hr' >,
+	props: PolymorphicComponentProps< DividerProps, 'hr', false >,
 	forwardedRef: Ref< any >
 ) {
 	const {

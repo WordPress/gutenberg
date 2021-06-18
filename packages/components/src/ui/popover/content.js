@@ -60,4 +60,9 @@ function PopoverContent( props, forwardedRef ) {
 	);
 }
 
-export default contextConnect( PopoverContent, 'PopoverContent' );
+const ConnectedPopoverContent = contextConnect(
+	PopoverContent,
+	'PopoverContent'
+);
+
+export default ConnectedPopoverContent;
