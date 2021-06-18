@@ -62,11 +62,7 @@ export const labelBlock = css`
 	flex: 1;
 `;
 
-export const buttonActive = css`
-	color: ${ COLORS.white } !important;
-`;
-
-export const ButtonView = styled.button`
+export const buttonView = css`
 	align-items: center;
 	appearance: none;
 	background: transparent;
@@ -96,6 +92,10 @@ export const ButtonView = styled.button`
 	&:active {
 		background: ${ CONFIG.segmentedControlBackgroundColor };
 	}
+`;
+
+export const buttonActive = css`
+	color: ${ COLORS.white };
 `;
 
 export const ButtonContentView = styled.div`

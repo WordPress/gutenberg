@@ -15,7 +15,6 @@ import { memo } from '@wordpress/element';
  */
 import {
 	ButtonContentView,
-	ButtonView,
 	LabelPlaceholderView,
 	LabelView,
 	SeparatorView,
@@ -35,12 +34,16 @@ function SegmentedControlButton( {
 }: SegmentedControlButtonProps ) {
 	const isActive = props.state === value;
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
-	const classes = cx( isActive && styles.buttonActive, className );
+	const classes = cx(
+		styles.buttonView,
+		className,
+		isActive && styles.buttonActive
+	);
 	return (
 		<LabelView className={ labelViewClasses } data-active={ isActive }>
 			<Radio
 				{ ...props }
-				as={ ButtonView }
+				as="button"
 				aria-label={ label }
 				className={ classes }
 				data-value={ value }
