@@ -234,7 +234,7 @@ export function ColorEdit( props ) {
 		localAttributes.current = attributes;
 	}, [ attributes ] );
 
-	if ( ! hasColorSupport( blockName ) || Platform.OS !== 'web' ) {
+	if ( ! hasColorSupport( blockName ) ) {
 		return null;
 	}
 
