@@ -29,6 +29,7 @@ export function TemplatePanel() {
 		isOpened,
 		selectedTemplate,
 		availableTemplates,
+		fetchedTemplates,
 		isViewable,
 		template,
 		supportsTemplateMode,
@@ -50,12 +51,12 @@ export function TemplatePanel() {
 			select( editorStore ).getEditorSettings().supportsTemplateMode &&
 			_isViewable;
 
-		const templates = getEntityRecords( 'postType', 'wp_template', {
+		const wpTemplates = getEntityRecords( 'postType', 'wp_template', {
 			per_page: -1,
 		} );
 
 		const newAvailableTemplates = fromPairs(
-			( templates || [] ).map( ( { slug, title } ) => [
+			( wpTemplates || [] ).map( ( { slug, title } ) => [
 				slug,
 				title.rendered,
 			] )
@@ -65,15 +66,18 @@ export function TemplatePanel() {
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 			selectedTemplate: getEditedPostAttribute( 'template' ),
-			availableTemplates: {
-				...getEditorSettings().availableTemplates,
-				...newAvailableTemplates,
-			},
+			availableTemplates: getEditorSettings().availableTemplates,
+			fetchedTemplates: newAvailableTemplates,
 			template: _supportsTemplateMode && getEditedPostTemplate(),
 			isViewable: _isViewable,
 			supportsTemplateMode: _supportsTemplateMode,
 		};
 	}, [] );
+
+	const templates = {
+		...availableTemplates,
+		...fetchedTemplates,
+	};
 
 	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
 	const { editPost } = useDispatch( editorStore );
@@ -114,7 +118,7 @@ export function TemplatePanel() {
 					} );
 				} }
 				options={ map(
-					availableTemplates,
+					templates,
 					( templateName, templateSlug ) => ( {
 						value: templateSlug,
 						label: templateName,
