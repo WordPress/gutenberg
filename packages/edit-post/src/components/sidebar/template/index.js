@@ -7,6 +7,7 @@ import { partial, isEmpty, map, fromPairs } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 import { PanelBody, SelectControl } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -74,10 +75,12 @@ export function TemplatePanel() {
 		};
 	}, [] );
 
-	const templates = {
-		...availableTemplates,
-		...fetchedTemplates,
-	};
+	const templates = useMemo( () => {
+		return {
+			...availableTemplates,
+			...fetchedTemplates,
+		};
+	}, [ availableTemplates, fetchedTemplates ] );
 
 	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
 	const { editPost } = useDispatch( editorStore );
