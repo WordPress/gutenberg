@@ -290,7 +290,8 @@ function _gutenberg_build_template_result_from_post( $post ) {
  *     Optional. Arguments to retrieve templates.
  *
  *     @type array  $slug__in List of slugs to include.
- *     @type int    $wp_id Post ID of customized template.
+ *     @type int    $wp_id    Post ID of customized template.
+ *     @type string $area     A 'wp_template_part_area' taxonomy value to filter by (for wp_template_part template type only).
  * }
  * @param array $template_type wp_template or wp_template_part.
  *
