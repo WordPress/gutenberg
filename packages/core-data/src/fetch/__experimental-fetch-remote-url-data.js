@@ -49,15 +49,13 @@ const fetchRemoteUrlData = async ( url, options = {} ) => {
 		return CACHE.get( url );
 	}
 
-	const response = apiFetch( {
+	return apiFetch( {
 		path: addQueryArgs( endpoint, args ),
 		...options,
 	} ).then( ( res ) => {
 		CACHE.set( url, res );
 		return res;
 	} );
-
-	return response;
 };
 
 export default fetchRemoteUrlData;
