@@ -57,7 +57,9 @@ function getPresetsDeclarations( blockPresets = {} ) {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( value ) => {
 						declarations.push(
-							`--wp--preset--${ cssVarInfix }--${ value.slug }: ${ value[ valueKey ] }`
+							`--wp--preset--${ cssVarInfix }--${ kebabCase(
+								value.slug
+							) }: ${ value[ valueKey ] }`
 						);
 					} );
 				}
@@ -89,9 +91,13 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( { slug } ) => {
 						classes.forEach( ( { classSuffix, propertyName } ) => {
-							const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
+							const classSelectorToUse = `.has-${ kebabCase(
+								slug
+							) }-${ classSuffix }`;
 							const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-							const value = `var(--wp--preset--${ cssVarInfix }--${ slug })`;
+							const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
+								slug
+							) })`;
 							declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
 						} );
 					} );
