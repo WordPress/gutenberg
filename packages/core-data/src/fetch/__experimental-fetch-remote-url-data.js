@@ -52,9 +52,11 @@ const fetchRemoteUrlData = async ( url, options = {} ) => {
 	const response = apiFetch( {
 		path: addQueryArgs( endpoint, args ),
 		...options,
+	} ).then( ( res ) => {
+		CACHE.set( url, res );
+		return res;
 	} );
 
-	CACHE.set( url, response );
 	return response;
 };
 
