@@ -21,8 +21,6 @@ Pod::Spec.new do |s|
   s.resources = 'common/**/*.{js,css,json}'
 
   s.dependency 'React-Core', react_native_version
-  s.dependency 'React-CoreModules', react_native_version
-  s.dependency 'React-RCTImage', react_native_version
 
   s.dependency 'RNTAztecView'
 end

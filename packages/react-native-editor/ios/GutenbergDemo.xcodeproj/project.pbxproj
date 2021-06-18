@@ -8,13 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* gutenbergTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* gutenbergTests.m */; };
+		0FB590A57834D96C699603A7 /* libPods-GutenbergDemoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C635652214BFEF341570BD40 /* libPods-GutenbergDemoTests.a */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		1E4F2E752459E6F200EB73E7 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E85944D2449D85A006CC6A0 /* WebViewController.swift */; };
 		1EFFAB71253EF6580062051E /* DocumentsMediaSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFFAB70253EF6580062051E /* DocumentsMediaSource.swift */; };
-		6EBC6CA237E4D4B00D5AC79F /* Pods_GutenbergDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB79EC55FB340834C8D3BAB6 /* Pods_GutenbergDemo.framework */; };
 		7EC7328F21907E3F00FED2E6 /* GutenbergViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC7328E21907E3F00FED2E6 /* GutenbergViewController.swift */; };
-		950B7A8B00E7FAB67173E517 /* Pods_GutenbergDemoTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D550F9EC8C63C5F836281628 /* Pods_GutenbergDemoTests.framework */; };
+		98675B4CB6CA5E16EDD3B149 /* libPods-GutenbergDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7DBE679FD51F5AEC0E18B45 /* libPods-GutenbergDemo.a */; };
 		F151983C2100DC3D000F6E97 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15198392100DC3D000F6E97 /* AppDelegate.swift */; };
 		F151983D2100DC3D000F6E97 /* MediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151983A2100DC3D000F6E97 /* MediaProvider.swift */; };
 		F1EE6F7821E7F0A500241744 /* NotoSerif-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F1EE6F7421E7F0A500241744 /* NotoSerif-BoldItalic.ttf */; };
@@ -54,9 +54,9 @@
 		7EC7328E21907E3F00FED2E6 /* GutenbergViewController.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = GutenbergViewController.swift; path = GutenbergDemo/GutenbergViewController.swift; sourceTree = "<group>"; tabWidth = 1; };
 		9193870E2260BA5500E4FBD6 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		9193873C2260BA7800E4FBD6 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
-		AB79EC55FB340834C8D3BAB6 /* Pods_GutenbergDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GutenbergDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7DBE679FD51F5AEC0E18B45 /* libPods-GutenbergDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GutenbergDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC045626571B657FA384BB16 /* Pods-GutenbergDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GutenbergDemo.release.xcconfig"; path = "Target Support Files/Pods-GutenbergDemo/Pods-GutenbergDemo.release.xcconfig"; sourceTree = "<group>"; };
-		D550F9EC8C63C5F836281628 /* Pods_GutenbergDemoTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GutenbergDemoTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C635652214BFEF341570BD40 /* libPods-GutenbergDemoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GutenbergDemoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F15198372100DC3C000F6E97 /* gutenberg-Bridging-Header.h */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = "gutenberg-Bridging-Header.h"; sourceTree = "<group>"; tabWidth = 1; };
 		F15198392100DC3D000F6E97 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = GutenbergDemo/AppDelegate.swift; sourceTree = "<group>"; tabWidth = 1; };
 		F151983A2100DC3D000F6E97 /* MediaProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = MediaProvider.swift; path = GutenbergDemo/MediaProvider.swift; sourceTree = "<group>"; tabWidth = 1; usesTabs = 0; };
@@ -76,7 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				950B7A8B00E7FAB67173E517 /* Pods_GutenbergDemoTests.framework in Frameworks */,
+				0FB590A57834D96C699603A7 /* libPods-GutenbergDemoTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,7 +85,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF37F903223819FA00AFA3DB /* JavaScriptCore.framework in Frameworks */,
-				6EBC6CA237E4D4B00D5AC79F /* Pods_GutenbergDemo.framework in Frameworks */,
+				98675B4CB6CA5E16EDD3B149 /* libPods-GutenbergDemo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,8 +136,8 @@
 				9193870E2260BA5500E4FBD6 /* MobileCoreServices.framework */,
 				FF37F8D0223819FA00AFA3DB /* JavaScriptCore.framework */,
 				7EA30CF021AC8CDA0092F894 /* libxml2.tbd */,
-				AB79EC55FB340834C8D3BAB6 /* Pods_GutenbergDemo.framework */,
-				D550F9EC8C63C5F836281628 /* Pods_GutenbergDemoTests.framework */,
+				A7DBE679FD51F5AEC0E18B45 /* libPods-GutenbergDemo.a */,
+				C635652214BFEF341570BD40 /* libPods-GutenbergDemoTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -229,6 +229,7 @@
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				06CE89E9A162D62B604C3B6C /* [CP] Embed Pods Frameworks */,
+				79FE299BFF18399A1C85B7C5 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -324,85 +325,11 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GutenbergDemo/Pods-GutenbergDemo-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/BVLinearGradient/BVLinearGradient.framework",
-				"${BUILT_PRODUCTS_DIR}/DoubleConversion/DoubleConversion.framework",
-				"${BUILT_PRODUCTS_DIR}/FBReactNativeSpec/FBReactNativeSpec.framework",
-				"${BUILT_PRODUCTS_DIR}/Gutenberg/Gutenberg.framework",
-				"${BUILT_PRODUCTS_DIR}/RCT-Folly/folly.framework",
-				"${BUILT_PRODUCTS_DIR}/RCTTypeSafety/RCTTypeSafety.framework",
-				"${BUILT_PRODUCTS_DIR}/RNCMaskedView/RNCMaskedView.framework",
-				"${BUILT_PRODUCTS_DIR}/RNGestureHandler/RNGestureHandler.framework",
-				"${BUILT_PRODUCTS_DIR}/RNReanimated/RNReanimated.framework",
-				"${BUILT_PRODUCTS_DIR}/RNSVG/RNSVG.framework",
-				"${BUILT_PRODUCTS_DIR}/RNScreens/RNScreens.framework",
-				"${BUILT_PRODUCTS_DIR}/RNTAztecView/RNTAztecView.framework",
-				"${BUILT_PRODUCTS_DIR}/React-Core/React.framework",
-				"${BUILT_PRODUCTS_DIR}/React-CoreModules/CoreModules.framework",
-				"${BUILT_PRODUCTS_DIR}/React-RCTAnimation/RCTAnimation.framework",
-				"${BUILT_PRODUCTS_DIR}/React-RCTBlob/RCTBlob.framework",
-				"${BUILT_PRODUCTS_DIR}/React-RCTImage/RCTImage.framework",
-				"${BUILT_PRODUCTS_DIR}/React-RCTLinking/RCTLinking.framework",
-				"${BUILT_PRODUCTS_DIR}/React-RCTNetwork/RCTNetwork.framework",
-				"${BUILT_PRODUCTS_DIR}/React-RCTSettings/RCTSettings.framework",
-				"${BUILT_PRODUCTS_DIR}/React-RCTText/RCTText.framework",
-				"${BUILT_PRODUCTS_DIR}/React-RCTVibration/RCTVibration.framework",
-				"${BUILT_PRODUCTS_DIR}/React-cxxreact/cxxreact.framework",
-				"${BUILT_PRODUCTS_DIR}/React-jsi/jsi.framework",
-				"${BUILT_PRODUCTS_DIR}/React-jsiexecutor/jsireact.framework",
-				"${BUILT_PRODUCTS_DIR}/React-jsinspector/jsinspector.framework",
-				"${BUILT_PRODUCTS_DIR}/React-perflogger/reactperflogger.framework",
-				"${BUILT_PRODUCTS_DIR}/ReactCommon/ReactCommon.framework",
-				"${BUILT_PRODUCTS_DIR}/ReactNativeDarkMode/ReactNativeDarkMode.framework",
-				"${BUILT_PRODUCTS_DIR}/WordPress-Aztec-iOS/Aztec.framework",
-				"${BUILT_PRODUCTS_DIR}/Yoga/yoga.framework",
-				"${BUILT_PRODUCTS_DIR}/glog/glog.framework",
-				"${BUILT_PRODUCTS_DIR}/react-native-blur/react_native_blur.framework",
-				"${BUILT_PRODUCTS_DIR}/react-native-get-random-values/react_native_get_random_values.framework",
-				"${BUILT_PRODUCTS_DIR}/react-native-keyboard-aware-scroll-view/react_native_keyboard_aware_scroll_view.framework",
-				"${BUILT_PRODUCTS_DIR}/react-native-safe-area/react_native_safe_area.framework",
-				"${BUILT_PRODUCTS_DIR}/react-native-safe-area-context/react_native_safe_area_context.framework",
-				"${BUILT_PRODUCTS_DIR}/react-native-slider/react_native_slider.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL/OpenSSL.framework/OpenSSL",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BVLinearGradient.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DoubleConversion.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBReactNativeSpec.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Gutenberg.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/folly.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTTypeSafety.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNCMaskedView.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNGestureHandler.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNReanimated.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNSVG.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNScreens.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RNTAztecView.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CoreModules.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTAnimation.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTBlob.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTImage.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTLinking.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTNetwork.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTSettings.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTText.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RCTVibration.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/cxxreact.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/jsi.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/jsireact.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/jsinspector.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/reactperflogger.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactCommon.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeDarkMode.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Aztec.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/yoga.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/glog.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_blur.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_get_random_values.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_keyboard_aware_scroll_view.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_safe_area.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_safe_area_context.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/react_native_slider.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -451,6 +378,42 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		79FE299BFF18399A1C85B7C5 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-GutenbergDemo/Pods-GutenbergDemo-resources.sh",
+				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/content-functions.js",
+				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/editor-style-overrides.css",
+				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/gutenberg-observer.js",
+				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/inject-css.js",
+				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/insert-block.js",
+				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/local-storage-overrides.json",
+				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/prevent-autosaves.js",
+				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/wp-bar-override.css",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/WordPress-Aztec-iOS/WordPress-Aztec-iOS.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/content-functions.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/editor-style-overrides.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gutenberg-observer.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/inject-css.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/insert-block.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/local-storage-overrides.json",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/prevent-autosaves.js",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/wp-bar-override.css",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/WordPress-Aztec-iOS.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-GutenbergDemo/Pods-GutenbergDemo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

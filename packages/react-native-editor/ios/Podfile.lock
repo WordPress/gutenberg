@@ -2,6 +2,7 @@ PODS:
   - boost-for-react-native (1.63.0)
   - BVLinearGradient (2.5.6):
     - React-Core
+  - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.64.0)
   - FBReactNativeSpec (0.64.0):
@@ -11,12 +12,72 @@ PODS:
     - React-Core (= 0.64.0)
     - React-jsi (= 0.64.0)
     - ReactCommon/turbomodule/core (= 0.64.0)
+  - Flipper (0.94.1):
+    - Flipper-Folly (~> 2.6)
+    - Flipper-RSocket (~> 1.4)
+  - Flipper-Boost-iOSX (1.76.0.1.11)
+  - Flipper-DoubleConversion (1.1.7)
+  - Flipper-Fmt (7.1.7)
+  - Flipper-Folly (2.6.7):
+    - Flipper-Boost-iOSX
+    - Flipper-DoubleConversion
+    - Flipper-Fmt (= 7.1.7)
+    - Flipper-Glog
+    - libevent (~> 2.1.12)
+    - OpenSSL-Universal (= 1.1.180)
+  - Flipper-Glog (0.3.6)
+  - Flipper-PeerTalk (0.0.4)
+  - Flipper-RSocket (1.4.3):
+    - Flipper-Folly (~> 2.6)
+  - FlipperKit (0.94.1):
+    - FlipperKit/Core (= 0.94.1)
+  - FlipperKit/Core (0.94.1):
+    - Flipper (~> 0.94.1)
+    - FlipperKit/CppBridge
+    - FlipperKit/FBCxxFollyDynamicConvert
+    - FlipperKit/FBDefines
+    - FlipperKit/FKPortForwarding
+  - FlipperKit/CppBridge (0.94.1):
+    - Flipper (~> 0.94.1)
+  - FlipperKit/FBCxxFollyDynamicConvert (0.94.1):
+    - Flipper-Folly (~> 2.6)
+  - FlipperKit/FBDefines (0.94.1)
+  - FlipperKit/FKPortForwarding (0.94.1):
+    - CocoaAsyncSocket (~> 7.6)
+    - Flipper-PeerTalk (~> 0.0.4)
+  - FlipperKit/FlipperKitHighlightOverlay (0.94.1)
+  - FlipperKit/FlipperKitLayoutHelpers (0.94.1):
+    - FlipperKit/Core
+    - FlipperKit/FlipperKitHighlightOverlay
+    - FlipperKit/FlipperKitLayoutTextSearchable
+  - FlipperKit/FlipperKitLayoutIOSDescriptors (0.94.1):
+    - FlipperKit/Core
+    - FlipperKit/FlipperKitHighlightOverlay
+    - FlipperKit/FlipperKitLayoutHelpers
+    - YogaKit (~> 1.18)
+  - FlipperKit/FlipperKitLayoutPlugin (0.94.1):
+    - FlipperKit/Core
+    - FlipperKit/FlipperKitHighlightOverlay
+    - FlipperKit/FlipperKitLayoutHelpers
+    - FlipperKit/FlipperKitLayoutIOSDescriptors
+    - FlipperKit/FlipperKitLayoutTextSearchable
+    - YogaKit (~> 1.18)
+  - FlipperKit/FlipperKitLayoutTextSearchable (0.94.1)
+  - FlipperKit/FlipperKitNetworkPlugin (0.94.1):
+    - FlipperKit/Core
+  - FlipperKit/FlipperKitReactPlugin (0.94.1):
+    - FlipperKit/Core
+  - FlipperKit/FlipperKitUserDefaultsPlugin (0.94.1):
+    - FlipperKit/Core
+  - FlipperKit/SKIOSNetworkPlugin (0.94.1):
+    - FlipperKit/Core
+    - FlipperKit/FlipperKitNetworkPlugin
   - glog (0.3.5)
   - Gutenberg (1.55.0):
     - React-Core (= 0.64.0)
-    - React-CoreModules (= 0.64.0)
-    - React-RCTImage (= 0.64.0)
     - RNTAztecView
+  - libevent (2.1.12)
+  - OpenSSL-Universal (1.1.180)
   - RCT-Folly (2020.01.13.00):
     - boost-for-react-native
     - DoubleConversion
@@ -308,12 +369,33 @@ PODS:
     - WordPress-Aztec-iOS (~> 1.19.4)
   - WordPress-Aztec-iOS (1.19.4)
   - Yoga (1.14.0)
+  - YogaKit (1.18.1):
+    - Yoga (~> 1.14)
 
 DEPENDENCIES:
   - BVLinearGradient (from `../../../node_modules/react-native-linear-gradient`)
   - DoubleConversion (from `../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../../../node_modules/react-native/React/FBReactNativeSpec`)
+  - Flipper (= 0.94.1)
+  - Flipper-DoubleConversion (= 1.1.7)
+  - Flipper-Folly (~> 2.5)
+  - Flipper-Glog (= 0.3.6)
+  - Flipper-PeerTalk (~> 0.0.4)
+  - Flipper-RSocket (~> 1.3)
+  - FlipperKit (= 0.94.1)
+  - FlipperKit/Core (= 0.94.1)
+  - FlipperKit/CppBridge (= 0.94.1)
+  - FlipperKit/FBCxxFollyDynamicConvert (= 0.94.1)
+  - FlipperKit/FBDefines (= 0.94.1)
+  - FlipperKit/FKPortForwarding (= 0.94.1)
+  - FlipperKit/FlipperKitHighlightOverlay (= 0.94.1)
+  - FlipperKit/FlipperKitLayoutPlugin (= 0.94.1)
+  - FlipperKit/FlipperKitLayoutTextSearchable (= 0.94.1)
+  - FlipperKit/FlipperKitNetworkPlugin (= 0.94.1)
+  - FlipperKit/FlipperKitReactPlugin (= 0.94.1)
+  - FlipperKit/FlipperKitUserDefaultsPlugin (= 0.94.1)
+  - FlipperKit/SKIOSNetworkPlugin (= 0.94.1)
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - Gutenberg (from `../../react-native-bridge`)
   - RCT-Folly (from `../../../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -360,7 +442,20 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - boost-for-react-native
+    - CocoaAsyncSocket
+    - Flipper
+    - Flipper-Boost-iOSX
+    - Flipper-DoubleConversion
+    - Flipper-Fmt
+    - Flipper-Folly
+    - Flipper-Glog
+    - Flipper-PeerTalk
+    - Flipper-RSocket
+    - FlipperKit
+    - libevent
+    - OpenSSL-Universal
     - WordPress-Aztec-iOS
+    - YogaKit
 
 EXTERNAL SOURCES:
   BVLinearGradient:
@@ -455,11 +550,23 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   BVLinearGradient: b2d297a15cf094d1947df4f0519779bb3a7f2392
+  CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 49cbe4b43e445b06bf29199b6ad2057649e4c8f5
   FBReactNativeSpec: 420ad7ff87adc491b45199891c72ea531fa4926e
+  Flipper: aac900e73c4b9a55421b428f62684f993b5e43a8
+  Flipper-Boost-iOSX: fd1e2b8cbef7e662a122412d7ac5f5bea715403c
+  Flipper-DoubleConversion: 38631e41ef4f9b12861c67d17cb5518d06badc41
+  Flipper-Fmt: 60cbdd92fc254826e61d669a5d87ef7015396a9b
+  Flipper-Folly: 83af37379faa69497529e414bd43fbfc7cae259a
+  Flipper-Glog: 1dfd6abf1e922806c52ceb8701a3599a79a200a6
+  Flipper-PeerTalk: 116d8f857dc6ef55c7a5a75ea3ceaafe878aadc9
+  Flipper-RSocket: d9d9ade67cbecf6ac10730304bf5607266dd2541
+  FlipperKit: 74fafa5bf9562fe87029285d810d5f7867978683
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
-  Gutenberg: 829c1db189c6f47728327bb1503026f42698cdb6
+  Gutenberg: 54c6773bef6f3b9826a6ac7a74fc702f07405b66
+  libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
+  OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: 2f8cb5b7533219bf4218a045f92768129cf7050a
   RCTTypeSafety: 512728b73549e72ad7330b92f3d42936f2a4de5b
@@ -499,7 +606,8 @@ SPEC CHECKSUMS:
   RNTAztecView: b36187f6d434a4f3b0ebdd423ca8651889d8c6cf
   WordPress-Aztec-iOS: 870c93297849072aadfc2223e284094e73023e82
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf
+  YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: db5f67a29ecba75541dad181ff59246b6da2fb09
+PODFILE CHECKSUM: 72d3b592bf487aa0e52fe6a8d1123b277cf9fd20
 
 COCOAPODS: 1.10.1

@@ -6,8 +6,6 @@ require_relative '../../../node_modules/react-native/scripts/react_native_pods'
 require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'GutenbergDemo' do
-  # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
 
   config = use_native_modules!
   use_react_native!(:path => "../../../node_modules/react-native")
@@ -16,6 +14,12 @@ target 'GutenbergDemo' do
     inherit! :search_paths
     # Pods for testing
   end
+
+  # Enables Flipper.
+  #
+  # Note that if you have use_frameworks! enabled, Flipper will not work and
+  # you should disable the next line.
+  use_flipper!({ 'Flipper' => '0.94.1' })
 
   ### Begin workaround for https://github.com/facebook/react-native/issues/31034
   # Can be removed when this issue is resolved.
