@@ -53,6 +53,69 @@ function gutenberg_register_colors_support( $block_type ) {
 	}
 }
 
+/**
+ * Build an array with CSS classes and inline styles defining the colors.
+ *
+ * @param array $block_attributes Block attributes to extract the data from.
+ * @param array $supports What colors it supports: text, background, gradients.
+ *
+ * @return array Colors CSS classes and inline styles.
+ */
+function gutenberg_extract_classes_and_styles_from_colors( $block_attributes, $supports = array( 'text' => true, 'background' => true, 'gradients' => true ) ) {
+	$colors = array(
+		'classes' => array(),
+		'styles'  => array(),
+	);
+
+	if ( $supports['text'] ) {
+		$has_named_text_color  = array_key_exists( 'textColor', $block_attributes );
+		$has_custom_text_color = isset( $block_attributes['style']['color']['text'] );
+
+		// Apply required generic class.
+		if ( $has_custom_text_color || $has_named_text_color ) {
+			$colors['classes'][] = 'has-text-color';
+		}
+		// Apply color class or inline style.
+		if ( $has_named_text_color ) {
+			$colors['classes'][] = sprintf( 'has-%s-color', $block_attributes['textColor'] );
+		} elseif ( $has_custom_text_color ) {
+			$colors['styles'][] = sprintf( 'color: %s;', $block_attributes['style']['color']['text'] );
+		}
+	}
+
+	if ( $supports['background'] ) {
+		$has_named_background_color  = array_key_exists( 'backgroundColor', $block_attributes );
+		$has_custom_background_color = isset( $block_attributes['style']['color']['background'] );
+
+		// Apply required background class.
+		if ( $has_custom_background_color || $has_named_background_color ) {
+			$colors['classes'][] = 'has-background';
+		}
+		// Apply background color classes or styles.
+		if ( $has_named_background_color ) {
+			$colors['classes'][] = sprintf( 'has-%s-background-color', $block_attributes['backgroundColor'] );
+		} elseif ( $has_custom_background_color ) {
+			$colors['styles'][] = sprintf( 'background-color: %s;', $block_attributes['style']['color']['background'] );
+		}
+	}
+
+	if ( $supports['gradients'] ) {
+		$has_named_gradient  = array_key_exists( 'gradient', $block_attributes );
+		$has_custom_gradient = isset( $block_attributes['style']['color']['gradient'] );
+
+		if ( $has_named_gradient || $has_custom_gradient ) {
+			$colors['classes'][] = 'has-background';
+		}
+		// Apply required background class.
+		if ( $has_named_gradient ) {
+			$colors['classes'][] = sprintf( 'has-%s-gradient-background', $block_attributes['gradient'] );
+		} elseif ( $has_custom_gradient ) {
+			$colors['styles'][] = sprintf( 'background: %s;', $block_attributes['style']['color']['gradient'] );
+		}
+	}
+
+	return $colors;
+}
 
 /**
  * Add CSS classes and inline styles for colors to the incoming attributes array.
@@ -74,69 +137,19 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$has_text_colors_support       = true === $color_support || ( is_array( $color_support ) && _wp_array_get( $color_support, array( 'text' ), true ) );
-	$has_background_colors_support = true === $color_support || ( is_array( $color_support ) && _wp_array_get( $color_support, array( 'background' ), true ) );
-	$has_gradients_support         = _wp_array_get( $color_support, array( 'gradients' ), false );
-	$classes                       = array();
-	$styles                        = array();
+	$supports = array();
+	$supports['text']       = true === $color_support || ( is_array( $color_support ) && _wp_array_get( $color_support, array( 'text' ), true ) );
+	$supports['background'] = true === $color_support || ( is_array( $color_support ) && _wp_array_get( $color_support, array( 'background' ), true ) );
+	$supports['gradients']  = _wp_array_get( $color_support, array( 'gradients' ), false );
 
-	// Text colors.
-	// Check support for text colors.
-	if ( $has_text_colors_support ) {
-		$has_named_text_color  = array_key_exists( 'textColor', $block_attributes );
-		$has_custom_text_color = isset( $block_attributes['style']['color']['text'] );
-
-		// Apply required generic class.
-		if ( $has_custom_text_color || $has_named_text_color ) {
-			$classes[] = 'has-text-color';
-		}
-		// Apply color class or inline style.
-		if ( $has_named_text_color ) {
-			$classes[] = sprintf( 'has-%s-color', $block_attributes['textColor'] );
-		} elseif ( $has_custom_text_color ) {
-			$styles[] = sprintf( 'color: %s;', $block_attributes['style']['color']['text'] );
-		}
-	}
-
-	// Background colors.
-	if ( $has_background_colors_support ) {
-		$has_named_background_color  = array_key_exists( 'backgroundColor', $block_attributes );
-		$has_custom_background_color = isset( $block_attributes['style']['color']['background'] );
-
-		// Apply required background class.
-		if ( $has_custom_background_color || $has_named_background_color ) {
-			$classes[] = 'has-background';
-		}
-		// Apply background color classes or styles.
-		if ( $has_named_background_color ) {
-			$classes[] = sprintf( 'has-%s-background-color', $block_attributes['backgroundColor'] );
-		} elseif ( $has_custom_background_color ) {
-			$styles[] = sprintf( 'background-color: %s;', $block_attributes['style']['color']['background'] );
-		}
-	}
-
-	// Gradients.
-	if ( $has_gradients_support ) {
-		$has_named_gradient  = array_key_exists( 'gradient', $block_attributes );
-		$has_custom_gradient = isset( $block_attributes['style']['color']['gradient'] );
-
-		if ( $has_named_gradient || $has_custom_gradient ) {
-			$classes[] = 'has-background';
-		}
-		// Apply required background class.
-		if ( $has_named_gradient ) {
-			$classes[] = sprintf( 'has-%s-gradient-background', $block_attributes['gradient'] );
-		} elseif ( $has_custom_gradient ) {
-			$styles[] = sprintf( 'background: %s;', $block_attributes['style']['color']['gradient'] );
-		}
-	}
+	$colors = gutenberg_extract_classes_and_styles_from_colors( $block_attributes, $supports );
 
 	$attributes = array();
-	if ( ! empty( $classes ) ) {
-		$attributes['class'] = implode( ' ', $classes );
+	if ( ! empty( $colors['classes'] ) ) {
+		$attributes['class'] = implode( ' ', $colors['classes'] );
 	}
-	if ( ! empty( $styles ) ) {
-		$attributes['style'] = implode( ' ', $styles );
+	if ( ! empty( $colors['styles'] ) ) {
+		$attributes['style'] = implode( ' ', $colors['styles'] );
 	}
 
 	return $attributes;
