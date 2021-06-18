@@ -39,7 +39,7 @@ describe( 'Widgets screen', () => {
 
 		// Wait for the widget areas to load.
 		await findAll( {
-			role: 'group',
+			role: undefined,
 			name: 'Block: Widget Area',
 		} );
 	} );
