@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
 
 ## 1.55.0
 -   [*] Gallery block - Fix gallery images caption text formatting [#32351]
