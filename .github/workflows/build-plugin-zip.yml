@@ -145,7 +145,12 @@ jobs:
         name: Build Release Artifact
         runs-on: ubuntu-latest
         needs: bump-version
-        if: always()
+        if: |
+            always() && (
+              github.event_name == 'pull_request' ||
+              github.event_name == 'workflow_dispatch' ||
+              github.repository == 'WordPress/gutenberg'
+            )
 
         steps:
             - name: Checkout code
