@@ -73,7 +73,7 @@ PODS:
     - FlipperKit/Core
     - FlipperKit/FlipperKitNetworkPlugin
   - glog (0.3.5)
-  - Gutenberg (1.55.0):
+  - Gutenberg (1.55.1):
     - React-Core (= 0.64.0)
     - RNTAztecView
   - libevent (2.1.12)
@@ -364,7 +364,7 @@ PODS:
     - React-Core
   - RNSVG (9.13.6-gb):
     - React-Core
-  - RNTAztecView (1.55.0):
+  - RNTAztecView (1.55.1):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.4)
   - WordPress-Aztec-iOS (1.19.4)
@@ -564,7 +564,7 @@ SPEC CHECKSUMS:
   Flipper-RSocket: d9d9ade67cbecf6ac10730304bf5607266dd2541
   FlipperKit: 74fafa5bf9562fe87029285d810d5f7867978683
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
-  Gutenberg: 54c6773bef6f3b9826a6ac7a74fc702f07405b66
+  Gutenberg: 683e9746ab5584be01978b2cc90d7dcb6bcf48c9
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
@@ -603,7 +603,7 @@ SPEC CHECKSUMS:
   RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 46c4b680fe18237fa01eb7d7b311d77618fde31f
-  RNTAztecView: b36187f6d434a4f3b0ebdd423ca8651889d8c6cf
+  RNTAztecView: c841a326e7a994bbeeb1fa9e2e54db3f07915ca3
   WordPress-Aztec-iOS: 870c93297849072aadfc2223e284094e73023e82
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a

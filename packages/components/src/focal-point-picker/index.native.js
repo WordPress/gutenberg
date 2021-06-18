@@ -92,10 +92,10 @@ function FocalPointPicker( props ) {
 					pan.extractOffset(); // Set offset to current value
 				},
 				// Move cursor to match delta drag
-				onPanResponderMove: Animated.event( [
-					null,
-					{ dx: pan.x, dy: pan.y },
-				] ),
+				onPanResponderMove: Animated.event(
+					[ null, { dx: pan.x, dy: pan.y } ],
+					{ useNativeDriver: false }
+				),
 				onPanResponderRelease: ( event ) => {
 					shouldEnableBottomSheetScroll( true );
 					pan.flattenOffset(); // Flatten offset into value
