@@ -12,12 +12,6 @@ import { useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 
-/**
- * Useful for positioning an element within the viewport so focussing the
- * element does not scroll the page.
- */
-const PREVENT_SCROLL_ON_FOCUS = { position: 'fixed' };
-
 function isFormElement( element ) {
 	const { tagName } = element;
 	return (
@@ -75,7 +69,6 @@ export default function useTabNav() {
 			ref={ focusCaptureBeforeRef }
 			tabIndex={ focusCaptureTabIndex }
 			onFocus={ onFocusCapture }
-			style={ PREVENT_SCROLL_ON_FOCUS }
 		/>
 	);
 
@@ -84,7 +77,6 @@ export default function useTabNav() {
 			ref={ focusCaptureAfterRef }
 			tabIndex={ focusCaptureTabIndex }
 			onFocus={ onFocusCapture }
-			style={ PREVENT_SCROLL_ON_FOCUS }
 		/>
 	);
 
