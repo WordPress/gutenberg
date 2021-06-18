@@ -406,7 +406,7 @@ describe( 'Widgets Customizer', () => {
 		await editParagraphWidget.click();
 
 		const firstParagraphBlock = await find( {
-			role: 'group',
+			role: undefined,
 			name: 'Paragraph block',
 			text: 'First Paragraph',
 		} );
