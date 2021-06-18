@@ -120,13 +120,10 @@ export function TemplatePanel() {
 						template: templateSlug || '',
 					} );
 				} }
-				options={ map(
-					templates,
-					( templateName, templateSlug ) => ( {
-						value: templateSlug,
-						label: templateName,
-					} )
-				) }
+				options={ map( templates, ( templateName, templateSlug ) => ( {
+					value: templateSlug,
+					label: templateName,
+				} ) ) }
 			/>
 			<PostTemplateActions />
 		</PanelBody>
