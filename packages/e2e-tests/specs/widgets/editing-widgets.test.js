@@ -135,7 +135,7 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 
 		const widgetAreas = await findAll( {
-			role: 'group',
+			role: undefined,
 			name: 'Block: Widget Area',
 		} );
 		const [ firstWidgetArea ] = widgetAreas;
