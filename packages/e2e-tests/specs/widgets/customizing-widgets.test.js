@@ -313,7 +313,7 @@ describe( 'Widgets Customizer', () => {
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
 		const paragraphBlock = await find( {
-			role: 'group',
+			role: undefined,
 			name: 'Paragraph block',
 		} );
 		await paragraphBlock.focus();
