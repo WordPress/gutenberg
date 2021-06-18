@@ -13,8 +13,6 @@ import { useCallback, useMemo } from '@wordpress/element';
  */
 import transformStyles from '../../utils/transform-styles';
 
-const EDITOR_STYLES_SELECTOR = '.editor-styles-wrapper';
-
 function useDarkThemeBodyClassName( styles ) {
 	return useCallback(
 		( node ) => {
@@ -24,12 +22,17 @@ function useDarkThemeBodyClassName( styles ) {
 
 			const { ownerDocument } = node;
 			const { defaultView, body } = ownerDocument;
-			const canvas = ownerDocument.querySelector(
-				EDITOR_STYLES_SELECTOR
-			);
+
+			// The real .editor-styles-wrapper element might not exist in the
+			// DOM, so calculate the background color by creating a fake
+			// wrapper.
+			const canvas = ownerDocument.createElement( 'div' );
+			canvas.classList.add( 'editor-styles-wrapper' );
+			body.appendChild( canvas );
 			const backgroundColor = defaultView
 				.getComputedStyle( canvas, null )
 				.getPropertyValue( 'background-color' );
+			body.removeChild( canvas );
 
 			// If background is transparent, it should be treated as light color.
 			if (
@@ -47,7 +50,7 @@ function useDarkThemeBodyClassName( styles ) {
 
 export default function EditorStyles( { styles } ) {
 	const transformedStyles = useMemo(
-		() => transformStyles( styles, EDITOR_STYLES_SELECTOR ),
+		() => transformStyles( styles, '.editor-styles-wrapper' ),
 		[ styles ]
 	);
 	return (

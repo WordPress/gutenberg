@@ -48,35 +48,6 @@ body.widgets-php {
 	.interface-interface-skeleton__content {
 		background-color: $gray-100;
 	}
-
-	// Widget areas should inherit the theme background color if it exists,
-	// but the editor background shouldn't.
-	.edit-widgets-block-editor > .editor-styles-wrapper {
-		background-color: transparent;
-	}
-	// The widget area heading should always have a white background.
-	// Needs additional specificity on hover to override default styles.
-	.components-panel__body-title,
-	.components-panel__body-title.components-panel__body-title.components-panel__body-title:hover {
-		background-color: $white;
-	}
-	// Override for Twenty Twenty theme styles.
-	.components-panel__body-title.components-panel__body-title {
-		margin: 0;
-
-		// Override for Twenty Nineteen theme styles.
-		&::before {
-			content: none;
-		}
-	}
-	// Remove unwanted styles from .editor-styles-wrapper in the widget area.
-	.components-panel__body.editor-styles-wrapper {
-		padding: 0;
-
-		.block-editor-block-list__layout {
-			padding: $grid-unit-20;
-		}
-	}
 }
 
 .blocks-widgets-container .editor-styles-wrapper {

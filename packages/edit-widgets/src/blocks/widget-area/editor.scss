@@ -5,17 +5,23 @@
 
 	.components-panel__body > .components-panel__body-title {
 		font-family: $default-font;
+		margin-bottom: 0;
 
 		// Remove default hover background in panel title. See #25752.
 		&:hover {
 			background: inherit;
 		}
 	}
+
+	.components-panel__body .editor-styles-wrapper {
+		margin: 0 (-$grid-unit-20) (-$grid-unit-20) (-$grid-unit-20);
+		padding: $grid-unit-20;
+	}
 }
 
 // Add some spacing above the inner blocks so that the block toolbar doesn't
 // overlap the panel header.
-.wp-block-widget-area > .components-panel__body > div > .block-editor-inner-blocks {
+.wp-block-widget-area > .components-panel__body > div > .editor-styles-wrapper > .block-editor-inner-blocks {
 	padding-top: $grid-unit-30;
 
 	// Ensure the widget area block lists have a minimum height so that it doesn't
