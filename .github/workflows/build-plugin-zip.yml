@@ -32,8 +32,8 @@ jobs:
                     -H "Accept: application/vnd.github.v3+json" \
                     -o latest.json \
                     "https://api.github.com/repos/${{ github.repository }}/releases/latest"
-                  LATEST_STABLE_VERSION=$(jq --raw-output '.name' latest.json)
-                  IFS='.' read LATEST_STABLE_MAJOR LATEST_STABLE_MINOR LATEST_STABLE_PATCH <<< "$LATEST_STABLE_VERSION"
+                  LATEST_STABLE_TAG=$(jq --raw-output '.tag_name' latest.json)
+                  IFS='.' read LATEST_STABLE_MAJOR LATEST_STABLE_MINOR LATEST_STABLE_PATCH <<< "${LATEST_STABLE_TAG#v}"
                   echo "::set-output name=current_stable_branch::release/${LATEST_STABLE_MAJOR}.${LATEST_STABLE_MINOR}"
                   if [[ ${LATEST_STABLE_MINOR} == "9" ]]; then
                     echo "::set-output name=next_stable_branch::release/$((LATEST_STABLE_MAJOR + 1)).0"
