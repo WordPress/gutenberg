@@ -1,6 +1,6 @@
 # CardFooter
 
-CardFooter renders an optional footer within a [`<Card />`](../card/README.md).
+CardFooter renders an optional footer within a [`<Card />`](/packages/components/src/card/card/README.md).
 
 ## Usage
 

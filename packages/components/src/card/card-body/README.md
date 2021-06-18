@@ -1,6 +1,6 @@
 # CardBody
 
-CardBody renders an optional content area for a [`<Card />`](../).
+CardBody renders an optional content area for a [`<Card />`](/packages/components/src/card/card/README.md).
 
 ## Usage
 

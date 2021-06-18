@@ -1,6 +1,6 @@
 # CardHeader
 
-CardHeader renders an optional header within a [`<Card />`](../card/README.md).
+CardHeader renders an optional header within a [`<Card />`](/packages/components/src/card/card/README.md).
 
 ## Usage
 
