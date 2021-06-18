@@ -2,9 +2,6 @@
  * WordPress dependencies
  */
 import { visitAdminPage } from '@wordpress/e2e-test-utils';
-/**
- * Internal dependencies
- */
 
 async function getOptionsValues( selector ) {
 	await visitAdminPage( 'options.php' );
@@ -19,8 +16,8 @@ async function getOptionsValues( selector ) {
 
 describe( 'Settings', () => {
 	test( 'Regression: updating a specific option will only change its value and will not corrupt others', async () => {
-		// We won't select the option that we updated and will also remove some _transient options that seem to change at
-		// every update (?)
+		// We won't select the option that we updated and will also remove some
+		// _transient options that seem to change at every update (?)
 		const optionsInputsSelector =
 			'form#all-options table.form-table input:not([id*="_transient"]):not([id="blogdescription"])';
 		const optionsBefore = await getOptionsValues( optionsInputsSelector );
