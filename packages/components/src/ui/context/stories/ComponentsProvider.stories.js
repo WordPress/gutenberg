@@ -22,7 +22,7 @@ export default {
 const outerContext = {
 	Card: {
 		isRounded: false,
-		elevation: 10,
+		elevation: 15,
 	},
 	CardBody: {
 		as: 'a',
@@ -41,11 +41,6 @@ const innerContext = {
 	},
 	CardBody: {
 		as: 'div',
-	},
-	Text: {
-		style: {
-			outline: '4px dashed purple',
-		},
 	},
 };
 
