@@ -5,13 +5,13 @@ import fetchRemoteUrlData from '../__experimental-fetch-remote-url-data';
 /**
  * WordPress dependencies
  */
-import triggerFetch from '@wordpress/api-fetch';
+import apiFetch from '@wordpress/api-fetch';
 
 jest.mock( '@wordpress/api-fetch' );
 
 describe( 'fetchRemoteUrlData', () => {
 	afterEach( () => {
-		triggerFetch.mockReset();
+		apiFetch.mockReset();
 	} );
 
 	describe( 'return value settles as expected', () => {
@@ -23,19 +23,17 @@ describe( 'fetchRemoteUrlData', () => {
 				description:
 					'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			};
-			triggerFetch.mockReturnValueOnce( Promise.resolve( data ) );
+			apiFetch.mockReturnValueOnce( Promise.resolve( data ) );
 
 			await expect(
 				fetchRemoteUrlData( 'https://www.wordpress.org' )
 			).resolves.toEqual( data );
 
-			expect( triggerFetch ).toBeCalledTimes( 1 );
+			expect( apiFetch ).toBeCalledTimes( 1 );
 		} );
 
 		it( 'rejects with error upon fetch failure', async () => {
-			triggerFetch.mockReturnValueOnce(
-				Promise.reject( 'fetch failed' )
-			);
+			apiFetch.mockReturnValueOnce( Promise.reject( 'fetch failed' ) );
 
 			await expect(
 				fetchRemoteUrlData( 'https://www.wordpress.org/1' )
@@ -45,15 +43,15 @@ describe( 'fetchRemoteUrlData', () => {
 
 	describe( 'interaction with underlying fetch API', () => {
 		it( 'passes options argument through to fetch API', async () => {
-			triggerFetch.mockReturnValueOnce( Promise.resolve() );
+			apiFetch.mockReturnValueOnce( Promise.resolve() );
 
 			await fetchRemoteUrlData( 'https://www.wordpress.org/2', {
 				method: 'POST',
 			} );
 
-			expect( triggerFetch ).toBeCalledTimes( 1 );
+			expect( apiFetch ).toBeCalledTimes( 1 );
 
-			const argsPassedToFetchApi = triggerFetch.mock.calls[ 0 ][ 0 ];
+			const argsPassedToFetchApi = apiFetch.mock.calls[ 0 ][ 0 ];
 
 			expect( argsPassedToFetchApi ).toEqual(
 				expect.objectContaining( {
@@ -73,16 +71,16 @@ describe( 'fetchRemoteUrlData', () => {
 				description:
 					'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			};
-			triggerFetch.mockReturnValueOnce( Promise.resolve( data ) );
+			apiFetch.mockReturnValueOnce( Promise.resolve( data ) );
 
 			await expect( fetchRemoteUrlData( targetUrl ) ).resolves.toEqual(
 				data
 			);
-			expect( triggerFetch ).toBeCalledTimes( 1 );
+			expect( apiFetch ).toBeCalledTimes( 1 );
 
 			// Allow us to reassert on calls without it being polluted by first fetch
 			// but retains the mock implementation from earlier.
-			triggerFetch.mockClear();
+			apiFetch.mockClear();
 
 			// Fetch the same URL again...should be cached.
 			await expect( fetchRemoteUrlData( targetUrl ) ).resolves.toEqual(
@@ -90,7 +88,7 @@ describe( 'fetchRemoteUrlData', () => {
 			);
 
 			// Should now be in cache so no need to refetch from API.
-			expect( triggerFetch ).toBeCalledTimes( 0 );
+			expect( apiFetch ).toBeCalledTimes( 0 );
 		} );
 
 		it( 'does not cache failed requests', async () => {
@@ -103,7 +101,7 @@ describe( 'fetchRemoteUrlData', () => {
 					'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			};
 
-			triggerFetch
+			apiFetch
 				.mockReturnValueOnce( Promise.reject( 'fetch failed' ) )
 				.mockReturnValueOnce( Promise.resolve( data ) );
 
@@ -117,7 +115,7 @@ describe( 'fetchRemoteUrlData', () => {
 				data
 			);
 
-			expect( triggerFetch ).toBeCalledTimes( 2 );
+			expect( apiFetch ).toBeCalledTimes( 2 );
 		} );
 	} );
 } );
