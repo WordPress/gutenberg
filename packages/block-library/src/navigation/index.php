@@ -106,11 +106,11 @@ function render_classic_location_menu( $location, $attributes ) {
 
 	return wp_nav_menu(
 		array(
-			'theme_location'   => $location,
-			'container'        => '',
-			'items_wrap'       => '%3$s',
-			'fallback_cb'      => false,
-			'echo'             => false,
+			'theme_location' => $location,
+			'container'      => '',
+			'items_wrap'     => '%3$s',
+			'fallback_cb'    => false,
+			'echo'           => false,
 		)
 	);
 }
