@@ -239,7 +239,7 @@ if ( ! function_exists( 'gutenberg_get_widget_key' ) ) {
 			}
 		}
 
-		return null;
+		return '';
 	}
 }
 
