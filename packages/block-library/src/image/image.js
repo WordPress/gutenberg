@@ -61,6 +61,27 @@ function getFilename( url ) {
 	}
 }
 
+/**
+ * Checks if the given block is registered and is in the allowed blocks list.
+ *
+ * @param {string}        name Block name.
+ * @param {boolean|Array} list Allowed block types.
+ *
+ * @return {boolean}           Whether the block exists.
+ */
+function checkBlockExists( name, list ) {
+	if ( ! getBlockType( name ) ) {
+		return false;
+	}
+
+	// The allowed blocks list has a boolean value so return it.
+	if ( ! Array.isArray( list ) ) {
+		return list;
+	}
+
+	return list.includes( name );
+}
+
 export default function Image( {
 	temporaryURL,
 	attributes: {
@@ -111,17 +132,22 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return pick( getSettings(), [
-				'imageEditing',
-				'imageSizes',
-				'maxWidth',
-				'mediaUpload',
-			] );
-		}
-	);
+	const {
+		allowedBlockTypes,
+		imageEditing,
+		imageSizes,
+		maxWidth,
+		mediaUpload,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return pick( getSettings(), [
+			'allowedBlockTypes',
+			'imageEditing',
+			'imageSizes',
+			'maxWidth',
+			'mediaUpload',
+		] );
+	} );
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
@@ -140,8 +166,11 @@ export default function Image( {
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
 
-	// Check if the cover block is registered.
-	const coverBlockExists = !! getBlockType( 'core/cover' );
+	// Check if the cover block is registered and in allowed block list.
+	const coverBlockExists = checkBlockExists(
+		'core/cover',
+		allowedBlockTypes
+	);
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,

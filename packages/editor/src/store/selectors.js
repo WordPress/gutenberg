@@ -1748,3 +1748,20 @@ export function __experimentalGetTemplateInfo( state, template ) {
 		icon: templateIcon,
 	};
 }
+
+/**
+ * Returns a post type label depending on the current post.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string|undefined} The post type label if available, otherwise undefined.
+ */
+export const getPostTypeLabel = createRegistrySelector(
+	( select ) => ( state ) => {
+		const currentPostType = getCurrentPostType( state );
+		const postType = select( coreStore ).getPostType( currentPostType );
+		// Disable reason: Post type labels object is shaped like this.
+		// eslint-disable-next-line camelcase
+		return postType?.labels?.singular_name;
+	}
+);

@@ -2,7 +2,7 @@
 	"apiVersion": 2,
 	"name": "core/post-featured-image",
 	"title": "Post Featured Image",
-	"category": "design",
+	"category": "theme",
 	"description": "Display a post's featured image.",
 	"textdomain": "default",
 	"attributes": {
@@ -11,7 +11,7 @@
 			"default": false
 		}
 	},
-	"usesContext": [ "postId", "postType" ],
+	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],
 		"html": false

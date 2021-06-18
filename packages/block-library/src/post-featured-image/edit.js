@@ -20,11 +20,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import { useIsEditablePostBlock } from '../utils/hooks';
-
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const placeholderChip = (
 	<div className="post-featured-image_placeholder">
@@ -34,14 +29,13 @@ const placeholderChip = (
 );
 
 function PostFeaturedImageDisplay( {
-	clientId,
 	attributes: { isLink },
 	setAttributes,
-	context: { postId, postType },
+	context: { postId, postType, queryId },
 	noticeUI,
 	noticeOperations,
 } ) {
-	const isEditable = useIsEditablePostBlock( clientId );
+	const isDescendentOfQueryLoop = !! queryId;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postType,
@@ -64,7 +58,7 @@ function PostFeaturedImageDisplay( {
 		noticeOperations.createErrorNotice( message );
 	}
 	let image;
-	if ( ! featuredImage && ! isEditable ) {
+	if ( ! featuredImage && isDescendentOfQueryLoop ) {
 		return <div { ...blockProps }>{ placeholderChip }</div>;
 	}
 	if ( ! featuredImage ) {
@@ -111,7 +105,7 @@ function PostFeaturedImageDisplay( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ !! media && isEditable && (
+			{ !! media && ! isDescendentOfQueryLoop && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ featuredImage }

@@ -68,6 +68,26 @@ Array [
 ]
 `;
 
+exports[`Webpack \`has-extension-suffix\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '99bd32161d8514cc8c0cb8b0543ace3f');"`;
+
+exports[`Webpack \`has-extension-suffix\` should produce expected output: External modules should match snapshot 1`] = `
+Array [
+  Object {
+    "externalType": "window",
+    "request": "lodash",
+    "userRequest": "lodash",
+  },
+  Object {
+    "externalType": "window",
+    "request": Array [
+      "wp",
+      "blob",
+    ],
+    "userRequest": "@wordpress/blob",
+  },
+]
+`;
+
 exports[`Webpack \`no-default\` should produce expected output: Asset file should match snapshot 1`] = `"<?php return array('dependencies' => array(), 'version' => '7cedfbba436728640c2c4961b598ab32');"`;
 
 exports[`Webpack \`no-default\` should produce expected output: External modules should match snapshot 1`] = `Array []`;

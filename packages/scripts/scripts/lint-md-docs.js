@@ -43,12 +43,8 @@ const hasIgnoredFiles =
 	hasProjectFile( '.markdownlintignore' );
 
 // Default ignore [ build, node_modules ] directories
-// TODO: Once https://github.com/igorshubovych/markdownlint-cli/issues/46 is in
-// we can switch this to specify an ignore file on the command-line. By default,
-// markdownlint looks for .markdownlintignore in project direcotry, but how our
-// scripts work we store the configs in the scripts/config directory
 const defaultIgnoreArgs = ! hasIgnoredFiles
-	? [ '--ignore', '**/build/**', '--ignore', '**/node_modules/**' ]
+	? [ '--ignore-path', fromConfigRoot( '.markdownlintignore' ) ]
 	: [];
 
 const result = spawn(

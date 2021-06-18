@@ -16,6 +16,7 @@ import {
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
+	canUserEditEntityRecord,
 	getAutosave,
 	getAutosaves,
 	getCurrentUser,
@@ -441,6 +442,54 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( canUser( state, 'create', 'media', 123 ) ).toBe( false );
+	} );
+} );
+
+describe( 'canUserEditEntityRecord', () => {
+	it( 'returns false by default', () => {
+		const state = deepFreeze( {
+			userPermissions: {},
+			entities: { data: {} },
+		} );
+		expect( canUserEditEntityRecord( state, 'postType', 'post' ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'returns whether the user can edit', () => {
+		const state = deepFreeze( {
+			userPermissions: {
+				'create/posts': false,
+				'update/posts/1': true,
+			},
+			entities: {
+				config: [
+					{
+						kind: 'postType',
+						name: 'post',
+						__unstable_rest_base: 'posts',
+					},
+				],
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {
+									post: { slug: 'post', __unstable: 'posts' },
+								},
+								itemIsComplete: {
+									post: true,
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			canUserEditEntityRecord( state, 'postType', 'post', '1' )
+		).toBe( true );
 	} );
 } );
 

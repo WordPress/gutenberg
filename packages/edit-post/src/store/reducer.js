@@ -198,6 +198,7 @@ export function isSavingMetaBoxes( state = false, action ) {
 		case 'REQUEST_META_BOX_UPDATES':
 			return true;
 		case 'META_BOX_UPDATES_SUCCESS':
+		case 'META_BOX_UPDATES_FAILURE':
 			return false;
 		default:
 			return state;
