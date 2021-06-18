@@ -20,6 +20,10 @@ import * as styles from '../styles';
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
  */
 function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
+	/**@type {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} */
+	const propsToReturn = {
+		...otherProps,
+	};
 	let computedElevation = elevation;
 
 	if ( isElevated ) {
@@ -30,10 +34,13 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
 		computedElevation ??= 2;
 	}
 
-	return {
-		...otherProps,
-		elevation: computedElevation,
-	};
+	// The `elevation` prop should only be passed when it's not `undefined`,
+	// otherwise it will override the value that gets derived from `useContextSystem`.
+	if ( typeof computedElevation !== 'undefined' ) {
+		propsToReturn.elevation = computedElevation;
+	}
+
+	return propsToReturn;
 }
 
 /**
