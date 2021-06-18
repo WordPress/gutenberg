@@ -558,9 +558,7 @@ describe( 'Navigation', () => {
 		const isScriptLoaded = await previewPage.evaluate(
 			() =>
 				null !==
-				document.querySelector(
-					'script[src*="navigation/frontend.js"]'
-				)
+				document.querySelector( 'script[src*="navigation/view.js"]' )
 		);
 
 		expect( isScriptLoaded ).toBe( false );
@@ -582,7 +580,7 @@ describe( 'Navigation', () => {
 			() =>
 				Array.from(
 					document.querySelectorAll(
-						'script[src*="navigation/frontend.js"]'
+						'script[src*="navigation/view.js"]'
 					)
 				).length
 		);
@@ -613,9 +611,7 @@ describe( 'Navigation', () => {
 		let isScriptLoaded = await previewPage.evaluate(
 			() =>
 				null !==
-				document.querySelector(
-					'script[src*="navigation/frontend.js"]'
-				)
+				document.querySelector( 'script[src*="navigation/view.js"]' )
 		);
 
 		expect( isScriptLoaded ).toBe( false );
@@ -631,9 +627,7 @@ describe( 'Navigation', () => {
 		isScriptLoaded = await previewPage.evaluate(
 			() =>
 				null !==
-				document.querySelector(
-					'script[src*="navigation/frontend.js"]'
-				)
+				document.querySelector( 'script[src*="navigation/view"]' )
 		);
 
 		expect( isScriptLoaded ).toBe( true );
