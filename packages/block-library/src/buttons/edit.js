@@ -52,14 +52,14 @@ function ButtonsEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		template: [
-			[
-				'core/button',
-				preferredStyle
-					? { className: `is-style-${ preferredStyle }` }
-					: {},
-			],
-		],
+		template: preferredStyle
+			? [
+					[
+						'core/button',
+						{ className: `is-style-${ preferredStyle }` },
+					],
+			  ]
+			: [ [ 'core/button' ] ],
 		orientation,
 		__experimentalLayout: LAYOUT,
 		templateInsertUpdatesSelection: true,
