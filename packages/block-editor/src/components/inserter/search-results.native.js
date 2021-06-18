@@ -23,8 +23,12 @@ function InserterSearchResults( {
 				rootClientId
 			);
 			const filteredItems = searchItems( allItems, filterValue );
+			const newStatusItems = filteredItems.map( ( item ) => ( {
+				...item,
+				isNew: true,
+			} ) );
 
-			return { items: filteredItems };
+			return { items: newStatusItems };
 		},
 		[ rootClientId, filterValue ]
 	);

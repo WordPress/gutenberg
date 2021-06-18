@@ -53,6 +53,13 @@ class MenuItem extends Component {
 			styles.clipboardBlock,
 			styles.clipboardBlockDark
 		);
+		const newBadgeStyle = [
+			styles.newBadge,
+			getStylesFromColorScheme(
+				styles.newBadgeLight,
+				styles.newBadgeDark
+			),
+		];
 
 		const isClipboardBlock = item.id === 'clipboard';
 		const blockTitle = isClipboardBlock ? __( 'Copied block' ) : item.title;
@@ -80,6 +87,7 @@ class MenuItem extends Component {
 							isClipboardBlock && clipboardBlockStyles,
 						] }
 					>
+						{ true && <Text style={ newBadgeStyle }>New</Text> }
 						<View style={ modalIconStyle }>
 							<Icon
 								icon={ item.icon.src || item.icon }

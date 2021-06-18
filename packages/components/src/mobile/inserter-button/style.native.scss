@@ -66,3 +66,23 @@
 	padding-top: 0;
 	padding-bottom: 0;
 }
+
+.newBadge {
+	border-radius: 5px;
+	font-size: 12px;
+	left: 4px;
+	padding: 2px 5px;
+	position: absolute;
+	overflow: hidden;
+	top: 4px;
+}
+
+.newBadgeLight {
+	color: $dark-primary;
+	background-color: $gray-50;
+}
+
+.newBadgeDark {
+	color: $light-primary;
+	background-color: $gray-30;
+}
