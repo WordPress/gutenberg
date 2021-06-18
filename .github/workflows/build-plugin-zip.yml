@@ -127,6 +127,10 @@ jobs:
                   git commit -m "Bump plugin version to ${{ steps.get_version.outputs.new_version }}"
                   git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
 
+            - name: Fetch trunk
+              if: ${{ github.ref != 'refs/heads/trunk' }}
+              run: git fetch --depth=1 origin trunk
+
             - name: Cherry-pick the version bump commit to trunk
               run: |
                   git checkout trunk
