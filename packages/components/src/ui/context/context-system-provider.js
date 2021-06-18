@@ -63,9 +63,15 @@ function useContextSystemBridge( { value } ) {
 		}
 	}, [ value ] );
 
-	// parent context will always be memoized or the default value (which will not change)
+	// `parentContext` will always be memoized (i.e., the result of this hook itself)
+	// or the default value from when the `ComponentsContext` was originally
+	// initialized (which will never change, it's a static variable)
 	// so this memoization will prevent `merge` and `cloneDeep` from rerunning unless
-	// the referneces to value change. The `useUpdateEffect` above will ensure that we are
+	// the references to `value` change OR the `parentContext` has an actual material change
+	// (because again, it's guaranteed to be memoized or a static reference to the empty object
+	// so we know that the only changes for `parentContext` are material ones... i.e., why we
+	// don't have to warn in the `useUpdateEffect` hook above for `parentContext` and we only
+	// need to bother with the `value`). The `useUpdateEffect` above will ensure that we are
 	// correctly warning when the `value` isn't being properly memoized. All of that to say
 	// that this should be super safe to assume that `useMemo` will only run on actual
 	// changes to the two dependencies, therefore saving us calls to `merge` and `cloneDeep`!
