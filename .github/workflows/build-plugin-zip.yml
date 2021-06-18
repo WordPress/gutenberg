@@ -18,17 +18,46 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    compute-stable-branches:
+        name: Compute current and next stable release branches
+        runs-on: ubuntu-latest
+        outputs:
+            current_stable_branch: ${{ steps.get_branches.outputs.current_stable_branch }}
+            next_stable_branch: ${{ steps.get_branches.outputs.next_stable_branch }}
+        steps:
+            - name: Get current and next stable release branches
+              id: get_branches
+              run: |
+                  curl \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    -o latest.json \
+                    "https://api.github.com/repos/${{ github.repository }}/releases/latest"
+                  LATEST_STABLE_VERSION=$(jq --raw-output '.name' latest.json)
+                  IFS='.' read LATEST_STABLE_MAJOR LATEST_STABLE_MINOR LATEST_STABLE_PATCH <<< "$LATEST_STABLE_VERSION"
+                  echo "::set-output name=current_stable_branch::release/${LATEST_STABLE_MAJOR}.${LATEST_STABLE_MINOR}"
+                  if [[ ${LATEST_STABLE_MINOR} == "9" ]]; then
+                    echo "::set-output name=next_stable_branch::release/$((LATEST_STABLE_MAJOR + 1)).0"
+                  else
+                    echo "::set-output name=next_stable_branch::release/${LATEST_STABLE_MAJOR}.$((LATEST_STABLE_MINOR + 1))"
+                  fi
+
     bump-version:
         name: Bump version
         runs-on: ubuntu-latest
+        needs: compute-stable-branches
         if: |
             github.repository == 'WordPress/gutenberg' &&
             github.event_name == 'workflow_dispatch' && (
-              github.ref == 'refs/heads/trunk' ||
-              startsWith( github.ref, 'refs/heads/release/' )
-            ) && (
-              github.event.inputs.version == 'rc' ||
-              github.event.inputs.version == 'stable'
+              (
+                github.ref == 'refs/heads/trunk' ||
+                endsWith( github.ref, needs.compute-stable-branches.outputs.next_stable_branch )
+              ) && (
+                github.event.inputs.version == 'rc' ||
+                github.event.inputs.version == 'stable'
+              ) || (
+                endsWith( github.ref, needs.compute-stable-branches.outputs.current_stable_branch ) &&
+                github.event.inputs.version == 'stable'
+              )
             )
         outputs:
             old_version: ${{ steps.get_version.outputs.old_version }}
