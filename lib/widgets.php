@@ -164,4 +164,3 @@ function gutenberg_set_show_instance_in_rest_on_core_widgets() {
 if ( ! function_exists( 'wp_use_widgets_block_editor' ) ) {
 	add_action( 'widgets_init', 'gutenberg_set_show_instance_in_rest_on_core_widgets' );
 }
-add_filter( 'wp_legacy_widget_key', 'gutenberg_get_widget_key' );

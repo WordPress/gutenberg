@@ -24,22 +24,13 @@ function render_block_core_legacy_widget( $attributes ) {
 		return '';
 	}
 
-	$base_id    = $attributes['idBase'];
-	$widget_key = false;
+	$base_id = $attributes['idBase'];
 	if ( method_exists( $wp_widget_factory, 'get_widget_key' ) ) {
 		$widget_key = $wp_widget_factory->get_widget_key( $base_id );
+	} else {
+		$widget_key = gutenberg_get_widget_key( $base_id );
 	}
 
-	/**
-	 * Filter the value of the key, that is passed to `the_widget` function.
-	 *
-	 * @since 5.8.0
-	 *
-	 * @param string $widget_key Key in the widget area.
-	 * @param string $base_id Base id used to look key.
-	 * @param array $attributes Attributes array for extra context.
-	 */
-	$widget_key = apply_filters( 'wp_get_legacy_widget_key', $widget_key, $base_id, $attributes );
 	if ( ! $widget_key ) {
 		return '';
 	}
