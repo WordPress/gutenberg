@@ -302,6 +302,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
     @Override
     public void onCreate() {
         super.onCreate();
+
+        if (BuildConfig.METRO_DEBUG_URL != null && !BuildConfig.METRO_DEBUG_URL.isEmpty()) {
+            PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .edit()
+                .putString("debug_http_host", BuildConfig.METRO_DEBUG_URL)
+                .apply();
+        }
+
         SoLoader.init(this, /* native exopackage */ false);
     }
 

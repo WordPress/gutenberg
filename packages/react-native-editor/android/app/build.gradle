@@ -117,6 +117,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        buildConfigField "String", "METRO_DEBUG_URL", "\"${String.valueOf(System.getenv("METRO_DEBUG_URL"))}\""
     }
     splits {
         abi {
