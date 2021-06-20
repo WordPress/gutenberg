@@ -15,7 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Post Comment Content' ),
-	description: __( 'Post Comment Content' ),
+	description: __( 'Post Comment Content.' ),
 	icon,
 	edit,
 	parent: [ 'core/post-comment' ],

@@ -16,7 +16,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Post Comment' ),
-	description: __( 'Post Comment' ),
+	description: __( 'Post Comment.' ),
 	icon,
 	edit,
 	save,

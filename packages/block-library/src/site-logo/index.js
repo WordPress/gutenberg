@@ -15,7 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Site Logo' ),
-	description: __( 'Show a site logo' ),
+	description: __( 'Show a site logo.' ),
 	icon,
 	supports: {
 		align: true,

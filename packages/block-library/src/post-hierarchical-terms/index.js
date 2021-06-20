@@ -14,7 +14,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Post Hierarchical Terms' ),
+	title: __( 'Post Hierarchical Terms.' ),
 	variations,
 	edit,
 };
