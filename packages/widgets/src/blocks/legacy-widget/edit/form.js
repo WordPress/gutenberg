@@ -9,8 +9,10 @@ import { useRef, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
-import { Popover } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	__experimentalUseDialog as useDialog,
+} from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -89,29 +91,31 @@ export default function Form( {
 		isMediumLargeViewport,
 	] );
 
+	const [ dialogRef, dialogProps ] = useDialog( {
+		focusOnMount: false,
+	} );
+
 	if ( isWide && isMediumLargeViewport ) {
 		return (
-			<div
-				className={ classnames( {
-					'wp-block-legacy-widget__container': isVisible,
-				} ) }
-			>
+			<div className="wp-block-legacy-widget__container">
 				{ isVisible && (
 					<h3 className="wp-block-legacy-widget__edit-form-title">
 						{ title }
 					</h3>
 				) }
-				<Popover
-					focusOnMount={ false }
-					position="middle right"
-					__unstableForceXAlignment
+				<div
+					className={ classnames(
+						'wp-block-legacy-widget__edit-form',
+						'is-wide',
+						{
+							'is-visible': isVisible,
+						}
+					) }
+					ref={ dialogRef }
+					{ ...dialogProps }
 				>
-					<div
-						ref={ ref }
-						className="wp-block-legacy-widget__edit-form"
-						hidden={ ! isVisible }
-					></div>
-				</Popover>
+					<div ref={ ref } hidden={ ! isVisible }></div>
+				</div>
 			</div>
 		);
 	}

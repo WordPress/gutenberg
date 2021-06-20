@@ -7,6 +7,21 @@
 	border: 1px solid $gray-900;
 	padding: $grid-unit-15 - 1px; //Subtract the border width.
 
+	&.is-wide {
+		overflow: auto;
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 299px;
+		border-radius: 0;
+		border: 1px solid #dcdcde;
+		display: none;
+
+		&.is-visible {
+			display: block;
+		}
+	}
+
 	.wp-block-legacy-widget__edit-form-title {
 		color: $black;
 		font-family: $default-font;
