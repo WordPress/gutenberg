@@ -9,10 +9,8 @@
 
 	// Scroll sideways.
 	overflow-y: auto;
-	z-index: z-index(".customize-widgets__block-toolbar");
 }
 
 .customize-control-sidebar_block_editor .block-editor-block-list__block-popover {
 	position: fixed;
-	z-index: z-index(".customize-widgets__block-toolbar");
 }

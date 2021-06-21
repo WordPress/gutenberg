@@ -1,4 +1,7 @@
 .customize-widgets-header {
+	position: sticky;
+	top: 0;
+
 	@include break-medium() {
 		// Make space for the floating toolbar.
 		margin-bottom: $grid-unit-60 + $default-block-margin;

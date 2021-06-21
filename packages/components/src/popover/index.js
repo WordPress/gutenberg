@@ -257,6 +257,8 @@ const Popover = (
 		__unstableBoundaryParent,
 		__unstableForcePosition,
 		__unstableForceXAlignment,
+		__experimentalStickyTop,
+		__experimentalStickier,
 		/* eslint-enable no-unused-vars */
 		...contentProps
 	},
@@ -351,7 +353,9 @@ const Popover = (
 				relativeOffsetTop,
 				boundaryElement,
 				__unstableForcePosition,
-				__unstableForceXAlignment
+				__unstableForceXAlignment,
+				__experimentalStickyTop,
+				__experimentalStickier
 			);
 
 			if (
@@ -444,6 +448,47 @@ const Popover = (
 			observer.observe( __unstableObserveElement, { attributes: true } );
 		}
 
+		let inViewObserver;
+
+		// When stickier, observes the anchor’s intersection with the sticky
+		// boundary element and sets attributes for styling.
+		if ( __experimentalStickier ) {
+			const isAnchorCompound = anchorRef.constructor === Object;
+			inViewObserver = new defaultView.IntersectionObserver(
+				( [ entry ] ) => {
+					let isInView;
+					// If the anchor is singular, it is in view if the entry
+					// reports it so. Otherwise, there are two elements to
+					// consider and unless both are outside the same side of
+					// the bounds the anchor is still in view.
+					if ( ! isAnchorCompound ) {
+						isInView = entry.isIntersecting;
+					} else {
+						const rect = entry.boundingClientRect;
+						isInView =
+							entry.target === anchorRef.top
+								? rect.top < entry.rootBounds.bottom
+								: rect.bottom > entry.rootBounds.top;
+					}
+					setAttribute(
+						containerRef.current,
+						'data-away',
+						! isInView ? 'true' : 'false'
+					);
+				},
+				{
+					root: __unstableStickyBoundaryElement,
+					rootMargin: `-${ __experimentalStickyTop }px 0px 0px 0px`,
+				}
+			);
+			if ( isAnchorCompound ) {
+				inViewObserver.observe( anchorRef.top );
+				inViewObserver.observe( anchorRef.bottom );
+			} else {
+				inViewObserver.observe( anchorRef );
+			}
+		}
+
 		return () => {
 			defaultView.clearInterval( intervalHandle );
 			defaultView.removeEventListener( 'resize', refresh );
@@ -466,6 +511,10 @@ const Popover = (
 			if ( observer ) {
 				observer.disconnect();
 			}
+
+			// Stickier related cleanup
+			inViewObserver?.disconnect();
+			setAttribute( containerRef.current, 'data-away' );
 		};
 	}, [
 		isExpanded,
@@ -476,6 +525,8 @@ const Popover = (
 		position,
 		contentSize,
 		__unstableStickyBoundaryElement,
+		__experimentalStickyTop,
+		__experimentalStickier,
 		__unstableObserveElement,
 		__unstableBoundaryParent,
 	] );

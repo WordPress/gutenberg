@@ -321,6 +321,20 @@
 		}
 	}
 
+	// The data-away attribute is used to hide the toolbar when its block is out of view.
+	&[data-away] {
+		transition: opacity 0.1s linear;
+
+		&[data-away="true"] {
+			opacity: 0;
+
+			// Allow clicking through the transparent toolbar
+			.block-editor-block-contextual-toolbar {
+				pointer-events: none;
+			}
+		}
+	}
+
 	// Hide the block toolbar if the insertion point is shown.
 	&.is-insertion-point-visible {
 		visibility: hidden;
