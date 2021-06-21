@@ -5,9 +5,11 @@
 // See: https://github.com/WordPress/gutenberg/pull/32514.
 // TODO: Remove this class when WordPress 5.9 is released.
 .wp-block-query-loop {
+	margin-left: 0;
 	max-width: 100%;
-	list-style: none;
+	list-style: none !important;
 	padding: 0;
+	padding-left: 0 !important;
 
 	li {
 		clear: both;
