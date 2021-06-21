@@ -465,6 +465,64 @@ describe( 'Navigation', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'encodes URL when create block if needed', async () => {
+		// Add the navigation block.
+		await insertBlock( 'Navigation' );
+
+		// Create an empty nav block.
+		await page.waitForSelector( '.wp-block-navigation-placeholder' );
+
+		await createEmptyNavBlock();
+
+		await addLinkBlock();
+
+		// Add a link to the Link block.
+		await updateActiveNavigationLink( {
+			url: 'https://wordpress.org/шеллы',
+			type: 'url',
+		} );
+
+		await showBlockToolbar();
+
+		await addLinkBlock();
+
+		// Wait for URL input to be focused
+		await page.waitForSelector(
+			'input.block-editor-url-input__input:focus'
+		);
+
+		// After adding a new block, search input should be shown immediately.
+		const isInURLInput = await page.evaluate(
+			() =>
+				!! document.activeElement.matches(
+					'input.block-editor-url-input__input'
+				)
+		);
+		expect( isInURLInput ).toBe( true );
+		await page.keyboard.press( 'Escape' );
+
+		//click the link placeholder
+		const placeholder = await page.waitForSelector(
+			'.wp-block-navigation-link__placeholder'
+		);
+		await placeholder.click();
+
+		// For the second nav link block use an existing internal page.
+		// Mock the api response so that it's consistent.
+		await mockSearchResponse( [
+			{ title: 'お問い合わせ', slug: encodeURI( 'お問い合わせ' ) },
+		] );
+
+		// Add a link to the default Link block.
+		await updateActiveNavigationLink( {
+			url: 'お問い合わせ',
+			type: 'entity',
+		} );
+
+		// Expect a Navigation Block with two Links in the snapshot.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
 		// Mock request for creating pages and the page search response.
 		// We mock the page search to return no results and we use a very long
