@@ -43,7 +43,7 @@
 			"type": "boolean",
 			"default": false
 		},
-		"__unstable__location": {
+		"__unstableLocation": {
 			"type": "string"
 		}
 	},
