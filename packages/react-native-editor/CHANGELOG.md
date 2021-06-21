@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
 
 -   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
 
