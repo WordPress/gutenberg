@@ -53,7 +53,7 @@ function PostTemplateActions() {
 	return (
 		<>
 			<div className="edit-post-template__actions">
-				{ !! template && (
+				{ template !== null && (
 					<Button
 						variant="link"
 						onClick={ () => __unstableSwitchToTemplateMode() }
