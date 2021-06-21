@@ -69,11 +69,6 @@ const LinkControlSearchInput = forwardRef(
 			setFocusedSuggestion( suggestion );
 		};
 
-		const onFormSubmit = ( event ) => {
-			event.preventDefault();
-			onSuggestionSelected( focusedSuggestion || { url: value } );
-		};
-
 		const handleRenderSuggestions = ( props ) =>
 			renderSuggestions( {
 				...props,
@@ -118,7 +113,7 @@ const LinkControlSearchInput = forwardRef(
 		};
 
 		return (
-			<form onSubmit={ onFormSubmit }>
+			<div>
 				<URLInput
 					className={ className }
 					value={ value }
@@ -132,10 +127,15 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
+					onSubmit={ ( suggestion ) => {
+						onSuggestionSelected(
+							suggestion || focusedSuggestion || { url: value }
+						);
+					} }
 					ref={ ref }
 				/>
 				{ children }
-			</form>
+			</div>
 		);
 	}
 );

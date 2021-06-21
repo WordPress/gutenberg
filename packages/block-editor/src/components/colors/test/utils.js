@@ -109,10 +109,22 @@ describe( 'color utils', () => {
 			).toBeUndefined();
 		} );
 
-		it( 'should return a class name with the color slug without spaces', () => {
+		it( 'should return a class name with the color slug in kebab case', () => {
 			expect(
 				getColorClassName( 'background', 'Light   Purple veryDark' )
-			).toBe( 'has-Light-Purple-veryDark-background' );
+			).toBe( 'has-light-purple-very-dark-background' );
+		} );
+
+		it( 'should return the correct class name if the color slug is not a string', () => {
+			expect( getColorClassName( 'background', 123456 ) ).toBe(
+				'has-123456-background'
+			);
+		} );
+
+		it( 'should return the correct class name if the color slug contains special characters', () => {
+			expect( getColorClassName( 'background', '#abcdef' ) ).toBe(
+				'has-abcdef-background'
+			);
 		} );
 	} );
 } );

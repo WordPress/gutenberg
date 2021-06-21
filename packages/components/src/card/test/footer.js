@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import CardFooter from '../footer';
+import { CardFooter } from '../';
 
 describe( 'CardFooter', () => {
 	describe( 'basic rendering', () => {

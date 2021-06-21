@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -23,13 +23,13 @@ export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 		return null;
 	}
 	return (
-		<Toolbar>
+		<ToolbarGroup>
 			<ToolbarButton
 				title={ __( 'Ungroup' ) }
 				icon={ UngroupIcon }
 				onClick={ onConvertFromGroup }
 			/>
-		</Toolbar>
+		</ToolbarGroup>
 	);
 }
 

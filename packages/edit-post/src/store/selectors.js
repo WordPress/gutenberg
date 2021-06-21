@@ -387,7 +387,7 @@ export const getEditedPostTemplate = createRegistrySelector(
 		}
 
 		const post = select( editorStore ).getCurrentPost();
-		if ( post.link && post.status !== 'auto-draft' ) {
+		if ( post.link ) {
 			return select( coreStore ).__experimentalGetTemplateForLink(
 				post.link
 			);

@@ -26,7 +26,10 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$align_class_name = empty( $attributes['textAlign'] ) ? '' : ' ' . "has-text-align-{$attributes['textAlign']}";
+	$classes = 'taxonomy-' . $attributes['term'];
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes .= ' has-text-align-' . $attributes['textAlign'];
+	}
 
 	$terms_links = '';
 	foreach ( $post_terms as $term ) {
@@ -37,7 +40,7 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 		);
 	}
 	$terms_links        = trim( $terms_links, ' | ' );
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',

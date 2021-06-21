@@ -277,6 +277,22 @@ export function stopMultiSelect() {
  * @param {string} end   Last block of the multiselection.
  */
 export function* multiSelect( start, end ) {
+	const startBlockRootClientId = yield controls.select(
+		blockEditorStoreName,
+		'getBlockRootClientId',
+		start
+	);
+	const endBlockRootClientId = yield controls.select(
+		blockEditorStoreName,
+		'getBlockRootClientId',
+		end
+	);
+
+	// Only allow block multi-selections at the same level.
+	if ( startBlockRootClientId !== endBlockRootClientId ) {
+		return;
+	}
+
 	yield {
 		type: 'MULTI_SELECT',
 		start,

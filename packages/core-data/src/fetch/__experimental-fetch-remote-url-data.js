@@ -15,8 +15,8 @@ import { addQueryArgs, prependHTTP } from '@wordpress/url';
  * eg: <title> tag, favicon...etc.
  *
  * @async
- * @param {string} url
- *
+ * @param {string}  url     the URL to request details from.
+ * @param {Object?} options any options to pass to the underlying fetch.
  * @example
  * ```js
  * import { __experimentalFetchRemoteUrlData as fetchRemoteUrlData } from '@wordpress/core-data';
@@ -26,12 +26,12 @@ import { addQueryArgs, prependHTTP } from '@wordpress/url';
  * export function initialize( id, settings ) {
  *
  * settings.__experimentalFetchRemoteUrlData = (
- *     url
+ * url
  * ) => fetchRemoteUrlData( url );
  * ```
  * @return {Promise< WPRemoteUrlData[] >} Remote URL data.
  */
-const fetchRemoteUrlData = async ( url ) => {
+const fetchRemoteUrlData = async ( url, options = {} ) => {
 	const endpoint = '/__experimental/url-details';
 
 	const args = {
@@ -40,6 +40,7 @@ const fetchRemoteUrlData = async ( url ) => {
 
 	return apiFetch( {
 		path: addQueryArgs( endpoint, args ),
+		...options,
 	} );
 };
 

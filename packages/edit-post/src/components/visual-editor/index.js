@@ -119,7 +119,7 @@ export default function VisualEditor( { styles } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
-		height: '100%',
+		minHeight: '100%',
 		width: '100%',
 		margin: 0,
 		display: 'flex',
@@ -178,7 +178,7 @@ export default function VisualEditor( { styles } ) {
 		if ( themeSupportsLayout ) {
 			const alignments =
 				contentSize || wideSize
-					? [ 'wide', 'full' ]
+					? [ 'wide', 'full', 'left', 'center', 'right' ]
 					: [ 'left', 'center', 'right' ];
 			return {
 				type: 'default',
