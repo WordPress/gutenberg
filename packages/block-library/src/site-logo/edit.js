@@ -355,8 +355,8 @@ export default function LogoEdit( {
 
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image
-			setLogo( '' );
-			setError();
+			setLogo( undefined );
+			setError( null );
 			setLogoUrl( media.url );
 			return;
 		}
