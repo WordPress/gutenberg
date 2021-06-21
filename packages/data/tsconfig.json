@@ -1,0 +1,11 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"noUnusedParameters": false
+	},
+	"include": [
+		"src/redux-store/metadata/actions.js"
+	]
+}
