@@ -48,6 +48,10 @@ export function getAnimateClassName( options ) {
 			'is-from-' + origin
 		);
 	}
+
+	if ( type === 'slide-out' ) {
+		return classnames( 'components-animate__slide-out', 'is-to-' + origin );
+	}
 }
 
 // @ts-ignore Reason: Planned for deprecation

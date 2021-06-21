@@ -48,6 +48,26 @@
 	}
 }
 
+.components-animate__slide-out {
+	animation: components-animate__slide-out-animation 0.1s cubic-bezier(0, 0, 0.2, 1);
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+
+	&.is-to-left {
+		transform: translateX(-100%);
+	}
+
+	&.is-to-right {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes components-animate__slide-out-animation {
+	0% {
+		transform: translateX(0%);
+	}
+}
+
 .components-animate__loading {
 	animation: components-animate__loading 1.6s ease-in-out infinite;
 }

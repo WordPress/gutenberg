@@ -21,8 +21,15 @@ export const NavigationUI = styled.div`
 	background-color: ${ G2.darkGray.primary };
 	box-sizing: border-box;
 	color: #f0f0f0;
-	padding: 0 ${ space( 2 ) };
-	overflow: hidden;
+	display: grid;
+	grid-template: 1fr/1fr;
+	> * {
+		padding: 0 ${ space( 2 ) };
+		grid-area: 1/1;
+	}
+	> .components-animate__slide-out {
+		pointer-events: none;
+	}
 `;
 
 export const MenuUI = styled.div`
