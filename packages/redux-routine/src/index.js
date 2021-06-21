@@ -12,9 +12,9 @@ import createRuntime from './runtime';
  * value of the yield assignment. If the control handler returns undefined, the
  * execution is not continued.
  *
- * @param {Record<string, (value: any) => Promise<boolean> | boolean>} controls Object of control handlers.
+ * @param {Record<string, (value: import('redux').AnyAction) => Promise<boolean> | boolean>} controls Object of control handlers.
  *
- * @return {(store: { dispatch: import('redux').Dispatch }) => (next: (action: import('redux').AnyAction) => Promise<unknown>) => (action: import('redux').AnyAction) => Promise<unknown>} Co-routine runtime
+ * @return {import('redux').Middleware} Co-routine runtime
  */
 export default function createMiddleware( controls = {} ) {
 	return ( store ) => {

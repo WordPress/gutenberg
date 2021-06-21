@@ -26,11 +26,13 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
 		"is-promise": "^4.0.0",
 		"lodash": "^4.17.21",
+		"redux": "^4.1.0",
 		"rungen": "^0.3.2"
 	},
 	"publishConfig": {
