@@ -197,7 +197,7 @@ const SiteLogo = ( {
 				naturalHeight={ naturalHeight }
 				clientWidth={ clientWidth }
 				onSaveImage={ ( imageAttributes ) => {
-					setLogo( imageAttributes.id.toString() );
+					setLogo( imageAttributes.id );
 				} }
 				isEditing={ isEditingImage }
 				onFinishEditing={ () => setIsEditingImage( false ) }
