@@ -7,11 +7,13 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { Disabled } from '@wordpress/components';
+import { calendar as icon } from '@wordpress/icons';
+import { Disabled, Placeholder, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import ServerSideRender from '@wordpress/server-side-render';
 import { useBlockProps } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 const getYearMonth = memoize( ( date ) => {
 	if ( ! date ) {
@@ -25,20 +27,64 @@ const getYearMonth = memoize( ( date ) => {
 } );
 
 export default function CalendarEdit( { attributes } ) {
-	const date = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
+	const blockProps = useBlockProps();
+	const { date, hasPosts, hasPostsResolved } = useSelect( ( select ) => {
+		const { getEntityRecords, hasFinishedResolution } = select( coreStore );
 
-		const postType = getEditedPostAttribute( 'type' );
-		// Dates are used to overwrite year and month used on the calendar.
-		// This overwrite should only happen for 'post' post types.
-		// For other post types the calendar always displays the current month.
-		return postType === 'post'
-			? getEditedPostAttribute( 'date' )
-			: undefined;
+		const singlePublishedPostQuery = {
+			status: 'publish',
+			per_page: 1,
+		};
+		const posts = getEntityRecords(
+			'postType',
+			'post',
+			singlePublishedPostQuery
+		);
+		const postsResolved = hasFinishedResolution( 'getEntityRecords', [
+			'postType',
+			'post',
+			singlePublishedPostQuery,
+		] );
+
+		let _date;
+
+		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+		// Blocks can be loaded into a *non-post* block editor.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const editorSelectors = select( 'core/editor' );
+		if ( editorSelectors ) {
+			const postType = editorSelectors.getEditedPostAttribute( 'type' );
+			// Dates are used to overwrite year and month used on the calendar.
+			// This overwrite should only happen for 'post' post types.
+			// For other post types the calendar always displays the current month.
+			if ( postType === 'post' ) {
+				_date = editorSelectors.getEditedPostAttribute( 'date' );
+			}
+		}
+
+		return {
+			date: _date,
+			hasPostsResolved: postsResolved,
+			hasPosts: postsResolved && posts?.length === 1,
+		};
 	}, [] );
 
+	if ( ! hasPosts ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder icon={ icon } label={ __( 'Calendar' ) }>
+					{ ! hasPostsResolved ? (
+						<Spinner />
+					) : (
+						__( 'No published posts found.' )
+					) }
+				</Placeholder>
+			</div>
+		);
+	}
+
 	return (
-		<div { ...useBlockProps() }>
+		<div { ...blockProps }>
 			<Disabled>
 				<ServerSideRender
 					block="core/calendar"

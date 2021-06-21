@@ -33,8 +33,8 @@ export function isValueEmpty( value ) {
  *
  * @template T
  *
- * @param {Array<T | null | undefined>} values Values to derive from.
- * @param {T} fallbackValue Fallback value if there are no defined values.
+ * @param {Array<T | null | undefined>} values        Values to derive from.
+ * @param {T}                           fallbackValue Fallback value if there are no defined values.
  * @return {T} A defined value or the fallback value.
  */
 export function getDefinedValue( values = [], fallbackValue ) {

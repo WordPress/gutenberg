@@ -9,9 +9,9 @@ import { __experimentalGetBlockAttributesNamesByRole as getBlockAttributesNamesB
  * of the matched block (it could be an InnerBlock).
  * If no match is found return nothing.
  *
- * @param {WPBlock} block The block to try to find a match.
- * @param {string} selectedBlockName The block's name to use for matching condition.
- * @param {Set} consumedBlocks A set holding the previously matched/consumed blocks.
+ * @param {WPBlock} block             The block to try to find a match.
+ * @param {string}  selectedBlockName The block's name to use for matching condition.
+ * @param {Set}     consumedBlocks    A set holding the previously matched/consumed blocks.
  *
  * @return {WPBlock?} The matched block if found or nothing(`undefined`).
  */
@@ -41,7 +41,7 @@ export const getMatchingBlockByName = (
  * attributes. If no `role:content` attributes exist,
  * return selected block's attributes.
  *
- * @param {string} name Block type's namespaced name.
+ * @param {string} name       Block type's namespaced name.
  * @param {Object} attributes Selected block's attributes.
  * @return {Object} The block's attributes to retain.
  */

@@ -171,10 +171,14 @@ export default function VisualEditor( { styles } ) {
 	);
 
 	const layout = useMemo( () => {
+		if ( isTemplateMode ) {
+			return { type: 'default' };
+		}
+
 		if ( themeSupportsLayout ) {
 			const alignments =
 				contentSize || wideSize
-					? [ 'wide', 'full' ]
+					? [ 'wide', 'full', 'left', 'center', 'right' ]
 					: [ 'left', 'center', 'right' ];
 			return {
 				type: 'default',
@@ -183,7 +187,7 @@ export default function VisualEditor( { styles } ) {
 			};
 		}
 		return undefined;
-	}, [ themeSupportsLayout, contentSize, wideSize ] );
+	}, [ isTemplateMode, themeSupportsLayout, contentSize, wideSize ] );
 
 	return (
 		<div
@@ -222,7 +226,7 @@ export default function VisualEditor( { styles } ) {
 							styles={ styles }
 							style={ { paddingBottom } }
 						>
-							{ themeSupportsLayout && (
+							{ themeSupportsLayout && ! isTemplateMode && (
 								<LayoutStyle
 									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
 									layout={ defaultLayout }

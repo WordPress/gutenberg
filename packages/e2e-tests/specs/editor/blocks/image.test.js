@@ -115,7 +115,7 @@ describe( 'Image', () => {
 		const fileName = await upload( '.wp-block-image input[type="file"]' );
 		await waitForImage( fileName );
 		await page.keyboard.type( '1' );
-		await insertBlock( 'Paragraph' );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '2' );
 

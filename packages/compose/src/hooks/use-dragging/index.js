@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
 /**
- * @param {Object} props
+ * @param {Object}                  props
  * @param {(e: MouseEvent) => void} props.onDragStart
  * @param {(e: MouseEvent) => void} props.onDragMove
  * @param {(e: MouseEvent) => void} props.onDragEnd

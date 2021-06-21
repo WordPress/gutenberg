@@ -4,7 +4,13 @@
 
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useReducer,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -17,6 +23,16 @@ import useBlockNavigationDropZone from './use-block-navigation-drop-zone';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
+const expanded = ( state, action ) => {
+	switch ( action.type ) {
+		case 'expand':
+			return { ...state, ...{ [ action.clientId ]: true } };
+		case 'collapse':
+			return { ...state, ...{ [ action.clientId ]: false } };
+		default:
+			return state;
+	}
+};
 
 /**
  * Wrap `BlockNavigationRows` with `TreeGrid`. BlockNavigationRows is a
@@ -52,6 +68,7 @@ export default function BlockNavigationTree( {
 		},
 		[ selectBlock, onSelect ]
 	);
+	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
 	let {
 		ref: treeGridRef,
@@ -67,18 +84,43 @@ export default function BlockNavigationTree( {
 		blockDropTarget = undefined;
 	}
 
+	const expand = ( clientId ) => {
+		if ( ! clientId ) {
+			return;
+		}
+		setExpandedState( { type: 'expand', clientId } );
+	};
+	const collapse = ( clientId ) => {
+		if ( ! clientId ) {
+			return;
+		}
+		setExpandedState( { type: 'collapse', clientId } );
+	};
+	const expandRow = ( row ) => {
+		expand( row?.dataset?.block );
+	};
+	const collapseRow = ( row ) => {
+		collapse( row?.dataset?.block );
+	};
+
 	const contextValue = useMemo(
 		() => ( {
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			blockDropTarget,
 			isTreeGridMounted: isMounted.current,
+			expandedState,
+			expand,
+			collapse,
 		} ),
 		[
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			blockDropTarget,
 			isMounted.current,
+			expandedState,
+			expand,
+			collapse,
 		]
 	);
 
@@ -87,6 +129,8 @@ export default function BlockNavigationTree( {
 			className="block-editor-block-navigation-tree"
 			aria-label={ __( 'Block navigation structure' ) }
 			ref={ treeGridRef }
+			onCollapseRow={ collapseRow }
+			onExpandRow={ expandRow }
 		>
 			<BlockNavigationContext.Provider value={ contextValue }>
 				<BlockNavigationBranch

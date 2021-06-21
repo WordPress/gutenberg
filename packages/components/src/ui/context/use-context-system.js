@@ -25,7 +25,7 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
  * These derived props are then consolidated with incoming component props.
  *
  * @template {{ className?: string }} P
- * @param {P} props Incoming props from the component.
+ * @param {P}      props     Incoming props from the component.
  * @param {string} namespace The namespace to register and to derive context props from.
  * @return {ConnectedProps<P>} The connected props.
  */

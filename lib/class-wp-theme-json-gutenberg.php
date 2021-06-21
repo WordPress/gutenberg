@@ -34,6 +34,12 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const ROOT_BLOCK_SELECTOR = 'body';
 
+	const VALID_ORIGINS = array(
+		'core',
+		'theme',
+		'user',
+	);
+
 	const VALID_TOP_LEVEL_KEYS = array(
 		'customTemplates',
 		'templateParts',
@@ -55,18 +61,8 @@ class WP_Theme_JSON_Gutenberg {
 			'text'       => null,
 		),
 		'spacing'    => array(
-			'margin'  => array(
-				'top'    => null,
-				'right'  => null,
-				'bottom' => null,
-				'left'   => null,
-			),
-			'padding' => array(
-				'bottom' => null,
-				'left'   => null,
-				'right'  => null,
-				'top'    => null,
-			),
+			'margin'  => null,
+			'padding' => null,
 		),
 		'typography' => array(
 			'fontFamily'     => null,
@@ -202,64 +198,39 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Metadata for style properties.
 	 *
-	 * Each property declares:
-	 *
-	 * - 'value': path to the value in theme.json and block attributes.
+	 * Each element is a direct mapping from the CSS property name to the
+	 * path to the value in theme.json & block attributes.
 	 */
 	const PROPERTIES_METADATA = array(
-		'background'       => array(
-			'value' => array( 'color', 'gradient' ),
-		),
-		'background-color' => array(
-			'value' => array( 'color', 'background' ),
-		),
-		'border-radius'    => array(
-			'value' => array( 'border', 'radius' ),
-		),
-		'border-color'     => array(
-			'value' => array( 'border', 'color' ),
-		),
-		'border-width'     => array(
-			'value' => array( 'border', 'width' ),
-		),
-		'border-style'     => array(
-			'value' => array( 'border', 'style' ),
-		),
-		'color'            => array(
-			'value' => array( 'color', 'text' ),
-		),
-		'font-family'      => array(
-			'value' => array( 'typography', 'fontFamily' ),
-		),
-		'font-size'        => array(
-			'value' => array( 'typography', 'fontSize' ),
-		),
-		'font-style'       => array(
-			'value' => array( 'typography', 'fontStyle' ),
-		),
-		'font-weight'      => array(
-			'value' => array( 'typography', 'fontWeight' ),
-		),
-		'letter-spacing'   => array(
-			'value' => array( 'typography', 'letterSpacing' ),
-		),
-		'line-height'      => array(
-			'value' => array( 'typography', 'lineHeight' ),
-		),
-		'margin'           => array(
-			'value'      => array( 'spacing', 'margin' ),
-			'properties' => array( 'top', 'right', 'bottom', 'left' ),
-		),
-		'padding'          => array(
-			'value'      => array( 'spacing', 'padding' ),
-			'properties' => array( 'top', 'right', 'bottom', 'left' ),
-		),
-		'text-decoration'  => array(
-			'value' => array( 'typography', 'textDecoration' ),
-		),
-		'text-transform'   => array(
-			'value' => array( 'typography', 'textTransform' ),
-		),
+		'background'                 => array( 'color', 'gradient' ),
+		'background-color'           => array( 'color', 'background' ),
+		'border-radius'              => array( 'border', 'radius' ),
+		'border-top-left-radius'     => array( 'border', 'radius', 'topLeft' ),
+		'border-top-right-radius'    => array( 'border', 'radius', 'topRight' ),
+		'border-bottom-left-radius'  => array( 'border', 'radius', 'bottomLeft' ),
+		'border-bottom-right-radius' => array( 'border', 'radius', 'bottomRight' ),
+		'border-color'               => array( 'border', 'color' ),
+		'border-width'               => array( 'border', 'width' ),
+		'border-style'               => array( 'border', 'style' ),
+		'color'                      => array( 'color', 'text' ),
+		'font-family'                => array( 'typography', 'fontFamily' ),
+		'font-size'                  => array( 'typography', 'fontSize' ),
+		'font-style'                 => array( 'typography', 'fontStyle' ),
+		'font-weight'                => array( 'typography', 'fontWeight' ),
+		'letter-spacing'             => array( 'typography', 'letterSpacing' ),
+		'line-height'                => array( 'typography', 'lineHeight' ),
+		'margin'                     => array( 'spacing', 'margin' ),
+		'margin-top'                 => array( 'spacing', 'margin', 'top' ),
+		'margin-right'               => array( 'spacing', 'margin', 'right' ),
+		'margin-bottom'              => array( 'spacing', 'margin', 'bottom' ),
+		'margin-left'                => array( 'spacing', 'margin', 'left' ),
+		'padding'                    => array( 'spacing', 'padding' ),
+		'padding-top'                => array( 'spacing', 'padding', 'top' ),
+		'padding-right'              => array( 'spacing', 'padding', 'right' ),
+		'padding-bottom'             => array( 'spacing', 'padding', 'bottom' ),
+		'padding-left'               => array( 'spacing', 'padding', 'left' ),
+		'text-decoration'            => array( 'typography', 'textDecoration' ),
+		'text-transform'             => array( 'typography', 'textTransform' ),
 	);
 
 	const ELEMENTS = array(
@@ -277,9 +248,14 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $theme_json A structure that follows the theme.json schema.
+	 * @param array  $theme_json A structure that follows the theme.json schema.
+	 * @param string $origin What source of data this object represents. One of core, theme, or user. Default: theme.
 	 */
-	public function __construct( $theme_json = array() ) {
+	public function __construct( $theme_json = array(), $origin = 'theme' ) {
+		if ( ! in_array( $origin, self::VALID_ORIGINS, true ) ) {
+			$origin = 'theme';
+		}
+
 		// The old format is not meant to be ported to core.
 		// We can remove it at that point.
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
@@ -289,6 +265,18 @@ class WP_Theme_JSON_Gutenberg {
 		$valid_block_names   = array_keys( self::get_blocks_metadata() );
 		$valid_element_names = array_keys( self::ELEMENTS );
 		$this->theme_json    = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+
+		// Internally, presets are keyed by origin.
+		$nodes = self::get_setting_nodes( $this->theme_json );
+		foreach ( $nodes as $node ) {
+			foreach ( self::PRESETS_METADATA as $preset ) {
+				$path   = array_merge( $node['path'], $preset['path'] );
+				$preset = _wp_array_get( $this->theme_json, $path, null );
+				if ( null !== $preset ) {
+					gutenberg_experimental_set( $this->theme_json, $path, array( $origin => $preset ) );
+				}
+			}
+		}
 	}
 
 	/**
@@ -349,29 +337,6 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $output;
-	}
-
-	/**
-	 * Given a CSS property name, returns the property it belongs
-	 * within the self::PROPERTIES_METADATA map.
-	 *
-	 * @param string $css_name The CSS property name.
-	 *
-	 * @return string The property name.
-	 */
-	private static function to_property( $css_name ) {
-		static $to_property;
-		if ( null === $to_property ) {
-			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				$to_property[ $key ] = $key;
-				if ( self::has_properties( $metadata ) ) {
-					foreach ( $metadata['properties'] as $property ) {
-						$to_property[ $key . '-' . $property ] = $key;
-					}
-				}
-			}
-		}
-		return $to_property[ $css_name ];
 	}
 
 	/**
@@ -533,7 +498,7 @@ class WP_Theme_JSON_Gutenberg {
 	private static function get_property_value( $styles, $path ) {
 		$value = _wp_array_get( $styles, $path, '' );
 
-		if ( '' === $value ) {
+		if ( '' === $value || is_array( $value ) ) {
 			return $value;
 		}
 
@@ -551,21 +516,6 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $value;
-	}
-
-	/**
-	 * Whether the metadata contains a key named properties.
-	 *
-	 * @param array $metadata Description of the style property.
-	 *
-	 * @return boolean True if properties exists, false otherwise.
-	 */
-	private static function has_properties( $metadata ) {
-		if ( array_key_exists( 'properties', $metadata ) ) {
-			return true;
-		}
-
-		return false;
 	}
 
 	/**
@@ -589,34 +539,16 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		$properties = array();
-		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
-			// Some properties can be shorthand properties, meaning that
-			// they contain multiple values instead of a single one.
-			// An example of this is the padding property.
-			if ( self::has_properties( $metadata ) ) {
-				foreach ( $metadata['properties'] as $property ) {
-					$properties[] = array(
-						'name'  => $name . '-' . $property,
-						'value' => array_merge( $metadata['value'], array( $property ) ),
-					);
-				}
-			} else {
-				$properties[] = array(
-					'name'  => $name,
-					'value' => $metadata['value'],
-				);
-			}
-		}
+		foreach ( self::PROPERTIES_METADATA as $css_property => $value_path ) {
+			$value = self::get_property_value( $styles, $value_path );
 
-		foreach ( $properties as $prop ) {
-			$value = self::get_property_value( $styles, $prop['value'] );
-			if ( empty( $value ) ) {
+			// Skip if empty or value represents array of longhand values.
+			if ( empty( $value ) || is_array( $value ) ) {
 				continue;
 			}
 
 			$declarations[] = array(
-				'name'  => $prop['name'],
+				'name'  => $css_property,
 				'value' => $value,
 			);
 		}
@@ -647,6 +579,33 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Function that given an array of presets keyed by origin
+	 * and the value key of the preset returns an array where each key is
+	 * the a preset slug and each value is the preset value.
+	 *
+	 * @param array  $preset_per_origin Array of presets keyed by origin.
+	 * @param string $value_key         The property of the preset that contains its value.
+	 *
+	 * @return array Array of presets where each key is a slug and each value is the preset value.
+	 */
+	private static function get_merged_preset_by_slug( $preset_per_origin, $value_key ) {
+		$result = array();
+		foreach ( self::VALID_ORIGINS as $origin ) {
+			if ( ! isset( $preset_per_origin[ $origin ] ) ) {
+				continue;
+			}
+			foreach ( $preset_per_origin[ $origin ] as $preset ) {
+				// We don't want to use kebabCase here,
+				// see https://github.com/WordPress/gutenberg/issues/32347
+				// However, we need to make sure the generated class or css variable
+				// doesn't contain spaces.
+				$result[ preg_replace( '/\s+/', '-', $preset['slug'] ) ] = $preset[ $value_key ];
+			}
+		}
+		return $result;
+	}
+
+	/**
 	 * Given a settings array, it returns the generated rulesets
 	 * for the preset classes.
 	 *
@@ -664,19 +623,16 @@ class WP_Theme_JSON_Gutenberg {
 
 		$stylesheet = '';
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = _wp_array_get( $settings, $preset['path'], array() );
-			foreach ( $values as $value ) {
-				foreach ( $preset['classes'] as $class ) {
+			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
+			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
+			foreach ( $preset['classes'] as $class ) {
+				foreach ( $preset_by_slug as $slug => $value ) {
 					$stylesheet .= self::to_ruleset(
-						// We don't want to use kebabCase here,
-						// see https://github.com/WordPress/gutenberg/issues/32347
-						// However, we need to make sure the generated class
-						// doesn't contain spaces.
-						self::append_to_selector( $selector, '.has-' . preg_replace( '/\s+/', '-', $value['slug'] ) . '-' . $class['class_suffix'] ),
+						self::append_to_selector( $selector, '.has-' . gutenberg_experimental_to_kebab_case( $slug ) . '-' . $class['class_suffix'] ),
 						array(
 							array(
 								'name'  => $class['property_name'],
-								'value' => $value[ $preset['value_key'] ] . ' !important',
+								'value' => 'var(--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ) . ') !important',
 							),
 						)
 					);
@@ -706,11 +662,12 @@ class WP_Theme_JSON_Gutenberg {
 	private static function compute_preset_vars( $settings ) {
 		$declarations = array();
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = _wp_array_get( $settings, $preset['path'], array() );
-			foreach ( $values as $value ) {
+			$preset_per_origin = _wp_array_get( $settings, $preset['path'], array() );
+			$preset_by_slug    = self::get_merged_preset_by_slug( $preset_per_origin, $preset['value_key'] );
+			foreach ( $preset_by_slug as $slug => $value ) {
 				$declarations[] = array(
-					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],
-					'value' => $value[ $preset['value_key'] ],
+					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . gutenberg_experimental_to_kebab_case( $slug ),
+					'value' => $value,
 				);
 			}
 		}
@@ -1106,85 +1063,34 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Merge new incoming data.
 	 *
-	 * @param WP_Theme_JSON_Gutenberg $incoming Data to merge.
-	 * @param string                  $update_or_remove Whether update or remove existing colors
-	 *                                                  for which the incoming data has a duplicated slug.
+	 * @param WP_Theme_JSON $incoming Data to merge.
 	 */
-	public function merge( $incoming, $update_or_remove = 'remove' ) {
-		$incoming_data = $incoming->get_raw_data();
-		$existing_data = $this->theme_json;
+	public function merge( $incoming ) {
+		$incoming_data    = $incoming->get_raw_data();
+		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
 		// The array_replace_recursive algorithm merges at the leaf level.
 		// For leaf values that are arrays it will use the numeric indexes for replacement.
-		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
-
-		// There are a few cases in which we want to merge things differently
-		// from what array_replace_recursive does.
-
-		// Some incoming properties should replace the existing.
+		// In those cases, we want to replace the existing with the incoming value, if it exists.
 		$to_replace   = array();
 		$to_replace[] = array( 'custom' );
 		$to_replace[] = array( 'spacing', 'units' );
-		$to_replace[] = array( 'typography', 'fontSizes' );
-		$to_replace[] = array( 'typography', 'fontFamilies' );
-
-		// Some others should be appended to the existing.
-		// If the slug is the same than an existing element,
-		// the $update_or_remove param is used to decide
-		// what to do with the existing element:
-		// either remove it and append the incoming,
-		// or update it with the incoming.
-		$to_append   = array();
-		$to_append[] = array( 'color', 'duotone' );
-		$to_append[] = array( 'color', 'gradients' );
-		$to_append[] = array( 'color', 'palette' );
+		$to_replace[] = array( 'color', 'duotone' );
+		foreach ( self::VALID_ORIGINS as $origin ) {
+			$to_replace[] = array( 'color', 'palette', $origin );
+			$to_replace[] = array( 'color', 'gradients', $origin );
+			$to_replace[] = array( 'typography', 'fontSizes', $origin );
+			$to_replace[] = array( 'typography', 'fontFamilies', $origin );
+		}
 
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
-			foreach ( $to_replace as $path_to_replace ) {
-				$path = array_merge( $metadata['path'], $path_to_replace );
+			foreach ( $to_replace as $property_path ) {
+				$path = array_merge( $metadata['path'], $property_path );
 				$node = _wp_array_get( $incoming_data, $path, array() );
 				if ( ! empty( $node ) ) {
 					gutenberg_experimental_set( $this->theme_json, $path, $node );
 				}
-			}
-			foreach ( $to_append as $path_to_append ) {
-				$path          = array_merge( $metadata['path'], $path_to_append );
-				$incoming_node = _wp_array_get( $incoming_data, $path, array() );
-				$existing_node = _wp_array_get( $existing_data, $path, array() );
-
-				if ( empty( $incoming_node ) && empty( $existing_node ) ) {
-					continue;
-				}
-
-				$index_table    = array();
-				$existing_slugs = array();
-				$merged         = array();
-				foreach ( $existing_node as $key => $value ) {
-					$index_table[ $value['slug'] ] = $key;
-					$existing_slugs[]              = $value['slug'];
-					$merged[ $key ]                = $value;
-				}
-
-				$to_remove = array();
-				foreach ( $incoming_node as $value ) {
-					if ( ! in_array( $value['slug'], $existing_slugs, true ) ) {
-						$merged[] = $value;
-					} elseif ( 'update' === $update_or_remove ) {
-						$merged[ $index_table[ $value['slug'] ] ] = $value;
-					} else {
-						$merged[]    = $value;
-						$to_remove[] = $index_table[ $value['slug'] ];
-					}
-				}
-
-				// Remove the duplicated values and pack the sparsed array.
-				foreach ( $to_remove as $index ) {
-					unset( $merged[ $index ] );
-				}
-				$merged = array_values( $merged );
-
-				gutenberg_experimental_set( $this->theme_json, $path, $merged );
 			}
 		}
 
@@ -1255,13 +1161,14 @@ class WP_Theme_JSON_Gutenberg {
 
 		foreach ( $declarations as $declaration ) {
 			if ( self::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
-				$property = self::to_property( $declaration['name'] );
-				$path     = self::PROPERTIES_METADATA[ $property ]['value'];
-				if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
-					$declaration_divided = explode( '-', $declaration['name'] );
-					$path[]              = $declaration_divided[1];
+				$path = self::PROPERTIES_METADATA[ $declaration['name'] ];
+
+				// Check the value isn't an array before adding so as to not
+				// double up shorthand and longhand styles.
+				$value = _wp_array_get( $input, $path, array() );
+				if ( ! is_array( $value ) ) {
+					gutenberg_experimental_set( $output, $path, $value );
 				}
-				gutenberg_experimental_set( $output, $path, _wp_array_get( $input, $path, array() ) );
 			}
 		}
 		return $output;
@@ -1282,14 +1189,26 @@ class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Removes insecure data from theme.json.
+	 *
+	 * @param array $theme_json Structure to sanitize.
+	 *
+	 * @return array Sanitized structure.
 	 */
-	public function remove_insecure_properties() {
+	public static function remove_insecure_properties( $theme_json ) {
 		$sanitized = array();
 
+		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
+		}
+
+		$valid_block_names   = array_keys( self::get_blocks_metadata() );
+		$valid_element_names = array_keys( self::ELEMENTS );
+		$theme_json          = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+
 		$blocks_metadata = self::get_blocks_metadata();
-		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
+		$style_nodes     = self::get_style_nodes( $theme_json, $blocks_metadata );
 		foreach ( $style_nodes as $metadata ) {
-			$input = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
 			if ( empty( $input ) ) {
 				continue;
 			}
@@ -1300,9 +1219,9 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		$setting_nodes = self::get_setting_nodes( $this->theme_json );
+		$setting_nodes = self::get_setting_nodes( $theme_json );
 		foreach ( $setting_nodes as $metadata ) {
-			$input = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
 			if ( empty( $input ) ) {
 				continue;
 			}
@@ -1314,17 +1233,18 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		if ( empty( $sanitized['styles'] ) ) {
-			unset( $this->theme_json['styles'] );
+			unset( $theme_json['styles'] );
 		} else {
-			$this->theme_json['styles'] = $sanitized['styles'];
+			$theme_json['styles'] = $sanitized['styles'];
 		}
 
 		if ( empty( $sanitized['settings'] ) ) {
-			unset( $this->theme_json['settings'] );
+			unset( $theme_json['settings'] );
 		} else {
-			$this->theme_json['settings'] = $sanitized['settings'];
+			$theme_json['settings'] = $sanitized['settings'];
 		}
 
+		return $theme_json;
 	}
 
 	/**

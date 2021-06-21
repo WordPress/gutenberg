@@ -2,11 +2,11 @@
  * External dependencies
  */
 import {
-	capitalize,
 	first,
 	forEach,
 	get,
 	isEmpty,
+	isString,
 	kebabCase,
 	pickBy,
 	reduce,
@@ -52,12 +52,19 @@ function getPresetsDeclarations( blockPresets = {} ) {
 	return reduce(
 		PRESET_METADATA,
 		( declarations, { path, valueKey, cssVarInfix } ) => {
-			const preset = get( blockPresets, path, [] );
-			preset.forEach( ( value ) => {
-				declarations.push(
-					`--wp--preset--${ cssVarInfix }--${ value.slug }: ${ value[ valueKey ] }`
-				);
+			const presetByOrigin = get( blockPresets, path, [] );
+			[ 'core', 'theme', 'user' ].forEach( ( origin ) => {
+				if ( presetByOrigin[ origin ] ) {
+					presetByOrigin[ origin ].forEach( ( value ) => {
+						declarations.push(
+							`--wp--preset--${ cssVarInfix }--${ kebabCase(
+								value.slug
+							) }: ${ value[ valueKey ] }`
+						);
+					} );
+				}
 			} );
+
 			return declarations;
 		},
 		[]
@@ -74,26 +81,27 @@ function getPresetsDeclarations( blockPresets = {} ) {
 function getPresetsClasses( blockSelector, blockPresets = {} ) {
 	return reduce(
 		PRESET_METADATA,
-		( declarations, { path, valueKey, classes } ) => {
+		( declarations, { path, cssVarInfix, classes } ) => {
 			if ( ! classes ) {
 				return declarations;
 			}
-			const presets = get( blockPresets, path, [] );
-			presets.forEach( ( preset ) => {
-				classes.forEach( ( { classSuffix, propertyName } ) => {
-					const slug = preset.slug;
-					const value = preset[ valueKey ];
-					// We don't want to use kebabCase from lodash here
-					// see https://github.com/WordPress/gutenberg/issues/32347
-					// However, we need to make sure the generated class
-					// doesn't contain spaces.
-					const classSelectorToUse = `.has-${ slug.replace(
-						/\s+/g,
-						'-'
-					) }-${ classSuffix }`;
-					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-					declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
-				} );
+
+			const presetByOrigin = get( blockPresets, path, [] );
+			[ 'core', 'theme', 'user' ].forEach( ( origin ) => {
+				if ( presetByOrigin[ origin ] ) {
+					presetByOrigin[ origin ].forEach( ( { slug } ) => {
+						classes.forEach( ( { classSuffix, propertyName } ) => {
+							const classSelectorToUse = `.has-${ kebabCase(
+								slug
+							) }-${ classSuffix }`;
+							const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
+							const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
+								slug
+							) })`;
+							declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
+						} );
+					} );
+				}
 			} );
 			return declarations;
 		},
@@ -120,7 +128,7 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object} blockStyles   Block styles.
+ * @param {Object} blockStyles Block styles.
  *
  * @return {Array} An array of style declarations.
  */
@@ -132,21 +140,23 @@ function getStylesDeclarations( blockStyles = {} ) {
 			if ( first( pathToValue ) === 'elements' ) {
 				return declarations;
 			}
-			if ( !! properties ) {
-				properties.forEach( ( prop ) => {
-					if (
-						! get( blockStyles, [ ...pathToValue, prop ], false )
-					) {
+
+			const styleValue = get( blockStyles, pathToValue );
+
+			if ( !! properties && ! isString( styleValue ) ) {
+				Object.entries( properties ).forEach( ( entry ) => {
+					const [ name, prop ] = entry;
+
+					if ( ! get( styleValue, [ prop ], false ) ) {
 						// Do not create a declaration
 						// for sub-properties that don't have any value.
 						return;
 					}
-					const cssProperty = kebabCase(
-						`${ key }${ capitalize( prop ) }`
-					);
+
+					const cssProperty = kebabCase( name );
 					declarations.push(
 						`${ cssProperty }: ${ compileStyleValue(
-							get( blockStyles, [ ...pathToValue, prop ] )
+							get( styleValue, [ prop ] )
 						) }`
 					);
 				} );

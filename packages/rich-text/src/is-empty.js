@@ -21,7 +21,7 @@ export function isEmpty( { text } ) {
  * Check if the current collapsed selection is on an empty line in case of a
  * multiline value.
  *
- * @param  {RichTextValue} value Value te check.
+ * @param {RichTextValue} value Value te check.
  *
  * @return {boolean} True if the line is empty, false if not.
  */

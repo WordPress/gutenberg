@@ -22,17 +22,17 @@ import { store as blockEditorStore } from '../../store';
  * is meant to be locked (e.g. templateLock = "all"), then we replace the inner
  * blocks with the correct value after synchronizing it with the template.
  *
- * @param {string} clientId     The block client ID.
- * @param {Object} template     The template to match.
- * @param {string} templateLock The template lock state for the inner blocks. For
- *                              example, if the template lock is set to "all",
- *                              then the inner blocks will stay in sync with the
- *                              template. If not defined or set to false, then
- *                              the inner blocks will not be synchronized with
- *                              the given template.
+ * @param {string}  clientId                       The block client ID.
+ * @param {Object}  template                       The template to match.
+ * @param {string}  templateLock                   The template lock state for the inner blocks. For
+ *                                                 example, if the template lock is set to "all",
+ *                                                 then the inner blocks will stay in sync with the
+ *                                                 template. If not defined or set to false, then
+ *                                                 the inner blocks will not be synchronized with
+ *                                                 the given template.
  * @param {boolean} templateInsertUpdatesSelection Whether or not to update the
- *                              block-editor selection state when inner blocks
- *                              are replaced after template synchronization.
+ *                                                 block-editor selection state when inner blocks
+ *                                                 are replaced after template synchronization.
  */
 export default function useInnerBlockTemplateSync(
 	clientId,

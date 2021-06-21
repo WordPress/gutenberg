@@ -65,9 +65,9 @@ function getPrecision( value ) {
  * Clamps a value based on a min/max range with rounding
  *
  * @param {number} value The value.
- * @param {number} min The minimum range.
- * @param {number} max The maximum range.
- * @param {number} step A multiplier for the value.
+ * @param {number} min   The minimum range.
+ * @param {number} max   The maximum range.
+ * @param {number} step  A multiplier for the value.
  *
  * @return {number} The rounded and clamped value.
  */

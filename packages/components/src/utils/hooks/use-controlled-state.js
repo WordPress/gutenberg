@@ -43,8 +43,8 @@ const defaultOptions = {
  *
  * @template T
  *
- * @param {T | undefined} currentState The current value.
- * @param {Options<T>} [options=defaultOptions] Additional options for the hook.
+ * @param {T | undefined} currentState             The current value.
+ * @param {Options<T>}    [options=defaultOptions] Additional options for the hook.
  *
  * @return {[T | "", (nextState: T) => void]} The controlled value and the value setter.
  */
