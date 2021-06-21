@@ -16,6 +16,10 @@
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
 	@include reduce-motion("transition");
 
+	@include break-small() {
+		overflow: inherit;
+	}
+
 	// Borders around toolbar segments.
 	.components-toolbar-group,
 	.components-toolbar {
