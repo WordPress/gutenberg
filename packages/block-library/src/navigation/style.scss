@@ -281,11 +281,14 @@
 
 // When justified space-between, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
+// When aligned right, open all submenus leftwards.
 // This needs high specificity.
 .wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
 .wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
 .wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
-.wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child {
+.wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child,
+.wp-block-navigation.alignright .wp-block-page-list > .has-child,
+.wp-block-navigation.alignright > .wp-block-navigation__container .has-child {
 
 	// First submenu.
 	.submenu-container,

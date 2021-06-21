@@ -61,6 +61,26 @@
 	}
 }
 
+// When aligned right, open all submenus leftwards.
+// This needs high specificity.
+.wp-block[data-align="right"] > .wp-block-navigation .wp-block-page-list > .has-child,
+.wp-block[data-align="right"] > .wp-block-navigation > .wp-block-navigation__container .has-child {
+
+	// First submenu.
+	.submenu-container,
+	.wp-block-navigation-link__container {
+		left: auto;
+		right: 0;
+
+		// Nested submenus.
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			left: auto;
+			right: 100%;
+		}
+	}
+}
+
 // Show a submenu when generally dragging (is-dragging-components-draggable) if that
 // submenu has children (has-child) and is being dragged within (is-dragging-within).
 .is-dragging-components-draggable .has-child.is-dragging-within {
