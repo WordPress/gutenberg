@@ -82,6 +82,13 @@ const legacyWidgetTransforms = [
 		},
 	},
 	{
+		block: 'core/paragraph',
+		widget: 'text',
+		transform: ( { text } ) => ( {
+			content: text,
+		} ),
+	},
+	{
 		block: 'core/video',
 		widget: 'media_video',
 		transform: ( { url, preload, loop, attachment_id: id } ) => {
