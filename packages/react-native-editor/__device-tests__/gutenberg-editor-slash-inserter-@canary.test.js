@@ -37,8 +37,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			slashInserter,
-			false
+			slashInserter
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
@@ -58,8 +57,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			slashInserter,
-			false
+			slashInserter
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
@@ -69,8 +67,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		if ( isAndroid() ) {
 			await editorPage.typeTextToParagraphBlock(
 				paragraphBlockElement,
-				`${ shortText }`,
-				false
+				`${ shortText }`
 			);
 		} else {
 			await editorPage.typeTextToParagraphBlock(
@@ -98,8 +95,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			`${ slashInserter }image`,
-			false
+			`${ slashInserter }image`
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
@@ -139,7 +135,11 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			'/img\n',
+			'/img'
+		);
+		await editorPage.typeTextToParagraphBlock(
+			paragraphBlockElement,
+			'\n',
 			false
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
