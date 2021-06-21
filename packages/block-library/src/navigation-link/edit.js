@@ -200,7 +200,7 @@ export const updateNavigationLinkBlockAttributes = (
 	const kind = isCustomLink ? 'custom' : newKind;
 
 	setAttributes( {
-		...( url && { url: encodeURI( url ) } ),
+		...( url && { url: new URL( url ).toString() } ),
 		...( label && { label } ),
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
 		...( id && Number.isInteger( id ) && { id } ),
