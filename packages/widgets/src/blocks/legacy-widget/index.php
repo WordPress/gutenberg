@@ -116,5 +116,5 @@ function handle_legacy_widget_preview_iframe() {
 
 // Use admin_init instead of init to ensure get_current_screen function is already available.
 // This isn't strictly required, but enables better compatibility with existing plugins.
-// See: https://github.com/WordPress/gutenberg/issues/32624
+// See: https://github.com/WordPress/gutenberg/issues/32624.
 add_action( 'admin_init', 'handle_legacy_widget_preview_iframe', 20 );
