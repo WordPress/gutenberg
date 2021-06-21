@@ -29,19 +29,11 @@ export type PolymorphicComponent<
 	IsPolymorphic extends boolean
 > = {
 	< TT extends React.ElementType >(
-		props: PolymorphicComponentProps<
-			O,
-			TT,
-			IsPolymorphic extends true ? true : false
-		> &
+		props: PolymorphicComponentProps< O, TT, IsPolymorphic > &
 			( IsPolymorphic extends true ? { as: TT } : { as: never } )
 	): JSX.Element | null;
 	(
-		props: PolymorphicComponentProps<
-			O,
-			T,
-			IsPolymorphic extends true ? true : false
-		>
+		props: PolymorphicComponentProps< O, T, IsPolymorphic >
 	): JSX.Element | null;
 	displayName?: string;
 	/**
