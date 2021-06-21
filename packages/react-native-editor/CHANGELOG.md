@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Update loading and in-progress screens for web version of the editor [#32395]
+
 ## 1.55.1
 -   [*] Fix: RNMobile borderRadius value setting [#32717]
 -   [*] Improve unsupported block message for reusable block [#32618]
