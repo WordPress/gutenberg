@@ -19,6 +19,11 @@ import {
 import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { useIsEditablePostBlock } from '../utils/hooks';
+
 function usePostContentExcerpt( wordCount, postId, postType ) {
 	// Don't destrcuture items from content here, it can be undefined.
 	const [ , , content ] = useEntityProp(
@@ -41,11 +46,13 @@ function usePostContentExcerpt( wordCount, postId, postType ) {
 }
 
 export default function PostExcerptEditor( {
+	clientId,
 	attributes: { textAlign, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
 	context: { postId, postType },
 } ) {
+	const isEditable = useIsEditablePostBlock( clientId );
 	const [ excerpt, setExcerpt ] = useEntityProp(
 		'postType',
 		postType,
@@ -84,6 +91,23 @@ export default function PostExcerptEditor( {
 			}
 		/>
 	);
+	const excerptContent = isEditable ? (
+		<RichText
+			className={
+				! showMoreOnNewLine &&
+				'wp-block-post-excerpt__excerpt is-inline'
+			}
+			aria-label={ __( 'Post excerpt text' ) }
+			value={
+				excerpt ||
+				postContentExcerpt ||
+				( isSelected ? '' : __( 'No post excerpt found' ) )
+			}
+			onChange={ setExcerpt }
+		/>
+	) : (
+		excerpt || postContentExcerpt || __( 'No post excerpt found' )
+	);
 	return (
 		<>
 			<BlockControls>
@@ -119,19 +143,7 @@ export default function PostExcerptEditor( {
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
-				<RichText
-					className={
-						! showMoreOnNewLine &&
-						'wp-block-post-excerpt__excerpt is-inline'
-					}
-					aria-label={ __( 'Post excerpt text' ) }
-					value={
-						excerpt ||
-						postContentExcerpt ||
-						( isSelected ? '' : __( 'No post excerpt found' ) )
-					}
-					onChange={ setExcerpt }
-				/>
+				{ excerptContent }
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">

@@ -28,9 +28,9 @@ const CSS_UNITS = [
 /**
  * Control for letter-spacing.
  *
- * @param  {Object}   props                 Component props.
- * @param  {string}   props.value           Currently selected letter-spacing.
- * @param  {Function} props.onChange        Handles change in letter-spacing selection.
+ * @param {Object}   props          Component props.
+ * @param {string}   props.value    Currently selected letter-spacing.
+ * @param {Function} props.onChange Handles change in letter-spacing selection.
  * @return {WPElement}                      Letter-spacing control.
  */
 export default function LetterSpacingControl( { value, onChange } ) {

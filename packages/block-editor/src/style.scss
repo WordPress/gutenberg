@@ -58,6 +58,7 @@
 @import "./components/warning/style.scss";
 @import "./hooks/anchor.scss";
 @import "./hooks/layout.scss";
+@import "./hooks/border.scss";
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
