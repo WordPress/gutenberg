@@ -19,8 +19,8 @@ import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
 
 // Must be a function as otherwise URLInput will default
-// to the fetchLinkSuggestions passed in block editor settings.
-// This will cause an unintended http request.
+// to the fetchLinkSuggestions passed in block editor settings
+// which will cause an unintended http request.
 const noopSearchHandler = () => Promise.resolve( [] );
 
 const LinkControlSearchInput = forwardRef(
