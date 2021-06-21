@@ -1,0 +1,6 @@
+// Properly center-align the block.
+.wp-block[data-align="center"] > .wp-block-site-title {
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
