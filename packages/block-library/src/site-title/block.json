@@ -35,5 +35,6 @@
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true
 		}
-	}
+	},
+	"editorStyle": "wp-block-site-title-editor"
 }

@@ -3,5 +3,6 @@ export const PREFERENCES_DEFAULTS = {
 		fixedToolbar: false,
 		welcomeGuide: true,
 		showBlockBreadcrumbs: true,
+		themeStyles: true,
 	},
 };
