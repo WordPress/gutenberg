@@ -95,3 +95,10 @@
 		min-height: 50px;
 	}
 }
+
+.wp-block-legacy-widget {
+	.components-select-control__input {
+		padding: 0;
+		font-family: system-ui;
+	}
+}
