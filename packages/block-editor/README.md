@@ -423,6 +423,14 @@ _Returns_
 
 -   `string`: Gradient value.
 
+<a name="ImageEditingProvider" href="#ImageEditingProvider">#</a> **ImageEditingProvider**
+
+Undocumented declaration.
+
+<a name="ImageEditor" href="#ImageEditor">#</a> **ImageEditor**
+
+Undocumented declaration.
+
 <a name="InnerBlocks" href="#InnerBlocks">#</a> **InnerBlocks**
 
 _Related_
