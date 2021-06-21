@@ -13,7 +13,7 @@ import { apiFetch } from '@wordpress/data-controls';
  * Internal dependencies
  */
 import { regularFetch } from './controls';
-import { CORE_STORE_NAME as coreStoreName } from './utils/constants';
+import { STORE_NAME } from './name';
 
 /**
  * Internal dependencies
@@ -86,7 +86,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 	}
 
 	const lock = yield* __unstableAcquireStoreLock(
-		coreStoreName,
+		STORE_NAME,
 		[ 'entities', 'data', kind, name, key ],
 		{ exclusive: false }
 	);
@@ -123,7 +123,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 			// fields, so it's tested here, prior to initiating the REST request,
 			// and without causing `getEntityRecords` resolution to occur.
 			const hasRecords = yield controls.select(
-				coreStoreName,
+				STORE_NAME,
 				'hasEntityRecords',
 				kind,
 				name,
@@ -175,7 +175,7 @@ export function* getEntityRecords( kind, name, query = {} ) {
 	}
 
 	const lock = yield* __unstableAcquireStoreLock(
-		coreStoreName,
+		STORE_NAME,
 		[ 'entities', 'data', kind, name ],
 		{ exclusive: false }
 	);
@@ -370,7 +370,7 @@ export function* canUserEditEntityRecord( kind, name, recordId ) {
  */
 export function* getAutosaves( postType, postId ) {
 	const { rest_base: restBase } = yield controls.resolveSelect(
-		coreStoreName,
+		STORE_NAME,
 		'getPostType',
 		postType
 	);
@@ -394,7 +394,7 @@ export function* getAutosaves( postType, postId ) {
  */
 export function* getAutosave( postType, postId ) {
 	yield controls.resolveSelect(
-		coreStoreName,
+		STORE_NAME,
 		'getAutosaves',
 		postType,
 		postId
@@ -427,7 +427,7 @@ export function* __experimentalGetTemplateForLink( link ) {
 
 	yield getEntityRecord( 'postType', 'wp_template', template.id );
 	const record = yield controls.select(
-		coreStoreName,
+		STORE_NAME,
 		'getEntityRecord',
 		'postType',
 		'wp_template',
