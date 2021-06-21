@@ -17,6 +17,10 @@
 		margin: 0 (-$grid-unit-20) (-$grid-unit-20) (-$grid-unit-20);
 		padding: $grid-unit-20;
 	}
+
+	.block-list-appender.wp-block {
+		width: initial;
+	}
 }
 
 // Add some spacing above the inner blocks so that the block toolbar doesn't
