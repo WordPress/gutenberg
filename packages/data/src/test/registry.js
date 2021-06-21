@@ -9,6 +9,7 @@ import { castArray, mapValues } from 'lodash';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
+import { STORE_NAME } from '../store/name';
 
 jest.useFakeTimers();
 
@@ -376,7 +377,7 @@ describe( 'createRegistry', () => {
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
 					registry
-						.select( 'core/data' )
+						.select( STORE_NAME )
 						.hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
@@ -403,7 +404,7 @@ describe( 'createRegistry', () => {
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
 					registry
-						.select( 'core/data' )
+						.select( STORE_NAME )
 						.hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 

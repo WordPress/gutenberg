@@ -183,8 +183,8 @@ tasks.register('checkIfVersionIsAlreadyPublished') {
 
     if (responseCode == 200) {
         throw new GradleException("'$publishReactNativeBridgeVersion' is already published, please use a different version name. If this happened in CI for a PR, a new commit is necessary. If this happened for a tag, the existing version needs to be manually removed from S3.")
-    } else if (responseCode == 403) {
-        // S3 returns 403 status code if a file doesn't exist, which is what we want. Proceed to publish..
+    } else if (responseCode == 403 || responseCode == 404) {
+        // If a file doesn't exist, which is what we want, S3 returns 403 if we don't have the List ACL or 404 if we do have the List ACL. Proceed to publish in those cases.
     } else {
         throw new GradleException("An unexpected status code ($responseCode) was received while checking if the version ($publishReactNativeBridgeVersion) is already published to S3. If this issue persists, please contact Platform 9 team for help.")
     }
