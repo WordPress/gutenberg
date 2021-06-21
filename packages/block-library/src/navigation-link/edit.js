@@ -200,7 +200,7 @@ export const updateNavigationLinkBlockAttributes = (
 	const kind = isCustomLink ? 'custom' : newKind;
 
 	setAttributes( {
-		// To prevent double application of encodeURI, decodeURI is executed to revert to the original string.
+		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
 		...( url && { url: encodeURI( safeDecodeURI( url ) ) } ),
 		...( label && { label } ),
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
