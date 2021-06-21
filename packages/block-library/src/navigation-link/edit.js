@@ -30,7 +30,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP } from '@wordpress/url';
+import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import {
 	Fragment,
 	useState,
@@ -201,7 +201,7 @@ export const updateNavigationLinkBlockAttributes = (
 
 	setAttributes( {
 		// To prevent double application of encodeURI, decodeURI is executed to revert to the original string.
-		...( url && { url: encodeURI( decodeURI( url ) ) } ),
+		...( url && { url: encodeURI( safeDecodeURI( url ) ) } ),
 		...( label && { label } ),
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
 		...( id && Number.isInteger( id ) && { id } ),
