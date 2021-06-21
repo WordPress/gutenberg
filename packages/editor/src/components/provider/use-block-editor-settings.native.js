@@ -16,7 +16,7 @@ function useNativeBlockEditorSettings( settings, hasTemplate ) {
 	const editorSettings = useBlockEditorSettings( settings, hasTemplate );
 
 	const supportReusableBlock = capabilities.reusableBlock === true;
-	const { isTitleSelected, reusableBlocks } = useSelect(
+	const { reusableBlocks } = useSelect(
 		( select ) => ( {
 			reusableBlocks: supportReusableBlock
 				? select( coreStore ).getEntityRecords(
@@ -27,10 +27,13 @@ function useNativeBlockEditorSettings( settings, hasTemplate ) {
 						{ per_page: 100 }
 				  )
 				: [],
-			isTitleSelected: select( editorStore ).isPostTitleSelected(),
 		} ),
 		[ supportReusableBlock ]
 	);
+
+	const { isTitleSelected } = useSelect( ( select ) => ( {
+		isTitleSelected: select( editorStore ).isPostTitleSelected(),
+	} ) );
 
 	return useMemo(
 		() => ( {
