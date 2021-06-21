@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import CardMedia from '../media';
+import { CardMedia } from '../';
 
 describe( 'CardMedia', () => {
 	describe( 'basic rendering', () => {

@@ -11,7 +11,11 @@ import { createComponent } from '../ui/utils';
  *
  * @example
  * ```jsx
- * import { Elevation, Surface, Text, View } from `@wordpress/components`;
+ * import {
+ *	__experimentalElevation as Elevation,
+ *	__experimentalSurface as Surface,
+ *	__experimentalText as Text,
+ * } from '@wordpress/components';
  *
  * function Example() {
  * 	return (

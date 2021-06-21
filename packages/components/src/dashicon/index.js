@@ -1,8 +1,8 @@
 /**
  * @typedef OwnProps
  *
- * @property {import('./types').IconKey} icon Icon name
- * @property {string} [className] Class name
+ * @property {import('./types').IconKey} icon        Icon name
+ * @property {string}                    [className] Class name
  */
 /** @typedef {import('react').ComponentPropsWithoutRef<'span'> & OwnProps} Props */
 

@@ -1537,15 +1537,11 @@ describe( 'block factory', () => {
 			// to keep the existing block's client ID.
 			expect( transformedBlocks ).toHaveLength( 2 );
 			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
-			expect( transformedBlocks[ 0 ].clientId ).not.toBe(
-				block.clientId
-			);
 			expect( transformedBlocks[ 0 ].name ).toBe( 'core/text-block' );
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
-			expect( transformedBlocks[ 1 ].clientId ).toBe( block.clientId );
 			expect( transformedBlocks[ 1 ] ).toHaveProperty( 'clientId' );
 			expect( transformedBlocks[ 1 ].name ).toBe(
 				'core/updated-text-block'

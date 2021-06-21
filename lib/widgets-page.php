@@ -21,6 +21,50 @@ function the_gutenberg_widgets() {
 }
 
 /**
+ * Creates an array of theme styles to load into the block editor.
+ *
+ * @since 5.8.0
+ *
+ * @global array $editor_styles
+ *
+ * @return array
+ */
+function gutenberg_get_block_editor_theme_styles() {
+	global $editor_styles;
+
+	$styles = array(
+		array(
+			'css'            => 'body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif }',
+			'__unstableType' => 'core',
+		),
+	);
+	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
+		foreach ( $editor_styles as $style ) {
+			if ( preg_match( '~^(https?:)?//~', $style ) ) {
+				$response = wp_remote_get( $style );
+				if ( ! is_wp_error( $response ) ) {
+					$styles[] = array(
+						'css'            => wp_remote_retrieve_body( $response ),
+						'__unstableType' => 'theme',
+					);
+				}
+			} else {
+				$file = get_theme_file_path( $style );
+				if ( is_file( $file ) ) {
+					$styles[] = array(
+						'css'            => file_get_contents( $file ),
+						'baseURL'        => get_theme_file_uri( $style ),
+						'__unstableType' => 'theme',
+					);
+				}
+			}
+		}
+	}
+
+	return $styles;
+}
+
+/**
  * Initialize the Gutenberg widgets page.
  *
  * @since 5.2.0
@@ -37,7 +81,8 @@ function gutenberg_widgets_init( $hook ) {
 	$widgets_editor_context = new WP_Block_Editor_Context();
 	$settings               = array_merge(
 		gutenberg_get_default_block_editor_settings(),
-		gutenberg_get_legacy_widget_settings()
+		gutenberg_get_legacy_widget_settings(),
+		array( 'styles' => gutenberg_get_block_editor_theme_styles() )
 	);
 
 	// This purposefully does not rely on apply_filters( 'block_editor_settings', $settings, null );
@@ -103,3 +148,59 @@ add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_ed
 function gutenberg_widgets_editor_add_admin_body_classes( $classes ) {
 	return "$classes block-editor-page wp-embed-responsive";
 }
+
+/**
+ * Emulates the Widgets screen `admin_print_styles` when at the block editor
+ * screen.
+ */
+function gutenberg_block_editor_admin_print_styles() {
+	if ( is_callable( 'get_current_screen' ) && 'appearance_page_gutenberg-widgets' === get_current_screen()->base ) {
+		/** This action is documented in wp-admin/admin-footer.php */
+		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		do_action( 'admin_print_styles-widgets.php' );
+	}
+}
+add_action( 'admin_print_styles', 'gutenberg_block_editor_admin_print_styles' );
+
+/**
+ * Emulates the Widgets screen `admin_print_scripts` when at the block editor
+ * screen.
+ */
+function gutenberg_block_editor_admin_print_scripts() {
+	if ( is_callable( 'get_current_screen' ) && 'appearance_page_gutenberg-widgets' === get_current_screen()->base ) {
+		/** This action is documented in wp-admin/includes/ajax-actions.php */
+		do_action( 'load-widgets.php' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		/** This action is documented in wp-admin/includes/ajax-actions.php */
+		do_action( 'widgets.php' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		/** This action is documented in wp-admin/widgets.php */
+		do_action( 'sidebar_admin_setup' );
+		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		do_action( 'admin_print_scripts-widgets.php' );
+	}
+}
+add_action( 'admin_print_scripts', 'gutenberg_block_editor_admin_print_scripts' );
+
+/**
+ * Emulates the Widgets screen `admin_print_footer_scripts` when at the block
+ * editor screen.
+ */
+function gutenberg_block_editor_admin_print_footer_scripts() {
+	if ( is_callable( 'get_current_screen' ) && 'appearance_page_gutenberg-widgets' === get_current_screen()->base ) {
+		/** This action is documented in wp-admin/admin-footer.php */
+		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		do_action( 'admin_print_footer_scripts-widgets.php' );
+	}
+}
+add_action( 'admin_print_footer_scripts', 'gutenberg_block_editor_admin_print_footer_scripts' );
+
+/**
+ * Emulates the Widgets screen `admin_footer` when at the block editor screen.
+ */
+function gutenberg_block_editor_admin_footer() {
+	if ( is_callable( 'get_current_screen' ) && 'appearance_page_gutenberg-widgets' === get_current_screen()->base ) {
+		/** This action is documented in wp-admin/admin-footer.php */
+		// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		do_action( 'admin_footer-widgets.php' );
+	}
+}
+add_action( 'admin_footer', 'gutenberg_block_editor_admin_footer' );

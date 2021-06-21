@@ -15,8 +15,9 @@ import {
  * so they can be laid out in a more flexible manner within the Typography
  * InspectorControls panel.
  *
- * @param  {Object}   props Block props to be passed on to individual controls.
- * @return {WPElement}      Component containing text decoration or transform controls.
+ * @param {Object} props Block props to be passed on to individual controls.
+ *
+ * @return {WPElement} Component containing text decoration or transform controls.
  */
 export default function TextDecorationAndTransformEdit( props ) {
 	const decorationAvailable = ! useIsTextDecorationDisabled( props );

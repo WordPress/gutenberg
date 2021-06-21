@@ -112,6 +112,19 @@ selectorNames.forEach( ( name ) => {
 			getAutosave() {
 				return state.getAutosave && state.getAutosave();
 			},
+
+			getPostType() {
+				const postTypeLabel = {
+					post: 'Post',
+					page: 'Page',
+				}[ state.postType ];
+
+				return {
+					labels: {
+						singular_name: postTypeLabel,
+					},
+				};
+			},
 		} );
 
 		selectorNames.forEach( ( otherName ) => {
@@ -169,6 +182,7 @@ const {
 	isPostSavingLocked,
 	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
+	getPostTypeLabel,
 	__experimentalGetDefaultTemplateType,
 	__experimentalGetDefaultTemplateTypes,
 	__experimentalGetTemplateInfo,
@@ -3023,6 +3037,37 @@ describe( 'selectors', () => {
 				title: 'template part, area = footer',
 				icon: footer,
 			} );
+		} );
+	} );
+
+	describe( 'getPostTypeLabel', () => {
+		it( 'should return the correct label for the current post type', () => {
+			const postTypes = [
+				{
+					state: {
+						postType: 'page',
+					},
+					expected: 'Page',
+				},
+				{
+					state: {
+						postType: 'post',
+					},
+					expected: 'Post',
+				},
+			];
+
+			postTypes.forEach( ( { state, expected } ) =>
+				expect( getPostTypeLabel( state ) ).toBe( expected )
+			);
+		} );
+
+		it( 'should return `undefined` when the post type label does not exist', () => {
+			const postTypes = [ {}, { postType: 'humpty' } ];
+
+			postTypes.forEach( ( state ) =>
+				expect( getPostTypeLabel( state ) ).toBeUndefined()
+			);
 		} );
 	} );
 } );

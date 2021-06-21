@@ -1,7 +1,7 @@
 /**
  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
  * @typedef OwnProps
- * @property {T} [as='div'] Component to render
+ * @property {T}                                                                                        [as='div'] Component to render
  * @property {import('react').ReactNode | ((props: import('react').ComponentProps<T>) => JSX.Element) } [children] Children or render props function
  */
 

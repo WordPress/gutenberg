@@ -106,4 +106,10 @@ module.exports = {
 		paddingLeft: 10,
 		paddingRight: 10,
 	},
+	'block-types-list__column': {
+		padding: 10,
+	},
+	floatingToolbar: {
+		height: 10,
+	},
 };

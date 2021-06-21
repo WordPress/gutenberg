@@ -29,11 +29,24 @@ export default function AllInputControl( {
 
 	const handleOnChange = ( next ) => {
 		const nextValues = { ...values };
-		const selectedSides = sides?.length
-			? sides
-			: [ 'top', 'right', 'bottom', 'left' ];
 
-		selectedSides.forEach( ( side ) => ( nextValues[ side ] = next ) );
+		if ( sides?.length ) {
+			sides.forEach( ( side ) => {
+				if ( side === 'vertical' ) {
+					nextValues.top = next;
+					nextValues.bottom = next;
+				} else if ( side === 'horizontal' ) {
+					nextValues.left = next;
+					nextValues.right = next;
+				} else {
+					nextValues[ side ] = next;
+				}
+			} );
+		} else {
+			[ 'top', 'right', 'bottom', 'left' ].forEach(
+				( side ) => ( nextValues[ side ] = next )
+			);
+		}
 
 		onChange( nextValues );
 	};

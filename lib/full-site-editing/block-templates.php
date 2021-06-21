@@ -290,7 +290,8 @@ function _gutenberg_build_template_result_from_post( $post ) {
  *     Optional. Arguments to retrieve templates.
  *
  *     @type array  $slug__in List of slugs to include.
- *     @type int    $wp_id Post ID of customized template.
+ *     @type int    $wp_id    Post ID of customized template.
+ *     @type string $area     A 'wp_template_part_area' taxonomy value to filter by (for wp_template_part template type only).
  * }
  * @param array $template_type wp_template or wp_template_part.
  *
@@ -333,7 +334,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 
 	$template_query = new WP_Query( $wp_query_args );
 	$query_result   = array();
-	foreach ( $template_query->get_posts() as $post ) {
+	foreach ( $template_query->posts as $post ) {
 		$template = _gutenberg_build_template_result_from_post( $post );
 
 		if ( ! is_wp_error( $template ) ) {
@@ -392,7 +393,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		),
 	);
 	$template_query       = new WP_Query( $wp_query_args );
-	$posts                = $template_query->get_posts();
+	$posts                = $template_query->posts;
 
 	if ( count( $posts ) > 0 ) {
 		$template = _gutenberg_build_template_result_from_post( $posts[0] );
@@ -477,7 +478,7 @@ function gutenberg_filter_wp_template_unique_post_slug( $override_slug, $slug, $
 		),
 	);
 	$check_query      = new WP_Query( $check_query_args );
-	$posts            = $check_query->get_posts();
+	$posts            = $check_query->posts;
 
 	if ( count( $posts ) > 0 ) {
 		$suffix = 2;
@@ -487,7 +488,7 @@ function gutenberg_filter_wp_template_unique_post_slug( $override_slug, $slug, $
 			$query_args['post_name__in'] = array( $alt_post_name );
 			$query                       = new WP_Query( $query_args );
 			$suffix++;
-		} while ( count( $query->get_posts() ) > 0 );
+		} while ( count( $query->posts ) > 0 );
 		$override_slug = $alt_post_name;
 	}
 

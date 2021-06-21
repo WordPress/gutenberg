@@ -64,16 +64,20 @@ export default function WidgetAreaEdit( {
 				scrollAfterOpen={ ! isDragging }
 			>
 				{ ( { opened } ) => (
-					// This is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
-					// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
+					// This is required to ensure LegacyWidget blocks are not
+					// unmounted when the panel is collapsed. Unmounting legacy
+					// widgets may have unintended consequences (e.g.  TinyMCE
+					// not being properly reinitialized)
 					<DisclosureContent visible={ opened }>
-						<EntityProvider
-							kind="root"
-							type="postType"
-							id={ `widget-area-${ id }` }
-						>
-							<WidgetAreaInnerBlocks />
-						</EntityProvider>
+						<div className="editor-styles-wrapper">
+							<EntityProvider
+								kind="root"
+								type="postType"
+								id={ `widget-area-${ id }` }
+							>
+								<WidgetAreaInnerBlocks />
+							</EntityProvider>
+						</div>
 					</DisclosureContent>
 				) }
 			</PanelBody>

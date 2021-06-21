@@ -24,7 +24,7 @@ import QueryInspectorControls from './query-inspector-controls';
 import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
-const TEMPLATE = [ [ 'core/query-loop' ] ];
+const TEMPLATE = [ [ 'core/post-template' ] ];
 export function QueryContent( { attributes, setAttributes } ) {
 	const {
 		queryId,
@@ -49,7 +49,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 		if ( themeSupportsLayout ) {
 			const alignments =
 				contentSize || wideSize
-					? [ 'wide', 'full' ]
+					? [ 'wide', 'full', 'left', 'center', 'right' ]
 					: [ 'left', 'center', 'right' ];
 			return {
 				type: 'default',
