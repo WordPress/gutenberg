@@ -21,6 +21,50 @@ function the_gutenberg_widgets() {
 }
 
 /**
+ * Creates an array of theme styles to load into the block editor.
+ *
+ * @since 5.8.0
+ *
+ * @global array $editor_styles
+ *
+ * @return array
+ */
+function gutenberg_get_block_editor_theme_styles() {
+	global $editor_styles;
+
+	$styles = array(
+		array(
+			'css'            => 'body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif }',
+			'__unstableType' => 'core',
+		),
+	);
+	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
+		foreach ( $editor_styles as $style ) {
+			if ( preg_match( '~^(https?:)?//~', $style ) ) {
+				$response = wp_remote_get( $style );
+				if ( ! is_wp_error( $response ) ) {
+					$styles[] = array(
+						'css'            => wp_remote_retrieve_body( $response ),
+						'__unstableType' => 'theme',
+					);
+				}
+			} else {
+				$file = get_theme_file_path( $style );
+				if ( is_file( $file ) ) {
+					$styles[] = array(
+						'css'            => file_get_contents( $file ),
+						'baseURL'        => get_theme_file_uri( $style ),
+						'__unstableType' => 'theme',
+					);
+				}
+			}
+		}
+	}
+
+	return $styles;
+}
+
+/**
  * Initialize the Gutenberg widgets page.
  *
  * @since 5.2.0
@@ -37,7 +81,8 @@ function gutenberg_widgets_init( $hook ) {
 	$widgets_editor_context = new WP_Block_Editor_Context();
 	$settings               = array_merge(
 		gutenberg_get_default_block_editor_settings(),
-		gutenberg_get_legacy_widget_settings()
+		gutenberg_get_legacy_widget_settings(),
+		array( 'styles' => gutenberg_get_block_editor_theme_styles() )
 	);
 
 	// This purposefully does not rely on apply_filters( 'block_editor_settings', $settings, null );
