@@ -110,8 +110,6 @@ describe( 'Post Editor Template mode', () => {
 			wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
 
-		await createNewTemplate( 'Blank Template' );
-
 		// Save the post
 		// Saving shouldn't be necessary but unfortunately,
 		// there's a template resolution bug forcing us to do so.

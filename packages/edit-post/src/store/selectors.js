@@ -372,7 +372,7 @@ export const getEditedPostTemplate = createRegistrySelector(
 		const currentTemplate = select( editorStore ).getEditedPostAttribute(
 			'template'
 		);
-		if ( currentTemplate !== null ) {
+		if ( currentTemplate ) {
 			const templateWithSameSlug = select( coreStore )
 				.getEntityRecords( 'postType', 'wp_template' )
 				?.find( ( template ) => template.slug === currentTemplate );
