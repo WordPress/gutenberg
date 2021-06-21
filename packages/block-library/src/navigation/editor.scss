@@ -18,6 +18,12 @@
 	display: inline-block;
 }
 
+// Properly center-align the block.
+.wp-block[data-align="center"] > .wp-block-navigation {
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
 
 /**
  * Submenus.

@@ -76,6 +76,13 @@
 			stroke: currentColor;
 		}
 	}
+
+	// Properly center-align the block.
+	&.aligncenter {
+		display: table;
+		margin-left: auto;
+		margin-right: auto;
+	}
 }
 
 
