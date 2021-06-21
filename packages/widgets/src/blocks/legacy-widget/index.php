@@ -24,11 +24,11 @@ function render_block_core_legacy_widget( $attributes ) {
 		return '';
 	}
 
-	$base_id = $attributes['idBase'];
+	$id_base = $attributes['idBase'];
 	if ( method_exists( $wp_widget_factory, 'get_widget_key' ) ) {
-		$widget_key = $wp_widget_factory->get_widget_key( $base_id );
+		$widget_key = $wp_widget_factory->get_widget_key( $id_base );
 	} else {
-		$widget_key = gutenberg_get_widget_key( $base_id );
+		$widget_key = gutenberg_get_widget_key( $id_base );
 	}
 
 	if ( ! $widget_key ) {
