@@ -1,3 +1,12 @@
+// When wide widget is selected and not in navigation mode (.is-visible) its
+// form opens in a popover but its container should still have a bit of height.
+.is-selected {
+	.is-visible.wp-block-legacy-widget__container {
+		padding: $grid-unit-10 $grid-unit-15;
+		min-height: 50px;
+	}
+}
+
 .wp-block-legacy-widget__edit-form {
 	&:not([hidden]) {
 		display: flow-root;
@@ -15,11 +24,7 @@
 		left: 299px;
 		border-radius: 0;
 		border: 1px solid #dcdcde;
-		display: none;
-
-		&.is-visible {
-			display: block;
-		}
+		min-width: 400px;
 	}
 
 	.wp-block-legacy-widget__edit-form-title {
@@ -159,19 +164,6 @@
 .interface-complementary-area .wp-block-legacy-widget-inspector-card__name {
 	margin: 0 0 5px;
 	font-weight: 500;
-}
-
-// When wide widget is selected it opens in a popover but its container should still have a bit of height.
-.is-selected {
-	.wp-block-legacy-widget__container {
-		padding: $grid-unit-10 $grid-unit-15;
-		min-height: 50px;
-	}
-}
-
-// Wide widgets opening in popovers in the Customizer should have a min-width
-.components-popover__content .wp-block-legacy-widget__edit-form {
-	min-width: 400px;
 }
 
 .wp-block-legacy-widget {

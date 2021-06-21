@@ -8,8 +8,10 @@ import classnames from 'classnames';
 import { useRef, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf  } from '@wordpress/i18n';
+import { Fill } from '@wordpress/components';
 import {
+	useRefEffect,
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
@@ -27,6 +29,7 @@ export default function Form( {
 	isWide,
 	onChangeInstance,
 	onChangeHasPreview,
+	onClose,
 } ) {
 	const ref = useRef();
 
@@ -89,33 +92,45 @@ export default function Form( {
 		onChangeInstance,
 		onChangeHasPreview,
 		isMediumLargeViewport,
+		isWide,
 	] );
 
-	const [ dialogRef, dialogProps ] = useDialog( {
-		focusOnMount: false,
-	} );
+	// Moves the form in and out of the dialog on mount and unmount.
+	const dialogContentRef = useRefEffect( ( node ) => {
+		if ( node ) {
+			node.appendChild( ref.current.firstElementChild );
+			return () => {
+				ref.current.appendChild( node.firstElementChild );
+			};
+		}
+	}, [] );
+
+	const [ dialogRef, dialogProps ] = useDialog( { onClose } );
 
 	if ( isWide && isMediumLargeViewport ) {
 		return (
-			<div className="wp-block-legacy-widget__container">
+			<div
+				className={ classnames( 'wp-block-legacy-widget__container', {
+					'is-visible': isVisible,
+				} ) }
+			>
 				{ isVisible && (
 					<h3 className="wp-block-legacy-widget__edit-form-title">
 						{ title }
 					</h3>
 				) }
-				<div
-					className={ classnames(
-						'wp-block-legacy-widget__edit-form',
-						'is-wide',
-						{
-							'is-visible': isVisible,
-						}
+				<div ref={ ref } hidden></div>
+				<Fill name="Popover">
+					{ isVisible && (
+						<div
+							className="wp-block-legacy-widget__edit-form is-wide"
+							ref={ dialogRef }
+							{ ...dialogProps }
+						>
+							<div ref={ dialogContentRef }></div>
+						</div>
 					) }
-					ref={ dialogRef }
-					{ ...dialogProps }
-				>
-					<div ref={ ref } hidden={ ! isVisible }></div>
-				</div>
+				</Fill>
 			</div>
 		);
 	}

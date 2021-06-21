@@ -16,7 +16,7 @@ import {
 import { Spinner, Placeholder } from '@wordpress/components';
 import { brush as brushIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -93,6 +93,7 @@ function NotEmpty( {
 	isWide = false,
 } ) {
 	const [ hasPreview, setHasPreview ] = useState( null );
+	const [ mode, setMode ] = useState( 'preview' );
 
 	const { widgetType, hasResolvedWidgetType, isNavigationMode } = useSelect(
 		( select ) => {
@@ -112,6 +113,10 @@ function NotEmpty( {
 		setAttributes( { instance: nextInstance } );
 	}, [] );
 
+	useEffect( () => {
+		setMode( isNavigationMode || ! isSelected ? 'preview' : 'edit' );
+	}, [ isNavigationMode, isSelected ] );
+
 	if ( ! widgetType && hasResolvedWidgetType ) {
 		return (
 			<Placeholder
@@ -130,9 +135,6 @@ function NotEmpty( {
 			</Placeholder>
 		);
 	}
-
-	const mode =
-		idBase && ( isNavigationMode || ! isSelected ) ? 'preview' : 'edit';
 
 	return (
 		<>
@@ -161,6 +163,7 @@ function NotEmpty( {
 				isWide={ isWide }
 				onChangeInstance={ setInstance }
 				onChangeHasPreview={ setHasPreview }
+				onClose={ () => setMode( 'preview' ) }
 			/>
 
 			{ idBase && (
@@ -178,7 +181,10 @@ function NotEmpty( {
 						/>
 					) }
 					{ hasPreview === false && mode === 'preview' && (
-						<NoPreview name={ widgetType.name } />
+						<NoPreview
+							name={ widgetType.name }
+							onClick={ () => setMode( 'edit' ) }
+						/>
 					) }
 				</>
 			) }
