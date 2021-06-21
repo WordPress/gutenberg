@@ -44,11 +44,11 @@ Determines the amount of padding within the component.
 
 This component provides a collection of sub-component that can be used to compose various interfaces.
 
--   [`<CardBody />`](../card-body/README.md)
--   [`<CardDivider />`](../card-divider/README.md)
--   [`<CardFooter />`](../card-footer/README.md)
--   [`<CardHeader />`](../card-header/README.md)
--   [`<CardMedia />`](../card-media/README.md)
+-   [`<CardBody />`](/packages/components/src/card/card-body/README.md)
+-   [`<CardDivider />`](/packages/components/src/card/card-divider/README.md)
+-   [`<CardFooter />`](/packages/components/src/card/card-footer/README.md)
+-   [`<CardHeader />`](/packages/components/src/card/card-header/README.md)
+-   [`<CardMedia />`](/packages/components/src/card/card-media/README.md)
 
 ### Sub-Components Example
 

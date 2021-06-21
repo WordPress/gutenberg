@@ -1,6 +1,6 @@
 # CardBody
 
-CardBody renders an optional content area for a [`<Card />`](../).
+CardBody renders an optional content area for a [`<Card />`](/packages/components/src/card/card/README.md).
 
 ## Usage
 
@@ -32,4 +32,4 @@ Determines the amount of padding within the component.
 -   Required: No
 -   Default: `medium`
 
-Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.
+Note: This component is connected to [`<Card />`'s Context](/packages/components/src/card/card/README.md#context). Passing props directly to this component will override the props derived from context.
