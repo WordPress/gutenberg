@@ -59,7 +59,7 @@ function useInsertionPoint( {
 			let _destinationRootClientId = rootClientId;
 			let _destinationIndex;
 
-			if ( insertionIndex ) {
+			if ( insertionIndex !== undefined ) {
 				// Insert into a specific index.
 				_destinationIndex = insertionIndex;
 			} else if ( clientId ) {
