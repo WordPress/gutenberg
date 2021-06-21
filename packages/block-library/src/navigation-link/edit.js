@@ -240,7 +240,14 @@ export default function NavigationLinkEdit( {
 		url,
 		opensInNewTab,
 	};
-	const { style, showSubmenuIcon } = context;
+	const {
+		style,
+		showSubmenuIcon,
+		overlayTextColor,
+		customOverlayTextColor,
+		overlayBackgroundColor,
+		customOverlayBackgroundColor,
+	} = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
@@ -323,14 +330,13 @@ export default function NavigationLinkEdit( {
 
 		// Override colors for submenus if they have been set by the parent Navigation block
 		if ( ! isTopLevelLink ) {
-			colors.textColor = context.overlayTextColor ?? colors.textColor;
+			colors.textColor = overlayTextColor ?? colors.textColor;
 			colors.backgroundColor =
-				context.overlayBackgroundColor ?? colors.backgroundColor;
+				overlayBackgroundColor ?? colors.backgroundColor;
 			colors.customTextColor =
-				context.customOverlayTextColor ?? colors.customTextColor;
+				customOverlayTextColor ?? colors.customTextColor;
 			colors.customBackgroundColor =
-				context.customOverlayBackgroundColor ??
-				colors.customBackgroundColor;
+				customOverlayBackgroundColor ?? colors.customBackgroundColor;
 		}
 
 		setAttributes( {
@@ -339,14 +345,14 @@ export default function NavigationLinkEdit( {
 		} );
 	}, [
 		isTopLevelLink,
+		overlayTextColor,
+		overlayBackgroundColor,
+		customOverlayTextColor,
+		customOverlayBackgroundColor,
 		context.textColor,
-		context.overlayTextColor,
 		context.backgroundColor,
-		context.overlayBackgroundColor,
 		context.customTextColor,
 		context.customBackgroundColor,
-		context.customOverlayTextColor,
-		context.customOverlayBackgroundColor,
 		style?.color?.text,
 		style?.color?.background,
 	] );
@@ -459,20 +465,23 @@ export default function NavigationLinkEdit( {
 		blockProps.onClick = () => setIsLinkOpen( true );
 	}
 
+	// Always use overlay colors for submenus
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: classnames( 'wp-block-navigation-link__container', {
 				'is-parent-of-selected-block': isParentOfSelectedBlock,
-				'has-text-color': !! ( textColor || customTextColor ),
-				[ `has-${ textColor }-color` ]: !! textColor,
-				'has-background': !! (
-					backgroundColor || customBackgroundColor
+				'has-text-color': !! (
+					overlayTextColor || customOverlayTextColor
 				),
-				[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+				[ `has-${ overlayTextColor }-color` ]: !! overlayTextColor,
+				'has-background': !! (
+					overlayBackgroundColor || customOverlayBackgroundColor
+				),
+				[ `has-${ overlayBackgroundColor }-background-color` ]: !! overlayBackgroundColor,
 			} ),
 			style: {
-				color: customTextColor,
-				backgroundColor: customBackgroundColor,
+				color: customOverlayTextColor,
+				backgroundColor: customOverlayBackgroundColor,
 			},
 		},
 		{
