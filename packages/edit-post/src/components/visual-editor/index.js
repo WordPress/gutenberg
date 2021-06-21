@@ -119,7 +119,7 @@ export default function VisualEditor( { styles } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
-		minHeight: '100%',
+		height: '100%',
 		width: '100%',
 		margin: 0,
 		display: 'flex',
