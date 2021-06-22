@@ -196,7 +196,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['typography']['customLineHeight'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
-		$editor_settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
+		$settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['customPadding'] ) ) {
 		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['customPadding'];
