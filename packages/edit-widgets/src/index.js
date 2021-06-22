@@ -24,14 +24,16 @@ import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
-import { ALLOW_REUSABLE_BLOCKS } from './constants';
+import {
+	ALLOW_REUSABLE_BLOCKS,
+	ENABLE_EXPERIMENTAL_FSE_BLOCKS,
+} from './constants';
 
-const DISABLED_BLOCKS = [
+const disabledBlocks = [
 	'core/more',
 	'core/freeform',
 	...( ! ALLOW_REUSABLE_BLOCKS && [ 'core/block' ] ),
 ];
-const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -42,7 +44,7 @@ const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
 export function initialize( id, settings ) {
 	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
 		return ! (
-			DISABLED_BLOCKS.includes( block.name ) ||
+			disabledBlocks.includes( block.name ) ||
 			block.name.startsWith( 'core/post' ) ||
 			block.name.startsWith( 'core/query' ) ||
 			block.name.startsWith( 'core/site' )
