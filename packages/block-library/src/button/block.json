@@ -73,6 +73,13 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalDimensions": {
+			"width": "segmented",
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"width": true
+			}
+		},
 		"reusable": false,
 		"spacing": {
 			"__experimentalSkipSerialization": true,

@@ -14,17 +14,13 @@ import {
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import getWidthClassesAndStyles from './get-width-classes-and-styles';
+
 export default function save( { attributes, className } ) {
-	const {
-		fontSize,
-		linkTarget,
-		rel,
-		style,
-		text,
-		title,
-		url,
-		width,
-	} = attributes;
+	const { fontSize, linkTarget, rel, style, text, title, url } = attributes;
 
 	if ( ! text ) {
 		return null;
@@ -53,13 +49,18 @@ export default function save( { attributes, className } ) {
 	// if it had already been assigned, for the sake of backward-compatibility.
 	// A title will no longer be assigned for new or updated button block links.
 
-	const wrapperClasses = classnames( className, {
-		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+	const widthProps = getWidthClassesAndStyles( attributes );
+	const wrapperClasses = classnames( className, widthProps.className, {
 		[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
 	} );
 
 	return (
-		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+		<div
+			{ ...useBlockProps.save( {
+				className: wrapperClasses,
+				style: widthProps.style,
+			} ) }
+		>
 			<RichText.Content
 				tagName="a"
 				className={ buttonClasses }
