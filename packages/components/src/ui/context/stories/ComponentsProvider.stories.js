@@ -36,7 +36,7 @@ const outerContext = {
 const innerContext = {
 	Card: {
 		style: {
-			background: 'white',
+			background: 'rgba(35, 255, 55, 0.2)',
 		},
 	},
 	CardBody: {
