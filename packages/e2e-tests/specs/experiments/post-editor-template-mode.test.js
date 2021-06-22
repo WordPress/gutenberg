@@ -9,7 +9,6 @@ import {
 	trashAllPosts,
 	openPreviewPage,
 	openDocumentSettingsSidebar,
-	closeDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 const openSidebarPanelWithTitle = async ( title ) => {
@@ -61,8 +60,6 @@ const createNewTemplate = async ( templateName ) => {
 	await disableTemplateWelcomeGuide();
 
 	// Create a new custom template.
-	await openDocumentSettingsSidebar();
-	await closeDocumentSettingsSidebar();
 	await openDocumentSettingsSidebar();
 	await openSidebarPanelWithTitle( 'Template' );
 	const newTemplateXPath =
