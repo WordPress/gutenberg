@@ -39,7 +39,7 @@ function render_block_core_legacy_widget( $attributes ) {
 	 * @param string $id_base Widget base id from the WP_Widget class.
 	 * @param array  $attributes The block attributes..
 	 */
-	$widget_key = apply_filters( 'wp_get_widget_key', $widget_key, $id_base, $id_base );
+	$widget_key = apply_filters( 'wp_get_widget_key', $widget_key, $id_base, $attributes );
 	if ( ! $widget_key ) {
 		return '';
 	}
