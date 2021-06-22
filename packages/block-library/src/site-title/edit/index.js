@@ -51,6 +51,7 @@ export default function SiteTitleEdit( {
 		<TagName { ...blockProps }>
 			<RichText
 				tagName={ isLink ? 'a' : 'div' }
+				href={ isLink ? '#site-title-pseudo-link' : undefined }
 				aria-label={ __( 'Site title text' ) }
 				placeholder={ __( 'Write site title…' ) }
 				value={ title || readOnlyTitle }
