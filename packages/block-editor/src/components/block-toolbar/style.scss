@@ -79,6 +79,10 @@
 		.block-editor-block-icon {
 			width: $button-size-small !important;
 			margin: 0 !important;
+
+			&.block-editor-block-switcher__toggle-with-text {
+				width: $grid-unit-50 !important;
+			}
 		}
 
 		&:focus::before {

@@ -149,7 +149,11 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 							<>
 								<BlockIcon
 									icon={ icon }
-									className="block-editor-block-switcher__toggle"
+									className={
+										isReusable || isTemplate
+											? 'block-editor-block-switcher__toggle-with-text'
+											: 'block-editor-block-switcher__toggle'
+									}
 									showColors
 								/>
 								{ ( isReusable || isTemplate ) && (
