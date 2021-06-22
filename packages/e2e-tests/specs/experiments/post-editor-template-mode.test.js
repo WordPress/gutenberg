@@ -13,7 +13,7 @@ import {
 
 const openSidebarPanelWithTitle = async ( title ) => {
 	const panel = await page.waitForXPath(
-		`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ title }")]`
+		`//div[contains(@aria-label,"Editor settings")]//button[contains(text(),"${ title }")]`
 	);
 	await panel.click();
 };
