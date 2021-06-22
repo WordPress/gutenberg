@@ -72,16 +72,6 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 	};
 } );
 
-jest.mock( 'react-native-dark-mode', () => {
-	return {
-		initialMode: 'light',
-		eventEmitter: {
-			on: jest.fn(),
-		},
-		useDarkModeContext: () => 'light',
-	};
-} );
-
 jest.mock( 'react-native-modal', () => ( props ) =>
 	props.isVisible ? mockComponent( 'Modal' )( props ) : null
 );

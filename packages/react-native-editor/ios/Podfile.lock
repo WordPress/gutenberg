@@ -1,7 +1,7 @@
 PODS:
   - boost-for-react-native (1.63.0)
-  - BVLinearGradient (2.5.6):
-    - React-Core
+  - BVLinearGradient (2.5.6-wp):
+    - React
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.64.0)
   - FBReactNativeSpec (0.64.0):
@@ -211,22 +211,22 @@ PODS:
     - React-perflogger (= 0.64.0)
   - React-jsinspector (0.64.0)
   - react-native-blur (0.8.0):
-    - React-Core
-  - react-native-get-random-values (1.4.0):
-    - React-Core
-  - react-native-keyboard-aware-scroll-view (0.8.8):
-    - React-Core
+    - React
+  - react-native-get-random-values (1.4.0-wp):
+    - React
+  - react-native-keyboard-aware-scroll-view (0.8.8-wp):
+    - React
   - react-native-safe-area (0.5.1):
+    - React
+  - react-native-safe-area-context (3.2.0-wp):
     - React-Core
-  - react-native-safe-area-context (3.2.0):
-    - React-Core
-  - react-native-slider (3.0.2):
-    - React-Core
-  - react-native-video (5.0.2):
-    - React-Core
-    - react-native-video/Video (= 5.0.2)
-  - react-native-video/Video (5.0.2):
-    - React-Core
+  - react-native-slider (3.0.2-wp):
+    - React
+  - react-native-video (5.0.2-wp):
+    - React
+    - react-native-video/Video (= 5.0.2-wp)
+  - react-native-video/Video (5.0.2-wp):
+    - React
   - React-perflogger (0.64.0)
   - React-RCTActionSheet (0.64.0):
     - React-Core/RCTActionSheetHeaders (= 0.64.0)
@@ -291,18 +291,16 @@ PODS:
     - React-cxxreact (= 0.64.0)
     - React-jsi (= 0.64.0)
     - React-perflogger (= 0.64.0)
-  - ReactNativeDarkMode (0.0.10):
+  - RNCMaskedView (0.1.11-wp):
+    - React
+  - RNGestureHandler (1.10.1-wp):
     - React-Core
-  - RNCMaskedView (0.1.10-wp):
-    - React-Core
-  - RNGestureHandler (1.10.1):
-    - React-Core
-  - RNReanimated (1.9.0):
-    - React-Core
-  - RNScreens (2.9.0):
-    - React-Core
-  - RNSVG (9.13.6-gb):
-    - React-Core
+  - RNReanimated (1.9.0-wp):
+    - React
+  - RNScreens (2.9.0-wp):
+    - React
+  - RNSVG (9.13.7-wp):
+    - React
   - RNTAztecView (1.55.1):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.4)
@@ -348,7 +346,6 @@ DEPENDENCIES:
   - React-RCTVibration (from `../../../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../../../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
-  - ReactNativeDarkMode (from `../../../node_modules/react-native-dark-mode`)
   - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
@@ -435,8 +432,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../../../node_modules/react-native/ReactCommon"
-  ReactNativeDarkMode:
-    :path: "../../../node_modules/react-native-dark-mode"
   RNCMaskedView:
     :path: "../../../node_modules/@react-native-community/masked-view"
   RNGestureHandler:
@@ -454,10 +449,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BVLinearGradient: b2d297a15cf094d1947df4f0519779bb3a7f2392
+  BVLinearGradient: 8c504adbe0e1c0de8130fdbf338dea8b2101a7e4
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 49cbe4b43e445b06bf29199b6ad2057649e4c8f5
-  FBReactNativeSpec: ebf5d0d5406a50fed4bd7e93460435dfddcab39a
+  FBReactNativeSpec: 420ad7ff87adc491b45199891c72ea531fa4926e
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   Gutenberg: c28fecb5d9d3bc915e7b89c40f68506643e301ea
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
@@ -471,13 +466,13 @@ SPEC CHECKSUMS:
   React-jsi: 74341196d9547cbcbcfa4b3bbbf03af56431d5a1
   React-jsiexecutor: 06a9c77b56902ae7ffcdd7a4905f664adc5d237b
   React-jsinspector: 0ae35a37b20d5e031eb020a69cc5afdbd6406301
-  react-native-blur: ef741a08d020010ba65e411be0ab82d1d325e7ad
-  react-native-get-random-values: 03edb8dcc2d3f43e55aa67ea13b61b6723bbf047
-  react-native-keyboard-aware-scroll-view: 6cb84879bf07e4cc1caed18b11fb928e142adac6
-  react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
-  react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
-  react-native-slider: 2e42dc91e7ab8b35a9c7f2eb3532729a41d0dbe2
-  react-native-video: b8767f54061e475ddd38c22375f46f4d93e5fdfd
+  react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
+  react-native-get-random-values: 69e5b3d8830b4cfa74cc3d73acdcd5c353b9d9fa
+  react-native-keyboard-aware-scroll-view: e42faf2b78fe921051da2fda1daea3e832ba18af
+  react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
+  react-native-safe-area-context: 0cdb8d2c7527d0c44e51645834b7b7bae9ea91ec
+  react-native-slider: 93c2cbf9ccf673168385a9957f48cc56f3f801f8
+  react-native-video: c08260a9a925156930b60530ab60749f106bb1fa
   React-perflogger: 9c547d8f06b9bf00cb447f2b75e8d7f19b7e02af
   React-RCTActionSheet: 3080b6e12e0e1a5b313c8c0050699b5c794a1b11
   React-RCTAnimation: 3f96f21a497ae7dabf4d2f150ee43f906aaf516f
@@ -490,12 +485,11 @@ SPEC CHECKSUMS:
   React-RCTVibration: 0fd6b21751a33cb72fce1a4a33ab9678416d307a
   React-runtimeexecutor: cad74a1eaa53ee6e7a3620231939d8fe2c6afcf0
   ReactCommon: cfe2b7fd20e0dbd2d1185cd7d8f99633fbc5ff05
-  ReactNativeDarkMode: 6d807bc8373b872472c8541fc3341817d979a6fb
-  RNCMaskedView: 66caacf33c86eaa7d22b43178dd998257d5c2e4d
-  RNGestureHandler: 5e58135436aacc1c5d29b75547d3d2b9430d052c
-  RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
-  RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
-  RNSVG: 46c4b680fe18237fa01eb7d7b311d77618fde31f
+  RNCMaskedView: 2b04ed8f031a87da49143608d5306f222613738c
+  RNGestureHandler: 45d3c3c93d2fba05710acb0bbb9d8b945821b1dd
+  RNReanimated: 223328cf7bfd725d357ee91323a926bda5dc0386
+  RNScreens: dbc844d7510d26afe187783b5fdd9151f55e6aff
+  RNSVG: 531de3ead9727a1c249c71e516d6889374cbb196
   RNTAztecView: c841a326e7a994bbeeb1fa9e2e54db3f07915ca3
   WordPress-Aztec-iOS: 870c93297849072aadfc2223e284094e73023e82
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf

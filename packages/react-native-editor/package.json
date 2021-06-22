@@ -55,7 +55,6 @@
 		"jsdom-jscore-rn": "git+https://github.com/iamcco/jsdom-jscore-rn.git#a562f3d57c27c13e5bfc8cf82d496e69a3ba2800",
 		"node-fetch": "^2.6.0",
 		"react-native": "0.64.0",
-		"react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
 		"react-native-gesture-handler": "git+https://github.com/wordpress-mobile/react-native-gesture-handler.git#1.10.1-wp",
 		"react-native-get-random-values": "git+https://github.com/wordpress-mobile/react-native-get-random-values.git#v1.4.0-wp",
 		"react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
