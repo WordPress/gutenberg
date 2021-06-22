@@ -47,7 +47,7 @@ function ButtonsEdit( {
 		const preferredStyleVariations = select(
 			blockEditorStore
 		).getSettings().__experimentalPreferredStyleVariations;
-		return preferredStyleVariations?.value?.[ 'core/button' ];
+		return preferredStyleVariations?.value?.[ buttonBlockName ];
 	}, [] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
