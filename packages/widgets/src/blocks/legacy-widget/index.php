@@ -24,13 +24,14 @@ function render_block_core_legacy_widget( $attributes ) {
 		return '';
 	}
 
-	if ( method_exists( $wp_widget_factory, 'get_widget_object' ) ) {
-		$widget_object = $wp_widget_factory->get_widget_object( $attributes['idBase'] );
+	$id_base = $attributes['idBase'];
+	if ( method_exists( $wp_widget_factory, 'get_widget_key' ) ) {
+		$widget_key = $wp_widget_factory->get_widget_key( $id_base );
 	} else {
-		$widget_object = gutenberg_get_widget_object( $attributes['idBase'] );
+		$widget_key = gutenberg_get_widget_key( $id_base );
 	}
 
-	if ( ! $widget_object ) {
+	if ( ! $widget_key ) {
 		return '';
 	}
 
@@ -45,7 +46,7 @@ function render_block_core_legacy_widget( $attributes ) {
 	}
 
 	ob_start();
-	the_widget( get_class( $widget_object ), $instance );
+	the_widget( $widget_key, $instance );
 	return ob_get_clean();
 }
 
