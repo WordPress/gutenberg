@@ -3,7 +3,9 @@
 		"clientId": "_clientId_0",
 		"name": "core/post-terms",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"separator": ", "
+		},
 		"innerBlocks": [],
 		"originalContent": ""
 	}
