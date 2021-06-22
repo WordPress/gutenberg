@@ -24,13 +24,22 @@ function render_block_core_legacy_widget( $attributes ) {
 		return '';
 	}
 
-	$id_base = $attributes['idBase'];
+	$id_base    = $attributes['idBase'];
+	$widget_key = '';
 	if ( method_exists( $wp_widget_factory, 'get_widget_key' ) ) {
 		$widget_key = $wp_widget_factory->get_widget_key( $id_base );
-	} else {
-		$widget_key = gutenberg_get_widget_key( $id_base );
 	}
 
+	/**
+	 * Filters the widget key value.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param string $widget_key The key of the array from wp_widget_factory for the WP_Widget instanse.
+	 * @param string $id_base Widget base id from the WP_Widget class.
+	 * @param array  $attributes The block attributes..
+	 */
+	$widget_key = apply_filters( 'wp_get_widget_key', $widget_key, $id_base, $id_base );
 	if ( ! $widget_key ) {
 		return '';
 	}
