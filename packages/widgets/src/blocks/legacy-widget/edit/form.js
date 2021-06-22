@@ -8,13 +8,10 @@ import classnames from 'classnames';
 import { useRef, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __, sprintf  } from '@wordpress/i18n';
-import { Fill } from '@wordpress/components';
-import {
-	useRefEffect,
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
+import { __, sprintf } from '@wordpress/i18n';
+import { Button, Fill } from '@wordpress/components';
+import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
+import { closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -32,8 +29,6 @@ export default function Form( {
 	onClose,
 } ) {
 	const ref = useRef();
-
-	const isMediumLargeViewport = useViewportMatch( 'small' );
 
 	// We only want to remount the control when the instance changes
 	// *externally*. For example, if the user performs an undo. To do this, we
@@ -85,51 +80,39 @@ export default function Form( {
 
 			control.destroy();
 		};
-	}, [
-		id,
-		idBase,
-		instance,
-		onChangeInstance,
-		onChangeHasPreview,
-		isMediumLargeViewport,
-		isWide,
-	] );
+	}, [ id, idBase, instance, onChangeInstance, onChangeHasPreview, isWide ] );
 
-	// Moves the form in and out of the dialog on mount and unmount.
-	const dialogContentRef = useRefEffect( ( node ) => {
-		if ( node ) {
-			node.appendChild( ref.current.firstElementChild );
-			return () => {
-				ref.current.appendChild( node.firstElementChild );
-			};
-		}
-	}, [] );
+	const [ dialogRef, dialogProps ] = useDialog( { focusOnMount: false } );
 
-	const [ dialogRef, dialogProps ] = useDialog( { onClose } );
-
-	if ( isWide && isMediumLargeViewport ) {
+	if ( isWide ) {
 		return (
 			<div
 				className={ classnames( 'wp-block-legacy-widget__container', {
 					'is-visible': isVisible,
 				} ) }
 			>
-				{ isVisible && (
-					<h3 className="wp-block-legacy-widget__edit-form-title">
-						{ title }
-					</h3>
-				) }
-				<div ref={ ref } hidden></div>
 				<Fill name="Popover">
-					{ isVisible && (
+					<div
+						className="wp-block-legacy-widget__edit-form is-wide"
+						ref={ dialogRef }
+						{ ...dialogProps }
+						hidden={ ! isVisible }
+					>
+						<header className="wp-block-legacy-widget__edit-form-header">
+							<h3 className="wp-block-legacy-widget__edit-form-title">
+								{ title }
+							</h3>
+							<Button
+								icon={ closeSmall }
+								label={ __( 'Close dialog' ) }
+								onClick={ onClose }
+							/>
+						</header>
 						<div
-							className="wp-block-legacy-widget__edit-form is-wide"
-							ref={ dialogRef }
-							{ ...dialogProps }
-						>
-							<div ref={ dialogContentRef }></div>
-						</div>
-					) }
+							className="wp-block-legacy-widget__edit-form-body"
+							ref={ ref }
+						/>
+					</div>
 				</Fill>
 			</div>
 		);

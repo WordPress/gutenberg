@@ -1,11 +1,4 @@
-// When wide widget is selected and not in navigation mode (.is-visible) its
-// form opens in a popover but its container should still have a bit of height.
-.is-selected {
-	.is-visible.wp-block-legacy-widget__container {
-		padding: $grid-unit-10 $grid-unit-15;
-		min-height: 50px;
-	}
-}
+$wide-header-height: 46px;
 
 .wp-block-legacy-widget__edit-form {
 	&:not([hidden]) {
@@ -17,14 +10,38 @@
 	padding: $grid-unit-15 - 1px; //Subtract the border width.
 
 	&.is-wide {
-		overflow: auto;
 		position: fixed;
 		top: 0;
 		bottom: 0;
 		left: 299px;
+		min-width: 400px;
+		width: calc(100vw - 299px);
+		max-width: 660px;
+		padding: $wide-header-height 0 0 0;
 		border-radius: 0;
 		border: 1px solid #dcdcde;
-		min-width: 400px;
+		border-width: 0 1px;
+
+		.wp-block-legacy-widget__edit-form-header {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			z-index: 1;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			background: #f0f0f1;
+			height: $wide-header-height;
+			padding: 0 5px 0 21px;
+			border-bottom: 1px solid #dcdcde;
+		}
+
+		.wp-block-legacy-widget__edit-form-body {
+			overflow: auto;
+			height: 100%;
+			padding: $grid-unit-15 - 1px; //Subtract the border width.
+		}
 	}
 
 	.wp-block-legacy-widget__edit-form-title {
@@ -32,7 +49,6 @@
 		font-family: $default-font;
 		font-size: 14px;
 		font-weight: 600;
-		margin: 0 0 $grid-unit-15 0;
 	}
 
 	.widget-inside.widget-inside {
