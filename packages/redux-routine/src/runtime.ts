@@ -30,8 +30,8 @@ export default function createRuntime(
 		controls,
 		( control, actionType ): Control => (
 			value,
-			_,
-			__,
+			next,
+			iterate,
 			yieldNext,
 			yieldError
 		) => {
