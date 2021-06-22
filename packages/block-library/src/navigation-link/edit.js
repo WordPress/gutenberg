@@ -134,6 +134,61 @@ function getSuggestionsQuery( type, kind ) {
 }
 
 /**
+ * Determine the colors for a menu.
+ *
+ * Order of priority is:
+ * 1: Overlay custom colors (if submenu)
+ * 2: Overlay theme colors (if submenu)
+ * 3: Custom colors
+ * 4: Theme colors
+ * 5: Global styles
+ *
+ * @param {Object} context
+ * @param {boolean} isSubMenu
+ */
+function getColors( context, isSubMenu ) {
+	const {
+		textColor,
+		customTextColor,
+		backgroundColor,
+		customBackgroundColor,
+		overlayTextColor,
+		customOverlayTextColor,
+		overlayBackgroundColor,
+		customOverlayBackgroundColor,
+		style,
+	} = context;
+
+	const colors = {};
+
+	if ( isSubMenu && !! customOverlayTextColor ) {
+		colors.customTextColor = customOverlayTextColor;
+	} else if ( isSubMenu && !! overlayTextColor ) {
+		colors.textColor = overlayTextColor;
+	} else if ( !! customTextColor ) {
+		colors.customTextColor = customTextColor;
+	} else if ( !! textColor ) {
+		colors.textColor = textColor;
+	} else if ( !! style?.color?.text ) {
+		colors.customTextColor = style.color.text;
+	}
+
+	if ( isSubMenu && !! customOverlayBackgroundColor ) {
+		colors.customBackgroundColor = customOverlayBackgroundColor;
+	} else if ( isSubMenu && !! overlayBackgroundColor ) {
+		colors.backgroundColor = overlayBackgroundColor;
+	} else if ( !! customBackgroundColor ) {
+		colors.customBackgroundColor = customBackgroundColor;
+	} else if ( !! backgroundColor ) {
+		colors.backgroundColor = backgroundColor;
+	} else if ( !! style?.color?.background ) {
+		colors.customTextColor = style.color.background;
+	}
+
+	return colors;
+}
+
+/**
  * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
  */
 
@@ -240,14 +295,7 @@ export default function NavigationLinkEdit( {
 		url,
 		opensInNewTab,
 	};
-	const {
-		style,
-		showSubmenuIcon,
-		overlayTextColor,
-		customOverlayTextColor,
-		overlayBackgroundColor,
-		customOverlayBackgroundColor,
-	} = context;
+	const { showSubmenuIcon } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
@@ -313,48 +361,23 @@ export default function NavigationLinkEdit( {
 	);
 
 	// Store the colors from context as attributes for rendering
-	// Priority goes:
-	// 1: Overlay custom colors (if submenu)
-	// 2: Overlay theme colors (if submenu)
-	// 3: Custom colors
-	// 4: Theme colors
-	// 5: Global styles
 	useEffect( () => {
-		const colors = {
-			textColor: context.textColor,
-			backgroundColor: context.backgroundColor,
-			customTextColor: context.customTextColor ?? style?.color?.text,
-			customBackgroundColor:
-				context.customBackgroundColor ?? style?.color?.background,
-		};
-
-		// Override colors for submenus if they have been set by the parent Navigation block
-		if ( ! isTopLevelLink ) {
-			colors.textColor = overlayTextColor ?? colors.textColor;
-			colors.backgroundColor =
-				overlayBackgroundColor ?? colors.backgroundColor;
-			colors.customTextColor =
-				customOverlayTextColor ?? colors.customTextColor;
-			colors.customBackgroundColor =
-				customOverlayBackgroundColor ?? colors.customBackgroundColor;
-		}
-
 		setAttributes( {
 			isTopLevelLink,
-			colors,
+			colors: getColors( context, ! isTopLevelLink ),
 		} );
 	}, [
 		isTopLevelLink,
-		overlayTextColor,
-		overlayBackgroundColor,
-		customOverlayTextColor,
-		customOverlayBackgroundColor,
+		context.overlayTextColor,
+		context.overlayBackgroundColor,
+		context.customOverlayTextColor,
+		context.customOverlayBackgroundColor,
 		context.textColor,
 		context.backgroundColor,
 		context.customTextColor,
 		context.customBackgroundColor,
-		style?.color?.text,
-		style?.color?.background,
+		context?.style?.color?.text,
+		context?.style?.color?.background,
 	] );
 
 	/**
@@ -466,22 +489,25 @@ export default function NavigationLinkEdit( {
 	}
 
 	// Always use overlay colors for submenus
+	const innerBlocksColors = getColors( context, true );
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: classnames( 'wp-block-navigation-link__container', {
 				'is-parent-of-selected-block': isParentOfSelectedBlock,
 				'has-text-color': !! (
-					overlayTextColor || customOverlayTextColor
+					innerBlocksColors.textColor ||
+					innerBlocksColors.customTextColor
 				),
-				[ `has-${ overlayTextColor }-color` ]: !! overlayTextColor,
+				[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
 				'has-background': !! (
-					overlayBackgroundColor || customOverlayBackgroundColor
+					innerBlocksColors.backgroundColor ||
+					innerBlocksColors.customBackgroundColor
 				),
-				[ `has-${ overlayBackgroundColor }-background-color` ]: !! overlayBackgroundColor,
+				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
 			} ),
 			style: {
-				color: customOverlayTextColor,
-				backgroundColor: customOverlayBackgroundColor,
+				color: innerBlocksColors.customTextColor,
+				backgroundColor: innerBlocksColors.customBackgroundColor,
 			},
 		},
 		{
