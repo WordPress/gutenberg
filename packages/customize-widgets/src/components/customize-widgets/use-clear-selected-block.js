@@ -52,8 +52,8 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 				}
 			}
 
-			// Handle focusing in the same document.
-			function handleFocus( event ) {
+			// Handle mouse down in the same document.
+			function handleMouseDown( event ) {
 				handleClearSelectedBlock( event.target );
 			}
 			// Handle focusing outside the current document, like to iframes.
@@ -61,11 +61,14 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 				handleClearSelectedBlock( ownerDocument.activeElement );
 			}
 
-			ownerDocument.addEventListener( 'focusin', handleFocus );
+			ownerDocument.addEventListener( 'mousedown', handleMouseDown );
 			ownerWindow.addEventListener( 'blur', handleBlur );
 
 			return () => {
-				ownerDocument.removeEventListener( 'focusin', handleFocus );
+				ownerDocument.removeEventListener(
+					'mousedown',
+					handleMouseDown
+				);
 				ownerWindow.removeEventListener( 'blur', handleBlur );
 			};
 		}
