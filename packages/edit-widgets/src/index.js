@@ -28,7 +28,7 @@ import { ALLOW_REUSABLE_BLOCKS } from './constants';
 
 const DISABLED_BLOCKS = [
 	'core/more',
-    'core/freeform',
+	'core/freeform',
 	...( ! ALLOW_REUSABLE_BLOCKS && [ 'core/block' ] ),
 ];
 const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
