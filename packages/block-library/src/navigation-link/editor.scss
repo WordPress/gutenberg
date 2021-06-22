@@ -80,15 +80,27 @@
 .wp-block-navigation-link__placeholder {
 	position: relative;
 
+	// Appear disabled to indicate incompleteness.
+	opacity: 0.6;
+	&:hover,
+	&:focus,
+	.is-selected > & {
+		opacity: 1;
+	}
+
+	// Draw a wavy underline.
 	.wp-block-navigation-link__placeholder-text {
+		$blur: 10%;
+		$width: 6%;
+		$stop1: 30%;
+		$stop2: 64%;
+
 		background-image:
-			linear-gradient(135deg, transparent 10%, currentColor 10%, currentColor 30%, transparent 30%),
-			linear-gradient(45deg,  transparent 30%, currentColor 30%, currentColor 50%, transparent 50%),
-			linear-gradient(135deg, transparent 50%, currentColor 50%, currentColor 70%, transparent 70%),
-			linear-gradient(45deg,  transparent 70%, currentColor 70%, currentColor 90%, transparent 90%);
-		background-size: 10px 3px;
-		background-repeat: repeat-x;
+			linear-gradient(45deg, transparent ($stop1 - $blur), currentColor $stop1, currentColor ($stop1 + $width), transparent ($stop1 + $width + $blur)),
+			linear-gradient(135deg, transparent ($stop2 - $blur), currentColor $stop2, currentColor ($stop2 + $width), transparent ($stop2 + $width + $blur));
 		background-position: 0 100%;
+		background-size: 6px 3px;
+		background-repeat: repeat-x;
 	}
 
 	// This needs extra specificity.
