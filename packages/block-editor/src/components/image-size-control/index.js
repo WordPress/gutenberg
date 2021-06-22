@@ -36,13 +36,8 @@ export default function ImageSizeControl( {
 		currentHeight,
 		currentWidth,
 		updateDimension,
+		updateDimensions,
 	} = useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
-
-	function updateDimensions( nextWidth, nextHeight ) {
-		return () => {
-			onChange( { width: nextWidth, height: nextHeight } );
-		};
-	}
 
 	return (
 		<>
@@ -92,8 +87,8 @@ export default function ImageSizeControl( {
 								);
 
 								const isCurrent =
-									width === scaledWidth &&
-									height === scaledHeight;
+									currentWidth === scaledWidth &&
+									currentHeight === scaledHeight;
 
 								return (
 									<Button
@@ -103,17 +98,19 @@ export default function ImageSizeControl( {
 											isCurrent ? 'primary' : undefined
 										}
 										isPressed={ isCurrent }
-										onClick={ updateDimensions(
-											scaledWidth,
-											scaledHeight
-										) }
+										onClick={ () =>
+											updateDimensions(
+												scaledHeight,
+												scaledWidth
+											)
+										}
 									>
 										{ scale }%
 									</Button>
 								);
 							} ) }
 						</ButtonGroup>
-						<Button isSmall onClick={ updateDimensions() }>
+						<Button isSmall onClick={ () => updateDimensions() }>
 							{ __( 'Reset' ) }
 						</Button>
 					</div>

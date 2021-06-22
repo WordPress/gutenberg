@@ -29,7 +29,7 @@ export default function useDimensionHander(
 		}
 	}, [ defaultWidth, defaultHeight ] );
 
-	function updateDimension( dimension, value ) {
+	const updateDimension = ( dimension, value ) => {
 		if ( dimension === 'width' ) {
 			setCurrentWidth( value );
 		} else {
@@ -38,11 +38,18 @@ export default function useDimensionHander(
 		onChange( {
 			[ dimension ]: value === '' ? undefined : parseInt( value, 10 ),
 		} );
-	}
+	};
+
+	const updateDimensions = ( nextHeight, nextWidth ) => {
+		setCurrentHeight( nextHeight ?? defaultHeight );
+		setCurrentWidth( nextWidth ?? defaultWidth );
+		onChange( { height: nextHeight, width: nextWidth } );
+	};
 
 	return {
 		currentHeight,
 		currentWidth,
 		updateDimension,
+		updateDimensions,
 	};
 }
