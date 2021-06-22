@@ -25,6 +25,8 @@ import './filters';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
 
+const DISABLED_BLOCKS = [ 'core/more', 'core/freeform' ];
+
 /**
  * Initializes the block editor in the widgets screen.
  *
@@ -32,9 +34,14 @@ import Layout from './components/layout';
  * @param {Object} settings Block editor settings.
  */
 export function initialize( id, settings ) {
-	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( block ) => ! [ 'core/more', 'core/freeform' ].includes( block.name )
-	);
+	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
+		return ! (
+			DISABLED_BLOCKS.includes( block.name ) ||
+			block.name.startsWith( 'core/post-' ) ||
+			block.name.startsWith( 'core/query' )
+		);
+	} );
+
 	registerCoreBlocks( coreBlocks );
 	registerLegacyWidgetBlock();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
