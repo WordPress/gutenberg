@@ -35,12 +35,12 @@ function render_block_core_legacy_widget( $attributes ) {
 	 *
 	 * @since 5.8.0
 	 *
-	 * @param string $widget_key The key of the array from wp_widget_factory for the WP_Widget instanse.
-	 * @param string $id_base Widget base id from the WP_Widget class.
-	 * @param array  $attributes The block attributes..
+	 * @param string $widget_key The key to the `WP_Widget` instance in the global `$wp_widget_factory` array.
+	 * @param string $id_base    The widget base id from the WP_Widget class.
+	 * @param array  $attributes The block attributes.
 	 */
 	$widget_key = apply_filters( 'wp_get_widget_key', $widget_key, $id_base, $attributes );
-	if ( ! $widget_key ) {
+	if ( '' === $widget_key ) {
 		return '';
 	}
 
