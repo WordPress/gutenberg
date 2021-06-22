@@ -1,58 +1,44 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
-
-/**
- * WordPress dependencies
- */
-import { HorizontalRule } from '@wordpress/primitives';
+import { css } from 'emotion';
 
 /**
  * Internal dependencies
  */
-import { Flex } from '../flex';
-import { COLORS, space } from '../utils';
+import { COLORS, CONFIG } from '../utils';
 
-export const styleProps = {
-	borderColor: COLORS.lightGray[ 500 ],
-	borderRadius: '3px',
-	backgroundShady: COLORS.lightGray[ 200 ],
-};
-
-const { borderColor, borderRadius, backgroundShady } = styleProps;
-
-export const CardUI = styled.div`
-	background: ${ COLORS.white };
-	box-sizing: border-box;
-	border-radius: ${ borderRadius };
-	border: 1px solid ${ borderColor };
-
-	${ handleBorderless };
-
-	&.is-elevated {
-		box-shadow: 0px 1px 3px 0px rgba( 0, 0, 0, 0.2 ),
-			0px 1px 1px 0px rgba( 0, 0, 0, 0.14 ),
-			0px 2px 1px -1px rgba( 0, 0, 0, 0.12 );
-	}
+export const Card = css`
+	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
+	outline: none;
 `;
 
-export const HeaderUI = styled( Flex )`
-	border-bottom: 1px solid ${ borderColor };
-	border-top-left-radius: ${ borderRadius };
-	border-top-right-radius: ${ borderRadius };
-	box-sizing: border-box;
+export const Header = css`
+	border-bottom: 1px solid;
 
 	&:last-child {
 		border-bottom: none;
 	}
-
-	${ headerFooterSizes };
-	${ handleBorderless };
-	${ handleShady };
 `;
 
-export const MediaUI = styled.div`
+export const Footer = css`
+	border-top: 1px solid;
+
+	&:first-child {
+		border-top: none;
+	}
+`;
+
+export const Content = css`
+	height: 100%;
+`;
+
+export const Body = css`
+	height: auto;
+	max-height: 100%;
+`;
+
+export const Media = css`
 	box-sizing: border-box;
 	overflow: hidden;
 
@@ -63,99 +49,57 @@ export const MediaUI = styled.div`
 		max-width: 100%;
 		width: 100%;
 	}
-
-	&:first-of-type {
-		border-top-left-radius: ${ borderRadius };
-		border-top-right-radius: ${ borderRadius };
-	}
-
-	&:last-of-type {
-		border-bottom-left-radius: ${ borderRadius };
-		border-bottom-right-radius: ${ borderRadius };
-	}
 `;
 
-export const BodyUI = styled.div`
-	box-sizing: border-box;
-
-	${ bodySize };
-	${ handleShady };
-`;
-
-export const FooterUI = styled( Flex )`
-	border-top: 1px solid ${ borderColor };
-	border-bottom-left-radius: ${ borderRadius };
-	border-bottom-right-radius: ${ borderRadius };
-	box-sizing: border-box;
-
-	&:first-of-type {
-		border-top: none;
-	}
-
-	${ headerFooterSizes };
-	${ handleBorderless };
-	${ handleShady };
-`;
-
-export const DividerUI = styled( HorizontalRule )`
-	all: unset;
-	border-top: 1px solid ${ borderColor };
+export const Divider = css`
 	box-sizing: border-box;
 	display: block;
-	height: 0;
 	width: 100%;
 `;
 
-export function bodySize() {
-	return `
-		&.is-size {
-			&-large {
-				padding: ${ space( 3 ) } ${ space( 4 ) };
-			}
-			&-medium {
-				padding: ${ space( 2 ) } ${ space( 3 ) };
-			}
-			&-small {
-				padding: ${ space( 2 ) };
-			}
-			&-extraSmall {
-				padding: ${ space( 1 ) };
-			}
-		}
-	`;
-}
+export const borderRadius = css`
+	&:first-of-type {
+		border-top-left-radius: ${ CONFIG.cardBorderRadius };
+		border-top-right-radius: ${ CONFIG.cardBorderRadius };
+	}
 
-export function headerFooterSizes() {
-	return `
-		&.is-size {
-			&-large {
-				padding: ${ space( 3 ) } ${ space( 4 ) };
-			}
-			&-medium {
-				padding: ${ space( 2 ) } ${ space( 3 ) };
-			}
-			&-small {
-				padding: ${ space( 2 ) };
-			}
-			&-extraSmall {
-				padding: ${ space( 1 ) };
-			}
-		}
-	`;
-}
+	&:last-of-type {
+		border-bottom-left-radius: ${ CONFIG.cardBorderRadius };
+		border-bottom-right-radius: ${ CONFIG.cardBorderRadius };
+	}
+`;
 
-export function handleBorderless() {
-	return `
-		&.is-borderless {
-			border: none;
-		}
-	`;
-}
+export const borderColor = css`
+	border-color: ${ CONFIG.colorDivider };
+`;
 
-export function handleShady() {
-	return `
-		&.is-shady {
-			background: ${ backgroundShady };
-		}
-	`;
-}
+export const boxShadowless = css`
+	box-shadow: none;
+`;
+
+export const borderless = css`
+	border: none;
+`;
+
+export const rounded = css`
+	border-radius: ${ CONFIG.cardBorderRadius };
+`;
+
+export const cardPaddings = {
+	large: css`
+		padding: ${ CONFIG.cardPaddingLarge };
+	`,
+	medium: css`
+		padding: ${ CONFIG.cardPaddingMedium };
+	`,
+	small: css`
+		padding: ${ CONFIG.cardPaddingSmall };
+	`,
+	xSmall: css`
+		padding: ${ CONFIG.cardPaddingXSmall };
+	`,
+};
+
+export const shady = css`
+	background-color: ${ COLORS.lightGray[ 200 ] };
+`;
