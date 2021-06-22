@@ -26,6 +26,7 @@ import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
 
 const DISABLED_BLOCKS = [ 'core/more', 'core/freeform' ];
+const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -37,15 +38,18 @@ export function initialize( id, settings ) {
 	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
 		return ! (
 			DISABLED_BLOCKS.includes( block.name ) ||
-			block.name.startsWith( 'core/post-' ) ||
-			block.name.startsWith( 'core/query' )
+			block.name.startsWith( 'core/post' ) ||
+			block.name.startsWith( 'core/query' ) ||
+			block.name.startsWith( 'core/site' )
 		);
 	} );
 
 	registerCoreBlocks( coreBlocks );
 	registerLegacyWidgetBlock();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks();
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
+		} );
 	}
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
