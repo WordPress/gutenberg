@@ -514,7 +514,7 @@ describe( 'Navigation', () => {
 			{ title: 'お問い合わせ', slug: encodeURI( 'お問い合わせ' ) },
 		] );
 
-		// Add a link to the default Link block.
+		// Select the mocked internal page above.
 		await updateActiveNavigationLink( {
 			url: 'お問い合わせ',
 			type: 'entity',
