@@ -25,7 +25,7 @@ import './filters';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
 
-const DISABLED_BLOCKS = [ 'core/more', 'core/freeform' ];
+const DISABLED_BLOCKS = [ 'core/more', 'core/freeform', 'core/block' ];
 const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
 
 /**
