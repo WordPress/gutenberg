@@ -171,7 +171,7 @@ export class Inserter extends Component {
 	}
 
 	onInserterToggledAnnouncement( isOpen ) {
-		AccessibilityInfo.fetch().done( ( isEnabled ) => {
+		AccessibilityInfo.isScreenReaderEnabled().done( ( isEnabled ) => {
 			if ( isEnabled ) {
 				const isIOS = Platform.OS === 'ios';
 				const announcement = isOpen

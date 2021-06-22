@@ -26,12 +26,11 @@ export default function CategoriesEdit( {
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 	const { categories, isRequesting } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
-		const { isResolving } = select( 'core/data' );
+		const { getEntityRecords, isResolving } = select( coreStore );
 		const query = { per_page: -1, hide_empty: true };
 		return {
 			categories: getEntityRecords( 'taxonomy', 'category', query ),
-			isRequesting: isResolving( 'core', 'getEntityRecords', [
+			isRequesting: isResolving( 'getEntityRecords', [
 				'taxonomy',
 				'category',
 				query,
