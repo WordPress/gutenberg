@@ -521,6 +521,7 @@ describe( 'Navigation', () => {
 		} );
 
 		// Expect a Navigation Block with two Links in the snapshot.
+		// The 2nd link should not be double encoded.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
