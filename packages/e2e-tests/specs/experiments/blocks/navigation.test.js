@@ -507,8 +507,9 @@ describe( 'Navigation', () => {
 		);
 		await placeholder.click();
 
-		// For the second nav link block use an existing internal page.
-		// Mock the api response so that it's consistent.
+		// Mocked response for internal page.
+		// We are encoding the slug/url in order
+		// that we can assert it is not double encoded by the block.
 		await mockSearchResponse( [
 			{ title: 'お問い合わせ', slug: encodeURI( 'お問い合わせ' ) },
 		] );
