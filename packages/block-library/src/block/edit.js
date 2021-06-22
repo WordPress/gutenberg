@@ -35,7 +35,12 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		ref
 	);
-	const { isMissing, hasResolved, parentBlockName } = useSelect(
+	const {
+		isMissing,
+		hasResolved,
+		parentBlockName,
+		selectedBlock,
+	} = useSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
 				'postType',
@@ -65,6 +70,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				hasResolved: hasResolvedBlock,
 				isMissing: hasResolvedBlock && ! persistedBlock,
 				parentBlockName: _parentBlockName,
+				selectedBlock: currentBlockId,
 			};
 		},
 		[ ref, clientId ]
@@ -116,7 +122,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		if ( ! isInnerBlock ) {
 			setIsLocked( true );
 		}
-	}, [ parentBlockName ] );
+	}, [ parentBlockName, selectedBlock ] );
 
 	if ( hasAlreadyRendered ) {
 		return (
