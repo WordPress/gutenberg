@@ -32,7 +32,7 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 		$classes .= ' has-text-align-' . $attributes['textAlign'];
 	}
 
-	$separator = empty( $attributes['separator'] ) ? ', ' : $attributes['separator'];
+	$separator = empty( $attributes['separator'] ) ? ' ' : $attributes['separator'];
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
