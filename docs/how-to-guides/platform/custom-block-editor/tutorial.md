@@ -29,7 +29,7 @@ By the end of this article, you should have gained a good understanding of how t
 
 We're going to be creating an (almost) fully functioning Block Editor instance.
 
-![The Standalone Editor instance populated with example Blocks within a custom WP Admin page](https://wordpress.org/gutenberg/files/2020/03/editor.pn)
+![The Standalone Editor instance populated with example Blocks within a custom WP Admin page](https://wordpress.org/gutenberg/files/2020/03/editor.png)
 
 This block editor will not be the same _Block Editor_ you are familiar with when creating `Post`s in WP Admin. Rather it will be an entirely custom instance which will live within a custom WP Admin page called (imaginatively) "Block Editor".
 
