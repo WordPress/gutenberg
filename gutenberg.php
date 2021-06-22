@@ -86,7 +86,7 @@ function gutenberg_theme_relies_on_notice( $plugin_file, $plugin_data ) {
 		return;
 	}
 
-	$theme = wp_get_theme();
+	$theme      = wp_get_theme();
 	$theme_tags = $theme->get( 'Tags' );
 
 	// Only display a notice for themes that require FSE.
