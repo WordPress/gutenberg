@@ -15,7 +15,7 @@ import { visitAdminPage } from './visit-admin-page';
  *
  * @param {string}  username  User name.
  * @param {string?} firstName First name.
- * @param {string?} lastName  Larst name.
+ * @param {string?} lastName  Last name.
  */
 export async function createUser( username, firstName, lastName ) {
 	await switchUserToAdmin();
