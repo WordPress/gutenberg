@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.55.2
 -   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
 
 ## 1.55.1
