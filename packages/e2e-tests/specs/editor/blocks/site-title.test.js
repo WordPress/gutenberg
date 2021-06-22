@@ -72,7 +72,6 @@ describe( 'Site Title block', () => {
 		await page.focus( editableSiteTitleSelector );
 		await pressKeyWithModifier( 'primary', 'a' );
 
-		// Create a second list item.
 		await page.keyboard.type( 'New Site Title' );
 
 		await saveEntities();
