@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import { create } from 'rungen';
-// eslint-disable-next-line no-duplicate-imports
-import type { Control } from 'rungen';
+import { create, Control } from 'rungen';
 import { map } from 'lodash';
 import isPromise from 'is-promise';
 import type { Dispatch, AnyAction } from 'redux';
