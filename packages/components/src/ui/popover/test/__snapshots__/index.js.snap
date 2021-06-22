@@ -161,7 +161,6 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-vg3gx-Surface-getBorders-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
 `;
 
 exports[`props should render without content 1`] = `
@@ -184,8 +183,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-vg3gx-Surface-getBorders-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
-@@ -21,10 +21,17 @@
+@@ -22,10 +22,17 @@
           frameborder="0"
           src="about:blank"
           style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
