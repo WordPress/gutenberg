@@ -24,8 +24,13 @@ import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
+import { ALLOW_REUSABLE_BLOCKS } from './constants';
 
-const DISABLED_BLOCKS = [ 'core/more', 'core/freeform', 'core/block' ];
+const DISABLED_BLOCKS = [
+	'core/more',
+    'core/freeform',
+	...( ! ALLOW_REUSABLE_BLOCKS && [ 'core/block' ] ),
+];
 const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
 
 /**
@@ -55,6 +60,7 @@ export function initialize( id, settings ) {
 	registerBlock( widgetArea );
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
+
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
