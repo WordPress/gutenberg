@@ -86,3 +86,7 @@ require $_tests_dir . '/includes/bootstrap.php';
 // Use existing behavior for wp_die during actual test execution.
 remove_filter( 'wp_die_handler', 'fail_if_died' );
 
+// Tell WordPress that Gutenberg is active so that any calls to
+// is_plugin_active( 'gutenberg/gutenberg.php' ) return true. This doesn't
+// happen automatically because we're importing the plugin manually (see above).
+activate_plugin( 'gutenberg/gutenberg.php' );
