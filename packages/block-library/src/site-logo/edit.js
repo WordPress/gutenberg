@@ -204,8 +204,8 @@ const SiteLogo = ( {
 			>
 				<ImageEditor
 					url={ logoUrl }
-					width={ width }
-					height={ height }
+					width={ currentWidth }
+					height={ currentHeight }
 					clientWidth={ clientWidth }
 					naturalHeight={ naturalHeight }
 					naturalWidth={ naturalWidth }
@@ -213,7 +213,10 @@ const SiteLogo = ( {
 			</ImageEditingProvider>
 		) : (
 			<ResizableBox
-				size={ { width, height } }
+				size={ {
+					width: currentWidth,
+					height: currentHeight,
+				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
