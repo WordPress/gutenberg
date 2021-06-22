@@ -8,6 +8,7 @@ import { without, mapValues, isObject } from 'lodash';
  */
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
+import { STORE_NAME } from './store/name';
 
 /** @typedef {import('./types').WPDataStore} WPDataStore */
 
@@ -259,7 +260,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return registry;
 	}
 
-	registerGenericStore( 'core/data', createCoreDataStore( registry ) );
+	registerGenericStore( STORE_NAME, createCoreDataStore( registry ) );
 
 	Object.entries( storeConfigs ).forEach( ( [ name, config ] ) =>
 		registry.registerStore( name, config )

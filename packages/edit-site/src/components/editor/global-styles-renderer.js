@@ -2,11 +2,11 @@
  * External dependencies
  */
 import {
-	capitalize,
 	first,
 	forEach,
 	get,
 	isEmpty,
+	isString,
 	kebabCase,
 	pickBy,
 	reduce,
@@ -57,7 +57,9 @@ function getPresetsDeclarations( blockPresets = {} ) {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( value ) => {
 						declarations.push(
-							`--wp--preset--${ cssVarInfix }--${ value.slug }: ${ value[ valueKey ] }`
+							`--wp--preset--${ cssVarInfix }--${ kebabCase(
+								value.slug
+							) }: ${ value[ valueKey ] }`
 						);
 					} );
 				}
@@ -89,9 +91,13 @@ function getPresetsClasses( blockSelector, blockPresets = {} ) {
 				if ( presetByOrigin[ origin ] ) {
 					presetByOrigin[ origin ].forEach( ( { slug } ) => {
 						classes.forEach( ( { classSuffix, propertyName } ) => {
-							const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
+							const classSelectorToUse = `.has-${ kebabCase(
+								slug
+							) }-${ classSuffix }`;
 							const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-							const value = `var(--wp--preset--${ cssVarInfix }--${ slug })`;
+							const value = `var(--wp--preset--${ cssVarInfix }--${ kebabCase(
+								slug
+							) })`;
 							declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
 						} );
 					} );
@@ -134,21 +140,23 @@ function getStylesDeclarations( blockStyles = {} ) {
 			if ( first( pathToValue ) === 'elements' ) {
 				return declarations;
 			}
-			if ( !! properties ) {
-				properties.forEach( ( prop ) => {
-					if (
-						! get( blockStyles, [ ...pathToValue, prop ], false )
-					) {
+
+			const styleValue = get( blockStyles, pathToValue );
+
+			if ( !! properties && ! isString( styleValue ) ) {
+				Object.entries( properties ).forEach( ( entry ) => {
+					const [ name, prop ] = entry;
+
+					if ( ! get( styleValue, [ prop ], false ) ) {
 						// Do not create a declaration
 						// for sub-properties that don't have any value.
 						return;
 					}
-					const cssProperty = kebabCase(
-						`${ key }${ capitalize( prop ) }`
-					);
+
+					const cssProperty = kebabCase( name );
 					declarations.push(
 						`${ cssProperty }: ${ compileStyleValue(
-							get( blockStyles, [ ...pathToValue, prop ] )
+							get( styleValue, [ prop ] )
 						) }`
 					);
 				} );

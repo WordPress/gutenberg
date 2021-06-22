@@ -104,7 +104,7 @@ export function useSetting( path, blockName = '' ) {
 	const topLevelPath = `__experimentalFeatures.${ path }`;
 	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
 	const result = get( settings, blockPath ) ?? get( settings, topLevelPath );
-	if ( PATHS_WITH_MERGE[ path ] ) {
+	if ( result && PATHS_WITH_MERGE[ path ] ) {
 		return result.user ?? result.theme ?? result.core;
 	}
 	return result;

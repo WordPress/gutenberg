@@ -144,6 +144,11 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
             label="Contain text cursor inside block"
           />
         </Section>
+        <Section
+          title="Manage visibility of blocks in the inserter"
+        >
+          <WithSelect(BlockManager) />
+        </Section>
       </NavigationItem>
     </NavigationMenu>
     <NavigationMenu
