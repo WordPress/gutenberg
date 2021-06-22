@@ -3,5 +3,22 @@
 		padding-left: 0;
 		margin-left: 0;
 		list-style: none;
+
+		[data-align="full"] &,
+		.alignfull & {
+			max-width: none;
+			width: auto;
+		}
 	}
+
+	// We need to nest this below .editor-styles-wrapper so it has enough specificity to override the padding-left: 0 above.
+	[data-align="full"],
+	.alignfull {
+		ul.wp-block-post-template {
+			max-width: none;
+			padding: 0 1em;
+			width: auto;
+		}
+	}
+
 }
