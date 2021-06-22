@@ -21,7 +21,7 @@ of a "block editor" using the `@wordpress/block-editor` package.
 
 The Gutenberg codebase is complex, with many packages and components, but at its core it is a tool for managing and editing blocks. Therefore, when working on the editor it is important to gain a better understanding of how block editing works at a _fundamental_ level.
 
-To do this, this tutorial will walk you through building a **fully functioning, **custom** block editor "instance"** within WordPress, introducing you to the key packages and components along the way.
+To do this, this tutorial will walk you through building a **fully functioning, _custom_ block editor "instance"** within WordPress, introducing you to the key packages and components along the way.
 
 By the end of this article, you should have gained a good understanding of how the block editor works and some of the knowledge required to put together your own block editor instances.
 
@@ -29,7 +29,7 @@ By the end of this article, you should have gained a good understanding of how t
 
 We're going to be creating an (almost) fully functioning Block Editor instance.
 
-![alt text](https://wordpress.org/gutenberg/files/2020/03/editor.png 'The Standalone Editor instance populated with example Blocks within a custom WP Admin page.')
+![The Standalone Editor instance populated with example Blocks within a custom WP Admin page](https://wordpress.org/gutenberg/files/2020/03/editor.pn)
 
 This block editor will not be the same _Block Editor_ you are familiar with when creating `Post`s in WP Admin. Rather it will be an entirely custom instance which will live within a custom WP Admin page called (imaginatively) "Block Editor".
 
