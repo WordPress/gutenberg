@@ -12,6 +12,11 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const openSidebarPanelWithTitle = async ( title ) => {
+	await page.evaluate( () =>
+		wp.data
+			.dispatch( 'core/edit-post' )
+			.toggleEditorPanelEnabled( 'template' )
+	);
 	const panel = await page.waitForXPath(
 		`//div[contains(@aria-label,"Editor settings")]//button[contains(text(),"${ title }")]`
 	);
