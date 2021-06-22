@@ -50,6 +50,9 @@ const saveEntities = async () => {
 	await page.waitForSelector( savePanelSelector );
 	await page.click( entitiesSaveSelector );
 	await page.waitForSelector( publishPanelSelector );
+	await page.waitForSelector(
+		'.editor-post-publish-panel__header-cancel-button button:not([disabled])'
+	);
 	await page.click( closePanelButtonSelector );
 };
 
@@ -76,7 +79,6 @@ describe( 'Site Title block', () => {
 
 		await saveEntities();
 
-		await page.reload();
 		const siteTitle = await getSetting( 'blogname' );
 		expect( siteTitle ).toEqual( 'New Site Title' );
 	} );
