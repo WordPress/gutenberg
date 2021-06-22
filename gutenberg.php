@@ -71,3 +71,45 @@ function gutenberg_pre_init() {
 
 	require_once __DIR__ . '/lib/load.php';
 }
+
+/**
+ * Displays a warning that deactivating Gutenberg is not recommended when the theme depends
+ * on the FSE functionality found in the plugin.
+ *
+ * @since 10.9.0
+ *
+ * @param string $plugin_file Path to the plugin file relative to the plugins directory.
+ * @param array  $plugin_data An array of plugin data.
+ */
+function gutenberg_theme_relies_on_notice( $plugin_file, $plugin_data ) {
+	if ( ! current_user_can( 'update_plugins' ) ) {
+		return;
+	}
+
+	$theme = wp_get_theme();
+	$theme_tags = $theme->get( 'Tags' );
+
+	// Only display a notice for themes that require FSE.
+	if ( empty( $theme_tags ) || ! in_array( 'full-site-editing', $theme_tags, true ) ) {
+		return;
+	}
+
+	$wp_list_table = _get_list_table(
+		'WP_Plugins_List_Table',
+		array(
+			'screen' => get_current_screen(),
+		)
+	);
+
+	printf(
+		'<tr class="plugin-update-tr active" id="%s" data-slug="%s" data-plugin="%s">' .
+		'<td colspan="%s" class="plugin-update colspanchange">' .
+		'<div class="notice inline notice-warning notice-alt"><p>%s</p></div></td></tr>',
+		esc_attr( $plugin_data['slug'] . '-update' ),
+		esc_attr( $plugin_data['slug'] ),
+		esc_attr( $plugin_file ),
+		esc_attr( $wp_list_table->get_column_count() ),
+		__( 'This plugin is required for the active theme to work correctly. Deactivating is not recommended.', 'gutenberg' )
+	);
+}
+add_action( 'after_plugin_row_gutenberg/gutenberg.php', 'gutenberg_theme_relies_on_notice', 10, 2 );
