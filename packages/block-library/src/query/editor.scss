@@ -5,3 +5,10 @@
 .wp-block-query__create-new-link {
 	padding: 0 $grid-unit-20 $grid-unit-20 56px;
 }
+
+.wp-block-query {
+	ul,
+	ol {
+		box-sizing: inherit;
+	}
+}
