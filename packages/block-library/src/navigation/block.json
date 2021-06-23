@@ -4,11 +4,7 @@
 	"title": "Navigation",
 	"category": "theme",
 	"description": "A collection of blocks that allow visitors to get around your site.",
-	"keywords": [
-		"menu",
-		"navigation",
-		"links"
-	],
+	"keywords": [ "menu", "navigation", "links" ],
 	"textdomain": "default",
 	"attributes": {
 		"orientation": {

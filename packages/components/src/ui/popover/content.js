@@ -8,7 +8,7 @@ import { Popover as ReakitPopover } from 'reakit';
 /**
  * Internal dependencies
  */
-import { Card } from '../card';
+import { Card } from '../../card';
 import { View } from '../../view';
 import { usePopoverContext } from './context';
 import * as styles from './styles';
