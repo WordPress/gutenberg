@@ -438,7 +438,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			? latestPosts.slice( 0, postsToShow )
 			: latestPosts;
 
-	function applyOrUnset( layout ) {
+	function applyOrUnsetLayout( layout ) {
 		return () =>
 			setAttributes( {
 				postLayout: postLayout === layout ? undefined : layout,
@@ -449,22 +449,22 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		{
 			layout: 'list',
 			icon: list,
-			title: __( 'List view' ),
-			onClick: applyOrUnset( 'list' ),
+			title: __( 'List' ),
+			onClick: applyOrUnsetLayout( 'list' ),
 			isActive: postLayout === 'list',
 		},
 		{
 			layout: 'bullet-list',
 			icon: formatListBullets,
-			title: __( 'Bullet List view' ),
-			onClick: applyOrUnset( 'bullet-list' ),
+			title: __( 'Bulleted List' ),
+			onClick: applyOrUnsetLayout( 'bullet-list' ),
 			isActive: postLayout === 'bullet-list',
 		},
 		{
 			layout: 'grid',
 			icon: grid,
-			title: __( 'Grid view' ),
-			onClick: applyOrUnset( 'grid' ),
+			title: __( 'Grid' ),
+			onClick: applyOrUnsetLayout( 'grid' ),
 			isActive: postLayout === 'grid',
 		},
 	];
