@@ -146,7 +146,6 @@ describe( 'Post Editor Template mode', () => {
 	} );
 
 	it( 'Allow creating custom block templates in classic themes', async () => {
-		await activatePlugin( 'gutenberg-test-block-templates' );
 		await activateTheme( 'twentytwentyone' );
 		await createNewPost();
 		// Create a random post.
