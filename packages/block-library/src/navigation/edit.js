@@ -110,22 +110,18 @@ function Navigation( {
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const blockProps = useBlockProps( {
-		className: classnames(
-			className,
-			textColor.class,
-			backgroundColor.class,
-			{
-				[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-				'is-vertical': attributes.orientation === 'vertical',
-				'is-responsive': attributes.isResponsive,
-				'has-text-color': !! textColor.color || !! textColor.class,
-				'has-background':
-					!! backgroundColor.color || !! backgroundColor.class,
-			}
-		),
+		className: classnames( className, {
+			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+			'is-vertical': attributes.orientation === 'vertical',
+			'is-responsive': attributes.isResponsive,
+			'has-text-color': !! textColor.color || !! textColor?.class,
+			[ `has-${ textColor?.slug }-color` ]: !! textColor?.slug,
+			'has-background': !! backgroundColor.color || backgroundColor.class,
+			[ `has-${ backgroundColor?.slug }-background-color` ]: !! backgroundColor?.slug,
+		} ),
 		style: {
-			color: textColor.color,
-			backgroundColor: backgroundColor.color,
+			color: textColor?.color,
+			backgroundColor: backgroundColor?.color,
 		},
 	} );
 
