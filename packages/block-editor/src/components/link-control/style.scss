@@ -189,11 +189,15 @@ $preview-image-height: 140px;
 		position: relative;
 		top: 0.2em;
 		margin-right: $grid-unit-10;
-		max-height: 24px;
-		flex-shrink: 0;
-		width: 24px;
-		display: flex;
-		justify-content: center;
+		width: 32px;
+		height: 32px;
+		padding: 7px;
+		background: $gray-0;
+
+		svg {
+			padding: 0;
+			background: none;
+		}
 
 		img {
 			width: 16px; // favicons often have a source of 32px
@@ -215,7 +219,8 @@ $preview-image-height: 140px;
 
 	.block-editor-link-control__search-item-title {
 		display: block;
-		margin-bottom: 0.2em;
+		margin-top: 0.2em;
+		font-size: 1.1em;
 		font-weight: 500;
 		position: relative;
 
@@ -275,6 +280,7 @@ $preview-image-height: 140px;
 
 		.components-text {
 			font-size: 0.9em;
+			line-height: 1.3em;
 		}
 	}
 
