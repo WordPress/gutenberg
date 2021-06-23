@@ -6,6 +6,11 @@
 	margin-right: 0;
 }
 
+.editor-styles-wrapper
+.block-editor-block-list__block.wp-block-columns {
+	gap: var(--global--spacing-vertical) 0;
+}
+
 // To do: remove horizontal margin override by the editor.
 @include break-small() {
 	.editor-styles-wrapper
