@@ -63,6 +63,7 @@ function gutenberg_get_dimensions_styles( $block_type, $block_attributes ) {
 	}
 
 	$has_height_support = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions', 'height' ), false );
+	$has_width_support  = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions', 'width' ), false );
 	$styles             = array();
 
 	if ( $has_height_support ) {
@@ -73,7 +74,13 @@ function gutenberg_get_dimensions_styles( $block_type, $block_attributes ) {
 		}
 	}
 
-	// Width support to be added in near future.
+	if ( $has_width_support ) {
+		$width_value = _wp_array_get( $block_attributes, array( 'style', 'dimensions', 'width' ), null );
+
+		if ( null !== $width_value ) {
+			$styles[] = sprintf( 'width: %s;', $width_value );
+		}
+	}
 
 	return empty( $styles ) ? null : implode( ' ', $styles );
 }

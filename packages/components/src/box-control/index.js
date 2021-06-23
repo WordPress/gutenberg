@@ -44,6 +44,7 @@ function useUniqueId( idProp ) {
 	return idProp || instanceId;
 }
 export default function BoxControl( {
+	className,
 	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
@@ -114,7 +115,12 @@ export default function BoxControl( {
 	};
 
 	return (
-		<Root id={ id } role="region" aria-labelledby={ headingId }>
+		<Root
+			id={ id }
+			role="region"
+			aria-labelledby={ headingId }
+			className={ className }
+		>
 			<Header className="component-box-control__header">
 				<FlexItem>
 					<Text

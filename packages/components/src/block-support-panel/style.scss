@@ -3,6 +3,10 @@
 	border-top: $border-width solid $gray-200;
 	padding: $grid-unit-20;
 	margin-top: -1px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	column-gap: $grid-unit-20;
+	row-gap: $grid-unit-30;
 
 	.components-block-support-panel__title {
 		margin: 0;
@@ -12,6 +16,7 @@
 		font-weight: 500;
 		line-height: normal;
 		font-size: inherit;
+		grid-column: span 2;
 
 		.components-dropdown-menu {
 			height: $grid-unit-30;
@@ -25,20 +30,17 @@
 			width: $grid-unit-30;
 			height: $grid-unit-30;
 		}
-
-		&:not(:last-child) {
-			padding-bottom: $grid-unit-30;
-		}
 	}
 
 	> div {
 		padding-bottom: 0;
-		margin-bottom: $grid-unit-30;
+		margin-bottom: 0;
 		max-width: 100%;
+	}
 
-		&:last-child {
-			margin-bottom: $grid-unit-10;
-		}
+	> [id*="inspector-box-control"],
+	.components-width-control.is-segmented {
+		grid-column: span 2;
 	}
 }
 

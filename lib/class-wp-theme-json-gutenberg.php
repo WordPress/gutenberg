@@ -56,6 +56,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'dimensions' => array(
 			'height' => null,
+			'width'  => null,
 		),
 		'spacing'    => array(
 			'margin'  => array(
@@ -101,6 +102,7 @@ class WP_Theme_JSON_Gutenberg {
 		'custom'     => null,
 		'dimensions' => array(
 			'customHeight' => null,
+			'customWidth'  => null,
 		),
 		'layout'     => null,
 		'spacing'    => array(
@@ -268,6 +270,9 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'text-transform'   => array(
 			'value' => array( 'typography', 'textTransform' ),
+		),
+		'width'            => array(
+			'value' => array( 'dimensions', 'width' ),
 		),
 	);
 
