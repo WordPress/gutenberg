@@ -184,12 +184,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['typography']['customLineHeight'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
-		if ( ! is_array( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
-			$settings['enableCustomUnits'] = false;
-		} else {
-			$settings['enableCustomUnits'] = count( $settings['__experimentalFeatures']['spacing']['units'] ) > 0;
-		}
-		unset( $settings['__experimentalFeatures']['spacing']['units'] );
+		$settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['customPadding'] ) ) {
 		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['customPadding'];
