@@ -100,9 +100,6 @@ function gutenberg_render_menu_from_location( $location, $attributes ) {
 		return false;
 	}
 
-	$block_attributes = $attributes;
-	unset( $block_attributes['__unstableLocation'] );
-
 	return wp_nav_menu(
 		array(
 			'theme_location' => $location,
