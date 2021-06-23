@@ -19,7 +19,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * not by explicitly focusing outside the editor, hence no need for clearing.
  *
  * @param {Object} sidebarControl The sidebar control instance.
- * @param {Object} popoverRef The ref object of the popover node container.
+ * @param {Object} popoverRef     The ref object of the popover node container.
  */
 export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 	const { hasSelectedBlock, hasMultiSelection } = useSelect(
@@ -52,8 +52,8 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 				}
 			}
 
-			// Handle focusing in the same document.
-			function handleFocus( event ) {
+			// Handle mouse down in the same document.
+			function handleMouseDown( event ) {
 				handleClearSelectedBlock( event.target );
 			}
 			// Handle focusing outside the current document, like to iframes.
@@ -61,11 +61,14 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 				handleClearSelectedBlock( ownerDocument.activeElement );
 			}
 
-			ownerDocument.addEventListener( 'focusin', handleFocus );
+			ownerDocument.addEventListener( 'mousedown', handleMouseDown );
 			ownerWindow.addEventListener( 'blur', handleBlur );
 
 			return () => {
-				ownerDocument.removeEventListener( 'focusin', handleFocus );
+				ownerDocument.removeEventListener(
+					'mousedown',
+					handleMouseDown
+				);
 				ownerWindow.removeEventListener( 'blur', handleBlur );
 			};
 		}

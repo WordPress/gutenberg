@@ -250,7 +250,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$config     = self::read_json_file( __DIR__ . '/experimental-default-theme.json' );
 		$config     = self::translate( $config );
-		self::$core = new WP_Theme_JSON_Gutenberg( $config );
+		self::$core = new WP_Theme_JSON_Gutenberg( $config, 'core' );
 
 		return self::$core;
 	}
@@ -368,7 +368,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
 				trigger_error( 'Error when decoding a theme.json schema for user data. ' . json_last_error_msg() );
-				return new WP_Theme_JSON_Gutenberg( $config );
+				return new WP_Theme_JSON_Gutenberg( $config, 'user' );
 			}
 
 			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.
@@ -382,7 +382,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$config = $decoded_data;
 			}
 		}
-		self::$user = new WP_Theme_JSON_Gutenberg( $config );
+		self::$user = new WP_Theme_JSON_Gutenberg( $config, 'user' );
 
 		return self::$user;
 	}
@@ -419,7 +419,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$result->merge( self::get_theme_data( $theme_support_data ) );
 
 		if ( 'user' === $origin ) {
-			$result->merge( self::get_user_data(), 'update' );
+			$result->merge( self::get_user_data() );
 		}
 
 		return $result;

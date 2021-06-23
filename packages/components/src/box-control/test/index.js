@@ -125,4 +125,71 @@ describe( 'BoxControl', () => {
 			expect( unitSelect.value ).toBe( 'px' );
 		} );
 	} );
+
+	describe( 'Unlinked Sides', () => {
+		it( 'should update a single side value when unlinked', () => {
+			let state = {};
+			const setState = ( newState ) => ( state = newState );
+
+			const { container, getByLabelText } = render(
+				<BoxControl
+					values={ state }
+					onChange={ ( next ) => setState( next ) }
+				/>
+			);
+
+			const unlink = getByLabelText( /Unlink Sides/ );
+			fireEvent.click( unlink );
+
+			const input = container.querySelector( 'input' );
+			const unitSelect = container.querySelector( 'select' );
+
+			input.focus();
+			fireEvent.change( input, { target: { value: '100px' } } );
+			fireEvent.keyDown( input, { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '100' );
+			expect( unitSelect.value ).toBe( 'px' );
+
+			expect( state ).toEqual( {
+				top: '100px',
+				right: undefined,
+				bottom: undefined,
+				left: undefined,
+			} );
+		} );
+
+		it( 'should update a whole axis when value is changed when unlinked', () => {
+			let state = {};
+			const setState = ( newState ) => ( state = newState );
+
+			const { container, getByLabelText } = render(
+				<BoxControl
+					values={ state }
+					onChange={ ( next ) => setState( next ) }
+					splitOnAxis={ true }
+				/>
+			);
+
+			const unlink = getByLabelText( /Unlink Sides/ );
+			fireEvent.click( unlink );
+
+			const input = container.querySelector( 'input' );
+			const unitSelect = container.querySelector( 'select' );
+
+			input.focus();
+			fireEvent.change( input, { target: { value: '100px' } } );
+			fireEvent.keyDown( input, { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '100' );
+			expect( unitSelect.value ).toBe( 'px' );
+
+			expect( state ).toEqual( {
+				top: '100px',
+				right: undefined,
+				bottom: '100px',
+				left: undefined,
+			} );
+		} );
+	} );
 } );

@@ -13,7 +13,7 @@ import { apiFetch } from '@wordpress/data-controls';
  * Internal dependencies
  */
 import { regularFetch } from './controls';
-import { CORE_STORE_NAME as coreStoreName } from './utils/constants';
+import { STORE_NAME } from './name';
 
 /**
  * Internal dependencies
@@ -86,7 +86,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 	}
 
 	const lock = yield* __unstableAcquireStoreLock(
-		coreStoreName,
+		STORE_NAME,
 		[ 'entities', 'data', kind, name, key ],
 		{ exclusive: false }
 	);
@@ -123,7 +123,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 			// fields, so it's tested here, prior to initiating the REST request,
 			// and without causing `getEntityRecords` resolution to occur.
 			const hasRecords = yield controls.select(
-				coreStoreName,
+				STORE_NAME,
 				'hasEntityRecords',
 				kind,
 				name,
@@ -163,9 +163,9 @@ export const getEditedEntityRecord = ifNotResolved(
 /**
  * Requests the entity's records from the REST API.
  *
- * @param {string}  kind   Entity kind.
- * @param {string}  name   Entity name.
- * @param {Object?} query  Query Object.
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {Object?} query Query Object.
  */
 export function* getEntityRecords( kind, name, query = {} ) {
 	const entities = yield getKindEntities( kind );
@@ -175,7 +175,7 @@ export function* getEntityRecords( kind, name, query = {} ) {
 	}
 
 	const lock = yield* __unstableAcquireStoreLock(
-		coreStoreName,
+		STORE_NAME,
 		[ 'entities', 'data', kind, name ],
 		{ exclusive: false }
 	);
@@ -272,7 +272,7 @@ export function* getThemeSupports() {
 /**
  * Requests a preview from the from the Embed API.
  *
- * @param {string} url   URL to get the preview for.
+ * @param {string} url URL to get the preview for.
  */
 export function* getEmbedPreview( url ) {
 	try {
@@ -344,6 +344,25 @@ export function* canUser( action, resource, id ) {
 }
 
 /**
+ * Checks whether the current user can perform the given action on the given
+ * REST resource.
+ *
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {string} recordId Record's id.
+ */
+export function* canUserEditEntityRecord( kind, name, recordId ) {
+	const entities = yield getKindEntities( kind );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
+
+	const resource = entity.__unstable_rest_base;
+	yield canUser( 'update', resource, recordId );
+}
+
+/**
  * Request autosave data from the REST API.
  *
  * @param {string} postType The type of the parent post.
@@ -351,7 +370,7 @@ export function* canUser( action, resource, id ) {
  */
 export function* getAutosaves( postType, postId ) {
 	const { rest_base: restBase } = yield controls.resolveSelect(
-		coreStoreName,
+		STORE_NAME,
 		'getPostType',
 		postType
 	);
@@ -375,7 +394,7 @@ export function* getAutosaves( postType, postId ) {
  */
 export function* getAutosave( postType, postId ) {
 	yield controls.resolveSelect(
-		coreStoreName,
+		STORE_NAME,
 		'getAutosaves',
 		postType,
 		postId
@@ -385,7 +404,7 @@ export function* getAutosave( postType, postId ) {
 /**
  * Retrieve the frontend template used for a given link.
  *
- * @param {string} link  Link.
+ * @param {string} link Link.
  */
 export function* __experimentalGetTemplateForLink( link ) {
 	// Ideally this should be using an apiFetch call
@@ -408,7 +427,7 @@ export function* __experimentalGetTemplateForLink( link ) {
 
 	yield getEntityRecord( 'postType', 'wp_template', template.id );
 	const record = yield controls.select(
-		coreStoreName,
+		STORE_NAME,
 		'getEntityRecord',
 		'postType',
 		'wp_template',

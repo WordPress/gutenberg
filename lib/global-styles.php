@@ -134,20 +134,51 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			'__experimentalNoWrapper' => true,
 		);
 
+		// Reset existing global styles.
+		foreach ( $settings['styles'] as $key => $style ) {
+			if ( isset( $style['__unstableType'] ) && 'globalStyles' === $style['__unstableType'] ) {
+				unset( $settings['styles'][ $key ] );
+			}
+		}
+
+		// Add the new ones.
 		$settings['styles'][] = $css_variables;
 		$settings['styles'][] = $block_styles;
 	}
 
 	// Copied from get_block_editor_settings() at wordpress-develop/block-editor.php.
 	$settings['__experimentalFeatures'] = $consolidated->get_settings();
+
 	if ( isset( $settings['__experimentalFeatures']['color']['palette'] ) ) {
-		$settings['colors'] = $settings['__experimentalFeatures']['color']['palette'];
-		unset( $settings['__experimentalFeatures']['color']['palette'] );
+		$colors_by_origin   = $settings['__experimentalFeatures']['color']['palette'];
+		$settings['colors'] = isset( $colors_by_origin['user'] ) ?
+			$colors_by_origin['user'] : (
+				isset( $colors_by_origin['theme'] ) ?
+					$colors_by_origin['theme'] :
+					$colors_by_origin['core']
+			);
 	}
+
 	if ( isset( $settings['__experimentalFeatures']['color']['gradients'] ) ) {
-		$settings['gradients'] = $settings['__experimentalFeatures']['color']['gradients'];
-		unset( $settings['__experimentalFeatures']['color']['gradients'] );
+		$gradients_by_origin   = $settings['__experimentalFeatures']['color']['gradients'];
+		$settings['gradients'] = isset( $gradients_by_origin['user'] ) ?
+			$gradients_by_origin['user'] : (
+				isset( $gradients_by_origin['theme'] ) ?
+					$gradients_by_origin['theme'] :
+					$gradients_by_origin['core']
+			);
 	}
+
+	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
+		$font_sizes_by_origin  = $settings['__experimentalFeatures']['typography']['fontSizes'];
+		$settings['fontSizes'] = isset( $font_sizes_by_origin['user'] ) ?
+			$font_sizes_by_origin['user'] : (
+				isset( $font_sizes_by_origin['theme'] ) ?
+					$font_sizes_by_origin['theme'] :
+					$font_sizes_by_origin['core']
+			);
+	}
+
 	if ( isset( $settings['__experimentalFeatures']['color']['custom'] ) ) {
 		$settings['disableCustomColors'] = ! $settings['__experimentalFeatures']['color']['custom'];
 		unset( $settings['__experimentalFeatures']['color']['custom'] );
@@ -155,10 +186,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	if ( isset( $settings['__experimentalFeatures']['color']['customGradient'] ) ) {
 		$settings['disableCustomGradients'] = ! $settings['__experimentalFeatures']['color']['customGradient'];
 		unset( $settings['__experimentalFeatures']['color']['customGradient'] );
-	}
-	if ( isset( $settings['__experimentalFeatures']['typography']['fontSizes'] ) ) {
-		$settings['fontSizes'] = $settings['__experimentalFeatures']['typography']['fontSizes'];
-		unset( $settings['__experimentalFeatures']['typography']['fontSizes'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['typography']['customFontSize'] ) ) {
 		$settings['disableCustomFontSizes'] = ! $settings['__experimentalFeatures']['typography']['customFontSize'];
@@ -169,12 +196,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		unset( $settings['__experimentalFeatures']['typography']['customLineHeight'] );
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
-		if ( ! is_array( $settings['__experimentalFeatures']['spacing']['units'] ) ) {
-			$settings['enableCustomUnits'] = false;
-		} else {
-			$settings['enableCustomUnits'] = count( $settings['__experimentalFeatures']['spacing']['units'] ) > 0;
-		}
-		unset( $settings['__experimentalFeatures']['spacing']['units'] );
+		$settings['enableCustomUnits'] = $settings['__experimentalFeatures']['spacing']['units'];
 	}
 	if ( isset( $settings['__experimentalFeatures']['spacing']['customPadding'] ) ) {
 		$settings['enableCustomSpacing'] = $settings['__experimentalFeatures']['spacing']['customPadding'];
@@ -213,9 +235,9 @@ function gutenberg_global_styles_filter_post( $content ) {
 		$decoded_data['isGlobalStylesUserThemeJSON']
 	) {
 		unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
-		$theme_json = new WP_Theme_JSON_Gutenberg( $decoded_data );
-		$theme_json->remove_insecure_properties();
-		$data_to_encode                                = $theme_json->get_raw_data();
+
+		$data_to_encode = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $decoded_data );
+
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
 		return wp_json_encode( $data_to_encode );
 	}

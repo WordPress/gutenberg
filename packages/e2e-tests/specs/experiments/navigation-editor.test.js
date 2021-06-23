@@ -93,7 +93,7 @@ const REST_PAGES_ROUTES = [
  * routes (expressed as substrings).
  *
  * @param {string} reqUrl the full URL to be tested for matches.
- * @param {Array} routes array of strings to match against the URL.
+ * @param {Array}  routes array of strings to match against the URL.
  */
 function matchUrlToRoute( reqUrl, routes ) {
 	return routes.some( ( route ) => reqUrl.includes( route ) );

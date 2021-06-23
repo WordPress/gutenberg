@@ -27,7 +27,7 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * internally. For example, `plugins: string[]` will be parsed into
  * `pluginSources: WPSource[]`.
  *
- * @param {Object} config A config object to validate.
+ * @param {Object} config                    A config object to validate.
  * @param {Object} options
  * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  * @return {WPServiceConfig} Parsed environment-level configuration.
@@ -61,9 +61,9 @@ module.exports = function parseConfig( config, options ) {
 /**
  * Parses a source string into a source object.
  *
- * @param {?string} sourceString The source string. See README.md for documentation on valid source string patterns.
- * @param {Object} options
- * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
+ * @param {?string} sourceString              The source string. See README.md for documentation on valid source string patterns.
+ * @param {Object}  options
+ * @param {string}  options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  *
  * @return {?WPSource} A source object.
  */
@@ -142,8 +142,8 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
  * property set correctly. Only the 'core' source requires a testsPath.
  *
  * @param {?WPSource} source                    A source object.
- * @param {Object}  options
- * @param {string}  options.workDirectoryPath Path to the work directory located in ~/.wp-env.
+ * @param {Object}    options
+ * @param {string}    options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  *
  * @return {?WPSource} A source object.
  */

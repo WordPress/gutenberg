@@ -1,9 +1,11 @@
 // Additional ids and class names are used in the selector for
 // added specificity.
 #customize-theme-controls .customize-pane-child.customize-widgets__sidebar-section {
-	// Override the default 'overflow' to allow the
-	// editor toolbars to be sticky.
-	overflow: unset;
+	// Override the `overflow` to allow the editor toolbars to be sticky.
+	// Applied with `.open` to keep overflow hidden in outer customize panes.
+	&.open {
+		overflow: unset;
+	}
 
 	// Make the entire sidebar background white.
 	min-height: 100%;

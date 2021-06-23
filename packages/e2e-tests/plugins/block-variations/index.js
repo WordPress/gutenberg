@@ -1,11 +1,11 @@
-( function() {
-	var el = wp.element.createElement;
-	var registerBlockVariation = wp.blocks.registerBlockVariation;
-	var __ = wp.i18n.__;
-	var Circle = wp.primitives.Circle;
-	var SVG = wp.primitives.SVG;
+( function () {
+	const el = wp.element.createElement;
+	const registerBlockVariation = wp.blocks.registerBlockVariation;
+	const __ = wp.i18n.__;
+	const Circle = wp.primitives.Circle;
+	const SVG = wp.primitives.SVG;
 
-	var redCircle = el( Circle, {
+	const redCircle = el( Circle, {
 		cx: 24,
 		cy: 24,
 		r: 15,
@@ -13,7 +13,8 @@
 		stroke: 'blue',
 		strokeWidth: '10',
 	} );
-	var redCircleIcon = el(
+
+	const redCircleIcon = el(
 		SVG,
 		{ width: 48, height: 48, viewBox: '0 0 48 48' },
 		redCircle

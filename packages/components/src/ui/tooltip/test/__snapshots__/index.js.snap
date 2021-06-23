@@ -31,7 +31,7 @@ exports[`props should render correctly 1`] = `
   data-wp-component="TooltipContent"
   id="base-tooltip"
   role="tooltip"
-  style="pointer-events: none;"
+  style="position: fixed; left: 100%; top: 100%; pointer-events: none;"
 >
   <div
     class="emotion-0 emotion-1"

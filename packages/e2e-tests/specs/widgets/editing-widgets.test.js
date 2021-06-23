@@ -9,6 +9,7 @@ import {
 	showBlockToolbar,
 	visitAdminPage,
 	deleteAllWidgets,
+	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -122,14 +123,17 @@ describe( 'Widgets screen', () => {
 		).toBe( true );
 	}
 
-	async function getInlineInserterButton() {
-		return await find( {
-			role: 'combobox',
-			name: 'Add block',
-		} );
-	}
-
 	it( 'Should insert content using the global inserter', async () => {
+		const updateButton = await find( {
+			role: 'button',
+			name: 'Update',
+		} );
+
+		// Update button should start out disabled.
+		expect(
+			await updateButton.evaluate( ( button ) => button.disabled )
+		).toBe( true );
+
 		const widgetAreas = await findAll( {
 			role: 'group',
 			name: 'Block: Widget Area',
@@ -145,6 +149,11 @@ describe( 'Widgets screen', () => {
 		// );
 
 		await addParagraphBlock.click();
+
+		// Adding content should enable the Update button.
+		expect(
+			await updateButton.evaluate( ( button ) => button.disabled )
+		).toBe( false );
 
 		let addedParagraphBlockInFirstWidgetArea = await find(
 			{
@@ -215,6 +224,12 @@ describe( 'Widgets screen', () => {
 		// await page.keyboard.type( 'Third Paragraph' );
 
 		await saveWidgets();
+
+		// The Update button should be disabled again after saving.
+		expect(
+			await updateButton.evaluate( ( button ) => button.disabled )
+		).toBe( true );
+
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
@@ -252,7 +267,10 @@ describe( 'Widgets screen', () => {
 				10
 		);
 
-		let inlineInserterButton = await getInlineInserterButton();
+		let inlineInserterButton = await find( {
+			role: 'combobox',
+			name: 'Add block',
+		} );
 		await inlineInserterButton.click();
 
 		let inlineQuickInserter = await find( {
@@ -312,7 +330,13 @@ describe( 'Widgets screen', () => {
 			secondParagraphBlockBoundingBox.y - 10
 		);
 
-		inlineInserterButton = await getInlineInserterButton();
+		// There will be 2 matches here.
+		// One is the in-between inserter,
+		// and the other one is the button block appender.
+		[ inlineInserterButton ] = await findAll( {
+			role: 'combobox',
+			name: 'Add block',
+		} );
 		await inlineInserterButton.click();
 
 		// TODO: Convert to find() API from puppeteer-testing-library.
@@ -669,6 +693,62 @@ describe( 'Widgets screen', () => {
 		Object {
 		  "sidebar-2": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
+		</div></div>",
+		}
+	` );
+	} );
+
+	it( 'Allows widget deletion to be undone', async () => {
+		const [ firstWidgetArea ] = await findAll( {
+			role: 'group',
+			name: 'Block: Widget Area',
+		} );
+
+		let addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
+
+		let addedParagraphBlockInFirstWidgetArea = await find(
+			{
+				name: /^Empty block/,
+				selector: '[data-block][data-type="core/paragraph"]',
+			},
+			{
+				root: firstWidgetArea,
+			}
+		);
+		await addedParagraphBlockInFirstWidgetArea.focus();
+		await page.keyboard.type( 'First Paragraph' );
+
+		addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
+
+		addedParagraphBlockInFirstWidgetArea = await firstWidgetArea.$(
+			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		);
+		await addedParagraphBlockInFirstWidgetArea.focus();
+		await page.keyboard.type( 'Second Paragraph' );
+
+		await saveWidgets();
+
+		// Delete the last block and save again.
+		await pressKeyWithModifier( 'access', 'z' );
+		await saveWidgets();
+
+		// Undo block deletion and save again
+		await pressKeyWithModifier( 'primary', 'z' );
+		await saveWidgets();
+
+		// Reload the page to make sure changes were actually saved.
+		await page.reload();
+
+		const serializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
+		</div></div>
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>Second Paragraph</p>
 		</div></div>",
 		}
 	` );

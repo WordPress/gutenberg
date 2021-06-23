@@ -708,9 +708,39 @@
 		"parent": "components"
 	},
 	{
+		"title": "CardBody",
+		"slug": "card-body",
+		"markdown_source": "../packages/components/src/card/card-body/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CardDivider",
+		"slug": "card-divider",
+		"markdown_source": "../packages/components/src/card/card-divider/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CardFooter",
+		"slug": "card-footer",
+		"markdown_source": "../packages/components/src/card/card-footer/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CardHeader",
+		"slug": "card-header",
+		"markdown_source": "../packages/components/src/card/card-header/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "CardMedia",
+		"slug": "card-media",
+		"markdown_source": "../packages/components/src/card/card-media/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Card",
 		"slug": "card",
-		"markdown_source": "../packages/components/src/card/README.md",
+		"markdown_source": "../packages/components/src/card/card/README.md",
 		"parent": "components"
 	},
 	{
@@ -1137,6 +1167,12 @@
 		"title": "Spinner",
 		"slug": "spinner",
 		"markdown_source": "../packages/components/src/spinner/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Surface",
+		"slug": "surface",
+		"markdown_source": "../packages/components/src/surface/README.md",
 		"parent": "components"
 	},
 	{
@@ -1689,6 +1725,12 @@
 		"title": "@wordpress/react-native-editor",
 		"slug": "packages-react-native-editor",
 		"markdown_source": "../packages/react-native-editor/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/readable-js-assets-webpack-plugin",
+		"slug": "packages-readable-js-assets-webpack-plugin",
+		"markdown_source": "../packages/readable-js-assets-webpack-plugin/README.md",
 		"parent": "packages"
 	},
 	{

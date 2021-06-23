@@ -24,6 +24,7 @@ export const Header = styled( Flex )`
 
 export const HeaderControlWrapper = styled( Flex )`
 	min-height: 30px;
+	gap: 0;
 `;
 
 export const UnitControlWrapper = styled.div`
@@ -59,8 +60,8 @@ const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {
 	} );
 };
 
-const unitControlMarginStyles = ( { isFirst } ) => {
-	const marginLeft = isFirst ? 0 : -1;
+const unitControlMarginStyles = ( { isFirst, isOnly } ) => {
+	const marginLeft = isFirst || isOnly ? 0 : -1;
 
 	return rtl( { marginLeft } )();
 };
