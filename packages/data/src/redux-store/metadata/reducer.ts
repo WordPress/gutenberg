@@ -3,25 +3,40 @@
  */
 import { omit, has } from 'lodash';
 import EquivalentKeyMap from 'equivalent-key-map';
+import type { Reducer } from 'redux';
 
 /**
  * Internal dependencies
  */
 import { onSubKey } from './utils';
 
+type Action =
+	| ReturnType< typeof import('./actions').startResolution >
+	| ReturnType< typeof import('./actions').finishResolution >
+	| ReturnType< typeof import('./actions').startResolutions >
+	| ReturnType< typeof import('./actions').finishResolutions >
+	| ReturnType< typeof import('./actions').invalidateResolution >
+	| ReturnType< typeof import('./actions').invalidateResolutionForStore >
+	| ReturnType<
+			typeof import('./actions').invalidateResolutionForStoreSelector
+	  >;
+
 /**
  * Reducer function returning next state for selector resolution of
  * subkeys, object form:
  *
  *  selectorName -> EquivalentKeyMap<Array,boolean>
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Next state.
  */
-const subKeysIsResolved = onSubKey( 'selectorName' )(
-	( state = new EquivalentKeyMap(), action ) => {
+const subKeysIsResolved: Reducer<
+	Record< string, EquivalentKeyMap< unknown[] | unknown, boolean > >,
+	Action
+> = onSubKey< EquivalentKeyMap< unknown[] | unknown, boolean >, Action >(
+	'selectorName'
+)(
+	(
+		state = new EquivalentKeyMap< unknown[] | unknown, boolean >(),
+		action: Action
+	) => {
 		switch ( action.type ) {
 			case 'START_RESOLUTION':
 			case 'FINISH_RESOLUTION': {
@@ -59,7 +74,13 @@ const subKeysIsResolved = onSubKey( 'selectorName' )(
  *
  * @return {Object} Next state.
  */
-const isResolved = ( state = {}, action ) => {
+const isResolved = (
+	state: Record<
+		string,
+		EquivalentKeyMap< unknown[] | unknown, boolean >
+	> = {},
+	action: Action
+) => {
 	switch ( action.type ) {
 		case 'INVALIDATE_RESOLUTION_FOR_STORE':
 			return {};
