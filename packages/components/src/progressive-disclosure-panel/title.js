@@ -11,15 +11,15 @@ import MenuGroup from '../menu-group';
 import MenuItem from '../menu-item';
 import DropdownMenu from '../dropdown-menu';
 
-const BlockSupportPanelTitle = ( props ) => {
-	const { menuItems = {}, menuLabel, resetAll, title, toggleControl } = props;
+const ProgressiveDisclosurePanelTitle = ( props ) => {
+	const { menuItems = {}, menuLabel, resetAll, title, toggleChild } = props;
 
 	if ( ! title ) {
 		return null;
 	}
 
 	return (
-		<h2 className="components-block-support-panel__title">
+		<h2 className="components-progressive-disclosure-panel__title">
 			{ title }
 			<DropdownMenu icon={ moreHorizontal } label={ menuLabel }>
 				{ ( { onClose } ) => (
@@ -33,7 +33,7 @@ const BlockSupportPanelTitle = ( props ) => {
 											icon={ isSelected && check }
 											isSelected={ isSelected }
 											onClick={ () => {
-												toggleControl( label );
+												toggleChild( label );
 												onClose();
 											} }
 											role="menuitemcheckbox"
@@ -61,4 +61,4 @@ const BlockSupportPanelTitle = ( props ) => {
 	);
 };
 
-export default BlockSupportPanelTitle;
+export default ProgressiveDisclosurePanelTitle;

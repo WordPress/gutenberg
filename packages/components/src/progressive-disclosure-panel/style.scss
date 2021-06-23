@@ -1,10 +1,10 @@
-.components-block-support-panel {
+.components-progressive-disclosure-panel {
 	border: none;
 	border-top: $border-width solid $gray-200;
 	padding: $grid-unit-20;
 	margin-top: -1px;
 
-	.components-block-support-panel__title {
+	.components-progressive-disclosure-panel__title {
 		margin: 0;
 		display: flex;
 		align-items: center;
@@ -43,11 +43,11 @@
 }
 
 .edit-site {
-	.components-block-support-panel {
+	.components-progressive-disclosure-panel {
 		border-bottom: $border-width solid $gray-200;
 	}
 
-	.components-block-support-panel + .components-panel__body {
+	.components-progressive-disclosure-panel + .components-panel__body {
 		margin-top: -1px;
 	}
 }
