@@ -6,9 +6,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import BlockSupportPanel from '../';
+import ProgressiveDisclosurePanel from '../';
 
-// Used to represent the block support provided controls.
+// Represents a child provided to the panel such as a block support control.
 const MockControl = ( { children } ) => <div>{ children }</div>;
 
 const resetAll = jest.fn();
@@ -17,45 +17,47 @@ const hasValue = jest.fn().mockImplementation( ( props ) => {
 	return props.attributes.value;
 } );
 
-// Default props for the block supports panel.
+// Default props for the progressive disclosure panel.
 const defaultProps = {
 	label: 'Display options',
 	title: 'Panel title',
 	resetAll,
 };
 
-// Default props for enabled block supports control to be rendered within panel.
+// Default props for an enabled control to be rendered within panel.
 const controlProps = {
 	attributes: { value: true },
 	hasValue,
 	label: 'Example',
-	reset: jest.fn().mockImplementation( () => {
+	onDeselect: jest.fn().mockImplementation( () => {
 		controlProps.attributes.value = undefined;
 	} ),
+	onSelect: jest.fn(),
 };
 
-// Default props without a value for alternate block supports control to be
-// rendered within the panel.
+// Default props without a value for an alternate control to be rendered within
+// the panel.
 const altControlProps = {
 	attributes: { value: false },
 	hasValue,
 	label: 'Alt',
-	reset: jest.fn(),
+	onDeselect: jest.fn(),
+	onSelect: jest.fn(),
 };
 
-// Attempts to find the block supports panel via its CSS class.
+// Attempts to find the progressive disclosure panel via its CSS class.
 const getPanel = ( container ) =>
-	container.querySelector( '.components-block-support-panel' );
+	container.querySelector( '.components-progressive-disclosure-panel' );
 
-// Renders a default block supports panel including a control that simulates
-// block support being disabled for that particular control.
+// Renders a default progressive disclosure panel including a child that
+// is being conditionally disabled.
 const renderPanel = () => {
 	return render(
-		<BlockSupportPanel { ...defaultProps }>
+		<ProgressiveDisclosurePanel { ...defaultProps }>
 			{ false && <div>Hidden</div> }
 			<MockControl { ...controlProps }>Example control</MockControl>
 			<MockControl { ...altControlProps }>Alt control</MockControl>
-		</BlockSupportPanel>
+		</ProgressiveDisclosurePanel>
 	);
 };
 
@@ -72,11 +74,11 @@ const selectMenuItem = async ( label ) => {
 	fireEvent.click( menuItem );
 };
 
-describe( 'BlockSupportPanel', () => {
+describe( 'ProgressiveDisclosurePanel', () => {
 	describe( 'basic rendering', () => {
 		it( 'should not render when no children provided', () => {
 			const { container } = render(
-				<BlockSupportPanel { ...defaultProps } />
+				<ProgressiveDisclosurePanel { ...defaultProps } />
 			);
 
 			expect( getPanel( container ) ).not.toBeInTheDocument();
@@ -85,9 +87,9 @@ describe( 'BlockSupportPanel', () => {
 		it( 'should not render when only child has been filtered out', () => {
 			// This covers case where children prop is not an array.
 			const { container } = render(
-				<BlockSupportPanel { ...defaultProps }>
+				<ProgressiveDisclosurePanel { ...defaultProps }>
 					{ false && <MockControl>Should not show</MockControl> }
-				</BlockSupportPanel>
+				</ProgressiveDisclosurePanel>
 			);
 
 			expect( getPanel( container ) ).not.toBeInTheDocument();
@@ -95,10 +97,10 @@ describe( 'BlockSupportPanel', () => {
 
 		it( 'should not render when all children have been filtered out', () => {
 			const { container } = render(
-				<BlockSupportPanel { ...defaultProps }>
+				<ProgressiveDisclosurePanel { ...defaultProps }>
 					{ false && <MockControl>Should not show</MockControl> }
 					{ false && <MockControl>Not shown either</MockControl> }
-				</BlockSupportPanel>
+				</ProgressiveDisclosurePanel>
 			);
 
 			expect( getPanel( container ) ).not.toBeInTheDocument();
@@ -145,8 +147,8 @@ describe( 'BlockSupportPanel', () => {
 		} );
 	} );
 
-	describe( 'conditional rendering of inner controls', () => {
-		it( 'should render child control when it has a value', () => {
+	describe( 'conditional rendering of children', () => {
+		it( 'should render child when it has a value', () => {
 			renderPanel();
 
 			const exampleControl = screen.getByText( 'Example control' );
@@ -156,7 +158,7 @@ describe( 'BlockSupportPanel', () => {
 			expect( altControl ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render child control when corresponding menu is selected', async () => {
+		it( 'should render child when corresponding menu item is selected', async () => {
 			renderPanel();
 			await selectMenuItem( altControlProps.label );
 			const control = await screen.findByText( 'Alt control' );
@@ -164,7 +166,7 @@ describe( 'BlockSupportPanel', () => {
 			expect( control ).toBeInTheDocument();
 		} );
 
-		it( 'should prevent child rendering when toggled off via menu', async () => {
+		it( 'should prevent child rendering when toggled off via menu item', async () => {
 			renderPanel();
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );
@@ -173,24 +175,26 @@ describe( 'BlockSupportPanel', () => {
 		} );
 	} );
 
-	describe( 'reset callbacks on menu item selection', () => {
+	describe( 'callbacks on menu item selection', () => {
 		beforeEach( () => {
 			jest.clearAllMocks();
 			controlProps.attributes.value = true;
 		} );
 
-		it( 'should call reset callback when menu item is toggled off', async () => {
+		it( 'should call onDeselect callback when menu item is toggled off', async () => {
 			renderPanel();
 			await selectMenuItem( controlProps.label );
 
-			expect( controlProps.reset ).toHaveBeenCalledTimes( 1 );
+			expect( controlProps.onSelect ).not.toHaveBeenCalled();
+			expect( controlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should not call reset callback when menu item is toggled on', async () => {
+		it( 'should call onSelect callback when menu item is toggled on', async () => {
 			renderPanel();
 			await selectMenuItem( altControlProps.label );
 
-			expect( altControlProps.reset ).not.toHaveBeenCalled();
+			expect( altControlProps.onSelect ).toHaveBeenCalledTimes( 1 );
+			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should call resetAll callback when its menu item is selected', async () => {

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import noop from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,27 +12,27 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BlockSupportPanelTitle from './title';
+import ProgressiveDisclosurePanelTitle from './title';
 
-const BlockSupportPanel = ( props ) => {
+const ProgressiveDisclosurePanel = ( props ) => {
 	const { children, className, label: menuLabel, resetAll, title } = props;
 	const [ menuItems, setMenuItems ] = useState( {} );
-	const [ defaultControls, setDefaultControls ] = useState( {} );
+	const [ defaultChildren, setDefaultChildren ] = useState( {} );
 
-	// If a block support UI has been disabled via theme.json a boolean `false`
-	// will be passed as a child. This panel is only interested in the children
-	// to be displayed.
+	// When conditionally including components e.g. { isShown && <Component /> }
+	// a boolean `false` will be passed as a child if component is excluded.
+	// This panel is only interested in the children to be displayed.
 	const filteredChildren = Array.isArray( children )
 		? children.filter( Boolean )
 		: [];
 
-	// Collect which controls have custom values. Used to update menu state to
-	// reflect customization for controls that display by default / always show.
+	// Collect which children have custom values. Used to update menu state to
+	// reflect customization for children that display by default / always show.
 	const customizedChildren = filteredChildren.map( ( child ) =>
 		child.props.hasValue( child.props ) ? child.props.label : undefined
 	);
 
-	// On first render determine initial menu state and which controls should
+	// On first render determine initial menu state and which children should
 	// always display by default.
 	useEffect( () => {
 		const items = {};
@@ -43,10 +44,10 @@ const BlockSupportPanel = ( props ) => {
 		} );
 
 		setMenuItems( items );
-		setDefaultControls( defaults );
+		setDefaultChildren( defaults );
 	}, [] );
 
-	// As the default controls are visible all the time. Reflect their
+	// As the default children are visible all the time. Reflect their
 	// customizations in the menu items' selected state.
 	useEffect( () => {
 		const menuLabels = Object.keys( menuItems );
@@ -58,7 +59,7 @@ const BlockSupportPanel = ( props ) => {
 
 		const updatedItems = { ...menuItems };
 		menuLabels.forEach( ( label ) => {
-			if ( defaultControls[ label ] ) {
+			if ( defaultChildren[ label ] ) {
 				updatedItems[ label ] = customizedChildren.includes( label );
 			}
 		} );
@@ -70,33 +71,33 @@ const BlockSupportPanel = ( props ) => {
 		return null;
 	}
 
-	const getControlByMenuLabel = ( label ) => {
+	const getChildByMenuLabel = ( label ) => {
 		return filteredChildren.find(
 			( child ) => child.props.label === label
 		);
 	};
 
-	// Toggles the customized state of the block support control and its display
-	// if it isn't to be displayed by default. When toggling off a control its
-	// associated block attribute is reset via the control's reset callback.
-	const toggleControl = ( label ) => {
-		const isSelected = menuItems[ label ];
+	// Toggles the customized state of the child and its display if it isn't to
+	// be displayed by default. When toggling a child it's callback is executed.
+	const toggleChild = ( label ) => {
+		const wasSelected = menuItems[ label ];
+		const child = getChildByMenuLabel( label );
+		const { onDeselect = noop, onSelect = noop } = child.props;
 
-		if ( isSelected ) {
-			const control = getControlByMenuLabel( label );
-			control.props.reset( control.props );
+		if ( wasSelected ) {
+			onDeselect( child.props );
+		} else {
+			onSelect( child.props );
 		}
 
 		setMenuItems( {
 			...menuItems,
-			[ label ]: ! isSelected,
+			[ label ]: ! wasSelected,
 		} );
 	};
 
-	// Resets all block support attributes for controls represented by the
-	// menu items. Then turns off their display.
-	const resetAllControls = () => {
-		// Reset the block support attributes.
+	// Resets display of children and executes resetAll callback if available.
+	const resetAllChildren = () => {
 		resetAll();
 
 		// Turn off menu items unless they are to display by default.
@@ -109,23 +110,26 @@ const BlockSupportPanel = ( props ) => {
 		setMenuItems( resetMenuItems );
 	};
 
-	const classes = classnames( 'components-block-support-panel', className );
+	const classes = classnames(
+		'components-progressive-disclosure-panel',
+		className
+	);
 
 	return (
 		<div className={ classes }>
-			<BlockSupportPanelTitle
+			<ProgressiveDisclosurePanelTitle
 				menuLabel={ menuLabel }
 				title={ title }
 				menuItems={ menuItems }
-				toggleControl={ toggleControl }
-				resetAll={ resetAllControls }
+				toggleChild={ toggleChild }
+				resetAll={ resetAllChildren }
 			/>
 			{ filteredChildren.map( ( child ) => {
-				// Only display the block support control if it is toggled on
-				// in the menu or is set to display by default.
+				// Only display the child if it is toggled on in the menu or is
+				// set to display by default.
 				const isShown =
 					menuItems[ child.props.label ] ||
-					defaultControls[ child.props.label ];
+					defaultChildren[ child.props.label ];
 
 				return isShown ? child : null;
 			} ) }
@@ -133,4 +137,4 @@ const BlockSupportPanel = ( props ) => {
 	);
 };
 
-export default BlockSupportPanel;
+export default ProgressiveDisclosurePanel;

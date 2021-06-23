@@ -22,7 +22,6 @@ export {
 	useAutocompleteProps as __unstableUseAutocompleteProps,
 } from './autocomplete';
 export { default as BaseControl } from './base-control';
-export { default as __experimentalBlockSupportPanel } from './block-support-panel';
 export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
@@ -100,6 +99,7 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
+export { default as __experimentalProgressiveDisclosurePanel } from './progressive-disclosure-panel';
 export { default as QueryControls } from './query-controls';
 export { default as __experimentalRadio } from './radio';
 export { default as __experimentalRadioGroup } from './radio-group';

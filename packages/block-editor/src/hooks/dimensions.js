@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalBlockSupportPanel as BlockSupportPanel } from '@wordpress/components';
+import { __experimentalProgressiveDisclosurePanel as ProgressiveDisclosurePanel } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
@@ -67,7 +67,7 @@ export function DimensionsPanel( props ) {
 
 	return (
 		<InspectorControls key="dimensions">
-			<BlockSupportPanel
+			<ProgressiveDisclosurePanel
 				label={ __( 'Dimensions options' ) }
 				title={ __( 'Dimensions' ) }
 				resetAll={ resetAll }
@@ -77,7 +77,7 @@ export function DimensionsPanel( props ) {
 						{ ...props }
 						hasValue={ hasPaddingValue }
 						label={ __( 'Padding' ) }
-						reset={ resetPadding }
+						onDeselect={ resetPadding }
 						isShownByDefault={ defaultSpacingControls?.padding }
 					/>
 				) }
@@ -86,11 +86,11 @@ export function DimensionsPanel( props ) {
 						{ ...props }
 						hasValue={ hasMarginValue }
 						label={ __( 'Margin' ) }
-						reset={ resetMargin }
+						onDeselect={ resetMargin }
 						isShownByDefault={ defaultSpacingControls?.margin }
 					/>
 				) }
-			</BlockSupportPanel>
+			</ProgressiveDisclosurePanel>
 		</InspectorControls>
 	);
 }

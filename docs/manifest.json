@@ -690,12 +690,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "BlockSupportPanel",
-		"slug": "block-support-panel",
-		"markdown_source": "../packages/components/src/block-support-panel/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "BoxControl",
 		"slug": "box-control",
 		"markdown_source": "../packages/components/src/box-control/README.md",
@@ -1083,6 +1077,12 @@
 		"title": "Popover",
 		"slug": "popover",
 		"markdown_source": "../packages/components/src/popover/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ProgressiveDisclosurePanel",
+		"slug": "progressive-disclosure-panel",
+		"markdown_source": "../packages/components/src/progressive-disclosure-panel/README.md",
 		"parent": "components"
 	},
 	{

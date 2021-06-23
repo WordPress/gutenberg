@@ -11,13 +11,13 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BlockSupportPanel from '../';
+import ProgressiveDisclosurePanel from '../';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 
 export default {
-	title: 'Components/BlockSupportPanel',
-	component: BlockSupportPanel,
+	title: 'Components/ProgressiveDisclosurePanel',
+	component: ProgressiveDisclosurePanel,
 };
 
 export const _default = () => {
@@ -32,26 +32,26 @@ export const _default = () => {
 	return (
 		<PanelWrapperView>
 			<Panel>
-				<BlockSupportPanel
+				<ProgressiveDisclosurePanel
 					label="Display options"
-					title="Block Support Panel"
+					title="Progressive Disclosure Panel"
 					resetAll={ resetAll }
 				>
 					<PlaceholderControl
 						hasValue={ () => !! height }
 						label="Height"
-						reset={ () => setHeight( undefined ) }
+						onDeselect={ () => setHeight( undefined ) }
 						value={ height }
 						onChange={ ( next ) => setHeight( next ) }
 					/>
 					<PlaceholderControl
 						hasValue={ () => !! width }
 						label="Width"
-						reset={ () => setWidth( undefined ) }
+						onDeselect={ () => setWidth( undefined ) }
 						value={ width }
 						onChange={ ( next ) => setWidth( next ) }
 					/>
-				</BlockSupportPanel>
+				</ProgressiveDisclosurePanel>
 			</Panel>
 		</PanelWrapperView>
 	);
