@@ -6,8 +6,8 @@ import { Divider } from '../../divider';
 import { useCardDivider } from './hook';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr'>} props
- * @param {import('react').Ref<any>}                                                                         forwardedRef
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+ * @param {import('react').Ref<any>}                                                                                forwardedRef
  */
 function CardDivider( props, forwardedRef ) {
 	const dividerProps = useCardDivider( props );

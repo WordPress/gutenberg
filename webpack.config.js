@@ -72,34 +72,37 @@ const stylesTransform = ( content ) => {
 
 /*
  * Matches a block's name in paths in the form
- * build-module/<blockName>/frontend.js
+ * build-module/<blockName>/view.js
  */
-const blockNameRegex = new RegExp( /(?<=build-module\/).*(?=(\/frontend))/g );
+const blockNameRegex = new RegExp( /(?<=build-module\/).*(?=(\/view))/g );
 
 const createEntrypoints = () => {
 	/*
-	 * Returns an array of paths to frontend.js files within the block-directory package.
+	 * Returns an array of paths to view.js files within the `@wordpress/block-library` package.
 	 * These paths can be matched by the regex `blockNameRegex` in order to extract
 	 * the block's name.
 	 *
 	 * Returns an empty array if no files were found.
 	 */
-	const scriptPaths = fastGlob.sync(
-		'./packages/block-library/build-module/**/frontend.js'
+	const blockViewScriptPaths = fastGlob.sync(
+		'./packages/block-library/build-module/**/view.js'
 	);
 
 	/*
 	 * Go through the paths found above, in order to define webpack entry points for
-	 * each block's frontend.js file.
+	 * each block's view.js file.
 	 */
-	const scriptEntries = scriptPaths.reduce( ( entries, scriptPath ) => {
-		const [ blockName ] = scriptPath.match( blockNameRegex );
+	const blockViewScriptEntries = blockViewScriptPaths.reduce(
+		( entries, scriptPath ) => {
+			const [ blockName ] = scriptPath.match( blockNameRegex );
 
-		return {
-			...entries,
-			[ blockName ]: scriptPath,
-		};
-	}, {} );
+			return {
+				...entries,
+				[ 'blocks/' + blockName ]: scriptPath,
+			};
+		},
+		{}
+	);
 
 	const packageEntries = gutenbergPackages.reduce( ( memo, packageName ) => {
 		return {
@@ -108,7 +111,7 @@ const createEntrypoints = () => {
 		};
 	}, {} );
 
-	return { ...packageEntries, ...scriptEntries };
+	return { ...packageEntries, ...blockViewScriptEntries };
 };
 
 module.exports = {
@@ -148,12 +151,12 @@ module.exports = {
 			// When processing ESM files, the requested path
 			// is defined in `entryModule.rootModule.rawRequest`, instead of
 			// being present in `entryModule.rawRequest`.
-			// In the context of frontend files, they would be processed
+			// In the context of frontend view files, they would be processed
 			// as ESM if they use `import` or `export` within it.
 			const request = rootModule?.rawRequest || rawRequest;
 
-			if ( request.includes( '/frontend.js' ) ) {
-				return `./build/block-library/blocks/[name]/frontend.min.js`;
+			if ( request.includes( '/view.js' ) ) {
+				return `./build/block-library/[name]/view.min.js`;
 			}
 
 			return `./build/[name]/index.min.js`;

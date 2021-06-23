@@ -96,10 +96,10 @@ Snapshot Diff:
             </div>
 @@ -119,22 +119,22 @@
             <div
-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
             >
               <label
-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
 -               htmlFor="inspector-text-control-4"
 +               htmlFor="inspector-text-control-3"
               >
@@ -218,10 +218,10 @@ Snapshot Diff:
             </div>
 @@ -119,22 +119,22 @@
             <div
-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
             >
               <label
-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
 -               htmlFor="inspector-text-control-8"
 +               htmlFor="inspector-text-control-7"
               >
@@ -340,10 +340,10 @@ Snapshot Diff:
             </div>
 @@ -119,22 +119,22 @@
             <div
-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
             >
               <label
-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
 -               htmlFor="inspector-text-control-10"
 +               htmlFor="inspector-text-control-9"
               >
@@ -462,10 +462,10 @@ Snapshot Diff:
             </div>
 @@ -119,22 +119,22 @@
             <div
-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
             >
               <label
-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
 -               htmlFor="inspector-text-control-6"
 +               htmlFor="inspector-text-control-5"
               >
@@ -547,10 +547,10 @@ Snapshot Diff:
             </div>
 @@ -119,22 +119,22 @@
             <div
-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
             >
               <label
-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
 -               htmlFor="inspector-text-control-2"
 +               htmlFor="inspector-text-control-1"
               >
@@ -580,7 +580,7 @@ exports[`ColorPicker should render color picker 1`] = `
 }
 
 .emotion-2 {
-  margin-bottom: 8px;
+  margin-bottom: calc(4px * 2);
 }
 
 .components-panel__row .emotion-2 {
@@ -589,7 +589,7 @@ exports[`ColorPicker should render color picker 1`] = `
 
 .emotion-0 {
   display: inline-block;
-  margin-bottom: 8px;
+  margin-bottom: calc(4px * 2);
 }
 
 <div

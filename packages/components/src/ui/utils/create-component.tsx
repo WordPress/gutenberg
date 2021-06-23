@@ -11,16 +11,14 @@ import type { As } from 'reakit-utils/types';
 import { contextConnect } from '../context';
 // eslint-disable-next-line no-duplicate-imports
 import type {
-	PolymorphicComponent,
-	PropsFromPolymorphicComponentProps,
-	ElementTypeFromPolymorphicComponentProps,
 	PolymorphicComponentProps,
+	PolymorphicComponentFromProps,
 } from '../context';
 import { View } from '../../view';
 
 interface Options<
 	A extends As,
-	P extends PolymorphicComponentProps< {}, A >
+	P extends PolymorphicComponentProps< {}, A, any >
 > {
 	as: A;
 	name: string;
@@ -40,16 +38,13 @@ interface Options<
  */
 export const createComponent = <
 	A extends As,
-	P extends PolymorphicComponentProps< {}, A >
+	P extends PolymorphicComponentProps< {}, A, any >
 >( {
 	as,
 	name,
 	useHook,
 	memo = false,
-}: Options< A, P > ): PolymorphicComponent<
-	ElementTypeFromPolymorphicComponentProps< P >,
-	PropsFromPolymorphicComponentProps< P >
-> => {
+}: Options< A, P > ): PolymorphicComponentFromProps< P > => {
 	function Component( props: P, forwardedRef: Ref< any > ) {
 		const otherProps = useHook( props );
 
