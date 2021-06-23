@@ -88,11 +88,12 @@ supports: {
     -   `background`: type `boolean`, default value `true`
     -   `__experimentalDuotone`: type `string`, default value undefined
     -   `gradients`: type `boolean`, default value `false`
+    -   `link`: type `boolean`, default value `true`
     -   `text`: type `boolean`, default value `true`
 
 This value signals that a block supports some of the properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
-Note that the `text` and `background` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
+Note that the `background`, `link`, and `text` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
 
 ```js
 supports: {
@@ -122,7 +123,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enable both background and text
+    color: true // Enables background, link, and text
 }
 ```
 
@@ -273,6 +274,68 @@ When the block declares support for `color.gradient`, the attributes definition 
   }
   ```
 
+### color.link
+
+This property adds block controls which allow the user to set link color in a block.
+
+When color support is declared, this property is enabled by default, so simply setting color will enable.
+
+```js
+supports: {
+    color: true // Enables background, link, and text
+}
+```
+
+To disable link color support while keeping other color supports enabled, set to `false`.
+
+```js
+supports: {
+    color: {
+        // Disable link color support. Background and text support is still enabled.
+        link: false
+    }
+}
+```
+
+Link color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
+
+
+When the block declares support for `color.link`, the attributes definition is extended to include two new attributes: `linkColor` and `style`:
+
+- `linkColor`: attribute of `string` type with no default assigned.
+
+  When a user chooses from the list of preset link colors, the preset slug is stored in the `linkColor` attribute.
+
+  The block can apply a default preset text color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      linkColor: {
+          type: 'string',
+          default: 'some-preset-link-color-slug',
+      }
+  }
+  ```
+
+- `style`: attribute of `object` type with no default assigned.
+
+  When a custom link color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.link` attribute.
+
+  The block can apply a default custom link color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      style: {
+          type: 'object',
+          default: {
+              color: {
+                  link: '#ff0000',
+              }
+          }
+      }
+  }
+  ```
+
 ### color.text
 
 This property adds block controls which allow the user to set text color in a block.
@@ -281,7 +344,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enable both text and background
+    color: true // Enables background, link, and text
 }
 ```
 
@@ -290,7 +353,7 @@ To disable text color support while keeping other color supports enabled, set to
 ```js
 supports: {
     color: {
-        // Disable text color support. Background support is still enabled.
+        // Disable text color support. Background and link support is still enabled.
         text: false
     }
 }
