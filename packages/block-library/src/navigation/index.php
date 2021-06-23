@@ -120,16 +120,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
-	$should_load_frontend_script = $attributes['isResponsive'] && ! wp_script_is( 'core_block_navigation_load_frontend_scripts' );
 
-	if ( $should_load_frontend_script ) {
-		wp_enqueue_script(
-			'core_block_navigation_load_frontend_scripts',
-			plugins_url( 'frontend.js', __DIR__ . '/navigation/frontend.js' ),
-			array(),
-			false,
-			true
-		);
+	$should_load_view_script = ! empty( $attributes['isResponsive'] ) && ! wp_script_is( 'wp-block-navigation-view' );
+	if ( $should_load_view_script ) {
+		wp_enqueue_script( 'wp-block-navigation-view' );
 	}
 
 	if ( empty( $block->inner_blocks ) ) {
