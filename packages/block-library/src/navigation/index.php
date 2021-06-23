@@ -91,8 +91,7 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
  *
  * If no location was provided as a block attribute then false is returned.
  *
- * @param  array $location The location of the classic menu to display.
- * @param  array $attributes Navigation block attributes.
+ * @param  string $location The location of the classic menu to display.
  * @return string|false HTML markup of a generated Navigation Block or false if no location is specified.
  */
 function gutenberg_render_menu_from_location( $location ) {
