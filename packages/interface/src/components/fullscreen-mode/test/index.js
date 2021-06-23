@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-
+import { act, create } from 'react-test-renderer';
 /**
  * Internal dependencies
  */
@@ -10,16 +9,18 @@ import { FullscreenMode } from '..';
 
 describe( 'FullscreenMode', () => {
 	it( 'fullscreen mode to be added to document body when active', () => {
-		shallow( <FullscreenMode isActive={ true } /> );
-
+		act( () => {
+			create( <FullscreenMode isActive={ true } /> );
+		} );
 		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
 			true
 		);
 	} );
 
 	it( 'fullscreen mode not to be added to document body when active', () => {
-		shallow( <FullscreenMode isActive={ false } /> );
-
+		act( () => {
+			create( <FullscreenMode isActive={ false } /> );
+		} );
 		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
 			false
 		);
@@ -27,9 +28,9 @@ describe( 'FullscreenMode', () => {
 
 	it( 'sticky-menu to be removed from the body class if present', () => {
 		document.body.classList.add( 'sticky-menu' );
-
-		shallow( <FullscreenMode isActive={ false } /> );
-
+		act( () => {
+			create( <FullscreenMode isActive={ false } /> );
+		} );
 		expect( document.body.classList.contains( 'sticky-menu' ) ).toBe(
 			false
 		);
@@ -37,10 +38,13 @@ describe( 'FullscreenMode', () => {
 
 	it( 'sticky-menu to be restored when component unmounted and originally present', () => {
 		document.body.classList.add( 'sticky-menu' );
-
-		const mode = shallow( <FullscreenMode isActive={ false } /> );
-		mode.unmount();
-
+		let mode;
+		act( () => {
+			mode = create( <FullscreenMode isActive={ false } /> );
+		} );
+		act( () => {
+			mode.unmount();
+		} );
 		expect( document.body.classList.contains( 'sticky-menu' ) ).toBe(
 			true
 		);
@@ -51,15 +55,18 @@ describe( 'FullscreenMode', () => {
 		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
 			false
 		);
-
-		const mode = shallow( <FullscreenMode isActive /> );
-
+		let mode;
+		act( () => {
+			mode = create( <FullscreenMode isActive /> );
+		} );
 		// present after mounting with `isActive`
 		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(
 			true
 		);
 
-		mode.unmount();
+		act( () => {
+			mode.unmount();
+		} );
 
 		// removed after unmounting
 		expect( document.body.classList.contains( 'is-fullscreen-mode' ) ).toBe(

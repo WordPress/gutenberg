@@ -1,51 +1,48 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
-export class FullscreenMode extends Component {
-	componentDidMount() {
-		this.isSticky = false;
-		this.sync();
+export const FullscreenMode = ( { isActive } ) => {
+	const [ isSticky, setIsSticky ] = useState( false );
 
+	// componentDidMount
+	useEffect( () => {
 		// `is-fullscreen-mode` is set in PHP as a body class by Gutenberg, and this causes
 		// `sticky-menu` to be applied by WordPress and prevents the admin menu being scrolled
 		// even if `is-fullscreen-mode` is then removed. Let's remove `sticky-menu` here as
 		// a consequence of the FullscreenMode setup
 		if ( document.body.classList.contains( 'sticky-menu' ) ) {
-			this.isSticky = true;
+			setIsSticky( true );
 			document.body.classList.remove( 'sticky-menu' );
 		}
-	}
+	}, [ setIsSticky ] );
 
-	componentWillUnmount() {
-		if ( this.isSticky ) {
-			document.body.classList.add( 'sticky-menu' );
-		}
+	// componentWillUnmount
+	useEffect( () => {
+		return () => {
+			if ( isSticky ) {
+				document.body.classList.add( 'sticky-menu' );
+			}
+		};
+	}, [ isSticky ] );
 
-		if ( this.props.isActive ) {
-			document.body.classList.remove( 'is-fullscreen-mode' );
-		}
-	}
+	useEffect( () => {
+		return () => {
+			if ( isActive ) {
+				document.body.classList.remove( 'is-fullscreen-mode' );
+			}
+		};
+	}, [ isActive ] );
 
-	componentDidUpdate( prevProps ) {
-		if ( this.props.isActive !== prevProps.isActive ) {
-			this.sync();
-		}
-	}
-
-	sync() {
-		const { isActive } = this.props;
+	// componentDidUpdate
+	useEffect( () => {
 		if ( isActive ) {
 			document.body.classList.add( 'is-fullscreen-mode' );
 		} else {
 			document.body.classList.remove( 'is-fullscreen-mode' );
 		}
-	}
+	}, [ isActive ] );
 
-	render() {
-		return null;
-	}
-}
-
-export default FullscreenMode;
+	return null;
+};
