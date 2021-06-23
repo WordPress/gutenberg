@@ -17,6 +17,7 @@ import {
 	ResizableBox,
 	Spinner,
 	ToggleControl,
+	Icon,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -73,7 +74,7 @@ const SiteLogo = ( {
 			title: siteEntities.title,
 			...pick( getSettings(), [ 'imageSizes', 'maxWidth' ] ),
 		};
-	} );
+	}, [] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -255,28 +256,48 @@ export default function LogoEdit( {
 	const [ logoUrl, setLogoUrl ] = useState();
 	const [ error, setError ] = useState();
 	const ref = useRef();
-	const { mediaItemData, siteLogo, url } = useSelect( ( select ) => {
+	const { siteLogo, mediaItemData } = useSelect( ( select ) => {
 		const siteSettings = select( coreStore ).getEditedEntityRecord(
 			'root',
 			'site'
 		);
-		const mediaItem = siteSettings.site_logo
-			? select( coreStore ).getEntityRecord(
-					'root',
-					'media',
-					siteSettings.site_logo
-			  )
-			: null;
+		const mediaItem =
+			siteSettings.site_logo &&
+			select( coreStore ).getEntityRecord(
+				'root',
+				'media',
+				siteSettings.site_logo
+			);
 		return {
 			mediaItemData: mediaItem && {
 				url: mediaItem.source_url,
 				alt: mediaItem.alt_text,
 			},
 			siteLogo: siteSettings.site_logo,
-			url: siteSettings.url,
 		};
 	}, [] );
-
+	/**
+	 * Data for users with no proper rights have to be fetched
+	 * from REST `index` endpoint, which is public for all.
+	 */
+	const {
+		canUserEdit,
+		readOnlyLogo,
+		readOnlyLogoMediaItemData,
+		url,
+	} = useSelect( ( select ) => {
+		const { canUser, getEntityRecord } = select( coreStore );
+		const siteData = getEntityRecord( 'root', '__unstableBase' );
+		return {
+			canUserEdit: canUser( 'update', 'settings' ),
+			url: siteData?.url,
+			readOnlyLogo: siteData?.site_logo?.id,
+			readOnlyLogoMediaItemData: siteData?.site_logo && {
+				url: siteData?.site_logo?.url,
+				alt: siteData?.site_logo?.alt,
+			},
+		};
+	}, [] );
 	const { editEntityRecord } = useDispatch( coreStore );
 	const setLogo = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
@@ -284,10 +305,15 @@ export default function LogoEdit( {
 		} );
 
 	let alt = null;
-	if ( mediaItemData ) {
+	if ( canUserEdit && mediaItemData ) {
 		alt = mediaItemData.alt;
 		if ( logoUrl !== mediaItemData.url ) {
 			setLogoUrl( mediaItemData.url );
+		}
+	} else if ( readOnlyLogoMediaItemData ) {
+		alt = readOnlyLogoMediaItemData.alt;
+		if ( logoUrl !== readOnlyLogoMediaItemData.url ) {
+			setLogoUrl( readOnlyLogoMediaItemData.url );
 		}
 	}
 
@@ -311,7 +337,7 @@ export default function LogoEdit( {
 		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
 
-	const controls = logoUrl && (
+	const controls = canUserEdit && logoUrl && (
 		<BlockControls group="other">
 			<MediaReplaceFlow
 				mediaURL={ logoUrl }
@@ -325,10 +351,9 @@ export default function LogoEdit( {
 
 	const label = __( 'Site Logo' );
 	let logoImage;
-	if ( siteLogo === undefined ) {
+	if ( canUserEdit && siteLogo === undefined ) {
 		logoImage = <Spinner />;
 	}
-
 	if ( !! logoUrl ) {
 		logoImage = (
 			<SiteLogo
@@ -343,45 +368,46 @@ export default function LogoEdit( {
 			/>
 		);
 	}
-
-	const mediaPlaceholder = (
-		<MediaPlaceholder
-			icon={ <BlockIcon icon={ icon } /> }
-			labels={ {
-				title: label,
-				instructions: __(
-					'Upload an image, or pick one from your media library, to be your site logo'
-				),
-			} }
-			onSelect={ onSelectLogo }
-			accept={ ACCEPT_MEDIA_STRING }
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			mediaPreview={ logoImage }
-			notices={
-				error && (
-					<Notice status="error" isDismissible={ false }>
-						{ error }
-					</Notice>
-				)
-			}
-			onError={ onUploadError }
-		/>
-	);
-
 	const classes = classnames( className, {
 		'is-default-size': ! width,
 	} );
-
 	const blockProps = useBlockProps( {
 		ref,
 		className: classes,
 	} );
-
 	return (
 		<div { ...blockProps }>
 			{ controls }
 			{ logoUrl && logoImage }
-			{ ! logoUrl && mediaPlaceholder }
+			{ ! canUserEdit && ! readOnlyLogo && (
+				<div className="site-logo_placeholder">
+					<Icon icon={ icon } />
+					<p> { __( 'Site Logo' ) }</p>
+				</div>
+			) }
+			{ canUserEdit && ! logoUrl && (
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					labels={ {
+						title: label,
+						instructions: __(
+							'Upload an image, or pick one from your media library, to be your site logo'
+						),
+					} }
+					onSelect={ onSelectLogo }
+					accept={ ACCEPT_MEDIA_STRING }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					mediaPreview={ logoImage }
+					notices={
+						error && (
+							<Notice status="error" isDismissible={ false }>
+								{ error }
+							</Notice>
+						)
+					}
+					onError={ onUploadError }
+				/>
+			) }
 		</div>
 	);
 }
