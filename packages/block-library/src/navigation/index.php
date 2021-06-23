@@ -95,7 +95,7 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
  * @param  array $attributes Navigation block attributes.
  * @return string|false HTML markup of a generated Navigation Block or false if no location is specified.
  */
-function gutenberg_render_menu_from_location( $location, $attributes ) {
+function gutenberg_render_menu_from_location( $location ) {
 	if ( empty( $location ) ) {
 		return false;
 	}
@@ -161,7 +161,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if ( empty( $block->inner_blocks ) ) {
 		if ( array_key_exists( '__unstableLocation', $attributes ) ) {
 			$location                 = $attributes['__unstableLocation'];
-			$maybe_classic_navigation = gutenberg_render_menu_from_location( $location, $attributes );
+			$maybe_classic_navigation = gutenberg_render_menu_from_location( $location );
 			if ( $maybe_classic_navigation ) {
 				return $maybe_classic_navigation;
 			}
