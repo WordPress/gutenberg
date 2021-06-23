@@ -412,7 +412,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			'has-dates': displayPostDate,
 			'has-author': displayAuthor,
 			[ `columns-${ columns }` ]: postLayout === 'grid',
-			'has-no-bullets': 'list' === postLayout,
+			'has-no-bullets': 'bullet-list' !== postLayout,
 			'has-bullets': 'bullet-list' === postLayout,
 		} ),
 	} );
