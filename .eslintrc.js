@@ -66,6 +66,7 @@ module.exports = {
 		'@wordpress/data-no-store-string-literals': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
+		'import/no-extraneous-dependencies': 'error',
 		'no-restricted-imports': [
 			'error',
 			{

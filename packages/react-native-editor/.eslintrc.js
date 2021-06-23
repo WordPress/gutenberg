@@ -18,6 +18,7 @@ module.exports = {
 		'import/resolver': require.resolve( '../../test/lint/import-resolver' ),
 	},
 	rules: {
+		'import/no-extraneous-dependencies': 'error',
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
