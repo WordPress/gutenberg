@@ -32,7 +32,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { pin, list, grid } from '@wordpress/icons';
+import { pin, list, formatListBullets, grid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -411,6 +411,8 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			'has-dates': displayPostDate,
 			'has-author': displayAuthor,
 			[ `columns-${ columns }` ]: postLayout === 'grid',
+			'has-no-bullets': 'list' === postLayout,
+			'has-bullets': 'bullet-list' === postLayout,
 		} ),
 	} );
 
@@ -441,6 +443,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			title: __( 'List view' ),
 			onClick: () => setAttributes( { postLayout: 'list' } ),
 			isActive: postLayout === 'list',
+		},
+		{
+			icon: formatListBullets,
+			title: __( 'Bullet List view' ),
+			onClick: () => setAttributes( { postLayout: 'bullet-list' } ),
+			isActive: postLayout === 'bullet-list',
 		},
 		{
 			icon: grid,

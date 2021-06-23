@@ -8,7 +8,10 @@
 		margin-left: 2em;
 	}
 	&.wp-block-latest-posts__list {
-		list-style: none;
+
+		&.has-no-bullets {
+			list-style: none;
+		}
 
 		li {
 			clear: both;
