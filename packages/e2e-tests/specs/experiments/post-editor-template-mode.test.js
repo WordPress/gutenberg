@@ -91,7 +91,7 @@ const createNewTemplate = async ( templateName ) => {
 
 describe( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
+		await activatePlugin( 'gutenberg-test-block-templates' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
