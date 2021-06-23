@@ -18,7 +18,11 @@ import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
 
-const noopSearchHandler = Promise.resolve( [] );
+// Must be a function as otherwise URLInput will default
+// to the fetchLinkSuggestions passed in block editor settings
+// which will cause an unintended http request.
+const noopSearchHandler = () => Promise.resolve( [] );
+
 const LinkControlSearchInput = forwardRef(
 	(
 		{
@@ -50,6 +54,7 @@ const LinkControlSearchInput = forwardRef(
 			withCreateSuggestion,
 			withURLSuggestion
 		);
+
 		const searchHandler = showSuggestions
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;
@@ -67,11 +72,6 @@ const LinkControlSearchInput = forwardRef(
 		const onInputChange = ( selection, suggestion ) => {
 			onChange( selection );
 			setFocusedSuggestion( suggestion );
-		};
-
-		const onFormSubmit = ( event ) => {
-			event.preventDefault();
-			onSuggestionSelected( focusedSuggestion || { url: value } );
 		};
 
 		const handleRenderSuggestions = ( props ) =>
@@ -118,7 +118,7 @@ const LinkControlSearchInput = forwardRef(
 		};
 
 		return (
-			<form onSubmit={ onFormSubmit }>
+			<div>
 				<URLInput
 					className={ className }
 					value={ value }
@@ -132,10 +132,15 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
+					onSubmit={ ( suggestion ) => {
+						onSuggestionSelected(
+							suggestion || focusedSuggestion || { url: value }
+						);
+					} }
 					ref={ ref }
 				/>
 				{ children }
-			</form>
+			</div>
 		);
 	}
 );

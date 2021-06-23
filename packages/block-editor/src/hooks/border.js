@@ -16,44 +16,7 @@ import { BorderRadiusEdit } from './border-radius';
 import { BorderStyleEdit } from './border-style';
 import { BorderWidthEdit } from './border-width';
 
-const isWeb = Platform.OS === 'web';
-
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
-export const CSS_UNITS = [
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-		a11yLabel: __( 'Pixels (px)' ),
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-		a11yLabel: __( 'Relative to parent font size (em)' ),
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-		a11yLabel: __( 'Relative to root font size (rem)' ),
-	},
-];
-
-/**
- * Parses a CSS unit from a border CSS value.
- *
- * @param {string} cssValue CSS value to parse e.g. `10px` or `1.5em`.
- * @return {string}          CSS unit from provided value or default 'px'.
- */
-export function parseUnit( cssValue ) {
-	const value = String( cssValue ).trim();
-	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
-	const unit = unitMatch !== undefined ? unitMatch.toLowerCase() : '';
-	const currentUnit = CSS_UNITS.find( ( item ) => item.value === unit );
-
-	return currentUnit?.value || 'px';
-}
 
 export function BorderPanel( props ) {
 	const isDisabled = useIsBorderDisabled( props );

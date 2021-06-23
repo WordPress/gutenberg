@@ -32,7 +32,7 @@ import { store as blockEditorStore } from '../../store';
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
 const defaultRenderToggle = ( {
-	canViewEditorOnboarding,
+	enableEditorOnboarding,
 	onToggle,
 	disabled,
 	style,
@@ -40,7 +40,7 @@ const defaultRenderToggle = ( {
 } ) => (
 	<ToolbarButton
 		title={
-			canViewEditorOnboarding
+			enableEditorOnboarding
 				? __( 'Tap to add content' )
 				: __( 'Add block' )
 		}
@@ -51,7 +51,7 @@ const defaultRenderToggle = ( {
 				color={ style.color }
 			/>
 		}
-		showTooltip={ canViewEditorOnboarding }
+		showTooltip={ enableEditorOnboarding }
 		tooltipPosition="top right"
 		onClick={ onToggle }
 		extraProps={ {
@@ -171,7 +171,7 @@ export class Inserter extends Component {
 	}
 
 	onInserterToggledAnnouncement( isOpen ) {
-		AccessibilityInfo.fetch().done( ( isEnabled ) => {
+		AccessibilityInfo.isScreenReaderEnabled().done( ( isEnabled ) => {
 			if ( isEnabled ) {
 				const isIOS = Platform.OS === 'ios';
 				const announcement = isOpen
@@ -200,7 +200,7 @@ export class Inserter extends Component {
 	 */
 	renderInserterToggle( { onToggle, isOpen } ) {
 		const {
-			canViewEditorOnboarding,
+			enableEditorOnboarding,
 			disabled,
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
@@ -247,7 +247,7 @@ export class Inserter extends Component {
 		return (
 			<>
 				{ renderToggle( {
-					canViewEditorOnboarding,
+					enableEditorOnboarding,
 					onToggle: onPress,
 					isOpen,
 					disabled,
@@ -378,8 +378,7 @@ export default compose( [
 		const insertionIndexEnd = endOfRootIndex;
 
 		return {
-			canViewEditorOnboarding: getBlockEditorSettings()
-				.canViewEditorOnboarding,
+			enableEditorOnboarding: getBlockEditorSettings().editorOnboarding,
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,

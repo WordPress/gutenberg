@@ -11,6 +11,7 @@ import { keyboardReturn } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
+import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -148,26 +149,14 @@ function LinkControl( {
 			isMounting.current = false;
 			return;
 		}
-		// When `isEditingLink` changes, a focus loss could occur
-		// since the link input may be removed from the DOM. To avoid this,
-		// reinstate focus to a suitable target if focus has in-fact been lost.
-		// Note that the check is necessary because while typically unsetting
-		// edit mode would render the read-only mode's link element, it isn't
-		// guaranteed. The link input may continue to be shown if the next value
-		// is still unassigned after calling `onChange`.
-		const hadFocusLoss = ! wrapperNode.current.contains(
-			wrapperNode.current.ownerDocument.activeElement
-		);
 
-		if ( hadFocusLoss ) {
-			// Prefer to focus a natural focusable descendent of the wrapper,
-			// but settle for the wrapper if there are no other options.
-			const nextFocusTarget =
-				focus.focusable.find( wrapperNode.current )[ 0 ] ||
-				wrapperNode.current;
+		// When switching between editable and non editable LinkControl
+		// move focus to the first element to avoid focus loss.
+		const nextFocusTarget =
+			focus.focusable.find( wrapperNode.current )[ 0 ] ||
+			wrapperNode.current;
 
-			nextFocusTarget.focus();
-		}
+		nextFocusTarget.focus();
 
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink ] );
@@ -190,6 +179,13 @@ function LinkControl( {
 
 	const handleSelectSuggestion = ( updatedValue ) => {
 		onChange( updatedValue );
+		stopEditing();
+	};
+
+	const handleSubmitButton = () => {
+		if ( currentInputValue !== value?.url ) {
+			onChange( { url: currentInputValue } );
+		}
 		stopEditing();
 	};
 
@@ -228,7 +224,14 @@ function LinkControl( {
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button
-									type="submit"
+									onClick={ () => handleSubmitButton() }
+									onKeyDown={ ( event ) => {
+										const { keyCode } = event;
+										if ( keyCode === ENTER ) {
+											event.preventDefault();
+											handleSubmitButton();
+										}
+									} }
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
 									className="block-editor-link-control__search-submit"

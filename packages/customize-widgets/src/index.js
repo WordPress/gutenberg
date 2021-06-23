@@ -7,7 +7,10 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { registerLegacyWidgetVariations } from '@wordpress/widgets';
+import {
+	registerLegacyWidgetBlock,
+	registerLegacyWidgetVariations,
+} from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -27,14 +30,13 @@ const { wp } = window;
  */
 export function initialize( editorName, blockEditorSettings ) {
 	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( block ) => ! [ 'core/more' ].includes( block.name )
+		( block ) => ! [ 'core/more', 'core/freeform' ].includes( block.name )
 	);
 	registerCoreBlocks( coreBlocks );
-
+	registerLegacyWidgetBlock();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks();
 	}
-
 	registerLegacyWidgetVariations( blockEditorSettings );
 
 	const SidebarControl = getSidebarControl( blockEditorSettings );

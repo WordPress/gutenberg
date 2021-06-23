@@ -19,6 +19,7 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -47,12 +48,31 @@ function Interface( { blockEditorSettings } ) {
 	);
 	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
 
-	const { hasSidebarEnabled, isInserterOpened } = useSelect(
+	const {
+		hasBlockBreadCrumbsEnabled,
+		hasSidebarEnabled,
+		isInserterOpened,
+		previousShortcut,
+		nextShortcut,
+	} = useSelect(
 		( select ) => ( {
 			hasSidebarEnabled: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( editWidgetsStore.name ),
 			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
+			hasBlockBreadCrumbsEnabled: select(
+				editWidgetsStore
+			).__unstableIsFeatureActive( 'showBlockBreadcrumbs' ),
+			previousShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutRawKeyCombinations(
+				'core/edit-widgets/previous-region'
+			),
+			nextShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutRawKeyCombinations(
+				'core/edit-widgets/next-region'
+			),
 		} ),
 		[]
 	);
@@ -113,12 +133,17 @@ function Interface( { blockEditorSettings } ) {
 				/>
 			}
 			footer={
+				hasBlockBreadCrumbsEnabled &&
 				! isMobileViewport && (
 					<div className="edit-widgets-layout__footer">
 						<BlockBreadcrumb rootLabelText={ __( 'Widgets' ) } />
 					</div>
 				)
 			}
+			shortcuts={ {
+				previous: previousShortcut,
+				next: nextShortcut,
+			} }
 		/>
 	);
 }

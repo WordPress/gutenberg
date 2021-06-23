@@ -64,7 +64,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_navigation_init' );
  * @return bool Filtered decision about loading block assets.
  */
 function gutenberg_navigation_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
-	if ( is_callable( 'get_current_screen' ) && 'gutenberg_page_gutenberg-navigation' === get_current_screen()->base ) {
+	if ( is_callable( 'get_current_screen' ) && get_current_screen() && 'gutenberg_page_gutenberg-navigation' === get_current_screen()->base ) {
 		return true;
 	}
 

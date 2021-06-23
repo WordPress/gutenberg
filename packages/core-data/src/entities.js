@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { addEntities } from './actions';
-import { CORE_STORE_NAME as coreStoreName } from './utils/constants';
+import { STORE_NAME } from './name';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -189,6 +189,7 @@ function* loadPostTypeEntities() {
 				record?.title ||
 				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
+			__unstable_rest_base: postType.rest_base,
 		};
 	} );
 }
@@ -249,7 +250,7 @@ export const getMethodName = (
  */
 export function* getKindEntities( kind ) {
 	let entities = yield controls.select(
-		coreStoreName,
+		STORE_NAME,
 		'getEntitiesByKind',
 		kind
 	);

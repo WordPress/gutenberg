@@ -559,7 +559,7 @@ describe( 'Navigation', () => {
 			() =>
 				null !==
 				document.querySelector(
-					'script[src*="navigation/frontend.js"]'
+					'script[src*="navigation/view.min.js"]'
 				)
 		);
 
@@ -582,7 +582,7 @@ describe( 'Navigation', () => {
 			() =>
 				Array.from(
 					document.querySelectorAll(
-						'script[src*="navigation/frontend.js"]'
+						'script[src*="navigation/view.min.js"]'
 					)
 				).length
 		);
@@ -614,7 +614,7 @@ describe( 'Navigation', () => {
 			() =>
 				null !==
 				document.querySelector(
-					'script[src*="navigation/frontend.js"]'
+					'script[src*="navigation/view.min.js"]'
 				)
 		);
 
@@ -632,7 +632,7 @@ describe( 'Navigation', () => {
 			() =>
 				null !==
 				document.querySelector(
-					'script[src*="navigation/frontend.js"]'
+					'script[src*="navigation/view.min.js"]'
 				)
 		);
 

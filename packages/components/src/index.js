@@ -25,12 +25,14 @@ export { default as BaseControl } from './base-control';
 export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
-export { default as Card } from './card';
-export { default as CardBody } from './card/body';
-export { default as CardDivider } from './card/divider';
-export { default as CardFooter } from './card/footer';
-export { default as CardHeader } from './card/header';
-export { default as CardMedia } from './card/media';
+export {
+	Card,
+	CardBody,
+	CardDivider,
+	CardFooter,
+	CardHeader,
+	CardMedia,
+} from './card';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as __experimentalColorEdit } from './color-edit';
@@ -137,6 +139,7 @@ export { Truncate as __experimentalTruncate } from './truncate';
 export {
 	default as __experimentalUnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
+	parseUnit as __experimentalParseUnit,
 } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';

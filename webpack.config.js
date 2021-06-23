@@ -16,6 +16,11 @@ const fastGlob = require( 'fast-glob' );
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+
+/**
+ * Internal dependencies
+ */
+const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
 const {
 	camelCaseDash,
 } = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
@@ -67,34 +72,37 @@ const stylesTransform = ( content ) => {
 
 /*
  * Matches a block's name in paths in the form
- * build-module/<blockName>/frontend.js
+ * build-module/<blockName>/view.js
  */
-const blockNameRegex = new RegExp( /(?<=build-module\/).*(?=(\/frontend))/g );
+const blockNameRegex = new RegExp( /(?<=build-module\/).*(?=(\/view))/g );
 
 const createEntrypoints = () => {
 	/*
-	 * Returns an array of paths to frontend.js files within the block-directory package.
+	 * Returns an array of paths to view.js files within the `@wordpress/block-library` package.
 	 * These paths can be matched by the regex `blockNameRegex` in order to extract
 	 * the block's name.
 	 *
 	 * Returns an empty array if no files were found.
 	 */
-	const scriptPaths = fastGlob.sync(
-		'./packages/block-library/build-module/**/frontend.js'
+	const blockViewScriptPaths = fastGlob.sync(
+		'./packages/block-library/build-module/**/view.js'
 	);
 
 	/*
 	 * Go through the paths found above, in order to define webpack entry points for
-	 * each block's frontend.js file.
+	 * each block's view.js file.
 	 */
-	const scriptEntries = scriptPaths.reduce( ( entries, scriptPath ) => {
-		const [ blockName ] = scriptPath.match( blockNameRegex );
+	const blockViewScriptEntries = blockViewScriptPaths.reduce(
+		( entries, scriptPath ) => {
+			const [ blockName ] = scriptPath.match( blockNameRegex );
 
-		return {
-			...entries,
-			[ blockName ]: scriptPath,
-		};
-	}, {} );
+			return {
+				...entries,
+				[ 'blocks/' + blockName ]: scriptPath,
+			};
+		},
+		{}
+	);
 
 	const packageEntries = gutenbergPackages.reduce( ( memo, packageName ) => {
 		return {
@@ -103,7 +111,7 @@ const createEntrypoints = () => {
 		};
 	}, {} );
 
-	return { ...packageEntries, ...scriptEntries };
+	return { ...packageEntries, ...blockViewScriptEntries };
 };
 
 module.exports = {
@@ -143,15 +151,15 @@ module.exports = {
 			// When processing ESM files, the requested path
 			// is defined in `entryModule.rootModule.rawRequest`, instead of
 			// being present in `entryModule.rawRequest`.
-			// In the context of frontend files, they would be processed
+			// In the context of frontend view files, they would be processed
 			// as ESM if they use `import` or `export` within it.
 			const request = rootModule?.rawRequest || rawRequest;
 
-			if ( request.includes( '/frontend.js' ) ) {
-				return `./build/block-library/blocks/[name]/frontend.js`;
+			if ( request.includes( '/view.js' ) ) {
+				return `./build/block-library/[name]/view.min.js`;
 			}
 
-			return './build/[name]/index.js';
+			return `./build/[name]/index.min.js`;
 		},
 		path: __dirname,
 		library: [ 'wp', '[camelName]' ],
@@ -238,12 +246,29 @@ module.exports = {
 				to: 'build/block-library/blocks/[1]/editor-rtl.css',
 				transform: stylesTransform,
 			},
+			{
+				from: './packages/block-library/build-style/*/theme.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }theme\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/theme.css',
+				transform: stylesTransform,
+			},
+			{
+				from: './packages/block-library/build-style/*/theme-rtl.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }theme-rtl\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/theme-rtl.css',
+				transform: stylesTransform,
+			},
 		] ),
 		new CopyWebpackPlugin(
 			Object.entries( {
 				'./packages/block-library/src/': 'build/block-library/blocks/',
 				'./packages/edit-widgets/src/blocks/':
 					'build/edit-widgets/blocks/',
+				'./packages/widgets/src/blocks/': 'build/widgets/blocks/',
 			} ).flatMap( ( [ from, to ] ) => [
 				{
 					from: `${ from }/**/index.php`,
@@ -297,6 +322,7 @@ module.exports = {
 			] )
 		),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+		mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 	].filter( Boolean ),
 	watchOptions: {
 		ignored: [ '**/node_modules', '**/packages/*/src' ],
