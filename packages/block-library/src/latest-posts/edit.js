@@ -438,10 +438,10 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			? latestPosts.slice( 0, postsToShow )
 			: latestPosts;
 
-	function applyOrUnsetLayout( layout ) {
+	function applyLayout( layout ) {
 		return () =>
 			setAttributes( {
-				postLayout: postLayout === layout ? undefined : layout,
+				postLayout: layout,
 			} );
 	}
 
@@ -450,21 +450,21 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			layout: 'list',
 			icon: list,
 			title: __( 'List' ),
-			onClick: applyOrUnsetLayout( 'list' ),
+			onClick: applyLayout( 'list' ),
 			isActive: postLayout === 'list',
 		},
 		{
 			layout: 'bullet-list',
 			icon: formatListBullets,
 			title: __( 'Bulleted List' ),
-			onClick: applyOrUnsetLayout( 'bullet-list' ),
+			onClick: applyLayout( 'bullet-list' ),
 			isActive: postLayout === 'bullet-list',
 		},
 		{
 			layout: 'grid',
 			icon: grid,
 			title: __( 'Grid' ),
-			onClick: applyOrUnsetLayout( 'grid' ),
+			onClick: applyLayout( 'grid' ),
 			isActive: postLayout === 'grid',
 		},
 	];
@@ -472,7 +472,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const dateFormat = __experimentalGetSettings().formats.date;
 
 	const activePostLayoutIcon =
-		layoutControls.filter( ( layout ) => layout.layout === postLayout )[ 0 ]
+		layoutControls.find( ( layout ) => layout.layout === postLayout )
 			?.icon || 'list';
 
 	return (
