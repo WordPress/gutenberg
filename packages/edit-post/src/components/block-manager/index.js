@@ -8,9 +8,10 @@ import { filter, includes, isArray } from 'lodash';
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { withSelect } from '@wordpress/data';
-import { TextControl } from '@wordpress/components';
+import { VisuallyHidden, TextControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,6 +27,7 @@ function BlockManager( {
 	numberOfHiddenBlocks,
 } ) {
 	const [ search, setSearch ] = useState( '' );
+	const instanceId = useInstanceId( BlockManager );
 
 	// Filtering occurs here (as opposed to `withSelect`) to avoid
 	// wasted renders by consequence of `Array#filter` producing
@@ -53,9 +55,16 @@ function BlockManager( {
 					) }
 				</div>
 			) }
+			<VisuallyHidden
+				as="label"
+				htmlFor={ `edit-post-block-manager__search-${ instanceId }` }
+			>
+				{ __( 'Search for a block' ) }
+			</VisuallyHidden>
 			<TextControl
 				type="search"
-				label={ __( 'Search for a block' ) }
+				id={ `edit-post-block-manager__search-${ instanceId }` }
+				placeholder={ __( 'Search for a block' ) }
 				value={ search }
 				onChange={ ( nextSearch ) => setSearch( nextSearch ) }
 				className="edit-post-block-manager__search"
