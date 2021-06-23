@@ -90,7 +90,7 @@ describe( 'Reusable block', () => {
 		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
 
 		// Navigate to reusable tab
-		const reusableSegment = getByA11yLabel( 'Reusable' );
+		const reusableSegment = getByText( 'Reusable' );
 		// onLayout event is required by Segment component
 		fireEvent( reusableSegment, 'layout', {
 			nativeEvent: {
