@@ -53,9 +53,12 @@ const BlockMobileToolbar = ( {
 		blockWidth <= BREAKPOINTS.wrapMover ||
 		appenderWidth - spacingValue <= BREAKPOINTS.wrapMover;
 
-	const BlockSettingsButtonFill = ( { children, onMount } ) => {
-		useEffect( onMount, [] );
-		return children ?? null;
+	const BlockSettingsButtonFill = ( fillProps ) => {
+		useEffect(
+			() => fillProps.onChangeFillsLength( fillProps.fillsLength ),
+			[ fillProps.fillsLength ]
+		);
+		return fillProps.children ?? null;
 	};
 
 	return (
@@ -75,10 +78,11 @@ const BlockMobileToolbar = ( {
 			<BlockSettingsButton.Slot>
 				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
 				{ ( fills = [ null ] ) => (
-					// This purpose of this component is only to provide a way
-					// to pass data from the slot rendering to the component
+					// The purpose of BlockSettingsButtonFill component is only to provide a way
+					// to pass data upstream from the slot rendering
 					<BlockSettingsButtonFill
-						onMount={ () => setFillsLength( fills.length ) }
+						fillsLength={ fills.length }
+						onChangeFillsLength={ setFillsLength }
 					>
 						{ wrapBlockSettings ? null : fills[ 0 ] }
 					</BlockSettingsButtonFill>
