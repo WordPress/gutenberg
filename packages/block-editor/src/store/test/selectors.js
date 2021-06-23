@@ -2255,12 +2255,43 @@ describe( 'selectors', () => {
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
+		it( 'should return false if the rootClientId has a truthy template lock', () => {
+			const state = {
+				insertionPoint: {
+					rootClientId: 'testClientId',
+					index: 5,
+				},
+				blockListSettings: {
+					testClientId: {
+						templateLock: 'all',
+					},
+				},
+			};
+
+			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if the rootClientId is undefined, and the settings has a template lock', () => {
+			const state = {
+				insertionPoint: {
+					rootClientId: undefined,
+					index: 5,
+				},
+				settings: {
+					templateLock: 'all',
+				},
+			};
+
+			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
+		} );
+
 		it( 'should return true if assigned insertion point', () => {
 			const state = {
 				insertionPoint: {
 					rootClientId: undefined,
 					index: 5,
 				},
+				settings: {},
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );

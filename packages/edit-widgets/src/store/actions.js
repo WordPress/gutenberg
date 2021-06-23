@@ -120,13 +120,20 @@ export function* saveWidgetArea( widgetAreaId ) {
 		return true;
 	} );
 
-	// Get all widgets that have been deleted
-	const deletedWidgets = areaWidgets.filter(
-		( { id } ) =>
-			! widgetsBlocks.some(
-				( widgetBlock ) => getWidgetIdFromBlock( widgetBlock ) === id
-			)
-	);
+	// Determine which widgets have been deleted. We can tell if a widget is
+	// deleted and not just moved to a different area by looking to see if
+	// getWidgetAreaForWidgetId() finds something.
+	const deletedWidgets = [];
+	for ( const widget of areaWidgets ) {
+		const widgetsNewArea = yield select(
+			editWidgetsStoreName,
+			'getWidgetAreaForWidgetId',
+			widget.id
+		);
+		if ( ! widgetsNewArea ) {
+			deletedWidgets.push( widget );
+		}
+	}
 
 	const batchMeta = [];
 	const batchTasks = [];
@@ -140,7 +147,9 @@ export function* saveWidgetArea( widgetAreaId ) {
 		// since order is important.
 		sidebarWidgetsIds.push( widgetId );
 
-		if ( widgetId ) {
+		// We need to check for the id in the widget object here, because a deleted
+		// and restored widget won't have this id.
+		if ( widget.id ) {
 			yield dispatch(
 				'core',
 				'editEntityRecord',
@@ -150,7 +159,8 @@ export function* saveWidgetArea( widgetAreaId ) {
 				{
 					...widget,
 					sidebar: widgetAreaId,
-				}
+				},
+				{ undoIgnore: true }
 			);
 
 			const hasEdits = yield select(
@@ -202,12 +212,9 @@ export function* saveWidgetArea( widgetAreaId ) {
 		const widget = preservedRecords[ i ];
 		const { block, position } = batchMeta[ i ];
 
-		yield dispatch(
-			'core/block-editor',
-			'updateBlockAttributes',
-			block.clientId,
-			{ __internalWidgetId: widget.id }
-		);
+		// Set __internalWidgetId on the block. This will be persisted to the
+		// store when we dispatch receiveEntityRecords( post ) below.
+		post.blocks[ position ].attributes.__internalWidgetId = widget.id;
 
 		const error = yield select(
 			'core',
@@ -243,7 +250,8 @@ export function* saveWidgetArea( widgetAreaId ) {
 		widgetAreaId,
 		{
 			widgets: sidebarWidgetsIds,
-		}
+		},
+		{ undoIgnore: true }
 	);
 
 	yield* trySaveWidgetArea( widgetAreaId );

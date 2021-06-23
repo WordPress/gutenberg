@@ -9,6 +9,7 @@ import {
 	getEditedPostContent,
 	clickBlockToolbarButton,
 	clickButton,
+	clickMenuItem,
 } from '@wordpress/e2e-test-utils';
 
 async function getSelectedFlatIndices() {
@@ -272,6 +273,19 @@ describe( 'Multi-block selection', () => {
 
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
+
+		// Group the blocks and test that multiselection also works for nested
+		// blocks. Checks for regressions of
+		// https://github.com/WordPress/gutenberg/issues/32056
+
+		await clickBlockToolbarButton( 'Options' );
+		await clickMenuItem( 'Group' );
+		await page.click( '[data-type="core/paragraph"]' );
+		await page.keyboard.down( 'Shift' );
+		await page.click( '[data-type="core/paragraph"]:nth-child(2)' );
+		await page.keyboard.up( 'Shift' );
+		await testNativeSelection();
+		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3 ] );
 	} );
 
 	it( 'should select by dragging', async () => {

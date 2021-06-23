@@ -638,6 +638,31 @@ export function canUser( state, action, resource, id ) {
 }
 
 /**
+ * Returns whether the current user can edit the given entity.
+ *
+ * Calling this may trigger an OPTIONS request to the REST API via the
+ * `canUser()` resolver.
+ *
+ * https://developer.wordpress.org/rest-api/reference/
+ *
+ * @param {Object} state    Data state.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {string} recordId Record's id.
+ * @return {boolean|undefined} Whether or not the user can edit,
+ * or `undefined` if the OPTIONS request is still being made.
+ */
+export function canUserEditEntityRecord( state, kind, name, recordId ) {
+	const entity = getEntity( state, kind, name );
+	if ( ! entity ) {
+		return false;
+	}
+	const resource = entity.__unstable_rest_base;
+
+	return canUser( state, 'update', resource, recordId );
+}
+
+/**
  * Returns the latest autosaves for the post.
  *
  * May return multiple autosaves since the backend stores one autosave per

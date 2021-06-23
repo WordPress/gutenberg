@@ -53,9 +53,11 @@ export default function DeleteTemplate() {
 					if (
 						// eslint-disable-next-line no-alert
 						window.confirm(
-							/* translators: %1$s: template name */
 							sprintf(
-								'Are you sure you want to delete the %s template? It may be used by other pages or posts.',
+								/* translators: %s: template name */
+								__(
+									'Are you sure you want to delete the %s template? It may be used by other pages or posts.'
+								),
 								templateTitle
 							)
 						)

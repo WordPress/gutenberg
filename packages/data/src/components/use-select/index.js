@@ -148,12 +148,11 @@ export default function useSelect( _mapSelect, deps ) {
 				errorMessage += `\nThe error may be correlated with this previous error:\n`;
 				errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
 				errorMessage += 'Original stack trace:';
-
-				throw new Error( errorMessage );
-			} else {
-				// eslint-disable-next-line no-console
-				console.error( errorMessage );
 			}
+
+			// eslint-disable-next-line no-console
+			console.error( errorMessage );
+			mapOutput = latestMapOutput.current;
 		}
 	}
 

@@ -63,8 +63,9 @@
 
 .wp-block-legacy-widget__edit-no-preview {
 	background: $gray-100;
-	padding: $grid-unit-10 $grid-unit-15;
+	font-family: $default-font;
 	font-size: $default-font-size;
+	padding: $grid-unit-10 $grid-unit-15;
 
 	h3 {
 		font-size: 14px;
@@ -92,5 +93,12 @@
 	.wp-block-legacy-widget__container {
 		padding: $grid-unit-10 $grid-unit-15;
 		min-height: 50px;
+	}
+}
+
+.wp-block-legacy-widget {
+	.components-select-control__input {
+		padding: 0;
+		font-family: system-ui;
 	}
 }
