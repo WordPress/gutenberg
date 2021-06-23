@@ -94,7 +94,6 @@ export class PostPublishPanel extends Component {
 									onSubmit={ this.onSubmit }
 									forceIsDirty={ forceIsDirty }
 									forceIsSaving={ forceIsSaving }
-									isSaving={ isSaving }
 								/>
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
