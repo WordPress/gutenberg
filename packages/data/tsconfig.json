@@ -11,8 +11,7 @@
 		{ "path": "../element" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../priority-queue" },
-		// Needs to be added once it is typed
-		// { "path": "../redux-routine" }
+		{ "path": "../redux-routine" }
 	],
 	"include": [
 		"src/redux-store/metadata/actions.js"
