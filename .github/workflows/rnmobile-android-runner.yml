@@ -1,10 +1,9 @@
 name: React Native E2E Tests (Android)
 
-# Triggers disabled while we investigate a foundational error is causing all runs
-# to fail
 on:
+    pull_request:
     push:
-        branches: []
+        branches: [trunk]
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
