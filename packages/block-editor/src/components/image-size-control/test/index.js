@@ -10,6 +10,7 @@ import ImageSizeControl from '../index';
 
 describe( 'ImageSizeControl', () => {
 	const mockOnChange = jest.fn();
+	const mockOnChangeImage = jest.fn();
 	const getHeightInput = () => screen.getByLabelText( 'Height' );
 	const getWidthInput = () => screen.getByLabelText( 'Width' );
 
@@ -215,6 +216,94 @@ describe( 'ImageSizeControl', () => {
 				// The inputs display the default values once more.
 				expect( heightInput.value ).toBe( '100' );
 				expect( widthInput.value ).toBe( '200' );
+			} );
+		} );
+	} );
+
+	describe( 'image size percentage presets', () => {
+		it( 'updates height and width attributes on selection', async () => {
+			render(
+				<ImageSizeControl
+					imageHeight="100"
+					imageWidth="201"
+					onChange={ mockOnChange }
+				/>
+			);
+
+			fireEvent.click( screen.getByText( '50%' ) );
+
+			await waitFor( () => {
+				expect( screen.getByText( '50%' ) ).toHaveClass( 'is-pressed' );
+
+				// Both attributes are set to the rounded scaled value.
+				expect( mockOnChange ).toHaveBeenCalledWith( {
+					height: 50,
+					width: 101,
+				} );
+			} );
+		} );
+
+		it( 'updates height and width inputs on selection', async () => {
+			render(
+				<ImageSizeControl
+					imageHeight="100"
+					imageWidth="201"
+					onChange={ mockOnChange }
+				/>
+			);
+
+			fireEvent.click( screen.getByText( '50%' ) );
+
+			await waitFor( () => {
+				// Both attributes are set to the rounded scaled value.
+				expect( getHeightInput().value ).toBe( '50' );
+				expect( getWidthInput().value ).toBe( '101' );
+			} );
+		} );
+	} );
+
+	describe( 'image size slug presets', () => {
+		const IMAGE_SIZE_OPTIONS = [
+			{ value: 'thumbnail', label: 'Thumbnail' },
+			{ value: 'medium', label: 'Medium' },
+			{ value: 'large', label: 'Large' },
+		];
+
+		it( 'displays the selected slug', () => {
+			render(
+				<ImageSizeControl
+					imageSizeOptions={ IMAGE_SIZE_OPTIONS }
+					slug="medium"
+					onChange={ mockOnChange }
+					onChangeImage={ mockOnChangeImage }
+				/>
+			);
+
+			expect( screen.getByLabelText( 'Image size' ).value ).toBe(
+				'medium'
+			);
+		} );
+
+		it( 'calls onChangeImage with selected slug on selection', async () => {
+			render(
+				<ImageSizeControl
+					imageSizeOptions={ IMAGE_SIZE_OPTIONS }
+					slug="Medium"
+					onChange={ mockOnChange }
+					onChangeImage={ mockOnChangeImage }
+				/>
+			);
+
+			fireEvent.change( screen.getByLabelText( 'Image size' ), {
+				target: { value: 'thumbnail' },
+			} );
+
+			await waitFor( () => {
+				// onChangeImage is called with the slug and the event.
+				expect( mockOnChangeImage ).toHaveBeenCalledWith(
+					'thumbnail',
+					expect.any( Object )
+				);
 			} );
 		} );
 	} );
