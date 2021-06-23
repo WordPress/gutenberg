@@ -15,7 +15,9 @@ concurrency:
 jobs:
     test:
         runs-on: macos-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        # The false value below disables the test while we investigate a
+        # foundational error causing failures
+        if: ${{ false && github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
                 native-test-name: [gutenberg-editor-initial-html]
