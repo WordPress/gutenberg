@@ -18,6 +18,7 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarGroup,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -437,34 +438,55 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			? latestPosts.slice( 0, postsToShow )
 			: latestPosts;
 
+	function applyOrUnset( layout ) {
+		return () =>
+			setAttributes( {
+				postLayout: postLayout === layout ? undefined : layout,
+			} );
+	}
+
 	const layoutControls = [
 		{
+			layout: 'list',
 			icon: list,
 			title: __( 'List view' ),
-			onClick: () => setAttributes( { postLayout: 'list' } ),
+			onClick: applyOrUnset( 'list' ),
 			isActive: postLayout === 'list',
 		},
 		{
+			layout: 'bullet-list',
 			icon: formatListBullets,
 			title: __( 'Bullet List view' ),
-			onClick: () => setAttributes( { postLayout: 'bullet-list' } ),
+			onClick: applyOrUnset( 'bullet-list' ),
 			isActive: postLayout === 'bullet-list',
 		},
 		{
+			layout: 'grid',
 			icon: grid,
 			title: __( 'Grid view' ),
-			onClick: () => setAttributes( { postLayout: 'grid' } ),
+			onClick: applyOrUnset( 'grid' ),
 			isActive: postLayout === 'grid',
 		},
 	];
 
 	const dateFormat = __experimentalGetSettings().formats.date;
 
+	const activePostLayoutIcon =
+		layoutControls.filter( ( layout ) => layout.layout === postLayout )[ 0 ]
+			?.icon || 'list';
+
 	return (
 		<div>
 			{ inspectorControls }
 			<BlockControls>
-				<ToolbarGroup controls={ layoutControls } />
+				<ToolbarGroup>
+					<ToolbarDropdownMenu
+						icon={ activePostLayoutIcon }
+						label={ __( 'Layout' ) }
+						toggleProps={ __( 'Change layout' ) }
+						controls={ layoutControls }
+					/>
+				</ToolbarGroup>
 			</BlockControls>
 			<ul { ...blockProps }>
 				{ displayPosts.map( ( post, i ) => {
