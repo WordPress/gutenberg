@@ -15,8 +15,8 @@ import { omit, without } from 'lodash';
 
 /**
  * @typedef SemanticElementDefinition
- * @property {string[]} [attributes] Content attributes
- * @property {ContentSchema} [children] Content attributes
+ * @property {string[]}      [attributes] Content attributes
+ * @property {ContentSchema} [children]   Content attributes
  */
 
 /**
@@ -142,7 +142,7 @@ const phrasingContentSchema = {
  * @see https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content
  *
  * @param {string} [context] Set to "paste" to exclude invisible elements and
- *                         sensitive data.
+ *                           sensitive data.
  *
  * @return {Partial<ContentSchema>} Schema.
  */

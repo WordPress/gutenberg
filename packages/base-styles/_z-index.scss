@@ -32,6 +32,7 @@ $z-layers: (
 	".block-editor-url-input__suggestions": 30,
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
+	".interface-interface-skeleton__content": 20,
 	".edit-site-header": 62,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
@@ -163,7 +164,9 @@ $z-layers: (
 	".components-resizable-box__corner-handle": 2,
 
 	// Make sure block manager sticky category titles appear above the options
-	".edit-post-manage-blocks-modal__category-title": 1,
+	".edit-post-block-manager__category-title": 1,
+	// And block manager sticky disabled block count is higher still
+	".edit-post-block-manager__disabled-blocks-count": 2,
 
 	// Needs to be higher than any other element as this is an overlay to catch all events
 	".components-tooltip .event-catcher": 100002,

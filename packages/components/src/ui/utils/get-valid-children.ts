@@ -12,7 +12,7 @@ import { Children, isValidElement } from '@wordpress/element';
 /**
  * Gets a collection of available children elements from a React component's children prop.
  *
- * @param children
+ * @param  children
  *
  * @return An array of available children.
  */

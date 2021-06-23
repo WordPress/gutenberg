@@ -14,6 +14,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 import DeleteTemplate from './delete-template';
 import EditTemplateTitle from './edit-template-title';
+import TemplateDescription from './template-description';
 
 function TemplateTitle() {
 	const { template, isEditing, title } = useSelect( ( select ) => {
@@ -87,7 +88,11 @@ function TemplateTitle() {
 						) }
 						renderContent={ () => (
 							<>
-								<EditTemplateTitle />
+								{ template.has_theme_file ? (
+									<TemplateDescription />
+								) : (
+									<EditTemplateTitle />
+								) }
 								<DeleteTemplate />
 							</>
 						) }

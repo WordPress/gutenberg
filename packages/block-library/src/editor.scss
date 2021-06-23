@@ -20,7 +20,6 @@
 @import "./html/editor.scss";
 @import "./image/editor.scss";
 @import "./latest-posts/editor.scss";
-@import "./legacy-widget/editor.scss";
 @import "./media-text/editor.scss";
 @import "./more/editor.scss";
 @import "./navigation/editor.scss";
@@ -37,6 +36,8 @@
 @import "./separator/editor.scss";
 @import "./shortcode/editor.scss";
 @import "./site-logo/editor.scss";
+@import "./site-tagline/editor.scss";
+@import "./site-title/editor.scss";
 @import "./social-link/editor.scss";
 @import "./social-links/editor.scss";
 @import "./spacer/editor.scss";
@@ -46,7 +47,7 @@
 @import "./text-columns/editor.scss";
 @import "./video/editor.scss";
 @import "./query-title/editor.scss";
-@import "./query-loop/editor.scss";
+@import "./post-template/editor.scss";
 @import "./query/editor.scss";
 @import "./query-pagination/editor.scss";
 @import "./query-pagination-numbers/editor.scss";
