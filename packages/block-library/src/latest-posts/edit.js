@@ -483,7 +483,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					<ToolbarDropdownMenu
 						icon={ activePostLayoutIcon }
 						label={ __( 'Layout' ) }
-						toggleProps={ __( 'Change layout' ) }
 						controls={ layoutControls }
 					/>
 				</ToolbarGroup>
