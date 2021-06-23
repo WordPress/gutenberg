@@ -89,14 +89,13 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
  * Renders a Navigation Block derived from data from the theme_location assigned
  * via the block attribute 'location'.
  *
- * If the theme doesn't explicity support 'block-nav-menus' or no location was provided
- * as a block attribute then an empty string is returned.
+ * If no location was provided as a block attribute then false is returned.
  *
  * @param  array $location The location of the classic menu to display.
  * @param  array $attributes Navigation block attributes.
  * @return string|false HTML markup of a generated Navigation Block or false if no location is specified.
  */
-function render_classic_location_menu( $location, $attributes ) {
+function gutenberg_render_menu_from_location( $location, $attributes ) {
 	if ( empty( $location ) ) {
 		return false;
 	}
@@ -165,7 +164,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if ( empty( $block->inner_blocks ) ) {
 		if ( array_key_exists( '__unstableLocation', $attributes ) ) {
 			$location                 = $attributes['__unstableLocation'];
-			$maybe_classic_navigation = render_classic_location_menu( $location, $attributes );
+			$maybe_classic_navigation = gutenberg_render_menu_from_location( $location, $attributes );
 			if ( $maybe_classic_navigation ) {
 				return $maybe_classic_navigation;
 			}
