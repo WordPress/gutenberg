@@ -15,7 +15,14 @@ const openSidebarPanelWithTitle = async ( title ) => {
 	const panel = await page.waitForXPath(
 		`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ title }")]`
 	);
-	await panel.click();
+
+	const expanded = await page.evaluate(
+		( element ) => element.getAttribute( 'aria-expanded' ),
+		panel
+	);
+	if ( expanded === 'false' ) {
+		await panel.click();
+	}
 };
 
 const disableTemplateWelcomeGuide = async () => {
