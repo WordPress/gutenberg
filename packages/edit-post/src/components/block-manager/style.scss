@@ -6,19 +6,6 @@
 
 .edit-post-block-manager__search {
 	margin: $grid-unit-20 0;
-
-	.components-base-control__field {
-		margin-bottom: 0;
-	}
-
-	.components-base-control__label {
-		margin-top: -0.25 * $grid-unit-20;
-	}
-
-	input[type="search"].components-text-control__input {
-		padding: $grid-unit-10;
-		border-radius: $radius-block-ui;
-	}
 }
 
 .edit-post-block-manager__disabled-blocks-count {

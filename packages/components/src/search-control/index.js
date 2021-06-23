@@ -8,44 +8,43 @@ import classnames from 'classnames';
  */
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { VisuallyHidden, Button } from '@wordpress/components';
 import { Icon, search, closeSmall } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
-function InserterSearchForm( {
+/**
+ * Internal dependencies
+ */
+import { VisuallyHidden, Button } from '../';
+
+function SearchControl( {
 	className,
 	onChange,
 	value,
 	label,
-	placeholder,
+	placeholder = __( 'Search' ),
 } ) {
-	const instanceId = useInstanceId( InserterSearchForm );
+	const instanceId = useInstanceId( SearchControl );
 	const searchInput = useRef();
 
 	return (
-		<div
-			className={ classnames(
-				'block-editor-inserter__search',
-				className
-			) }
-		>
+		<div className={ classnames( 'components-search-control', className ) }>
 			<VisuallyHidden
 				as="label"
-				htmlFor={ `block-editor-inserter__search-${ instanceId }` }
+				htmlFor={ `components-search-control-${ instanceId }` }
 			>
 				{ label || placeholder }
 			</VisuallyHidden>
 			<input
 				ref={ searchInput }
-				className="block-editor-inserter__search-input"
-				id={ `block-editor-inserter__search-${ instanceId }` }
+				className="components-search-control__input"
+				id={ `components-search-control-${ instanceId }` }
 				type="search"
 				placeholder={ placeholder }
 				onChange={ ( event ) => onChange( event.target.value ) }
 				autoComplete="off"
 				value={ value || '' }
 			/>
-			<div className="block-editor-inserter__search-icon">
+			<div className="components-search-control__icon">
 				{ !! value && (
 					<Button
 						icon={ closeSmall }
@@ -62,4 +61,4 @@ function InserterSearchForm( {
 	);
 }
 
-export default InserterSearchForm;
+export default SearchControl;
