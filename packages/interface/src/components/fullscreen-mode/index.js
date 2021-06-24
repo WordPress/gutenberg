@@ -3,7 +3,7 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 
-export const FullscreenMode = ( { isActive } ) => {
+const FullscreenMode = ( { isActive } ) => {
 	const [ isSticky, setIsSticky ] = useState( false );
 
 	// componentDidMount
@@ -46,3 +46,4 @@ export const FullscreenMode = ( { isActive } ) => {
 
 	return null;
 };
+export default FullscreenMode;
