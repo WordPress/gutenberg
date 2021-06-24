@@ -18,6 +18,7 @@ import {
 	withColors,
 	PanelColorSettings,
 	ContrastChecker,
+	getColorClassName,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
@@ -115,13 +116,13 @@ function Navigation( {
 			'is-vertical': attributes.orientation === 'vertical',
 			'is-responsive': attributes.isResponsive,
 			'has-text-color': !! textColor.color || !! textColor?.class,
-			[ `has-${ textColor?.slug }-color` ]: !! textColor?.slug,
+			[ getColorClassName( 'color', textColor?.slug) ]: !! textColor?.slug,
 			'has-background': !! backgroundColor.color || backgroundColor.class,
-			[ `has-${ backgroundColor?.slug }-background-color` ]: !! backgroundColor?.slug,
+			[ getColorClassName( 'background-color', backgroundColor?.slug ) ]: !! backgroundColor?.slug,
 		} ),
 		style: {
-			color: textColor?.color,
-			backgroundColor: backgroundColor?.color,
+			color: ! textColor?.slug && textColor?.color,
+			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
 		},
 	} );
 

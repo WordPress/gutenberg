@@ -10,6 +10,7 @@ import {
 	BlockControls,
 	useBlockProps,
 	store as blockEditorStore,
+	getColorClassName,
 } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { ToolbarButton } from '@wordpress/components';
@@ -76,9 +77,9 @@ export default function PageListEdit( {
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			'has-text-color': !! textColor,
-			[ `has-${ textColor }-color` ]: !! textColor,
+			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor,
-			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+			[ getColorClassName( 'background-color', backgroundColor ) ]: !! backgroundColor,
 			'show-submenu-icons': !! showSubmenuIcon,
 		} ),
 		style: { ...style?.color },

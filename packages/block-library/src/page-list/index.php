@@ -34,7 +34,7 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	if ( $has_named_text_color ) {
 		// Add the color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
+		$colors['css_classes'][] = sprintf( 'has-%s-color', gutenberg_experimental_to_kebab_case( $attributes['textColor'] ) );
 	} elseif ( $has_picked_text_color ) {
 		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
 	} elseif ( $has_custom_text_color ) {
@@ -55,7 +55,7 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	if ( $has_named_background_color ) {
 		// Add the background-color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
+		$colors['css_classes'][] = sprintf( 'has-%s-background-color', gutenberg_experimental_to_kebab_case( $attributes['backgroundColor'] ) );
 	} elseif ( $has_picked_background_color ) {
 		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
@@ -74,7 +74,7 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 
 	// Give overlay colors priority, fall back to Navigation block colors, then global styles.
 	if ( $has_named_overlay_text_color ) {
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', $attributes['overlayTextColor'] );
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', gutenberg_experimental_to_kebab_case( $attributes['overlayTextColor'] ) );
 	} elseif ( $has_picked_overlay_text_color ) {
 		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
 	}
@@ -89,7 +89,7 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
 	}
 
 	if ( $has_named_overlay_background_color ) {
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', $attributes['overlayBackgroundColor'] );
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', gutenberg_experimental_to_kebab_case( $attributes['overlayBackgroundColor'] ) );
 	} elseif ( $has_picked_overlay_background_color ) {
 		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customOverlayBackgroundColor'] );
 	}
