@@ -69,7 +69,7 @@ describe( 'Site Title block', () => {
 	it( 'Can edit the site title', async () => {
 		await createNewPost();
 		await insertBlock( 'Site Title' );
-		const editableSiteTitleSelector = '.wp-block-site-title a';
+		const editableSiteTitleSelector = '[aria-label="Block: Site Title"] a';
 		await page.waitForSelector( editableSiteTitleSelector );
 		await page.focus( editableSiteTitleSelector );
 		await pressKeyWithModifier( 'primary', 'a' );
