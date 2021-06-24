@@ -65,5 +65,8 @@ $panel-title-height: 48px;
 
 // Prevent "dragenter" event from firing when dragging onto the title component.
 body.is-dragging-components-draggable .wp-block[data-type="core/widget-area"] .components-panel__body > .components-panel__body-title {
-	pointer-events: none;
+	&,
+	* {
+		pointer-events: none;
+	}
 }
