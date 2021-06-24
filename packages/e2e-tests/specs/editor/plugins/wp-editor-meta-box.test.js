@@ -39,6 +39,8 @@ describe( 'WP Editor Meta Boxes', () => {
 			( textarea ) => textarea.value
 		);
 
-		expect( content ).toMatchSnapshot();
+		expect( content ).toMatchInlineSnapshot(
+			`"<p>Typing in a metabox</p>"`
+		);
 	} );
 } );
