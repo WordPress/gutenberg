@@ -113,8 +113,8 @@ function gutenberg_theme_relies_on_notice( $plugin_file, $plugin_data ) {
 	);
 	?>
 	<style>
-		.plugins tr[data-slug="gutenberg"] th,
-		.plugins tr[data-slug="gutenberg"] td {
+		tr.plugin-update-tr[data-slug="gutenberg"] th,
+		tr.plugin-update-tr[data-slug="gutenberg"] td {
 			box-shadow: none;
 		}
 	</style>
