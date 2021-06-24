@@ -5,7 +5,7 @@
 
 	.components-panel__body > .components-panel__body-title {
 		font-family: $default-font;
-		margin-bottom: 0;
+		margin: 0;
 
 		// Remove default hover background in panel title. See #25752.
 		&:hover {
@@ -14,7 +14,7 @@
 	}
 
 	.components-panel__body .editor-styles-wrapper {
-		margin: 0 (-$grid-unit-20) (-$grid-unit-20) (-$grid-unit-20);
+		margin: 0;
 		padding: $grid-unit-20;
 	}
 
