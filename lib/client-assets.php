@@ -684,7 +684,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
 }
 
 /**
- * Adds a flag to the editor settings to know whether we're in FSE theme or not.
+ * Adds a flag to the editor settings to know whether we're in a block-based.
  *
  * This can be removed when plugin support requires WordPress 5.8.0+.
  *
@@ -692,7 +692,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
  *
  * @return array Filtered editor settings.
  */
-function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
+function gutenberg_extend_block_editor_settings_with_block_theme_flag( $settings ) {
 	$settings['supportsTemplateMode'] = gutenberg_supports_block_templates();
 
 	// Enable the new layout options for themes with a theme.json file.
@@ -702,9 +702,9 @@ function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings )
 }
 // This can be removed when plugin support requires WordPress 5.8.0+.
 if ( function_exists( 'get_block_editor_settings' ) ) {
-	add_filter( 'block_editor_settings_all', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
+	add_filter( 'block_editor_settings_all', 'gutenberg_extend_block_editor_settings_with_block_theme_flag' );
 } else {
-	add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
+	add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_block_theme_flag' );
 }
 
 /**
