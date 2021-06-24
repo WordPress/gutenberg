@@ -1,32 +1,30 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-2 {
+.emotion-0 {
   z-index: 1000002;
   box-sizing: border-box;
   opacity: 0;
   outline: none;
-  -webkit-transform-origin: top center;
-  -ms-transform-origin: top center;
   transform-origin: top center;
   -webkit-transition: opacity 100ms ease;
   transition: opacity 100ms ease;
 }
 
-.emotion-2[data-enter] {
+.emotion-0[data-enter] {
   opacity: 1;
 }
 
-.emotion-0 {
-  background: rgba( 0,0,0,0.8 );
+.emotion-3 {
+  background: rgba( 0, 0, 0, 0.8 );
   border-radius: 6px;
-  box-shadow: 0 0 0 1px rgba( 255,255,255,0.04 );
+  box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
   color: #fff;
   padding: 4px 8px;
 }
 
 <div
-  class="emotion-2 components-tooltip-content emotion-3 emotion-4"
+  class="emotion-0 components-tooltip-content emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="TooltipContent"
   id="base-tooltip"
@@ -34,7 +32,7 @@ exports[`props should render correctly 1`] = `
   style="position: fixed; left: 100%; top: 100%; pointer-events: none;"
 >
   <div
-    class="emotion-0 emotion-1"
+    class="emotion-3 emotion-4"
   >
     Code is Poetry
   </div>
