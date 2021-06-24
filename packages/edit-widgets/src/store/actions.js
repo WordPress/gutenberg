@@ -116,7 +116,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 	const widgetsBlocks = post.blocks.filter( ( block ) => {
 		const { id } = block.attributes;
 
-		if ( block.name === 'core/legacy-widget' && block.attributes?.id ) {
+		if ( block.name === 'core/legacy-widget' && id ) {
 			if ( usedReferenceWidgets.includes( id ) ) {
 				return false;
 			}
