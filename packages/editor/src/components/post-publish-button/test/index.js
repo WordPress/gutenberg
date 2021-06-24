@@ -25,6 +25,22 @@ describe( 'PostPublishButton', () => {
 			);
 		} );
 
+		it( 'should be true if post is currently saving, even if there are non-post entity changes', () => {
+			// This normally means that we're still saving those changes.
+			const wrapper = shallow(
+				<PostPublishButton
+					hasNonPostEntityChanges
+					isPublishable
+					isSaveable
+					isSaving
+				/>
+			);
+
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
+				true
+			);
+		} );
+
 		it( 'should be true if forceIsSaving is true', () => {
 			const wrapper = shallow(
 				<PostPublishButton isPublishable isSaveable forceIsSaving />
@@ -90,6 +106,20 @@ describe( 'PostPublishButton', () => {
 		it( 'should be false if post is publishave and saveable', () => {
 			const wrapper = shallow(
 				<PostPublishButton isPublishable isSaveable />
+			);
+
+			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should be false if there are non-post entity changes', () => {
+			const wrapper = shallow(
+				<PostPublishButton
+					hasNonPostEntityChanges
+					isPublishable
+					isSaveable
+				/>
 			);
 
 			expect( wrapper.find( Button ).prop( 'aria-disabled' ) ).toBe(
