@@ -69,16 +69,17 @@ export default function WidgetAreaEdit( {
 					// unmounted when the panel is collapsed. Unmounting legacy
 					// widgets may have unintended consequences (e.g.  TinyMCE
 					// not being properly reinitialized)
-					<DisclosureContent visible={ opened }>
-						<div className="editor-styles-wrapper">
-							<EntityProvider
-								kind="root"
-								type="postType"
-								id={ `widget-area-${ id }` }
-							>
-								<WidgetAreaInnerBlocks />
-							</EntityProvider>
-						</div>
+					<DisclosureContent
+						className="widget-area-panel-body-content"
+						visible={ opened }
+					>
+						<EntityProvider
+							kind="root"
+							type="postType"
+							id={ `widget-area-${ id }` }
+						>
+							<WidgetAreaInnerBlocks />
+						</EntityProvider>
 					</DisclosureContent>
 				) }
 			</PanelBody>

@@ -1,3 +1,5 @@
+$panel-title-height: 48px;
+
 .wp-block[data-type="core/widget-area"] {
 	max-width: $widget-area-width;
 	margin-left: auto;
@@ -6,16 +8,22 @@
 	.components-panel__body > .components-panel__body-title {
 		font-family: $default-font;
 		margin: 0;
+		height: $panel-title-height;
+		// Create a stacking context and make sure it's higher is than the content.
+		// Since the inner blocks will be stretched to cover the whole panel,
+		// we still want the title to be interactive.
+		position: relative;
+		z-index: 1;
+		background: $white;
+		// z-index should be enough to create a new stacking context,
+		// unfortunately, Safari needs this to stop it from flickering while dragging.
+		// The reason behind that is still unknown, probably a bug in the browser.
+		transform: translateZ(0);
 
 		// Remove default hover background in panel title. See #25752.
 		&:hover {
-			background: inherit;
+			background: $white;
 		}
-	}
-
-	.components-panel__body .editor-styles-wrapper {
-		margin: 0;
-		padding: $grid-unit-20;
 	}
 
 	.block-list-appender.wp-block {
@@ -29,19 +37,33 @@
 
 	.components-panel__body.is-opened {
 		padding: 0;
-
-		> div > .editor-styles-wrapper > .block-editor-inner-blocks > .block-editor-block-list__layout {
-			// Ensure the widget area block lists have a minimum height so that it doesn't
-			// collapse to zero height when it has no blocks. When that happens the block
-			// can't be used as a drop target.
-			min-height: $grid-unit-40;
-			// Add some spacing above the inner blocks so that the block toolbar doesn't
-			// overlap the panel header.
-			padding: $grid-unit-30 $grid-unit-20 $grid-unit-20;
-		}
 	}
 }
 
-.edit-widgets-highlight-drop-zone {
-	outline: 2px dashed var(--wp-admin-theme-color);
+.blocks-widgets-container .widget-area-inner-blocks.editor-styles-wrapper {
+	margin: 0;
+	padding: 0;
+
+	> .block-editor-block-list__layout {
+		// Stretch the inner-blocks container to cover the entire panel,
+		// so that dragging onto anywhere in it works.
+		margin-top: -$panel-title-height;
+		// Add some spacing above the inner blocks so that the block toolbar doesn't
+		// overlap the panel header.
+		padding: ($panel-title-height + $grid-unit-30) $grid-unit-20 $grid-unit-20;
+
+		// Ensure the widget area block lists have a minimum height so that it doesn't
+		// collapse to zero height when it has no blocks. When that happens the block
+		// can't be used as a drop target.
+		min-height: $grid-unit-40;
+	}
+}
+
+.widget-area-highlight-drop-zone {
+	outline: --wp-admin-border-width-focus solid var(--wp-admin-theme-color);
+}
+
+// Prevent "dragenter" event from firing when dragging onto the title component.
+body.is-dragging-components-draggable .wp-block[data-type="core/widget-area"] .components-panel__body > .components-panel__body-title {
+	pointer-events: none;
 }

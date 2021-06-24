@@ -1,8 +1,16 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	__experimentalUseInnerBlocksProps,
+} from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
 /**
@@ -17,25 +25,29 @@ export default function WidgetAreaInnerBlocks() {
 	);
 	const innerBlocksRef = useRef();
 	const isDraggingWithinInnerBlocks = useIsDraggingWithin( innerBlocksRef );
-	const shouldHighlightDropZone =
-		blocks.length === 0 && isDraggingWithinInnerBlocks;
+	const shouldHighlightDropZone = isDraggingWithinInnerBlocks;
+	// Using the experimental hook so that we can control the className of the element.
+	const innerBlocksProps = __experimentalUseInnerBlocksProps(
+		{ ref: innerBlocksRef },
+		{
+			value: blocks,
+			onInput,
+			onChange,
+			templateLock: false,
+			renderAppender: InnerBlocks.ButtonBlockAppender,
+		}
+	);
 
 	return (
 		<div
-			className={
-				shouldHighlightDropZone
-					? 'edit-widgets-highlight-drop-zone'
-					: undefined
-			}
+			className={ classnames(
+				'widget-area-inner-blocks block-editor-inner-blocks editor-styles-wrapper',
+				{
+					'widget-area-highlight-drop-zone': shouldHighlightDropZone,
+				}
+			) }
 		>
-			<InnerBlocks
-				ref={ innerBlocksRef }
-				value={ blocks }
-				onInput={ onInput }
-				onChange={ onChange }
-				templateLock={ false }
-				renderAppender={ InnerBlocks.ButtonBlockAppender }
-			/>
+			<div { ...innerBlocksProps } />
 		</div>
 	);
 }
