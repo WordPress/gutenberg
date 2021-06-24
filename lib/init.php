@@ -200,12 +200,7 @@ add_filter( 'rest_index', 'register_site_icon_url' );
  */
 function register_site_logo_to_rest_index( $response ) {
 	$data              = $response->data;
-	$logo_id           = get_theme_mod( 'custom_logo' );
-	$data['site_logo'] = array(
-		'id'  => $logo_id,
-		'url' => wp_get_attachment_image_url( $logo_id, 'full' ),
-		'alt' => get_post_meta( $logo_id, '_wp_attachment_image_alt', true ),
-	);
+	$data['site_logo'] = get_theme_mod( 'custom_logo' );
 	$response->set_data( $data );
 	return $response;
 }

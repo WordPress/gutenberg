@@ -256,48 +256,38 @@ export default function LogoEdit( {
 	const [ logoUrl, setLogoUrl ] = useState();
 	const [ error, setError ] = useState();
 	const ref = useRef();
-	const { siteLogo, mediaItemData } = useSelect( ( select ) => {
-		const siteSettings = select( coreStore ).getEditedEntityRecord(
-			'root',
-			'site'
-		);
-		const mediaItem =
-			siteSettings.site_logo &&
-			select( coreStore ).getEntityRecord(
+
+	const { siteLogoId, canUserEdit, url, mediaItemData } = useSelect(
+		( select ) => {
+			const { canUser, getEntityRecord, getEditedEntityRecord } = select(
+				coreStore
+			);
+			const siteSettings = getEditedEntityRecord( 'root', 'site' );
+			const siteData = getEntityRecord( 'root', '__unstableBase' );
+			const _siteLogo = siteSettings?.site_logo;
+			const _readOnlyLogo = siteData?.site_logo;
+			const _canUserEdit = canUser( 'update', 'settings' );
+			const _siteLogoId = _canUserEdit ? _siteLogo : _readOnlyLogo;
+			const query = _canUserEdit ? {} : { context: 'view' };
+			const mediaItem = select( coreStore ).getEntityRecord(
 				'root',
 				'media',
-				siteSettings.site_logo
+				_siteLogoId,
+				query
 			);
-		return {
-			mediaItemData: mediaItem && {
-				url: mediaItem.source_url,
-				alt: mediaItem.alt_text,
-			},
-			siteLogo: siteSettings.site_logo,
-		};
-	}, [] );
-	/**
-	 * Data for users with no proper rights have to be fetched
-	 * from REST `index` endpoint, which is public for all.
-	 */
-	const {
-		canUserEdit,
-		readOnlyLogo,
-		readOnlyLogoMediaItemData,
-		url,
-	} = useSelect( ( select ) => {
-		const { canUser, getEntityRecord } = select( coreStore );
-		const siteData = getEntityRecord( 'root', '__unstableBase' );
-		return {
-			canUserEdit: canUser( 'update', 'settings' ),
-			url: siteData?.url,
-			readOnlyLogo: siteData?.site_logo?.id,
-			readOnlyLogoMediaItemData: siteData?.site_logo && {
-				url: siteData?.site_logo?.url,
-				alt: siteData?.site_logo?.alt,
-			},
-		};
-	}, [] );
+			return {
+				siteLogoId: _siteLogoId,
+				canUserEdit: _canUserEdit,
+				url: siteData?.url,
+				mediaItemData: mediaItem && {
+					url: mediaItem.source_url,
+					alt: mediaItem.alt_text,
+				},
+			};
+		},
+		[]
+	);
+
 	const { editEntityRecord } = useDispatch( coreStore );
 	const setLogo = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
@@ -305,18 +295,12 @@ export default function LogoEdit( {
 		} );
 
 	let alt = null;
-	if ( canUserEdit && mediaItemData ) {
+	if ( mediaItemData ) {
 		alt = mediaItemData.alt;
 		if ( logoUrl !== mediaItemData.url ) {
 			setLogoUrl( mediaItemData.url );
 		}
-	} else if ( readOnlyLogoMediaItemData ) {
-		alt = readOnlyLogoMediaItemData.alt;
-		if ( logoUrl !== readOnlyLogoMediaItemData.url ) {
-			setLogoUrl( readOnlyLogoMediaItemData.url );
-		}
 	}
-
 	const onSelectLogo = ( media ) => {
 		if ( ! media ) {
 			return;
@@ -351,7 +335,8 @@ export default function LogoEdit( {
 
 	const label = __( 'Site Logo' );
 	let logoImage;
-	if ( canUserEdit && siteLogo === undefined ) {
+	const isLoading = siteLogoId === undefined || ( siteLogoId && ! logoUrl );
+	if ( isLoading ) {
 		logoImage = <Spinner />;
 	}
 	if ( !! logoUrl ) {
@@ -378,14 +363,14 @@ export default function LogoEdit( {
 	return (
 		<div { ...blockProps }>
 			{ controls }
-			{ logoUrl && logoImage }
-			{ ! canUserEdit && ! readOnlyLogo && (
+			{ !! logoUrl && logoImage }
+			{ ! logoUrl && ! canUserEdit && (
 				<div className="site-logo_placeholder">
 					<Icon icon={ icon } />
 					<p> { __( 'Site Logo' ) }</p>
 				</div>
 			) }
-			{ canUserEdit && ! logoUrl && (
+			{ ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
