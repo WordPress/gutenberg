@@ -452,7 +452,7 @@ SPEC CHECKSUMS:
   BVLinearGradient: 2c791e973a3df0df46028210c530fde52c06b717
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 49cbe4b43e445b06bf29199b6ad2057649e4c8f5
-  FBReactNativeSpec: 420ad7ff87adc491b45199891c72ea531fa4926e
+  FBReactNativeSpec: 6bc1f02ac035b26200e663a6a866abee2b3fd2bd
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   Gutenberg: 370764154bd1acf878f58985e3d75d15f7cc0666
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
@@ -486,11 +486,11 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: cad74a1eaa53ee6e7a3620231939d8fe2c6afcf0
   ReactCommon: cfe2b7fd20e0dbd2d1185cd7d8f99633fbc5ff05
   RNCMaskedView: cd41b9758dfa6205d7fa16f9eb25f0d2d5b1b707
-  RNGestureHandler: 45d3c3c93d2fba05710acb0bbb9d8b945821b1dd
+  RNGestureHandler: fffc3fd24c69f3e682aca052b5559cd309231932
   RNReanimated: ca6105fdc2739ea1b3a7a5350b6490d8160143bc
   RNScreens: eb4e23256e7f2a5a1af87ea24dfeb49aea0ef310
   RNSVG: 1b6dcbec5884b6dbe256bf8c38eeeab0acf05926
-  RNTAztecView: c841a326e7a994bbeeb1fa9e2e54db3f07915ca3
+  RNTAztecView: 4a25067d531ba62f2e0595b513d34477a538988f
   WordPress-Aztec-iOS: 870c93297849072aadfc2223e284094e73023e82
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf
 
