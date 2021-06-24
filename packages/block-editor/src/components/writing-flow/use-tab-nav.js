@@ -123,7 +123,11 @@ export default function useTabNav() {
 			// doesn't refocus this block and so it allows default behaviour
 			// (moving focus to the next tabbable element).
 			noCapture.current = true;
-			next.current.focus();
+
+			// Focusing the focus capture element, which is located above and
+			// below the editor, should not scroll the page all the way up or
+			// down.
+			next.current.focus( { preventScroll: true } );
 		}
 
 		function onFocusOut( event ) {
