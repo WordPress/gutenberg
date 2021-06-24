@@ -10,7 +10,7 @@
  *
  * @return boolean Whether the current theme is an FSE theme or not.
  */
-function gutenberg_is_fse_theme() {
+function gutenberg_is_block_theme() {
 	return is_readable( get_stylesheet_directory() . '/block-templates/index.html' );
 }
 
@@ -20,14 +20,14 @@ function gutenberg_is_fse_theme() {
  * @return boolean Whether the current theme is FSE-enabled or not.
  */
 function gutenberg_supports_block_templates() {
-	return gutenberg_is_fse_theme() || current_theme_supports( 'block-templates' );
+	return gutenberg_is_block_theme() || current_theme_supports( 'block-templates' );
 }
 
 /**
  * Show a notice when a Full Site Editing theme is used.
  */
 function gutenberg_full_site_editing_notice() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_is_block_theme() ) {
 		return;
 	}
 	?>
@@ -42,7 +42,7 @@ add_action( 'admin_notices', 'gutenberg_full_site_editing_notice' );
  * Removes legacy pages from FSE themes.
  */
 function gutenberg_remove_legacy_pages() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_is_block_theme() ) {
 		return;
 	}
 
@@ -74,7 +74,7 @@ add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
 function gutenberg_adminbar_items( $wp_admin_bar ) {
 
 	// Early exit if not an FSE theme.
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_is_block_theme() ) {
 		return;
 	}
 
@@ -110,7 +110,7 @@ add_filter( 'menu_order', 'gutenberg_menu_order' );
  * @param array $menu_order Menu Order.
  */
 function gutenberg_menu_order( $menu_order ) {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_is_block_theme() ) {
 		return $menu_order;
 	}
 

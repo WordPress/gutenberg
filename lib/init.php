@@ -94,7 +94,7 @@ add_action( 'admin_menu', 'gutenberg_menu', 9 );
  * @since 9.4.0
  */
 function gutenberg_site_editor_menu() {
-	if ( gutenberg_is_fse_theme() ) {
+	if ( gutenberg_is_block_theme() ) {
 		add_menu_page(
 			__( 'Site Editor (beta)', 'gutenberg' ),
 			sprintf(
