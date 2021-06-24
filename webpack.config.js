@@ -151,7 +151,7 @@ module.exports = {
 			const request = rootModule?.rawRequest || rawRequest;
 
 			if ( request.includes( '/view.js' ) ) {
-				return `./build/block-library/[name]/view.min.js`;
+				return `./build/block-library/[name]/view.js`;
 			}
 
 			return './build/[name]/index.js';
