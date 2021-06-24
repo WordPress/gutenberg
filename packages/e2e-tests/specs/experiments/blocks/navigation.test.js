@@ -582,7 +582,7 @@ describe( 'Navigation', () => {
 			() =>
 				Array.from(
 					document.querySelectorAll(
-						'script[src*="navigation/view.min.js"]'
+						'script[src*="navigation/view.js"]'
 					)
 				).length
 		);
