@@ -76,7 +76,7 @@ $blocks-block__margin: 0.5em;
 	.wp-block-buttons {
 
 		> .wp-block-button,
-		&.is-content-justification-right > .wp-block-button, {
+		&.is-content-justification-right > .wp-block-button {
 			// Added (duplicate) specificity needed to override the default button margin.
 			&.wp-block-button {
 				margin-right: 0;

@@ -238,6 +238,10 @@
 			"customPadding": false,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
+		"dimensions": {
+			"customHeight": false,
+			"customWidth": false
+		},
 		"border": {
 			"customColor": false,
 			"customRadius": false,
@@ -248,6 +252,9 @@
 			"core/button": {
 				"border": {
 					"customRadius": true
+				},
+				"dimensions": {
+					"customWidth": true
 				}
 			}
 		}

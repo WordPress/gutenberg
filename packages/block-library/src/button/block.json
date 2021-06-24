@@ -61,6 +61,13 @@
 			"__experimentalSkipSerialization": true,
 			"gradients": true
 		},
+		"__experimentalDimensions": {
+			"width": "segmented",
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"width": true
+			}
+		},
 		"fontSize": true,
 		"reusable": false,
 		"__experimentalBorder": {
