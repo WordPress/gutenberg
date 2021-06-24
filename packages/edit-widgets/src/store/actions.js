@@ -108,7 +108,22 @@ export function* saveWidgetArea( widgetAreaId ) {
 		( { sidebar } ) => sidebar === widgetAreaId
 	);
 
-	const widgetsBlocks = post.blocks;
+	// Remove all duplicate reference widget instances for legacy widgets.
+	// Why? We filter out the widgets with duplicate IDs to prevent adding more than one instance of a widget
+	// implemented using a function. WordPress doesn't support having more than one instance of these, if you try to
+	// save multiple instances of these in different sidebars you will run into undefined behaviors.
+	const usedReferenceWidgets = [];
+	const widgetsBlocks = post.blocks.filter( ( block ) => {
+		const { id } = block.attributes;
+
+		if ( block.name === 'core/legacy-widget' && block.attributes?.id ) {
+			if ( usedReferenceWidgets.includes( id ) ) {
+				return false;
+			}
+			usedReferenceWidgets.push( id );
+		}
+		return true;
+	} );
 
 	// Determine which widgets have been deleted. We can tell if a widget is
 	// deleted and not just moved to a different area by looking to see if
