@@ -47,7 +47,7 @@ if ( ! function_exists( 'wp_should_load_separate_core_block_assets' ) ) {
 add_filter(
 	'separate_core_block_assets',
 	function( $load_separate_styles ) {
-		if ( function_exists( 'gutenberg_is_fse_theme' ) && gutenberg_is_fse_theme() ) {
+		if ( function_exists( 'gutenberg_is_block_theme' ) && gutenberg_is_block_theme() ) {
 			return true;
 		}
 		return $load_separate_styles;

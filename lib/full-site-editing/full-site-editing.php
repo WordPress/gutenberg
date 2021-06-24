@@ -5,29 +5,40 @@
  * @package gutenberg
  */
 
+
 /**
- * Returns whether the current theme is an FSE theme or not.
+ * Returns whether the current theme is a block-based theme.
  *
- * @return boolean Whether the current theme is an FSE theme or not.
+ * @return boolean Whether the current theme is a block-based theme.
  */
-function gutenberg_is_fse_theme() {
+function gutenberg_is_block_theme() {
 	return is_readable( get_stylesheet_directory() . '/block-templates/index.html' );
 }
 
 /**
- * Returns whether the current theme is FSE-enabled or not.
+ * An alias of the gutenberg_is_block_theme function.
  *
- * @return boolean Whether the current theme is FSE-enabled or not.
+ * @deprecated 10.9.1
  */
-function gutenberg_supports_block_templates() {
-	return gutenberg_is_fse_theme() || current_theme_supports( 'block-templates' );
+function gutenberg_is_fse_theme() {
+	_deprecated_function( __FUNCTION__, '10.9.1', 'gutenberg_is_block_theme' );
+	return gutenberg_is_block_theme();
 }
 
 /**
- * Show a notice when a Full Site Editing theme is used.
+ * Returns whether the current theme supports block templates.
+ *
+ * @return boolean Whether the current theme supports block templates.
+ */
+function gutenberg_supports_block_templates() {
+	return gutenberg_is_block_theme() || current_theme_supports( 'block-templates' );
+}
+
+/**
+ * Show a notice when a block-based theme is used.
  */
 function gutenberg_full_site_editing_notice() {
-	if ( ! gutenberg_is_fse_theme() || 'themes' !== get_current_screen()->base ) {
+	if ( ! gutenberg_is_block_theme() || 'themes' !== get_current_screen()->base ) {
 		return;
 	}
 	?>
@@ -39,10 +50,10 @@ function gutenberg_full_site_editing_notice() {
 add_action( 'admin_notices', 'gutenberg_full_site_editing_notice' );
 
 /**
- * Removes legacy pages from FSE themes.
+ * Removes legacy pages from block-based themes.
  */
 function gutenberg_remove_legacy_pages() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_is_block_theme() ) {
 		return;
 	}
 
@@ -73,8 +84,8 @@ add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
  */
 function gutenberg_adminbar_items( $wp_admin_bar ) {
 
-	// Early exit if not an FSE theme.
-	if ( ! gutenberg_is_fse_theme() ) {
+	// Early exit if not a block-based theme.
+	if ( ! gutenberg_is_block_theme() ) {
 		return;
 	}
 
@@ -110,7 +121,7 @@ add_filter( 'menu_order', 'gutenberg_menu_order' );
  * @param array $menu_order Menu Order.
  */
 function gutenberg_menu_order( $menu_order ) {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_is_block_theme() ) {
 		return $menu_order;
 	}
 
