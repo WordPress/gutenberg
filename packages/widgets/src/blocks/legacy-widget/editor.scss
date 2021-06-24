@@ -12,7 +12,7 @@
 		margin: 0 0 $grid-unit-15 0;
 	}
 
-	.widget-inside {
+	.widget-inside.widget-inside {
 		border: none;
 		box-shadow: none;
 		display: block;
@@ -59,6 +59,12 @@
 	.widget.open {
 		z-index: 0;
 	}
+}
+
+// Make sure edit form text and no preview warning are always visible.
+.wp-block-legacy-widget__edit-form.wp-block-legacy-widget__edit-form,
+.wp-block-legacy-widget__edit-no-preview.wp-block-legacy-widget__edit-no-preview {
+	color: $black;
 }
 
 .wp-block-legacy-widget__edit-preview,
