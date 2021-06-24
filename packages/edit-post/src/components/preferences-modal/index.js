@@ -85,7 +85,7 @@ export default function PreferencesModal() {
 							>
 								<EnablePublishSidebarOption
 									help={ __(
-										'Review settings such as categories and tags.'
+										'Review settings, such as visibility and tags.'
 									) }
 									label={ __(
 										'Include pre-publish checklist'
