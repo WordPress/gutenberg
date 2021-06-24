@@ -3,7 +3,10 @@
  */
 import {
 	createNewPost,
+	createUser,
+	deleteUser,
 	insertBlock,
+	loginUser,
 	pressKeyWithModifier,
 	switchUserToAdmin,
 	switchUserToTest,
@@ -66,7 +69,7 @@ describe( 'Site Title block', () => {
 		await setSetting( 'blogname', originalSiteTitle );
 	} );
 
-	it( 'Can edit the site title', async () => {
+	it( 'Can edit the site title as admin', async () => {
 		await createNewPost();
 		await insertBlock( 'Site Title' );
 		const editableSiteTitleSelector = '[aria-label="Block: Site Title"] a';
@@ -86,5 +89,24 @@ describe( 'Site Title block', () => {
 
 		const siteTitle = await getSetting( 'blogname' );
 		expect( siteTitle ).toEqual( 'New Site Title' );
+	} );
+
+	it( 'Cannot edit the site title as editor', async () => {
+		const username = 'testuser';
+		const password = await createUser( username, '', '', 'editor' );
+		await loginUser( username, password );
+
+		await createNewPost();
+		await insertBlock( 'Site Title' );
+		const editableSiteTitleSelector = '[aria-label="Block: Site Title"] a';
+		await page.waitForSelector( editableSiteTitleSelector );
+
+		const editable = await page.$eval(
+			editableSiteTitleSelector,
+			( element ) => element.contentEditable
+		);
+		expect( editable ).toBe( 'inherit' );
+
+		await deleteUser( username );
 	} );
 } );
