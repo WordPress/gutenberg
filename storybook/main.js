@@ -59,23 +59,4 @@ module.exports = {
 
 		return updateEmotionAliases( config );
 	},
-	babel: ( config ) => {
-		const getEntryIndexByName = ( type, name ) => {
-			return config[ type ].findIndex( ( entry ) => {
-				const entryName = Array.isArray( entry ) ? entry[ 0 ] : entry;
-				return entryName.includes( name );
-			} );
-		};
-
-		// Replace reference to v10 of the Babel plugin to v11.
-		const emotionPluginIndex = getEntryIndexByName(
-			'plugins',
-			'babel-plugin-emotion'
-		);
-		config.plugins[ emotionPluginIndex ] = require.resolve(
-			'@emotion/babel-plugin'
-		);
-
-		return config;
-	},
 };
