@@ -88,12 +88,12 @@ supports: {
     -   `background`: type `boolean`, default value `true`
     -   `__experimentalDuotone`: type `string`, default value undefined
     -   `gradients`: type `boolean`, default value `false`
-    -   `link`: type `boolean`, default value `true`
+    -   `link`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
 
 This value signals that a block supports some of the properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
-Note that the `background`, `link`, and `text` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
+Note that the `background` and `text` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
 
 ```js
 supports: {
@@ -123,7 +123,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enables background, link, and text
+    color: true // Enables background and text
 }
 ```
 
@@ -276,23 +276,21 @@ When the block declares support for `color.gradient`, the attributes definition 
 
 ### color.link
 
-This property adds block controls which allow the user to set link color in a block.
+This property adds block controls which allow the user to set link color in a block, link color is disabled by default.
 
-When color support is declared, this property is enabled by default, so simply setting color will enable.
 
 ```js
 supports: {
-    color: true // Enables background, link, and text
+    color: true // Enables only background and text
 }
 ```
 
-To disable link color support while keeping other color supports enabled, set to `false`.
+To enable link color support, set to `true`.
 
 ```js
 supports: {
     color: {
-        // Disable link color support. Background and text support is still enabled.
-        link: false
+        link: true
     }
 }
 ```
@@ -344,7 +342,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enables background, link, and text
+    color: true // Enables background and text, but not link.
 }
 ```
 
@@ -353,7 +351,7 @@ To disable text color support while keeping other color supports enabled, set to
 ```js
 supports: {
     color: {
-        // Disable text color support. Background and link support is still enabled.
+        // Disable text color support.
         text: false
     }
 }
