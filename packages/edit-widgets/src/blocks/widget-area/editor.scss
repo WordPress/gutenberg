@@ -60,7 +60,7 @@ $panel-title-height: 48px;
 }
 
 .widget-area-highlight-drop-zone {
-	outline: --wp-admin-border-width-focus solid var(--wp-admin-theme-color);
+	outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 }
 
 // Prevent "dragenter" event from firing when dragging onto the title component.
