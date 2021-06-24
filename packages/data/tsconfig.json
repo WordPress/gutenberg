@@ -1,0 +1,20 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"noUnusedParameters": false,
+	},
+	"references": [
+		{ "path": "../compose" },
+		{ "path": "../deprecated" },
+		{ "path": "../element" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../priority-queue" },
+		// Needs to be added once it is typed
+		// { "path": "../redux-routine" }
+	],
+	"include": [
+		"src/redux-store/metadata/actions.js"
+	]
+}
