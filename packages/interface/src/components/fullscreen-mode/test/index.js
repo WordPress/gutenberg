@@ -5,7 +5,7 @@ import { act, create } from 'react-test-renderer';
 /**
  * Internal dependencies
  */
-import { FullscreenMode } from '..';
+import FullscreenMode from '..';
 
 describe( 'FullscreenMode', () => {
 	it( 'fullscreen mode to be added to document body when active', () => {
