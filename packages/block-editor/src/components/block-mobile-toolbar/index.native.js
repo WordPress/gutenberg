@@ -8,7 +8,7 @@ import { View } from 'react-native';
  */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -53,6 +53,11 @@ const BlockMobileToolbar = ( {
 		blockWidth <= BREAKPOINTS.wrapMover ||
 		appenderWidth - spacingValue <= BREAKPOINTS.wrapMover;
 
+	const BlockSettingsButtonFill = ( { children, onMount } ) => {
+		useEffect( onMount, [] );
+		return children ?? null;
+	};
+
 	return (
 		<View
 			style={ [ styles.toolbar, isFullWidth && styles.toolbarFullWidth ] }
@@ -69,10 +74,15 @@ const BlockMobileToolbar = ( {
 
 			<BlockSettingsButton.Slot>
 				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
-				{ ( fills = [ null ] ) => {
-					setFillsLength( fills.length );
-					return wrapBlockSettings ? null : fills[ 0 ];
-				} }
+				{ ( fills = [ null ] ) => (
+					// This purpose of this component is only to provide a way
+					// to pass data from the slot rendering to the component
+					<BlockSettingsButtonFill
+						onMount={ () => setFillsLength( fills.length ) }
+					>
+						{ wrapBlockSettings ? null : fills[ 0 ] }
+					</BlockSettingsButtonFill>
+				) }
 			</BlockSettingsButton.Slot>
 
 			<BlockActionsMenu

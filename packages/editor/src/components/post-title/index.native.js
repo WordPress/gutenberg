@@ -122,13 +122,11 @@ class PostTitle extends Component {
 					{ borderColor },
 					isDimmed && styles.dimmed,
 				] }
-				accessible={ ! this.props.isSelected }
-				accessibilityLabel={ this.getTitle( title, postType ) }
-				accessibilityHint={ __( 'Updates the title.' ) }
 			>
 				<RichText
 					setRef={ this.setRef }
 					accessibilityLabel={ this.getTitle( title, postType ) }
+					accessibilityHint={ __( 'Updates the title.' ) }
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }

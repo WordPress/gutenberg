@@ -112,4 +112,7 @@ module.exports = {
 	floatingToolbar: {
 		height: 10,
 	},
+	searchFormPlaceholder: {
+		color: 'gray',
+	},
 };
