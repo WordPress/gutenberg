@@ -105,11 +105,19 @@ function gutenberg_theme_relies_on_notice( $plugin_file, $plugin_data ) {
 		'<tr class="plugin-update-tr active" id="%s" data-slug="%s" data-plugin="%s">' .
 		'<td colspan="%s" class="plugin-update colspanchange">' .
 		'<div class="notice inline notice-warning notice-alt"><p>%s</p></div></td></tr>',
-		esc_attr( $plugin_data['slug'] . '-update' ),
+		esc_attr( $plugin_data['slug'] . '-required' ),
 		esc_attr( $plugin_data['slug'] ),
 		esc_attr( $plugin_file ),
 		esc_attr( $wp_list_table->get_column_count() ),
 		__( 'This plugin is required for the active theme to work correctly. Deactivating is not recommended.', 'gutenberg' )
 	);
+	?>
+	<style>
+		.plugins tr[data-slug="gutenberg"] th,
+		.plugins tr[data-slug="gutenberg"] td {
+			box-shadow: none;
+		}
+	</style>
+	<?php
 }
 add_action( 'after_plugin_row_gutenberg/gutenberg.php', 'gutenberg_theme_relies_on_notice', 10, 2 );
