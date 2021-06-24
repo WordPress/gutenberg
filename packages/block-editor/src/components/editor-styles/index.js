@@ -35,7 +35,7 @@ function useDarkThemeBodyClassName( styles ) {
 				// DOM, so calculate the background color by creating a fake
 				// wrapper.
 				const tempCanvas = ownerDocument.createElement( 'div' );
-				tempCanvas.classList.add( EDITOR_STYLES_SELECTOR );
+				tempCanvas.classList.add( 'editor-styles-wrapper' );
 				body.appendChild( tempCanvas );
 
 				backgroundColor = defaultView
