@@ -58,11 +58,74 @@ afterAll( () => {
 } );
 
 describe( 'Reusable block', () => {
+	it( 'inserts a reusable block', async () => {
+		// We have to use different ids because entities are cached in memory.
+		const reusableBlockMock1 = getMockedReusableBlock( 1 );
+		const reusableBlockMock2 = getMockedReusableBlock( 2 );
+
+		// Return mocked responses for the block endpoints.
+		fetchRequest.mockImplementation( ( { path } ) => {
+			let response = {};
+			if ( path.startsWith( '/wp/v2/blocks?' ) ) {
+				response = [ reusableBlockMock1, reusableBlockMock2 ];
+			} else if ( path.startsWith( '/wp/v2/blocks/1' ) ) {
+				response = reusableBlockMock1;
+			}
+			return Promise.resolve( response );
+		} );
+
+		const {
+			getByA11yLabel,
+			getByTestId,
+			getByText,
+		} = await initializeEditor( {
+			initialHtml: '',
+			capabilities: { reusableBlock: true },
+		} );
+
+		// Open the inserter menu
+		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+
+		// Navigate to reusable tab
+		const reusableSegment = getByText( 'Reusable' );
+		// onLayout event is required by Segment component
+		fireEvent( reusableSegment, 'layout', {
+			nativeEvent: {
+				layout: {
+					width: 100,
+				},
+			},
+		} );
+		fireEvent.press( reusableSegment );
+
+		const reusableBlockList = getByTestId( 'InserterUI-ReusableBlocks' );
+		// onScroll event used to force the FlatList to render all items
+		fireEvent.scroll( reusableBlockList, {
+			nativeEvent: {
+				contentOffset: { y: 0, x: 0 },
+				contentSize: { width: 100, height: 100 },
+				layoutMeasurement: { width: 100, height: 100 },
+			},
+		} );
+
+		// Insert a reusable block
+		fireEvent.press(
+			await waitFor( () => getByText( `Reusable block - 1` ) )
+		);
+
+		// Get the reusable block
+		const reusableBlock = await waitFor( () =>
+			getByA11yLabel( /Reusable block Block\. Row 1/ )
+		);
+
+		expect( reusableBlock ).toBeDefined();
+		expect( getEditorHtml() ).toBe( '<!-- wp:block {"ref":1} /-->' );
+	} );
+
 	it( 'renders warning when the block does not exist', async () => {
 		// We have to use different ids because entities are cached in memory.
-		const id = 1;
+		const id = 3;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
-		const endpoint = `/wp/v2/blocks/${ id }`;
 
 		const { getByA11yLabel } = await initializeEditor( {
 			initialHtml,
@@ -70,10 +133,6 @@ describe( 'Reusable block', () => {
 
 		const reusableBlock = await waitFor( () =>
 			getByA11yLabel( /Reusable block Block\. Row 1/ )
-		);
-
-		const reusableBlockRequest = fetchRequest.mock.calls.find( ( call ) =>
-			call[ 0 ].path.startsWith( endpoint )
 		);
 
 		const blockDeleted = await waitFor( () =>
@@ -82,23 +141,23 @@ describe( 'Reusable block', () => {
 			)
 		);
 
-		expect( reusableBlockRequest ).toBeDefined();
 		expect( reusableBlock ).toBeDefined();
 		expect( blockDeleted ).toBeDefined();
-		expect( getEditorHtml() ).toBe( initialHtml );
 	} );
 
 	it( 'renders block content', async () => {
 		// We have to use different ids because entities are cached in memory.
-		const id = 2;
+		const id = 4;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
 		const endpoint = `/wp/v2/blocks/${ id }`;
 
 		// Return mocked response for the block endpoint.
 		fetchRequest.mockImplementation( ( { path } ) => {
+			let response = {};
 			if ( path.startsWith( endpoint ) ) {
-				return Promise.resolve( getMockedReusableBlock( id ) );
+				response = getMockedReusableBlock( id );
 			}
+			return Promise.resolve( response );
 		} );
 
 		const { getByA11yLabel } = await initializeEditor( {
@@ -107,10 +166,6 @@ describe( 'Reusable block', () => {
 
 		const reusableBlock = await waitFor( () =>
 			getByA11yLabel( /Reusable block Block\. Row 1/ )
-		);
-
-		const reusableBlockRequest = fetchRequest.mock.calls.find( ( call ) =>
-			call[ 0 ].path.startsWith( endpoint )
 		);
 
 		const innerBlockListWrapper = await waitFor( () =>
@@ -133,9 +188,7 @@ describe( 'Reusable block', () => {
 			)
 		);
 
-		expect( reusableBlockRequest ).toBeDefined();
 		expect( reusableBlock ).toBeDefined();
 		expect( headingInnerBlock ).toBeDefined();
-		expect( getEditorHtml() ).toBe( initialHtml );
 	} );
 } );
