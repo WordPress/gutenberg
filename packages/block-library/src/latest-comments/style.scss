@@ -1,15 +1,21 @@
 ol.wp-block-latest-comments {
-	padding-left: 0;
+	&.has-numbering {
+		padding-left: revert;
+		list-style: revert;
+	}
+
+	&.has-no-numbering {
+		padding-left: 0;
+		list-style: none;
+	}
 }
 
 .wp-block-latest-comments__comment {
 	line-height: 1.1;
-	list-style: none;
 	margin-bottom: 1em;
 
 	.has-avatars & {
 		min-height: 2.25em;
-		list-style: none;
 
 		.wp-block-latest-comments__comment-meta,
 		.wp-block-latest-comments__comment-excerpt {
