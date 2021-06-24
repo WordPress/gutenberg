@@ -70,8 +70,6 @@ describe( 'Reusable block', () => {
 				response = [ reusableBlockMock1, reusableBlockMock2 ];
 			} else if ( path.startsWith( '/wp/v2/blocks/1' ) ) {
 				response = reusableBlockMock1;
-			} else if ( path.startsWith( '/wp/v2/blocks/2' ) ) {
-				response = reusableBlockMock2;
 			}
 			return Promise.resolve( response );
 		} );
