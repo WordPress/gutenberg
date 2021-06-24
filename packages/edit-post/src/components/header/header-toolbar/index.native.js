@@ -115,8 +115,8 @@ export default compose( [
 			getBlockRootClientId,
 			getBlockSelectionEnd,
 			hasInserterItems,
-			getEditorSettings,
-		} = select( editorStore );
+		} = select( blockEditorStore );
+		const { getEditorSettings } = select( editorStore );
 		return {
 			hasRedo: select( editorStore ).hasEditorRedo(),
 			hasUndo: select( editorStore ).hasEditorUndo(),
