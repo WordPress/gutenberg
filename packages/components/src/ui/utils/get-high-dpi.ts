@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/css';
-// eslint-disable-next-line no-duplicate-imports
-import type { CSSInterpolation } from '@emotion/css';
+import { css, CSSInterpolation } from '@emotion/css';
 
 export function getHighDpi(
 	strings: TemplateStringsArray,

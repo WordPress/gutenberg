@@ -2,7 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-import { css } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
