@@ -5,7 +5,6 @@
  * @package gutenberg
  */
 
-
 /**
  * Returns whether the current theme is a block-based theme.
  *
