@@ -6,7 +6,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-2 {
   margin-bottom: calc(4px * 2);
 }
 

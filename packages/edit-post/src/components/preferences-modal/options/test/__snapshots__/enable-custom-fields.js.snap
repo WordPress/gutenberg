@@ -6,7 +6,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-2 {
   margin-bottom: calc(4px * 2);
 }
 
@@ -69,7 +69,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-2 {
   margin-bottom: calc(4px * 2);
 }
 
@@ -118,7 +118,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-2 {
   margin-bottom: calc(4px * 2);
 }
 
@@ -181,7 +181,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-2 {
   margin-bottom: calc(4px * 2);
 }
 
