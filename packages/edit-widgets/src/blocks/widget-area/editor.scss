@@ -21,6 +21,10 @@
 	.block-list-appender.wp-block {
 		width: initial;
 	}
+	// Override theme custom widths for blocks.
+	.editor-styles-wrapper .wp-block.wp-block.wp-block.wp-block.wp-block {
+		max-width: 100%;
+	}
 }
 
 // Add some spacing above the inner blocks so that the block toolbar doesn't
