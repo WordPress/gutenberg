@@ -82,7 +82,7 @@ function gutenberg_pre_init() {
  * @param array  $plugin_data An array of plugin data.
  */
 function gutenberg_theme_relies_on_notice( $plugin_file, $plugin_data ) {
-	if ( ! current_user_can( 'update_plugins' ) ) {
+	if ( ! current_user_can( 'deactivate_plugin', 'gutenberg/gutenberg.php' ) ) {
 		return;
 	}
 
