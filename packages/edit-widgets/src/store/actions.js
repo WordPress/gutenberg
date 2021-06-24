@@ -108,17 +108,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 		( { sidebar } ) => sidebar === widgetAreaId
 	);
 
-	// Remove all duplicate reference widget instances
-	const usedReferenceWidgets = [];
-	const widgetsBlocks = post.blocks.filter( ( { attributes: { id } } ) => {
-		if ( id ) {
-			if ( usedReferenceWidgets.includes( id ) ) {
-				return false;
-			}
-			usedReferenceWidgets.push( id );
-		}
-		return true;
-	} );
+	const widgetsBlocks = post.blocks;
 
 	// Determine which widgets have been deleted. We can tell if a widget is
 	// deleted and not just moved to a different area by looking to see if
