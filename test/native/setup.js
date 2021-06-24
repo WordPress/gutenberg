@@ -178,3 +178,14 @@ jest.mock(
 		} ) ),
 	} )
 );
+
+// Silences the warning: dispatchCommand was called with a ref that isn't a native
+// component. Use React.forwardRef to get access to the underlying native component.
+// This is a known bug of react-native-testing-library package:
+// https://github.com/callstack/react-native-testing-library/issues/329#issuecomment-737307473
+jest.mock( 'react-native/Libraries/Components/Switch/Switch', () => {
+	const jestMockComponent = require( 'react-native/jest/mockComponent' );
+	return jestMockComponent(
+		'react-native/Libraries/Components/Switch/Switch'
+	);
+} );
