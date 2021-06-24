@@ -15,15 +15,13 @@ const FullscreenMode = ( { isActive } ) => {
 			isSticky.current = true;
 			document.body.classList.remove( 'sticky-menu' );
 		}
-	}, [] );
 
-	useEffect( () => {
 		return () => {
 			if ( isSticky.current ) {
 				document.body.classList.add( 'sticky-menu' );
 			}
 		};
-	}, [ isSticky ] );
+	}, [] );
 
 	useEffect( () => {
 		if ( isActive ) {
