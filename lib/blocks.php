@@ -170,7 +170,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
-	$script_suffix   = '.min.js';
+	$script_suffix   = '.js';
 
 	$view_script_path = "build/block-library/blocks/$block_name/view$script_suffix";
 	if ( file_exists( gutenberg_dir_path() . $view_script_path ) ) {
