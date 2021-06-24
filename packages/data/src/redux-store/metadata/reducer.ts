@@ -21,66 +21,55 @@ type Action =
 			typeof import('./actions').invalidateResolutionForStoreSelector
 	  >;
 
+type State = EquivalentKeyMap< unknown[] | unknown, boolean >;
+
 /**
  * Reducer function returning next state for selector resolution of
  * subkeys, object form:
  *
  *  selectorName -> EquivalentKeyMap<Array,boolean>
  */
-const subKeysIsResolved: Reducer<
-	Record< string, EquivalentKeyMap< unknown[] | unknown, boolean > >,
+const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
+	State,
 	Action
-> = onSubKey< EquivalentKeyMap< unknown[] | unknown, boolean >, Action >(
-	'selectorName'
-)(
-	(
-		state = new EquivalentKeyMap< unknown[] | unknown, boolean >(),
-		action: Action
-	) => {
-		switch ( action.type ) {
-			case 'START_RESOLUTION':
-			case 'FINISH_RESOLUTION': {
-				const isStarting = action.type === 'START_RESOLUTION';
-				const nextState = new EquivalentKeyMap( state );
-				nextState.set( action.args, isStarting );
-				return nextState;
-			}
-			case 'START_RESOLUTIONS':
-			case 'FINISH_RESOLUTIONS': {
-				const isStarting = action.type === 'START_RESOLUTIONS';
-				const nextState = new EquivalentKeyMap( state );
-				for ( const resolutionArgs of action.args ) {
-					nextState.set( resolutionArgs, isStarting );
-				}
-				return nextState;
-			}
-			case 'INVALIDATE_RESOLUTION': {
-				const nextState = new EquivalentKeyMap( state );
-				nextState.delete( action.args );
-				return nextState;
-			}
+>( 'selectorName' )( ( state = new EquivalentKeyMap(), action: Action ) => {
+	switch ( action.type ) {
+		case 'START_RESOLUTION':
+		case 'FINISH_RESOLUTION': {
+			const isStarting = action.type === 'START_RESOLUTION';
+			const nextState = new EquivalentKeyMap( state );
+			nextState.set( action.args, isStarting );
+			return nextState;
 		}
-		return state;
+		case 'START_RESOLUTIONS':
+		case 'FINISH_RESOLUTIONS': {
+			const isStarting = action.type === 'START_RESOLUTIONS';
+			const nextState = new EquivalentKeyMap( state );
+			for ( const resolutionArgs of action.args ) {
+				nextState.set( resolutionArgs, isStarting );
+			}
+			return nextState;
+		}
+		case 'INVALIDATE_RESOLUTION': {
+			const nextState = new EquivalentKeyMap( state );
+			nextState.delete( action.args );
+			return nextState;
+		}
 	}
-);
+	return state;
+} );
 
 /**
  * Reducer function returning next state for selector resolution, object form:
  *
  *   selectorName -> EquivalentKeyMap<Array, boolean>
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param  state  Current state.
+ * @param  action Dispatched action.
  *
- * @return {Object} Next state.
+ * @return Next state.
  */
-const isResolved = (
-	state: Record<
-		string,
-		EquivalentKeyMap< unknown[] | unknown, boolean >
-	> = {},
-	action: Action
-) => {
+const isResolved = ( state: Record< string, State > = {}, action: Action ) => {
 	switch ( action.type ) {
 		case 'INVALIDATE_RESOLUTION_FOR_STORE':
 			return {};
