@@ -558,9 +558,7 @@ describe( 'Navigation', () => {
 		const isScriptLoaded = await previewPage.evaluate(
 			() =>
 				null !==
-				document.querySelector(
-					'script[src*="navigation/view.js"]'
-				)
+				document.querySelector( 'script[src*="navigation/view.js"]' )
 		);
 
 		expect( isScriptLoaded ).toBe( false );
@@ -613,9 +611,7 @@ describe( 'Navigation', () => {
 		let isScriptLoaded = await previewPage.evaluate(
 			() =>
 				null !==
-				document.querySelector(
-					'script[src*="navigation/view.js"]'
-				)
+				document.querySelector( 'script[src*="navigation/view.js"]' )
 		);
 
 		expect( isScriptLoaded ).toBe( false );
@@ -631,9 +627,7 @@ describe( 'Navigation', () => {
 		isScriptLoaded = await previewPage.evaluate(
 			() =>
 				null !==
-				document.querySelector(
-					'script[src*="navigation/view.js"]'
-				)
+				document.querySelector( 'script[src*="navigation/view.js"]' )
 		);
 
 		expect( isScriptLoaded ).toBe( true );
