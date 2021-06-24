@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.55.2
 -   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
 
 -   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
@@ -17,7 +19,7 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.55.1
 -   [*] Fix: RNMobile borderRadius value setting [#32717]
 -   [*] Improve unsupported block message for reusable block [#32618]
-    
+
 ## 1.55.0
 -   [*] Gallery block - Fix gallery images caption text formatting [#32351]
 -   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]

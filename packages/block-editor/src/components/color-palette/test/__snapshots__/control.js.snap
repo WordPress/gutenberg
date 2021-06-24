@@ -7,7 +7,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 }
 
 .emotion-0 {
-  margin-bottom: 8px;
+  margin-bottom: calc(4px * 2);
 }
 
 .components-panel__row .emotion-0 {

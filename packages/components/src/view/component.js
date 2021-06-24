@@ -20,7 +20,7 @@ import styled from '@emotion/styled';
  * }
  * ```
  *
- * @type {import('../ui/context').PolymorphicComponent<'div', { children?: import('react').ReactNode }>}
+ * @type {import('../ui/context').PolymorphicComponent<'div', { children?: import('react').ReactNode }, true>}
  */
 // @ts-ignore
 const View = styled.div``;

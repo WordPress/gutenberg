@@ -7,9 +7,6 @@ import { COLORS } from './colors-values';
 const CONTROL_HEIGHT = '30px';
 const CONTROL_PADDING_X = '12px';
 
-const CARD_PADDING_X = space( 3 );
-const CARD_PADDING_Y = space( 3 );
-
 export default {
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
@@ -51,11 +48,10 @@ export default {
 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
 	cardBorderRadius: '2px',
-	cardPaddingX: CARD_PADDING_X,
-	cardPaddingY: CARD_PADDING_Y,
-	cardPadding: `${ CARD_PADDING_X } ${ CARD_PADDING_Y }`,
-	cardHeaderFooterPaddingY: space( 1 ),
-	cardHeaderHeight: '44px',
+	cardPaddingXSmall: `${ space( 2 ) }`,
+	cardPaddingSmall: `${ space( 4 ) }`,
+	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
+	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
 	surfaceBackgroundColor: COLORS.white,
 	surfaceBackgroundSubtleColor: '#F3F3F3',
 	surfaceBackgroundTintColor: '#F5F5F5',

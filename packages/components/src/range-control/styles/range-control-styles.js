@@ -8,7 +8,8 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import NumberControl from '../../number-control';
-import { COLORS, reduceMotion, rtl, space } from '../../utils';
+import { COLORS, reduceMotion, rtl } from '../../utils';
+import { space } from '../../ui/utils/space';
 
 const rangeHeight = () => css( { height: 30, minHeight: 30 } );
 const thumbSize = 20;
@@ -276,13 +277,13 @@ export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;
 	margin-top: 0;
-	width: ${ space( 8 ) } !important;
+	width: ${ space( 16 ) } !important;
 
 	input[type='number']& {
 		${ rangeHeight };
 	}
 
-	${ rtl( { marginLeft: `${ space( 2 ) } !important` } ) }
+	${ rtl( { marginLeft: `${ space( 4 ) } !important` } ) }
 `;
 
 export const ActionRightWrapper = styled.span`
