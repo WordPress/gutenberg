@@ -191,7 +191,7 @@ add_filter( 'rest_index', 'register_site_icon_url' );
 add_theme_support( 'widgets-block-editor' );
 
 /**
- * Enable the block templates (editor mode) for themes with theme.json.
+ * Enable block templates (editor mode) for themes with theme.json.
  */
 function gutenberg_enable_block_templates() {
 	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {

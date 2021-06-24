@@ -12,7 +12,7 @@ PODS:
     - React-jsi (= 0.64.0)
     - ReactCommon/turbomodule/core (= 0.64.0)
   - glog (0.3.5)
-  - Gutenberg (1.55.1):
+  - Gutenberg (1.55.2):
     - React-Core (= 0.64.0)
     - React-CoreModules (= 0.64.0)
     - React-RCTImage (= 0.64.0)
@@ -301,7 +301,7 @@ PODS:
     - React-Core
   - RNSVG (9.13.7-wp):
     - React-Core
-  - RNTAztecView (1.55.1):
+  - RNTAztecView (1.55.2):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.4)
   - WordPress-Aztec-iOS (1.19.4)
@@ -454,7 +454,7 @@ SPEC CHECKSUMS:
   FBLazyVector: 49cbe4b43e445b06bf29199b6ad2057649e4c8f5
   FBReactNativeSpec: 420ad7ff87adc491b45199891c72ea531fa4926e
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
-  Gutenberg: c28fecb5d9d3bc915e7b89c40f68506643e301ea
+  Gutenberg: 370764154bd1acf878f58985e3d75d15f7cc0666
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: 2f8cb5b7533219bf4218a045f92768129cf7050a
   RCTTypeSafety: 512728b73549e72ad7330b92f3d42936f2a4de5b
