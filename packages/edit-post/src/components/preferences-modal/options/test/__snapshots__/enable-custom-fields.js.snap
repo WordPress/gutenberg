@@ -7,7 +7,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
 }
 
 .emotion-0 {
-  margin-bottom: 8px;
+  margin-bottom: calc(4px * 2);
 }
 
 .components-panel__row .emotion-0 {
@@ -70,7 +70,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
 }
 
 .emotion-0 {
-  margin-bottom: 8px;
+  margin-bottom: calc(4px * 2);
 }
 
 .components-panel__row .emotion-0 {
@@ -119,7 +119,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
 }
 
 .emotion-0 {
-  margin-bottom: 8px;
+  margin-bottom: calc(4px * 2);
 }
 
 .components-panel__row .emotion-0 {
@@ -182,7 +182,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
 }
 
 .emotion-0 {
-  margin-bottom: 8px;
+  margin-bottom: calc(4px * 2);
 }
 
 .components-panel__row .emotion-0 {

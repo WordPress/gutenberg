@@ -78,6 +78,8 @@ These are packages used in development mode to help developers with daily tasks 
 
 ## Editor Packages
 
+![Post Editor Modules Architecture](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/modules.png)
+
 ### What's the difference between the different editor packages? What's the purpose of each package?
 
 It's often surprising to new contributors to discover that the post editor is constructed as a layered abstraction of three separate packages `@wordpress/edit-post`, `@wordpress/editor`, and `@wordpress/block-editor`.

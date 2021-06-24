@@ -59,4 +59,10 @@ body.widgets-php {
 	display: none;
 }
 
+// Don't display admin notices on the Widgets screen.
+// Needs !important because plugins may add inline styles to notices.
+.widgets-php .notice {
+	display: none !important;
+}
+
 @include wordpress-admin-schemes();
