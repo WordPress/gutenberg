@@ -70,6 +70,7 @@
 		},
 		"color": true
 	},
+	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
 }
