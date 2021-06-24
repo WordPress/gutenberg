@@ -15,5 +15,6 @@
 	],
 	"include": [
 		"src/redux-store/metadata/**/*",
+		"src/promise-middleware.js",
 	]
 }
