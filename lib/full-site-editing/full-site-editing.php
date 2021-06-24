@@ -78,7 +78,7 @@ function gutenberg_remove_legacy_pages() {
 add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
 
 /**
- * Removes legacy adminbar items from FSE themes.
+ * Removes legacy adminbar items from block-based themes.
  *
  * @param WP_Admin_Bar $wp_admin_bar The admin-bar instance.
  */

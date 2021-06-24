@@ -665,7 +665,7 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		}
 	}
 
-	// Remove the default font editor styles for FSE themes.
+	// Remove the default font editor styles for block-based themes.
 	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		foreach ( $settings['styles'] as $j => $style ) {
 			if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {

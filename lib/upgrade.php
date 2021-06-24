@@ -30,7 +30,7 @@ function _gutenberg_migrate_database() {
 }
 
 /**
- * Remove FSE auto drafts and associated terms.
+ * Remove wp_template auto drafts and associated terms.
  *
  * @access private
  * @internal
