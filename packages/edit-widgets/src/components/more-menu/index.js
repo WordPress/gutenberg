@@ -122,6 +122,13 @@ export default function MoreMenu() {
 									'Contain text cursor inside block deactivated'
 								) }
 							/>
+							<FeatureToggle
+								feature="themeStyles"
+								info={ __(
+									'Make the editor look like your theme.'
+								) }
+								label={ __( 'Use theme styles' ) }
+							/>
 							{ isLargeViewport && (
 								<FeatureToggle
 									feature="showBlockBreadcrumbs"

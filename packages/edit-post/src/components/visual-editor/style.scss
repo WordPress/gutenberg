@@ -3,6 +3,11 @@
 	display: flex;
 	flex-flow: column;
 
+	// Gray preview overlay (desktop/tablet/mobile) is intentionally not set on an element with scrolling content like
+	// interface-interface-skeleton__content. This causes graphical glitches (flashes of the background color)
+	// when scrolling in Safari due to incorrect ordering of large compositing layers (GPU acceleration).
+	background-color: $gray-800;
+
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
 	// This is duplicated in edit-site.
@@ -61,9 +66,7 @@
 
 .edit-post-visual-editor__content-area {
 	width: 100%;
-	// If this is set to height: 100%; it breaks in Safari 13, which calculates the height relatively to the incorrect flex container.
-	// By setting it as a min-height instead, it appears to work in all cases.
-	min-height: 100%;
+	height: 100%;
 	position: relative;
 	display: flex;
 }

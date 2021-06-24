@@ -18,7 +18,11 @@ import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
 
-const noopSearchHandler = Promise.resolve( [] );
+// Must be a function as otherwise URLInput will default
+// to the fetchLinkSuggestions passed in block editor settings
+// which will cause an unintended http request.
+const noopSearchHandler = () => Promise.resolve( [] );
+
 const LinkControlSearchInput = forwardRef(
 	(
 		{
@@ -50,6 +54,7 @@ const LinkControlSearchInput = forwardRef(
 			withCreateSuggestion,
 			withURLSuggestion
 		);
+
 		const searchHandler = showSuggestions
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;

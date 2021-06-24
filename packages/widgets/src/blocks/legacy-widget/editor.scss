@@ -12,7 +12,7 @@
 		margin: 0 0 $grid-unit-15 0;
 	}
 
-	.widget-inside {
+	.widget-inside.widget-inside {
 		border: none;
 		box-shadow: none;
 		display: block;
@@ -25,12 +25,46 @@
 		label + .widefat {
 			margin-top: $grid-unit-15;
 		}
+
+		// Override theme style bleed.
+		label,
+		input,
+		a {
+			color: $black;
+		}
+		select {
+			font-family: system-ui;
+			-webkit-appearance: revert;
+			color: revert;
+			border: revert;
+			border-radius: revert;
+			background: revert;
+			box-shadow: revert;
+			text-shadow: revert;
+			outline: revert;
+			cursor: revert;
+			transform: revert;
+			font-size: revert;
+			line-height: revert;
+			padding: revert;
+			margin: revert;
+			min-height: revert;
+			max-width: revert;
+			vertical-align: revert;
+			font-weight: revert;
+		}
 	}
 
 	// Reset z-index set on https://github.com/WordPress/wordpress-develop/commit/f26d4d37351a55fd1fc5dad0f5fef8f0f964908c.
 	.widget.open {
 		z-index: 0;
 	}
+}
+
+// Make sure edit form text and no preview warning are always visible.
+.wp-block-legacy-widget__edit-form.wp-block-legacy-widget__edit-form,
+.wp-block-legacy-widget__edit-no-preview.wp-block-legacy-widget__edit-no-preview {
+	color: $black;
 }
 
 .wp-block-legacy-widget__edit-preview,
@@ -93,5 +127,12 @@
 	.wp-block-legacy-widget__container {
 		padding: $grid-unit-10 $grid-unit-15;
 		min-height: 50px;
+	}
+}
+
+.wp-block-legacy-widget {
+	.components-select-control__input {
+		padding: 0;
+		font-family: system-ui;
 	}
 }

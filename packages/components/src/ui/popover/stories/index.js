@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { CardBody, CardHeader } from '../../card';
+import { CardBody, CardHeader } from '../../../card';
 import Button from '../../../button';
 import { Popover } from '..';
 
