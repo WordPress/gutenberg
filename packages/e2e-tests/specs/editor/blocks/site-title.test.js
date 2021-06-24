@@ -69,11 +69,16 @@ describe( 'Site Title block', () => {
 	it( 'Can edit the site title', async () => {
 		await createNewPost();
 		await insertBlock( 'Site Title' );
-		const editableSiteTitleSelector =
-			'.wp-block-site-title a[contenteditable="true"]';
+		const editableSiteTitleSelector = '.wp-block-site-title a';
 		await page.waitForSelector( editableSiteTitleSelector );
 		await page.focus( editableSiteTitleSelector );
 		await pressKeyWithModifier( 'primary', 'a' );
+
+		const editable = await page.$eval(
+			editableSiteTitleSelector,
+			( element ) => element.contentEditable
+		);
+		expect( editable ).toBe( 'true' );
 
 		await page.keyboard.type( 'New Site Title' );
 
