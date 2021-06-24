@@ -65,16 +65,15 @@ describe( 'Reusable block', () => {
 
 		// Return mocked responses for the block endpoints.
 		fetchRequest.mockImplementation( ( { path } ) => {
+			let response = {};
 			if ( path.startsWith( '/wp/v2/blocks?' ) ) {
-				return Promise.resolve( [
-					reusableBlockMock1,
-					reusableBlockMock2,
-				] );
+				response = [ reusableBlockMock1, reusableBlockMock2 ];
 			} else if ( path.startsWith( '/wp/v2/blocks/1' ) ) {
-				return reusableBlockMock1;
+				response = reusableBlockMock1;
 			} else if ( path.startsWith( '/wp/v2/blocks/2' ) ) {
-				return reusableBlockMock2;
+				response = reusableBlockMock2;
 			}
+			return Promise.resolve( response );
 		} );
 
 		const {
@@ -156,9 +155,11 @@ describe( 'Reusable block', () => {
 
 		// Return mocked response for the block endpoint.
 		fetchRequest.mockImplementation( ( { path } ) => {
+			let response = {};
 			if ( path.startsWith( endpoint ) ) {
-				return Promise.resolve( getMockedReusableBlock( id ) );
+				response = getMockedReusableBlock( id );
 			}
+			return Promise.resolve( response );
 		} );
 
 		const { getByA11yLabel } = await initializeEditor( {
