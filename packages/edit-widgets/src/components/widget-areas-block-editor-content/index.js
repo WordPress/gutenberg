@@ -43,10 +43,7 @@ export default function WidgetAreasBlockEditorContent( {
 				<BlockSelectionClearer>
 					<WritingFlow>
 						<ObserveTyping>
-							<BlockList
-								className="edit-widgets-main-block-list"
-								renderAppender={ false }
-							/>
+							<BlockList className="edit-widgets-main-block-list" />
 						</ObserveTyping>
 					</WritingFlow>
 				</BlockSelectionClearer>
