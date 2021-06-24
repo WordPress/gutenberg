@@ -194,8 +194,8 @@ export function* getEntityRecords( kind, name, query = {} ) {
 		}
 
 		const path = addQueryArgs( entity.baseURL, {
-			...entity.baseURLParams,
 			...query,
+			context: 'edit',
 		} );
 
 		let records = Object.values( yield apiFetch( { path } ) );

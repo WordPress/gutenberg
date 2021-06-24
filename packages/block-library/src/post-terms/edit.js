@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,17 +33,9 @@ export default function PostTermsEdit( {
 	const selectedTerm = useSelect(
 		( select ) => {
 			if ( ! term ) return {};
-			const taxonomies = select( coreStore ).getTaxonomies( {
-				per_page: -1,
-				context: 'view',
-			} );
-			return (
-				find(
-					taxonomies,
-					( taxonomy ) =>
-						taxonomy.slug === term && taxonomy.visibility.show_ui
-				) || {}
-			);
+			const { getTaxonomy } = select( coreStore );
+			const taxonomy = getTaxonomy( term );
+			return taxonomy?.visibility?.show_ui ? taxonomy : {};
 		},
 		[ term ]
 	);
