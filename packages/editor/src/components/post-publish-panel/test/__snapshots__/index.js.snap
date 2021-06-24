@@ -128,7 +128,6 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
     >
       <WithSelect(WithDispatch(PostPublishButton))
         focusOnMount={true}
-        isSaving={false}
         onSubmit={[Function]}
       />
     </div>
@@ -170,7 +169,6 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
     >
       <WithSelect(WithDispatch(PostPublishButton))
         focusOnMount={true}
-        isSaving={true}
         onSubmit={[Function]}
       />
     </div>
