@@ -57,3 +57,11 @@ exports[`Navigation allows pages to be created from the navigation block and the
 <!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/create/page/my-new-page\\",\\"kind\\":\\"post-type\\"} /-->
 <!-- /wp:navigation -->"
 `;
+
+exports[`Navigation encodes URL when create block if needed 1`] = `
+"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"wordpress.org/шеллы\\",\\"url\\":\\"https://wordpress.org/%D1%88%D0%B5%D0%BB%D0%BB%D1%8B\\",\\"kind\\":\\"custom\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"お問い合わせ\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B\\",\\"kind\\":\\"post-type\\"} /-->
+<!-- /wp:navigation -->"
+`;
