@@ -95,7 +95,7 @@ export const usePostTypes = () => {
  * Query Loop block's clientId.
  *
  * @param {WPBlock[]} blocks The list of blocks to look through.
- * @return {string} The first found Query Loop's clientId.
+ * @return {string=} The first found Query Loop's clientId.
  */
 export const getFirstQueryClientIdFromBlocks = ( blocks ) => {
 	const blocksQueue = [ ...blocks ];
