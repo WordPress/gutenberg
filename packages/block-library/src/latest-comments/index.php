@@ -129,6 +129,15 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	if ( empty( $comments ) ) {
 		$classnames[] = 'no-comments';
 	}
+
+	if ( $attributes['commentLayout'] !== 'numbered-list' ) {
+		$classnames[] = 'has-no-numbering';
+	}
+
+	if ( $attributes['commentLayout'] === 'numbered-list' ) {
+		$classnames[] = 'has-numbering';
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
 
 	return ! empty( $comments ) ? sprintf(
