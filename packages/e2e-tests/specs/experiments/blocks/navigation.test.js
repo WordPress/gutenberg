@@ -632,7 +632,7 @@ describe( 'Navigation', () => {
 			() =>
 				null !==
 				document.querySelector(
-					'script[src*="navigation/view.min.js"]'
+					'script[src*="navigation/view.js"]'
 				)
 		);
 
