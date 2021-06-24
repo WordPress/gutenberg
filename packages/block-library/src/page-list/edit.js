@@ -79,7 +79,10 @@ export default function PageListEdit( {
 			'has-text-color': !! textColor,
 			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor,
-			[ getColorClassName( 'background-color', backgroundColor ) ]: !! backgroundColor,
+			[ getColorClassName(
+				'background-color',
+				backgroundColor
+			) ]: !! backgroundColor,
 			'show-submenu-icons': !! showSubmenuIcon,
 		} ),
 		style: { ...style?.color },

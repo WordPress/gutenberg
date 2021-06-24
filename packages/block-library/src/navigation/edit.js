@@ -116,9 +116,15 @@ function Navigation( {
 			'is-vertical': attributes.orientation === 'vertical',
 			'is-responsive': attributes.isResponsive,
 			'has-text-color': !! textColor.color || !! textColor?.class,
-			[ getColorClassName( 'color', textColor?.slug) ]: !! textColor?.slug,
+			[ getColorClassName(
+				'color',
+				textColor?.slug
+			) ]: !! textColor?.slug,
 			'has-background': !! backgroundColor.color || backgroundColor.class,
-			[ getColorClassName( 'background-color', backgroundColor?.slug ) ]: !! backgroundColor?.slug,
+			[ getColorClassName(
+				'background-color',
+				backgroundColor?.slug
+			) ]: !! backgroundColor?.slug,
 		} ),
 		style: {
 			color: ! textColor?.slug && textColor?.color,
