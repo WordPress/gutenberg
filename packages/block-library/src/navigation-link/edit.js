@@ -48,7 +48,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
 
-const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/spacer' ];
+const ALLOWED_BLOCKS = [ 'core/navigation-link' ];
 
 const MAX_NESTING = 5;
 
@@ -418,7 +418,6 @@ export default function NavigationLinkEdit( {
 				hasDescendants
 					? InnerBlocks.DefaultAppender
 					: false,
-			__experimentalAppenderTagName: 'li',
 		}
 	);
 
@@ -507,7 +506,7 @@ export default function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<li { ...blockProps }>
+			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
@@ -611,8 +610,8 @@ export default function NavigationLinkEdit( {
 						</span>
 					) }
 				</a>
-				<ul { ...innerBlocksProps } />
-			</li>
+				<div { ...innerBlocksProps } />
+			</div>
 		</Fragment>
 	);
 }
