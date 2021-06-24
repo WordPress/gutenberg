@@ -77,6 +77,7 @@ export default function BlockTypesList( { name, items, onSelect, listProps } ) {
 		<FlatList
 			onLayout={ onLayout }
 			key={ `InserterUI-${ name }-${ numberOfColumns }` } //re-render when numberOfColumns changes
+			testID={ `InserterUI-${ name }` }
 			keyboardShouldPersistTaps="always"
 			numColumns={ numberOfColumns }
 			data={ items }
