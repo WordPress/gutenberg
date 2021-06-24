@@ -194,8 +194,8 @@ export function* getEntityRecords( kind, name, query = {} ) {
 		}
 
 		const path = addQueryArgs( entity.baseURL, {
+			...entity.baseURLParams,
 			...query,
-			context: 'edit',
 		} );
 
 		let records = Object.values( yield apiFetch( { path } ) );
@@ -218,7 +218,7 @@ export function* getEntityRecords( kind, name, query = {} ) {
 		// When requesting all fields, the list of results can be used to
 		// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
 		// See https://github.com/WordPress/gutenberg/pull/26575
-		if ( ! query?._fields ) {
+		if ( ! query?._fields && ! query.context ) {
 			const key = entity.key || DEFAULT_ENTITY_KEY;
 			const resolutionsArgs = records
 				.filter( ( record ) => record[ key ] )

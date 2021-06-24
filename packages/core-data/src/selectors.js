@@ -147,17 +147,21 @@ export function getEntityRecord( state, kind, name, key, query ) {
 	if ( ! queriedState ) {
 		return undefined;
 	}
+	const context = query?.context ?? 'default';
 
 	if ( query === undefined ) {
 		// If expecting a complete item, validate that completeness.
-		if ( ! queriedState.itemIsComplete[ key ] ) {
+		if (
+			! queriedState.itemIsComplete[ context ] ||
+			! queriedState.itemIsComplete[ context ][ key ]
+		) {
 			return undefined;
 		}
 
-		return queriedState.items[ key ];
+		return queriedState.items[ context ][ key ];
 	}
 
-	const item = queriedState.items[ key ];
+	const item = queriedState.items[ context ][ key ];
 	if ( item && query._fields ) {
 		const filteredItem = {};
 		const fields = getNormalizedCommaSeparable( query._fields );

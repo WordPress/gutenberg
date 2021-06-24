@@ -41,6 +41,7 @@ export function getQueryParts( query ) {
 		perPage: 10,
 		fields: null,
 		include: null,
+		context: 'default',
 	};
 
 	// Ensure stable key by sorting keys. Also more efficient for iterating.
@@ -63,6 +64,10 @@ export function getQueryParts( query ) {
 				parts.include = getNormalizedCommaSeparable( value ).map(
 					Number
 				);
+				break;
+
+			case 'context':
+				parts.context = value;
 				break;
 
 			default:

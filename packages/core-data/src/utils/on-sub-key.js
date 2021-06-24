@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * Higher-order reducer creator which creates a combined reducer object, keyed
  * by a property on the action object.
  *
- * @param {string} actionProperty Action property by which to key object.
+ * @param {string|Function} actionProperty Action property by which to key object.
  *
  * @return {Function} Higher-order reducer.
  */
@@ -12,7 +17,9 @@ export const onSubKey = ( actionProperty ) => ( reducer ) => (
 ) => {
 	// Retrieve subkey from action. Do not track if undefined; useful for cases
 	// where reducer is scoped by action shape.
-	const key = action[ actionProperty ];
+	const key = isFunction( actionProperty )
+		? actionProperty( action )
+		: action[ actionProperty ];
 	if ( key === undefined ) {
 		return state;
 	}

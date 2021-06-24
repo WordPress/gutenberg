@@ -28,10 +28,16 @@ const queriedItemsCacheByState = new WeakMap();
  * @return {?Array} Query items.
  */
 function getQueriedItemsUncached( state, query ) {
-	const { stableKey, page, perPage, include, fields } = getQueryParts(
-		query
-	);
+	const {
+		stableKey,
+		page,
+		perPage,
+		include,
+		fields,
+		context,
+	} = getQueryParts( query );
 	let itemIds;
+
 	if ( Array.isArray( include ) && ! stableKey ) {
 		// If the parsed query yields a set of IDs, but otherwise no filtering,
 		// it's safe to consider targeted item IDs as the include set. This
@@ -40,8 +46,8 @@ function getQueriedItemsUncached( state, query ) {
 		itemIds = include;
 		// TODO: Avoid storing the empty stable string in reducer, since it
 		// can be computed dynamically here always.
-	} else if ( state.queries[ stableKey ] ) {
-		itemIds = state.queries[ stableKey ];
+	} else if ( state.queries?.[ context ]?.[ stableKey ] ) {
+		itemIds = state.queries[ context ][ stableKey ];
 	}
 
 	if ( ! itemIds ) {
@@ -61,11 +67,14 @@ function getQueriedItemsUncached( state, query ) {
 			continue;
 		}
 
-		if ( ! state.items.hasOwnProperty( itemId ) ) {
+		if (
+			! state.items[ context ] ||
+			! state.items[ context ].hasOwnProperty( itemId )
+		) {
 			return null;
 		}
 
-		const item = state.items[ itemId ];
+		const item = state.items[ context ][ itemId ];
 
 		let filteredItem;
 		if ( Array.isArray( fields ) ) {
@@ -79,7 +88,10 @@ function getQueriedItemsUncached( state, query ) {
 		} else {
 			// If expecting a complete item, validate that completeness, or
 			// otherwise abort.
-			if ( ! state.itemIsComplete[ itemId ] ) {
+			if (
+				! state.itemIsComplete[ context ] ||
+				! state.itemIsComplete[ context ][ itemId ]
+			) {
 				return null;
 			}
 
