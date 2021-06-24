@@ -181,7 +181,12 @@ _Parameters_
 
 -   _username_ `string`: User name.
 -   _firstName_ `string?`: First name.
--   _lastName_ `string?`: Larst name.
+-   _lastName_ `string?`: Last name.
+-   _role_ `string?`: Role.
+
+_Returns_
+
+-   `string`: Password for the newly created user account
 
 <a name="deactivatePlugin" href="#deactivatePlugin">#</a> **deactivatePlugin**
 
