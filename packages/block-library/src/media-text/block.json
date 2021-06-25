@@ -90,6 +90,7 @@
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
+			"__experimentalDuotone": "img",
 			"gradients": true,
 			"link": true
 		}
