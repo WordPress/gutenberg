@@ -8,7 +8,7 @@ import { defaultTo } from 'lodash';
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo, createPortal, useRef, useCallback } from '@wordpress/element';
+import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
 	BlockTools,
@@ -18,7 +18,6 @@ import {
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
-	ButtonBlockAppender,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 
@@ -32,6 +31,7 @@ import SidebarEditorProvider from './sidebar-editor-provider';
 import { store as customizeWidgetsStore } from '../../store';
 import WelcomeGuide from '../welcome-guide';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import BlockAppender from '../block-appender';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -40,7 +40,6 @@ export default function SidebarBlockEditor( {
 	inspector,
 } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
-	const blockAppenderRef = useRef();
 	const {
 		hasUploadPermissions,
 		isFixedToolbarActive,
@@ -90,13 +89,6 @@ export default function SidebarBlockEditor( {
 		keepCaretInsideBlock,
 	] );
 
-	const renderBlockAppender = useCallback(
-		( props ) => (
-			<ButtonBlockAppender { ...props } ref={ blockAppenderRef } />
-		),
-		[]
-	);
-
 	if ( isWelcomeGuideActive ) {
 		return <WelcomeGuide sidebar={ sidebar } />;
 	}
@@ -106,11 +98,7 @@ export default function SidebarBlockEditor( {
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 
-			<SidebarEditorProvider
-				sidebar={ sidebar }
-				settings={ settings }
-				blockAppenderRef={ blockAppenderRef }
-			>
+			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
 				<BlockEditorKeyboardShortcuts />
 				<KeyboardShortcuts
 					undo={ sidebar.undo }
@@ -130,9 +118,7 @@ export default function SidebarBlockEditor( {
 					<BlockSelectionClearer>
 						<WritingFlow>
 							<ObserveTyping>
-								<BlockList
-									renderAppender={ renderBlockAppender }
-								/>
+								<BlockList renderAppender={ BlockAppender } />
 							</ObserveTyping>
 						</WritingFlow>
 					</BlockSelectionClearer>
