@@ -914,10 +914,26 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		clientIds,
 	};
 
+	if ( previousBlockId ) {
+		return [ previousBlockId ];
+	}
+
+	const { __unstableHasCustomAppender } = yield controls.select(
+		blockEditorStoreName,
+		'getSettings'
+	);
+
+	// If there's an custom appender, don't insert default block.
+	// We have to remember to manually move the focus elsewhere to
+	// prevent if from being lost though.
+	if ( __unstableHasCustomAppender ) {
+		return;
+	}
+
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
 	const defaultBlockId = yield* ensureDefaultBlock();
-	return [ previousBlockId || defaultBlockId ];
+	return [ defaultBlockId ];
 }
 
 /**

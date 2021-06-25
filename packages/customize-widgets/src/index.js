@@ -7,7 +7,6 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { setDefaultBlockName } from '@wordpress/blocks';
 import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
@@ -49,9 +48,6 @@ export function initialize( editorName, blockEditorSettings ) {
 		} );
 	}
 	registerLegacyWidgetVariations( blockEditorSettings );
-	// Unregister the default block to prevent "zombie" widget from showing
-	// when trying to empty the widget area.
-	setDefaultBlockName( null );
 
 	const SidebarControl = getSidebarControl( blockEditorSettings );
 

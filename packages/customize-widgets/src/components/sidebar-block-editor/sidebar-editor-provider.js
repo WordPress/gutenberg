@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { BlockEditorProvider } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,10 +14,20 @@ export default function SidebarEditorProvider( {
 	sidebar,
 	settings,
 	children,
+	blockAppenderRef,
 } ) {
 	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
+	const isEmpty = blocks.length === 0;
 
 	useBlocksFocusControl( blocks );
+
+	// Move the focus to the block appender to prevent focus from
+	// being lost when emptying the widget area.
+	useEffect( () => {
+		if ( isEmpty ) {
+			blockAppenderRef.current?.focus();
+		}
+	}, [ isEmpty, blockAppenderRef ] );
 
 	return (
 		<BlockEditorProvider

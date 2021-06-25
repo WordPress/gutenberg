@@ -8,7 +8,7 @@ import { defaultTo } from 'lodash';
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo, createPortal } from '@wordpress/element';
+import { useMemo, createPortal, useRef } from '@wordpress/element';
 import {
 	BlockList,
 	BlockTools,
@@ -40,6 +40,7 @@ export default function SidebarBlockEditor( {
 	inspector,
 } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
+	const blockAppenderRef = useRef();
 	const {
 		hasUploadPermissions,
 		isFixedToolbarActive,
@@ -80,6 +81,7 @@ export default function SidebarBlockEditor( {
 			mediaUpload: mediaUploadBlockEditor,
 			hasFixedToolbar: isFixedToolbarActive,
 			keepCaretInsideBlock,
+			__unstableHasCustomAppender: true,
 		};
 	}, [
 		hasUploadPermissions,
@@ -97,7 +99,11 @@ export default function SidebarBlockEditor( {
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 
-			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
+			<SidebarEditorProvider
+				sidebar={ sidebar }
+				settings={ settings }
+				blockAppenderRef={ blockAppenderRef }
+			>
 				<BlockEditorKeyboardShortcuts />
 				<KeyboardShortcuts
 					undo={ sidebar.undo }
@@ -118,7 +124,12 @@ export default function SidebarBlockEditor( {
 						<WritingFlow>
 							<ObserveTyping>
 								<BlockList
-									renderAppender={ ButtonBlockAppender }
+									renderAppender={ ( props ) => (
+										<ButtonBlockAppender
+											{ ...props }
+											ref={ blockAppenderRef }
+										/>
+									) }
 								/>
 							</ObserveTyping>
 						</WritingFlow>
