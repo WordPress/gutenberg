@@ -8,7 +8,7 @@ import { defaultTo } from 'lodash';
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo, createPortal, useRef } from '@wordpress/element';
+import { useMemo, createPortal, useRef, useCallback } from '@wordpress/element';
 import {
 	BlockList,
 	BlockTools,
@@ -90,6 +90,13 @@ export default function SidebarBlockEditor( {
 		keepCaretInsideBlock,
 	] );
 
+	const renderBlockAppender = useCallback(
+		( props ) => (
+			<ButtonBlockAppender { ...props } ref={ blockAppenderRef } />
+		),
+		[]
+	);
+
 	if ( isWelcomeGuideActive ) {
 		return <WelcomeGuide sidebar={ sidebar } />;
 	}
@@ -124,12 +131,7 @@ export default function SidebarBlockEditor( {
 						<WritingFlow>
 							<ObserveTyping>
 								<BlockList
-									renderAppender={ ( props ) => (
-										<ButtonBlockAppender
-											{ ...props }
-											ref={ blockAppenderRef }
-										/>
-									) }
+									renderAppender={ renderBlockAppender }
 								/>
 							</ObserveTyping>
 						</WritingFlow>
