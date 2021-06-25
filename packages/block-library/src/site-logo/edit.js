@@ -268,12 +268,11 @@ export default function LogoEdit( {
 			const _readOnlyLogo = siteData?.site_logo;
 			const _canUserEdit = canUser( 'update', 'settings' );
 			const _siteLogoId = _canUserEdit ? _siteLogo : _readOnlyLogo;
-			const query = _canUserEdit ? {} : { context: 'view' };
 			const mediaItem = select( coreStore ).getEntityRecord(
 				'root',
 				'media',
 				_siteLogoId,
-				query
+				{ context: 'view' }
 			);
 			return {
 				siteLogoId: _siteLogoId,
