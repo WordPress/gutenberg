@@ -13,16 +13,16 @@ import { useCallback, useMemo, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '../ui/context';
-import { AccessiblePopoverContext } from './context';
-import { usePopoverResizeUpdater } from './utils';
-import AccessiblePopoverContent from './content';
-import { useUpdateEffect } from '../utils/hooks';
+import { contextConnect, useContextSystem } from '../../ui/context';
+import { AccessiblePopoverContext } from '../context';
+import { usePopoverResizeUpdater } from '../utils';
+import AccessiblePopoverContent from '../content';
+import { useUpdateEffect } from '../../utils/hooks';
 
 /**
  *
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                          forwardedRef
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                              forwardedRef
  */
 function Popover( props, forwardedRef ) {
 	const {

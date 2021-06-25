@@ -656,7 +656,7 @@
 	{
 		"title": "AccessiblePopover",
 		"slug": "accessible-popover",
-		"markdown_source": "../packages/components/src/accessible-popover/README.md",
+		"markdown_source": "../packages/components/src/accessible-popover/accessible-popover/README.md",
 		"parent": "components"
 	},
 	{

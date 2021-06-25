@@ -13,11 +13,9 @@ import { Button, __experimentalAccessiblePopover as Popover, View, Text } from '
 
 function Example() {
 	return (
-		<Popover trigger={ <Button>Popover</Button> }>
-			<View>
-				<Text>Code is Poetry</Text>
-			</View>
-		</Popover>
+		<AccessiblePopover trigger={ <Button>Show/Hide content</Button> }>
+			<Text>Code is Poetry</Text>
+		</AccessiblePopover>
 	);
 }
 ```
