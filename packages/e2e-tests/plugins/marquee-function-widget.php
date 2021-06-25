@@ -40,7 +40,7 @@ function marquee_greeting_init() {
 					class="widefat"
 					name="marquee-greeting"
 					type="text"
-					value="<?php echo esc_attr( $greeting ) ?>"
+					value="<?php echo esc_attr( $greeting ); ?>"
 					placeholder="Hello!"
 				/>
 			</p>
