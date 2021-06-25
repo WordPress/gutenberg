@@ -38,7 +38,6 @@
         android:layout_height="match_parent"
         android:background="@color/white"
         android:gravity="center"
-        android:textAlignment="center"
         android:paddingStart="@dimen/foreground_view_padding_large"
         android:paddingEnd="@dimen/foreground_view_padding_large"
         android:orientation="vertical">
