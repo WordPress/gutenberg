@@ -267,13 +267,15 @@ export default function LogoEdit( {
 			const _siteLogo = siteSettings?.site_logo;
 			const _readOnlyLogo = siteData?.site_logo;
 			const _canUserEdit = canUser( 'update', 'settings' );
-			const _siteLogoId = _canUserEdit ? _siteLogo : _readOnlyLogo;
-			const mediaItem = select( coreStore ).getEntityRecord(
-				'root',
-				'media',
-				_siteLogoId,
-				{ context: 'view' }
-			);
+			const _siteLogoId = _siteLogo || _readOnlyLogo;
+			const mediaItem =
+				_siteLogoId &&
+				select( coreStore ).getEntityRecord(
+					'root',
+					'media',
+					_siteLogoId,
+					{ context: 'view' }
+				);
 			return {
 				siteLogoId: _siteLogoId,
 				canUserEdit: _canUserEdit,
