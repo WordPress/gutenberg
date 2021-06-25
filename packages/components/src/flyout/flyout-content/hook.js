@@ -15,19 +15,15 @@ import * as styles from '../styles';
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').ContentProps, 'div'>} props
  */
-export function useAccessiblePopoverContent( props ) {
+export function useFlyoutContent( props ) {
 	const {
 		className,
 		elevation = 5,
 		maxWidth = 360,
 		...otherProps
-	} = useContextSystem( props, 'AccessiblePopoverContent' );
+	} = useContextSystem( props, 'FlyoutContent' );
 
-	const classes = cx(
-		styles.AccessiblePopoverContent,
-		css( { maxWidth } ),
-		className
-	);
+	const classes = cx( styles.FlyoutContent, css( { maxWidth } ), className );
 
 	return {
 		...otherProps,

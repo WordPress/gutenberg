@@ -3,22 +3,22 @@
  */
 import { CardBody, CardHeader } from '../../card';
 import Button from '../../button';
-import { AccessiblePopover } from '..';
+import { Flyout } from '..';
 
 export default {
-	component: AccessiblePopover,
-	title: 'Components (Experimental)/AccessiblePopover',
+	component: Flyout,
+	title: 'Components (Experimental)/Flyout',
 };
 
 export const _default = () => {
 	return (
-		<AccessiblePopover
+		<Flyout
 			trigger={ <Button>Click</Button> }
 			visible
 			placement="bottom-start"
 		>
 			<CardHeader>Go</CardHeader>
 			<CardBody>Stuff</CardBody>
-		</AccessiblePopover>
+		</Flyout>
 	);
 };

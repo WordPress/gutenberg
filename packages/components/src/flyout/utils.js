@@ -9,7 +9,7 @@ import useResizeAware from 'react-resize-aware';
  */
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
-export function usePopoverResizeUpdater( { onResize = noop } ) {
+export function useFlyoutResizeUpdater( { onResize = noop } ) {
 	const [ resizeListener, sizes ] = useResizeAware();
 
 	useIsomorphicLayoutEffect( () => {

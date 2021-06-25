@@ -13,7 +13,7 @@ import { CardBody } from '../card';
 import * as ZIndex from '../utils/z-index';
 import CONFIG from '../utils/config-values';
 
-export const AccessiblePopoverContent = css`
+export const FlyoutContent = css`
 	z-index: ${ ZIndex.Popover };
 	box-sizing: border-box;
 	opacity: 0;

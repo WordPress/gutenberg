@@ -12,7 +12,7 @@ import { useContextSystem } from '../../ui/context';
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
  */
-export function useAccessiblePopover( props ) {
+export function useFlyout( props ) {
 	const {
 		animated = true,
 		animationDuration = 160,
@@ -24,7 +24,7 @@ export function useAccessiblePopover( props ) {
 		state,
 		visible,
 		...otherProps
-	} = useContextSystem( props, 'AccessiblePopover' );
+	} = useContextSystem( props, 'Flyout' );
 
 	const _popover = usePopoverState( {
 		animated: animated ? animationDuration : undefined,

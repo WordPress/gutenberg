@@ -9,29 +9,26 @@ import { Popover as ReakitPopover } from 'reakit';
  */
 import { Card } from '../../card';
 import { View } from '../../view';
-import { useAccessiblePopoverContext } from '../context';
+import { useFlyoutContext } from '../context';
 import * as styles from '../styles';
 import { contextConnect } from '../../ui/context';
-import { useAccessiblePopoverContent } from './hook';
+import { useFlyoutContent } from './hook';
 
 /**
  *
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').ContentProps, 'div'>} props
  * @param {import('react').Ref<any>}                                                                     forwardedRef
  */
-function AccessiblePopoverContent( props, forwardedRef ) {
-	const {
-		children,
-		elevation,
-		classes,
-		...otherProps
-	} = useAccessiblePopoverContent( props );
+function FlyoutContent( props, forwardedRef ) {
+	const { children, elevation, classes, ...otherProps } = useFlyoutContent(
+		props
+	);
 
-	const { label, popover } = useAccessiblePopoverContext();
+	const { label, popover } = useFlyoutContext();
 
 	if ( ! popover ) {
 		throw new Error(
-			'`AccessiblePopoverContent` must only be used inside a `AccessiblePopover`.'
+			'`FlyoutContent` must only be used inside a `Flyout`.'
 		);
 	}
 
@@ -58,9 +55,6 @@ function AccessiblePopoverContent( props, forwardedRef ) {
 	);
 }
 
-const ConnectedAccessiblePopoverContent = contextConnect(
-	AccessiblePopoverContent,
-	'AccessiblePopoverContent'
-);
+const ConnectedFlyoutContent = contextConnect( FlyoutContent, 'FlyoutContent' );
 
-export default ConnectedAccessiblePopoverContent;
+export default ConnectedFlyoutContent;

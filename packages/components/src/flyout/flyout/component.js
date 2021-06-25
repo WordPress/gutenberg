@@ -13,18 +13,18 @@ import { useCallback, useMemo, cloneElement } from '@wordpress/element';
  * Internal dependencies
  */
 import { contextConnect } from '../../ui/context';
-import { AccessiblePopoverContext } from '../context';
-import { usePopoverResizeUpdater } from '../utils';
-import AccessiblePopoverContent from '../accessible-popover-content';
+import { FlyoutContext } from '../context';
+import { useFlyoutResizeUpdater } from '../utils';
+import FlyoutContent from '../flyout-content';
 import { useUpdateEffect } from '../../utils/hooks';
-import { useAccessiblePopover } from './hook';
+import { useFlyout } from './hook';
 
 /**
  *
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
  * @param {import('react').Ref<any>}                                                              forwardedRef
  */
-function AccessiblePopover( props, forwardedRef ) {
+function Flyout( props, forwardedRef ) {
 	const {
 		children,
 		elevation,
@@ -34,13 +34,13 @@ function AccessiblePopover( props, forwardedRef ) {
 		trigger,
 		popover,
 		...otherProps
-	} = useAccessiblePopover( props );
+	} = useFlyout( props );
 
-	const resizeListener = usePopoverResizeUpdater( {
+	const resizeListener = useFlyoutResizeUpdater( {
 		onResize: popover.unstable_update,
 	} );
 
-	const uniqueId = `popover-${ popover.baseId }`;
+	const uniqueId = `flyout-${ popover.baseId }`;
 	const labelId = label || uniqueId;
 
 	const contextProps = useMemo(
@@ -63,7 +63,7 @@ function AccessiblePopover( props, forwardedRef ) {
 	}, [ popover.visible ] );
 
 	return (
-		<AccessiblePopoverContext.Provider value={ contextProps }>
+		<FlyoutContext.Provider value={ contextProps }>
 			{ trigger && (
 				<PopoverDisclosure
 					{ ...popover }
@@ -74,7 +74,7 @@ function AccessiblePopover( props, forwardedRef ) {
 				</PopoverDisclosure>
 			) }
 			<Portal>
-				<AccessiblePopoverContent
+				<FlyoutContent
 					ref={ forwardedRef }
 					{ ...otherProps }
 					elevation={ elevation }
@@ -82,28 +82,28 @@ function AccessiblePopover( props, forwardedRef ) {
 				>
 					{ resizeListener }
 					{ children }
-				</AccessiblePopoverContent>
+				</FlyoutContent>
 			</Portal>
-		</AccessiblePopoverContext.Provider>
+		</FlyoutContext.Provider>
 	);
 }
 
 /**
- * `AccessiblePopover` is a component to render a floating content modal.
+ * `Flyout` is a component to render a floating content modal.
  * It is similar in purpose to a tooltip, but renders content of any sort,
  * not only simple text.
  *
  * @example
  * ```jsx
- * import { Button, AccessiblePopover, Text } from `@wordpress/components`;
+ * import { Button, __experimentalFlyout as Flyout, View, Text } from '@wordpress/components';
  *
  * function Example() {
  * 	return (
- * 		<AccessiblePopover trigger={ <Button>Show/Hide content</Button> }>
+ * 		<Flyout trigger={ <Button>Show/Hide content</Button> }>
  *			<Text>Code is Poetry</Text>
- * 		</AccessiblePopover>
+ * 		</Flyout>
  * 	);
  * }
  * ```
  */
-export default contextConnect( AccessiblePopover, 'AccessiblePopover' );
+export default contextConnect( Flyout, 'Flyout' );

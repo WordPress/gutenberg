@@ -654,18 +654,6 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "AccessiblePopoverContent",
-		"slug": "accessible-popover-content",
-		"markdown_source": "../packages/components/src/accessible-popover/accessible-popover-content/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "AccessiblePopover",
-		"slug": "accessible-popover",
-		"markdown_source": "../packages/components/src/accessible-popover/accessible-popover/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "AlignmentMatrixControl",
 		"slug": "alignment-matrix-control",
 		"markdown_source": "../packages/components/src/alignment-matrix-control/README.md",
@@ -885,6 +873,18 @@
 		"title": "Flex",
 		"slug": "flex",
 		"markdown_source": "../packages/components/src/flex/flex/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "FlyoutContent",
+		"slug": "flyout-content",
+		"markdown_source": "../packages/components/src/flyout/flyout-content/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Flyout",
+		"slug": "flyout",
+		"markdown_source": "../packages/components/src/flyout/flyout/README.md",
 		"parent": "components"
 	},
 	{
