@@ -1,15 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	BlockControls,
+} from '@wordpress/block-editor';
 import {
 	Disabled,
 	PanelBody,
 	RangeControl,
 	ToggleControl,
+	ToolbarDropdownMenu,
+	ToolbarGroup,
 } from '@wordpress/components';
+
 import ServerSideRender from '@wordpress/server-side-render';
 import { __ } from '@wordpress/i18n';
+import { list, formatListNumbered } from '@wordpress/icons';
 
 /**
  * Minimum number of comments a user can show using this block.
@@ -30,10 +38,48 @@ export default function LatestComments( { attributes, setAttributes } ) {
 		displayAvatar,
 		displayDate,
 		displayExcerpt,
+		commentLayout,
 	} = attributes;
+
+	function applyLayout( layout ) {
+		return () =>
+			setAttributes( {
+				commentLayout: layout,
+			} );
+	}
+
+	const layoutControls = [
+		{
+			layout: 'list',
+			icon: list,
+			title: __( 'List' ),
+			onClick: applyLayout( 'list' ),
+			isActive: commentLayout === 'list',
+		},
+		{
+			layout: 'numbered-list',
+			icon: formatListNumbered,
+			title: __( 'Numbered List' ),
+			onClick: applyLayout( 'numbered-list' ),
+			isActive: commentLayout === 'numbered-list',
+		},
+	];
+
+	const activeCommentLayoutIcon =
+		layoutControls.find( ( layout ) => layout.layout === commentLayout )
+			?.icon || 'list';
 
 	return (
 		<div { ...useBlockProps() }>
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarDropdownMenu
+						icon={ activeCommentLayoutIcon }
+						label={ __( 'Layout' ) }
+						controls={ layoutControls }
+					/>
+				</ToolbarGroup>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Latest comments settings' ) }>
 					<ToggleControl

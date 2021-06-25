@@ -24,6 +24,10 @@
 		"displayExcerpt": {
 			"type": "boolean",
 			"default": true
+		},
+		"commentLayout": {
+			"type": "string",
+			"default": "list"
 		}
 	},
 	"supports": {
