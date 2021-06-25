@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 // eslint-disable-next-line no-restricted-imports
-import { PopoverDisclosure, usePopoverState, Portal } from 'reakit';
+import { PopoverDisclosure, Portal } from 'reakit';
 
 /**
  * WordPress dependencies
@@ -13,44 +12,29 @@ import { useCallback, useMemo, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
 import { AccessiblePopoverContext } from '../context';
 import { usePopoverResizeUpdater } from '../utils';
 import AccessiblePopoverContent from '../content';
 import { useUpdateEffect } from '../../utils/hooks';
+import { useAccessiblePopover } from './hook';
 
 /**
  *
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
  * @param {import('react').Ref<any>}                                                              forwardedRef
  */
-function Popover( props, forwardedRef ) {
+function AccessiblePopover( props, forwardedRef ) {
 	const {
-		animated = true,
-		animationDuration = 160,
-		baseId,
 		children,
-		elevation = 5,
-		id,
+		elevation,
 		label,
-		maxWidth = 360,
-		onVisibleChange = noop,
-		placement,
-		state,
+		maxWidth,
+		onVisibleChange,
 		trigger,
-		visible,
+		popover,
 		...otherProps
-	} = useContextSystem( props, 'Popover' );
-
-	const _popover = usePopoverState( {
-		animated: animated ? animationDuration : undefined,
-		baseId: baseId || id,
-		placement,
-		visible,
-		...otherProps,
-	} );
-
-	const popover = state || _popover;
+	} = useAccessiblePopover( props );
 
 	const resizeListener = usePopoverResizeUpdater( {
 		onResize: popover.unstable_update,
@@ -75,7 +59,7 @@ function Popover( props, forwardedRef ) {
 	);
 
 	useUpdateEffect( () => {
-		onVisibleChange( popover.visible );
+		onVisibleChange?.( popover.visible );
 	}, [ popover.visible ] );
 
 	return (
@@ -105,21 +89,21 @@ function Popover( props, forwardedRef ) {
 }
 
 /**
- * `Popover` is a component to render a floating content modal.
+ * `AccessiblePopover` is a component to render a floating content modal.
  * It is similar in purpose to a tooltip, but renders content of any sort,
  * not only simple text.
  *
  * @example
  * ```jsx
- * import { Button, Popover, Text } from `@wordpress/components/ui`;
+ * import { Button, AccessiblePopover, Text } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (
- * 		<Popover trigger={ <Button>Popover</Button> }>
+ * 		<AccessiblePopover trigger={ <Button>Show/Hide content</Button> }>
  *			<Text>Code is Poetry</Text>
- * 		</Popover>
+ * 		</AccessiblePopover>
  * 	);
  * }
  * ```
  */
-export default contextConnect( Popover, 'Popover' );
+export default contextConnect( AccessiblePopover, 'AccessiblePopover' );
