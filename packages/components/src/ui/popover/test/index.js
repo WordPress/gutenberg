@@ -7,7 +7,7 @@ import { render, screen } from '@testing-library/react';
  * Internal dependencies
  */
 import Button from '../../../button';
-import { CardBody } from '../../card';
+import { CardBody } from '../../../card';
 import { Popover } from '../index';
 
 describe( 'props', () => {

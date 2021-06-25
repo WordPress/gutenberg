@@ -32,7 +32,7 @@
 		"lodash": "^4.17.21"
 	},
 	"peerDependencies": {
-		"@babel/core": "^7.0.0"
+		"@babel/core": "^7.12.9"
 	},
 	"publishConfig": {
 		"access": "public"

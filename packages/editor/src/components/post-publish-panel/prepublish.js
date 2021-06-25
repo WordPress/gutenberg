@@ -33,11 +33,10 @@ function PostPublishPanelPrepublish( { children } ) {
 		siteTitle,
 		siteHome,
 	} = useSelect( ( select ) => {
-		const { isResolving } = select( 'core/data' );
 		const { getCurrentPost, isEditedPostBeingScheduled } = select(
 			editorStore
 		);
-		const { getEntityRecord } = select( coreStore );
+		const { getEntityRecord, isResolving } = select( coreStore );
 		const siteData =
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
@@ -48,7 +47,7 @@ function PostPublishPanelPrepublish( { children } ) {
 				false
 			),
 			isBeingScheduled: isEditedPostBeingScheduled(),
-			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+			isRequestingSiteIcon: isResolving( 'getEntityRecord', [
 				'root',
 				'__unstableBase',
 				undefined,

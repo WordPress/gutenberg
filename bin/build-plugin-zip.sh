@@ -116,6 +116,8 @@ build_files=$(
 	build/block-library/blocks/*/*.css \
 	build/block-library/blocks/*/*.js \
 	build/edit-widgets/blocks/*/block.json \
+	build/widgets/blocks/*.php \
+	build/widgets/blocks/*/block.json \
 )
 
 

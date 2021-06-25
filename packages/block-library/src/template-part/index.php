@@ -108,6 +108,10 @@ function render_block_core_template_part( $attributes ) {
 	}
 	$content = do_shortcode( $content );
 
+	// Handle embeds for block template parts.
+	global $wp_embed;
+	$content = $wp_embed->autoembed( $content );
+
 	if ( empty( $attributes['tagName'] ) ) {
 		$defined_areas = gutenberg_get_allowed_template_part_areas();
 		$area_tag      = 'div';

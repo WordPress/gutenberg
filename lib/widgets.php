@@ -56,8 +56,6 @@ function gutenberg_use_widgets_block_editor() {
  * @return array Legacy widget settings.
  */
 function gutenberg_get_legacy_widget_settings() {
-	global $wp_widget_factory;
-
 	$settings = array();
 
 	$widget_types_to_hide_from_legacy_widget_block = apply_filters(

@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 
 /**
  * Internal dependencies
  */
-import { CardBody } from '../card';
+import { CardBody } from '../../card';
 import * as ZIndex from '../../utils/z-index';
 import CONFIG from '../../utils/config-values';
 

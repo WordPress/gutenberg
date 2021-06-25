@@ -64,7 +64,7 @@ const EmbedEdit = ( props ) => {
 
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
-	const { invalidateResolution } = useDispatch( 'core/data' );
+	const { invalidateResolution } = useDispatch( coreStore );
 
 	const {
 		preview,
@@ -214,9 +214,7 @@ const EmbedEdit = ( props ) => {
 					onChange={ ( event ) => setURL( event.target.value ) }
 					fallback={ () => fallback( url, onReplace ) }
 					tryAgain={ () => {
-						invalidateResolution( 'core', 'getEmbedPreview', [
-							url,
-						] );
+						invalidateResolution( 'getEmbedPreview', [ url ] );
 					} }
 				/>
 			</View>

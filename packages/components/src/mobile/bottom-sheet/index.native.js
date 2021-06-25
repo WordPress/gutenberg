@@ -495,7 +495,7 @@ class BottomSheet extends Component {
 				backdropOpacity={ 0.2 }
 				onBackdropPress={ this.onCloseBottomSheet }
 				onBackButtonPress={ this.onHardwareButtonPress }
-				onSwipe={ this.onCloseBottomSheet }
+				onSwipeComplete={ this.onCloseBottomSheet }
 				onDismiss={ Platform.OS === 'ios' ? this.onDismiss : undefined }
 				onModalHide={
 					Platform.OS === 'android' ? this.onDismiss : undefined

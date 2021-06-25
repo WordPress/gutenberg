@@ -168,6 +168,7 @@ function Tooltip( { children, position, text, shortcut } ) {
 	};
 	const clearOnUnmount = () => {
 		delayedSetIsOver.cancel();
+		document.removeEventListener( 'mouseup', cancelIsMouseDown );
 	};
 
 	useEffect( () => clearOnUnmount, [] );

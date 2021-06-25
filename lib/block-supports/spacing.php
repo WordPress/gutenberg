@@ -45,19 +45,25 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 
 	if ( $has_padding_support ) {
 		$padding_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'padding' ), null );
-		if ( null !== $padding_value ) {
+
+		if ( is_array( $padding_value ) ) {
 			foreach ( $padding_value as $key => $value ) {
 				$styles[] = sprintf( 'padding-%s: %s;', $key, $value );
 			}
+		} elseif ( null !== $padding_value ) {
+			$styles[] = sprintf( 'padding: %s;', $padding_value );
 		}
 	}
 
 	if ( $has_margin_support ) {
 		$margin_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'margin' ), null );
-		if ( null !== $margin_value ) {
+
+		if ( is_array( $margin_value ) ) {
 			foreach ( $margin_value as $key => $value ) {
 				$styles[] = sprintf( 'margin-%s: %s;', $key, $value );
 			}
+		} elseif ( null !== $margin_value ) {
+			$styles[] = sprintf( 'margin: %s;', $margin_value );
 		}
 	}
 

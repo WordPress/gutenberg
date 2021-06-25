@@ -74,7 +74,7 @@
 	&.is-navigate-mode .block-editor-block-list__block.is-selected::after,
 	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		outline: var(--wp-admin-border-width-focus) solid transparent;
+		outline: 2px solid transparent;
 	}
 
 	& .is-block-moving-mode.block-editor-block-list__block.is-selected {

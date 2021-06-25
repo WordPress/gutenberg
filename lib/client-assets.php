@@ -200,13 +200,13 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	gutenberg_register_vendor_script(
 		$scripts,
 		'react',
-		'https://unpkg.com/react@16.13.1/umd/react' . $react_suffix . '.js',
+		'https://unpkg.com/react@17.0.1/umd/react' . $react_suffix . '.js',
 		array( 'wp-polyfill' )
 	);
 	gutenberg_register_vendor_script(
 		$scripts,
 		'react-dom',
-		'https://unpkg.com/react-dom@16.13.1/umd/react-dom' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@17.0.1/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
 
@@ -236,15 +236,14 @@ function gutenberg_register_packages_scripts( $scripts ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
-	$suffix          = '.min.js';
 
-	foreach ( glob( gutenberg_dir_path() . "build/*/index$suffix" ) as $path ) {
+	foreach ( glob( gutenberg_dir_path() . 'build/*/index.min.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
 		// For example, `…/build/a11y/index.min.js` becomes `wp-a11y`.
 		$handle = 'wp-' . basename( dirname( $path ) );
 
-		// Replace suffix and extension with `.asset.php` to find the generated dependencies file.
-		$asset_file   = substr( $path, 0, -( strlen( $suffix ) ) ) . '.asset.php';
+		// Replace extension with `.asset.php` to find the generated dependencies file.
+		$asset_file   = substr( $path, 0, -( strlen( '.js' ) ) ) . '.asset.php';
 		$asset        = file_exists( $asset_file )
 			? require( $asset_file )
 			: null;

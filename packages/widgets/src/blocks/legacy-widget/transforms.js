@@ -14,7 +14,7 @@ const legacyWidgetTransforms = [
 	},
 	{
 		block: 'core/html',
-		widget: 'html',
+		widget: 'custom_html',
 		transform: ( { content } ) => ( {
 			content,
 		} ),

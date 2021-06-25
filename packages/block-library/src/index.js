@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/core-data';
-import '@wordpress/block-editor';
 import {
 	registerBlockType,
 	setDefaultBlockName,

@@ -12,7 +12,6 @@ import { Disabled, Placeholder, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import ServerSideRender from '@wordpress/server-side-render';
 import { useBlockProps } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
@@ -31,7 +30,6 @@ export default function CalendarEdit( { attributes } ) {
 	const blockProps = useBlockProps();
 	const { date, hasPosts, hasPostsResolved } = useSelect( ( select ) => {
 		const { getEntityRecords, hasFinishedResolution } = select( coreStore );
-		const { getEditedPostAttribute } = select( editorStore );
 
 		const singlePublishedPostQuery = {
 			status: 'publish',
@@ -48,12 +46,22 @@ export default function CalendarEdit( { attributes } ) {
 			singlePublishedPostQuery,
 		] );
 
-		const postType = getEditedPostAttribute( 'type' );
-		// Dates are used to overwrite year and month used on the calendar.
-		// This overwrite should only happen for 'post' post types.
-		// For other post types the calendar always displays the current month.
-		const _date =
-			postType === 'post' ? getEditedPostAttribute( 'date' ) : undefined;
+		let _date;
+
+		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+		// Blocks can be loaded into a *non-post* block editor.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const editorSelectors = select( 'core/editor' );
+		if ( editorSelectors ) {
+			const postType = editorSelectors.getEditedPostAttribute( 'type' );
+			// Dates are used to overwrite year and month used on the calendar.
+			// This overwrite should only happen for 'post' post types.
+			// For other post types the calendar always displays the current month.
+			if ( postType === 'post' ) {
+				_date = editorSelectors.getEditedPostAttribute( 'date' );
+			}
+		}
+
 		return {
 			date: _date,
 			hasPostsResolved: postsResolved,

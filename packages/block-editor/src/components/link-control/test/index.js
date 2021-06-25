@@ -371,6 +371,31 @@ describe( 'Searching for a link', () => {
 		expect( mockFetchSuggestionsFirstArg ).toEqual( 'Hello' );
 	} );
 
+	it( 'should not call search handler when showSuggestions is false', async () => {
+		act( () => {
+			render( <LinkControl showSuggestions={ false } />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'anything' },
+			} );
+		} );
+
+		const searchResultElements = getSearchResults();
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		expect( searchResultElements ).toHaveLength( 0 );
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+	} );
+
 	it.each( [
 		[ 'couldbeurlorentitysearchterm' ],
 		[ 'ThisCouldAlsoBeAValidURL' ],
