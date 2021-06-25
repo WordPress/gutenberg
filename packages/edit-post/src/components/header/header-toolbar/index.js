@@ -23,7 +23,6 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import TemplateTitle from '../template-title';
 import { store as editPostStore } from '../../../store';
 
 function HeaderToolbar() {
@@ -156,8 +155,6 @@ function HeaderToolbar() {
 					</>
 				) }
 			</div>
-
-			<TemplateTitle />
 		</NavigableToolbar>
 	);
 }
