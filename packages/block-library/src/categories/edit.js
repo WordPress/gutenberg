@@ -150,7 +150,7 @@ export default function CategoriesEdit( {
 					<Spinner />
 				</Placeholder>
 			) }
-			{ ! isRequesting && categories.length === 0 && (
+			{ ! isRequesting && categories?.length === 0 && (
 				<p>
 					{ __(
 						'Your site does not have any posts, so there is nothing to display here at the moment.'
@@ -158,7 +158,7 @@ export default function CategoriesEdit( {
 				</p>
 			) }
 			{ ! isRequesting &&
-				categories.length > 0 &&
+				categories?.length > 0 &&
 				( displayAsDropdown
 					? renderCategoryDropdown()
 					: renderCategoryList() ) }

@@ -1,4 +1,5 @@
 .wp-block-legacy-widget__edit-form {
+	display: flow-root;
 	background: $white;
 	border-radius: $radius-block-ui;
 	border: 1px solid $gray-900;
@@ -12,7 +13,7 @@
 		margin: 0 0 $grid-unit-15 0;
 	}
 
-	.widget-inside {
+	.widget-inside.widget-inside {
 		border: none;
 		box-shadow: none;
 		display: block;
@@ -22,8 +23,32 @@
 			font-size: $default-font-size;
 		}
 
-		label + .widefat {
-			margin-top: $grid-unit-15;
+		// Override theme style bleed.
+		label,
+		input,
+		a {
+			font-family: system-ui;
+			font-weight: normal;
+			color: $black;
+		}
+		input[type="text"],
+		select {
+			font-family: system-ui;
+			background: transparent;
+			box-sizing: border-box;
+			border: 1px solid $gray-700;
+			border-radius: 3px;
+			box-shadow: none;
+			color: $black;
+			display: block;
+			margin: 0;
+			width: 100%;
+			font-size: $default-font-size;
+			font-weight: normal;
+			height: 30px;
+			line-height: 1;
+			min-height: 30px;
+			padding-left: $grid-unit-05;
 		}
 	}
 
@@ -31,6 +56,12 @@
 	.widget.open {
 		z-index: 0;
 	}
+}
+
+// Make sure edit form text and no preview warning are always visible.
+.wp-block-legacy-widget__edit-form.wp-block-legacy-widget__edit-form,
+.wp-block-legacy-widget__edit-no-preview.wp-block-legacy-widget__edit-no-preview {
+	color: $black;
 }
 
 .wp-block-legacy-widget__edit-preview,
@@ -94,6 +125,11 @@
 		padding: $grid-unit-10 $grid-unit-15;
 		min-height: 50px;
 	}
+}
+
+// Wide widgets opening in popovers in the Customizer should have a min-width
+.components-popover__content .wp-block-legacy-widget__edit-form {
+	min-width: 400px;
 }
 
 .wp-block-legacy-widget {

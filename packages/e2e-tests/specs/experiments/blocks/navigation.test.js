@@ -465,6 +465,66 @@ describe( 'Navigation', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'encodes URL when create block if needed', async () => {
+		// Add the navigation block.
+		await insertBlock( 'Navigation' );
+
+		// Create an empty nav block.
+		await page.waitForSelector( '.wp-block-navigation-placeholder' );
+
+		await createEmptyNavBlock();
+
+		await addLinkBlock();
+
+		// Add a link to the Link block.
+		await updateActiveNavigationLink( {
+			url: 'https://wordpress.org/шеллы',
+			type: 'url',
+		} );
+
+		await showBlockToolbar();
+
+		await addLinkBlock();
+
+		// Wait for URL input to be focused
+		await page.waitForSelector(
+			'input.block-editor-url-input__input:focus'
+		);
+
+		// After adding a new block, search input should be shown immediately.
+		const isInURLInput = await page.evaluate(
+			() =>
+				!! document.activeElement.matches(
+					'input.block-editor-url-input__input'
+				)
+		);
+		expect( isInURLInput ).toBe( true );
+		await page.keyboard.press( 'Escape' );
+
+		// Click the link placeholder
+		const placeholder = await page.waitForSelector(
+			'.wp-block-navigation-link__placeholder'
+		);
+		await placeholder.click();
+
+		// Mocked response for internal page.
+		// We are encoding the slug/url in order
+		// that we can assert it is not double encoded by the block.
+		await mockSearchResponse( [
+			{ title: 'お問い合わせ', slug: encodeURI( 'お問い合わせ' ) },
+		] );
+
+		// Select the mocked internal page above.
+		await updateActiveNavigationLink( {
+			url: 'お問い合わせ',
+			type: 'entity',
+		} );
+
+		// Expect a Navigation Block with two Links in the snapshot.
+		// The 2nd link should not be double encoded.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'allows pages to be created from the navigation block and their links added to menu', async () => {
 		// Mock request for creating pages and the page search response.
 		// We mock the page search to return no results and we use a very long
