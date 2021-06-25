@@ -197,7 +197,7 @@ function entity( entityConfig ) {
 			edits: ( state = {}, action ) => {
 				switch ( action.type ) {
 					case 'RECEIVE_ITEMS':
-						const context = action?.query?.context;
+						const context = action?.query?.context ?? 'default';
 						if ( context !== 'default' ) {
 							return state;
 						}
