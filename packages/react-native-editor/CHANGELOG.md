@@ -15,6 +15,8 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
 -   [*] Update loading and failed screens for web version of the editor [#32395]
 
+-   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
+
 ## 1.55.1
 -   [*] Fix: RNMobile borderRadius value setting [#32717]
 -   [*] Improve unsupported block message for reusable block [#32618]

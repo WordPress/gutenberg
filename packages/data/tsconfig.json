@@ -15,6 +15,9 @@
 		// { "path": "../redux-routine" }
 	],
 	"include": [
-		"src/redux-store/metadata/actions.js"
+		"src/redux-store/metadata/actions.js",
+		"src/redux-store/metadata/equivalent-key-map.d.ts",
+		"src/redux-store/metadata/reducer.ts",
+		"src/redux-store/metadata/utils.js"
 	]
 }

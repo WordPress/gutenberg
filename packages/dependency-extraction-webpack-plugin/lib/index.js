@@ -179,7 +179,7 @@ class DependencyExtractionWebpackPlugin {
 				}
 
 				const assetFilename = buildFilename.replace(
-					/(\.min)?\.js$/i,
+					/\.js$/i,
 					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
 				);
 

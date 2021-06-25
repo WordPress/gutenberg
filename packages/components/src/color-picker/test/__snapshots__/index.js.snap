@@ -96,10 +96,10 @@ Snapshot Diff:
             </div>
 @@ -119,22 +119,22 @@
             <div
-              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
               <label
-                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
 -               htmlFor="inspector-text-control-4"
 +               htmlFor="inspector-text-control-3"
               >
@@ -218,10 +218,10 @@ Snapshot Diff:
             </div>
 @@ -119,22 +119,22 @@
             <div
-              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
               <label
-                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
 -               htmlFor="inspector-text-control-8"
 +               htmlFor="inspector-text-control-7"
               >
@@ -340,10 +340,10 @@ Snapshot Diff:
             </div>
 @@ -119,22 +119,22 @@
             <div
-              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
               <label
-                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
 -               htmlFor="inspector-text-control-10"
 +               htmlFor="inspector-text-control-9"
               >
@@ -462,10 +462,10 @@ Snapshot Diff:
             </div>
 @@ -119,22 +119,22 @@
             <div
-              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
               <label
-                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
 -               htmlFor="inspector-text-control-6"
 +               htmlFor="inspector-text-control-5"
               >
@@ -547,10 +547,10 @@ Snapshot Diff:
             </div>
 @@ -119,22 +119,22 @@
             <div
-              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
+              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
               <label
-                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
+                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
 -               htmlFor="inspector-text-control-2"
 +               htmlFor="inspector-text-control-1"
               >
@@ -574,7 +574,7 @@ Snapshot Diff:
 `;
 
 exports[`ColorPicker should render color picker 1`] = `
-.emotion-4 {
+.emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
@@ -587,7 +587,7 @@ exports[`ColorPicker should render color picker 1`] = `
   margin-bottom: inherit;
 }
 
-.emotion-0 {
+.emotion-4 {
   display: inline-block;
   margin-bottom: calc(4px * 2);
 }
@@ -708,13 +708,13 @@ exports[`ColorPicker should render color picker 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+          className="components-base-control components-color-picker__inputs-field emotion-0 emotion-1"
         >
           <div
             className="components-base-control__field emotion-2 emotion-3"
           >
             <label
-              className="components-base-control__label emotion-0 emotion-1"
+              className="components-base-control__label emotion-4 emotion-5"
               htmlFor="inspector-text-control-0"
             >
               Color value in hexadecimal
