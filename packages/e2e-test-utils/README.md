@@ -182,7 +182,7 @@ _Parameters_
 -   _username_ `string`: User name.
 -   _firstName_ `string?`: First name.
 -   _lastName_ `string?`: Last name.
--   _role_ `string?`: Role.
+-   _role_ `Role?`: Role.
 
 _Returns_
 

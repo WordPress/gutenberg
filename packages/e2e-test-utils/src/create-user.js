@@ -20,7 +20,7 @@ import { visitAdminPage } from './visit-admin-page';
  * @param {string}  username  User name.
  * @param {string?} firstName First name.
  * @param {string?} lastName  Last name.
- * @param {string?} role      Role.
+ * @param {Role?}   role      Role.
  *
  * @return {string} Password for the newly created user account
  */
