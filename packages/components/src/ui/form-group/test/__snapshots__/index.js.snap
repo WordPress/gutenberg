@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render alignLabel 1`] = `
-.emotion-3 {
+.emotion-0 {
   width: 100%;
 }
 
-.emotion-0 {
+.emotion-3 {
   display: inline-block;
   line-height: calc(13px * 1.2);
   margin: 0;
@@ -24,27 +24,27 @@ exports[`props should render alignLabel 1`] = `
   vertical-align: middle;
 }
 
-.emotion-0:active {
+.emotion-3:active {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
 
-@media ( -webkit-min-device-pixel-ratio:1.25 ),( min-resolution:120dpi ) {
-  .emotion-0 > * {
+@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+  .emotion-3>* {
     position: relative;
     top: 0.5px;
   }
 }
 
 <div
-  class="emotion-3 components-form-group emotion-1 emotion-2"
+  class="emotion-0 components-form-group emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="FormGroup"
 >
   <label
-    class="components-truncate components-text components-control-label emotion-0 emotion-1 emotion-2"
+    class="components-truncate components-text components-control-label emotion-3 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="ControlLabel"
     for="fname"
@@ -59,11 +59,11 @@ exports[`props should render alignLabel 1`] = `
 `;
 
 exports[`props should render vertically 1`] = `
-.emotion-3 {
+.emotion-0 {
   width: 100%;
 }
 
-.emotion-0 {
+.emotion-3 {
   display: inline-block;
   line-height: calc(13px * 1.2);
   margin: 0;
@@ -82,27 +82,27 @@ exports[`props should render vertically 1`] = `
   vertical-align: middle;
 }
 
-.emotion-0:active {
+.emotion-3:active {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
 
-@media ( -webkit-min-device-pixel-ratio:1.25 ),( min-resolution:120dpi ) {
-  .emotion-0 > * {
+@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
+  .emotion-3>* {
     position: relative;
     top: 0.5px;
   }
 }
 
 <div
-  class="emotion-3 components-form-group emotion-1 emotion-2"
+  class="emotion-0 components-form-group emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="FormGroup"
 >
   <label
-    class="components-truncate components-text components-control-label emotion-0 emotion-1 emotion-2"
+    class="components-truncate components-text components-control-label emotion-3 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="ControlLabel"
     for="fname"
