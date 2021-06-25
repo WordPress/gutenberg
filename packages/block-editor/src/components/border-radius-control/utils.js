@@ -6,6 +6,7 @@ import { isEmpty, isNumber } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __experimentalParseUnit as parseUnit } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export const LABELS = {
@@ -23,26 +24,6 @@ export const DEFAULT_VALUES = {
 	bottomLeft: null,
 	bottomRight: null,
 };
-
-const CSS_UNITS = [ 'px', 'em', 'rem' ];
-
-/**
- * Parses a number and unit from a value.
- *
- * @param {string} initialValue Value to parse
- * @return {Array<number, string>} The extracted number and unit.
- */
-export function parseUnit( initialValue ) {
-	const value = String( initialValue ).trim();
-
-	let num = parseFloat( value, 10 );
-	num = isNaN( num ) ? '' : num;
-
-	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ]?.toLowerCase();
-	const unit = CSS_UNITS.includes( unitMatch ) ? unitMatch : undefined;
-
-	return [ num, unit ];
-}
 
 /**
  * Gets an items with the most occurrence within an array

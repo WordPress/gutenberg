@@ -3,6 +3,7 @@
  */
 import {
 	RangeControl,
+	__experimentalParseUnit as parseUnit,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -20,7 +21,6 @@ import {
 	getAllUnit,
 	isValuesDefined,
 	isValuesMixed,
-	parseUnit,
 } from './utils';
 
 export const MIN_BORDER_RADIUS_VALUE = 0;

@@ -8,7 +8,9 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
+	__experimentalParseUnit as parseUnit,
 	__experimentalUnitControl as UnitControl,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -23,11 +25,6 @@ const MIN_BORDER_WIDTH = 0;
 // Defining empty array here instead of inline avoids unnecessary re-renders of
 // color control.
 const EMPTY_ARRAY = [];
-const CSS_UNITS = [
-	{ value: 'px', label: 'px', default: '' },
-	{ value: 'em', label: 'em', default: '' },
-	{ value: 'rem', label: 'rem', default: '' },
-];
 
 export function useHasBorderPanel( { supports, name } ) {
 	const controls = [
@@ -68,27 +65,22 @@ function useHasBorderWidthControl( { supports, name } ) {
 	);
 }
 
-function parseUnit( cssValue ) {
-	const value = String( cssValue ).trim();
-	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
-	const unit = unitMatch !== undefined ? unitMatch.toLowerCase() : '';
-	const currentUnit = CSS_UNITS.find( ( item ) => item.value === unit );
-
-	return currentUnit?.value || 'px';
-}
-
 export default function BorderPanel( {
 	context: { supports, name },
 	getStyle,
 	setStyle,
 } ) {
+	const units = useCustomUnits( {
+		availableUnits: [ 'px', 'em', 'rem' ],
+	} );
+
 	// Border width.
 	const hasBorderWidth = useHasBorderWidthControl( { supports, name } );
 	const borderWidthValue = getStyle( name, 'borderWidth' );
 
 	// Step value is maintained in state so step is appropriate for current unit
 	// even when current width value is undefined.
-	const initialStep = parseUnit( borderWidthValue ) === 'px' ? 1 : 0.25;
+	const [ , initialStep ] = parseUnit( borderWidthValue ) === 'px' ? 1 : 0.25;
 	const [ step, setStep ] = useState( initialStep );
 
 	// Border style.
@@ -126,7 +118,7 @@ export default function BorderPanel( {
 								setStep( newUnit === 'px' ? 1 : 0.25 );
 							} }
 							step={ step }
-							units={ CSS_UNITS }
+							units={ units }
 						/>
 					) }
 					{ hasBorderStyle && (
