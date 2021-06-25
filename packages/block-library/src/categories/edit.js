@@ -28,7 +28,7 @@ export default function CategoriesEdit( {
 	const { categories, isRequesting } = useSelect( ( select ) => {
 		const { getEntityRecords } = select( coreStore );
 		const { isResolving } = select( 'core/data' );
-		const query = { per_page: -1, hide_empty: true };
+		const query = { per_page: -1, hide_empty: true, context: 'view' };
 		return {
 			categories: getEntityRecords( 'taxonomy', 'category', query ),
 			isRequesting: isResolving( 'core', 'getEntityRecords', [
