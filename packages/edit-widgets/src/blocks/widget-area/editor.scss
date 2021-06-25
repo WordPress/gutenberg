@@ -40,7 +40,7 @@ $panel-title-height: 48px;
 	}
 }
 
-.blocks-widgets-container .widget-area-inner-blocks.editor-styles-wrapper {
+.blocks-widgets-container .wp-block-widget-area__inner-blocks.editor-styles-wrapper {
 	margin: 0;
 	padding: 0;
 
@@ -59,7 +59,7 @@ $panel-title-height: 48px;
 	}
 }
 
-.widget-area-highlight-drop-zone {
+.wp-block-widget-area__highlight-drop-zone {
 	outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 }
 
