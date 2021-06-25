@@ -41,6 +41,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_SAVE = "mediaSave";
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
+    private static final String EVENT_NAME_UPDATE_RAW_EDITOR_SETTINGS = "updateRawEditorSettings";
 
     private static final String EVENT_FEATURED_IMAGE_ID_NATIVE_UPDATED = "featuredImageIdNativeUpdated";
 
@@ -51,6 +52,8 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
 
     private static final String MAP_KEY_REPLACE_BLOCK_HTML = "html";
     private static final String MAP_KEY_REPLACE_BLOCK_BLOCK_ID = "clientId";
+
+    private static final String MAP_KEY_RAW_EDITOR_SETTINGS = "rawEditorSettings";
 
     /**
      * Used for storing deferred actions prior to editor mounting
@@ -225,5 +228,11 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
 
     public void updateCapabilities(GutenbergProps gutenbergProps) {
         queueActionToJS(MAP_KEY_UPDATE_CAPABILITIES, Arguments.makeNativeMap(gutenbergProps.getUpdatedCapabilitiesProps()));
+    }
+
+    public void updateEditorSettings(String rawEditorSettings) {
+        WritableMap editorSettings = new WritableNativeMap();
+        editorSettings.putString(MAP_KEY_RAW_EDITOR_SETTINGS, rawEditorSettings);
+        queueActionToJS(EVENT_NAME_UPDATE_RAW_EDITOR_SETTINGS, editorSettings);
     }
 }

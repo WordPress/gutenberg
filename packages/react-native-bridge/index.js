@@ -132,6 +132,14 @@ export function subscribeUpdateEditorSettings( callback ) {
 	);
 }
 
+/* in parallel for now ... */
+export function subscribeUpdateRawEditorSettings( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'updateRawEditorSettings',
+		callback
+	);
+}
+
 export function subscribePreferredColorScheme( callback ) {
 	return gutenbergBridgeEvents.addListener(
 		'preferredColorScheme',
