@@ -80,7 +80,7 @@ export default function BorderPanel( {
 
 	// Step value is maintained in state so step is appropriate for current unit
 	// even when current width value is undefined.
-	const [ , initialStep ] = parseUnit( borderWidthValue ) === 'px' ? 1 : 0.25;
+	const initialStep = parseUnit( borderWidthValue )[ 1 ] === 'px' ? 1 : 0.25;
 	const [ step, setStep ] = useState( initialStep );
 
 	// Border style.
