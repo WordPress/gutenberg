@@ -93,7 +93,7 @@ describe( 'Site Title block', () => {
 
 	it( 'Cannot edit the site title as editor', async () => {
 		const username = 'testuser';
-		const password = await createUser( username, '', '', 'editor' );
+		const password = await createUser( username, { role: 'editor' } );
 		await loginUser( username, password );
 
 		await createNewPost();
