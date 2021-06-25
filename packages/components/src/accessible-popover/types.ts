@@ -11,7 +11,7 @@ import type { CSSProperties, FunctionComponentElement } from 'react';
  */
 import type { PopperProps } from '../utils/types';
 
-export type PopoverContext = {
+export type Context = {
 	popover?: PopoverStateReturn;
 	label?: string;
 };
