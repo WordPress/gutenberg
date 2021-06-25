@@ -7,7 +7,9 @@
  * @package gutenberg-test-marquee-widget
  */
 
-// Add a non-WP_Widget marquee widget
+/**
+ * Add a non-WP_Widget marquee widget.
+ */
 function marquee_greeting_init() {
 	wp_register_sidebar_widget(
 		'marquee_greeting',
@@ -38,7 +40,7 @@ function marquee_greeting_init() {
 					class="widefat"
 					name="marquee-greeting"
 					type="text"
-					value="<?= esc_attr( $greeting ) ?>"
+					value="<?php echo esc_attr( $greeting ) ?>"
 					placeholder="Hello!"
 				/>
 			</p>
