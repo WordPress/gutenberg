@@ -13,7 +13,7 @@ import { Popover as ReakitPopover } from 'reakit';
  */
 import { Card } from '../card';
 import { View } from '../view';
-import { usePopoverContext } from './context';
+import { useAccessiblePopoverContext } from './context';
 import * as styles from './styles';
 import { contextConnect, useContextSystem } from '../ui/context';
 
@@ -31,7 +31,7 @@ function PopoverContent( props, forwardedRef ) {
 		...otherProps
 	} = useContextSystem( props, 'PopoverContent' );
 
-	const { label, popover } = usePopoverContext();
+	const { label, popover } = useAccessiblePopoverContext();
 	const classes = cx( styles.PopoverContent, css( { maxWidth } ), className );
 
 	if ( ! popover ) {

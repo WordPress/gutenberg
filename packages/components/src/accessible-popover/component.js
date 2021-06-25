@@ -14,7 +14,7 @@ import { useCallback, useMemo, cloneElement } from '@wordpress/element';
  * Internal dependencies
  */
 import { contextConnect, useContextSystem } from '../ui/context';
-import { PopoverContext } from './context';
+import { AccessiblePopoverContext } from './context';
 import { usePopoverResizeUpdater } from './utils';
 import PopoverContent from './content';
 import { useUpdateEffect } from '../utils/hooks';
@@ -79,7 +79,7 @@ function Popover( props, forwardedRef ) {
 	}, [ popover.visible ] );
 
 	return (
-		<PopoverContext.Provider value={ contextProps }>
+		<AccessiblePopoverContext.Provider value={ contextProps }>
 			{ trigger && (
 				<PopoverDisclosure
 					{ ...popover }
@@ -100,7 +100,7 @@ function Popover( props, forwardedRef ) {
 					{ children }
 				</PopoverContent>
 			</Portal>
-		</PopoverContext.Provider>
+		</AccessiblePopoverContext.Provider>
 	);
 }
 
