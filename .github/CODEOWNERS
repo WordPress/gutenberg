@@ -125,6 +125,7 @@
 /lib/experimental-default-theme.json            @timothybjabocs @spacedmonkey @nosolosw
 /lib/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @nosolosw
 /lib/class-wp-theme-json-resolver-gutenberg.php @timothybjabocs @spacedmonkey @nosolosw
+/lib/full-site-editing                          @timothybjabocs @spacedmonkey @janw-me
 /phpunit/class-wp-theme-json-test.php           @nosolosw
 
 # Native (Unowned)
