@@ -180,9 +180,10 @@ Create a new user account.
 _Parameters_
 
 -   _username_ `string`: User name.
--   _firstName_ `string?`: First name.
--   _lastName_ `string?`: Last name.
--   _role_ `Role?`: Role.
+-   _object_ `Object?`: Optional Settings for the new user account.
+-   _object.firstName_ `[string]`: First name.
+-   _object.lastName_ `[string]`: Last name.
+-   _object.role_ `[Role]`: Role.
 
 _Returns_
 

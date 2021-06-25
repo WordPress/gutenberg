@@ -17,14 +17,18 @@ import { visitAdminPage } from './visit-admin-page';
 /**
  * Create a new user account.
  *
- * @param {string}  username  User name.
- * @param {string?} firstName First name.
- * @param {string?} lastName  Last name.
- * @param {Role?}   role      Role.
+ * @param {string}  username           User name.
+ * @param {Object?} object             Optional Settings for the new user account.
+ * @param {string}  [object.firstName] First name.
+ * @param {string}  [object.lastName]  Last name.
+ * @param {Role}    [object.role]      Role.
  *
  * @return {string} Password for the newly created user account
  */
-export async function createUser( username, firstName, lastName, role ) {
+export async function createUser(
+	username,
+	{ firstName, lastName, role } = {}
+) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'user-new.php' );
 
