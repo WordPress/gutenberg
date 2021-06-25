@@ -158,7 +158,7 @@ export function getEntityRecord( state, kind, name, key, query ) {
 		return queriedState.items[ context ][ key ];
 	}
 
-	const item = queriedState.items[ context ][ key ];
+	const item = queriedState.items[ context ]?.[ key ];
 	if ( item && query._fields ) {
 		const filteredItem = {};
 		const fields = getNormalizedCommaSeparable( query._fields );
