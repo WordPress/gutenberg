@@ -290,7 +290,6 @@ function RichTextWrapper(
 				children &&
 				children( { value, onChange, onFocus } ) }
 			{ isSelected && <RemoveBrowserShortcuts /> }
-			{ isSelected && autocompleteProps.children }
 			{ isSelected && (
 				<FormatEdit
 					value={ value }
