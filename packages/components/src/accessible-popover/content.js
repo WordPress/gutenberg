@@ -22,21 +22,25 @@ import { contextConnect, useContextSystem } from '../ui/context';
  * @param {import('../ui/context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
  * @param {import('react').Ref<any>}                                                                 forwardedRef
  */
-function PopoverContent( props, forwardedRef ) {
+function AccessiblePopoverContent( props, forwardedRef ) {
 	const {
 		children,
 		className,
 		elevation = 5,
 		maxWidth = 360,
 		...otherProps
-	} = useContextSystem( props, 'PopoverContent' );
+	} = useContextSystem( props, 'AccessiblePopoverContent' );
 
 	const { label, popover } = useAccessiblePopoverContext();
-	const classes = cx( styles.PopoverContent, css( { maxWidth } ), className );
+	const classes = cx(
+		styles.AccessiblePopoverContent,
+		css( { maxWidth } ),
+		className
+	);
 
 	if ( ! popover ) {
 		throw new Error(
-			'`PopoverContent` must only be used inside a `Popover`.'
+			'`AccessiblePopoverContent` must only be used inside a `Popover`.'
 		);
 	}
 
@@ -63,9 +67,9 @@ function PopoverContent( props, forwardedRef ) {
 	);
 }
 
-const ConnectedPopoverContent = contextConnect(
-	PopoverContent,
-	'PopoverContent'
+const ConnectedAccessiblePopoverContent = contextConnect(
+	AccessiblePopoverContent,
+	'AccessiblePopoverContent'
 );
 
-export default ConnectedPopoverContent;
+export default ConnectedAccessiblePopoverContent;

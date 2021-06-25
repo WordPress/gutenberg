@@ -16,7 +16,7 @@ import { useCallback, useMemo, cloneElement } from '@wordpress/element';
 import { contextConnect, useContextSystem } from '../ui/context';
 import { AccessiblePopoverContext } from './context';
 import { usePopoverResizeUpdater } from './utils';
-import PopoverContent from './content';
+import AccessiblePopoverContent from './content';
 import { useUpdateEffect } from '../utils/hooks';
 
 /**
@@ -90,7 +90,7 @@ function Popover( props, forwardedRef ) {
 				</PopoverDisclosure>
 			) }
 			<Portal>
-				<PopoverContent
+				<AccessiblePopoverContent
 					ref={ forwardedRef }
 					{ ...otherProps }
 					elevation={ elevation }
@@ -98,7 +98,7 @@ function Popover( props, forwardedRef ) {
 				>
 					{ resizeListener }
 					{ children }
-				</PopoverContent>
+				</AccessiblePopoverContent>
 			</Portal>
 		</AccessiblePopoverContext.Provider>
 	);
