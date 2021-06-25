@@ -13,6 +13,7 @@
 		// or "wide" alignment.
 		&.has-bullets {
 			padding-left: revert;
+			list-style: initial; // needed in case Theme Styles are disabled.
 		}
 
 		&.has-no-bullets {
