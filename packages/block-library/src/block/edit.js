@@ -14,8 +14,10 @@ import {
 	ToolbarButton,
 	TextControl,
 	PanelBody,
+	Disabled,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
@@ -24,6 +26,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
@@ -32,7 +35,12 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		ref
 	);
-	const { isMissing, hasResolved } = useSelect(
+	const {
+		isMissing,
+		hasResolved,
+		parentBlockName,
+		selectedBlock,
+	} = useSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
 				'postType',
@@ -46,9 +54,23 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				'wp_block',
 				ref,
 			] );
+
+			const {
+				getSelectedBlockClientId,
+				getBlockName,
+				getBlockParents,
+			} = select( blockEditorStore );
+
+			const currentBlockId = getSelectedBlockClientId();
+			const parents = getBlockParents( currentBlockId );
+			const _firstParentClientId = parents[ parents.length - 1 ];
+			const _parentBlockName = getBlockName( _firstParentClientId );
+
 			return {
 				hasResolved: hasResolvedBlock,
 				isMissing: hasResolvedBlock && ! persistedBlock,
+				parentBlockName: _parentBlockName,
+				selectedBlock: currentBlockId,
 			};
 		},
 		[ ref, clientId ]
@@ -83,6 +105,24 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	);
 
 	const blockProps = useBlockProps();
+
+	// state for lock
+	const [ isLocked, setIsLocked ] = useState( true );
+
+	let innerBlocks = <div { ...innerBlocksProps } />;
+	if ( isLocked ) {
+		innerBlocks = <Disabled> { innerBlocks } </Disabled>;
+	}
+
+	const lockContainerClass = isLocked ? 'is-locked' : 'is-unlocked';
+
+	// lock the blocks when deselected
+	useEffect( () => {
+		const isInnerBlock = parentBlockName === 'core/block'; // first check if selectedblock is inner block
+		if ( ! isInnerBlock ) {
+			setIsLocked( true );
+		}
+	}, [ parentBlockName, selectedBlock ] );
 
 	if ( hasAlreadyRendered ) {
 		return (
@@ -136,8 +176,21 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<div className="block-library-block__reusable-block-container">
-					{ <div { ...innerBlocksProps } /> }
+				<div
+					className="block-library-block__reusable-block-container"
+					role="button"
+					tabIndex={ 0 }
+					onClick={ () => setIsLocked( false ) }
+					onKeyDown={ ( e ) => {
+						if ( e.key === 85 ) {
+							setIsLocked( false );
+						}
+					} }
+				>
+					<div
+						className={ `reusable-block-lock-container ${ lockContainerClass }` }
+					></div>
+					{ innerBlocks }
 				</div>
 			</div>
 		</RecursionProvider>
