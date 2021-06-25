@@ -6,7 +6,7 @@
  *
  * @return {Function} Higher-order reducer.
  */
- export const onSubKey = ( actionProperty ) => ( reducer ) => (
+export const onSubKey = ( actionProperty ) => ( reducer ) => (
 	state = {},
 	action
 ) => {

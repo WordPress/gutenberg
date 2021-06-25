@@ -67,10 +67,7 @@ function getQueriedItemsUncached( state, query ) {
 			continue;
 		}
 
-		if (
-			! state.items[ context ] ||
-			! state.items[ context ].hasOwnProperty( itemId )
-		) {
+		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
 			return null;
 		}
 
@@ -88,10 +85,7 @@ function getQueriedItemsUncached( state, query ) {
 		} else {
 			// If expecting a complete item, validate that completeness, or
 			// otherwise abort.
-			if (
-				! state.itemIsComplete[ context ] ||
-				! state.itemIsComplete[ context ][ itemId ]
-			) {
+			if ( ! state.itemIsComplete[ context ]?.[ itemId ] ) {
 				return null;
 			}
 

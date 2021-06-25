@@ -151,10 +151,7 @@ export function getEntityRecord( state, kind, name, key, query ) {
 
 	if ( query === undefined ) {
 		// If expecting a complete item, validate that completeness.
-		if (
-			! queriedState.itemIsComplete[ context ] ||
-			! queriedState.itemIsComplete[ context ][ key ]
-		) {
+		if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
 			return undefined;
 		}
 
