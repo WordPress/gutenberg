@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,7 +20,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import useTermLinks from './use-term-links';
+import usePostTerms from './use-post-terms';
 
 export default function PostTermsEdit( {
 	attributes,
@@ -34,28 +33,18 @@ export default function PostTermsEdit( {
 	const selectedTerm = useSelect(
 		( select ) => {
 			if ( ! term ) return {};
-			const taxonomies = select( coreStore ).getTaxonomies( {
-				per_page: -1,
-			} );
-			return (
-				find(
-					taxonomies,
-					( taxonomy ) =>
-						taxonomy.slug === term && taxonomy.visibility.show_ui
-				) || {}
-			);
+			const { getTaxonomy } = select( coreStore );
+			const taxonomy = getTaxonomy( term );
+			return taxonomy?.visibility?.show_ui ? taxonomy : {};
 		},
 		[ term ]
 	);
-
-	const { termLinks, isLoadingTermLinks } = useTermLinks( {
+	const { postTerms, hasPostTerms, isLoading } = usePostTerms( {
 		postId,
 		postType,
 		term: selectedTerm,
 	} );
-
 	const hasPost = postId && postType;
-	const hasTermLinks = termLinks && termLinks.length > 0;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -90,19 +79,22 @@ export default function PostTermsEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ isLoadingTermLinks && <Spinner /> }
-
-				{ hasTermLinks &&
-					! isLoadingTermLinks &&
-					termLinks.reduce( ( prev, curr ) => [
-						prev,
-						' | ',
-						curr,
-					] ) }
-
-				{ ! isLoadingTermLinks &&
-					! hasTermLinks &&
-					// eslint-disable-next-line camelcase
+				{ isLoading && <Spinner /> }
+				{ ! isLoading &&
+					hasPostTerms &&
+					postTerms
+						.map( ( postTerm ) => (
+							<a
+								key={ postTerm.id }
+								href={ postTerm.link }
+								onClick={ ( event ) => event.preventDefault() }
+							>
+								{ postTerm.name }
+							</a>
+						) )
+						.reduce( ( prev, curr ) => [ prev, ' | ', curr ] ) }
+				{ ! isLoading &&
+					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
 			</div>
