@@ -289,7 +289,6 @@ function RichTextWrapper(
 			{ isSelected &&
 				children &&
 				children( { value, onChange, onFocus } ) }
-			{ isSelected && autocompleteProps.children }
 			{ isSelected && (
 				<FormatEdit
 					value={ value }
