@@ -8,7 +8,18 @@
 		margin-left: 2em;
 	}
 	&.wp-block-latest-posts__list {
-		list-style: none;
+
+		// Ensure bullets are visible even if block is "full-width"
+		// or "wide" alignment.
+		&.has-bullets {
+			padding-left: revert;
+			list-style: initial; // needed in case Theme Styles are disabled.
+		}
+
+		&.has-no-bullets {
+			list-style: none;
+			padding-left: 0; // needed in case Theme Styles are disabled.
+		}
 
 		li {
 			clear: both;

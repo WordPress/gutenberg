@@ -18,6 +18,7 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarGroup,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -32,7 +33,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { pin, list, grid } from '@wordpress/icons';
+import { pin, list, formatListBullets, grid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -411,6 +412,8 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			'has-dates': displayPostDate,
 			'has-author': displayAuthor,
 			[ `columns-${ columns }` ]: postLayout === 'grid',
+			'has-no-bullets': 'bullet-list' !== postLayout,
+			'has-bullets': 'bullet-list' === postLayout,
 		} ),
 	} );
 
@@ -435,28 +438,54 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			? latestPosts.slice( 0, postsToShow )
 			: latestPosts;
 
+	function applyLayout( layout ) {
+		return () =>
+			setAttributes( {
+				postLayout: layout,
+			} );
+	}
+
 	const layoutControls = [
 		{
+			layout: 'list',
 			icon: list,
-			title: __( 'List view' ),
-			onClick: () => setAttributes( { postLayout: 'list' } ),
+			title: __( 'List' ),
+			onClick: applyLayout( 'list' ),
 			isActive: postLayout === 'list',
 		},
 		{
+			layout: 'bullet-list',
+			icon: formatListBullets,
+			title: __( 'Bulleted List' ),
+			onClick: applyLayout( 'bullet-list' ),
+			isActive: postLayout === 'bullet-list',
+		},
+		{
+			layout: 'grid',
 			icon: grid,
-			title: __( 'Grid view' ),
-			onClick: () => setAttributes( { postLayout: 'grid' } ),
+			title: __( 'Grid' ),
+			onClick: applyLayout( 'grid' ),
 			isActive: postLayout === 'grid',
 		},
 	];
 
 	const dateFormat = __experimentalGetSettings().formats.date;
 
+	const activePostLayoutIcon =
+		layoutControls.find( ( layout ) => layout.layout === postLayout )
+			?.icon || 'list';
+
 	return (
 		<div>
 			{ inspectorControls }
 			<BlockControls>
-				<ToolbarGroup controls={ layoutControls } />
+				<ToolbarGroup>
+					<ToolbarDropdownMenu
+						icon={ activePostLayoutIcon }
+						label={ __( 'Layout' ) }
+						controls={ layoutControls }
+					/>
+				</ToolbarGroup>
 			</BlockControls>
 			<ul { ...blockProps }>
 				{ displayPosts.map( ( post, i ) => {
