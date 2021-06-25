@@ -146,6 +146,15 @@ export default function useTabNav() {
 			if ( event.keyCode !== TAB ) {
 				return;
 			}
+
+			if ( event.target?.getAttribute( 'role' ) === 'region' ) {
+				return;
+			}
+
+			if ( container.current === event.target ) {
+				return;
+			}
+
 			const isShift = event.shiftKey;
 			const direction = isShift ? 'findPrevious' : 'findNext';
 			const target = focus.tabbable[ direction ]( event.target );
