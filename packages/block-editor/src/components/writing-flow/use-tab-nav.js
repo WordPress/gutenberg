@@ -134,9 +134,43 @@ export default function useTabNav() {
 			lastFocus.current = event.target;
 		}
 
+		// When tabbing back to an element in block list, this event handler prevents scrolling if the
+		// focus capture divs (before/after) are outside of the viewport. (For example shift+tab back to a paragraph
+		// when focus is on a sidebar element. This prevents the scrollable writing area from jumping either to the
+		// top or bottom of the document.
+		//
+		// Note that it isn't possible to disable scrolling in the onFocus event. We need to intercept this
+		// earlier in the keypress handler, and call focus( { preventScroll: true } ) instead.
+		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLOrForeignElement/focus#parameters
+		function preventScrollOnTab( event ) {
+			if ( event.keyCode !== TAB ) {
+				return;
+			}
+			const isShift = event.shiftKey;
+			const direction = isShift ? 'findPrevious' : 'findNext';
+			const target = focus.tabbable[ direction ]( event.target );
+			// only do something when the next tabbable is a focus capture div (before/after)
+			if (
+				target === focusCaptureBeforeRef.current ||
+				target === focusCaptureAfterRef.current
+			) {
+				event.stopPropagation();
+				event.preventDefault();
+				target.focus( { preventScroll: true } );
+			}
+		}
+
+		node.ownerDocument.defaultView.addEventListener(
+			'keydown',
+			preventScrollOnTab
+		);
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'focusout', onFocusOut );
 		return () => {
+			node.ownerDocument.defaultView.removeEventListener(
+				'keydown',
+				preventScrollOnTab
+			);
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'focusout', onFocusOut );
 		};
