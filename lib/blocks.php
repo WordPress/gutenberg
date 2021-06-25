@@ -165,37 +165,15 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  * @return void
  */
 function gutenberg_register_core_block_assets( $block_name ) {
+	if ( ! wp_should_load_separate_core_block_assets() ) {
+		return;
+	}
+
 	$block_name = str_replace( 'core/', '', $block_name );
 
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
-	$script_suffix   = '.js';
-
-	$view_script_path = "build/block-library/blocks/$block_name/view$script_suffix";
-	if ( file_exists( gutenberg_dir_path() . $view_script_path ) ) {
-		$view_script_handle = "wp-block-{$block_name}-view";
-		wp_deregister_script( $view_script_handle );
-
-		// Replace suffix and extension with `.asset.php` to find the generated dependencies file.
-		$view_asset_file          = substr( $view_script_path, 0, -( strlen( $script_suffix ) ) ) . '.asset.php';
-		$view_asset               = file_exists( gutenberg_dir_path() . $view_asset_file )
-			? require( gutenberg_dir_path() . $view_asset_file )
-			: null;
-		$view_script_dependencies = isset( $view_asset['dependencies'] ) ? $view_asset['dependencies'] : array();
-		$view_script_version      = isset( $view_asset['version'] ) ? $view_asset['version'] : $default_version;
-
-		wp_register_script(
-			$view_script_handle,
-			gutenberg_url( $view_script_path ),
-			$view_script_dependencies,
-			$view_script_version
-		);
-	}
-
-	if ( ! gutenberg_should_load_separate_block_assets() ) {
-		return;
-	}
 
 	$style_path        = "build/block-library/blocks/$block_name/style.css";
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
