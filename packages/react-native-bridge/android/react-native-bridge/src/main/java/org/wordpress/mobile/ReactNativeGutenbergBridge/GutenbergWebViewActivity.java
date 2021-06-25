@@ -67,14 +67,14 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                         // Insert block content
                         insertBlockScript();
                     }, 200);
+                } else {
+                    final Handler handler = new Handler();
+                    handler.postDelayed(() -> {
+                        if (!mIsGutenbergReady) {
+                            showTroubleshootingInstructions();
+                        }
+                    }, 10000);
                 }
-
-                final Handler handler = new Handler();
-                handler.postDelayed(() -> {
-                    if (!mIsGutenbergReady) {
-                        showTroubleshootingInstructions();
-                    }
-                }, 10000);
             }
         }
     };
