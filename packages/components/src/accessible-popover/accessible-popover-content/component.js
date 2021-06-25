@@ -1,10 +1,6 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { css, cx } from '@emotion/css';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as ReakitPopover } from 'reakit';
 
@@ -15,7 +11,8 @@ import { Card } from '../../card';
 import { View } from '../../view';
 import { useAccessiblePopoverContext } from '../context';
 import * as styles from '../styles';
-import { contextConnect, useContextSystem } from '../../ui/context';
+import { contextConnect } from '../../ui/context';
+import { useAccessiblePopoverContent } from './hook';
 
 /**
  *
@@ -25,22 +22,16 @@ import { contextConnect, useContextSystem } from '../../ui/context';
 function AccessiblePopoverContent( props, forwardedRef ) {
 	const {
 		children,
-		className,
-		elevation = 5,
-		maxWidth = 360,
+		elevation,
+		classes,
 		...otherProps
-	} = useContextSystem( props, 'AccessiblePopoverContent' );
+	} = useAccessiblePopoverContent( props );
 
 	const { label, popover } = useAccessiblePopoverContext();
-	const classes = cx(
-		styles.AccessiblePopoverContent,
-		css( { maxWidth } ),
-		className
-	);
 
 	if ( ! popover ) {
 		throw new Error(
-			'`AccessiblePopoverContent` must only be used inside a `Popover`.'
+			'`AccessiblePopoverContent` must only be used inside a `AccessiblePopover`.'
 		);
 	}
 
