@@ -15,7 +15,7 @@ import { useCallback, useMemo, cloneElement } from '@wordpress/element';
 import { contextConnect } from '../../ui/context';
 import { AccessiblePopoverContext } from '../context';
 import { usePopoverResizeUpdater } from '../utils';
-import AccessiblePopoverContent from '../content';
+import AccessiblePopoverContent from '../accessible-popover-content';
 import { useUpdateEffect } from '../../utils/hooks';
 import { useAccessiblePopover } from './hook';
 

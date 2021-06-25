@@ -11,16 +11,16 @@ import { Popover as ReakitPopover } from 'reakit';
 /**
  * Internal dependencies
  */
-import { Card } from '../card';
-import { View } from '../view';
-import { useAccessiblePopoverContext } from './context';
-import * as styles from './styles';
-import { contextConnect, useContextSystem } from '../ui/context';
+import { Card } from '../../card';
+import { View } from '../../view';
+import { useAccessiblePopoverContext } from '../context';
+import * as styles from '../styles';
+import { contextConnect, useContextSystem } from '../../ui/context';
 
 /**
  *
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
- * @param {import('react').Ref<any>}                                                                 forwardedRef
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').ContentProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                                     forwardedRef
  */
 function AccessiblePopoverContent( props, forwardedRef ) {
 	const {

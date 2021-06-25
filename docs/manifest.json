@@ -654,6 +654,12 @@
 		"parent": "reference-guides"
 	},
 	{
+		"title": "AccessiblePopoverContent",
+		"slug": "accessible-popover-content",
+		"markdown_source": "../packages/components/src/accessible-popover/accessible-popover-content/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "AccessiblePopover",
 		"slug": "accessible-popover",
 		"markdown_source": "../packages/components/src/accessible-popover/accessible-popover/README.md",
