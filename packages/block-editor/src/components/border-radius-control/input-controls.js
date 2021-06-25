@@ -7,6 +7,14 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+
+const CORNERS = {
+	topLeft: __( 'Top left' ),
+	topRight: __( 'Top right' ),
+	bottomLeft: __( 'Bottom left' ),
+	bottomRight: __( 'Bottom right' ),
+};
 
 export default function BoxInputControls( {
 	onChange = noop,
@@ -20,7 +28,7 @@ export default function BoxInputControls( {
 		} );
 	};
 
-	// For backwards compatibility, handle possible flat string value.
+	// For shorthand style & backwards compatibility, handle flat string value.
 	const values =
 		typeof valuesProp !== 'string'
 			? valuesProp
@@ -31,33 +39,18 @@ export default function BoxInputControls( {
 					bottomRight: valuesProp,
 			  };
 
+	// Controls are wrapped in tooltips as visible labels aren't desired here.
 	return (
 		<div className="components-border-radius-control__input-controls-wrapper">
-			<UnitControl
-				{ ...props }
-				isFirst={ true }
-				isLast={ true }
-				value={ values.topLeft }
-				onChange={ createHandleOnChange( 'topLeft' ) }
-			/>
-			<UnitControl
-				{ ...props }
-				isLast={ true }
-				value={ values.topRight }
-				onChange={ createHandleOnChange( 'topRight' ) }
-			/>
-			<UnitControl
-				{ ...props }
-				isFirst={ true }
-				value={ values.bottomLeft }
-				onChange={ createHandleOnChange( 'bottomLeft' ) }
-			/>
-			<UnitControl
-				{ ...props }
-				isLast={ true }
-				value={ values.bottomRight }
-				onChange={ createHandleOnChange( 'bottomRight' ) }
-			/>
+			{ Object.entries( CORNERS ).map( ( [ key, label ] ) => (
+				<UnitControl
+					{ ...props }
+					key={ key }
+					aria-label={ label }
+					value={ values[ key ] }
+					onChange={ createHandleOnChange( key ) }
+				/>
+			) ) }
 		</div>
 	);
 }

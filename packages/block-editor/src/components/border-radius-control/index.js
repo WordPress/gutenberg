@@ -16,14 +16,19 @@ import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import LinkedButton from './linked-button';
 import {
-	DEFAULT_VALUES,
 	getAllValue,
 	getAllUnit,
 	isValuesDefined,
 	isValuesMixed,
 } from './utils';
 
-export const MIN_BORDER_RADIUS_VALUE = 0;
+const DEFAULT_VALUES = {
+	topLeft: null,
+	topRight: null,
+	bottomLeft: null,
+	bottomRight: null,
+};
+const MIN_BORDER_RADIUS_VALUE = 0;
 
 /**
  * Control to display border radius options.
@@ -39,13 +44,10 @@ export default function BorderRadiusControl( { onChange, values } ) {
 		! isValuesDefined( values ) || ! isValuesMixed( values )
 	);
 
-	const units = useCustomUnits( {
-		availableUnits: [ 'px', 'em', 'rem' ],
-	} );
-
-	const [ allValue ] = parseUnit( getAllValue( values ) );
+	const units = useCustomUnits( { availableUnits: [ 'px', 'em', 'rem' ] } );
 	const unit = getAllUnit( values );
 	const step = unit === 'px' ? 1 : 0.25;
+	const [ allValue ] = parseUnit( getAllValue( values ) );
 
 	const toggleLinked = () => setIsLinked( ! isLinked );
 

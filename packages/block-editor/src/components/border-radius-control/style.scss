@@ -21,6 +21,7 @@
 
 			.components-base-control__field {
 				margin-bottom: 0;
+				height: 30px;
 			}
 
 			.components-range-control__wrapper {
@@ -42,6 +43,15 @@
 			width: calc(50% - #{ $grid-unit-10 });
 			margin-bottom: $grid-unit-10;
 			margin-right: $grid-unit-10;
+		}
+	}
+
+	.component-border-radius-control__linked-button.has-icon {
+		display: flex;
+		justify-content: center;
+
+		svg {
+			margin-right: 0;
 		}
 	}
 }

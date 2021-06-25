@@ -7,23 +7,6 @@ import { isEmpty, isNumber } from 'lodash';
  * WordPress dependencies
  */
 import { __experimentalParseUnit as parseUnit } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-
-export const LABELS = {
-	all: __( 'All' ),
-	topLeft: __( 'Top left' ),
-	topRight: __( 'Top right' ),
-	bottomLeft: __( 'Bottom left' ),
-	bottomRight: __( 'Bottom right' ),
-	mixed: __( 'Mixed' ),
-};
-
-export const DEFAULT_VALUES = {
-	topLeft: null,
-	topRight: null,
-	bottomLeft: null,
-	bottomRight: null,
-};
 
 /**
  * Gets an items with the most occurrence within an array

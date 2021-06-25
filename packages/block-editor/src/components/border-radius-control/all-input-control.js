@@ -27,6 +27,7 @@ export default function AllInputControl( {
 	return (
 		<UnitControl
 			{ ...props }
+			aria-label={ __( 'Border radius' ) }
 			disableUnits={ isMixed }
 			isOnly
 			value={ allValue }
