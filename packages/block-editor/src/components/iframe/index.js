@@ -190,15 +190,20 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			setBodyClassName( contentDocument );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
-			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
 			clearerRef( body );
 
-			scripts.reduce(
-				( promise, script ) =>
-					promise.then( () => loadScript( contentDocument, script ) ),
-				Promise.resolve()
-			);
+			scripts
+				.reduce(
+					( promise, script ) =>
+						promise.then( () =>
+							loadScript( contentDocument, script )
+						),
+					Promise.resolve()
+				)
+				.finally( () => {
+					setIframeDocument( contentDocument );
+				} );
 
 			return true;
 		}
