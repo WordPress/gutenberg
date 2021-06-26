@@ -18,7 +18,6 @@ import {
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
-	ButtonBlockAppender,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 
@@ -32,6 +31,7 @@ import SidebarEditorProvider from './sidebar-editor-provider';
 import { store as customizeWidgetsStore } from '../../store';
 import WelcomeGuide from '../welcome-guide';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import BlockAppender from '../block-appender';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -80,6 +80,7 @@ export default function SidebarBlockEditor( {
 			mediaUpload: mediaUploadBlockEditor,
 			hasFixedToolbar: isFixedToolbarActive,
 			keepCaretInsideBlock,
+			__unstableHasCustomAppender: true,
 		};
 	}, [
 		hasUploadPermissions,
@@ -117,9 +118,7 @@ export default function SidebarBlockEditor( {
 					<BlockSelectionClearer>
 						<WritingFlow>
 							<ObserveTyping>
-								<BlockList
-									renderAppender={ ButtonBlockAppender }
-								/>
+								<BlockList renderAppender={ BlockAppender } />
 							</ObserveTyping>
 						</WritingFlow>
 					</BlockSelectionClearer>
