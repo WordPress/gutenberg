@@ -35,10 +35,19 @@
 			const ref = useRefEffect( ( node ) => {
 				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;
-				new defaultView.Masonry( node, {
+
+				if ( ! defaultView.Masonry ) {
+					return;
+				}
+
+				const masonry = new defaultView.Masonry( node, {
 					itemSelector: '.grid-item',
 				} );
-			}, [] );
+
+				return () => {
+					masonry.destroy();
+				};
+			} );
 			return el( 'div', useBlockProps( { ref } ), ...content );
 		},
 		save: function Save() {

@@ -8,6 +8,7 @@ import {
 	forwardRef,
 	useEffect,
 	useMemo,
+	useReducer,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
@@ -164,6 +165,7 @@ async function loadScript( doc, { id, src } ) {
 }
 
 function Iframe( { contentRef, children, head, ...props }, ref ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const styles = useParsedAssets( window.__editorAssets.styles );
 	const scripts = useParsedAssets( window.__editorAssets.scripts );
@@ -190,6 +192,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			setBodyClassName( contentDocument );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
+			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
 			clearerRef( body );
 
@@ -202,7 +205,9 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 					Promise.resolve()
 				)
 				.finally( () => {
-					setIframeDocument( contentDocument );
+					// When script are loaded, re-render blocks to allow them
+					// to initialise.
+					forceRender();
 				} );
 
 			return true;

@@ -51,6 +51,7 @@ describe( 'changing image size', () => {
 		await page.keyboard.type( 'Iframed Test' );
 		await clickButton( 'Create' );
 		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await canvas().waitForSelector( '.grid-item[style]' );
 
 		expect( await didMasonryLoadCorrectly( canvas() ) ).toBe( true );
 	} );
