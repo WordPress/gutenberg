@@ -104,8 +104,12 @@ export default function Form( {
 				>
 					<div
 						ref={ ref }
-						className="wp-block-legacy-widget__edit-form"
-						hidden={ ! isVisible }
+						className={ classnames(
+							'wp-block-legacy-widget__edit-form',
+							{
+								'is-hidden': ! isVisible,
+							}
+						) }
 					></div>
 				</Popover>
 			</div>
@@ -115,8 +119,9 @@ export default function Form( {
 	return (
 		<div
 			ref={ ref }
-			className="wp-block-legacy-widget__edit-form"
-			hidden={ ! isVisible }
+			className={ classnames( 'wp-block-legacy-widget__edit-form', {
+				'is-hidden': ! isVisible,
+			} ) }
 		>
 			<h3 className="wp-block-legacy-widget__edit-form-title">
 				{ title }
