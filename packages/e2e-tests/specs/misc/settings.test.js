@@ -14,10 +14,12 @@ async function getOptionsValues( selector ) {
 	}, selector );
 }
 
+// It might make sense to include a similar test in WP core (or move this one over).
+// See discussion here: https://github.com/WordPress/gutenberg/pull/32797#issuecomment-864192088.
 describe( 'Settings', () => {
 	test( 'Regression: updating a specific option will only change its value and will not corrupt others', async () => {
 		// We won't select the option that we updated and will also remove some
-		// _transient options that seem to change at every update (?)
+		// _transient options that seem to change at every update.
 		const optionsInputsSelector =
 			'form#all-options table.form-table input:not([id*="_transient"]):not([id="blogdescription"])';
 		const optionsBefore = await getOptionsValues( optionsInputsSelector );
