@@ -11,9 +11,6 @@
  *
  * @property {HeadingData}              heading  The heading content, level,
  *                                               and link.
- * @property {number}                   index    The index of this heading
- *                                               node in the entire nested
- *                                               list of heading data.
  * @property {NestedHeadingData[]|null} children The sub-headings of this
  *                                               heading, if any.
  */
@@ -23,11 +20,10 @@
  * immediate parent's level.
  *
  * @param {HeadingData[]} headingList The flat list of headings to nest.
- * @param {number}        index       The current list index.
  *
  * @return {NestedHeadingData[]} The nested list of headings.
  */
-export function linearToNestedHeadingList( headingList, index = 0 ) {
+export function linearToNestedHeadingList( headingList ) {
 	const nestedHeadingList = [];
 
 	headingList.forEach( ( heading, key ) => {
@@ -58,17 +54,14 @@ export function linearToNestedHeadingList( headingList, index = 0 ) {
 				// We found a child node: Push a new node onto the return array with children.
 				nestedHeadingList.push( {
 					heading,
-					index: index + key,
 					children: linearToNestedHeadingList(
-						headingList.slice( key + 1, endOfSlice ),
-						index + key + 1
+						headingList.slice( key + 1, endOfSlice )
 					),
 				} );
 			} else {
 				// No child node: Push a new node onto the return array.
 				nestedHeadingList.push( {
 					heading,
-					index: index + key,
 					children: null,
 				} );
 			}
