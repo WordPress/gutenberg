@@ -9,6 +9,7 @@ import {
 import { isURL } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { useState } from '@wordpress/element';
 
 const linkSettingsOptions = {
 	url: {
@@ -28,15 +29,20 @@ const linkSettingsOptions = {
 	},
 };
 
-const EmbedBottomSheet = ( { value, isVisible, onClose, onSetAttributes } ) => {
+const EmbedBottomSheet = ( { value, isVisible, onClose, onChangeURL } ) => {
+	const [ url, setUrl ] = useState( value );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	function setAttributes( attributes ) {
-		const { url } = attributes;
+	function onDismiss() {
+		if ( url !== value && url !== '' ) {
+			onChangeURL( url );
+		}
+	}
 
-		if ( isURL( url ) ) {
-			onSetAttributes( attributes );
-		} else if ( url !== '' ) {
+	function setAttributes( { url: nextUrl } ) {
+		if ( isURL( nextUrl ) ) {
+			setUrl( nextUrl );
+		} else if ( nextUrl !== '' ) {
 			createErrorNotice( __( 'Invalid URL. Please enter a valid URL.' ) );
 		}
 	}
@@ -44,9 +50,10 @@ const EmbedBottomSheet = ( { value, isVisible, onClose, onSetAttributes } ) => {
 	return (
 		<LinkSettingsNavigation
 			isVisible={ isVisible }
-			url={ value }
-			setAttributes={ setAttributes }
+			url={ url }
 			onClose={ onClose }
+			onDismiss={ onDismiss }
+			setAttributes={ setAttributes }
 			options={ linkSettingsOptions }
 			withBottomSheet
 			showIcon

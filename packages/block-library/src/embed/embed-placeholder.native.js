@@ -62,7 +62,7 @@ const EmbedPlaceholder = ( {
 				value={ value }
 				isVisible={ isEmbedSheetVisible }
 				onClose={ () => setIsEmbedSheetVisible( false ) }
-				onSetAttributes={ ( { url } ) => {
+				onChangeURL={ ( url ) => {
 					onChange( { target: { value: url } } );
 					onSubmit();
 				} }
