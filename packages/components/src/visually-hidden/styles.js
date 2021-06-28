@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
  */
 import { COLORS } from '../utils/colors-values';
 
-export const VisuallyHidden = css`
+export const VisuallyHidden = styled.div`
 	border: 0;
 	clip: rect( 1px, 1px, 1px, 1px );
 	-webkit-clip-path: inset( 50% );

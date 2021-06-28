@@ -1,8 +1,16 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
-import { useVisuallyHidden } from './hook';
+import { useContextSystem, contextConnect } from '../ui/context';
+import { VisuallyHidden as VisuallyHiddenWrapper } from './styles';
+
+/**
+ * @param {import('../ui/context').PolymorphicComponentProps<{}, 'div'>} props
+ */
+function VisuallyHidden( props ) {
+	const contextProps = useContextSystem( props, 'VisuallyHidden' );
+	return <VisuallyHiddenWrapper { ...contextProps } />;
+}
 
 /**
  * `VisuallyHidden` is a component used to render text intended to be visually
@@ -21,11 +29,9 @@ import { useVisuallyHidden } from './hook';
  * }
  * ```
  */
+const ConnectedVisuallyHidden = contextConnect(
+	VisuallyHidden,
+	'VisuallyHidden'
+);
 
-const VisuallyHidden = createComponent( {
-	as: 'div',
-	useHook: useVisuallyHidden,
-	name: 'VisuallyHidden',
-} );
-
-export default VisuallyHidden;
+export default ConnectedVisuallyHidden;
