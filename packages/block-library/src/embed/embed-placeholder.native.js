@@ -24,7 +24,7 @@ const EmbedPlaceholder = ( {
 	onSubmit,
 	onChange,
 } ) => {
-	const [ isEmbedSheeVisible, setIsEmbedSheetVisible ] = useState( ! value );
+	const [ isEmbedSheetVisible, setIsEmbedSheetVisible ] = useState( ! value );
 
 	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
 		styles.emptyStateContainer,
@@ -60,7 +60,7 @@ const EmbedPlaceholder = ( {
 			) }
 			<EmbedBottomSheet
 				value={ value }
-				isVisible={ isEmbedSheeVisible }
+				isVisible={ isEmbedSheetVisible }
 				onClose={ () => setIsEmbedSheetVisible( false ) }
 				onSetAttributes={ ( { url } ) => {
 					onChange( { target: { value: url } } );
