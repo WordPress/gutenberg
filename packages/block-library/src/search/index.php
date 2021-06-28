@@ -213,8 +213,9 @@ function styles_for_block_core_search( $attributes ) {
 	$has_border_radius = ! empty( $attributes['style']['border']['radius'] );
 
 	if ( $has_border_radius ) {
-		// Shared style for button and input radius values.
 		$border_radius = $attributes['style']['border']['radius'];
+		$button_inside = ! empty( $attributes['buttonPosition'] ) &&
+			'button-inside' === $attributes['buttonPosition'];
 
 		if ( is_array( $border_radius ) ) {
 			// Add shared styles for individual border radii for input & button.
@@ -224,17 +225,15 @@ function styles_for_block_core_search( $attributes ) {
 			$shared_styles[] = sprintf( 'border-bottom-right-radius: %s;', esc_attr( $border_radius['bottomRight'] ) );
 
 			// Add adjusted border radius styles for the wrapper element.
-			$wrapper_styles[] = get_wrapper_radius_style( 'border-top-left-radius', $border_radius['topLeft'] );
-			$wrapper_styles[] = get_wrapper_radius_style( 'border-top-right-radius', $border_radius['topRight'] );
-			$wrapper_styles[] = get_wrapper_radius_style( 'border-bottom-left-radius', $border_radius['bottomLeft'] );
-			$wrapper_styles[] = get_wrapper_radius_style( 'border-bottom-right-radius', $border_radius['bottomRight'] );
+			if ( $button_inside ) {
+				$wrapper_styles[] = get_wrapper_radius_style( 'border-top-left-radius', $border_radius['topLeft'] );
+				$wrapper_styles[] = get_wrapper_radius_style( 'border-top-right-radius', $border_radius['topRight'] );
+				$wrapper_styles[] = get_wrapper_radius_style( 'border-bottom-left-radius', $border_radius['bottomLeft'] );
+				$wrapper_styles[] = get_wrapper_radius_style( 'border-bottom-right-radius', $border_radius['bottomRight'] );
+			}
 		} else {
 			$border_radius   = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
 			$shared_styles[] = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
-
-			// Apply wrapper border radius if button placed inside.
-			$button_inside = ! empty( $attributes['buttonPosition'] ) &&
-				'button-inside' === $attributes['buttonPosition'];
 
 			if ( $button_inside ) {
 				$wrapper_styles[] = get_wrapper_radius_style( 'border-radius', $border_radius );
