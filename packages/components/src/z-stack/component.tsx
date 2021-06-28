@@ -1,10 +1,6 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { css, cx } from '@emotion/css';
 // eslint-disable-next-line no-restricted-imports
 import type { Ref, ReactNode } from 'react';
 
@@ -20,9 +16,7 @@ import { getValidChildren } from '../ui/utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../ui/context';
-import { View } from '../view';
-import * as styles from './styles';
-const { ZStackView } = styles;
+import { ZStackView, ZStackChild } from './styles';
 
 export interface ZStackProps {
 	/**
@@ -69,27 +63,17 @@ function ZStack(
 		const zIndex = isReversed ? childrenLastIndex - index : index;
 		const offsetAmount = offset * index;
 
-		const classes = cx(
-			isLayered ? styles.positionAbsolute : styles.positionRelative,
-			css( {
-				...( isLayered
-					? { marginLeft: offsetAmount }
-					: { right: offsetAmount * -1 } ),
-			} )
-		);
-
 		const key = isValidElement( child ) ? child.key : index;
 
 		return (
-			<View
-				className={ classes }
+			<ZStackChild
+				isLayered={ isLayered }
+				offsetAmount={ offsetAmount }
+				zIndex={ zIndex }
 				key={ key }
-				style={ {
-					zIndex,
-				} }
 			>
 				{ child }
-			</View>
+			</ZStackChild>
 		);
 	} );
 
