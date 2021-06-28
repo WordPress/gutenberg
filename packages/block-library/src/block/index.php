@@ -25,7 +25,7 @@ function render_block_core_block( $attributes ) {
 	}
 
 	if ( isset( $seen_refs[ $attributes['ref'] ] ) ) {
-		if ( ! is_admin() ) {
+		if ( ! is_admin() && ! is_rest_api_request() ) {
 			trigger_error(
 				sprintf(
 					// translators: %s is the user-provided title of the reusable block.
