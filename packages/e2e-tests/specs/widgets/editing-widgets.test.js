@@ -242,7 +242,6 @@ describe( 'Widgets screen', () => {
 		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\"><p><div style=\\"width: 580px;\\" class=\\"wp-video\\"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
 		<video class=\\"wp-video-shortcode\\" id=\\"video-0-1\\" width=\\"580\\" height=\\"326\\" preload=\\"metadata\\" controls=\\"controls\\"><source type=\\"video/mp4\\" src=\\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4?_=1\\" /><a href=\\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4\\">http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4</a></video></div></p>
 		</div></div>",
-		  "wp_inactive_widgets": "",
 		}
 	` );
 	} );
@@ -391,7 +390,6 @@ describe( 'Widgets screen', () => {
 		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
 		</div></div>",
-		  "wp_inactive_widgets": "",
 		}
 	` );
 	} );
@@ -497,6 +495,8 @@ describe( 'Widgets screen', () => {
 			selector: '[id=marquee-greeting]',
 		} );
 		expect( marqueesAfter ).toHaveLength( 1 );
+
+		await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 	} );
 
 	// Disable reason: We temporary skip this test until we can figure out why it fails sometimes.
@@ -733,7 +733,6 @@ describe( 'Widgets screen', () => {
 			<input type=\\"submit\\" class=\\"search-submit\\" value=\\"Search\\" />
 		</form>
 		</div></div>",
-		  "wp_inactive_widgets": "",
 		}
 	` );
 	} );
@@ -802,7 +801,6 @@ describe( 'Widgets screen', () => {
 		  "sidebar-2": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>",
-		  "wp_inactive_widgets": "",
 		}
 	` );
 	} );
@@ -859,7 +857,6 @@ describe( 'Widgets screen', () => {
 		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
 		</div></div>",
-		  "wp_inactive_widgets": "",
 		}
 	` );
 	} );
