@@ -1,16 +1,14 @@
 /**
- * External dependencies
+ * A real number or something parsable as a number
  */
-// eslint-disable-next-line no-restricted-imports
-import type { ReactText } from 'react';
-/**
- * Internal dependencies
- */
+export type SpaceInput = number | `${ number }`;
 
 const GRID_BASE = '4px';
 
-export function space( value: ReactText ): string {
-	return typeof value === 'number'
-		? `calc(${ GRID_BASE } * ${ value })`
-		: value;
+export function space( value?: SpaceInput ): string | undefined {
+	if ( typeof value === 'undefined' ) {
+		return undefined;
+	}
+
+	return `calc(${ GRID_BASE } * ${ value })`;
 }

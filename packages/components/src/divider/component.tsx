@@ -15,20 +15,21 @@ import { contextConnect, useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../ui/context';
 import { StyledHorizontalRule } from './styles';
+import type { SpaceInput } from '../ui/utils/space';
 
 export interface DividerProps extends Omit< SeparatorProps, 'children' > {
 	/**
 	 * Adjusts all margins.
 	 */
-	margin?: number;
+	margin?: SpaceInput;
 	/**
 	 * Adjusts top margins.
 	 */
-	marginTop?: number;
+	marginTop?: SpaceInput;
 	/**
 	 * Adjusts bottom margins.
 	 */
-	marginBottom?: number;
+	marginBottom?: SpaceInput;
 }
 
 function Divider(

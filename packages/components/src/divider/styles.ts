@@ -7,13 +7,13 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { space } from '../ui/utils/space';
+import { space, SpaceInput } from '../ui/utils/space';
 import CONFIG from '../utils/config-values';
 
 type Props = {
-	margin?: number;
-	marginTop?: number;
-	marginBottom?: number;
+	margin?: SpaceInput;
+	marginTop?: SpaceInput;
+	marginBottom?: SpaceInput;
 };
 
 const renderMargin = ( { margin, marginTop, marginBottom }: Props ) => {
@@ -25,8 +25,8 @@ const renderMargin = ( { margin, marginTop, marginBottom }: Props ) => {
 	}
 
 	return css( {
-		marginTop,
-		marginBottom,
+		marginTop: space( marginTop ),
+		marginBottom: space( marginBottom ),
 	} );
 };
 
