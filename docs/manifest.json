@@ -1194,6 +1194,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "TextInput",
+		"slug": "text-input",
+		"markdown_source": "../packages/components/src/text-input/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Text",
 		"slug": "text",
 		"markdown_source": "../packages/components/src/text/README.md",
