@@ -12,6 +12,7 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalUnitControl as UnitControl,
+	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
 import {
 	DropdownMenu,
@@ -73,6 +74,7 @@ export default function SearchEdit( {
 	} = attributes;
 
 	const borderRadius = style?.border?.radius;
+	const colorProps = useColorProps( attributes );
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 
@@ -149,21 +151,30 @@ export default function SearchEdit( {
 		);
 	};
 
+	const getButtonClassNames = () => {
+		return classnames( 'wp-block-search__button', colorProps.className );
+	};
+
+	const getButtonStyles = () => ( {
+		...colorProps.style,
+		borderRadius,
+	} );
+
 	const renderButton = () => {
 		return (
 			<>
 				{ buttonUseIcon && (
 					<Button
 						icon={ search }
-						className="wp-block-search__button"
-						style={ { borderRadius } }
+						className={ getButtonClassNames() }
+						style={ getButtonStyles() }
 					/>
 				) }
 
 				{ ! buttonUseIcon && (
 					<RichText
-						className="wp-block-search__button"
-						style={ { borderRadius } }
+						className={ getButtonClassNames() }
+						style={ getButtonStyles() }
 						aria-label={ __( 'Button text' ) }
 						placeholder={ __( 'Add button text…' ) }
 						withoutInteractiveFormatting

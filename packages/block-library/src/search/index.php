@@ -37,6 +37,7 @@ function render_block_core_search( $attributes ) {
 	$input_markup    = '';
 	$button_markup   = '';
 	$inline_styles   = styles_for_block_core_search( $attributes );
+	$color_classes   = get_color_classes_for_block_core_search( $attributes );
 
 	if ( $show_label ) {
 		if ( ! empty( $attributes['label'] ) ) {
@@ -60,20 +61,20 @@ function render_block_core_search( $attributes ) {
 			$input_id,
 			esc_attr( get_search_query() ),
 			esc_attr( $attributes['placeholder'] ),
-			$inline_styles['shared']
+			$inline_styles['input']
 		);
 	}
 
 	if ( $show_button ) {
 		$button_internal_markup = '';
-		$button_classes         = '';
+		$button_classes         = $color_classes;
 
 		if ( ! $use_icon_button ) {
 			if ( ! empty( $attributes['buttonText'] ) ) {
 				$button_internal_markup = $attributes['buttonText'];
 			}
 		} else {
-			$button_classes        .= 'has-icon';
+			$button_classes        .= ' has-icon';
 			$button_internal_markup =
 				'<svg id="search-icon" class="search-icon" viewBox="0 0 24 24" width="24" height="24">
 			        <path d="M13.5 6C10.5 6 8 8.5 8 11.5c0 1.1.3 2.1.9 3l-3.4 3 1 1.1 3.4-2.9c1 .9 2.2 1.4 3.6 1.4 3 0 5.5-2.5 5.5-5.5C19 8.5 16.5 6 13.5 6zm0 9.5c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"></path>
@@ -83,7 +84,7 @@ function render_block_core_search( $attributes ) {
 		$button_markup = sprintf(
 			'<button type="submit" class="wp-block-search__button %s"%s>%s</button>',
 			$button_classes,
-			$inline_styles['shared'],
+			$inline_styles['button'],
 			$button_internal_markup
 		);
 	}
@@ -169,8 +170,9 @@ function classnames_for_block_core_search( $attributes ) {
  * @return array Style HTML attribute.
  */
 function styles_for_block_core_search( $attributes ) {
-	$shared_styles  = array();
 	$wrapper_styles = array();
+	$button_styles  = array();
+	$input_styles   = array();
 
 	// Add width styles.
 	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
@@ -191,7 +193,7 @@ function styles_for_block_core_search( $attributes ) {
 		// Shared style for button and input radius values.
 		$border_radius   = $attributes['style']['border']['radius'];
 		$border_radius   = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
-		$shared_styles[] = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
+		$button_styles[] = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
 
 		// Apply wrapper border radius if button placed inside.
 		$button_inside = ! empty( $attributes['buttonPosition'] ) &&
@@ -201,17 +203,65 @@ function styles_for_block_core_search( $attributes ) {
 			// We adjust the border radius value for the outer wrapper element
 			// to make it visually consistent with the radius applied to inner
 			// elements. calc() is used to support non-pixel CSS units.
-			$default_padding  = '4px';
-			$wrapper_styles[] = sprintf(
+			$default_padding        = '4px';
+			$adjusted_border_styles = sprintf(
 				'border-radius: calc(%s + %s);',
 				esc_attr( $border_radius ),
 				esc_attr( $default_padding )
 			);
+			$wrapper_styles[]       = $adjusted_border_styles;
+			$input_styles[]         = $adjusted_border_styles;
+		}
+	}
+
+	// Add color styles.
+	$has_colors = ! empty( $attributes['style']['color'] );
+
+	if ( $has_colors ) {
+		if ( ! empty( $attributes['style']['color']['text'] ) ) {
+			$button_styles[] = sprintf( 'color: %s;', esc_attr( $attributes['style']['color']['text'] ) );
+		}
+		if ( ! empty( $attributes['style']['color']['background'] ) ) {
+			$button_styles[] = sprintf( 'background-color: %s;', esc_attr( $attributes['style']['color']['background'] ) );
 		}
 	}
 
 	return array(
-		'shared'  => ! empty( $shared_styles ) ? sprintf( ' style="%s"', implode( ' ', $shared_styles ) ) : '',
+		'input'   => ! empty( $input_styles ) ? sprintf( ' style="%s"', implode( ' ', $input_styles ) ) : '',
+		'button'  => ! empty( $button_styles ) ? sprintf( ' style="%s"', implode( ' ', $button_styles ) ) : '',
 		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', implode( ' ', $wrapper_styles ) ) : '',
 	);
+}
+
+/**
+ * Returns color classnames depending on whether there are named or custom border colors.
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string The color classnames to be applied to the block elements.
+ */
+function get_color_classes_for_block_core_search( $attributes ) {
+	$classnames = array();
+
+	// Text color.
+	$has_preset_text_color = ! empty( $attributes['textColor'] );
+	$has_custom_text_color = ! empty( $attributes['style']['color']['text'] );
+	if ( $has_preset_text_color ) {
+		$classnames[] = sprintf( 'has-text-color has-%s-color', $attributes['textColor'] );
+	} elseif ( $has_custom_text_color ) {
+		// If a custom 'textColor' was selected instead of a preset, still add the generic `has-text-color` class.
+		$classnames[] = 'has-text-color';
+	}
+
+	// Background color.
+	$has_preset_background_color = ! empty( $attributes['backgroundColor'] );
+	$has_custom_background_color = ! empty( $attributes['style']['color']['background'] );
+	if ( $has_preset_background_color ) {
+		$classnames[] = sprintf( 'has-background has-%s-background-color', $attributes['backgroundColor'] );
+	} elseif ( $has_custom_background_color ) {
+		// If a custom 'backgroundColor' was selected instead of a preset, still add the generic `has-background` class.
+		$classnames[] = 'has-background';
+	}
+
+	return implode( ' ', $classnames );
 }
