@@ -8,6 +8,13 @@
  */
 
 add_action(
+	'setup_theme',
+	function() {
+		add_theme_support( 'block-templates' );
+	}
+);
+
+add_action(
 	'init',
 	function() {
 		wp_register_script(
