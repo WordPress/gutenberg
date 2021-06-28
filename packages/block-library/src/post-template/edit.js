@@ -116,7 +116,6 @@ export default function PostTemplateEdit( {
 			posts?.map( ( post ) => ( {
 				postType: post.type,
 				postId: post.id,
-				queryId,
 			} ) ),
 		[ posts, queryId ]
 	);
