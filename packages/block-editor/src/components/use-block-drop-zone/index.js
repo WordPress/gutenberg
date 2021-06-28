@@ -7,6 +7,7 @@ import {
 	useThrottle,
 	__experimentalUseDropZone as useDropZone,
 } from '@wordpress/compose';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -39,6 +40,8 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 			? [ 'left', 'right' ]
 			: [ 'top', 'bottom' ];
 
+	const isRightToLeft = isRTL();
+
 	let candidateIndex;
 	let candidateDistance;
 
@@ -53,7 +56,12 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 		if ( candidateDistance === undefined || distance < candidateDistance ) {
 			// If the user is dropping to the trailing edge of the block
 			// add 1 to the index to represent dragging after.
-			const isTrailingEdge = edge === 'bottom' || edge === 'right';
+			// Take RTL languages into account where the left edge is
+			// the trailing edge.
+			const isTrailingEdge =
+				edge === 'bottom' ||
+				( ! isRightToLeft && edge === 'right' ) ||
+				( isRightToLeft && edge === 'left' );
 			const offset = isTrailingEdge ? 1 : 0;
 
 			// Update the currently known best candidate.
@@ -102,7 +110,9 @@ export default function useBlockDropZone( {
 		useCallback( ( event, currentTarget ) => {
 			const blockElements = Array.from( currentTarget.children ).filter(
 				// Ensure the element is a block. It should have the `wp-block` class.
-				( element ) => element.classList.contains( 'wp-block' )
+				( element ) =>
+					element.classList.contains( 'wp-block' ) &&
+					! element.classList.contains( 'block-list-appender' )
 			);
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
