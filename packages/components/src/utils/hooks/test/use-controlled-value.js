@@ -1,107 +1,101 @@
 /**
  * External dependencies
  */
-import { renderHook, act } from '@testing-library/react-hooks';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import { useControlledValue } from '../use-controlled-value';
 
+function Input( props ) {
+	const [ value, setValue ] = useControlledValue( props );
+	return (
+		<input
+			value={ value }
+			onChange={ ( event ) => setValue( event.target.value ) }
+		/>
+	);
+}
+
+function getInput() {
+	return screen.getByRole( 'textbox' );
+}
+
 describe( 'useControlledValue', () => {
 	it( 'should use the default value', () => {
-		const { result } = renderHook( () =>
-			useControlledValue( { defaultValue: 'WordPress.org' } )
-		);
-
-		expect( result.current[ 0 ] ).toEqual( 'WordPress.org' );
+		render( <Input defaultValue="WordPress.org" /> );
+		expect( getInput() ).toHaveValue( 'WordPress.org' );
 	} );
 
 	it( 'should use the default value then switch to the controlled value', () => {
-		const { result, rerender } = renderHook(
-			( { value } ) =>
-				useControlledValue( { defaultValue: 'WordPress.org', value } ),
-			{ initialProps: { value: undefined } }
+		const { rerender } = render( <Input defaultValue="WordPress.org" /> );
+		expect( getInput() ).toHaveValue( 'WordPress.org' );
+
+		rerender(
+			<Input defaultValue="WordPress.org" value="Code is Poetry" />
 		);
-		expect( result.current[ 0 ] ).toEqual( 'WordPress.org' );
-
-		rerender( { value: 'Code is Poetry' } );
-
-		expect( result.current[ 0 ] ).toEqual( 'Code is Poetry' );
+		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 	} );
 
 	it( 'should not call onChange only when there is no value being passed in', () => {
 		const onChange = jest.fn();
-		const { result } = renderHook( () =>
-			useControlledValue( { defaultValue: 'WordPress.org', onChange } )
-		);
+		render( <Input defaultValue="WordPress.org" onChange={ onChange } /> );
 
-		expect( result.current[ 0 ] ).toEqual( 'WordPress.org' );
+		expect( getInput() ).toHaveValue( 'WordPress.org' );
 
-		act( () => {
-			result.current[ 1 ]( 'Code is Poetry' );
-		} );
+		fireEvent.change( getInput(), { target: { value: 'Code is Poetry' } } );
 
-		expect( result.current[ 0 ] ).toEqual( 'Code is Poetry' );
+		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should call onChange when there is a value passed in', () => {
 		const onChange = jest.fn();
-		const { result, rerender } = renderHook(
-			( { value } ) =>
-				useControlledValue( {
-					defaultValue: 'WordPress.org',
-					value,
-					onChange,
-				} ),
-			{ initialProps: { value: 'Code is Poetry' } }
+		const { rerender } = render(
+			<Input
+				defaultValue="WordPress.org"
+				value="Code is Poetry"
+				onChange={ onChange }
+			/>
 		);
 
-		expect( result.current[ 0 ] ).toEqual( 'Code is Poetry' );
+		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 
-		act( () => {
-			// simulate `setValue` getting called by an input
-			result.current[ 1 ]( 'WordPress rocks!' );
+		fireEvent.change( getInput(), {
+			target: { value: 'WordPress rocks!' },
 		} );
 
-		// simulate the parent re-rendering and passing a new value down
-		rerender( { value: 'WordPress rocks!' } );
+		rerender(
+			<Input
+				defaultValue="WordPress.org"
+				value="WordPress rocks!"
+				onChange={ onChange }
+			/>
+		);
 
-		expect( result.current[ 0 ] ).toEqual( 'WordPress rocks!' );
+		expect( getInput() ).toHaveValue( 'WordPress rocks!' );
 		expect( onChange ).toHaveBeenCalledWith( 'WordPress rocks!' );
 	} );
 
 	it( 'should not maintain internal state if no onChange is passed but a value is passed', () => {
-		const { result, rerender } = renderHook(
-			( { value } ) => useControlledValue( { value } ),
-			{ initialProps: { value: undefined } }
-		);
+		const { rerender } = render( <Input value="Code is Poetry" /> );
 
-		expect( result.current[ 0 ] ).toBe( undefined );
+		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 
-		rerender( { value: 'Code is Poetry' } );
-
-		expect( result.current[ 0 ] ).toEqual( 'Code is Poetry' );
-
-		act( () => {
-			// call setState which will be the internal state rather than
-			// the onChange prop (as no onChange was passed in)
-
-			// primarily this proves that the hook doesn't break if no onChange is passed but
-			// value turns into a controlled state, for example if the value needs to be set
-			// to a constant in certain conditions but no change listening needs to happen
-			result.current[ 1 ]( 'WordPress.org' );
-		} );
+		// primarily this proves that the hook doesn't break if no onChange is passed but
+		// value turns into a controlled state, for example if the value needs to be set
+		// to a constant in certain conditions but no change listening needs to happen
+		fireEvent.change( getInput(), { target: { value: 'WordPress.org' } } );
 
 		// If `value` is passed then we expect the value to be fully controlled
 		// meaning that the value passed in will always be used even though
 		// we're managing internal state.
-		expect( result.current[ 0 ] ).toEqual( 'Code is Poetry' );
+		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 
 		// Next we un-set the value to uncover the internal state which was still maintained
-		rerender( { value: undefined } );
+		rerender( <Input /> );
 
-		expect( result.current[ 0 ] ).toEqual( 'WordPress.org' );
+		expect( getInput() ).toHaveValue( 'WordPress.org' );
 	} );
 } );
