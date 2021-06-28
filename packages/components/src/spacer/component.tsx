@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
-import { useSpacer } from './hook';
+import {
+	useContextSystem,
+	contextConnect,
+	PolymorphicComponentProps,
+} from '../ui/context';
+import type { SpacerProps } from './types';
+import { SpacerWrapper } from './styles';
+
+function Spacer( props: PolymorphicComponentProps< SpacerProps, 'div' > ) {
+	const contextProps = useContextSystem( props, 'Spacer' );
+
+	return <SpacerWrapper { ...contextProps } />;
+}
 
 /**
  * `Spacer` is a primitive layout component that providers inner (`padding`) or outer (`margin`) space in-between components. It can also be used to adaptively provide space within an `HStack` or `VStack`.
@@ -27,10 +38,6 @@ import { useSpacer } from './hook';
  * }
  * ```
  */
-const Spacer = createComponent( {
-	as: 'div',
-	useHook: useSpacer,
-	name: 'Spacer',
-} );
+const ConnectedSpacer = contextConnect( Spacer, 'Spacer' );
 
-export default Spacer;
+export default ConnectedSpacer;
