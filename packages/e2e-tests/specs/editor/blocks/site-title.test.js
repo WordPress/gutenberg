@@ -98,6 +98,7 @@ describe( 'Site Title block', () => {
 
 		await createNewPost();
 		await insertBlock( 'Site Title' );
+
 		const editableSiteTitleSelector = '[aria-label="Block: Site Title"] a';
 		await page.waitForSelector( editableSiteTitleSelector );
 
@@ -108,5 +109,10 @@ describe( 'Site Title block', () => {
 		expect( editable ).toBe( 'inherit' );
 
 		await deleteUser( username );
+
+		// FIXME: Fix https://github.com/WordPress/gutenberg/issues/33003 and remove the following line.
+		expect( console ).toHaveErroredWith(
+			'Failed to load resource: the server responded with a status of 403 (Forbidden)'
+		);
 	} );
 } );
