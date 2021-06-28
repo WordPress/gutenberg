@@ -140,7 +140,10 @@ function InserterMenu( {
 
 	const onSelectItem = useCallback(
 		( item ) => {
-			onInsert( item );
+			// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+			setTimeout( () => {
+				onInsert( item );
+			}, 100 );
 			onSelect( item );
 		},
 		[ onInsert, onSelect ]
