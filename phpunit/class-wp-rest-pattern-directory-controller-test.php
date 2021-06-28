@@ -292,6 +292,46 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 		$this->assertWPError( $response->as_error() );
 	}
 
+	/**
+	 * @covers WP_REST_Pattern_Directory_Controller::get_items
+	 *
+	 * @since 5.8.0
+	 */
+	public function test_get_items_prepare_filter() {
+		wp_set_current_user( self::$contributor_id );
+		self::mock_successful_response( 'browse-all', true );
+
+		// Test that filter changes uncached values.
+		add_filter(
+			'rest_prepare_block_pattern',
+			function() {
+				return 'initial value';
+			}
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+		$response = rest_do_request( $request );
+		$patterns = $response->get_data();
+
+		$this->assertSame( 'initial value', $patterns[0] );
+
+		// Test that filter changes cached values (the previous request primed the cache).
+		add_filter(
+			'rest_prepare_block_pattern',
+			function() {
+				return 'modified the cache';
+			},
+			11
+		);
+
+		// Test that the filter works against cached values.
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+		$response = rest_do_request( $request );
+		$patterns = $response->get_data();
+
+		$this->assertSame( 'modified the cache', $patterns[0] );
+	}
+
 	public function test_get_item() {
 		$this->markTestSkipped( 'Controller does not have get_item route.' );
 	}

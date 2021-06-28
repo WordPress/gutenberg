@@ -200,25 +200,24 @@ function remove_core_patterns() {
 }
 
 /**
- * Import patterns from wordpress.org/patterns.
+ * Register Core's official patterns from wordpress.org/patterns.
+ *
+ * @since 5.8.0
  */
 function load_remote_patterns() {
 	// This is the core function that provides the same feature.
 	if ( function_exists( '_load_remote_block_patterns' ) ) {
 		return;
 	}
-	$patterns = get_transient( 'gutenberg_remote_block_patterns' );
-	if ( ! $patterns ) {
-		$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-		$core_keyword_id = 11; // 11 is the ID for "core".
-		$request->set_param( 'keyword', $core_keyword_id );
-		$response = rest_do_request( $request );
-		if ( $response->is_error() ) {
-			return;
-		}
-		$patterns = $response->get_data();
-		set_transient( 'gutenberg_remote_block_patterns', $patterns, HOUR_IN_SECONDS );
+
+	$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+	$core_keyword_id = 11; // 11 is the ID for "core".
+	$request->set_param( 'keyword', $core_keyword_id );
+	$response = rest_do_request( $request );
+	if ( $response->is_error() ) {
+		return;
 	}
+	$patterns = $response->get_data();
 
 	foreach ( $patterns as $settings ) {
 		$pattern_name = 'core/' . sanitize_title( $settings['title'] );
