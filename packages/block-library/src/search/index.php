@@ -158,6 +158,31 @@ function classnames_for_block_core_search( $attributes ) {
 }
 
 /**
+ * Generates a border radius inline style for the wrapper element. It will
+ * adjust the supplied radius value to account for the default padding, making
+ * it visually consistent with the border radii applied to inner elements.
+ * `calc()` is used to support non-pixel CSS units.
+ *
+ * @param string $css_property The CSS property for the inline style.
+ * @param string $value        The border radius value to apply to the property.
+ *
+ * @return string A border radius inline style.
+ */
+function get_wrapper_radius_style( $css_property, $value ) {
+	$default_padding = '4px';
+
+	// Adjust border radius value for outer wrapper to make it
+	// visually consistent with those applied ot inner elements.
+	// calc() is used to support non-pixel CSS units.
+	return sprintf(
+		'%s: calc(%s + %s);',
+		$css_property,
+		esc_attr( $value ),
+		$default_padding
+	);
+}
+
+/**
  * Builds an array of inline styles for the search block.
  *
  * The result will contain one entry for shared styles such as those for the
@@ -189,24 +214,31 @@ function styles_for_block_core_search( $attributes ) {
 
 	if ( $has_border_radius ) {
 		// Shared style for button and input radius values.
-		$border_radius   = $attributes['style']['border']['radius'];
-		$border_radius   = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
-		$shared_styles[] = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
+		$border_radius = $attributes['style']['border']['radius'];
 
-		// Apply wrapper border radius if button placed inside.
-		$button_inside = ! empty( $attributes['buttonPosition'] ) &&
-			'button-inside' === $attributes['buttonPosition'];
+		if ( is_array( $border_radius ) ) {
+			// Add shared styles for individual border radii for input & button.
+			$shared_styles[] = sprintf( 'border-top-left-radius: %s;', esc_attr( $border_radius['topLeft'] ) );
+			$shared_styles[] = sprintf( 'border-top-right-radius: %s;', esc_attr( $border_radius['topRight'] ) );
+			$shared_styles[] = sprintf( 'border-bottom-left-radius: %s;', esc_attr( $border_radius['bottomLeft'] ) );
+			$shared_styles[] = sprintf( 'border-bottom-right-radius: %s;', esc_attr( $border_radius['bottomRight'] ) );
 
-		if ( $button_inside ) {
-			// We adjust the border radius value for the outer wrapper element
-			// to make it visually consistent with the radius applied to inner
-			// elements. calc() is used to support non-pixel CSS units.
-			$default_padding  = '4px';
-			$wrapper_styles[] = sprintf(
-				'border-radius: calc(%s + %s);',
-				esc_attr( $border_radius ),
-				esc_attr( $default_padding )
-			);
+			// Add adjusted border radius styles for the wrapper element.
+			$wrapper_styles[] = get_wrapper_radius_style( 'border-top-left-radius', $border_radius['topLeft'] );
+			$wrapper_styles[] = get_wrapper_radius_style( 'border-top-right-radius', $border_radius['topRight'] );
+			$wrapper_styles[] = get_wrapper_radius_style( 'border-bottom-left-radius', $border_radius['bottomLeft'] );
+			$wrapper_styles[] = get_wrapper_radius_style( 'border-bottom-right-radius', $border_radius['bottomRight'] );
+		} else {
+			$border_radius   = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
+			$shared_styles[] = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
+
+			// Apply wrapper border radius if button placed inside.
+			$button_inside = ! empty( $attributes['buttonPosition'] ) &&
+				'button-inside' === $attributes['buttonPosition'];
+
+			if ( $button_inside ) {
+				$wrapper_styles[] = get_wrapper_radius_style( 'border-radius', $border_radius );
+			}
 		}
 	}
 
