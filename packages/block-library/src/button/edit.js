@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useState, useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	Button,
 	ButtonGroup,
@@ -22,6 +23,7 @@ import {
 	InspectorControls,
 	InspectorAdvancedControls,
 	RichText,
+	store as blockEditorStore,
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalLinkControl as LinkControl,
@@ -66,7 +68,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 }
 
 function URLPicker( {
-	isSelected,
+	mayOpen,
 	url,
 	setAttributes,
 	opensInNewTab,
@@ -75,7 +77,6 @@ function URLPicker( {
 } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const urlIsSet = !! url;
-	const urlIsSetandSelected = urlIsSet && isSelected;
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
 		return false; // prevents default behaviour for event
@@ -88,7 +89,7 @@ function URLPicker( {
 		} );
 		setIsURLPickerOpen( false );
 	};
-	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
+	const linkControl = ( isURLPickerOpen || urlIsSet ) && mayOpen && (
 		<Popover
 			position="bottom center"
 			onClose={ () => setIsURLPickerOpen( false ) }
@@ -122,7 +123,7 @@ function URLPicker( {
 						onClick={ openLinkControl }
 					/>
 				) }
-				{ urlIsSetandSelected && (
+				{ urlIsSet && (
 					<ToolbarButton
 						name="link"
 						icon={ linkOff }
@@ -133,7 +134,7 @@ function URLPicker( {
 					/>
 				) }
 			</BlockControls>
-			{ isSelected && (
+			{ mayOpen && (
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
@@ -152,6 +153,7 @@ function ButtonEdit( props ) {
 		attributes,
 		setAttributes,
 		className,
+		clientId,
 		isSelected,
 		onReplace,
 		mergeBlocks,
@@ -195,6 +197,14 @@ function ButtonEdit( props ) {
 		// Remove anchor tags from button text content.
 		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
 	};
+
+	const isVisualEditMode = useSelect( ( select ) => {
+		const store = select( blockEditorStore );
+		return (
+			'visual' === store.getBlockMode( clientId ) &&
+			! store.isNavigationMode()
+		);
+	}, [] );
 
 	const borderRadius = style?.border?.radius;
 	const colorProps = useColorProps( attributes );
@@ -242,7 +252,7 @@ function ButtonEdit( props ) {
 			<URLPicker
 				url={ url }
 				setAttributes={ setAttributes }
-				isSelected={ isSelected }
+				mayOpen={ isVisualEditMode && isSelected }
 				opensInNewTab={ linkTarget === '_blank' }
 				onToggleOpenInNewTab={ onToggleOpenInNewTab }
 				anchorRef={ ref }
