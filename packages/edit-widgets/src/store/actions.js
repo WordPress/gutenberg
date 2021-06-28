@@ -148,13 +148,15 @@ export function* saveWidgetArea( widgetAreaId ) {
 		const widgetId = getWidgetIdFromBlock( block );
 		const oldWidget = widgets[ widgetId ];
 		const widget = transformBlockToWidget( block, oldWidget );
+
 		// We'll replace the null widgetId after save, but we track it here
 		// since order is important.
 		sidebarWidgetsIds.push( widgetId );
 
-		// We need to check for the id in the widget object here, because a deleted
-		// and restored widget won't have this id.
-		if ( widget.id ) {
+		// Check oldWidget as widgetId might refer to an ID which has been
+		// deleted, e.g. if a deleted block is restored via undo after saving.
+		if ( oldWidget ) {
+			// Update an existing widget.
 			yield dispatch(
 				'core',
 				'editEntityRecord',
@@ -184,6 +186,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 				saveEditedEntityRecord( 'root', 'widget', widgetId )
 			);
 		} else {
+			// Create a new widget.
 			batchTasks.push( ( { saveEntityRecord } ) =>
 				saveEntityRecord( 'root', 'widget', {
 					...widget,
