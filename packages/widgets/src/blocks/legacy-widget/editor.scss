@@ -1,5 +1,7 @@
 .wp-block-legacy-widget__edit-form {
-	display: flow-root;
+	&:not([hidden]) {
+		display: flow-root;
+	}
 	background: $white;
 	border-radius: $radius-block-ui;
 	border: 1px solid $gray-900;
