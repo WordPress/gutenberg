@@ -118,7 +118,7 @@ export default function PostTemplateEdit( {
 				postId: post.id,
 				queryId,
 			} ) ),
-		[ posts ]
+		[ posts, queryId ]
 	);
 	const hasLayoutFlex = layoutType === 'flex' && columns > 1;
 	const blockProps = useBlockProps( {
