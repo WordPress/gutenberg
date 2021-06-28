@@ -1,7 +1,7 @@
 /**
- * Performs log in with specified username and password.
+ * Get the username of the user that's currently logged into WordPress (if any).
  *
- * @return {string} username The user that's currently logged into WordPress (if any).
+ * @return {string?} username The user that's currently logged into WordPress (if any).
  */
 export async function getCurrentUser() {
 	const cookies = await page.cookies();
