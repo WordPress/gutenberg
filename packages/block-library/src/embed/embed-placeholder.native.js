@@ -24,9 +24,7 @@ const EmbedPlaceholder = ( {
 	onSubmit,
 	onChange,
 } ) => {
-	const [ isBottomSheetVisible, setIsBottomSheetVisible ] = useState(
-		! value
-	);
+	const [ isEmbedSheeVisible, setIsEmbedSheetVisible ] = useState( ! value );
 
 	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
 		styles.emptyStateContainer,
@@ -48,7 +46,7 @@ const EmbedPlaceholder = ( {
 					accessibilityHint={ __( 'Double tap to add a link.' ) }
 					onPress={ ( event ) => {
 						onFocus( event );
-						setIsBottomSheetVisible( true );
+						setIsEmbedSheetVisible( true );
 					} }
 				>
 					<View style={ emptyStateContainerStyle }>
@@ -62,9 +60,9 @@ const EmbedPlaceholder = ( {
 			) }
 			<EmbedBottomSheet
 				value={ value }
-				isVisible={ isBottomSheetVisible }
-				onClose={ ( { url } ) => {
-					setIsBottomSheetVisible( false );
+				isVisible={ isEmbedSheeVisible }
+				onClose={ () => setIsEmbedSheetVisible( false ) }
+				onSetAttributes={ ( { url } ) => {
 					onChange( { target: { value: url } } );
 					onSubmit();
 				} }

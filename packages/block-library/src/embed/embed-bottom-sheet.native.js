@@ -6,7 +6,6 @@ import {
 	LinkSettingsNavigation,
 	FooterMessageLink,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 import { isURL } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -29,25 +28,25 @@ const linkSettingsOptions = {
 	},
 };
 
-const EmbedBottomSheet = ( { value, onClose, isVisible } ) => {
-	const [ url, setUrl ] = useState( value );
+const EmbedBottomSheet = ( { value, isVisible, onClose, onSetAttributes } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	function onCloseWithUrl() {
+	function setAttributes( attributes ) {
+		const { url } = attributes;
+
 		if ( isURL( url ) ) {
-			onClose( { url } );
-		} else {
+			onSetAttributes( attributes );
+		} else if ( url !== '' ) {
 			createErrorNotice( __( 'Invalid URL. Please enter a valid URL.' ) );
-			onClose( {} );
 		}
 	}
 
 	return (
 		<LinkSettingsNavigation
 			isVisible={ isVisible }
-			url={ url }
-			setAttributes={ ( attributes ) => setUrl( attributes.url ) }
-			onClose={ onCloseWithUrl }
+			url={ value }
+			setAttributes={ setAttributes }
+			onClose={ onClose }
 			options={ linkSettingsOptions }
 			withBottomSheet
 			showIcon
