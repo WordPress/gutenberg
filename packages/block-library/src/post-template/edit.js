@@ -41,7 +41,6 @@ export default function PostTemplateEdit( {
 			sticky,
 			inherit,
 		} = {},
-		queryId,
 		queryContext = [ { page: 1 } ],
 		templateSlug,
 		displayLayout: { type: layoutType = 'flex', columns = 1 } = {},
@@ -117,7 +116,7 @@ export default function PostTemplateEdit( {
 				postType: post.type,
 				postId: post.id,
 			} ) ),
-		[ posts, queryId ]
+		[ posts ]
 	);
 	const hasLayoutFlex = layoutType === 'flex' && columns > 1;
 	const blockProps = useBlockProps( {
