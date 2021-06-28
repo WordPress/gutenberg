@@ -1,20 +1,41 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { css } from '@emotion/css';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
  */
+import { space } from '../ui/utils/space';
 import CONFIG from '../utils/config-values';
 
-export const Divider = css`
+type Props = {
+	margin?: number;
+	marginTop?: number;
+	marginBottom?: number;
+};
+
+const renderMargin = ( { margin, marginTop, marginBottom }: Props ) => {
+	if ( typeof margin !== 'undefined' ) {
+		return css( {
+			marginBottom: space( margin ),
+			marginTop: space( margin ),
+		} );
+	}
+
+	return css( {
+		marginTop,
+		marginBottom,
+	} );
+};
+
+export const StyledHorizontalRule = styled.hr< Props >`
 	border-color: ${ CONFIG.colorDivider };
 	border-width: 0 0 1px 0;
 	height: 0;
 	margin: 0;
 	width: auto;
+
+	${ renderMargin }
 `;
