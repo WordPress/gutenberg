@@ -15,12 +15,14 @@ import { useCallback, useMemo } from '@wordpress/element';
  */
 import ColorPicker from '../color-picker';
 import CircularOptionPicker from '../circular-option-picker';
+import { rgba } from '../utils';
 
 export default function ColorPalette( {
 	clearable = true,
 	className,
 	colors,
 	disableCustomColors = false,
+	disableAlpha = true,
 	onChange,
 	value,
 } ) {
@@ -61,8 +63,12 @@ export default function ColorPalette( {
 	const renderCustomColorPicker = () => (
 		<ColorPicker
 			color={ value }
-			onChangeComplete={ ( color ) => onChange( color.hex ) }
-			disableAlpha
+			onChangeComplete={ ( color ) =>
+				onChange(
+					disableAlpha ? color.hex : rgba( color.hex, color.rgb.a )
+				)
+			}
+			disableAlpha={ disableAlpha }
 		/>
 	);
 

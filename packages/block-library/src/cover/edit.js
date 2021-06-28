@@ -399,8 +399,15 @@ function CoverEdit( {
 			: {
 					backgroundImage: gradientValue ? gradientValue : undefined,
 			  } ),
-		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
+	};
+
+	const gradientStyle = {
+		background: gradientValue,
+	};
+
+	const backgroundStyle = {
+		backgroundColor: overlayColor.color,
 	};
 
 	const mediaStyle = {
@@ -512,49 +519,50 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelBody title={ __( 'Dimensions' ) }>
-					<CoverHeightInput
-						value={ temporaryMinHeight || minHeight }
-						unit={ minHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
-						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
-								minHeightUnit: nextUnit,
-							} )
-						}
-					/>
-				</PanelBody>
-				<PanelColorGradientSettings
-					title={ __( 'Overlay' ) }
-					initialOpen={ true }
-					settings={ [
-						{
-							colorValue: overlayColor.color,
-							gradientValue,
-							onColorChange: setOverlayColor,
-							onGradientChange: setGradient,
-							label: __( 'Color' ),
-						},
-					] }
-				>
-					{ !! url && (
-						<RangeControl
-							label={ __( 'Opacity' ) }
-							value={ dimRatio }
-							onChange={ ( newDimRation ) =>
-								setAttributes( {
-									dimRatio: newDimRation,
-								} )
-							}
-							min={ 0 }
-							max={ 100 }
-							step={ 10 }
-							required
-						/>
-					) }
-				</PanelColorGradientSettings>
+				{ hasBackground && (
+					<>
+						<PanelBody title={ __( 'Dimensions' ) }>
+							<CoverHeightInput
+								value={ temporaryMinHeight || minHeight }
+								unit={ minHeightUnit }
+								onChange={ ( newMinHeight ) =>
+									setAttributes( { minHeight: newMinHeight } )
+								}
+								onUnitChange={ ( nextUnit ) => {
+									setAttributes( {
+										minHeightUnit: nextUnit,
+									} );
+								} }
+							/>
+						</PanelBody>
+						<PanelColorGradientSettings
+							title={ __( 'Overlay' ) }
+							initialOpen={ true }
+							settings={ [
+								{
+									colorValue: overlayColor.color,
+									gradientValue,
+									onColorChange: setOverlayColor,
+									onGradientChange: setGradient,
+									label: __( 'Color' ),
+								},
+							] }
+						>
+							<RangeControl
+								label={ __( 'Opacity' ) }
+								value={ dimRatio }
+								onChange={ ( newDimRation ) =>
+									setAttributes( {
+										dimRatio: newDimRation,
+									} )
+								}
+								min={ 0 }
+								max={ 100 }
+								required
+							/>
+						</PanelColorGradientSettings>
+					</>
+				) }
 			</InspectorControls>
 		</>
 	);
@@ -646,14 +654,24 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-				{ url && gradientValue && dimRatio !== 0 && (
+				{ overlayColor.color && ! gradientValue && dimRatio !== 0 && (
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__background',
+							classes
+						) }
+						style={ backgroundStyle }
+					/>
+				) }
+				{ gradientValue && ! overlayColor.color && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
 						className={ classnames(
 							'wp-block-cover__gradient-background',
-							gradientClass
+							classes
 						) }
-						style={ { backgroundImage: gradientValue } }
+						style={ gradientStyle }
 					/>
 				) }
 				{ url && isImageBackground && isImgElement && (
