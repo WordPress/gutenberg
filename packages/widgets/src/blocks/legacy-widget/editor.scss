@@ -21,8 +21,13 @@
 		display: block;
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 
+		p {
+			margin: $grid-unit-10 0;
+		}
+
 		label {
 			font-size: $default-font-size;
+			line-height: $default-line-height * 1.5;
 		}
 
 		// Override theme style bleed.
@@ -50,6 +55,11 @@
 			height: 30px;
 			line-height: 1;
 			min-height: 30px;
+		}
+		input[type="text"] {
+			padding-left: $grid-unit-10;
+		}
+		select {
 			padding-left: $grid-unit-05;
 		}
 	}
