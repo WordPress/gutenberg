@@ -69,7 +69,7 @@ describe( 'Image', () => {
 		await waitForImage( filename );
 
 		const regex = new RegExp(
-			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
+			`<!-- wp:image {"id":\\d+,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
@@ -80,7 +80,7 @@ describe( 'Image', () => {
 		await waitForImage( filename1 );
 
 		const regex1 = new RegExp(
-			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
+			`<!-- wp:image {"id":\\d+,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex1 );
 
@@ -88,7 +88,7 @@ describe( 'Image', () => {
 		await page.click( '[aria-label="Image size presets"] button' );
 
 		const regex2 = new RegExp(
-			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large is-resized"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`
+			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full is-resized"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`
 		);
 
 		expect( await getEditedPostContent() ).toMatch( regex2 );
@@ -100,7 +100,7 @@ describe( 'Image', () => {
 		await waitForImage( filename2 );
 
 		const regex3 = new RegExp(
-			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename2 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
+			`<!-- wp:image {"id":\\d+,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename2 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
 
@@ -110,7 +110,7 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
-	it( 'should place caret at end of caption after merging empty paragraph', async () => {
+	it.skip( 'should place caret at end of caption after merging empty paragraph', async () => {
 		await insertBlock( 'Image' );
 		const fileName = await upload( '.wp-block-image input[type="file"]' );
 		await waitForImage( fileName );
@@ -322,7 +322,7 @@ describe( 'Image', () => {
 		);
 
 		const regexBefore = new RegExp(
-			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large is-resized"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`
+			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full is-resized"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`
 		);
 
 		// Check if dimensions are changed.

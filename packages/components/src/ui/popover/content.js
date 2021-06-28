@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+import { css, cx } from '@emotion/css';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as ReakitPopover } from 'reakit';
 
 /**
  * Internal dependencies
  */
-import { Card } from '../card';
+import { Card } from '../../card';
 import { View } from '../../view';
 import { usePopoverContext } from './context';
 import * as styles from './styles';
@@ -60,4 +60,9 @@ function PopoverContent( props, forwardedRef ) {
 	);
 }
 
-export default contextConnect( PopoverContent, 'PopoverContent' );
+const ConnectedPopoverContent = contextConnect(
+	PopoverContent,
+	'PopoverContent'
+);
+
+export default ConnectedPopoverContent;

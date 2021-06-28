@@ -296,7 +296,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .mediaFilesCollectionBlock: true,
             .isAudioBlockMediaUploadEnabled: true,
             .reusableBlock: false,
-            .canViewEditorOnboarding: false
+            .editorOnboarding: false
         ]
     }
 

@@ -5,7 +5,7 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -12,11 +12,11 @@
+@@ -11,11 +11,11 @@
       "-webkit-justify-content": "space-between",
       "-webkit-transition": "border-color 100ms ease",
       "align-items": "center",
@@ -25,7 +25,7 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -15,18 +15,17 @@
+@@ -14,19 +14,18 @@
       "background": "#fff",
       "border": "1px solid",
       "border-color": "#757575",
@@ -45,6 +45,7 @@ Snapshot Diff:
 -     "width": "auto",
 +     "width": "100%",
     },
+    Object {},
   ]
 `;
 
@@ -53,7 +54,7 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -11,11 +11,10 @@
+@@ -10,11 +10,10 @@
       "-webkit-flex-direction": "row",
       "-webkit-justify-content": "space-between",
       "-webkit-transition": "border-color 100ms ease",
@@ -82,7 +83,6 @@ exports[`base field should render correctly 1`] = `
   flex-direction: row;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
   justify-content: space-between;
   width: 100%;
   background: #fff;
@@ -106,17 +106,16 @@ exports[`base field should render correctly 1`] = `
   width: 100%;
 }
 
-.emotion-0 > * + *:not(marquee) {
+.emotion-0>*+*:not(marquee) {
   margin-left: calc(4px * 2);
 }
 
-.emotion-0 > * {
+.emotion-0>* {
   min-width: 0;
 }
 
-@media ( prefers-reduced-motion:reduce ) {
+@media ( prefers-reduced-motion: reduce ) {
   .emotion-0 {
-    -webkit-transition-duration: 0ms;
     transition-duration: 0ms;
   }
 }
@@ -131,7 +130,7 @@ exports[`base field should render correctly 1`] = `
 
 .emotion-0:focus,
 .emotion-0[data-focused='true'] {
-  border-color: var( --wp-admin-theme-color,#00669b);
+  border-color: var( --wp-admin-theme-color, #00669b);
   box-shadow: 0 0 0,0.5px,[object Object];
 }
 

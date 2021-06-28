@@ -188,10 +188,37 @@ function register_site_icon_url( $response ) {
 
 add_filter( 'rest_index', 'register_site_icon_url' );
 
+/**
+ * Exposes the site logo to the Gutenberg editor through the WordPress REST
+ * API. This is used for fetching this information when user has no rights
+ * to update settings.
+ *
+ * @since 10.9
+ *
+ * @param WP_REST_Response $response Response data served by the WordPress REST index endpoint.
+ * @return WP_REST_Response
+ */
+function register_site_logo_to_rest_index( $response ) {
+	$site_logo_id                = get_theme_mod( 'custom_logo' );
+	$response->data['site_logo'] = $site_logo_id;
+	if ( $site_logo_id ) {
+		$response->add_link(
+			'https://api.w.org/featuredmedia',
+			rest_url( 'wp/v2/media/' . $site_logo_id ),
+			array(
+				'embeddable' => true,
+			)
+		);
+	}
+	return $response;
+}
+
+add_filter( 'rest_index', 'register_site_logo_to_rest_index' );
+
 add_theme_support( 'widgets-block-editor' );
 
 /**
- * Enable the block templates (editor mode) for themes with theme.json.
+ * Enable block templates (editor mode) for themes with theme.json.
  */
 function gutenberg_enable_block_templates() {
 	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {

@@ -9,13 +9,22 @@ import {
 	trashAllPosts,
 	openPreviewPage,
 	openDocumentSettingsSidebar,
+	activatePlugin,
+	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
 
 const openSidebarPanelWithTitle = async ( title ) => {
 	const panel = await page.waitForXPath(
 		`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ title }")]`
 	);
-	await panel.click();
+
+	const expanded = await page.evaluate(
+		( element ) => element.getAttribute( 'aria-expanded' ),
+		panel
+	);
+	if ( expanded === 'false' ) {
+		await panel.click();
+	}
 };
 
 const disableTemplateWelcomeGuide = async () => {
@@ -82,12 +91,14 @@ const createNewTemplate = async ( templateName ) => {
 
 describe( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-block-templates' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
+		await deactivatePlugin( 'gutenberg-test-block-templates' );
 	} );
 
 	it( 'Allow to switch to template mode, edit the template and check the result', async () => {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+import { css, cx } from '@emotion/css';
 // eslint-disable-next-line no-restricted-imports
 import type { Ref, ReactNode } from 'react';
 
