@@ -156,8 +156,8 @@ function InsertionPointPopover( {
 		if ( isRTL() ) {
 			return {
 				top: previousRect ? previousRect.top : nextRect.top,
-				left: nextRect ? nextRect.left : previousRect.right,
-				right: previousRect ? previousRect.right : nextRect.left,
+				left: previousRect ? previousRect.left : nextRect.right,
+				right: nextRect ? nextRect.right : previousRect.left,
 				bottom: previousRect ? previousRect.bottom : nextRect.bottom,
 				ownerDocument,
 			};
