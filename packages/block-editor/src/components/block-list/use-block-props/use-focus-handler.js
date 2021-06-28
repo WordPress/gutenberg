@@ -17,7 +17,7 @@ import { store as blockEditorStore } from '../../../store';
  */
 export function useFocusHandler( clientId ) {
 	const { isBlockSelected } = useSelect( blockEditorStore );
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
@@ -33,6 +33,10 @@ export function useFocusHandler( clientId ) {
 				// Check synchronously because a non-selected block might be
 				// getting data through `useSelect` asynchronously.
 				if ( isBlockSelected( clientId ) ) {
+					// Potentially change selection away from rich text.
+					if ( ! event.target.isContentEditable ) {
+						selectionChange( clientId );
+					}
 					return;
 				}
 

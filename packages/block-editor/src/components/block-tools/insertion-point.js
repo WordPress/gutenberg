@@ -23,16 +23,19 @@ import { isRTL } from '@wordpress/i18n';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { usePopoverScroll } from './use-popover-scroll';
 
 export const InsertionPointOpenRef = createContext();
 
-function InsertionPointPopover() {
+function InsertionPointPopover( {
+	__unstablePopoverSlot,
+	__unstableContentRef,
+} ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
 	const {
 		orientation,
-		isHidden,
 		previousClientId,
 		nextClientId,
 		rootClientId,
@@ -41,47 +44,36 @@ function InsertionPointPopover() {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
-			getMultiSelectedBlockClientIds,
-			getSelectedBlockClientId,
-			hasMultiSelection,
-			getSettings,
 			getBlockInsertionPoint,
+			isBlockBeingDragged,
+			getPreviousBlockClientId,
+			getNextBlockClientId,
 		} = select( blockEditorStore );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
-		const targetClientId = order[ insertionPoint.index - 1 ];
-		const targetRootClientId = insertionPoint.rootClientId;
-		const blockOrder = getBlockOrder( targetRootClientId );
-		if ( ! blockOrder.length ) {
+
+		if ( ! order.length ) {
 			return {};
 		}
-		const previous = targetClientId
-			? targetClientId
-			: blockOrder[ blockOrder.length - 1 ];
-		const isLast = previous === blockOrder[ blockOrder.length - 1 ];
-		const next = isLast
-			? null
-			: blockOrder[ blockOrder.indexOf( previous ) + 1 ];
-		const { hasReducedUI } = getSettings();
-		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const blockOrientation =
-			getBlockListSettings( targetRootClientId )?.orientation ||
-			'vertical';
+
+		let _previousClientId = order[ insertionPoint.index - 1 ];
+		let _nextClientId = order[ insertionPoint.index ];
+
+		while ( isBlockBeingDragged( _previousClientId ) ) {
+			_previousClientId = getPreviousBlockClientId( _previousClientId );
+		}
+
+		while ( isBlockBeingDragged( _nextClientId ) ) {
+			_nextClientId = getNextBlockClientId( _nextClientId );
+		}
 
 		return {
-			previousClientId: previous,
-			nextClientId: next,
-			isHidden:
-				hasReducedUI ||
-				( hasMultiSelection()
-					? next && multiSelectedBlockClientIds.includes( next )
-					: next &&
-					  blockOrientation === 'vertical' &&
-					  next === selectedBlockClientId ),
-			orientation: blockOrientation,
-			clientId: targetClientId,
-			rootClientId: targetRootClientId,
+			previousClientId: _previousClientId,
+			nextClientId: _nextClientId,
+			orientation:
+				getBlockListSettings( insertionPoint.rootClientId )
+					?.orientation || 'vertical',
+			rootClientId: insertionPoint.rootClientId,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
@@ -117,6 +109,7 @@ function InsertionPointPopover() {
 	}, [ previousElement, nextElement ] );
 
 	const getAnchorRect = useCallback( () => {
+		const { ownerDocument } = previousElement;
 		const previousRect = previousElement.getBoundingClientRect();
 		const nextRect = nextElement
 			? nextElement.getBoundingClientRect()
@@ -128,6 +121,7 @@ function InsertionPointPopover() {
 					left: previousRect.right,
 					right: previousRect.left,
 					bottom: nextRect ? nextRect.top : previousRect.bottom,
+					ownerDocument,
 				};
 			}
 
@@ -136,6 +130,7 @@ function InsertionPointPopover() {
 				left: previousRect.left,
 				right: previousRect.right,
 				bottom: nextRect ? nextRect.top : previousRect.bottom,
+				ownerDocument,
 			};
 		}
 
@@ -145,6 +140,7 @@ function InsertionPointPopover() {
 				left: nextRect ? nextRect.right : previousRect.left,
 				right: previousRect.left,
 				bottom: previousRect.bottom,
+				ownerDocument,
 			};
 		}
 
@@ -153,8 +149,11 @@ function InsertionPointPopover() {
 			left: previousRect.right,
 			right: nextRect ? nextRect.left : previousRect.right,
 			bottom: previousRect.bottom,
+			ownerDocument,
 		};
 	}, [ previousElement, nextElement ] );
+
+	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
 	if ( ! previousElement ) {
 		return null;
@@ -182,14 +181,7 @@ function InsertionPointPopover() {
 	// Only show the inserter when there's a `nextElement` (a block after the
 	// insertion point). At the end of the block list the trailing appender
 	// should serve the purpose of inserting blocks.
-	const showInsertionPointInserter =
-		! isHidden && nextElement && isInserterShown;
-
-	// Show the indicator if the insertion point inserter is visible, or if
-	// the `showInsertionPoint` state is `true`. The latter is generally true
-	// when hovering blocks for insertion in the block library.
-	const showInsertionPointIndicator =
-		showInsertionPointInserter || ! isHidden;
+	const showInsertionPointInserter = nextElement && isInserterShown;
 
 	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the
@@ -200,12 +192,15 @@ function InsertionPointPopover() {
 	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 	return (
 		<Popover
+			ref={ popoverScrollRef }
 			noArrow
 			animate={ false }
 			getAnchorRect={ getAnchorRect }
 			focusOnMount={ false }
 			className="block-editor-block-list__insertion-point-popover"
-			__unstableSlotName="block-toolbar"
+			// Render in the old slot if needed for backward compatibility,
+			// otherwise render in place (not in the the default popover slot).
+			__unstableSlotName={ __unstablePopoverSlot || null }
 		>
 			<div
 				ref={ ref }
@@ -217,9 +212,7 @@ function InsertionPointPopover() {
 				} ) }
 				style={ style }
 			>
-				{ showInsertionPointIndicator && (
-					<div className="block-editor-block-list__insertion-point-indicator" />
-				) }
+				<div className="block-editor-block-list__insertion-point-indicator" />
 				{ showInsertionPointInserter && (
 					<div
 						className={ classnames(
@@ -246,18 +239,23 @@ function InsertionPointPopover() {
 	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
-export default function InsertionPoint( { children } ) {
+export default function InsertionPoint( {
+	children,
+	__unstablePopoverSlot,
+	__unstableContentRef,
+} ) {
 	const isVisible = useSelect( ( select ) => {
-		const { isMultiSelecting, isBlockInsertionPointVisible } = select(
-			blockEditorStore
-		);
-
-		return isBlockInsertionPointVisible() && ! isMultiSelecting();
+		return select( blockEditorStore ).isBlockInsertionPointVisible();
 	}, [] );
 
 	return (
 		<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-			{ isVisible && <InsertionPointPopover /> }
+			{ isVisible && (
+				<InsertionPointPopover
+					__unstablePopoverSlot={ __unstablePopoverSlot }
+					__unstableContentRef={ __unstableContentRef }
+				/>
+			) }
 			{ children }
 		</InsertionPointOpenRef.Provider>
 	);

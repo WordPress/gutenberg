@@ -18,6 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 import {
 	BlockEditorProvider,
 	BlockList,
+	BlockTools,
 	WritingFlow,
 	ObserveTyping,
 } from '@wordpress/block-editor';
@@ -34,12 +35,13 @@ function MyEditorComponent() {
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
 			<SlotFillProvider>
-				<Popover.Slot name="block-toolbar" />
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList />
-					</ObserveTyping>
-				</WritingFlow>
+				<BlockTools>
+					<WritingFlow>
+						<ObserveTyping>
+							<BlockList />
+						</ObserveTyping>
+					</WritingFlow>
+				</BlockTools>
 				<Popover.Slot />
 			</SlotFillProvider>
 		</BlockEditorProvider>
@@ -57,7 +59,7 @@ Inside `BlockEditorProvider`, you can nest any of the available `@wordpress/bloc
 
 In the example above we're rendering the `BlockList` to show and edit the block list. For instance we could add a custom sidebar and use the `BlockInspector` component to be able to edit the advanced settings for the currently selected block. (See the [API](#API) for the list of all the available components).
 
-The `Popover.Slot` with the `name="block-toolbar"` prop is used to render the toolbar for a selected block.
+The `BlockTools` component is used to render the toolbar for a selected block.
 
 In the example above, there's no registered block type, in order to use the block editor successfully make sure to register some block types. For instance, registering the core block types can be done like so:
 
@@ -101,6 +103,11 @@ Undocumented declaration.
 <a name="BlockBreadcrumb" href="#BlockBreadcrumb">#</a> **BlockBreadcrumb**
 
 Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
 
 _Returns_
 
@@ -226,6 +233,18 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="BlockTools" href="#BlockTools">#</a> **BlockTools**
+
+Renders block tools (the block toolbar, select/navigation mode toolbar, the
+insertion point and a slot for the inline rich text toolbar). Must be wrapped
+around the block content and editor styles wrapper or iframe.
+
+_Parameters_
+
+-   _$0_ `Object`: Props.
+-   _$0.children_ `Object`: The block content and style container.
+-   _$0.\_\_unstableContentRef_ `Object`: Ref holding the content scroll container.
+
 <a name="BlockVerticalAlignmentControl" href="#BlockVerticalAlignmentControl">#</a> **BlockVerticalAlignmentControl**
 
 Undocumented declaration.
@@ -234,11 +253,17 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-<a name="ButtonBlockerAppender" href="#ButtonBlockerAppender">#</a> **ButtonBlockerAppender**
+<a name="ButtonBlockAppender" href="#ButtonBlockAppender">#</a> **ButtonBlockAppender**
 
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md>
+
+<a name="ButtonBlockerAppender" href="#ButtonBlockerAppender">#</a> **ButtonBlockerAppender**
+
+> **Deprecated** 
+
+Use `ButtonBlockAppender` instead.
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
 
@@ -541,7 +566,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
 
@@ -553,7 +578,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
 
@@ -639,6 +664,25 @@ _Parameters_
 _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
+
+<a name="useSetting" href="#useSetting">#</a> **useSetting**
+
+Hook that retrieves the editor setting.
+It works with nested objects using by finding the value at path.
+
+_Usage_
+
+```js
+const isEnabled = useSetting( 'typography.dropCap' );
+```
+
+_Parameters_
+
+-   _path_ `string`: The path to the setting.
+
+_Returns_
+
+-   `any`: Returns the value defined for the setting.
 
 <a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
 

@@ -23,7 +23,7 @@ import InserterDraggableBlocks from '../inserter-draggable-blocks';
 /**
  * Return true if platform is MacOS.
  *
- * @param {Object} _window   window object by default; used for DI testing.
+ * @param {Object} _window window object by default; used for DI testing.
  *
  * @return {boolean} True if MacOS; false otherwise.
  */

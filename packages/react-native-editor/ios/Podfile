@@ -2,52 +2,44 @@ project 'GutenbergDemo.xcodeproj'
 
 # Uncomment the next line to define a global platform for your project
 platform :ios, '13.0'
+require_relative '../../../node_modules/react-native/scripts/react_native_pods'
 require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'GutenbergDemo' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for gutenberg
-  pod 'FBLazyVector', :path => "../../../node_modules/react-native/Libraries/FBLazyVector"
-  pod 'FBReactNativeSpec', :path => "../../../node_modules/react-native/Libraries/FBReactNativeSpec"
-  pod 'RCTRequired', :path => "../../../node_modules/react-native/Libraries/RCTRequired"
-  pod 'RCTTypeSafety', :path => "../../../node_modules/react-native/Libraries/TypeSafety"
-  pod 'React', :path => '../../../node_modules/react-native/'
-  pod 'React-Core', :path => '../../../node_modules/react-native/'
-  pod 'React-CoreModules', :path => '../../../node_modules/react-native/React/CoreModules'
-  pod 'React-Core/DevSupport', :path => '../../../node_modules/react-native/'
-  pod 'React-RCTActionSheet', :path => '../../../node_modules/react-native/Libraries/ActionSheetIOS'
-  pod 'React-RCTAnimation', :path => '../../../node_modules/react-native/Libraries/NativeAnimation'
-  pod 'React-RCTBlob', :path => '../../../node_modules/react-native/Libraries/Blob'
-  pod 'React-RCTImage', :path => '../../../node_modules/react-native/Libraries/Image'
-  pod 'React-RCTLinking', :path => '../../../node_modules/react-native/Libraries/LinkingIOS'
-  pod 'React-RCTNetwork', :path => '../../../node_modules/react-native/Libraries/Network'
-  pod 'React-RCTSettings', :path => '../../../node_modules/react-native/Libraries/Settings'
-  pod 'React-RCTText', :path => '../../../node_modules/react-native/Libraries/Text'
-  pod 'React-RCTVibration', :path => '../../../node_modules/react-native/Libraries/Vibration'
-  pod 'React-Core/RCTWebSocket', :path => '../../../node_modules/react-native/'
-  pod 'React-cxxreact', :path => '../../../node_modules/react-native/ReactCommon/cxxreact'
-  pod 'React-jsi', :path => '../../../node_modules/react-native/ReactCommon/jsi'
-  pod 'React-jsiexecutor', :path => '../../../node_modules/react-native/ReactCommon/jsiexecutor'
-  pod 'React-jsinspector', :path => '../../../node_modules/react-native/ReactCommon/jsinspector'
-  pod 'ReactCommon/jscallinvoker', :path => "../../../node_modules/react-native/ReactCommon"
-  pod 'ReactCommon/turbomodule/core', :path => "../../../node_modules/react-native/ReactCommon"
-  pod 'Yoga', :path => '../../../node_modules/react-native/ReactCommon/yoga'
-  pod 'DoubleConversion', :podspec => '../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
-  pod 'glog', :podspec => '../../../node_modules/react-native/third-party-podspecs/glog.podspec'
-  pod 'Folly', :podspec => '../../../node_modules/react-native/third-party-podspecs/Folly.podspec'
-  pod 'RNTAztecView', :path => '../../react-native-aztec/RNTAztecView.podspec'
-  #Use for testing non official versions of Aztec
-  # pod 'WordPress-Aztec-iOS', :git => 'https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git', :commit => '9187001a9c6dc84c211937b1b5a2af2a8b8d54a9'
-  pod 'Gutenberg', :path => '../../react-native-bridge/Gutenberg.podspec'
-
-
+  config = use_native_modules!
+  use_react_native!(:path => "../../../node_modules/react-native")
 
   target 'GutenbergDemoTests' do
     inherit! :search_paths
     # Pods for testing
   end
 
-  use_native_modules!
+  ### Begin workaround for https://github.com/facebook/react-native/issues/31034
+  # Can be removed when this issue is resolved.
+  post_install do |installer|
+    
+    react_native_post_install(installer)
+    
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      end
+      
+      if (target.name&.eql?('FBReactNativeSpec'))
+        target.build_phases.each do |build_phase|
+          if (build_phase.respond_to?(:name) && build_phase.name.eql?('[CP-User] Generate Specs'))
+            ## Begin workaround for https://stackoverflow.com/questions/66627590/phasescriptexecution-error-in-react-native-app
+            # Can be removed when this issue is resolved.
+            build_phase.shell_script.prepend("unset npm_config_prefix \n") 
+            ## End workaround for https://stackoverflow.com/questions/66627590/phasescriptexecution-error-in-react-native-app
+            target.build_phases.move(build_phase, 0)
+          end
+        end
+      end
+    end
+  end
+  ### End workaround for https://github.com/facebook/react-native/issues/31034
 end

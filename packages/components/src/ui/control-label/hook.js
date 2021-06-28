@@ -1,18 +1,18 @@
 /**
  * External dependencies
  */
-import { cx } from 'emotion';
+import { cx } from '@emotion/css';
 
 /**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
 import { useFormGroupContextId } from '../form-group';
-import { useText } from '../text';
+import { useText } from '../../text';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'label'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'label'>} props
  */
 export function useControlLabel( props ) {
 	const {

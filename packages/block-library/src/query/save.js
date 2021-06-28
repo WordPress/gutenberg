@@ -3,10 +3,10 @@
  */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-export default function QuerySave() {
+export default function QuerySave( { attributes: { tagName: Tag = 'div' } } ) {
 	return (
-		<div { ...useBlockProps.save() }>
+		<Tag { ...useBlockProps.save() }>
 			<InnerBlocks.Content />
-		</div>
+		</Tag>
 	);
 }

@@ -17,7 +17,7 @@ A very simple block theme is structured like so:
 ```
 theme
 |__ style.css
-|__ experimental-theme.json
+|__ theme.json
 |__ functions.php
 |__ block-templates
     |__ index.html
@@ -31,7 +31,7 @@ theme
     |__ ...
 ```
 
-The difference with existing WordPress themes is that the different templates in the template hierarchy, and template parts, are block templates instead of php files. In addition, this example includes an [`experimental-theme.json`](/docs/how-to-guides/themes/theme-json.md) file for some styles.
+The difference with existing WordPress themes is that the different templates in the template hierarchy, and template parts, are block templates instead of php files. In addition, this example includes a [`theme.json`](/docs/how-to-guides/themes/theme-json.md) file for some styles.
 
 ## What is a block template?
 

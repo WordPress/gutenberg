@@ -167,7 +167,7 @@ export function themeSupports( state = {}, action ) {
  *  - Editing
  *  - Saving
  *
- * @param {Object} entityConfig  Entity config.
+ * @param {Object} entityConfig Entity config.
  *
  * @return {Function} Reducer.
  */
@@ -197,6 +197,11 @@ function entity( entityConfig ) {
 			edits: ( state = {}, action ) => {
 				switch ( action.type ) {
 					case 'RECEIVE_ITEMS':
+						const context = action?.query?.context ?? 'default';
+						if ( context !== 'default' ) {
+							return state;
+						}
+
 						const nextState = { ...state };
 
 						for ( const record of action.items ) {
@@ -523,8 +528,8 @@ export function embedPreviews( state = {}, action ) {
  * State which tracks whether the user can perform an action on a REST
  * resource.
  *
- * @param  {Object} state  Current state.
- * @param  {Object} action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
@@ -543,8 +548,8 @@ export function userPermissions( state = {}, action ) {
 /**
  * Reducer returning autosaves keyed by their parent's post id.
  *
- * @param  {Object} state  Current state.
- * @param  {Object} action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */

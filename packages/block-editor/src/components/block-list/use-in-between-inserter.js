@@ -14,12 +14,17 @@ import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
+	const hasReducedUI = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().hasReducedUI,
+		[]
+	);
 	const {
 		getBlockListSettings,
 		getBlockRootClientId,
 		getBlockIndex,
 		isBlockInsertionPointVisible,
 		isMultiSelecting,
+		getSelectedBlockClientIds,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
 		blockEditorStore
@@ -27,6 +32,10 @@ export function useInBetweenInserter() {
 
 	return useRefEffect(
 		( node ) => {
+			if ( hasReducedUI ) {
+				return;
+			}
+
 			function onMouseMove( event ) {
 				if ( openRef.current ) {
 					return;
@@ -98,6 +107,12 @@ export function useInBetweenInserter() {
 					return;
 				}
 
+				// Don't show the inserter when hovering above (conflicts with
+				// block toolbar) or inside selected block(s).
+				if ( getSelectedBlockClientIds().includes( clientId ) ) {
+					return;
+				}
+
 				const elementRect = element.getBoundingClientRect();
 
 				if (
@@ -145,6 +160,7 @@ export function useInBetweenInserter() {
 			isMultiSelecting,
 			showInsertionPoint,
 			hideInsertionPoint,
+			getSelectedBlockClientIds,
 		]
 	);
 }

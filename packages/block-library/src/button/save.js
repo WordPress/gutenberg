@@ -38,7 +38,7 @@ export default function save( { attributes, className } ) {
 		}
 	);
 	const buttonStyle = {
-		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+		borderRadius: borderRadius ? borderRadius : undefined,
 		...colorProps.style,
 	};
 

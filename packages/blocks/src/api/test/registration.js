@@ -17,7 +17,6 @@ import { blockDefault as blockIcon } from '@wordpress/icons';
  */
 import {
 	registerBlockType,
-	registerBlockTypeFromMetadata,
 	registerBlockCollection,
 	unregisterBlockCollection,
 	unregisterBlockType,
@@ -801,12 +800,10 @@ describe( 'blocks', () => {
 				expect( block1.attributes ).not.toEqual( block2.attributes );
 			} );
 		} );
-	} );
 
-	describe( 'registerBlockTypeFromMetadata', () => {
 		test( 'registers block from metadata', () => {
 			const Edit = () => 'test';
-			const block = registerBlockTypeFromMetadata(
+			const block = registerBlockType(
 				{
 					name: 'test/block-from-metadata',
 					title: 'Block from metadata',
@@ -859,7 +856,7 @@ describe( 'blocks', () => {
 			);
 
 			const Edit = () => 'test';
-			const block = registerBlockTypeFromMetadata(
+			const block = registerBlockType(
 				{
 					name: 'test/block-from-metadata-i18n',
 					title: 'I18n title from metadata',

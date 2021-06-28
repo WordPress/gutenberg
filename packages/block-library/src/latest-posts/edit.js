@@ -52,6 +52,7 @@ const CATEGORIES_LIST_QUERY = {
 };
 const USERS_LIST_QUERY = {
 	per_page: -1,
+	has_published_posts: [ 'post' ],
 };
 
 export default function LatestPostsEdit( { attributes, setAttributes } ) {
@@ -229,6 +230,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		};
 	}, [] );
 
+	const hasPosts = !! latestPosts?.length;
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Post content settings' ) }>
@@ -412,7 +414,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		} ),
 	} );
 
-	const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 	if ( ! hasPosts ) {
 		return (
 			<div { ...blockProps }>

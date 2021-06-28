@@ -138,7 +138,7 @@ function gutenberg_menu_order( $menu_order ) {
  * @return bool Filtered decision about loading block assets.
  */
 function gutenberg_site_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
-	return ( is_callable( 'get_current_screen' ) && 'toplevel_page_gutenberg-edit-site' === get_current_screen()->base )
+	return ( is_callable( 'get_current_screen' ) && get_current_screen() && 'toplevel_page_gutenberg-edit-site' === get_current_screen()->base )
 		? true
 		: $is_block_editor_screen;
 }

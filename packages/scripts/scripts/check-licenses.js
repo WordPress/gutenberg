@@ -124,7 +124,7 @@ const licenseFileStrings = {
  * eg, "(MIT OR Zlib)".
  *
  * @param {string} allowedLicense The license that's allowed.
- * @param {string} licenseType The license string to check.
+ * @param {string} licenseType    The license string to check.
  *
  * @return {boolean} true if the licenseType matches the allowedLicense, false if it doesn't.
  */

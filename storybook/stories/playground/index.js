@@ -6,6 +6,7 @@ import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 	BlockList,
+	BlockTools,
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
@@ -37,15 +38,18 @@ function App() {
 					<div className="playground__sidebar">
 						<BlockInspector />
 					</div>
-					<div className="editor-styles-wrapper">
-						<Popover.Slot name="block-toolbar" />
-						<BlockEditorKeyboardShortcuts.Register />
-						<BlockEditorKeyboardShortcuts />
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
-						</WritingFlow>
+					<div className="playground__content">
+						<BlockTools>
+							<div className="editor-styles-wrapper">
+								<BlockEditorKeyboardShortcuts.Register />
+								<BlockEditorKeyboardShortcuts />
+								<WritingFlow>
+									<ObserveTyping>
+										<BlockList />
+									</ObserveTyping>
+								</WritingFlow>
+							</div>
+						</BlockTools>
 					</div>
 					<Popover.Slot />
 				</BlockEditorProvider>

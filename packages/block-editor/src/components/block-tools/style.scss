@@ -115,6 +115,7 @@
 
 .block-editor-block-contextual-toolbar {
 	// Block UI appearance.
+	display: inline-flex;
 	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 	background-color: $white;
@@ -122,6 +123,25 @@
 	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-right-color: $gray-900;
+	}
+
+	&.is-fixed {
+		position: sticky;
+		top: 0;
+		width: 100%;
+		z-index: z-index(".block-editor-block-list__block-popover");
+		// Fill up when empty
+		min-height: $block-toolbar-height;
+		display: block;
+
+		border: none;
+		border-bottom: $border-width solid $gray-200;
+		border-radius: 0;
+
+		.block-editor-block-toolbar .components-toolbar-group,
+		.block-editor-block-toolbar .components-toolbar {
+			border-right-color: $gray-200;
+		}
 	}
 
 	.block-editor-block-mover-button {
@@ -140,29 +160,23 @@
 }
 
 // Position mover arrows for both toolbars.
-.block-editor-block-contextual-toolbar,
-.edit-post-header-toolbar__block-toolbar,
-.edit-site-header-toolbar__block-toolbar,
-.edit-navigation-layout__block-toolbar,
-.edit-widgets-header__block-toolbar {
-	.block-editor-block-mover:not(.is-horizontal) {
-		// Position SVGs.
-		.block-editor-block-mover-button {
-			&:focus::before {
-				left: 0 !important;
-				min-width: 0;
-				width: 100%;
-			}
+.block-editor-block-contextual-toolbar .block-editor-block-mover:not(.is-horizontal) {
+	// Position SVGs.
+	.block-editor-block-mover-button {
+		&:focus::before {
+			left: 0 !important;
+			min-width: 0;
+			width: 100%;
+		}
+	}
+
+	@include break-small() {
+		.block-editor-block-mover-button.is-up-button svg {
+			top: 5px;
 		}
 
-		@include break-small() {
-			.block-editor-block-mover-button.is-up-button svg {
-				top: 5px;
-			}
-
-			.block-editor-block-mover-button.is-down-button svg {
-				bottom: 5px;
-			}
+		.block-editor-block-mover-button.is-down-button svg {
+			bottom: 5px;
 		}
 	}
 }
@@ -233,7 +247,6 @@
 		padding: 0;
 	}
 }
-
 
 /**
  * Popovers.
@@ -306,6 +319,11 @@
 			margin-top: $grid-unit-15;
 			margin-bottom: $grid-unit-15;
 		}
+	}
+
+	// Hide the block toolbar if the insertion point is shown.
+	&.is-insertion-point-visible {
+		visibility: hidden;
 	}
 
 	.is-dragging-components-draggable & {

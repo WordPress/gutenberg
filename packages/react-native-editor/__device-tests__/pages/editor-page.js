@@ -639,7 +639,7 @@ class EditorPage {
 		return await this.driver
 			.elementByXPath( optionMenuButtonLocator )
 			.click()
-			.sleep( isAndroid() ? 500 : 200 ); // sleep a little longer due to multiple menus
+			.sleep( isAndroid() ? 600 : 200 ); // sleep a little longer due to multiple menus
 	}
 
 	async toggleSearchIconOnlySetting( block ) {

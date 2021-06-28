@@ -102,8 +102,9 @@ module.exports = async function initConfig( {
  * Generates the Dockerfile used by wp-env's development instance.
  *
  * @param {string}   image  The base docker image to use.
- * @param {WPConfig} config The configuration object
- * @return {string}         The dockerfile contents.
+ * @param {WPConfig} config The configuration object.
+ *
+ * @return {string} The dockerfile contents.
  */
 function dockerFileContents( image, config ) {
 	let shouldInstallXdebug = true;

@@ -39,7 +39,7 @@ _Parameters_
 
 _Returns_
 
--   `I18n`: I18n instance
+-   `I18n`: I18n instance.
 
 <a name="defaultI18n" href="#defaultI18n">#</a> **defaultI18n**
 

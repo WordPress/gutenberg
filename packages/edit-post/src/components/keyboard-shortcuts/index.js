@@ -8,6 +8,8 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -15,11 +17,15 @@ import { __ } from '@wordpress/i18n';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { getBlockSelectionStart } = useSelect( 'core/block-editor' );
-	const { getEditorMode, isEditorSidebarOpened } = useSelect( editPostStore );
+	const { getBlockSelectionStart } = useSelect( blockEditorStore );
+	const {
+		getEditorMode,
+		isEditorSidebarOpened,
+		isListViewOpened,
+	} = useSelect( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
 		const { richEditingEnabled, codeEditingEnabled } = select(
-			'core/editor'
+			editorStore
 		).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
@@ -29,6 +35,7 @@ function KeyboardShortcuts() {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		toggleFeature,
+		setIsListViewOpened,
 	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
@@ -155,6 +162,12 @@ function KeyboardShortcuts() {
 				openGeneralSidebar( sidebarToOpen );
 			}
 		},
+		{ bindGlobal: true }
+	);
+
+	useShortcut(
+		'core/edit-post/toggle-block-navigation',
+		() => setIsListViewOpened( ! isListViewOpened() ),
 		{ bindGlobal: true }
 	);
 

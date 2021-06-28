@@ -52,6 +52,8 @@ module.exports = ( token ) => {
 					jsdoc.tags.push( {
 						tag: 'type',
 						type: potentialTypeAnnotation,
+						name: '',
+						description: '',
 					} );
 				}
 			}

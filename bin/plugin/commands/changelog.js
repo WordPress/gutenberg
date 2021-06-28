@@ -27,19 +27,19 @@ const manifest = require( '../../../package.json' );
 /**
  * @typedef WPChangelogCommandOptions
  *
- * @property {string=}  milestone   Optional Milestone title.
- * @property {string=}  token       Optional personal access token.
- * @property {boolean=} unreleased  Optional flag to only include issues that haven't been part of a release yet.
+ * @property {string=}  milestone  Optional Milestone title.
+ * @property {string=}  token      Optional personal access token.
+ * @property {boolean=} unreleased Optional flag to only include issues that haven't been part of a release yet.
  */
 
 /**
  * @typedef WPChangelogSettings
  *
- * @property {string}   owner       Repository owner.
- * @property {string}   repo        Repository name.
- * @property {string=}  token       Optional personal access token.
- * @property {string}   milestone   Milestone title.
- * @property {boolean=} unreleased  Only include issues that have been closed since the milestone's latest release.
+ * @property {string}   owner      Repository owner.
+ * @property {string}   repo       Repository name.
+ * @property {string=}  token      Optional personal access token.
+ * @property {string}   milestone  Milestone title.
+ * @property {boolean=} unreleased Only include issues that have been closed since the milestone's latest release.
  */
 
 /**
@@ -386,10 +386,10 @@ function getEntry( issue ) {
 /**
  * Returns the latest release for a given series
  *
- * @param {GitHub} octokit  Initialized Octokit REST client.
- * @param {string} owner    Repository owner.
- * @param {string} repo     Repository name.
- * @param {string} series   Gutenberg release series (e.g. '6.7' or '9.8').
+ * @param {GitHub} octokit Initialized Octokit REST client.
+ * @param {string} owner   Repository owner.
+ * @param {string} repo    Repository name.
+ * @param {string} series  Gutenberg release series (e.g. '6.7' or '9.8').
  *
  * @return {Promise<ReposListReleasesResponseItem|undefined>} Promise resolving to pull
  *                                                            requests for the given

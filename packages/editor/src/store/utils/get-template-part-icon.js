@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import * as icons from '@wordpress/icons';
+import {
+	header as headerIcon,
+	footer as footerIcon,
+	sidebar as sidebarIcon,
+	layout as layoutIcon,
+} from '@wordpress/icons';
 /**
  * Helper function to retrieve the corresponding icon by name.
  *
@@ -10,5 +15,12 @@ import * as icons from '@wordpress/icons';
  * @return {Object} The corresponding icon.
  */
 export function getTemplatePartIcon( iconName ) {
-	return icons[ iconName ] || icons.layout;
+	if ( 'header' === iconName ) {
+		return headerIcon;
+	} else if ( 'footer' === iconName ) {
+		return footerIcon;
+	} else if ( 'sidebar' === iconName ) {
+		return sidebarIcon;
+	}
+	return layoutIcon;
 }

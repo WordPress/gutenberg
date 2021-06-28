@@ -70,6 +70,40 @@ exports[`Multi-block selection should cut and paste 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Multi-block selection should gradually multi-select 1`] = `
+"<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class=\\"wp-block-column\\"></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Multi-block selection should gradually multi-select 2`] = `
+"<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Multi-block selection should not multi select single block 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Multi-block selection should only trigger multi-selection when at the end 1`] = `
 "<!-- wp:paragraph -->
 <p>1.</p>

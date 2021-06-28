@@ -1,13 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`adding patterns should insert a block pattern 1`] = `
-"<!-- wp:buttons {\\"contentJustification\\":\\"center\\"} -->
-<div class=\\"wp-block-buttons is-content-justification-center\\"><!-- wp:button {\\"style\\":{\\"border\\":{\\"radius\\":0}}} -->
-<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link no-border-radius\\">Our Work</a></div>
-<!-- /wp:button -->
+"<!-- wp:social-links {\\"customIconColor\\":\\"#ffffff\\",\\"iconColorValue\\":\\"#ffffff\\",\\"customIconBackgroundColor\\":\\"#3962e3\\",\\"iconBackgroundColorValue\\":\\"#3962e3\\"} -->
+<ul class=\\"wp-block-social-links has-icon-color has-icon-background-color\\"><!-- wp:social-link {\\"url\\":\\"https://wordpress.org\\",\\"service\\":\\"wordpress\\"} /-->
 
-<!-- wp:button {\\"style\\":{\\"border\\":{\\"radius\\":1}},\\"className\\":\\"is-style-outline\\"} -->
-<div class=\\"wp-block-button is-style-outline\\"><a class=\\"wp-block-button__link\\" style=\\"border-radius:1px\\">Where We Are</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->"
+<!-- wp:social-link {\\"url\\":\\"#\\",\\"service\\":\\"chain\\"} /-->
+
+<!-- wp:social-link {\\"url\\":\\"#\\",\\"service\\":\\"mail\\"} /--></ul>
+<!-- /wp:social-links -->"
 `;

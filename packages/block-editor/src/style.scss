@@ -15,6 +15,7 @@
 @import "./components/block-breadcrumb/style.scss";
 @import "./components/block-card/style.scss";
 @import "./components/block-compare/style.scss";
+@import "./components/block-content-overlay/style.scss";
 @import "./components/block-draggable/style.scss";
 @import "./components/block-mobile-toolbar/style.scss";
 @import "./components/block-mover/style.scss";
@@ -58,6 +59,7 @@
 @import "./components/warning/style.scss";
 @import "./hooks/anchor.scss";
 @import "./hooks/layout.scss";
+@import "./hooks/border.scss";
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {

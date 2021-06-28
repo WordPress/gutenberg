@@ -145,6 +145,11 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// Ignore all JQMIGRATE (jQuery migrate) deprecation warnings.
+		if ( text.includes( 'JQMIGRATE' ) ) {
+			return;
+		}
+
 		const logFunction = OBSERVED_CONSOLE_MESSAGE_TYPES[ type ];
 
 		// As of Puppeteer 1.6.1, `message.text()` wrongly returns an object of

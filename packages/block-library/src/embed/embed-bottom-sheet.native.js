@@ -29,8 +29,7 @@ const linkSettingsOptions = {
 	},
 };
 
-const EmbedBottomSheet = ( { value, onClose } ) => {
-	const [ isVisible, setIsVisible ] = useState( true );
+const EmbedBottomSheet = ( { value, onClose, isVisible } ) => {
 	const [ url, setUrl ] = useState( value );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -41,7 +40,6 @@ const EmbedBottomSheet = ( { value, onClose } ) => {
 			createErrorNotice( __( 'Invalid URL. Please enter a valid URL.' ) );
 			onClose( {} );
 		}
-		setIsVisible( false );
 	}
 
 	return (

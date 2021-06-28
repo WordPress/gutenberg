@@ -72,6 +72,7 @@
 	margin-top: auto;
 	margin-bottom: auto;
 	cursor: default;
+	padding-right: $grid-unit-10;
 
 	& + .block-list-appender {
 		margin-right: $grid-unit-10;

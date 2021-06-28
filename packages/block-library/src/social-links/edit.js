@@ -14,19 +14,17 @@ import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
-	JustifyToolbar,
+	JustifyContentControl,
 	ContrastChecker,
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
 import {
-	DropdownMenu,
 	MenuGroup,
 	MenuItem,
 	PanelBody,
 	ToggleControl,
-	ToolbarItem,
-	ToolbarGroup,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
@@ -114,8 +112,8 @@ export function SocialLinksEdit( props ) {
 
 	return (
 		<Fragment>
-			<BlockControls>
-				<JustifyToolbar
+			<BlockControls group="block">
+				<JustifyContentControl
 					allowedControls={ [
 						'left',
 						'center',
@@ -131,51 +129,43 @@ export function SocialLinksEdit( props ) {
 						isAlternate: true,
 					} }
 				/>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<DropdownMenu
-								label={ __( 'Size' ) }
-								text={ __( 'Size' ) }
-								icon={ null }
-								popoverProps={ POPOVER_PROPS }
-								toggleProps={ toggleProps }
-							>
-								{ ( { onClose } ) => (
-									<MenuGroup>
-										{ sizeOptions.map( ( entry ) => {
-											return (
-												<MenuItem
-													icon={
-														( size ===
-															entry.value ||
-															( ! size &&
-																entry.value ===
-																	'has-normal-icon-size' ) ) &&
-														check
-													}
-													isSelected={
-														size === entry.value
-													}
-													key={ entry.value }
-													onClick={ () => {
-														setAttributes( {
-															size: entry.value,
-														} );
-													} }
-													onClose={ onClose }
-													role="menuitemradio"
-												>
-													{ entry.name }
-												</MenuItem>
-											);
-										} ) }
-									</MenuGroup>
-								) }
-							</DropdownMenu>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
+			</BlockControls>
+			<BlockControls group="other">
+				<ToolbarDropdownMenu
+					label={ __( 'Size' ) }
+					text={ __( 'Size' ) }
+					icon={ null }
+					popoverProps={ POPOVER_PROPS }
+				>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							{ sizeOptions.map( ( entry ) => {
+								return (
+									<MenuItem
+										icon={
+											( size === entry.value ||
+												( ! size &&
+													entry.value ===
+														'has-normal-icon-size' ) ) &&
+											check
+										}
+										isSelected={ size === entry.value }
+										key={ entry.value }
+										onClick={ () => {
+											setAttributes( {
+												size: entry.value,
+											} );
+										} }
+										onClose={ onClose }
+										role="menuitemradio"
+									>
+										{ entry.name }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+				</ToolbarDropdownMenu>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>

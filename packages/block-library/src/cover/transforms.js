@@ -13,7 +13,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { caption, url, align, id, anchor, duotone } ) =>
+			transform: ( { caption, url, align, id, anchor, style } ) =>
 				createBlock(
 					'core/cover',
 					{
@@ -21,7 +21,11 @@ const transforms = {
 						align,
 						id,
 						anchor,
-						duotone,
+						style: {
+							color: {
+								duotone: style?.color?.duotone,
+							},
+						},
 					},
 					[
 						createBlock( 'core/paragraph', {
@@ -52,6 +56,42 @@ const transforms = {
 					]
 				),
 		},
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			isMatch: ( { backgroundColor, gradient, style } ) => {
+				/*
+				 * Make this transformation available only if the Group has background
+				 * or gradient set, because otherwise `Cover` block displays a Placeholder.
+				 *
+				 * This helps avoid arbitrary decisions about the Cover block's background
+				 * and user confusion about the existence of previous content.
+				 */
+				return (
+					backgroundColor ||
+					style?.color?.background ||
+					style?.color?.gradient ||
+					gradient
+				);
+			},
+			transform: (
+				{ align, anchor, backgroundColor, gradient, style },
+				innerBlocks
+			) => {
+				return createBlock(
+					'core/cover',
+					{
+						align,
+						anchor,
+						overlayColor: backgroundColor,
+						customOverlayColor: style?.color?.background,
+						gradient,
+						customGradient: style?.color?.gradient,
+					},
+					innerBlocks
+				);
+			},
+		},
 	],
 	to: [
 		{
@@ -77,14 +117,18 @@ const transforms = {
 					! customGradient
 				);
 			},
-			transform: ( { title, url, align, id, anchor, duotone } ) =>
+			transform: ( { title, url, align, id, anchor, style } ) =>
 				createBlock( 'core/image', {
 					caption: title,
 					url,
 					align,
 					id,
 					anchor,
-					duotone,
+					style: {
+						color: {
+							duotone: style?.color?.duotone,
+						},
+					},
 				} ),
 		},
 		{

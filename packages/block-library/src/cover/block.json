@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/cover",
+	"title": "Cover",
 	"category": "media",
+	"description": "Add an image or video with a text overlay — great for headers.",
+	"textdomain": "default",
 	"attributes": {
 		"url": {
 			"type": "string"

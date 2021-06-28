@@ -15,8 +15,24 @@ const searchBlockHtml = `<!-- wp:search {"label":"","buttonText":""} /-->`;
 
 describe( 'Gutenberg Editor Search Block tests.', () => {
 	describe( 'Editing Search Block elements.', () => {
-		it( 'Add search block via HTML', async () => {
+		beforeAll( async () => {
+			// Add a search block with all child elements having no text.
+			// This is important to get around test flakiness where sometimes
+			// the existing default text isn't replaced properly when entering
+			// new text during testing.
 			await editorPage.setHtmlContent( searchBlockHtml );
+		} );
+
+		beforeEach( async () => {
+			// Tap search block to ensure selected
+			const searchBlock = await editorPage.getBlockAtPosition(
+				blockNames.search
+			);
+			await searchBlock.click();
+		} );
+
+		afterAll( async () => {
+			await removeSearchBlock();
 		} );
 
 		it( 'Able to customize label text', async () => {
@@ -25,24 +41,10 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 				testData.shortText
 			);
 
-			let actual;
-			let expected;
-
-			if ( isAndroid() ) {
-				// Android pads the string entered into the `PlainText` component so we'll get the
-				// value a different way by asking for it directly.
-				const input = await editorPage.getSearchBlockTextElement(
-					testIds.label
-				);
-				const inputValue = await input.text();
-				actual = inputValue.trim();
-				expected = testData.shortText;
-			} else {
-				actual = await editorPage.getHtmlContent();
-				expected = `"label":"${ testData.shortText }"`;
-			}
-
-			expect( actual ).toContain( expected );
+			const expected = isAndroid()
+				? testData.shortText
+				: `"label":"${ testData.shortText }"`;
+			await verifySearchElementText( testIds.label, expected );
 		} );
 
 		it( 'Able to customize placeholder text', async () => {
@@ -51,24 +53,10 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 				testData.shortText
 			);
 
-			let actual;
-			let expected;
-
-			if ( isAndroid() ) {
-				// Android pads the string entered into the `PlainText` component so we'll get the
-				// value a different way by asking for it directly.
-				const input = await editorPage.getSearchBlockTextElement(
-					testIds.input
-				);
-				const inputValue = await input.text();
-				actual = inputValue.trim();
-				expected = testData.shortText;
-			} else {
-				actual = await editorPage.getHtmlContent();
-				expected = `"placeholder":"${ testData.shortText }"`;
-			}
-
-			expect( actual ).toContain( expected );
+			const expected = isAndroid()
+				? testData.shortText
+				: `"placeholder":"${ testData.shortText }"`;
+			await verifySearchElementText( testIds.input, expected );
 		} );
 
 		it( 'Able to customize button text', async () => {
@@ -77,33 +65,18 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 				testData.shortButtonText
 			);
 
-			let actual;
-			let expected;
-
-			if ( isAndroid() ) {
-				// Android pads the string entered into the `PlainText` component so we'll get the
-				// value a different way by asking for it directly.
-				const input = await editorPage.getSearchBlockTextElement(
-					testIds.button
-				);
-				const inputValue = await input.text();
-				actual = inputValue.trim();
-				expected = testData.shortButtonText;
-			} else {
-				actual = await editorPage.getHtmlContent();
-				expected = `"buttonText":"${ testData.shortButtonText }"`;
-			}
-
-			expect( actual ).toContain( expected );
-		} );
-
-		it( 'Remove Search block', async () => {
-			// Remove the search block to end this suite of tests.
-			await editorPage.removeBlockAtPosition( blockNames.search );
+			const expected = isAndroid()
+				? testData.shortButtonText
+				: `"buttonText":"${ testData.shortButtonText }"`;
+			await verifySearchElementText( testIds.button, expected );
 		} );
 	} );
 
 	describe( 'Changing search block settings.', () => {
+		afterAll( async () => {
+			await removeSearchBlock();
+		} );
+
 		it( 'Able to add the Search Block.', async () => {
 			await editorPage.addNewBlock( blockNames.search );
 			const searchBlock = await editorPage.getBlockAtPosition(
@@ -117,6 +90,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			const searchBlock = await editorPage.getBlockAtPosition(
 				blockNames.search
 			);
+			await searchBlock.click();
 
 			await editorPage.toggleHideSearchLabelSetting( searchBlock );
 			await editorPage.dismissBottomSheet();
@@ -130,6 +104,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			const searchBlock = await editorPage.getBlockAtPosition(
 				blockNames.search
 			);
+			await searchBlock.click();
 
 			await editorPage.toggleSearchIconOnlySetting( searchBlock );
 			await editorPage.dismissBottomSheet();
@@ -143,6 +118,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			const searchBlock = await editorPage.getBlockAtPosition(
 				blockNames.search
 			);
+			await searchBlock.click();
 
 			await editorPage.changeSearchButtonPositionSetting(
 				searchBlock,
@@ -159,6 +135,7 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			const searchBlock = await editorPage.getBlockAtPosition(
 				blockNames.search
 			);
+			await searchBlock.click();
 
 			await editorPage.changeSearchButtonPositionSetting(
 				searchBlock,
@@ -170,10 +147,29 @@ describe( 'Gutenberg Editor Search Block tests.', () => {
 			const html = await editorPage.getHtmlContent();
 			expect( html ).toContain( `"buttonPosition":"no-button"` );
 		} );
-
-		it( 'Remove search block', async () => {
-			// Remove the search block to end this suite of tests.
-			await editorPage.removeBlockAtPosition( blockNames.search );
-		} );
 	} );
 } );
+
+const removeSearchBlock = async () => {
+	const searchBlock = await editorPage.getBlockAtPosition(
+		blockNames.search
+	);
+	await searchBlock.click();
+
+	// Remove search block
+	await editorPage.removeBlockAtPosition( blockNames.search );
+};
+
+const verifySearchElementText = async ( testId, expected ) => {
+	let actual;
+
+	if ( isAndroid() ) {
+		const input = await editorPage.getSearchBlockTextElement( testId );
+		const inputValue = await input.text();
+		actual = inputValue.trim();
+	} else {
+		actual = await editorPage.getHtmlContent();
+	}
+
+	expect( actual ).toContain( expected );
+};

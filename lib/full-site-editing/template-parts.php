@@ -45,7 +45,7 @@ function gutenberg_register_template_part_post_type() {
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
 		'rest_base'             => 'template-parts',
-		'rest_controller_class' => 'WP_REST_Templates_Controller',
+		'rest_controller_class' => 'Gutenberg_REST_Templates_Controller',
 		'map_meta_cap'          => true,
 		'supports'              => array(
 			'title',

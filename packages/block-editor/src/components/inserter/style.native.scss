@@ -1,9 +1,5 @@
 /** @format */
 
-.rowSeparator {
-	height: 12px;
-}
-
 .addBlockButton {
 	color: $blue-wordpress;
 }
@@ -12,12 +8,9 @@
 	color: $blue-30;
 }
 
-.columnPadding {
-	padding: $grid-unit-20;
-}
-
 .list {
 	padding-bottom: 20;
+	padding-top: 8;
 }
 
 .searchForm {
@@ -49,4 +42,17 @@
 
 .searchFormPlaceholderDark {
 	color: rgba($white, 0.8);
+}
+
+.inserter-tabs__wrapper {
+	overflow: hidden;
+}
+
+.inserter-tabs__container {
+	height: 100%;
+	width: 100%;
+}
+
+.inserter-tabs__item {
+	position: absolute;
 }

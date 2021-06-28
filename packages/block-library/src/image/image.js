@@ -61,6 +61,27 @@ function getFilename( url ) {
 	}
 }
 
+/**
+ * Checks if the given block is registered and is in the allowed blocks list.
+ *
+ * @param {string}        name Block name.
+ * @param {boolean|Array} list Allowed block types.
+ *
+ * @return {boolean}           Whether the block exists.
+ */
+function checkBlockExists( name, list ) {
+	if ( ! getBlockType( name ) ) {
+		return false;
+	}
+
+	// The allowed blocks list has a boolean value so return it.
+	if ( ! Array.isArray( list ) ) {
+		return list;
+	}
+
+	return list.includes( name );
+}
+
 export default function Image( {
 	temporaryURL,
 	attributes: {
@@ -87,50 +108,51 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
+	clientId,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { block, currentId, image, multiImageSelection } = useSelect(
+	const { getBlock } = useSelect( blockEditorStore );
+	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
-			const {
-				getMultiSelectedBlockClientIds,
-				getBlockName,
-				getSelectedBlock,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+			const { getMultiSelectedBlockClientIds, getBlockName } = select(
+				blockEditorStore
+			);
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
-				block: getSelectedBlock(),
-				currentId: getSelectedBlockClientId(),
 				image: id && isSelected ? getMedia( id ) : null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
-						( clientId ) =>
-							getBlockName( clientId ) === 'core/image'
+						( _clientId ) =>
+							getBlockName( _clientId ) === 'core/image'
 					),
 			};
 		},
 		[ id, isSelected ]
 	);
-	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return pick( getSettings(), [
-				'imageEditing',
-				'imageSizes',
-				'maxWidth',
-				'mediaUpload',
-			] );
-		}
-	);
+	const {
+		allowedBlockTypes,
+		imageEditing,
+		imageSizes,
+		maxWidth,
+		mediaUpload,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return pick( getSettings(), [
+			'allowedBlockTypes',
+			'imageEditing',
+			'imageSizes',
+			'maxWidth',
+			'mediaUpload',
+		] );
+	} );
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
@@ -144,14 +166,11 @@ export default function Image( {
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
 
-	// Check if the cover block is registered.
-	const coverBlockExists = !! getBlockType( 'core/cover' );
-
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setCaptionFocused( false );
-		}
-	}, [ isSelected ] );
+	// Check if the cover block is registered and in allowed block list.
+	const coverBlockExists = checkBlockExists(
+		'core/cover',
+		allowedBlockTypes
+	);
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -201,18 +220,6 @@ export default function Image( {
 		// This is the HTML title attribute, separate from the media object
 		// title.
 		setAttributes( { title: value } );
-	}
-
-	function onFocusCaption() {
-		if ( ! captionFocused ) {
-			setCaptionFocused( true );
-		}
-	}
-
-	function onImageClick() {
-		if ( captionFocused ) {
-			setCaptionFocused( false );
-		}
 	}
 
 	function updateAlt( newAlt ) {
@@ -279,6 +286,13 @@ export default function Image( {
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
 
+	function switchToCover() {
+		replaceBlocks(
+			clientId,
+			switchToBlockType( getBlock( clientId ), 'core/cover' )
+		);
+	}
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -316,12 +330,7 @@ export default function Image( {
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }
-						onClick={ () =>
-							replaceBlocks(
-								currentId,
-								switchToBlockType( block, 'core/cover' )
-							)
-						}
+						onClick={ switchToCover }
 					/>
 				) }
 			</BlockControls>
@@ -417,7 +426,6 @@ export default function Image( {
 			<img
 				src={ temporaryURL || url }
 				alt={ defaultedAlt }
-				onClick={ onImageClick }
 				onError={ () => onImageError() }
 				onLoad={ ( event ) => {
 					setNaturalSize(
@@ -564,11 +572,9 @@ export default function Image( {
 					aria-label={ __( 'Image caption text' ) }
 					placeholder={ __( 'Add caption' ) }
 					value={ caption }
-					unstableOnFocus={ onFocusCaption }
 					onChange={ ( value ) =>
 						setAttributes( { caption: value } )
 					}
-					isSelected={ captionFocused }
 					inlineToolbar
 					__unstableOnSplitAtEnd={ () =>
 						insertBlocksAfter( createBlock( 'core/paragraph' ) )

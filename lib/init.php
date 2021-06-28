@@ -30,7 +30,11 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	if ( gutenberg_use_widgets_block_editor() ) {
+	if (
+		gutenberg_use_widgets_block_editor() &&
+		! function_exists( 'wp_use_widgets_block_editor' ) &&
+		current_theme_supports( 'widgets' )
+	) {
 		add_theme_page(
 			__( 'Widgets', 'gutenberg' ),
 			__( 'Widgets', 'gutenberg' ),
@@ -113,7 +117,11 @@ add_action( 'admin_menu', 'gutenberg_site_editor_menu', 9 );
  * @param WP_Admin_Bar $wp_admin_bar Core class used to implement the Toolbar API.
  */
 function modify_admin_bar( $wp_admin_bar ) {
-	if ( gutenberg_use_widgets_block_editor() ) {
+	if (
+		gutenberg_use_widgets_block_editor() &&
+		! function_exists( 'wp_use_widgets_block_editor' ) &&
+		$wp_admin_bar->get_node( 'widgets' ) !== null
+	) {
 		$wp_admin_bar->add_menu(
 			array(
 				'id'   => 'widgets',
@@ -137,7 +145,10 @@ function modify_welcome_panel() {
 	ob_start();
 	wp_welcome_panel();
 	$welcome_panel = ob_get_clean();
-	if ( gutenberg_use_widgets_block_editor() ) {
+	if (
+		gutenberg_use_widgets_block_editor() &&
+		! function_exists( 'wp_use_widgets_block_editor' )
+	) {
 		echo str_replace(
 			admin_url( 'widgets.php' ),
 			admin_url( 'themes.php?page=gutenberg-widgets' ),
@@ -177,5 +188,42 @@ function register_site_icon_url( $response ) {
 
 add_filter( 'rest_index', 'register_site_icon_url' );
 
+/**
+ * Exposes the site logo to the Gutenberg editor through the WordPress REST
+ * API. This is used for fetching this information when user has no rights
+ * to update settings.
+ *
+ * @since 10.9
+ *
+ * @param WP_REST_Response $response Response data served by the WordPress REST index endpoint.
+ * @return WP_REST_Response
+ */
+function register_site_logo_to_rest_index( $response ) {
+	$site_logo_id                = get_theme_mod( 'custom_logo' );
+	$response->data['site_logo'] = $site_logo_id;
+	if ( $site_logo_id ) {
+		$response->add_link(
+			'https://api.w.org/featuredmedia',
+			rest_url( 'wp/v2/media/' . $site_logo_id ),
+			array(
+				'embeddable' => true,
+			)
+		);
+	}
+	return $response;
+}
+
+add_filter( 'rest_index', 'register_site_logo_to_rest_index' );
+
 add_theme_support( 'widgets-block-editor' );
-add_theme_support( 'block-templates' );
+
+/**
+ * Enable block templates (editor mode) for themes with theme.json.
+ */
+function gutenberg_enable_block_templates() {
+	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		add_theme_support( 'block-templates' );
+	}
+}
+
+add_action( 'setup_theme', 'gutenberg_enable_block_templates' );

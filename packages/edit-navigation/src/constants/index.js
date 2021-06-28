@@ -31,14 +31,21 @@ export const NAVIGATION_POST_POST_TYPE = 'postType';
  *
  * @type {string}
  */
-export const COMPLEMENTARY_AREA_SCOPE = 'core/edit-navigation';
+export const SIDEBAR_SCOPE = 'core/edit-navigation';
 
 /**
- * The identifier of the editor's complementary area.
+ * The identifier of the editor's menu complementary area.
  *
  * @type {string}
  */
-export const COMPLEMENTARY_AREA_ID = 'edit-navigation/block-inspector';
+export const SIDEBAR_MENU = 'edit-navigation/menu';
+
+/**
+ * The identifier of the editor's block complementary area.
+ *
+ * @type {string}
+ */
+export const SIDEBAR_BLOCK = 'edit-navigation/block-inspector';
 
 /**
  * The string identifier for the menu item's "target" attribute indicating

@@ -82,6 +82,13 @@ const MyRadioControl = withState( {
 
 The component accepts the following props:
 
+### hideLabelFromVision
+
+If true, the label will only be visible to screen readers.
+
+-   Type: `Boolean`
+-   Required: No
+
 #### label
 
 If this property is added, a label will be generated using label property as the content.

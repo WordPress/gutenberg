@@ -20,6 +20,7 @@ import {
 	select,
 	apiFetch,
 } from './controls';
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 import {
 	menuItemsQuery,
 	serializeProcessing,
@@ -27,6 +28,19 @@ import {
 } from './utils';
 
 const { ajaxurl } = window;
+
+/**
+ * Returns an action object used to select menu.
+ *
+ * @param {number} menuId The menu ID.
+ * @return {Object} Action object.
+ */
+export function setSelectedMenuId( menuId ) {
+	return {
+		type: 'SET_SELECTED_MENU_ID',
+		menuId,
+	};
+}
 
 /**
  * Creates a menu item for every block that doesn't have an associated menuItem.
@@ -122,6 +136,16 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 		if ( ! batchSaveResponse.success ) {
 			throw new Error( batchSaveResponse.data.message );
 		}
+
+		// Clear "stub" navigation post edits to avoid a false "dirty" state.
+		yield dispatch(
+			'core',
+			'receiveEntityRecords',
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
+			[ post ],
+			undefined
+		);
 
 		yield dispatch(
 			noticesStore,

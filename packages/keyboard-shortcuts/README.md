@@ -26,7 +26,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="useShortcut" href="#useShortcut">#</a> **useShortcut**
 

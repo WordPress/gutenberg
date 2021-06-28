@@ -2,41 +2,43 @@
  * WordPress dependencies
  */
 import { store as coreDataStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
-import { store as blocksStore } from '@wordpress/blocks';
-import { dispatch, select, subscribe } from '@wordpress/data';
+import { select } from '@wordpress/data';
+import {
+	header as headerIcon,
+	footer as footerIcon,
+	sidebar as sidebarIcon,
+	layout as layoutIcon,
+} from '@wordpress/icons';
 
-const unsubscribe = subscribe( () => {
-	const definedVariations = select(
-		editorStore
-	).__experimentalGetDefaultTemplatePartAreas();
+/**
+ * Internal dependencies
+ */
+import fallbackVariations from './fallback-variations';
 
-	if ( ! definedVariations?.length ) {
-		return;
+function getTemplatePartIcon( iconName ) {
+	if ( 'header' === iconName ) {
+		return headerIcon;
+	} else if ( 'footer' === iconName ) {
+		return footerIcon;
+	} else if ( 'sidebar' === iconName ) {
+		return sidebarIcon;
 	}
-	unsubscribe();
+	return layoutIcon;
+}
 
-	const variations = definedVariations
-		.filter( ( { area } ) => 'uncategorized' !== area )
-		.map( ( { area, label, description, icon } ) => {
-			return {
-				name: area,
-				title: label,
-				description,
-				icon,
-				attributes: { area },
-				scope: [ 'inserter' ],
-			};
-		} );
+export function enhanceTemplatePartVariations( settings, name ) {
+	if ( name !== 'core/template-part' ) {
+		return settings;
+	}
 
-	/**
-	 * Add `isActive` function to all `Template Part` variations, if not defined.
-	 * `isActive` function is used to find a variation match from a created
-	 *  Block by providing its attributes.
-	 */
-	variations.forEach( ( variation ) => {
-		if ( variation.isActive ) return;
-		variation.isActive = ( blockAttributes, variationAttributes ) => {
+	// WordPress versions pre-5.8 do not support server side variation registration.
+	// So we must register the fallback variations until those versions are no longer supported.
+	if ( ! ( settings.variations && settings.variations.length ) ) {
+		return { ...settings, variations: fallbackVariations };
+	}
+
+	if ( settings.variations ) {
+		const isActive = ( blockAttributes, variationAttributes ) => {
 			const { area, theme, slug } = blockAttributes;
 			// We first check the `area` block attribute which is set during insertion.
 			// This property is removed on the creation of a template part.
@@ -51,10 +53,21 @@ const unsubscribe = subscribe( () => {
 			);
 			return entity?.area === variationAttributes.area;
 		};
-	} );
 
-	dispatch( blocksStore ).addBlockVariations(
-		'core/template-part',
-		variations
-	);
-} );
+		const variations = settings.variations.map( ( variation ) => {
+			return {
+				...variation,
+				...( ! variation.isActive && { isActive } ),
+				...( typeof variation.icon === 'string' && {
+					icon: getTemplatePartIcon( variation.icon ),
+				} ),
+			};
+		} );
+
+		return {
+			...settings,
+			variations,
+		};
+	}
+	return settings;
+}

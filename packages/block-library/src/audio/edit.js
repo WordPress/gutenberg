@@ -97,9 +97,7 @@ function AudioEdit( {
 
 	function getAutoplayHelp( checked ) {
 		return checked
-			? __(
-					'Note: Autoplaying audio may cause usability issues for some visitors.'
-			  )
+			? __( 'Autoplay may cause usability issues for some users.' )
 			: null;
 	}
 

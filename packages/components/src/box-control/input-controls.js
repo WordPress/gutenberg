@@ -94,7 +94,7 @@ export default function BoxInputControls( {
 						onFocus={ createHandleOnFocus( side ) }
 						onHoverOn={ createHandleOnHoverOn( side ) }
 						onHoverOff={ createHandleOnHoverOff( side ) }
-						label={ LABELS.top }
+						label={ LABELS[ side ] }
 						key={ `box-control-${ side }` }
 					/>
 				) ) }

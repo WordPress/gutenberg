@@ -18,7 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 This package builds a standalone JS file. When loaded on a page with the block editor, it extends the block inserter to search for blocks from WordPress.org.
 
-To do this, it uses the `__experimentalInserterMenuExtension`, a slot-fill area hooked into the block types list. When the user runs a search and there are no results currently installed, it fires off a request to WordPress.org for matching blocks. These are listed for the user to install with a one-click process that [installs, activates, and injects the block into the post.](./src/store/actions.js#L49) When the post is saved, if the block was not used, it will be [silently uninstalled](./src/store/actions.js#L129) to avoid clutter.
+To do this, it uses the `__unstableInserterMenuExtension`, a slot-fill area hooked into the block types list. When the user runs a search and there are no results currently installed, it fires off a request to WordPress.org for matching blocks. These are listed for the user to install with a one-click process that [installs, activates, and injects the block into the post.](./src/store/actions.js#L49) When the post is saved, if the block was not used, it will be [silently uninstalled](./src/store/actions.js#L129) to avoid clutter.
 
 See also the API endpoints for searching WordPress.org: `/wp/v2/block-directory/search`, and installing & activating plugins: `/wp/v2/plugins/`.
 

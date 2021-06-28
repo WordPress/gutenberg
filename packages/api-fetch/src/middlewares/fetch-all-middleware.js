@@ -12,7 +12,7 @@ import apiFetch from '..';
  * Apply query arguments to both URL and Path, whichever is present.
  *
  * @param {import('../types').APIFetchOptions} props
- * @param {Record<string, string | number>} queryArgs
+ * @param {Record<string, string | number>}    queryArgs
  * @return {import('../types').APIFetchOptions} The request with the modified query args
  */
 const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {

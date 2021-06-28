@@ -53,7 +53,7 @@ export default function SearchEdit( {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
 	const [ isPlaceholderSelected, setIsPlaceholderSelected ] = useState(
-		true
+		false
 	);
 	const [ isLongButton, setIsLongButton ] = useState( false );
 	const [ buttonWidth, setButtonWidth ] = useState( MIN_BUTTON_WIDTH );

@@ -86,13 +86,14 @@ supports: {
 -   Default value: null
 -   Subproperties:
     -   `background`: type `boolean`, default value `true`
-    -   `duotone`: type `string`, default value undefined
+    -   `__experimentalDuotone`: type `string`, default value undefined
     -   `gradients`: type `boolean`, default value `false`
+    -   `link`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
 
 This value signals that a block supports some of the properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
-Note that the `text` and `background` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
+Note that the `background` and `text` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
 
 ```js
 supports: {
@@ -122,7 +123,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enable both background and text
+    color: true // Enables background and text
 }
 ```
 
@@ -196,7 +197,7 @@ supports: {
 
 Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
 
-When the block declares support for `color.duotone`, the attributes definition is extended to include the attribute `style`:
+When the block declares support for `color.__experimentalDuotone`, the attributes definition is extended to include the attribute `style`:
 
 - `style`: attribute of `object` type with no default assigned.
 
@@ -210,7 +211,7 @@ When the block declares support for `color.duotone`, the attributes definition i
               color: {
                   duotone: [
                       '#FFF',
-                      '#000
+                      '#000'
                   ]
               }
           }
@@ -273,6 +274,66 @@ When the block declares support for `color.gradient`, the attributes definition 
   }
   ```
 
+### color.link
+
+This property adds block controls which allow the user to set link color in a block, link color is disabled by default.
+
+
+```js
+supports: {
+    color: true // Enables only background and text
+}
+```
+
+To enable link color support, set to `true`.
+
+```js
+supports: {
+    color: {
+        link: true
+    }
+}
+```
+
+Link color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
+
+
+When the block declares support for `color.link`, the attributes definition is extended to include two new attributes: `linkColor` and `style`:
+
+- `linkColor`: attribute of `string` type with no default assigned.
+
+  When a user chooses from the list of preset link colors, the preset slug is stored in the `linkColor` attribute.
+
+  The block can apply a default preset text color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      linkColor: {
+          type: 'string',
+          default: 'some-preset-link-color-slug',
+      }
+  }
+  ```
+
+- `style`: attribute of `object` type with no default assigned.
+
+  When a custom link color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.link` attribute.
+
+  The block can apply a default custom link color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      style: {
+          type: 'object',
+          default: {
+              color: {
+                  link: '#ff0000',
+              }
+          }
+      }
+  }
+  ```
+
 ### color.text
 
 This property adds block controls which allow the user to set text color in a block.
@@ -281,7 +342,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enable both text and background
+    color: true // Enables background and text, but not link.
 }
 ```
 
@@ -290,7 +351,7 @@ To disable text color support while keeping other color supports enabled, set to
 ```js
 supports: {
     color: {
-        // Disable text color support. Background support is still enabled.
+        // Disable text color support.
         text: false
     }
 }
@@ -497,16 +558,31 @@ supports: {
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
-    -   `padding`: type `boolean`, default value `false`
+    -   `margin`: type `boolean` or `array`, default value `false`
+    -   `padding`: type `boolean` or `array`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
 
 ```js
 supports: {
-    padding: true, // Enable padding color UI control.
+    spacing: {
+        margin: true,  // Enable margin UI control.
+        padding: true, // Enable padding UI control.
+    }
 }
 ```
 
 When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
 
--   `style`: attribute of `object` type with no default assigned. This is added when `padding` support is declared. It stores the custom values set by the user.
+-   `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user.
+
+```js
+supports: {
+    spacing: {
+        margin: [ 'top', 'bottom' ], // Enable margin for arbitrary sides.
+        padding: true,               // Enable padding for all sides.
+    }
+}
+```
+
+A spacing property may define an array of allowable sides that can be configured. When arbitrary sides are defined only UI controls for those sides are displayed.

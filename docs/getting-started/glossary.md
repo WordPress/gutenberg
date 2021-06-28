@@ -10,7 +10,7 @@
 <dt>Block</dt>
 <dd>The abstract term used to describe units of markup that, composed together, form the content or layout of a webpage. The idea combines concepts of what in WordPress today we achieve with shortcodes, custom HTML, and embed discovery into a single consistent API and user experience.</dd>
 
-<dt>Block Based Theme</dt>
+<dt>Block Theme</dt>
 <dd>A theme built in block forward way that allows Full Site Editing to work. The core of a block theme are its block templates and block template parts. To date, block theme templates have been HTML files of block markup that map to templates from the standard WordPress template hierarchy. </dd>
 
 <dt>Block categories</dt>
@@ -46,8 +46,14 @@
 <dt>Inspector</dt>
 <dd>Deprecated term. See <a href="#settings-sidebar">Settings Sidebar.</a></dd>
 
+<dt>Navigation Block</dt>
+<dd>A block that allows you to edit a site's navigation menu, both in terms of structure and design.</a></dd>
+
 <dt>Post settings</dt>
 <dd>A sidebar region containing metadata fields for the post, including scheduling, visibility, terms, and featured image.</dd>
+
+<dt>Query Block</dt>
+<dd>A block that replicates the classic WP_Query and allows for further customization with additional functionality.</dd>
 
 <dt>RichText</dt>
 <dd>A common component enabling rich content editing including bold, italics, hyperlinks, etc.</dd>
@@ -61,8 +67,17 @@
 <dt>Serialization</dt>
 <dd>The process of converting a block's attributes object into HTML markup, which occurs each time a block is edited.</dd>
 
+<dt>Site Editor</dt>
+<dd>The cohesive experience that allows you to directly edit and navigate between various templates, template parts, styling options, and more. </dd>
+
 <dt>Static block</dt>
 <dd>A type of block where the content of which is known at the time of saving a post. A static block will be saved with HTML markup directly in post content.</dd>
+
+<dt>Template Editing Mode</dt>
+<dd>A scaled down direct editing experience allowing you to edit/change/create the template a post/page uses. </dd>
+
+<dt>Theme Blocks</dt>
+<dd>Blocks that accomplish everything possible in traditional templates using template tags (ex: Post Author Block). A full list can be found [here](https://github.com/WordPress/gutenberg/issues/22724).</dd>
 
 <dt>TinyMCE</dt>
 <dd><a href="https://www.tinymce.com/">TinyMCE</a> is a web-based JavaScript WYSIWYG (What You See Is What You Get) editor.</dd>

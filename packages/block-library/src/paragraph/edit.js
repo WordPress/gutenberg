@@ -7,14 +7,18 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x, isRTL } from '@wordpress/i18n';
-import { DropdownMenu, PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToolbarDropdownMenu,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
 import {
 	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
 	useBlockProps,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useSetting,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
@@ -24,8 +28,7 @@ const name = 'core/paragraph';
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
 		isRTL() && (
-			<DropdownMenu
-				isToolbarButton
+			<ToolbarDropdownMenu
 				controls={ [
 					{
 						icon: formatLtr,
@@ -52,7 +55,7 @@ function ParagraphBlock( {
 	clientId,
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
-	const isDropCapFeatureEnabled = useEditorFeature( 'typography.dropCap' );
+	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			'has-drop-cap': dropCap,

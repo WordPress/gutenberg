@@ -300,7 +300,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<RichTextValue>`: An array of new values.
+-   `Array<RichTextValue>|undefined`: An array of new values.
 
 <a name="store" href="#store">#</a> **store**
 
@@ -312,7 +312,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="toggleFormat" href="#toggleFormat">#</a> **toggleFormat**
 

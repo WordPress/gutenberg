@@ -8,6 +8,7 @@ import { without, mapValues, isObject } from 'lodash';
  */
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
+import { STORE_NAME } from './store/name';
 
 /** @typedef {import('./types').WPDataStore} WPDataStore */
 
@@ -61,9 +62,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Subscribe to changes to any data.
 	 *
-	 * @param {Function}   listener Listener function.
+	 * @param {Function} listener Listener function.
 	 *
-	 * @return {Function}           Unsubscribe function.
+	 * @return {Function} Unsubscribe function.
 	 */
 	const subscribe = ( listener ) => {
 		listeners.push( listener );
@@ -229,8 +230,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a standard `@wordpress/data` store.
 	 *
-	 * @param {string} storeName  Unique namespace identifier.
-	 * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
+	 * @param {string} storeName Unique namespace identifier.
+	 * @param {Object} options   Store description (reducer, actions, selectors, resolvers).
 	 *
 	 * @return {Object} Registered store object.
 	 */
@@ -259,7 +260,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return registry;
 	}
 
-	registerGenericStore( 'core/data', createCoreDataStore( registry ) );
+	registerGenericStore( STORE_NAME, createCoreDataStore( registry ) );
 
 	Object.entries( storeConfigs ).forEach( ( [ name, config ] ) =>
 		registry.registerStore( name, config )

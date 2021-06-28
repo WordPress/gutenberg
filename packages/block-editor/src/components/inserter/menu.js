@@ -54,11 +54,9 @@ function InserterMenu( {
 			);
 
 			return {
-				showPatterns:
-					! destinationRootClientId ||
-					!! __experimentalGetAllowedPatterns(
-						destinationRootClientId
-					).length,
+				showPatterns: !! __experimentalGetAllowedPatterns(
+					destinationRootClientId
+				).length,
 				hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
 					?.length,
 			};

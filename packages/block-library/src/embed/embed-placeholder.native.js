@@ -1,29 +1,72 @@
 /**
  * External dependencies
  */
-import { TextInput } from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import EmbedBottomSheet from './embed-bottom-sheet';
+import styles from './styles.scss';
 
-const EmbedPlaceholder = ( { value } ) => {
+const EmbedPlaceholder = ( {
+	icon,
+	label,
+	onFocus,
+	value,
+	onSubmit,
+	onChange,
+} ) => {
+	const [ isBottomSheetVisible, setIsBottomSheetVisible ] = useState(
+		! value
+	);
+
+	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
+		styles.emptyStateContainer,
+		styles.emptyStateContainerDark
+	);
+
+	const emptyStateTitleStyle = usePreferredColorSchemeStyle(
+		styles.emptyStateTitle,
+		styles.emptyStateTitleDark
+	);
+
 	return (
 		<>
-			<TextInput
-				value={ value }
-				placeholder={ __( 'Enter URL to embed here…' ) }
-			/>
+			{ value ? (
+				<Text>{ value }</Text>
+			) : (
+				<TouchableWithoutFeedback
+					accessibilityRole={ 'button' }
+					accessibilityHint={ __( 'Double tap to add a link.' ) }
+					onPress={ ( event ) => {
+						onFocus( event );
+						setIsBottomSheetVisible( true );
+					} }
+				>
+					<View style={ emptyStateContainerStyle }>
+						<View style={ styles.modalIcon }>{ icon }</View>
+						<Text style={ emptyStateTitleStyle }>{ label }</Text>
+						<Text style={ styles.emptyStateDescription }>
+							{ __( 'ADD LINK' ) }
+						</Text>
+					</View>
+				</TouchableWithoutFeedback>
+			) }
 			<EmbedBottomSheet
 				value={ value }
-				onClose={ () => {
-					// TODO:
+				isVisible={ isBottomSheetVisible }
+				onClose={ ( { url } ) => {
+					setIsBottomSheetVisible( false );
+					onChange( { target: { value: url } } );
+					onSubmit();
 				} }
 			/>
 		</>
