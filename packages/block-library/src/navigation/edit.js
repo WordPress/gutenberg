@@ -15,6 +15,7 @@ import {
 	BlockControls,
 	useBlockProps,
 	store as blockEditorStore,
+	useSetting,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
@@ -63,12 +64,20 @@ function Navigation( {
 		false
 	);
 
+	const possibleOrientation = attributes.orientation || 'horizontal';
+
+	const allowedOrientations = useSetting( 'layout.orientations' );
+
+	const blockOrientation = allowedOrientations.includes( possibleOrientation )
+		? possibleOrientation
+		: 'vertical';
+
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-			'is-vertical': attributes.orientation === 'vertical',
+			'is-vertical': blockOrientation === 'vertical',
 			'is-responsive': attributes.isResponsive,
 		} ),
 	} );
@@ -85,7 +94,7 @@ function Navigation( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			orientation: attributes.orientation || 'horizontal',
+			orientation: blockOrientation,
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
@@ -120,7 +129,7 @@ function Navigation( {
 	}
 
 	const justifyAllowedControls =
-		attributes.orientation === 'vertical'
+		blockOrientation === 'vertical'
 			? [ 'left', 'center', 'right' ]
 			: [ 'left', 'center', 'right', 'space-between' ];
 
