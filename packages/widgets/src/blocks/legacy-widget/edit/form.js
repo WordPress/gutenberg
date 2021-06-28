@@ -10,12 +10,16 @@ import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Fill } from '@wordpress/components';
-import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
+import {
+	__experimentalUseDialog as useDialog,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
 import Control from './control';
+import { useBudgeYAxisBy } from './utils';
 
 export default function Form( {
 	title,
@@ -82,51 +86,70 @@ export default function Form( {
 		};
 	}, [ id, idBase, instance, onChangeInstance, onChangeHasPreview, isWide ] );
 
-	const [ dialogRef, dialogProps ] = useDialog( { focusOnMount: false } );
+	const formCore = (
+		<>
+			<header className="wp-block-legacy-widget__edit-form-header">
+				<h3 className="wp-block-legacy-widget__edit-form-title">
+					{ title }
+				</h3>
+				{ isWide && (
+					<Button
+						icon={ closeSmall }
+						label={ __( 'Close dialog' ) }
+						onClick={ onClose }
+					/>
+				) }
+			</header>
+			<div
+				className="wp-block-legacy-widget__edit-form-body"
+				ref={ ref }
+			/>
+		</>
+	);
 
 	if ( isWide ) {
 		return (
-			<div
-				className={ classnames( 'wp-block-legacy-widget__container', {
-					'is-visible': isVisible,
-				} ) }
-			>
-				<Fill name="Popover">
-					<div
-						className="wp-block-legacy-widget__edit-form is-wide"
-						ref={ dialogRef }
-						{ ...dialogProps }
-						hidden={ ! isVisible }
-					>
-						<header className="wp-block-legacy-widget__edit-form-header">
-							<h3 className="wp-block-legacy-widget__edit-form-title">
-								{ title }
-							</h3>
-							<Button
-								icon={ closeSmall }
-								label={ __( 'Close dialog' ) }
-								onClick={ onClose }
-							/>
-						</header>
-						<div
-							className="wp-block-legacy-widget__edit-form-body"
-							ref={ ref }
-						/>
-					</div>
-				</Fill>
-			</div>
+			<WideFormDialog isVisible={ isVisible }>
+				{ formCore }
+			</WideFormDialog>
 		);
 	}
 
 	return (
 		<div
-			ref={ ref }
 			className="wp-block-legacy-widget__edit-form"
 			hidden={ ! isVisible }
 		>
-			<h3 className="wp-block-legacy-widget__edit-form-title">
-				{ title }
-			</h3>
+			{ formCore }
+		</div>
+	);
+}
+
+function WideFormDialog( { isVisible, children } ) {
+	const containerRef = useRef();
+	const [ dialogRef, dialogProps ] = useDialog( { focusOnMount: false } );
+	const {
+		ref: budgeRef,
+		resizeObserver,
+	} = useBudgeYAxisBy( containerRef.current, { isEnabled: isVisible } );
+	return (
+		<div
+			ref={ containerRef }
+			className={ classnames( 'wp-block-legacy-widget__container', {
+				'is-visible': isVisible,
+			} ) }
+		>
+			<Fill name="Popover">
+				<div
+					className="wp-block-legacy-widget__edit-form is-wide"
+					ref={ useMergeRefs( [ dialogRef, budgeRef ] ) }
+					{ ...dialogProps }
+					hidden={ ! isVisible }
+				>
+					{ resizeObserver }
+					{ children }
+				</div>
+			</Fill>
 		</div>
 	);
 }
