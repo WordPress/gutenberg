@@ -69,6 +69,19 @@ A function that receives the value of the input.
 -   Type: `function`
 -   Required: Yes
 
+#### help
+
+If this property is added, a help text will be generated using help property as the content.
+
+-   Type: `String|WPElement`
+-   Required: No
+### hideLabelFromVision
+
+If true, the label will only be visible to screen readers.
+
+-   Type: `Boolean`
+-   Required: No
+
 ## Related components
 
 -   To offer users more constrained options for input, use TextControl, SelectControl, RadioControl, CheckboxControl, or RangeControl.
