@@ -17,7 +17,7 @@ import {
  */
 // eslint-disable-next-line no-restricted-imports
 import { find, findAll, waitFor } from 'puppeteer-testing-library';
-import { groupBy, mapValues, pickBy } from 'lodash';
+import { groupBy, mapValues } from 'lodash';
 
 describe( 'Widgets screen', () => {
 	beforeEach( async () => {
@@ -46,6 +46,7 @@ describe( 'Widgets screen', () => {
 
 	afterEach( async () => {
 		await deleteAllWidgets();
+		await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 	} );
 
 	beforeAll( async () => {
@@ -449,6 +450,7 @@ describe( 'Widgets screen', () => {
 		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
 		  "sidebar-1": "<marquee>Hello!</marquee>",
+			"wp_inactive_widgets": "",
 		}
 	` );
 
@@ -458,6 +460,7 @@ describe( 'Widgets screen', () => {
 		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
 		  "sidebar-1": "<marquee>Hello!</marquee>",
+			"wp_inactive_widgets": "",
 		}
 	` );
 
@@ -487,6 +490,7 @@ describe( 'Widgets screen', () => {
 		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
 		  "sidebar-1": "<marquee>Hello!</marquee>",
+			"wp_inactive_widgets": "",
 		}
 	` );
 
@@ -907,13 +911,13 @@ async function getSerializedWidgetAreas() {
 		wp.data.select( 'core' ).getWidgets( { _embed: 'about' } )
 	);
 
-	const serializedWidgetAreas = pickBy(
-		mapValues( groupBy( widgets, 'sidebar' ), ( sidebarWidgets ) =>
+	const serializedWidgetAreas = mapValues(
+		groupBy( widgets, 'sidebar' ),
+		( sidebarWidgets ) =>
 			sidebarWidgets
 				.map( ( widget ) => widget.rendered )
 				.filter( Boolean )
 				.join( '\n' )
-		)
 	);
 
 	return serializedWidgetAreas;
