@@ -11,9 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Update loading and failed screens for web version of the editor [#32395]
 ## 1.55.2
 -   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
--   [*] Update loading and failed screens for web version of the editor [#32395]
 
 -   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
 
