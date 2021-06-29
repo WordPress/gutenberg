@@ -10,7 +10,18 @@ export function space( value?: SpaceInput ): string | undefined {
 		return undefined;
 	}
 
-	const asInt = typeof value === 'number' ? value : Number( value );
+	// handle empty strings, if it's the number 0 this still works
+	if ( ! value ) {
+		return '0';
+	}
+
+	// test if the input has a unit, in which case just use that value
+	if ( CSS.supports( 'margin', value.toString() ) ) {
+		return value.toString();
+	}
+
+	// otherwise try to parse the value as a number if it's a string and then do the calculation
+	const asInt = typeof value === 'number' ? value : parseInt( value, 10 );
 
 	if ( Number.isNaN( asInt ) ) {
 		return value.toString();
