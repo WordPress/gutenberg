@@ -321,8 +321,13 @@ export default function SearchEdit( {
 		</>
 	);
 
+	const padBorderRadius = ( radius ) =>
+		radius ? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })` : undefined;
+
 	const getWrapperStyles = () => {
-		if ( 'button-inside' === buttonPosition && borderRadius ) {
+		const isNonZeroBorderRadius = parseInt( borderRadius, 10 ) !== 0;
+
+		if ( 'button-inside' === buttonPosition && isNonZeroBorderRadius ) {
 			// We have button inside wrapper and a border radius value to apply.
 			// Add default padding so we don't get "fat" corners.
 			//
@@ -338,10 +343,10 @@ export default function SearchEdit( {
 				} = borderRadius;
 
 				return {
-					borderTopLeftRadius: `calc(${ topLeft } + ${ DEFAULT_INNER_PADDING })`,
-					borderTopRightRadius: `calc(${ topRight } + ${ DEFAULT_INNER_PADDING })`,
-					borderBottomLeftRadius: `calc(${ bottomLeft } + ${ DEFAULT_INNER_PADDING })`,
-					borderBottomRightRadius: `calc(${ bottomRight } + ${ DEFAULT_INNER_PADDING })`,
+					borderTopLeftRadius: padBorderRadius( topLeft ),
+					borderTopRightRadius: padBorderRadius( topRight ),
+					borderBottomLeftRadius: padBorderRadius( bottomLeft ),
+					borderBottomRightRadius: padBorderRadius( bottomRight ),
 				};
 			}
 
