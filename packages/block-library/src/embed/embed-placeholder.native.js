@@ -9,6 +9,11 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import {
+	useBlockEditContext,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -18,13 +23,25 @@ import styles from './styles.scss';
 
 const EmbedPlaceholder = ( {
 	icon,
+	isSelected,
 	label,
 	onFocus,
 	value,
 	onSubmit,
 	onChange,
 } ) => {
-	const [ isEmbedSheetVisible, setIsEmbedSheetVisible ] = useState( ! value );
+	const { clientId } = useBlockEditContext();
+	const { wasBlockJustInserted } = useSelect(
+		( select ) => ( {
+			wasBlockJustInserted: select(
+				blockEditorStore
+			).wasBlockJustInserted( clientId, 'inserter_menu' ),
+		} ),
+		[ clientId ]
+	);
+	const [ isEmbedSheetVisible, setIsEmbedSheetVisible ] = useState(
+		isSelected && wasBlockJustInserted
+	);
 
 	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
 		styles.emptyStateContainer,

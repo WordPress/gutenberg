@@ -216,6 +216,7 @@ const EmbedEdit = ( props ) => {
 					tryAgain={ () => {
 						invalidateResolution( 'getEmbedPreview', [ url ] );
 					} }
+					isSelected={ isSelected }
 				/>
 			</View>
 		);
