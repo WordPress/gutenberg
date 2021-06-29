@@ -10,7 +10,7 @@ export function space( value?: SpaceInput ): string | undefined {
 		return undefined;
 	}
 
-	const asInt = typeof value === 'number' ? value : parseInt( value, 10 );
+	const asInt = typeof value === 'number' ? value : Number( value );
 
 	if ( Number.isNaN( asInt ) ) {
 		return value.toString();
