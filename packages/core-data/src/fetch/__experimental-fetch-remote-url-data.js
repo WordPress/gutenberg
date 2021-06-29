@@ -5,6 +5,13 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs, prependHTTP } from '@wordpress/url';
 
 /**
+ * A simple in-memory cache for requests.
+ * This avoids repeat HTTP requests which may be beneficial
+ * for those wishing to preserve low-bandwidth.
+ */
+const CACHE = new Map();
+
+/**
  * @typedef WPRemoteUrlData
  *
  * @property {string} title contents of the remote URL's `<title>` tag.
@@ -38,9 +45,16 @@ const fetchRemoteUrlData = async ( url, options = {} ) => {
 		url: prependHTTP( url ),
 	};
 
+	if ( CACHE.has( url ) ) {
+		return CACHE.get( url );
+	}
+
 	return apiFetch( {
 		path: addQueryArgs( endpoint, args ),
 		...options,
+	} ).then( ( res ) => {
+		CACHE.set( url, res );
+		return res;
 	} );
 };
 

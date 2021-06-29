@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { cx } from 'emotion';
+import { cx } from '@emotion/css';
 
 /**
  * WordPress dependencies

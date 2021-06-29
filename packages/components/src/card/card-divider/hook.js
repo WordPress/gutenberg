@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { cx } from 'emotion';
+import { cx } from '@emotion/css';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
 
 /**
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr', false>} props
  */
 export function useCardDivider( props ) {
 	const { className, ...otherProps } = useContextSystem(

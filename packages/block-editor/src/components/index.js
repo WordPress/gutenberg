@@ -14,6 +14,7 @@ export {
 export { default as __experimentalBlockFullHeightAligmentControl } from './block-full-height-alignment-control';
 export { default as __experimentalBlockAlignmentMatrixControl } from './block-alignment-matrix-control';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
+export { default as __experimentalBlockContentOverlay } from './block-content-overlay';
 export { BlockContextProvider } from './block-context';
 export {
 	default as BlockControls,

@@ -172,8 +172,9 @@ export default function PreferencesModal() {
 							/>
 						</Section>
 						<Section
-							title={ __(
-								'Manage visibility of blocks in the inserter'
+							title={ __( 'Visible blocks' ) }
+							description={ __(
+								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
 							) }
 						>
 							<BlockManager />

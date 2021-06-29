@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 
 /* eslint-disable jsdoc/no-undefined-types */
 /**
  * @param {TemplateStringsArray}                     strings
- * @param {import('create-emotion').Interpolation[]} interpolations
+ * @param {import('@emotion/css/create-instance').CSSInterpolation[]} interpolations
  */
 export function firefoxOnly( strings, ...interpolations ) {
 	const interpolatedStyles = css( strings, ...interpolations );
@@ -20,7 +20,7 @@ export function firefoxOnly( strings, ...interpolations ) {
 
 /**
  * @param {TemplateStringsArray}                     strings
- * @param {import('create-emotion').Interpolation[]} interpolations
+ * @param {import('@emotion/css/create-instance').CSSInterpolation[]} interpolations
  */
 export function safariOnly( strings, ...interpolations ) {
 	const interpolatedStyles = css( strings, ...interpolations );

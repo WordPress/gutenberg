@@ -194,6 +194,7 @@ export default function TemplatePartEdit( {
 			) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
+					clientId={ clientId }
 					tagName={ TagName }
 					blockProps={ blockProps }
 					postId={ templatePartId }

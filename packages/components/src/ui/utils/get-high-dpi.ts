@@ -1,12 +1,11 @@
 /**
  * External dependencies
  */
-import type { Interpolation } from '@emotion/core';
-import { css } from 'emotion';
+import { css, CSSInterpolation } from '@emotion/css';
 
 export function getHighDpi(
 	strings: TemplateStringsArray,
-	...interpolations: Interpolation[]
+	...interpolations: CSSInterpolation[]
 ) {
 	const interpolatedStyles = css( strings, ...interpolations );
 
