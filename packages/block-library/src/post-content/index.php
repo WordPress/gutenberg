@@ -23,7 +23,7 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	$post_id = $block->context['postId'];
 
 	if ( isset( $seen_ids[ $post_id ] ) ) {
-		if ( ! is_admin() && ! is_rest_api_request() ) {
+		if ( ! is_admin() && ! gutenberg_is_rest_api_request() ) {
 			trigger_error(
 				sprintf(
 					// translators: %s is a post ID (integer).

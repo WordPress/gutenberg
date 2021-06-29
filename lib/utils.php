@@ -148,7 +148,7 @@ function gutenberg_experimental_to_kebab_case( $string ) {
  *
  * @return bool
  */
-function is_rest_api_request() {
+function gutenberg_is_rest_api_request() {
 	if ( empty( $_SERVER['REQUEST_URI'] ) ) {
 		return false;
 	}

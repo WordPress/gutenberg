@@ -73,7 +73,7 @@ function render_block_core_template_part( $attributes ) {
 	}
 
 	if ( isset( $seen_ids[ $template_part_id ] ) ) {
-		if ( ! is_admin() && ! is_rest_api_request() ) {
+		if ( ! is_admin() && ! gutenberg_is_rest_api_request() ) {
 			trigger_error(
 				sprintf(
 					// translators: %s are the block attributes.
