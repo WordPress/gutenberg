@@ -70,13 +70,13 @@ const paddingYLarge = `calc((${ CONFIG.controlHeightLarge } - ${ baseFontHeight 
 
 const itemSizes = {
 	small: css`
-		padding: ${ paddingYSmall }, ${ CONFIG.controlPaddingXSmall };
+		padding: ${ paddingYSmall } ${ CONFIG.controlPaddingXSmall };
 	`,
 	medium: css`
-		padding: ${ paddingY }, ${ CONFIG.controlPaddingX };
+		padding: ${ paddingY } ${ CONFIG.controlPaddingX };
 	`,
 	large: css`
-		padding: ${ paddingYLarge }, ${ CONFIG.controlPaddingXLarge };
+		padding: ${ paddingYLarge } ${ CONFIG.controlPaddingXLarge };
 	`,
 };
 
