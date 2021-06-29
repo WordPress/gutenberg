@@ -9,7 +9,7 @@ import {
 import { isURL } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { useState } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 
 const linkSettingsOptions = {
 	url: {
@@ -29,28 +29,31 @@ const linkSettingsOptions = {
 	},
 };
 
-const EmbedBottomSheet = ( { value, isVisible, onClose, onChangeURL } ) => {
-	const [ url, setUrl ] = useState( value );
+const EmbedBottomSheet = ( { value, isVisible, onClose, onSubmit } ) => {
+	const url = useRef( value );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	function onDismiss() {
-		if ( url !== value && url !== '' ) {
-			onChangeURL( url );
+	const onDismiss = useCallback( () => {
+		const currentUrl = url.current;
+		if ( currentUrl !== '' && currentUrl !== value ) {
+			if ( isURL( currentUrl ) ) {
+				onSubmit( currentUrl );
+			} else {
+				createErrorNotice(
+					__( 'Invalid URL. Please enter a valid URL.' )
+				);
+			}
 		}
-	}
+	}, [ url.current, onSubmit ] );
 
-	function setAttributes( { url: nextUrl } ) {
-		if ( isURL( nextUrl ) ) {
-			setUrl( nextUrl );
-		} else if ( nextUrl !== '' ) {
-			createErrorNotice( __( 'Invalid URL. Please enter a valid URL.' ) );
-		}
+	function setAttributes( attributes ) {
+		url.current = attributes.url;
 	}
 
 	return (
 		<LinkSettingsNavigation
 			isVisible={ isVisible }
-			url={ url }
+			url={ value }
 			onClose={ onClose }
 			onDismiss={ onDismiss }
 			setAttributes={ setAttributes }

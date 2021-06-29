@@ -28,7 +28,6 @@ const EmbedPlaceholder = ( {
 	onFocus,
 	value,
 	onSubmit,
-	onChange,
 } ) => {
 	const { clientId } = useBlockEditContext();
 	const { wasBlockJustInserted } = useSelect(
@@ -79,12 +78,7 @@ const EmbedPlaceholder = ( {
 				value={ value }
 				isVisible={ isEmbedSheetVisible }
 				onClose={ () => setIsEmbedSheetVisible( false ) }
-				onChangeURL={ ( url ) => {
-					// The onChange prop in the edit component expects the argument to be a JS event
-					// so it's required to match its structure.
-					onChange( { target: { value: url } } );
-					onSubmit();
-				} }
+				onSubmit={ onSubmit }
 			/>
 		</>
 	);
