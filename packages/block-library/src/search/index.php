@@ -168,7 +168,7 @@ function classnames_for_block_core_search( $attributes ) {
  *
  * @return string A border radius inline style.
  */
-function get_wrapper_radius_style( $css_property, $value ) {
+function wrapper_radius_style_for_block_core_search( $css_property, $value ) {
 	$default_padding = '4px';
 
 	// Adjust border radius value for outer wrapper to make it
@@ -226,17 +226,17 @@ function styles_for_block_core_search( $attributes ) {
 
 			// Add adjusted border radius styles for the wrapper element.
 			if ( $button_inside ) {
-				$wrapper_styles[] = get_wrapper_radius_style( 'border-top-left-radius', $border_radius['topLeft'] );
-				$wrapper_styles[] = get_wrapper_radius_style( 'border-top-right-radius', $border_radius['topRight'] );
-				$wrapper_styles[] = get_wrapper_radius_style( 'border-bottom-left-radius', $border_radius['bottomLeft'] );
-				$wrapper_styles[] = get_wrapper_radius_style( 'border-bottom-right-radius', $border_radius['bottomRight'] );
+				$wrapper_styles[] = wrapper_radius_style_for_block_core_search( 'border-top-left-radius', $border_radius['topLeft'] );
+				$wrapper_styles[] = wrapper_radius_style_for_block_core_search( 'border-top-right-radius', $border_radius['topRight'] );
+				$wrapper_styles[] = wrapper_radius_style_for_block_core_search( 'border-bottom-left-radius', $border_radius['bottomLeft'] );
+				$wrapper_styles[] = wrapper_radius_style_for_block_core_search( 'border-bottom-right-radius', $border_radius['bottomRight'] );
 			}
 		} else {
 			$border_radius   = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
 			$shared_styles[] = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
 
 			if ( $button_inside ) {
-				$wrapper_styles[] = get_wrapper_radius_style( 'border-radius', $border_radius );
+				$wrapper_styles[] = wrapper_radius_style_for_block_core_search( 'border-radius', $border_radius );
 			}
 		}
 	}
