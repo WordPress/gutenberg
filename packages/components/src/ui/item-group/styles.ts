@@ -1,73 +1,58 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { css } from '@emotion/css';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
  */
 import { CONFIG } from '../../utils';
 import COLORS from '../../utils/colors-values';
+import type { ItemGroupProps, ItemProps } from './types';
+import type { ItemGroupContext } from './context';
 
-export const unstyledButton = css`
-	appearance: none;
-	border: 1px solid transparent;
-	cursor: pointer;
-	background: none;
-	text-align: left;
+const renderBordered = ( { bordered = false }: ItemGroupProps ) =>
+	bordered &&
+	css`
+		border: 1px solid ${ CONFIG.surfaceBorderColor };
+	`;
 
-	&:hover {
-		color: ${ COLORS.admin.theme };
-	}
+const renderSeparated = ( {
+	separated = false,
+	bordered = false,
+}: ItemGroupProps ) =>
+	( bordered || separated ) &&
+	css`
+		> *:not( marquee ) {
+			border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
+		}
 
-	&:focus {
-		background-color: transparent;
-		color: ${ COLORS.admin.theme };
-		border-color: ${ COLORS.admin.theme };
-		outline: 3px solid transparent;
-	}
-`;
+		> *:last-child:not( :focus ) {
+			border-bottom-color: transparent;
+		}
+	`;
 
-export const item = css`
-	width: 100%;
-	display: block;
-`;
+const renderRounded = ( { rounded = false }: ItemGroupProps ) =>
+	rounded &&
+	css`
+		border-radius: ${ borderRadius };
 
-export const bordered = css`
-	border: 1px solid ${ CONFIG.surfaceBorderColor };
-`;
+		> *:first-child {
+			border-top-left-radius: ${ borderRadius };
+			border-top-right-radius: ${ borderRadius };
+		}
 
-export const separated = css`
-	> *:not( marquee ) {
-		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
-	}
+		> *:last-child {
+			border-bottom-left-radius: ${ borderRadius };
+			border-bottom-right-radius: ${ borderRadius };
+		}
+	`;
 
-	> *:last-child:not( :focus ) {
-		border-bottom-color: transparent;
-	}
-`;
-
-const borderRadius = CONFIG.controlBorderRadius;
-
-export const spacedAround = css`
-	border-radius: ${ borderRadius };
-`;
-
-export const rounded = css`
-	border-radius: ${ borderRadius };
-
-	> *:first-child {
-		border-top-left-radius: ${ borderRadius };
-		border-top-right-radius: ${ borderRadius };
-	}
-
-	> *:last-child {
-		border-bottom-left-radius: ${ borderRadius };
-		border-bottom-right-radius: ${ borderRadius };
-	}
+export const ItemGroupWrapper = styled.div< ItemGroupProps >`
+	${ renderBordered }
+	${ renderSeparated }
+	${ renderRounded }
 `;
 
 const baseFontHeight = `calc(${ CONFIG.fontSize } * ${ CONFIG.fontLineHeightBase })`;
@@ -83,7 +68,7 @@ const paddingY = `calc((${ CONFIG.controlHeight } - ${ baseFontHeight } - 2px) /
 const paddingYSmall = `calc((${ CONFIG.controlHeightSmall } - ${ baseFontHeight } - 2px) / 2)`;
 const paddingYLarge = `calc((${ CONFIG.controlHeightLarge } - ${ baseFontHeight } - 2px) / 2)`;
 
-export const itemSizes = {
+const itemSizes = {
 	small: css`
 		padding: ${ paddingYSmall }, ${ CONFIG.controlPaddingXSmall };
 	`,
@@ -94,3 +79,43 @@ export const itemSizes = {
 		padding: ${ paddingYLarge }, ${ CONFIG.controlPaddingXLarge };
 	`,
 };
+
+const renderSize = ( { size = 'medium' }: ItemProps ) => itemSizes[ size ];
+
+const renderAction = ( { action = false }: ItemProps ) =>
+	action &&
+	css`
+		appearance: none;
+		border: 1px solid transparent;
+		cursor: pointer;
+		background: none;
+		text-align: left;
+
+		&:hover {
+			color: ${ COLORS.admin.theme };
+		}
+
+		&:focus {
+			background-color: transparent;
+			color: ${ COLORS.admin.theme };
+			border-color: ${ COLORS.admin.theme };
+			outline: 3px solid transparent;
+		}
+	`;
+
+const borderRadius = CONFIG.controlBorderRadius;
+
+const renderSpacedAround = ( { spacedAround }: ItemGroupContext ) =>
+	spacedAround &&
+	css`
+		border-radius: ${ borderRadius };
+	`;
+
+export const ItemWrapper = styled.div< ItemProps & ItemGroupContext >`
+	width: 100%;
+	display: block;
+
+	${ renderAction }
+	${ renderSize }
+	${ renderSpacedAround }
+`;

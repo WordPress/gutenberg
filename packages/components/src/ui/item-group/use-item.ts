@@ -1,10 +1,8 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
 // eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
+import type { ElementType } from 'react';
 
 /**
  * Internal dependencies
@@ -12,7 +10,6 @@ import { cx } from '@emotion/css';
 import { useContextSystem } from '../context';
 // eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../context';
-import * as styles from './styles';
 import { useItemGroupContext } from './context';
 
 export interface Props {
@@ -24,7 +21,6 @@ export function useItem( props: PolymorphicComponentProps< Props, 'div' > ) {
 	const {
 		action = false,
 		as: asProp,
-		className,
 		role = 'listitem',
 		size: sizeProp,
 		...otherProps
@@ -34,20 +30,14 @@ export function useItem( props: PolymorphicComponentProps< Props, 'div' > ) {
 
 	const size = sizeProp || contextSize;
 
-	const as = asProp || action ? 'button' : 'div';
-
-	const classes = cx(
-		action && styles.unstyledButton,
-		styles.itemSizes[ size ] || styles.itemSizes.medium,
-		styles.item,
-		spacedAround && styles.spacedAround,
-		className
-	);
+	const as = ( asProp || action ? 'button' : 'div' ) as ElementType;
 
 	return {
 		as,
-		className: classes,
 		role,
+		size,
+		spacedAround,
+		action,
 		...otherProps,
 	};
 }
