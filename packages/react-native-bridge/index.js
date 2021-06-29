@@ -123,8 +123,11 @@ export function subscribeAndroidModalClosed( callback ) {
 		: undefined;
 }
 
-export function subscribeUpdateTheme( callback ) {
-	return gutenbergBridgeEvents.addListener( 'updateTheme', callback );
+export function subscribeUpdateEditorSettings( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'updateEditorSettings',
+		callback
+	);
 }
 
 export function subscribePreferredColorScheme( callback ) {
