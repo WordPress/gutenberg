@@ -39,7 +39,7 @@ const EmbedPlaceholder = ( {
 		[ clientId ]
 	);
 	const [ isEmbedSheetVisible, setIsEmbedSheetVisible ] = useState(
-		isSelected && wasBlockJustInserted
+		isSelected && wasBlockJustInserted && ! value
 	);
 
 	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
