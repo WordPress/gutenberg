@@ -3,21 +3,18 @@
 /**
  * External dependencies
  */
-/**
- * WordPress dependencies
- */
-import RCTAztecView from '@wordpress/react-native-aztec';
 import { View, Platform } from 'react-native';
-import {
-	showUserSuggestions,
-	showXpostSuggestions,
-} from '@wordpress/react-native-bridge';
 import { get, pickBy, debounce, isString } from 'lodash';
 import memize from 'memize';
 
 /**
  * WordPress dependencies
  */
+import RCTAztecView from '@wordpress/react-native-aztec';
+import {
+	showUserSuggestions,
+	showXpostSuggestions,
+} from '@wordpress/react-native-bridge';
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -982,10 +979,12 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
-						linkTextColor: defaultTextDecorationColor,
+						linkTextColor:
+							style?.linkColor || defaultTextDecorationColor,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
+						style?.placeholderColor ||
 						this.props.placeholderTextColor ||
 						defaultPlaceholderTextColor
 					}

@@ -21,7 +21,7 @@ type Action =
 			typeof import('./actions').invalidateResolutionForStoreSelector
 	  >;
 
-type State = EquivalentKeyMap< unknown[] | unknown, boolean >;
+export type State = EquivalentKeyMap< unknown[] | unknown, boolean >;
 
 /**
  * Reducer function returning next state for selector resolution of

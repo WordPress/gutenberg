@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 10.9.1 =
+
+### Bug Fixes
+
+- Autocomplete: Fix double popover. ([32988](https://github.com/WordPress/gutenberg/pull/32988))
+
+
+
+
 = 10.9.0 =
 
 ### Enhancements

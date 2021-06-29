@@ -11,13 +11,10 @@
 		{ "path": "../element" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../priority-queue" },
-		// Needs to be added once it is typed
-		// { "path": "../redux-routine" }
+		{ "path": "../redux-routine" }
 	],
 	"include": [
-		"src/redux-store/metadata/actions.js",
-		"src/redux-store/metadata/equivalent-key-map.d.ts",
-		"src/redux-store/metadata/reducer.ts",
-		"src/redux-store/metadata/utils.js"
+		"src/redux-store/metadata/**/*",
+		"src/promise-middleware.js",
 	]
 }
