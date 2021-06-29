@@ -13,7 +13,7 @@ exports[`Post Editor Template mode Allow creating custom block templates in clas
 
 
 <main class=\\"wp-block-group\\" id=\\"wp--skip-link--target\\">
-<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><div class=\\"wp-block-group__inner-container\\"><div class=\\"wp-block-group__inner-container\\"><h2 class=\\"wp-block-post-title\\">Another FSE Post</h2></div></div></div></div>
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><div class=\\"wp-block-group__inner-container\\"><h2 class=\\"wp-block-post-title\\">Another FSE Post</h2></div></div></div>
 
 
 <div class=\\"entry-content wp-block-post-content\\">
