@@ -163,7 +163,6 @@ export default function useTabNav() {
 				target === focusCaptureBeforeRef.current ||
 				target === focusCaptureAfterRef.current
 			) {
-				event.stopPropagation();
 				event.preventDefault();
 				target.focus( { preventScroll: true } );
 			}
