@@ -26,19 +26,19 @@ const CACHE = new Map();
  * @param {Object?} options any options to pass to the underlying fetch.
  * @example
  * ```js
- * import { __experimentalFetchRemoteUrlData as fetchRemoteUrlData } from '@wordpress/core-data';
+ * import { __experimentalFetchUrlData as fetchUrlData } from '@wordpress/core-data';
  *
  * //...
  *
  * export function initialize( id, settings ) {
  *
- * settings.__experimentalFetchRemoteUrlData = (
+ * settings.__experimentalFetchUrlData = (
  * url
- * ) => fetchRemoteUrlData( url );
+ * ) => fetchUrlData( url );
  * ```
  * @return {Promise< WPRemoteUrlData[] >} Remote URL data.
  */
-const fetchRemoteUrlData = async ( url, options = {} ) => {
+const fetchUrlData = async ( url, options = {} ) => {
 	const endpoint = '/__experimental/url-details';
 
 	const args = {
@@ -58,4 +58,4 @@ const fetchRemoteUrlData = async ( url, options = {} ) => {
 	} );
 };
 
-export default fetchRemoteUrlData;
+export default fetchUrlData;

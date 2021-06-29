@@ -11,7 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
-	__experimentalFetchRemoteUrlData as fetchRemoteUrlData,
+	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import {
 	getAuthority,
@@ -119,7 +119,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			}
 
 			// If external then attempt fetch of data.
-			return fetchRemoteUrlData( url, fetchOptions );
+			return fetchUrlData( url, fetchOptions );
 		},
 		[ baseUrl, hasResolvedLocalSiteData ]
 	);
