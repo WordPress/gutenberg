@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { LayoutAnimation, TouchableHighlight } from 'react-native';
+import { LayoutAnimation, TouchableHighlight, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -140,10 +140,15 @@ function InserterMenu( {
 
 	const onSelectItem = useCallback(
 		( item ) => {
-			// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
-			setTimeout( () => {
+			// Avoid a focus loop, see https://github.com/WordPress/gutenberg/issues/30562
+			if ( Platform.OS === 'ios' ) {
+				// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+				setTimeout( () => {
+					onInsert( item );
+				}, 100 );
+			} else {
 				onInsert( item );
-			}, 100 );
+			}
 			onSelect( item );
 		},
 		[ onInsert, onSelect ]
