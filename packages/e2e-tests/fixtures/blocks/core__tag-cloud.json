@@ -4,7 +4,7 @@
 		"name": "core/tag-cloud",
 		"isValid": true,
 		"attributes": {
-			"tagsToShow": 45,
+			"numberOfTags": 45,
 			"taxonomy": "category",
 			"showTagCounts": false
 		},

@@ -33,7 +33,7 @@ const MIN_TAGS = 3;
 const MAX_TAGS = 100;
 
 function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
-	const { taxonomy, showTagCounts, tagsToShow } = attributes;
+	const { taxonomy, showTagCounts, numberOfTags } = attributes;
 
 	const getTaxonomyOptions = () => {
 		const selectOption = {
@@ -74,9 +74,9 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 				/>
 				<RangeControl
 					label={ __( 'Number of tags' ) }
-					value={ tagsToShow }
+					value={ numberOfTags }
 					onChange={ ( value ) =>
-						setAttributes( { tagsToShow: value } )
+						setAttributes( { numberOfTags: value } )
 					}
 					min={ MIN_TAGS }
 					max={ MAX_TAGS }
