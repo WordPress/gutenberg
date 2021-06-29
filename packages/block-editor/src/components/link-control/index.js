@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -106,6 +106,7 @@ function LinkControl( {
 	value,
 	settings,
 	onChange = noop,
+	onRemove,
 	noDirectEntry = false,
 	showSuggestions = true,
 	showInitialSuggestions,
@@ -266,18 +267,20 @@ function LinkControl( {
 					settings={ settings }
 					onChange={ onChange }
 				/>
-				{ value && ! isEditingLink && ! isCreatingPage && (
-					<Button
-						className="block-editor-link-control__unlink"
-						isDestructive
-						variant="link"
-						onClick={ () => {
-							onChange( null );
-						} }
-					>
-						{ __( 'Unlink' ) }
-					</Button>
-				) }
+				{ onRemove &&
+					isFunction( onRemove ) &&
+					value &&
+					! isEditingLink &&
+					! isCreatingPage && (
+						<Button
+							className="block-editor-link-control__unlink"
+							isDestructive
+							variant="link"
+							onClick={ onRemove }
+						>
+							{ __( 'Unlink' ) }
+						</Button>
+					) }
 			</div>
 		</div>
 	);

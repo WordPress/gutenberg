@@ -49,14 +49,16 @@ function InlineLinkUI( {
 		...nextLinkValue,
 	};
 
+	function removeLink() {
+		const newValue = removeFormat( value, 'core/link' );
+		onChange( newValue );
+		stopAddingLink();
+		speak( __( 'Link removed.' ), 'assertive' );
+	}
+
 	function onChangeLink( nextValue ) {
-		// null values trigger removal of link format.
 		if ( null === nextValue ) {
-			const newValue = removeFormat( value, 'core/link' );
-			onChange( newValue );
-			stopAddingLink();
-			speak( __( 'Link removed.' ), 'assertive' );
-			return;
+			return removeLink();
 		}
 
 		// Merge with values from state, both for the purpose of assigning the
@@ -149,6 +151,7 @@ function InlineLinkUI( {
 			<LinkControl
 				value={ linkValue }
 				onChange={ onChangeLink }
+				onRemove={ removeLink }
 				forceIsEditingLink={ addingLink }
 				hasRichPreviews
 			/>
