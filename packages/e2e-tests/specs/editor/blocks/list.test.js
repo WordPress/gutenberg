@@ -539,4 +539,26 @@ describe( 'List', () => {
 		);
 		expect( content ).toMatchSnapshot();
 	} );
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/33078
+	it( 'pasting from paragraph blocks work', async () => {
+		const text = 'Copy and paste me, pretty please!';
+
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( text );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		await page.keyboard.press( 'Enter' );
+		await insertBlock( 'List' );
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		const content = await page.$eval(
+			'.wp-block-list',
+			( el ) => el.innerHTML
+		);
+
+		expect( content ).toMatch( text );
+	} );
 } );
