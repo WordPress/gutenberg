@@ -44,6 +44,18 @@ function* ensureDefaultBlock() {
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
 	if ( count === 0 ) {
+		const { __unstableHasCustomAppender } = yield controls.select(
+			blockEditorStoreName,
+			'getSettings'
+		);
+
+		// If there's an custom appender, don't insert default block.
+		// We have to remember to manually move the focus elsewhere to
+		// prevent it from being lost though.
+		if ( __unstableHasCustomAppender ) {
+			return;
+		}
+
 		return yield insertDefaultBlock();
 	}
 }

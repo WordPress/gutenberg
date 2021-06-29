@@ -32,6 +32,7 @@ $z-layers: (
 	".block-editor-url-input__suggestions": 30,
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
+	".interface-interface-skeleton__content": 20,
 	".edit-site-header": 62,
 	".edit-widgets-header": 30,
 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
@@ -72,6 +73,9 @@ $z-layers: (
 
 	// The toolbar, when contextual, should be above any adjacent nested block click overlays.
 	".block-editor-block-contextual-toolbar": 61,
+
+	// Ensures content overlay appears higher than resize containers used for image/video/etc.
+	".block-editor-block-content-overlay__overlay": 10,
 
 	// The block mover, particularly in nested contexts,
 	// should overlap most block content.

@@ -89,20 +89,15 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
  * Renders a Navigation Block derived from data from the theme_location assigned
  * via the block attribute 'location'.
  *
- * If the theme doesn't explicity support 'block-nav-menus' or no location was provided
- * as a block attribute then an empty string is returned.
+ * If no location was provided as a block attribute then false is returned.
  *
- * @param  array $location The location of the classic menu to display.
- * @param  array $attributes Navigation block attributes.
+ * @param  string $location The location of the classic menu to display.
  * @return string|false HTML markup of a generated Navigation Block or false if no location is specified.
  */
-function render_classic_location_menu( $location, $attributes ) {
+function gutenberg_render_menu_from_location( $location ) {
 	if ( empty( $location ) ) {
 		return false;
 	}
-
-	$block_attributes = $attributes;
-	unset( $block_attributes['__unstableLocation'] );
 
 	return wp_nav_menu(
 		array(
@@ -150,22 +145,16 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
-	$should_load_frontend_script = $attributes['isResponsive'] && ! wp_script_is( 'core_block_navigation_load_frontend_scripts' );
 
-	if ( $should_load_frontend_script ) {
-		wp_enqueue_script(
-			'core_block_navigation_load_frontend_scripts',
-			plugins_url( 'frontend.js', __DIR__ . '/navigation/frontend.js' ),
-			array(),
-			false,
-			true
-		);
+	$should_load_view_script = ! empty( $attributes['isResponsive'] ) && ! wp_script_is( 'wp-block-navigation-view' );
+	if ( $should_load_view_script ) {
+		wp_enqueue_script( 'wp-block-navigation-view' );
 	}
 
 	if ( empty( $block->inner_blocks ) ) {
 		if ( array_key_exists( '__unstableLocation', $attributes ) ) {
 			$location                 = $attributes['__unstableLocation'];
-			$maybe_classic_navigation = render_classic_location_menu( $location, $attributes );
+			$maybe_classic_navigation = gutenberg_render_menu_from_location( $location );
 			if ( $maybe_classic_navigation ) {
 				return $maybe_classic_navigation;
 			}

@@ -28,7 +28,10 @@ class FixStyleWebpackPlugin {
 							}
 
 							const file = `${ chunk.name }.js`;
-							const styleFile = `style-${ chunk.name }.js`;
+							const styleFile = chunk.name.replace(
+								/(\/?)([^/]+?)$/,
+								'$1style-$2.js'
+							);
 							const styleFileAsset = compilation.getAsset(
 								styleFile
 							);

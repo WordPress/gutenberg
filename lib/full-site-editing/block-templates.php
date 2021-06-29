@@ -32,10 +32,10 @@ function _gutenberg_get_template_paths( $base_directory ) {
  * @access private
  * @internal
  *
- * @param array  $template_type wp_template or wp_template_part.
+ * @param string $template_type wp_template or wp_template_part.
  * @param string $slug template slug.
  *
- * @return array Template.
+ * @return array|null Template.
  */
 function _gutenberg_get_template_file( $template_type, $slug ) {
 	$template_base_paths = array(
@@ -72,7 +72,7 @@ function _gutenberg_get_template_file( $template_type, $slug ) {
  * @access private
  * @internal
  *
- * @param array $template_type wp_template or wp_template_part.
+ * @param string $template_type wp_template or wp_template_part.
  *
  * @return array Template.
  */
@@ -298,6 +298,28 @@ function _gutenberg_build_template_result_from_post( $post ) {
  * @return array Templates.
  */
 function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_template' ) {
+	/**
+	 * Filters the block templates array before the query takes place.
+	 *
+	 * Return a non-null value to bypass the WordPress quries.
+	 *
+	 * @since 10.8
+	 *
+	 * @param WP_Block_Template[]|null $block_templates Return an array of block templates to short-circuit the default query,
+	 *                                                  or null to allow WP to run it's normal queries.
+	 * @param array $query {
+	 *     Optional. Arguments to retrieve templates.
+	 *
+	 *     @type array  $slug__in List of slugs to include.
+	 *     @type int    $wp_id Post ID of customized template.
+	 * }
+	 * @param array $template_type wp_template or wp_template_part.
+	 */
+	$templates = apply_filters( 'pre_get_block_templates', null, $query, $template_type );
+	if ( ! is_null( $templates ) ) {
+		return $templates;
+	}
+
 	$wp_query_args = array(
 		'post_status'    => array( 'auto-draft', 'draft', 'publish' ),
 		'post_type'      => $template_type,
@@ -361,7 +383,21 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		}
 	}
 
-	return $query_result;
+	/**
+	 * Filters the array of queried block templates array after they've been fetched.
+	 *
+	 * @since 10.8
+	 *
+	 * @param WP_Block_Template[] $query_result Array of found block templates.
+	 * @param array $query {
+	 *     Optional. Arguments to retrieve templates.
+	 *
+	 *     @type array  $slug__in List of slugs to include.
+	 *     @type int    $wp_id Post ID of customized template.
+	 * }
+	 * @param array $template_type wp_template or wp_template_part.
+	 */
+	return apply_filters( 'get_block_templates', $query_result, $query, $template_type );
 }
 
 /**
@@ -373,6 +409,23 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
  * @return WP_Block_Template|null Template.
  */
 function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
+	/**
+	 * Filters the block templates array before the query takes place.
+	 *
+	 * Return a non-null value to bypass the WordPress quries.
+	 *
+	 * @since 10.8
+	 *
+	 * @param WP_Block_Template|null $block_template Return block template object to short-circuit the default query,
+	 *                                               or null to allow WP to run it's normal queries.
+	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
+	 * @param array  $template_type wp_template or wp_template_part.
+	 */
+	$block_template = apply_filters( 'pre_get_block_template', null, $id, $template_type );
+	if ( ! is_null( $block_template ) ) {
+		return $block_template;
+	}
+
 	$parts = explode( '//', $id, 2 );
 	if ( count( $parts ) < 2 ) {
 		return null;
@@ -403,7 +456,18 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		}
 	}
 
-	return gutenberg_get_block_file_template( $id, $template_type );
+	$block_template = gutenberg_get_block_file_template( $id, $template_type );
+
+	/**
+	 * Filters the array of queried block templates array after they've been fetched.
+	 *
+	 * @since 10.8
+	 *
+	 * @param WP_Block_Template $block_template The found block template.
+	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
+	 * @param array  $template_type wp_template or wp_template_part.
+	 */
+	return apply_filters( 'get_block_template', $block_template, $id, $template_type );
 }
 
 /**
@@ -416,20 +480,53 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
  * @return WP_Block_Template|null File template.
  */
 function gutenberg_get_block_file_template( $id, $template_type = 'wp_template' ) {
+	/**
+	 * Filters the block templates array before the query takes place.
+	 *
+	 * Return a non-null value to bypass the WordPress quries.
+	 *
+	 * @since 10.8
+	 *
+	 * @param WP_Block_Template|null $block_template Return block template object to short-circuit the default query,
+	 *                                               or null to allow WP to run it's normal queries.
+	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
+	 * @param array  $template_type wp_template or wp_template_part.
+	 */
+	$block_template = apply_filters( 'pre_get_block_file_template', null, $id, $template_type );
+	if ( ! is_null( $block_template ) ) {
+		return $block_template;
+	}
+
 	$parts = explode( '//', $id, 2 );
 	if ( count( $parts ) < 2 ) {
-		return null;
+		/** This filter is documented at the end of this function */
+		return apply_filters( 'get_block_file_template', null, $id, $template_type );
 	}
 	list( $theme, $slug ) = $parts;
 
-	if ( wp_get_theme()->get_stylesheet() === $theme ) {
-		$template_file = _gutenberg_get_template_file( $template_type, $slug );
-		if ( null !== $template_file ) {
-			return _gutenberg_build_template_result_from_file( $template_file, $template_type );
-		}
+	if ( wp_get_theme()->get_stylesheet() !== $theme ) {
+		/** This filter is documented at the end of this function */
+		return apply_filters( 'get_block_file_template', null, $id, $template_type );
 	}
 
-	return null;
+	$template_file = _gutenberg_get_template_file( $template_type, $slug );
+	if ( null === $template_file ) {
+		/** This filter is documented at the end of this function */
+		return apply_filters( 'get_block_file_template', null, $id, $template_type );
+	}
+
+	$block_template = _gutenberg_build_template_result_from_file( $template_file, $template_type );
+
+	/**
+	 * Filters the array of queried block templates array after they've been fetched.
+	 *
+	 * @since 10.8
+	 *
+	 * @param null|WP_Block_Template $block_template The found block template.
+	 * @param string $id Template unique identifier (example: theme_slug//template_slug).
+	 * @param array  $template_type wp_template or wp_template_part.
+	 */
+	return apply_filters( 'get_block_file_template', $block_template, $id, $template_type );
 }
 
 /**

@@ -27,7 +27,7 @@ const migrateBorderRadius = ( attributes ) => {
 		...newAttributes,
 		style: {
 			...newAttributes.style,
-			border: { radius: borderRadius },
+			border: { radius: `${ borderRadius }px` },
 		},
 	};
 };
