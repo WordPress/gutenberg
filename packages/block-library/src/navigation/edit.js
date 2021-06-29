@@ -44,8 +44,6 @@ const LAYOUT = {
 	alignments: [],
 };
 
-const DEFAULT_ORIENTATION = 'vertical';
-
 function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
@@ -66,8 +64,6 @@ function Navigation( {
 		false
 	);
 
-	const possibleOrientation = attributes.orientation || DEFAULT_ORIENTATION;
-
 	const allowedOrientations = Object.entries(
 		useSetting( 'layout.orientations' )
 	).reduce( ( allowed, curr ) => {
@@ -77,9 +73,24 @@ function Navigation( {
 		return allowed;
 	}, [] );
 
+	let defaultOrientation;
+
+	if ( allowedOrientations.includes( 'vertical' ) ) {
+		defaultOrientation = 'vertical';
+	} else if (
+		! allowedOrientations.includes( 'vertical' ) &&
+		allowedOrientations.includes( 'horizontal' )
+	) {
+		defaultOrientation = 'horizontal';
+	} else {
+		defaultOrientation = 'vertical';
+	}
+
+	const possibleOrientation = attributes.orientation || defaultOrientation;
+
 	const blockOrientation = allowedOrientations.includes( possibleOrientation )
 		? possibleOrientation
-		: DEFAULT_ORIENTATION;
+		: defaultOrientation;
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
