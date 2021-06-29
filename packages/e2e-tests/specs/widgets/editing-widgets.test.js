@@ -46,7 +46,6 @@ describe( 'Widgets screen', () => {
 
 	afterEach( async () => {
 		await deleteAllWidgets();
-		await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 	} );
 
 	beforeAll( async () => {
@@ -395,112 +394,120 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	async function addMarquee() {
-		// There will be 2 matches here.
-		// One is the in-between inserter,
-		// and the other one is the button block appender.
-		const [ inlineInserterButton ] = await findAll( {
-			role: 'combobox',
-			name: 'Add block',
+
+	describe( 'Function widgets', () => {
+		async function addMarquee() {
+			// There will be 2 matches here.
+			// One is the in-between inserter,
+			// and the other one is the button block appender.
+			const [ inlineInserterButton ] = await findAll( {
+				role: 'combobox',
+				name: 'Add block',
+			} );
+			await inlineInserterButton.click();
+
+			// TODO: Convert to find() API from puppeteer-testing-library.
+			const inserterSearchBox = await page.waitForSelector(
+				'aria/Search for blocks and patterns[role="searchbox"]'
+			);
+			await expect( inserterSearchBox ).toHaveFocus();
+
+			await page.keyboard.type( 'Marquee' );
+
+			const inlineQuickInserter = await find( {
+				role: 'listbox',
+				name: 'Blocks',
+			} );
+			const marqueeBlockOption = await find(
+				{
+					role: 'option',
+				},
+				{
+					root: inlineQuickInserter,
+				}
+			);
+			await marqueeBlockOption.click();
+		}
+
+		afterEach( async () => {
+			await deleteAllWidgets();
+			await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 		} );
-		await inlineInserterButton.click();
 
-		// TODO: Convert to find() API from puppeteer-testing-library.
-		const inserterSearchBox = await page.waitForSelector(
-			'aria/Search for blocks and patterns[role="searchbox"]'
-		);
-		await expect( inserterSearchBox ).toHaveFocus();
+		it( 'Should add and save the marquee widget', async () => {
+			await activatePlugin( 'gutenberg-test-marquee-widget' );
+			await visitAdminPage( 'widgets.php' );
 
-		await page.keyboard.type( 'Marquee' );
+			await addMarquee();
 
-		const inlineQuickInserter = await find( {
-			role: 'listbox',
-			name: 'Blocks',
-		} );
-		const marqueeBlockOption = await find(
-			{
-				role: 'option',
-			},
-			{
-				root: inlineQuickInserter,
+			await find( {
+				selector: '[data-block][data-type="core/legacy-widget"]',
+			} );
+
+			const greetingsInput = await find( {
+				selector: '#marquee-greeting',
+			} );
+			await greetingsInput.click();
+			await page.keyboard.type( 'Howdy' );
+
+			await saveWidgets();
+
+			let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+			Object {
+				"sidebar-1": "<marquee>Hello!</marquee>",
+				"wp_inactive_widgets": "",
 			}
-		);
-		await marqueeBlockOption.click();
-	}
+		` );
 
-	it( 'Should add and save the marquee widget', async () => {
-		await activatePlugin( 'gutenberg-test-marquee-widget' );
-		await visitAdminPage( 'widgets.php' );
+			await page.reload();
 
-		await addMarquee();
+			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+			Object {
+				"sidebar-1": "<marquee>Hello!</marquee>",
+				"wp_inactive_widgets": "",
+			}
+		` );
 
-		await find( {
-			selector: '[data-block][data-type="core/legacy-widget"]',
-		} );
+			// Add another marquee, it shouldn't be saved
+			await addMarquee();
 
-		const greetingsInput = await find( {
-			selector: '#marquee-greeting',
-		} );
-		await greetingsInput.click();
-		await page.keyboard.type( 'Howdy' );
+			// It takes a moment to load the form, let's wait for it.
+			await waitFor( async () => {
+				const marquees = await findAll( {
+					selector: '[id=marquee-greeting]',
+				} );
+				if ( marquees.length === 1 ) {
+					throw new Error();
+				}
+			} );
 
-		await saveWidgets();
-
-		let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
-		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": "<marquee>Hello!</marquee>",
-			"wp_inactive_widgets": "",
-		}
-	` );
-
-		await page.reload();
-
-		editedSerializedWidgetAreas = await getSerializedWidgetAreas();
-		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": "<marquee>Hello!</marquee>",
-			"wp_inactive_widgets": "",
-		}
-	` );
-
-		// Add another marquee, it shouldn't be saved
-		await addMarquee();
-
-		// It takes a moment to load the form, let's wait for it.
-		await waitFor( async () => {
 			const marquees = await findAll( {
 				selector: '[id=marquee-greeting]',
 			} );
-			if ( marquees.length === 1 ) {
-				throw new Error();
+
+			expect( marquees ).toHaveLength( 2 );
+			await marquees[ 1 ].click();
+			await page.keyboard.type( 'Second howdy' );
+
+			await saveWidgets();
+			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+			Object {
+				"sidebar-1": "<marquee>Hello!</marquee>",
+				"wp_inactive_widgets": "",
 			}
+		` );
+
+			await page.reload();
+			const marqueesAfter = await findAll( {
+				selector: '[id=marquee-greeting]',
+			} );
+			expect( marqueesAfter ).toHaveLength( 1 );
+
+			await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 		} );
-
-		const marquees = await findAll( {
-			selector: '[id=marquee-greeting]',
-		} );
-
-		expect( marquees ).toHaveLength( 2 );
-		await marquees[ 1 ].click();
-		await page.keyboard.type( 'Second howdy' );
-
-		await saveWidgets();
-		editedSerializedWidgetAreas = await getSerializedWidgetAreas();
-		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": "<marquee>Hello!</marquee>",
-			"wp_inactive_widgets": "",
-		}
-	` );
-
-		await page.reload();
-		const marqueesAfter = await findAll( {
-			selector: '[id=marquee-greeting]',
-		} );
-		expect( marqueesAfter ).toHaveLength( 1 );
-
-		await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 	} );
 
 	// Disable reason: We temporary skip this test until we can figure out why it fails sometimes.
