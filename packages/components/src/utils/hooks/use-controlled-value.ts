@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isNil } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -28,11 +23,12 @@ export function useControlledValue< T >( {
 	onChange,
 	value: valueProp,
 }: Props< T > ): [ T | undefined, ( value: T ) => void ] {
-	const hasValue = ! isNil( valueProp );
+	const hasValue = typeof valueProp !== 'undefined';
 	const initialValue = hasValue ? valueProp : defaultValue;
 	const [ state, setState ] = useState( initialValue );
 	const value = hasValue ? valueProp : state;
-	const setValue = hasValue && ! isNil( onChange ) ? onChange : setState;
+	const setValue =
+		hasValue && typeof onChange === 'function' ? onChange : setState;
 
 	return [ value, setValue ];
 }
