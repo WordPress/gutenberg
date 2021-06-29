@@ -44,6 +44,9 @@ const LAYOUT = {
 	alignments: [],
 };
 
+const ORIENTATION_VERTICAL = 'vertical';
+const ORIENTATION_HORIZONTAL = 'horizontal';
+
 function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
@@ -64,26 +67,29 @@ function Navigation( {
 		false
 	);
 
-	const allowedOrientations = Object.entries(
-		useSetting( 'layout.orientations' )
-	).reduce( ( allowed, curr ) => {
-		if ( true === curr[ 1 ] ) {
-			allowed.push( curr[ 0 ] );
-		}
-		return allowed;
-	}, [] );
+	const orientationSettings = useSetting( 'layout.orientations' ) || {};
+
+	const allowedOrientations = Object.entries( orientationSettings ).reduce(
+		( allowed, curr ) => {
+			if ( true === curr[ 1 ] ) {
+				allowed.push( curr[ 0 ] );
+			}
+			return allowed;
+		},
+		[]
+	);
 
 	let defaultOrientation;
 
-	if ( allowedOrientations.includes( 'vertical' ) ) {
-		defaultOrientation = 'vertical';
+	if ( allowedOrientations.includes( ORIENTATION_VERTICAL ) ) {
+		defaultOrientation = ORIENTATION_VERTICAL;
 	} else if (
-		! allowedOrientations.includes( 'vertical' ) &&
-		allowedOrientations.includes( 'horizontal' )
+		! allowedOrientations.includes( ORIENTATION_VERTICAL ) &&
+		allowedOrientations.includes( ORIENTATION_HORIZONTAL )
 	) {
-		defaultOrientation = 'horizontal';
+		defaultOrientation = ORIENTATION_HORIZONTAL;
 	} else {
-		defaultOrientation = 'vertical';
+		defaultOrientation = ORIENTATION_VERTICAL;
 	}
 
 	const possibleOrientation = attributes.orientation || defaultOrientation;
@@ -97,7 +103,7 @@ function Navigation( {
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-			'is-vertical': blockOrientation === 'vertical',
+			'is-vertical': blockOrientation === ORIENTATION_VERTICAL,
 			'is-responsive': attributes.isResponsive,
 		} ),
 	} );
@@ -149,7 +155,7 @@ function Navigation( {
 	}
 
 	const justifyAllowedControls =
-		blockOrientation === 'vertical'
+		blockOrientation === ORIENTATION_VERTICAL
 			? [ 'left', 'center', 'right' ]
 			: [ 'left', 'center', 'right', 'space-between' ];
 
