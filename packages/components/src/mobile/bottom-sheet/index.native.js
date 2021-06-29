@@ -393,6 +393,8 @@ class BottomSheet extends Component {
 			children,
 			withHeaderSeparator = false,
 			hasNavigation,
+			// eslint-disable-next-line no-unused-vars
+			onDismiss,
 			...rest
 		} = this.props;
 		const {
