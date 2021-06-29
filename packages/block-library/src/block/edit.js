@@ -97,7 +97,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				: InnerBlocks.ButtonBlockAppender,
 		}
 	);
-	n;
+
 	// local states for gudie modal
 	const [ isGudieOpen, setIsGudieOpen ] = useState( false );
 
