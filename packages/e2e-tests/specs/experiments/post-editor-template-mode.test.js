@@ -9,6 +9,8 @@ import {
 	trashAllPosts,
 	openPreviewPage,
 	openDocumentSettingsSidebar,
+	activatePlugin,
+	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
 
 const openSidebarPanelWithTitle = async ( title ) => {
@@ -89,12 +91,14 @@ const createNewTemplate = async ( templateName ) => {
 
 describe( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-block-templates' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
+		await deactivatePlugin( 'gutenberg-test-block-templates' );
 	} );
 
 	it( 'Allow to switch to template mode, edit the template and check the result', async () => {

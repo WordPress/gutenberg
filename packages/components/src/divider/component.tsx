@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { css, cx } from '@emotion/css';
 // eslint-disable-next-line no-restricted-imports
 import { Separator } from 'reakit';
 // eslint-disable-next-line no-restricted-imports, no-duplicate-imports
@@ -39,7 +42,7 @@ export interface DividerProps extends Omit< SeparatorProps, 'children' > {
 }
 
 function Divider(
-	props: PolymorphicComponentProps< DividerProps, 'hr' >,
+	props: PolymorphicComponentProps< DividerProps, 'hr', false >,
 	forwardedRef: Ref< any >
 ) {
 	const {

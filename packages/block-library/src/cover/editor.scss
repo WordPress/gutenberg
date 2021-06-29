@@ -1,4 +1,9 @@
 .wp-block-cover {
+	/* Extra specificity needed because the reset.css applied in the editor context is overriding this rule. */
+	.editor-styles-wrapper & {
+		box-sizing: border-box;
+	}
+
 	// Override default cover styles
 	// because we're not ready yet to show the cover block.
 	&.is-placeholder {

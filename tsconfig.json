@@ -8,6 +8,7 @@
 		{ "path": "packages/block-editor" },
 		{ "path": "packages/components" },
 		{ "path": "packages/compose" },
+		{ "path": "packages/data" },
 		{ "path": "packages/date" },
 		{ "path": "packages/deprecated" },
 		{ "path": "packages/docgen" },
