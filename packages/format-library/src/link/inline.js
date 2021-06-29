@@ -57,10 +57,6 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
-		if ( null === nextValue ) {
-			return removeLink();
-		}
-
 		// Merge with values from state, both for the purpose of assigning the
 		// next state value, and for use in constructing the new link format if
 		// the link is ready to be applied.
