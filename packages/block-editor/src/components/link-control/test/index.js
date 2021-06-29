@@ -237,9 +237,12 @@ describe( 'Basic rendering', () => {
 				);
 			} );
 
-			const unLinkButton = queryByText( container, 'Unlink' );
+			const unLinkButton = queryByRole( container, 'button', {
+				name: 'Unlink',
+			} );
 
 			expect( unLinkButton ).toBeNull();
+			expect( unLinkButton ).not.toBeInTheDocument();
 		} );
 
 		it( 'should show "Unlink" button if a onRemove handler is provided', () => {
@@ -254,8 +257,11 @@ describe( 'Basic rendering', () => {
 				);
 			} );
 
-			const unLinkButton = queryByText( container, 'Unlink' );
+			const unLinkButton = queryByRole( container, 'button', {
+				name: 'Unlink',
+			} );
 			expect( unLinkButton ).toBeTruthy();
+			expect( unLinkButton ).toBeInTheDocument();
 
 			act( () => {
 				Simulate.click( unLinkButton );
