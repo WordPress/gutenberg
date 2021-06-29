@@ -454,8 +454,7 @@ describe( 'Widgets screen', () => {
 			let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 			Object {
-				"sidebar-1": "<marquee>Hello!</marquee>",
-				"wp_inactive_widgets": "",
+			  "sidebar-1": "<marquee>Hello!</marquee>",
 			}
 		` );
 
@@ -464,8 +463,7 @@ describe( 'Widgets screen', () => {
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 			Object {
-				"sidebar-1": "<marquee>Hello!</marquee>",
-				"wp_inactive_widgets": "",
+			  "sidebar-1": "<marquee>Hello!</marquee>",
 			}
 		` );
 
@@ -494,8 +492,7 @@ describe( 'Widgets screen', () => {
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 			Object {
-				"sidebar-1": "<marquee>Hello!</marquee>",
-				"wp_inactive_widgets": "",
+			  "sidebar-1": "<marquee>Hello!</marquee>",
 			}
 		` );
 
