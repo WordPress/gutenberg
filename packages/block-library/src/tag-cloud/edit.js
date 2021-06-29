@@ -23,7 +23,7 @@ import { store as coreStore } from '@wordpress/core-data';
  *
  * @type {number}
  */
-const MIN_TAGS = 3;
+const MIN_TAGS = 1;
 
 /**
  * Maximum number of tags a user can show using this block.

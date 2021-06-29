@@ -9,7 +9,7 @@
 		"numberOfTags": {
 			"type": "number",
 			"default": 45,
-			"minimum": 3,
+			"minimum": 1,
 			"maximum": 100
 		},
 		"taxonomy": {
