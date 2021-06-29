@@ -96,6 +96,11 @@ module.exports = {
 						message:
 							'`puppeteer-testing-library` is still experimental.',
 					},
+					{
+						name: '@emotion/css',
+						message:
+							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support',
+					},
 				],
 			},
 		],
