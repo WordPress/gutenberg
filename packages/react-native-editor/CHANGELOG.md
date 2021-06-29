@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] Image block: Add a "featured" banner and ability to set or remove an image as featured. (iOS only) [#31345]
+
 ## 1.55.2
 -   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
 
@@ -45,7 +47,6 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.52.2
 
 -   [*] Disabled featured image banner on iOS. [#31681]
--   [*] Image block: Add a "featured" banner and ability to set or remove an image as featured. (iOS only)
 
 ## 1.52.1
 
