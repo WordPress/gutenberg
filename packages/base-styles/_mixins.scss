@@ -266,21 +266,6 @@
 	&:-ms-input-placeholder {
 		color: $dark-gray-placeholder;
 	}
-
-	.is-dark-theme & {
-		&::-webkit-input-placeholder {
-			color: $light-gray-placeholder;
-		}
-
-		&::-moz-placeholder {
-			opacity: 1; // Necessary because Firefox reduces this from 1.
-			color: $light-gray-placeholder;
-		}
-
-		&:-ms-input-placeholder {
-			color: $light-gray-placeholder;
-		}
-	}
 }
 
 @mixin checkbox-control {
