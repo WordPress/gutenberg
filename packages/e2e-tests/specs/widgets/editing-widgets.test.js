@@ -394,7 +394,6 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-
 	describe( 'Function widgets', () => {
 		async function addMarquee() {
 			// There will be 2 matches here.
