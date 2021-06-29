@@ -227,6 +227,43 @@ describe( 'Basic rendering', () => {
 			expect( isEditing() ).toBe( false );
 		} );
 	} );
+
+	describe( 'Unlinking', () => {
+		it( 'should not show "Unlink" button if no onRemove handler is provided', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			const unLinkButton = queryByText( container, 'Unlink' );
+
+			expect( unLinkButton ).toBeNull();
+		} );
+
+		it( 'should show "Unlink" button if a onRemove handler is provided', () => {
+			const mockOnRemove = jest.fn();
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						onRemove={ mockOnRemove }
+					/>,
+					container
+				);
+			} );
+
+			const unLinkButton = queryByText( container, 'Unlink' );
+			expect( unLinkButton ).toBeTruthy();
+
+			act( () => {
+				Simulate.click( unLinkButton );
+			} );
+
+			expect( mockOnRemove ).toHaveBeenCalled();
+		} );
+	} );
 } );
 
 describe( 'Searching for a link', () => {
