@@ -60,12 +60,15 @@ const saveEntities = async () => {
 };
 
 describe( 'Site Title block', () => {
-	let originalSiteTitle;
+	let originalSiteTitle, password;
+	const username = 'testuser';
 	beforeAll( async () => {
 		originalSiteTitle = await getSetting( 'blogname' );
+		password = await createUser( username, { role: 'editor' } );
 	} );
 
 	afterAll( async () => {
+		await deleteUser( username );
 		await setSetting( 'blogname', originalSiteTitle );
 	} );
 
@@ -92,8 +95,6 @@ describe( 'Site Title block', () => {
 	} );
 
 	it( 'Cannot edit the site title as editor', async () => {
-		const username = 'testuser';
-		const password = await createUser( username, { role: 'editor' } );
 		await loginUser( username, password );
 
 		await createNewPost();
@@ -107,8 +108,6 @@ describe( 'Site Title block', () => {
 			( element ) => element.contentEditable
 		);
 		expect( editable ).toBe( 'inherit' );
-
-		await deleteUser( username );
 
 		// FIXME: Fix https://github.com/WordPress/gutenberg/issues/33003 and remove the following line.
 		expect( console ).toHaveErroredWith(
