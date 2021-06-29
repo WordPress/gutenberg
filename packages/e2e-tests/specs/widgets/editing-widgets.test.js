@@ -246,153 +246,153 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	// it( 'Should insert content using the inline inserter', async () => {
-	// 	const [ firstWidgetArea ] = await findAll( {
-	// 		role: 'group',
-	// 		name: 'Block: Widget Area',
-	// 	} );
-	//
-	// 	// Scroll to the end of the first widget area.
-	// 	await firstWidgetArea.evaluate( ( node ) =>
-	// 		node.scrollIntoView( { block: 'end' } )
-	// 	);
-	//
-	// 	const firstWidgetAreaBoundingBox = await firstWidgetArea.boundingBox();
-	//
-	// 	// Click near the end of the widget area to select it.
-	// 	await page.mouse.click(
-	// 		firstWidgetAreaBoundingBox.x + firstWidgetAreaBoundingBox.width / 2,
-	// 		firstWidgetAreaBoundingBox.y +
-	// 			firstWidgetAreaBoundingBox.height -
-	// 			10
-	// 	);
-	//
-	// 	let inlineInserterButton = await find( {
-	// 		role: 'combobox',
-	// 		name: 'Add block',
-	// 	} );
-	// 	await inlineInserterButton.click();
-	//
-	// 	let inlineQuickInserter = await find( {
-	// 		role: 'listbox',
-	// 		name: 'Blocks',
-	// 	} );
-	//
-	// 	const paragraphBlock = await find(
-	// 		{
-	// 			role: 'option',
-	// 			name: 'Paragraph',
-	// 		},
-	// 		{
-	// 			root: inlineQuickInserter,
-	// 		}
-	// 	);
-	// 	await paragraphBlock.click();
-	//
-	// 	const firstParagraphBlock = await find(
-	// 		{
-	// 			name: /^Empty block/,
-	// 			selector: '[data-block][data-type="core/paragraph"]',
-	// 		},
-	// 		{
-	// 			root: firstWidgetArea,
-	// 		}
-	// 	);
-	//
-	// 	await firstParagraphBlock.focus();
-	// 	await page.keyboard.type( 'First Paragraph' );
-	//
-	// 	await page.keyboard.press( 'Enter' );
-	// 	await page.keyboard.type( 'Second Paragraph' );
-	//
-	// 	const secondParagraphBlock = await page.evaluateHandle(
-	// 		() => document.activeElement
-	// 	);
-	// 	await expect( secondParagraphBlock ).not.toBeElement(
-	// 		firstParagraphBlock
-	// 	);
-	//
-	// 	const secondParagraphBlockBoundingBox = await secondParagraphBlock.boundingBox();
-	//
-	// 	// Click outside the block to move the focus back to the widget area.
-	// 	await page.mouse.click(
-	// 		secondParagraphBlockBoundingBox.x +
-	// 			firstWidgetAreaBoundingBox.width / 2,
-	// 		secondParagraphBlockBoundingBox.y +
-	// 			secondParagraphBlockBoundingBox.height +
-	// 			10
-	// 	);
-	//
-	// 	// Hover above the last block to trigger the inline inserter between blocks.
-	// 	await page.mouse.move(
-	// 		secondParagraphBlockBoundingBox.x +
-	// 			secondParagraphBlockBoundingBox.width / 2,
-	// 		secondParagraphBlockBoundingBox.y - 10
-	// 	);
-	//
-	// 	// There will be 2 matches here.
-	// 	// One is the in-between inserter,
-	// 	// and the other one is the button block appender.
-	// 	[ inlineInserterButton ] = await findAll( {
-	// 		role: 'combobox',
-	// 		name: 'Add block',
-	// 	} );
-	// 	await inlineInserterButton.click();
-	//
-	// 	// TODO: Convert to find() API from puppeteer-testing-library.
-	// 	const inserterSearchBox = await page.waitForSelector(
-	// 		'aria/Search for blocks and patterns[role="searchbox"]'
-	// 	);
-	// 	await expect( inserterSearchBox ).toHaveFocus();
-	//
-	// 	await page.keyboard.type( 'Heading' );
-	//
-	// 	inlineQuickInserter = await find( {
-	// 		role: 'listbox',
-	// 		name: 'Blocks',
-	// 	} );
-	// 	const headingBlockOption = await find(
-	// 		{
-	// 			role: 'option',
-	// 			name: 'Heading',
-	// 		},
-	// 		{
-	// 			root: inlineQuickInserter,
-	// 		}
-	// 	);
-	// 	await headingBlockOption.click();
-	//
-	// 	// Get the added heading block as second last block.
-	// 	const addedHeadingBlock = await secondParagraphBlock.evaluateHandle(
-	// 		( node ) => node.previousSibling
-	// 	);
-	//
-	// 	await expect( addedHeadingBlock ).toHaveFocus();
-	//
-	// 	await page.keyboard.type( 'My Heading' );
-	//
-	// 	await expect( addedHeadingBlock ).toMatchQuery( {
-	// 		name: 'Block: Heading',
-	// 		level: 2,
-	// 		value: 'My Heading',
-	// 	} );
-	//
-	// 	await saveWidgets();
-	// 	const serializedWidgetAreas = await getSerializedWidgetAreas();
-	// 	expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
-	// 	Object {
-	// 	  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
-	// 	<p>First Paragraph</p>
-	// 	</div></div>
-	// 	<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
-	// 	<h2>My Heading</h2>
-	// 	</div></div>
-	// 	<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
-	// 	<p>Second Paragraph</p>
-	// 	</div></div>",
-	// 	}
-	// ` );
-	// } );
+	it( 'Should insert content using the inline inserter', async () => {
+		const [ firstWidgetArea ] = await findAll( {
+			role: 'group',
+			name: 'Block: Widget Area',
+		} );
+
+		// Scroll to the end of the first widget area.
+		await firstWidgetArea.evaluate( ( node ) =>
+			node.scrollIntoView( { block: 'end' } )
+		);
+
+		const firstWidgetAreaBoundingBox = await firstWidgetArea.boundingBox();
+
+		// Click near the end of the widget area to select it.
+		await page.mouse.click(
+			firstWidgetAreaBoundingBox.x + firstWidgetAreaBoundingBox.width / 2,
+			firstWidgetAreaBoundingBox.y +
+				firstWidgetAreaBoundingBox.height -
+				10
+		);
+
+		let inlineInserterButton = await find( {
+			role: 'combobox',
+			name: 'Add block',
+		} );
+		await inlineInserterButton.click();
+
+		let inlineQuickInserter = await find( {
+			role: 'listbox',
+			name: 'Blocks',
+		} );
+
+		const paragraphBlock = await find(
+			{
+				role: 'option',
+				name: 'Paragraph',
+			},
+			{
+				root: inlineQuickInserter,
+			}
+		);
+		await paragraphBlock.click();
+
+		const firstParagraphBlock = await find(
+			{
+				name: /^Empty block/,
+				selector: '[data-block][data-type="core/paragraph"]',
+			},
+			{
+				root: firstWidgetArea,
+			}
+		);
+
+		await firstParagraphBlock.focus();
+		await page.keyboard.type( 'First Paragraph' );
+
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second Paragraph' );
+
+		const secondParagraphBlock = await page.evaluateHandle(
+			() => document.activeElement
+		);
+		await expect( secondParagraphBlock ).not.toBeElement(
+			firstParagraphBlock
+		);
+
+		const secondParagraphBlockBoundingBox = await secondParagraphBlock.boundingBox();
+
+		// Click outside the block to move the focus back to the widget area.
+		await page.mouse.click(
+			secondParagraphBlockBoundingBox.x +
+				firstWidgetAreaBoundingBox.width / 2,
+			secondParagraphBlockBoundingBox.y +
+				secondParagraphBlockBoundingBox.height +
+				10
+		);
+
+		// Hover above the last block to trigger the inline inserter between blocks.
+		await page.mouse.move(
+			secondParagraphBlockBoundingBox.x +
+				secondParagraphBlockBoundingBox.width / 2,
+			secondParagraphBlockBoundingBox.y - 10
+		);
+
+		// There will be 2 matches here.
+		// One is the in-between inserter,
+		// and the other one is the button block appender.
+		[ inlineInserterButton ] = await findAll( {
+			role: 'combobox',
+			name: 'Add block',
+		} );
+		await inlineInserterButton.click();
+
+		// TODO: Convert to find() API from puppeteer-testing-library.
+		const inserterSearchBox = await page.waitForSelector(
+			'aria/Search for blocks and patterns[role="searchbox"]'
+		);
+		await expect( inserterSearchBox ).toHaveFocus();
+
+		await page.keyboard.type( 'Heading' );
+
+		inlineQuickInserter = await find( {
+			role: 'listbox',
+			name: 'Blocks',
+		} );
+		const headingBlockOption = await find(
+			{
+				role: 'option',
+				name: 'Heading',
+			},
+			{
+				root: inlineQuickInserter,
+			}
+		);
+		await headingBlockOption.click();
+
+		// Get the added heading block as second last block.
+		const addedHeadingBlock = await secondParagraphBlock.evaluateHandle(
+			( node ) => node.previousSibling
+		);
+
+		await expect( addedHeadingBlock ).toHaveFocus();
+
+		await page.keyboard.type( 'My Heading' );
+
+		await expect( addedHeadingBlock ).toMatchQuery( {
+			name: 'Block: Heading',
+			level: 2,
+			value: 'My Heading',
+		} );
+
+		await saveWidgets();
+		const serializedWidgetAreas = await getSerializedWidgetAreas();
+		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
+		Object {
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>First Paragraph</p>
+		</div></div>
+		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
+		<h2>My Heading</h2>
+		</div></div>
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>Second Paragraph</p>
+		</div></div>",
+		}
+	` );
+	} );
 
 	async function addMarquee() {
 		// There will be 2 matches here.
@@ -425,16 +425,6 @@ describe( 'Widgets screen', () => {
 			}
 		);
 		await marqueeBlockOption.click();
-
-		// It takes a moment to load the form, let's wait for it.
-		await waitFor( async () => {
-			const marquees = await findAll( {
-				selector: '[id=marquee-greeting]',
-			} );
-			if ( marquees.length === 1 ) {
-				throw new Error();
-			}
-		} );
 	}
 
 	it( 'Should add and save the marquee widget', async () => {
@@ -473,6 +463,16 @@ describe( 'Widgets screen', () => {
 
 		// Add another marquee, it shouldn't be saved
 		await addMarquee();
+
+		// It takes a moment to load the form, let's wait for it.
+		await waitFor( async () => {
+			const marquees = await findAll( {
+				selector: '[id=marquee-greeting]',
+			} );
+			if ( marquees.length === 1 ) {
+				throw new Error();
+			}
+		} );
 
 		const marquees = await findAll( {
 			selector: '[id=marquee-greeting]',
@@ -908,9 +908,7 @@ async function getSerializedWidgetAreas() {
 	);
 
 	const serializedWidgetAreas = pickBy(
-		mapValues(
-			groupBy( widgets, 'sidebar' ),
-			( sidebarWidgets ) =>
+		mapValues( groupBy( widgets, 'sidebar' ), ( sidebarWidgets ) =>
 			sidebarWidgets
 				.map( ( widget ) => widget.rendered )
 				.filter( Boolean )
