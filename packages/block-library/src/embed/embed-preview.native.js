@@ -12,6 +12,7 @@ import { View } from '@wordpress/primitives';
 import { BlockCaption } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,13 +20,21 @@ import { useState } from '@wordpress/element';
 import styles from './styles.scss';
 
 const EmbedPreview = ( {
-	isSelected,
+	clientId,
 	insertBlocksAfter,
+	isSelected,
 	onBlur,
 	onFocus,
-	clientId,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+	const stylePlaceholder = usePreferredColorSchemeStyle(
+		styles[ 'embed-preview__placeholder' ],
+		styles[ 'embed-preview__placeholder--dark' ]
+	);
+	const stylePlaceholderText = usePreferredColorSchemeStyle(
+		styles[ 'embed-preview__placeholder-text' ],
+		styles[ 'embed-preview__placeholder-text--dark' ]
+	);
 
 	function accessibilityLabelCreator( caption ) {
 		return isEmpty( caption )
@@ -59,20 +68,20 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				<View style={ styles[ 'embed-preview__placeholder' ] }>
-					<Text style={ styles[ 'embed-preview__placeholder-text' ] }>
+				<View style={ stylePlaceholder }>
+					<Text style={ stylePlaceholderText }>
 						Embed Preview will be directly above the Block Caption
 						component when it is implemented.
 					</Text>
 				</View>
 				<BlockCaption
-					accessible
 					accessibilityLabelCreator={ accessibilityLabelCreator }
+					accessible
 					clientId={ clientId }
 					insertBlocksAfter={ insertBlocksAfter }
 					isSelected={ isCaptionSelected }
-					onFocus={ onFocusCaption }
 					onBlur={ onBlur }
+					onFocus={ onFocusCaption }
 				/>
 			</View>
 		</TouchableWithoutFeedback>

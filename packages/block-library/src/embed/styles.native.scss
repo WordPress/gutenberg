@@ -56,6 +56,16 @@
 	background-color: $gray-lighten-30;
 }
 
+.embed-preview__placeholder--dark {
+	background-color: $gray-darken-30;
+}
+
 .embed-preview__placeholder-text {
+	font-size: $default-font-size;
 	text-align: center;
+	color: $light-primary;
+}
+
+.embed-preview__placeholder-text--dark {
+	color: $dark-primary;
 }
