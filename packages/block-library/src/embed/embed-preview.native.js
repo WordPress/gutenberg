@@ -13,19 +13,39 @@ import { BlockCaption } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
+
 const EmbedPreview = ( {
 	isSelected,
 	insertBlocksAfter,
 	onBlur,
+	onFocus,
 	clientId,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+
+	function accessibilityLabelCreator( caption ) {
+		return isEmpty( caption )
+			? /* translators: accessibility text. Empty Embed caption. */
+			  __( 'Embed caption. Empty' )
+			: sprintf(
+					/* translators: accessibility text. %s: Embed caption. */
+					__( 'Embed caption. %s' ),
+					caption
+			  );
+	}
 
 	function onEmbedPreviewPress() {
 		setIsCaptionSelected( false );
 	}
 
 	function onFocusCaption() {
+		if ( onFocus ) {
+			onFocus();
+		}
 		if ( ! isCaptionSelected ) {
 			setIsCaptionSelected( true );
 		}
@@ -39,27 +59,20 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				<Text style={ { color: 'blue', fontSize: 12 } }>
-					Embed Preview will be directly above the Block Caption
-					component when it is implemented.
-				</Text>
+				<View style={ styles[ 'embed-preview__placeholder' ] }>
+					<Text style={ styles[ 'embed-preview__placeholder-text' ] }>
+						Embed Preview will be directly above the Block Caption
+						component when it is implemented.
+					</Text>
+				</View>
 				<BlockCaption
-					accessible={ true }
-					accessibilityLabelCreator={ ( caption ) =>
-						isEmpty( caption )
-							? /* translators: accessibility text. Empty Embed caption. */
-							  __( 'Embed caption. Empty' )
-							: sprintf(
-									/* translators: accessibility text. %s: Embed caption. */
-									__( 'Embed caption. %s' ),
-									caption
-							  )
-					}
+					accessible
+					accessibilityLabelCreator={ accessibilityLabelCreator }
 					clientId={ clientId }
+					insertBlocksAfter={ insertBlocksAfter }
 					isSelected={ isCaptionSelected }
 					onFocus={ onFocusCaption }
 					onBlur={ onBlur }
-					insertBlocksAfter={ insertBlocksAfter }
 				/>
 			</View>
 		</TouchableWithoutFeedback>

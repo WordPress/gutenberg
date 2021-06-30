@@ -46,3 +46,16 @@
 	align-items: center;
 	fill: $gray-dark;
 }
+
+.embed-preview__placeholder {
+	flex: 1;
+	padding-left: 12px;
+	padding-right: 12px;
+	padding-top: 40px;
+	padding-bottom: 40px;
+	background-color: $gray-lighten-30;
+}
+
+.embed-preview__placeholder-text {
+	text-align: center;
+}
