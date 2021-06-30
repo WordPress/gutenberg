@@ -29,6 +29,7 @@ export default function save( { attributes, className } ) {
 		return null;
 	}
 
+	const borderRadius = style?.border?.radius;
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const colorProps = getColorClassesAndStyles( attributes );
 	const buttonClasses = classnames(
@@ -38,11 +39,18 @@ export default function save( { attributes, className } ) {
 		{
 			// For backwards compatibility add style that isn't provided via
 			// block support.
-			'no-border-radius': style?.border?.radius === 0,
+			'no-border-radius': borderRadius === 0,
 		}
 	);
+
+	// For backwards compatibility support number based radius.
+	const borderStyle =
+		typeof borderRadius === 'number' && borderRadius
+			? { borderRadius: style.border.radius }
+			: { ...borderProps.style };
+
 	const buttonStyle = {
-		...borderProps.style,
+		...borderStyle,
 		...colorProps.style,
 	};
 

@@ -202,6 +202,12 @@ function ButtonEdit( props ) {
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
 
+	// For backwards compatibility support number based radius.
+	const borderStyle =
+		typeof style?.border?.radius === 'number' && style?.border?.radius
+			? { borderRadius: style.border.radius }
+			: { ...borderProps.style };
+
 	return (
 		<>
 			<div
@@ -229,7 +235,7 @@ function ButtonEdit( props ) {
 						}
 					) }
 					style={ {
-						...borderProps.style,
+						...borderStyle,
 						...colorProps.style,
 					} }
 					onSplit={ ( value ) =>

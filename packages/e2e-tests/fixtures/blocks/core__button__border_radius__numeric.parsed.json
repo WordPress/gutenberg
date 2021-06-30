@@ -1,0 +1,18 @@
+[
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"style": {
+				"border": {
+					"radius": 1
+				}
+			},
+			"className": "is-style-outline"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button is-style-outline\"><a class=\"wp-block-button__link\" style=\"border-radius:1px\">Where We Are</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button is-style-outline\"><a class=\"wp-block-button__link\" style=\"border-radius:1px\">Where We Are</a></div>\n"
+		]
+	}
+]
