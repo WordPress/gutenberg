@@ -7,12 +7,28 @@ import {
 	PolymorphicComponentProps,
 } from '../ui/context';
 import type { Props } from './types';
-import { ElevationWrapper } from './styles';
+import { ElevationWrapper, StyleProps } from './styles';
+
+const DEFAULT_PROPS: StyleProps = {
+	isInteractive: false,
+	offset: 0,
+	value: 0,
+	active: null,
+	focus: null,
+	hover: null,
+	borderRadius: 'inherit',
+};
 
 function Elevation( props: PolymorphicComponentProps< Props, 'div', false > ) {
 	const contextProps = useContextSystem( props, 'Elevation' );
 
-	return <ElevationWrapper { ...contextProps } aria-hidden="true" />;
+	return (
+		<ElevationWrapper
+			{ ...DEFAULT_PROPS }
+			{ ...contextProps }
+			aria-hidden="true"
+		/>
+	);
 }
 
 /**

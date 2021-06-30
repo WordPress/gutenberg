@@ -8,7 +8,7 @@ export type Props = {
 	/**
 	 * Renders the active (interaction) shadow value.
 	 */
-	active?: number;
+	active?: number | null;
 	/**
 	 * Renders the border-radius of the shadow.
 	 */
@@ -16,11 +16,11 @@ export type Props = {
 	/**
 	 * Renders the focus (interaction) shadow value.
 	 */
-	focus?: number;
+	focus?: number | null;
 	/**
 	 * Renders the hover (interaction) shadow value.
 	 */
-	hover?: number;
+	hover?: number | null;
 	/**
 	 * Determines if hover, active, and focus shadow values should be automatically calculated and rendered.
 	 */
