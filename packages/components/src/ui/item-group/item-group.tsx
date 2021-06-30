@@ -13,7 +13,7 @@ import {
 	PolymorphicComponentProps,
 } from '../context';
 import { ItemGroupContext, useItemGroupContext } from './context';
-import { ItemGroupWrapper } from './styles';
+import { ItemGroupView } from './styles';
 import type { ItemGroupProps } from './types';
 
 function ItemGroup(
@@ -40,7 +40,7 @@ function ItemGroup(
 
 	return (
 		<ItemGroupContext.Provider value={ contextValue }>
-			<ItemGroupWrapper
+			<ItemGroupView
 				role={ role }
 				bordered={ bordered }
 				separated={ separated }

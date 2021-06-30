@@ -49,7 +49,7 @@ const renderRounded = ( { rounded = false }: ItemGroupProps ) =>
 		}
 	`;
 
-export const ItemGroupWrapper = styled.div< ItemGroupProps >`
+export const ItemGroupView = styled.div< ItemGroupProps >`
 	${ renderBordered }
 	${ renderSeparated }
 	${ renderRounded }
@@ -111,7 +111,7 @@ const renderSpacedAround = ( { spacedAround }: ItemGroupContext ) =>
 		border-radius: ${ borderRadius };
 	`;
 
-export const ItemWrapper = styled.div< ItemProps & ItemGroupContext >`
+export const ItemView = styled.div< ItemProps & ItemGroupContext >`
 	width: 100%;
 	display: block;
 

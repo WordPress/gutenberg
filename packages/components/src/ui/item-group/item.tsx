@@ -4,12 +4,12 @@
 import { contextConnect, PolymorphicComponentProps } from '../context';
 import type { ItemProps } from './types';
 import { useItem } from './use-item';
-import { ItemWrapper } from './styles';
+import { ItemView } from './styles';
 
 function Item( props: PolymorphicComponentProps< ItemProps, 'div' > ) {
 	const contextProps = useItem( props );
 
-	return <ItemWrapper { ...contextProps } />;
+	return <ItemView { ...contextProps } />;
 }
 
 const ConnectedItem = contextConnect( Item, 'Item' );
