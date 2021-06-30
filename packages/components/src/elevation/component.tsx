@@ -1,8 +1,19 @@
 /**
  * Internal dependencies
  */
-import { useElevation } from './hook';
-import { createComponent } from '../ui/utils';
+import {
+	useContextSystem,
+	contextConnect,
+	PolymorphicComponentProps,
+} from '../ui/context';
+import type { Props } from './types';
+import { ElevationWrapper } from './styles';
+
+function Elevation( props: PolymorphicComponentProps< Props, 'div', false > ) {
+	const contextProps = useContextSystem( props, 'Elevation' );
+
+	return <ElevationWrapper { ...contextProps } aria-hidden="true" />;
+}
 
 /**
  * `Elevation` is a core component that renders shadow, using the library's shadow system.
@@ -27,10 +38,6 @@ import { createComponent } from '../ui/utils';
  * }
  * ```
  */
-const Elevation = createComponent( {
-	as: 'div',
-	useHook: useElevation,
-	name: 'Elevation',
-} );
+const ConnectedElevation = contextConnect( Elevation, 'Elevation' );
 
-export default Elevation;
+export default ConnectedElevation;
