@@ -420,7 +420,7 @@ describe( 'Widgets screen', () => {
 			await addMarquee();
 
 			const greetingInput = await page.waitForSelector(
-				'[name="marquee-greeting"]'
+				'[data-testid="marquee-greeting"]'
 			);
 			await greetingInput.type( 'Howdy' );
 
@@ -447,12 +447,15 @@ describe( 'Widgets screen', () => {
 			// It takes a moment to load the form, let's wait for it.
 			await page.waitForFunction( () => {
 				return (
-					document.querySelectorAll( '[name="marquee-greeting"]' )
-						.length === 2
+					document.querySelectorAll(
+						'[data-testid="marquee-greeting"]'
+					).length === 2
 				);
 			} );
 
-			const marqueeInputs = await page.$$( '[name="marquee-greeting"]' );
+			const marqueeInputs = await page.$$(
+				'[data-testid="marquee-greeting"]'
+			);
 
 			expect( marqueeInputs ).toHaveLength( 2 );
 			await marqueeInputs[ 1 ].type( 'Second howdy' );
@@ -469,7 +472,7 @@ describe( 'Widgets screen', () => {
 
 			await page.reload();
 			const marqueesAfter = await findAll( {
-				selector: '[name="marquee-greeting"]',
+				selector: '[data-testid="marquee-greeting"]',
 			} );
 			expect( marqueesAfter ).toHaveLength( 1 );
 		} );

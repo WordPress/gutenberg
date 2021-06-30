@@ -38,6 +38,7 @@ function marquee_greeting_init() {
 					Greeting:
 					<input
 						class="widefat"
+						data-testid="marquee-greeting"
 						name="marquee-greeting"
 						type="text"
 						value="<?php echo esc_attr( $greeting ); ?>"
