@@ -244,6 +244,14 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestPreview() {
         print(#function)
     }
+
+    func gutenbergDidRequestBlockTypeImpressions() -> NSDictionary {
+        return ["core/paragraph": 1];
+    }
+
+    func gutenbergDidRequestSetBlockTypeImpressions(_ name: String, count: Int) -> Void {
+        print("Gutenberg requested setting \"\(name)\" block type impression count to \(count).")
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,15 +10,31 @@ import { useState } from '@wordpress/element';
 import BlockTypesList from '../block-types-list';
 import useClipboardBlock from './hooks/use-clipboard-block';
 import { store as blockEditorStore } from '../../store';
+import {
+	requestBlockTypeImpressions,
+	setBlockTypeImpressions,
+} from '@wordpress/react-native-bridge';
 
 const NON_BLOCK_CATEGORIES = [ 'reusable' ];
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
-	// TODO(David): Set initial state from native impression count
-	const [ blockImpressions, setBlockImpressions ] = useState( {
-		'core/paragraph': 1,
-	} );
+	const [ blockImpressions, setBlockImpressions ] = useState( {} );
+
+	// Request current block impressions from native app
+	useEffect( () => {
+		let isCurrent = true;
+
+		requestBlockTypeImpressions( ( impressions ) => {
+			if ( isCurrent ) {
+				setBlockImpressions( impressions );
+			}
+		} );
+
+		return () => {
+			isCurrent = false;
+		};
+	}, [] );
 
 	const { enableEditorOnboarding, blockTypes } = useSelect(
 		( select ) => {
@@ -61,6 +77,8 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 
 			return blockImpressions;
 		} );
+		// Persist updated block impression count for the block
+		setBlockTypeImpressions( name, blockImpressions[ name ] - 1 );
 		onSelect( ...args );
 	};
 

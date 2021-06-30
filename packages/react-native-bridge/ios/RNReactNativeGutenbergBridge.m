@@ -32,5 +32,7 @@ RCT_EXTERN_METHOD(actionButtonPressed:(NSString *)buttonType)
 RCT_EXTERN_METHOD(mediaSaveSync)
 RCT_EXTERN_METHOD(mediaFilesBlockReplaceSync:(NSArray<NSDictionary *> *)mediaFiles clientId:(NSString *)clientId)
 RCT_EXTERN_METHOD(requestPreview)
+RCT_EXTERN_METHOD(requestBlockTypeImpressions:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(setBlockTypeImpressions:(NSString)name count: (int)count)
 
 @end
