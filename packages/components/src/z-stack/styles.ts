@@ -9,7 +9,7 @@ export const ZStackView = styled.div`
 	position: relative;
 `;
 
-export const ZStackChild = styled.div< {
+export const ZStackChildView = styled.div< {
 	isLayered: boolean;
 	offsetAmount: number;
 	zIndex: number;

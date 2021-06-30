@@ -16,7 +16,7 @@ import { getValidChildren } from '../ui/utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../ui/context';
-import { ZStackView, ZStackChild } from './styles';
+import { ZStackView, ZStackChildView } from './styles';
 
 export interface ZStackProps {
 	/**
@@ -66,14 +66,14 @@ function ZStack(
 		const key = isValidElement( child ) ? child.key : index;
 
 		return (
-			<ZStackChild
+			<ZStackChildView
 				isLayered={ isLayered }
 				offsetAmount={ offsetAmount }
 				zIndex={ zIndex }
 				key={ key }
 			>
 				{ child }
-			</ZStackChild>
+			</ZStackChildView>
 		);
 	} );
 
