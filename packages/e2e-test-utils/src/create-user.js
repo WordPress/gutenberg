@@ -11,17 +11,13 @@ import { switchUserToTest } from './switch-user-to-test';
 import { visitAdminPage } from './visit-admin-page';
 
 /**
- * @typedef {'Subscriber' | 'Contributor' | 'Author' | 'Editor' | 'Administrator'} Role
- */
-
-/**
  * Create a new user account.
  *
  * @param {string}  username           User name.
  * @param {Object?} object             Optional Settings for the new user account.
  * @param {string}  [object.firstName] First name.
  * @param {string}  [object.lastName]  Last name.
- * @param {Role}    [object.role]      Role.
+ * @param {string}  [object.role]      Role. Defaults to Administrator.
  *
  * @return {string} Password for the newly created user account
  */

@@ -183,7 +183,7 @@ _Parameters_
 -   _object_ `Object?`: Optional Settings for the new user account.
 -   _object.firstName_ `[string]`: First name.
 -   _object.lastName_ `[string]`: Last name.
--   _object.role_ `[Role]`: Role.
+-   _object.role_ `[string]`: Role. Defaults to Administrator.
 
 _Returns_
 
