@@ -201,14 +201,18 @@ function styles_for_block_core_search( $attributes ) {
 					$name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
 
 					// Add shared styles for individual border radii for input & button.
-					$shared_styles[] = sprintf( 'border-%s-radius: %s;', $name, esc_attr( $value ) );
+					$shared_styles[] = sprintf(
+						'border-%s-radius: %s;',
+						esc_attr( $name ),
+						esc_attr( $value )
+					);
 
 					// Add adjusted border radius styles for the wrapper element
 					// if button is positioned inside.
 					if ( $button_inside && intval( $value ) !== 0 ) {
 						$wrapper_styles[] = sprintf(
 							'border-%s-radius: calc(%s + %s);',
-							$name,
+							esc_attr( $name ),
 							esc_attr( $value ),
 							$default_padding
 						);
