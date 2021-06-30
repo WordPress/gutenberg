@@ -102,12 +102,12 @@ function gutenberg_render_menu_from_location( $location, $attributes ) {
 
 	return wp_nav_menu(
 		array(
-			'theme_location' => $location,
-			'container'      => '',
-			'items_wrap'     => '%3$s',
+			'theme_location'   => $location,
+			'container'        => '',
+			'items_wrap'       => '%3$s',
 			'block_attributes' => $attributes,
-			'fallback_cb'    => false,
-			'echo'           => false,
+			'fallback_cb'      => false,
+			'echo'             => false,
 		)
 	);
 }
