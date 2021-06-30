@@ -20,10 +20,10 @@ Use TextareaControl when you need to encourage users enter an amount of text tha
 
 TextareaControl should:
 
-- Stand out from the background of the page and indicate that users can input information.
-- Have clearly differentiated active/inactive states, including focus styling.
-- Make it easy to understand and address any errors via clear and direct error notices.
-- Make it easy to understand the requested information by using a clear and descriptive label.
+-   Stand out from the background of the page and indicate that users can input information.
+-   Have clearly differentiated active/inactive states, including focus styling.
+-   Make it easy to understand and address any errors via clear and direct error notices.
+-   Make it easy to understand the requested information by using a clear and descriptive label.
 
 #### When not to use TextareaControl
 
@@ -90,7 +90,6 @@ When text input isn’t accepted, an error message can display instructions on h
         />
     ) );
 
-
 ### Props
 
 The set of props accepted by the component will be specified below.
@@ -101,45 +100,45 @@ Props not included in this set will be applied to the textarea element.
 
 If this property is added, a label will be generated using label property as the content.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 #### hideLabelFromVision
 
 If true, the label will only be visible to screen readers.
 
-- Type: `Boolean`
-- Required: No
+-   Type: `Boolean`
+-   Required: No
 
 #### help
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String|WPElement`
-- Required: No
+-   Type: `String|WPElement`
+-   Required: No
 
 #### rows
 
 The number of rows the textarea should contain. Defaults to four.
 
-- Type: `String`
-- Required: No
-- Default: 4
+-   Type: `String`
+-   Required: No
+-   Default: 4
 
 #### value
 
 The current value of the textarea.
 
-- Type: `String`
-- Required: Yes
+-   Type: `String`
+-   Required: Yes
 
 #### onChange
 
 A function that receives the new value of the textarea each time it changes.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes
 
 ## Related components
 
-- For a field where users only enter one line of text, use the `TextControl` component.
+-   For a field where users only enter one line of text, use the `TextControl` component.

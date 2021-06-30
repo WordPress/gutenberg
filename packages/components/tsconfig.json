@@ -3,37 +3,52 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ],
-		"paths": {
-			"styled-griddie": [ "../../typings/styled-griddie" ]
-		}
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
+		{ "path": "../compose" },
 		{ "path": "../deprecated" },
+		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../primitives" },
-		{ "path": "../react-i18n" }
+		{ "path": "../react-i18n" },
+		{ "path": "../warning" }
 	],
 	"include": [
+		"src/__next/**/*",
 		"src/animate/**/*",
 		"src/base-control/**/*",
+		"src/base-field/**/*",
+		"src/card/**/*",
 		"src/dashicon/**/*",
+		"src/disabled/**/*",
+		"src/divider/**/*",
 		"src/draggable/**/*",
+		"src/elevation/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
+		"src/grid/**/*",
+		"src/h-stack/**/*",
+		"src/heading/**/*",
+		"src/icon/**/*",
 		"src/scroll-lock/**/*",
+		"src/scrollable/**/*",
 		"src/shortcut/**/*",
+		"src/spacer/**/*",
 		"src/spinner/**/*",
+		"src/surface/**/*",
+		"src/text/**/*",
 		"src/tip/**/*",
+		"src/truncate/**/*",
 		"src/ui/**/*",
 		"src/utils/**/*",
+		"src/v-stack/**/*",
+		"src/view/**/*",
 		"src/visually-hidden/**/*",
-		"src/text/**/*",
-		"src/grid/**/*",
-		"src/__next/**/*"
+		"src/z-stack/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",

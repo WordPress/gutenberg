@@ -62,20 +62,29 @@ export function subscribeUpdateHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
 }
 
+export function subscribeFeaturedImageIdNativeUpdated( callback ) {
+	return isAndroid
+		? gutenbergBridgeEvents.addListener(
+				'featuredImageIdNativeUpdated',
+				callback
+		  )
+		: undefined;
+}
+
 /**
  * Request to subscribe to mediaUpload events
  *
  * When a media item exists as a local file and is to be uploaded, these are the generated events that are useful listening to.
  * see subscribeMediaSave for events during a save operation.
  *
- * @param {Function}       callback  RN Callback function to be called with the following
- * 										state and params:
- * 	state:
- * 		MEDIA_UPLOAD_STATE_SAVING: this is a progress update. Takes String mediaId, float progress.
- * 		MEDIA_UPLOAD_STATE_SUCCEEDED: sent when one media is finished being saved. Takes String mediaId, String mediaUrl, String serverID
- * 									(which is the remote id assigned to this file after having been uploaded).
- * 		MEDIA_UPLOAD_STATE_FAILED: sent in case of saving failure (final state). Takes String mediaId.
- * 		MEDIA_UPLOAD_STATE_RESET: sent when the progress and state needs be reset (a retry for example, for cleanup). Takes String mediaId.
+ * @param {Function} callback RN Callback function to be called with the following
+ *                            state and params:
+ *                            state:
+ *                            MEDIA_UPLOAD_STATE_SAVING: this is a progress update. Takes String mediaId, float progress.
+ *                            MEDIA_UPLOAD_STATE_SUCCEEDED: sent when one media is finished being saved. Takes String mediaId, String mediaUrl, String serverID
+ *                            (which is the remote id assigned to this file after having been uploaded).
+ *                            MEDIA_UPLOAD_STATE_FAILED: sent in case of saving failure (final state). Takes String mediaId.
+ *                            MEDIA_UPLOAD_STATE_RESET: sent when the progress and state needs be reset (a retry for example, for cleanup). Takes String mediaId.
  */
 export function subscribeMediaUpload( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaUpload', callback );
@@ -87,20 +96,20 @@ export function subscribeMediaUpload( callback ) {
  * When a media item does not yet exist as a local file and is progressively being saved, these are the generated events that are useful listening to.
  * see subscribeMediaUpload for events during an upload operation.
  *
- * @param {Function}       callback  RN Callback function to be called with the following
- * 										state and params:
- *  Note that the first 4 states described are similar to upload events.
- * 	state:
- * 		MEDIA_SAVE_STATE_SAVING: this is a progress update. Takes String mediaId, float progress.
- * 		MEDIA_SAVE_STATE_SUCCEEDED: sent when one media is finished being saved. Takes String mediaId, String mediaUrl.
- * 		MEDIA_SAVE_STATE_FAILED: sent in case of saving failure (final state). Takes String mediaId.
- * 		MEDIA_SAVE_STATE_RESET: sent when the progress and state needs be reset (a retry for example, for cleanup). Takes String mediaId.
- * 		MEDIA_SAVE_FINAL_STATE_RESULT: used in media collections, sent when ALL media items in a collection have reached
- * 									a final state (either FAILED or SUCCEEDED). Handy to know when to show a final state to the user, on
- * 									a media collection based block when we don't know if there are still events to be received for other
- * 									items in the collection.
- * 		MEDIA_SAVE_MEDIAID_CHANGED:	used when changing a media item id from a temporary id to a local file id, and then from a local file
- * 									id to a remote file id.
+ * @param {Function} callback RN Callback function to be called with the following
+ *                            state and params:
+ *                            Note that the first 4 states described are similar to upload events.
+ *                            state:
+ *                            MEDIA_SAVE_STATE_SAVING: this is a progress update. Takes String mediaId, float progress.
+ *                            MEDIA_SAVE_STATE_SUCCEEDED: sent when one media is finished being saved. Takes String mediaId, String mediaUrl.
+ *                            MEDIA_SAVE_STATE_FAILED: sent in case of saving failure (final state). Takes String mediaId.
+ *                            MEDIA_SAVE_STATE_RESET: sent when the progress and state needs be reset (a retry for example, for cleanup). Takes String mediaId.
+ *                            MEDIA_SAVE_FINAL_STATE_RESULT: used in media collections, sent when ALL media items in a collection have reached
+ *                            a final state (either FAILED or SUCCEEDED). Handy to know when to show a final state to the user, on
+ *                            a media collection based block when we don't know if there are still events to be received for other
+ *                            items in the collection.
+ *                            MEDIA_SAVE_MEDIAID_CHANGED:	used when changing a media item id from a temporary id to a local file id, and then from a local file
+ *                            id to a remote file id.
  */
 export function subscribeMediaSave( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaSave', callback );
@@ -116,8 +125,11 @@ export function subscribeAndroidModalClosed( callback ) {
 		: undefined;
 }
 
-export function subscribeUpdateTheme( callback ) {
-	return gutenbergBridgeEvents.addListener( 'updateTheme', callback );
+export function subscribeUpdateEditorSettings( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'updateEditorSettings',
+		callback
+	);
 }
 
 export function subscribePreferredColorScheme( callback ) {
@@ -137,7 +149,7 @@ export function subscribeShowNotice( callback ) {
 
 /**
  * @callback FnReplaceBlockCompletion
- * @param {string} html the HTML to replace the block.
+ * @param {string} html     the HTML to replace the block.
  * @param {string} clientId the clientId of the block to be replaced.
  */
 
@@ -155,10 +167,10 @@ export function subscribeReplaceBlock( callback ) {
  *
  * Kinds of media source can be device library, camera, etc.
  *
- * @param {string}         source    The media source to request media from.
- * @param {Array<string>}  filter    Array of media types to filter the media to select.
- * @param {boolean}        multiple  Is multiple selection allowed?
- * @param {Function}       callback  RN Callback function to be called with the selected media objects.
+ * @param {string}        source   The media source to request media from.
+ * @param {Array<string>} filter   Array of media types to filter the media to select.
+ * @param {boolean}       multiple Is multiple selection allowed?
+ * @param {Function}      callback RN Callback function to be called with the selected media objects.
  */
 export function requestMediaPicker( source, filter, multiple, callback ) {
 	RNReactNativeGutenbergBridge.requestMediaPickFrom(
@@ -174,10 +186,10 @@ export function requestMediaPicker( source, filter, multiple, callback ) {
  *
  * A way to show unsupported blocks to the user is to render it on a web view.
  *
- * @param {string} htmlContent Raw html content of the block.
+ * @param {string} htmlContent   Raw html content of the block.
  * @param {string} blockClientId the clientId of the block.
- * @param {string} blockName the internal system block name.
- * @param {string} blockTitle the user-facing, localized block name.
+ * @param {string} blockName     the internal system block name.
+ * @param {string} blockTitle    the user-facing, localized block name.
  */
 export function requestUnsupportedBlockFallback(
 	htmlContent,
@@ -237,6 +249,10 @@ export function requestImageUploadCancel( mediaId ) {
 	return RNReactNativeGutenbergBridge.requestImageUploadCancel( mediaId );
 }
 
+export function setFeaturedImage( mediaId ) {
+	return RNReactNativeGutenbergBridge.setFeaturedImage( mediaId );
+}
+
 export function getOtherMediaOptions( filter, callback ) {
 	return RNReactNativeGutenbergBridge.getOtherMediaOptions(
 		filter,
@@ -266,7 +282,10 @@ export function requestMediaEditor( mediaUrl, callback ) {
 	);
 }
 
-export function fetchRequest( path ) {
+export function fetchRequest( path, enableCaching = true ) {
+	if ( isAndroid ) {
+		return RNReactNativeGutenbergBridge.fetchRequest( path, enableCaching );
+	}
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
 }
 
@@ -284,8 +303,8 @@ export function showXpostSuggestions() {
  * For example, a mediaFiles collection editor can make special handling of visualization
  * in this regard.
  *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
- * @param {string} blockClientId the clientId of the block.
+ * @param {Array<Map>} mediaFiles    the mediaFiles attribute of the block, containing data about each media item.
+ * @param {string}     blockClientId the clientId of the block.
  */
 export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
 	RNReactNativeGutenbergBridge.requestMediaFilesEditorLoad(
@@ -341,8 +360,8 @@ export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
  * Request the host app to listen to mediaFiles collection based block replacement signals
  * in case such an event was enqueued
  *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
- * @param {string} blockClientId the clientId of the block.
+ * @param {Array<Map>} mediaFiles    the mediaFiles attribute of the block, containing data about each media item.
+ * @param {string}     blockClientId the clientId of the block.
  */
 export function mediaFilesBlockReplaceSync( mediaFiles, blockClientId ) {
 	RNReactNativeGutenbergBridge.mediaFilesBlockReplaceSync(

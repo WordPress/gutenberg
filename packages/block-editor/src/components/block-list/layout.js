@@ -48,8 +48,8 @@ export function LayoutStyle( { selector, layout = {} } ) {
 
 				${ appendSelectors( selector, '> *' ) } {
 					max-width: var(--wp--layout--content-size);
-					margin-left: auto;
-					margin-right: auto;
+					margin-left: auto !important;
+					margin-right: auto !important;
 				}
 
 				${ appendSelectors( selector, '> [data-align="wide"]' ) } {

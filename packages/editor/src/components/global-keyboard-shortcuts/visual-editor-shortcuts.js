@@ -9,9 +9,10 @@ import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import SaveShortcut from './save-shortcut';
+import { store as editorStore } from '../../store';
 
 function VisualEditorGlobalKeyboardShortcuts() {
-	const { redo, undo } = useDispatch( 'core/editor' );
+	const { redo, undo } = useDispatch( editorStore );
 
 	useShortcut(
 		'core/editor/undo',

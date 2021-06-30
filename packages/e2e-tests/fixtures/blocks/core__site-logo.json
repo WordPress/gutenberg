@@ -3,7 +3,10 @@
 		"clientId": "_clientId_0",
 		"name": "core/site-logo",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"isLink": true,
+			"linkTarget": "_self"
+		},
 		"innerBlocks": [],
 		"originalContent": ""
 	}

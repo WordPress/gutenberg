@@ -23,14 +23,14 @@ Any props aside from those listed below will be passed to the `FocusableIframe` 
 
 ### `onFocus`
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No
 
 Callback to invoke when iframe receives focus. Passes an emulated `FocusEvent` object as the first argument.
 
 ### `iframeRef`
 
-- Type: `wp.element.Ref`
-- Required: No
+-   Type: `wp.element.Ref`
+-   Required: No
 
 If a reference to the underlying DOM element is needed, pass `iframeRef` as the result of a `wp.element.createRef` called from your component.

@@ -13,18 +13,20 @@ import { withSelect } from '@wordpress/data';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useCopyToClipboard } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import PostScheduleLabel from '../post-schedule/label';
+import { store as editorStore } from '../../store';
 
 const POSTNAME = '%postname%';
 
 /**
  * Returns URL for a future post.
  *
- * @param {Object} post         Post object.
+ * @param {Object} post Post object.
  *
  * @return {string} PostPublish URL.
  */
@@ -42,7 +44,7 @@ const getFuturePostUrl = ( post ) => {
 function CopyButton( { text, onCopy, children } ) {
 	const ref = useCopyToClipboard( text, onCopy );
 	return (
-		<Button isSecondary ref={ ref }>
+		<Button variant="secondary" ref={ ref }>
 			{ children }
 		</Button>
 	);
@@ -127,7 +129,7 @@ class PostPublishPanelPostpublish extends Component {
 					/>
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
-							<Button isSecondary href={ link }>
+							<Button variant="secondary" href={ link }>
 								{ viewPostLabel }
 							</Button>
 						) }
@@ -149,8 +151,8 @@ export default withSelect( ( select ) => {
 		getEditedPostAttribute,
 		getCurrentPost,
 		isCurrentPostScheduled,
-	} = select( 'core/editor' );
-	const { getPostType } = select( 'core' );
+	} = select( editorStore );
+	const { getPostType } = select( coreStore );
 
 	return {
 		post: getCurrentPost(),

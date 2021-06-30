@@ -25,11 +25,19 @@
 
 .edit-widgets-header__actions {
 	display: flex;
-}
 
-.edit-widgets-header__block-toolbar {
-	border-bottom: 1px solid $gray-300;
-	border-top: 1px solid $gray-300;
+	.components-button {
+		margin-right: $grid-unit-05;
+
+		@include break-small() {
+			margin-right: $grid-unit-15;
+		}
+	}
+
+	.edit-widgets-more-menu .components-button,
+	.interface-pinned-items .components-button {
+		margin-right: 0;
+	}
 }
 
 .edit-widgets-header-toolbar {

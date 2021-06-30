@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import GradientPicker from './';
-import useEditorFeature from '../use-editor-feature';
+import useSetting from '../use-setting';
 
 export default function GradientPickerControl( {
 	className,
@@ -23,8 +23,8 @@ export default function GradientPickerControl( {
 	label = __( 'Gradient Presets' ),
 	...props
 } ) {
-	const gradients = useEditorFeature( 'color.gradients' );
-	const disableCustomGradients = ! useEditorFeature( 'color.customGradient' );
+	const gradients = useSetting( 'color.gradients' );
+	const disableCustomGradients = ! useSetting( 'color.customGradient' );
 	if ( isEmpty( gradients ) && disableCustomGradients ) {
 		return null;
 	}

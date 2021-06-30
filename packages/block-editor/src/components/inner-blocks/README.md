@@ -1,5 +1,4 @@
-InnerBlocks
-===========
+# InnerBlocks
 
 InnerBlocks exports a pair of components which can be used in block implementations to enable nested block content.
 
@@ -34,7 +33,7 @@ registerBlockType( 'my-plugin/my-block', {
 				<InnerBlocks.Content />
 			</div>
 		);
-	}
+	},
 } );
 ```
 
@@ -45,8 +44,9 @@ _Note:_ Because the save step will automatically apply props to the element retu
 ## Props
 
 ### `allowedBlocks`
-* **Type:** `Boolean|Array<String>`
-* **Default:** `true`
+
+-   **Type:** `Boolean|Array<String>`
+-   **Default:** `true`
 
 `allowedBlocks` can contain an array of strings, each string should contain the identifier of a block. When `allowedBlocks` is set it is only possible to insert blocks part of the set specified in the array.
 
@@ -75,14 +75,16 @@ The previous code block restricts all blocks, so only child blocks explicitly re
 If `allowedBlocks` is set to `true`, all blocks are allowed. `false` means no blocks are allowed.
 
 ### `orientation`
-* **Type:** `"horizontal"|"vertical"|undefined`
+
+-   **Type:** `"horizontal"|"vertical"|undefined`
 
 Indicates whether inner blocks are shown horizontally or vertically. Use the string 'horizontal' or 'vertical' as a value. When left unspecified, defaults to 'vertical'.
 
 While this prop doesn't change any styles for the inner blocks themselves, it does display the Block Movers in the correct orientation, and also ensures drag and drop works correctly.
 
 ### `template`
-* **Type:** `Array<Array<Object>>`
+
+-   **Type:** `Array<Array<Object>>`
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
 More information about templates can be found in [template docs](/docs/reference-guides/block-api/block-templates.md).
@@ -105,39 +107,43 @@ const TEMPLATE = [ [ 'core/columns', {}, [
 The previous example creates an InnerBlocks area containing two columns one with an image and the other with a paragraph.
 
 ### `templateInsertUpdatesSelection`
-* **Type:** `Boolean`
-* **Default:** `false`
+
+-   **Type:** `Boolean`
+-   **Default:** `false`
 
 If true when child blocks in the template are inserted the selection is updated.
 If false the selection should not be updated when child blocks specified in the template are inserted.
 
 ### `templateLock`
-* **Type:** `String|Boolean`
+
+-   **Type:** `String|Boolean`
 
 Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/reference-guides/block-api/block-templates.md#locking).
 
 Template locking allows locking the `InnerBlocks` area for the current template.
-*Options:*
+_Options:_
 
-- `'all'` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
-- `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
-- `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
+-   `'all'` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
+-   `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
+-   `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
 
 If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
 
 If the block is a top level block: the locking of the Custom Post Type is used.
 
 ### `renderAppender`
-* **Type:** `Component|false`
-* **Default:** - `undefined`. When `renderAppender` is not specified, the default appender is shown. If a `false` value is provided, no appender is rendered.
+
+-   **Type:** `Component|false`
+-   **Default:** - `undefined`. When `renderAppender` is not specified, the default appender is shown. If a `false` value is provided, no appender is rendered.
 
 A component to show as the trailing appender for the inner blocks list.
 
 #### Notes
-* For convenience two predefined appender components are exposed on `InnerBlocks` which can be used for the prop:
-	- `InnerBlocks.ButtonBlockAppender` -  display a `+` (plus) icon button as the appender.
-	- `InnerBlocks.DefaultBlockAppender` - display the default block appender, typically the paragraph style appender when the paragraph block is allowed.
-* Consumers are also free to pass any valid component. This provides the full flexibility to define a bespoke block appender.
+
+-   For convenience two predefined appender components are exposed on `InnerBlocks` which can be used for the prop:
+    -   `InnerBlocks.ButtonBlockAppender` - display a `+` (plus) icon button as the appender.
+    -   `InnerBlocks.DefaultBlockAppender` - display the default block appender, typically the paragraph style appender when the paragraph block is allowed.
+-   Consumers are also free to pass any valid component. This provides the full flexibility to define a bespoke block appender.
 
 #### Example usage
 
@@ -160,8 +166,8 @@ A component to show as the trailing appender for the inner blocks list.
 
 ### `__experimentalCaptureToolbars`
 
-* **Type:** `Boolean`
-* **Default:** `false`
+-   **Type:** `Boolean`
+-   **Default:** `false`
 
 Determines whether the toolbars of _all_ child Blocks (applied deeply, recursive) should have their toolbars "captured" and shown on the Block which is consuming `InnerBlocks`.
 
@@ -169,5 +175,5 @@ For example, a button block, deeply nested in several levels of block `X` that u
 
 ### `placeholder`
 
-* **Type:** `Function`
-* **Default:** - `undefined`. The placeholder is an optional function that can be passed in to be a rendered component placed in front of the appender. This can be used to represent an example state prior to any blocks being placed. See the Social Links for an implementation example.
+-   **Type:** `Function`
+-   **Default:** - `undefined`. The placeholder is an optional function that can be passed in to be a rendered component placed in front of the appender. This can be used to represent an example state prior to any blocks being placed. See the Social Links for an implementation example.

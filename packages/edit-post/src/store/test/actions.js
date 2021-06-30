@@ -17,6 +17,7 @@ import {
 	closeModal,
 	toggleFeature,
 	requestMetaBoxUpdates,
+	setIsListViewOpened,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -111,6 +112,19 @@ describe( 'actions', () => {
 			expect( fulfillment.next() ).toEqual( {
 				done: false,
 				value: controls.select( 'core/editor', 'getCurrentPost' ),
+			} );
+		} );
+	} );
+
+	describe( 'setIsListViewOpened', () => {
+		it( 'should return the SET_IS_LIST_VIEW_OPENED action', () => {
+			expect( setIsListViewOpened( true ) ).toEqual( {
+				type: 'SET_IS_LIST_VIEW_OPENED',
+				isOpen: true,
+			} );
+			expect( setIsListViewOpened( false ) ).toEqual( {
+				type: 'SET_IS_LIST_VIEW_OPENED',
+				isOpen: false,
 			} );
 		} );
 	} );

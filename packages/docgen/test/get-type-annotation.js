@@ -17,6 +17,7 @@ const getArrayDestructuringTupleTypeNode = require( './fixtures/type-annotations
 const getArrayDestructuringAnyOtherTypeNode = require( './fixtures/type-annotations/array-destructuring-any-other-type/get-node' );
 const getObjectDestructuringTypeLiteralNode = require( './fixtures/type-annotations/object-destructuring-object-literal-type/get-node' );
 const getAssignmentPatternNode = require( './fixtures/type-annotations/assignment-pattern/get-node' );
+const getExportedVariableDeclarationStaticNode = require( './fixtures/type-annotations/exported-variable-declaration-statics/get-node' );
 
 describe( 'Type annotations', () => {
 	it( 'are taken from JSDoc if any', () => {
@@ -309,6 +310,16 @@ describe( 'Type annotations', () => {
 			expect(
 				getTypeAnnotation( { ...paramTag, name: 'props.0' }, node, 0 )
 			).toBe( '( string )[ 0 ]' );
+		} );
+	} );
+
+	describe( 'static exported variable', () => {
+		const node = getExportedVariableDeclarationStaticNode();
+
+		it( 'should get the type of the variable', () => {
+			expect( getTypeAnnotation( { tag: 'type' }, node, 0 ) ).toBe(
+				'( string | number )[]'
+			);
 		} );
 	} );
 } );

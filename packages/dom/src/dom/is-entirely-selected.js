@@ -1,18 +1,19 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { includes } from 'lodash';
+import { assertIsDefined } from '../utils/assert-is-defined';
+import isInputOrTextArea from './is-input-or-text-area';
 
 /**
  * Check whether the contents of the element have been entirely selected.
  * Returns true if there is no possibility of selection.
  *
- * @param {Element} element The element to check.
+ * @param {HTMLElement} element The element to check.
  *
  * @return {boolean} True if entirely selected, false if not.
  */
 export default function isEntirelySelected( element ) {
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], element.nodeName ) ) {
+	if ( isInputOrTextArea( element ) ) {
 		return (
 			element.selectionStart === 0 &&
 			element.value.length === element.selectionEnd
@@ -25,7 +26,9 @@ export default function isEntirelySelected( element ) {
 
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
+	assertIsDefined( defaultView, 'defaultView' );
 	const selection = defaultView.getSelection();
+	assertIsDefined( selection, 'selection' );
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
@@ -44,9 +47,10 @@ export default function isEntirelySelected( element ) {
 	}
 
 	const lastChild = element.lastChild;
+	assertIsDefined( lastChild, 'lastChild' );
 	const lastChildContentLength =
 		lastChild.nodeType === lastChild.TEXT_NODE
-			? lastChild.data.length
+			? /** @type {Text} */ ( lastChild ).data.length
 			: lastChild.childNodes.length;
 
 	return (

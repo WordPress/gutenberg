@@ -298,19 +298,8 @@ describe( 'Inserting blocks', () => {
 			'button.block-editor-inserter__quick-inserter-expand'
 		);
 		await browseAll.click();
-		const inserterMenuInputSelector =
-			'.edit-post-layout__inserter-panel .block-editor-inserter__search-input';
-		const inserterMenuSearchInput = await page.waitForSelector(
-			inserterMenuInputSelector
-		);
-		inserterMenuSearchInput.type( 'cover' );
-		await page.waitForSelector(
-			'.block-editor-block-types-list .editor-block-list-item-cover'
-		);
-		// clicking may be too quick and may select a detached node.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
+		// `insertBlock` uses the currently open panel.
+		await insertBlock( 'Cover' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -374,7 +363,7 @@ describe( 'Inserting blocks', () => {
 
 		// The inserter panel should've closed.
 		const inserterPanels = await page.$$(
-			'.edit-post-layout__inserter-panel'
+			'.edit-post-editor__inserter-panel'
 		);
 		expect( inserterPanels.length ).toBe( 0 );
 

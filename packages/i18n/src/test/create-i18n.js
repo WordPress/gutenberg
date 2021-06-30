@@ -194,6 +194,86 @@ describe( 'createI18n', () => {
 			} );
 		} );
 	} );
+
+	describe( 'resetLocaleData', () => {
+		it( 'reset the locale data', () => {
+			const locale = createTestLocale();
+			expect( locale.__( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
+
+			locale.resetLocaleData();
+			expect( locale.__( 'hello', 'test_domain' ) ).toBe( 'hello' );
+		} );
+
+		it( 'reset the current locale data and set new locale data for the specified domain', () => {
+			const locale = createTestLocale();
+			expect( locale.__( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
+
+			locale.resetLocaleData( additionalLocaleData );
+			expect( locale.__( 'cheeseburger' ) ).toBe(
+				'hamburger au fromage'
+			);
+
+			locale.resetLocaleData( additionalLocaleData, 'test_domain2' );
+			expect( locale.__( '%d cat', 'test_domain2' ) ).toBe( '%d chat' );
+		} );
+
+		it( 'reset the plural forms function cache', () => {
+			const locale = createI18n( {}, 'test_domain' );
+
+			// Call `_n` to get the plural forms function cached.
+			locale._n( 'singular', 'plural', 1, 'test_domain' );
+
+			// Reset the locale data and provide custom plural forms function.
+			locale.resetLocaleData(
+				{
+					'': {
+						domain: 'test_domain',
+						lang: 'aa',
+						plural_forms:
+							'nplurals=3; plural=n==1 ? 0 : n==2 ? 1 : 2;',
+					},
+					singular: [
+						'translated',
+						'translated_plural_1',
+						'translated_plural_2',
+					],
+				},
+				'test_domain'
+			);
+
+			expect( locale._n( 'singular', 'plural', 1, 'test_domain' ) ).toBe(
+				'translated'
+			);
+			expect( locale._n( 'singular', 'plural', 2, 'test_domain' ) ).toBe(
+				'translated_plural_1'
+			);
+			expect( locale._n( 'singular', 'plural', 3, 'test_domain' ) ).toBe(
+				'translated_plural_2'
+			);
+
+			// Reset the locale data and fallback to the defualt plural forms function.
+			locale.resetLocaleData(
+				{
+					singular: [
+						'translated',
+						'translated_plural_1',
+						'translated_plural_2',
+					],
+				},
+				'test_domain'
+			);
+
+			expect( locale._n( 'singular', 'plural', 1, 'test_domain' ) ).toBe(
+				'translated'
+			);
+			expect( locale._n( 'singular', 'plural', 2, 'test_domain' ) ).toBe(
+				'translated_plural_1'
+			);
+			expect( locale._n( 'singular', 'plural', 3, 'test_domain' ) ).toBe(
+				'translated_plural_1'
+			);
+		} );
+	} );
 } );
 
 describe( 'i18n filters', () => {

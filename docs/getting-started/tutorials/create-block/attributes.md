@@ -57,13 +57,13 @@ import './editor.scss';
 
 export default function Edit( { attributes, setAttributes } ) {
 	return (
-			<div { ...useBlockProps() }>
-				<TextControl
-						label={ __( 'Message', 'gutenpride' ) }
-						value={ attributes.message }
-						onChange={ ( val ) => setAttributes( { message: val } ) }
-				/>
-			</div>
+		<div { ...useBlockProps() }>
+			<TextControl
+				label={ __( 'Message', 'gutenpride' ) }
+				value={ attributes.message }
+				onChange={ ( val ) => setAttributes( { message: val } ) }
+			/>
+		</div>
 	);
 }
 ```

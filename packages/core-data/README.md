@@ -12,7 +12,7 @@ Install the module
 npm install @wordpress/core-data --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Example
 
@@ -267,6 +267,26 @@ _Parameters_
 _Returns_
 
 -   `boolean|undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
+
+<a name="canUserEditEntityRecord" href="#canUserEditEntityRecord">#</a> **canUserEditEntityRecord**
+
+Returns whether the current user can edit the given entity.
+
+Calling this may trigger an OPTIONS request to the REST API via the
+`canUser()` resolver.
+
+<https://developer.wordpress.org/rest-api/reference/>
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordId_ `string`: Record's id.
+
+_Returns_
+
+-   `boolean|undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
 
 <a name="getAuthors" href="#getAuthors">#</a> **getAuthors**
 

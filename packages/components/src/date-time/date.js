@@ -82,7 +82,7 @@ class DatePicker extends Component {
 	}
 
 	onMonthPreviewedHandler( newMonthDate ) {
-		this.props?.onMonthPreviewed( newMonthDate.toISOString() );
+		this.props.onMonthPreviewed?.( newMonthDate.toISOString() );
 		this.keepFocusInside();
 	}
 

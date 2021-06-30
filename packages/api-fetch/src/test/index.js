@@ -178,6 +178,33 @@ describe( 'apiFetch', () => {
 		} );
 	} );
 
+	it( 'should throw AbortError when fetch aborts', async () => {
+		const abortError = new Error();
+		abortError.name = 'AbortError';
+		abortError.code = 20;
+
+		window.fetch.mockReturnValue( Promise.reject( abortError ) );
+
+		const controller = new window.AbortController();
+
+		const promise = apiFetch( {
+			path: '/random',
+			signal: controller.signal,
+		} );
+
+		controller.abort();
+
+		let error;
+
+		try {
+			await promise;
+		} catch ( err ) {
+			error = err;
+		}
+
+		expect( error.name ).toBe( 'AbortError' );
+	} );
+
 	it( 'should return null if response has no content status code', () => {
 		window.fetch.mockReturnValue(
 			Promise.resolve( {

@@ -1,17 +1,24 @@
 /**
  * External dependencies
  */
-import { css, getHighDpi, ui } from '@wp-g2/styles';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { css } from '@emotion/css';
 
-const lineHeight = `calc(${ ui.get( 'fontSize' ) } * 1.2)`;
-
-/* eslint-disable jsdoc/valid-types */
 /**
- * @param {Parameters<typeof ui.get>[0]} size The padding size.
+ * Internal dependencies
  */
-/* eslint-enable jsdoc/valid-types */
+import CONFIG from '../../utils/config-values';
+import { getHighDpi } from '../utils/get-high-dpi';
+
+const lineHeight = `calc(${ CONFIG.fontSize } * 1.2)`;
+
+/**
+ * @param {keyof CONFIG} size The padding size.
+ */
 function getPadding( size ) {
-	return `calc((${ ui.get( size ) } - ${ lineHeight }) / 2)`;
+	return `calc((${ CONFIG[ size ] } - ${ lineHeight }) / 2)`;
 }
 
 const highDpiAdjust = getHighDpi`

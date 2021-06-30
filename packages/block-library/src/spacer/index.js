@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
 import { resizeCornerNE as icon } from '@wordpress/icons';
 
 /**
@@ -16,10 +15,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Spacer', 'block title' ),
-	description: __(
-		'Add white space between blocks and customize its height.'
-	),
 	icon,
 	edit,
 	save,

@@ -54,11 +54,9 @@ function InserterMenu( {
 			);
 
 			return {
-				showPatterns:
-					! destinationRootClientId ||
-					!! __experimentalGetAllowedPatterns(
-						destinationRootClientId
-					).length,
+				showPatterns: !! __experimentalGetAllowedPatterns(
+					destinationRootClientId
+				).length,
 				hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
 					?.length,
 			};
@@ -190,6 +188,9 @@ function InserterMenu( {
 							rootClientId={ rootClientId }
 							clientId={ clientId }
 							isAppender={ isAppender }
+							__experimentalInsertionIndex={
+								__experimentalInsertionIndex
+							}
 							showBlockDirectory
 							shouldFocusBlock={ shouldFocusBlock }
 						/>

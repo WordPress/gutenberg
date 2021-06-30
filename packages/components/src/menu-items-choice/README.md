@@ -1,6 +1,6 @@
 # MenuItemsChoice
 
-`MenuItemsChoice` functions similarly to a set of  `MenuItem`s, but allows the user to select one option from a set of multiple choices.
+`MenuItemsChoice` functions similarly to a set of `MenuItem`s, but allows the user to select one option from a set of multiple choices.
 
 ![MenuItemsChoice Example](https://wordpress.org/gutenberg/files/2019/03/MenuItemsChoice.png)
 
@@ -17,7 +17,7 @@ A `MenuItemsChoice` should be housed within in its own distinct `MenuGroup`, so 
 
 ### Usage
 
-`MenuItemsChoice` is used in a `DropdownMenu` to present users with a set of options. When one option in a `MenuItemsChoice` is selected, the others are automatically deselected. 
+`MenuItemsChoice` is used in a `DropdownMenu` to present users with a set of options. When one option in a `MenuItemsChoice` is selected, the others are automatically deselected.
 
 ![MenuItemsChoice Diagram](https://wordpress.org/gutenberg/files/2019/03/MenuItemsChoice-Checkbox-Keyboard-Shortcut.png)
 
@@ -28,10 +28,10 @@ A `MenuItemsChoice` should be housed within in its own distinct `MenuGroup`, so 
 
 Use `MenuItemsChoice` when you want users to:
 
-- Select a single option from a set of choices in a menu.
-- Expose all available options.
+-   Select a single option from a set of choices in a menu.
+-   Expose all available options.
 
-`MenuItemsChoice` should not be used to toggle individual features on and off. For that, consider using a `FeatureToggle`. 
+`MenuItemsChoice` should not be used to toggle individual features on and off. For that, consider using a `FeatureToggle`.
 
 #### Defaults
 
@@ -48,7 +48,6 @@ When one choice in a set of `MenuItemsChoice` is the most desirable or frequentl
 **The power of suggestion**
 
 Designs with a `MenuItemsChoice` option selected by default make a strong suggestion to the user. It can help them make the best decision and increase their confidence. (Use this guidance with caution, and only for good.)
-
 
 ## Development guidelines
 
@@ -75,7 +74,7 @@ const MyMenuItemsChoice = withState( {
 		<MenuItemsChoice
 			choices={ choices }
 			value={ mode }
-			onSelect={ mode => setState( { mode } ) }
+			onSelect={ ( mode ) => setState( { mode } ) }
 		/>
 	</MenuGroup>
 ) );

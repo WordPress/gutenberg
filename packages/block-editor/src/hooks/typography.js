@@ -5,10 +5,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
 /**
  * External dependencies
  */
-import {
-	PanelBody,
-	__unstableComponentSystemProvider as ComponentSystemProvider,
-} from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -47,7 +44,13 @@ import {
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	useIsTextTransformDisabled,
 } from './text-transform';
+import {
+	LETTER_SPACING_SUPPORT_KEY,
+	LetterSpacingEdit,
+	useIsLetterSpacingDisabled,
+} from './letter-spacing';
 
+export const TYPOGRAPHY_SUPPORT_KEY = 'typography';
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
@@ -56,6 +59,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	FONT_FAMILY_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
+	LETTER_SPACING_SUPPORT_KEY,
 ];
 
 export function TypographyPanel( props ) {
@@ -67,15 +71,12 @@ export function TypographyPanel( props ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Typography' ) }>
-				<ComponentSystemProvider
-					__unstableNextInclude={ [ 'WPComponentsFontSizePicker' ] }
-				>
-					<FontFamilyEdit { ...props } />
-					<FontSizeEdit { ...props } />
-					<FontAppearanceEdit { ...props } />
-					<LineHeightEdit { ...props } />
-					<TextDecorationAndTransformEdit { ...props } />
-				</ComponentSystemProvider>
+				<FontFamilyEdit { ...props } />
+				<FontSizeEdit { ...props } />
+				<FontAppearanceEdit { ...props } />
+				<LineHeightEdit { ...props } />
+				<TextDecorationAndTransformEdit { ...props } />
+				<LetterSpacingEdit { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -98,6 +99,7 @@ function useIsTypographyDisabled( props = {} ) {
 		useIsFontFamilyDisabled( props ),
 		useIsTextDecorationDisabled( props ),
 		useIsTextTransformDisabled( props ),
+		useIsLetterSpacingDisabled( props ),
 	];
 
 	return configs.filter( Boolean ).length === configs.length;

@@ -23,7 +23,7 @@ figure.wp-block-image:not(.wp-block) {
 		margin-left: -9px;
 	}
 
-	&:not(.is-style-rounded) > div {
+	&:not(.is-style-rounded) > div:not(.components-placeholder) {
 		border-radius: inherit;
 	}
 }

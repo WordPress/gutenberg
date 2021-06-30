@@ -20,14 +20,19 @@ export const _default = () => {
 	return <BoxControl />;
 };
 
-function DemoExample() {
-	const [ values, setValues ] = useState( {
-		top: '10px',
-		right: '10px',
-		bottom: '10px',
-		left: '10px',
-	} );
+const defaultSideValues = {
+	top: '10px',
+	right: '10px',
+	bottom: '10px',
+	left: '10px',
+};
 
+function DemoExample( {
+	sides,
+	defaultValues = defaultSideValues,
+	splitOnAxis = false,
+} ) {
+	const [ values, setValues ] = useState( defaultValues );
 	const [ showVisualizer, setShowVisualizer ] = useState( {} );
 
 	return (
@@ -37,8 +42,10 @@ function DemoExample() {
 					<BoxControl
 						label="Padding"
 						values={ values }
+						sides={ sides }
 						onChange={ setValues }
 						onChangeShowVisualizer={ setShowVisualizer }
+						splitOnAxis={ splitOnAxis }
 					/>
 				</Content>
 			</FlexBlock>
@@ -60,6 +67,38 @@ function DemoExample() {
 
 export const visualizer = () => {
 	return <DemoExample />;
+};
+
+export const arbitrarySides = () => {
+	return (
+		<DemoExample
+			sides={ [ 'top', 'bottom' ] }
+			defaultValues={ { top: '10px', bottom: '10px' } }
+		/>
+	);
+};
+
+export const singleSide = () => {
+	return (
+		<DemoExample
+			sides={ [ 'bottom' ] }
+			defaultValues={ { bottom: '10px' } }
+		/>
+	);
+};
+
+export const verticalHorizontalControls = () => {
+	return <DemoExample splitOnAxis={ true } />;
+};
+
+export const verticalHorizontalControlsWithSingleSide = () => {
+	return (
+		<DemoExample
+			sides={ [ 'horizontal' ] }
+			defaultValues={ { left: '10px', right: '10px' } }
+			splitOnAxis={ true }
+		/>
+	);
 };
 
 const Container = styled( Flex )`

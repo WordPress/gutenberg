@@ -25,7 +25,7 @@ function SaveButton() {
 
 	return (
 		<Button
-			isPrimary
+			variant="primary"
 			isBusy={ isSaving }
 			aria-disabled={ isSaving }
 			onClick={ isSaving ? undefined : saveEditedWidgetAreas }

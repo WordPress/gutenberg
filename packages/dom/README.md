@@ -102,7 +102,7 @@ _Parameters_
 
 _Returns_
 
--   `?Node`: Offset parent.
+-   `Node | null`: Offset parent.
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
@@ -138,11 +138,11 @@ Given a DOM node, finds the closest scrollable container node.
 
 _Parameters_
 
--   _node_ `Element`: Node from which to start.
+-   _node_ `Element | null`: Node from which to start.
 
 _Returns_
 
--   `?Element`: Scrollable container node, if found.
+-   `Element | undefined`: Scrollable container node, if found.
 
 <a name="insertAfter" href="#insertAfter">#</a> **insertAfter**
 
@@ -178,7 +178,7 @@ Returns true if there is no possibility of selection.
 
 _Parameters_
 
--   _element_ `Element`: The element to check.
+-   _element_ `HTMLElement`: The element to check.
 
 _Returns_
 
@@ -226,6 +226,18 @@ _Returns_
 
 -   `boolean`: True if phrasing content, false if not.
 
+<a name="isRTL" href="#isRTL">#</a> **isRTL**
+
+Whether the element's text direction is right-to-left.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+
+_Returns_
+
+-   `boolean`: True if rtl, false if ltr.
+
 <a name="isTextContent" href="#isTextContent">#</a> **isTextContent**
 
 _Parameters_
@@ -249,7 +261,7 @@ _Parameters_
 
 _Returns_
 
--   `element is HTMLElement`: True if the element is an text field, false if not.
+-   `node is HTMLElement`: True if the element is an text field, false if not.
 
 <a name="isVerticalEdge" href="#isVerticalEdge">#</a> **isVerticalEdge**
 
@@ -270,9 +282,8 @@ Places the caret at start or end of a given element.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: True for end, false for start.
--   _mayUseScroll_ `boolean`: Whether to allow scrolling.
 
 <a name="placeCaretAtVerticalEdge" href="#placeCaretAtVerticalEdge">#</a> **placeCaretAtVerticalEdge**
 
@@ -280,7 +291,7 @@ Places the caret at the top or bottom of a given element.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: True for bottom, false for top.
 -   _rect_ `[DOMRect]`: The rectangle to position the caret with.
 -   _mayUseScroll_ `[boolean]`: True to allow scrolling, false to disallow.
@@ -304,8 +315,8 @@ Given a schema, unwraps or removes nodes, attributes and classes on HTML.
 _Parameters_
 
 -   _HTML_ `string`: The HTML to clean up.
--   _schema_ `Object`: Schema for the HTML.
--   _inline_ `Object`: Whether to clean for inline mode.
+-   _schema_ `import('./clean-node-list').Schema`: Schema for the HTML.
+-   _inline_ `boolean`: Whether to clean for inline mode.
 
 _Returns_
 

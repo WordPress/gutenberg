@@ -6,25 +6,6 @@
  */
 
 /**
- * Returns all block template file path of the current theme and its parent theme.
- * Includes demo block template files if demo experiment is enabled.
- *
- * @return array $block_template_files A list of paths to all template files.
- */
-function gutenberg_get_template_paths() {
-	$block_template_files = glob( get_stylesheet_directory() . '/block-templates/*.html' );
-	$block_template_files = is_array( $block_template_files ) ? $block_template_files : array();
-
-	if ( is_child_theme() ) {
-		$child_block_template_files = glob( get_template_directory() . '/block-templates/*.html' );
-		$child_block_template_files = is_array( $child_block_template_files ) ? $child_block_template_files : array();
-		$block_template_files       = array_merge( $block_template_files, $child_block_template_files );
-	}
-
-	return $block_template_files;
-}
-
-/**
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
@@ -64,7 +45,7 @@ function gutenberg_register_template_post_type() {
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
 		'rest_base'             => 'templates',
-		'rest_controller_class' => 'WP_REST_Templates_Controller',
+		'rest_controller_class' => 'Gutenberg_REST_Templates_Controller',
 		'capability_type'       => array( 'template', 'templates' ),
 		'map_meta_cap'          => true,
 		'supports'              => array(
@@ -84,13 +65,13 @@ add_action( 'init', 'gutenberg_register_template_post_type' );
  * Registers block editor 'wp_theme' taxonomy.
  */
 function gutenberg_register_wp_theme_taxonomy() {
-	if ( ! gutenberg_supports_block_templates() ) {
+	if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
 		return;
 	}
 
 	register_taxonomy(
 		'wp_theme',
-		array( 'wp_template', 'wp_template_part' ),
+		array( 'wp_template', 'wp_template_part', 'wp_global_styles' ),
 		array(
 			'public'            => false,
 			'hierarchical'      => false,
@@ -192,3 +173,112 @@ function set_unique_slug_on_create_template( $post_id ) {
 	}
 }
 add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template' );
+
+/**
+ * Print the skip-link script & styles.
+ *
+ * @todo Remove this when WP 5.8 is the minimum required version.
+ *
+ * @return void
+ */
+function gutenberg_the_skip_link() {
+
+	// Early exit if on WP 5.8+.
+	if ( function_exists( 'the_block_template_skip_link' ) ) {
+		return;
+	}
+
+	// Early exit if not a block theme.
+	if ( ! gutenberg_supports_block_templates() ) {
+		return;
+	}
+
+	// Early exit if not a block template.
+	global $_wp_current_template_content;
+	if ( ! $_wp_current_template_content ) {
+		return;
+	}
+	?>
+
+	<?php
+	/**
+	 * Print the skip-link styles.
+	 */
+	?>
+	<style id="skip-link-styles">
+		.skip-link.screen-reader-text {
+			border: 0;
+			clip: rect(1px,1px,1px,1px);
+			clip-path: inset(50%);
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			padding: 0;
+			position: absolute !important;
+			width: 1px;
+			word-wrap: normal !important;
+		}
+
+		.skip-link.screen-reader-text:focus {
+			background-color: #eee;
+			clip: auto !important;
+			clip-path: none;
+			color: #444;
+			display: block;
+			font-size: 1em;
+			height: auto;
+			left: 5px;
+			line-height: normal;
+			padding: 15px 23px 14px;
+			text-decoration: none;
+			top: 5px;
+			width: auto;
+			z-index: 100000;
+		}
+	</style>
+	<?php
+	/**
+	 * Print the skip-link script.
+	 */
+	?>
+	<script>
+	( function() {
+		var skipLinkTarget = document.querySelector( 'main' ),
+			parentEl,
+			skipLinkTargetID,
+			skipLink;
+
+		// Early exit if a skip-link target can't be located.
+		if ( ! skipLinkTarget ) {
+			return;
+		}
+
+		// Get the site wrapper.
+		// The skip-link will be injected in the beginning of it.
+		parentEl = document.querySelector( '.wp-site-blocks' );
+
+		// Early exit if the root element was not found.
+		if ( ! parentEl ) {
+			return;
+		}
+
+		// Get the skip-link target's ID, and generate one if it doesn't exist.
+		skipLinkTargetID = skipLinkTarget.id;
+		if ( ! skipLinkTargetID ) {
+			skipLinkTargetID = 'wp--skip-link--target';
+			skipLinkTarget.id = skipLinkTargetID;
+		}
+
+		// Create the skip link.
+		skipLink = document.createElement( 'a' );
+		skipLink.classList.add( 'skip-link', 'screen-reader-text' );
+		skipLink.href = '#' + skipLinkTargetID;
+		skipLink.innerHTML = '<?php esc_html_e( 'Skip to content', 'gutenberg' ); ?>';
+
+		// Inject the skip link.
+		parentEl.insertAdjacentElement( 'afterbegin', skipLink );
+	}() );
+	</script>
+	<?php
+}
+add_action( 'wp_footer', 'gutenberg_the_skip_link' );

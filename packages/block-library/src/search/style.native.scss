@@ -20,7 +20,6 @@
 	border: $border-width solid $gray-5;
 	border-radius: $grid-unit-05;
 	padding: $grid-unit-05;
-	padding-left: $grid-unit-10;
 }
 
 .borderDark {
@@ -35,7 +34,11 @@
 	border-radius: $grid-unit-05;
 	align-content: center;
 	align-items: center;
-	flex-shrink: 1;
+}
+
+.buttonContainerWide {
+	margin-left: 0;
+	margin-top: $grid-unit-05;
 }
 
 .icon {
@@ -59,7 +62,8 @@
 	font-weight: 400;
 	background-color: transparent;
 	font-family: $default-regular-font;
-	padding: 0;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
 	margin: 0;
 	text-align: center;
 	min-height: 24px;
@@ -72,7 +76,7 @@
 .plainTextInput {
 	min-height: 42px;
 	padding: $grid-unit-05;
-	padding-left: 0;
+	padding-left: $grid-unit-10;
 	font-family: $default-regular-font;
 	color: $gray-90;
 }
@@ -87,4 +91,9 @@
 
 .plainTextPlaceholderDark {
 	color: $gray-50;
+}
+
+.widthMargin {
+	margin: $grid-unit-20;
+	padding: $grid-unit-05;
 }

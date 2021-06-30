@@ -22,13 +22,14 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from '@wordpress/react-native-bridge';
-import { getProtocol, safeDecodeURI } from '@wordpress/url';
+import { getProtocol } from '@wordpress/url';
 import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+import { parseAudioUrl } from './audio-url-parser.native';
 
 const isIOS = Platform.OS === 'ios';
 
@@ -127,11 +128,9 @@ function Player( {
 	let extension = '';
 
 	if ( src ) {
-		const decodedURI = safeDecodeURI( src );
-		const fileName = decodedURI.split( '/' ).pop();
-		const parts = fileName.split( '.' );
-		extension = parts.pop().toUpperCase();
-		title = parts.join( '.' );
+		const result = parseAudioUrl( src );
+		extension = result.extension;
+		title = result.title;
 	}
 
 	const getSubtitleValue = () => {
@@ -144,7 +143,7 @@ function Player( {
 		return (
 			extension +
 			// translators: displays audio file extension. e.g. MP3 audio file
-			__( ' audio file' )
+			__( 'audio file' )
 		);
 	};
 

@@ -7,14 +7,20 @@
 Wrap your original component with `withConstrainedTabbing`.
 
 ```jsx
-import { withConstrainedTabbing, TextControl, Button } from '@wordpress/components';
+import {
+	withConstrainedTabbing,
+	TextControl,
+	Button,
+} from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
-const ConstrainedTabbing = withConstrainedTabbing( ( { children } ) => children );
+const ConstrainedTabbing = withConstrainedTabbing(
+	( { children } ) => children
+);
 
 const MyComponentWithConstrainedTabbing = withState( {
 	isConstrainedTabbing: false,
-} )( ( { isConstrainedTabbing, setState } ) => { 
+} )( ( { isConstrainedTabbing, setState } ) => {
 	let form = (
 		<form>
 			<TextControl label="Input 1" onChange={ () => {} } />
@@ -24,16 +30,19 @@ const MyComponentWithConstrainedTabbing = withState( {
 	if ( isConstrainedTabbing ) {
 		form = <ConstrainedTabbing>{ form }</ConstrainedTabbing>;
 	}
-	
+
 	const toggleConstrain = () => {
-		setState( ( state ) => ( { isConstrainedTabbing: ! state.isConstrainedTabbing } ) );
+		setState( ( state ) => ( {
+			isConstrainedTabbing: ! state.isConstrainedTabbing,
+		} ) );
 	};
-	
+
 	return (
 		<div>
 			{ form }
-			<Button isSecondary onClick={ toggleConstrain }>
-				{ isConstrainedTabbing ? 'Disable' : 'Enable' } constrain tabbing
+			<Button variant="secondary" onClick={ toggleConstrain }>
+				{ isConstrainedTabbing ? 'Disable' : 'Enable' } constrain
+				tabbing
 			</Button>
 		</div>
 	);

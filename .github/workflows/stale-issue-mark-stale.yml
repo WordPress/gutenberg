@@ -6,6 +6,7 @@ on:
 jobs:
     stale:
         runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
         steps:
             - uses: actions/stale@996798eb71ef485dc4c7b4d3285842d714040c4a # v3.0.17
               with:

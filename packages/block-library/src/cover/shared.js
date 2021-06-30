@@ -2,9 +2,6 @@
  * WordPress dependencies
  */
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
-import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
-import { MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
 
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
@@ -27,37 +24,7 @@ export const COVER_DEFAULT_HEIGHT = 300;
 export function backgroundImageStyles( url ) {
 	return url ? { backgroundImage: `url(${ url })` } : {};
 }
-export const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
-
-const isWeb = Platform.OS === 'web';
-
-export const CSS_UNITS = [
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '430',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '20',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '20',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
-		default: '20',
-	},
-	{
-		value: 'vh',
-		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
-		default: '50',
-	},
-];
+export const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 
 export function dimRatioToClass( ratio ) {
 	return ratio === 0 || ratio === 50 || ! ratio

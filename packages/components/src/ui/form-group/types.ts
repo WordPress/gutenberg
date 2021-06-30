@@ -8,7 +8,7 @@ import type { CSSProperties, ReactNode, ReactText } from 'react';
  * Internal dependencies
  */
 import type { Props as ControlLabelProps } from '../control-label/types';
-import type { Props as GridProps } from '../grid/types';
+import type { Props as GridProps } from '../../grid/types';
 
 export type FormGroupLabelProps = ControlLabelProps & {
 	labelHidden?: boolean;

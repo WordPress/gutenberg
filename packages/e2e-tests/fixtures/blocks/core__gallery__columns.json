@@ -16,7 +16,10 @@
 					"caption": ""
 				}
 			],
-			"ids": [ null, null ],
+			"ids": [
+				null,
+				null
+			],
 			"columns": 1,
 			"caption": "",
 			"imageCrop": true,

@@ -1119,6 +1119,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				'menu_order',
 			),
 		);
+		// Change default to 100 items.
+		$query_params['per_page']['default'] = 100;
 
 		return $query_params;
 	}

@@ -34,6 +34,11 @@
 	margin: $grid-unit-05 #{ $button-size-small + $border-width } $grid-unit-05 0;
 }
 
+.components-notice__actions {
+	display: flex;
+	flex-wrap: wrap;
+}
+
 .components-notice__action.components-button {
 	&,
 	&.is-link {
@@ -42,6 +47,10 @@
 	&.is-secondary {
 		vertical-align: initial;
 	}
+
+	// When it has better support, this can be replaced
+	// with column-gap since these are flex items.
+	margin-right: $grid-unit-10;
 }
 
 .components-notice__dismiss {
@@ -67,7 +76,6 @@
 	// The notice should never be wider than the viewport, or the close button might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
 	box-sizing: border-box;
-	z-index: z-index(".components-notice-list");
 
 	.components-notice__content {
 		margin-top: $grid-unit-15;

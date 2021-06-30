@@ -79,13 +79,10 @@ public class Gutenberg: NSObject {
             initialProps["capabilities"] = capabilities.toJSPayload()
         }
 
-        let editorTheme = dataSource.gutenbergEditorTheme()
-        if let colors = editorTheme?.colors {
-            initialProps["colors"] = colors
-        }
-
-        if let gradients = editorTheme?.gradients {
-            initialProps["gradients"] = gradients
+        let editorSettings = dataSource.gutenbergEditorSettings()
+        let settingsUpdates = properties(from: editorSettings)
+        initialProps.merge(settingsUpdates) { (intialProp, settingsUpdates) -> Any in
+            settingsUpdates
         }
 
         return initialProps
@@ -184,19 +181,32 @@ public class Gutenberg: NSObject {
         bridgeModule.sendEventIfNeeded(.setFocusOnTitle, body: nil)
     }
 
-    public func updateTheme(_ editorTheme: GutenbergEditorTheme?) {
+    public func updateEditorSettings(_ editorSettings: GutenbergEditorSettings?) {
+        let settingsUpdates = properties(from: editorSettings)
+        sendEvent(.updateEditorSettings, body: settingsUpdates)
+    }
 
-        var themeUpdates = [String : Any]()
+    private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
+        var settingsUpdates = [String : Any]()
+        settingsUpdates["isFSETheme"] = editorSettings?.isFSETheme ?? false
 
-        if let colors = editorTheme?.colors {
-            themeUpdates["colors"] = colors
+        if let rawStyles = editorSettings?.rawStyles {
+            settingsUpdates["rawStyles"] = rawStyles
         }
 
-        if let gradients = editorTheme?.gradients {
-            themeUpdates["gradients"] = gradients
+        if let rawFeatures = editorSettings?.rawFeatures {
+            settingsUpdates["rawFeatures"] = rawFeatures
         }
 
-        bridgeModule.sendEventIfNeeded(.updateTheme, body:themeUpdates)
+        if let colors = editorSettings?.colors {
+            settingsUpdates["colors"] = colors
+        }
+
+        if let gradients = editorSettings?.gradients {
+            settingsUpdates["gradients"] = gradients
+        }
+
+        return settingsUpdates
     }
 
     public func showNotice(_ message: String) {

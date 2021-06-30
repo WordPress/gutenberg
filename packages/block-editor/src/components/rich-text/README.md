@@ -6,60 +6,60 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 ### `value: String`
 
-*Required.* HTML string to make editable. The HTML should be valid, and valid inside the `tagName`, if provided.
+_Required._ HTML string to make editable. The HTML should be valid, and valid inside the `tagName`, if provided.
 
 ### `onChange( value: String ): Function`
 
-*Required.* Called when the value changes.
+_Required._ Called when the value changes.
 
 ### `tagName: String`
 
-*Default: `div`.* The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element. Elements that display inline are not supported. Set to `inline-block` to use tag names that have `inline` as the default.
+_Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element.
 
 ### `placeholder: String`
 
-*Optional.* Placeholder text to show when the field is empty, similar to the
-  [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
+_Optional._ Placeholder text to show when the field is empty, similar to the
+[`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 
 ### `multiline: Boolean | String`
 
-*Optional.* By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
+_Optional._ By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
 
 ### `onSplit( value: String ): Function`
 
-*Optional.* Called when the content can be split, where `value` is a piece of content being split off. Here you should create a new block with that content and return it. Note that you also need to provide `onReplace` in order for this to take any effect.
+_Optional._ Called when the content can be split, where `value` is a piece of content being split off. Here you should create a new block with that content and return it. Note that you also need to provide `onReplace` in order for this to take any effect.
 
 ### `onReplace( blocks: Array ): Function`
 
-*Optional.* Called when the `RichText` instance can be replaced with the given blocks.
+_Optional._ Called when the `RichText` instance can be replaced with the given blocks.
 
 ### `onMerge( forward: Boolean ): Function`
 
-*Optional.* Called when blocks can be merged. `forward` is true when merging with the next block, false when merging with the previous block.
+_Optional._ Called when blocks can be merged. `forward` is true when merging with the next block, false when merging with the previous block.
 
 ### `onRemove( forward: Boolean ): Function`
 
-*Optional.* Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block.
+_Optional._ Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block.
 
 ### `allowedFormats: Array`
 
-*Optional.* By default, all registered formats are allowed. This setting can be used to fine-tune the allowed formats. Example: `[ 'core/bold', 'core/link' ]`.
+_Optional._ By default, all registered formats are allowed. This setting can be used to fine-tune the allowed formats. Example: `[ 'core/bold', 'core/link' ]`.
 
 ### `withoutInteractiveFormatting: Boolean`
 
-*Optional.* By default, all formatting controls are present. This setting can be used to remove formatting controls that would make content [interactive](https://html.spec.whatwg.org/multipage/dom.html#interactive-content). This is useful if you want to make content that is already interactive editable.
+_Optional._ By default, all formatting controls are present. This setting can be used to remove formatting controls that would make content [interactive](https://html.spec.whatwg.org/multipage/dom.html#interactive-content). This is useful if you want to make content that is already interactive editable.
 
 ### `isSelected: Boolean`
 
-*Optional.* Whether to show the input is selected or not in order to show the formatting controls. By default it renders the controls when the block is selected.
+_Optional._ Whether to show the input is selected or not in order to show the formatting controls. By default it renders the controls when the block is selected.
 
 ### `autocompleters: Array<Completer>`
 
-*Optional.* A list of autocompleters to use instead of the default.
+_Optional._ A list of autocompleters to use instead of the default.
 
 ### `preserveWhiteSpace: Boolean`
 
-*Optional.* Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space. If turned on, soft line breaks will be saved as newline characters, not as line break elements.
+_Optional._ Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space. If turned on, soft line breaks will be saved as newline characters, not as line break elements.
 
 ## RichText.Content
 
@@ -69,6 +69,7 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 {% codetabs %}
 {% ES5 %}
+
 ```js
 wp.blocks.registerBlockType( /* ... */, {
 	// ...
@@ -98,7 +99,9 @@ wp.blocks.registerBlockType( /* ... */, {
 	}
 } );
 ```
+
 {% ESNext %}
+
 ```js
 const { registerBlockType } = wp.blocks;
 const { RichText } = wp.editor;
@@ -129,6 +132,7 @@ registerBlockType( /* ... */, {
 	}
 } );
 ```
+
 {% end %}
 
 ## RichTextToolbarButton
@@ -139,6 +143,7 @@ Slot to extend the format toolbar. Use it in the edit function of a `registerFor
 
 {% codetabs %}
 {% ES5 %}
+
 ```js
 wp.richText.registerFormatType( /* ... */, {
 	/* ... */
@@ -154,7 +159,9 @@ wp.richText.registerFormatType( /* ... */, {
 	/* ... */
 } );
 ```
+
 {% ESNext %}
+
 ```js
 import { registerFormatType } from 'wp-rich-text';
 import { richTextToolbarButton } from 'wp-editor';
@@ -174,4 +181,5 @@ registerFormatType( /* ... */, {
 	/* ... */
 } );
 ```
+
 {% end %}

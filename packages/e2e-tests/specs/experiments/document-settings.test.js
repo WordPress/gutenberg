@@ -55,7 +55,9 @@ describe( 'Document Settings', () => {
 		describe( 'and a template part is clicked in the template', () => {
 			it.skip( "should display the selected template part's name in the document header", async () => {
 				// Select the header template part via list view.
-				await page.click( 'button[aria-label="List View"]' );
+				await page.click(
+					'.edit-post-header-toolbar__list-view-toggle'
+				);
 				const headerTemplatePartListViewButton = await page.waitForXPath(
 					'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
 				);
@@ -77,8 +79,7 @@ describe( 'Document Settings', () => {
 			// Navigate to a template part
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			// TODO: Change General to Headers once TT1 blocks categorise the template parts
-			await navigationPanel.navigate( [ 'Template Parts', 'General' ] );
+			await navigationPanel.navigate( [ 'Template Parts', 'Headers' ] );
 			await navigationPanel.clickItemByText( 'header' );
 
 			// Evaluate the document settings title

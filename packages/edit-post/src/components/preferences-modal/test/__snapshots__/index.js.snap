@@ -144,6 +144,12 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
             label="Contain text cursor inside block"
           />
         </Section>
+        <Section
+          description="Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
+          title="Visible blocks"
+        >
+          <WithSelect(BlockManager) />
+        </Section>
       </NavigationItem>
     </NavigationMenu>
     <NavigationMenu
@@ -186,12 +192,12 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
               panelName="discussion-panel"
             />
           </WithSelect(PostTypeSupportCheck)>
-          <WithSelect(PageAttributesCheck)>
+          <PageAttributesCheck>
             <WithSelect(IfCondition(WithDispatch(BaseOption)))
               label="Page attributes"
               panelName="page-attributes"
             />
-          </WithSelect(PageAttributesCheck)>
+          </PageAttributesCheck>
         </Section>
         <Section
           description="Add extra areas to the editor."

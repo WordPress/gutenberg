@@ -1,4 +1,3 @@
-
 # Block Grammar
 
 <dl><dt></dt><dd><pre><header>Block_List</header>  = $(!Block .)* (Block $(!Block .)*)* $(.*)</pre></dd><dt></dt><dd><pre><header>Block</header>  = Block_Void

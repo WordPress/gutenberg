@@ -174,10 +174,12 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 
 	const siteUrl = config.env.development.config.WP_SITEURL;
 	const e2eSiteUrl = config.env.tests.config.WP_TESTS_DOMAIN;
-	const mySQLAddress = await exec(
-		`docker-compose -f ${ dockerComposeConfigPath } port mysql 3306`
+	const { out: mySQLAddress } = await dockerCompose.port(
+		'mysql',
+		3306,
+		dockerComposeConfig
 	);
-	const mySQLPort = mySQLAddress.stdout.split( ':' ).pop();
+	const mySQLPort = mySQLAddress.split( ':' ).pop();
 
 	spinner.prefixText = 'WordPress development site started'
 		.concat( siteUrl ? ` at ${ siteUrl }` : '.' )

@@ -10,24 +10,24 @@ Install the module
 npm install @wordpress/block-library --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Building JavaScript for the browser
 
-If a `frontend.js` file is present in the block's directory, this file will be built along other assets, making it available to load from the browser.
+If a `view.js` file is present in the block's directory, this file will be built along other assets, making it available to load from the browser.
 
 This enables us to, for instance, load this file when the block is present on the page in two ways:
 
 1.  Using the block's `render_callback`:
 
 ```php
-function render_my_block() {
-	$script_path = __DIR__ . '/block-name/frontend.js';
+function render_block_my_block() {
+	$script_path = __DIR__ . '/my-block/view.js';
 
  	if ( file_exists( $script_path ) ) {
  		wp_enqueue_script(
- 			'my_block_frontend_script',
- 			plugins_url( 'frontend.js', $script_path ),
+ 			'wp-block-my-block-view',
+ 			plugins_url( 'view.js', $script_path ),
  			array(),
  			false,
  			true
@@ -36,10 +36,10 @@ function render_my_block() {
 }
 
 function register_block_my_block() {
-	register_block_type_from_metadata(
-		__DIR__ . '/block-name',
+	register_block_type(
+		__DIR__ . '/my-block',
 		array(
-			'render_callback' => 'render_my_block',
+			'render_callback' => 'render_block_my_block',
 		)
 	);
 }
@@ -51,13 +51,13 @@ add_action( 'init', 'register_block_my_block' );
 2.  Using the `render_block` filter:
 
 ```php
-function render_my_block() {
-	$script_path = __DIR__ . '/block-name/frontend.js';
+function render_block_my_block() {
+	$script_path = __DIR__ . '/my-block/view.js';
 
  	if ( file_exists( $script_path ) ) {
  		wp_enqueue_script(
- 			'my_block_frontend_script',
- 			plugins_url( 'frontend.js', $script_path ),
+ 			'wp-block-my-block-view',
+ 			plugins_url( 'view.js', $script_path ),
  			array(),
  			false,
  			true
@@ -65,7 +65,7 @@ function render_my_block() {
  	}
 }
 
-apply_filter( 'render_block', 'render_my_block' );
+apply_filter( 'render_block', 'render_block_my_block' );
 ```
 
 ## API

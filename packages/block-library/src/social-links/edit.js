@@ -14,19 +14,17 @@ import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
-	JustifyToolbar,
+	JustifyContentControl,
 	ContrastChecker,
 	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
 import {
-	DropdownMenu,
 	MenuGroup,
 	MenuItem,
 	PanelBody,
 	ToggleControl,
-	ToolbarItem,
-	ToolbarGroup,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
@@ -45,6 +43,7 @@ export function SocialLinksEdit( props ) {
 		attributes,
 		iconBackgroundColor,
 		iconColor,
+		isSelected,
 		setAttributes,
 		setIconBackgroundColor,
 		setIconColor,
@@ -72,14 +71,20 @@ export function SocialLinksEdit( props ) {
 	}, [ logosOnly, setAttributes ] );
 
 	const SocialPlaceholder = (
-		<div className="wp-block-social-links__social-placeholder">
+		<li className="wp-block-social-links__social-placeholder">
 			<div className="wp-social-link"></div>
 			<div className="wp-block-social-links__social-placeholder-icons">
 				<div className="wp-social-link wp-social-link-twitter"></div>
 				<div className="wp-social-link wp-social-link-facebook"></div>
 				<div className="wp-social-link wp-social-link-instagram"></div>
 			</div>
-		</div>
+		</li>
+	);
+
+	const SelectedSocialPlaceholder = (
+		<li className="wp-block-social-links__social-prompt">
+			{ __( 'Click plus to add' ) }
+		</li>
 	);
 
 	// Fallback color values are used maintain selections in case switching
@@ -95,7 +100,7 @@ export function SocialLinksEdit( props ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
-		placeholder: SocialPlaceholder,
+		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
 	} );
@@ -107,8 +112,8 @@ export function SocialLinksEdit( props ) {
 
 	return (
 		<Fragment>
-			<BlockControls>
-				<JustifyToolbar
+			<BlockControls group="block">
+				<JustifyContentControl
 					allowedControls={ [
 						'left',
 						'center',
@@ -124,51 +129,43 @@ export function SocialLinksEdit( props ) {
 						isAlternate: true,
 					} }
 				/>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<DropdownMenu
-								label={ __( 'Size' ) }
-								text={ __( 'Size' ) }
-								icon={ null }
-								popoverProps={ POPOVER_PROPS }
-								toggleProps={ toggleProps }
-							>
-								{ ( { onClose } ) => (
-									<MenuGroup>
-										{ sizeOptions.map( ( entry ) => {
-											return (
-												<MenuItem
-													icon={
-														( size ===
-															entry.value ||
-															( ! size &&
-																entry.value ===
-																	'has-normal-icon-size' ) ) &&
-														check
-													}
-													isSelected={
-														size === entry.value
-													}
-													key={ entry.value }
-													onClick={ () => {
-														setAttributes( {
-															size: entry.value,
-														} );
-													} }
-													onClose={ onClose }
-													role="menuitemradio"
-												>
-													{ entry.name }
-												</MenuItem>
-											);
-										} ) }
-									</MenuGroup>
-								) }
-							</DropdownMenu>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
+			</BlockControls>
+			<BlockControls group="other">
+				<ToolbarDropdownMenu
+					label={ __( 'Size' ) }
+					text={ __( 'Size' ) }
+					icon={ null }
+					popoverProps={ POPOVER_PROPS }
+				>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							{ sizeOptions.map( ( entry ) => {
+								return (
+									<MenuItem
+										icon={
+											( size === entry.value ||
+												( ! size &&
+													entry.value ===
+														'has-normal-icon-size' ) ) &&
+											check
+										}
+										isSelected={ size === entry.value }
+										key={ entry.value }
+										onClick={ () => {
+											setAttributes( {
+												size: entry.value,
+											} );
+										} }
+										onClose={ onClose }
+										role="menuitemradio"
+									>
+										{ entry.name }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+				</ToolbarDropdownMenu>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
@@ -181,7 +178,7 @@ export function SocialLinksEdit( props ) {
 					/>
 				</PanelBody>
 				<PanelColorSettings
-					title={ __( 'Color settings' ) }
+					title={ __( 'Color' ) }
 					colorSettings={ [
 						{
 							// Use custom attribute as fallback to prevent loss of named color selection when
