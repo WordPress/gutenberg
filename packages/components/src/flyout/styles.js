@@ -14,7 +14,7 @@ import * as ZIndex from '../utils/z-index';
 import CONFIG from '../utils/config-values';
 
 export const FlyoutContent = css`
-	z-index: ${ ZIndex.Popover };
+	z-index: ${ ZIndex.Flyout };
 	box-sizing: border-box;
 	opacity: 0;
 	outline: none;
