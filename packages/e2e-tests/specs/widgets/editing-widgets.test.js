@@ -16,7 +16,7 @@ import {
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { find, findAll, waitFor } from 'puppeteer-testing-library';
+import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
 
 describe( 'Widgets screen', () => {
@@ -88,6 +88,12 @@ describe( 'Widgets screen', () => {
 			}
 		);
 		expect( categoryHeaders.length > 0 ).toBe( true );
+
+		const searchBox = await find( {
+			role: 'searchbox',
+			name: 'Search for blocks and patterns',
+		} );
+		await searchBox.type( blockName );
 
 		const addBlock = await find(
 			{
@@ -396,68 +402,34 @@ describe( 'Widgets screen', () => {
 
 	describe( 'Function widgets', () => {
 		async function addMarquee() {
-			// There will be 2 matches here.
-			// One is the in-between inserter,
-			// and the other one is the button block appender.
-			const [ inlineInserterButton ] = await findAll( {
-				role: 'combobox',
-				name: 'Add block',
-			} );
-			await inlineInserterButton.click();
-
-			// TODO: Convert to find() API from puppeteer-testing-library.
-			const inserterSearchBox = await page.waitForSelector(
-				'aria/Search for blocks and patterns[role="searchbox"]'
+			const marqueeBlock = await getBlockInGlobalInserter(
+				'Marquee Greeting'
 			);
-			await expect( inserterSearchBox ).toHaveFocus();
-
-			await page.keyboard.type( 'Marquee' );
-
-			const inlineQuickInserter = await find( {
-				role: 'listbox',
-				name: 'Blocks',
-			} );
-			const marqueeBlockOption = await find(
-				{
-					role: 'option',
-				},
-				{
-					root: inlineQuickInserter,
-				}
-			);
-			await marqueeBlockOption.click();
+			await marqueeBlock.click();
 		}
 
-		beforeEach( async () => {
+		beforeAll( async () => {
 			await activatePlugin( 'gutenberg-test-marquee-widget' );
 		} );
 
-		afterEach( async () => {
-			await deleteAllWidgets();
+		afterAll( async () => {
 			await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 		} );
 
 		it( 'Should add and save the marquee widget', async () => {
-			await visitAdminPage( 'widgets.php' );
-
 			await addMarquee();
 
-			await find( {
-				selector: '[data-block][data-type="core/legacy-widget"]',
-			} );
-
-			const greetingsInput = await find( {
-				selector: '#marquee-greeting',
-			} );
-			await greetingsInput.click();
-			await page.keyboard.type( 'Howdy' );
+			const greetingInput = await page.waitForSelector(
+				'[name="marquee-greeting"]'
+			);
+			await greetingInput.type( 'Howdy' );
 
 			await saveWidgets();
 
 			let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 			Object {
-			  "sidebar-1": "<marquee>Howdy!</marquee>",
+			  "sidebar-1": "<marquee>Howdy</marquee>",
 			}
 		` );
 
@@ -466,46 +438,40 @@ describe( 'Widgets screen', () => {
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 			Object {
-			  "sidebar-1": "<marquee>Howdy!</marquee>",
+			  "sidebar-1": "<marquee>Howdy</marquee>",
 			}
 		` );
 
-			// Add another marquee, it shouldn't be saved
 			await addMarquee();
 
 			// It takes a moment to load the form, let's wait for it.
-			await waitFor( async () => {
-				const marquees = await findAll( {
-					selector: '[id=marquee-greeting]',
-				} );
-				if ( marquees.length === 1 ) {
-					throw new Error();
-				}
+			await page.waitForFunction( () => {
+				return (
+					document.querySelectorAll( '[name="marquee-greeting"]' )
+						.length === 2
+				);
 			} );
 
-			const marquees = await findAll( {
-				selector: '[id=marquee-greeting]',
-			} );
+			const marqueeInputs = await page.$$( '[name="marquee-greeting"]' );
 
-			expect( marquees ).toHaveLength( 2 );
-			await marquees[ 1 ].click();
-			await page.keyboard.type( 'Second howdy' );
+			expect( marqueeInputs ).toHaveLength( 2 );
+			await marqueeInputs[ 1 ].type( 'Second howdy' );
 
+			// The second marquee shouldn't be saved.
+			// See #32978 for more info.
 			await saveWidgets();
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 			Object {
-			  "sidebar-1": "<marquee>howdy!</marquee>",
+			  "sidebar-1": "<marquee>Howdy</marquee>",
 			}
 		` );
 
 			await page.reload();
 			const marqueesAfter = await findAll( {
-				selector: '[id=marquee-greeting]',
+				selector: '[name="marquee-greeting"]',
 			} );
 			expect( marqueesAfter ).toHaveLength( 1 );
-
-			await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 		} );
 	} );
 

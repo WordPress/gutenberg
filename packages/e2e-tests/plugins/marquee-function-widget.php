@@ -34,15 +34,16 @@ function marquee_greeting_init() {
 			$greeting = get_option( 'marquee_greeting' );
 			?>
 			<p>
-				<label for="marquee-greeting">Greeting:</label>
-				<input
-					id="marquee-greeting"
-					class="widefat"
-					name="marquee-greeting"
-					type="text"
-					value="<?php echo esc_attr( $greeting ); ?>"
-					placeholder="Hello!"
-				/>
+				<label>
+					Greeting:
+					<input
+						class="widefat"
+						name="marquee-greeting"
+						type="text"
+						value="<?php echo esc_attr( $greeting ); ?>"
+						placeholder="Hello!"
+					/>
+				</label>
 			</p>
 			<?php
 		}
