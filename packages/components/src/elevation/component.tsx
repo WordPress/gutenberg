@@ -7,9 +7,9 @@ import {
 	PolymorphicComponentProps,
 } from '../ui/context';
 import type { Props } from './types';
-import { ElevationWrapper, StyleProps } from './styles';
+import { ElevationWrapper, ElevationWrapperProps } from './styles';
 
-const DEFAULT_PROPS: StyleProps = {
+const DEFAULT_PROPS: ElevationWrapperProps = {
 	isInteractive: false,
 	offset: 0,
 	value: 0,
