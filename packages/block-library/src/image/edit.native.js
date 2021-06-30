@@ -493,10 +493,12 @@ export class ImageEdit extends Component {
 			imageDefaultSize,
 			featuredImageId,
 			wasBlockJustInserted,
-			imageSizes,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
+		const imageSizes = Array.isArray( this.props.imageSizes )
+			? this.props.imageSizes
+			: [];
 		// Only map available image sizes for the user to choose.
 		const sizeOptions = imageSizes
 			.filter( ( { slug } ) => getUrlForSlug( image, slug ) )
