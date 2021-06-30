@@ -16,6 +16,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateEditorSettings,
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
+	subscribeShowEditorHelp,
 } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -150,6 +151,11 @@ class NativeEditorProvider extends Component {
 				this.props.createSuccessNotice( payload.message );
 			}
 		);
+
+		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
+			// eslint-disable-next-line no-console
+			console.log( `AMANDA-TEST > show editor help received in JS!` );
+		} );
 	}
 
 	componentWillUnmount() {
@@ -187,6 +193,10 @@ class NativeEditorProvider extends Component {
 
 		if ( this.subscriptionParentShowNotice ) {
 			this.subscriptionParentShowNotice.remove();
+		}
+
+		if ( this.subscriptionParentShowEditorHelp ) {
+			this.subscriptionParentShowEditorHelp.remove();
 		}
 	}
 

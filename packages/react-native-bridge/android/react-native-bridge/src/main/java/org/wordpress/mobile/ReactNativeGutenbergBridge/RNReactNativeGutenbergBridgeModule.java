@@ -46,6 +46,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
     private static final String EVENT_NAME_UPDATE_EDITOR_SETTINGS = "updateEditorSettings";
     private static final String EVENT_NAME_SHOW_NOTICE = "showNotice";
+    private static final String EVENT_NAME_SHOW_EDITOR_HELP = "showEditorHelp";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
@@ -160,6 +161,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         }
 
         emitToJS(EVENT_NAME_UPDATE_EDITOR_SETTINGS, writableMap);
+    }
+
+    public void showEditorHelp() {
+        WritableMap writableMap = new WritableNativeMap();
+        emitToJS(EVENT_NAME_SHOW_EDITOR_HELP, writableMap);
     }
 
     @ReactMethod
