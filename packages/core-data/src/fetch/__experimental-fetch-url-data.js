@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs, prependHTTP } from '@wordpress/url';
+import {
+	addQueryArgs,
+	prependHTTP,
+	isURL,
+	getProtocol,
+	isValidProtocol,
+} from '@wordpress/url';
 
 /**
  * A simple in-memory cache for requests.
@@ -44,6 +50,26 @@ const fetchUrlData = async ( url, options = {} ) => {
 	const args = {
 		url: prependHTTP( url ),
 	};
+
+	if ( ! isURL( url ) ) {
+		return Promise.reject(
+			new TypeError( `${ url } is not a valid URL.` )
+		);
+	}
+
+	// Test for "http" based URL as it is possible for valid
+	// yet unusable URLs such as `tel:123456` to be passed.
+	const protocol = getProtocol( url );
+
+	if (
+		! isValidProtocol( protocol ) ||
+		! protocol.startsWith( 'http' ) ||
+		! /^https?:\/\/[^\/\s]/i.test( url )
+	) {
+		return Promise.reject(
+			new TypeError( `${ url } does not have a valid protocol.` )
+		);
+	}
 
 	if ( CACHE.has( url ) ) {
 		return CACHE.get( url );
