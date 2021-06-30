@@ -5,6 +5,16 @@ export type SpaceInput = number | string;
 
 const GRID_BASE = '4px';
 
+/**
+ * A function that handles numbers, numeric strings, and unit values.
+ *
+ * When given a number or a numeric string, it will return the grid-based
+ * value as a factor of GRID_BASE, defined above.
+ *
+ * When given a unit value, it will simply return the unit value back.
+ *
+ * @param  value A number, numeric string, or a unit value.
+ */
 export function space( value?: SpaceInput ): string | undefined {
 	if ( typeof value === 'undefined' ) {
 		return undefined;
