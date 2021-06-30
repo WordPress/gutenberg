@@ -49,18 +49,19 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 		  } ) )
 		: blockTypes;
 
-	const handleSelect = ( blockType, ...args ) => {
+	const handleSelect = ( ...args ) => {
+		const [ { name } ] = args;
 		setBlockImpressions( ( impressions ) => {
-			if ( impressions[ blockType.name ] > 0 ) {
+			if ( impressions[ name ] > 0 ) {
 				return {
 					...impressions,
-					[ blockType.name ]: impressions[ blockType.name ] - 1,
+					[ name ]: impressions[ name ] - 1,
 				};
 			}
 
 			return blockImpressions;
 		} );
-		onSelect( blockType, ...args );
+		onSelect( ...args );
 	};
 
 	return (
