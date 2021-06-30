@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  */
 import { COLORS } from '../utils/colors-values';
 
-export const VisuallyHidden = styled.div`
+export const VisuallyHiddenView = styled.div`
 	border: 0;
 	clip: rect( 1px, 1px, 1px, 1px );
 	-webkit-clip-path: inset( 50% );

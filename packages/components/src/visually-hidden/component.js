@@ -2,14 +2,14 @@
  * Internal dependencies
  */
 import { useContextSystem, contextConnect } from '../ui/context';
-import { VisuallyHidden as VisuallyHiddenWrapper } from './styles';
+import { VisuallyHiddenView } from './styles';
 
 /**
  * @param {import('../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
  */
 function VisuallyHidden( props ) {
 	const contextProps = useContextSystem( props, 'VisuallyHidden' );
-	return <VisuallyHiddenWrapper { ...contextProps } />;
+	return <VisuallyHiddenView { ...contextProps } />;
 }
 
 /**
