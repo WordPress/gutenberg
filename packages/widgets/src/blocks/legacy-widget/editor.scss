@@ -12,30 +12,37 @@ $wide-header-height: 46px;
 	background: $white;
 	border-radius: $radius-block-ui;
 	border: 1px solid $gray-900;
-	padding: $grid-unit-15 - 1px; //Subtract the border width.
 
 	&.is-wide {
 		flex-direction: column;
 		position: fixed;
-		top: 0;
+		top: max(#{$wide-header-height}, var(--budge-top, 0));
 		left: 299px;
 		min-width: 300px;
 		width: calc(100vw - 299px);
 		max-width: 660px;
-		max-height: 100%;
+		max-height: calc(100% - #{$wide-header-height});
 		padding: 0;
+		background: none;
 		border-radius: 0;
-		border: 1px solid #dcdcde;
+		border: none;
 
-		// Include the top and bottom border in the resizeObserver’s height.
-		> iframe {
-			margin: -1px 0;
-			height: calc(100% + 2px) !important;
+		@media (min-width: 641px) {
+			// The customizer sidebar has a footer and the bottom of the form
+			// is offset from it.
+			padding-bottom: $wide-header-height;
+			// Allows pointer interaction to pass through.
+			pointer-events: none;
+
+			// Restores pointer interaction for the content.
+			.wp-block-legacy-widget__edit-form-header,
+			.wp-block-legacy-widget__edit-form-body {
+				pointer-events: auto;
+			}
 		}
 
 		.wp-block-legacy-widget__edit-form-header {
 			position: absolute;
-			top: 0;
 			left: 0;
 			width: 100%;
 			z-index: 1;
@@ -45,15 +52,25 @@ $wide-header-height: 46px;
 			background: #f0f0f1;
 			height: $wide-header-height;
 			padding: 0 5px 0 21px;
-			border-bottom: 1px solid #dcdcde;
+			margin: 0;
+			border: 1px solid #dcdcde;
 		}
 
 		.wp-block-legacy-widget__edit-form-body {
 			overflow: auto;
-			height: 100%;
-			// Add the header height to the top and subtract the border width from horizontal sides.
-			padding: ($wide-header-height + $grid-unit-15) ($grid-unit-15 - 1px) $grid-unit-15;
+			margin-top: $wide-header-height;
+			border: 1px solid #dcdcde;
+			border-top-width: 0;
+			background: #fff;
 		}
+	}
+
+	.wp-block-legacy-widget__edit-form-header {
+		margin: 0 0 $grid-unit-15 0;
+		padding: $grid-unit-20 21px 0;
+	}
+	.wp-block-legacy-widget__edit-form-body {
+		padding: 0 $grid-unit-15 $grid-unit-05;
 	}
 
 	.wp-block-legacy-widget__edit-form-title {
@@ -61,6 +78,7 @@ $wide-header-height: 46px;
 		font-family: $default-font;
 		font-size: 14px;
 		font-weight: 600;
+		margin: 0;
 	}
 
 	.widget-inside.widget-inside {
@@ -119,6 +137,10 @@ $wide-header-height: 46px;
 		select {
 			padding-left: $grid-unit-05;
 		}
+	}
+
+	.widget {
+		margin-bottom: 0;
 	}
 
 	// Reset z-index set on https://github.com/WordPress/wordpress-develop/commit/f26d4d37351a55fd1fc5dad0f5fef8f0f964908c.

@@ -1,26 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useEffect,
-	useLayoutEffect,
-	useState,
-} from '@wordpress/element';
+import { useRef, useLayoutEffect, useState } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
-function getScrollContext( node ) {
-	let at = node.parentNode;
-	while ( at && at.clientHeight === at.scrollHeight ) {
-		at = at.parentNode;
-	}
-	return at;
-}
-
 /**
- * Positions an element by the vertical edges of an objective element if it can
- * fit or otherwise as close as possible within the bounds of the objective’s
- * scrolling context.
+ * Positions an element by the top of an objective element if it can fit or
+ * otherwise as close as possible within the window.
  *
  * @param {Element} objective    Element to take position from.
  * @param {Object}  $1           Options.
@@ -28,76 +14,52 @@ function getScrollContext( node ) {
  *
  * @return {Object} A ref and resize observer element.
  */
-export function useBudgeYAxisBy( objective, { isEnabled } ) {
+export function useBudgeTopBy( objective, { isEnabled } ) {
 	const subjectRef = useRef();
 	const objectiveRef = useRef();
-	const scrollContextRef = useRef();
-	const [ scrollBounds = {}, setScrollBounds ] = useState();
+	const [
+		{ start: boundsStart, end: boundsEnd } = {},
+		setBounds,
+	] = useState();
 	const boundsUpdaterRef = useRef();
 
 	const hasSubject = !! subjectRef.current;
 	const hasObjective = !! objective;
 	const objectiveHasChanged = objectiveRef.current !== objective;
-
-	let scrollContextHasChanged;
-	if ( objectiveHasChanged ) {
-		objectiveRef.current = objective;
-		const scrollContext = hasObjective
-			? getScrollContext( objective )
-			: null;
-		scrollContextHasChanged = scrollContextRef.current !== scrollContext;
-		scrollContextRef.current = scrollContext;
-	}
-	const hasScrollContext = !! scrollContextRef.current;
+	objectiveRef.current = objective;
 
 	// Defines the bounds updating function a single time
 	if ( ! boundsUpdaterRef.current ) {
 		boundsUpdaterRef.current = () => {
-			const rect = scrollContextRef.current.getBoundingClientRect();
-			subjectRef.current.style.maxHeight = rect.height + 'px';
-			setScrollBounds( rect );
+			const { defaultView } = subjectRef.current.ownerDocument;
+			setBounds( { start: 0, end: defaultView.innerHeight } );
 		};
 	}
 
-	// Handles window resizes to update scroll bounds
-	useEffect( () => {
+	// Sets the bounds height and handles window resizes to update it
+	useLayoutEffect( () => {
 		if ( ! hasSubject || ! hasObjective || ! isEnabled ) {
 			return;
 		}
+		boundsUpdaterRef.current();
 		const { defaultView } = objective.ownerDocument;
 		const updateBounds = boundsUpdaterRef.current;
 		defaultView.addEventListener( 'resize', updateBounds );
 		return () => defaultView.removeEventListener( 'resize', updateBounds );
 	}, [ hasObjective, hasSubject, isEnabled ] );
 
-	// Handles mutations on the scrolling element to update scroll bounds
-	useLayoutEffect( () => {
-		if ( ! hasScrollContext || ! isEnabled ) {
-			return;
-		}
-		boundsUpdaterRef.current();
-		const { MutationObserver } = objective.ownerDocument.defaultView;
-		const observer = new MutationObserver( boundsUpdaterRef.current );
-		observer.observe( scrollContextRef.current, { attributes: true } );
-		return () => observer.disconnect();
-	}, [ scrollContextHasChanged, isEnabled ] );
-
 	const [ resizeObserver, contentSize ] = useResizeObserver();
 
 	// Handles scrolling, if needed, to update subject position
 	useLayoutEffect( () => {
-		if (
-			! isEnabled ||
-			! hasSubject ||
-			! hasObjective ||
-			! hasScrollContext
-		) {
+		if ( ! isEnabled || ! hasSubject || ! hasObjective ) {
 			return;
 		}
 		// The subject fills the bounds so scroll handling is not needed.
 		// Positions subject at the top of bounds and returns.
-		if ( contentSize.height >= scrollBounds.height ) {
-			subjectRef.current.style.top = scrollBounds.top + 'px';
+		if ( contentSize.height >= boundsEnd ) {
+			// subjectRef.current.style.top = '0px';
+			subjectRef.current.style.setProperty( '--budge-top', '0px' );
 			return;
 		}
 		const layout = () => {
@@ -105,29 +67,26 @@ export function useBudgeYAxisBy( objective, { isEnabled } ) {
 			let { top } = objectiveRect;
 			const height = contentSize.height;
 			const bottom = top + height;
-			const { bottom: boundsBottom, top: boundsTop } = scrollBounds;
-			if ( top < boundsTop || bottom > boundsBottom ) {
-				const fromTop = Math.abs( boundsTop - top );
-				const fromBottom = Math.abs( boundsBottom - bottom );
-				top = fromTop < fromBottom ? boundsTop : boundsBottom - height;
+			if ( top < boundsStart || bottom > boundsEnd ) {
+				const fromTop = Math.abs( boundsStart - top );
+				const fromBottom = Math.abs( boundsEnd - bottom );
+				top = fromTop < fromBottom ? boundsStart : boundsEnd - height;
 			}
-			subjectRef.current.style.top = top + 'px';
+			subjectRef.current.style.setProperty( '--budge-top', top + 'px' );
 		};
 		layout();
-		const scrollNode = scrollContextRef.current;
-		const options = { passive: true };
-		scrollNode.addEventListener( 'scroll', layout, options );
+		const { defaultView } = objective.ownerDocument;
+		const options = { capture: true, passive: true };
+		defaultView.addEventListener( 'scroll', layout, options );
 		return () => {
-			scrollNode.removeEventListener( 'scroll', layout, options );
+			defaultView.removeEventListener( 'scroll', layout, options );
 		};
 	}, [
 		hasSubject,
-		hasScrollContext,
 		objectiveHasChanged,
 		contentSize.height,
-		scrollBounds.height,
-		scrollBounds.top,
-		scrollBounds.bottom,
+		boundsStart,
+		boundsEnd,
 		isEnabled,
 	] );
 
@@ -136,8 +95,7 @@ export function useBudgeYAxisBy( objective, { isEnabled } ) {
 		if ( isEnabled && !! subjectRef.current ) {
 			const subject = subjectRef.current;
 			return () => {
-				subject.style.top = '';
-				subject.style.maxHeight = '';
+				subject.style.removeProperty( '--budge-top' );
 			};
 		}
 	}, [ isEnabled ] );

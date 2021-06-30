@@ -19,7 +19,7 @@ import { closeSmall } from '@wordpress/icons';
  * Internal dependencies
  */
 import Control from './control';
-import { useBudgeYAxisBy } from './utils';
+import { useBudgeTopBy } from './utils';
 
 export default function Form( {
 	title,
@@ -131,7 +131,7 @@ function WideFormDialog( { isVisible, children } ) {
 	const {
 		ref: budgeRef,
 		resizeObserver,
-	} = useBudgeYAxisBy( containerRef.current, { isEnabled: isVisible } );
+	} = useBudgeTopBy( containerRef.current, { isEnabled: isVisible } );
 	return (
 		<div
 			ref={ containerRef }
