@@ -1,2 +1,2 @@
 export { default as Divider } from './component';
-export type { DividerProps } from './types';
+export type { Props as DividerProps } from './types';

@@ -24,6 +24,4 @@ export interface OwnProps {
 	marginBottom?: SpaceInput;
 }
 
-export interface DividerProps
-	extends Omit< SeparatorProps, 'children' >,
-		OwnProps {}
+export interface Props extends Omit< SeparatorProps, 'children' >, OwnProps {}
