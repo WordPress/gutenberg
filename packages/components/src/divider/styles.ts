@@ -7,16 +7,11 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { space, SpaceInput } from '../ui/utils/space';
+import { space } from '../ui/utils/space';
 import CONFIG from '../utils/config-values';
+import type { OwnProps } from './types';
 
-type Props = {
-	margin?: SpaceInput;
-	marginTop?: SpaceInput;
-	marginBottom?: SpaceInput;
-};
-
-const renderMargin = ( { margin, marginTop, marginBottom }: Props ) => {
+const renderMargin = ( { margin, marginTop, marginBottom }: OwnProps ) => {
 	if ( typeof margin !== 'undefined' ) {
 		return css( {
 			marginBottom: space( margin ),
@@ -30,7 +25,7 @@ const renderMargin = ( { margin, marginTop, marginBottom }: Props ) => {
 	} );
 };
 
-export const StyledHorizontalRule = styled.hr< Props >`
+export const DividerView = styled.hr< OwnProps >`
 	border-color: ${ CONFIG.colorDivider };
 	border-width: 0 0 1px 0;
 	height: 0;

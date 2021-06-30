@@ -3,8 +3,6 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import { Separator } from 'reakit';
-// eslint-disable-next-line no-restricted-imports, no-duplicate-imports
-import type { SeparatorProps } from 'reakit';
 // eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 
@@ -14,23 +12,8 @@ import type { Ref } from 'react';
 import { contextConnect, useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../ui/context';
-import { StyledHorizontalRule } from './styles';
-import type { SpaceInput } from '../ui/utils/space';
-
-export interface DividerProps extends Omit< SeparatorProps, 'children' > {
-	/**
-	 * Adjusts all margins.
-	 */
-	margin?: SpaceInput;
-	/**
-	 * Adjusts top margins.
-	 */
-	marginTop?: SpaceInput;
-	/**
-	 * Adjusts bottom margins.
-	 */
-	marginBottom?: SpaceInput;
-}
+import { DividerView } from './styles';
+import type { DividerProps } from './types';
 
 function Divider(
 	props: PolymorphicComponentProps< DividerProps, 'hr', false >,
@@ -40,7 +23,7 @@ function Divider(
 
 	return (
 		<Separator
-			as={ StyledHorizontalRule }
+			as={ DividerView }
 			{ ...contextProps }
 			ref={ forwardedRef }
 		/>
