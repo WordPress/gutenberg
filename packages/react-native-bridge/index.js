@@ -413,8 +413,11 @@ export function requestBlockTypeImpressions( callback ) {
  * @param {number} count The number of impressions for the block type.
  * @return {void}
  */
-export function setBlockTypeImpressions( name, count ) {
-	return RNReactNativeGutenbergBridge.setBlockTypeImpressions( name, count );
+export function setBlockTypeImpressionCount( name, count ) {
+	return RNReactNativeGutenbergBridge.setBlockTypeImpressionCount(
+		name,
+		count
+	);
 }
 
 export default RNReactNativeGutenbergBridge;

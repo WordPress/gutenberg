@@ -363,8 +363,8 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func setBlockTypeImpressions(_ name: String, count: Int) {
-        self.delegate?.gutenbergDidRequestSetBlockTypeImpressions(name, count: count)
+    func setBlockTypeImpressionCount(_ name: String, count: Int) {
+        self.delegate?.gutenbergDidRequestSetBlockTypeImpressionCount(name, count: count)
     }
 }
 

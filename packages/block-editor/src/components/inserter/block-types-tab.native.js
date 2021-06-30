@@ -12,14 +12,14 @@ import useClipboardBlock from './hooks/use-clipboard-block';
 import { store as blockEditorStore } from '../../store';
 import {
 	requestBlockTypeImpressions,
-	setBlockTypeImpressions,
+	setBlockTypeImpressionCount,
 } from '@wordpress/react-native-bridge';
 
 const NON_BLOCK_CATEGORIES = [ 'reusable' ];
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
-	const [ blockImpressions, setBlockImpressions ] = useState( {} );
+	const [ blockTypeImpressions, setBlockTypeImpressions ] = useState( {} );
 
 	// Request current block impressions from native app
 	useEffect( () => {
@@ -27,7 +27,7 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 
 		requestBlockTypeImpressions( ( impressions ) => {
 			if ( isCurrent ) {
-				setBlockImpressions( impressions );
+				setBlockTypeImpressions( impressions );
 			}
 		} );
 
@@ -61,13 +61,13 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const items = enableEditorOnboarding
 		? blockTypes.map( ( b ) => ( {
 				...b,
-				isNew: blockImpressions[ b.name ] > 0,
+				isNew: blockTypeImpressions[ b.name ] > 0,
 		  } ) )
 		: blockTypes;
 
 	const handleSelect = ( ...args ) => {
 		const [ { name } ] = args;
-		setBlockImpressions( ( impressions ) => {
+		setBlockTypeImpressions( ( impressions ) => {
 			if ( impressions[ name ] > 0 ) {
 				return {
 					...impressions,
@@ -75,10 +75,10 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 				};
 			}
 
-			return blockImpressions;
+			return blockTypeImpressions;
 		} );
 		// Persist updated block impression count for the block
-		setBlockTypeImpressions( name, blockImpressions[ name ] - 1 );
+		setBlockTypeImpressionCount( name, blockTypeImpressions[ name ] - 1 );
 		onSelect( ...args );
 	};
 

@@ -240,7 +240,7 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidRequestBlockTypeImpressions() -> NSDictionary
 
     /// Tells the delegate the the editor requested setting the impression count for a block type
-    func gutenbergDidRequestSetBlockTypeImpressions(_ name: String, count: Int)
+    func gutenbergDidRequestSetBlockTypeImpressionCount(_ name: String, count: Int)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
