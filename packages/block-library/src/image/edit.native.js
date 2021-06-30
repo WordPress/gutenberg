@@ -50,7 +50,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	image as placeholderIcon,
 	replace,
-	fullscreen,
+	expand,
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -119,19 +119,6 @@ export class ImageEdit extends Component {
 				placeholder: __( 'None' ),
 			},
 		};
-
-		// Only map available image sizes.
-		this.sizeOptions = map(
-			filter( this.props.imageSizes, ( { slug } ) =>
-				get( this.props.image, [
-					'media_details',
-					'sizes',
-					slug,
-					'source_url',
-				] )
-			),
-			( { name, slug } ) => ( { value: slug, label: name } )
-		);
 	}
 
 	componentDidMount() {
@@ -499,24 +486,34 @@ export class ImageEdit extends Component {
 			imageDefaultSize,
 			featuredImageId,
 			wasBlockJustInserted,
+			imageSizes,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
+		// Only map available image sizes.
+		const sizeOptions = map(
+			filter( imageSizes, ( { slug } ) =>
+				get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
+			),
+			( { name, slug } ) => ( { value: slug, label: name } )
+		);
+
 		let selectedSizeOption = sizeSlug || imageDefaultSize;
-		let sizeOptionsValid = find( this.sizeOptions, [
+
+		let sizeOptionsValid = find( sizeOptions, [
 			'value',
-			sizeSlug || imageDefaultSize,
+			selectedSizeOption,
 		] );
+
+		if ( ! sizeOptionsValid ) {
+			// Default to 'full' size if the default large size is not available.
+			sizeOptionsValid = find( sizeOptions, [ 'value', 'full' ] );
+			selectedSizeOption = 'full';
+		}
 
 		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
 		// Images that haven't been uploaded to a site's library have an id of 'undefined', which the 'canImageBeFeatured' check filters out.
 		const canImageBeFeatured = typeof attributes.id !== 'undefined';
-
-		if ( ! sizeOptionsValid ) {
-			// Default to 'full' size if the default large size is not available.
-			sizeOptionsValid = find( this.sizeOptions, [ 'value', 'full' ] );
-			selectedSizeOption = 'full';
-		}
 
 		const isFeaturedImage =
 			canImageBeFeatured && featuredImageId === attributes.id;
@@ -551,7 +548,7 @@ export class ImageEdit extends Component {
 						<BottomSheetSelectControl
 							icon={ expand }
 							label={ __( 'Size' ) }
-							options={ this.sizeOptions }
+							options={ sizeOptions }
 							onChange={ this.onSizeChangeValue }
 							value={ selectedSizeOption }
 						/>
