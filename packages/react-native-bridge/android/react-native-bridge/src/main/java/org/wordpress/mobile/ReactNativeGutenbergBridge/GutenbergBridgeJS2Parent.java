@@ -56,6 +56,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onRequestFocalPointPickerTooltipShown(boolean tooltipShown);
     }
 
+    interface BlockTypeImpressionsCallback {
+        void onRequestBlockTypeImpressions(ReadableMap impressions);
+    }
+
     // Ref: https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
     enum LogLevel {
         TRACE(0),
@@ -163,5 +167,9 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback);
 
     void requestPreview();
+
+    void requestBlockTypeImpressions(BlockTypeImpressionsCallback blockTypeImpressionsCallback);
+
+    void setBlockTypeImpressionCount(String name, Integer count);
 
 }
