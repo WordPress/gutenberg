@@ -87,7 +87,9 @@ class MenuItem extends Component {
 							isClipboardBlock && clipboardBlockStyles,
 						] }
 					>
-						{ true && <Text style={ newBadgeStyle }>New</Text> }
+						{ item.isNew && (
+							<Text style={ newBadgeStyle }>New</Text>
+						) }
 						<View style={ modalIconStyle }>
 							<Icon
 								icon={ item.icon.src || item.icon }
