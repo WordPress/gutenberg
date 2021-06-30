@@ -187,7 +187,7 @@ _Parameters_
 
 _Returns_
 
--   `string`: Password for the newly created user account
+-   `string`: Password for the newly created user account.
 
 <a name="deactivatePlugin" href="#deactivatePlugin">#</a> **deactivatePlugin**
 
