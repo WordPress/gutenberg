@@ -429,11 +429,11 @@ describe( 'Widgets screen', () => {
 		}
 
 		beforeEach( async () => {
+			await deleteAllWidgets();
 			await activatePlugin( 'gutenberg-test-marquee-widget' );
 		} );
 
 		afterEach( async () => {
-			await deleteAllWidgets();
 			await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 		} );
 
