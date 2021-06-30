@@ -11,7 +11,7 @@ import type { Required } from 'utility-types';
 import type { Props } from './types';
 import { CONFIG, reduceMotion } from '../utils';
 
-export type ElevationWrapperProps = Required< Props >;
+export type ElevationViewProps = Required< Props >;
 
 const getBoxShadow = ( value: number ) => {
 	const boxShadowColor = `rgba(0 ,0, 0, ${ value / 20 })`;
@@ -19,7 +19,7 @@ const getBoxShadow = ( value: number ) => {
 	${ boxShadowColor }`;
 };
 
-const renderBoxShadow = ( { value }: ElevationWrapperProps ) =>
+const renderBoxShadow = ( { value }: ElevationViewProps ) =>
 	css( { boxShadow: getBoxShadow( value ) } );
 
 const renderTransition = () =>
@@ -28,10 +28,10 @@ const renderTransition = () =>
 ${ CONFIG.transitionTimingFunction }`,
 	} );
 
-const renderBorderRadius = ( { borderRadius }: ElevationWrapperProps ) =>
+const renderBorderRadius = ( { borderRadius }: ElevationViewProps ) =>
 	css( { borderRadius } );
 
-const renderOffset = ( { offset }: ElevationWrapperProps ) =>
+const renderOffset = ( { offset }: ElevationViewProps ) =>
 	css( { bottom: offset, left: offset, right: offset, top: offset } );
 
 const renderHoverActiveFocus = ( {
@@ -40,7 +40,7 @@ const renderHoverActiveFocus = ( {
 	hover,
 	focus,
 	value,
-}: ElevationWrapperProps ) => {
+}: ElevationViewProps ) => {
 	let hoverValue: number | null = hover !== null ? hover : value * 2;
 	let activeValue: number | null = active !== null ? active : value / 2;
 
@@ -72,7 +72,7 @@ const renderHoverActiveFocus = ( {
 	return css( cssObj );
 };
 
-export const ElevationWrapper = styled.div< ElevationWrapperProps >`
+export const ElevationView = styled.div< ElevationViewProps >`
 	background: transparent;
 	display: block;
 	margin: 0 !important;

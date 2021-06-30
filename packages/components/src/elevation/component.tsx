@@ -7,9 +7,9 @@ import {
 	PolymorphicComponentProps,
 } from '../ui/context';
 import type { Props } from './types';
-import { ElevationWrapper, ElevationWrapperProps } from './styles';
+import { ElevationView, ElevationViewProps } from './styles';
 
-const DEFAULT_PROPS: ElevationWrapperProps = {
+const DEFAULT_PROPS: ElevationViewProps = {
 	isInteractive: false,
 	offset: 0,
 	value: 0,
@@ -23,7 +23,7 @@ function Elevation( props: PolymorphicComponentProps< Props, 'div', false > ) {
 	const contextProps = useContextSystem( props, 'Elevation' );
 
 	return (
-		<ElevationWrapper
+		<ElevationView
 			{ ...DEFAULT_PROPS }
 			{ ...contextProps }
 			aria-hidden="true"
