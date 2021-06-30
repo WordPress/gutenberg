@@ -12,9 +12,7 @@ import CONFIG from '../utils/config-values';
 import type { OwnProps } from './types';
 
 const renderMargin = ( { margin, marginTop, marginBottom }: OwnProps ) => {
-	// Disable reason: handle undefined and null in one go
-	// eslint-disable-next-line eqeqeq
-	if ( margin != null ) {
+	if ( typeof margin !== 'undefined' ) {
 		return css( {
 			marginBottom: space( margin ),
 			marginTop: space( margin ),

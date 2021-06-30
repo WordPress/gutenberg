@@ -13,12 +13,23 @@ export default {
 	title: 'Components (Experimental)/Divider',
 };
 
+const BlackDivider = ( props ) => (
+	<Divider { ...props } style={ { borderColor: 'black' } } />
+);
+
 export const _default = () => {
 	const props = {
-		margin: number( 'margin', undefined ),
-		marginTop: number( 'marginTop', undefined ),
-		marginBottom: number( 'marginBottom', undefined ),
+		margin: number( 'margin', 0 ),
 	};
 	// make the border color black to give higher contrast and help it appear in storybook better
-	return <Divider { ...props } style={ { borderColor: 'black' } } />;
+	return <BlackDivider { ...props } />;
+};
+
+export const splitMargins = () => {
+	const props = {
+		marginTop: number( 'marginTop', 0 ),
+		marginBottom: number( 'marginBottom', 0 ),
+	};
+
+	return <BlackDivider { ...props } />;
 };
