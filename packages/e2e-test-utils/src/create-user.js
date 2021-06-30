@@ -19,7 +19,7 @@ import { visitAdminPage } from './visit-admin-page';
  * @param {string}  [object.lastName]  Last name.
  * @param {string}  [object.role]      Role. Defaults to Administrator.
  *
- * @return {string} Password for the newly created user account
+ * @return {string} Password for the newly created user account.
  */
 export async function createUser(
 	username,
