@@ -25,26 +25,26 @@ function render_block_core_block( $attributes ) {
 	}
 
 	if ( isset( $seen_refs[ $attributes['ref'] ] ) ) {
-		if ( ! is_admin() && ! gutenberg_is_rest_api_request() ) {
-			trigger_error(
-				sprintf(
-					// translators: %s is the user-provided title of the reusable block.
-					__( 'Could not render Reusable Block <strong>%s</strong>. Block cannot be rendered inside itself.' ),
-					$reusable_block->post_title
-				),
-				E_USER_WARNING
-			);
-		}
-
 		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
 		// is set in `wp_debug_mode()`.
 		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
 			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 
-		return $is_debug ?
+		if ( $is_debug ) {
+			if ( ! is_admin() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+				trigger_error(
+					sprintf(
+						// translators: %s is the user-provided title of the reusable block.
+						__( 'Could not render Reusable Block <strong>%s</strong>. Block cannot be rendered inside itself.' ),
+						$reusable_block->post_title
+					),
+					E_USER_WARNING
+				);
+			}
 			// translators: Visible only in the front end, this warning takes the place of a faulty block.
-			__( '[block rendering halted]' ) :
-			'';
+			return __( '[block rendering halted]' );
+		}
+		return;
 	}
 
 	if ( 'publish' !== $reusable_block->post_status || ! empty( $reusable_block->post_password ) ) {
