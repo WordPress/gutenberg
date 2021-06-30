@@ -147,7 +147,7 @@ export class PostPublishButton extends Component {
 		};
 
 		const buttonProps = {
-			'aria-disabled': isButtonDisabled,
+			'aria-disabled': isButtonDisabled && ! hasNonPostEntityChanges,
 			className: 'editor-post-publish-button',
 			isBusy: ! isAutoSaving && isSaving && isPublished,
 			variant: 'primary',
