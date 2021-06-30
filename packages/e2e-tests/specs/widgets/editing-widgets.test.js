@@ -519,18 +519,21 @@ describe( 'Widgets screen', () => {
 		} );
 	} );
 
-	// Disable reason: We temporary skip this test until we can figure out why it fails sometimes.
-	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'Should duplicate the widgets', async () => {
-		let firstWidgetArea = await page.$(
-			'[aria-label="Block: Widget Area"][role="group"]'
-		);
+	it( 'Should duplicate the widgets', async () => {
+		let [ firstWidgetArea ] = await findAll( {
+			role: 'group',
+			name: 'Block: Widget Area',
+		} );
 
 		const addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
 		await addParagraphBlock.click();
 
-		let firstParagraphBlock = await firstWidgetArea.$(
-			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		let firstParagraphBlock = await find(
+			{
+				role: 'group',
+				name: /^Empty block/,
+			},
+			{ root: firstWidgetArea }
 		);
 		await firstParagraphBlock.focus();
 		await page.keyboard.type( 'First Paragraph' );
@@ -538,9 +541,10 @@ describe( 'Widgets screen', () => {
 		await saveWidgets();
 		await page.reload();
 		// Wait for the widget areas to load.
-		firstWidgetArea = await page.waitForSelector(
-			'[aria-label="Block: Widget Area"][role="group"]'
-		);
+		[ firstWidgetArea ] = await findAll( {
+			role: 'group',
+			name: 'Block: Widget Area',
+		} );
 
 		const initialSerializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( initialSerializedWidgetAreas ).toMatchInlineSnapshot( `
@@ -559,21 +563,11 @@ describe( 'Widgets screen', () => {
 		await firstParagraphBlock.focus();
 
 		await showBlockToolbar();
-
-		const blockToolbar = await page.waitForSelector(
-			'[role="toolbar"][aria-label="Block tools"]'
-		);
-		const moreOptionsButton = await blockToolbar.$(
-			'button[aria-label="Options"]'
-		);
-		await moreOptionsButton.click();
-
-		const optionsMenu = await page.waitForSelector(
-			'[role="menu"][aria-label="Options"]'
-		);
-		const [ duplicateButton ] = await optionsMenu.$x(
-			'//*[@role="menuitem"][*[text()="Duplicate"]]'
-		);
+		await clickBlockToolbarButton( 'Options' );
+		const duplicateButton = await find( {
+			role: 'menuitem',
+			name: /^Duplicate/,
+		} );
 		await duplicateButton.click();
 
 		await page.waitForFunction(
@@ -597,16 +591,10 @@ describe( 'Widgets screen', () => {
 		expect( firstParagraphBlockClientId ).not.toBe(
 			duplicatedParagraphBlockClientId
 		);
-		expect(
-			await duplicatedParagraphBlock.evaluate(
-				( node ) => node.textContent
-			)
-		).toBe( 'First Paragraph' );
-		expect(
-			await duplicatedParagraphBlock.evaluate(
-				( node ) => node === document.activeElement
-			)
-		).toBe( true );
+		await expect( duplicatedParagraphBlock ).toMatchQuery( {
+			text: 'First Paragraph',
+		} );
+		await expect( duplicatedParagraphBlock ).toHaveFocus();
 
 		await saveWidgets();
 		const editedSerializedWidgetAreas = await getSerializedWidgetAreas();
