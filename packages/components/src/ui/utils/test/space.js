@@ -11,6 +11,7 @@ describe( 'space', () => {
 		${ '-1px' }      | ${ '-1px' }
 		${ '1em' }       | ${ '1em' }
 		${ '1notaunit' } | ${ '1notaunit' }
+		${ 'auto' }      | ${ 'auto' }
 	`( 'should return $output when given $input', ( { input, output } ) => {
 		expect( space( input ) ).toEqual( output );
 	} );
