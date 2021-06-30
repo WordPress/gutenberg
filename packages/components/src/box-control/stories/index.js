@@ -27,7 +27,11 @@ const defaultSideValues = {
 	left: '10px',
 };
 
-function DemoExample( { sides, defaultValues = defaultSideValues } ) {
+function DemoExample( {
+	sides,
+	defaultValues = defaultSideValues,
+	splitOnAxis = false,
+} ) {
 	const [ values, setValues ] = useState( defaultValues );
 	const [ showVisualizer, setShowVisualizer ] = useState( {} );
 
@@ -41,6 +45,7 @@ function DemoExample( { sides, defaultValues = defaultSideValues } ) {
 						sides={ sides }
 						onChange={ setValues }
 						onChangeShowVisualizer={ setShowVisualizer }
+						splitOnAxis={ splitOnAxis }
 					/>
 				</Content>
 			</FlexBlock>
@@ -78,6 +83,20 @@ export const singleSide = () => {
 		<DemoExample
 			sides={ [ 'bottom' ] }
 			defaultValues={ { bottom: '10px' } }
+		/>
+	);
+};
+
+export const verticalHorizontalControls = () => {
+	return <DemoExample splitOnAxis={ true } />;
+};
+
+export const verticalHorizontalControlsWithSingleSide = () => {
+	return (
+		<DemoExample
+			sides={ [ 'horizontal' ] }
+			defaultValues={ { left: '10px', right: '10px' } }
+			splitOnAxis={ true }
 		/>
 	);
 };

@@ -17,9 +17,9 @@ If the widget uses JavaScript in its form, it is important that events are added
 For example, a widget might want to show a "Password" field when the "Change password" checkbox is checked.
 
 ```js
-( function( $ ) {
-	$( document ).on( 'widget-added', function( $control ) {
-		$control.find( '.change-password' ).on( 'change', function() {
+( function ( $ ) {
+	$( document ).on( 'widget-added', function ( $control ) {
+		$control.find( '.change-password' ).on( 'change', function () {
 			var isChecked = $( this ).prop( 'checked' );
 			$control.find( '.password' ).toggleClass( 'hidden', ! isChecked );
 		} );
@@ -66,10 +66,32 @@ First, we need to tell WordPress that it is OK to display your widget's instance
 
 This can be safely done if:
 
-- You know that all of the values stored by your widget in `$instance` can be represented as JSON; and
-- You know that your widget does not store any private data in `$instance` that should be kept hidden from users that have permission to customize the site.
+-   You know that all of the values stored by your widget in `$instance` can be represented as JSON; and
+-   You know that your widget does not store any private data in `$instance` that should be kept hidden from users that have permission to customize the site.
 
-If it is safe to do so, then set `$show_instance_in_rest` to `true` in the class that extends `WP_Widget`.
+If it is safe to do so, then include a widget option named `show_instance_in_rest` with its value set to `true` when registering your widget.
+
+```php
+class ExampleWidget extends WP_Widget {
+	...
+	/**
+	 * Sets up the widget
+	 */
+	public function __construct() {
+		$widget_ops = array(
+			// ...other options here
+			'show_instance_in_rest' => true,
+			// ...other options here
+		);
+		parent::__construct( 'example_widget', 'ExampleWidget', $widget_ops );
+	}
+	...
+}
+```
+
+This allows the block editor and other REST API clients to see your widget's instance array by accessing `instance.raw` in the REST API response.
+
+Note that [versions of WordPress prior to 5.8.0 allowed you to enable this feature by setting `$show_instance_in_rest` to `true`](https://core.trac.wordpress.org/ticket/53332) in the class that extends `WP_Widget`.
 
 ```php
 class ExampleWidget extends WP_Widget {
@@ -79,7 +101,7 @@ class ExampleWidget extends WP_Widget {
 }
 ```
 
-This allows the block editor and other REST API clients to see your widget's instance array by accessing `instance.raw` in the REST API response.
+This is now deprecated in favour of the widget option method.
 
 #### 2) Add a block transform
 
@@ -122,4 +144,50 @@ function hide_example_widget( $widget_types ) {
 	return $widget_types;
 }
 add_filter( 'widget_types_to_hide_from_legacy_widget_block', 'hide_example_widget' );
+```
+
+## Using the Legacy Widget block in other block editors (Advanced)
+
+You may optionally allow the Legacy Widget block in other block editors such as
+the WordPress post editor. This is not enabled by default.
+
+First, ensure that any styles and scripts required by the legacy widgets are
+loaded onto the page. A convenient way of doing this is to manually perform all
+of the hooks that ordinarily run when a user browses to the widgets WP Admin
+screen.
+
+```php
+add_action( 'admin_print_styles', function() {
+	if ( get_current_screen()->is_block_editor() ) {
+		do_action( 'admin_print_styles-widgets.php' );
+	}
+} );
+add_action( 'admin_print_scripts', function() {
+	if ( get_current_screen()->is_block_editor() ) {
+		do_action( 'load-widgets.php' );
+		do_action( 'widgets.php' );
+		do_action( 'sidebar_admin_setup' );
+		do_action( 'admin_print_scripts-widgets.php' );
+	}
+} );
+add_action( 'admin_print_footer_scripts', function() {
+	if ( get_current_screen()->is_block_editor() ) {
+		do_action( 'admin_print_footer_scripts-widgets.php' );
+	}
+} );
+add_action( 'admin_footer', function() {
+	if ( get_current_screen()->is_block_editor() ) {
+		do_action( 'admin_footer-widgets.php' );
+	}
+} );
+```
+
+Then, register the Legacy Widget block using `registerLegacyWidgetBlock` which
+is defined in the `@wordpress/widgets` package.
+
+```php
+add_action( 'enqueue_block_editor_assets', function() {
+	wp_enqueue_script( 'wp-widgets' );
+	wp_add_inline_script( 'wp-widgets', 'wp.widgets.registerLegacyWidgetBlock()' );
+} );
 ```

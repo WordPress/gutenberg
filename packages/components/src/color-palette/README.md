@@ -55,11 +55,10 @@ Whether the palette should have a clearing button or not.
 
 ```jsx
 import { ColorPalette } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyColorPalette = withState( {
-	color: '#f00',
-} )( ( { color, setState } ) => {
+const MyColorPalette = () => {
+	const [ color, setColor ] = useState ( '#f00' )
 	const colors = [
 		{ name: 'red', color: '#f00' },
 		{ name: 'white', color: '#fff' },
@@ -70,7 +69,7 @@ const MyColorPalette = withState( {
 		<ColorPalette
 			colors={ colors }
 			value={ color }
-			onChange={ ( color ) => setState( { color } ) }
+			onChange={ ( color ) => setColor( color ) }
 		/>
 	);
 } );

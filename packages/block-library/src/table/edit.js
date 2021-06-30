@@ -528,7 +528,7 @@ function TableEdit( {
 						/>
 						<Button
 							className="blocks-table__placeholder-button"
-							isPrimary
+							variant="primary"
 							type="submit"
 						>
 							{ __( 'Create Table' ) }

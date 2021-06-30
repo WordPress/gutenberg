@@ -5,7 +5,7 @@ import { Text } from '..';
 
 export default {
 	component: Text,
-	title: 'G2 Components (Experimental)/Text',
+	title: 'Components (Experimental)/Text',
 };
 
 export const _default = () => {

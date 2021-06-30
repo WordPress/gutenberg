@@ -17,7 +17,7 @@ exports[`DotTip should render correctly 1`] = `
   </p>
   <p>
     <ForwardRef(Button)
-      isLink={true}
+      variant="link"
     >
       Got it
     </ForwardRef(Button)>

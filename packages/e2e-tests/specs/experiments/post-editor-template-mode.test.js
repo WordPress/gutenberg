@@ -9,13 +9,22 @@ import {
 	trashAllPosts,
 	openPreviewPage,
 	openDocumentSettingsSidebar,
+	activatePlugin,
+	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
 
 const openSidebarPanelWithTitle = async ( title ) => {
 	const panel = await page.waitForXPath(
 		`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ title }")]`
 	);
-	await panel.click();
+
+	const expanded = await page.evaluate(
+		( element ) => element.getAttribute( 'aria-expanded' ),
+		panel
+	);
+	if ( expanded === 'false' ) {
+		await panel.click();
+	}
 };
 
 const disableTemplateWelcomeGuide = async () => {
@@ -35,6 +44,8 @@ const disableTemplateWelcomeGuide = async () => {
 };
 
 const switchToTemplateMode = async () => {
+	await disableTemplateWelcomeGuide();
+
 	// Switch to template mode.
 	await openDocumentSettingsSidebar();
 	await openSidebarPanelWithTitle( 'Template' );
@@ -51,12 +62,12 @@ const switchToTemplateMode = async () => {
 		'.edit-post-template-top-area',
 		( el ) => el.innerText
 	);
-	expect( title ).toContain( 'About\n' );
-
-	await disableTemplateWelcomeGuide();
+	expect( title ).toContain( 'Just an FSE Post\n' );
 };
 
 const createNewTemplate = async ( templateName ) => {
+	await disableTemplateWelcomeGuide();
+
 	// Create a new custom template.
 	await openDocumentSettingsSidebar();
 	await openSidebarPanelWithTitle( 'Template' );
@@ -76,18 +87,18 @@ const createNewTemplate = async ( templateName ) => {
 	await page.waitForXPath(
 		'//*[contains(@class, "components-snackbar")]/*[text()="Custom template created. You\'re in template mode now."]'
 	);
-
-	await disableTemplateWelcomeGuide();
 };
 
 describe( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-block-templates' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	afterAll( async () => {
 		await activateTheme( 'twentytwentyone' );
+		await deactivatePlugin( 'gutenberg-test-block-templates' );
 	} );
 
 	it( 'Allow to switch to template mode, edit the template and check the result', async () => {

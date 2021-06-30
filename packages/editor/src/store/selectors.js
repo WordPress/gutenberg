@@ -28,6 +28,8 @@ import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
 import { layout } from '@wordpress/icons';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -69,7 +71,7 @@ const EMPTY_ARRAY = [];
  * @return {boolean} Whether undo history exists.
  */
 export const hasEditorUndo = createRegistrySelector( ( select ) => () => {
-	return select( 'core' ).hasUndo();
+	return select( coreStore ).hasUndo();
 } );
 
 /**
@@ -81,7 +83,7 @@ export const hasEditorUndo = createRegistrySelector( ( select ) => () => {
  * @return {boolean} Whether redo history exists.
  */
 export const hasEditorRedo = createRegistrySelector( ( select ) => () => {
-	return select( 'core' ).hasRedo();
+	return select( coreStore ).hasRedo();
 } );
 
 /**
@@ -133,7 +135,7 @@ export const isEditedPostDirty = createRegistrySelector(
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
 		if (
-			select( 'core' ).hasEditsForEntityRecord(
+			select( coreStore ).hasEditsForEntityRecord(
 				'postType',
 				postType,
 				postId
@@ -156,7 +158,7 @@ export const isEditedPostDirty = createRegistrySelector(
 export const hasNonPostEntityChanges = createRegistrySelector(
 	( select ) => ( state ) => {
 		const dirtyEntityRecords = select(
-			'core'
+			coreStore
 		).__experimentalGetDirtyEntityRecords();
 		const { type, id } = getCurrentPost( state );
 		return some(
@@ -195,7 +197,7 @@ export const getCurrentPost = createRegistrySelector(
 		const postId = getCurrentPostId( state );
 		const postType = getCurrentPostType( state );
 
-		const post = select( 'core' ).getRawEntityRecord(
+		const post = select( coreStore ).getRawEntityRecord(
 			'postType',
 			postType,
 			postId
@@ -277,8 +279,11 @@ export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
 	return (
-		select( 'core' ).getEntityRecordEdits( 'postType', postType, postId ) ||
-		EMPTY_OBJECT
+		select( coreStore ).getEntityRecordEdits(
+			'postType',
+			postType,
+			postId
+		) || EMPTY_OBJECT
 	);
 } );
 
@@ -313,7 +318,7 @@ export const getReferenceByDistinctEdits = createRegistrySelector(
 			}
 		);
 
-		return select( 'core' ).getReferenceByDistinctEdits();
+		return select( coreStore ).getReferenceByDistinctEdits();
 	}
 );
 
@@ -421,10 +426,10 @@ export const getAutosaveAttribute = createRegistrySelector(
 
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		const currentUserId = get( select( 'core' ).getCurrentUser(), [
+		const currentUserId = get( select( coreStore ).getCurrentUser(), [
 			'id',
 		] );
-		const autosave = select( 'core' ).getAutosave(
+		const autosave = select( coreStore ).getAutosave(
 			postType,
 			postId,
 			currentUserId
@@ -627,11 +632,11 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		const hasFetchedAutosave = select( 'core' ).hasFetchedAutosaves(
+		const hasFetchedAutosave = select( coreStore ).hasFetchedAutosaves(
 			postType,
 			postId
 		);
-		const currentUserId = get( select( 'core' ).getCurrentUser(), [
+		const currentUserId = get( select( coreStore ).getCurrentUser(), [
 			'id',
 		] );
 
@@ -639,7 +644,7 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		// via a resolver, moving below the return would result in the autosave never
 		// being fetched.
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const autosave = select( 'core' ).getAutosave(
+		const autosave = select( coreStore ).getAutosave(
 			postType,
 			postId,
 			currentUserId
@@ -694,8 +699,8 @@ export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
 
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
-	const autosave = select( 'core' ).getAutosave(
+	const currentUserId = get( select( coreStore ).getCurrentUser(), [ 'id' ] );
+	const autosave = select( coreStore ).getAutosave(
 		postType,
 		postId,
 		currentUserId
@@ -722,8 +727,12 @@ export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
 
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
-	return !! select( 'core' ).getAutosave( postType, postId, currentUserId );
+	const currentUserId = get( select( coreStore ).getCurrentUser(), [ 'id' ] );
+	return !! select( coreStore ).getAutosave(
+		postType,
+		postId,
+		currentUserId
+	);
 } );
 
 /**
@@ -763,7 +772,7 @@ export function isEditedPostDateFloating( state ) {
 
 	// This should be the status of the persisted post
 	// It shouldn't use the "edited" status otherwise it breaks the
-	// infered post data floating status
+	// inferred post data floating status
 	// See https://github.com/WordPress/gutenberg/issues/28083
 	const status = getCurrentPost( state ).status;
 	if (
@@ -786,7 +795,7 @@ export function isEditedPostDateFloating( state ) {
 export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
 	const postType = getCurrentPostType( state );
 	const postId = getCurrentPostId( state );
-	return select( 'core' ).isSavingEntityRecord(
+	return select( coreStore ).isSavingEntityRecord(
 		'postType',
 		postType,
 		postId
@@ -805,7 +814,7 @@ export const didPostSaveRequestSucceed = createRegistrySelector(
 	( select ) => ( state ) => {
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		return ! select( 'core' ).getLastEntitySaveError(
+		return ! select( coreStore ).getLastEntitySaveError(
 			'postType',
 			postType,
 			postId
@@ -825,7 +834,7 @@ export const didPostSaveRequestFail = createRegistrySelector(
 	( select ) => ( state ) => {
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		return !! select( 'core' ).getLastEntitySaveError(
+		return !! select( coreStore ).getLastEntitySaveError(
 			'postType',
 			postType,
 			postId
@@ -990,7 +999,7 @@ export const getEditedPostContent = createRegistrySelector(
 	( select ) => ( state ) => {
 		const postId = getCurrentPostId( state );
 		const postType = getCurrentPostType( state );
-		const record = select( 'core' ).getEditedEntityRecord(
+		const record = select( coreStore ).getEditedEntityRecord(
 			'postType',
 			postType,
 			postId
@@ -1331,7 +1340,7 @@ function getBlockEditorSelector( name ) {
 			alternative: "`wp.data.select( 'core/block-editor' )." + name + '`',
 		} );
 
-		return select( 'core/block-editor' )[ name ]( ...args );
+		return select( blockEditorStore )[ name ]( ...args );
 	} );
 }
 
@@ -1694,7 +1703,7 @@ export const __experimentalGetDefaultTemplatePartAreas = createSelector(
  * Returns a default template type searched by slug.
  *
  * @param {Object} state Global application state.
- * @param {string} slug The template type slug.
+ * @param {string} slug  The template type slug.
  *
  * @return {Object} The template type.
  */
@@ -1708,7 +1717,7 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  * Given a template entity, return information about it which is ready to be
  * rendered, such as the title, description, and icon.
  *
- * @param {Object} state Global application state.
+ * @param {Object} state    Global application state.
  * @param {Object} template The template for which we need information.
  * @return {Object} Information about the template, including title, description, and icon.
  */
@@ -1739,3 +1748,20 @@ export function __experimentalGetTemplateInfo( state, template ) {
 		icon: templateIcon,
 	};
 }
+
+/**
+ * Returns a post type label depending on the current post.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string|undefined} The post type label if available, otherwise undefined.
+ */
+export const getPostTypeLabel = createRegistrySelector(
+	( select ) => ( state ) => {
+		const currentPostType = getCurrentPostType( state );
+		const postType = select( coreStore ).getPostType( currentPostType );
+		// Disable reason: Post type labels object is shaped like this.
+		// eslint-disable-next-line camelcase
+		return postType?.labels?.singular_name;
+	}
+);

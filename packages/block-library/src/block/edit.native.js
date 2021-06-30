@@ -12,23 +12,30 @@ import {
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import {
 	useEntityBlockEditor,
 	useEntityProp,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { BottomSheet, Icon, Disabled } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import {
+	BottomSheet,
+	Icon,
+	Disabled,
+	TextControl,
+} from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	InnerBlocks,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { help } from '@wordpress/icons';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -57,6 +64,14 @@ export default function ReusableBlockEdit( {
 	const infoSheetIconStyle = usePreferredColorSchemeStyle(
 		styles.infoSheetIcon,
 		styles.infoSheetIconDark
+	);
+	const infoDescriptionStyle = usePreferredColorSchemeStyle(
+		styles.infoDescription,
+		styles.infoDescriptionDark
+	);
+	const actionButtonStyle = usePreferredColorSchemeStyle(
+		styles.actionButton,
+		styles.actionButtonDark
 	);
 	const spinnerStyle = usePreferredColorSchemeStyle(
 		styles.spinner,
@@ -88,6 +103,12 @@ export default function ReusableBlockEdit( {
 		[ ref, clientId ]
 	);
 
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const {
+		__experimentalConvertBlockToStatic: convertBlockToStatic,
+	} = useDispatch( reusableBlocksStore );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
@@ -104,13 +125,30 @@ export default function ReusableBlockEdit( {
 		setShowHelp( false );
 	}
 
+	const onConvertToRegularBlocks = useCallback( () => {
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: name of the reusable block */
+				__( '%s converted to regular blocks' ),
+				title
+			)
+		);
+
+		clearSelectedBlock();
+		// Convert action is executed at the end of the current JavaScript execution block
+		// to prevent issues related to undo/redo actions.
+		setImmediate( () => convertBlockToStatic( clientId ) );
+	}, [ title, clientId ] );
+
 	function renderSheet() {
 		const infoTitle =
 			Platform.OS === 'android'
 				? __(
-						"Reusable blocks aren't editable on WordPress for Android"
+						'Editing reusable blocks is not yet supported on WordPress for Android'
 				  )
-				: __( "Reusable blocks aren't editable on WordPress for iOS" );
+				: __(
+						'Editing reusable blocks is not yet supported on WordPress for iOS'
+				  );
 
 		return (
 			<BottomSheet
@@ -127,6 +165,17 @@ export default function ReusableBlockEdit( {
 					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
 						{ infoTitle }
 					</Text>
+					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
+						{ __(
+							'Alternatively, you can detach and edit these blocks separately by tapping "Convert to regular blocks".'
+						) }
+					</Text>
+					<TextControl
+						label={ __( 'Convert to regular blocks' ) }
+						separatorType="topFullWidth"
+						onPress={ onConvertToRegularBlocks }
+						labelStyle={ actionButtonStyle }
+					/>
 				</View>
 			</BottomSheet>
 		);

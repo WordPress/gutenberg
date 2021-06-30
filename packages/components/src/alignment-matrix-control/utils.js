@@ -47,7 +47,7 @@ export function transformValue( value ) {
  * Creates an item ID based on a prefix ID and an alignment value.
  *
  * @param {string} prefixId An ID to prefix.
- * @param {string} value An alignment value.
+ * @param {string} value    An alignment value.
  *
  * @return {string} The item id.
  */

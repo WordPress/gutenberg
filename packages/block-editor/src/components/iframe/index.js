@@ -8,6 +8,7 @@ import {
 	forwardRef,
 	useEffect,
 	useMemo,
+	useReducer,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
@@ -131,6 +132,11 @@ function setBodyClassName( doc ) {
 	for ( const name of document.body.classList ) {
 		if ( name.startsWith( 'admin-color-' ) ) {
 			doc.body.classList.add( name );
+		} else if ( name === 'wp-embed-responsive' ) {
+			// Ideally ALL classes that are added through get_body_class should
+			// be added in the editor too, which we'll somehow have to get from
+			// the server in the future (which will run the PHP filters).
+			doc.body.classList.add( 'wp-embed-responsive' );
 		}
 	}
 }
@@ -159,6 +165,7 @@ async function loadScript( doc, { id, src } ) {
 }
 
 function Iframe( { contentRef, children, head, ...props }, ref ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const styles = useParsedAssets( window.__editorAssets.styles );
 	const scripts = useParsedAssets( window.__editorAssets.scripts );
@@ -189,11 +196,19 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			clearerRef( documentElement );
 			clearerRef( body );
 
-			scripts.reduce(
-				( promise, script ) =>
-					promise.then( () => loadScript( contentDocument, script ) ),
-				Promise.resolve()
-			);
+			scripts
+				.reduce(
+					( promise, script ) =>
+						promise.then( () =>
+							loadScript( contentDocument, script )
+						),
+					Promise.resolve()
+				)
+				.finally( () => {
+					// When script are loaded, re-render blocks to allow them
+					// to initialise.
+					forceRender();
+				} );
 
 			return true;
 		}

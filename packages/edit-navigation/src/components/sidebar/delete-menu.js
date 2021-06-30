@@ -9,7 +9,7 @@ export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
 		<PanelBody>
 			<Button
 				className="edit-navigation-inspector-additions__delete-menu-button"
-				isSecondary
+				variant="secondary"
 				isDestructive
 				isBusy={ isMenuBeingDeleted }
 				onClick={ () => {

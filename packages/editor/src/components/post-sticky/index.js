@@ -10,6 +10,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import PostStickyCheck from './check';
+import { store as editorStore } from '../../store';
 
 export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 	return (
@@ -26,7 +27,7 @@ export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			postSticky: select( 'core/editor' ).getEditedPostAttribute(
+			postSticky: select( editorStore ).getEditedPostAttribute(
 				'sticky'
 			),
 		};
@@ -34,7 +35,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		return {
 			onUpdateSticky( postSticky ) {
-				dispatch( 'core/editor' ).editPost( { sticky: postSticky } );
+				dispatch( editorStore ).editPost( { sticky: postSticky } );
 			},
 		};
 	} ),

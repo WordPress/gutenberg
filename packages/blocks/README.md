@@ -238,7 +238,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the list of blocks matches a templates
+-   `boolean`: Whether the list of blocks matches a templates.
 
 <a name="findTransform" href="#findTransform">#</a> **findTransform**
 

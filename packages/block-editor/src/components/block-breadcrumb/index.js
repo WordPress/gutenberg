@@ -14,9 +14,11 @@ import { store as blockEditorStore } from '../../store';
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
  *
- * @return {WPElement} Block Breadcrumb.
+ * @param  {Object}   props               Component props.
+ * @param  {string}   props.rootLabelText Translated label for the root element of the breadcrumb trail.
+ * @return {WPElement}                    Block Breadcrumb.
  */
-function BlockBreadcrumb() {
+function BlockBreadcrumb( { rootLabelText } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
 		const {
@@ -31,6 +33,7 @@ function BlockBreadcrumb() {
 			hasSelection: !! getSelectionStart().clientId,
 		};
 	}, [] );
+	const rootLabel = rootLabelText || __( 'Document' );
 
 	/*
 	 * Disable reason: The `list` ARIA role is redundant but
@@ -54,19 +57,19 @@ function BlockBreadcrumb() {
 				{ hasSelection && (
 					<Button
 						className="block-editor-block-breadcrumb__button"
-						isTertiary
+						variant="tertiary"
 						onClick={ clearSelectedBlock }
 					>
-						{ __( 'Document' ) }
+						{ rootLabel }
 					</Button>
 				) }
-				{ ! hasSelection && __( 'Document' ) }
+				{ ! hasSelection && rootLabel }
 			</li>
 			{ parents.map( ( parentClientId ) => (
 				<li key={ parentClientId }>
 					<Button
 						className="block-editor-block-breadcrumb__button"
-						isTertiary
+						variant="tertiary"
 						onClick={ () => selectBlock( parentClientId ) }
 					>
 						<BlockTitle clientId={ parentClientId } />

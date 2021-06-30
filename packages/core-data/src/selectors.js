@@ -40,11 +40,7 @@ const EMPTY_ARRAY = [];
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
 	( select ) => ( state, url ) => {
-		return select( 'core/data' ).isResolving(
-			STORE_NAME,
-			'getEmbedPreview',
-			[ url ]
-		);
+		return select( STORE_NAME ).isResolving( 'getEmbedPreview', [ url ] );
 	}
 );
 
@@ -68,7 +64,7 @@ export function getAuthors( state, query ) {
  * Returns all available authors.
  *
  * @param {Object} state Data state.
- * @param {number} id The author id.
+ * @param {number} id    The author id.
  *
  * @return {Array} Authors list.
  */
@@ -107,7 +103,7 @@ export const getUserQueryResults = createSelector(
 /**
  * Returns whether the entities for the give kind are loaded.
  *
- * @param {Object} state   Data state.
+ * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
  *
  * @return {Array<Object>} Array of entities with config matching kind.
@@ -119,7 +115,7 @@ export function getEntitiesByKind( state, kind ) {
 /**
  * Returns the entity object given its kind and name.
  *
- * @param {Object} state   Data state.
+ * @param {Object} state Data state.
  * @param {string} kind  Entity kind.
  * @param {string} name  Entity name.
  *
@@ -151,17 +147,18 @@ export function getEntityRecord( state, kind, name, key, query ) {
 	if ( ! queriedState ) {
 		return undefined;
 	}
+	const context = query?.context ?? 'default';
 
 	if ( query === undefined ) {
 		// If expecting a complete item, validate that completeness.
-		if ( ! queriedState.itemIsComplete[ key ] ) {
+		if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
 			return undefined;
 		}
 
-		return queriedState.items[ key ];
+		return queriedState.items[ context ][ key ];
 	}
 
-	const item = queriedState.items[ key ];
+	const item = queriedState.items[ context ]?.[ key ];
 	if ( item && query._fields ) {
 		const filteredItem = {};
 		const fields = getNormalizedCommaSeparable( query._fields );
@@ -179,10 +176,10 @@ export function getEntityRecord( state, kind, name, key, query ) {
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity from the API if the entity record isn't available in the local state.
  *
- * @param {Object} state  State tree
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
- * @param {number} key    Record's key
+ * @param {Object} state State tree
+ * @param {string} kind  Entity kind.
+ * @param {string} name  Entity name.
+ * @param {number} key   Record's key
  *
  * @return {Object|null} Record.
  */
@@ -199,10 +196,10 @@ export function __experimentalGetEntityRecordNoResolver(
  * Returns the entity's record object by key,
  * with its attributes mapped to their raw values.
  *
- * @param {Object} state  State tree.
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
- * @param {number} key    Record's key.
+ * @param {Object} state State tree.
+ * @param {string} kind  Entity kind.
+ * @param {string} name  Entity name.
+ * @param {number} key   Record's key.
  *
  * @return {Object?} Object with the entity's raw attributes.
  */
@@ -565,7 +562,7 @@ export function hasRedo( state ) {
  *
  * @param {Object} state Data state.
  *
- * @return {Object}      The current theme.
+ * @return {Object} The current theme.
  */
 export function getCurrentTheme( state ) {
 	return state.themes[ state.currentTheme ];
@@ -576,7 +573,7 @@ export function getCurrentTheme( state ) {
  *
  * @param {Object} state Data state.
  *
- * @return {*}           Index data.
+ * @return {*} Index data.
  */
 export function getThemeSupports( state ) {
 	return state.themeSupports;
@@ -585,8 +582,8 @@ export function getThemeSupports( state ) {
 /**
  * Returns the embed preview for the given URL.
  *
- * @param {Object} state    Data state.
- * @param {string} url      Embedded URL.
+ * @param {Object} state Data state.
+ * @param {string} url   Embedded URL.
  *
  * @return {*} Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
  */
@@ -601,8 +598,8 @@ export function getEmbedPreview( state, url ) {
  * We need to be able to determine if a URL is embeddable or not, based on what we
  * get back from the oEmbed preview API.
  *
- * @param {Object} state    Data state.
- * @param {string} url      Embedded URL.
+ * @param {Object} state Data state.
+ * @param {string} url   Embedded URL.
  *
  * @return {boolean} Is the preview for the URL an oEmbed link fallback.
  */
@@ -624,10 +621,10 @@ export function isPreviewEmbedFallback( state, url ) {
  *
  * https://developer.wordpress.org/rest-api/reference/
  *
- * @param {Object}   state            Data state.
- * @param {string}   action           Action to check. One of: 'create', 'read', 'update', 'delete'.
- * @param {string}   resource         REST resource to check, e.g. 'media' or 'posts'.
- * @param {string=}  id               Optional ID of the rest resource to check.
+ * @param {Object}  state    Data state.
+ * @param {string}  action   Action to check. One of: 'create', 'read', 'update', 'delete'.
+ * @param {string}  resource REST resource to check, e.g. 'media' or 'posts'.
+ * @param {string=} id       Optional ID of the rest resource to check.
  *
  * @return {boolean|undefined} Whether or not the user can perform the action,
  *                             or `undefined` if the OPTIONS request is still being made.
@@ -635,6 +632,31 @@ export function isPreviewEmbedFallback( state, url ) {
 export function canUser( state, action, resource, id ) {
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
+}
+
+/**
+ * Returns whether the current user can edit the given entity.
+ *
+ * Calling this may trigger an OPTIONS request to the REST API via the
+ * `canUser()` resolver.
+ *
+ * https://developer.wordpress.org/rest-api/reference/
+ *
+ * @param {Object} state    Data state.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {string} recordId Record's id.
+ * @return {boolean|undefined} Whether or not the user can edit,
+ * or `undefined` if the OPTIONS request is still being made.
+ */
+export function canUserEditEntityRecord( state, kind, name, recordId ) {
+	const entity = getEntity( state, kind, name );
+	if ( ! entity ) {
+		return false;
+	}
+	const resource = entity.__unstable_rest_base;
+
+	return canUser( state, 'update', resource, recordId );
 }
 
 /**
@@ -675,7 +697,7 @@ export function getAutosave( state, postType, postId, authorId ) {
 /**
  * Returns true if the REST request for autosaves has completed.
  *
- * @param {Object} state State tree.
+ * @param {Object} state    State tree.
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
  *

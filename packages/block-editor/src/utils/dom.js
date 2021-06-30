@@ -1,6 +1,4 @@
-// Consider the block appender to be a child block of its own, which also has
-// this class.
-const BLOCK_SELECTOR = '.wp-block';
+const BLOCK_SELECTOR = '.block-editor-block-list__block';
 
 /**
  * Returns true if two elements are contained within the same block.

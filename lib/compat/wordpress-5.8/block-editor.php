@@ -371,3 +371,27 @@ function gutenberg_block_editor_rest_api_preload( array $preload_paths, $block_e
 		'after'
 	);
 }
+
+/**
+ * Filters the arguments for registering a block type.
+ *
+ * @todo Remove from the Gutenberg plugin when WordPress 5.8 is the minimum required version.
+ *
+ * @param array $args Array of arguments for registering a block type.
+ *
+ * @return array Returns the $metadata with any missing `style` and `editorStyle` added.
+ */
+function gutenberg_add_missing_styles_to_core_block_json( $args ) {
+	if ( ! empty( $args['name'] ) && 0 === strpos( $args['name'], 'core/' ) ) {
+		$block_name = str_replace( 'core/', '', $args['name'] );
+
+		if ( ! isset( $args['style'] ) ) {
+			$args['style'] = "wp-block-$block_name";
+		}
+		if ( ! isset( $args['editor_style'] ) ) {
+			$args['editor_style'] = "wp-block-$block_name-editor";
+		}
+	}
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_add_missing_styles_to_core_block_json' );

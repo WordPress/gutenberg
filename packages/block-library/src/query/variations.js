@@ -35,6 +35,7 @@ const variations = [
 				author: '',
 				search: '',
 				sticky: 'exclude',
+				inherit: false,
 			},
 		},
 		scope: [ 'inserter' ],
@@ -45,7 +46,7 @@ const variations = [
 		icon: titleDate,
 		innerBlocks: [
 			[
-				'core/query-loop',
+				'core/post-template',
 				{},
 				[ [ 'core/post-title' ], [ 'core/post-date' ] ],
 			],
@@ -58,7 +59,7 @@ const variations = [
 		icon: titleExcerpt,
 		innerBlocks: [
 			[
-				'core/query-loop',
+				'core/post-template',
 				{},
 				[ [ 'core/post-title' ], [ 'core/post-excerpt' ] ],
 			],
@@ -71,7 +72,7 @@ const variations = [
 		icon: titleDateExcerpt,
 		innerBlocks: [
 			[
-				'core/query-loop',
+				'core/post-template',
 				{},
 				[
 					[ 'core/post-title' ],
@@ -88,7 +89,7 @@ const variations = [
 		icon: imageDateTitle,
 		innerBlocks: [
 			[
-				'core/query-loop',
+				'core/post-template',
 				{},
 				[
 					[ 'core/post-featured-image' ],

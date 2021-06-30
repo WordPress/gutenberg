@@ -1,9 +1,6 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/core-data';
-import '@wordpress/block-editor';
-import '@wordpress/editor';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,

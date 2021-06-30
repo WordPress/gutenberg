@@ -28,7 +28,7 @@ const CreateNewPostLink = ( {
 /**
  * Override the default edit UI to include layout controls
  *
- * @param  {Function} BlockEdit Original component
+ * @param {Function} BlockEdit Original component
  * @return {Function}           Wrapped component
  */
 const queryTopInspectorControls = createHigherOrderComponent(

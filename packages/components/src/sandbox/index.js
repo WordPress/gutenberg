@@ -220,7 +220,11 @@ export default function Sandbox( {
 		defaultView.addEventListener( 'message', checkMessageForResize );
 
 		return () => {
-			ref.current.removeEventListener( 'load', tryNoForceSandbox, false );
+			ref.current?.removeEventListener(
+				'load',
+				tryNoForceSandbox,
+				false
+			);
 			defaultView.addEventListener( 'message', checkMessageForResize );
 		};
 	}, [] );

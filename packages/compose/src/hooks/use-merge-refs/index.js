@@ -13,7 +13,7 @@ import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
 /**
  * @template T
  * @param {import('react').Ref<T>} ref
- * @param {T} value
+ * @param {T}                      value
  */
 function assignRef( ref, value ) {
 	if ( typeof ref === 'function' ) {

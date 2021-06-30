@@ -214,10 +214,20 @@ describe( 'global styles renderer', () => {
 			const tree = {
 				settings: {
 					color: {
-						palette: [
-							{ name: 'White', slug: 'white', color: 'white' },
-							{ name: 'Black', slug: 'black', color: 'black' },
-						],
+						palette: {
+							user: [
+								{
+									name: 'White',
+									slug: 'white',
+									color: 'white',
+								},
+								{
+									name: 'Black',
+									slug: 'black',
+									color: 'black',
+								},
+							],
+						},
 					},
 					custom: {
 						'font-primary': 'value',
@@ -229,18 +239,20 @@ describe( 'global styles renderer', () => {
 					blocks: {
 						'core/heading': {
 							typography: {
-								fontSizes: [
-									{
-										name: 'small',
-										slug: 'small',
-										size: '12px',
-									},
-									{
-										name: 'medium',
-										slug: 'medium',
-										size: '23px',
-									},
-								],
+								fontSizes: {
+									theme: [
+										{
+											name: 'small',
+											slug: 'small',
+											size: '12px',
+										},
+										{
+											name: 'medium',
+											slug: 'medium',
+											size: '23px',
+										},
+									],
+								},
 							},
 						},
 					},
@@ -264,13 +276,27 @@ describe( 'global styles renderer', () => {
 			const tree = {
 				settings: {
 					color: {
-						palette: [
-							{ name: 'White', slug: 'white', color: 'white' },
-							{ name: 'Black', slug: 'black', color: 'black' },
-						],
+						palette: {
+							core: [
+								{
+									name: 'White',
+									slug: 'white',
+									color: 'white',
+								},
+								{
+									name: 'Black',
+									slug: 'black',
+									color: 'black',
+								},
+							],
+						},
 					},
 				},
 				styles: {
+					spacing: {
+						margin: '10px',
+						padding: '10px',
+					},
 					color: {
 						background: 'red',
 					},
@@ -282,6 +308,22 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					blocks: {
+						'core/group': {
+							spacing: {
+								margin: {
+									top: '10px',
+									right: '20px',
+									bottom: '30px',
+									left: '40px',
+								},
+								padding: {
+									top: '11px',
+									right: '22px',
+									bottom: '33px',
+									left: '44px',
+								},
+							},
+						},
 						'core/heading': {
 							color: {
 								text: 'orange',
@@ -299,6 +341,9 @@ describe( 'global styles renderer', () => {
 			};
 
 			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
 				'core/heading': {
 					selector: 'h1,h2,h3,h4,h5,h6',
 					elements: {
@@ -320,7 +365,7 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( toStyles( tree, blockSelectors ) ).toEqual(
-				'body{background-color: red;}h1{font-size: 42px;}h1,h2,h3,h4,h5,h6{color: orange;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: hotpink;}.has-white-color{color: white !important;}.has-white-background-color{background-color: white !important;}.has-white-border-color{border-color: white !important;}.has-black-color{color: black !important;}.has-black-background-color{background-color: black !important;}.has-black-border-color{border-color: black !important;}'
+				'body{background-color: red;margin: 10px;padding: 10px;}h1{font-size: 42px;}.wp-block-group{margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}h1,h2,h3,h4,h5,h6{color: orange;}h1 a,h2 a,h3 a,h4 a,h5 a,h6 a{color: hotpink;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}'
 			);
 		} );
 	} );

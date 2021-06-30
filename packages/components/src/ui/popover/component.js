@@ -22,7 +22,7 @@ import { useUpdateEffect } from '../../utils/hooks';
 /**
  *
  * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('react').Ref<any>}                                                       forwardedRef
  */
 function Popover( props, forwardedRef ) {
 	const {

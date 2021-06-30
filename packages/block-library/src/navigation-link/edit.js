@@ -30,7 +30,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP } from '@wordpress/url';
+import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import {
 	Fragment,
 	useState,
@@ -142,14 +142,14 @@ function getSuggestionsQuery( type, kind ) {
  *
  * @typedef {Object} WPNavigationLinkBlockAttributes
  *
- * @property {string}                [label]          Link text.
- * @property {WPNavigationLinkKind}  [kind]           Kind is used to differentiate between term and post ids to check post draft status.
- * @property {string}                [type]           The type such as post, page, tag, category and other custom types.
- * @property {string}                [rel]            The relationship of the linked URL.
- * @property {number}                [id]             A post or term id.
- * @property {boolean}               [opensInNewTab]  Sets link target to _blank when true.
- * @property {string}                [url]            Link href.
- * @property {string}                [title]          Link title attribute.
+ * @property {string}               [label]         Link text.
+ * @property {WPNavigationLinkKind} [kind]          Kind is used to differentiate between term and post ids to check post draft status.
+ * @property {string}               [type]          The type such as post, page, tag, category and other custom types.
+ * @property {string}               [rel]           The relationship of the linked URL.
+ * @property {number}               [id]            A post or term id.
+ * @property {boolean}              [opensInNewTab] Sets link target to _blank when true.
+ * @property {string}               [url]           Link href.
+ * @property {string}               [title]         Link title attribute.
  */
 
 /**
@@ -200,7 +200,8 @@ export const updateNavigationLinkBlockAttributes = (
 	const kind = isCustomLink ? 'custom' : newKind;
 
 	setAttributes( {
-		...( url && { url: encodeURI( url ) } ),
+		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
+		...( url && { url: encodeURI( safeDecodeURI( url ) ) } ),
 		...( label && { label } ),
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
 		...( id && Number.isInteger( id ) && { id } ),
@@ -605,12 +606,12 @@ export default function NavigationLinkEdit( {
 							/>
 						</Popover>
 					) }
+					{ hasDescendants && showSubmenuIcon && (
+						<span className="wp-block-navigation-link__submenu-icon">
+							<ItemSubmenuIcon />
+						</span>
+					) }
 				</a>
-				{ hasDescendants && showSubmenuIcon && (
-					<span className="wp-block-navigation-link__submenu-icon">
-						<ItemSubmenuIcon />
-					</span>
-				) }
 				<ul { ...innerBlocksProps } />
 			</li>
 		</Fragment>

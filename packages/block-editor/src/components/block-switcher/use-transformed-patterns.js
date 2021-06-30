@@ -3,20 +3,18 @@
  */
 import { useMemo } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { getMatchingBlockByName, getRetainedBlockAttributes } from './utils';
-import { store as blockEditorStore } from '../../store';
 
 /**
  * Mutate the matched block's attributes by getting
  * which block type's attributes to retain and prioritize
  * them in the merging of the attributes.
  *
- * @param {WPBlock} match The matched block.
+ * @param {WPBlock} match         The matched block.
  * @param {WPBlock} selectedBlock The selected block.
  * @return {void}
  */
@@ -38,7 +36,7 @@ export const transformMatchingBlock = ( match, selectedBlock ) => {
  * If not all selected blocks are matched, return nothing.
  *
  * @param {WPBlock[]} selectedBlocks The selected blocks.
- * @param {WPBlock[]} patternBlocks The pattern's blocks.
+ * @param {WPBlock[]} patternBlocks  The pattern's blocks.
  * @return {WPBlock[]|void} The transformed pattern's blocks or undefined if not all selected blocks have been matched.
  */
 export const getPatternTransformedBlocks = (
@@ -90,25 +88,15 @@ export const getPatternTransformedBlocks = (
  * The transformed pattern's blocks are set to a new pattern
  * property `transformedBlocks`.
  *
- * @param {WPBlockPattern[]} patterns Patterns from state.
- * @param {WPBlock[]} selectedBlocks The currently selected blocks.
+ * @param {WPBlockPattern[]} patterns       Patterns from state.
+ * @param {WPBlock[]}        selectedBlocks The currently selected blocks.
  * @return {TransformedBlockPattern[]} Returns the eligible matched patterns with all the selected blocks.
  */
 // TODO tests
 const useTransformedPatterns = ( patterns, selectedBlocks ) => {
-	const parsedPatterns = useSelect(
-		( select ) =>
-			patterns.map( ( { name } ) =>
-				select( blockEditorStore ).__experimentalGetParsedPattern(
-					name
-				)
-			),
-		[ patterns ]
-	);
-
 	return useMemo(
 		() =>
-			parsedPatterns.reduce( ( accumulator, _pattern ) => {
+			patterns.reduce( ( accumulator, _pattern ) => {
 				const transformedBlocks = getPatternTransformedBlocks(
 					selectedBlocks,
 					_pattern.blocks
@@ -121,7 +109,7 @@ const useTransformedPatterns = ( patterns, selectedBlocks ) => {
 				}
 				return accumulator;
 			}, [] ),
-		[ parsedPatterns, selectedBlocks ]
+		[ patterns, selectedBlocks ]
 	);
 };
 

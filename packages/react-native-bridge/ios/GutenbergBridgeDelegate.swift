@@ -17,14 +17,15 @@ public struct MediaInfo: Encodable {
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
     case contactInfoBlock
+    case layoutGridBlock
     case mediaFilesCollectionBlock
     case mentions
     case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
-    case audioBlock
+    case isAudioBlockMediaUploadEnabled
     case reusableBlock
-    case canViewEditorOnboarding
+    case editorOnboarding
 }
 
 /// Wrapper for single block data

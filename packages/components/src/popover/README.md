@@ -17,7 +17,7 @@ const MyPopover = withState( {
 		setState( ( state ) => ( { isVisible: ! state.isVisible } ) );
 	};
 	return (
-		<Button isSecondary onClick={ toggleVisible }>
+		<Button variant="secondary" onClick={ toggleVisible }>
 			Toggle Popover!
 			{ isVisible && <Popover>Popover is toggled!</Popover> }
 		</Button>

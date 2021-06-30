@@ -6,7 +6,8 @@ import { createContext, useContext, memo, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Card, CardBody, View } from '../../';
+import { Card, CardBody } from '../../../card';
+import { View } from '../../../view';
 import { Text } from '../../../text';
 import { ContextSystemProvider } from '../index';
 
@@ -18,11 +19,28 @@ export default {
 	title: 'G2 Components (Experimental)/ContextSystemProvider',
 };
 
+const outerContext = {
+	Card: {
+		isRounded: false,
+		elevation: 15,
+	},
+	CardBody: {
+		as: 'a',
+		href: 'https://wordpress.org',
+		style: {
+			display: 'block',
+		},
+	},
+};
+
 const innerContext = {
 	Card: {
-		css: {
-			background: 'white',
+		style: {
+			background: 'rgba(35, 255, 55, 0.2)',
 		},
+	},
+	CardBody: {
+		as: 'div',
 	},
 };
 
@@ -30,8 +48,10 @@ const InnerContent = memo( () => {
 	const state = useSomeContext();
 	const isEven = state % 2 === 0;
 	return (
-		<View css={ { background: isEven ? 'red' : 'initial' } }>
-			{ state }
+		<View style={ { background: isEven ? 'red' : 'initial' } }>
+			<Text>Card (inside innerContext)</Text>
+			<br />
+			<Text>Counter:{ state }</Text>
 		</View>
 	);
 } );
@@ -52,37 +72,26 @@ export const Default = () => {
 	const [ state, update ] = useState( 0 );
 	const forceUpdate = () => update( ( prev ) => prev + 1 );
 
-	const value = {
-		Card: {
-			isRounded: false,
-			elevation: 100,
-		},
-		CardBody: {
-			as: 'a',
-			href: 'https://wordpress.org',
-		},
-	};
-
 	return (
-		<>
-			<SomeContext.Provider value={ state }>
-				<button onClick={ forceUpdate }>Force Update</button>
-				<ContextSystemProvider value={ value }>
-					<Card>
-						<CardBody>
-							<Text optimizeReadabilityFor="blue">Card</Text>
-							<ContextSystemProvider value={ innerContext }>
-								<InnerCard />
-							</ContextSystemProvider>
-						</CardBody>
-					</Card>
-				</ContextSystemProvider>
+		<SomeContext.Provider value={ state }>
+			<button onClick={ forceUpdate }>
+				Force Update (increment counter)
+			</button>
+			<ContextSystemProvider value={ outerContext }>
 				<Card>
 					<CardBody>
-						<Text>Card</Text>
+						<Text>Card (inside outerContext)</Text>
+						<ContextSystemProvider value={ innerContext }>
+							<InnerCard />
+						</ContextSystemProvider>
 					</CardBody>
 				</Card>
-			</SomeContext.Provider>
-		</>
+			</ContextSystemProvider>
+			<Card>
+				<CardBody>
+					<Text>Card (outside of outerContext)</Text>
+				</CardBody>
+			</Card>
+		</SomeContext.Provider>
 	);
 };

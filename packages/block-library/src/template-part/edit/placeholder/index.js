@@ -12,7 +12,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Placeholder, Dropdown, Button } from '@wordpress/components';
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -36,8 +35,11 @@ export default function TemplatePartPlaceholder( {
 
 	const { areaIcon, areaLabel } = useSelect(
 		( select ) => {
+			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+			// Blocks can be loaded into a *non-post* block editor.
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
 			const definedAreas = select(
-				editorStore
+				'core/editor'
 			).__experimentalGetDefaultTemplatePartAreas();
 
 			const selectedArea = find( definedAreas, { area } );
@@ -107,7 +109,7 @@ export default function TemplatePartPlaceholder( {
 							<>
 								{ enableSelection && (
 									<Button
-										isPrimary
+										variant="primary"
 										onClick={ onToggle }
 										aria-expanded={ isOpen }
 									>
@@ -115,9 +117,9 @@ export default function TemplatePartPlaceholder( {
 									</Button>
 								) }
 								<Button
-									{ ...( enableSelection
-										? { isTertiary: true }
-										: { isPrimary: true } ) }
+									variant={
+										enableSelection ? 'tertiary' : 'primary'
+									}
 									onClick={ () =>
 										setStep( PLACEHOLDER_STEPS.patterns )
 									}

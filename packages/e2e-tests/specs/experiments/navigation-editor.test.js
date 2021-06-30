@@ -83,12 +83,17 @@ const REST_SEARCH_ROUTES = [
 	`rest_route=${ encodeURIComponent( '/wp/v2/search' ) }`,
 ];
 
+const REST_PAGES_ROUTES = [
+	'/wp/v2/pages',
+	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
+];
+
 /**
  * Determines if a given URL matches any of a given collection of
  * routes (expressed as substrings).
  *
  * @param {string} reqUrl the full URL to be tested for matches.
- * @param {Array} routes array of strings to match against the URL.
+ * @param {Array}  routes array of strings to match against the URL.
  */
 function matchUrlToRoute( reqUrl, routes ) {
 	return routes.some( ( route ) => reqUrl.includes( route ) );
@@ -133,6 +138,10 @@ function getMenuItemMocks( responsesByMethod ) {
 
 function getSearchMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_SEARCH_ROUTES, responsesByMethod );
+}
+
+function getPagesMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod );
 }
 
 async function visitNavigationEditor() {
@@ -184,6 +193,7 @@ describe( 'Navigation editor', () => {
 				POST: menuPostResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
+			...getPagesMocks( { GET: [ {} ] } ), // mock a single page
 		] );
 
 		await page.keyboard.type( 'Main Menu' );

@@ -90,18 +90,11 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 	return getPresetMetadataFromStyleProperty.MAP[ styleProperty ];
 }
 
-const filterColorsFromCoreOrigin = ( path, setting ) => {
-	if ( path !== 'color.palette' && path !== 'color.gradients' ) {
-		return setting;
-	}
-
-	if ( ! Array.isArray( setting ) ) {
-		return setting;
-	}
-
-	const colors = setting.filter( ( color ) => color?.origin !== 'core' );
-
-	return colors.length > 0 ? colors : setting;
+const PATHS_WITH_MERGE = {
+	'color.gradients': true,
+	'color.palette': true,
+	'typography.fontFamilies': true,
+	'typography.fontSizes': true,
 };
 
 export function useSetting( path, blockName = '' ) {
@@ -110,8 +103,11 @@ export function useSetting( path, blockName = '' ) {
 	} );
 	const topLevelPath = `__experimentalFeatures.${ path }`;
 	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
-	const setting = get( settings, blockPath ) ?? get( settings, topLevelPath );
-	return filterColorsFromCoreOrigin( path, setting );
+	const result = get( settings, blockPath ) ?? get( settings, topLevelPath );
+	if ( result && PATHS_WITH_MERGE[ path ] ) {
+		return result.user ?? result.theme ?? result.core;
+	}
+	return result;
 }
 
 export function getPresetVariable( styles, context, propertyName, value ) {

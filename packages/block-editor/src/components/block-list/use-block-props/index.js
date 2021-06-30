@@ -50,15 +50,15 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * also pass any other props through this hook, and they will be merged and
  * returned.
  *
- * @param {Object}  props   Optional. Props to pass to the element. Must contain
- *                          the ref if one is defined.
- * @param {Object}  options Options for internal use only.
+ * @param {Object}  props                    Optional. Props to pass to the element. Must contain
+ *                                           the ref if one is defined.
+ * @param {Object}  options                  Options for internal use only.
  * @param {boolean} options.__unstableIsHtml
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
-	const { clientId, className, wrapperProps = {} } = useContext(
+	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
 		BlockListBlockContext
 	);
 	const {
@@ -141,7 +141,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-title': blockTitle,
 		className: classnames(
 			// The wp-block className is important for editor styles.
-			'wp-block block-editor-block-list__block',
+			classnames( 'block-editor-block-list__block', {
+				'wp-block': ! isAligned,
+			} ),
 			className,
 			props.className,
 			wrapperProps.className,

@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/core-data';
-import '@wordpress/block-editor';
 import {
 	registerBlockType,
 	setDefaultBlockName,
@@ -38,7 +36,6 @@ import * as navigationLink from './navigation-link';
 import * as homeLink from './home-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
-import * as legacyWidget from './legacy-widget';
 import * as logInOut from './loginout';
 import * as list from './list';
 import * as missing from './missing';
@@ -70,7 +67,7 @@ import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
-import * as queryLoop from './query-loop';
+import * as postTemplate from './post-template';
 import * as queryTitle from './query-title';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
@@ -148,7 +145,6 @@ export const __experimentalGetCoreBlocks = () => [
 	mediaText,
 	latestComments,
 	latestPosts,
-	legacyWidget,
 	missing,
 	more,
 	nextpage,
@@ -175,7 +171,7 @@ export const __experimentalGetCoreBlocks = () => [
 	siteTitle,
 
 	query,
-	queryLoop,
+	postTemplate,
 	queryTitle,
 	queryPagination,
 	queryPaginationNext,

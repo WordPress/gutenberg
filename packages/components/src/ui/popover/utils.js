@@ -5,9 +5,9 @@ import { noop } from 'lodash';
 import useResizeAware from 'react-resize-aware';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { useIsomorphicLayoutEffect } from '../utils';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
 export function usePopoverResizeUpdater( { onResize = noop } ) {
 	const [ resizeListener, sizes ] = useResizeAware();

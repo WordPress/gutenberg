@@ -34,5 +34,4 @@ export type Props = {
 	 * In the example below, `isInteractive` is activated to give a better sense of depth.
 	 */
 	value?: number;
-	children?: never;
 };

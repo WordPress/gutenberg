@@ -115,7 +115,7 @@ export default function ManageLocations( {
 				} }
 			/>
 			<Button
-				isSecondary
+				variant="secondary"
 				style={ {
 					visibility: !! menuLocation.menu ? 'visible' : 'hidden',
 				} }
@@ -138,7 +138,7 @@ export default function ManageLocations( {
 				{ menusWithSelection }
 			</ul>
 			<Button
-				isSecondary
+				variant="secondary"
 				className="edit-navigation-manage-locations__open-menu-locations-modal-button"
 				aria-expanded={ isModalOpen }
 				onClick={ openModal }

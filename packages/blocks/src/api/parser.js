@@ -211,8 +211,8 @@ export function matcherFromSource( sourceConfig ) {
  * Given a block's raw content and an attribute's schema returns the attribute's
  * value depending on its source.
  *
- * @param {string} innerHTML         Block's raw content.
- * @param {Object} attributeSchema   Attribute's schema.
+ * @param {string} innerHTML       Block's raw content.
+ * @param {Object} attributeSchema Attribute's schema.
  *
  * @return {*} Attribute value.
  */
@@ -409,7 +409,7 @@ export function getMigratedBlock( block, parsedAttributes ) {
  * both in the parser level for previous content and to convert such blocks
  * used in Custom Post Types templates.
  *
- * @param {string} name The block's name
+ * @param {string} name       The block's name
  * @param {Object} attributes The block's attributes
  *
  * @return {Object} The block's name and attributes, changed accordingly if a match was found
@@ -453,6 +453,12 @@ export function convertLegacyBlocks( name, attributes ) {
 			newAttributes.responsive = true;
 		}
 		name = 'core/embed';
+	}
+
+	// Convert 'core/query-loop' blocks in existing content to 'core/post-template'.
+	// TODO: Remove this check when WordPress 5.9 is released.
+	if ( name === 'core/query-loop' ) {
+		name = 'core/post-template';
 	}
 	return { name, attributes: newAttributes };
 }

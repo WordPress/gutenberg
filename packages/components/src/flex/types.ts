@@ -54,6 +54,10 @@ export type FlexProps = {
 	 */
 	wrap?: boolean;
 	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
+	/**
 	 * @deprecated
 	 */
 	isReversed?: boolean;
@@ -70,6 +74,10 @@ export type FlexItemProps = {
 	 * @default true
 	 */
 	isBlock?: boolean;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 };
 
 export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' >;

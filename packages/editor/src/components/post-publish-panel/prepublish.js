@@ -11,6 +11,7 @@ import { Icon, PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { wordpress } from '@wordpress/icons';
 import { filterURLForDisplay } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -21,6 +22,7 @@ import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
 import MaybeTagsPanel from './maybe-tags-panel';
 import MaybePostFormatPanel from './maybe-post-format-panel';
+import { store as editorStore } from '../../store';
 
 function PostPublishPanelPrepublish( { children } ) {
 	const {
@@ -31,11 +33,10 @@ function PostPublishPanelPrepublish( { children } ) {
 		siteTitle,
 		siteHome,
 	} = useSelect( ( select ) => {
-		const { isResolving } = select( 'core/data' );
 		const { getCurrentPost, isEditedPostBeingScheduled } = select(
-			'core/editor'
+			editorStore
 		);
-		const { getEntityRecord } = select( 'core' );
+		const { getEntityRecord, isResolving } = select( coreStore );
 		const siteData =
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
@@ -46,7 +47,7 @@ function PostPublishPanelPrepublish( { children } ) {
 				false
 			),
 			isBeingScheduled: isEditedPostBeingScheduled(),
-			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+			isRequestingSiteIcon: isResolving( 'getEntityRecord', [
 				'root',
 				'__unstableBase',
 				undefined,

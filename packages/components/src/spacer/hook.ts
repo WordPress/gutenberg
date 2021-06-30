@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { css, cx } from '@emotion/css';
 
 /**
  * Internal dependencies
@@ -73,6 +76,10 @@ export interface SpacerProps {
 	 * Adjusts right padding.
 	 */
 	paddingRight?: number;
+	/**
+	 * The children elements.
+	 */
+	children?: React.ReactNode;
 }
 
 export function useSpacer(

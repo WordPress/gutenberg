@@ -492,7 +492,7 @@ function CoverEdit( {
 						) }
 						<PanelRow>
 							<Button
-								isSecondary
+								variant="secondary"
 								isSmall
 								className="block-library-cover__reset-button"
 								onClick={ () =>

@@ -296,7 +296,7 @@ describe( 'offsetIframe', () => {
 		} ) );
 
 		const rect = child.getBoundingClientRect();
-		const offsettedRect = offsetIframe( rect, child.ownerDocument );
+		const offsettedRect = offsetIframe( rect, child.ownerDocument, parent );
 
 		expect( offsettedRect.left ).toBe( iframeLeft + childLeft );
 		expect( offsettedRect.top ).toBe( iframeTop + childTop );

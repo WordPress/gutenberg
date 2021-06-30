@@ -13,16 +13,12 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
-import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
 import {
 	useViewportMatch,
 	useResizeObserver,
-	useFocusOnMount,
-	__experimentalUseFocusOutside as useFocusOutside,
-	useConstrainedTabbing,
-	useFocusReturn,
 	useMergeRefs,
+	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
@@ -47,7 +43,8 @@ function computeAnchorRect(
 	anchorRect,
 	getAnchorRect,
 	anchorRef = false,
-	shouldAnchorIncludePadding
+	shouldAnchorIncludePadding,
+	container
 ) {
 	if ( anchorRect ) {
 		return anchorRect;
@@ -61,7 +58,8 @@ function computeAnchorRect(
 		const rect = getAnchorRect( anchorRefFallback.current );
 		return offsetIframe(
 			rect,
-			rect.ownerDocument || anchorRefFallback.current.ownerDocument
+			rect.ownerDocument || anchorRefFallback.current.ownerDocument,
+			container
 		);
 	}
 
@@ -81,7 +79,8 @@ function computeAnchorRect(
 		if ( typeof anchorRef?.cloneRange === 'function' ) {
 			return offsetIframe(
 				getRectangleFromRange( anchorRef ),
-				anchorRef.endContainer.ownerDocument
+				anchorRef.endContainer.ownerDocument,
+				container
 			);
 		}
 
@@ -91,7 +90,8 @@ function computeAnchorRect(
 		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
 			const rect = offsetIframe(
 				anchorRef.getBoundingClientRect(),
-				anchorRef.ownerDocument
+				anchorRef.ownerDocument,
+				container
 			);
 
 			if ( shouldAnchorIncludePadding ) {
@@ -111,7 +111,8 @@ function computeAnchorRect(
 				topRect.width,
 				bottomRect.bottom - topRect.top
 			),
-			top.ownerDocument
+			top.ownerDocument,
+			container
 		);
 
 		if ( shouldAnchorIncludePadding ) {
@@ -232,7 +233,6 @@ const Popover = (
 	{
 		headerTitle,
 		onClose,
-		onKeyDown,
 		children,
 		className,
 		noArrow = true,
@@ -256,6 +256,7 @@ const Popover = (
 		__unstableObserveElement,
 		__unstableBoundaryParent,
 		__unstableForcePosition,
+		__unstableForceXAlignment,
 		/* eslint-enable no-unused-vars */
 		...contentProps
 	},
@@ -294,7 +295,8 @@ const Popover = (
 				anchorRect,
 				getAnchorRect,
 				anchorRef,
-				shouldAnchorIncludePadding
+				shouldAnchorIncludePadding,
+				containerRef.current
 			);
 
 			if ( ! anchor ) {
@@ -348,7 +350,8 @@ const Popover = (
 				containerRef.current,
 				relativeOffsetTop,
 				boundaryElement,
-				__unstableForcePosition
+				__unstableForcePosition,
+				__unstableForceXAlignment
 			);
 
 			if (
@@ -477,89 +480,37 @@ const Popover = (
 		__unstableBoundaryParent,
 	] );
 
-	const constrainedTabbingRef = useConstrainedTabbing();
-	const focusReturnRef = useFocusReturn();
-	const focusOnMountRef = useFocusOnMount( focusOnMount );
-	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
-	const mergedRefs = useMergeRefs( [
-		ref,
-		containerRef,
-		focusOnMount ? constrainedTabbingRef : null,
-		focusOnMount ? focusReturnRef : null,
-		focusOnMount ? focusOnMountRef : null,
-	] );
+	const onDialogClose = ( type, event ) => {
+		// Ideally the popover should have just a single onClose prop and
+		// not three props that potentially do the same thing.
+		if ( type === 'focus-outside' && onFocusOutside ) {
+			onFocusOutside( event );
+		} else if ( type === 'focus-outside' && onClickOutside ) {
+			// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click target.
+			const clickEvent = new window.MouseEvent( 'click' );
 
-	// Event handlers
-	const maybeClose = ( event ) => {
-		// Close on escape
-		if ( event.keyCode === ESCAPE && onClose ) {
-			event.stopPropagation();
+			Object.defineProperty( clickEvent, 'target', {
+				get: () => event.relatedTarget,
+			} );
+
+			deprecated( 'Popover onClickOutside prop', {
+				since: '5.3',
+				alternative: 'onFocusOutside',
+			} );
+
+			onClickOutside( clickEvent );
+		} else if ( onClose ) {
 			onClose();
-		}
-
-		// Preserve original content prop behavior
-		if ( onKeyDown ) {
-			onKeyDown( event );
 		}
 	};
 
-	/**
-	 * Shims an onFocusOutside callback to be compatible with a deprecated
-	 * onClickOutside prop function, if provided.
-	 *
-	 * @param {FocusEvent} event Focus event from onFocusOutside.
-	 */
-	function handleOnFocusOutside( event ) {
-		// Defer to given `onFocusOutside` if specified. Call `onClose` only if
-		// both `onFocusOutside` and `onClickOutside` are unspecified. Doing so
-		// assures backwards-compatibility for prior `onClickOutside` default.
-		if ( onFocusOutside ) {
-			onFocusOutside( event );
-			return;
-		} else if ( ! onClickOutside ) {
-			if ( onClose ) {
-				onClose();
-			}
-			return;
-		}
+	const [ dialogRef, dialogProps ] = useDialog( {
+		focusOnMount,
+		__unstableOnClose: onDialogClose,
+		onClose: onDialogClose,
+	} );
 
-		// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click
-		// target. MouseEvent constructor is unsupported in Internet Explorer.
-		let clickEvent;
-		try {
-			clickEvent = new window.MouseEvent( 'click' );
-		} catch ( error ) {
-			clickEvent = document.createEvent( 'MouseEvent' );
-			clickEvent.initMouseEvent(
-				'click',
-				true,
-				true,
-				window,
-				0,
-				0,
-				0,
-				0,
-				0,
-				false,
-				false,
-				false,
-				false,
-				0,
-				null
-			);
-		}
-
-		Object.defineProperty( clickEvent, 'target', {
-			get: () => event.relatedTarget,
-		} );
-
-		deprecated( 'Popover onClickOutside prop', {
-			since: '5.3',
-			alternative: 'onFocusOutside',
-		} );
-
-		onClickOutside( clickEvent );
-	}
+	const mergedRefs = useMergeRefs( [ containerRef, dialogRef, ref ] );
 
 	/** @type {false | string} */
 	const animateClassName =
@@ -587,9 +538,8 @@ const Popover = (
 				}
 			) }
 			{ ...contentProps }
-			onKeyDown={ maybeClose }
-			{ ...focusOutsideProps }
 			ref={ mergedRefs }
+			{ ...dialogProps }
 			tabIndex="-1"
 		>
 			{ isExpanded && <ScrollLock /> }

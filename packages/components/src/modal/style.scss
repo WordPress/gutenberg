@@ -7,6 +7,7 @@
 	left: 0;
 	background-color: rgba($black, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
+	display: flex;
 
 	// This animates the appearance of the white background.
 	@include edit-post__fade-in-animation();
@@ -14,44 +15,41 @@
 
 // The modal window element.
 .components-modal__frame {
-	// On small screens the content needs to be full width because of limited
-	// space.
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	box-sizing: border-box;
+	// Use the entire viewport on smaller screens.
 	margin: 0;
+	width: 100%;
 	background: $white;
 	box-shadow: $shadow-modal;
 	border-radius: $radius-block-ui;
-	overflow: auto;
+	overflow: hidden;
+	// Have the content element fill the vertical space yet not overflow.
+	display: flex;
 
 	// Show a centered modal on bigger screens.
 	@include break-small() {
-		top: 50%;
-		right: auto;
-		bottom: auto;
-		left: 50%;
+		margin: auto;
+		width: auto;
 		min-width: $modal-min-width;
-		max-width: calc(100% - #{ $grid-unit-20 } - #{ $grid-unit-20 });
-		max-height: 90%;
-		transform: translate(-50%, -50%);
+		max-width: calc(100% - #{ $grid-unit-20 * 2 });
+		max-height: calc(100% - #{ $header-height * 2 });
 
 		// Animate the modal frame/contents appearing on the page.
 		animation: components-modal__appear-animation 0.1s ease-out;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
 	}
+
+	@include break-large() {
+		max-height: 70%;
+	}
 }
 
 @keyframes components-modal__appear-animation {
 	from {
-		margin-top: $grid-unit-40;
+		transform: translateY($grid-unit-40);
 	}
 	to {
-		margin-top: 0;
+		transform: translateY(0);
 	}
 }
 
@@ -65,25 +63,13 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	background: $white;
 	align-items: center;
 	height: $header-height;
+	width: 100%;
 	z-index: z-index(".components-modal__header");
-	// For z-index to take effect, the element must be positioned. A "sticky"
-	// element is positioned, but since this is not supported in IE11,
-	// "relative" is used as a fallback.
-	position: relative;
-	position: sticky;
+	position: absolute;
 	top: 0;
-	margin: 0 -#{$grid-unit-40} $grid-unit-30;
-
-	// Rules inside this query are only run by Microsoft Edge.
-	// Edge has bugs around position: sticky;, so it needs a separate top rule.
-	// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17555420/.
-	@supports (-ms-ime-align:auto) {
-		position: fixed;
-		width: 100%;
-	}
+	left: 0;
 
 	.components-modal__header-heading {
 		font-size: 1rem;
@@ -121,13 +107,18 @@
 
 // Modal contents.
 .components-modal__content {
-	box-sizing: border-box;
-	height: 100%;
+	flex: 1;
+	margin-top: $header-height;
 	padding: 0 $grid-unit-40 $grid-unit-30;
+	overflow: auto;
 
-	// Rules inside this query are only run by Microsoft Edge.
-	// This is a companion top padding to the fixed rule in line 77.
-	@supports (-ms-ime-align:auto) {
-		padding-top: $header-height;
+	// Emulate margin-bottom for the header. Uses a pseudo-element since the
+	// absolutely positioned header’s margins wouldn’t effect siblings and
+	// padding-top on the content element would effect positioning of any
+	// sticky elements within.
+	&::before {
+		content: "";
+		display: block;
+		margin-bottom: $grid-unit-30;
 	}
 }

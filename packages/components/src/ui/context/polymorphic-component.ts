@@ -3,31 +3,38 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type * as React from 'react';
-import type { As, RenderProp, ExtractHTMLAttributes } from 'reakit-utils/types';
-import type { Interpolation } from 'create-emotion';
 
 /**
  * Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
+ *
+ * The `children` prop is being explicitely omitted since it is otherwise implicitly added
+ * by `ComponentPropsWithRef`. The context is that components should require the `children`
+ * prop explicitely when needed (see https://github.com/WordPress/gutenberg/pull/31817).
  */
-export type PolymorphicComponentProps< P, T extends As > = P &
-	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P > & {
-		as?: T | keyof JSX.IntrinsicElements;
-		children?: React.ReactNode | RenderProp< ExtractHTMLAttributes< any > >;
-	};
+export type PolymorphicComponentProps<
+	P,
+	T extends React.ElementType,
+	IsPolymorphic extends boolean = true
+> = P &
+	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P | 'children' > &
+	( IsPolymorphic extends true
+		? {
+				as?: T | keyof JSX.IntrinsicElements;
+		  }
+		: { as?: never } );
 
-export type ElementTypeFromPolymorphicComponentProps<
-	P
-> = P extends PolymorphicComponentProps< unknown, infer T > ? T : never;
-
-export type PropsFromPolymorphicComponentProps<
-	P
-> = P extends PolymorphicComponentProps< infer PP, any > ? PP : never;
-
-export type PolymorphicComponent< T extends As, O > = {
-	< TT extends As >(
-		props: PolymorphicComponentProps< O, TT > & { as: TT }
+export type PolymorphicComponent<
+	T extends React.ElementType,
+	O,
+	IsPolymorphic extends boolean
+> = {
+	< TT extends React.ElementType >(
+		props: PolymorphicComponentProps< O, TT, IsPolymorphic > &
+			( IsPolymorphic extends true ? { as: TT } : { as: never } )
 	): JSX.Element | null;
-	( props: PolymorphicComponentProps< O, T > ): JSX.Element | null;
+	(
+		props: PolymorphicComponentProps< O, T, IsPolymorphic >
+	): JSX.Element | null;
 	displayName?: string;
 	/**
 	 * A CSS selector used to fake component interpolation in styled components
@@ -40,27 +47,8 @@ export type PolymorphicComponent< T extends As, O > = {
 	selector: `.${ string }`;
 };
 
-export type CreatePolymorphicComponent< T extends As, P > = (
-	template: TemplateStringsArray,
-	...styles: (
-		| Interpolation< undefined >
-		| PolymorphicComponent< any, any >
-	 )[]
-) => PolymorphicComponent< T, P >;
-
-export type ForwardedRef< TElement extends HTMLElement > =
-	| ( ( instance: TElement | null ) => void )
-	| React.MutableRefObject< TElement | null >
-	| null;
-
-export type CoreElements = {
-	[ P in keyof JSX.IntrinsicElements ]: PolymorphicComponent< P, {} >;
-};
-
-type CreateStyledComponents = {
-	[ P in keyof JSX.IntrinsicElements ]: CreatePolymorphicComponent< P, {} >;
-};
-
-export type CreateStyled = CreateStyledComponents & {
-	< T extends As >( component: T ): CreatePolymorphicComponent< T, {} >;
-};
+export type PolymorphicComponentFromProps<
+	Props
+> = Props extends PolymorphicComponentProps< infer P, infer T, infer I >
+	? PolymorphicComponent< T, P, I >
+	: never;

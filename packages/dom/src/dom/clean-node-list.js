@@ -16,12 +16,12 @@ import isElement from './is-element';
 /* eslint-disable jsdoc/valid-types */
 /**
  * @typedef SchemaItem
- * @property {string[]} [attributes] Attributes.
- * @property {(string | RegExp)[]} [classes] Classnames or RegExp to test against.
- * @property {'*' | { [tag: string]: SchemaItem }} [children] Child schemas.
- * @property {string[]} [require] Selectors to test required children against. Leave empty or undefined if there are no requirements.
- * @property {boolean} allowEmpty Whether to allow nodes without children.
- * @property {(node: Node) => boolean} [isMatch] Function to test whether a node is a match. If left undefined any node will be assumed to match.
+ * @property {string[]}                            [attributes] Attributes.
+ * @property {(string | RegExp)[]}                 [classes]    Classnames or RegExp to test against.
+ * @property {'*' | { [tag: string]: SchemaItem }} [children]   Child schemas.
+ * @property {string[]}                            [require]    Selectors to test required children against. Leave empty or undefined if there are no requirements.
+ * @property {boolean}                             allowEmpty   Whether to allow nodes without children.
+ * @property {(node: Node) => boolean}             [isMatch]    Function to test whether a node is a match. If left undefined any node will be assumed to match.
  */
 
 /** @typedef {{ [tag: string]: SchemaItem }} Schema */
