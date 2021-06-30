@@ -153,8 +153,9 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
-			// eslint-disable-next-line no-console
-			console.log( `AMANDA-TEST > show editor help received in JS!` );
+			this.props.createSuccessNotice(
+				'Show Editor Help request received by JS!'
+			);
 		} );
 	}
 
