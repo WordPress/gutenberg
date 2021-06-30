@@ -16,7 +16,7 @@ import {
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { find, findAll, waitFor } from 'puppeteer-testing-library';
+import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
 
 describe( 'Widgets screen', () => {
@@ -88,6 +88,12 @@ describe( 'Widgets screen', () => {
 			}
 		);
 		expect( categoryHeaders.length > 0 ).toBe( true );
+
+		const searchBox = await find( {
+			role: 'searchbox',
+			name: 'Search for blocks and patterns',
+		} );
+		await searchBox.type( blockName );
 
 		const addBlock = await find(
 			{
@@ -394,109 +400,123 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	async function addMarquee() {
-		// There will be 2 matches here.
-		// One is the in-between inserter,
-		// and the other one is the button block appender.
-		const [ inlineInserterButton ] = await findAll( {
-			role: 'combobox',
-			name: 'Add block',
-		} );
-		await inlineInserterButton.click();
+	describe( 'Function widgets', () => {
+		async function addMarquee( nbExpectedMarquees ) {
+			const marqueeBlock = await getBlockInGlobalInserter(
+				'Marquee Greeting'
+			);
+			await marqueeBlock.click();
+			await page.waitForFunction(
+				( expectedMarquees ) => {
+					return (
+						document.querySelectorAll(
+							'[data-testid="marquee-greeting"]'
+						).length === expectedMarquees
+					);
+				},
+				{},
+				nbExpectedMarquees
+			);
+		}
 
-		// TODO: Convert to find() API from puppeteer-testing-library.
-		const inserterSearchBox = await page.waitForSelector(
-			'aria/Search for blocks and patterns[role="searchbox"]'
-		);
-		await expect( inserterSearchBox ).toHaveFocus();
+		async function deleteExistingMarquees() {
+			const widgetAreasHoldingMarqueeWidgets = await page.$x(
+				'//input[@data-testid="marquee-greeting"]/ancestor::div[@aria-label="Block: Widget Area"]'
+			);
+			for ( const widgetArea of widgetAreasHoldingMarqueeWidgets ) {
+				const closedPanelBody = await widgetArea.$(
+					'.components-panel__body:not(.is-opened)'
+				);
+				if ( closedPanelBody ) {
+					await closedPanelBody.focus();
+					await closedPanelBody.click();
+				}
 
-		await page.keyboard.type( 'Marquee' );
-
-		const inlineQuickInserter = await find( {
-			role: 'listbox',
-			name: 'Blocks',
-		} );
-		const marqueeBlockOption = await find(
-			{
-				role: 'option',
-			},
-			{
-				root: inlineQuickInserter,
+				const [ existingMarqueeWidgets ] = await widgetArea.$x(
+					'//input[@data-testid="marquee-greeting"]/ancestor::div[@data-block][contains(@class, "wp-block-legacy-widget")]'
+				);
+				if ( existingMarqueeWidgets ) {
+					await existingMarqueeWidgets.focus();
+					await pressKeyWithModifier( 'access', 'z' );
+				}
 			}
-		);
-		await marqueeBlockOption.click();
-	}
+		}
 
-	it( 'Should add and save the marquee widget', async () => {
-		await activatePlugin( 'gutenberg-test-marquee-widget' );
-		await visitAdminPage( 'widgets.php' );
-
-		await addMarquee();
-
-		await find( {
-			selector: '[data-block][data-type="core/legacy-widget"]',
+		beforeAll( async () => {
+			await activatePlugin( 'gutenberg-test-marquee-widget' );
 		} );
 
-		const greetingsInput = await find( {
-			selector: '#marquee-greeting',
+		beforeEach( async () => {
+			await deleteExistingMarquees();
 		} );
-		await greetingsInput.click();
-		await page.keyboard.type( 'Howdy' );
 
-		await saveWidgets();
+		afterAll( async () => {
+			await deactivatePlugin( 'gutenberg-test-marquee-widget' );
+		} );
 
-		let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
-		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": "<marquee>Hello!</marquee>",
-		}
-	` );
+		it( 'Should add and save the marquee widget', async () => {
+			await addMarquee( 1 );
 
-		await page.reload();
+			const [ marqueeInput ] = await page.$x(
+				'//input[@data-testid="marquee-greeting"]'
+			);
+			await marqueeInput.focus();
+			await marqueeInput.type( 'Howdy' );
 
-		editedSerializedWidgetAreas = await getSerializedWidgetAreas();
-		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": "<marquee>Hello!</marquee>",
-		}
-	` );
+			// The first marquee is saved after clicking the form save button.
+			const [ marqueeSaveButton ] = await marqueeInput.$x(
+				'//input/ancestor::div[@data-block][contains(@class, "wp-block-legacy-widget")]//button[@type="submit"]'
+			);
+			await marqueeSaveButton.click();
 
-		// Add another marquee, it shouldn't be saved
-		await addMarquee();
+			await saveWidgets();
 
-		// It takes a moment to load the form, let's wait for it.
-		await waitFor( async () => {
-			const marquees = await findAll( {
-				selector: '[id=marquee-greeting]',
+			let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+			Object {
+			  "sidebar-1": "<marquee>Howdy</marquee>",
+			}
+		` );
+
+			await page.reload();
+
+			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+			Object {
+			  "sidebar-1": "<marquee>Howdy</marquee>",
+			}
+		` );
+
+			await addMarquee( 2 );
+
+			const marqueeInputs = await page.$$(
+				'[data-testid="marquee-greeting"]'
+			);
+
+			expect( marqueeInputs ).toHaveLength( 2 );
+			await marqueeInputs[ 0 ].focus();
+			await marqueeInputs[ 0 ].type( 'first howdy' );
+
+			await marqueeInputs[ 1 ].focus();
+			await marqueeInputs[ 1 ].type( 'Second howdy' );
+
+			// No marquee should be changed without clicking on their "save" button.
+			// The second marquee shouldn't be stored as a widget.
+			// See #32978 for more info.
+			await saveWidgets();
+			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+			Object {
+			  "sidebar-1": "<marquee>Howdy</marquee>",
+			}
+		` );
+
+			await page.reload();
+			const marqueesAfter = await findAll( {
+				selector: '[data-testid="marquee-greeting"]',
 			} );
-			if ( marquees.length === 1 ) {
-				throw new Error();
-			}
+			expect( marqueesAfter ).toHaveLength( 1 );
 		} );
-
-		const marquees = await findAll( {
-			selector: '[id=marquee-greeting]',
-		} );
-
-		expect( marquees ).toHaveLength( 2 );
-		await marquees[ 1 ].click();
-		await page.keyboard.type( 'Second howdy' );
-
-		await saveWidgets();
-		editedSerializedWidgetAreas = await getSerializedWidgetAreas();
-		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": "<marquee>Hello!</marquee>",
-		}
-	` );
-
-		await page.reload();
-		const marqueesAfter = await findAll( {
-			selector: '[id=marquee-greeting]',
-		} );
-		expect( marqueesAfter ).toHaveLength( 1 );
-
-		await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 	} );
 
 	// Disable reason: We temporary skip this test until we can figure out why it fails sometimes.
@@ -528,7 +548,6 @@ describe( 'Widgets screen', () => {
 		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>",
-		  "wp_inactive_widgets": "",
 		}
 	` );
 		const initialWidgets = await getWidgetAreaWidgets();
@@ -599,7 +618,6 @@ describe( 'Widgets screen', () => {
 		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>",
-		  "wp_inactive_widgets": "",
 		}
 	` );
 		const editedWidgets = await getWidgetAreaWidgets();
