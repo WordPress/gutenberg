@@ -69,6 +69,7 @@ export interface InnerProps {
 	 */
 	paddingRight?: SpaceInput;
 }
+
 export interface Props extends InnerProps {
 	children?: ReactNode;
 }
