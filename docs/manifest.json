@@ -1494,6 +1494,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/edit-dashboard",
+		"slug": "packages-edit-dashboard",
+		"markdown_source": "../packages/edit-dashboard/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-navigation",
 		"slug": "packages-edit-navigation",
 		"markdown_source": "../packages/edit-navigation/README.md",
