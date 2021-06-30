@@ -428,13 +428,16 @@ describe( 'Widgets screen', () => {
 			await marqueeBlockOption.click();
 		}
 
+		beforeEach( async () => {
+			await activatePlugin( 'gutenberg-test-marquee-widget' );
+		} );
+
 		afterEach( async () => {
 			await deleteAllWidgets();
 			await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 		} );
 
 		it( 'Should add and save the marquee widget', async () => {
-			await activatePlugin( 'gutenberg-test-marquee-widget' );
 			await visitAdminPage( 'widgets.php' );
 
 			await addMarquee();
