@@ -34,7 +34,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		if ( themeSupportsLayout ) {
 			const alignments =
 				contentSize || wideSize
-					? [ 'wide', 'full' ]
+					? [ 'wide', 'full', 'left', 'center', 'right' ]
 					: [ 'left', 'center', 'right' ];
 			return {
 				type: 'default',

@@ -145,7 +145,8 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
           />
         </Section>
         <Section
-          title="Manage visibility of blocks in the inserter"
+          description="Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
+          title="Visible blocks"
         >
           <WithSelect(BlockManager) />
         </Section>

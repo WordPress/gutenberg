@@ -51,7 +51,7 @@ function EditableContent( { layout, context = {} } ) {
 		if ( themeSupportsLayout ) {
 			const alignments =
 				contentSize || wideSize
-					? [ 'wide', 'full' ]
+					? [ 'wide', 'full', 'left', 'center', 'right' ]
 					: [ 'left', 'center', 'right' ];
 			return {
 				type: 'default',

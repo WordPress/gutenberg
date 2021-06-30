@@ -27,9 +27,27 @@ function useDarkThemeBodyClassName( styles ) {
 			const canvas = ownerDocument.querySelector(
 				EDITOR_STYLES_SELECTOR
 			);
-			const backgroundColor = defaultView
-				.getComputedStyle( canvas, null )
-				.getPropertyValue( 'background-color' );
+
+			let backgroundColor;
+
+			if ( ! canvas ) {
+				// The real .editor-styles-wrapper element might not exist in the
+				// DOM, so calculate the background color by creating a fake
+				// wrapper.
+				const tempCanvas = ownerDocument.createElement( 'div' );
+				tempCanvas.classList.add( 'editor-styles-wrapper' );
+				body.appendChild( tempCanvas );
+
+				backgroundColor = defaultView
+					.getComputedStyle( tempCanvas, null )
+					.getPropertyValue( 'background-color' );
+
+				body.removeChild( tempCanvas );
+			} else {
+				backgroundColor = defaultView
+					.getComputedStyle( canvas, null )
+					.getPropertyValue( 'background-color' );
+			}
 
 			// If background is transparent, it should be treated as light color.
 			if (

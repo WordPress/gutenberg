@@ -13,14 +13,10 @@ import RNReactNativeGutenbergBridge, {
 	subscribeSetTitle,
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
-	subscribeUpdateTheme,
+	subscribeUpdateEditorSettings,
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 } from '@wordpress/react-native-bridge';
-
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
 import {
@@ -37,6 +33,7 @@ import {
 	validateThemeGradients,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { getGlobalStyles } from '@wordpress/components';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -84,13 +81,11 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities, colors, gradients } = this.props;
+		const { capabilities, updateSettings } = this.props;
 
-		this.props.updateSettings( {
+		updateSettings( {
 			...capabilities,
-			// Set theme colors for the editor
-			...( colors ? { colors } : {} ),
-			...( gradients ? { gradients } : {} ),
+			...this.getThemeColors( this.props ),
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
@@ -137,15 +132,10 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
-		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
-			( theme ) => {
-				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
-
-				theme.colors = validateThemeColors( theme.colors );
-
-				theme.gradients = validateThemeGradients( theme.gradients );
-
-				this.props.updateSettings( theme );
+		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
+			( editorSettings ) => {
+				const themeColors = this.getThemeColors( editorSettings );
+				updateSettings( themeColors );
 			}
 		);
 
@@ -187,8 +177,8 @@ class NativeEditorProvider extends Component {
 			this.subscriptionParentMediaAppend.remove();
 		}
 
-		if ( this.subscriptionParentUpdateTheme ) {
-			this.subscriptionParentUpdateTheme.remove();
+		if ( this.subscriptionParentUpdateEditorSettings ) {
+			this.subscriptionParentUpdateEditorSettings.remove();
 		}
 
 		if ( this.subscriptionParentUpdateCapabilities ) {
@@ -198,6 +188,17 @@ class NativeEditorProvider extends Component {
 		if ( this.subscriptionParentShowNotice ) {
 			this.subscriptionParentShowNotice.remove();
 		}
+	}
+
+	getThemeColors( { colors, gradients, rawStyles, rawFeatures } ) {
+		return {
+			...( rawStyles
+				? getGlobalStyles( rawStyles, rawFeatures, colors, gradients )
+				: {
+						colors: validateThemeColors( colors ),
+						gradients: validateThemeGradients( gradients ),
+				  } ),
+		};
 	}
 
 	componentDidUpdate( prevProps ) {

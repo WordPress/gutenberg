@@ -55,6 +55,8 @@ function PostTemplateActions() {
 		return null;
 	}
 
+	const defaultTitle = __( 'Custom Template' );
+
 	return (
 		<>
 			<div className="edit-post-template__actions">
@@ -83,7 +85,6 @@ function PostTemplateActions() {
 					<form
 						onSubmit={ ( event ) => {
 							event.preventDefault();
-							const defaultTitle = __( 'Custom Template' );
 							const newTemplateContent =
 								defaultTemplate ??
 								serialize( [
@@ -126,9 +127,9 @@ function PostTemplateActions() {
 							__unstableSwitchToTemplateMode( {
 								slug:
 									'wp-custom-template-' +
-									kebabCase( title ?? defaultTitle ),
+									kebabCase( title || defaultTitle ),
 								content: newTemplateContent,
-								title: title ?? defaultTitle,
+								title: title || defaultTitle,
 							} );
 							setIsModalOpen( false );
 						} }
@@ -139,6 +140,7 @@ function PostTemplateActions() {
 									label={ __( 'Name' ) }
 									value={ title }
 									onChange={ setTitle }
+									placeholder={ defaultTitle }
 									help={ __(
 										'Describe the purpose of the template, e.g. "Full Width". Custom templates can be applied to any post or page.'
 									) }

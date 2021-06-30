@@ -1,6 +1,6 @@
 # CardBody
 
-CardBody renders an optional content area for a [`<Card />`](../).
+`CardBody` renders an optional content area for a [`Card`](/packages/components/src/card/card/README.md). Multiple `CardBody` components can be used within `Card` if needed.
 
 ## Usage
 
@@ -16,20 +16,26 @@ const Example = () => (
 
 ## Props
 
-### isShady
+Note: This component is connected to [`Card`'s Context](/packages/components/src/card/card/README.md#context). The value of the `size` prop is derived from the `Card` parent component (if there is one). Setting this prop directly on this component will override any derived values.
+
+### `isScrollable`: `boolean`
+
+Determines if the component is scrollable.
+
+-   Required: No
+-   Default: `true`
+
+### `isShady`: `boolean`
 
 Renders with a light gray background color.
 
--   Type: `Boolean`
 -   Required: No
 -   Default: `false`
 
-### size
+### `size`: `string`
 
 Determines the amount of padding within the component.
 
--   Type: `String`
--   Required: No
--   Default: `medium`
-
-Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.
+- Required: No
+- Default: `medium`
+- Allowed values: `xSmall`, `small`, `medium`, `large`

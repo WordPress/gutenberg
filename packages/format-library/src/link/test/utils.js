@@ -74,6 +74,7 @@ describe( 'isValidHref', () => {
 			expect( isValidHref( 'http://test.com/eeee#qwd qwdw' ) ).toBe(
 				false
 			);
+			expect( isValidHref( 'this: is invalid' ) ).toBe( false );
 		} );
 	} );
 

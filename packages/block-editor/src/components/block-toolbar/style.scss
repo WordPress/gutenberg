@@ -16,7 +16,6 @@
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
 	@include reduce-motion("transition");
 
-	// Allow overflow on desktop.
 	@include break-small() {
 		overflow: inherit;
 	}
@@ -82,10 +81,6 @@
 		.block-editor-block-icon {
 			width: $button-size-small !important;
 			margin: 0 !important;
-		}
-
-		&:focus::before {
-			right: $grid-unit-05 !important;
 		}
 	}
 
@@ -158,10 +153,6 @@
 		.block-editor-block-icon {
 			width: 0 !important;
 			height: 0 !important;
-		}
-
-		&:focus::before {
-			right: $grid-unit-05 !important;
 		}
 	}
 
