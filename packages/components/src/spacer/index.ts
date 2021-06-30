@@ -1,2 +1,2 @@
 export { default as Spacer } from './component';
-export type { SpacerProps } from './types';
+export type { Props as SpacerProps } from './types';

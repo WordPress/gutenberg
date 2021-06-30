@@ -34,7 +34,7 @@ const renderProperty = (
 	);
 };
 
-export const SpacerWrapper = styled.div< InnerProps >`
+export const SpacerView = styled.div< InnerProps >`
 	${ renderProperty( 'marginTop' ) }
 	${ renderProperty( 'marginBottom' ) }
 	${ renderProperty( 'marginLeft' ) }

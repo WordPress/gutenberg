@@ -6,13 +6,13 @@ import {
 	contextConnect,
 	PolymorphicComponentProps,
 } from '../ui/context';
-import type { SpacerProps } from './types';
-import { SpacerWrapper } from './styles';
+import type { Props } from './types';
+import { SpacerView } from './styles';
 
-function Spacer( props: PolymorphicComponentProps< SpacerProps, 'div' > ) {
+function Spacer( props: PolymorphicComponentProps< Props, 'div' > ) {
 	const contextProps = useContextSystem( props, 'Spacer' );
 
-	return <SpacerWrapper { ...contextProps } />;
+	return <SpacerView { ...contextProps } />;
 }
 
 /**
