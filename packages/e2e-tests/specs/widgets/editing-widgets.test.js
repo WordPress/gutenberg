@@ -401,15 +401,53 @@ describe( 'Widgets screen', () => {
 	} );
 
 	describe( 'Function widgets', () => {
-		async function addMarquee() {
+		async function addMarquee( nbExpectedMarquees ) {
 			const marqueeBlock = await getBlockInGlobalInserter(
 				'Marquee Greeting'
 			);
 			await marqueeBlock.click();
+			await page.waitForFunction(
+				( expectedMarquees ) => {
+					return (
+						document.querySelectorAll(
+							'[data-testid="marquee-greeting"]'
+						).length === expectedMarquees
+					);
+				},
+				{},
+				nbExpectedMarquees
+			);
+		}
+
+		async function deleteExistingMarquees() {
+			const widgetAreasHoldingMarqueeWidgets = await page.$x(
+				'//input[@data-testid="marquee-greeting"]/ancestor::div[@aria-label="Block: Widget Area"]'
+			);
+			for ( const widgetArea of widgetAreasHoldingMarqueeWidgets ) {
+				const closedPanelBody = await widgetArea.$(
+					'.components-panel__body:not(.is-opened)'
+				);
+				if ( closedPanelBody ) {
+					await closedPanelBody.focus();
+					await closedPanelBody.click();
+				}
+
+				const [ existingMarqueeWidgets ] = await widgetArea.$x(
+					'//input[@data-testid="marquee-greeting"]/ancestor::div[@data-block][contains(@class, "wp-block-legacy-widget")]'
+				);
+				if ( existingMarqueeWidgets ) {
+					await existingMarqueeWidgets.focus();
+					await pressKeyWithModifier( 'access', 'z' );
+				}
+			}
 		}
 
 		beforeAll( async () => {
 			await activatePlugin( 'gutenberg-test-marquee-widget' );
+		} );
+
+		beforeEach( async () => {
+			await deleteExistingMarquees();
 		} );
 
 		afterAll( async () => {
@@ -417,12 +455,19 @@ describe( 'Widgets screen', () => {
 		} );
 
 		it( 'Should add and save the marquee widget', async () => {
-			await addMarquee();
+			await addMarquee( 1 );
 
-			const greetingInput = await page.waitForSelector(
-				'[data-testid="marquee-greeting"]'
+			const [ marqueeInput ] = await page.$x(
+				'//input[@data-testid="marquee-greeting"]'
 			);
-			await greetingInput.type( 'Howdy' );
+			await marqueeInput.focus();
+			await marqueeInput.type( 'Howdy' );
+
+			// The first marquee is saved after clicking the form save button.
+			const [ marqueeSaveButton ] = await marqueeInput.$x(
+				'//input/ancestor::div[@data-block][contains(@class, "wp-block-legacy-widget")]//button[@type="submit"]'
+			);
+			await marqueeSaveButton.click();
 
 			await saveWidgets();
 
@@ -442,25 +487,21 @@ describe( 'Widgets screen', () => {
 			}
 		` );
 
-			await addMarquee();
-
-			// It takes a moment to load the form, let's wait for it.
-			await page.waitForFunction( () => {
-				return (
-					document.querySelectorAll(
-						'[data-testid="marquee-greeting"]'
-					).length === 2
-				);
-			} );
+			await addMarquee( 2 );
 
 			const marqueeInputs = await page.$$(
 				'[data-testid="marquee-greeting"]'
 			);
 
 			expect( marqueeInputs ).toHaveLength( 2 );
+			await marqueeInputs[ 0 ].focus();
+			await marqueeInputs[ 0 ].type( 'first howdy' );
+
+			await marqueeInputs[ 1 ].focus();
 			await marqueeInputs[ 1 ].type( 'Second howdy' );
 
-			// The second marquee shouldn't be saved.
+			// No marquee should be changed without clicking on their "save" button.
+			// The second marquee shouldn't be stored as a widget.
 			// See #32978 for more info.
 			await saveWidgets();
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
