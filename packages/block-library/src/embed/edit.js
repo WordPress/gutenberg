@@ -180,6 +180,15 @@ const EmbedEdit = ( props ) => {
 
 	const blockProps = useBlockProps();
 
+	// NOTE: This effect is only required for testing the caption element in the native version,
+	// once the PR is approved this code block should be removed.
+	// Reference: https://github.com/WordPress/gutenberg/pull/32226
+	useEffect( () => {
+		if ( ! url ) {
+			setAttributes( { url: 'http://wordpress.com' } );
+		}
+	}, [] );
+
 	if ( fetching ) {
 		return (
 			<View { ...blockProps }>
