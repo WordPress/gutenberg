@@ -14,6 +14,8 @@
 		{ "path": "../redux-routine" }
 	],
 	"include": [
+		"src/turbo-combine-reducers.d.ts",
+		"src/types.ts",
 		"src/redux-store/metadata/**/*",
 		"src/promise-middleware.js",
 	]
