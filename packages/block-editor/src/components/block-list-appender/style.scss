@@ -33,6 +33,12 @@
 	}
 }
 
+// Cancel left margin when appender is used at the root level of a list of blocks.
+// This happens on the Widgets screen where the full width appender is used.
+.block-editor-block-list__block .block-editor-block-list__layout > .block-list-appender {
+	margin-left: 0;
+}
+
 // For vertical flex containers, a 100% width ensures correct alignment.
 .is-vertical .block-list-appender {
 	width: $icon-size;
