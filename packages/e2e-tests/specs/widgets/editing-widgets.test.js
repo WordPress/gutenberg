@@ -454,7 +454,7 @@ describe( 'Widgets screen', () => {
 			let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 			Object {
-			  "sidebar-1": "<marquee>Hello!</marquee>",
+			  "sidebar-1": "<marquee>Howdy!</marquee>",
 			}
 		` );
 
@@ -463,7 +463,7 @@ describe( 'Widgets screen', () => {
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 			Object {
-			  "sidebar-1": "<marquee>Hello!</marquee>",
+			  "sidebar-1": "<marquee>Howdy!</marquee>",
 			}
 		` );
 
@@ -492,7 +492,7 @@ describe( 'Widgets screen', () => {
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
 			Object {
-			  "sidebar-1": "<marquee>Hello!</marquee>",
+			  "sidebar-1": "<marquee>howdy!</marquee>",
 			}
 		` );
 
