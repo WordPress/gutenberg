@@ -21,6 +21,8 @@ export type Props = PopperProps & {
 	label?: string;
 	/**
 	 * Determines if `Flyout` has animations.
+	 *
+	 * @default true
 	 */
 	animated?: boolean;
 	/**
