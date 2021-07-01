@@ -511,7 +511,80 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ### Styles
 
+<div class="callout callout-alert">
+The Gutenberg plugin extends the styles available from WordPress 5.8, so they can be used with other WordPress versions and they go through a maturation process before being ported to core.
+
+The tabs below show WordPress 5.8 supported styles and the ones supported by the Gutenberg plugin.
+</div>
+
 Each block declares which style properties it exposes via the [block supports mechanism](../block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
+
+{% codetabs %}
+
+{% WordPress %}
+
+```json
+{
+	"version": 1,
+	"styles": {
+		"color": {
+			"background": "value",
+			"gradient": "value",
+			"text": "value"
+		},
+		"spacing": {
+			"margin": {
+				"top": "value",
+				"right": "value",
+				"bottom": "value",
+				"left": "value"
+			},
+			"padding": {
+				"top": "value",
+				"right": "value",
+				"bottom": "value",
+				"left": "value"
+			}
+		},
+		"typography": {
+			"fontSize": "value",
+			"lineHeight": "value"
+		},
+		"elements": {
+			"link": {
+				"color": {},
+				"spacing": {},
+				"typography": {}
+			},
+			"h1": {},
+			"h2": {},
+			"h3": {},
+			"h4": {},
+			"h5": {},
+			"h6": {}
+		},
+		"blocks": {
+			"core/group": {
+				"color": {},
+				"spacing": {},
+				"typography": {},
+				"elements": {
+					"link": {},
+					"h1": {},
+					"h2": {},
+					"h3": {},
+					"h4": {},
+					"h5": {},
+					"h6": {}
+				}
+			},
+			"etc": {}
+		}
+	}
+}
+```
+
+{% Gutenberg %}
 
 ```json
 {
@@ -556,7 +629,7 @@ Each block declares which style properties it exposes via the [block supports me
 				"border": {},
 				"color": {},
 				"spacing": {},
-				"typography": {},
+				"typography": {}
 			},
 			"h1": {},
 			"h2": {},
@@ -581,11 +654,13 @@ Each block declares which style properties it exposes via the [block supports me
 					"h6": {}
 				}
 			},
-            "etc": {}
+			"etc": {}
 		}
 	}
 }
 ```
+
+{% end%}
 
 ### Top-level styles
 
