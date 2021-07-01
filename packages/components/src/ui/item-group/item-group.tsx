@@ -18,7 +18,7 @@ import type { ItemGroupProps } from './types';
 
 const DEFAULT_PROPS = {
 	size: 'medium' as const,
-	isRounded: false,
+	isRounded: true,
 };
 
 function ItemGroup(
