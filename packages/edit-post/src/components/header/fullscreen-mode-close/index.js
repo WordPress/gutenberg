@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -50,10 +51,20 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
+	const effect = {
+		expand: {
+			scale: 1.7,
+			borderRadius: 0,
+			transition: { type: 'tween', duration: '0.2' },
+		},
+		press: { scale: 1.6, opacity: 0.5 },
+	};
+
 	if ( siteIconUrl ) {
 		buttonIcon = (
-			<img
-				alt={ __( 'Site Icon' ) }
+			<motion.img
+				variants={ effect }
+				alt={ __( 'Site Iconnnnn' ) }
 				className="edit-post-fullscreen-mode-close_site-icon"
 				src={ siteIconUrl }
 			/>
@@ -70,19 +81,25 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 	}
 
 	return (
-		<Button
-			className="edit-post-fullscreen-mode-close has-icon"
-			href={
-				href ??
-				addQueryArgs( 'edit.php', {
-					post_type: postType.slug,
-				} )
-			}
-			label={ get( postType, [ 'labels', 'view_items' ], __( 'Back' ) ) }
-			showTooltip={ showTooltip }
-		>
-			{ buttonIcon }
-		</Button>
+		<motion.div whileHover="expand" whileTap="press">
+			<Button
+				className="edit-post-fullscreen-mode-close has-icon"
+				href={
+					href ??
+					addQueryArgs( 'edit.php', {
+						post_type: postType.slug,
+					} )
+				}
+				label={ get(
+					postType,
+					[ 'labels', 'view_items' ],
+					__( 'Back' )
+				) }
+				showTooltip={ showTooltip }
+			>
+				{ buttonIcon }
+			</Button>
+		</motion.div>
 	);
 }
 
