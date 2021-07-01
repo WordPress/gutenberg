@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        willPublishReactNativeBridgeBinary = properties["publishReactNativeBridgeVersion"]?.trim() as boolean
+        willPublishReactNativeBridgeBinary = properties["willPublishReactNativeBridgeBinary"]?.toBoolean() ?: false
     }
     repositories {
         jcenter()
