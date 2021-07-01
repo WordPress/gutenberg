@@ -6,9 +6,18 @@
 	li {
 		display: inline-block;
 		margin: 0;
+	}
 
-		&:not(:last-child)::after {
-			content: "\2192" #{'/*rtl:"\2190"*/'}; // This becomes → for LTR and ← for RTL.
+	.block-editor-block-breadcrumb__separator {
+		fill: currentColor;
+		margin-left: -$grid-unit-05;
+		margin-right: -$grid-unit-05;
+
+		// Flip for RTL.
+		transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the chevron right for LTR and left for RTL.
+
+		&:last-child {
+			display: none;
 		}
 	}
 }
