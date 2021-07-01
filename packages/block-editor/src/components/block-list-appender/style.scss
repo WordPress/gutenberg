@@ -33,7 +33,10 @@
 		margin-left: $grid-unit-10;
 	}
 
-	// Cancel any left margin if the black plus is the only child.
+	// Cancel any left margin if the black plus sits alone in the container.
+	// `first-of-type` is used instead of `first-child` as the element is not always the only
+	// element in the "empty" container. For example the empty navigation block state has a
+	// zero-width placeholder state that is meant to help correctly size the dimensions.
 	&:first-of-type .block-list-appender__toggle {
 		margin-left: 0;
 	}
