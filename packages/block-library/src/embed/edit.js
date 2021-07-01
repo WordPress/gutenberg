@@ -84,7 +84,12 @@ const EmbedEdit = ( props ) => {
 				return { fetching: false, cannotEmbed: false };
 			}
 
-			const embedPreview = getEmbedPreview( attributesUrl );
+			const embedPreview = Platform.select( {
+				web: getEmbedPreview( attributesUrl ),
+				// On the native version, the embed previews are not supported yet,
+				// so we return instead the URL as the preview.
+				native: attributesUrl,
+			} );
 			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
 
 			// The external oEmbed provider does not exist. We got no type info and no html.
@@ -180,15 +185,6 @@ const EmbedEdit = ( props ) => {
 
 	const blockProps = useBlockProps();
 
-	// NOTE: This effect is only required for testing the caption element in the native version,
-	// once the PR is approved this code block should be removed.
-	// Reference: https://github.com/WordPress/gutenberg/pull/32226
-	useEffect( () => {
-		if ( ! url ) {
-			setAttributes( { url: 'http://wordpress.com' } );
-		}
-	}, [] );
-
 	if ( fetching ) {
 		return (
 			<View { ...blockProps }>
@@ -223,11 +219,7 @@ const EmbedEdit = ( props ) => {
 	};
 
 	// No preview, or we can't embed the current URL, or we've clicked the edit button.
-	//const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
-	// NOTE: This change is only required for testing the caption element in the native version,
-	// once the PR is approved this code block should be reverted.
-	// Reference: https://github.com/WordPress/gutenberg/pull/32226
-	const showEmbedPlaceholder = false;
+	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
 
 	if ( showEmbedPlaceholder ) {
 		return (
