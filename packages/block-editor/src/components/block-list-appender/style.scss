@@ -10,26 +10,35 @@
 		max-width: none;
 	}
 
-	// Add a little left margin when used horizontally.
-	// The right margin should be set to auto, so as to not shift layout in flex containers.
-	margin: 0 auto 0 $grid-unit-10;
-
-	// ... unless it's the only child.
-	&:first-child {
-		margin-left: 0;
-	}
-
 	.block-editor-default-block-appender {
 		margin: $grid-unit-10 0;
 	}
 
-	// Animate appearance.
+	// Add an explicit left margin of zero and auto right margin to work in horizontal
+	// flex containers. Without it, a "space-between"-like effect from two auto margins
+	// will cause the black plus to sit in the center of what space is left.
+	margin: 0 auto 0 0;
+
+	// Black square plus appender.
 	.block-list-appender__toggle {
 		padding: 0;
+
+		// Animate appearance.
 		opacity: 1;
 		transform: scale(1);
 		transition: all 0.1s ease;
 		@include reduce-motion("transition");
+
+		// The black square button should have a little left margin in horizontal containers.
+		margin-left: $grid-unit-10;
+	}
+
+	// Cancel any left margin if the black plus sits alone in the container.
+	// `first-of-type` is used instead of `first-child` as the element is not always the only
+	// element in the "empty" container. For example the empty navigation block state has a
+	// zero-width placeholder state that is meant to help correctly size the dimensions.
+	&:first-of-type .block-list-appender__toggle {
+		margin-left: 0;
 	}
 }
 
