@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+
+/**
  * Internal dependencies
  */
 import {
@@ -9,10 +15,23 @@ import {
 import type { Props } from './types';
 import { SpacerView } from './styles';
 
-function Spacer( props: PolymorphicComponentProps< Props, 'div' > ) {
+const DEFAULT_PROPS = {
+	marginBottom: 2,
+};
+
+function Spacer(
+	props: PolymorphicComponentProps< Props, 'div' >,
+	forwardedRef: Ref< any >
+) {
 	const contextProps = useContextSystem( props, 'Spacer' );
 
-	return <SpacerView { ...contextProps } />;
+	return (
+		<SpacerView
+			ref={ forwardedRef }
+			{ ...DEFAULT_PROPS }
+			{ ...contextProps }
+		/>
+	);
 }
 
 /**
