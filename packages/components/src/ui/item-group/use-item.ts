@@ -11,15 +11,13 @@ import { useContextSystem } from '../context';
 // eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../context';
 import { useItemGroupContext } from './context';
+import type { ItemProps } from './types';
 
-export interface Props {
-	action?: boolean;
-	size?: 'small' | 'medium' | 'large';
-}
-
-export function useItem( props: PolymorphicComponentProps< Props, 'div' > ) {
+export function useItem(
+	props: PolymorphicComponentProps< ItemProps, 'div' >
+) {
 	const {
-		action = false,
+		isAction = false,
 		as: asProp,
 		role = 'listitem',
 		size: sizeProp,
@@ -30,14 +28,14 @@ export function useItem( props: PolymorphicComponentProps< Props, 'div' > ) {
 
 	const size = sizeProp || contextSize;
 
-	const as = ( asProp || action ? 'button' : 'div' ) as ElementType;
+	const as = ( asProp || isAction ? 'button' : 'div' ) as ElementType;
 
 	return {
 		as,
 		role,
 		size,
 		spacedAround,
-		action,
+		isAction,
 		...otherProps,
 	};
 }

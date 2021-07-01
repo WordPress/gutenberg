@@ -12,17 +12,17 @@ import COLORS from '../../utils/colors-values';
 import type { ItemGroupProps, ItemProps } from './types';
 import type { ItemGroupContext } from './context';
 
-const renderBordered = ( { bordered = false }: ItemGroupProps ) =>
-	bordered &&
+type ItemGroupViewProps = Required< ItemGroupProps >;
+type ItemViewProps = Required< ItemProps >;
+
+const renderBordered = ( { isBordered }: ItemGroupViewProps ) =>
+	isBordered &&
 	css`
 		border: 1px solid ${ CONFIG.surfaceBorderColor };
 	`;
 
-const renderSeparated = ( {
-	separated = false,
-	bordered = false,
-}: ItemGroupProps ) =>
-	( bordered || separated ) &&
+const renderSeparated = ( { isSeparated, isBordered }: ItemGroupViewProps ) =>
+	( isBordered || isSeparated ) &&
 	css`
 		> *:not( marquee ) {
 			border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
@@ -33,8 +33,8 @@ const renderSeparated = ( {
 		}
 	`;
 
-const renderRounded = ( { rounded = false }: ItemGroupProps ) =>
-	rounded &&
+const renderRounded = ( { isRounded }: ItemGroupViewProps ) =>
+	isRounded &&
 	css`
 		border-radius: ${ borderRadius };
 
@@ -49,7 +49,7 @@ const renderRounded = ( { rounded = false }: ItemGroupProps ) =>
 		}
 	`;
 
-export const ItemGroupView = styled.div< ItemGroupProps >`
+export const ItemGroupView = styled.div< ItemGroupViewProps >`
 	${ renderBordered }
 	${ renderSeparated }
 	${ renderRounded }
@@ -80,10 +80,10 @@ const itemSizes = {
 	`,
 };
 
-const renderSize = ( { size = 'medium' }: ItemProps ) => itemSizes[ size ];
+const renderSize = ( { size }: ItemViewProps ) => itemSizes[ size ];
 
-const renderAction = ( { action = false }: ItemProps ) =>
-	action &&
+const renderAction = ( { isAction }: ItemViewProps ) =>
+	isAction &&
 	css`
 		appearance: none;
 		border: 1px solid transparent;
@@ -111,7 +111,7 @@ const renderSpacedAround = ( { spacedAround }: ItemGroupContext ) =>
 		border-radius: ${ borderRadius };
 	`;
 
-export const ItemView = styled.div< ItemProps & ItemGroupContext >`
+export const ItemView = styled.div< ItemViewProps & ItemGroupContext >`
 	width: 100%;
 	display: block;
 

@@ -1,13 +1,13 @@
 type ItemSize = 'small' | 'medium' | 'large';
 
 export interface ItemGroupProps {
-	bordered?: boolean;
-	rounded?: boolean;
-	separated?: boolean;
+	isBordered?: boolean;
+	isRounded?: boolean;
+	isSeparated?: boolean;
 	size?: ItemSize;
 }
 
 export interface ItemProps {
-	action?: boolean;
+	isAction?: boolean;
 	size?: ItemSize;
 }

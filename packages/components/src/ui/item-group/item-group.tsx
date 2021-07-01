@@ -16,13 +16,18 @@ import { ItemGroupContext, useItemGroupContext } from './context';
 import { ItemGroupView } from './styles';
 import type { ItemGroupProps } from './types';
 
+const DEFAULT_PROPS = {
+	size: 'medium' as const,
+	isRounded: false,
+};
+
 function ItemGroup(
 	props: PolymorphicComponentProps< ItemGroupProps, 'div' >,
 	forwardedRef: Ref< any >
 ) {
 	const {
-		bordered,
-		separated,
+		isBordered = false,
+		isSeparated = false,
 		size: sizeProp,
 		role = 'list',
 		...otherProps
@@ -30,7 +35,7 @@ function ItemGroup(
 
 	const { size: contextSize } = useItemGroupContext();
 
-	const spacedAround = ! bordered && ! separated;
+	const spacedAround = ! isBordered && ! isSeparated;
 	const size = sizeProp || contextSize;
 
 	const contextValue = {
@@ -41,9 +46,10 @@ function ItemGroup(
 	return (
 		<ItemGroupContext.Provider value={ contextValue }>
 			<ItemGroupView
+				{ ...DEFAULT_PROPS }
 				role={ role }
-				bordered={ bordered }
-				separated={ separated }
+				isBordered={ isBordered }
+				isSeparated={ isSeparated }
 				{ ...otherProps }
 				ref={ forwardedRef }
 			/>
