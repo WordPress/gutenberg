@@ -333,10 +333,10 @@ describe( 'Widgets screen', () => {
 		} );
 		await inlineInserterButton.click();
 
-		// TODO: Convert to find() API from puppeteer-testing-library.
-		const inserterSearchBox = await page.waitForSelector(
-			'aria/Search for blocks and patterns[role="searchbox"]'
-		);
+		const inserterSearchBox = await find( {
+			role: 'searchbox',
+			name: 'Search for blocks and patterns',
+		} );
 		await expect( inserterSearchBox ).toHaveFocus();
 
 		await page.keyboard.type( 'Heading' );
