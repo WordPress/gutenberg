@@ -87,11 +87,11 @@ export const singleSide = () => {
 	);
 };
 
-export const verticalHorizontalControls = () => {
+export const axialControls = () => {
 	return <DemoExample splitOnAxis={ true } />;
 };
 
-export const verticalHorizontalControlsWithSingleSide = () => {
+export const axialControlsWithSingleSide = () => {
 	return (
 		<DemoExample
 			sides={ [ 'horizontal' ] }

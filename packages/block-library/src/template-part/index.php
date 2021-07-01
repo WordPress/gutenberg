@@ -73,21 +73,11 @@ function render_block_core_template_part( $attributes ) {
 	}
 
 	if ( isset( $seen_ids[ $template_part_id ] ) ) {
-		if ( ! is_admin() ) {
-			trigger_error(
-				sprintf(
-					// translators: %s are the block attributes.
-					__( 'Could not render Template Part block with the attributes: <code>%s</code>. Block cannot be rendered inside itself.' ),
-					wp_json_encode( $attributes )
-				),
-				E_USER_WARNING
-			);
-		}
-
 		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
 		// is set in `wp_debug_mode()`.
 		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
 			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+
 		return $is_debug ?
 			// translators: Visible only in the front end, this warning takes the place of a faulty block.
 			__( '[block rendering halted]' ) :
