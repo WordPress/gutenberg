@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,38 +9,16 @@ import { useState, useEffect } from '@wordpress/element';
 import BlockTypesList from '../block-types-list';
 import useClipboardBlock from './hooks/use-clipboard-block';
 import { store as blockEditorStore } from '../../store';
-import {
-	requestBlockTypeImpressions,
-	setBlockTypeImpressionCount,
-} from '@wordpress/react-native-bridge';
+import useBlockTypeImpressions from './hooks/use-block-type-impressions';
 
 const NON_BLOCK_CATEGORIES = [ 'reusable' ];
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
-	const [ blockTypeImpressions, setBlockTypeImpressions ] = useState( {} );
 
-	// Request current block impressions from native app
-	useEffect( () => {
-		let isCurrent = true;
-
-		requestBlockTypeImpressions( ( impressions ) => {
-			if ( isCurrent ) {
-				setBlockTypeImpressions( impressions );
-			}
-		} );
-
-		return () => {
-			isCurrent = false;
-		};
-	}, [] );
-
-	const { enableEditorOnboarding, blockTypes } = useSelect(
+	const { blockTypes } = useSelect(
 		( select ) => {
-			const {
-				getInserterItems,
-				getSettings: getBlockEditorSettings,
-			} = select( blockEditorStore );
+			const { getInserterItems } = select( blockEditorStore );
 
 			const allItems = getInserterItems( rootClientId );
 			const blockItems = allItems.filter(
@@ -49,8 +26,6 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 			);
 
 			return {
-				enableEditorOnboarding: getBlockEditorSettings()
-					.editorOnboarding,
 				blockTypes: clipboardBlock
 					? [ clipboardBlock, ...blockItems ]
 					: blockItems,
@@ -58,27 +33,15 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 		},
 		[ rootClientId ]
 	);
-	const items = enableEditorOnboarding
-		? blockTypes.map( ( b ) => ( {
-				...b,
-				isNew: blockTypeImpressions[ b.name ] > 0,
-		  } ) )
-		: blockTypes;
+
+	const {
+		items,
+		decrementBlockTypeImpressionCount,
+	} = useBlockTypeImpressions( blockTypes );
 
 	const handleSelect = ( ...args ) => {
 		const [ { name } ] = args;
-		setBlockTypeImpressions( ( impressions ) => {
-			if ( impressions[ name ] > 0 ) {
-				return {
-					...impressions,
-					[ name ]: impressions[ name ] - 1,
-				};
-			}
-
-			return blockTypeImpressions;
-		} );
-		// Persist updated block impression count for the block
-		setBlockTypeImpressionCount( name, blockTypeImpressions[ name ] - 1 );
+		decrementBlockTypeImpressionCount( name );
 		onSelect( ...args );
 	};
 
