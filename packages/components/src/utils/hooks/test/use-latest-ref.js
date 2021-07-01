@@ -11,15 +11,15 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { usePropRef } from '..';
+import { useLatestRef } from '..';
 
 function getInput() {
 	return screen.getByRole( 'textbox' );
 }
 
-describe( 'usePropRef', () => {
+describe( 'useLatestRef', () => {
 	function Example( { value, onChange } ) {
-		const ref = usePropRef( value );
+		const ref = useLatestRef( value );
 
 		const handleChange = useCallback( () => {
 			onChange( ref.current );
@@ -31,9 +31,13 @@ describe( 'usePropRef', () => {
 	it( 'should maintain the ref when the prop value changes', () => {
 		const { rerender } = render( <Example value="A" /> );
 
-		expect( getInput().value ).toEqual( 'A' );
-
 		rerender( <Example value="B" /> );
+
+		expect( getInput().value ).toEqual( 'A' );
+	} );
+
+	it( 'should keep a handle on the value', () => {
+		render( <Example value="A" /> );
 
 		expect( getInput().value ).toEqual( 'A' );
 	} );
