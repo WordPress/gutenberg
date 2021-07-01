@@ -12,6 +12,8 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 -   [*] Update loading and failed screens for web version of the editor [#32395]
+-   [*] Image block: Add a "featured" banner and ability to set or remove an image as featured. (iOS only) [#31345]
+
 ## 1.55.2
 -   [*] Handle floating keyboard case - Fix issue with the block selector on iPad. [#33089]
 -   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]

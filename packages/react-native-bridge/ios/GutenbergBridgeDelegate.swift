@@ -163,6 +163,10 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaUploadCancelation(for mediaID: Int32)
 
+    /// Tells the delegate that an image block requested for the featured image to be set.
+    ///
+    func gutenbergDidRequestToSetFeaturedImage(for mediaID: Int32)
+
     /// Tells the delegate that the Gutenberg module has finished loading.
     ///
     func gutenbergDidLoad()
