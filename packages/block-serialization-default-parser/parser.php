@@ -300,13 +300,22 @@ class WP_Block_Parser {
 				 */
 				if ( 0 === $stack_depth ) {
 					if ( isset( $leading_html_start ) ) {
-						$this->output[] = (array) $this->freeform(
-							substr(
-								$this->document,
-								$leading_html_start,
-								$start_offset - $leading_html_start
-							)
+						$html_soup = substr(
+							$this->document,
+							$leading_html_start,
+							$start_offset - $leading_html_start
 						);
+
+						if ( trim( $html_soup ) ) {
+
+							$this->output[] = (array) $this->freeform(
+								substr(
+									$this->document,
+									$leading_html_start,
+									$start_offset - $leading_html_start
+								)
+							);
+						}
 					}
 
 					$this->output[] = (array) new WP_Block_Parser_Block( $block_name, $attrs, array(), '', array() );
@@ -492,7 +501,13 @@ class WP_Block_Parser {
 			return;
 		}
 
-		$this->output[] = (array) $this->freeform( substr( $this->document, $this->offset, $length ) );
+		$candidate_freeform = substr( $this->document, $this->offset, $length );
+
+		if ( ! trim( $candidate_freeform ) ) {
+			return;
+		}
+
+		$this->output[] = (array) $this->freeform( $candidate_freeform );
 	}
 
 	/**
