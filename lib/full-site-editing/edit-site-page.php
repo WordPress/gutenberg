@@ -130,6 +130,7 @@ function gutenberg_edit_site_init( $hook ) {
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-edit-site' );
 	wp_enqueue_style( 'wp-format-library' );
+	wp_enqueue_media();
 
 	if (
 		current_theme_supports( 'wp-block-styles' ) ||
