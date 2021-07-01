@@ -43,6 +43,8 @@ export type Props = PopperProps & {
 	elevation?: number;
 	/**
 	 * Max-width for the `Flyout` element.
+	 *
+	 * @default 360
 	 */
 	maxWidth?: CSSProperties[ 'maxWidth' ];
 	/**
@@ -75,7 +77,7 @@ export type Props = PopperProps & {
 };
 
 export type ContentProps = {
-	elevation?: number;
-	maxWidth?: CSSProperties[ 'maxWidth' ];
+	elevation: number;
+	maxWidth: CSSProperties[ 'maxWidth' ];
 	children: React.ReactNode;
 };

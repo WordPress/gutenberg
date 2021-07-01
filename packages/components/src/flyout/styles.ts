@@ -1,19 +1,23 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 // eslint-disable-next-line no-restricted-imports
-import { css } from '@emotion/css';
+import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
  */
-import { CardBody } from '../card';
+import { Card, CardBody } from '../card';
 import * as ZIndex from '../utils/z-index';
 import CONFIG from '../utils/config-values';
 
-export const FlyoutContent = css`
+type FlyoutContentViewProps = {
+	maxWidth: CSSProperties[ 'maxWidth' ];
+};
+
+export const FlyoutContentView = styled.div< FlyoutContentViewProps >`
 	z-index: ${ ZIndex.Flyout };
 	box-sizing: border-box;
 	opacity: 0;
@@ -31,9 +35,11 @@ export const FlyoutContent = css`
 	&::after {
 		display: none;
 	}
+
+	${ ( { maxWidth } ) => css( { maxWidth } ) }
 `;
 
-export const cardStyle = css`
+export const CardView = styled( Card )`
 	${ CardBody.selector } {
 		max-height: 80vh;
 	}

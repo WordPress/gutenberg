@@ -106,4 +106,6 @@ function Flyout( props, forwardedRef ) {
  * }
  * ```
  */
-export default contextConnect( Flyout, 'Flyout' );
+const ConnectedFlyout = contextConnect( Flyout, 'Flyout' );
+
+export default ConnectedFlyout;

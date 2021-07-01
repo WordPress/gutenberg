@@ -7,12 +7,9 @@ import { Popover as ReakitPopover } from 'reakit';
 /**
  * Internal dependencies
  */
-import { Card } from '../../card';
-import { View } from '../../view';
 import { useFlyoutContext } from '../context';
-import * as styles from '../styles';
-import { contextConnect } from '../../ui/context';
-import { useFlyoutContent } from './hook';
+import { FlyoutContentView, CardView } from '../styles';
+import { contextConnect, useContextSystem } from '../../ui/context';
 
 /**
  *
@@ -20,8 +17,9 @@ import { useFlyoutContent } from './hook';
  * @param {import('react').Ref<any>}                                                                     forwardedRef
  */
 function FlyoutContent( props, forwardedRef ) {
-	const { children, elevation, classes, ...otherProps } = useFlyoutContent(
-		props
+	const { children, elevation, ...otherProps } = useContextSystem(
+		props,
+		'FlyoutContent'
 	);
 
 	const { label, flyoutState } = useFlyoutContext();
@@ -35,23 +33,18 @@ function FlyoutContent( props, forwardedRef ) {
 	const showContent = flyoutState.visible || flyoutState.animating;
 
 	return (
-		<ReakitPopover
+		<FlyoutContentView
 			aria-label={ label }
-			as={ View }
-			className={ classes }
+			as={ ReakitPopover }
 			{ ...otherProps }
 			{ ...flyoutState }
 		>
 			{ showContent && (
-				<Card
-					className={ styles.cardStyle }
-					elevation={ elevation }
-					ref={ forwardedRef }
-				>
+				<CardView elevation={ elevation } ref={ forwardedRef }>
 					{ children }
-				</Card>
+				</CardView>
 			) }
-		</ReakitPopover>
+		</FlyoutContentView>
 	);
 }
 
