@@ -87,7 +87,6 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { getBlock } = useSelect( blockEditorStore );
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -109,6 +108,7 @@ export default function Image( {
 	);
 	const {
 		canInsertCover,
+		getBlock,
 		imageEditing,
 		imageSizes,
 		maxWidth,
@@ -116,12 +116,18 @@ export default function Image( {
 	} = useSelect(
 		( select ) => {
 			const {
-				canInsertBlockType,
+				getBlock: _getBlock,
 				getBlockRootClientId,
+				getBlockTransformItems,
 				getSettings,
 			} = select( blockEditorStore );
 
+			const block = _getBlock( clientId );
 			const rootClientId = getBlockRootClientId( clientId );
+			const transformations = getBlockTransformItems(
+				[ block ],
+				rootClientId
+			);
 			const settings = pick( getSettings(), [
 				'imageEditing',
 				'imageSizes',
@@ -131,10 +137,12 @@ export default function Image( {
 
 			return {
 				...settings,
-				canInsertCover: canInsertBlockType(
-					'core/cover',
-					rootClientId
-				),
+				getBlock: _getBlock,
+				canInsertCover:
+					transformations?.length &&
+					!! transformations.find(
+						( { name } ) => name === 'core/cover'
+					),
 			};
 		},
 		[ clientId ]
