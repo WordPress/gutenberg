@@ -152,7 +152,61 @@ WordPress 5.8 will ignore the contents of any `theme.json` whose version is not 
 
 ### Settings
 
+<div class="callout callout-alert">
+The Gutenberg plugin extends the settings available from WordPress 5.8, so they can be used with other WordPress versions and they go through a maturation process before being ported to core.
+
+The tabs below show WordPress 5.8 supported settings and the ones supported by the Gutenberg plugin.
+</div>
+
 The settings section has the following structure:
+
+{% codetabs %}
+{% WordPress %}
+
+```json
+{
+	"version": 1,
+	"settings": {
+		"color": {
+			"custom": true,
+			"customGradient": true,
+			"duotone": [],
+			"gradients": [],
+			"link": false,
+			"palette": []
+		},
+		"custom": {},
+		"layout": {
+			"contentSize": "800px",
+			"wideSize": "1000px"
+		},
+		"spacing": {
+			"customMargin": false,
+			"customPadding": false,
+			"units": [ "px", "em", "rem", "vh", "vw" ]
+		},
+		"typography": {
+			"customFontSize": true,
+			"customLineHeight": false,
+			"dropCap": true,
+			"fontSizes": []
+		},
+		"blocks": {
+			"core/paragraph": {
+				"color": {},
+				"custom": {},
+				"layout": {},
+				"spacing": {},
+				"typography": {}
+			},
+			"core/heading": {},
+			"etc": {}
+		}
+	}
+}
+```
+
+{% Gutenberg %}
 
 ```json
 {
@@ -209,7 +263,7 @@ The settings section has the following structure:
 }
 ```
 
-
+{% end %}
 
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`. The settings declared at the top-level affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and configure all blocks at once.
 
@@ -399,7 +453,6 @@ body {
 .wp-block-group.has-white-border-color { border-color: #444 !important; }
 
 ```
-
 {% end %}
 
 To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
