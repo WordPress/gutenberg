@@ -41,10 +41,6 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 
 const DEFAULT_CONTROL = 'center';
 
-const POPOVER_PROPS = {
-	isAlternate: true,
-};
-
 function BlockAlignmentUI( {
 	value,
 	onChange,
@@ -70,7 +66,6 @@ function BlockAlignmentUI( {
 
 	return (
 		<UIComponent
-			popoverProps={ POPOVER_PROPS }
 			icon={
 				activeAlignmentControl
 					? activeAlignmentControl.icon
