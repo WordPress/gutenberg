@@ -153,6 +153,8 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
+			// Temporary: feature hidden from production. This is just here for testing
+			// purposes and will be replaced with actual logic in a later PR.
 			this.props.createSuccessNotice(
 				'Show Editor Help request received by JS!'
 			);
