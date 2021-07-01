@@ -82,6 +82,45 @@ const hasTextColorSupport = ( blockType ) => {
 	return colorSupport && colorSupport.text !== false;
 };
 
+const hasColorSetsSupport = ( blockType ) => {
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return (
+		colorSupport &&
+		Array.isArray( colorSupport.sets ) &&
+		colorSupport.sets.length
+	);
+};
+
+const getColorSets = ( blockType ) => {
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+	return colorSupport?.sets || [];
+};
+
+const resetDefaultColors = ( { attributes, setAttributes } ) => {
+	const { style } = attributes;
+	const newStyle = immutableSet(
+		{
+			...style,
+			color: {
+				...style?.color,
+				background: undefined,
+				gradient: undefined,
+				text: undefined,
+			},
+		},
+		[ 'elements', 'link', 'color', 'text' ],
+		undefined
+	);
+
+	setAttributes( {
+		backgroundColor: undefined,
+		gradient: undefined,
+		textColor: undefined,
+		style: newStyle,
+	} );
+};
+
 /**
  * Filters registered block settings, extending attributes to include
  * `backgroundColor` and `textColor` attribute.
@@ -141,7 +180,7 @@ export function addSaveProps( props, blockType, attributes ) {
 
 	const hasGradient = hasGradientSupport( blockType );
 
-	// I'd have prefered to avoid the "style" attribute usage here
+	// I'd have preferred to avoid the "style" attribute usage here
 	const { backgroundColor, textColor, gradient, style } = attributes;
 
 	const backgroundClass = getColorClassName(
@@ -173,7 +212,7 @@ export function addSaveProps( props, blockType, attributes ) {
 }
 
 /**
- * Filters registered block settings to extand the block edit wrapper
+ * Filters registered block settings to extend the block edit wrapper
  * to apply the desired styles and classnames properly.
  *
  * @param {Object} settings Original block settings.
@@ -213,6 +252,41 @@ function immutableSet( object, path, value ) {
 }
 
 /**
+ * Checks whether a custom color set has one of its color values set.
+ *
+ * @param {string} colorSetName Name of a custom color set to check.
+ * @return {boolean} Whether or not a custom color set has a value.
+ */
+const hasSetColor = ( colorSetName ) => ( props ) => {
+	const colorSet = props.attributes.style?.color?.sets?.[ colorSetName ];
+
+	return colorSet?.color || colorSet?.background;
+};
+
+/**
+ * Resets a custom color set by setting its corresponding attribute to
+ * undefined.
+ *
+ * @param {string} colorSet Name of color set to clear.
+ */
+const resetColorSet = ( colorSet ) => ( { attributes, setAttributes } ) => {
+	const { style } = attributes;
+
+	setAttributes( {
+		style: {
+			...style,
+			color: {
+				...style?.color,
+				sets: {
+					...style?.color?.sets,
+					[ colorSet ]: undefined,
+				},
+			},
+		},
+	} );
+};
+
+/**
  * Inspector control panel containing the color related configuration
  *
  * @param {Object} props
@@ -220,7 +294,7 @@ function immutableSet( object, path, value ) {
  * @return {WPElement} Color edit element.
  */
 export function ColorEdit( props ) {
-	const { name: blockName, attributes } = props;
+	const { name: blockName, attributes, setAttributes } = props;
 	const isLinkColorEnabled = useSetting( 'color.link' );
 	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
@@ -321,61 +395,171 @@ export function ColorEdit( props ) {
 		props.setAttributes( { style: newStyle } );
 	};
 
+	// Turn on contrast checker for web only since it's not supported on mobile yet.
+	const enableContrastChecking =
+		Platform.OS === 'web' && ! gradient && ! style?.color?.gradient;
+
+	const textColorSettings = hasTextColorSupport( blockName )
+		? [
+				{
+					label: __( 'Text color' ),
+					onColorChange: onChangeColor( 'text' ),
+					colorValue: getColorObjectByAttributeValues(
+						colors,
+						textColor,
+						style?.color?.text
+					).color,
+				},
+		  ]
+		: [];
+
+	const backgroundColorSettings =
+		hasBackground || hasGradient
+			? [
+					{
+						label: __( 'Background color' ),
+						onColorChange: hasBackground
+							? onChangeColor( 'background' )
+							: undefined,
+						colorValue: getColorObjectByAttributeValues(
+							colors,
+							backgroundColor,
+							style?.color?.background
+						).color,
+						gradientValue,
+						onGradientChange: hasGradient
+							? onChangeGradient
+							: undefined,
+					},
+			  ]
+			: [];
+
+	const linkColorSettings =
+		isLinkColorEnabled && hasLinkColorSupport( blockName )
+			? [
+					{
+						label: __( 'Link Color' ),
+						onColorChange: onChangeLinkColor,
+						colorValue: getLinkColorFromAttributeValue(
+							colors,
+							style?.elements?.link?.color?.text
+						),
+						clearable: !! style?.elements?.link?.color?.text,
+					},
+			  ]
+			: [];
+
+	const defaultColorSet = {
+		label: __( 'Default colors' ),
+		hasValue: () => true, // TODO: Update with check if any default colors set.
+		onDeselect: resetDefaultColors, // TODO: Update with reset callback.
+		isShownByDefault: true,
+		checkDefaultContrast: true,
+		colorSettings: [
+			...textColorSettings,
+			...backgroundColorSettings,
+			...linkColorSettings,
+		],
+	};
+
+	const onChangeSetColor = ( colorSet, name ) => ( value ) => {
+		const currentStyle = localAttributes.current?.style;
+
+		const newStyle = {
+			...currentStyle,
+			color: {
+				...currentStyle?.color,
+				sets: {
+					...currentStyle?.color?.sets,
+					[ colorSet ]: {
+						...currentStyle?.color?.sets?.[ colorSet ],
+						[ name ]: value,
+					},
+				},
+			},
+		};
+
+		const newAttributes = { style: cleanEmptyObject( newStyle ) };
+
+		props.setAttributes( newAttributes );
+		localAttributes.current = {
+			...localAttributes.current,
+			...newAttributes,
+		};
+	};
+
+	const customColorSets = hasColorSetsSupport( blockName )
+		? getColorSets( blockName ).map( ( colorSet ) => {
+				const colorSettings = [];
+				const showColor = colorSet.color !== false;
+				const showBackground = colorSet.background !== false;
+				const colorSetValues = style?.color?.sets?.[ colorSet.slug ];
+
+				const contrastSettings = enableContrastChecking &&
+					showColor &&
+					showBackground && {
+						backgroundColor: colorSetValues?.background,
+						textColor: colorSetValues?.color,
+					};
+
+				if ( showColor ) {
+					colorSettings.push( {
+						label: colorSet.colorLabel,
+						onColorChange: onChangeSetColor(
+							colorSet.slug,
+							'color'
+						),
+						colorValue: colorSetValues?.color,
+					} );
+				}
+
+				if ( showBackground ) {
+					colorSettings.push( {
+						label: colorSet.backgroundLabel,
+						onColorChange: onChangeSetColor(
+							colorSet.slug,
+							'background'
+						),
+						colorValue: colorSetValues?.background,
+					} );
+				}
+
+				return {
+					label: colorSet.menuLabel,
+					hasValue: hasSetColor( colorSet.slug ),
+					onDeselect: resetColorSet( colorSet.slug ),
+					colorSettings,
+					contrastSettings,
+				};
+		  } )
+		: [];
+
+	const resetAllColors = () => {
+		const newStyle = immutableSet(
+			{
+				...localAttributes.current.style,
+				color: undefined,
+			},
+			[ 'elements', 'link', 'color', 'text' ],
+			undefined
+		);
+
+		setAttributes( {
+			backgroundColor: undefined,
+			gradient: undefined,
+			textColor: undefined,
+			style: newStyle,
+		} );
+	};
+
 	return (
 		<ColorPanel
-			enableContrastChecking={
-				// Turn on contrast checker for web only since it's not supported on mobile yet.
-				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
-			}
+			enableContrastChecking={ enableContrastChecking }
 			clientId={ props.clientId }
-			settings={ [
-				...( hasTextColorSupport( blockName )
-					? [
-							{
-								label: __( 'Text color' ),
-								onColorChange: onChangeColor( 'text' ),
-								colorValue: getColorObjectByAttributeValues(
-									colors,
-									textColor,
-									style?.color?.text
-								).color,
-							},
-					  ]
-					: [] ),
-				...( hasBackground || hasGradient
-					? [
-							{
-								label: __( 'Background color' ),
-								onColorChange: hasBackground
-									? onChangeColor( 'background' )
-									: undefined,
-								colorValue: getColorObjectByAttributeValues(
-									colors,
-									backgroundColor,
-									style?.color?.background
-								).color,
-								gradientValue,
-								onGradientChange: hasGradient
-									? onChangeGradient
-									: undefined,
-							},
-					  ]
-					: [] ),
-				...( isLinkColorEnabled && hasLinkColorSupport( blockName )
-					? [
-							{
-								label: __( 'Link Color' ),
-								onColorChange: onChangeLinkColor,
-								colorValue: getLinkColorFromAttributeValue(
-									colors,
-									style?.elements?.link?.color?.text
-								),
-								clearable: !! style?.elements?.link?.color
-									?.text,
-							},
-					  ]
-					: [] ),
-			] }
+			colorSets={ [ defaultColorSet, ...customColorSets ] }
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			resetAll={ resetAllColors }
 		/>
 	);
 }
