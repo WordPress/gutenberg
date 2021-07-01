@@ -306,8 +306,7 @@ class WP_Block_Parser {
 							$start_offset - $leading_html_start
 						);
 
-						if ( trim( $html_soup ) ) {
-
+						if ( ! empty( trim( $html_soup ) ) ) {
 							$this->output[] = (array) $this->freeform(
 								substr(
 									$this->document,
@@ -503,7 +502,7 @@ class WP_Block_Parser {
 
 		$candidate_freeform = substr( $this->document, $this->offset, $length );
 
-		if ( ! trim( $candidate_freeform ) ) {
+		if ( empty( trim( $candidate_freeform ) ) ) {
 			return;
 		}
 
