@@ -10,15 +10,17 @@ import type { AnyAction as Action, Reducer } from 'redux';
  */
 export type { Action };
 
+type ConfigFromStore< T > = T extends Store< any, infer R > ? R : never;
+
 //
 // Core functionality
 //
-export type SelectorMap = Record<
-	string,
+export type SelectorMap< TStore extends Store< any, any > > = Record<
+	keyof ConfigFromStore< TStore >[ 'selectors' ],
 	< T = unknown >( ...args: readonly any[] ) => T
 >;
-export type DispatcherMap = Record<
-	string,
+export type DispatcherMap< TStore extends Store< any, any > > = Record<
+	keyof ConfigFromStore< TStore >[ 'actions' ],
 	< T = void >( ...args: readonly any[] ) => T
 >;
 
@@ -40,15 +42,19 @@ export type DispatcherMap = Record<
  *
  */
 export type Subscriber = ( callback: () => void ) => () => void;
-export type Dispatch = ( key: string ) => DispatcherMap;
-export type Select = ( key: string ) => SelectorMap;
+export type Dispatch< TStore extends Store< any, any > > = (
+	store: string | TStore
+) => DispatcherMap< TStore >;
+export type Select< TStore extends Store< any, any > > = (
+	store: string | TStore
+) => SelectorMap< TStore >;
 
 //
 // Stores
 //
 export interface GenericStoreConfig {
-	getActions(): DispatcherMap;
-	getSelectors(): SelectorMap;
+	getActions(): DispatcherMap< any >;
+	getSelectors(): SelectorMap< any >;
 	subscribe: Subscriber;
 }
 
@@ -89,7 +95,11 @@ export interface StoreConfig< S > {
 	persist?: true | Array< keyof S >;
 }
 
-export interface Store< S, A extends Action = Action > {
+export interface Store<
+	S,
+	Config extends StoreConfig< any >,
+	A extends Action = Action
+> {
 	getState(): S;
 	subscribe: Subscriber;
 	dispatch( action: A ): A;
@@ -103,16 +113,16 @@ export type RegisterGenericStore = (
 export type RegisterStore< T = {} > = (
 	key: string,
 	config: StoreConfig< T >
-) => Store< T >;
+) => Store< T, StoreConfig< T > >;
 
 //
 // Registry
 //
 export interface DataRegistry {
-	dispatch: Dispatch;
+	dispatch: Dispatch< any >;
 	registerGenericStore: RegisterGenericStore;
 	registerStore: RegisterStore;
-	select: Select;
+	select: Select< any >;
 	subscribe: Subscriber;
 }
 
@@ -128,11 +138,15 @@ export type RegistryProvider = Provider< DataRegistry >;
 // React Hooks
 //
 export type UseRegister = () => DataRegistry;
-export type UseSelect< T > = (
-	mapSelect: ( s: Select ) => T,
+export type UseSelect< T, TStore extends Store< any, any > > = (
+	mapSelect: ( s: Select< TStore > ) => T,
 	deps?: readonly any[]
 ) => T;
-export type UseDispatch = Dispatch & { (): Dispatch };
+export type UseDispatch<
+	TStore extends Store< any, any >
+> = Dispatch< TStore > & {
+	(): Dispatch< TStore >;
+};
 
 //
 // Plugins
