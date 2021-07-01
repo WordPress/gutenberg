@@ -224,6 +224,9 @@ const EmbedEdit = ( props ) => {
 
 	// No preview, or we can't embed the current URL, or we've clicked the edit button.
 	//const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
+	// NOTE: This change is only required for testing the caption element in the native version,
+	// once the PR is approved this code block should be reverted.
+	// Reference: https://github.com/WordPress/gutenberg/pull/32226
 	const showEmbedPlaceholder = false;
 
 	if ( showEmbedPlaceholder ) {
