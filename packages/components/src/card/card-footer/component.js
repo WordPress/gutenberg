@@ -2,8 +2,8 @@
  * Internal dependencies
  */
 import { contextConnect } from '../../ui/context';
-import { Flex } from '../../flex';
 import { useCardFooter } from './hook';
+import { CardFooterView } from '../styles';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
@@ -12,7 +12,7 @@ import { useCardFooter } from './hook';
 function CardFooter( props, forwardedRef ) {
 	const footerProps = useCardFooter( props );
 
-	return <Flex { ...footerProps } ref={ forwardedRef } />;
+	return <CardFooterView { ...footerProps } ref={ forwardedRef } />;
 }
 
 /**

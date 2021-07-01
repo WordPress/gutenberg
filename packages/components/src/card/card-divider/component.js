@@ -2,8 +2,8 @@
  * Internal dependencies
  */
 import { contextConnect } from '../../ui/context';
-import { Divider } from '../../divider';
 import { useCardDivider } from './hook';
+import { CardDividerView } from '../styles';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr', false>} props
@@ -12,7 +12,7 @@ import { useCardDivider } from './hook';
 function CardDivider( props, forwardedRef ) {
 	const dividerProps = useCardDivider( props );
 
-	return <Divider { ...dividerProps } ref={ forwardedRef } />;
+	return <CardDividerView { ...dividerProps } ref={ forwardedRef } />;
 }
 
 /**

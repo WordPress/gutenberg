@@ -2,8 +2,8 @@
  * Internal dependencies
  */
 import { contextConnect } from '../../ui/context';
-import { Flex } from '../../flex';
 import { useCardHeader } from './hook';
+import { CardHeaderView } from '../styles';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
@@ -12,7 +12,7 @@ import { useCardHeader } from './hook';
 function CardHeader( props, forwardedRef ) {
 	const headerProps = useCardHeader( props );
 
-	return <Flex { ...headerProps } ref={ forwardedRef } />;
+	return <CardHeaderView { ...headerProps } ref={ forwardedRef } />;
 }
 
 /**

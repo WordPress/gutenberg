@@ -1,8 +1,20 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../../ui/utils';
+import { contextConnect } from '../../ui/context';
+import { CardMediaView } from '../styles';
 import { useCardMedia } from './hook';
+
+/**
+ *
+ * @param {import('../../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+ * @param {import('react').Ref<any>}                                                                             forwardedRef
+ */
+function CardMedia( props, forwardedRef ) {
+	const contextProps = useCardMedia( props );
+
+	return <CardMediaView ref={ forwardedRef } { ...contextProps } />;
+}
 
 /**
  * `CardMedia` provides a container for media elements within a `Card`.
@@ -21,10 +33,6 @@ import { useCardMedia } from './hook';
  * );
  * ```
  */
-const CardMedia = createComponent( {
-	as: 'div',
-	useHook: useCardMedia,
-	name: 'CardMedia',
-} );
+const ConnectedCardMedia = contextConnect( CardMedia, 'CardMedia' );
 
-export default CardMedia;
+export default ConnectedCardMedia;

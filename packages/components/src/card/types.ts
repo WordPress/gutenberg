@@ -52,7 +52,7 @@ export type Props = SurfaceProps &
 		isElevated?: boolean;
 	};
 
-type BaseSubComponentProps = SizeableProps & {
+export type BaseSubComponentProps = SizeableProps & {
 	/**
 	 * The children elements.
 	 */

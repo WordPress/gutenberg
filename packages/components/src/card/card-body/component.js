@@ -3,8 +3,8 @@
  */
 import { contextConnect } from '../../ui/context';
 import { Scrollable } from '../../scrollable';
-import { View } from '../../view';
 import { useCardBody } from './hook';
+import { CardBodyView } from '../styles';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
@@ -14,10 +14,16 @@ function CardBody( props, forwardedRef ) {
 	const { isScrollable, ...otherProps } = useCardBody( props );
 
 	if ( isScrollable ) {
-		return <Scrollable { ...otherProps } ref={ forwardedRef } />;
+		return (
+			<Scrollable
+				as={ CardBodyView }
+				{ ...otherProps }
+				ref={ forwardedRef }
+			/>
+		);
 	}
 
-	return <View { ...otherProps } ref={ forwardedRef } />;
+	return <CardBodyView { ...otherProps } ref={ forwardedRef } />;
 }
 
 /**
