@@ -19,14 +19,14 @@ export default {
 
 export const _default = () => {
 	const itemGroupProps = {
-		bordered: boolean( 'ItemGroup: bordered', true ),
+		isBordered: boolean( 'ItemGroup: isBordered', true ),
 		size: select(
 			'ItemGroup: size',
 			[ 'small', 'medium', 'large' ],
 			'medium'
 		),
-		separated: boolean( 'ItemGroup: separated', false ),
-		rounded: boolean( 'ItemGroup: rounded', false ),
+		isSeparated: boolean( 'ItemGroup: isSeparated', false ),
+		isRounded: boolean( 'ItemGroup: isRounded', false ),
 	};
 
 	const itemProps = {
@@ -35,7 +35,7 @@ export const _default = () => {
 			[ 'small', 'medium', 'large' ],
 			'medium'
 		),
-		action: boolean( 'Item 1: action', true ),
+		isAction: boolean( 'Item 1: isAction', true ),
 	};
 
 	return (
@@ -43,13 +43,13 @@ export const _default = () => {
 			<Item { ...itemProps } onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
+			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
+			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
+			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
 		</ItemGroup>
@@ -62,16 +62,16 @@ export const dropdown = () => (
 		trigger={ <Button>Open Popover</Button> }
 	>
 		<ItemGroup style={ { padding: 4 } }>
-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
+			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
+			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
+			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
+			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
 		</ItemGroup>
