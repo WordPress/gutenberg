@@ -250,6 +250,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void requestBlockTypeImpressions(BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
                 WritableMap impressions = Arguments.createMap();
+                impressions.putInt("core/paragraph", 3);
                 blockTypeImpressionsCallback.onRequestBlockTypeImpressions(impressions);
             }
 
