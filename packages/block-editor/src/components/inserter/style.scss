@@ -16,6 +16,10 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__content {
+	position: relative;
+}
+
 .block-editor-inserter__popover.is-quick {
 	.components-popover__content {
 		border: none;
