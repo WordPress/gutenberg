@@ -155,6 +155,9 @@
 }
 
 .wp-block-legacy-widget {
+	.components-base-control {
+		width: 100%;
+	}
 	.components-select-control__input {
 		padding: 0;
 		font-family: system-ui;
