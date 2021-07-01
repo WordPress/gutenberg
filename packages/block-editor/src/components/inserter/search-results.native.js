@@ -30,10 +30,9 @@ function InserterSearchResults( {
 		[ rootClientId, filterValue ]
 	);
 
-	const {
-		items,
-		decrementBlockTypeImpressionCount,
-	} = useBlockTypeImpressions( blockTypes );
+	const { items, trackBlockTypeSelected } = useBlockTypeImpressions(
+		blockTypes
+	);
 
 	if ( ! items || items?.length === 0 ) {
 		return <InserterNoResults />;
@@ -41,7 +40,7 @@ function InserterSearchResults( {
 
 	const handleSelect = ( ...args ) => {
 		const [ { name } ] = args;
-		decrementBlockTypeImpressionCount( name );
+		trackBlockTypeSelected( name );
 		onSelect( ...args );
 	};
 

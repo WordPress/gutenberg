@@ -47,22 +47,18 @@ function useBlockTypeImpressions( blockTypes ) {
 		  } ) )
 		: blockTypes;
 
-	const decrementBlockTypeImpressionCount = ( name ) => {
-		setBlockTypeImpressions( ( impressions ) => {
-			if ( impressions[ name ] > 0 ) {
-				return {
-					...impressions,
-					[ name ]: impressions[ name ] - 1,
-				};
-			}
-
-			return blockTypeImpressions;
-		} );
-		// Persist updated block impression count for the block
-		setBlockTypeImpressionCount( name, blockTypeImpressions[ name ] - 1 );
+	const trackBlockTypeSelected = ( name ) => {
+		if ( blockTypeImpressions[ name ] > 0 ) {
+			setBlockTypeImpressions( ( impressions ) => ( {
+				...impressions,
+				[ name ]: 0,
+			} ) );
+			// Persist block type impression count to native app
+			setBlockTypeImpressionCount( name, 0 );
+		}
 	};
 
-	return { items, decrementBlockTypeImpressionCount };
+	return { items, trackBlockTypeSelected };
 }
 
 export default useBlockTypeImpressions;
