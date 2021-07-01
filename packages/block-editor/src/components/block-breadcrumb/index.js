@@ -4,6 +4,7 @@
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { chevronRightSmall, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -14,9 +15,9 @@ import { store as blockEditorStore } from '../../store';
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
  *
- * @param  {Object}   props               Component props.
- * @param  {string}   props.rootLabelText Translated label for the root element of the breadcrumb trail.
- * @return {WPElement}                    Block Breadcrumb.
+ * @param {Object} props               Component props.
+ * @param {string} props.rootLabelText Translated label for the root element of the breadcrumb trail.
+ * @return {WPElement}                 Block Breadcrumb.
  */
 function BlockBreadcrumb( { rootLabelText } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
@@ -65,16 +66,26 @@ function BlockBreadcrumb( { rootLabelText } ) {
 				) }
 				{ ! hasSelection && rootLabel }
 			</li>
+			<Icon
+				icon={ chevronRightSmall }
+				className="block-editor-block-breadcrumb__separator"
+			/>
 			{ parents.map( ( parentClientId ) => (
-				<li key={ parentClientId }>
-					<Button
-						className="block-editor-block-breadcrumb__button"
-						variant="tertiary"
-						onClick={ () => selectBlock( parentClientId ) }
-					>
-						<BlockTitle clientId={ parentClientId } />
-					</Button>
-				</li>
+				<>
+					<li key={ parentClientId }>
+						<Button
+							className="block-editor-block-breadcrumb__button"
+							variant="tertiary"
+							onClick={ () => selectBlock( parentClientId ) }
+						>
+							<BlockTitle clientId={ parentClientId } />
+						</Button>
+					</li>
+					<Icon
+						icon={ chevronRightSmall }
+						className="block-editor-block-breadcrumb__separator"
+					/>
+				</>
 			) ) }
 			{ !! clientId && (
 				<li

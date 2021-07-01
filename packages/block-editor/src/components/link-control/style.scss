@@ -380,10 +380,23 @@ $preview-image-height: 140px;
 	padding: 10px;
 }
 
-.block-editor-link-control__settings {
+.block-editor-link-control__tools {
+	display: flex;
+	align-items: center;
 	border-top: $border-width solid $gray-300;
 	margin: 0;
 	padding: $grid-unit-20 $grid-unit-30;
+}
+
+.block-editor-link-control__unlink {
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+}
+
+.block-editor-link-control__settings {
+	flex: 1;
+	margin: 0;
+
 
 	:last-child {
 		margin-bottom: 0;
