@@ -180,8 +180,14 @@ Create a new user account.
 _Parameters_
 
 -   _username_ `string`: User name.
--   _firstName_ `string?`: First name.
--   _lastName_ `string?`: Larst name.
+-   _object_ `Object?`: Optional Settings for the new user account.
+-   _object.firstName_ `[string]`: First name.
+-   _object.lastName_ `[string]`: Last name.
+-   _object.role_ `[string]`: Role. Defaults to Administrator.
+
+_Returns_
+
+-   `string`: Password for the newly created user account.
 
 <a name="deactivatePlugin" href="#deactivatePlugin">#</a> **deactivatePlugin**
 

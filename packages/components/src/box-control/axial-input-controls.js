@@ -7,7 +7,7 @@ import { Layout } from './styles/box-control-styles';
 
 const groupedSides = [ 'vertical', 'horizontal' ];
 
-export default function VerticalHorizontalInputControls( {
+export default function AxialInputControls( {
 	onChange,
 	onFocus,
 	onHoverOn,

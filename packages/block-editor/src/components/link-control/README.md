@@ -127,6 +127,14 @@ This `suggestion` will then be _automatically_ passed to the `onChange` handler 
 
 As a result of the above, this prop is often used to allow on the fly creation of new entities (eg: `Posts`, `Pages`) based on the text the user has entered into the link search UI. As an example, the Navigation Block uses `createSuggestion` to create Pages on the fly from within the Block itself.
 
+### onRemove
+
+-   Type: `Function`
+-   Required: No
+-   Default: null
+
+An optional handler, which when passed will trigger the display of an `Unlink` UI within the control. This handler is expected to remove the current `value` of the control thus resetting it back to a default state. The key use case for this is allowing users to remove a link from the control without relying on there being an "unlink" control in the block toolbar.
+
 #### Search `suggestion` values
 
 A `suggestion` should have the following shape:
