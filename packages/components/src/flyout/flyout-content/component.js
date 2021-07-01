@@ -1,10 +1,4 @@
 /**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
-import { Popover as ReakitPopover } from 'reakit';
-
-/**
  * Internal dependencies
  */
 import { useFlyoutContext } from '../context';
@@ -13,11 +7,11 @@ import { contextConnect, useContextSystem } from '../../ui/context';
 
 /**
  *
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').ContentProps, 'div'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').ContentProps, 'div', false>} props
  * @param {import('react').Ref<any>}                                                                     forwardedRef
  */
 function FlyoutContent( props, forwardedRef ) {
-	const { children, elevation, ...otherProps } = useContextSystem(
+	const { children, elevation, maxWidth, style = {}, ...otherProps } = useContextSystem(
 		props,
 		'FlyoutContent'
 	);
@@ -35,7 +29,10 @@ function FlyoutContent( props, forwardedRef ) {
 	return (
 		<FlyoutContentView
 			aria-label={ label }
-			as={ ReakitPopover }
+			// maxWidth is applied via inline styles in order to avoid the `React does
+			// not recognize the maxWidth prop on a DOM element` error that comes from
+			// passing `maxWidth` as a prop to `FlyoutContentView`
+			style={{maxWidth, ...style}}
 			{ ...otherProps }
 			{ ...flyoutState }
 		>

@@ -2,9 +2,8 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
 // eslint-disable-next-line no-restricted-imports
-import type { CSSProperties } from 'react';
+import { Popover as ReakitPopover } from 'reakit';
 
 /**
  * Internal dependencies
@@ -13,11 +12,7 @@ import { Card, CardBody } from '../card';
 import * as ZIndex from '../utils/z-index';
 import CONFIG from '../utils/config-values';
 
-type FlyoutContentViewProps = {
-	maxWidth: CSSProperties[ 'maxWidth' ];
-};
-
-export const FlyoutContentView = styled.div< FlyoutContentViewProps >`
+export const FlyoutContentView = styled(ReakitPopover)`
 	z-index: ${ ZIndex.Flyout };
 	box-sizing: border-box;
 	opacity: 0;
@@ -35,8 +30,6 @@ export const FlyoutContentView = styled.div< FlyoutContentViewProps >`
 	&::after {
 		display: none;
 	}
-
-	${ ( { maxWidth } ) => css( { maxWidth } ) }
 `;
 
 export const CardView = styled( Card )`
