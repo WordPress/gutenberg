@@ -72,7 +72,19 @@ const renderHoverActiveFocus = ( {
 	return css( cssObj );
 };
 
-export const ElevationView = styled.div< ElevationViewProps >`
+const DO_NOT_FORWARD = [
+	'value',
+	'offset',
+	'hover',
+	'active',
+	'focus',
+	'borderRadius',
+];
+
+export const ElevationView = styled( 'div', {
+	shouldForwardProp: ( propName ) =>
+		! DO_NOT_FORWARD.includes( propName as string ),
+} )< ElevationViewProps >`
 	background: transparent;
 	display: block;
 	margin: 0 !important;
