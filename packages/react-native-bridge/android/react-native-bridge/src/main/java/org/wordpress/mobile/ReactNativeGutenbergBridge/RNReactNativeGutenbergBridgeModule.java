@@ -164,8 +164,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     public void showEditorHelp() {
-        WritableMap writableMap = new WritableNativeMap();
-        emitToJS(EVENT_NAME_SHOW_EDITOR_HELP, writableMap);
+        emitToJS(EVENT_NAME_SHOW_EDITOR_HELP, null);
     }
 
     @ReactMethod
