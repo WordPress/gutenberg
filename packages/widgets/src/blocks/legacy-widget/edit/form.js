@@ -102,14 +102,20 @@ export default function Form( {
 					</h3>
 				) }
 				<Popover
+					__experimentalCustomProperties
+					shouldAnchorIncludePadding
+					animate={ false }
+					hidden={ ! isVisible }
+					className="wp-block-legacy-widget__popover"
 					focusOnMount={ false }
 					position="middle right"
-					__unstableForceXAlignment
+					__unstableStickyBoundaryElement={
+						ref.current?.ownerDocument.body
+					}
 				>
 					<div
 						ref={ ref }
 						className="wp-block-legacy-widget__edit-form"
-						hidden={ ! isVisible }
 					></div>
 				</Popover>
 			</div>
