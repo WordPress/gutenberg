@@ -103,6 +103,7 @@ export class PostPublishButton extends Component {
 			onToggle,
 			visibility,
 			hasNonPostEntityChanges,
+			isSavingNonPostEntityChanges,
 		} = this.props;
 
 		const isButtonDisabled =
@@ -147,7 +148,9 @@ export class PostPublishButton extends Component {
 		};
 
 		const buttonProps = {
-			'aria-disabled': isButtonDisabled && ! hasNonPostEntityChanges,
+			'aria-disabled':
+				isButtonDisabled &&
+				( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges ),
 			className: 'editor-post-publish-button',
 			isBusy: ! isAutoSaving && isSaving && isPublished,
 			variant: 'primary',
@@ -155,7 +158,9 @@ export class PostPublishButton extends Component {
 		};
 
 		const toggleProps = {
-			'aria-disabled': isToggleDisabled && ! hasNonPostEntityChanges,
+			'aria-disabled':
+				isToggleDisabled &&
+				( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges ),
 			'aria-expanded': isOpen,
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,
@@ -210,6 +215,7 @@ export default compose( [
 			getCurrentPostType,
 			getCurrentPostId,
 			hasNonPostEntityChanges,
+			isSavingNonPostEntityChanges,
 		} = select( editorStore );
 		const _isAutoSaving = isAutosavingPost();
 		return {
@@ -229,6 +235,7 @@ export default compose( [
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
+			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
