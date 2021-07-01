@@ -24,15 +24,15 @@ function FlyoutContent( props, forwardedRef ) {
 		props
 	);
 
-	const { label, popover } = useFlyoutContext();
+	const { label, flyoutState } = useFlyoutContext();
 
-	if ( ! popover ) {
+	if ( ! flyoutState ) {
 		throw new Error(
 			'`FlyoutContent` must only be used inside a `Flyout`.'
 		);
 	}
 
-	const showContent = popover.visible || popover.animating;
+	const showContent = flyoutState.visible || flyoutState.animating;
 
 	return (
 		<ReakitPopover
@@ -40,7 +40,7 @@ function FlyoutContent( props, forwardedRef ) {
 			as={ View }
 			className={ classes }
 			{ ...otherProps }
-			{ ...popover }
+			{ ...flyoutState }
 		>
 			{ showContent && (
 				<Card

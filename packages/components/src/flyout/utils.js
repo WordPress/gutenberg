@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import useResizeAware from 'react-resize-aware';
 
 /**
@@ -9,11 +8,15 @@ import useResizeAware from 'react-resize-aware';
  */
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
-export function useFlyoutResizeUpdater( { onResize = noop } ) {
+/**
+ *
+ * @param { { onResize?: () => any } } onResize
+ */
+export function useFlyoutResizeUpdater( { onResize } ) {
 	const [ resizeListener, sizes ] = useResizeAware();
 
 	useIsomorphicLayoutEffect( () => {
-		onResize();
+		onResize?.();
 	}, [ sizes.width, sizes.height ] );
 
 	return resizeListener;

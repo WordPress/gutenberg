@@ -26,7 +26,7 @@ export function useFlyout( props ) {
 		...otherProps
 	} = useContextSystem( props, 'Flyout' );
 
-	const _popover = usePopoverState( {
+	const _flyoutState = usePopoverState( {
 		animated: animated ? animationDuration : undefined,
 		baseId: baseId || id,
 		placement,
@@ -34,12 +34,12 @@ export function useFlyout( props ) {
 		...otherProps,
 	} );
 
-	const popover = state || _popover;
+	const flyoutState = state || _flyoutState;
 
 	return {
 		...otherProps,
 		elevation,
 		maxWidth,
-		popover,
+		flyoutState,
 	};
 }

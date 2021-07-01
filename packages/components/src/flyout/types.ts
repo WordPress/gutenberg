@@ -12,7 +12,7 @@ import type { CSSProperties, FunctionComponentElement } from 'react';
 import type { PopperProps } from '../utils/types';
 
 export type Context = {
-	popover?: PopoverStateReturn;
+	flyoutState?: PopoverStateReturn;
 	label?: string;
 };
 

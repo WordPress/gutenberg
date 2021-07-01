@@ -32,23 +32,23 @@ function Flyout( props, forwardedRef ) {
 		maxWidth,
 		onVisibleChange,
 		trigger,
-		popover,
+		flyoutState,
 		...otherProps
 	} = useFlyout( props );
 
 	const resizeListener = useFlyoutResizeUpdater( {
-		onResize: popover.unstable_update,
+		onResize: flyoutState.unstable_update,
 	} );
 
-	const uniqueId = `flyout-${ popover.baseId }`;
+	const uniqueId = `flyout-${ flyoutState.baseId }`;
 	const labelId = label || uniqueId;
 
 	const contextProps = useMemo(
 		() => ( {
 			label: labelId,
-			popover,
+			flyoutState,
 		} ),
-		[ labelId, popover ]
+		[ labelId, flyoutState ]
 	);
 
 	const triggerContent = useCallback(
@@ -59,14 +59,14 @@ function Flyout( props, forwardedRef ) {
 	);
 
 	useUpdateEffect( () => {
-		onVisibleChange?.( popover.visible );
-	}, [ popover.visible ] );
+		onVisibleChange?.( flyoutState.visible );
+	}, [ flyoutState.visible ] );
 
 	return (
 		<FlyoutContext.Provider value={ contextProps }>
 			{ trigger && (
 				<PopoverDisclosure
-					{ ...popover }
+					{ ...flyoutState }
 					ref={ trigger.ref }
 					{ ...trigger.props }
 				>
