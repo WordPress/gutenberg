@@ -144,7 +144,7 @@ describe( 'Widgets screen', () => {
 			role: 'group',
 			name: 'Block: Widget Area',
 		} );
-		const [ firstWidgetArea ] = widgetAreas;
+		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
 
 		let addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
 		await addParagraphBlock.hover();
@@ -202,32 +202,17 @@ describe( 'Widgets screen', () => {
 			'[video src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"]'
 		);
 
-		/**
-		 * FIXME: There seems to have a bug when saving the widgets
-		 */
-		// await secondWidgetArea.click();
+		// Add to the second widget area.
+		await secondWidgetArea.click();
 
-		// addParagraphBlock = await getParagraphBlockInGlobalInserter();
-		// await addParagraphBlock.hover();
+		addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
 
-		// // FIXME: The insertion point indicator is not showing when the widget area has no blocks.
-		// // await expectInsertionPointIndicatorToBeBelowLastBlock(
-		// // 	secondWidgetArea
-		// // );
-
-		// await addParagraphBlock.click();
-
-		// const addedParagraphBlockInSecondWidgetArea = await secondWidgetArea.$(
-		// 	'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
-		// );
-
-		// expect(
-		// 	await addedParagraphBlockInSecondWidgetArea.evaluate(
-		// 		( node ) => node === document.activeElement
-		// 	)
-		// ).toBe( true );
-
-		// await page.keyboard.type( 'Third Paragraph' );
+		const addedParagraphBlockInSecondWidgetArea = await secondWidgetArea.$(
+			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		);
+		await addedParagraphBlockInSecondWidgetArea.focus();
+		await page.keyboard.type( 'Third Paragraph' );
 
 		await saveWidgets();
 
@@ -247,6 +232,9 @@ describe( 'Widgets screen', () => {
 		</div></div>
 		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\"><p><div style=\\"width: 580px;\\" class=\\"wp-video\\"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
 		<video class=\\"wp-video-shortcode\\" id=\\"video-0-1\\" width=\\"580\\" height=\\"326\\" preload=\\"metadata\\" controls=\\"controls\\"><source type=\\"video/mp4\\" src=\\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4?_=1\\" /><a href=\\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4\\">http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4</a></video></div></p>
+		</div></div>",
+		  "sidebar-2": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>Third Paragraph</p>
 		</div></div>",
 		}
 	` );
@@ -473,19 +461,19 @@ describe( 'Widgets screen', () => {
 
 			let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-			Object {
-			  "sidebar-1": "<marquee>Howdy</marquee>",
-			}
-		` );
+									Object {
+									  "sidebar-1": "<marquee>Howdy</marquee>",
+									}
+							` );
 
 			await page.reload();
 
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-			Object {
-			  "sidebar-1": "<marquee>Howdy</marquee>",
-			}
-		` );
+									Object {
+									  "sidebar-1": "<marquee>Howdy</marquee>",
+									}
+							` );
 
 			await addMarquee( 2 );
 
@@ -506,10 +494,10 @@ describe( 'Widgets screen', () => {
 			await saveWidgets();
 			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
 			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-			Object {
-			  "sidebar-1": "<marquee>Howdy</marquee>",
-			}
-		` );
+									Object {
+									  "sidebar-1": "<marquee>Howdy</marquee>",
+									}
+							` );
 
 			await page.reload();
 			const marqueesAfter = await findAll( {
