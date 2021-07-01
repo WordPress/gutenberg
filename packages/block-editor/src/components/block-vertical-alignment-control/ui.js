@@ -27,6 +27,10 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
 const DEFAULT_CONTROL = 'top';
 
+const POPOVER_PROPS = {
+	isAlternate: true,
+};
+
 function BlockVerticalAlignmentUI( {
 	value,
 	onChange,
@@ -47,6 +51,7 @@ function BlockVerticalAlignmentUI( {
 
 	return (
 		<UIComponent
+			popoverProps={ POPOVER_PROPS }
 			icon={
 				activeAlignment
 					? activeAlignment.icon
