@@ -378,7 +378,7 @@ function addFreeform( rawLength ) {
 		return;
 	}
 
-	output.push( Freeform( document.substr( offset, length ) ) );
+	output.push( Freeform( candidateFreeform ) );
 }
 
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
