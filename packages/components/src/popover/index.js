@@ -256,7 +256,6 @@ const Popover = (
 		__unstableObserveElement,
 		__unstableBoundaryParent,
 		__unstableForcePosition,
-		__unstableForceXAlignment,
 		__experimentalCustomProperties,
 		/* eslint-enable no-unused-vars */
 		...contentProps
@@ -351,8 +350,7 @@ const Popover = (
 				containerRef.current,
 				relativeOffsetTop,
 				boundaryElement,
-				__unstableForcePosition,
-				__unstableForceXAlignment
+				__unstableForcePosition
 			);
 
 			if (
