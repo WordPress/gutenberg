@@ -55,6 +55,7 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
+import { getRowStyles } from './utils';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -101,8 +102,11 @@ function TableEdit( {
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
 
+	const blockProps = useBlockProps();
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
+
+	const isStripedStyle = blockProps.className.includes( 'is-style-stripes' );
 
 	/**
 	 * Updates the initial column count used for table creation.
@@ -386,7 +390,15 @@ function TableEdit( {
 	const renderedSections = [ 'head', 'body', 'foot' ].map( ( name ) => (
 		<TSection name={ name } key={ name }>
 			{ attributes[ name ].map( ( { cells }, rowIndex ) => (
-				<tr key={ rowIndex }>
+				<tr
+					key={ rowIndex }
+					style={ getRowStyles(
+						name,
+						attributes,
+						rowIndex,
+						isStripedStyle
+					) }
+				>
 					{ cells.map(
 						(
 							{ content, tag: CellTag, scope, align },
@@ -425,7 +437,7 @@ function TableEdit( {
 	const isEmpty = ! sections.length;
 
 	return (
-		<figure { ...useBlockProps() }>
+		<figure { ...blockProps }>
 			{ ! isEmpty && (
 				<>
 					<BlockControls group="block">

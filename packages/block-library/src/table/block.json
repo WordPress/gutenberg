@@ -127,7 +127,27 @@
 		"align": true,
 		"color": {
 			"__experimentalSkipSerialization": true,
-			"gradients": true
+			"gradients": true,
+			"sets": [
+				{
+					"slug": "header",
+					"menuLabel": "Header colors",
+					"colorLabel": "Header color",
+					"backgroundLabel": "Header background color"
+				},
+				{
+					"slug": "secondary",
+					"menuLabel": "Striped colors",
+					"colorLabel": "Striped color",
+					"backgroundLabel": "Striped background color"
+				},
+				{
+					"slug": "footer",
+					"menuLabel": "Footer colors",
+					"colorLabel": "Footer color",
+					"backgroundLabel": "Footer background color"
+				}
+			]
 		},
 		"__experimentalBorder": {
 			"__experimentalSkipSerialization": true,

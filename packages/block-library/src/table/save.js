@@ -13,6 +13,11 @@ import {
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { getRowStyles } from './utils';
+
 export default function save( { attributes } ) {
 	const { hasFixedLayout, head, body, foot, caption } = attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
@@ -20,6 +25,9 @@ export default function save( { attributes } ) {
 	if ( isEmpty ) {
 		return null;
 	}
+
+	const blockProps = useBlockProps.save();
+	const isStripedStyle = blockProps.className.includes( 'is-style-stripes' );
 
 	const colorProps = getColorClassesAndStyles( attributes );
 	const borderProps = getBorderClassesAndStyles( attributes );
@@ -40,7 +48,15 @@ export default function save( { attributes } ) {
 		return (
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) => (
-					<tr key={ rowIndex }>
+					<tr
+						key={ rowIndex }
+						style={ getRowStyles(
+							type,
+							attributes,
+							rowIndex,
+							isStripedStyle
+						) }
+					>
 						{ cells.map(
 							( { content, tag, scope, align }, cellIndex ) => {
 								const cellClasses = classnames( {
@@ -72,7 +88,7 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<figure { ...useBlockProps.save() }>
+		<figure { ...blockProps }>
 			<table
 				className={ classes === '' ? undefined : classes }
 				style={ { ...colorProps.style, ...borderProps.style } }
