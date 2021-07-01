@@ -84,12 +84,7 @@ const EmbedEdit = ( props ) => {
 				return { fetching: false, cannotEmbed: false };
 			}
 
-			const embedPreview = Platform.select( {
-				web: getEmbedPreview( attributesUrl ),
-				// On the native version, the embed previews are not supported yet,
-				// so we return instead the URL as the preview.
-				native: attributesUrl,
-			} );
+			const embedPreview = getEmbedPreview( attributesUrl );
 			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
 
 			// The external oEmbed provider does not exist. We got no type info and no html.
