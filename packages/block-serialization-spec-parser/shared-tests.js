@@ -223,6 +223,22 @@ export const jsTester = ( parse ) => () => {
 				] )
 			) );
 
+		test( 'should ignore HTML soup that is empty whitespace', () =>
+			[
+				`<!-- wp:archives /-->
+				<!-- wp:categories /-->
+				`,
+			].forEach( ( input ) =>
+				expect( parse( input ) ).toEqual( [
+					expect.objectContaining( {
+						blockName: 'core/archives',
+					} ),
+					expect.objectContaining( {
+						blockName: 'core/categories',
+					} ),
+				] )
+			) );
+
 		test( 'should grab HTML soup after blocks', () =>
 			[
 				'<!-- wp:block /--><p>Break me</p>',

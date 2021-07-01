@@ -206,10 +206,11 @@ function proceed() {
 						leadingHtmlStart,
 						startOffset - leadingHtmlStart
 					);
+
 					// If there is some non-whitespace content between
 					// blocks then create a freeform block to contain it.
 					// Otherwise ignore as whitespace.
-					if ( htmlSoup.trim() ) {
+					if ( htmlSoup?.trim()?.length ) {
 						output.push(
 							Freeform(
 								document.substr(
@@ -221,6 +222,7 @@ function proceed() {
 					}
 				}
 				output.push( Block( blockName, attrs, [], '', [] ) );
+
 				offset = startOffset + tokenLength;
 				return true;
 			}
@@ -367,6 +369,12 @@ function addFreeform( rawLength ) {
 	const length = rawLength ? rawLength : document.length - offset;
 
 	if ( 0 === length ) {
+		return;
+	}
+
+	const candidateFreeform = document.substr( offset, length );
+
+	if ( ! candidateFreeform?.trim()?.length ) {
 		return;
 	}
 
