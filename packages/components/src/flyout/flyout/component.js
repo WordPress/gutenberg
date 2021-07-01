@@ -95,7 +95,7 @@ function Flyout( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Button, __experimentalFlyout as Flyout, View, Text } from '@wordpress/components';
+ * import { Button, __experimentalFlyout as Flyout, __experimentalText as } from '@wordpress/components';
  *
  * function Example() {
  * 	return (
