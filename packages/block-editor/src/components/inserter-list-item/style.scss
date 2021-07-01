@@ -31,8 +31,13 @@
 
 	&:not(:disabled) {
 		&:hover {
+			background: var(--wp-admin-theme-color);
 			border-color: var(--wp-admin-theme-color);
-			color: var(--wp-admin-theme-color) !important;
+			color: $white !important;
+
+			svg {
+				color: $white;
+			}
 		}
 
 		&.is-active {
