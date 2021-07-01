@@ -1,12 +1,6 @@
 # Global Settings & Styles (theme.json)
 
-<div class="callout callout-alert">
-These features are still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-
-Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. Please share your feedback in the weekly #core-editor or #fse-outreach-experiment channels in Slack, or async in GitHub issues.
-</div>
-
-This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
+WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/) to configure the editor that enables a finer-grained control and introduces the first step in managing styles for future WordPress releases: the `theme.json` file. This page documents its format.
 
 - Rationale
     - Settings for the block editor
@@ -152,7 +146,9 @@ This specification is the same for the three different origins that use this for
 
 ### Version
 
-This field describes the format of the `theme.json` file and it's used to detect different versions and migrate them to the latest format.
+This field describes the format of the `theme.json` file. The current and only version is 1.
+
+WordPress 5.8 will ignore the contents of any `theme.json` whose version is not equals to the current. Should the Gutenberg plugin need it, it'll update the version and will add the corresponding migration mechanisms from older versions.
 
 ### Settings
 
