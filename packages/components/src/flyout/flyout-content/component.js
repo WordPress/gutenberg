@@ -11,10 +11,13 @@ import { contextConnect, useContextSystem } from '../../ui/context';
  * @param {import('react').Ref<any>}                                                                     forwardedRef
  */
 function FlyoutContent( props, forwardedRef ) {
-	const { children, elevation, maxWidth, style = {}, ...otherProps } = useContextSystem(
-		props,
-		'FlyoutContent'
-	);
+	const {
+		children,
+		elevation,
+		maxWidth,
+		style = {},
+		...otherProps
+	} = useContextSystem( props, 'FlyoutContent' );
 
 	const { label, flyoutState } = useFlyoutContext();
 
@@ -32,7 +35,7 @@ function FlyoutContent( props, forwardedRef ) {
 			// maxWidth is applied via inline styles in order to avoid the `React does
 			// not recognize the maxWidth prop on a DOM element` error that comes from
 			// passing `maxWidth` as a prop to `FlyoutContentView`
-			style={{maxWidth, ...style}}
+			style={ { maxWidth, ...style } }
 			{ ...otherProps }
 			{ ...flyoutState }
 		>

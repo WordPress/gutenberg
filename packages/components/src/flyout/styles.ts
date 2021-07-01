@@ -12,7 +12,7 @@ import { Card, CardBody } from '../card';
 import * as ZIndex from '../utils/z-index';
 import CONFIG from '../utils/config-values';
 
-export const FlyoutContentView = styled(ReakitPopover)`
+export const FlyoutContentView = styled( ReakitPopover )`
 	z-index: ${ ZIndex.Flyout };
 	box-sizing: border-box;
 	opacity: 0;
