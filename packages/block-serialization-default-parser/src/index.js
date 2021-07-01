@@ -202,14 +202,23 @@ function proceed() {
 			// in the top-level of the document
 			if ( 0 === stackDepth ) {
 				if ( null !== leadingHtmlStart ) {
-					output.push(
-						Freeform(
-							document.substr(
-								leadingHtmlStart,
-								startOffset - leadingHtmlStart
-							)
-						)
+					const htmlSoup = document.substr(
+						leadingHtmlStart,
+						startOffset - leadingHtmlStart
 					);
+					// If there is some non-whitespace content between
+					// blocks then create a freeform block to contain it.
+					// Otherwise ignore as whitespace.
+					if ( htmlSoup.trim() ) {
+						output.push(
+							Freeform(
+								document.substr(
+									leadingHtmlStart,
+									startOffset - leadingHtmlStart
+								)
+							)
+						);
+					}
 				}
 				output.push( Block( blockName, attrs, [], '', [] ) );
 				offset = startOffset + tokenLength;
