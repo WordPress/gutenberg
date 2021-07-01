@@ -826,6 +826,10 @@ h3 {
 
 ### customTemplates
 
+<div class="callout callout-alert">
+This field is only allowed when the Gutenberg plugin is active. In WordPress 5.8 will be ignored.
+</div>
+
 Within this field themes can list the custom templates present in the `block-templates` folder. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
 
 - name: mandatory.
@@ -850,6 +854,10 @@ Within this field themes can list the custom templates present in the `block-tem
 ```
 
 ### templateParts
+
+<div class="callout callout-alert">
+This field is only allowed when the Gutenberg plugin is active. In WordPress 5.8 will be ignored.
+</div>
 
 Within this field themes can list the template parts present in the `block-template-parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare the area term for the template part entity which is responsible for rendering the corresponding block variation (Header block, Footer block, etc.) in the editor. Defining this area term in the json will allow the setting to persist across all uses of that template part entity, as opposed to a block attribute that would only affect one block. Defining area as a block attribute is not recommended as this is only used 'behind the scenes' to aid in bridging the gap between placeholder flows and entity creation.
 
