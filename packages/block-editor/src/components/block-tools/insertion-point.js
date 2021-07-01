@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -79,7 +80,7 @@ function InsertionPointPopover( {
 	}, [] );
 	const previousElement = useBlockElement( previousClientId );
 	const nextElement = useBlockElement( nextClientId );
-
+	const isVertical = orientation === 'vertical';
 	const style = useMemo( () => {
 		if ( ! previousElement && ! nextElement ) {
 			return {};
@@ -92,7 +93,7 @@ function InsertionPointPopover( {
 			? nextElement.getBoundingClientRect()
 			: null;
 
-		if ( orientation === 'vertical' ) {
+		if ( isVertical ) {
 			return {
 				width: previousElement
 					? previousElement.offsetWidth
@@ -133,7 +134,7 @@ function InsertionPointPopover( {
 			? nextElement.getBoundingClientRect()
 			: null;
 
-		if ( orientation === 'vertical' ) {
+		if ( isVertical ) {
 			if ( isRTL() ) {
 				return {
 					top: previousRect ? previousRect.bottom : nextRect.top,
@@ -198,6 +199,51 @@ function InsertionPointPopover( {
 	const showInsertionPointInserter =
 		previousElement && nextElement && isInserterShown;
 
+	// Define animation variants for the line element.
+	// @todo address rtl
+	const lineVariants = {
+		// Initial position starts from the center and invisible.
+		start: {
+			...( isVertical && { height: 0 } ),
+			...( ! isVertical && { width: 0 } ),
+			...( isVertical && { left: '50%' } ),
+			...( isVertical && { right: '50%' } ),
+			...( isVertical && { y: 0 } ),
+			...( ! isVertical && { top: '50%' } ),
+			...( ! isVertical && { bottom: '50%' } ),
+			...( ! isVertical && { x: 0 } ),
+			opacity: 0,
+		},
+		// The line expands to fill the container. If the inserter is visible it
+		// is delayed so it appears orchestrated.
+		rest: {
+			...( isVertical && { height: 4 } ),
+			...( ! isVertical && { width: 4 } ),
+			...( isVertical && { left: 0 } ),
+			...( isVertical && { right: 0 } ),
+			...( ! isVertical && { top: 0 } ),
+			...( ! isVertical && { bottom: 0 } ),
+			opacity: 1,
+			...( isVertical && { y: -2 } ),
+			...( ! isVertical && { x: -2 } ),
+			borderRadius: '2px',
+			transition: { delay: showInsertionPointInserter ? 0.4 : 0 },
+		},
+		hover: {
+			...( isVertical && { height: 4 } ),
+			...( ! isVertical && { width: 4 } ),
+			...( isVertical && { left: 0 } ),
+			...( isVertical && { right: 0 } ),
+			...( ! isVertical && { top: 0 } ),
+			...( ! isVertical && { bottom: 0 } ),
+			opacity: 1,
+			...( isVertical && { y: -2 } ),
+			...( ! isVertical && { x: -2 } ),
+			borderRadius: '2px',
+			transition: { delay: 0.4 },
+		},
+	};
+
 	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the
 	// bubbling focus event from the Inserter, due to the
@@ -217,7 +263,13 @@ function InsertionPointPopover( {
 			// otherwise render in place (not in the the default popover slot).
 			__unstableSlotName={ __unstablePopoverSlot || null }
 		>
-			<div
+			<motion.div
+				layout
+				initial="start"
+				animate="rest"
+				whileHover="hover"
+				whileTap="pressed"
+				exit="start"
 				ref={ ref }
 				tabIndex={ -1 }
 				onClick={ onClick }
@@ -227,9 +279,17 @@ function InsertionPointPopover( {
 				} ) }
 				style={ style }
 			>
-				<div className="block-editor-block-list__insertion-point-indicator" />
+				<motion.div
+					variants={ lineVariants }
+					className="block-editor-block-list__insertion-point-indicator"
+				/>
 				{ showInsertionPointInserter && (
-					<div
+					<motion.div
+						initial={ { scale: 0 } }
+						animate={ { scale: 1 } }
+						whileHover={ { scale: 1.12 } }
+						whileTap={ { scale: 0.9 } }
+						transition={ { delay: 0.2 } }
 						className={ classnames(
 							'block-editor-block-list__insertion-point-inserter'
 						) }
@@ -246,9 +306,9 @@ function InsertionPointPopover( {
 								openRef.current = false;
 							} }
 						/>
-					</div>
+					</motion.div>
 				) }
-			</div>
+			</motion.div>
 		</Popover>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
