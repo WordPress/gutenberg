@@ -78,21 +78,10 @@ function render_block_core_template_part( $attributes ) {
 		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
 			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 
-		if ( $is_debug ) {
-			if ( ! is_admin() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-				trigger_error(
-					sprintf(
-						// translators: %s are the block attributes.
-						__( 'Could not render Template Part block with the attributes: <code>%s</code>. Block cannot be rendered inside itself.' ),
-						wp_json_encode( $attributes )
-					),
-					E_USER_WARNING
-				);
-			}
+		return $is_debug ?
 			// translators: Visible only in the front end, this warning takes the place of a faulty block.
-			return __( '[block rendering halted]' );
-		}
-		return;
+			__( '[block rendering halted]' ) :
+			'';
 	}
 
 	// Run through the actions that are typically taken on the_content.

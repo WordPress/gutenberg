@@ -28,21 +28,10 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
 			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 
-		if ( $is_debug ) {
-			if ( ! is_admin() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-				trigger_error(
-					sprintf(
-						// translators: %s is a post ID (integer).
-						__( 'Could not render Post Content block with post ID: <code>%s</code>. Block cannot be rendered inside itself.' ),
-						$post_id
-					),
-					E_USER_WARNING
-				);
-			}
+		return $is_debug ?
 			// translators: Visible only in the front end, this warning takes the place of a faulty block.
-			return __( '[block rendering halted]' );
-		}
-		return;
+			__( '[block rendering halted]' ) :
+			'';
 	}
 
 	$seen_ids[ $post_id ] = true;
