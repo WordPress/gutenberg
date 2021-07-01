@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+
+/**
  * Internal dependencies
  */
 import {
@@ -19,11 +25,15 @@ const DEFAULT_PROPS: ElevationViewProps = {
 	borderRadius: 'inherit',
 };
 
-function Elevation( props: PolymorphicComponentProps< Props, 'div', false > ) {
+function Elevation(
+	props: PolymorphicComponentProps< Props, 'div', false >,
+	forwardedRef: Ref< any >
+) {
 	const contextProps = useContextSystem( props, 'Elevation' );
 
 	return (
 		<ElevationView
+			ref={ forwardedRef }
 			{ ...DEFAULT_PROPS }
 			{ ...contextProps }
 			aria-hidden="true"

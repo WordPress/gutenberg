@@ -79,6 +79,7 @@ const DO_NOT_FORWARD = [
 	'active',
 	'focus',
 	'borderRadius',
+	'isInteractive',
 ];
 
 export const ElevationView = styled( 'div', {
