@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { find, kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,11 +70,36 @@ function addSaveProps( props, blockType, attributes ) {
 
 	// Use TokenList to dedupe classes.
 	const classes = new TokenList( props.className );
-	classes.add( `has-${ attributes?.fontFamily }-font-family` );
+	classes.add( `has-${ kebabCase( attributes?.fontFamily ) }-font-family` );
 	const newClassName = classes.value;
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
+}
+
+/**
+ * Filters registered block settings to expand the block edit wrapper
+ * by applying the desired styles and classnames.
+ *
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
+ */
+function addEditProps( settings ) {
+	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
+		return settings;
+	}
+
+	const existingGetEditWrapperProps = settings.getEditWrapperProps;
+	settings.getEditWrapperProps = ( attributes ) => {
+		let props = {};
+		if ( existingGetEditWrapperProps ) {
+			props = existingGetEditWrapperProps( attributes );
+		}
+		return addSaveProps( props, settings, attributes );
+	};
+
+	return settings;
 }
 
 export function FontFamilyEdit( {
@@ -129,7 +154,7 @@ export function useIsFontFamilyDisabled( { name } ) {
 
 addFilter(
 	'blocks.registerBlockType',
-	'core/font/addAttribute',
+	'core/fontFamily/addAttribute',
 	addAttributes
 );
 
@@ -137,4 +162,10 @@ addFilter(
 	'blocks.getSaveContent.extraProps',
 	'core/fontFamily/addSaveProps',
 	addSaveProps
+);
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/fontFamily/addEditProps',
+	addEditProps
 );
