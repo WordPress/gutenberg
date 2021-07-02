@@ -105,17 +105,22 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	}
 
 	if ( $has_font_family_support ) {
-		$has_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
-		if ( $has_font_family ) {
+		$has_named_font_family  = array_key_exists( 'fontFamily', $block_attributes );
+		$has_custom_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
+
+		if ( $has_named_font_family ) {
+			$classes[] = sprintf( 'has-%s-font-family', $block_attributes['fontFamily'] );
+		} elseif ( $has_custom_font_family ) {
 			$font_family = $block_attributes['style']['typography']['fontFamily'];
-			if ( strpos( $font_family, 'var:preset|font-family' ) !== false ) {
-				// Get the name from the string and add proper styles.
+			if ( strpos( $font_family, 'var:preset|font-family' ) !== false ) { // Legacy.
 				$index_to_splice  = strrpos( $font_family, '|' ) + 1;
 				$font_family_name = substr( $font_family, $index_to_splice );
-				$styles[]         = sprintf( 'font-family: var(--wp--preset--font-family--%s);', $font_family_name );
+				$styles[]         = sprintf( 'font-family: var(--wp--preset--font-family--%s) !important;', $font_family_name );
 			} else {
-				$styles[] = sprintf( 'font-family: %s;', $block_attributes['style']['typography']['fontFamily'] );
+				$styles[] = sprintf( 'font-family: %s;', $font_family );
 			}
+		} elseif ( isset( $block_attributes['fontFamily'] ) ) { // Current attribute style.
+			$styles[] = sprintf( 'font-family: %s;', $block_attributes['fontFamily'] );
 		}
 	}
 
