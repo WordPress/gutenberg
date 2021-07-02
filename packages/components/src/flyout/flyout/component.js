@@ -21,8 +21,8 @@ import { useFlyout } from './hook';
 
 /**
  *
- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
- * @param {import('react').Ref<any>}                                                              forwardedRef
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div', false>} props
+ * @param {import('react').Ref<any>}                                                                     forwardedRef
  */
 function Flyout( props, forwardedRef ) {
 	const {
