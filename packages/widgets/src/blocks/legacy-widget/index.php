@@ -48,8 +48,8 @@ function render_block_core_legacy_widget( $attributes ) {
 	}
 
 	$args = array(
-			'widget_id'   => $widget_object->id,
-			'widget_name' => $widget_object->name
+		'widget_id'   => $widget_object->id,
+		'widget_name' => $widget_object->name,
 	);
 
 	ob_start();
