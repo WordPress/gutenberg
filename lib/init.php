@@ -199,7 +199,7 @@ add_filter( 'rest_index', 'register_site_icon_url' );
  * @return WP_REST_Response
  */
 function register_site_logo_to_rest_index( $response ) {
-	$site_logo_id                = get_theme_mod( 'custom_logo' );
+	$site_logo_id                = get_option( 'site_logo' );
 	$response->data['site_logo'] = $site_logo_id;
 	if ( $site_logo_id ) {
 		$response->add_link(
