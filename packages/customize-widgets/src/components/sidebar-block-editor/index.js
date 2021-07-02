@@ -120,7 +120,9 @@ export default function SidebarBlockEditor( {
 						<BlockSelectionClearer>
 							<WritingFlow>
 								<ObserveTyping>
-									<BlockList renderAppender={ BlockAppender } />
+									<BlockList
+										renderAppender={ BlockAppender }
+									/>
 								</ObserveTyping>
 							</WritingFlow>
 						</BlockSelectionClearer>
