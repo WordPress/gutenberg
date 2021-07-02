@@ -33,7 +33,7 @@ function useBlockTypeImpressions( blockTypes ) {
 		  } ) )
 		: blockTypes;
 
-	const trackBlockTypeSelected = ( name ) => {
+	const trackBlockTypeSelected = ( { name } ) => {
 		if ( blockTypeImpressions[ name ] > 0 ) {
 			// Persist block type impression to JavaScript store
 			updateSettings( {

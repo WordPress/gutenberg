@@ -39,8 +39,7 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	);
 
 	const handleSelect = ( ...args ) => {
-		const [ { name } ] = args;
-		trackBlockTypeSelected( name );
+		trackBlockTypeSelected( ...args );
 		onSelect( ...args );
 	};
 
