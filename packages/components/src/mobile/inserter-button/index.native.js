@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import styles from './style.scss';
+import Badge from '../badge';
 
 class MenuItem extends Component {
 	constructor() {
@@ -53,13 +54,6 @@ class MenuItem extends Component {
 			styles.clipboardBlock,
 			styles.clipboardBlockDark
 		);
-		const newBadgeStyle = [
-			styles.newBadge,
-			getStylesFromColorScheme(
-				styles.newBadgeLight,
-				styles.newBadgeDark
-			),
-		];
 
 		const isClipboardBlock = item.id === 'clipboard';
 		const blockTitle = isClipboardBlock ? __( 'Copied block' ) : item.title;
@@ -87,16 +81,20 @@ class MenuItem extends Component {
 							isClipboardBlock && clipboardBlockStyles,
 						] }
 					>
-						{ item.isNew && (
-							<Text style={ newBadgeStyle }>New</Text>
-						) }
-						<View style={ modalIconStyle }>
-							<Icon
-								icon={ item.icon.src || item.icon }
-								fill={ modalIconStyle.fill }
-								size={ modalIconStyle.width }
-							/>
-						</View>
+						<Badge
+							label={ __( 'New' ) }
+							position={ { top: 4, left: 4 } }
+							show={ item.isNew }
+							size="small"
+						>
+							<View style={ modalIconStyle }>
+								<Icon
+									icon={ item.icon.src || item.icon }
+									fill={ modalIconStyle.fill }
+									size={ modalIconStyle.width }
+								/>
+							</View>
+						</Badge>
 					</View>
 					<Text numberOfLines={ 3 } style={ modalItemLabelStyle }>
 						{ blockTitle }
