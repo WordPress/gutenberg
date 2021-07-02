@@ -1,102 +1,102 @@
 name: Build Gutenberg Plugin Zip
 
 on:
-  pull_request:
-    paths-ignore:
-    - '**.md'
-  push:
-    branches: [trunk]
-    tags:
-      - 'v*'
-    paths-ignore:
-    - '**.md'
+    pull_request:
+        paths-ignore:
+            - '**.md'
+    push:
+        branches: [trunk]
+        tags:
+            - 'v*'
+        paths-ignore:
+            - '**.md'
 
 jobs:
-  build:
-    name: Build Release Artifact
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+    build:
+        name: Build Release Artifact
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-      - name: Cache node modules
-        uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+            - name: Cache node modules
+              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
+              env:
+                  cache-name: cache-node-modules
+              with:
+                  # npm cache files are stored in `~/.npm` on Linux/macOS
+                  path: ~/.npm
+                  key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-build-${{ env.cache-name }}-
+                      ${{ runner.os }}-build-
+                      ${{ runner.os }}-
 
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
-        with:
-          node-version: 14.x
+            - name: Use Node.js 14.x
+              uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
+              with:
+                  node-version: 14.x
 
-      - name: Build Gutenberg plugin ZIP file
-        run: ./bin/build-plugin-zip.sh
-        env:
-          NO_CHECKS: 'true'
+            - name: Build Gutenberg plugin ZIP file
+              run: ./bin/build-plugin-zip.sh
+              env:
+                  NO_CHECKS: 'true'
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
-        with:
-          name: gutenberg-plugin
-          path: ./gutenberg.zip
+            - name: Upload artifact
+              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              with:
+                  name: gutenberg-plugin
+                  path: ./gutenberg.zip
 
-  create-release:
-    name: Create Release Draft and Attach Asset
-    needs: build
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Set Release Version
-        id: get_release_version
-        run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3 | sed s/^v// | sed 's/-rc./ RC/' )
+    create-release:
+        name: Create Release Draft and Attach Asset
+        needs: build
+        runs-on: ubuntu-latest
+        if: startsWith(github.ref, 'refs/tags/v')
+        steps:
+            - name: Set Release Version
+              id: get_release_version
+              run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3 | sed s/^v// | sed 's/-rc./ RC/' )
 
-      - name: Download Plugin Zip Artifact
-        uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
-        with:
-          name: gutenberg-plugin
+            - name: Download Plugin Zip Artifact
+              uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
+              with:
+                  name: gutenberg-plugin
 
-      - name: Extract Changelog for Release
-        run: |
-          unzip gutenberg.zip changelog.txt
-          CHANGELOG_REGEX="/=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s=/"
-          awk -i inplace "$CHANGELOG_REGEX"'{p++;next} p==2{exit} p>=1' changelog.txt
+            - name: Extract Changelog for Release
+              run: |
+                  unzip gutenberg.zip changelog.txt
+                  CHANGELOG_REGEX="/=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s=/"
+                  awk -i inplace "$CHANGELOG_REGEX"'{p++;next} p==2{exit} p>=1' changelog.txt
 
-      - name: Create Release Draft
-        id: create_release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ steps.get_release_version.outputs.version }}
-          draft: true
-          prerelease: ${{ contains(github.ref, 'rc') }}
-          body_path: changelog.txt
+            - name: Create Release Draft
+              id: create_release
+              uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ github.ref }}
+                  release_name: ${{ steps.get_release_version.outputs.version }}
+                  draft: true
+                  prerelease: ${{ contains(github.ref, 'rc') }}
+                  body_path: changelog.txt
 
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gutenberg.zip
-          asset_name: gutenberg.zip
-          asset_content_type: application/zip
+            - name: Upload Release Asset
+              id: upload-release-asset
+              uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  upload_url: ${{ steps.create_release.outputs.upload_url }}
+                  asset_path: ./gutenberg.zip
+                  asset_name: gutenberg.zip
+                  asset_content_type: application/zip
 
-      - name: Publish Release
-        run: |
-          curl \
-            --request PATCH \
-            --url https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }} \
-            --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
-            --header "Accept: application/vnd.github.v3+json" \
-            --data-raw '{"draft":false}'
+            - name: Publish Release
+              run: |
+                  curl \
+                    --request PATCH \
+                    --url https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.id }} \
+                    --header 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' \
+                    --header "Accept: application/vnd.github.v3+json" \
+                    --data-raw '{"draft":false}'
