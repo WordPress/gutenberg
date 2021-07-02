@@ -1,12 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import {
-	requestBlockTypeImpressions,
-	setBlockTypeImpressionCount,
-} from '@wordpress/react-native-bridge';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { setBlockTypeImpressionCount } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -14,31 +10,21 @@ import {
 import { store as blockEditorStore } from '../../../store';
 
 function useBlockTypeImpressions( blockTypes ) {
-	const [ blockTypeImpressions, setBlockTypeImpressions ] = useState( {} );
-	const { enableEditorOnboarding } = useSelect( ( select ) => {
-		const { getSettings: getBlockEditorSettings } = select(
-			blockEditorStore
-		);
+	const { blockTypeImpressions, enableEditorOnboarding } = useSelect(
+		( select ) => {
+			const { getSettings: getBlockEditorSettings } = select(
+				blockEditorStore
+			);
+			const { editorOnboarding, impressions } = getBlockEditorSettings();
 
-		return {
-			enableEditorOnboarding: getBlockEditorSettings().editorOnboarding,
-		};
-	}, [] );
-
-	// Request current block impressions from native app
-	useEffect( () => {
-		let isCurrent = true;
-
-		requestBlockTypeImpressions( ( impressions ) => {
-			if ( isCurrent ) {
-				setBlockTypeImpressions( impressions );
-			}
-		} );
-
-		return () => {
-			isCurrent = false;
-		};
-	}, [] );
+			return {
+				blockTypeImpressions: impressions,
+				enableEditorOnboarding: editorOnboarding,
+			};
+		},
+		[]
+	);
+	const { updateSettings } = useDispatch( blockEditorStore );
 
 	const items = enableEditorOnboarding
 		? blockTypes.map( ( b ) => ( {
@@ -49,11 +35,12 @@ function useBlockTypeImpressions( blockTypes ) {
 
 	const trackBlockTypeSelected = ( name ) => {
 		if ( blockTypeImpressions[ name ] > 0 ) {
-			setBlockTypeImpressions( ( impressions ) => ( {
-				...impressions,
-				[ name ]: 0,
-			} ) );
-			// Persist block type impression count to native app
+			// Persist block type impression to JavaScript store
+			updateSettings( {
+				impressions: { ...blockTypeImpressions, [ name ]: 0 },
+			} );
+
+			// Persist block type impression count to native app store
 			setBlockTypeImpressionCount( name, 0 );
 		}
 	};
