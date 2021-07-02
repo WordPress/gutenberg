@@ -53,6 +53,7 @@ const EmbedEdit = ( props ) => {
 		setAttributes,
 		insertBlocksAfter,
 		onFocus,
+		clientId,
 	} = props;
 
 	const defaultEmbedInfo = {
@@ -214,6 +215,7 @@ const EmbedEdit = ( props ) => {
 
 	// No preview, or we can't embed the current URL, or we've clicked the edit button.
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
+
 	if ( showEmbedPlaceholder ) {
 		return (
 			<View { ...blockProps }>
@@ -279,6 +281,7 @@ const EmbedEdit = ( props ) => {
 					icon={ icon }
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
+					clientId={ clientId }
 				/>
 			</View>
 		</>
