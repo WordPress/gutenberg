@@ -7,7 +7,8 @@ import type { RefObject } from 'react';
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
 /**
  * Creates a reference for a prop. This is useful for preserving dependency
@@ -44,7 +45,7 @@ import { useLayoutEffect, useRef } from '@wordpress/element';
 export function useLatestRef< T >( value: T ): RefObject< T > {
 	const ref = useRef( value );
 
-	useLayoutEffect( () => {
+	useIsomorphicLayoutEffect( () => {
 		ref.current = value;
 	} );
 
