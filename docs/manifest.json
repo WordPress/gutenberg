@@ -876,12 +876,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "FlyoutContent",
-		"slug": "flyout-content",
-		"markdown_source": "../packages/components/src/flyout/flyout-content/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Flyout",
 		"slug": "flyout",
 		"markdown_source": "../packages/components/src/flyout/flyout/README.md",
