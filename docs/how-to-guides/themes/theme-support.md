@@ -391,20 +391,38 @@ Some blocks can have padding controls. This is off by default, and requires the 
 add_theme_support('custom-spacing');
 ```
 
-## Experimental — Link color control
+## Link color control
 
-Using the Gutenberg plugin (version 8.3 or later), link color control is available to a number of blocks including Paragraph, Heading, Group, Columns, and Media & Text blocks. This is off by default, and requires the theme to opt in by declaring support:
+Link support has been made stable as part of WordPress 5.8. It's `false` by default and themes can enable it via the [theme.json file](./theme-json.md):
+
+```json
+{
+	"version": 1,
+	"settings": {
+		"color": {
+			"link": true
+		}
+	}
+}
+```
+
+Alternatively, opt-in via the old legacy support would also work:
 
 ```php
 add_theme_support('experimental-link-color');
 ```
 
- If a theme opts in, it can [define link colors](/docs/how-to-guides/themes/theme-json.md#color-properties) by using the `theme.json`. If the theme doesn't use the `theme.json` it can configure the color of links by settings the value of the `--wp--style--color--link` CSS Custom Property such as:
+When the user sets the link color of a block, a new style will be added in the form of:
 
 ```css
-:root {
-	--wp--style--color--link: <value>;
+.wp-elements-<uuid> a {
+	color: <link-color> !important;
 }
 ```
 
-The framework will take care of enqueing the necessary rules for this to work. Whether or not the theme supports `theme.json` the presets will also be enqueued as CSS Custom Properties, so themes can also use `--wp--style--color-link: var(--wp--preset--color--<color-slug>)`. See [the docs](/docs/how-to-guides/themes/theme-json.md#color-properties) for details.
+where
+
+- `<uuid>` is a random number
+- `<link-color>` is either `var(--wp--preset--color--slug)` (if the user selected a preset value) or a raw color value (if the user selected a custom value)
+
+The block will get attached the class `.wp-elements-<uuid>`.
