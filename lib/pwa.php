@@ -8,13 +8,28 @@
 add_filter(
 	'admin_head',
 	function() {
-		$icon_sizes = array( 32, 180, 192, 270, 512 );
+		$icon_sizes = array( 180, 192, 512 );
 
-		// Ideally we have the WordPress logo as the default app logo in the sizes
-		// below.
-		$icons = array();
+		$icons = array(
+			array(
+				'src'   => 'https://s1.wp.com/i/favicons/apple-touch-icon-180x180.png',
+				'sizes' => '180x180',
+				'type'  => 'image/png',
+			),
+			// Android/Chrome.
+			array(
+				'src'   => 'https://wordpress.com/calypso/images/manifest/icon-192x192.png',
+				'sizes' => '192x192',
+				'type'  => 'image/png',
+			),
+			array(
+				'src'   => 'https://wordpress.com/calypso/images/manifest/icon-512x512.png',
+				'sizes' => '512x512',
+				'type'  => 'image/png',
+			),
+		);
 
-		if ( has_site_icon() ) {
+		if ( false ) {
 			$type = wp_check_filetype( get_site_icon_url() );
 
 			foreach ( $icon_sizes as $size ) {
@@ -26,30 +41,28 @@ add_filter(
 			}
 		}
 
-		$manifest = wp_json_encode(
+		$manifest = array(
+			'name'        => get_bloginfo( 'name' ),
+			// 'icons'       => $icons,
+			'display'     => 'standalone',
+			'orientation' => 'portrait',
+			'start_url'   => admin_url(),
+			// Open front-end, login page, and any external URLs in a browser modal.
+			'scope'       => admin_url(),
+		);
+
+		$script      = file_get_contents( __DIR__ . '/pwa-load.js' );
+		$script_vars = wp_json_encode(
 			array(
-				'name'        => get_bloginfo( 'name' ),
-				'icons'       => $icons,
-				'display'     => 'standalone',
-				'orientation' => 'portrait',
-				'start_url'   => admin_url(),
-				// Open front-end, login page, and any external URLs in a browser modal.
-				'scope'       => admin_url(),
+				// Must be at the admin root so the scope is correct. Move to the
+				// wp-admin folder when merging with core.
+				'serviceWorkerUrl' => admin_url( '?service-worker' ),
+				'logo'             => file_get_contents( ABSPATH . 'wp-admin/images/wordpress-logo-white.svg' ),
+				'manifest'         => $manifest,
 			)
 		);
 
-		// Must be at the admin root so the scope is correct. Move to the
-		// wp-admin folder when merging with core.
-		$service_worker_url = admin_url( '?service-worker' );
-
-		echo '<link rel="manifest" href=\'data:application/manifest+json,' . $manifest . '\'>';
-		echo '<script>
-			if( "serviceWorker" in window.navigator ) {
-				window.addEventListener( "load", function() {
-					window.navigator.serviceWorker.register( "' . $service_worker_url . '" );
-				} );
-			}
-		</script>';
+		echo "<script>( function( scriptVars ) { $script } )( $script_vars );</script>";
 	}
 );
 
