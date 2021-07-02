@@ -32,6 +32,7 @@
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",

@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { keyBy, omit } from 'lodash';
+import { keyBy, omit, trim } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { serialize } from '@wordpress/blocks';
+import { getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -200,6 +201,7 @@ export function computeCustomizedAttribute(
  * @param {number}  blockAttributes.id            the ID of the entity optionally associated with the block's link (eg: the Post ID).
  * @param {string}  blockAttributes.kind          the family of objects originally represented, such as 'post-type' or 'taxonomy'.
  * @param {boolean} blockAttributes.opensInNewTab whether or not the block's link should open in a new tab.
+ * @param {Object}  blockAttributes.colors        text and background colors
  * @return {Object} the menu item (converted from block attributes).
  */
 export const blockAttributesToMenuItem = ( {
@@ -213,6 +215,7 @@ export const blockAttributesToMenuItem = ( {
 	id,
 	kind,
 	opensInNewTab,
+	colors,
 } ) => {
 	// For historical reasons, the `core/navigation-link` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
@@ -220,6 +223,19 @@ export const blockAttributesToMenuItem = ( {
 	// See also inverse equivalent in `menuItemToBlockAttributes`.
 	if ( type && type === 'tag' ) {
 		type = 'post_tag';
+	}
+
+	// Add color attributes to classes
+	const classes = className?.length ? className?.trim().split( ' ' ) : [];
+	if ( colors?.textColor ) {
+		classes.push( 'has-text-color' );
+		classes.push( getColorClassName( 'color', colors.textColor ) );
+	}
+	if ( colors?.backgroundColor ) {
+		classes.push( 'has-background' );
+		classes.push(
+			getColorClassName( 'background-color', colors.backgroundColor )
+		);
 	}
 
 	return {
@@ -231,9 +247,7 @@ export const blockAttributesToMenuItem = ( {
 		...( rel?.length && {
 			xfn: rel?.trim().split( ' ' ),
 		} ),
-		...( className?.length && {
-			classes: className?.trim().split( ' ' ),
-		} ),
+		...( classes.length && { classes } ),
 		...( blockTitleAttr?.length && {
 			attr_title: blockTitleAttr,
 		} ),
@@ -251,6 +265,62 @@ export const blockAttributesToMenuItem = ( {
 		target: opensInNewTab ? NEW_TAB_TARGET_ATTRIBUTE : '',
 	};
 };
+
+const PREFIX_LEN = 'has-'.length;
+const COLOR_SUFFIX_LEN = '-color'.length;
+const BACKGROUND_SUFFIX_LEN = '-background-color'.length;
+
+/**
+ * @typedef {Object} WPEditNavigationExtractedColors
+ * @property {string?} textColor       Color slug for the text.
+ * @property {string?} backgroundColor Color slug for the background.
+ */
+
+/**
+ * @typedef {Object} WPEditNavigationExtractedClassesAndColors
+ * @property {string?}                          className Classes for the elemnt.
+ * @property {WPEditNavigationExtractedColors?} colors    Colors for the element.
+ */
+
+/**
+ * Parses an array of classes and separates the color related ones:
+ *
+ * @param {string[]} classes Array of classes.
+ * @return {WPEditNavigationExtractedClassesAndColors} Class and color attributes for the block.
+ */
+export function extractColorsFromClasses( classes ) {
+	return classes.reduce( ( memo, className ) => {
+		if (
+			className === 'has-text-color' ||
+			className === 'has-background'
+		) {
+			return memo;
+		} else if (
+			className.startsWith( 'has-' ) &&
+			className.endsWith( '-background-color' )
+		) {
+			memo.colors = memo.colors || {};
+			memo.colors.backgroundColor = className.substring(
+				PREFIX_LEN,
+				className.length - BACKGROUND_SUFFIX_LEN
+			);
+		} else if (
+			className.startsWith( 'has-' ) &&
+			className.endsWith( '-color' )
+		) {
+			memo.colors = memo.colors || {};
+			memo.colors.textColor = className.substring(
+				PREFIX_LEN,
+				className.length - COLOR_SUFFIX_LEN
+			);
+		} else if ( trim( className ).length ) {
+			memo.className = memo.className
+				? memo.className + ' ' + className
+				: className;
+		}
+		return memo;
+	}, {} );
+}
 
 /**
  * Convert block attributes to menu item.
@@ -291,10 +361,7 @@ export const menuItemToBlockAttributes = ( {
 			xfn.join( ' ' ).trim() && {
 				rel: xfn.join( ' ' ).trim(),
 			} ),
-		...( classes?.length &&
-			classes.join( ' ' ).trim() && {
-				className: classes.join( ' ' ).trim(),
-			} ),
+		...( classes?.length && extractColorsFromClasses( classes ) ),
 		...( attr_title?.length && {
 			title: attr_title,
 		} ),
