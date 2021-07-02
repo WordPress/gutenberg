@@ -203,8 +203,8 @@ const EmbedEdit = ( props ) => {
 	};
 
 	const onSubmitNative = ( value ) => {
-		// On native, the URL change is only notified when submitting
-		// so we have to explicitly set the URL.
+		// On native, the URL change is only notified when submitting,
+		// and not via 'onChange', so we have to explicitly set the URL.
 		setURL( value );
 
 		// Replicate the same behavior as onSubmit
