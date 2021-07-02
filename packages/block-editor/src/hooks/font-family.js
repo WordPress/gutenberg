@@ -9,7 +9,6 @@ import { find } from 'lodash';
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
-import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -128,60 +127,6 @@ export function useIsFontFamilyDisabled( { name } ) {
 	);
 }
 
-/**
- * Add inline styles for font families.
- * Ideally, this is not needed and themes load the font-family classes on the
- * editor.
- *
- * @param  {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
- */
-const withFontFamilyInlineStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const fontFamilies = useSetting( 'typography.fontFamilies' );
-		const {
-			name: blockName,
-			attributes: { fontFamily, style },
-			wrapperProps,
-		} = props;
-
-		// Only add inline styles if the block supports font families,
-		// doesn't skip serialization of font families,
-		// doesn't already have an inline font family,
-		// and does have a class to extract the font family from.
-		if (
-			! hasBlockSupport( blockName, FONT_FAMILY_SUPPORT_KEY ) ||
-			hasBlockSupport(
-				blockName,
-				'__experimentalSkipTypographySerialization'
-			) ||
-			! fontFamily ||
-			style?.typography?.fontFamily
-		) {
-			return <BlockListBlock { ...props } />;
-		}
-
-		const fontFamilyValue = find(
-			fontFamilies,
-			( { slug } ) => slug === fontFamily
-		)?.fontFamily;
-
-		const newProps = {
-			...props,
-			wrapperProps: {
-				...wrapperProps,
-				style: {
-					fontFamily: fontFamilyValue,
-					...wrapperProps?.style,
-				},
-			},
-		};
-
-		return <BlockListBlock { ...newProps } />;
-	},
-	'withFontFamilyInlineStyles'
-);
-
 addFilter(
 	'blocks.registerBlockType',
 	'core/font/addAttribute',
@@ -192,10 +137,4 @@ addFilter(
 	'blocks.getSaveContent.extraProps',
 	'core/fontFamily/addSaveProps',
 	addSaveProps
-);
-
-addFilter(
-	'editor.BlockListBlock',
-	'core/font-family/with-font-family-inline-styles',
-	withFontFamilyInlineStyles
 );
