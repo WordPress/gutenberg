@@ -56,7 +56,7 @@ export function subtract( ...args ) {
  *
  * @return {number} The number of decimal places.
  */
-function getPrecision( value ) {
+export function getPrecision( value ) {
 	const split = ( value + '' ).split( '.' );
 	return split[ 1 ] !== undefined ? split[ 1 ].length : 0;
 }

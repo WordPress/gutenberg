@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ENTER } from '@wordpress/keycodes';
 
@@ -22,6 +22,7 @@ import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
 import { useControlledState } from '../utils/hooks';
+import { getNumber, getPrecision } from '../utils/math';
 
 function UnitControl(
 	{
@@ -50,8 +51,16 @@ function UnitControl(
 		initial: initialUnit,
 	} );
 
+	const activeUnit = useMemo(
+		() => units.find( ( option ) => option.value === unit ),
+		[ unit, units ]
+	);
+
 	// Stores parsed value for hand-off in state reducer
 	const refParsedValue = useRef( null );
+
+	// Stores custom step value for hand-off in state reducer
+	const refCustomStep = useRef( null );
 
 	const classes = classnames( 'components-unit-control', className );
 
@@ -131,6 +140,32 @@ function UnitControl(
 	 * @return {Object} The updated state to apply to InputControl
 	 */
 	const unitControlStateReducer = ( state, action ) => {
+		const realValue = action?.payload?.value;
+		if ( realValue ) {
+			const originalStep = props.step ?? activeUnit?.step ?? 1;
+
+			const currentStepPrecision = getPrecision(
+				getNumber( originalStep )
+			);
+			const realValuePrecision = getPrecision( getNumber( realValue ) );
+			const customStepPrecision = getPrecision(
+				getNumber( refCustomStep.current )
+			);
+
+			if (
+				realValuePrecision > 0 &&
+				realValuePrecision > currentStepPrecision &&
+				realValuePrecision > customStepPrecision
+			) {
+				const zeros = '0'.repeat(
+					Math.min( realValuePrecision - 1, 4 )
+				);
+				refCustomStep.current = getNumber( `0.${ zeros }1` );
+			} else if ( realValuePrecision < customStepPrecision ) {
+				refCustomStep.current = null;
+			}
+		}
+
 		/*
 		 * On commits (when pressing ENTER and on blur if
 		 * isPressEnterToChange is true), if a parse has been performed
@@ -165,8 +200,12 @@ function UnitControl(
 	 * try to get step from `units`, or default to a value of `1`
 	 */
 	if ( ! step && units ) {
-		const activeUnit = units.find( ( option ) => option.value === unit );
 		step = activeUnit?.step ?? 1;
+	}
+
+	// If a more specific custom step value is being used, use that instead.
+	if ( refCustomStep.current && refCustomStep.current < step ) {
+		step = refCustomStep.current;
 	}
 
 	return (
