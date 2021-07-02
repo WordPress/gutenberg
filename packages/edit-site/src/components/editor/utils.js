@@ -71,6 +71,7 @@ export const PRESET_METADATA = [
 ];
 
 const STYLE_PROPERTIES_TO_CSS_VAR_INFIX = {
+	linkColor: 'color',
 	backgroundColor: 'color',
 	background: 'gradient',
 };
