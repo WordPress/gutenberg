@@ -156,10 +156,9 @@ export function BlockSettingsDropdown( {
 										</MenuItem>
 									</>
 								) }
-								{ ! isLocked && (
+								{ ! isLocked && ! onlyBlock && (
 									<MenuItem
 										onClick={ flow( onClose, onMoveTo ) }
-										disabled={ onlyBlock }
 									>
 										{ __( 'Move to' ) }
 									</MenuItem>
