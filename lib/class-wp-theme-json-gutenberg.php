@@ -59,6 +59,7 @@ class WP_Theme_JSON_Gutenberg {
 			'background' => null,
 			'gradient'   => null,
 			'text'       => null,
+			'sets'       => null,
 		),
 		'spacing'    => array(
 			'margin'  => array(
@@ -266,6 +267,11 @@ class WP_Theme_JSON_Gutenberg {
 		'text-transform'   => array(
 			'value' => array( 'typography', 'textTransform' ),
 		),
+	);
+
+	const COLOR_SET_METADATA = array(
+		'background-color' => array( 'background' ),
+		'color'            => array( 'text' ),
 	);
 
 	const ELEMENTS = array(
@@ -628,6 +634,23 @@ class WP_Theme_JSON_Gutenberg {
 				$properties[] = array(
 					'name'  => $name,
 					'value' => $metadata['value'],
+				);
+			}
+		}
+
+		// Check for color set or style node that contains custom selector
+		// for targeting inner elements within blocks.
+		if ( isset( $styles['selector'] ) ) {
+			foreach ( self::COLOR_SET_METADATA as $css_property => $value_path ) {
+				$value = self::get_property_value( $styles, $value_path );
+
+				if ( empty( $value ) ) {
+					continue;
+				}
+
+				$declarations[] = array(
+					'name'  => $css_property,
+					'value' => $value,
 				);
 			}
 		}
@@ -1071,6 +1094,21 @@ class WP_Theme_JSON_Gutenberg {
 						'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
 						'selector' => $selectors[ $name ]['elements'][ $element ],
 					);
+				}
+			}
+
+			// Create nodes for custom color sets targeting elements within
+			// the current block type.
+			if ( isset( $theme_json['styles']['blocks'][ $name ]['color']['sets'] ) ) {
+				$color_sets = $theme_json['styles']['blocks'][ $name ]['color']['sets'];
+
+				foreach ( $color_sets as $color_set_name => $color_set ) {
+					if ( isset( $color_set['selector'] ) ) {
+						$nodes[] = array(
+							'path'     => array( 'styles', 'blocks', $name, 'color', 'sets', $color_set_name ),
+							'selector' => $color_set['selector'],
+						);
+					}
 				}
 			}
 		}
