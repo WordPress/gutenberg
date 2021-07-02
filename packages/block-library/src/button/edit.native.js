@@ -35,7 +35,6 @@ import { link } from '@wordpress/icons';
 import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
 import ColorBackground from './color-background';
-import ColorEdit from './color-edit';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
@@ -500,7 +499,6 @@ class ButtonEdit extends Component {
 							</ToolbarGroup>
 						</BlockControls>
 						{ this.getLinkSettings( false ) }
-						<ColorEdit { ...this.props } />
 						<InspectorControls>
 							<PanelBody title={ __( 'Border Settings' ) }>
 								<RangeControl
