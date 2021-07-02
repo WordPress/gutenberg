@@ -35,19 +35,19 @@ const renderProperty = (
 };
 
 export const SpacerView = styled.div< InnerProps >`
+	${ renderProperty( 'margin' ) }
+	${ renderProperty( 'marginY', [ 'marginTop', 'marginBottom' ] ) }
+	${ renderProperty( 'marginX', [ 'marginLeft', 'marginRight' ] ) }
 	${ renderProperty( 'marginTop' ) }
 	${ renderProperty( 'marginBottom' ) }
 	${ renderProperty( 'marginLeft' ) }
 	${ renderProperty( 'marginRight' ) }
-	${ renderProperty( 'marginX', [ 'marginLeft', 'marginRight' ] ) }
-	${ renderProperty( 'marginY', [ 'marginTop', 'marginBottom' ] ) }
-	${ renderProperty( 'margin' ) }
 
+	${ renderProperty( 'padding' ) }
+	${ renderProperty( 'paddingY', [ 'paddingTop', 'paddingBottom' ] ) }
+	${ renderProperty( 'paddingX', [ 'paddingLeft', 'paddingRight' ] ) }
 	${ renderProperty( 'paddingTop' ) }
 	${ renderProperty( 'paddingBottom' ) }
 	${ renderProperty( 'paddingLeft' ) }
 	${ renderProperty( 'paddingRight' ) }
-	${ renderProperty( 'paddingX', [ 'paddingLeft', 'paddingRight' ] ) }
-	${ renderProperty( 'paddingY', [ 'paddingTop', 'paddingBottom' ] ) }
-	${ renderProperty( 'padding' ) }
 `;
