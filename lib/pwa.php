@@ -11,12 +11,9 @@ add_filter(
 		$script      = file_get_contents( __DIR__ . '/pwa-load.js' );
 		$script_vars = wp_json_encode(
 			array(
-				// Must be at the admin root so the scope is correct. Move to the
-				// wp-admin folder when merging with core.
-				'serviceWorkerUrl' => admin_url( '?service-worker' ),
-				'logo'             => file_get_contents( ABSPATH . 'wp-admin/images/wordpress-logo-white.svg' ),
-				'siteTitle'        => get_bloginfo( 'name' ),
-				'adminUrl'         => admin_url(),
+				'logo'      => file_get_contents( ABSPATH . 'wp-admin/images/wordpress-logo-white.svg' ),
+				'siteTitle' => get_bloginfo( 'name' ),
+				'adminUrl'  => admin_url(),
 			)
 		);
 
