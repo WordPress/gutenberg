@@ -55,21 +55,6 @@ public protocol GutenbergBridgeDataSource: class {
     ///
     /// - Returns: Sentry SDK options.
     func getSentryOptions() -> [String: Any]?
-    
-    /// Asks the data source for the current user of Sentry SDK.
-    ///
-    /// - Returns: Sentry user.
-    func getSentryUser() -> [String: Any]?
-    
-    /// Asks the data source for the current Sentry scope and includes it to an event.
-    ///
-    /// - Returns: Event object with attached scope.
-    func attachScopeToSentryEvent(_ event: [String: Any]) -> [String: Any]?
-    
-    /// Asks the data source to know if the app should send Sentry events depending on user preferences.
-    ///
-    /// - Returns: True if Sentry events can be sent.
-    func shouldSendSentryEvent() -> Bool?
 }
 
 public extension GutenbergBridgeDataSource {

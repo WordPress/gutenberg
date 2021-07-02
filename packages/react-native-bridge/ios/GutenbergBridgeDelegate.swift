@@ -233,9 +233,6 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
 
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
-    
-    // Crash logging - Sentry
-    func gutenbergDidLogSentryEnvelope(_ envelope: [String: Any])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
