@@ -92,20 +92,22 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
  * If no location was provided as a block attribute then false is returned.
  *
  * @param  string $location The location of the classic menu to display.
+ * @param  object $attributes The block attributes.
  * @return string|false HTML markup of a generated Navigation Block or false if no location is specified.
  */
-function gutenberg_render_menu_from_location( $location ) {
+function gutenberg_render_menu_from_location( $location, $attributes ) {
 	if ( empty( $location ) ) {
 		return false;
 	}
 
 	return wp_nav_menu(
 		array(
-			'theme_location' => $location,
-			'container'      => '',
-			'items_wrap'     => '%3$s',
-			'fallback_cb'    => false,
-			'echo'           => false,
+			'theme_location'   => $location,
+			'container'        => '',
+			'items_wrap'       => '%3$s',
+			'block_attributes' => $attributes,
+			'fallback_cb'      => false,
+			'echo'             => false,
 		)
 	);
 }
@@ -154,7 +156,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	if ( empty( $block->inner_blocks ) ) {
 		if ( array_key_exists( '__unstableLocation', $attributes ) ) {
 			$location                 = $attributes['__unstableLocation'];
-			$maybe_classic_navigation = gutenberg_render_menu_from_location( $location );
+			$maybe_classic_navigation = gutenberg_render_menu_from_location( $location, $attributes );
 			if ( $maybe_classic_navigation ) {
 				return $maybe_classic_navigation;
 			}
