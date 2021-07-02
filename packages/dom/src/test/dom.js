@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	isEntirelySelected,
 	isHorizontalEdge,
 	placeCaretAtHorizontalEdge,
 	isTextField,
@@ -24,73 +23,6 @@ describe( 'DOM', () => {
 
 	afterEach( () => {
 		parent.remove();
-	} );
-
-	describe( 'isEntirelySelected', () => {
-		describe( 'input', () => {
-			let input;
-
-			beforeEach( () => {
-				input = document.createElement( 'input' );
-				parent.appendChild( input );
-				input.value = 'value';
-				input.focus();
-			} );
-
-			it( 'should return true when the entire content of an input is selected', () => {
-				input.selectionStart = 0;
-				input.selectionEnd = 5;
-				expect( isEntirelySelected( input ) ).toBe( true );
-			} );
-			it( 'should return false when less than the entire content of an input is selected', () => {
-				input.selectionStart = 0;
-				input.selectionEnd = 4;
-				expect( isEntirelySelected( input ) ).toBe( false );
-			} );
-		} );
-
-		it( 'should return true when the entire content of a contenteditable span is selected', () => {
-			const span = document.createElement( 'span' );
-			parent.appendChild( span );
-			span.innerText = 'value';
-			span.contentEditable = true;
-			span.focus();
-			span.selectionStart = 0;
-			span.selectionEnd = 5;
-			expect( isEntirelySelected( span ) ).toBe( true );
-		} );
-
-		describe( 'ul', () => {
-			let ul;
-			let li;
-
-			beforeEach( () => {
-				ul = document.createElement( 'ul' );
-				parent.appendChild( ul );
-				ul.contentEditable = true;
-
-				li = document.createElement( 'li' );
-				ul.appendChild( li );
-				li.innerText = 'value';
-				li.focus();
-			} );
-
-			it( 'should return true when the entire content of a <li> is selected within a contenteditable <ul>', () => {
-				li.selectionStart = 0;
-				li.selectionEnd = 5;
-				expect( isEntirelySelected( ul ) ).toBe( true );
-			} );
-			it( 'should return true when less than the entire content of a <li> is selected within a contenteditable <ul> (1)', () => {
-				li.selectionStart = 0;
-				li.selectionEnd = 2;
-				expect( isEntirelySelected( ul ) ).toBe( false );
-			} );
-			// it( 'should return true when less than the entire content of a <li> is selected within a contenteditable <ul> (2)', () => {
-			// 	li.selectionStart = 1;
-			// 	li.selectionEnd = 5;
-			// 	expect( isEntirelySelected( ul ) ).toBe( false );
-			// } );
-		} );
 	} );
 
 	describe( 'isHorizontalEdge', () => {
