@@ -220,7 +220,7 @@ public class WPAndroidGlueCode {
 
     public interface OnBlockTypeImpressionsEventListener {
         void onSetBlockTypeImpressionCount(String name, Integer count);
-        ReadableMap onRequestBlockTypeImpressions();
+        ReadableMap onRequestBlockTypeImpressions(ReadableArray newBlockTypes);
     }
 
     public void mediaSelectionCancelled() {
@@ -502,8 +502,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestBlockTypeImpressions(BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
-                ReadableMap impressions = mOnBlockTypeImpressionsEventListener.onRequestBlockTypeImpressions();
+            public void requestBlockTypeImpressions(ReadableArray newBlockTypes, BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
+                ReadableMap impressions = mOnBlockTypeImpressionsEventListener.onRequestBlockTypeImpressions(newBlockTypes);
                 blockTypeImpressionsCallback.onRequestBlockTypeImpressions(impressions);
             }
 

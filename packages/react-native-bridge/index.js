@@ -399,11 +399,15 @@ export function requestPreview() {
 /**
  * Request the host app provide the latest block type impression counts.
  *
- * @param {Function} callback Callback invoked with object containing counts for each block type.
+ * @param {Function} callback      Callback invoked with object containing counts for each block type.
+ * @param {Array}    newBlockTypes The block types to consider new.
  * @return {void}
  */
-export function requestBlockTypeImpressions( callback ) {
-	return RNReactNativeGutenbergBridge.requestBlockTypeImpressions( callback );
+export function requestBlockTypeImpressions( callback, newBlockTypes = [] ) {
+	return RNReactNativeGutenbergBridge.requestBlockTypeImpressions(
+		newBlockTypes,
+		callback
+	);
 }
 
 /**

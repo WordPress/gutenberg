@@ -245,8 +245,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print(#function)
     }
 
-    func gutenbergDidRequestBlockTypeImpressions() -> NSDictionary {
-        return ["core/paragraph": 3];
+    func gutenbergDidRequestBlockTypeImpressions(_ newBlockTypes: [String]) -> [String: Int] {
+        return newBlockTypes.reduce(into: [:], { $0[$1] = 3 })
     }
 
     func gutenbergDidRequestSetBlockTypeImpressionCount(_ name: String, count: Int) -> Void {
