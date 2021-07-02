@@ -4,6 +4,7 @@
 import {
 	registerBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
 import { render } from '@wordpress/element';
 import {
@@ -63,6 +64,11 @@ export function initialize( id, settings ) {
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 
+	// As we are unregistering `core/freeform` to avoid the Classic block, we must
+	// replace it with something as the default freeform content handler. Failure to
+	// do this will result in errors in the default block parser.
+	// see: https://github.com/WordPress/gutenberg/issues/33097
+	setFreeformContentHandlerName( 'core/html' );
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
