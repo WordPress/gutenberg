@@ -705,6 +705,10 @@ public class WPAndroidGlueCode {
         }
     }
 
+    public void showEditorHelp() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
+    }
+
     public void setTitle(String title) {
         mTitleInitialized = true;
         mTitle = title;
