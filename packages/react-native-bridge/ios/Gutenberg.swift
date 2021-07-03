@@ -186,9 +186,9 @@ public class Gutenberg: NSObject {
         sendEvent(.updateEditorSettings, body: settingsUpdates)
     }
 
-	public func showEditorHelp() {
-		bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)
-	}
+    public func showEditorHelp() {
+        bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)
+    }
 
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
         var settingsUpdates = [String : Any]()
