@@ -14,30 +14,7 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
  * Creates a reference for a prop. This is useful for preserving dependency
  * memoization for hooks like useCallback.
  *
- * @example
- *               ```js
- *               // Referencing a simple prop, used in a useCallback function.
- *               const valueRef = usePropRef(value)
- *
- *               const increment = useCallback(() => {
- *               const value = valueRef.current
- *               onChange(value + 1)
- *               }, [onChange, valueRef])
- *               ```
- *
- *               ---
- *
- *               Multiple props can be passed in using an `object`.
- *
- * @example
- * ```js
- * const propRefs = usePropRef({ value, step })
- *
- * const increment = useCallback(() => {
- *   const { value, step } = propRefs.current
- *   onChange(value + step)
- * }, [onChange, propRefs])
- * ```
+ * @see https://codesandbox.io/s/uselatestref-mlj3i?file=/src/App.tsx
  *
  * @param  value The value to reference
  * @return The prop reference.
