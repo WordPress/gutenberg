@@ -660,7 +660,7 @@ Each block declares which style properties it exposes via the [block supports me
 }
 ```
 
-{% end%}
+{% end %}
 
 ### Top-level styles
 
