@@ -111,34 +111,52 @@ add_filter( 'theme_mod_custom_logo', '_override_custom_logo_theme_mod' );
 /**
  * Updates the site_logo option when the custom_logo theme-mod gets updated.
  *
- * This function is hooked on "pre_update_option_theme_mods_$theme" and not
- * "pre_set_theme_mod_custom_logo" because by hooking into the theme_mods
- * option the function accounts for remove_theme_mod() as well.
- *
- * The `pre_update_` hook is used so the `site_logo` option will be updated even
- * if the new custom_logo value is the same as the existing one, or the option
- * does not exist yet. In both cases the regular `update_` hook is not called.
- *
- * @param array $value Theme mod settings.
- * @return array
+ * @param  mixed $value Attachment ID of the custom logo or an empty value.
+ * @return mixed
  */
 function _sync_custom_logo_to_site_logo( $value ) {
-	if ( empty( $value['custom_logo'] ) ) {
+	if ( empty( $value ) ) {
 		delete_option( 'site_logo' );
 	} else {
-		update_option( 'site_logo', $value['custom_logo'] );
+		update_option( 'site_logo', $value );
 	}
 
 	return $value;
 }
 
+add_filter( 'pre_set_theme_mod_custom_logo', '_sync_custom_logo_to_site_logo' );
+
 /**
- * Hooks `_sync_custom_logo_to_site_logo` into `pre_update_option_theme_mods_$theme`.
+ * Deletes the site_logo when the custom_logo theme mod is removed.
+ *
+ * @param array $old_value Previous theme mod settings.
+ * @param array $value     Updated theme mod settings.
+ */
+function _delete_site_logo_on_remove_custom_logo( $old_value, $value ) {
+	// If the custom_logo is being unset, it's being removed from theme mods.
+	if ( isset( $old_value['custom_logo'] ) && ! isset( $value['custom_logo'] ) ) {
+		delete_option( 'site_logo' );
+	}
+}
+
+/**
+ * Deletes the site logo when all theme mods are being removed.
+ */
+function _delete_site_logo_on_remove_theme_mods() {
+	if ( false !== get_theme_support( 'custom-logo' ) ) {
+		delete_option( 'site_logo' );
+	}
+}
+
+/**
+ * Hooks `_delete_site_logo_on_remove_custom_logo` in `update_option_theme_mods_$theme`.
+ * Hooks `_delete_site_logo_on_remove_theme_mods` in `delete_option_theme_mods_$theme`.
  *
  * Runs on `setup_theme` to account for dynamically-switched themes in the Customizer.
  */
-function _sync_custom_logo_to_site_logo_on_setup_theme() {
+function _delete_site_logo_on_remove_custom_logo_on_setup_theme() {
 	$theme = get_option( 'stylesheet' );
-	add_filter( "pre_update_option_theme_mods_$theme", '_sync_custom_logo_to_site_logo', 10 );
+	add_action( "update_option_theme_mods_$theme", '_delete_site_logo_on_remove_custom_logo', 10, 2 );
+	add_action( "delete_option_theme_mods_$theme", '_delete_site_logo_on_remove_theme_mods', 10, 0 );
 }
-add_action( 'setup_theme', '_sync_custom_logo_to_site_logo_on_setup_theme', 11 );
+add_action( 'setup_theme', '_delete_site_logo_on_remove_custom_logo_on_setup_theme', 11 );
