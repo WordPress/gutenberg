@@ -1,0 +1,16 @@
+{
+	"apiVersion": 2,
+	"name": "core/i18n",
+	"title": "i18n",
+	"category": "text",
+	"description": "Pass strings to PHP for i18n.",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "default",
+	"attributes": {
+		"text": {
+			"type": "string"
+		}
+	}
+}
