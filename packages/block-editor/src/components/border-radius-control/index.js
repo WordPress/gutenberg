@@ -29,6 +29,11 @@ const DEFAULT_VALUES = {
 	bottomRight: null,
 };
 const MIN_BORDER_RADIUS_VALUE = 0;
+const MAX_BORDER_RADIUS_VALUES = {
+	px: 100,
+	em: 20,
+	rem: 20,
+};
 
 /**
  * Control to display border radius options.
@@ -46,7 +51,9 @@ export default function BorderRadiusControl( { onChange, values } ) {
 
 	const units = useCustomUnits( { availableUnits: [ 'px', 'em', 'rem' ] } );
 	const unit = getAllUnit( values );
-	const step = unit === 'px' ? 1 : 0.25;
+	const unitConfig = units.find( ( item ) => item.value === unit );
+	const step = unitConfig?.step || 1;
+
 	const [ allValue ] = parseUnit( getAllValue( values ) );
 
 	const toggleLinked = () => setIsLinked( ! isLinked );
@@ -68,12 +75,12 @@ export default function BorderRadiusControl( { onChange, values } ) {
 							onChange={ onChange }
 							unit={ unit }
 							units={ units }
-							step={ step }
 						/>
 						<RangeControl
 							className="components-border-radius-control__range-control"
 							value={ allValue }
 							min={ MIN_BORDER_RADIUS_VALUE }
+							max={ MAX_BORDER_RADIUS_VALUES[ unit ] }
 							initialPosition={ 0 }
 							withInputField={ false }
 							onChange={ handleSliderChange }
