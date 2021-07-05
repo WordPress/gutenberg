@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, isNumber } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __experimentalParseUnit as parseUnit } from '@wordpress/components';
@@ -73,16 +68,7 @@ export function getAllValue( values = {} ) {
 		: '';
 	const unit = mode( allUnits );
 
-	/**
-	 * The isNumber check is important. On reset actions, the incoming value
-	 * may be null or an empty string.
-	 *
-	 * Also, the value may also be zero (0), which is considered a valid unit value.
-	 *
-	 * isNumber() is more specific for these cases, rather than relying on a
-	 * simple truthy check.
-	 */
-	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
+	const allValue = value === 0 || value ? `${ value }${ unit }` : null;
 
 	return allValue;
 }
@@ -107,9 +93,20 @@ export function isValuesMixed( values = {} ) {
  * @return {boolean}      Whether values are mixed.
  */
 export function isValuesDefined( values ) {
-	return (
-		values !== undefined &&
-		( typeof values === 'string' ||
-			! isEmpty( Object.values( values ).filter( Boolean ) ) )
-	);
+	if ( ! values ) {
+		return false;
+	}
+
+	// A string value represents a shorthand value.
+	if ( typeof values === 'string' ) {
+		return true;
+	}
+
+	// An object represents longhand border radius values, if any are set
+	// flag values as being defined.
+	const filteredValues = Object.values( values ).filter( ( value ) => {
+		return !! value || value === 0;
+	} );
+
+	return !! filteredValues.length;
 }
