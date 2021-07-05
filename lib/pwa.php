@@ -8,16 +8,13 @@
 add_filter(
 	'admin_head',
 	function() {
-		$script      = file_get_contents( __DIR__ . '/pwa-load.js' );
-		$script_vars = wp_json_encode(
-			array(
-				'logo'      => file_get_contents( ABSPATH . 'wp-admin/images/wordpress-logo-white.svg' ),
-				'siteTitle' => get_bloginfo( 'name' ),
-				'adminUrl'  => admin_url(),
-			)
+		$l10n = array(
+			'logo'      => file_get_contents( ABSPATH . 'wp-admin/images/wordpress-logo-white.svg' ),
+			'siteTitle' => get_bloginfo( 'name' ),
+			'adminUrl'  => admin_url(),
 		);
-
-		echo "<script>( function( scriptVars ) { $script } )( $script_vars );</script>";
+		wp_enqueue_script( 'wp-admin-manifest' );
+		wp_localize_script( 'wp-admin-manifest', 'wpAdminManifestL10n', $l10n );
 	}
 );
 

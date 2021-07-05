@@ -1,5 +1,3 @@
-/* global scriptVars */
-
 function addManifest( manifest ) {
 	const link = document.createElement( 'link' );
 	link.rel = 'manifest';
@@ -88,13 +86,13 @@ function createIcon( { svgElement, size, color, backgroundColor, circle } ) {
 	} );
 }
 
-if ( ! ( 'serviceWorker' in window.navigator ) ) {
-	return;
-}
-
 // eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener( 'load', () => {
-	const { logo, siteTitle, adminUrl } = scriptVars;
+	if ( ! ( 'serviceWorker' in window.navigator ) ) {
+		return;
+	}
+
+	const { logo, siteTitle, adminUrl } = window.wpAdminManifestL10n;
 	const manifest = {
 		// Replace spaces with non breaking spaces. Chrome collapses them.
 		name: siteTitle.replace( / /g, ' ' ),
