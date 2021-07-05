@@ -99,10 +99,6 @@ exports[`Multi-block selection should multi-select from within the list block 1`
 <p>1</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p>2</p>
-<!-- /wp:paragraph -->
-
 <!-- wp:list -->
 <ul><li>1</li></ul>
 <!-- /wp:list -->"
