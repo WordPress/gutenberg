@@ -22,7 +22,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 			// or it will grow to an unexpected large height in Safari if it's hidden initially.
 			if ( isLoaded ) {
 				function setHeight() {
-					iframe.style.height = `${ iframe.contentDocument.documentElement.offsetHeight }px`;
+					iframe.style.height = `${ iframe.contentDocument.body.offsetHeight }px`;
 				}
 
 				const {
@@ -94,7 +94,13 @@ export default function Preview( { idBase, instance, isVisible } ) {
 								instance,
 							},
 						} ) }
-						onLoad={ () => setIsLoaded( true ) }
+						onLoad={ ( event ) => {
+							// To hide the scrollbars of the preview frame,
+							// it can't be scrolled anyway.
+							event.target.contentDocument.body.style.overflow =
+								'hidden';
+							setIsLoaded( true );
+						} }
 						height={ 100 }
 					/>
 				</Disabled>
