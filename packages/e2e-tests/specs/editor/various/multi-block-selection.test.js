@@ -633,11 +633,6 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'Enter' );
-		// Add a list
-		await page.keyboard.type( '/list' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '1' );
 
 		// Confirm correct setup: two columns with two paragraphs in the first.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -659,5 +654,28 @@ describe( 'Multi-block selection', () => {
 
 		// Expect both columns to be deleted.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should multi-select from within the list block', async () => {
+		await clickBlockAppender();
+		// Select a paragraph.
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'Enter' );
+		// Add a list
+		await page.keyboard.type( '/list' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+
+		// Confirm correct setup: two columns with two paragraphs in the first.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		await page.waitForSelector(
+			'[data-type="core/paragraph"].is-multi-selected'
+		);
 	} );
 } );
