@@ -807,7 +807,7 @@ export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} Whether non-post entities is being saved.
+ * @return {boolean} Whether non-post entities are being saved.
  */
 export const isSavingNonPostEntityChanges = createRegistrySelector(
 	( select ) => ( state ) => {
