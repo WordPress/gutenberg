@@ -112,7 +112,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
         >
           <WithSelect(WithDispatch(BaseOption))
             featureName="showIconLabels"
-            help="Shows text instead of icons in toolbar."
+            help="Shows text instead of icons in the toolbar."
             label="Display button labels"
           />
           <WithSelect(WithDispatch(BaseOption))
