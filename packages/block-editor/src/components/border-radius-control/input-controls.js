@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
@@ -17,11 +12,15 @@ const CORNERS = {
 };
 
 export default function BoxInputControls( {
-	onChange = noop,
+	onChange,
 	values: valuesProp,
 	...props
 } ) {
 	const createHandleOnChange = ( corner ) => ( next ) => {
+		if ( ! onChange ) {
+			return;
+		}
+
 		onChange( {
 			...values,
 			[ corner ]: next ? next : undefined,
