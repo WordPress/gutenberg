@@ -22,7 +22,12 @@ export default function Preview( { idBase, instance, isVisible } ) {
 			// or it will grow to an unexpected large height in Safari if it's hidden initially.
 			if ( isLoaded ) {
 				function setHeight() {
-					iframe.style.height = `${ iframe.contentDocument.body.offsetHeight }px`;
+					// Pick the maximum of these two values to account for margin collapsing.
+					const height = Math.max(
+						iframe.contentDocument.documentElement.offsetHeight,
+						iframe.contentDocument.body.offsetHeight
+					);
+					iframe.style.height = `${ height }px`;
 				}
 
 				const {
@@ -95,10 +100,18 @@ export default function Preview( { idBase, instance, isVisible } ) {
 							},
 						} ) }
 						onLoad={ ( event ) => {
-							// To hide the scrollbars of the preview frame,
-							// it can't be scrolled anyway.
-							event.target.contentDocument.body.style.overflow =
-								'hidden';
+							// To hide the scrollbars of the preview frame for some edge cases,
+							// such as negative margins in the Gallery Legacy Widget.
+							// It can't be scrolled anyway.
+							// TODO: Ideally, this should be fixed in core.
+							try {
+								event.target.contentDocument.body.style.overflow =
+									'hidden';
+							} catch {
+								// There might be permission error when trying to access cross-origin iframes.
+								// As a progressive enhancement, simply ignore the errors here.
+							}
+
 							setIsLoaded( true );
 						} }
 						height={ 100 }
