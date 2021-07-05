@@ -633,6 +633,10 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
+		// Add a list
+		await page.keyboard.type( '/list' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
 
 		// Confirm correct setup: two columns with two paragraphs in the first.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
