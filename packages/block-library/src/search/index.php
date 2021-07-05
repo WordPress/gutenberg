@@ -87,7 +87,7 @@ function render_block_core_search( $attributes ) {
 		}
 
 		$button_markup = sprintf(
-	'<button type="submit" class="wp-block-search__button %s" %s>%s</button>',
+			'<button type="submit" class="wp-block-search__button %s" %s>%s</button>',
 			$button_classes,
 			$inline_styles['shared'],
 			$button_internal_markup
