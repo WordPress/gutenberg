@@ -39,11 +39,10 @@ if ( ! function_exists( 'build_query_vars_from_query_block' ) ) {
 				$query['post_type'] = $block->context['query']['postType'];
 			}
 			if ( isset( $block->context['query']['sticky'] ) && ! empty( $block->context['query']['sticky'] ) ) {
-				$sticky = get_option( 'sticky_posts' );
 				if ( 'only' === $block->context['query']['sticky'] ) {
-					$query['post__in'] = $sticky;
+					$query['post__in'] = get_option( 'sticky_posts' );
 				} else {
-					$query['post__not_in'] = array_merge( $query['post__not_in'], $sticky );
+					$query['ignore_sticky_posts'] = true;
 				}
 			}
 			if ( isset( $block->context['query']['exclude'] ) ) {
