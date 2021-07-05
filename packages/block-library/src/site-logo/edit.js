@@ -280,7 +280,7 @@ export default function LogoEdit( {
 			} );
 		const _isRequestingMediaItem =
 			_siteLogoId &&
-			select( coreStore ).isResolving( 'getEntityRecord', [
+			! select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
 				'root',
 				'media',
 				_siteLogoId,
@@ -345,9 +345,7 @@ export default function LogoEdit( {
 
 	const label = __( 'Site Logo' );
 	let logoImage;
-	const isLoading =
-		siteLogoId === undefined ||
-		( siteLogoId && ! logoUrl && isRequestingMediaItem );
+	const isLoading = siteLogoId === undefined || isRequestingMediaItem;
 	if ( isLoading ) {
 		logoImage = <Spinner />;
 	}
@@ -381,7 +379,13 @@ export default function LogoEdit( {
 					className="site-logo_placeholder"
 					icon={ icon }
 					label={ label }
-				/>
+				>
+					{ isLoading && (
+						<span className="components-placeholder__preview">
+							<Spinner />
+						</span>
+					) }
+				</Placeholder>
 			) }
 			{ ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
