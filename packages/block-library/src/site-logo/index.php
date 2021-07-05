@@ -157,6 +157,6 @@ function _delete_site_logo_on_remove_theme_mods() {
 function _delete_site_logo_on_remove_custom_logo_on_setup_theme() {
 	$theme = get_option( 'stylesheet' );
 	add_action( "update_option_theme_mods_$theme", '_delete_site_logo_on_remove_custom_logo', 10, 2 );
-	add_action( "delete_option_theme_mods_$theme", '_delete_site_logo_on_remove_theme_mods', 10, 0 );
+	add_action( "delete_option_theme_mods_$theme", '_delete_site_logo_on_remove_theme_mods' );
 }
 add_action( 'setup_theme', '_delete_site_logo_on_remove_custom_logo_on_setup_theme', 11 );
