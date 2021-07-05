@@ -106,16 +106,20 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	if ( $has_font_family_support ) {
 		$has_named_font_family  = array_key_exists( 'fontFamily', $block_attributes );
-		$has_legacy_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
-
+		$has_custom_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
+		
 		if ( $has_named_font_family ) {
 			$classes[] = sprintf( 'has-%s-font-family', $block_attributes['fontFamily'] );
-		} elseif ( $has_legacy_font_family ) {
-			$font_family = $block_attributes['style']['typography']['fontFamily'];
-			if ( strpos( $font_family, 'var:preset|font-family' ) !== false ) {
-				$index_to_splice  = strrpos( $font_family, '|' ) + 1;
-				$font_family_name = substr( $font_family, $index_to_splice );
-				$styles[]         = sprintf( 'font-family: var(--wp--preset--font-family--%s) !important;', $font_family_name );
+		} elseif ( $has_custom_font_family ) {
+			// Before using classes, the value was serialized as a CSS Custom Property.
+			// We don't need this code path it lands in core.
+			$font_family_custom = $block_attributes['style']['typography']['fontFamily'];
+			if ( strpos( $font_family_custom, 'var:preset|font-family' ) !== false ) {
+				$index_to_splice  = strrpos( $font_family_custom, '|' ) + 1;
+				$font_family_slug = substr( $font_family_custom, $index_to_splice );
+				$classes[]        = sprintf( 'has-%s-font-family', $font_family_slug );
+			} else {
+				$styles[] = sprintf( 'font-family: %s;', $font_family_custom );
 			}
 		}
 	}
