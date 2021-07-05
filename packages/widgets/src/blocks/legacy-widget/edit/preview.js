@@ -16,34 +16,43 @@ export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
-	const ref = useRefEffect( ( iframe ) => {
-		function setHeight() {
-			iframe.style.height = `${ iframe.contentDocument.documentElement.offsetHeight }px`;
-		}
-
-		const { IntersectionObserver } = iframe.ownerDocument.defaultView;
-
-		// Observe for intersections that might cause a change in the height of
-		// the iframe, e.g. a Widget Area becoming expanded.
-		const intersectionObserver = new IntersectionObserver(
-			( [ entry ] ) => {
-				if ( entry.isIntersecting ) {
-					setHeight();
+	const ref = useRefEffect(
+		( iframe ) => {
+			// Only set height if the iframe is loaded,
+			// or it will grow to an unexpected large height in Safari if it's hidden initially.
+			if ( isLoaded ) {
+				function setHeight() {
+					iframe.style.height = `${ iframe.contentDocument.documentElement.offsetHeight }px`;
 				}
-			},
-			{
-				threshold: 1,
+
+				const {
+					IntersectionObserver,
+				} = iframe.ownerDocument.defaultView;
+
+				// Observe for intersections that might cause a change in the height of
+				// the iframe, e.g. a Widget Area becoming expanded.
+				const intersectionObserver = new IntersectionObserver(
+					( [ entry ] ) => {
+						if ( entry.isIntersecting ) {
+							setHeight();
+						}
+					},
+					{
+						threshold: 1,
+					}
+				);
+				intersectionObserver.observe( iframe );
+
+				iframe.addEventListener( 'load', setHeight );
+
+				return () => {
+					intersectionObserver.disconnect();
+					iframe.removeEventListener( 'load', setHeight );
+				};
 			}
-		);
-		intersectionObserver.observe( iframe );
-
-		iframe.addEventListener( 'load', setHeight );
-
-		return () => {
-			intersectionObserver.disconnect();
-			iframe.removeEventListener( 'load', setHeight );
-		};
-	}, [] );
+		},
+		[ isLoaded ]
+	);
 
 	return (
 		<>
