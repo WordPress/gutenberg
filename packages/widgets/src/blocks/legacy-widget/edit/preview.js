@@ -21,6 +21,9 @@ export default function Preview( { idBase, instance, isVisible } ) {
 			// Only set height if the iframe is loaded,
 			// or it will grow to an unexpected large height in Safari if it's hidden initially.
 			if ( isLoaded ) {
+				// If the preview frame has another origin then this won't work.
+				// One possible solution is to add custom script to call `postMessage` in the preview frame.
+				// Or, better yet, we migrate away from iframe.
 				function setHeight() {
 					// Pick the maximum of these two values to account for margin collapsing.
 					const height = Math.max(
@@ -104,13 +107,8 @@ export default function Preview( { idBase, instance, isVisible } ) {
 							// such as negative margins in the Gallery Legacy Widget.
 							// It can't be scrolled anyway.
 							// TODO: Ideally, this should be fixed in core.
-							try {
-								event.target.contentDocument.body.style.overflow =
-									'hidden';
-							} catch {
-								// There might be permission error when trying to access cross-origin iframes.
-								// As a progressive enhancement, simply ignore the errors here.
-							}
+							event.target.contentDocument.body.style.overflow =
+								'hidden';
 
 							setIsLoaded( true );
 						} }
