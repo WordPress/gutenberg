@@ -17,7 +17,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
 	const ref = useRefEffect( ( iframe ) => {
-		function onChange() {
+		function setHeight() {
 			iframe.style.height = `${ iframe.contentDocument.documentElement.offsetHeight }px`;
 		}
 
@@ -28,7 +28,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 		const intersectionObserver = new IntersectionObserver(
 			( [ entry ] ) => {
 				if ( entry.isIntersecting ) {
-					onChange();
+					setHeight();
 				}
 			},
 			{
@@ -37,11 +37,11 @@ export default function Preview( { idBase, instance, isVisible } ) {
 		);
 		intersectionObserver.observe( iframe );
 
-		iframe.addEventListener( 'load', onChange );
+		iframe.addEventListener( 'load', setHeight );
 
 		return () => {
 			intersectionObserver.disconnect();
-			iframe.removeEventListener( 'load', onChange );
+			iframe.removeEventListener( 'load', setHeight );
 		};
 	}, [] );
 
