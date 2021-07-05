@@ -13,33 +13,34 @@ import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function Preview( { idBase, instance, isVisible } ) {
-	const [ iframeHeight, setIframeHeight ] = useState();
+	const [ isLoaded, setIsLoaded ] = useState( false );
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
 	const ref = useRefEffect( ( iframe ) => {
 		function onChange() {
-			const boundingRect = iframe?.contentDocument?.body?.getBoundingClientRect();
-			if ( boundingRect ) {
-				// Include `top` in the height calculation to avoid the bottom
-				// of widget previews being cut-off. Most widgets have a
-				// heading at the top that has top margin, and the `height`
-				// alone doesn't take that margin into account.
-				setIframeHeight( boundingRect.top + boundingRect.height );
-			}
+			iframe.style.height = `${ iframe.contentDocument.documentElement.offsetHeight }px`;
 		}
 
 		const { IntersectionObserver } = iframe.ownerDocument.defaultView;
 
 		// Observe for intersections that might cause a change in the height of
 		// the iframe, e.g. a Widget Area becoming expanded.
-		const intersectionObserver = new IntersectionObserver( onChange, {
-			threshold: 1,
-		} );
+		const intersectionObserver = new IntersectionObserver(
+			( [ entry ] ) => {
+				if ( entry.isIntersecting ) {
+					onChange();
+				}
+			},
+			{
+				threshold: 1,
+			}
+		);
 		intersectionObserver.observe( iframe );
 
 		iframe.addEventListener( 'load', onChange );
 
 		return () => {
+			intersectionObserver.disconnect();
 			iframe.removeEventListener( 'load', onChange );
 		};
 	}, [] );
@@ -53,7 +54,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 			move the iframe off-screen instead of hiding it because web browsers
 			will not trigger onLoad if the iframe is hidden.
 			*/ }
-			{ isVisible && iframeHeight === null && (
+			{ isVisible && ! isLoaded && (
 				<Placeholder>
 					<Spinner />
 				</Placeholder>
@@ -62,7 +63,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 				className={ classnames(
 					'wp-block-legacy-widget__edit-preview',
 					{
-						'is-offscreen': ! isVisible || iframeHeight === null,
+						'is-offscreen': ! isVisible || ! isLoaded,
 					}
 				) }
 			>
@@ -84,7 +85,8 @@ export default function Preview( { idBase, instance, isVisible } ) {
 								instance,
 							},
 						} ) }
-						height={ iframeHeight || 100 }
+						onLoad={ () => setIsLoaded( true ) }
+						height={ 100 }
 					/>
 				</Disabled>
 			</div>
