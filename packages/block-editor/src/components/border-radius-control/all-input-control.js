@@ -7,12 +7,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getAllValue, isValuesMixed, isValuesDefined } from './utils';
+import { getAllValue, hasMixedValues, hasDefinedValues } from './utils';
 
 export default function AllInputControl( { onChange, values, ...props } ) {
 	const allValue = getAllValue( values );
-	const hasValues = isValuesDefined( values );
-	const isMixed = hasValues && isValuesMixed( values );
+	const hasValues = hasDefinedValues( values );
+	const isMixed = hasValues && hasMixedValues( values );
 	const allPlaceholder = isMixed ? __( 'Mixed' ) : null;
 
 	return (

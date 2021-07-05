@@ -18,8 +18,8 @@ import LinkedButton from './linked-button';
 import {
 	getAllValue,
 	getAllUnit,
-	isValuesDefined,
-	isValuesMixed,
+	hasDefinedValues,
+	hasMixedValues,
 } from './utils';
 
 const DEFAULT_VALUES = {
@@ -41,7 +41,7 @@ const MIN_BORDER_RADIUS_VALUE = 0;
  */
 export default function BorderRadiusControl( { onChange, values } ) {
 	const [ isLinked, setIsLinked ] = useState(
-		! isValuesDefined( values ) || ! isValuesMixed( values )
+		! hasDefinedValues( values ) || ! hasMixedValues( values )
 	);
 
 	const units = useCustomUnits( { availableUnits: [ 'px', 'em', 'rem' ] } );

@@ -79,7 +79,7 @@ export function getAllValue( values = {} ) {
  * @param {Object} values Radius values.
  * @return {boolean}      Whether values are mixed.
  */
-export function isValuesMixed( values = {} ) {
+export function hasMixedValues( values = {} ) {
 	const allValue = getAllValue( values );
 	const isMixed = isNaN( parseFloat( allValue ) );
 
@@ -92,7 +92,7 @@ export function isValuesMixed( values = {} ) {
  * @param {Object} values Radius values.
  * @return {boolean}      Whether values are mixed.
  */
-export function isValuesDefined( values ) {
+export function hasDefinedValues( values ) {
 	if ( ! values ) {
 		return false;
 	}
