@@ -6,21 +6,6 @@
 	margin-right: 0;
 }
 
-// To do: remove horizontal margin override by the editor.
-@include break-small() {
-	.editor-styles-wrapper
-	.block-editor-block-list__block.wp-block-column:nth-child(even) {
-		margin-left: $grid-unit-20 * 2;
-	}
-}
-
-@include break-medium() {
-	.editor-styles-wrapper
-	.block-editor-block-list__block.wp-block-column:not(:first-child) {
-		margin-left: $grid-unit-20 * 2;
-	}
-}
-
 // Individual columns do not have top and bottom margins on the frontend.
 // So we make the editor match that.
 // Needs specificity.

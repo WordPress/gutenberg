@@ -51,6 +51,8 @@ const migrateCustomColors = ( attributes ) => {
 	}
 	return {
 		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
+		gridGap: 2,
+		gridGapUnit: 'em',
 		style,
 	};
 };
@@ -166,7 +168,14 @@ export default [
 				createBlock( 'core/column', {}, columnBlocks )
 			);
 
-			return [ omit( attributes, [ 'columns' ] ), migratedInnerBlocks ];
+			return [
+				{
+					...omit( attributes, [ 'columns' ] ),
+					gridGap: 2,
+					gridGapUnit: 'em',
+				},
+				migratedInnerBlocks,
+			];
 		},
 		save( { attributes } ) {
 			const { columns } = attributes;
@@ -186,7 +195,11 @@ export default [
 			},
 		},
 		migrate( attributes, innerBlocks ) {
-			attributes = omit( attributes, [ 'columns' ] );
+			attributes = {
+				...omit( attributes, [ 'columns' ] ),
+				gridGap: 2,
+				gridGapUnit: 'em',
+			};
 
 			return [ attributes, innerBlocks ];
 		},

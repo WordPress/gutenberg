@@ -1,13 +1,13 @@
 .wp-block-columns {
-	display: flex;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 	margin-bottom: 1.75em;
 	box-sizing: border-box;
 
-	// Responsiveness: Allow wrapping on mobile.
-	flex-wrap: wrap;
-
-	@include break-medium() {
-		flex-wrap: nowrap;
+	// In viewports smaller than large, try to show 2 columns,
+	// reducing to a single column in smaller containers.
+	@media (max-width: #{ ($break-medium - 1) }) {
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
 	}
 
 	&.has-background {
@@ -31,13 +31,6 @@
 }
 
 .wp-block-column {
-	flex-grow: 1;
-
-	@media (max-width: #{ ($break-small - 1) }) {
-		// Responsiveness: Show at most one columns on mobile. This must be
-		// important since the Column assigns its own width as an inline style.
-		flex-basis: 100% !important;
-	}
 
 	// Prevent the columns from growing wider than their distributed sizes.
 	min-width: 0;
@@ -45,48 +38,6 @@
 	// Prevent long unbroken words from overflowing.
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
-
-	// Between mobile and large viewports, allow 2 columns.
-	@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
-		// Only add two column styling if there are two or more columns
-		&:not(:only-child) {
-			// As with mobile styles, this must be important since the Column
-			// assigns its own width as an inline style, which should take effect
-			// starting at `break-medium`.
-			flex-basis: calc(50% - 1em) !important;
-			flex-grow: 0;
-		}
-
-		// Add space between the multiple columns. Themes can customize this if they wish to work differently.
-		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
-		&:nth-child(even) {
-			margin-left: 2em;
-		}
-	}
-
-	// At large viewports, show all columns horizontally.
-	@include break-medium() {
-		// Available space should be divided equally amongst columns without an
-		// assigned width. This is achieved by assigning a flex basis that is
-		// consistent (equal), would not cause the sum total of column widths to
-		// exceed 100%, and which would cede to a column with an assigned width.
-		// The `flex-grow` allows columns to maximally and equally occupy space
-		// remaining after subtracting the space occupied by columns with
-		// explicit widths (if any exist).
-		flex-basis: 0;
-		flex-grow: 1;
-
-		// Columns with an explicitly-assigned width should maintain their
-		// `flex-basis` width and not grow.
-		&[style*="flex-basis"] {
-			flex-grow: 0;
-		}
-
-		// When columns are in a single row, add space before all except the first.
-		&:not(:first-child) {
-			margin-left: 2em;
-		}
-	}
 
 	/**
 	* Individual Column Alignment

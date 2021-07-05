@@ -173,3 +173,37 @@ export function getWidthWithUnit( width, unit ) {
 export function isPercentageUnit( unit ) {
 	return unit === '%';
 }
+
+/**
+ * Returns a string of fr units representing the widths of each column in innerBlocks,
+ * to be used in the CSS attribute `grid-template-columns`. Non-percentage based units
+ * (e.g. px, em, rem) skip conversion to `fr` units.
+ *
+ * @param {WPBlock[]} blocks	Block objects.
+ *
+ * @return {string} A string of fr units to be used in the gridTemplateColumns attribute.
+ */
+export function getColumnWidthsAsGridColumnsValues( blocks ) {
+	let fractionsString = '';
+
+	blocks.forEach( ( block ) => {
+		// If width exists, isn't empty or zero, and doesn't use percentage units,
+		// then use the value directly to support px, em, rem widths.
+		if (
+			block.attributes?.width &&
+			typeof block.attributes.width === 'string' &&
+			block.attributes.width !== '0' &&
+			! block.attributes.width.includes( '%' )
+		) {
+			fractionsString += block.attributes?.width + ' ';
+		} else {
+			const colWidth = getEffectiveColumnWidth( block, blocks.length );
+			const frWidth = colWidth
+				? toWidthPrecision( ( colWidth / 100 ) * blocks.length )
+				: 1;
+			fractionsString += frWidth + 'fr ';
+		}
+	} );
+
+	return fractionsString.trim();
+}
