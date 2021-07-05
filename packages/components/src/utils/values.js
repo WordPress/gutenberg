@@ -40,3 +40,18 @@ export function isValueEmpty( value ) {
 export function getDefinedValue( values = [], fallbackValue ) {
 	return values.find( isValueDefined ) ?? fallbackValue;
 }
+
+/* eslint-disable jsdoc/valid-types */
+/**
+ * Checks to see if a value is a numeric value (`number` or `string`).
+ *
+ * @param {any} value
+ *
+ * @return {value is number | `${number}`} Whether value is numeric.
+ */
+export function isValueNumeric( value ) {
+	/* eslint-enable jsdoc/valid-types */
+	const valueToCheck =
+		typeof value === 'string' ? value.replace( /,/g, '' ) : value;
+	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
+}
