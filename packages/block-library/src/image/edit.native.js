@@ -49,7 +49,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	image as placeholderIcon,
 	replace,
-	expand,
+	fullscreen,
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -552,7 +552,7 @@ export class ImageEdit extends Component {
 				<PanelBody>
 					{ image && sizeOptionsValid && (
 						<BottomSheetSelectControl
-							icon={ expand }
+							icon={ fullscreen }
 							label={ __( 'Size' ) }
 							options={ sizeOptions }
 							onChange={ this.onSizeChangeValue }
