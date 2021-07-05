@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
@@ -14,11 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { getAllValue, isValuesMixed, isValuesDefined } from './utils';
 
-export default function AllInputControl( {
-	onChange = noop,
-	values,
-	...props
-} ) {
+export default function AllInputControl( { onChange, values, ...props } ) {
 	const allValue = getAllValue( values );
 	const hasValues = isValuesDefined( values );
 	const isMixed = hasValues && isValuesMixed( values );
