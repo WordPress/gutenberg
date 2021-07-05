@@ -48,13 +48,13 @@ public protocol GutenbergBridgeDataSource: class {
     /// Asks the data source for a list of theme colors.
     func gutenbergEditorTheme() -> GutenbergEditorTheme?
 
-    /// Asks the data source for a view to show while the Editor is loading.
-     var loadingView: UIView? { get }
-    
     /// Asks the data source for the Sentry SDK options to initialize the SDK in the React native side.
     ///
     /// - Returns: Sentry SDK options.
-    func getSentryOptions() -> [String: Any]?
+    func gutenbergSentryOptions() -> [String: Any]?
+
+    /// Asks the data source for a view to show while the Editor is loading.
+     var loadingView: UIView? { get }
 }
 
 public extension GutenbergBridgeDataSource {
