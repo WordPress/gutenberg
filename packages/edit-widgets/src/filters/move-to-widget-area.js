@@ -2,11 +2,14 @@
  * WordPress dependencies
  */
 
-import { BlockControls } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-import { getWidgetIdFromBlock, MoveToWidgetArea } from '@wordpress/widgets';
+import { MoveToWidgetArea } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -15,8 +18,7 @@ import { store as editWidgetsStore } from '../store';
 
 const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const widgetId = getWidgetIdFromBlock( props );
-		const blockName = props.name;
+		const { clientId, name: blockName } = props;
 		const {
 			widgetAreas,
 			currentWidgetAreaId,
@@ -28,18 +30,31 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 					return {};
 				}
 
-				const selectors = select( editWidgetsStore );
+				const {
+					getWidgetAreas,
+					canInsertBlockInWidgetArea: _canInsertBlockInWidgetArea,
+				} = select( editWidgetsStore );
+				const { getBlock, getBlockName, getBlockParents } = select(
+					blockEditorStore
+				);
+
+				// Find the widget area by searching through parent blocks.
+				const blockParents = getBlockParents( clientId );
+				const widgetAreaClientId = blockParents.find(
+					( parentClientId ) =>
+						getBlockName( parentClientId ) === 'core/widget-area'
+				);
+				const widgetAreaBlock = getBlock( widgetAreaClientId );
+
 				return {
-					widgetAreas: selectors.getWidgetAreas(),
-					currentWidgetAreaId: widgetId
-						? selectors.getWidgetAreaForWidgetId( widgetId )?.id
-						: undefined,
-					canInsertBlockInWidgetArea: selectors.canInsertBlockInWidgetArea(
+					widgetAreas: getWidgetAreas(),
+					currentWidgetAreaId: widgetAreaBlock.attributes.id,
+					canInsertBlockInWidgetArea: _canInsertBlockInWidgetArea(
 						blockName
 					),
 				};
 			},
-			[ widgetId, blockName ]
+			[ clientId, blockName ]
 		);
 
 		const { moveBlockToWidgetArea } = useDispatch( editWidgetsStore );
