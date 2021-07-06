@@ -19,6 +19,8 @@ const config = require( '../config' );
 // @ts-ignore
 const manifest = require( '../../../package.json' );
 
+const UNKNOWN = 'Unknown';
+
 /** @typedef {import('@octokit/rest')} GitHub */
 /** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
 /** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
@@ -245,7 +247,7 @@ function getIssueFeature( issue ) {
 	];
 
 	if ( ! candidates.length ) {
-		return 'Unknown';
+		return UNKNOWN;
 	}
 
 	// Get occurances of the feature labels.
@@ -573,17 +575,28 @@ async function getChangelog( settings ) {
 
 		changelog += '### ' + group + '\n\n';
 
-		Object.keys( featureGroups ).forEach( ( feature ) => {
-			const featureGroup = featureGroups[ feature ];
-			changelog += '- ' + feature + '\n';
-			const featureGroupEntries = featureGroup
-				.map( getEntry )
-				.filter( Boolean );
-			featureGroupEntries.forEach(
-				( entry ) => ( changelog += `  ${ entry }\n` )
-			);
-			changelog += '\n';
-		} );
+		Object.keys( featureGroups )
+			.sort() // natural sort first
+			.sort( ( a, b ) => {
+				// sort "Unknown" to always be at the end
+				if ( a === 'Unknown' ) {
+					return 1;
+				} else if ( b === 'Unknown' ) {
+					return -1;
+				}
+				return 0;
+			} )
+			.forEach( ( feature ) => {
+				const featureGroup = featureGroups[ feature ];
+				changelog += '- ' + feature + '\n';
+				const featureGroupEntries = featureGroup
+					.map( getEntry )
+					.filter( Boolean );
+				featureGroupEntries.forEach(
+					( entry ) => ( changelog += `  ${ entry }\n` )
+				);
+				changelog += '\n';
+			} );
 		changelog += '\n';
 	}
 
