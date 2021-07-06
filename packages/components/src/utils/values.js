@@ -47,7 +47,7 @@ export function getDefinedValue( values = [], fallbackValue ) {
  *
  * @param {any} value
  *
- * @return {value is number | `${number}`} Whether value is numeric.
+ * @return {boolean} Whether value is numeric.
  */
 export function isValueNumeric( value ) {
 	/* eslint-enable jsdoc/valid-types */
