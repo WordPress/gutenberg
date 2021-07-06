@@ -17,7 +17,7 @@ import {
 	ResizableBox,
 	Spinner,
 	ToggleControl,
-	Icon,
+	Placeholder,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -257,37 +257,46 @@ export default function LogoEdit( {
 	const [ error, setError ] = useState();
 	const ref = useRef();
 
-	const { siteLogoId, canUserEdit, url, mediaItemData } = useSelect(
-		( select ) => {
-			const { canUser, getEntityRecord, getEditedEntityRecord } = select(
-				coreStore
-			);
-			const siteSettings = getEditedEntityRecord( 'root', 'site' );
-			const siteData = getEntityRecord( 'root', '__unstableBase' );
-			const _siteLogo = siteSettings?.site_logo;
-			const _readOnlyLogo = siteData?.site_logo;
-			const _canUserEdit = canUser( 'update', 'settings' );
-			const _siteLogoId = _siteLogo || _readOnlyLogo;
-			const mediaItem =
-				_siteLogoId &&
-				select( coreStore ).getEntityRecord(
-					'root',
-					'media',
-					_siteLogoId,
-					{ context: 'view' }
-				);
-			return {
-				siteLogoId: _siteLogoId,
-				canUserEdit: _canUserEdit,
-				url: siteData?.url,
-				mediaItemData: mediaItem && {
-					url: mediaItem.source_url,
-					alt: mediaItem.alt_text,
-				},
-			};
-		},
-		[]
-	);
+	const {
+		siteLogoId,
+		canUserEdit,
+		url,
+		mediaItemData,
+		isRequestingMediaItem,
+	} = useSelect( ( select ) => {
+		const { canUser, getEntityRecord, getEditedEntityRecord } = select(
+			coreStore
+		);
+		const siteSettings = getEditedEntityRecord( 'root', 'site' );
+		const siteData = getEntityRecord( 'root', '__unstableBase' );
+		const _siteLogo = siteSettings?.site_logo;
+		const _readOnlyLogo = siteData?.site_logo;
+		const _canUserEdit = canUser( 'update', 'settings' );
+		const _siteLogoId = _siteLogo || _readOnlyLogo;
+		const mediaItem =
+			_siteLogoId &&
+			select( coreStore ).getEntityRecord( 'root', 'media', _siteLogoId, {
+				context: 'view',
+			} );
+		const _isRequestingMediaItem =
+			_siteLogoId &&
+			! select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
+				'root',
+				'media',
+				_siteLogoId,
+				{ context: 'view' },
+			] );
+		return {
+			siteLogoId: _siteLogoId,
+			canUserEdit: _canUserEdit,
+			url: siteData?.url,
+			mediaItemData: mediaItem && {
+				url: mediaItem.source_url,
+				alt: mediaItem.alt_text,
+			},
+			isRequestingMediaItem: _isRequestingMediaItem,
+		};
+	}, [] );
 
 	const { editEntityRecord } = useDispatch( coreStore );
 	const setLogo = ( newValue ) =>
@@ -336,7 +345,7 @@ export default function LogoEdit( {
 
 	const label = __( 'Site Logo' );
 	let logoImage;
-	const isLoading = siteLogoId === undefined || ( siteLogoId && ! logoUrl );
+	const isLoading = siteLogoId === undefined || isRequestingMediaItem;
 	if ( isLoading ) {
 		logoImage = <Spinner />;
 	}
@@ -366,10 +375,17 @@ export default function LogoEdit( {
 			{ controls }
 			{ !! logoUrl && logoImage }
 			{ ! logoUrl && ! canUserEdit && (
-				<div className="site-logo_placeholder">
-					<Icon icon={ icon } />
-					<p> { __( 'Site Logo' ) }</p>
-				</div>
+				<Placeholder
+					className="site-logo_placeholder"
+					icon={ icon }
+					label={ label }
+				>
+					{ isLoading && (
+						<span className="components-placeholder__preview">
+							<Spinner />
+						</span>
+					) }
+				</Placeholder>
 			) }
 			{ ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
