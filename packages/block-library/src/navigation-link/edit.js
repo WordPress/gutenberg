@@ -545,9 +545,7 @@ export default function NavigationLinkEdit( {
 				// Show the appender while dragging to allow inserting element between item and the appender.
 				hasDescendants ? (
 					<InnerBlocks.DefaultBlockAppender />
-				) : (
-					false
-				),
+				) : null,
 		}
 	);
 

@@ -126,9 +126,7 @@ function ColumnEdit( {
 		>
 			<InnerBlocks.ButtonBlockAppender />
 		</View>
-	) : (
-		false
-	);
+	) : null;
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (

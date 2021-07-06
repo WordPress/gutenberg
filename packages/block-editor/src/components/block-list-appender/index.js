@@ -36,13 +36,15 @@ function BlockListAppender( {
 		} );
 	}
 
-	if ( isLocked || appender === false || CustomAppender === false ) {
+	if ( isLocked || null === appender || false === CustomAppender ) {
 		return null;
 	}
 
 	let blockAppender;
-	if ( appender || CustomAppender ) {
-		blockAppender = appender || <CustomAppender />;
+	if ( undefined !== appender ) {
+		blockAppender = appender;
+	} else if ( CustomAppender ) {
+		blockAppender = <CustomAppender />;
 	} else {
 		const isDocumentAppender = ! rootClientId;
 		const isParentSelected = selectedBlockClientId === rootClientId;

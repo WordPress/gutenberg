@@ -156,7 +156,7 @@ function Navigation( {
 					! selectedBlockHasDescendants ) ||
 				isSelected
 					? undefined
-					: false,
+					: null,
 			// Ensure block toolbar is not too far removed from item
 			// being edited when in vertical mode.
 			// see: https://github.com/WordPress/gutenberg/pull/34615.

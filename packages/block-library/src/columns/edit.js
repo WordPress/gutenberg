@@ -81,7 +81,7 @@ function ColumnsEditContainer( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
-		appender: false,
+		appender: null,
 	} );
 
 	return (

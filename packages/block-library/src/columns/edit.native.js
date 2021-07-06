@@ -135,9 +135,7 @@ function ColumnsEditContainer( {
 		<View style={ isFullWidth( align ) && styles.columnAppender }>
 			<InnerBlocks.ButtonBlockAppender onAddBlock={ onAddBlock } />
 		</View>
-	) : (
-		false
-	);
+	) : null;
 
 	const contentWidths = useMemo(
 		() =>
