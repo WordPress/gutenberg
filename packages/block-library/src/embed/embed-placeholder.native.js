@@ -23,6 +23,7 @@ import styles from './styles.scss';
 
 const EmbedPlaceholder = ( {
 	icon,
+	isEditingURL,
 	isSelected,
 	label,
 	onFocus,
@@ -39,7 +40,7 @@ const EmbedPlaceholder = ( {
 		[ clientId ]
 	);
 	const [ isEmbedSheetVisible, setIsEmbedSheetVisible ] = useState(
-		isSelected && wasBlockJustInserted && ! value
+		isSelected && ( ( wasBlockJustInserted && ! value ) || isEditingURL )
 	);
 
 	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
