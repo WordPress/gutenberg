@@ -210,18 +210,29 @@ function load_remote_patterns() {
 		return;
 	}
 
-	$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
-	$core_keyword_id = 11; // 11 is the ID for "core".
-	$request->set_param( 'keyword', $core_keyword_id );
-	$response = rest_do_request( $request );
-	if ( $response->is_error() ) {
-		return;
-	}
-	$patterns = $response->get_data();
+	/**
+	 * Filter to disable remote block patterns.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param bool $should_load_remote
+	 */
+	$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
 
-	foreach ( $patterns as $settings ) {
-		$pattern_name = 'core/' . sanitize_title( $settings['title'] );
-		register_block_pattern( $pattern_name, (array) $settings );
+	if ( $should_load_remote ) {
+		$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+		$core_keyword_id = 11; // 11 is the ID for "core".
+		$request->set_param( 'keyword', $core_keyword_id );
+		$response = rest_do_request( $request );
+		if ( $response->is_error() ) {
+			return;
+		}
+		$patterns = $response->get_data();
+
+		foreach ( $patterns as $settings ) {
+			$pattern_name = 'core/' . sanitize_title( $settings['title'] );
+			register_block_pattern( $pattern_name, (array) $settings );
+		}
 	}
 }
 
