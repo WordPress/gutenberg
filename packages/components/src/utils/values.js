@@ -41,17 +41,35 @@ export function getDefinedValue( values = [], fallbackValue ) {
 	return values.find( isValueDefined ) ?? fallbackValue;
 }
 
-/* eslint-disable jsdoc/valid-types */
+/**
+ * @param {string} [locale]
+ * @return {[RegExp, RegExp]} The delimiter and decimal regexp
+ */
+const getDelimiterAndDecimalRegex = ( locale ) => {
+	const formatted = Intl.NumberFormat( locale ).format( 1000.1 );
+	const delimiter = formatted[ 1 ];
+	const decimal = formatted[ formatted.length - 2 ];
+	return [
+		new RegExp( `\\${ delimiter }`, 'g' ),
+		new RegExp( `\\${ decimal }`, 'g' ),
+	];
+};
+
 /**
  * Checks to see if a value is a numeric value (`number` or `string`).
  *
- * @param {any} value
- *
+ * @param {any}    value
+ * @param {string} [locale]
  * @return {boolean} Whether value is numeric.
  */
-export function isValueNumeric( value ) {
-	/* eslint-enable jsdoc/valid-types */
+export function isValueNumeric( value, locale ) {
+	const [ delimiterRegexp, decimalRegexp ] = getDelimiterAndDecimalRegex(
+		locale
+	);
 	const valueToCheck =
-		typeof value === 'string' ? value.replace( /,/g, '' ) : value;
+		typeof value === 'string'
+			? value.replace( delimiterRegexp, '' ).replace( decimalRegexp, '.' )
+			: value;
+
 	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
 }
