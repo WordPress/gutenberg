@@ -22,6 +22,27 @@ const useEmotionCacheContext = () => useContext( EmotionCacheContext );
 const isSerializedStyles = ( o: any ): o is SerializedStyles =>
 	[ 'name', 'styles' ].every( ( p ) => typeof o[ p ] !== 'undefined' );
 
+/**
+ * Retrieve a `cx` function that knows how to handle `SerializedStyles`
+ * returned by the `@emotion/react` `css` function in addition to what
+ * `cx` normally knows how to handle. It also hooks into the Emotion
+ * Cache, allowing `css` calls to work inside iframes.
+ *
+ * @example
+ * import { css } from '@emotion/react';
+ *
+ * const styles = css`
+ * 	color: red
+ * `;
+ *
+ * function RedText( { className, ...props } ) {
+ * 	const cx = useCx();
+ *
+ * 	const classes = cx(styles, className);
+ *
+ * 	return <span className={classes} {...props} />;
+ * }
+ */
 export const useCx = () => {
 	const cache = useEmotionCacheContext();
 
