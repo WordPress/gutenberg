@@ -118,6 +118,7 @@ require __DIR__ . '/navigation.php';
 require __DIR__ . '/navigation-page.php';
 require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/global-styles.php';
+require __DIR__ . '/pwa.php';
 
 require __DIR__ . '/block-supports/generated-classname.php';
 require __DIR__ . '/block-supports/elements.php';

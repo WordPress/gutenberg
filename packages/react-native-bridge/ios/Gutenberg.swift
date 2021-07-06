@@ -55,11 +55,11 @@ public class Gutenberg: NSObject {
 
     private var initialProps: [String: Any]? {
         var initialProps = [String: Any]()
-        
+
         if let initialContent = dataSource.gutenbergInitialContent() {
             initialProps["initialData"] = initialContent
         }
-        
+
         if let initialTitle = dataSource.gutenbergInitialTitle() {
             initialProps["initialTitle"] = initialTitle
         }
@@ -69,7 +69,7 @@ public class Gutenberg: NSObject {
         if let locale = dataSource.gutenbergLocale() {
             initialProps["locale"] = locale
         }
-        
+
         if let translations = dataSource.gutenbergTranslations() {
             initialProps["translations"] = translations
         }
@@ -106,11 +106,11 @@ public class Gutenberg: NSObject {
     public func toggleHTMLMode() {
         sendEvent(.toggleHTMLMode)
     }
-    
+
     public func setTitle(_ title: String) {
         sendEvent(.setTitle, body: ["title": title])
     }
-    
+
     public func updateHtml(_ html: String) {
         sendEvent(.updateHtml, body: ["html": html])
     }
@@ -184,6 +184,10 @@ public class Gutenberg: NSObject {
     public func updateEditorSettings(_ editorSettings: GutenbergEditorSettings?) {
         let settingsUpdates = properties(from: editorSettings)
         sendEvent(.updateEditorSettings, body: settingsUpdates)
+    }
+
+    public func showEditorHelp() {
+        bridgeModule.sendEventIfNeeded(.showEditorHelp, body: nil)
     }
 
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {

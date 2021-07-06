@@ -1348,6 +1348,10 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// Things that didn't land in core yet, so didn't have a setting assigned.
+		// This should be removed when the plugin minimum WordPress version
+		// is bumped to 5.8.
+		//
+		// Do not port this to WordPress core.
 		if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
 			if ( ! isset( $theme_settings['settings']['color'] ) ) {
 				$theme_settings['settings']['color'] = array();
