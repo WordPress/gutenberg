@@ -95,7 +95,17 @@ export const createUpgradedEmbedBlock = (
 	props,
 	attributesFromPreview = {}
 ) => {
-	const { preview, attributes: { url, providerNameSlug, type } = {} } = props;
+	const {
+		preview,
+		attributes: {
+			align,
+			allowResponsive,
+			caption,
+			url,
+			providerNameSlug,
+			type,
+		} = {},
+	} = props;
 
 	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) return;
 
@@ -114,6 +124,9 @@ export const createUpgradedEmbedBlock = (
 			! providerNameSlug );
 	if ( shouldCreateNewBlock ) {
 		return createBlock( DEFAULT_EMBED_BLOCK, {
+			align,
+			allowResponsive,
+			caption,
 			url,
 			...matchedBlock.attributes,
 		} );
