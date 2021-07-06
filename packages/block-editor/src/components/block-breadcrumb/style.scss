@@ -4,19 +4,19 @@
 	margin: 0;
 
 	li {
-		display: inline-block;
+		display: inline-flex;
 		margin: 0;
-	}
 
-	.block-editor-block-breadcrumb__separator {
-		fill: currentColor;
-		margin-left: -$grid-unit-05;
-		margin-right: -$grid-unit-05;
+		.block-editor-block-breadcrumb__separator {
+			fill: currentColor;
+			margin-left: -$grid-unit-05;
+			margin-right: -$grid-unit-05;
 
-		// Flip for RTL.
-		transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the chevron right for LTR and left for RTL.
+			// Flip for RTL.
+			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the chevron right for LTR and left for RTL.
+		}
 
-		&:last-child {
+		&:last-child .block-editor-block-breadcrumb__separator {
 			display: none;
 		}
 	}

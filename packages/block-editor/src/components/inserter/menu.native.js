@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { LayoutAnimation, TouchableHighlight } from 'react-native';
+import {
+	AccessibilityInfo,
+	LayoutAnimation,
+	TouchableHighlight,
+	Platform,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -140,7 +145,19 @@ function InserterMenu( {
 
 	const onSelectItem = useCallback(
 		( item ) => {
-			onInsert( item );
+			// Avoid a focus loop, see https://github.com/WordPress/gutenberg/issues/30562
+			if ( Platform.OS === 'ios' ) {
+				AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
+					// In testing, the bug focus loop needed a longer timeout when VoiceOver was enabled
+					const timeout = enabled ? 200 : 100;
+					// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+					setTimeout( () => {
+						onInsert( item );
+					}, timeout );
+				} );
+			} else {
+				onInsert( item );
+			}
 			onSelect( item );
 		},
 		[ onInsert, onSelect ]

@@ -65,27 +65,28 @@ function BlockBreadcrumb( { rootLabelText } ) {
 					</Button>
 				) }
 				{ ! hasSelection && rootLabel }
-			</li>
-			<Icon
-				icon={ chevronRightSmall }
-				className="block-editor-block-breadcrumb__separator"
-			/>
-			{ parents.map( ( parentClientId ) => (
-				<>
-					<li key={ parentClientId }>
-						<Button
-							className="block-editor-block-breadcrumb__button"
-							variant="tertiary"
-							onClick={ () => selectBlock( parentClientId ) }
-						>
-							<BlockTitle clientId={ parentClientId } />
-						</Button>
-					</li>
+				{ !! clientId && (
 					<Icon
 						icon={ chevronRightSmall }
 						className="block-editor-block-breadcrumb__separator"
 					/>
-				</>
+				) }
+			</li>
+
+			{ parents.map( ( parentClientId ) => (
+				<li key={ parentClientId }>
+					<Button
+						className="block-editor-block-breadcrumb__button"
+						variant="tertiary"
+						onClick={ () => selectBlock( parentClientId ) }
+					>
+						<BlockTitle clientId={ parentClientId } />
+					</Button>
+					<Icon
+						icon={ chevronRightSmall }
+						className="block-editor-block-breadcrumb__separator"
+					/>
+				</li>
 			) ) }
 			{ !! clientId && (
 				<li
