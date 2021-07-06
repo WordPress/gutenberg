@@ -41,7 +41,8 @@ export default function PostTermsEdit( {
 				find(
 					taxonomies,
 					( taxonomy ) =>
-						taxonomy.slug === term && taxonomy.visibility.show_ui
+						taxonomy.slug === term &&
+						taxonomy.visibility.publicly_queryable
 				) || {}
 			);
 		},
