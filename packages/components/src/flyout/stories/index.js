@@ -1,24 +1,24 @@
 /**
  * Internal dependencies
  */
-import { CardBody, CardHeader } from '../../../card';
-import Button from '../../../button';
-import { Popover } from '..';
+import { CardBody, CardHeader } from '../../card';
+import Button from '../../button';
+import { Flyout } from '..';
 
 export default {
-	component: Popover,
-	title: 'G2 Components (Experimental)/Popover',
+	component: Flyout,
+	title: 'Components (Experimental)/Flyout',
 };
 
 export const _default = () => {
 	return (
-		<Popover
+		<Flyout
 			trigger={ <Button>Click</Button> }
 			visible
 			placement="bottom-start"
 		>
 			<CardHeader>Go</CardHeader>
 			<CardBody>Stuff</CardBody>
-		</Popover>
+		</Flyout>
 	);
 };

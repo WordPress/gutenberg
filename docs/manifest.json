@@ -876,6 +876,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Flyout",
+		"slug": "flyout",
+		"markdown_source": "../packages/components/src/flyout/flyout/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "FocalPointPicker",
 		"slug": "focal-point-picker",
 		"markdown_source": "../packages/components/src/focal-point-picker/README.md",
