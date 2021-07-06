@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, Text } from 'react-native';
+import { TouchableWithoutFeedback, Image, Text } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -25,6 +25,9 @@ const EmbedPreview = ( {
 	isSelected,
 	onBlur,
 	onFocus,
+	preview,
+	previewable,
+	url,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 	const stylePlaceholder = usePreferredColorSchemeStyle(
@@ -60,7 +63,17 @@ const EmbedPreview = ( {
 		}
 	}
 
-	// Currently returning a Text component that act's as the Embed Preview to simulate the caption's isSelected state.
+	const parsedHost = new URL( url ).host.split( '.' );
+	const parsedHostBaseUrl = parsedHost
+		.splice( parsedHost.length - 2, parsedHost.length - 1 )
+		.join( '.' );
+
+	const cannotShowThumbnail =
+		! previewable ||
+		! preview ||
+		! preview.thumbnail_url?.length ||
+		! preview.height;
+
 	return (
 		<TouchableWithoutFeedback
 			accessible={ ! isSelected }
@@ -68,12 +81,30 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				<View style={ stylePlaceholder }>
-					<Text style={ stylePlaceholderText }>
-						Embed Preview will be directly above the Block Caption
-						component when it is implemented.
-					</Text>
-				</View>
+				{ cannotShowThumbnail ? (
+					<View style={ stylePlaceholder }>
+						<Text style={ stylePlaceholderText }>
+							{ sprintf(
+								/* translators: %s: host providing embed content e.g: www.youtube.com */
+								__(
+									"Embedded content from %s can't be viewed in the mobile editor at the moment. Please preview the page to see the embedded content."
+								),
+								parsedHostBaseUrl
+							) }
+						</Text>
+					</View>
+				) : (
+					<Image
+						style={ {
+							height: preview.height,
+							width: '100%',
+						} }
+						source={ {
+							uri: preview.thumbnail_url,
+						} }
+						resizeMode="contain"
+					/>
+				) }
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }
 					accessible
