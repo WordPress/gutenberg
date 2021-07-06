@@ -133,8 +133,8 @@ If the block is a top level block: the locking of the Custom Post Type is used.
 
 ### `appender`
 
--   **Type:** `Object|false`
--   **Default:** - `undefined`. When `appender` is not specified, the default appender is shown. If a `false` value is provided, no appender is rendered.
+-   **Type:** `Object|null`
+-   **Default:** - `undefined`. When `appender` is not specified, the default appender is shown. If a `null` value is provided, no appender is rendered.
 
 A instantiated component to show as the trailing appender for the inner blocks list.
 
@@ -155,7 +155,7 @@ A instantiated component to show as the trailing appender for the inner blocks l
 
 // Don't display an appender
 <InnerBlocks
-	appender={ false }
+	appender={ null }
 />
 
 // Fully custom

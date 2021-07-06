@@ -153,7 +153,7 @@ function Navigation( {
 					! selectedBlockHasDescendants ) ||
 				isSelected
 					? undefined
-					: false,
+					: null,
 			__experimentalAppenderTagName: 'li',
 			__experimentalCaptureToolbars: true,
 			// Template lock set to false here so that the Nav
