@@ -80,6 +80,13 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
 	}
 );
 
+/**
+ * Given a child client id, returns the parent widget area block.
+ *
+ * @param {string} clientId The client id of a block in a widget area.
+ *
+ * @return {WPBlock} The widget area block.
+ */
 export const getParentWidgetAreaBlock = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
 		const { getBlock, getBlockName, getBlockParents } = select(
