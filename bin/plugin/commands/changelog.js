@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { groupBy, escapeRegExp, uniq } = require( 'lodash' );
+const { countBy, groupBy, escapeRegExp, uniq } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -93,7 +93,7 @@ const LABEL_TYPE_MAPPING = {
 };
 
 const LABEL_FEATURE_MAPPING = {
-	'[Package] Block editor': 'Block Editor',
+	'[Package] Block Editor': 'Block Editor',
 	'[Package] Editor': 'Editor',
 	'[Package] Edit Widgets': 'Widgets',
 	'[Package] Widgets Customizer': 'Widgets',
@@ -167,17 +167,15 @@ function getTypesByLabels( labels ) {
 	);
 }
 
-function getIssuesByFeature( labels ) {
-	return uniq(
-		labels
-			.filter( ( label ) =>
-				Object.keys( LABEL_FEATURE_MAPPING ).includes( label )
-			)
-			.map( ( label ) => LABEL_FEATURE_MAPPING[ label ] )
-	);
+function getIssueFeatures( labels ) {
+	return labels
+		.filter( ( label ) =>
+			Object.keys( LABEL_FEATURE_MAPPING ).includes( label )
+		)
+		.map( ( label ) => LABEL_FEATURE_MAPPING[ label ] );
 }
 
-function getBlockSpecificIssues( labels ) {
+function getIsBlockSpecificIssue( labels ) {
 	return uniq(
 		labels
 			.filter( ( label ) => label.startsWith( '[Block] ' ) )
@@ -225,12 +223,31 @@ function getIssueType( issue ) {
 function getIssueFeature( issue ) {
 	const labels = issue.labels.map( ( { name } ) => name );
 
+	const blockSpecificLabels = getIsBlockSpecificIssue( labels );
+
+	if ( blockSpecificLabels.length ) {
+		return blockSpecificLabels[ 0 ];
+	}
+
 	const candidates = [
-		...getIssuesByFeature( labels ),
-		...getBlockSpecificIssues( labels ),
+		...blockSpecificLabels,
+		...getIssueFeatures( labels ),
 	];
 
-	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Unknown';
+	if ( ! candidates.length ) {
+		return 'Unknown';
+	}
+
+	// Get occurances of the feature labels.
+	const featureCounts = countBy( candidates );
+
+	// Check which matching label occurs most often.
+	const rankedFeatures = Object.keys( featureCounts ).sort(
+		( a, b ) => featureCounts[ b ] - featureCounts[ a ]
+	);
+
+	// Return the one that appeared most often.
+	return rankedFeatures[ 0 ];
 }
 
 /**
@@ -541,19 +558,22 @@ async function getChangelog( settings ) {
 		if ( ! groupEntries.length ) {
 			continue;
 		}
-		// console.log( groupPullRequests );
-		console.log(
-			groupBy(
-				groupPullRequests.map( ( item ) => ( {
-					title: item.title,
-					labels: item.labels,
-				} ) ),
-				getIssueFeature
-			)
-		);
+
+		const featureGroups = groupBy( groupPullRequests, getIssueFeature );
 
 		changelog += '### ' + group + '\n\n';
-		groupEntries.forEach( ( entry ) => ( changelog += entry + '\n' ) );
+
+		Object.keys( featureGroups ).forEach( ( feature ) => {
+			const featureGroup = featureGroups[ feature ];
+			changelog += '- ' + feature + '\n';
+			const featureGroupEntries = featureGroup
+				.map( getEntry )
+				.filter( Boolean );
+			featureGroupEntries.forEach(
+				( entry ) => ( changelog += `  ${ entry }\n` )
+			);
+			changelog += '\n';
+		} );
 		changelog += '\n';
 	}
 

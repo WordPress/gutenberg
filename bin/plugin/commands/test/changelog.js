@@ -174,43 +174,64 @@ describe( 'getIssueType', () => {
 } );
 
 describe( 'getIssueFeature', () => {
-	it( 'returns "Unknown" if unable to find appropriate feature by label', () => {
+	it( 'returns "Unknown" as feature if unable to find appropriate feature by label', () => {
 		const result = getIssueFeature( { labels: [] } );
 
 		expect( result ).toBe( 'Unknown' );
 	} );
 
-	it( 'returns "Block Library" for all PRs that have a block specific label', () => {
+	it( 'returns "Block Library" as feature for all PRs that have a block specific label', () => {
+		const widgetFavouringLabels = [
+			{
+				name: '[Block] Some Block',
+			},
+			{
+				name: '[Package] Edit Widgets',
+			},
+			{
+				name: '[Feature] Widgets Screen',
+			},
+			{
+				name: '[Package] Widgets Customizer',
+			},
+		];
+
 		const result = getIssueFeature( {
-			labels: [
-				{
-					name: '[Block] Some Block',
-				},
-			],
+			labels: widgetFavouringLabels,
 		} );
 
 		expect( result ).toEqual( 'Block Library' );
 	} );
 
-	it.each( [
-		{
+	it( 'returns a single best match feature for a given issue', () => {
+		const result = getIssueFeature( {
 			labels: [
+				{
+					name: '[Package] Components',
+				},
 				{
 					name: '[Package] Edit Widgets',
 				},
+				{
+					name: '[Package] Block Editor',
+				},
+				{
+					name: '[Package] Editor',
+				},
+				{
+					name: '[Feature] UI Components',
+				},
+				{
+					name: '[Feature] Component System',
+				},
+				{
+					name: '[Package] Block Library', // 2. mapped to "Block Library"
+				},
 			],
-			feature: 'Widgets',
-		},
-	] )(
-		'returns appropriate feature for all PRs that have a specific label',
-		( testData ) => {
-			const result = getIssueFeature( {
-				labels: testData.labels,
-			} );
+		} );
 
-			expect( result ).toEqual( testData.feature );
-		}
-	);
+		expect( result ).toEqual( 'Components' );
+	} );
 } );
 
 describe( 'sortGroup', () => {
