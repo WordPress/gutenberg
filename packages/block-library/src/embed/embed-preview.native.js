@@ -27,6 +27,7 @@ const EmbedPreview = ( {
 	label,
 	onBlur,
 	onFocus,
+	preview,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 	const containerStyle = usePreferredColorSchemeStyle(
@@ -77,10 +78,7 @@ const EmbedPreview = ( {
 				<View style={ containerStyle }>
 					<View style={ styles.embed__icon }>{ icon }</View>
 					<Text style={ labelStyle }>{ label }</Text>
-					<Text style={ stylePlaceholderText }>
-						Embed Preview will be directly above the Block Caption
-						component when it is implemented.
-					</Text>
+					<Text style={ stylePlaceholderText }>{ preview }</Text>
 				</View>
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }
