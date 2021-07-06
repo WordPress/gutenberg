@@ -80,6 +80,20 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
 	}
 );
 
+export const getParentWidgetAreaBlock = createRegistrySelector(
+	( select ) => ( state, clientId ) => {
+		const { getBlock, getBlockName, getBlockParents } = select(
+			blockEditorStore
+		);
+		const blockParents = getBlockParents( clientId );
+		const widgetAreaClientId = blockParents.find(
+			( parentClientId ) =>
+				getBlockName( parentClientId ) === 'core/widget-area'
+		);
+		return getBlock( widgetAreaClientId );
+	}
+);
+
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
 		let widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();

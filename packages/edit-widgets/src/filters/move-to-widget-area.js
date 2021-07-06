@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 
-import {
-	BlockControls,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { BlockControls } from '@wordpress/block-editor';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
@@ -32,23 +29,15 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 
 				const {
 					getWidgetAreas,
+					getParentWidgetAreaBlock,
 					canInsertBlockInWidgetArea: _canInsertBlockInWidgetArea,
 				} = select( editWidgetsStore );
-				const { getBlock, getBlockName, getBlockParents } = select(
-					blockEditorStore
-				);
 
-				// Find the widget area by searching through parent blocks.
-				const blockParents = getBlockParents( clientId );
-				const widgetAreaClientId = blockParents.find(
-					( parentClientId ) =>
-						getBlockName( parentClientId ) === 'core/widget-area'
-				);
-				const widgetAreaBlock = getBlock( widgetAreaClientId );
+				const widgetAreaBlock = getParentWidgetAreaBlock( clientId );
 
 				return {
 					widgetAreas: getWidgetAreas(),
-					currentWidgetAreaId: widgetAreaBlock.attributes.id,
+					currentWidgetAreaId: widgetAreaBlock?.attributes?.id,
 					canInsertBlockInWidgetArea: _canInsertBlockInWidgetArea(
 						blockName
 					),
