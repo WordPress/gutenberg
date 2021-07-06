@@ -16,6 +16,7 @@ jobs:
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
             VERSION: ${{ github.event.release.name }}
+
         steps:
             - name: Check out Gutenberg trunk from WP.org plugin repo
               run: svn checkout "$PLUGIN_REPO_URL/trunk"
