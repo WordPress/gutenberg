@@ -1,9 +1,6 @@
 # Set the default behavior, in case people don't have `core.autocrlf` set.
 * text=auto
 
-# Declare files that will always have LF line endings on checkout.
-*.php text eol=lf
-
 # Windows bat files in mobile/android.
 *.bat -text
 
