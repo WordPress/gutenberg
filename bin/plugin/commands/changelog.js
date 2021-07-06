@@ -183,6 +183,10 @@ function getIsBlockSpecificIssue( labels ) {
 	);
 }
 
+function getFeatureSpecificLabel( labels ) {
+	return labels.find( ( label ) => label.startsWith( '[Feature] ' ) );
+}
+
 /**
  * Returns type candidates based on given issue title.
  *
@@ -222,6 +226,12 @@ function getIssueType( issue ) {
 
 function getIssueFeature( issue ) {
 	const labels = issue.labels.map( ( { name } ) => name );
+
+	const featureSpecificLabel = getFeatureSpecificLabel( labels );
+
+	if ( featureSpecificLabel ) {
+		return featureSpecificLabel.replace( '[Feature] ', '' );
+	}
 
 	const blockSpecificLabels = getIsBlockSpecificIssue( labels );
 

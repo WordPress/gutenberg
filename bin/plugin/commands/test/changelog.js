@@ -180,6 +180,27 @@ describe( 'getIssueFeature', () => {
 		expect( result ).toBe( 'Unknown' );
 	} );
 
+	it( 'returns the feature label for any PRs marked with a specific feature label', () => {
+		const result = getIssueFeature( {
+			labels: [
+				{
+					name: '[Block] Some Block',
+				},
+				{
+					name: '[Package] Edit Widgets',
+				},
+				{
+					name: '[Feature] Widgets Screen',
+				},
+				{
+					name: '[Package] Widgets Customizer',
+				},
+			],
+		} );
+
+		expect( result ).toEqual( 'Widgets Screen' );
+	} );
+
 	it( 'returns "Block Library" as feature for all PRs that have a block specific label', () => {
 		const widgetFavouringLabels = [
 			{
