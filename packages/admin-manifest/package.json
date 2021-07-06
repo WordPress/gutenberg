@@ -2,6 +2,7 @@
 	"name": "@wordpress/admin-manifest",
 	"version": "1.0.0",
 	"description": "Dynamically creates a Web App manifest and registers the service worker for the admin.",
+	"private": true,
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
