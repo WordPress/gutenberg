@@ -274,3 +274,157 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 }
 
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
+
+/**
+ * Shim that causes `wp_nav_menu()` to output a Navigation block instead of a
+ * nav menu when the theme supports block menus. The Navigation block is
+ * constructed by transforming the stored tree of menu items into a tree of
+ * blocks.
+ *
+ * Specifically, this shim makes it so that `wp_nav_menu()` returns early when
+ * the theme supports block menus. When merged to Core, this functionality
+ * should exist in `wp_nav_menu()` after `$sorted_menu_items` is set. The
+ * duplicated code (marked using BEGIN and END) can be deleted.
+ *
+ * This shim can be removed when the Gutenberg plugin requires a WordPress
+ * version that has the ticket below.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50544
+ *
+ * @param string|null $output Nav menu output to short-circuit with. Default null.
+ * @param stdClass    $args   An object containing wp_nav_menu() arguments.
+ *
+ * @return string|null Nav menu output to short-circuit with.
+ */
+function gutenberg_output_block_nav_menu( $output, $args ) {
+	if ( ! current_theme_supports( 'block-nav-menus' ) ) {
+		return null;
+	}
+
+	// BEGIN: Code that already exists in wp_nav_menu().
+
+	// Get the nav menu based on the requested menu.
+	$menu = wp_get_nav_menu_object( $args->menu );
+
+	// Get the nav menu based on the theme_location.
+	$locations = get_nav_menu_locations();
+	if ( ! $menu && $args->theme_location && $locations && isset( $locations[ $args->theme_location ] ) ) {
+		$menu = wp_get_nav_menu_object( $locations[ $args->theme_location ] );
+	}
+
+	// Get the first menu that has items if we still can't find a menu.
+	if ( ! $menu && ! $args->theme_location ) {
+		$menus = wp_get_nav_menus();
+		foreach ( $menus as $menu_maybe ) {
+			$menu_items = wp_get_nav_menu_items( $menu_maybe->term_id, array( 'update_post_term_cache' => false ) );
+			if ( $menu_items ) {
+				$menu = $menu_maybe;
+				break;
+			}
+		}
+	}
+
+	if ( empty( $args->menu ) ) {
+		$args->menu = $menu;
+	}
+
+	// If the menu exists, get its items.
+	if ( $menu && ! is_wp_error( $menu ) && ! isset( $menu_items ) ) {
+		$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
+	}
+
+	// Set up the $menu_item variables.
+	_wp_menu_item_classes_by_context( $menu_items );
+
+	$sorted_menu_items = array();
+	foreach ( (array) $menu_items as $menu_item ) {
+		$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
+	}
+
+	unset( $menu_items, $menu_item );
+
+	// END: Code that already exists in wp_nav_menu().
+
+	$menu_items_by_parent_id = array();
+	foreach ( $sorted_menu_items as $menu_item ) {
+		$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
+	}
+
+	$block_attributes = array();
+	if ( isset( $args->block_attributes ) ) {
+		$block_attributes = $args->block_attributes;
+	}
+
+	$navigation_block = array(
+		'blockName'   => 'core/navigation',
+		'attrs'       => $block_attributes,
+		'innerBlocks' => gutenberg_convert_menu_items_to_blocks(
+			isset( $menu_items_by_parent_id[0] )
+				? $menu_items_by_parent_id[0]
+				: array(),
+			$menu_items_by_parent_id
+		),
+	);
+
+	return render_block( $navigation_block );
+}
+add_filter( 'pre_wp_nav_menu', 'gutenberg_output_block_nav_menu', 10, 2 );
+
+/**
+ * Recursively converts a list of menu items into a list of blocks. This is a
+ * helper function used by `gutenberg_output_block_nav_menu()`.
+ *
+ * Transformation depends on the menu item type. Link menu items are turned into
+ * a `core/navigation-link` block. Block menu items are simply parsed.
+ *
+ * @param array $menu_items The menu items to convert, sorted by each menu item's menu order.
+ * @param array $menu_items_by_parent_id All menu items, indexed by their parent's ID.
+
+ * @return array Updated menu items, sorted by each menu item's menu order.
+ */
+function gutenberg_convert_menu_items_to_blocks(
+	$menu_items,
+	&$menu_items_by_parent_id
+) {
+	if ( empty( $menu_items ) ) {
+		return array();
+	}
+
+	$blocks = array();
+
+	foreach ( $menu_items as $menu_item ) {
+		if ( 'block' === $menu_item->type ) {
+			$parsed_blocks = parse_blocks( $menu_item->content );
+
+			if ( count( $parsed_blocks ) ) {
+				$block = $parsed_blocks[0];
+			} else {
+				$block = array(
+					'blockName' => 'core/freeform',
+					'attrs'     => array(
+						'originalContent' => $menu_item->content,
+					),
+				);
+			}
+		} else {
+			$block = array(
+				'blockName' => 'core/navigation-link',
+				'attrs'     => array(
+					'label' => $menu_item->title,
+					'url'   => $menu_item->url,
+				),
+			);
+		}
+
+		$block['innerBlocks'] = gutenberg_convert_menu_items_to_blocks(
+			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+					? $menu_items_by_parent_id[ $menu_item->ID ]
+					: array(),
+			$menu_items_by_parent_id
+		);
+
+		$blocks[] = $block;
+	}
+
+	return $blocks;
+}
