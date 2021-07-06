@@ -290,7 +290,7 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should correctly handle quotes with one paragraphs and no citation', () => {
+	it( 'should correctly handle quotes with one paragraph and no citation', () => {
 		const filtered = pasteHandler( {
 			HTML: '<blockquote><p>chicken</p></blockquote>',
 			mode: 'AUTO',
@@ -299,7 +299,9 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p></blockquote>'
+			`<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>chicken</p>
+<!-- /wp:paragraph --></blockquote>`
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -312,7 +314,13 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p></blockquote>'
+			`<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>chicken</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>ribs</p>
+<!-- /wp:paragraph --></blockquote>`
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -326,7 +334,9 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p><cite>ribs</cite></blockquote>'
+			`<figure class="wp-block-quote"><blockquote><!-- wp:paragraph -->
+<p>chicken</p>
+<!-- /wp:paragraph --></blockquote><figcaption><cite>ribs</cite></figcaption></figure>`
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -340,7 +350,9 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>ribs</p><cite>ribs</cite></blockquote>'
+			`<figure class="wp-block-quote"><blockquote><!-- wp:paragraph -->
+<p>ribs</p>
+<!-- /wp:paragraph --></blockquote><figcaption><cite>ribs</cite></figcaption></figure>`
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -355,7 +367,13 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p><cite>ribs</cite></blockquote>'
+			`<figure class="wp-block-quote"><blockquote><!-- wp:paragraph -->
+<p>chicken</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>ribs</p>
+<!-- /wp:paragraph --></blockquote><figcaption><cite>ribs</cite></figcaption></figure>`
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -369,7 +387,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p></p><cite>ribs</cite></blockquote>'
+			'<figure class="wp-block-quote"><blockquote></blockquote><figcaption><cite>ribs</cite></figcaption></figure>'
 		);
 		expect( console ).toHaveLogged();
 	} );

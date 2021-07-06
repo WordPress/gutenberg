@@ -2,10 +2,22 @@
 	{
 		"blockName": "core/quote",
 		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n<blockquote class=\"wp-block-quote\"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><cite>Matt Mullenweg, 2017</cite></blockquote>\n",
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p>\n",
+				"innerContent": [
+					"\n<p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p>\n"
+				]
+			}
+		],
+		"innerHTML": "\n<figure class=\"wp-block-quote\"><blockquote></blockquote><figcaption><cite>Matt Mullenweg, 2017</cite></figcaption></figure>\n",
 		"innerContent": [
-			"\n<blockquote class=\"wp-block-quote\"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><cite>Matt Mullenweg, 2017</cite></blockquote>\n"
+			"\n<figure class=\"wp-block-quote\"><blockquote>",
+			null,
+			"</blockquote><figcaption><cite>Matt Mullenweg, 2017</cite></figcaption></figure>\n"
 		]
 	}
 ]

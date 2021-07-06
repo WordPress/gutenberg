@@ -2,9 +2,8 @@
 	{
 		"clientId": "_clientId_0",
 		"name": "core/quote",
-		"isValid": true,
+		"isValid": false,
 		"attributes": {
-			"value": "<p>Testing deprecated quote block...</p>",
 			"citation": "...with a caption",
 			"align": "right"
 		},

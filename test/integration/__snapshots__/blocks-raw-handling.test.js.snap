@@ -75,12 +75,20 @@ exports[`rawHandler should convert HTML post to blocks with minimal content chan
 <!-- /wp:list -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>Text.</p></blockquote>
+<blockquote class=\\"wp-block-quote\\"><!-- wp:paragraph -->
+<p>Text.</p>
+<!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->
 
-<!-- wp:html -->
-<blockquote><h1>Heading</h1><p>Text.</p></blockquote>
-<!-- /wp:html -->"
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><!-- wp:heading {\\"level\\":1} -->
+<h1>Heading</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Text.</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->"
 `;
 
 exports[`rawHandler should convert a caption shortcode 1`] = `

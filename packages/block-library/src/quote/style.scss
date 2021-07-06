@@ -1,4 +1,8 @@
 .wp-block-quote {
+	blockquote {
+		margin: 0;
+	}
+
 	&.is-style-large,
 	&.is-large {
 		margin-bottom: 1em;

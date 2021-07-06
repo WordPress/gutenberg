@@ -4,11 +4,22 @@
 		"name": "core/quote",
 		"isValid": true,
 		"attributes": {
-			"value": "<p>There is no greater agony than bearing an untold story inside you.</p>",
 			"citation": "Maya Angelou",
 			"className": "is-style-large"
 		},
-		"innerBlocks": [],
-		"originalContent": "<blockquote class=\"wp-block-quote is-style-large\"><p>There is no greater agony than bearing an untold story inside you.</p><cite>Maya Angelou</cite></blockquote>"
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "There is no greater agony than bearing an untold story inside you.",
+					"dropCap": false
+				},
+				"innerBlocks": [],
+				"originalContent": "<p>There is no greater agony than bearing an untold story inside you.</p>"
+			}
+		],
+		"originalContent": "<figure class=\"wp-block-quote is-style-large\"><blockquote></blockquote><figcaption><cite>Maya Angelou</cite></figcaption></figure>"
 	}
 ]

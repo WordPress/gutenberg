@@ -7,15 +7,9 @@ import { omit } from 'lodash';
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
+import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
 
 const blockAttributes = {
-	value: {
-		type: 'string',
-		source: 'html',
-		selector: 'blockquote',
-		multiline: 'p',
-		default: '',
-	},
 	citation: {
 		type: 'string',
 		source: 'html',
@@ -107,6 +101,47 @@ const deprecated = [
 					<RichText.Content multiline value={ value } />
 					{ ! RichText.isEmpty( citation ) && (
 						<RichText.Content tagName="footer" value={ citation } />
+					) }
+				</blockquote>
+			);
+		},
+	},
+	{
+		attributes: {
+			...blockAttributes,
+			value: {
+				type: 'string',
+				source: 'html',
+				selector: 'blockquote',
+				multiline: 'p',
+				default: '',
+			},
+		},
+		migrate( attributes ) {
+			// The old value attribute for quotes can contain:
+			// - a single paragraph: "<p>single paragraph</p>"
+			// - multiple paragraphs: "<p>first paragraph</p><p>second paragraph</p>"
+			const innerBlocks = parseWithAttributeSchema( attributes.value, {
+				type: 'array',
+				source: 'query',
+				selector: 'p',
+				query: {
+					value: {
+						type: 'string',
+						source: 'text',
+					},
+				},
+			} ).map( ( { value } ) =>
+				createBlock( 'core/paragraph', { content: value } )
+			);
+			return [ omit( attributes, [ 'value' ] ), innerBlocks ];
+		},
+		save( { attributes: { value, citation } } ) {
+			return (
+				<blockquote>
+					<RichText.Content multiline value={ value } />
+					{ ! RichText.isEmpty( citation ) && (
+						<RichText.Content tagName="cite" value={ citation } />
 					) }
 				</blockquote>
 			);

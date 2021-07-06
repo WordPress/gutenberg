@@ -16,8 +16,14 @@ describe( 'adding blocks', () => {
 	it( 'Should switch the style of the quote block', async () => {
 		// Inserting a quote block
 		await insertBlock( 'Quote' );
+		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.type( 'Quote content' );
 
+		// After adding content, the selected block
+		// would be the paragraph, hence we have
+		// to select the parent and then click for open
+		// style variations.
+		await clickBlockToolbarButton( 'Select Quote' );
 		await clickBlockToolbarButton( 'Quote' );
 
 		const styleVariations = await page.$$(
