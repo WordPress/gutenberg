@@ -588,13 +588,19 @@ async function getChangelog( settings ) {
 			} )
 			.forEach( ( feature ) => {
 				const featureGroup = featureGroups[ feature ];
+				// Start new markdown list
 				changelog += '- ' + feature + '\n';
 				const featureGroupEntries = featureGroup
 					.map( getEntry )
 					.filter( Boolean );
-				featureGroupEntries.forEach(
-					( entry ) => ( changelog += `  ${ entry }\n` )
-				);
+				featureGroupEntries.forEach( ( entry ) => {
+					// Strip feature name from entry if present.
+					entry = entry && entry.replace( `[${ feature } - `, '[' );
+
+					// Add a new bullet point to the list.
+					changelog += `  ${ entry }\n`;
+				} );
+				// End the markdown list.
 				changelog += '\n';
 			} );
 		changelog += '\n';
