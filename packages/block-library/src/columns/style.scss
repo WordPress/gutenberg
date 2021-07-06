@@ -113,6 +113,10 @@
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
 
+	> .wp-block[data-align="right"] {
+		margin-left: auto;
+	}
+
 	/**
 	* Individual Column Alignment
 	*/
