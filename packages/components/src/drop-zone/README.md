@@ -15,9 +15,9 @@ const MyDropZone = () => {
 		<div>
 			{ hasDropped ? 'Dropped!' : 'Drop something here' }
 			<DropZone
-				onFilesDrop={ () => setState( { hasDropped: true } ) }
-				onHTMLDrop={ () => setState( { hasDropped: true } ) }
-				onDrop={ () => setState( { hasDropped: true } ) }
+				onFilesDrop={ () => setHasDropped( true ) }
+				onHTMLDrop={ () => setHasDropped( true ) }
+				onDrop={ () => setHasDropped( true ) }
 			/>
 		</div>
 	);
