@@ -31,6 +31,16 @@
 	color: $white;
 }
 
+.editLink {
+	width: 100%;
+	text-align: center;
+	color: $blue-wordpress;
+	font-size: 14;
+	font-weight: 500;
+	margin-top: 16;
+	margin-bottom: 16;
+}
+
 .emptyStateDescription {
 	width: 100%;
 	text-align: center;
@@ -45,6 +55,19 @@
 	justify-content: center;
 	align-items: center;
 	fill: $gray-dark;
+}
+
+.embed-preview__loading {
+	flex: 1;
+	padding-left: 12px;
+	padding-right: 12px;
+	padding-top: 40px;
+	padding-bottom: 40px;
+	background-color: $gray-lighten-30;
+}
+
+.embed-preview__loading--dark {
+	background-color: $gray-darken-30;
 }
 
 .embed-preview__placeholder {
