@@ -43,38 +43,33 @@ const EmbedPlaceholder = ( {
 		isSelected && ( ( wasBlockJustInserted && ! value ) || isEditingURL )
 	);
 
-	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
-		styles.emptyStateContainer,
-		styles.emptyStateContainerDark
+	const containerStyle = usePreferredColorSchemeStyle(
+		styles.embed__container,
+		styles[ 'embed__container--dark' ]
 	);
-
-	const emptyStateTitleStyle = usePreferredColorSchemeStyle(
-		styles.emptyStateTitle,
-		styles.emptyStateTitleDark
+	const labelStyle = usePreferredColorSchemeStyle(
+		styles.embed__label,
+		styles[ 'embed__label--dark' ]
 	);
 
 	return (
 		<>
-			{ value ? (
-				<Text>{ value }</Text>
-			) : (
-				<TouchableWithoutFeedback
-					accessibilityRole={ 'button' }
-					accessibilityHint={ __( 'Double tap to add a link.' ) }
-					onPress={ ( event ) => {
-						onFocus( event );
-						setIsEmbedSheetVisible( true );
-					} }
-				>
-					<View style={ emptyStateContainerStyle }>
-						<View style={ styles.modalIcon }>{ icon }</View>
-						<Text style={ emptyStateTitleStyle }>{ label }</Text>
-						<Text style={ styles.emptyStateDescription }>
-							{ __( 'ADD LINK' ) }
-						</Text>
-					</View>
-				</TouchableWithoutFeedback>
-			) }
+			<TouchableWithoutFeedback
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Double tap to add a link.' ) }
+				onPress={ ( event ) => {
+					onFocus( event );
+					setIsEmbedSheetVisible( true );
+				} }
+			>
+				<View style={ containerStyle }>
+					<View style={ styles.embed__icon }>{ icon }</View>
+					<Text style={ labelStyle }>{ label }</Text>
+					<Text style={ styles[ 'embed-empty__description' ] }>
+						{ __( 'ADD LINK' ) }
+					</Text>
+				</View>
+			</TouchableWithoutFeedback>
 			<EmbedBottomSheet
 				value={ value }
 				isVisible={ isEmbedSheetVisible }
