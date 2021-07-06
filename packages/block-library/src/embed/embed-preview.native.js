@@ -38,7 +38,7 @@ const EmbedPreview = ( {
 		styles.embed__label,
 		styles[ 'embed__label--dark' ]
 	);
-	const stylePlaceholderText = usePreferredColorSchemeStyle(
+	const placeholderTextStyle = usePreferredColorSchemeStyle(
 		styles[ 'embed-preview__placeholder-text' ],
 		styles[ 'embed-preview__placeholder-text--dark' ]
 	);
@@ -78,7 +78,7 @@ const EmbedPreview = ( {
 				<View style={ containerStyle }>
 					<View style={ styles.embed__icon }>{ icon }</View>
 					<Text style={ labelStyle }>{ label }</Text>
-					<Text style={ stylePlaceholderText }>{ preview }</Text>
+					<Text style={ placeholderTextStyle }>{ preview }</Text>
 				</View>
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }
