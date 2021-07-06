@@ -354,14 +354,14 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	return $content . $duotone;
 }
 
-// This can be removed when plugin support requires WordPress 5.8.0+.
-if ( ! function_exists( 'wp_render_duotone_support' ) ) {
-	// Register the block support.
-	WP_Block_Supports::get_instance()->register(
-		'duotone',
-		array(
-			'register_attribute' => 'gutenberg_register_duotone_support',
-		)
-	);
-	add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );
-}
+// Register the block support.
+WP_Block_Supports::get_instance()->register(
+	'duotone',
+	array(
+		'register_attribute' => 'gutenberg_register_duotone_support',
+	)
+);
+
+// Remove WordPress core filter to avoid rendering duplicate support elements.
+remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
+add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );
