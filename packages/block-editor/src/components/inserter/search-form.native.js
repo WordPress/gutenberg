@@ -12,7 +12,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useMemo } from '@wordpress/element';
+import { useState, useRef, useMemo, useEffect } from '@wordpress/element';
 import { usePreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Button, Gridicons } from '@wordpress/components';
@@ -45,11 +45,12 @@ function usePreferredColorSchemeBemStyle( styles, darkModifier = 'dark' ) {
 	}
 
 	const darkSelectors = Object.keys( styles ).filter( ( selector ) =>
-		selector.match( `--${ darkModifier }$` )
+		selector.match( `-{1,2}${ darkModifier }$` )
 	);
 
 	darkSelectors.forEach( ( darkSelector ) => {
-		const baseSelector = darkSelector.replace( `--${ darkModifier }`, '' );
+		const matchDarkModifier = new RegExp( `-{1,2}${ darkModifier }` );
+		const baseSelector = darkSelector.replace( matchDarkModifier, '' );
 
 		styles[ baseSelector ] = {
 			...styles[ baseSelector ],
@@ -63,6 +64,8 @@ function usePreferredColorSchemeBemStyle( styles, darkModifier = 'dark' ) {
 function InserterSearchForm( { value, onChange } ) {
 	const [ isActive, setIsActive ] = useState( false );
 
+	const [ currentStyles, setCurrentStyles ] = useState( baseStyles );
+
 	const inputRef = useRef();
 
 	const isIOS = Platform.OS === 'ios';
@@ -70,9 +73,9 @@ function InserterSearchForm( { value, onChange } ) {
 	const themedStyles = usePreferredColorSchemeBemStyle( baseStyles );
 
 	const activeStyles = useMemo( () => {
-		// pluck slecetors with an 'active' modifier
+		// pluck selectors with an 'active' modifier
 		const activeSelectors = Object.keys( themedStyles ).filter(
-			( key ) => !! key?.match( /--(.*)active/ )
+			( key ) => !! key?.match( /-{1,2}active$/ )
 		);
 
 		// Remove the 'active' modifier from selector so it can be merged
@@ -84,9 +87,10 @@ function InserterSearchForm( { value, onChange } ) {
 		}, {} );
 	}, [ themedStyles ] );
 
-	const updatedStyles = useMemo( () => {
+	useEffect( () => {
 		if ( ! isActive ) {
-			return themedStyles;
+			setCurrentStyles( themedStyles );
+			return;
 		}
 
 		const updated = { ...themedStyles };
@@ -97,7 +101,7 @@ function InserterSearchForm( { value, onChange } ) {
 				...activeStyles[ selector ],
 			};
 		}
-		return updated;
+		setCurrentStyles( updated );
 	}, [ themedStyles, isActive ] );
 
 	const {
@@ -112,7 +116,7 @@ function InserterSearchForm( { value, onChange } ) {
 		'inserter-search-form__cancel-button-text': cancelButtonTextStyle,
 		'inserter-search-form__icon': iconStyle,
 		'inserter-search-form__right-icon': rightIconStyle,
-	} = updatedStyles;
+	} = currentStyles;
 
 	function clearInput() {
 		onChange( '' );

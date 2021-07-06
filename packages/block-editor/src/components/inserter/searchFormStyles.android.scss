@@ -1,12 +1,26 @@
 .inserter-search-form__container {
 	height: 40px;
 }
+
 .inserter-search-form__container--active {
-	margin-right: 16px;
+	border-bottom-color: $light-gray-500;
+	border-bottom-width: 1px;
+	margin-left: 0;
+	margin-right: 0;
+	border-radius: 0;
+	elevation: 0;
+}
+
+.inserter-search-form__container--active-dark {
+	border-bottom-color: $gray-70;
 }
 
 .inserter-search-form__input-container {
 	background-color: $gray-light;
+}
+
+.inserter-search-form__input-container--active {
+	background-color: transparent;
 }
 
 .inserter-search-form__input-container--dark {
