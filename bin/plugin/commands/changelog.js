@@ -92,6 +92,21 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Security': 'Security',
 };
 
+const LABEL_FEATURE_MAPPING = {
+	'[Package] Block editor': 'Block Editor',
+	'[Package] Editor': 'Editor',
+	'[Package] Edit Widgets': 'Widgets',
+	'[Package] Widgets Customizer': 'Widgets',
+	'[Feature] Widgets Screen': 'Widgets',
+	'[Block] Legacy Widget': 'Widgets',
+	'[Package] Components': 'Components',
+	'[Feature] UI Components': 'Components',
+	'[Feature] Component System': 'Components',
+	'[Package] Block Library': 'Block Library',
+	'[Feature] Blocks': 'Block Library',
+	'New Block': 'Block Library',
+};
+
 /**
  * Order in which to print group titles. A value of `undefined` is used as slot
  * in which unrecognized headings are to be inserted.
@@ -152,6 +167,24 @@ function getTypesByLabels( labels ) {
 	);
 }
 
+function getIssuesByFeature( labels ) {
+	return uniq(
+		labels
+			.filter( ( label ) =>
+				Object.keys( LABEL_FEATURE_MAPPING ).includes( label )
+			)
+			.map( ( label ) => LABEL_FEATURE_MAPPING[ label ] )
+	);
+}
+
+function getBlockSpecificIssues( labels ) {
+	return uniq(
+		labels
+			.filter( ( label ) => label.startsWith( '[Block] ' ) )
+			.map( () => 'Block Library' )
+	);
+}
+
 /**
  * Returns type candidates based on given issue title.
  *
@@ -180,12 +213,24 @@ function getTypesByTitle( title ) {
  */
 function getIssueType( issue ) {
 	const labels = issue.labels.map( ( { name } ) => name );
+
 	const candidates = [
 		...getTypesByLabels( labels ),
 		...getTypesByTitle( issue.title ),
 	];
 
 	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
+}
+
+function getIssueFeature( issue ) {
+	const labels = issue.labels.map( ( { name } ) => name );
+
+	const candidates = [
+		...getIssuesByFeature( labels ),
+		...getBlockSpecificIssues( labels ),
+	];
+
+	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Unknown';
 }
 
 /**
@@ -485,6 +530,7 @@ async function getChangelog( settings ) {
 	let changelog = '';
 
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
+
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
 	for ( const group of sortedGroups ) {
 		const groupPullRequests = groupedPullRequests[ group ];
@@ -495,6 +541,16 @@ async function getChangelog( settings ) {
 		if ( ! groupEntries.length ) {
 			continue;
 		}
+		// console.log( groupPullRequests );
+		console.log(
+			groupBy(
+				groupPullRequests.map( ( item ) => ( {
+					title: item.title,
+					labels: item.labels,
+				} ) ),
+				getIssueFeature
+			)
+		);
 
 		changelog += '### ' + group + '\n\n';
 		groupEntries.forEach( ( entry ) => ( changelog += entry + '\n' ) );
@@ -562,6 +618,7 @@ async function getReleaseChangelog( options ) {
 	getNormalizedTitle,
 	getReleaseChangelog,
 	getIssueType,
+	getIssueFeature,
 	sortGroup,
 	getTypesByLabels,
 	getTypesByTitle,

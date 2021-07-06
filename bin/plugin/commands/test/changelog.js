@@ -12,6 +12,7 @@ import {
 	sortGroup,
 	getTypesByLabels,
 	getTypesByTitle,
+	getIssueFeature,
 } from '../changelog';
 
 describe( 'getNormalizedTitle', () => {
@@ -170,6 +171,46 @@ describe( 'getIssueType', () => {
 
 		expect( result ).toBe( 'Enhancements' );
 	} );
+} );
+
+describe( 'getIssueFeature', () => {
+	it( 'returns "Unknown" if unable to find appropriate feature by label', () => {
+		const result = getIssueFeature( { labels: [] } );
+
+		expect( result ).toBe( 'Unknown' );
+	} );
+
+	it( 'returns "Block Library" for all PRs that have a block specific label', () => {
+		const result = getIssueFeature( {
+			labels: [
+				{
+					name: '[Block] Some Block',
+				},
+			],
+		} );
+
+		expect( result ).toEqual( 'Block Library' );
+	} );
+
+	it.each( [
+		{
+			labels: [
+				{
+					name: '[Package] Edit Widgets',
+				},
+			],
+			feature: 'Widgets',
+		},
+	] )(
+		'returns appropriate feature for all PRs that have a specific label',
+		( testData ) => {
+			const result = getIssueFeature( {
+				labels: testData.labels,
+			} );
+
+			expect( result ).toEqual( testData.feature );
+		}
+	);
 } );
 
 describe( 'sortGroup', () => {
