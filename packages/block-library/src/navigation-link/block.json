@@ -39,15 +39,6 @@
 		},
 		"isTopLevelLink": {
 			"type": "boolean"
-		},
-		"colors": {
-			"type": "object",
-			"default": {
-				"textColor": null,
-				"customTextColor": null,
-				"backgroundColor": null,
-				"customBackgroundColor": null
-			}
 		}
 	},
 	"usesContext": [

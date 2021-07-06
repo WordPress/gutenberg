@@ -285,12 +285,6 @@ export default function NavigationLinkEdit( {
 		rel,
 		title,
 		kind,
-		colors: {
-			textColor,
-			customTextColor,
-			backgroundColor,
-			customBackgroundColor,
-		},
 	} = attributes;
 	const link = {
 		url,
@@ -362,24 +356,7 @@ export default function NavigationLinkEdit( {
 	);
 
 	// Store the colors from context as attributes for rendering
-	useEffect( () => {
-		setAttributes( {
-			isTopLevelLink,
-			colors: getColors( context, ! isTopLevelLink ),
-		} );
-	}, [
-		isTopLevelLink,
-		context.overlayTextColor,
-		context.overlayBackgroundColor,
-		context.customOverlayTextColor,
-		context.customOverlayBackgroundColor,
-		context.textColor,
-		context.backgroundColor,
-		context.customTextColor,
-		context.customBackgroundColor,
-		context?.style?.color?.text,
-		context?.style?.color?.background,
-	] );
+	useEffect( () => setAttributes( { isTopLevelLink } ), [ isTopLevelLink ] );
 
 	/**
 	 * Insert a link block when submenu is added.
@@ -465,6 +442,13 @@ export default function NavigationLinkEdit( {
 			kind: 'post-type',
 		};
 	}
+
+	const {
+		textColor,
+		customTextColor,
+		backgroundColor,
+		customBackgroundColor,
+	} = getColors( context, ! isTopLevelLink );
 
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
