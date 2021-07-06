@@ -184,7 +184,7 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { attributes, colors, gradients, mergedStyle } = this.props;
+		const { attributes, colors, gradients, style } = this.props;
 		const { backgroundColor, gradient } = attributes;
 
 		// Return named gradient value if available.
@@ -207,13 +207,13 @@ class ButtonEdit extends Component {
 			colorObject?.color ||
 			colorProps.style?.backgroundColor ||
 			colorProps.style?.background ||
-			mergedStyle?.backgroundColor ||
+			style?.backgroundColor ||
 			styles.defaultButton.backgroundColor
 		);
 	}
 
 	getTextColor() {
-		const { attributes, colors, mergedStyle } = this.props;
+		const { attributes, colors, style } = this.props;
 		const colorProps = getColorClassesAndStyles( attributes );
 
 		// Retrieve named color object to force inline styles for themes that
@@ -226,7 +226,7 @@ class ButtonEdit extends Component {
 		return (
 			colorObject?.color ||
 			colorProps.style?.color ||
-			mergedStyle?.color ||
+			style?.color ||
 			styles.defaultButton.color
 		);
 	}
@@ -377,12 +377,12 @@ class ButtonEdit extends Component {
 			mergeBlocks,
 			parentWidth,
 			setAttributes,
-			mergedStyle,
+			style,
 		} = this.props;
 		const {
 			placeholder,
 			text,
-			style,
+			style: buttonStyle,
 			url,
 			align = 'center',
 			width,
@@ -394,7 +394,7 @@ class ButtonEdit extends Component {
 			return null;
 		}
 
-		const borderRadius = style?.border?.radius;
+		const borderRadius = buttonStyle?.border?.radius;
 
 		const borderRadiusValue = Number.isInteger( borderRadius )
 			? borderRadius
@@ -466,8 +466,7 @@ class ButtonEdit extends Component {
 						} }
 						textAlign={ align }
 						placeholderTextColor={
-							mergedStyle?.color ||
-							styles.placeholderTextColor.color
+							style?.color || styles.placeholderTextColor.color
 						}
 						identifier="text"
 						tagName="p"

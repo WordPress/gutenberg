@@ -254,7 +254,7 @@ class MediaTextEdit extends Component {
 			setAttributes,
 			isSelected,
 			isRTL,
-			mergedStyle,
+			style,
 			blockWidth,
 		} = this.props;
 		const {
@@ -285,7 +285,7 @@ class MediaTextEdit extends Component {
 							? styles.innerBlockStackMediaLeft
 							: styles.innerBlockStackMediaRight ),
 				  },
-			( mergedStyle?.backgroundColor || backgroundColor.color ) &&
+			( style?.backgroundColor || backgroundColor.color ) &&
 				styles.innerBlockPaddings,
 		];
 
@@ -302,8 +302,7 @@ class MediaTextEdit extends Component {
 				? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ]
 				: {} ),
 			...( isSelected && styles[ 'is-selected' ] ),
-			backgroundColor:
-				mergedStyle?.backgroundColor || backgroundColor.color,
+			backgroundColor: style?.backgroundColor || backgroundColor.color,
 			paddingBottom: 0,
 		};
 

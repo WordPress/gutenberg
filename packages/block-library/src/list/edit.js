@@ -41,7 +41,7 @@ export default function ListEdit( {
 	setAttributes,
 	mergeBlocks,
 	onReplace,
-	mergedStyle,
+	style,
 } ) {
 	const { ordered, values, type, reversed, start, placeholder } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
@@ -134,7 +134,7 @@ export default function ListEdit( {
 	);
 
 	const blockProps = useBlockProps( {
-		style: mergedStyle,
+		style,
 	} );
 
 	return (

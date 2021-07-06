@@ -19,14 +19,14 @@ export default function VerseEdit( {
 	setAttributes,
 	mergeBlocks,
 	onRemove,
-	mergedStyle,
+	style,
 } ) {
 	const { textAlign, content } = attributes;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
-		style: mergedStyle,
+		style,
 	} );
 
 	return (
