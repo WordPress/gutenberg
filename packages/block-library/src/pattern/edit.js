@@ -1,23 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	store as blockEditorStore,
-	BlockList,
-	BlockEditorProvider,
+	InnerBlocks,
 } from '@wordpress/block-editor';
 
-const PatternEdit = ( { attributes } ) => {
+const PatternEdit = ( { attributes, clientId } ) => {
 	const selectedPattern = useSelect( ( select ) =>
-		select( blockEditorStore ).__experimentalGetParsedPattern( attributes.slug )
+		select( blockEditorStore ).__experimentalGetParsedPattern(
+			attributes.slug
+		)
 	);
-
-	return (
-		<BlockEditorProvider value={ selectedPattern.blocks }>
-			<BlockList />
-		</BlockEditorProvider>
-	);
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	replaceInnerBlocks( clientId, selectedPattern.blocks );
+	return <InnerBlocks />;
 };
 
 export default PatternEdit;

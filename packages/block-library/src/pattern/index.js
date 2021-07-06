@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { InnerBlocks } from '@wordpress/block-editor';
+
+/**
  * Internal dependencies
  */
 import metadata from './block.json';
@@ -9,4 +14,7 @@ export { metadata, name };
 
 export const settings = {
 	edit: PatternEdit,
+	save: () => {
+		return <InnerBlocks.Content />;
+	},
 };
