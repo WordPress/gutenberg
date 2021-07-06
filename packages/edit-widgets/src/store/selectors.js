@@ -87,7 +87,7 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
 export const getParentWidgetAreaBlock = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
 		const { getBlock, getBlockName, getBlockParents } = select(
-			blockEditorStore
+			'core/block-editor'
 		);
 		const blockParents = getBlockParents( clientId );
 		const widgetAreaClientId = blockParents.find(
