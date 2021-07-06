@@ -27,18 +27,16 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 					return {};
 				}
 
-				const {
-					getWidgetAreas,
-					getParentWidgetAreaBlock,
-					canInsertBlockInWidgetArea: _canInsertBlockInWidgetArea,
-				} = select( editWidgetsStore );
+				const selectors = select( editWidgetsStore );
 
-				const widgetAreaBlock = getParentWidgetAreaBlock( clientId );
+				const widgetAreaBlock = selectors.getParentWidgetAreaBlock(
+					clientId
+				);
 
 				return {
-					widgetAreas: getWidgetAreas(),
+					widgetAreas: selectors.getWidgetAreas(),
 					currentWidgetAreaId: widgetAreaBlock?.attributes?.id,
-					canInsertBlockInWidgetArea: _canInsertBlockInWidgetArea(
+					canInsertBlockInWidgetArea: selectors.canInsertBlockInWidgetArea(
 						blockName
 					),
 				};
