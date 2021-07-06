@@ -119,9 +119,7 @@ export default function PreferencesModal() {
 							/>
 							<EnableFeature
 								featureName="showIconLabels"
-								help={ __(
-									'Shows text instead of icons in the toolbar.'
-								) }
+								help={ __( 'Shows text instead of icons.' ) }
 								label={ __( 'Display button labels' ) }
 							/>
 							<EnableFeature
