@@ -17,7 +17,7 @@ export const {
 	initialize,
 	remove,
 	getContent,
-} = window.wp.oldEditor;
+} = window?.wp?.oldEditor;
 
 /*
  * Backward compatibility
