@@ -28,6 +28,7 @@ const EmbedPlaceholder = ( {
 	onFocus,
 	value,
 	onSubmit,
+	cannotEmbed,
 } ) => {
 	const { clientId } = useBlockEditContext();
 	const { wasBlockJustInserted } = useSelect(
@@ -54,26 +55,35 @@ const EmbedPlaceholder = ( {
 
 	return (
 		<>
-			{ value ? (
-				<Text>{ value }</Text>
-			) : (
-				<TouchableWithoutFeedback
-					accessibilityRole={ 'button' }
-					accessibilityHint={ __( 'Double tap to add a link.' ) }
-					onPress={ ( event ) => {
-						onFocus( event );
-						setIsEmbedSheetVisible( true );
-					} }
-				>
-					<View style={ emptyStateContainerStyle }>
-						<View style={ styles.modalIcon }>{ icon }</View>
-						<Text style={ emptyStateTitleStyle }>{ label }</Text>
+			<TouchableWithoutFeedback
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Double tap to add a link.' ) }
+				onPress={ ( event ) => {
+					onFocus( event );
+					setIsEmbedSheetVisible( true );
+				} }
+			>
+				<View style={ emptyStateContainerStyle }>
+					<View style={ styles.modalIcon }>{ icon }</View>
+					<Text style={ emptyStateTitleStyle }>{ label }</Text>
+					{ cannotEmbed ? (
+						<>
+							<Text>
+								{ __(
+									'Sorry, this content could not be embedded.'
+								) }
+							</Text>
+							<Text style={ styles.editLink }>
+								{ __( 'EDIT LINK' ) }
+							</Text>
+						</>
+					) : (
 						<Text style={ styles.emptyStateDescription }>
 							{ __( 'ADD LINK' ) }
 						</Text>
-					</View>
-				</TouchableWithoutFeedback>
-			) }
+					) }
+				</View>
+			</TouchableWithoutFeedback>
 			<EmbedBottomSheet
 				value={ value }
 				isVisible={ isEmbedSheetVisible }
