@@ -1302,12 +1302,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/admin-manifest",
-		"slug": "packages-admin-manifest",
-		"markdown_source": "../packages/admin-manifest/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/annotations",
 		"slug": "packages-annotations",
 		"markdown_source": "../packages/annotations/README.md",
