@@ -226,7 +226,17 @@ export const blockAttributesToMenuItem = ( {
 	}
 
 	// Add color attributes to classes
-	const classes = className?.length ? className?.trim().split( ' ' ) : [];
+	const classes = className?.length
+		? className
+				.trim()
+				.split( ' ' )
+				.filter(
+					( c ) =>
+						! c.startsWith( 'has-' ) &&
+						! c.endsWith( '-color' )
+				)
+		: [];
+
 	if ( colors?.textColor ) {
 		classes.push( 'has-text-color' );
 		classes.push( getColorClassName( 'color', colors.textColor ) );
