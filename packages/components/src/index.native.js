@@ -102,6 +102,7 @@ export { default as InserterButton } from './mobile/inserter-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
 export { default as AudioPlayer } from './mobile/audio-player';
 export { default as Badge } from './mobile/badge';
+export { default as Gridicons } from './mobile/gridicons';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';
