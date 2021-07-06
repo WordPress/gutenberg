@@ -232,8 +232,7 @@ export const blockAttributesToMenuItem = ( {
 				.split( ' ' )
 				.filter(
 					( c ) =>
-						! c.startsWith( 'has-' ) &&
-						! c.endsWith( '-color' )
+						! c.startsWith( 'has-' ) && ! c.endsWith( '-color' )
 				)
 		: [];
 
