@@ -13,35 +13,103 @@
 	padding-top: 8;
 }
 
-.searchForm {
+
+.inserter-search-form__container {
 	height: 46px;
-	border-radius: 8px;
-	color: $gray-dark;
-	margin: $grid-unit-30;
-	background-color: $gray-light;
+	margin: 0 16px $grid-unit-10;
 	flex-direction: row;
 	justify-content: space-between;
 }
 
-.searchFormDark {
+.inserter-search-form__input-container {
+	height: 100%;
+	border-radius: $grid-unit;
+	flex-direction: row;
+	justify-content: space-between;
+	flex: 1;
+}
+
+.inserter-search-form__input-container--dark {
 	background-color: rgba($white, 0.07);
 }
 
-.searchFormInput {
+.inserter-search-form__form-input {
 	color: $gray-dark;
-	flex: 2;
+	text-align: left;
+	font-size: 17px;
+	align-items: center;
 }
 
-.searchFormInputDark {
+.inserter-search-form__form-input--dark {
 	color: $white;
 }
 
-.searchFormPlaceholder {
+.inserter-search-form__form-input-placeholder {
 	color: $gray;
 }
 
-.searchFormPlaceholderDark {
+.inserter-search-form__form-input-placeholder--dark {
 	color: rgba($white, 0.8);
+}
+.inserter-search-form__icon {
+	margin: 0 12px;
+	justify-content: center;
+	width: 19px;
+	color: $gray;
+}
+
+.inserter-search-form__icon--dark {
+	color: $white;
+}
+
+.inserter-search-form__input-button {
+	justify-content: center;
+	width: 19px;
+}
+
+.inserter-search-form__input-button-left {
+	margin: 0 12px;
+}
+
+.inserter-search-form__input-button-right {
+	margin: 0 12px;
+}
+
+.inserter-search-results__column {
+	padding: $grid-unit-20;
+}
+
+.inserter-search-results__row-separator {
+	height: 12px;
+}
+
+.inserter-search-results__list {
+	padding-bottom: 20px;
+	padding-top: 8px;
+}
+
+.inserter-search-results__no-results-container {
+	margin-top: 60px;
+	align-items: center;
+}
+
+.inserter-search-results__no-results-text-primary {
+	font-size: 16px;
+	color: $light-primary;
+}
+
+.inserter-search-results__no-results-text-primary--dark {
+	font-size: 16px;
+	color: $dark-primary;
+}
+
+.inserter-search-results__no-results-text-secondary {
+	font-size: 14px;
+	color: $light-secondary;
+}
+
+.inserter-search-results__no-results-text-secondary--dark {
+	color: $dark-secondary;
 }
 
 .inserter-tabs__wrapper {
