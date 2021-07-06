@@ -347,6 +347,7 @@ extension GutenbergViewController {
         alert.addAction(toggleHTMLModeAction)
         alert.addAction(updateHtmlAction)
         alert.addAction(unsupportedBlockUIAction)
+        alert.addAction(showEditorHelpAction)
         alert.addAction(cancelAction)
 
         present(alert, animated: true)
@@ -359,6 +360,16 @@ extension GutenbergViewController {
             handler: { [unowned self] action in
                 self.toggleHTMLMode(action)
         })
+    }
+    
+    var showEditorHelpAction: UIAlertAction {
+        return UIAlertAction(
+            title: "Help",
+            style: .default,
+            handler: { [unowned self] action in
+                self.showEditorHelp()
+            }
+        )
     }
 
     var updateHtmlAction: UIAlertAction {
@@ -404,5 +415,9 @@ extension GutenbergViewController {
     func toggleHTMLMode(_ action: UIAlertAction) {
         htmlMode = !htmlMode
         gutenberg.toggleHTMLMode()
+    }
+    
+    func showEditorHelp() {
+        gutenberg.showEditorHelp()
     }
 }
