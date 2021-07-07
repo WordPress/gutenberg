@@ -17,6 +17,9 @@ jobs:
     performance:
         name: Run performance tests
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                compare_with: [trunk, releases]
         if: ${{ github.repository == 'WordPress/gutenberg' }}
 
         steps:
@@ -39,11 +42,11 @@ jobs:
                   npm ci
 
             - name: Compare performance with trunk
-              if: github.event_name == 'pull_request'
+              if: github.event_name == 'pull_request' && ${ compare_with } == 'trunk'
               run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
-              if: github.event_name == 'release'
+              if: github.event_name == 'release' && ${ compare_with } == 'releases'
               env:
                   PLUGIN_VERSION: ${{ github.event.release.name }}
               shell: bash
