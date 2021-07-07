@@ -89,7 +89,6 @@ export { default as ColorSettings } from './mobile/color-settings';
 export { default as SegmentedControls } from './mobile/segmented-control';
 export { default as FocalPointSettingsPanel } from './mobile/focal-point-settings-panel';
 export { default as BottomSheetTextControl } from './mobile/bottom-sheet-text-control';
-export { default as FooterMessageLink } from './mobile/bottom-sheet/footer-message-link/footer-message-link';
 export { LinkPicker } from './mobile/link-picker';
 export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-screen';
 export { default as LinkSettings } from './mobile/link-settings';

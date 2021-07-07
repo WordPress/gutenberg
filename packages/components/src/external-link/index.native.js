@@ -2,23 +2,32 @@
  * External dependencies
  */
 
-import { TouchableOpacity, Text, Linking } from 'react-native';
+import { Text, Linking } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { external, Icon } from '@wordpress/icons';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+/**
+ * Internal dependencies
+ */
+import style from './style.native.scss';
 
 export function ExternalLink( { href, children } ) {
+	const externalLink = usePreferredColorSchemeStyle(
+		style[ 'external-link' ],
+		style[ 'external-link__dark' ]
+	);
+
 	return (
-		<TouchableOpacity
+		<Text
+			style={ externalLink }
 			onPress={ () => Linking.openURL( href ) }
 			accessibilityLabel={ __( 'Open link in a browser' ) }
 		>
-			<Text>{ children }</Text>
-			<Icon icon={ external } />
-		</TouchableOpacity>
+			{ children }
+		</Text>
 	);
 }
 
