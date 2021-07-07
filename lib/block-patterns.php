@@ -309,8 +309,8 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Footer with navigation and credit line', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
-			'content'    => '<!-- wp:columns {"verticalAlignment":"center","align":"full"} -->
-							<div class="wp-block-columns alignfull are-vertically-aligned-center"><!-- wp:column {"style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+			'content'    => '<!-- wp:columns {"isStackedOnMobile":false,"verticalAlignment":"center","align":"full"} -->
+							<div class="wp-block-columns alignfull is-not-stacked-on-mobile are-vertically-aligned-center"><!-- wp:column {"style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
 							<div class="wp-block-column" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px"><!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /--></div>
 							<!-- /wp:column -->
 
