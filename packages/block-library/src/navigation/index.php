@@ -85,6 +85,12 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 	return $font_sizes;
 }
 
+/**
+ * Returns the menu items for a WordPress menu location.
+ *
+ * @param string $location The menu location.
+ * @return array Menu items for the location.
+ */
 function gutenberg_get_menu_items_at_location( $location ) {
 	if ( empty( $location ) ) {
 		return;
@@ -113,6 +119,14 @@ function gutenberg_get_menu_items_at_location( $location ) {
 	return $menu_items;
 }
 
+/**
+ * Sorts a standard array of menu items into a nested structure keyed by the
+ * id of the parent menu.
+ *
+ * @param array $menu_items Menu items to sort.
+ * @return array An array keyed by the id of the parent menu where each element
+ *               is an array of menu items that belong to that parent.
+ */
 function gutenberg_sort_menu_items_by_parent_id( $menu_items ) {
 	$sorted_menu_items = array();
 	foreach ( (array) $menu_items as $menu_item ) {
@@ -128,6 +142,17 @@ function gutenberg_sort_menu_items_by_parent_id( $menu_items ) {
 	return $menu_items_by_parent_id;
 }
 
+/**
+ * Turns menu item data into a nested array of parsed blocks
+ *
+ * @param array $menu_items               An array of menu items that represent
+ *                                        an individual level of a menu.
+ * @param array $menu_items_by_parent_id  An array keyed by the id of the
+ *                                        parent menu where each element is an
+ *                                        array of menu items that belong to
+ *                                        that parent.
+ * @return array An array of parsed block data.
+ */
 function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
 	if ( empty( $menu_items ) ) {
 		return array();
