@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-27 {
+.emotion-0 {
   background: #fff;
   border: 1px solid;
   border-color: #757575;
@@ -15,44 +15,27 @@ exports[`props should render correctly 1`] = `
   padding: 2px;
   position: relative;
   -webkit-transition: -webkit-transform 100ms linear;
-  -webkit-transition: transform 100ms linear;
   transition: transform 100ms linear;
 }
 
-@media ( prefers-reduced-motion:reduce ) {
-  .emotion-27 {
-    -webkit-transition-duration: 0ms;
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-0 {
     transition-duration: 0ms;
   }
 }
 
-.emotion-27:hover {
+.emotion-0:hover {
   border-color: #757575;
 }
 
-.emotion-27:focus {
-  border-color: var( --wp-admin-theme-color-darker-10,#007cba);
-  box-shadow: 0 0 0,0.5px,var( --wp-admin-theme-color,#00669b);
+.emotion-0:focus {
+  border-color: var( --wp-admin-theme-color-darker-10, #007cba);
+  box-shadow: 0 0 0,0.5px,var( --wp-admin-theme-color, #00669b);
   outline: none;
   z-index: 1;
 }
 
-.emotion-12 {
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.emotion-6 {
-  color: #fff !important;
-  background: #1e1e1e !important;
-}
-
-.emotion-9 {
-  background: transparent;
-}
-
-.emotion-0 {
+.emotion-3 {
   background: #1e1e1e;
   border-radius: 2px;
   box-shadow: transparent;
@@ -61,19 +44,23 @@ exports[`props should render correctly 1`] = `
   top: 2px;
   bottom: 2px;
   -webkit-transition: -webkit-transform 160ms ease;
-  -webkit-transition: transform 160ms ease;
   transition: transform 160ms ease;
   z-index: 1;
 }
 
-@media ( prefers-reduced-motion:reduce ) {
-  .emotion-0 {
-    -webkit-transition-duration: 0ms;
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-3 {
     transition-duration: 0ms;
   }
 }
 
-.emotion-13 {
+.emotion-5 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-6 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -83,13 +70,14 @@ exports[`props should render correctly 1`] = `
   position: relative;
 }
 
-.emotion-7 {
+.emotion-8 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   -webkit-appearance: none;
   -moz-appearance: none;
+  -ms-appearance: none;
   appearance: none;
   background: transparent;
   border: none;
@@ -102,8 +90,102 @@ exports[`props should render correctly 1`] = `
   display: flex;
   height: 100%;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  line-height: 100%;
+  outline: none;
+  padding: 0 12px;
+  position: relative;
+  text-align: center;
+  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 100%;
+  z-index: 2;
+  color: #fff;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-8 {
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-8::-moz-focus-inner {
+  border: 0;
+}
+
+.emotion-8:active {
+  background: #fff;
+}
+
+.emotion-9 {
+  font-size: 13px;
+  line-height: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate( -50%, -50% );
+  -moz-transform: translate( -50%, -50% );
+  -ms-transform: translate( -50%, -50% );
+  transform: translate( -50%, -50% );
+}
+
+.emotion-11 {
+  font-size: 13px;
+  font-weight: bold;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.emotion-13 {
+  background: transparent;
+}
+
+.emotion-14 {
+  background: rgba(0, 0, 0, 0.1);
+  height: calc( 100% - 4px - 4px );
+  position: absolute;
+  right: 0;
+  top: 4px;
+  -webkit-transition: background 200ms linear;
+  transition: background 200ms linear;
+  width: 1px;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-14 {
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-19 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  color: #757575;
+  cursor: pointer;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  height: 100%;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   line-height: 100%;
   outline: none;
@@ -120,67 +202,27 @@ exports[`props should render correctly 1`] = `
   z-index: 2;
 }
 
-@media ( prefers-reduced-motion:reduce ) {
-  .emotion-7 {
-    -webkit-transition-duration: 0ms;
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-19 {
     transition-duration: 0ms;
   }
 }
 
-.emotion-7::-moz-focus-inner {
+.emotion-19::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-7:active {
+.emotion-19:active {
   background: #fff;
 }
 
-.emotion-2 {
-  font-size: 13px;
-  line-height: 1;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate( -50%,-50% );
-  -ms-transform: translate( -50%,-50% );
-  transform: translate( -50%,-50% );
-}
-
-.emotion-4 {
-  font-size: 13px;
-  font-weight: bold;
-  height: 0;
-  overflow: hidden;
-  visibility: hidden;
-}
-
-.emotion-10 {
-  background: rgba(0,0,0,0.1);
-  height: calc( 100% - 4px - 4px );
-  position: absolute;
-  right: 0;
-  top: 4px;
-  -webkit-transition: background 200ms linear;
-  transition: background 200ms linear;
-  width: 1px;
-}
-
-@media ( prefers-reduced-motion:reduce ) {
-  .emotion-10 {
-    -webkit-transition-duration: 0ms;
-    transition-duration: 0ms;
-  }
-}
-
 <div
-  aria-activedescendant="segmented-1"
   aria-label="Test Segmented Control"
-  class="emotion-27 medium components-segmented-control emotion-28 emotion-29"
+  class="emotion-0 medium components-segmented-control emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="SegmentedControl"
   id="segmented"
   role="radiogroup"
-  tabindex="0"
 >
   <iframe
     aria-hidden="true"
@@ -190,69 +232,68 @@ exports[`props should render correctly 1`] = `
     tabindex="-1"
   />
   <div
-    class="emotion-0 emotion-1"
+    class="emotion-3 emotion-4"
     role="presentation"
     style="transform: translateX(NaNpx); transition: none; width: 0px;"
   />
   <div
-    class="emotion-12 emotion-13 emotion-14"
+    class="emotion-5 emotion-6 emotion-7"
     data-active="true"
   >
     <button
       aria-checked="true"
       aria-label="O"
-      aria-selected="true"
-      class="emotion-6 emotion-7 emotion-8"
+      class="emotion-8"
       data-value="olaf"
       id="segmented-1"
       role="radio"
-      tabindex="-1"
+      tabindex="0"
     >
       <div
-        class="emotion-2 emotion-3"
+        class="emotion-9 emotion-10"
       >
         O
       </div>
       <div
         aria-hidden="true"
-        class="emotion-4 emotion-5"
+        class="emotion-11 emotion-12"
       >
         O
       </div>
     </button>
     <div
       aria-hidden="true"
-      class="emotion-9 emotion-10 emotion-11"
+      class="emotion-13 emotion-14 emotion-15"
     />
   </div>
   <div
-    class="emotion-12 emotion-13 emotion-14"
+    class="emotion-5 emotion-6 emotion-7"
     data-active="false"
   >
     <button
       aria-checked="false"
       aria-label="S"
-      class=" emotion-7 emotion-8"
+      class="emotion-19"
       data-value="samantha"
       id="segmented-2"
       role="radio"
       tabindex="-1"
     >
       <div
-        class="emotion-2 emotion-3"
+        class="emotion-9 emotion-10"
       >
         S
       </div>
       <div
         aria-hidden="true"
-        class="emotion-4 emotion-5"
+        class="emotion-11 emotion-12"
       >
         S
       </div>
     </button>
     <div
       aria-hidden="true"
-      class="emotion-9 emotion-10 emotion-11"
+      class="emotion-13 emotion-14 emotion-15"
     />
   </div>
 </div>

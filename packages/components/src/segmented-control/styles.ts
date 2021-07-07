@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { css } from 'emotion';
+// eslint-disable-next-line no-restricted-imports
+import { css } from '@emotion/css';
 import styled from '@emotion/styled';
 
 /**

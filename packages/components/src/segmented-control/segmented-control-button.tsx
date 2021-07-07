@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { cx } from 'emotion';
+// eslint-disable-next-line no-restricted-imports
+import { cx } from '@emotion/css';
 // eslint-disable-next-line no-restricted-imports
 import { Radio } from 'reakit';
 
@@ -13,15 +14,15 @@ import { memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
+import * as styles from './styles';
+import type { SegmentedControlButtonProps } from './types';
+
+const {
 	ButtonContentView,
 	LabelPlaceholderView,
 	LabelView,
 	SeparatorView,
-} from './styles';
-// eslint-disable-next-line no-duplicate-imports
-import * as styles from './styles';
-import type { SegmentedControlButtonProps } from './types';
+} = styles;
 
 function SegmentedControlButton( {
 	className,

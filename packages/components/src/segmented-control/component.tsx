@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { cx } from 'emotion';
+// eslint-disable-next-line no-restricted-imports
+import { cx } from '@emotion/css';
 // eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
 import useResizeAware from 'react-resize-aware';
@@ -52,7 +53,6 @@ function SegmentControl(
 
 	const radio = useRadioState( {
 		baseId: baseId || id,
-		unstable_virtual: true,
 		state: value || options[ 0 ]?.value,
 	} );
 
