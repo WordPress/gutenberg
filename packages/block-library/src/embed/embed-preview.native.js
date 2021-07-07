@@ -78,7 +78,8 @@ const EmbedPreview = ( {
 		! previewable ||
 		! preview ||
 		! preview.thumbnail_url?.length ||
-		! preview.height;
+		! preview.height ||
+		! preview.width;
 
 	return (
 		<TouchableWithoutFeedback
@@ -104,13 +105,13 @@ const EmbedPreview = ( {
 				) : (
 					<Image
 						style={ {
-							height: preview.height,
-							width: '100%',
+							flex: 1,
+							aspectRatio: preview.width / preview.height,
 						} }
 						source={ {
 							uri: preview.thumbnail_url,
 						} }
-						resizeMode="contain"
+						resizeMode="cover"
 					/>
 				) }
 				<BlockCaption
