@@ -100,7 +100,8 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
  */
 function gutenberg_navigation_convert_menu_items_to_blocks(
 	$menu_items,
-	&$menu_items_by_parent_id
+	&$menu_items_by_parent_id,
+	$navigation_block_attributes
 ) {
 	if ( empty( $menu_items ) ) {
 		return array();
@@ -121,10 +122,11 @@ function gutenberg_navigation_convert_menu_items_to_blocks(
 			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
 					? $menu_items_by_parent_id[ $menu_item->ID ]
 					: array(),
-			$menu_items_by_parent_id
+			$menu_items_by_parent_id,
+			$navigation_block_attributes
 		);
 
-		$blocks[] = new WP_Block( $block, array() );
+		$blocks[] = new WP_Block( $block, $navigation_block_attributes );
 	}
 
 	return $blocks;
@@ -136,7 +138,7 @@ function gutenberg_navigation_convert_menu_items_to_blocks(
  * @param  string $location The location of the classic menu to display.
  * @return array  Inner blocks converted from the menu_items at the location.
  */
-function gutenberg_convert_menu_items_at_location_to_inner_blocks( $location ) {
+function gutenberg_convert_menu_items_at_location_to_inner_blocks( $location, $navigation_block_attributes ) {
 	if ( empty( $location ) ) {
 		return;
 	}
@@ -176,7 +178,8 @@ function gutenberg_convert_menu_items_at_location_to_inner_blocks( $location ) {
 		isset( $menu_items_by_parent_id[0] )
 		? $menu_items_by_parent_id[0]
 		: array(),
-		$menu_items_by_parent_id
+		$menu_items_by_parent_id,
+		$navigation_block_attributes
 	);
 }
 
@@ -225,7 +228,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	if ( empty( $inner_blocks ) && array_key_exists( '__unstableLocation', $attributes ) ) {
 		$inner_blocks = gutenberg_convert_menu_items_at_location_to_inner_blocks(
-			$attributes['__unstableLocation']
+			$attributes['__unstableLocation'],
+			$attributes
 		);
 	}
 
