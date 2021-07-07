@@ -35,7 +35,7 @@ export default function PostTermsEdit( {
 			if ( ! term ) return {};
 			const { getTaxonomy } = select( coreStore );
 			const taxonomy = getTaxonomy( term );
-			return taxonomy?.visibility?.show_ui ? taxonomy : {};
+			return taxonomy?.visibility?.publicly_queryable ? taxonomy : {};
 		},
 		[ term ]
 	);

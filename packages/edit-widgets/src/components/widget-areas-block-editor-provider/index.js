@@ -13,6 +13,7 @@ import { useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
+	CopyHandler,
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
@@ -108,7 +109,7 @@ export default function WidgetAreasBlockEditorProvider( {
 					useSubRegistry={ false }
 					{ ...props }
 				>
-					{ children }
+					<CopyHandler>{ children }</CopyHandler>
 					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
 				</BlockEditorProvider>
 			</SlotFillProvider>
