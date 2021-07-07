@@ -41,9 +41,16 @@ const EmbedBottomSheet = ( { value, isVisible, onClose, onSubmit } ) => {
 				createErrorNotice(
 					__( 'Invalid URL. Please enter a valid URL.' )
 				);
+				// If the URL was already defined, we submit it to stop showing the embed placeholder.
+				if ( value !== '' ) {
+					onSubmit( value );
+				}
 			}
+		} else if ( value !== '' ) {
+			// Resets the URL when new value is empty and URL was already defined.
+			onSubmit( '' );
 		}
-	}, [ url, onSubmit ] );
+	}, [ url, onSubmit, value ] );
 
 	function setAttributes( attributes ) {
 		setURL( attributes.url );
