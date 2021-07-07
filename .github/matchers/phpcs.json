@@ -1,0 +1,23 @@
+{
+    "problemMatcher": [
+      {
+        "owner": "phpcs",
+        "severity": "error",
+        "pattern": [
+          {
+            "regexp": "^<file name=\"(?:\\/github\\/workspace\\/)?(.*)\">$",
+            "file": 1
+          },
+          {
+            "regexp": "<error line=\"(\\d*)\" column=\"(\\d*)\" severity=\"(error|warning)\" message=\"(.*)\" source=\"(.*)(\"\\/>+)$",
+            "line": 1,
+            "column": 2,
+            "severity": 3,
+            "message": 4,
+            "code": 5,
+            "loop": true
+          }
+        ]
+      }
+    ]
+  }
