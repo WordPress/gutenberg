@@ -1,23 +1,16 @@
 /**
  * External dependencies
  */
-import { Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import {
-	BottomSheet,
-	PanelBody,
-	Icon,
-	TextControl,
-} from '@wordpress/components';
+import { BottomSheet, PanelBody } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
 	helpFilled,
-	chevronRight,
 	plusCircleFilled,
 	alignJustifyAlt,
 	trashFilled,
@@ -30,7 +23,7 @@ import {
 import styles from './style.scss';
 import TopicRow from './topic-row.native.js';
 
-function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
+function EditorHelpTopics( { isVisible, onClose } ) {
 	return useMemo( () => (
 		<BottomSheet
 			isVisible={ isVisible }
@@ -43,26 +36,31 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 				style={ styles.sectionContainer }
 			>
 				<TopicRow
+					// eslint-disable-next-line no-console
 					onPress={ () => console.log( 'onPress!' ) }
 					label={ __( 'What is a block?' ) }
 					icon={ helpFilled }
 				/>
 				<TopicRow
+					// eslint-disable-next-line no-console
 					onPress={ () => console.log( 'onPress!' ) }
 					label={ __( 'Add blocks' ) }
 					icon={ plusCircleFilled }
 				/>
 				<TopicRow
+					// eslint-disable-next-line no-console
 					onPress={ () => console.log( 'onPress!' ) }
 					label={ __( 'Move blocks' ) }
 					icon={ alignJustifyAlt }
 				/>
 				<TopicRow
+					// eslint-disable-next-line no-console
 					onPress={ () => console.log( 'onPress!' ) }
 					label={ __( 'Remove blocks' ) }
 					icon={ trashFilled }
 				/>
 				<TopicRow
+					// eslint-disable-next-line no-console
 					onPress={ () => console.log( 'onPress!' ) }
 					label={ __( 'Customize blocks' ) }
 					icon={ cogAlt }
