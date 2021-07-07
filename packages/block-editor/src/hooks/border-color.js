@@ -70,7 +70,7 @@ export function BorderColorEdit( props ) {
 
 	return (
 		<ColorGradientControl
-			label={ __( 'Border color' ) }
+			label={ __( 'Color' ) }
 			value={ borderColor || style?.border?.color }
 			colors={ colors }
 			gradients={ undefined }
