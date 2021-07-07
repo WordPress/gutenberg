@@ -85,31 +85,98 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 	return $font_sizes;
 }
 
+
 /**
- * Renders a Navigation Block derived from data from the theme_location assigned
- * via the block attribute 'location'.
+ * Recursively converts a list of menu items into a list of blocks. This is a
+ * helper function used by `gutenberg_output_block_nav_menu()`.
  *
- * If no location was provided as a block attribute then false is returned.
+ * Transformation depends on the menu item type. Link menu items are turned into
+ * a `core/navigation-link` block. Block menu items are simply parsed.
  *
- * @param  string $location The location of the classic menu to display.
- * @param  object $attributes The block attributes.
- * @return string HTML markup of a generated Navigation Block or empty string
- *                if location is unspecified.
+ * @param array $menu_items The menu items to convert, sorted by each menu item's menu order.
+ * @param array $menu_items_by_parent_id All menu items, indexed by their parent's ID.
+
+ * @return array Updated menu items, sorted by each menu item's menu order.
  */
-function gutenberg_render_menu_from_location( $location, $attributes ) {
-	if ( empty( $location ) ) {
-		return '';
+function gutenberg_navigation_convert_menu_items_to_blocks(
+	$menu_items,
+	&$menu_items_by_parent_id
+) {
+	if ( empty( $menu_items ) ) {
+		return array();
 	}
 
-	return wp_nav_menu(
-		array(
-			'theme_location'   => $location,
-			'container'        => '',
-			'items_wrap'       => '%3$s',
-			'block_attributes' => $attributes,
-			'fallback_cb'      => false,
-			'echo'             => false,
-		)
+	$blocks = array();
+
+	foreach ( $menu_items as $menu_item ) {
+		$block = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array(
+				'label' => $menu_item->title,
+				'url'   => $menu_item->url,
+			),
+		);
+
+		$block['innerBlocks'] = gutenberg_navigation_convert_menu_items_to_blocks(
+			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+					? $menu_items_by_parent_id[ $menu_item->ID ]
+					: array(),
+			$menu_items_by_parent_id
+		);
+
+		$blocks[] = new WP_Block( $block, array() );
+	}
+
+	return $blocks;
+}
+
+/**
+ * Converts the menu_items of a WordPress menu at a location to inner_blocks.
+ *
+ * @param  string $location The location of the classic menu to display.
+ * @return array  Inner blocks converted from the menu_items at the location.
+ */
+function gutenberg_convert_menu_items_at_location_to_inner_blocks( $location ) {
+	if ( empty( $location ) ) {
+		return;
+	}
+
+	// Build menu data. The following code is approximates the code in
+	// `wp_nav_menu()` and `gutenberg_output_block_nav_menu`.
+
+	// Find the location in the list of locations, returning early if the
+	// location can't be found.
+	$locations = get_nav_menu_locations();
+	if ( ! isset( $locations[ $location ] ) ) {
+		return;
+	}
+
+	// Get the menu from the location, returning early if there is no
+	// menu or there was an error.
+	$menu = wp_get_nav_menu_object( $locations[ $location ] );
+	if ( ! $menu || is_wp_error( $menu ) ) {
+		return;
+	}
+
+	$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
+	_wp_menu_item_classes_by_context( $menu_items );
+
+	$sorted_menu_items = array();
+	foreach ( (array) $menu_items as $menu_item ) {
+		$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
+	}
+	unset( $menu_items, $menu_item );
+
+	$menu_items_by_parent_id = array();
+	foreach ( $sorted_menu_items as $menu_item ) {
+		$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
+	}
+
+	return gutenberg_navigation_convert_menu_items_to_blocks(
+		isset( $menu_items_by_parent_id[0] )
+		? $menu_items_by_parent_id[0]
+		: array(),
+		$menu_items_by_parent_id
 	);
 }
 
@@ -154,12 +221,15 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		wp_enqueue_script( 'wp-block-navigation-view' );
 	}
 
-	if ( empty( $block->inner_blocks ) ) {
-		if ( array_key_exists( '__unstableLocation', $attributes ) ) {
-			$location = $attributes['__unstableLocation'];
-			return gutenberg_render_menu_from_location( $location, $attributes );
-		}
+	$inner_blocks = $block->inner_blocks;
 
+	if ( empty( $inner_blocks ) && array_key_exists( '__unstableLocation', $attributes ) ) {
+		$inner_blocks = gutenberg_convert_menu_items_at_location_to_inner_blocks(
+			$attributes['__unstableLocation']
+		);
+	}
+
+	if ( empty( $inner_blocks ) ) {
 		return '';
 	}
 
@@ -175,7 +245,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$inner_blocks_html = '';
 	$is_list_open      = false;
-	foreach ( $block->inner_blocks as $inner_block ) {
+	foreach ( $inner_blocks as $inner_block ) {
 		if ( ( 'core/navigation-link' === $inner_block->name || 'core/home-link' === $inner_block->name ) && false === $is_list_open ) {
 			$is_list_open       = true;
 			$inner_blocks_html .= '<ul class="wp-block-navigation__container">';
