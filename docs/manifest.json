@@ -942,6 +942,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "HelpText",
+		"slug": "help-text",
+		"markdown_source": "../packages/components/src/help-text/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "NavigateRegions",
 		"slug": "navigate-regions",
 		"markdown_source": "../packages/components/src/higher-order/navigate-regions/README.md",

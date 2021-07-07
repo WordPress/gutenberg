@@ -39,6 +39,7 @@ export { default as PanelActions } from './panel/actions';
 export { default as Button } from './button';
 export { default as __experimentalText } from './text';
 export { default as ExternalLink } from './external-link';
+export { default as HelpText } from './help-text';
 export { default as TextControl } from './text-control';
 export { default as ToggleControl } from './toggle-control';
 export { default as SandBox } from './sandbox';
@@ -108,7 +109,6 @@ export { default as InserterButton } from './mobile/inserter-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
 export { default as AudioPlayer } from './mobile/audio-player';
 export { default as Badge } from './mobile/badge';
-export { default as HelpText } from './mobile/help-text';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';
