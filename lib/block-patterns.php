@@ -22,13 +22,16 @@ function register_gutenberg_patterns() {
 			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
+							<!-- wp:group {"align":"wide","layout":{"inherit":true}} -->
+							<div class="wp-block-group alignwide">
 							<!-- wp:post-title {"isLink":true} /-->
 							<!-- wp:post-featured-image  {"isLink":true,"align":"wide"} /-->
 							<!-- wp:post-excerpt /-->
 							<!-- wp:separator -->
 							<hr class="wp-block-separator"/>
 							<!-- /wp:separator -->
-							<!-- wp:post-date /-->
+							<!-- wp:post-date /--></div>
+							<!-- /wp:group -->
 							<!-- /wp:post-template -->
 							</div>
 							<!-- /wp:query -->',
@@ -40,6 +43,8 @@ function register_gutenberg_patterns() {
 			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
+							<!-- wp:group {"align":"wide","layout":{"inherit":true}} -->
+							<div class="wp-block-group alignwide">
 							<!-- wp:columns {"align":"wide"} -->
 							<div class="wp-block-columns alignwide"><!-- wp:column {"width":"66.66%"} -->
 							<div class="wp-block-column" style="flex-basis:66.66%"><!-- wp:post-featured-image {"isLink":true} /--></div>
@@ -48,7 +53,8 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-column" style="flex-basis:33.33%"><!-- wp:post-title {"isLink":true} /-->
 							<!-- wp:post-excerpt /--></div>
 							<!-- /wp:column --></div>
-							<!-- /wp:columns -->
+							<!-- /wp:columns --></div>
+							<!-- /wp:group -->
 							<!-- /wp:post-template -->
 							</div>
 							<!-- /wp:query -->',
@@ -57,7 +63,7 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Small image and title', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
+			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"layout":{"inherit":true}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
 							<!-- wp:columns {"verticalAlignment":"center"} -->
