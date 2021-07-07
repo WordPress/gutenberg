@@ -36,7 +36,7 @@ export const BarsView = styled.div`
 	width: 54px;
 
 	> div {
-		animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
+		/* animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite; */
 		background: currentColor;
 		border-radius: 50px;
 		height: 16%;
@@ -47,63 +47,57 @@ export const BarsView = styled.div`
 		width: 6%;
 	}
 
-	@keyframes ComponentsUISpinnerFadeAnimation {
-		from {
-			opacity: 1;
-		}
-		to {
-			opacity: 0.25;
-		}
-	}
-
 	.InnerBar1 {
-		animation-delay: 0s;
+		opacity: 0.25;
 		transform: rotate( 0deg ) translate( 0, -130% );
 	}
 
 	.InnerBar2 {
-		animation-delay: -0.9167s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 1 ) );
 		transform: rotate( 30deg ) translate( 0, -130% );
 	}
 
 	.InnerBar3 {
-		animation-delay: -0.833s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 2 ) );
 		transform: rotate( 60deg ) translate( 0, -130% );
 	}
 	.InnerBar4 {
-		animation-delay: -0.7497s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 3 ) );
+
 		transform: rotate( 90deg ) translate( 0, -130% );
 	}
 	.InnerBar5 {
-		animation-delay: -0.667s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 4 ) );
+
 		transform: rotate( 120deg ) translate( 0, -130% );
 	}
 	.InnerBar6 {
-		animation-delay: -0.5837s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 5 ) );
+
 		transform: rotate( 150deg ) translate( 0, -130% );
 	}
 	.InnerBar7 {
-		animation-delay: -0.5s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 6 ) );
 		transform: rotate( 180deg ) translate( 0, -130% );
 	}
 	.InnerBar8 {
-		animation-delay: -0.4167s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 7 ) );
 		transform: rotate( 210deg ) translate( 0, -130% );
 	}
 	.InnerBar9 {
-		animation-delay: -0.333s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 8 ) );
 		transform: rotate( 240deg ) translate( 0, -130% );
 	}
 	.InnerBar10 {
-		animation-delay: -0.2497s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 9 ) );
 		transform: rotate( 270deg ) translate( 0, -130% );
 	}
 	.InnerBar11 {
-		animation-delay: -0.167s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 10 ) );
 		transform: rotate( 300deg ) translate( 0, -130% );
 	}
 	.InnerBar12 {
-		animation-delay: -0.0833s;
+		opacity: calc( 0.25 + ( 0.75 / 12 * 11 ) );
 		transform: rotate( 330deg ) translate( 0, -130% );
 	}
 `;

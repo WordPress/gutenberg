@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { motion } from 'framer-motion';
+
+/**
  * Internal dependencies
  */
 import { BarsView, BarsWrapperView, ContainerView } from './styles';
@@ -13,6 +18,13 @@ import { COLORS } from '../../utils/colors-values';
  * @property {number}                                 [size=16] Size of `Spinner`.
  */
 /* eslint-enable jsdoc/valid-types */
+
+const animate = { rotate: 360 };
+const transition = {
+	repeat: Infinity,
+	ease: 'linear',
+	duration: 2,
+};
 
 /**
  *
@@ -39,20 +51,22 @@ function Spinner( props, forwardedRef ) {
 			style={ { height: size, width: size } }
 		>
 			<BarsWrapperView aria-hidden={ true } style={ styles }>
-				<BarsView style={ { color } }>
-					<div className="InnerBar1" />
-					<div className="InnerBar2" />
-					<div className="InnerBar3" />
-					<div className="InnerBar4" />
-					<div className="InnerBar5" />
-					<div className="InnerBar6" />
-					<div className="InnerBar7" />
-					<div className="InnerBar8" />
-					<div className="InnerBar9" />
-					<div className="InnerBar10" />
-					<div className="InnerBar11" />
-					<div className="InnerBar12" />
-				</BarsView>
+				<motion.div animate={ animate } transition={ transition }>
+					<BarsView style={ { color } }>
+						<div className="InnerBar1" />
+						<div className="InnerBar2" />
+						<div className="InnerBar3" />
+						<div className="InnerBar4" />
+						<div className="InnerBar5" />
+						<div className="InnerBar6" />
+						<div className="InnerBar7" />
+						<div className="InnerBar8" />
+						<div className="InnerBar9" />
+						<div className="InnerBar10" />
+						<div className="InnerBar11" />
+						<div className="InnerBar12" />
+					</BarsView>
+				</motion.div>
 			</BarsWrapperView>
 		</ContainerView>
 	);
