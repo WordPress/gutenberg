@@ -76,6 +76,7 @@ function gutenberg_widgets_init( $hook ) {
 		return;
 	}
 
+	gutenberg_enqueue_wp_old_editor_compatibility_snippet();
 	add_filter( 'admin_body_class', 'gutenberg_widgets_editor_add_admin_body_classes' );
 
 	$widgets_editor_context = new WP_Block_Editor_Context();
