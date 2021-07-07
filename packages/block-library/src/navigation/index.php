@@ -155,8 +155,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	if ( empty( $block->inner_blocks ) ) {
 		if ( array_key_exists( '__unstableLocation', $attributes ) ) {
-			$location                 = $attributes['__unstableLocation'];
-			$maybe_classic_navigation = gutenberg_render_menu_from_location( $location, $attributes );
+			$location                         = $attributes['__unstableLocation'];
+			$attributes['__unstableLocation'] = null;
+			$maybe_classic_navigation         = gutenberg_render_menu_from_location( $location, $attributes );
 			if ( $maybe_classic_navigation ) {
 				return $maybe_classic_navigation;
 			}
