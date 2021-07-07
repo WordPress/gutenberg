@@ -112,7 +112,7 @@ class Gutenberg_REST_Global_Styles_Controller_Test extends WP_Test_REST_Controll
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertEquals( 'My new global styles title', $data['title']['raw'] );
+		$this->assertEquals( 'blergh', $data['title']['raw'] );
 	}
 
 	public function test_delete_item() {
