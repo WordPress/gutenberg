@@ -85,60 +85,7 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 	return $font_sizes;
 }
 
-
-/**
- * Recursively converts a list of menu items into a list of blocks. This is a
- * helper function used by `gutenberg_output_block_nav_menu()`.
- *
- * Transformation depends on the menu item type. Link menu items are turned into
- * a `core/navigation-link` block. Block menu items are simply parsed.
- *
- * @param array $menu_items The menu items to convert, sorted by each menu item's menu order.
- * @param array $menu_items_by_parent_id All menu items, indexed by their parent's ID.
-
- * @return array Updated menu items, sorted by each menu item's menu order.
- */
-function gutenberg_navigation_convert_menu_items_to_blocks(
-	$menu_items,
-	&$menu_items_by_parent_id,
-	$navigation_block_attributes
-) {
-	if ( empty( $menu_items ) ) {
-		return array();
-	}
-
-	$blocks = array();
-
-	foreach ( $menu_items as $menu_item ) {
-		$block = array(
-			'blockName' => 'core/navigation-link',
-			'attrs'     => array(
-				'label' => $menu_item->title,
-				'url'   => $menu_item->url,
-			),
-		);
-
-		$block['innerBlocks'] = gutenberg_navigation_convert_menu_items_to_blocks(
-			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-					? $menu_items_by_parent_id[ $menu_item->ID ]
-					: array(),
-			$menu_items_by_parent_id,
-			$navigation_block_attributes
-		);
-
-		$blocks[] = new WP_Block( $block, $navigation_block_attributes );
-	}
-
-	return $blocks;
-}
-
-/**
- * Converts the menu_items of a WordPress menu at a location to inner_blocks.
- *
- * @param  string $location The location of the classic menu to display.
- * @return array  Inner blocks converted from the menu_items at the location.
- */
-function gutenberg_convert_menu_items_at_location_to_inner_blocks( $location, $navigation_block_attributes ) {
+function gutenberg_get_menu_items_at_location( $location ) {
 	if ( empty( $location ) ) {
 		return;
 	}
@@ -163,6 +110,10 @@ function gutenberg_convert_menu_items_at_location_to_inner_blocks( $location, $n
 	$menu_items = wp_get_nav_menu_items( $menu->term_id, array( 'update_post_term_cache' => false ) );
 	_wp_menu_item_classes_by_context( $menu_items );
 
+	return $menu_items;
+}
+
+function gutenberg_sort_menu_items_by_parent_id( $menu_items ) {
 	$sorted_menu_items = array();
 	foreach ( (array) $menu_items as $menu_item ) {
 		$sorted_menu_items[ $menu_item->menu_order ] = $menu_item;
@@ -174,13 +125,36 @@ function gutenberg_convert_menu_items_at_location_to_inner_blocks( $location, $n
 		$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
 	}
 
-	return gutenberg_navigation_convert_menu_items_to_blocks(
-		isset( $menu_items_by_parent_id[0] )
-		? $menu_items_by_parent_id[0]
-		: array(),
-		$menu_items_by_parent_id,
-		$navigation_block_attributes
-	);
+	return $menu_items_by_parent_id;
+}
+
+function gutenberg_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
+	if ( empty( $menu_items ) ) {
+		return array();
+	}
+
+	$blocks = array();
+
+	foreach ( $menu_items as $menu_item ) {
+		$block = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array(
+				'label' => $menu_item->title,
+				'url'   => $menu_item->url,
+			),
+		);
+
+		$block['innerBlocks'] = gutenberg_parse_blocks_from_menu_items(
+			isset( $menu_items_by_parent_id[ $menu_item->ID ] )
+					? $menu_items_by_parent_id[ $menu_item->ID ]
+					: array(),
+			$menu_items_by_parent_id
+		);
+
+		$blocks[] = $block;
+	}
+
+	return $blocks;
 }
 
 /**
@@ -227,10 +201,17 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$inner_blocks = $block->inner_blocks;
 
 	if ( empty( $inner_blocks ) && array_key_exists( '__unstableLocation', $attributes ) ) {
-		$inner_blocks = gutenberg_convert_menu_items_at_location_to_inner_blocks(
-			$attributes['__unstableLocation'],
-			$attributes
-		);
+		$menu_items = gutenberg_get_menu_items_at_location( $attributes['__unstableLocation'] );
+		if ( empty( $menu_items ) ) {
+			return;
+		}
+
+		$menu_items_by_parent_id = gutenberg_sort_menu_items_by_parent_id( $menu_items );
+		$parsed_blocks           = gutenberg_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+
+		// TODO - this uses the full navigation block attributes for the
+		// context which could be refined.
+		$inner_blocks = new WP_Block_List( $parsed_blocks, $attributes );
 	}
 
 	if ( empty( $inner_blocks ) ) {
