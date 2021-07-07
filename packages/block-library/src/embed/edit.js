@@ -96,7 +96,7 @@ const EmbedEdit = ( props ) => {
 			// than generating a fallback response as other embeds do.
 			const wordpressCantEmbed = Platform.select( {
 				web: embedPreview?.data?.status === 404,
-				native: embedPreview?.code === '404', // TODO: check android response
+				native: embedPreview?.code === '404',
 			} );
 			const validPreview =
 				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
