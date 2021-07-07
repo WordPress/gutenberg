@@ -24,7 +24,9 @@ export function ExternalLink( { href, children } ) {
 		<Text
 			style={ externalLink }
 			onPress={ () => Linking.openURL( href ) }
-			accessibilityLabel={ __( 'Open link in a browser' ) }
+			accessibilityLabel={ children }
+			accessibilityHint={ __( 'Opens link in a browser' ) }
+			accessibilityRole={ 'link' }
 		>
 			{ children }
 		</Text>
