@@ -4,11 +4,11 @@
 import { __experimentalParseUnit as parseUnit } from '@wordpress/components';
 
 /**
- * Gets an items with the most occurrence within an array
+ * Gets the item with the highest occurrence within an array
  * https://stackoverflow.com/a/20762713
  *
  * @param {Array<any>} arr Array of items to check.
- * @return {any} The item with the most occurrences.
+ * @return {any}           The item with the most occurrences.
  */
 function mode( arr ) {
 	return arr
