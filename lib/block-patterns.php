@@ -20,17 +20,17 @@ function register_gutenberg_patterns() {
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
 			'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false}} -->
-							<div class="wp-block-query">
-							<!-- wp:post-template -->
-							<!-- wp:post-title {"isLink":true} /-->
-							<!-- wp:post-featured-image  {"isLink":true,"align":"wide"} /-->
+							<div class="wp-block-query"><!-- wp:post-template -->
+							<!-- wp:group {"align":"wide","layout":{"inherit":true}} -->
+							<div class="wp-block-group alignwide"><!-- wp:post-title {"isLink":true} /-->
+							<!-- wp:post-featured-image {"isLink":true,"align":"wide"} /-->
 							<!-- wp:post-excerpt /-->
 							<!-- wp:separator -->
 							<hr class="wp-block-separator"/>
 							<!-- /wp:separator -->
-							<!-- wp:post-date /-->
-							<!-- /wp:post-template -->
-							</div>
+							<!-- wp:post-date /--></div>
+							<!-- /wp:group -->
+							<!-- /wp:post-template --></div>
 							<!-- /wp:query -->',
 		),
 		'query-medium-posts'                   => array(
