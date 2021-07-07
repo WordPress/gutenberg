@@ -18,10 +18,6 @@ exports[`PreferencesModal should match snapshot when the modal is active large v
           "title": "General",
         },
         Object {
-          "name": "appearance",
-          "title": "Appearance",
-        },
-        Object {
           "name": "blocks",
           "title": "Blocks",
         },
@@ -57,11 +53,6 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
         title="General"
       />
       <NavigationItem
-        key="appearance"
-        navigateToMenu="appearance"
-        title="Appearance"
-      />
-      <NavigationItem
         key="blocks"
         navigateToMenu="blocks"
         title="Blocks"
@@ -80,7 +71,8 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
     >
       <NavigationItem>
         <Section
-          title="Decide what to focus on"
+          description="Customize options related to the block editor interface and editing flow."
+          title="Appearance"
         >
           <WithSelect(WithDispatch(BaseOption))
             featureName="reducedUI"
@@ -93,32 +85,19 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
             label="Spotlight mode"
           />
           <WithSelect(WithDispatch(BaseOption))
-            featureName="showBlockBreadcrumbs"
-            help="Shows block breadcrumbs at the bottom of the editor."
-            label="Display block breadcrumbs"
-          />
-        </Section>
-      </NavigationItem>
-    </NavigationMenu>
-    <NavigationMenu
-      key="appearance-menu"
-      menu="appearance"
-      parentMenu="preferences-menu"
-      title="Appearance"
-    >
-      <NavigationItem>
-        <Section
-          title="Choose the way it looks"
-        >
-          <WithSelect(WithDispatch(BaseOption))
             featureName="showIconLabels"
-            help="Shows text instead of icons in toolbar."
+            help="Shows text instead of icons."
             label="Display button labels"
           />
           <WithSelect(WithDispatch(BaseOption))
             featureName="themeStyles"
             help="Make the editor look like your theme."
             label="Use theme styles"
+          />
+          <WithSelect(WithDispatch(BaseOption))
+            featureName="showBlockBreadcrumbs"
+            help="Shows block breadcrumbs at the bottom of the editor."
+            label="Display block breadcrumbs"
           />
         </Section>
       </NavigationItem>
@@ -131,7 +110,8 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
     >
       <NavigationItem>
         <Section
-          title="Choose how you interact with blocks"
+          description="Customize how you interact with blocks in the block library and editing canvas."
+          title="Block interactions"
         >
           <WithSelect(WithDispatch(BaseOption))
             featureName="mostUsedBlocks"
