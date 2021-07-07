@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Update loading and failed screens for web version of the editor [#32395]
 -   [*] Handle floating keyboard case - Fix issue with the block selector on iPad. [#33089]
+-   [**] Added color/background customization for text blocks. [#33250]
 
 ## 1.56.0
 -   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
