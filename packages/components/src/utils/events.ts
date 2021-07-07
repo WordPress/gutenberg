@@ -30,21 +30,30 @@ function mergeEvent< TEvent extends Event >(
  */
 export function mergeEventHandlers<
 	TEvent extends Event,
-	TLeft extends Record< string, EventHandler< TEvent > >
->(
-	handlers: TLeft,
-	extraHandlers: Record< string, EventHandler< TEvent > >
-): TLeft {
-	const mergedHandlers: TLeft = { ...handlers };
+	TLeft extends Record< string, EventHandler< TEvent > >,
+	TRight extends Record< string, EventHandler< TEvent > >
+>( handlers: TLeft, extraHandlers: TRight ): TLeft & TRight {
+	// @ts-ignore We'll fill in all the properties below
+	const mergedHandlers: TLeft & TRight = {
+		...handlers,
+	};
 
 	for ( const [ key, handler ] of Object.entries( mergedHandlers ) ) {
 		if ( typeof extraHandlers[ key ] === 'function' ) {
 			// @ts-ignore
-			mergedHandlers[ key as keyof TLeft ] = mergeEvent(
+			mergedHandlers[ key as keyof typeof mergedHandlers ] = mergeEvent(
 				handler,
 				extraHandlers[ key ]
 			);
 		}
+	}
+
+	for ( const [ key, handler ] of Object.entries( extraHandlers ) ) {
+		if ( key in mergedHandlers ) {
+			continue;
+		}
+		// @ts-ignore
+		mergedHandlers[ key ] = handler;
 	}
 
 	return mergedHandlers;
