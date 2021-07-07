@@ -51,9 +51,9 @@ function gutenberg_use_widgets_block_editor() {
 }
 
 /**
- * wp-editor module is exposed as window.wp.editor
- * Problem: there is quite some code expecting window.wp.oldEditor object available under window.wp.editor
- * Solution: fuse the two objects together to maintain backward compatibility
+ * Wp-editor module is exposed as window.wp.editor.
+ * Problem: there is quite some code expecting window.wp.oldEditor object available under window.wp.editor.
+ * Solution: fuse the two objects together to maintain backward compatibility.
  * For more context, see https://github.com/WordPress/gutenberg/issues/33203
  *
  * @return void
