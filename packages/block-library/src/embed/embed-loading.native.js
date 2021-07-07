@@ -15,8 +15,8 @@ import styles from './styles.scss';
 
 const EmbedLoading = () => {
 	const style = usePreferredColorSchemeStyle(
-		styles[ 'embed-preview__placeholder' ],
-		styles[ 'embed-preview__placeholder--dark' ]
+		styles[ 'embed-preview__loading' ],
+		styles[ 'embed-preview__loading--dark' ]
 	);
 
 	return (
