@@ -8,11 +8,9 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
-	__experimentalParseUnit as parseUnit,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -78,11 +76,6 @@ export default function BorderPanel( {
 	const hasBorderWidth = useHasBorderWidthControl( { supports, name } );
 	const borderWidthValue = getStyle( name, 'borderWidth' );
 
-	// Step value is maintained in state so step is appropriate for current unit
-	// even when current width value is undefined.
-	const initialStep = parseUnit( borderWidthValue )[ 1 ] === 'px' ? 1 : 0.25;
-	const [ step, setStep ] = useState( initialStep );
-
 	// Border style.
 	const hasBorderStyle = useHasBorderStyleControl( { supports, name } );
 	const borderStyle = getStyle( name, 'borderStyle' );
@@ -114,10 +107,6 @@ export default function BorderPanel( {
 									value || undefined
 								);
 							} }
-							onUnitChange={ ( newUnit ) => {
-								setStep( newUnit === 'px' ? 1 : 0.25 );
-							} }
-							step={ step }
 							units={ units }
 						/>
 					) }
