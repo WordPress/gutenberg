@@ -79,6 +79,22 @@ register_block_type(
 
 This section describes all the properties that can be added to the `block.json` file to define the behavior and metadata of block types.
 
+### API Version
+
+-   Type: `number`
+-   Optional
+-   Localized: No
+-   Property: `apiVersion`
+-   Default: `1`
+
+```json
+{ "apiVersion": 2 }
+```
+
+The version of the Block API used by the block. The most recent version is `2` and it was introduced in WordPress 5.6.
+
+See the [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
+
 ### Name
 
 -   Type: `string`
