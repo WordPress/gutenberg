@@ -20,7 +20,7 @@ import {
 	isTemplatePart,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { stack } from '@wordpress/icons';
+import { stack, reusableBlockType } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -148,7 +148,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						icon={
 							<>
 								<BlockIcon
-									icon={ icon }
+									icon={
+										isReusable ? reusableBlockType : icon
+									}
 									className="block-editor-block-switcher__toggle"
 									showColors
 								/>
