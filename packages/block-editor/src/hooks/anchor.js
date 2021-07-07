@@ -7,7 +7,12 @@ import { has } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
+import {
+	PanelBody,
+	TextControl,
+	HelpText,
+	ExternalLink,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -73,22 +78,6 @@ export const withInspectorControl = createHigherOrderComponent(
 					<TextControl
 						className="html-anchor-control"
 						label={ __( 'HTML anchor' ) }
-						help={
-							<>
-								{ __(
-									'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
-								) }{ ' ' }
-								{
-									<ExternalLink
-										href={
-											'https://wordpress.org/support/article/page-jumps/'
-										}
-									>
-										{ __( 'Learn more about anchors' ) }
-									</ExternalLink>
-								}
-							</>
-						}
 						value={ props.attributes.anchor || '' }
 						placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
 						onChange={ ( nextValue ) => {
@@ -99,6 +88,23 @@ export const withInspectorControl = createHigherOrderComponent(
 						} }
 						autoCapitalize="none"
 						autoComplete="off"
+						separatorType="none"
+						help={
+							isWeb && (
+								<>
+									{ __(
+										'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
+									) }
+									<ExternalLink
+										href={
+											'https://wordpress.org/support/article/page-jumps/'
+										}
+									>
+										{ __( 'Learn more about anchors' ) }
+									</ExternalLink>
+								</>
+							)
+						}
 					/>
 				);
 
@@ -120,6 +126,17 @@ export const withInspectorControl = createHigherOrderComponent(
 							<InspectorControls>
 								<PanelBody title={ __( 'Heading settings' ) }>
 									{ textControl }
+									<HelpText
+										url="https://wordpress.org/support/article/page-jumps/"
+										r
+										moreLinkText={ __(
+											'Learn more about anchors'
+										) }
+									>
+										{ __(
+											'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
+										) }
+									</HelpText>
 								</PanelBody>
 							</InspectorControls>
 						) }
