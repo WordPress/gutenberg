@@ -34,7 +34,7 @@ const EmbedBottomSheet = ( { value, isVisible, onClose, onSubmit } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const onDismiss = useCallback( () => {
-		if ( url !== '' && url !== value ) {
+		if ( url !== '' ) {
 			if ( isURL( url ) ) {
 				onSubmit( url );
 			} else {

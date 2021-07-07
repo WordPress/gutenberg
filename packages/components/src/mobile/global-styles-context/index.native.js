@@ -26,7 +26,8 @@ export const getMergedGlobalStyles = (
 	globalStyle,
 	wrapperPropsStyle,
 	blockAttributes,
-	defaultColors
+	defaultColors,
+	blockName
 ) => {
 	const baseGlobalColors = {
 		baseColors: baseGlobalStyles || {},
@@ -40,12 +41,18 @@ export const getMergedGlobalStyles = (
 		...globalStyle,
 		...wrapperPropsStyle,
 	};
+	const blockColors = getBlockColors(
+		blockStyleAttributes,
+		defaultColors,
+		blockName,
+		baseGlobalStyles
+	);
 	const blockPaddings = getBlockPaddings(
 		mergedStyle,
 		wrapperPropsStyle,
-		blockStyleAttributes
+		blockStyleAttributes,
+		blockColors
 	);
-	const blockColors = getBlockColors( blockStyleAttributes, defaultColors );
 
 	return { ...mergedStyle, ...blockPaddings, ...blockColors };
 };

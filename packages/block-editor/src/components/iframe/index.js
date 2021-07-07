@@ -49,6 +49,13 @@ function styleSheetsCompat( doc ) {
 			return;
 		}
 
+		// Don't try to add the reset styles, which were removed as a dependency
+		// from `edit-blocks` for the iframe since we don't need to reset admin
+		// styles.
+		if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
+			return;
+		}
+
 		const isMatch = Array.from( cssRules ).find(
 			( { selectorText } ) =>
 				selectorText &&

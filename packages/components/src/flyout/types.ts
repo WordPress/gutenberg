@@ -11,8 +11,8 @@ import type { CSSProperties, FunctionComponentElement } from 'react';
  */
 import type { PopperProps } from '../utils/types';
 
-export type PopoverContext = {
-	popover?: PopoverStateReturn;
+export type Context = {
+	flyoutState?: PopoverStateReturn;
 	label?: string;
 };
 
@@ -20,11 +20,13 @@ export type Props = PopperProps & {
 	state?: PopoverStateReturn;
 	label?: string;
 	/**
-	 * Determines if `Popover` has animations.
+	 * Determines if `Flyout` has animations.
+	 *
+	 * @default true
 	 */
 	animated?: boolean;
 	/**
-	 * The duration of `Popover` animations.
+	 * The duration of `Flyout` animations.
 	 *
 	 * @default 160
 	 */
@@ -36,13 +38,15 @@ export type Props = PopperProps & {
 	 */
 	baseId?: string;
 	/**
-	 * Renders `Elevation` styles for the `Popover`.
+	 * Renders `Elevation` styles for the `Flyout`.
 	 *
 	 * @default 5
 	 */
 	elevation?: number;
 	/**
-	 * Max-width for the `Popover` element.
+	 * Max-width for the `Flyout` element.
+	 *
+	 * @default 360
 	 */
 	maxWidth?: CSSProperties[ 'maxWidth' ];
 	/**
@@ -50,18 +54,18 @@ export type Props = PopperProps & {
 	 */
 	onVisibleChange?: ( ...args: any ) => void;
 	/**
-	 * Element that triggers the `visible` state of `Popover` when clicked.
+	 * Element that triggers the `visible` state of `Flyout` when clicked.
 	 *
 	 * @example
 	 * ```jsx
-	 * <Popover trigger={<Button>Greet</Button>}>
+	 * <Flyout trigger={<Button>Greet</Button>}>
 	 *  <Text>Hi! I'm Olaf!</Text>
-	 * </Popover>
+	 * </Flyout>
 	 * ```
 	 */
 	trigger: FunctionComponentElement< any >;
 	/**
-	 * Whether `Popover` is visible.
+	 * Whether `Flyout` is visible.
 	 *
 	 * @default false
 	 *
@@ -75,7 +79,7 @@ export type Props = PopperProps & {
 };
 
 export type ContentProps = {
-	elevation?: number;
-	maxWidth?: CSSProperties[ 'maxWidth' ];
+	elevation: number;
+	maxWidth: CSSProperties[ 'maxWidth' ];
 	children: React.ReactNode;
 };

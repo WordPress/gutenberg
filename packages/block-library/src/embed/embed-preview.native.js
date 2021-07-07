@@ -21,8 +21,10 @@ import styles from './styles.scss';
 
 const EmbedPreview = ( {
 	clientId,
+	icon,
 	insertBlocksAfter,
 	isSelected,
+	label,
 	onBlur,
 	onFocus,
 	preview,
@@ -30,11 +32,15 @@ const EmbedPreview = ( {
 	url,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
-	const stylePlaceholder = usePreferredColorSchemeStyle(
-		styles[ 'embed-preview__placeholder' ],
-		styles[ 'embed-preview__placeholder--dark' ]
+	const containerStyle = usePreferredColorSchemeStyle(
+		styles.embed__container,
+		styles[ 'embed__container--dark' ]
 	);
-	const stylePlaceholderText = usePreferredColorSchemeStyle(
+	const labelStyle = usePreferredColorSchemeStyle(
+		styles.embed__label,
+		styles[ 'embed__label--dark' ]
+	);
+	const placeholderTextStyle = usePreferredColorSchemeStyle(
 		styles[ 'embed-preview__placeholder-text' ],
 		styles[ 'embed-preview__placeholder-text--dark' ]
 	);
@@ -82,8 +88,10 @@ const EmbedPreview = ( {
 		>
 			<View>
 				{ cannotShowThumbnail ? (
-					<View style={ stylePlaceholder }>
-						<Text style={ stylePlaceholderText }>
+					<View style={ containerStyle }>
+						<View style={ styles.embed__icon }>{ icon }</View>
+						<Text style={ labelStyle }>{ label }</Text>
+						<Text style={ placeholderTextStyle }>
 							{ sprintf(
 								/* translators: %s: host providing embed content e.g: www.youtube.com */
 								__(
