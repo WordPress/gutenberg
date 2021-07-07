@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RIGHT, SPACE } from '@wordpress/keycodes';
+import { RIGHT, UP, DOWN, LEFT, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -9,21 +9,26 @@ import { RIGHT, SPACE } from '@wordpress/keycodes';
 import { normalizeArrowKey } from '../keyboard';
 
 describe( 'normalizeArrowKey', () => {
-	it( 'should return the Arrow(Key) version for the presed key', () => {
-		const e = new window.KeyboardEvent( 'keydown', {
-			key: 'Right',
-			keyCode: RIGHT,
-		} );
+	it.each`
+		keyCode    | key               | normalized
+		${ RIGHT } | ${ 'Right' }      | ${ 'ArrowRight' }
+		${ UP }    | ${ 'Up' }         | ${ 'ArrowUp' }
+		${ DOWN }  | ${ 'Down' }       | ${ 'ArrowDown' }
+		${ LEFT }  | ${ 'Left' }       | ${ 'ArrowLeft' }
+		${ RIGHT } | ${ 'ArrowRight' } | ${ 'ArrowRight' }
+		${ UP }    | ${ 'ArrowUp' }    | ${ 'ArrowUp' }
+		${ DOWN }  | ${ 'ArrowDown' }  | ${ 'ArrowDown' }
+		${ LEFT }  | ${ 'ArrowLeft' }  | ${ 'ArrowLeft' }
+		${ SPACE } | ${ 'Space' }      | ${ 'Space' }
+	`(
+		'should return $normalized for $key with keycode $keyCode',
+		( { keyCode, key, normalized } ) => {
+			const e = new window.KeyboardEvent( 'keydown', {
+				key,
+				keyCode,
+			} );
 
-		expect( normalizeArrowKey( e ) ).toEqual( 'ArrowRight' );
-	} );
-
-	it( 'should return the non-normalized version if given a non arrow key event', () => {
-		const e = new window.KeyboardEvent( 'keydown', {
-			key: 'Space',
-			keyCode: SPACE,
-		} );
-
-		expect( normalizeArrowKey( e ) ).toEqual( 'Space' );
-	} );
+			expect( normalizeArrowKey( e ) ).toEqual( normalized );
+		}
+	);
 } );
