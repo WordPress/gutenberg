@@ -96,7 +96,7 @@ function gutenberg_get_menu_items_at_location( $location ) {
 		return;
 	}
 
-	// Build menu data. The following code is approximates the code in
+	// Build menu data. The following approximates the code in
 	// `wp_nav_menu()` and `gutenberg_output_block_nav_menu`.
 
 	// Find the location in the list of locations, returning early if the
