@@ -63,6 +63,10 @@ import * as buttons from './buttons';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 
+import { transformationCategory } from './transformationCategories';
+
+const ALLOWED_BLOCKS_GRADIENT_SUPPORT = [ 'core/button' ];
+
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
 	// in various contexts — like the inserter and auto-complete components.
@@ -125,10 +129,25 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	registerBlockType( name, {
-		...metadata,
-		...settings,
-	} );
+	const { supports } = metadata;
+
+	registerBlockType(
+		{
+			name,
+			...metadata,
+			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT
+			...( ! ALLOWED_BLOCKS_GRADIENT_SUPPORT.includes( name ) &&
+			supports?.color?.gradients
+				? {
+						supports: {
+							...supports,
+							color: { ...supports.color, gradients: false },
+						},
+				  }
+				: {} ),
+		},
+		settings
+	);
 };
 
 /**
@@ -180,6 +199,28 @@ addFilter(
 	}
 );
 
+addFilter(
+	'blocks.registerBlockType',
+	'core/react-native-editor',
+	( settings, name ) => {
+		if ( ! settings.transforms ) {
+			return settings;
+		}
+
+		if ( ! settings.transforms.supportedMobileTransforms ) {
+			return {
+				...settings,
+				transforms: {
+					...settings.transforms,
+					supportedMobileTransforms: transformationCategory( name ),
+				},
+			};
+		}
+
+		return settings;
+	}
+);
+
 /**
  * Function to register core blocks provided by the block editor.
  *
@@ -223,8 +264,9 @@ export const registerCoreBlocks = () => {
 		pullquote,
 		file,
 		audio,
-		devOnly( reusableBlock ),
-		devOnly( search ),
+		reusableBlock,
+		search,
+		devOnly( embed ),
 	].forEach( registerBlock );
 
 	registerBlockVariations( socialLink );

@@ -9,11 +9,13 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
-	withColors,
 	InspectorControls,
 	BlockControls,
 	withGradient,
 	store as blockEditorStore,
+	getColorObjectByAttributeValues,
+	getGradientValueBySlug,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -33,8 +35,6 @@ import { link } from '@wordpress/icons';
 import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
 import ColorBackground from './color-background';
-import ColorEdit from './color-edit';
-import getColorAndStyleProps from './color-props';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
@@ -184,30 +184,49 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes, gradientValue } = this.props;
-		const { customGradient } = attributes;
+		const { attributes, colors, gradients, style } = this.props;
+		const { backgroundColor, gradient } = attributes;
 
-		if ( customGradient || gradientValue ) {
-			return customGradient || gradientValue;
+		// Return named gradient value if available.
+		const gradientValue = getGradientValueBySlug( gradients, gradient );
+
+		if ( gradientValue ) {
+			return gradientValue;
 		}
-		const colorAndStyleProps = getColorAndStyleProps( attributes );
+
+		const colorProps = getColorClassesAndStyles( attributes );
+
+		// Retrieve named color object to force inline styles for themes that
+		// do not load their color stylesheets in the editor.
+		const colorObject = getColorObjectByAttributeValues(
+			colors,
+			backgroundColor
+		);
+
 		return (
-			colorAndStyleProps.style?.backgroundColor ||
-			colorAndStyleProps.style?.background ||
-			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
-			backgroundColor.color ||
+			colorObject?.color ||
+			colorProps.style?.backgroundColor ||
+			colorProps.style?.background ||
+			style?.backgroundColor ||
 			styles.defaultButton.backgroundColor
 		);
 	}
 
 	getTextColor() {
-		const { textColor, attributes } = this.props;
-		const colorAndStyleProps = getColorAndStyleProps( attributes );
+		const { attributes, colors, style } = this.props;
+		const colorProps = getColorClassesAndStyles( attributes );
+
+		// Retrieve named color object to force inline styles for themes that
+		// do not load their color stylesheets in the editor.
+		const colorObject = getColorObjectByAttributeValues(
+			colors,
+			attributes.textColor
+		);
 
 		return (
-			colorAndStyleProps.style?.color ||
-			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
-			textColor.color ||
+			colorObject?.color ||
+			colorProps.style?.color ||
+			style?.color ||
 			styles.defaultButton.color
 		);
 	}
@@ -217,11 +236,18 @@ class ButtonEdit extends Component {
 		setAttributes( { text: value } );
 	}
 
-	onChangeBorderRadius( value ) {
-		const { setAttributes } = this.props;
-		setAttributes( {
-			borderRadius: value,
-		} );
+	onChangeBorderRadius( newRadius ) {
+		const { setAttributes, attributes } = this.props;
+		const { style } = attributes;
+		const newStyle = {
+			...style,
+			border: {
+				...style?.border,
+				radius: newRadius,
+			},
+		};
+
+		setAttributes( { style: newStyle } );
 	}
 
 	onShowLinkSettings() {
@@ -351,11 +377,12 @@ class ButtonEdit extends Component {
 			mergeBlocks,
 			parentWidth,
 			setAttributes,
+			style,
 		} = this.props;
 		const {
 			placeholder,
 			text,
-			borderRadius,
+			style: buttonStyle,
 			url,
 			align = 'center',
 			width,
@@ -366,6 +393,8 @@ class ButtonEdit extends Component {
 		if ( parentWidth === 0 ) {
 			return null;
 		}
+
+		const borderRadius = buttonStyle?.border?.radius;
 
 		const borderRadiusValue = Number.isInteger( borderRadius )
 			? borderRadius
@@ -437,7 +466,7 @@ class ButtonEdit extends Component {
 						} }
 						textAlign={ align }
 						placeholderTextColor={
-							styles.placeholderTextColor.color
+							style?.color || styles.placeholderTextColor.color
 						}
 						identifier="text"
 						tagName="p"
@@ -473,7 +502,6 @@ class ButtonEdit extends Component {
 							</ToolbarGroup>
 						</BlockControls>
 						{ this.getLinkSettings( false ) }
-						<ColorEdit { ...this.props } />
 						<InspectorControls>
 							<PanelBody title={ __( 'Border Settings' ) }>
 								<RangeControl
@@ -502,16 +530,18 @@ class ButtonEdit extends Component {
 export default compose( [
 	withInstanceId,
 	withGradient,
-	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId, isSelected } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getBlockCount, getBlockRootClientId } = select(
+		const { getBlockCount, getBlockRootClientId, getSettings } = select(
 			blockEditorStore
 		);
 		const parentId = getBlockRootClientId( clientId );
 		const numOfButtons = getBlockCount( parentId );
+		const settings = getSettings();
 
 		return {
+			colors: settings?.colors || [],
+			gradients: settings?.gradients || [],
 			editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			numOfButtons,
 		};

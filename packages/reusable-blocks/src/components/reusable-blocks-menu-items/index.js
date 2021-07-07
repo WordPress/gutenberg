@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -24,7 +25,7 @@ function ReusableBlocksMenuItems( { clientIds, rootClientId } ) {
 }
 
 export default withSelect( ( select ) => {
-	const { getSelectedBlockClientIds } = select( 'core/block-editor' );
+	const { getSelectedBlockClientIds } = select( blockEditorStore );
 	return {
 		clientIds: getSelectedBlockClientIds(),
 	};

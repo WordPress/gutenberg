@@ -15,6 +15,9 @@ import {
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
+import { Platform } from '@wordpress/element';
+
+const isWebPlatform = Platform.OS === 'web';
 
 export default function QuoteEdit( {
 	attributes,
@@ -24,14 +27,14 @@ export default function QuoteEdit( {
 	onReplace,
 	className,
 	insertBlocksAfter,
-	mergedStyle,
+	style,
 } ) {
 	const { align, value, citation } = attributes;
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
 			[ `has-text-align-${ align }` ]: align,
 		} ),
-		style: mergedStyle,
+		style,
 	} );
 
 	return (
@@ -82,7 +85,7 @@ export default function QuoteEdit( {
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
 						identifier="citation"
-						tagName="cite"
+						tagName={ isWebPlatform ? 'cite' : undefined }
 						style={ { display: 'block' } }
 						value={ citation }
 						onChange={ ( nextCitation ) =>

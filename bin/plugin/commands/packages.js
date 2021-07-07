@@ -32,9 +32,9 @@ const git = require( '../lib/git' );
  * Checks out the WordPress release branch and syncs it with the changes from
  * the last plugin release.
  *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
- * @param {string} abortMessage            Abort Message.
+ * @param {string}  gitWorkingDirectoryPath Git working directory path.
+ * @param {boolean} isPrerelease            Whether the package version to publish is a prerelease.
+ * @param {string}  abortMessage            Abort Message.
  *
  * @return {Promise<Object>} WordPress release branch.
  */
@@ -97,10 +97,10 @@ async function runWordPressReleaseBranchSyncStep(
  * Update CHANGELOG files with the new version number for those packages that
  * contain new entries.
  *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {SemVer} minimumVersionBump      Minimum version bump for the packages.
- * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
- * @param {string} abortMessage            Abort Message.
+ * @param {string}  gitWorkingDirectoryPath Git working directory path.
+ * @param {SemVer}  minimumVersionBump      Minimum version bump for the packages.
+ * @param {boolean} isPrerelease            Whether the package version to publish is a prerelease.
+ * @param {string}  abortMessage            Abort Message.
  */
 async function updatePackages(
 	gitWorkingDirectoryPath,
@@ -274,9 +274,9 @@ async function runPushGitChangesStep(
 /**
  * Publishes all changed packages to npm.
  *
- * @param {string} gitWorkingDirectoryPath Git working directory path.
- * @param {SemVer} minimumVersionBump      Minimum version bump for the packages.
- * @param {boolean} isPrerelease           Whether the package version to publish is a prerelease.
+ * @param {string}  gitWorkingDirectoryPath Git working directory path.
+ * @param {SemVer}  minimumVersionBump      Minimum version bump for the packages.
+ * @param {boolean} isPrerelease            Whether the package version to publish is a prerelease.
  */
 async function publishPackagesToNpm(
 	gitWorkingDirectoryPath,
@@ -398,8 +398,11 @@ async function publishNpmLatestDistTag() {
 	await prepareForPackageRelease();
 
 	log(
-		'\n>> 🎉 WordPress packages are now published!\n',
-		'Let also people know on WordPress Slack.\n'
+		'\n>> 🎉 WordPress packages are now published!\n\n',
+		'Please remember to run `git cherry-pick` in the `trunk` branch for the newly created commits during the release with labels:\n',
+		' - Update changelog files (if exists)\n',
+		' - chore(release): publish\n\n',
+		'Finally, let also people know on WordPress Slack and celebrate together.'
 	);
 }
 

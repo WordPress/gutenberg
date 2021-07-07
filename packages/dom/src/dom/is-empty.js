@@ -11,7 +11,7 @@ export default function isEmpty( element ) {
 		case element.TEXT_NODE:
 			// We cannot use \s since it includes special spaces which we want
 			// to preserve.
-			return /^[ \f\n\r\t\v\u00a0]*$/.test( element.nodeValue );
+			return /^[ \f\n\r\t\v\u00a0]*$/.test( element.nodeValue || '' );
 		case element.ELEMENT_NODE:
 			if ( element.hasAttributes() ) {
 				return false;
@@ -19,7 +19,9 @@ export default function isEmpty( element ) {
 				return true;
 			}
 
-			return Array.from( element.childNodes ).every( isEmpty );
+			return /** @type {Element[]} */ ( Array.from(
+				element.childNodes
+			) ).every( isEmpty );
 		default:
 			return true;
 	}

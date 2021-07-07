@@ -11,6 +11,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
+	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/block-editor';
 import {
@@ -24,6 +25,7 @@ import {
 	ResizableBox,
 	PanelBody,
 	BaseControl,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { search } from '@wordpress/icons';
@@ -41,12 +43,15 @@ import {
 	toggleLabel,
 } from './icons';
 import {
-	CSS_UNITS,
 	PC_WIDTH_DEFAULT,
 	PX_WIDTH_DEFAULT,
 	MIN_WIDTH,
 	MIN_WIDTH_UNIT,
 } from './utils.js';
+
+// Used to calculate border radius adjustment to avoid "fat" corners when
+// button is placed inside wrapper.
+const DEFAULT_INNER_PADDING = '4px';
 
 export default function SearchEdit( {
 	className,
@@ -65,10 +70,26 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
+		style,
 	} = attributes;
+
+	const borderRadius = style?.border?.radius;
+	const borderProps = useBorderProps( attributes );
+
+	// Check for old deprecated numerical border radius. Done as a separate
+	// check so that a borderRadius style won't overwrite the longhand
+	// per-corner styles.
+	if ( typeof borderRadius === 'number' ) {
+		borderProps.style.borderRadius = `${ borderRadius }px`;
+	}
 
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
+
+	const units = useCustomUnits( {
+		availableUnits: [ '%', 'px' ],
+		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
+	} );
 
 	const getBlockClassNames = () => {
 		return classnames(
@@ -122,6 +143,7 @@ export default function SearchEdit( {
 		return (
 			<input
 				className="wp-block-search__input"
+				style={ borderProps.style }
 				aria-label={ __( 'Optional placeholder text' ) }
 				// We hide the placeholder field's placeholder when there is a value. This
 				// stops screen readers from reading the placeholder field's placeholder
@@ -144,12 +166,14 @@ export default function SearchEdit( {
 					<Button
 						icon={ search }
 						className="wp-block-search__button"
+						style={ borderProps.style }
 					/>
 				) }
 
 				{ ! buttonUseIcon && (
 					<RichText
 						className="wp-block-search__button"
+						style={ borderProps.style }
 						aria-label={ __( 'Button text' ) }
 						placeholder={ __( 'Add button text…' ) }
 						withoutInteractiveFormatting
@@ -269,7 +293,7 @@ export default function SearchEdit( {
 							style={ { maxWidth: 80 } }
 							value={ `${ width }${ widthUnit }` }
 							unit={ widthUnit }
-							units={ CSS_UNITS }
+							units={ units }
 						/>
 
 						<ButtonGroup
@@ -281,9 +305,11 @@ export default function SearchEdit( {
 									<Button
 										key={ widthValue }
 										isSmall
-										isPrimary={
+										variant={
 											`${ widthValue }%` ===
 											`${ width }${ widthUnit }`
+												? 'primary'
+												: undefined
 										}
 										onClick={ () =>
 											setAttributes( {
@@ -302,6 +328,50 @@ export default function SearchEdit( {
 			</InspectorControls>
 		</>
 	);
+
+	const padBorderRadius = ( radius ) =>
+		radius ? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })` : undefined;
+
+	const getWrapperStyles = () => {
+		const isNonZeroBorderRadius = parseInt( borderRadius, 10 ) !== 0;
+
+		if ( 'button-inside' === buttonPosition && isNonZeroBorderRadius ) {
+			// We have button inside wrapper and a border radius value to apply.
+			// Add default padding so we don't get "fat" corners.
+			//
+			// CSS calc() is used here to support non-pixel units.
+
+			if ( typeof borderRadius === 'object' ) {
+				// Individual corner border radii present.
+				const {
+					topLeft,
+					topRight,
+					bottomLeft,
+					bottomRight,
+				} = borderRadius;
+
+				return {
+					borderTopLeftRadius: padBorderRadius( topLeft ),
+					borderTopRightRadius: padBorderRadius( topRight ),
+					borderBottomLeftRadius: padBorderRadius( bottomLeft ),
+					borderBottomRightRadius: padBorderRadius( bottomRight ),
+				};
+			}
+
+			// The inline style using calc() will only apply if both values
+			// supplied to calc() have units. Deprecated block's may have
+			// unitless integer.
+			const radius = Number.isInteger( borderRadius )
+				? `${ borderRadius }px`
+				: borderRadius;
+
+			return {
+				borderRadius: `calc(${ radius } + ${ DEFAULT_INNER_PADDING })`,
+			};
+		}
+
+		return undefined;
+	};
 
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
@@ -327,6 +397,7 @@ export default function SearchEdit( {
 					width: `${ width }${ widthUnit }`,
 				} }
 				className="wp-block-search__inside-wrapper"
+				style={ getWrapperStyles() }
 				minWidth={ MIN_WIDTH }
 				enable={ getResizableSides() }
 				onResizeStart={ ( event, direction, elt ) => {

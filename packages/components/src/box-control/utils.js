@@ -20,6 +20,8 @@ export const LABELS = {
 	left: __( 'Left' ),
 	right: __( 'Right' ),
 	mixed: __( 'Mixed' ),
+	vertical: __( 'Vertical' ),
+	horizontal: __( 'Horizontal' ),
 };
 
 export const DEFAULT_VALUES = {
@@ -109,6 +111,31 @@ export function isValuesMixed( values = {} ) {
 export function isValuesDefined( values ) {
 	return (
 		values !== undefined &&
-		! isEmpty( Object.values( values ).filter( Boolean ) )
+		! isEmpty(
+			Object.values( values ).filter(
+				// Switching units when input is empty causes values only
+				// containing units. This gives false positive on mixed values
+				// unless filtered.
+				( value ) => !! value && /\d/.test( value )
+			)
+		)
 	);
+}
+
+/**
+ * Get initial selected side, factoring in whether the sides are linked,
+ * and whether the vertical / horizontal directions are grouped via splitOnAxis.
+ *
+ * @param {boolean} isLinked
+ * @param {boolean} splitOnAxis
+ * @return {string} The initial side.
+ */
+export function getInitialSide( isLinked, splitOnAxis ) {
+	let initialSide = 'all';
+
+	if ( ! isLinked ) {
+		initialSide = splitOnAxis ? 'vertical' : 'top';
+	}
+
+	return initialSide;
 }

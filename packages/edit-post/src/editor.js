@@ -12,13 +12,11 @@ import {
 	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
+	store as editorStore,
 } from '@wordpress/editor';
 import { StrictMode, useMemo } from '@wordpress/element';
-import {
-	KeyboardShortcuts,
-	SlotFillProvider,
-	__unstableDropZoneContextProvider as DropZoneContextProvider,
-} from '@wordpress/components';
+import { KeyboardShortcuts, SlotFillProvider } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -56,14 +54,12 @@ function Editor( {
 			getPreference,
 			__experimentalGetPreviewDeviceType,
 			isEditingTemplate,
+			getEditedPostTemplate,
 		} = select( editPostStore );
-		const {
-			getEntityRecord,
-			__experimentalGetTemplateForLink,
-			getPostType,
-			getEntityRecords,
-		} = select( 'core' );
-		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
+		const { getEntityRecord, getPostType, getEntityRecords } = select(
+			coreStore
+		);
+		const { getEditorSettings } = select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postType
@@ -79,7 +75,7 @@ function Editor( {
 		} else {
 			postObject = getEntityRecord( 'postType', postType, postId );
 		}
-		const isFSETheme = getEditorSettings().isFSETheme;
+		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
 		const isViewable = getPostType( postType )?.viewable ?? false;
 
 		return {
@@ -100,11 +96,8 @@ function Editor( {
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 			isTemplateMode: isEditingTemplate(),
 			template:
-				isFSETheme &&
-				isViewable &&
-				postObject &&
-				getCurrentPost().status !== 'auto-draft'
-					? __experimentalGetTemplateForLink( postObject.link )
+				supportsTemplateMode && isViewable
+					? getEditedPostTemplate()
 					: null,
 			post: postObject,
 		};
@@ -174,27 +167,25 @@ function Editor( {
 		<StrictMode>
 			<EditPostSettings.Provider value={ settings }>
 				<SlotFillProvider>
-					<DropZoneContextProvider>
-						<EditorProvider
-							settings={ editorSettings }
-							post={ post }
-							initialEdits={ initialEdits }
-							useSubRegistry={ false }
-							__unstableTemplate={
-								isTemplateMode ? template : undefined
-							}
-							{ ...props }
-						>
-							<ErrorBoundary onError={ onError }>
-								<EditorInitialization postId={ postId } />
-								<Layout styles={ styles } />
-								<KeyboardShortcuts
-									shortcuts={ preventEventDiscovery }
-								/>
-							</ErrorBoundary>
-							<PostLockedModal />
-						</EditorProvider>
-					</DropZoneContextProvider>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ post }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						__unstableTemplate={
+							isTemplateMode ? template : undefined
+						}
+						{ ...props }
+					>
+						<ErrorBoundary onError={ onError }>
+							<EditorInitialization postId={ postId } />
+							<Layout styles={ styles } />
+							<KeyboardShortcuts
+								shortcuts={ preventEventDiscovery }
+							/>
+						</ErrorBoundary>
+						<PostLockedModal />
+					</EditorProvider>
 				</SlotFillProvider>
 			</EditPostSettings.Provider>
 		</StrictMode>

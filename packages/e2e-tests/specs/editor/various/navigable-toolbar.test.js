@@ -3,6 +3,14 @@
  */
 import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
 
+async function isInBlockToolbar() {
+	return await page.evaluate( () => {
+		return !! document.activeElement.closest(
+			'.block-editor-block-toolbar'
+		);
+	} );
+}
+
 describe.each( [
 	[ 'unified', true ],
 	[ 'contextual', false ],
@@ -20,18 +28,6 @@ describe.each( [
 			}
 		}, isUnifiedToolbar );
 	} );
-
-	const isInBlockToolbar = () =>
-		page.evaluate( ( _isUnifiedToolbar ) => {
-			if ( _isUnifiedToolbar ) {
-				return !! document.activeElement
-					.closest( '.edit-post-header-toolbar' )
-					.querySelector( '.block-editor-block-toolbar' );
-			}
-			return !! document.activeElement.closest(
-				'.block-editor-block-toolbar'
-			);
-		}, isUnifiedToolbar );
 
 	it( 'navigates in and out of toolbar by keyboard (Alt+F10, Escape)', async () => {
 		// Assumes new post focus starts in title. Create first new

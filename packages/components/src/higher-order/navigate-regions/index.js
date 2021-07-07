@@ -53,7 +53,7 @@ export function useNavigateRegions( ref, shortcuts = defaultShortcuts ) {
 		ref.current.addEventListener( 'click', onClick );
 
 		return () => {
-			ref.current.removeEventListener( 'click', onClick );
+			ref.current?.removeEventListener( 'click', onClick );
 		};
 	}, [ setIsFocusingRegions ] );
 

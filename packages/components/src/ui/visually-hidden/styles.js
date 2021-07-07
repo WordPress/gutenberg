@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { css, ui } from '@wp-g2/styles';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { css } from '@emotion/css';
+
+/**
+ * Internal dependencies
+ */
+import { COLORS } from '../../utils/colors-values';
 
 export const VisuallyHidden = css`
 	border: 0;
@@ -17,7 +25,7 @@ export const VisuallyHidden = css`
 	word-wrap: normal !important;
 
 	&:focus {
-		background-color: ${ ui.get( 'lightGray300' ) };
+		background-color: ${ COLORS.lightGray[ '300' ] };
 		clip: auto !important;
 		clip-path: none;
 		color: #444;

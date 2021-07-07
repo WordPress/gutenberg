@@ -8,14 +8,12 @@ Spinners notify users that their action is being processed.
 
 The spinner component should:
 
-- Signal to users that the processing of their request is underway and will soon complete.
+-   Signal to users that the processing of their request is underway and will soon complete.
 
 ## Usage
 
 ```jsx
 import { Spinner } from '@wordpress/components';
 
-const MySpinner = () => (
-	<Spinner />
-);
+const MySpinner = () => <Spinner />;
 ```

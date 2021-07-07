@@ -12,10 +12,7 @@
 			"column": 29
 		}
 	},
-	"range": [
-		0,
-		91
-	],
+	"range": [ 0, 91 ],
 	"body": [
 		{
 			"type": "ImportDeclaration",
@@ -31,10 +28,7 @@
 					"column": 60
 				}
 			},
-			"range": [
-				0,
-				60
-			],
+			"range": [ 0, 60 ],
 			"specifiers": [
 				{
 					"type": "ImportDefaultSpecifier",
@@ -50,10 +44,7 @@
 							"column": 20
 						}
 					},
-					"range": [
-						7,
-						20
-					],
+					"range": [ 7, 20 ],
 					"local": {
 						"type": "Identifier",
 						"start": 7,
@@ -68,10 +59,7 @@
 								"column": 20
 							}
 						},
-						"range": [
-							7,
-							20
-						],
+						"range": [ 7, 20 ],
 						"name": "fnDeclaration"
 					}
 				}
@@ -90,10 +78,7 @@
 						"column": 59
 					}
 				},
-				"range": [
-					26,
-					59
-				],
+				"range": [ 26, 59 ],
 				"value": "./default-import-default-module",
 				"raw": "'./default-import-default-module'"
 			}
@@ -112,10 +97,7 @@
 					"column": 29
 				}
 			},
-			"range": [
-				62,
-				91
-			],
+			"range": [ 62, 91 ],
 			"declaration": {
 				"type": "Identifier",
 				"start": 77,
@@ -130,10 +112,7 @@
 						"column": 28
 					}
 				},
-				"range": [
-					77,
-					90
-				],
+				"range": [ 77, 90 ],
 				"name": "fnDeclaration"
 			}
 		}

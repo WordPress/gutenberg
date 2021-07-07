@@ -1,18 +1,21 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
-import { getValidChildren } from '@wp-g2/utils';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { cx } from '@emotion/css';
 
 /**
  * Internal dependencies
  */
+import { getValidChildren } from '../utils/get-valid-children';
+import { useContextSystem } from '../context';
 import { ControlGroupContext } from './context';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 export function useControlGroup( props ) {
 	const {

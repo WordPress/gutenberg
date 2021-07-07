@@ -10,11 +10,16 @@
  *
  * @param array $attributes Block attributes.
  *
- * @return string Returns the filtered post content of the current post.
+ * @return string Returns the description of the current taxonomy term, if available
  */
 function render_block_core_term_description( $attributes ) {
+	$term_description = '';
 
-	if ( ! is_category() && ! is_tag() && ! is_tax() ) {
+	if ( is_category() || is_tag() || is_tax() ) {
+		$term_description = term_description();
+	}
+
+	if ( empty( $term_description ) ) {
 		return '';
 	}
 
@@ -23,7 +28,7 @@ function render_block_core_term_description( $attributes ) {
 		: array();
 	$wrapper_attributes = get_block_wrapper_attributes( $extra_attributes );
 
-	return '<div ' . $wrapper_attributes . '>' . term_description() . '</div>';
+	return '<div ' . $wrapper_attributes . '>' . $term_description . '</div>';
 }
 
 /**

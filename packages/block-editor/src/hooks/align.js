@@ -81,8 +81,9 @@ export function getValidAlignments(
 /**
  * Filters registered block settings, extending attributes to include `align`.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	// allow blocks to specify their own attribute definition with default values if needed.
@@ -109,8 +110,9 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include new toolbar controls for block
  * alignment, if block defines support.
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
@@ -157,8 +159,9 @@ export const withToolbarControls = createHigherOrderComponent(
 /**
  * Override the default block element to add alignment wrapper props.
  *
- * @param  {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
+ * @param {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withDataAlign = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
@@ -191,10 +194,11 @@ export const withDataAlign = createHigherOrderComponent(
  * Override props assigned to save component to inject alignment class name if
  * block supports it.
  *
- * @param  {Object} props      Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {Object}            Filtered props applied to save element
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} Filtered props applied to save element.
  */
 export function addAssignedAlign( props, blockType, attributes ) {
 	const { align } = attributes;

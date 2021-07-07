@@ -43,7 +43,7 @@ function NavigationBackButton(
 		<MenuBackButtonUI
 			className={ classes }
 			href={ href }
-			isTertiary
+			variant="tertiary"
 			ref={ ref }
 			onClick={ handleOnClick }
 		>

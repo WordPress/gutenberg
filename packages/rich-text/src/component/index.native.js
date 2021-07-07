@@ -3,21 +3,18 @@
 /**
  * External dependencies
  */
-/**
- * WordPress dependencies
- */
-import RCTAztecView from '@wordpress/react-native-aztec';
 import { View, Platform } from 'react-native';
-import {
-	showUserSuggestions,
-	showXpostSuggestions,
-} from '@wordpress/react-native-bridge';
 import { get, pickBy, debounce, isString } from 'lodash';
 import memize from 'memize';
 
 /**
  * WordPress dependencies
  */
+import RCTAztecView from '@wordpress/react-native-aztec';
+import {
+	showUserSuggestions,
+	showXpostSuggestions,
+} from '@wordpress/react-native-bridge';
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -350,6 +347,13 @@ export class RichText extends Component {
 		if ( event.defaultPrevented ) {
 			return;
 		}
+
+		// Add stubs for conformance in downstream autocompleters logic
+		this.customEditableOnKeyDown?.( {
+			preventDefault: () => undefined,
+			stopPropagation: () => undefined,
+			...event,
+		} );
 
 		this.handleDelete( event );
 		this.handleEnter( event );
@@ -836,9 +840,18 @@ export class RichText extends Component {
 					extraAttributes += ` start=${ this.props.start }`;
 				}
 			}
-			value = `<${ tagName } ${ extraAttributes }>${ value }</${ tagName }>`;
+			value = `<${ tagName }${ extraAttributes }>${ value }</${ tagName }>`;
 		}
 		return value;
+	}
+
+	getEditableProps() {
+		return {
+			// Overridable props.
+			style: {},
+			className: 'rich-text',
+			onKeyDown: () => null,
+		};
 	}
 
 	render() {
@@ -858,6 +871,7 @@ export class RichText extends Component {
 
 		const record = this.getRecord();
 		const html = this.getHtmlToRender( record, tagName );
+		const editableProps = this.getEditableProps();
 
 		const placeholderStyle = getStylesFromColorScheme(
 			styles.richTextPlaceholder,
@@ -927,6 +941,12 @@ export class RichText extends Component {
 				backgroundColor: style.backgroundColor,
 			};
 
+		const EditableView = ( props ) => {
+			this.customEditableOnKeyDown = props?.onKeyDown;
+
+			return <></>;
+		};
+
 		return (
 			<View style={ containerStyles }>
 				{ children &&
@@ -935,6 +955,8 @@ export class RichText extends Component {
 						value: record,
 						onChange: this.onFormatChange,
 						onFocus: () => {},
+						editableProps,
+						editableTagName: EditableView,
 					} ) }
 				<RCTAztecView
 					accessibilityLabel={ accessibilityLabel }
@@ -957,10 +979,12 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
-						linkTextColor: defaultTextDecorationColor,
+						linkTextColor:
+							style?.linkColor || defaultTextDecorationColor,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
+						style?.placeholderColor ||
 						this.props.placeholderTextColor ||
 						defaultPlaceholderTextColor
 					}
@@ -969,9 +993,13 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
-					triggerKeyCodes={ this.suggestionOptions().map(
-						( op ) => op.triggerChar
-					) }
+					triggerKeyCodes={
+						disableEditingMenu
+							? []
+							: this.suggestionOptions().map(
+									( op ) => op.triggerChar
+							  )
+					}
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }

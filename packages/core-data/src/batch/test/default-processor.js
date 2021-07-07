@@ -27,7 +27,7 @@ describe( 'defaultProcessor', () => {
 	];
 
 	const expectedFetchOptions = {
-		path: '/v1/batch',
+		path: '/batch/v1',
 		method: 'POST',
 		data: {
 			validation: 'require-all-validate',

@@ -17,8 +17,9 @@ import Button from '../button';
 import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
+import AxialInputControls from './axial-input-controls';
 import BoxControlIcon from './icon';
-import Text from '../text';
+import { Text } from '../text';
 import LinkedButton from './linked-button';
 import Visualizer from './visualizer';
 import {
@@ -29,6 +30,7 @@ import {
 import {
 	DEFAULT_VALUES,
 	DEFAULT_VISUALIZER_VALUES,
+	getInitialSide,
 	isValuesMixed,
 	isValuesDefined,
 } from './utils';
@@ -51,26 +53,33 @@ export default function BoxControl( {
 	label = __( 'Box Control' ),
 	values: valuesProp,
 	units,
+	sides,
+	splitOnAxis = false,
+	allowReset = true,
+	resetValues = DEFAULT_VALUES,
 } ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
 	} );
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( valuesProp );
+	const hasOneSide = sides?.length === 1;
 
 	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
 	const [ isLinked, setIsLinked ] = useState(
-		! hasInitialValue || ! isValuesMixed( inputValues )
+		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
 	);
 
-	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
+	const [ side, setSide ] = useState(
+		getInitialSide( isLinked, splitOnAxis )
+	);
 
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
 
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
-		setSide( ! isLinked ? 'all' : 'top' );
+		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
 	};
 
 	const handleOnFocus = ( event, { side: nextSide } ) => {
@@ -92,10 +101,8 @@ export default function BoxControl( {
 	};
 
 	const handleOnReset = () => {
-		const initialValues = DEFAULT_VALUES;
-
-		onChange( initialValues );
-		setValues( initialValues );
+		onChange( resetValues );
+		setValues( resetValues );
 		setIsDirty( false );
 	};
 
@@ -107,6 +114,7 @@ export default function BoxControl( {
 		onHoverOff: handleOnHoverOff,
 		isLinked,
 		units,
+		sides,
 		values: inputValues,
 	};
 
@@ -121,21 +129,23 @@ export default function BoxControl( {
 						{ label }
 					</Text>
 				</FlexItem>
-				<FlexItem>
-					<Button
-						className="component-box-control__reset-button"
-						isSecondary
-						isSmall
-						onClick={ handleOnReset }
-						disabled={ ! isDirty }
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</FlexItem>
+				{ allowReset && (
+					<FlexItem>
+						<Button
+							className="component-box-control__reset-button"
+							isSecondary
+							isSmall
+							onClick={ handleOnReset }
+							disabled={ ! isDirty }
+						>
+							{ __( 'Reset' ) }
+						</Button>
+					</FlexItem>
+				) }
 			</Header>
 			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
 				<FlexItem>
-					<BoxControlIcon side={ side } />
+					<BoxControlIcon side={ side } sides={ sides } />
 				</FlexItem>
 				{ isLinked && (
 					<FlexBlock>
@@ -145,14 +155,23 @@ export default function BoxControl( {
 						/>
 					</FlexBlock>
 				) }
-				<FlexItem>
-					<LinkedButton
-						onClick={ toggleLinked }
-						isLinked={ isLinked }
-					/>
-				</FlexItem>
+				{ ! isLinked && splitOnAxis && (
+					<FlexBlock>
+						<AxialInputControls { ...inputControlProps } />
+					</FlexBlock>
+				) }
+				{ ! hasOneSide && (
+					<FlexItem>
+						<LinkedButton
+							onClick={ toggleLinked }
+							isLinked={ isLinked }
+						/>
+					</FlexItem>
+				) }
 			</HeaderControlWrapper>
-			{ ! isLinked && <InputControls { ...inputControlProps } /> }
+			{ ! isLinked && ! splitOnAxis && (
+				<InputControls { ...inputControlProps } />
+			) }
 		</Root>
 	);
 }

@@ -6,6 +6,11 @@ import { ExternalLink, TextareaControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	return (
 		<div className="editor-post-excerpt">
@@ -27,14 +32,12 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			excerpt: select( 'core/editor' ).getEditedPostAttribute(
-				'excerpt'
-			),
+			excerpt: select( editorStore ).getEditedPostAttribute( 'excerpt' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		onUpdateExcerpt( excerpt ) {
-			dispatch( 'core/editor' ).editPost( { excerpt } );
+			dispatch( editorStore ).editPost( { excerpt } );
 		},
 	} ) ),
 ] )( PostExcerpt );

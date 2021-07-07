@@ -1,6 +1,8 @@
 /**
  * External dependencies
  */
+import memize from 'memize';
+
 /**
  * WordPress dependencies
  */
@@ -11,14 +13,11 @@ import RNReactNativeGutenbergBridge, {
 	subscribeSetTitle,
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
-	subscribeUpdateTheme,
+	subscribeUpdateEditorSettings,
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
+	subscribeShowEditorHelp,
 } from '@wordpress/react-native-bridge';
-
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
 import {
@@ -33,7 +32,9 @@ import { applyFilters } from '@wordpress/hooks';
 import {
 	validateThemeColors,
 	validateThemeGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { getGlobalStyles } from '@wordpress/components';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -69,16 +70,23 @@ class NativeEditorProvider extends Component {
 			this.post.type,
 			this.post
 		);
+		this.getEditorSettings = memize(
+			( settings, capabilities ) => ( {
+				...settings,
+				capabilities,
+			} ),
+			{
+				maxSize: 1,
+			}
+		);
 	}
 
 	componentDidMount() {
-		const { capabilities, colors, gradients } = this.props;
+		const { capabilities, updateSettings } = this.props;
 
-		this.props.updateSettings( {
+		updateSettings( {
 			...capabilities,
-			// Set theme colors for the editor
-			...( colors ? { colors } : {} ),
-			...( gradients ? { gradients } : {} ),
+			...this.getThemeColors( this.props ),
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
@@ -125,15 +133,10 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
-		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
-			( theme ) => {
-				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
-
-				theme.colors = validateThemeColors( theme.colors );
-
-				theme.gradients = validateThemeGradients( theme.gradients );
-
-				this.props.updateSettings( theme );
+		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
+			( editorSettings ) => {
+				const themeColors = this.getThemeColors( editorSettings );
+				updateSettings( themeColors );
 			}
 		);
 
@@ -148,6 +151,14 @@ class NativeEditorProvider extends Component {
 				this.props.createSuccessNotice( payload.message );
 			}
 		);
+
+		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
+			// Temporary: feature hidden from production. This is just here for testing
+			// purposes and will be replaced with actual logic in a later PR.
+			this.props.createSuccessNotice(
+				'Show Editor Help request received by JS!'
+			);
+		} );
 	}
 
 	componentWillUnmount() {
@@ -175,8 +186,8 @@ class NativeEditorProvider extends Component {
 			this.subscriptionParentMediaAppend.remove();
 		}
 
-		if ( this.subscriptionParentUpdateTheme ) {
-			this.subscriptionParentUpdateTheme.remove();
+		if ( this.subscriptionParentUpdateEditorSettings ) {
+			this.subscriptionParentUpdateEditorSettings.remove();
 		}
 
 		if ( this.subscriptionParentUpdateCapabilities ) {
@@ -186,6 +197,21 @@ class NativeEditorProvider extends Component {
 		if ( this.subscriptionParentShowNotice ) {
 			this.subscriptionParentShowNotice.remove();
 		}
+
+		if ( this.subscriptionParentShowEditorHelp ) {
+			this.subscriptionParentShowEditorHelp.remove();
+		}
+	}
+
+	getThemeColors( { colors, gradients, rawStyles, rawFeatures } ) {
+		return {
+			...( rawStyles
+				? getGlobalStyles( rawStyles, rawFeatures, colors, gradients )
+				: {
+						colors: validateThemeColors( colors ),
+						gradients: validateThemeGradients( gradients ),
+				  } ),
+		};
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -266,11 +292,18 @@ class NativeEditorProvider extends Component {
 		const {
 			children,
 			post, // eslint-disable-line no-unused-vars
+			capabilities,
+			settings,
 			...props
 		} = this.props;
+		const editorSettings = this.getEditorSettings( settings, capabilities );
 
 		return (
-			<EditorProvider post={ this.post } { ...props }>
+			<EditorProvider
+				post={ this.post }
+				settings={ editorSettings }
+				{ ...props }
+			>
 				{ children }
 			</EditorProvider>
 		);
@@ -291,7 +324,7 @@ export default compose( [
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
@@ -312,7 +345,7 @@ export default compose( [
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
-		} = dispatch( 'core/block-editor' );
+		} = dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 		const { createSuccessNotice } = dispatch( 'core/notices' );

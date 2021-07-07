@@ -261,16 +261,18 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
 					{ is12Hour && (
 						<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
 							<Button
-								isPrimary={ am === 'AM' }
-								isSecondary={ am !== 'AM' }
+								variant={
+									am === 'AM' ? 'primary' : 'secondary'
+								}
 								onClick={ updateAmPm( 'AM' ) }
 								className="components-datetime__time-am-button"
 							>
 								{ __( 'AM' ) }
 							</Button>
 							<Button
-								isPrimary={ am === 'PM' }
-								isSecondary={ am !== 'PM' }
+								variant={
+									am === 'PM' ? 'primary' : 'secondary'
+								}
 								onClick={ updateAmPm( 'PM' ) }
 								className="components-datetime__time-pm-button"
 							>

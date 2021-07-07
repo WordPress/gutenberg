@@ -62,6 +62,10 @@ program
 		'--tests-branch <branch>',
 		"Use this branch's performance test files"
 	)
+	.option(
+		'--wp-version <version>',
+		'Specify a WordPress version on which to test all branches'
+	)
 	.description(
 		'Runs performance tests on two separate branches and outputs the result'
 	)

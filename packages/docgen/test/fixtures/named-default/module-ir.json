@@ -1,5 +1,7 @@
-[{
-	"name": "default",
-	"description": "Module declaration.",
-	"tags": []
-}]
+[
+	{
+		"name": "default",
+		"description": "Module declaration.",
+		"tags": []
+	}
+]

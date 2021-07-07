@@ -118,8 +118,8 @@ module.exports = async (
 		code( '  $ npm run build' );
 		info( '    Builds the code for production.' );
 		info( '' );
-		code( '  $ npm run format:js' );
-		info( '    Formats JavaScript files.' );
+		code( '  $ npm run format' );
+		info( '    Formats files.' );
 		info( '' );
 		code( '  $ npm run lint:css' );
 		info( '    Lints CSS files.' );

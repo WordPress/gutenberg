@@ -19,21 +19,28 @@ import useAsyncMode from '../async-mode-provider/use-async-mode';
 
 const renderQueue = createQueue();
 
+/** @typedef {import('./types').WPDataStore} WPDataStore */
+
 /**
  * Custom react hook for retrieving props from registered selectors.
  *
  * In general, this custom React hook follows the
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
- * @param {Function} _mapSelect  Function called on every state change. The
- *                               returned value is exposed to the component
- *                               implementing this hook. The function receives
- *                               the `registry.select` method on the first
- *                               argument and the `registry` on the second
- *                               argument.
- * @param {Array}    deps        If provided, this memoizes the mapSelect so the
- *                               same `mapSelect` is invoked on every state
- *                               change unless the dependencies change.
+ * @param {Function|WPDataStore|string} _mapSelect Function called on every state change. The
+ *                                                 returned value is exposed to the component
+ *                                                 implementing this hook. The function receives
+ *                                                 the `registry.select` method on the first
+ *                                                 argument and the `registry` on the second
+ *                                                 argument.
+ *                                                 When a store key is passed, all selectors for
+ *                                                 the store will be returned. This is only meant
+ *                                                 for usage of these selectors in event
+ *                                                 callbacks, not for data needed to create the
+ *                                                 element tree.
+ * @param {Array}                       deps       If provided, this memoizes the mapSelect so the
+ *                                                 same `mapSelect` is invoked on every state
+ *                                                 change unless the dependencies change.
  *
  * @example
  * ```js
@@ -60,9 +67,34 @@ const renderQueue = createQueue();
  * doesn't change and other props are passed in that do change, the price will
  * not change because the dependency is just the currency.
  *
+ * When data is only used in an event callback, the data should not be retrieved
+ * on render, so it may be useful to get the selectors function instead.
+ *
+ * **Don't use `useSelect` this way when calling the selectors in the render
+ * function because your component won't re-render on a data change.**
+ *
+ * ```js
+ * import { useSelect } from '@wordpress/data';
+ *
+ * function Paste( { children } ) {
+ *   const { getSettings } = useSelect( 'my-shop' );
+ *   function onPaste() {
+ *     // Do something with the settings.
+ *     const settings = getSettings();
+ *   }
+ *   return <div onPaste={ onPaste }>{ children }</div>;
+ * }
+ * ```
+ *
  * @return {Function}  A custom react hook.
  */
 export default function useSelect( _mapSelect, deps ) {
+	const isWithoutMapping = typeof _mapSelect !== 'function';
+
+	if ( isWithoutMapping ) {
+		deps = [];
+	}
+
 	const mapSelect = useCallback( _mapSelect, deps );
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
@@ -97,33 +129,38 @@ export default function useSelect( _mapSelect, deps ) {
 
 	let mapOutput;
 
-	try {
-		if (
-			latestMapSelect.current !== mapSelect ||
-			latestMapOutputError.current
-		) {
-			mapOutput = trapSelect( () =>
-				mapSelect( registry.select, registry )
-			);
-		} else {
-			mapOutput = latestMapOutput.current;
-		}
-	} catch ( error ) {
-		let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
+	if ( ! isWithoutMapping ) {
+		try {
+			if (
+				latestMapSelect.current !== mapSelect ||
+				latestMapOutputError.current
+			) {
+				mapOutput = trapSelect( () =>
+					mapSelect( registry.select, registry )
+				);
+			} else {
+				mapOutput = latestMapOutput.current;
+			}
+		} catch ( error ) {
+			let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
 
-		if ( latestMapOutputError.current ) {
-			errorMessage += `\nThe error may be correlated with this previous error:\n`;
-			errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
-			errorMessage += 'Original stack trace:';
+			if ( latestMapOutputError.current ) {
+				errorMessage += `\nThe error may be correlated with this previous error:\n`;
+				errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
+				errorMessage += 'Original stack trace:';
+			}
 
-			throw new Error( errorMessage );
-		} else {
 			// eslint-disable-next-line no-console
 			console.error( errorMessage );
+			mapOutput = latestMapOutput.current;
 		}
 	}
 
 	useIsomorphicLayoutEffect( () => {
+		if ( isWithoutMapping ) {
+			return;
+		}
+
 		latestMapSelect.current = mapSelect;
 		latestMapOutput.current = mapOutput;
 		latestMapOutputError.current = undefined;
@@ -140,6 +177,10 @@ export default function useSelect( _mapSelect, deps ) {
 	} );
 
 	useIsomorphicLayoutEffect( () => {
+		if ( isWithoutMapping ) {
+			return;
+		}
+
 		const onStoreChange = () => {
 			if ( isMountedAndNotUnsubscribing.current ) {
 				try {
@@ -186,7 +227,7 @@ export default function useSelect( _mapSelect, deps ) {
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry, trapSelect, depsChangedFlag ] );
+	}, [ registry, trapSelect, depsChangedFlag, isWithoutMapping ] );
 
-	return mapOutput;
+	return isWithoutMapping ? registry.select( _mapSelect ) : mapOutput;
 }

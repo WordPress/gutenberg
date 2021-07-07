@@ -11,7 +11,7 @@ This limitation applies to both singular and plural strings, as well as the `con
 Examples of **incorrect** code for this rule:
 
 ```js
-__( `Hello ${foo}` );
+__( `Hello ${ foo }` );
 __( foo );
 _x( 'Hello World', bar );
 ```

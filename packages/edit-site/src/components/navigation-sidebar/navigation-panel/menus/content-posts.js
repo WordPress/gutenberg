@@ -8,6 +8,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -32,7 +33,7 @@ export default function ContentPostsMenu() {
 				getEntityRecords,
 				getEditedEntityRecord,
 				hasFinishedResolution,
-			} = select( 'core' );
+			} = select( coreStore );
 			const getEntityRecodsArgs = [
 				'postType',
 				'post',

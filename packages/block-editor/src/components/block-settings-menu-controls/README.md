@@ -11,11 +11,7 @@ import MyButton from './my-toggle-button';
 function ReusableBlocksMenuItems() {
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
-				<MyToggleButton
-					onToggle={ onClose }
-				/>
-			) }
+			{ ( { onClose } ) => <MyToggleButton onToggle={ onClose } /> }
 		</BlockSettingsMenuControls>
 	);
 }

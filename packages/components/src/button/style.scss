@@ -154,11 +154,16 @@
 		white-space: nowrap;
 		color: var(--wp-admin-theme-color);
 		background: transparent;
-		padding: 6px; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
+		padding: $grid-unit-15 / 2; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
 
 		.dashicon {
 			display: inline-block;
 			flex: 0 0 auto;
+		}
+
+		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
+		p + & {
+			margin-left: -($grid-unit-15 / 2);
 		}
 	}
 
@@ -210,8 +215,7 @@
 		background: none;
 		outline: none;
 		text-align: left;
-		/* Mimics the default link style in common.css */
-		color: #0073aa;
+		color: var(--wp-admin-theme-color);
 		text-decoration: underline;
 		transition-property: border, background, color;
 		transition-duration: 0.05s;
@@ -219,17 +223,8 @@
 		@include reduce-motion("transition");
 		height: auto;
 
-		&:hover:not(:disabled),
-		&:active:not(:disabled) {
-			color: #00a0d2;
-			box-shadow: none;
-		}
-
 		&:focus {
-			color: #124964;
-			box-shadow:
-				0 0 0 $border-width #5b9dd9,
-				0 0 var(--wp-admin-border-width-focus) $border-width rgba(30, 140, 190, 0.8);
+			border-radius: $radius-block-ui;
 		}
 
 		// Link buttons that are red to indicate destructive behavior.
@@ -337,6 +332,12 @@
 	svg {
 		fill: currentColor;
 		outline: none;
+
+		// Optimizate for high contrast modes.
+		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
+		@media (forced-colors: active) {
+			fill: CanvasText;
+		}
 	}
 
 	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.

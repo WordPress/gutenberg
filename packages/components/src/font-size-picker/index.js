@@ -7,7 +7,6 @@ import { isNumber, isString } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
 import { textColor } from '@wordpress/icons';
 import { useMemo, forwardRef } from '@wordpress/element';
 
@@ -16,9 +15,9 @@ import { useMemo, forwardRef } from '@wordpress/element';
  */
 import Button from '../button';
 import RangeControl from '../range-control';
+import { default as UnitControl, useCustomUnits } from '../unit-control';
 import CustomSelectControl from '../custom-select-control';
 import VisuallyHidden from '../visually-hidden';
-import { withNextComponent } from './next';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
@@ -78,7 +77,9 @@ function FontSizePicker(
 	const isPixelValue =
 		isNumber( value ) || ( isString( value ) && value.endsWith( 'px' ) );
 
-	const instanceId = useInstanceId( FontSizePicker );
+	const units = useCustomUnits( {
+		availableUnits: [ 'px', 'em', 'rem' ],
+	} );
 
 	const options = useMemo(
 		() => getSelectOptions( fontSizes, disableCustomFontSizes ),
@@ -90,8 +91,6 @@ function FontSizePicker(
 	}
 
 	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
-
-	const fontSizePickerNumberId = `components-font-size-picker__number#${ instanceId }`;
 
 	return (
 		<fieldset
@@ -118,33 +117,20 @@ function FontSizePicker(
 					/>
 				) }
 				{ ! withSlider && ! disableCustomFontSizes && (
-					<div className="components-font-size-picker__number-container">
-						<label htmlFor={ fontSizePickerNumberId }>
-							{ __( 'Custom' ) }
-						</label>
-						<input
-							id={ fontSizePickerNumberId }
-							className="components-font-size-picker__number"
-							type="number"
-							min={ 1 }
-							onChange={ ( event ) => {
-								if (
-									! event.target.value &&
-									event.target.value !== 0
-								) {
-									onChange( undefined );
-									return;
-								}
-								if ( hasUnits ) {
-									onChange( event.target.value + 'px' );
-								} else {
-									onChange( Number( event.target.value ) );
-								}
-							} }
-							aria-label={ __( 'Custom' ) }
-							value={ ( isPixelValue && noUnitsValue ) || '' }
-						/>
-					</div>
+					<UnitControl
+						label={ __( 'Custom' ) }
+						labelPosition="top"
+						__unstableInputWidth="60px"
+						value={ value }
+						onChange={ ( nextSize ) => {
+							if ( 0 === parseFloat( nextSize ) || ! nextSize ) {
+								onChange( undefined );
+							} else {
+								onChange( nextSize );
+							}
+						} }
+						units={ units }
+					/>
 				) }
 				<Button
 					className="components-color-palette__clear"
@@ -153,7 +139,7 @@ function FontSizePicker(
 						onChange( undefined );
 					} }
 					isSmall
-					isSecondary
+					variant="secondary"
 				>
 					{ __( 'Reset' ) }
 				</Button>
@@ -177,4 +163,4 @@ function FontSizePicker(
 	);
 }
 
-export default withNextComponent( forwardRef( FontSizePicker ) );
+export default forwardRef( FontSizePicker );

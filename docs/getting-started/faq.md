@@ -4,15 +4,15 @@ What follows is a set of questions that have come up from the last few years of 
 
 ## What is Gutenberg?
 
-“Gutenberg” is the name of the project to create a new editor experience for WordPress  — contributors have been working on it since January 2017 and it’s one of the most significant changes to WordPress in years. It’s built on the idea of using “blocks” to write and design posts and pages. This will serve as the foundation for future improvements to WordPress, including blocks as a way not just to design posts and pages, but also entire sites. The overall goal is to simplify the first-time user experience of WordPress — for those who are writing, editing, publishing, and designing web pages. The editing experience is intended to give users a better visual representation of what their post or page will look like when they hit publish. Originally, this was the kickoff goal:
+“Gutenberg” is the name of the project to create a new editor experience for WordPress — contributors have been working on it since January 2017 and it’s one of the most significant changes to WordPress in years. It’s built on the idea of using “blocks” to write and design posts and pages. This will serve as the foundation for future improvements to WordPress, including blocks as a way not just to design posts and pages, but also entire sites. The overall goal is to simplify the first-time user experience of WordPress — for those who are writing, editing, publishing, and designing web pages. The editing experience is intended to give users a better visual representation of what their post or page will look like when they hit publish. Originally, this was the kickoff goal:
 
 > The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
 
 Key takeaways include the following points:
 
-- Authoring richly laid-out posts is a key strength of WordPress.
-- By embracing blocks as an interaction paradigm, we can unify multiple different interfaces into one. Instead of learning how to write shortcodes and custom HTML, or pasting URLs to embed media, there's a common, reliable flow for inserting any kind of content.
-- “Mystery meat” refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
+-   Authoring richly laid-out posts is a key strength of WordPress.
+-   By embracing blocks as an interaction paradigm, we can unify multiple different interfaces into one. Instead of learning how to write shortcodes and custom HTML, or pasting URLs to embed media, there's a common, reliable flow for inserting any kind of content.
+-   “Mystery meat” refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
 
 Gutenberg is developed on [GitHub](https://github.com/WordPress/gutenberg) under the WordPress organization. The block editor has been available in core WordPress since 5.0. If you want to test upcoming features from Gutenberg project, it is [available in the plugin repository](https://wordpress.org/plugins/gutenberg/).
 
@@ -25,7 +25,7 @@ There are four phases of Gutenberg which you can see on the [official WordPress 
 3. Collaboration — A more intuitive way to co-author content
 4. Multi-lingual — Core implementation for Multi-lingual sites
 
-## When was Gutenberg started? 
+## When was Gutenberg started?
 
 The editor focus started in early 2017 with the first three months spent designing, planning, prototyping, and testing prototypes, to help us inform how to approach this project. The first plugin was launched during WordCamp Europe in June 2017.
 
@@ -37,12 +37,12 @@ Gutenberg was first merged into [WordPress 5.0](https://wordpress.org/news/2018/
 
 The classic WordPress editor is an open text window—it’s always been a wonderful blank canvas for writing, but when it comes to building posts and pages with images, multimedia, embedded content from social media, polls, and other elements, it required a mix of different approaches that were not always intuitive:
 
-- Media library/HTML for images, multimedia and approved files.
-- Pasted links for embeds.
-- Shortcodes for specialized assets from plugins.
-- Featured images for the image at the top of a post or page.
-- Excerpts for subheadings.
-- Widgets for content on the side of a page.
+-   Media library/HTML for images, multimedia and approved files.
+-   Pasted links for embeds.
+-   Shortcodes for specialized assets from plugins.
+-   Featured images for the image at the top of a post or page.
+-   Excerpts for subheadings.
+-   Widgets for content on the side of a page.
 
 As we thought about these uses and how to make them obvious and consistent, we began to embrace the concept of “blocks.” All of the above items could be blocks: easy to search and understand, and easy to dynamically shift around the page. The block concept is very powerful, and when designed thoughtfully, can offer an outstanding editing and publishing experience. Ultimately, the idea with blocks is to create a new common language across WordPress, a new way to connect users to plugins, and replace a number of older content types — things like shortcodes and widgets — that one usually has to be well-versed in the idiosyncrasies of WordPress to understand.
 
@@ -276,11 +276,11 @@ No. [TinyMCE](https://www.tinymce.com/) is only used for the "Classic" block.
 
 Gutenberg works in modern browsers, and Internet Explorer 11.
 
-Our [list of supported browsers can be found in the Make WordPress handbook](https://make.wordpress.org/core/handbook/best-practices/browser-support/). By “modern browsers” we generally mean the *current and past two versions* of each major browser.
+Our [list of supported browsers can be found in the Make WordPress handbook](https://make.wordpress.org/core/handbook/best-practices/browser-support/). By “modern browsers” we generally mean the _current and past two versions_ of each major browser.
 
 ## How do I make my own block?
 
-The best place to start is the [Create a Block Tutorial](https://developer.wordpress.org/block-editor/tutorials/create-block/). 
+The best place to start is the [Create a Block Tutorial](https://developer.wordpress.org/block-editor/tutorials/create-block/).
 
 ## Does Gutenberg involve editing posts/pages in the front-end?
 
@@ -320,7 +320,7 @@ Blocks are able to provide base structural CSS styles, and themes can add styles
 
 Other features, like the new _wide_ and _full-wide_ alignment options, are simply CSS classes applied to blocks that offer this alignment. We are looking at how a theme can opt in to this feature, for example using `add_theme_support`.
 
-This is currently a work in progress and we recommend reviewing the [block based theme documentation](/docs/how-to-guides/block-based-theme/README.md) to learn more.
+This is currently a work in progress and we recommend reviewing the [block based theme documentation](/docs/how-to-guides/themes/block-theme-overview.md) to learn more.
 
 ## What are block variations? Are they the same as block styles?
 
@@ -339,7 +339,7 @@ function gutenbergtheme_editor_styles() {
 add_action( 'enqueue_block_editor_assets', 'gutenbergtheme_editor_styles' );
 ```
 
-*See:* [Editor Styles](/docs/how-to-guides/themes/theme-support.md#editor-styles)
+_See:_ [Editor Styles](/docs/how-to-guides/themes/theme-support.md#editor-styles)
 
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 
@@ -354,7 +354,6 @@ We realize it's a big change. We also think there will be many new opportunities
 There is a “Classic” block, which is virtually the same as the current editor, except in block form.
 
 There is also the [Classic Editor plugin](https://wordpress.org/plugins/classic-editor/) which restores the previous editor, see the plugin for more information. The WordPress Core team has committed to supporting the Classic Editor plugin [until December 2021](https://make.wordpress.org/core/2018/11/07/classic-editor-plugin-support-window/).
-
 
 ## How do custom TinyMCE buttons work in Gutenberg?
 
@@ -372,9 +371,9 @@ However we see the block as an evolution of the `[shortcode]`. Instead of having
 
 We think so for a variety of reasons including but not limited to:
 
-- Blocks have visual editing built-in which creates a more rich, dynamic experience for building your site.
-- Blocks are simply html and don’t persist things the browser doesn't understand on the frontend. In comparison, if you disable a plugin that powers a shortcode, you end up with strange visuals on the frontend (often just showing the shortcode in plain text).
-- Blocks will be discovered more readily with the launch of the block directory in a way shortcodes never could be allowing for more people to get more functionality. 
+-   Blocks have visual editing built-in which creates a more rich, dynamic experience for building your site.
+-   Blocks are simply html and don’t persist things the browser doesn't understand on the frontend. In comparison, if you disable a plugin that powers a shortcode, you end up with strange visuals on the frontend (often just showing the shortcode in plain text).
+-   Blocks will be discovered more readily with the launch of the block directory in a way shortcodes never could be allowing for more people to get more functionality.
 
 Ultimately, Blocks are designed to be visually representative of the final look, and, with the launch of the Block Directory in 5.5, they will become the expected way in which users will discover and insert content in WordPress.
 
@@ -393,6 +392,7 @@ This also [gives us the flexibility](https://github.com/WordPress/gutenberg/issu
 We suggest you look at the [Gutenberg key concepts](/docs/getting-started/architecture/key-concepts.md) to learn more about how this aspect of the project works.
 
 ## How can I parse the post content back out into blocks in PHP or JS?
+
 In JS:
 
 ```js
@@ -407,4 +407,4 @@ $blocks = parse_blocks( $post_content );
 
 ## WordPress is already the world's most popular publishing platform. Why change the editor at all?
 
-The Editor is where most of the action happens in WordPress’s daily use, and it was a place where we could polish and perfect the block experience in a contained environment. Further, as an open-source project, we believe that it is critical for WordPress to continue to innovate and keep working to make the core experience intuitive and enjoyable for all users. As a community project, Gutenberg has the potential to do just that, and we’re excited to pursue this goal together. If you’d like to test, contribute, or offer feedback, we welcome you to [share what you find on GitHub](https://github.com/WordPress/gutenberg/issues). 
+The Editor is where most of the action happens in WordPress’s daily use, and it was a place where we could polish and perfect the block experience in a contained environment. Further, as an open-source project, we believe that it is critical for WordPress to continue to innovate and keep working to make the core experience intuitive and enjoyable for all users. As a community project, Gutenberg has the potential to do just that, and we’re excited to pursue this goal together. If you’d like to test, contribute, or offer feedback, we welcome you to [share what you find on GitHub](https://github.com/WordPress/gutenberg/issues).

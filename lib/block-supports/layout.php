@@ -41,8 +41,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$used_layout = $block['attrs']['layout'];
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
-		$tree           = WP_Theme_JSON_Resolver::get_merged_data( array(), 'theme' );
-		$default_layout = _wp_array_get( $tree->get_settings(), array( 'defaults', 'layout' ) );
+		$tree           = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( array(), 'theme' );
+		$default_layout = _wp_array_get( $tree->get_settings(), array( 'layout' ) );
 		if ( ! $default_layout ) {
 			return $block_content;
 		}
@@ -53,43 +53,32 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$content_size = isset( $used_layout['contentSize'] ) ? $used_layout['contentSize'] : null;
 	$wide_size    = isset( $used_layout['wideSize'] ) ? $used_layout['wideSize'] : null;
 
+	$all_max_width_value  = $content_size ? $content_size : $wide_size;
+	$wide_max_width_value = $wide_size ? $wide_size : $content_size;
+
+	// Make sure there is a single CSS rule, and all tags are stripped for security.
+	// TODO: Use `safecss_filter_attr` instead - once https://core.trac.wordpress.org/ticket/46197 is patched.
+	$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
+	$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
+
 	$style = '';
 	if ( $content_size || $wide_size ) {
-		ob_start();
-		?>
-			<?php echo '.wp-container-' . $id; ?> > * {
-				max-width: <?php echo $content_size ? $content_size : $wide_size; ?>;
-				margin-left: auto;
-				margin-right: auto;
-			}
+		$style  = ".wp-container-$id > * {";
+		$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
+		$style .= 'margin-left: auto !important;';
+		$style .= 'margin-right: auto !important;';
+		$style .= '}';
 
-			<?php echo '.wp-container-' . $id; ?> > .alignwide {
-				max-width: <?php echo $wide_size ? $wide_size : $content_size; ?>;
-			}
+		$style .= ".wp-container-$id > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
 
-			<?php echo '.wp-container-' . $id; ?> .alignfull {
-				max-width: none;
-			}
-		<?php
-		$style = ob_get_clean();
+		$style .= ".wp-container-$id .alignfull { max-width: none; }";
 	}
 
-	ob_start();
-	?>
-		<?php echo '.wp-container-' . $id; ?> .alignleft {
-			float: left;
-			margin-right: 2em;
-		}
+	$style .= ".wp-container-$id .alignleft { float: left; margin-right: 2em; }";
+	$style .= ".wp-container-$id .alignright { float: right; margin-left: 2em; }";
 
-		<?php echo '.wp-container-' . $id; ?> .alignright {
-			float: right;
-			margin-left: 2em;
-		}
-	<?php
-	$style .= ob_get_clean();
-
-	// This assumes the hook only applys to blocks with a single wrapper.
-	// I think this is a reasonable limitation for that particular hoook.
+	// This assumes the hook only applies to blocks with a single wrapper.
+	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
 		'class="wp-container-' . $id . ' ',
@@ -100,14 +89,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	return $content . '<style>' . $style . '</style>';
 }
 
-// Register the block support.
-WP_Block_Supports::get_instance()->register(
-	'layout',
-	array(
-		'register_attribute' => 'gutenberg_register_layout_support',
-	)
-);
-add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( ! function_exists( 'wp_render_layout_support_flag' ) ) {
+	// Register the block support.
+	WP_Block_Supports::get_instance()->register(
+		'layout',
+		array(
+			'register_attribute' => 'gutenberg_register_layout_support',
+		)
+	);
+	add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
+}
 
 /**
  * For themes without theme.json file, make sure
@@ -123,7 +115,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 
 	if (
 		'core/group' !== $block['blockName'] ||
-		WP_Theme_JSON_Resolver::theme_has_support() ||
+		WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ||
 		1 === preg_match( $group_with_inner_container_regex, $block_content )
 	) {
 		return $block_content;
@@ -140,4 +132,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	return $updated_content;
 }
 
-add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( ! function_exists( 'wp_restore_group_inner_container' ) ) {
+	add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+}

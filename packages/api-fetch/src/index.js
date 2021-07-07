@@ -43,8 +43,11 @@ const DEFAULT_OPTIONS = {
 	credentials: 'include',
 };
 
+/** @typedef {import('./types').APIFetchMiddleware} APIFetchMiddleware */
+/** @typedef {import('./types').APIFetchOptions} APIFetchOptions */
+
 /**
- * @type {import('./types').ApiFetchMiddleware[]}
+ * @type {import('./types').APIFetchMiddleware[]}
  */
 const middlewares = [
 	userLocaleMiddleware,
@@ -56,7 +59,7 @@ const middlewares = [
 /**
  * Register a middleware
  *
- * @param {import('./types').ApiFetchMiddleware} middleware
+ * @param {import('./types').APIFetchMiddleware} middleware
  */
 function registerMiddleware( middleware ) {
 	middlewares.unshift( middleware );
@@ -77,7 +80,7 @@ const checkStatus = ( response ) => {
 	throw response;
 };
 
-/** @typedef {(options: import('./types').ApiFetchRequestProps) => Promise<any>} FetchHandler*/
+/** @typedef {(options: import('./types').APIFetchOptions) => Promise<any>} FetchHandler*/
 
 /**
  * @type {FetchHandler}
@@ -106,28 +109,27 @@ const defaultFetchHandler = ( nextOptions ) => {
 		}
 	);
 
-	return (
-		responsePromise
-			// Return early if fetch errors. If fetch error, there is most likely no
-			// network connection. Unfortunately fetch just throws a TypeError and
-			// the message might depend on the browser.
-			.then(
-				( value ) =>
-					Promise.resolve( value )
-						.then( checkStatus )
-						.catch( ( response ) =>
-							parseAndThrowError( response, parse )
-						)
-						.then( ( response ) =>
-							parseResponseAndNormalizeError( response, parse )
-						),
-				() => {
-					throw {
-						code: 'fetch_error',
-						message: __( 'You are probably offline.' ),
-					};
-				}
-			)
+	return responsePromise.then(
+		( value ) =>
+			Promise.resolve( value )
+				.then( checkStatus )
+				.catch( ( response ) => parseAndThrowError( response, parse ) )
+				.then( ( response ) =>
+					parseResponseAndNormalizeError( response, parse )
+				),
+		( err ) => {
+			// Re-throw AbortError for the users to handle it themselves.
+			if ( err && err.name === 'AbortError' ) {
+				throw err;
+			}
+
+			// Otherwise, there is most likely no network connection.
+			// Unfortunately the message might depend on the browser.
+			throw {
+				code: 'fetch_error',
+				message: __( 'You are probably offline.' ),
+			};
+		}
 	);
 };
 
@@ -146,7 +148,7 @@ function setFetchHandler( newFetchHandler ) {
 
 /**
  * @template T
- * @param {import('./types').ApiFetchRequestProps} options
+ * @param {import('./types').APIFetchOptions} options
  * @return {Promise<T>} A promise representing the request processed via the registered middlewares.
  */
 function apiFetch( options ) {

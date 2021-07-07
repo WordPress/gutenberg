@@ -2,6 +2,23 @@
 	text-align: center;
 }
 
+.wp-block-video {
+	position: relative;
+
+	&.is-transient video {
+		opacity: 0.3;
+	}
+
+	// Shown while video is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
+}
+
 .editor-video-poster-control {
 	.components-base-control__label {
 		display: block;

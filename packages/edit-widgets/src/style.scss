@@ -2,9 +2,12 @@
 
 @import "./blocks/widget-area/editor.scss";
 @import "./components/header/style.scss";
+@import "./components/keyboard-shortcut-help-modal/style.scss";
+@import "./components/more-menu/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/notices/style.scss";
 @import "./components/layout/style.scss";
+@import "./components/welcome-guide/style.scss";
 @import "./components/widget-areas-block-editor-content/style.scss";
 
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color
@@ -43,17 +46,23 @@ body.widgets-php {
 	}
 
 	.interface-interface-skeleton__content {
-		background-color: #f1f1f1;
+		background-color: $gray-100;
 	}
 }
 
-.blocks-widgets-container .editor-style-wrapper {
+.blocks-widgets-container .editor-styles-wrapper {
 	max-width: $widget-area-width;
 	margin: auto;
 }
 
 .edit-widgets-sidebar .components-button.interface-complementary-area__pin-unpin-item {
 	display: none;
+}
+
+// Don't display admin notices on the Widgets screen.
+// Needs !important because plugins may add inline styles to notices.
+.widgets-php .notice {
+	display: none !important;
 }
 
 @include wordpress-admin-schemes();
