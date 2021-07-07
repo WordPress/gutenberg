@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, Image, Text } from 'react-native';
+import { TouchableWithoutFeedback, Image } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -12,12 +12,11 @@ import { View } from '@wordpress/primitives';
 import { BlockCaption } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import styles from './styles.scss';
+import EmbedNoPreview from './embed-no-preview';
 
 const EmbedPreview = ( {
 	clientId,
@@ -29,21 +28,8 @@ const EmbedPreview = ( {
 	onFocus,
 	preview,
 	previewable,
-	url,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
-	const containerStyle = usePreferredColorSchemeStyle(
-		styles.embed__container,
-		styles[ 'embed__container--dark' ]
-	);
-	const labelStyle = usePreferredColorSchemeStyle(
-		styles.embed__label,
-		styles[ 'embed__label--dark' ]
-	);
-	const placeholderTextStyle = usePreferredColorSchemeStyle(
-		styles[ 'embed-preview__placeholder-text' ],
-		styles[ 'embed-preview__placeholder-text--dark' ]
-	);
 
 	function accessibilityLabelCreator( caption ) {
 		return isEmpty( caption )
@@ -69,11 +55,6 @@ const EmbedPreview = ( {
 		}
 	}
 
-	const parsedHost = new URL( url ).host.split( '.' );
-	const parsedHostBaseUrl = parsedHost
-		.splice( parsedHost.length - 2, parsedHost.length - 1 )
-		.join( '.' );
-
 	const cannotShowThumbnail =
 		! previewable ||
 		! preview ||
@@ -89,19 +70,12 @@ const EmbedPreview = ( {
 		>
 			<View>
 				{ cannotShowThumbnail ? (
-					<View style={ containerStyle }>
-						<View style={ styles.embed__icon }>{ icon }</View>
-						<Text style={ labelStyle }>{ label }</Text>
-						<Text style={ placeholderTextStyle }>
-							{ sprintf(
-								/* translators: %s: host providing embed content e.g: www.youtube.com */
-								__(
-									"Embedded content from %s can't be viewed in the mobile editor at the moment. Please preview the page to see the embedded content."
-								),
-								parsedHostBaseUrl
-							) }
-						</Text>
-					</View>
+					<EmbedNoPreview
+						label={ label }
+						icon={ icon }
+						isSelected={ isSelected }
+						onPress={ () => setIsCaptionSelected( false ) }
+					/>
 				) : (
 					<Image
 						style={ {

@@ -51,6 +51,14 @@ const EmbedPlaceholder = ( {
 		styles.embed__label,
 		styles[ 'embed__label--dark' ]
 	);
+	const descriptionStyle = usePreferredColorSchemeStyle(
+		styles.embed__description,
+		styles[ 'embed__description--dark' ]
+	);
+	const actionStyle = usePreferredColorSchemeStyle(
+		styles.embed__action,
+		styles[ 'embed__action--dark' ]
+	);
 
 	return (
 		<>
@@ -61,27 +69,24 @@ const EmbedPlaceholder = ( {
 					onFocus( event );
 					setIsEmbedSheetVisible( true );
 				} }
+				disabled={ ! isSelected }
 			>
 				<View style={ containerStyle }>
 					<View style={ styles.embed__icon }>{ icon }</View>
 					<Text style={ labelStyle }>{ label }</Text>
 					{ cannotEmbed ? (
 						<>
-							<Text style={ labelStyle }>
+							<Text style={ descriptionStyle }>
 								{ __(
 									'Sorry, this content could not be embedded.'
 								) }
 							</Text>
-							<Text
-								style={ styles[ 'embed-empty__description' ] }
-							>
+							<Text style={ actionStyle }>
 								{ __( 'EDIT LINK' ) }
 							</Text>
 						</>
 					) : (
-						<Text style={ styles[ 'embed-empty__description' ] }>
-							{ __( 'ADD LINK' ) }
-						</Text>
+						<Text style={ actionStyle }>{ __( 'ADD LINK' ) }</Text>
 					) }
 				</View>
 			</TouchableWithoutFeedback>
