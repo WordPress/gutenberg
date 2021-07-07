@@ -24,14 +24,15 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 		( select ) => {
 			const { getCurrentPostType } = select( editorStore );
 			const { isFeatureActive } = select( editPostStore );
-			const { isResolving } = select( 'core/data' );
-			const { getEntityRecord, getPostType } = select( coreStore );
+			const { getEntityRecord, getPostType, isResolving } = select(
+				coreStore
+			);
 			const siteData =
 				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
 			return {
 				isActive: isFeatureActive( 'fullscreenMode' ),
-				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+				isRequestingSiteIcon: isResolving( 'getEntityRecord', [
 					'root',
 					'__unstableBase',
 					undefined,

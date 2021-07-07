@@ -61,17 +61,17 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 				{
 					<BlockControls>
 						<AlignmentToolbar
-							value={ alignment }
+							value={ attributes.alignment }
 							onChange={ onChangeAlignment }
 						/>
 					</BlockControls>
 				}
 				<RichText
-					className={ className }
-					style={ { textAlign: alignment } }
+					className={ attributes.className }
+					style={ { textAlign: attributes.alignment } }
 					tagName="p"
 					onChange={ onChangeContent }
-					value={ content }
+					value={ attributes.content }
 				/>
 			</div>
 		);
@@ -82,9 +82,9 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 		return (
 			<div { ...blockProps }>
 				<RichText.Content
-					className={ `gutenberg-examples-align-${ attributes.alignment }` }
+					className={ `gutenberg-examples-align-${ props.attributes.alignment }` }
 					tagName="p"
-					value={ attributes.content }
+					value={ props.attributes.content }
 				/>
 			</div>
 		);

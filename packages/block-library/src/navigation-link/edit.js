@@ -30,7 +30,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP } from '@wordpress/url';
+import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import {
 	Fragment,
 	useState,
@@ -48,7 +48,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
 
-const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/spacer' ];
+const ALLOWED_BLOCKS = [ 'core/navigation-link' ];
 
 const MAX_NESTING = 5;
 
@@ -200,7 +200,8 @@ export const updateNavigationLinkBlockAttributes = (
 	const kind = isCustomLink ? 'custom' : newKind;
 
 	setAttributes( {
-		...( url && { url: encodeURI( url ) } ),
+		// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
+		...( url && { url: encodeURI( safeDecodeURI( url ) ) } ),
 		...( label && { label } ),
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
 		...( id && Number.isInteger( id ) && { id } ),
@@ -418,7 +419,6 @@ export default function NavigationLinkEdit( {
 				hasDescendants
 					? InnerBlocks.DefaultAppender
 					: false,
-			__experimentalAppenderTagName: 'li',
 		}
 	);
 
@@ -507,7 +507,7 @@ export default function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<li { ...blockProps }>
+			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
@@ -611,8 +611,8 @@ export default function NavigationLinkEdit( {
 						</span>
 					) }
 				</a>
-				<ul { ...innerBlocksProps } />
-			</li>
+				<div { ...innerBlocksProps } />
+			</div>
 		</Fragment>
 	);
 }

@@ -17,7 +17,6 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable } from './utils';
-import { CORE_DATA_STORE_NAME as coreDataStoreName } from './utils/constants';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -41,11 +40,7 @@ const EMPTY_ARRAY = [];
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
 	( select ) => ( state, url ) => {
-		return select( coreDataStoreName ).isResolving(
-			STORE_NAME,
-			'getEmbedPreview',
-			[ url ]
-		);
+		return select( STORE_NAME ).isResolving( 'getEmbedPreview', [ url ] );
 	}
 );
 
@@ -152,17 +147,18 @@ export function getEntityRecord( state, kind, name, key, query ) {
 	if ( ! queriedState ) {
 		return undefined;
 	}
+	const context = query?.context ?? 'default';
 
 	if ( query === undefined ) {
 		// If expecting a complete item, validate that completeness.
-		if ( ! queriedState.itemIsComplete[ key ] ) {
+		if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
 			return undefined;
 		}
 
-		return queriedState.items[ key ];
+		return queriedState.items[ context ][ key ];
 	}
 
-	const item = queriedState.items[ key ];
+	const item = queriedState.items[ context ]?.[ key ];
 	if ( item && query._fields ) {
 		const filteredItem = {};
 		const fields = getNormalizedCommaSeparable( query._fields );

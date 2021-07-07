@@ -22,7 +22,6 @@ import {
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
@@ -422,27 +421,6 @@ function translateBlockSettingUsingI18nSchema(
 		}, {} );
 	}
 	return settingValue;
-}
-
-/**
- * Registers a new block provided from metadata stored in `block.json` file.
- *
- * @deprecated Use `registerBlockType` instead.
- *
- * @param {Object} metadata           Block metadata loaded from `block.json`.
- * @param {Object} additionalSettings Additional block settings.
- *
- * @return {?WPBlock} The block, if it has been successfully registered;
- *                    otherwise `undefined`.
- */
-export function registerBlockTypeFromMetadata( metadata, additionalSettings ) {
-	deprecated( 'wp.blocks.registerBlockTypeFromMetadata', {
-		since: '10.7',
-		plugin: 'Gutenberg',
-		alternative: 'wp.blocks.registerBlockType',
-		version: '11.0',
-	} );
-	return registerBlockType( metadata, additionalSettings );
 }
 
 /**

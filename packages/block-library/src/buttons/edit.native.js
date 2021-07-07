@@ -26,7 +26,6 @@ import { name as buttonBlockName } from '../button/';
 import styles from './editor.scss';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
-const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
 const layoutProp = { type: 'default', alignments: [] };
 
@@ -65,6 +64,14 @@ export default function ButtonsEdit( {
 		},
 		[ clientId ]
 	);
+
+	const preferredStyle = useSelect( ( select ) => {
+		const preferredStyleVariations = select(
+			blockEditorStore
+		).getSettings().__experimentalPreferredStyleVariations;
+		return preferredStyleVariations?.value?.[ buttonBlockName ];
+	}, [] );
+
 	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { insertBlock, removeBlock, selectBlock } = useDispatch(
 		blockEditorStore
@@ -133,7 +140,16 @@ export default function ButtonsEdit( {
 			{ resizeObserver }
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
-				template={ BUTTONS_TEMPLATE }
+				template={ [
+					[
+						buttonBlockName,
+						{
+							className:
+								preferredStyle &&
+								`is-style-${ preferredStyle }`,
+						},
+					],
+				] }
 				renderFooterAppender={
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}

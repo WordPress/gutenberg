@@ -35,7 +35,6 @@ import { link } from '@wordpress/icons';
 import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
 import ColorBackground from './color-background';
-import ColorEdit from './color-edit';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
@@ -185,7 +184,7 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { attributes, colors, gradients } = this.props;
+		const { attributes, colors, gradients, style } = this.props;
 		const { backgroundColor, gradient } = attributes;
 
 		// Return named gradient value if available.
@@ -208,12 +207,13 @@ class ButtonEdit extends Component {
 			colorObject?.color ||
 			colorProps.style?.backgroundColor ||
 			colorProps.style?.background ||
+			style?.backgroundColor ||
 			styles.defaultButton.backgroundColor
 		);
 	}
 
 	getTextColor() {
-		const { attributes, colors } = this.props;
+		const { attributes, colors, style } = this.props;
 		const colorProps = getColorClassesAndStyles( attributes );
 
 		// Retrieve named color object to force inline styles for themes that
@@ -226,6 +226,7 @@ class ButtonEdit extends Component {
 		return (
 			colorObject?.color ||
 			colorProps.style?.color ||
+			style?.color ||
 			styles.defaultButton.color
 		);
 	}
@@ -376,11 +377,12 @@ class ButtonEdit extends Component {
 			mergeBlocks,
 			parentWidth,
 			setAttributes,
+			style,
 		} = this.props;
 		const {
 			placeholder,
 			text,
-			style,
+			style: buttonStyle,
 			url,
 			align = 'center',
 			width,
@@ -392,7 +394,7 @@ class ButtonEdit extends Component {
 			return null;
 		}
 
-		const borderRadius = style?.border?.radius;
+		const borderRadius = buttonStyle?.border?.radius;
 
 		const borderRadiusValue = Number.isInteger( borderRadius )
 			? borderRadius
@@ -464,7 +466,7 @@ class ButtonEdit extends Component {
 						} }
 						textAlign={ align }
 						placeholderTextColor={
-							styles.placeholderTextColor.color
+							style?.color || styles.placeholderTextColor.color
 						}
 						identifier="text"
 						tagName="p"
@@ -500,7 +502,6 @@ class ButtonEdit extends Component {
 							</ToolbarGroup>
 						</BlockControls>
 						{ this.getLinkSettings( false ) }
-						<ColorEdit { ...this.props } />
 						<InspectorControls>
 							<PanelBody title={ __( 'Border Settings' ) }>
 								<RangeControl

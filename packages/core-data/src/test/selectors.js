@@ -74,10 +74,14 @@ describe.each( [
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post' },
+									default: {
+										post: { slug: 'post' },
+									},
 								},
 								itemIsComplete: {
-									post: true,
+									default: {
+										post: true,
+									},
 								},
 								queries: {},
 							},
@@ -105,14 +109,18 @@ describe.each( [
 						post: {
 							queriedData: {
 								items: {
-									1: {
-										id: 1,
-										content: 'chicken',
-										author: 'bob',
+									default: {
+										1: {
+											id: 1,
+											content: 'chicken',
+											author: 'bob',
+										},
 									},
 								},
 								itemIsComplete: {
-									1: true,
+									default: {
+										1: true,
+									},
 								},
 								queries: {},
 							},
@@ -168,15 +176,21 @@ describe( 'hasEntityRecords', () => {
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post' },
-									page: { slug: 'page' },
+									default: {
+										post: { slug: 'post' },
+										page: { slug: 'page' },
+									},
 								},
 								itemIsComplete: {
-									post: true,
-									page: true,
+									default: {
+										post: true,
+										page: true,
+									},
 								},
 								queries: {
-									'': [ 'post', 'page' ],
+									default: {
+										'': [ 'post', 'page' ],
+									},
 								},
 							},
 						},
@@ -227,15 +241,21 @@ describe( 'getEntityRecords', () => {
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post' },
-									page: { slug: 'page' },
+									default: {
+										post: { slug: 'post' },
+										page: { slug: 'page' },
+									},
 								},
 								itemIsComplete: {
-									post: true,
-									page: true,
+									default: {
+										post: true,
+										page: true,
+									},
 								},
 								queries: {
-									'': [ 'post', 'page' ],
+									default: {
+										'': [ 'post', 'page' ],
+									},
 								},
 							},
 						},
@@ -257,17 +277,23 @@ describe( 'getEntityRecords', () => {
 						post: {
 							queriedData: {
 								items: {
-									1: {
-										id: 1,
-										content: 'chicken',
-										author: 'bob',
+									default: {
+										1: {
+											id: 1,
+											content: 'chicken',
+											author: 'bob',
+										},
 									},
 								},
 								itemIsComplete: {
-									1: true,
+									default: {
+										1: true,
+									},
 								},
 								queries: {
-									'_fields=id%2Ccontent': [ 1 ],
+									default: {
+										'_fields=id%2Ccontent': [ 1 ],
+									},
 								},
 							},
 						},
@@ -335,16 +361,20 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 						someName: {
 							queriedData: {
 								items: {
-									someKey: {
-										someProperty: 'somePersistedValue',
-										someRawProperty: {
-											raw: 'somePersistedRawValue',
+									default: {
+										someKey: {
+											someProperty: 'somePersistedValue',
+											someRawProperty: {
+												raw: 'somePersistedRawValue',
+											},
+											id: 'someKey',
 										},
-										id: 'someKey',
 									},
 								},
 								itemIsComplete: {
-									someKey: true,
+									default: {
+										someKey: true,
+									},
 								},
 							},
 							edits: {
@@ -475,10 +505,17 @@ describe( 'canUserEditEntityRecord', () => {
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post', __unstable: 'posts' },
+									default: {
+										post: {
+											slug: 'post',
+											__unstable: 'posts',
+										},
+									},
 								},
 								itemIsComplete: {
-									post: true,
+									default: {
+										post: true,
+									},
 								},
 								queries: {},
 							},

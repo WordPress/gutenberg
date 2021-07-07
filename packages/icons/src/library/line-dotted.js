@@ -1,0 +1,16 @@
+/**
+ * WordPress dependencies
+ */
+import { Path, SVG } from '@wordpress/primitives';
+
+const lineDotted = (
+	<SVG xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+		<Path
+			fillRule="evenodd"
+			d="M5.25 11.25h1.5v1.5h-1.5v-1.5zm3 0h1.5v1.5h-1.5v-1.5zm4.5 0h-1.5v1.5h1.5v-1.5zm1.5 0h1.5v1.5h-1.5v-1.5zm4.5 0h-1.5v1.5h1.5v-1.5z"
+			clipRule="evenodd"
+		/>
+	</SVG>
+);
+
+export default lineDotted;

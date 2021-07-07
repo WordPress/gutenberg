@@ -6,7 +6,7 @@ import { Animated, Easing, View, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, Toolbar } from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -83,7 +83,7 @@ const FloatingToolbar = ( {
 				pointerEvents={ showFloatingToolbar ? 'auto' : 'none' }
 			>
 				{ showNavUpButton && (
-					<Toolbar passedStyle={ styles.toolbar }>
+					<ToolbarGroup passedStyle={ styles.toolbar }>
 						<ToolbarButton
 							title={ __( 'Navigate Up' ) }
 							onClick={
@@ -93,7 +93,7 @@ const FloatingToolbar = ( {
 							icon={ <NavigateUpSVG isRTL={ isRTL } /> }
 						/>
 						<View style={ styles.pipe } />
-					</Toolbar>
+					</ToolbarGroup>
 				) }
 				<BlockSelectionButton
 					clientId={ blockSelectionButtonClientId }

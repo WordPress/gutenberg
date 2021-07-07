@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { css, cx } from '@emotion/css';
 
 /**
  * Internal dependencies
@@ -9,7 +12,7 @@ import { css, cx } from 'emotion';
 import { useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../ui/context';
-import { space } from '../ui/utils/space';
+import { space, SpaceInput } from '../ui/utils/space';
 
 const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
 	typeof o !== 'undefined' && o !== null;
@@ -18,61 +21,61 @@ export interface SpacerProps {
 	/**
 	 * Adjusts all margins.
 	 */
-	margin?: number;
+	margin?: SpaceInput;
 	/**
 	 * Adjusts top and bottom margins.
 	 */
-	marginY?: number;
+	marginY?: SpaceInput;
 	/**
 	 * Adjusts left and right margins.
 	 */
-	marginX?: number;
+	marginX?: SpaceInput;
 	/**
 	 * Adjusts top margins.
 	 */
-	marginTop?: number;
+	marginTop?: SpaceInput;
 	/**
 	 * Adjusts bottom margins.
 	 *
 	 * @default 2
 	 */
-	marginBottom?: number;
+	marginBottom?: SpaceInput;
 	/**
 	 * Adjusts left margins.
 	 */
-	marginLeft?: number;
+	marginLeft?: SpaceInput;
 	/**
 	 * Adjusts right margins.
 	 */
-	marginRight?: number;
+	marginRight?: SpaceInput;
 	/**
 	 * Adjusts all padding.
 	 */
-	padding?: number;
+	padding?: SpaceInput;
 	/**
 	 * Adjusts top and bottom padding.
 	 */
-	paddingY?: number;
+	paddingY?: SpaceInput;
 	/**
 	 * Adjusts left and right padding.
 	 */
-	paddingX?: number;
+	paddingX?: SpaceInput;
 	/**
 	 * Adjusts top padding.
 	 */
-	paddingTop?: number;
+	paddingTop?: SpaceInput;
 	/**
 	 * Adjusts bottom padding.
 	 */
-	paddingBottom?: number;
+	paddingBottom?: SpaceInput;
 	/**
 	 * Adjusts left padding.
 	 */
-	paddingLeft?: number;
+	paddingLeft?: SpaceInput;
 	/**
 	 * Adjusts right padding.
 	 */
-	paddingRight?: number;
+	paddingRight?: SpaceInput;
 	/**
 	 * The children elements.
 	 */

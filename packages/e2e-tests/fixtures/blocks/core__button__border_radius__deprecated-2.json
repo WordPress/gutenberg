@@ -1,0 +1,21 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"text": "Where We Are",
+			"className": "is-style-outline",
+			"style": {
+				"border": {
+					"radius": "10px"
+				},
+				"color": {
+					"text": "#1b9b6c"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"originalContent": "<div class=\"wp-block-button is-style-outline\"><a class=\"wp-block-button__link has-text-color\" style=\"color:#1b9b6c;border-radius:10px;\">Where We Are</a></div>"
+	}
+]

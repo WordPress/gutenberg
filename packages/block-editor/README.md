@@ -59,7 +59,7 @@ Inside `BlockEditorProvider`, you can nest any of the available `@wordpress/bloc
 
 In the example above we're rendering the `BlockList` to show and edit the block list. For instance we could add a custom sidebar and use the `BlockInspector` component to be able to edit the advanced settings for the currently selected block. (See the [API](#API) for the list of all the available components).
 
-The `Popover.Slot` with the `name="block-toolbar"` prop is used to render the toolbar for a selected block.
+The `BlockTools` component is used to render the toolbar for a selected block.
 
 In the example above, there's no registered block type, in order to use the block editor successfully make sure to register some block types. For instance, registering the core block types can be done like so:
 

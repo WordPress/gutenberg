@@ -8,7 +8,7 @@ import { filter, includes, isArray } from 'lodash';
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { withSelect } from '@wordpress/data';
-import { TextControl } from '@wordpress/components';
+import { SearchControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
@@ -53,9 +53,9 @@ function BlockManager( {
 					) }
 				</div>
 			) }
-			<TextControl
-				type="search"
+			<SearchControl
 				label={ __( 'Search for a block' ) }
+				placeholder={ __( 'Search for a block' ) }
 				value={ search }
 				onChange={ ( nextSearch ) => setSearch( nextSearch ) }
 				className="edit-post-block-manager__search"
