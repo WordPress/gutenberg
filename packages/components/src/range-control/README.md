@@ -92,19 +92,21 @@ Render a RangeControl to make a selection from a range of incremental values.
 
 ```jsx
 import { RangeControl } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyRangeControl = withState( {
-	columns: 2,
-} )( ( { columns, setState } ) => (
-	<RangeControl
-		label="Columns"
-		value={ columns }
-		onChange={ ( columns ) => setState( { columns } ) }
-		min={ 2 }
-		max={ 10 }
-	/>
-) );
+const MyRangeControl = () => {
+	const [ columns, setColumns ] = useState( 2 );
+
+	return(
+		<RangeControl
+			label="Columns"
+			value={ columns }
+			onChange={ ( value ) => setColumns( value ) }
+			min={ 2 }
+			max={ 10 }
+		/>
+	);
+};
 ```
 
 ### Props
