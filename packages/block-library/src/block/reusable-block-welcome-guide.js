@@ -4,6 +4,18 @@
 import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+function WelcomeGuideImage( { nonAnimatedSrc, animatedSrc } ) {
+	return (
+		<picture className="edit-reusable-block-welcome-guide__image">
+			<source
+				srcSet={ nonAnimatedSrc }
+				media="(prefers-reduced-motion: reduce)"
+			/>
+			<img src={ animatedSrc } width="312" height="240" alt="" />
+		</picture>
+	);
+}
+
 function ReusableBlockWelcomeGuide( { isGudieOpen, setIsGudieOpen } ) {
 	if ( ! isGudieOpen ) {
 		return null;
@@ -18,7 +30,10 @@ function ReusableBlockWelcomeGuide( { isGudieOpen, setIsGudieOpen } ) {
 			pages={ [
 				{
 					image: (
-						<div className="edit-reusable-block-welcome-guide__image"></div>
+						<WelcomeGuideImage
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-reusable.svg"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-reusable.gif"
+						/>
 					),
 					content: (
 						<>
