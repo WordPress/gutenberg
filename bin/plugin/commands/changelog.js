@@ -61,18 +61,13 @@ const manifest = require( '../../../package.json' );
  */
 const LABEL_TYPE_MAPPING = {
 	'[Block] Navigation': 'Experiments',
-	'[Block] Query': 'Experiments',
 	'[Block] Post Comments Count': 'Experiments',
 	'[Block] Post Comments Form': 'Experiments',
 	'[Block] Post Comments': 'Experiments',
-	'[Block] Post Featured Image': 'Experiments',
 	'[Block] Post Hierarchical Terms': 'Experiments',
-	'[Block] Post Title': 'Experiments',
-	'[Block] Site Logo': 'Experiments',
 	'[Feature] Full Site Editing': 'Experiments',
 	'Global Styles': 'Experiments',
 	'[Feature] Navigation Screen': 'Experiments',
-	'[Feature] Widgets Screen': 'Experiments',
 	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
 	'[Package] Jest Puppeteer aXe': 'Tools',
 	'[Package] E2E Tests': 'Tools',
