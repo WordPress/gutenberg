@@ -10,7 +10,7 @@ import { PanelBody, Button, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { safeDecodeURIComponent } from '@wordpress/url';
+import { addQueryArgs, safeDecodeURIComponent } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
@@ -48,6 +48,11 @@ function CopyButton( { text, onCopy, children } ) {
 			{ children }
 		</Button>
 	);
+}
+
+function ConvertToSentenceCase( string ) {
+	const sentence = string.toLowerCase();
+	return sentence.charAt( 0 ).toUpperCase() + sentence.slice( 1 );
 }
 
 class PostPublishPanelPostpublish extends Component {
@@ -91,9 +96,18 @@ class PostPublishPanelPostpublish extends Component {
 	render() {
 		const { children, isScheduled, post, postType } = this.props;
 		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
-		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
+		const viewPostLabel = ConvertToSentenceCase(
+			get( postType, [ 'labels', 'view_item' ] )
+		);
+		const addNewPostLabel = ConvertToSentenceCase(
+			get( postType, [ 'labels', 'add_new_item' ] )
+		);
 		const link =
 			post.status === 'future' ? getFuturePostUrl( post ) : post.link;
+		const addLink = addQueryArgs( 'post-new.php', {
+			post_type: post.type,
+		} );
+		const dashboardLink = addQueryArgs( 'index.php', {} );
 
 		const postPublishNonLinkHeader = isScheduled ? (
 			<>
@@ -116,28 +130,42 @@ class PostPublishPanelPostpublish extends Component {
 					<p className="post-publish-panel__postpublish-subheader">
 						<strong>{ __( 'What’s next?' ) }</strong>
 					</p>
-					<TextControl
-						className="post-publish-panel__postpublish-post-address"
-						readOnly
-						label={ sprintf(
-							/* translators: %s: post type singular name */
-							__( '%s address' ),
-							postLabel
-						) }
-						value={ safeDecodeURIComponent( link ) }
-						onFocus={ this.onSelectInput }
-					/>
+					<div className="post-publish-panel__postpublish-post-address-container">
+						<TextControl
+							className="post-publish-panel__postpublish-post-address"
+							readOnly
+							label={ sprintf(
+								/* translators: %s: post type singular name */
+								__( '%s address' ),
+								postLabel
+							) }
+							value={ safeDecodeURIComponent( link ) }
+							onFocus={ this.onSelectInput }
+						/>
+
+						<div className="post-publish-panel__postpublish-post-address__button-wrap">
+							<CopyButton text={ link } onCopy={ this.onCopy }>
+								{ this.state.showCopyConfirmation
+									? __( 'Copied!' )
+									: __( 'Copy' ) }
+							</CopyButton>
+						</div>
+					</div>
+
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
 							<Button variant="secondary" href={ link }>
 								{ viewPostLabel }
 							</Button>
 						) }
-						<CopyButton text={ link } onCopy={ this.onCopy }>
-							{ this.state.showCopyConfirmation
-								? __( 'Copied!' )
-								: __( 'Copy Link' ) }
-						</CopyButton>
+						<Button variant="secondary" href={ addLink }>
+							{ addNewPostLabel }
+						</Button>
+					</div>
+					<div className="post-publish-panel__dashboard-link">
+						<Button variant="link" href={ dashboardLink }>
+							{ __( 'Back to dashboard' ) }
+						</Button>
 					</div>
 				</PanelBody>
 				{ children }
