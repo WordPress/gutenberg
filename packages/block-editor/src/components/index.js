@@ -34,6 +34,7 @@ export {
 	BlockVerticalAlignmentToolbar,
 	BlockVerticalAlignmentControl,
 } from './block-vertical-alignment-control';
+export { default as __experimentalBorderRadiusControl } from './border-radius-control';
 export { default as __experimentalBorderStyleControl } from './border-style-control';
 export {
 	// This is a typo, but kept here for back-compat.
@@ -120,7 +121,6 @@ export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { default as __experimentalLibrary } from './inserter/library';
-export { default as __experimentalSearchForm } from './inserter/search-form';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
 export { MultiSelectScrollIntoView } from './selection-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';

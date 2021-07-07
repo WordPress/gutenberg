@@ -24,3 +24,17 @@
 .edit-site-global-styles-sidebar__reset-button.components-button {
 	margin-left: auto;
 }
+
+.edit-site-global-styles-sidebar__border-controls-row {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: $grid-unit-15;
+
+	> * {
+		width: calc(50% - #{ $grid-unit-10 });
+	}
+
+	.components-border-style-control__buttons {
+		margin-bottom: 0;
+	}
+}

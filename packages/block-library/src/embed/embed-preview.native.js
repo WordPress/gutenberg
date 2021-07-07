@@ -21,17 +21,24 @@ import styles from './styles.scss';
 
 const EmbedPreview = ( {
 	clientId,
+	icon,
 	insertBlocksAfter,
 	isSelected,
+	label,
 	onBlur,
 	onFocus,
+	preview,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
-	const stylePlaceholder = usePreferredColorSchemeStyle(
-		styles[ 'embed-preview__placeholder' ],
-		styles[ 'embed-preview__placeholder--dark' ]
+	const containerStyle = usePreferredColorSchemeStyle(
+		styles.embed__container,
+		styles[ 'embed__container--dark' ]
 	);
-	const stylePlaceholderText = usePreferredColorSchemeStyle(
+	const labelStyle = usePreferredColorSchemeStyle(
+		styles.embed__label,
+		styles[ 'embed__label--dark' ]
+	);
+	const placeholderTextStyle = usePreferredColorSchemeStyle(
 		styles[ 'embed-preview__placeholder-text' ],
 		styles[ 'embed-preview__placeholder-text--dark' ]
 	);
@@ -68,11 +75,10 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				<View style={ stylePlaceholder }>
-					<Text style={ stylePlaceholderText }>
-						Embed Preview will be directly above the Block Caption
-						component when it is implemented.
-					</Text>
+				<View style={ containerStyle }>
+					<View style={ styles.embed__icon }>{ icon }</View>
+					<Text style={ labelStyle }>{ label }</Text>
+					<Text style={ placeholderTextStyle }>{ preview }</Text>
 				</View>
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }

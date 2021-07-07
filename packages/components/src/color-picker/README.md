@@ -16,7 +16,7 @@ const MyColorPicker = withState( {
 	return (
 		<ColorPicker
 			color={ color }
-			onChangeComplete={ ( value ) => setState( value.hex ) }
+			onChangeComplete={ ( value ) => setState( { color: value.hex } ) }
 			disableAlpha
 		/>
 	);
