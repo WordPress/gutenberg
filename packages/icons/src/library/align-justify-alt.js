@@ -8,7 +8,7 @@ const alignJustifyAlt = (
 		<Path
 			clipRule="evenodd"
 			fillRule="evenodd"
-			d="M4 5H20V7H4V5ZM4 9V11H20V9H4ZM4 13H20V15H4V13ZM20 19H4V17H20V19Z"
+			d="M4 5h16v2H4V5zm0 4v2h16V9H4zm0 4h16v2H4v-2zm16 6H4v-2h16v2z"
 		/>
 	</SVG>
 );
