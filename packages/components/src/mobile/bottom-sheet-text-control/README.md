@@ -31,7 +31,7 @@ const MyTextControl = () => {
 				placeholder={ __( 'Generic placeholder text' ) }
 				label={ __( 'Generic label' ) }
 				icon={ textColor }
-				footerNote={
+				help={
 					<>
 						{ __( 'A footer note to add to the component! ' ) }
 						<ExternalLink href={ 'https://wordpress.org/' } >
@@ -82,9 +82,9 @@ The icon to display alongside the control.
 -   Type: `String`
 -   Required: No
 
-#### footerNote
+#### help
 
 An optional note to display in the component's footer area.
 
--   Type: `String`
+-   Type: `Component`
 -   Required: No

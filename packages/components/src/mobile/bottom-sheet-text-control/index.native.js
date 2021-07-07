@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TextInput } from 'react-native';
+import { TextInput, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 /**
@@ -10,11 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import {
-	BottomSheet,
-	PanelBody,
-	FooterMessageControl,
-} from '@wordpress/components';
+import { BottomSheet, PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -27,7 +23,7 @@ const BottomSheetTextControl = ( {
 	placeholder,
 	label,
 	icon,
-	footerNote,
+	help,
 } ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
@@ -88,12 +84,9 @@ const BottomSheetTextControl = ( {
 				</PanelBody>
 			</>
 
-			{ footerNote && (
-				<PanelBody style={ styles.textFooternote }>
-					<FooterMessageControl
-						label={ footerNote }
-						textAlign="left"
-					/>
+			{ !! help && (
+				<PanelBody>
+					<View style={ styles.textFooternote }>{ help }</View>
 				</PanelBody>
 			) }
 		</BottomSheet.SubSheet>
