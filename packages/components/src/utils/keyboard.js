@@ -1,4 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { RIGHT, UP, DOWN, LEFT } from '@wordpress/keycodes';
+
+/**
+ * @type {number[]}
+ */
+const arrowKeys = [ RIGHT, UP, DOWN, LEFT ];
+
+/**
  * Normalizes the 'key' property of a KeyboardEvent in IE/Edge
  *
  * Source:
@@ -11,7 +21,7 @@
 export function normalizeArrowKey( event ) {
 	const { key, keyCode } = event;
 
-	if ( keyCode >= 37 && keyCode <= 40 && key.indexOf( 'Arrow' ) !== 0 ) {
+	if ( arrowKeys.includes( keyCode ) && key.indexOf( 'Arrow' ) !== 0 ) {
 		return `Arrow${ key }`;
 	}
 	return key;
