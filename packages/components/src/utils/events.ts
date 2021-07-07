@@ -38,22 +38,12 @@ export function mergeEventHandlers<
 		...handlers,
 	};
 
-	for ( const [ key, handler ] of Object.entries( mergedHandlers ) ) {
-		if ( typeof extraHandlers[ key ] === 'function' ) {
-			// @ts-ignore
-			mergedHandlers[ key as keyof typeof mergedHandlers ] = mergeEvent(
-				handler,
-				extraHandlers[ key ]
-			);
-		}
-	}
-
 	for ( const [ key, handler ] of Object.entries( extraHandlers ) ) {
-		if ( key in mergedHandlers ) {
-			continue;
-		}
 		// @ts-ignore
-		mergedHandlers[ key ] = handler;
+		mergedHandlers[ key as keyof typeof mergedHandlers ] =
+			key in mergedHandlers
+				? mergeEvent( mergedHandlers[ key ], handler )
+				: handler;
 	}
 
 	return mergedHandlers;
