@@ -1,4 +1,4 @@
-.wp-block-rss {
+ul.wp-block-rss { // The ul is needed for specificity to override the reset styles
 	list-style: none;
 	padding: 0;
 
