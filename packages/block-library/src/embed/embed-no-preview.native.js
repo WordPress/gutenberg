@@ -42,7 +42,10 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 		styles.embed__description,
 		styles[ 'embed__description--dark' ]
 	);
-	const helpIconStyle = styles[ 'embed-no-preview__help-icon' ];
+	const helpIconStyle = usePreferredColorSchemeStyle(
+		styles[ 'embed-no-preview__help-icon' ],
+		styles[ 'embed-no-preview__help-icon--dark' ]
+	);
 
 	const sheetIconStyle = usePreferredColorSchemeStyle(
 		styles[ 'embed-no-preview__sheet-icon' ],
