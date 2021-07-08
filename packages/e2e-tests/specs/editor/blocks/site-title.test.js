@@ -75,16 +75,11 @@ describe( 'Site Title block', () => {
 	it( 'Can edit the site title as admin', async () => {
 		await createNewPost();
 		await insertBlock( 'Site Title' );
-		const editableSiteTitleSelector = '[aria-label="Block: Site Title"] a';
+		const editableSiteTitleSelector =
+			'[aria-label="Block: Site Title"] a[contenteditable="true"]';
 		await page.waitForSelector( editableSiteTitleSelector );
 		await page.focus( editableSiteTitleSelector );
 		await pressKeyWithModifier( 'primary', 'a' );
-
-		const editable = await page.$eval(
-			editableSiteTitleSelector,
-			( element ) => element.contentEditable
-		);
-		expect( editable ).toBe( 'true' );
 
 		await page.keyboard.type( 'New Site Title' );
 
