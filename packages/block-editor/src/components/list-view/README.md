@@ -1,4 +1,4 @@
-# Block navigation
+# List view
 
 The ListView component provides an overview of the hierarchical structure of all blocks in the editor. The blocks are presented vertically one below the other.
 
