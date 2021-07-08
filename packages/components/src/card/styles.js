@@ -24,7 +24,7 @@ export const Header = css`
 export const Footer = css`
 	border-top: 1px solid;
 
-	&:first-child {
+	&:first-of-type {
 		border-top: none;
 	}
 `;
