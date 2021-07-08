@@ -17,6 +17,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import EmbedNoPreview from './embed-no-preview';
+import styles from './styles';
 
 const EmbedPreview = ( {
 	clientId,
@@ -78,10 +79,10 @@ const EmbedPreview = ( {
 					/>
 				) : (
 					<Image
-						style={ {
-							flex: 1,
-							aspectRatio: preview.width / preview.height,
-						} }
+						style={ [
+							styles[ 'embed-preview__image' ],
+							{ aspectRatio: preview.width / preview.height },
+						] }
 						source={ {
 							uri: preview.thumbnail_url,
 						} }
