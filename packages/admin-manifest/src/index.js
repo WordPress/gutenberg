@@ -1,7 +1,9 @@
 function addManifest( manifest ) {
 	const link = document.createElement( 'link' );
 	link.rel = 'manifest';
-	link.href = 'data:application/manifest+json,' + JSON.stringify( manifest );
+	link.href = `data:application/manifest+json,${ encodeURIComponent(
+		JSON.stringify( manifest )
+	) }`;
 	document.head.appendChild( link );
 }
 
@@ -94,8 +96,7 @@ window.addEventListener( 'load', () => {
 
 	const { logo, siteTitle, adminUrl } = window.wpAdminManifestL10n;
 	const manifest = {
-		// Replace spaces with non breaking spaces. Chrome collapses them.
-		name: siteTitle.replace( / /g, ' ' ),
+		name: siteTitle,
 		display: 'standalone',
 		orientation: 'portrait',
 		start_url: adminUrl,
