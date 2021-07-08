@@ -1,0 +1,15 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/breadcrumbs",
+		"isValid": true,
+		"attributes": {
+			"nestingLevel": 4,
+			"separator": "|",
+			"showCurrentPageTitle": false,
+			"showLeadingSeparator": true
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]
