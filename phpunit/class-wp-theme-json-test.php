@@ -708,6 +708,94 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	public function test_merge_incoming_data_empty_presets() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'      => array(
+						'duotone'   => array(
+							array(
+								'slug'   => 'value',
+								'colors' => array( 'red', 'green' ),
+							),
+						),
+						'gradients' => array(
+							array(
+								'slug'     => 'gradient',
+								'gradient' => 'gradient',
+							),
+						),
+						'palette'   => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+						),
+					),
+					'spacing'    => array(
+						'units' => array( 'px', 'em' ),
+					),
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'slug'  => 'size',
+								'value' => 'size',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$theme_json->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'color'      => array(
+							'duotone'   => array(),
+							'gradients' => array(),
+							'palette'   => array(),
+						),
+						'spacing'    => array(
+							'units' => array(),
+						),
+						'typography' => array(
+							'fontSizes' => array(),
+						),
+					),
+				)
+			)
+		);
+
+		$actual   = $theme_json->get_raw_data();
+		$expected = array(
+			'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'settings' => array(
+				'color'      => array(
+					'duotone'   => array(),
+					'gradients' => array(
+						'theme' => array(),
+					),
+					'palette'   => array(
+						'theme' => array(),
+					),
+				),
+				'spacing'    => array(
+					'units' => array(),
+				),
+				'typography' => array(
+					'fontSizes' => array(
+						'theme' => array(),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	function test_remove_insecure_properties_removes_unsafe_styles() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
