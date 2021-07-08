@@ -58,7 +58,8 @@ function BlockForType( {
 			globalStyle,
 			wrapperProps.style,
 			attributes,
-			defaultColors
+			defaultColors,
+			name
 		);
 	}, [
 		defaultColors,
@@ -85,7 +86,7 @@ function BlockForType( {
 				// Block level styles
 				wrapperProps={ wrapperProps }
 				// inherited styles merged with block level styles
-				mergedStyle={ mergedStyle }
+				style={ mergedStyle }
 				clientId={ clientId }
 				parentWidth={ parentWidth }
 				contentStyle={ contentStyle }

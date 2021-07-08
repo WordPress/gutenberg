@@ -21,6 +21,7 @@ jobs:
     compute-stable-branches:
         name: Compute current and next stable release branches
         runs-on: ubuntu-latest
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         outputs:
             current_stable_branch: ${{ steps.get_branches.outputs.current_stable_branch }}
             next_stable_branch: ${{ steps.get_branches.outputs.next_stable_branch }}
@@ -47,7 +48,6 @@ jobs:
         runs-on: ubuntu-latest
         needs: compute-stable-branches
         if: |
-            github.repository == 'WordPress/gutenberg' &&
             github.event_name == 'workflow_dispatch' && (
               (
                 github.ref == 'refs/heads/trunk' ||
@@ -148,7 +148,12 @@ jobs:
         name: Build Release Artifact
         runs-on: ubuntu-latest
         needs: bump-version
-        if: ${{ ( github.repository == 'WordPress/gutenberg' && always() ) || ( github.event_name == 'pull_request' && always() ) }}
+        if: |
+            always() && (
+              github.event_name == 'pull_request' ||
+              github.event_name == 'workflow_dispatch' ||
+              github.repository == 'WordPress/gutenberg'
+            )
 
         steps:
             - name: Checkout code
@@ -200,7 +205,6 @@ jobs:
         name: Create Release Draft and Attach Asset
         needs: [bump-version, build]
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' }}
 
         steps:
             - name: Set Release Version

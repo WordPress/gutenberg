@@ -244,7 +244,7 @@ describe( 'Multi-entity save flow', () => {
 			// Select the header template part via list view.
 			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
-				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
+				'//button[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
 			);
 			headerTemplatePartListViewButton.click();
 			await page.click( 'button[aria-label="Close list view sidebar"]' );

@@ -24,9 +24,6 @@ export { default as BlockColorsStyleSelector } from './color-style-selector';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
-export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } from './block-navigation/block-slot';
-export { default as __experimentalBlockNavigationEditor } from './block-navigation/editor';
-export { default as __experimentalBlockNavigationTree } from './block-navigation/tree';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
 export { default as __experimentalBlockPatternSetup } from './block-pattern-setup';
 export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';
@@ -34,6 +31,7 @@ export {
 	BlockVerticalAlignmentToolbar,
 	BlockVerticalAlignmentControl,
 } from './block-vertical-alignment-control';
+export { default as __experimentalBorderRadiusControl } from './border-radius-control';
 export { default as __experimentalBorderStyleControl } from './border-style-control';
 export {
 	// This is a typo, but kept here for back-compat.
@@ -44,9 +42,6 @@ export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
 export { default as ContrastChecker } from './contrast-checker';
 export { default as __experimentalDuotoneControl } from './duotone-control';
-export { default as __experimentalGradientPicker } from './gradient-picker';
-export { default as __experimentalGradientPickerControl } from './gradient-picker/control';
-export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';
 export { default as __experimentalFontAppearanceControl } from './font-appearance-control';
 export { default as __experimentalFontFamilyControl } from './font-family';
 export { default as __experimentalLetterSpacingControl } from './letter-spacing-control';
@@ -68,6 +63,9 @@ export { default as __experimentalLinkControlSearchInput } from './link-control/
 export { default as __experimentalLinkControlSearchResults } from './link-control/search-results';
 export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
 export { default as LineHeightControl } from './line-height-control';
+export { default as __experimentalListView } from './list-view';
+export { ListViewBlockFill as __experimentalListViewBlockFill } from './list-view/block-slot';
+export { default as __experimentalListViewEditor } from './list-view/editor';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
@@ -120,7 +118,6 @@ export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { default as __experimentalLibrary } from './inserter/library';
-export { default as __experimentalSearchForm } from './inserter/search-form';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
 export { MultiSelectScrollIntoView } from './selection-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';

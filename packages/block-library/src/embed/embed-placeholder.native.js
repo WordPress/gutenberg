@@ -23,11 +23,13 @@ import styles from './styles.scss';
 
 const EmbedPlaceholder = ( {
 	icon,
+	isEditingURL,
 	isSelected,
 	label,
 	onFocus,
 	value,
 	onSubmit,
+	cannotEmbed,
 } ) => {
 	const { clientId } = useBlockEditContext();
 	const { wasBlockJustInserted } = useSelect(
@@ -39,7 +41,7 @@ const EmbedPlaceholder = ( {
 		[ clientId ]
 	);
 	const [ isEmbedSheetVisible, setIsEmbedSheetVisible ] = useState(
-		isSelected && wasBlockJustInserted && ! value
+		isSelected && ( ( wasBlockJustInserted && ! value ) || isEditingURL )
 	);
 
 	const containerStyle = usePreferredColorSchemeStyle(
@@ -64,9 +66,24 @@ const EmbedPlaceholder = ( {
 				<View style={ containerStyle }>
 					<View style={ styles.embed__icon }>{ icon }</View>
 					<Text style={ labelStyle }>{ label }</Text>
-					<Text style={ styles[ 'embed-empty__description' ] }>
-						{ __( 'ADD LINK' ) }
-					</Text>
+					{ cannotEmbed ? (
+						<>
+							<Text style={ labelStyle }>
+								{ __(
+									'Sorry, this content could not be embedded.'
+								) }
+							</Text>
+							<Text
+								style={ styles[ 'embed-empty__description' ] }
+							>
+								{ __( 'EDIT LINK' ) }
+							</Text>
+						</>
+					) : (
+						<Text style={ styles[ 'embed-empty__description' ] }>
+							{ __( 'ADD LINK' ) }
+						</Text>
+					) }
 				</View>
 			</TouchableWithoutFeedback>
 			<EmbedBottomSheet

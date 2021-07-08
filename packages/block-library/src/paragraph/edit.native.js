@@ -19,7 +19,6 @@ function ParagraphBlock( {
 	mergeBlocks,
 	onReplace,
 	setAttributes,
-	mergedStyle,
 	style,
 	clientId,
 } ) {
@@ -30,12 +29,11 @@ function ParagraphBlock( {
 	const { align, content, placeholder } = attributes;
 
 	const styles = {
-		...( mergedStyle?.baseColors && {
-			color: mergedStyle.baseColors?.color?.text,
-			placeholderColor: mergedStyle.baseColors?.color?.text,
-			linkColor: mergedStyle.baseColors?.elements?.link?.color?.text,
+		...( style?.baseColors && {
+			color: style.baseColors?.color?.text,
+			placeholderColor: style.color || style.baseColors?.color?.text,
+			linkColor: style.baseColors?.elements?.link?.color?.text,
 		} ),
-		...mergedStyle,
 		...style,
 	};
 
