@@ -120,13 +120,22 @@ ${ selector } {
 	);
 }
 
-function DuotonePanel( { attributes, setAttributes } ) {
+function DuotonePanel( { name, attributes, setAttributes } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
 
 	const duotonePalette = useSetting( 'color.duotone' );
 	const colorPalette = useSetting( 'color.palette' );
 	const disableCustomColors = ! useSetting( 'color.custom' );
+
+	if (
+		! hasBlockSupport( name, 'color.__experimentalDuotone' ) ||
+		( duotonePalette?.length === 0 &&
+			colorPalette?.length === 0 &&
+			disableCustomColors )
+	) {
+		return null;
+	}
 
 	return (
 		<BlockControls group="block">
@@ -186,15 +195,10 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const hasDuotoneSupport = hasBlockSupport(
-			props.name,
-			'color.__experimentalDuotone'
-		);
-
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
+				<DuotonePanel { ...props } />
 			</>
 		);
 	},

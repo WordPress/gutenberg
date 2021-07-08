@@ -20,10 +20,6 @@ function DuotoneControl( {
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
-	if ( ! duotonePalette ) {
-		return null;
-	}
-
 	const onToggle = () => {
 		setIsOpen( ( prev ) => ! prev );
 	};
