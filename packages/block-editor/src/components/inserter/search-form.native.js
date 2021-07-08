@@ -7,13 +7,13 @@ import {
 	View,
 	TouchableOpacity,
 	Platform,
+	useColorScheme,
 } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { useState, useRef, useMemo, useEffect } from '@wordpress/element';
-import { usePreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Button, Gridicons } from '@wordpress/components';
 import {
@@ -37,24 +37,24 @@ for ( const selector in platformStyles ) {
 	};
 }
 
-function usePreferredColorSchemeBemStyle( styles, darkModifier = 'dark' ) {
-	const colorScheme = usePreferredColorScheme();
-
-	if ( colorScheme !== 'dark' ) {
-		return styles;
-	}
-
-	const darkSelectors = Object.keys( styles ).filter( ( selector ) =>
-		selector.match( `-{1,2}${ darkModifier }$` )
+function selectModifiedStyles( styles, modifier ) {
+	const modifierMatcher = new RegExp( `--${ modifier }$` );
+	const modifierSelectors = Object.keys( styles ).filter( ( selector ) =>
+		selector.match( modifierMatcher )
 	);
 
-	darkSelectors.forEach( ( darkSelector ) => {
-		const matchDarkModifier = new RegExp( `-{1,2}${ darkModifier }` );
-		const baseSelector = darkSelector.replace( matchDarkModifier, '' );
+	return modifierSelectors.reduce( ( modifiedStyles, modifierSelector ) => {
+		const blockElementSelector = modifierSelector.split( '--' )[ 0 ];
+		modifiedStyles[ blockElementSelector ] = styles[ modifierSelector ];
+		return modifiedStyles;
+	}, {} );
+}
 
-		styles[ baseSelector ] = {
-			...styles[ baseSelector ],
-			...styles[ darkSelector ],
+function mergeStyles( styles, updateStyles, selectors ) {
+	selectors.forEach( ( selector ) => {
+		styles[ selector ] = {
+			...styles[ selector ],
+			...updateStyles[ selector ],
 		};
 	} );
 
@@ -63,46 +63,52 @@ function usePreferredColorSchemeBemStyle( styles, darkModifier = 'dark' ) {
 
 function InserterSearchForm( { value, onChange } ) {
 	const [ isActive, setIsActive ] = useState( false );
-
 	const [ currentStyles, setCurrentStyles ] = useState( baseStyles );
 
+	const isDark = useColorScheme() === 'dark';
 	const inputRef = useRef();
 
 	const isIOS = Platform.OS === 'ios';
 
-	const themedStyles = usePreferredColorSchemeBemStyle( baseStyles );
+	const darkStyles = useMemo( () => {
+		return selectModifiedStyles( baseStyles, 'dark' );
+	}, [] );
 
 	const activeStyles = useMemo( () => {
-		// pluck selectors with an 'active' modifier
-		const activeSelectors = Object.keys( themedStyles ).filter(
-			( key ) => !! key?.match( /-{1,2}active$/ )
-		);
+		return selectModifiedStyles( baseStyles, 'active' );
+	}, [] );
 
-		// Remove the 'active' modifier from selector so it can be merged
-		// with the themed style selector
-		return activeSelectors.reduce( ( _activeStyles, activeSelector ) => {
-			const selector = activeSelector.split( '--' )[ 0 ];
-			_activeStyles[ selector ] = baseStyles[ activeSelector ];
-			return _activeStyles;
-		}, {} );
-	}, [ themedStyles ] );
+	const activeDarkStyles = useMemo( () => {
+		return selectModifiedStyles( baseStyles, 'active-dark' );
+	}, [] );
 
 	useEffect( () => {
-		if ( ! isActive ) {
-			setCurrentStyles( themedStyles );
-			return;
+		let futureStyles = { ...baseStyles };
+
+		function mergeFutureStyles( modifiedStyles, shouldUseConditions ) {
+			const shouldUseModified = shouldUseConditions.every(
+				( should ) => should
+			);
+
+			const updatedStyles = shouldUseModified
+				? modifiedStyles
+				: futureStyles;
+
+			const selectors = Object.keys( modifiedStyles );
+
+			futureStyles = mergeStyles(
+				futureStyles,
+				updatedStyles,
+				selectors
+			);
 		}
 
-		const updated = { ...themedStyles };
+		mergeFutureStyles( activeStyles, [ isActive ] );
+		mergeFutureStyles( darkStyles, [ isDark ] );
+		mergeFutureStyles( activeDarkStyles, [ isActive, isDark ], true );
 
-		for ( const selector in activeStyles ) {
-			updated[ selector ] = {
-				...themedStyles[ selector ],
-				...activeStyles[ selector ],
-			};
-		}
-		setCurrentStyles( updated );
-	}, [ themedStyles, isActive ] );
+		setCurrentStyles( futureStyles );
+	}, [ isActive, isDark ] );
 
 	const {
 		'inserter-search-form__container': containerStyle,
@@ -138,7 +144,7 @@ function InserterSearchForm( { value, onChange } ) {
 					style={ iconStyle }
 				/>
 			) : (
-				<Icon icon={ Gridicons.search } fill={ iconStyle.color } />
+				<Icon icon={ Gridicons.search } fill={ iconStyle?.color } />
 			);
 
 		return (
