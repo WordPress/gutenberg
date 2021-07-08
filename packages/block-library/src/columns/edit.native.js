@@ -107,7 +107,7 @@ function ColumnsEditContainer( {
 	const { width } = sizes || {};
 
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'layout.units' ) || [
+		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
 			'px',
 			'em',
@@ -442,7 +442,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 )( memo( ColumnsEditContainer ) );
 
 const ColumnsEdit = ( props ) => {
-	const { clientId, isSelected } = props;
+	const { clientId, isSelected, style } = props;
 	const {
 		columnCount,
 		isDefaultColumns,
@@ -505,7 +505,7 @@ const ColumnsEdit = ( props ) => {
 	}, [] );
 
 	return (
-		<>
+		<View style={ style }>
 			<ColumnsEditContainerWrapper
 				columnCount={ columnCount }
 				innerWidths={ memoizedInnerWidths }
@@ -520,7 +520,7 @@ const ColumnsEdit = ( props ) => {
 				clientId={ clientId }
 				isVisible={ isVisible }
 			/>
-		</>
+		</View>
 	);
 };
 

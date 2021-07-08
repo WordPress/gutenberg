@@ -1,6 +1,6 @@
-.emptyStateContainer {
+.embed__container {
 	flex: 1;
-	height: 142;
+	min-height: 142;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
@@ -15,11 +15,19 @@
 	border-bottom-right-radius: 4;
 }
 
-.emptyStateContainerDark {
+.embed__container--dark {
 	background-color: $background-dark-secondary;
 }
 
-.emptyStateTitle {
+.embed__icon {
+	width: 24px;
+	height: 24px;
+	justify-content: center;
+	align-items: center;
+	fill: $gray-dark;
+}
+
+.embed__label {
 	text-align: center;
 	margin-top: 4;
 	margin-bottom: 16;
@@ -27,11 +35,11 @@
 	color: #2e4453;
 }
 
-.emptyStateTitleDark {
+.embed__label--dark {
 	color: $white;
 }
 
-.emptyStateDescription {
+.embed-empty__description {
 	width: 100%;
 	text-align: center;
 	color: $blue-wordpress;
@@ -39,10 +47,27 @@
 	font-weight: 500;
 }
 
-.modalIcon {
-	width: 24px;
-	height: 24px;
+.embed-preview__loading {
+	flex: 1;
+	padding-left: 12px;
+	padding-right: 12px;
+	padding-top: 40px;
+	padding-bottom: 40px;
+	background-color: $gray-lighten-30;
 	justify-content: center;
 	align-items: center;
-	fill: $gray-dark;
+}
+
+.embed-preview__loading--dark {
+	background-color: $background-dark-secondary;
+}
+
+.embed-preview__placeholder-text {
+	font-size: $default-font-size;
+	text-align: center;
+	color: $light-primary;
+}
+
+.embed-preview__placeholder-text--dark {
+	color: $dark-primary;
 }

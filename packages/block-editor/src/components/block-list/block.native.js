@@ -48,15 +48,18 @@ function BlockForType( {
 	parentWidth,
 	wrapperProps,
 	blockWidth,
+	baseGlobalStyles,
 } ) {
 	const defaultColors = useSetting( 'color.palette' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
+			baseGlobalStyles,
 			globalStyle,
 			wrapperProps.style,
 			attributes,
-			defaultColors
+			defaultColors,
+			name
 		);
 	}, [
 		defaultColors,
@@ -83,7 +86,7 @@ function BlockForType( {
 				// Block level styles
 				wrapperProps={ wrapperProps }
 				// inherited styles merged with block level styles
-				mergedStyle={ mergedStyle }
+				style={ mergedStyle }
 				clientId={ clientId }
 				parentWidth={ parentWidth }
 				contentStyle={ contentStyle }
@@ -300,6 +303,7 @@ export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
+			getSettings,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getSelectedBlockClientId,
@@ -347,6 +351,9 @@ export default compose( [
 			isDescendantOfParentSelected ||
 			isParentSelected ||
 			parentId === '';
+		const baseGlobalStyles = getSettings()
+			?.__experimentalGlobalStylesBaseStyles;
+
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -360,6 +367,7 @@ export default compose( [
 			isParentSelected,
 			firstToSelectId,
 			isTouchable,
+			baseGlobalStyles,
 			wrapperProps: getWrapperProps(
 				attributes,
 				blockType.getEditWrapperProps

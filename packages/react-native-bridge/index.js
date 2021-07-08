@@ -125,8 +125,11 @@ export function subscribeAndroidModalClosed( callback ) {
 		: undefined;
 }
 
-export function subscribeUpdateTheme( callback ) {
-	return gutenbergBridgeEvents.addListener( 'updateTheme', callback );
+export function subscribeUpdateEditorSettings( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'updateEditorSettings',
+		callback
+	);
 }
 
 export function subscribePreferredColorScheme( callback ) {
@@ -157,6 +160,16 @@ export function subscribeShowNotice( callback ) {
  */
 export function subscribeReplaceBlock( callback ) {
 	return gutenbergBridgeEvents.addListener( 'replaceBlock', callback );
+}
+
+/**
+ * Subscribe a listener for handling requests to open the editor help topics page.
+ *
+ * @param {Function} callback RN Callback function to display the editor
+ * 							  help topics.
+ */
+export function subscribeShowEditorHelp( callback ) {
+	return gutenbergBridgeEvents.addListener( 'showEditorHelp', callback );
 }
 
 /**

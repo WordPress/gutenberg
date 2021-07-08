@@ -107,9 +107,16 @@ module.exports = {
 		paddingRight: 10,
 	},
 	'block-types-list__column': {
-		padding: 10,
+		paddingLeft: 10,
+		paddingRight: 10,
 	},
 	floatingToolbar: {
 		height: 10,
+	},
+	searchFormPlaceholder: {
+		color: 'gray',
+	},
+	ripple: {
+		backgroundColor: 'white',
 	},
 };

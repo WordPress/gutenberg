@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, omit, pick } from 'lodash';
+import { get, has, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,6 +70,22 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
  * @return {boolean} Is the url an externally hosted url?
  */
 export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
+
+/**
+ * Checks if WP generated default image size. Size generation is skipped
+ * when the image is smaller than the said size.
+ *
+ * @param {Object} image
+ * @param {string} defaultSize
+ *
+ * @return {boolean} Whether or not it has default image size.
+ */
+function hasDefaultSize( image, defaultSize ) {
+	return (
+		has( image, [ 'sizes', defaultSize, 'url' ] ) ||
+		has( image, [ 'media_details', 'sizes', defaultSize, 'source_url' ] )
+	);
+}
 
 export function ImageEdit( {
 	attributes,
@@ -148,7 +164,11 @@ export function ImageEdit( {
 			additionalAttributes = {
 				width: undefined,
 				height: undefined,
-				sizeSlug: imageDefaultSize,
+				// Fallback to size "full" if there's no default image size.
+				// It means the image is smaller, and the block will use a full-size URL.
+				sizeSlug: hasDefaultSize( media, imageDefaultSize )
+					? imageDefaultSize
+					: 'full',
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size"

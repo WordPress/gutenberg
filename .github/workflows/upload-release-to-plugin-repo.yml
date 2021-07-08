@@ -11,6 +11,7 @@ jobs:
         if: github.event.release.assets[0]
         outputs:
             release_branch: ${{ steps.get_release_branch.outputs.release_branch }}
+
         steps:
             - name: Compute release branch name
               id: get_release_branch
@@ -35,6 +36,7 @@ jobs:
                       label: trunk
                     - branch: ${{ needs.get-release-branch.outputs.release_branch }}
                       label: release
+
         steps:
             - name: Checkout code
               uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
@@ -98,6 +100,7 @@ jobs:
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
             VERSION: ${{ github.event.release.name }}
+
         steps:
             - name: Check out Gutenberg trunk from WP.org plugin repo
               run: svn checkout "$PLUGIN_REPO_URL/trunk"

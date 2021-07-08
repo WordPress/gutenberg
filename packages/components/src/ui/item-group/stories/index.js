@@ -4,7 +4,7 @@
  * Internal dependencies
  */
 import { ItemGroup, Item } from '..';
-import { Popover } from '../../popover';
+import { Flyout } from '../../../flyout';
 import Button from '../../../button';
 
 export default {
@@ -30,7 +30,7 @@ export const _default = () => (
 );
 
 export const dropdown = () => (
-	<Popover
+	<Flyout
 		css={ { width: '350px' } }
 		trigger={ <Button>Open Popover</Button> }
 	>
@@ -48,6 +48,6 @@ export const dropdown = () => (
 				Code is Poetry — Click me!
 			</Item>
 		</ItemGroup>
-	</Popover>
+	</Flyout>
 );
 /* eslint-enable no-alert */
