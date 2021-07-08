@@ -1172,8 +1172,8 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $nodes as $metadata ) {
 			foreach ( $to_replace as $property_path ) {
 				$path = array_merge( $metadata['path'], $property_path );
-				$node = _wp_array_get( $incoming_data, $path, array() );
-				if ( ! empty( $node ) ) {
+				$node = _wp_array_get( $incoming_data, $path, null );
+				if ( isset( $node ) ) {
 					gutenberg_experimental_set( $this->theme_json, $path, $node );
 				}
 			}

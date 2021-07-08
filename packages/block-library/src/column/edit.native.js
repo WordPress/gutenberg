@@ -65,7 +65,7 @@ function ColumnEdit( {
 	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
 
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'layout.units' ) || [
+		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
 			'px',
 			'em',
