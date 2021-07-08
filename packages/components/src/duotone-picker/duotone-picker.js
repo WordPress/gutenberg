@@ -76,7 +76,7 @@ function DuotonePicker( {
 				</CircularOptionPicker.ButtonAction>
 			}
 		>
-			{ ! disableCustomColors && !disableCustomDuotone && (
+			{ ! disableCustomColors && ! disableCustomDuotone && (
 				<CustomDuotoneBar value={ value } onChange={ onChange } />
 			) }
 			{ ! disableCustomDuotone && (
