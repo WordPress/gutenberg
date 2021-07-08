@@ -116,7 +116,7 @@ export function __experimentalCloneSanitizedBlock(
 			...block.attributes,
 			...mergeAttributes,
 		},
-		true
+		{ shouldRemoveDuplicateAttributes: true }
 	);
 
 	return {

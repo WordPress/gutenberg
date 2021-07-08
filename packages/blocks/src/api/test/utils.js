@@ -280,12 +280,12 @@ describe( 'sanitizeBlockAttributes', () => {
 		} );
 	} );
 
-	it( 'does not strip unique attributes by default', () => {
+	it( 'does not strip non-duplicable attributes by default', () => {
 		registerBlockType( 'core/test-block', {
 			attributes: {
-				uniqueAttr: {
+				nonDupicableAttr: {
 					type: 'string',
-					unique: true,
+					duplicable: false,
 				},
 			},
 			title: 'Test block',
@@ -294,25 +294,25 @@ describe( 'sanitizeBlockAttributes', () => {
 		const attributes = __experimentalSanitizeBlockAttributes(
 			'core/test-block',
 			{
-				uniqueAttr: 'unique-value',
+				nonDupicableAttr: 'unique-value',
 			}
 		);
 
 		expect( attributes ).toEqual( {
-			uniqueAttr: 'unique-value',
+			nonDupicableAttr: 'unique-value',
 		} );
 	} );
 
-	it( 'sanitizes unique attributes and falls back to defaults when sanitizeUniqueAttributes is true', () => {
+	it( 'removes non-duplicable attributes and falls back to defaults when shouleRemoveDuplicateAttributes is true', () => {
 		registerBlockType( 'core/test-block', {
 			attributes: {
-				uniqueAttr: {
+				nonDuplicableAttr: {
 					type: 'string',
-					unique: true,
+					duplicable: false,
 				},
-				uniqueAttrWithDefault: {
+				nonDuplicableAttrWithDefault: {
 					type: 'string',
-					unique: true,
+					duplicable: false,
 					default: 'default-value',
 				},
 			},
@@ -322,14 +322,14 @@ describe( 'sanitizeBlockAttributes', () => {
 		const attributes = __experimentalSanitizeBlockAttributes(
 			'core/test-block',
 			{
-				uniqueAttr: 'unique-value',
-				uniqueAttrWithDefault: 'unique-non-default-value',
+				nonDuplicableAttr: 'unique-value',
+				nonDuplicableAttrWithDefault: 'unique-non-default-value',
 			},
-			true
+			{ shouldRemoveDuplicateAttributes: true }
 		);
 
 		expect( attributes ).toEqual( {
-			uniqueAttrWithDefault: 'default-value',
+			nonDuplicableAttrWithDefault: 'default-value',
 		} );
 	} );
 

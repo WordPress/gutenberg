@@ -167,17 +167,19 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 // }
 ```
 
-## Unique Attributes
+## Duplicable Attributes
 
-The `unique` key is used to mark block attributes that should not be copied when a block is duplicated. By default all attribute values will be cloned to the duplicate block. If an attribute sets the `unique` key to `true`, its value will not be copied, and it will instead fall back to the default value if one is supplied.
+The `duplicable` key is used to indicate whether a block attribute should be copied when a block is duplicated. If an attribute sets the `duplicable` key to `false`, its value will not be copied, and it will instead fall back to the default value if one is supplied. If the key is not explicitly set, the attribute will be considered duplicable by default.
 
-_Example_: A `resourceId` attribute is marked as `unique` so that it will not be copied to duplicate blocks.
+The `duplicable` key should not be used for attributes that are extracted from block content using an [attribute source](#common-sources).
+
+_Example_: A `resourceId` attribute which should not be copied to duplicate blocks.
 
 ```js
 {
 	resourceId: {
 		type: 'string',
-		unique: true
+		duplicable: false
 	}
 }
 ```
