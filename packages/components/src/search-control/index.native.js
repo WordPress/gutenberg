@@ -27,7 +27,7 @@ import {
  * Internal dependencies
  */
 import baseStyles from './style.scss';
-import platformStyles from './searchFormStyles.scss';
+import platformStyles from './platform-style.scss';
 
 // Merge platform specific styles
 for ( const selector in platformStyles ) {
@@ -115,17 +115,17 @@ function SearchControl( {
 	}, [ isActive, isDark ] );
 
 	const {
-		'inserter-search-form__container': containerStyle,
-		'inserter-search-form__input-container': inputContainerStyle,
-		'inserter-search-form__form-input': formInputStyle,
-		'inserter-search-form__form-input-placeholder': placeholderStyle,
-		'inserter-search-form__input-button': inputButtonStyle,
-		'inserter-search-form__input-button-left': inputButtonLeftStyle,
-		'inserter-search-form__input-button-right': inputButtonRightStyle,
-		'inserter-search-form__cancel-button': cancelButtonStyle,
-		'inserter-search-form__cancel-button-text': cancelButtonTextStyle,
-		'inserter-search-form__icon': iconStyle,
-		'inserter-search-form__right-icon': rightIconStyle,
+		'search-control__container': containerStyle,
+		'search-control__input-container': inputContainerStyle,
+		'search-control__form-input': formInputStyle,
+		'search-control__form-input-placeholder': placeholderStyle,
+		'search-control__input-button': inputButtonStyle,
+		'search-control__input-button-left': inputButtonLeftStyle,
+		'search-control__input-button-right': inputButtonRightStyle,
+		'search-control__cancel-button': cancelButtonStyle,
+		'search-control__cancel-button-text': cancelButtonTextStyle,
+		'search-control__icon': iconStyle,
+		'search-control__right-icon': rightIconStyle,
 	} = currentStyles;
 
 	function clearInput() {
