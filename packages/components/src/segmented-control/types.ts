@@ -2,7 +2,9 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { MutableRefObject, Ref } from 'react';
+import type { MutableRefObject, Ref, ReactNode } from 'react';
+// eslint-disable-next-line no-restricted-imports
+import type { RadioStateReturn } from 'reakit';
 
 /**
  * Internal dependencies
@@ -49,20 +51,6 @@ export type SegmentedControlProps = Omit<
 	 */
 	isBlock?: boolean;
 	/**
-	 * Options to render within `SegmentedControl`.
-	 *
-	 * @example
-	 * ```jsx
-	 * const options = [
-	 *  { value: 'elsa', label: 'Elsa' },
-	 *  { value: 'ana', label: 'Ana' },
-	 * ]
-	 *
-	 * const Heroes = <SegmentedControl options={options} />
-	 * ```
-	 */
-	options?: Array< SegmentedControlOption >;
-	/**
 	 * Callback when a segment is selected.
 	 */
 	onChange?: ( ...args: any ) => void;
@@ -70,6 +58,19 @@ export type SegmentedControlProps = Omit<
 	 * The value of `SegmentedControl`
 	 */
 	value?: string | number;
+	/**
+	 * React children
+	 */
+	children: ReactNode;
+};
+
+export type SegmentedControlRadioState = RadioStateReturn & {
+	/**
+	 * Renders `SegmentedControl` as a (CSS) block element.
+	 *
+	 * @default false
+	 */
+	isBlock?: boolean;
 };
 
 export type SegmentedControlButtonProps = {

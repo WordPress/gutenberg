@@ -11,7 +11,7 @@ import useResizeAware from 'react-resize-aware';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useMemo } from '@wordpress/element';
+import { useRef, useMemo, createContext, useContext } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -27,9 +27,14 @@ import * as styles from './styles';
 import { useUpdateEffect } from '../utils/hooks';
 import Backdrop from './segmented-control-backdrop';
 import Button from './segmented-control-button';
-import type { SegmentedControlProps } from './types';
+import type {
+	SegmentedControlProps,
+	SegmentedControlOption,
+	SegmentedControlRadioState,
+} from './types';
 
 const noop = () => {};
+const RadioContext = createContext( {} as SegmentedControlRadioState );
 
 function SegmentControl(
 	props: PolymorphicComponentProps< SegmentedControlProps, 'input' >,
@@ -42,9 +47,9 @@ function SegmentControl(
 		isBlock = false,
 		id,
 		label,
-		options = [],
 		onChange = noop,
 		value,
+		children,
 		...otherProps
 	} = useContextSystem( props, 'SegmentedControl' );
 
@@ -53,7 +58,7 @@ function SegmentControl(
 
 	const radio = useRadioState( {
 		baseId: baseId || id,
-		state: value || options[ 0 ]?.value,
+		state: value,
 	} );
 
 	// Propagate radio.state change
@@ -79,33 +84,26 @@ function SegmentControl(
 		[ className ]
 	);
 	return (
-		<RadioGroup
-			{ ...radio }
-			aria-label={ label }
-			as={ View }
-			className={ classes }
-			{ ...otherProps }
-			ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+		<RadioContext.Provider
+			value={ { ...radio, isBlock: ! isAdaptiveWidth } }
 		>
-			{ resizeListener }
-			<Backdrop
+			<RadioGroup
 				{ ...radio }
-				containerRef={ containerRef }
-				containerWidth={ sizes.width }
-			/>
-			{ options.map( ( option: any, index: number ) => {
-				const showSeparator = getShowSeparator( radio, index );
-				return (
-					<Button
-						{ ...radio }
-						{ ...option }
-						isBlock={ ! isAdaptiveWidth }
-						key={ option.value || index }
-						showSeparator={ showSeparator }
-					/>
-				);
-			} ) }
-		</RadioGroup>
+				aria-label={ label }
+				as={ View }
+				className={ classes }
+				{ ...otherProps }
+				ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+			>
+				{ resizeListener }
+				<Backdrop
+					{ ...radio }
+					containerRef={ containerRef }
+					containerWidth={ sizes.width }
+				/>
+				{ children }
+			</RadioGroup>
+		</RadioContext.Provider>
 	);
 }
 
@@ -128,4 +126,32 @@ function getShowSeparator( radio: any, index: number ) {
 	return showSeparator;
 }
 
-export default contextConnect( SegmentControl, 'SegmentControl' );
+function ControlOption(
+	props: PolymorphicComponentProps< SegmentedControlOption, 'input' >,
+	forwardedRef: import('react').Ref< any >
+) {
+	const radio = useContext( RadioContext );
+	const buttonProps = useContextSystem( props, 'SegmentedControlOption' );
+	const index = radio.items.findIndex(
+		( item: any ) => item.id === buttonProps.id
+	);
+	const showSeparator = getShowSeparator( radio, index );
+	return (
+		<Button
+			ref={ forwardedRef }
+			{ ...{ ...radio, ...buttonProps, showSeparator } }
+		/>
+	);
+}
+
+const ConnectedSegmentedControl: any = contextConnect(
+	SegmentControl,
+	'SegmentControl'
+);
+const ConnectedSegmentedControlOption = contextConnect(
+	ControlOption,
+	'SegmentedControlOption'
+);
+ConnectedSegmentedControl.Option = ConnectedSegmentedControlOption;
+
+export default ConnectedSegmentedControl;
