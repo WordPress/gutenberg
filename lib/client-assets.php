@@ -109,7 +109,7 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	 * Solution: fuse the two objects together to maintain backward compatibility.
 	 * For more context, see https://github.com/WordPress/gutenberg/issues/33203
 	 */
-	wp_add_inline_script(
+	$scripts->add_inline_script(
 		'wp-editor',
 		'Object.assign(window.wp.editor, window.wp.oldEditor);',
 		'after'
