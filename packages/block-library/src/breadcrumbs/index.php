@@ -34,16 +34,11 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		);
 	}
 
-	$separator    = '';
 	$inner_markup = '';
 
-	if ( isset( $attributes['separator'] ) ) {
-		$separator = $attributes['separator'];
-	}
-
-	foreach( array_reverse( $ancestor_ids ) as $index => $ancestor_id ) {
+	foreach ( array_reverse( $ancestor_ids ) as $index => $ancestor_id ) {
 		$show_separator = 0 !== $index || ! empty( $attributes['showLeadingSeparator'] );
-		$inner_markup .= build_block_core_breadcrumbs_inner_markup_item(
+		$inner_markup  .= build_block_core_breadcrumbs_inner_markup_item(
 			$ancestor_id,
 			$attributes,
 			$show_separator
@@ -52,14 +47,14 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 	if ( ! empty( $attributes['showCurrentPageTitle'] ) ) {
 		$show_separator = true;
-		$inner_markup .= build_block_core_breadcrumbs_inner_markup_item(
+		$inner_markup  .= build_block_core_breadcrumbs_inner_markup_item(
 			$post_id,
 			$attributes,
 			$show_separator
 		);
 	}
 
-	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
+	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
 	return sprintf(
@@ -73,9 +68,10 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
  * Builds the markup for a single Breadcrumb item.
  *
  * Used when iterating over a list of ancestor post ids.
- * @param int      $post_id        The post id for this item.
- * @param array    $attributes     Block attributes.
- * @param bool     $show_separator Whether to show the separator character where available.
+ *
+ * @param int   $post_id        The post id for this item.
+ * @param array $attributes     Block attributes.
+ * @param bool  $show_separator Whether to show the separator character where available.
  *
  * @return string The markup for a single breadcrumb item wrapped in an `li` element.
  */
