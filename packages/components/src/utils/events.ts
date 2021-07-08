@@ -22,7 +22,7 @@ function mergeEvent< TEvent extends Event >(
 }
 
 /**
- * Merges a set of event handlers together.
+ * Merges two sets of event handlers together.
  *
  * @template TEvent
  * @param  handlers
