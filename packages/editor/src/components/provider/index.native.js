@@ -82,10 +82,11 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities, updateSettings } = this.props;
+		const { capabilities, updateSettings, galleryRefactor } = this.props;
 
 		updateSettings( {
 			...capabilities,
+			...{ __experimentalGalleryRefactor: galleryRefactor },
 			...this.getThemeColors( this.props ),
 		} );
 
@@ -135,8 +136,10 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
 			( editorSettings ) => {
-				const themeColors = this.getThemeColors( editorSettings );
-				updateSettings( themeColors );
+				updateSettings(  {
+					...{ __experimentalGalleryRefactor: editorSettings.galleryRefactor },
+					...this.getThemeColors( editorSettings ),
+				} );
 			}
 		);
 
