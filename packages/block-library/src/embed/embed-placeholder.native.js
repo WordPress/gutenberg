@@ -8,42 +8,19 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import {
-	useBlockEditContext,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import EmbedBottomSheet from './embed-bottom-sheet';
 import styles from './styles.scss';
 
 const EmbedPlaceholder = ( {
 	icon,
-	isEditingURL,
 	isSelected,
 	label,
-	onFocus,
-	value,
-	onSubmit,
+	onPress,
 	cannotEmbed,
 } ) => {
-	const { clientId } = useBlockEditContext();
-	const { wasBlockJustInserted } = useSelect(
-		( select ) => ( {
-			wasBlockJustInserted: select(
-				blockEditorStore
-			).wasBlockJustInserted( clientId, 'inserter_menu' ),
-		} ),
-		[ clientId ]
-	);
-	const [ isEmbedSheetVisible, setIsEmbedSheetVisible ] = useState(
-		isSelected && ( ( wasBlockJustInserted && ! value ) || isEditingURL )
-	);
-
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles.embed__container,
 		styles[ 'embed__container--dark' ]
@@ -66,10 +43,7 @@ const EmbedPlaceholder = ( {
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
 				accessibilityHint={ __( 'Double tap to add a link.' ) }
-				onPress={ ( event ) => {
-					onFocus( event );
-					setIsEmbedSheetVisible( true );
-				} }
+				onPress={ onPress }
 				disabled={ ! isSelected }
 			>
 				<View style={ containerStyle }>
@@ -91,12 +65,6 @@ const EmbedPlaceholder = ( {
 					) }
 				</View>
 			</TouchableWithoutFeedback>
-			<EmbedBottomSheet
-				value={ value }
-				isVisible={ isEmbedSheetVisible }
-				onClose={ () => setIsEmbedSheetVisible( false ) }
-				onSubmit={ onSubmit }
-			/>
 		</>
 	);
 };

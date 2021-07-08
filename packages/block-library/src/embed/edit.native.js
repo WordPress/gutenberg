@@ -3,8 +3,6 @@
  */
 import {
 	createUpgradedEmbedBlock,
-	getClassNames,
-	fallback,
 	getAttributesFromPreview,
 	getEmbedInfoByProvider,
 } from './util';
@@ -13,31 +11,20 @@ import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
-
-/**
- * External dependencies
- */
-import classnames from 'classnames';
+import EmbedBottomSheet from './embed-bottom-sheet';
 
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { useState, useEffect, Platform } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useBlockProps } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import {
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
-
-function getResponsiveHelp( checked ) {
-	return checked
-		? __(
-				'This embed will preserve its aspect ratio when the browser is resized.'
-		  )
-		: __(
-				'This embed may not preserve its aspect ratio when the browser is resized.'
-		  );
-}
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -53,6 +40,7 @@ const EmbedEdit = ( props ) => {
 		setAttributes,
 		insertBlocksAfter,
 		onFocus,
+		clientId,
 	} = props;
 
 	const defaultEmbedInfo = {
@@ -63,21 +51,25 @@ const EmbedEdit = ( props ) => {
 		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;
 
 	const [ url, setURL ] = useState( attributesUrl );
-	const [ isEditingURL, setIsEditingURL ] = useState( false );
-	const { invalidateResolution } = useDispatch( coreStore );
 
-	const {
-		preview,
-		fetching,
-		themeSupportsResponsive,
-		cannotEmbed,
-	} = useSelect(
+	const { wasBlockJustInserted } = useSelect(
+		( select ) => ( {
+			wasBlockJustInserted: select(
+				blockEditorStore
+			).wasBlockJustInserted( clientId, 'inserter_menu' ),
+		} ),
+		[ clientId ]
+	);
+	const [ isEditingURL, setIsEditingURL ] = useState(
+		isSelected && wasBlockJustInserted && ! url
+	);
+
+	const { preview, fetching, cannotEmbed } = useSelect(
 		( select ) => {
 			const {
 				getEmbedPreview,
 				isPreviewEmbedFallback,
 				isRequestingEmbedPreview,
-				getThemeSupports,
 			} = select( coreStore );
 			if ( ! attributesUrl ) {
 				return { fetching: false, cannotEmbed: false };
@@ -102,9 +94,6 @@ const EmbedEdit = ( props ) => {
 			return {
 				preview: validPreview ? embedPreview : undefined,
 				fetching: isRequestingEmbedPreview( attributesUrl ),
-				themeSupportsResponsive: getThemeSupports()[
-					'responsive-embeds'
-				],
 				cannotEmbed: ! validPreview || previewIsFallback,
 			};
 		},
@@ -126,21 +115,6 @@ const EmbedEdit = ( props ) => {
 				allowResponsive
 			),
 		};
-	};
-
-	const toggleResponsive = () => {
-		const { allowResponsive, className } = attributes;
-		const { html } = preview;
-		const newAllowResponsive = ! allowResponsive;
-
-		setAttributes( {
-			allowResponsive: newAllowResponsive,
-			className: getClassNames(
-				html,
-				className,
-				responsive && newAllowResponsive
-			),
-		} );
 	};
 
 	useEffect( () => {
@@ -190,84 +164,58 @@ const EmbedEdit = ( props ) => {
 		);
 	}
 
-	// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
-	const label = sprintf( __( '%s URL' ), title );
-
-	const onSubmit = ( event ) => {
-		if ( event ) {
-			event.preventDefault();
-		}
+	const onSubmit = ( value ) => {
+		// On native, the URL change is only notified when submitting,
+		// and not via 'onChange', so we have to explicitly set the URL.
+		setURL( value );
 
 		setIsEditingURL( false );
-		setAttributes( { url } );
+		setAttributes( { url: value } );
 	};
 
-	// No preview, or we can't embed the current URL, or we've clicked the edit button.
-	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
-
-	if ( showEmbedPlaceholder ) {
-		return (
-			<View { ...blockProps }>
-				<EmbedPlaceholder
-					icon={ icon }
-					label={ label }
-					onFocus={ onFocus }
-					onSubmit={ onSubmit }
-					value={ url }
-					cannotEmbed={ cannotEmbed }
-					onChange={ ( event ) => setURL( event.target.value ) }
-					fallback={ () => fallback( url, onReplace ) }
-					tryAgain={ () => {
-						invalidateResolution( 'getEmbedPreview', [ url ] );
-					} }
-				/>
-			</View>
-		);
-	}
-
-	// Even though we set attributes that get derived from the preview,
-	// we don't access them directly because for the initial render,
-	// the `setAttributes` call will not have taken effect. If we're
-	// rendering responsive content, setting the responsive classes
-	// after the preview has been rendered can result in unwanted
-	// clipping or scrollbars. The `getAttributesFromPreview` function
-	// that `getMergedAttributes` uses is memoized so that we're not
-	const {
-		caption,
-		type,
-		allowResponsive,
-		className: classFromPreview,
-	} = getMergedAttributes();
-	const className = classnames( classFromPreview, props.className );
+	const showEmbedPlaceholder = ! preview || cannotEmbed;
 
 	return (
 		<>
-			<EmbedControls
-				showEditButton={ preview && ! cannotEmbed }
-				themeSupportsResponsive={ themeSupportsResponsive }
-				blockSupportsResponsive={ responsive }
-				allowResponsive={ allowResponsive }
-				getResponsiveHelp={ getResponsiveHelp }
-				toggleResponsive={ toggleResponsive }
-				switchBackToURLInput={ () => setIsEditingURL( true ) }
+			{ showEmbedPlaceholder ? (
+				<View { ...blockProps }>
+					<EmbedPlaceholder
+						icon={ icon }
+						isSelected={ isSelected }
+						label={ title }
+						onPress={ ( event ) => {
+							onFocus( event );
+							setIsEditingURL( true );
+						} }
+						cannotEmbed={ cannotEmbed }
+					/>
+				</View>
+			) : (
+				<>
+					<EmbedControls
+						showEditButton={ preview && ! cannotEmbed }
+						switchBackToURLInput={ () => setIsEditingURL( true ) }
+					/>
+					<View { ...blockProps }>
+						<EmbedPreview
+							clientId={ clientId }
+							icon={ icon }
+							insertBlocksAfter={ insertBlocksAfter }
+							isSelected={ isSelected }
+							label={ title }
+							preview={ preview }
+							previewable={ previewable }
+							url={ url }
+						/>
+					</View>
+				</>
+			) }
+			<EmbedBottomSheet
+				value={ url }
+				isVisible={ isEditingURL }
+				onClose={ () => setIsEditingURL( false ) }
+				onSubmit={ onSubmit }
 			/>
-			<View { ...blockProps }>
-				<EmbedPreview
-					preview={ preview }
-					previewable={ previewable }
-					className={ className }
-					url={ url }
-					type={ type }
-					caption={ caption }
-					onCaptionChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					isSelected={ isSelected }
-					icon={ icon }
-					label={ label }
-					insertBlocksAfter={ insertBlocksAfter }
-				/>
-			</View>
 		</>
 	);
 };
