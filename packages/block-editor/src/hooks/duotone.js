@@ -21,6 +21,8 @@ import {
 	useSetting,
 } from '../components';
 
+const EMPTY_ARRAY = [];
+
 /**
  * Convert a list of colors to an object of R, G, and B values.
  *
@@ -124,14 +126,14 @@ function DuotonePanel( { name, attributes, setAttributes } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
 
-	const duotonePalette = useSetting( 'color.duotone' );
-	const colorPalette = useSetting( 'color.palette' );
+	const duotonePalette = useSetting( 'color.duotone' ) || EMPTY_ARRAY;
+	const colorPalette = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const disableCustomColors = ! useSetting( 'color.custom' );
 
 	if (
 		! hasBlockSupport( name, 'color.__experimentalDuotone' ) ||
-		( ( ! duotonePalette || duotonePalette?.length === 0 ) &&
-			( ! colorPalette || colorPalette?.length === 0 ) &&
+		( duotonePalette?.length === 0 &&
+			colorPalette?.length === 0 &&
 			disableCustomColors )
 	) {
 		return null;
