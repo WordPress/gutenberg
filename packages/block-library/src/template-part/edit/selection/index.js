@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalSearchForm as SearchForm } from '@wordpress/block-editor';
+import { SearchControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 /**
@@ -34,7 +34,7 @@ export default function TemplatePartSelection( {
 			onKeyPress={ stopKeyPropagation }
 			onKeyDown={ preventArrowKeysPropagation }
 		>
-			<SearchForm
+			<SearchControl
 				value={ filterValue }
 				onChange={ setFilterValue }
 				className="wp-block-template-part__selection-preview-search-form"

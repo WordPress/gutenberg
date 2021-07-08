@@ -6,6 +6,7 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
+		{ "path": "../compose" },
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
 		{ "path": "../element" },
@@ -28,6 +29,7 @@
 		"src/draggable/**/*",
 		"src/elevation/**/*",
 		"src/flex/**/*",
+		"src/flyout/**/*",
 		"src/form-group/**/*",
 		"src/grid/**/*",
 		"src/h-stack/**/*",

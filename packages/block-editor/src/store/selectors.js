@@ -1215,17 +1215,7 @@ export function getBlockInsertionPoint( state ) {
  * @return {?boolean} Whether the insertion point is visible or not.
  */
 export function isBlockInsertionPointVisible( state ) {
-	const insertionPoint = state.insertionPoint;
-
-	if ( ! state.insertionPoint ) {
-		return false;
-	}
-
-	if ( getTemplateLock( state, insertionPoint.rootClientId ) ) {
-		return false;
-	}
-
-	return true;
+	return state.insertionPoint !== null;
 }
 
 /**

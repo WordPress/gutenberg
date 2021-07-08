@@ -63,7 +63,7 @@ module.exports = {
 			},
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
-		'@wordpress/data-no-store-string-literals': 'warn',
+		'@wordpress/data-no-store-string-literals': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
@@ -95,6 +95,11 @@ module.exports = {
 						name: 'puppeteer-testing-library',
 						message:
 							'`puppeteer-testing-library` is still experimental.',
+					},
+					{
+						name: '@emotion/css',
+						message:
+							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support',
 					},
 				],
 			},
@@ -175,6 +180,12 @@ module.exports = {
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
 				'@wordpress/data-no-store-string-literals': 'off',
+			},
+		},
+		{
+			files: [ 'packages/react-native-*/**/*.js' ],
+			settings: {
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
 			},
 		},
 		{

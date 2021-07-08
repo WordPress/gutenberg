@@ -23,7 +23,6 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import TemplateTitle from '../template-title';
 import { store as editPostStore } from '../../../store';
 
 const preventDefault = ( event ) => {
@@ -67,7 +66,7 @@ function HeaderToolbar() {
 			showIconLabels: isFeatureActive( 'showIconLabels' ),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
-				'core/edit-post/toggle-block-navigation'
+				'core/edit-post/toggle-list-view'
 			),
 		};
 	}, [] );
@@ -164,8 +163,6 @@ function HeaderToolbar() {
 					</>
 				) }
 			</div>
-
-			<TemplateTitle />
 		</NavigableToolbar>
 	);
 }

@@ -273,7 +273,7 @@ _Parameters_
 
 -   _object_ `object`: Object reference to create an id for.
 -   _prefix_ `[string]`: Prefix for the unique id.
--   _preferredId_ `[string]`: Default ID to use.
+-   _preferredId_ `[string | number]`: Default ID to use.
 
 _Returns_
 

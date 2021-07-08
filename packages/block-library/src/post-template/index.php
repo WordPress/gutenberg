@@ -61,7 +61,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 				)
 			)
 		)->render( array( 'dynamic' => false ) );
-		$content      .= "<li>{$block_content}</li>";
+		$post_classes  = esc_attr( implode( ' ', get_post_class( 'wp-block-post' ) ) );
+		$content      .= '<li class="' . $post_classes . '">' . $block_content . '</li>';
 	}
 
 	wp_reset_postdata();
@@ -103,7 +104,7 @@ add_action( 'init', 'register_block_core_post_template' );
 function render_legacy_query_loop_block( $attributes, $content, $block ) {
 	trigger_error(
 		/* translators: %1$s: Block type */
-		sprintf( __( 'Block %1$s has been renamed to Post Template. %1$s will be supported until WordPress version 5.9.', 'gutenberg' ), $block->name ),
+		sprintf( __( 'Block %1$s has been renamed to Post Template. %1$s will be supported until WordPress version 5.9.' ), $block->name ),
 		headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
 	);
 	return render_block_core_post_template( $attributes, $content, $block );

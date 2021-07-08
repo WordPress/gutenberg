@@ -18,8 +18,18 @@ import { compose } from '@wordpress/compose';
 
 const migrateBorderRadius = ( attributes ) => {
 	const { borderRadius, ...newAttributes } = attributes;
-
-	if ( ! borderRadius && borderRadius !== 0 ) {
+	// We have to check old property `borderRadius` and if
+	// `styles.border.radius` is a `number`
+	const oldBorderRadius = [
+		borderRadius,
+		newAttributes.style?.border?.radius,
+	].find( ( possibleBorderRadius ) => {
+		return (
+			typeof possibleBorderRadius === 'number' &&
+			possibleBorderRadius !== 0
+		);
+	} );
+	if ( ! oldBorderRadius ) {
 		return newAttributes;
 	}
 
@@ -27,7 +37,10 @@ const migrateBorderRadius = ( attributes ) => {
 		...newAttributes,
 		style: {
 			...newAttributes.style,
-			border: { radius: borderRadius },
+			border: {
+				...newAttributes.style?.border,
+				radius: `${ oldBorderRadius }px`,
+			},
 		},
 	};
 };
@@ -100,6 +113,112 @@ const blockAttributes = {
 };
 
 const deprecated = [
+	{
+		supports: {
+			anchor: true,
+			align: true,
+			alignWide: false,
+			color: {
+				__experimentalSkipSerialization: true,
+				gradients: true,
+			},
+			typography: {
+				fontSize: true,
+				__experimentalFontFamily: true,
+			},
+			reusable: false,
+			__experimentalSelector: '.wp-block-button__link',
+		},
+		attributes: {
+			...blockAttributes,
+			linkTarget: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'target',
+			},
+			rel: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'rel',
+			},
+			placeholder: {
+				type: 'string',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+			gradient: {
+				type: 'string',
+			},
+			width: {
+				type: 'number',
+			},
+		},
+		isEligible( { style } ) {
+			return typeof style?.border?.radius === 'number';
+		},
+		save( { attributes, className } ) {
+			const {
+				fontSize,
+				linkTarget,
+				rel,
+				style,
+				text,
+				title,
+				url,
+				width,
+			} = attributes;
+
+			if ( ! text ) {
+				return null;
+			}
+
+			const borderRadius = style?.border?.radius;
+			const colorProps = getColorClassesAndStyles( attributes );
+			const buttonClasses = classnames(
+				'wp-block-button__link',
+				colorProps.className,
+				{
+					'no-border-radius': style?.border?.radius === 0,
+				}
+			);
+			const buttonStyle = {
+				borderRadius: borderRadius ? borderRadius : undefined,
+				...colorProps.style,
+			};
+
+			// The use of a `title` attribute here is soft-deprecated, but still applied
+			// if it had already been assigned, for the sake of backward-compatibility.
+			// A title will no longer be assigned for new or updated button block links.
+
+			const wrapperClasses = classnames( className, {
+				[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+				[ `has-custom-font-size` ]:
+					fontSize || style?.typography?.fontSize,
+			} );
+
+			return (
+				<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+					<RichText.Content
+						tagName="a"
+						className={ buttonClasses }
+						href={ url }
+						title={ title }
+						style={ buttonStyle }
+						value={ text }
+						target={ linkTarget }
+						rel={ rel }
+					/>
+				</div>
+			);
+		},
+		migrate: migrateBorderRadius,
+	},
 	{
 		supports: {
 			anchor: true,

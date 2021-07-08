@@ -1,20 +1,15 @@
-( function() {
-	var Button = wp.components.Button;
-	var PanelBody = wp.components.PanelBody;
-	var PanelRow = wp.components.PanelRow;
-	var compose = wp.compose.compose;
-	var withDispatch = wp.data.withDispatch;
-	var withSelect = wp.data.withSelect;
-	var select = wp.data.select;
-	var dispatch = wp.data.dispatch;
-	var PlainText = wp.blockEditor.PlainText;
-	var Fragment = wp.element.Fragment;
-	var el = wp.element.createElement;
-	var Component = wp.element.Component;
-	var __ = wp.i18n.__;
-	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
-	var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+( function () {
+	const Button = wp.components.Button;
+	const PanelBody = wp.components.PanelBody;
+	const select = wp.data.select;
+	const dispatch = wp.data.dispatch;
+	const Fragment = wp.element.Fragment;
+	const el = wp.element.createElement;
+	const Component = wp.element.Component;
+	const __ = wp.i18n.__;
+	const registerPlugin = wp.plugins.registerPlugin;
+	const PluginSidebar = wp.editPost.PluginSidebar;
+	const PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
 
 	class SidebarContents extends Component {
 		constructor( props ) {
@@ -23,47 +18,45 @@
 			this.state = {
 				start: 0,
 				end: 0,
-			}
+			};
 		}
 
 		render() {
 			return el(
 				PanelBody,
 				{},
-				el(
-					'input',
-					{
-						type: 'number',
-						id: 'annotations-tests-range-start',
-						onChange: ( reactEvent ) => {
-							this.setState( {
-								start: reactEvent.target.value,
-							} );
-						},
-						value: this.state.start,
-					}
-				),
-				el(
-					'input',
-					{
-						type: 'number',
-						id: 'annotations-tests-range-end',
-						onChange: ( reactEvent ) => {
-							this.setState( {
-								end: reactEvent.target.value,
-							} );
-						},
-						value: this.state.end,
-					}
-				),
+				el( 'input', {
+					type: 'number',
+					id: 'annotations-tests-range-start',
+					onChange: ( reactEvent ) => {
+						this.setState( {
+							start: reactEvent.target.value,
+						} );
+					},
+					value: this.state.start,
+				} ),
+				el( 'input', {
+					type: 'number',
+					id: 'annotations-tests-range-end',
+					onChange: ( reactEvent ) => {
+						this.setState( {
+							end: reactEvent.target.value,
+						} );
+					},
+					value: this.state.end,
+				} ),
 				el(
 					Button,
 					{
 						variant: "primary",
 						onClick: () => {
-							dispatch( 'core/annotations' ).__experimentalAddAnnotation( {
+							dispatch(
+								'core/annotations'
+							).__experimentalAddAnnotation( {
 								source: 'e2e-tests',
-								blockClientId: select( 'core/block-editor' ).getBlockOrder()[ 0 ],
+								blockClientId: select(
+									'core/block-editor'
+								).getBlockOrder()[ 0 ],
 								richTextIdentifier: 'content',
 								range: {
 									start: parseInt( this.state.start, 10 ),
@@ -79,8 +72,12 @@
 					{
 						variant: "primary",
 						onClick: () => {
-							dispatch( 'core/annotations' ).__experimentalRemoveAnnotationsBySource( 'e2e-tests' );
-						}
+							dispatch(
+								'core/annotations'
+							).__experimentalRemoveAnnotationsBySource(
+								'e2e-tests'
+							);
+						},
 					},
 
 					__( 'Remove annotations' )
@@ -97,17 +94,14 @@
 				PluginSidebar,
 				{
 					name: 'annotations-sidebar',
-					title: __( 'Annotations Sidebar' )
+					title: __( 'Annotations Sidebar' ),
 				},
-				el(
-					SidebarContents,
-					{}
-				)
+				el( SidebarContents, {} )
 			),
 			el(
 				PluginSidebarMoreMenuItem,
 				{
-					target: 'annotations-sidebar'
+					target: 'annotations-sidebar',
 				},
 				__( 'Annotations Sidebar' )
 			)
@@ -116,6 +110,6 @@
 
 	registerPlugin( 'annotations-sidebar', {
 		icon: 'text',
-		render: AnnotationsSidebar
+		render: AnnotationsSidebar,
 	} );
 } )();

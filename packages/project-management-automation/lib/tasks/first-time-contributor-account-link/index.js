@@ -5,7 +5,7 @@ const debug = require( '../../debug' );
 const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 const hasWordPressProfile = require( '../../has-wordpress-profile' );
 
-/** @typedef {import('@actions/github').GitHub} GitHub */
+/** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
 /** @typedef {import('../../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
@@ -65,7 +65,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		`first-time-contributor-account-link: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
-	const { data: commits } = await octokit.repos.listCommits( {
+	const { data: commits } = await octokit.rest.repos.listCommits( {
 		owner,
 		repo,
 		author,
@@ -103,7 +103,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		'first-time-contributor-account-link: User not known. Adding comment to prompt for account link.'
 	);
 
-	await octokit.issues.createComment( {
+	await octokit.rest.issues.createComment( {
 		owner,
 		repo,
 		issue_number: pullRequest,

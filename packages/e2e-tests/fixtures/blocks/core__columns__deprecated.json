@@ -3,7 +3,9 @@
 		"clientId": "_clientId_0",
 		"name": "core/columns",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"isStackedOnMobile": true
+		},
 		"innerBlocks": [
 			{
 				"clientId": "_clientId_0",

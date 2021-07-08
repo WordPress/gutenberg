@@ -33,14 +33,9 @@ provideToNativeHtml.mockImplementation( ( html ) => {
 	serializedHtml = html;
 } );
 
-export async function initializeEditor( { initialHtml } ) {
+export async function initializeEditor( props ) {
 	const renderResult = render(
-		<Editor
-			postId={ 0 }
-			postType="post"
-			initialTitle="test"
-			initialHtml={ initialHtml }
-		/>
+		<Editor postId={ 0 } postType="post" initialTitle="test" { ...props } />
 	);
 	const { getByTestId } = renderResult;
 

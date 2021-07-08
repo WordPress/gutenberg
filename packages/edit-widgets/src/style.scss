@@ -50,13 +50,19 @@ body.widgets-php {
 	}
 }
 
-.blocks-widgets-container .editor-style-wrapper {
+.blocks-widgets-container .editor-styles-wrapper {
 	max-width: $widget-area-width;
 	margin: auto;
 }
 
 .edit-widgets-sidebar .components-button.interface-complementary-area__pin-unpin-item {
 	display: none;
+}
+
+// Don't display admin notices on the Widgets screen.
+// Needs !important because plugins may add inline styles to notices.
+.widgets-php .notice {
+	display: none !important;
 }
 
 @include wordpress-admin-schemes();

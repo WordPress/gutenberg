@@ -29,13 +29,13 @@ lodash.debounce = jest.fn( ( callback ) => {
 const mockFetchSearchSuggestions = jest.fn();
 
 /**
- * The call to the real method `fetchRemoteUrlData` is wrapped in a promise in order to make it cancellable.
- * Therefore if we pass any value as the mock of `fetchRemoteUrlData` then ALL of the tests will require
- * addition code to handle the async nature of `fetchRemoteUrlData`. This is unecessary. Instead we default
- * to an undefined value which will ensure that the code under test does not call `fetchRemoteUrlData`. Only
+ * The call to the real method `fetchRichUrlData` is wrapped in a promise in order to make it cancellable.
+ * Therefore if we pass any value as the mock of `fetchRichUrlData` then ALL of the tests will require
+ * addition code to handle the async nature of `fetchRichUrlData`. This is unecessary. Instead we default
+ * to an undefined value which will ensure that the code under test does not call `fetchRichUrlData`. Only
  * when we are testing the "rich previews" to we update this value with a true mock.
  */
-let mockFetchRemoteUrlData;
+let mockFetchRichUrlData;
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test
@@ -44,7 +44,7 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 } );
 useSelect.mockImplementation( () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
-	fetchRemoteUrlData: mockFetchRemoteUrlData,
+	fetchRichUrlData: mockFetchRichUrlData,
 } ) );
 
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
@@ -78,7 +78,7 @@ afterEach( () => {
 	container.remove();
 	container = null;
 	mockFetchSearchSuggestions.mockReset();
-	mockFetchRemoteUrlData?.mockReset(); // conditionally reset as it may NOT be a mock
+	mockFetchRichUrlData?.mockReset(); // conditionally reset as it may NOT be a mock
 } );
 
 function getURLInput() {
@@ -227,6 +227,49 @@ describe( 'Basic rendering', () => {
 			expect( isEditing() ).toBe( false );
 		} );
 	} );
+
+	describe( 'Unlinking', () => {
+		it( 'should not show "Unlink" button if no onRemove handler is provided', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			const unLinkButton = queryByRole( container, 'button', {
+				name: 'Unlink',
+			} );
+
+			expect( unLinkButton ).toBeNull();
+			expect( unLinkButton ).not.toBeInTheDocument();
+		} );
+
+		it( 'should show "Unlink" button if a onRemove handler is provided', () => {
+			const mockOnRemove = jest.fn();
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						onRemove={ mockOnRemove }
+					/>,
+					container
+				);
+			} );
+
+			const unLinkButton = queryByRole( container, 'button', {
+				name: 'Unlink',
+			} );
+			expect( unLinkButton ).toBeTruthy();
+			expect( unLinkButton ).toBeInTheDocument();
+
+			act( () => {
+				Simulate.click( unLinkButton );
+			} );
+
+			expect( mockOnRemove ).toHaveBeenCalled();
+		} );
+	} );
 } );
 
 describe( 'Searching for a link', () => {
@@ -369,6 +412,31 @@ describe( 'Searching for a link', () => {
 		// the fetch handler in our test so we need to assert it would be called
 		// correctly in a real world scenario.
 		expect( mockFetchSuggestionsFirstArg ).toEqual( 'Hello' );
+	} );
+
+	it( 'should not call search handler when showSuggestions is false', async () => {
+		act( () => {
+			render( <LinkControl showSuggestions={ false } />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'anything' },
+			} );
+		} );
+
+		const searchResultElements = getSearchResults();
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		expect( searchResultElements ).toHaveLength( 0 );
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 	} );
 
 	it.each( [
@@ -1738,16 +1806,16 @@ describe( 'Rich link previews', () => {
 
 	beforeAll( () => {
 		/**
-		 * These tests require that we exercise the `fetchRemoteUrlData` function.
+		 * These tests require that we exercise the `fetchRichUrlData` function.
 		 * We are therefore overwriting the mock "placeholder" with a true jest mock
 		 * which will cause the code under test to execute the code which fetches
 		 * rich previews.
 		 */
-		mockFetchRemoteUrlData = jest.fn();
+		mockFetchRichUrlData = jest.fn();
 	} );
 
 	it( 'should not fetch or display rich previews by default', async () => {
-		mockFetchRemoteUrlData.mockImplementation( () =>
+		mockFetchRichUrlData.mockImplementation( () =>
 			Promise.resolve( {
 				title:
 					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
@@ -1762,7 +1830,7 @@ describe( 'Rich link previews', () => {
 			render( <LinkControl value={ selectedLink } />, container );
 		} );
 
-		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		// mockFetchRichUrlData resolves on next "tick" of event loop
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -1773,12 +1841,12 @@ describe( 'Rich link previews', () => {
 
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
 
-		expect( mockFetchRemoteUrlData ).not.toHaveBeenCalled();
+		expect( mockFetchRichUrlData ).not.toHaveBeenCalled();
 		expect( isRichLinkPreview ).toBe( false );
 	} );
 
 	it( 'should display a rich preview when data is available', async () => {
-		mockFetchRemoteUrlData.mockImplementation( () =>
+		mockFetchRichUrlData.mockImplementation( () =>
 			Promise.resolve( {
 				title:
 					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
@@ -1796,7 +1864,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		// mockFetchRichUrlData resolves on next "tick" of event loop
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -1811,7 +1879,7 @@ describe( 'Rich link previews', () => {
 	} );
 
 	it( 'should display a fallback when title is missing from rich data', async () => {
-		mockFetchRemoteUrlData.mockImplementation( () =>
+		mockFetchRichUrlData.mockImplementation( () =>
 			Promise.resolve( {
 				icon: 'https://s.w.org/favicon.ico?2',
 				description:
@@ -1827,7 +1895,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		// mockFetchRichUrlData resolves on next "tick" of event loop
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -1849,7 +1917,7 @@ describe( 'Rich link previews', () => {
 	} );
 
 	it( 'should display a fallback when icon is missing from rich data', async () => {
-		mockFetchRemoteUrlData.mockImplementation( () =>
+		mockFetchRichUrlData.mockImplementation( () =>
 			Promise.resolve( {
 				title:
 					'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
@@ -1866,7 +1934,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		// mockFetchRichUrlData resolves on next "tick" of event loop
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -1892,7 +1960,7 @@ describe( 'Rich link previews', () => {
 	it.each( [ 'image', 'description' ] )(
 		'should display a fallback placeholder when %s it is missing from the rich data',
 		async ( dataItem ) => {
-			mockFetchRemoteUrlData.mockImplementation( () => {
+			mockFetchRichUrlData.mockImplementation( () => {
 				const data = {
 					title:
 						'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
@@ -1912,7 +1980,7 @@ describe( 'Rich link previews', () => {
 				);
 			} );
 
-			// mockFetchRemoteUrlData resolves on next "tick" of event loop
+			// mockFetchRichUrlData resolves on next "tick" of event loop
 			await act( async () => {
 				await eventLoopTick();
 			} );
@@ -1940,7 +2008,7 @@ describe( 'Rich link previews', () => {
 	] )(
 		'should not display a rich preview when data is %s',
 		async ( _descriptor, data ) => {
-			mockFetchRemoteUrlData.mockImplementation( () =>
+			mockFetchRichUrlData.mockImplementation( () =>
 				Promise.resolve( data )
 			);
 
@@ -1951,7 +2019,7 @@ describe( 'Rich link previews', () => {
 				);
 			} );
 
-			// mockFetchRemoteUrlData resolves on next "tick" of event loop
+			// mockFetchRichUrlData resolves on next "tick" of event loop
 			await act( async () => {
 				await eventLoopTick();
 			} );
@@ -1971,7 +2039,7 @@ describe( 'Rich link previews', () => {
 	it( 'should display in loading state when rich data is being fetched', async () => {
 		const nonResolvingPromise = () => new Promise( () => {} );
 
-		mockFetchRemoteUrlData.mockImplementation( nonResolvingPromise );
+		mockFetchRichUrlData.mockImplementation( nonResolvingPromise );
 
 		act( () => {
 			render(
@@ -1980,7 +2048,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		// mockFetchRichUrlData resolves on next "tick" of event loop
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2001,7 +2069,7 @@ describe( 'Rich link previews', () => {
 	it( 'should remove fetching UI indicators and fallback to standard preview if request for rich preview results in an error', async () => {
 		const simulateFailedFetch = () => Promise.reject();
 
-		mockFetchRemoteUrlData.mockImplementation( simulateFailedFetch );
+		mockFetchRichUrlData.mockImplementation( simulateFailedFetch );
 
 		act( () => {
 			render(
@@ -2010,7 +2078,7 @@ describe( 'Rich link previews', () => {
 			);
 		} );
 
-		// mockFetchRemoteUrlData resolves on next "tick" of event loop
+		// mockFetchRichUrlData resolves on next "tick" of event loop
 		await act( async () => {
 			await eventLoopTick();
 		} );
@@ -2031,6 +2099,6 @@ describe( 'Rich link previews', () => {
 
 	afterAll( () => {
 		// Remove the mock to avoid edge cases in other tests.
-		mockFetchRemoteUrlData = undefined;
+		mockFetchRichUrlData = undefined;
 	} );
 } );

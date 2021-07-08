@@ -12,12 +12,14 @@ import {
 	Text,
 } from 'react-native';
 import { map, uniq } from 'lodash';
+
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */

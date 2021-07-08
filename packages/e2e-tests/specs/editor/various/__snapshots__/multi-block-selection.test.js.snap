@@ -94,6 +94,16 @@ exports[`Multi-block selection should gradually multi-select 2`] = `
 <!-- /wp:columns -->"
 `;
 
+exports[`Multi-block selection should multi-select from within the list block 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li>1</li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`Multi-block selection should not multi select single block 1`] = `
 "<!-- wp:paragraph -->
 <p></p>

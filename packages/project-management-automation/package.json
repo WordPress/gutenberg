@@ -22,8 +22,8 @@
 	"main": "lib/index.js",
 	"types": "build-types",
 	"dependencies": {
-		"@actions/core": "^1.0.0",
-		"@actions/github": "^1.0.0",
+		"@actions/core": "^1.4.0",
+		"@actions/github": "^5.0.0",
 		"@babel/runtime": "^7.13.10"
 	},
 	"publishConfig": {

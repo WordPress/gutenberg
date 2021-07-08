@@ -1,7 +1,20 @@
 /**
  * External dependencies
  */
-import 'react-native-gesture-handler/jestSetup';
+import { NativeModules as RNNativeModules } from 'react-native';
+
+RNNativeModules.UIManager = RNNativeModules.UIManager || {};
+RNNativeModules.UIManager.RCTView = RNNativeModules.UIManager.RCTView || {};
+RNNativeModules.RNGestureHandlerModule = RNNativeModules.RNGestureHandlerModule || {
+	State: { BEGAN: 'BEGAN', FAILED: 'FAILED', ACTIVE: 'ACTIVE', END: 'END' },
+	attachGestureHandler: jest.fn(),
+	createGestureHandler: jest.fn(),
+	dropGestureHandler: jest.fn(),
+	updateGestureHandler: jest.fn(),
+};
+RNNativeModules.PlatformConstants = RNNativeModules.PlatformConstants || {
+	forceTouchAvailable: false,
+};
 
 // Mock component to render with props rather than merely a string name so that
 // we may assert against it. ...args is used avoid warnings about ignoring
@@ -35,11 +48,12 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeFeaturedImageIdNativeUpdated: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
 		subscribeAndroidModalClosed: jest.fn(),
-		subscribeUpdateTheme: jest.fn(),
+		subscribeUpdateEditorSettings: jest.fn(),
 		subscribePreferredColorScheme: () => 'light',
 		subscribeUpdateCapabilities: jest.fn(),
 		subscribeShowNotice: jest.fn(),
 		subscribeParentGetHtml: jest.fn(),
+		subscribeShowEditorHelp: jest.fn(),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
@@ -142,7 +156,7 @@ jest.mock( 'react-native-reanimated', () => {
 // Silence the warning: Animated: `useNativeDriver` is not supported because the
 // native animated module is missing. This was added per React Navigation docs.
 // https://reactnavigation.org/docs/testing/#mocking-native-modules
-jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
+jest.mock( 'react-native/Libraries/Animated/NativeAnimatedHelper' );
 
 // We currently reference TextStateInput (a private module) within
 // react-native-aztec/src/AztecView. Doing so requires that we mock it via its
@@ -165,3 +179,14 @@ jest.mock(
 		} ) ),
 	} )
 );
+
+// Silences the warning: dispatchCommand was called with a ref that isn't a native
+// component. Use React.forwardRef to get access to the underlying native component.
+// This is a known bug of react-native-testing-library package:
+// https://github.com/callstack/react-native-testing-library/issues/329#issuecomment-737307473
+jest.mock( 'react-native/Libraries/Components/Switch/Switch', () => {
+	const jestMockComponent = require( 'react-native/jest/mockComponent' );
+	return jestMockComponent(
+		'react-native/Libraries/Components/Switch/Switch'
+	);
+} );

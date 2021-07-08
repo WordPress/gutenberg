@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Plugin scaffolded with the `esnext` template requires WordPress 5.8 now ([#33252](https://github.com/WordPress/gutenberg/pull/33252).
+-   Block scaffolded with the `esnext` template is now registered from `block.json` with the `register_block_type` helper ([#33252](https://github.com/WordPress/gutenberg/pull/33252)).
+
 ## 2.3.0 (2021-04-29)
 
 ### Enhancement

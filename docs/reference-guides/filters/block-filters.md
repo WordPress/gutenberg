@@ -2,13 +2,56 @@
 
 To modify the behavior of existing blocks, WordPress exposes several APIs:
 
-## Filters
+## Registration
 
-The following filters are available to extend the settings for existing blocks.
+The following filters are available to extend the settings for blocks during their registration.
+
+### `block_type_metadata`
+
+Filters the raw metadata loaded from the `block.json` file when registering a block type on the server with PHP. It allows applying modifications before the metadata gets processed.
+
+The filter takes one param:
+
+-   `$metadata` (`array`) – metadata loaded from `block.json` for registering a block type.
+
+_Example_:
+
+```php
+<?php
+
+function filter_metadata_registration( $metadata ) {
+	$metadata['apiVersion'] = 1;
+	return $metadata;
+};
+add_filter( 'block_type_metadata', 'filter_metadata_registration', 10, 2 );
+
+register_block_type( __DIR__ );
+```
+
+### `block_type_metadata_settings`
+
+Filters the settings determined from the processed block type metadata. It makes it possible to apply custom modifications using the block metadata that isn’t handled by default.
+
+The filter takes two params:
+
+-   `$settings` (`array`) – Array of determined settings for registering a block type.
+-   `$metadata` (`array`) – Metadata loaded from the `block.json` file.
+
+_Example:_
+
+```php
+function filter_metadata_registration( $settings, $metadata ) {
+	$settings['api_version'] = $metadata['apiVersion'] + 1;
+	return $settings;
+};
+add_filter( 'block_type_metadata_settings', 'filter_metadata_registration', 10, 2 );
+
+register_block_type( __DIR__ );
+```
 
 ### `blocks.registerBlockType`
 
-Used to filter the block settings. It receives the block settings and the name of the registered block as arguments. Since v6.1.0 this filter is also applied to each of a block's deprecated settings.
+Used to filter the block settings when registering the block on the client with JavaScript. It receives the block settings and the name of the registered block as arguments. This filter is also applied to each of a block's deprecated settings.
 
 _Example:_
 
@@ -33,6 +76,10 @@ wp.hooks.addFilter(
 	addListBlockClassName
 );
 ```
+
+## Block Editor
+
+The following filters are available to change the behavior of blocks while editing in the block editor.
 
 ### `blocks.getSaveElement`
 
@@ -220,30 +267,6 @@ wp.hooks.addFilter(
 ```
 
 {% end %}
-
-#### `media.crossOrigin`
-
-Used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e `<img>`, `<audio>` , `<img>` , `<link>` , `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information the `crossOrigin` attribute, its values and how it applies to each element.
-
-One example of it in action is in the Image block's transform feature to allow cross-origin images to be used in a `<canvas>`.
-
-_Example:_
-
-```js
-addFilter(
-	'media.crossOrigin',
-	'my-plugin/with-cors-media',
-	// The callback accepts a second `mediaSrc` argument which references
-	// the url to actual foreign media, useful if you want to decide
-	// the value of crossOrigin based upon it.
-	( crossOrigin, mediaSrc ) => {
-		if ( mediaSrc.startsWith( 'https://example.com' ) ) {
-			return 'use-credentials';
-		}
-		return crossOrigin;
-	}
-);
-```
 
 ## Removing Blocks
 
