@@ -36,7 +36,11 @@ function BlockListAppender( {
 		} );
 	}
 
-	if ( isLocked || null === appender || false === CustomAppender ) {
+	if (
+		isLocked ||
+		( undefined !== appender && ! appender ) ||
+		false === CustomAppender
+	) {
 		return null;
 	}
 
