@@ -64,14 +64,13 @@ Renders `SegmentedControl` as a (CSS) block element.
 
 ### `options`
 
-An array of objects containing the following properties:
+-   Type: `Array`
+-   Required: No
+
+Options to render within `SegmentedControl`. An array of objects containing the following properties:
 
 -   `label`: (string) The label to be shown to the user.
 -   `value`: (string|number) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
-
--   Type: `Array`
-
-Options to render within `SegmentedControl`.
 
 ### `onChange`
 
