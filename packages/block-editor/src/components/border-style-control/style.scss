@@ -1,14 +1,17 @@
-.components-border-style-control__select {
-	margin-bottom: 24px;
-
-	button {
-		width: 100%;
+.components-border-style-control {
+	legend {
+		padding-bottom: $grid-unit-05;
 	}
 
-	ul {
-		li,
-		li:last-child {
-			margin: 6px;
+	.components-border-style-control__buttons {
+		display: inline-flex;
+		margin-bottom: $grid-unit-30;
+
+		.components-button.has-icon {
+			min-width: 30px;
+			height: 30px;
+			padding: 3px;
+			margin-right: $grid-unit-05;
 		}
 	}
 }

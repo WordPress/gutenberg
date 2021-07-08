@@ -16,7 +16,7 @@ import {
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { find, findAll, waitFor } from 'puppeteer-testing-library';
+import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
 
 describe( 'Widgets screen', () => {
@@ -89,6 +89,12 @@ describe( 'Widgets screen', () => {
 		);
 		expect( categoryHeaders.length > 0 ).toBe( true );
 
+		const searchBox = await find( {
+			role: 'searchbox',
+			name: 'Search for blocks and patterns',
+		} );
+		await searchBox.type( blockName );
+
 		const addBlock = await find(
 			{
 				role: 'option',
@@ -138,7 +144,7 @@ describe( 'Widgets screen', () => {
 			role: 'group',
 			name: 'Block: Widget Area',
 		} );
-		const [ firstWidgetArea ] = widgetAreas;
+		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
 
 		let addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
 		await addParagraphBlock.hover();
@@ -196,32 +202,17 @@ describe( 'Widgets screen', () => {
 			'[video src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"]'
 		);
 
-		/**
-		 * FIXME: There seems to have a bug when saving the widgets
-		 */
-		// await secondWidgetArea.click();
+		// Add to the second widget area.
+		await secondWidgetArea.click();
 
-		// addParagraphBlock = await getParagraphBlockInGlobalInserter();
-		// await addParagraphBlock.hover();
+		addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
+		await addParagraphBlock.click();
 
-		// // FIXME: The insertion point indicator is not showing when the widget area has no blocks.
-		// // await expectInsertionPointIndicatorToBeBelowLastBlock(
-		// // 	secondWidgetArea
-		// // );
-
-		// await addParagraphBlock.click();
-
-		// const addedParagraphBlockInSecondWidgetArea = await secondWidgetArea.$(
-		// 	'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
-		// );
-
-		// expect(
-		// 	await addedParagraphBlockInSecondWidgetArea.evaluate(
-		// 		( node ) => node === document.activeElement
-		// 	)
-		// ).toBe( true );
-
-		// await page.keyboard.type( 'Third Paragraph' );
+		const addedParagraphBlockInSecondWidgetArea = await secondWidgetArea.$(
+			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		);
+		await addedParagraphBlockInSecondWidgetArea.focus();
+		await page.keyboard.type( 'Third Paragraph' );
 
 		await saveWidgets();
 
@@ -241,6 +232,9 @@ describe( 'Widgets screen', () => {
 		</div></div>
 		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\"><p><div style=\\"width: 580px;\\" class=\\"wp-video\\"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->
 		<video class=\\"wp-video-shortcode\\" id=\\"video-0-1\\" width=\\"580\\" height=\\"326\\" preload=\\"metadata\\" controls=\\"controls\\"><source type=\\"video/mp4\\" src=\\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4?_=1\\" /><a href=\\"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4\\">http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4</a></video></div></p>
+		</div></div>",
+		  "sidebar-2": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		<p>Third Paragraph</p>
 		</div></div>",
 		}
 	` );
@@ -339,10 +333,10 @@ describe( 'Widgets screen', () => {
 		} );
 		await inlineInserterButton.click();
 
-		// TODO: Convert to find() API from puppeteer-testing-library.
-		const inserterSearchBox = await page.waitForSelector(
-			'aria/Search for blocks and patterns[role="searchbox"]'
-		);
+		const inserterSearchBox = await find( {
+			role: 'searchbox',
+			name: 'Search for blocks and patterns',
+		} );
 		await expect( inserterSearchBox ).toHaveFocus();
 
 		await page.keyboard.type( 'Heading' );
@@ -394,123 +388,140 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	async function addMarquee() {
-		// There will be 2 matches here.
-		// One is the in-between inserter,
-		// and the other one is the button block appender.
-		const [ inlineInserterButton ] = await findAll( {
-			role: 'combobox',
-			name: 'Add block',
-		} );
-		await inlineInserterButton.click();
+	describe( 'Function widgets', () => {
+		async function addMarquee( nbExpectedMarquees ) {
+			const marqueeBlock = await getBlockInGlobalInserter(
+				'Marquee Greeting'
+			);
+			await marqueeBlock.click();
+			await page.waitForFunction(
+				( expectedMarquees ) => {
+					return (
+						document.querySelectorAll(
+							'[data-testid="marquee-greeting"]'
+						).length === expectedMarquees
+					);
+				},
+				{},
+				nbExpectedMarquees
+			);
+		}
 
-		// TODO: Convert to find() API from puppeteer-testing-library.
-		const inserterSearchBox = await page.waitForSelector(
-			'aria/Search for blocks and patterns[role="searchbox"]'
-		);
-		await expect( inserterSearchBox ).toHaveFocus();
+		async function deleteExistingMarquees() {
+			const widgetAreasHoldingMarqueeWidgets = await page.$x(
+				'//input[@data-testid="marquee-greeting"]/ancestor::div[@aria-label="Block: Widget Area"]'
+			);
+			for ( const widgetArea of widgetAreasHoldingMarqueeWidgets ) {
+				const closedPanelBody = await widgetArea.$(
+					'.components-panel__body:not(.is-opened)'
+				);
+				if ( closedPanelBody ) {
+					await closedPanelBody.focus();
+					await closedPanelBody.click();
+				}
 
-		await page.keyboard.type( 'Marquee' );
-
-		const inlineQuickInserter = await find( {
-			role: 'listbox',
-			name: 'Blocks',
-		} );
-		const marqueeBlockOption = await find(
-			{
-				role: 'option',
-			},
-			{
-				root: inlineQuickInserter,
+				const [ existingMarqueeWidgets ] = await widgetArea.$x(
+					'//input[@data-testid="marquee-greeting"]/ancestor::div[@data-block][contains(@class, "wp-block-legacy-widget")]'
+				);
+				if ( existingMarqueeWidgets ) {
+					await existingMarqueeWidgets.focus();
+					await pressKeyWithModifier( 'access', 'z' );
+				}
 			}
-		);
-		await marqueeBlockOption.click();
-	}
+		}
 
-	it( 'Should add and save the marquee widget', async () => {
-		await activatePlugin( 'gutenberg-test-marquee-widget' );
-		await visitAdminPage( 'widgets.php' );
-
-		await addMarquee();
-
-		await find( {
-			selector: '[data-block][data-type="core/legacy-widget"]',
+		beforeAll( async () => {
+			await activatePlugin( 'gutenberg-test-marquee-widget' );
 		} );
 
-		const greetingsInput = await find( {
-			selector: '#marquee-greeting',
+		beforeEach( async () => {
+			await deleteExistingMarquees();
 		} );
-		await greetingsInput.click();
-		await page.keyboard.type( 'Howdy' );
 
-		await saveWidgets();
+		afterAll( async () => {
+			await deactivatePlugin( 'gutenberg-test-marquee-widget' );
+		} );
 
-		let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
-		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": "<marquee>Hello!</marquee>",
-		}
-	` );
+		it( 'Should add and save the marquee widget', async () => {
+			await addMarquee( 1 );
 
-		await page.reload();
+			const [ marqueeInput ] = await page.$x(
+				'//input[@data-testid="marquee-greeting"]'
+			);
+			await marqueeInput.focus();
+			await marqueeInput.type( 'Howdy' );
 
-		editedSerializedWidgetAreas = await getSerializedWidgetAreas();
-		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": "<marquee>Hello!</marquee>",
-		}
-	` );
+			// The first marquee is saved after clicking the form save button.
+			const [ marqueeSaveButton ] = await marqueeInput.$x(
+				'//input/ancestor::div[@data-block][contains(@class, "wp-block-legacy-widget")]//button[@type="submit"]'
+			);
+			await marqueeSaveButton.click();
 
-		// Add another marquee, it shouldn't be saved
-		await addMarquee();
+			await saveWidgets();
 
-		// It takes a moment to load the form, let's wait for it.
-		await waitFor( async () => {
-			const marquees = await findAll( {
-				selector: '[id=marquee-greeting]',
+			let editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+						Object {
+						  "sidebar-1": "<marquee>Howdy</marquee>",
+						}
+					` );
+
+			await page.reload();
+
+			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+						Object {
+						  "sidebar-1": "<marquee>Howdy</marquee>",
+						}
+					` );
+
+			await addMarquee( 2 );
+
+			const marqueeInputs = await page.$$(
+				'[data-testid="marquee-greeting"]'
+			);
+
+			expect( marqueeInputs ).toHaveLength( 2 );
+			await marqueeInputs[ 0 ].focus();
+			await marqueeInputs[ 0 ].type( 'first howdy' );
+
+			await marqueeInputs[ 1 ].focus();
+			await marqueeInputs[ 1 ].type( 'Second howdy' );
+
+			// No marquee should be changed without clicking on their "save" button.
+			// The second marquee shouldn't be stored as a widget.
+			// See #32978 for more info.
+			await saveWidgets();
+			editedSerializedWidgetAreas = await getSerializedWidgetAreas();
+			await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
+						Object {
+						  "sidebar-1": "<marquee>Howdy</marquee>",
+						}
+					` );
+
+			await page.reload();
+			const marqueesAfter = await findAll( {
+				selector: '[data-testid="marquee-greeting"]',
 			} );
-			if ( marquees.length === 1 ) {
-				throw new Error();
-			}
+			expect( marqueesAfter ).toHaveLength( 1 );
 		} );
-
-		const marquees = await findAll( {
-			selector: '[id=marquee-greeting]',
-		} );
-
-		expect( marquees ).toHaveLength( 2 );
-		await marquees[ 1 ].click();
-		await page.keyboard.type( 'Second howdy' );
-
-		await saveWidgets();
-		editedSerializedWidgetAreas = await getSerializedWidgetAreas();
-		await expect( editedSerializedWidgetAreas ).toMatchInlineSnapshot( `
-		Object {
-		  "sidebar-1": "<marquee>Hello!</marquee>",
-		}
-	` );
-
-		await page.reload();
-		const marqueesAfter = await findAll( {
-			selector: '[id=marquee-greeting]',
-		} );
-		expect( marqueesAfter ).toHaveLength( 1 );
-
-		await deactivatePlugin( 'gutenberg-test-marquee-widget' );
 	} );
 
-	// Disable reason: We temporary skip this test until we can figure out why it fails sometimes.
-	// eslint-disable-next-line jest/no-disabled-tests
-	it.skip( 'Should duplicate the widgets', async () => {
-		let firstWidgetArea = await page.$(
-			'[aria-label="Block: Widget Area"][role="group"]'
-		);
+	it( 'Should duplicate the widgets', async () => {
+		let [ firstWidgetArea ] = await findAll( {
+			role: 'group',
+			name: 'Block: Widget Area',
+		} );
 
 		const addParagraphBlock = await getBlockInGlobalInserter( 'Paragraph' );
 		await addParagraphBlock.click();
 
-		let firstParagraphBlock = await firstWidgetArea.$(
-			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		let firstParagraphBlock = await find(
+			{
+				role: 'group',
+				name: /^Empty block/,
+			},
+			{ root: firstWidgetArea }
 		);
 		await firstParagraphBlock.focus();
 		await page.keyboard.type( 'First Paragraph' );
@@ -518,9 +529,10 @@ describe( 'Widgets screen', () => {
 		await saveWidgets();
 		await page.reload();
 		// Wait for the widget areas to load.
-		firstWidgetArea = await page.waitForSelector(
-			'[aria-label="Block: Widget Area"][role="group"]'
-		);
+		[ firstWidgetArea ] = await findAll( {
+			role: 'group',
+			name: 'Block: Widget Area',
+		} );
 
 		const initialSerializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( initialSerializedWidgetAreas ).toMatchInlineSnapshot( `
@@ -528,7 +540,6 @@ describe( 'Widgets screen', () => {
 		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>",
-		  "wp_inactive_widgets": "",
 		}
 	` );
 		const initialWidgets = await getWidgetAreaWidgets();
@@ -540,21 +551,11 @@ describe( 'Widgets screen', () => {
 		await firstParagraphBlock.focus();
 
 		await showBlockToolbar();
-
-		const blockToolbar = await page.waitForSelector(
-			'[role="toolbar"][aria-label="Block tools"]'
-		);
-		const moreOptionsButton = await blockToolbar.$(
-			'button[aria-label="Options"]'
-		);
-		await moreOptionsButton.click();
-
-		const optionsMenu = await page.waitForSelector(
-			'[role="menu"][aria-label="Options"]'
-		);
-		const [ duplicateButton ] = await optionsMenu.$x(
-			'//*[@role="menuitem"][*[text()="Duplicate"]]'
-		);
+		await clickBlockToolbarButton( 'Options' );
+		const duplicateButton = await find( {
+			role: 'menuitem',
+			name: /^Duplicate/,
+		} );
 		await duplicateButton.click();
 
 		await page.waitForFunction(
@@ -578,16 +579,10 @@ describe( 'Widgets screen', () => {
 		expect( firstParagraphBlockClientId ).not.toBe(
 			duplicatedParagraphBlockClientId
 		);
-		expect(
-			await duplicatedParagraphBlock.evaluate(
-				( node ) => node.textContent
-			)
-		).toBe( 'First Paragraph' );
-		expect(
-			await duplicatedParagraphBlock.evaluate(
-				( node ) => node === document.activeElement
-			)
-		).toBe( true );
+		await expect( duplicatedParagraphBlock ).toMatchQuery( {
+			text: 'First Paragraph',
+		} );
+		await expect( duplicatedParagraphBlock ).toHaveFocus();
 
 		await saveWidgets();
 		const editedSerializedWidgetAreas = await getSerializedWidgetAreas();
@@ -599,7 +594,6 @@ describe( 'Widgets screen', () => {
 		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
 		</div></div>",
-		  "wp_inactive_widgets": "",
 		}
 	` );
 		const editedWidgets = await getWidgetAreaWidgets();

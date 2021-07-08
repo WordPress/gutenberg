@@ -298,41 +298,44 @@ Object {
 }
 
 .emotion-15 {
-  border-color: rgba(0, 0, 0, 0.1);
-  border-width: 0 0 1px 0;
-  height: 0;
-  margin: 0;
-  width: auto;
   box-sizing: border-box;
   display: block;
   width: 100%;
   border-color: rgba(0, 0, 0, 0.1);
 }
 
-.emotion-19 {
+.emotion-16 {
+  border-color: rgba(0, 0, 0, 0.1);
+  border-width: 0 0 1px 0;
+  height: 0;
+  margin: 0;
+  width: auto;
+}
+
+.emotion-21 {
   box-sizing: border-box;
   overflow: hidden;
 }
 
-.emotion-19>img,
-.emotion-19>iframe {
+.emotion-21>img,
+.emotion-21>iframe {
   display: block;
   height: auto;
   max-width: 100%;
   width: 100%;
 }
 
-.emotion-19:first-of-type {
+.emotion-21:first-of-type {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-19:last-of-type {
+.emotion-21:last-of-type {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
-.emotion-22 {
+.emotion-24 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -353,29 +356,29 @@ Object {
   padding: calc(4px * 4) calc(4px * 6);
 }
 
-.emotion-22>*+*:not(marquee) {
+.emotion-24>*+*:not(marquee) {
   margin-left: calc(4px * 2);
 }
 
-.emotion-22>* {
+.emotion-24>* {
   min-width: 0;
 }
 
-.emotion-22:first-child {
+.emotion-24:first-child {
   border-top: none;
 }
 
-.emotion-22:first-of-type {
+.emotion-24:first-of-type {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-22:last-of-type {
+.emotion-24:last-of-type {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
-.emotion-25 {
+.emotion-27 {
   background: transparent;
   display: block;
   margin: 0!important;
@@ -427,7 +430,7 @@ Object {
           </div>
           <hr
             aria-orientation="horizontal"
-            class="components-divider components-card__divider components-card-divider emotion-15"
+            class="components-divider components-card__divider components-card-divider emotion-15 emotion-16 emotion-17"
             data-wp-c16t="true"
             data-wp-component="CardDivider"
             role="separator"
@@ -440,7 +443,7 @@ Object {
             Card Body 3
           </div>
           <div
-            class="components-card__media components-card-media emotion-19 emotion-1 emotion-2"
+            class="components-card__media components-card-media emotion-21 emotion-1 emotion-2"
             data-wp-c16t="true"
             data-wp-component="CardMedia"
           >
@@ -450,7 +453,7 @@ Object {
             />
           </div>
           <div
-            class="components-flex components-card__footer components-card-footer emotion-22 emotion-1 emotion-2"
+            class="components-flex components-card__footer components-card-footer emotion-24 emotion-1 emotion-2"
             data-wp-c16t="true"
             data-wp-component="CardFooter"
           >
@@ -459,13 +462,13 @@ Object {
         </div>
         <div
           aria-hidden="true"
-          class="components-elevation emotion-25 emotion-1 emotion-2"
+          class="components-elevation emotion-27 emotion-1 emotion-2"
           data-wp-c16t="true"
           data-wp-component="Elevation"
         />
         <div
           aria-hidden="true"
-          class="components-elevation emotion-25 emotion-1 emotion-2"
+          class="components-elevation emotion-27 emotion-1 emotion-2"
           data-wp-c16t="true"
           data-wp-component="Elevation"
         />
@@ -576,41 +579,44 @@ Object {
 }
 
 .emotion-15 {
-  border-color: rgba(0, 0, 0, 0.1);
-  border-width: 0 0 1px 0;
-  height: 0;
-  margin: 0;
-  width: auto;
   box-sizing: border-box;
   display: block;
   width: 100%;
   border-color: rgba(0, 0, 0, 0.1);
 }
 
-.emotion-19 {
+.emotion-16 {
+  border-color: rgba(0, 0, 0, 0.1);
+  border-width: 0 0 1px 0;
+  height: 0;
+  margin: 0;
+  width: auto;
+}
+
+.emotion-21 {
   box-sizing: border-box;
   overflow: hidden;
 }
 
-.emotion-19>img,
-.emotion-19>iframe {
+.emotion-21>img,
+.emotion-21>iframe {
   display: block;
   height: auto;
   max-width: 100%;
   width: 100%;
 }
 
-.emotion-19:first-of-type {
+.emotion-21:first-of-type {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-19:last-of-type {
+.emotion-21:last-of-type {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
-.emotion-22 {
+.emotion-24 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -631,29 +637,29 @@ Object {
   padding: calc(4px * 4) calc(4px * 6);
 }
 
-.emotion-22>*+*:not(marquee) {
+.emotion-24>*+*:not(marquee) {
   margin-left: calc(4px * 2);
 }
 
-.emotion-22>* {
+.emotion-24>* {
   min-width: 0;
 }
 
-.emotion-22:first-child {
+.emotion-24:first-child {
   border-top: none;
 }
 
-.emotion-22:first-of-type {
+.emotion-24:first-of-type {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-22:last-of-type {
+.emotion-24:last-of-type {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
-.emotion-25 {
+.emotion-27 {
   background: transparent;
   display: block;
   margin: 0!important;
@@ -704,7 +710,7 @@ Object {
         </div>
         <hr
           aria-orientation="horizontal"
-          class="components-divider components-card__divider components-card-divider emotion-15"
+          class="components-divider components-card__divider components-card-divider emotion-15 emotion-16 emotion-17"
           data-wp-c16t="true"
           data-wp-component="CardDivider"
           role="separator"
@@ -717,7 +723,7 @@ Object {
           Card Body 3
         </div>
         <div
-          class="components-card__media components-card-media emotion-19 emotion-1 emotion-2"
+          class="components-card__media components-card-media emotion-21 emotion-1 emotion-2"
           data-wp-c16t="true"
           data-wp-component="CardMedia"
         >
@@ -727,7 +733,7 @@ Object {
           />
         </div>
         <div
-          class="components-flex components-card__footer components-card-footer emotion-22 emotion-1 emotion-2"
+          class="components-flex components-card__footer components-card-footer emotion-24 emotion-1 emotion-2"
           data-wp-c16t="true"
           data-wp-component="CardFooter"
         >
@@ -736,13 +742,13 @@ Object {
       </div>
       <div
         aria-hidden="true"
-        class="components-elevation emotion-25 emotion-1 emotion-2"
+        class="components-elevation emotion-27 emotion-1 emotion-2"
         data-wp-c16t="true"
         data-wp-component="Elevation"
       />
       <div
         aria-hidden="true"
-        class="components-elevation emotion-25 emotion-1 emotion-2"
+        class="components-elevation emotion-27 emotion-1 emotion-2"
         data-wp-c16t="true"
         data-wp-component="Elevation"
       />

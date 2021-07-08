@@ -61,10 +61,6 @@ const hasLinkColorSupport = ( blockType ) => {
 };
 
 const hasGradientSupport = ( blockType ) => {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return isObject( colorSupport ) && !! colorSupport.gradients;
