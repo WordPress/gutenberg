@@ -16,6 +16,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'color'       => array(
 						'custom' => false,
 					),
+					'layout' => array(
+						'contentSize' => 'value',
+						'invalid/key' => 'value',
+					),
 					'invalid/key' => 'value',
 					'blocks'      => array(
 						'core/group' => array(
@@ -43,6 +47,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$expected = array(
 			'color'  => array(
 				'custom' => false,
+			),
+			'layout' => array(
+				'contentSize' => 'value',
 			),
 			'blocks' => array(
 				'core/group' => array(
