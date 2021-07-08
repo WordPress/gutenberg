@@ -7,7 +7,7 @@ import noop from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,55 +17,30 @@ import ProgressiveDisclosurePanelTitle from './title';
 const ProgressiveDisclosurePanel = ( props ) => {
 	const { children, className, label: menuLabel, resetAll, title } = props;
 	const [ menuItems, setMenuItems ] = useState( {} );
-	const [ defaultChildren, setDefaultChildren ] = useState( {} );
 
 	// When conditionally including components e.g. { isShown && <Component /> }
 	// a boolean `false` will be passed as a child if component is excluded.
 	// This panel is only interested in the children to be displayed.
-	const filteredChildren = Array.isArray( children )
-		? children.filter( Boolean )
-		: [];
+	const filteredChildren = useMemo( () => {
+		return Array.isArray( children ) ? children.filter( Boolean ) : [];
+	}, [ children ] );
 
-	// Collect which children have custom values. Used to update menu state to
-	// reflect customization for children that display by default / always show.
-	const customizedChildren = filteredChildren.map( ( child ) =>
-		child.props.hasValue( child.props ) ? child.props.label : undefined
-	);
-
-	// On first render determine initial menu state and which children should
-	// always display by default.
+	// Refresh which children should be reflected in the menu and what their
+	// associated menu item's state is; checked or not.
 	useEffect( () => {
 		const items = {};
-		const defaults = {};
 
 		filteredChildren.forEach( ( child ) => {
-			items[ child.props.label ] = child.props.hasValue( child.props );
-			defaults[ child.props.label ] = child.props.isShownByDefault;
+			// New item is checked if:
+			// - it currently has a value
+			// - or it was checked in previous menuItems state.
+			items[ child.props.label ] =
+				child.props.hasValue( child.props ) ||
+				menuItems[ child.props.label ];
 		} );
 
 		setMenuItems( items );
-		setDefaultChildren( defaults );
-	}, [] );
-
-	// As the default children are visible all the time. Reflect their
-	// customizations in the menu items' selected state.
-	useEffect( () => {
-		const menuLabels = Object.keys( menuItems );
-
-		// Skip if no children or menu state not initialized.
-		if ( menuLabels.length === 0 ) {
-			return;
-		}
-
-		const updatedItems = { ...menuItems };
-		menuLabels.forEach( ( label ) => {
-			if ( defaultChildren[ label ] ) {
-				updatedItems[ label ] = customizedChildren.includes( label );
-			}
-		} );
-
-		setMenuItems( updatedItems );
-	}, customizedChildren );
+	}, [ filteredChildren ] );
 
 	if ( filteredChildren.length === 0 ) {
 		return null;
@@ -98,9 +73,12 @@ const ProgressiveDisclosurePanel = ( props ) => {
 
 	// Resets display of children and executes resetAll callback if available.
 	const resetAllChildren = () => {
-		resetAll();
+		if ( typeof resetAll === 'function' ) {
+			resetAll();
+		}
 
-		// Turn off menu items unless they are to display by default.
+		// Turn off all menu items. Default controls will continue to display
+		// by virtue of their `isShownByDefault` prop.
 		const resetMenuItems = {};
 
 		filteredChildren.forEach( ( child ) => {
@@ -129,7 +107,7 @@ const ProgressiveDisclosurePanel = ( props ) => {
 				// set to display by default.
 				const isShown =
 					menuItems[ child.props.label ] ||
-					defaultChildren[ child.props.label ];
+					child.props.isShownByDefault;
 
 				return isShown ? child : null;
 			} ) }
