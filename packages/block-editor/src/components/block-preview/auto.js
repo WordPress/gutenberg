@@ -2,17 +2,20 @@
  * WordPress dependencies
  */
 import { useResizeObserver, pure } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockList from '../block-list';
 import Iframe from '../iframe';
+import EditorStyles from '../editor-styles';
+import { store } from '../../store';
 
 // This is used to avoid rendering the block list if the sizes change.
 let MemoizedBlockList;
 
-function AutoBlockPreview( { viewportWidth } ) {
+function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	const [
 		containerResizeListener,
 		{ width: containerWidth },
@@ -21,6 +24,9 @@ function AutoBlockPreview( { viewportWidth } ) {
 		contentResizeListener,
 		{ height: contentHeight },
 	] = useResizeObserver();
+	const styles = useSelect( ( select ) => {
+		return select( store ).getSettings().styles;
+	} );
 
 	// Initialize on render instead of module top level, to avoid circular dependency issues.
 	MemoizedBlockList = MemoizedBlockList || pure( BlockList );
@@ -38,8 +44,11 @@ function AutoBlockPreview( { viewportWidth } ) {
 				} }
 			>
 				<Iframe
-					contentRef={ ( body ) => {
-						body.style.position = 'absolute';
+					head={ <EditorStyles styles={ styles } /> }
+					contentRef={ ( { ownerDocument: { documentElement } } ) => {
+						documentElement.style.position = 'relative';
+						documentElement.style.padding =
+							__experimentalPadding + 'px';
 					} }
 					aria-hidden
 					style={ {
@@ -49,7 +58,7 @@ function AutoBlockPreview( { viewportWidth } ) {
 					} }
 				>
 					{ contentResizeListener }
-					<MemoizedBlockList />
+					<MemoizedBlockList renderAppender={ false } />
 				</Iframe>
 			</div>
 		</div>

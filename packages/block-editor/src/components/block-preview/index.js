@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { castArray } from 'lodash';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -33,12 +34,19 @@ export function BlockPreview( {
 		_settings.__experimentalBlockPatterns = [];
 		return _settings;
 	}, [ originalSettings ] );
+	// When the blocks change, the preview needs to be remounted because the
+	// resized listener won't detect height reductions.
+	const key = useMemo( () => uuid(), [ blocks ] );
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
 	}
 	return (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+		<BlockEditorProvider
+			value={ renderedBlocks }
+			settings={ settings }
+			key={ key }
+		>
 			{ __experimentalLive ? (
 				<LiveBlockPreview onClick={ __experimentalOnClick } />
 			) : (
