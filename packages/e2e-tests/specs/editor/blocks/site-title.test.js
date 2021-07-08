@@ -15,7 +15,7 @@ import {
 
 async function getSetting( setting ) {
 	await switchUserToAdmin();
-	await visitAdminPage( 'options-general.php' );
+	await visitAdminPage( 'options.php' );
 
 	const value = await page.$eval(
 		`#${ setting }`,
