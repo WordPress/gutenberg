@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 
-const useBlockNavigationSelectedClientIds = (
+const useListViewSelectedClientIds = (
 	__experimentalPersistentListViewFeatures
 ) =>
 	useSelect(
@@ -29,7 +29,7 @@ const useBlockNavigationSelectedClientIds = (
 		[ __experimentalPersistentListViewFeatures ]
 	);
 
-const useBlockNavigationClientIdsTree = (
+const useListViewClientIdsTree = (
 	blocks,
 	selectedClientIds,
 	showOnlyCurrentHierarchy
@@ -71,15 +71,15 @@ const useBlockNavigationClientIdsTree = (
 		[ blocks, selectedClientIds, showOnlyCurrentHierarchy ]
 	);
 
-export default function useBlockNavigationClientIds(
+export default function useListViewClientIds(
 	blocks,
 	showOnlyCurrentHierarchy,
 	__experimentalPersistentListViewFeatures
 ) {
-	const selectedClientIds = useBlockNavigationSelectedClientIds(
+	const selectedClientIds = useListViewSelectedClientIds(
 		__experimentalPersistentListViewFeatures
 	);
-	const clientIdsTree = useBlockNavigationClientIdsTree(
+	const clientIdsTree = useListViewClientIdsTree(
 		blocks,
 		selectedClientIds,
 		showOnlyCurrentHierarchy

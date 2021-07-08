@@ -11,12 +11,12 @@ import { Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BlockNavigationBlock from './block';
-import BlockNavigationAppender from './appender';
+import ListViewBlock from './block';
+import ListViewAppender from './appender';
 import { isClientIdSelected } from './utils';
-import { useBlockNavigationContext } from './context';
+import { useListViewContext } from './context';
 
-export default function BlockNavigationBranch( props ) {
+export default function ListViewBranch( props ) {
 	const {
 		blocks,
 		selectBlock,
@@ -44,7 +44,7 @@ export default function BlockNavigationBranch( props ) {
 	const rowCount = hasAppender ? blockCount + 1 : blockCount;
 	const appenderPosition = rowCount;
 
-	const { expandedState, expand, collapse } = useBlockNavigationContext();
+	const { expandedState, expand, collapse } = useListViewContext();
 
 	return (
 		<>
@@ -95,7 +95,7 @@ export default function BlockNavigationBranch( props ) {
 
 				return (
 					<Fragment key={ clientId }>
-						<BlockNavigationBlock
+						<ListViewBlock
 							block={ block }
 							onClick={ selectBlockWithClientId }
 							onToggleExpanded={ toggleExpanded }
@@ -112,7 +112,7 @@ export default function BlockNavigationBranch( props ) {
 							isExpanded={ isExpanded }
 						/>
 						{ hasNestedBranch && isExpanded && (
-							<BlockNavigationBranch
+							<ListViewBranch
 								blocks={ innerBlocks }
 								selectedBlockClientIds={
 									selectedBlockClientIds
@@ -133,7 +133,7 @@ export default function BlockNavigationBranch( props ) {
 				);
 			} ) }
 			{ hasAppender && (
-				<BlockNavigationAppender
+				<ListViewAppender
 					parentBlockClientId={ parentBlockClientId }
 					position={ rowCount }
 					rowCount={ appenderPosition }
@@ -146,6 +146,6 @@ export default function BlockNavigationBranch( props ) {
 	);
 }
 
-BlockNavigationBranch.defaultProps = {
+ListViewBranch.defaultProps = {
 	selectBlock: () => {},
 };

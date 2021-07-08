@@ -16,10 +16,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import BlockNavigationBranch from './branch';
-import { BlockNavigationContext } from './context';
-import useBlockNavigationClientIds from './use-block-navigation-client-ids';
-import useBlockNavigationDropZone from './use-block-navigation-drop-zone';
+import ListViewBranch from './branch';
+import { ListViewContext } from './context';
+import useListViewClientIds from './use-list-view-client-ids';
+import useListViewDropZone from './use-list-view-drop-zone';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
@@ -35,7 +35,7 @@ const expanded = ( state, action ) => {
 };
 
 /**
- * Wrap `BlockNavigationRows` with `TreeGrid`. BlockNavigationRows is a
+ * Wrap `ListViewRows` with `TreeGrid`. ListViewRows is a
  * recursive component (it renders itself), so this ensures TreeGrid is only
  * present at the very top of the navigation grid.
  *
@@ -47,7 +47,7 @@ const expanded = ( state, action ) => {
  * @param {boolean}  props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean}  props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
  */
-export default function BlockNavigationTree( {
+export default function ListView( {
 	blocks,
 	showOnlyCurrentHierarchy,
 	onSelect = noop,
@@ -55,7 +55,7 @@ export default function BlockNavigationTree( {
 	__experimentalPersistentListViewFeatures,
 	...props
 } ) {
-	const { clientIdsTree, selectedClientIds } = useBlockNavigationClientIds(
+	const { clientIdsTree, selectedClientIds } = useListViewClientIds(
 		blocks,
 		showOnlyCurrentHierarchy,
 		__experimentalPersistentListViewFeatures
@@ -70,10 +70,7 @@ export default function BlockNavigationTree( {
 	);
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
-	let {
-		ref: treeGridRef,
-		target: blockDropTarget,
-	} = useBlockNavigationDropZone();
+	let { ref: treeGridRef, target: blockDropTarget } = useListViewDropZone();
 
 	const isMounted = useRef( false );
 	useEffect( () => {
@@ -126,20 +123,20 @@ export default function BlockNavigationTree( {
 
 	return (
 		<TreeGrid
-			className="block-editor-block-navigation-tree"
+			className="block-editor-list-view-tree"
 			aria-label={ __( 'Block navigation structure' ) }
 			ref={ treeGridRef }
 			onCollapseRow={ collapseRow }
 			onExpandRow={ expandRow }
 		>
-			<BlockNavigationContext.Provider value={ contextValue }>
-				<BlockNavigationBranch
+			<ListViewContext.Provider value={ contextValue }>
+				<ListViewBranch
 					blocks={ clientIdsTree }
 					selectBlock={ selectEditorBlock }
 					selectedBlockClientIds={ selectedClientIds }
 					{ ...props }
 				/>
-			</BlockNavigationContext.Provider>
+			</ListViewContext.Provider>
 		</TreeGrid>
 	);
 }
