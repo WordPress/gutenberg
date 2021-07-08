@@ -81,6 +81,15 @@
 	justify-content: flex-end;
 }
 
+.embed-no-preview__help-icon {
+	position: absolute;
+	top: 12;
+	right: 12;
+	width: 16;
+	height: 16;
+	fill: $light-secondary;
+}
+
 .embed-no-preview__sheet-icon {
 	width: 36;
 	height: 36;

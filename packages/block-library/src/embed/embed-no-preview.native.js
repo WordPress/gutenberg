@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, Text } from 'react-native';
+import { TouchableOpacity, TouchableWithoutFeedback, Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -42,6 +42,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 		styles.embed__description,
 		styles[ 'embed__description--dark' ]
 	);
+	const helpIconStyle = styles[ 'embed-no-preview__help-icon' ];
 
 	const sheetIconStyle = usePreferredColorSchemeStyle(
 		styles[ 'embed-no-preview__sheet-icon' ],
@@ -92,16 +93,22 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 		shouldRequestReview.current = false;
 	}
 
+	function onPressContainer() {
+		onPress();
+		onOpenSheet();
+	}
+
+	function onPressHelp() {
+		onPressContainer();
+	}
+
 	return (
 		<>
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
 				accessibilityHint={ previewButtonA11yHint }
 				disabled={ ! isSelected }
-				onPress={ () => {
-					onPress();
-					onOpenSheet();
-				} }
+				onPress={ onPressContainer }
 			>
 				<View style={ containerStyle }>
 					<View style={ styles.embed__icon }>{ icon }</View>
@@ -112,6 +119,20 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					<Text style={ styles.embed__action }>
 						{ previewButtonText.toUpperCase() }
 					</Text>
+					<TouchableOpacity
+						accessibilityHint={ __( 'Tap here to show help' ) }
+						accessibilityLabel={ __( 'Help button' ) }
+						accessibilityRole={ 'button' }
+						disabled={ ! isSelected }
+						onPress={ onPressHelp }
+						style={ helpIconStyle }
+					>
+						<Icon
+							icon={ help }
+							fill={ helpIconStyle.fill }
+							size={ helpIconStyle.width }
+						/>
+					</TouchableOpacity>
 				</View>
 			</TouchableWithoutFeedback>
 			<BottomSheet
