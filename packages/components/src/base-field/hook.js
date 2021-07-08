@@ -1,12 +1,4 @@
 /**
- * External dependencies
- */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -18,6 +10,7 @@ import { useContextSystem } from '../ui/context';
 import { useControlGroupContext } from '../ui/control-group';
 import { useFlex } from '../flex';
 import * as styles from './styles';
+import { useCx } from '../utils/hooks/use-cx';
 
 /**
  * @typedef OwnProps
@@ -45,6 +38,7 @@ export function useBaseField( props ) {
 	} = useContextSystem( props, 'BaseField' );
 
 	const { styles: controlGroupStyles } = useControlGroupContext();
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>

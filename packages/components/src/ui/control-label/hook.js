@@ -1,18 +1,11 @@
 /**
- * External dependencies
- */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
-
-/**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
 import { useFormGroupContextId } from '../form-group';
 import { useText } from '../../text';
 import * as styles from './styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'label'>} props
@@ -31,6 +24,8 @@ export function useControlLabel( props ) {
 		isBlock,
 		truncate,
 	} );
+
+	const cx = useCx();
 
 	const htmlFor = useFormGroupContextId( htmlForProp );
 	const classes = cx(
