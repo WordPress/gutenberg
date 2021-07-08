@@ -80,14 +80,6 @@
 .wp-block-navigation-link__placeholder {
 	position: relative;
 
-	// Appear disabled to indicate incompleteness.
-	opacity: 0.6;
-	&:hover,
-	&:focus,
-	.is-selected > & {
-		opacity: 1;
-	}
-
 	// Draw a wavy underline.
 	.wp-block-navigation-link__placeholder-text {
 		$blur: 10%;
