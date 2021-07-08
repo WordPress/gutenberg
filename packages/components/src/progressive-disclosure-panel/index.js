@@ -2,17 +2,29 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import noop from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import ProgressiveDisclosurePanelItem from './item';
 import ProgressiveDisclosurePanelTitle from './title';
+
+const PanelContext = createContext( {} );
+
+export const usePanelContext = () => useContext( PanelContext );
+
+const isMenuItem = ( item ) => item.type === ProgressiveDisclosurePanelItem;
 
 const ProgressiveDisclosurePanel = ( props ) => {
 	const { children, className, label: menuLabel, resetAll, title } = props;
@@ -22,7 +34,7 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	// a boolean `false` will be passed as a child if component is excluded.
 	// This panel is only interested in the children to be displayed.
 	const filteredChildren = useMemo( () => {
-		return Array.isArray( children ) ? children.filter( Boolean ) : [];
+		return Array.isArray( children ) ? children.filter( isMenuItem ) : [];
 	}, [ children ] );
 
 	// Refresh which children should be reflected in the menu and what their
@@ -30,13 +42,11 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	useEffect( () => {
 		const items = {};
 
-		filteredChildren.forEach( ( child ) => {
+		filteredChildren.forEach( ( { props: { hasValue, label } } ) => {
 			// New item is checked if:
 			// - it currently has a value
 			// - or it was checked in previous menuItems state.
-			items[ child.props.label ] =
-				child.props.hasValue( child.props ) ||
-				menuItems[ child.props.label ];
+			items[ label ] = hasValue() || menuItems[ label ];
 		} );
 
 		setMenuItems( items );
@@ -57,12 +67,14 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	const toggleChild = ( label ) => {
 		const wasSelected = menuItems[ label ];
 		const child = getChildByMenuLabel( label );
-		const { onDeselect = noop, onSelect = noop } = child.props;
+		const { onDeselect, onSelect } = child.props;
 
-		if ( wasSelected ) {
-			onDeselect( child.props );
-		} else {
-			onSelect( child.props );
+		if ( wasSelected && onDeselect ) {
+			onDeselect();
+		}
+
+		if ( ! wasSelected && onSelect ) {
+			onSelect();
 		}
 
 		setMenuItems( {
@@ -95,22 +107,15 @@ const ProgressiveDisclosurePanel = ( props ) => {
 
 	return (
 		<div className={ classes }>
-			<ProgressiveDisclosurePanelTitle
-				menuLabel={ menuLabel }
-				title={ title }
-				menuItems={ menuItems }
-				toggleChild={ toggleChild }
-				resetAll={ resetAllChildren }
-			/>
-			{ filteredChildren.map( ( child ) => {
-				// Only display the child if it is toggled on in the menu or is
-				// set to display by default.
-				const isShown =
-					menuItems[ child.props.label ] ||
-					child.props.isShownByDefault;
-
-				return isShown ? child : null;
-			} ) }
+			<PanelContext.Provider value={ menuItems }>
+				<ProgressiveDisclosurePanelTitle
+					menuLabel={ menuLabel }
+					title={ title }
+					toggleChild={ toggleChild }
+					resetAll={ resetAllChildren }
+				/>
+				{ children }
+			</PanelContext.Provider>
 		</div>
 	);
 };

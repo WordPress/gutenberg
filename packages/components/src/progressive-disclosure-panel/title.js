@@ -7,12 +7,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { usePanelContext } from './';
 import MenuGroup from '../menu-group';
 import MenuItem from '../menu-item';
 import DropdownMenu from '../dropdown-menu';
 
 const ProgressiveDisclosurePanelTitle = ( props ) => {
-	const { menuItems = {}, menuLabel, resetAll, title, toggleChild } = props;
+	const { menuLabel, resetAll, title, toggleChild } = props;
+	const menuItems = usePanelContext();
 
 	if ( ! title ) {
 		return null;

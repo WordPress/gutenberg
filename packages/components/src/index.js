@@ -101,6 +101,7 @@ export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
 export { default as __experimentalProgressiveDisclosurePanel } from './progressive-disclosure-panel';
+export { default as __experimentalProgressiveDisclosurePanelItem } from './progressive-disclosure-panel/item';
 export { default as QueryControls } from './query-controls';
 export { default as __experimentalRadio } from './radio';
 export { default as __experimentalRadioGroup } from './radio-group';

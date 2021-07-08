@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalProgressiveDisclosurePanel as ProgressiveDisclosurePanel } from '@wordpress/components';
+import {
+	__experimentalProgressiveDisclosurePanel as ProgressiveDisclosurePanel,
+	__experimentalProgressiveDisclosurePanelItem as ProgressiveDisclosurePanelItem,
+} from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
@@ -73,22 +76,24 @@ export function DimensionsPanel( props ) {
 				resetAll={ resetAll }
 			>
 				{ ! isPaddingDisabled && (
-					<PaddingEdit
-						{ ...props }
-						hasValue={ hasPaddingValue }
+					<ProgressiveDisclosurePanelItem
+						hasValue={ () => hasPaddingValue( props ) }
 						label={ __( 'Padding' ) }
-						onDeselect={ resetPadding }
+						onDeselect={ () => resetPadding( props ) }
 						isShownByDefault={ defaultSpacingControls?.padding }
-					/>
+					>
+						<PaddingEdit { ...props } />
+					</ProgressiveDisclosurePanelItem>
 				) }
 				{ ! isMarginDisabled && (
-					<MarginEdit
-						{ ...props }
-						hasValue={ hasMarginValue }
+					<ProgressiveDisclosurePanelItem
+						hasValue={ () => hasMarginValue( props ) }
 						label={ __( 'Margin' ) }
-						onDeselect={ resetMargin }
+						onDeselect={ () => resetMargin( props ) }
 						isShownByDefault={ defaultSpacingControls?.margin }
-					/>
+					>
+						<MarginEdit { ...props } />
+					</ProgressiveDisclosurePanelItem>
 				) }
 			</ProgressiveDisclosurePanel>
 		</InspectorControls>
