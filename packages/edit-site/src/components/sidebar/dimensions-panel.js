@@ -3,7 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalBlockSupportPanel as BlockSupportPanel,
+	__experimentalProgressiveDisclosurePanel as ProgressiveDisclosurePanel,
+	__experimentalProgressiveDisclosurePanelItem as ProgressiveDisclosurePanelItem,
 	__experimentalBoxControl as BoxControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
@@ -103,37 +104,45 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	};
 
 	return (
-		<BlockSupportPanel
+		<ProgressiveDisclosurePanel
 			label={ __( 'Dimensions options' ) }
 			title={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 		>
 			{ showPaddingControl && (
-				<BoxControl
-					values={ paddingValues }
-					onChange={ setPaddingValues }
-					label={ __( 'Padding' ) }
-					sides={ paddingSides }
-					units={ units }
+				<ProgressiveDisclosurePanelItem
 					hasValue={ hasPaddingValue }
-					reset={ resetPaddingValue }
-					allowReset={ false }
+					label={ __( 'Padding' ) }
+					onDeselect={ resetPaddingValue }
 					isShownByDefault={ true }
-				/>
+				>
+					<BoxControl
+						values={ paddingValues }
+						onChange={ setPaddingValues }
+						label={ __( 'Padding' ) }
+						sides={ paddingSides }
+						units={ units }
+						allowReset={ false }
+					/>
+				</ProgressiveDisclosurePanelItem>
 			) }
 			{ showMarginControl && (
-				<BoxControl
-					values={ marginValues }
-					onChange={ setMarginValues }
-					label={ __( 'Margin' ) }
-					sides={ marginSides }
-					units={ units }
+				<ProgressiveDisclosurePanelItem
 					hasValue={ hasMarginValue }
-					reset={ resetMarginValue }
-					allowReset={ false }
+					label={ __( 'Margin' ) }
+					onDeselect={ resetMarginValue }
 					isShownByDefault={ true }
-				/>
+				>
+					<BoxControl
+						values={ marginValues }
+						onChange={ setMarginValues }
+						label={ __( 'Margin' ) }
+						sides={ marginSides }
+						units={ units }
+						allowReset={ false }
+					/>
+				</ProgressiveDisclosurePanelItem>
 			) }
-		</BlockSupportPanel>
+		</ProgressiveDisclosurePanel>
 	);
 }
