@@ -1,22 +1,33 @@
 /**
+ * External dependencies
+ */
+import { useNavigation } from '@react-navigation/native';
+
+/**
  * WordPress dependencies
  */
 import { TextControl, Icon } from '@wordpress/components';
 import { chevronRight } from '@wordpress/icons';
 
-function TopicRow( { onPress, label, icon } ) {
+const HelpTopicRow = ( { label, icon } ) => {
+	const navigation = useNavigation();
+
+	const openSubSheet = () => {
+		navigation.navigate( label );
+	};
+
 	return (
 		<TextControl
 			separatorType="leftMargin"
 			customActionButton
 			leftAlign
-			onPress={ onPress }
+			onPress={ openSubSheet }
 			label={ label }
 			icon={ icon }
 		>
 			<Icon icon={ chevronRight } />
 		</TextControl>
 	);
-}
+};
 
-export default TopicRow;
+export default HelpTopicRow;

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { View, Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -21,51 +22,69 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
-import TopicRow from './topic-row.native.js';
+import HelpDetailNavigationScreen from './help-detail-navigation-screen.js';
+import HelpTopicRow from './help-topic-row.js';
 
-function EditorHelpTopics( { isVisible, onClose } ) {
+const HELP_TOPICS = [
+	{ label: __( 'What is a block?' ), icon: helpFilled },
+	{ label: __( 'Add blocks' ), icon: plusCircleFilled },
+	{ label: __( 'Move blocks' ), icon: alignJustifyAlt },
+	{ label: __( 'Remove blocks' ), icon: trashFilled },
+	{ label: __( 'Customize blocks' ), icon: cogAlt },
+];
+
+function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
+	const bottomSheetHeaderTitleStyle = getStylesFromColorScheme(
+		styles.bottomSheetHeaderTitle,
+		styles.bottomSheetHeaderTitleDark
+	);
+
 	return useMemo( () => (
 		<BottomSheet
 			isVisible={ isVisible }
 			onClose={ onClose }
-			title={ __( 'How to edit your site' ) }
-			withHeaderSeparator
+			hideHeader
+			hasNavigation
 		>
-			<PanelBody
-				title={ __( 'The basics' ) }
-				style={ styles.sectionContainer }
-			>
-				<TopicRow
-					// eslint-disable-next-line no-console
-					onPress={ () => console.log( 'onPress!' ) }
-					label={ __( 'What is a block?' ) }
-					icon={ helpFilled }
-				/>
-				<TopicRow
-					// eslint-disable-next-line no-console
-					onPress={ () => console.log( 'onPress!' ) }
-					label={ __( 'Add blocks' ) }
-					icon={ plusCircleFilled }
-				/>
-				<TopicRow
-					// eslint-disable-next-line no-console
-					onPress={ () => console.log( 'onPress!' ) }
-					label={ __( 'Move blocks' ) }
-					icon={ alignJustifyAlt }
-				/>
-				<TopicRow
-					// eslint-disable-next-line no-console
-					onPress={ () => console.log( 'onPress!' ) }
-					label={ __( 'Remove blocks' ) }
-					icon={ trashFilled }
-				/>
-				<TopicRow
-					// eslint-disable-next-line no-console
-					onPress={ () => console.log( 'onPress!' ) }
-					label={ __( 'Customize blocks' ) }
-					icon={ cogAlt }
-				/>
-			</PanelBody>
+			<BottomSheet.NavigationContainer animate main>
+				<BottomSheet.NavigationScreen name={ 'Topics' }>
+					<View style={ styles.bottomSheetHeader }>
+						<Text
+							style={ bottomSheetHeaderTitleStyle }
+							maxFontSizeMultiplier={ 3 }
+						>
+							{ __( 'How to edit your site' ) }
+						</Text>
+					</View>
+					<View style={ styles.separator } />
+					<PanelBody
+						title={ __( 'The basics' ) }
+						style={ styles.sectionContainer }
+					>
+						{ /* Print out help topics */ }
+						{ HELP_TOPICS.map( ( topic, _ ) => {
+							const key = topic.label;
+							return (
+								<HelpTopicRow
+									key={ key }
+									label={ topic.label }
+									icon={ topic.icon }
+								/>
+							);
+						} ) }
+					</PanelBody>
+				</BottomSheet.NavigationScreen>
+				{ /* Print out help detail screens */ }
+				{ HELP_TOPICS.map( ( topic, _ ) => {
+					const key = topic.label;
+					return (
+						<HelpDetailNavigationScreen
+							key={ key }
+							name={ topic.label }
+						/>
+					);
+				} ) }
+			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	) );
 }
