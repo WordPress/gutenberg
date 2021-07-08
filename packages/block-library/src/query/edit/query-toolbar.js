@@ -72,7 +72,9 @@ export default function QueryToolbar( {
 												numValue >= 1 &&
 												numValue <= 100
 											) {
-												setQuery( { perPage: +value } );
+												setQuery( {
+													perPage: numValue,
+												} );
 											}
 										} }
 										step="1"
