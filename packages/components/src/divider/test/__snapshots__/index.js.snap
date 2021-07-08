@@ -2,7 +2,7 @@
 
 exports[`props should render correctly 1`] = `
 .emotion-0 {
-  border-color: rgba(0,0,0,0.1);
+  border-color: rgba(0, 0, 0, 0.1);
   border-width: 0 0 1px 0;
   height: 0;
   margin: 0;
@@ -11,7 +11,7 @@ exports[`props should render correctly 1`] = `
 
 <hr
   aria-orientation="horizontal"
-  class="emotion-0 components-divider"
+  class="components-divider emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Divider"
   role="separator"
@@ -25,7 +25,7 @@ Snapshot Diff:
 
 @@ -2,10 +2,8 @@
     Object {
-      "border-color": "rgba(0,0,0,0.1)",
+      "border-color": "rgba(0, 0, 0, 0.1)",
       "border-width": "0 0 1px 0",
       "height": "0",
       "margin": "0",
@@ -43,7 +43,7 @@ Snapshot Diff:
 
 @@ -2,9 +2,8 @@
     Object {
-      "border-color": "rgba(0,0,0,0.1)",
+      "border-color": "rgba(0, 0, 0, 0.1)",
       "border-width": "0 0 1px 0",
       "height": "0",
       "margin": "0",
@@ -60,7 +60,7 @@ Snapshot Diff:
 
 @@ -2,9 +2,8 @@
     Object {
-      "border-color": "rgba(0,0,0,0.1)",
+      "border-color": "rgba(0, 0, 0, 0.1)",
       "border-width": "0 0 1px 0",
       "height": "0",
       "margin": "0",

@@ -58,12 +58,21 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	) {
 		$border_radius = $block_attributes['style']['border']['radius'];
 
-		// This check handles original unitless implementation.
-		if ( is_numeric( $border_radius ) ) {
-			$border_radius .= 'px';
-		}
+		if ( is_array( $border_radius ) ) {
+			// We have individual border radius corner values.
+			foreach ( $border_radius as $key => $radius ) {
+				// Convert CamelCase corner name to kebab-case.
+				$corner   = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
+				$styles[] = sprintf( 'border-%s-radius: %s;', $corner, $radius );
+			}
+		} else {
+			// This check handles original unitless implementation.
+			if ( is_numeric( $border_radius ) ) {
+				$border_radius .= 'px';
+			}
 
-		$styles[] = sprintf( 'border-radius: %s;', $border_radius );
+			$styles[] = sprintf( 'border-radius: %s;', $border_radius );
+		}
 	}
 
 	// Border style.

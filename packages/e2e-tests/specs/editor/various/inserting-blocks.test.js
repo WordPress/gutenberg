@@ -147,7 +147,7 @@ describe( 'Inserting blocks', () => {
 			() =>
 				document.activeElement &&
 				document.activeElement.classList.contains(
-					'block-editor-inserter__search-input'
+					'components-search-control__input'
 				)
 		);
 		await page.keyboard.type( 'para' );
@@ -185,7 +185,7 @@ describe( 'Inserting blocks', () => {
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__search-input'
+			'components-search-control__input'
 		);
 
 		// Try using the up arrow key (vertical navigation triggers the issue described in #9583).
@@ -196,7 +196,7 @@ describe( 'Inserting blocks', () => {
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__search-input'
+			'components-search-control__input'
 		);
 
 		// Tab to the block list
@@ -250,7 +250,7 @@ describe( 'Inserting blocks', () => {
 		);
 
 		// Insert a paragraph block.
-		await page.waitForSelector( '.block-editor-inserter__search-input' );
+		await page.waitForSelector( '.block-editor-inserter__search input' );
 
 		// Search for the paragraph block if it's not in the list of blocks shown.
 		if ( ! page.$( '.editor-block-list-item-paragraph' ) ) {

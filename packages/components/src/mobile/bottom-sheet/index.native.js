@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -495,7 +496,7 @@ class BottomSheet extends Component {
 				backdropOpacity={ 0.2 }
 				onBackdropPress={ this.onCloseBottomSheet }
 				onBackButtonPress={ this.onHardwareButtonPress }
-				onSwipe={ this.onCloseBottomSheet }
+				onSwipeComplete={ this.onCloseBottomSheet }
 				onDismiss={ Platform.OS === 'ios' ? this.onDismiss : undefined }
 				onModalHide={
 					Platform.OS === 'android' ? this.onDismiss : undefined
@@ -510,7 +511,9 @@ class BottomSheet extends Component {
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
 				onAccessibilityEscape={ this.onCloseBottomSheet }
-				{ ...rest }
+				// We need to prevent overwriting the onDismiss prop,
+				// for this reason it is excluded from the rest object.
+				{ ...omit( rest, 'onDismiss' ) }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }

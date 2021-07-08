@@ -700,6 +700,69 @@ describe( 'Widgets Customizer', () => {
 			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
 		);
 	} );
+
+	it( 'should move (inner) blocks to another sidebar', async () => {
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
+
+		await addBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+
+		await showBlockToolbar();
+		await clickBlockToolbarButton( 'Options' );
+		const groupButton = await find( {
+			role: 'menuitem',
+			name: 'Group',
+		} );
+		await groupButton.click();
+
+		// Refocus the paragraph block.
+		const paragraphBlock = await find( {
+			role: 'group',
+			name: 'Paragraph block',
+			value: 'First Paragraph',
+		} );
+		await paragraphBlock.focus();
+		await showBlockToolbar();
+		await clickBlockToolbarButton( 'Move to widget area' );
+
+		const footer2Option = await find( {
+			role: 'menuitemradio',
+			name: 'Footer #2',
+		} );
+		await footer2Option.click();
+
+		// Should switch to and expand Footer #2.
+		await expect( {
+			role: 'heading',
+			name: 'Customizing ▸ Widgets Footer #2',
+		} ).toBeFound();
+
+		// The paragraph block should be moved to the new sidebar and have focus.
+		const movedParagraphBlockQuery = {
+			role: 'group',
+			name: 'Paragraph block',
+			value: 'First Paragraph',
+		};
+		await expect( movedParagraphBlockQuery ).toBeFound();
+		const movedParagraphBlock = await find( movedParagraphBlockQuery );
+		await expect( movedParagraphBlock ).toHaveFocus();
+
+		expect( console ).toHaveWarned(
+			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
+		);
+	} );
 } );
 
 /**

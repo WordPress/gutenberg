@@ -61,10 +61,6 @@ const hasLinkColorSupport = ( blockType ) => {
 };
 
 const hasGradientSupport = ( blockType ) => {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return isObject( colorSupport ) && !! colorSupport.gradients;
@@ -234,7 +230,7 @@ export function ColorEdit( props ) {
 		localAttributes.current = attributes;
 	}, [ attributes ] );
 
-	if ( ! hasColorSupport( blockName ) || Platform.OS !== 'web' ) {
+	if ( ! hasColorSupport( blockName ) ) {
 		return null;
 	}
 

@@ -173,6 +173,22 @@ _Returns_
 
 -   `Function`: Function that determines if a request's URL contains substring.
 
+<a name="createUser" href="#createUser">#</a> **createUser**
+
+Create a new user account.
+
+_Parameters_
+
+-   _username_ `string`: User name.
+-   _object_ `Object?`: Optional Settings for the new user account.
+-   _object.firstName_ `[string]`: First name.
+-   _object.lastName_ `[string]`: Last name.
+-   _object.role_ `[string]`: Role. Defaults to Administrator.
+
+_Returns_
+
+-   `string`: Password for the newly created user account.
+
 <a name="deactivatePlugin" href="#deactivatePlugin">#</a> **deactivatePlugin**
 
 Deactivates an active plugin.
@@ -195,6 +211,14 @@ _Parameters_
 -   _settings_ `Object?`: Optional settings object.
 -   _settings.newThemeSlug_ `string?`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
 -   _settings.newThemeSearchTerm_ `string?`: A search term to use if the new theme is not findable by its slug.
+
+<a name="deleteUser" href="#deleteUser">#</a> **deleteUser**
+
+Delete a user account.
+
+_Parameters_
+
+-   _username_ `string`: User name.
 
 <a name="disableFocusLossObservation" href="#disableFocusLossObservation">#</a> **disableFocusLossObservation**
 

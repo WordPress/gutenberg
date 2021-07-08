@@ -46,7 +46,7 @@ public protocol GutenbergBridgeDataSource: class {
     func gutenbergCapabilities() -> [Capabilities: Bool]
 
     /// Asks the data source for a list of theme colors.
-    func gutenbergEditorTheme() -> GutenbergEditorTheme?
+    func gutenbergEditorSettings() -> GutenbergEditorSettings?
 
     /// Asks the data source for a view to show while the Editor is loading.
      var loadingView: UIView? { get }
@@ -70,7 +70,10 @@ public extension GutenbergBridgeDataSource {
     }
 }
 
-public protocol GutenbergEditorTheme {
+public protocol GutenbergEditorSettings {
+    var isFSETheme: Bool { get }
+    var rawStyles: String? { get }
+    var rawFeatures: String? { get }
     var colors: [[String: String]]? { get }
     var gradients: [[String: String]]? { get }
 }

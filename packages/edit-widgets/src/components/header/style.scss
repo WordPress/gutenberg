@@ -45,8 +45,9 @@
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles
-	> .components-button.has-icon,
-	> .components-dropdown > .components-button.has-icon {
+	// Specificity bump needed to offset https://github.com/WordPress/gutenberg/blob/8ea29cb04412c80c9adf7c1db0e816d6a0ac1232/packages/components/src/toolbar/style.scss#L76
+	> .components-button.has-icon.has-icon.has-icon,
+	> .components-dropdown > .components-button.has-icon.has-icon {
 		height: $button-size;
 		min-width: $button-size;
 		padding: 6px;

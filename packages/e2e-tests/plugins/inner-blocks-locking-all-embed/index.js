@@ -1,9 +1,9 @@
-( function() {
-	var registerBlockType = wp.blocks.registerBlockType;
-	var el = wp.element.createElement;
-	var InnerBlocks = wp.blockEditor.InnerBlocks;
-	var __ = wp.i18n.__;
-	var TEMPLATE = [
+( function () {
+	const registerBlockType = wp.blocks.registerBlockType;
+	const el = wp.element.createElement;
+	const InnerBlocks = wp.blockEditor.InnerBlocks;
+	const __ = wp.i18n.__;
+	const TEMPLATE = [
 		[
 			'core/paragraph',
 			{
@@ -14,7 +14,7 @@
 		[ 'core/embed' ],
 	];
 
-	var save = function() {
+	const save = function () {
 		return el( InnerBlocks.Content );
 	};
 
@@ -23,7 +23,7 @@
 		icon: 'cart',
 		category: 'text',
 
-		edit: function( props ) {
+		edit() {
 			return el( InnerBlocks, {
 				template: TEMPLATE,
 				templateLock: 'all',
