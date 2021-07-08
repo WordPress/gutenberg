@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`props should render correctly 1`] = `
+exports[`SegmentedControl should render correctly 1`] = `
 .emotion-0 {
   background: #fff;
   border: 1px solid;
