@@ -174,7 +174,7 @@ function Navigation( {
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ attributes.isResponsive }
 				>
-					<ul { ...innerBlocksProps }></ul>
+					<div { ...innerBlocksProps }></div>
 				</ResponsiveWrapper>
 			</nav>
 		</>

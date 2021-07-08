@@ -361,4 +361,7 @@ WP_Block_Supports::get_instance()->register(
 		'register_attribute' => 'gutenberg_register_duotone_support',
 	)
 );
+
+// Remove WordPress core filter to avoid rendering duplicate support elements.
+remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );

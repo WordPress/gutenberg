@@ -141,6 +141,10 @@ $media-to-text: 12px;
 	padding-left: $media-to-text;
 }
 
+.innerBlockPaddings {
+	padding: 0 $media-to-text $media-to-text;
+}
+
 // Media STACK
 .mediaStackLeft {
 	margin-bottom: $media-to-text;

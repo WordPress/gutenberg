@@ -84,7 +84,10 @@ const EmbedEdit = ( props ) => {
 				return { fetching: false, cannotEmbed: false };
 			}
 
-			const embedPreview = getEmbedPreview( attributesUrl );
+			const embedPreview = Platform.select( {
+				web: getEmbedPreview( attributesUrl ),
+				native: attributesUrl,
+			} );
 			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
 
 			// The external oEmbed provider does not exist. We got no type info and no html.
@@ -235,6 +238,7 @@ const EmbedEdit = ( props ) => {
 						invalidateResolution( 'getEmbedPreview', [ url ] );
 					} }
 					isSelected={ isSelected }
+					isEditingURL={ isEditingURL }
 				/>
 			</View>
 		);

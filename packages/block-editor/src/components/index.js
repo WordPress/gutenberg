@@ -34,6 +34,7 @@ export {
 	BlockVerticalAlignmentToolbar,
 	BlockVerticalAlignmentControl,
 } from './block-vertical-alignment-control';
+export { default as __experimentalBorderRadiusControl } from './border-radius-control';
 export { default as __experimentalBorderStyleControl } from './border-style-control';
 export {
 	// This is a typo, but kept here for back-compat.
@@ -44,9 +45,6 @@ export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
 export { default as ContrastChecker } from './contrast-checker';
 export { default as __experimentalDuotoneControl } from './duotone-control';
-export { default as __experimentalGradientPicker } from './gradient-picker';
-export { default as __experimentalGradientPickerControl } from './gradient-picker/control';
-export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';
 export { default as __experimentalFontAppearanceControl } from './font-appearance-control';
 export { default as __experimentalFontFamilyControl } from './font-family';
 export { default as __experimentalLetterSpacingControl } from './letter-spacing-control';
@@ -120,7 +118,6 @@ export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { default as __experimentalLibrary } from './inserter/library';
-export { default as __experimentalSearchForm } from './inserter/search-form';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
 export { MultiSelectScrollIntoView } from './selection-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';

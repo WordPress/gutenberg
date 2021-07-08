@@ -22,7 +22,12 @@ import {
  */
 import styles from './style.scss';
 
-function InserterSearchForm( { value, onChange } ) {
+function SearchControl( {
+	value,
+	onChange,
+	label,
+	placeholder = __( 'Search' ),
+} ) {
 	const [ isActive, setIsActive ] = useState( false );
 
 	const inputRef = useRef();
@@ -57,7 +62,7 @@ function InserterSearchForm( { value, onChange } ) {
 					/>
 				) : (
 					<ToolbarButton
-						title={ __( 'Search block' ) }
+						title={ label }
 						icon={ searchIcon }
 						onClick={ () => {
 							inputRef.current.focus();
@@ -72,7 +77,7 @@ function InserterSearchForm( { value, onChange } ) {
 					onChangeText={ onChange }
 					onFocus={ () => setIsActive( true ) }
 					value={ value }
-					placeholder={ __( 'Search blocks' ) }
+					placeholder={ placeholder }
 				/>
 
 				{ !! value && (
@@ -89,4 +94,4 @@ function InserterSearchForm( { value, onChange } ) {
 	);
 }
 
-export default InserterSearchForm;
+export default SearchControl;

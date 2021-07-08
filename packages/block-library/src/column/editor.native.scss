@@ -5,13 +5,11 @@
 .columnPlaceholder {
 	flex: 1;
 	padding: $block-selected-to-content;
-	background-color: $white;
 	border: $border-width dashed $gray;
 	border-radius: 4px;
 }
 
 .columnPlaceholderDark {
-	background-color: $black;
 	border: $border-width dashed $gray-70;
 }
 

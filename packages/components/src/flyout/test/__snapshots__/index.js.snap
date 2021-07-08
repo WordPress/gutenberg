@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-0 {
+.emotion-1 {
   background-color: #fff;
   color: #000;
   position: relative;
@@ -10,15 +10,15 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
-.emotion-0 .components-card-body {
+.emotion-2 .components-card-body {
   max-height: 80vh;
 }
 
-.emotion-3 {
+.emotion-4 {
   height: 100%;
 }
 
-.emotion-6 {
+.emotion-7 {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -28,21 +28,21 @@ exports[`props should render correctly 1`] = `
 }
 
 @media only screen and ( min-device-width: 40em ) {
-  .emotion-6::-webkit-scrollbar {
+  .emotion-7::-webkit-scrollbar {
     height: 12px;
     width: 12px;
   }
 
-  .emotion-6::-webkit-scrollbar-track {
+  .emotion-7::-webkit-scrollbar-track {
     background-color: transparent;
   }
 
-  .emotion-6::-webkit-scrollbar-track {
+  .emotion-7::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.04);
     border-radius: 8px;
   }
 
-  .emotion-6::-webkit-scrollbar-thumb {
+  .emotion-7::-webkit-scrollbar-thumb {
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     background-color: rgba(0, 0, 0, 0.2);
@@ -50,22 +50,22 @@ exports[`props should render correctly 1`] = `
     border-radius: 7px;
   }
 
-  .emotion-6:hover::-webkit-scrollbar-thumb {
+  .emotion-7:hover::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.5);
   }
 }
 
-.emotion-6:first-of-type {
+.emotion-7:first-of-type {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-6:last-of-type {
+.emotion-7:last-of-type {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
-.emotion-9 {
+.emotion-10 {
   background: transparent;
   display: block;
   margin: 0!important;
@@ -84,7 +84,7 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
-.emotion-12 {
+.emotion-13 {
   background: transparent;
   display: block;
   margin: 0!important;
@@ -104,12 +104,12 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2"
+  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2 emotion-3"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
   <div
-    class="emotion-3 emotion-1 emotion-2"
+    class="emotion-4 emotion-5 emotion-3"
   >
     <iframe
       aria-hidden="true"
@@ -119,7 +119,7 @@ exports[`props should render correctly 1`] = `
       tabindex="-1"
     />
     <div
-      class="components-scrollable components-card__body components-card-body emotion-6 emotion-1 emotion-2"
+      class="components-scrollable components-card__body components-card-body emotion-7 emotion-5 emotion-3"
       data-wp-c16t="true"
       data-wp-component="CardBody"
     >
@@ -128,13 +128,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="components-elevation emotion-9 emotion-1 emotion-2"
+    class="components-elevation emotion-10 emotion-5 emotion-3"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
   <div
     aria-hidden="true"
-    class="components-elevation emotion-12 emotion-1 emotion-2"
+    class="components-elevation emotion-13 emotion-5 emotion-3"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
@@ -149,15 +149,15 @@ Snapshot Diff:
 @@ -1,12 +1,12 @@
   <div
 -   aria-label="show"
-+   aria-label="popover-base-popover"
-    class="components-popover-content components-popover css-mlsx58-PopoverContent-classes css-1mm2cvy-View em57xhy0"
++   aria-label="flyout-base-flyout"
+    class="components-flyout-content components-flyout css-1b8wigk-FlyoutContentView e1vtu5161"
     data-dialog="true"
     data-wp-c16t="true"
-    data-wp-component="Popover"
--   id="labelled-popover"
-+   id="base-popover"
+    data-wp-component="Flyout"
+-   id="labelled-flyout"
++   id="base-flyout"
     role="dialog"
-    style="position: fixed; left: 100%; top: 100%;"
+    style="position: fixed; left: 100%; top: 100%; max-width: 360px;"
     tabindex="-1"
   >
     <div
@@ -170,16 +170,16 @@ Snapshot Diff:
 
 @@ -1,12 +1,12 @@
   <div
--   aria-label="popover-contentless-popover"
-+   aria-label="popover-base-popover"
-    class="components-popover-content components-popover css-mlsx58-PopoverContent-classes css-1mm2cvy-View em57xhy0"
+-   aria-label="flyout-contentless-flyout"
++   aria-label="flyout-base-flyout"
+    class="components-flyout-content components-flyout css-1b8wigk-FlyoutContentView e1vtu5161"
     data-dialog="true"
     data-wp-c16t="true"
-    data-wp-component="Popover"
--   id="contentless-popover"
-+   id="base-popover"
+    data-wp-component="Flyout"
+-   id="contentless-flyout"
++   id="base-flyout"
     role="dialog"
-    style="position: fixed; left: 100%; top: 100%;"
+    style="position: fixed; left: 100%; top: 100%; max-width: 360px;"
     tabindex="-1"
   >
     <div

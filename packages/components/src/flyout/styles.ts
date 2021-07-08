@@ -1,20 +1,19 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+import styled from '@emotion/styled';
 // eslint-disable-next-line no-restricted-imports
-import { css } from '@emotion/css';
+import { Popover as ReakitPopover } from 'reakit';
 
 /**
  * Internal dependencies
  */
-import { CardBody } from '../../card';
-import * as ZIndex from '../../utils/z-index';
-import CONFIG from '../../utils/config-values';
+import { Card, CardBody } from '../card';
+import * as ZIndex from '../utils/z-index';
+import CONFIG from '../utils/config-values';
 
-export const PopoverContent = css`
-	z-index: ${ ZIndex.Popover };
+export const FlyoutContentView = styled( ReakitPopover )`
+	z-index: ${ ZIndex.Flyout };
 	box-sizing: border-box;
 	opacity: 0;
 	outline: none;
@@ -33,7 +32,7 @@ export const PopoverContent = css`
 	}
 `;
 
-export const cardStyle = css`
+export const CardView = styled( Card )`
 	${ CardBody.selector } {
 		max-height: 80vh;
 	}
