@@ -15,6 +15,7 @@ function DuotoneControl( {
 	colorPalette,
 	duotonePalette,
 	disableCustomColors,
+	disableCustomDuotone,
 	value,
 	onChange,
 } ) {
@@ -51,6 +52,7 @@ function DuotoneControl( {
 					duotonePalette={ duotonePalette }
 					colorPalette={ colorPalette }
 					disableCustomColors={ disableCustomColors }
+					disableCustomDuotone={ disableCustomDuotone }
 				/>
 			) }
 		</>

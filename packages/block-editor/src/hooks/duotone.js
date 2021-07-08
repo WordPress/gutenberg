@@ -129,12 +129,13 @@ function DuotonePanel( { name, attributes, setAttributes } ) {
 	const duotonePalette = useSetting( 'color.duotone' ) || EMPTY_ARRAY;
 	const colorPalette = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const disableCustomColors = ! useSetting( 'color.custom' );
+	const disableCustomDuotone =
+		! useSetting( 'color.customDuotone' ) ||
+		( colorPalette?.length === 0 && disableCustomColors );
 
 	if (
 		! hasBlockSupport( name, 'color.__experimentalDuotone' ) ||
-		( duotonePalette?.length === 0 &&
-			colorPalette?.length === 0 &&
-			disableCustomColors )
+		( duotonePalette?.length === 0 && disableCustomDuotone )
 	) {
 		return null;
 	}
@@ -144,6 +145,7 @@ function DuotonePanel( { name, attributes, setAttributes } ) {
 			<DuotoneControl
 				duotonePalette={ duotonePalette }
 				colorPalette={ colorPalette }
+				disableCustomDuotone={ disableCustomDuotone }
 				disableCustomColors={ disableCustomColors }
 				value={ duotone }
 				onChange={ ( newDuotone ) => {

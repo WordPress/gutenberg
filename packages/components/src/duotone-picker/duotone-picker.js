@@ -22,6 +22,7 @@ function DuotonePicker( {
 	colorPalette,
 	duotonePalette,
 	disableCustomColors,
+	disableCustomDuotone,
 	value,
 	onChange,
 } ) {
@@ -78,7 +79,7 @@ function DuotonePicker( {
 			{ ! disableCustomColors && (
 				<CustomDuotoneBar value={ value } onChange={ onChange } />
 			) }
-			{ ( ! disableCustomColors || colorPalette?.length > 0 ) && (
+			{ ! disableCustomDuotone && (
 				<ColorListPicker
 					labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
 					colors={ colorPalette }
