@@ -130,8 +130,8 @@ function DuotonePanel( { name, attributes, setAttributes } ) {
 
 	if (
 		! hasBlockSupport( name, 'color.__experimentalDuotone' ) ||
-		( duotonePalette?.length === 0 &&
-			colorPalette?.length === 0 &&
+		( ( ! duotonePalette || duotonePalette?.length === 0 ) &&
+			( ! colorPalette || colorPalette?.length === 0 ) &&
 			disableCustomColors )
 	) {
 		return null;
