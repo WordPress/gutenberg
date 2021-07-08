@@ -31,6 +31,7 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
+		"@react-navigation/native": "5.7.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
@@ -62,6 +63,7 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
+		"react-native": "^0.64.0",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
