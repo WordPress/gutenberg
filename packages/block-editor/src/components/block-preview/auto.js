@@ -46,12 +46,14 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 				<Iframe
 					head={ <EditorStyles styles={ styles } /> }
 					contentRef={ ( { ownerDocument: { documentElement } } ) => {
-						documentElement.style.position = 'relative';
+						documentElement.style.position = 'absolute';
+						documentElement.style.width = '100%';
 						documentElement.style.padding =
 							__experimentalPadding + 'px';
 					} }
 					aria-hidden
 					style={ {
+						position: 'absolute',
 						width: viewportWidth,
 						height: contentHeight,
 						pointerEvents: 'none',
