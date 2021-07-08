@@ -9,6 +9,9 @@ import { View, Text } from 'react-native';
 import { BottomSheet } from '@wordpress/components';
 import { useNavigation } from '@react-navigation/native';
 
+/**
+ * Internal dependencies
+ */
 import styles from './style.scss';
 import { __ } from '@wordpress/i18n';
 

@@ -62,7 +62,7 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 						style={ styles.sectionContainer }
 					>
 						{ /* Print out help topics */ }
-						{ HELP_TOPICS.map( ( topic, _ ) => {
+						{ HELP_TOPICS.map( ( topic ) => {
 							const key = topic.label;
 							return (
 								<HelpTopicRow
@@ -75,7 +75,7 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 					</PanelBody>
 				</BottomSheet.NavigationScreen>
 				{ /* Print out help detail screens */ }
-				{ HELP_TOPICS.map( ( topic, _ ) => {
+				{ HELP_TOPICS.map( ( topic ) => {
 					const key = topic.label;
 					return (
 						<HelpDetailNavigationScreen
