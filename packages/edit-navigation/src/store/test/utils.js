@@ -507,42 +507,6 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				target: '_blank',
 			},
 		},
-		{
-			block: {
-				attributes: {
-					label: 'Example With Colors',
-					url: 'https://wordpress.org',
-					description: '',
-					rel: '',
-					className: '',
-					title: '',
-					type: 'custom',
-					kind: 'custom',
-					opensInNewTab: true,
-					colors: {
-						textColor: 'white',
-						backgroundColor: 'black',
-					},
-				},
-				clientId: 'navigation-link-block-client-id-5',
-				innerBlocks: [],
-				isValid: true,
-				name: 'core/navigation-link',
-			},
-			menuItem: {
-				title: 'Example With Colors',
-				url: 'https://wordpress.org',
-				classes: [
-					'has-text-color',
-					'has-white-color',
-					'has-background',
-					'has-black-background-color',
-				],
-				object: 'custom',
-				type: 'custom',
-				target: '_blank',
-			},
-		},
 	];
 
 	const menuItemsToBlockAttrs = [
@@ -676,35 +640,6 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				type: 'custom',
 				kind: 'custom',
 				opensInNewTab: true,
-			},
-		},
-		{
-			menuItem: {
-				title: {
-					raw: 'Example With Colors',
-					rendered: 'Example With Colors',
-				},
-				url: 'https://wordpress.org',
-				classes: [
-					'has-text-color',
-					'has-red-color',
-					'has-background',
-					'has-blue-background-color',
-				],
-				object: 'custom',
-				type: 'custom',
-				target: '_blank',
-			},
-			blockAttrs: {
-				label: 'Example With Colors',
-				url: 'https://wordpress.org',
-				type: 'custom',
-				kind: 'custom',
-				opensInNewTab: true,
-				colors: {
-					textColor: 'red',
-					backgroundColor: 'blue',
-				},
 			},
 		},
 	];

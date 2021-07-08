@@ -100,6 +100,7 @@ function Navigation( {
 	subMenuClientId,
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
+	hasColorSettings = true,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -250,47 +251,49 @@ function Navigation( {
 						/>
 					</PanelBody>
 				) }
-				<PanelColorSettings
-					title={ __( 'Color' ) }
-					initialOpen={ false }
-					colorSettings={ [
-						{
-							value: textColor.color,
-							onChange: setTextColor,
-							label: __( 'Text' ),
-						},
-						{
-							value: backgroundColor.color,
-							onChange: setBackgroundColor,
-							label: __( 'Background' ),
-						},
-						{
-							value: overlayTextColor.color,
-							onChange: setOverlayTextColor,
-							label: __( 'Overlay text' ),
-						},
-						{
-							value: overlayBackgroundColor.color,
-							onChange: setOverlayBackgroundColor,
-							label: __( 'Overlay background' ),
-						},
-					] }
-				>
-					{ enableContrastChecking && (
-						<>
-							<ContrastChecker
-								backgroundColor={ detectedBackgroundColor }
-								textColor={ detectedColor }
-							/>
-							<ContrastChecker
-								backgroundColor={
-									detectedOverlayBackgroundColor
-								}
-								textColor={ detectedOverlayColor }
-							/>
-						</>
-					) }
-				</PanelColorSettings>
+				{ hasColorSettings && (
+					<PanelColorSettings
+						title={ __( 'Color' ) }
+						initialOpen={ false }
+						colorSettings={ [
+							{
+								value: textColor.color,
+								onChange: setTextColor,
+								label: __( 'Text' ),
+							},
+							{
+								value: backgroundColor.color,
+								onChange: setBackgroundColor,
+								label: __( 'Background' ),
+							},
+							{
+								value: overlayTextColor.color,
+								onChange: setOverlayTextColor,
+								label: __( 'Overlay text' ),
+							},
+							{
+								value: overlayBackgroundColor.color,
+								onChange: setOverlayBackgroundColor,
+								label: __( 'Overlay background' ),
+							},
+						] }
+					>
+						{ enableContrastChecking && (
+							<>
+								<ContrastChecker
+									backgroundColor={ detectedBackgroundColor }
+									textColor={ detectedColor }
+								/>
+								<ContrastChecker
+									backgroundColor={
+										detectedOverlayBackgroundColor
+									}
+									textColor={ detectedOverlayColor }
+								/>
+							</>
+						) }
+					</PanelColorSettings>
+				) }
 			</InspectorControls>
 			<nav { ...blockProps }>
 				<ResponsiveWrapper

@@ -9,7 +9,7 @@ import { createBlock } from '@wordpress/blocks';
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 
 import { resolveMenuItems, dispatch } from './controls';
-import { buildNavigationPostId, extractColorsFromClasses } from './utils';
+import { buildNavigationPostId } from './utils';
 import menuItemsToBlocks from './menu-items-to-blocks';
 /**
  * Creates a "stub" navigation post reflecting the contents of menu with id=menuId. The
@@ -82,36 +82,6 @@ const persistPost = ( post ) =>
 	);
 
 /**
- * Given an array of menu items, finds the colors to apply to the main navigation block
- *
- * @param {Array} menuItems a list of menu items.
- * @return {Object} color attributes for Navigation block
- */
-function findColorsFromMenuItems( menuItems ) {
-	const colorAttrs = {};
-	// Colors should be set on all menu items so we can just use the first we
-	// find. If this isn't true, we'll need to search through the menuItems for
-	// ones with classes like has-color
-	const topLevelItem = menuItems.find( ( i ) => i.parent === 0 );
-	if ( topLevelItem ) {
-		const { colors } = extractColorsFromClasses( topLevelItem.classes );
-		colorAttrs.textColor = colors?.textColor;
-		colorAttrs.backgroundColor = colors?.backgroundColor;
-	}
-
-	const subMenuItem = menuItems.find( ( i ) => i.parent !== 0 );
-	if ( subMenuItem ) {
-		const { colors: overlayColors } = extractColorsFromClasses(
-			subMenuItem.classes
-		);
-		colorAttrs.overlayTextColor = overlayColors?.textColor;
-		colorAttrs.overlayBackgroundColor = overlayColors?.backgroundColor;
-	}
-
-	return colorAttrs;
-}
-
-/**
  * Converts an adjacency list of menuItems into a navigation block.
  *
  * @param {Array} menuItems a list of menu items
@@ -122,13 +92,10 @@ function createNavigationBlock( menuItems ) {
 		menuItems
 	);
 
-	const colors = findColorsFromMenuItems( menuItems );
-
 	const navigationBlock = createBlock(
 		'core/navigation',
 		{
 			orientation: 'vertical',
-			...colors,
 		},
 		innerBlocks
 	);

@@ -133,17 +133,6 @@ function menuItemToBlockAttributes( {
 		object = 'tag';
 	}
 
-	// Remove colors from classNames since they will be set by the navigation
-	// block. Keeping the color classes would mean multiple color classes could
-	// accumulate as it gets saved and loaded.
-	const colorlessClasses = classes?.length
-		? classes.filter(
-				( className ) =>
-					! className.startsWith( 'has-' ) &&
-					! className.endsWith( '-color' )
-		  )
-		: [];
-
 	return {
 		label: menuItemTitleField?.rendered || '',
 		...( object?.length && {
@@ -155,9 +144,9 @@ function menuItemToBlockAttributes( {
 			xfn.join( ' ' ).trim() && {
 				rel: xfn.join( ' ' ).trim(),
 			} ),
-		...( colorlessClasses.length &&
-			colorlessClasses.join( ' ' ).trim() && {
-				className: colorlessClasses.join( ' ' ).trim(),
+		...( classes?.length &&
+			classes.join( ' ' ).trim() && {
+				className: classes.join( ' ' ).trim(),
 			} ),
 		...( attr_title?.length && {
 			title: attr_title,
