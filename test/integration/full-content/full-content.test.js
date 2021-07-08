@@ -58,8 +58,8 @@ function normalizeParsedBlocks( blocks ) {
 }
 
 describe( 'full post content fixture', () => {
-	beforeAll( async () => {
-		const blockMetadataFiles = await glob(
+	beforeAll( () => {
+		const blockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
 		);
 		const blockDefinitions = fromPairs(

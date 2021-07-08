@@ -43,6 +43,8 @@ jest.mock( '@wordpress/dom', () => {
 	};
 } );
 
+jest.useRealTimers();
+
 describe( 'useDisabled', () => {
 	const Form = forwardRef( ( { showButton }, ref ) => {
 		return (
