@@ -34,7 +34,7 @@ const ListViewBlockContents = forwardRef(
 	) => {
 		const {
 			__experimentalFeatures,
-			blockDropTarget = {},
+			blockDropTarget,
 		} = useListViewContext();
 
 		const { clientId } = block;
@@ -66,7 +66,7 @@ const ListViewBlockContents = forwardRef(
 			rootClientId: dropTargetRootClientId,
 			clientId: dropTargetClientId,
 			dropPosition,
-		} = blockDropTarget;
+		} = blockDropTarget || {};
 
 		const isDroppingBefore =
 			dropTargetRootClientId === rootClientId &&
@@ -117,7 +117,7 @@ const ListViewBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ draggable && __experimentalFeatures }
+							draggable={ draggable }
 							onDragStart={ onDragStart }
 							onDragEnd={ onDragEnd }
 							{ ...props }

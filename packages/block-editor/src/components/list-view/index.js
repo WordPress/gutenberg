@@ -70,16 +70,12 @@ export default function ListView( {
 	);
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
-	let { ref: treeGridRef, target: blockDropTarget } = useListViewDropZone();
+	const { ref: treeGridRef, target: blockDropTarget } = useListViewDropZone();
 
 	const isMounted = useRef( false );
 	useEffect( () => {
 		isMounted.current = true;
 	}, [] );
-
-	if ( ! __experimentalFeatures ) {
-		blockDropTarget = undefined;
-	}
 
 	const expand = ( clientId ) => {
 		if ( ! clientId ) {
