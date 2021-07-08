@@ -32,18 +32,11 @@ const ListViewBlockContents = forwardRef(
 		},
 		ref
 	) => {
-		const {
-			__experimentalFeatures,
-			blockDropTarget,
-		} = useListViewContext();
+		const { __experimentalFeatures } = useListViewContext();
 
 		const { clientId } = block;
 
-		const {
-			rootClientId,
-			blockMovingClientId,
-			selectedBlockInBlockEditor,
-		} = useSelect(
+		const { blockMovingClientId, selectedBlockInBlockEditor } = useSelect(
 			( select ) => {
 				const {
 					getBlockRootClientId,
@@ -62,27 +55,8 @@ const ListViewBlockContents = forwardRef(
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
 
-		const {
-			rootClientId: dropTargetRootClientId,
-			clientId: dropTargetClientId,
-			dropPosition,
-		} = blockDropTarget || {};
-
-		const isDroppingBefore =
-			dropTargetRootClientId === rootClientId &&
-			dropTargetClientId === clientId &&
-			dropPosition === 'top';
-		const isDroppingAfter =
-			dropTargetRootClientId === rootClientId &&
-			dropTargetClientId === clientId &&
-			dropPosition === 'bottom';
-		const isDroppingToInnerBlocks =
-			dropTargetRootClientId === clientId && dropPosition === 'inside';
-
 		const className = classnames( 'block-editor-list-view-block-contents', {
-			'is-dropping-before': isDroppingBefore || isBlockMoveTarget,
-			'is-dropping-after': isDroppingAfter,
-			'is-dropping-to-inner-blocks': isDroppingToInnerBlocks,
+			'is-dropping-before': isBlockMoveTarget,
 		} );
 
 		return (
