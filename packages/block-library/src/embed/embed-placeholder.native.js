@@ -14,6 +14,7 @@ import {
 	useBlockEditContext,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -64,14 +65,13 @@ const EmbedPlaceholder = ( {
 				} }
 			>
 				<View style={ containerStyle }>
-					<View style={ styles.embed__icon }>{ icon }</View>
-					<Text style={ labelStyle }>{ label }</Text>
 					{ cannotEmbed ? (
 						<>
+							<View style={ styles.embed__icon }>
+								{ warning }
+							</View>
 							<Text style={ labelStyle }>
-								{ __(
-									'Sorry, this content could not be embedded.'
-								) }
+								{ __( 'Unable to embed media' ) }
 							</Text>
 							<Text
 								style={ styles[ 'embed-empty__description' ] }
@@ -80,9 +80,15 @@ const EmbedPlaceholder = ( {
 							</Text>
 						</>
 					) : (
-						<Text style={ styles[ 'embed-empty__description' ] }>
-							{ __( 'ADD LINK' ) }
-						</Text>
+						<>
+							<View style={ styles.embed__icon }>{ icon }</View>
+							<Text style={ labelStyle }>{ label }</Text>
+							<Text
+								style={ styles[ 'embed-empty__description' ] }
+							>
+								{ __( 'ADD LINK' ) }
+							</Text>
+						</>
 					) }
 				</View>
 			</TouchableWithoutFeedback>
