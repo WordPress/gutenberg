@@ -12,12 +12,19 @@ import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
 import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 
+const EMPTY_OBJECT = {};
+const DISABLE_GRADIENT_SETTINGS = {
+	disableCustomGradients: true,
+	gradients: [],
+};
+
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
 
 export default function ColorPanel( {
 	settings,
+	hasGradient,
 	clientId,
 	enableContrastChecking = true,
 } ) {
@@ -58,6 +65,9 @@ export default function ColorPanel( {
 				title={ __( 'Color' ) }
 				initialOpen={ false }
 				settings={ settings }
+				{ ...( hasGradient
+					? EMPTY_OBJECT
+					: DISABLE_GRADIENT_SETTINGS ) }
 			>
 				{ enableContrastChecking && (
 					<ContrastChecker

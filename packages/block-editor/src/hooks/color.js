@@ -319,6 +319,7 @@ export function ColorEdit( props ) {
 
 	return (
 		<ColorPanel
+			hasGradient={ hasGradient }
 			enableContrastChecking={
 				// Turn on contrast checker for web only since it's not supported on mobile yet.
 				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
