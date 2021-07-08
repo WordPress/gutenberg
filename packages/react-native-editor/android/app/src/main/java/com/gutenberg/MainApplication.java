@@ -240,6 +240,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             }
 
+            @Override
+            public void requestPreview() {
+
+            }
+
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
