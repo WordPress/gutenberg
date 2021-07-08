@@ -88,11 +88,7 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-<<<<<<< HEAD
 	const { allowResize = true, isGrouped = false } = context;
-	const { getBlock } = useSelect( blockEditorStore );
-=======
->>>>>>> trunk
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -325,11 +321,7 @@ export default function Image( {
 						label={ __( 'Upload external image' ) }
 					/>
 				) }
-<<<<<<< HEAD
-				{ ! isGrouped && ! multiImageSelection && coverBlockExists && (
-=======
-				{ ! multiImageSelection && canInsertCover && (
->>>>>>> trunk
+				{ ! isGrouped && ! multiImageSelection && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }
