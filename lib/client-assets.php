@@ -111,7 +111,7 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 	 */
 	$scripts->add_inline_script(
 		'wp-editor',
-		'Object.assign(window.wp.editor, window.wp.oldEditor);',
+		'Object.assign( window.wp.editor, window.wp.oldEditor );',
 		'after'
 	);
 }
