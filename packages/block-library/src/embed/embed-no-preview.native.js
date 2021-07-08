@@ -65,9 +65,15 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 			? __( 'Double tap to preview page.' )
 			: __( 'Double tap to preview post.' );
 	const previewButtonText =
-		postType === 'page' ? __( 'PREVIEW PAGE' ) : __( 'PREVIEW POST' );
-	const previewSheetButtonText =
 		postType === 'page' ? __( 'Preview page' ) : __( 'Preview post' );
+	const comingSoonDescription =
+		postType === 'page'
+			? __(
+					'We’re working hard on adding support for embed previews. In the meantime, you can preview the embedded content on the page.'
+			  )
+			: __(
+					'We’re working hard on adding support for embed previews. In the meantime, you can preview the embedded content on the post.'
+			  );
 
 	function onOpenSheet() {
 		setIsSheetVisible( true );
@@ -104,7 +110,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 						{ __( 'Inline preview coming soon' ) }
 					</Text>
 					<Text style={ styles.embed__action }>
-						{ previewButtonText }
+						{ previewButtonText.toUpperCase() }
 					</Text>
 				</View>
 			</TouchableWithoutFeedback>
@@ -126,13 +132,11 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 						{ __( 'Embed block previews are coming soon' ) }
 					</Text>
 					<Text style={ sheetDescriptionStyle }>
-						{ __(
-							'We’re working hard on adding support for embed previews. In the meantime, you can preview the embedded content on the page.'
-						) }
+						{ comingSoonDescription }
 					</Text>
 				</View>
 				<TextControl
-					label={ previewSheetButtonText }
+					label={ previewButtonText }
 					separatorType="topFullWidth"
 					onPress={ () => {
 						shouldRequestReview.current = true;
