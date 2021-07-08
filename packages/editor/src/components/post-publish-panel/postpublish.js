@@ -107,7 +107,6 @@ class PostPublishPanelPostpublish extends Component {
 		const addLink = addQueryArgs( 'post-new.php', {
 			post_type: post.type,
 		} );
-		const dashboardLink = addQueryArgs( 'index.php', {} );
 
 		const postPublishNonLinkHeader = isScheduled ? (
 			<>
@@ -160,11 +159,6 @@ class PostPublishPanelPostpublish extends Component {
 						) }
 						<Button variant="secondary" href={ addLink }>
 							{ addNewPostLabel }
-						</Button>
-					</div>
-					<div className="post-publish-panel__dashboard-link">
-						<Button variant="link" href={ dashboardLink }>
-							{ __( 'Back to dashboard' ) }
 						</Button>
 					</div>
 				</PanelBody>

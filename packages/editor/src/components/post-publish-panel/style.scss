@@ -195,17 +195,6 @@
 	color: $alert-yellow;
 }
 
-.post-publish-panel__dashboard-link {
-	margin-top: $grid-unit-15;
-	display: flex;
-	justify-content: center;
-
-	.components-button {
-		color: inherit;
-		text-decoration: none;
-	}
-}
-
 @media screen and (max-width: 782px) {
 	.post-publish-panel__postpublish-post-address__button-wrap {
 		.components-button {
