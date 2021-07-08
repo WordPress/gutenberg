@@ -13,7 +13,6 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
 import {
 	RangeControl,
 	PanelBody,
@@ -45,7 +44,7 @@ export default function BreadcrumbsEdit( {
 			const { getEntityRecord, getEditedEntityRecord } = select(
 				coreStore
 			);
-			const { getEditedPostAttribute } = select( editorStore );
+
 			const parentEntities = [];
 
 			const currentPost = getEditedEntityRecord(
@@ -54,7 +53,7 @@ export default function BreadcrumbsEdit( {
 				postId
 			);
 
-			let currentParentId = getEditedPostAttribute( 'parent' );
+			let currentParentId = currentPost?.parent;
 
 			while ( currentParentId ) {
 				const nextParent = getEntityRecord(
