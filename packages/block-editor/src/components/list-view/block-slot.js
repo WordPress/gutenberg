@@ -23,30 +23,27 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockIcon from '../block-icon';
 import { BlockListBlockContext } from '../block-list/block';
-import BlockNavigationBlockSelectButton from './block-select-button';
+import ListViewBlockSelectButton from './block-select-button';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
-import BlockNavigationExpander from './expander';
+import ListViewExpander from './expander';
 
-const getSlotName = ( clientId ) => `BlockNavigationBlock-${ clientId }`;
+const getSlotName = ( clientId ) => `ListViewBlock-${ clientId }`;
 
-function BlockNavigationBlockSlot( props, ref ) {
+function ListViewBlockSlot( props, ref ) {
 	const { clientId } = props.block;
 	const { name } = useSelect(
 		( select ) => select( blockEditorStore ).getBlockName( clientId ),
 		[ clientId ]
 	);
-	const instanceId = useInstanceId( BlockNavigationBlockSlot );
+	const instanceId = useInstanceId( ListViewBlockSlot );
 
 	return (
 		<Slot name={ getSlotName( clientId ) }>
 			{ ( fills ) => {
 				if ( ! fills.length ) {
 					return (
-						<BlockNavigationBlockSelectButton
-							ref={ ref }
-							{ ...props }
-						/>
+						<ListViewBlockSelectButton ref={ ref } { ...props } />
 					);
 				}
 
@@ -62,7 +59,7 @@ function BlockNavigationBlockSlot( props, ref ) {
 				} = props;
 
 				const blockType = getBlockType( name );
-				const descriptionId = `block-navigation-block-slot__${ instanceId }`;
+				const descriptionId = `list-view-block-slot__${ instanceId }`;
 				const blockPositionDescription = getBlockPositionDescription(
 					position,
 					siblingBlockCount,
@@ -84,13 +81,11 @@ function BlockNavigationBlockSlot( props, ref ) {
 					<>
 						<div
 							className={ classnames(
-								'block-editor-block-navigation-block-slot',
+								'block-editor-list-view-block-slot',
 								className
 							) }
 						>
-							<BlockNavigationExpander
-								onClick={ onToggleExpanded }
-							/>
+							<ListViewExpander onClick={ onToggleExpanded } />
 							<BlockIcon icon={ blockType.icon } showColors />
 							{ Children.map( fills, ( fill ) =>
 								cloneElement( fill, {
@@ -104,7 +99,7 @@ function BlockNavigationBlockSlot( props, ref ) {
 								</VisuallyHidden>
 							) }
 							<div
-								className="block-editor-block-navigation-block-slot__description"
+								className="block-editor-list-view-block-slot__description"
 								id={ descriptionId }
 							>
 								{ blockPositionDescription }
@@ -117,9 +112,9 @@ function BlockNavigationBlockSlot( props, ref ) {
 	);
 }
 
-export default forwardRef( BlockNavigationBlockSlot );
+export default forwardRef( ListViewBlockSlot );
 
-export const BlockNavigationBlockFill = ( props ) => {
+export const ListViewBlockFill = ( props ) => {
 	const { clientId } = useContext( BlockListBlockContext );
 	return <Fill { ...props } name={ getSlotName( clientId ) } />;
 };

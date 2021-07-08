@@ -1146,6 +1146,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "SearchControl",
+		"slug": "search-control",
+		"markdown_source": "../packages/components/src/search-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "SelectControl",
 		"slug": "select-control",
 		"markdown_source": "../packages/components/src/select-control/README.md",

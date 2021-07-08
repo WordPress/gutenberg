@@ -3,10 +3,9 @@
  */
 import { createContext, useContext } from '@wordpress/element';
 
-export const BlockNavigationContext = createContext( {
+export const ListViewContext = createContext( {
 	__experimentalFeatures: false,
 	__experimentalPersistentListViewFeatures: false,
 } );
 
-export const useBlockNavigationContext = () =>
-	useContext( BlockNavigationContext );
+export const useListViewContext = () => useContext( ListViewContext );

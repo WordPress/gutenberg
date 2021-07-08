@@ -55,18 +55,16 @@ When a user switches a toggle, its corresponding action takes effect immediately
 
 ```jsx
 import { FormToggle } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyFormToggle = withState( {
-	checked: true,
-} )( ( { checked, setState } ) => (
+const MyFormToggle = () => {
+	const [ isChecked, setChecked ] = useState( true );
+
 	<FormToggle
 		checked={ checked }
-		onChange={ () =>
-			setState( ( state ) => ( { checked: ! state.checked } ) )
-		}
+		onChange={ () => setChecked( ( state ) => ! state ) }
 	/>
-) );
+};
 ```
 
 ### Props

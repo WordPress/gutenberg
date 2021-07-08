@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { chevronRightSmall, Icon } from '@wordpress/icons';
-export default function BlockNavigationExpander( { onClick } ) {
+export default function ListViewExpander( { onClick } ) {
 	return (
 		// Keyboard events are handled by TreeGrid see: components/src/tree-grid/index.js
 		//
@@ -14,7 +14,7 @@ export default function BlockNavigationExpander( { onClick } ) {
 		//
 		// eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
 		<span
-			className="block-editor-block-navigation__expander"
+			className="block-editor-list-view__expander"
 			onClick={ ( event ) => onClick( event, { forceToggle: true } ) }
 			aria-hidden="true"
 		>
