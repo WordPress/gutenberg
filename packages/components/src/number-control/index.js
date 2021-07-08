@@ -6,7 +6,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useCallback } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -17,9 +17,11 @@ import {
 	inputControlActionTypes,
 	composeStateReducers,
 } from '../input-control/state';
-import { add, subtract, roundClamp } from '../utils/math';
+import { add, subtract, roundClamp, getNumber } from '../utils/math';
 import { useJumpStep } from '../utils/hooks';
 import { isValueEmpty } from '../utils/values';
+
+const noop = () => {};
 
 export function NumberControl(
 	{
@@ -36,6 +38,7 @@ export function NumberControl(
 		step = 1,
 		type: typeProp = 'number',
 		value: valueProp,
+		onValidate = noop,
 		...props
 	},
 	ref
@@ -161,10 +164,24 @@ export function NumberControl(
 		return state;
 	};
 
+	const handleValidate = useCallback(
+		( value ) => {
+			onValidate( value );
+			const minInt = getNumber( min );
+			const maxInt = getNumber( max );
+			const valueInt = getNumber( value );
+			if ( valueInt < minInt || valueInt > maxInt ) {
+				throw new Error(
+					`Value is outside of min/max bounds of ${ min }/${ max }`
+				);
+			}
+		},
+		[ min, max, onValidate ]
+	);
+
 	return (
 		<Input
 			autoComplete={ autoComplete }
-			inputMode="numeric"
 			{ ...props }
 			className={ classes }
 			dragDirection={ dragDirection }
@@ -181,6 +198,7 @@ export function NumberControl(
 				numberControlStateReducer,
 				stateReducer
 			) }
+			onValidate={ handleValidate }
 		/>
 	);
 }

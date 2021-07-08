@@ -272,7 +272,6 @@ function RangeControl(
 						aria-label={ label }
 						className="components-range-control__number"
 						disabled={ disabled }
-						inputMode="decimal"
 						isShiftStepEnabled={ isShiftStepEnabled }
 						max={ max }
 						min={ min }
