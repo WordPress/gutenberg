@@ -61,11 +61,20 @@ export default function QueryToolbar( {
 										labelPosition="edge"
 										min={ 1 }
 										max={ 100 }
-										onChange={ ( value ) =>
-											setQuery( {
-												perPage: +value ?? -1,
-											} )
-										}
+										onChange={ ( value ) => {
+											/**
+											 * For now allow only a positive number and exclude `-1`
+											 * which will result in fetching all entities.
+											 */
+											const numValue = +value;
+											if (
+												numValue &&
+												numValue >= 1 &&
+												numValue <= 100
+											) {
+												setQuery( { perPage: +value } );
+											}
+										} }
 										step="1"
 										value={ query.perPage }
 										isDragEnabled={ false }
