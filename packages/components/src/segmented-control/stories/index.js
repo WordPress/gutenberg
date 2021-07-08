@@ -21,24 +21,18 @@ export default {
 	title: 'Components/SegmentedControl',
 };
 
-const align = [
-	{
-		label: <Icon icon={ alignLeft } size={ 14 } />,
-		value: 'left',
-	},
-	{
-		label: <Icon icon={ alignCenter } size={ 14 } />,
-		value: 'center',
-	},
-	{
-		label: <Icon icon={ alignRight } size={ 14 } />,
-		value: 'right',
-	},
-	{
-		label: <Icon icon={ alignJustify } size={ 14 } />,
-		value: 'justify',
-	},
-];
+const alignMapObject = {
+	left: alignLeft,
+	center: alignCenter,
+	right: alignRight,
+	justify: alignJustify,
+};
+const align = Object.entries( alignMapObject ).map( ( [ key, icon ] ) => ( {
+	label: (
+		<Icon icon={ icon } size={ 14 } style={ { fill: 'currentColor' } } />
+	),
+	value: key,
+} ) );
 
 export const _default = () => {
 	const [ alignState, setAlignState ] = useState( align[ 0 ].value );
