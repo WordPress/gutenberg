@@ -43,7 +43,7 @@ describe( 'Test case', () => {
 		<div class="wp-block-button"><a class="wp-block-button__link">Hello</a></div>
 		<!-- /wp:button --></div>
 		<!-- /wp:buttons -->`;
-		const { getByA11yLabel, getByText } = await initializeEditor( {
+		const { getByA11yLabel } = await initializeEditor( {
 			initialHtml,
 		} );
 
@@ -77,9 +77,8 @@ describe( 'Test case', () => {
 			getByA11yLabel( 'Open Settings' )
 		);
 		fireEvent.press( settingsButton );
-
 		const radiusSlider = await waitFor( () =>
-			getByText( 'Border Radius' )
+			getByA11yLabel( /Border Radius/ )
 		);
 		// Adjust the Button block border radius slider
 		fireEvent( radiusSlider, 'valueChange', '31' );
