@@ -14,6 +14,7 @@ import { ESCAPE } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
+import Navigation from './navigation';
 import NavigationMenu from './navigation-menu';
 import { store as editSiteStore } from '../../../store';
 
@@ -66,7 +67,9 @@ const NavigationPanel = ( { isOpen } ) => {
 					</div>
 				</div>
 				<div className="edit-site-navigation-panel__scroll-container">
-					<NavigationMenu />
+					<Navigation.Slot>
+						<NavigationMenu />
+					</Navigation.Slot>
 				</div>
 			</div>
 		</div>
