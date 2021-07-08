@@ -733,6 +733,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
+					'layout'     => array(
+						'units' => array( 'px', 'em' ),
+					),
 					'spacing'    => array(
 						'units' => array( 'px', 'em' ),
 					),
@@ -758,6 +761,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'gradients' => array(),
 							'palette'   => array(),
 						),
+						'layout'     => array(
+							'units' => array(),
+						),
 						'spacing'    => array(
 							'units' => array(),
 						),
@@ -781,6 +787,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'palette'   => array(
 						'theme' => array(),
 					),
+				),
+				'layout'     => array(
+					'units' => array(),
 				),
 				'spacing'    => array(
 					'units' => array(),
@@ -821,6 +830,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
+					'layout'     => array(
+						'units' => array( 'px', 'em' ),
+					),
 					'spacing'    => array(
 						'units' => array( 'px', 'em' ),
 					),
@@ -843,6 +855,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'settings' => array(
 						'color'      => array(
 							'custom' => false,
+						),
+						'layout'     => array(
+							'contentSize' => '610px',
 						),
 						'spacing'    => array(
 							'customMargin' => false,
@@ -883,6 +898,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
+				),
+				'layout'     => array(
+					'contentSize' => '610px',
+					'units'       => array( 'px', 'em' ),
 				),
 				'spacing'    => array(
 					'customMargin' => false,
