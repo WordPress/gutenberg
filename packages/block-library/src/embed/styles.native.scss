@@ -47,6 +47,21 @@
 	font-weight: 500;
 }
 
+.embed-preview__loading {
+	flex: 1;
+	padding-left: 12px;
+	padding-right: 12px;
+	padding-top: 40px;
+	padding-bottom: 40px;
+	background-color: $gray-lighten-30;
+	justify-content: center;
+	align-items: center;
+}
+
+.embed-preview__loading--dark {
+	background-color: $background-dark-secondary;
+}
+
 .embed-preview__placeholder-text {
 	font-size: $default-font-size;
 	text-align: center;
