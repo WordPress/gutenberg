@@ -13,7 +13,7 @@ import {
 	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
 
-async function getSetting( setting ) {
+async function getOption( setting ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'options.php' );
 
@@ -25,7 +25,7 @@ async function getSetting( setting ) {
 	return value;
 }
 
-async function setSetting( setting, value ) {
+async function setOption( setting, value ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'options-general.php' );
 
@@ -63,13 +63,13 @@ describe( 'Site Title block', () => {
 	let originalSiteTitle, password;
 	const username = 'testuser';
 	beforeAll( async () => {
-		originalSiteTitle = await getSetting( 'blogname' );
+		originalSiteTitle = await getOption( 'blogname' );
 		password = await createUser( username, { role: 'editor' } );
 	} );
 
 	afterAll( async () => {
 		await deleteUser( username );
-		await setSetting( 'blogname', originalSiteTitle );
+		await setOption( 'blogname', originalSiteTitle );
 	} );
 
 	it( 'Can edit the site title as admin', async () => {
@@ -90,7 +90,7 @@ describe( 'Site Title block', () => {
 
 		await saveEntities();
 
-		const siteTitle = await getSetting( 'blogname' );
+		const siteTitle = await getOption( 'blogname' );
 		expect( siteTitle ).toEqual( 'New Site Title' );
 	} );
 
