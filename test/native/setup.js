@@ -26,6 +26,8 @@ const mockComponent = ( element ) => ( ...args ) => {
 	return React.createElement( element, props, props.children );
 };
 
+jest.useFakeTimers();
+
 jest.mock( '@wordpress/element', () => {
 	return {
 		__esModule: true,
@@ -125,6 +127,12 @@ if ( ! global.window.matchMedia ) {
 		addListener: () => {},
 		removeListener: () => {},
 	} );
+}
+
+if ( ! global.window.setImmediate ) {
+	global.window.setImmediate = function ( callback ) {
+		return setTimeout( callback, 0 );
+	};
 }
 
 jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {

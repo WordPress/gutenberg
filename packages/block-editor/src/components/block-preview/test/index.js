@@ -47,6 +47,8 @@ jest.mock( '@wordpress/dom', () => {
 	};
 } );
 
+jest.useRealTimers();
+
 describe( 'useBlockPreview', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {

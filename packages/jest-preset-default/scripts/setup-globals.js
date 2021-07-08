@@ -6,6 +6,10 @@ global.window.tinyMCEPreInit = {
 	baseURL: 'about:blank',
 };
 
+global.window.setImmediate = function ( callback ) {
+	return setTimeout( callback, 0 );
+};
+
 global.window.requestAnimationFrame = function requestAnimationFrame(
 	callback
 ) {
