@@ -6,6 +6,17 @@
 .wp-block-navigation {
 	position: relative;
 
+	// Horizontal layout
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+
+	// Vertical layout
+	&.is-vertical {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
 	// Normalize list styles.
 	ul,
 	ul li {

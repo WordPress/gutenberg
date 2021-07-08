@@ -18,6 +18,7 @@ import styles from './style.scss';
 
 const BottomSheetSelectControl = ( {
 	label,
+	icon,
 	options: items,
 	onChange,
 	value: selectedValue,
@@ -52,6 +53,7 @@ const BottomSheetSelectControl = ( {
 				<BottomSheet.Cell
 					label={ label }
 					separatorType="none"
+					icon={ icon }
 					value={ selectedOption.label }
 					onPress={ openSubSheet }
 					accessibilityRole={ 'button' }

@@ -32,11 +32,7 @@ import {
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
-import {
-	createBlock,
-	getBlockType,
-	switchToBlockType,
-} from '@wordpress/blocks';
+import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -59,27 +55,6 @@ function getFilename( url ) {
 	if ( path ) {
 		return last( path.split( '/' ) );
 	}
-}
-
-/**
- * Checks if the given block is registered and is in the allowed blocks list.
- *
- * @param {string}        name Block name.
- * @param {boolean|Array} list Allowed block types.
- *
- * @return {boolean}           Whether the block exists.
- */
-function checkBlockExists( name, list ) {
-	if ( ! getBlockType( name ) ) {
-		return false;
-	}
-
-	// The allowed blocks list has a boolean value so return it.
-	if ( ! Array.isArray( list ) ) {
-		return list;
-	}
-
-	return list.includes( name );
 }
 
 export default function Image( {
@@ -112,7 +87,6 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { getBlock } = useSelect( blockEditorStore );
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -133,21 +107,46 @@ export default function Image( {
 		[ id, isSelected ]
 	);
 	const {
-		allowedBlockTypes,
+		canInsertCover,
+		getBlock,
 		imageEditing,
 		imageSizes,
 		maxWidth,
 		mediaUpload,
-	} = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return pick( getSettings(), [
-			'allowedBlockTypes',
-			'imageEditing',
-			'imageSizes',
-			'maxWidth',
-			'mediaUpload',
-		] );
-	} );
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlock: _getBlock,
+				getBlockRootClientId,
+				getBlockTransformItems,
+				getSettings,
+			} = select( blockEditorStore );
+
+			const block = _getBlock( clientId );
+			const rootClientId = getBlockRootClientId( clientId );
+			const transformations = getBlockTransformItems(
+				[ block ],
+				rootClientId
+			);
+			const settings = pick( getSettings(), [
+				'imageEditing',
+				'imageSizes',
+				'maxWidth',
+				'mediaUpload',
+			] );
+
+			return {
+				...settings,
+				getBlock: _getBlock,
+				canInsertCover:
+					transformations?.length &&
+					!! transformations.find(
+						( { name } ) => name === 'core/cover'
+					),
+			};
+		},
+		[ clientId ]
+	);
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
@@ -164,12 +163,6 @@ export default function Image( {
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )
-	);
-
-	// Check if the cover block is registered and in allowed block list.
-	const coverBlockExists = checkBlockExists(
-		'core/cover',
-		allowedBlockTypes
 	);
 
 	// If an image is externally hosted, try to fetch the image data. This may
@@ -326,7 +319,7 @@ export default function Image( {
 						label={ __( 'Upload external image' ) }
 					/>
 				) }
-				{ ! multiImageSelection && coverBlockExists && (
+				{ ! multiImageSelection && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }

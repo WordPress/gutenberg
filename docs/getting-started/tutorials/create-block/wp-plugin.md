@@ -92,12 +92,12 @@ To load the built script, so it is run within the editor, you need to tell WordP
 
 ```php
 function create_block_gutenpride_block_init() {
-	register_block_type_from_metadata( __DIR__ );
+	register_block_type( __DIR__ );
 }
 add_action( 'init', 'create_block_gutenpride_block_init' );
 ```
 
-The `register_block_type_from_metadata` function registers the block we are going to create and specifies the `editor_script` file handle registered from the metadata provided in `block.json` file. So now when the editor loads it will load this script.
+The `register_block_type` function registers the block we are going to create and specifies the editor script handle registered from the metadata provided in `block.json` file with the `editorScript` field. So now when the editor loads it will load this script.
 
 ```json
 {
@@ -137,6 +137,6 @@ For more info, see the build section of the [Getting Started with JavaScript tut
 
 ## Summary
 
-Hopefully, at this point, you have your plugin created and activated. We have the package.json with the `@wordpress/scripts` dependency, that defines the build and start scripts. The basic block is in place and can be added to the editor.
+Hopefully, at this point, you have your plugin created and activated. We have the `package.json` with the `@wordpress/scripts` dependency, that defines the build and start scripts. The basic block is in place and can be added to the editor.
 
 Next Section: [Anatomy of a Block](/docs/getting-started/tutorials/create-block/block-anatomy.md)

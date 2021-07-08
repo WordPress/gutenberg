@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, Text } from 'react-native';
+import { TouchableWithoutFeedback, Image, Text } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -21,17 +21,26 @@ import styles from './styles.scss';
 
 const EmbedPreview = ( {
 	clientId,
+	icon,
 	insertBlocksAfter,
 	isSelected,
+	label,
 	onBlur,
 	onFocus,
+	preview,
+	previewable,
+	url,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
-	const stylePlaceholder = usePreferredColorSchemeStyle(
-		styles[ 'embed-preview__placeholder' ],
-		styles[ 'embed-preview__placeholder--dark' ]
+	const containerStyle = usePreferredColorSchemeStyle(
+		styles.embed__container,
+		styles[ 'embed__container--dark' ]
 	);
-	const stylePlaceholderText = usePreferredColorSchemeStyle(
+	const labelStyle = usePreferredColorSchemeStyle(
+		styles.embed__label,
+		styles[ 'embed__label--dark' ]
+	);
+	const placeholderTextStyle = usePreferredColorSchemeStyle(
 		styles[ 'embed-preview__placeholder-text' ],
 		styles[ 'embed-preview__placeholder-text--dark' ]
 	);
@@ -60,7 +69,18 @@ const EmbedPreview = ( {
 		}
 	}
 
-	// Currently returning a Text component that act's as the Embed Preview to simulate the caption's isSelected state.
+	const parsedHost = new URL( url ).host.split( '.' );
+	const parsedHostBaseUrl = parsedHost
+		.splice( parsedHost.length - 2, parsedHost.length - 1 )
+		.join( '.' );
+
+	const cannotShowThumbnail =
+		! previewable ||
+		! preview ||
+		! preview.thumbnail_url?.length ||
+		! preview.height ||
+		! preview.width;
+
 	return (
 		<TouchableWithoutFeedback
 			accessible={ ! isSelected }
@@ -68,12 +88,32 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				<View style={ stylePlaceholder }>
-					<Text style={ stylePlaceholderText }>
-						Embed Preview will be directly above the Block Caption
-						component when it is implemented.
-					</Text>
-				</View>
+				{ cannotShowThumbnail ? (
+					<View style={ containerStyle }>
+						<View style={ styles.embed__icon }>{ icon }</View>
+						<Text style={ labelStyle }>{ label }</Text>
+						<Text style={ placeholderTextStyle }>
+							{ sprintf(
+								/* translators: %s: host providing embed content e.g: www.youtube.com */
+								__(
+									"Embedded content from %s can't be viewed in the mobile editor at the moment. Please preview the page to see the embedded content."
+								),
+								parsedHostBaseUrl
+							) }
+						</Text>
+					</View>
+				) : (
+					<Image
+						style={ {
+							flex: 1,
+							aspectRatio: preview.width / preview.height,
+						} }
+						source={ {
+							uri: preview.thumbnail_url,
+						} }
+						resizeMode="cover"
+					/>
+				) }
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }
 					accessible

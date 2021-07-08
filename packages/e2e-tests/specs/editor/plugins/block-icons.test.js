@@ -40,7 +40,7 @@ async function getFirstInserterIcon() {
 async function selectFirstBlock() {
 	await pressKeyWithModifier( 'access', 'o' );
 	const navButtons = await page.$$(
-		'.block-editor-block-navigation-block-select-button'
+		'.block-editor-list-view-block-select-button'
 	);
 	await navButtons[ 0 ].click();
 }

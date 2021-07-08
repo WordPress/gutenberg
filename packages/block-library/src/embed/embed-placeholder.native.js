@@ -23,11 +23,13 @@ import styles from './styles.scss';
 
 const EmbedPlaceholder = ( {
 	icon,
+	isEditingURL,
 	isSelected,
 	label,
 	onFocus,
 	value,
 	onSubmit,
+	cannotEmbed,
 } ) => {
 	const { clientId } = useBlockEditContext();
 	const { wasBlockJustInserted } = useSelect(
@@ -39,41 +41,51 @@ const EmbedPlaceholder = ( {
 		[ clientId ]
 	);
 	const [ isEmbedSheetVisible, setIsEmbedSheetVisible ] = useState(
-		isSelected && wasBlockJustInserted && ! value
+		isSelected && ( ( wasBlockJustInserted && ! value ) || isEditingURL )
 	);
 
-	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
-		styles.emptyStateContainer,
-		styles.emptyStateContainerDark
+	const containerStyle = usePreferredColorSchemeStyle(
+		styles.embed__container,
+		styles[ 'embed__container--dark' ]
 	);
-
-	const emptyStateTitleStyle = usePreferredColorSchemeStyle(
-		styles.emptyStateTitle,
-		styles.emptyStateTitleDark
+	const labelStyle = usePreferredColorSchemeStyle(
+		styles.embed__label,
+		styles[ 'embed__label--dark' ]
 	);
 
 	return (
 		<>
-			{ value ? (
-				<Text>{ value }</Text>
-			) : (
-				<TouchableWithoutFeedback
-					accessibilityRole={ 'button' }
-					accessibilityHint={ __( 'Double tap to add a link.' ) }
-					onPress={ ( event ) => {
-						onFocus( event );
-						setIsEmbedSheetVisible( true );
-					} }
-				>
-					<View style={ emptyStateContainerStyle }>
-						<View style={ styles.modalIcon }>{ icon }</View>
-						<Text style={ emptyStateTitleStyle }>{ label }</Text>
-						<Text style={ styles.emptyStateDescription }>
+			<TouchableWithoutFeedback
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Double tap to add a link.' ) }
+				onPress={ ( event ) => {
+					onFocus( event );
+					setIsEmbedSheetVisible( true );
+				} }
+			>
+				<View style={ containerStyle }>
+					<View style={ styles.embed__icon }>{ icon }</View>
+					<Text style={ labelStyle }>{ label }</Text>
+					{ cannotEmbed ? (
+						<>
+							<Text style={ labelStyle }>
+								{ __(
+									'Sorry, this content could not be embedded.'
+								) }
+							</Text>
+							<Text
+								style={ styles[ 'embed-empty__description' ] }
+							>
+								{ __( 'EDIT LINK' ) }
+							</Text>
+						</>
+					) : (
+						<Text style={ styles[ 'embed-empty__description' ] }>
 							{ __( 'ADD LINK' ) }
 						</Text>
-					</View>
-				</TouchableWithoutFeedback>
-			) }
+					) }
+				</View>
+			</TouchableWithoutFeedback>
 			<EmbedBottomSheet
 				value={ value }
 				isVisible={ isEmbedSheetVisible }
