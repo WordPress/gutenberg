@@ -293,7 +293,7 @@ export const menuItemToBlockAttributes = ( {
 			} ),
 		...( classes?.length &&
 			classes.join( ' ' ).trim() && {
-				className: classes?.join( ' ' ).trim(),
+				className: classes.join( ' ' ).trim(),
 			} ),
 		...( attr_title?.length && {
 			title: attr_title,
