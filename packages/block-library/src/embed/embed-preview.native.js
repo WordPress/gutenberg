@@ -17,7 +17,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import EmbedNoPreview from './embed-no-preview';
-import styles from './styles';
+import styles from './styles.scss';
 
 const EmbedPreview = ( {
 	clientId,
