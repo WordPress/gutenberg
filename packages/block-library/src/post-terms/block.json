@@ -28,5 +28,6 @@
 			"lineHeight": true,
 			"fontSize": true
 		}
-	}
+	},
+	"style": "wp-block-post-terms"
 }
