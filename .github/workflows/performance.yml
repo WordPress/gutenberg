@@ -50,7 +50,7 @@ jobs:
     performance-tests:
         name: Run performance tests
         needs: determine-branches
-        if: ${{ github.repository == 'WordPress/gutenberg' }}
+        if: ${{ github.event_name == 'release' || github.repository == 'WordPress/gutenberg' }}
         runs-on: ubuntu-latest
         strategy:
             matrix:
