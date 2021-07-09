@@ -120,7 +120,7 @@ export default function ListView( {
 	);
 
 	return (
-		<ListViewContext.Provider value={ contextValue }>
+		<>
 			<ListViewDropIndicator
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
@@ -132,13 +132,15 @@ export default function ListView( {
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
 			>
-				<ListViewBranch
-					blocks={ clientIdsTree }
-					selectBlock={ selectEditorBlock }
-					selectedBlockClientIds={ selectedClientIds }
-					{ ...props }
-				/>
+				<ListViewContext.Provider value={ contextValue }>
+					<ListViewBranch
+						blocks={ clientIdsTree }
+						selectBlock={ selectEditorBlock }
+						selectedBlockClientIds={ selectedClientIds }
+						{ ...props }
+					/>
+				</ListViewContext.Provider>
 			</TreeGrid>
-		</ListViewContext.Provider>
+		</>
 	);
 }
