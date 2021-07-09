@@ -107,7 +107,7 @@ export default function PostTermsEdit( {
 						.reduce( ( prev, curr ) => (
 							<>
 								{ prev }
-								<span className="wp-block-post-terms__sep">
+								<span className="wp-block-post-terms__separator">
 									{ separator || ' ' }
 								</span>
 								{ curr }
