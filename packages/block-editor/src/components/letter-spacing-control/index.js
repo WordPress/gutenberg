@@ -22,7 +22,7 @@ import useSetting from '../../components/use-setting';
  */
 export default function LetterSpacingControl( { value, onChange } ) {
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'layout.units' ) || [ 'px', 'em', 'rem' ],
+		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 		defaultValues: { px: '2', em: '.2', rem: '.2' },
 	} );
 	return (
