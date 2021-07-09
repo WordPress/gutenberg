@@ -58,7 +58,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable the refactored gallery block', 'gutenberg' ),
+			'label' => __( 'Enable the refactored gallery block (Warning: The refactored gallery is not compatible with WordPress mobile apps prior to version 17.8. If you use the mobile app, please update to the latest version to avoid content loss.)', 'gutenberg' ),
 			'id'    => 'gutenberg-gallery-refactor',
 		)
 	);
