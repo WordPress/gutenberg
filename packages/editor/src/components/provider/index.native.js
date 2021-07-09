@@ -136,8 +136,11 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
 			( editorSettings ) => {
-				updateSettings(  {
-					...{ __experimentalGalleryRefactor: editorSettings.galleryRefactor },
+				updateSettings( {
+					...{
+						__experimentalGalleryRefactor:
+							editorSettings.galleryRefactor,
+					},
 					...this.getThemeColors( editorSettings ),
 				} );
 			}
