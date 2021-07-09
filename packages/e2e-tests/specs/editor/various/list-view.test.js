@@ -9,19 +9,14 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 async function dragAndDrop( draggableElement, targetElement, offsetY ) {
-	const draggableRect = await draggableElement.boundingBox();
-	const dragPosition = {
-		x: draggableRect.x + draggableRect.width / 2,
-		y: draggableRect.y + draggableRect.height / 2,
+	const draggablePoint = await draggableElement.clickablePoint();
+	const targetClickablePoint = await targetElement.clickablePoint();
+	const targetPoint = {
+		x: targetClickablePoint.x,
+		y: targetClickablePoint.y + offsetY,
 	};
 
-	const targetRect = await targetElement.boundingBox();
-	const targetPosition = {
-		x: targetRect.x + targetRect.width / 2,
-		y: offsetY + targetRect.y + targetRect.height / 2,
-	};
-
-	return await page.mouse.dragAndDrop( dragPosition, targetPosition, {
+	return await page.mouse.dragAndDrop( draggablePoint, targetPoint, {
 		delay: 1000,
 	} );
 }
