@@ -225,6 +225,7 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
               with:
+                  fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
 
@@ -238,7 +239,6 @@ jobs:
                   github.event.inputs.version == 'stable' ||
                   contains( steps.get_version.outputs.old_version, 'rc' )
               run: |
-                  git pull
                   git revert --no-edit ${{ needs.bump-version.outputs.release_branch_commit }}
                   git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
 
