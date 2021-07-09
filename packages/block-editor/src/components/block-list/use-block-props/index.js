@@ -14,6 +14,7 @@ import {
 } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -65,6 +66,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		index,
 		mode,
 		name,
+		blockAPIVersion,
 		blockTitle,
 		isPartOfSelection,
 		adjustScrolling,
@@ -89,11 +91,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
 			const rootClientId = getBlockRootClientId( clientId );
+			const blockType = getBlockType( blockName );
 			return {
 				index: getBlockIndex( clientId, rootClientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
-				blockTitle: getBlockType( blockName ).title,
+				blockAPIVersion: blockType.apiVersion,
+				blockTitle: blockType.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
@@ -127,6 +131,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			triggerAnimationOnChange: index,
 		} ),
 	] );
+
+	if ( blockAPIVersion < 2 ) {
+		warning(
+			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
+		);
+	}
 
 	return {
 		...wrapperProps,

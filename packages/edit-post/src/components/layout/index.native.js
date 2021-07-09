@@ -9,7 +9,11 @@ import SafeArea from 'react-native-safe-area';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { BottomSheetSettings, FloatingToolbar } from '@wordpress/block-editor';
+import {
+	BottomSheetSettings,
+	FloatingToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	HTMLTextInput,
@@ -101,7 +105,7 @@ class Layout extends Component {
 	}
 
 	render() {
-		const { getStylesFromColorScheme, mode } = this.props;
+		const { getStylesFromColorScheme, mode, globalStyles } = this.props;
 
 		const isHtmlView = mode === 'text';
 
@@ -118,6 +122,16 @@ class Layout extends Component {
 			bottom: this.state.safeAreaInsets.bottom,
 		};
 
+		const editorStyles = [
+			getStylesFromColorScheme(
+				styles.background,
+				styles.backgroundDark
+			),
+			globalStyles?.background && {
+				backgroundColor: globalStyles.background,
+			},
+		];
+
 		return (
 			<Tooltip.Slot>
 				<SafeAreaView
@@ -128,12 +142,7 @@ class Layout extends Component {
 					onLayout={ this.onRootViewLayout }
 				>
 					<AutosaveMonitor disableIntervalChecks />
-					<View
-						style={ getStylesFromColorScheme(
-							styles.background,
-							styles.backgroundDark
-						) }
-					>
+					<View style={ editorStyles }>
 						{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 						{ ! isHtmlView && Platform.OS === 'android' && (
 							<FloatingToolbar />
@@ -176,9 +185,14 @@ export default compose( [
 			editorStore
 		);
 		const { getEditorMode } = select( editPostStore );
+		const { getSettings } = select( blockEditorStore );
+		const globalStyles = getSettings()?.__experimentalGlobalStylesBaseStyles
+			?.color;
+
 		return {
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
+			globalStyles,
 		};
 	} ),
 	withPreferredColorScheme,

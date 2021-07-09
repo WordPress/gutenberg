@@ -20,7 +20,8 @@ var el = wp.element.createElement,
 	RadioControl = wp.components.RadioControl,
 	TextControl = wp.components.TextControl,
 	ToggleControl = wp.components.ToggleControl,
-	SelectControl = wp.components.SelectControl;
+	SelectControl = wp.components.SelectControl,
+	PanelBody = wp.components.PanelBody;
 
 registerBlockType( 'my-plugin/inspector-controls-example', {
 	apiVersion: 2,
@@ -96,58 +97,64 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 			el(
 				InspectorControls,
 				null,
-				el( CheckboxControl, {
-					heading: 'Checkbox Field',
-					label: 'Tick Me',
-					help: 'Additional help text',
-					checked: checkboxField,
-					onChange: onChangeCheckboxField,
-				} ),
-				el( RadioControl, {
-					label: 'Radio Field',
-					selected: radioField,
-					options: [
-						{
-							label: 'Yes',
-							value: 'yes',
-						},
-						{
-							label: 'No',
-							value: 'no',
-						},
-					],
-					onChange: onChangeRadioField,
-				} ),
-				el( TextControl, {
-					label: 'Text Field',
-					help: 'Additional help text',
-					value: textField,
-					onChange: onChangeTextField,
-				} ),
-				el( ToggleControl, {
-					label: 'Toggle Field',
-					checked: toggleField,
-					onChange: onChangeToggleField,
-				} ),
-				el( SelectControl, {
-					label: 'Select Field',
-					value: selectField,
-					options: [
-						{
-							value: 'a',
-							label: 'Option A',
-						},
-						{
-							value: 'b',
-							label: 'Option B',
-						},
-						{
-							value: 'c',
-							label: 'Option C',
-						},
-					],
-					onChange: onChangeSelectField,
-				} )
+				el(
+					PanelBody, 
+					{
+						title: 'Settings',
+					},
+					el( CheckboxControl, {
+						heading: 'Checkbox Field',
+						label: 'Tick Me',
+						help: 'Additional help text',
+						checked: checkboxField,
+						onChange: onChangeCheckboxField,
+					} ),
+					el( RadioControl, {
+						label: 'Radio Field',
+						selected: radioField,
+						options: [
+							{
+								label: 'Yes',
+								value: 'yes',
+							},
+							{
+								label: 'No',
+								value: 'no',
+							},
+						],
+						onChange: onChangeRadioField,
+					} ),
+					el( TextControl, {
+						label: 'Text Field',
+						help: 'Additional help text',
+						value: textField,
+						onChange: onChangeTextField,
+					} ),
+					el( ToggleControl, {
+						label: 'Toggle Field',
+						checked: toggleField,
+						onChange: onChangeToggleField,
+					} ),
+					el( SelectControl, {
+						label: 'Select Field',
+						value: selectField,
+						options: [
+							{
+								value: 'a',
+								label: 'Option A',
+							},
+							{
+								value: 'b',
+								label: 'Option B',
+							},
+							{
+								value: 'c',
+								label: 'Option C',
+							},
+						],
+						onChange: onChangeSelectField,
+					} )
+				)
 			),
 			el(
 				RichText,
@@ -202,6 +209,7 @@ import {
 	TextControl,
 	ToggleControl,
 	SelectControl,
+	PanelBody
 } from '@wordpress/components';
 import {
 	RichText,
@@ -281,47 +289,49 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 		return (
 			<>
 				<InspectorControls>
-					<CheckboxControl
-						heading="Checkbox Field"
-						label="Tick Me"
-						help="Additional help text"
-						checked={ checkboxField }
-						onChange={ onChangeCheckboxField }
-					/>
+					<PanelBody title={__('Settings')}>
+						<CheckboxControl
+							heading="Checkbox Field"
+							label="Tick Me"
+							help="Additional help text"
+							checked={ checkboxField }
+							onChange={ onChangeCheckboxField }
+						/>
 
-					<RadioControl
-						label="Radio Field"
-						selected={ radioField }
-						options={ [
-							{ label: 'Yes', value: 'yes' },
-							{ label: 'No', value: 'no' },
-						] }
-						onChange={ onChangeRadioField }
-					/>
+						<RadioControl
+							label="Radio Field"
+							selected={ radioField }
+							options={ [
+								{ label: 'Yes', value: 'yes' },
+								{ label: 'No', value: 'no' },
+							] }
+							onChange={ onChangeRadioField }
+						/>
 
-					<TextControl
-						label="Text Field"
-						help="Additional help text"
-						value={ textField }
-						onChange={ onChangeTextField }
-					/>
+						<TextControl
+							label="Text Field"
+							help="Additional help text"
+							value={ textField }
+							onChange={ onChangeTextField }
+						/>
 
-					<ToggleControl
-						label="Toggle Field"
-						checked={ toggleField }
-						onChange={ onChangeToggleField }
-					/>
+						<ToggleControl
+							label="Toggle Field"
+							checked={ toggleField }
+							onChange={ onChangeToggleField }
+						/>
 
-					<SelectControl
-						label="Select Control"
-						value={ selectField }
-						options={ [
-							{ value: 'a', label: 'Option A' },
-							{ value: 'b', label: 'Option B' },
-							{ value: 'c', label: 'Option C' },
-						] }
-						onChange={ onChangeSelectField }
-					/>
+						<SelectControl
+							label="Select Control"
+							value={ selectField }
+							options={ [
+								{ value: 'a', label: 'Option A' },
+								{ value: 'b', label: 'Option B' },
+								{ value: 'c', label: 'Option C' },
+							] }
+							onChange={ onChangeSelectField }
+						/>
+					</PanelBody>
 				</InspectorControls>
 
 				<RichText

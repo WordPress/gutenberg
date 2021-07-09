@@ -137,6 +137,7 @@ export default function VisualEditor( { styles } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
 	const defaultLayout = useSetting( 'layout' );
 	const { contentSize, wideSize } = defaultLayout || {};
+	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode
 		? templateModeStyles
@@ -219,6 +220,7 @@ export default function VisualEditor( { styles } ) {
 					<motion.div
 						animate={ animatedStyles }
 						initial={ desktopCanvasStyles }
+						className={ previewMode }
 					>
 						<MaybeIframe
 							isTemplateMode={ isTemplateMode }

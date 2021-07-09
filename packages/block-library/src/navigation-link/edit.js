@@ -48,7 +48,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { ItemSubmenuIcon } from './icons';
 import { name } from './block.json';
 
-const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/spacer' ];
+const ALLOWED_BLOCKS = [ 'core/navigation-link' ];
 
 const MAX_NESTING = 5;
 
@@ -419,7 +419,6 @@ export default function NavigationLinkEdit( {
 				hasDescendants
 					? InnerBlocks.DefaultAppender
 					: false,
-			__experimentalAppenderTagName: 'li',
 		}
 	);
 
@@ -431,23 +430,23 @@ export default function NavigationLinkEdit( {
 	switch ( type ) {
 		case 'post':
 			/* translators: label for missing post in navigation link block */
-			missingText = __( 'Select a post' );
+			missingText = __( 'Select post' );
 			break;
 		case 'page':
 			/* translators: label for missing page in navigation link block */
-			missingText = __( 'Select a page' );
+			missingText = __( 'Select page' );
 			break;
 		case 'category':
 			/* translators: label for missing category in navigation link block */
-			missingText = __( 'Select a category' );
+			missingText = __( 'Select category' );
 			break;
 		case 'tag':
 			/* translators: label for missing tag in navigation link block */
-			missingText = __( 'Select a tag' );
+			missingText = __( 'Select tag' );
 			break;
 		default:
 			/* translators: label for missing values in navigation link block */
-			missingText = __( 'Add a link' );
+			missingText = __( 'Add link' );
 	}
 
 	return (
@@ -508,7 +507,7 @@ export default function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<li { ...blockProps }>
+			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
@@ -612,8 +611,8 @@ export default function NavigationLinkEdit( {
 						</span>
 					) }
 				</a>
-				<ul { ...innerBlocksProps } />
-			</li>
+				<div { ...innerBlocksProps } />
+			</div>
 		</Fragment>
 	);
 }

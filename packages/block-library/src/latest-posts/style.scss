@@ -9,11 +9,13 @@
 	}
 	&.wp-block-latest-posts__list {
 		list-style: none;
+		padding-left: 0;
 
 		li {
 			clear: both;
 		}
 	}
+
 	&.is-grid {
 		display: flex;
 		flex-wrap: wrap;

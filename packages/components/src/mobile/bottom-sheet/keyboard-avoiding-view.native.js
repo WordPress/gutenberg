@@ -38,6 +38,12 @@ class KeyboardAvoidingView extends Component {
 			return 0;
 		}
 
+		const windowWidth = Dimensions.get( 'window' ).width;
+		const isFloatingKeyboard = keyboardFrame.width !== windowWidth;
+		if ( isFloatingKeyboard ) {
+			return 0;
+		}
+
 		const windowHeight = Dimensions.get( 'window' ).height;
 		const keyboardY =
 			keyboardFrame.screenY - this.props.keyboardVerticalOffset;

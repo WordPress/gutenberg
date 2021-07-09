@@ -7,7 +7,7 @@
 			"text": "My button",
 			"style": {
 				"border": {
-					"radius": 25
+					"radius": "25px"
 				}
 			}
 		},
