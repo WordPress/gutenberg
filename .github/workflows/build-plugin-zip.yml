@@ -169,6 +169,9 @@ jobs:
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
 
+            - name: Fail
+              run: exit 1
+
             - name: Use desired version of NodeJS
               uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
               with:
