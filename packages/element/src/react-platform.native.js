@@ -12,36 +12,34 @@ import { applyFilters, doAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { cloneElement } from './react';
+import { Component, cloneElement } from './react';
 
-const registeredComponents = {};
+const render = ( element, id ) => {
+	class App extends Component {
+		constructor() {
+			super( ...arguments );
 
-const render = ( element, id ) =>
-	AppRegistry.registerComponent( id, () => ( propsFromParent ) => {
-		// This callback can be called multiple times in development when a warning or error
-		// is triggered when executing code below so we have to prevent it.
-		// Reference: https://github.com/WordPress/gutenberg/issues/32882#issuecomment-868414379
-		// eslint-disable-next-line no-undef
-		if ( __DEV__ ) {
-			if ( registeredComponents[ id ] ) {
-				return;
-			}
-			registeredComponents[ id ] = true;
+			const parentProps = omit( this.props || {}, [ 'rootTag' ] );
+
+			doAction( 'native.pre-render', parentProps );
+
+			this.filteredProps = applyFilters(
+				'native.block_editor_props',
+				parentProps
+			);
 		}
 
-		const parentProps = omit( propsFromParent || {}, [ 'rootTag' ] );
+		componentDidMount() {
+			doAction( 'native.render', this.filteredProps );
+		}
 
-		doAction( 'native.pre-render', parentProps );
+		render() {
+			return cloneElement( element, this.filteredProps );
+		}
+	}
 
-		const filteredProps = applyFilters(
-			'native.block_editor_props',
-			parentProps
-		);
-
-		doAction( 'native.render', filteredProps );
-
-		return cloneElement( element, filteredProps );
-	} );
+	AppRegistry.registerComponent( id, () => App );
+};
 
 /**
  * Render a given element on Native.
