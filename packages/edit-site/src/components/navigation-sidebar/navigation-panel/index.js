@@ -15,6 +15,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -48,7 +49,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			editedPostId: getEditedPostId(),
 			editedPostType: getEditedPostType(),
 			activeMenu: getNavigationPanelActiveMenu(),
-			siteTitle: siteData.name,
+			siteTitle: siteData.name && decodeEntities( siteData.name ),
 		};
 	}, [] );
 

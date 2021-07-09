@@ -12,6 +12,7 @@ import { useSelect } from '@wordpress/data';
 import { wordpress } from '@wordpress/icons';
 import { filterURLForDisplay } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -53,7 +54,7 @@ function PostPublishPanelPrepublish( { children } ) {
 				undefined,
 			] ),
 			siteIconUrl: siteData.site_icon_url,
-			siteTitle: siteData.name,
+			siteTitle: siteData.name && decodeEntities( siteData.name ),
 			siteHome: siteData.home && filterURLForDisplay( siteData.home ),
 		};
 	}, [] );
