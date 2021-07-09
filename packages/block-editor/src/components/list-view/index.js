@@ -104,7 +104,6 @@ export default function ListView( {
 		() => ( {
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
-			blockDropTarget,
 			isTreeGridMounted: isMounted.current,
 			expandedState,
 			expand,
@@ -113,7 +112,6 @@ export default function ListView( {
 		[
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
-			blockDropTarget,
 			isMounted.current,
 			expandedState,
 			expand,
@@ -123,7 +121,10 @@ export default function ListView( {
 
 	return (
 		<ListViewContext.Provider value={ contextValue }>
-			<ListViewDropIndicator listViewRef={ elementRef } />
+			<ListViewDropIndicator
+				listViewRef={ elementRef }
+				blockDropTarget={ blockDropTarget }
+			/>
 			<TreeGrid
 				className="block-editor-list-view-tree"
 				aria-label={ __( 'Block navigation structure' ) }

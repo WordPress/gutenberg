@@ -4,15 +4,11 @@
 import { Popover } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import { useListViewContext } from './context';
-
-export default function ListViewDropIndicator( { listViewRef } ) {
-	const { blockDropTarget } = useListViewContext();
-
-	const { clientId, rootClientId, dropPosition } = blockDropTarget || {};
+export default function ListViewDropIndicator( {
+	listViewRef,
+	blockDropTarget,
+} ) {
+	const { rootClientId, clientId, dropPosition } = blockDropTarget || {};
 
 	const [ rootBlockElement, blockElement ] = useMemo( () => {
 		if ( ! listViewRef.current ) {
@@ -21,12 +17,17 @@ export default function ListViewDropIndicator( { listViewRef } ) {
 
 		const ownerDocument = listViewRef.current.ownerDocument;
 
+		// The rootClientId will be defined whenever dropping into inner
+		// block lists, but is undefined when dropping at the root level.
 		const _rootBlockElement = rootClientId
 			? ownerDocument.getElementById(
 					`list-view-block-${ rootClientId }`
 			  )
 			: undefined;
 
+		// The clientId represents the sibling block, the dragged block will
+		// usually be inserted adjacent to it. It will be undefined when
+		// dropping a block into an empty block list.
 		const _blockElement = clientId
 			? ownerDocument.getElementById( `list-view-block-${ clientId }` )
 			: undefined;
@@ -34,10 +35,9 @@ export default function ListViewDropIndicator( { listViewRef } ) {
 		return [ _rootBlockElement, _blockElement ];
 	}, [ rootClientId, clientId ] );
 
-	// The root block element is used when dropPosition 'inside', which
-	// means dropping a block into an empty inner blocks list. In this
-	// case there's no sibling block to use for positioning, so the
-	// root block is used instead.
+	// The targetElement is the element that the drop indicator will appear
+	// before or after. When dropping into an empty block list, blockElement
+	// is undefined, so the indicator will appear after the rootBlockElement.
 	const targetElement = blockElement || rootBlockElement;
 
 	const getDropIndicatorIndent = useCallback( () => {
@@ -46,6 +46,8 @@ export default function ListViewDropIndicator( { listViewRef } ) {
 		}
 
 		// Calculate the indent using the block icon of the root block.
+		// Using a classname selector here might be flaky and could be
+		// improved.
 		const targetElementRect = targetElement.getBoundingClientRect();
 		const rootBlockIconElement = rootBlockElement.querySelector(
 			'.block-editor-block-icon'
@@ -75,7 +77,6 @@ export default function ListViewDropIndicator( { listViewRef } ) {
 		const rect = targetElement.getBoundingClientRect();
 		const indent = getDropIndicatorIndent();
 
-		// The most common 'dropPosition' is bottom, so optimize for that.
 		const anchorRect = {
 			left: rect.left + indent,
 			right: rect.right,
@@ -83,14 +84,6 @@ export default function ListViewDropIndicator( { listViewRef } ) {
 			height: rect.height,
 			ownerDocument,
 		};
-
-		if ( dropPosition === 'bottom' || dropPosition === 'inside' ) {
-			return {
-				...anchorRect,
-				top: rect.bottom,
-				bottom: rect.bottom,
-			};
-		}
 
 		if ( dropPosition === 'top' ) {
 			return {
@@ -100,10 +93,18 @@ export default function ListViewDropIndicator( { listViewRef } ) {
 			};
 		}
 
-		return {};
-	}, [ targetElement, getDropIndicatorIndent, dropPosition ] );
+		if ( dropPosition === 'bottom' || dropPosition === 'inside' ) {
+			return {
+				...anchorRect,
+				top: rect.bottom,
+				bottom: rect.bottom,
+			};
+		}
 
-	if ( ! clientId && ! rootClientId ) {
+		return {};
+	}, [ targetElement, dropPosition, getDropIndicatorIndent ] );
+
+	if ( ! targetElement ) {
 		return null;
 	}
 
