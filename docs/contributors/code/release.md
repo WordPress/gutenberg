@@ -82,7 +82,7 @@ Given the big scope of Gutenberg and the high number of pull requests merged in 
 
 #### 3. Drafting the release post
 
-Because of the nature of the release post content, responsibilities are divided in this step. While the post **can either be written by the release manager or delegated to another core member** agreed upon in advance, **visual assets should be created by the design team**.
+Because of the nature of the release post content, responsibilities are divided in this step. While the post **can either be written by the release manager or delegated to another core member** agreed upon in advance, **visual assets are best created by the design team**.
 
 When possible, the highlighted changes in the release post should include an animation (video or GIF) or a static image of them in use. Choosing between an animation or a static image will depend on the best way to showcase each highlight: while animations are better to demonstrate workflows, more direct highlights can be shown with an image; having too many video players adds a layer of friction for users to see the highlight, whereas too many simultaneous animated GIFs can distract and overwhelm the reader.
 
