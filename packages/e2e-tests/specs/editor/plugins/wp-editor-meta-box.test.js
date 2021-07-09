@@ -50,6 +50,8 @@ describe( 'WP Editor Meta Boxes', () => {
 		 * hasWpautop has been errorneously set to false in the line above. You may want to check:
 		 * * Is window.wp.editor.autop a function? It should be one since https://github.com/WordPress/gutenberg/pull/33228
 		 * * Is wpautop still true in the second link mentioned in this comment?
+		 *
+		 * For more context, see https://github.com/WordPress/gutenberg/pull/33228/files#r666897885
 		 */
 		expect( content ).toBe( 'Typing in a metabox' );
 	} );
