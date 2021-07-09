@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Disabled } from '@wordpress/components';
 import { useResizeObserver, pure } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
@@ -36,7 +37,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	return (
 		<div className="block-editor-block-preview__container">
 			{ containerResizeListener }
-			<div
+			<Disabled
 				className="block-editor-block-preview__content"
 				style={ {
 					transform: `scale(${ scale })`,
@@ -62,7 +63,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 					{ contentResizeListener }
 					<MemoizedBlockList renderAppender={ false } />
 				</Iframe>
-			</div>
+			</Disabled>
 		</div>
 	);
 }
