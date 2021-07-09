@@ -190,6 +190,11 @@ function LinkControl( {
 		stopEditing();
 	};
 
+	const shownUnlinkControl =
+		onRemove && value && ! isEditingLink && ! isCreatingPage;
+
+	const showSettingsDrawer = settings?.length;
+
 	return (
 		<div
 			tabIndex={ -1 }
@@ -261,23 +266,26 @@ function LinkControl( {
 				/>
 			) }
 
-			<div className="block-editor-link-control__tools">
-				<LinkControlSettingsDrawer
-					value={ value }
-					settings={ settings }
-					onChange={ onChange }
-				/>
-				{ onRemove && value && ! isEditingLink && ! isCreatingPage && (
-					<Button
-						className="block-editor-link-control__unlink"
-						isDestructive
-						variant="link"
-						onClick={ onRemove }
-					>
-						{ __( 'Unlink' ) }
-					</Button>
-				) }
-			</div>
+			{ showSettingsDrawer ||
+				( shownUnlinkControl && (
+					<div className="block-editor-link-control__tools">
+						<LinkControlSettingsDrawer
+							value={ value }
+							settings={ settings }
+							onChange={ onChange }
+						/>
+						{ shownUnlinkControl && (
+							<Button
+								className="block-editor-link-control__unlink"
+								isDestructive
+								variant="link"
+								onClick={ onRemove }
+							>
+								{ __( 'Unlink' ) }
+							</Button>
+						) }
+					</div>
+				) ) }
 		</div>
 	);
 }
