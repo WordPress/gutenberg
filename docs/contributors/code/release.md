@@ -2,7 +2,7 @@
 
 This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
-To release a stable version of the Gutenberg plugin, you need approval from a member of the Gutenberg Core team for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release. You can ping in the [#core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7).
+To release a stable version of the Gutenberg plugin you need to be part of the [Gutenberg development team](/docs/contributors/repository-management/#teams). On top of that, you need approval from a member of the Gutenberg Core team for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release. You can ping in the [#core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7).
 
 To release Gutenberg's npm packages, you need to be part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
 
@@ -78,7 +78,7 @@ Guidelines for proof-reading include:
 
 Once the changelog is cleaned up, the next step is to choose a few changes to highlight in the release post. These highlights usually focus on new features and enhancements, including performance and accessibility ones, but can also include important API changes or critical bug fixes.
 
-Given the big scope of Gutenberg and the high number of pull requests merged in each milestone, it is not uncommon to overlook impactful changes worth highlighting; because of this, this step is a collaborative effort between the release manager and Gutenberg Core team members.
+Given the big scope of Gutenberg and the high number of pull requests merged in each milestone, it is not uncommon to overlook impactful changes worth highlighting; because of this, this step is a collaborative effort between the release manager, design, and Gutenberg Core team members.
 
 #### 3. Drafting the release post
 
