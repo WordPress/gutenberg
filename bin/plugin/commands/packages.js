@@ -55,11 +55,6 @@ async function runWordPressReleaseBranchSyncStep(
 		'Getting into the WordPress release branch',
 		abortMessage,
 		async () => {
-			const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
-			const pluginReleaseBranch = findReleaseBranchName(
-				packageJsonPath
-			);
-
 			// Creating the release branch
 			await git.checkoutRemoteBranch(
 				gitWorkingDirectoryPath,
@@ -71,27 +66,35 @@ async function runWordPressReleaseBranchSyncStep(
 					' has been successfully checked out.'
 			);
 
-			await askForConfirmation(
-				`The branch is ready for sync with the latest plugin release changes applied to "${ pluginReleaseBranch }". Proceed?`,
-				true,
-				abortMessage
-			);
+			if ( [ 'latest', 'next' ].includes( releaseType ) ) {
+				const packageJsonPath =
+					gitWorkingDirectoryPath + '/package.json';
+				const pluginReleaseBranch = findReleaseBranchName(
+					packageJsonPath
+				);
 
-			await git.replaceContentFromRemoteBranch(
-				gitWorkingDirectoryPath,
-				pluginReleaseBranch
-			);
+				await askForConfirmation(
+					`The branch is ready for sync with the latest plugin release changes applied to "${ pluginReleaseBranch }". Proceed?`,
+					true,
+					abortMessage
+				);
 
-			await git.commit(
-				gitWorkingDirectoryPath,
-				`Merge changes published in the Gutenberg plugin "${ pluginReleaseBranch }" branch`
-			);
+				await git.replaceContentFromRemoteBranch(
+					gitWorkingDirectoryPath,
+					pluginReleaseBranch
+				);
 
-			log(
-				'>> The local WordPress release branch ' +
-					formats.success( wordpressReleaseBranch ) +
-					' has been successfully synced.'
-			);
+				await git.commit(
+					gitWorkingDirectoryPath,
+					`Merge changes published in the Gutenberg plugin "${ pluginReleaseBranch }" branch`
+				);
+
+				log(
+					'>> The local WordPress release branch ' +
+						formats.success( wordpressReleaseBranch ) +
+						' has been successfully synced.'
+				);
+			}
 		}
 	);
 
@@ -314,6 +317,12 @@ async function publishPackagesToNpm(
 
 		log( '>> Publishing modified packages to npm.' );
 		await command( 'npx lerna publish from-package --dist-tag next', {
+			cwd: gitWorkingDirectoryPath,
+			stdio: 'inherit',
+		} );
+	} else if ( releaseType === 'bugfix' ) {
+		log( '>> Publishing modified packages to npm.' );
+		await command( `npm run publish:latest`, {
 			cwd: gitWorkingDirectoryPath,
 			stdio: 'inherit',
 		} );
