@@ -82,6 +82,7 @@ class WP_Theme_JSON_Gutenberg {
 			'customRadius' => null,
 			'customStyle'  => null,
 			'customWidth'  => null,
+			'units'        => null,
 		),
 		'color'      => array(
 			'custom'         => null,
