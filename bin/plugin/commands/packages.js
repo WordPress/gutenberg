@@ -23,6 +23,12 @@ const {
 const git = require( '../lib/git' );
 
 /**
+ * Release type names.
+ *
+ * @typedef {('latest'|'bugfix'|'patch'|'next')} ReleaseType
+ */
+
+/**
  * Semantic Versioning labels.
  *
  * @typedef {('major'|'minor'|'patch')} SemVer
@@ -32,18 +38,19 @@ const git = require( '../lib/git' );
  * Checks out the WordPress release branch and syncs it with the changes from
  * the last plugin release.
  *
- * @param {string}  gitWorkingDirectoryPath Git working directory path.
- * @param {boolean} isPrerelease            Whether the package version to publish is a prerelease.
- * @param {string}  abortMessage            Abort Message.
+ * @param {string}      gitWorkingDirectoryPath Git working directory path.
+ * @param {ReleaseType} releaseType             Release type selected from CLI.
+ * @param {string}      abortMessage            Abort Message.
  *
  * @return {Promise<Object>} WordPress release branch.
  */
 async function runWordPressReleaseBranchSyncStep(
 	gitWorkingDirectoryPath,
-	isPrerelease,
+	releaseType,
 	abortMessage
 ) {
-	const wordpressReleaseBranch = isPrerelease ? 'wp/next' : 'wp/trunk';
+	const wordpressReleaseBranch =
+		releaseType === 'next' ? 'wp/next' : 'wp/trunk';
 	await runStep(
 		'Getting into the WordPress release branch',
 		abortMessage,
@@ -97,15 +104,15 @@ async function runWordPressReleaseBranchSyncStep(
  * Update CHANGELOG files with the new version number for those packages that
  * contain new entries.
  *
- * @param {string}  gitWorkingDirectoryPath Git working directory path.
- * @param {SemVer}  minimumVersionBump      Minimum version bump for the packages.
- * @param {boolean} isPrerelease            Whether the package version to publish is a prerelease.
- * @param {string}  abortMessage            Abort Message.
+ * @param {string}      gitWorkingDirectoryPath Git working directory path.
+ * @param {SemVer}      minimumVersionBump      Minimum version bump for the packages.
+ * @param {ReleaseType} releaseType             Release type selected from CLI.
+ * @param {string}      abortMessage            Abort Message.
  */
 async function updatePackages(
 	gitWorkingDirectoryPath,
 	minimumVersionBump,
-	isPrerelease,
+	releaseType,
 	abortMessage
 ) {
 	const changelogFiles = await glob(
@@ -148,7 +155,7 @@ async function updatePackages(
 			// the stable minor or major version bump requested.
 			if (
 				! versionBump &&
-				! isPrerelease &&
+				releaseType !== 'next' &&
 				minimumVersionBump !== 'patch' &&
 				productionPackageNames.includes( packageName )
 			) {
@@ -207,7 +214,9 @@ async function updatePackages(
 					content.replace(
 						'## Unreleased',
 						`## Unreleased\n\n## ${
-							isPrerelease ? nextVersion + '-next.0' : nextVersion
+							releaseType === 'next'
+								? nextVersion + '-next.0'
+								: nextVersion
 						} (${ publishDate })`
 					)
 				);
@@ -225,7 +234,9 @@ async function updatePackages(
 
 				log(
 					`   - ${ packageName }: ${ version } -> ${
-						isPrerelease ? nextVersion + '-next.0' : nextVersion
+						releaseType === 'next'
+							? nextVersion + '-next.0'
+							: nextVersion
 					}`
 				);
 			}
@@ -274,21 +285,21 @@ async function runPushGitChangesStep(
 /**
  * Publishes all changed packages to npm.
  *
- * @param {string}  gitWorkingDirectoryPath Git working directory path.
- * @param {SemVer}  minimumVersionBump      Minimum version bump for the packages.
- * @param {boolean} isPrerelease            Whether the package version to publish is a prerelease.
+ * @param {string}      gitWorkingDirectoryPath Git working directory path.
+ * @param {SemVer}      minimumVersionBump      Minimum version bump for the packages.
+ * @param {ReleaseType} releaseType             Release type selected from CLI.
  */
 async function publishPackagesToNpm(
 	gitWorkingDirectoryPath,
 	minimumVersionBump,
-	isPrerelease
+	releaseType
 ) {
 	log( '>> Installing npm packages.' );
 	await command( 'npm ci', {
 		cwd: gitWorkingDirectoryPath,
 	} );
 
-	if ( isPrerelease ) {
+	if ( releaseType === 'next' ) {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
@@ -329,11 +340,11 @@ async function publishPackagesToNpm(
 /**
  * Prepare everything to publish WordPress packages to npm.
  *
- * @param {boolean} [isPrerelease] Whether the package version to publish is a prerelease.
+ * @param {ReleaseType} releaseType Release type selected from CLI.
  *
  * @return {Promise<Object>} Github release object.
  */
-async function prepareForPackageRelease( isPrerelease ) {
+async function prepareForPackageRelease( releaseType ) {
 	await askForConfirmation( 'Ready to go?' );
 
 	// Cloning the Git repository.
@@ -347,7 +358,7 @@ async function prepareForPackageRelease( isPrerelease ) {
 	// Checking out the WordPress release branch and doing sync with the last plugin release.
 	const { releaseBranch } = await runWordPressReleaseBranchSyncStep(
 		gitWorkingDirectoryPath,
-		isPrerelease,
+		releaseType,
 		abortMessage
 	);
 
@@ -364,7 +375,7 @@ async function prepareForPackageRelease( isPrerelease ) {
 	await updatePackages(
 		gitWorkingDirectoryPath,
 		minimumVersionBump,
-		isPrerelease,
+		releaseType,
 		abortMessage
 	);
 
@@ -377,7 +388,7 @@ async function prepareForPackageRelease( isPrerelease ) {
 	await publishPackagesToNpm(
 		gitWorkingDirectoryPath,
 		minimumVersionBump,
-		isPrerelease
+		releaseType
 	);
 
 	await runCleanLocalFoldersStep( temporaryFolders, 'Cleaning failed.' );
@@ -395,7 +406,7 @@ async function publishNpmLatestDistTag() {
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
-	await prepareForPackageRelease();
+	await prepareForPackageRelease( 'latest' );
 
 	log(
 		'\n>> 🎉 WordPress packages are now published!\n\n',
@@ -418,7 +429,7 @@ async function publishNpmNextDistTag() {
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
-	await prepareForPackageRelease( true );
+	await prepareForPackageRelease( 'next' );
 
 	log(
 		'\n>> 🎉 WordPress packages are now published!\n',
