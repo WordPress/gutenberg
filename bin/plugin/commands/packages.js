@@ -340,11 +340,15 @@ async function publishPackagesToNpm(
 /**
  * Prepare everything to publish WordPress packages to npm.
  *
- * @param {ReleaseType} releaseType Release type selected from CLI.
+ * @param {ReleaseType} releaseType        Release type selected from CLI.
+ * @param {SemVer}      minimumVersionBump Minimum version bump for the packages. Default: `true`.
  *
  * @return {Promise<Object>} Github release object.
  */
-async function prepareForPackageRelease( releaseType ) {
+async function prepareForPackageRelease(
+	releaseType,
+	minimumVersionBump = 'patch'
+) {
 	await askForConfirmation( 'Ready to go?' );
 
 	// Cloning the Git repository.
@@ -361,16 +365,6 @@ async function prepareForPackageRelease( releaseType ) {
 		releaseType,
 		abortMessage
 	);
-
-	const { minimumVersionBump } = await prompt( [
-		{
-			type: 'list',
-			name: 'minimumVersionBump',
-			message: 'Select the minimum version bump for packages:',
-			default: 'patch',
-			choices: [ 'patch', 'minor', 'major' ],
-		},
-	] );
 
 	await updatePackages(
 		gitWorkingDirectoryPath,
@@ -406,7 +400,40 @@ async function publishNpmLatestDistTag() {
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
-	await prepareForPackageRelease( 'latest' );
+	const minimumVersionBump = await prompt( [
+		{
+			type: 'list',
+			name: 'minimumVersionBump',
+			message: 'Select the minimum version bump for packages:',
+			default: 'patch',
+			choices: [ 'patch', 'minor', 'major' ],
+		},
+	] );
+
+	await prepareForPackageRelease( 'latest', minimumVersionBump );
+
+	log(
+		'\n>> 🎉 WordPress packages are now published!\n\n',
+		'Please remember to run `git cherry-pick` in the `trunk` branch for the newly created commits during the release with labels:\n',
+		' - Update changelog files (if exists)\n',
+		' - chore(release): publish\n\n',
+		'Finally, let also people know on WordPress Slack and celebrate together.'
+	);
+}
+
+/**
+ * Publishes a new latest version of WordPress packages.
+ */
+async function publishNpmBugfixLatestDistTag() {
+	log(
+		formats.title(
+			'\n💃 Time to publish WordPress packages to npm 🕺\n\n'
+		),
+		'Welcome! This tool is going to help you with publishing a new bugfix version of WordPress packages with the latest dist tag.\n',
+		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
+	);
+
+	await prepareForPackageRelease( 'bugfix' );
 
 	log(
 		'\n>> 🎉 WordPress packages are now published!\n\n',
@@ -437,4 +464,8 @@ async function publishNpmNextDistTag() {
 	);
 }
 
-module.exports = { publishNpmLatestDistTag, publishNpmNextDistTag };
+module.exports = {
+	publishNpmLatestDistTag,
+	publishNpmBugfixLatestDistTag,
+	publishNpmNextDistTag,
+};
