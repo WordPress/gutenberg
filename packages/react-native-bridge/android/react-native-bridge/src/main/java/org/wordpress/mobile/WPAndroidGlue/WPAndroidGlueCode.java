@@ -689,6 +689,10 @@ public class WPAndroidGlueCode {
         }
     }
 
+    public void updateEditorSettings(@Nullable String rawEditorSettings) {
+        mDeferredEventEmitter.updateEditorSettings(rawEditorSettings);
+    }
+
     private void refreshEditorTheme() {
         if (mEditorTheme != null) {
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()

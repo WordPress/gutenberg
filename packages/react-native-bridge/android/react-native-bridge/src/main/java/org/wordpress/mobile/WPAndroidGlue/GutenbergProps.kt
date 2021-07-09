@@ -19,7 +19,8 @@ data class GutenbergProps @JvmOverloads constructor(
     val translations: Bundle,
     val isDarkMode: Boolean,
     val htmlModeEnabled: Boolean,
-    val enableEditorOnboarding: Boolean
+    val enableEditorOnboarding: Boolean,
+    val rawEditorSettings: String
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
@@ -41,6 +42,8 @@ data class GutenbergProps @JvmOverloads constructor(
             theme.getSerializable(PROP_FEATURES)
                     ?.let { putSerializable(PROP_FEATURES, it) }
         }
+
+        putString(PROP_RAW_EDITOR_SETTINGS, rawEditorSettings)
     }
 
     fun getUpdatedCapabilitiesProps() = Bundle().apply {
@@ -75,6 +78,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_GRADIENTS = "gradients"
         private const val PROP_STYLES = "rawStyles"
         private const val PROP_FEATURES = "rawFeatures"
+        private const val PROP_RAW_EDITOR_SETTINGS = "rawEditorSettings"
 
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
