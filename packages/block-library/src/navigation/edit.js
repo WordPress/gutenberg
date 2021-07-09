@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useMemo, Platform } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useMemo,
+	useRef,
+	Platform,
+} from '@wordpress/element';
 import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -47,16 +53,11 @@ const LAYOUT = {
 	alignments: [],
 };
 
-function getBlockDOMNode( clientId, doc ) {
-	return doc.getElementById( 'block-' + clientId );
-}
-
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
 
-function detectColors( clientId, setColor, setBackground ) {
-	const colorsDetectionElement = getBlockDOMNode( clientId, document );
+function detectColors( colorsDetectionElement, setColor, setBackground ) {
 	if ( ! colorsDetectionElement ) {
 		return;
 	}
@@ -97,7 +98,6 @@ function Navigation( {
 	setOverlayBackgroundColor,
 	overlayTextColor,
 	setOverlayTextColor,
-	subMenuClientId,
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
 	hasColorSettings = true,
@@ -111,7 +111,10 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
+	const navRef = useRef();
+
 	const blockProps = useBlockProps( {
+		ref: navRef,
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
@@ -178,10 +181,17 @@ function Navigation( {
 		if ( ! enableContrastChecking ) {
 			return;
 		}
-		detectColors( clientId, setDetectedColor, setDetectedBackgroundColor );
-		if ( subMenuClientId ) {
+		detectColors(
+			navRef.current,
+			setDetectedColor,
+			setDetectedBackgroundColor
+		);
+		const subMenuElement = navRef.current.querySelector(
+			'[data-type="core/navigation-link"] [data-type="core/navigation-link"]'
+		);
+		if ( subMenuElement ) {
 			detectColors(
-				subMenuClientId,
+				subMenuElement,
 				setDetectedOverlayColor,
 				setDetectedOverlayBackgroundColor
 			);
@@ -326,14 +336,9 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 
-		const subMenuClientId = innerBlocks.find(
-			( b ) => b.innerBlocks.length
-		)?.innerBlocks[ 0 ]?.clientId;
-
 		return {
 			isImmediateParentOfSelectedBlock,
 			selectedBlockHasDescendants,
-			subMenuClientId,
 			hasExistingNavItems: !! innerBlocks.length,
 
 			// This prop is already available but computing it here ensures it's
