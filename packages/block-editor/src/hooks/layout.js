@@ -216,13 +216,14 @@ export const withLayoutStyles = createHigherOrderComponent(
 
 		return (
 			<>
-				{ createPortal(
-					<LayoutStyle
-						selector={ `.wp-container-${ id }` }
-						layout={ usedLayout }
-					/>,
-					element
-				) }
+				{ element &&
+					createPortal(
+						<LayoutStyle
+							selector={ `.wp-container-${ id }` }
+							layout={ usedLayout }
+						/>,
+						element
+					) }
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
