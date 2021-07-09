@@ -13,29 +13,18 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    performance:
-        name: Run performance tests
+    determine-branches:
+        name: Determine which branches to compare performance for
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' }}
-
+        outputs:
+            branches: ${{ steps.get-release-branches.outputs.branches || steps.get-pull-request-branches.outputs.branches }}
+            test-suites: '[ "post-editor", "site-editor" ]'
+            wp-version: ${{ steps.get-release-branches.outputs.wp-version }}
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
 
-            - name: Use desired version of NodeJS
-              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
-              with:
-                  node-version: 14
-                  cache: npm
-
-            - name: Npm install
-              run: |
-                  npm ci
-
-            - name: Compare performance with trunk
-              if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
-
-            - name: Compare performance with current WordPress Core and previous Gutenberg versions
+            - name: Set branches to current WordPress Core plus previous and current Gutenberg versions
+              id: get-release-branches
               if: github.event_name == 'release'
               env:
                   PLUGIN_VERSION: ${{ github.event.release.name }}
@@ -48,4 +37,127 @@ jobs:
                   WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf --ci "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --wp-version "$WP_MAJOR"
+                  echo "::set-output name=branches::[\"wp/$WP_MAJOR\",\"$PREVIOUS_RELEASE_BRANCH\",\"$CURRENT_RELEASE_BRANCH\"]"
+                  echo "::set-output name=wp-version::$WP_MAJOR"
+
+            - name: Set branches to current PR's and trunk
+              id: get-pull-request-branches
+              if: github.event_name == 'pull_request'
+              env:
+                  BRANCH: ${{ github.head_ref }}
+              run: echo "::set-output name=branches::[\"$BRANCH\",\"trunk\"]"
+
+    performance-tests:
+        name: Run performance tests
+        needs: determine-branches
+        if: ${{ github.repository == 'WordPress/gutenberg' }}
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                branch: ${{ fromJson( needs.determine-branches.outputs.branches ) }}
+                test-suite: ${{ fromJson( needs.determine-branches.outputs.test-suites ) }}
+        env:
+            tests-branch: ${{ fromJson( needs.determine-branches.outputs.branches )[ 0 ] }} # First matrix entry also serves as tests branch
+        steps:
+            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  ref: ${{ env.tests-branch }}
+                  path: performance-tests
+
+            - name: Set WordPress version
+              if: ${{ needs.determine-branches.outputs.wp-version }}
+              env:
+                  WP_VERSION: ${{ needs.determine-branches.outputs.wp-version }}
+              run: |
+                  echo "{ \"core\": \"https://wordpress.org/wordpress-$WP_VERSION.zip\" }" > .wp-env.override.json
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              with:
+                  node-version: 14
+                  cache: npm
+
+            - name: Install dependencies and build packages
+              working-directory: performance-tests
+              run: npm install && npm run build:packages
+
+            - name: Copy performance-tests directory to environment directory
+              run: cp -R performance-tests environment
+
+            - name: Start the WordPress environment
+              working-directory: environment
+              run: npm run wp-env start
+
+            - name: Switch environment to ${{ matrix.branch }} branch
+              uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  ref: ${{ matrix.branch }}
+                  path: environment
+
+            - name: Build ${{ matrix.branch }} branch
+              working-directory: environment
+              run: rm -rf node_modules packages/*/node_modules && npm install && npm run build
+
+            - name: Run ${{ matrix.test-suite }} test suite
+              uses: actions/github-script@v4
+              env:
+                  BRANCH: ${{ matrix.branch }}
+                  TEST_SUITE: ${{ matrix.test-suite }}
+              with:
+                  script: |
+                      const { BRANCH: branch, TEST_SUITE: testSuite } = process.env;
+                      const fs = require('fs');
+                      const { runTestSuite } = require( './performance-tests/bin/plugin/commands/performance.js' );
+                      const results = await runTestSuite( testSuite, './performance-tests' );
+                      const pathName = `./results/${ testSuite }/${ branch }`;
+                      fs.mkdirSync( pathName, { recursive: true } );
+                      fs.writeFileSync( `${ pathName }/results.json`, JSON.stringify( results ) );
+
+            - name: Upload test results artifact
+              uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              with:
+                  name: performance-test-results
+                  # The leading wildcard is only used to preserve the directory hiearchy, see
+                  # https://github.com/actions/upload-artifact#upload-using-multiple-paths-and-exclusions.
+                  path: '*/${{ matrix.test-suite }}/${{ matrix.branch }}/results.json'
+
+            - name: Stop the WordPress environment
+              working-directory: environment
+              run: npm run wp-env stop
+
+    evaluate-test-results:
+        name: Evaluate performance test results
+        needs: [determine-branches, performance-tests]
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Download results artifacts
+              uses: actions/download-artifact@4a7a711286f30c025902c28b541c10e147a9b843 # v2.0.8
+              with:
+                  name: performance-test-results
+
+            - name: Aggregate test results
+              uses: actions/github-script@v4
+              env:
+                  BRANCHES: ${{ needs.determine-branches.outputs.branches }}
+                  TEST_SUITES: ${{ needs.determine-branches.outputs.test-suites }}
+              with:
+                  script: |
+                      const branches = JSON.parse( process.env.BRANCHES );
+                      const testSuites = JSON.parse( process.env.TEST_SUITES );
+                      const fs = require('fs');
+                      let results = {};
+                      for ( testSuite of testSuites ) {
+                        results[ testSuite ] = {};
+                        for ( branch of branches ) {
+                          let result = require( `./results/${ testSuite }/${ branch }/results.json` );
+                          for ( test of Object.keys( result ) ) {
+                            if ( ! results[ testSuite ][ test ] ) {
+                              results[ testSuite ][ test ] = {};
+                            }
+                            results[ testSuite ][ test ][ branch ] = result[ test ];
+                          }
+                        }
+                        console.log( `\n>> ${ testSuite }\n` );
+                        console.table( results[ testSuite ] );
+                      }
