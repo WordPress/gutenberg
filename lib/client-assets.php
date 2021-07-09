@@ -102,6 +102,20 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 		$output = sprintf( "wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ '%s' ] }, 'default' );", $ltr );
 		$scripts->add_inline_script( 'wp-i18n', $output, 'after' );
 	}
+
+	/*
+	 * Wp-editor module is exposed as window.wp.editor.
+	 * Problem: there is quite some code expecting window.wp.oldEditor object available under window.wp.editor.
+	 * Solution: fuse the two objects together to maintain backward compatibility.
+	 * For more context, see https://github.com/WordPress/gutenberg/issues/33203
+	 */
+	if ( 'wp-editor' === $handle ) {
+		$scripts->add_inline_script(
+			'wp-editor',
+			'Object.assign( window.wp.editor, window.wp.oldEditor );',
+			'after'
+		);
+	}
 }
 
 /**
