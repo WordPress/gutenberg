@@ -252,7 +252,7 @@ jobs:
             - name: Revert version bump on trunk
               if: ${{ needs.bump-version.outputs.trunk_commit }}
               run: |
-                  git fetch --depth=1 origin trunk
+                  git fetch --depth=2 origin trunk
                   git checkout trunk
                   git revert --no-edit ${{ needs.bump-version.outputs.trunk_commit }}
                   git push --set-upstream origin trunk
