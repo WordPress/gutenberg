@@ -196,7 +196,7 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const hasDuotoneSupport = ! hasBlockSupport(
+		const hasDuotoneSupport = hasBlockSupport(
 			props.name,
 			'color.__experimentalDuotone'
 		);
