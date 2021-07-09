@@ -13,6 +13,8 @@ import {
 	PanelBody,
 	RangeControl,
 	ToggleControl,
+	__experimentalUnitControl as UnitControl,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 
 import {
@@ -59,7 +61,7 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+	const { isStackedOnMobile, verticalAlignment, columnMinWidth } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -82,6 +84,9 @@ function ColumnsEditContainer( {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
 		renderAppender: false,
+	} );
+	const units = useCustomUnits( {
+		availableUnits: [ '%', 'px', 'em', 'rem', 'vw' ],
 	} );
 
 	return (
@@ -117,6 +122,23 @@ function ColumnsEditContainer( {
 							} )
 						}
 					/>
+					{ isStackedOnMobile && (
+						<UnitControl
+							label={ __( 'Columns minimum width' ) }
+							description={ __(
+								'Minimum width for columns is used to determine how columns will stack when the viewport size changes.'
+							) }
+							labelPosition="edge"
+							__unstableInputWidth="80px"
+							onChange={ ( value ) => {
+								setAttributes( {
+									columnMinWidth: value,
+								} );
+							} }
+							value={ columnMinWidth }
+							units={ units }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
@@ -276,8 +298,15 @@ const ColumnsEdit = ( props ) => {
 	const Component = hasInnerBlocks
 		? ColumnsEditContainerWrapper
 		: Placeholder;
+	const style = `--wp--columns-min-width:${
+		props?.attributes?.columnMinWidth || '200px'
+	}`;
+	const propsWithStyle = {
+		...props,
+		style,
+	};
 
-	return <Component { ...props } />;
+	return <Component { ...propsWithStyle } />;
 };
 
 export default ColumnsEdit;

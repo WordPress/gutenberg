@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+	const { isStackedOnMobile, verticalAlignment, columnMinWidth } = attributes;
 
 	const className = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -18,6 +18,9 @@ export default function save( { attributes } ) {
 
 	const blockProps = useBlockProps.save( { className } );
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
-
-	return <div { ...innerBlocksProps } />;
+	const styles =
+		columnMinWidth && isStackedOnMobile
+			? `--wp--columns-min-width:${ columnMinWidth };`
+			: null;
+	return <div { ...innerBlocksProps } style={ styles } />;
 }
