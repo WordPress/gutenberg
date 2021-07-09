@@ -182,11 +182,12 @@ describe( 'Reusable block', () => {
 			},
 		} );
 
-		const headingInnerBlock = await waitFor( () =>
+		const headingInnerBlock = waitFor( () =>
 			within( reusableBlock ).getByA11yLabel(
 				'Heading Block. Row 1. Level 2. First Reusable block'
 			)
 		);
+
 		expect( reusableBlock ).toBeDefined();
 		expect( headingInnerBlock ).toBeDefined();
 	} );
