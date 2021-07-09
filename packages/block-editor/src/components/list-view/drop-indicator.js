@@ -12,64 +12,98 @@ import { useListViewContext } from './context';
 export default function ListViewDropIndicator( { listViewRef } ) {
 	const { blockDropTarget } = useListViewContext();
 
-	const { clientId, dropPosition } = blockDropTarget || {};
+	const { clientId, rootClientId, dropPosition } = blockDropTarget || {};
 
-	const blockElement = useMemo( () => {
-		if ( ! clientId || ! listViewRef.current ) {
-			return;
+	const [ rootBlockElement, blockElement ] = useMemo( () => {
+		if ( ! listViewRef.current ) {
+			return [];
 		}
 
-		return listViewRef.current.ownerDocument.getElementById(
-			`list-view-block-${ clientId }`
+		const ownerDocument = listViewRef.current.ownerDocument;
+
+		const _rootBlockElement = rootClientId
+			? ownerDocument.getElementById(
+					`list-view-block-${ rootClientId }`
+			  )
+			: undefined;
+
+		const _blockElement = clientId
+			? ownerDocument.getElementById( `list-view-block-${ clientId }` )
+			: undefined;
+
+		return [ _rootBlockElement, _blockElement ];
+	}, [ rootClientId, clientId ] );
+
+	// The root block element is used when dropPosition 'inside', which
+	// means dropping a block into an empty inner blocks list. In this
+	// case there's no sibling block to use for positioning, so the
+	// root block is used instead.
+	const targetElement = blockElement || rootBlockElement;
+
+	const getDropIndicatorIndent = useCallback( () => {
+		if ( ! rootBlockElement ) {
+			return 0;
+		}
+
+		// Calculate the indent using the block icon of the root block.
+		const targetElementRect = targetElement.getBoundingClientRect();
+		const rootBlockIconElement = rootBlockElement.querySelector(
+			'.block-editor-block-icon'
 		);
-	}, [ clientId ] );
+		const rootBlockIconRect = rootBlockIconElement.getBoundingClientRect();
+		return rootBlockIconRect.right - targetElementRect.left;
+	}, [ rootBlockElement, targetElement ] );
 
 	const style = useMemo( () => {
-		if ( ! blockElement ) {
+		if ( ! targetElement ) {
 			return {};
 		}
+
+		const indent = getDropIndicatorIndent();
 
 		return {
-			width: blockElement.offsetWidth,
+			width: targetElement.offsetWidth - indent,
 		};
-	}, [ blockElement ] );
+	}, [ getDropIndicatorIndent, targetElement ] );
 
 	const getAnchorRect = useCallback( () => {
-		if ( ! blockElement ) {
+		if ( ! targetElement ) {
 			return {};
 		}
 
-		const ownerDocument = blockElement.ownerDocument;
-		const rect = blockElement.getBoundingClientRect();
+		const ownerDocument = targetElement.ownerDocument;
+		const rect = targetElement.getBoundingClientRect();
+		const indent = getDropIndicatorIndent();
 
-		if ( dropPosition === 'top' ) {
-			return {
-				top: rect.top,
-				bottom: rect.top,
-				left: rect.left,
-				right: rect.right,
-				width: 0,
-				height: rect.height,
-				ownerDocument,
-			};
-		}
+		// The most common 'dropPosition' is bottom, so optimize for that.
+		const anchorRect = {
+			left: rect.left + indent,
+			right: rect.right,
+			width: 0,
+			height: rect.height,
+			ownerDocument,
+		};
 
 		if ( dropPosition === 'bottom' || dropPosition === 'inside' ) {
 			return {
+				...anchorRect,
 				top: rect.bottom,
 				bottom: rect.bottom,
-				left: rect.left,
-				right: rect.right,
-				width: 0,
-				height: rect.height,
-				ownerDocument,
+			};
+		}
+
+		if ( dropPosition === 'top' ) {
+			return {
+				...anchorRect,
+				top: rect.top,
+				bottom: rect.top,
 			};
 		}
 
 		return {};
-	}, [ blockElement, dropPosition ] );
+	}, [ targetElement, getDropIndicatorIndent, dropPosition ] );
 
-	if ( ! clientId ) {
+	if ( ! clientId && ! rootClientId ) {
 		return null;
 	}
 
