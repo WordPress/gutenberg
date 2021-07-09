@@ -238,6 +238,7 @@ jobs:
                   github.event.inputs.version == 'stable' ||
                   contains( steps.get_version.outputs.old_version, 'rc' )
               run: |
+                  git pull
                   git revert --no-edit ${{ needs.bump-version.outputs.release_branch_commit }}
                   git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
 
