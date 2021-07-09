@@ -210,7 +210,9 @@ export default function useListViewDropZone() {
 	const throttled = useThrottle(
 		useCallback( ( event, currentTarget ) => {
 			const position = { x: event.clientX, y: event.clientY };
-			const isBlockDrag = !! event.dataTransfer.getData( 'wp-blocks' );
+			const isBlockDrag = !! event.dataTransfer.types.includes(
+				'wp-blocks'
+			);
 
 			const draggedBlockClientIds = isBlockDrag
 				? getDraggedBlockClientIds()
