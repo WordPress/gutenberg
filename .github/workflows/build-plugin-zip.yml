@@ -237,17 +237,17 @@ jobs:
             - name: Revert version bump commit on release branch
               if: |
                   github.event.inputs.version == 'stable' ||
-                  contains( steps.get_version.outputs.old_version, 'rc' )
+                  contains( needs.bump-version.outputs.old_version, 'rc' )
               run: |
                   git revert --no-edit ${{ needs.bump-version.outputs.release_branch_commit }}
-                  git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
+                  git push --set-upstream origin "${{ needs.bump-version.outputs.release_branch }}"
 
             - name: Delete release branch
               if: |
                   github.event.inputs.version == 'rc' &&
-                  ! contains( steps.get_version.outputs.old_version, 'rc' )
+                  ! contains( needs.bump-version.outputs.old_version, 'rc' )
               run: |
-                  git push origin :"${{ steps.get_version.outputs.release_branch }}"
+                  git push origin :"${{ needs.bump-version.outputs.release_branch }}"
 
             - name: Revert version bump on trunk
               if: ${{ needs.bump-version.outputs.trunk_commit }}
