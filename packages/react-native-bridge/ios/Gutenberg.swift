@@ -88,7 +88,7 @@ public class Gutenberg: NSObject {
             initialProps["gradients"] = gradients
         }
 
-        initialProps["sentryOptions"] = dataSource.gutenbergSentryOptions()
+        initialProps["crashLoggingOptions"] = dataSource.gutenbergCrashLoggingOptions()
         
         return initialProps
     }

@@ -304,7 +304,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return [.filesApp, .otherApps]
     }
     
-    func gutenbergSentryOptions() -> [String: Any]? {
+    func gutenbergCrashLoggingOptions() -> [String: Any]? {
         return nil
     }
 }
