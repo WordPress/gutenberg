@@ -44,11 +44,11 @@ export default function ListViewDropIndicator( { listViewRef } ) {
 
 		if ( dropPosition === 'top' ) {
 			return {
-				top: rect.top - 2,
+				top: rect.top,
 				bottom: rect.top,
 				left: rect.left,
 				right: rect.right,
-				width: rect.width,
+				width: 0,
 				height: rect.height,
 				ownerDocument,
 			};
@@ -57,10 +57,10 @@ export default function ListViewDropIndicator( { listViewRef } ) {
 		if ( dropPosition === 'bottom' || dropPosition === 'inside' ) {
 			return {
 				top: rect.bottom,
-				bottom: rect.bottom + 2,
+				bottom: rect.bottom,
 				left: rect.left,
 				right: rect.right,
-				width: rect.width,
+				width: 0,
 				height: rect.height,
 				ownerDocument,
 			};
@@ -79,7 +79,6 @@ export default function ListViewDropIndicator( { listViewRef } ) {
 			animate={ false }
 			getAnchorRect={ getAnchorRect }
 			focusOnMount={ false }
-			// position="bottom middle"
 			className="block-editor-list-view-drop-indicator"
 		>
 			<div
