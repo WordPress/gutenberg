@@ -23,7 +23,9 @@
 	padding: $grid-unit-15 $grid-unit-30 0;
 
 	.block-editor-media-replace-flow__image-url-label {
+		display: block;
 		top: $grid-unit-20;
+		margin-bottom: $grid-unit-10;
 	}
 
 	.block-editor-link-control {
