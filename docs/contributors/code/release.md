@@ -51,7 +51,7 @@ Once released, all that's left to do is writing a release post on [make.wordpres
 ### Documenting the release with the Release Notes and Post
 
 <div class="callout callout-info">
-Documenting the release is a group effort between the release manager, Gutenberg core team developers, and designers , comprised of a series of sequential steps that, because of the amount of people involved and the coordination required, need to adhere to a timeline between the RC and stable releases.
+Documenting the release is a group effort between the release manager, Gutenberg core team developers, and designers , comprised of a series of sequential steps that, because of the amount of people involved and the coordination required, need to adhere to a timeline between the RC and stable releases. The release manager will get pinged by a core member to kick-off and coordinate this process.
 </div>
 
 1. Curating the changelog - Wednesday after the RC release to Friday
@@ -82,7 +82,7 @@ Given the big scope of Gutenberg and the high number of pull requests merged in 
 
 #### 3. Drafting the release post
 
-Because of the nature of the release post content, responsibilities are divided in this step. While the post **can either be written by the release manager or delegated to another core member** agreed upon in advance, **visual assets are best created by the design team**.
+Because of the nature of the release post content, responsibilities are divided in this step. While the post **can either be written by the release manager or delegated to another core member** agreed upon in advance, **visual assets are created by the design team**.
 
 When possible, the highlighted changes in the release post should include an animation (video or GIF) or a static image of them in use. Choosing between an animation or a static image will depend on the best way to showcase each highlight: while animations are better to demonstrate workflows, more direct highlights can be shown with an image; having too many video players adds a layer of friction for users to see the highlight, whereas too many simultaneous animated GIFs can distract and overwhelm the reader.
 
