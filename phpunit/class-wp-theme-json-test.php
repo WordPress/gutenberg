@@ -16,7 +16,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'color'       => array(
 						'custom' => false,
 					),
-					'layout' => array(
+					'layout'      => array(
 						'contentSize' => 'value',
 						'invalid/key' => 'value',
 					),
