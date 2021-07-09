@@ -1,5 +1,5 @@
 {
-	"apiVersion": 1,
+	"apiVersion": 2,
 	"name": "core/heading",
 	"title": "Heading",
 	"category": "text",
