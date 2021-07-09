@@ -24,13 +24,30 @@ import {
 import styles from './style.scss';
 import HelpDetailNavigationScreen from './help-detail-navigation-screen.js';
 import HelpTopicRow from './help-topic-row.js';
+import IntroToBlocks from './intro-to-blocks';
+import AddBlocks from './add-blocks';
+import MoveBlocks from './move-blocks';
+import RemoveBlocks from './remove-blocks';
+import CustomizeBlocks from './customize-blocks';
 
 const HELP_TOPICS = [
-	{ label: __( 'What is a block?' ), icon: helpFilled },
-	{ label: __( 'Add blocks' ), icon: plusCircleFilled },
-	{ label: __( 'Move blocks' ), icon: alignJustifyAlt },
-	{ label: __( 'Remove blocks' ), icon: trashFilled },
-	{ label: __( 'Customize blocks' ), icon: cogAlt },
+	{
+		label: __( 'What is a block?' ),
+		icon: helpFilled,
+		view: <IntroToBlocks />,
+	},
+	{
+		label: __( 'Add blocks' ),
+		icon: plusCircleFilled,
+		view: <AddBlocks />,
+	},
+	{ label: __( 'Move blocks' ), icon: alignJustifyAlt, view: <MoveBlocks /> },
+	{ label: __( 'Remove blocks' ), icon: trashFilled, view: <RemoveBlocks /> },
+	{
+		label: __( 'Customize blocks' ),
+		icon: cogAlt,
+		view: <CustomizeBlocks />,
+	},
 ];
 
 function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
@@ -45,6 +62,7 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 			onClose={ onClose }
 			hideHeader
 			hasNavigation
+			contentStyle={ styles.contentContainer }
 		>
 			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen name={ 'Topics' }>
@@ -81,6 +99,7 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 						<HelpDetailNavigationScreen
 							key={ key }
 							name={ topic.label }
+							view={ topic.view }
 						/>
 					);
 				} ) }
