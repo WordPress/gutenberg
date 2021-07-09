@@ -24,14 +24,18 @@ function render_block_core_legacy_widget( $attributes ) {
 		return '';
 	}
 
-	$id_base = $attributes['idBase'];
+	$id_base      = $attributes['idBase'];
+	$widget_key   = '';
+	$widget_object = null;
+
 	if ( method_exists( $wp_widget_factory, 'get_widget_key' ) && method_exists( $wp_widget_factory, 'get_widget_object' ) ) {
 		$widget_key    = $wp_widget_factory->get_widget_key( $id_base );
 		$widget_object = $wp_widget_factory->get_widget_object( $id_base );
-	} else {
-		$widget_key    = gutenberg_get_widget_key( $id_base );
-		$widget_object = gutenberg_get_widget_object( $id_base );
 	}
+
+	$widget_key = apply_filters( 'render_block_core_legacy_widget_key', $widget_key, $id_base, $attributes );
+
+	$widget_object = apply_filters( 'render_block_core_legacy_widget_object', $widget_object, $widget_key, $id_base, $attributes );
 
 	if ( ! $widget_key || ! $widget_object ) {
 		return '';
