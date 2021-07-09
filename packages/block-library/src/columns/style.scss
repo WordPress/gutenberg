@@ -103,8 +103,6 @@
 
 .wp-block-column {
 	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
 
 	// Prevent the columns from growing wider than their distributed sizes.
 	min-width: 0;
@@ -112,6 +110,12 @@
 	// Prevent long unbroken words from overflowing.
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
+
+	// Only apply display flex for vertically aligned columns.
+	&[class*="is-vertically-aligned-"] {
+		display: flex;
+		flex-direction: column;
+	}
 
 	// Columns need flex layout to achieve full height column when vertically
 	// aligned with a background color. This means normal float alignments for
