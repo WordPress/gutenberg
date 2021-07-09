@@ -29,7 +29,11 @@
 	}
 
 	.block-editor-link-control {
-		width: auto;
+		width: 200px; // hardcoded width avoids resizing of control when switching between preview/edit
+
+		.block-editor-url-input {
+			padding: 0; // cancel unnecessary default 1px padding in this case
+		}
 
 		.components-base-control .components-base-control__field {
 			margin-bottom: 0;
@@ -45,11 +49,12 @@
 		}
 
 		.block-editor-link-control__search-input.block-editor-link-control__search-input input[type="text"] {
-			margin: 16px 0 0 0;
+			margin: 0;
 			width: 100%;
 		}
 
 		.block-editor-link-control__search-actions {
+			top: 0; // cancel default top positioning
 			right: 4px;
 		}
 	}
