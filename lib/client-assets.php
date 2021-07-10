@@ -740,7 +740,7 @@ function gutenberg_extend_block_editor_styles_html() {
 		'wp-edit-blocks',
 	);
 
-	if ( 'widgets.php' === $pagenow ) {
+	if ( 'widgets.php' === $pagenow || 'customize.php' === $pagenow ) {
 		$style_handles[] = 'wp-widgets';
 		$style_handles[] = 'wp-edit-widgets';
 	}
