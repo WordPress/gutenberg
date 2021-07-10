@@ -29,7 +29,7 @@ function InserterSearchResults( {
 		[ rootClientId, filterValue ]
 	);
 
-	if ( items?.length === 0 ) {
+	if ( ! items || items?.length === 0 ) {
 		return <InserterNoResults />;
 	}
 
