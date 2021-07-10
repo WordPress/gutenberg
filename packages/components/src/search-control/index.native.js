@@ -116,6 +116,7 @@ function SearchControl( {
 
 	const {
 		'search-control__container': containerStyle,
+		'search-control__inner-container': innerContainerStyle,
 		'search-control__input-container': inputContainerStyle,
 		'search-control__form-input': formInputStyle,
 		'search-control__form-input-placeholder': placeholderStyle,
@@ -189,7 +190,7 @@ function SearchControl( {
 			return null;
 		}
 		return (
-			<View style={ [ cancelButtonStyle, { alignSelf: 'flex-start' } ] }>
+			<View style={ cancelButtonStyle }>
 				<Text
 					onPress={ onCancel }
 					style={ cancelButtonTextStyle }
@@ -213,7 +214,7 @@ function SearchControl( {
 			} }
 			activeOpacity={ 1 }
 		>
-			<View style={ { flex: 1, flexDirection: 'row' } }>
+			<View style={ innerContainerStyle }>
 				<View style={ inputContainerStyle }>
 					{ renderLeftButton() }
 					<TextInput
