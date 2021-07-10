@@ -13,8 +13,9 @@ import {
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useMemo, useEffect } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useModifiedStyles } from '@wordpress/compose';
 import { Button, Gridicons } from '@wordpress/components';
 import {
 	Icon,
@@ -37,82 +38,21 @@ for ( const selector in platformStyles ) {
 	};
 }
 
-function selectModifiedStyles( styles, modifier ) {
-	const modifierMatcher = new RegExp( `--${ modifier }$` );
-	const modifierSelectors = Object.keys( styles ).filter( ( selector ) =>
-		selector.match( modifierMatcher )
-	);
-
-	return modifierSelectors.reduce( ( modifiedStyles, modifierSelector ) => {
-		const blockElementSelector = modifierSelector.split( '--' )[ 0 ];
-		modifiedStyles[ blockElementSelector ] = styles[ modifierSelector ];
-		return modifiedStyles;
-	}, {} );
-}
-
-function mergeStyles( styles, updateStyles, selectors ) {
-	selectors.forEach( ( selector ) => {
-		styles[ selector ] = {
-			...styles[ selector ],
-			...updateStyles[ selector ],
-		};
-	} );
-
-	return styles;
-}
-
 function SearchControl( {
 	value,
 	onChange,
 	placeholder = __( 'Search Blocks' ),
 } ) {
 	const [ isActive, setIsActive ] = useState( false );
-	const [ currentStyles, setCurrentStyles ] = useState( baseStyles );
-
 	const isDark = useColorScheme() === 'dark';
 	const inputRef = useRef();
-
 	const isIOS = Platform.OS === 'ios';
 
-	const darkStyles = useMemo( () => {
-		return selectModifiedStyles( baseStyles, 'dark' );
-	}, [] );
-
-	const activeStyles = useMemo( () => {
-		return selectModifiedStyles( baseStyles, 'active' );
-	}, [] );
-
-	const activeDarkStyles = useMemo( () => {
-		return selectModifiedStyles( baseStyles, 'active-dark' );
-	}, [] );
-
-	useEffect( () => {
-		let futureStyles = { ...baseStyles };
-
-		function mergeFutureStyles( modifiedStyles, shouldUseConditions ) {
-			const shouldUseModified = shouldUseConditions.every(
-				( should ) => should
-			);
-
-			const updatedStyles = shouldUseModified
-				? modifiedStyles
-				: futureStyles;
-
-			const selectors = Object.keys( modifiedStyles );
-
-			futureStyles = mergeStyles(
-				futureStyles,
-				updatedStyles,
-				selectors
-			);
-		}
-
-		mergeFutureStyles( activeStyles, [ isActive ] );
-		mergeFutureStyles( darkStyles, [ isDark ] );
-		mergeFutureStyles( activeDarkStyles, [ isActive, isDark ], true );
-
-		setCurrentStyles( futureStyles );
-	}, [ isActive, isDark ] );
+	const styles = useModifiedStyles( baseStyles, {
+		active: [ isActive ],
+		dark: [ isDark ],
+		'active-dark': [ isActive, isDark ],
+	} );
 
 	const {
 		'search-control__container': containerStyle,
@@ -127,7 +67,7 @@ function SearchControl( {
 		'search-control__cancel-button-text': cancelButtonTextStyle,
 		'search-control__icon': iconStyle,
 		'search-control__right-icon': rightIconStyle,
-	} = currentStyles;
+	} = styles;
 
 	function clearInput() {
 		onChange( '' );
