@@ -144,5 +144,4 @@ export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursi
  */
 
 export { default as BlockEditorProvider } from './provider';
-export { default as __experimentalUseSimulatedMediaQuery } from './use-simulated-media-query';
 export { default as useSetting } from './use-setting';
