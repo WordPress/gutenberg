@@ -20,17 +20,17 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import BlockNavigationLeaf from './leaf';
+import ListViewLeaf from './leaf';
 import {
 	BlockMoverUpButton,
 	BlockMoverDownButton,
 } from '../block-mover/button';
-import BlockNavigationBlockContents from './block-contents';
+import ListViewBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
-import { useBlockNavigationContext } from './context';
+import { useListViewContext } from './context';
 import { store as blockEditorStore } from '../../store';
 
-export default function BlockNavigationBlock( {
+export default function ListViewBlock( {
 	block,
 	isSelected,
 	isBranchSelected,
@@ -74,20 +74,20 @@ export default function BlockNavigationBlock( {
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = classnames(
-		'block-editor-block-navigation-block__mover-cell',
+		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered }
 	);
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
 		isTreeGridMounted,
-	} = useBlockNavigationContext();
-	const blockNavigationBlockSettingsClassName = classnames(
-		'block-editor-block-navigation-block__menu-cell',
+	} = useListViewContext();
+	const listViewBlockSettingsClassName = classnames(
+		'block-editor-list-view-block__menu-cell',
 		{ 'is-visible': isHovered }
 	);
 
-	// If BlockNavigation has experimental features related to the Persistent List View,
+	// If ListView has experimental features related to the Persistent List View,
 	// only focus the selected list item on mount; otherwise the list would always
 	// try to steal the focus from the editor canvas.
 	useEffect( () => {
@@ -100,7 +100,7 @@ export default function BlockNavigationBlock( {
 		}
 	}, [] );
 
-	// If BlockNavigation has experimental features (such as drag and drop) enabled,
+	// If ListView has experimental features (such as drag and drop) enabled,
 	// leave the focus handling as it was before, to avoid accidental regressions.
 	useEffect( () => {
 		if ( withExperimentalFeatures && isSelected ) {
@@ -132,7 +132,7 @@ export default function BlockNavigationBlock( {
 	} );
 
 	return (
-		<BlockNavigationLeaf
+		<ListViewLeaf
 			className={ classes }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
@@ -142,18 +142,18 @@ export default function BlockNavigationBlock( {
 			position={ position }
 			rowCount={ rowCount }
 			path={ path }
-			id={ `block-navigation-block-${ clientId }` }
+			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
 			isExpanded={ isExpanded }
 		>
 			<TreeGridCell
-				className="block-editor-block-navigation-block__contents-cell"
+				className="block-editor-list-view-block__contents-cell"
 				colSpan={ hasRenderedMovers ? undefined : 2 }
 				ref={ cellRef }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
-					<div className="block-editor-block-navigation-block__contents-container">
-						<BlockNavigationBlockContents
+					<div className="block-editor-list-view-block__contents-container">
+						<ListViewBlockContents
 							block={ block }
 							onClick={ onClick }
 							onToggleExpanded={ onToggleExpanded }
@@ -201,9 +201,7 @@ export default function BlockNavigationBlock( {
 			) }
 
 			{ withExperimentalFeatures && (
-				<TreeGridCell
-					className={ blockNavigationBlockSettingsClassName }
-				>
+				<TreeGridCell className={ listViewBlockSettingsClassName }>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsDropdown
 							clientIds={ [ clientId ] }
@@ -245,6 +243,6 @@ export default function BlockNavigationBlock( {
 					) }
 				</TreeGridCell>
 			) }
-		</BlockNavigationLeaf>
+		</ListViewLeaf>
 	);
 }

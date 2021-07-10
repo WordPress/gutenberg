@@ -14,11 +14,11 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import BlockNavigationLeaf from './leaf';
+import ListViewLeaf from './leaf';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 
-export default function BlockNavigationAppender( {
+export default function ListViewAppender( {
 	parentBlockClientId,
 	position,
 	level,
@@ -38,8 +38,8 @@ export default function BlockNavigationAppender( {
 		},
 		[ parentBlockClientId ]
 	);
-	const instanceId = useInstanceId( BlockNavigationAppender );
-	const descriptionId = `block-navigation-appender-row__description_${ instanceId }`;
+	const instanceId = useInstanceId( ListViewAppender );
+	const descriptionId = `list-view-appender-row__description_${ instanceId }`;
 
 	const appenderPositionDescription = sprintf(
 		/* translators: 1: The numerical position of the block that will be inserted. 2: The level of nesting for the block that will be inserted. */
@@ -49,7 +49,7 @@ export default function BlockNavigationAppender( {
 	);
 
 	return (
-		<BlockNavigationLeaf
+		<ListViewLeaf
 			className={ classnames( { 'is-dragging': isDragging } ) }
 			level={ level }
 			position={ position }
@@ -57,11 +57,11 @@ export default function BlockNavigationAppender( {
 			path={ path }
 		>
 			<TreeGridCell
-				className="block-editor-block-navigation-appender__cell"
+				className="block-editor-list-view-appender__cell"
 				colSpan="3"
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
-					<div className="block-editor-block-navigation-appender__container">
+					<div className="block-editor-list-view-appender__container">
 						<Inserter
 							rootClientId={ parentBlockClientId }
 							__experimentalIsQuick
@@ -69,7 +69,7 @@ export default function BlockNavigationAppender( {
 							toggleProps={ { ref, tabIndex, onFocus } }
 						/>
 						<div
-							className="block-editor-block-navigation-appender__description"
+							className="block-editor-list-view-appender__description"
 							id={ descriptionId }
 						>
 							{ appenderPositionDescription }
@@ -77,6 +77,6 @@ export default function BlockNavigationAppender( {
 					</div>
 				) }
 			</TreeGridCell>
-		</BlockNavigationLeaf>
+		</ListViewLeaf>
 	);
 }

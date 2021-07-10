@@ -317,6 +317,56 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 );
 
 /**
+ * Returns the list of entities currently being saved.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {[{ title: string, key: string, name: string, kind: string }]} The list of records being saved.
+ */
+export const __experimentalGetEntitiesBeingSaved = createSelector(
+	( state ) => {
+		const {
+			entities: { data },
+		} = state;
+		const recordsBeingSaved = [];
+		Object.keys( data ).forEach( ( kind ) => {
+			Object.keys( data[ kind ] ).forEach( ( name ) => {
+				const primaryKeys = Object.keys(
+					data[ kind ][ name ].saving
+				).filter( ( primaryKey ) =>
+					isSavingEntityRecord( state, kind, name, primaryKey )
+				);
+
+				if ( primaryKeys.length ) {
+					const entity = getEntity( state, kind, name );
+					primaryKeys.forEach( ( primaryKey ) => {
+						const entityRecord = getEditedEntityRecord(
+							state,
+							kind,
+							name,
+							primaryKey
+						);
+						recordsBeingSaved.push( {
+							// We avoid using primaryKey because it's transformed into a string
+							// when it's used as an object key.
+							key:
+								entityRecord[
+									entity.key || DEFAULT_ENTITY_KEY
+								],
+							title: entity?.getTitle?.( entityRecord ) || '',
+							name,
+							kind,
+						} );
+					} );
+				}
+			} );
+		} );
+		return recordsBeingSaved;
+	},
+	( state ) => [ state.entities.data ]
+);
+
+/**
  * Returns the specified entity record's edits.
  *
  * @param {Object} state    State tree.

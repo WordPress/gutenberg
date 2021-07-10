@@ -7,11 +7,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { RichText } from '../';
-import { BlockNavigationBlockFill } from './block-slot';
+import { ListViewBlockFill } from './block-slot';
 
-export default function BlockNavigationEditor( { value, onChange } ) {
+export default function ListViewEditor( { value, onChange } ) {
 	return (
-		<BlockNavigationBlockFill>
+		<ListViewBlockFill>
 			<RichText
 				value={ value }
 				onChange={ onChange }
@@ -24,6 +24,6 @@ export default function BlockNavigationEditor( { value, onChange } ) {
 					'core/strikethrough',
 				] }
 			/>
-		</BlockNavigationBlockFill>
+		</ListViewBlockFill>
 	);
 }

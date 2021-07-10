@@ -1,100 +1,19 @@
 /**
  * External dependencies
  */
-import { omit, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { serialize, parse, createBlock } from '@wordpress/blocks';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { getWidgetIdFromBlock, addWidgetIdToBlock } from '@wordpress/widgets';
 
-function blockToWidget( block, existingWidget = null ) {
-	let widget;
-
-	const isValidLegacyWidgetBlock =
-		block.name === 'core/legacy-widget' &&
-		( block.attributes.id || block.attributes.instance );
-
-	if ( isValidLegacyWidgetBlock ) {
-		if ( block.attributes.id ) {
-			// Widget that does not extend WP_Widget.
-			widget = {
-				id: block.attributes.id,
-			};
-		} else {
-			const { encoded, hash, raw, ...rest } = block.attributes.instance;
-
-			// Widget that extends WP_Widget.
-			widget = {
-				idBase: block.attributes.idBase,
-				instance: {
-					...existingWidget?.instance,
-					// Required only for the customizer.
-					is_widget_customizer_js_value: true,
-					encoded_serialized_instance: encoded,
-					instance_hash_key: hash,
-					raw_instance: raw,
-					...rest,
-				},
-			};
-		}
-	} else {
-		const instance = {
-			content: serialize( block ),
-		};
-		widget = {
-			idBase: 'block',
-			widgetClass: 'WP_Widget_Block',
-			instance: {
-				raw_instance: instance,
-			},
-		};
-	}
-
-	return {
-		...omit( existingWidget, [ 'form', 'rendered' ] ),
-		...widget,
-	};
-}
-
-function widgetToBlock( { id, idBase, number, instance } ) {
-	let block;
-
-	const {
-		encoded_serialized_instance: encoded,
-		instance_hash_key: hash,
-		raw_instance: raw,
-		...rest
-	} = instance;
-
-	if ( idBase === 'block' ) {
-		const parsedBlocks = parse( raw.content );
-		block = parsedBlocks.length
-			? parsedBlocks[ 0 ]
-			: createBlock( 'core/paragraph', {} );
-	} else if ( number ) {
-		// Widget that extends WP_Widget.
-		block = createBlock( 'core/legacy-widget', {
-			idBase,
-			instance: {
-				encoded,
-				hash,
-				raw,
-				...rest,
-			},
-		} );
-	} else {
-		// Widget that does not extend WP_Widget.
-		block = createBlock( 'core/legacy-widget', {
-			id,
-		} );
-	}
-
-	return addWidgetIdToBlock( block, id );
-}
+/**
+ * Internal dependencies
+ */
+import { blockToWidget, widgetToBlock } from '../../utils';
 
 function widgetsToBlocks( widgets ) {
 	return widgets.map( ( widget ) => widgetToBlock( widget ) );

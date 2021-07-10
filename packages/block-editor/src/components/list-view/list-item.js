@@ -18,7 +18,7 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockIcon from '../block-icon';
 
-export default function BlockNavigationListItem( {
+export default function ListViewListItem( {
 	block,
 	onClick,
 	isSelected,
@@ -28,10 +28,10 @@ export default function BlockNavigationListItem( {
 	const blockType = getBlockType( block.name );
 
 	return (
-		<div className="block-editor-block-navigation__list-item">
+		<div className="block-editor-list-view__list-item">
 			<WrapperComponent
 				className={ classnames(
-					'block-editor-block-navigation__list-item-button',
+					'block-editor-list-view__list-item-button',
 					{
 						'is-selected': isSelected,
 					}
@@ -52,7 +52,7 @@ export default function BlockNavigationListItem( {
 	);
 }
 
-BlockNavigationListItem.defaultProps = {
+ListViewListItem.defaultProps = {
 	onClick: () => {},
 	wrapperComponent: ( props ) => <Button { ...props } />,
 };

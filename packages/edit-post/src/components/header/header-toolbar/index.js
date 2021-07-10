@@ -66,7 +66,7 @@ function HeaderToolbar() {
 			showIconLabels: isFeatureActive( 'showIconLabels' ),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
-				'core/edit-post/toggle-block-navigation'
+				'core/edit-post/toggle-list-view'
 			),
 		};
 	}, [] );
