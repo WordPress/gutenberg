@@ -17,6 +17,7 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
 import { useInBetweenInserter } from './use-in-between-inserter';
+import { useInBetweenClickRedirect } from './use-in-between-click-redirect';
 import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
@@ -47,6 +48,7 @@ function Root( { className, children } ) {
 				useBlockSelectionClearer(),
 				useBlockDropZone(),
 				useInBetweenInserter(),
+				useInBetweenClickRedirect(),
 			] ) }
 			className={ classnames(
 				'block-editor-block-list__layout is-root-container',

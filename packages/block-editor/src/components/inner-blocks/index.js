@@ -25,6 +25,7 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
+import { useInBetweenClickRedirect } from '../block-list/use-in-between-click-redirect';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -157,6 +158,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	const ref = useMergeRefs( [
 		props.ref,
+		useInBetweenClickRedirect(),
 		useBlockDropZone( {
 			rootClientId: clientId,
 		} ),

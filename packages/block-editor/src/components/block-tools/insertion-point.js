@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	useCallback,
 	useRef,
@@ -31,7 +31,6 @@ function InsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
 } ) {
-	const { selectBlock } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
 	const {
@@ -179,12 +178,6 @@ function InsertionPointPopover( {
 		'is-' + orientation
 	);
 
-	function onClick( event ) {
-		if ( event.target === ref.current && nextClientId ) {
-			selectBlock( nextClientId, -1 );
-		}
-	}
-
 	function onFocus( event ) {
 		// Only handle click on the wrapper specifically, and not an event
 		// bubbled from the inserter itself.
@@ -220,18 +213,18 @@ function InsertionPointPopover( {
 			<div
 				ref={ ref }
 				tabIndex={ -1 }
-				onClick={ onClick }
 				onFocus={ onFocus }
-				className={ classnames( className, {
-					'is-with-inserter': showInsertionPointInserter,
-				} ) }
+				className={ className }
 				style={ style }
 			>
 				<div className="block-editor-block-list__insertion-point-indicator" />
 				{ showInsertionPointInserter && (
 					<div
 						className={ classnames(
-							'block-editor-block-list__insertion-point-inserter'
+							'block-editor-block-list__insertion-point-inserter',
+							{
+								'is-with-inserter': showInsertionPointInserter,
+							}
 						) }
 					>
 						<Inserter
