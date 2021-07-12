@@ -27,7 +27,13 @@ const Example = ( { color } ) => {
 	const classes = cx(
 		bgColor,
 		textColor,
-		css( { padding: '1em', borderRadius: '2px' } )
+		css( {
+			padding: '1em',
+			borderRadius: '2px',
+			borderColor: color,
+			borderStyle: 'solid',
+			borderWidth: '1px',
+		} )
 	);
 
 	return <span className={ classes }>This is an example</span>;
