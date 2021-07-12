@@ -83,7 +83,7 @@ const EmbedEdit = ( props ) => {
 				embedPreview?.html === false &&
 				embedPreview?.type === undefined;
 			// Some WordPress URLs that can't be embedded will cause the API to return
-			// a valid JSON response with no HTML and `data.status` set to 404, rather
+			// a valid JSON response with no HTML and `code` set to 404, rather
 			// than generating a fallback response as other embeds do.
 			const wordpressCantEmbed = embedPreview?.code === '404';
 			const validPreview =
