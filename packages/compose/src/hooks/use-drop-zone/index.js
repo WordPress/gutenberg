@@ -138,12 +138,30 @@ export default function useDropZone( {
 				}
 			}
 
+			/** @type {number | undefined} */
+			let lastDragX;
+			/** @type {number | undefined} */
+			let lastDragY;
+			/** @type { number } */
+			let lastTime = Date.now(); // Note that FF will reduce precision to 100ms when privacy.resistFingerprinting is enabled
 			function onDragOver( /** @type {DragEvent} */ event ) {
 				// Only call onDragOver for the innermost hovered drop zones.
 				if ( ! event.defaultPrevented && onDragOverRef.current ) {
-					onDragOverRef.current( event );
+					const x = lastDragX ?? event.clientX;
+					const y = lastDragY ?? event.clientY;
+					const time = Date.now();
+					if ( time - lastTime > 100 ) {
+						const distance =
+							Math.abs( event.clientY - y ) +
+							Math.abs( event.clientX - x );
+						if ( distance < 50 ) {
+							onDragOverRef.current( event );
+						}
+						lastDragX = event.clientX;
+						lastDragY = event.clientY;
+						lastTime = time;
+					}
 				}
-
 				// Prevent the browser default while also signalling to parent
 				// drop zones that `onDragOver` is already handled.
 				event.preventDefault();
