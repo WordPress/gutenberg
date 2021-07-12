@@ -170,10 +170,10 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 							isPrimary
 							style={ {
 								margin: '7px',
-								height: '34px',
+								height: '32px',
 							} }
 							onClick={ saveEditedRecords }
-							label={ __( 'Save Globally' ) }
+							label={ __( 'Save globally' ) }
 							showTooltip
 							isDisabled={ ! hasEdits }
 						>

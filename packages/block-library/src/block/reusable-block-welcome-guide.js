@@ -31,8 +31,8 @@ function ReusableBlockWelcomeGuide( { isGudieOpen, setIsGudieOpen } ) {
 				{
 					image: (
 						<WelcomeGuideImage
-							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-reusable.svg"
-							animatedSrc="https://s.w.org/images/block-editor/welcome-reusable.gif"
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-reusable.svg?3"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-reusable.gif?2"
 						/>
 					),
 					content: (
@@ -42,7 +42,7 @@ function ReusableBlockWelcomeGuide( { isGudieOpen, setIsGudieOpen } ) {
 							</h1>
 							<p className="edit-reusable-block-welcome-guide__text">
 								{ __(
-									'You just saved a Reusable block. Any other documents that include this block have been updated to reflect this change. '
+									'You just saved a Reusable block. Any other documents that include this block have been updated to reflect this change. To make local changes, try converting to regular blocks first.'
 								) }
 							</p>
 						</>
