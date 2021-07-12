@@ -222,6 +222,14 @@ function load_remote_patterns() {
 
 	foreach ( $patterns as $settings ) {
 		$pattern_name = 'core/' . sanitize_title( $settings['title'] );
+		if ( isset( $settings['block_types'] ) ) {
+			$settings['blockTypes'] = $settings['block_types'];
+			unset( $settings['block_types'] );
+		}
+		if ( isset( $settings['viewport_width'] ) ) {
+			$settings['viewportWidth'] = $settings['viewport_width'];
+			unset( $settings['viewport_width'] );
+		}
 		register_block_pattern( $pattern_name, (array) $settings );
 	}
 }
