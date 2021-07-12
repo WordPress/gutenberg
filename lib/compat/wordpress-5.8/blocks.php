@@ -56,42 +56,40 @@ function gutenberg_block_type_metadata_view_script( $settings, $metadata ) {
 
 add_filter( 'block_type_metadata_settings', 'gutenberg_block_type_metadata_view_script', 10, 2 );
 
-if ( ! function_exists( 'gutenberg_register_legacy_query_loop_block' ) ) {
-	/**
-	 * Complements the renaming of `Query Loop` to `Post Template`.
-	 * This ensures backwards compatibility for any users running the Gutenberg
-	 * plugin who have used Query Loop prior to its renaming.
-	 *
-	 * This can be removed when WordPress 5.9 is released.
-	 *
-	 * @see https://github.com/WordPress/gutenberg/pull/32514
-	 */
-	function gutenberg_register_legacy_query_loop_block() {
-		$registry = WP_Block_Type_Registry::get_instance();
-		if ( $registry->is_registered( 'core/query-loop' ) ) {
-			unregister_block_type( 'core/query-loop' );
-		}
-		register_block_type(
-			'core/query-loop',
-			array(
-				'category'          => 'design',
-				'uses_context'      => array(
-					'queryId',
-					'query',
-					'queryContext',
-					'displayLayout',
-					'templateSlug',
-				),
-				'supports'          => array(
-					'reusable' => false,
-					'html'     => false,
-					'align'    => true,
-				),
-				'style'             => 'wp-block-post-template',
-				'render_callback'   => 'render_legacy_query_loop_block',
-				'skip_inner_blocks' => true,
-			)
-		);
+/**
+ * Complements the renaming of `Query Loop` to `Post Template`.
+ * This ensures backwards compatibility for any users running the Gutenberg
+ * plugin who have used Query Loop prior to its renaming.
+ *
+ * This can be removed when WordPress 5.9 is released.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/32514
+ */
+function gutenberg_register_legacy_query_loop_block() {
+	$registry = WP_Block_Type_Registry::get_instance();
+	if ( $registry->is_registered( 'core/query-loop' ) ) {
+		unregister_block_type( 'core/query-loop' );
 	}
-	add_action( 'init', 'gutenberg_register_legacy_query_loop_block' );
+	register_block_type(
+		'core/query-loop',
+		array(
+			'category'          => 'design',
+			'uses_context'      => array(
+				'queryId',
+				'query',
+				'queryContext',
+				'displayLayout',
+				'templateSlug',
+			),
+			'supports'          => array(
+				'reusable' => false,
+				'html'     => false,
+				'align'    => true,
+			),
+			'style'             => 'wp-block-post-template',
+			'render_callback'   => 'render_legacy_query_loop_block',
+			'skip_inner_blocks' => true,
+		)
+	);
 }
+add_action( 'init', 'gutenberg_register_legacy_query_loop_block' );
