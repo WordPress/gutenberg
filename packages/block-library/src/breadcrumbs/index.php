@@ -37,16 +37,19 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	$inner_markup = '';
 
 	foreach ( array_reverse( $ancestor_ids ) as $index => $ancestor_id ) {
-		$show_separator = 0 !== $index || ! empty( $attributes['showLeadingSeparator'] );
+		$show_separator =
+			! empty( $attributes['showCurrentPageTitle'] ) ||
+			$index < count( $ancestor_ids ) - 1;
 		$inner_markup  .= build_block_core_breadcrumbs_inner_markup_item(
 			$ancestor_id,
 			$attributes,
-			$show_separator
+			$show_separator,
+			$index
 		);
 	}
 
 	if ( ! empty( $attributes['showCurrentPageTitle'] ) ) {
-		$show_separator = true;
+		$show_separator = false;
 		$inner_markup  .= build_block_core_breadcrumbs_inner_markup_item(
 			$post_id,
 			$attributes,
@@ -75,11 +78,32 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
  *
  * @return string The markup for a single breadcrumb item wrapped in an `li` element.
  */
-function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, $show_separator = true ) {
+function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, $show_separator = true, $index = null) {
 	$li_class        = 'wp-block-breadcrumbs__item';
 	$separator_class = 'wp-block-breadcrumbs__separator';
 
 	$markup = '';
+
+	// Render leading separator if specified.
+	if (
+		! empty( $attributes['showLeadingSeparator'] ) &&
+		! empty( $attributes['separator'] ) &&
+		$index === 0
+	) {
+		$markup .= sprintf(
+			'<span class="%1$s">%2$s</span>',
+			$separator_class,
+			esc_html( $attributes['separator'] )
+		);
+	}
+
+	if ( ! empty( $post_id ) ) {
+		$markup .= sprintf(
+			'<a href="%s">%s</a>',
+			get_the_permalink( $post_id ),
+			get_the_title( $post_id )
+		);
+	}
 
 	if (
 		$show_separator &&
@@ -91,12 +115,6 @@ function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, 
 			esc_html( $attributes['separator'] )
 		);
 	}
-
-	$markup .= sprintf(
-		'<a href="%s">%s</a>',
-		get_the_permalink( $post_id ),
-		get_the_title( $post_id )
-	);
 
 	return sprintf(
 		'<li class="%1$s">%2$s</li>',

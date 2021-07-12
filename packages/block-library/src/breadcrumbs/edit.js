@@ -88,8 +88,14 @@ export default function BreadcrumbsEdit( {
 		breadcrumbTitles = breadcrumbTitles.slice( -nestingLevel );
 	}
 
-	const buildBreadcrumb = ( crumbTitle, showSeparator, key ) => {
+	const buildBreadcrumb = (
+		crumbTitle,
+		showSeparator,
+		addLeadingSeparator,
+		key
+	) => {
 		let separatorSpan;
+		let crumbAnchor;
 
 		if ( showSeparator && separator ) {
 			separatorSpan = (
@@ -99,28 +105,45 @@ export default function BreadcrumbsEdit( {
 			);
 		}
 
-		return (
-			<li className="wp-block-breadcrumbs__item" key={ key }>
-				{ separatorSpan }
-				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
+		if ( crumbTitle ) {
+			/* eslint-disable jsx-a11y/anchor-is-valid */
+			crumbAnchor = (
 				<a href="#" onClick={ ( event ) => event.preventDefault() }>
 					{ crumbTitle }
 				</a>
-				{ /* eslint-enable */ }
+			);
+			/* eslint-enable */
+		}
+
+		return (
+			<li className="wp-block-breadcrumbs__item" key={ key }>
+				{ addLeadingSeparator ? separatorSpan : null }
+				{ crumbAnchor }
+				{ separatorSpan }
 			</li>
 		);
 	};
 
+	const breadcrumbs = [];
+
 	// Add a useMemo on this one?
-	const breadcrumbs = breadcrumbTitles.map( ( item, index ) =>
-		buildBreadcrumb( item, index !== 0 || showLeadingSeparator, index )
+	breadcrumbs.push(
+		...breadcrumbTitles.map( ( item, index ) =>
+			buildBreadcrumb(
+				item,
+				index < breadcrumbTitles.length - 1 || showCurrentPageTitle,
+				index === 0 && showLeadingSeparator,
+				index
+			)
+		)
 	);
 
 	if ( showCurrentPageTitle ) {
 		breadcrumbs.push(
 			buildBreadcrumb(
 				post?.title || __( 'Current page' ),
-				true,
+				false,
+				false,
 				breadcrumbTitles.length
 			)
 		);
