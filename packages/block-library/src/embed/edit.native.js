@@ -17,7 +17,7 @@ import EmbedBottomSheet from './embed-bottom-sheet';
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { useState, useEffect, Platform } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
@@ -85,10 +85,7 @@ const EmbedEdit = ( props ) => {
 			// Some WordPress URLs that can't be embedded will cause the API to return
 			// a valid JSON response with no HTML and `data.status` set to 404, rather
 			// than generating a fallback response as other embeds do.
-			const wordpressCantEmbed = Platform.select( {
-				web: embedPreview?.data?.status === 404,
-				native: embedPreview?.code === '404',
-			} );
+			const wordpressCantEmbed = embedPreview?.code === '404';
 			const validPreview =
 				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
 			return {
