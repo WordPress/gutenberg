@@ -15,6 +15,7 @@ import {
 	BlockControls,
 	useBlockProps,
 	store as blockEditorStore,
+	useSetting,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
@@ -43,6 +44,9 @@ const LAYOUT = {
 	alignments: [],
 };
 
+const ORIENTATION_VERTICAL = 'vertical';
+const ORIENTATION_HORIZONTAL = 'horizontal';
+
 function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
@@ -63,12 +67,43 @@ function Navigation( {
 		false
 	);
 
+	const orientationSettings = useSetting( 'layout.orientations' ) || {};
+
+	const allowedOrientations = Object.entries( orientationSettings ).reduce(
+		( allowed, curr ) => {
+			if ( true === curr[ 1 ] ) {
+				allowed.push( curr[ 0 ] );
+			}
+			return allowed;
+		},
+		[]
+	);
+
+	let defaultOrientation;
+
+	if ( allowedOrientations.includes( ORIENTATION_VERTICAL ) ) {
+		defaultOrientation = ORIENTATION_VERTICAL;
+	} else if (
+		! allowedOrientations.includes( ORIENTATION_VERTICAL ) &&
+		allowedOrientations.includes( ORIENTATION_HORIZONTAL )
+	) {
+		defaultOrientation = ORIENTATION_HORIZONTAL;
+	} else {
+		defaultOrientation = ORIENTATION_VERTICAL;
+	}
+
+	const possibleOrientation = attributes.orientation || defaultOrientation;
+
+	const blockOrientation = allowedOrientations.includes( possibleOrientation )
+		? possibleOrientation
+		: defaultOrientation;
+
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-			'is-vertical': attributes.orientation === 'vertical',
+			'is-vertical': blockOrientation === ORIENTATION_VERTICAL,
 			'is-responsive': attributes.isResponsive,
 		} ),
 	} );
@@ -85,7 +120,7 @@ function Navigation( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			orientation: attributes.orientation || 'horizontal',
+			orientation: blockOrientation,
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
@@ -120,7 +155,7 @@ function Navigation( {
 	}
 
 	const justifyAllowedControls =
-		attributes.orientation === 'vertical'
+		blockOrientation === ORIENTATION_VERTICAL
 			? [ 'left', 'center', 'right' ]
 			: [ 'left', 'center', 'right', 'space-between' ];
 
