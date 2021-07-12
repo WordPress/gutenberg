@@ -6,7 +6,9 @@ example the controls provided via block supports.
 ## Development guidelines
 
 The `ProgressiveDisclosurePanel` creates a container with a header including a
-dropdown menu. The menu is generated automatically from the panel's children.
+dropdown menu. The menu is generated automatically from the panel's children
+matching the `ProgressiveDisclosurePanelItem` component type.
+
 Each menu item allows for the display of the corresponding child to be
 toggled on or off. The control's `onSelect` and `onDeselect` callbacks are fired
 allowing for greater control over the child e.g. resetting block attributes when
@@ -21,7 +23,12 @@ child's props.
 ### Usage
 
 ```jsx
-import { __experimentalProgressiveDisclosurePanel as ProgressiveDisclosurePanel } from '@wordpress/components';
+import {
+	__experimentalProgressiveDisclosurePanel as ProgressiveDisclosurePanel,
+	__experimentalProgressiveDisclosurePanelItem as ProgressiveDisclosurePanelItem,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+
 import {
 	PaddingEdit,
 	hasPaddingValue,
@@ -44,12 +51,13 @@ export function DimensionPanel( props ) {
 			resetAll={ resetAll }
 		>
 			{ ! isPaddingDisabled && (
-				<PaddingEdit
-					{ ...props }
-					hasValue={ hasPaddingValue }
+				<ProgressiveDisclosurePanelItem
+					hasValue={ () => hasPaddingValue( props ) }
 					label={ __( 'Padding' ) }
-					onDeselect={ resetPadding }
-				/>
+					onDeselect={ () => resetPadding( props ) }
+				>
+					<PaddingEdit { ...props } />
+				</ProgressiveDisclosurePanelItem>
 			) }
 		</ProgressiveDisclosurePanel>
 	);
@@ -73,45 +81,27 @@ Title to be displayed within the panel's title.
 
 ### Sub-Components
 
-#### ProgressiveDisclosurePanelTitle
+#### ProgressiveDisclosurePanelItem
 
-This is a simple component to display the panel title and house the dropdown
-menu for toggling child display. It is used by the `ProgressiveDisclosurePanel`
-component under the hood, so it does not typically need to be used.
+This component acts a wrapper and controls the display of items to contained
+within a ProgressiveDisclosurePanel. An item is displayed if it is
+flagged as a default control or the corresponding panel menu item, provided via
+context, is toggled on for this item.
 
 ##### Props
-###### resetAll
+###### isShownByDefault
 
-A function to call when the `Reset all` menu option is selected.
+This prop identifies the current item as being displayed by default. This means
+it will show regardless of whether it has a value set or is toggled on in the
+panel's menu.
 
--   Type: `function`
+-   Type: `boolean`
 -   Required: Yes
 
-###### toggleChild
+###### label
 
-Callback used to toggle display of an individual child component.
+The label acts as a key to locate the corresponding item in the panel's menu
+context. This is used when checking if the panel item should be displayed.
 
--   Type: `function`
+-   Type: `string`
 -   Required: Yes
-
-###### menuItems
-
-This object represents the panel's children and their visibility state. It
-is built by the parent panel from its children prop.
-
--   Type: `Object`
--   Required: No
-
-###### menuLabel
-
-A label for the dropdown menu.
-
--   Type: `String`
--   Required: No
-
-###### title
-
-The panel title to display.
-
--   Type: `String`
--   Required: No

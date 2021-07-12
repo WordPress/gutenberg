@@ -30,9 +30,8 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	const { children, className, label: menuLabel, resetAll, title } = props;
 	const [ menuItems, setMenuItems ] = useState( {} );
 
-	// When conditionally including components e.g. { isShown && <Component /> }
-	// a boolean `false` will be passed as a child if component is excluded.
-	// This panel is only interested in the children to be displayed.
+	// This panel only needs to concern itself with the
+	// ProgressiveDisclosurePanelItem components to be displayed in the menu.
 	const filteredChildren = useMemo( () => {
 		return Array.isArray( children ) ? children.filter( isMenuItem ) : [];
 	}, [ children ] );
