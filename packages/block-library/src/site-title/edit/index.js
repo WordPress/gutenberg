@@ -35,7 +35,7 @@ export default function SiteTitleEdit( {
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
 		return {
 			canUserEdit: canUser( 'update', 'settings' ),
-			readOnlyTitle: siteData?.name && decodeEntities( siteData.name ),
+			readOnlyTitle: decodeEntities( siteData?.name ),
 		};
 	}, [] );
 	const TagName = level === 0 ? 'p' : `h${ level }`;
