@@ -442,6 +442,12 @@ async function publishNpmBugfixLatestDistTag() {
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
+	await askForConfirmation(
+		'Can you confirm that all required changes have beed already cherry-picked to the release branch?',
+		true,
+		'Please try again when all changes are cherry-picked.'
+	);
+
 	await prepareForPackageRelease( 'bugfix' );
 
 	log(
