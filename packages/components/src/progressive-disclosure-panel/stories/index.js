@@ -12,6 +12,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import ProgressiveDisclosurePanel from '../';
+import ProgressiveDisclosurePanelItem from '../item';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 
@@ -37,20 +38,28 @@ export const _default = () => {
 					title="Progressive Disclosure Panel"
 					resetAll={ resetAll }
 				>
-					<PlaceholderControl
+					<ProgressiveDisclosurePanelItem
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
-						value={ height }
-						onChange={ ( next ) => setHeight( next ) }
-					/>
-					<PlaceholderControl
+					>
+						<PlaceholderControl
+							label="Height"
+							value={ height }
+							onChange={ ( next ) => setHeight( next ) }
+						/>
+					</ProgressiveDisclosurePanelItem>
+					<ProgressiveDisclosurePanelItem
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
-						value={ width }
-						onChange={ ( next ) => setWidth( next ) }
-					/>
+					>
+						<PlaceholderControl
+							label="Width"
+							value={ width }
+							onChange={ ( next ) => setWidth( next ) }
+						/>
+					</ProgressiveDisclosurePanelItem>
 				</ProgressiveDisclosurePanel>
 			</Panel>
 		</PanelWrapperView>
@@ -64,6 +73,6 @@ function PlaceholderControl( { label, value, onChange } ) {
 }
 
 const PanelWrapperView = styled.div`
-	max-width: 232px;
+	max-width: 250px;
 	font-size: 13px;
 `;
