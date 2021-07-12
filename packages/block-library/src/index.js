@@ -49,6 +49,7 @@ import * as rss from './rss';
 import * as search from './search';
 import * as group from './group';
 import * as separator from './separator';
+import * as shapeDivider from './shape-divider';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
 import * as table from './table';
@@ -154,6 +155,7 @@ export const __experimentalGetCoreBlocks = () => [
 	rss,
 	search,
 	separator,
+	shapeDivider,
 	reusableBlock,
 	socialLinks,
 	socialLink,

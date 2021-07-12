@@ -1,0 +1,49 @@
+{
+	"apiVersion": 2,
+	"name": "core/shape-divider",
+	"title": "Shape Divider",
+	"category": "design",
+	"description": "Create a break between ideas or sections with a custom shape divider.",
+	"keywords": [ "shape", "divider" ],
+	"textdomain": "default",
+	"attributes": {
+		"flipHorizontal": {
+			"type": "boolean"
+		},
+		"flipVertical": {
+			"type": "boolean"
+		},
+		"height": {
+			"type": "number",
+			"default": 160
+		},
+		"shapes": {
+			"type": "array",
+			"items": {
+				"type": "object"
+			},
+			"default": [ {
+				"type": null,
+				"style": null,
+				"seed": null,
+				"color": null,
+				"complexity": 5,
+				"height": 50,
+				"opacity": 1,
+				"path": null
+			} ]
+		}
+	},
+	"supports": {
+		"align": [ "center", "wide", "full" ],
+		"color": {
+			"background": true,
+			"gradients": false,
+			"text": false,
+			"link": false
+		},
+		"spacing": {
+			"margin": [ "top", "bottom" ]
+		}
+	}
+}
