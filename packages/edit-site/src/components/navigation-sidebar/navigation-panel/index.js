@@ -49,7 +49,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			editedPostId: getEditedPostId(),
 			editedPostType: getEditedPostType(),
 			activeMenu: getNavigationPanelActiveMenu(),
-			siteTitle: siteData.name && decodeEntities( siteData.name ),
+			siteTitle: siteData.name,
 		};
 	}, [] );
 
@@ -96,7 +96,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
 					<div className="edit-site-navigation-panel__site-title">
-						{ siteTitle }
+						{ decodeEntities( siteTitle ) }
 					</div>
 				</div>
 				<div className="edit-site-navigation-panel__scroll-container">
