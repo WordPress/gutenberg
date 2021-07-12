@@ -16,6 +16,11 @@
 		"showSubmenuIcon",
 		"style"
 	],
+	"attributes": {
+		"childrenOnly": {
+			"type": "boolean"
+		}
+	},
 	"supports": {
 		"reusable": false,
 		"html": false

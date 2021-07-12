@@ -148,20 +148,29 @@ function block_core_page_list_nest_pages( $current_level, $children ) {
  * @return string Returns the page list markup.
  */
 function render_block_core_page_list( $attributes, $content, $block ) {
+	global $post;
 	static $block_id = 0;
 	$block_id++;
+
+	$children_only = ( isset( $attributes['childrenOnly'] ) && $attributes['childrenOnly'] );
+
+	$parent_id = ( $post->post_parent ) ? $post->post_parent : $post->ID;
 
 	// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby values is resolved,
 	// update 'sort_column' to 'menu_order, post_title'. Sorting by both menu_order and post_title ensures a stable sort.
 	// Otherwise with pages that have the same menu_order value, we can see different ordering depending on how DB
 	// queries are constructed internally. For example we might see a different order when a limit is set to <499
 	// versus >= 500.
-	$all_pages = get_pages(
-		array(
-			'sort_column' => 'menu_order',
-			'order'       => 'asc',
-		)
+	$query_args = array(
+		'sort_column' => 'menu_order',
+		'order'       => 'asc',
 	);
+
+	if ( $children_only ) {
+		$query_args['child_of'] = $parent_id;
+	}
+
+	$all_pages = get_pages( $query_args );
 
 	$top_level_pages = array();
 
@@ -170,13 +179,15 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$active_page_ancestor_ids = array();
 
 	foreach ( (array) $all_pages as $page ) {
+
 		$is_active = ! empty( $page->ID ) && ( get_the_ID() === $page->ID );
 
 		if ( $is_active ) {
 			$active_page_ancestor_ids = get_post_ancestors( $page->ID );
 		}
 
-		if ( $page->post_parent ) {
+		if ( ( $page->post_parent && ! $children_only ) ||
+			( $children_only && $page->post_parent !== $parent_id ) ) {
 			$pages_with_children[ $page->post_parent ][ $page->ID ] = array(
 				'page_id'   => $page->ID,
 				'title'     => $page->post_title,
