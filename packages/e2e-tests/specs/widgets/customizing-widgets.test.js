@@ -150,7 +150,7 @@ describe( 'Widgets Customizer', () => {
 		);
 	} );
 
-	it( 'should open the inspector panel', async () => {
+	it.skip( 'should open the inspector panel', async () => {
 		const widgetsPanel = await find( {
 			role: 'heading',
 			name: /Widgets/,
