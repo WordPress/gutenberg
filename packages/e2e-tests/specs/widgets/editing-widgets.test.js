@@ -252,7 +252,7 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	it( 'Should insert content using the inline inserter', async () => {
+	it.skip( 'Should insert content using the inline inserter', async () => {
 		const [ firstWidgetArea ] = await findAll( {
 			role: 'group',
 			name: 'Block: Widget Area',
