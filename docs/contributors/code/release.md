@@ -221,6 +221,8 @@ Check the versions listed in the current `CHANGELOG.md` file, looking through th
 
 Note: You may discover the current version of each package is not up to date, if so updating the previous released versions would be appreciated.
 
+The good news is that the rest of the process is automated with `./bin/plugin/cli.js npm-bugfix` command. The rest of the section covers all the necessary steps for publishing the packages if you prefer to do it manually.
+
 Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#maintaining-changelogs) documentation and commit the changes:
 
 1. `git checkout wp/trunk`
