@@ -66,6 +66,8 @@ addFilter(
 
 ### `block_editor_settings_all`
 
+_**Note:** Before WordPress 5.8 known as `block_editor_settings`. In the case when you want to support older versions of WordPress you might need a way to detect which filter should be used – the deprecated one vs the new one. The recommended way to proceed is to check if the `WP_Block_Editor_Context` class exists._
+
 This is a PHP filter which is applied before sending settings to the WordPress block editor.
 
 You may find details about this filter [on its WordPress Code Reference page](https://developer.wordpress.org/reference/hooks/block_editor_settings_all/).
