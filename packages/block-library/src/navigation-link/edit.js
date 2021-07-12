@@ -430,23 +430,23 @@ export default function NavigationLinkEdit( {
 	switch ( type ) {
 		case 'post':
 			/* translators: label for missing post in navigation link block */
-			missingText = __( 'Select a post' );
+			missingText = __( 'Select post' );
 			break;
 		case 'page':
 			/* translators: label for missing page in navigation link block */
-			missingText = __( 'Select a page' );
+			missingText = __( 'Select page' );
 			break;
 		case 'category':
 			/* translators: label for missing category in navigation link block */
-			missingText = __( 'Select a category' );
+			missingText = __( 'Select category' );
 			break;
 		case 'tag':
 			/* translators: label for missing tag in navigation link block */
-			missingText = __( 'Select a tag' );
+			missingText = __( 'Select tag' );
 			break;
 		default:
 			/* translators: label for missing values in navigation link block */
-			missingText = __( 'Add a link' );
+			missingText = __( 'Add link' );
 	}
 
 	return (
