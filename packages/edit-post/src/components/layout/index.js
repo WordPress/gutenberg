@@ -12,6 +12,7 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
+	EditorSnackbars,
 	store as editorStore,
 } from '@wordpress/editor';
 import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
@@ -246,15 +247,20 @@ function Layout( { styles } ) {
 					</>
 				}
 				footer={
-					! hasReducedUI &&
-					showBlockBreadcrumbs &&
-					! isMobileViewport &&
-					isRichEditingEnabled &&
-					mode === 'visual' && (
-						<div className="edit-post-layout__footer">
-							<BlockBreadcrumb rootLabelText={ documentLabel } />
-						</div>
-					)
+					<>
+						<EditorSnackbars />
+						{ ! hasReducedUI &&
+							showBlockBreadcrumbs &&
+							! isMobileViewport &&
+							isRichEditingEnabled &&
+							mode === 'visual' && (
+								<div className="edit-post-layout__footer">
+									<BlockBreadcrumb
+										rootLabelText={ documentLabel }
+									/>
+								</div>
+							) }
+					</>
 				}
 				actions={
 					<ActionsPanel

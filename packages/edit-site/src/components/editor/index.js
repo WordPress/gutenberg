@@ -19,6 +19,7 @@ import {
 } from '@wordpress/interface';
 import {
 	EditorNotices,
+	EditorSnackbars,
 	EntitiesSavedStates,
 	UnsavedChangesWarning,
 	store as editorStore,
@@ -268,7 +269,12 @@ function Editor( { initialSettings } ) {
 												) }
 											</>
 										}
-										footer={ <BlockBreadcrumb /> }
+										footer={
+											<>
+												<EditorSnackbars />
+												<BlockBreadcrumb />
+											</>
+										}
 									/>
 									<Popover.Slot />
 									<PluginArea />
