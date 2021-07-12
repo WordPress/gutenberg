@@ -69,6 +69,34 @@ export default function PostExcerptEditor( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+	/**
+	 * Some themes might use `excerpt_more` filter to add links
+	 * to excerpts generated from content. Since we display the
+	 * renderedExcerpt from REST API links might be included.
+	 * Before the application of this filter all content has been
+	 * stripped of tags, so if we find any links there should come
+	 * from the filter.
+	 *
+	 * In order to avoid a possible `inception` effect
+	 * see: (https://github.com/WordPress/gutenberg/issues/33309)
+	 * we change the `href` attribute of links to a `pseudo link`.
+	 *
+	 */
+	const filteredRenderedExcerpt = useMemo( () => {
+		const document = new window.DOMParser().parseFromString(
+			renderedExcerpt,
+			'text/html'
+		);
+		const links = document.getElementsByTagName( 'a' );
+		if ( ! links?.length ) {
+			return renderedExcerpt;
+		}
+		for ( const link of links ) {
+			link.setAttribute( 'href', '#excerpt_more-pseudo-link' );
+		}
+		return document.body.innerHTML || '';
+	}, [ renderedExcerpt ] );
+
 	if ( ! postType || ! postId ) {
 		return (
 			<div { ...blockProps }>
@@ -116,10 +144,16 @@ export default function PostExcerptEditor( {
 			onChange={ setExcerpt }
 		/>
 	) : (
-		( renderedExcerpt && (
-			<RawHTML key="html">{ renderedExcerpt }</RawHTML>
+		( filteredRenderedExcerpt && (
+			<RawHTML
+				key="html"
+				onClick={ ( event ) => {
+					event.preventDefault();
+				} }
+			>
+				{ filteredRenderedExcerpt }
+			</RawHTML>
 		) ) ||
-		postContentExcerpt ||
 		__( 'No post excerpt found' )
 	);
 	return (
@@ -134,7 +168,7 @@ export default function PostExcerptEditor( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Post Excerpt Settings' ) }>
-					{ ! renderedExcerpt && (
+					{ ! rawExcerpt && (
 						<RangeControl
 							label={ __( 'Max words' ) }
 							value={ wordCount }
