@@ -11,23 +11,23 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 			// Development mode scripts.
 			array(
 				'react-handle',
-				'https://unpkg.com/react@17.0.1/umd/react.development.js',
+				'https://unpkg.com/react@18.0.0-alpha-a0d2d1e1e/umd/react.development.js',
 				'react-handle.HASH.js',
 			),
 			array(
 				'react-dom-handle',
-				'https://unpkg.com/react-dom@17.0.1/umd/react-dom.development.js',
+				'https://unpkg.com/react-dom@18.0.0-alpha-a0d2d1e1e/umd/react-dom.development.js',
 				'react-dom-handle.HASH.js',
 			),
 			// Production mode scripts.
 			array(
 				'react-handle',
-				'https://unpkg.com/react@17.0.1/umd/react.production.min.js',
+				'https://unpkg.com/react@18.0.0-alpha-a0d2d1e1e/umd/react.production.min.js',
 				'react-handle.min.HASH.js',
 			),
 			array(
 				'react-dom-handle',
-				'https://unpkg.com/react-dom@17.0.1/umd/react-dom.production.min.js',
+				'https://unpkg.com/react-dom@18.0.0-alpha-a0d2d1e1e/umd/react-dom.production.min.js',
 				'react-dom-handle.min.HASH.js',
 			),
 			// Other cases.

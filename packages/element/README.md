@@ -198,6 +198,10 @@ _Returns_
 
 -   `Object`: Ref object.
 
+<a name="createRoot" href="#createRoot">#</a> **createRoot**
+
+Undocumented declaration.
+
 <a name="findDOMNode" href="#findDOMNode">#</a> **findDOMNode**
 
 Finds the dom node of a React component.

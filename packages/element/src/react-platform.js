@@ -6,6 +6,7 @@ import {
 	findDOMNode,
 	render,
 	unmountComponentAtNode,
+	createRoot,
 } from 'react-dom';
 
 /**
@@ -40,3 +41,5 @@ export { render };
  * @param {Element} target DOM node in which element is to be removed
  */
 export { unmountComponentAtNode };
+
+export { createRoot };
