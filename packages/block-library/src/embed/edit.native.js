@@ -161,15 +161,6 @@ const EmbedEdit = ( props ) => {
 		);
 	}
 
-	const onSubmit = ( value ) => {
-		// On native, the URL change is only notified when submitting,
-		// and not via 'onChange', so we have to explicitly set the URL.
-		setURL( value );
-
-		setIsEditingURL( false );
-		setAttributes( { url: value } );
-	};
-
 	const showEmbedPlaceholder = ! preview || cannotEmbed;
 
 	return (
@@ -211,7 +202,14 @@ const EmbedEdit = ( props ) => {
 				value={ url }
 				isVisible={ isEditingURL }
 				onClose={ () => setIsEditingURL( false ) }
-				onSubmit={ onSubmit }
+				onSubmit={ ( value ) => {
+					// On native, the URL change is only notified when submitting,
+					// and not via 'onChange', so we have to explicitly set the URL.
+					setURL( value );
+
+					setIsEditingURL( false );
+					setAttributes( { url: value } );
+				} }
 			/>
 		</>
 	);
