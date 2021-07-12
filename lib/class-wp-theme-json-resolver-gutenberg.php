@@ -302,7 +302,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array
 	 */
 	public static function get_theme_json_translated( $theme_folder = null ) {
-		$theme_folder    = $theme_folder || get_stylesheet_directory();
+		if ( ! $theme_folder ) {
+			$theme_folder = get_stylesheet_directory();
+		}
 		$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json', $theme_folder ) );
 		// Fallback to experimental-theme.json.
 		if ( empty( $theme_json_data ) ) {
@@ -530,7 +532,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return string The whole file path or empty if the file doesn't exist.
 	 */
 	private static function get_file_path_from_theme( $file_name, $theme_folder = null ) {
-		$theme_folder = $theme_folder || get_stylesheet_directory();
+		if ( ! $theme_folder ) {
+			$theme_folder = get_stylesheet_directory();
+		}
 		// This used to be a locate_template call.
 		// However, that method proved problematic
 		// due to its use of constants (STYLESHEETPATH)
