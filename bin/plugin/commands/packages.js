@@ -349,16 +349,18 @@ async function publishPackagesToNpm(
 /**
  * Prepare everything to publish WordPress packages to npm.
  *
- * @param {ReleaseType} releaseType        Release type selected from CLI.
- * @param {SemVer}      minimumVersionBump Minimum version bump for the packages. Default: `true`.
+ * @param {ReleaseType} releaseType           Release type selected from CLI.
+ * @param {SemVer}      [minimumVersionBump]  Minimum version bump for the packages. Default: `true`.
+ * @param {string}      [confirmationMessage] Confirmation message to show at first.
  *
  * @return {Promise<Object>} Github release object.
  */
 async function prepareForPackageRelease(
 	releaseType,
-	minimumVersionBump = 'patch'
+	minimumVersionBump = 'patch',
+	confirmationMessage = 'Ready to go?'
 ) {
-	await askForConfirmation( 'Ready to go?' );
+	await askForConfirmation( confirmationMessage );
 
 	// Cloning the Git repository.
 	const abortMessage = 'Aborting!';
@@ -442,13 +444,11 @@ async function publishNpmBugfixLatestDistTag() {
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
-	await askForConfirmation(
-		'Can you confirm that all required changes have beed already cherry-picked to the release branch?',
-		true,
-		'Please try again when all changes are cherry-picked.'
+	await prepareForPackageRelease(
+		'bugfix',
+		'patch',
+		'Before we proceed, can you confirm that all required changes have beed already cherry-picked to the release branch?'
 	);
-
-	await prepareForPackageRelease( 'bugfix' );
 
 	log(
 		'\n>> 🎉 WordPress packages are now published!\n\n',
