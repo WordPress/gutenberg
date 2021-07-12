@@ -35,7 +35,7 @@ export function useLayout() {
 	return useContext( Layout );
 }
 
-export function LayoutStyle( { selector, layout = {} } ) {
+function DefaultLayoutStyle( { selector, layout = {} } ) {
 	const { contentSize, wideSize } = layout;
 
 	let style =
@@ -70,4 +70,28 @@ export function LayoutStyle( { selector, layout = {} } ) {
 	`;
 
 	return <style>{ style }</style>;
+}
+
+function FlexLayoutStyle( { selector } ) {
+	return (
+		<style>{ `${ selector } {
+		display: flex;
+		column-gap: 0.5em;
+		align-items: center;
+	}` }</style>
+	);
+}
+
+export function LayoutStyle( { layout = {}, ...props } ) {
+	const type = layout.type ?? 'default';
+
+	if ( type === 'default' ) {
+		return <DefaultLayoutStyle layout={ layout } { ...props } />;
+	}
+
+	if ( type === 'flex' ) {
+		return <FlexLayoutStyle layout={ layout } { ...props } />;
+	}
+
+	return null;
 }
