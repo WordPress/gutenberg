@@ -45,7 +45,7 @@ export const BorderWidthEdit = ( props ) => {
 	};
 
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'border.units' ) || [ 'px', 'em', 'rem' ],
+		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
 
 	return (

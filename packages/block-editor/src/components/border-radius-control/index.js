@@ -51,7 +51,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
 	);
 
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'border.units' ) || [ 'px', 'em', 'rem' ],
+		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
 	const unit = getAllUnit( values );
 	const unitConfig = units.find( ( item ) => item.value === unit );
