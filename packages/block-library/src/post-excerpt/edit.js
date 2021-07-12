@@ -16,7 +16,12 @@ import {
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
+import {
+	PanelBody,
+	RangeControl,
+	ToggleControl,
+	Disabled,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -69,33 +74,6 @@ export default function PostExcerptEditor( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-	/**
-	 * Some themes might use `excerpt_more` filter to add links
-	 * to excerpts generated from content. Since we display the
-	 * renderedExcerpt from REST API links might be included.
-	 * Before the application of this filter all content has been
-	 * stripped of tags, so if we find any links there should come
-	 * from the filter.
-	 *
-	 * In order to avoid a possible `inception` effect
-	 * see: (https://github.com/WordPress/gutenberg/issues/33309)
-	 * we change the `href` attribute of links to a `pseudo link`.
-	 *
-	 */
-	const filteredRenderedExcerpt = useMemo( () => {
-		const document = new window.DOMParser().parseFromString(
-			renderedExcerpt,
-			'text/html'
-		);
-		const links = document.getElementsByTagName( 'a' );
-		if ( ! links?.length ) {
-			return renderedExcerpt;
-		}
-		for ( const link of links ) {
-			link.setAttribute( 'href', '#excerpt_more-pseudo-link' );
-		}
-		return document.body.innerHTML || '';
-	}, [ renderedExcerpt ] );
 
 	if ( ! postType || ! postId ) {
 		return (
@@ -144,15 +122,10 @@ export default function PostExcerptEditor( {
 			onChange={ setExcerpt }
 		/>
 	) : (
-		( filteredRenderedExcerpt && (
-			<RawHTML
-				key="html"
-				onClick={ ( event ) => {
-					event.preventDefault();
-				} }
-			>
-				{ filteredRenderedExcerpt }
-			</RawHTML>
+		( renderedExcerpt && (
+			<Disabled>
+				<RawHTML key="html">{ renderedExcerpt }</RawHTML>
+			</Disabled>
 		) ) ||
 		__( 'No post excerpt found' )
 	);
