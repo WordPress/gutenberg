@@ -33,7 +33,7 @@ const ProgressiveDisclosurePanelTitle = ( props ) => {
 										<MenuItem
 											key={ label }
 											icon={ isSelected && check }
-											isSelected={ isSelected }
+											isSelected={ !! isSelected }
 											onClick={ () => {
 												toggleChild( label );
 												onClose();

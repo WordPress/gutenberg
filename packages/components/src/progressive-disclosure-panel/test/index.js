@@ -7,15 +7,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
  * Internal dependencies
  */
 import ProgressiveDisclosurePanel from '../';
-
-// Represents a child provided to the panel such as a block support control.
-const MockControl = ( { children } ) => <div>{ children }</div>;
+import PanelItem from '../item';
 
 const resetAll = jest.fn();
-const hasValue = jest.fn().mockImplementation( ( props ) => {
-	// Use fudged attribute to determine existence of value for testing.
-	return props.attributes.value;
-} );
 
 // Default props for the progressive disclosure panel.
 const defaultProps = {
@@ -27,7 +21,9 @@ const defaultProps = {
 // Default props for an enabled control to be rendered within panel.
 const controlProps = {
 	attributes: { value: true },
-	hasValue,
+	hasValue: jest.fn().mockImplementation( () => {
+		return !! controlProps.attributes.value;
+	} ),
 	label: 'Example',
 	onDeselect: jest.fn().mockImplementation( () => {
 		controlProps.attributes.value = undefined;
@@ -39,7 +35,9 @@ const controlProps = {
 // the panel.
 const altControlProps = {
 	attributes: { value: false },
-	hasValue,
+	hasValue: jest.fn().mockImplementation( () => {
+		return !! altControlProps.attributes.value;
+	} ),
 	label: 'Alt',
 	onDeselect: jest.fn(),
 	onSelect: jest.fn(),
@@ -49,14 +47,19 @@ const altControlProps = {
 const getPanel = ( container ) =>
 	container.querySelector( '.components-progressive-disclosure-panel' );
 
-// Renders a default progressive disclosure panel including a child that
-// is being conditionally disabled.
+// Renders a default progressive disclosure panel including children that are
+// not to be represented within the panel's menu.
 const renderPanel = () => {
 	return render(
 		<ProgressiveDisclosurePanel { ...defaultProps }>
 			{ false && <div>Hidden</div> }
-			<MockControl { ...controlProps }>Example control</MockControl>
-			<MockControl { ...altControlProps }>Alt control</MockControl>
+			<PanelItem { ...controlProps }>
+				<div>Example control</div>
+			</PanelItem>
+			<PanelItem { ...altControlProps }>
+				<div>Alt control</div>
+			</PanelItem>
+			<span>Visible</span>
 		</ProgressiveDisclosurePanel>
 	);
 };
@@ -88,28 +91,54 @@ describe( 'ProgressiveDisclosurePanel', () => {
 			// This covers case where children prop is not an array.
 			const { container } = render(
 				<ProgressiveDisclosurePanel { ...defaultProps }>
-					{ false && <MockControl>Should not show</MockControl> }
+					{ false && <PanelItem>Should not show</PanelItem> }
 				</ProgressiveDisclosurePanel>
 			);
 
 			expect( getPanel( container ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should not render when all children have been filtered out', () => {
+		it( 'should not render when there are no progressive panel items', () => {
 			const { container } = render(
 				<ProgressiveDisclosurePanel { ...defaultProps }>
-					{ false && <MockControl>Should not show</MockControl> }
-					{ false && <MockControl>Not shown either</MockControl> }
+					{ false && <PanelItem>Should not show</PanelItem> }
+					{ false && <PanelItem>Not shown either</PanelItem> }
+					<span>Visible but insignificant</span>
 				</ProgressiveDisclosurePanel>
 			);
 
 			expect( getPanel( container ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render panel when at least one child', () => {
+		it( 'should render panel when at least one panel item as child', () => {
 			const { container } = renderPanel();
 
 			expect( getPanel( container ) ).toBeInTheDocument();
+		} );
+
+		it( 'should render non panel item child', () => {
+			renderPanel();
+
+			const nonPanelItem = screen.queryByText( 'Visible' );
+
+			expect( nonPanelItem ).toBeInTheDocument();
+		} );
+
+		it( 'should render child flagged as default control even without value', () => {
+			render(
+				<ProgressiveDisclosurePanel { ...defaultProps }>
+					<PanelItem { ...controlProps }>
+						<div>Example control</div>
+					</PanelItem>
+					<PanelItem { ...altControlProps } isShownByDefault={ true }>
+						<div>Alt control</div>
+					</PanelItem>
+				</ProgressiveDisclosurePanel>
+			);
+
+			const altControl = screen.getByText( 'Alt control' );
+
+			expect( altControl ).toBeInTheDocument();
 		} );
 
 		it( 'should render display options menu', () => {
