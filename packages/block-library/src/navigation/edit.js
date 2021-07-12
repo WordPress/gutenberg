@@ -31,6 +31,7 @@ import ResponsiveWrapper from './responsive-wrapper';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
+	'core/navigation-heading',
 	'core/search',
 	'core/social-links',
 	'core/page-list',
