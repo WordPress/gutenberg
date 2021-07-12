@@ -1,7 +1,7 @@
 // Utils
 export { default as createHigherOrderComponent } from './utils/create-higher-order-component';
 
-// Compose helper (aliased flowRight from Lodash)
+// Compose helper
 export { default as compose } from './higher-order/compose';
 
 // Higher-order components
