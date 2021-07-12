@@ -93,7 +93,8 @@ add_action( 'init', 'register_block_core_post_template' );
  * It triggers a developer warning and then calls the renamed
  * block's `render_callback` function output.
  *
- * This can be removed when WordPress 5.9 is released.
+ * @since 5.8.0
+ * @access private
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
@@ -101,7 +102,7 @@ add_action( 'init', 'register_block_core_post_template' );
  *
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
-function render_legacy_query_loop_block( $attributes, $content, $block ) {
+function wp_render_legacy_query_loop_block( $attributes, $content, $block ) {
 	trigger_error(
 		/* translators: %1$s: Block type */
 		sprintf( __( 'Block %1$s has been renamed to Post Template. %1$s will be supported until WordPress version 5.9.' ), $block->name ),
@@ -115,11 +116,12 @@ function render_legacy_query_loop_block( $attributes, $content, $block ) {
  * This ensures backwards compatibility for any users running the Gutenberg
  * plugin who have used Query Loop prior to its renaming.
  *
- * This can be removed when WordPress 5.9 is released.
+ * @since 5.8.0
+ * @access private
  *
  * @see https://github.com/WordPress/gutenberg/pull/32514
  */
-function gutenberg_register_legacy_query_loop_block() {
+function wp_register_legacy_query_loop_block() {
 	$registry = WP_Block_Type_Registry::get_instance();
 	if ( $registry->is_registered( 'core/query-loop' ) ) {
 		unregister_block_type( 'core/query-loop' );
@@ -141,9 +143,9 @@ function gutenberg_register_legacy_query_loop_block() {
 				'align'    => true,
 			),
 			'style'             => 'wp-block-post-template',
-			'render_callback'   => 'render_legacy_query_loop_block',
+			'render_callback'   => 'wp_render_legacy_query_loop_block',
 			'skip_inner_blocks' => true,
 		)
 	);
 }
-add_action( 'init', 'gutenberg_register_legacy_query_loop_block' );
+add_action( 'init', 'wp_register_legacy_query_loop_block' );
