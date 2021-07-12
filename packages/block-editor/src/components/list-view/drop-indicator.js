@@ -15,13 +15,11 @@ export default function ListViewDropIndicator( {
 			return [];
 		}
 
-		const ownerDocument = listViewRef.current.ownerDocument;
-
 		// The rootClientId will be defined whenever dropping into inner
 		// block lists, but is undefined when dropping at the root level.
 		const _rootBlockElement = rootClientId
-			? ownerDocument.getElementById(
-					`list-view-block-${ rootClientId }`
+			? listViewRef.current.querySelector(
+					`[data-block="${ rootClientId }"]`
 			  )
 			: undefined;
 
@@ -29,7 +27,9 @@ export default function ListViewDropIndicator( {
 		// usually be inserted adjacent to it. It will be undefined when
 		// dropping a block into an empty block list.
 		const _blockElement = clientId
-			? ownerDocument.getElementById( `list-view-block-${ clientId }` )
+			? listViewRef.current.querySelector(
+					`[data-block="${ clientId }"]`
+			  )
 			: undefined;
 
 		return [ _rootBlockElement, _blockElement ];

@@ -60,10 +60,7 @@ const ListViewBlockContents = forwardRef(
 		} );
 
 		return (
-			<BlockDraggable
-				clientIds={ [ block.clientId ] }
-				elementId={ `list-view-block-${ block.clientId }` }
-			>
+			<BlockDraggable clientIds={ [ block.clientId ] }>
 				{ ( { draggable, onDragStart, onDragEnd } ) =>
 					__experimentalFeatures ? (
 						<ListViewBlockSlot
