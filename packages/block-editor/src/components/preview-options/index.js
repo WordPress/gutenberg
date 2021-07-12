@@ -7,9 +7,35 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	__experimentalUseSlot as useSlot,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { PluginPreviewMenuSlot } from '../plugin-preview';
+
+/**
+ * An array of strings that represent `deviceType` values that belong to the
+ * block editor core system.
+ *
+ * When the `deviceType` returned by `__experimentalGetPreviewDeviceType()`, is
+ * one of these values, the built-in `VisualEditor` is responsible for rendering
+ * a preview of that type.
+ *
+ * When the `deviceType` is something other than one of the `coreDeviceTypes`,
+ * we are rendering a custom preview registered by the `<PluginPreview />`
+ * component and defer to a `<Slot />` filled by the plugin to draw the preview.
+ *
+ * @type {Array}
+ */
+export const coreDeviceTypes = [ 'Desktop', 'Tablet', 'Mobile' ];
 
 export default function PreviewOptions( {
 	children,
@@ -18,6 +44,7 @@ export default function PreviewOptions( {
 	deviceType,
 	setDeviceType,
 } ) {
+	const previewMenuSlot = useSlot( PluginPreviewMenuSlot.__unstableName );
 	const isMobile = useViewportMatch( 'small', '<' );
 	if ( isMobile ) return null;
 
@@ -67,6 +94,18 @@ export default function PreviewOptions( {
 							{ __( 'Mobile' ) }
 						</MenuItem>
 					</MenuGroup>
+
+					{ previewMenuSlot.fills?.length > 0 && (
+						<MenuGroup>
+							<PluginPreviewMenuSlot
+								fillProps={ {
+									deviceType,
+									setDeviceType,
+								} }
+							/>
+						</MenuGroup>
+					) }
+
 					{ children }
 				</>
 			) }

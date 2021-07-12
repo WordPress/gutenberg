@@ -104,3 +104,7 @@ The following SlotFills are available in the `edit-post` package. Please refer t
 -   [PluginPrePublishPanel](/docs/reference-guides/slotfills/plugin-pre-publish-panel.md)
 -   [PluginSidebar](/docs/reference-guides/slotfills/plugin-sidebar.md)
 -   [PluginSidebarMoreMenuItem](/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md)
+
+The following SlotFill is available in the `block-editor` package:
+
+-   [PluginPreview](/docs/designers-developers/developers/slotfills/plugin-preview.md)

@@ -281,6 +281,23 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="coreDeviceTypes" href="#coreDeviceTypes">#</a> **coreDeviceTypes**
+
+An array of strings that represent `deviceType` values that belong to the
+block editor core system.
+
+When the `deviceType` returned by `__experimentalGetPreviewDeviceType()`, is
+one of these values, the built-in `VisualEditor` is responsible for rendering
+a preview of that type.
+
+When the `deviceType` is something other than one of the `coreDeviceTypes`,
+we are rendering a custom preview registered by the `<PluginPreview />`
+component and defer to a `<Slot />` filled by the plugin to draw the preview.
+
+_Type_
+
+-   `Array`
+
 <a name="createCustomColorsHOC" href="#createCustomColorsHOC">#</a> **createCustomColorsHOC**
 
 A higher-order component factory for creating a 'withCustomColors' HOC, which handles color logic
@@ -505,6 +522,24 @@ Undocumented declaration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
+
+<a name="PluginPreview" href="#PluginPreview">#</a> **PluginPreview**
+
+Component used to define a custom preview menu item and optional content.
+
+The children of this component will be displayed in the main area of the
+block editor, instead of the `VisualEditor` component.
+
+The `title` and `icon` are used to populate the Preview menu item.
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.children_ `WPElement`: Preview content.
+-   _props.icon_ `WPIcon`: Menu item icon to be rendered.
+-   _props.name_ `string`: A unique name of the custom preview.
+-   _props.onClick_ `Function`: Menu item click handler, e.g. for previews that provide no content (`children`).
+-   _props.title_ `string`: Menu item title.
 
 <a name="PreserveScrollInReorder" href="#PreserveScrollInReorder">#</a> **PreserveScrollInReorder**
 
