@@ -20,8 +20,17 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 
 	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . $attributes['moreText'] . '</a>' : '';
 	$filter_excerpt_more = function( $more ) use ( $more_text ) {
-		return empty( $more_text ) ? $more : ' [&hellip;]';
+		return empty( $more_text ) ? $more : '';
 	};
+	/**
+	 * Some themes might use `excerpt_more` filter to handle the
+	 * `more` link displayed after a trimmed excerpt. Since the
+	 * block has a `more text` attribute we have to check and
+	 * override if needed the return value from this filter.
+	 * So if the block's attribute is not empty override the
+	 * `excerpt_more` filter and return nothing. This will
+	 * result in showing only one `read more` link at a time.
+	 */
 	add_filter( 'excerpt_more', $filter_excerpt_more );
 
 	$filter_excerpt_length = function() use ( $attributes ) {
