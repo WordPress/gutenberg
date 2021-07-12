@@ -272,13 +272,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function get_theme_data( $theme_support_data = array() ) {
 		if ( null === self::$theme ) {
-			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json' ) );
-			// Fallback to experimental-theme.json.
-			if ( empty( $theme_json_data ) ) {
-				$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
+			$theme_json_data = self::get_theme_json_translated( get_stylesheet_directory() );
+			if ( is_child_theme() ) {
+				$parent_theme_json_data = self::get_theme_json_translated( get_template_directory() );
+				$theme_json_data        = array_merge_recursive( $parent_theme_json_data, $theme_json_data );
 			}
-			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			self::$theme     = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+			self::$theme = new WP_Theme_JSON_Gutenberg( $theme_json_data );
 		}
 
 		if ( empty( $theme_support_data ) ) {
@@ -293,6 +292,23 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$with_theme_supports->merge( self::$theme );
 
 		return $with_theme_supports;
+	}
+
+	/**
+	 * Get the theme.json file translated.
+	 *
+	 * @param string $theme_folder Absolute path to the theme folder. Defaults to get_stylesheet_directory().
+	 *
+	 * @return array
+	 */
+	public static function get_theme_json_translated( $theme_folder = null ) {
+		$theme_folder    = $theme_folder || get_stylesheet_directory();
+		$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json', $theme_folder ) );
+		// Fallback to experimental-theme.json.
+		if ( empty( $theme_json_data ) ) {
+			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json', $theme_folder ) );
+		}
+		return self::translate( $theme_json_data, wp_get_theme( basename( $theme_folder ) )->get( 'TextDomain' ) );
 	}
 
 	/**
@@ -481,10 +497,20 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function theme_has_support() {
 		if ( ! isset( self::$theme_has_support ) ) {
-			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'theme.json' );
+			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'theme.json', get_stylesheet_directory() );
 			if ( ! self::$theme_has_support ) {
 				// Fallback to experimental-theme.json.
-				self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json' );
+				self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json', get_stylesheet_directory() );
+			}
+		}
+
+		$is_child_theme = get_stylesheet_directory() !== get_template_directory();
+
+		if ( ! self::$theme_has_support && $is_child_theme ) {
+			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'theme.json', get_template_directory() );
+			if ( ! self::$theme_has_support ) {
+				// Fallback to experimental-theme.json.
+				self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json', get_template_directory() );
 			}
 		}
 
@@ -499,9 +525,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * otherwise returns the whole file path.
 	 *
 	 * @param string $file_name Name of the file.
+	 * @param string $theme_folder The theme folder. Defaults to get_stylesheet_directory().
+	 *
 	 * @return string The whole file path or empty if the file doesn't exist.
 	 */
-	private static function get_file_path_from_theme( $file_name ) {
+	private static function get_file_path_from_theme( $file_name, $theme_folder = null ) {
+		$theme_folder = $theme_folder || get_stylesheet_directory();
 		// This used to be a locate_template call.
 		// However, that method proved problematic
 		// due to its use of constants (STYLESHEETPATH)
@@ -511,7 +540,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		// child themes, this should also fallback
 		// to the template path, as locate_template did.
 		$located   = '';
-		$candidate = get_stylesheet_directory() . '/' . $file_name;
+		$candidate = $theme_folder . '/' . $file_name;
 		if ( is_readable( $candidate ) ) {
 			$located = $candidate;
 		}
