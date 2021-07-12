@@ -368,6 +368,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         };
     }
 
+    @ReactMethod
+    public void requestPreview() {
+        mGutenbergBridgeJS2Parent.requestPreview();
+    }
+
     private GutenbergBridgeJS2Parent.MediaSelectedCallback getNewMediaSelectedCallback(final Boolean allowMultipleSelection, final Callback jsCallback) {
         return new GutenbergBridgeJS2Parent.MediaSelectedCallback() {
             @Override
