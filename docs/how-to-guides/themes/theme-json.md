@@ -169,6 +169,7 @@ The settings section has the following structure:
 	"settings": {
 		"color": {
 			"custom": true,
+			"customDuotone": true,
 			"customGradient": true,
 			"duotone": [],
 			"gradients": [],
@@ -220,6 +221,7 @@ The settings section has the following structure:
 		},
 		"color": {
 			"custom": true,
+			"customDuotone": true,
 			"customGradient": true,
 			"duotone": [],
 			"gradients": [],
