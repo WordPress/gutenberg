@@ -21,6 +21,8 @@ import {
 	useSetting,
 } from '../components';
 
+const EMPTY_ARRAY = [];
+
 /**
  * Convert a list of colors to an object of R, G, and B values.
  *
@@ -124,15 +126,23 @@ function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
 
-	const duotonePalette = useSetting( 'color.duotone' );
-	const colorPalette = useSetting( 'color.palette' );
+	const duotonePalette = useSetting( 'color.duotone' ) || EMPTY_ARRAY;
+	const colorPalette = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const disableCustomColors = ! useSetting( 'color.custom' );
+	const disableCustomDuotone =
+		! useSetting( 'color.customDuotone' ) ||
+		( colorPalette?.length === 0 && disableCustomColors );
+
+	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
+		return null;
+	}
 
 	return (
 		<BlockControls group="block">
 			<DuotoneControl
 				duotonePalette={ duotonePalette }
 				colorPalette={ colorPalette }
+				disableCustomDuotone={ disableCustomDuotone }
 				disableCustomColors={ disableCustomColors }
 				value={ duotone }
 				onChange={ ( newDuotone ) => {

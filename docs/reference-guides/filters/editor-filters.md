@@ -64,13 +64,51 @@ addFilter(
 
 ## Editor settings
 
-### `block_editor_settings`
+### `block_editor_settings_all`
+
+_**Note:** Before WordPress 5.8 known as `block_editor_settings`. In the case when you want to support older versions of WordPress you might need a way to detect which filter should be used – the deprecated one vs the new one. The recommended way to proceed is to check if the `WP_Block_Editor_Context` class exists._
 
 This is a PHP filter which is applied before sending settings to the WordPress block editor.
 
-You may find details about this filter [on its WordPress Code Reference page](https://developer.wordpress.org/reference/hooks/block_editor_settings/).
+You may find details about this filter [on its WordPress Code Reference page](https://developer.wordpress.org/reference/hooks/block_editor_settings_all/).
 
-The filter will send any setting to the initialized Editor, which means any editor setting that is used to configure the editor at initialisation can be filtered by a PHP WordPress plugin before being sent.
+The filter will send any setting to the initialized Editor, which means any editor setting that is used to configure the editor at initialiation can be filtered by a PHP WordPress plugin before being sent.
+
+_Example:_
+
+```php
+<?php
+// my-plugin.php
+
+function filter_block_editor_settings_when_post_provided( $editor_settings, $editor_context ) {
+	if ( ! empty( $editor_context->post ) ) {
+		$editor_settings['maxUploadFileSize'] = 12345;
+	}
+	return $editor_settings;
+}
+
+add_filter( 'block_editor_settings_all', 'filter_block_editor_settings_when_post_provided', 10, 2 );
+```
+
+#### `block_editor_rest_api_preload_paths`
+
+Filters the array of REST API paths that will be used to preloaded common data to use with the block editor.
+
+_Example:_
+
+```php
+<?php
+// my-plugin.php
+
+function filter_block_editor_rest_api_preload_paths_when_post_provided( $preload_paths, $editor_context ) {
+	if ( ! empty( $editor_context->post ) ) {
+		array_push( $preload_paths, array( '/wp/v2/blocks', 'OPTIONS' ) );
+	}
+	return $preload_paths;
+}
+
+add_filter( 'block_editor_rest_api_preload_paths', 'filter_block_editor_rest_api_preload_paths_when_post_provided', 10, 2 );
+```
 
 ### Available default editor settings
 
@@ -88,9 +126,11 @@ If set to false the user will not be able to switch between visual and code edit
 
 ### Block Directory
 
-The Block Directory enables installing new block plugins from [WordPress.org.](https://wordpress.org/plugins/browse/block/) It can be disabled by removing the actions that enqueue it. In WordPress core, the function is `wp_enqueue_editor_block_directory_assets`, and Gutenberg uses `gutenberg_enqueue_block_editor_assets_block_directory`. To remove the feature, use [`remove_action`,](https://developer.wordpress.org/reference/functions/remove_action/) like this:
+The Block Directory enables installing new block plugins from [WordPress.org.](https://wordpress.org/plugins/browse/block/) It can be disabled by removing the actions that enqueue it. In WordPress core, the function is `wp_enqueue_editor_block_directory_assets`. To remove the feature, use [`remove_action`,](https://developer.wordpress.org/reference/functions/remove_action/) like this:
 
 ```php
+<?php
+// my-plugin.php
+
 remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_editor_block_directory_assets' );
-remove_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets_block_directory' );
 ```

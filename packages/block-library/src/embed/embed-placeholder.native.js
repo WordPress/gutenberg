@@ -8,43 +8,20 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import {
-	useBlockEditContext,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
 import { warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import EmbedBottomSheet from './embed-bottom-sheet';
 import styles from './styles.scss';
 
 const EmbedPlaceholder = ( {
 	icon,
-	isEditingURL,
 	isSelected,
 	label,
-	onFocus,
-	value,
-	onSubmit,
+	onPress,
 	cannotEmbed,
 } ) => {
-	const { clientId } = useBlockEditContext();
-	const { wasBlockJustInserted } = useSelect(
-		( select ) => ( {
-			wasBlockJustInserted: select(
-				blockEditorStore
-			).wasBlockJustInserted( clientId, 'inserter_menu' ),
-		} ),
-		[ clientId ]
-	);
-	const [ isEmbedSheetVisible, setIsEmbedSheetVisible ] = useState(
-		isSelected && ( ( wasBlockJustInserted && ! value ) || isEditingURL )
-	);
-
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles.embed__container,
 		styles[ 'embed__container--dark' ]
@@ -53,16 +30,22 @@ const EmbedPlaceholder = ( {
 		styles.embed__label,
 		styles[ 'embed__label--dark' ]
 	);
+	const descriptionStyle = usePreferredColorSchemeStyle(
+		styles.embed__description,
+		styles[ 'embed__description--dark' ]
+	);
+	const actionStyle = usePreferredColorSchemeStyle(
+		styles.embed__action,
+		styles[ 'embed__action--dark' ]
+	);
 
 	return (
 		<>
 			<TouchableWithoutFeedback
 				accessibilityRole={ 'button' }
 				accessibilityHint={ __( 'Double tap to add a link.' ) }
-				onPress={ ( event ) => {
-					onFocus( event );
-					setIsEmbedSheetVisible( true );
-				} }
+				onPress={ onPress }
+				disabled={ ! isSelected }
 			>
 				<View style={ containerStyle }>
 					{ cannotEmbed ? (
@@ -70,12 +53,10 @@ const EmbedPlaceholder = ( {
 							<View style={ styles.embed__icon }>
 								{ warning }
 							</View>
-							<Text style={ labelStyle }>
+							<Text style={ descriptionStyle }>
 								{ __( 'Unable to embed media' ) }
 							</Text>
-							<Text
-								style={ styles[ 'embed-empty__description' ] }
-							>
+							<Text style={ actionStyle }>
 								{ __( 'EDIT LINK' ) }
 							</Text>
 						</>
@@ -83,21 +64,13 @@ const EmbedPlaceholder = ( {
 						<>
 							<View style={ styles.embed__icon }>{ icon }</View>
 							<Text style={ labelStyle }>{ label }</Text>
-							<Text
-								style={ styles[ 'embed-empty__description' ] }
-							>
+							<Text style={ actionStyle }>
 								{ __( 'ADD LINK' ) }
 							</Text>
 						</>
 					) }
 				</View>
 			</TouchableWithoutFeedback>
-			<EmbedBottomSheet
-				value={ value }
-				isVisible={ isEmbedSheetVisible }
-				onClose={ () => setIsEmbedSheetVisible( false ) }
-				onSubmit={ onSubmit }
-			/>
 		</>
 	);
 };
