@@ -15,7 +15,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/block-editor';
 import {
-	DropdownMenu,
+	ToolbarDropdownMenu,
 	MenuGroup,
 	MenuItem,
 	ToolbarGroup,
@@ -201,7 +201,7 @@ export default function SearchEdit( {
 						} }
 						className={ showLabel ? 'is-pressed' : undefined }
 					/>
-					<DropdownMenu
+					<ToolbarDropdownMenu
 						icon={ getButtonPositionIcon() }
 						label={ __( 'Change button position' ) }
 					>
@@ -242,7 +242,7 @@ export default function SearchEdit( {
 								</MenuItem>
 							</MenuGroup>
 						) }
-					</DropdownMenu>
+					</ToolbarDropdownMenu>
 
 					{ 'no-button' !== buttonPosition && (
 						<ToolbarButton
