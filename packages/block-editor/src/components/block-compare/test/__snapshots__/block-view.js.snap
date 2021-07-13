@@ -20,7 +20,9 @@ exports[`BlockView should match snapshot 1`] = `
     <div
       className="block-editor-block-compare__preview edit-post-visual-editor"
     >
-      render
+      <RawHTML>
+        render
+      </RawHTML>
     </div>
   </div>
   <div
