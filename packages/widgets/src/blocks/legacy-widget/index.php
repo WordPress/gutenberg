@@ -24,37 +24,21 @@ function render_block_core_legacy_widget( $attributes ) {
 		return '';
 	}
 
-	$id_base       = $attributes['idBase'];
-	$widget_key    = '';
-	$widget_object = null;
-
+	$id_base = $attributes['idBase'];
 	if ( method_exists( $wp_widget_factory, 'get_widget_key' ) && method_exists( $wp_widget_factory, 'get_widget_object' ) ) {
 		$widget_key    = $wp_widget_factory->get_widget_key( $id_base );
 		$widget_object = $wp_widget_factory->get_widget_object( $id_base );
+	} else {
+		/*
+		 * This file is copied from the published @wordpress/widgets package when WordPress
+		 * Core is built. Because the package is a dependency of both WordPress Core and the
+		 * Gutenberg plugin where the block editor is developed, this fallback condition is
+		 * required until the minimum required version of WordPress for the plugin is raised
+		 * to 5.8.
+		 */
+		$widget_key    = gutenberg_get_widget_key( $id_base );
+		$widget_object = gutenberg_get_widget_object( $id_base );
 	}
-
-	/**
-	 * Filters the core legacy widget block key.
-	 *
-	 * @since 5.8.0
-	 *
-	 * @param string $widget_key The widget key.
-	 * @param string $id_base    The widget ID base.
-	 * @param array  $attributes The block attributes.
-	 */
-	$widget_key = apply_filters( 'render_block_core_legacy_widget_key', $widget_key, $id_base, $attributes );
-
-	/**
-	 * Filters the Core legacy widget object.
-	 *
-	 * @since 5.8.0
-	 *
-	 * @param null|WP_Widget $widget_object The widget object.
-	 * @param string         $widget_key    The widget key.
-	 * @param string $id_base               The widget ID base.
-	 * @param array  $attributes            The block attributes.
-	 */
-	$widget_object = apply_filters( 'render_block_core_legacy_widget_object', $widget_object, $widget_key, $id_base, $attributes );
 
 	if ( ! $widget_key || ! $widget_object ) {
 		return '';
