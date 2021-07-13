@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { includes } from 'lodash';
+import { AnimatePresence, motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -68,17 +69,54 @@ export default function DropZoneComponent( {
 
 	let children;
 
+	const backdrop = {
+		hidden: { scaleY: 0, opacity: 0 },
+		show: {
+			scaleY: 1,
+			opacity: 1,
+			transition: {
+				type: 'tween',
+				duration: 0.2,
+				delayChildren: 0.2,
+			},
+		},
+		exit: {
+			scaleY: 1,
+			opacity: 0,
+			transition: {
+				duration: 0.3,
+				delayChildren: 0,
+			},
+		},
+	};
+
+	const foreground = {
+		hidden: { opacity: 0, scale: 0.75 },
+		show: { opacity: 1, scale: 1 },
+		exit: { opacity: 0, scale: 0.9 },
+	};
+
 	if ( isDraggingOverElement ) {
 		children = (
-			<div className="components-drop-zone__content">
-				<Icon
-					icon={ upload }
-					className="components-drop-zone__content-icon"
-				/>
-				<span className="components-drop-zone__content-text">
-					{ label ? label : __( 'Drop files to upload' ) }
-				</span>
-			</div>
+			<>
+				<motion.div
+					variants={ backdrop }
+					initial="hidden"
+					animate="show"
+					exit="exit"
+					className="components-drop-zone__content"
+				>
+					<motion.div variants={ foreground }>
+						<Icon
+							icon={ upload }
+							className="components-drop-zone__content-icon"
+						/>
+						<span className="components-drop-zone__content-text">
+							{ label ? label : __( 'Drop files to upload' ) }
+						</span>
+					</motion.div>
+				</motion.div>
+			</>
 		);
 	}
 
@@ -95,7 +133,7 @@ export default function DropZoneComponent( {
 
 	return (
 		<div ref={ ref } className={ classes }>
-			{ children }
+			<AnimatePresence>{ children }</AnimatePresence>
 		</div>
 	);
 }

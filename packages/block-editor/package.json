@@ -61,6 +61,7 @@
 		"css-mediaquery": "^0.1.2",
 		"diff": "^4.0.2",
 		"dom-scroll-into-view": "^1.2.1",
+		"framer-motion": "^4.1.3",
 		"inherits": "^2.0.3",
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
