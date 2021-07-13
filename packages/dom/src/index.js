@@ -9,7 +9,6 @@ import * as tabbable from './tabbable';
  * under the keys with the same name.
  */
 export const focus = { focusable, tabbable };
-
 export * from './dom';
 export * from './phrasing-content';
 export * from './data-transfer';
