@@ -9,15 +9,7 @@ const fastGlob = require( 'fast-glob' );
 /**
  * Internal dependencies
  */
-const {
-	devtool,
-	mode,
-	moduleConfig,
-	optimization,
-	plugins,
-	stylesTransform,
-	watchOptions,
-} = require( './shared' );
+const { baseConfig, plugins, stylesTransform } = require( './shared' );
 
 /*
  * Matches a block's name in paths in the form
@@ -52,16 +44,14 @@ const createEntrypoints = () => {
 };
 
 module.exports = {
+	...baseConfig,
 	name: 'blocks',
-	optimization,
-	mode,
 	entry: createEntrypoints(),
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './build/block-library/[name]/view.min.js',
 		path: join( __dirname, '..', '..' ),
 	},
-	module: moduleConfig,
 	plugins: [
 		...plugins,
 		new CopyWebpackPlugin( {
@@ -167,6 +157,4 @@ module.exports = {
 			),
 		} ),
 	].filter( Boolean ),
-	watchOptions,
-	devtool,
 };

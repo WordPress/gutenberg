@@ -17,15 +17,7 @@ const {
  * Internal dependencies
  */
 const { dependencies } = require( '../../package' );
-const {
-	devtool,
-	mode,
-	moduleConfig,
-	optimization,
-	plugins,
-	stylesTransform,
-	watchOptions,
-} = require( './shared' );
+const { baseConfig, plugins, stylesTransform } = require( './shared' );
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
 const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
@@ -40,9 +32,8 @@ const gutenbergPackages = Object.keys( dependencies )
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 module.exports = {
+	...baseConfig,
 	name: 'packages',
-	optimization,
-	mode,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
 		return {
 			...memo,
@@ -56,7 +47,6 @@ module.exports = {
 		library: [ 'wp', '[camelName]' ],
 		libraryTarget: 'window',
 	},
-	module: moduleConfig,
 	plugins: [
 		...plugins,
 		new CustomTemplatedPathPlugin( {
@@ -84,6 +74,4 @@ module.exports = {
 			} ) ),
 		} ),
 	].filter( Boolean ),
-	watchOptions,
-	devtool,
 };
