@@ -64,7 +64,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
 		BlockListBlockContext
 	);
-	const blockEditContext = useBlockEditContext();
 	const {
 		index,
 		mode,
@@ -73,7 +72,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
-		hasBlockAPIVersionWarning,
+		lightBlockWrapper,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -95,9 +94,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			const blockName = getBlockName( clientId );
 			const rootClientId = getBlockRootClientId( clientId );
 			const blockType = getBlockType( blockName );
-			const lightBlockWrapper =
-				blockType.apiVersion > 1 ||
-				hasBlockSupport( blockType, 'lightBlockWrapper', false );
 
 			return {
 				index: getBlockIndex( clientId, rootClientId ),
@@ -110,9 +106,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-				hasBlockAPIVersionWarning:
-					clientId === blockEditContext.clientId &&
-					! lightBlockWrapper,
+				lightBlockWrapper:
+					blockType.apiVersion > 1 ||
+					hasBlockSupport( blockType, 'lightBlockWrapper', false ),
 			};
 		},
 		[ clientId ]
@@ -141,7 +137,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		} ),
 	] );
 
-	if ( hasBlockAPIVersionWarning ) {
+	const blockEditContext = useBlockEditContext();
+	if ( ! lightBlockWrapper && clientId === blockEditContext.clientId ) {
 		warning(
 			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
 		);
