@@ -124,7 +124,7 @@ project.afterEvaluate {
                 artifact bundleReleaseAar
 
                 groupId 'org.wordpress-mobile.gutenberg-mobile'
-                artifactId 'react-native-bridge'
+                artifactId 'react-native-gutenberg-bridge'
                 // version is set by 'publish-to-s3' plugin
 
                 addDependenciesToPom(pom)
