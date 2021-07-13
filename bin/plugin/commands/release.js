@@ -276,37 +276,37 @@ async function runPushGitChangesStep(
 }
 
 /**
- * Cherry-picks the version bump commit into master.
+ * Cherry-picks the version bump commit into trunk.
  *
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
  * @param {string} commitHash   Commit to cherry-pick.
  * @param {string} abortMessage Abort message.
  */
-async function runCherrypickBumpCommitIntoMasterStep(
+async function runCherrypickBumpCommitIntoTrunkStep(
 	gitWorkingDirectoryPath,
 	commitHash,
 	abortMessage
 ) {
 	await runStep(
-		'Cherry-picking the bump commit into master',
+		'Cherry-picking the bump commit into trunk',
 		abortMessage,
 		async () => {
 			await askForConfirmation(
-				'The plugin is now released. Proceed with the version bump in the master branch?',
+				'The plugin is now released. Proceed with the version bump in the trunk branch?',
 				true,
 				abortMessage
 			);
 			await git.discardLocalChanges( gitWorkingDirectoryPath );
 			await git.resetLocalBranchAgainstOrigin(
 				gitWorkingDirectoryPath,
-				'master'
+				'trunk'
 			);
 			await git.cherrypickCommitIntoBranch(
 				gitWorkingDirectoryPath,
 				commitHash,
-				'master'
+				'trunk'
 			);
-			await git.pushBranchToOrigin( gitWorkingDirectoryPath, 'master' );
+			await git.pushBranchToOrigin( gitWorkingDirectoryPath, 'trunk' );
 		}
 	);
 }
@@ -462,10 +462,10 @@ async function releasePlugin( isRC = true ) {
 	abortMessage =
 		'Aborting! Make sure to manually cherry-pick the ' +
 		formats.success( commitHash ) +
-		' commit to the master branch.';
+		' commit to the trunk branch.';
 
-	// Cherry-picking the bump commit into master
-	await runCherrypickBumpCommitIntoMasterStep(
+	// Cherry-picking the bump commit into trunk
+	await runCherrypickBumpCommitIntoTrunkStep(
 		gitWorkingDirectory,
 		commitHash,
 		abortMessage

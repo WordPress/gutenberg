@@ -147,7 +147,7 @@
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"benchmark": "2.1.4",
 		"browserslist": "4.15.0",
-		"chalk": "4.0.0",
+		"chalk": "4.1.1",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "4.5.2",
@@ -190,7 +190,7 @@
 		"react-test-renderer": "16.13.1",
 		"rimraf": "3.0.2",
 		"rtlcss": "2.6.2",
-		"sass": "1.26.11",
+		"sass": "1.26.12",
 		"sass-loader": "8.0.2",
 		"semver": "7.3.2",
 		"simple-git": "1.113.0",
@@ -287,7 +287,7 @@
 		"*.scss": [
 			"wp-scripts lint-style"
 		],
-		"*.js": [
+		"*.{js,yml}": [
 			"wp-scripts format-js",
 			"wp-scripts lint-js"
 		],

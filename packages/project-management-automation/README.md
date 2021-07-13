@@ -16,7 +16,7 @@ jobs:
   pull-request-automation:
     runs-on: ubuntu-latest
     steps:
-      - uses: WordPress/gutenberg/packages/project-management-automation@master
+      - uses: WordPress/gutenberg/packages/project-management-automation@trunk
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 

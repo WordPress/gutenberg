@@ -17,7 +17,7 @@ const DEFAULT_OUT_FILE = path.resolve(
  * Source test data URL.
  */
 const DATA_URL =
-	'https://raw.githubusercontent.com/web-platform-tests/wpt/master/url/resources/urltestdata.json';
+	'https://raw.githubusercontent.com/web-platform-tests/wpt/HEAD/url/resources/urltestdata.json';
 
 /**
  * Items to exclude from the default test data, where the test case relies on
