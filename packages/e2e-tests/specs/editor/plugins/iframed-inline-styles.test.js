@@ -12,35 +12,30 @@ import {
 	canvas,
 } from '@wordpress/e2e-test-utils';
 
-async function didMasonryLoadCorrectly( context ) {
+async function getPadding( context ) {
 	return await context.evaluate( () => {
 		const container = document.querySelector(
-			'.wp-block-test-iframed-masonry-block'
+			'.wp-block-test-iframed-inline-styles'
 		);
-		return (
-			// Expect Masonry to set a non-zero height.
-			parseInt( container.style.height, 10 ) > 0 &&
-			// Expect Masonry to absolute position items.
-			container.firstElementChild.style.position === 'absolute'
-		);
+		return window.getComputedStyle( container ).padding;
 	} );
 }
 
-describe( 'iframed masonry block', () => {
+describe( 'iframed inline styles', () => {
 	beforeEach( async () => {
-		await activatePlugin( 'gutenberg-test-iframed-masonry-block' );
+		await activatePlugin( 'gutenberg-test-iframed-inline-styles' );
 		await createNewPost( { postType: 'page' } );
 	} );
 
 	afterEach( async () => {
-		await deactivatePlugin( 'gutenberg-test-iframed-masonry-block' );
+		await deactivatePlugin( 'gutenberg-test-iframed-inline-styles' );
 	} );
 
-	it( 'should load script and dependencies in iframe', async () => {
-		await insertBlock( 'Iframed Masonry Block' );
+	it( 'should load inline styles in iframe', async () => {
+		await insertBlock( 'Iframed Inline Styles' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		expect( await didMasonryLoadCorrectly( page ) ).toBe( true );
+		expect( await getPadding( page ) ).toBe( '20px' );
 
 		await openDocumentSettingsSidebar();
 		await clickButton( 'Page' );
@@ -51,8 +46,10 @@ describe( 'iframed masonry block', () => {
 		await page.keyboard.type( 'Iframed Test' );
 		await clickButton( 'Create' );
 		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
-		await canvas().waitForSelector( '.grid-item[style]' );
+		await canvas().waitForSelector(
+			'.wp-block-test-iframed-inline-styles'
+		);
 
-		expect( await didMasonryLoadCorrectly( canvas() ) ).toBe( true );
+		expect( await getPadding( canvas() ) ).toBe( '20px' );
 	} );
 } );

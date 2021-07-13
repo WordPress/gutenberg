@@ -239,12 +239,23 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 	head = (
 		<>
 			<style>{ 'body{margin:0}' }</style>
-			{ styles.map( ( { tagName, href, id, rel, media }, index ) => {
-				const TagName = tagName.toLowerCase();
-				return (
-					<TagName { ...{ href, id, rel, media } } key={ index } />
-				);
-			} ) }
+			{ styles.map(
+				( { tagName, href, id, rel, media, textContent } ) => {
+					const TagName = tagName.toLowerCase();
+
+					if ( TagName === 'style' ) {
+						return (
+							<TagName { ...{ id } } key={ id }>
+								{ textContent }
+							</TagName>
+						);
+					}
+
+					return (
+						<TagName { ...{ href, id, rel, media } } key={ id } />
+					);
+				}
+			) }
 			{ head }
 		</>
 	);
