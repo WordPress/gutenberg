@@ -22,7 +22,7 @@ jobs:
     build:
         name: Build Release Artifact
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
 
         steps:
             - name: Checkout code
