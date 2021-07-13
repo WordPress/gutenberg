@@ -18,11 +18,22 @@
 	&.is-selected .block-editor-list-view-block-contents {
 		background: var(--wp-admin-theme-color);
 		color: $white;
+
+		// Hide selection styles while a user is dragging blocks/files etc.
+		.is-dragging-components-draggable & {
+			background: none;
+			color: $gray-900;
+		}
 	}
 	&.is-selected .block-editor-list-view-block-contents:focus {
 		box-shadow:
 			inset 0 0 0 1px $white,
 			0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Hide focus styles while a user is dragging blocks/files etc.
+		.is-dragging-components-draggable & {
+			box-shadow: none;
+		}
 	}
 
 	&.is-branch-selected.is-selected .block-editor-list-view-block-contents {
@@ -64,6 +75,11 @@
 		&:hover,
 		&:focus {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+			// Hide hover styles while a user is dragging blocks/files etc.
+			.is-dragging-components-draggable & {
+				box-shadow: none;
+			}
 		}
 		&:focus {
 			z-index: 1;
@@ -78,28 +94,6 @@
 			right: 0;
 			left: 0;
 			border-top: 4px solid var(--wp-admin-theme-color);
-		}
-
-		&.is-dropping-after::before {
-			content: "";
-			position: absolute;
-			pointer-events: none;
-			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
-			bottom: -2px;
-			right: 0;
-			left: 0;
-			border-bottom: 4px solid var(--wp-admin-theme-color);
-		}
-
-		&.is-dropping-to-inner-blocks::before {
-			content: "";
-			position: absolute;
-			pointer-events: none;
-			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
-			bottom: -2px;
-			right: 0;
-			left: $icon-size;
-			border-bottom: 4px solid var(--wp-admin-theme-color);
 		}
 
 		.components-modal__content & {
@@ -318,3 +312,20 @@ $block-navigation-max-indent: 8;
 	transition: transform 0.2s ease;
 	@include reduce-motion("transition");
 }
+
+.block-editor-list-view-drop-indicator {
+	pointer-events: none;
+
+	.block-editor-list-view-drop-indicator__line {
+		background: var(--wp-admin-theme-color);
+		height: $border-width;
+	}
+}
+
+// Reset some popover defaults for the drop indicator.
+.block-editor-list-view-drop-indicator:not([data-y-axis="middle"][data-x-axis="right"]) > .components-popover__content {
+	margin-left: 0;
+	border: none;
+	box-shadow: none;
+}
+
