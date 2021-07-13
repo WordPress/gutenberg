@@ -9,7 +9,7 @@ export function Head( { children } ) {
 	const [ element, setElement ] = useState();
 	return (
 		<context.Provider value={ element }>
-			<div ref={ setElement } style={ { display: 'none' } } />
+			<div ref={ setElement } />
 			{ children }
 		</context.Provider>
 	);
