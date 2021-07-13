@@ -51,7 +51,7 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/url": "file:../url",
-		"classnames": "^2.2.5",
+		"classnames": "^2.3.1",
 		"downloadjs": "^1.4.7",
 		"file-saver": "^2.0.2",
 		"jszip": "^3.2.2",
