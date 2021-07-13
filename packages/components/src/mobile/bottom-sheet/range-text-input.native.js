@@ -188,7 +188,12 @@ class RangeTextInput extends Component {
 		];
 
 		const valueFinalStyle = [
-			! isIOS ? inputBorderStyles : verticalBorderStyle,
+			! isIOS
+				? inputBorderStyles
+				: {
+						...verticalBorderStyle,
+						...textInputStyle,
+				  },
 			{
 				width: 50 * fontScale,
 			},
