@@ -16,11 +16,8 @@ import {
 	ButtonGroup,
 	ToggleControl,
 	PanelBody,
-	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 import { useContext, createPortal } from '@wordpress/element';
 
 /**
@@ -31,6 +28,7 @@ import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 import { Head } from '../components/block-list/head';
+import { getLayoutType, getLayoutTypes } from '../layouts';
 
 const layoutBlockSupportKey = '__experimentalLayout';
 
@@ -57,6 +55,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 	const allowLayoutSwitching = canBlockSwitchLayout( blockName );
 	const { inherit = false, type = 'default' } = layout;
+	const layoutType = getLayoutType( type );
 
 	const onChangeType = ( newType ) =>
 		setAttributes( { layout: { type: newType } } );
@@ -82,8 +81,9 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						onChange={ onChangeType }
 					/>
 				) }
-				{ ! inherit && type === 'default' && (
-					<LayoutDefaultEdit
+
+				{ ! inherit && layoutType && (
+					<layoutType.edit
 						layout={ layout }
 						onChange={ onChangeLayout }
 					/>
@@ -93,18 +93,10 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	);
 }
 
-const availableTypes = [
-	{
-		name: 'default',
-		label: __( 'Default' ),
-	},
-	{ name: 'flex', label: __( 'Flex' ) },
-];
-
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
 		<ButtonGroup>
-			{ availableTypes.map( ( { name, label } ) => {
+			{ getLayoutTypes().map( ( { name, label } ) => {
 				return (
 					<Button
 						key={ name }
@@ -116,84 +108,6 @@ function LayoutTypeSwitcher( { type, onChange } ) {
 				);
 			} ) }
 		</ButtonGroup>
-	);
-}
-
-function LayoutDefaultEdit( { layout, onChange } ) {
-	const { wideSize, contentSize } = layout;
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
-	} );
-
-	return (
-		<>
-			<div className="block-editor-hooks__layout-controls">
-				<div className="block-editor-hooks__layout-controls-unit">
-					<UnitControl
-						label={ __( 'Content' ) }
-						labelPosition="top"
-						__unstableInputWidth="80px"
-						value={ contentSize || wideSize || '' }
-						onChange={ ( nextWidth ) => {
-							nextWidth =
-								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-							onChange( {
-								...layout,
-								contentSize: nextWidth,
-							} );
-						} }
-						units={ units }
-					/>
-					<Icon icon={ positionCenter } />
-				</div>
-				<div className="block-editor-hooks__layout-controls-unit">
-					<UnitControl
-						label={ __( 'Wide' ) }
-						labelPosition="top"
-						__unstableInputWidth="80px"
-						value={ wideSize || contentSize || '' }
-						onChange={ ( nextWidth ) => {
-							nextWidth =
-								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-							onChange( {
-								...layout,
-								wideSize: nextWidth,
-							} );
-						} }
-						units={ units }
-					/>
-					<Icon icon={ stretchWide } />
-				</div>
-			</div>
-			<div className="block-editor-hooks__layout-controls-reset">
-				<Button
-					variant="secondary"
-					isSmall
-					disabled={ ! contentSize && ! wideSize }
-					onClick={ () =>
-						onChange( {
-							contentSize: undefined,
-							wideSize: undefined,
-							inherit: false,
-						} )
-					}
-				>
-					{ __( 'Reset' ) }
-				</Button>
-			</div>
-
-			<p className="block-editor-hooks__layout-controls-helptext">
-				{ __(
-					'Customize the width for all elements that are assigned to the center or wide columns.'
-				) }
-			</p>
-		</>
 	);
 }
 
