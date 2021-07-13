@@ -8,11 +8,13 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+import { noticeOutline } from '../../../components/src/mobile/gridicons';
 
 const EmbedPlaceholder = ( {
 	icon,
@@ -37,6 +39,10 @@ const EmbedPlaceholder = ( {
 		styles.embed__action,
 		styles[ 'embed__action--dark' ]
 	);
+	const embedIconStyle = usePreferredColorSchemeStyle(
+		styles.embed__icon,
+		styles[ 'embed__icon--dark' ]
+	);
 
 	return (
 		<>
@@ -47,21 +53,28 @@ const EmbedPlaceholder = ( {
 				disabled={ ! isSelected }
 			>
 				<View style={ containerStyle }>
-					<View style={ styles.embed__icon }>{ icon }</View>
-					<Text style={ labelStyle }>{ label }</Text>
 					{ cannotEmbed ? (
 						<>
+							<Icon
+								icon={ noticeOutline }
+								fill={ embedIconStyle.fill }
+								style={ styles[ 'embed__icon--error' ] }
+							/>
 							<Text style={ descriptionStyle }>
-								{ __(
-									'Sorry, this content could not be embedded.'
-								) }
+								{ __( 'Unable to embed media' ) }
 							</Text>
 							<Text style={ actionStyle }>
 								{ __( 'EDIT LINK' ) }
 							</Text>
 						</>
 					) : (
-						<Text style={ actionStyle }>{ __( 'ADD LINK' ) }</Text>
+						<>
+							<Icon icon={ icon } fill={ embedIconStyle.fill } />
+							<Text style={ labelStyle }>{ label }</Text>
+							<Text style={ actionStyle }>
+								{ __( 'ADD LINK' ) }
+							</Text>
+						</>
 					) }
 				</View>
 			</TouchableWithoutFeedback>
