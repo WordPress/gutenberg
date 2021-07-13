@@ -2,7 +2,7 @@
 
 This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
-To release a stable version of the Gutenberg plugin you need to be part of the [Gutenberg development team](/docs/contributors/repository-management/#teams). On top of that, you need approval from a member of the Gutenberg Core team for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release. You can ping in the [#core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7).
+To release a stable version of the Gutenberg plugin you need to be part of the [Gutenberg development team](/docs/block-editor/contributors/repository-management/#teams). On top of that, you need approval from a member of the Gutenberg Core team for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release. You can ping in the [#core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7).
 
 To release Gutenberg's npm packages, you need to be part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
 
@@ -12,7 +12,7 @@ To release Gutenberg's npm packages, you need to be part of the [WordPress organ
 
 We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date (the day when _the release candidate_ is to be tagged).
 
--   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on. [Preparation of the release post starts here](#writing-the-release-notes-and-post) and spans until the final release.
+-   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on. [Preparation of the release post starts here](/docs/block-editor/contributors/code/release/#writing-the-release-notes-and-post) and spans until the final release.
 
 -   **One week after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, the release post is published, including a [performance audit](/docs/block-editor/contributors/testing-overview/#performance-testing).
 
