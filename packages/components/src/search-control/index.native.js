@@ -110,7 +110,7 @@ function SearchControl( {
 
 		mergeFutureStyles( activeStyles, [ isActive ] );
 		mergeFutureStyles( darkStyles, [ isDark ] );
-		mergeFutureStyles( activeDarkStyles, [ isActive, isDark ], true );
+		mergeFutureStyles( activeDarkStyles, [ isActive, isDark ] );
 
 		setCurrentStyles( futureStyles );
 	}, [ isActive, isDark ] );
