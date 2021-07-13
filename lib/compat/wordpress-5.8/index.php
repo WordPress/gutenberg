@@ -104,24 +104,26 @@ if ( ! function_exists( 'build_query_vars_from_query_block' ) ) {
 	}
 }
 
-/**
- * Renders the legacy `core/query-loop` block on the server.
- * It triggers a developer warning and then calls the renamed
- * block's `render_callback` function output.
- *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
- *
- * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
- */
-function gutenberg_render_legacy_query_loop_block( $attributes, $content, $block ) {
-	trigger_error(
-	/* translators: %1$s: Block type */
-		sprintf( __( 'Block %1$s has been renamed to Post Template. %1$s will be supported until WordPress version 5.9.', 'gutenberg' ), $block->name ),
-		headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
-	);
-	return render_block_core_post_template( $attributes, $content, $block );
+if ( ! function_exists( 'gutenberg_register_legacy_query_loop_block' ) ) {
+	/**
+	 * Renders the legacy `core/query-loop` block on the server.
+	 * It triggers a developer warning and then calls the renamed
+	 * block's `render_callback` function output.
+	 *
+	 * @param array    $attributes Block attributes.
+	 * @param string   $content    Block default content.
+	 * @param WP_Block $block      Block instance.
+	 *
+	 * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
+	 */
+	function gutenberg_render_legacy_query_loop_block( $attributes, $content, $block ) {
+		trigger_error(
+		/* translators: %1$s: Block type */
+			sprintf( __( 'Block %1$s has been renamed to Post Template. %1$s will be supported until WordPress version 5.9.', 'gutenberg' ), $block->name ),
+			headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
+		);
+		return render_block_core_post_template( $attributes, $content, $block );
+	}
 }
 
 if ( ! function_exists( 'gutenberg_register_legacy_query_loop_block' ) ) {
