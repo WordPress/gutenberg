@@ -54,7 +54,7 @@ export default function PostExcerptEditor( {
 			renderedExcerpt,
 			'text/html'
 		);
-		return document.body.innerText || '';
+		return document.body.textContent || document.body.innerText || '';
 	}, [ renderedExcerpt ] );
 	if ( ! postType || ! postId ) {
 		return (
