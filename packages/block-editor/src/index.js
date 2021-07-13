@@ -7,6 +7,7 @@ import '@wordpress/rich-text';
  * Internal dependencies
  */
 import './hooks';
+
 export {
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
 	useBorderProps as __experimentalUseBorderProps,
