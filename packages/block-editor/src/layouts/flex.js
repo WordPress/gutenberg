@@ -26,4 +26,8 @@ export default {
         }` }</style>
 		);
 	},
+
+	getOrientation() {
+		return 'horizontal';
+	},
 };

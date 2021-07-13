@@ -138,4 +138,8 @@ export default {
 
 		return <style>{ style }</style>;
 	},
+
+	getOrientation() {
+		return 'vertical';
+	},
 };
