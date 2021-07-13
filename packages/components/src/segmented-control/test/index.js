@@ -10,22 +10,24 @@ import { act, Simulate } from 'react-dom/test-utils';
 import { SegmentedControl } from '../index';
 
 describe( 'SegmentedControl', () => {
-	const options = [
-		{ value: 'olaf', label: 'O' },
-		{ value: 'samantha', label: 'S' },
-	];
-
+	const options = (
+		<>
+			<SegmentedControl.Option value="olaf" label="O" />
+			<SegmentedControl.Option value="samantha" label="S" />
+		</>
+	);
 	it( 'should render correctly', () => {
 		const { container } = render(
 			<SegmentedControl
 				baseId="segmented"
 				options={ options }
 				label="Test Segmented Control"
-			/>
+			>
+				{ options }
+			</SegmentedControl>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
 	} );
-
 	it( 'should call onChange with proper value', () => {
 		let container;
 		const mockOnChange = jest.fn();
@@ -33,19 +35,18 @@ describe( 'SegmentedControl', () => {
 			( { container } = render(
 				<SegmentedControl
 					baseId="segmented"
-					options={ options }
-					value={ options[ 1 ].value }
+					value="samantha"
 					onChange={ mockOnChange }
 					label="Test Segmented Control"
-				/>
+				>
+					{ options }
+				</SegmentedControl>
 			) );
 		} );
-		const firstButton = container.querySelector(
-			`button[aria-label="${ options[ 0 ].label }"]`
-		);
+		const firstButton = container.querySelector( 'button[aria-label="O"]' );
 		act( () => {
 			Simulate.click( firstButton );
 		} );
-		expect( mockOnChange ).toHaveBeenCalledWith( options[ 0 ].value );
+		expect( mockOnChange ).toHaveBeenCalledWith( 'olaf' );
 	} );
 } );

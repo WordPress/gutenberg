@@ -36,7 +36,7 @@ import type {
 const noop = () => {};
 const RadioContext = createContext( {} as SegmentedControlRadioState );
 
-function SegmentControl(
+function SegmentedControl(
 	props: PolymorphicComponentProps< SegmentedControlProps, 'input' >,
 	forwardedRef: import('react').Ref< any >
 ) {
@@ -145,8 +145,8 @@ function ControlOption(
 }
 
 const ConnectedSegmentedControl: any = contextConnect(
-	SegmentControl,
-	'SegmentControl'
+	SegmentedControl,
+	'SegmentedControl'
 );
 const ConnectedSegmentedControlOption = contextConnect(
 	ControlOption,

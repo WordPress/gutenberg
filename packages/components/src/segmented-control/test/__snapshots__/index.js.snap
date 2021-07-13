@@ -106,7 +106,6 @@ exports[`SegmentedControl should render correctly 1`] = `
   user-select: none;
   width: 100%;
   z-index: 2;
-  color: #fff;
 }
 
 @media ( prefers-reduced-motion: reduce ) {
@@ -164,58 +163,6 @@ exports[`SegmentedControl should render correctly 1`] = `
   }
 }
 
-.emotion-19 {
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  -ms-appearance: none;
-  appearance: none;
-  background: transparent;
-  border: none;
-  border-radius: 2px;
-  color: #757575;
-  cursor: pointer;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  height: 100%;
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  -webkit-justify-content: center;
-  justify-content: center;
-  line-height: 100%;
-  outline: none;
-  padding: 0 12px;
-  position: relative;
-  text-align: center;
-  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
-  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  width: 100%;
-  z-index: 2;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-19 {
-    transition-duration: 0ms;
-  }
-}
-
-.emotion-19::-moz-focus-inner {
-  border: 0;
-}
-
-.emotion-19:active {
-  background: #fff;
-}
-
 <div
   aria-label="Test Segmented Control"
   class="emotion-0 medium components-segmented-control emotion-1 emotion-2"
@@ -234,17 +181,19 @@ exports[`SegmentedControl should render correctly 1`] = `
   <div
     class="emotion-3 emotion-4"
     role="presentation"
-    style="transform: translateX(NaNpx); transition: none; width: 0px;"
+    style="transform: translateX(0px); transition: none; width: 0px;"
   />
   <div
     class="emotion-5 emotion-6 emotion-7"
-    data-active="true"
+    data-active="false"
   >
     <button
-      aria-checked="true"
+      aria-checked="false"
       aria-label="O"
-      class="emotion-8"
+      class="emotion-8 components-segmented-control-option"
       data-value="olaf"
+      data-wp-c16t="true"
+      data-wp-component="SegmentedControlOption"
       id="segmented-1"
       role="radio"
       tabindex="0"
@@ -273,8 +222,10 @@ exports[`SegmentedControl should render correctly 1`] = `
     <button
       aria-checked="false"
       aria-label="S"
-      class="emotion-19"
+      class="emotion-8 components-segmented-control-option"
       data-value="samantha"
+      data-wp-c16t="true"
+      data-wp-component="SegmentedControlOption"
       id="segmented-2"
       role="radio"
       tabindex="-1"
