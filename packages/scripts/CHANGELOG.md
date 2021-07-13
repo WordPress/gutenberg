@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- Upgrade `puppeteer-core` (`^9.0.0`) to version `^10.1.0`. This version drops support for Node v10.
+
 ### New Features
 
 -   Add .markdownlintignore config and reference from lint-md-docs script ([#32633](https://github.com/WordPress/gutenberg/pull/32633)).
