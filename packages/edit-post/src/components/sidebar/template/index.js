@@ -34,6 +34,7 @@ export function TemplatePanel() {
 		isViewable,
 		template,
 		supportsTemplateMode,
+		canUserEdit,
 	} = useSelect( ( select ) => {
 		const {
 			isEditorPanelEnabled,
@@ -45,7 +46,7 @@ export function TemplatePanel() {
 			getEditorSettings,
 			getCurrentPostType,
 		} = select( editorStore );
-		const { getPostType, getEntityRecords } = select( coreStore );
+		const { getPostType, getEntityRecords, canUser } = select( coreStore );
 		const _isViewable =
 			getPostType( getCurrentPostType() )?.viewable ?? false;
 		const _supportsTemplateMode =
@@ -72,6 +73,7 @@ export function TemplatePanel() {
 			template: _supportsTemplateMode && getEditedPostTemplate(),
 			isViewable: _isViewable,
 			supportsTemplateMode: _supportsTemplateMode,
+			canUserEdit: canUser( 'update', 'settings' ),
 		};
 	}, [] );
 
@@ -88,7 +90,8 @@ export function TemplatePanel() {
 	if (
 		! isEnabled ||
 		! isViewable ||
-		( isEmpty( availableTemplates ) && ! supportsTemplateMode )
+		( isEmpty( availableTemplates ) &&
+			( ! supportsTemplateMode || ! canUserEdit ) )
 	) {
 		return null;
 	}
@@ -128,7 +131,7 @@ export function TemplatePanel() {
 					label: templateName,
 				} ) ) }
 			/>
-			<PostTemplateActions />
+			{ canUserEdit && <PostTemplateActions /> }
 		</PanelBody>
 	);
 }
