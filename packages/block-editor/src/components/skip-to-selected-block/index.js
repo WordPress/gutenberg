@@ -19,7 +19,7 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 
 	return selectedBlockClientId ? (
 		<Button
-			isSecondary
+			variant="secondary"
 			className="block-editor-skip-to-selected-block"
 			onClick={ onClick }
 		>

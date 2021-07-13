@@ -25,12 +25,14 @@ export { default as BaseControl } from './base-control';
 export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
-export { default as Card } from './card';
-export { default as CardBody } from './card/body';
-export { default as CardDivider } from './card/divider';
-export { default as CardFooter } from './card/footer';
-export { default as CardHeader } from './card/header';
-export { default as CardMedia } from './card/media';
+export {
+	Card,
+	CardBody,
+	CardDivider,
+	CardFooter,
+	CardHeader,
+	CardMedia,
+} from './card';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as __experimentalColorEdit } from './color-edit';
@@ -60,14 +62,15 @@ export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { Elevation as __experimentalElevation } from './elevation';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
+export { Flyout as __experimentalFlyout } from './flyout';
 export { default as FocalPointPicker } from './focal-point-picker';
 export { default as FocusableIframe } from './focusable-iframe';
 export { default as FontSizePicker } from './font-size-picker';
 export { default as FormFileUpload } from './form-file-upload';
 export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
-export { default as __experimentalGradientPicker } from './gradient-picker';
-export { default as __experimentalCustomGradientPicker } from './custom-gradient-picker';
+export { default as GradientPicker } from './gradient-picker';
+export { default as CustomGradientPicker } from './custom-gradient-picker';
 export { Grid as __experimentalGrid } from './grid';
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
@@ -105,11 +108,14 @@ export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
+export { default as SearchControl } from './search-control';
 export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { Spacer as __experimentalSpacer } from './spacer';
+export { Scrollable as __experimentalScrollable } from './scrollable';
 export { default as Spinner } from './spinner';
+export { Surface as __experimentalSurface } from './surface';
 export { default as TabPanel } from './tab-panel';
 export { Text as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
@@ -135,6 +141,7 @@ export { Truncate as __experimentalTruncate } from './truncate';
 export {
 	default as __experimentalUnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
+	parseUnit as __experimentalParseUnit,
 } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
@@ -164,9 +171,3 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
-
-// Component System
-export {
-	withNext as __unstableWithNext,
-	ComponentSystemProvider as __unstableComponentSystemProvider,
-} from './ui/context';

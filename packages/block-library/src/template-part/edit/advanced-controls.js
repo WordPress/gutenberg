@@ -6,7 +6,6 @@ import { SelectControl, TextControl } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorAdvancedControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 
 export function TemplatePartAdvancedControls( {
 	tagName,
@@ -30,8 +29,11 @@ export function TemplatePartAdvancedControls( {
 	);
 
 	const { areaOptions } = useSelect( ( select ) => {
+		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+		// Blocks can be loaded into a *non-post* block editor.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		const definedAreas = select(
-			editorStore
+			'core/editor'
 		).__experimentalGetDefaultTemplatePartAreas();
 		return {
 			areaOptions: definedAreas.map( ( { label, area: _area } ) => ( {

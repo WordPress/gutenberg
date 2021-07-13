@@ -57,7 +57,7 @@ export default function CustomizeWidgets( {
 	const popover =
 		parentContainer &&
 		createPortal(
-			<div ref={ popoverRef }>
+			<div className="customize-widgets-popover" ref={ popoverRef }>
 				<Popover.Slot />
 			</div>,
 			parentContainer

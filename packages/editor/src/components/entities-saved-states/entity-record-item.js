@@ -6,6 +6,12 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 export default function EntityRecordItem( {
 	record,
@@ -16,7 +22,7 @@ export default function EntityRecordItem( {
 	const { name, kind, title, key } = record;
 	const parentBlockId = useSelect( ( select ) => {
 		// Get entity's blocks.
-		const { blocks = [] } = select( 'core' ).getEditedEntityRecord(
+		const { blocks = [] } = select( coreStore ).getEditedEntityRecord(
 			kind,
 			name,
 			key
@@ -36,12 +42,12 @@ export default function EntityRecordItem( {
 				return title;
 			}
 
-			const template = select( 'core' ).getEditedEntityRecord(
+			const template = select( coreStore ).getEditedEntityRecord(
 				kind,
 				name,
 				key
 			);
-			return select( 'core/editor' ).__experimentalGetTemplateInfo(
+			return select( editorStore ).__experimentalGetTemplateInfo(
 				template
 			).title;
 		},

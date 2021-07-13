@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback } from 'react-native';
+import { TouchableWithoutFeedback, Image } from 'react-native';
 import { isEmpty } from 'lodash';
 import { WebView } from 'react-native-webview';
 
@@ -14,25 +14,79 @@ import { BlockCaption } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import EmbedNoPreview from './embed-no-preview';
+import styles from './styles.scss';
+
 const EmbedPreview = ( {
-	isSelected,
-	insertBlocksAfter,
-	onBlur,
 	clientId,
+	icon,
+	insertBlocksAfter,
+	isSelected,
+	label,
+	onBlur,
+	onFocus,
+	preview,
+	previewable,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+
+	function accessibilityLabelCreator( caption ) {
+		return isEmpty( caption )
+			? /* translators: accessibility text. Empty Embed caption. */
+			  __( 'Embed caption. Empty' )
+			: sprintf(
+					/* translators: accessibility text. %s: Embed caption. */
+					__( 'Embed caption. %s' ),
+					caption
+			  );
+	}
 
 	function onEmbedPreviewPress() {
 		setIsCaptionSelected( false );
 	}
 
 	function onFocusCaption() {
+		if ( onFocus ) {
+			onFocus();
+		}
 		if ( ! isCaptionSelected ) {
 			setIsCaptionSelected( true );
 		}
 	}
 
-	// Currently returning a Text component that act's as the Embed Preview to simulate the caption's isSelected state.
+	const cannotShowThumbnail =
+		! previewable ||
+		! preview ||
+		! preview.thumbnail_url?.length ||
+		! preview.height ||
+		! preview.width;
+
+	// eslint-disable-next-line no-undef
+	const previewContent = __DEV__ ? (
+		<View
+			style={ {
+				height: 200,
+				width: '100%',
+			} }
+		>
+			<WebView source={ { uri: 'https://reactnative.dev/' } } />
+		</View>
+	) : (
+		<Image
+			style={ [
+				styles[ 'embed-preview__image' ],
+				{ aspectRatio: preview.width / preview.height },
+			] }
+			source={ {
+				uri: preview.thumbnail_url,
+			} }
+			resizeMode="cover"
+		/>
+	);
+
 	return (
 		<TouchableWithoutFeedback
 			accessible={ ! isSelected }
@@ -40,31 +94,24 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				<View
-					style={ {
-						height: 200,
-						width: '100%',
-					} }
-				>
-					<WebView source={ { uri: 'https://reactnative.dev/' } } />
-				</View>
+				{ cannotShowThumbnail ? (
+					<EmbedNoPreview
+						label={ label }
+						icon={ icon }
+						isSelected={ isSelected }
+						onPress={ () => setIsCaptionSelected( false ) }
+					/>
+				) : (
+					previewContent
+				) }
 				<BlockCaption
-					accessible={ true }
-					accessibilityLabelCreator={ ( caption ) =>
-						isEmpty( caption )
-							? /* translators: accessibility text. Empty Embed caption. */
-							  __( 'Embed caption. Empty' )
-							: sprintf(
-									/* translators: accessibility text. %s: Embed caption. */
-									__( 'Embed caption. %s' ),
-									caption
-							  )
-					}
+					accessibilityLabelCreator={ accessibilityLabelCreator }
+					accessible
 					clientId={ clientId }
-					isSelected={ isCaptionSelected }
-					onFocus={ onFocusCaption }
-					onBlur={ onBlur }
 					insertBlocksAfter={ insertBlocksAfter }
+					isSelected={ isCaptionSelected }
+					onBlur={ onBlur }
+					onFocus={ onFocusCaption }
 				/>
 			</View>
 		</TouchableWithoutFeedback>

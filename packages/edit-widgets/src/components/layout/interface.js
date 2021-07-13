@@ -7,7 +7,10 @@ import {
 	useViewportMatch,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
-import { __experimentalLibrary as Library } from '@wordpress/block-editor';
+import {
+	__experimentalLibrary as Library,
+	BlockBreadcrumb,
+} from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -16,6 +19,7 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -32,6 +36,8 @@ const interfaceLabels = {
 	body: __( 'Widgets and blocks' ),
 	/* translators: accessibility text for the widgets screen settings landmark region. */
 	sidebar: __( 'Widgets settings' ),
+	/* translators: accessibility text for the widgets screen footer landmark region. */
+	footer: __( 'Widgets footer' ),
 };
 
 function Interface( { blockEditorSettings } ) {
@@ -42,12 +48,31 @@ function Interface( { blockEditorSettings } ) {
 	);
 	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
 
-	const { hasSidebarEnabled, isInserterOpened } = useSelect(
+	const {
+		hasBlockBreadCrumbsEnabled,
+		hasSidebarEnabled,
+		isInserterOpened,
+		previousShortcut,
+		nextShortcut,
+	} = useSelect(
 		( select ) => ( {
 			hasSidebarEnabled: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( editWidgetsStore.name ),
 			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
+			hasBlockBreadCrumbsEnabled: select(
+				editWidgetsStore
+			).__unstableIsFeatureActive( 'showBlockBreadcrumbs' ),
+			previousShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutRawKeyCombinations(
+				'core/edit-widgets/previous-region'
+			),
+			nextShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutRawKeyCombinations(
+				'core/edit-widgets/next-region'
+			),
 		} ),
 		[]
 	);
@@ -107,6 +132,18 @@ function Interface( { blockEditorSettings } ) {
 					blockEditorSettings={ blockEditorSettings }
 				/>
 			}
+			footer={
+				hasBlockBreadCrumbsEnabled &&
+				! isMobileViewport && (
+					<div className="edit-widgets-layout__footer">
+						<BlockBreadcrumb rootLabelText={ __( 'Widgets' ) } />
+					</div>
+				)
+			}
+			shortcuts={ {
+				previous: previousShortcut,
+				next: nextShortcut,
+			} }
 		/>
 	);
 }

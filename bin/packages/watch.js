@@ -125,8 +125,8 @@ function getBuildFile( srcFile ) {
 /**
  * Adds a build file to the set of files that should be rebuilt.
  *
- * @param {'update'} event The event name
- * @param {string} filename
+ * @param {'update'} event    The event name
+ * @param {string}   filename
  */
 function updateBuildFile( event, filename ) {
 	if ( exists( filename ) ) {
@@ -147,8 +147,8 @@ function updateBuildFile( event, filename ) {
  * Removes a build file from the build folder
  * (usually triggered the associated source file was deleted)
  *
- * @param {'remove'} event The event name
- * @param {string} filename
+ * @param {'remove'} event    The event name
+ * @param {string}   filename
  */
 function removeBuildFile( event, filename ) {
 	const buildFile = getBuildFile( filename );

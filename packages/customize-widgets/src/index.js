@@ -7,7 +7,11 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { registerLegacyWidgetVariations } from '@wordpress/widgets';
+import {
+	registerLegacyWidgetBlock,
+	registerLegacyWidgetVariations,
+} from '@wordpress/widgets';
+import { setFreeformContentHandlerName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,6 +23,9 @@ import './filters';
 
 const { wp } = window;
 
+const DISABLED_BLOCKS = [ 'core/more', 'core/block', 'core/freeform' ];
+const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
+
 /**
  * Initializes the widgets block editor in the customizer.
  *
@@ -26,16 +33,28 @@ const { wp } = window;
  * @param {Object} blockEditorSettings Block editor settings.
  */
 export function initialize( editorName, blockEditorSettings ) {
-	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( block ) => ! [ 'core/more' ].includes( block.name )
-	);
+	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
+		return ! (
+			DISABLED_BLOCKS.includes( block.name ) ||
+			block.name.startsWith( 'core/post' ) ||
+			block.name.startsWith( 'core/query' ) ||
+			block.name.startsWith( 'core/site' )
+		);
+	} );
 	registerCoreBlocks( coreBlocks );
-
+	registerLegacyWidgetBlock();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks();
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
+		} );
 	}
-
 	registerLegacyWidgetVariations( blockEditorSettings );
+
+	// As we are unregistering `core/freeform` to avoid the Classic block, we must
+	// replace it with something as the default freeform content handler. Failure to
+	// do this will result in errors in the default block parser.
+	// see: https://github.com/WordPress/gutenberg/issues/33097
+	setFreeformContentHandlerName( 'core/html' );
 
 	const SidebarControl = getSidebarControl( blockEditorSettings );
 

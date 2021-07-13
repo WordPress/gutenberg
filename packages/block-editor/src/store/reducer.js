@@ -79,7 +79,7 @@ function mapBlockParents( blocks, rootClientId = '' ) {
  * applying a transformation function to each one.
  * Returns a flattened object with the transformed blocks.
  *
- * @param {Array} blocks Blocks to flatten.
+ * @param {Array}    blocks    Blocks to flatten.
  * @param {Function} transform Transforming function to be applied to each block.
  *
  * @return {Object} Flattened object.
@@ -137,9 +137,9 @@ function getFlattenedBlockAttributes( blocks ) {
  * an inner block controller. To do so, it must be excluded from the list of
  * client IDs which are considered to be part of the top-level entity.
  *
- * @param {Object}  blocksOrder  Object that maps block client IDs to a list of
- *                               nested block client IDs.
- * @param {?string} rootClientId The root client ID to search. Defaults to ''.
+ * @param {Object}  blocksOrder           Object that maps block client IDs to a list of
+ *                                        nested block client IDs.
+ * @param {?string} rootClientId          The root client ID to search. Defaults to ''.
  * @param {?Object} controlledInnerBlocks The InnerBlocks controller state.
  *
  * @return {Array} List of descendant client IDs.
@@ -1131,7 +1131,7 @@ export function isTyping( state = false, action ) {
  * Reducer returning dragged block client id.
  *
  * @param {string[]} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object}   action Dispatched action.
  *
  * @return {string[]} Updated state.
  */
@@ -1458,8 +1458,8 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 /**
  * Reducer returning the user preferences.
  *
- * @param {Object}  state                 Current state.
- * @param {Object}  action                Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {string} Updated state.
  */
@@ -1568,7 +1568,7 @@ export function isNavigationMode( state = false, action ) {
  * Reducer returning whether the block moving mode is enabled or not.
  *
  * @param {string|null} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Object}      action Dispatched action.
  *
  * @return {string|null} Updated state.
  */
@@ -1689,8 +1689,8 @@ export function highlightedBlock( state, action ) {
 /**
  * Reducer returning the block insertion event list state.
  *
- * @param {Object}  state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */

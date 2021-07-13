@@ -2,13 +2,56 @@
 
 To modify the behavior of existing blocks, WordPress exposes several APIs:
 
-## Filters
+## Registration
 
-The following filters are available to extend the settings for existing blocks.
+The following filters are available to extend the settings for blocks during their registration.
+
+### `block_type_metadata`
+
+Filters the raw metadata loaded from the `block.json` file when registering a block type on the server with PHP. It allows applying modifications before the metadata gets processed.
+
+The filter takes one param:
+
+-   `$metadata` (`array`) – metadata loaded from `block.json` for registering a block type.
+
+_Example_:
+
+```php
+<?php
+
+function filter_metadata_registration( $metadata ) {
+	$metadata['apiVersion'] = 1;
+	return $metadata;
+};
+add_filter( 'block_type_metadata', 'filter_metadata_registration', 10, 2 );
+
+register_block_type( __DIR__ );
+```
+
+### `block_type_metadata_settings`
+
+Filters the settings determined from the processed block type metadata. It makes it possible to apply custom modifications using the block metadata that isn’t handled by default.
+
+The filter takes two params:
+
+-   `$settings` (`array`) – Array of determined settings for registering a block type.
+-   `$metadata` (`array`) – Metadata loaded from the `block.json` file.
+
+_Example:_
+
+```php
+function filter_metadata_registration( $settings, $metadata ) {
+	$settings['api_version'] = $metadata['apiVersion'] + 1;
+	return $settings;
+};
+add_filter( 'block_type_metadata_settings', 'filter_metadata_registration', 10, 2 );
+
+register_block_type( __DIR__ );
+```
 
 ### `blocks.registerBlockType`
 
-Used to filter the block settings. It receives the block settings and the name of the registered block as arguments. Since v6.1.0 this filter is also applied to each of a block's deprecated settings.
+Used to filter the block settings when registering the block on the client with JavaScript. It receives the block settings and the name of the registered block as arguments. This filter is also applied to each of a block's deprecated settings.
 
 _Example:_
 
@@ -33,6 +76,10 @@ wp.hooks.addFilter(
 	addListBlockClassName
 );
 ```
+
+## Block Editor
+
+The following filters are available to change the behavior of blocks while editing in the block editor.
 
 ### `blocks.getSaveElement`
 
@@ -221,30 +268,6 @@ wp.hooks.addFilter(
 
 {% end %}
 
-#### `media.crossOrigin`
-
-Used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e `<img>`, `<audio>` , `<img>` , `<link>` , `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information the `crossOrigin` attribute, its values and how it applies to each element.
-
-One example of it in action is in the Image block's transform feature to allow cross-origin images to be used in a `<canvas>`.
-
-_Example:_
-
-```js
-addFilter(
-	'media.crossOrigin',
-	'my-plugin/with-cors-media',
-	// The callback accepts a second `mediaSrc` argument which references
-	// the url to actual foreign media, useful if you want to decide
-	// the value of crossOrigin based upon it.
-	( crossOrigin, mediaSrc ) => {
-		if ( mediaSrc.startsWith( 'https://example.com' ) ) {
-			return 'use-credentials';
-		}
-		return crossOrigin;
-	}
-);
-```
-
 ## Removing Blocks
 
 ### Using a deny list
@@ -316,47 +339,56 @@ wp.blocks.getBlockTypes().forEach( function ( blockType ) {
 
 ## Hiding blocks from the inserter
 
-On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types` filter. You can return either true (all block types supported), false (no block types supported), or an array of block type names to allow. You can also use the second provided param `$post` to filter block types based on its content.
+### `allowed_block_types_all`
+
+_**Note:** Before WordPress 5.8 known as `allowed_block_types`. In the case when you want to support older versions of WordPress you might need a way to detect which filter should be used – the deprecated one vs the new one. The recommended way to proceed is to check if the `WP_Block_Editor_Context` class exists._
+
+On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types_all` filter. You can return either true (all block types supported), false (no block types supported), or an array of block type names to allow. You can also use the second provided param `$editor_context` to filter block types based on its content.
 
 ```php
 <?php
 // my-plugin.php
 
-function my_plugin_allowed_block_types( $allowed_block_types, $post ) {
-	if ( $post->post_type !== 'post' ) {
-		return $allowed_block_types;
+function filter_allowed_block_types_when_post_provided( $allowed_block_types, $editor_context ) {
+	if ( ! empty( $editor_context->post ) ) {
+		return array( 'core/paragraph', 'core/heading' );
 	}
-	return array( 'core/paragraph' );
+	return $allowed_block_types;
 }
 
-add_filter( 'allowed_block_types', 'my_plugin_allowed_block_types', 10, 2 );
+add_filter( 'allowed_block_types_all', 'filter_allowed_block_types_when_post_provided', 10, 2 );
 ```
 
 ## Managing block categories
 
-It is possible to filter the list of default block categories using the `block_categories` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during blocks registration and to group blocks in the inserter. You can also use the second provided param `$post` to generate a different list depending on the post's content.
+### `block_categories_all`
+
+_**Note:** Before WordPress 5.8 known as `block_categories`. In the case when you want to support older versions of WordPress you might need a way to detect which filter should be used – the deprecated one vs the new one. The recommended way to proceed is to check if the `WP_Block_Editor_Context` class exists._
+
+It is possible to filter the list of default block categories using the `block_categories_all` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during blocks registration and to group blocks in the inserter. You can also use the second provided param `$editor_context` to filter the based on its content.
 
 ```php
 <?php
 // my-plugin.php
 
-function my_plugin_block_categories( $categories, $post ) {
-	if ( $post->post_type !== 'post' ) {
-		return $categories;
-	}
-	return array_merge(
-		$categories,
-		array(
+function filter_block_categories_when_post_provided( $block_categories, $editor_context ) {
+	if ( ! empty( $editor_context->post ) ) {
+		array_push(
+			$block_categories,
 			array(
-				'slug' => 'my-category',
-				'title' => __( 'My category', 'my-plugin' ),
-				'icon'  => 'wordpress',
-			),
-		)
-	);
+				'slug'  => 'custom-category',
+				'title' => __( 'Custom Category', 'custom-plugin' ),
+				'icon'  => null,
+			)
+		);
+	}
+	return $block_categories;
 }
-add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
+
+add_filter( 'block_categories_all', 'filter_block_categories_when_post_provided', 10, 2 );
 ```
+
+### `wp.blocks.updateCategory`
 
 You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/).
 

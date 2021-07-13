@@ -29,7 +29,7 @@ const addParagraphsAndColumnsDemo = async () => {
 	await page.keyboard.press( 'Enter' );
 	await page.click( ':focus [aria-label="Two columns; equal split"]' );
 	await page.click( ':focus .block-editor-button-block-appender' );
-	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
+	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
 	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.
@@ -40,7 +40,7 @@ const addParagraphsAndColumnsDemo = async () => {
 	// is a temporary solution.
 	await page.focus( '.wp-block[data-type="core/column"]:nth-child(2)' );
 	await page.click( ':focus .block-editor-button-block-appender' );
-	await page.waitForSelector( ':focus.block-editor-inserter__search-input' );
+	await page.waitForSelector( '.block-editor-inserter__search input:focus' );
 	await page.keyboard.type( 'Paragraph' );
 	await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 	await page.keyboard.press( 'Enter' ); // Insert paragraph.

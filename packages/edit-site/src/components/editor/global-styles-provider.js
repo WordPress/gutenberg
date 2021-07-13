@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set, get, mergeWith } from 'lodash';
+import { set, get, mergeWith, mapValues, setWith, clone } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,6 +30,7 @@ import {
 	ROOT_BLOCK_SUPPORTS,
 	getValueFromVariable,
 	getPresetVariable,
+	PRESET_METADATA,
 } from './utils';
 import { toCustomProperties, toStyles } from './global-styles-renderer';
 import { store as editSiteStore } from '../../store';
@@ -47,31 +48,7 @@ const GlobalStylesContext = createContext( {
 	/* eslint-enable no-unused-vars */
 } );
 
-const mergeTreesCustomizer = ( objValue, srcValue, key ) => {
-	// Users can add their own colors.
-	// We want to append them when they don't
-	// have the same slug as an existing color,
-	// otherwise we want to update the existing color instead.
-	if ( 'palette' === key ) {
-		const indexTable = {};
-		const existingSlugs = [];
-		const result = [ ...( objValue ?? [] ) ];
-		result.forEach( ( { slug }, index ) => {
-			indexTable[ slug ] = index;
-			existingSlugs.push( slug );
-		} );
-
-		( srcValue ?? [] ).forEach( ( element ) => {
-			if ( existingSlugs.includes( element?.slug ) ) {
-				result[ indexTable[ element?.slug ] ] = element;
-			} else {
-				result.push( element );
-			}
-		} );
-
-		return result;
-	}
-
+const mergeTreesCustomizer = ( objValue, srcValue ) => {
 	// We only pass as arrays the presets,
 	// in which case we want the new array of values
 	// to override the old array (no merging).
@@ -135,6 +112,10 @@ const getBlockMetadata = ( blockTypes ) => {
 	return result;
 };
 
+function immutableSet( object, path, value ) {
+	return setWith( object ? clone( object ) : {}, path, value, clone );
+}
+
 export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
 	const { blockTypes, settings } = useSelect( ( select ) => {
@@ -174,12 +155,41 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 			newUserStyles = EMPTY_CONTENT;
 		}
 
+		const addUserToSettings = ( settingsToAdd ) => {
+			PRESET_METADATA.forEach( ( { path } ) => {
+				const presetData = get( settingsToAdd, path );
+				if ( presetData ) {
+					settingsToAdd = immutableSet( settingsToAdd, path, {
+						user: presetData,
+					} );
+				}
+			} );
+			return settingsToAdd;
+		};
+
+		let userStylesWithOrigin = newUserStyles;
+		if ( userStylesWithOrigin.settings ) {
+			userStylesWithOrigin = {
+				...userStylesWithOrigin,
+				settings: addUserToSettings( userStylesWithOrigin.settings ),
+			};
+			if ( userStylesWithOrigin.settings.blocks ) {
+				userStylesWithOrigin.settings = {
+					...userStylesWithOrigin.settings,
+					blocks: mapValues(
+						userStylesWithOrigin.settings.blocks,
+						addUserToSettings
+					),
+				};
+			}
+		}
+
 		// At this point, the version schema of the theme & user
 		// is the same, so we can merge them.
 		const newMergedStyles = mergeWith(
 			{},
 			baseStyles,
-			newUserStyles,
+			userStylesWithOrigin,
 			mergeTreesCustomizer
 		);
 

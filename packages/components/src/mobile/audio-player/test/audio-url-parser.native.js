@@ -17,6 +17,11 @@ const supportedAudioUrlsWithoutExtensions = [
 	'https://www.mp3.com/folder/file',
 ];
 
+const supportedLocalAudioUrls = [
+	'file.mp3',
+	'file:///storage/emulated/0/Download/file.mp3',
+];
+
 describe( 'supportedAudioUrlsWithExtensions', () => {
 	supportedAudioUrlsWithExtensions.forEach( ( url ) => {
 		it( `supports ${ url }`, () => {
@@ -33,6 +38,16 @@ describe( 'supportedAudioUrlsWithoutExtensions', () => {
 			const { title, extension } = parseAudioUrl( url );
 			expect( title ).toBe( 'file' );
 			expect( extension ).toBe( '' );
+		} );
+	} );
+} );
+
+describe( 'supportedLocalAudioUrls', () => {
+	supportedLocalAudioUrls.forEach( ( url ) => {
+		it( `supports ${ url }`, () => {
+			const { title, extension } = parseAudioUrl( url );
+			expect( title ).toBe( 'file' );
+			expect( extension ).toBe( 'MP3 ' );
 		} );
 	} );
 } );

@@ -30,6 +30,12 @@ import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
 import BlockInspectorButton from './block-inspector-button';
 
+const LAYOUT = {
+	type: 'default',
+	// At the root level of the site editor, no alignments should be allowed.
+	alignments: [],
+};
+
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page, deviceType } = useSelect(
 		( select ) => {
@@ -94,11 +100,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						<WritingFlow>
 							<BlockList
 								className="edit-site-block-editor__block-list"
-								__experimentalLayout={ {
-									type: 'default',
-									// At the root level of the site editor, no alignments should be allowed.
-									alignments: [],
-								} }
+								__experimentalLayout={ LAYOUT }
 							/>
 						</WritingFlow>
 					</Iframe>

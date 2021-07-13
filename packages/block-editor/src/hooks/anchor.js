@@ -79,13 +79,15 @@ export const withInspectorControl = createHigherOrderComponent(
 									'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
 								) }
 
-								<ExternalLink
-									href={
-										'https://wordpress.org/support/article/page-jumps/'
-									}
-								>
-									{ __( 'Learn more about anchors' ) }
-								</ExternalLink>
+								{ isWeb && (
+									<ExternalLink
+										href={
+											'https://wordpress.org/support/article/page-jumps/'
+										}
+									>
+										{ __( 'Learn more about anchors' ) }
+									</ExternalLink>
+								) }
 							</>
 						}
 						value={ props.attributes.anchor || '' }

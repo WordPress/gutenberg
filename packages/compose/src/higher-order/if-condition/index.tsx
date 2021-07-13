@@ -18,7 +18,7 @@ import type { HigherOrderComponent } from '../../utils/create-higher-order-compo
  * <ConditionalComponent foo="bar" />; // => <div>bar</div>;
  * ```
  *
- * @param predicate Function to test condition.
+ * @param  predicate Function to test condition.
  *
  * @return Higher-order component.
  */

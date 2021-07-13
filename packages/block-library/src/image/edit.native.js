@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
-import { isEmpty, get, find, map } from 'lodash';
+import { View, TouchableWithoutFeedback, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -14,9 +13,9 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
+	setFeaturedImage,
 } from '@wordpress/react-native-bridge';
 import {
-	CycleSelectControl,
 	Icon,
 	PanelBody,
 	ToolbarButton,
@@ -24,7 +23,9 @@ import {
 	Image,
 	WIDE_ALIGNMENTS,
 	LinkSettingsNavigation,
+	BottomSheet,
 	BottomSheetTextControl,
+	BottomSheetSelectControl,
 	FooterMessageLink,
 	Badge,
 } from '@wordpress/components';
@@ -44,7 +45,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	image as placeholderIcon,
 	replace,
@@ -52,6 +53,7 @@ import {
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -59,10 +61,16 @@ import { store as coreStore } from '@wordpress/core-data';
 import styles from './styles.scss';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import { LINK_DESTINATION_CUSTOM } from './constants';
+import {
+	LINK_DESTINATION_CUSTOM,
+	MEDIA_ID_NO_FEATURED_IMAGE_SET,
+} from './constants';
 
-const getUrlForSlug = ( image, { sizeSlug } ) => {
-	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
+const getUrlForSlug = ( image, sizeSlug ) => {
+	if ( ! sizeSlug ) {
+		return undefined;
+	}
+	return image?.media_details?.sizes?.[ sizeSlug ]?.source_url;
 };
 
 export class ImageEdit extends Component {
@@ -89,6 +97,7 @@ export class ImageEdit extends Component {
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
+		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
@@ -112,11 +121,6 @@ export class ImageEdit extends Component {
 				placeholder: __( 'None' ),
 			},
 		};
-
-		this.sizeOptions = map( this.props.imageSizes, ( { name, slug } ) => ( {
-			value: slug,
-			name,
-		} ) );
 	}
 
 	componentDidMount() {
@@ -169,7 +173,9 @@ export class ImageEdit extends Component {
 	componentDidUpdate( previousProps ) {
 		if ( ! previousProps.image && this.props.image ) {
 			const { image, attributes } = this.props;
-			const url = getUrlForSlug( image, attributes ) || image.source_url;
+			const url =
+				getUrlForSlug( image, attributes?.sizeSlug ) ||
+				image.source_url;
 			this.props.setAttributes( { url } );
 		}
 	}
@@ -183,7 +189,10 @@ export class ImageEdit extends Component {
 	}
 
 	accessibilityLabelCreator( caption ) {
-		return isEmpty( caption )
+		// Checks if caption is empty.
+		return ( typeof caption === 'string' && caption.trim().length === 0 ) ||
+			caption === undefined ||
+			caption === null
 			? /* translators: accessibility text. Empty image caption. */
 			  'Image caption. Empty'
 			: sprintf(
@@ -285,7 +294,7 @@ export class ImageEdit extends Component {
 	onSetSizeSlug( sizeSlug ) {
 		const { image } = this.props;
 
-		const url = getUrlForSlug( image, { sizeSlug } );
+		const url = getUrlForSlug( image, sizeSlug );
 		if ( ! url ) {
 			return null;
 		}
@@ -430,6 +439,50 @@ export class ImageEdit extends Component {
 		this.onSetSizeSlug( newValue );
 	}
 
+	onSetFeatured( mediaId ) {
+		const { closeSettingsBottomSheet } = this.props;
+		setFeaturedImage( mediaId );
+		closeSettingsBottomSheet();
+	}
+
+	getSetFeaturedButton( isFeaturedImage ) {
+		const { attributes, getStylesFromColorScheme } = this.props;
+
+		const setFeaturedButtonStyle = getStylesFromColorScheme(
+			styles.setFeaturedButton,
+			styles.setFeaturedButtonDark
+		);
+
+		const removeFeaturedButton = () => (
+			<BottomSheet.Cell
+				label={ __( 'Remove as Featured Image ' ) }
+				labelStyle={ [
+					setFeaturedButtonStyle,
+					styles.removeFeaturedButton,
+				] }
+				onPress={ () =>
+					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
+				}
+			/>
+		);
+
+		const setFeaturedButton = () => (
+			<BottomSheet.Cell
+				label={ __( 'Set as Featured Image ' ) }
+				labelStyle={ setFeaturedButtonStyle }
+				onPress={ () => this.onSetFeatured( attributes.id ) }
+			/>
+		);
+
+		return (
+			<PanelBody>
+				{ isFeaturedImage
+					? removeFeaturedButton()
+					: setFeaturedButton() }
+			</PanelBody>
+		);
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
 		const {
@@ -443,14 +496,36 @@ export class ImageEdit extends Component {
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
-		const sizeOptionsValid = find( this.sizeOptions, [
-			'value',
-			imageDefaultSize,
-		] );
+		const imageSizes = Array.isArray( this.props.imageSizes )
+			? this.props.imageSizes
+			: [];
+		// Only map available image sizes for the user to choose.
+		const sizeOptions = imageSizes
+			.filter( ( { slug } ) => getUrlForSlug( image, slug ) )
+			.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+
+		let selectedSizeOption = sizeSlug || imageDefaultSize;
+		let sizeOptionsValid = sizeOptions.find(
+			( option ) => option.value === selectedSizeOption
+		);
+
+		if ( ! sizeOptionsValid ) {
+			// Default to 'full' size if the default large size is not available.
+			sizeOptionsValid = sizeOptions.find(
+				( option ) => option.value === 'full'
+			);
+			selectedSizeOption = 'full';
+		}
+
+		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
+		// Images that haven't been uploaded to a site's library have an id of 'undefined', which the 'canImageBeFeatured' check filters out.
+		const canImageBeFeatured = typeof attributes.id !== 'undefined';
 
 		const isFeaturedImage =
-			typeof featuredImageId !== 'undefined' &&
-			featuredImageId === attributes.id;
+			canImageBeFeatured && featuredImageId === attributes.id;
+
+		// eslint-disable-next-line no-unused-vars
+		const androidOnly = Platform.OS === 'android';
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -476,12 +551,12 @@ export class ImageEdit extends Component {
 				</PanelBody>
 				<PanelBody>
 					{ image && sizeOptionsValid && (
-						<CycleSelectControl
+						<BottomSheetSelectControl
 							icon={ fullscreen }
 							label={ __( 'Size' ) }
-							value={ sizeSlug || imageDefaultSize }
-							onChangeValue={ this.onSizeChangeValue }
-							options={ this.sizeOptions }
+							options={ sizeOptions }
+							onChange={ this.onSizeChangeValue }
+							value={ selectedSizeOption }
 						/>
 					) }
 					{ this.getAltTextSettings() }
@@ -489,6 +564,9 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
+				{ androidOnly &&
+					canImageBeFeatured &&
+					this.getSetFeaturedButton( isFeaturedImage ) }
 			</InspectorControls>
 		);
 
@@ -631,6 +709,13 @@ export default compose( [
 				clientId,
 				'inserter_menu'
 			),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( editPostStore ).closeGeneralSidebar();
+			},
 		};
 	} ),
 	withPreferredColorScheme,

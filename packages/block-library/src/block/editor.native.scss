@@ -94,6 +94,24 @@
 	color: $white;
 }
 
+.infoDescription {
+	padding-bottom: 24;
+	font-size: 16;
+	color: $gray-darken-20;
+}
+
+.infoDescriptionDark {
+	color: $gray-20;
+}
+
+.actionButton {
+	color: $blue-50;
+}
+
+.actionButtonDark {
+	color: $blue-30;
+}
+
 .spinner {
 	height: $grid-unit-60;
 	border-width: $border-width;

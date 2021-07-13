@@ -10,12 +10,34 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Update loading and failed screens for web version of the editor [#32395]
+-   [*] Handle floating keyboard case - Fix issue with the block selector on iPad. [#33089]
+-   [**] Added color/background customization for text blocks. [#33250]
 
+## 1.56.0
+-   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
+
+## 1.55.2
+-   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
+
+## 1.55.1
+-   [*] Fix: RNMobile borderRadius value setting [#32717]
+-   [*] Improve unsupported block message for reusable block [#32618]
+
+## 1.55.0
+-   [*] Gallery block - Fix gallery images caption text formatting [#32351]
+-   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]
+-   [***] Audio block now available on WP.com sites on the free plan. [#31966]
+
+## 1.54.0
 -   [***] Slash inserter [#29772]
 -   [*] Audio block: Add Insert from URL functionality. [#27817]
--   [*] Fix missing title for some unsupported blocks [#31743]
 -   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
 -   [***] Enable reusable block only in WP.com sites [#31744]
+
+## 1.53.1
+
+-   [*] Fix missing title for some unsupported blocks [#31743]
 
 ## 1.53.0
 
@@ -51,10 +73,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.50.1
 
--   [x] Truncate rangecell screenreader decimals] [#30678]
--   [x] Fix Quote block citation [#30548]
--   [xx] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
--   [xx] Fix Unsupported Block Editor on Android [#30650]
+-   [*] Truncate rangecell screenreader decimals] [#30678]
+-   [*] Fix Quote block citation [#30548]
+-   [**] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
+-   [**] Fix Unsupported Block Editor on Android [#30650]
 
 ## 1.50.0
 

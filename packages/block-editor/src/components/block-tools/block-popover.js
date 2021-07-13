@@ -64,6 +64,24 @@ function BlockPopover( {
 		hasFixedToolbar,
 		lastClientId,
 	} = useSelect( selector, [] );
+	const isInsertionPointVisible = useSelect(
+		( select ) => {
+			const {
+				isBlockInsertionPointVisible,
+				getBlockInsertionPoint,
+				getBlockOrder,
+			} = select( blockEditorStore );
+
+			if ( ! isBlockInsertionPointVisible() ) {
+				return false;
+			}
+
+			const insertionPoint = getBlockInsertionPoint();
+			const order = getBlockOrder( insertionPoint.rootClientId );
+			return order[ insertionPoint.index ] === clientId;
+		},
+		[ clientId ]
+	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
@@ -184,7 +202,9 @@ function BlockPopover( {
 			position={ popoverPosition }
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
-			className="block-editor-block-list__block-popover"
+			className={ classnames( 'block-editor-block-list__block-popover', {
+				'is-insertion-point-visible': isInsertionPointVisible,
+			} ) }
 			__unstableStickyBoundaryElement={ stickyBoundaryElement }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the the default popover slot).

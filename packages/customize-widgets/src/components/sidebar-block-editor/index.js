@@ -14,6 +14,7 @@ import {
 	BlockTools,
 	BlockSelectionClearer,
 	BlockInspector,
+	CopyHandler,
 	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
@@ -31,6 +32,7 @@ import SidebarEditorProvider from './sidebar-editor-provider';
 import { store as customizeWidgetsStore } from '../../store';
 import WelcomeGuide from '../welcome-guide';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import BlockAppender from '../block-appender';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -79,6 +81,7 @@ export default function SidebarBlockEditor( {
 			mediaUpload: mediaUploadBlockEditor,
 			hasFixedToolbar: isFixedToolbarActive,
 			keepCaretInsideBlock,
+			__unstableHasCustomAppender: true,
 		};
 	}, [
 		hasUploadPermissions,
@@ -112,15 +115,19 @@ export default function SidebarBlockEditor( {
 					isFixedToolbarActive={ isFixedToolbarActive }
 				/>
 
-				<BlockTools>
-					<BlockSelectionClearer>
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
-						</WritingFlow>
-					</BlockSelectionClearer>
-				</BlockTools>
+				<CopyHandler>
+					<BlockTools>
+						<BlockSelectionClearer>
+							<WritingFlow>
+								<ObserveTyping>
+									<BlockList
+										renderAppender={ BlockAppender }
+									/>
+								</ObserveTyping>
+							</WritingFlow>
+						</BlockSelectionClearer>
+					</BlockTools>
+				</CopyHandler>
 
 				{ createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>

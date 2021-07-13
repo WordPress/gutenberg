@@ -126,7 +126,7 @@ const transforms = {
 					anchor,
 					style: {
 						color: {
-							duotone: style.color.duotone,
+							duotone: style?.color?.duotone,
 						},
 					},
 				} ),

@@ -101,7 +101,7 @@ export default function MoreMenu() {
 								</VisuallyHidden>
 							</MenuItem>
 						</MenuGroup>
-						<MenuGroup>
+						<MenuGroup label={ __( 'Preferences' ) }>
 							<FeatureToggle
 								feature="keepCaretInsideBlock"
 								label={ __(

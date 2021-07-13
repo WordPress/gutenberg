@@ -150,7 +150,7 @@ export default function ReusableBlockConvertButton( {
 								>
 									<FlexItem>
 										<Button
-											isSecondary
+											variant="secondary"
 											onClick={ () => {
 												setIsModalOpen( false );
 												setTitle( '' );
@@ -160,7 +160,7 @@ export default function ReusableBlockConvertButton( {
 										</Button>
 									</FlexItem>
 									<FlexItem>
-										<Button isPrimary type="submit">
+										<Button variant="primary" type="submit">
 											{ __( 'Save' ) }
 										</Button>
 									</FlexItem>

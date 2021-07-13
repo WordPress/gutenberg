@@ -2,18 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import {
 	AlignmentToolbar,
+	InspectorAdvancedControls,
 	BlockControls,
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Spinner } from '@wordpress/components';
+import { Spinner, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -21,44 +21,35 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import useTermLinks from './use-term-links';
+import usePostTerms from './use-post-terms';
 
 export default function PostTermsEdit( {
 	attributes,
 	context,
 	setAttributes,
 } ) {
-	const { term, textAlign } = attributes;
+	const { term, textAlign, separator } = attributes;
 	const { postId, postType } = context;
 
 	const selectedTerm = useSelect(
 		( select ) => {
 			if ( ! term ) return {};
-			const taxonomies = select( coreStore ).getTaxonomies( {
-				per_page: -1,
-			} );
-			return (
-				find(
-					taxonomies,
-					( taxonomy ) =>
-						taxonomy.slug === term && taxonomy.visibility.show_ui
-				) || {}
-			);
+			const { getTaxonomy } = select( coreStore );
+			const taxonomy = getTaxonomy( term );
+			return taxonomy?.visibility?.publicly_queryable ? taxonomy : {};
 		},
 		[ term ]
 	);
-
-	const { termLinks, isLoadingTermLinks } = useTermLinks( {
+	const { postTerms, hasPostTerms, isLoading } = usePostTerms( {
 		postId,
 		postType,
 		term: selectedTerm,
 	} );
-
 	const hasPost = postId && postType;
-	const hasTermLinks = termLinks && termLinks.length > 0;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
+			[ `taxonomy-${ term }` ]: term,
 		} ),
 	} );
 
@@ -88,20 +79,42 @@ export default function PostTermsEdit( {
 					} }
 				/>
 			</BlockControls>
+			<InspectorAdvancedControls>
+				<TextControl
+					autoComplete="off"
+					label={ __( 'Separator' ) }
+					value={ separator || '' }
+					onChange={ ( nextValue ) => {
+						setAttributes( { separator: nextValue } );
+					} }
+					help={ __( 'Enter character(s) used to separate terms.' ) }
+				/>
+			</InspectorAdvancedControls>
 			<div { ...blockProps }>
-				{ isLoadingTermLinks && <Spinner /> }
-
-				{ hasTermLinks &&
-					! isLoadingTermLinks &&
-					termLinks.reduce( ( prev, curr ) => [
-						prev,
-						' | ',
-						curr,
-					] ) }
-
-				{ ! isLoadingTermLinks &&
-					! hasTermLinks &&
-					// eslint-disable-next-line camelcase
+				{ isLoading && <Spinner /> }
+				{ ! isLoading &&
+					hasPostTerms &&
+					postTerms
+						.map( ( postTerm ) => (
+							<a
+								key={ postTerm.id }
+								href={ postTerm.link }
+								onClick={ ( event ) => event.preventDefault() }
+							>
+								{ postTerm.name }
+							</a>
+						) )
+						.reduce( ( prev, curr ) => (
+							<>
+								{ prev }
+								<span className="wp-block-post-terms__separator">
+									{ separator || ' ' }
+								</span>
+								{ curr }
+							</>
+						) ) }
+				{ ! isLoading &&
+					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
 			</div>

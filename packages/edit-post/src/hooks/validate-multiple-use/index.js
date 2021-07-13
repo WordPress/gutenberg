@@ -78,14 +78,14 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 				actions={ [
 					<Button
 						key="find-original"
-						isSecondary
+						variant="secondary"
 						onClick={ selectFirst }
 					>
 						{ __( 'Find original' ) }
 					</Button>,
 					<Button
 						key="remove"
-						isSecondary
+						variant="secondary"
 						onClick={ () => props.onReplace( [] ) }
 					>
 						{ __( 'Remove' ) }
@@ -93,7 +93,7 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
 					outboundType && (
 						<Button
 							key="transform"
-							isSecondary
+							variant="secondary"
 							onClick={ () =>
 								props.onReplace(
 									createBlock(

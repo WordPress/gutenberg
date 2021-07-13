@@ -21,6 +21,8 @@ import {
 	useSetting,
 } from '../components';
 
+const EMPTY_ARRAY = [];
+
 /**
  * Convert a list of colors to an object of R, G, and B values.
  *
@@ -54,11 +56,12 @@ export function getValuesFromColors( colors = [] ) {
 /**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param  {Object} props          Duotone props.
- * @param  {string} props.selector Selector to apply the filter to.
- * @param  {string} props.id       Unique id for this duotone filter.
- * @param  {Values} props.values   R, G, and B values to filter with.
- * @return {WPElement}             Duotone element.
+ * @param {Object} props          Duotone props.
+ * @param {string} props.selector Selector to apply the filter to.
+ * @param {string} props.id       Unique id for this duotone filter.
+ * @param {Values} props.values   R, G, and B values to filter with.
+ *
+ * @return {WPElement} Duotone element.
  */
 function DuotoneFilter( { selector, id, values } ) {
 	const stylesheet = `
@@ -123,15 +126,23 @@ function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
 
-	const duotonePalette = useSetting( 'color.duotone' );
-	const colorPalette = useSetting( 'color.palette' );
+	const duotonePalette = useSetting( 'color.duotone' ) || EMPTY_ARRAY;
+	const colorPalette = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const disableCustomColors = ! useSetting( 'color.custom' );
+	const disableCustomDuotone =
+		! useSetting( 'color.customDuotone' ) ||
+		( colorPalette?.length === 0 && disableCustomColors );
+
+	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
+		return null;
+	}
 
 	return (
 		<BlockControls group="block">
 			<DuotoneControl
 				duotonePalette={ duotonePalette }
 				colorPalette={ colorPalette }
+				disableCustomDuotone={ disableCustomDuotone }
 				disableCustomColors={ disableCustomColors }
 				value={ duotone }
 				onChange={ ( newDuotone ) => {
@@ -153,8 +164,9 @@ function DuotonePanel( { attributes, setAttributes } ) {
  * Filters registered block settings, extending attributes to include
  * the `duotone` attribute.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 function addDuotoneAttributes( settings ) {
 	if ( ! hasBlockSupport( settings, 'color.__experimentalDuotone' ) ) {
@@ -178,8 +190,9 @@ function addDuotoneAttributes( settings ) {
  * Override the default edit UI to include toolbar controls for duotone if the
  * block supports duotone.
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
@@ -201,8 +214,9 @@ const withDuotoneControls = createHigherOrderComponent(
 /**
  * Override the default block element to include duotone styles.
  *
- * @param  {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
+ * @param {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
@@ -224,7 +238,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 		);
 		const selectorsGroup = selectorsScoped.join( ', ' );
 
-		const className = classnames( props?.classname, id );
+		const className = classnames( props?.className, id );
 
 		return (
 			<>

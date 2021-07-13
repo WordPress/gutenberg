@@ -238,7 +238,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the list of blocks matches a templates
+-   `boolean`: Whether the list of blocks matches a templates.
 
 <a name="findTransform" href="#findTransform">#</a> **findTransform**
 
@@ -708,21 +708,6 @@ _Parameters_
 
 -   _blockNameOrMetadata_ `string|Object`: Block type name or its metadata.
 -   _settings_ `Object`: Block settings.
-
-_Returns_
-
--   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
-
-<a name="registerBlockTypeFromMetadata" href="#registerBlockTypeFromMetadata">#</a> **registerBlockTypeFromMetadata**
-
-> **Deprecated** Use `registerBlockType` instead.
-
-Registers a new block provided from metadata stored in `block.json` file.
-
-_Parameters_
-
--   _metadata_ `Object`: Block metadata loaded from `block.json`.
--   _additionalSettings_ `Object`: Additional block settings.
 
 _Returns_
 

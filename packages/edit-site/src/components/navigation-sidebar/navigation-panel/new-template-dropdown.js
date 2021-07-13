@@ -81,7 +81,7 @@ export default function NewTemplateDropdown() {
 			toggleProps={ {
 				children: <Icon icon={ plus } />,
 				isSmall: true,
-				isTertiary: true,
+				variant: 'tertiary',
 			} }
 		>
 			{ ( { onClose } ) => (

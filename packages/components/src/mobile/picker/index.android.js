@@ -7,7 +7,7 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { PanelBody, TextControl } from '@wordpress/components';
 
@@ -55,7 +55,7 @@ export default class Picker extends Component {
 		const { options, leftAlign } = this.props;
 
 		return options.map( ( option ) => (
-			<View key={ `${ option.label }-${ option.value }` }>
+			<Fragment key={ `${ option.label }-${ option.value }` }>
 				{ options.length > 1 && option.separated && <Separator /> }
 				<BottomSheet.Cell
 					icon={ option.icon }
@@ -66,7 +66,7 @@ export default class Picker extends Component {
 					disabled={ option.disabled }
 					style={ option.disabled && styles.disabled }
 				/>
-			</View>
+			</Fragment>
 		) );
 	}
 

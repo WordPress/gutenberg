@@ -251,7 +251,7 @@ function Editor( { initialSettings } ) {
 												) : (
 													<div className="edit-site-editor__toggle-save-panel">
 														<Button
-															isSecondary
+															variant="secondary"
 															className="edit-site-editor__toggle-save-panel-button"
 															onClick={
 																openEntitiesSavedStates

@@ -21,6 +21,7 @@ export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
 export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
+export { default as Tooltip } from './tooltip';
 export { default as Icon } from './icon';
 export { default as Spinner } from './spinner';
 export {
@@ -39,6 +40,7 @@ export { default as __experimentalText } from './text';
 export { default as ExternalLink } from './external-link';
 export { default as TextControl } from './text-control';
 export { default as ToggleControl } from './toggle-control';
+export { default as SearchControl } from './search-control';
 export { default as SelectControl } from './select-control';
 export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
@@ -123,3 +125,4 @@ export {
 	withGlobalStyles,
 	getMergedGlobalStyles,
 } from './mobile/global-styles-context';
+export { getGlobalStyles } from './mobile/global-styles-context/utils';

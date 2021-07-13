@@ -37,8 +37,9 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 /**
  * Returns API widget data for a particular widget ID.
  *
- * @param  {number} id  Widget ID
- * @return {Object}     API widget data for a particular widget ID.
+ * @param {number} id Widget ID.
+ *
+ * @return {Object} API widget data for a particular widget ID.
  */
 export const getWidget = createRegistrySelector(
 	( select ) => ( state, id ) => {
@@ -79,6 +80,27 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
 	}
 );
 
+/**
+ * Given a child client id, returns the parent widget area block.
+ *
+ * @param {string} clientId The client id of a block in a widget area.
+ *
+ * @return {WPBlock} The widget area block.
+ */
+export const getParentWidgetAreaBlock = createRegistrySelector(
+	( select ) => ( state, clientId ) => {
+		const { getBlock, getBlockName, getBlockParents } = select(
+			blockEditorStore
+		);
+		const blockParents = getBlockParents( clientId );
+		const widgetAreaClientId = blockParents.find(
+			( parentClientId ) =>
+				getBlockName( parentClientId ) === 'core/widget-area'
+		);
+		return getBlock( widgetAreaClientId );
+	}
+);
+
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
 		let widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
@@ -111,7 +133,7 @@ export const getEditedWidgetAreas = createRegistrySelector(
 /**
  * Returns all blocks representing reference widgets.
  *
- * @param  {string} referenceWidgetName  Optional. If given, only reference widgets with this name will be returned.
+ * @param {string} referenceWidgetName Optional. If given, only reference widgets with this name will be returned.
  * @return {Array}  List of all blocks representing reference widgets
  */
 export const getReferenceWidgetBlocks = createRegistrySelector(
@@ -181,7 +203,8 @@ export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
  *
  * @param {Array}  state    The open state of the widget areas.
  * @param {string} clientId The clientId of the widget area.
- * @return {boolean}        True if the widget area is open.
+ *
+ * @return {boolean} True if the widget area is open.
  */
 export const getIsWidgetAreaOpen = ( state, clientId ) => {
 	const { widgetAreasOpenState } = state;
@@ -191,7 +214,7 @@ export const getIsWidgetAreaOpen = ( state, clientId ) => {
 /**
  * Returns true if the inserter is opened.
  *
- * @param  {Object}  state Global application state.
+ * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the inserter is opened.
  */
@@ -202,7 +225,7 @@ export function isInserterOpened( state ) {
 /**
  * Returns true if a block can be inserted into a widget area.
  *
- * @param {Array}  state    The open state of the widget areas.
+ * @param {Array}  state     The open state of the widget areas.
  * @param {string} blockName The name of the block being inserted.
  *
  * @return {boolean} True if the block can be inserted in a widget area.

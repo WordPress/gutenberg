@@ -36,8 +36,8 @@ export const getColorObjectByAttributeValues = (
 /**
  * Provided an array of color objects as set by the theme or by the editor defaults, and a color value returns the color object matching that value or undefined.
  *
- * @param {Array}   colors      Array of color objects as set by the theme or by the editor defaults.
- * @param {?string} colorValue  A string containing the color value.
+ * @param {Array}   colors     Array of color objects as set by the theme or by the editor defaults.
+ * @param {?string} colorValue A string containing the color value.
  *
  * @return {?Object} Color object included in the colors array whose color property equals colorValue.
  *                   Returns undefined if no color object matches this requirement.

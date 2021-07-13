@@ -14,33 +14,58 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 
-const EmbedPlaceholder = ( { icon, label, onFocus } ) => {
-	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
-		styles.emptyStateContainer,
-		styles.emptyStateContainerDark
+const EmbedPlaceholder = ( {
+	icon,
+	isSelected,
+	label,
+	onPress,
+	cannotEmbed,
+} ) => {
+	const containerStyle = usePreferredColorSchemeStyle(
+		styles.embed__container,
+		styles[ 'embed__container--dark' ]
 	);
-
-	const emptyStateTitleStyle = usePreferredColorSchemeStyle(
-		styles.emptyStateTitle,
-		styles.emptyStateTitleDark
+	const labelStyle = usePreferredColorSchemeStyle(
+		styles.embed__label,
+		styles[ 'embed__label--dark' ]
+	);
+	const descriptionStyle = usePreferredColorSchemeStyle(
+		styles.embed__description,
+		styles[ 'embed__description--dark' ]
+	);
+	const actionStyle = usePreferredColorSchemeStyle(
+		styles.embed__action,
+		styles[ 'embed__action--dark' ]
 	);
 
 	return (
-		<TouchableWithoutFeedback
-			accessibilityRole={ 'button' }
-			accessibilityHint={ __( 'Double tap to add a link.' ) }
-			onPress={ ( event ) => {
-				onFocus( event );
-			} }
-		>
-			<View style={ emptyStateContainerStyle }>
-				<View style={ styles.modalIcon }>{ icon }</View>
-				<Text style={ emptyStateTitleStyle }>{ label }</Text>
-				<Text style={ styles.emptyStateDescription }>
-					{ __( 'ADD LINK' ) }
-				</Text>
-			</View>
-		</TouchableWithoutFeedback>
+		<>
+			<TouchableWithoutFeedback
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Double tap to add a link.' ) }
+				onPress={ onPress }
+				disabled={ ! isSelected }
+			>
+				<View style={ containerStyle }>
+					<View style={ styles.embed__icon }>{ icon }</View>
+					<Text style={ labelStyle }>{ label }</Text>
+					{ cannotEmbed ? (
+						<>
+							<Text style={ descriptionStyle }>
+								{ __(
+									'Sorry, this content could not be embedded.'
+								) }
+							</Text>
+							<Text style={ actionStyle }>
+								{ __( 'EDIT LINK' ) }
+							</Text>
+						</>
+					) : (
+						<Text style={ actionStyle }>{ __( 'ADD LINK' ) }</Text>
+					) }
+				</View>
+			</TouchableWithoutFeedback>
+		</>
 	);
 };
 

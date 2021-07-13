@@ -25,7 +25,11 @@ export interface Props {
 	 */
 	limit?: number;
 	/**
-	 * Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
+	 * Clamps the text content to the specified `numberOfLines`, adding the `ellipsis` at the end.
 	 */
 	numberOfLines?: number;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 }

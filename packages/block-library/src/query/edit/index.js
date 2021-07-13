@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
+import { cloneBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import {
 	BlockControls,
 	InspectorAdvancedControls,
@@ -23,8 +24,9 @@ import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './query-inspector-controls';
 import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
+import { getFirstQueryClientIdFromBlocks } from '../utils';
 
-const TEMPLATE = [ [ 'core/query-loop' ] ];
+const TEMPLATE = [ [ 'core/post-template' ] ];
 export function QueryContent( { attributes, setAttributes } ) {
 	const {
 		queryId,
@@ -44,18 +46,24 @@ export function QueryContent( { attributes, setAttributes } ) {
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const { contentSize, wideSize } = usedLayout;
-	const alignments =
-		contentSize || wideSize
-			? [ 'wide', 'full' ]
-			: [ 'left', 'center', 'right' ];
 	const blockProps = useBlockProps();
+	const _layout = useMemo( () => {
+		if ( themeSupportsLayout ) {
+			const alignments =
+				contentSize || wideSize
+					? [ 'wide', 'full', 'left', 'center', 'right' ]
+					: [ 'left', 'center', 'right' ];
+			return {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments,
+			};
+		}
+		return undefined;
+	}, [ themeSupportsLayout, contentSize, wideSize ] );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		__experimentalLayout: {
-			type: 'default',
-			// Find a way to inject this in the support flag code (hooks).
-			alignments: themeSupportsLayout ? alignments : undefined,
-		},
+		__experimentalLayout: _layout,
 	} );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -134,6 +142,17 @@ export function QueryContent( { attributes, setAttributes } ) {
 function QueryPatternSetup( props ) {
 	const { clientId, name: blockName } = props;
 	const blockProps = useBlockProps();
+	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
+	const onBlockPatternSelect = ( blocks ) => {
+		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+		const firstQueryClientId = getFirstQueryClientIdFromBlocks(
+			clonedBlocks
+		);
+		replaceBlock( clientId, clonedBlocks );
+		if ( firstQueryClientId ) {
+			selectBlock( firstQueryClientId );
+		}
+	};
 	// `startBlankComponent` is what to render when clicking `Start blank`
 	// or if no matched patterns are found.
 	return (
@@ -142,6 +161,7 @@ function QueryPatternSetup( props ) {
 				blockName={ blockName }
 				clientId={ clientId }
 				startBlankComponent={ <QueryPlaceholder { ...props } /> }
+				onBlockPatternSelect={ onBlockPatternSelect }
 			/>
 		</div>
 	);

@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { TemplateEditorImage } from './images';
+import WelcomeGuideImage from './image';
 import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuideTemplate() {
@@ -22,7 +22,12 @@ export default function WelcomeGuideTemplate() {
 			onFinish={ () => toggleFeature( 'welcomeGuideTemplate' ) }
 			pages={ [
 				{
-					image: <TemplateEditorImage />,
+					image: (
+						<WelcomeGuideImage
+							nonAnimatedSrc="https://s.w.org/images/block-editor/welcome-template-editor.svg"
+							animatedSrc="https://s.w.org/images/block-editor/welcome-template-editor.gif"
+						/>
+					),
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
@@ -30,7 +35,7 @@ export default function WelcomeGuideTemplate() {
 							</h1>
 							<p className="edit-post-welcome-guide__text">
 								{ __(
-									'Templates express the layout of the site. Customize all aspects of your posts and pages using the tools of blocks and patterns.'
+									'Templates help define the layout of the site. You can customize all aspects of your posts and pages using blocks and patterns in this editor.'
 								) }
 							</p>
 						</>

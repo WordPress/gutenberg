@@ -9,32 +9,34 @@
  */
 
 /**
- * Determine if the current theme needs to load separate block styles or not.
+ * Backporting wp_should_load_separate_core_block_assets from WP-Core.
  *
  * @todo Remove this function when the minimum supported version is WordPress 5.8.
- *
- * @return bool
  */
-function gutenberg_should_load_separate_block_assets() {
-	if ( function_exists( 'wp_should_load_separate_core_block_assets' ) ) {
-		return wp_should_load_separate_core_block_assets();
-	}
-
-	if ( is_admin() || is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-		return false;
-	}
-
-	// The `should_load_separate_core_block_assets` filter was added in WP 5.8.
-	$load_separate_styles = apply_filters( 'should_load_separate_core_block_assets', gutenberg_is_fse_theme() );
-
+if ( ! function_exists( 'wp_should_load_separate_core_block_assets' ) ) {
 	/**
-	 * Determine if separate styles will be loaded for blocks on-render or not.
+	 * Checks whether separate assets should be loaded for core blocks on-render.
 	 *
-	 * @param bool $load_separate_styles Whether separate styles will be loaded or not.
+	 * @since 5.8.0
 	 *
-	 * @return bool
+	 * @return bool Whether separate assets will be loaded.
 	 */
-	return apply_filters( 'load_separate_block_assets', $load_separate_styles );
+	function wp_should_load_separate_core_block_assets() {
+		if ( is_admin() || is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			return false;
+		}
+
+		/**
+		 * Filters the flag that decides whether separate scripts and styles
+		 * will be loaded for core blocks on-render.
+		 *
+		 * @since 5.8.0
+		 *
+		 * @param bool $load_separate_assets Whether separate assets will be loaded.
+		 *                                   Default false.
+		 */
+		return apply_filters( 'should_load_separate_core_block_assets', false );
+	}
 }
 
 /**
@@ -58,7 +60,7 @@ add_filter(
  * @return void
  */
 function gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles() {
-	if ( gutenberg_should_load_separate_block_assets() ) {
+	if ( wp_should_load_separate_core_block_assets() ) {
 		/**
 		 * Avoid enqueueing block assets of all registered blocks for all posts, instead
 		 * deferring to block render mechanics to enqueue scripts, thereby ensuring only
@@ -180,6 +182,10 @@ add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post
  */
 function gutenberg_safe_style_attrs( $attrs ) {
 	$attrs[] = 'object-position';
+	$attrs[] = 'border-top-left-radius';
+	$attrs[] = 'border-top-right-radius';
+	$attrs[] = 'border-bottom-right-radius';
+	$attrs[] = 'border-bottom-left-radius';
 
 	return $attrs;
 }

@@ -8,6 +8,7 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 function NavigationEditorShortcuts( { saveBlocks } ) {
 	useShortcut(
@@ -21,7 +22,7 @@ function NavigationEditorShortcuts( { saveBlocks } ) {
 		}
 	);
 
-	const { redo, undo } = useDispatch( 'core' );
+	const { redo, undo } = useDispatch( coreStore );
 	useShortcut(
 		'core/edit-navigation/undo',
 		( event ) => {

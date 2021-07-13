@@ -11,6 +11,7 @@ import { backup } from '@wordpress/icons';
  */
 import PostLastRevisionCheck from './check';
 import { getWPAdminURL } from '../../utils/url';
+import { store as editorStore } from '../../store';
 
 function LastRevision( { lastRevisionId, revisionsCount } ) {
 	return (
@@ -37,7 +38,7 @@ export default withSelect( ( select ) => {
 	const {
 		getCurrentPostLastRevisionId,
 		getCurrentPostRevisionsCount,
-	} = select( 'core/editor' );
+	} = select( editorStore );
 	return {
 		lastRevisionId: getCurrentPostLastRevisionId(),
 		revisionsCount: getCurrentPostRevisionsCount(),

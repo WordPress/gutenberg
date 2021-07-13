@@ -61,11 +61,18 @@ export default function QueryToolbar( {
 										labelPosition="edge"
 										min={ 1 }
 										max={ 100 }
-										onChange={ ( value ) =>
+										onChange={ ( value ) => {
+											if (
+												isNaN( value ) ||
+												value < 1 ||
+												value > 100
+											) {
+												return;
+											}
 											setQuery( {
-												perPage: +value ?? -1,
-											} )
-										}
+												perPage: value,
+											} );
+										} }
 										step="1"
 										value={ query.perPage }
 										isDragEnabled={ false }
@@ -78,9 +85,16 @@ export default function QueryToolbar( {
 										labelPosition="edge"
 										min={ 0 }
 										max={ 100 }
-										onChange={ ( value ) =>
-											setQuery( { offset: +value } )
-										}
+										onChange={ ( value ) => {
+											if (
+												isNaN( value ) ||
+												value < 0 ||
+												value > 100
+											) {
+												return;
+											}
+											setQuery( { offset: value } );
+										} }
 										step="1"
 										value={ query.offset }
 										isDragEnabled={ false }
@@ -98,9 +112,12 @@ export default function QueryToolbar( {
 										label={ __( 'Max page to show' ) }
 										labelPosition="edge"
 										min={ 0 }
-										onChange={ ( value ) =>
-											setQuery( { pages: +value } )
-										}
+										onChange={ ( value ) => {
+											if ( isNaN( value ) || value < 0 ) {
+												return;
+											}
+											setQuery( { pages: value } );
+										} }
 										step="1"
 										value={ query.pages }
 										isDragEnabled={ false }

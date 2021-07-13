@@ -135,7 +135,7 @@ describe( 'getMenuItemForClientId', () => {
 describe( 'getSelectedMenuId', () => {
 	it( 'returns default selected menu ID (zero)', () => {
 		const state = {};
-		expect( getSelectedMenuId( state ) ).toBe( 0 );
+		expect( getSelectedMenuId( state ) ).toBe( null );
 	} );
 
 	it( 'returns selected menu ID', () => {

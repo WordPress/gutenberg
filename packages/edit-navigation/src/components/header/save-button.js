@@ -28,7 +28,7 @@ export default function SaveButton( { navigationPost } ) {
 	return (
 		<Button
 			className="edit-navigation-toolbar__save-button"
-			isPrimary
+			variant="primary"
 			onClick={ () => {
 				saveNavigationPost( navigationPost );
 			} }

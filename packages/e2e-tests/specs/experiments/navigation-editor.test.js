@@ -83,12 +83,17 @@ const REST_SEARCH_ROUTES = [
 	`rest_route=${ encodeURIComponent( '/wp/v2/search' ) }`,
 ];
 
+const REST_PAGES_ROUTES = [
+	'/wp/v2/pages',
+	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
+];
+
 /**
  * Determines if a given URL matches any of a given collection of
  * routes (expressed as substrings).
  *
  * @param {string} reqUrl the full URL to be tested for matches.
- * @param {Array} routes array of strings to match against the URL.
+ * @param {Array}  routes array of strings to match against the URL.
  */
 function matchUrlToRoute( reqUrl, routes ) {
 	return routes.some( ( route ) => reqUrl.includes( route ) );
@@ -133,6 +138,10 @@ function getMenuItemMocks( responsesByMethod ) {
 
 function getSearchMocks( responsesByMethod ) {
 	return getEndpointMocks( REST_SEARCH_ROUTES, responsesByMethod );
+}
+
+function getPagesMocks( responsesByMethod ) {
+	return getEndpointMocks( REST_PAGES_ROUTES, responsesByMethod );
 }
 
 async function visitNavigationEditor() {
@@ -184,6 +193,7 @@ describe( 'Navigation editor', () => {
 				POST: menuPostResponse,
 			} ),
 			...getMenuItemMocks( { GET: [] } ),
+			...getPagesMocks( { GET: [ {} ] } ), // mock a single page
 		] );
 
 		await page.keyboard.type( 'Main Menu' );
@@ -303,7 +313,7 @@ describe( 'Navigation editor', () => {
 
 		// Select a link block with nested links in a submenu.
 		const parentLinkXPath =
-			'//li[@aria-label="Block: Custom Link" and contains(.,"WordPress.org")]';
+			'//div[@aria-label="Block: Custom Link" and contains(.,"WordPress.org")]';
 		const linkBlock = await page.waitForXPath( parentLinkXPath );
 		await linkBlock.click();
 
@@ -312,7 +322,7 @@ describe( 'Navigation editor', () => {
 		// Submenus are hidden using `visibility: hidden` and shown using
 		// `visibility: visible` so the visible/hidden options must be used
 		// when selecting the elements.
-		const submenuLinkXPath = `${ parentLinkXPath }//li[@aria-label="Block: Custom Link"]`;
+		const submenuLinkXPath = `${ parentLinkXPath }//div[@aria-label="Block: Custom Link"]`;
 		const submenuLinkVisible = await page.waitForXPath( submenuLinkXPath, {
 			visible: true,
 		} );
