@@ -120,31 +120,62 @@ export function getBlockColors(
 	return blockStyles;
 }
 
-export function parseColorVariables( styles, colorPalette ) {
+export function parseVariables( styles, mappedValues ) {
 	const stylesBase = styles;
-	const colorPrefixRegex = /var\(--wp--preset--color--(.*?)\)/g;
+	// Examples
+	// var(--wp--preset--color--gray)
+	// var(--wp--preset--font-size--normal)
+	// var(--wp--custom--line-height--body)
+	const variablePrefixRegex = /var\(--wp--(.*?)--(.*?)--(.*?)\)/g;
 
 	return stylesBase
 		? JSON.parse(
-				stylesBase?.replace( colorPrefixRegex, ( _$1, $2 ) => {
-					const mappedColor = find( colorPalette, {
-						slug: $2,
-					} );
-					return mappedColor?.color;
-				} )
+				stylesBase?.replace(
+					variablePrefixRegex,
+					( _$1, _$2, $3, $4 ) => {
+						const mappedValue = mappedValues[ $3 ];
+						if ( mappedValue && mappedValue.slug ) {
+							const matchedValue = find( mappedValue.values, {
+								slug: $4,
+							} );
+							return matchedValue?.[ mappedValue.slug ];
+						} else if ( mappedValue ) {
+							return mappedValue.values?.[ $4 ];
+						}
+						return UNKNOWN_VALUE;
+					}
+				)
 		  )
 		: styles;
 }
 
+export function getMappedValues( features, colors ) {
+	return {
+		color: {
+			values: colors,
+			slug: 'color',
+		},
+		'font-size': {
+			values: features?.typography?.fontSizes?.theme,
+			slug: 'size',
+		},
+		'line-height': {
+			values: features?.custom?.[ 'line-height' ],
+		},
+	};
+}
+
 export function getGlobalStyles( rawStyles, rawFeatures, colors, gradients ) {
-	const parsedGradients = parseColorVariables(
+	const features = JSON.parse( rawFeatures );
+	const mappedValues = getMappedValues( features, colors );
+	const parsedGradients = parseVariables(
 		JSON.stringify( gradients ),
-		colors
+		mappedValues
 	);
-	const globalStyles = parseColorVariables( rawStyles, colors );
-	const parsedExperimentalFeatures = parseColorVariables(
+	const globalStyles = parseVariables( rawStyles, mappedValues );
+	const parsedExperimentalFeatures = parseVariables(
 		rawFeatures,
-		colors
+		mappedValues
 	);
 
 	return {
@@ -154,6 +185,12 @@ export function getGlobalStyles( rawStyles, rawFeatures, colors, gradients ) {
 			color: {
 				palette: parsedExperimentalFeatures?.color?.palette,
 				gradients: parsedExperimentalFeatures?.color?.gradients,
+			},
+			typography: {
+				fontSizes: features?.typography?.fontSizes,
+				custom: {
+					'line-height': features?.custom?.[ 'line-height' ],
+				},
 			},
 		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,
