@@ -30,4 +30,8 @@ export default {
 	getOrientation() {
 		return 'horizontal';
 	},
+
+	getAlignments() {
+		return [];
+	},
 };

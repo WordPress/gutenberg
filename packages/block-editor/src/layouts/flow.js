@@ -142,4 +142,14 @@ export default {
 	getOrientation() {
 		return 'vertical';
 	},
+
+	getAlignments( layout ) {
+		if ( layout.alignments !== undefined ) {
+			return layout.alignments;
+		}
+
+		return layout.contentSize || layout.wideSize
+			? [ 'wide', 'full', 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right' ];
+	},
 };
