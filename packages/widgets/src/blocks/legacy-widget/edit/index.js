@@ -175,6 +175,7 @@ function NotEmpty( {
 							idBase={ idBase }
 							instance={ instance }
 							isVisible={ mode === 'preview' }
+							name={ widgetType.name }
 						/>
 					) }
 					{ hasPreview === false && mode === 'preview' && (
