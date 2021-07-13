@@ -13,8 +13,8 @@ import {
 	BlockIcon,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ToolbarButton, Spinner, Placeholder } from '@wordpress/components';
-import { brush as brushIcon, update as updateIcon } from '@wordpress/icons';
+import { Spinner, Placeholder } from '@wordpress/components';
+import { brush as brushIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -94,23 +94,14 @@ function NotEmpty( {
 } ) {
 	const [ hasPreview, setHasPreview ] = useState( null );
 
-	const {
-		widgetType,
-		hasResolvedWidgetType,
-		isWidgetTypeHidden,
-		isNavigationMode,
-	} = useSelect(
+	const { widgetType, hasResolvedWidgetType, isNavigationMode } = useSelect(
 		( select ) => {
 			const widgetTypeId = id ?? idBase;
-			const hiddenIds =
-				select( blockEditorStore ).getSettings()
-					?.widgetTypesToHideFromLegacyWidgetBlock ?? [];
 			return {
 				widgetType: select( coreStore ).getWidgetType( widgetTypeId ),
 				hasResolvedWidgetType: select(
 					coreStore
 				).hasFinishedResolution( 'getWidgetType', [ widgetTypeId ] ),
-				isWidgetTypeHidden: hiddenIds.includes( widgetTypeId ),
 				isNavigationMode: select( blockEditorStore ).isNavigationMode(),
 			};
 		},
@@ -140,26 +131,11 @@ function NotEmpty( {
 		);
 	}
 
-	const mode = isNavigationMode || ! isSelected ? 'preview' : 'edit';
+	const mode =
+		idBase && ( isNavigationMode || ! isSelected ) ? 'preview' : 'edit';
 
 	return (
 		<>
-			{ ! isWidgetTypeHidden && (
-				<BlockControls group="block">
-					<ToolbarButton
-						label={ __( 'Change widget' ) }
-						icon={ updateIcon }
-						onClick={ () =>
-							setAttributes( {
-								id: null,
-								idBase: null,
-								instance: null,
-							} )
-						}
-					/>
-				</BlockControls>
-			) }
-
 			{ idBase === 'text' && (
 				<BlockControls group="other">
 					<ConvertToBlocksButton

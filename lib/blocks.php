@@ -133,7 +133,7 @@ function gutenberg_reregister_core_block_types() {
 				$registry->unregister( $metadata['name'] );
 			}
 
-			gutenberg_register_core_block_styles( $folder_name );
+			gutenberg_register_core_block_assets( $folder_name );
 			register_block_type_from_metadata( $block_json_file );
 		}
 
@@ -147,7 +147,7 @@ function gutenberg_reregister_core_block_types() {
 				if ( $registry->is_registered( $block_name ) ) {
 					$registry->unregister( $block_name );
 				}
-				gutenberg_register_core_block_styles( $block_name );
+				gutenberg_register_core_block_assets( $block_name );
 			}
 
 			require_once $blocks_dir . $file;
@@ -164,12 +164,16 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  *
  * @return void
  */
-function gutenberg_register_core_block_styles( $block_name ) {
+function gutenberg_register_core_block_assets( $block_name ) {
 	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;
 	}
 
 	$block_name = str_replace( 'core/', '', $block_name );
+
+	// When in production, use the plugin's version as the default asset version;
+	// else (for development or test) default to use the current time.
+	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
 
 	$style_path        = "build/block-library/blocks/$block_name/style.css";
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
@@ -180,7 +184,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 			"wp-block-{$block_name}",
 			gutenberg_url( $style_path ),
 			array(),
-			filemtime( gutenberg_dir_path() . $style_path )
+			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
 
@@ -227,7 +231,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 					"wp-block-{$block_name}",
 					gutenberg_url( $theme_style_path ),
 					array(),
-					filemtime( gutenberg_dir_path() . $theme_style_path )
+					$default_version
 				);
 				wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $theme_style_path );
 			}
@@ -240,7 +244,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 			"wp-block-{$block_name}-editor",
 			gutenberg_url( $editor_style_path ),
 			array(),
-			filemtime( gutenberg_dir_path() . $editor_style_path )
+			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}-editor", 'rtl', 'replace' );
 	} else {

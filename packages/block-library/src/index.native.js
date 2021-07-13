@@ -65,6 +65,8 @@ import * as socialLinks from './social-links';
 
 import { transformationCategory } from './transformationCategories';
 
+const ALLOWED_BLOCKS_GRADIENT_SUPPORT = [ 'core/button' ];
+
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
 	// in various contexts — like the inserter and auto-complete components.
@@ -127,10 +129,22 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
+	const { supports } = metadata;
+
 	registerBlockType(
 		{
 			name,
 			...metadata,
+			// Gradients support only available for blocks listed in ALLOWED_BLOCKS_GRADIENT_SUPPORT
+			...( ! ALLOWED_BLOCKS_GRADIENT_SUPPORT.includes( name ) &&
+			supports?.color?.gradients
+				? {
+						supports: {
+							...supports,
+							color: { ...supports.color, gradients: false },
+						},
+				  }
+				: {} ),
 		},
 		settings
 	);

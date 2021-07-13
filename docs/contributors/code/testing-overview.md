@@ -386,6 +386,8 @@ Contributors to Gutenberg will note that PRs include continuous integration E2E 
 
 End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
+### Using wp-env
+
 If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the e2e tests locally using this command:
 
 ```bash
@@ -416,11 +418,21 @@ You can additionally have the devtools automatically open for interactive debugg
 npm run test-e2e:watch -- --puppeteer-devtools
 ```
 
-If you're using a different setup, you can provide the base URL, username and password like this:
+### Using alternate enviornment
+
+If you're using a different setup than wp-env, you can provide the base URL, username and password like this:
 
 ```bash
 npm run test-e2e -- --wordpress-base-url=http://localhost:8888 --wordpress-username=admin --wordpress-password=password
 ```
+
+You also need to symlink all e2e test plugins to your site plugins directory:
+
+```bash
+ln -s gutenberg/packages/e2e-tests/plugins/* .
+```
+
+### Scenario Testing
 
 If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:
 
@@ -430,7 +442,7 @@ THROTTLE_CPU=4 npm run test-e2e
 
 `THROTTLE_CPU` is a slowdown factor (in this example, a 4x slowdown multiplier)
 
-Related: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
+See [Chrome docs: setCPUThrottlingRate](https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate)
 
 ```
 SLOW_NETWORK=true npm run test-e2e
@@ -438,7 +450,7 @@ SLOW_NETWORK=true npm run test-e2e
 
 `SLOW_NETWORK` emulates a network speed equivalent to "Fast 3G" in the Chrome devtools.
 
-Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions and https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274
+See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions) and [NetworkManager.js](https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274)
 
 ```
 OFFLINE=true npm run test-e2e
@@ -446,7 +458,7 @@ OFFLINE=true npm run test-e2e
 
 `OFFLINE` emulates network disconnection.
 
-Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions)
 
 ### Core Block Testing
 

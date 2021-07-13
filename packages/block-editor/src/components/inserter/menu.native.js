@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { LayoutAnimation, TouchableHighlight } from 'react-native';
+import {
+	AccessibilityInfo,
+	LayoutAnimation,
+	TouchableHighlight,
+	Platform,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -9,13 +14,16 @@ import { LayoutAnimation, TouchableHighlight } from 'react-native';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	SearchControl,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import InserterSearchResults from './search-results';
-import InserterSearchForm from './search-form';
 import { store as blockEditorStore } from '../../store';
 import InserterTabs from './tabs';
 import styles from './style.scss';
@@ -140,7 +148,19 @@ function InserterMenu( {
 
 	const onSelectItem = useCallback(
 		( item ) => {
-			onInsert( item );
+			// Avoid a focus loop, see https://github.com/WordPress/gutenberg/issues/30562
+			if ( Platform.OS === 'ios' ) {
+				AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
+					// In testing, the bug focus loop needed a longer timeout when VoiceOver was enabled
+					const timeout = enabled ? 200 : 100;
+					// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+					setTimeout( () => {
+						onInsert( item );
+					}, timeout );
+				} );
+			} else {
+				onInsert( item );
+			}
 			onSelect( item );
 		},
 		[ onInsert, onSelect ]
@@ -175,7 +195,7 @@ function InserterMenu( {
 			header={
 				<>
 					{ showSearchForm && (
-						<InserterSearchForm
+						<SearchControl
 							onChange={ onChangeSearch }
 							value={ filterValue }
 						/>

@@ -119,7 +119,7 @@ export default function VisualEditor( { styles } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
-		minHeight: '100%',
+		height: '100%',
 		width: '100%',
 		margin: 0,
 		display: 'flex',
@@ -137,6 +137,7 @@ export default function VisualEditor( { styles } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
 	const defaultLayout = useSetting( 'layout' );
 	const { contentSize, wideSize } = defaultLayout || {};
+	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode
 		? templateModeStyles
@@ -178,7 +179,7 @@ export default function VisualEditor( { styles } ) {
 		if ( themeSupportsLayout ) {
 			const alignments =
 				contentSize || wideSize
-					? [ 'wide', 'full' ]
+					? [ 'wide', 'full', 'left', 'center', 'right' ]
 					: [ 'left', 'center', 'right' ];
 			return {
 				type: 'default',
@@ -219,6 +220,7 @@ export default function VisualEditor( { styles } ) {
 					<motion.div
 						animate={ animatedStyles }
 						initial={ desktopCanvasStyles }
+						className={ previewMode }
 					>
 						<MaybeIframe
 							isTemplateMode={ isTemplateMode }

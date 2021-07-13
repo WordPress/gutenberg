@@ -4,6 +4,7 @@
 		"name": "core/columns",
 		"isValid": true,
 		"attributes": {
+			"isStackedOnMobile": true,
 			"backgroundColor": "secondary"
 		},
 		"innerBlocks": [

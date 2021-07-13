@@ -17,7 +17,6 @@ import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable } from './utils';
-import { CORE_DATA_STORE_NAME as coreDataStoreName } from './utils/constants';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -41,11 +40,7 @@ const EMPTY_ARRAY = [];
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
 	( select ) => ( state, url ) => {
-		return select( coreDataStoreName ).isResolving(
-			STORE_NAME,
-			'getEmbedPreview',
-			[ url ]
-		);
+		return select( STORE_NAME ).isResolving( 'getEmbedPreview', [ url ] );
 	}
 );
 
@@ -152,17 +147,18 @@ export function getEntityRecord( state, kind, name, key, query ) {
 	if ( ! queriedState ) {
 		return undefined;
 	}
+	const context = query?.context ?? 'default';
 
 	if ( query === undefined ) {
 		// If expecting a complete item, validate that completeness.
-		if ( ! queriedState.itemIsComplete[ key ] ) {
+		if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
 			return undefined;
 		}
 
-		return queriedState.items[ key ];
+		return queriedState.items[ context ][ key ];
 	}
 
-	const item = queriedState.items[ key ];
+	const item = queriedState.items[ context ]?.[ key ];
 	if ( item && query._fields ) {
 		const filteredItem = {};
 		const fields = getNormalizedCommaSeparable( query._fields );
@@ -316,6 +312,56 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 		} );
 
 		return dirtyRecords;
+	},
+	( state ) => [ state.entities.data ]
+);
+
+/**
+ * Returns the list of entities currently being saved.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {[{ title: string, key: string, name: string, kind: string }]} The list of records being saved.
+ */
+export const __experimentalGetEntitiesBeingSaved = createSelector(
+	( state ) => {
+		const {
+			entities: { data },
+		} = state;
+		const recordsBeingSaved = [];
+		Object.keys( data ).forEach( ( kind ) => {
+			Object.keys( data[ kind ] ).forEach( ( name ) => {
+				const primaryKeys = Object.keys(
+					data[ kind ][ name ].saving
+				).filter( ( primaryKey ) =>
+					isSavingEntityRecord( state, kind, name, primaryKey )
+				);
+
+				if ( primaryKeys.length ) {
+					const entity = getEntity( state, kind, name );
+					primaryKeys.forEach( ( primaryKey ) => {
+						const entityRecord = getEditedEntityRecord(
+							state,
+							kind,
+							name,
+							primaryKey
+						);
+						recordsBeingSaved.push( {
+							// We avoid using primaryKey because it's transformed into a string
+							// when it's used as an object key.
+							key:
+								entityRecord[
+									entity.key || DEFAULT_ENTITY_KEY
+								],
+							title: entity?.getTitle?.( entityRecord ) || '',
+							name,
+							kind,
+						} );
+					} );
+				}
+			} );
+		} );
+		return recordsBeingSaved;
 	},
 	( state ) => [ state.entities.data ]
 );

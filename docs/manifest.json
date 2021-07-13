@@ -876,6 +876,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Flyout",
+		"slug": "flyout",
+		"markdown_source": "../packages/components/src/flyout/flyout/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "FocalPointPicker",
 		"slug": "focal-point-picker",
 		"markdown_source": "../packages/components/src/focal-point-picker/README.md",
@@ -1137,6 +1143,12 @@
 		"title": "Scrollable",
 		"slug": "scrollable",
 		"markdown_source": "../packages/components/src/scrollable/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "SearchControl",
+		"slug": "search-control",
+		"markdown_source": "../packages/components/src/search-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1494,12 +1506,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/edit-navigation",
-		"slug": "packages-edit-navigation",
-		"markdown_source": "../packages/edit-navigation/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "../packages/edit-post/README.md",
@@ -1707,24 +1713,6 @@
 		"title": "@wordpress/react-i18n",
 		"slug": "packages-react-i18n",
 		"markdown_source": "../packages/react-i18n/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/react-native-aztec",
-		"slug": "packages-react-native-aztec",
-		"markdown_source": "../packages/react-native-aztec/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/react-native-bridge",
-		"slug": "packages-react-native-bridge",
-		"markdown_source": "../packages/react-native-bridge/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/react-native-editor",
-		"slug": "packages-react-native-editor",
-		"markdown_source": "../packages/react-native-editor/README.md",
 		"parent": "packages"
 	},
 	{

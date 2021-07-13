@@ -81,11 +81,14 @@ export default function PreferencesModal() {
 					<>
 						{ isLargeViewport && (
 							<Section
-								title={ __( 'Choose your own experience' ) }
+								title={ __( 'Publishing' ) }
+								description={ __(
+									'Change options related to publishing.'
+								) }
 							>
 								<EnablePublishSidebarOption
 									help={ __(
-										'Review settings such as categories and tags.'
+										'Review settings, such as visibility and tags.'
 									) }
 									label={ __(
 										'Include pre-publish checklist'
@@ -94,7 +97,12 @@ export default function PreferencesModal() {
 							</Section>
 						) }
 
-						<Section title={ __( 'Decide what to focus on' ) }>
+						<Section
+							title={ __( 'Appearance' ) }
+							description={ __(
+								'Customize options related to the block editor interface and editing flow.'
+							) }
+						>
 							<EnableFeature
 								featureName="reducedUI"
 								help={ __(
@@ -108,6 +116,18 @@ export default function PreferencesModal() {
 									'Highlights the current block and fades other content.'
 								) }
 								label={ __( 'Spotlight mode' ) }
+							/>
+							<EnableFeature
+								featureName="showIconLabels"
+								help={ __( 'Shows text instead of icons.' ) }
+								label={ __( 'Display button labels' ) }
+							/>
+							<EnableFeature
+								featureName="themeStyles"
+								help={ __(
+									'Make the editor look like your theme.'
+								) }
+								label={ __( 'Use theme styles' ) }
 							/>
 							{ showBlockBreadcrumbsOption && (
 								<EnableFeature
@@ -123,35 +143,14 @@ export default function PreferencesModal() {
 				),
 			},
 			{
-				name: 'appearance',
-				tabLabel: __( 'Appearance' ),
-				content: (
-					<Section title={ __( 'Choose the way it looks' ) }>
-						<EnableFeature
-							featureName="showIconLabels"
-							help={ __(
-								'Shows text instead of icons in toolbar.'
-							) }
-							label={ __( 'Display button labels' ) }
-						/>
-						<EnableFeature
-							featureName="themeStyles"
-							help={ __(
-								'Make the editor look like your theme.'
-							) }
-							label={ __( 'Use theme styles' ) }
-						/>
-					</Section>
-				),
-			},
-			{
 				name: 'blocks',
 				tabLabel: __( 'Blocks' ),
 				content: (
 					<>
 						<Section
-							title={ __(
-								'Choose how you interact with blocks'
+							title={ __( 'Block interactions' ) }
+							description={ __(
+								'Customize how you interact with blocks in the block library and editing canvas.'
 							) }
 						>
 							<EnableFeature
@@ -172,8 +171,9 @@ export default function PreferencesModal() {
 							/>
 						</Section>
 						<Section
-							title={ __(
-								'Manage visibility of blocks in the inserter'
+							title={ __( 'Visible blocks' ) }
+							description={ __(
+								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
 							) }
 						>
 							<BlockManager />

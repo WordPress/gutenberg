@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__experimentalBlockNavigationTree,
+	__experimentalListView as ListView,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -18,7 +18,7 @@ export default function BlockNavigationList( {
 	);
 
 	return (
-		<__experimentalBlockNavigationTree
+		<ListView
 			blocks={ blocks }
 			showAppender
 			showBlockMovers

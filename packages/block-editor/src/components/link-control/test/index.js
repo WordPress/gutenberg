@@ -227,6 +227,49 @@ describe( 'Basic rendering', () => {
 			expect( isEditing() ).toBe( false );
 		} );
 	} );
+
+	describe( 'Unlinking', () => {
+		it( 'should not show "Unlink" button if no onRemove handler is provided', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			const unLinkButton = queryByRole( container, 'button', {
+				name: 'Unlink',
+			} );
+
+			expect( unLinkButton ).toBeNull();
+			expect( unLinkButton ).not.toBeInTheDocument();
+		} );
+
+		it( 'should show "Unlink" button if a onRemove handler is provided', () => {
+			const mockOnRemove = jest.fn();
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						onRemove={ mockOnRemove }
+					/>,
+					container
+				);
+			} );
+
+			const unLinkButton = queryByRole( container, 'button', {
+				name: 'Unlink',
+			} );
+			expect( unLinkButton ).toBeTruthy();
+			expect( unLinkButton ).toBeInTheDocument();
+
+			act( () => {
+				Simulate.click( unLinkButton );
+			} );
+
+			expect( mockOnRemove ).toHaveBeenCalled();
+		} );
+	} );
 } );
 
 describe( 'Searching for a link', () => {
@@ -369,6 +412,31 @@ describe( 'Searching for a link', () => {
 		// the fetch handler in our test so we need to assert it would be called
 		// correctly in a real world scenario.
 		expect( mockFetchSuggestionsFirstArg ).toEqual( 'Hello' );
+	} );
+
+	it( 'should not call search handler when showSuggestions is false', async () => {
+		act( () => {
+			render( <LinkControl showSuggestions={ false } />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'anything' },
+			} );
+		} );
+
+		const searchResultElements = getSearchResults();
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		expect( searchResultElements ).toHaveLength( 0 );
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 	} );
 
 	it.each( [

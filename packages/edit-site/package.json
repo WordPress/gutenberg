@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "2.1.8",
+	"version": "2.1.14",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -40,6 +40,7 @@
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/interface": "file:../interface",
