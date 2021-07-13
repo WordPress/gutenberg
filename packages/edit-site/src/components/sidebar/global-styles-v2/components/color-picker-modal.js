@@ -2,15 +2,17 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	Card,
 	CardBody,
 	CardHeader,
-	CloseButton,
 	ColorPicker,
-	Heading,
-	HStack,
-	View,
+	__experimentalHeading as Heading,
+	__experimentalHStack as HStack,
+	__experimentalUseContextSystem as useContextSystem,
+	__experimentalView as View,
 } from '@wordpress/components';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,8 +22,16 @@ import { useAppState } from '../state';
 export function ColorPickerModal() {
 	const appState = useAppState();
 	const { showColorPicker, toggleShowColorPicker } = appState;
-	if ( ! showColorPicker ) return null;
 	const { colorPickerKey, get, set } = appState;
+	const buttonProps = {
+		onClick: toggleShowColorPicker,
+		size: 'small',
+	};
+	const { ...otherButtonProps } = useContextSystem(
+		buttonProps,
+		'CloseButton'
+	);
+	if ( ! showColorPicker ) return null;
 
 	const color = get( colorPickerKey );
 	const handleOnChange = ( next ) => set( colorPickerKey, next );
@@ -41,9 +51,11 @@ export function ColorPickerModal() {
 					<CardHeader>
 						<HStack>
 							<Heading size={ 5 }>Color</Heading>
-							<CloseButton
-								onClick={ toggleShowColorPicker }
-								size="small"
+							<Button
+								icon={ close }
+								iconSize={ 12 }
+								variant="tertiary"
+								{ ...otherButtonProps }
 							/>
 						</HStack>
 					</CardHeader>

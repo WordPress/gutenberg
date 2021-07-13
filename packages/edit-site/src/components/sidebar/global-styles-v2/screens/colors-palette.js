@@ -4,12 +4,12 @@
 import {
 	CardBody,
 	ColorCircle,
-	HStack,
+	__experimentalHStack as HStack,
 	ListGroup,
 	ListGroupHeader,
 	ListGroups,
 	SegmentedControl,
-	VStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 /**

@@ -33,7 +33,7 @@ const createPalette = ( { colors, title } ) => ( {
 	colors,
 } );
 
-const createElement = ( { title, ...rest } ) => ( {
+const createUiElement = ( { title, ...rest } ) => ( {
 	...rest,
 	id: uuid(),
 	title,
@@ -90,14 +90,14 @@ const initialState = {
 			} ),
 		],
 		elements: [
-			createElement( { title: 'Background', color: COLOR_MAIN } ),
-			createElement( { title: 'Text', color: COLOR_TEXT } ),
+			createUiElement( { title: 'Background', color: COLOR_MAIN } ),
+			createUiElement( { title: 'Text', color: COLOR_TEXT } ),
 		],
 	},
 	typography: {
 		fontFamily: 'Helvetica Neue',
 		elements: [
-			createElement( {
+			createUiElement( {
 				title: 'Headings',
 				styles: {
 					fontFamily: 'Helvetica Neue',
@@ -106,11 +106,11 @@ const initialState = {
 					lineHeight: 1.2,
 				},
 			} ),
-			createElement( {
+			createUiElement( {
 				title: 'Text',
 				styles: { fontFamily: 'Helvetica Neue', fontSize: '14px' },
 			} ),
-			createElement( {
+			createUiElement( {
 				title: 'Links',
 				styles: {
 					fontFamily: 'Helvetica Neue',
@@ -118,7 +118,7 @@ const initialState = {
 					textDecoration: 'underline',
 				},
 			} ),
-			createElement( {
+			createUiElement( {
 				title: 'Captions',
 				styles: { fontFamily: 'Helvetica Neue', fontSize: '11px' },
 			} ),

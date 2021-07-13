@@ -11,14 +11,13 @@ import {
 	Card,
 	CardBody,
 	CardHeader,
-	FormGroup,
 	Panel,
 	PanelBody,
 	PanelHeader,
-	Select,
+	SelectControl,
 	useNavigatorHistory,
 	useNavigatorLocation,
-	View,
+	__experimentalView as View,
 } from '@wordpress/components';
 
 /**
@@ -51,13 +50,13 @@ export const Inspector = () => {
 				<Card css={ { minWidth: 400 } } size="small">
 					<CardHeader size="small">Inspector</CardHeader>
 					<CardBody>
-						<FormGroup horizontal label="Go to">
-							<Select
-								onChange={ handleOnRouteChange }
-								options={ routes }
-								value={ currentPath }
-							/>
-						</FormGroup>
+						<SelectControl
+							onChange={ handleOnRouteChange }
+							options={ routes }
+							value={ currentPath }
+							label="Go to"
+							labelPosition="side"
+						/>
 					</CardBody>
 					<Panel>
 						<PanelHeader>State</PanelHeader>

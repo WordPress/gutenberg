@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { HStack, Spacer, View, VStack } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
+	__experimentalView as View,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies

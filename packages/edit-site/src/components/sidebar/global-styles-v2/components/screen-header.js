@@ -3,14 +3,14 @@
  */
 import {
 	Button,
-	Heading,
-	HStack,
+	__experimentalHeading as Heading,
+	__experimentalHStack as HStack,
 	Icon,
 	NavigatorLink,
-	Spacer,
-	Text,
-	View,
-	VStack,
+	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
+	__experimentalView as View,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { chevronLeft } from '@wordpress/icons';
 
@@ -24,8 +24,6 @@ export const ScreenHeader = ( { action, back, description, title } ) => {
 							icon={
 								<Icon icon={ chevronLeft } variant="muted" />
 							}
-							isControl
-							isSubtle
 							size="small"
 						/>
 					</NavigatorLink>

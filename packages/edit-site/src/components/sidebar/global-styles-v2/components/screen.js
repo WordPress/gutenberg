@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 /**
  * WordPress dependencies
  */
-import { Surface } from '@wordpress/components';
+import { __experimentalSurface as Surface } from '@wordpress/components';
 
 export const Screen = styled( Surface, { props: { variant: 'tertiary' } } )`
 	bottom: 0;

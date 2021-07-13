@@ -4,7 +4,7 @@
 import {
 	CardBody,
 	__experimentalItemGroup as ItemGroup,
-	Text,
+	__experimentalText as Text,
 } from '@wordpress/components';
 
 /**

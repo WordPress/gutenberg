@@ -6,7 +6,11 @@ import { startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { CardBody, useNavigatorParams, VStack } from '@wordpress/components';
+import {
+	CardBody,
+	useNavigatorParams,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies

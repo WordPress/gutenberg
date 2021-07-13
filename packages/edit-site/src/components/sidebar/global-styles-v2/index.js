@@ -3,12 +3,12 @@
  */
 import {
 	CardHeader,
-	ContextSystemProvider,
-	Heading,
+	__experimentalContextSystemProvider as ContextSystemProvider,
+	__experimentalHeading as Heading,
 	Navigator,
 	NavigatorScreen,
 	NavigatorScreens,
-	View,
+	__experimentalView as View,
 } from '@wordpress/components';
 
 /**
@@ -30,14 +30,6 @@ import {
 	TypographyScreen,
 } from './screens';
 import { AppProvider } from './state';
-
-/**
- * This is the "root" Component (or app) for Global Styles.
- */
-
-export default {
-	title: 'Examples/WIP/GlobalStylesSidebarV2',
-};
 
 /**
  * These are the "routes" that bind navigation paths with components for the
@@ -183,7 +175,7 @@ const App = () => {
  * Mounting for Storybook.
  */
 
-export const GlobalStylesSidebar = () => {
+export default () => {
 	return (
 		<Sidebar>
 			<App />

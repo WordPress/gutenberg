@@ -9,16 +9,15 @@ import { take } from 'lodash';
 import {
 	CardBody,
 	ColorCircle,
-	HStack,
+	__experimentalHStack as HStack,
 	__experimentalItemGroup as ItemGroup,
-	ListGroup,
-	ListGroupHeader,
-	ListGroups,
-	Spacer,
-	Text,
-	View,
-	VStack,
-	ZStack,
+	Panel,
+	PanelHeader,
+	__experimentalSpacer as Spacer,
+	__experimentalTest as Text,
+	__experimentalView as View,
+	__experimentalVStack as VStack,
+	__experimentalZStack as ZStack,
 } from '@wordpress/components';
 
 /**
@@ -33,8 +32,8 @@ const Palette = () => {
 	const colors = take( theme, 3 );
 
 	return (
-		<ListGroup>
-			<ListGroupHeader>Palette</ListGroupHeader>
+		<Panel>
+			<PanelHeader>Palette</PanelHeader>
 			<ItemGroup isBordered isSeparated>
 				<NavLink to="/colors/palette">
 					<HStack>
@@ -55,7 +54,7 @@ const Palette = () => {
 					</HStack>
 				</NavLink>
 			</ItemGroup>
-		</ListGroup>
+		</Panel>
 	);
 };
 
@@ -64,8 +63,8 @@ const Elements = () => {
 	const elements = get( 'color.elements' );
 
 	return (
-		<ListGroup>
-			<ListGroupHeader>Elements</ListGroupHeader>
+		<Panel>
+			<PanelHeader>Elements</PanelHeader>
 			<ItemGroup isBordered isSeparated>
 				{ elements.map( ( element ) => (
 					<NavLink
@@ -88,7 +87,7 @@ const Elements = () => {
 					</NavLink>
 				) ) }
 			</ItemGroup>
-		</ListGroup>
+		</Panel>
 	);
 };
 
@@ -104,10 +103,8 @@ export const ColorsScreen = () => {
 						}
 						title="Color"
 					/>
-					<ListGroups>
-						<Palette />
-						<Elements />
-					</ListGroups>
+					<Palette />
+					<Elements />
 				</VStack>
 			</CardBody>
 		</Screen>
