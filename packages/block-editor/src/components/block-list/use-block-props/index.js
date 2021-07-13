@@ -138,7 +138,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	] );
 
 	const blockEditContext = useBlockEditContext();
-	// Ensures it warns only inside the `edit` implemenation for the block.
+	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( ! lightBlockWrapper && clientId === blockEditContext.clientId ) {
 		warning(
 			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
