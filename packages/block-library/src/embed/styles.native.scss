@@ -20,11 +20,14 @@
 }
 
 .embed__icon {
-	width: 24px;
-	height: 24px;
-	justify-content: center;
-	align-items: center;
-	fill: $gray-dark;
+	fill: $light-secondary;
+}
+
+.embed__icon--dark {
+	fill: $dark-secondary;
+}
+
+.embed__icon--error {
 	margin-bottom: 6;
 }
 
@@ -34,22 +37,22 @@
 	margin-bottom: 4;
 	font-size: 14;
 	font-weight: 500;
-	color: #2e4453;
+	color: $gray-90;
 }
 
 .embed__label--dark {
-	color: $white;
+	color: $gray-10;
 }
 
 .embed__description {
 	font-size: $default-font-size;
 	text-align: center;
-	color: $light-primary;
 	margin-bottom: 4;
+	color: $light-secondary;
 }
 
 .embed__description--dark {
-	color: $dark-primary;
+	color: $dark-secondary;
 }
 
 .embed__action {

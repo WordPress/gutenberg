@@ -8,6 +8,7 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -38,6 +39,10 @@ const EmbedPlaceholder = ( {
 		styles.embed__action,
 		styles[ 'embed__action--dark' ]
 	);
+	const embedIconStyle = usePreferredColorSchemeStyle(
+		styles.embed__icon,
+		styles[ 'embed__icon--dark' ]
+	);
 
 	return (
 		<>
@@ -50,9 +55,11 @@ const EmbedPlaceholder = ( {
 				<View style={ containerStyle }>
 					{ cannotEmbed ? (
 						<>
-							<View style={ styles.embed__icon }>
-								{ noticeOutline }
-							</View>
+							<Icon
+								icon={ noticeOutline }
+								fill={ embedIconStyle.fill }
+								style={ styles[ 'embed__icon--error' ] }
+							/>
 							<Text style={ descriptionStyle }>
 								{ __( 'Unable to embed media' ) }
 							</Text>
@@ -62,7 +69,7 @@ const EmbedPlaceholder = ( {
 						</>
 					) : (
 						<>
-							<View style={ styles.embed__icon }>{ icon }</View>
+							<Icon icon={ icon } fill={ embedIconStyle.fill } />
 							<Text style={ labelStyle }>{ label }</Text>
 							<Text style={ actionStyle }>
 								{ __( 'ADD LINK' ) }
