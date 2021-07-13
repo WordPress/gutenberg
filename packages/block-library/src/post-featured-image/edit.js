@@ -8,8 +8,6 @@ import {
 	ToggleControl,
 	PanelBody,
 	withNotices,
-	BaseControl,
-	__experimentalSegmentedControl as SegmentedControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -21,22 +19,7 @@ import {
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage } from '@wordpress/icons';
-function Example() {
-	return (
-		<SegmentedControl
-			label="my label"
-			value="vertical"
-			onChange={ ( value ) => {
-				// eslint-disable-next-line no-console
-				console.log( value );
-			} }
-			isBlock
-		>
-			<SegmentedControl.Option value="horizontal" label="horizontal" />
-			<SegmentedControl.Option value="vertical" label="vertical" />
-		</SegmentedControl>
-	);
-}
+
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const placeholderChip = (
 	<div className="post-featured-image_placeholder">
@@ -111,9 +94,6 @@ function PostFeaturedImageDisplay( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
-					<BaseControl>
-						<Example />
-					</BaseControl>
 					<ToggleControl
 						label={ sprintf(
 							// translators: %s: Name of the post type e.g: "post".
