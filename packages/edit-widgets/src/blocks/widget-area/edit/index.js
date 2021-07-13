@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
@@ -14,7 +9,6 @@ import {
 	Panel,
 	PanelBody,
 } from '@wordpress/components';
-import { cleanForSlug } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -30,11 +24,6 @@ export default function WidgetAreaEdit( {
 	className,
 	attributes: { id, name },
 } ) {
-	const areaClassName = classnames(
-		className,
-		'widget-area',
-		cleanForSlug( name )
-	);
 	const isOpen = useSelect(
 		( select ) =>
 			select( editWidgetsStore ).getIsWidgetAreaOpen( clientId ),
@@ -66,7 +55,7 @@ export default function WidgetAreaEdit( {
 	}, [ isOpen, isDragging, isDraggingWithin, openedWhileDragging ] );
 
 	return (
-		<Panel className={ areaClassName } ref={ wrapper }>
+		<Panel className={ className } ref={ wrapper }>
 			<PanelBody
 				title={ name }
 				opened={ isOpen }
@@ -89,7 +78,7 @@ export default function WidgetAreaEdit( {
 							type="postType"
 							id={ `widget-area-${ id }` }
 						>
-							<WidgetAreaInnerBlocks />
+							<WidgetAreaInnerBlocks id={ id } />
 						</EntityProvider>
 					</DisclosureContent>
 				) }

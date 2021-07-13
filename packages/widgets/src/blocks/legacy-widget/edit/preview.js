@@ -7,12 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { addQueryArgs, cleanForSlug } from '@wordpress/url';
+import { addQueryArgs } from '@wordpress/url';
 import { useState } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function Preview( { idBase, instance, isVisible, name } ) {
+export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
@@ -77,8 +77,8 @@ export default function Preview( { idBase, instance, isVisible, name } ) {
 				</Placeholder>
 			) }
 			<div
+				data-widget-preview-id={ idBase }
 				className={ classnames(
-					cleanForSlug( 'widget_' + name ),
 					'wp-block-legacy-widget__edit-preview',
 					{
 						'is-offscreen': ! isVisible || ! isLoaded,
