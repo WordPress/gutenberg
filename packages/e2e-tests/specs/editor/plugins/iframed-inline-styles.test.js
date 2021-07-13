@@ -12,13 +12,13 @@ import {
 	canvas,
 } from '@wordpress/e2e-test-utils';
 
-async function getPadding( context ) {
-	return await context.evaluate( () => {
+async function getComputedStyle( context, property ) {
+	return await context.evaluate( ( prop ) => {
 		const container = document.querySelector(
 			'.wp-block-test-iframed-inline-styles'
 		);
-		return window.getComputedStyle( container ).padding;
-	} );
+		return window.getComputedStyle( container )[ prop ];
+	}, property );
 }
 
 describe( 'iframed inline styles', () => {
@@ -35,7 +35,8 @@ describe( 'iframed inline styles', () => {
 		await insertBlock( 'Iframed Inline Styles' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-		expect( await getPadding( page ) ).toBe( '20px' );
+		expect( await getComputedStyle( page, 'padding' ) ).toBe( '20px' );
+		expect( await getComputedStyle( page, 'border-width' ) ).toBe( '2px' );
 
 		await openDocumentSettingsSidebar();
 		await clickButton( 'Page' );
@@ -50,6 +51,19 @@ describe( 'iframed inline styles', () => {
 			'.wp-block-test-iframed-inline-styles'
 		);
 
-		expect( await getPadding( canvas() ) ).toBe( '20px' );
+		// Inline styles of properly enqueued stylesheet should load.
+		expect( await getComputedStyle( canvas(), 'padding' ) ).toBe( '20px' );
+
+		// Inline styles of stylesheet loaded with the compatibility layer
+		// should load.
+		expect( await getComputedStyle( canvas(), 'border-width' ) ).toBe(
+			'2px'
+		);
+
+		expect( console ).toHaveErrored(
+			`Stylesheet iframed-inline-styles-compat-style-css was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles). <link rel="stylesheet" id="iframed-inline-styles-compat-style-css" href="http://localhost:8889/wp-content/plugins/gutenberg-test-plugins/iframed-inline-styles/compat-style.css?ver=1626189899" media="all">`
+		);
 	} );
 } );

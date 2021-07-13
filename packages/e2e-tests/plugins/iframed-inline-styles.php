@@ -33,7 +33,20 @@ add_action(
 			array(),
 			filemtime( plugin_dir_path( __FILE__ ) . 'iframed-inline-styles/style.css' )
 		);
-		wp_add_inline_style( 'iframed-inline-styles-style', '.wp-block-test-iframed-inline-styles{padding: 20px}' );
+		wp_add_inline_style( 'iframed-inline-styles-style', '.wp-block-test-iframed-inline-styles{padding:20px}' );
 		register_block_type_from_metadata( __DIR__ . '/iframed-inline-styles' );
+	}
+);
+
+add_action(
+	'enqueue_block_editor_assets',
+	function() {
+		wp_enqueue_style(
+			'iframed-inline-styles-compat-style',
+			plugin_dir_url( __FILE__ ) . 'iframed-inline-styles/compat-style.css',
+			array(),
+			filemtime( plugin_dir_path( __FILE__ ) . 'iframed-inline-styles/compat-style.css' )
+		);
+		wp_add_inline_style( 'iframed-inline-styles-compat-style', '.wp-block-test-iframed-inline-styles{border-width:2px}' );
 	}
 );
