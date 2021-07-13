@@ -87,26 +87,3 @@ function register_block_core_post_template() {
 	);
 }
 add_action( 'init', 'register_block_core_post_template' );
-
-/**
- * Renders the legacy `core/query-loop` block on the server.
- * It triggers a developer warning and then calls the renamed
- * block's `render_callback` function output.
- *
- * @since 5.8.0
- * @access private
- *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
- *
- * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
- */
-function wp_render_legacy_query_loop_block( $attributes, $content, $block ) {
-	trigger_error(
-		/* translators: %1$s: Block type */
-		sprintf( __( 'Block %1$s has been renamed to Post Template. %1$s will be supported until WordPress version 5.9.' ), $block->name ),
-		headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
-	);
-	return render_block_core_post_template( $attributes, $content, $block );
-}
