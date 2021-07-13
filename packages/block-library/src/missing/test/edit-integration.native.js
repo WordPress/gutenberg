@@ -1,20 +1,13 @@
 /**
  * External dependencies
  */
-import { initializeEditor } from 'test/helpers';
+import { initializeEditor, fireEvent, waitFor, within } from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
 import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
-import * as i18n from '@wordpress/i18n';
-jest.mock( '@wordpress/i18n', () => {
-	const actual = jest.requireActual( '@wordpress/i18n' );
-	return {
-		...actual,
-		_x: jest.fn( actual._x ),
-	};
-} );
+import { setLocaleData } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,11 +15,20 @@ jest.mock( '@wordpress/i18n', () => {
 import { registerCoreBlocks } from '../..';
 
 beforeAll( () => {
+	// Mock translations
+	setLocaleData( {
+		'block title\u0004Table': [ 'Tabla' ],
+		"'%s' is not fully-supported": [ '«%s» no es totalmente compatible' ],
+	} );
+
 	// Register all core blocks
 	registerCoreBlocks();
 } );
 
 afterAll( () => {
+	// Clean up translations
+	setLocaleData( {} );
+
 	// Clean up registered blocks
 	getBlockTypes().forEach( ( block ) => {
 		unregisterBlockType( block.name );
@@ -34,17 +36,49 @@ afterAll( () => {
 } );
 
 describe( 'Unsupported block', () => {
-	it( 'requests translated block title', async () => {
+	it( 'requests translated block title in block placeholder', async () => {
 		const initialHtml = `<!-- wp:table -->
-		 <figure class="wp-block-table"><table><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table></figure>
-		 <!-- /wp:table -->`;
-		await initializeEditor( {
+			 <figure class="wp-block-table"><table><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table></figure>
+			 <!-- /wp:table -->`;
+		const { getByA11yLabel } = await initializeEditor( {
 			initialHtml,
 		} );
 
-		// jest spy for the _x translation function
-		const _xSpy = jest.spyOn( i18n, '_x' );
+		const missingBlock = await waitFor( () =>
+			getByA11yLabel( /Unsupported Block\. Row 1/ )
+		);
 
-		expect( _xSpy ).toHaveBeenCalled();
+		const translatedTableTitle = within( missingBlock ).getByText(
+			'Tabla'
+		);
+
+		expect( translatedTableTitle ).toBeDefined();
+	} );
+
+	it( 'requests translated block title in bottom sheet', async () => {
+		const initialHtml = `<!-- wp:table -->
+		 <figure class="wp-block-table"><table><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table></figure>
+		 <!-- /wp:table -->`;
+		const { getByA11yLabel, getByText } = await initializeEditor( {
+			initialHtml,
+		} );
+
+		const missingBlock = await waitFor( () =>
+			getByA11yLabel( /Unsupported Block\. Row 1/ )
+		);
+
+		fireEvent.press( missingBlock );
+
+		const helpButton = await waitFor( () =>
+			getByA11yLabel( /Help button/ )
+		);
+
+		fireEvent.press( helpButton );
+
+		const bottomSheetTitle = await waitFor( () =>
+			getByText( '«Tabla» no es totalmente compatible' )
+		);
+
+		expect( bottomSheetTitle ).toBeDefined();
 	} );
 } );
