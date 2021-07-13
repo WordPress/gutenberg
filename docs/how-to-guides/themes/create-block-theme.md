@@ -7,7 +7,7 @@ You will learn about the required files, how to combine templates and template p
 
 Full site editing is an experimental feature, and the workflow in this tutorial is likely to change.
 
-This tutorial is up to date with Gutenberg version 10.11.
+This tutorial is up to date with Gutenberg version 11.0.0.
 
 ## Table of Contents
 
