@@ -2,8 +2,6 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
-// eslint-disable-next-line no-restricted-imports
 import { Radio } from 'reakit';
 
 /**
@@ -16,6 +14,7 @@ import { memo } from '@wordpress/element';
  */
 import * as styles from './styles';
 import type { SegmentedControlButtonProps } from './types';
+import { useCx } from '../utils/hooks';
 
 const {
 	ButtonContentView,
@@ -34,6 +33,7 @@ function SegmentedControlButton( {
 	...props
 }: SegmentedControlButtonProps ) {
 	const isActive = props.state === value;
+	const cx = useCx();
 	const labelViewClasses = cx( isBlock && styles.labelBlock );
 	const classes = cx(
 		styles.buttonView,
@@ -63,6 +63,7 @@ function SegmentedControlButton( {
 
 const SegmentedControlSeparator = memo(
 	( { isActive }: { isActive: boolean } ) => {
+		const cx = useCx();
 		const classes = cx( isActive && styles.separatorActive );
 		return <SeparatorView aria-hidden className={ classes } />;
 	}

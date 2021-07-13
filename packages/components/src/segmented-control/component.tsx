@@ -2,8 +2,6 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
-// eslint-disable-next-line no-restricted-imports
 import { RadioGroup, useRadioState } from 'reakit';
 import useResizeAware from 'react-resize-aware';
 
@@ -24,11 +22,11 @@ import {
 } from '../ui/context';
 import { View } from '../view';
 import * as styles from './styles';
-import { useUpdateEffect } from '../utils/hooks';
+import { useUpdateEffect, useCx } from '../utils/hooks';
 import Backdrop from './segmented-control-backdrop';
 import Option from './segmented-control-option';
 import type { SegmentedControlProps } from './types';
-import RadioContext from './radio-context';
+import SegmentedControlContext from './segmented-control-context';
 
 const noop = () => {};
 
@@ -48,7 +46,7 @@ function SegmentedControl(
 		children,
 		...otherProps
 	} = useContextSystem( props, 'SegmentedControl' );
-
+	const cx = useCx();
 	const containerRef = useRef();
 	const [ resizeListener, sizes ] = useResizeAware();
 
@@ -80,7 +78,7 @@ function SegmentedControl(
 		[ className ]
 	);
 	return (
-		<RadioContext.Provider
+		<SegmentedControlContext.Provider
 			value={ { ...radio, isBlock: ! isAdaptiveWidth } }
 		>
 			<RadioGroup
@@ -99,7 +97,7 @@ function SegmentedControl(
 				/>
 				{ children }
 			</RadioGroup>
-		</RadioContext.Provider>
+		</SegmentedControlContext.Provider>
 	);
 }
 

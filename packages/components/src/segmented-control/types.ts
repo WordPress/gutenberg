@@ -64,7 +64,7 @@ export type SegmentedControlProps = Omit<
 	children: ReactNode;
 };
 
-export type SegmentedControlRadioState = RadioStateReturn & {
+export type SegmentedControlContextProps = RadioStateReturn & {
 	/**
 	 * Renders `SegmentedControl` as a (CSS) block element.
 	 *

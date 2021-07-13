@@ -35,7 +35,7 @@ exports[`SegmentedControl should render correctly 1`] = `
   z-index: 1;
 }
 
-.emotion-3 {
+.emotion-2 {
   background: #1e1e1e;
   border-radius: 2px;
   box-shadow: transparent;
@@ -49,18 +49,12 @@ exports[`SegmentedControl should render correctly 1`] = `
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-  .emotion-3 {
+  .emotion-2 {
     transition-duration: 0ms;
   }
 }
 
-.emotion-5 {
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.emotion-6 {
+.emotion-4 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -68,9 +62,12 @@ exports[`SegmentedControl should render correctly 1`] = `
   max-width: 100%;
   min-width: 0;
   position: relative;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
 }
 
-.emotion-8 {
+.emotion-6 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -109,20 +106,20 @@ exports[`SegmentedControl should render correctly 1`] = `
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-  .emotion-8 {
+  .emotion-6 {
     transition-duration: 0ms;
   }
 }
 
-.emotion-8::-moz-focus-inner {
+.emotion-6::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-8:active {
+.emotion-6:active {
   background: #fff;
 }
 
-.emotion-9 {
+.emotion-7 {
   font-size: 13px;
   line-height: 1;
   position: absolute;
@@ -134,7 +131,7 @@ exports[`SegmentedControl should render correctly 1`] = `
   transform: translate( -50%, -50% );
 }
 
-.emotion-11 {
+.emotion-9 {
   font-size: 13px;
   font-weight: bold;
   height: 0;
@@ -142,11 +139,7 @@ exports[`SegmentedControl should render correctly 1`] = `
   visibility: hidden;
 }
 
-.emotion-13 {
-  background: transparent;
-}
-
-.emotion-14 {
+.emotion-11 {
   background: rgba(0, 0, 0, 0.1);
   height: calc( 100% - 4px - 4px );
   position: absolute;
@@ -155,17 +148,18 @@ exports[`SegmentedControl should render correctly 1`] = `
   -webkit-transition: background 200ms linear;
   transition: background 200ms linear;
   width: 1px;
+  background: transparent;
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-  .emotion-14 {
+  .emotion-11 {
     transition-duration: 0ms;
   }
 }
 
 <div
   aria-label="Test Segmented Control"
-  class="emotion-0 medium components-segmented-control emotion-1 emotion-2"
+  class="medium components-segmented-control emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="SegmentedControl"
   id="segmented"
@@ -179,18 +173,18 @@ exports[`SegmentedControl should render correctly 1`] = `
     tabindex="-1"
   />
   <div
-    class="emotion-3 emotion-4"
+    class="emotion-2 emotion-3"
     role="presentation"
     style="transform: translateX(0px); transition: none; width: 0px;"
   />
   <div
-    class="emotion-5 emotion-6 emotion-7"
+    class="emotion-4 emotion-5"
     data-active="false"
   >
     <button
       aria-checked="false"
       aria-label="R"
-      class="emotion-8 components-segmented-control-option"
+      class="emotion-6 components-segmented-control-option"
       data-value="rigas"
       data-wp-c16t="true"
       data-wp-component="SegmentedControlOption"
@@ -199,30 +193,30 @@ exports[`SegmentedControl should render correctly 1`] = `
       tabindex="0"
     >
       <div
-        class="emotion-9 emotion-10"
+        class="emotion-7 emotion-8"
       >
         R
       </div>
       <div
         aria-hidden="true"
-        class="emotion-11 emotion-12"
+        class="emotion-9 emotion-10"
       >
         R
       </div>
     </button>
     <div
       aria-hidden="true"
-      class="emotion-13 emotion-14 emotion-15"
+      class="emotion-11 emotion-12"
     />
   </div>
   <div
-    class="emotion-5 emotion-6 emotion-7"
+    class="emotion-4 emotion-5"
     data-active="false"
   >
     <button
       aria-checked="false"
       aria-label="J"
-      class="emotion-8 components-segmented-control-option"
+      class="emotion-6 components-segmented-control-option"
       data-value="jack"
       data-wp-c16t="true"
       data-wp-component="SegmentedControlOption"
@@ -231,20 +225,20 @@ exports[`SegmentedControl should render correctly 1`] = `
       tabindex="-1"
     >
       <div
-        class="emotion-9 emotion-10"
+        class="emotion-7 emotion-8"
       >
         J
       </div>
       <div
         aria-hidden="true"
-        class="emotion-11 emotion-12"
+        class="emotion-9 emotion-10"
       >
         J
       </div>
     </button>
     <div
       aria-hidden="true"
-      class="emotion-13 emotion-14 emotion-15"
+      class="emotion-11 emotion-12"
     />
   </div>
 </div>
