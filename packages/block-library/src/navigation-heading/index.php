@@ -133,7 +133,7 @@ function render_block_core_navigation_heading( $attributes, $content, $block ) {
 		)
 	);
 	$html               = '<li ' . $wrapper_attributes . '>' .
-		'<span class="wp-block-navigation-link__content">';
+		'<span class="wp-block-navigation-link__content" tabindex="0">';
 
 	// Start heading tag content.
 	// Wrap title with span to isolate it from submenu icon.

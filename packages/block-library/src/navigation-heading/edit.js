@@ -192,7 +192,10 @@ export default function NavigationHeadingEdit( {
 			</BlockControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
-				<span className="wp-block-navigation-link__content">
+				<span
+					className="wp-block-navigation-link__content"
+					tabIndex="0"
+				>
 					{ /* eslint-enable */ }
 					<RichText
 						ref={ ref }
