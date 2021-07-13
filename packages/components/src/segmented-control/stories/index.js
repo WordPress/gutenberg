@@ -1,18 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	alignCenter,
-	alignJustify,
-	alignLeft,
-	alignRight,
-} from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { Icon, __experimentalSpacer as Spacer } from '../../';
+import { __experimentalSpacer as Spacer } from '../../';
 import { SegmentedControl } from '../index';
 import { View } from '../../view';
 
@@ -21,30 +15,13 @@ export default {
 	title: 'Components/SegmentedControl',
 };
 
-const alignMapObject = {
-	left: alignLeft,
-	center: alignCenter,
-	right: alignRight,
-	justify: alignJustify,
-};
-const align = Object.entries( alignMapObject ).map( ( [ key, icon ] ) => (
-	<SegmentedControl.Option
-		key={ key }
-		value={ key }
-		label={
-			<Icon
-				icon={ icon }
-				size={ 14 }
-				style={ { fill: 'currentColor' } }
-			/>
-		}
-	/>
+const aligns = [ 'Left', 'Center', 'Right', 'Justify' ];
+const alignOptions = aligns.map( ( key ) => (
+	<SegmentedControl.Option key={ key } value={ key } label={ key } />
 ) );
 
 export const _default = () => {
-	const [ alignState, setAlignState ] = useState(
-		Object.keys( alignMapObject )[ 0 ]
-	);
+	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
 	const label = 'Segmented Control';
 
 	return (
@@ -56,17 +33,7 @@ export const _default = () => {
 					value={ alignState }
 					label={ label }
 				>
-					{ align }
-				</SegmentedControl>
-			</Spacer>
-			<Spacer>
-				<SegmentedControl
-					isBlock
-					onChange={ setAlignState }
-					value={ alignState }
-					label={ label }
-				>
-					{ align }
+					{ alignOptions }
 				</SegmentedControl>
 			</Spacer>
 			<Spacer>

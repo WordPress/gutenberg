@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { MutableRefObject, Ref, ReactNode } from 'react';
+import type { MutableRefObject, Ref, ReactNode, ReactText } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type { RadioStateReturn } from 'reakit';
 
@@ -20,7 +20,7 @@ import type { FormElementProps } from '../utils/types';
  * ```
  */
 export type SegmentedControlOption = {
-	value: string | number;
+	value: ReactText;
 	label: string;
 };
 
@@ -53,11 +53,11 @@ export type SegmentedControlProps = Omit<
 	/**
 	 * Callback when a segment is selected.
 	 */
-	onChange?: ( ...args: any ) => void;
+	onChange?: ( value: ReactText | undefined ) => void;
 	/**
 	 * The value of `SegmentedControl`
 	 */
-	value?: string | number;
+	value?: ReactText;
 	/**
 	 * React children
 	 */
@@ -84,7 +84,7 @@ export type SegmentedControlButtonProps = {
 	isBlock?: boolean;
 	label: string;
 	showSeparator?: boolean;
-	value?: string | number;
+	value?: ReactText;
 	state?: any;
 };
 

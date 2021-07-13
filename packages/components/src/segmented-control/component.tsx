@@ -11,7 +11,7 @@ import useResizeAware from 'react-resize-aware';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useMemo, createContext, useContext } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -26,15 +26,11 @@ import { View } from '../view';
 import * as styles from './styles';
 import { useUpdateEffect } from '../utils/hooks';
 import Backdrop from './segmented-control-backdrop';
-import Button from './segmented-control-button';
-import type {
-	SegmentedControlProps,
-	SegmentedControlOption,
-	SegmentedControlRadioState,
-} from './types';
+import Option from './segmented-control-option';
+import type { SegmentedControlProps } from './types';
+import RadioContext from './radio-context';
 
 const noop = () => {};
-const RadioContext = createContext( {} as SegmentedControlRadioState );
 
 function SegmentedControl(
 	props: PolymorphicComponentProps< SegmentedControlProps, 'input' >,
@@ -107,51 +103,10 @@ function SegmentedControl(
 	);
 }
 
-function getShowSeparator( radio: any, index: number ) {
-	const { currentId, items } = radio;
-	const isLast = index === items.length - 1;
-	const isActive = items[ index ]?.id === currentId;
-	const isNextActive = items[ index + 1 ]?.id === currentId;
-
-	let showSeparator = true;
-
-	if ( items.length < 3 ) {
-		showSeparator = false;
-	}
-
-	if ( isActive || isNextActive || isLast ) {
-		showSeparator = false;
-	}
-
-	return showSeparator;
-}
-
-function ControlOption(
-	props: PolymorphicComponentProps< SegmentedControlOption, 'input' >,
-	forwardedRef: import('react').Ref< any >
-) {
-	const radio = useContext( RadioContext );
-	const buttonProps = useContextSystem( props, 'SegmentedControlOption' );
-	const index = radio.items.findIndex(
-		( item: any ) => item.id === buttonProps.id
-	);
-	const showSeparator = getShowSeparator( radio, index );
-	return (
-		<Button
-			ref={ forwardedRef }
-			{ ...{ ...radio, ...buttonProps, showSeparator } }
-		/>
-	);
-}
-
 const ConnectedSegmentedControl: any = contextConnect(
 	SegmentedControl,
 	'SegmentedControl'
 );
-const ConnectedSegmentedControlOption = contextConnect(
-	ControlOption,
-	'SegmentedControlOption'
-);
-ConnectedSegmentedControl.Option = ConnectedSegmentedControlOption;
+ConnectedSegmentedControl.Option = Option;
 
 export default ConnectedSegmentedControl;
