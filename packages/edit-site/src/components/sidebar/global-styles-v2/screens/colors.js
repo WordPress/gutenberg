@@ -14,7 +14,7 @@ import {
 	Panel,
 	PanelHeader,
 	__experimentalSpacer as Spacer,
-	__experimentalTest as Text,
+	__experimentalText as Text,
 	__experimentalView as View,
 	__experimentalVStack as VStack,
 	__experimentalZStack as ZStack,

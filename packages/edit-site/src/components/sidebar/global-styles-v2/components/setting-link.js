@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem, NavigatorLink, Text } from '@wordpress/components';
+import {
+	MenuItem,
+	NavigatorLink,
+	__experimentalText as Text,
+} from '@wordpress/components';
 
 export const SettingLink = ( { prefix, title, to } ) => {
 	return (
