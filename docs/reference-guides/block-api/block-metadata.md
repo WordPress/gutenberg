@@ -14,6 +14,7 @@ Starting in WordPress 5.8 release, we encourage using the `block.json` metadata 
 	"icon": "star",
 	"description": "Shows warning, error or success notices…",
 	"keywords": [ "alert", "message" ],
+	"version": "1.0.3",
 	"textdomain": "my-plugin",
 	"attributes": {
 		"message": {
@@ -247,6 +248,20 @@ This is a short description for your block, which can be translated with our tra
 ```
 
 Sometimes a block could have aliases that help users discover it while searching. For example, an image block could also want to be discovered by photo. You can do so by providing an array of unlimited terms (which are translated).
+
+### Version
+
+-   Type: `string`
+-   Optional
+-   Localized: No
+-   Property: `version`
+-   Since: `5.8.0`
+
+```json
+{ "version": "1.0.3" }
+```
+
+The current version number of the block, such as 1.0 or 1.0.3. It's similar to how plugins are versioned. This field might be used with block assets to control cache invalidation.
 
 ### Text Domain
 
