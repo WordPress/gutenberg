@@ -39,7 +39,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: usedLayout,
+			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 		}
 	);
 
