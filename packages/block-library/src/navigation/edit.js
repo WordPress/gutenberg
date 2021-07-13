@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useMemo,
+	useRef,
+	Platform,
+} from '@wordpress/element';
 import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -15,6 +21,10 @@ import {
 	BlockControls,
 	useBlockProps,
 	store as blockEditorStore,
+	withColors,
+	PanelColorSettings,
+	ContrastChecker,
+	getColorClassName,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
@@ -43,6 +53,33 @@ const LAYOUT = {
 	alignments: [],
 };
 
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
+
+function detectColors( colorsDetectionElement, setColor, setBackground ) {
+	if ( ! colorsDetectionElement ) {
+		return;
+	}
+	setColor( getComputedStyle( colorsDetectionElement ).color );
+
+	let backgroundColorNode = colorsDetectionElement;
+	let backgroundColor = getComputedStyle( backgroundColorNode )
+		.backgroundColor;
+	while (
+		backgroundColor === 'rgba(0, 0, 0, 0)' &&
+		backgroundColorNode.parentNode &&
+		backgroundColorNode.parentNode.nodeType ===
+			backgroundColorNode.parentNode.ELEMENT_NODE
+	) {
+		backgroundColorNode = backgroundColorNode.parentNode;
+		backgroundColor = getComputedStyle( backgroundColorNode )
+			.backgroundColor;
+	}
+
+	setBackground( backgroundColor );
+}
+
 function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
@@ -53,8 +90,17 @@ function Navigation( {
 	isSelected,
 	updateInnerBlocks,
 	className,
+	backgroundColor,
+	setBackgroundColor,
+	textColor,
+	setTextColor,
+	overlayBackgroundColor,
+	setOverlayBackgroundColor,
+	overlayTextColor,
+	setOverlayTextColor,
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
+	hasColorSettings = true,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -65,12 +111,29 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
+	const navRef = useRef();
+
 	const blockProps = useBlockProps( {
+		ref: navRef,
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
 			'is-responsive': attributes.isResponsive,
+			'has-text-color': !! textColor.color || !! textColor?.class,
+			[ getColorClassName(
+				'color',
+				textColor?.slug
+			) ]: !! textColor?.slug,
+			'has-background': !! backgroundColor.color || backgroundColor.class,
+			[ getColorClassName(
+				'background-color',
+				backgroundColor?.slug
+			) ]: !! backgroundColor?.slug,
 		} ),
+		style: {
+			color: ! textColor?.slug && textColor?.color,
+			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
+		},
 	} );
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
@@ -102,6 +165,38 @@ function Navigation( {
 			placeholder,
 		}
 	);
+
+	// Turn on contrast checker for web only since it's not supported on mobile yet.
+	const enableContrastChecking = Platform.OS === 'web';
+
+	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
+	const [ detectedColor, setDetectedColor ] = useState();
+	const [
+		detectedOverlayBackgroundColor,
+		setDetectedOverlayBackgroundColor,
+	] = useState();
+	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+
+	useEffect( () => {
+		if ( ! enableContrastChecking ) {
+			return;
+		}
+		detectColors(
+			navRef.current,
+			setDetectedColor,
+			setDetectedBackgroundColor
+		);
+		const subMenuElement = navRef.current.querySelector(
+			'[data-type="core/navigation-link"] [data-type="core/navigation-link"]'
+		);
+		if ( subMenuElement ) {
+			detectColors(
+				subMenuElement,
+				setDetectedOverlayColor,
+				setDetectedOverlayBackgroundColor
+			);
+		}
+	} );
 
 	if ( isPlaceholderShown ) {
 		return (
@@ -166,6 +261,49 @@ function Navigation( {
 						/>
 					</PanelBody>
 				) }
+				{ hasColorSettings && (
+					<PanelColorSettings
+						title={ __( 'Color' ) }
+						initialOpen={ false }
+						colorSettings={ [
+							{
+								value: textColor.color,
+								onChange: setTextColor,
+								label: __( 'Text' ),
+							},
+							{
+								value: backgroundColor.color,
+								onChange: setBackgroundColor,
+								label: __( 'Background' ),
+							},
+							{
+								value: overlayTextColor.color,
+								onChange: setOverlayTextColor,
+								label: __( 'Overlay text' ),
+							},
+							{
+								value: overlayBackgroundColor.color,
+								onChange: setOverlayBackgroundColor,
+								label: __( 'Overlay background' ),
+							},
+						] }
+					>
+						{ enableContrastChecking && (
+							<>
+								<ContrastChecker
+									backgroundColor={ detectedBackgroundColor }
+									textColor={ detectedColor }
+								/>
+								<ContrastChecker
+									backgroundColor={
+										detectedOverlayBackgroundColor
+									}
+									textColor={ detectedOverlayColor }
+								/>
+							</>
+						) }
+					</PanelColorSettings>
+				) }
 			</InspectorControls>
 			<nav { ...blockProps }>
 				<ResponsiveWrapper
@@ -222,4 +360,10 @@ export default compose( [
 			},
 		};
 	} ),
+	withColors(
+		{ textColor: 'color' },
+		{ backgroundColor: 'color' },
+		{ overlayBackgroundColor: 'color' },
+		{ overlayTextColor: 'color' }
+	),
 ] )( Navigation );
