@@ -40,7 +40,7 @@ const PACKAGES_DIR = resolve( ROOT_DIR, 'packages' );
  */
 const DATA_DOCS_DIR = resolve(
 	ROOT_DIR,
-	'docs/designers-developers/developers/data'
+	'docs/reference-guides/data'
 );
 
 /**
