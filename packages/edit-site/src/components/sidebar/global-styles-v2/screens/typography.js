@@ -3,12 +3,12 @@
  */
 import {
 	CardBody,
-	HStack,
+	__experimentalHStack as HStack,
 	__experimentalItemGroup as ItemGroup,
-	Spacer,
-	Text,
-	View,
-	VStack,
+	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
+	__experimentalView as View,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 /**

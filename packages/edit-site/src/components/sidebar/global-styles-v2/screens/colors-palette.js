@@ -5,9 +5,8 @@ import {
 	CardBody,
 	ColorCircle,
 	__experimentalHStack as HStack,
-	ListGroup,
-	ListGroupHeader,
-	ListGroups,
+	Panel,
+	PanelHeader,
 	SegmentedControl,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -29,8 +28,8 @@ const Palette = ( { colors = [], title, index } ) => {
 	};
 
 	return (
-		<ListGroup>
-			<ListGroupHeader>{ title }</ListGroupHeader>
+		<Panel>
+			<PanelHeader>{ title }</PanelHeader>
 			<HStack alignment="left" wrap>
 				{ colors.map( ( color, colorIndex ) => (
 					<ColorCircle
@@ -40,22 +39,22 @@ const Palette = ( { colors = [], title, index } ) => {
 					/>
 				) ) }
 			</HStack>
-		</ListGroup>
+		</Panel>
 	);
 };
 
 const Palettes = () => {
 	const [ palettes ] = useAppState( 'color.palettes' );
 	return (
-		<ListGroups>
-			<ListGroup>
+		<>
+			<Panel>
 				<SegmentedControl
 					options={ [
 						{ value: 'solids', label: 'Solids' },
 						{ value: 'gradients', label: 'Gradients' },
 					] }
 				/>
-			</ListGroup>
+			</Panel>
 			{ palettes.map( ( palette, index ) => (
 				<Palette
 					key={ palette.id }
@@ -64,7 +63,7 @@ const Palettes = () => {
 					index={ index }
 				/>
 			) ) }
-		</ListGroups>
+		</>
 	);
 };
 

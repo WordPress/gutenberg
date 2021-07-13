@@ -15,14 +15,14 @@ import {
 	DropdownMenuItem,
 	DropdownTrigger,
 	FormGroup,
-	Grid,
+	__experimentalGrid as Grid,
 	ListGroup,
 	Select,
 	Slider,
 	TextInput,
 	UnitInput,
 	useNavigatorParams,
-	VStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
 	formatCapitalize,
