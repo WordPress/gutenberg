@@ -8,12 +8,12 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+import { noticeOutline } from '../../../components/src/mobile/gridicons';
 
 const EmbedPlaceholder = ( {
 	icon,
@@ -51,7 +51,7 @@ const EmbedPlaceholder = ( {
 					{ cannotEmbed ? (
 						<>
 							<View style={ styles.embed__icon }>
-								{ warning }
+								{ noticeOutline }
 							</View>
 							<Text style={ descriptionStyle }>
 								{ __( 'Unable to embed media' ) }
