@@ -243,7 +243,7 @@ class ButtonEdit extends Component {
 			...style,
 			border: {
 				...style?.border,
-				radius: newRadius,
+				radius: `${ newRadius }px`, // Store the value with the px value so that it works as expected.
 			},
 		};
 
@@ -368,6 +368,16 @@ class ButtonEdit extends Component {
 		}
 	}
 
+	getBorderRadiusValue( borderRadius, defaultBorderRadius ) {
+		// Return an integer value for the border Radius.
+		// Since that is what the we expect that value to be.
+		if ( Number.isInteger( parseInt( borderRadius ) ) ) {
+			return parseInt( borderRadius );
+		}
+
+		return defaultBorderRadius;
+	}
+
 	render() {
 		const {
 			attributes,
@@ -395,10 +405,11 @@ class ButtonEdit extends Component {
 		}
 
 		const borderRadius = buttonStyle?.border?.radius;
+		const borderRadiusValue = this.getBorderRadiusValue(
+			borderRadius,
+			styles.defaultButton.borderRadius
+		);
 
-		const borderRadiusValue = Number.isInteger( borderRadius )
-			? borderRadius
-			: styles.defaultButton.borderRadius;
 		const outlineBorderRadius =
 			borderRadiusValue > 0
 				? borderRadiusValue + spacing + borderWidth
