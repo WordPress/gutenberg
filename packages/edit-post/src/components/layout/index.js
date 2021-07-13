@@ -247,31 +247,31 @@ function Layout( { styles } ) {
 					</>
 				}
 				footer={
-					<>
-						<EditorSnackbars />
-						{ ! hasReducedUI &&
-							showBlockBreadcrumbs &&
-							! isMobileViewport &&
-							isRichEditingEnabled &&
-							mode === 'visual' && (
-								<div className="edit-post-layout__footer">
-									<BlockBreadcrumb
-										rootLabelText={ documentLabel }
-									/>
-								</div>
-							) }
-					</>
+					! hasReducedUI &&
+					showBlockBreadcrumbs &&
+					! isMobileViewport &&
+					isRichEditingEnabled &&
+					mode === 'visual' && (
+						<div className="edit-post-layout__footer">
+							<BlockBreadcrumb rootLabelText={ documentLabel } />
+						</div>
+					)
 				}
 				actions={
-					<ActionsPanel
-						closeEntitiesSavedStates={ closeEntitiesSavedStates }
-						isEntitiesSavedStatesOpen={
-							entitiesSavedStatesCallback
-						}
-						setEntitiesSavedStatesCallback={
-							setEntitiesSavedStatesCallback
-						}
-					/>
+					<>
+						<EditorSnackbars />
+						<ActionsPanel
+							closeEntitiesSavedStates={
+								closeEntitiesSavedStates
+							}
+							isEntitiesSavedStatesOpen={
+								entitiesSavedStatesCallback
+							}
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+						/>
+					</>
 				}
 				shortcuts={ {
 					previous: previousShortcut,

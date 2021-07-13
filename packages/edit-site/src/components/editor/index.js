@@ -243,6 +243,7 @@ function Editor( { initialSettings } ) {
 										}
 										actions={
 											<>
+												<EditorSnackbars />
 												{ isEntitiesSavedStatesOpen ? (
 													<EntitiesSavedStates
 														close={
@@ -269,12 +270,7 @@ function Editor( { initialSettings } ) {
 												) }
 											</>
 										}
-										footer={
-											<>
-												<EditorSnackbars />
-												<BlockBreadcrumb />
-											</>
-										}
+										footer={ <BlockBreadcrumb /> }
 									/>
 									<Popover.Slot />
 									<PluginArea />
