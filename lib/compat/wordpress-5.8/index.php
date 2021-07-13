@@ -103,3 +103,42 @@ if ( ! function_exists( 'build_query_vars_from_query_block' ) ) {
 		return $query;
 	}
 }
+
+if ( ! function_exists( 'register_legacy_query_loop_block' ) ) {
+	/**
+	 * Complements the renaming of `Query Loop` to `Post Template`.
+	 * This ensures backwards compatibility for any users running the Gutenberg
+	 * plugin who have used Query Loop prior to its renaming.
+	 *
+	 * @see    https://github.com/WordPress/gutenberg/pull/32514
+	 * @since  5.8.0
+	 * @access private
+	 *
+	 */
+	function register_legacy_query_loop_block() {
+		$registry = WP_Block_Type_Registry::get_instance();
+		if ( $registry->is_registered( 'core/query-loop' ) ) {
+			unregister_block_type( 'core/query-loop' );
+		}
+		register_block_type( 'core/query-loop', array(
+				'category'          => 'design',
+				'uses_context'      => array(
+					'queryId',
+					'query',
+					'queryContext',
+					'displayLayout',
+					'templateSlug',
+				),
+				'supports'          => array(
+					'reusable' => false,
+					'html'     => false,
+					'align'    => true,
+				),
+				'style'             => 'wp-block-post-template',
+				'render_callback'   => 'wp_render_legacy_query_loop_block',
+				'skip_inner_blocks' => true,
+			) );
+	}
+
+	add_action( 'init', 'register_legacy_query_loop_block' );
+}
