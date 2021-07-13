@@ -82,7 +82,7 @@ Given the big scope of Gutenberg and the high number of pull requests merged in 
 
 #### 3. Drafting the release post
 
-Because of the nature of the release post content, responsibilities are divided in this step. While the post **can either be written by the release manager or delegated to another core member** agreed upon in advance, **visual assets are created by the design team**.
+Because of the nature of the release post content, responsibilities are divided in this step. While the post **can either be drafted by the release manager or delegated to another core member** agreed upon in advance, **visual assets are created by the design team**.
 
 When possible, the highlighted changes in the release post should include an animation (video or GIF) or a static image of them in use. Choosing between an animation or a static image will depend on the best way to showcase each highlight: while animations are better to demonstrate workflows, more direct highlights can be shown with an image; having too many video players adds a layer of friction for users to see the highlight, whereas too many simultaneous animated GIFs can distract and overwhelm the reader.
 
@@ -101,7 +101,7 @@ The performance values usually displayed in the release post are:
 
 #### 5. Publishing the post
 
-Once the post content is ready, a new draft on [make.wordpress.org/core](https://make.wordpress.org/core/) needs to be created; this post should be published after the actual release. Remember asking for peer review is encouraged by the [make/core posting guidelines](https://make.wordpress.org/core/handbook/best-practices/post-comment-guidelines/#peer-review)!
+Once the post content is ready, an author already having permissions to post in [make.wordpress.org/core](https://make.wordpress.org/core/) will create a new draft and import the content; this post should be published after the actual release, helping external media to echo and amplify the release news. Remember asking for peer review is encouraged by the [make/core posting guidelines](https://make.wordpress.org/core/handbook/best-practices/post-comment-guidelines/#peer-review)!
 
 ### Creating Release Candidate Patches (done via `git cherry-pick`)
 
