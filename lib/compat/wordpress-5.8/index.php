@@ -115,7 +115,7 @@ if ( ! function_exists( 'build_query_vars_from_query_block' ) ) {
  *
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
-function render_legacy_query_loop_block( $attributes, $content, $block ) {
+function gutenberg_render_legacy_query_loop_block( $attributes, $content, $block ) {
 	trigger_error(
 	/* translators: %1$s: Block type */
 		sprintf( __( 'Block %1$s has been renamed to Post Template. %1$s will be supported until WordPress version 5.9.' ), $block->name ),
@@ -124,7 +124,7 @@ function render_legacy_query_loop_block( $attributes, $content, $block ) {
 	return render_block_core_post_template( $attributes, $content, $block );
 }
 
-if ( ! function_exists( 'register_legacy_query_loop_block' ) ) {
+if ( ! function_exists( 'gutenberg_register_legacy_query_loop_block' ) ) {
 	/**
 	 * Complements the renaming of `Query Loop` to `Post Template`.
 	 * This ensures backwards compatibility for any users running the Gutenberg
@@ -132,7 +132,7 @@ if ( ! function_exists( 'register_legacy_query_loop_block' ) ) {
 	 *
 	 * @see    https://github.com/WordPress/gutenberg/pull/32514
 	 */
-	function register_legacy_query_loop_block() {
+	function gutenberg_register_legacy_query_loop_block() {
 		$registry = WP_Block_Type_Registry::get_instance();
 		if ( $registry->is_registered( 'core/query-loop' ) ) {
 			unregister_block_type( 'core/query-loop' );
@@ -154,11 +154,11 @@ if ( ! function_exists( 'register_legacy_query_loop_block' ) ) {
 					'align'    => true,
 				),
 				'style'             => 'wp-block-post-template',
-				'render_callback'   => 'render_legacy_query_loop_block',
+				'render_callback'   => 'gutenberg_render_legacy_query_loop_block',
 				'skip_inner_blocks' => true,
 			)
 		);
 	}
 
-	add_action( 'init', 'register_legacy_query_loop_block' );
+	add_action( 'init', 'gutenberg_register_legacy_query_loop_block' );
 }
