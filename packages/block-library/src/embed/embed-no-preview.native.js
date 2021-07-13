@@ -117,7 +117,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 					<View style={ styles.embed__icon }>{ icon }</View>
 					<Text style={ labelStyle }>{ label }</Text>
 					<Text style={ descriptionStyle }>
-						{ __( 'Inline preview coming soon' ) }
+						{ __( 'Embed previews not yet available' ) }
 					</Text>
 					<Text style={ styles.embed__action }>
 						{ previewButtonText.toUpperCase() }
