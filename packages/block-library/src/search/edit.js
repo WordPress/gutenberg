@@ -15,9 +15,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/block-editor';
 import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
+	ToolbarDropdownMenu,
 	ToolbarGroup,
 	Button,
 	ButtonGroup,
@@ -115,6 +113,42 @@ export default function SearchEdit( {
 		);
 	};
 
+	const buttonPositionControls = [
+		{
+			role: 'menuitemradio',
+			title: __( 'Button outside' ),
+			isActive: buttonPosition === 'button-outside',
+			icon: buttonOutside,
+			onClick: () => {
+				setAttributes( {
+					buttonPosition: 'button-outside',
+				} );
+			},
+		},
+		{
+			role: 'menuitemradio',
+			title: __( 'Button inside' ),
+			isActive: buttonPosition === 'button-inside',
+			icon: buttonInside,
+			onClick: () => {
+				setAttributes( {
+					buttonPosition: 'button-inside',
+				} );
+			},
+		},
+		{
+			role: 'menuitemradio',
+			title: __( 'No button' ),
+			isActive: buttonPosition === 'no-button',
+			icon: noButton,
+			onClick: () => {
+				setAttributes( {
+					buttonPosition: 'no-button',
+				} );
+			},
+		},
+	];
+
 	const getButtonPositionIcon = () => {
 		switch ( buttonPosition ) {
 			case 'button-inside':
@@ -201,49 +235,11 @@ export default function SearchEdit( {
 						} }
 						className={ showLabel ? 'is-pressed' : undefined }
 					/>
-					<DropdownMenu
+					<ToolbarDropdownMenu
 						icon={ getButtonPositionIcon() }
 						label={ __( 'Change button position' ) }
-					>
-						{ ( { onClose } ) => (
-							<MenuGroup className="wp-block-search__button-position-menu">
-								<MenuItem
-									icon={ noButton }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'no-button',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'No Button' ) }
-								</MenuItem>
-								<MenuItem
-									icon={ buttonOutside }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'button-outside',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Button Outside' ) }
-								</MenuItem>
-								<MenuItem
-									icon={ buttonInside }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'button-inside',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Button Inside' ) }
-								</MenuItem>
-							</MenuGroup>
-						) }
-					</DropdownMenu>
-
+						controls={ buttonPositionControls }
+					/>
 					{ 'no-button' !== buttonPosition && (
 						<ToolbarButton
 							title={ __( 'Use button with icon' ) }
