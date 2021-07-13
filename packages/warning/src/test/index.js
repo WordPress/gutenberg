@@ -9,9 +9,7 @@ const initialNodeEnv = process.env.NODE_ENV;
 describe( 'warning', () => {
 	afterEach( () => {
 		process.env.NODE_ENV = initialNodeEnv;
-		for ( const key in logged ) {
-			delete logged[ key ];
-		}
+		logged.clear();
 	} );
 
 	it( 'logs to console.warn when NODE_ENV is not "production"', () => {

@@ -11,6 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	__unstableGetBlockProps as getBlockProps,
 	getBlockType,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -23,6 +24,7 @@ import useMovingAnimation from '../../use-moving-animation';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
+import { useBlockEditContext } from '../../block-edit/context';
 import { useBlockClassNames } from './use-block-class-names';
 import { useBlockDefaultClassName } from './use-block-default-class-name';
 import { useBlockCustomClassName } from './use-block-custom-class-name';
@@ -66,11 +68,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		index,
 		mode,
 		name,
-		blockAPIVersion,
 		blockTitle,
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
+		lightBlockWrapper,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -92,11 +94,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			const blockName = getBlockName( clientId );
 			const rootClientId = getBlockRootClientId( clientId );
 			const blockType = getBlockType( blockName );
+
 			return {
 				index: getBlockIndex( clientId, rootClientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
-				blockAPIVersion: blockType.apiVersion,
 				blockTitle: blockType.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
@@ -104,6 +106,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+				lightBlockWrapper:
+					blockType.apiVersion > 1 ||
+					hasBlockSupport( blockType, 'lightBlockWrapper', false ),
 			};
 		},
 		[ clientId ]
@@ -132,7 +137,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		} ),
 	] );
 
-	if ( blockAPIVersion < 2 ) {
+	const blockEditContext = useBlockEditContext();
+	// Ensures it warns only inside the `edit` implementation for the block.
+	if ( ! lightBlockWrapper && clientId === blockEditContext.clientId ) {
 		warning(
 			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
 		);
