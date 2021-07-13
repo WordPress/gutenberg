@@ -66,11 +66,9 @@ export function isValueNumeric( value, locale ) {
 	const [ delimiterRegexp, decimalRegexp ] = getDelimiterAndDecimalRegex(
 		locale
 	);
-	console.log( delimiterRegexp, decimalRegexp );
 	const valueToCheck =
 		typeof value === 'string'
 			? value.replace( delimiterRegexp, '' ).replace( decimalRegexp, '.' )
 			: value;
-	console.log( valueToCheck );
 	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
 }
