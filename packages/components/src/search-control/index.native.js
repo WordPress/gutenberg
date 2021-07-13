@@ -26,10 +26,11 @@ import {
 /**
  * Internal dependencies
  */
-import baseStyles from './style.scss';
+import allStyles from './style.scss';
 import platformStyles from './platform-style.scss';
 
-// Merge platform specific styles
+// Merge platform specific styles with the default styles.
+const baseStyles = { ...allStyles };
 for ( const selector in platformStyles ) {
 	baseStyles[ selector ] = {
 		...baseStyles[ selector ],
