@@ -32,15 +32,9 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	 * result in showing only one `read more` link at a time.
 	 */
 	add_filter( 'excerpt_more', $filter_excerpt_more );
-
-	$filter_excerpt_length = function() use ( $attributes ) {
-		return isset( $attributes['wordCount'] ) ? $attributes['wordCount'] : 55;
-	};
-	add_filter( 'excerpt_length', $filter_excerpt_length );
-
 	$classes = '';
 	if ( isset( $attributes['textAlign'] ) ) {
-		$classes .= 'has-text-align-' . $attributes['textAlign'];
+		$classes .= "has-text-align-{$attributes['textAlign']}";
 	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
@@ -50,10 +44,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	} else {
 		$content .= " $more_text</p>";
 	}
-
-	remove_filter( 'excerpt_length', $filter_excerpt_length );
 	remove_filter( 'excerpt_more', $filter_excerpt_more );
-
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $content );
 }
 
