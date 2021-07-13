@@ -188,12 +188,10 @@ class RangeTextInput extends Component {
 		];
 
 		const valueFinalStyle = [
-			! isIOS
-				? inputBorderStyles
-				: {
-						...verticalBorderStyle,
-						...textInputStyle,
-				  },
+			Platform.select( {
+				android: inputBorderStyles,
+				ios: { ...verticalBorderStyle, color: textInputStyle.color },
+			} ),
 			{
 				width: 50 * fontScale,
 			},
