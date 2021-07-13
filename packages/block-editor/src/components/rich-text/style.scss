@@ -84,3 +84,12 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 		}
 	}
 }
+
+[data-rich-text-script] {
+	display: inline;
+
+	&::before {
+		content: "</>";
+		background: rgb(255, 255, 0);
+	}
+}
