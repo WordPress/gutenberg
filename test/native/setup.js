@@ -196,7 +196,7 @@ jest.mock( '@wordpress/compose', () => {
 		...jest.requireActual( '@wordpress/compose' ),
 		useViewportMatch: jest.fn(),
 		useResizeObserver: jest.fn( () => [
-			jest.fn(),
+			mockComponent( 'ResizeObserverMock' )( {} ),
 			{ width: 100, height: 100 },
 		] ),
 	};
