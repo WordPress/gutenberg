@@ -27,37 +27,25 @@ const alignMapObject = {
 	right: alignRight,
 	justify: alignJustify,
 };
-const align = Object.entries( alignMapObject ).map( ( [ key, icon ] ) => ( {
-	label: (
-		<Icon icon={ icon } size={ 14 } style={ { fill: 'currentColor' } } />
-	),
-	value: key,
-} ) );
+const align = Object.entries( alignMapObject ).map( ( [ key, icon ] ) => (
+	<SegmentedControl.Option
+		key={ key }
+		value={ key }
+		label={
+			<Icon
+				icon={ icon }
+				size={ 14 }
+				style={ { fill: 'currentColor' } }
+			/>
+		}
+	/>
+) );
 
 export const _default = () => {
-	const [ alignState, setAlignState ] = useState( align[ 0 ].value );
+	const [ alignState, setAlignState ] = useState(
+		Object.keys( alignMapObject )[ 0 ]
+	);
 	const label = 'Segmented Control';
-	const xy = [
-		{
-			label: 'Horizontal',
-			value: 'horizontal',
-		},
-		{
-			label: 'Vertical',
-			value: 'vertical',
-		},
-	];
-
-	const shortLong = [
-		{
-			label: 'Short',
-			value: 'short',
-		},
-		{
-			label: 'Looooooooooooong',
-			value: 'long',
-		},
-	];
 
 	return (
 		<View>
@@ -65,29 +53,42 @@ export const _default = () => {
 				<SegmentedControl
 					isBlock
 					onChange={ setAlignState }
-					options={ align }
 					value={ alignState }
 					label={ label }
-				/>
+				>
+					{ align }
+				</SegmentedControl>
 			</Spacer>
 			<Spacer>
 				<SegmentedControl
 					isBlock
 					onChange={ setAlignState }
-					options={ align }
 					value={ alignState }
 					label={ label }
-				/>
+				>
+					{ align }
+				</SegmentedControl>
 			</Spacer>
 			<Spacer>
-				<SegmentedControl options={ xy } label={ label } />
+				<SegmentedControl label={ label } value="horizontal">
+					<SegmentedControl.Option
+						value="horizontal"
+						label="Horizontal"
+					/>
+					<SegmentedControl.Option
+						value="vertical"
+						label="Vertical"
+					/>
+				</SegmentedControl>
 			</Spacer>
 			<Spacer>
-				<SegmentedControl
-					isAdaptiveWidth
-					options={ shortLong }
-					label={ label }
-				/>
+				<SegmentedControl isAdaptiveWidth label={ label } value="long">
+					<SegmentedControl.Option value="short" label="Short" />
+					<SegmentedControl.Option
+						value="long"
+						label="Looooooooooooong"
+					/>
+				</SegmentedControl>
 			</Spacer>
 		</View>
 	);

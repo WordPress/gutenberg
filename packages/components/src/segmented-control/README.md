@@ -4,7 +4,7 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`SegementedControl` is a form component that lets users choose options represented in horizontal segments.
+`SegementedControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `SegmentedControl.Option` component.
 
 ## Usage
 
@@ -14,19 +14,13 @@ import { __experimentalSegmentedControl as SegmentedControl } from '@wordpress/c
 function Example() {
 	return (
 		<SegmentedControl
-			label="My Segmented Control"
+			label="my label"
 			value="vertical"
-			options={ [
-				{
-					label: 'Horizontal',
-					value: 'horizontal',
-				},
-				{
-					label: 'Vertical',
-					value: 'vertical',
-				},
-			] }
-		/>
+			isBlock
+		>
+			<SegmentedControl.Option value="horizontal" label="horizontal" />
+			<SegmentedControl.Option value="vertical" label="vertical" />
+		</SegmentedControl>
 	);
 }
 ```
@@ -61,16 +55,6 @@ Determines if segments should be rendered with equal widths.
 -   Default: `false`
 
 Renders `SegmentedControl` as a (CSS) block element.
-
-### `options`
-
--   Type: `Array`
--   Required: No
-
-Options to render within `SegmentedControl`. An array of objects containing the following properties:
-
--   `label`: (string) The label to be shown to the user.
--   `value`: (string|number) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
 
 ### `onChange`
 
