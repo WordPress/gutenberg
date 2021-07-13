@@ -38,7 +38,7 @@ jobs:
               uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v.2.1.6
               with:
                   path: ${{ github.workspace }}/.jest-cache
-                  key: ${{ runner.os }}-jest-${{ hashFiles( packages/e2e-tests ) }}
+                  key: ${{ runner.os }}-jest-${{ hashFiles( 'packages/e2e-tests' ) }}
 
             - name: Npm install and build
               run: |
