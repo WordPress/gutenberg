@@ -10,6 +10,7 @@ WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/
 - Specification
     - version
     - settings
+        - Backward compatibility with add_theme_support
         - Presets
         - Custom
     - styles
@@ -266,6 +267,8 @@ The settings section has the following structure:
 ```
 
 {% end %}
+
+#### Backward compatibility with add_theme_support
 
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`. The settings declared at the top-level affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and configure all blocks at once.
 
