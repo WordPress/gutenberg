@@ -149,11 +149,10 @@ function Navigation( {
 			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: attributes.orientation || 'horizontal',
 			appender:
-				( isImmediateParentOfSelectedBlock &&
+				( ( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
-				isSelected
-					? undefined
-					: null,
+					isSelected ) &&
+				undefined,
 			__experimentalAppenderTagName: 'li',
 			__experimentalCaptureToolbars: true,
 			// Template lock set to false here so that the Nav

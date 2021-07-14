@@ -113,7 +113,7 @@ function ColumnEdit( {
 
 	const { width: columnWidth } = contentStyle[ clientId ];
 	const isFullWidth = columnWidth === screenWidth;
-	const appender = isSelected ? (
+	const appender = isSelected && (
 		<View
 			style={ [
 				styles.columnAppender,
@@ -126,7 +126,7 @@ function ColumnEdit( {
 		>
 			<InnerBlocks.ButtonBlockAppender />
 		</View>
-	) : null;
+	);
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (

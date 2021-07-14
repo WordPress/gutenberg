@@ -87,7 +87,7 @@ function GroupEdit( {
 		>
 			{ resizeObserver }
 			<InnerBlocks
-				appender={ isSelected ? appender : null }
+				appender={ isSelected && appender }
 				parentWidth={ width }
 				blockWidth={ blockWidth }
 			/>
