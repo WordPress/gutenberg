@@ -2,18 +2,18 @@
  * External dependencies
  */
 import { View, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheet } from '@wordpress/components';
-import { useNavigation } from '@react-navigation/native';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import { __ } from '@wordpress/i18n';
 
 const HelpDetailNavigationScreen = ( { name } ) => {
 	const navigation = useNavigation();
