@@ -220,7 +220,7 @@ exports[`SegmentedControl should render correctly 1`] = `
       data-value="jack"
       data-wp-c16t="true"
       data-wp-component="SegmentedControlOption"
-      id="segmented-2"
+      id="1"
       role="radio"
       tabindex="-1"
     >

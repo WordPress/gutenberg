@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -44,8 +45,12 @@ function SegmentedControlOption(
 	props: PolymorphicComponentProps< SegmentedControlOptionProps, 'input' >,
 	forwardedRef: import('react').Ref< any >
 ) {
+	const id = useInstanceId( SegmentedControlOption );
 	const segmentedControlContext = useSegmentedControlContext();
-	const buttonProps = useContextSystem( props, 'SegmentedControlOption' );
+	const buttonProps = useContextSystem(
+		{ ...props, id },
+		'SegmentedControlOption'
+	);
 	const index = segmentedControlContext.items.findIndex(
 		( item ) => item.id === buttonProps.id
 	);
