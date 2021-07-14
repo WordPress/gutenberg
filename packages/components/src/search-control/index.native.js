@@ -72,6 +72,7 @@ function SearchControl( {
 
 	const isDark = useColorScheme() === 'dark';
 	const inputRef = useRef();
+	const onCancelTimer = useRef();
 
 	const isIOS = Platform.OS === 'ios';
 
@@ -115,6 +116,13 @@ function SearchControl( {
 		setCurrentStyles( futureStyles );
 	}, [ isActive, isDark ] );
 
+	useEffect(
+		() => () => {
+			clearTimeout( onCancelTimer.current );
+		},
+		[]
+	);
+
 	const {
 		'search-control__container': containerStyle,
 		'search-control__inner-container': innerContainerStyle,
@@ -135,9 +143,11 @@ function SearchControl( {
 	}
 
 	function onCancel() {
-		inputRef.current.blur();
-		clearInput();
-		setIsActive( false );
+		onCancelTimer.current = setTimeout( () => {
+			inputRef.current.blur();
+			clearInput();
+			setIsActive( false );
+		}, 0 );
 	}
 
 	function renderLeftButton() {
