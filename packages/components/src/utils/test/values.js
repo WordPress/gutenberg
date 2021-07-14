@@ -27,6 +27,13 @@ function scopeTestToFullICU( testCallback ) {
 }
 
 describe( 'isValueNumeric', () => {
+	scopeTestToFullICU( () => {
+		it( 'should handle space separated numbers for various locales', () => {
+			expect( isValueNumeric( '1 000.1', 'en-US' ) ).toBe( true );
+			expect( isValueNumeric( '1 000.1', 'pt-BR' ) ).toBe( true );
+		} );
+	} );
+
 	it.each( [
 		'999',
 		'99.33',

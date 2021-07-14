@@ -55,6 +55,9 @@ const getDelimiterAndDecimalRegex = ( locale ) => {
 	];
 };
 
+// https://en.wikipedia.org/wiki/Decimal_separator#Current_standards
+const INTERNATIONAL_THOUSANDS_DELIMITER = / /g;
+
 /**
  * Checks to see if a value is a numeric value (`number` or `string`).
  *
@@ -68,7 +71,10 @@ export function isValueNumeric( value, locale ) {
 	);
 	const valueToCheck =
 		typeof value === 'string'
-			? value.replace( delimiterRegexp, '' ).replace( decimalRegexp, '.' )
+			? value
+					.replace( delimiterRegexp, '' )
+					.replace( decimalRegexp, '.' )
+					.replace( INTERNATIONAL_THOUSANDS_DELIMITER, '' )
 			: value;
 	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
 }
