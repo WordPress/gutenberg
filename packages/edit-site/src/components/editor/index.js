@@ -214,6 +214,7 @@ function Editor( { initialSettings } ) {
 												}
 											/>
 										}
+										notices={ <EditorSnackbars /> }
 										content={
 											<>
 												<EditorNotices />
@@ -243,7 +244,6 @@ function Editor( { initialSettings } ) {
 										}
 										actions={
 											<>
-												<EditorSnackbars />
 												{ isEntitiesSavedStatesOpen ? (
 													<EntitiesSavedStates
 														close={

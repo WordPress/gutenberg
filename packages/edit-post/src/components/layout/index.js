@@ -226,6 +226,7 @@ function Layout( { styles } ) {
 						</>
 					)
 				}
+				notices={ <EditorSnackbars /> }
 				content={
 					<>
 						<EditorNotices />
@@ -258,20 +259,15 @@ function Layout( { styles } ) {
 					)
 				}
 				actions={
-					<>
-						<EditorSnackbars />
-						<ActionsPanel
-							closeEntitiesSavedStates={
-								closeEntitiesSavedStates
-							}
-							isEntitiesSavedStatesOpen={
-								entitiesSavedStatesCallback
-							}
-							setEntitiesSavedStatesCallback={
-								setEntitiesSavedStatesCallback
-							}
-						/>
-					</>
+					<ActionsPanel
+						closeEntitiesSavedStates={ closeEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={
+							entitiesSavedStatesCallback
+						}
+						setEntitiesSavedStatesCallback={
+							setEntitiesSavedStatesCallback
+						}
+					/>
 				}
 				shortcuts={ {
 					previous: previousShortcut,
