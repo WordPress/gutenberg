@@ -144,8 +144,6 @@ class HierarchicalTermSelector extends Component {
 		this.setFilterValue = this.setFilterValue.bind( this );
 		this.state = {
 			loading: false,
-			availableTermsTree: [],
-			availableTerms: [],
 			adding: false,
 			formName: '',
 			formParent: '',
