@@ -25,7 +25,15 @@ import { store as coreStore } from '@wordpress/core-data';
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
 
-const sortBySelected = ( termsTree, terms ) => {
+/**
+ * Sort Terms by Selected.
+ *
+ * @param {Object[]} termsTree Array of terms in tree format.
+ * @param {number[]} terms     Selected terms.
+ *
+ * @return {Object[]} Sorted array of terms.
+ */
+function sortBySelected( termsTree, terms ) {
 	const treeHasSelection = ( termTree ) => {
 		if ( terms.indexOf( termTree.id ) !== -1 ) {
 			return true;
@@ -62,14 +70,72 @@ const sortBySelected = ( termsTree, terms ) => {
 	};
 	termsTree.sort( termOrChildIsSelected );
 	return termsTree;
-};
+}
+
+/**
+ * Find term by parent id or name.
+ *
+ * @param {Object[]}      terms  Array of Terms.
+ * @param {number|string} parent id.
+ * @param {string}        name   Term name.
+ * @return {Object} Term object.
+ */
+function findTerm( terms, parent, name ) {
+	return find( terms, ( term ) => {
+		return (
+			( ( ! term.parent && ! parent ) ||
+				parseInt( term.parent ) === parseInt( parent ) ) &&
+			term.name.toLowerCase() === name.toLowerCase()
+		);
+	} );
+}
+
+/**
+ * Get filter matcher function.
+ *
+ * @param {string} filterValue Filter value.
+ * @return {(function(Object): (Object|boolean))} Matcher function.
+ */
+function getFilterMatcher( filterValue ) {
+	const matchTermsForFilter = ( originalTerm ) => {
+		if ( '' === filterValue ) {
+			return originalTerm;
+		}
+
+		// Shallow clone, because we'll be filtering the term's children and
+		// don't want to modify the original term.
+		const term = { ...originalTerm };
+
+		// Map and filter the children, recursive so we deal with grandchildren
+		// and any deeper levels.
+		if ( term.children.length > 0 ) {
+			term.children = term.children
+				.map( matchTermsForFilter )
+				.filter( ( child ) => child );
+		}
+
+		// If the term's name contains the filterValue, or it has children
+		// (i.e. some child matched at some point in the tree) then return it.
+		if (
+			-1 !==
+				term.name.toLowerCase().indexOf( filterValue.toLowerCase() ) ||
+			term.children.length > 0
+		) {
+			return term;
+		}
+
+		// Otherwise, return false. After mapping, the list of terms will need
+		// to have false values filtered out.
+		return false;
+	};
+	return matchTermsForFilter;
+}
 
 const MIN_TERMS_COUNT_FOR_FILTER = 8;
 
 class HierarchicalTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
-		this.findTerm = this.findTerm.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onChangeFormName = this.onChangeFormName.bind( this );
 		this.onChangeFormParent = this.onChangeFormParent.bind( this );
@@ -114,16 +180,6 @@ class HierarchicalTermSelector extends Component {
 		} ) );
 	}
 
-	findTerm( terms, parent, name ) {
-		return find( terms, ( term ) => {
-			return (
-				( ( ! term.parent && ! parent ) ||
-					parseInt( term.parent ) === parseInt( parent ) ) &&
-				term.name.toLowerCase() === name.toLowerCase()
-			);
-		} );
-	}
-
 	async onAddTerm( event ) {
 		event.preventDefault();
 		const {
@@ -140,11 +196,7 @@ class HierarchicalTermSelector extends Component {
 		}
 
 		// check if the term we are adding already exists
-		const existingTerm = this.findTerm(
-			availableTerms,
-			formParent,
-			formName
-		);
+		const existingTerm = findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
 			// if the term we are adding exists but is not selected select it
 			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
@@ -190,7 +242,7 @@ class HierarchicalTermSelector extends Component {
 		const { availableTermsTree } = this.props;
 		const filterValue = event.target.value;
 		const filteredTermsTree = availableTermsTree
-			.map( this.getFilterMatcher( filterValue ) )
+			.map( getFilterMatcher( filterValue ) )
 			.filter( ( term ) => term );
 		const getResultCount = ( terms ) => {
 			let count = 0;
@@ -214,43 +266,6 @@ class HierarchicalTermSelector extends Component {
 			resultCount
 		);
 		this.props.debouncedSpeak( resultsFoundMessage, 'assertive' );
-	}
-
-	getFilterMatcher( filterValue ) {
-		const matchTermsForFilter = ( originalTerm ) => {
-			if ( '' === filterValue ) {
-				return originalTerm;
-			}
-
-			// Shallow clone, because we'll be filtering the term's children and
-			// don't want to modify the original term.
-			const term = { ...originalTerm };
-
-			// Map and filter the children, recursive so we deal with grandchildren
-			// and any deeper levels.
-			if ( term.children.length > 0 ) {
-				term.children = term.children
-					.map( matchTermsForFilter )
-					.filter( ( child ) => child );
-			}
-
-			// If the term's name contains the filterValue, or it has children
-			// (i.e. some child matched at some point in the tree) then return it.
-			if (
-				-1 !==
-					term.name
-						.toLowerCase()
-						.indexOf( filterValue.toLowerCase() ) ||
-				term.children.length > 0
-			) {
-				return term;
-			}
-
-			// Otherwise, return false. After mapping, the list of terms will need
-			// to have false values filtered out.
-			return false;
-		};
-		return matchTermsForFilter;
 	}
 
 	renderTerms( renderedTerms ) {
