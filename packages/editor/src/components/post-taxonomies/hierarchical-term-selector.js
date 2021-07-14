@@ -229,8 +229,6 @@ function HierarchicalTermSelector( {
 		onUpdateTerms( [ ...terms, newTerm.id ], taxonomy.rest_base );
 	};
 
-
-
 	const setFilter = ( event ) => {
 		const value = event.target.value;
 		const newFilteredTermsTree = availableTermsTree
