@@ -7,7 +7,7 @@ import { COLORS } from './colors-values';
 const CONTROL_HEIGHT = '30px';
 const CONTROL_PADDING_X = '12px';
 
-export default {
+const CONFIG = {
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
@@ -66,4 +66,7 @@ export default {
 	transitionDurationFastest: '100ms',
 	transitionTimingFunction: 'cubic-bezier(0.08, 0.52, 0.52, 1)',
 	transitionTimingFunctionControl: 'cubic-bezier(0.12, 0.8, 0.32, 1)',
-};
+	circularBorderRadius: '99999px',
+} as const;
+
+export default CONFIG;
