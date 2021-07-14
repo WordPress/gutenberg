@@ -13,6 +13,7 @@ WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/
         - Backward compatibility with add_theme_support
         - Presets
         - Custom
+        - Setting examples
     - styles
         - Top-level
         - Block-level
@@ -494,7 +495,7 @@ body {
 
 Note that the name of the variable is created by adding `--` in between each nesting level and `camelCase` fields are transformed to `kebab-case`.
 
-#### Examples
+#### Settings examples
 
 - Enable custom colors only for the paragraph block:
 
