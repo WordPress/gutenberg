@@ -38,7 +38,6 @@ function UnitControl( {
 	units = CSS_UNITS,
 	unit,
 	getStylesFromColorScheme,
-	decimalNum,
 	...props
 } ) {
 	const pickerRef = useRef();
@@ -105,6 +104,11 @@ function UnitControl( {
 		[ anchorNodeRef?.current ]
 	);
 
+	const getDecimal = ( step ) => {
+		const stepToString = step;
+		return step === 1 ? 0 : stepToString.toString().length - 2;
+	};
+
 	const renderUnitPicker = useCallback( () => {
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
@@ -121,7 +125,7 @@ function UnitControl( {
 				) : null }
 			</View>
 		);
-	}, [ pickerRef, units, onUnitChange, getAnchor ] );
+	}, [ pickerRef, units, onUnitChange, getAnchor, renderUnitButton ] );
 
 	let step = props.step;
 
@@ -147,7 +151,7 @@ function UnitControl( {
 					step={ step }
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
-					decimalNum={ unit === 'px' ? 0 : decimalNum }
+					decimalNum={ getDecimal( step ) }
 					openUnitPicker={ onPickerPresent }
 					unitLabel={ parseA11yLabelForUnit( unit ) }
 					{ ...props }
@@ -165,7 +169,7 @@ function UnitControl( {
 					unit={ unit }
 					defaultValue={ initialControlValue }
 					separatorType={ separatorType }
-					decimalNum={ decimalNum }
+					decimalNum={ getDecimal( step ) }
 					openUnitPicker={ onPickerPresent }
 					unitLabel={ parseA11yLabelForUnit( unit ) }
 					{ ...props }
