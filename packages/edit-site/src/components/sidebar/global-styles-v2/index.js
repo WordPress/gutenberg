@@ -91,15 +91,15 @@ const Sidebar = ( { children } ) => {
 			} }
 		>
 			<View
-				css={ `
-					width: 280px;
-					position: absolute;
-					height: 100vh;
-					top: 0;
-					right: 0;
+				style={ {
+					width: '280px',
+					position: 'absolute',
+					height: '100vh',
+					top: 0,
+					right: 0,
 					/* @TODO: Update this to properly reflect the colorDivider color */
-					border-left: 1px solid #444;
-				` }
+					borderLeft: '1px solid #444',
+				} }
 			>
 				{ children }
 			</View>
@@ -141,17 +141,17 @@ const App = () => {
 				<DevOnlyComponents />
 				<GlobalStylesHeader />
 				<View
-					css={ {
+					style={ {
 						overflowY: 'auto',
 						height: 'calc(100vh - 50px)',
 					} }
 				>
 					<View>
 						<NavigatorScreens
-							css={ `
-								height: auto,
-								max-height: 100%;
-							` }
+							style={ {
+								height: 'auto',
+								maxHeight: '100%',
+							} }
 						>
 							{ screens.map( ( screen ) => (
 								<NavigatorScreen
