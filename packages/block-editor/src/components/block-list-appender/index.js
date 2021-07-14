@@ -38,14 +38,15 @@ function BlockListAppender( {
 
 	if (
 		isLocked ||
-		( appender !== undefined && ! appender ) ||
+		appender === null ||
+		appender === false ||
 		CustomAppender === false
 	) {
 		return null;
 	}
 
 	let blockAppender;
-	if ( appender !== undefined ) {
+	if ( appender ) {
 		blockAppender = appender;
 	} else if ( CustomAppender ) {
 		blockAppender = <CustomAppender />;
