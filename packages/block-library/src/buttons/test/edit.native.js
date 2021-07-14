@@ -72,8 +72,8 @@ describe( 'when a button is shown', () => {
 		fireEvent( radiusSlider, 'valueChange', '25' );
 
 		const expectedHtml = `<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"style":{"border":{"radius":25}}} -->
-<div class="wp-block-button"><a class="wp-block-button__link" href="">Hello</a></div>
+<div class="wp-block-buttons"><!-- wp:button {"style":{"border":{"radius":"25px"}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link" href="" style="border-radius:25px">Hello</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
