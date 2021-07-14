@@ -26,6 +26,16 @@ import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
 
 /**
+ * Module Constants
+ */
+const DEFAULT_QUERY = {
+	per_page: -1,
+	orderby: 'name',
+	order: 'asc',
+	context: 'view',
+};
+
+/**
  * Sort Terms by Selected.
  *
  * @param {Object[]} termsTree Array of terms in tree format.
@@ -405,8 +415,7 @@ export default compose( [
 		const taxonomySlug = slug ?? '';
 		const availableTerms =
 			getEntityRecords( 'taxonomy', taxonomySlug, {
-				per_page: -1,
-				context: 'view',
+				DEFAULT_QUERY,
 			} ) || [];
 		const terms = taxonomy
 			? select( editorStore ).getEditedPostAttribute( taxonomy.rest_base )
