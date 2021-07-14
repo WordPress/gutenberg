@@ -29,7 +29,7 @@ export const ScreenHeader = ( { action, back, description, title } ) => {
 					</NavigatorLink>
 				</View>
 				<Spacer>
-					<Heading size={ 5 }>{ title }</Heading>
+					<Heading level={ 5 }>{ title }</Heading>
 				</Spacer>
 				<View>{ action }</View>
 			</HStack>

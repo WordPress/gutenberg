@@ -50,7 +50,7 @@ export function ColorPickerModal() {
 				<Card>
 					<CardHeader>
 						<HStack>
-							<Heading size={ 5 }>Color</Heading>
+							<Heading level={ 5 }>Color</Heading>
 							<Button
 								icon={ close }
 								iconSize={ 12 }

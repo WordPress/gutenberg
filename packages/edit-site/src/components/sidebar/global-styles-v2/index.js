@@ -77,7 +77,7 @@ const screens = [
 const GlobalStylesHeader = () => {
 	return (
 		<CardHeader>
-			<Heading size={ 5 }>Global Styles</Heading>
+			<Heading level={ 5 }>Global Styles</Heading>
 		</CardHeader>
 	);
 };
