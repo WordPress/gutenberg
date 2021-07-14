@@ -1,14 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	get,
-	unescape as unescapeString,
-	without,
-	find,
-	some,
-	invoke,
-} from 'lodash';
+import { get, unescape as unescapeString, without, find, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,8 +17,6 @@ import {
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -71,16 +62,6 @@ const sortBySelected = ( termsTree, terms ) => {
 	};
 	termsTree.sort( termOrChildIsSelected );
 	return termsTree;
-};
-
-/**
- * Module Constants
- */
-const DEFAULT_QUERY = {
-	per_page: -1,
-	orderby: 'name',
-	order: 'asc',
-	_fields: 'id,name,parent',
 };
 
 const MIN_TERMS_COUNT_FOR_FILTER = 8;
@@ -143,10 +124,11 @@ class HierarchicalTermSelector extends Component {
 		} );
 	}
 
-	onAddTerm( event ) {
+	async onAddTerm( event ) {
 		event.preventDefault();
 		const {
 			onUpdateTerms,
+			addTerm,
 			taxonomy,
 			terms,
 			slug,
@@ -178,82 +160,30 @@ class HierarchicalTermSelector extends Component {
 			return;
 		}
 
-		this.setState( {
-			adding: true,
-		} );
-		this.addRequest = apiFetch( {
-			path: `/wp/v2/${ taxonomy.rest_base }`,
-			method: 'POST',
-			data: {
+		const newTerm = await addTerm(
+			{
 				name: formName,
 				parent: formParent ? formParent : undefined,
 			},
-		} );
-		// Tries to create a term or fetch it if it already exists
-		const findOrCreatePromise = this.addRequest.catch( ( error ) => {
-			const errorCode = error.code;
-			if ( errorCode === 'term_exists' ) {
-				// search the new category created since last fetch
-				this.addRequest = apiFetch( {
-					path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, {
-						...DEFAULT_QUERY,
-						parent: formParent || 0,
-						search: formName,
-					} ),
-				} );
-				return this.addRequest.then( ( searchResult ) => {
-					return this.findTerm( searchResult, formParent, formName );
-				} );
-			}
-			return Promise.reject( error );
-		} );
-		findOrCreatePromise.then(
-			( term ) => {
-				const hasTerm = !! find(
-					this.state.availableTerms,
-					( availableTerm ) => availableTerm.id === term.id
-				);
-				const newAvailableTerms = hasTerm
-					? this.state.availableTerms
-					: [ term, ...this.state.availableTerms ];
-				const termAddedMessage = sprintf(
-					/* translators: %s: taxonomy name */
-					_x( '%s added', 'term' ),
-					get(
-						this.props.taxonomy,
-						[ 'labels', 'singular_name' ],
-						slug === 'category' ? __( 'Category' ) : __( 'Term' )
-					)
-				);
-				this.props.speak( termAddedMessage, 'assertive' );
-				this.addRequest = null;
-				this.setState( {
-					adding: false,
-					formName: '',
-					formParent: '',
-					availableTerms: newAvailableTerms,
-					availableTermsTree: sortBySelected(
-						buildTermsTree( newAvailableTerms ),
-						newAvailableTerms
-					),
-				} );
-				onUpdateTerms( [ ...terms, term.id ], taxonomy.rest_base );
-			},
-			( xhr ) => {
-				if ( xhr.statusText === 'abort' ) {
-					return;
-				}
-				this.addRequest = null;
-				this.setState( {
-					adding: false,
-				} );
-			}
+			slug
 		);
-	}
 
-	componentWillUnmount() {
-		invoke( this.fetchRequest, [ 'abort' ] );
-		invoke( this.addRequest, [ 'abort' ] );
+		const termAddedMessage = sprintf(
+			/* translators: %s: taxonomy name */
+			_x( '%s added', 'term' ),
+			get(
+				this.props.taxonomy,
+				[ 'labels', 'singular_name' ],
+				slug === 'category' ? __( 'Category' ) : __( 'Term' )
+			)
+		);
+		this.props.speak( termAddedMessage, 'assertive' );
+		this.setState( {
+			adding: false,
+			formName: '',
+			formParent: '',
+		} );
+		onUpdateTerms( [ ...terms, newTerm.id ], taxonomy.rest_base );
 	}
 
 	setFilterValue( event ) {
@@ -502,7 +432,6 @@ export default compose( [
 				per_page: -1,
 				context: 'view',
 			} ) || [];
-
 		return {
 			hasCreateAction: taxonomy
 				? get(
@@ -534,6 +463,13 @@ export default compose( [
 	withDispatch( ( dispatch ) => ( {
 		onUpdateTerms( terms, restBase ) {
 			dispatch( editorStore ).editPost( { [ restBase ]: terms } );
+		},
+		addTerm( term, slug ) {
+			return dispatch( coreStore ).saveEntityRecord(
+				'taxonomy',
+				slug,
+				term
+			);
 		},
 	} ) ),
 	withSpokenMessages,
