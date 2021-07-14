@@ -77,7 +77,12 @@
 			"isRepeated": false,
 			"dimRatio": 50,
 			"backgroundType": "image",
-			"contentPosition": "bottom right"
+			"contentPosition": "bottom right",
+			"style": {
+				"ui": {
+					"duotoneHidden": true
+				}
+			}
 		},
 		"innerBlocks": [
 			{

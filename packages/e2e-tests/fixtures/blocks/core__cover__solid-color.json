@@ -8,7 +8,12 @@
 			"isRepeated": false,
 			"dimRatio": 50,
 			"overlayColor": "primary",
-			"backgroundType": "image"
+			"backgroundType": "image",
+			"style": {
+				"ui": {
+					"duotoneHidden": true
+				}
+			}
 		},
 		"innerBlocks": [
 			{
