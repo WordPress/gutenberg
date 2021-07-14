@@ -60,7 +60,7 @@ jobs:
               with:
                   name: ${{ github.sha }}-build
 
-            - run: unzip ${{ github.sha }}-build
+            - run: unzip ${{ github.sha }}-build.zip
 
             - name: Use desired version of NodeJS
               uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
