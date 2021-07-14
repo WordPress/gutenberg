@@ -96,7 +96,7 @@ class HierarchicalTermSelector extends Component {
 		this.onToggleForm = this.onToggleForm.bind( this );
 		this.setFilterValue = this.setFilterValue.bind( this );
 		this.state = {
-			loading: true,
+			loading: false,
 			availableTermsTree: [],
 			availableTerms: [],
 			adding: false,
