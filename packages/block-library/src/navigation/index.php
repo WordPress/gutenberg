@@ -264,12 +264,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			$is_list_open       = false;
 			$inner_blocks_html .= '</ul>';
 		}
-		if( 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name ) {
+		if ( 'core/site-title' === $inner_block->name || 'core/site-logo' === $inner_block->name ) {
 			$inner_blocks_html .= '<li>' . $inner_block->render() . '</li>';
 		} else {
 			$inner_blocks_html .= $inner_block->render();
 		}
-		
 	}
 
 	if ( $is_list_open ) {
