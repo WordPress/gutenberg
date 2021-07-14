@@ -54,8 +54,6 @@ function InterfaceSkeleton(
 		drawer: __( 'Drawer' ),
 		/* translators: accessibility text for the top bar landmark region. */
 		header: __( 'Header' ),
-		/* translators: accessibility text for the notices landmark region. */
-		notices: __( 'Notices' ),
 		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
 		/* translators: accessibility text for the secondary sidebar landmark region. */
@@ -112,12 +110,7 @@ function InterfaceSkeleton(
 						</div>
 					) }
 					{ !! notices && (
-						<div
-							className="interface-interface-skeleton__notices"
-							role="region"
-							aria-label={ mergedLabels.notices }
-							tabIndex="-1"
-						>
+						<div className="interface-interface-skeleton__notices">
 							{ notices }
 						</div>
 					) }
