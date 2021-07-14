@@ -3,17 +3,20 @@
  */
 import { useContextSystem, contextConnect } from '../ui/context';
 import { visuallyHidden } from './styles';
+import { View } from '../view';
 
 /**
  * @param {import('../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+ * @param {import('react').Ref<any>}                                                                          forwardedRef
  */
-function VisuallyHidden( props ) {
+function VisuallyHidden( props, forwardedRef ) {
 	const { style: styleProp, ...contextProps } = useContextSystem(
 		props,
 		'VisuallyHidden'
 	);
 	return (
-		<div
+		<View
+			ref={ forwardedRef }
 			{ ...contextProps }
 			style={ { ...visuallyHidden, ...( styleProp || {} ) } }
 		/>
