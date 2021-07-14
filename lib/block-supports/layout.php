@@ -25,11 +25,19 @@ function gutenberg_register_layout_support( $block_type ) {
 	}
 }
 
+/**
+ * Generates the CSS corresponding to the provided layout.
+ *
+ * @param string $selector CSS selector.
+ * @param array  $layout   Layout object.
+ *
+ * @return string CSS style.
+ */
 function gutenberg_get_layout_style( $selector, $layout ) {
 	$layout_type = isset( $layout['type'] ) ? $layout['type'] : 'default';
 
 	$style = '';
-	if ( $layout_type === 'default' ) {
+	if ( 'default' === $layout_type ) {
 		$content_size = isset( $layout['contentSize'] ) ? $layout['contentSize'] : null;
 		$wide_size    = isset( $layout['wideSize'] ) ? $layout['wideSize'] : null;
 
@@ -56,11 +64,11 @@ function gutenberg_get_layout_style( $selector, $layout ) {
 
 		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
 		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
-	} else if ( $layout_type === 'flex' ) {
+	} elseif ( 'flex' === $layout_type ) {
 		$style  = "$selector {";
-		$style .= "display: flex;";
-		$style .= "column-gap: 0.5em;";
-		$style .= "align-items: center;";
+		$style .= 'display: flex;';
+		$style .= 'column-gap: 0.5em;';
+		$style .= 'align-items: center;';
 		$style .= '}';
 	}
 
@@ -91,8 +99,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$used_layout = $default_layout;
 	}
 
-	$id           = uniqid();
-	$style = gutenberg_get_layout_style(".wp-container-$id", $used_layout);
+	$id    = uniqid();
+	$style = gutenberg_get_layout_style( ".wp-container-$id", $used_layout );
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
