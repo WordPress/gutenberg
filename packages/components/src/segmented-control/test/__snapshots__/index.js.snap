@@ -188,7 +188,7 @@ exports[`SegmentedControl should render correctly 1`] = `
       data-value="rigas"
       data-wp-c16t="true"
       data-wp-component="SegmentedControlOption"
-      id="segmented-1"
+      id="segmented-0"
       role="radio"
       tabindex="0"
     >
@@ -220,7 +220,7 @@ exports[`SegmentedControl should render correctly 1`] = `
       data-value="jack"
       data-wp-c16t="true"
       data-wp-component="SegmentedControlOption"
-      id="1"
+      id="segmented-1"
       role="radio"
       tabindex="-1"
     >

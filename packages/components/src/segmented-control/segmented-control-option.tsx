@@ -45,8 +45,11 @@ function SegmentedControlOption(
 	props: PolymorphicComponentProps< SegmentedControlOptionProps, 'input' >,
 	forwardedRef: import('react').Ref< any >
 ) {
-	const id = useInstanceId( SegmentedControlOption );
 	const segmentedControlContext = useSegmentedControlContext();
+	const id = useInstanceId(
+		SegmentedControlOption,
+		segmentedControlContext.baseId || 'segmented-control-option'
+	);
 	const buttonProps = useContextSystem(
 		{ ...props, id },
 		'SegmentedControlOption'
