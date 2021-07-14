@@ -31,7 +31,6 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
-		"@react-navigation/native": "5.7.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
