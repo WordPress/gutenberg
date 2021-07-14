@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	InnerBlocks,
@@ -13,8 +14,14 @@ const PatternEdit = ( { attributes, clientId } ) => {
 			attributes.slug
 		)
 	);
+
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-	replaceInnerBlocks( clientId, selectedPattern.blocks );
+	useEffect( () => {
+		if ( selectedPattern && selectedPattern.blocks ) {
+			replaceInnerBlocks( clientId, selectedPattern.blocks );
+		}
+	}, [ selectedPattern ] );
+
 	return <InnerBlocks />;
 };
 

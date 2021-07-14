@@ -5,7 +5,8 @@
 	"category": "text",
 	"description": "Show a block pattern.",
 	"supports": {
-		"html": false
+		"html": false,
+		"inserter": false
 	},
 	"textdomain": "default",
 	"attributes": {
