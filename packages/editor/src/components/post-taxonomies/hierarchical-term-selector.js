@@ -17,13 +17,13 @@ import {
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, useDebounce, useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
-import { speak } from '@wordpress/a11y';
 
 /**
  * Sort Terms by Selected.
