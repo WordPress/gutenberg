@@ -131,11 +131,11 @@ function ColumnsEditContainer( {
 		}
 	}, [ width, columnCount ] );
 
-	const appender = isSelected ? (
+	const appender = isSelected && (
 		<View style={ isFullWidth( align ) && styles.columnAppender }>
 			<InnerBlocks.ButtonBlockAppender onAddBlock={ onAddBlock } />
 		</View>
-	) : null;
+	);
 
 	const contentWidths = useMemo(
 		() =>
