@@ -16,7 +16,7 @@ import {
 	DropdownTrigger,
 	FormGroup,
 	__experimentalGrid as Grid,
-	ListGroup,
+	Panel,
 	Select,
 	Slider,
 	TextInput,
@@ -187,7 +187,7 @@ export const TypographyElementScreen = () => {
 			<CardBody>
 				<VStack spacing={ 8 }>
 					<Header title={ title } />
-					<ListGroup>
+					<Panel>
 						<RenderComponent prop={ getIsDefined( 'fontFamily' ) }>
 							<FormGroup label="Font">
 								<TextInput
@@ -278,7 +278,7 @@ export const TypographyElementScreen = () => {
 								</FormGroup>
 							</RenderComponent>
 						</Grid>
-					</ListGroup>
+					</Panel>
 				</VStack>
 			</CardBody>
 		</Screen>
