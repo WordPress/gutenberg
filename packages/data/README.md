@@ -913,7 +913,7 @@ _Returns_
 
 -   `WPComponent`: Enhanced component.
 
-### withSelect
+### useSelect
 
 Higher-order component used to inject state-derived props using registered
 selectors.
@@ -921,7 +921,7 @@ selectors.
 _Usage_
 
 ```js
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 function PriceDisplay( { price, currency } ) {
 	return new Intl.NumberFormat( 'en-US', {
@@ -930,7 +930,7 @@ function PriceDisplay( { price, currency } ) {
 	} ).format( price );
 }
 
-const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
+const HammerPriceDisplay = useSelect( ( select, ownProps ) => {
 	const { getPrice } = select( 'my-shop' );
 	const { currency } = ownProps;
 

@@ -22,7 +22,7 @@ The following code example shows how to create a dynamic block that shows only t
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-dynamic', {
@@ -31,7 +31,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 	icon: 'megaphone',
 	category: 'widgets',
 
-	edit: withSelect( ( select ) => {
+	edit: useSelect( ( select ) => {
 		return {
 			posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
 		};
@@ -59,7 +59,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 ( function ( blocks, element, data, blockEditor ) {
 	var el = element.createElement,
 		registerBlockType = blocks.registerBlockType,
-		withSelect = data.withSelect,
+		useSelect = data.useSelect,
 		useBlockProps = blockEditor.useBlockProps;
 
 	registerBlockType( 'gutenberg-examples/example-dynamic', {
@@ -67,7 +67,7 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 		title: 'Example: last post',
 		icon: 'megaphone',
 		category: 'widgets',
-		edit: withSelect( function ( select ) {
+		edit: useSelect( function ( select ) {
 			return {
 				posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
 			};

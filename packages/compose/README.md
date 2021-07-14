@@ -16,7 +16,7 @@ Here's a simplified example of **compose** in use from Gutenberg's [`PluginSideb
 Using compose:
 
 ```js
-const applyWithSelect = withSelect( ( select, ownProps ) => {
+const applyWithSelect = useSelect( ( select, ownProps ) => {
 	return doSomething( select, ownProps );
 } );
 const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
@@ -33,7 +33,7 @@ export default compose(
 Without `compose`, the code would look like this:
 
 ```js
-const applyWithSelect = withSelect( ( select, ownProps ) => {
+const applyWithSelect = useSelect( ( select, ownProps ) => {
 	return doSomething( select, ownProps );
 } );
 const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {

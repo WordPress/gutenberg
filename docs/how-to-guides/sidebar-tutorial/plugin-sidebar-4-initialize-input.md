@@ -41,17 +41,17 @@ Now that the field is available in the editor store, it can be surfaced to the U
 
 Now you can focus solely on the `MetaBlockField` component. The goal is to initialize it with the value of `sidebar_plugin_meta_block_field`, but also to keep it updated when that value changes.
 
-WordPress has [some utilities to work with data](/packages/data/README.md) from the stores. The first you're going to use is [withSelect](/packages/data/README.md#withselect-mapselecttoprops-function-function), whose signature is:
+WordPress has [some utilities to work with data](/packages/data/README.md) from the stores. The first you're going to use is [useSelect](/packages/data/README.md#useSelect-mapselecttoprops-function-function), whose signature is:
 
 ```js
-withSelect()();
+useSelect()();
 // a function that takes `select` as input
 // and returns an object containing data
 // a function that takes the previous data as input
 // and returns a component
 ```
 
-`withSelect` is used to pass data to other components, and update them when the original data changes. Let's update the code to use it:
+`useSelect` is used to pass data to other components, and update them when the original data changes. Let's update the code to use it:
 
 ```js
 ( function ( wp ) {
@@ -59,7 +59,7 @@ withSelect()();
 	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
-	var withSelect = wp.data.withSelect;
+	var useSelect = wp.data.useSelect;
 
 	var mapSelectToProps = function ( select ) {
 		return {
@@ -79,7 +79,7 @@ withSelect()();
 		} );
 	};
 
-	var MetaBlockFieldWithData = withSelect( mapSelectToProps )(
+	var MetaBlockFieldWithData = useSelect( mapSelectToProps )(
 		MetaBlockField
 	);
 
