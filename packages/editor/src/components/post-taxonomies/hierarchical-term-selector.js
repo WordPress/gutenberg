@@ -34,6 +34,45 @@ import { store as coreStore } from '@wordpress/core-data';
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
 
+const sortBySelected = ( termsTree, terms ) => {
+	const treeHasSelection = ( termTree ) => {
+		if ( terms.indexOf( termTree.id ) !== -1 ) {
+			return true;
+		}
+		if ( undefined === termTree.children ) {
+			return false;
+		}
+		const anyChildIsSelected =
+			termTree.children
+				.map( treeHasSelection )
+				.filter( ( child ) => child ).length > 0;
+		if ( anyChildIsSelected ) {
+			return true;
+		}
+		return false;
+	};
+	const termOrChildIsSelected = ( termA, termB ) => {
+		const termASelected = treeHasSelection( termA );
+		const termBSelected = treeHasSelection( termB );
+
+		if ( termASelected === termBSelected ) {
+			return 0;
+		}
+
+		if ( termASelected && ! termBSelected ) {
+			return -1;
+		}
+
+		if ( ! termASelected && termBSelected ) {
+			return 1;
+		}
+
+		return 0;
+	};
+	termsTree.sort( termOrChildIsSelected );
+	return termsTree;
+};
+
 /**
  * Module Constants
  */
@@ -107,8 +146,14 @@ class HierarchicalTermSelector extends Component {
 
 	onAddTerm( event ) {
 		event.preventDefault();
-		const { onUpdateTerms, taxonomy, terms, slug } = this.props;
-		const { formName, formParent, adding, availableTerms } = this.state;
+		const {
+			onUpdateTerms,
+			taxonomy,
+			terms,
+			slug,
+			availableTerms,
+		} = this.props;
+		const { formName, formParent, adding } = this.state;
 		if ( formName === '' || adding ) {
 			return;
 		}
@@ -206,57 +251,9 @@ class HierarchicalTermSelector extends Component {
 		);
 	}
 
-	componentDidMount() {
-		this.fetchTerms();
-	}
-
 	componentWillUnmount() {
 		invoke( this.fetchRequest, [ 'abort' ] );
 		invoke( this.addRequest, [ 'abort' ] );
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.props.taxonomy !== prevProps.taxonomy ) {
-			this.fetchTerms();
-		}
-	}
-
-	fetchTerms() {
-		const { taxonomy } = this.props;
-		if ( ! taxonomy ) {
-			return;
-		}
-		this.fetchRequest = apiFetch( {
-			path: addQueryArgs(
-				`/wp/v2/${ taxonomy.rest_base }`,
-				DEFAULT_QUERY
-			),
-		} );
-		this.fetchRequest.then(
-			( terms ) => {
-				// resolve
-				const availableTermsTree = this.sortBySelected(
-					buildTermsTree( terms )
-				);
-
-				this.fetchRequest = null;
-				this.setState( {
-					loading: false,
-					availableTermsTree,
-					availableTerms: terms,
-				} );
-			},
-			( xhr ) => {
-				// reject
-				if ( xhr.statusText === 'abort' ) {
-					return;
-				}
-				this.fetchRequest = null;
-				this.setState( {
-					loading: false,
-				} );
-			}
-		);
 	}
 
 	sortBySelected( termsTree ) {
@@ -300,7 +297,7 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	setFilterValue( event ) {
-		const { availableTermsTree } = this.state;
+		const { availableTermsTree } = this.props;
 		const filterValue = event.target.value;
 		const filteredTermsTree = availableTermsTree
 			.map( this.getFilterMatcher( filterValue ) )
@@ -399,6 +396,8 @@ class HierarchicalTermSelector extends Component {
 			instanceId,
 			hasCreateAction,
 			hasAssignAction,
+			availableTerms,
+			availableTermsTree,
 		} = this.props;
 
 		if ( ! hasAssignAction ) {
@@ -406,8 +405,6 @@ class HierarchicalTermSelector extends Component {
 		}
 
 		const {
-			availableTermsTree,
-			availableTerms,
 			filteredTermsTree,
 			formName,
 			formParent,
@@ -537,6 +534,15 @@ export default compose( [
 		const { getCurrentPost } = select( editorStore );
 		const { getTaxonomy } = select( coreStore );
 		const taxonomy = getTaxonomy( slug );
+		const { getEntityRecords } = select( coreStore );
+
+		const taxonomySlug = slug ?? '';
+		const availableTerms =
+			getEntityRecords( 'taxonomy', taxonomySlug, {
+				per_page: -1,
+				context: 'view',
+			} ) || [];
+
 		return {
 			hasCreateAction: taxonomy
 				? get(
@@ -557,6 +563,11 @@ export default compose( [
 						taxonomy.rest_base
 				  )
 				: [],
+			availableTerms,
+			availableTermsTree: sortBySelected(
+				buildTermsTree( availableTerms ),
+				availableTerms
+			),
 			taxonomy,
 		};
 	} ),
