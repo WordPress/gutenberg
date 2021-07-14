@@ -52,6 +52,7 @@ export function getBackgroundColor(
 	}
 	return css( {
 		background: colorized.toRgbString(),
+		fontWeight: isBold ? 'bold' : 'normal',
 	} );
 }
 
@@ -66,13 +67,29 @@ const BACKGROUND_COLOR_TO_TEXT: Record< SupportedColors, `#${ string }` > = {
 	purple: '#342c48',
 };
 
+const BACKGROUND_COLOR_TEXT_BOLD: Record<
+	SupportedColors,
+	typeof COLORS.white | typeof COLORS.black
+> = {
+	blue: COLORS.white,
+	green: COLORS.black,
+	yellow: COLORS.black,
+	orange: COLORS.black,
+	red: COLORS.black,
+	lightGray: COLORS.black,
+	darkGray: COLORS.black,
+	purple: COLORS.white,
+};
+
 export function getTextColorForBackgroundColor(
 	color: SupportedColors,
 	{ isBold }: { isBold?: boolean } = {}
 ): SerializedStyles {
 	assertIsSupportedColor( color );
 
-	const value = isBold ? COLORS.white : BACKGROUND_COLOR_TO_TEXT[ color ];
+	const value = isBold
+		? BACKGROUND_COLOR_TEXT_BOLD[ color ]
+		: BACKGROUND_COLOR_TO_TEXT[ color ];
 
 	return css`
 		color: ${ value };

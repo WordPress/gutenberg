@@ -18,11 +18,11 @@ export default {
 	title: 'Components (Experimental)/Background Colors',
 };
 
-const Example = ( { color } ) => {
+const Example = ( { color, isBold } ) => {
 	const cx = useCx();
 
-	const textColor = getTextColorForBackgroundColor( color );
-	const bgColor = getBackgroundColor( color );
+	const textColor = getTextColorForBackgroundColor( color, { isBold } );
+	const bgColor = getBackgroundColor( color, { isBold } );
 
 	const classes = cx(
 		bgColor,
@@ -44,6 +44,9 @@ export const _default = () => {
 		<Flex>
 			{ SUPPORTED_COLORS.map( ( color ) => (
 				<Example color={ color } key={ color } />
+			) ) }
+			{ SUPPORTED_COLORS.map( ( color ) => (
+				<Example color={ color } key={ color } isBold />
 			) ) }
 		</Flex>
 	);
