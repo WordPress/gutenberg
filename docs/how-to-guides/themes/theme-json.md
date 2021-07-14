@@ -270,6 +270,8 @@ The settings section has the following structure:
 
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`. The settings declared at the top-level affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and configure all blocks at once.
 
+Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `theme.json`.
+
 #### Backward compatibility with add_theme_support
 
 To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`. This is the complete list of equivalences:
@@ -286,28 +288,6 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 | `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`. |
 | `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.      |
 | `experimental-link-color`   | Set `color.link` to `true`.                               |
-
-Let's say a theme author wants to enable custom colors only for the paragraph block. This is how it can be done:
-
-```json
-{
-	"version": 1,
-	"settings": {
-		"color": {
-			"custom": false
-		},
-		"blocks": {
-			"core/paragraph": {
-				"color": {
-					"custom": true
-				}
-			}
-		}
-	}
-}
-```
-
-Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `theme.json`.
 
 #### Presets
 
@@ -513,6 +493,98 @@ body {
 {% end %}
 
 Note that the name of the variable is created by adding `--` in between each nesting level and `camelCase` fields are transformed to `kebab-case`.
+
+#### Examples
+
+- Enable custom colors only for the paragraph block:
+
+```json
+{
+	"version": 1,
+	"settings": {
+		"color": {
+			"custom": false
+		},
+		"blocks": {
+			"core/paragraph": {
+				"color": {
+					"custom": true
+				}
+			}
+		}
+	}
+}
+```
+
+- Disable border radius for the button block (borders only work in the plugin so far):
+
+```json
+{
+	"version": 1,
+	"settings": {
+		"core/button": {
+			"border": {
+				"customRadius": false
+			}
+		}
+	}
+}
+```
+
+- Provide the group block a different palette than the rest:
+
+```json
+{
+	"version": 1,
+	"settings": {
+		"color": {
+			"palette": [
+				{
+					"slug": "black",
+					"color": "#000000",
+					"name": "Black"
+				},
+				{
+					"slug": "white",
+					"color": "#FFFFFF",
+					"name": "White"
+				},
+				{
+					"slug": "red",
+					"color": "#FF0000",
+					"name": "Red"
+				},
+				{
+					"slug": "green",
+					"color": "#00FF00",
+					"name": "Green"
+				},
+				{
+					"slug": "blue",
+					"color": "#0000FF",
+					"name": "Blue"
+				}
+			]
+		},
+		"core/group": {
+			"color": {
+				"palette": [
+					{
+						"slug": "black",
+						"color": "#000000",
+						"name": "Black"
+					},
+					{
+						"slug": "white",
+						"color": "#FFF",
+						"name": "White"
+					}
+				]
+			}
+		}
+	}
+}
+```
 
 ### Styles
 
