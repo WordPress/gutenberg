@@ -189,13 +189,6 @@ async function simulateAdverseConditions() {
 
 	if ( OFFLINE ) {
 		await page.setOfflineMode( true );
-		await page.emulateNetworkConditions( {
-			// Disable download/upload.
-			download: -1,
-			upload: -1,
-			// Disable latency.
-			latency: 0,
-		} );
 	}
 
 	if ( SLOW_NETWORK ) {
