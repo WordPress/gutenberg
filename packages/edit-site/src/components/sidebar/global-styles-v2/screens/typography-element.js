@@ -7,22 +7,19 @@ import { isUndefined, startCase } from 'lodash';
  * WordPress dependencies
  */
 import {
+	__experimentalGrid as Grid,
+	__experimentalVStack as VStack,
 	Button,
 	ButtonGroup,
 	CardBody,
-	Dropdown,
 	DropdownMenu,
-	DropdownMenuItem,
-	DropdownTrigger,
+	FontSizePicker,
 	FormGroup,
-	__experimentalGrid as Grid,
+	NumberControl,
 	Panel,
-	Select,
-	Slider,
-	TextInput,
-	UnitInput,
+	SelectControl,
+	TextControl,
 	useNavigatorParams,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
 	formatCapitalize,
@@ -38,32 +35,32 @@ import { useAppState } from '../state';
 
 const typographyOptions = [
 	{
-		label: 'Font',
+		title: 'Font',
 		value: 'fontFamily',
 		defaultValue: 'Helvetica Neue',
 	},
 	{
-		label: 'Size',
+		title: 'Size',
 		value: 'fontSize',
 		defaultValue: '14px',
 	},
 	{
-		label: 'Appearance',
+		title: 'Appearance',
 		value: 'fontWeight',
 		defaultValue: '400',
 	},
 	{
-		label: 'Line height',
+		title: 'Line height',
 		value: 'lineHeight',
 		defaultValue: '1.5',
 	},
 	{
-		label: 'Letter spacing',
+		title: 'Letter spacing',
 		value: 'letterSpacing',
 		defaultValue: '0',
 	},
 	{
-		label: 'Letter case',
+		title: 'Letter case',
 		value: 'letterCase',
 		defaultValue: null,
 	},
@@ -78,23 +75,12 @@ const TypographyOptions = () => {
 	const options = typographyOptions.map( ( o ) => {
 		return {
 			...o,
-			isSelected: ! isUndefined( styles[ o.value ] ),
+			isActive: ! isUndefined( styles[ o.value ] ),
 			onClick: () => toggleAttribute( o.value, o.defaultValue ),
 		};
 	} );
 
-	return (
-		<Dropdown>
-			<DropdownTrigger icon="ellipsis" isControl isSubtle size="small" />
-			<DropdownMenu>
-				{ options.map( ( option ) => (
-					<DropdownMenuItem key={ option.value } { ...option }>
-						{ option.label }
-					</DropdownMenuItem>
-				) ) }
-			</DropdownMenu>
-		</Dropdown>
-	);
+	return <DropdownMenu controls={ options } />;
 };
 
 const Header = ( { title } ) => {
@@ -189,68 +175,56 @@ export const TypographyElementScreen = () => {
 					<Header title={ title } />
 					<Panel>
 						<RenderComponent prop={ getIsDefined( 'fontFamily' ) }>
-							<FormGroup label="Font">
-								<TextInput
-									isCommitOnBlurOrEnter
-									{ ...bindAttribute( 'fontFamily' ) }
-								/>
-							</FormGroup>
+							<TextControl
+								label="Font"
+								{ ...bindAttribute( 'fontFamily' ) }
+							/>
 						</RenderComponent>
 						<RenderComponent prop={ getIsDefined( 'fontSize' ) }>
-							<FormGroup label="Size">
-								<Grid>
-									<UnitInput
-										{ ...bindAttribute( 'fontSize' ) }
-										min={ 0 }
-									/>
-									<Slider
-										{ ...bindAttribute( 'fontSize' ) }
-										max={ 40 }
-										min={ 0 }
-									/>
-								</Grid>
-							</FormGroup>
+							<Grid>
+								<FontSizePicker
+									{ ...bindAttribute( 'fontSize' ) }
+									withSlider
+								/>
+							</Grid>
 						</RenderComponent>
 						<Grid>
 							<RenderComponent
 								prop={ getIsDefined( 'fontWeight' ) }
 							>
-								<FormGroup label="Appearance">
-									<Select
-										{ ...bindAttribute( 'fontWeight', {
-											defaultValue: 400,
-										} ) }
-										options={ fontWeightOptions }
-									/>
-								</FormGroup>
+								<SelectControl
+									label="Appearance"
+									{ ...bindAttribute( 'fontWeight', {
+										defaultValue: 400,
+									} ) }
+									options={ fontWeightOptions }
+								/>
 							</RenderComponent>
 							<RenderComponent
 								prop={ getIsDefined( 'lineHeight' ) }
 							>
-								<FormGroup label="Line Height">
-									<TextInput
-										arrows="stepper"
-										min={ 0 }
-										step={ 0.1 }
-										type="number"
-										{ ...bindAttribute( 'lineHeight' ) }
-									/>
-								</FormGroup>
+								<TextControl
+									label="Line Height"
+									arrows="stepper"
+									min={ 0 }
+									step={ 0.1 }
+									type="number"
+									{ ...bindAttribute( 'lineHeight' ) }
+								/>
 							</RenderComponent>
 							<RenderComponent
 								prop={ getIsDefined( 'letterSpacing' ) }
 							>
-								<FormGroup label="Letter spacing">
-									<TextInput
-										arrows="stepper"
-										min={ 0 }
-										step={ 0.1 }
-										type="number"
-										{ ...bindAttribute( 'letterSpacing', {
-											defaultValue: 0,
-										} ) }
-									/>
-								</FormGroup>
+								<NumberControl
+									label="Letter spacing"
+									arrows="stepper"
+									min={ 0 }
+									step={ 0.1 }
+									type="number"
+									{ ...bindAttribute( 'letterSpacing', {
+										defaultValue: 0,
+									} ) }
+								/>
 							</RenderComponent>
 							<RenderComponent
 								prop={ getIsDefined( 'letterCase' ) }
