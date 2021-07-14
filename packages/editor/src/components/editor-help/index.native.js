@@ -63,10 +63,9 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 					>
 						{ /* Print out help topics */ }
 						{ HELP_TOPICS.map( ( topic ) => {
-							const key = topic.label;
 							return (
 								<HelpTopicRow
-									key={ key }
+									key={ topic.label }
 									label={ topic.label }
 									icon={ topic.icon }
 								/>
