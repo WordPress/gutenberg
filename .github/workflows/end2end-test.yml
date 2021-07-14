@@ -16,15 +16,10 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    admin:
-        name: Admin - ${{ matrix.part }}
+    build:
+        name: Build for testing
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-        strategy:
-            fail-fast: false
-            matrix:
-                part: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-                node: ['14']
 
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
@@ -35,10 +30,46 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
-            - name: Npm install and build
-              run: |
-                  npm ci
-                  FORCE_REDUCED_MOTION=true npm run build
+            - name: Install NPM dependencies
+              run: npm ci
+
+            - name: Build project
+              run: FORCE_REDUCED_MOTION=true npm run build
+
+            - name: Zip project
+              run: zip -r ${{ github.sha }}.zip . -x "node_modules" -x "vendor" -x ".git"
+
+            - uses: actions/upload-artifact@v2
+              with:
+                name: ${{ github.sha }}-build
+                path: ${{ github.sha }}.zip
+
+    admin:
+        name: Admin - ${{ matrix.part }}
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        needs: build
+        strategy:
+            fail-fast: false
+            matrix:
+                part: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                node: ['14']
+
+        steps:
+            - uses: actions/download-artifact@v2
+              with:
+                  name: ${{ github.sha }}-build
+
+            - run: unzip ${{ github.sha }}-build
+
+            - name: Use desired version of NodeJS
+              uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: npm
+
+            - name: Install NPM dependencies
+              run: npm ci
 
             - name: Install WordPress
               run: |
@@ -47,7 +78,7 @@ jobs:
             - name: Running the tests
               run: |
                   $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 20 == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
+                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 10 == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
               uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
