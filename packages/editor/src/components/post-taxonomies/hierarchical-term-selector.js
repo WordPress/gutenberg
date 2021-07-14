@@ -229,30 +229,7 @@ function HierarchicalTermSelector( {
 		onUpdateTerms( [ ...terms, newTerm.id ], taxonomy.rest_base );
 	};
 
-	const renderTerms = ( renderedTerms ) => {
-		return renderedTerms.map( ( term ) => {
-			return (
-				<div
-					key={ term.id }
-					className="editor-post-taxonomies__hierarchical-terms-choice"
-				>
-					<CheckboxControl
-						checked={ terms.indexOf( term.id ) !== -1 }
-						onChange={ () => {
-							const termId = parseInt( term.id, 10 );
-							onChange( termId );
-						} }
-						label={ unescapeString( term.name ) }
-					/>
-					{ !! term.children.length && (
-						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
-							{ renderTerms( term.children ) }
-						</div>
-					) }
-				</div>
-			);
-		} );
-	};
+
 
 	const setFilter = ( event ) => {
 		const value = event.target.value;
@@ -281,6 +258,31 @@ function HierarchicalTermSelector( {
 		);
 
 		debouncedSpeak( resultsFoundMessage, 'assertive' );
+	};
+
+	const renderTerms = ( renderedTerms ) => {
+		return renderedTerms.map( ( term ) => {
+			return (
+				<div
+					key={ term.id }
+					className="editor-post-taxonomies__hierarchical-terms-choice"
+				>
+					<CheckboxControl
+						checked={ terms.indexOf( term.id ) !== -1 }
+						onChange={ () => {
+							const termId = parseInt( term.id, 10 );
+							onChange( termId );
+						} }
+						label={ unescapeString( term.name ) }
+					/>
+					{ !! term.children.length && (
+						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
+							{ renderTerms( term.children ) }
+						</div>
+					) }
+				</div>
+			);
+		} );
 	};
 
 	const labelWithFallback = (
