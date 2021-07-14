@@ -451,4 +451,19 @@ describe( 'RichText', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		expect( await page.$( blockToolbarSelector ) ).toBe( null );
 	} );
+
+	it( 'should run input rules after composition end', async () => {
+		await clickBlockAppender();
+		await page.evaluate( () => {
+			document.activeElement.textContent = '`a`';
+			const selection = window.getSelection();
+			selection.selectAllChildren( document.activeElement );
+			selection.collapseToEnd();
+			document.activeElement.dispatchEvent(
+				new CompositionEvent( 'compositionend' )
+			);
+		} );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
