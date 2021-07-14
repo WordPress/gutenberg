@@ -162,6 +162,7 @@ const EmbedEdit = ( props ) => {
 	}
 
 	const showEmbedPlaceholder = ! preview || cannotEmbed;
+	const { type } = getMergedAttributes();
 
 	return (
 		<>
@@ -193,6 +194,7 @@ const EmbedEdit = ( props ) => {
 							label={ title }
 							preview={ preview }
 							previewable={ previewable }
+							type={ type }
 							url={ url }
 						/>
 					</View>

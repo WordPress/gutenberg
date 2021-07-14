@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, Image } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
-import { WebView } from 'react-native-webview';
 
 /**
  * WordPress dependencies
@@ -13,12 +12,13 @@ import { View } from '@wordpress/primitives';
 import { BlockCaption } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { SandBox } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import { getPhotoHtml } from './util';
 import EmbedNoPreview from './embed-no-preview';
-import styles from './styles.scss';
 
 const EmbedPreview = ( {
 	clientId,
@@ -30,6 +30,8 @@ const EmbedPreview = ( {
 	onFocus,
 	preview,
 	previewable,
+	type,
+	url,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 
@@ -57,35 +59,32 @@ const EmbedPreview = ( {
 		}
 	}
 
-	const cannotShowThumbnail =
-		! previewable ||
-		! preview ||
-		! preview.thumbnail_url?.length ||
-		! preview.height ||
-		! preview.width;
-
-	// eslint-disable-next-line no-undef
-	const previewContent = __DEV__ ? (
-		<View
-			style={ {
-				height: 200,
-				width: '100%',
-			} }
-		>
-			<WebView source={ { uri: 'https://reactnative.dev/' } } />
-		</View>
-	) : (
-		<Image
-			style={ [
-				styles[ 'embed-preview__image' ],
-				{ aspectRatio: preview.width / preview.height },
-			] }
-			source={ {
-				uri: preview.thumbnail_url,
-			} }
-			resizeMode="cover"
-		/>
+	const { scripts } = preview;
+	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
+	const parsedHost = new URL( url ).host.split( '.' );
+	const parsedHostBaseUrl = parsedHost
+		.splice( parsedHost.length - 2, parsedHost.length - 1 )
+		.join( '.' );
+	const iframeTitle = sprintf(
+		// translators: %s: host providing embed content e.g: www.youtube.com
+		__( 'Embedded content from %s' ),
+		parsedHostBaseUrl
 	);
+
+	const embedWrapper =
+		/* We should render here: <WpEmbedPreview html={ html } /> */
+		'wp-embed' === type ? null : (
+			<>
+				<View pointerEvents={ isSelected ? 'auto' : 'none' }>
+					<SandBox
+						html={ html }
+						scripts={ scripts }
+						title={ iframeTitle }
+						// type={ sandboxClassnames }
+					/>
+				</View>
+			</>
+		);
 
 	return (
 		<TouchableWithoutFeedback
@@ -94,15 +93,15 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				{ cannotShowThumbnail ? (
+				{ previewable ? (
+					embedWrapper
+				) : (
 					<EmbedNoPreview
 						label={ label }
 						icon={ icon }
 						isSelected={ isSelected }
 						onPress={ () => setIsCaptionSelected( false ) }
 					/>
-				) : (
-					previewContent
 				) }
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }
