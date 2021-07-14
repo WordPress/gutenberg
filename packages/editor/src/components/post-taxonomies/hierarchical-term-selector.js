@@ -35,6 +35,8 @@ const DEFAULT_QUERY = {
 	context: 'view',
 };
 
+const MIN_TERMS_COUNT_FOR_FILTER = 8;
+
 /**
  * Sort Terms by Selected.
  *
@@ -141,7 +143,6 @@ function getFilterMatcher( filterValue ) {
 	return matchTermsForFilter;
 }
 
-const MIN_TERMS_COUNT_FOR_FILTER = 8;
 
 function HierarchicalTermSelector( {
 	onUpdateTerms,
