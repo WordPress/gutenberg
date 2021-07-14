@@ -348,6 +348,18 @@ _Returns_
 
 -   `Element`: The new node.
 
+### safeHTML
+
+Strips scripts and on\* attributes from HTML.
+
+_Parameters_
+
+-   _html_ `string`: HTML to sanitize.
+
+_Returns_
+
+-   `string`: The sanitized HTML.
+
 ### unwrap
 
 Unwrap the given node. This means any child nodes are moved to the parent.
