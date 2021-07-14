@@ -11,9 +11,9 @@ import {
 	useContextSystem,
 	PolymorphicComponentProps,
 } from '../ui/context';
-import Button from './segmented-control-button';
+import SegmentedControlButton from './segmented-control-button';
 import type {
-	SegmentedControlOption,
+	SegmentedControlOptionProps,
 	SegmentedControlContextProps,
 } from './types';
 import { useSegmentedControlContext } from './segmented-control-context';
@@ -40,21 +40,24 @@ function getShowSeparator(
 	return showSeparator;
 }
 
-function ControlOption(
-	props: PolymorphicComponentProps< SegmentedControlOption, 'input' >,
+function SegmentedControlOption(
+	props: PolymorphicComponentProps< SegmentedControlOptionProps, 'input' >,
 	forwardedRef: import('react').Ref< any >
 ) {
 	const segmentedControlContext = useSegmentedControlContext();
 	const buttonProps = useContextSystem( props, 'SegmentedControlOption' );
 	const index = segmentedControlContext.items.findIndex(
-		( item: any ) => item.id === buttonProps.id
+		( item ) => item.id === buttonProps.id
 	);
 	const showSeparator = getShowSeparator( segmentedControlContext, index );
 	return (
-		<Button
+		<SegmentedControlButton
 			ref={ forwardedRef }
 			{ ...{ ...segmentedControlContext, ...buttonProps, showSeparator } }
 		/>
 	);
 }
-export default contextConnect( ControlOption, 'SegmentedControlOption' );
+export default contextConnect(
+	SegmentedControlOption,
+	'SegmentedControlOption'
+);

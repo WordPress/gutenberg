@@ -7,7 +7,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { __experimentalSpacer as Spacer } from '../../';
-import { SegmentedControl } from '../index';
+import { SegmentedControl, SegmentedControlOption } from '../index';
 import { View } from '../../view';
 
 export default {
@@ -17,7 +17,7 @@ export default {
 
 const aligns = [ 'Left', 'Center', 'Right', 'Justify' ];
 const alignOptions = aligns.map( ( key ) => (
-	<SegmentedControl.Option key={ key } value={ key } label={ key } />
+	<SegmentedControlOption key={ key } value={ key } label={ key } />
 ) );
 
 export const _default = () => {
@@ -38,20 +38,17 @@ export const _default = () => {
 			</Spacer>
 			<Spacer>
 				<SegmentedControl label={ label } value="horizontal">
-					<SegmentedControl.Option
+					<SegmentedControlOption
 						value="horizontal"
 						label="Horizontal"
 					/>
-					<SegmentedControl.Option
-						value="vertical"
-						label="Vertical"
-					/>
+					<SegmentedControlOption value="vertical" label="Vertical" />
 				</SegmentedControl>
 			</Spacer>
 			<Spacer>
 				<SegmentedControl isAdaptiveWidth label={ label } value="long">
-					<SegmentedControl.Option value="short" label="Short" />
-					<SegmentedControl.Option
+					<SegmentedControlOption value="short" label="Short" />
+					<SegmentedControlOption
 						value="long"
 						label="Looooooooooooong"
 					/>

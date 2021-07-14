@@ -6,13 +6,13 @@ import { render, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { SegmentedControl } from '../index';
+import { SegmentedControl, SegmentedControlOption } from '../index';
 
 describe( 'SegmentedControl', () => {
 	const options = (
 		<>
-			<SegmentedControl.Option value="rigas" label="R" />
-			<SegmentedControl.Option value="jack" label="J" />
+			<SegmentedControlOption value="rigas" label="R" />
+			<SegmentedControlOption value="jack" label="J" />
 		</>
 	);
 	it( 'should render correctly', () => {

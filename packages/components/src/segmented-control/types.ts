@@ -11,15 +11,7 @@ import type { RadioStateReturn } from 'reakit';
  */
 import type { FormElementProps } from '../utils/types';
 
-/**
- * Option to render within `SegmentedControl`.
- *
- * @example
- * ```jsx
- * const option = { value: 'elsa', label: 'Elsa' };
- * ```
- */
-export type SegmentedControlOption = {
+export type SegmentedControlOptionProps = {
 	value: ReactText;
 	label: string;
 };

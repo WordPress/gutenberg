@@ -4,22 +4,21 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`SegementedControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `SegmentedControl.Option` component.
+`SegementedControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `SegmentedControlOption` component.
 
 ## Usage
 
 ```js
-import { __experimentalSegmentedControl as SegmentedControl } from '@wordpress/components';
+import {
+	__experimentalSegmentedControl as SegmentedControl,
+	__experimentalSegmentedControlOption as SegmentedControlOption,
+} from '@wordpress/components';
 
 function Example() {
 	return (
-		<SegmentedControl
-			label="my label"
-			value="vertical"
-			isBlock
-		>
-			<SegmentedControl.Option value="horizontal" label="horizontal" />
-			<SegmentedControl.Option value="vertical" label="vertical" />
+		<SegmentedControl label="my label" value="vertical" isBlock>
+			<SegmentedControlOption value="horizontal" label="Horizontal" />
+			<SegmentedControlOption value="vertical" label="Vertical" />
 		</SegmentedControl>
 	);
 }

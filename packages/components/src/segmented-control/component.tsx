@@ -24,7 +24,6 @@ import { View } from '../view';
 import * as styles from './styles';
 import { useUpdateEffect, useCx } from '../utils/hooks';
 import Backdrop from './segmented-control-backdrop';
-import Option from './segmented-control-option';
 import type { SegmentedControlProps } from './types';
 import SegmentedControlContext from './segmented-control-context';
 
@@ -101,10 +100,4 @@ function SegmentedControl(
 	);
 }
 
-const ConnectedSegmentedControl: any = contextConnect(
-	SegmentedControl,
-	'SegmentedControl'
-);
-ConnectedSegmentedControl.Option = Option;
-
-export default ConnectedSegmentedControl;
+export default contextConnect( SegmentedControl, 'SegmentedControl' );
