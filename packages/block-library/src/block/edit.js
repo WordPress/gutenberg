@@ -168,10 +168,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 					<ToolbarGroup>
 						<ToolbarButton
 							isPrimary
-							style={ {
-								margin: '7px',
-								height: '32px',
-							} }
+							className="block-library-block__reusable-block-save-button"
 							onClick={ saveEditedRecords }
 							label={ __( 'Save globally' ) }
 							showTooltip

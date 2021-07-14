@@ -15,6 +15,20 @@
 	}
 }
 
+// Styles for save button
+.components-toolbar-group {
+	.block-library-block__reusable-block-save-button {
+		margin: 7px;
+		height: 32px;
+		&::before {
+			left: 0 !important;
+			right: 0 !important;
+			height: 32px !important;
+		}
+	}
+}
+
+
 // Styles for Reusable Block Welcome Guide
 .edit-reusable-block-welcome-guide {
 	$image-height: 240px;
