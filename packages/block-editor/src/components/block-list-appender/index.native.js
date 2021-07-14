@@ -26,7 +26,7 @@ function BlockListAppender( {
 	appender,
 	showSeparator,
 } ) {
-	if ( undefined !== CustomAppender ) {
+	if ( CustomAppender !== undefined ) {
 		deprecated( 'renderAppender prop', {
 			since: '10.9',
 			alternative: 'appender prop',
@@ -37,7 +37,7 @@ function BlockListAppender( {
 		return null;
 	}
 
-	if ( undefined !== appender ) {
+	if ( appender !== undefined ) {
 		return appender;
 	}
 

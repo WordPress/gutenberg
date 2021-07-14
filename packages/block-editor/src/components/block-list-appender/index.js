@@ -29,7 +29,7 @@ function BlockListAppender( {
 	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	if ( undefined !== CustomAppender ) {
+	if ( CustomAppender !== undefined ) {
 		deprecated( 'renderAppender prop', {
 			since: '10.9',
 			alternative: 'appender prop',
@@ -38,14 +38,14 @@ function BlockListAppender( {
 
 	if (
 		isLocked ||
-		( undefined !== appender && ! appender ) ||
-		false === CustomAppender
+		( appender !== undefined && ! appender ) ||
+		CustomAppender === false
 	) {
 		return null;
 	}
 
 	let blockAppender;
-	if ( undefined !== appender ) {
+	if ( appender !== undefined ) {
 		blockAppender = appender;
 	} else if ( CustomAppender ) {
 		blockAppender = <CustomAppender />;
