@@ -47,7 +47,7 @@ export const Inspector = () => {
 	return (
 		<div style={ { position: 'fixed', top: 16, left: 16 } }>
 			<motion.div drag dragMomentum={ false }>
-				<Card css={ { minWidth: 400 } } size="small">
+				<Card style={ { minWidth: 400 } } size="small">
 					<CardHeader size="small">Inspector</CardHeader>
 					<CardBody>
 						<SelectControl
@@ -62,7 +62,7 @@ export const Inspector = () => {
 						<PanelHeader>State</PanelHeader>
 						<PanelBody>
 							<View
-								css={ {
+								style={ {
 									fontFamily: 'monospace',
 									maxWidth: '100%',
 									maxHeight: 300,

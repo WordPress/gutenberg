@@ -22,16 +22,20 @@ export const StylePreview = () => {
 	const [ main, text, accent ] = themeColors.colors.map( ( i ) => i.color );
 
 	return (
-		<View css={ { background: main, padding: '32px 20px' } }>
+		<View style={ { background: main, padding: '32px 20px' } }>
 			<VStack spacing={ 5 }>
-				<View css={ { fontFamily, fontSize: 24 } }>{ fontFamily }</View>
-				<View css={ { fontFamily, fontSize: 16 } }>{ fontFamily }</View>
+				<View style={ { fontFamily, fontSize: 24 } }>
+					{ fontFamily }
+				</View>
+				<View style={ { fontFamily, fontSize: 16 } }>
+					{ fontFamily }
+				</View>
 				<HStack>
 					<Spacer>
-						<View css={ { background: text, height: 8 } } />
+						<View style={ { background: text, height: 8 } } />
 					</Spacer>
 					<Spacer>
-						<View css={ { background: accent, height: 8 } } />
+						<View style={ { background: accent, height: 8 } } />
 					</Spacer>
 				</HStack>
 			</VStack>

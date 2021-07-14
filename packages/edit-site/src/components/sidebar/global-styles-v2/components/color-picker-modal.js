@@ -38,7 +38,7 @@ export function ColorPickerModal() {
 
 	return (
 		<View
-			css={ {
+			style={ {
 				position: 'fixed',
 				right: 280,
 				top: 0,
@@ -46,7 +46,7 @@ export function ColorPickerModal() {
 				zIndex: 999,
 			} }
 		>
-			<View css={ { right: 12, top: 100, position: 'relative' } }>
+			<View style={ { right: 12, top: 100, position: 'relative' } }>
 				<Card>
 					<CardHeader>
 						<HStack>

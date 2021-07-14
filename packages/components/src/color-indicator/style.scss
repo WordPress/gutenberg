@@ -8,4 +8,9 @@
 	& + & {
 		margin-left: 0.5rem;
 	}
+
+	&.is-circular {
+		height: 25px;
+		border-radius: 50%;
+	}
 }

@@ -8,10 +8,10 @@ import {
 
 export const NavLink = ( props ) => {
 	return (
-		<Item isAction css={ { padding: 0 } }>
+		<Item isAction style={ { padding: 0 } }>
 			<NavigatorLink
 				{ ...props }
-				css={ { display: 'block', padding: '8px 12px' } }
+				style={ { display: 'block', padding: '8px 12px' } }
 			/>
 		</Item>
 	);

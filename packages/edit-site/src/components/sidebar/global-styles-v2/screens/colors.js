@@ -8,7 +8,7 @@ import { take } from 'lodash';
  */
 import {
 	CardBody,
-	ColorCircle,
+	ColorIndicator,
 	__experimentalHStack as HStack,
 	__experimentalItemGroup as ItemGroup,
 	Panel,
@@ -38,12 +38,12 @@ const Palette = () => {
 				<NavLink to="/colors/palette">
 					<HStack>
 						<Spacer>
-							<ZStack isLayered={ false } offset={ 4 }>
+							<ZStack isLayered={ false } offset={ -15 }>
 								{ colors.map( ( color ) => (
-									<ColorCircle
-										color={ color.color }
+									<ColorIndicator
+										colorValue={ color.color }
 										key={ color.id }
-										size="small"
+										circular
 									/>
 								) ) }
 							</ZStack>
@@ -73,9 +73,9 @@ const Elements = () => {
 					>
 						<HStack spacing={ 3 }>
 							<View>
-								<ColorCircle
-									color={ element.color }
-									size="small"
+								<ColorIndicator
+									colorValue={ element.color }
+									circular
 								/>
 							</View>
 							<Spacer>
