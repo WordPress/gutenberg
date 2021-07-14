@@ -22,8 +22,8 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
-import HelpDetailNavigationScreen from './help-detail-navigation-screen.js';
-import HelpTopicRow from './help-topic-row.js';
+import HelpDetailNavigationScreen from './help-detail-navigation-screen.native.js';
+import HelpTopicRow from './help-topic-row.native.js';
 
 const HELP_TOPICS = [
 	{ label: __( 'What is a block?' ), icon: helpFilled },
