@@ -2,12 +2,13 @@
  * WordPress dependencies
  */
 import {
+	Button,
+	ButtonGroup,
 	CardBody,
-	ColorCircle,
+	ColorIndicator,
 	__experimentalHStack as HStack,
 	Panel,
 	PanelHeader,
-	SegmentedControl,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
@@ -32,10 +33,11 @@ const Palette = ( { colors = [], title, index } ) => {
 			<PanelHeader>{ title }</PanelHeader>
 			<HStack alignment="left" wrap>
 				{ colors.map( ( color, colorIndex ) => (
-					<ColorCircle
-						color={ color.color }
+					<ColorIndicator
+						colorValue={ color.color }
 						key={ color.id }
 						onClick={ handleOnClick( colorIndex ) }
+						circular
 					/>
 				) ) }
 			</HStack>
@@ -48,12 +50,10 @@ const Palettes = () => {
 	return (
 		<>
 			<Panel>
-				<SegmentedControl
-					options={ [
-						{ value: 'solids', label: 'Solids' },
-						{ value: 'gradients', label: 'Gradients' },
-					] }
-				/>
+				<ButtonGroup>
+					<Button>Solids</Button>
+					<Button>Gradients</Button>
+				</ButtonGroup>
 			</Panel>
 			{ palettes.map( ( palette, index ) => (
 				<Palette
