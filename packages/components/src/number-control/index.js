@@ -29,6 +29,7 @@ export function NumberControl(
 		hideHTMLArrows = false,
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
+		allowEmpty = false,
 		label,
 		max = Infinity,
 		min = -Infinity,
@@ -155,7 +156,11 @@ export function NumberControl(
 			type === inputControlActionTypes.PRESS_ENTER ||
 			type === inputControlActionTypes.COMMIT
 		) {
-			state.value = roundClamp( currentValue, min, max, step );
+			const applyEmptyValue = allowEmpty && currentValue === '';
+
+			state.value = applyEmptyValue
+				? currentValue
+				: roundClamp( currentValue, min, max, step );
 		}
 
 		return state;

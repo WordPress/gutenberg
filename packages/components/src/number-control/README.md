@@ -27,6 +27,14 @@ const Example = () => {
 
 ## Props
 
+### allowEmpty
+
+If true, allows an empty string as a valid value.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ### dragDirection
 
 Determines the drag axis to increment/decrement the value.

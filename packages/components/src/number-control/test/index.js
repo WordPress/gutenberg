@@ -92,6 +92,17 @@ describe( 'NumberControl', () => {
 
 			expect( input.value ).toBe( '0' );
 		} );
+
+		it( 'should accept empty string on ENTER keypress', () => {
+			render( <NumberControl value={ 5 } allowEmpty={ true } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '' );
+		} );
 	} );
 
 	describe( 'Key UP interactions', () => {
