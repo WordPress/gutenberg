@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { get, unescape as unescapeString, without, find, some } from 'lodash';
+import {
+	get,
+	unescape as unescapeString,
+	without,
+	find,
+	some,
+	isArray,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -143,12 +150,12 @@ function getFilterMatcher( filterValue ) {
 	return matchTermsForFilter;
 }
 
-
 function HierarchicalTermSelector( {
 	onUpdateTerms,
 	addTerm,
 	taxonomy,
 	terms,
+	loading,
 	slug,
 	availableTerms,
 	hasCreateAction,
@@ -157,7 +164,6 @@ function HierarchicalTermSelector( {
 } ) {
 	const instanceId = useInstanceId( HierarchicalTermSelector );
 
-	const loading = false;
 	const [ adding, setAdding ] = useState( false );
 	const [ formName, setFormName ] = useState( '' );
 	const [ formParent, setFormParent ] = useState( '' );
@@ -414,10 +420,9 @@ export default compose( [
 		const { getEntityRecords } = select( coreStore );
 
 		const taxonomySlug = slug ?? '';
-		const availableTerms =
-			getEntityRecords( 'taxonomy', taxonomySlug, {
-				DEFAULT_QUERY,
-			} ) || [];
+		const queriedTerms = getEntityRecords( 'taxonomy', taxonomySlug, {
+			DEFAULT_QUERY,
+		} );
 		const terms = taxonomy
 			? select( editorStore ).getEditedPostAttribute( taxonomy.rest_base )
 			: [];
@@ -437,9 +442,10 @@ export default compose( [
 				  )
 				: false,
 			terms,
-			availableTerms,
+			loading: ! isArray( queriedTerms ),
+			availableTerms: queriedTerms || [],
 			availableTermsTree: sortBySelected(
-				buildTermsTree( availableTerms ),
+				buildTermsTree( queriedTerms || [] ),
 				terms
 			),
 			taxonomy,
