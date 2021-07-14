@@ -6,7 +6,7 @@
 
 	// Move upwards when in modal.
 	.components-modal__content & {
-		margin: (-$grid-unit-15) (-$grid-unit-15 / 2) 0;
+		margin: (-$grid-unit-15) (-$grid-unit-15 * 0.5) 0;
 		width: calc(100% + #{ $grid-unit-15 });
 	}
 }
@@ -65,7 +65,7 @@
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: ($grid-unit-15 / 2) $grid-unit-15 ($grid-unit-15 / 2) 0;
+		padding: ($grid-unit-15 * 0.5) $grid-unit-15 ($grid-unit-15 * 0.5) 0;
 		text-align: left;
 		color: $gray-900;
 		border-radius: 2px;
@@ -169,7 +169,7 @@
 		}
 
 		&.is-up-button {
-			margin-top: -$grid-unit-15 / 2;
+			margin-top: -$grid-unit-15 * 0.5;
 			align-items: flex-end;
 			svg {
 				bottom: -$grid-unit-05;
@@ -177,7 +177,7 @@
 		}
 
 		&.is-down-button {
-			margin-bottom: -$grid-unit-15 / 2;
+			margin-bottom: -$grid-unit-15 * 0.5;
 			align-items: flex-start;
 			svg {
 				top: -$grid-unit-05;

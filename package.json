@@ -200,7 +200,7 @@
 		"react-test-renderer": "17.0.1",
 		"rimraf": "3.0.2",
 		"rtlcss": "2.6.2",
-		"sass": "1.26.12",
+		"sass": "1.35.2",
 		"sass-loader": "10.1.1",
 		"semver": "7.3.2",
 		"simple-git": "^2.35.0",
