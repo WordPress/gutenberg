@@ -50,9 +50,9 @@ const Palettes = () => {
 	return (
 		<>
 			<Panel>
-				<ButtonGroup>
-					<Button>Solids</Button>
-					<Button>Gradients</Button>
+				<ButtonGroup defaultValue={ null }>
+					<Button value="solids">Solids</Button>
+					<Button value="gradients">Gradients</Button>
 				</ButtonGroup>
 			</Panel>
 			{ palettes.map( ( palette, index ) => (
