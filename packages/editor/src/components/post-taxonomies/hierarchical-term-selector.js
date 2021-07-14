@@ -95,7 +95,6 @@ class HierarchicalTermSelector extends Component {
 		this.onAddTerm = this.onAddTerm.bind( this );
 		this.onToggleForm = this.onToggleForm.bind( this );
 		this.setFilterValue = this.setFilterValue.bind( this );
-		this.sortBySelected = this.sortBySelected.bind( this );
 		this.state = {
 			loading: true,
 			availableTermsTree: [],
@@ -233,8 +232,9 @@ class HierarchicalTermSelector extends Component {
 					formName: '',
 					formParent: '',
 					availableTerms: newAvailableTerms,
-					availableTermsTree: this.sortBySelected(
-						buildTermsTree( newAvailableTerms )
+					availableTermsTree: sortBySelected(
+						buildTermsTree( newAvailableTerms ),
+						newAvailableTerms
 					),
 				} );
 				onUpdateTerms( [ ...terms, term.id ], taxonomy.rest_base );
@@ -254,46 +254,6 @@ class HierarchicalTermSelector extends Component {
 	componentWillUnmount() {
 		invoke( this.fetchRequest, [ 'abort' ] );
 		invoke( this.addRequest, [ 'abort' ] );
-	}
-
-	sortBySelected( termsTree ) {
-		const { terms } = this.props;
-		const treeHasSelection = ( termTree ) => {
-			if ( terms.indexOf( termTree.id ) !== -1 ) {
-				return true;
-			}
-			if ( undefined === termTree.children ) {
-				return false;
-			}
-			const anyChildIsSelected =
-				termTree.children
-					.map( treeHasSelection )
-					.filter( ( child ) => child ).length > 0;
-			if ( anyChildIsSelected ) {
-				return true;
-			}
-			return false;
-		};
-		const termOrChildIsSelected = ( termA, termB ) => {
-			const termASelected = treeHasSelection( termA );
-			const termBSelected = treeHasSelection( termB );
-
-			if ( termASelected === termBSelected ) {
-				return 0;
-			}
-
-			if ( termASelected && ! termBSelected ) {
-				return -1;
-			}
-
-			if ( ! termASelected && termBSelected ) {
-				return 1;
-			}
-
-			return 0;
-		};
-		termsTree.sort( termOrChildIsSelected );
-		return termsTree;
 	}
 
 	setFilterValue( event ) {
