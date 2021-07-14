@@ -8,13 +8,13 @@ import { isUndefined, startCase } from 'lodash';
  */
 import {
 	__experimentalGrid as Grid,
+	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 	Button,
 	ButtonGroup,
 	CardBody,
 	DropdownMenu,
 	FontSizePicker,
-	FormGroup,
 	NumberControl,
 	Panel,
 	SelectControl,
@@ -229,27 +229,26 @@ export const TypographyElementScreen = () => {
 							<RenderComponent
 								prop={ getIsDefined( 'letterCase' ) }
 							>
-								<FormGroup label="Letter case">
-									<ButtonGroup
-										enableSelectNone
-										{ ...bindAttribute( 'letterCase', {
-											defaultValue: null,
-										} ) }
-									>
-										<Button
-											icon={ formatUppercase }
-											value="uppercase"
-										/>
-										<Button
-											icon={ formatLowercase }
-											value="lowercase"
-										/>
-										<Button
-											icon={ formatCapitalize }
-											value="capitalize"
-										/>
-									</ButtonGroup>
-								</FormGroup>
+								<Heading level="h5">Letter case</Heading>
+								<ButtonGroup
+									enableSelectNone
+									{ ...bindAttribute( 'letterCase', {
+										defaultValue: null,
+									} ) }
+								>
+									<Button
+										icon={ formatUppercase }
+										value="uppercase"
+									/>
+									<Button
+										icon={ formatLowercase }
+										value="lowercase"
+									/>
+									<Button
+										icon={ formatCapitalize }
+										value="capitalize"
+									/>
+								</ButtonGroup>
 							</RenderComponent>
 						</Grid>
 					</Panel>
