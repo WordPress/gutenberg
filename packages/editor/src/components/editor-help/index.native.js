@@ -9,7 +9,7 @@ import { View, Text } from 'react-native';
 import { BottomSheet, PanelBody } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
 	helpFilled,
 	plusCircleFilled,
@@ -33,8 +33,8 @@ const HELP_TOPICS = [
 	{ label: __( 'Customize blocks' ), icon: cogAlt },
 ];
 
-function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
-	const bottomSheetHeaderTitleStyle = getStylesFromColorScheme(
+function EditorHelpTopics( { isVisible, onClose } ) {
+	const bottomSheetHeaderTitleStyle = usePreferredColorSchemeStyle(
 		styles.bottomSheetHeaderTitle,
 		styles.bottomSheetHeaderTitleDark
 	);
@@ -89,4 +89,4 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 	) );
 }
 
-export default withPreferredColorScheme( EditorHelpTopics );
+export default EditorHelpTopics;
