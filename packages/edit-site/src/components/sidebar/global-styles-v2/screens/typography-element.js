@@ -22,6 +22,7 @@ import {
 	useNavigatorParams,
 } from '@wordpress/components';
 import {
+	check,
 	formatCapitalize,
 	formatLowercase,
 	formatUppercase,
@@ -73,10 +74,12 @@ const TypographyOptions = () => {
 	} = useStyleAttributesForScreen();
 
 	const options = typographyOptions.map( ( o ) => {
+		const isActive = ! isUndefined( styles[ o.value ] );
 		return {
 			...o,
-			isActive: ! isUndefined( styles[ o.value ] ),
+			isActive,
 			onClick: () => toggleAttribute( o.value, o.defaultValue ),
+			icon: isActive ? check : undefined,
 		};
 	} );
 
