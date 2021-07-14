@@ -138,7 +138,7 @@ function render_block_core_navigation_heading( $attributes, $content, $block ) {
 	// Start heading tag content.
 	// Wrap title with span to isolate it from submenu icon.
 	$html .= '<span class="wp-block-navigation-link__label">';
-	
+
 	if ( isset( $attributes['label'] ) ) {
 		$html .= wp_kses(
 			$attributes['label'],
