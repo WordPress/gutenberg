@@ -190,11 +190,10 @@ async function simulateAdverseConditions() {
 	if ( OFFLINE ) {
 		await page.setOfflineMode( true );
 		await page.emulateNetworkConditions( {
-			// Download speed (bytes/s)
+			// Disable download/upload.
 			download: -1,
-			// Upload speed (bytes/s)
 			upload: -1,
-			// Latency (ms)
+			// Disable latency.
 			latency: 0,
 		} );
 	}
