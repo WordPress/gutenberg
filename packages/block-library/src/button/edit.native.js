@@ -254,7 +254,7 @@ class ButtonEdit extends Component {
 			...style,
 			border: {
 				...style?.border,
-				radius: `${ newRadius }${ borderRadiusUnit }`, // Store the value with the px value so that it works as expected.
+				radius: `${ newRadius }${ borderRadiusUnit }`, // Store the value with the unit value so that it works as expected.
 			},
 		};
 
@@ -272,7 +272,7 @@ class ButtonEdit extends Component {
 			...style,
 			border: {
 				...style?.border,
-				radius: `${ borderRadius }${ newRadiusUnit }`, // Store the value with the px value so that it works as expected.
+				radius: `${ borderRadius }${ newRadiusUnit }`, // Store the value with the unit value so that it works as expected.
 			},
 		};
 

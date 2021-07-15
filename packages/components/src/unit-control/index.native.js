@@ -105,8 +105,13 @@ function UnitControl( {
 	);
 
 	const getDecimal = ( step ) => {
+		// Return the decimal offset based on the step size.
+		// if step size is 0.1 we expect the offset to be 1.
+		// for example 12 + 0.1 we would expect the see 12.1 (not 12.10 or 12 );
+		// steps are defined in the CSS_UNITS and they vary from unit to unit.
 		const stepToString = step;
-		return step === 1 ? 0 : stepToString.toString().length - 2;
+		const splitStep = stepToString.toString().split( '.' );
+		return splitStep[ 1 ] ? splitStep[ 1 ].length : 0;
 	};
 
 	const renderUnitPicker = useCallback( () => {
