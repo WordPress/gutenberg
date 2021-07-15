@@ -143,6 +143,8 @@ function UnitControl( {
 		step = activeUnit?.step ?? 1;
 	}
 
+	const decimalNum = getDecimal( step );
+
 	return (
 		<>
 			{ unit !== '%' ? (
@@ -156,7 +158,7 @@ function UnitControl( {
 					step={ step }
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
-					decimalNum={ getDecimal( step ) }
+					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
 					unitLabel={ parseA11yLabelForUnit( unit ) }
 					{ ...props }
@@ -174,7 +176,7 @@ function UnitControl( {
 					unit={ unit }
 					defaultValue={ initialControlValue }
 					separatorType={ separatorType }
-					decimalNum={ getDecimal( step ) }
+					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
 					unitLabel={ parseA11yLabelForUnit( unit ) }
 					{ ...props }
