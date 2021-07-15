@@ -165,16 +165,12 @@ function HierarchicalTermSelector( { slug } ) {
 		const taxonomy = getTaxonomy( slug );
 
 		const availableTerms =
-			getEntityRecords( 'taxonomy', slug, {
-				DEFAULT_QUERY,
-			} ) || [];
+			getEntityRecords( 'taxonomy', slug, DEFAULT_QUERY ) || [];
 
 		const loading = isResolving( 'getEntityRecords', [
 			'taxonomy',
 			slug,
-			{
-				DEFAULT_QUERY,
-			},
+			DEFAULT_QUERY,
 		] );
 
 		const terms = taxonomy
