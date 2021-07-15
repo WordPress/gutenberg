@@ -1476,7 +1476,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 				'spacing'    => array(
-					'units' => array( 'px', 'em', 'rem', 'vh', 'vw' ),
+					'units' => array( 'px', 'em', 'rem', 'vh', 'vw', '%' ),
 				),
 				'typography' => array(
 					'customFontSize'   => false,
@@ -1578,7 +1578,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$input = gutenberg_get_default_block_editor_settings();
 
 		$expected = array(
-			'units'         => array( 'px', 'em', 'rem', 'vh', 'vw' ),
+			'units'         => array( 'px', 'em', 'rem', 'vh', 'vw', '%' ),
 			'customPadding' => false,
 		);
 
