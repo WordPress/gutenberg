@@ -102,6 +102,7 @@ export default function useTabNav() {
 			const direction = isShift ? 'findPrevious' : 'findNext';
 
 			if ( ! hasMultiSelection() && ! getSelectedBlockClientId() ) {
+				setNavigationMode( true );
 				return;
 			}
 
