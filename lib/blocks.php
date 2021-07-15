@@ -555,6 +555,18 @@ function gutenberg_enqueue_block_style( $block_name, $args ) {
 		// Add `path` data if provided.
 		if ( isset( $args['path'] ) ) {
 			wp_style_add_data( $args['handle'], 'path', $args['path'] );
+
+			// Get the RTL file path.
+			$rtl_file_path = str_replace( '.css', '-rtl.css', $args['path'] );
+
+			// Add RTL stylesheet.
+			if ( file_exists( $rtl_file_path ) ) {
+				wp_style_add_data( $args['hanle'], 'rtl', 'replace' );
+
+				if ( is_rtl() ) {
+					wp_style_add_data( $args['handle'], 'path', $rtl_file_path );
+				}
+			}
 		}
 
 		// Enqueue the stylesheet.
