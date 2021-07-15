@@ -5,7 +5,7 @@ exports[`Navigating the block hierarchy should appear and function even without 
 <p>and I say hello</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
+<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->"
 `;

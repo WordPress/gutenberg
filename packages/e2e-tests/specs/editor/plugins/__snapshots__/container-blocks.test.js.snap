@@ -2,7 +2,7 @@
 
 exports[`Container block without paragraph support ensures we can use the alternative block appender properly 1`] = `
 "<!-- wp:test/container-without-paragraph -->
-<!-- wp:image -->
+<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 <!-- /wp:test/container-without-paragraph -->"

@@ -253,7 +253,7 @@ exports[`Writing Flow should not have a dead zone above an aligned block 1`] = `
 <p>1</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {\\"align\\":\\"wide\\"} -->
+<!-- wp:image {\\"align\\":\\"wide\\",\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image alignwide\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->"
 `;

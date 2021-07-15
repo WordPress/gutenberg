@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`cpt locking template_lock all should insert line breaks when using enter and shift-enter 1`] = `
-"<!-- wp:image -->
+"<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
@@ -19,7 +19,7 @@ exports[`cpt locking template_lock all should insert line breaks when using ente
 `;
 
 exports[`cpt locking template_lock all should not error when deleting the cotents of a paragraph 1`] = `
-"<!-- wp:image -->
+"<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
@@ -57,7 +57,7 @@ exports[`cpt locking template_lock all unlocked group should allow blocks to be 
 `;
 
 exports[`cpt locking template_lock false should allow blocks to be inserted 1`] = `
-"<!-- wp:image -->
+"<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
@@ -83,7 +83,7 @@ exports[`cpt locking template_lock false should allow blocks to be moved 1`] = `
 <p>p1</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
+<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
@@ -97,7 +97,7 @@ exports[`cpt locking template_lock false should allow blocks to be moved 1`] = `
 `;
 
 exports[`cpt locking template_lock false should allow blocks to be removed 1`] = `
-"<!-- wp:image -->
+"<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
@@ -115,7 +115,7 @@ exports[`cpt locking template_lock insert should allow blocks to be moved 1`] = 
 <p>p1</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image -->
+<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 

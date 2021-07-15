@@ -6,7 +6,7 @@ exports[`Block Grouping Group creation creates a group from multiple blocks of d
 <h2>Group Heading</h2>
 <!-- /wp:heading -->
 
-<!-- wp:image -->
+<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
@@ -54,7 +54,7 @@ exports[`Block Grouping Group creation groups and ungroups multiple blocks of di
 <h2>Group Heading</h2>
 <!-- /wp:heading -->
 
-<!-- wp:image -->
+<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
@@ -69,7 +69,7 @@ exports[`Block Grouping Group creation groups and ungroups multiple blocks of di
 <h2>Group Heading</h2>
 <!-- /wp:heading -->
 
-<!-- wp:image -->
+<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
@@ -84,11 +84,11 @@ exports[`Block Grouping Preserving selected blocks attributes preserves width al
 <h2>Group Heading</h2>
 <!-- /wp:heading -->
 
-<!-- wp:image {\\"align\\":\\"full\\"} -->
+<!-- wp:image {\\"align\\":\\"full\\",\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image alignfull\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
-<!-- wp:image {\\"align\\":\\"wide\\"} -->
+<!-- wp:image {\\"align\\":\\"wide\\",\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image alignwide\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
