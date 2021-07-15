@@ -75,10 +75,11 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
  * @param int   $post_id        The post id for this item.
  * @param array $attributes     Block attributes.
  * @param bool  $show_separator Whether to show the separator character where available.
+ * @param int   $index          The position in a list of ids.
  *
  * @return string The markup for a single breadcrumb item wrapped in an `li` element.
  */
-function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, $show_separator = true, $index = null) {
+function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, $show_separator = true, $index = null ) {
 	$li_class        = 'wp-block-breadcrumbs__item';
 	$separator_class = 'wp-block-breadcrumbs__separator';
 
@@ -88,7 +89,7 @@ function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, 
 	if (
 		! empty( $attributes['showLeadingSeparator'] ) &&
 		! empty( $attributes['separator'] ) &&
-		$index === 0
+		0 === $index
 	) {
 		$markup .= sprintf(
 			'<span class="%1$s">%2$s</span>',
