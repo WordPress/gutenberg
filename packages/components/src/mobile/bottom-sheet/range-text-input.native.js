@@ -176,9 +176,9 @@ class RangeTextInput extends Component {
 			styles.textInputDark
 		);
 
-		const verticalBorderStyle = getStylesFromColorScheme(
-			styles.verticalBorder,
-			styles.verticalBorderDark
+		const textInputIOSStyle = getStylesFromColorScheme(
+			styles.textInputIOS,
+			styles.textInputIOSDark
 		);
 
 		const inputBorderStyles = [
@@ -190,7 +190,7 @@ class RangeTextInput extends Component {
 		const valueFinalStyle = [
 			Platform.select( {
 				android: inputBorderStyles,
-				ios: { ...verticalBorderStyle, color: textInputStyle.color },
+				ios: textInputIOSStyle,
 			} ),
 			{
 				width: 50 * fontScale,
