@@ -152,7 +152,7 @@ function HierarchicalTermSelector( { slug } ) {
 	const [ adding, setAdding ] = useState( false );
 	const [ formName, setFormName ] = useState( '' );
 	/**
-	 * @type {[number|string, Function]}
+	 * @type {[number|'', Function]}
 	 */
 	const [ formParent, setFormParent ] = useState( '' );
 	const [ showForm, setShowForm ] = useState( false );
@@ -259,6 +259,15 @@ function HierarchicalTermSelector( { slug } ) {
 		const newValue =
 			event.target.value.trim() === '' ? '' : event.target.value;
 		setFormName( newValue );
+	};
+
+	/**
+	 * Handler for changing form parent.
+	 *
+	 * @param {number|''} parentId Parent post id.
+	 */
+	const onChangeFormParent = ( parentId ) => {
+		setFormParent( parentId );
 	};
 
 	const onToggleForm = () => {
@@ -456,7 +465,7 @@ function HierarchicalTermSelector( { slug } ) {
 					<TreeSelect
 						label={ parentSelectLabel }
 						noOptionLabel={ noParentOption }
-						onChange={ setFormParent }
+						onChange={ onChangeFormParent }
 						selectedId={ formParent }
 						tree={ availableTermsTree }
 					/>
