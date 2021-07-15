@@ -74,6 +74,7 @@ module.exports = async function readConfig( configPath ) {
 		plugins: [],
 		themes: [],
 		port: 8888,
+		ssl: null,
 		mappings: {},
 		config: {
 			WP_DEBUG: true,
@@ -91,6 +92,7 @@ module.exports = async function readConfig( configPath ) {
 			tests: {
 				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
 				port: 8889,
+				ssl: null,
 			},
 		},
 	};
@@ -272,6 +274,11 @@ function withOverrides( config ) {
 				// Don't overwrite the port of WP_HOME when set.
 				if ( ! ( configKey === 'WP_HOME' && !! baseUrl.port ) ) {
 					baseUrl.port = config.env[ envKey ].port;
+
+					if ( config.env[ envKey ].ssl ) {
+						baseUrl.protocol = 'https';
+						baseUrl.port = config.env[ envKey ].ssl;
+					}
 				}
 
 				config.env[ envKey ].config[ configKey ] = baseUrl.toString();

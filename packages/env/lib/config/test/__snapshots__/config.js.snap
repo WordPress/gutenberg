@@ -26,6 +26,7 @@ Object {
       "phpVersion": null,
       "pluginSources": Array [],
       "port": 2000,
+      "ssl": null,
       "themeSources": Array [],
     },
     "tests": Object {
@@ -49,6 +50,7 @@ Object {
       "phpVersion": null,
       "pluginSources": Array [],
       "port": 1000,
+      "ssl": null,
       "themeSources": Array [],
     },
   },
