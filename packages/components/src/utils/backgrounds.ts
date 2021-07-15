@@ -71,12 +71,6 @@ export function getBackgroundColor(
 		colorized.darken( 20 );
 	}
 
-	// if ( isBold ) {
-	// 	colorized.lighten( 30 );
-	// } else if ( isSubtle ) {
-	// 	colorized.lighten( 90 );
-	// }
-
 	return css( {
 		background: colorized.toHslString(),
 		fontWeight: isBold ? 'bold' : 'normal',
