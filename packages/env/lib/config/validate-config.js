@@ -51,6 +51,12 @@ function validateConfig( config, envLocation ) {
 		);
 	}
 
+	if ( config?.ssl && ! Number.isInteger( config.ssl ) ) {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ envPrefix }ssl" must be an integer.`
+		);
+	}
+
 	if ( typeof config.config !== 'object' ) {
 		throw new ValidationError(
 			`Invalid .wp-env.json: "${ envPrefix }config" must be an object.`
