@@ -10,7 +10,6 @@ import { throttle } from 'lodash';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
-const cloneHeightTransformationBreakpoint = 700;
 const clonePadding = 0;
 const bodyClass = 'is-dragging-components-draggable';
 
@@ -23,30 +22,14 @@ const bodyClass = 'is-dragging-components-draggable';
 /**
  * @typedef Props
  * @property {(props: RenderProp) => JSX.Element | null}  children                         Children.
- * @property {(event: import('react').DragEvent) => void} [onDragStart]                    Callback when dragging
- *     starts.
- * @property {(event: import('react').DragEvent) => void} [onDragOver]                     Callback when dragging
- *     happens over the document.
+ * @property {(event: import('react').DragEvent) => void} [onDragStart]                    Callback when dragging starts.
+ * @property {(event: import('react').DragEvent) => void} [onDragOver]                     Callback when dragging happens over the document.
  * @property {(event: import('react').DragEvent) => void} [onDragEnd]                      Callback when dragging ends.
- * @property {string}                                     [cloneClassname]                 Classname for the cloned
- *     element.
+ * @property {string}                                     [cloneClassname]                 Classname for the cloned element.
  * @property {string}                                     [elementId]                      ID for the element.
- * @property {any}                                        [transferData]                   Transfer data for the drag
- *     event.
- * @property {string}                                     [__experimentalTransferDataType] The transfer data type to
- *     set.
- * @property {import('react').ReactNode}                  __experimentalDragComponent      Component to show when
- *     dragging.
- */
-
-/**
- * @typedef DragState
- * @property {number}                    x            Current X coordinate of cloneWrapper
- * @property {number}                    y            Current Y coordinate of cloneWrapper
- * @property {number}                    cursorLeft   Last mouse x coordinate
- * @property {number}                    cursorTop    Last mouse y coordinate
- * @property {number}                    scale        Scale to apply to the draggable.
- * @property {HTMLDivElement}            cloneWrapper Cloned Draggable
+ * @property {any}                                        [transferData]                   Transfer data for the drag event.
+ * @property {string}                                     [__experimentalTransferDataType] The transfer data type to set.
+ * @property {import('react').ReactNode}                  __experimentalDragComponent      Component to show when dragging.
  */
 
 /**
@@ -79,29 +62,6 @@ export default function Draggable( {
 
 		if ( onDragEnd ) {
 			onDragEnd( event );
-		}
-	}
-
-	/**
-	 * @param {import('react').DragEvent} e
-	 * @param {DragState} dragState
-	 */
-	function over( e, dragState ) {
-		const nextX = dragState.x + e.clientX - dragState.cursorLeft;
-		const nextY = dragState.y + e.clientY - dragState.cursorTop;
-		if ( dragState.scale === 1 ) {
-			dragState.cloneWrapper.style.transform = `translate( ${ nextX }px, ${ nextY }px )`;
-		} else {
-			dragState.cloneWrapper.style.transform = `translate( ${ nextX }px, ${ nextY }px ) scale( ${ dragState.scale } )`;
-		}
-
-		// Update cursor coordinates.
-		dragState.cursorLeft = e.clientX;
-		dragState.cursorTop = e.clientY;
-		dragState.x = nextX;
-		dragState.y = nextY;
-		if ( onDragOver ) {
-			onDragOver( e );
 		}
 	}
 
@@ -146,9 +106,8 @@ export default function Draggable( {
 			cloneWrapper.classList.add( cloneClassname );
 		}
 
-		let x,
-			y,
-			scale = 1;
+		let x = 0;
+		let y = 0;
 		// If a dragComponent is defined, the following logic will clone the
 		// HTML node and inject it into the cloneWrapper.
 		if ( dragComponentRef.current ) {
@@ -179,22 +138,10 @@ export default function Draggable( {
 			const clone = element.cloneNode( true );
 			clone.id = `clone-${ elementId }`;
 
-			if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
-				// Scale down clone if original element is larger than 700px.
-				cloneWrapper.style.transformOrigin = 'top left';
-				// Position clone near the cursor.
-				x = event.clientX;
-				y = event.clientY - 100;
-				// Can also be written as the affine transform: matrix( 0.5, 0, 0, 0.5, x, y ).
-				// Note that order matters, translate should be done before scale.
-				cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px ) scale(0.5)`;
-				scale = 0.5;
-			} else {
-				// Position clone right over the original element (20px padding).
-				x = elementLeftOffset - clonePadding;
-				y = elementTopOffset - clonePadding;
-				cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
-			}
+			// Position clone right over the original element (20px padding).
+			x = elementLeftOffset - clonePadding;
+			y = elementTopOffset - clonePadding;
+			cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
 
 			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
 			Array.from(
@@ -208,36 +155,33 @@ export default function Draggable( {
 		}
 
 		// Mark the current cursor coordinates.
-		const dragState = {
-			x,
-			y,
-			cursorLeft: event.clientX,
-			cursorTop: event.clientY,
-			cloneWrapper,
-			scale,
-		};
+		let cursorLeft = event.clientX;
+		let cursorTop = event.clientY;
 
 		/**
-		 * @param {import("react").DragEvent<Element>} e
+		 * @param {import('react').DragEvent<Element>} e
 		 */
-		function update( e ) {
+		function over( e ) {
 			//Skip doing any work if mouse has not moved.
-			if (
-				dragState.cursorLeft === e.clientX &&
-				dragState.cursorTop === e.clientY
-			) {
+			if ( cursorLeft === e.clientX && cursorTop === e.clientY ) {
 				return;
 			}
-			over( e, dragState );
+			const nextX = x + e.clientX - cursorLeft;
+			const nextY = y + e.clientY - cursorTop;
+			cloneWrapper.style.transform = `translate( ${ nextX }px, ${ nextY }px )`;
+			cursorLeft = e.clientX;
+			cursorTop = e.clientY;
+			x = nextX;
+			y = nextY;
+			if ( onDragOver ) {
+				onDragOver( e );
+			}
 		}
 
 		// Aim for 60fps (16 ms per frame) for now. We can potentially use requestAnimationFrame (raf) instead,
 		// note that browsers may throttle raf below 60fps in certain conditions.
-		const throttledDragOver = throttle( update, 16 );
+		const throttledDragOver = throttle( over, 16 );
 
-		/**
-		 * @param {import('react').DragEvent} e
-		 */
 		ownerDocument.addEventListener( 'dragover', throttledDragOver );
 
 		// Update cursor to 'grabbing', document wide.
