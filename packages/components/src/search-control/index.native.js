@@ -65,7 +65,7 @@ function mergeStyles( styles, updateStyles, selectors ) {
 function SearchControl( {
 	value,
 	onChange,
-	placeholder = __( 'Search Blocks' ),
+	placeholder = __( 'Search blocks' ),
 } ) {
 	const [ isActive, setIsActive ] = useState( false );
 	const [ currentStyles, setCurrentStyles ] = useState( baseStyles );
@@ -154,7 +154,7 @@ function SearchControl( {
 		const button =
 			! isIOS && isActive ? (
 				<Button
-					label={ __( 'Cancel Search' ) }
+					label={ __( 'Cancel search' ) }
 					icon={ arrowLeftIcon }
 					onClick={ onCancel }
 					style={ iconStyle }
@@ -181,7 +181,7 @@ function SearchControl( {
 		if ( !! value ) {
 			button = (
 				<Button
-					label={ __( 'Clear Search' ) }
+					label={ __( 'Clear search' ) }
 					icon={ isIOS ? cancelCircleFilledIcon : closeIcon }
 					onClick={ clearInput }
 					style={ [ iconStyle, rightIconStyle ] }
@@ -207,8 +207,8 @@ function SearchControl( {
 					style={ cancelButtonTextStyle }
 					accessible={ true }
 					accessibilityRole={ 'button' }
-					accessibilityLabel={ __( 'Cancel Search' ) }
-					accessibilityHint={ __( 'Cancel Search' ) }
+					accessibilityLabel={ __( 'Cancel search' ) }
+					accessibilityHint={ __( 'Cancel search' ) }
 				>
 					{ __( 'Cancel' ) }
 				</Text>
