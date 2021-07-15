@@ -131,5 +131,5 @@ module.exports = {
 	},
 	buttonNoBg: {
 		color: 'orange',
-	}
+	},
 };
