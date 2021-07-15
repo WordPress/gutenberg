@@ -9,6 +9,20 @@ import { useMergeRefs, useRefEffect } from '@wordpress/compose';
  */
 import StyleProvider from '../style-provider';
 
+/**
+ * Renders an iframe with the passed children inside it.
+ *
+ * @param {Object}          props            Component Props.
+ * @param {WPElement}       props.children   Children to render inside the
+ *                                           iframe body.
+ * @param {WPElement}       props.head       Head elements to render inside the
+ *                                           iframe head.
+ * @param {Object|Function} props.contentRef Ref to pass to the iframe body.
+ * @param {string}          props.title      Iframe title.
+ * @param {Object|Function} ref              Forwarded ref.
+ *
+ * @return {WPElement} The iframe component.
+ */
 function Iframe( { contentRef, children, head, title, ...props }, ref ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const refEffect = useRefEffect( ( node ) => {
