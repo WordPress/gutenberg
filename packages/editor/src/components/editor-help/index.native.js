@@ -47,7 +47,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 			hasNavigation
 		>
 			<BottomSheet.NavigationContainer animate main>
-				<BottomSheet.NavigationScreen name={ 'Topics' }>
+				<BottomSheet.NavigationScreen name={ __( 'Topics' ) }>
 					<View style={ styles.bottomSheetHeader }>
 						<Text
 							style={ bottomSheetHeaderTitleStyle }
