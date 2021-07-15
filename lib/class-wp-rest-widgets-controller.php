@@ -544,10 +544,16 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			rest_is_field_included( 'rendered', $fields ) &&
 			'wp_inactive_widgets' !== $sidebar_id
 		) {
+			// Some third-party widgets rely on wp-admin functions
+			require_once ABSPATH . 'wp-admin/includes/admin.php';
+
 			$prepared['rendered'] = trim( wp_render_widget( $widget_id, $sidebar_id ) );
 		}
 
 		if ( rest_is_field_included( 'rendered_form', $fields ) ) {
+			// Some third-party widgets rely on wp-admin functions
+			require_once ABSPATH . 'wp-admin/includes/admin.php';
+
 			$rendered_form = wp_render_widget_control( $widget_id );
 			if ( ! is_null( $rendered_form ) ) {
 				$prepared['rendered_form'] = trim( $rendered_form );
