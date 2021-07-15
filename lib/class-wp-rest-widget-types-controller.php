@@ -421,7 +421,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			);
 		}
 
-		// Some third-party widgets rely on wp-admin functions so let's load them before rendering the preview.
+		// Third-party widgets may rely on wp-admin functions. So let's load them before working with the widget object.
 		require_once ABSPATH . 'wp-admin/includes/admin.php';
 
 		// Set the widget's number so that the id attributes in the HTML that we
