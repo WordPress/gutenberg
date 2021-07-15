@@ -585,12 +585,13 @@ function gutenberg_enqueue_block_style( $block_name, $args ) {
 function gutenberg_multiple_block_styles( $metadata ) {
 	foreach ( array( 'style', 'editorStyle' ) as $key ) {
 		if ( isset( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
+			$default_style = array_shift( $metadata[ $key ] );
 			foreach ( $metadata[ $key ] as $handle ) {
 				gutenberg_enqueue_block_style( $metadata['name'], array( 'handle' => $handle ) );
 			}
 
 			// Only return the 1st item in the array.
-			$metadata[ $key ] = $metadata[ $key ][0];
+			$metadata[ $key ] = $default_style;
 		}
 	}
 	return $metadata;
