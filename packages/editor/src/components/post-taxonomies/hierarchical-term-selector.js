@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { get, unescape as unescapeString, without, find, some } from 'lodash';
+import {
+	get,
+	unescape as unescapeString,
+	without,
+	find,
+	some,
+	isArray,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -148,6 +155,7 @@ function HierarchicalTermSelector( {
 	addTerm,
 	taxonomy,
 	terms,
+	loading,
 	slug,
 	availableTerms,
 	hasCreateAction,
@@ -356,7 +364,7 @@ function HierarchicalTermSelector( {
 				'' !== filterValue ? filteredTermsTree : availableTermsTree
 			) }
 		</div>,
-		hasCreateAction && (
+		! loading && hasCreateAction && (
 			<Button
 				key="term-add-button"
 				onClick={ onToggleForm }
@@ -434,6 +442,7 @@ export default compose( [
 				  )
 				: false,
 			terms,
+			loading: ! isArray( queriedTerms ),
 			availableTerms: queriedTerms || [],
 			availableTermsTree: sortBySelected(
 				buildTermsTree( queriedTerms || [] ),
