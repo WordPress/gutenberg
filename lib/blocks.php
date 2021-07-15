@@ -572,7 +572,7 @@ function gutenberg_enqueue_block_style( $block_name, $args ) {
 	add_filter( $hook, $callback );
 
 	// Enqueue assets in the editor.
-	add_action( 'enqueue_block_editor_assets', $callback );
+	add_action( 'enqueue_block_assets', $callback );
 }
 
 /**
