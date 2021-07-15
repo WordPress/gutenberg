@@ -10,37 +10,9 @@ import {
 	FlexItem,
 	__experimentalSegmentedControl as SegmentedControl,
 	__experimentalSegmentedControlOption as SegmentedControlOption,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
-import { Platform } from '@wordpress/element';
 
-const isWeb = Platform.OS === 'web';
-const CSS_UNITS = [
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-	{
-		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
-		default: '',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-];
 const SCALE_OPTIONS = (
 	<>
 		<SegmentedControlOption
@@ -68,6 +40,9 @@ const DimensionControls = ( {
 	attributes: { width, height, scale },
 	setAttributes,
 } ) => {
+	const units = useCustomUnits( {
+		availableUnits: [ 'px', '%', 'vw', 'em', 'rem' ],
+	} );
 	const onDimensionChange = ( dimension, nextValue ) => {
 		setAttributes( {
 			[ dimension ]: parseFloat( nextValue ) < 0 ? '0' : nextValue,
@@ -85,7 +60,7 @@ const DimensionControls = ( {
 						onChange={ ( nextHeight ) => {
 							onDimensionChange( 'height', nextHeight );
 						} }
-						units={ CSS_UNITS }
+						units={ units }
 					/>
 				</FlexItem>
 				<FlexItem>
@@ -96,7 +71,7 @@ const DimensionControls = ( {
 						onChange={ ( nextWidth ) => {
 							onDimensionChange( 'width', nextWidth );
 						} }
-						units={ CSS_UNITS }
+						units={ units }
 					/>
 				</FlexItem>
 			</Flex>
