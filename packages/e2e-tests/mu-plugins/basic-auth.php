@@ -10,18 +10,24 @@
  * @package gutenberg-test-basic-auth
  */
 
+/**
+ * Handles basic auth for REST API.
+ *
+ * @param WP_User $user The current user.
+ * @return string The user ID.
+ */
 function json_basic_auth_handler( $user ) {
 	global $wp_json_basic_auth_error;
 
 	$wp_json_basic_auth_error = null;
 
-	// Don't authenticate twice
+	// Don't authenticate twice.
 	if ( ! empty( $user ) ) {
 		return $user;
 	}
 
-	// Check that we're trying to authenticate
-	if ( !isset( $_SERVER['PHP_AUTH_USER'] ) ) {
+	// Check that we're trying to authenticate.
+	if ( ! isset( $_SERVER['PHP_AUTH_USER'] ) ) {
 		return $user;
 	}
 
@@ -51,8 +57,14 @@ function json_basic_auth_handler( $user ) {
 }
 add_filter( 'determine_current_user', 'json_basic_auth_handler', 20 );
 
+/**
+ * Handle auth errors.
+ *
+ * @param WP_Error $error The REST API authentication error.
+ * @return WP_Error The REST API authentication error.
+ */
 function json_basic_auth_error( $error ) {
-	// Passthrough other errors
+	// Passthrough other errors.
 	if ( ! empty( $error ) ) {
 		return $error;
 	}
