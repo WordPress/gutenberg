@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 import { archiveTitle } from '@wordpress/icons';
 const variations = [
 	{

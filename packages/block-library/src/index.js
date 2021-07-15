@@ -66,7 +66,6 @@ import * as siteLogo from './site-logo';
 import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
-import * as queryTitle from './query-title';
 import * as query from './query';
 import * as postTemplate from './post-template';
 import * as queryTitle from './query-title';
