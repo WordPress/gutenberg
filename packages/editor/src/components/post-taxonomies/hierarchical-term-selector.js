@@ -1,20 +1,20 @@
 /**
  * External dependencies
  */
-import { get, unescape as unescapeString, without, find, some } from 'lodash';
+import { find, get, some, unescape as unescapeString, without } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, _x, _n, sprintf } from '@wordpress/i18n';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
+	Button,
 	CheckboxControl,
 	TreeSelect,
 	withFilters,
-	Button,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce, useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
@@ -53,14 +53,11 @@ function sortBySelected( termsTree, terms ) {
 		if ( undefined === termTree.children ) {
 			return false;
 		}
-		const anyChildIsSelected =
+		return (
 			termTree.children
 				.map( treeHasSelection )
-				.filter( ( child ) => child ).length > 0;
-		if ( anyChildIsSelected ) {
-			return true;
-		}
-		return false;
+				.filter( ( child ) => child ).length > 0
+		);
 	};
 	const termOrChildIsSelected = ( termA, termB ) => {
 		const termASelected = treeHasSelection( termA );
