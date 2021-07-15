@@ -70,7 +70,7 @@ describe( 'Unsupported block', () => {
 		fireEvent.press( missingBlock );
 
 		const helpButton = await waitFor( () =>
-			getByA11yLabel( /Help button/ )
+			getByA11yLabel( 'Help button' )
 		);
 
 		fireEvent.press( helpButton );
