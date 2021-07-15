@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import { toMatchInlineSnapshot, toMatchSnapshot } from 'jest-snapshot';
 
 /**
  * WordPress dependencies
@@ -209,6 +210,22 @@ async function simulateAdverseConditions() {
 		await page.emulateCPUThrottling( Number( THROTTLE_CPU ) );
 	}
 }
+
+// Override snapshot matchers to throw errors as soon as possible,
+// See https://jestjs.io/docs/expect#bail-out
+// This is to fix a bug in Jest that snapshot failures won't trigger `test_fn_failure` events.
+expect.extend( {
+	toMatchInlineSnapshot( ...args ) {
+		this.dontThrow = () => {};
+
+		return toMatchInlineSnapshot.call( this, ...args );
+	},
+	toMatchSnapshot( ...args ) {
+		this.dontThrow = () => {};
+
+		return toMatchSnapshot.call( this, ...args );
+	},
+} );
 
 // Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
