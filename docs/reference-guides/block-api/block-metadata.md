@@ -261,7 +261,7 @@ Sometimes a block could have aliases that help users discover it while searching
 { "version": "1.0.3" }
 ```
 
-The current version number of the block, such as 1.0 or 1.0.3. It's similar to how plugins are versioned. This field might be used with block assets to control cache invalidation.
+The current version number of the block, such as 1.0 or 1.0.3. It's similar to how plugins are versioned. This field might be used with block assets to control cache invalidation, and when the block author omits it, then the current version of WordPress is used instead.
 
 ### Text Domain
 
