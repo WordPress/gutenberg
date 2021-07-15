@@ -421,6 +421,9 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			);
 		}
 
+		// Some third-party widgets rely on wp-admin functions so let's load them before rendering the preview.
+		require_once ABSPATH . 'wp-admin/includes/admin.php';
+
 		// Set the widget's number so that the id attributes in the HTML that we
 		// return are predictable.
 		if ( isset( $request['number'] ) && is_numeric( $request['number'] ) ) {
@@ -500,9 +503,6 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	 * @return string
 	 */
 	private function get_widget_preview( $widget_object, $instance ) {
-		// Some third-party widgets rely on wp-admin functions so let's load them before rendering the preview.
-		require_once ABSPATH . 'wp-admin/includes/admin.php';
-
 		ob_start();
 		the_widget( get_class( $widget_object ), $instance );
 		return ob_get_clean();
@@ -517,9 +517,6 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	 * @return string
 	 */
 	private function get_widget_form( $widget_object, $instance ) {
-		// Some third-party widgets rely on wp-admin functions so let's load them before rendering the form.
-		require_once ABSPATH . 'wp-admin/includes/admin.php';
-
 		ob_start();
 
 		/** This filter is documented in wp-includes/class-wp-widget.php */
