@@ -413,6 +413,19 @@ _Returns_
 
 -   `string[]`: Array of dragged block client ids.
 
+### getDuotoneVisibility
+
+Returns the visibility state of the duotone controls for a given clientId.
+
+_Parameters_
+
+-   _state_ `Object`: Block editor state.
+-   _clientId_ `Object`: Client Id of the block.
+
+_Returns_
+
+-   `boolean`: Visibility of the duotone controls.
+
 ### getFirstMultiSelectedBlockClientId
 
 Returns the client ID of the first block in the multi-selection set, or null
@@ -1407,6 +1420,20 @@ Returns an action object resetting the template validity.
 _Parameters_
 
 -   _isValid_ `boolean`: template validity flag.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### showDuotoneControls
+
+Returns an action object used in signalling that the duotone block controls
+visibility changed.
+
+_Parameters_
+
+-   _clientId_ `string`: The selected block client ID.
+-   _isShown_ `boolean`: If the duotone controls should be shown.
 
 _Returns_
 
