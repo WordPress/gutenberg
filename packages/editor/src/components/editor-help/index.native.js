@@ -43,6 +43,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 		<BottomSheet
 			isVisible={ isVisible }
 			onClose={ onClose }
+			contentStyle={ styles.contentContainer }
 			hideHeader
 			hasNavigation
 		>
