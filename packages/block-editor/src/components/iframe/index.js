@@ -2,17 +2,15 @@
  * WordPress dependencies
  */
 import {
-	useState,
-	createPortal,
-	useCallback,
 	forwardRef,
 	useEffect,
 	useMemo,
 	useReducer,
+	useRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs } from '@wordpress/compose';
-import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { Iframe } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -185,113 +183,73 @@ async function loadScript( doc, { id, src } ) {
 	} );
 }
 
-function Iframe( { contentRef, children, head, ...props }, ref ) {
-	const [ , forceRender ] = useReducer( () => ( {} ) );
-	const [ iframeDocument, setIframeDocument ] = useState();
+function Styles() {
+	const ref = useRef();
 	const styles = useParsedAssets( window.__editorAssets.styles );
-	const scripts = useParsedAssets( window.__editorAssets.scripts );
-	const clearerRef = useBlockSelectionClearer();
-	const setRef = useCallback( ( node ) => {
-		if ( ! node ) {
-			return;
-		}
-
-		function setDocumentIfReady() {
-			const { contentDocument } = node;
-			const { readyState, body, documentElement } = contentDocument;
-
-			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
-				return false;
-			}
-
-			if ( typeof contentRef === 'function' ) {
-				contentRef( body );
-			} else if ( contentRef ) {
-				contentRef.current = body;
-			}
-
-			setBodyClassName( contentDocument );
-			bubbleEvents( contentDocument );
-			setBodyClassName( contentDocument );
-			setIframeDocument( contentDocument );
-			clearerRef( documentElement );
-			clearerRef( body );
-
-			scripts
-				.reduce(
-					( promise, script ) =>
-						promise.then( () =>
-							loadScript( contentDocument, script )
-						),
-					Promise.resolve()
-				)
-				.finally( () => {
-					// When script are loaded, re-render blocks to allow them
-					// to initialise.
-					forceRender();
-				} );
-
-			return true;
-		}
-
-		if ( setDocumentIfReady() ) {
-			return;
-		}
-
-		// Document is not immediately loaded in Firefox.
-		node.addEventListener( 'load', () => {
-			setDocumentIfReady();
-		} );
-	}, [] );
 
 	useEffect( () => {
-		if ( iframeDocument ) {
-			styleSheetsCompat( iframeDocument );
+		styleSheetsCompat( ref.current.ownerDocument );
+	}, [] );
+
+	return styles.map( ( { tagName, href, id, rel, media, textContent } ) => {
+		const TagName = tagName.toLowerCase();
+
+		if ( TagName === 'style' ) {
+			return (
+				<TagName { ...{ id } } key={ id }>
+					{ textContent }
+				</TagName>
+			);
 		}
-	}, [ iframeDocument ] );
 
-	head = (
-		<>
-			<style>{ 'body{margin:0}' }</style>
-			{ styles.map(
-				( { tagName, href, id, rel, media, textContent } ) => {
-					const TagName = tagName.toLowerCase();
+		return <TagName { ...{ href, id, rel, media } } key={ id } />;
+	} );
+}
 
-					if ( TagName === 'style' ) {
-						return (
-							<TagName { ...{ id } } key={ id }>
-								{ textContent }
-							</TagName>
-						);
-					}
+function BlockEditorIframe( { contentRef, children, head, ...props }, ref ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
+	const scripts = useParsedAssets( window.__editorAssets.scripts );
+	const clearerRef = useBlockSelectionClearer();
+	const refEffect = useRefEffect( ( bodyElement ) => {
+		const { ownerDocument } = bodyElement;
+		const { documentElement } = ownerDocument;
+		setBodyClassName( ownerDocument );
+		bubbleEvents( ownerDocument );
+		setBodyClassName( ownerDocument );
+		clearerRef( documentElement );
+		clearerRef( bodyElement );
 
-					return (
-						<TagName { ...{ href, id, rel, media } } key={ id } />
-					);
-				}
-			) }
-			{ head }
-		</>
-	);
+		scripts
+			.reduce(
+				( promise, script ) =>
+					promise.then( () => loadScript( ownerDocument, script ) ),
+				Promise.resolve()
+			)
+			.finally( () => {
+				// When script are loaded, re-render blocks to allow them
+				// to initialise.
+				forceRender();
+			} );
+	}, [] );
 
 	return (
-		<iframe
+		<Iframe
 			{ ...props }
-			ref={ useMergeRefs( [ ref, setRef ] ) }
+			ref={ ref }
+			contentRef={ useMergeRefs( [ contentRef, refEffect ] ) }
 			tabIndex="0"
 			title={ __( 'Editor canvas' ) }
 			name="editor-canvas"
+			head={
+				<>
+					<Styles />
+					{ head }
+				</>
+			}
 		>
-			{ iframeDocument &&
-				createPortal(
-					<StyleProvider document={ iframeDocument }>
-						{ children }
-					</StyleProvider>,
-					iframeDocument.body
-				) }
-			{ iframeDocument && createPortal( head, iframeDocument.head ) }
-		</iframe>
+			{ children }
+		</Iframe>
 	);
 }
 
-export default forwardRef( Iframe );
+export default forwardRef( BlockEditorIframe );
