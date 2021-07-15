@@ -111,8 +111,16 @@ module.exports = function buildDockerComposeConfig( config ) {
 	}
 
 	// Set the default ports based on the config values.
-	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
-	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
+	const developmentPorts = [ `\${WP_ENV_PORT:-${ config.env.development.port }}:80` ];
+	const testsPorts = [ `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80` ];
+
+	// Set the default SSL ports based on the config values.
+	if ( config.env.development.ssl ) {
+		developmentPorts.push( `${ config.env.development.ssl }:443` );
+	}
+	if ( config.env.tests.ssl ) {
+		testsPorts.push( `${ config.env.tests.ssl }:443` );
+	}
 
 	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
 	const developmentPhpVersion = config.env.development.phpVersion
