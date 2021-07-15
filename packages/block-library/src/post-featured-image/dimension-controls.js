@@ -12,6 +12,7 @@ import {
 	__experimentalSegmentedControlOption as SegmentedControlOption,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
+import { useSetting } from '@wordpress/block-editor';
 
 const SCALE_OPTIONS = (
 	<>
@@ -41,11 +42,13 @@ const DimensionControls = ( {
 	setAttributes,
 } ) => {
 	const units = useCustomUnits( {
-		availableUnits: [ 'px', '%', 'vw', 'em', 'rem' ],
+		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
 	const onDimensionChange = ( dimension, nextValue ) => {
+		const parsedValue = parseFloat( nextValue );
+		if ( isNaN( parsedValue ) ) return;
 		setAttributes( {
-			[ dimension ]: parseFloat( nextValue ) < 0 ? '0' : nextValue,
+			[ dimension ]: parsedValue < 0 ? '0' : nextValue,
 		} );
 	};
 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
