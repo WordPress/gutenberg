@@ -47,7 +47,7 @@ export default function WritingFlow( { children, ...props } ) {
 					props.className,
 					'block-editor-writing-flow'
 				) }
-				tabIndex={ hasMultiSelection ? '0' : '-1' }
+				tabIndex={ -1 }
 				aria-label={
 					hasMultiSelection
 						? __( 'Multiple selected blocks' )
