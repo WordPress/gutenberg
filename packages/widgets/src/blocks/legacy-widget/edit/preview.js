@@ -77,7 +77,6 @@ export default function Preview( { idBase, instance, isVisible } ) {
 				</Placeholder>
 			) }
 			<div
-				data-widget-preview-id={ idBase }
 				className={ classnames(
 					'wp-block-legacy-widget__edit-preview',
 					{
