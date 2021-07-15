@@ -20,11 +20,9 @@ export const SUPPORTED_COLORS = [
 	'lightGray',
 ] as const;
 
-export type SupportedColors = typeof SUPPORTED_COLORS[ number ];
+export type SupportedColor = typeof SUPPORTED_COLORS[ number ];
 
-function assertIsSupportedColor(
-	color: any
-): asserts color is SupportedColors {
+function assertIsSupportedColor( color: any ): asserts color is SupportedColor {
 	if ( ! SUPPORTED_COLORS.includes( color ) ) {
 		throw new Error(
 			`'color' must be one of the supported colors: ${ SUPPORTED_COLORS.join(
@@ -35,7 +33,7 @@ function assertIsSupportedColor(
 }
 
 export function getBackgroundColor(
-	color: SupportedColors,
+	color: SupportedColor,
 	options: { isBold?: boolean } = {}
 ): SerializedStyles {
 	assertIsSupportedColor( color );
@@ -77,7 +75,7 @@ export function getBackgroundColor(
 	} );
 }
 
-const BACKGROUND_COLOR_TO_TEXT: Record< SupportedColors, `#${ string }` > = {
+const BACKGROUND_COLOR_TO_TEXT: Record< SupportedColor, `#${ string }` > = {
 	blue: '#005f8c',
 	green: '#25612f',
 	yellow: '#c44f09',
@@ -89,7 +87,7 @@ const BACKGROUND_COLOR_TO_TEXT: Record< SupportedColors, `#${ string }` > = {
 };
 
 export function getTextColorForBackgroundColor(
-	color: SupportedColors,
+	color: SupportedColor,
 	{ isBold }: { isBold?: boolean } = {}
 ): SerializedStyles {
 	assertIsSupportedColor( color );
