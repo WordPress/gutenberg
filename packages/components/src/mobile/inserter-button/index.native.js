@@ -84,7 +84,7 @@ class MenuItem extends Component {
 						<Badge
 							label={ __( 'New' ) }
 							position={ { top: 4, left: 4 } }
-							show={ item.isNew }
+							show={ item.isNew === true }
 							size="small"
 						>
 							<View style={ modalIconStyle }>
