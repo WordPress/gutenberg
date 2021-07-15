@@ -522,13 +522,10 @@ if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
  *
  * @param string $block_name The block-name, including namespace.
  * @param array  $args       An array of arguments [handle,src,deps,ver,media].
- * @param bool   $register   Whether the stylesheet should be registered.
- *                           If set to false, then assume it has already been registered,
- *                           and only enqueue it.
  *
  * @return void
  */
-function gutenberg_enqueue_block_style( $block_name, $args, $register = true ) {
+function gutenberg_enqueue_block_style( $block_name, $args ) {
 	$args = wp_parse_args(
 		$args,
 		array(
@@ -549,9 +546,9 @@ function gutenberg_enqueue_block_style( $block_name, $args, $register = true ) {
 	 *
 	 * @return string
 	 */
-	$callback = function( $content ) use ( $args, $register ) {
+	$callback = function( $content ) use ( $args ) {
 		// Register the stylesheet.
-		if ( $register ) {
+		if ( ! empty( $args['src'] ) ) {
 			wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
 		}
 
@@ -589,11 +586,7 @@ function gutenberg_multiple_block_styles( $metadata ) {
 	foreach ( array( 'style', 'editorStyle' ) as $key ) {
 		if ( isset( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
 			foreach ( $metadata[ $key ] as $handle ) {
-				gutenberg_enqueue_block_style(
-					$metadata['name'],
-					array( 'handle' => $handle ),
-					false
-				);
+				gutenberg_enqueue_block_style( $metadata['name'], array( 'handle' => $handle ) );
 			}
 
 			// Only return the 1st item in the array.
