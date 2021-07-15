@@ -36,22 +36,49 @@ function assertIsSupportedColor(
 
 export function getBackgroundColor(
 	color: SupportedColors,
-	options: { isBold?: boolean; isSubtle?: boolean } = {}
+	options: { isBold?: boolean } = {}
 ): SerializedStyles {
 	assertIsSupportedColor( color );
 
-	const { isBold, isSubtle } = options;
+	const { isBold } = options;
 
 	const colorized = colorize( color );
 
-	colorized.setAlpha( 0.2 );
-	if ( isBold ) {
-		colorized.setAlpha( 0.7 );
-	} else if ( isSubtle ) {
-		colorized.setAlpha( 0.1 );
+	switch ( color ) {
+		case 'purple':
+		case 'green':
+			colorized.lighten( 60 );
+			colorized.desaturate( 60 );
+			break;
+		case 'blue':
+		case 'red':
+		case 'orange':
+			colorized.lighten( 40 );
+			colorized.desaturate( 10 );
+			break;
+		case 'darkGray':
+			colorized.lighten( 25 );
+			break;
+		case 'lightGray':
+			colorized.lighten( 13 );
+			break;
+		case 'yellow':
+			colorized.lighten( 40 );
+			break;
 	}
+
+	if ( isBold ) {
+		colorized.darken( 20 );
+	}
+
+	// if ( isBold ) {
+	// 	colorized.lighten( 30 );
+	// } else if ( isSubtle ) {
+	// 	colorized.lighten( 90 );
+	// }
+
 	return css( {
-		background: colorized.toRgbString(),
+		background: colorized.toHslString(),
 		fontWeight: isBold ? 'bold' : 'normal',
 	} );
 }
@@ -67,29 +94,13 @@ const BACKGROUND_COLOR_TO_TEXT: Record< SupportedColors, `#${ string }` > = {
 	purple: '#342c48',
 };
 
-const BACKGROUND_COLOR_TEXT_BOLD: Record<
-	SupportedColors,
-	typeof COLORS.white | typeof COLORS.black
-> = {
-	blue: COLORS.white,
-	green: COLORS.black,
-	yellow: COLORS.black,
-	orange: COLORS.black,
-	red: COLORS.black,
-	lightGray: COLORS.black,
-	darkGray: COLORS.black,
-	purple: COLORS.white,
-};
-
 export function getTextColorForBackgroundColor(
 	color: SupportedColors,
 	{ isBold }: { isBold?: boolean } = {}
 ): SerializedStyles {
 	assertIsSupportedColor( color );
 
-	const value = isBold
-		? BACKGROUND_COLOR_TEXT_BOLD[ color ]
-		: BACKGROUND_COLOR_TO_TEXT[ color ];
+	const value = isBold ? COLORS.black : BACKGROUND_COLOR_TO_TEXT[ color ];
 
 	return css`
 		color: ${ value };

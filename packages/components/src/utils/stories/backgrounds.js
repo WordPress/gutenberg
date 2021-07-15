@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
@@ -12,11 +13,20 @@ import {
 	getBackgroundColor,
 	getTextColorForBackgroundColor,
 } from '../backgrounds';
-import { Flex } from '../../flex';
+import { HStack } from '../../h-stack';
 
 export default {
 	title: 'Components (Experimental)/Background Colors',
 };
+
+const WhiteBackground = styled( HStack )`
+	background-color: white;
+	padding: 2em;
+`;
+
+const BlackBackground = styled( WhiteBackground )`
+	background-color: black;
+`;
 
 const Example = ( { color, isBold } ) => {
 	const cx = useCx();
@@ -41,13 +51,23 @@ const Example = ( { color, isBold } ) => {
 
 export const _default = () => {
 	return (
-		<Flex>
-			{ SUPPORTED_COLORS.map( ( color ) => (
-				<Example color={ color } key={ color } />
-			) ) }
-			{ SUPPORTED_COLORS.map( ( color ) => (
-				<Example color={ color } key={ color } isBold />
-			) ) }
-		</Flex>
+		<>
+			<WhiteBackground wrap>
+				{ SUPPORTED_COLORS.map( ( color ) => (
+					<Example color={ color } key={ color } />
+				) ) }
+				{ SUPPORTED_COLORS.map( ( color ) => (
+					<Example color={ color } key={ color } isBold />
+				) ) }
+			</WhiteBackground>
+			<BlackBackground wrap>
+				{ SUPPORTED_COLORS.map( ( color ) => (
+					<Example color={ color } key={ color } />
+				) ) }
+				{ SUPPORTED_COLORS.map( ( color ) => (
+					<Example color={ color } key={ color } isBold />
+				) ) }
+			</BlackBackground>
+		</>
 	);
 };
