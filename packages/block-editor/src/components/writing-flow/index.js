@@ -13,6 +13,10 @@ import useTabNav from './use-tab-nav';
 import useArrowNav from './use-arrow-nav';
 import useSelectAll from './use-select-all';
 import { store as blockEditorStore } from '../../store';
+/**
+ * External dependencies
+ */
+import classNames from 'classnames';
 
 /**
  * Handles selection and navigation across blocks. This component should be
@@ -21,7 +25,7 @@ import { store as blockEditorStore } from '../../store';
  * @param {Object}    props          Component properties.
  * @param {WPElement} props.children Children to be rendered.
  */
-export default function WritingFlow( { children } ) {
+export default function WritingFlow( { children, ...props } ) {
 	const [ before, ref, after ] = useTabNav();
 	const hasMultiSelection = useSelect(
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
@@ -31,14 +35,19 @@ export default function WritingFlow( { children } ) {
 		<>
 			{ before }
 			<div
+				{ ...props }
 				ref={ useMergeRefs( [
+					props.ref,
 					ref,
 					useMultiSelection(),
 					useSelectAll(),
 					useArrowNav(),
 				] ) }
-				className="block-editor-writing-flow"
-				tabIndex={ hasMultiSelection ? '0' : undefined }
+				className={ classNames(
+					props.className,
+					'block-editor-writing-flow'
+				) }
+				tabIndex={ hasMultiSelection ? '0' : '-1' }
 				aria-label={
 					hasMultiSelection
 						? __( 'Multiple selected blocks' )
