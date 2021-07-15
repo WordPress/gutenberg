@@ -8,7 +8,8 @@ import {
 	BaseControl,
 	Flex,
 	FlexItem,
-	Button,
+	__experimentalSegmentedControl as SegmentedControl,
+	__experimentalSegmentedControlOption as SegmentedControlOption,
 } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 
@@ -40,20 +41,28 @@ const CSS_UNITS = [
 		default: '',
 	},
 ];
-const SCALE_OPTIONS = [
-	{
-		label: _x( 'Cover', 'Scale option for Image dimension control' ),
-		value: 'cover',
-	},
-	{
-		label: _x( 'Contain', 'Scale option for Image dimension control' ),
-		value: 'contain',
-	},
-	{
-		label: _x( 'Stretch', 'Scale option for Image dimension control' ),
-		value: 'fill',
-	},
-];
+const SCALE_OPTIONS = (
+	<>
+		<SegmentedControlOption
+			value="cover"
+			label={ _x( 'Cover', 'Scale option for Image dimension control' ) }
+		/>
+		<SegmentedControlOption
+			value="contain"
+			label={ _x(
+				'Contain',
+				'Scale option for Image dimension control'
+			) }
+		/>
+		<SegmentedControlOption
+			value="fill"
+			label={ _x(
+				'Stretch',
+				'Scale option for Image dimension control'
+			) }
+		/>
+	</>
+);
 
 const DimensionControls = ( {
 	attributes: { width, height, scale },
@@ -102,31 +111,18 @@ const DimensionControls = ( {
 								{ scaleLabel }
 							</BaseControl.VisualLabel>
 						</div>
-						<Flex>
-							{ SCALE_OPTIONS.map( ( { value, label } ) => {
-								const isActive = value === scale;
-								return (
-									<FlexItem
-										key={ value }
-										style={ { width: '100%' } }
-									>
-										<Button
-											isPrimary={ isActive }
-											isPressed={ isActive }
-											onClick={ () =>
-												setAttributes( {
-													scale: isActive
-														? undefined
-														: value,
-												} )
-											}
-										>
-											{ label }
-										</Button>
-									</FlexItem>
-								);
-							} ) }
-						</Flex>
+						<SegmentedControl
+							label={ scaleLabel }
+							value={ scale }
+							onChange={ ( value ) => {
+								setAttributes( {
+									scale: value,
+								} );
+							} }
+							isBlock
+						>
+							{ SCALE_OPTIONS }
+						</SegmentedControl>
 					</BaseControl>
 				</>
 			) }
