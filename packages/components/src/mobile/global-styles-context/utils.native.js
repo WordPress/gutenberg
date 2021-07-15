@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, startsWith } from 'lodash';
+import { find, startsWith, get } from 'lodash';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
@@ -120,39 +120,45 @@ export function getBlockColors(
 	return blockStyles;
 }
 
-export function parseVariables( styles, mappedValues ) {
-	const stylesBase = styles;
-	// Examples
-	// var(--wp--preset--color--gray)
-	// var(--wp--preset--font-size--normal)
-	// var(--wp--custom--line-height--body)
-	const variablePrefixRegex = /var\(--wp--(.*?)--(.*?)--(.*?)\)/g;
+export function parseStylesVariables( styles, mappedValues, customValues ) {
+	let stylesBase = styles;
+	const variables = [ 'preset', 'custom' ];
 
-	return stylesBase
-		? JSON.parse(
-				stylesBase?.replace(
-					variablePrefixRegex,
-					( _$1, _$2, $3, $4 ) => {
-						const mappedValue = mappedValues[ $3 ];
-						if ( mappedValue && mappedValue.slug ) {
-							const matchedValue = find( mappedValue.values, {
-								slug: $4,
-							} );
-							return matchedValue?.[ mappedValue.slug ];
-						} else if ( mappedValue ) {
-							return mappedValue.values?.[ $4 ];
-						}
-						return UNKNOWN_VALUE;
-					}
-				)
-		  )
-		: styles;
+	variables.forEach( ( variable ) => {
+		// Examples
+		// var(--wp--preset--color--gray)
+		// var(--wp--custom--body--typography--font-family)
+		const regex = new RegExp( `var\\(--wp--${ variable }--(.*?)\\)`, 'g' );
+
+		if ( variable === 'preset' ) {
+			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
+				const path = $2.split( '--' );
+				const mappedPresetValue = mappedValues[ path[ 0 ] ];
+				if ( mappedPresetValue && mappedPresetValue.slug ) {
+					const matchedValue = find( mappedPresetValue.values, {
+						slug: path[ 1 ],
+					} );
+					return matchedValue?.[ mappedPresetValue.slug ];
+				}
+				return UNKNOWN_VALUE;
+			} );
+		}
+		if ( variable === 'custom' ) {
+			const customValuesData = customValues ?? JSON.parse( stylesBase );
+			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
+				const path = $2.split( '--' );
+				return get( customValuesData, path );
+			} );
+		}
+	} );
+
+	return JSON.parse( stylesBase );
 }
 
 export function getMappedValues( features, colors ) {
-	return {
+	const mappedValues = {
 		color: {
-			values: colors,
+			values: colors?.palette?.theme,
 			slug: 'color',
 		},
 		'font-size': {
@@ -163,28 +169,34 @@ export function getMappedValues( features, colors ) {
 			values: features?.custom?.[ 'line-height' ],
 		},
 	};
+	return mappedValues;
 }
 
-export function getGlobalStyles( rawStyles, rawFeatures, colors, gradients ) {
+export function getGlobalStyles( rawStyles, rawFeatures ) {
 	const features = JSON.parse( rawFeatures );
+	const colors = features?.color;
 	const mappedValues = getMappedValues( features, colors );
-	const parsedGradients = parseVariables(
-		JSON.stringify( gradients ),
+	const gradients = parseStylesVariables(
+		JSON.stringify( colors?.gradients ),
 		mappedValues
 	);
-	const globalStyles = parseVariables( rawStyles, mappedValues );
-	const parsedExperimentalFeatures = parseVariables(
-		rawFeatures,
+	const customValues = parseStylesVariables(
+		JSON.stringify( features.custom ),
 		mappedValues
+	);
+	const globalStyles = parseStylesVariables(
+		rawStyles,
+		mappedValues,
+		customValues
 	);
 
 	return {
 		colors,
-		gradients: parsedGradients,
+		gradients,
 		__experimentalFeatures: {
 			color: {
-				palette: parsedExperimentalFeatures?.color?.palette,
-				gradients: parsedExperimentalFeatures?.color?.gradients,
+				palette: colors?.palette,
+				gradients,
 			},
 			typography: {
 				fontSizes: features?.typography?.fontSizes,
