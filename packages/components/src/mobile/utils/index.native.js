@@ -5,5 +5,8 @@ export function removeNonDigit( text, decimalNum ) {
 }
 
 export function toFixed( num, decimalNum = 0 ) {
-	return Number.parseFloat( num ).toFixed( decimalNum );
+	const decimalOffset = decimalNum < 0 ? 0 : decimalNum;
+	return Number.parseFloat(
+		Number.parseFloat( num ).toFixed( decimalOffset )
+	);
 }

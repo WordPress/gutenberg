@@ -50,7 +50,7 @@ describe( 'toFixed', () => {
 
 	it( 'function returns the number applying `decimalNum`', () => {
 		const result = toFixed( '123.4567', 2 );
-		expect( result ).toBe( 123.45 );
+		expect( result ).toBe( 123.46 );
 	} );
 
 	it( 'function returns the number applying `decimalNum` all point numbers', () => {
