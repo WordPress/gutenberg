@@ -103,7 +103,13 @@ export default function useTabNav() {
 			const direction = isShift ? 'findPrevious' : 'findNext';
 
 			if ( ! hasMultiSelection() && ! getSelectedBlockClientId() ) {
-				setNavigationMode( true );
+				// Preserve the behaviour of entering navigation mode when
+				// tabbing into the content without a block selection.
+				// `onFocusCapture` already did this previously, but we need to
+				// do it again here because after clearing block selection,
+				// focus land on the writing flow container and pressing Tab
+				// will no longer send focus through the focus capture element.
+				if ( event.target === node ) setNavigationMode( true );
 				return;
 			}
 
