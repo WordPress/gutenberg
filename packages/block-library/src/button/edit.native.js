@@ -250,13 +250,7 @@ class ButtonEdit extends Component {
 		const { setAttributes, attributes } = this.props;
 		const { borderRadiusUnit } = this.state;
 		const { style } = attributes;
-		const newStyle = {
-			...style,
-			border: {
-				...style?.border,
-				radius: `${ newRadius }${ borderRadiusUnit }`, // Store the value with the unit value so that it works as expected.
-			},
-		};
+		const newStyle = this.getNewStyle( style, newRadius, borderRadiusUnit );
 
 		setAttributes( { style: newStyle } );
 	}
@@ -267,17 +261,19 @@ class ButtonEdit extends Component {
 		const borderRadius = this.getBorderRadiusValue(
 			attributes?.style?.border?.radius
 		);
+		const newStyle = this.getNewStyle( style, borderRadius, newRadiusUnit );
+		setAttributes( { style: newStyle } );
+		this.setState( { borderRadiusUnit: newRadiusUnit } );
+	}
 
-		const newStyle = {
+	getNewStyle( style, radius, radiusUnit ) {
+		return {
 			...style,
 			border: {
 				...style?.border,
-				radius: `${ borderRadius }${ newRadiusUnit }`, // Store the value with the unit value so that it works as expected.
+				radius: `${ radius }${ radiusUnit }`, // Store the value with the unit so that it works as expected.
 			},
 		};
-
-		setAttributes( { style: newStyle } );
-		this.setState( { borderRadiusUnit: newRadiusUnit } );
 	}
 
 	onShowLinkSettings() {
