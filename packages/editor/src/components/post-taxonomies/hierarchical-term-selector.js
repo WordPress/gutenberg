@@ -148,6 +148,7 @@ function HierarchicalTermSelector( {
 	addTerm,
 	taxonomy,
 	terms,
+	loading,
 	slug,
 	availableTerms,
 	hasCreateAction,
@@ -355,7 +356,7 @@ function HierarchicalTermSelector( {
 				'' !== filterValue ? filteredTermsTree : availableTermsTree
 			) }
 		</div>,
-		hasCreateAction && (
+		! loading && hasCreateAction && (
 			<Button
 				key="term-add-button"
 				onClick={ onToggleForm }
@@ -408,8 +409,7 @@ export default compose( [
 		const { getCurrentPost } = select( editorStore );
 		const { getTaxonomy } = select( coreStore );
 		const taxonomy = getTaxonomy( slug );
-		const { getEntityRecords } = select( coreStore );
-
+		const { getEntityRecords, isResolving } = select( coreStore );
 		const taxonomySlug = slug ?? '';
 		const queriedTerms = getEntityRecords( 'taxonomy', taxonomySlug, {
 			DEFAULT_QUERY,
@@ -433,6 +433,13 @@ export default compose( [
 				  )
 				: false,
 			terms,
+			loading: isResolving( 'getEntityRecords', [
+				'taxonomy',
+				taxonomySlug,
+				{
+					DEFAULT_QUERY,
+				},
+			] ),
 			availableTerms: queriedTerms || [],
 			availableTermsTree: sortBySelected(
 				buildTermsTree( queriedTerms || [] ),
