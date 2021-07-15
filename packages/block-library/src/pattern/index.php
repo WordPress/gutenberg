@@ -11,7 +11,7 @@ function register_block_core_pattern() {
 
 function render_block_pattern( $attributes ) {
 	$slug = $attributes['slug'];
-	if( class_exists( 'WP_Block_Type_Registry' ) && WP_Block_Patterns_Registry::get_instance()->is_registered( $slug ) ) {
+	if ( class_exists( 'WP_Block_Patterns_Registry' ) && WP_Block_Patterns_Registry::get_instance()->is_registered( $slug ) ) {
 		$pattern = WP_Block_Patterns_Registry::get_instance()->get_registered( $slug );
 		return do_blocks( $pattern['content'] );
 
