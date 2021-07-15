@@ -38,8 +38,9 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
-	$content = '<p class="wp-block-post-excerpt__excerpt">' . get_the_excerpt( $block->context['postId'] );
-	if ( ! isset( $attributes['showMoreOnNewLine'] ) || $attributes['showMoreOnNewLine'] ) {
+	$content               = '<p class="wp-block-post-excerpt__excerpt">' . get_the_excerpt( $block->context['postId'] );
+	$show_more_on_new_line = ! isset( $attributes['showMoreOnNewLine'] ) || $attributes['showMoreOnNewLine'];
+	if ( $show_more_on_new_line && ! empty( $more_text ) ) {
 		$content .= '</p><p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>';
 	} else {
 		$content .= " $more_text</p>";
