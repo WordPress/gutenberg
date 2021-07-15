@@ -596,7 +596,7 @@ function gutenberg_enqueue_block_style( $block_name, $args ) {
  */
 function gutenberg_multiple_block_styles( $metadata ) {
 	foreach ( array( 'style', 'editorStyle' ) as $key ) {
-		if ( isset( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
+		if ( ! empty( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
 			$default_style = array_shift( $metadata[ $key ] );
 			foreach ( $metadata[ $key ] as $handle ) {
 				gutenberg_enqueue_block_style( $metadata['name'], array( 'handle' => $handle ) );
