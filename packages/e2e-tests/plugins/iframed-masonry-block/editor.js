@@ -28,7 +28,7 @@
 		el( 'div', { className: 'grid-item' } ),
 		el( 'div', { className: 'grid-item' } ),
 		el( 'div', { className: 'grid-item grid-item--height2' } ),
-	]
+	];
 
 	registerBlockType( 'test/iframed-masonry-block', {
 		edit: function Edit() {
