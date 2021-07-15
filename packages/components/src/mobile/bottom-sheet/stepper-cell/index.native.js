@@ -58,9 +58,8 @@ class BottomSheetStepperCell extends Component {
 	onIncrementValue() {
 		const { step, max, onChange, value, decimalNum } = this.props;
 		let newValue = toFixed( value + step, decimalNum );
-		newValue = parseInt( newValue ) === newValue 
-			? parseInt( newValue )
-			: newValue;
+		newValue =
+			parseInt( newValue ) === newValue ? parseInt( newValue ) : newValue;
 		if ( newValue <= max || max === undefined ) {
 			onChange( newValue );
 			this.setState( {
@@ -73,9 +72,8 @@ class BottomSheetStepperCell extends Component {
 	onDecrementValue() {
 		const { step, min, onChange, value, decimalNum } = this.props;
 		let newValue = toFixed( value - step, decimalNum );
-		newValue = parseInt( newValue ) === newValue 
-			? parseInt( newValue )
-			: newValue;
+		newValue =
+			parseInt( newValue ) === newValue ? parseInt( newValue ) : newValue;
 		if ( newValue >= min ) {
 			onChange( newValue );
 			this.setState( {
