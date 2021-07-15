@@ -17,7 +17,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	useEffect( () => {
-		if ( selectedPattern && selectedPattern.blocks ) {
+		if ( selectedPattern?.blocks ) {
 			replaceInnerBlocks( clientId, selectedPattern.blocks );
 		}
 	}, [] );
