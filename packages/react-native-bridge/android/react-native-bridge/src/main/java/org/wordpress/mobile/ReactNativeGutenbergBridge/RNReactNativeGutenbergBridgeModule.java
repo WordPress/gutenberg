@@ -413,7 +413,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     private BlockTypeImpressionsCallback requestBlockTypeImpressionsCallback(final Callback jsCallback) {
         return new GutenbergBridgeJS2Parent.BlockTypeImpressionsCallback() {
-            @Override public void onRequestBlockTypeImpressions(ReadableMap impressions) {
+            @Override public void onRequestBlockTypeImpressions(WritableMap impressions) {
                 jsCallback.invoke(impressions);
             }
         };

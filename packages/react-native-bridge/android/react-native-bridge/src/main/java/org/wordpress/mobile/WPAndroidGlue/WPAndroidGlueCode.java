@@ -25,9 +25,11 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -220,7 +222,7 @@ public class WPAndroidGlueCode {
 
     public interface OnBlockTypeImpressionsEventListener {
         void onSetBlockTypeImpressionCount(String name, Integer count);
-        ReadableMap onRequestBlockTypeImpressions(ReadableArray newBlockTypes);
+        Map<String, Integer> onRequestBlockTypeImpressions(ArrayList<Object> newBlockTypes);
     }
 
     public void mediaSelectionCancelled() {
@@ -503,7 +505,11 @@ public class WPAndroidGlueCode {
 
             @Override
             public void requestBlockTypeImpressions(ReadableArray newBlockTypes, BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
-                ReadableMap impressions = mOnBlockTypeImpressionsEventListener.onRequestBlockTypeImpressions(newBlockTypes);
+                Map<String, Integer> storedImpressions = mOnBlockTypeImpressionsEventListener.onRequestBlockTypeImpressions(newBlockTypes.toArrayList());
+                WritableMap impressions = Arguments.createMap();
+                for (Map.Entry<String, Integer> entry: storedImpressions.entrySet()) {
+                    impressions.putInt(entry.getKey(), entry.getValue());
+                }
                 blockTypeImpressionsCallback.onRequestBlockTypeImpressions(impressions);
             }
 
