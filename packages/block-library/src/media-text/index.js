@@ -20,6 +20,7 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {
+		viewportWidth: 601, // Columns collapse "@media (max-width: 600px)".
 		attributes: {
 			mediaType: 'image',
 			mediaUrl:

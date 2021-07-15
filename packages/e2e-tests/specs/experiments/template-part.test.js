@@ -307,7 +307,9 @@ describe( 'Template Part', () => {
 				chooseExistingButtonSelector
 			);
 			await chooseExistingButton.click();
-			const preview = await page.waitForXPath( testContentSelector );
+			const preview = await page.waitForSelector(
+				'.block-editor-block-preview__content iframe'
+			);
 			expect( preview ).toBeTruthy();
 
 			await preview.click();

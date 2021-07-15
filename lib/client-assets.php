@@ -730,6 +730,8 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
  * Sets the editor styles to be consumed by JS.
  */
 function gutenberg_extend_block_editor_styles_html() {
+	global $pagenow;
+
 	$script_handles = array();
 	$style_handles  = array(
 		'wp-block-editor',
@@ -737,6 +739,11 @@ function gutenberg_extend_block_editor_styles_html() {
 		'wp-block-library-theme',
 		'wp-edit-blocks',
 	);
+
+	if ( 'widgets.php' === $pagenow || 'customize.php' === $pagenow ) {
+		$style_handles[] = 'wp-widgets';
+		$style_handles[] = 'wp-edit-widgets';
+	}
 
 	$block_registry = WP_Block_Type_Registry::get_instance();
 
@@ -789,6 +796,7 @@ function gutenberg_extend_block_editor_styles_html() {
 add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
 add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
 add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
+add_action( 'admin_footer-widgets.php', 'gutenberg_extend_block_editor_styles_html' );
 
 /**
  * Adds a polyfill for object-fit in environments which do not support it.

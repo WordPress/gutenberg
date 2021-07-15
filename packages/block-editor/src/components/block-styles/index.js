@@ -103,6 +103,7 @@ function BlockStyles( {
 				return (
 					<BlockStyleItem
 						genericPreviewBlock={ genericPreviewBlock }
+						viewportWidth={ type.example?.viewportWidth ?? 500 }
 						className={ className }
 						isActive={ activeStyle === style }
 						key={ style.name }
@@ -127,6 +128,7 @@ function BlockStyles( {
 
 function BlockStyleItem( {
 	genericPreviewBlock,
+	viewportWidth,
 	style,
 	isActive,
 	onBlur,
@@ -165,7 +167,10 @@ function BlockStyleItem( {
 			aria-label={ style.label || style.name }
 		>
 			<div className="block-editor-block-styles__item-preview">
-				<BlockPreview viewportWidth={ 500 } blocks={ previewBlocks } />
+				<BlockPreview
+					viewportWidth={ viewportWidth }
+					blocks={ previewBlocks }
+				/>
 			</div>
 			<div className="block-editor-block-styles__item-label">
 				{ style.label || style.name }
