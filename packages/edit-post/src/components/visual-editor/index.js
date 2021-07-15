@@ -70,7 +70,7 @@ function MaybeIframe( {
 
 	return (
 		<Iframe
-			head={ <EditorStyles styles={ styles } /> }
+			head={ <EditorStyles styles={ styles } prefix={ false } /> }
 			ref={ ref }
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
