@@ -27,15 +27,11 @@ export default function useSelectAll() {
 
 	return useRefEffect( ( node ) => {
 		function onKeyDown( event ) {
-			const selectedClientIds = getSelectedBlockClientIds();
-
-			if ( ! selectedClientIds.length ) {
-				return;
-			}
-
 			if ( ! isMatch( 'core/block-editor/select-all', event ) ) {
 				return;
 			}
+
+			const selectedClientIds = getSelectedBlockClientIds();
 
 			if (
 				selectedClientIds.length === 1 &&
