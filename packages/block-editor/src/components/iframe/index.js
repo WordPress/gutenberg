@@ -10,7 +10,7 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
-import { Iframe } from '@wordpress/components';
+import { __experimentalIframe as Iframe } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -196,13 +196,15 @@ function Styles() {
 
 		if ( TagName === 'style' ) {
 			return (
-				<TagName { ...{ id } } key={ id }>
+				<TagName { ...{ id } } key={ id } ref={ ref }>
 					{ textContent }
 				</TagName>
 			);
 		}
 
-		return <TagName { ...{ href, id, rel, media } } key={ id } />;
+		return (
+			<TagName { ...{ href, id, rel, media } } key={ id } ref={ ref } />
+		);
 	} );
 }
 
