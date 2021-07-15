@@ -14,8 +14,8 @@ import {
 	withFilters,
 	Button,
 } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, useDebounce, useInstanceId } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useDebounce, useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 
@@ -143,18 +143,14 @@ function getFilterMatcher( filterValue ) {
 	return matchTermsForFilter;
 }
 
-function HierarchicalTermSelector( {
-	onUpdateTerms,
-	addTerm,
-	taxonomy,
-	terms,
-	loading,
-	slug,
-	availableTerms,
-	hasCreateAction,
-	hasAssignAction,
-	availableTermsTree,
-} ) {
+/**
+ * Hierarchical term selector.
+ *
+ * @param {Object} props      Component props.
+ * @param {string} props.slug Taxonomy slug.
+ * @return {WPElement}        Hierarchical term selector component.
+ */
+function HierarchicalTermSelector( { slug } ) {
 	const instanceId = useInstanceId( HierarchicalTermSelector );
 	const [ adding, setAdding ] = useState( false );
 	const [ formName, setFormName ] = useState( '' );
@@ -164,26 +160,111 @@ function HierarchicalTermSelector( {
 	const [ filteredTermsTree, setFilteredTermsTree ] = useState( [] );
 	const debouncedSpeak = useDebounce( speak, 500 );
 
+	const selector = ( select ) => {
+		const { getCurrentPost } = select( editorStore );
+		const { getTaxonomy, getEntityRecords, isResolving } = select(
+			coreStore
+		);
+		const taxonomy = getTaxonomy( slug );
+
+		const availableTerms =
+			getEntityRecords( 'taxonomy', slug, {
+				DEFAULT_QUERY,
+			} ) || [];
+
+		const loading = isResolving( 'getEntityRecords', [
+			'taxonomy',
+			slug,
+			{
+				DEFAULT_QUERY,
+			},
+		] );
+
+		const terms = taxonomy
+			? select( editorStore ).getEditedPostAttribute( taxonomy.rest_base )
+			: [];
+
+		return {
+			hasCreateAction: taxonomy
+				? get(
+						getCurrentPost(),
+						[ '_links', 'wp:action-create-' + taxonomy.rest_base ],
+						false
+				  )
+				: false,
+			hasAssignAction: taxonomy
+				? get(
+						getCurrentPost(),
+						[ '_links', 'wp:action-assign-' + taxonomy.rest_base ],
+						false
+				  )
+				: false,
+			terms,
+			loading,
+			availableTerms,
+			availableTermsTree: sortBySelected(
+				buildTermsTree( availableTerms ),
+				terms
+			),
+			taxonomy,
+		};
+	};
+
+	const {
+		hasCreateAction,
+		hasAssignAction,
+		terms,
+		loading,
+		availableTerms,
+		availableTermsTree,
+		taxonomy,
+	} = useSelect( selector, [ slug ] );
+
+	const { editPost } = useDispatch( editorStore );
+	const { saveEntityRecord } = useDispatch( coreStore );
+
 	if ( ! hasAssignAction ) {
 		return null;
 	}
 
+	/**
+	 * Append new term.
+	 *
+	 * @param {Object} term Term object.
+	 * @return {Promise} A promise that resolves to save term object.
+	 */
+	const appendTerm = ( term ) => {
+		return saveEntityRecord( 'taxonomy', slug, term, {
+			isAutosave: false,
+		} );
+	};
+
+	/**
+	 * Update terms for post.
+	 *
+	 * @param {number[]} termIds Term ids.
+	 */
+	const onUpdateTerms = ( termIds ) => {
+		editPost( { [ taxonomy.rest_base ]: termIds } );
+	};
+
+	/**
+	 * Handler for checking term.
+	 *
+	 * @param {number} termId
+	 */
 	const onChange = ( termId ) => {
 		const hasTerm = terms.indexOf( termId ) !== -1;
 		const newTerms = hasTerm
 			? without( terms, termId )
 			: [ ...terms, termId ];
-		onUpdateTerms( newTerms, taxonomy.rest_base );
+		onUpdateTerms( newTerms );
 	};
 
 	const onChangeFormName = ( event ) => {
 		const newValue =
 			event.target.value.trim() === '' ? '' : event.target.value;
 		setFormName( newValue );
-	};
-
-	const onChangeFormParent = ( newParent ) => {
-		setFormParent( newParent );
 	};
 
 	const onToggleForm = () => {
@@ -201,10 +282,7 @@ function HierarchicalTermSelector( {
 		if ( existingTerm ) {
 			// if the term we are adding exists but is not selected select it
 			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
-				onUpdateTerms(
-					[ ...terms, existingTerm.id ],
-					taxonomy.rest_base
-				);
+				onUpdateTerms( [ ...terms, existingTerm.id ] );
 			}
 
 			setFormName( '' );
@@ -214,13 +292,10 @@ function HierarchicalTermSelector( {
 		}
 		setAdding( true );
 
-		const newTerm = await addTerm(
-			{
-				name: formName,
-				parent: formParent ? formParent : undefined,
-			},
-			slug
-		);
+		const newTerm = await appendTerm( {
+			name: formName,
+			parent: formParent ? formParent : undefined,
+		} );
 
 		const termAddedMessage = sprintf(
 			/* translators: %s: taxonomy name */
@@ -235,7 +310,7 @@ function HierarchicalTermSelector( {
 		setAdding( false );
 		setFormName( '' );
 		setFormParent( '' );
-		onUpdateTerms( [ ...terms, newTerm.id ], taxonomy.rest_base );
+		onUpdateTerms( [ ...terms, newTerm.id ] );
 	};
 
 	const setFilter = ( event ) => {
@@ -387,7 +462,7 @@ function HierarchicalTermSelector( {
 					<TreeSelect
 						label={ parentSelectLabel }
 						noOptionLabel={ noParentOption }
-						onChange={ onChangeFormParent }
+						onChange={ setFormParent }
 						selectedId={ formParent }
 						tree={ availableTermsTree }
 					/>
@@ -404,62 +479,6 @@ function HierarchicalTermSelector( {
 	];
 }
 
-export default compose( [
-	withSelect( ( select, { slug } ) => {
-		const { getCurrentPost } = select( editorStore );
-		const { getTaxonomy } = select( coreStore );
-		const taxonomy = getTaxonomy( slug );
-		const { getEntityRecords, isResolving } = select( coreStore );
-		const taxonomySlug = slug ?? '';
-		const queriedTerms = getEntityRecords( 'taxonomy', taxonomySlug, {
-			DEFAULT_QUERY,
-		} );
-		const terms = taxonomy
-			? select( editorStore ).getEditedPostAttribute( taxonomy.rest_base )
-			: [];
-		return {
-			hasCreateAction: taxonomy
-				? get(
-						getCurrentPost(),
-						[ '_links', 'wp:action-create-' + taxonomy.rest_base ],
-						false
-				  )
-				: false,
-			hasAssignAction: taxonomy
-				? get(
-						getCurrentPost(),
-						[ '_links', 'wp:action-assign-' + taxonomy.rest_base ],
-						false
-				  )
-				: false,
-			terms,
-			loading: isResolving( 'getEntityRecords', [
-				'taxonomy',
-				taxonomySlug,
-				{
-					DEFAULT_QUERY,
-				},
-			] ),
-			availableTerms: queriedTerms || [],
-			availableTermsTree: sortBySelected(
-				buildTermsTree( queriedTerms || [] ),
-				terms
-			),
-			taxonomy,
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdateTerms( terms, restBase ) {
-			dispatch( editorStore ).editPost( { [ restBase ]: terms } );
-		},
-		addTerm( term, slug ) {
-			return dispatch( coreStore ).saveEntityRecord(
-				'taxonomy',
-				slug,
-				term,
-				{ isAutosave: false }
-			);
-		},
-	} ) ),
-	withFilters( 'editor.PostTaxonomyType' ),
-] )( HierarchicalTermSelector );
+export default withFilters( 'editor.PostTaxonomyType' )(
+	HierarchicalTermSelector
+);
