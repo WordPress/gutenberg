@@ -74,6 +74,7 @@ module.exports = async function readConfig( configPath ) {
 		plugins: [],
 		themes: [],
 		port: 8888,
+		ssl: null,
 		mappings: {},
 		config: {
 			WP_DEBUG: true,
@@ -91,6 +92,7 @@ module.exports = async function readConfig( configPath ) {
 			tests: {
 				config: { WP_DEBUG: false, SCRIPT_DEBUG: false },
 				port: 8889,
+				ssl: null,
 			},
 		},
 	};
@@ -141,6 +143,7 @@ module.exports = async function readConfig( configPath ) {
 
 	// Merge each of the specified environment-level overrides.
 	const allPorts = new Set(); // Keep track of unique ports for validation.
+	const allSSLPorts = new Set(); // Keep track of unique ports for validation.
 	const env = allEnvs.reduce( ( result, environment ) => {
 		result[ environment ] = parseConfig(
 			validateConfig(
@@ -156,12 +159,19 @@ module.exports = async function readConfig( configPath ) {
 			}
 		);
 		allPorts.add( result[ environment ].port );
+		allSSLPorts.add( result[ environment ].ssl );
 		return result;
 	}, {} );
 
 	if ( allPorts.size !== allEnvs.length ) {
 		throw new ValidationError(
 			'Invalid .wp-env.json: Each port value must be unique.'
+		);
+	}
+
+	if ( allSSLPorts.size !== allEnvs.length ) {
+		throw new ValidationError(
+			'Invalid .wp-env.json: Each ssl value must be unique.'
 		);
 	}
 
@@ -272,6 +282,11 @@ function withOverrides( config ) {
 				// Don't overwrite the port of WP_HOME when set.
 				if ( ! ( configKey === 'WP_HOME' && !! baseUrl.port ) ) {
 					baseUrl.port = config.env[ envKey ].port;
+
+					if ( config.env[ envKey ].ssl ) {
+						baseUrl.protocol = 'https';
+						baseUrl.port = config.env[ envKey ].ssl;
+					}
 				}
 
 				config.env[ envKey ].config[ configKey ] = baseUrl.toString();
