@@ -43,8 +43,8 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		$inner_markup  .= build_block_core_breadcrumbs_inner_markup_item(
 			$ancestor_id,
 			$attributes,
-			$show_separator,
-			$index
+			$index,
+			$show_separator
 		);
 	}
 
@@ -53,6 +53,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		$inner_markup  .= build_block_core_breadcrumbs_inner_markup_item(
 			$post_id,
 			$attributes,
+			count( $ancestor_ids ),
 			$show_separator
 		);
 	}
@@ -61,7 +62,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
 	return sprintf(
-		'<nav %1$s><ol>%2$s</ol></nav>',
+		'<nav %1$s><ol itemscope itemtype="https://schema.org/BreadcrumbList">%2$s</ol></nav>',
 		$wrapper_attributes,
 		$inner_markup
 	);
@@ -74,12 +75,12 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
  *
  * @param int   $post_id        The post id for this item.
  * @param array $attributes     Block attributes.
- * @param bool  $show_separator Whether to show the separator character where available.
  * @param int   $index          The position in a list of ids.
+ * @param bool  $show_separator Whether to show the separator character where available.
  *
  * @return string The markup for a single breadcrumb item wrapped in an `li` element.
  */
-function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, $show_separator = true, $index = null ) {
+function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, $index, $show_separator = true ) {
 	$li_class        = 'wp-block-breadcrumbs__item';
 	$separator_class = 'wp-block-breadcrumbs__separator';
 
@@ -100,9 +101,10 @@ function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, 
 
 	if ( ! empty( $post_id ) ) {
 		$markup .= sprintf(
-			'<a href="%s">%s</a>',
+			'<a itemprop="item" href="%s">%s%s</a>',
 			get_the_permalink( $post_id ),
-			get_the_title( $post_id )
+			sprintf( '<span itemprop="name">%s</span>', get_the_title( $post_id ) ),
+			sprintf( '<meta itemprop="position" content="%s" />', $index + 1 )
 		);
 	}
 
@@ -118,7 +120,7 @@ function build_block_core_breadcrumbs_inner_markup_item( $post_id, $attributes, 
 	}
 
 	return sprintf(
-		'<li class="%1$s">%2$s</li>',
+		'<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" class="%1$s">%2$s</li>',
 		$li_class,
 		$markup
 	);
