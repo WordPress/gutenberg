@@ -13,7 +13,7 @@ export default {
 };
 
 export const _default = () => (
-	<ItemGroup css={ { width: '350px' } } bordered>
+	<ItemGroup style={ { width: '350px' } } bordered>
 		<Item action onClick={ () => alert( 'WordPress.org' ) }>
 			Code is Poetry — Click me!
 		</Item>
@@ -31,10 +31,10 @@ export const _default = () => (
 
 export const dropdown = () => (
 	<Flyout
-		css={ { width: '350px' } }
+		style={ { width: '350px' } }
 		trigger={ <Button>Open Popover</Button> }
 	>
-		<ItemGroup css={ { padding: 4 } }>
+		<ItemGroup style={ { padding: 4 } }>
 			<Item action onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>

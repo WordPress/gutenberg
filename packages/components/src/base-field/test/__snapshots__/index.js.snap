@@ -25,7 +25,7 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -14,19 +14,18 @@
+@@ -14,18 +14,17 @@
       "background": "#fff",
       "border": "1px solid",
       "border-color": "#757575",
@@ -45,7 +45,6 @@ Snapshot Diff:
 -     "width": "auto",
 +     "width": "100%",
     },
-    Object {},
   ]
 `;
 
@@ -135,7 +134,7 @@ exports[`base field should render correctly 1`] = `
 }
 
 <div
-  class="components-flex components-base-field emotion-0 emotion-1 emotion-2"
+  class="components-flex components-base-field emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="BaseField"
 />

@@ -38,7 +38,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <label
-  class="components-truncate components-text components-control-label emotion-0 emotion-1 emotion-2"
+  class="components-truncate components-text components-control-label emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="ControlLabel"
 >
@@ -80,7 +80,7 @@ exports[`props should render no truncate 1`] = `
 }
 
 <label
-  class="components-truncate components-text components-control-label emotion-0 emotion-1 emotion-2"
+  class="components-truncate components-text components-control-label emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="ControlLabel"
 >
@@ -126,7 +126,7 @@ exports[`props should render size 1`] = `
 }
 
 <label
-  class="components-truncate components-text components-control-label emotion-0 emotion-1 emotion-2"
+  class="components-truncate components-text components-control-label emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="ControlLabel"
 >
