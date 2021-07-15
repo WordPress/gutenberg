@@ -61,6 +61,9 @@ const INTERNATIONAL_THOUSANDS_DELIMITER = / /g;
 /**
  * Checks to see if a value is a numeric value (`number` or `string`).
  *
+ * Intentionally ignores whether the thousands delimiters are only
+ * in the thousands marks.
+ *
  * @param {any}    value
  * @param {string} [locale]
  * @return {boolean} Whether value is numeric.
