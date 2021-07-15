@@ -151,6 +151,9 @@ function HierarchicalTermSelector( { slug } ) {
 	const instanceId = useInstanceId( HierarchicalTermSelector );
 	const [ adding, setAdding ] = useState( false );
 	const [ formName, setFormName ] = useState( '' );
+	/**
+	 * @type {[number|string, Function]}
+	 */
 	const [ formParent, setFormParent ] = useState( '' );
 	const [ showForm, setShowForm ] = useState( false );
 	const [ filterValue, setFilterValue ] = useState( '' );
@@ -227,9 +230,7 @@ function HierarchicalTermSelector( { slug } ) {
 	 * @return {Promise} A promise that resolves to save term object.
 	 */
 	const appendTerm = ( term ) => {
-		return saveEntityRecord( 'taxonomy', slug, term, {
-			isAutosave: false,
-		} );
+		return saveEntityRecord( 'taxonomy', slug, term );
 	};
 
 	/**
