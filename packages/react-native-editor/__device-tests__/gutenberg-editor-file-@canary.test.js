@@ -8,6 +8,10 @@ import { isAndroid } from './helpers/utils';
 describe( 'Gutenberg Editor File Block tests', () => {
 	it( 'should be able to add a file block', async () => {
 		await editorPage.addNewBlock( blockNames.file );
+
+		await editorPage.driver.sleep( 1000 );
+		await editorPage.closePicker();
+
 		const block = await editorPage.getFirstBlockVisible();
 		await expect( block ).toBeTruthy();
 	} );
@@ -17,7 +21,7 @@ describe( 'Gutenberg Editor File Block tests', () => {
 
 		block.click();
 
-		if ( isAndroid ) {
+		if ( isAndroid() ) {
 			await editorPage.driver.sleep( 5000 );
 		} else {
 			await editorPage.driver.sleep( 1000 );
@@ -26,8 +30,9 @@ describe( 'Gutenberg Editor File Block tests', () => {
 		await editorPage.chooseMediaLibrary();
 
 		const html = await editorPage.getHtmlContent();
-		expect( testData.fileBlockPlaceholder.toLowerCase() ).toBe(
-			html.toLowerCase()
+
+		expect( html.toLowerCase() ).toBe(
+			testData.fileBlockPlaceholder.toLowerCase()
 		);
 	} );
 } );

@@ -20,9 +20,10 @@ export function* __experimentalConvertBlockToStatic( clientId ) {
  * Returns a generator converting one or more static blocks into a reusable block.
  *
  * @param {string[]} clientIds The client IDs of the block to detach.
+ * @param {string}   title     Reusable block title.
  */
-export function* __experimentalConvertBlocksToReusable( clientIds ) {
-	yield convertBlocksToReusable( clientIds );
+export function* __experimentalConvertBlocksToReusable( clientIds, title ) {
+	yield convertBlocksToReusable( clientIds, title );
 }
 
 /**
@@ -37,7 +38,7 @@ export function* __experimentalDeleteReusableBlock( id ) {
 /**
  * Returns an action descriptor for SET_EDITING_REUSABLE_BLOCK action.
  *
- * @param {string} clientId The clientID of the reusable block to target.
+ * @param {string}  clientId  The clientID of the reusable block to target.
  * @param {boolean} isEditing Whether the block should be in editing state.
  * @return {Object} Action descriptor.
  */

@@ -10,6 +10,7 @@ import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -17,20 +18,13 @@ import { Icon, plus } from '@wordpress/icons';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender(
-	{
-		rootClientId,
-		className,
-		__experimentalSelectBlockOnInsert: selectBlockOnInsert,
-		onFocus,
-		tabIndex,
-	},
+	{ rootClientId, className, onFocus, tabIndex },
 	ref
 ) {
 	return (
 		<Inserter
 			position="bottom center"
 			rootClientId={ rootClientId }
-			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 			__experimentalIsQuick
 			renderToggle={ ( {
 				onToggle,
@@ -89,6 +83,19 @@ function ButtonBlockAppender(
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md
+ * Use `ButtonBlockAppender` instead.
+ *
+ * @deprecated
+ */
+export const ButtonBlockerAppender = forwardRef( ( props, ref ) => {
+	deprecated( `wp.blockEditor.ButtonBlockerAppender`, {
+		alternative: 'wp.blockEditor.ButtonBlockAppender',
+	} );
+
+	return ButtonBlockAppender( props, ref );
+} );
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md
  */
 export default forwardRef( ButtonBlockAppender );

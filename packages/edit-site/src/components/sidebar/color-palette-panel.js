@@ -13,7 +13,8 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useEditorFeature, GLOBAL_CONTEXT_NAME } from '../editor/utils';
+import { useSetting } from '../editor/utils';
+import { store as editSiteStore } from '../../store';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -31,25 +32,29 @@ export default function ColorPalettePanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useEditorFeature( 'color.palette', contextName );
+	const colors = useSetting( 'color.palette', contextName );
 	const userColors = getSetting( contextName, 'color.palette' );
 	const immutableColorSlugs = useSelect(
 		( select ) => {
-			const baseStyles = select( 'core/edit-site' ).getSettings()
+			const baseStyles = select( editSiteStore ).getSettings()
 				.__experimentalGlobalStylesBaseStyles;
+			const contextualBasePalette = get( baseStyles, [
+				'settings',
+				'blocks',
+				contextName,
+				'color',
+				'palette',
+			] );
+			const globalPalette = get( baseStyles, [
+				'settings',
+				'color',
+				'palette',
+			] );
 			const basePalette =
-				get( baseStyles, [
-					contextName,
-					'settings',
-					'color',
-					'palette',
-				] ) ??
-				get( baseStyles, [
-					GLOBAL_CONTEXT_NAME,
-					'settings',
-					'color',
-					'palette',
-				] );
+				contextualBasePalette?.theme ??
+				contextualBasePalette?.core ??
+				globalPalette?.theme ??
+				globalPalette?.core;
 			if ( ! basePalette ) {
 				return EMPTY_ARRAY;
 			}

@@ -37,14 +37,12 @@ import { isAppleOS } from './platform';
  * @typedef {Record<WPKeycodeModifier, T>} WPModifierHandler
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * @template T
  *
  * @typedef {(character: string, isApple?: () => boolean) => T} WPKeyHandler
  */
 /** @typedef {(event: KeyboardEvent, character: string, isApple?: () => boolean) => boolean} WPEventKeyHandler */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * Keycode for BACKSPACE key.

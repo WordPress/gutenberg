@@ -7,7 +7,7 @@ const { sync: resolveBin } = require( 'resolve-bin' );
 /**
  * Internal dependencies
  */
-const { getArgsFromCLI, hasArgInCLI } = require( '../utils' );
+const { getArgsFromCLI, hasArgInCLI, getPackageProp } = require( '../utils' );
 
 const getConfig = () => {
 	const hasConfig =
@@ -19,9 +19,8 @@ const getConfig = () => {
 	if ( hasConfig ) {
 		return [];
 	}
-	const {
-		engines: { node, npm },
-	} = require( '../package.json' );
+	const { node, npm } =
+		getPackageProp( 'engines' ) || require( '../package.json' ).engines;
 
 	return [ '--node', node, '--npm', npm ];
 };

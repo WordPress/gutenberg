@@ -1,5 +1,9 @@
 # Navigation
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 Render a navigation list with optional groupings and hierarchy.
 
 ## Usage
@@ -122,6 +126,13 @@ The unique identifier of the menu. The root menu can omit this, and it will defa
 -   Required: No
 
 When `hasSearch` is active, this function handles the search input's `onChange` event, making it controlled from the outside. It requires setting the `search` prop as well.
+
+### isSearchDebouncing
+
+-   Type: `boolean`
+-   Required: No
+
+Indicates whether the search is debouncing or not. In case of `true` the "No results found." text is omitted. Used to prevent showing "No results found." text between debounced searches.
 
 ### `parentMenu`
 

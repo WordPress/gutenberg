@@ -12,6 +12,7 @@ import { safeDecodeURIComponent } from '@wordpress/url';
  */
 import PostSlugCheck from './check';
 import { cleanForSlug } from '../../utils/url';
+import { store as editorStore } from '../../store';
 
 export class PostSlug extends Component {
 	constructor( { postSlug, postTitle, postID } ) {
@@ -67,7 +68,7 @@ export class PostSlug extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getCurrentPost, getEditedPostAttribute } = select(
-			'core/editor'
+			editorStore
 		);
 
 		const { id } = getCurrentPost();
@@ -78,7 +79,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost } = dispatch( 'core/editor' );
+		const { editPost } = dispatch( editorStore );
 		return {
 			onUpdateSlug( slug ) {
 				editPost( { slug } );

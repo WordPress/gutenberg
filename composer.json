@@ -5,7 +5,12 @@
 	"description": "Prototyping since 1440. Development hub for the editor focus in core.",
 	"homepage": "https://wordpress.github.io/gutenberg/",
 	"keywords": [
-		"gutenberg", "wordpress", "editor", "wp", "react", "javascript"
+		"gutenberg",
+		"wordpress",
+		"editor",
+		"wp",
+		"react",
+		"javascript"
 	],
 	"support": {
 		"issues": "https://github.com/WordPress/gutenberg/issues"
@@ -20,7 +25,7 @@
 		"wp-coding-standards/wpcs": "^2.2",
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
 		"wp-phpunit/wp-phpunit": "^5.4",
-		"phpunit/phpunit": "^7.5.20",
+		"phpunit/phpunit": "^8.5",
 		"spatie/phpunit-watcher": "^1.23"
 	},
 	"require": {
@@ -28,7 +33,7 @@
 	},
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
-		"lint": "phpcs --standard=phpcs.xml.dist --runtime-set ignore_warnings_on_exit 1",
+		"lint": "phpcs --standard=phpcs.xml.dist",
 		"test": "phpunit",
 		"test:watch": "phpunit-watcher watch < /dev/tty"
 	}

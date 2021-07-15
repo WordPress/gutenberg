@@ -4,6 +4,11 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { renderAsRenderProps } from './utils';
@@ -16,7 +21,7 @@ import { renderAsRenderProps } from './utils';
 
 /**
  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
- * @typedef {OwnProps<T> & import('react').ComponentProps<T>} Props
+ * @typedef {OwnProps<T> & import('react').ComponentPropsWithRef<T>} Props
  */
 
 /**
@@ -24,15 +29,17 @@ import { renderAsRenderProps } from './utils';
  * for use in devices such as a screen reader.
  *
  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
- *
- * @param {Props<T>} props
+ * @param {Props<T>}                 props
+ * @param {import('react').Ref<any>} forwardedRef
  * @return {JSX.Element} Element
  */
-function VisuallyHidden( { as = 'div', className, ...props } ) {
+function VisuallyHidden( { as = 'div', className, ...props }, forwardedRef ) {
 	return renderAsRenderProps( {
 		as,
 		className: classnames( 'components-visually-hidden', className ),
 		...props,
+		ref: forwardedRef,
 	} );
 }
-export default VisuallyHidden;
+
+export default forwardRef( VisuallyHidden );

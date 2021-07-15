@@ -9,25 +9,28 @@ import { map, filter } from 'lodash';
  */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
-	BlockVerticalAlignmentToolbar,
+	BlockVerticalAlignmentControl,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	__experimentalImageSizeControl as ImageSizeControl,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
+	RangeControl,
 	TextareaControl,
 	ToggleControl,
-	ToolbarGroup,
+	ToolbarButton,
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
 import { pullLeft, pullRight } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -47,6 +50,7 @@ const TEMPLATE = [
 		},
 	],
 ];
+
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
 const applyWidthConstraints = ( width ) =>
@@ -138,9 +142,18 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 
 	const image = useSelect(
 		( select ) =>
-			mediaId && isSelected ? select( 'core' ).getMedia( mediaId ) : null,
+			mediaId && isSelected
+				? select( coreStore ).getMedia( mediaId )
+				: null,
 		[ isSelected, mediaId ]
 	);
+
+	const refMediaContainer = useRef();
+	const imperativeFocalPointPreview = ( value ) => {
+		const { style } = refMediaContainer.current.resizable;
+		const { x, y } = value;
+		style.backgroundPosition = `${ x * 100 }% ${ y * 100 }%`;
+	};
 
 	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
 
@@ -176,20 +189,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		gridTemplateColumns,
 		msGridColumns: gridTemplateColumns,
 	};
-	const toolbarControls = [
-		{
-			icon: pullLeft,
-			title: __( 'Show media on left' ),
-			isActive: mediaPosition === 'left',
-			onClick: () => setAttributes( { mediaPosition: 'left' } ),
-		},
-		{
-			icon: pullRight,
-			title: __( 'Show media on right' ),
-			isActive: mediaPosition === 'right',
-			onClick: () => setAttributes( { mediaPosition: 'right' } ),
-		},
-	];
 	const onMediaAltChange = ( newMediaAlt ) => {
 		setAttributes( { mediaAlt: newMediaAlt } );
 	};
@@ -198,7 +197,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const imageSizes = useSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
+		const settings = select( blockEditorStore ).getSettings();
 		return settings?.imageSizes;
 	} );
 	const imageSizeOptions = map(
@@ -250,6 +249,8 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					onChange={ ( value ) =>
 						setAttributes( { focalPoint: value } )
 					}
+					onDragStart={ imperativeFocalPointPreview }
+					onDrag={ imperativeFocalPointPreview }
 				/>
 			) }
 			{ mediaType === 'image' && (
@@ -277,6 +278,15 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					isResizable={ false }
 				/>
 			) }
+			{ mediaUrl && (
+				<RangeControl
+					label={ __( 'Media width' ) }
+					value={ temporaryMediaWidth || mediaWidth }
+					onChange={ commitWidthChange }
+					min={ WIDTH_CONSTRAINT_PERCENTAGE }
+					max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
+				/>
+			) }
 		</PanelBody>
 	);
 
@@ -293,26 +303,37 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
-			<BlockControls>
-				<ToolbarGroup controls={ toolbarControls } />
-				<BlockVerticalAlignmentToolbar
+			<BlockControls group="block">
+				<BlockVerticalAlignmentControl
 					onChange={ onVerticalAlignmentChange }
 					value={ verticalAlignment }
 				/>
+				<ToolbarButton
+					icon={ pullLeft }
+					title={ __( 'Show media on left' ) }
+					isActive={ mediaPosition === 'left' }
+					onClick={ () => setAttributes( { mediaPosition: 'left' } ) }
+				/>
+				<ToolbarButton
+					icon={ pullRight }
+					title={ __( 'Show media on right' ) }
+					isActive={ mediaPosition === 'right' }
+					onClick={ () =>
+						setAttributes( { mediaPosition: 'right' } )
+					}
+				/>
 				{ mediaType === 'image' && (
-					<ToolbarGroup>
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ onSetHref }
-							linkDestination={ linkDestination }
-							mediaType={ mediaType }
-							mediaUrl={ image && image.source_url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-						/>
-					</ToolbarGroup>
+					<ImageURLInputUI
+						url={ href || '' }
+						onChangeUrl={ onSetHref }
+						linkDestination={ linkDestination }
+						mediaType={ mediaType }
+						mediaUrl={ image && image.source_url }
+						mediaLink={ image && image.link }
+						linkTarget={ linkTarget }
+						linkClass={ linkClass }
+						rel={ rel }
+					/>
 				) }
 			</BlockControls>
 			<div { ...blockProps }>
@@ -321,6 +342,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					onSelectMedia={ onSelectMedia }
 					onWidthChange={ onWidthChange }
 					commitWidthChange={ commitWidthChange }
+					ref={ refMediaContainer }
 					{ ...{
 						focalPoint,
 						imageFill,

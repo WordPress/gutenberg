@@ -2,6 +2,12 @@
 	margin-top: $grid-unit-10;
 	padding-top: $grid-unit-10;
 	border-top: $border-width solid $gray-900;
+
+	&.has-hidden-separator {
+		border-top: none;
+		margin-top: 0;
+		padding-top: 0;
+	}
 }
 
 .components-menu-group__label {

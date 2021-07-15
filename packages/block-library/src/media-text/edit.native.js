@@ -16,6 +16,7 @@ import {
 	withColors,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import {
@@ -253,7 +254,8 @@ class MediaTextEdit extends Component {
 			setAttributes,
 			isSelected,
 			isRTL,
-			wrapperProps,
+			style,
+			blockWidth,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -271,14 +273,21 @@ class MediaTextEdit extends Component {
 			? 100
 			: this.state.mediaWidth || mediaWidth;
 		const widthString = `${ temporaryMediaWidth }%`;
+		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
+		const innerBlockWidthString = `${ innerBlockWidth }%`;
 
-		const innerBlockContainerStyle = ! shouldStack
-			? styles.innerBlock
-			: {
-					...( mediaPosition === 'left'
-						? styles.innerBlockStackMediaLeft
-						: styles.innerBlockStackMediaRight ),
-			  };
+		const innerBlockContainerStyle = [
+			{ width: innerBlockWidthString },
+			! shouldStack
+				? styles.innerBlock
+				: {
+						...( mediaPosition === 'left'
+							? styles.innerBlockStackMediaLeft
+							: styles.innerBlockStackMediaRight ),
+				  },
+			( style?.backgroundColor || backgroundColor.color ) &&
+				styles.innerBlockPaddings,
+		];
 
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
@@ -293,13 +302,9 @@ class MediaTextEdit extends Component {
 				? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ]
 				: {} ),
 			...( isSelected && styles[ 'is-selected' ] ),
-			backgroundColor:
-				wrapperProps?.style?.backgroundColor || backgroundColor.color,
+			backgroundColor: style?.backgroundColor || backgroundColor.color,
 			paddingBottom: 0,
 		};
-
-		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
-		const innerBlockWidthString = `${ innerBlockWidth }%`;
 
 		const mediaContainerStyle = [
 			{ flex: 1 },
@@ -373,13 +378,11 @@ class MediaTextEdit extends Component {
 					>
 						{ this.renderMediaArea( shouldStack ) }
 					</View>
-					<View
-						style={ {
-							width: innerBlockWidthString,
-							...innerBlockContainerStyle,
-						} }
-					>
-						<InnerBlocks template={ TEMPLATE } />
+					<View style={ innerBlockContainerStyle }>
+						<InnerBlocks
+							template={ TEMPLATE }
+							blockWidth={ blockWidth }
+						/>
 					</View>
 				</View>
 			</>
@@ -392,23 +395,18 @@ export default compose(
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getSelectedBlockClientId,
-			getBlockRootClientId,
 			getBlockParents,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const parents = getBlockParents( clientId, true );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const isParentSelected =
-			selectedBlockClientId &&
-			selectedBlockClientId === getBlockRootClientId( clientId );
 		const isAncestorSelected =
 			selectedBlockClientId && parents.includes( selectedBlockClientId );
 
 		return {
 			isSelected: selectedBlockClientId === clientId,
-			isParentSelected,
 			isAncestorSelected,
 			isRTL: getSettings().isRTL,
 		};

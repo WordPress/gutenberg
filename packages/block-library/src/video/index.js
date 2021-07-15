@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { video as icon } from '@wordpress/icons';
 
 /**
@@ -17,12 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Video', 'block title' ),
-	description: __(
-		'Embed a video from your media library or upload a new one.'
-	),
 	icon,
-	keywords: [ __( 'movie' ) ],
 	example: {
 		attributes: {
 			src:

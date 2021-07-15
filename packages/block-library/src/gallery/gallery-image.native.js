@@ -283,13 +283,11 @@ class GalleryImage extends Component {
 							>
 								<Caption
 									inlineToolbar
-									isSelected={ captionSelected }
+									isSelected={ isSelected && captionSelected }
 									onChange={ this.onCaptionChange }
 									onFocus={ this.onSelectCaption }
 									placeholder={
-										isSelected
-											? __( 'Write caption…' )
-											: null
+										isSelected ? __( 'Add caption' ) : null
 									}
 									placeholderTextColor={
 										captionPlaceholderStyle.color

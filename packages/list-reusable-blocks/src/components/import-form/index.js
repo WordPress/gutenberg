@@ -60,8 +60,8 @@ class ImportForm extends Component {
 					case 'Invalid JSON file':
 						uiMessage = __( 'Invalid JSON file' );
 						break;
-					case 'Invalid Reusable Block JSON file':
-						uiMessage = __( 'Invalid Reusable Block JSON file' );
+					case 'Invalid Reusable block JSON file':
+						uiMessage = __( 'Invalid Reusable block JSON file' );
 						break;
 					default:
 						uiMessage = __( 'Unknown error' );
@@ -107,7 +107,7 @@ class ImportForm extends Component {
 					type="submit"
 					isBusy={ isLoading }
 					disabled={ ! file || isLoading }
-					isSecondary
+					variant="secondary"
 					className="list-reusable-blocks-import-form__button"
 				>
 					{ _x( 'Import', 'button label' ) }

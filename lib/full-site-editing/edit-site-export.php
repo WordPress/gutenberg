@@ -6,8 +6,8 @@
  */
 
 /**
- * Parses wp_template content and injects the current theme's
- * stylesheet as a theme attribute into each wp_template_part
+ * Parses wp_template content and removes the theme attribute from
+ * each wp_template_part
  *
  * @param string $template_content serialized wp_template content.
  *
@@ -18,9 +18,10 @@ function _remove_theme_attribute_from_content( $template_content ) {
 	$new_content         = '';
 	$template_blocks     = parse_blocks( $template_content );
 
-	foreach ( $template_blocks as $key => $block ) {
+	$blocks = _gutenberg_flatten_blocks( $template_blocks );
+	foreach ( $blocks as $key => $block ) {
 		if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['theme'] ) ) {
-			unset( $template_blocks[ $key ]['attrs']['theme'] );
+			unset( $blocks[ $key ]['attrs']['theme'] );
 			$has_updated_content = true;
 		}
 	}
@@ -31,22 +32,23 @@ function _remove_theme_attribute_from_content( $template_content ) {
 		}
 
 		return $new_content;
-	} else {
-		return $template_content;
 	}
+
+	return $template_content;
 }
 
-
 /**
- * Output a ZIP file with an export of the current templates
- * and template parts from the site editor, and close the connection.
+ * Creates an export of the current templates and
+ * template parts from the site editor at the
+ * specified path in a ZIP file.
+ *
+ * @param string $filename path of the ZIP file.
  */
-function gutenberg_edit_site_export() {
-	// Create ZIP file and directories.
-	$filename = tempnam( get_temp_dir(), 'edit-site-export' );
+function gutenberg_edit_site_export_create_zip( $filename ) {
 	if ( ! class_exists( 'ZipArchive' ) ) {
 		return new WP_Error( 'Zip Export not supported.' );
 	}
+
 	$zip = new ZipArchive();
 	$zip->open( $filename, ZipArchive::OVERWRITE );
 	$zip->addEmptyDir( 'theme' );
@@ -56,8 +58,7 @@ function gutenberg_edit_site_export() {
 	// Load templates into the zip file.
 	$templates = gutenberg_get_block_templates();
 	foreach ( $templates as $template ) {
-		$updated_content   = _remove_theme_attribute_from_content( $template['content'] );
-		$template->content = $updated_content;
+		$template->content = _remove_theme_attribute_from_content( $template->content );
 
 		$zip->addFromString(
 			'theme/block-templates/' . $template->slug . '.html',
@@ -74,8 +75,19 @@ function gutenberg_edit_site_export() {
 		);
 	}
 
-	// Send back the ZIP file.
+	// Save changes to the zip file.
 	$zip->close();
+}
+
+/**
+ * Output a ZIP file with an export of the current templates
+ * and template parts from the site editor, and close the connection.
+ */
+function gutenberg_edit_site_export() {
+	// Create ZIP file in the temporary directory.
+	$filename = tempnam( get_temp_dir(), 'edit-site-export' );
+	gutenberg_edit_site_export_create_zip( $filename );
+
 	header( 'Content-Type: application/zip' );
 	header( 'Content-Disposition: attachment; filename=edit-site-export.zip' );
 	header( 'Content-Length: ' . filesize( $filename ) );

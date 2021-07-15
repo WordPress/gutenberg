@@ -16,7 +16,7 @@ import { readTextFile } from './file';
 /**
  * Import a reusable block from a JSON file.
  *
- * @param {File}     file File.
+ * @param {File} file File.
  * @return {Promise} Promise returning the imported reusable block.
  */
 async function importReusableBlock( file ) {
@@ -34,7 +34,7 @@ async function importReusableBlock( file ) {
 		! isString( parsedContent.title ) ||
 		! isString( parsedContent.content )
 	) {
-		throw new Error( 'Invalid Reusable Block JSON file' );
+		throw new Error( 'Invalid Reusable block JSON file' );
 	}
 	const postType = await apiFetch( { path: `/wp/v2/types/wp_block` } );
 	const reusableBlock = await apiFetch( {

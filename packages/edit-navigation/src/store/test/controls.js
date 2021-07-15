@@ -271,7 +271,7 @@ describe( 'controls', () => {
 	it( 'triggers RESOLVE_MENU_ITEMS', () => {
 		const getMenuItems = jest.fn( () => [ 'menu-1', 'menu-2' ] );
 		const registry = {
-			__experimentalResolveSelect: jest.fn( () => ( {
+			resolveSelect: jest.fn( () => ( {
 				getMenuItems,
 			} ) ),
 		};
@@ -282,9 +282,7 @@ describe( 'controls', () => {
 			} )
 		).toEqual( [ 'menu-1', 'menu-2' ] );
 
-		expect( registry.__experimentalResolveSelect ).toHaveBeenCalledWith(
-			'core'
-		);
+		expect( registry.resolveSelect ).toHaveBeenCalledWith( 'core' );
 		expect( getMenuItems ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

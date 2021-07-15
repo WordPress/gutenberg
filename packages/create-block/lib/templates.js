@@ -5,6 +5,7 @@ const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { fromPairs, isObject } = require( 'lodash' );
+const npmPackageArg = require( 'npm-package-arg' );
 const { tmpdir } = require( 'os' );
 const { join } = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
@@ -38,6 +39,9 @@ const predefinedBlockTemplates = {
 			description:
 				'Example block written with ESNext standard and JSX support – build step required.',
 			dashicon: 'smiley',
+			supports: {
+				html: false,
+			},
 			npmDependencies: [
 				'@wordpress/block-editor',
 				'@wordpress/blocks',
@@ -153,8 +157,9 @@ const getBlockTemplate = async ( templateName ) => {
 			cwd: tempCwd,
 		} );
 
+		const { name } = npmPackageArg( templateName );
 		return await configToTemplate(
-			require( require.resolve( templateName, {
+			require( require.resolve( name, {
 				paths: [ tempCwd ],
 			} ) )
 		);
@@ -183,6 +188,7 @@ const getDefaultValues = ( blockTemplate ) => {
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
 		wpScripts: true,
+		wpEnv: false,
 		npmDependencies: [],
 		editorScript: 'file:./build/index.js',
 		editorStyle: 'file:./build/index.css',

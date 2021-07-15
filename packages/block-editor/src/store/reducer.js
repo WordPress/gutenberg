@@ -21,8 +21,8 @@ import {
 /**
  * WordPress dependencies
  */
-import { combineReducers } from '@wordpress/data';
-import { isReusableBlock } from '@wordpress/blocks';
+import { combineReducers, select } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -79,7 +79,7 @@ function mapBlockParents( blocks, rootClientId = '' ) {
  * applying a transformation function to each one.
  * Returns a flattened object with the transformed blocks.
  *
- * @param {Array} blocks Blocks to flatten.
+ * @param {Array}    blocks    Blocks to flatten.
  * @param {Function} transform Transforming function to be applied to each block.
  *
  * @return {Object} Flattened object.
@@ -137,9 +137,9 @@ function getFlattenedBlockAttributes( blocks ) {
  * an inner block controller. To do so, it must be excluded from the list of
  * client IDs which are considered to be part of the top-level entity.
  *
- * @param {Object}  blocksOrder  Object that maps block client IDs to a list of
- *                               nested block client IDs.
- * @param {?string} rootClientId The root client ID to search. Defaults to ''.
+ * @param {Object}  blocksOrder           Object that maps block client IDs to a list of
+ *                                        nested block client IDs.
+ * @param {?string} rootClientId          The root client ID to search. Defaults to ''.
  * @param {?Object} controlledInnerBlocks The InnerBlocks controller state.
  *
  * @return {Array} List of descendant client IDs.
@@ -822,7 +822,9 @@ export const blocks = flow(
 					( accumulator, id ) => ( {
 						...accumulator,
 						[ id ]: reduce(
-							action.attributes,
+							action.uniqueByBlock
+								? action.attributes[ id ]
+								: action.attributes,
 							( result, value, key ) => {
 								// Consider as updates only changed values.
 								if ( value !== result[ key ] ) {
@@ -1129,7 +1131,7 @@ export function isTyping( state = false, action ) {
  * Reducer returning dragged block client id.
  *
  * @param {string[]} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object}   action Dispatched action.
  *
  * @return {string[]} Updated state.
  */
@@ -1189,9 +1191,8 @@ function selectionHelper( state = {}, action ) {
 			}
 
 			return { clientId: action.clientId };
-		case 'REPLACE_INNER_BLOCKS': // REPLACE_INNER_BLOCKS and INSERT_BLOCKS should follow the same logic.
+		case 'REPLACE_INNER_BLOCKS':
 		case 'INSERT_BLOCKS': {
-			// REPLACE_INNER_BLOCKS can be called with an empty array.
 			if ( ! action.updateSelection || ! action.blocks.length ) {
 				return state;
 			}
@@ -1225,11 +1226,7 @@ function selectionHelper( state = {}, action ) {
 				return state;
 			}
 
-			const newState = { clientId: blockToSelect.clientId };
-			if ( typeof action.initialPosition === 'number' ) {
-				newState.initialPosition = action.initialPosition;
-			}
-			return newState;
+			return { clientId: blockToSelect.clientId };
 		}
 	}
 
@@ -1358,23 +1355,26 @@ export function isSelectionEnabled( state = true, action ) {
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {?number} Initial position: -1 or undefined.
+ * @return {number|null} Initial position: 0, -1 or null.
  */
-export function initialPosition( state, action ) {
+export function initialPosition( state = null, action ) {
 	if (
 		action.type === 'REPLACE_BLOCKS' &&
-		typeof action.initialPosition === 'number'
+		action.initialPosition !== undefined
 	) {
 		return action.initialPosition;
-	} else if ( action.type === 'SELECT_BLOCK' ) {
+	} else if (
+		[
+			'SELECT_BLOCK',
+			'RESET_SELECTION',
+			'INSERT_BLOCKS',
+			'REPLACE_INNER_BLOCKS',
+		].includes( action.type )
+	) {
 		return action.initialPosition;
-	} else if ( action.type === 'REMOVE_BLOCKS' ) {
-		return state;
-	} else if ( action.type === 'START_TYPING' ) {
-		return state;
 	}
 
-	// Reset the state by default (for any action not handled).
+	return state;
 }
 
 export function blocksMode( state = {}, action ) {
@@ -1393,31 +1393,9 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * A helper for resetting the insertion point state.
- *
- * @param {Object} state        Current state.
- * @param {Object} action       Dispatched action.
- * @param {*}      defaultValue The default value for the reducer.
- *
- * @return {*} Either the default value if a reset is required, or the state.
- */
-function resetInsertionPoint( state, action, defaultValue ) {
-	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
-		case 'SELECT_BLOCK':
-		case 'REPLACE_INNER_BLOCKS':
-		case 'INSERT_BLOCKS':
-		case 'REMOVE_BLOCKS':
-		case 'REPLACE_BLOCKS':
-			return defaultValue;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the insertion point position, consisting of the
- * rootClientId and an index.
+ * Reducer returning the block insertion point visibility, either null if there
+ * is not an explicit insertion point assigned, or an object of its `index` and
+ * `rootClientId`.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -1426,33 +1404,15 @@ function resetInsertionPoint( state, action, defaultValue ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SET_INSERTION_POINT':
-		case 'SHOW_INSERTION_POINT': {
-			const { rootClientId, index } = action;
-			return { rootClientId, index };
-		}
-	}
-
-	return resetInsertionPoint( state, action, null );
-}
-
-/**
- * Reducer returning the visibility of the insertion point.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function insertionPointVisibility( state = false, action ) {
-	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
-			return true;
+			const { rootClientId, index, __unstableWithInserter } = action;
+			return { rootClientId, index, __unstableWithInserter };
+
 		case 'HIDE_INSERTION_POINT':
-			return false;
+			return null;
 	}
 
-	return resetInsertionPoint( state, action, false );
+	return state;
 }
 
 /**
@@ -1498,8 +1458,8 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 /**
  * Reducer returning the user preferences.
  *
- * @param {Object}  state                 Current state.
- * @param {Object}  action                Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {string} Updated state.
  */
@@ -1508,11 +1468,20 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'INSERT_BLOCKS':
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
-				let id = block.name;
-				const insert = { name: block.name };
-				if ( isReusableBlock( block ) ) {
-					insert.ref = block.attributes.ref;
-					id += '/' + block.attributes.ref;
+				const { attributes, name: blockName } = block;
+				const match = select( blocksStore ).getActiveBlockVariation(
+					blockName,
+					attributes
+				);
+				// If a block variation match is found change the name to be the same with the
+				// one that is used for block variations in the Inserter (`getItemFromVariation`).
+				let id = match?.name
+					? `${ blockName }/${ match.name }`
+					: blockName;
+				const insert = { name: id };
+				if ( blockName === 'core/block' ) {
+					insert.ref = attributes.ref;
+					id += '/' + attributes.ref;
 				}
 
 				return {
@@ -1599,7 +1568,7 @@ export function isNavigationMode( state = false, action ) {
  * Reducer returning whether the block moving mode is enabled or not.
  *
  * @param {string|null} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Object}      action Dispatched action.
  *
  * @return {string|null} Updated state.
  */
@@ -1642,7 +1611,9 @@ export function lastBlockAttributesChange( state, action ) {
 			return action.clientIds.reduce(
 				( accumulator, id ) => ( {
 					...accumulator,
-					[ id ]: action.attributes,
+					[ id ]: action.uniqueByBlock
+						? action.attributes[ id ]
+						: action.attributes,
 				} ),
 				{}
 			);
@@ -1715,6 +1686,31 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the block insertion event list state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function lastBlockInserted( state = {}, action ) {
+	switch ( action.type ) {
+		case 'INSERT_BLOCKS':
+			if ( ! action.blocks.length ) {
+				return state;
+			}
+
+			const clientId = action.blocks[ 0 ].clientId;
+			const source = action.meta?.source;
+
+			return { clientId, source };
+		case 'RESET_BLOCKS':
+			return {};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1727,7 +1723,6 @@ export default combineReducers( {
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
-	insertionPointVisibility,
 	template,
 	settings,
 	preferences,
@@ -1736,4 +1731,5 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
+	lastBlockInserted,
 } );

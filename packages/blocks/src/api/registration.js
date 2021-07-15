@@ -4,10 +4,15 @@
  * External dependencies
  */
 import {
-	get,
+	camelCase,
+	isArray,
+	isEmpty,
 	isFunction,
 	isNil,
+	isObject,
 	isPlainObject,
+	isString,
+	mapKeys,
 	omit,
 	pick,
 	pickBy,
@@ -19,11 +24,13 @@ import {
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import { _x } from '@wordpress/i18n';
 import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import i18nBlockSchema from './i18n-block.json';
 import { isValidIcon, normalizeIconObject } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
 import { store as blocksStore } from '../store';
@@ -79,32 +86,37 @@ import { store as blocksStore } from '../store';
  *
  * @typedef {Object} WPBlockVariation
  *
- * @property {string}   name                   The unique and machine-readable name.
- * @property {string}   title                  A human-readable variation title.
- * @property {string}   [description]          A detailed variation description.
- * @property {WPIcon}   [icon]                 An icon helping to visualize the variation.
- * @property {boolean}  [isDefault]            Indicates whether the current variation is
- *                                             the default one. Defaults to `false`.
- * @property {Object}   [attributes]           Values which override block attributes.
- * @property {Array[]}  [innerBlocks]          Initial configuration of nested blocks.
- * @property {Object}   [example]              Example provides structured data for
- *                                             the block preview. You can set to
- *                                             `undefined` to disable the preview shown
- *                                             for the block type.
- * @property {WPBlockVariationScope[]} [scope] The list of scopes where the variation
- *                                             is applicable. When not provided, it
- *                                             assumes all available scopes.
- * @property {string[]} [keywords]             An array of terms (which can be translated)
- *                                             that help users discover the variation
- *                                             while searching.
- * @property {Function} [isActive]             A function that accepts a block's attributes
- *                                             and the variation's attributes and determines
- *                                             if a variation is active. This function doesn't
- *                                             try to find a match dynamically based on all
- *                                             block's attributes, as in many cases some
- *                                             attributes are irrelevant. An example would
- *                                             be for `embed` block where we only care about
- *                                             `providerNameSlug` attribute's value.
+ * @property {string}                  name          The unique and machine-readable name.
+ * @property {string}                  title         A human-readable variation title.
+ * @property {string}                  [description] A detailed variation description.
+ * @property {string}                  [category]    Block type category classification,
+ *                                                   used in search interfaces to arrange
+ *                                                   block types by category.
+ * @property {WPIcon}                  [icon]        An icon helping to visualize the variation.
+ * @property {boolean}                 [isDefault]   Indicates whether the current variation is
+ *                                                   the default one. Defaults to `false`.
+ * @property {Object}                  [attributes]  Values which override block attributes.
+ * @property {Array[]}                 [innerBlocks] Initial configuration of nested blocks.
+ * @property {Object}                  [example]     Example provides structured data for
+ *                                                   the block preview. You can set to
+ *                                                   `undefined` to disable the preview shown
+ *                                                   for the block type.
+ * @property {WPBlockVariationScope[]} [scope]       The list of scopes where the variation
+ *                                                   is applicable. When not provided, it
+ *                                                   assumes all available scopes.
+ * @property {string[]}                [keywords]    An array of terms (which can be translated)
+ *                                                   that help users discover the variation
+ *                                                   while searching.
+ * @property {Function|string[]}       [isActive]    This can be a function or an array of block attributes.
+ *                                                   Function that accepts a block's attributes and the
+ *                                                   variation's attributes and determines if a variation is active.
+ *                                                   This function doesn't try to find a match dynamically based
+ *                                                   on all block's attributes, as in many cases some attributes are irrelevant.
+ *                                                   An example would be for `embed` block where we only care
+ *                                                   about `providerNameSlug` attribute's value.
+ *                                                   We can also use a `string[]` to tell which attributes
+ *                                                   should be compared as a shorthand. Each attributes will
+ *                                                   be matched and the variation will be active if all of them are matching.
  */
 
 /**
@@ -146,7 +158,7 @@ const LEGACY_CATEGORY_MAPPING = {
 	layout: 'design',
 };
 
-export let serverSideBlockDefinitions = {};
+export const serverSideBlockDefinitions = {};
 
 /**
  * Sets the server side block definition of blocks.
@@ -155,10 +167,73 @@ export let serverSideBlockDefinitions = {};
  */
 // eslint-disable-next-line camelcase
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
-	serverSideBlockDefinitions = {
-		...serverSideBlockDefinitions,
-		...definitions,
-	};
+	for ( const blockName of Object.keys( definitions ) ) {
+		// Don't overwrite if already set. It covers the case when metadata
+		// was initialized from the server.
+		if ( serverSideBlockDefinitions[ blockName ] ) {
+			// We still need to polyfill `apiVersion` for WordPress version
+			// lower than 5.7. If it isn't present in the definition shared
+			// from the server, we try to fallback to the definition passed.
+			// @see https://github.com/WordPress/gutenberg/pull/29279
+			if (
+				serverSideBlockDefinitions[ blockName ].apiVersion ===
+					undefined &&
+				definitions[ blockName ].apiVersion
+			) {
+				serverSideBlockDefinitions[ blockName ].apiVersion =
+					definitions[ blockName ].apiVersion;
+			}
+			continue;
+		}
+		serverSideBlockDefinitions[ blockName ] = mapKeys(
+			pickBy( definitions[ blockName ], ( value ) => ! isNil( value ) ),
+			( value, key ) => camelCase( key )
+		);
+	}
+}
+
+/**
+ * Gets block settings from metadata loaded from `block.json` file.
+ *
+ * @param {Object} metadata            Block metadata loaded from `block.json`.
+ * @param {string} metadata.textdomain Textdomain to use with translations.
+ *
+ * @return {Object} Block settings.
+ */
+function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
+	const allowedFields = [
+		'apiVersion',
+		'title',
+		'category',
+		'parent',
+		'icon',
+		'description',
+		'keywords',
+		'attributes',
+		'providesContext',
+		'usesContext',
+		'supports',
+		'styles',
+		'example',
+		'variations',
+	];
+
+	const settings = pick( metadata, allowedFields );
+
+	if ( textdomain ) {
+		Object.keys( i18nBlockSchema ).forEach( ( key ) => {
+			if ( ! settings[ key ] ) {
+				return;
+			}
+			settings[ key ] = translateBlockSettingUsingI18nSchema(
+				i18nBlockSchema[ key ],
+				settings[ key ],
+				textdomain
+			);
+		} );
+	}
+
+	return settings;
 }
 
 /**
@@ -166,13 +241,28 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
  *
- * @param {string} name     Block name.
- * @param {Object} settings Block settings.
+ * @param {string|Object} blockNameOrMetadata Block type name or its metadata.
+ * @param {Object}        settings            Block settings.
  *
  * @return {?WPBlock} The block, if it has been successfully registered;
  *                    otherwise `undefined`.
  */
-export function registerBlockType( name, settings ) {
+export function registerBlockType( blockNameOrMetadata, settings ) {
+	const name = isObject( blockNameOrMetadata )
+		? blockNameOrMetadata.name
+		: blockNameOrMetadata;
+
+	if ( typeof name !== 'string' ) {
+		console.error( 'Block names must be strings.' );
+		return;
+	}
+
+	if ( isObject( blockNameOrMetadata ) ) {
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: getBlockSettingsFromMetadata( blockNameOrMetadata ),
+		} );
+	}
+
 	settings = {
 		name,
 		icon: blockDefault,
@@ -183,17 +273,10 @@ export function registerBlockType( name, settings ) {
 		supports: {},
 		styles: [],
 		save: () => null,
-		...pickBy(
-			get( serverSideBlockDefinitions, name, {} ),
-			( value ) => ! isNil( value )
-		),
+		...serverSideBlockDefinitions?.[ name ],
 		...settings,
 	};
 
-	if ( typeof name !== 'string' ) {
-		console.error( 'Block names must be strings.' );
-		return;
-	}
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
 		console.error(
 			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
@@ -286,6 +369,58 @@ export function registerBlockType( name, settings ) {
 	dispatch( blocksStore ).addBlockTypes( settings );
 
 	return settings;
+}
+
+/**
+ * Translates block settings provided with metadata using the i18n schema.
+ *
+ * @param {string|string[]|Object[]} i18nSchema   I18n schema for the block setting.
+ * @param {string|string[]|Object[]} settingValue Value for the block setting.
+ * @param {string}                   textdomain   Textdomain to use with translations.
+ *
+ * @return {string|string[]|Object[]} Translated setting.
+ */
+function translateBlockSettingUsingI18nSchema(
+	i18nSchema,
+	settingValue,
+	textdomain
+) {
+	if ( isString( i18nSchema ) && isString( settingValue ) ) {
+		// eslint-disable-next-line @wordpress/i18n-no-variables, @wordpress/i18n-text-domain
+		return _x( settingValue, i18nSchema, textdomain );
+	}
+	if (
+		isArray( i18nSchema ) &&
+		! isEmpty( i18nSchema ) &&
+		isArray( settingValue )
+	) {
+		return settingValue.map( ( value ) =>
+			translateBlockSettingUsingI18nSchema(
+				i18nSchema[ 0 ],
+				value,
+				textdomain
+			)
+		);
+	}
+	if (
+		isObject( i18nSchema ) &&
+		! isEmpty( i18nSchema ) &&
+		isObject( settingValue )
+	) {
+		return Object.keys( settingValue ).reduce( ( accumulator, key ) => {
+			if ( ! i18nSchema[ key ] ) {
+				accumulator[ key ] = settingValue[ key ];
+				return accumulator;
+			}
+			accumulator[ key ] = translateBlockSettingUsingI18nSchema(
+				i18nSchema[ key ],
+				settingValue[ key ],
+				textdomain
+			);
+			return accumulator;
+		}, {} );
+	}
+	return settingValue;
 }
 
 /**
@@ -425,10 +560,10 @@ export function getBlockTypes() {
 /**
  * Returns the block support value for a feature, if defined.
  *
- * @param  {(string|Object)} nameOrType      Block name or type object
- * @param  {string}          feature         Feature to retrieve
- * @param  {*}               defaultSupports Default value to return if not
- *                                           explicitly defined
+ * @param {(string|Object)} nameOrType      Block name or type object
+ * @param {string}          feature         Feature to retrieve
+ * @param {*}               defaultSupports Default value to return if not
+ *                                          explicitly defined
  *
  * @return {?*} Block support value
  */
@@ -469,6 +604,19 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  */
 export function isReusableBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';
+}
+
+/**
+ * Determines whether or not the given block is a template part. This is a
+ * special block type that allows composing a page template out of reusable
+ * design elements.
+ *
+ * @param {Object} blockOrType Block or Block Type to test.
+ *
+ * @return {boolean} Whether the given block is a template part.
+ */
+export function isTemplatePart( blockOrType ) {
+	return blockOrType.name === 'core/template-part';
 }
 
 /**

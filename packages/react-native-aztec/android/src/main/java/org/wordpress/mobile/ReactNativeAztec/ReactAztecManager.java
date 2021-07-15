@@ -217,7 +217,8 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             // force a 2nd setText from JS side to Native, just set a high eventCount
             int eventCount = inputMap.getInt("eventCount");
 
-            if (view.mNativeEventCount < eventCount) {
+            if (view.getEventCounter() < eventCount) {
+                view.setEventCounterSyncFromJS(eventCount);
                 setTextfromJS(view, inputMap.getString("text"), inputMap.getMap("selection"));
             }
         }
@@ -558,9 +559,9 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     }
 
     @Override
-    public void receiveCommand(final ReactAztecText parent, int commandType, @Nullable ReadableArray args) {
+    public void receiveCommand(final ReactAztecText parent, String commandType, @Nullable ReadableArray args) {
         Assertions.assertNotNull(parent);
-        if (commandType == mFocusTextInputCommandCode) {
+        if (commandType.equals("focus")) {
             // schedule a request to focus in the next layout, to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1870
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
@@ -569,7 +570,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                 }
             });
             return;
-        } else if (commandType == mBlurTextInputCommandCode) {
+        } else if (commandType.equals("blur")) {
             parent.clearFocusFromJS();
             return;
         }

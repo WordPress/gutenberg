@@ -1,39 +1,37 @@
 /**
+ * External dependencies
+ */
+import { flow } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
 
 /**
- * Internal to edit-widgets package.
- *
- * Stores widgetId -> clientId mapping which is necessary for saving the navigation.
- *
- * @param {Object} state Redux state
- * @param {Object} action Redux action
- * @return {Object} Updated state
+ * Internal dependencies
  */
-export function mapping( state, action ) {
-	const { type, ...rest } = action;
-	if ( type === 'SET_WIDGET_TO_CLIENT_ID_MAPPING' ) {
-		return rest.mapping;
-	}
-	if ( type === 'SET_WIDGET_ID_FOR_CLIENT_ID' ) {
-		const newMapping = {
-			...state,
-		};
-		newMapping[ action.widgetId ] = action.clientId;
-		return newMapping;
-	}
+import { PREFERENCES_DEFAULTS } from './defaults';
 
-	return state || {};
-}
+/**
+ * Higher-order reducer creator which provides the given initial state for the
+ * original reducer.
+ *
+ * @param {*} initialState Initial state to provide to reducer.
+ *
+ * @return {Function} Higher-order reducer.
+ */
+const createWithInitialState = ( initialState ) => ( reducer ) => {
+	return ( state = initialState, action ) => reducer( state, action );
+};
 
 /**
  * Controls the open state of the widget areas.
  *
- * @param {Object} state   Redux state
- * @param {Object} action  Redux action
- * @return {Array}         Updated state
+ * @param {Object} state  Redux state.
+ * @param {Object} action Redux action.
+ *
+ * @return {Array} Updated state.
  */
 export function widgetAreasOpenState( state = {}, action ) {
 	const { type } = action;
@@ -57,10 +55,10 @@ export function widgetAreasOpenState( state = {}, action ) {
 /**
  * Reducer tracking whether the inserter is open.
  *
- * @param {boolean} state
- * @param {Object}  action
+ * @param {boolean|Object} state
+ * @param {Object}         action
  */
-function isInserterOpened( state = false, action ) {
+function blockInserterPanel( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value;
@@ -68,8 +66,32 @@ function isInserterOpened( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the user preferences.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const preferences = flow( [
+	combineReducers,
+	createWithInitialState( PREFERENCES_DEFAULTS ),
+] )( {
+	features( state, action ) {
+		if ( action.type === 'TOGGLE_FEATURE' ) {
+			return {
+				...state,
+				[ action.feature ]: ! state[ action.feature ],
+			};
+		}
+
+		return state;
+	},
+} );
+
 export default combineReducers( {
-	mapping,
-	isInserterOpened,
+	blockInserterPanel,
 	widgetAreasOpenState,
+	preferences,
 } );

@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import PublishButtonLabel from './label';
+import { store as editorStore } from '../../store';
 
 export class PostPublishButton extends Component {
 	constructor( props ) {
@@ -102,21 +103,24 @@ export class PostPublishButton extends Component {
 			onToggle,
 			visibility,
 			hasNonPostEntityChanges,
+			isSavingNonPostEntityChanges,
 		} = this.props;
 
 		const isButtonDisabled =
-			isSaving ||
-			forceIsSaving ||
-			! isSaveable ||
-			isPostSavingLocked ||
-			( ! isPublishable && ! forceIsDirty );
+			( isSaving ||
+				forceIsSaving ||
+				! isSaveable ||
+				isPostSavingLocked ||
+				( ! isPublishable && ! forceIsDirty ) ) &&
+			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
 
 		const isToggleDisabled =
-			isPublished ||
-			isSaving ||
-			forceIsSaving ||
-			! isSaveable ||
-			( ! isPublishable && ! forceIsDirty );
+			( isPublished ||
+				isSaving ||
+				forceIsSaving ||
+				! isSaveable ||
+				( ! isPublishable && ! forceIsDirty ) ) &&
+			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
 
 		let publishStatus;
 		if ( ! hasPublishAction ) {
@@ -146,19 +150,19 @@ export class PostPublishButton extends Component {
 		};
 
 		const buttonProps = {
-			'aria-disabled': isButtonDisabled && ! hasNonPostEntityChanges,
+			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
 			isBusy: ! isAutoSaving && isSaving && isPublished,
-			isPrimary: true,
+			variant: 'primary',
 			onClick: this.createOnClick( onClickButton ),
 		};
 
 		const toggleProps = {
-			'aria-disabled': isToggleDisabled && ! hasNonPostEntityChanges,
+			'aria-disabled': isToggleDisabled,
 			'aria-expanded': isOpen,
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,
-			isPrimary: true,
+			variant: 'primary',
 			onClick: this.createOnClick( onClickToggle ),
 		};
 
@@ -209,7 +213,8 @@ export default compose( [
 			getCurrentPostType,
 			getCurrentPostId,
 			hasNonPostEntityChanges,
-		} = select( 'core/editor' );
+			isSavingNonPostEntityChanges,
+		} = select( editorStore );
 		const _isAutoSaving = isAutosavingPost();
 		return {
 			isSaving: isSavingPost() || _isAutoSaving,
@@ -228,10 +233,11 @@ export default compose( [
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
+			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( 'core/editor' );
+		const { editPost, savePost } = dispatch( editorStore );
 		return {
 			onStatusChange: ( status ) =>
 				editPost( { status }, { undoIgnore: true } ),

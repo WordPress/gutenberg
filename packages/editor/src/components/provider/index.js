@@ -33,16 +33,13 @@ function EditorProvider( {
 		}
 		return { postId: post.id, postType: post.type };
 	}, [ post.id, post.type ] );
-	const { selectionEnd, selectionStart, isReady } = useSelect( ( select ) => {
-		const {
-			getEditorSelectionStart,
-			getEditorSelectionEnd,
-			__unstableIsEditorReady,
-		} = select( editorStore );
+	const { selection, isReady } = useSelect( ( select ) => {
+		const { getEditorSelection, __unstableIsEditorReady } = select(
+			editorStore
+		);
 		return {
 			isReady: __unstableIsEditorReady(),
-			selectionStart: getEditorSelectionStart(),
-			selectionEnd: getEditorSelectionEnd(),
+			selection: getEditorSelection(),
 		};
 	}, [] );
 	const { id, type } = __unstableTemplate ?? post;
@@ -63,7 +60,7 @@ function EditorProvider( {
 	} = useDispatch( editorStore );
 	const { createWarningNotice } = useDispatch( noticesStore );
 
-	// Iniitialize and tear down the editor.
+	// Initialize and tear down the editor.
 	// Ideally this should be synced on each change and not just something you do once.
 	useLayoutEffect( () => {
 		// Assume that we don't need to initialize in the case of an error recovery.
@@ -112,8 +109,7 @@ function EditorProvider( {
 						value={ blocks }
 						onChange={ onChange }
 						onInput={ onInput }
-						selectionStart={ selectionStart }
-						selectionEnd={ selectionEnd }
+						selection={ selection }
 						settings={ editorSettings }
 						useSubRegistry={ false }
 					>

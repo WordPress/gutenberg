@@ -1,10 +1,12 @@
 .wp-block-image {
-	// The image block is in a `figure` element, and many themes zero this out.
-	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
-	margin-bottom: 1em;
+	margin: 0 0 1em 0;
 
 	img {
 		max-width: 100%;
+	}
+
+	&:not(.is-style-rounded) img {
+		border-radius: inherit;
 	}
 
 	&.aligncenter {
@@ -86,4 +88,8 @@
 			border-radius: 0;
 		}
 	}
+}
+
+.wp-block-image figure {
+	margin: 0;
 }

@@ -8,33 +8,21 @@ import { omit } from 'lodash';
  * WordPress dependencies
  */
 import {
-	useState,
 	createContext,
 	useMemo,
 	useCallback,
+	RawHTML,
 } from '@wordpress/element';
 import {
 	getBlockType,
-	getSaveElement,
-	isReusableBlock,
+	getSaveContent,
 	isUnmodifiedDefaultBlock,
-	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
-	getBlockDefaultClassName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import {
-	withDispatch,
-	withSelect,
-	useSelect,
-	useDispatch,
-} from '@wordpress/data';
-import {
-	compose,
-	pure,
-	ifCondition,
-	useViewportMatch,
-} from '@wordpress/compose';
+import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
+import { compose, pure, ifCondition } from '@wordpress/compose';
+import { safeHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -45,6 +33,7 @@ import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './use-block-props';
+import { store as blockEditorStore } from '../../store';
 
 export const BlockListBlockContext = createContext();
 
@@ -85,12 +74,6 @@ function BlockListBlock( {
 	isLocked,
 	clientId,
 	isSelected,
-	isMultiSelected,
-	isPartOfMultiSelection,
-	isFirstMultiSelected,
-	isLastMultiSelected,
-	isTypingWithinBlock,
-	isAncestorOfSelectedBlock,
 	isSelectionEnabled,
 	className,
 	name,
@@ -102,85 +85,9 @@ function BlockListBlock( {
 	onInsertBlocksAfter,
 	onMerge,
 	toggleSelection,
-	index,
-	enableAnimation,
-	activeEntityBlockId,
 } ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
-	// In addition to withSelect, we should favor using useSelect in this
-	// component going forward to avoid leaking new props to the public API
-	// (editor.BlockListBlock filter)
-	const { isDragging, isHighlighted, isFocusMode, isOutlineMode } = useSelect(
-		( select ) => {
-			const {
-				isBlockBeingDragged,
-				isBlockHighlighted,
-				getSettings,
-			} = select( 'core/block-editor' );
-			return {
-				isDragging: isBlockBeingDragged( clientId ),
-				isHighlighted: isBlockHighlighted( clientId ),
-				isFocusMode: getSettings().focusMode,
-				isOutlineMode: getSettings().outlineMode,
-			};
-		},
-		[ clientId ]
-	);
-	const { removeBlock } = useDispatch( 'core/block-editor' );
+	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
-
-	// Handling the error state
-	const [ hasError, setErrorState ] = useState( false );
-	const onBlockError = () => setErrorState( true );
-
-	const blockType = getBlockType( name );
-	const lightBlockWrapper =
-		blockType.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', false );
-	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
-
-	// Determine whether the block has props to apply to the wrapper.
-	if ( blockType.getEditWrapperProps ) {
-		wrapperProps = mergeWrapperProps(
-			wrapperProps,
-			blockType.getEditWrapperProps( attributes )
-		);
-	}
-
-	const generatedClassName =
-		lightBlockWrapper && hasBlockSupport( blockType, 'className', true )
-			? getBlockDefaultClassName( name )
-			: null;
-	const customClassName = lightBlockWrapper ? attributes.className : null;
-	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
-
-	// The wp-block className is important for editor styles.
-	// Generate the wrapper class names handling the different states of the
-	// block.
-	const wrapperClassName = classnames(
-		generatedClassName,
-		customClassName,
-		'block-editor-block-list__block',
-		{
-			'wp-block': ! isAligned,
-			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			'is-selected': isSelected && ! isDragging,
-			'is-highlighted': isHighlighted,
-			'is-multi-selected': isMultiSelected,
-			'is-reusable': isReusableBlock( blockType ),
-			'is-dragging': isDragging,
-			'is-typing': isTypingWithinBlock,
-			'is-focused':
-				isFocusMode &&
-				isLargeViewport &&
-				( isSelected || isAncestorOfSelectedBlock ),
-			'is-focus-mode': isFocusMode && isLargeViewport,
-			'is-outline-mode': isOutlineMode,
-			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
-			'is-active-entity': activeEntityBlockId === clientId,
-		},
-		className
-	);
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -202,43 +109,43 @@ function BlockListBlock( {
 		/>
 	);
 
+	const blockType = getBlockType( name );
+	const lightBlockWrapper =
+		blockType.apiVersion > 1 ||
+		hasBlockSupport( blockType, 'lightBlockWrapper', false );
+
+	// Determine whether the block has props to apply to the wrapper.
+	if ( blockType.getEditWrapperProps ) {
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
+		);
+	}
+
+	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
+
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column.
 	if ( isAligned ) {
-		const alignmentWrapperProps = {
-			'data-align': wrapperProps[ 'data-align' ],
-		};
 		blockEdit = (
-			<div className="wp-block" { ...alignmentWrapperProps }>
+			<div
+				className="wp-block"
+				data-align={ wrapperProps[ 'data-align' ] }
+			>
 				{ blockEdit }
 			</div>
 		);
 	}
 
-	const value = {
-		clientId,
-		isSelected,
-		isFirstMultiSelected,
-		isLastMultiSelected,
-		isPartOfMultiSelection,
-		enableAnimation,
-		index,
-		className: wrapperClassName,
-		isLocked,
-		name,
-		mode,
-		blockTitle: blockType.title,
-		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
-	};
-	const memoizedValue = useMemo( () => value, Object.values( value ) );
-
 	let block;
 
 	if ( ! isValid ) {
+		const saveContent = getSaveContent( blockType, attributes );
+
 		block = (
-			<Block>
+			<Block className="has-warning">
 				<BlockInvalidWarning clientId={ clientId } />
-				<div>{ getSaveElement( blockType, attributes ) }</div>
+				<RawHTML>{ safeHTML( saveContent ) }</RawHTML>
 			</Block>
 		);
 	} else if ( mode === 'html' ) {
@@ -258,16 +165,25 @@ function BlockListBlock( {
 		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
 	}
 
+	const value = {
+		clientId,
+		className,
+		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
+		isAligned,
+	};
+	const memoizedValue = useMemo( () => value, Object.values( value ) );
+
 	return (
 		<BlockListBlockContext.Provider value={ memoizedValue }>
-			<BlockCrashBoundary onError={ onBlockError }>
+			<BlockCrashBoundary
+				fallback={
+					<Block className="has-warning">
+						<BlockCrashWarning />
+					</Block>
+				}
+			>
 				{ block }
 			</BlockCrashBoundary>
-			{ !! hasError && (
-				<Block>
-					<BlockCrashWarning />
-				</Block>
-			) }
 		</BlockListBlockContext.Provider>
 	);
 }
@@ -275,70 +191,35 @@ function BlockListBlock( {
 const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	const {
 		isBlockSelected,
-		isAncestorMultiSelected,
-		isBlockMultiSelected,
-		isFirstMultiSelectedBlock,
-		getLastMultiSelectedBlockClientId,
-		isTyping,
 		getBlockMode,
 		isSelectionEnabled,
-		hasSelectedInnerBlock,
 		getTemplateLock,
 		__unstableGetBlockWithoutInnerBlocks,
-		getMultiSelectedBlockClientIds,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
-	const checkDeep = true;
-
-	// "ancestor" is the more appropriate label due to "deep" check
-	const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
-		clientId,
-		checkDeep
-	);
-
 	// The fallback to `{}` is a temporary fix.
 	// This function should never be called when a block is not present in
 	// the state. It happens now because the order in withSelect rendering
 	// is not correct.
 	const { name, attributes, isValid } = block || {};
-	const isFirstMultiSelected = isFirstMultiSelectedBlock( clientId );
 
 	// Do not add new properties here, use `useSelect` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
-		isMultiSelected: isBlockMultiSelected( clientId ),
-		isPartOfMultiSelection:
-			isBlockMultiSelected( clientId ) ||
-			isAncestorMultiSelected( clientId ),
-		isFirstMultiSelected,
-		isLastMultiSelected: getLastMultiSelectedBlockClientId() === clientId,
-		multiSelectedClientIds: isFirstMultiSelected
-			? getMultiSelectedBlockClientIds()
-			: undefined,
-
-		// We only care about this prop when the block is selected
-		// Thus to avoid unnecessary rerenders we avoid updating the prop if
-		// the block is not selected.
-		isTypingWithinBlock:
-			( isSelected || isAncestorOfSelectedBlock ) && isTyping(),
-
 		mode: getBlockMode( clientId ),
 		isSelectionEnabled: isSelectionEnabled(),
 		isLocked: !! templateLock,
-
 		// Users of the editor.BlockListBlock filter used to be able to
 		// access the block prop.
 		// Ideally these blocks would rely on the clientId prop only.
 		// This is kept for backward compatibility reasons.
 		block,
-
 		name,
 		attributes,
 		isValid,
 		isSelected,
-		isAncestorOfSelectedBlock,
 	};
 } );
 
@@ -350,19 +231,19 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		replaceBlocks,
 		toggleSelection,
 		__unstableMarkLastChangeAsPersistent,
-	} = dispatch( 'core/block-editor' );
+	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( newAttributes ) {
-			const {
-				clientId,
-				isFirstMultiSelected,
-				multiSelectedClientIds,
-			} = ownProps;
-			const clientIds = isFirstMultiSelected
-				? multiSelectedClientIds
+			const { getMultiSelectedBlockClientIds } = select(
+				blockEditorStore
+			);
+			const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
+			const { clientId } = ownProps;
+			const clientIds = multiSelectedBlockClientIds.length
+				? multiSelectedBlockClientIds
 				: [ clientId ];
 
 			updateBlockAttributes( clientIds, newAttributes );
@@ -373,14 +254,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 		onInsertBlocksAfter( blocks ) {
 			const { clientId, rootClientId } = ownProps;
-			const { getBlockIndex } = select( 'core/block-editor' );
+			const { getBlockIndex } = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
 		onMerge( forward ) {
 			const { clientId } = ownProps;
 			const { getPreviousBlockClientId, getNextBlockClientId } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			if ( forward ) {

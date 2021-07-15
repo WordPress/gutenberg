@@ -11,6 +11,7 @@ import { useEffect, useRef } from '@wordpress/element';
  */
 import BlockDraggableChip from './draggable-chip';
 import useScrollWhenDragging from './use-scroll-when-dragging';
+import { store as blockEditorStore } from '../../store';
 
 const BlockDraggable = ( {
 	children,
@@ -18,7 +19,6 @@ const BlockDraggable = ( {
 	cloneClassname,
 	onDragStart,
 	onDragEnd,
-	elementId,
 } ) => {
 	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
@@ -26,7 +26,7 @@ const BlockDraggable = ( {
 				getBlockRootClientId,
 				getTemplateLock,
 				getBlockName,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
@@ -49,7 +49,7 @@ const BlockDraggable = ( {
 	] = useScrollWhenDragging();
 
 	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	// Stop dragging blocks if the block draggable is unmounted
@@ -74,7 +74,7 @@ const BlockDraggable = ( {
 	return (
 		<Draggable
 			cloneClassname={ cloneClassname }
-			elementId={ elementId }
+			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
 				startDraggingBlocks( clientIds );

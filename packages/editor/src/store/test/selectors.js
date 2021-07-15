@@ -16,6 +16,7 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
+import { layout, footer, header } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -36,6 +37,13 @@ selectorNames.forEach( ( name ) => {
 				return (
 					state.__experimentalGetDirtyEntityRecords &&
 					state.__experimentalGetDirtyEntityRecords()
+				);
+			},
+
+			__experimentalGetEntitiesBeingSaved() {
+				return (
+					state.__experimentalGetEntitiesBeingSaved &&
+					state.__experimentalGetEntitiesBeingSaved()
 				);
 			},
 
@@ -111,6 +119,19 @@ selectorNames.forEach( ( name ) => {
 			getAutosave() {
 				return state.getAutosave && state.getAutosave();
 			},
+
+			getPostType() {
+				const postTypeLabel = {
+					post: 'Post',
+					page: 'Page',
+				}[ state.postType ];
+
+				return {
+					labels: {
+						singular_name: postTypeLabel,
+					},
+				};
+			},
 		} );
 
 		selectorNames.forEach( ( otherName ) => {
@@ -156,6 +177,7 @@ const {
 	getCurrentPostAttribute,
 	getEditedPostAttribute,
 	isSavingPost,
+	isSavingNonPostEntityChanges,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
@@ -168,9 +190,11 @@ const {
 	isPostSavingLocked,
 	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
+	getPostTypeLabel,
 	__experimentalGetDefaultTemplateType,
 	__experimentalGetDefaultTemplateTypes,
 	__experimentalGetTemplateInfo,
+	__experimentalGetDefaultTemplatePartAreas,
 } = selectors;
 
 const defaultTemplateTypes = [
@@ -183,6 +207,21 @@ const defaultTemplateTypes = [
 		title: '404 (Not Found)',
 		description: 'Applied when content cannot be found',
 		slug: '404',
+	},
+];
+
+const defaultTemplatePartAreas = [
+	{
+		area: 'header',
+		label: 'Header',
+		description: 'Some description of a header',
+		icon: 'header',
+	},
+	{
+		area: 'footer',
+		label: 'Footer',
+		description: 'Some description of a footer',
+		icon: 'footer',
 	},
 ];
 
@@ -2054,6 +2093,53 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isSavingNonPostEntityChanges', () => {
+		it( 'should return true if changes to an arbitrary entity are being saved', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [
+						{ kind: 'someKind', name: 'someName', key: 'someKey' },
+					];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( true );
+		} );
+		it( 'should return false if the only changes being saved are for the current post', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [ { kind: 'postType', name: 'post', key: 1 } ];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( false );
+		} );
+		it( 'should return true if changes to multiple posts are being saved', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [
+						{ kind: 'postType', name: 'post', key: 1 },
+						{ kind: 'postType', name: 'post', key: 2 },
+					];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( true );
+		} );
+		it( 'should return true if changes to multiple posts of different post types are being saved', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [
+						{ kind: 'postType', name: 'post', key: 1 },
+						{ kind: 'postType', name: 'wp_template', key: 1 },
+					];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'didPostSaveRequestSucceed', () => {
 		it( 'should return true if the post save request is successful', () => {
 			const state = {
@@ -2803,6 +2889,32 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( '__experimentalGetDefaultTemplatePartAreas', () => {
+		const state = { editorSettings: { defaultTemplatePartAreas } };
+
+		it( 'returns empty array if there are no default template part areas', () => {
+			const emptyState = { editorSettings: {} };
+			expect(
+				__experimentalGetDefaultTemplatePartAreas( emptyState )
+			).toHaveLength( 0 );
+		} );
+
+		it( 'returns a list of default template part areas if present in state', () => {
+			expect(
+				__experimentalGetDefaultTemplatePartAreas( state )
+			).toHaveLength( 2 );
+		} );
+
+		it( 'assigns an icon to each area', () => {
+			const templatePartAreas = __experimentalGetDefaultTemplatePartAreas(
+				state
+			);
+			templatePartAreas.forEach( ( area ) =>
+				expect( area.icon ).not.toBeNull()
+			);
+		} );
+	} );
+
 	describe( '__experimentalGetDefaultTemplateType', () => {
 		const state = { editorSettings: { defaultTemplateTypes } };
 
@@ -2841,7 +2953,9 @@ describe( 'selectors', () => {
 	} );
 
 	describe( '__experimentalGetTemplateInfo', () => {
-		const state = { editorSettings: { defaultTemplateTypes } };
+		const state = {
+			editorSettings: { defaultTemplateTypes, defaultTemplatePartAreas },
+		};
 
 		it( 'should return an empty object if no template is passed', () => {
 			expect( __experimentalGetTemplateInfo( state, null ) ).toEqual(
@@ -2894,12 +3008,13 @@ describe( 'selectors', () => {
 			).toEqual( 'test description' );
 		} );
 
-		it( 'should return both a title and a description', () => {
+		it( 'should return a title, description, and icon', () => {
 			expect(
 				__experimentalGetTemplateInfo( state, { slug: 'index' } )
 			).toEqual( {
 				title: 'Default (Index)',
 				description: 'Main template',
+				icon: layout,
 			} );
 
 			expect(
@@ -2910,6 +3025,7 @@ describe( 'selectors', () => {
 			).toEqual( {
 				title: 'test title',
 				description: 'Main template',
+				icon: layout,
 			} );
 
 			expect(
@@ -2920,6 +3036,7 @@ describe( 'selectors', () => {
 			).toEqual( {
 				title: 'Default (Index)',
 				description: 'test description',
+				icon: layout,
 			} );
 
 			expect(
@@ -2931,7 +3048,81 @@ describe( 'selectors', () => {
 			).toEqual( {
 				title: 'test title',
 				description: 'test description',
+				icon: layout,
 			} );
+		} );
+
+		it( 'should return correct icon based on area', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = uncategorized',
+					area: 'uncategorized',
+				} )
+			).toEqual( {
+				title: 'template part, area = uncategorized',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = invalid',
+					area: 'invalid',
+				} )
+			).toEqual( {
+				title: 'template part, area = invalid',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = header',
+					area: 'header',
+				} )
+			).toEqual( {
+				title: 'template part, area = header',
+				icon: header,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = footer',
+					area: 'footer',
+				} )
+			).toEqual( {
+				title: 'template part, area = footer',
+				icon: footer,
+			} );
+		} );
+	} );
+
+	describe( 'getPostTypeLabel', () => {
+		it( 'should return the correct label for the current post type', () => {
+			const postTypes = [
+				{
+					state: {
+						postType: 'page',
+					},
+					expected: 'Page',
+				},
+				{
+					state: {
+						postType: 'post',
+					},
+					expected: 'Post',
+				},
+			];
+
+			postTypes.forEach( ( { state, expected } ) =>
+				expect( getPostTypeLabel( state ) ).toBe( expected )
+			);
+		} );
+
+		it( 'should return `undefined` when the post type label does not exist', () => {
+			const postTypes = [ {}, { postType: 'humpty' } ];
+
+			postTypes.forEach( ( state ) =>
+				expect( getPostTypeLabel( state ) ).toBeUndefined()
+			);
 		} );
 	} );
 } );

@@ -4,7 +4,7 @@
 const glob = require( 'glob' ).sync;
 
 // Finds all packages which are transpiled with Babel to force Jest to use their source code.
-const transpiledPackageNames = glob( 'packages/*/src/index.js' ).map(
+const transpiledPackageNames = glob( 'packages/*/src/index.{js,ts,tsx}' ).map(
 	( fileName ) => fileName.split( '/' )[ 1 ]
 );
 
@@ -20,6 +20,7 @@ module.exports = {
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
 	],
+	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
 	testURL: 'http://localhost',
 	testPathIgnorePatterns: [
 		'/.git/',
@@ -33,9 +34,17 @@ module.exports = {
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
-	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
+	snapshotSerializers: [
+		'enzyme-to-json/serializer',
+		'@emotion/jest/serializer',
+		'snapshot-diff/serializer',
+	],
 	watchPlugins: [
 		'jest-watch-typeahead/filename',
 		'jest-watch-typeahead/testname',
+	],
+	reporters: [
+		'default',
+		'<rootDir>packages/scripts/config/jest-github-actions-reporter.js',
 	],
 };

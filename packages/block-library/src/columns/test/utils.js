@@ -276,8 +276,8 @@ describe( 'getMappedColumnWidths', () => {
 		const result = getMappedColumnWidths( blocks, widths );
 
 		expect( result ).toEqual( [
-			{ clientId: 'a', attributes: { width: 25 } },
-			{ clientId: 'b', attributes: { width: 35 } },
+			{ clientId: 'a', attributes: { width: '25%' } },
+			{ clientId: 'b', attributes: { width: '35%' } },
 		] );
 	} );
 } );

@@ -1,48 +1,20 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import './plugins';
 import './hooks';
-import registerEditSiteStore from './store';
+import './store';
 import Editor from './components/editor';
-
-const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
-	apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			per_page: perPage,
-			search,
-			type: 'post',
-			subtype: 'post',
-		} ),
-	} )
-		.then( ( posts ) =>
-			Promise.all(
-				posts.map( ( post ) =>
-					apiFetch( { url: post._links.self[ 0 ].href } )
-				)
-			)
-		)
-		.then( ( posts ) =>
-			posts.map( ( post ) => ( {
-				url: post.link,
-				type: post.type,
-				id: post.id,
-				slug: post.slug,
-				title: post.title.rendered || __( '(no title)' ),
-			} ) )
-		);
 
 /**
  * Initializes the site editor screen.
@@ -51,17 +23,21 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
  * @param {Object} settings Editor settings.
  */
 export function initialize( id, settings ) {
-	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
+	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
+		fetchLinkSuggestions( search, searchOptions, settings );
 	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
-
-	registerEditSiteStore( { settings } );
 
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( true );
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableFSEBlocks: true,
+		} );
 	}
 
-	render( <Editor />, document.getElementById( id ) );
+	render(
+		<Editor initialSettings={ settings } />,
+		document.getElementById( id )
+	);
 }
 
 export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';

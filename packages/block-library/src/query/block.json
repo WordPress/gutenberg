@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/query",
-	"category": "design",
+	"title": "Query Loop",
+	"category": "theme",
+	"description": "An advanced block that allows displaying post types based on different query parameters and visual configurations.",
+	"textdomain": "default",
 	"attributes": {
 		"queryId": {
 			"type": "number"
@@ -10,7 +13,7 @@
 			"type": "object",
 			"default": {
 				"perPage": null,
-				"pages": 1,
+				"pages": 0,
 				"offset": 0,
 				"postType": "post",
 				"categoryIds": [],
@@ -24,7 +27,11 @@
 				"inherit": true
 			}
 		},
-		"layout": {
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		},
+		"displayLayout": {
 			"type": "object",
 			"default": {
 				"type": "list"
@@ -34,13 +41,16 @@
 	"providesContext": {
 		"queryId": "queryId",
 		"query": "query",
-		"layout": "layout"
+		"displayLayout": "displayLayout"
 	},
-	"usesContext": [
-		"postId"
-	],
 	"supports": {
-		"html": false
+		"align": [ "wide", "full" ],
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-query-editor"
 }

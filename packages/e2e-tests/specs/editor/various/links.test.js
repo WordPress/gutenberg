@@ -81,6 +81,27 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'will not automatically create a link if selected text is not a valid HTTP based URL', async () => {
+		// Create a block with some text
+		await clickBlockAppender();
+		await page.keyboard.type( 'This: is not a link' );
+
+		// Select some text
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+
+		// Click on the Link button
+		await page.click( 'button[aria-label="Link"]' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
+
+		const urlInputValue = await page.evaluate(
+			() => document.querySelector( '[aria-label="URL"]' ).value
+		);
+
+		expect( urlInputValue ).toBe( '' );
+	} );
+
 	it( 'can be created by selecting text and using keyboard shortcuts', async () => {
 		// Create a block with some text
 		await clickBlockAppender();
@@ -233,7 +254,13 @@ describe( 'Links', () => {
 		await createAndReselectLink();
 
 		// Click on the Unlink button
-		await page.click( 'button[aria-label="Unlink"]' );
+		// await page.click( 'button[aria-label="Unlink"]' );
+
+		// Unlick via shortcut
+		// we do this to avoid an layout edge case whereby
+		// the rich link preview popover will obscure the block toolbar
+		// under very specific circumstances and screensizes.
+		await pressKeyWithModifier( 'primaryShift', 'K' );
 
 		// The link should have been removed
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -318,7 +345,7 @@ describe( 'Links', () => {
 		// Disable reason: Wait for the animation to complete, since otherwise the
 		// click attempt may occur at the wrong point.
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 100 );
+		await page.waitForTimeout( 100 );
 
 		// Publish the post
 		await page.click( '.editor-post-publish-button' );

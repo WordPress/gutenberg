@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import React from 'react';
+import { useRoute } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
  */
-import { useEffect, useContext } from '@wordpress/element';
+import { memo, useEffect, useContext } from '@wordpress/element';
 import { BottomSheetContext, BottomSheet } from '@wordpress/components';
-import { useRoute } from '@react-navigation/native';
 
 /**
  * Internal dependencies
@@ -19,7 +18,7 @@ import PaletteScreen from './palette.screen';
 
 import { colorsUtils } from './utils';
 
-const ColorSettingsMemo = React.memo(
+const ColorSettingsMemo = memo(
 	( {
 		defaultSettings,
 		onHandleClosingBottomSheet,

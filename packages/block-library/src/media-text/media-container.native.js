@@ -12,12 +12,7 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 } from '@wordpress/react-native-bridge';
-import {
-	Icon,
-	Image,
-	IMAGE_DEFAULT_FOCAL_POINT,
-	withNotices,
-} from '@wordpress/components';
+import { Icon, Image, IMAGE_DEFAULT_FOCAL_POINT } from '@wordpress/components';
 import {
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
@@ -31,6 +26,8 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -54,7 +51,6 @@ export { imageFillStyles } from './media-container.js';
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
-		this.onUploadError = this.onUploadError.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
 			this
@@ -81,12 +77,6 @@ class MediaContainer extends Component {
 		if ( mediaId && mediaUrl && getProtocol( mediaUrl ) === 'file:' ) {
 			mediaUploadSync();
 		}
-	}
-
-	onUploadError( message ) {
-		const { noticeOperations } = this.props;
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
 	}
 
 	onSelectMediaUploadOption( params ) {
@@ -162,6 +152,10 @@ class MediaContainer extends Component {
 	}
 
 	finishMediaUploadWithFailure() {
+		const { createErrorNotice } = this.props;
+
+		createErrorNotice( __( 'Failed to insert media.' ) );
+
 		this.setState( { isUploadInProgress: false } );
 	}
 
@@ -333,7 +327,6 @@ class MediaContainer extends Component {
 				onSelect={ this.onSelectMediaUploadOption }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ this.props.onFocus }
-				onError={ this.onUploadError }
 			/>
 		);
 	}
@@ -388,7 +381,11 @@ class MediaContainer extends Component {
 	}
 }
 
-export default compose(
-	withNotices,
-	withPreferredColorScheme
-)( MediaContainer );
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { createErrorNotice } = dispatch( noticesStore );
+
+		return { createErrorNotice };
+	} ),
+	withPreferredColorScheme,
+] )( MediaContainer );

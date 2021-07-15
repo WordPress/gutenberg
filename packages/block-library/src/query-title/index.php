@@ -10,20 +10,18 @@
  * For now it supports Arhive title and Search title,
  * using queried object information
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
+ * @param array $attributes Block attributes.
  *
  * @return string Returns the query title based on the queried object.
  */
-function render_block_core_query_title( $attributes, $content, $block ) {
+function render_block_core_query_title( $attributes ) {
 	$type       = isset( $attributes['type'] ) ? $attributes['type'] : null;
 	$is_search  = is_search();
 	$is_archive = is_archive();
 	if ( ! $type || ( 'archive' === $type && ! $is_archive ) || ( 'search' === $type && ! $is_search ) ) {
 		return '';
 	}
-	$title = isset( $attributes['content'] ) ? $attributes['content'] : '';
+	$title = '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
 	}
@@ -33,7 +31,7 @@ function render_block_core_query_title( $attributes, $content, $block ) {
 		$replacements = array( $wp_query->found_posts, get_search_query() );
 		$title        = str_replace( $formats, $replacements, $title );
 	}
-	$tag_name           = isset( $attributes['level'] ) ? 'h' . (int) $attributes['level'] : 'h2';
+	$tag_name           = isset( $attributes['level'] ) ? 'h' . (int) $attributes['level'] : 'h1';
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 	return sprintf(

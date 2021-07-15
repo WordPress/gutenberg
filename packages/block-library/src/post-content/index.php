@@ -14,7 +14,38 @@
  * @return string Returns the filtered post content of the current post.
  */
 function render_block_core_post_content( $attributes, $content, $block ) {
+	static $seen_ids = array();
+
 	if ( ! isset( $block->context['postId'] ) ) {
+		return '';
+	}
+
+	$post_id = $block->context['postId'];
+
+	if ( isset( $seen_ids[ $post_id ] ) ) {
+		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
+		// is set in `wp_debug_mode()`.
+		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
+			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+
+		return $is_debug ?
+			// translators: Visible only in the front end, this warning takes the place of a faulty block.
+			__( '[block rendering halted]' ) :
+			'';
+	}
+
+	$seen_ids[ $post_id ] = true;
+
+	if ( ! in_the_loop() && have_posts() ) {
+		the_post();
+	}
+
+	$content = get_the_content( null, false, $post_id );
+	/** This filter is documented in wp-includes/post-template.php */
+	$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
+	unset( $seen_ids[ $post_id ] );
+
+	if ( empty( $content ) ) {
 		return '';
 	}
 
@@ -22,7 +53,7 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 
 	return (
 		'<div ' . $wrapper_attributes . '>' .
-			apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', get_the_content( null, false, $block->context['postId'] ) ) ) .
+			$content .
 		'</div>'
 	);
 }

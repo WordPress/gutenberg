@@ -5,16 +5,16 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] 
   className="editor-post-preview"
   disabled={false}
   href="https://wordpress.org/?p=1"
-  isTertiary={true}
   onClick={[Function]}
   target="wp-preview-1"
+  variant="tertiary"
 >
   Preview
-  <VisuallyHidden
+  <ForwardRef(VisuallyHidden)
     as="span"
   >
     (opens in a new tab)
-  </VisuallyHidden>
+  </ForwardRef(VisuallyHidden)>
 </ForwardRef(Button)>
 `;
 
@@ -23,15 +23,15 @@ exports[`PostPreviewButton render() should render previewLink if provided 1`] = 
   className="editor-post-preview"
   disabled={false}
   href="https://wordpress.org/?p=1&preview=true"
-  isTertiary={true}
   onClick={[Function]}
   target="wp-preview-1"
+  variant="tertiary"
 >
   Preview
-  <VisuallyHidden
+  <ForwardRef(VisuallyHidden)
     as="span"
   >
     (opens in a new tab)
-  </VisuallyHidden>
+  </ForwardRef(VisuallyHidden)>
 </ForwardRef(Button)>
 `;

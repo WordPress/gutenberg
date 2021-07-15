@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { CheckboxControl } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 
 function BaseOption( { help, label, isChecked, onChange, children } ) {
 	return (
 		<div className="edit-post-preferences-modal__option">
-			<CheckboxControl
+			<ToggleControl
 				help={ help }
 				label={ label }
 				checked={ isChecked }

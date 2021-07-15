@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import React from 'react';
-import ReactNative, {
+import {
 	requireNativeComponent,
 	UIManager,
 	TouchableWithoutFeedback,
@@ -12,13 +11,16 @@ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInpu
 /**
  * WordPress dependencies
  */
+import { Component, createRef } from '@wordpress/element';
 import { ENTER, BACKSPACE } from '@wordpress/keycodes';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
-class AztecView extends React.Component {
+class AztecView extends Component {
 	constructor() {
 		super( ...arguments );
+		this.aztecViewRef = createRef();
+
 		this._onContentSizeChange = this._onContentSizeChange.bind( this );
 		this._onEnter = this._onEnter.bind( this );
 		this._onBackspace = this._onBackspace.bind( this );
@@ -39,7 +41,7 @@ class AztecView extends React.Component {
 	dispatch( command, params ) {
 		params = params || [];
 		UIManager.dispatchViewManagerCommand(
-			ReactNative.findNodeHandle( this ),
+			this.aztecViewRef.current,
 			command,
 			params
 		);
@@ -125,7 +127,7 @@ class AztecView extends React.Component {
 
 	_onBlur( event ) {
 		this.selectionEndCaretY = null;
-		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
+		TextInputState.blurTextInput( this.aztecViewRef.current );
 
 		if ( ! this.props.onBlur ) {
 			return;
@@ -177,18 +179,16 @@ class AztecView extends React.Component {
 	}
 
 	blur() {
-		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
+		TextInputState.blurTextInput( this.aztecViewRef.current );
 	}
 
 	focus() {
-		TextInputState.focusTextInput( ReactNative.findNodeHandle( this ) );
+		TextInputState.focusTextInput( this.aztecViewRef.current );
 	}
 
 	isFocused() {
-		const focusedField = TextInputState.currentlyFocusedField();
-		return (
-			focusedField && focusedField === ReactNative.findNodeHandle( this )
-		);
+		const focusedField = TextInputState.currentlyFocusedInput();
+		return focusedField && focusedField === this.aztecViewRef.current;
 	}
 
 	_onPress( event ) {
@@ -244,6 +244,7 @@ class AztecView extends React.Component {
 					// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
 					onFocus={ this._onAztecFocus }
 					onBlur={ this._onBlur }
+					ref={ this.aztecViewRef }
 				/>
 			</TouchableWithoutFeedback>
 		);

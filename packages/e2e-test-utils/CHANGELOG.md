@@ -1,14 +1,29 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
 
+### New Features
+
+-   Added `createUser` and `deleteUser` - Create and delete a user account, respectively.
+-   Added `getCurrentUser` - Determine the currently logged in user. Changed `switchUserToAdmin` and `switchUserToTest` to use it.
+
+## 5.3.0 (2021-05-31)
+
+### New Features
+
+-   Added `deleteAllWidgets` - Delete all widgets in the widgets screen.
+
+## 5.0.0 (2021-01-21)
+
 ### Breaking Changes
+
+-   `toggleScreenOption` util has been removed, since `Preferences` modal was redesigned. Use `togglePreferencesOption` instead ([#28329](https://github.com/WordPress/gutenberg/pull/28329)).
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 
 ## 4.16.0 (2020-12-17)
 
-### Nee Features
+### New Features
 
 -   Added `clickMenuItem` - clicks the item that matches the label in the opened menu.
 

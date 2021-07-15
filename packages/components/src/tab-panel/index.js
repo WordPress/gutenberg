@@ -90,6 +90,7 @@ export default function TabPanel( {
 			</NavigableMenu>
 			{ selectedTab && (
 				<div
+					key={ selectedId }
 					aria-labelledby={ selectedId }
 					role="tabpanel"
 					id={ `${ selectedId }-view` }

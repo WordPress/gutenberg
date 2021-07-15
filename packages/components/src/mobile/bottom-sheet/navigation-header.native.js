@@ -7,19 +7,14 @@ import { View, TouchableWithoutFeedback, Text, Platform } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	check,
-	Icon,
-	chevronBackIOS,
-	arrowLeft,
-	close,
-} from '@wordpress/icons';
+import { check, Icon, arrowLeft, close } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+import chevronBack from './chevron-back';
 
 function BottomSheetNavigationHeader( {
 	leftButtonOnPress,
@@ -57,7 +52,7 @@ function BottomSheetNavigationHeader( {
 		if ( isIOS ) {
 			backIcon = isFullscreen ? undefined : (
 				<Icon
-					icon={ chevronBackIOS }
+					icon={ chevronBack }
 					size={ 21 }
 					style={ chevronLeftStyle }
 				/>

@@ -114,14 +114,14 @@ class BottomSheetStepperCell extends Component {
 	}
 
 	announceValue( value ) {
-		const { label } = this.props;
+		const { label, unitLabel = '' } = this.props;
 
-		if ( Platform.OS === 'ios' ) {
+		if ( isIOS ) {
 			// On Android it triggers the accessibilityLabel with the value change
 			clearTimeout( this.timeoutAnnounceValue );
 			this.timeoutAnnounceValue = setTimeout( () => {
 				AccessibilityInfo.announceForAccessibility(
-					`${ value } ${ label }`
+					`${ value } ${ unitLabel } ${ label }`
 				);
 			}, 300 );
 		}
@@ -130,6 +130,8 @@ class BottomSheetStepperCell extends Component {
 	render() {
 		const {
 			label,
+			settingLabel = 'Value',
+			unitLabel = '',
 			icon,
 			min,
 			max,
@@ -139,6 +141,7 @@ class BottomSheetStepperCell extends Component {
 			shouldDisplayTextInput = false,
 			preview,
 			onChange,
+			openUnitPicker,
 			decimalNum,
 			cellContainerStyle,
 		} = this.props;
@@ -149,12 +152,20 @@ class BottomSheetStepperCell extends Component {
 			styles.cellLabel,
 			! icon ? styles.cellLabelNoIcon : {},
 		];
+
+		const getAccessibilityHint = () => {
+			return openUnitPicker ? __( 'double-tap to change unit' ) : '';
+		};
+
 		const accessibilityLabel = sprintf(
-			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
-			__( '%1$s. Current value is %2$s' ),
+			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: setting label (example: width), %3$s: Current value. %4$s: value measurement unit (example: pixels) */
+			__( '%1$s. %2$s is %3$s %4$s.' ),
 			label,
-			value
+			settingLabel,
+			value,
+			unitLabel
 		);
+
 		const containerStyle = [
 			styles.rowContainer,
 			isIOS ? styles.containerIOS : styles.containerAndroid,
@@ -165,9 +176,11 @@ class BottomSheetStepperCell extends Component {
 				accessible={ true }
 				accessibilityRole="adjustable"
 				accessibilityLabel={ accessibilityLabel }
+				accessibilityHint={ getAccessibilityHint() }
 				accessibilityActions={ [
 					{ name: 'increment' },
 					{ name: 'decrement' },
+					{ name: 'activate' },
 				] }
 				onAccessibilityAction={ ( event ) => {
 					switch ( event.nativeEvent.actionName ) {
@@ -177,55 +190,66 @@ class BottomSheetStepperCell extends Component {
 						case 'decrement':
 							this.onDecrementValue();
 							break;
+						case 'activate':
+							if ( openUnitPicker ) {
+								openUnitPicker();
+							}
+							break;
 					}
 				} }
 			>
-				<Cell
-					accessibilityRole="none"
-					accessible={ false }
-					cellContainerStyle={ [
-						styles.cellContainerStyle,
-						preview && styles.columnContainer,
-						cellContainerStyle,
-					] }
-					cellRowContainerStyle={
-						preview ? containerStyle : styles.cellRowStyles
-					}
-					disabled={ true }
-					editable={ false }
-					icon={ icon }
-					label={ label }
-					labelStyle={ labelStyle }
-					leftAlign={ true }
-					separatorType={ separatorType }
-				>
-					<View style={ preview && containerStyle }>
-						{ preview }
-						<Stepper
-							isMaxValue={ isMaxValue }
-							isMinValue={ isMinValue }
-							onPressInDecrement={ this.onDecrementValuePressIn }
-							onPressInIncrement={ this.onIncrementValuePressIn }
-							onPressOut={ this.onPressOut }
-							value={ value }
-							shouldDisplayTextInput={ shouldDisplayTextInput }
-						>
-							{ shouldDisplayTextInput && (
-								<RangeTextInput
-									label={ label }
-									onChange={ onChange }
-									defaultValue={ `${ inputValue }` }
-									value={ inputValue }
-									min={ min }
-									step={ 1 }
-									decimalNum={ decimalNum }
-								>
-									{ children }
-								</RangeTextInput>
-							) }
-						</Stepper>
-					</View>
-				</Cell>
+				<View importantForAccessibility="no-hide-descendants">
+					<Cell
+						accessible={ false }
+						cellContainerStyle={ [
+							styles.cellContainerStyle,
+							preview && styles.columnContainer,
+							cellContainerStyle,
+						] }
+						cellRowContainerStyle={
+							preview ? containerStyle : styles.cellRowStyles
+						}
+						editable={ false }
+						icon={ icon }
+						label={ label }
+						labelStyle={ labelStyle }
+						leftAlign={ true }
+						separatorType={ separatorType }
+					>
+						<View style={ preview && containerStyle }>
+							{ preview }
+							<Stepper
+								isMaxValue={ isMaxValue }
+								isMinValue={ isMinValue }
+								onPressInDecrement={
+									this.onDecrementValuePressIn
+								}
+								onPressInIncrement={
+									this.onIncrementValuePressIn
+								}
+								onPressOut={ this.onPressOut }
+								value={ value }
+								shouldDisplayTextInput={
+									shouldDisplayTextInput
+								}
+							>
+								{ shouldDisplayTextInput && (
+									<RangeTextInput
+										label={ label }
+										onChange={ onChange }
+										defaultValue={ `${ inputValue }` }
+										value={ inputValue }
+										min={ min }
+										step={ 1 }
+										decimalNum={ decimalNum }
+									>
+										{ children }
+									</RangeTextInput>
+								) }
+							</Stepper>
+						</View>
+					</Cell>
+				</View>
 			</View>
 		);
 	}

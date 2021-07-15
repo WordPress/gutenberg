@@ -4,6 +4,7 @@
 import { unregisterBlockType } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -14,7 +15,7 @@ export default function AutoBlockUninstaller() {
 	const { uninstallBlockType } = useDispatch( blockDirectoryStore );
 
 	const shouldRemoveBlockTypes = useSelect( ( select ) => {
-		const { isAutosavingPost, isSavingPost } = select( 'core/editor' );
+		const { isAutosavingPost, isSavingPost } = select( editorStore );
 		return isSavingPost() && ! isAutosavingPost();
 	}, [] );
 

@@ -2,6 +2,8 @@
  * External dependencies
  */
 const { escapeRegExp } = require( 'lodash' );
+const glob = require( 'glob' ).sync;
+const { join } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -26,7 +28,13 @@ const developmentFiles = [
 	'**/benchmark/**/*.js',
 	'**/@(__mocks__|__tests__|test)/**/*.js',
 	'**/@(storybook|stories)/**/*.js',
+	'packages/babel-preset-default/bin/**/*.js',
 ];
+
+// All files from packages that have types provided with TypeScript.
+const typedFiles = glob( 'packages/*/package.json' )
+	.filter( ( fileName ) => require( join( __dirname, fileName ) ).types )
+	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
 
 module.exports = {
 	root: true,
@@ -41,6 +49,7 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
@@ -54,6 +63,9 @@ module.exports = {
 			},
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
+		'@wordpress/data-no-store-string-literals': 'error',
+		'import/default': 'error',
+		'import/named': 'error',
 		'no-restricted-imports': [
 			'error',
 			{
@@ -62,6 +74,11 @@ module.exports = {
 						name: 'lodash',
 						importNames: [ 'memoize' ],
 						message: 'Please use `memize` instead.',
+					},
+					{
+						name: 'react',
+						message:
+							'Please use React API through `@wordpress/element` instead.',
 					},
 					{
 						name: 'reakit',
@@ -73,6 +90,16 @@ module.exports = {
 						importNames: [ 'combineReducers' ],
 						message:
 							'Please use `combineReducers` from `@wordpress/data` instead.',
+					},
+					{
+						name: 'puppeteer-testing-library',
+						message:
+							'`puppeteer-testing-library` is still experimental.',
+					},
+					{
+						name: '@emotion/css',
+						message:
+							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support',
 					},
 				],
 			},
@@ -105,6 +132,12 @@ module.exports = {
 			{
 				selector:
 					'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+				message:
+					'This method is deprecated. You should use the more explicit API methods available.',
+			},
+			{
+				selector:
+					'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
@@ -137,10 +170,22 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ '**/*.@(android|ios|native).js', ...developmentFiles ],
+			files: [
+				'**/*.@(android|ios|native).js',
+				'packages/react-native-*/**/*.js',
+				...developmentFiles,
+			],
 			rules: {
 				'import/no-extraneous-dependencies': 'off',
 				'import/no-unresolved': 'off',
+				'import/named': 'off',
+				'@wordpress/data-no-store-string-literals': 'off',
+			},
+		},
+		{
+			files: [ 'packages/react-native-*/**/*.js' ],
+			settings: {
+				'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549
 			},
 		},
 		{
@@ -154,7 +199,6 @@ module.exports = {
 					'error',
 					{
 						forbid: [
-							[ 'button', 'Button' ],
 							[ 'circle', 'Circle' ],
 							[ 'g', 'G' ],
 							[ 'path', 'Path' ],
@@ -183,9 +227,16 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js' ],
+			files: [ 'bin/**/*.js', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
+			},
+		},
+		{
+			files: typedFiles,
+			rules: {
+				'jsdoc/no-undefined-types': 'off',
+				'jsdoc/valid-types': 'off',
 			},
 		},
 	],

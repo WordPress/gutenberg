@@ -12,7 +12,11 @@ import { Button, Spinner, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { RichText, MediaPlaceholder } from '@wordpress/block-editor';
+import {
+	RichText,
+	MediaPlaceholder,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
 import {
@@ -22,6 +26,7 @@ import {
 	edit,
 	image as imageIcon,
 } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -39,7 +44,6 @@ class GalleryImage extends Component {
 		super( ...arguments );
 
 		this.onSelectImage = this.onSelectImage.bind( this );
-		this.onSelectCaption = this.onSelectCaption.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 		this.onEdit = this.onEdit.bind( this );
@@ -48,7 +52,6 @@ class GalleryImage extends Component {
 		);
 		this.onSelectCustomURL = this.onSelectCustomURL.bind( this );
 		this.state = {
-			captionSelected: false,
 			isEditing: false,
 		};
 	}
@@ -57,27 +60,9 @@ class GalleryImage extends Component {
 		this.container = ref;
 	}
 
-	onSelectCaption() {
-		if ( ! this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: true,
-			} );
-		}
-
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
-		}
-	}
-
 	onSelectImage() {
 		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
-		}
-
-		if ( this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: false,
-			} );
 		}
 	}
 
@@ -99,9 +84,8 @@ class GalleryImage extends Component {
 		} );
 	}
 
-	componentDidUpdate( prevProps ) {
+	componentDidUpdate() {
 		const {
-			isSelected,
 			image,
 			url,
 			__unstableMarkNextChangeAsNotPersistent,
@@ -111,18 +95,6 @@ class GalleryImage extends Component {
 			this.props.setAttributes( {
 				url: image.source_url,
 				alt: image.alt_text,
-			} );
-		}
-
-		// unselect the caption so when the user selects other image and comeback
-		// the caption is not immediately selected
-		if (
-			this.state.captionSelected &&
-			! isSelected &&
-			prevProps.isSelected
-		) {
-			this.setState( {
-				captionSelected: false,
 			} );
 		}
 	}
@@ -211,8 +183,6 @@ class GalleryImage extends Component {
 					src={ url }
 					alt={ alt }
 					data-id={ id }
-					onClick={ this.onSelectImage }
-					onFocus={ this.onSelectImage }
 					onKeyDown={ this.onRemoveImage }
 					tabIndex="0"
 					aria-label={ ariaLabel }
@@ -229,7 +199,12 @@ class GalleryImage extends Component {
 		} );
 
 		return (
-			<figure className={ className }>
+			// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+			<figure
+				className={ className }
+				onClick={ this.onSelectImage }
+				onFocus={ this.onSelectImage }
+			>
 				{ ! isEditing && ( href ? <a href={ href }>{ img }</a> : img ) }
 				{ isEditing && (
 					<MediaPlaceholder
@@ -276,15 +251,11 @@ class GalleryImage extends Component {
 					<RichText
 						tagName="figcaption"
 						aria-label={ __( 'Image caption text' ) }
-						placeholder={
-							isSelected ? __( 'Write caption…' ) : null
-						}
+						placeholder={ isSelected ? __( 'Add caption' ) : null }
 						value={ caption }
-						isSelected={ this.state.captionSelected }
 						onChange={ ( newCaption ) =>
 							setAttributes( { caption: newCaption } )
 						}
-						unstableOnFocus={ this.onSelectCaption }
 						inlineToolbar
 					/>
 				) }
@@ -295,7 +266,7 @@ class GalleryImage extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getMedia } = select( 'core' );
+		const { getMedia } = select( coreStore );
 		const { id } = ownProps;
 
 		return {
@@ -304,7 +275,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { __unstableMarkNextChangeAsNotPersistent } = dispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 		return {
 			__unstableMarkNextChangeAsNotPersistent,

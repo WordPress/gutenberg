@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import {
+	createSlotFill,
+	__experimentalStyleProvider as StyleProvider,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -13,13 +16,17 @@ const { Fill, Slot } = createSlotFill( name );
 
 function InspectorAdvancedControls( { children } ) {
 	const { isSelected } = useBlockEditContext();
-	return isSelected ? <Fill>{ children }</Fill> : null;
+	return isSelected ? (
+		<StyleProvider document={ document }>
+			<Fill>{ children }</Fill>
+		</StyleProvider>
+	) : null;
 }
 
 InspectorAdvancedControls.slotName = name;
 InspectorAdvancedControls.Slot = Slot;
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls-advanced/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-advanced-controls/README.md
  */
 export default InspectorAdvancedControls;

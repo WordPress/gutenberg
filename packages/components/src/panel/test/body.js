@@ -136,5 +136,21 @@ describe( 'PanelBody', () => {
 
 			expect( panelContent ).toBeFalsy();
 		} );
+
+		it( 'should pass button props to panel title', () => {
+			const mock = jest.fn();
+
+			const { container } = render(
+				<PanelBody title="Panel" buttonProps={ { onClick: mock } }>
+					<div>Content</div>
+				</PanelBody>
+			);
+
+			const panelToggle = getPanelToggle( container );
+
+			fireEvent.click( panelToggle );
+
+			expect( mock ).toHaveBeenCalled();
+		} );
 	} );
 } );

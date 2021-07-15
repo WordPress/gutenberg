@@ -11,6 +11,7 @@ import { stack } from '@wordpress/icons';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import { store as blockEditorStore } from '../../store';
 
 function MultiSelectionInspector( { blocks } ) {
 	const words = wordCount( serialize( blocks ), 'words' );
@@ -39,7 +40,7 @@ function MultiSelectionInspector( { blocks } ) {
 }
 
 export default withSelect( ( select ) => {
-	const { getMultiSelectedBlocks } = select( 'core/block-editor' );
+	const { getMultiSelectedBlocks } = select( blockEditorStore );
 	return {
 		blocks: getMultiSelectedBlocks(),
 	};

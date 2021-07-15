@@ -15,6 +15,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import {
 	Icon,
+	plusCircle,
 	plusCircleFilled,
 	insertAfter,
 	insertBefore,
@@ -26,12 +27,23 @@ import {
 import styles from './style.scss';
 import InserterMenu from './menu';
 import BlockInsertionPoint from '../block-list/insertion-point';
+import { store as blockEditorStore } from '../../store';
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
-const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
+const defaultRenderToggle = ( {
+	enableEditorOnboarding,
+	onToggle,
+	disabled,
+	style,
+	onLongPress,
+} ) => (
 	<ToolbarButton
-		title={ __( 'Add block' ) }
+		title={
+			enableEditorOnboarding
+				? __( 'Tap to add content' )
+				: __( 'Add block' )
+		}
 		icon={
 			<Icon
 				icon={ plusCircleFilled }
@@ -39,6 +51,8 @@ const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 				color={ style.color }
 			/>
 		}
+		showTooltip={ enableEditorOnboarding }
+		tooltipPosition="top right"
 		onClick={ onToggle }
 		extraProps={ {
 			hint: __( 'Double tap to add a block' ),
@@ -56,7 +70,7 @@ export class Inserter extends Component {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
-		this.renderToggle = this.renderToggle.bind( this );
+		this.renderInserterToggle = this.renderInserterToggle.bind( this );
 		this.renderContent = this.renderContent.bind( this );
 	}
 
@@ -64,7 +78,7 @@ export class Inserter extends Component {
 		const addBeforeOption = {
 			value: 'before',
 			label: __( 'Add Block Before' ),
-			icon: insertBefore,
+			icon: plusCircle,
 		};
 
 		const replaceCurrentOption = {
@@ -76,17 +90,17 @@ export class Inserter extends Component {
 		const addAfterOption = {
 			value: 'after',
 			label: __( 'Add Block After' ),
-			icon: insertAfter,
+			icon: plusCircle,
 		};
 
 		const addToBeginningOption = {
-			value: 'before',
+			value: 'start',
 			label: __( 'Add To Beginning' ),
 			icon: insertBefore,
 		};
 
 		const addToEndOption = {
-			value: 'after',
+			value: 'end',
 			label: __( 'Add To End' ),
 			icon: insertAfter,
 		};
@@ -95,12 +109,19 @@ export class Inserter extends Component {
 		if ( isAnyBlockSelected ) {
 			if ( isSelectedBlockReplaceable ) {
 				return [
+					addToBeginningOption,
 					addBeforeOption,
 					replaceCurrentOption,
 					addAfterOption,
+					addToEndOption,
 				];
 			}
-			return [ addBeforeOption, addAfterOption ];
+			return [
+				addToBeginningOption,
+				addBeforeOption,
+				addAfterOption,
+				addToEndOption,
+			];
 		}
 		return [ addToBeginningOption, addToEndOption ];
 	}
@@ -108,14 +129,22 @@ export class Inserter extends Component {
 	getInsertionIndex( insertionType ) {
 		const {
 			insertionIndexDefault,
+			insertionIndexStart,
 			insertionIndexBefore,
 			insertionIndexAfter,
+			insertionIndexEnd,
 		} = this.props;
+		if ( insertionType === 'start' ) {
+			return insertionIndexStart;
+		}
 		if ( insertionType === 'before' || insertionType === 'replace' ) {
 			return insertionIndexBefore;
 		}
 		if ( insertionType === 'after' ) {
 			return insertionIndexAfter;
+		}
+		if ( insertionType === 'end' ) {
+			return insertionIndexEnd;
 		}
 		return insertionIndexDefault;
 	}
@@ -142,7 +171,7 @@ export class Inserter extends Component {
 	}
 
 	onInserterToggledAnnouncement( isOpen ) {
-		AccessibilityInfo.fetch().done( ( isEnabled ) => {
+		AccessibilityInfo.isScreenReaderEnabled().done( ( isEnabled ) => {
 			if ( isEnabled ) {
 				const isIOS = Platform.OS === 'ios';
 				const announcement = isOpen
@@ -169,8 +198,9 @@ export class Inserter extends Component {
 	 *
 	 * @return {WPElement} Dropdown toggle element.
 	 */
-	renderToggle( { onToggle, isOpen } ) {
+	renderInserterToggle( { onToggle, isOpen } ) {
 		const {
+			enableEditorOnboarding,
 			disabled,
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
@@ -217,6 +247,7 @@ export class Inserter extends Component {
 		return (
 			<>
 				{ renderToggle( {
+					enableEditorOnboarding,
 					onToggle: onPress,
 					isOpen,
 					disabled,
@@ -269,7 +300,7 @@ export class Inserter extends Component {
 			<Dropdown
 				onToggle={ this.onToggle }
 				headerTitle={ __( 'Add a block' ) }
-				renderToggle={ this.renderToggle }
+				renderToggle={ this.renderInserterToggle }
 				renderContent={ this.renderContent }
 			/>
 		);
@@ -284,7 +315,8 @@ export default compose( [
 			getBlockOrder,
 			getBlockIndex,
 			getBlock,
-		} = select( 'core/block-editor' );
+			getSettings: getBlockEditorSettings,
+		} = select( blockEditorStore );
 
 		const end = getBlockSelectionEnd();
 		// `end` argument (id) can refer to the component which is removed
@@ -304,11 +336,9 @@ export default compose( [
 			: undefined;
 
 		function getDefaultInsertionIndex() {
-			const { getSettings } = select( 'core/block-editor' );
-
 			const {
 				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-			} = getSettings();
+			} = getBlockEditorSettings();
 
 			// if post title is selected insert as first block
 			if ( shouldInsertAtTheTop ) {
@@ -335,20 +365,27 @@ export default compose( [
 			return endOfRootIndex;
 		}
 
+		const insertionIndexStart = 0;
+
 		const insertionIndexBefore = isAnyBlockSelected
 			? selectedBlockIndex
-			: 0;
+			: insertionIndexStart;
 
 		const insertionIndexAfter = isAnyBlockSelected
 			? selectedBlockIndex + 1
 			: endOfRootIndex;
 
+		const insertionIndexEnd = endOfRootIndex;
+
 		return {
+			enableEditorOnboarding: getBlockEditorSettings().editorOnboarding,
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,
 			insertionIndexAfter,
-			isAnyBlockSelected,
+			insertionIndexStart,
+			insertionIndexEnd,
+			isAnyBlockSelected: !! isAnyBlockSelected,
 			isSelectedBlockReplaceable: isSelectedUnmodifiedDefaultBlock,
 		};
 	} ),

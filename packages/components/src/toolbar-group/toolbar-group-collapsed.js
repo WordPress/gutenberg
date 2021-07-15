@@ -20,7 +20,6 @@ function ToolbarGroupCollapsed( { controls = [], toggleProps, ...props } ) {
 			controls={ controls }
 			toggleProps={ {
 				...internalToggleProps,
-				...toggleProps,
 				'data-toolbar-item': true,
 			} }
 			{ ...props }
@@ -28,10 +27,12 @@ function ToolbarGroupCollapsed( { controls = [], toggleProps, ...props } ) {
 	);
 
 	if ( accessibleToolbarState ) {
-		return <ToolbarItem>{ renderDropdownMenu }</ToolbarItem>;
+		return (
+			<ToolbarItem { ...toggleProps }>{ renderDropdownMenu }</ToolbarItem>
+		);
 	}
 
-	return renderDropdownMenu();
+	return renderDropdownMenu( toggleProps );
 }
 
 export default ToolbarGroupCollapsed;

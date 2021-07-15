@@ -1,19 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { _x, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { archiveTitle } from '@wordpress/icons';
 const variations = [
 	{
-		name: 'custom-query-title',
-		title: __( 'Custom query Title' ),
-		description: __( 'Display a custom query title.' ),
-		icon: archiveTitle,
-		attributes: { type: 'custom', content: '' },
-		scope: [ 'inserter', 'transform' ],
 		isDefault: true,
-	},
-	{
 		name: 'archive-title',
 		title: __( 'Archive Title' ),
 		description: __(
@@ -22,9 +14,8 @@ const variations = [
 		icon: archiveTitle,
 		attributes: {
 			type: 'archive',
-			content: __( 'Archive title placeholder' ),
 		},
-		scope: [ 'inserter', 'transform' ],
+		scope: [ 'inserter' ],
 	},
 	{
 		name: 'search-title',

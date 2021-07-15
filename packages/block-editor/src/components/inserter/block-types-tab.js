@@ -1,23 +1,21 @@
 /**
  * External dependencies
  */
-import { map, findIndex, flow, sortBy, groupBy, orderBy } from 'lodash';
+import { map, flow, groupBy, orderBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { store as blocksStore } from '@wordpress/blocks';
 import { useMemo, useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockTypesList from '../block-types-list';
-import ChildBlocks from './child-blocks';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
+import InserterListbox from '../inserter-listbox';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -34,17 +32,6 @@ export function BlockTypesTab( {
 		onInsert
 	);
 
-	const hasChildItems = useSelect(
-		( select ) => {
-			const { getBlockName } = select( 'core/block-editor' );
-			const { getChildBlockNames } = select( blocksStore );
-			const rootBlockName = getBlockName( rootClientId );
-
-			return !! getChildBlockNames( rootBlockName ).length;
-		},
-		[ rootClientId ]
-	);
-
 	const suggestedItems = useMemo( () => {
 		return orderBy( items, [ 'frecency' ], [ 'desc' ] ).slice(
 			0,
@@ -57,22 +44,14 @@ export function BlockTypesTab( {
 	}, [ items ] );
 
 	const itemsPerCategory = useMemo( () => {
-		const getCategoryIndex = ( item ) => {
-			return findIndex(
-				categories,
-				( category ) => category.slug === item.category
-			);
-		};
-
 		return flow(
 			( itemList ) =>
 				itemList.filter(
 					( item ) => item.category && item.category !== 'reusable'
 				),
-			( itemList ) => sortBy( itemList, getCategoryIndex ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( items );
-	}, [ items, categories ] );
+	}, [ items ] );
 
 	const itemsPerCollection = useMemo( () => {
 		// Create a new Object to avoid mutating collection.
@@ -93,24 +72,9 @@ export function BlockTypesTab( {
 	useEffect( () => () => onHover( null ), [] );
 
 	return (
-		<div>
-			{ hasChildItems && (
-				<ChildBlocks rootClientId={ rootClientId }>
-					<BlockTypesList
-						// Pass along every block, as useBlockTypesState() and
-						// getInserterItems() will have already filtered out
-						// non-child blocks.
-						items={ items }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-						label={ __( 'Child Blocks' ) }
-					/>
-				</ChildBlocks>
-			) }
-
-			{ showMostUsedBlocks &&
-				! hasChildItems &&
-				!! suggestedItems.length && (
+		<InserterListbox>
+			<div>
+				{ showMostUsedBlocks && !! suggestedItems.length && (
 					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
 						<BlockTypesList
 							items={ suggestedItems }
@@ -121,8 +85,7 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-			{ ! hasChildItems &&
-				map( categories, ( category ) => {
+				{ map( categories, ( category ) => {
 					const categoryItems = itemsPerCategory[ category.slug ];
 					if ( ! categoryItems || ! categoryItems.length ) {
 						return null;
@@ -143,22 +106,21 @@ export function BlockTypesTab( {
 					);
 				} ) }
 
-			{ ! hasChildItems && !! uncategorizedItems.length && (
-				<InserterPanel
-					className="block-editor-inserter__uncategorized-blocks-panel"
-					title={ __( 'Uncategorized' ) }
-				>
-					<BlockTypesList
-						items={ uncategorizedItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-						label={ __( 'Uncategorized' ) }
-					/>
-				</InserterPanel>
-			) }
+				{ uncategorizedItems.length > 0 && (
+					<InserterPanel
+						className="block-editor-inserter__uncategorized-blocks-panel"
+						title={ __( 'Uncategorized' ) }
+					>
+						<BlockTypesList
+							items={ uncategorizedItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+							label={ __( 'Uncategorized' ) }
+						/>
+					</InserterPanel>
+				) }
 
-			{ ! hasChildItems &&
-				map( collections, ( collection, namespace ) => {
+				{ map( collections, ( collection, namespace ) => {
 					const collectionItems = itemsPerCollection[ namespace ];
 					if ( ! collectionItems || ! collectionItems.length ) {
 						return null;
@@ -179,7 +141,8 @@ export function BlockTypesTab( {
 						</InserterPanel>
 					);
 				} ) }
-		</div>
+			</div>
+		</InserterListbox>
 	);
 }
 

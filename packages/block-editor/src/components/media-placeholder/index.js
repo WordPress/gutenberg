@@ -26,6 +26,7 @@ import { keyboardReturn } from '@wordpress/icons';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
+import { store as blockEditorStore } from '../../store';
 
 const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	<URLPopover onClose={ onClose }>
@@ -76,7 +77,7 @@ export function MediaPlaceholder( {
 	children,
 } ) {
 	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	}, [] );
 	const [ src, setSrc ] = useState( '' );
@@ -265,7 +266,7 @@ export function MediaPlaceholder( {
 				<Button
 					className="block-editor-media-placeholder__cancel-button"
 					title={ __( 'Cancel' ) }
-					isLink
+					variant="link"
 					onClick={ onCancel }
 				>
 					{ __( 'Cancel' ) }
@@ -282,7 +283,7 @@ export function MediaPlaceholder( {
 						className="block-editor-media-placeholder__button"
 						onClick={ openURLInput }
 						isPressed={ isURLInputVisible }
-						isTertiary
+						variant="tertiary"
 					>
 						{ __( 'Insert from URL' ) }
 					</Button>
@@ -315,7 +316,7 @@ export function MediaPlaceholder( {
 				render={ ( { open } ) => {
 					return (
 						<Button
-							isTertiary
+							variant="tertiary"
 							onClick={ ( event ) => {
 								event.stopPropagation();
 								open();
@@ -340,7 +341,7 @@ export function MediaPlaceholder( {
 							const content = (
 								<>
 									<Button
-										isPrimary
+										variant="primary"
 										className={ classnames(
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
@@ -365,7 +366,7 @@ export function MediaPlaceholder( {
 				<>
 					{ renderDropZone() }
 					<FormFileUpload
-						isPrimary
+						variant="primary"
 						className={ classnames(
 							'block-editor-media-placeholder__button',
 							'block-editor-media-placeholder__upload-button'
@@ -390,6 +391,7 @@ export function MediaPlaceholder( {
 	if ( dropZoneUIOnly || disableMediaButtons ) {
 		if ( dropZoneUIOnly ) {
 			deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
+				since: '5.4',
 				alternative: 'disableMediaButtons',
 			} );
 		}
@@ -407,6 +409,6 @@ export function MediaPlaceholder( {
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-placeholder/README.md
  */
 export default withFilters( 'editor.MediaPlaceholder' )( MediaPlaceholder );

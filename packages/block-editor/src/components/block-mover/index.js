@@ -20,6 +20,7 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
+import { store as blockEditorStore } from '../../store';
 
 function BlockMover( {
 	isFirst,
@@ -102,7 +103,7 @@ export default withSelect( ( select, { clientIds } ) => {
 		getTemplateLock,
 		getBlockOrder,
 		getBlockRootClientId,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	const normalizedClientIds = castArray( clientIds );
 	const firstClientId = first( normalizedClientIds );
 	const block = getBlock( firstClientId );

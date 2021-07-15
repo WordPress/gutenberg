@@ -17,7 +17,7 @@ export default function normaliseBlocks( HTML ) {
 
 		// Text nodes: wrap in a paragraph, or append to previous.
 		if ( node.nodeType === node.TEXT_NODE ) {
-			if ( ! node.nodeValue.trim() ) {
+			if ( isEmpty( node ) ) {
 				decu.removeChild( node );
 			} else {
 				if ( ! accu.lastChild || accu.lastChild.nodeName !== 'P' ) {

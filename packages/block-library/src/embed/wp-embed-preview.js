@@ -11,7 +11,6 @@ export default function WpEmbedPreview( { html } ) {
 	useEffect( () => {
 		const { ownerDocument } = ref.current;
 		const { defaultView } = ownerDocument;
-		const { FocusEvent } = defaultView;
 
 		/**
 		 * Checks for WordPress embed events signaling the height change when iframe
@@ -20,8 +19,8 @@ export default function WpEmbedPreview( { html } ) {
 		 *
 		 * References:
 		 * window.postMessage: https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
-		 * WordPress core embed-template on load: https://github.com/WordPress/WordPress/blob/master/wp-includes/js/wp-embed-template.js#L143
-		 * WordPress core embed-template on resize: https://github.com/WordPress/WordPress/blob/master/wp-includes/js/wp-embed-template.js#L187
+		 * WordPress core embed-template on load: https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L143
+		 * WordPress core embed-template on resize: https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L187
 		 *
 		 * @param {WPSyntheticEvent} event Message event.
 		 */
@@ -58,8 +57,7 @@ export default function WpEmbedPreview( { html } ) {
 				return;
 			}
 
-			const focusEvent = new FocusEvent( 'focus', { bubbles: true } );
-			activeElement.dispatchEvent( focusEvent );
+			activeElement.focus();
 		}
 
 		defaultView.addEventListener( 'message', resizeWPembeds );

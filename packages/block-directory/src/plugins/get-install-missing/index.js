@@ -6,7 +6,12 @@ import { Button } from '@wordpress/components';
 import { createBlock, getBlockType } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Warning, useBlockProps } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+import {
+	Warning,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -25,7 +30,7 @@ const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 				'block:' + originalName
 			).filter( ( { name } ) => originalName === name );
 			return {
-				hasPermission: select( 'core' ).canUser(
+				hasPermission: select( coreStore ).canUser(
 					'read',
 					'block-directory/search'
 				),
@@ -45,7 +50,7 @@ const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 
 const ModifiedWarning = ( { originalBlock, ...props } ) => {
 	const { originalName, originalUndelimitedContent } = props.attributes;
-	const { replaceBlock } = useDispatch( 'core/block-editor' );
+	const { replaceBlock } = useDispatch( blockEditorStore );
 	const convertToHTML = () => {
 		replaceBlock(
 			props.clientId,
@@ -61,7 +66,7 @@ const ModifiedWarning = ( { originalBlock, ...props } ) => {
 	let messageHTML = sprintf(
 		/* translators: %s: block name */
 		__(
-			'Your site doesn’t include support for the %s block. You can try installing the block or remove it entirely!'
+			'Your site doesn’t include support for the %s block. You can try installing the block or remove it entirely.'
 		),
 		originalBlock.title || originalName
 	);
@@ -83,7 +88,7 @@ const ModifiedWarning = ( { originalBlock, ...props } ) => {
 			originalBlock.title || originalName
 		);
 		actions.push(
-			<Button key="convert" onClick={ convertToHTML } isLink>
+			<Button key="convert" onClick={ convertToHTML } variant="link">
 				{ __( 'Keep as HTML' ) }
 			</Button>
 		);

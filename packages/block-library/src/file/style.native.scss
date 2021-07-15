@@ -41,6 +41,16 @@
 	color: $blue-30;
 }
 
+.dimmedActionButton {
+	color: $blue-50;
+	opacity: 0.45;
+}
+
+.dimmedActionButtonDark {
+	opacity: 0.45;
+	color: $blue-30;
+}
+
 .errorContainer {
 	flex-direction: row;
 	align-items: center;

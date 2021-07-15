@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -66,7 +67,7 @@ export function getInstalledBlockTypes( state ) {
  */
 export const getNewBlockTypes = createRegistrySelector(
 	( select ) => ( state ) => {
-		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
+		const usedBlockTree = select( blockEditorStore ).getBlocks();
 		const installedBlockTypes = getInstalledBlockTypes( state );
 
 		return installedBlockTypes.filter( ( blockType ) =>
@@ -85,7 +86,7 @@ export const getNewBlockTypes = createRegistrySelector(
  */
 export const getUnusedBlockTypes = createRegistrySelector(
 	( select ) => ( state ) => {
-		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
+		const usedBlockTree = select( blockEditorStore ).getBlocks();
 		const installedBlockTypes = getInstalledBlockTypes( state );
 
 		return installedBlockTypes.filter(

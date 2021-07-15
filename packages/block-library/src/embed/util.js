@@ -43,8 +43,8 @@ export const getEmbedInfoByProvider = ( provider ) =>
 /**
  * Returns true if any of the regular expressions match the URL.
  *
- * @param {string}   url      The URL to test.
- * @param {Array}    patterns The list of regular expressions to test agains.
+ * @param {string} url      The URL to test.
+ * @param {Array}  patterns The list of regular expressions to test agains.
  * @return {boolean} True if any of the regular expressions match the URL.
  */
 export const matchesPatterns = ( url, patterns = [] ) =>
@@ -54,7 +54,7 @@ export const matchesPatterns = ( url, patterns = [] ) =>
  * Finds the block variation that should be used for the URL,
  * based on the provided URL and the variation's patterns.
  *
- * @param {string}  url The URL to test.
+ * @param {string} url The URL to test.
  * @return {WPBlockVariation} The block variation that should be used for this URL
  */
 export const findMoreSuitableBlock = ( url ) =>
@@ -87,15 +87,16 @@ export const getPhotoHtml = ( photo ) => {
  * versions, so we require that these are generated separately.
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
- * @param {Object} props                  The block's props.
- * @param {Object} [attributesFromPreview]  Attributes generated from the block's most up to date preview.
+ * @param {Object} props                   The block's props.
+ * @param {Object} [attributesFromPreview] Attributes generated from the block's most up to date preview.
  * @return {Object|undefined} A more suitable embed block if one exists.
  */
 export const createUpgradedEmbedBlock = (
 	props,
 	attributesFromPreview = {}
 ) => {
-	const { preview, attributes: { url, providerNameSlug, type } = {} } = props;
+	const { preview, attributes = {} } = props;
+	const { url, providerNameSlug, type, ...restAttributes } = attributes;
 
 	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) return;
 
@@ -115,6 +116,7 @@ export const createUpgradedEmbedBlock = (
 	if ( shouldCreateNewBlock ) {
 		return createBlock( DEFAULT_EMBED_BLOCK, {
 			url,
+			...restAttributes,
 			...matchedBlock.attributes,
 		} );
 	}
@@ -156,6 +158,12 @@ export const createUpgradedEmbedBlock = (
  * @return {string} The class names without any aspect ratio related class.
  */
 export const removeAspectRatioClasses = ( existingClassNames ) => {
+	if ( ! existingClassNames ) {
+		// Avoids extraneous work and also, by returning the same value as
+		// received, ensures the post is not dirtied by a change of the block
+		// attribute from `undefined` to an emtpy string.
+		return existingClassNames;
+	}
 	const aspectRatioClassNames = ASPECT_RATIOS.reduce(
 		( accumulator, { className } ) => {
 			accumulator[ className ] = false;
@@ -176,7 +184,7 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
  */
 export function getClassNames(
 	html,
-	existingClassNames = '',
+	existingClassNames,
 	allowResponsive = true
 ) {
 	if ( ! allowResponsive ) {
@@ -198,6 +206,14 @@ export function getClassNames(
 		) {
 			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
 			if ( aspectRatio >= potentialRatio.ratio ) {
+				// Evaluate the difference between actual aspect ratio and closest match.
+				// If the difference is too big, do not scale the embed according to aspect ratio.
+				const ratioDiff = aspectRatio - potentialRatio.ratio;
+				if ( ratioDiff > 0.1 ) {
+					// No close aspect ratio match found.
+					return removeAspectRatioClasses( existingClassNames );
+				}
+				// Close aspect ratio match found.
 				return classnames(
 					removeAspectRatioClasses( existingClassNames ),
 					potentialRatio.className,

@@ -7,6 +7,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit/context';
+import { store as blockEditorStore } from '../../store';
 
 export default function useDisplayBlockControls() {
 	const { isSelected, clientId, name } = useBlockEditContext();
@@ -21,7 +22,7 @@ export default function useDisplayBlockControls() {
 				getBlockName,
 				isFirstMultiSelectedBlock,
 				getMultiSelectedBlockClientIds,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			if ( ! isFirstMultiSelectedBlock( clientId ) ) {
 				return false;

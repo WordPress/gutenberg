@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import useCallbackRef from '../use-callback-ref';
+import { useRef, useEffect, useCallback } from '@wordpress/element';
 
 /**
  * When opening modals/sidebars/dialogs, the focus
@@ -14,8 +9,8 @@ import useCallbackRef from '../use-callback-ref';
  * previously focused element when closed.
  * The current hook implements the returning behavior.
  *
- * @param {Function?} onFocusReturn Overrides the default return behavior.
- * @return {Function} Element Ref.
+ * @param {() => void} [onFocusReturn] Overrides the default return behavior.
+ * @return {import('react').RefCallback<HTMLElement>} Element Ref.
  *
  * @example
  * ```js
@@ -33,14 +28,16 @@ import useCallbackRef from '../use-callback-ref';
  * ```
  */
 function useFocusReturn( onFocusReturn ) {
-	const ref = useRef();
-	const focusedBeforeMount = useRef();
+	/** @type {import('react').MutableRefObject<null | HTMLElement>} */
+	const ref = useRef( null );
+	/** @type {import('react').MutableRefObject<null | Element>} */
+	const focusedBeforeMount = useRef( null );
 	const onFocusReturnRef = useRef( onFocusReturn );
 	useEffect( () => {
 		onFocusReturnRef.current = onFocusReturn;
 	}, [ onFocusReturn ] );
 
-	return useCallbackRef( ( node ) => {
+	return useCallback( ( node ) => {
 		if ( node ) {
 			// Set ref to be used when unmounting.
 			ref.current = node;
@@ -52,11 +49,11 @@ function useFocusReturn( onFocusReturn ) {
 
 			focusedBeforeMount.current = node.ownerDocument.activeElement;
 		} else if ( focusedBeforeMount.current ) {
-			const isFocused = ref.current.contains(
-				ref.current.ownerDocument.activeElement
+			const isFocused = ref.current?.contains(
+				ref.current?.ownerDocument.activeElement
 			);
 
-			if ( ! isFocused ) {
+			if ( ref.current?.isConnected && ! isFocused ) {
 				return;
 			}
 
@@ -67,7 +64,7 @@ function useFocusReturn( onFocusReturn ) {
 			if ( onFocusReturnRef.current ) {
 				onFocusReturnRef.current();
 			} else {
-				focusedBeforeMount.current.focus();
+				/** @type {null | HTMLElement} */ ( focusedBeforeMount.current )?.focus();
 			}
 		}
 	}, [] );

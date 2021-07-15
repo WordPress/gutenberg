@@ -55,17 +55,6 @@ export function isProcessingPost( postId ) {
 }
 
 /**
- * Selects widgetId -> clientId mapping (necessary for saving widgets).
- *
- * @return {Object} Action.
- */
-export function getWidgetToClientIdMapping() {
-	return {
-		type: 'GET_WIDGET_TO_CLIENT_ID_MAPPING',
-	};
-}
-
-/**
  * Resolves navigation post for given menuId.
  *
  * @see selectors.js
@@ -112,7 +101,7 @@ export function resolveWidgets( query = buildWidgetsQuery() ) {
  *
  * @param {string} registryName Registry name.
  * @param {string} selectorName Selector name.
- * @param {Array} args          Selector arguments.
+ * @param {Array}  args         Selector arguments.
  * @return {Object} control descriptor.
  */
 export function select( registryName, selectorName, ...args ) {
@@ -129,7 +118,7 @@ export function select( registryName, selectorName, ...args ) {
  *
  * @param {string} registryName Registry name.
  * @param {string} actionName   Action name.
- * @param {Array} args          Selector arguments.
+ * @param {Array}  args         Selector arguments.
  * @return {Object} control descriptor.
  */
 export function dispatch( registryName, actionName, ...args ) {
@@ -165,12 +154,6 @@ const controls = {
 		}
 	),
 
-	GET_WIDGET_TO_CLIENT_ID_MAPPING: createRegistryControl(
-		( registry ) => () => {
-			return getState( registry ).mapping || {};
-		}
-	),
-
 	DISPATCH: createRegistryControl(
 		( registry ) => ( { registryName, actionName, args } ) => {
 			return registry.dispatch( registryName )[ actionName ]( ...args );
@@ -180,14 +163,14 @@ const controls = {
 	RESOLVE_WIDGET_AREAS: createRegistryControl(
 		( registry ) => ( { query } ) => {
 			return registry
-				.__experimentalResolveSelect( 'core' )
+				.resolveSelect( 'core' )
 				.getEntityRecords( KIND, WIDGET_AREA_ENTITY_TYPE, query );
 		}
 	),
 
 	RESOLVE_WIDGETS: createRegistryControl( ( registry ) => ( { query } ) => {
 		return registry
-			.__experimentalResolveSelect( 'core' )
+			.resolveSelect( 'core' )
 			.getEntityRecords( 'root', 'widget', query );
 	} ),
 };

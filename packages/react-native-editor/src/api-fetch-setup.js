@@ -6,9 +6,13 @@ import apiFetch from '@wordpress/api-fetch';
 
 // Please add only wp.org API paths here!
 const SUPPORTED_ENDPOINTS = [
-	/wp\/v2\/(media|categories)\/?\d*?.*/i,
+	/wp\/v2\/(media|categories|blocks)\/?\d*?.*/i,
 	/wp\/v2\/search\?.*/i,
+	/oembed\/1\.0\/proxy\?.*/i,
 ];
+
+// [ONLY ON ANDROID] The requests made to these endpoints won't be cached.
+const DISABLED_CACHING_ENDPOINTS = [ /wp\/v2\/(blocks)\/?\d*?.*/i ];
 
 const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
@@ -18,7 +22,7 @@ const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
 		return Promise.reject( `Unsupported path: ${ path }` );
 	}
 
-	const responsePromise = fetchRequest( path );
+	const responsePromise = fetchRequest( path, shouldEnableCaching( path ) );
 
 	const parseResponse = ( response ) => {
 		if ( typeof response === 'string' ) {
@@ -43,6 +47,9 @@ const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
 
 export const isPathSupported = ( path ) =>
 	SUPPORTED_ENDPOINTS.some( ( pattern ) => pattern.test( path ) );
+
+export const shouldEnableCaching = ( path ) =>
+	! DISABLED_CACHING_ENDPOINTS.some( ( pattern ) => pattern.test( path ) );
 
 export default () => {
 	apiFetch.setFetchHandler( ( options ) => fetchHandler( options ) );

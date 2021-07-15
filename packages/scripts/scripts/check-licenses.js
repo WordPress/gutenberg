@@ -76,6 +76,7 @@ const otherOssLicenses = [
 	'CC-BY-3.0',
 	'CC-BY-SA-2.0',
 	'LGPL',
+	'Python-2.0',
 ];
 
 const licenses = [
@@ -123,7 +124,7 @@ const licenseFileStrings = {
  * eg, "(MIT OR Zlib)".
  *
  * @param {string} allowedLicense The license that's allowed.
- * @param {string} licenseType The license string to check.
+ * @param {string} licenseType    The license string to check.
  *
  * @return {boolean} true if the licenseType matches the allowedLicense, false if it doesn't.
  */
@@ -173,6 +174,7 @@ const child = spawn.sync(
 		'ls',
 		'--json',
 		'--long',
+		'--all',
 		...( prod ? [ '--prod' ] : [] ),
 		...( dev ? [ '--dev' ] : [] ),
 	],

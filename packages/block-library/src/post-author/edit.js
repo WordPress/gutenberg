@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -17,14 +17,19 @@ import {
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
-function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
-	const { postType, postId } = context;
-
+function PostAuthorEdit( {
+	isSelected,
+	context: { postType, postId, queryId },
+	attributes,
+	setAttributes,
+} ) {
+	const isDescendentOfQueryLoop = !! queryId;
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getUsers } = select(
-				'core'
+				coreStore
 			);
 			const _authorId = getEditedEntityRecord(
 				'postType',
@@ -41,7 +46,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		[ postType, postId ]
 	);
 
-	const { editEntityRecord } = useDispatch( 'core' );
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	const { textAlign, showAvatar, showBio, byline } = attributes;
 
@@ -65,7 +70,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Author Settings' ) }>
-					{ !! authors?.length && (
+					{ ! isDescendentOfQueryLoop && !! authors?.length && (
 						<SelectControl
 							label={ __( 'Author' ) }
 							value={ authorId }
@@ -116,8 +121,8 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );

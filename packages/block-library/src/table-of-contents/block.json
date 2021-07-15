@@ -1,0 +1,19 @@
+{
+	"apiVersion": 2,
+	"name": "core/table-of-contents",
+	"title": "Table of Contents",
+	"category": "layout",
+	"description": "Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.",
+	"keywords": [ "document outline", "summary" ],
+	"textdomain": "default",
+	"attributes": {
+		"onlyIncludeCurrentPage": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"usesContext": [ "postId" ],
+	"supports": {
+		"html": false
+	}
+}

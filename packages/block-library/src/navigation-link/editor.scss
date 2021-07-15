@@ -1,18 +1,55 @@
 // Normalize Link and edit containers, to look mostly the same.
-.wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
 .wp-block-navigation-link__container {
 	border-radius: 0;
-	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
-	line-height: $button-size;
+
+	// Make it the same height as the appender to prevent a jump.
 	min-height: $button-size;
 }
 
+
 /**
- * Adjust Navigation Item.
+ * Submenus.
  */
+
+// Show submenus above the sibling inserter.
+.wp-block-navigation .has-child {
+	cursor: pointer;
+
+	.submenu-container,
+	.wp-block-navigation-link__container {
+		z-index: z-index(".has-child .wp-block-navigation-link__container");
+	}
+
+	&:hover {
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			z-index: z-index(".has-child:hover .wp-block-navigation-link__container");
+		}
+	}
+
+	// Show on editor selected, even if on frontend it only stays open on focus-within.
+	&.is-selected,
+	&.has-child-selected {
+		> .wp-block-navigation-link__container {
+			// We use important here because if the parent block is selected and submenus are present, they should always be visible.
+			visibility: visible !important;
+			opacity: 1 !important;
+		}
+	}
+}
+
+
+/**
+ * Navigation Items.
+ */
+
 .wp-block-navigation-link {
-	.block-editor-block-list__layout {
+	.wp-block-navigation-link__container {
 		display: block;
+	}
+
+	.wp-block-navigation-link__content {
+		cursor: text;
 	}
 
 	&.is-editing,
@@ -20,35 +57,46 @@
 		min-width: 20px;
 	}
 
-	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus)[data-rich-text-placeholder]::after {
-		display: inline-block;
-	}
-
 	.block-list-appender {
-		margin: $grid-unit-10 * 2;
-		margin-left: $grid-unit-10 * 1.25;
-		margin-top: $grid-unit-10 * 1.25;
+		margin-top: $grid-unit-20;
+		// The right margin should be set to auto, so as to not shift layout in flex containers.
+		margin-right: auto;
+		margin-bottom: $grid-unit-20;
+		margin-left: $grid-unit-20;
 	}
-}
-
-// Separator
-.wp-block-navigation-link__separator {
-	margin: $grid-unit-10 0 $grid-unit-10;
-	border-top: $border-width solid $gray-300;
-}
-
-// Popover styles
-.components-popover.wp-block-navigation-link__dropdown-content {
-	margin-top: -1px;
-	margin-left: -4px;
-}
-
-.wp-block-navigation-link__dropdown-content .components-popover__content > div {
-	padding: $grid-unit-10 0;
 }
 
 .wp-block-navigation .block-editor-block-list__block[data-type="core/navigation-link"] {
 	& > .block-editor-block-list__insertion-point {
 		display: none;
+	}
+}
+
+
+/**
+ * Menu item setup state. Is shown when a menu item has no URL configured.
+ */
+
+.wp-block-navigation-link__placeholder {
+	position: relative;
+
+	// Draw a wavy underline.
+	.wp-block-navigation-link__placeholder-text {
+		$blur: 10%;
+		$width: 6%;
+		$stop1: 30%;
+		$stop2: 64%;
+
+		background-image:
+			linear-gradient(45deg, transparent ($stop1 - $blur), currentColor $stop1, currentColor ($stop1 + $width), transparent ($stop1 + $width + $blur)),
+			linear-gradient(135deg, transparent ($stop2 - $blur), currentColor $stop2, currentColor ($stop2 + $width), transparent ($stop2 + $width + $blur));
+		background-position: 0 100%;
+		background-size: 6px 3px;
+		background-repeat: repeat-x;
+	}
+
+	// This needs extra specificity.
+	&.wp-block-navigation-link__content {
+		cursor: pointer;
 	}
 }

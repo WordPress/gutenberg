@@ -10,7 +10,19 @@ import useSlot from './use-slot';
 
 function useForceUpdate() {
 	const [ , setState ] = useState( {} );
-	return () => setState( {} );
+	const mounted = useRef( true );
+
+	useEffect( () => {
+		return () => {
+			mounted.current = false;
+		};
+	}, [] );
+
+	return () => {
+		if ( mounted.current ) {
+			setState( {} );
+		}
+	};
 }
 
 export default function Fill( { name, children } ) {

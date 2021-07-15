@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
@@ -10,7 +10,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import Tips from './tips';
-import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs from './block-patterns-tab';
@@ -18,16 +17,17 @@ import ReusableBlocksTab from './reusable-blocks-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
+import { store as blockEditorStore } from '../../store';
 
 function InserterMenu( {
 	rootClientId,
 	clientId,
 	isAppender,
-	__experimentalSelectBlockOnInsert,
 	__experimentalInsertionIndex,
 	onSelect,
 	showInserterHelpPanel,
 	showMostUsedBlocks,
+	shouldFocusBlock = true,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -43,26 +43,29 @@ function InserterMenu( {
 		rootClientId,
 		clientId,
 		isAppender,
-		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
 		insertionIndex: __experimentalInsertionIndex,
+		shouldFocusBlock,
 	} );
-	const { hasPatterns, hasReusableBlocks } = useSelect( ( select ) => {
-		const {
-			__experimentalBlockPatterns,
-			__experimentalReusableBlocks,
-		} = select( 'core/block-editor' ).getSettings();
+	const { showPatterns, hasReusableBlocks } = useSelect(
+		( select ) => {
+			const { __experimentalGetAllowedPatterns, getSettings } = select(
+				blockEditorStore
+			);
 
-		return {
-			hasPatterns: !! __experimentalBlockPatterns?.length,
-			hasReusableBlocks: !! __experimentalReusableBlocks?.length,
-		};
-	}, [] );
-
-	const showPatterns = ! destinationRootClientId && hasPatterns;
+			return {
+				showPatterns: !! __experimentalGetAllowedPatterns(
+					destinationRootClientId
+				).length,
+				hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
+					?.length,
+			};
+		},
+		[ destinationRootClientId ]
+	);
 
 	const onInsert = useCallback(
-		( blocks ) => {
-			onInsertBlocks( blocks );
+		( blocks, meta, shouldForceFocusBlock ) => {
+			onInsertBlocks( blocks, meta, shouldForceFocusBlock );
 			onSelect();
 		},
 		[ onInsertBlocks, onSelect ]
@@ -125,12 +128,18 @@ function InserterMenu( {
 	const patternsTab = useMemo(
 		() => (
 			<BlockPatternsTabs
+				rootClientId={ destinationRootClientId }
 				onInsert={ onInsertPattern }
 				onClickCategory={ onClickPatternCategory }
 				selectedCategory={ selectedPatternCategory }
 			/>
 		),
-		[ onInsertPattern, onClickPatternCategory, selectedPatternCategory ]
+		[
+			destinationRootClientId,
+			onInsertPattern,
+			onClickPatternCategory,
+			selectedPatternCategory,
+		]
 	);
 
 	const reusableBlocksTab = useMemo(
@@ -161,12 +170,14 @@ function InserterMenu( {
 			<div className="block-editor-inserter__main-area">
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
-					<InserterSearchForm
+					<SearchControl
+						className="block-editor-inserter__search"
 						onChange={ ( value ) => {
 							if ( hoveredItem ) setHoveredItem( null );
 							setFilterValue( value );
 						} }
 						value={ filterValue }
+						label={ __( 'Search for blocks and patterns' ) }
 						placeholder={ __( 'Search' ) }
 					/>
 					{ !! filterValue && (
@@ -177,10 +188,11 @@ function InserterMenu( {
 							rootClientId={ rootClientId }
 							clientId={ clientId }
 							isAppender={ isAppender }
-							selectBlockOnInsert={
-								__experimentalSelectBlockOnInsert
+							__experimentalInsertionIndex={
+								__experimentalInsertionIndex
 							}
 							showBlockDirectory
+							shouldFocusBlock={ shouldFocusBlock }
 						/>
 					) }
 					{ ! filterValue && ( showPatterns || hasReusableBlocks ) && (

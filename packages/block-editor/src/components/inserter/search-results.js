@@ -17,13 +17,14 @@ import { speak } from '@wordpress/a11y';
  */
 import BlockTypesList from '../block-types-list';
 import BlockPatternsList from '../block-patterns-list';
-import __experimentalInserterMenuExtension from '../inserter-menu-extension';
+import __unstableInserterMenuExtension from '../inserter-menu-extension';
 import InserterPanel from './panel';
 import InserterNoResults from './no-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import usePatternsState from './hooks/use-patterns-state';
 import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
+import InserterListbox from '../inserter-listbox';
 
 function InserterSearchResults( {
 	filterValue,
@@ -32,11 +33,12 @@ function InserterSearchResults( {
 	rootClientId,
 	clientId,
 	isAppender,
-	selectBlockOnInsert,
+	__experimentalInsertionIndex,
 	maxBlockPatterns,
 	maxBlockTypes,
 	showBlockDirectory = false,
 	isDraggable = true,
+	shouldFocusBlock = true,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -45,7 +47,8 @@ function InserterSearchResults( {
 		rootClientId,
 		clientId,
 		isAppender,
-		selectBlockOnInsert,
+		insertionIndex: __experimentalInsertionIndex,
+		shouldFocusBlock,
 	} );
 	const [
 		blockTypes,
@@ -54,7 +57,8 @@ function InserterSearchResults( {
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
 	const [ patterns, , onSelectBlockPattern ] = usePatternsState(
-		onInsertBlocks
+		onInsertBlocks,
+		destinationRootClientId
 	);
 
 	const filteredBlockTypes = useMemo( () => {
@@ -103,7 +107,7 @@ function InserterSearchResults( {
 		! isEmpty( filteredBlockTypes ) || ! isEmpty( filteredBlockPatterns );
 
 	return (
-		<>
+		<InserterListbox>
 			{ ! showBlockDirectory && ! hasItems && <InserterNoResults /> }
 
 			{ !! filteredBlockTypes.length && (
@@ -147,7 +151,7 @@ function InserterSearchResults( {
 			) }
 
 			{ showBlockDirectory && (
-				<__experimentalInserterMenuExtension.Slot
+				<__unstableInserterMenuExtension.Slot
 					fillProps={ {
 						onSelect: onSelectBlockType,
 						onHover,
@@ -165,9 +169,9 @@ function InserterSearchResults( {
 						}
 						return null;
 					} }
-				</__experimentalInserterMenuExtension.Slot>
+				</__unstableInserterMenuExtension.Slot>
 			) }
-		</>
+		</InserterListbox>
 	);
 }
 

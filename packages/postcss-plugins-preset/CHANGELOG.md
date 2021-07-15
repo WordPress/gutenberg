@@ -1,6 +1,15 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 3.0.0 (2021-04-29)
+
+### Breaking Changes
+
+-   The bundled `autoprefixer` dependency has been updated from requiring `^9.8.6` to requiring `^10.2.5` (see [Breaking Changes](https://github.com/postcss/autoprefixer/releases/tag/10.0.0), [#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `postcss-custom-properties` dependency has been updated from requiring `^10.0.0` to requiring `^11.0.0` (see [Breaking Changes](https://github.com/postcss/postcss-custom-properties/releases/tag/11.0.0), [#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+
+## 2.0.0 (2021-01-21)
 
 ### Breaking Changes
 

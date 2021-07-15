@@ -69,10 +69,10 @@ describe( 'Using Plugins API', () => {
 
 	describe( 'Sidebar', () => {
 		const SIDEBAR_PINNED_ITEM_BUTTON =
-			'.interface-pinned-items button[aria-label="Sidebar title plugin"]';
+			'.interface-pinned-items button[aria-label="Plugin sidebar title"]';
 		const SIDEBAR_PANEL_SELECTOR = '.sidebar-title-plugin-panel';
 		it( 'Should open plugins sidebar using More Menu item and render content', async () => {
-			await clickOnMoreMenuItem( 'Sidebar title plugin' );
+			await clickOnMoreMenuItem( 'Plugin sidebar more menu title' );
 
 			const pluginSidebarContent = await page.$eval(
 				'.edit-post-sidebar',
@@ -105,7 +105,7 @@ describe( 'Using Plugins API', () => {
 			await page.reload();
 			await page.waitForSelector( '.edit-post-layout' );
 			expect( await page.$( SIDEBAR_PINNED_ITEM_BUTTON ) ).toBeNull();
-			await clickOnMoreMenuItem( 'Sidebar title plugin' );
+			await clickOnMoreMenuItem( 'Plugin sidebar more menu title' );
 			await page.click( 'button[aria-label="Pin to toolbar"]' );
 			expect( await page.$( SIDEBAR_PINNED_ITEM_BUTTON ) ).not.toBeNull();
 			await page.reload();
@@ -114,12 +114,12 @@ describe( 'Using Plugins API', () => {
 		} );
 
 		it( 'Should close plugins sidebar using More Menu item', async () => {
-			await clickOnMoreMenuItem( 'Sidebar title plugin' );
+			await clickOnMoreMenuItem( 'Plugin sidebar more menu title' );
 
 			const pluginSidebarOpened = await page.$( '.edit-post-sidebar' );
 			expect( pluginSidebarOpened ).not.toBeNull();
 
-			await clickOnMoreMenuItem( 'Sidebar title plugin' );
+			await clickOnMoreMenuItem( 'Plugin sidebar more menu title' );
 
 			const pluginSidebarClosed = await page.$( '.edit-post-sidebar' );
 			expect( pluginSidebarClosed ).toBeNull();
@@ -135,7 +135,7 @@ describe( 'Using Plugins API', () => {
 			} );
 
 			it( 'Should open plugins sidebar using More Menu item and render content', async () => {
-				await clickOnMoreMenuItem( 'Sidebar title plugin' );
+				await clickOnMoreMenuItem( 'Plugin sidebar more menu title' );
 
 				const pluginSidebarContent = await page.$eval(
 					'.edit-post-sidebar',

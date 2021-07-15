@@ -1,11 +1,21 @@
-.wp-block-custom-logo {
+.wp-block-site-logo {
 	line-height: 0;
+
+	a {
+		display: inline-block;
+	}
+
+	// Provide a sane starting point for the size.
+	&.is-default-size img {
+		width: 120px;
+		height: auto;
+	}
 
 	.aligncenter {
 		display: table;
 	}
 
-	// Variations
+	// Style variations
 	&.is-style-rounded img {
 		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 		// to rectangular images. A pill-shape is better than otherwise.

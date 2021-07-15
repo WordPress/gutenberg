@@ -6,14 +6,16 @@
 	display: flex;
 	flex-grow: 1;
 	width: 100%;
-	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
+
+	// Allow horizontal scrolling on mobile.
+	overflow-y: hidden;
+	overflow-x: auto;
 
 	// Animation
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
 	@include reduce-motion("transition");
 
-	// Allow overflow on desktop.
 	@include break-small() {
 		overflow: inherit;
 	}
@@ -44,6 +46,29 @@
 	}
 }
 
+.block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
+	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
+
+	.show-icon-labels & {
+		margin-left: 0;
+	}
+}
+
+.block-editor-block-parent-selector {
+	position: absolute;
+	top: -$border-width;
+	left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+	.show-icon-labels & {
+		position: relative;
+		left: auto;
+		top: auto;
+		margin-top: -$border-width;
+		margin-left: -$border-width;
+		margin-bottom: -$border-width;
+	}
+}
+
 // Block controls.
 .block-editor-block-toolbar__block-controls {
 	// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
@@ -57,11 +82,10 @@
 			width: $button-size-small !important;
 			margin: 0 !important;
 		}
-
-		&:focus::before {
-			right: $grid-unit-05 !important;
-		}
 	}
+
+	// Match the parent selector button.
+	margin-left: -$border-width;
 
 	// Compensate for width of block switcher.
 	.block-editor-block-mover {
@@ -70,7 +94,7 @@
 }
 
 .block-editor-block-toolbar,
-.block-editor-format-toolbar {
+.block-editor-rich-text__inline-format-toolbar-group {
 	// Override Toolbar buttons size.
 	.components-toolbar-group,
 	.components-toolbar {
@@ -88,22 +112,6 @@
 	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 	@supports (position: sticky) {
 		display: inline-flex;
-	}
-}
-
-.block-editor-block-toolbar__block-parent-selector-wrapper {
-	position: absolute;
-	top: -1px;
-	left: -1px;
-	opacity: 0;
-	transition: all 60ms linear;
-	z-index: -1; // This makes it slide out from underneath the toolbar.
-
-	@include reduce-motion("transition");
-
-	.is-showing-movers & {
-		opacity: 1;
-		transform: translateY(-($block-toolbar-height + $grid-unit-15));
 	}
 }
 
@@ -145,10 +153,6 @@
 		.block-editor-block-icon {
 			width: 0 !important;
 			height: 0 !important;
-		}
-
-		&:focus::before {
-			right: $grid-unit-05 !important;
 		}
 	}
 
@@ -197,7 +201,7 @@
 		flex-shrink: 1;
 	}
 
-	.block-editor-format-toolbar {
+	.block-editor-rich-text__inline-format-toolbar-group {
 		.components-button + .components-button {
 			margin-left: 6px;
 		}

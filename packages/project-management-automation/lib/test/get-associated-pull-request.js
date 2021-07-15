@@ -18,7 +18,7 @@ const VALID_COMMIT = {
 
 /**
  * An example commit which cannot be associated with a pull request, e.g. when
- * someone commits directly to master.
+ * someone commits directly to trunk.
  *
  * @type {WebhookPayloadPushCommit}
  */

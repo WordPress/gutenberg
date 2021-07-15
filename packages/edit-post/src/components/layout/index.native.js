@@ -9,14 +9,20 @@ import SafeArea from 'react-native-safe-area';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { BottomSheetSettings, FloatingToolbar } from '@wordpress/block-editor';
+import {
+	BottomSheetSettings,
+	FloatingToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
 	NoticeList,
+	Tooltip,
+	__unstableAutocompletionItemsSlot as AutocompletionItemsSlot,
 } from '@wordpress/components';
-import { AutosaveMonitor } from '@wordpress/editor';
+import { AutosaveMonitor, store as editorStore } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
@@ -76,7 +82,12 @@ class Layout extends Component {
 
 	setHeightState( event ) {
 		const { height } = event.nativeEvent.layout;
-		this.setState( { rootViewHeight: height }, sendNativeEditorDidLayout );
+		if ( height !== this.state.rootViewHeight ) {
+			this.setState(
+				{ rootViewHeight: height },
+				sendNativeEditorDidLayout
+			);
+		}
 	}
 
 	renderHTML() {
@@ -94,7 +105,7 @@ class Layout extends Component {
 	}
 
 	render() {
-		const { getStylesFromColorScheme, mode } = this.props;
+		const { getStylesFromColorScheme, mode, globalStyles } = this.props;
 
 		const isHtmlView = mode === 'text';
 
@@ -111,46 +122,59 @@ class Layout extends Component {
 			bottom: this.state.safeAreaInsets.bottom,
 		};
 
+		const editorStyles = [
+			getStylesFromColorScheme(
+				styles.background,
+				styles.backgroundDark
+			),
+			globalStyles?.background && {
+				backgroundColor: globalStyles.background,
+			},
+		];
+
 		return (
-			<SafeAreaView
-				style={ getStylesFromColorScheme(
-					styles.container,
-					styles.containerDark
-				) }
-				onLayout={ this.onRootViewLayout }
-			>
-				<AutosaveMonitor disableIntervalChecks />
-				<View
+			<Tooltip.Slot>
+				<SafeAreaView
 					style={ getStylesFromColorScheme(
-						styles.background,
-						styles.backgroundDark
+						styles.container,
+						styles.containerDark
 					) }
+					onLayout={ this.onRootViewLayout }
 				>
-					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
-					{ ! isHtmlView && Platform.OS === 'android' && (
-						<FloatingToolbar />
+					<AutosaveMonitor disableIntervalChecks />
+					<View style={ editorStyles }>
+						{ isHtmlView ? this.renderHTML() : this.renderVisual() }
+						{ ! isHtmlView && Platform.OS === 'android' && (
+							<FloatingToolbar />
+						) }
+						<NoticeList />
+					</View>
+					<View
+						style={ {
+							flex: 0,
+							flexBasis: marginBottom,
+							height: marginBottom,
+						} }
+					/>
+					{ ! isHtmlView && (
+						<KeyboardAvoidingView
+							parentHeight={ this.state.rootViewHeight }
+							style={ toolbarKeyboardAvoidingViewStyle }
+							withAnimatedHeight
+						>
+							{ Platform.OS === 'ios' && (
+								<>
+									<AutocompletionItemsSlot />
+									<FloatingToolbar />
+								</>
+							) }
+							<Header />
+							<BottomSheetSettings />
+						</KeyboardAvoidingView>
 					) }
-					<NoticeList />
-				</View>
-				<View
-					style={ {
-						flex: 0,
-						flexBasis: marginBottom,
-						height: marginBottom,
-					} }
-				/>
-				{ ! isHtmlView && (
-					<KeyboardAvoidingView
-						parentHeight={ this.state.rootViewHeight }
-						style={ toolbarKeyboardAvoidingViewStyle }
-						withAnimatedHeight
-					>
-						{ Platform.OS === 'ios' && <FloatingToolbar /> }
-						<Header />
-						<BottomSheetSettings />
-					</KeyboardAvoidingView>
-				) }
-			</SafeAreaView>
+					{ Platform.OS === 'android' && <AutocompletionItemsSlot /> }
+				</SafeAreaView>
+			</Tooltip.Slot>
 		);
 	}
 }
@@ -158,12 +182,17 @@ class Layout extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { __unstableIsEditorReady: isEditorReady } = select(
-			'core/editor'
+			editorStore
 		);
 		const { getEditorMode } = select( editPostStore );
+		const { getSettings } = select( blockEditorStore );
+		const globalStyles = getSettings()?.__experimentalGlobalStylesBaseStyles
+			?.color;
+
 		return {
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
+			globalStyles,
 		};
 	} ),
 	withPreferredColorScheme,

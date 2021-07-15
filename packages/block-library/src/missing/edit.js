@@ -6,7 +6,12 @@ import { RawHTML } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { getBlockType, createBlock } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
-import { Warning, useBlockProps } from '@wordpress/block-editor';
+import {
+	Warning,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { safeHTML } from '@wordpress/dom';
 
 function MissingBlockWarning( { attributes, convertToHTML } ) {
 	const { originalName, originalUndelimitedContent } = attributes;
@@ -24,7 +29,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 			originalName
 		);
 		actions.push(
-			<Button key="convert" onClick={ convertToHTML } isPrimary>
+			<Button key="convert" onClick={ convertToHTML } variant="primary">
 				{ __( 'Keep as HTML' ) }
 			</Button>
 		);
@@ -39,15 +44,15 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	}
 
 	return (
-		<div { ...useBlockProps() }>
+		<div { ...useBlockProps( { className: 'has-warning' } ) }>
 			<Warning actions={ actions }>{ messageHTML }</Warning>
-			<RawHTML>{ originalUndelimitedContent }</RawHTML>
+			<RawHTML>{ safeHTML( originalUndelimitedContent ) }</RawHTML>
 		</div>
 	);
 }
 
 const MissingEdit = withDispatch( ( dispatch, { clientId, attributes } ) => {
-	const { replaceBlock } = dispatch( 'core/block-editor' );
+	const { replaceBlock } = dispatch( blockEditorStore );
 	return {
 		convertToHTML() {
 			replaceBlock(

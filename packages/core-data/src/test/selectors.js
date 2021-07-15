@@ -12,10 +12,12 @@ import {
 	hasEntityRecords,
 	getEntityRecords,
 	__experimentalGetDirtyEntityRecords,
+	__experimentalGetEntitiesBeingSaved,
 	getEntityRecordNonTransientEdits,
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
+	canUserEditEntityRecord,
 	getAutosave,
 	getAutosaves,
 	getCurrentUser,
@@ -73,10 +75,14 @@ describe.each( [
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post' },
+									default: {
+										post: { slug: 'post' },
+									},
 								},
 								itemIsComplete: {
-									post: true,
+									default: {
+										post: true,
+									},
 								},
 								queries: {},
 							},
@@ -104,14 +110,18 @@ describe.each( [
 						post: {
 							queriedData: {
 								items: {
-									1: {
-										id: 1,
-										content: 'chicken',
-										author: 'bob',
+									default: {
+										1: {
+											id: 1,
+											content: 'chicken',
+											author: 'bob',
+										},
 									},
 								},
 								itemIsComplete: {
-									1: true,
+									default: {
+										1: true,
+									},
 								},
 								queries: {},
 							},
@@ -167,15 +177,21 @@ describe( 'hasEntityRecords', () => {
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post' },
-									page: { slug: 'page' },
+									default: {
+										post: { slug: 'post' },
+										page: { slug: 'page' },
+									},
 								},
 								itemIsComplete: {
-									post: true,
-									page: true,
+									default: {
+										post: true,
+										page: true,
+									},
 								},
 								queries: {
-									'': [ 'post', 'page' ],
+									default: {
+										'': [ 'post', 'page' ],
+									},
 								},
 							},
 						},
@@ -226,15 +242,21 @@ describe( 'getEntityRecords', () => {
 						postType: {
 							queriedData: {
 								items: {
-									post: { slug: 'post' },
-									page: { slug: 'page' },
+									default: {
+										post: { slug: 'post' },
+										page: { slug: 'page' },
+									},
 								},
 								itemIsComplete: {
-									post: true,
-									page: true,
+									default: {
+										post: true,
+										page: true,
+									},
 								},
 								queries: {
-									'': [ 'post', 'page' ],
+									default: {
+										'': [ 'post', 'page' ],
+									},
 								},
 							},
 						},
@@ -256,17 +278,23 @@ describe( 'getEntityRecords', () => {
 						post: {
 							queriedData: {
 								items: {
-									1: {
-										id: 1,
-										content: 'chicken',
-										author: 'bob',
+									default: {
+										1: {
+											id: 1,
+											content: 'chicken',
+											author: 'bob',
+										},
 									},
 								},
 								itemIsComplete: {
-									1: true,
+									default: {
+										1: true,
+									},
 								},
 								queries: {
-									'_fields=id%2Ccontent': [ 1 ],
+									default: {
+										'_fields=id%2Ccontent': [ 1 ],
+									},
 								},
 							},
 						},
@@ -334,16 +362,20 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 						someName: {
 							queriedData: {
 								items: {
-									someKey: {
-										someProperty: 'somePersistedValue',
-										someRawProperty: {
-											raw: 'somePersistedRawValue',
+									default: {
+										someKey: {
+											someProperty: 'somePersistedValue',
+											someRawProperty: {
+												raw: 'somePersistedRawValue',
+											},
+											id: 'someKey',
 										},
-										id: 'someKey',
 									},
 								},
 								itemIsComplete: {
-									someKey: true,
+									default: {
+										someKey: true,
+									},
 								},
 							},
 							edits: {
@@ -360,6 +392,54 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 			},
 		} );
 		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
+			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
+		] );
+	} );
+} );
+
+describe( '__experimentalGetEntitiesBeingSaved', () => {
+	it( "should return a map of objects with each raw entity record that's being saved", () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						transientEdits: { someTransientEditProperty: true },
+					},
+				],
+				data: {
+					someKind: {
+						someName: {
+							queriedData: {
+								items: {
+									default: {
+										someKey: {
+											someProperty: 'somePersistedValue',
+											someRawProperty: {
+												raw: 'somePersistedRawValue',
+											},
+											id: 'someKey',
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										someKey: true,
+									},
+								},
+							},
+							saving: {
+								someKey: {
+									pending: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( __experimentalGetEntitiesBeingSaved( state ) ).toEqual( [
 			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
 		] );
 	} );
@@ -441,6 +521,61 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( canUser( state, 'create', 'media', 123 ) ).toBe( false );
+	} );
+} );
+
+describe( 'canUserEditEntityRecord', () => {
+	it( 'returns false by default', () => {
+		const state = deepFreeze( {
+			userPermissions: {},
+			entities: { data: {} },
+		} );
+		expect( canUserEditEntityRecord( state, 'postType', 'post' ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'returns whether the user can edit', () => {
+		const state = deepFreeze( {
+			userPermissions: {
+				'create/posts': false,
+				'update/posts/1': true,
+			},
+			entities: {
+				config: [
+					{
+						kind: 'postType',
+						name: 'post',
+						__unstable_rest_base: 'posts',
+					},
+				],
+				data: {
+					root: {
+						postType: {
+							queriedData: {
+								items: {
+									default: {
+										post: {
+											slug: 'post',
+											__unstable: 'posts',
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										post: true,
+									},
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			canUserEditEntityRecord( state, 'postType', 'post', '1' )
+		).toBe( true );
 	} );
 } );
 

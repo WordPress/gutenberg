@@ -19,26 +19,40 @@ import {
 
 const GlobalStylesContext = createContext( { style: {} } );
 
+GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES = BLOCK_STYLE_ATTRIBUTES;
+
 export const getMergedGlobalStyles = (
+	baseGlobalStyles,
 	globalStyle,
 	wrapperPropsStyle,
 	blockAttributes,
-	defaultColors
+	defaultColors,
+	blockName
 ) => {
+	const baseGlobalColors = {
+		baseColors: baseGlobalStyles || {},
+	};
 	const blockStyleAttributes = pick(
 		blockAttributes,
 		BLOCK_STYLE_ATTRIBUTES
 	);
 	const mergedStyle = {
+		...baseGlobalColors,
 		...globalStyle,
 		...wrapperPropsStyle,
 	};
+	const blockColors = getBlockColors(
+		blockStyleAttributes,
+		defaultColors,
+		blockName,
+		baseGlobalStyles
+	);
 	const blockPaddings = getBlockPaddings(
 		mergedStyle,
 		wrapperPropsStyle,
-		blockStyleAttributes
+		blockStyleAttributes,
+		blockColors
 	);
-	const blockColors = getBlockColors( blockStyleAttributes, defaultColors );
 
 	return { ...mergedStyle, ...blockPaddings, ...blockColors };
 };

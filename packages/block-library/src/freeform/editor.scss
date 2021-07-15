@@ -307,11 +307,10 @@ div[data-type="core/freeform"] {
 	// On mobile, toolbars go edge to edge.
 	padding: 0;
 
-	// By using the `data-type` attribute in this selector it ensures these styles only appear
-	// when the block itself is selected, without it they would also show when a parent block
-	// is selected.
-	div[data-type="core/freeform"].is-selected &,
-	div[data-type="core/freeform"].is-typing & {
+	// By using the `data-type` attribute in this selector it ensures these
+	// styles only appear when the block itself is selected, without it they
+	// would also show when a parent block is selected.
+	div[data-type="core/freeform"].is-selected & {
 		display: block;
 		border-color: $gray-900;
 	}

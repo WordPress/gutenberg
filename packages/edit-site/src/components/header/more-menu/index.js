@@ -3,7 +3,7 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { ActionItem } from '@wordpress/interface';
 
 /**
@@ -49,19 +49,10 @@ const MoreMenu = () => (
 							'Spotlight mode deactivated'
 						) }
 					/>
-					<FeatureToggle
-						feature="fullscreenMode"
-						label={ __( 'Fullscreen mode' ) }
-						info={ __( 'Work without distraction' ) }
-						messageActivated={ __( 'Fullscreen mode activated' ) }
-						messageDeactivated={ __(
-							'Fullscreen mode deactivated'
-						) }
-					/>
 					<ActionItem.Slot
 						name="core/edit-site/plugin-more-menu"
 						label={ __( 'Plugins' ) }
-						as={ [ MenuGroup, MenuItem ] }
+						as={ MenuGroup }
 						fillProps={ { onClick: onClose } }
 					/>
 				</MenuGroup>

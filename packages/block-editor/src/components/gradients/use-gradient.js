@@ -13,7 +13,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
-import useEditorFeature from '../use-editor-feature';
+import useSetting from '../use-setting';
+import { store as blockEditorStore } from '../../store';
 
 const EMPTY_ARRAY = [];
 
@@ -27,8 +28,8 @@ export function __experimentalGetGradientClass( gradientSlug ) {
 /**
  * Retrieves the gradient value per slug.
  *
- * @param {Array} gradients Gradient Palette
- * @param {string} slug Gradient slug
+ * @param {Array}  gradients Gradient Palette
+ * @param {string} slug      Gradient slug
  *
  * @return {string} Gradient value.
  */
@@ -48,8 +49,8 @@ export function __experimentalGetGradientObjectByGradientValue(
 /**
  * Retrieves the gradient slug per slug.
  *
- * @param {Array} gradients Gradient Palette
- * @param {string} value Gradient value
+ * @param {Array}  gradients Gradient Palette
+ * @param {string} value     Gradient value
  * @return {string} Gradient slug.
  */
 export function getGradientSlugByValue( gradients, value ) {
@@ -66,10 +67,10 @@ export function __experimentalUseGradient( {
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
 	const { gradient, customGradient } = useSelect(
 		( select ) => {
-			const { getBlockAttributes } = select( 'core/block-editor' );
+			const { getBlockAttributes } = select( blockEditorStore );
 			const attributes = getBlockAttributes( clientId ) || {};
 			return {
 				customGradient: attributes[ customGradientAttribute ],
@@ -79,7 +80,7 @@ export function __experimentalUseGradient( {
 		[ clientId, gradientAttribute, customGradientAttribute ]
 	);
 
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const setGradient = useCallback(
 		( newGradientValue ) => {
 			const slug = getGradientSlugByValue( gradients, newGradientValue );

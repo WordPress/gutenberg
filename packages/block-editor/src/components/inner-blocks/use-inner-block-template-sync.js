@@ -11,23 +11,28 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+/**
  * This hook makes sure that a block's inner blocks stay in sync with the given
  * block "template". The template is a block hierarchy to which inner blocks must
  * conform. If the blocks get "out of sync" with the template and the template
  * is meant to be locked (e.g. templateLock = "all"), then we replace the inner
  * blocks with the correct value after synchronizing it with the template.
  *
- * @param {string} clientId     The block client ID.
- * @param {Object} template     The template to match.
- * @param {string} templateLock The template lock state for the inner blocks. For
- *                              example, if the template lock is set to "all",
- *                              then the inner blocks will stay in sync with the
- *                              template. If not defined or set to false, then
- *                              the inner blocks will not be synchronized with
- *                              the given template.
+ * @param {string}  clientId                       The block client ID.
+ * @param {Object}  template                       The template to match.
+ * @param {string}  templateLock                   The template lock state for the inner blocks. For
+ *                                                 example, if the template lock is set to "all",
+ *                                                 then the inner blocks will stay in sync with the
+ *                                                 template. If not defined or set to false, then
+ *                                                 the inner blocks will not be synchronized with
+ *                                                 the given template.
  * @param {boolean} templateInsertUpdatesSelection Whether or not to update the
- *                              block-editor selection state when inner blocks
- *                              are replaced after template synchronization.
+ *                                                 block-editor selection state when inner blocks
+ *                                                 are replaced after template synchronization.
  */
 export default function useInnerBlockTemplateSync(
 	clientId,
@@ -35,10 +40,12 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-
+	const { getSelectedBlocksInitialCaretPosition } = useSelect(
+		blockEditorStore
+	);
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const innerBlocks = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlocks( clientId ),
+		( select ) => select( blockEditorStore ).getBlocks( clientId ),
 		[ clientId ]
 	);
 
@@ -64,7 +71,12 @@ export default function useInnerBlockTemplateSync(
 						nextBlocks,
 						innerBlocks.length === 0 &&
 							templateInsertUpdatesSelection &&
-							nextBlocks.length !== 0
+							nextBlocks.length !== 0,
+						// This ensures the "initialPosition" doesn't change when applying the template
+						// If we're supposed to focus the block, we'll focus the first inner block
+						// otherwise, we won't apply any auto-focus.
+						// This ensures for instance that the focus stays in the inserter when inserting the "buttons" block.
+						getSelectedBlocksInitialCaretPosition()
 					);
 				}
 			}

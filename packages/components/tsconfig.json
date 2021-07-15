@@ -2,21 +2,55 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types"
+		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
+		{ "path": "../compose" },
 		{ "path": "../deprecated" },
+		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },
-		{ "path": "../primitives" }
+		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../primitives" },
+		{ "path": "../react-i18n" },
+		{ "path": "../warning" }
 	],
 	"include": [
+		"src/__next/**/*",
 		"src/animate/**/*",
 		"src/base-control/**/*",
+		"src/base-field/**/*",
+		"src/card/**/*",
 		"src/dashicon/**/*",
+		"src/disabled/**/*",
+		"src/divider/**/*",
+		"src/draggable/**/*",
+		"src/elevation/**/*",
+		"src/flex/**/*",
+		"src/flyout/**/*",
+		"src/form-group/**/*",
+		"src/grid/**/*",
+		"src/h-stack/**/*",
+		"src/heading/**/*",
+		"src/icon/**/*",
+		"src/scroll-lock/**/*",
+		"src/scrollable/**/*",
+		"src/segmented-control/**/*",
+		"src/shortcut/**/*",
+		"src/spacer/**/*",
+		"src/spinner/**/*",
+		"src/surface/**/*",
+		"src/text/**/*",
 		"src/tip/**/*",
+		"src/truncate/**/*",
+		"src/ui/**/*",
 		"src/utils/**/*",
-		"src/visually-hidden/**/*"
+		"src/v-stack/**/*",
+		"src/view/**/*",
+		"src/visually-hidden/**/*",
+		"src/z-stack/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",
@@ -24,6 +58,8 @@
 		"src/**/*.native.js",
 		"src/**/react-native-*",
 		"src/**/stories",
-		"src/**/test"
+		"src/**/test",
+		"src/ui/__storybook-utils",
+		"src/ui/font-size-control"
 	]
 }

@@ -12,12 +12,14 @@ import {
 	Text,
 } from 'react-native';
 import { map, uniq } from 'lodash';
+
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
@@ -81,7 +83,7 @@ function ColorPalette( {
 	useEffect( () => {
 		if ( scrollViewRef.current ) {
 			if ( isSelectedCustom() ) {
-				scrollViewRef.current.scrollToEnd();
+				scrollToEndWithDelay();
 			} else {
 				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 			}
@@ -89,7 +91,8 @@ function ColorPalette( {
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {
-		const isWithinColors = activeColor && colors.includes( activeColor );
+		const isWithinColors =
+			activeColor && colors && colors.includes( activeColor );
 		if ( activeColor ) {
 			if ( isGradientSegment ) {
 				return isGradientColor && ! isWithinColors;
@@ -163,8 +166,17 @@ function ColorPalette( {
 	function onContentSizeChange( width ) {
 		contentWidth = width;
 		if ( isSelectedCustom() && scrollViewRef.current ) {
-			scrollViewRef.current.scrollToEnd( { animated: ! isIOS } );
+			scrollToEndWithDelay();
 		}
+	}
+
+	function scrollToEndWithDelay() {
+		const delayedScroll = setTimeout( () => {
+			scrollViewRef.current.scrollToEnd();
+		}, ANIMATION_DURATION );
+		return () => {
+			clearTimeout( delayedScroll );
+		};
 	}
 
 	function onCustomIndicatorLayout( { nativeEvent } ) {
@@ -208,38 +220,6 @@ function ColorPalette( {
 			onScrollEndDrag={ () => shouldEnableBottomSheetScroll( true ) }
 			ref={ scrollViewRef }
 		>
-			{ colors.map( ( color ) => {
-				const scaleValue = isSelected( color ) ? scaleInterpolation : 1;
-				return (
-					<TouchableWithoutFeedback
-						onPress={ () => onColorPress( color ) }
-						key={ `${ color }-${ isSelected( color ) }` }
-						accessibilityRole={ 'button' }
-						accessibilityState={ { selected: isSelected( color ) } }
-						accessibilityHint={ color }
-					>
-						<Animated.View
-							style={ {
-								transform: [
-									{
-										scale: scaleValue,
-									},
-								],
-							} }
-						>
-							<ColorIndicator
-								color={ color }
-								isSelected={ isSelected( color ) }
-								opacity={ opacity }
-								style={ [
-									styles.colorIndicator,
-									customColorIndicatorStyles,
-								] }
-							/>
-						</Animated.View>
-					</TouchableWithoutFeedback>
-				);
-			} ) }
 			{ shouldShowCustomIndicator && (
 				<View
 					style={ customIndicatorWrapperStyle }
@@ -275,6 +255,41 @@ function ColorPalette( {
 					</TouchableWithoutFeedback>
 				</View>
 			) }
+			{ colors.map( ( color ) => {
+				const scaleValue = isSelected( color ) ? scaleInterpolation : 1;
+				return (
+					<View key={ `${ color }-${ isSelected( color ) }` }>
+						<TouchableWithoutFeedback
+							onPress={ () => onColorPress( color ) }
+							accessibilityRole={ 'button' }
+							accessibilityState={ {
+								selected: isSelected( color ),
+							} }
+							accessibilityHint={ color }
+						>
+							<Animated.View
+								style={ {
+									transform: [
+										{
+											scale: scaleValue,
+										},
+									],
+								} }
+							>
+								<ColorIndicator
+									color={ color }
+									isSelected={ isSelected( color ) }
+									opacity={ opacity }
+									style={ [
+										styles.colorIndicator,
+										customColorIndicatorStyles,
+									] }
+								/>
+							</Animated.View>
+						</TouchableWithoutFeedback>
+					</View>
+				);
+			} ) }
 		</ScrollView>
 	);
 }

@@ -4,10 +4,12 @@
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	RichText,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 const name = 'core/paragraph';
@@ -17,29 +19,34 @@ function ParagraphBlock( {
 	mergeBlocks,
 	onReplace,
 	setAttributes,
-	mergedStyle,
 	style,
+	clientId,
 } ) {
 	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
+		return !! select( blockEditorStore ).getSettings().isRTL;
 	}, [] );
 
 	const { align, content, placeholder } = attributes;
 
 	const styles = {
-		...mergedStyle,
+		...( style?.baseColors && {
+			color: style.baseColors?.color?.text,
+			placeholderColor: style.color || style.baseColors?.color?.text,
+			linkColor: style.baseColors?.elements?.link?.color?.text,
+		} ),
 		...style,
 	};
 
+	const onAlignmentChange = useCallback( ( nextAlign ) => {
+		setAttributes( { align: nextAlign } );
+	}, [] );
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ align }
 					isRTL={ isRTL }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
-					} }
+					onChange={ onAlignmentChange }
 				/>
 			</BlockControls>
 			<RichText
@@ -53,15 +60,23 @@ function ParagraphBlock( {
 						content: nextContent,
 					} );
 				} }
-				onSplit={ ( value ) => {
-					if ( ! value ) {
-						return createBlock( name );
+				onSplit={ ( value, isOriginal ) => {
+					let newAttributes;
+
+					if ( isOriginal || value ) {
+						newAttributes = {
+							...attributes,
+							content: value,
+						};
 					}
 
-					return createBlock( name, {
-						...attributes,
-						content: value,
-					} );
+					const block = createBlock( name, newAttributes );
+
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }

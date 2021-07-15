@@ -7,6 +7,7 @@ import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { edit } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function NavigateToLink( {
 	type,
@@ -19,14 +20,14 @@ export default function NavigateToLink( {
 			type &&
 			id &&
 			type !== 'URL' &&
-			select( 'core' ).getEntityRecord( 'postType', type, id ),
+			select( coreStore ).getEntityRecord( 'postType', type, id ),
 		[ type, id ]
 	);
 
 	const onClick = useMemo( () => {
 		if ( ! post?.link ) return null;
 		const path = getPathAndQueryString( post.link );
-		if ( path === activePage.path ) return null;
+		if ( path === activePage?.path ) return null;
 		return () =>
 			onActivePageChange( {
 				type,
@@ -37,7 +38,7 @@ export default function NavigateToLink( {
 					postId: post.id,
 				},
 			} );
-	}, [ post, activePage.path, onActivePageChange ] );
+	}, [ post, activePage?.path, onActivePageChange ] );
 
 	return (
 		onClick && (

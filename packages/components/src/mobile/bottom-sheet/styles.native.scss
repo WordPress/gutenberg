@@ -149,7 +149,7 @@
 // Footer Message Cell
 
 .footerMessageCell {
-	font-size: $text-editor-font-size;
+	font-size: 12px;
 	color: $gray;
 	flex: 1;
 }
@@ -283,4 +283,13 @@
 
 .flex {
 	flex: 1;
+}
+
+.cellHelpLabel {
+	font-size: $default-font-size;
+	padding-bottom: $grid-unit-15;
+}
+
+.cellHelpLabelIOS {
+	padding-bottom: $grid-unit-10;
 }

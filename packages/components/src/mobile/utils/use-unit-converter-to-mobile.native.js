@@ -37,7 +37,7 @@ const getValueAndUnit = ( value, unit ) => {
 
 const convertUnitToMobile = ( containerSize, globalStyles, value, unit ) => {
 	const { width, height } = containerSize;
-	const { valueToConvert, valueUnit } = getValueAndUnit( value, unit );
+	const { valueToConvert, valueUnit } = getValueAndUnit( value, unit ) || {};
 	const { fontSize = 16 } = globalStyles || {};
 
 	switch ( valueUnit ) {

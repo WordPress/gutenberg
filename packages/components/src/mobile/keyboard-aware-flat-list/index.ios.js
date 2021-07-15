@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { FlatList } from 'react-native';
 import { isEqual } from 'lodash';
+
 /**
  * WordPress dependencies
  */
+import { memo } from '@wordpress/element';
 
-const List = React.memo( FlatList, isEqual );
+const List = memo( FlatList, isEqual );
 
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
@@ -29,7 +30,7 @@ export const KeyboardAwareFlatList = ( {
 		extraHeight={ 0 }
 		inputAccessoryViewHeight={ inputAccessoryViewHeight }
 		enableAutomaticScroll={ autoScroll === undefined ? false : autoScroll }
-		innerRef={ ( ref ) => {
+		ref={ ( ref ) => {
 			this.scrollViewRef = ref;
 			innerRef( ref );
 		} }
@@ -45,7 +46,7 @@ export const KeyboardAwareFlatList = ( {
 				) {
 					// Reset the content position if keyboard is still closed
 					if ( this.scrollViewRef ) {
-						this.scrollViewRef.props.scrollToPosition(
+						this.scrollViewRef.scrollToPosition(
 							0,
 							this.latestContentOffsetY,
 							true
@@ -74,7 +75,7 @@ KeyboardAwareFlatList.handleCaretVerticalPositionChange = (
 ) => {
 	if ( previousCaretY ) {
 		//if this is not the first tap
-		scrollView.props.refreshScrollForField( targetId );
+		scrollView.refreshScrollForField( targetId );
 	}
 };
 

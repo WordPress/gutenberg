@@ -1,43 +1,48 @@
 .edit-navigation-header {
-	padding: $grid-unit-20;
-	background: #f1f1f1; // Need to find a variable for this
-
-	.edit-navigation-header__title {
-		font-size: 23px;
-		font-weight: 400;
-		line-height: $default-line-height;
-		margin: 0 0 $grid-unit-10;
-	}
+	display: flex;
+	align-items: center;
+	padding: $grid-unit-15 $grid-unit-30 $grid-unit-15 20px;
 }
 
-// Lining up all the actions in a nice row.
+.edit-navigation-header__title-subtitle {
+	flex-grow: 1;
+}
+
+.edit-navigation-header__title {
+	font-size: 23px;
+	font-weight: 400;
+	margin: 0;
+	padding: 7px 0 4px 0;
+	line-height: 1.3;
+}
+
+.edit-navigation-header__subtitle {
+	margin: 0;
+	font-size: 15px;
+	font-weight: normal;
+}
+
 .edit-navigation-header__actions {
 	display: flex;
-	align-items: baseline;
-	margin-top: $grid-unit-10;
 
-	.edit-navigation-header__action_header {
-		font-weight: normal;
-		font-size: inherit;
-		margin: 0;
-	}
-
-	// Spacing out the actions a little.
-	.edit-navigation-header__action_header,
-	.components-dropdown {
-		margin-right: $grid-unit-20;
-	}
-
-	.components-dropdown:last-child {
-		margin-right: 0;
+	> .components-dropdown,
+	> .components-button,
+	> .interface-pinned-items .components-button {
+		&:not(:last-child) {
+			margin-right: $grid-unit-15;
+		}
 	}
 }
 
-.edit-navigation-header__create-menu-button {
-	margin-top: $grid-unit-10;
+.edit-navigation-header__menu-switcher-dropdown {
+	// Appear below the modal overlay.
+	z-index: z-index(".components-popover.edit-navigation-header__menu-switcher-dropdown");
 }
 
-.edit-navigation-header__manage-locations .components-spinner {
-	display: block;
-	margin: $grid-unit-20 auto;
+// Hide notices.
+.gutenberg_page_gutenberg-navigation {
+	.notice,
+	#wpfooter {
+		display: none;
+	}
 }

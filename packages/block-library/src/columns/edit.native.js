@@ -15,6 +15,7 @@ import {
 	getValueAndUnit,
 	GlobalStylesContext,
 	alignmentHelpers,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -22,6 +23,8 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	BlockVariationPicker,
+	useSetting,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
 import {
@@ -30,6 +33,7 @@ import {
 	useContext,
 	useMemo,
 	useCallback,
+	memo,
 } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
@@ -47,7 +51,6 @@ import {
 	getWidths,
 	getWidthWithUnit,
 	isPercentageUnit,
-	CSS_UNITS,
 } from './utils';
 import {
 	getColumnsInRow,
@@ -82,7 +85,7 @@ const DEFAULT_COLUMNS_NUM = 2;
  */
 const MIN_COLUMNS_NUM = 1;
 
-const { isWider, isFullWidth } = alignmentHelpers;
+const { isFullWidth } = alignmentHelpers;
 
 function ColumnsEditContainer( {
 	attributes,
@@ -91,7 +94,7 @@ function ColumnsEditContainer( {
 	columnCount,
 	isSelected,
 	onDeleteBlock,
-	innerColumns,
+	innerWidths,
 	updateInnerColumnWidth,
 	editorSidebarOpened,
 } ) {
@@ -103,10 +106,19 @@ function ColumnsEditContainer( {
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
 
+	const units = useCustomUnits( {
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
+	} );
+
 	useEffect( () => {
 		if ( columnCount === 0 ) {
 			const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
-
 			updateColumns( columnCount, newColumnCount );
 		}
 	}, [] );
@@ -120,16 +132,9 @@ function ColumnsEditContainer( {
 	}, [ width, columnCount ] );
 
 	const renderAppender = () => {
-		const isEqualWidth = width === screenWidth;
-
 		if ( isSelected ) {
 			return (
-				<View
-					style={
-						( isWider( screenWidth, 'mobile' ) || isEqualWidth ) &&
-						styles.columnAppender
-					}
-				>
+				<View style={ isFullWidth( align ) && styles.columnAppender }>
 					<InnerBlocks.ButtonBlockAppender
 						onAddBlock={ onAddBlock }
 					/>
@@ -145,10 +150,10 @@ function ColumnsEditContainer( {
 				columnsInRow,
 				width,
 				columnCount,
-				innerColumns,
+				innerWidths,
 				globalStyles
 			),
-		[ width, columnsInRow, columnCount, innerColumns, globalStyles ]
+		[ width, columnsInRow, columnCount, innerWidths, globalStyles ]
 	);
 
 	const onAddBlock = useCallback( () => {
@@ -163,7 +168,7 @@ function ColumnsEditContainer( {
 
 	const onChangeUnit = ( nextUnit, index, columnId ) => {
 		const widthWithoutUnit = parseFloat(
-			getWidths( innerColumns )[ index ]
+			getWidths( innerWidths )[ index ]
 		);
 		const widthWithUnit = getWidthWithUnit( widthWithoutUnit, nextUnit );
 
@@ -177,19 +182,20 @@ function ColumnsEditContainer( {
 		onChangeWidth( nextWidth, valueUnit, columnId );
 	};
 
-	const getColumnsSliders = () => {
+	const getColumnsSliders = useMemo( () => {
 		if ( ! editorSidebarOpened || ! isSelected ) {
 			return null;
 		}
 
-		return innerColumns.map( ( column, index ) => {
+		return innerWidths.map( ( column, index ) => {
 			const { valueUnit = '%' } =
 				getValueAndUnit( column.attributes.width ) || {};
 			return (
 				<UnitControl
 					label={ `Column ${ index + 1 }` }
+					settingLabel="Width"
 					key={ `${ column.clientId }-${
-						getWidths( innerColumns ).length
+						getWidths( innerWidths ).length
 					}` }
 					min={ 1 }
 					max={
@@ -198,7 +204,7 @@ function ColumnsEditContainer( {
 							: undefined
 					}
 					decimalNum={ 1 }
-					value={ getWidths( innerColumns )[ index ] }
+					value={ getWidths( innerWidths )[ index ] }
 					onChange={ ( nextWidth ) => {
 						onChange( nextWidth, valueUnit, column.clientId );
 					} }
@@ -209,49 +215,58 @@ function ColumnsEditContainer( {
 						onChangeWidth( nextWidth, valueUnit, column.clientId );
 					} }
 					unit={ valueUnit }
-					units={ CSS_UNITS }
+					units={ units }
 					preview={
 						<ColumnsPreview
-							columnWidths={ getWidths( innerColumns, false ) }
+							columnWidths={ getWidths( innerWidths, false ) }
 							selectedColumnIndex={ index }
 						/>
 					}
 				/>
 			);
 		} );
-	};
+	}, [ editorSidebarOpened, isSelected, innerWidths ] );
+
+	const onChangeColumnsNum = useCallback(
+		( value ) => {
+			updateColumns( columnCount, value );
+		},
+		[ columnCount ]
+	);
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Columns Settings' ) }>
-					<RangeControl
-						label={ __( 'Number of columns' ) }
-						icon={ columns }
-						value={ columnCount }
-						onChange={ ( value ) =>
-							updateColumns( columnCount, value )
-						}
-						min={ MIN_COLUMNS_NUM }
-						max={ columnCount + 1 }
-						type="stepper"
-					/>
-					{ getColumnsSliders() }
-				</PanelBody>
-				<PanelBody>
-					<FooterMessageControl
-						label={ __(
-							'Note: Column layout may vary between themes and screen sizes'
-						) }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<BlockControls>
-				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
-				/>
-			</BlockControls>
+			{ isSelected && (
+				<>
+					<InspectorControls>
+						<PanelBody title={ __( 'Columns Settings' ) }>
+							<RangeControl
+								label={ __( 'Number of columns' ) }
+								icon={ columns }
+								value={ columnCount }
+								onChange={ onChangeColumnsNum }
+								min={ MIN_COLUMNS_NUM }
+								max={ columnCount + 1 }
+								type="stepper"
+							/>
+							{ getColumnsSliders }
+						</PanelBody>
+						<PanelBody>
+							<FooterMessageControl
+								label={ __(
+									'Note: Column layout may vary between themes and screen sizes'
+								) }
+							/>
+						</PanelBody>
+					</InspectorControls>
+					<BlockControls>
+						<BlockVerticalAlignmentToolbar
+							onChange={ updateAlignment }
+							value={ verticalAlignment }
+						/>
+					</BlockControls>
+				</>
+			) }
 			<View style={ isSelected && styles.innerBlocksSelected }>
 				{ resizeListener }
 				{ width && (
@@ -292,8 +307,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateAlignment( verticalAlignment ) {
 			const { clientId, setAttributes } = ownProps;
-			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-			const { getBlockOrder } = registry.select( 'core/block-editor' );
+			const { updateBlockAttributes } = dispatch( blockEditorStore );
+			const { getBlockOrder } = registry.select( blockEditorStore );
 
 			// Update own alignment.
 			setAttributes( { verticalAlignment } );
@@ -307,7 +322,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			} );
 		},
 		updateInnerColumnWidth( value, columnId ) {
-			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
+			const { updateBlockAttributes } = dispatch( blockEditorStore );
 
 			updateBlockAttributes( columnId, {
 				width: value,
@@ -315,7 +330,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 		},
 		updateBlockSettings( settings ) {
 			const { clientId } = ownProps;
-			const { updateBlockListSettings } = dispatch( 'core/block-editor' );
+			const { updateBlockListSettings } = dispatch( blockEditorStore );
 			updateBlockListSettings( clientId, settings );
 		},
 		/**
@@ -327,9 +342,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+			const { replaceInnerBlocks } = dispatch( blockEditorStore );
 			const { getBlocks, getBlockAttributes } = registry.select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			let innerBlocks = getBlocks( clientId );
@@ -359,7 +374,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 					...getMappedColumnWidths( innerBlocks, widths ),
 					...times( newColumns - previousColumns, () => {
 						return createBlock( 'core/column', {
-							width: newColumnWidth,
+							width: `${ newColumnWidth }%`,
 							verticalAlignment,
 						} );
 					} ),
@@ -396,10 +411,10 @@ const ColumnsEditContainerWrapper = withDispatch(
 		onAddNextColumn: () => {
 			const { clientId } = ownProps;
 			const { replaceInnerBlocks, selectBlock } = dispatch(
-				'core/block-editor'
+				blockEditorStore
 			);
 			const { getBlocks, getBlockAttributes } = registry.select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			// Get verticalAlignment from Columns block to set the same to new Column
@@ -420,18 +435,18 @@ const ColumnsEditContainerWrapper = withDispatch(
 		},
 		onDeleteBlock: () => {
 			const { clientId } = ownProps;
-			const { removeBlock } = dispatch( 'core/block-editor' );
+			const { removeBlock } = dispatch( blockEditorStore );
 			removeBlock( clientId );
 		},
 	} )
-)( ColumnsEditContainer );
+)( memo( ColumnsEditContainer ) );
 
 const ColumnsEdit = ( props ) => {
-	const { clientId, isSelected } = props;
+	const { clientId, isSelected, style } = props;
 	const {
 		columnCount,
 		isDefaultColumns,
-		innerColumns = [],
+		innerWidths = [],
 		hasParents,
 		parentBlockAlignment,
 		editorSidebarOpened,
@@ -439,30 +454,43 @@ const ColumnsEdit = ( props ) => {
 		( select ) => {
 			const {
 				getBlockCount,
-				getBlock,
+				getBlocks,
 				getBlockParents,
 				getBlockAttributes,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const { isEditorSidebarOpened } = select( 'core/edit-post' );
-			const block = getBlock( clientId );
-			const innerBlocks = block?.innerBlocks;
+			const innerBlocks = getBlocks( clientId );
+
 			const isContentEmpty = map(
 				innerBlocks,
 				( innerBlock ) => innerBlock.innerBlocks.length
 			);
+
+			const innerColumnsWidths = innerBlocks.map( ( inn ) => ( {
+				clientId: inn.clientId,
+				attributes: { width: inn.attributes.width },
+			} ) );
 			const parents = getBlockParents( clientId, true );
 
 			return {
 				columnCount: getBlockCount( clientId ),
 				isDefaultColumns: ! compact( isContentEmpty ).length,
-				innerColumns: innerBlocks,
+				innerWidths: innerColumnsWidths,
 				hasParents: !! parents.length,
 				parentBlockAlignment: getBlockAttributes( parents[ 0 ] )?.align,
-				editorSidebarOpened: isEditorSidebarOpened(),
+				editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			};
 		},
-		[ clientId ]
+		[ clientId, isSelected ]
 	);
+
+	const memoizedInnerWidths = useMemo( () => {
+		return innerWidths;
+	}, [
+		// The JSON.stringify is used because innerWidth is always a new reference.
+		// The innerBlocks is a new reference after each attribute change of any nested block.
+		JSON.stringify( innerWidths ),
+	] );
 
 	const [ isVisible, setIsVisible ] = useState( false );
 
@@ -472,11 +500,15 @@ const ColumnsEdit = ( props ) => {
 		}
 	}, [] );
 
+	const onClose = useCallback( () => {
+		setIsVisible( false );
+	}, [] );
+
 	return (
-		<>
+		<View style={ style }>
 			<ColumnsEditContainerWrapper
 				columnCount={ columnCount }
-				innerColumns={ innerColumns }
+				innerWidths={ memoizedInnerWidths }
 				hasParents={ hasParents }
 				parentBlockAlignment={ parentBlockAlignment }
 				editorSidebarOpened={ editorSidebarOpened }
@@ -484,11 +516,11 @@ const ColumnsEdit = ( props ) => {
 			/>
 			<BlockVariationPicker
 				variations={ variations }
-				onClose={ () => setIsVisible( false ) }
+				onClose={ onClose }
 				clientId={ clientId }
 				isVisible={ isVisible }
 			/>
-		</>
+		</View>
 	);
 };
 

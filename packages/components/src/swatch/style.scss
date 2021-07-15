@@ -1,0 +1,21 @@
+.components-swatch {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	color: transparent;
+	background: transparent;
+
+	// Regular border doesn't seem to work in the toolbar button, but pseudo-selector border does.
+	&::after {
+		content: "";
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: $border-width solid rgba(0, 0, 0, 0.2);
+		border-radius: 50%;
+	}
+}
+
+.components-button.has-icon.has-text .components-swatch {
+	margin-right: $grid-unit;
+}

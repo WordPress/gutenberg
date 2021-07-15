@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { omit, without, mapValues, isObject } from 'lodash';
-import memize from 'memize';
+import { without, mapValues, isObject } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
+import { STORE_NAME } from './store/name';
 
 /** @typedef {import('./types').WPDataStore} WPDataStore */
 
@@ -62,9 +62,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Subscribe to changes to any data.
 	 *
-	 * @param {Function}   listener Listener function.
+	 * @param {Function} listener Listener function.
 	 *
-	 * @return {Function}           Unsubscribe function.
+	 * @return {Function} Unsubscribe function.
 	 */
 	const subscribe = ( listener ) => {
 		listeners.push( listener );
@@ -102,47 +102,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return result;
 	}
 
-	const getResolveSelectors = memize(
-		( selectors ) => {
-			return mapValues(
-				omit( selectors, [
-					'getIsResolving',
-					'hasStartedResolution',
-					'hasFinishedResolution',
-					'isResolving',
-					'getCachedResolvers',
-				] ),
-				( selector, selectorName ) => {
-					return ( ...args ) => {
-						return new Promise( ( resolve ) => {
-							const hasFinished = () =>
-								selectors.hasFinishedResolution(
-									selectorName,
-									args
-								);
-							const getResult = () =>
-								selector.apply( null, args );
-
-							// trigger the selector (to trigger the resolver)
-							const result = getResult();
-							if ( hasFinished() ) {
-								return resolve( result );
-							}
-
-							const unsubscribe = subscribe( () => {
-								if ( hasFinished() ) {
-									unsubscribe();
-									resolve( getResult() );
-								}
-							} );
-						} );
-					};
-				}
-			);
-		},
-		{ maxSize: 1 }
-	);
-
 	/**
 	 * Given the name of a registered store, returns an object containing the store's
 	 * selectors pre-bound to state so that you only need to supply additional arguments,
@@ -154,8 +113,17 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function __experimentalResolveSelect( storeNameOrDefinition ) {
-		return getResolveSelectors( select( storeNameOrDefinition ) );
+	function resolveSelect( storeNameOrDefinition ) {
+		const storeName = isObject( storeNameOrDefinition )
+			? storeNameOrDefinition.name
+			: storeNameOrDefinition;
+		__experimentalListeningStores.add( storeName );
+		const store = stores[ storeName ];
+		if ( store ) {
+			return store.getResolveSelectors();
+		}
+
+		return parent && parent.resolveSelect( storeName );
 	}
 
 	/**
@@ -251,7 +219,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		namespaces: stores, // TODO: Deprecate/remove this.
 		subscribe,
 		select,
-		__experimentalResolveSelect,
+		resolveSelect,
 		dispatch,
 		use,
 		register,
@@ -262,8 +230,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a standard `@wordpress/data` store.
 	 *
-	 * @param {string} storeName  Unique namespace identifier.
-	 * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
+	 * @param {string} storeName Unique namespace identifier.
+	 * @param {Object} options   Store description (reducer, actions, selectors, resolvers).
 	 *
 	 * @return {Object} Registered store object.
 	 */
@@ -292,7 +260,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return registry;
 	}
 
-	registerGenericStore( 'core/data', createCoreDataStore( registry ) );
+	registerGenericStore( STORE_NAME, createCoreDataStore( registry ) );
 
 	Object.entries( storeConfigs ).forEach( ( [ name, config ] ) =>
 		registry.registerStore( name, config )

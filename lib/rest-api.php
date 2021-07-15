@@ -10,6 +10,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+
+/**
+ * Registers the REST API routes for URL Details.
+ *
+ * @since 5.0.0
+ */
+function gutenberg_register_url_details_routes() {
+	$url_details_controller = new WP_REST_URL_Details_Controller();
+	$url_details_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_url_details_routes' );
+
+/**
+ * Registers the block pattern directory.
+ */
+function gutenberg_register_rest_pattern_directory() {
+	$block_directory_controller = new WP_REST_Pattern_Directory_Controller();
+	$block_directory_controller->register_routes();
+}
+add_filter( 'rest_api_init', 'gutenberg_register_rest_pattern_directory' );
+
 /**
  * Registers the menu locations area REST API routes.
  */
@@ -35,21 +56,22 @@ function gutenberg_register_sidebars_and_widgets_endpoint() {
 	$sidebars = new WP_REST_Sidebars_Controller();
 	$sidebars->register_routes();
 
-	$widget_types = new WP_REST_Widget_Types_Controller();
-	$widget_types->register_routes();
 	$widgets = new WP_REST_Widgets_Controller();
 	$widgets->register_routes();
+
+	$widget_types = new WP_REST_Widget_Types_Controller();
+	$widget_types->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
 
 /**
- * Registers the Batch REST API routes.
+ * Registers the Block editor settings REST API routes.
  */
-function gutenberg_register_batch_endpoint() {
-	$batch = new WP_REST_Batch_Controller();
-	$batch->register_routes();
+function gutenberg_register_block_editor_settings() {
+	$editor_settings = new WP_REST_Block_Editor_Settings_Controller();
+	$editor_settings->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
+add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
@@ -163,30 +185,42 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
 
 /**
- * Registers the post format search handler.
+ * Filters WP_User_Query arguments when querying users via the REST API.
  *
- * @param string $search_handlers     Title list of current handlers.
+ * Allow using the has_published_post argument.
  *
- * @return array Title updated list of handlers.
+ * @param array           $prepared_args Array of arguments for WP_User_Query.
+ * @param WP_REST_Request $request       The REST API request.
+ *
+ * @return array Returns modified $prepared_args.
  */
-function gutenberg_post_format_search_handler( $search_handlers ) {
-	if ( current_theme_supports( 'post-formats' ) ) {
-		$search_handlers[] = new WP_REST_Post_Format_Search_Handler();
+function gutenberg_rest_user_query_has_published_posts( $prepared_args, $request ) {
+	if ( ! empty( $request['has_published_posts'] ) ) {
+		$prepared_args['has_published_posts'] = ( true === $request['has_published_posts'] )
+			? get_post_types( array( 'show_in_rest' => true ), 'names' )
+			: (array) $request['has_published_posts'];
 	}
-
-	return $search_handlers;
+	return $prepared_args;
 }
-add_filter( 'wp_rest_search_handlers', 'gutenberg_post_format_search_handler', 10, 5 );
+add_filter( 'rest_user_query', 'gutenberg_rest_user_query_has_published_posts', 10, 2 );
+
 
 /**
- * Registers the terms search handler.
+ * Filters REST API collection parameters for the users controller.
  *
- * @param string $search_handlers Title list of current handlers.
+ * @param array $query_params JSON Schema-formatted collection parameters.
  *
- * @return array Title updated list of handlers.
+ * @return array Returns the $query_params with "has_published_posts".
  */
-function gutenberg_term_search_handler( $search_handlers ) {
-	$search_handlers[] = new WP_REST_Term_Search_Handler();
-	return $search_handlers;
+function gutenberg_rest_user_collection_params_has_published_posts( $query_params ) {
+	$query_params['has_published_posts'] = array(
+		'description' => __( 'Limit result set to users who have published posts.', 'gutenberg' ),
+		'type'        => array( 'boolean', 'array' ),
+		'items'       => array(
+			'type' => 'string',
+			'enum' => get_post_types( array( 'show_in_rest' => true ), 'names' ),
+		),
+	);
+	return $query_params;
 }
-add_filter( 'wp_rest_search_handlers', 'gutenberg_term_search_handler', 10, 5 );
+add_filter( 'rest_user_collection_params', 'gutenberg_rest_user_collection_params_has_published_posts' );

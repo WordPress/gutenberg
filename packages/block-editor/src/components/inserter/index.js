@@ -21,6 +21,7 @@ import { plus } from '@wordpress/icons';
  */
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
+import { store as blockEditorStore } from '../../store';
 
 const defaultRenderToggle = ( {
 	onToggle,
@@ -131,7 +132,6 @@ class Inserter extends Component {
 			clientId,
 			isAppender,
 			showInserterHelpPanel,
-			__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 
 			// This prop is experimental to give some time for the quick inserter to mature
 			// Feel free to make them stable after a few releases.
@@ -141,23 +141,25 @@ class Inserter extends Component {
 		if ( isQuick ) {
 			return (
 				<QuickInserter
-					onSelect={ onClose }
+					onSelect={ () => {
+						onClose();
+					} }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
-					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			);
 		}
 
 		return (
 			<InserterMenu
-				onSelect={ onClose }
+				onSelect={ () => {
+					onClose();
+				} }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }
 				showInserterHelpPanel={ showInserterHelpPanel }
-				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 			/>
 		);
 	}
@@ -168,6 +170,7 @@ class Inserter extends Component {
 			hasSingleBlockType,
 			insertOnlyAllowedBlock,
 			__experimentalIsQuick: isQuick,
+			onSelectOrClose,
 		} = this.props;
 
 		if ( hasSingleBlockType ) {
@@ -187,6 +190,7 @@ class Inserter extends Component {
 				headerTitle={ __( 'Add a block' ) }
 				renderToggle={ this.renderToggle }
 				renderContent={ this.renderContent }
+				onClose={ onSelectOrClose }
 			/>
 		);
 	}
@@ -198,7 +202,7 @@ export default compose( [
 			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const { getBlockVariations } = select( blocksStore );
 
 		rootClientId =
@@ -228,11 +232,13 @@ export default compose( [
 	withDispatch( ( dispatch, ownProps, { select } ) => {
 		return {
 			insertOnlyAllowedBlock() {
-				const { rootClientId, clientId, isAppender } = ownProps;
 				const {
+					rootClientId,
+					clientId,
+					isAppender,
 					hasSingleBlockType,
 					allowedBlockType,
-					__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+					onSelectOrClose,
 				} = ownProps;
 
 				if ( ! hasSingleBlockType ) {
@@ -244,7 +250,8 @@ export default compose( [
 						getBlockIndex,
 						getBlockSelectionEnd,
 						getBlockOrder,
-					} = select( 'core/block-editor' );
+						getBlockRootClientId,
+					} = select( blockEditorStore );
 
 					// If the clientId is defined, we insert at the position of the block.
 					if ( clientId ) {
@@ -253,7 +260,11 @@ export default compose( [
 
 					// If there a selected block, we insert after the selected block.
 					const end = getBlockSelectionEnd();
-					if ( ! isAppender && end ) {
+					if (
+						! isAppender &&
+						end &&
+						getBlockRootClientId( end ) === rootClientId
+					) {
 						return getBlockIndex( end, rootClientId ) + 1;
 					}
 
@@ -261,25 +272,22 @@ export default compose( [
 					return getBlockOrder( rootClientId ).length;
 				}
 
-				const { insertBlock } = dispatch( 'core/block-editor' );
+				const { insertBlock } = dispatch( blockEditorStore );
 
 				const blockToInsert = createBlock( allowedBlockType.name );
 
-				insertBlock(
-					blockToInsert,
-					getInsertionIndex(),
-					rootClientId,
-					selectBlockOnInsert
-				);
+				insertBlock( blockToInsert, getInsertionIndex(), rootClientId );
 
-				if ( ! selectBlockOnInsert ) {
-					const message = sprintf(
-						// translators: %s: the name of the block that has been added
-						__( '%s block added' ),
-						allowedBlockType.title
-					);
-					speak( message );
+				if ( onSelectOrClose ) {
+					onSelectOrClose();
 				}
+
+				const message = sprintf(
+					// translators: %s: the name of the block that has been added
+					__( '%s block added' ),
+					allowedBlockType.title
+				);
+				speak( message );
 			},
 		};
 	} ),

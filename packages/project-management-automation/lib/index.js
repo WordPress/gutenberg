@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { setFailed, getInput } = require( '@actions/core' );
-const { context, GitHub } = require( '@actions/github' );
+const { getOctokit, context } = require( '@actions/github' );
 
 /**
  * Internal dependencies
@@ -13,12 +13,10 @@ const firstTimeContributorLabel = require( './tasks/first-time-contributor-label
 const addMilestone = require( './tasks/add-milestone' );
 const debug = require( './debug' );
 
-/** @typedef {import('@actions/github').GitHub} GitHub */
-
 /**
  * Automation task function.
  *
- * @typedef {(payload:any,octokit:GitHub)=>void} WPAutomationTask
+ * @typedef {( payload: any, octokit: ReturnType<getOctokit> ) => void} WPAutomationTask
  */
 
 /**
@@ -63,7 +61,7 @@ const automations = [
 		return;
 	}
 
-	const octokit = new GitHub( token );
+	const octokit = getOctokit( token );
 
 	debug(
 		`main: Received event = '${ context.eventName }', action = '${ context.payload.action }'`

@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
@@ -19,7 +19,7 @@ import {
 	ToolbarGroup,
 	PanelBody,
 } from '@wordpress/components';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { withPreferredColorScheme, compose } from '@wordpress/compose';
 import {
 	BlockCaption,
 	MediaPlaceholder,
@@ -30,11 +30,13 @@ import {
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { video as SvgIcon, replace } from '@wordpress/icons';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -49,7 +51,7 @@ const ICON_TYPE = {
 	UPLOAD: 'upload',
 };
 
-class VideoEdit extends React.Component {
+class VideoEdit extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -189,7 +191,12 @@ class VideoEdit extends React.Component {
 	}
 
 	render() {
-		const { setAttributes, attributes, isSelected } = this.props;
+		const {
+			setAttributes,
+			attributes,
+			isSelected,
+			wasBlockJustInserted,
+		} = this.props;
 		const { id, src } = attributes;
 		const { videoContainerHeight } = this.state;
 
@@ -221,6 +228,9 @@ class VideoEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
+						autoOpenMediaUpload={
+							isSelected && wasBlockJustInserted
+						}
 					/>
 				</View>
 			);
@@ -236,14 +246,16 @@ class VideoEdit extends React.Component {
 					{ ! this.state.isCaptionSelected && (
 						<BlockControls>{ toolbarEditButton }</BlockControls>
 					) }
-					<InspectorControls>
-						<PanelBody title={ __( 'Video settings' ) }>
-							<VideoCommonSettings
-								setAttributes={ setAttributes }
-								attributes={ attributes }
-							/>
-						</PanelBody>
-					</InspectorControls>
+					{ isSelected && (
+						<InspectorControls>
+							<PanelBody title={ __( 'Video settings' ) }>
+								<VideoCommonSettings
+									setAttributes={ setAttributes }
+									attributes={ attributes }
+								/>
+							</PanelBody>
+						</InspectorControls>
+					) }
 					<MediaUploadProgress
 						mediaId={ id }
 						onFinishMediaUploadWithSuccess={
@@ -359,4 +371,12 @@ class VideoEdit extends React.Component {
 	}
 }
 
-export default withPreferredColorScheme( VideoEdit );
+export default compose( [
+	withSelect( ( select, { clientId } ) => ( {
+		wasBlockJustInserted: select( blockEditorStore ).wasBlockJustInserted(
+			clientId,
+			'inserter_menu'
+		),
+	} ) ),
+	withPreferredColorScheme,
+] )( VideoEdit );

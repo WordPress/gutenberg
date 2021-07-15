@@ -18,6 +18,7 @@ import { useSelect } from '@wordpress/data';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function CategoriesEdit( {
 	attributes: { displayAsDropdown, showHierarchy, showPostCounts },
@@ -25,12 +26,11 @@ export default function CategoriesEdit( {
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 	const { categories, isRequesting } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( 'core' );
-		const { isResolving } = select( 'core/data' );
-		const query = { per_page: -1, hide_empty: true };
+		const { getEntityRecords, isResolving } = select( coreStore );
+		const query = { per_page: -1, hide_empty: true, context: 'view' };
 		return {
 			categories: getEntityRecords( 'taxonomy', 'category', query ),
-			isRequesting: isResolving( 'core', 'getEntityRecords', [
+			isRequesting: isResolving( 'getEntityRecords', [
 				'taxonomy',
 				'category',
 				query,
@@ -150,7 +150,15 @@ export default function CategoriesEdit( {
 					<Spinner />
 				</Placeholder>
 			) }
+			{ ! isRequesting && categories?.length === 0 && (
+				<p>
+					{ __(
+						'Your site does not have any posts, so there is nothing to display here at the moment.'
+					) }
+				</p>
+			) }
 			{ ! isRequesting &&
+				categories?.length > 0 &&
 				( displayAsDropdown
 					? renderCategoryDropdown()
 					: renderCategoryList() ) }

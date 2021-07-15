@@ -171,7 +171,9 @@ describe( 'adding blocks from block directory', () => {
 				document.querySelector( '.block-editor-inserter__main-area' )
 					.innerHTML
 		);
-		expect( selectorContent ).toContain( 'has-no-results' );
+		expect( selectorContent ).toContain(
+			'block-editor-inserter__no-results'
+		);
 	} );
 
 	it( 'Should be able to add (the first) block.', async () => {

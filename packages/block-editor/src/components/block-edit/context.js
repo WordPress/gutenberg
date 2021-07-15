@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createContext, useContext } from '@wordpress/element';
@@ -11,8 +6,6 @@ import { createContext, useContext } from '@wordpress/element';
 const Context = createContext( {
 	name: '',
 	isSelected: false,
-	focusedElement: null,
-	setFocusedElement: noop,
 	clientId: null,
 } );
 const { Provider } = Context;

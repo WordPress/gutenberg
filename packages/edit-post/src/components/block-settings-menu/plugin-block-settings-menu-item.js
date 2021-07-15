@@ -21,7 +21,7 @@ const isEverySelectedBlockAllowed = ( selected, allowed ) =>
  * is of one allowed type (not necessarily the same).
  *
  * @param {string[]} selectedBlocks Array containing the names of the blocks selected
- * @param {string[]} allowedBlocks Array containing the names of the blocks allowed
+ * @param {string[]} allowedBlocks  Array containing the names of the blocks allowed
  * @return {boolean} Whether the item will be rendered or not.
  */
 const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
@@ -40,7 +40,6 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * @param {string}                [props.role]          The ARIA role for the menu item.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -64,7 +63,6 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';

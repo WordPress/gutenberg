@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
-import { flowRight, get, mapValues } from 'lodash';
+import { flowRight, get, mapValues, omit } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
 import EquivalentKeyMap from 'equivalent-key-map';
 
@@ -17,6 +17,7 @@ import createReduxRoutineMiddleware from '@wordpress/redux-routine';
 import { builtinControls } from '../controls';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
+import createThunkMiddleware from './thunk-middleware';
 import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
@@ -69,10 +70,10 @@ function createResolversCache() {
  * } );
  * ```
  *
- * @param {string}                 key      Unique namespace identifier.
- * @param {WPDataReduxStoreConfig} options  Registered store options, with properties
- *                                          describing reducer, actions, selectors,
- *                                          and resolvers.
+ * @param {string}                 key     Unique namespace identifier.
+ * @param {WPDataReduxStoreConfig} options Registered store options, with properties
+ *                                         describing reducer, actions, selectors,
+ *                                         and resolvers.
  *
  * @return {WPDataStore} Store Object.
  */
@@ -81,7 +82,32 @@ export default function createReduxStore( key, options ) {
 		name: key,
 		instantiate: ( registry ) => {
 			const reducer = options.reducer;
-			const store = instantiateReduxStore( key, options, registry );
+			const thunkArgs = {
+				registry,
+				get dispatch() {
+					return Object.assign(
+						( action ) => store.dispatch( action ),
+						getActions()
+					);
+				},
+				get select() {
+					return Object.assign(
+						( selector ) =>
+							selector( store.__unstableOriginalGetState() ),
+						getSelectors()
+					);
+				},
+				get resolveSelect() {
+					return getResolveSelectors();
+				},
+			};
+
+			const store = instantiateReduxStore(
+				key,
+				options,
+				registry,
+				thunkArgs
+			);
 			const resolversCache = createResolversCache();
 
 			let resolvers;
@@ -92,6 +118,7 @@ export default function createReduxStore( key, options ) {
 				},
 				store
 			);
+
 			let selectors = mapSelectors(
 				{
 					...mapValues(
@@ -121,8 +148,11 @@ export default function createReduxStore( key, options ) {
 				selectors = result.selectors;
 			}
 
+			const resolveSelectors = mapResolveSelectors( selectors, store );
+
 			const getSelectors = () => selectors;
 			const getActions = () => actions;
+			const getResolveSelectors = () => resolveSelectors;
 
 			// We have some modules monkey-patching the store object
 			// It's wrong to do so but until we refactor all of our effects to controls
@@ -156,6 +186,7 @@ export default function createReduxStore( key, options ) {
 				selectors,
 				resolvers,
 				getSelectors,
+				getResolveSelectors,
 				getActions,
 				subscribe,
 			};
@@ -166,15 +197,15 @@ export default function createReduxStore( key, options ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string}         key      Unique namespace identifier.
- * @param {Object}         options  Registered store options, with properties
- *                                  describing reducer, actions, selectors,
- *                                  and resolvers.
- * @param {WPDataRegistry} registry Registry reference.
- *
+ * @param {string}         key       Unique namespace identifier.
+ * @param {Object}         options   Registered store options, with properties
+ *                                   describing reducer, actions, selectors,
+ *                                   and resolvers.
+ * @param {WPDataRegistry} registry  Registry reference.
+ * @param {Object}         thunkArgs Argument object for the thunk middleware.
  * @return {Object} Newly created redux store.
  */
-function instantiateReduxStore( key, options, registry ) {
+function instantiateReduxStore( key, options, registry, thunkArgs ) {
 	const controls = {
 		...options.controls,
 		...builtinControls,
@@ -189,6 +220,10 @@ function instantiateReduxStore( key, options, registry ) {
 		promise,
 		createReduxRoutineMiddleware( normalizedControls ),
 	];
+
+	if ( options.__experimentalUseThunks ) {
+		middlewares.push( createThunkMiddleware( thunkArgs ) );
+	}
 
 	const enhancers = [ applyMiddleware( ...middlewares ) ];
 	if (
@@ -254,9 +289,10 @@ function mapSelectors( selectors, store ) {
 /**
  * Maps actions to dispatch from a given store.
  *
- * @param {Object} actions    Actions to register.
- * @param {Object} store      The redux store to which the actions should be mapped.
- * @return {Object}           Actions mapped to the redux store provided.
+ * @param {Object} actions Actions to register.
+ * @param {Object} store   The redux store to which the actions should be mapped.
+ *
+ * @return {Object} Actions mapped to the redux store provided.
  */
 function mapActions( actions, store ) {
 	const createBoundAction = ( action ) => ( ...args ) => {
@@ -264,6 +300,45 @@ function mapActions( actions, store ) {
 	};
 
 	return mapValues( actions, createBoundAction );
+}
+
+/**
+ * Maps selectors to functions that return a resolution promise for them
+ *
+ * @param {Object} selectors Selectors to map.
+ * @param {Object} store     The redux store the selectors select from.
+ *
+ * @return {Object} Selectors mapped to their resolution functions.
+ */
+function mapResolveSelectors( selectors, store ) {
+	return mapValues(
+		omit( selectors, [
+			'getIsResolving',
+			'hasStartedResolution',
+			'hasFinishedResolution',
+			'isResolving',
+			'getCachedResolvers',
+		] ),
+		( selector, selectorName ) => ( ...args ) =>
+			new Promise( ( resolve ) => {
+				const hasFinished = () =>
+					selectors.hasFinishedResolution( selectorName, args );
+				const getResult = () => selector.apply( null, args );
+
+				// trigger the selector (to trigger the resolver)
+				const result = getResult();
+				if ( hasFinished() ) {
+					return resolve( result );
+				}
+
+				const unsubscribe = store.subscribe( () => {
+					if ( hasFinished() ) {
+						unsubscribe();
+						resolve( getResult() );
+					}
+				} );
+			} )
+	);
 }
 
 /**
@@ -359,7 +434,7 @@ function mapResolvers( resolvers, selectors, store, resolversCache ) {
  * @param {Object} store        Store reference, for fulfilling via resolvers
  * @param {Object} resolvers    Store Resolvers
  * @param {string} selectorName Selector name to fulfill.
- * @param {Array} args          Selector Arguments.
+ * @param {Array}  args         Selector Arguments.
  */
 async function fulfillResolver( store, resolvers, selectorName, ...args ) {
 	const resolver = get( resolvers, [ selectorName ] );

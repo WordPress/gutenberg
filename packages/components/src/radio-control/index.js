@@ -20,7 +20,9 @@ export default function RadioControl( {
 	selected,
 	help,
 	onChange,
+	hideLabelFromVision,
 	options = [],
+	...props
 } ) {
 	const instanceId = useInstanceId( RadioControl );
 	const id = `inspector-radio-control-${ instanceId }`;
@@ -31,6 +33,7 @@ export default function RadioControl( {
 			<BaseControl
 				label={ label }
 				id={ id }
+				hideLabelFromVision={ hideLabelFromVision }
 				help={ help }
 				className={ classnames(
 					className,
@@ -53,6 +56,7 @@ export default function RadioControl( {
 							aria-describedby={
 								!! help ? `${ id }__help` : undefined
 							}
+							{ ...props }
 						/>
 						<label htmlFor={ `${ id }-${ index }` }>
 							{ option.label }

@@ -2,6 +2,18 @@
  * Internal dependencies
  */
 import { removeNonDigit, toFixed } from '../';
+import { alignmentHelpers } from '../alignments.native.js';
+
+/**
+ * WordPress dependencies
+ */
+import {
+	getBlockTypes,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
+
+const { isContainerRelated } = alignmentHelpers;
 
 describe( 'removeNonDigit', () => {
 	it( 'function returns empty string if passed text does not contain digit characters', () => {
@@ -44,5 +56,69 @@ describe( 'toFixed', () => {
 	it( 'function returns number without decimals if `decimalNum` is negative', () => {
 		const result = toFixed( '12.34', -12 );
 		expect( result ).toBe( 12 );
+	} );
+} );
+
+describe( 'isContainerRelated', () => {
+	const currentlySupportedBlocks = [
+		'core/group',
+		'core/columns',
+		'core/column',
+		'core/buttons',
+		'core/button',
+	];
+
+	beforeAll( () => {
+		const registerCoreBlocks = require( '@wordpress/block-library' )
+			.registerCoreBlocks;
+		registerCoreBlocks();
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( blockname ) => {
+			unregisterBlockType( blockname.name );
+		} );
+	} );
+
+	it( 'function returns True for currently supported block types', () => {
+		currentlySupportedBlocks.forEach( ( blockName ) => {
+			const result = isContainerRelated( blockName );
+			expect( result ).toBe( true );
+		} );
+	} );
+
+	it( 'function returns false for currently NOT supported Blocks types', () => {
+		getBlockTypes().forEach( ( blockType ) => {
+			if ( currentlySupportedBlocks.includes( blockType.name ) ) {
+				return;
+			}
+			const result = isContainerRelated( blockType.name );
+			expect( result ).toBe( false );
+		} );
+	} );
+
+	it( 'function return true from no core blocks if they meet the criteria', () => {
+		registerBlockType( 'foo/bar', {
+			title: 'Foo block',
+			attributes: {},
+			supports: {
+				align: [ 'full' ],
+			},
+		} );
+
+		const resultFoo = isContainerRelated( 'foo/bar' );
+		expect( resultFoo ).toBe( true );
+
+		registerBlockType( 'foo/bar-sup', {
+			title: 'bar block',
+			attributes: {},
+			parent: [ 'foo/bar' ],
+		} );
+
+		const resultBar = isContainerRelated( 'foo/bar-sup' );
+		expect( resultBar ).toBe( true );
+
+		unregisterBlockType( 'foo/bar' );
+		unregisterBlockType( 'foo/bar-sup' );
 	} );
 } );

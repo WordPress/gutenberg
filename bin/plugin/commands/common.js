@@ -66,19 +66,17 @@ async function runCleanLocalFoldersStep( folders, abortMessage ) {
  * @return {string} Name of the release branch.
  */
 function findReleaseBranchName( packageJsonPath ) {
-	const masterPackageJson = readJSONFile( packageJsonPath );
-	const masterParsedVersion = semver.parse( masterPackageJson.version );
+	const mainPackageJson = readJSONFile( packageJsonPath );
+	const mainParsedVersion = semver.parse( mainPackageJson.version );
 
-	return (
-		'release/' + masterParsedVersion.major + '.' + masterParsedVersion.minor
-	);
+	return 'release/' + mainParsedVersion.major + '.' + mainParsedVersion.minor;
 }
 
 /**
  * Calculates version bump for the packages based on the content
  * from the provided CHANGELOG file split into individual lines.
  *
- * @param {string[]} lines                                 Changelog content split into lines.
+ * @param {string[]}                  lines                Changelog content split into lines.
  * @param {('patch'|'minor'|'major')} [minimumVersionBump] Minimum version bump for the package.
  *                                                         Defaults to `patch`.
  *
@@ -118,6 +116,7 @@ function calculateVersionBumpFromChangelog(
 		if (
 			lineNormalized.startsWith( '### deprecation' ) ||
 			lineNormalized.startsWith( '### enhancement' ) ||
+			lineNormalized.startsWith( '### new api' ) ||
 			lineNormalized.startsWith( '### new feature' )
 		) {
 			versionBump = 'minor';

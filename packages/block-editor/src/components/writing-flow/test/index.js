@@ -6,7 +6,7 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { isNavigationCandidate } from '../';
+import { isNavigationCandidate } from '../use-arrow-nav';
 
 describe( 'isNavigationCandidate', () => {
 	let elements;

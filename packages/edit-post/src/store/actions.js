@@ -11,6 +11,10 @@ import { apiFetch } from '@wordpress/data-controls';
 import { store as interfaceStore } from '@wordpress/interface';
 import { controls, dispatch, select, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -170,7 +174,7 @@ export function* switchEditorMode( mode ) {
 
 	// Unselect blocks when we switch to the code editor.
 	if ( mode !== 'visual' ) {
-		yield controls.dispatch( 'core/block-editor', 'clearSelectedBlock' );
+		yield controls.dispatch( blockEditorStore.name, 'clearSelectedBlock' );
 	}
 
 	const message =
@@ -271,16 +275,19 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 	};
 
 	const postType = yield controls.select(
-		'core/editor',
+		editorStore.name,
 		'getCurrentPostType'
 	);
 	if ( window.postboxes.page !== postType ) {
 		window.postboxes.add_postbox_toggles( postType );
 	}
 
-	let wasSavingPost = yield controls.select( 'core/editor', 'isSavingPost' );
+	let wasSavingPost = yield controls.select(
+		editorStore.name,
+		'isSavingPost'
+	);
 	let wasAutosavingPost = yield controls.select(
-		'core/editor',
+		editorStore.name,
 		'isAutosavingPost'
 	);
 
@@ -300,8 +307,8 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 
 	// Save metaboxes when performing a full save on the post.
 	saveMetaboxUnsubscribe = subscribe( () => {
-		const isSavingPost = select( 'core/editor' ).isSavingPost();
-		const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+		const isSavingPost = select( editorStore.name ).isSavingPost();
+		const isAutosavingPost = select( editorStore.name ).isAutosavingPost();
 
 		// Save metaboxes on save completion, except for autosaves that are not a post preview.
 		const shouldTriggerMetaboxesSave =
@@ -337,7 +344,7 @@ export function* requestMetaBoxUpdates() {
 
 	// Additional data needed for backward compatibility.
 	// If we do not provide this data, the post will be overridden with the default values.
-	const post = yield controls.select( 'core/editor', 'getCurrentPost' );
+	const post = yield controls.select( editorStore.name, 'getCurrentPost' );
 	const additionalData = [
 		post.comment_status ? [ 'comment_status', post.comment_status ] : false,
 		post.ping_status ? [ 'ping_status', post.ping_status ] : false,
@@ -376,24 +383,39 @@ export function* requestMetaBoxUpdates() {
 		formData.append( key, value )
 	);
 
-	// Save the metaboxes
-	yield apiFetch( {
-		url: window._wpMetaBoxUrl,
-		method: 'POST',
-		body: formData,
-		parse: false,
-	} );
-	yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
+	try {
+		// Save the metaboxes
+		yield apiFetch( {
+			url: window._wpMetaBoxUrl,
+			method: 'POST',
+			body: formData,
+			parse: false,
+		} );
+		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
+	} catch {
+		yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesFailure' );
+	}
 }
 
 /**
- * Returns an action object used signal a successful meta box update.
+ * Returns an action object used to signal a successful meta box update.
  *
  * @return {Object} Action object.
  */
 export function metaBoxUpdatesSuccess() {
 	return {
 		type: 'META_BOX_UPDATES_SUCCESS',
+	};
+}
+
+/**
+ * Returns an action object used to signal a failed meta box update.
+ *
+ * @return {Object} Action object.
+ */
+export function metaBoxUpdatesFailure() {
+	return {
+		type: 'META_BOX_UPDATES_FAILURE',
 	};
 }
 
@@ -414,13 +436,32 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
 /**
  * Returns an action object used to open/close the inserter.
  *
- * @param {boolean} value A boolean representing whether the inserter should be opened or closed.
+ * @param {boolean|Object} value                Whether the inserter should be
+ *                                              opened (true) or closed (false).
+ *                                              To specify an insertion point,
+ *                                              use an object.
+ * @param {string}         value.rootClientId   The root client ID to insert at.
+ * @param {number}         value.insertionIndex The index to insert at.
+ *
  * @return {Object} Action object.
  */
 export function setIsInserterOpened( value ) {
 	return {
 		type: 'SET_IS_INSERTER_OPENED',
 		value,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the list view.
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsListViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
 	};
 }
 
@@ -435,4 +476,55 @@ export function setIsEditingTemplate( value ) {
 		type: 'SET_IS_EDITING_TEMPLATE',
 		value,
 	};
+}
+
+/**
+ * Potentially create a block based template and switches to the template mode.
+ *
+ * @param {Object?} template template to create and assign before switching.
+ */
+export function* __unstableSwitchToTemplateMode( template ) {
+	if ( !! template ) {
+		const savedTemplate = yield controls.dispatch(
+			coreStore,
+			'saveEntityRecord',
+			'postType',
+			'wp_template',
+			template
+		);
+		const post = yield controls.select(
+			editorStore.name,
+			'getCurrentPost'
+		);
+
+		yield controls.dispatch(
+			coreStore,
+			'editEntityRecord',
+			'postType',
+			post.type,
+			post.id,
+			{
+				template: savedTemplate.slug,
+			}
+		);
+	}
+
+	yield setIsEditingTemplate( true );
+
+	const isWelcomeGuideActive = yield controls.select(
+		editPostStore.name,
+		'isFeatureActive',
+		'welcomeGuideTemplate'
+	);
+
+	if ( ! isWelcomeGuideActive ) {
+		const message = !! template
+			? __( "Custom template created. You're in template mode now." )
+			: __(
+					'Editing template. Changes made here affect all posts and pages that use the template.'
+			  );
+		yield controls.dispatch( noticesStore, 'createSuccessNotice', message, {
+			type: 'snackbar',
+		} );
+	}
 }

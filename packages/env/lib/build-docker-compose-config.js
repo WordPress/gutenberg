@@ -9,6 +9,7 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const { hasSameCoreSource } = require( './wordpress' );
+const { dbEnv } = require( './config' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -18,9 +19,9 @@ const { hasSameCoreSource } = require( './wordpress' );
 /**
  * Gets the volume mounts for an individual service.
  *
- * @param {WPServiceConfig} config The service config to get the mounts from.
- * @param {string} wordpressDefault The default internal path for the WordPress
- *                                  source code (such as tests-wordpress).
+ * @param {WPServiceConfig} config           The service config to get the mounts from.
+ * @param {string}          wordpressDefault The default internal path for the WordPress
+ *                                           source code (such as tests-wordpress).
  *
  * @return {string[]} An array of volumes to mount in string format.
  */
@@ -164,6 +165,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 	// https://github.com/docker-library/wordpress/issues/256
 	const cliUser = '33:33';
 
+	// If the user mounted their own uploads folder, we should not override it in the phpunit service.
+	const isMappingTestUploads = testsMounts.some( ( mount ) =>
+		mount.endsWith( ':/var/www/html/wp-content/uploads' )
+	);
+
 	return {
 		version: '3.7',
 		services: {
@@ -171,9 +177,21 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'mariadb',
 				ports: [ '3306' ],
 				environment: {
-					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
+					MYSQL_ROOT_PASSWORD:
+						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
+					MYSQL_DATABASE: dbEnv.development.WORDPRESS_DB_NAME,
 				},
 				volumes: [ 'mysql:/var/lib/mysql' ],
+			},
+			'tests-mysql': {
+				image: 'mariadb',
+				ports: [ '3306' ],
+				environment: {
+					MYSQL_ROOT_PASSWORD:
+						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
+					MYSQL_DATABASE: dbEnv.tests.WORDPRESS_DB_NAME,
+				},
+				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
 			wordpress: {
 				build: '.',
@@ -181,16 +199,18 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: developmentWpImage,
 				ports: [ developmentPorts ],
 				environment: {
-					WORDPRESS_DB_NAME: 'wordpress',
+					...dbEnv.credentials,
+					...dbEnv.development,
 				},
 				volumes: developmentMounts,
 			},
 			'tests-wordpress': {
-				depends_on: [ 'mysql' ],
+				depends_on: [ 'tests-mysql' ],
 				image: testsWpImage,
 				ports: [ testsPorts ],
 				environment: {
-					WORDPRESS_DB_NAME: 'tests-wordpress',
+					...dbEnv.credentials,
+					...dbEnv.tests,
 				},
 				volumes: testsMounts,
 			},
@@ -199,12 +219,20 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: developmentWpCliImage,
 				volumes: developmentMounts,
 				user: cliUser,
+				environment: {
+					...dbEnv.credentials,
+					...dbEnv.development,
+				},
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
 				image: testsWpCliImage,
 				volumes: testsMounts,
 				user: cliUser,
+				environment: {
+					...dbEnv.credentials,
+					...dbEnv.tests,
+				},
 			},
 			composer: {
 				image: 'composer',
@@ -215,19 +243,24 @@ module.exports = function buildDockerComposeConfig( config ) {
 				depends_on: [ 'tests-wordpress' ],
 				volumes: [
 					...testsMounts,
-					'phpunit-uploads:/var/www/html/wp-content/uploads',
+					...( ! isMappingTestUploads
+						? [ 'phpunit-uploads:/var/www/html/wp-content/uploads' ]
+						: [] ),
 				],
 				environment: {
 					LOCAL_DIR: 'html',
 					WP_PHPUNIT__TESTS_CONFIG:
 						'/var/www/html/phpunit-wp-config.php',
+					...dbEnv.credentials,
+					...dbEnv.tests,
 				},
 			},
 		},
 		volumes: {
-			...( ! config.coreSource && { wordpress: {} } ),
-			...( ! config.coreSource && { 'tests-wordpress': {} } ),
+			...( ! config.env.development.coreSource && { wordpress: {} } ),
+			...( ! config.env.tests.coreSource && { 'tests-wordpress': {} } ),
 			mysql: {},
+			'mysql-test': {},
 			'phpunit-uploads': {},
 		},
 	};

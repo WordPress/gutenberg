@@ -116,6 +116,16 @@ export function getShortcutAliases( state, name ) {
 		: EMPTY_ARRAY;
 }
 
+export const getAllShortcutKeyCombinations = createSelector(
+	( state, name ) => {
+		return compact( [
+			getShortcutKeyCombination( state, name ),
+			...getShortcutAliases( state, name ),
+		] );
+	},
+	( state, name ) => [ state[ name ] ]
+);
+
 /**
  * Returns the raw representation of all the keyboard combinations of a given shortcut name.
  *
@@ -126,15 +136,12 @@ export function getShortcutAliases( state, name ) {
  */
 export const getAllShortcutRawKeyCombinations = createSelector(
 	( state, name ) => {
-		return compact( [
-			getKeyCombinationRepresentation(
-				getShortcutKeyCombination( state, name ),
-				'raw'
-			),
-			...getShortcutAliases( state, name ).map( ( combination ) =>
-				getKeyCombinationRepresentation( combination, 'raw' )
-			),
-		] );
+		return getAllShortcutKeyCombinations(
+			state,
+			name
+		).map( ( combination ) =>
+			getKeyCombinationRepresentation( combination, 'raw' )
+		);
 	},
 	( state, name ) => [ state[ name ] ]
 );

@@ -15,15 +15,20 @@
 /packages/block-library/src/gallery             @mkevins
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
-/packages/block-library/src/image               @ajlende
+
+# Duotone
+/lib/block-supports/duotone.php                       @ajlende
+/packages/block-editor/src/components/duotone-control @ajlende
+/packages/block-editor/src/hooks/duotone.js           @ajlende
+/packages/components/src/duotone-picker               @ajlende
 
 # Editor
-/packages/annotations                           @atimmer @ellatrix
+/packages/annotations                           @atimmer
 /packages/autop
 /packages/block-editor                          @ellatrix
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
-/packages/blocks                                @ellatrix
+/packages/blocks
 /packages/edit-post
 /packages/editor
 /packages/list-reusable-blocks
@@ -37,7 +42,7 @@
 /packages/edit-widgets                          @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
 
 # Navigation
-/packages/edit-navigation                       @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
+/packages/edit-navigation                       @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726 @getdave
 
 # Full Site Editing
 /packages/edit-site
@@ -46,25 +51,27 @@
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra @nosolosw
 /docs/tool                                      @chrisvanpatten @ajitbohra @nosolosw
-/packages/babel-plugin-import-jsx-pragma        @gziolo @ntwb @nerrad @ajitbohra
+/packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
-/packages/browserslist-config                   @gziolo @ntwb @nerrad @ajitbohra
+/packages/browserslist-config                   @ntwb @nerrad @ajitbohra
 /packages/create-block                          @gziolo @mkaz
+/packages/create-block-tutorial-template        @gziolo
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
+/packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/docgen                                @nosolosw
-/packages/e2e-test-utils                        @gziolo @ntwb @nerrad @ajitbohra
+/packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @ntwb @nerrad @ajitbohra
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-puppeteer-axe                    @gziolo @ntwb @nerrad @ajitbohra
-/packages/library-export-default-webpack-plugin @gziolo @ntwb @nerrad @ajitbohra
+/packages/library-export-default-webpack-plugin @ntwb @nerrad @ajitbohra
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
-/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra
-/packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/prettier-config                       @ntwb @gziolo
+/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra
+/packages/stylelint-config                      @ntwb
 
 # UI Components
 /packages/components                            @ajitbohra @jaymanpandya @chrisvanpatten
@@ -88,7 +95,7 @@
 /packages/html-entities
 /packages/i18n                                  @swissspidy
 /packages/is-shallow-equal
-/packages/keycodes                              @ellatrix
+/packages/keycodes
 /packages/priority-queue
 /packages/token-list
 /packages/url
@@ -97,7 +104,7 @@
 /packages/keyboard-shortcuts
 
 # Extensibility
-/packages/hooks                                 @gziolo @adamsilverstein
+/packages/hooks                                 @adamsilverstein
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
@@ -106,7 +113,7 @@
 /packages/block-editor/src/components/rich-text @ellatrix @cameronvoell @guarani
 
 # Project Management
-/.github                                        @mapk @karmatosed
+/.github
 /packages/project-management-automation
 
 # wp-env
@@ -116,9 +123,14 @@
 /lib                                            @timothybjacobs @spacedmonkey
 /lib/global-styles.php                          @timothybjabocs @spacedmonkey @nosolosw
 /lib/experimental-default-theme.json            @timothybjabocs @spacedmonkey @nosolosw
-/lib/class-wp-theme-json.php                    @timothybjabocs @spacedmonkey @nosolosw
-/lib/class-wp-theme-json-resolver.php           @timothybjabocs @spacedmonkey @nosolosw
+/lib/class-wp-theme-json-gutenberg.php          @timothybjabocs @spacedmonkey @nosolosw
+/lib/class-wp-theme-json-resolver-gutenberg.php @timothybjabocs @spacedmonkey @nosolosw
 /phpunit/class-wp-theme-json-test.php           @nosolosw
+
+# Web App
+/packages/admin-manifest                        @ellatrix
+/lib/pwa.php                                    @ellatrix
+/lib/service-worker.js                          @ellatrix
 
 # Native (Unowned)
 *.native.js                                     @ghost

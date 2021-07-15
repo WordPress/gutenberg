@@ -8,7 +8,12 @@ import { dropRight, get, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl, Notice } from '@wordpress/components';
+import {
+	Notice,
+	PanelBody,
+	RangeControl,
+	ToggleControl,
+} from '@wordpress/components';
 
 import {
 	InspectorControls,
@@ -17,6 +22,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -48,16 +54,17 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
+	setAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { isStackedOnMobile, verticalAlignment } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
 			return {
-				count: select( 'core/block-editor' ).getBlockCount( clientId ),
+				count: select( blockEditorStore ).getBlockCount( clientId ),
 			};
 		},
 		[ clientId ]
@@ -65,6 +72,7 @@ function ColumnsEditContainer( {
 
 	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -100,6 +108,15 @@ function ColumnsEditContainer( {
 							) }
 						</Notice>
 					) }
+					<ToggleControl
+						label={ __( 'Stack on mobile' ) }
+						checked={ isStackedOnMobile }
+						onChange={ () =>
+							setAttributes( {
+								isStackedOnMobile: ! isStackedOnMobile,
+							} )
+						}
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
@@ -118,8 +135,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateAlignment( verticalAlignment ) {
 			const { clientId, setAttributes } = ownProps;
-			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
-			const { getBlockOrder } = registry.select( 'core/block-editor' );
+			const { updateBlockAttributes } = dispatch( blockEditorStore );
+			const { getBlockOrder } = registry.select( blockEditorStore );
 
 			// Update own alignment.
 			setAttributes( { verticalAlignment } );
@@ -142,8 +159,8 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
-			const { getBlocks } = registry.select( 'core/block-editor' );
+			const { replaceInnerBlocks } = dispatch( blockEditorStore );
+			const { getBlocks } = registry.select( blockEditorStore );
 
 			let innerBlocks = getBlocks( clientId );
 			const hasExplicitWidths = hasExplicitPercentColumnWidths(
@@ -169,7 +186,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 					...getMappedColumnWidths( innerBlocks, widths ),
 					...times( newColumns - previousColumns, () => {
 						return createBlock( 'core/column', {
-							width: newColumnWidth,
+							width: `${ newColumnWidth }%`,
 						} );
 					} ),
 				];
@@ -220,7 +237,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 		},
 		[ name ]
 	);
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
 
 	return (
@@ -253,7 +270,7 @@ const ColumnsEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
 		( select ) =>
-			select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
+			select( blockEditorStore ).getBlocks( clientId ).length > 0,
 		[ clientId ]
 	);
 	const Component = hasInnerBlocks

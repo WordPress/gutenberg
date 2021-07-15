@@ -15,6 +15,7 @@ import { startsWith } from 'lodash';
  */
 import isURLLike from './is-url-like';
 import { CREATE_TYPE } from './constants';
+import { store as blockEditorStore } from '../../store';
 
 export const handleNoop = () => Promise.resolve( [] );
 
@@ -109,7 +110,7 @@ export default function useSearchHandler(
 	withURLSuggestion
 ) {
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return {
 			fetchSearchSuggestions: getSettings()
 				.__experimentalFetchLinkSuggestions,

@@ -43,6 +43,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
+import im.shimo.react.prompt.RNPromptPackage;
+
 public class MainApplication extends Application implements ReactApplication, GutenbergBridgeInterface {
 
     private static final String TAG = "MainApplication";
@@ -79,11 +81,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         break;
                     case VIDEO:
                         rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
+                        break;
                     case ANY:
                     case OTHER:
                         rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
                         break;
-
+                    case AUDIO:
+                        rnMediaList.add(new Media(5, "https://cldup.com/59IrU0WJtq.mp3", "audio", "Summer presto", ""));
+                        break;
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
             }
@@ -107,6 +112,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void requestImageUploadCancel(int mediaId) {
+            }
+
+            @Override
+            public void setFeaturedImage(int mediaId) {
             }
 
             @Override
@@ -146,7 +155,12 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void logUserEvent(GutenbergUserEvent gutenbergUserEvent, ReadableMap eventProperties) {
+            public void setFocalPointPickerTooltipShown(boolean tooltipShown) {
+            }
+
+            @Override
+            public void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback) {
+                focalPointPickerTooltipShownCallback.onRequestFocalPointPickerTooltipShown(false);
             }
 
             @Override
@@ -168,7 +182,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void performRequest(String path, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
+            public void performRequest(String path, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
 
             @Override
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
@@ -192,7 +206,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void requestMediaFilesEditorLoad(
-                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {
@@ -215,8 +228,21 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void mediaFilesBlockReplaceSync(
+                    ReadableArray mediaFiles,
+                    String blockId
+            ) {
+                Toast.makeText(MainApplication.this, "mediaFilesBlockReplaceSync called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void gutenbergDidSendButtonPressedAction(String buttonType) {
 
+            }
+
+            @Override
+            public void requestPreview() {
+                Toast.makeText(MainApplication.this, "requestPreview called", Toast.LENGTH_SHORT).show();
             }
 
         }, isDarkMode());
@@ -243,6 +269,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new ReanimatedPackage(),
                         new SafeAreaContextPackage(),
                         new RNScreensPackage(),
+                        new RNPromptPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 
@@ -294,6 +321,13 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void onOptionSelected() {
                 mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
+            }
+        });
+
+        devSupportManager.addCustomDevOption("Help", new DevOptionHandler() {
+            @Override
+            public void onOptionSelected() {
+                mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
             }
         });
     }

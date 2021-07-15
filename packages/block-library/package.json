@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.27.1",
+	"version": "3.2.12",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"blocks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-library/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,15 +18,21 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"sideEffects": [
 		"build-style/**",
-		"src/**/*.scss"
+		"src/**/*.scss",
+		"src/navigation-link/index.js",
+		"src/template-part/index.js",
+		"src/query/index.js"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
@@ -40,10 +46,10 @@
 		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
-		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
@@ -55,13 +61,14 @@
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
-		"classnames": "^2.2.5",
+		"classnames": "^2.3.1",
 		"fast-average-color": "4.3.0",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
+		"micromodal": "^0.4.6",
 		"moment": "^2.22.1",
 		"react-easy-crop": "^3.0.0",
-		"tinycolor2": "^1.4.1"
+		"tinycolor2": "^1.4.2"
 	},
 	"publishConfig": {
 		"access": "public"

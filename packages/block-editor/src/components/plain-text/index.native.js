@@ -21,7 +21,11 @@ export default class PlainText extends Component {
 
 	componentDidMount() {
 		// if isSelected is true, we should request the focus on this TextInput
-		if ( this._input.isFocused() === false && this.props.isSelected ) {
+		if (
+			this._input &&
+			this._input.isFocused() === false &&
+			this.props.isSelected
+		) {
 			if ( this.isAndroid ) {
 				/*
 				 * There seems to be an issue in React Native where the keyboard doesn't show if called shortly after rendering.
@@ -51,6 +55,10 @@ export default class PlainText extends Component {
 
 	focus() {
 		this._input.focus();
+	}
+
+	blur() {
+		this._input.blur();
 	}
 
 	render() {

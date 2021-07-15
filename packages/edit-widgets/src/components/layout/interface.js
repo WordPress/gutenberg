@@ -9,9 +9,9 @@ import {
 import { close } from '@wordpress/icons';
 import {
 	__experimentalLibrary as Library,
-	__unstableUseEditorStyles as useEditorStyles,
+	BlockBreadcrumb,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	InterfaceSkeleton,
@@ -19,6 +19,7 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -35,6 +36,8 @@ const interfaceLabels = {
 	body: __( 'Widgets and blocks' ),
 	/* translators: accessibility text for the widgets screen settings landmark region. */
 	sidebar: __( 'Widgets settings' ),
+	/* translators: accessibility text for the widgets screen footer landmark region. */
+	footer: __( 'Widgets footer' ),
 };
 
 function Interface( { blockEditorSettings } ) {
@@ -45,15 +48,34 @@ function Interface( { blockEditorSettings } ) {
 	);
 	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
 
-	const { hasSidebarEnabled, isInserterOpened } = useSelect( ( select ) => ( {
-		hasSidebarEnabled: !! select(
-			interfaceStore
-		).getActiveComplementaryArea( editWidgetsStore ),
-		isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
-	} ) );
-	const ref = useRef();
-
-	useEditorStyles( ref, blockEditorSettings.styles );
+	const {
+		hasBlockBreadCrumbsEnabled,
+		hasSidebarEnabled,
+		isInserterOpened,
+		previousShortcut,
+		nextShortcut,
+	} = useSelect(
+		( select ) => ( {
+			hasSidebarEnabled: !! select(
+				interfaceStore
+			).getActiveComplementaryArea( editWidgetsStore.name ),
+			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
+			hasBlockBreadCrumbsEnabled: select(
+				editWidgetsStore
+			).__unstableIsFeatureActive( 'showBlockBreadcrumbs' ),
+			previousShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutRawKeyCombinations(
+				'core/edit-widgets/previous-region'
+			),
+			nextShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutRawKeyCombinations(
+				'core/edit-widgets/next-region'
+			),
+		} ),
+		[]
+	);
 
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
@@ -74,7 +96,6 @@ function Interface( { blockEditorSettings } ) {
 
 	return (
 		<InterfaceSkeleton
-			ref={ ref }
 			labels={ interfaceLabels }
 			header={ <Header /> }
 			secondarySidebar={
@@ -93,11 +114,7 @@ function Interface( { blockEditorSettings } ) {
 						<div className="edit-widgets-layout__inserter-panel-content">
 							<Library
 								showInserterHelpPanel
-								onSelect={ () => {
-									if ( isMobileViewport ) {
-										setIsInserterOpened( false );
-									}
-								} }
+								shouldFocusBlock={ isMobileViewport }
 								rootClientId={ rootClientId }
 								__experimentalInsertionIndex={ insertionIndex }
 							/>
@@ -115,6 +132,18 @@ function Interface( { blockEditorSettings } ) {
 					blockEditorSettings={ blockEditorSettings }
 				/>
 			}
+			footer={
+				hasBlockBreadCrumbsEnabled &&
+				! isMobileViewport && (
+					<div className="edit-widgets-layout__footer">
+						<BlockBreadcrumb rootLabelText={ __( 'Widgets' ) } />
+					</div>
+				)
+			}
+			shortcuts={ {
+				previous: previousShortcut,
+				next: nextShortcut,
+			} }
 		/>
 	);
 }

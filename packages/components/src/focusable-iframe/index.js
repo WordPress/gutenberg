@@ -2,16 +2,16 @@
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
-export default function FocusableIframe( { iframeRef, onFocus, ...props } ) {
+export default function FocusableIframe( { iframeRef, ...props } ) {
 	const fallbackRef = useRef();
-	const ref = iframeRef || fallbackRef;
+	const ref = useMergeRefs( [ iframeRef, fallbackRef ] );
 
 	useEffect( () => {
-		const iframe = ref.current;
+		const iframe = fallbackRef.current;
 		const { ownerDocument } = iframe;
 		const { defaultView } = ownerDocument;
-		const { FocusEvent } = defaultView;
 
 		/**
 		 * Checks whether the iframe is the activeElement, inferring that it has
@@ -22,13 +22,7 @@ export default function FocusableIframe( { iframeRef, onFocus, ...props } ) {
 				return;
 			}
 
-			const focusEvent = new FocusEvent( 'focus', { bubbles: true } );
-
-			iframe.dispatchEvent( focusEvent );
-
-			if ( onFocus ) {
-				onFocus( focusEvent );
-			}
+			iframe.focus();
 		}
 
 		defaultView.addEventListener( 'blur', checkFocus );
@@ -36,7 +30,7 @@ export default function FocusableIframe( { iframeRef, onFocus, ...props } ) {
 		return () => {
 			defaultView.removeEventListener( 'blur', checkFocus );
 		};
-	}, [ onFocus ] );
+	}, [] );
 
 	// Disable reason: The rendered iframe is a pass-through component,
 	// assigning props inherited from the rendering parent. It's the

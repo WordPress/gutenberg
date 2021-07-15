@@ -9,6 +9,11 @@ import classnames from 'classnames';
 import { useSelect } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../../store';
+
+/**
  * Returns the class names used for block moving mode.
  *
  * @param {string} clientId The block client ID to insert above.
@@ -24,7 +29,7 @@ export function useBlockMovingModeClassNames( clientId ) {
 				getBlockName,
 				getBlockRootClientId,
 				isBlockSelected,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			// The classes are only relevant for the selected block. Avoid
 			// re-rendering all blocks!

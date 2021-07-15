@@ -46,10 +46,10 @@ async function testGroupKeyboardNavigation(
 	currentBlockTitle
 ) {
 	await expectLabelToHaveFocus( 'Block: Group' );
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expectLabelToHaveFocus( currentBlockLabel );
 	await pressKeyWithModifier( 'shift', 'Tab' );
-	await expectLabelToHaveFocus( 'Select parent (Group)' );
+	await expectLabelToHaveFocus( 'Select Group' );
 	await page.keyboard.press( 'ArrowRight' );
 	await expectLabelToHaveFocus( currentBlockTitle );
 }
@@ -102,17 +102,15 @@ describe( 'Toolbar roving tabindex', () => {
 		await page.keyboard.press( 'Home' );
 		await expectLabelToHaveFocus( 'Table' );
 		await page.click( '.blocks-table__placeholder-button' );
-		await testBlockToolbarKeyboardNavigation( 'Block: Table', 'Table' );
+		await page.keyboard.press( 'Tab' );
+		await testBlockToolbarKeyboardNavigation( 'Body cell text', 'Table' );
 		await wrapCurrentBlockWithGroup( 'Table' );
 		await testGroupKeyboardNavigation( 'Block: Table', 'Table' );
 	} );
 
 	it( 'ensures custom html block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Custom HTML' );
-		await testBlockToolbarKeyboardNavigation(
-			'Block: Custom HTML',
-			'Custom HTML'
-		);
+		await testBlockToolbarKeyboardNavigation( 'HTML', 'Custom HTML' );
 		await wrapCurrentBlockWithGroup( 'Custom HTML' );
 		await testGroupKeyboardNavigation(
 			'Block: Custom HTML',
@@ -127,6 +125,13 @@ describe( 'Toolbar roving tabindex', () => {
 		await clickBlockToolbarButton( 'Bold' );
 		await page.keyboard.type( 'a' );
 		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expectLabelToHaveFocus( 'Bold' );
+	} );
+
+	it( 'can reach toolbar items with arrow keys after pressing alt+F10', async () => {
+		await pressKeyWithModifier( 'alt', 'F10' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
 		await expectLabelToHaveFocus( 'Bold' );
 	} );
 } );

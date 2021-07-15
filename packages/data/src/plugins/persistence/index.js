@@ -233,15 +233,16 @@ persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
 	const state = persistence.get();
 
 	// Migrate 'insertUsage' from 'core/editor' to 'core/block-editor'
-	const insertUsage = get( state, [
-		'core/editor',
-		'preferences',
-		'insertUsage',
-	] );
-	if ( insertUsage ) {
+	const editorInsertUsage = state[ 'core/editor' ]?.preferences?.insertUsage;
+	if ( editorInsertUsage ) {
+		const blockEditorInsertUsage =
+			state[ 'core/block-editor' ]?.preferences?.insertUsage;
 		persistence.set( 'core/block-editor', {
 			preferences: {
-				insertUsage,
+				insertUsage: {
+					...editorInsertUsage,
+					...blockEditorInsertUsage,
+				},
 			},
 		} );
 	}

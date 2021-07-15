@@ -20,7 +20,8 @@ import BlockList from '../block-list';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
-import { defaultLayout, LayoutProvider } from './layout';
+import { defaultLayout, LayoutProvider } from '../block-list/layout';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -55,7 +56,7 @@ function UncontrolledInnerBlocks( props ) {
 	} = props;
 
 	const block = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
 	) || { innerBlocks: [] };
 
@@ -152,6 +153,6 @@ InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
 ) );
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export default InnerBlocks;

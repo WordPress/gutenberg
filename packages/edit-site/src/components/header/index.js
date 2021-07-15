@@ -1,18 +1,20 @@
 /**
  * WordPress dependencies
  */
+import { useCallback, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
-	BlockNavigationDropdown,
 	ToolSelector,
-	BlockToolbar,
 	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
-import { _x } from '@wordpress/i18n';
-import { plus } from '@wordpress/icons';
+import { _x, __ } from '@wordpress/i18n';
+import { listView, plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -23,69 +25,99 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
+import { store as editSiteStore } from '../../store';
 
-export default function Header( { openEntitiesSavedStates } ) {
+const preventDefault = ( event ) => {
+	event.preventDefault();
+};
+
+export default function Header( {
+	openEntitiesSavedStates,
+	isEntitiesSavedStatesOpen,
+} ) {
+	const inserterButton = useRef();
 	const {
 		deviceType,
 		entityTitle,
-		hasFixedToolbar,
 		template,
 		templateType,
 		isInserterOpen,
+		isListViewOpen,
+		listViewShortcut,
+		isLoaded,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
-			isFeatureActive,
 			getEditedPostType,
 			getEditedPostId,
 			isInserterOpened,
-		} = select( 'core/edit-site' );
-		const { getEntityRecord } = select( 'core' );
+			isListViewOpened,
+		} = select( editSiteStore );
+		const { getEditedEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			'core/editor'
+			editorStore
 		);
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
-		const record = getEntityRecord( 'postType', postType, postId );
+		const record = getEditedEntityRecord( 'postType', postType, postId );
 		const _entityTitle =
 			'wp_template' === postType
 				? getTemplateInfo( record ).title
 				: record?.slug;
+		const _isLoaded = !! postId;
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			entityTitle: _entityTitle,
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			isLoaded: _isLoaded,
 			template: record,
 			templateType: postType,
 			isInserterOpen: isInserterOpened(),
+			isListViewOpen: isListViewOpened(),
+			listViewShortcut: getShortcutRepresentation(
+				'core/edit-site/toggle-list-view'
+			),
 		};
 	}, [] );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
-	} = useDispatch( 'core/edit-site' );
+		setIsListViewOpened,
+	} = useDispatch( editSiteStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const displayBlockToolbar =
-		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
+
+	const openInserter = useCallback( () => {
+		if ( isInserterOpen ) {
+			// Focusing the inserter button closes the inserter popover
+			inserterButton.current.focus();
+		} else {
+			setIsInserterOpened( true );
+		}
+	}, [ isInserterOpen, setIsInserterOpened ] );
+
+	const toggleListView = useCallback(
+		() => setIsListViewOpened( ! isListViewOpen ),
+		[ setIsListViewOpened, isListViewOpen ]
+	);
 
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
 				<div className="edit-site-header__toolbar">
 					<Button
-						isPrimary
+						ref={ inserterButton }
+						variant="primary"
 						isPressed={ isInserterOpen }
 						className="edit-site-header-toolbar__inserter-toggle"
-						onClick={ () =>
-							setIsInserterOpened( ! isInserterOpen )
-						}
+						onMouseDown={ preventDefault }
+						onClick={ openInserter }
 						icon={ plus }
 						label={ _x(
-							'Add block',
+							'Toggle block inserter',
 							'Generic label for block inserter button'
 						) }
 					/>
@@ -94,13 +126,16 @@ export default function Header( { openEntitiesSavedStates } ) {
 							<ToolSelector />
 							<UndoButton />
 							<RedoButton />
-							<BlockNavigationDropdown />
+							<Button
+								className="edit-site-header-toolbar__list-view-toggle"
+								icon={ listView }
+								isPressed={ isListViewOpen }
+								/* translators: button label text should, if possible, be under 16 characters. */
+								label={ __( 'List View' ) }
+								onClick={ toggleListView }
+								shortcut={ listViewShortcut }
+							/>
 						</>
-					) }
-					{ displayBlockToolbar && (
-						<div className="edit-site-header-toolbar__block-toolbar">
-							<BlockToolbar hideDragHandle />
-						</div>
 					) }
 				</div>
 			</div>
@@ -110,6 +145,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 					<DocumentActions
 						entityTitle={ entityTitle }
 						entityLabel="template"
+						isLoaded={ isLoaded }
 					>
 						{ ( { onClose } ) => (
 							<TemplateDetails
@@ -123,6 +159,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 					<DocumentActions
 						entityTitle={ entityTitle }
 						entityLabel="template part"
+						isLoaded={ isLoaded }
 					/>
 				) }
 			</div>
@@ -135,6 +172,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 					/>
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
 					/>
 					<PinnedItems.Slot scope="core/edit-site" />
 					<MoreMenu />

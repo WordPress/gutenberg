@@ -5,6 +5,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { createBlock, getBlockType, parse } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,7 +17,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
 		select( blockDirectoryStore ).isInstalling( block.id )
 	);
 	const { installBlockType } = useDispatch( blockDirectoryStore );
-	const { replaceBlock } = useDispatch( 'core/block-editor' );
+	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	return (
 		<Button
@@ -42,7 +43,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
 			}
 			disabled={ isInstallingBlock }
 			isBusy={ isInstallingBlock }
-			isPrimary
+			variant="primary"
 		>
 			{ sprintf(
 				/* translators: %s: block name */

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalSearchForm as SearchForm } from '@wordpress/block-editor';
+import { SearchControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 /**
@@ -22,14 +22,19 @@ const stopKeyPropagation = ( event ) => event.stopPropagation();
 // Disable reason (no-static-element-interactions): Navigational key-presses within
 // the menu are prevented from triggering WritingFlow and ObserveTyping interactions.
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-export default function TemplatePartSelection( { setAttributes, onClose } ) {
+export default function TemplatePartSelection( {
+	setAttributes,
+	onClose,
+	area,
+	templatePartId = null,
+} ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	return (
 		<div
 			onKeyPress={ stopKeyPropagation }
 			onKeyDown={ preventArrowKeysPropagation }
 		>
-			<SearchForm
+			<SearchControl
 				value={ filterValue }
 				onChange={ setFilterValue }
 				className="wp-block-template-part__selection-preview-search-form"
@@ -39,6 +44,8 @@ export default function TemplatePartSelection( { setAttributes, onClose } ) {
 					setAttributes={ setAttributes }
 					filterValue={ filterValue }
 					onClose={ onClose }
+					area={ area }
+					templatePartId={ templatePartId }
 				/>
 			</div>
 		</div>

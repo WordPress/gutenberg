@@ -6,7 +6,7 @@ import { overEvery, findLast } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 
 /**
@@ -22,18 +22,25 @@ const isTabbableTextField = overEvery( [
 	focus.tabbable.isTabbableIndex,
 ] );
 
-export function useCanvasClickRedirect( ref ) {
-	useEffect( () => {
+export function useCanvasClickRedirect() {
+	return useRefEffect( ( node ) => {
 		function onMouseDown( event ) {
 			// Only handle clicks on the canvas, not the content.
-			if ( event.target !== ref.current ) {
+			if ( event.target !== node ) {
 				return;
 			}
 
-			const focusableNodes = focus.focusable.find( ref.current );
+			const focusableNodes = focus.focusable.find( node );
 			const target = findLast( focusableNodes, isTabbableTextField );
 
 			if ( ! target ) {
+				return;
+			}
+
+			const { bottom } = target.getBoundingClientRect();
+
+			// Ensure the click is below the last block.
+			if ( event.clientY < bottom ) {
 				return;
 			}
 
@@ -41,10 +48,10 @@ export function useCanvasClickRedirect( ref ) {
 			event.preventDefault();
 		}
 
-		ref.current.addEventListener( 'mousedown', onMouseDown );
+		node.addEventListener( 'mousedown', onMouseDown );
 
 		return () => {
-			ref.current.addEventListener( 'mousedown', onMouseDown );
+			node.addEventListener( 'mousedown', onMouseDown );
 		};
 	}, [] );
 }
