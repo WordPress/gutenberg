@@ -171,12 +171,22 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
+		const { attributes } = this.props;
 		if ( ! previousProps.image && this.props.image ) {
-			const { image, attributes } = this.props;
+			const { image } = this.props;
 			const url =
 				getUrlForSlug( image, attributes?.sizeSlug ) ||
 				image.source_url;
 			this.props.setAttributes( { url } );
+		}
+		if (
+			previousProps.clientId !== this.props.clientId ||
+			! previousProps.attributes.url !== ! attributes.url
+		) {
+			this.props.showDuotoneControls(
+				this.props.clientId,
+				!! attributes.url
+			);
 		}
 	}
 
@@ -715,6 +725,9 @@ export default compose( [
 		return {
 			closeSettingsBottomSheet() {
 				dispatch( editPostStore ).closeGeneralSidebar();
+			},
+			showDuotoneControls( ...args ) {
+				dispatch( blockEditorStore ).showDuotoneControls( ...args );
 			},
 		};
 	} ),

@@ -58,6 +58,7 @@ import { store as editPostStore } from '@wordpress/edit-post';
 import styles from './style.scss';
 import {
 	attributesFromMedia,
+	useDuotoneControlVisibility,
 	ALLOWED_MEDIA_TYPES,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
@@ -80,6 +81,7 @@ const INNER_BLOCKS_TEMPLATE = [
 
 const Cover = ( {
 	attributes,
+	clientId,
 	getStylesFromColorScheme,
 	isParentSelected,
 	onFocus,
@@ -102,6 +104,9 @@ const Cover = ( {
 		customOverlayColor,
 		minHeightUnit = 'px',
 	} = attributes;
+
+	useDuotoneControlVisibility( clientId, attributes );
+
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false
 	);

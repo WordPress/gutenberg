@@ -43,7 +43,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { withDispatch, useSelect, useDispatch } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
 
@@ -60,6 +60,7 @@ import {
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
+	useDuotoneControlVisibility,
 } from './shared';
 
 /**
@@ -321,12 +322,7 @@ function CoverEdit( {
 		url,
 	} = attributes;
 
-	// Hide and show duotone controls depending on when it should work.
-	const isDuotoneAvailable = !! url && ! hasParallax && ! isRepeated;
-	const { showDuotoneControls } = useDispatch( blockEditorStore );
-	useEffect( () => {
-		showDuotoneControls( clientId, isDuotoneAvailable );
-	}, [ clientId, isDuotoneAvailable ] );
+	useDuotoneControlVisibility( clientId, attributes );
 
 	const {
 		gradientClass,
