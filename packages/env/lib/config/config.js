@@ -143,7 +143,6 @@ module.exports = async function readConfig( configPath ) {
 
 	// Merge each of the specified environment-level overrides.
 	const allPorts = new Set(); // Keep track of unique ports for validation.
-	const allSSLPorts = new Set(); // Keep track of unique ports for validation.
 	const env = allEnvs.reduce( ( result, environment ) => {
 		result[ environment ] = parseConfig(
 			validateConfig(
@@ -159,19 +158,12 @@ module.exports = async function readConfig( configPath ) {
 			}
 		);
 		allPorts.add( result[ environment ].port );
-		allSSLPorts.add( result[ environment ].ssl );
 		return result;
 	}, {} );
 
 	if ( allPorts.size !== allEnvs.length ) {
 		throw new ValidationError(
 			'Invalid .wp-env.json: Each port value must be unique.'
-		);
-	}
-
-	if ( allSSLPorts.size !== allEnvs.length ) {
-		throw new ValidationError(
-			'Invalid .wp-env.json: Each ssl value must be unique.'
 		);
 	}
 
