@@ -2,7 +2,7 @@
 
 This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
-To release a stable version of the Gutenberg plugin, you need approval from a member of the Gutenberg Core team for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release. You can ping in the [#core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7).
+To release a stable version of the Gutenberg plugin you need to be part of the [Gutenberg development team](/docs/block-editor/contributors/repository-management/#teams). On top of that, you need approval from a member of the Gutenberg Core team for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release. You can ping in the [#core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7).
 
 To release Gutenberg's npm packages, you need to be part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
 
@@ -12,9 +12,9 @@ To release Gutenberg's npm packages, you need to be part of the [WordPress organ
 
 We release a new major version approximately every two weeks. The current and next versions are [tracked in GitHub milestones](https://github.com/WordPress/gutenberg/milestones), along with each version's tagging date (the day when _the release candidate_ is to be tagged).
 
--   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
+-   **On the date of the current milestone**, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new one can be published. On this date, all remaining PRs on the milestone are moved automatically to the next release. Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on. [Preparation of the release post starts here](/docs/block-editor/contributors/code/release/#writing-the-release-notes-and-post) and spans until the final release.
 
--   **One week after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](/docs/block-editor/contributors/testing-overview/#performance-testing) is published.
+-   **One week after the first release candidate**, the stable version is created based on the last release candidate and any necessary regression fixes. Once the stable version is released, the release post is published, including a [performance audit](/docs/block-editor/contributors/testing-overview/#performance-testing).
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
@@ -48,18 +48,22 @@ You should check that folks are able to install the new version from their Dashb
 
 Once released, all that's left to do is writing a release post on [make.wordpress.org/core](https://make.wordpress.org/core/). You can find some tips on that below.
 
-### Writing the Release Notes and Post
+### Documenting the release with the Release Notes and Post
 
-Documenting the release is comprised of the following steps:
-1. Curating the changelog
-2. Selecting the release highlights
-3. Drafting the release post
-4. Running the performance tests
-5. Publishing the post
+<div class="callout callout-info">
+Documenting the release is a group effort between the release manager, Gutenberg core team developers, and designers , comprised of a series of sequential steps that, because of the amount of people involved and the coordination required, need to adhere to a timeline between the RC and stable releases. The release manager will get pinged by a core member to kick-off and coordinate this process.
+</div>
+
+1. Curating the changelog - Wednesday after the RC release to Friday
+2. Selecting the release highlights - Friday to Monday
+3. Drafting the release post - Monday to Wednesday
+4. Running the performance tests - Wednesday right after the stable release
+5. Publishing the post - Wednesday after stable release
 
 #### 1. Curating the changelog
+
 The release notes draft is auto-generated by a script that looks for pull requests for the current milestone, and groups them by pull request label.
-This is intended to be a starting point for release notes; you will still want to manually review and curate the changelog entries. Because the release candidate changelog is reused in the stable release and it can be a time-consuming process, it is recommended to start this process as soon as the milestone is closed and the release candidate is published.
+This is intended to be a starting point for release notes, and manually reviewing and curating the changelog entries is still required. The release candidate changelog is reused in the stable release and greatly helps select the highlights; because depending on the release it can be a very time-consuming process, **it is recommended to start this process as soon as the milestone is closed** and the release candidate is published.
 
 Guidelines for proof-reading include:
 
@@ -71,31 +75,33 @@ Guidelines for proof-reading include:
 -   Remove mobile app pull request entries.
 
 #### 2. Selecting the release highlights
-Once you have cleaned up the changelog, the next step is to choose a few changes to highlight in the release post. These highlights usually focus on new features and enhancements, including performance and accessibility ones, but can also include important API changes or critical bug fixes.
 
-Given the big scope of Gutenberg and the high number of pull requests merged in each milestone, it is not uncommon to overlook impactful changes worth highlighting; it is recommended to make this step a collaborative effort and share your picks with the Gutenberg Core team.
+Once the changelog is cleaned up, the next step is to choose a few changes to highlight in the release post. These highlights usually focus on new features and enhancements, including performance and accessibility ones, but can also include important API changes or critical bug fixes.
+
+Given the big scope of Gutenberg and the high number of pull requests merged in each milestone, it is not uncommon to overlook impactful changes worth highlighting; because of this, this step is a collaborative effort between the release manager, design, and Gutenberg Core team members.
 
 #### 3. Drafting the release post
 
+Because of the nature of the release post content, responsibilities are divided in this step. While the post **can either be drafted by the release manager or delegated to another core member** agreed upon in advance, **visual assets are created by the design team**.
+
 When possible, the highlighted changes in the release post should include an animation (video or GIF) or a static image of them in use. Choosing between an animation or a static image will depend on the best way to showcase each highlight: while animations are better to demonstrate workflows, more direct highlights can be shown with an image; having too many video players adds a layer of friction for users to see the highlight, whereas too many simultaneous animated GIFs can distract and overwhelm the reader.
 
-These visual assets should maintain consistency with previous release posts; using lean, white themes helps in this regard and visually integrate well with the [make.wordpress.org/core](https://make.wordpress.org/core/) blog aesthetics. Including copyrighted material should be avoided, and browser plugins that can be seen in the browser canvas (spell checkers, form fillers, etc.) disabled when capturing the assets. If you would like help creating the visual assets, please ping somebody in the Gutenberg Core team in advance so that it can be planned for.
+These visual assets should maintain consistency with previous release posts; using lean, white themes helps in this regard and visually integrate well with the [make.wordpress.org/core](https://make.wordpress.org/core/) blog aesthetics. Including copyrighted material should be avoided, and browser plugins that can be seen in the browser canvas (spell checkers, form fillers, etc.) disabled when capturing the assets.
 
 #### 4. Running the performance tests
 
-Your post should also include a performance audit at the end, comparing the current Gutenberg release with both the previous one and the latest WordPress major version. There are GitHub worfklows in place to do this comparison as part of the Continuous Integration setup, so the performance audit results can be found at the workflow run generated by the release commit in the [Performance Tests workflows](https://github.com/WordPress/gutenberg/actions/workflows/performance.yml) page, with the job name `Compare performance with current WordPress Core and previous Gutenberg versions`.
+The post should also include a performance audit at the end, comparing the current Gutenberg release with both the previous one and the latest WordPress major version. There are GitHub worfklows in place to do this comparison as part of the Continuous Integration setup, so the performance audit results can be found at the workflow run generated by the release commit in the [Performance Tests workflows](https://github.com/WordPress/gutenberg/actions/workflows/performance.yml) page, with the job name `Compare performance with current WordPress Core and previous Gutenberg versions`.
 
 If the GitHub workflow fails, the performance audit can be executed locally using `bin/plugin/cli.js perf` and passing as parameters the tags to run the performance suite against, such as `bin/plugin/cli.js perf release/x.y release/x.z wp/a.b`.
 
 The performance values usually displayed in the release post are:
-- Post Editor Loading Time (test named `load`)
-- KeyPress Event (test named `typing`)
+
+-   Post Editor Loading Time (test named `load`)
+-   KeyPress Event (test named `typing`)
 
 #### 5. Publishing the post
 
-Compile this to a draft post on [make.wordpress.org/core](https://make.wordpress.org/core/); this post should be published after the actual release. Remember asking for peer review is encouraged by the [make/core posting guidelines](https://make.wordpress.org/core/handbook/best-practices/post-comment-guidelines/#peer-review)!
-
-If you don't have access to [make.wordpress.org/core](https://make.wordpress.org/core/), ping someone on the Gutenberg Core team in the [WordPress #core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7) to publish the post.
+Once the post content is ready, an author already having permissions to post in [make.wordpress.org/core](https://make.wordpress.org/core/) will create a new draft and import the content; this post should be published after the actual release, helping external media to echo and amplify the release news. Remember asking for peer review is encouraged by the [make/core posting guidelines](https://make.wordpress.org/core/handbook/best-practices/post-comment-guidelines/#peer-review)!
 
 ### Creating Release Candidate Patches (done via `git cherry-pick`)
 
@@ -121,7 +127,7 @@ Release types and their schedule:
 -   [Minor WordPress Releases](#minor-wordpress-releases) (`patch` dist tag) – only when bug fixes or security releases need to be backported into WordPress Core.
 -   [Development Releases](#development-releases) (`next` dist tag) – at least every two weeks when the RC version for the Gutenberg plugin is released.
 
-There is also an option to perform [Standalone Package Releases](#standalone-package-releases) at will. It should be reserved only for critical bug fixes or security releases that must be published to _npm_ outside of a regular WordPress release cycle.
+There is also an option to perform [Standalone Bugfix Package Releases](#standalone-bugfix-package-releases) at will. It should be reserved only for critical bug fixes or security releases that must be published to _npm_ outside of a regular WordPress release cycle.
 
 ### Synchronizing WordPress Trunk
 
@@ -172,7 +178,7 @@ Now, the branch is ready to be used to publish the npm packages.
 
 Now, the npm packages should be ready and a patch can be created and committed into the corresponding WordPress SVN branch.
 
-### Standalone Package Releases
+### Standalone Bugfix Package Releases
 
 The following workflow is needed when packages require bug fixes or security releases to be published to _npm_ outside of a regular WordPress release cycle.
 
@@ -216,6 +222,8 @@ Whilst waiting for the GitHub actions build for `wp/trunk`[branch to pass](https
 Check the versions listed in the current `CHANGELOG.md` file, looking through the commit history of a package e.g [@wordpress/scripts](https://github.com/WordPress/gutenberg/commits/HEAD/packages/scripts) and look out for _"chore(release): publish"_ and _"Update changelogs"_ commits to determine recent version bumps, then looking at the commits since the most recent release should aid with discovering what changes have occurred since the last release.
 
 Note: You may discover the current version of each package is not up to date, if so updating the previous released versions would be appreciated.
+
+The good news is that the rest of the process is automated with `./bin/plugin/cli.js npm-bugfix` command. The rest of the section covers all the necessary steps for publishing the packages if you prefer to do it manually.
 
 Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#maintaining-changelogs) documentation and commit the changes:
 

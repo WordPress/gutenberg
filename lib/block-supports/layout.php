@@ -86,17 +86,30 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		1
 	);
 
-	return $content . '<style>' . $style . '</style>';
+	// Ideally styles should be loaded in the head, but blocks may be parsed
+	// after that, so loading in the footer for now.
+	// See https://core.trac.wordpress.org/ticket/53494.
+	add_action(
+		'wp_footer',
+		function () use ( $style ) {
+			echo '<style>' . $style . '</style>';
+		}
+	);
+
+	return $content;
 }
 
-// Register the block support.
-WP_Block_Supports::get_instance()->register(
-	'layout',
-	array(
-		'register_attribute' => 'gutenberg_register_layout_support',
-	)
-);
-add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( ! function_exists( 'wp_render_layout_support_flag' ) ) {
+	// Register the block support.
+	WP_Block_Supports::get_instance()->register(
+		'layout',
+		array(
+			'register_attribute' => 'gutenberg_register_layout_support',
+		)
+	);
+	add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
+}
 
 /**
  * For themes without theme.json file, make sure
@@ -129,4 +142,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	return $updated_content;
 }
 
-add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( ! function_exists( 'wp_restore_group_inner_container' ) ) {
+	add_filter( 'render_block', 'gutenberg_restore_group_inner_container', 10, 2 );
+}

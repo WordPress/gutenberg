@@ -377,12 +377,13 @@ function useAutocomplete( {
 	const activeId = isExpanded
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
+	const hasSelection = record.start !== undefined;
 
 	return {
 		listBoxId,
 		activeId,
 		onKeyDown: handleKeyDown,
-		popover: AutocompleterUI && (
+		popover: hasSelection && AutocompleterUI && (
 			<AutocompleterUI
 				className={ className }
 				filterValue={ filterValue }

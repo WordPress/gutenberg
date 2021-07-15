@@ -240,6 +240,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestSetFocalPointPickerTooltipShown(_ tooltipShown: Bool) {
         print("Gutenberg requested setting tooltip flag")
     }
+
+    func gutenbergDidRequestPreview() {
+        print(#function)
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -296,7 +300,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return ExampleAttachmentDelegate()
     }
 
-    func gutenbergEditorTheme() -> GutenbergEditorTheme? {
+    func gutenbergEditorSettings() -> GutenbergEditorSettings? {
         return nil
     }
 

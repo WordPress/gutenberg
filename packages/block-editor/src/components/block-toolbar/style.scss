@@ -82,10 +82,6 @@
 			width: $button-size-small !important;
 			margin: 0 !important;
 		}
-
-		&:focus::before {
-			right: $grid-unit-05 !important;
-		}
 	}
 
 	// Match the parent selector button.
@@ -157,10 +153,6 @@
 		.block-editor-block-icon {
 			width: 0 !important;
 			height: 0 !important;
-		}
-
-		&:focus::before {
-			right: $grid-unit-05 !important;
 		}
 	}
 
