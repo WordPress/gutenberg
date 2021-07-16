@@ -14,7 +14,7 @@ const variations = [
 		icon: archiveTitle,
 		attributes: {
 			type: 'archive',
-			content: __( 'Archive title' ),
+			content: __( 'Archive' ),
 		},
 		scope: [ 'inserter' ],
 	},
@@ -31,6 +31,17 @@ const variations = [
 				'%total% results found for "%search%"',
 				'search template title'
 			),
+		},
+		scope: [ 'inserter' ],
+	},
+	{
+		name: '404-title',
+		title: __( '404 Title' ),
+		description: __( 'Displays a title in a 404 template.' ),
+		attributes: {
+			type: '404',
+			// translators: Title for search template with dynamic content placeholders.
+			content: __( 'Nothing found' ),
 		},
 		scope: [ 'inserter' ],
 	},

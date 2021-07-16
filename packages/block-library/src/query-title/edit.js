@@ -21,7 +21,7 @@ import { __ } from '@wordpress/i18n';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
-const SUPPORTED_TYPES = [ 'archive', 'search' ];
+const SUPPORTED_TYPES = [ 'archive', 'search', '404' ];
 
 export default function QueryTitleEdit( {
 	attributes: { content, type, level, textAlign },
