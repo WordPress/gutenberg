@@ -1,10 +1,7 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { css, cx } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -13,6 +10,7 @@ import { useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../ui/context';
 import { space, SpaceInput } from '../ui/utils/space';
+import { useCx } from '../utils/hooks/use-cx';
 
 const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
 	typeof o !== 'undefined' && o !== null;
@@ -103,6 +101,8 @@ export function useSpacer(
 		paddingY,
 		...otherProps
 	} = useContextSystem( props, 'Spacer' );
+
+	const cx = useCx();
 
 	const classes = cx(
 		isDefined( marginTop ) &&

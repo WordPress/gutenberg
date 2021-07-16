@@ -11,6 +11,7 @@ export { default as EditorKeyboardShortcutsRegister } from './global-keyboard-sh
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
+export { default as EditorSnackbars } from './editor-snackbars';
 export { default as EntitiesSavedStates } from './entities-saved-states';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as LocalAutosaveMonitor } from './local-autosave-monitor';

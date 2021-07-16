@@ -1,10 +1,7 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { css, cx } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -12,6 +9,7 @@ import { css, cx } from '@emotion/css';
 import { useContextSystem } from '../../ui/context';
 import { useFlexContext } from '../context';
 import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexItemProps, 'div'>} props
@@ -30,6 +28,8 @@ export function useFlexItem( props ) {
 	sx.Base = css( {
 		display: displayProp || contextDisplay,
 	} );
+
+	const cx = useCx();
 
 	const classes = cx(
 		styles.Item,

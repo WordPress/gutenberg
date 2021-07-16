@@ -38,7 +38,6 @@ function UnitControl( {
 	units = CSS_UNITS,
 	unit,
 	getStylesFromColorScheme,
-	decimalNum,
 	...props
 } ) {
 	const pickerRef = useRef();
@@ -105,6 +104,16 @@ function UnitControl( {
 		[ anchorNodeRef?.current ]
 	);
 
+	const getDecimal = ( step ) => {
+		// Return the decimal offset based on the step size.
+		// if step size is 0.1 we expect the offset to be 1.
+		// for example 12 + 0.1 we would expect the see 12.1 (not 12.10 or 12 );
+		// steps are defined in the CSS_UNITS and they vary from unit to unit.
+		const stepToString = step;
+		const splitStep = stepToString.toString().split( '.' );
+		return splitStep[ 1 ] ? splitStep[ 1 ].length : 0;
+	};
+
 	const renderUnitPicker = useCallback( () => {
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
@@ -121,7 +130,7 @@ function UnitControl( {
 				) : null }
 			</View>
 		);
-	}, [ pickerRef, units, onUnitChange, getAnchor ] );
+	}, [ pickerRef, units, onUnitChange, getAnchor, renderUnitButton ] );
 
 	let step = props.step;
 
@@ -133,6 +142,8 @@ function UnitControl( {
 		const activeUnit = units.find( ( option ) => option.value === unit );
 		step = activeUnit?.step ?? 1;
 	}
+
+	const decimalNum = getDecimal( step );
 
 	return (
 		<>
@@ -147,7 +158,7 @@ function UnitControl( {
 					step={ step }
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
-					decimalNum={ unit === 'px' ? 0 : decimalNum }
+					decimalNum={ decimalNum }
 					openUnitPicker={ onPickerPresent }
 					unitLabel={ parseA11yLabelForUnit( unit ) }
 					{ ...props }

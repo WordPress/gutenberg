@@ -10,15 +10,15 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
-.emotion-2 .components-card-body {
+.emotion-1 .components-card-body {
   max-height: 80vh;
 }
 
-.emotion-4 {
+.emotion-3 {
   height: 100%;
 }
 
-.emotion-7 {
+.emotion-5 {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -28,21 +28,21 @@ exports[`props should render correctly 1`] = `
 }
 
 @media only screen and ( min-device-width: 40em ) {
-  .emotion-7::-webkit-scrollbar {
+  .emotion-5::-webkit-scrollbar {
     height: 12px;
     width: 12px;
   }
 
-  .emotion-7::-webkit-scrollbar-track {
+  .emotion-5::-webkit-scrollbar-track {
     background-color: transparent;
   }
 
-  .emotion-7::-webkit-scrollbar-track {
+  .emotion-5::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.04);
     border-radius: 8px;
   }
 
-  .emotion-7::-webkit-scrollbar-thumb {
+  .emotion-5::-webkit-scrollbar-thumb {
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     background-color: rgba(0, 0, 0, 0.2);
@@ -50,22 +50,22 @@ exports[`props should render correctly 1`] = `
     border-radius: 7px;
   }
 
-  .emotion-7:hover::-webkit-scrollbar-thumb {
+  .emotion-5:hover::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.5);
   }
 }
 
-.emotion-7:first-of-type {
+.emotion-5:first-of-type {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-7:last-of-type {
+.emotion-5:last-of-type {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
-.emotion-10 {
+.emotion-7 {
   background: transparent;
   display: block;
   margin: 0!important;
@@ -84,7 +84,7 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
-.emotion-13 {
+.emotion-9 {
   background: transparent;
   display: block;
   margin: 0!important;
@@ -104,12 +104,12 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2 emotion-3"
+  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
   <div
-    class="emotion-4 emotion-5 emotion-3"
+    class="emotion-3 emotion-2"
   >
     <iframe
       aria-hidden="true"
@@ -119,7 +119,7 @@ exports[`props should render correctly 1`] = `
       tabindex="-1"
     />
     <div
-      class="components-scrollable components-card__body components-card-body emotion-7 emotion-5 emotion-3"
+      class="components-scrollable components-card__body components-card-body emotion-5 emotion-2"
       data-wp-c16t="true"
       data-wp-component="CardBody"
     >
@@ -128,13 +128,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="components-elevation emotion-10 emotion-5 emotion-3"
+    class="components-elevation emotion-7 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
   <div
     aria-hidden="true"
-    class="components-elevation emotion-13 emotion-5 emotion-3"
+    class="components-elevation emotion-9 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
@@ -190,7 +190,7 @@ Snapshot Diff:
           tabindex="-1"
         />
 +       <div
-+         class="components-scrollable components-card__body components-card-body css-1x21s5j-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
++         class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
 +         data-wp-c16t="true"
 +         data-wp-component="CardBody"
 +       >
@@ -199,6 +199,6 @@ Snapshot Diff:
       </div>
       <div
         aria-hidden="true"
-        class="components-elevation css-1446wzr-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
+        class="components-elevation css-180mfx7-View-Elevation-sx-Base-elevationClassName em57xhy0"
         data-wp-c16t="true"
 `;

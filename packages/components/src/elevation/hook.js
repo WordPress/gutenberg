@@ -1,10 +1,7 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { css, cx } from '@emotion/css';
+import { css } from '@emotion/react';
 import { isNil } from 'lodash';
 
 /**
@@ -18,6 +15,7 @@ import { useMemo } from '@wordpress/element';
 import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
 import CONFIG from '../utils/config-values';
+import { useCx } from '../utils/hooks/use-cx';
 
 /**
  * @param {number} value
@@ -46,6 +44,8 @@ export function useElevation( props ) {
 		value = 0,
 		...otherProps
 	} = useContextSystem( props, 'Elevation' );
+
+	const cx = useCx();
 
 	const classes = useMemo( () => {
 		/** @type {number | undefined} */

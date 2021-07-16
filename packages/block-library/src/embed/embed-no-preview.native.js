@@ -38,6 +38,10 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 		styles.embed__label,
 		styles[ 'embed__label--dark' ]
 	);
+	const embedIconStyle = usePreferredColorSchemeStyle(
+		styles.embed__icon,
+		styles[ 'embed__icon--dark' ]
+	);
 	const descriptionStyle = usePreferredColorSchemeStyle(
 		styles.embed__description,
 		styles[ 'embed__description--dark' ]
@@ -114,10 +118,10 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 				onPress={ onPressContainer }
 			>
 				<View style={ containerStyle }>
-					<View style={ styles.embed__icon }>{ icon }</View>
+					<Icon icon={ icon } fill={ embedIconStyle.fill } />
 					<Text style={ labelStyle }>{ label }</Text>
 					<Text style={ descriptionStyle }>
-						{ __( 'Inline preview coming soon' ) }
+						{ __( 'Embed previews not yet available' ) }
 					</Text>
 					<Text style={ styles.embed__action }>
 						{ previewButtonText.toUpperCase() }

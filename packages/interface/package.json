@@ -41,7 +41,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/viewport": "file:../viewport",
-		"classnames": "^2.2.5",
+		"classnames": "^2.3.1",
 		"lodash": "^4.17.21"
 	},
 	"publishConfig": {
