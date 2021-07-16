@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	AccessibilityInfo,
-	LayoutAnimation,
-	TouchableHighlight,
-	Platform,
-} from 'react-native';
+import { AccessibilityInfo, TouchableHighlight, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -168,11 +163,6 @@ function InserterMenu( {
 
 	const onChangeSearch = useCallback(
 		( value ) => {
-			if ( ! value ) {
-				LayoutAnimation.configureNext(
-					LayoutAnimation.Presets.easeInEaseOut
-				);
-			}
 			setFilterValue( value );
 		},
 		[ setFilterValue ]
