@@ -32,7 +32,7 @@ describe( 'iframed inline styles', () => {
 		await deactivatePlugin( 'gutenberg-test-iframed-inline-styles' );
 	} );
 
-	it( 'should load inline styles in iframe', async () => {
+	it.skip( 'should load inline styles in iframe', async () => {
 		await insertBlock( 'Iframed Inline Styles' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
