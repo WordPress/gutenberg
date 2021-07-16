@@ -28,7 +28,8 @@ const variations = [
 			type: 'search',
 			// translators: Title for search template with dynamic content placeholders.
 			content: _x(
-				'%total% results found for "%search%"',
+				// '%total% results found for "%search%"',
+				'Search results for "%search%"',
 				'search template title'
 			),
 		},
