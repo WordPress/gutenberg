@@ -26,6 +26,7 @@ public enum Capabilities: String {
     case isAudioBlockMediaUploadEnabled
     case reusableBlock
     case editorOnboarding
+    case firstGutenbergEditorSession
 }
 
 /// Wrapper for single block data
