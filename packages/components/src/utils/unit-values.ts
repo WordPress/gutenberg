@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isNil } from 'lodash';
+
+/**
  * Parses a number and unit from a value.
  *
  * @param  toParse Value to parse
@@ -8,8 +13,7 @@
 export function parseCSSUnitValue(
 	toParse: string | number
 ): [ number | undefined, string | undefined ] {
-	// eslint-disable-next-line eqeqeq
-	if ( toParse == null ) {
+	if ( isNil( toParse ) ) {
 		return [ undefined, undefined ];
 	}
 
@@ -26,8 +30,7 @@ export function parseCSSUnitValue(
 	}
 	const [ , unitMatch ] = matched;
 
-	// eslint-disable-next-line eqeqeq
-	const unit = unitMatch != null ? unitMatch : '';
+	const unit = ! isNil( unitMatch ) ? unitMatch : '';
 
 	return [ num, unit ];
 }
