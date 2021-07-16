@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 /**
@@ -16,7 +16,7 @@ import { chevronRight } from '@wordpress/icons';
  */
 import styles from './style.scss';
 
-const HelpTopicRow = ( { label, icon } ) => {
+const HelpTopicRow = ( { label, icon, view } ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
 
@@ -51,7 +51,7 @@ const HelpTopicRow = ( { label, icon } ) => {
 				leftButtonOnPress={ goBack }
 			/>
 			<View style={ styles.separator } />
-			<Text>Amanda Todo</Text>
+			{ view }
 		</BottomSheet.SubSheet>
 	);
 };
