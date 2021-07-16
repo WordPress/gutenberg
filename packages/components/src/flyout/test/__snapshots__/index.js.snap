@@ -19,6 +19,7 @@ exports[`props should render correctly 1`] = `
 }
 
 .emotion-5 {
+  box-sizing: border-box;
   height: auto;
   max-height: 100%;
   padding: calc(4px * 4) calc(4px * 6);
@@ -159,7 +160,7 @@ Snapshot Diff:
           tabindex="-1"
         />
 +       <div
-+         class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
++         class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
 +         data-wp-c16t="true"
 +         data-wp-component="CardBody"
 +       >
