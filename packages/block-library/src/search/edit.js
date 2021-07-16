@@ -25,7 +25,8 @@ import {
 	BaseControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useResizeObserver } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -45,6 +46,8 @@ import {
 	PX_WIDTH_DEFAULT,
 	MIN_WIDTH,
 	MIN_WIDTH_UNIT,
+	getAlignedStyles,
+	hasAlignedWidth,
 } from './utils.js';
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
@@ -71,6 +74,7 @@ export default function SearchEdit( {
 		style,
 	} = attributes;
 
+	const [ resizeListener ] = useResizeObserver();
 	const borderRadius = style?.border?.radius;
 	const borderProps = useBorderProps( attributes );
 
@@ -369,12 +373,31 @@ export default function SearchEdit( {
 		return undefined;
 	};
 
+	// If aligned left/right, the block will be floated. When floated a wrapper
+	// element is added around the search block. This would make the search
+	// block's percentage width only a fraction of the wrapper which will not
+	// have an appropriate width when floated.
+	//
+	// A ref is used here to be able to determine the available width and
+	// calculate the styles to add to the block to correct the floating issue.
+	const searchRef = useRef();
+	const alignedStyles = getAlignedStyles( searchRef.current, attributes );
+
+	// If setting width on block to overcome the floated block make the
+	// resizable box fill the floated block.
+	const innerWidth = hasAlignedWidth( attributes )
+		? '100%'
+		: `${ width }${ widthUnit }`;
+
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
+		style: alignedStyles,
+		ref: searchRef,
 	} );
 
 	return (
 		<div { ...blockProps }>
+			{ resizeListener }
 			{ controls }
 
 			{ showLabel && (
@@ -389,9 +412,7 @@ export default function SearchEdit( {
 			) }
 
 			<ResizableBox
-				size={ {
-					width: `${ width }${ widthUnit }`,
-				} }
+				size={ { width: innerWidth } }
 				className="wp-block-search__inside-wrapper"
 				style={ getWrapperStyles() }
 				minWidth={ MIN_WIDTH }
