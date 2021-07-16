@@ -26,6 +26,7 @@ const chalk = require( 'chalk' );
  * Internal dependencies
  */
 const { readConfig, getPuppeteer } = require( './config' );
+const { startScreencast } = require( './screencast' );
 
 const handleError = ( error ) => {
 	// To match the same behavior in jest-jasmine2:
@@ -44,6 +45,8 @@ const KEYS = {
 
 const root = process.env.GITHUB_WORKSPACE || process.cwd();
 const ARTIFACTS_PATH = path.join( root, 'artifacts' );
+const CAPTURE_SCREENCASTS = process.env.CAPTURE_SCREENCASTS !== 'false';
+const screencasts = new Map();
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
@@ -199,11 +202,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 		}
 	}
 
-	async storeArtifacts( testName ) {
-		const datetime = new Date().toISOString().split( '.' )[ 0 ];
-		const fileName = filenamify( `${ testName } ${ datetime }`, {
-			replacement: '-',
-		} );
+	async storeArtifacts( fileName ) {
 		await writeFile(
 			path.join( ARTIFACTS_PATH, `${ fileName }-snapshot.html` ),
 			await this.global.page.content()
@@ -214,11 +213,59 @@ class PuppeteerEnvironment extends NodeEnvironment {
 	}
 
 	async handleTestEvent( event, state ) {
-		if ( event.name === 'test_fn_failure' ) {
+		if ( state.currentlyRunningTest ) {
 			const testName = state.currentlyRunningTest.name;
-			await this.storeArtifacts( testName );
+			const fileName = getFileName( testName );
+
+			if ( CAPTURE_SCREENCASTS && event.name === 'test_fn_start' ) {
+				screencasts.set(
+					testName,
+					await startScreencast( {
+						page: this.global.page,
+						browser: this.global.browser,
+						downloadPath: ARTIFACTS_PATH,
+						fileName,
+					} ).catch( ( err ) => {
+						// Ignore error to prevent it from failing the test,
+						// instead just log it for debugging.
+						// eslint-disable-next-line no-console
+						console.error( err );
+					} )
+				);
+			}
+
+			if (
+				CAPTURE_SCREENCASTS &&
+				( event.name === 'test_fn_success' ||
+					event.name === 'test_fn_failure' ) &&
+				screencasts.has( testName )
+			) {
+				const stopScreencast = screencasts.get( testName );
+				screencasts.delete( testName );
+				await stopScreencast( {
+					// Only save the screencast if the test failed.
+					save: event.name === 'test_fn_failure',
+				} ).catch( ( err ) => {
+					// Ignore error to prevent it from failing the test,
+					// instead just log it for debugging.
+					// eslint-disable-next-line no-console
+					console.error( err );
+				} );
+			}
+
+			if ( event.name === 'test_fn_failure' ) {
+				await this.storeArtifacts( fileName );
+			}
 		}
 	}
+}
+
+function getFileName( testName ) {
+	const datetime = new Date().toISOString().split( '.' )[ 0 ];
+	const fileName = filenamify( `${ testName } ${ datetime }`, {
+		replacement: '-',
+	} );
+	return fileName;
 }
 
 module.exports = PuppeteerEnvironment;
