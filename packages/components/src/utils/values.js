@@ -58,7 +58,7 @@ const getDelimiterAndDecimalRegex = ( locale ) => {
 // https://en.wikipedia.org/wiki/Decimal_separator#Current_standards
 const INTERNATIONAL_THOUSANDS_DELIMITER = / /g;
 
-const ARABIC_NUMERAL_LOCALES = [ 'ar', 'fa' ];
+const ARABIC_NUMERAL_LOCALES = [ 'ar', 'fa', 'ur' ];
 
 const EASTERN_ARABIC_NUMBERS = /([۰-۹]|[٠-٩])/g;
 
