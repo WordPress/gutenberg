@@ -92,7 +92,6 @@ class PostPublishPanelPostpublish extends Component {
 		const { children, isScheduled, post, postType } = this.props;
 		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
 		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
-		const addNewPostLabel = get( postType, [ 'labels', 'add_new_item' ] );
 		const link =
 			post.status === 'future' ? getFuturePostUrl( post ) : post.link;
 		const addLink = addQueryArgs( 'post-new.php', {
@@ -149,7 +148,7 @@ class PostPublishPanelPostpublish extends Component {
 							</Button>
 						) }
 						<Button variant="secondary" href={ addLink }>
-							{ addNewPostLabel }
+							{ __( 'Add Item' ) }
 						</Button>
 					</div>
 				</PanelBody>
