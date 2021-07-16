@@ -24,12 +24,13 @@ function getScreencastAPI( downloadName ) {
 		}
 
 		async beginRecording( stream ) {
-			return new Promise( ( resolve, reject ) => {
+			this.recordingFinish = new Promise( ( resolve, reject ) => {
 				this.recorder = new window.MediaRecorder( stream, {
 					mimeType: 'video/webm',
 				} );
-				this.recorder.ondataavailable = ( event ) =>
+				this.recorder.ondataavailable = ( event ) => {
 					this.chunks.push( event.data );
+				};
 				this.recorder.onerror = reject;
 				this.recorder.onstop = resolve;
 				this.recorder.start();
@@ -53,25 +54,39 @@ function getScreencastAPI( downloadName ) {
 		async start( { width, height } ) {
 			this.canvas.width = width;
 			this.canvas.height = height;
-			this.recordingFinish = this.beginRecording(
-				this.canvas.captureStream()
-			);
+			this.beginRecording( this.canvas.captureStream() );
+
+			const loop = () => {
+				this.draw();
+				this.animationFrame = window.requestAnimationFrame( loop );
+			};
+			loop();
 		}
 
-		async draw( pngData ) {
-			const data = await window
-				.fetch( `data:image/png;base64,${ pngData }` )
-				.then( ( res ) => res.blob() )
-				.then( ( blob ) => window.createImageBitmap( blob ) );
+		async draw() {
+			if ( ! this.currentFrame ) {
+				return this;
+			}
 
 			this.ctx.clearRect( 0, 0, this.canvas.width, this.canvas.height );
-			this.ctx.drawImage( data, 0, 0 );
+			this.ctx.drawImage( this.currentFrame, 0, 0 );
 
 			return this;
 		}
 
-		stop() {
+		async setCurrentFrame( pngData ) {
+			this.currentFrame = await window
+				.fetch( `data:image/png;base64,${ pngData }` )
+				.then( ( res ) => res.blob() )
+				.then( ( blob ) => window.createImageBitmap( blob ) );
+
+			return this;
+		}
+
+		async stop() {
+			window.cancelAnimationFrame( this.animationFrame );
 			this.recorder.stop();
+			await this.recordingFinish;
 			return this;
 		}
 	}
@@ -116,7 +131,8 @@ async function startScreencast( { page, browser, downloadPath, fileName } ) {
 	async function onScreencastFrame( { data, sessionId } ) {
 		renderer
 			.evaluate(
-				( _screencastAPI, _data ) => _screencastAPI.draw( _data ),
+				( _screencastAPI, _data ) =>
+					_screencastAPI.setCurrentFrame( _data ),
 				screencastAPI,
 				data
 			)
