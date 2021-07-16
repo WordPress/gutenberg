@@ -26,7 +26,7 @@ export function parseCSSUnitValue(
 		/[\d.\-+]*\s*(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|vw|vh|vmin|vmax)/
 	);
 	if ( ! matched ) {
-		return [ undefined, undefined ];
+		return [ num, undefined ];
 	}
 	const [ , unitMatch ] = matched;
 
