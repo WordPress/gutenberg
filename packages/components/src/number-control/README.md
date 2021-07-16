@@ -27,14 +27,6 @@ const Example = () => {
 
 ## Props
 
-### allowEmpty
-
-If true, allows an empty string as a valid value.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
 ### dragDirection
 
 Determines the drag axis to increment/decrement the value.
@@ -87,6 +79,13 @@ If this property is added, a label will be generated using label property as the
 The position of the label (`top`, `side`, `bottom`, or `edge`).
 
 -   Type: `String`
+-   Required: No
+
+### required
+
+If boolean false, allows an empty string as a valid value.
+
+-   Type: `Boolean`
 -   Required: No
 
 ### shiftStep

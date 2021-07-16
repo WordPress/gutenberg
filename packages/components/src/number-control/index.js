@@ -29,10 +29,10 @@ export function NumberControl(
 		hideHTMLArrows = false,
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
-		allowEmpty = false,
 		label,
 		max = Infinity,
 		min = -Infinity,
+		required,
 		shiftStep = 10,
 		step = 1,
 		type: typeProp = 'number',
@@ -156,7 +156,7 @@ export function NumberControl(
 			type === inputControlActionTypes.PRESS_ENTER ||
 			type === inputControlActionTypes.COMMIT
 		) {
-			const applyEmptyValue = allowEmpty && currentValue === '';
+			const applyEmptyValue = required === false && currentValue === '';
 
 			state.value = applyEmptyValue
 				? currentValue
@@ -179,6 +179,7 @@ export function NumberControl(
 			max={ max }
 			min={ min }
 			ref={ ref }
+			required={ required }
 			step={ jumpStep }
 			type={ typeProp }
 			value={ valueProp }
