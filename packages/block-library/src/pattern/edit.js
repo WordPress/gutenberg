@@ -20,7 +20,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		if ( selectedPattern && selectedPattern.blocks ) {
 			replaceInnerBlocks( clientId, selectedPattern.blocks );
 		}
-	}, [ selectedPattern ] );
+	}, [] );
 
 	return <InnerBlocks />;
 };
