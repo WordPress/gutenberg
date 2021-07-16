@@ -89,7 +89,6 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED = "isAudioBlockMediaUploadEnabled"
         const val PROP_CAPABILITIES_REUSABLE_BLOCK = "reusableBlock"
         const val PROP_CAPABILITIES_EDITOR_ONBOARDING = "editorOnboarding"
-        const val PROP_CAPABILITIES_FIRST_GUTENBERG_SESSION
- = "firstGutenbergEditorSession"
+        const val PROP_CAPABILITIES_FIRST_GUTENBERG_SESSION = "firstGutenbergEditorSession"
     }
 }
