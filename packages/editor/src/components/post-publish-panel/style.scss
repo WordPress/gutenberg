@@ -173,14 +173,15 @@
 	}
 }
 
-.post-publish-panel__postpublish-post-address__button-wrap {
+.post-publish-panel__postpublish-post-address__copy-button-wrap {
 	flex-shrink: 0;
-	margin-left: 8px;
+	margin-left: 8px; // margin left for copy button
+
+	// match copy button height to the address field height
 	.components-button {
 		height: 38px;
 	}
 }
-
 
 .post-publish-panel__postpublish-header {
 	font-weight: 500;
@@ -196,6 +197,7 @@
 
 @media screen and (max-width: 782px) {
 	.post-publish-panel__postpublish-post-address__button-wrap {
+		// match copy button height to the address field height in smaller screens
 		.components-button {
 			height: 40px;
 		}

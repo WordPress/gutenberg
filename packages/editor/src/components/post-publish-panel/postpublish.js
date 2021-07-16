@@ -50,11 +50,6 @@ function CopyButton( { text, onCopy, children } ) {
 	);
 }
 
-function ConvertToSentenceCase( string ) {
-	const sentence = string.toLowerCase();
-	return sentence.charAt( 0 ).toUpperCase() + sentence.slice( 1 );
-}
-
 class PostPublishPanelPostpublish extends Component {
 	constructor() {
 		super( ...arguments );
@@ -96,12 +91,8 @@ class PostPublishPanelPostpublish extends Component {
 	render() {
 		const { children, isScheduled, post, postType } = this.props;
 		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
-		const viewPostLabel = ConvertToSentenceCase(
-			get( postType, [ 'labels', 'view_item' ] )
-		);
-		const addNewPostLabel = ConvertToSentenceCase(
-			get( postType, [ 'labels', 'add_new_item' ] )
-		);
+		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
+		const addNewPostLabel = get( postType, [ 'labels', 'add_new_item' ] );
 		const link =
 			post.status === 'future' ? getFuturePostUrl( post ) : post.link;
 		const addLink = addQueryArgs( 'post-new.php', {
@@ -142,7 +133,7 @@ class PostPublishPanelPostpublish extends Component {
 							onFocus={ this.onSelectInput }
 						/>
 
-						<div className="post-publish-panel__postpublish-post-address__button-wrap">
+						<div className="post-publish-panel__postpublish-post-address__copy-button-wrap">
 							<CopyButton text={ link } onCopy={ this.onCopy }>
 								{ this.state.showCopyConfirmation
 									? __( 'Copied!' )
