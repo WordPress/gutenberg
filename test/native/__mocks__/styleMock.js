@@ -119,4 +119,14 @@ module.exports = {
 	ripple: {
 		backgroundColor: 'white',
 	},
+	image: {
+		height: 100,
+	},
+	captionPlaceholder: {
+		color: 'white',
+	},
+	addMediaButton: {
+		color: 'white',
+		size: 20,
+	},
 };
