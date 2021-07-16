@@ -8,6 +8,7 @@ const stories = [
 	'../packages/block-editor/src/**/stories/*.js',
 	'../packages/components/src/**/stories/*.js',
 	'../packages/icons/src/**/stories/*.js',
+	'../packages/edit-site/src/**/stories/*.js',
 ].filter( Boolean );
 
 const customEnvVariables = {};
