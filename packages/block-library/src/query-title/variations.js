@@ -40,7 +40,6 @@ const variations = [
 		description: __( 'Displays a title in a 404 template.' ),
 		attributes: {
 			type: '404',
-			// translators: Title for search template with dynamic content placeholders.
 			content: __( 'Nothing found' ),
 		},
 		scope: [ 'inserter' ],
