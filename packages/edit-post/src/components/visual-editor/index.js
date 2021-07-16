@@ -76,7 +76,7 @@ function MaybeIframe( {
 			contentRef={ contentRef }
 			style={ { width: '100%', height: '100%', display: 'block' } }
 		>
-			<WritingFlow>{ children }</WritingFlow>
+			{ children }
 		</Iframe>
 	);
 }
