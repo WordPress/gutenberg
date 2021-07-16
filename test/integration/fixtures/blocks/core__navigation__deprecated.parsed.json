@@ -25,10 +25,6 @@
 			}
 		],
 		"innerHTML": "\n\n",
-		"innerContent": [
-			"\n",
-			null,
-			"\n"
-		]
+		"innerContent": [ "\n", null, "\n" ]
 	}
 ]

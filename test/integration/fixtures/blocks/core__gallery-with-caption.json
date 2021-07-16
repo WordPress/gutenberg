@@ -16,10 +16,7 @@
 					"caption": ""
 				}
 			],
-			"ids": [
-				null,
-				null
-			],
+			"ids": [ null, null ],
 			"caption": "Gallery caption.",
 			"imageCrop": true,
 			"linkTo": "none",

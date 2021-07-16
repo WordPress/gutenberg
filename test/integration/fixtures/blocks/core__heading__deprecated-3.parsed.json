@@ -6,8 +6,6 @@
 		},
 		"innerBlocks": [],
 		"innerHTML": "\n<h2 style=\"color:#268ebb\">Text</h2>\n",
-		"innerContent": [
-			"\n<h2 style=\"color:#268ebb\">Text</h2>\n"
-		]
+		"innerContent": [ "\n<h2 style=\"color:#268ebb\">Text</h2>\n" ]
 	}
 ]

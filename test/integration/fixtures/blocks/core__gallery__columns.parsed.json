@@ -2,10 +2,7 @@
 	{
 		"blockName": "core/gallery",
 		"attrs": {
-			"ids": [
-				null,
-				null
-			],
+			"ids": [ null, null ],
 			"columns": 1
 		},
 		"innerBlocks": [],

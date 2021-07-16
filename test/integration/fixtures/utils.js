@@ -16,7 +16,8 @@ function readFixtureFile( fixturesDir, filename ) {
 }
 
 function writeFixtureFile( fixturesDir, filename, content ) {
-	fs.writeFileSync( path.join( fixturesDir, filename ), content );
+	const file = path.join( fixturesDir, filename );
+	fs.writeFileSync( file, content );
 }
 
 export function blockNameToFixtureBasename( blockName ) {
