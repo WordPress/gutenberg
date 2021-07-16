@@ -1,96 +1,176 @@
 /**
  * External dependencies
  */
-import { TextInput, View, TouchableHighlight } from 'react-native';
+import {
+	TextInput,
+	Text,
+	View,
+	TouchableOpacity,
+	Platform,
+	useColorScheme,
+} from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { useState, useRef } from '@wordpress/element';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { ToolbarButton } from '@wordpress/components';
+import { useModifiedStyles } from '@wordpress/compose';
+import { Button, Gridicons } from '@wordpress/components';
 import {
 	Icon,
-	cancelCircleFilled,
-	arrowLeft,
-	search as searchIcon,
+	cancelCircleFilled as cancelCircleFilledIcon,
+	arrowLeft as arrowLeftIcon,
+	close as closeIcon,
 } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
+import baseStyles from './style.scss';
+import platformStyles from './platform-style.scss';
+
+// Merge platform specific styles
+for ( const selector in platformStyles ) {
+	baseStyles[ selector ] = {
+		...baseStyles[ selector ],
+		...platformStyles[ selector ],
+	};
+}
 
 function SearchControl( {
 	value,
 	onChange,
-	label,
-	placeholder = __( 'Search' ),
+	placeholder = __( 'Search Blocks' ),
 } ) {
 	const [ isActive, setIsActive ] = useState( false );
-
+	const isDark = useColorScheme() === 'dark';
 	const inputRef = useRef();
+	const isIOS = Platform.OS === 'ios';
 
-	const searchFormStyle = usePreferredColorSchemeStyle(
-		styles.searchForm,
-		styles.searchFormDark
-	);
+	const styles = useModifiedStyles( baseStyles, {
+		active: [ isActive ],
+		dark: [ isDark ],
+		'active-dark': [ isActive, isDark ],
+	} );
 
-	const searchFormInputStyle = usePreferredColorSchemeStyle(
-		styles.searchFormInput,
-		styles.searchFormInputDark
-	);
+	const {
+		'search-control__container': containerStyle,
+		'search-control__inner-container': innerContainerStyle,
+		'search-control__input-container': inputContainerStyle,
+		'search-control__form-input': formInputStyle,
+		'search-control__form-input-placeholder': placeholderStyle,
+		'search-control__input-button': inputButtonStyle,
+		'search-control__input-button-left': inputButtonLeftStyle,
+		'search-control__input-button-right': inputButtonRightStyle,
+		'search-control__cancel-button': cancelButtonStyle,
+		'search-control__cancel-button-text': cancelButtonTextStyle,
+		'search-control__icon': iconStyle,
+		'search-control__right-icon': rightIconStyle,
+	} = styles;
 
-	const placeholderStyle = usePreferredColorSchemeStyle(
-		styles.searchFormPlaceholder,
-		styles.searchFormPlaceholderDark
-	);
+	function clearInput() {
+		onChange( '' );
+	}
+
+	function onCancel() {
+		inputRef.current.blur();
+		clearInput();
+		setIsActive( false );
+	}
+
+	function renderLeftButton() {
+		const button =
+			! isIOS && isActive ? (
+				<Button
+					label={ __( 'Cancel Search' ) }
+					icon={ arrowLeftIcon }
+					onClick={ onCancel }
+					style={ iconStyle }
+				/>
+			) : (
+				<Icon icon={ Gridicons.search } fill={ iconStyle?.color } />
+			);
+
+		return (
+			<View style={ [ inputButtonStyle, inputButtonLeftStyle ] }>
+				{ button }
+			</View>
+		);
+	}
+
+	function renderRightButton() {
+		let button;
+
+		// Add a View element to properly center the input placeholder via flexbox.
+		if ( isIOS && ! isActive ) {
+			button = <View />;
+		}
+
+		if ( !! value ) {
+			button = (
+				<Button
+					label={ __( 'Clear Search' ) }
+					icon={ isIOS ? cancelCircleFilledIcon : closeIcon }
+					onClick={ clearInput }
+					style={ [ iconStyle, rightIconStyle ] }
+				/>
+			);
+		}
+
+		return (
+			<View style={ [ inputButtonStyle, inputButtonRightStyle ] }>
+				{ button }
+			</View>
+		);
+	}
+
+	function renderCancel() {
+		if ( ! isIOS ) {
+			return null;
+		}
+		return (
+			<View style={ cancelButtonStyle }>
+				<Text
+					onPress={ onCancel }
+					style={ cancelButtonTextStyle }
+					accessible={ true }
+					accessibilityRole={ 'button' }
+					accessibilityLabel={ __( 'Cancel Search' ) }
+					accessibilityHint={ __( 'Cancel Search' ) }
+				>
+					{ __( 'Cancel' ) }
+				</Text>
+			</View>
+		);
+	}
 
 	return (
-		<TouchableHighlight accessible={ false }>
-			<View style={ searchFormStyle }>
-				{ isActive ? (
-					<ToolbarButton
-						title={ __( 'Cancel search' ) }
-						icon={ arrowLeft }
-						onClick={ () => {
-							inputRef.current.blur();
-							onChange( '' );
-							setIsActive( false );
-						} }
+		<TouchableOpacity
+			style={ containerStyle }
+			onPress={ () => {
+				setIsActive( true );
+				inputRef.current.focus();
+			} }
+			activeOpacity={ 1 }
+		>
+			<View style={ innerContainerStyle }>
+				<View style={ inputContainerStyle }>
+					{ renderLeftButton() }
+					<TextInput
+						ref={ inputRef }
+						style={ formInputStyle }
+						placeholderTextColor={ placeholderStyle?.color }
+						onChangeText={ onChange }
+						onFocus={ () => setIsActive( true ) }
+						value={ value }
+						placeholder={ placeholder }
 					/>
-				) : (
-					<ToolbarButton
-						title={ label }
-						icon={ searchIcon }
-						onClick={ () => {
-							inputRef.current.focus();
-							setIsActive( true );
-						} }
-					/>
-				) }
-				<TextInput
-					ref={ inputRef }
-					style={ searchFormInputStyle }
-					placeholderTextColor={ placeholderStyle.color }
-					onChangeText={ onChange }
-					onFocus={ () => setIsActive( true ) }
-					value={ value }
-					placeholder={ placeholder }
-				/>
-
-				{ !! value && (
-					<ToolbarButton
-						title={ __( 'Clear search' ) }
-						icon={ <Icon icon={ cancelCircleFilled } /> }
-						onClick={ () => {
-							onChange( '' );
-						} }
-					/>
-				) }
+					{ renderRightButton() }
+				</View>
+				{ isActive && renderCancel() }
 			</View>
-		</TouchableHighlight>
+		</TouchableOpacity>
 	);
 }
 

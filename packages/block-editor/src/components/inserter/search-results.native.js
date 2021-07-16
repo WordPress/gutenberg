@@ -8,6 +8,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { searchItems } from './search-items';
 import BlockTypesList from '../block-types-list';
+import InserterNoResults from './no-results';
 import { store as blockEditorStore } from '../../store';
 
 function InserterSearchResults( {
@@ -27,6 +28,10 @@ function InserterSearchResults( {
 		},
 		[ rootClientId, filterValue ]
 	);
+
+	if ( ! items || items?.length === 0 ) {
+		return <InserterNoResults />;
+	}
 
 	return (
 		<BlockTypesList name="Blocks" { ...{ items, onSelect, listProps } } />
