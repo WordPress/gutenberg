@@ -263,7 +263,7 @@ describe( 'Reusable blocks', () => {
 		expect( console ).toHaveErrored();
 	} );
 
-	it( 'should be able to insert a reusable block twice', async () => {
+	it.skip( 'should be able to insert a reusable block twice', async () => {
 		await createReusableBlock(
 			'Awesome Paragraph',
 			'Duplicated reusable block'
