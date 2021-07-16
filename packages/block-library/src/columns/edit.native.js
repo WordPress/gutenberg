@@ -203,7 +203,6 @@ function ColumnsEditContainer( {
 							? 100
 							: undefined
 					}
-					decimalNum={ 1 }
 					value={ getWidths( innerWidths )[ index ] }
 					onChange={ ( nextWidth ) => {
 						onChange( nextWidth, valueUnit, column.clientId );
