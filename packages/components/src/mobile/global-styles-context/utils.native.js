@@ -155,18 +155,15 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 	return JSON.parse( stylesBase );
 }
 
-export function getMappedValues( features, colors ) {
+export function getMappedValues( features, palette ) {
 	const mappedValues = {
 		color: {
-			values: colors?.palette?.theme,
+			values: palette?.theme,
 			slug: 'color',
 		},
 		'font-size': {
 			values: features?.typography?.fontSizes?.theme,
 			slug: 'size',
-		},
-		'line-height': {
-			values: features?.custom?.[ 'line-height' ],
 		},
 	};
 	return mappedValues;
@@ -174,10 +171,13 @@ export function getMappedValues( features, colors ) {
 
 export function getGlobalStyles( rawStyles, rawFeatures ) {
 	const features = JSON.parse( rawFeatures );
-	const colors = features?.color;
-	const mappedValues = getMappedValues( features, colors );
+	const mappedValues = getMappedValues( features, features?.color?.palette );
+	const colors = parseStylesVariables(
+		JSON.stringify( features?.color ),
+		mappedValues
+	);
 	const gradients = parseStylesVariables(
-		JSON.stringify( colors?.gradients ),
+		JSON.stringify( features?.color?.gradients ),
 		mappedValues
 	);
 	const customValues = parseStylesVariables(

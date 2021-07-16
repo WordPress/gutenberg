@@ -4,13 +4,12 @@
 import {
 	getBlockPaddings,
 	getBlockColors,
-	parseVariables,
+	parseStylesVariables,
 	getGlobalStyles,
 } from '../utils';
 
 import {
 	DEFAULT_COLORS,
-	GLOBAL_STYLES_PALETTE,
 	GLOBAL_STYLES_GRADIENTS,
 	DEFAULT_GLOBAL_STYLES,
 	PARSED_GLOBAL_STYLES,
@@ -94,11 +93,16 @@ describe( 'getBlockColors', () => {
 	} );
 } );
 
-describe( 'parseVariables', () => {
-	it( 'returns the parsed colors values correctly', () => {
-		const blockColors = parseVariables(
-			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+describe( 'parseStylesVariables', () => {
+	it( 'returns the parsed preset values correctly', () => {
+		const customValues = parseStylesVariables(
+			JSON.stringify( RAW_FEATURES.custom ),
 			MAPPED_VALUES
+		);
+		const blockColors = parseStylesVariables(
+			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			MAPPED_VALUES,
+			customValues
 		);
 		expect( blockColors ).toEqual(
 			expect.objectContaining( PARSED_GLOBAL_STYLES )
@@ -109,29 +113,24 @@ describe( 'parseVariables', () => {
 describe( 'getGlobalStyles', () => {
 	it( 'returns the global styles data correctly', () => {
 		const rawFeatures = JSON.stringify( RAW_FEATURES );
-		const globalStyles = getGlobalStyles(
-			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
-			rawFeatures,
-			GLOBAL_STYLES_PALETTE,
-			GLOBAL_STYLES_GRADIENTS
-		);
-		const gradients = parseVariables(
+		const gradients = parseStylesVariables(
 			JSON.stringify( GLOBAL_STYLES_GRADIENTS ),
 			MAPPED_VALUES
 		);
-		const parsedExperimentalFeatures = parseVariables(
-			rawFeatures,
-			MAPPED_VALUES
+
+		const globalStyles = getGlobalStyles(
+			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			rawFeatures
 		);
 
 		expect( globalStyles ).toEqual(
 			expect.objectContaining( {
-				colors: GLOBAL_STYLES_PALETTE,
+				colors: RAW_FEATURES.color,
 				gradients,
 				__experimentalFeatures: {
 					color: {
-						palette: parsedExperimentalFeatures?.color?.palette,
-						gradients: parsedExperimentalFeatures?.color?.gradients,
+						palette: RAW_FEATURES.color.palette,
+						gradients,
 					},
 					typography: {
 						fontSizes: RAW_FEATURES.typography.fontSizes,

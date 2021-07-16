@@ -22,20 +22,36 @@ export const GLOBAL_STYLES_PALETTE = [
 	},
 ];
 
-export const GLOBAL_STYLES_GRADIENTS = [
-	{
-		slug: 'purple-to-blue',
-		gradient:
-			'linear-gradient(160deg, var(--wp--preset--color--purple), var(--wp--preset--color--blue))',
-		name: 'Purple to Blue',
-	},
-	{
-		slug: 'green-to-purple',
-		gradient:
-			'linear-gradient(160deg, var(--wp--preset--color--green), var(--wp--preset--color--purple))',
-		name: 'Green to Purple',
-	},
-];
+export const GLOBAL_STYLES_GRADIENTS = {
+	core: [
+		{
+			name: 'Vivid cyan blue to vivid purple',
+			gradient:
+				'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+			slug: 'vivid-cyan-blue-to-vivid-purple',
+		},
+		{
+			name: 'Light green cyan to vivid green cyan',
+			gradient:
+				'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)',
+			slug: 'light-green-cyan-to-vivid-green-cyan',
+		},
+	],
+	theme: [
+		{
+			slug: 'purple-to-blue',
+			gradient:
+				'linear-gradient(160deg, var(--wp--preset--color--purple), var(--wp--preset--color--blue))',
+			name: 'Purple to Blue',
+		},
+		{
+			slug: 'green-to-purple',
+			gradient:
+				'linear-gradient(160deg, var(--wp--preset--color--green), var(--wp--preset--color--purple))',
+			name: 'Green to Purple',
+		},
+	],
+};
 
 export const DEFAULT_GLOBAL_STYLES = {
 	color: {
@@ -175,14 +191,12 @@ export const RAW_FEATURES = {
 			theme: [
 				{
 					slug: 'purple-to-blue',
-					gradient:
-						'linear-gradient(160deg, var(--wp--preset--color--purple), var(--wp--preset--color--blue))',
+					gradient: 'linear-gradient(160deg, #D1D1E4, #D1DFE4)',
 					name: 'Purple to Blue',
 				},
 				{
 					slug: 'green-to-purple',
-					gradient:
-						'linear-gradient(160deg, var(--wp--preset--color--green), var(--wp--preset--color--purple))',
+					gradient: 'linear-gradient(160deg, #D1E4DD, #D1D1E4)',
 					name: 'Green to Purple',
 				},
 			],
@@ -243,9 +257,5 @@ export const MAPPED_VALUES = {
 	'font-size': {
 		values: RAW_FEATURES.typography.fontSizes.theme,
 		slug: 'size',
-	},
-
-	'line-height': {
-		values: RAW_FEATURES.custom[ 'line-height' ],
 	},
 };
