@@ -12,6 +12,7 @@ import {
 	BlockControls,
 	useBlockProps,
 	Warning,
+	RichText,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -20,10 +21,10 @@ import { __ } from '@wordpress/i18n';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
-const SUPPORTED_TYPES = [ 'archive' ];
+const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign },
+	attributes: { content, type, level, textAlign },
 	setAttributes,
 } ) {
 	const TagName = `h${ level }`;
@@ -47,6 +48,21 @@ export default function QueryTitleEdit( {
 	if ( type === 'archive' ) {
 		titleElement = (
 			<TagName { ...blockProps }>{ __( 'Archive title' ) }</TagName>
+		);
+	} else {
+		titleElement = (
+			<div { ...blockProps }>
+				<RichText
+					tagName={ TagName }
+					value={ content }
+					placeholder={ __( 'Query title' ) }
+					allowedFormats={ [ 'core/bold', 'core/italic' ] }
+					onChange={ ( newContent ) =>
+						setAttributes( { content: newContent } )
+					}
+					disableLineBreaks={ true }
+				/>
+			</div>
 		);
 	}
 	return (

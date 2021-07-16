@@ -6,6 +6,9 @@
 	"description": "Display the query title.",
 	"textdomain": "default",
 	"attributes": {
+		"content": {
+			"type": "string"
+		},
 		"type": {
 			"type": "string"
 		},

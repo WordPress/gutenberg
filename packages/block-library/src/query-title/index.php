@@ -21,7 +21,7 @@ function render_block_core_query_title( $attributes ) {
 	if ( ! $type || ( 'archive' === $type && ! $is_archive ) || ( 'search' === $type && ! $is_search ) ) {
 		return '';
 	}
-	$title = '';
+	$title = isset( $attributes['content'] ) ? $attributes['content'] : '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
 	}

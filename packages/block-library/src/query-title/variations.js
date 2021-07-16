@@ -14,12 +14,13 @@ const variations = [
 		icon: archiveTitle,
 		attributes: {
 			type: 'archive',
+			content: __( 'Archive title' ),
 		},
 		scope: [ 'inserter' ],
 	},
 	{
 		name: 'search-title',
-		title: __( 'Search title' ),
+		title: __( 'Search Title' ),
 		description: __(
 			'Displays a title in a search template, using search related format placeholders.'
 		),
@@ -31,7 +32,7 @@ const variations = [
 				'search template title'
 			),
 		},
-		scope: [ 'inserter', 'transform' ],
+		scope: [ 'inserter' ],
 	},
 ];
 
