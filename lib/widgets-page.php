@@ -139,14 +139,13 @@ add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_ed
  * Adds admin classes necessary for the block-based widgets screen.
  *
  * - Adds `block-editor-page` editor body class to allow directly styling the admin pages that are based on the block editor.
- * - Shows responsive embeds correctly on the widgets screen by adding the `wp-embed-responsive` class.
  *
  * @param string $classes existing admin body classes.
  *
- * @return string admin body classes including the `block-editor-page` and `wp-embed-responsive` classes.
+ * @return string admin body classes including the `block-editor-page` class.
  */
 function gutenberg_widgets_editor_add_admin_body_classes( $classes ) {
-	return "$classes block-editor-page wp-embed-responsive";
+	return "$classes block-editor-page";
 }
 
 /**
