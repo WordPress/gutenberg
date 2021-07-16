@@ -8,7 +8,7 @@ import classNames from 'classnames';
  */
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -20,34 +20,56 @@ import useArrowNav from './use-arrow-nav';
 import useSelectAll from './use-select-all';
 import { store as blockEditorStore } from '../../store';
 
-function WritingFlow( { children, ...props }, forwardedRef ) {
+export function useWritingFlow() {
 	const [ before, ref, after ] = useTabNav();
 	const hasMultiSelection = useSelect(
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
 		[]
 	);
+
+	return [
+		before,
+		useMergeRefs( [
+			ref,
+			useMultiSelection(),
+			useSelectAll(),
+			useArrowNav(),
+			useRefEffect(
+				( node ) => {
+					node.tabIndex = -1;
+
+					if ( ! hasMultiSelection ) {
+						return;
+					}
+
+					node.setAttribute(
+						'aria-label',
+						__( 'Multiple selected blocks' )
+					);
+
+					return () => {
+						node.removeAttribute( 'aria-label' );
+					};
+				},
+				[ hasMultiSelection ]
+			),
+		] ),
+		after,
+	];
+}
+
+function WritingFlow( { children, ...props }, forwardedRef ) {
+	const [ before, ref, after ] = useWritingFlow();
 	return (
 		<>
 			{ before }
 			<div
 				{ ...props }
-				ref={ useMergeRefs( [
-					forwardedRef,
-					ref,
-					useMultiSelection(),
-					useSelectAll(),
-					useArrowNav(),
-				] ) }
+				ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 				className={ classNames(
 					props.className,
 					'block-editor-writing-flow'
 				) }
-				tabIndex={ -1 }
-				aria-label={
-					hasMultiSelection
-						? __( 'Multiple selected blocks' )
-						: undefined
-				}
 			>
 				{ children }
 			</div>

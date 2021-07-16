@@ -18,6 +18,7 @@ import { __experimentalStyleProvider as StyleProvider } from '@wordpress/compone
  * Internal dependencies
  */
 import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { useWritingFlow } from '../writing-flow';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -191,6 +192,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 	const styles = useParsedAssets( window.__editorAssets.styles );
 	const scripts = useParsedAssets( window.__editorAssets.scripts );
 	const clearerRef = useBlockSelectionClearer();
+	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const setRef = useCallback( ( node ) => {
 		if ( ! node ) {
 			return;
@@ -216,6 +218,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
 			clearerRef( body );
+			writingFlowRef( body );
 
 			scripts
 				.reduce(
@@ -275,22 +278,26 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 	);
 
 	return (
-		<iframe
-			{ ...props }
-			ref={ useMergeRefs( [ ref, setRef ] ) }
-			tabIndex="0"
-			title={ __( 'Editor canvas' ) }
-			name="editor-canvas"
-		>
-			{ iframeDocument &&
-				createPortal(
-					<StyleProvider document={ iframeDocument }>
-						{ children }
-					</StyleProvider>,
-					iframeDocument.body
-				) }
-			{ iframeDocument && createPortal( head, iframeDocument.head ) }
-		</iframe>
+		<>
+			{ before }
+			<iframe
+				{ ...props }
+				ref={ useMergeRefs( [ ref, setRef ] ) }
+				tabIndex="0"
+				title={ __( 'Editor canvas' ) }
+				name="editor-canvas"
+			>
+				{ iframeDocument &&
+					createPortal(
+						<StyleProvider document={ iframeDocument }>
+							{ children }
+						</StyleProvider>,
+						iframeDocument.body
+					) }
+				{ iframeDocument && createPortal( head, iframeDocument.head ) }
+			</iframe>
+			{ after }
+		</>
 	);
 }
 
