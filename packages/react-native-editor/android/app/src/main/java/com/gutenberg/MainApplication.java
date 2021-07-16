@@ -251,14 +251,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void requestBlockTypeImpressions(ReadableArray newBlockTypes, BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
                 WritableMap impressions = Arguments.createMap();
                 for (int i = 0; i < newBlockTypes.size(); i++) {
-                    impressions.putInt(newBlockTypes.getString(i), 3);
+                    impressions.putDouble(newBlockTypes.getString(i), 3.0);
                 }
                 blockTypeImpressionsCallback.onRequestBlockTypeImpressions(impressions);
             }
 
             @Override
-            public void setBlockTypeImpressionCount(String name, Integer count) {
-                Log.d("BlockTypeImpressions", String.format("Gutenberg requested setting \"%s\" block type impression count to %d.", name, count));
+            public void setBlockTypeImpressionCount(String name, Double count) {
+                Log.d("BlockTypeImpressions", String.format("Gutenberg requested setting \"%s\" block type impression count to %1.0f.", name, count));
             }
 
         }, isDarkMode());

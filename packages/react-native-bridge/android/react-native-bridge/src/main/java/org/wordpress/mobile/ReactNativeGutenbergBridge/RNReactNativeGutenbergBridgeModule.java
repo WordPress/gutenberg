@@ -420,7 +420,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void setBlockTypeImpressionCount(String name, Integer count) {
+    public void setBlockTypeImpressionCount(String name, Double count) {
         mGutenbergBridgeJS2Parent.setBlockTypeImpressionCount(name, count);
     }
 }

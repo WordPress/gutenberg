@@ -169,6 +169,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void requestBlockTypeImpressions(ReadableArray newBlockTypes, BlockTypeImpressionsCallback blockTypeImpressionsCallback);
 
-    void setBlockTypeImpressionCount(String name, Integer count);
+    void setBlockTypeImpressionCount(String name, Double count);
 
 }
