@@ -58,6 +58,10 @@ const getDelimiterAndDecimalRegex = ( locale ) => {
 // https://en.wikipedia.org/wiki/Decimal_separator#Current_standards
 const INTERNATIONAL_THOUSANDS_DELIMITER = / /g;
 
+const ARABIC_NUMERAL_LOCALES = [ 'ar', 'fa' ];
+
+const EASTERN_ARABIC_NUMBERS = /([۰-۹]|[٠-٩])/g;
+
 /**
  * Checks to see if a value is a numeric value (`number` or `string`).
  *
@@ -68,7 +72,19 @@ const INTERNATIONAL_THOUSANDS_DELIMITER = / /g;
  * @param {string} [locale]
  * @return {boolean} Whether value is numeric.
  */
-export function isValueNumeric( value, locale ) {
+export function isValueNumeric( value, locale = window.navigator.language ) {
+	if ( ARABIC_NUMERAL_LOCALES.some( ( l ) => locale.startsWith( l ) ) ) {
+		locale = 'en-GB';
+		if ( EASTERN_ARABIC_NUMBERS.test( value ) ) {
+			value = value
+				.replace( /([۰-۹]|[٠-٩])/g, ( /** @type {string} */ d ) =>
+					'٠١٢٣٤٥٦٧٨٩'.indexOf( d )
+				)
+				.replace( /٬/g, ',' )
+				.replace( /٫/g, '.' );
+		}
+	}
+
 	const [ delimiterRegexp, decimalRegexp ] = getDelimiterAndDecimalRegex(
 		locale
 	);

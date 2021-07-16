@@ -79,5 +79,17 @@ describe( 'isValueNumeric', () => {
 				expect( isValueNumeric( x, 'pt-BR' ) ).toBe( false );
 			}
 		);
+
+		it( 'should handle arabic locales with western arabic numerals', () => {
+			expect( isValueNumeric( '1.000,1', 'ar' ) ).toBe( true );
+			expect( isValueNumeric( '1.000,1', 'fa' ) ).toBe( true );
+			expect( isValueNumeric( '1.000,a', 'ar' ) ).toBe( false );
+		} );
+
+		it( 'should handle arabic locales with eastern arabic numerals', () => {
+			expect( isValueNumeric( '١٬٠٠٠٫١', 'ar' ) ).toBe( true );
+			expect( isValueNumeric( '١٬٠٠٠٫١', 'fa' ) ).toBe( true );
+			expect( isValueNumeric( '١٬٠٠٠٫a', 'ar' ) ).toBe( false );
+		} );
 	} );
 } );
