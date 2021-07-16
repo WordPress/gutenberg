@@ -233,6 +233,8 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
 
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
+    
+    func gutenbergDidRequestPreview()
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

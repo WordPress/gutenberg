@@ -51,16 +51,23 @@ describe( 'Widgets screen', () => {
 	beforeAll( async () => {
 		// TODO: Ideally we can bundle our test theme directly in the repo.
 		await activateTheme( 'twentytwenty' );
-		await deactivatePlugin(
-			'gutenberg-test-plugin-disables-the-css-animations'
-		);
+		// Reduced motion is needed to immediately show and dismiss the snackbars.
+		await page.emulateMediaFeatures( [
+			{
+				name: 'prefers-reduced-motion',
+				value: 'reduce',
+			},
+		] );
 		await deleteAllWidgets();
 	} );
 
 	afterAll( async () => {
-		await activatePlugin(
-			'gutenberg-test-plugin-disables-the-css-animations'
-		);
+		await page.emulateMediaFeatures( [
+			{
+				name: 'prefers-reduced-motion',
+				value: 'no-preference',
+			},
+		] );
 		await activateTheme( 'twentytwentyone' );
 	} );
 
@@ -240,7 +247,7 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	it( 'Should insert content using the inline inserter', async () => {
+	it.skip( 'Should insert content using the inline inserter', async () => {
 		const [ firstWidgetArea ] = await findAll( {
 			role: 'group',
 			name: 'Block: Widget Area',
@@ -888,14 +895,18 @@ async function saveWidgets() {
 	} );
 	await updateButton.click();
 
-	await findAll( {
+	// Expect the "Widgets saved." snackbar to appear.
+	const savedSnackbarQuery = {
+		role: 'button',
+		name: 'Dismiss this notice',
 		text: 'Widgets saved.',
-	} );
+	};
+	await expect( savedSnackbarQuery ).toBeFound();
 
-	// FIXME: The snackbar above is enough for the widget areas to get saved,
-	// but not enough for the widgets to get saved.
-	// eslint-disable-next-line no-restricted-syntax
-	await page.waitForTimeout( 500 );
+	// Close the snackbar.
+	const savedSnackbar = await find( savedSnackbarQuery );
+	await savedSnackbar.click();
+	await expect( savedSnackbarQuery ).not.toBeFound();
 }
 
 async function getSerializedWidgetAreas() {

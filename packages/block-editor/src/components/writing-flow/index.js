@@ -1,9 +1,15 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,14 +20,7 @@ import useArrowNav from './use-arrow-nav';
 import useSelectAll from './use-select-all';
 import { store as blockEditorStore } from '../../store';
 
-/**
- * Handles selection and navigation across blocks. This component should be
- * wrapped around BlockList.
- *
- * @param {Object}    props          Component properties.
- * @param {WPElement} props.children Children to be rendered.
- */
-export default function WritingFlow( { children } ) {
+function WritingFlow( { children, ...props }, forwardedRef ) {
 	const [ before, ref, after ] = useTabNav();
 	const hasMultiSelection = useSelect(
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
@@ -31,14 +30,19 @@ export default function WritingFlow( { children } ) {
 		<>
 			{ before }
 			<div
+				{ ...props }
 				ref={ useMergeRefs( [
+					forwardedRef,
 					ref,
 					useMultiSelection(),
 					useSelectAll(),
 					useArrowNav(),
 				] ) }
-				className="block-editor-writing-flow"
-				tabIndex={ hasMultiSelection ? '0' : undefined }
+				className={ classNames(
+					props.className,
+					'block-editor-writing-flow'
+				) }
+				tabIndex={ -1 }
 				aria-label={
 					hasMultiSelection
 						? __( 'Multiple selected blocks' )
@@ -51,3 +55,12 @@ export default function WritingFlow( { children } ) {
 		</>
 	);
 }
+
+/**
+ * Handles selection and navigation across blocks. This component should be
+ * wrapped around BlockList.
+ *
+ * @param {Object}    props          Component properties.
+ * @param {WPElement} props.children Children to be rendered.
+ */
+export default forwardRef( WritingFlow );

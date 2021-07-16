@@ -190,3 +190,14 @@ jest.mock( 'react-native/Libraries/Components/Switch/Switch', () => {
 		'react-native/Libraries/Components/Switch/Switch'
 	);
 } );
+
+jest.mock( '@wordpress/compose', () => {
+	return {
+		...jest.requireActual( '@wordpress/compose' ),
+		useViewportMatch: jest.fn(),
+		useResizeObserver: jest.fn( () => [
+			mockComponent( 'ResizeObserverMock' )( {} ),
+			{ width: 100, height: 100 },
+		] ),
+	};
+} );

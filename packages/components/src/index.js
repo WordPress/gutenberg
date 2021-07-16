@@ -109,6 +109,10 @@ export { default as ResizableBox } from './resizable-box';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as SearchControl } from './search-control';
+export {
+	SegmentedControl as __experimentalSegmentedControl,
+	SegmentedControlOption as __experimentalSegmentedControlOption,
+} from './segmented-control';
 export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';

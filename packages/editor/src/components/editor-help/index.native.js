@@ -9,7 +9,7 @@ import { View, Text } from 'react-native';
 import { BottomSheet, PanelBody } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
 	helpFilled,
 	plusCircleFilled,
@@ -50,8 +50,8 @@ const HELP_TOPICS = [
 	},
 ];
 
-function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
-	const bottomSheetHeaderTitleStyle = getStylesFromColorScheme(
+function EditorHelpTopics( { isVisible, onClose } ) {
+	const bottomSheetHeaderTitleStyle = usePreferredColorSchemeStyle(
 		styles.bottomSheetHeaderTitle,
 		styles.bottomSheetHeaderTitleDark
 	);
@@ -60,12 +60,12 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 		<BottomSheet
 			isVisible={ isVisible }
 			onClose={ onClose }
+			contentStyle={ styles.contentContainer }
 			hideHeader
 			hasNavigation
-			contentStyle={ styles.contentContainer }
 		>
 			<BottomSheet.NavigationContainer animate main>
-				<BottomSheet.NavigationScreen name={ 'Topics' }>
+				<BottomSheet.NavigationScreen name={ __( 'Topics' ) }>
 					<View style={ styles.bottomSheetHeader }>
 						<Text
 							style={ bottomSheetHeaderTitleStyle }
@@ -81,10 +81,9 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 					>
 						{ /* Print out help topics */ }
 						{ HELP_TOPICS.map( ( topic ) => {
-							const key = topic.label;
 							return (
 								<HelpTopicRow
-									key={ key }
+									key={ topic.label }
 									label={ topic.label }
 									icon={ topic.icon }
 								/>
@@ -93,19 +92,14 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 					</PanelBody>
 				</BottomSheet.NavigationScreen>
 				{ /* Print out help detail screens */ }
-				{ HELP_TOPICS.map( ( topic ) => {
-					const key = topic.label;
-					return (
-						<HelpDetailNavigationScreen
-							key={ key }
-							name={ topic.label }
-							view={ topic.view }
-						/>
-					);
-				} ) }
+				<BottomSheet.NavigationScreen
+					name={ BottomSheet.SubSheet.screenName }
+				>
+					<BottomSheet.SubSheet.Slot />
+				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	) );
 }
 
-export default withPreferredColorScheme( EditorHelpTopics );
+export default EditorHelpTopics;

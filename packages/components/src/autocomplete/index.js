@@ -273,6 +273,7 @@ function useAutocomplete( {
 
 	useEffect( () => {
 		if ( ! textContent ) {
+			reset();
 			return;
 		}
 

@@ -1,12 +1,4 @@
 /**
- * External dependencies
- */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
-
-/**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
@@ -17,6 +9,7 @@ import type { PolymorphicComponentProps } from '../context';
  * Internal dependencies
  */
 import * as styles from './styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 export interface Props {
 	bordered?: boolean;
@@ -36,6 +29,8 @@ export function useItemGroup(
 		role = 'list',
 		...otherProps
 	} = useContextSystem( props, 'ItemGroup' );
+
+	const cx = useCx();
 
 	const classes = cx(
 		bordered && styles.bordered,

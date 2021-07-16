@@ -23,7 +23,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useState, useEffect, Platform } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -53,7 +53,6 @@ const EmbedEdit = ( props ) => {
 		setAttributes,
 		insertBlocksAfter,
 		onFocus,
-		clientId,
 	} = props;
 
 	const defaultEmbedInfo = {
@@ -94,10 +93,7 @@ const EmbedEdit = ( props ) => {
 			// Some WordPress URLs that can't be embedded will cause the API to return
 			// a valid JSON response with no HTML and `data.status` set to 404, rather
 			// than generating a fallback response as other embeds do.
-			const wordpressCantEmbed = Platform.select( {
-				web: embedPreview?.data?.status === 404,
-				native: embedPreview?.code === '404',
-			} );
+			const wordpressCantEmbed = embedPreview?.data?.status === 404;
 			const validPreview =
 				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
 			return {
@@ -191,30 +187,8 @@ const EmbedEdit = ( props ) => {
 		);
 	}
 
-	const label = Platform.select( {
-		// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
-		web: sprintf( __( '%s URL' ), title ),
-		native: title,
-	} );
-
-	const onSubmit = ( event ) => {
-		if ( event ) {
-			event.preventDefault();
-		}
-
-		setIsEditingURL( false );
-		setAttributes( { url } );
-	};
-
-	const onSubmitNative = ( value ) => {
-		// On native, the URL change is only notified when submitting,
-		// and not via 'onChange', so we have to explicitly set the URL.
-		setURL( value );
-
-		// Replicate the same behavior as onSubmit
-		setIsEditingURL( false );
-		setAttributes( { url: value } );
-	};
+	// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
+	const label = sprintf( __( '%s URL' ), title );
 
 	// No preview, or we can't embed the current URL, or we've clicked the edit button.
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
@@ -226,10 +200,14 @@ const EmbedEdit = ( props ) => {
 					icon={ icon }
 					label={ label }
 					onFocus={ onFocus }
-					onSubmit={ Platform.select( {
-						web: onSubmit,
-						native: onSubmitNative,
-					} ) }
+					onSubmit={ ( event ) => {
+						if ( event ) {
+							event.preventDefault();
+						}
+
+						setIsEditingURL( false );
+						setAttributes( { url } );
+					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }
 					onChange={ ( event ) => setURL( event.target.value ) }
@@ -237,8 +215,6 @@ const EmbedEdit = ( props ) => {
 					tryAgain={ () => {
 						invalidateResolution( 'getEmbedPreview', [ url ] );
 					} }
-					isSelected={ isSelected }
-					isEditingURL={ isEditingURL }
 				/>
 			</View>
 		);
@@ -285,7 +261,6 @@ const EmbedEdit = ( props ) => {
 					icon={ icon }
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
-					clientId={ clientId }
 				/>
 			</View>
 		</>
