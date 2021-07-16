@@ -5,9 +5,9 @@
  *
  * @return  The extracted number and unit.
  */
-export function parseUnitValue(
+export function parseCSSUnitValue(
 	toParse: string | number
-): [ number | string | undefined, string | undefined ] {
+): [ number | undefined, string | undefined ] {
 	// eslint-disable-next-line eqeqeq
 	if ( toParse == null ) {
 		return [ undefined, undefined ];
@@ -15,8 +15,8 @@ export function parseUnitValue(
 
 	const value = String( toParse ).trim();
 
-	let num: number | string = parseFloat( value );
-	num = Number.isNaN( num ) ? '' : num;
+	let num: number | undefined = parseFloat( value );
+	num = Number.isNaN( num ) ? undefined : num;
 
 	const matched = value.match(
 		/[\d.\-+]*\s*(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|vw|vh|vmin|vmax)/
@@ -40,7 +40,7 @@ export function parseUnitValue(
  *
  * @return The unit value.
  */
-export function createUnitValue(
+export function createCSSUnitValue(
 	value: string | number,
 	unit: string
 ): string {

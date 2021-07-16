@@ -1,10 +1,10 @@
 /**
  * Internal dependencies
  */
-import { createUnitValue, parseUnitValue } from '../unit-values';
+import { createCSSUnitValue, parseCSSUnitValue } from '../unit-values';
 
 describe( 'unit-values', () => {
-	describe( 'createUnitValue', () => {
+	describe( 'createCSSUnitValue', () => {
 		it.each`
 			value     | unit      | output
 			${ 100 }  | ${ 'em' } | ${ '100em' }
@@ -12,11 +12,11 @@ describe( 'unit-values', () => {
 		`(
 			'should combine $value and $unit to create $output',
 			( { value, unit, output } ) =>
-				expect( createUnitValue( value, unit ) ).toEqual( output )
+				expect( createCSSUnitValue( value, unit ) ).toEqual( output )
 		);
 	} );
 
-	describe( 'parseUnitValue', () => {
+	describe( 'parseCSSUnitValue', () => {
 		it.each`
 			value                  | output
 			${ '10cm' }            | ${ [ 10, 'cm' ] }
@@ -41,7 +41,7 @@ describe( 'unit-values', () => {
 		`(
 			'should parse $value into $output',
 			( { value, output: [ num, unit ] } ) =>
-				expect( parseUnitValue( value ) ).toEqual( [ num, unit ] )
+				expect( parseCSSUnitValue( value ) ).toEqual( [ num, unit ] )
 		);
 	} );
 } );
