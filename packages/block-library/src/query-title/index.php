@@ -19,10 +19,12 @@ function render_block_core_query_title( $attributes ) {
 	$is_search  = is_search();
 	$is_archive = is_archive();
 	$is_404		= is_404();
-	if ( ! $type ||
+	if (
+		! $type ||
 		( 'archive' === $type && ! $is_archive ) ||
 		( 'search' === $type && ! $is_search ) ||
-		( '404' === $type && ! $is_404 ) ) {
+		( '404' === $type && ! $is_404 )
+	) {
 		return '';
 	}
 	$title = isset( $attributes['content'] ) ? $attributes['content'] : '';
