@@ -7,8 +7,8 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import GalleryEdit from './edit';
-import GalleryEditV1 from './v1/edit';
+import EditWithInnerBlocks from './edit';
+import EditWithoutInnerBlocks from './v1/edit';
 
 /*
  * Using a wrapper around the logic to load the edit for v1 of Gallery block
@@ -33,8 +33,8 @@ export default function GalleryEditWrapper( props ) {
 		hasOldVersionContent ||
 		( ! hasNewVersionContent && ! __experimentalGalleryRefactor )
 	) {
-		return <GalleryEditV1 { ...props } />;
+		return <EditWithoutInnerBlocks { ...props } />;
 	}
 
-	return <GalleryEdit { ...props } />;
+	return <EditWithInnerBlocks { ...props } />;
 }

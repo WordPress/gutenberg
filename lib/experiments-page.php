@@ -53,12 +53,12 @@ function gutenberg_initialize_experiments_settings() {
 	);
 	add_settings_field(
 		'gutenberg-gallery-refactor',
-		__( 'Gallery Refactor', 'gutenberg' ),
+		__( 'Gallery block experiment', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable the refactored gallery block', 'gutenberg' ),
+			'label' => __( 'Test a new gallery block that uses nested image blocks', 'gutenberg' ),
 			'id'    => 'gutenberg-gallery-refactor',
 		)
 	);
