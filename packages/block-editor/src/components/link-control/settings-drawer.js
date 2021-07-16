@@ -7,6 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 import { ToggleControl, VisuallyHidden } from '@wordpress/components';
 
 const defaultSettings = [
@@ -21,14 +22,23 @@ const LinkControlSettingsDrawer = ( {
 	onChange = noop,
 	settings = defaultSettings,
 } ) => {
-	if ( ! settings || ! settings.length ) {
+	settings = applyFilters(
+		'core.block-editor.link-control.settings',
+		settings,
+		value
+	);
+
+	if ( ! settings || ! Array.isArray( settings ) || ! settings.length ) {
 		return null;
 	}
 
 	const handleSettingChange = ( setting ) => ( newValue ) => {
 		onChange( {
 			...value,
-			[ setting.id ]: newValue,
+			settings: {
+				...value.settings,
+				[ setting.id ]: newValue,
+			},
 		} );
 	};
 
@@ -38,7 +48,9 @@ const LinkControlSettingsDrawer = ( {
 			key={ setting.id }
 			label={ setting.title }
 			onChange={ handleSettingChange( setting ) }
-			checked={ value ? !! value[ setting.id ] : false }
+			checked={
+				value?.settings ? !! value?.settings[ setting.id ] : false
+			}
 		/>
 	) );
 
