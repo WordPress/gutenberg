@@ -51,6 +51,14 @@
 		},
 		"contentPosition": {
 			"type": "string"
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"ui": {
+					"duotoneHidden": true
+				}
+			}
 		}
 	},
 	"supports": {

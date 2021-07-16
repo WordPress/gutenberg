@@ -9,7 +9,12 @@
 			"isRepeated": false,
 			"dimRatio": 10,
 			"customOverlayColor": "#3615d9",
-			"backgroundType": "video"
+			"backgroundType": "video",
+			"style": {
+				"ui": {
+					"duotoneHidden": true
+				}
+			}
 		},
 		"innerBlocks": [
 			{

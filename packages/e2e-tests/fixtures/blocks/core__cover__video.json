@@ -8,7 +8,12 @@
 			"hasParallax": false,
 			"isRepeated": false,
 			"dimRatio": 40,
-			"backgroundType": "video"
+			"backgroundType": "video",
+			"style": {
+				"ui": {
+					"duotoneHidden": true
+				}
+			}
 		},
 		"innerBlocks": [
 			{

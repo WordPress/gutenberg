@@ -88,7 +88,7 @@ exports[`Inserting blocks inserts a block in proper place after having clicked \
 <p>First paragraph</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:cover -->
+<!-- wp:cover {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <div class=\\"wp-block-cover has-background-dim\\"><div class=\\"wp-block-cover__inner-container\\"></div></div>
 <!-- /wp:cover -->
 

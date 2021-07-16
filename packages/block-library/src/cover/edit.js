@@ -60,6 +60,7 @@ import {
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
+	useDuotoneUI,
 } from './shared';
 
 /**
@@ -327,6 +328,8 @@ function CoverEdit( {
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
 	const isUploadingMedia = isTemporaryMedia( id, url );
+
+	useDuotoneUI( attributes, setAttributes );
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
 	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(

@@ -62,6 +62,7 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_DEFAULT_HEIGHT,
+	useDuotoneUI,
 } from './shared';
 import Controls from './controls';
 
@@ -105,6 +106,8 @@ const Cover = ( {
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false
 	);
+
+	useDuotoneUI( attributes, setAttributes );
 
 	useEffect( () => {
 		let isCurrent = true;

@@ -127,6 +127,7 @@ ${ selector } {
 function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
+	const isHidden = style?.ui?.duotoneHidden;
 
 	const duotonePalette = useSetting( 'color.duotone' ) || EMPTY_ARRAY;
 	const colorPalette = useSetting( 'color.palette' ) || EMPTY_ARRAY;
@@ -136,6 +137,10 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		( colorPalette?.length === 0 && disableCustomColors );
 
 	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
+		return null;
+	}
+
+	if ( isHidden ) {
 		return null;
 	}
 

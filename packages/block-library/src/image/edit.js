@@ -120,6 +120,18 @@ export function ImageEdit( {
 		captionRef.current = caption;
 	}, [ caption ] );
 
+	useEffect( () => {
+		setAttributes( {
+			style: {
+				...attributes.style,
+				ui: {
+					...attributes.style?.ui,
+					duotoneHidden: ! url,
+				},
+			},
+		} );
+	}, [ url, setAttributes ] );
+
 	const ref = useRef();
 	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );

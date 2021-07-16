@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`templates Using a CPT with a predefined template Should add a custom post types with a predefined template 1`] = `
-"<!-- wp:image -->
+"<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
@@ -15,7 +15,7 @@ exports[`templates Using a CPT with a predefined template Should add a custom po
 
 <!-- wp:columns -->
 <div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"><!-- wp:image -->
+<div class=\\"wp-block-column\\"><!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image --></div>
 <!-- /wp:column -->
@@ -41,7 +41,7 @@ exports[`templates Using a CPT with a predefined template Should respect user ed
 
 <!-- wp:columns -->
 <div class=\\"wp-block-columns\\"><!-- wp:column -->
-<div class=\\"wp-block-column\\"><!-- wp:image -->
+<div class=\\"wp-block-column\\"><!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image --></div>
 <!-- /wp:column -->
@@ -59,7 +59,7 @@ exports[`templates With default post format assigned should not populate edited 
 exports[`templates With default post format assigned should not populate new page with default block for format 1`] = `""`;
 
 exports[`templates With default post format assigned should populate new post with default block for format 1`] = `
-"<!-- wp:image -->
+"<!-- wp:image {\\"style\\":{\\"ui\\":{\\"duotoneHidden\\":true}}} -->
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->"
 `;

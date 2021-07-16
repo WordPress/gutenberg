@@ -72,6 +72,14 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"ui": {
+					"duotoneHidden": true
+				}
+			}
 		}
 	},
 	"supports": {
