@@ -22,13 +22,12 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
-import HelpDetailNavigationScreen from './help-detail-navigation-screen.js';
-import HelpTopicRow from './help-topic-row.js';
-import IntroToBlocks from './intro-to-blocks';
-import AddBlocks from './add-blocks';
-import MoveBlocks from './move-blocks';
-import RemoveBlocks from './remove-blocks';
-import CustomizeBlocks from './customize-blocks';
+import HelpTopicRow from './help-topic-row.native';
+import IntroToBlocks from './intro-to-blocks.native';
+import AddBlocks from './add-blocks.native';
+import MoveBlocks from './move-blocks.native';
+import RemoveBlocks from './remove-blocks.native';
+import CustomizeBlocks from './customize-blocks.native';
 
 const HELP_TOPICS = [
 	{
