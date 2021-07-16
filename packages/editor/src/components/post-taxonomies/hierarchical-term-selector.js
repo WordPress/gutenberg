@@ -229,7 +229,7 @@ function HierarchicalTermSelector( { slug } ) {
 	 * @param {Object} term Term object.
 	 * @return {Promise} A promise that resolves to save term object.
 	 */
-	const appendTerm = ( term ) => {
+	const addTerm = ( term ) => {
 		return saveEntityRecord( 'taxonomy', slug, term );
 	};
 
@@ -295,7 +295,7 @@ function HierarchicalTermSelector( { slug } ) {
 		}
 		setAdding( true );
 
-		const newTerm = await appendTerm( {
+		const newTerm = await addTerm( {
 			name: formName,
 			parent: formParent ? formParent : undefined,
 		} );
