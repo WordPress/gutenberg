@@ -75,7 +75,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $current_screen, $post, $editor_styles;
+	global $current_screen, $post, $editor_styles, $wp_styles;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
@@ -135,6 +135,12 @@ function gutenberg_edit_site_init( $hook ) {
 		( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 )
 	) {
 		wp_enqueue_style( 'wp-block-library-theme' );
+	}
+
+	// Remove wp-reset-editor-styles, as it's not needed in the iframed site editor.
+	if ( isset( $wp_styles->registered['wp-edit-blocks'] ) ) {
+		$wp_edit_blocks_dependencies                   = array_diff( $wp_styles->registered['wp-edit-blocks']->deps, array( 'wp-reset-editor-styles' ) );
+		$wp_styles->registered['wp-edit-blocks']->deps = $wp_edit_blocks_dependencies;
 	}
 
 	/**
