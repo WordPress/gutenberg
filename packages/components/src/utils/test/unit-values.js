@@ -26,7 +26,7 @@ describe( 'unit-values', () => {
 			${ '10pc' }            | ${ [ 10, 'pc' ] }
 			${ '10pt' }            | ${ [ 10, 'pt' ] }
 			${ '10px' }            | ${ [ 10, 'px' ] }
-			${ 'abc em' }          | ${ [ '', 'em' ] }
+			${ 'abc em' }          | ${ [ undefined, 'em' ] }
 			${ '10ex' }            | ${ [ 10, 'ex' ] }
 			${ '10ch' }            | ${ [ 10, 'ch' ] }
 			${ '10rem' }           | ${ [ 10, 'rem' ] }
@@ -35,13 +35,13 @@ describe( 'unit-values', () => {
 			${ '10vh' }            | ${ [ 10, 'vh' ] }
 			${ '10vmin' }          | ${ [ 10, 'vmin' ] }
 			${ '10vmax' }          | ${ [ 10, 'vmax' ] }
+			${ '10 vmax' }         | ${ [ 10, 'vmax' ] }
+			${ '10notacssunit' }   | ${ [ 10, undefined ] }
 			${ 'notaunitedvalue' } | ${ [ undefined, undefined ] }
 			${ null }              | ${ [ undefined, undefined ] }
 			${ undefined }         | ${ [ undefined, undefined ] }
-		`(
-			'should parse $value into $output',
-			( { value, output: [ num, unit ] } ) =>
-				expect( parseCSSUnitValue( value ) ).toEqual( [ num, unit ] )
+		`( 'should parse $value into $output', ( { value, output } ) =>
+			expect( parseCSSUnitValue( value ) ).toEqual( output )
 		);
 	} );
 } );
