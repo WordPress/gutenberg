@@ -177,6 +177,7 @@ const EmbedEdit = ( props ) => {
 		}
 	}, [ preview, isEditingURL ] );
 
+	// Shows responsive embeds correctly by adding the `wp-embed-responsive` class.
 	const blockProps = useBlockProps( { className: 'wp-embed-responsive' } );
 
 	if ( fetching ) {
