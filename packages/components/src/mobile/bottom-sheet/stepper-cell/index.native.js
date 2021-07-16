@@ -240,7 +240,7 @@ class BottomSheetStepperCell extends Component {
 										label={ label }
 										onChange={ onChange }
 										defaultValue={ `${ inputValue }` }
-										value={ inputValue }
+										value={ value }
 										min={ min }
 										step={ 1 }
 										decimalNum={ decimalNum }
