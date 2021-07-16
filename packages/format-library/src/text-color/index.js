@@ -8,10 +8,7 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import {
-	RichTextToolbarButton,
-	__experimentalUseEditorFeature as useEditorFeature,
-} from '@wordpress/block-editor';
+import { RichTextToolbarButton, useSetting } from '@wordpress/block-editor';
 import { Icon, textColor as textColorIcon } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 
@@ -32,8 +29,8 @@ function TextColorEdit( {
 	activeAttributes,
 	contentRef,
 } ) {
-	const allowCustomControl = useEditorFeature( 'color.custom' );
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
+	const allowCustomControl = useSetting( 'color.custom' );
+	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
 		setIsAddingColor,
@@ -87,10 +84,7 @@ function TextColorEdit( {
 					onClose={ disableIsAddingColor }
 					activeAttributes={ activeAttributes }
 					value={ value }
-					onChange={ ( ...args ) => {
-						onChange( ...args );
-						disableIsAddingColor();
-					} }
+					onChange={ onChange }
 					contentRef={ contentRef }
 				/>
 			) }

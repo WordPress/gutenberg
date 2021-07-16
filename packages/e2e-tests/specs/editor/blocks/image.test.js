@@ -69,7 +69,7 @@ describe( 'Image', () => {
 		await waitForImage( filename );
 
 		const regex = new RegExp(
-			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
+			`<!-- wp:image {"id":\\d+,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
@@ -80,7 +80,7 @@ describe( 'Image', () => {
 		await waitForImage( filename1 );
 
 		const regex1 = new RegExp(
-			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
+			`<!-- wp:image {"id":\\d+,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex1 );
 
@@ -88,7 +88,7 @@ describe( 'Image', () => {
 		await page.click( '[aria-label="Image size presets"] button' );
 
 		const regex2 = new RegExp(
-			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large is-resized"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`
+			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full is-resized"><img src="[^"]+\\/${ filename1 }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`
 		);
 
 		expect( await getEditedPostContent() ).toMatch( regex2 );
@@ -100,7 +100,7 @@ describe( 'Image', () => {
 		await waitForImage( filename2 );
 
 		const regex3 = new RegExp(
-			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename2 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
+			`<!-- wp:image {"id":\\d+,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename2 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
 
@@ -110,12 +110,12 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
-	it( 'should place caret at end of caption after merging empty paragraph', async () => {
+	it.skip( 'should place caret at end of caption after merging empty paragraph', async () => {
 		await insertBlock( 'Image' );
 		const fileName = await upload( '.wp-block-image input[type="file"]' );
 		await waitForImage( fileName );
 		await page.keyboard.type( '1' );
-		await insertBlock( 'Paragraph' );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '2' );
 
@@ -135,6 +135,24 @@ describe( 'Image', () => {
 		expect(
 			await page.evaluate( () => document.activeElement.innerHTML )
 		).toBe( '1<br data-rich-text-line-break="true">2' );
+	} );
+
+	it( 'should have keyboard navigable toolbar for caption', async () => {
+		await insertBlock( 'Image' );
+		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( fileName );
+		// Navigate to More, Link, Italic and finally Bold.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await page.keyboard.press( 'Space' );
+		await page.keyboard.press( 'a' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		expect(
+			await page.evaluate( () => document.activeElement.innerHTML )
+		).toBe( '<strong>a</strong>' );
 	} );
 
 	it( 'should drag and drop files into media placeholder', async () => {
@@ -287,5 +305,60 @@ describe( 'Image', () => {
 		const updatedImageDataURL = await getDataURL( updatedImage );
 		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
 		expect( updatedImageDataURL ).toMatchSnapshot();
+	} );
+
+	it( 'Should reset dimensions on change URL', async () => {
+		const imageUrl = '/wp-includes/images/w-logo-blue.png';
+
+		await insertBlock( 'Image' );
+
+		// Upload an initial image.
+		const filename = await upload( '.wp-block-image input[type="file"]' );
+
+		// Resize the Uploaded Image.
+		await openDocumentSettingsSidebar();
+		await page.click(
+			'[aria-label="Image size presets"] button:first-child'
+		);
+
+		const regexBefore = new RegExp(
+			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"full","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-full is-resized"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`
+		);
+
+		// Check if dimensions are changed.
+		expect( await getEditedPostContent() ).toMatch( regexBefore );
+
+		// Replace uploaded image with an URL.
+		await clickButton( 'Replace' );
+		await clickButton( 'Edit' );
+
+		await page.waitForSelector( '.block-editor-url-input__input' );
+		await page.evaluate(
+			() =>
+				( document.querySelector(
+					'.block-editor-url-input__input'
+				).value = '' )
+		);
+
+		await page.focus( '.block-editor-url-input__input' );
+		await page.keyboard.type( imageUrl );
+		await page.click( '.block-editor-link-control__search-submit' );
+
+		const regexAfter = new RegExp(
+			`<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="${ imageUrl }" alt=""/></figure>\\s*<!-- /wp:image -->`
+		);
+
+		// Check if dimensions are reset.
+		expect( await getEditedPostContent() ).toMatch( regexAfter );
+	} );
+
+	it( 'should undo without broken temporary state', async () => {
+		await insertBlock( 'Image' );
+		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( fileName );
+		await pressKeyWithModifier( 'primary', 'z' );
+		// Expect an empty image block (placeholder) rather than one with a
+		// broken temporary URL.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

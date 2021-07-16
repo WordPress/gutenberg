@@ -60,7 +60,7 @@ export class BlockList extends Component {
 			renderFooterAppender: this.props.renderFooterAppender,
 			renderAppender: this.props.renderAppender,
 			onDeleteBlock: this.props.onDeleteBlock,
-			contentStyle: this.props.contentstyle,
+			contentStyle: this.props.contentStyle,
 		};
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
@@ -233,6 +233,7 @@ export class BlockList extends Component {
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 				onLayout={ this.onLayout }
+				testID="block-list-wrapper"
 			>
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android'
@@ -258,6 +259,7 @@ export class BlockList extends Component {
 						! isRootList && styles.overflowVisible,
 					] }
 					horizontal={ horizontal }
+					numColumns={ 1 }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
 					contentContainerStyle={ [

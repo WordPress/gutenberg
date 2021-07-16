@@ -16,7 +16,7 @@ import RangeCell from '../mobile/bottom-sheet/range-cell';
 import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 import Picker from '../mobile/picker';
 import styles from './style.scss';
-import { CSS_UNITS, hasUnits } from './utils';
+import { CSS_UNITS, hasUnits, parseA11yLabelForUnit } from './utils';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,6 @@ function UnitControl( {
 	units = CSS_UNITS,
 	unit,
 	getStylesFromColorScheme,
-	decimalNum,
 	...props
 } ) {
 	const pickerRef = useRef();
@@ -105,6 +104,16 @@ function UnitControl( {
 		[ anchorNodeRef?.current ]
 	);
 
+	const getDecimal = ( step ) => {
+		// Return the decimal offset based on the step size.
+		// if step size is 0.1 we expect the offset to be 1.
+		// for example 12 + 0.1 we would expect the see 12.1 (not 12.10 or 12 );
+		// steps are defined in the CSS_UNITS and they vary from unit to unit.
+		const stepToString = step;
+		const splitStep = stepToString.toString().split( '.' );
+		return splitStep[ 1 ] ? splitStep[ 1 ].length : 0;
+	};
+
 	const renderUnitPicker = useCallback( () => {
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
@@ -121,7 +130,20 @@ function UnitControl( {
 				) : null }
 			</View>
 		);
-	}, [ pickerRef, units, onUnitChange, getAnchor ] );
+	}, [ pickerRef, units, onUnitChange, getAnchor, renderUnitButton ] );
+
+	let step = props.step;
+
+	/*
+	 * If no step prop has been passed, lookup the active unit and
+	 * try to get step from `units`, or default to a value of `1`
+	 */
+	if ( ! step && units ) {
+		const activeUnit = units.find( ( option ) => option.value === unit );
+		step = activeUnit?.step ?? 1;
+	}
+
+	const decimalNum = getDecimal( step );
 
 	return (
 		<>
@@ -133,9 +155,12 @@ function UnitControl( {
 					onChange={ onChange }
 					separatorType={ separatorType }
 					value={ value }
+					step={ step }
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
-					decimalNum={ unit === 'px' ? 0 : decimalNum }
+					decimalNum={ decimalNum }
+					openUnitPicker={ onPickerPresent }
+					unitLabel={ parseA11yLabelForUnit( unit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
@@ -147,9 +172,13 @@ function UnitControl( {
 					minimumValue={ min }
 					maximumValue={ max }
 					value={ value }
+					step={ step }
+					unit={ unit }
 					defaultValue={ initialControlValue }
 					separatorType={ separatorType }
 					decimalNum={ decimalNum }
+					openUnitPicker={ onPickerPresent }
+					unitLabel={ parseA11yLabelForUnit( unit ) }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
@@ -159,4 +188,5 @@ function UnitControl( {
 	);
 }
 
+export { useCustomUnits } from './utils';
 export default memo( withPreferredColorScheme( UnitControl ) );

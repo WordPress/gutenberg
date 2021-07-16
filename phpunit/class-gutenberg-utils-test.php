@@ -4,12 +4,6 @@
  *
  * @package Gutenberg
  */
-
-/**
- * Test WP_Theme_JSON class.
- *
- * @package Gutenberg
- */
 class Gutenberg_Utils_Test extends WP_UnitTestCase {
 	/**
 	 * Test gutenberg_experimental_set() with simple non subtree path.
@@ -128,34 +122,31 @@ class Gutenberg_Utils_Test extends WP_UnitTestCase {
 		);
 	}
 
-	/**
-	 * Test gutenberg_get_minified_styles().
-	 */
-	public function test_gutenberg_get_minified_styles() {
-		$cases = array(
-			array(
-				'in'  => '
-/**
- * Comment
- */
-          .foo      {
-			  bar:  		1;
-		  }
-			',
-				'out' => '.foo{bar:1}',
-			),
-			array(
-				'in'  => '/* Comment */#foo{content:" ";  bar:   0;
-				  }',
-				'out' => '#foo{content:" ";bar:0}',
-			),
-		);
-
-		foreach ( $cases as $case ) {
-			$this->assertSame(
-				gutenberg_get_minified_styles( $case['in'] ),
-				$case['out']
-			);
-		}
+	public function test_gutenberg_experimental_to_kebab_case() {
+		$this->assertEquals( 'white', gutenberg_experimental_to_kebab_case( 'white' ) );
+		$this->assertEquals( 'white-black', gutenberg_experimental_to_kebab_case( 'white+black' ) );
+		$this->assertEquals( 'white-black', gutenberg_experimental_to_kebab_case( 'white:black' ) );
+		$this->assertEquals( 'white-black', gutenberg_experimental_to_kebab_case( 'white*black' ) );
+		$this->assertEquals( 'white-black', gutenberg_experimental_to_kebab_case( 'white.black' ) );
+		$this->assertEquals( 'white-black', gutenberg_experimental_to_kebab_case( 'white black' ) );
+		$this->assertEquals( 'white-black', gutenberg_experimental_to_kebab_case( 'white	black' ) );
+		$this->assertEquals( 'white-to-black', gutenberg_experimental_to_kebab_case( 'white-to-black' ) );
+		$this->assertEquals( 'white-2-white', gutenberg_experimental_to_kebab_case( 'white2white' ) );
+		$this->assertEquals( 'white-2nd', gutenberg_experimental_to_kebab_case( 'white2nd' ) );
+		$this->assertEquals( 'white-2-ndcolor', gutenberg_experimental_to_kebab_case( 'white2ndcolor' ) );
+		$this->assertEquals( 'white-2nd-color', gutenberg_experimental_to_kebab_case( 'white2ndColor' ) );
+		$this->assertEquals( 'white-2nd-color', gutenberg_experimental_to_kebab_case( 'white2nd_color' ) );
+		$this->assertEquals( 'white-23-color', gutenberg_experimental_to_kebab_case( 'white23color' ) );
+		$this->assertEquals( 'white-23', gutenberg_experimental_to_kebab_case( 'white23' ) );
+		$this->assertEquals( '23-color', gutenberg_experimental_to_kebab_case( '23color' ) );
+		$this->assertEquals( 'white-4th', gutenberg_experimental_to_kebab_case( 'white4th' ) );
+		$this->assertEquals( 'font-2-xl', gutenberg_experimental_to_kebab_case( 'font2xl' ) );
+		$this->assertEquals( 'white-to-white', gutenberg_experimental_to_kebab_case( 'whiteToWhite' ) );
+		$this->assertEquals( 'white-t-owhite', gutenberg_experimental_to_kebab_case( 'whiteTOwhite' ) );
+		$this->assertEquals( 'whit-eto-white', gutenberg_experimental_to_kebab_case( 'WHITEtoWHITE' ) );
+		$this->assertEquals( '42', gutenberg_experimental_to_kebab_case( 42 ) );
+		$this->assertEquals( 'ive-done', gutenberg_experimental_to_kebab_case( "i've done" ) );
+		$this->assertEquals( 'ffffff', gutenberg_experimental_to_kebab_case( '#ffffff' ) );
+		$this->assertEquals( 'ffffff', gutenberg_experimental_to_kebab_case( '$ffffff' ) );
 	}
 }

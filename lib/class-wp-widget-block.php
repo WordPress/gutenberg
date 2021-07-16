@@ -23,13 +23,22 @@ class WP_Widget_Block extends WP_Widget {
 	);
 
 	/**
+	 * Whether or not to show the widget's instance settings array in the REST
+	 * API.
+	 *
+	 * @since 5.8.0
+	 * @var array
+	 */
+	public $show_instance_in_rest = true;
+
+	/**
 	 * Sets up a new Block widget instance.
 	 *
 	 * @since 4.8.1
 	 */
 	public function __construct() {
 		$widget_ops  = array(
-			'classname'                   => '%s', // Set dynamically in widget().
+			'classname'                   => 'widget_block',
 			'description'                 => __( 'Gutenberg block.', 'gutenberg' ),
 			'customize_selective_refresh' => true,
 		);
@@ -53,7 +62,14 @@ class WP_Widget_Block extends WP_Widget {
 	 * @global WP_Post $post Global post object.
 	 */
 	public function widget( $args, $instance ) {
-		echo sprintf( $args['before_widget'], $this->get_dynamic_classname( $instance ) );
+		$instance = wp_parse_args( $instance, $this->default_instance );
+
+		echo str_replace(
+			'widget_block',
+			$this->get_dynamic_classname( $instance['content'] ),
+			$args['before_widget']
+		);
+
 		// Handle embeds for block widgets.
 		//
 		// When this feature is added to core it may need to be implemented
@@ -64,7 +80,10 @@ class WP_Widget_Block extends WP_Widget {
 		$content = $wp_embed->run_shortcode( $instance['content'] );
 		$content = $wp_embed->autoembed( $content );
 
-		echo do_blocks( $content );
+		$content = do_blocks( $content );
+		$content = do_shortcode( $content );
+
+		echo $content;
 
 		echo $args['after_widget'];
 	}
@@ -82,12 +101,12 @@ class WP_Widget_Block extends WP_Widget {
 	 *
 	 * @since 9.3.0
 	 *
-	 * @param array $instance Settings for the current block widget instance.
+	 * @param array $content The HTML content of the current block widget.
 	 *
 	 * @return string The classname to use in the block widget's container HTML.
 	 */
-	private function get_dynamic_classname( $instance ) {
-		$blocks = parse_blocks( $instance['content'] );
+	private function get_dynamic_classname( $content ) {
+		$blocks = parse_blocks( $content );
 
 		$block_name = isset( $blocks[0] ) ? $blocks[0]['blockName'] : null;
 
@@ -177,7 +196,10 @@ class WP_Widget_Block extends WP_Widget {
 	public function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance, $this->default_instance );
 		?>
-		<textarea id="<?php echo $this->get_field_id( 'content' ); ?>" name="<?php echo $this->get_field_name( 'content' ); ?>" rows="6" cols="50" class="widefat text wp-block-widget-textarea"><?php echo esc_textarea( $instance['content'] ); ?></textarea>
+		<p>
+		<label for="<?php echo $this->get_field_id( 'content' ); ?>"><?php echo __( 'Block HTML:', 'gutenberg' ); ?></label>
+		<textarea id="<?php echo $this->get_field_id( 'content' ); ?>" name="<?php echo $this->get_field_name( 'content' ); ?>" rows="6" cols="50" class="widefat code"><?php echo esc_textarea( $instance['content'] ); ?></textarea>
+		</p>
 		<?php
 	}
 

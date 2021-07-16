@@ -18,6 +18,15 @@
 		margin-left: -2px; // This optically balances the icon.
 		margin-right: $grid-unit-10;
 	}
+
+	&.is-primary {
+		justify-content: center;
+
+		.components-menu-item__item {
+			// Override the default right margin.
+			margin-right: 0;
+		}
+	}
 }
 
 .components-menu-item__info-wrapper {

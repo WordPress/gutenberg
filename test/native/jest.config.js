@@ -55,6 +55,7 @@ module.exports = {
 		[ `@wordpress\\/(${ transpiledPackageNames.join(
 			'|'
 		) })$` ]: '<rootDir>/packages/$1/src',
+		'test/helpers$': '<rootDir>/test/native/helpers.js',
 	},
 	modulePathIgnorePatterns: [
 		'<rootDir>/packages/react-native-editor/node_modules',
@@ -62,15 +63,17 @@ module.exports = {
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],
-		providesModuleNodeModules: [ 'react-native', 'react-native-svg' ],
 	},
 	transformIgnorePatterns: [
 		// This is required for now to have jest transform some of our modules
 		// See: https://github.com/wordpress-mobile/gutenberg-mobile/pull/257#discussion_r234978268
 		// There is no overloading in jest so we need to rewrite the config from react-native-jest-preset:
 		// https://github.com/facebook/react-native/blob/HEAD/jest-preset.json#L20
-		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|react-clone-referenced-element))',
+		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|@react-native|react-clone-referenced-element))',
 	],
-	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
+	snapshotSerializers: [
+		'enzyme-to-json/serializer',
+		'@emotion/jest/serializer',
+	],
 	reporters: [ 'default', 'jest-junit' ],
 };

@@ -7,12 +7,15 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRef, useEffect } from '@wordpress/element';
-import { useCopyOnClick } from '@wordpress/compose';
+import { useCopyToClipboard } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
+
+const TIMEOUT = 4000;
 
 export default function ClipboardButton( {
 	className,
@@ -22,23 +25,25 @@ export default function ClipboardButton( {
 	text,
 	...buttonProps
 } ) {
-	const ref = useRef();
-	const hasCopied = useCopyOnClick( ref, text );
-	const lastHasCopied = useRef( hasCopied );
+	deprecated( 'wp.components.ClipboardButton', {
+		since: '10.3',
+		plugin: 'Gutenberg',
+		alternative: 'wp.compose.useCopyToClipboard',
+	} );
+
+	const timeoutId = useRef();
+	const ref = useCopyToClipboard( text, () => {
+		onCopy();
+		clearTimeout( timeoutId.current );
+
+		if ( onFinishCopy ) {
+			timeoutId.current = setTimeout( () => onFinishCopy(), TIMEOUT );
+		}
+	} );
 
 	useEffect( () => {
-		if ( lastHasCopied.current === hasCopied ) {
-			return;
-		}
-
-		if ( hasCopied ) {
-			onCopy();
-		} else if ( onFinishCopy ) {
-			onFinishCopy();
-		}
-
-		lastHasCopied.current = hasCopied;
-	}, [ onCopy, onFinishCopy, hasCopied ] );
+		clearTimeout( timeoutId.current );
+	}, [] );
 
 	const classes = classnames( 'components-clipboard-button', className );
 

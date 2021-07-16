@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { Text } from '@wp-g2/components';
-
-/**
  * Internal dependencies
  */
 import { FormGroup, useFormGroupContextId } from '../index';
+import { Text } from '../../../text';
 
 // @todo: Refactor this after adding next TextInput component.
 const TextInput = ( { id: idProp, ...props } ) => {
@@ -20,7 +16,7 @@ const TextInput = ( { id: idProp, ...props } ) => {
 
 export default {
 	component: FormGroup,
-	title: 'Components/FormGroup',
+	title: 'G2 Components (Experimental)/FormGroup',
 };
 
 export const _default = () => {

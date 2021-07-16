@@ -1,18 +1,18 @@
 /**
  * External dependencies
  */
-import { contextConnect } from '@wp-g2/context';
 
 /**
  * Internal dependencies
  */
-import { Flex } from '../flex';
-import { Grid } from '../grid';
+import { Flex } from '../../flex';
+import { Grid } from '../../grid';
 import { useControlGroup } from './hook';
+import { contextConnect } from '../context';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+ * @param {import('react').Ref<any>}                                                       forwardedRef
  */
 function ControlGroup( props, forwardedRef ) {
 	const {

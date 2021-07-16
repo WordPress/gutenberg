@@ -1,20 +1,37 @@
 
-.block-directory-downloadable-blocks-panel__description {
-	font-style: italic;
+.block-directory-downloadable-blocks-panel {
 	padding: $grid-unit-20;
-	margin: 0;
-	text-align: left;
-	color: $gray-700;
+
+	&.has-blocks-loading {
+		$no-result-padding: $grid-unit-20 * 7;
+		font-style: normal;
+		padding: 0;
+		margin: $no-result-padding 0;
+		text-align: center;
+		color: $gray-700;
+
+		.components-spinner {
+			float: inherit;
+		}
+	}
 }
 
-.block-directory-downloadable-blocks-panel__description.has-no-results {
-	$no-result-padding: $grid-unit-20 * 7;
-	font-style: normal;
-	padding: 0;
-	margin: $no-result-padding 0;
-	text-align: center;
+.block-directory-downloadable-blocks-panel__no-local {
+	margin: $grid-unit-60 0;
+	padding: 0 $grid-unit-40 * 2;
 	color: $gray-700;
-	.components-spinner {
-		float: inherit;
-	}
+	text-align: center;
+}
+
+.block-directory-downloadable-blocks-panel__title {
+	margin: 0 0 $grid-unit-05;
+	font-size: 14px;
+}
+
+.block-directory-downloadable-blocks-panel__description {
+	margin-top: 0;
+}
+
+.block-directory-downloadable-blocks-panel button {
+	margin-top: $grid-unit-05;
 }

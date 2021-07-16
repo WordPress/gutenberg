@@ -1,61 +1,78 @@
 .block-directory-downloadable-block-list-item {
+	padding: $grid-unit-15;
 	width: 100%;
-	padding: 0;
-	margin: 0;
-	display: flex;
-	flex-direction: row;
-	font-size: $default-font-size;
-	color: $gray-900;
-	align-items: flex-start;
-	justify-content: center;
-	background: transparent;
-	word-break: break-word;
-	border-top: $border-width solid $gray-300;
-	border-bottom: $border-width solid $gray-300;
-	transition: all 0.05s ease-in-out;
-	@include reduce-motion("transition");
-	position: relative;
+	height: auto;
 	text-align: left;
-	overflow: hidden;
+	display: grid;
+	grid-template-columns: auto 1fr;
 
-	& + .block-directory-downloadable-block-list-item {
-		border-top: none;
+	&:hover {
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+	}
+
+	&.is-busy {
+		background: transparent;
+
+		.block-directory-downloadable-block-list-item__author {
+			border: 0;
+			clip: rect(1px, 1px, 1px, 1px);
+			-webkit-clip-path: inset(50%);
+			clip-path: inset(50%);
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			padding: 0;
+			position: absolute;
+			width: 1px;
+			word-wrap: normal !important;
+		}
+	}
+
+	&:disabled,
+	&[aria-disabled] {
+		opacity: 1;
 	}
 }
 
-.block-directory-downloadable-block-list-item:last-child:not(:only-of-type) {
-	border-top: 0;
+.block-directory-downloadable-block-list-item__icon {
+	position: relative;
+	margin-right: $grid-unit-20;
+	align-self: flex-start;
+
+	.block-directory-downloadable-block-list-item__spinner {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background: rgba(255, 255, 255, 0.75);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 }
 
-.block-directory-downloadable-block-list-item:last-child {
-	border-bottom: 0;
+.block-directory-block-ratings {
+	display: block;
+	margin-top: $grid-unit-05;
 }
 
-.block-directory-downloadable-block-list-item__panel {
-	display: flex;
-	flex-grow: 1;
-	flex-direction: column;
+.block-directory-downloadable-block-list-item__details {
+	color: $gray-900;
 }
 
-.block-directory-downloadable-block-list-item__header {
-	display: flex;
-	flex-direction: column;
-	padding: $grid-unit-20 $grid-unit-20 0;
+.block-directory-downloadable-block-list-item__title {
+	display: block;
+	font-weight: 600;
 }
 
-.block-directory-downloadable-block-list-item__body {
-	display: flex;
-	flex-direction: column;
-	padding: $grid-unit-20;
+.block-directory-downloadable-block-list-item__author {
+	display: block;
+	margin-top: $grid-unit-05;
+	font-weight: normal;
 }
 
-.block-directory-downloadable-block-list-item__footer {
-	display: flex;
-	flex-direction: column;
-	padding: $grid-unit-20;
-	background-color: $gray-100;
-}
-
-.block-directory-downloadable-block-list-item__content {
-	color: $gray-700;
+.block-directory-downloadable-block-list-item__desc {
+	display: block;
+	margin-top: $grid-unit-10;
 }

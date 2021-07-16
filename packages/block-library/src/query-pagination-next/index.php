@@ -16,11 +16,11 @@
  */
 function render_block_core_query_pagination_next( $attributes, $content, $block ) {
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : filter_var( $_GET[ $page_key ], FILTER_VALIDATE_INT );
+	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$default_label      = __( 'Next Page &raquo;', 'gutenberg' );
+	$default_label      = __( 'Next Page &raquo;' );
 	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$content            = '';
 
@@ -39,7 +39,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		$content = get_next_posts_link( $label, $max_page );
 		remove_filter( 'next_posts_link_attributes', $filter_link_attributes );
 	} elseif ( ! $max_page || $max_page > $page ) {
-		$custom_query = new WP_Query( construct_wp_query_args( $block, $page ) );
+		$custom_query = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
 		if ( (int) $custom_query->max_num_pages !== $page ) {
 			$content = sprintf(
 				'<a href="%1$s" %2$s>%3$s</a>',

@@ -13,6 +13,8 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	private static $category;
 	private static $page;
 	private static $draft;
+	private static $custom_draft;
+	private static $custom_post;
 
 	private static $pages;
 	private static $terms;
@@ -30,6 +32,30 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			)
 		);
 		self::$pages[] = self::$draft;
+
+		self::$custom_draft = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'cats',
+				'post_status'  => 'draft',
+				'post_name'    => 'metalcat',
+				'post_title'   => 'Metal Cat',
+				'post_content' => 'Metal Cat content',
+				'post_excerpt' => 'Metal Cat',
+			)
+		);
+		self::$pages[]      = self::$custom_draft;
+
+		self::$custom_post = self::factory()->post->create_and_get(
+			array(
+				'post_type'    => 'dogs',
+				'post_status'  => 'publish',
+				'post_name'    => 'metaldog',
+				'post_title'   => 'Metal Dog',
+				'post_content' => 'Metal Dog content',
+				'post_excerpt' => 'Metal Dog',
+			)
+		);
+		self::$pages[]     = self::$custom_post;
 
 		self::$page    = self::factory()->post->create_and_get(
 			array(
@@ -163,6 +189,48 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 					$navigation_link_block
 				),
 				'My Website'
+			) !== false
+		);
+	}
+
+	function test_returns_empty_when_custom_post_type_draft() {
+		$page_id = self::$custom_draft->ID;
+
+		$parsed_blocks = parse_blocks(
+			"<!-- wp:navigation-link {\"label\":\"Draft Custom Post Type\",\"type\":\"cats\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
+		);
+		$this->assertEquals( 1, count( $parsed_blocks ) );
+
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+
+		$this->assertEquals(
+			'',
+			gutenberg_render_block_core_navigation_link(
+				$navigation_link_block->attributes,
+				array(),
+				$navigation_link_block
+			)
+		);
+	}
+
+	function test_returns_link_when_custom_post_is_published() {
+		$page_id = self::$custom_post->ID;
+
+		$parsed_blocks = parse_blocks(
+			"<!-- wp:navigation-link {\"label\":\"Metal Dogs\",\"type\":\"dogs\",\"kind\":\"post-type\",\"id\":{$page_id},\"url\":\"http://localhost:8888/?page_id={$page_id}\"} /-->"
+		);
+		$this->assertEquals( 1, count( $parsed_blocks ) );
+
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], array() );
+		$this->assertEquals(
+			true,
+			strpos(
+				gutenberg_render_block_core_navigation_link(
+					$navigation_link_block->attributes,
+					array(),
+					$navigation_link_block
+				),
+				'Metal Dogs'
 			) !== false
 		);
 	}

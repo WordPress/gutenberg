@@ -1,11 +1,12 @@
 /**
- * External dependencies
- */
-import { ContextSystemProvider } from '@wp-g2/context';
-/**
  * WordPress dependencies
  */
 import { memo } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { ContextSystemProvider } from '../context';
 
 const contextValue = { Text: { variant: 'muted' } };
 

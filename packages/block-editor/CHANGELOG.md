@@ -2,7 +2,22 @@
 
 ## Unreleased
 
-- Add `JustifyToolbar` component abstracted out of the Navigation block so can be used elsewhere.
+### New Features
+
+-   `ButtonBlockerAppender` is now `ButtonBlockAppender`, the original name was a typo, but is still being exported for backward compatibility.
+
+## 6.1.0 (2021-05-20)
+
+## 6.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
+## 5.3.0 (2021-03-17)
+
+-   Add `JustifyToolbar` component abstracted out of the Navigation block so can be used elsewhere.
 
 ## 5.2.0 (2020-12-17)
 

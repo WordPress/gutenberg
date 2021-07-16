@@ -13,13 +13,13 @@ import {
 	useEffect,
 	useState,
 } from '@wordpress/element';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import Popover from '../popover';
 import Shortcut from '../shortcut';
-import { useDebounce } from '@wordpress/compose';
 
 /**
  * Time over children to wait before showing tooltip
@@ -168,6 +168,7 @@ function Tooltip( { children, position, text, shortcut } ) {
 	};
 	const clearOnUnmount = () => {
 		delayedSetIsOver.cancel();
+		document.removeEventListener( 'mouseup', cancelIsMouseDown );
 	};
 
 	useEffect( () => clearOnUnmount, [] );

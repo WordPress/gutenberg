@@ -36,7 +36,7 @@ function render_block_core_search( $attributes ) {
 	$label_markup    = '';
 	$input_markup    = '';
 	$button_markup   = '';
-	$width_styles    = '';
+	$inline_styles   = styles_for_block_core_search( $attributes );
 
 	if ( $show_label ) {
 		if ( ! empty( $attributes['label'] ) ) {
@@ -56,10 +56,11 @@ function render_block_core_search( $attributes ) {
 
 	if ( $show_input ) {
 		$input_markup = sprintf(
-			'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" required />',
+			'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" %s required />',
 			$input_id,
 			esc_attr( get_search_query() ),
-			esc_attr( $attributes['placeholder'] )
+			esc_attr( $attributes['placeholder'] ),
+			$inline_styles['shared']
 		);
 	}
 
@@ -80,20 +81,16 @@ function render_block_core_search( $attributes ) {
 		}
 
 		$button_markup = sprintf(
-			'<button type="submit" class="wp-block-search__button ' . $button_classes . '">%s</button>',
+			'<button type="submit" class="wp-block-search__button %s"%s>%s</button>',
+			$button_classes,
+			$inline_styles['shared'],
 			$button_internal_markup
 		);
 	}
 
-	if ( ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] ) ) {
-		if ( ! empty( $attributes['buttonPosition'] ) && 'button-only' !== $attributes['buttonPosition'] ) {
-			$width_styles = ' style="width: ' . $attributes['width'] . $attributes['widthUnit'] . ';"';
-		}
-	}
-
 	$field_markup       = sprintf(
 		'<div class="wp-block-search__inside-wrapper"%s>%s</div>',
-		$width_styles,
+		$inline_styles['wrapper'],
 		$input_markup . $button_markup
 	);
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
@@ -158,4 +155,89 @@ function classnames_for_block_core_search( $attributes ) {
 	}
 
 	return implode( ' ', $classnames );
+}
+
+/**
+ * Builds an array of inline styles for the search block.
+ *
+ * The result will contain one entry for shared styles such as those for the
+ * inner input or button and a second for the inner wrapper should the block
+ * be positioning the button "inside".
+ *
+ * @param  array $attributes The block attributes.
+ *
+ * @return array Style HTML attribute.
+ */
+function styles_for_block_core_search( $attributes ) {
+	$shared_styles  = array();
+	$wrapper_styles = array();
+
+	// Add width styles.
+	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
+	$button_only = ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'];
+
+	if ( $has_width && ! $button_only ) {
+		$wrapper_styles[] = sprintf(
+			'width: %d%s;',
+			esc_attr( $attributes['width'] ),
+			esc_attr( $attributes['widthUnit'] )
+		);
+	}
+
+	// Add border radius styles.
+	$has_border_radius = ! empty( $attributes['style']['border']['radius'] );
+
+	if ( $has_border_radius ) {
+		$default_padding = '4px';
+		$border_radius   = $attributes['style']['border']['radius'];
+		$button_inside   = ! empty( $attributes['buttonPosition'] ) &&
+			'button-inside' === $attributes['buttonPosition'];
+
+		if ( is_array( $border_radius ) ) {
+			// Apply styles for individual corner border radii.
+			foreach ( $border_radius as $key => $value ) {
+				if ( null !== $value ) {
+					// Convert camelCase key to kebab-case.
+					$name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
+
+					// Add shared styles for individual border radii for input & button.
+					$shared_styles[] = sprintf(
+						'border-%s-radius: %s;',
+						esc_attr( $name ),
+						esc_attr( $value )
+					);
+
+					// Add adjusted border radius styles for the wrapper element
+					// if button is positioned inside.
+					if ( $button_inside && intval( $value ) !== 0 ) {
+						$wrapper_styles[] = sprintf(
+							'border-%s-radius: calc(%s + %s);',
+							esc_attr( $name ),
+							esc_attr( $value ),
+							$default_padding
+						);
+					}
+				}
+			}
+		} else {
+			// Numeric check is for backwards compatibility purposes.
+			$border_radius   = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
+			$shared_styles[] = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
+
+			if ( $button_inside && intval( $border_radius ) !== 0 ) {
+				// Adjust wrapper border radii to maintain visual consistency
+				// with inner elements when button is positioned inside.
+				$wrapper_styles[] = sprintf(
+					'border-radius: calc(%s + %s);',
+					esc_attr( $border_radius ),
+					$default_padding
+				);
+			}
+		}
+	}
+
+	return array(
+		'shared'  => ! empty( $shared_styles ) ? sprintf( ' style="%s"', implode( ' ', $shared_styles ) ) : '',
+		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', implode( ' ', $wrapper_styles ) ) : '',
+	);
 }

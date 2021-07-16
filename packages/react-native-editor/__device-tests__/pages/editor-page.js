@@ -11,6 +11,7 @@ const {
 	toggleHtmlMode,
 	swipeFromTo,
 	longPressMiddleOfElement,
+	doubleTap,
 } = require( '../helpers/utils' );
 
 const initializeEditorPage = async () => {
@@ -135,6 +136,27 @@ class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
+	// iOS loads the block list more eagerly compared to Android.
+	// This makes this function return elements without scrolling on iOS.
+	// So we are keeping this Android only.
+	async androidScrollAndReturnElement( accessibilityLabel ) {
+		const elements = await this.driver.elementsByXPath(
+			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
+		);
+		if ( elements.length === 0 ) {
+			await swipeUp( this.driver, undefined, 100, 1 );
+			return this.androidScrollAndReturnElement( accessibilityLabel );
+		}
+		return elements[ elements.length - 1 ];
+	}
+
+	async getLastElementByXPath( accessibilityLabel ) {
+		const elements = await this.driver.elementsByXPath(
+			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
+		);
+		return elements[ elements.length - 1 ];
+	}
+
 	async getTextViewForHtmlViewContent() {
 		const accessibilityId = 'html-view-content';
 		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
@@ -161,8 +183,30 @@ class EditorPage {
 	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
 
+		const base64String = Buffer.from( html ).toString( 'base64' );
+
+		await this.driver.setClipboard( base64String, 'plaintext' );
+
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		await htmlContentView.type( html );
+
+		if ( isAndroid() ) {
+			// Attention! On Android `.type()` replaces the content of htmlContentView instead of appending
+			// contrary to what iOS is doing. On Android tried calling `driver.pressKeycode( 279 ) // KEYCODE_PASTE`
+			// before to paste, but for some reason it didn't work on GitHub Actions but worked only on Sauce Labs
+			await htmlContentView.type( html );
+		} else {
+			await htmlContentView.click();
+			await doubleTap( this.driver, htmlContentView );
+			// Sometimes double tap is not enough for paste menu to appear, so we also long press
+			await longPressMiddleOfElement( this.driver, htmlContentView );
+
+			const pasteButton = this.driver.elementByXPath(
+				'//XCUIElementTypeMenuItem[@name="Paste"]'
+			);
+
+			await pasteButton.click();
+			await this.driver.sleep( 3000 ); // wait for paste notification to disappear
+		}
 
 		await toggleHtmlMode( this.driver, false );
 	}
@@ -194,6 +238,19 @@ class EditorPage {
 		if ( smartSuggestions.length !== 0 ) {
 			smartSuggestions[ 0 ].click();
 		}
+	}
+
+	async openBlockSettings( block ) {
+		await block.click();
+
+		const settingsButton = await block.elementByAccessibilityId(
+			'Open Settings'
+		);
+		await settingsButton.click();
+	}
+
+	async dismissBottomSheet() {
+		return await swipeDown( this.driver );
 	}
 
 	// =========================
@@ -526,6 +583,77 @@ class EditorPage {
 		return await typeString( this.driver, textViewElement, text, clear );
 	}
 
+	async closePicker() {
+		if ( isAndroid() ) {
+			await swipeDown( this.driver );
+		} else {
+			const cancelButton = await this.driver.elementByAccessibilityId(
+				'Cancel'
+			);
+			await cancelButton.click();
+		}
+	}
+
+	// =============================
+	// Search Block functions
+	// =============================
+
+	async getSearchBlockTextElement( testID ) {
+		const child = await this.driver.elementByAccessibilityId( testID );
+
+		if ( isAndroid() ) {
+			// Get the child EditText element of the ViewGroup returned by
+			// elementByAccessibilityId.
+			return await child.elementByClassName( 'android.widget.EditText' );
+		}
+
+		return child;
+	}
+
+	async sendTextToSearchBlockChild( testID, text ) {
+		const textViewElement = await this.getSearchBlockTextElement( testID );
+		return await typeString( this.driver, textViewElement, text );
+	}
+
+	async toggleHideSearchLabelSetting( block ) {
+		await this.openBlockSettings( block );
+
+		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
+
+		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Hide search heading")]`;
+		return await this.driver
+			.elementByXPath( locator )
+			.click()
+			.sleep( isAndroid() ? 200 : 0 );
+	}
+
+	async changeSearchButtonPositionSetting( block, buttonPosition ) {
+		await this.openBlockSettings( block );
+
+		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
+
+		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Button position")]`;
+		await this.driver.elementByXPath( locator ).click();
+
+		const optionMenuButtonLocator = `${ elementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ buttonPosition }")]`;
+		return await this.driver
+			.elementByXPath( optionMenuButtonLocator )
+			.click()
+			.sleep( isAndroid() ? 600 : 200 ); // sleep a little longer due to multiple menus
+	}
+
+	async toggleSearchIconOnlySetting( block ) {
+		await this.openBlockSettings( block );
+
+		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
+
+		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Use icon button")]`;
+		return await this.driver
+			.elementByXPath( locator )
+			.click()
+			.sleep( isAndroid() ? 200 : 0 );
+	}
+
 	// =============================
 	// Unsupported Block functions
 	// =============================
@@ -589,6 +717,7 @@ const blockNames = {
 	verse: 'Verse',
 	file: 'File',
 	audio: 'Audio',
+	search: 'Search',
 };
 
 module.exports = { initializeEditorPage, blockNames };

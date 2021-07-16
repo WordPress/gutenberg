@@ -43,6 +43,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
+import im.shimo.react.prompt.RNPromptPackage;
+
 public class MainApplication extends Application implements ReactApplication, GutenbergBridgeInterface {
 
     private static final String TAG = "MainApplication";
@@ -113,6 +115,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void setFeaturedImage(int mediaId) {
+            }
+
+            @Override
             public void editorDidMount(ReadableArray unsupportedBlockNames) {
             }
 
@@ -149,10 +155,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void logUserEvent(GutenbergUserEvent gutenbergUserEvent, ReadableMap eventProperties) {
-            }
-
-            @Override
             public void setFocalPointPickerTooltipShown(boolean tooltipShown) {
             }
 
@@ -180,7 +182,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void performRequest(String path, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
+            public void performRequest(String path, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
 
             @Override
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
@@ -238,6 +240,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             }
 
+            @Override
+            public void requestPreview() {
+                Toast.makeText(MainApplication.this, "requestPreview called", Toast.LENGTH_SHORT).show();
+            }
+
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
@@ -262,6 +269,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new ReanimatedPackage(),
                         new SafeAreaContextPackage(),
                         new RNScreensPackage(),
+                        new RNPromptPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 
@@ -313,6 +321,13 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void onOptionSelected() {
                 mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
+            }
+        });
+
+        devSupportManager.addCustomDevOption("Help", new DevOptionHandler() {
+            @Override
+            public void onOptionSelected() {
+                mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
             }
         });
     }

@@ -42,8 +42,7 @@ describe( 'Template Part', () => {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			// TODO: Change General to Headers once TT1 blocks categorise the template parts
-			await navigationPanel.navigate( [ 'Template Parts', 'General' ] );
+			await navigationPanel.navigate( [ 'Template Parts', 'Headers' ] );
 			await navigationPanel.clickItemByText( 'header' );
 		}
 
@@ -66,7 +65,6 @@ describe( 'Template Part', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Index' );
-			await navigationPanel.close();
 		}
 
 		async function triggerEllipsisMenuItem( textPrompt ) {
@@ -94,6 +92,15 @@ describe( 'Template Part', () => {
 				`//*[@data-type="core/template-part"][//p[text()="${ content }"]]`
 			);
 			expect( paragraphInTemplatePart ).not.toBeNull();
+		}
+
+		async function awaitHeaderAndFooterLoad() {
+			await canvas().waitForSelector(
+				'.wp-block-template-part.site-header.block-editor-block-list__layout'
+			);
+			await canvas().waitForSelector(
+				'.wp-block-template-part.site-footer.block-editor-block-list__layout'
+			);
 		}
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
@@ -166,7 +173,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert selected block to template part', async () => {
-			await canvas().waitForSelector( '.wp-block-template-part' );
+			await awaitHeaderAndFooterLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -204,7 +211,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert multiple selected blocks to template part', async () => {
-			await canvas().waitForSelector( '.wp-block-template-part' );
+			await awaitHeaderAndFooterLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -263,7 +270,7 @@ describe( 'Template Part', () => {
 			'.editor-entities-saved-states__save-button';
 		const savePostSelector = '.editor-post-publish-button__button';
 		const templatePartSelector = '*[data-type="core/template-part"]';
-		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
+		const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
 		const createNewButtonSelector =
 			'//button[contains(text(), "New template part")]';
@@ -275,6 +282,7 @@ describe( 'Template Part', () => {
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
+			await page.waitForXPath( chooseExistingButtonSelector );
 			const [ createNewButton ] = await page.$x(
 				createNewButtonSelector
 			);
@@ -295,7 +303,7 @@ describe( 'Template Part', () => {
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			const [ chooseExistingButton ] = await page.$x(
+			const chooseExistingButton = await page.waitForXPath(
 				chooseExistingButtonSelector
 			);
 			await chooseExistingButton.click();

@@ -777,14 +777,14 @@ describe( 'block parser', () => {
 					<!-- wp:column -->
 					<div class="wp-block-column">
 						<!-- wp:group -->
-						<div class="wp-block-group"><div class="wp-block-group__inner-container">
+						<div class="wp-block-group">
 							<!-- wp:list -->
 							<ul><li>B</li><li>C</li></ul>
 							<!-- /wp:list -->
 							<!-- wp:paragraph -->
 							<p>D</p>
 							<!-- /wp:paragraph -->
-						</div></div>
+						</div>
 						<!-- /wp:group -->
 					</div>
 					<!-- /wp:column -->
@@ -839,14 +839,13 @@ describe( 'block parser', () => {
 										innerContent: [ '<p>D</p>' ],
 									},
 								],
-								innerHTML:
-									'<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+								innerHTML: '<div class="wp-block-group"></div>',
 								innerContent: [
-									'<div class="wp-block-group"><div class="wp-block-group__inner-container">',
+									'<div class="wp-block-group">',
 									null,
 									'',
 									null,
-									'</div></div>',
+									'</div>',
 								],
 							},
 						],

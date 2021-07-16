@@ -18,12 +18,18 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import {
+	MediaUpload,
+	MediaUploadCheck,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import PostFeaturedImageCheck from './check';
+import { store as editorStore } from '../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -184,7 +190,7 @@ function PostFeaturedImage( {
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
-								<Button onClick={ open } isSecondary>
+								<Button onClick={ open } variant="secondary">
 									{ __( 'Replace Image' ) }
 								</Button>
 							) }
@@ -193,7 +199,11 @@ function PostFeaturedImage( {
 				) }
 				{ !! featuredImageId && (
 					<MediaUploadCheck>
-						<Button onClick={ onRemoveImage } isLink isDestructive>
+						<Button
+							onClick={ onRemoveImage }
+							variant="link"
+							isDestructive
+						>
 							{ postLabel.remove_featured_image ||
 								DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 						</Button>
@@ -205,10 +215,8 @@ function PostFeaturedImage( {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getMedia, getPostType } = select( 'core' );
-	const { getCurrentPostId, getEditedPostAttribute } = select(
-		'core/editor'
-	);
+	const { getMedia, getPostType } = select( coreStore );
+	const { getCurrentPostId, getEditedPostAttribute } = select( editorStore );
 	const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 	return {
@@ -221,13 +229,13 @@ const applyWithSelect = withSelect( ( select ) => {
 
 const applyWithDispatch = withDispatch(
 	( dispatch, { noticeOperations }, { select } ) => {
-		const { editPost } = dispatch( 'core/editor' );
+		const { editPost } = dispatch( editorStore );
 		return {
 			onUpdateImage( image ) {
 				editPost( { featured_media: image.id } );
 			},
 			onDropImage( filesList ) {
-				select( 'core/block-editor' )
+				select( blockEditorStore )
 					.getSettings()
 					.mediaUpload( {
 						allowedTypes: [ 'image' ],

@@ -8,40 +8,38 @@
 
 ```jsx
 import { withFocusReturn, TextControl, Button } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const EnhancedComponent = withFocusReturn(
-	() => (
-		<div>
-			Focus will return to the previous input when this component is unmounted
-			<TextControl
-				autoFocus={ true }
-				onChange={ () => {} }
-			/>
-		</div>
-	)
-);
+const EnhancedComponent = withFocusReturn( () => (
+	<div>
+		Focus will return to the previous input when this component is unmounted
+		<TextControl autoFocus={ true } onChange={ () => {} } />
+	</div>
+) );
 
-const MyComponentWithFocusReturn = withState( {
-	text: '',
-} )( ( { text, setState } ) => {
+const MyComponentWithFocusReturn = () => {
+	const [ text, setText ] = useState( '' );
 	const unmount = () => {
 		document.activeElement.blur();
-		setState( { text: '' } );
-	}
+		setText( '' );
+	};
 
 	return (
 		<div>
 			<TextControl
 				placeholder="Type something"
 				value={ text }
-				onChange={ ( text ) => setState( { text } ) }
+				onChange={ ( value ) => setText( value ) }
 			/>
 			{ text && <EnhancedComponent /> }
-			{ text && <Button isSecondary onClick={ unmount }>Unmount</Button> }
+			{ text && (
+				<Button variant="secondary" onClick={ unmount }>
+					Unmount
+				</Button>
+			) }
 		</div>
 	);
-} ); 
+}
 ```
 
 `withFocusReturn` can optionally be called as a higher-order function creator. Provided an options object, a new higher-order function is returned.
@@ -52,8 +50,8 @@ Currently, the following options are supported:
 
 An optional function which allows the developer to customize the focus return behavior. A return value of `false` should be returned from this function to indicate that the default focus return behavior should be skipped.
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No
 
 _Example:_
 

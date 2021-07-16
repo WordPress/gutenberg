@@ -14,6 +14,7 @@ export default function AllInputControl( {
 	onHoverOn = noop,
 	onHoverOff = noop,
 	values,
+	sides,
 	...props
 } ) {
 	const allValue = getAllValue( values );
@@ -29,10 +30,23 @@ export default function AllInputControl( {
 	const handleOnChange = ( next ) => {
 		const nextValues = { ...values };
 
-		nextValues.top = next;
-		nextValues.bottom = next;
-		nextValues.left = next;
-		nextValues.right = next;
+		if ( sides?.length ) {
+			sides.forEach( ( side ) => {
+				if ( side === 'vertical' ) {
+					nextValues.top = next;
+					nextValues.bottom = next;
+				} else if ( side === 'horizontal' ) {
+					nextValues.left = next;
+					nextValues.right = next;
+				} else {
+					nextValues[ side ] = next;
+				}
+			} );
+		} else {
+			[ 'top', 'right', 'bottom', 'left' ].forEach(
+				( side ) => ( nextValues[ side ] = next )
+			);
+		}
 
 		onChange( nextValues );
 	};

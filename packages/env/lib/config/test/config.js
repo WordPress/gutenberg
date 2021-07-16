@@ -364,7 +364,7 @@ describe( 'readConfig', () => {
 					JSON.stringify( {
 						plugins: [
 							'WordPress/gutenberg',
-							'WordPress/gutenberg#master',
+							'WordPress/gutenberg#trunk',
 							'WordPress/gutenberg#5.0',
 							'WordPress/theme-experiments/tt1-blocks#tt1-blocks@0.4.3',
 						],
@@ -384,7 +384,7 @@ describe( 'readConfig', () => {
 					{
 						type: 'git',
 						url: 'https://github.com/WordPress/gutenberg.git',
-						ref: 'master',
+						ref: 'trunk',
 						path: expect.stringMatching( /^\/.*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
@@ -541,7 +541,7 @@ describe( 'readConfig', () => {
 					JSON.stringify( {
 						mappings: {
 							test: './relative',
-							test2: 'WordPress/gutenberg#master',
+							test2: 'WordPress/gutenberg#trunk',
 						},
 					} )
 				)
@@ -1077,6 +1077,7 @@ describe( 'readConfig', () => {
 				TEST3: 'foo',
 				TEST: '2',
 				WP_DEBUG: false,
+				WP_ENVIRONMENT_TYPE: 'local',
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',
 				WP_TESTS_TITLE: 'Test Blog',
@@ -1090,6 +1091,7 @@ describe( 'readConfig', () => {
 				TEST5: 5,
 				TEST: '2',
 				WP_DEBUG: true,
+				WP_ENVIRONMENT_TYPE: 'local',
 				WP_PHP_BINARY: 'php',
 				WP_TESTS_EMAIL: 'admin@example.org',
 				WP_TESTS_TITLE: 'Test Blog',

@@ -6,7 +6,7 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 
@@ -55,10 +55,12 @@ function useInitialPosition( clientId ) {
  * Transitions focus to the block or inner tabbable when the block becomes
  * selected and an initial position is set.
  *
- * @param {RefObject} ref      React ref with the block element.
- * @param {string}    clientId Block client ID.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {RefObject} React ref with the block element.
  */
-export function useFocusFirstElement( ref, clientId ) {
+export function useFocusFirstElement( clientId ) {
+	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
 
 	useEffect( () => {
@@ -66,27 +68,21 @@ export function useFocusFirstElement( ref, clientId ) {
 			return;
 		}
 
+		if ( ! ref.current ) {
+			return;
+		}
+
 		const { ownerDocument } = ref.current;
 
-		// Focus is captured by the wrapper node, so while focus transition
-		// should only consider tabbables within editable display, since it
-		// may be the wrapper itself or a side control which triggered the
-		// focus event, don't unnecessary transition to an inner tabbable.
-		if (
-			ownerDocument.activeElement &&
-			isInsideRootBlock( ref.current, ownerDocument.activeElement )
-		) {
+		// Do not focus the block if it already contains the active element.
+		if ( ref.current.contains( ownerDocument.activeElement ) ) {
 			return;
 		}
 
 		// Find all tabbables within node.
-		const textInputs = focus.tabbable.find( ref.current ).filter(
-			( node ) =>
-				isTextField( node ) &&
-				// Exclude inner blocks and block appenders
-				isInsideRootBlock( ref.current, node ) &&
-				! node.closest( '.block-list-appender' )
-		);
+		const textInputs = focus.tabbable
+			.find( ref.current )
+			.filter( ( node ) => isTextField( node ) );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
@@ -94,6 +90,17 @@ export function useFocusFirstElement( ref, clientId ) {
 		const target =
 			( isReverse ? last : first )( textInputs ) || ref.current;
 
+		if (
+			// Don't focus inner block or block appenders.
+			! isInsideRootBlock( ref.current, target ) ||
+			target.closest( '.block-list-appender' )
+		) {
+			ref.current.focus();
+			return;
+		}
+
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition ] );
+
+	return ref;
 }

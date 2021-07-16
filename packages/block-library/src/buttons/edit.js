@@ -10,8 +10,10 @@ import {
 	BlockControls,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	JustifyToolbar,
+	JustifyContentControl,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -19,7 +21,17 @@ import {
 import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
-const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
+const LAYOUT = {
+	type: 'default',
+	alignments: [],
+};
+const VERTICAL_JUSTIFY_CONTROLS = [ 'left', 'center', 'right' ];
+const HORIZONTAL_JUSTIFY_CONTROLS = [
+	'left',
+	'center',
+	'right',
+	'space-between',
+];
 
 function ButtonsEdit( {
 	attributes: { contentJustification, orientation },
@@ -31,26 +43,35 @@ function ButtonsEdit( {
 			'is-vertical': orientation === 'vertical',
 		} ),
 	} );
+	const preferredStyle = useSelect( ( select ) => {
+		const preferredStyleVariations = select(
+			blockEditorStore
+		).getSettings().__experimentalPreferredStyleVariations;
+		return preferredStyleVariations?.value?.[ buttonBlockName ];
+	}, [] );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		template: BUTTONS_TEMPLATE,
+		template: [
+			[
+				buttonBlockName,
+				{ className: preferredStyle && `is-style-${ preferredStyle }` },
+			],
+		],
 		orientation,
-		__experimentalLayout: {
-			type: 'default',
-			alignments: [],
-		},
+		__experimentalLayout: LAYOUT,
 		templateInsertUpdatesSelection: true,
 	} );
 
 	const justifyControls =
 		orientation === 'vertical'
-			? [ 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right', 'space-between' ];
+			? VERTICAL_JUSTIFY_CONTROLS
+			: HORIZONTAL_JUSTIFY_CONTROLS;
 
 	return (
 		<>
-			<BlockControls>
-				<JustifyToolbar
+			<BlockControls group="block">
+				<JustifyContentControl
 					allowedControls={ justifyControls }
 					value={ contentJustification }
 					onChange={ ( value ) =>

@@ -136,7 +136,7 @@ function ColorOption( {
 									onConfirm();
 								}
 							} }
-							isPrimary
+							variant="primary"
 						>
 							{ confirmLabel }
 						</Button>
@@ -314,7 +314,7 @@ export default function ColorEdit( {
 				{ !! canReset && (
 					<Button
 						isSmall
-						isSecondary
+						variant="secondary"
 						className="components-color-edit__reset-button"
 						onClick={ () => onChange() }
 					>

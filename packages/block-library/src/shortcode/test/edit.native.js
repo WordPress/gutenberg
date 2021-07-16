@@ -2,14 +2,35 @@
  * External dependencies
  */
 import renderer from 'react-test-renderer';
+import { TextInput } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
+import { BlockEdit } from '@wordpress/block-editor';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import Shortcode from '../edit';
-import { TextInput } from 'react-native';
+import { metadata, settings, name } from '../index';
+
+const Shortcode = ( { clientId, ...props } ) => (
+	<BlockEdit name={ name } clientId={ clientId || 0 } { ...props } />
+);
 
 describe( 'Shortcode', () => {
+	beforeAll( () => {
+		registerBlockType( name, {
+			...metadata,
+			...settings,
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( name );
+	} );
+
 	it( 'renders without crashing', () => {
 		const component = renderer.create(
 			<Shortcode attributes={ { text: '' } } />

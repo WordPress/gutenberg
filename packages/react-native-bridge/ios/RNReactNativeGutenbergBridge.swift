@@ -261,12 +261,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func logUserEvent(_ event: String, properties: [AnyHashable: Any]?) {
-        guard let logEvent = GutenbergUserEvent(event: event, properties: properties) else { return }
-        self.delegate?.gutenbergDidLogUserEvent(logEvent)
-    }
-
-    @objc
     func showUserSuggestions(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         self.delegate?.gutenbergDidRequestMention(callback: { (result) in
             switch result {
@@ -355,6 +349,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             self.delegate?.gutenbergDidSendButtonPressedAction(button)
         }
     }
+    
+    @objc
+    func requestPreview() {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestPreview()
+        }
+    }
 
 }
 
@@ -375,11 +376,12 @@ extension RNReactNativeGutenbergBridge {
         case mediaUpload
         case setFocusOnTitle
         case mediaAppend
-        case updateTheme
+        case updateEditorSettings
         case replaceBlock
         case updateCapabilities
         case showNotice
         case mediaSave
+        case showEditorHelp
     }
 
     public override func supportedEvents() -> [String]! {

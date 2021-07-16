@@ -25,10 +25,10 @@ Only one option in a button group can be selected and active at a time. Selectin
 
 Button groups should:
 
-- **Be clearly and accurately labeled.**
-- **Clearly communicate that clicking or tapping will trigger an action.**
-- **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
-- **Have consistent locations in the interface.**
+-   **Be clearly and accurately labeled.**
+-   **Clearly communicate that clicking or tapping will trigger an action.**
+-   **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
+-   **Have consistent locations in the interface.**
 
 ### States
 
@@ -51,12 +51,12 @@ import { Button, ButtonGroup } from '@wordpress/components';
 
 const MyButtonGroup = () => (
 	<ButtonGroup>
-		<Button isPrimary>Button 1</Button>
-		<Button isPrimary>Button 2</Button>
+		<Button variant="primary">Button 1</Button>
+		<Button variant="primary">Button 2</Button>
 	</ButtonGroup>
 );
 ```
 
 ## Related components
 
-- For individual buttons, use a `Button` component.
+-   For individual buttons, use a `Button` component.

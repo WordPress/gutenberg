@@ -102,9 +102,10 @@ export const navigationPanel = {
 };
 
 export const siteEditor = {
-	async visit() {
-		const query = addQueryArgs( '', {
+	async visit( query ) {
+		query = addQueryArgs( '', {
 			page: 'gutenberg-edit-site',
+			...query,
 		} ).slice( 1 );
 		await visitAdminPage( 'admin.php', query );
 		await page.waitForSelector( '.edit-site-visual-editor iframe' );
@@ -128,5 +129,31 @@ export const siteEditor = {
 		 )[ 0 ];
 
 		await elementToClick.click();
+	},
+
+	async getEditedPostContent() {
+		return page.evaluate( async () => {
+			const postId = window.wp.data
+				.select( 'core/edit-site' )
+				.getEditedPostId();
+			const postType = window.wp.data
+				.select( 'core/edit-site' )
+				.getEditedPostType();
+			const record = window.wp.data
+				.select( 'core' )
+				.getEditedEntityRecord( 'postType', postType, postId );
+			if ( record ) {
+				if ( typeof record.content === 'function' ) {
+					return record.content( record );
+				} else if ( record.blocks ) {
+					return window.wp.blocks.__unstableSerializeAndClean(
+						record.blocks
+					);
+				} else if ( record.content ) {
+					return record.content;
+				}
+			}
+			return '';
+		} );
 	},
 };

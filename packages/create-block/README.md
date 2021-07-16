@@ -90,10 +90,10 @@ $ npm run build
 Builds the code for production. [Learn more](/packages/scripts#build).
 
 ```bash
-$ npm run format:js
+$ npm run format
 ```
 
-Formats JavaScript files. [Learn more](/packages/scripts#format-js).
+Formats files. [Learn more](/packages/scripts#format).
 
 ```bash
 $ npm run lint:css
@@ -177,7 +177,7 @@ The following configurable variables are used with the template files. Template 
 -   `title` (no default) - a display title for your block.
 -   `description` (no default) - a short description for your block.
 -   `dashicon` (no default) - an icon property thats makes it easier to identify a block, see https://developer.wordpress.org/resource/dashicons/.
--   `category` (default: `'widgets'`) - blocks are grouped into categories to help users browse and discover them. The categories provided by core are `text`, `media`, `design`, `widgets`, and `embed`.
+-   `category` (default: `'widgets'`) - blocks are grouped into categories to help users browse and discover them. The categories provided by core are `text`, `media`, `design`, `widgets`, `theme`, and `embed`.
 -   `attributes` (no default) - see https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/.
 -   `supports` (no default) - optional block extended support features, see https://developer.wordpress.org/block-editor/developers/block-api/block-supports/.
 -   `author` (default: `'The WordPress Contributors'`)

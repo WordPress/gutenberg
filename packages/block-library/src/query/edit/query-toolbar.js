@@ -13,27 +13,30 @@ import { __ } from '@wordpress/i18n';
 import { settings, list, grid } from '@wordpress/icons';
 
 export default function QueryToolbar( {
-	attributes: { query, layout },
+	attributes: { query, displayLayout },
 	setQuery,
-	setLayout,
+	setDisplayLayout,
 } ) {
 	const maxPageInputId = useInstanceId(
 		QueryToolbar,
 		'blocks-query-pagination-max-page-input'
 	);
-	const layoutControls = [
+	const displayLayoutControls = [
 		{
 			icon: list,
 			title: __( 'List view' ),
-			onClick: () => setLayout( { type: 'list' } ),
-			isActive: layout?.type === 'list',
+			onClick: () => setDisplayLayout( { type: 'list' } ),
+			isActive: displayLayout?.type === 'list',
 		},
 		{
 			icon: grid,
 			title: __( 'Grid view' ),
 			onClick: () =>
-				setLayout( { type: 'flex', columns: layout?.columns || 3 } ),
-			isActive: layout?.type === 'flex',
+				setDisplayLayout( {
+					type: 'flex',
+					columns: displayLayout?.columns || 3,
+				} ),
+			isActive: displayLayout?.type === 'flex',
 		},
 	];
 	return (
@@ -58,11 +61,18 @@ export default function QueryToolbar( {
 										labelPosition="edge"
 										min={ 1 }
 										max={ 100 }
-										onChange={ ( value ) =>
+										onChange={ ( value ) => {
+											if (
+												isNaN( value ) ||
+												value < 1 ||
+												value > 100
+											) {
+												return;
+											}
 											setQuery( {
-												perPage: +value ?? -1,
-											} )
-										}
+												perPage: value,
+											} );
+										} }
 										step="1"
 										value={ query.perPage }
 										isDragEnabled={ false }
@@ -75,9 +85,16 @@ export default function QueryToolbar( {
 										labelPosition="edge"
 										min={ 0 }
 										max={ 100 }
-										onChange={ ( value ) =>
-											setQuery( { offset: +value } )
-										}
+										onChange={ ( value ) => {
+											if (
+												isNaN( value ) ||
+												value < 0 ||
+												value > 100
+											) {
+												return;
+											}
+											setQuery( { offset: value } );
+										} }
 										step="1"
 										value={ query.offset }
 										isDragEnabled={ false }
@@ -95,9 +112,12 @@ export default function QueryToolbar( {
 										label={ __( 'Max page to show' ) }
 										labelPosition="edge"
 										min={ 0 }
-										onChange={ ( value ) =>
-											setQuery( { pages: +value } )
-										}
+										onChange={ ( value ) => {
+											if ( isNaN( value ) || value < 0 ) {
+												return;
+											}
+											setQuery( { pages: value } );
+										} }
 										step="1"
 										value={ query.pages }
 										isDragEnabled={ false }
@@ -108,7 +128,7 @@ export default function QueryToolbar( {
 					/>
 				</ToolbarGroup>
 			) }
-			<ToolbarGroup controls={ layoutControls } />
+			<ToolbarGroup controls={ displayLayoutControls } />
 		</>
 	);
 }

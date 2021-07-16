@@ -3,6 +3,7 @@ export const categories = [
 	{ slug: 'media', title: 'Media' },
 	{ slug: 'design', title: 'Design' },
 	{ slug: 'widgets', title: 'Widgets' },
+	{ slug: 'theme', title: 'Theme' },
 	{ slug: 'embed', title: 'Embeds' },
 	{ slug: 'reusable', title: 'Reusable blocks' },
 ];

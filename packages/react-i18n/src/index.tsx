@@ -3,7 +3,12 @@
  */
 // Disable reason: Type-only import, this is fine. See https://github.com/typescript-eslint/typescript-eslint/issues/2661
 // eslint-disable-next-line no-restricted-imports
-import type { ComponentType, PropsWithChildren } from 'react';
+import type {
+	ComponentType,
+	FunctionComponent,
+	PropsWithChildren,
+} from 'react';
+import type { Subtract } from 'utility-types';
 
 /**
  * WordPress dependencies
@@ -15,9 +20,9 @@ import {
 	useMemo,
 	useReducer,
 } from '@wordpress/element';
-import { defaultI18n, I18n } from '@wordpress/i18n';
-import type { Subtract } from 'utility-types';
-
+import { defaultI18n } from '@wordpress/i18n';
+// eslint-disable-next-line no-duplicate-imports
+import type { I18n } from '@wordpress/i18n';
 interface I18nContextProps {
 	__: I18n[ '__' ];
 	_x: I18n[ '_x' ];
@@ -30,7 +35,7 @@ interface I18nContextProps {
 /**
  * Utility to make a new context value
  *
- * @param i18n
+ * @param  i18n
  */
 function makeContextValue( i18n: I18n ): I18nContextProps {
 	return {
@@ -67,7 +72,7 @@ type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
  * You can also instantiate the provider without the `i18n` prop. In that case it will use the
  * default `I18n` instance exported from `@wordpress/i18n`.
  *
- * @param props i18n provider props.
+ * @param  props i18n provider props.
  * @return Children wrapped in the I18nProvider.
  */
 export function I18nProvider( props: I18nProviderProps ): JSX.Element {
@@ -103,6 +108,11 @@ export function I18nProvider( props: I18nProviderProps ): JSX.Element {
  */
 export const useI18n = () => useContext( I18nContext );
 
+type PropsAndI18n< P > = Pick<
+	P,
+	Exclude< keyof P, '__' | '_x' | '_n' | '_nx' | 'isRTL' | 'hasTranslation' >
+>;
+
 /**
  * React higher-order component that passes the i18n translate functions (the same set
  * as exposed by the `useI18n` hook) to the wrapped component as props.
@@ -118,12 +128,12 @@ export const useI18n = () => useContext( I18nContext );
  * export default withI18n( MyComponent );
  * ```
  *
- * @param InnerComponent React component to be wrapped and receive the i18n functions like `__`
+ * @param  InnerComponent React component to be wrapped and receive the i18n functions like `__`
  * @return The wrapped component
  */
 export function withI18n< P extends I18nContextProps >(
 	InnerComponent: ComponentType< P >
-) {
+): FunctionComponent< PropsAndI18n< P > > {
 	const EnhancedComponent: ComponentType<
 		Subtract< P, I18nContextProps >
 	> = ( props ) => {

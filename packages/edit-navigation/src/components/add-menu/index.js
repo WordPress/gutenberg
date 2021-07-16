@@ -9,17 +9,30 @@ import classnames from 'classnames';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { TextControl, Button } from '@wordpress/components';
+import { useFocusOnMount } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
 
-export default function AddMenu( { className, menus, onCreate } ) {
+export default function AddMenu( {
+	className,
+	menus,
+	onCreate,
+	titleText,
+	helpText,
+	focusInputOnMount = false,
+} ) {
 	const [ menuName, setMenuName ] = useState( '' );
-	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
+	const { createErrorNotice, createInfoNotice, removeNotice } = useDispatch(
+		noticesStore
+	);
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
-	const { saveMenu } = useDispatch( 'core' );
+	const { saveMenu } = useDispatch( coreStore );
+
+	const inputRef = useFocusOnMount( focusInputOnMount );
 
 	const createMenu = async ( event ) => {
 		event.preventDefault();
@@ -27,6 +40,9 @@ export default function AddMenu( { className, menus, onCreate } ) {
 		if ( ! menuName.length ) {
 			return;
 		}
+
+		// Remove any existing notices so duplicates aren't created.
+		removeNotice( 'edit-navigation-error' );
 
 		if ( some( menus, menuNameMatches( menuName ) ) ) {
 			const message = sprintf(
@@ -56,27 +72,18 @@ export default function AddMenu( { className, menus, onCreate } ) {
 		setIsCreatingMenu( false );
 	};
 
-	const hasMenus = menus?.length;
-
-	const titleText = hasMenus
-		? __( 'Create a new menu' )
-		: __( 'Create your first menu' );
-
-	const helpText = hasMenus
-		? __( 'A short descriptive name for your menu.' )
-		: __( 'A short descriptive name for your first menu.' );
-
 	return (
 		<form
 			className={ classnames( 'edit-navigation-add-menu', className ) }
 			onSubmit={ createMenu }
 		>
-			<h3 className="edit-navigation-add-menu__title">{ titleText }</h3>
+			{ titleText && (
+				<h3 className="edit-navigation-add-menu__title">
+					{ titleText }
+				</h3>
+			) }
 			<TextControl
-				// Disable reason: it should focus.
-				//
-				// eslint-disable-next-line jsx-a11y/no-autofocus
-				autoFocus
+				ref={ inputRef }
 				label={ __( 'Menu name' ) }
 				value={ menuName }
 				onChange={ setMenuName }
@@ -86,7 +93,7 @@ export default function AddMenu( { className, menus, onCreate } ) {
 			<Button
 				className="edit-navigation-add-menu__create-menu-button"
 				type="submit"
-				isPrimary
+				variant="primary"
 				disabled={ ! menuName.length }
 				isBusy={ isCreatingMenu }
 			>

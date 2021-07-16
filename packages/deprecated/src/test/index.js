@@ -21,6 +21,14 @@ describe( 'deprecated', () => {
 		expect( console ).toHaveWarnedWith( 'Eating meat is deprecated.' );
 	} );
 
+	it( 'should show a deprecation warning with a since', () => {
+		deprecated( 'Eating meat', { since: '2019.01.01' } );
+
+		expect( console ).toHaveWarnedWith(
+			'Eating meat is deprecated since version 2019.01.01.'
+		);
+	} );
+
 	it( 'should show a deprecation warning with a version', () => {
 		deprecated( 'Eating meat', { version: '2020.01.01' } );
 
@@ -31,12 +39,13 @@ describe( 'deprecated', () => {
 
 	it( 'should show a deprecation warning with an alternative', () => {
 		deprecated( 'Eating meat', {
+			since: '2019.01.01',
 			version: '2020.01.01',
 			alternative: 'vegetables',
 		} );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed in version 2020.01.01. Please use vegetables instead.'
+			'Eating meat is deprecated since version 2019.01.01 and will be removed in version 2020.01.01. Please use vegetables instead.'
 		);
 	} );
 
@@ -67,6 +76,7 @@ describe( 'deprecated', () => {
 
 	it( 'should show a deprecation warning with a hint', () => {
 		deprecated( 'Eating meat', {
+			since: '2019.01.01',
 			version: '2020.01.01',
 			alternative: 'vegetables',
 			plugin: 'the earth',
@@ -74,7 +84,7 @@ describe( 'deprecated', () => {
 		} );
 
 		expect( console ).toHaveWarnedWith(
-			'Eating meat is deprecated and will be removed from the earth in version 2020.01.01. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
+			'Eating meat is deprecated since version 2019.01.01 and will be removed from the earth in version 2020.01.01. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
 		);
 	} );
 

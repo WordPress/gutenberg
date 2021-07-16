@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect } from '@wordpress/element';
+import { useLayoutEffect, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -54,9 +54,13 @@ export default function useNestedSettingsUpdate(
 		[ clientId ]
 	);
 
+	// Memoize as inner blocks implementors often pass a new array on every
+	// render.
+	const _allowedBlocks = useMemo( () => allowedBlocks, allowedBlocks );
+
 	useLayoutEffect( () => {
 		const newSettings = {
-			allowedBlocks,
+			allowedBlocks: _allowedBlocks,
 			templateLock:
 				templateLock === undefined ? parentLock : templateLock,
 		};
@@ -77,7 +81,7 @@ export default function useNestedSettingsUpdate(
 	}, [
 		clientId,
 		blockListSettings,
-		allowedBlocks,
+		_allowedBlocks,
 		templateLock,
 		parentLock,
 		captureToolbars,

@@ -73,7 +73,7 @@ export class BlockListItem extends Component {
 		) {
 			const isScreenWidthEqual = parentWidth === screenWidth;
 			if ( isScreenWidthEqual || isWider( screenWidth, 'mobile' ) ) {
-				return marginHorizontal * 2;
+				return marginHorizontal;
 			}
 		}
 
@@ -141,7 +141,6 @@ export class BlockListItem extends Component {
 				<View
 					style={ this.getContentStyles( readableContentViewStyle ) }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
-					onLayout={ this.onLayout }
 				>
 					{ shouldShowInsertionPointBefore && (
 						<BlockInsertionPoint />

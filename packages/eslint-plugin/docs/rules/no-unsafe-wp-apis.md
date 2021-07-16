@@ -3,7 +3,7 @@
 Prevent unsafe APIs from `@wordpress/*` packages from being imported.
 
 This includes experimental and unstable APIs which are expected to change and likely to cause issues in application code.
-See the [documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/coding-guidelines.md#experimental-and-unstable-apis).
+See the [documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/coding-guidelines.md#experimental-and-unstable-apis).
 
 > **There is no support commitment for experimental and unstable APIs.** They can and will be removed or changed without advance warning, including as part of a minor or patch release. As an external consumer, you should avoid these APIs.
 > …

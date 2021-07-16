@@ -19,7 +19,6 @@ import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
 import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
-import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
 import { useShowMoversGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -125,11 +124,16 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			{ shouldShowVisualToolbar && (
 				<>
 					<BlockControls.Slot
-						bubblesVirtually
+						group="block"
 						className="block-editor-block-toolbar__slot"
 					/>
-					<BlockFormatControls.Slot
-						bubblesVirtually
+					<BlockControls.Slot className="block-editor-block-toolbar__slot" />
+					<BlockControls.Slot
+						group="inline"
+						className="block-editor-block-toolbar__slot"
+					/>
+					<BlockControls.Slot
+						group="other"
 						className="block-editor-block-toolbar__slot"
 					/>
 				</>

@@ -10,6 +10,12 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 function PostAuthorCombobox() {
 	const [ fieldValue, setFieldValue ] = useState();
@@ -17,9 +23,9 @@ function PostAuthorCombobox() {
 	const { authorId, isLoading, authors, postAuthor } = useSelect(
 		( select ) => {
 			const { __unstableGetAuthor, getAuthors, isResolving } = select(
-				'core'
+				coreStore
 			);
-			const { getEditedPostAttribute } = select( 'core/editor' );
+			const { getEditedPostAttribute } = select( editorStore );
 			const author = __unstableGetAuthor(
 				getEditedPostAttribute( 'author' )
 			);
@@ -34,7 +40,7 @@ function PostAuthorCombobox() {
 		},
 		[ fieldValue ]
 	);
-	const { editPost } = useDispatch( 'core/editor' );
+	const { editPost } = useDispatch( editorStore );
 
 	const authorOptions = useMemo( () => {
 		const fetchedAuthors = ( authors ?? [] ).map( ( author ) => {

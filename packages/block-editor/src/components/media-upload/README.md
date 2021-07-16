@@ -1,5 +1,4 @@
-MediaUpload
-===========
+# MediaUpload
 
 MediaUpload is a React component used to render a button that opens the WordPress media modal.
 
@@ -36,13 +35,13 @@ function MyMediaUploader() {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
-				onSelect={ ( media ) => console.log( 'selected ' + media.length ) }
+				onSelect={ ( media ) =>
+					console.log( 'selected ' + media.length )
+				}
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ mediaId }
 				render={ ( { open } ) => (
-					<Button onClick={ open }>
-						Open Media Library
-					</Button>
+					<Button onClick={ open }>Open Media Library</Button>
 				) }
 			/>
 		</MediaUploadCheck>
@@ -61,26 +60,26 @@ Each type is a string that can contain the general mime type e.g: 'image', 'audi
 or the complete mime type e.g: 'audio/mpeg', 'image/gif'.
 If allowedTypes is unset all mime types should be allowed.
 
-- Type: `Array`
-- Required: No
-- Platform: Web | Mobile
+-   Type: `Array`
+-   Required: No
+-   Platform: Web | Mobile
 
 ### multiple
 
 Whether to allow multiple selections or not.
 
-- Type: `Boolean`
-- Required: No
-- Default: false
-- Platform: Web
+-   Type: `Boolean`
+-   Required: No
+-   Default: false
+-   Platform: Web
 
 ### value
 
 Media ID (or media IDs if multiple is true) to be selected by default when opening the media library.
 
-- Type: `Number|Array`
-- Required: No
-- Platform: Web
+-   Type: `Number|Array`
+-   Required: No
+-   Platform: Web
 
 ### onClose
 
@@ -88,35 +87,35 @@ Callback called when the media modal is closed.
 
 This is called both when media is selected and when the user closes the modal without making a selection.
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No
 
 ### onSelect
 
-Callback called when the media modal is closed after media is selected. 
+Callback called when the media modal is closed after media is selected.
 
 This is called subsequent to `onClose` when media is selected. The selected media are passed as an argument.
 
-- Type: `Function`
-- Required: Yes
-- Platform: Web | Mobile
+-   Type: `Function`
+-   Required: Yes
+-   Platform: Web | Mobile
 
 ### title
 
 Title displayed in the media modal.
 
-- Type: `String`
-- Required: No
-- Default: `Select or Upload Media`
-- Platform: Web
+-   Type: `String`
+-   Required: No
+-   Default: `Select or Upload Media`
+-   Platform: Web
 
 ### modalClass
 
 CSS class added to the media modal frame.
 
-- Type: `String`
-- Required: No
-- Platform: Web
+-   Type: `String`
+-   Required: No
+-   Platform: Web
 
 ### addToGallery
 
@@ -124,28 +123,37 @@ If true, the gallery media modal opens directly in the media library where the u
 If false the gallery media modal opens in the edit mode where the user can edit existing images, by reordering them, remove them, or change their attributes.
 Only applies if `gallery === true`.
 
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+-   Platform: Web
+
+### autoOpen
+
+If true, the picker of the respective platform auto-opens.
+
 - Type: `Boolean`
 - Required: No
 - Default: `false`
-- Platform: Web
+- Platform: Mobile
 
 ### gallery
 
 If true, the component will initiate all the states required to represent a gallery. By default, the media modal opens in the gallery edit frame, but that can be changed using the `addToGallery`flag.
 
-- Type: `Boolean`
-- Required: No
-- Default: `false`
-- Platform: Web
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+-   Platform: Web
 
 ## render
 
 A callback invoked to render the Button opening the media library.
 
-- Type: `Function`
-- Required: Yes
-- Platform: Web | Mobile
+-   Type: `Function`
+-   Required: Yes
+-   Platform: Web | Mobile
 
 The first argument of the callback is an object containing the following properties:
 
- - `open`: A function opening the media modal when called
+-   `open`: A function opening the media modal when called

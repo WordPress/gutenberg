@@ -54,6 +54,7 @@ $gray-lighten-10: lighten($gray, 10%); // #a8bece
 $gray-lighten-20: lighten($gray, 20%); // #c8d7e1
 $gray-lighten-30: lighten($gray, 30%); // #e9eff3
 $gray-darken-20: darken($gray, 20%); // #4f748e
+$gray-darken-30: darken($gray, 30%); // #3d596d
 
 // Custom
 $toolbar-button: #7b9ab1;
@@ -66,12 +67,15 @@ $button-fallback-bg: #595959;
 
 // color-studio
 $gray-0: #f6f7f7;
+$gray-5: #dcdcde;
+$gray-10: #c3c4c7;
 $gray-20: #a7aaad;
 $gray-30: #8e9196;
 $gray-40: #787c82;
 $gray-50: #646970;
 $gray-60: #50575e;
 $gray-70: #3c434a;
+$gray-80: #2c3338;
 $gray-90: #1d2327;
 $gray-100: #101517;
 

@@ -27,19 +27,19 @@ const manifest = require( '../../../package.json' );
 /**
  * @typedef WPChangelogCommandOptions
  *
- * @property {string=}  milestone   Optional Milestone title.
- * @property {string=}  token       Optional personal access token.
- * @property {boolean=} unreleased  Optional flag to only include issues that haven't been part of a release yet.
+ * @property {string=}  milestone  Optional Milestone title.
+ * @property {string=}  token      Optional personal access token.
+ * @property {boolean=} unreleased Optional flag to only include issues that haven't been part of a release yet.
  */
 
 /**
  * @typedef WPChangelogSettings
  *
- * @property {string}   owner       Repository owner.
- * @property {string}   repo        Repository name.
- * @property {string=}  token       Optional personal access token.
- * @property {string}   milestone   Milestone title.
- * @property {boolean=} unreleased  Only include issues that have been closed since the milestone's latest release.
+ * @property {string}   owner      Repository owner.
+ * @property {string}   repo       Repository name.
+ * @property {string=}  token      Optional personal access token.
+ * @property {string}   milestone  Milestone title.
+ * @property {boolean=} unreleased Only include issues that have been closed since the milestone's latest release.
  */
 
 /**
@@ -61,18 +61,13 @@ const manifest = require( '../../../package.json' );
  */
 const LABEL_TYPE_MAPPING = {
 	'[Block] Navigation': 'Experiments',
-	'[Block] Query': 'Experiments',
 	'[Block] Post Comments Count': 'Experiments',
 	'[Block] Post Comments Form': 'Experiments',
 	'[Block] Post Comments': 'Experiments',
-	'[Block] Post Featured Image': 'Experiments',
 	'[Block] Post Hierarchical Terms': 'Experiments',
-	'[Block] Post Title': 'Experiments',
-	'[Block] Site Logo': 'Experiments',
 	'[Feature] Full Site Editing': 'Experiments',
 	'Global Styles': 'Experiments',
 	'[Feature] Navigation Screen': 'Experiments',
-	'[Feature] Widgets Screen': 'Experiments',
 	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
 	'[Package] Jest Puppeteer aXe': 'Tools',
 	'[Package] E2E Tests': 'Tools',
@@ -386,10 +381,10 @@ function getEntry( issue ) {
 /**
  * Returns the latest release for a given series
  *
- * @param {GitHub} octokit  Initialized Octokit REST client.
- * @param {string} owner    Repository owner.
- * @param {string} repo     Repository name.
- * @param {string} series   Gutenberg release series (e.g. '6.7' or '9.8').
+ * @param {GitHub} octokit Initialized Octokit REST client.
+ * @param {string} owner   Repository owner.
+ * @param {string} repo    Repository name.
+ * @param {string} series  Gutenberg release series (e.g. '6.7' or '9.8').
  *
  * @return {Promise<ReposListReleasesResponseItem|undefined>} Promise resolving to pull
  *                                                            requests for the given

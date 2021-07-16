@@ -50,6 +50,7 @@ figure.wp-block-gallery {
 			bottom: 0;
 			left: 0;
 			z-index: 1;
+			pointer-events: none;
 		}
 		figcaption {
 			z-index: 2;

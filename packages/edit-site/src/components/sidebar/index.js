@@ -4,7 +4,8 @@
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { cog, typography } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -24,23 +25,38 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 export const SidebarInspectorFill = InspectorFill;
 
 export function SidebarComplementaryAreaFills() {
-	const { sidebarName } = useSelect( ( select ) => {
-		let sidebar = select( interfaceStore ).getActiveComplementaryArea(
-			STORE_NAME
-		);
-
-		if ( ! [ SIDEBAR_BLOCK, SIDEBAR_TEMPLATE ].includes( sidebar ) ) {
-			sidebar = SIDEBAR_TEMPLATE;
-			if ( select( blockEditorStore ).getBlockSelectionStart() ) {
-				sidebar = SIDEBAR_BLOCK;
-			}
+	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
+		( select ) => {
+			const _sidebar = select(
+				interfaceStore
+			).getActiveComplementaryArea( STORE_NAME );
+			const _isEditorSidebarOpened = [
+				SIDEBAR_BLOCK,
+				SIDEBAR_TEMPLATE,
+			].includes( _sidebar );
+			return {
+				sidebar: _sidebar,
+				isEditorSidebarOpened: _isEditorSidebarOpened,
+				hasBlockSelection: !! select(
+					blockEditorStore
+				).getBlockSelectionStart(),
+			};
+		},
+		[]
+	);
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	useEffect( () => {
+		if ( ! isEditorSidebarOpened ) return;
+		if ( hasBlockSelection ) {
+			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+		} else {
+			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}
-
-		return {
-			sidebarName: sidebar,
-		};
-	} );
-
+	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+	let sidebarName = sidebar;
+	if ( ! isEditorSidebarOpened ) {
+		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
+	}
 	return (
 		<>
 			<DefaultSidebar

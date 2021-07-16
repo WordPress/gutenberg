@@ -12,7 +12,7 @@ import serialize, {
 	serializeAttributes,
 	getCommentDelimitedContent,
 	serializeBlock,
-	getBlockContent,
+	getBlockInnerHTML,
 } from '../serializer';
 import {
 	getBlockTypes,
@@ -380,7 +380,7 @@ describe( 'block serializer', () => {
 		} );
 	} );
 
-	describe( 'getBlockContent', () => {
+	describe( 'getBlockInnerHTML', () => {
 		it( "should return the block's serialized inner HTML", () => {
 			const blockType = {
 				attributes: {
@@ -403,7 +403,7 @@ describe( 'block serializer', () => {
 				},
 				isValid: true,
 			};
-			expect( getBlockContent( block ) ).toBe( 'chicken' );
+			expect( getBlockInnerHTML( block ) ).toBe( 'chicken' );
 		} );
 	} );
 } );

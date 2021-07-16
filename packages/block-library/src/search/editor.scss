@@ -1,3 +1,11 @@
+.wp-block[data-align="center"] {
+	.wp-block-search {
+		.wp-block-search__inside-wrapper {
+			margin: auto;
+		}
+	}
+}
+
 .wp-block-search {
 	.wp-block-search__input {
 		padding: $grid-unit-10;
@@ -15,6 +23,8 @@
 		// stylelint-disable-line no-duplicate-selectors
 		&.wp-block-search__button.wp-block-search__button {
 			padding: 6px 10px;
+			display: flex;
+			align-items: center;
 		}
 	}
 

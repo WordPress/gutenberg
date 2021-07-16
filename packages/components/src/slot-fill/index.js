@@ -1,19 +1,18 @@
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-import BaseSlot from './slot';
 import BaseFill from './fill';
-import Provider from './context';
-import BubblesVirtuallySlot from './bubbles-virtually/slot';
+import BaseSlot from './slot';
 import BubblesVirtuallyFill from './bubbles-virtually/fill';
+import BubblesVirtuallySlot from './bubbles-virtually/slot';
+import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
+import SlotFillProvider from './provider';
 import useSlot from './bubbles-virtually/use-slot';
-
-export function Slot( { bubblesVirtually, ...props } ) {
-	if ( bubblesVirtually ) {
-		return <BubblesVirtuallySlot { ...props } />;
-	}
-	return <BaseSlot { ...props } />;
-}
 
 export function Fill( props ) {
 	// We're adding both Fills here so they can register themselves before
@@ -26,6 +25,22 @@ export function Fill( props ) {
 		</>
 	);
 }
+export const Slot = forwardRef( ( { bubblesVirtually, ...props }, ref ) => {
+	if ( bubblesVirtually ) {
+		return <BubblesVirtuallySlot { ...props } ref={ ref } />;
+	}
+	return <BaseSlot { ...props } />;
+} );
+
+export function Provider( { children, ...props } ) {
+	return (
+		<SlotFillProvider { ...props }>
+			<BubblesVirtuallySlotFillProvider>
+				{ children }
+			</BubblesVirtuallySlotFillProvider>
+		</SlotFillProvider>
+	);
+}
 
 export function createSlotFill( name ) {
 	const FillComponent = ( props ) => <Fill name={ name } { ...props } />;
@@ -33,6 +48,7 @@ export function createSlotFill( name ) {
 
 	const SlotComponent = ( props ) => <Slot name={ name } { ...props } />;
 	SlotComponent.displayName = name + 'Slot';
+	SlotComponent.__unstableName = name;
 
 	return {
 		Fill: FillComponent,
@@ -40,4 +56,4 @@ export function createSlotFill( name ) {
 	};
 }
 
-export { useSlot, Provider };
+export { useSlot };

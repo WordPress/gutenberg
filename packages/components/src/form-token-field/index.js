@@ -108,9 +108,14 @@ class FormTokenField extends Component {
 	}
 
 	onFocus( event ) {
+		const { __experimentalExpandOnFocus } = this.props;
 		// If focus is on the input or on the container, set the isActive state to true.
 		if ( this.input.hasFocus() || event.target === this.tokensAndInput ) {
-			this.setState( { isActive: true } );
+			this.setState( {
+				isActive: true,
+				isExpanded:
+					!! __experimentalExpandOnFocus || this.state.isExpanded,
+			} );
 		} else {
 			/*
 			 * Otherwise, focus is on one of the token "remove" buttons and we
@@ -397,6 +402,17 @@ class FormTokenField extends Component {
 	}
 
 	addNewToken( token ) {
+		const {
+			__experimentalExpandOnFocus,
+			__experimentalValidateInput,
+		} = this.props;
+		if ( ! __experimentalValidateInput( token ) ) {
+			this.props.speak(
+				this.props.messages.__experimentalInvalid,
+				'assertive'
+			);
+			return;
+		}
 		this.addNewTokens( [ token ] );
 		this.props.speak( this.props.messages.added, 'assertive' );
 
@@ -404,7 +420,7 @@ class FormTokenField extends Component {
 			incompleteTokenValue: '',
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
-			isExpanded: false,
+			isExpanded: ! __experimentalExpandOnFocus,
 		} );
 
 		if ( this.state.isActive ) {
@@ -491,6 +507,7 @@ class FormTokenField extends Component {
 	}
 
 	updateSuggestions( resetSelectedSuggestion = true ) {
+		const { __experimentalExpandOnFocus } = this.props;
 		const { incompleteTokenValue } = this.state;
 
 		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
@@ -500,7 +517,9 @@ class FormTokenField extends Component {
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
 
 		const newState = {
-			isExpanded: inputHasMinimumChars && hasMatchingSuggestions,
+			isExpanded:
+				__experimentalExpandOnFocus ||
+				( inputHasMinimumChars && hasMatchingSuggestions ),
 		};
 		if ( resetSelectedSuggestion ) {
 			newState.selectedSuggestionIndex = -1;
@@ -565,6 +584,7 @@ class FormTokenField extends Component {
 			autoCapitalize,
 			autoComplete,
 			maxLength,
+			placeholder,
 			value,
 			instanceId,
 		} = this.props;
@@ -573,6 +593,7 @@ class FormTokenField extends Component {
 			instanceId,
 			autoCapitalize,
 			autoComplete,
+			placeholder: value.length === 0 ? placeholder : '',
 			ref: this.bindInput,
 			key: 'input',
 			disabled: this.props.disabled,
@@ -595,6 +616,7 @@ class FormTokenField extends Component {
 			label = __( 'Add item' ),
 			instanceId,
 			className,
+			__experimentalShowHowTo,
 		} = this.props;
 		const { isExpanded } = this.state;
 		const classes = classnames(
@@ -657,16 +679,18 @@ class FormTokenField extends Component {
 						/>
 					) }
 				</div>
-				<p
-					id={ `components-form-token-suggestions-howto-${ instanceId }` }
-					className="components-form-token-field__help"
-				>
-					{ this.props.tokenizeOnSpace
-						? __(
-								'Separate with commas, spaces, or the Enter key.'
-						  )
-						: __( 'Separate with commas or the Enter key.' ) }
-				</p>
+				{ __experimentalShowHowTo && (
+					<p
+						id={ `components-form-token-suggestions-howto-${ instanceId }` }
+						className="components-form-token-field__help"
+					>
+						{ this.props.tokenizeOnSpace
+							? __(
+									'Separate with commas, spaces, or the Enter key.'
+							  )
+							: __( 'Separate with commas or the Enter key.' ) }
+					</p>
+				) }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
@@ -688,7 +712,11 @@ FormTokenField.defaultProps = {
 		added: __( 'Item added.' ),
 		removed: __( 'Item removed.' ),
 		remove: __( 'Remove item' ),
+		__experimentalInvalid: __( 'Invalid item' ),
 	},
+	__experimentalExpandOnFocus: false,
+	__experimentalValidateInput: () => true,
+	__experimentalShowHowTo: true,
 };
 
 export default withSpokenMessages( withInstanceId( FormTokenField ) );

@@ -4,6 +4,7 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __experimentalNavigationItem as NavigationItem } from '@wordpress/components';
 import { getPathAndQueryString } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ const getEntityTitle = ( kind, entity ) =>
 
 export default function NavigationEntityItems( { kind, name, query = {} } ) {
 	const entities = useSelect(
-		( select ) => select( 'core' ).getEntityRecords( kind, name, query ),
+		( select ) => select( coreStore ).getEntityRecords( kind, name, query ),
 		[ kind, name, query ]
 	);
 

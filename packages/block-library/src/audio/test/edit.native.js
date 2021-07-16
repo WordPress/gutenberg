@@ -1,25 +1,41 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
+import { act, create } from 'react-test-renderer';
 
 /**
  * WordPress dependencies
  */
-import { MediaUploadProgress } from '@wordpress/block-editor';
+import { MediaUploadProgress, BlockEdit } from '@wordpress/block-editor';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import AudioEdit from '../edit.native.js';
+import { metadata, settings, name } from '../index';
+
+const AudioEdit = ( { clientId, ...props } ) => (
+	<BlockEdit name={ name } clientId={ clientId || 0 } { ...props } />
+);
 
 const getTestComponentWithContent = ( attributes = {} ) => {
-	return renderer.create(
+	return create(
 		<AudioEdit attributes={ attributes } setAttributes={ jest.fn() } />
 	);
 };
 
 describe( 'Audio block', () => {
+	beforeAll( () => {
+		registerBlockType( name, {
+			...metadata,
+			...settings,
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( name );
+	} );
+
 	it( 'renders placeholder without crashing', () => {
 		const component = getTestComponentWithContent();
 		const rendered = component.toJSON();
@@ -43,7 +59,12 @@ describe( 'Audio block', () => {
 		} );
 
 		const mediaUpload = component.root.findByType( MediaUploadProgress );
-		mediaUpload.instance.finishMediaUploadWithFailure( { mediaId: -1 } );
+
+		act( () => {
+			mediaUpload.instance.finishMediaUploadWithFailure( {
+				mediaId: -1,
+			} );
+		} );
 
 		const rendered = component.toJSON();
 		expect( rendered ).toMatchSnapshot();

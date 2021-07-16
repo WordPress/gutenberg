@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { paragraph as icon } from '@wordpress/icons';
 
 /**
@@ -23,10 +23,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Paragraph', 'block title' ),
-	description: __( 'Start with the building block of all narrative.' ),
 	icon,
-	keywords: [ __( 'text' ) ],
 	example: {
 		attributes: {
 			content: __(

@@ -36,6 +36,7 @@ export const DEFAULT_CATEGORIES = [
 	{ slug: 'media', title: __( 'Media' ) },
 	{ slug: 'design', title: __( 'Design' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
+	{ slug: 'theme', title: __( 'Theme' ) },
 	{ slug: 'embed', title: __( 'Embeds' ) },
 	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
@@ -171,7 +172,7 @@ export function blockVariations( state = {}, action ) {
 /**
  * Higher-order Reducer creating a reducer keeping track of given block name.
  *
- * @param {string} setActionType  Action type.
+ * @param {string} setActionType Action type.
  *
  * @return {Function} Reducer.
  */

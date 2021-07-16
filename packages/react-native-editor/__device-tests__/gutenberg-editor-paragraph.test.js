@@ -148,10 +148,8 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		}
 	} );
 
-	// Restricting these test to Android because I was not able to update the html on iOS
-	if ( isAndroid() ) {
-		it( 'should be able to merge blocks with unknown html elements', async () => {
-			await editorPage.setHtmlContent( `
+	it( 'should be able to merge blocks with unknown html elements', async () => {
+		await editorPage.setHtmlContent( `
 <!-- wp:paragraph -->
 <p><unknownhtmlelement>abc</unknownhtmlelement>D</p>
 <!-- /wp:paragraph -->
@@ -160,61 +158,53 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 <p>E</p>
 <!-- /wp:paragraph -->` );
 
-			// // Merge paragraphs
-			const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
-				blockNames.paragraph,
-				2
-			);
-			await clickBeginningOfElement(
-				editorPage.driver,
-				secondParagraphBlockElement
-			);
-			await editorPage.typeTextToParagraphBlock(
-				secondParagraphBlockElement,
-				backspace
-			);
+		// // Merge paragraphs
+		const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
+			blockNames.paragraph,
+			2
+		);
+		await clickBeginningOfElement(
+			editorPage.driver,
+			secondParagraphBlockElement
+		);
+		await editorPage.typeTextToParagraphBlock(
+			secondParagraphBlockElement,
+			backspace
+		);
 
-			// verify the editor has not crashed
-			const text = await editorPage.getTextForParagraphBlockAtPosition(
-				1
-			);
-			expect( text.length ).not.toEqual( 0 );
+		// verify the editor has not crashed
+		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		expect( text.length ).not.toEqual( 0 );
 
-			await editorPage.removeBlockAtPosition( blockNames.paragraph );
-		} );
+		await editorPage.removeBlockAtPosition( blockNames.paragraph );
+	} );
 
-		// Based on https://github.com/wordpress-mobile/gutenberg-mobile/pull/1507
-		it( 'should handle multiline paragraphs from web', async () => {
-			await editorPage.setHtmlContent( `
-	<!-- wp:paragraph -->
-	<p>multiple lines<br><br></p>
-	<!-- /wp:paragraph -->
+	// Based on https://github.com/wordpress-mobile/gutenberg-mobile/pull/1507
+	it( 'should handle multiline paragraphs from web', async () => {
+		await editorPage.setHtmlContent( `
+<!-- wp:paragraph -->
+<p>multiple lines<br><br></p>
+<!-- /wp:paragraph -->
 
-	<!-- wp:paragraph -->
-	<p></p>
-	<!-- /wp:paragraph -->` );
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->` );
 
-			// // Merge paragraphs
-			const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
-				blockNames.paragraph,
-				2
-			);
-			await clickBeginningOfElement(
-				editorPage.driver,
-				secondParagraphBlockElement
-			);
-			await editorPage.typeTextToParagraphBlock(
-				secondParagraphBlockElement,
-				backspace
-			);
+		// // Merge paragraphs
+		const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
+			blockNames.paragraph,
+			2
+		);
+		await secondParagraphBlockElement.click();
+		await editorPage.typeTextToParagraphBlock(
+			secondParagraphBlockElement,
+			backspace
+		);
 
-			// verify the editor has not crashed
-			const text = await editorPage.getTextForParagraphBlockAtPosition(
-				1
-			);
-			expect( text.length ).not.toEqual( 0 );
+		// verify the editor has not crashed
+		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+		expect( text.length ).not.toEqual( 0 );
 
-			await editorPage.removeBlockAtPosition( blockNames.paragraph );
-		} );
-	}
+		await editorPage.removeBlockAtPosition( blockNames.paragraph );
+	} );
 } );

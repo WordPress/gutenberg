@@ -6,14 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useContext } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__unstableGetBlockProps as getBlockProps,
 	getBlockType,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -22,12 +24,18 @@ import useMovingAnimation from '../../use-moving-animation';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
+import { useBlockEditContext } from '../../block-edit/context';
 import { useBlockClassNames } from './use-block-class-names';
 import { useBlockDefaultClassName } from './use-block-default-class-name';
 import { useBlockCustomClassName } from './use-block-custom-class-name';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
-import { useEventHandlers } from './use-event-handlers';
-import { useBlockNodes } from './use-block-nodes';
+import { useFocusHandler } from './use-focus-handler';
+import { useEventHandlers } from './use-selected-block-event-handlers';
+import { useNavModeExit } from './use-nav-mode-exit';
+import { useScrollIntoView } from './use-scroll-into-view';
+import { useBlockRefProvider } from './use-block-refs';
+import { useMultiSelection } from './use-multi-selection';
+import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
 
 /**
@@ -45,29 +53,31 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * also pass any other props through this hook, and they will be merged and
  * returned.
  *
- * @param {Object}  props   Optional. Props to pass to the element. Must contain
- *                          the ref if one is defined.
- * @param {Object}  options Options for internal use only.
+ * @param {Object}  props                    Optional. Props to pass to the element. Must contain
+ *                                           the ref if one is defined.
+ * @param {Object}  options                  Options for internal use only.
  * @param {boolean} options.__unstableIsHtml
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
-	const fallbackRef = useRef();
-	const ref = props.ref || fallbackRef;
-	const { clientId, index, className, wrapperProps = {} } = useContext(
+	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
 		BlockListBlockContext
 	);
 	const {
+		index,
 		mode,
 		name,
 		blockTitle,
 		isPartOfSelection,
 		adjustScrolling,
 		enableAnimation,
+		lightBlockWrapper,
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlockRootClientId,
+				getBlockIndex,
 				getBlockMode,
 				getBlockName,
 				isTyping,
@@ -82,16 +92,23 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
+			const rootClientId = getBlockRootClientId( clientId );
+			const blockType = getBlockType( blockName );
+
 			return {
+				index: getBlockIndex( clientId, rootClientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
-				blockTitle: getBlockType( blockName ).title,
+				blockTitle: blockType.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
 				enableAnimation:
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+				lightBlockWrapper:
+					blockType.apiVersion > 1 ||
+					hasBlockSupport( blockType, 'lightBlockWrapper', false ),
 			};
 		},
 		[ clientId ]
@@ -99,15 +116,19 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
-
-	useFocusFirstElement( ref, clientId );
-
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
-		ref,
-		useBlockNodes( clientId ),
+		props.ref,
+		useFocusFirstElement( clientId ),
+		// Must happen after focus because we check for focus in the block.
+		useScrollIntoView( clientId ),
+		useBlockRefProvider( clientId ),
+		useFocusHandler( clientId ),
+		useMultiSelection( clientId ),
 		useEventHandlers( clientId ),
+		useNavModeExit( clientId ),
 		useIsHovered(),
+		useIntersectionObserver(),
 		useMovingAnimation( {
 			isSelected: isPartOfSelection,
 			adjustScrolling,
@@ -115,6 +136,14 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			triggerAnimationOnChange: index,
 		} ),
 	] );
+
+	const blockEditContext = useBlockEditContext();
+	// Ensures it warns only inside the `edit` implementation for the block.
+	if ( ! lightBlockWrapper && clientId === blockEditContext.clientId ) {
+		warning(
+			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
+		);
+	}
 
 	return {
 		...wrapperProps,
@@ -128,6 +157,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-type': name,
 		'data-title': blockTitle,
 		className: classnames(
+			// The wp-block className is important for editor styles.
+			classnames( 'block-editor-block-list__block', {
+				'wp-block': ! isAligned,
+			} ),
 			className,
 			props.className,
 			wrapperProps.className,

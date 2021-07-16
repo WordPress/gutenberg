@@ -1,0 +1,10 @@
+.block-editor-block-alignment-matrix-control__popover {
+	.components-popover__content {
+		min-width: 0;
+		width: auto;
+
+		> div {
+			padding: $grid-unit;
+		}
+	}
+}

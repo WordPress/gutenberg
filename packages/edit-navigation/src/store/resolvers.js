@@ -1,19 +1,16 @@
 /**
- * External dependencies
- */
-import { groupBy, sortBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { parse, createBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { resolveMenuItems, dispatch } from './controls';
-import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 
+import { resolveMenuItems, dispatch } from './controls';
+import { buildNavigationPostId } from './utils';
+import menuItemsToBlocks from './menu-items-to-blocks';
 /**
  * Creates a "stub" navigation post reflecting the contents of menu with id=menuId. The
  * post is meant as a convenient to only exists in runtime and should never be saved. It
@@ -35,7 +32,11 @@ export function* getNavigationPostForMenu( menuId ) {
 
 	// Dispatch startResolution to skip the execution of the real getEntityRecord resolver - it would
 	// issue an http request and fail.
-	const args = [ KIND, POST_TYPE, stubPost.id ];
+	const args = [
+		NAVIGATION_POST_KIND,
+		NAVIGATION_POST_POST_TYPE,
+		stubPost.id,
+	];
 	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
 
 	// Now let's create a proper one hydrated using actual menu items
@@ -73,8 +74,8 @@ const persistPost = ( post ) =>
 	dispatch(
 		'core',
 		'receiveEntityRecords',
-		KIND,
-		POST_TYPE,
+		NAVIGATION_POST_KIND,
+		NAVIGATION_POST_POST_TYPE,
 		post,
 		{ id: post.id },
 		false
@@ -87,31 +88,10 @@ const persistPost = ( post ) =>
  * @return {Object} Navigation block
  */
 function createNavigationBlock( menuItems ) {
-	const itemsByParentID = groupBy( menuItems, 'parent' );
-	const menuItemIdToClientId = {};
-	const menuItemsToTreeOfBlocks = ( items ) => {
-		const innerBlocks = [];
-		if ( ! items ) {
-			return;
-		}
+	const { innerBlocks, mapping: menuItemIdToClientId } = menuItemsToBlocks(
+		menuItems
+	);
 
-		const sortedItems = sortBy( items, 'menu_order' );
-		for ( const item of sortedItems ) {
-			let menuItemInnerBlocks = [];
-			if ( itemsByParentID[ item.id ]?.length ) {
-				menuItemInnerBlocks = menuItemsToTreeOfBlocks(
-					itemsByParentID[ item.id ]
-				);
-			}
-			const block = convertMenuItemToBlock( item, menuItemInnerBlocks );
-			menuItemIdToClientId[ item.id ] = block.clientId;
-			innerBlocks.push( block );
-		}
-		return innerBlocks;
-	};
-
-	// menuItemsToTreeOfBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
-	const innerBlocks = menuItemsToTreeOfBlocks( itemsByParentID[ 0 ] || [] );
 	const navigationBlock = createBlock(
 		'core/navigation',
 		{
@@ -120,29 +100,4 @@ function createNavigationBlock( menuItems ) {
 		innerBlocks
 	);
 	return [ navigationBlock, menuItemIdToClientId ];
-}
-
-function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
-	if ( menuItem.type === 'block' ) {
-		const [ block ] = parse( menuItem.content.raw );
-
-		if ( ! block ) {
-			return createBlock( 'core/freeform', {
-				originalContent: menuItem.content.raw,
-			} );
-		}
-
-		return createBlock( block.name, block.attributes, innerBlocks );
-	}
-
-	const attributes = {
-		label: menuItem.title.rendered,
-		url: menuItem.url,
-		title: menuItem.attr_title,
-		className: menuItem.classes.join( ' ' ),
-		description: menuItem.description,
-		rel: menuItem.xfn.join( ' ' ),
-	};
-
-	return createBlock( 'core/navigation-link', attributes, innerBlocks );
 }

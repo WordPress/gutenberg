@@ -14,7 +14,6 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
-	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
@@ -33,11 +32,7 @@ import {
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
-import {
-	createBlock,
-	getBlockType,
-	switchToBlockType,
-} from '@wordpress/blocks';
+import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -63,6 +58,7 @@ function getFilename( url ) {
 }
 
 export default function Image( {
+	temporaryURL,
 	attributes: {
 		url = '',
 		alt,
@@ -87,50 +83,75 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
+	clientId,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { block, currentId, image, multiImageSelection } = useSelect(
+	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
-			const {
-				getMultiSelectedBlockClientIds,
-				getBlockName,
-				getSelectedBlock,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
+			const { getMultiSelectedBlockClientIds, getBlockName } = select(
+				blockEditorStore
+			);
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
-				block: getSelectedBlock(),
-				currentId: getSelectedBlockClientId(),
 				image: id && isSelected ? getMedia( id ) : null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
-						( clientId ) =>
-							getBlockName( clientId ) === 'core/image'
+						( _clientId ) =>
+							getBlockName( _clientId ) === 'core/image'
 					),
 			};
 		},
 		[ id, isSelected ]
 	);
-	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
+	const {
+		canInsertCover,
+		getBlock,
+		imageEditing,
+		imageSizes,
+		maxWidth,
+		mediaUpload,
+	} = useSelect(
 		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return pick( getSettings(), [
+			const {
+				getBlock: _getBlock,
+				getBlockRootClientId,
+				getBlockTransformItems,
+				getSettings,
+			} = select( blockEditorStore );
+
+			const block = _getBlock( clientId );
+			const rootClientId = getBlockRootClientId( clientId );
+			const transformations = getBlockTransformItems(
+				[ block ],
+				rootClientId
+			);
+			const settings = pick( getSettings(), [
 				'imageEditing',
 				'imageSizes',
 				'maxWidth',
 				'mediaUpload',
 			] );
-		}
+
+			return {
+				...settings,
+				getBlock: _getBlock,
+				canInsertCover:
+					transformations?.length &&
+					!! transformations.find(
+						( { name } ) => name === 'core/cover'
+					),
+			};
+		},
+		[ clientId ]
 	);
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
@@ -144,15 +165,6 @@ export default function Image( {
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
 
-	// Check if the cover block is registered.
-	const coverBlockExists = !! getBlockType( 'core/cover' );
-
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setCaptionFocused( false );
-		}
-	}, [ isSelected ] );
-
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
 	// we can enable a button in the toolbar to upload the image.
@@ -164,7 +176,9 @@ export default function Image( {
 		window
 			.fetch( url )
 			.then( ( response ) => response.blob() )
-			.then( ( blob ) => setExternalBlob( blob ) );
+			.then( ( blob ) => setExternalBlob( blob ) )
+			// Do nothing, cannot upload.
+			.catch( () => {} );
 	}, [ id, url, isSelected, externalBlob ] );
 
 	// Focus the caption after inserting an image from the placeholder. This is
@@ -201,18 +215,6 @@ export default function Image( {
 		// This is the HTML title attribute, separate from the media object
 		// title.
 		setAttributes( { title: value } );
-	}
-
-	function onFocusCaption() {
-		if ( ! captionFocused ) {
-			setCaptionFocused( true );
-		}
-	}
-
-	function onImageClick() {
-		if ( captionFocused ) {
-			setCaptionFocused( false );
-		}
 	}
 
 	function updateAlt( newAlt ) {
@@ -279,54 +281,56 @@ export default function Image( {
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
 
+	function switchToCover() {
+		replaceBlocks(
+			clientId,
+			switchToBlockType( getBlock( clientId ), 'core/cover' )
+		);
+	}
+
 	const controls = (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<BlockAlignmentControl
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-					{ ! multiImageSelection && ! isEditingImage && (
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ onSetHref }
-							linkDestination={ linkDestination }
-							mediaUrl={ ( image && image.source_url ) || url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-						/>
-					) }
-					{ allowCrop && (
-						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
-							icon={ crop }
-							label={ __( 'Crop' ) }
-						/>
-					) }
-					{ externalBlob && (
-						<ToolbarButton
-							onClick={ uploadExternal }
-							icon={ upload }
-							label={ __( 'Upload external image' ) }
-						/>
-					) }
-					{ ! multiImageSelection && coverBlockExists && (
-						<ToolbarButton
-							icon={ overlayText }
-							label={ __( 'Add text over image' ) }
-							onClick={ () =>
-								replaceBlocks(
-									currentId,
-									switchToBlockType( block, 'core/cover' )
-								)
-							}
-						/>
-					) }
-				</ToolbarGroup>
+			<BlockControls group="block">
+				<BlockAlignmentControl
+					value={ align }
+					onChange={ updateAlignment }
+				/>
 				{ ! multiImageSelection && ! isEditingImage && (
+					<ImageURLInputUI
+						url={ href || '' }
+						onChangeUrl={ onSetHref }
+						linkDestination={ linkDestination }
+						mediaUrl={ ( image && image.source_url ) || url }
+						mediaLink={ image && image.link }
+						linkTarget={ linkTarget }
+						linkClass={ linkClass }
+						rel={ rel }
+					/>
+				) }
+				{ allowCrop && (
+					<ToolbarButton
+						onClick={ () => setIsEditingImage( true ) }
+						icon={ crop }
+						label={ __( 'Crop' ) }
+					/>
+				) }
+				{ externalBlob && (
+					<ToolbarButton
+						onClick={ uploadExternal }
+						icon={ upload }
+						label={ __( 'Upload external image' ) }
+					/>
+				) }
+				{ ! multiImageSelection && canInsertCover && (
+					<ToolbarButton
+						icon={ overlayText }
+						label={ __( 'Add text over image' ) }
+						onClick={ switchToCover }
+					/>
+				) }
+			</BlockControls>
+			{ ! multiImageSelection && ! isEditingImage && (
+				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ id }
 						mediaURL={ url }
@@ -336,8 +340,8 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					/>
-				) }
-			</BlockControls>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
 					{ ! multiImageSelection && (
@@ -415,9 +419,8 @@ export default function Image( {
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		<>
 			<img
-				src={ url }
+				src={ temporaryURL || url }
 				alt={ defaultedAlt }
-				onClick={ onImageClick }
 				onError={ () => onImageError() }
 				onLoad={ ( event ) => {
 					setNaturalSize(
@@ -428,7 +431,7 @@ export default function Image( {
 					);
 				} }
 			/>
-			{ isBlobURL( url ) && <Spinner /> }
+			{ temporaryURL && <Spinner /> }
 		</>
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
@@ -510,7 +513,10 @@ export default function Image( {
 
 		img = (
 			<ResizableBox
-				size={ { width, height } }
+				size={ {
+					width: width ?? 'auto',
+					height: height ?? 'auto',
+				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
@@ -550,20 +556,20 @@ export default function Image( {
 			isEditing={ isEditingImage }
 			onFinishEditing={ () => setIsEditingImage( false ) }
 		>
-			{ controls }
+			{ /* Hide controls during upload to avoid component remount,
+				which causes duplicated image upload. */ }
+			{ ! temporaryURL && controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
 					ref={ captionRef }
 					tagName="figcaption"
 					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Write caption…' ) }
+					placeholder={ __( 'Add caption' ) }
 					value={ caption }
-					unstableOnFocus={ onFocusCaption }
 					onChange={ ( value ) =>
 						setAttributes( { caption: value } )
 					}
-					isSelected={ captionFocused }
 					inlineToolbar
 					__unstableOnSplitAtEnd={ () =>
 						insertBlocksAfter( createBlock( 'core/paragraph' ) )

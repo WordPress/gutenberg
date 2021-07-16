@@ -67,60 +67,73 @@ div.components-toolbar {
 
 // Size multiple sequential buttons to be optically balanced.
 // Icons are 36px, as set by a 24px icon and 12px padding.
-.components-accessible-toolbar .components-toolbar-group > .components-button.components-button.has-icon,
-.components-toolbar div > .components-button.components-button.has-icon {
-	min-width: $block-toolbar-height - $grid-unit-15;
-	padding-left: $grid-unit-15 / 2; // 6px.
-	padding-right: $grid-unit-15 / 2;
+.block-editor-block-toolbar > .components-toolbar > .block-editor-block-toolbar__slot, // When a plugin adds to a slot, the segment has a `components-toolbar` class.
+.block-editor-block-toolbar > .components-toolbar-group > .block-editor-block-toolbar__slot, // When no plugin adds to slots, the segment has a `components-toolbar-group` class.
+.block-editor-block-toolbar > .block-editor-block-toolbar__slot > .components-toolbar, // The nesting order is sometimes reversed.
+.block-editor-block-toolbar > .block-editor-block-toolbar__slot > .components-dropdown, // Targets unique markup for the "Replace" button.
+.block-editor-block-toolbar .block-editor-block-toolbar__slot .components-toolbar-group { // Inline formatting tools use this class.
 
-	svg {
-		min-width: $button-size-small; // This is the optimal icon size, and we size the whole button after this.
+	// Segments with just a single button.
+	> .components-button:first-child:last-child,
+	> .components-dropdown:first-child:last-child .components-button,
+	&.components-dropdown > .components-button.components-button, // Single segments where the dropdown is also the toolbar group (such as text align).
+	&.components-dropdown > * .components-button {
+		min-width: $block-toolbar-height;
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
+
+		&::before {
+			left: $grid-unit-10;
+			right: $grid-unit-10;
+		}
 	}
 
-	&::before {
-		left: 2px;
-		right: 2px;
+	// First.
+	// @todo, this unnamed div only shows up when plugins add to slots. We should remove the fragment.
+	> .components-button:first-child,
+	> div:first-child > .components-button,
+	> .components-dropdown:first-child .components-button {
+		min-width: $block-toolbar-height - $grid-unit-15 / 2;
+		padding-left: $grid-unit-15 - $border-width;
+		padding-right: $grid-unit-15 / 2;
+
+		&::before {
+			left: $grid-unit-10;
+			right: 2px;
+		}
 	}
-}
 
-// First button in a group.
-.components-accessible-toolbar .components-toolbar-group > .components-button:first-child.has-icon,
-.components-accessible-toolbar .components-toolbar-group > div:first-child > .components-button.has-icon,
-.components-toolbar div:first-child .components-button.has-icon {
-	min-width: $block-toolbar-height - $grid-unit-15 / 2;
-	padding-left: $grid-unit-15 - $border-width;
-	padding-right: $grid-unit-15 / 2;
+	// Middle.
+	// @todo, this unnamed div only shows up when plugins add to slots. We should remove the fragment.
+	> .components-button,
+	> div > .components-button,
+	> .components-dropdown .components-button {
+		min-width: $block-toolbar-height - $grid-unit-15;
+		padding-left: $grid-unit-15 / 2; // 6px.
+		padding-right: $grid-unit-15 / 2;
 
-	&::before {
-		left: $grid-unit-10;
-		right: 2px;
+		svg {
+			min-width: $button-size-small; // This is the optimal icon size, and we size the whole button after this.
+		}
+
+		&::before {
+			left: 2px;
+			right: 2px;
+		}
 	}
-}
 
-// Last button in a group.
-.components-accessible-toolbar .components-toolbar-group > .components-button:last-of-type.has-icon,
-.components-accessible-toolbar .components-toolbar-group > div:last-child > .components-button.has-icon,
-.components-toolbar div:last-child .components-button.has-icon {
-	min-width: $block-toolbar-height - $grid-unit-15 / 2;
-	padding-left: $grid-unit-15 / 2;
-	padding-right: $grid-unit-15 - $border-width;
+	// Last.
+	// @todo, this unnamed div only shows up when plugins add to slots. We should remove the fragment.
+	> .components-button:last-child,
+	> div:last-child > .components-button,
+	> .components-dropdown:last-child .components-button {
+		min-width: $block-toolbar-height - $grid-unit-15 / 2;
+		padding-left: $grid-unit-15 / 2;
+		padding-right: $grid-unit-15 - $border-width;
 
-	&::before {
-		left: 2px;
-		right: $grid-unit-10;
-	}
-}
-
-// Single buttons should remain 48px.
-.components-accessible-toolbar .components-toolbar-group > .components-button:first-of-type:last-of-type.has-icon,
-.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon,
-.components-toolbar div:first-child:last-child > .components-button.has-icon {
-	min-width: $block-toolbar-height;
-	padding-left: $grid-unit-15;
-	padding-right: $grid-unit-15;
-
-	&::before {
-		left: $grid-unit-10;
-		right: $grid-unit-10;
+		&::before {
+			left: 2px;
+			right: $grid-unit-10;
+		}
 	}
 }
