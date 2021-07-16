@@ -68,5 +68,5 @@ export default function useSelectAll() {
 		return () => {
 			node.removeEventListener( 'keydown', onKeyDown );
 		};
-	} );
+	}, [] );
 }
