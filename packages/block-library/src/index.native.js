@@ -287,4 +287,4 @@ export const registerCoreBlocks = () => {
  *
  * @constant {string[]}
  */
-export const NEW_BLOCK_TYPES = [ paragraph.name ];
+export const NEW_BLOCK_TYPES = [ embed.name, search.name, audio.name ];
