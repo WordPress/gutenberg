@@ -54,6 +54,10 @@ export {
 	default as UnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
 } from './unit-control';
+export {
+	CSS_UNITS as CSS_UNITS,
+	filterUnitsWithSettings as filterUnitsWithSettings,
+} from './unit-control/utils';
 export { default as Disabled } from './disabled';
 
 // Higher-Order Components

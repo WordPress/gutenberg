@@ -129,4 +129,7 @@ module.exports = {
 	textInput: {
 		color: 'black',
 	},
+	buttonNoBg: {
+		color: 'orange',
+	},
 };
