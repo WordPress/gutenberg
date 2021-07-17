@@ -99,7 +99,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	);
 
 	// local states for gudie modal
-	const [ isGudieOpen, setIsGudieOpen ] = useState( false );
+	const [ isGuideOpen, setIsGuideOpen ] = useState( false );
 
 	const { saveEditedEntityRecord } = useDispatch( coreStore );
 	const { createNotice } = useDispatch( noticesStore );
@@ -117,7 +117,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 			actions: [
 				{
 					label: __( 'Learn more' ),
-					onClick: () => setIsGudieOpen( true ),
+					onClick: () => setIsGuideOpen( true ),
 				},
 			],
 		} );
@@ -170,7 +170,7 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 							isPrimary
 							className="block-library-block__reusable-block-save-button"
 							onClick={ saveEditedRecords }
-							label={ __( 'Save globally' ) }
+							label={ __( 'Save reusable block' ) }
 							showTooltip
 							isDisabled={ ! hasEdits }
 						>
@@ -192,10 +192,10 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 					wrapperProps={ innerBlocksProps }
 					className="block-library-block__reusable-block-container"
 				/>
-				{ isGudieOpen && (
+				{ isGuideOpen && (
 					<ReusableBlockWelcomeGuide
-						isGudieOpen={ isGudieOpen }
-						setIsGudieOpen={ setIsGudieOpen }
+						isGuideOpen={ isGuideOpen }
+						setIsGuideOpen={ setIsGuideOpen }
 					/>
 				) }
 			</div>

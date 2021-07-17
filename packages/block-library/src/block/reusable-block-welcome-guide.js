@@ -16,8 +16,8 @@ function WelcomeGuideImage( { nonAnimatedSrc, animatedSrc } ) {
 	);
 }
 
-function ReusableBlockWelcomeGuide( { isGudieOpen, setIsGudieOpen } ) {
-	if ( ! isGudieOpen ) {
+function ReusableBlockWelcomeGuide( { isGuideOpen, setIsGuideOpen } ) {
+	if ( ! isGuideOpen ) {
 		return null;
 	}
 
@@ -26,7 +26,7 @@ function ReusableBlockWelcomeGuide( { isGudieOpen, setIsGudieOpen } ) {
 			className="edit-reusable-block-welcome-guide"
 			contentLabel={ __( 'Get familiar with Reusable blocks' ) }
 			finishButtonText={ __( 'Got it' ) }
-			onFinish={ () => setIsGudieOpen( false ) }
+			onFinish={ () => setIsGuideOpen( false ) }
 			pages={ [
 				{
 					image: (

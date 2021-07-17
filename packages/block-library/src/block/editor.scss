@@ -19,11 +19,13 @@
 .components-toolbar-group {
 	.block-library-block__reusable-block-save-button {
 		margin: 7px;
-		height: 32px;
+		height: $grid-unit-40;
+
+		// override the default box inset properties to match height and width of the save button
 		&::before {
 			left: 0 !important;
 			right: 0 !important;
-			height: 32px !important;
+			height: $grid-unit-40 !important;
 		}
 	}
 }
