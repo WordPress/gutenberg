@@ -464,6 +464,22 @@ OFFLINE=true npm run test-e2e
 
 See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions)
 
+### Capturing debugging screencasts.
+
+Sometimes it's hard to debug a flaky test, especially when it can only be reproduced in a certain environment. We can append the `--puppeteer-screencasts` flag to record the failing tests into `.webm` videos to help us debugging. It's automatically enabled in GitHub CI.
+
+```bash
+npm run test-e2e -- --puppeteer-screencasts
+```
+
+By default, it will only record failing tests. If you want to record all tests, then specify `always` as the value.
+
+```bash
+npm run test-e2e -- --puppeteer-screencasts=always
+```
+
+Note that recording screencasts will inevitably slow down the tests and consume disk size. Even though it's not a huge overhead, you probably won't want to record it for every test during local development.
+
 ### Core Block Testing
 
 Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](https://github.com/wordpress/gutenberg/blob/HEAD/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.

@@ -45,10 +45,7 @@ const KEYS = {
 
 const root = process.env.GITHUB_WORKSPACE || process.cwd();
 const ARTIFACTS_PATH = path.join( root, 'artifacts' );
-const CAPTURE_SCREENCASTS =
-	process.env.CAPTURE_SCREENCASTS === 'false'
-		? false
-		: process.env.CAPTURE_SCREENCASTS || 'failure';
+const PUPPETEER_SCREENCASTS = process.env.PUPPETEER_SCREENCASTS;
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
@@ -183,7 +180,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 			}
 		}
 
-		if ( CAPTURE_SCREENCASTS ) {
+		if ( PUPPETEER_SCREENCASTS ) {
 			this.screencast = await setupScreencast(
 				this.global.page,
 				this.global.browser
@@ -247,7 +244,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 				await this.screencast
 					.stop(
 						( event.name === 'test_fn_failure' ||
-							CAPTURE_SCREENCASTS === 'always' ) &&
+							PUPPETEER_SCREENCASTS === 'always' ) &&
 							path.join( ARTIFACTS_PATH, fileName + '.webm' )
 					)
 					.catch( ( err ) => {
