@@ -7,8 +7,8 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 
-function getScreencastAPI( downloadName ) {
-	class ScreencastAPI {
+function createScreencastClient() {
+	class ScreencastClient {
 		constructor() {
 			this.canvas = document.createElement( 'canvas' );
 			this.downloadAnchor = document.createElement( 'a' );
@@ -23,7 +23,7 @@ function getScreencastAPI( downloadName ) {
 			this.chunks = [];
 		}
 
-		async beginRecording( stream ) {
+		beginRecording( stream ) {
 			this.recordingFinish = new Promise( ( resolve, reject ) => {
 				this.recorder = new window.MediaRecorder( stream, {
 					mimeType: 'video/webm',
@@ -37,132 +37,181 @@ function getScreencastAPI( downloadName ) {
 			} );
 		}
 
-		async download() {
-			await this.recordingFinish;
+		download( downloadName ) {
 			const blob = new window.Blob( this.chunks, {
 				type: 'video/webm',
 			} );
 
-			this.downloadAnchor.onclick = () => {
-				this.downloadAnchor.href = URL.createObjectURL( blob );
-				this.downloadAnchor.download = downloadName;
-			};
+			const url = URL.createObjectURL( blob );
+			this.downloadAnchor.href = url;
+			this.downloadAnchor.download = downloadName;
 
 			this.downloadAnchor.click();
+
+			// Revoke the url and free up the memory after download started.
+			setTimeout( () => {
+				URL.revokeObjectURL( url );
+			} );
 		}
 
-		async start( { width, height } ) {
+		start( width, height ) {
+			this.chunks = [];
+			this.currentFrame = null;
 			this.canvas.width = width;
 			this.canvas.height = height;
+			this.ctx.clearRect( 0, 0, this.canvas.width, this.canvas.height );
 			this.beginRecording( this.canvas.captureStream() );
-
-			const loop = () => {
-				this.draw();
-				this.animationFrame = window.requestAnimationFrame( loop );
-			};
-			loop();
 		}
 
-		async draw() {
+		draw() {
 			if ( ! this.currentFrame ) {
 				return this;
 			}
 
 			this.ctx.clearRect( 0, 0, this.canvas.width, this.canvas.height );
 			this.ctx.drawImage( this.currentFrame, 0, 0 );
-
-			return this;
 		}
 
-		async setCurrentFrame( pngData ) {
-			this.currentFrame = await window
+		setCurrentFrame( pngData ) {
+			window
 				.fetch( `data:image/png;base64,${ pngData }` )
 				.then( ( res ) => res.blob() )
-				.then( ( blob ) => window.createImageBitmap( blob ) );
-
-			return this;
+				.then( ( blob ) => window.createImageBitmap( blob ) )
+				.then( ( imageBitmap ) => {
+					this.currentFrame = imageBitmap;
+				} );
 		}
 
 		async stop() {
-			window.cancelAnimationFrame( this.animationFrame );
 			this.recorder.stop();
 			await this.recordingFinish;
-			return this;
 		}
 	}
 
-	return new ScreencastAPI();
+	return new ScreencastClient();
 }
 
-async function startScreencast( { page, browser, downloadPath, fileName } ) {
-	const client = await page.target().createCDPSession();
-	const renderer = await browser.newPage();
-	const rendererClient = await renderer.target().createCDPSession();
-	const downloadName = fileName + '.webm';
-	const fullDownloadPath = path.join( downloadPath, downloadName );
+class Screencast {
+	static async setup( page, browser ) {
+		const renderer = await browser.newPage();
+		const client = await page.target().createCDPSession();
+		const rendererClient = await renderer.target().createCDPSession();
 
-	await rendererClient.send( 'Page.setDownloadBehavior', {
-		behavior: 'allow',
-		downloadPath,
-	} );
+		const screencastClient = await renderer.evaluateHandle(
+			createScreencastClient
+		);
+		await page.bringToFront();
 
-	const viewport = page.viewport();
-	const screencastAPI = await renderer.evaluateHandle(
-		getScreencastAPI,
-		downloadName
-	);
-	await page.bringToFront();
+		return new Screencast( {
+			page,
+			renderer,
+			client,
+			rendererClient,
+			screencastClient,
+		} );
+	}
 
-	await renderer.evaluate(
-		( _screencastAPI, width, height ) =>
-			_screencastAPI.start( { width, height } ),
-		screencastAPI,
-		viewport.width,
-		viewport.height
-	);
+	constructor( {
+		page,
+		renderer,
+		client,
+		rendererClient,
+		screencastClient,
+	} ) {
+		this.page = page;
+		this.renderer = renderer;
+		this.client = client;
+		this.rendererClient = rendererClient;
+		this.screencastClient = screencastClient;
 
-	await client.send( 'Page.startScreencast', {
-		format: 'png',
-		maxWidth: viewport.width,
-		maxHeight: viewport.height,
-		everyNthFrame: 1,
-	} );
+		this.intervalId = 0;
 
-	async function onScreencastFrame( { data, sessionId } ) {
-		renderer
+		this._onScreencastFrame = this._onScreencastFrame.bind( this );
+	}
+
+	async _onScreencastFrame( { data, sessionId } ) {
+		this.screencastClient
 			.evaluate(
-				( _screencastAPI, _data ) =>
-					_screencastAPI.setCurrentFrame( _data ),
-				screencastAPI,
+				( screencastClient, _data ) =>
+					screencastClient.setCurrentFrame( _data ),
 				data
 			)
 			.catch( () => {} );
-		client
+		this.client
 			.send( 'Page.screencastFrameAck', { sessionId } )
 			.catch( () => {} );
 	}
 
-	client.on( 'Page.screencastFrame', onScreencastFrame );
+	async start() {
+		this.client = await this.page.target().createCDPSession();
+		const viewport = this.page.viewport();
 
-	return async function stopScreencast( { save = false } = {} ) {
-		await client.send( 'Page.stopScreencast' );
-		client.off( 'Page.screencastFrame', onScreencastFrame );
-		await renderer.bringToFront();
-		await renderer.evaluate(
-			async ( _screencastAPI, _save ) => {
-				_screencastAPI.stop();
-				if ( _save ) {
-					await _screencastAPI.download();
+		await this.screencastClient.evaluate(
+			( screencastClient, width, height ) =>
+				screencastClient.start( width, height ),
+			viewport.width,
+			viewport.height
+		);
+
+		await this.client.send( 'Page.startScreencast', {
+			format: 'png',
+			quality: 70,
+			maxWidth: viewport.width,
+			maxHeight: viewport.height,
+			everyNthFrame: 1,
+		} );
+
+		/**
+		 * MediaRecorder won't push new frames if the canvas didn't update.
+		 * To solve this, we manually calling `draw()` for every "frame".
+		 * However, the renderer page is in the background and could delay
+		 * `requestAnimationFrame`, `setTimeout`, `setInterval` longer than it should be.
+		 * We instead schedule the interval on server side to maintain stabler frame rates.
+		 * Note that `setInterval` doesn't guarantee stable FPS,
+		 * but in our case it's good enough for debugging purpose.
+		 */
+		this.intervalId = setInterval( () => {
+			this.screencastClient
+				.evaluate( ( screencastClient ) => screencastClient.draw() )
+				.catch( () => {} );
+		}, 1000 / 60 ); // 60 FPS
+
+		this.client.on( 'Page.screencastFrame', this._onScreencastFrame );
+	}
+
+	async stop( downloadFilePath ) {
+		if ( downloadFilePath ) {
+			const downloadPath = path.dirname( downloadFilePath );
+
+			await this.rendererClient.send( 'Page.setDownloadBehavior', {
+				behavior: 'allow',
+				downloadPath,
+			} );
+		}
+
+		clearInterval( this.intervalId );
+		await this.client.send( 'Page.stopScreencast' );
+		this.client.off( 'Page.screencastFrame', this._onScreencastFrame );
+
+		await this.screencastClient.evaluate(
+			async ( screencastClient, downloadName ) => {
+				await screencastClient.stop();
+				if ( downloadName ) {
+					screencastClient.download( downloadName );
 				}
 			},
-			screencastAPI,
-			save
+			downloadFilePath && path.basename( downloadFilePath )
 		);
-		if ( save ) {
-			await waitUntilFileDownloaded( fullDownloadPath );
+
+		if ( downloadFilePath ) {
+			// Wait until the download is finished before closing the page or exiting the tests.
+			await waitUntilFileDownloaded( downloadFilePath );
 		}
-		await renderer.close();
-	};
+	}
+
+	async teardown() {
+		await this.renderer.close();
+	}
 }
 
 async function waitUntilFileDownloaded( filePath ) {
@@ -176,4 +225,4 @@ async function waitUntilFileDownloaded( filePath ) {
 	}
 }
 
-module.exports = { startScreencast };
+module.exports = Screencast.setup;

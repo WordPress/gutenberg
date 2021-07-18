@@ -26,7 +26,7 @@ const chalk = require( 'chalk' );
  * Internal dependencies
  */
 const { readConfig, getPuppeteer } = require( './config' );
-const { startScreencast } = require( './screencast' );
+const setupScreencast = require( './screencast' );
 
 const handleError = ( error ) => {
 	// To match the same behavior in jest-jasmine2:
@@ -45,8 +45,10 @@ const KEYS = {
 
 const root = process.env.GITHUB_WORKSPACE || process.cwd();
 const ARTIFACTS_PATH = path.join( root, 'artifacts' );
-const CAPTURE_SCREENCASTS = process.env.CAPTURE_SCREENCASTS !== 'false';
-const screencasts = new Map();
+const CAPTURE_SCREENCASTS =
+	process.env.CAPTURE_SCREENCASTS === 'false'
+		? false
+		: process.env.CAPTURE_SCREENCASTS || 'failure';
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
@@ -180,6 +182,13 @@ class PuppeteerEnvironment extends NodeEnvironment {
 				throw err;
 			}
 		}
+
+		if ( CAPTURE_SCREENCASTS ) {
+			this.screencast = await setupScreencast(
+				this.global.page,
+				this.global.browser
+			);
+		}
 	}
 
 	async teardown() {
@@ -195,6 +204,10 @@ class PuppeteerEnvironment extends NodeEnvironment {
 			}
 		} else if ( page ) {
 			await page.close();
+		}
+
+		if ( this.screencast ) {
+			await this.screencast.teardown();
 		}
 
 		if ( browser ) {
@@ -217,40 +230,32 @@ class PuppeteerEnvironment extends NodeEnvironment {
 			const testName = state.currentlyRunningTest.name;
 			const fileName = getFileName( testName );
 
-			if ( CAPTURE_SCREENCASTS && event.name === 'test_fn_start' ) {
-				screencasts.set(
-					testName,
-					await startScreencast( {
-						page: this.global.page,
-						browser: this.global.browser,
-						downloadPath: ARTIFACTS_PATH,
-						fileName,
-					} ).catch( ( err ) => {
-						// Ignore error to prevent it from failing the test,
-						// instead just log it for debugging.
-						// eslint-disable-next-line no-console
-						console.error( err );
-					} )
-				);
-			}
-
-			if (
-				CAPTURE_SCREENCASTS &&
-				( event.name === 'test_fn_success' ||
-					event.name === 'test_fn_failure' ) &&
-				screencasts.has( testName )
-			) {
-				const stopScreencast = screencasts.get( testName );
-				screencasts.delete( testName );
-				await stopScreencast( {
-					// Only save the screencast if the test failed.
-					save: event.name === 'test_fn_failure',
-				} ).catch( ( err ) => {
+			if ( this.screencast && event.name === 'test_fn_start' ) {
+				await this.screencast.start().catch( ( err ) => {
 					// Ignore error to prevent it from failing the test,
 					// instead just log it for debugging.
 					// eslint-disable-next-line no-console
 					console.error( err );
 				} );
+			}
+
+			if (
+				this.screencast &&
+				( event.name === 'test_fn_success' ||
+					event.name === 'test_fn_failure' )
+			) {
+				await this.screencast
+					.stop(
+						( event.name === 'test_fn_failure' ||
+							CAPTURE_SCREENCASTS === 'always' ) &&
+							path.join( ARTIFACTS_PATH, fileName + '.webm' )
+					)
+					.catch( ( err ) => {
+						// Ignore error to prevent it from failing the test,
+						// instead just log it for debugging.
+						// eslint-disable-next-line no-console
+						console.error( err );
+					} );
 			}
 
 			if ( event.name === 'test_fn_failure' ) {
