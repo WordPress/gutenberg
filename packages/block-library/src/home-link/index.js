@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
 import { home } from '@wordpress/icons';
 
 /**
@@ -23,8 +22,6 @@ export const settings = {
 	save,
 
 	example: {
-		attributes: {
-			label: _x( 'Home Link', 'block example' ),
-		},
+		attributes: {},
 	},
 };
