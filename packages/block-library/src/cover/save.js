@@ -38,6 +38,7 @@ export default function save( { attributes } ) {
 		isRepeated,
 		overlayColor,
 		url,
+		alt,
 		id,
 		minHeight: minHeightProp,
 		minHeightUnit,
@@ -109,7 +110,7 @@ export default function save( { attributes } ) {
 						'wp-block-cover__image-background',
 						id ? `wp-image-${ id }` : null
 					) }
-					alt=""
+					alt={ alt }
 					src={ url }
 					style={ { objectPosition } }
 					data-object-fit="cover"
