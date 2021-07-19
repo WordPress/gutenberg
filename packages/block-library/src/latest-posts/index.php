@@ -54,7 +54,17 @@ function render_block_core_latest_posts( $attributes ) {
 		$args['author'] = $attributes['selectedAuthor'];
 	}
 
-	$recent_posts = get_posts( $args );
+	$recent_posts = get_posts(
+		/** This filter is documented in wp-includes/widgets/class-wp-widget-recent-posts.php */
+		apply_filters(
+			'widget_posts_args',
+			$args,
+			array(
+				'number'    => $attributes['postsToShow'],
+				'show_date' => $attributes['displayPostDate'],
+			)
+		)
+	);
 
 	$list_items_markup = '';
 
