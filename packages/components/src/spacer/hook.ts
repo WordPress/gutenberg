@@ -9,80 +9,14 @@ import { css } from '@emotion/react';
 import { useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../ui/context';
-import { space, SpaceInput } from '../ui/utils/space';
+import { space } from '../ui/utils/space';
 import { useCx } from '../utils/hooks/use-cx';
+import type { Props } from './types';
 
 const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
 	typeof o !== 'undefined' && o !== null;
 
-export interface SpacerProps {
-	/**
-	 * Adjusts all margins.
-	 */
-	margin?: SpaceInput;
-	/**
-	 * Adjusts top and bottom margins.
-	 */
-	marginY?: SpaceInput;
-	/**
-	 * Adjusts left and right margins.
-	 */
-	marginX?: SpaceInput;
-	/**
-	 * Adjusts top margins.
-	 */
-	marginTop?: SpaceInput;
-	/**
-	 * Adjusts bottom margins.
-	 *
-	 * @default 2
-	 */
-	marginBottom?: SpaceInput;
-	/**
-	 * Adjusts left margins.
-	 */
-	marginLeft?: SpaceInput;
-	/**
-	 * Adjusts right margins.
-	 */
-	marginRight?: SpaceInput;
-	/**
-	 * Adjusts all padding.
-	 */
-	padding?: SpaceInput;
-	/**
-	 * Adjusts top and bottom padding.
-	 */
-	paddingY?: SpaceInput;
-	/**
-	 * Adjusts left and right padding.
-	 */
-	paddingX?: SpaceInput;
-	/**
-	 * Adjusts top padding.
-	 */
-	paddingTop?: SpaceInput;
-	/**
-	 * Adjusts bottom padding.
-	 */
-	paddingBottom?: SpaceInput;
-	/**
-	 * Adjusts left padding.
-	 */
-	paddingLeft?: SpaceInput;
-	/**
-	 * Adjusts right padding.
-	 */
-	paddingRight?: SpaceInput;
-	/**
-	 * The children elements.
-	 */
-	children?: React.ReactNode;
-}
-
-export function useSpacer(
-	props: PolymorphicComponentProps< SpacerProps, 'div' >
-) {
+export function useSpacer( props: PolymorphicComponentProps< Props, 'div' > ) {
 	const {
 		className,
 		margin,
