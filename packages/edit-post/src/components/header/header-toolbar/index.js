@@ -135,9 +135,8 @@ function HeaderToolbar() {
 					) }
 					showTooltip={ ! showIconLabels }
 				>
-					{ showIconLabels && ! isInserterOpened
-						? __( 'Add' )
-						: __( 'Close' ) }
+					{ showIconLabels &&
+						( ! isInserterOpened ? __( 'Add' ) : __( 'Close' ) ) }
 				</ToolbarItem>
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
