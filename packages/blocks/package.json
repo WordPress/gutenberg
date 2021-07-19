@@ -43,6 +43,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/shortcode": "file:../shortcode",
+		"@wordpress/warning": "file:../warning",
 		"hpq": "^1.3.0",
 		"lodash": "^4.17.21",
 		"rememo": "^3.0.0",
