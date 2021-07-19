@@ -9,7 +9,7 @@ import type { ReactNode } from 'react';
  */
 import type { SpaceInput } from '../ui/utils/space';
 
-export interface InnerProps {
+export type Props = {
 	/**
 	 * Adjusts all margins.
 	 */
@@ -68,8 +68,8 @@ export interface InnerProps {
 	 * Adjusts right padding.
 	 */
 	paddingRight?: SpaceInput;
-}
-
-export interface Props extends InnerProps {
+	/**
+	 * The children elements.
+	 */
 	children?: ReactNode;
-}
+};
