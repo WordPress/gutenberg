@@ -630,11 +630,12 @@ async function getChangelog( settings ) {
 		}
 
 		const featureGroups = groupBy( groupPullRequests, getIssueFeature );
-
 		changelog += '### ' + group + '\n\n';
 
 		Object.keys( featureGroups )
-			.sort() // natural sort first
+			.sort( ( a, b ) => {
+				return featureGroups[ b ].length - featureGroups[ a ].length;
+			} )
 			.sort( ( a, b ) => {
 				// sort "Unknown" to always be at the end
 				if ( a === 'Unknown' ) {
