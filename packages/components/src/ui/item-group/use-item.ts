@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { ElementType } from 'react';
+
+/**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
@@ -7,15 +13,13 @@ import type { PolymorphicComponentProps } from '../context';
 import * as styles from './styles';
 import { useItemGroupContext } from './context';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { ItemProps } from './types';
 
-export interface Props {
-	action?: boolean;
-	size?: 'small' | 'medium' | 'large';
-}
-
-export function useItem( props: PolymorphicComponentProps< Props, 'div' > ) {
+export function useItem(
+	props: PolymorphicComponentProps< ItemProps, 'div' >
+) {
 	const {
-		action = false,
+		isAction = false,
 		as: asProp,
 		className,
 		role = 'listitem',
@@ -27,12 +31,12 @@ export function useItem( props: PolymorphicComponentProps< Props, 'div' > ) {
 
 	const size = sizeProp || contextSize;
 
-	const as = asProp || action ? 'button' : 'div';
+	const as = ( asProp || isAction ? 'button' : 'div' ) as ElementType;
 
 	const cx = useCx();
 
 	const classes = cx(
-		action && styles.unstyledButton,
+		isAction && styles.unstyledButton,
 		styles.itemSizes[ size ] || styles.itemSizes.medium,
 		styles.item,
 		spacedAround && styles.spacedAround,
