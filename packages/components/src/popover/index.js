@@ -191,8 +191,8 @@ function setAttribute( element, name, value ) {
  *                           property.
  */
 function setStyle( element, property, value = '' ) {
-	if ( element.style[ property ] !== value ) {
-		element.style[ property ] = value;
+	if ( element.style.getPropertyValue( property ) !== value ) {
+		element.style.setProperty( property, value );
 	}
 }
 
@@ -256,7 +256,7 @@ const Popover = (
 		__unstableObserveElement,
 		__unstableBoundaryParent,
 		__unstableForcePosition,
-		__unstableForceXAlignment,
+		__experimentalCustomProperties,
 		/* eslint-enable no-unused-vars */
 		...contentProps
 	},
@@ -350,16 +350,26 @@ const Popover = (
 				containerRef.current,
 				relativeOffsetTop,
 				boundaryElement,
-				__unstableForcePosition,
-				__unstableForceXAlignment
+				__unstableForcePosition
 			);
 
 			if (
 				typeof popoverTop === 'number' &&
 				typeof popoverLeft === 'number'
 			) {
-				setStyle( containerRef.current, 'top', popoverTop + 'px' );
-				setStyle( containerRef.current, 'left', popoverLeft + 'px' );
+				let propY = 'top';
+				let propX = 'left';
+				if ( __experimentalCustomProperties ) {
+					propY = '--top';
+					propX = '--left';
+					setStyle(
+						containerRef.current,
+						'--contentHeight',
+						usedContentSize.height + 'px'
+					);
+				}
+				setStyle( containerRef.current, propY, popoverTop + 'px' );
+				setStyle( containerRef.current, propX, popoverLeft + 'px' );
 			}
 
 			setClass(
@@ -370,16 +380,20 @@ const Popover = (
 			setClass( containerRef.current, 'is-alternate', isAlternate );
 			setAttribute( containerRef.current, 'data-x-axis', xAxis );
 			setAttribute( containerRef.current, 'data-y-axis', yAxis );
-			setStyle(
-				contentRef.current,
-				'maxHeight',
-				typeof contentHeight === 'number' ? contentHeight + 'px' : ''
-			);
-			setStyle(
-				contentRef.current,
-				'maxWidth',
-				typeof contentWidth === 'number' ? contentWidth + 'px' : ''
-			);
+			if ( ! __experimentalCustomProperties ) {
+				setStyle(
+					contentRef.current,
+					'maxHeight',
+					typeof contentHeight === 'number'
+						? contentHeight + 'px'
+						: ''
+				);
+				setStyle(
+					contentRef.current,
+					'maxWidth',
+					typeof contentWidth === 'number' ? contentWidth + 'px' : ''
+				);
+			}
 
 			// Compute the animation position
 			const yAxisMapping = {

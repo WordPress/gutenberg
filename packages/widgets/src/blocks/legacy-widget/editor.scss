@@ -159,6 +159,27 @@
 	min-width: 400px;
 }
 
+// Ensures the popover will be hidden when the attribute is applied.
+.wp-block-legacy-widget__popover[hidden] {
+	display: none;
+}
+
+.wp-block-legacy-widget__popover {
+	// The maximum height excludes 45px on top and bottom to match the height
+	// of the sidebar scrolling area.
+	--maxHeight: calc(100vh - 90px);
+	--usedHeight: min(var(--contentHeight), var(--maxHeight));
+	--remainingHeight: calc(100vh - var(--usedHeight));
+	--usedHalfHeight: calc(var(--usedHeight) / 2);
+	// Keeps the popover in the viewport even if its anchor has scrolled out of view
+	top: clamp(var(--usedHalfHeight), var(--top), calc(var(--usedHalfHeight) + var(--remainingHeight)));
+	left: calc(var(--left) + #{$grid-unit-40});
+}
+.wp-block-legacy-widget__popover .components-popover__content {
+	max-height: var(--maxHeight);
+}
+
+
 .wp-block-legacy-widget {
 	.components-base-control {
 		width: 100%;

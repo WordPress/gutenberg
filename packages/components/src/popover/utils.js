@@ -21,7 +21,6 @@ const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
  * @param {string}  chosenYAxis           yAxis to be used.
  * @param {Element} boundaryElement       Boundary element.
  * @param {boolean} forcePosition         Don't adjust position based on anchor.
- * @param {boolean} forceXAlignment       Don't adjust alignment based on YAxis
  *
  * @return {Object} Popover xAxis position and constraints.
  */
@@ -33,8 +32,7 @@ export function computePopoverXAxisPosition(
 	stickyBoundaryElement,
 	chosenYAxis,
 	boundaryElement,
-	forcePosition,
-	forceXAlignment
+	forcePosition
 ) {
 	const { width } = contentSize;
 
@@ -66,7 +64,7 @@ export function computePopoverXAxisPosition(
 
 	if ( corner === 'right' ) {
 		leftAlignmentX = anchorRect.right;
-	} else if ( chosenYAxis !== 'middle' && ! forceXAlignment ) {
+	} else if ( chosenYAxis !== 'middle' ) {
 		leftAlignmentX = anchorMidPoint;
 	}
 
@@ -74,7 +72,7 @@ export function computePopoverXAxisPosition(
 
 	if ( corner === 'left' ) {
 		rightAlignmentX = anchorRect.left;
-	} else if ( chosenYAxis !== 'middle' && ! forceXAlignment ) {
+	} else if ( chosenYAxis !== 'middle' ) {
 		rightAlignmentX = anchorMidPoint;
 	}
 
@@ -287,7 +285,6 @@ export function computePopoverYAxisPosition(
  *                                        relative positioned parent container.
  * @param {Element} boundaryElement       Boundary element.
  * @param {boolean} forcePosition         Don't adjust position based on anchor.
- * @param {boolean} forceXAlignment       Don't adjust alignment based on YAxis
  *
  * @return {Object} Popover position and constraints.
  */
@@ -299,8 +296,7 @@ export function computePopoverPosition(
 	anchorRef,
 	relativeOffsetTop,
 	boundaryElement,
-	forcePosition,
-	forceXAlignment
+	forcePosition
 ) {
 	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
 
@@ -322,8 +318,7 @@ export function computePopoverPosition(
 		stickyBoundaryElement,
 		yAxisPosition.yAxis,
 		boundaryElement,
-		forcePosition,
-		forceXAlignment
+		forcePosition
 	);
 
 	return {
