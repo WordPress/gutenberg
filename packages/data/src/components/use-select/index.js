@@ -1,12 +1,6 @@
 /**
- * External dependencies
- */
-import { useMemoOne } from 'use-memo-one';
-
-/**
  * WordPress dependencies
  */
-import { createQueue } from '@wordpress/priority-queue';
 import { useRef, useCallback, useReducer, useMemo } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
@@ -16,8 +10,6 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
  */
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
-
-const renderQueue = createQueue();
 
 /** @typedef {import('./types').WPDataStore} WPDataStore */
 
@@ -98,14 +90,8 @@ export default function useSelect( _mapSelect, deps ) {
 	const mapSelect = useCallback( _mapSelect, deps );
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
-	// React can sometimes clear the `useMemo` cache.
-	// We use the cache-stable `useMemoOne` to avoid
-	// losing queues.
-	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
 	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
-
 	const latestMapSelect = useRef();
-	const latestIsAsync = useRef( isAsync );
 	const latestMapOutput = useRef();
 	const latestMapOutputError = useRef();
 	const isMountedAndNotUnsubscribing = useRef();
@@ -165,19 +151,10 @@ export default function useSelect( _mapSelect, deps ) {
 		latestMapOutput.current = mapOutput;
 		latestMapOutputError.current = undefined;
 		isMountedAndNotUnsubscribing.current = true;
-
-		// This has to run after the other ref updates
-		// to avoid using stale values in the flushed
-		// callbacks or potentially overwriting a
-		// changed `latestMapOutput.current`.
-		if ( latestIsAsync.current !== isAsync ) {
-			latestIsAsync.current = isAsync;
-			renderQueue.flush( queueContext );
-		}
 	} );
 
 	useIsomorphicLayoutEffect( () => {
-		if ( isWithoutMapping ) {
+		if ( isWithoutMapping || isAsync ) {
 			return;
 		}
 
@@ -203,31 +180,18 @@ export default function useSelect( _mapSelect, deps ) {
 
 		// catch any possible state changes during mount before the subscription
 		// could be set.
-		if ( latestIsAsync.current ) {
-			renderQueue.add( queueContext, onStoreChange );
-		} else {
-			onStoreChange();
-		}
-
-		const onChange = () => {
-			if ( latestIsAsync.current ) {
-				renderQueue.add( queueContext, onStoreChange );
-			} else {
-				onStoreChange();
-			}
-		};
+		onStoreChange();
 
 		const unsubscribers = listeningStores.current.map( ( storeName ) =>
-			registry.__experimentalSubscribeStore( storeName, onChange )
+			registry.__experimentalSubscribeStore( storeName, onStoreChange )
 		);
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
 			// The return value of the subscribe function could be undefined if the store is a custom generic store.
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
-			renderQueue.flush( queueContext );
 		};
-	}, [ registry, trapSelect, depsChangedFlag, isWithoutMapping ] );
+	}, [ registry, trapSelect, depsChangedFlag, isWithoutMapping, isAsync ] );
 
 	return isWithoutMapping ? registry.select( _mapSelect ) : mapOutput;
 }
