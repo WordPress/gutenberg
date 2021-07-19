@@ -239,7 +239,7 @@ jobs:
                   git revert --no-edit ${{ needs.bump-version.outputs.release_branch_commit }}
                   git push --set-upstream origin "${{ needs.bump-version.outputs.release_branch }}"
 
-            - name: Delete release branch
+            - name: Delete release branch if it was only just created for the RC
               if: |
                   github.event.inputs.version == 'rc' &&
                   ! contains( needs.bump-version.outputs.old_version, 'rc' )
