@@ -74,15 +74,21 @@ jobs:
               run: |
                   npm run wp-env start
 
+            - name: Set up problem matcher for PHPCS (lint check)
+              run: echo "::add-matcher::.github/matchers/phpcs.json"
+
             - name: Running lint check
               run: npm run lint-php
 
+            - name: Set up problem matcher for phpunit (unit tests)
+              run: echo "::add-matcher::.github/matchers/phpunit.json"
+
             - name: Running single site unit tests
-              run: npm run test-unit-php
+              run: npm run test-unit-php -- --teamcity
               if: ${{ success() || failure() }}
 
             - name: Running multisite unit tests
-              run: npm run test-unit-php-multisite
+              run: npm run test-unit-php-multisite -- --teamcity
               if: ${{ success() || failure() }}
 
     mobile-unit-js:
