@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { _x, __ } from '@wordpress/i18n';
-import { archiveTitle } from '@wordpress/icons';
+import { archiveTitle, search, help } from '@wordpress/icons';
 const variations = [
 	{
 		isDefault: true,
@@ -24,6 +24,7 @@ const variations = [
 		description: __(
 			'Displays a title in a search template, using search related format placeholders.'
 		),
+		icon: search,
 		attributes: {
 			type: 'search',
 			// translators: Title for search template with dynamic content placeholders.
@@ -39,6 +40,7 @@ const variations = [
 		name: '404-title',
 		title: __( '404 Title' ),
 		description: __( 'Displays a title in a 404 template.' ),
+		icon: help,
 		attributes: {
 			type: '404',
 			// translators: Title for 404 template.
