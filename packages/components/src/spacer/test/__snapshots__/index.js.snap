@@ -98,9 +98,8 @@ Snapshot Diff:
 
   Array [
     Object {
--     "margin-bottom": "calc(4px * 5)",
+      "margin-bottom": "calc(4px * 2)",
 -     "margin-top": "calc(4px * 5)",
-+     "margin-bottom": "calc(4px * 2)",
     },
   ]
 `;
