@@ -8,12 +8,22 @@ import { filter, every, toString } from 'lodash';
  */
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
+import { select } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import {
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_NONE,
+	LINK_DESTINATION_MEDIA,
+} from './constants';
+import {
+	LINK_DESTINATION_ATTACHMENT as DEPRECATED_LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA as DEPRECATED_LINK_DESTINATION_MEDIA,
+} from './v1/constants';
 import { pickRelevantMediaFiles } from './shared';
-import { LINK_DESTINATION_ATTACHMENT } from './constants';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -42,6 +52,23 @@ const transforms = {
 
 				const validImages = filter( attributes, ( { url } ) => url );
 
+				const settings = select( blockEditorStore ).getSettings();
+				if ( settings.__unstableGalleryWithInnerBlocks ) {
+					const innerBlocks = validImages.map( ( image ) => {
+						return createBlock( 'core/image', image );
+					} );
+
+					return createBlock(
+						'core/gallery',
+						{
+							imageCount: innerBlocks.length,
+							align,
+							sizeSlug,
+						},
+						innerBlocks
+					);
+				}
+
 				return createBlock( 'core/gallery', {
 					images: validImages.map(
 						( { id, url, alt, caption } ) => ( {
@@ -60,19 +87,43 @@ const transforms = {
 		{
 			type: 'shortcode',
 			tag: 'gallery',
+
 			attributes: {
 				images: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
-						return parseShortcodeIds( ids ).map( ( id ) => ( {
-							id: toString( id ),
-						} ) );
+						const settings = select(
+							blockEditorStore
+						).getSettings();
+						if ( ! settings.__unstableGalleryWithInnerBlocks ) {
+							return parseShortcodeIds( ids ).map( ( id ) => ( {
+								id: toString( id ),
+							} ) );
+						}
 					},
 				},
 				ids: {
 					type: 'array',
 					shortcode: ( { named: { ids } } ) => {
-						return parseShortcodeIds( ids );
+						const settings = select(
+							blockEditorStore
+						).getSettings();
+						if ( ! settings.__unstableGalleryWithInnerBlocks ) {
+							return parseShortcodeIds( ids );
+						}
+					},
+				},
+				shortCodeTransforms: {
+					type: 'array',
+					shortcode: ( { named: { ids } } ) => {
+						const settings = select(
+							blockEditorStore
+						).getSettings();
+						if ( settings.__unstableGalleryWithInnerBlocks ) {
+							return parseShortcodeIds( ids ).map( ( id ) => ( {
+								id: parseInt( id ),
+							} ) );
+						}
 					},
 				},
 				columns: {
@@ -83,10 +134,28 @@ const transforms = {
 				},
 				linkTo: {
 					type: 'string',
-					shortcode: ( {
-						named: { link = LINK_DESTINATION_ATTACHMENT },
-					} ) => {
-						return link;
+					shortcode: ( { named: { link } } ) => {
+						const settings = select(
+							blockEditorStore
+						).getSettings();
+						if ( ! settings.__unstableGalleryWithInnerBlocks ) {
+							switch ( link ) {
+								case 'post':
+									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
+								case 'file':
+									return DEPRECATED_LINK_DESTINATION_MEDIA;
+								default:
+									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
+							}
+						}
+						switch ( link ) {
+							case 'post':
+								return LINK_DESTINATION_ATTACHMENT;
+							case 'file':
+								return LINK_DESTINATION_MEDIA;
+							default:
+								return LINK_DESTINATION_NONE;
+						}
 					},
 				},
 			},
@@ -95,8 +164,13 @@ const transforms = {
 			},
 		},
 		{
-			// When created by drag and dropping multiple files on an insertion point
+			// When created by drag and dropping multiple files on an insertion point. Because multiple
+			// files must not be transformed to a gallery when dropped within a gallery there is another transform
+			// within the image block to handle that case. Therefore this transform has to have priority 1
+			// set so that it overrrides the image block transformation when mulitple images are dropped outside
+			// of a gallery block.
 			type: 'files',
+			priority: 1,
 			isMatch( files ) {
 				return (
 					files.length !== 1 &&
@@ -107,6 +181,16 @@ const transforms = {
 				);
 			},
 			transform( files ) {
+				const settings = select( blockEditorStore ).getSettings();
+				if ( settings.__unstableGalleryWithInnerBlocks ) {
+					const innerBlocks = files.map( ( file ) =>
+						createBlock( 'core/image', {
+							url: createBlobURL( file ),
+						} )
+					);
+
+					return createBlock( 'core/gallery', {}, innerBlocks );
+				}
 				const block = createBlock( 'core/gallery', {
 					images: files.map( ( file ) =>
 						pickRelevantMediaFiles( {
@@ -122,7 +206,32 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { images, align, sizeSlug, ids } ) => {
+			transform: ( { align, images, ids, sizeSlug }, innerBlocks ) => {
+				const settings = select( blockEditorStore ).getSettings();
+				if ( settings.__unstableGalleryWithInnerBlocks ) {
+					if ( innerBlocks.length > 0 ) {
+						return innerBlocks.map(
+							( {
+								attributes: {
+									id,
+									url,
+									alt,
+									caption,
+									imageSizeSlug,
+								},
+							} ) =>
+								createBlock( 'core/image', {
+									id,
+									url,
+									alt,
+									caption,
+									sizeSlug: imageSizeSlug,
+									align,
+								} )
+						);
+					}
+					return createBlock( 'core/image', { align } );
+				}
 				if ( images.length > 0 ) {
 					return images.map( ( { url, alt, caption }, index ) =>
 						createBlock( 'core/image', {

@@ -135,6 +135,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
+				'__unstableGalleryWithInnerBlocks',
 				'alignWide',
 				'allowedBlockTypes',
 				'bodyPlaceholder',

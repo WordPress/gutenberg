@@ -1,74 +1,33 @@
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { defaultColumnsNumber } from './shared';
-import {
-	LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_MEDIA,
-} from './constants';
+import saveWithoutInnerBlocks from './v1/save';
 
-export default function save( { attributes } ) {
+export default function saveWithInnerBlocks( { attributes } ) {
+	if ( attributes?.ids?.length > 0 || attributes?.images?.length > 0 ) {
+		return saveWithoutInnerBlocks( { attributes } );
+	}
+
 	const {
-		images,
-		columns = defaultColumnsNumber( attributes ),
-		imageCrop,
+		imageCount,
 		caption,
-		linkTo,
+		columns = defaultColumnsNumber( imageCount ),
+		imageCrop,
 	} = attributes;
-	const className = `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }`;
+
+	const className = `blocks-gallery-grid has-nested-images columns-${ columns } ${
+		imageCrop ? 'is-cropped' : ''
+	}`;
 
 	return (
 		<figure { ...useBlockProps.save( { className } ) }>
-			<ul className="blocks-gallery-grid">
-				{ images.map( ( image ) => {
-					let href;
-
-					switch ( linkTo ) {
-						case LINK_DESTINATION_MEDIA:
-							href = image.fullUrl || image.url;
-							break;
-						case LINK_DESTINATION_ATTACHMENT:
-							href = image.link;
-							break;
-					}
-
-					const img = (
-						<img
-							src={ image.url }
-							alt={ image.alt }
-							data-id={ image.id }
-							data-full-url={ image.fullUrl }
-							data-link={ image.link }
-							className={
-								image.id ? `wp-image-${ image.id }` : null
-							}
-						/>
-					);
-
-					return (
-						<li
-							key={ image.id || image.url }
-							className="blocks-gallery-item"
-						>
-							<figure>
-								{ href ? <a href={ href }>{ img }</a> : img }
-								{ ! RichText.isEmpty( image.caption ) && (
-									<RichText.Content
-										tagName="figcaption"
-										className="blocks-gallery-item__caption"
-										value={ image.caption }
-									/>
-								) }
-							</figure>
-						</li>
-					);
-				} ) }
-			</ul>
+			<InnerBlocks.Content />
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"

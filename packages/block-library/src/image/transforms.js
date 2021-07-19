@@ -1,8 +1,16 @@
 /**
+ * External dependencies
+ */
+import { every } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import { dispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 export function stripFirstImage( attributes, { shortcode } ) {
 	const { body } = document.implementation.createHTMLDocument( '' );
@@ -123,21 +131,36 @@ const transforms = {
 			},
 		},
 		{
+			// Note: when dragging and dropping multiple files onto a gallery this overrides the
+			// gallery transform in order to add new images to the gallery instead of
+			// creating a new gallery.
 			type: 'files',
 			isMatch( files ) {
-				return (
-					files.length === 1 &&
-					files[ 0 ].type.indexOf( 'image/' ) === 0
+				if (
+					files.some(
+						( file ) => file.type.indexOf( 'image/' ) !== 0
+					)
+				) {
+					const { createErrorNotice } = dispatch( noticesStore );
+					createErrorNotice(
+						__(
+							'If uploading to a gallery all files need to be image formats'
+						),
+						{ id: 'gallery-transform-invalid-file' }
+					);
+				}
+				return every(
+					files,
+					( file ) => file.type.indexOf( 'image/' ) === 0
 				);
 			},
 			transform( files ) {
-				const file = files[ 0 ];
-				// We don't need to upload the media directly here
-				// It's already done as part of the `componentDidMount`
-				// int the image block
-				return createBlock( 'core/image', {
-					url: createBlobURL( file ),
+				const blocks = files.map( ( file ) => {
+					return createBlock( 'core/image', {
+						url: createBlobURL( file ),
+					} );
 				} );
+				return blocks;
 			},
 		},
 		{

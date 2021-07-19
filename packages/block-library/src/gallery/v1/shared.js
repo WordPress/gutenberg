@@ -3,15 +3,6 @@
  */
 import { get, pick } from 'lodash';
 
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-export function defaultColumnsNumber( imageCount ) {
-	return imageCount ? Math.min( 3, imageCount ) : 3;
-}
-
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
 	imageProps.url =
@@ -24,7 +15,5 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	if ( fullUrl ) {
 		imageProps.fullUrl = fullUrl;
 	}
-	imageProps.alt =
-		imageProps.alt !== '' ? imageProps.alt : __( 'Image gallery image' );
 	return imageProps;
 };
