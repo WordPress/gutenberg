@@ -103,7 +103,7 @@ function render_block_core_latest_posts( $attributes ) {
 			$title = __( '(no title)' );
 		}
 		$list_items_markup .= sprintf(
-			'<a href="%1$s">%2$s</a>',
+			'<a href="%1$s" class="wp-block-latest-posts__post-title">%2$s</a>',
 			$post_link,
 			$title
 		);
