@@ -36,7 +36,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 		>
 			<input
 				className="block-editor-media-placeholder__url-input-field"
-				type="url"
+				type="text"
 				aria-label={ __( 'URL' ) }
 				placeholder={ __( 'Paste or type URL' ) }
 				onChange={ onChange }
