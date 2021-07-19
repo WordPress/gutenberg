@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
-import { useEffect } from '@wordpress/element';
 
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
