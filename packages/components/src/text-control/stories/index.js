@@ -32,12 +32,21 @@ export const _default = () => {
 	const className = text( 'Class Name', '' );
 
 	return (
-		<TextControlWithState
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
-			type={ type }
-			className={ className }
-		/>
+		<>
+			<TextControlWithState
+				label={ label }
+				hideLabelFromVision={ hideLabelFromVision }
+				help={ help }
+				type={ type }
+				className={ className }
+			/>
+			<TextControlWithState
+				label={ label }
+				hideLabelFromVision={ hideLabelFromVision }
+				help={ help }
+				type="color"
+				className={ className }
+			/>
+		</>
 	);
 };
