@@ -217,7 +217,7 @@ function ResizableCover( {
  *
  * @return {boolean} True if the cover background is considered "dark" and false otherwise.
  */
-function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
+function useCoverIsDark( url, dimRatio = 50, overlayColor = '#000000', elementRef ) {
 	const [ isDark, setIsDark ] = useState( false );
 	useEffect( () => {
 		// If opacity is lower than 50 the dominant color is the image or video color,
