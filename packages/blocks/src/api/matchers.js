@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { decodeEntities } from '@wordpress/html-entities';
+
+/**
  * External dependencies
  */
 export { attr, prop, text, query } from 'hpq';
@@ -38,6 +43,6 @@ export function html( selector, multilineTag ) {
 			return value;
 		}
 
-		return match.innerHTML;
+		return decodeEntities( match.innerHTML );
 	};
 }
