@@ -123,7 +123,7 @@ class DependencyExtractionWebpackPlugin {
 						{
 							name: this.constructor.name,
 							stage:
-								webpack.Compilation
+								compiler.webpack.Compilation
 									.PROCESS_ASSETS_STAGE_ADDITIONAL,
 						},
 						() => this.addAssets( compilation, compiler )
