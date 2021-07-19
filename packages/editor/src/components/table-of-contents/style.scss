@@ -1,5 +1,5 @@
 .table-of-contents__popover.components-popover .components-popover__content {
-	min-width: 380px;
+	min-width: 220px;
 }
 
 .components-popover.table-of-contents__popover {
@@ -36,33 +36,49 @@
 }
 
 .table-of-contents__counts {
-	display: flex;
-	flex-wrap: wrap;
 	margin: 0;
-	margin-top: -$grid-unit-10;
+	display: table;
+	width: 100%;
 }
 
 .table-of-contents__count {
-	flex-basis: 33%;
-	display: flex;
-	flex-direction: column;
+	display: table-row;
+	align-items: center;
 	font-size: $default-font-size;
 	color: $gray-900;
-	padding-right: $grid-unit-10;
 	margin-bottom: 0;
-	margin-top: $grid-unit-10;
 
-	&:nth-child(4n) {
-		padding-right: 0;
+	& > span {
+		border-top: $border-width solid $gray-200;
+		padding-bottom: $grid-unit-10;
+		padding-top: $grid-unit-10;
+	}
+
+	&:first-child > span {
+		padding-top: 0;
+		border-top: 0;
+	}
+
+	&:last-child > span {
+		padding-bottom: 0;
 	}
 }
 
 .table-of-contents__number,
 .table-of-contents__popover .word-count {
+	display: table-cell;
 	font-size: 21px;
 	font-weight: 400;
 	line-height: 30px;
 	color: $gray-900;
+	padding-right: $grid-unit-20;
+	text-align: right;
+}
+
+.table-of-contents__label {
+	display: table-cell;
+	vertical-align: middle;
+	width: 100%;
 }
 
 .table-of-contents__title {
