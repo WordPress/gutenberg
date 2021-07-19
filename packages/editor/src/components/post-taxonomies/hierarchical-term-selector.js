@@ -45,7 +45,7 @@ const MIN_TERMS_COUNT_FOR_FILTER = 8;
  *
  * @return {Object[]} Sorted array of terms.
  */
-function sortBySelected( termsTree, terms ) {
+export function sortBySelected( termsTree, terms ) {
 	const treeHasSelection = ( termTree ) => {
 		if ( terms.indexOf( termTree.id ) !== -1 ) {
 			return true;
@@ -77,8 +77,9 @@ function sortBySelected( termsTree, terms ) {
 
 		return 0;
 	};
-	termsTree.sort( termOrChildIsSelected );
-	return termsTree;
+	const newTermTree = [ ...termsTree ];
+	newTermTree.sort( termOrChildIsSelected );
+	return newTermTree;
 }
 
 /**
