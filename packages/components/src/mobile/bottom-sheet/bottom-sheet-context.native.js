@@ -1,20 +1,7 @@
 /**
- * External dependencies
- */
-import { Platform, UIManager } from 'react-native';
-/**
  * WordPress dependencies
  */
 import { createContext } from '@wordpress/element';
-
-// It's needed to set the following flags via UIManager
-// to have `LayoutAnimation` working on Android
-if (
-	Platform.OS === 'android' &&
-	UIManager.setLayoutAnimationEnabledExperimental
-) {
-	UIManager.setLayoutAnimationEnabledExperimental( true );
-}
 
 // Context in BottomSheet is necessary for controlling the
 // transition flow between subsheets and replacing a content inside them

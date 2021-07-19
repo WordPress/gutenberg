@@ -17,6 +17,7 @@ import { ReadableContentView, alignmentHelpers } from '@wordpress/components';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
+import { performLayoutAnimation } from './layout-animation';
 import { store as blockEditorStore } from '../../store';
 
 const stretchStyle = {
@@ -102,6 +103,31 @@ export class BlockListItem extends Component {
 					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
 				},
 		];
+	}
+
+	componentDidMount() {
+		performLayoutAnimation();
+	}
+
+	componentWillUnmount() {
+		performLayoutAnimation();
+	}
+
+	componentDidUpdate( prevProps ) {
+		if (
+			this.willShowInsertionPoint( prevProps ) !==
+			this.willShowInsertionPoint( this.props )
+		) {
+			performLayoutAnimation();
+		}
+	}
+
+	willShowInsertionPoint( props ) {
+		return (
+			props.shouldShowInsertionPointBefore ||
+			( ! props.shouldShowInnerBlockAppender() &&
+				props.shouldShowInsertionPointAfter )
+		);
 	}
 
 	render() {

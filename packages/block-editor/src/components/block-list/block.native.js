@@ -29,6 +29,7 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
+import { performLayoutAnimation } from './layout-animation';
 import { store as blockEditorStore } from '../../store';
 
 const emptyArray = [];
@@ -111,6 +112,12 @@ class BlockListBlock extends Component {
 		};
 
 		this.anchorNodeRef = createRef();
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.isSelected !== prevProps.isSelected ) {
+			performLayoutAnimation();
+		}
 	}
 
 	onFocus() {
@@ -226,6 +233,7 @@ class BlockListBlock extends Component {
 								pointerEvents="box-none"
 								style={ [
 									styles.solidBorder,
+									isSelected && styles.solidBorderSelected,
 									isFullWidth( align ) &&
 										isScreenWidthWider &&
 										styles.borderFullWidth,
@@ -260,7 +268,10 @@ class BlockListBlock extends Component {
 							/>
 						) }
 						<View
-							style={ styles.neutralToolbar }
+							style={ [
+								styles.neutralToolbar,
+								isSelected && styles.neutralToolbarSelected,
+							] }
 							ref={ this.anchorNodeRef }
 						>
 							{ isSelected && (
