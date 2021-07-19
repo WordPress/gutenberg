@@ -11,6 +11,8 @@ export type Props = {
 	active?: number;
 	/**
 	 * Renders the border-radius of the shadow.
+	 *
+	 * @default 'inherit'
 	 */
 	borderRadius?: CSSProperties[ 'borderRadius' ];
 	/**
@@ -23,15 +25,21 @@ export type Props = {
 	hover?: number;
 	/**
 	 * Determines if hover, active, and focus shadow values should be automatically calculated and rendered.
+	 *
+	 * @default false
 	 */
 	isInteractive?: boolean;
 	/**
 	 * Dimensional offsets (margin) for the shadow.
+	 *
+	 * @default 0
 	 */
 	offset?: number;
 	/**
 	 * Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
 	 * In the example below, `isInteractive` is activated to give a better sense of depth.
+	 *
+	 * @default 0
 	 */
 	value?: number;
 };
