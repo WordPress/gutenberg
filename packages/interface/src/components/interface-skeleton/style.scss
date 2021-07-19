@@ -113,7 +113,7 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__sidebar {
-	overflow: auto;
+	overflow-y: scroll;
 
 	@include break-medium() {
 		border-left: $border-width solid $gray-200;
