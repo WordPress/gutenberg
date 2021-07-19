@@ -169,8 +169,9 @@
 				}
 			],
 			"custom": true,
-			"link": false,
-			"customGradient": true
+			"customDuotone": true,
+			"customGradient": true,
+			"link": false
 		},
 		"typography": {
 			"dropCap": true,
@@ -212,7 +213,7 @@
 		"spacing": {
 			"customMargin": false,
 			"customPadding": false,
-			"units": [ "px", "em", "rem", "vh", "vw" ]
+			"units": [ "px", "em", "rem", "vh", "vw", "%" ]
 		},
 		"border": {
 			"customColor": false,

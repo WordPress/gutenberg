@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 
+import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import {
@@ -18,6 +19,7 @@ import { __ } from '@wordpress/i18n';
  */
 import ListViewBranch from './branch';
 import { ListViewContext } from './context';
+import ListViewDropIndicator from './drop-indicator';
 import useListViewClientIds from './use-list-view-client-ids';
 import useListViewDropZone from './use-list-view-drop-zone';
 import { store as blockEditorStore } from '../../store';
@@ -70,16 +72,14 @@ export default function ListView( {
 	);
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
-	let { ref: treeGridRef, target: blockDropTarget } = useListViewDropZone();
+	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone();
+	const elementRef = useRef();
+	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef ] );
 
 	const isMounted = useRef( false );
 	useEffect( () => {
 		isMounted.current = true;
 	}, [] );
-
-	if ( ! __experimentalFeatures ) {
-		blockDropTarget = undefined;
-	}
 
 	const expand = ( clientId ) => {
 		if ( ! clientId ) {
@@ -104,7 +104,6 @@ export default function ListView( {
 		() => ( {
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
-			blockDropTarget,
 			isTreeGridMounted: isMounted.current,
 			expandedState,
 			expand,
@@ -113,7 +112,6 @@ export default function ListView( {
 		[
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
-			blockDropTarget,
 			isMounted.current,
 			expandedState,
 			expand,
@@ -122,21 +120,27 @@ export default function ListView( {
 	);
 
 	return (
-		<TreeGrid
-			className="block-editor-list-view-tree"
-			aria-label={ __( 'Block navigation structure' ) }
-			ref={ treeGridRef }
-			onCollapseRow={ collapseRow }
-			onExpandRow={ expandRow }
-		>
-			<ListViewContext.Provider value={ contextValue }>
-				<ListViewBranch
-					blocks={ clientIdsTree }
-					selectBlock={ selectEditorBlock }
-					selectedBlockClientIds={ selectedClientIds }
-					{ ...props }
-				/>
-			</ListViewContext.Provider>
-		</TreeGrid>
+		<>
+			<ListViewDropIndicator
+				listViewRef={ elementRef }
+				blockDropTarget={ blockDropTarget }
+			/>
+			<TreeGrid
+				className="block-editor-list-view-tree"
+				aria-label={ __( 'Block navigation structure' ) }
+				ref={ treeGridRef }
+				onCollapseRow={ collapseRow }
+				onExpandRow={ expandRow }
+			>
+				<ListViewContext.Provider value={ contextValue }>
+					<ListViewBranch
+						blocks={ clientIdsTree }
+						selectBlock={ selectEditorBlock }
+						selectedBlockClientIds={ selectedClientIds }
+						{ ...props }
+					/>
+				</ListViewContext.Provider>
+			</TreeGrid>
+		</>
 	);
 }

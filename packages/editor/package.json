@@ -58,7 +58,7 @@
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
 		"@wordpress/wordcount": "file:../wordcount",
-		"classnames": "^2.2.5",
+		"classnames": "^2.3.1",
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",

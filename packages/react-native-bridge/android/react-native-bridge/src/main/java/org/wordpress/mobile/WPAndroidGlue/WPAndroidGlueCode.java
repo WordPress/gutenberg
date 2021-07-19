@@ -95,6 +95,7 @@ public class WPAndroidGlueCode {
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
     private OnFocalPointPickerTooltipShownEventListener mOnFocalPointPickerTooltipShownListener;
+    private OnGutenbergDidRequestPreviewListener mOnGutenbergDidRequestPreviewListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -210,6 +211,10 @@ public class WPAndroidGlueCode {
         void onContentInfoFailed();
         void onEditorNotReady();
         void onContentInfoReceived(HashMap<String, Object> contentInfo);
+    }
+
+    public interface OnGutenbergDidRequestPreviewListener {
+        void gutenbergDidRequestPreview();
     }
 
     public void mediaSelectionCancelled() {
@@ -484,6 +489,11 @@ public class WPAndroidGlueCode {
                 boolean tooltipShown = mOnFocalPointPickerTooltipShownListener.onRequestFocalPointPickerTooltipShown();
                 focalPointPickerTooltipShownCallback.onRequestFocalPointPickerTooltipShown(tooltipShown);
             }
+
+            @Override
+            public void requestPreview() {
+                mOnGutenbergDidRequestPreviewListener.gutenbergDidRequestPreview();
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -561,6 +571,7 @@ public class WPAndroidGlueCode {
                                   ShowSuggestionsUtil showSuggestionsUtil,
                                   OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
                                   OnFocalPointPickerTooltipShownEventListener onFocalPointPickerTooltipListener,
+                                  OnGutenbergDidRequestPreviewListener onGutenbergDidRequestPreviewListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -579,6 +590,7 @@ public class WPAndroidGlueCode {
         mShowSuggestionsUtil = showSuggestionsUtil;
         mOnMediaFilesCollectionBasedBlockEditorListener = onMediaFilesCollectionBasedBlockEditorListener;
         mOnFocalPointPickerTooltipShownListener = onFocalPointPickerTooltipListener;
+        mOnGutenbergDidRequestPreviewListener = onGutenbergDidRequestPreviewListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 

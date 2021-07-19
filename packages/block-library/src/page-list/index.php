@@ -9,49 +9,89 @@
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the pages markup in the front-end when it is a descendant of navigation.
  *
- * @param  array $context Navigation block context.
+ * @param  array $attributes Block attributes.
+ * @param  array $context    Navigation block context.
  * @return array Colors CSS classes and inline styles.
  */
-function block_core_page_list_build_css_colors( $context ) {
+function block_core_page_list_build_css_colors( $attributes, $context ) {
 	$colors = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
+		'css_classes'           => array(),
+		'inline_styles'         => '',
+		'overlay_css_classes'   => array(),
+		'overlay_inline_styles' => '',
 	);
 
 	// Text color.
-	$has_named_text_color  = array_key_exists( 'textColor', $context );
+	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
+	$has_picked_text_color = array_key_exists( 'customTextColor', $attributes );
 	$has_custom_text_color = isset( $context['style']['color']['text'] );
 
 	// If has text color.
-	if ( $has_custom_text_color || $has_named_text_color ) {
+	if ( $has_custom_text_color || $has_picked_text_color || $has_named_text_color ) {
 		// Add has-text-color class.
 		$colors['css_classes'][] = 'has-text-color';
 	}
 
 	if ( $has_named_text_color ) {
 		// Add the color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-color', $context['textColor'] );
+		$colors['css_classes'][] = sprintf( 'has-%s-color', gutenberg_experimental_to_kebab_case( $attributes['textColor'] ) );
+	} elseif ( $has_picked_text_color ) {
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
 		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['style']['color']['text'] );
 	}
 
 	// Background color.
-	$has_named_background_color  = array_key_exists( 'backgroundColor', $context );
+	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
+	$has_picked_background_color = array_key_exists( 'customBackgroundColor', $attributes );
 	$has_custom_background_color = isset( $context['style']['color']['background'] );
 
 	// If has background color.
-	if ( $has_custom_background_color || $has_named_background_color ) {
+	if ( $has_custom_background_color || $has_picked_background_color || $has_named_background_color ) {
 		// Add has-background class.
 		$colors['css_classes'][] = 'has-background';
 	}
 
 	if ( $has_named_background_color ) {
 		// Add the background-color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $context['backgroundColor'] );
+		$colors['css_classes'][] = sprintf( 'has-%s-background-color', gutenberg_experimental_to_kebab_case( $attributes['backgroundColor'] ) );
+	} elseif ( $has_picked_background_color ) {
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
 		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['style']['color']['background'] );
+	}
+
+	// Overlay text color.
+	$has_named_overlay_text_color  = array_key_exists( 'overlayTextColor', $attributes );
+	$has_picked_overlay_text_color = array_key_exists( 'customOverlayTextColor', $attributes );
+
+	// If it has a text color.
+	if ( $has_named_overlay_text_color || $has_picked_overlay_text_color ) {
+		$colors['overlay_css_classes'][] = 'has-text-color';
+	}
+
+	// Give overlay colors priority, fall back to Navigation block colors, then global styles.
+	if ( $has_named_overlay_text_color ) {
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', gutenberg_experimental_to_kebab_case( $attributes['overlayTextColor'] ) );
+	} elseif ( $has_picked_overlay_text_color ) {
+		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $attributes['customOverlayTextColor'] );
+	}
+
+	// Overlay background colors.
+	$has_named_overlay_background_color  = array_key_exists( 'overlayBackgroundColor', $attributes );
+	$has_picked_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $attributes );
+
+	// If has background color.
+	if ( $has_named_overlay_background_color || $has_picked_overlay_background_color ) {
+		$colors['overlay_css_classes'][] = 'has-background';
+	}
+
+	if ( $has_named_overlay_background_color ) {
+		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', gutenberg_experimental_to_kebab_case( $attributes['overlayBackgroundColor'] ) );
+	} elseif ( $has_picked_overlay_background_color ) {
+		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customOverlayBackgroundColor'] );
 	}
 
 	return $colors;
@@ -88,30 +128,43 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 /**
  * Outputs Page list markup from an array of pages with nested children.
  *
- * @param array $nested_pages The array of nested pages.
- * @param array $active_page_ancestor_ids An array of ancestor ids for active page.
+ * @param array   $nested_pages The array of nested pages.
+ * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
+ * @param array   $colors Color information for overlay styles.
+ * @param integer $depth The nesting depth.
  *
  * @return string List markup.
  */
-function block_core_page_list_render_nested_page_list( $nested_pages, $active_page_ancestor_ids = array() ) {
+function block_core_page_list_render_nested_page_list( $nested_pages, $active_page_ancestor_ids = array(), $colors, $depth = 0 ) {
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
 	$markup = '';
 	foreach ( (array) $nested_pages as $page ) {
-		$css_class  = $page['is_active'] ? ' current-menu-item' : '';
+		$css_class       = $page['is_active'] ? ' current-menu-item' : '';
+		$style_attribute = '';
+
 		$css_class .= in_array( $page['page_id'], $active_page_ancestor_ids, true ) ? ' current-menu-ancestor' : '';
 		if ( isset( $page['children'] ) ) {
 			$css_class .= ' has-child';
 		}
-		$markup .= '<li class="wp-block-pages-list__item' . $css_class . '">';
+
+		// If this is the first level of submenus, include the overlay colors.
+		if ( 1 === $depth ) {
+			$css_class .= ' ' . trim( implode( ' ', $colors['overlay_css_classes'] ) );
+			if ( '' !== $colors['overlay_inline_styles'] ) {
+				$style_attribute = sprintf( ' style="%s"', esc_attr( $colors['overlay_inline_styles'] ) );
+			}
+		}
+
+		$markup .= '<li class="wp-block-pages-list__item' . $css_class . '"' . $style_attribute . '>';
 		$markup .= '<a class="wp-block-pages-list__item__link" href="' . esc_url( $page['link'] ) . '">' . wp_kses(
 			$page['title'],
 			wp_kses_allowed_html( 'post' )
 		) . '</a>';
 		if ( isset( $page['children'] ) ) {
 			$markup .= '<span class="wp-block-page-list__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
-			$markup .= '<ul class="submenu-container">' . block_core_page_list_render_nested_page_list( $page['children'], $active_page_ancestor_ids ) . '</ul>';
+			$markup .= '<ul class="submenu-container">' . block_core_page_list_render_nested_page_list( $page['children'], $active_page_ancestor_ids, $colors, $depth + 1 ) . '</ul>';
 		}
 		$markup .= '</li>';
 	}
@@ -194,13 +247,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		}
 	}
 
-	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
-
-	$wrapper_markup = '<ul %1$s>%2$s</ul>';
-
-	$items_markup = block_core_page_list_render_nested_page_list( $nested_pages, $active_page_ancestor_ids );
-
-	$colors          = block_core_page_list_build_css_colors( $block->context );
+	$colors          = block_core_page_list_build_css_colors( $attributes, $block->context );
 	$font_sizes      = block_core_page_list_build_css_font_sizes( $block->context );
 	$classes         = array_merge(
 		$colors['css_classes'],
@@ -208,6 +255,12 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	);
 	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
 	$css_classes     = trim( implode( ' ', $classes ) );
+
+	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
+
+	$wrapper_markup = '<ul %1$s>%2$s</ul>';
+
+	$items_markup = block_core_page_list_render_nested_page_list( $nested_pages, $active_page_ancestor_ids, $colors );
 
 	if ( $block->context && $block->context['showSubmenuIcon'] ) {
 		$css_classes .= ' show-submenu-icons';

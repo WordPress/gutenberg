@@ -1,18 +1,11 @@
 /**
- * External dependencies
- */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
-
-/**
  * Internal dependencies
  */
 import { getValidChildren } from '../utils/get-valid-children';
 import { useContextSystem } from '../context';
 import { ControlGroupContext } from './context';
 import * as styles from './styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
@@ -29,6 +22,8 @@ export function useControlGroup( props ) {
 	const validChildren = getValidChildren( children );
 	const isVertical = direction === 'column';
 	const isGrid = !! templateColumns;
+
+	const cx = useCx();
 
 	const classes = cx(
 		styles.itemFocus,
@@ -47,7 +42,7 @@ export function useControlGroup( props ) {
 			// @ts-ignore
 			const _key = child?.key || index;
 
-			/** @type {string | undefined} */
+			/** @type {import('@emotion/react').SerializedStyles | undefined} */
 			let first;
 			if ( isFirst ) {
 				if ( isVertical ) {
@@ -57,7 +52,7 @@ export function useControlGroup( props ) {
 				}
 			}
 
-			/** @type {string | undefined} */
+			/** @type {import('@emotion/react').SerializedStyles | undefined} */
 			let last;
 			if ( isLast ) {
 				if ( isVertical ) {
