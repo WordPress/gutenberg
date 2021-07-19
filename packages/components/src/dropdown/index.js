@@ -85,6 +85,7 @@ export default function Dropdown( {
 		<div
 			className={ classnames( 'components-dropdown', className ) }
 			ref={ containerRef }
+			tabIndex="-1"
 		>
 			{ renderToggle( args ) }
 			{ isOpen && (

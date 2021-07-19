@@ -41,6 +41,7 @@ exports[`MoreMenu should match snapshot 1`] = `
     >
       <div
         className="components-dropdown components-dropdown-menu edit-post-more-menu"
+        tabIndex="-1"
       >
         <ForwardRef(Button)
           aria-expanded={false}

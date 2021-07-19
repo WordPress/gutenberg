@@ -111,6 +111,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
 >
   <div
     className="components-dropdown components-circular-option-picker__dropdown-link-action"
+    tabIndex="-1"
   >
     <ForwardRef(Button)
       aria-expanded={false}
@@ -545,6 +546,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           >
             <div
               className="components-dropdown components-circular-option-picker__dropdown-link-action"
+              tabIndex="-1"
             >
               <ForwardRef(Button)
                 aria-expanded={false}
