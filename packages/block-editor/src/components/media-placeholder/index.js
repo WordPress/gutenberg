@@ -120,6 +120,7 @@ export function MediaPlaceholder( {
 	const onFilesUpload = ( files ) => {
 		onFilesPreUpload( files );
 		let setMedia;
+
 		if ( multiple ) {
 			if ( addToGallery ) {
 				// Since the setMedia function runs multiple times per upload group
@@ -160,8 +161,23 @@ export function MediaPlaceholder( {
 				setMedia = onSelect;
 			}
 		} else {
+			const [ file ] = files;
+
+			if ( file.type === 'image/svg+xml' ) {
+				file.text().then( ( source ) => {
+					this.props.onSelectURL(
+						`data:image/svg+xml,${
+							window.encodeURI( source )
+						}`
+					);
+				} );
+
+				return;
+			}
+
 			setMedia = ( [ media ] ) => onSelect( media );
 		}
+
 		mediaUpload( {
 			allowedTypes,
 			filesList: files,
