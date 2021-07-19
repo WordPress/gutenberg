@@ -7,7 +7,7 @@ import { find, get, some, unescape as unescapeString, without } from 'lodash';
  * WordPress dependencies
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import {
 	Button,
 	CheckboxControl,
@@ -170,21 +170,16 @@ function HierarchicalTermSelector( { slug } ) {
 		terms,
 		loading,
 		availableTerms,
-		availableTermsTree,
 		taxonomy,
 	} = useSelect(
 		( select ) => {
-			const { getCurrentPost } = select( editorStore );
+			const { getCurrentPost, getEditedPostAttribute } = select(
+				editorStore
+			);
 			const { getTaxonomy, getEntityRecords, isResolving } = select(
 				coreStore
 			);
 			const _taxonomy = getTaxonomy( slug );
-
-			const _terms = _taxonomy
-				? select( editorStore ).getEditedPostAttribute(
-						_taxonomy.rest_base
-				  )
-				: [];
 
 			return {
 				hasCreateAction: _taxonomy
@@ -207,7 +202,9 @@ function HierarchicalTermSelector( { slug } ) {
 							false
 					  )
 					: false,
-				terms: _terms,
+				terms: _taxonomy
+					? getEditedPostAttribute( _taxonomy.rest_base )
+					: EMPTY_ARRAY,
 				loading: isResolving( 'getEntityRecords', [
 					'taxonomy',
 					slug,
@@ -216,10 +213,6 @@ function HierarchicalTermSelector( { slug } ) {
 				availableTerms:
 					getEntityRecords( 'taxonomy', slug, DEFAULT_QUERY ) ||
 					EMPTY_ARRAY,
-				availableTermsTree: sortBySelected(
-					buildTermsTree( availableTerms ),
-					_terms
-				),
 				taxonomy: _taxonomy,
 			};
 		},
@@ -228,6 +221,11 @@ function HierarchicalTermSelector( { slug } ) {
 
 	const { editPost } = useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
+
+	const availableTermsTree = useMemo(
+		() => sortBySelected( buildTermsTree( availableTerms ), terms ),
+		[ availableTerms, terms ]
+	);
 
 	if ( ! hasAssignAction ) {
 		return null;
