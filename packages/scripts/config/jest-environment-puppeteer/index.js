@@ -26,6 +26,7 @@ const chalk = require( 'chalk' );
  * Internal dependencies
  */
 const { readConfig, getPuppeteer } = require( './config' );
+const setupScreencast = require( './screencast' );
 
 const handleError = ( error ) => {
 	// To match the same behavior in jest-jasmine2:
@@ -44,6 +45,7 @@ const KEYS = {
 
 const root = process.env.GITHUB_WORKSPACE || process.cwd();
 const ARTIFACTS_PATH = path.join( root, 'artifacts' );
+const PUPPETEER_SCREENCASTS = process.env.PUPPETEER_SCREENCASTS;
 
 class PuppeteerEnvironment extends NodeEnvironment {
 	// Jest is not available here, so we have to reverse engineer
@@ -177,6 +179,13 @@ class PuppeteerEnvironment extends NodeEnvironment {
 				throw err;
 			}
 		}
+
+		if ( PUPPETEER_SCREENCASTS ) {
+			this.screencast = await setupScreencast(
+				this.global.page,
+				this.global.browser
+			);
+		}
 	}
 
 	async teardown() {
@@ -194,16 +203,16 @@ class PuppeteerEnvironment extends NodeEnvironment {
 			await page.close();
 		}
 
+		if ( this.screencast ) {
+			await this.screencast.teardown();
+		}
+
 		if ( browser ) {
 			await browser.disconnect();
 		}
 	}
 
-	async storeArtifacts( testName ) {
-		const datetime = new Date().toISOString().split( '.' )[ 0 ];
-		const fileName = filenamify( `${ testName } ${ datetime }`, {
-			replacement: '-',
-		} );
+	async storeArtifacts( fileName ) {
 		await writeFile(
 			path.join( ARTIFACTS_PATH, `${ fileName }-snapshot.html` ),
 			await this.global.page.content()
@@ -214,11 +223,51 @@ class PuppeteerEnvironment extends NodeEnvironment {
 	}
 
 	async handleTestEvent( event, state ) {
-		if ( event.name === 'test_fn_failure' ) {
+		if ( state.currentlyRunningTest ) {
 			const testName = state.currentlyRunningTest.name;
-			await this.storeArtifacts( testName );
+			const fileName = getFileName( testName );
+
+			if ( this.screencast && event.name === 'test_fn_start' ) {
+				await this.screencast.start().catch( ( err ) => {
+					// Ignore error to prevent it from failing the test,
+					// instead just log it for debugging.
+					// eslint-disable-next-line no-console
+					console.error( err );
+				} );
+			}
+
+			if (
+				this.screencast &&
+				( event.name === 'test_fn_success' ||
+					event.name === 'test_fn_failure' )
+			) {
+				await this.screencast
+					.stop(
+						( event.name === 'test_fn_failure' ||
+							PUPPETEER_SCREENCASTS === 'always' ) &&
+							path.join( ARTIFACTS_PATH, fileName + '.webm' )
+					)
+					.catch( ( err ) => {
+						// Ignore error to prevent it from failing the test,
+						// instead just log it for debugging.
+						// eslint-disable-next-line no-console
+						console.error( err );
+					} );
+			}
+
+			if ( event.name === 'test_fn_failure' ) {
+				await this.storeArtifacts( fileName );
+			}
 		}
 	}
+}
+
+function getFileName( testName ) {
+	const datetime = new Date().toISOString().split( '.' )[ 0 ];
+	const fileName = filenamify( `${ testName } ${ datetime }`, {
+		replacement: '-',
+	} );
+	return fileName;
 }
 
 module.exports = PuppeteerEnvironment;

@@ -36,6 +36,10 @@ describe( 'Widgets Customizer', () => {
 					.__unstableToggleFeature( 'welcomeGuide' )
 			);
 		}
+
+		await page.addStyleTag( {
+			content: `* { transition-timing-function: step-end !important; }`,
+		} );
 	} );
 
 	beforeAll( async () => {
