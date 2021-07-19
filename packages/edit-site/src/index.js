@@ -41,4 +41,5 @@ export function initialize( id, settings ) {
 }
 
 export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';
+export { default as __experimentalNavigation } from './components/navigation-sidebar/navigation-panel/navigation';
 export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';
