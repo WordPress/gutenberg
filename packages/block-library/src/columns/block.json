@@ -21,8 +21,22 @@
 		"color": {
 			"gradients": true,
 			"link": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
 		}
 	},
+	"styles": [
+		{
+			"name": "default",
+			"label": "Default",
+			"isDefault": true
+		},
+		{ "name": "divided", "label": "Divided" }
+	],
 	"editorStyle": "wp-block-columns-editor",
 	"style": "wp-block-columns"
 }
