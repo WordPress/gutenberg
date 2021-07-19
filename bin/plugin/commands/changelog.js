@@ -286,36 +286,38 @@ function stripFeaturePrefix( label ) {
 function getIssueFeature( issue ) {
 	const labels = issue.labels.map( ( { name } ) => name );
 
+	const featureCandidates = mapLabelsToFeatures( labels );
+
+	// 1. Prefer explicit mapping of label to feature.
+	if ( featureCandidates.length ) {
+		// Get occurances of the feature labels.
+		const featureCounts = countBy( featureCandidates );
+
+		// Check which matching label occurs most often.
+		const rankedFeatures = Object.keys( featureCounts ).sort(
+			( a, b ) => featureCounts[ b ] - featureCounts[ a ]
+		);
+
+		// Return the one that appeared most often.
+		return rankedFeatures[ 0 ];
+	}
+
+	// 2. `[Feature]` labels
 	const featureSpecificLabel = getFeatureSpecificLabels( labels );
 
-	// If it's marked as as `[Feature]` label then use that feature name.
 	if ( featureSpecificLabel ) {
 		return stripFeaturePrefix( featureSpecificLabel );
 	}
 
+	// 3. Block specific labels.
 	const blockSpecificLabels = getIsBlockSpecificIssue( labels );
 
-	// If it's block specific issue then use the block specific label.
 	if ( blockSpecificLabels ) {
 		return 'Block Library';
 	}
 
-	const featureCandidates = mapLabelsToFeatures( labels );
-
-	if ( ! featureCandidates.length ) {
-		return UNKNOWN;
-	}
-
-	// Get occurances of the feature labels.
-	const featureCounts = countBy( featureCandidates );
-
-	// Check which matching label occurs most often.
-	const rankedFeatures = Object.keys( featureCounts ).sort(
-		( a, b ) => featureCounts[ b ] - featureCounts[ a ]
-	);
-
-	// Return the one that appeared most often.
-	return rankedFeatures[ 0 ];
+	// Fallback - if we couldn't find a good match.
+	return UNKNOWN;
 }
 
 /**

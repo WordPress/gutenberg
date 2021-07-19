@@ -174,84 +174,90 @@ describe( 'getIssueType', () => {
 } );
 
 describe( 'getIssueFeature', () => {
-	it( 'returns "Unknown" as feature if unable to find appropriate feature by label', () => {
+	it( 'returns "Unknown" as feature if there are no labels', () => {
 		const result = getIssueFeature( { labels: [] } );
 
 		expect( result ).toBe( 'Unknown' );
 	} );
 
-	it( 'returns the feature label for any PRs marked with a specific feature label', () => {
+	it( 'falls by to "Unknown" as the feature if unable to classify by other means', () => {
+		const result = getIssueFeature( {
+			labels: [
+				{
+					name: 'Some Label',
+				},
+				{
+					name: '[Package] Example Package', // 1. has explicit mapping
+				},
+				{
+					name: '[Package] Another One',
+				},
+			],
+		} );
+
+		expect( result ).toEqual( 'Unknown' );
+	} );
+
+	it( 'gives precedence to manual feature mapping', () => {
+		const result = getIssueFeature( {
+			labels: [
+				{
+					name: '[Block] Some Block', // 3. Block-specific label
+				},
+				{
+					name: '[Package] Edit Widgets', // 1. has explicit mapping
+				},
+				{
+					name: '[Feature] Some Feature', // 2. Feature label.
+				},
+				{
+					name: '[Package] Another One',
+				},
+			],
+		} );
+
+		const mappingForPackageEditWidgets = 'Widgets Editor';
+
+		expect( result ).toEqual( mappingForPackageEditWidgets );
+	} );
+
+	it( 'gives secondary priority to feature labels when manually mapped label is not present', () => {
+		const result = getIssueFeature( {
+			labels: [
+				{
+					name: '[Block] Some Block', // block specific label
+				},
+				{
+					name: '[Package] This package',
+				},
+				{
+					name: '[Feature] Cool Feature', // should have priority despite prescence of block specific label
+				},
+				{
+					name: '[Package] Another One',
+				},
+			],
+		} );
+
+		expect( result ).toEqual( 'Cool Feature' );
+	} );
+
+	it( 'gives tertiary priority to "Block Library" as feature for all PRs that have a block specific label (and where manually mapped or feature label not present)', () => {
 		const result = getIssueFeature( {
 			labels: [
 				{
 					name: '[Block] Some Block',
 				},
 				{
-					name: '[Package] Edit Widgets',
+					name: '[Package] This package',
 				},
 				{
-					name: '[Feature] Widgets Screen',
-				},
-				{
-					name: '[Package] Widgets Customizer',
+					name: '[Package] Another One',
 				},
 			],
-		} );
-
-		expect( result ).toEqual( 'Widgets Screen' );
-	} );
-
-	it( 'returns "Block Library" as feature for all PRs that have a block specific label', () => {
-		const widgetFavouringLabels = [
-			{
-				name: '[Block] Some Block',
-			},
-			{
-				name: '[Package] Edit Widgets',
-			},
-			{
-				name: '[Feature] Widgets Screen',
-			},
-			{
-				name: '[Package] Widgets Customizer',
-			},
-		];
-
-		const result = getIssueFeature( {
-			labels: widgetFavouringLabels,
 		} );
 
 		expect( result ).toEqual( 'Block Library' );
-	} );
-
-	it( 'returns a single best match feature for a given issue', () => {
-		const result = getIssueFeature( {
-			labels: [
-				{
-					name: '[Package] Components',
-				},
-				{
-					name: '[Package] Edit Widgets',
-				},
-				{
-					name: '[Package] Block Editor',
-				},
-				{
-					name: '[Package] Editor',
-				},
-				{
-					name: '[Feature] UI Components',
-				},
-				{
-					name: '[Feature] Component System',
-				},
-				{
-					name: '[Package] Block Library', // 2. mapped to "Block Library"
-				},
-			],
-		} );
-
-		expect( result ).toEqual( 'Components' );
 	} );
 } );
 
