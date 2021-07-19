@@ -21,6 +21,7 @@ function createScreencastClient() {
 			this.downloadAnchor.textContent = 'Download video';
 			this.downloadAnchor.id = 'download';
 			this.chunks = [];
+			this.currentFrame = null;
 		}
 
 		beginRecording( stream ) {
@@ -63,26 +64,28 @@ function createScreencastClient() {
 			this.beginRecording( this.canvas.captureStream() );
 		}
 
-		draw() {
-			if ( ! this.currentFrame ) {
-				return this;
+		async draw( pngData ) {
+			if ( pngData ) {
+				await window
+					.fetch( `data:image/png;base64,${ pngData }` )
+					.then( ( res ) => res.blob() )
+					.then( ( blob ) => window.createImageBitmap( blob ) )
+					.then( ( imageBitmap ) => {
+						this.currentFrame = imageBitmap;
+					} );
 			}
 
 			this.ctx.clearRect( 0, 0, this.canvas.width, this.canvas.height );
 			this.ctx.drawImage( this.currentFrame, 0, 0 );
 		}
 
-		setCurrentFrame( pngData ) {
-			window
-				.fetch( `data:image/png;base64,${ pngData }` )
-				.then( ( res ) => res.blob() )
-				.then( ( blob ) => window.createImageBitmap( blob ) )
-				.then( ( imageBitmap ) => {
-					this.currentFrame = imageBitmap;
-				} );
-		}
-
 		async stop() {
+			// Force draw the last frame to make sure the video length is correct.
+			await this.draw();
+			// Wait for the draw to be caught up by MediaRecorder.
+			// We can't use requestAnimationFrame here since the page is in background.
+			// 50ms is an approximation for a frame cycle, the exact interval is still unknown.
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
 			this.recorder.stop();
 			await this.recordingFinish;
 		}
@@ -124,18 +127,14 @@ class Screencast {
 		this.rendererClient = rendererClient;
 		this.screencastClient = screencastClient;
 
-		this.intervalId = 0;
-
 		this._onScreencastFrame = this._onScreencastFrame.bind( this );
 	}
 
 	async _onScreencastFrame( { data, sessionId } ) {
 		this.screencastClient
-			.evaluate(
-				( screencastClient, _data ) =>
-					screencastClient.setCurrentFrame( _data ),
-				data
-			)
+			.evaluate( ( screencastClient, _data ) => {
+				screencastClient.draw( _data );
+			}, data )
 			.catch( () => {} );
 		this.client
 			.send( 'Page.screencastFrameAck', { sessionId } )
@@ -161,21 +160,6 @@ class Screencast {
 			everyNthFrame: 1,
 		} );
 
-		/**
-		 * MediaRecorder won't push new frames if the canvas didn't update.
-		 * To solve this, we manually calling `draw()` for every "frame".
-		 * However, the renderer page is in the background and could delay
-		 * `requestAnimationFrame`, `setTimeout`, `setInterval` longer than it should be.
-		 * We instead schedule the interval on server side to maintain stabler frame rates.
-		 * Note that `setInterval` doesn't guarantee stable FPS,
-		 * but in our case it's good enough for debugging purpose.
-		 */
-		this.intervalId = setInterval( () => {
-			this.screencastClient
-				.evaluate( ( screencastClient ) => screencastClient.draw() )
-				.catch( () => {} );
-		}, 1000 / 60 ); // 60 FPS
-
 		this.client.on( 'Page.screencastFrame', this._onScreencastFrame );
 	}
 
@@ -189,7 +173,6 @@ class Screencast {
 			} );
 		}
 
-		clearInterval( this.intervalId );
 		await this.client.send( 'Page.stopScreencast' );
 		this.client.off( 'Page.screencastFrame', this._onScreencastFrame );
 
