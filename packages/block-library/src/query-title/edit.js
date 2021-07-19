@@ -12,7 +12,7 @@ import {
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -36,7 +36,8 @@ export default function QueryTitleEdit( {
 	// Defaults to content attribute prop
 	switch ( templateSlug ) {
 		case 'archive':
-			content = __( 'Archive title' );
+			// translators: Title for archive template.
+			content = _x( 'Archive title', 'archive template title' );
 			break;
 		case 'search':
 			// translators: Title for search template with dynamic content placeholders.
