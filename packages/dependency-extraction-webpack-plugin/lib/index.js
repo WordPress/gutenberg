@@ -215,8 +215,7 @@ class DependencyExtractionWebpackPlugin {
 
 			// Add source and file into compilation for webpack to output.
 			compilation.assets[ assetFilename ] = new RawSource( assetString );
-			if ( isWebpack4 ) runtimeChunk.files.push( assetFilename );
-			else runtimeChunk.files.add( assetFilename );
+			runtimeChunk.files[ isWebpack4 ? 'push' : 'add' ]( assetFilename );
 		}
 
 		if ( combineAssets ) {
