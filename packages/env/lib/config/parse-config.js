@@ -47,6 +47,7 @@ module.exports = function parseConfig( config, options ) {
 			parseSourceString( sourceString, options )
 		),
 		config: config.config,
+		phpConfig: config.phpConfig,
 		mappings: Object.entries( config.mappings ).reduce(
 			( result, [ wpDir, localDir ] ) => {
 				const source = parseSourceString( localDir, options );

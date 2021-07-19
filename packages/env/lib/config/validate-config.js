@@ -83,6 +83,12 @@ function validateConfig( config, envLocation ) {
 		);
 	}
 
+	if ( typeof config.phpConfig !== 'object' ) {
+		throw new ValidationError(
+			'Invalid .wp-env.json: "phpConfig" must be an object.'
+		);
+	}
+
 	return config;
 }
 

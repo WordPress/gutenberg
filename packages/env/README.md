@@ -392,6 +392,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"port"`       | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
 | `"config"`     | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`   | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
+| `"phpConfig"`  | `Object`       | `"{}"`                                 | PHP configuration directives.
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
@@ -547,6 +548,29 @@ If you need a plugin active in one environment but not the other, you can use `e
 	}
 }
 ```
+
+#### Custom PHP Configuration.
+
+You can customize the configuration of PHP via `phpConfig`.
+
+```json
+{
+	"phpConfig": {
+		"memory_limit": "512M",
+		"post_max_size": "512M",
+		"upload_max_filesize": "512M"
+	}
+}
+```
+
+The settings will be added to `.htaccess`.
+
+```apacheconf
+php_value memory_limit 512M
+php_value post_max_size 512M
+php_value upload_max_filesize 512M
+```
+
 
 #### Custom Port Numbers
 
