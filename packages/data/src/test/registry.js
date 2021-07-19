@@ -414,7 +414,7 @@ describe( 'createRegistry', () => {
 			return promise;
 		} );
 
-		it( 'should resolve promise non-action to dispatch', () => {
+		it.skip( 'should resolve promise non-action to dispatch', () => {
 			let shouldThrow = false;
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'OK' ) => {

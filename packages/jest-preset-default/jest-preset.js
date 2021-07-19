@@ -16,6 +16,7 @@ module.exports = {
 		),
 	],
 	snapshotSerializers: [ require.resolve( 'enzyme-to-json/serializer.js' ) ],
+	testEnvironment: 'jsdom',
 	testMatch: [
 		'**/__tests__/**/*.[jt]s',
 		'**/test/*.[jt]s',
@@ -26,5 +27,4 @@ module.exports = {
 	transform: {
 		'^.+\\.[jt]sx?$': require.resolve( 'babel-jest' ),
 	},
-	verbose: true,
 };

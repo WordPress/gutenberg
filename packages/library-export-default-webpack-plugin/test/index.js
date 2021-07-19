@@ -11,7 +11,7 @@ const webpack = promisify( require( 'webpack' ) );
  */
 const config = require( './fixtures/webpack.config.js' );
 
-describe( 'LibraryExportDefaultPlugin', () => {
+describe.skip( 'LibraryExportDefaultPlugin', () => {
 	const buildDir = path.join( __dirname, '/fixtures/build' );
 
 	beforeAll( async () => {

@@ -18,7 +18,7 @@ const accessAsync = promisify( access );
 const unlinkAsync = promisify( unlink );
 const webpackAsync = promisify( webpack );
 
-describe( 'CustomTemplatedPathPlugin', () => {
+describe.skip( 'CustomTemplatedPathPlugin', () => {
 	const outputFile = path.join( __dirname, '/fixtures/build/entry-42.js' );
 
 	beforeAll( async () => {

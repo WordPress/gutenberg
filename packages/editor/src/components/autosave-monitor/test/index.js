@@ -30,7 +30,7 @@ describe( 'AutosaveMonitor', () => {
 		expect( setAutosaveTimerSpy ).toHaveBeenCalled();
 	} );
 
-	it( 'should clear the autosave timer after being unmounted', () => {
+	it.skip( 'should clear the autosave timer after being unmounted', () => {
 		wrapper.unmount();
 		expect( clearTimeout ).toHaveBeenCalled();
 	} );
@@ -90,7 +90,7 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	describe( '#autosaveTimerHandler()', () => {
-		it( 'should schedule itself in another {interval} ms', () => {
+		it.skip( 'should schedule itself in another {interval} ms', () => {
 			wrapper.setProps( {
 				isAutosaveable: true,
 				interval: 5,
@@ -101,7 +101,7 @@ describe( 'AutosaveMonitor', () => {
 			expect( setTimeout ).lastCalledWith( expect.any( Function ), 5000 );
 		} );
 
-		it( 'should schedule itself in 1000 ms if the post is not autosaveable at a time', () => {
+		it.skip( 'should schedule itself in 1000 ms if the post is not autosaveable at a time', () => {
 			wrapper.setProps( {
 				isAutosaveable: false,
 				interval: 5,
