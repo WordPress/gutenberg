@@ -3,8 +3,9 @@
 	"name": "core/query-title",
 	"title": "Query Title",
 	"category": "design",
-	"description": "Display the query title.",
+	"description": "Display the query title based on the queried object.",
 	"textdomain": "default",
+	"usesContext": [ "templateSlug" ],
 	"attributes": {
 		"content": {
 			"type": "string",
