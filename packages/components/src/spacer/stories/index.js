@@ -17,21 +17,21 @@ export default {
 };
 
 const PROPS = [
+	'margin',
+	'marginY',
+	'marginX',
 	'marginTop',
 	'marginBottom',
 	'marginLeft',
 	'marginRight',
-	'marginX',
-	'marginY',
-	'margin',
 
+	'padding',
+	'paddingY',
+	'paddingX',
 	'paddingTop',
 	'paddingBottom',
 	'paddingLeft',
 	'paddingRight',
-	'paddingX',
-	'paddingY',
-	'padding',
 ];
 
 const BlackBox = () => (

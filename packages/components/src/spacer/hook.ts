@@ -39,6 +39,20 @@ export function useSpacer( props: PolymorphicComponentProps< Props, 'div' > ) {
 	const cx = useCx();
 
 	const classes = cx(
+		isDefined( margin ) &&
+			css`
+				margin: ${ space( margin ) };
+			`,
+		isDefined( marginY ) &&
+			css`
+				margin-bottom: ${ space( marginY ) };
+				margin-top: ${ space( marginY ) };
+			`,
+		isDefined( marginX ) &&
+			css`
+				margin-left: ${ space( marginX ) };
+				margin-right: ${ space( marginX ) };
+			`,
 		isDefined( marginTop ) &&
 			css`
 				margin-top: ${ space( marginTop ) };
@@ -55,19 +69,19 @@ export function useSpacer( props: PolymorphicComponentProps< Props, 'div' > ) {
 			css`
 				margin-right: ${ space( marginRight ) };
 			`,
-		isDefined( marginX ) &&
+		isDefined( padding ) &&
 			css`
-				margin-left: ${ space( marginX ) };
-				margin-right: ${ space( marginX ) };
+				padding: ${ space( padding ) };
 			`,
-		isDefined( marginY ) &&
+		isDefined( paddingY ) &&
 			css`
-				margin-bottom: ${ space( marginY ) };
-				margin-top: ${ space( marginY ) };
+				padding-bottom: ${ space( paddingY ) };
+				padding-top: ${ space( paddingY ) };
 			`,
-		isDefined( margin ) &&
+		isDefined( paddingX ) &&
 			css`
-				margin: ${ space( margin ) };
+				padding-left: ${ space( paddingX ) };
+				padding-right: ${ space( paddingX ) };
 			`,
 		isDefined( paddingTop ) &&
 			css`
@@ -84,20 +98,6 @@ export function useSpacer( props: PolymorphicComponentProps< Props, 'div' > ) {
 		isDefined( paddingRight ) &&
 			css`
 				padding-right: ${ space( paddingRight ) };
-			`,
-		isDefined( paddingX ) &&
-			css`
-				padding-left: ${ space( paddingX ) };
-				padding-right: ${ space( paddingX ) };
-			`,
-		isDefined( paddingY ) &&
-			css`
-				padding-bottom: ${ space( paddingY ) };
-				padding-top: ${ space( paddingY ) };
-			`,
-		isDefined( padding ) &&
-			css`
-				padding: ${ space( padding ) };
 			`,
 		className
 	);
