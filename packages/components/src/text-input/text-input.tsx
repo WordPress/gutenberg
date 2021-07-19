@@ -19,6 +19,7 @@ import TextInputSteppers from './text-input-steppers';
 import { useTextInput } from './hooks/use-text-input';
 import * as styles from './styles';
 import type { Props } from './types';
+import { useCx } from '../utils';
 
 function TextInput(
 	props: PolymorphicComponentProps< Props, 'input' >,
@@ -38,6 +39,8 @@ function TextInput(
 		...otherProps
 	} = useTextInput( props );
 
+	const cx = useCx();
+
 	const showTextInputArrows = arrows === true && isTypeNumeric;
 	const showTextInputSteppers = arrows === 'stepper' && isTypeNumeric;
 	const mergedRefs = useMergeRefs( [ inputRef, forwardedRef ] );
@@ -46,7 +49,7 @@ function TextInput(
 		<View { ...otherProps } disabled={ disabled }>
 			{ prefix }
 			<View
-				{ ...styles.Input }
+				className={ cx( styles.Input ) }
 				autoComplete="off"
 				spellCheck={ false }
 				{ ...inputProps }
