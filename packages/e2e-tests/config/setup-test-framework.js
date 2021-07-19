@@ -3,6 +3,8 @@
  */
 import { get } from 'lodash';
 import { toMatchInlineSnapshot, toMatchSnapshot } from 'jest-snapshot';
+// eslint-disable-next-line no-restricted-imports
+import { configure } from 'puppeteer-testing-library';
 
 /**
  * WordPress dependencies
@@ -67,6 +69,11 @@ const pageEvents = [];
 
 // The Jest timeout is increased because these tests are a bit slow
 jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
+
+// The default timeout for `puppeteer-testing-library` is 3 seconds.
+configure( {
+	timeout: 5000,
+} );
 
 async function setupBrowser() {
 	await clearLocalStorage();
