@@ -53,7 +53,7 @@ const transforms = {
 				const validImages = filter( attributes, ( { url } ) => url );
 
 				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__experimentalGalleryRefactor ) {
+				if ( settings.__unstableGalleryWithInnerBlocks ) {
 					const innerBlocks = validImages.map( ( image ) => {
 						return createBlock( 'core/image', image );
 					} );
@@ -95,7 +95,7 @@ const transforms = {
 						const settings = select(
 							blockEditorStore
 						).getSettings();
-						if ( ! settings.__experimentalGalleryRefactor ) {
+						if ( ! settings.__unstableGalleryWithInnerBlocks ) {
 							return parseShortcodeIds( ids ).map( ( id ) => ( {
 								id: toString( id ),
 							} ) );
@@ -108,7 +108,7 @@ const transforms = {
 						const settings = select(
 							blockEditorStore
 						).getSettings();
-						if ( ! settings.__experimentalGalleryRefactor ) {
+						if ( ! settings.__unstableGalleryWithInnerBlocks ) {
 							return parseShortcodeIds( ids );
 						}
 					},
@@ -119,7 +119,7 @@ const transforms = {
 						const settings = select(
 							blockEditorStore
 						).getSettings();
-						if ( settings.__experimentalGalleryRefactor ) {
+						if ( settings.__unstableGalleryWithInnerBlocks ) {
 							return parseShortcodeIds( ids ).map( ( id ) => ( {
 								id: parseInt( id ),
 							} ) );
@@ -138,7 +138,7 @@ const transforms = {
 						const settings = select(
 							blockEditorStore
 						).getSettings();
-						if ( ! settings.__experimentalGalleryRefactor ) {
+						if ( ! settings.__unstableGalleryWithInnerBlocks ) {
 							switch ( link ) {
 								case 'post':
 									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
@@ -182,7 +182,7 @@ const transforms = {
 			},
 			transform( files ) {
 				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__experimentalGalleryRefactor ) {
+				if ( settings.__unstableGalleryWithInnerBlocks ) {
 					const innerBlocks = files.map( ( file ) =>
 						createBlock( 'core/image', {
 							url: createBlobURL( file ),
@@ -208,7 +208,7 @@ const transforms = {
 			blocks: [ 'core/image' ],
 			transform: ( { align, images, ids, sizeSlug }, innerBlocks ) => {
 				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__experimentalGalleryRefactor ) {
+				if ( settings.__unstableGalleryWithInnerBlocks ) {
 					if ( innerBlocks.length > 0 ) {
 						return innerBlocks.map(
 							( {

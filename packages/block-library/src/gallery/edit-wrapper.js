@@ -18,9 +18,9 @@ import EditWithoutInnerBlocks from './v1/edit';
 export default function GalleryEditWrapper( props ) {
 	const { attributes } = props;
 
-	const __experimentalGalleryRefactor = useSelect( ( select ) => {
+	const __unstableGalleryWithInnerBlocks = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
-		return settings.__experimentalGalleryRefactor;
+		return settings.__unstableGalleryWithInnerBlocks;
 	}, [] );
 
 	// This logic is used to infer version information from content with higher
@@ -31,7 +31,7 @@ export default function GalleryEditWrapper( props ) {
 		0 < attributes?.ids?.length || 0 < attributes?.images?.length;
 	if (
 		hasOldVersionContent ||
-		( ! hasNewVersionContent && ! __experimentalGalleryRefactor )
+		( ! hasNewVersionContent && ! __unstableGalleryWithInnerBlocks )
 	) {
 		return <EditWithoutInnerBlocks { ...props } />;
 	}
