@@ -143,6 +143,25 @@
 	background: var(--wp-admin-theme-color);
 }
 
+// Events tooltip.
+.components-datetime__date-day-events {
+	ul {
+		margin: 0;
+		padding: 2px 0;
+		text-align: left;
+		list-style-position: inside;
+	}
+
+	li {
+		margin: 0;
+		padding: 1px;
+		max-width: 200px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}
+
 .components-datetime__time {
 	padding-bottom: $grid-unit-20;
 
