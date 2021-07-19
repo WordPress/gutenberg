@@ -232,6 +232,9 @@ glob.stream( [
 					{ shell: true }
 				);
 			}
+			await execa( 'npm', [ 'run', 'format', output ], {
+				shell: true,
+			} );
 		} catch ( error ) {
 			console.error( error );
 			process.exit( 1 );
