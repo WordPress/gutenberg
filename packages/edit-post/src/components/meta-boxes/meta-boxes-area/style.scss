@@ -103,3 +103,18 @@
 .edit-post-meta-boxes-area__clear {
 	clear: both;
 }
+
+// Use chevrons instead for the metabox arrows to match the rest of Gutenberg.
+// Needs extra specificity to override core's common.css.
+.js .edit-post-meta-boxes-area .meta-box-sortables .postbox {
+
+	.handlediv .toggle-indicator::before {
+		content: "\f343";
+		font-size: 20px;
+		color: $dark-gray-900;
+	}
+
+	&.closed .handlediv .toggle-indicator::before {
+		content: "\f347";
+	}
+}
