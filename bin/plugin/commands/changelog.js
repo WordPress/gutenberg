@@ -169,7 +169,15 @@ function getTypesByLabels( labels ) {
 	);
 }
 
-function getIssueFeatures( labels ) {
+/**
+ * Returns candidates by retrieving the appropriate mapping
+ * from the label -> feature lookup.
+ *
+ * @param {string[]} labels Label names.
+ *
+ * @return {string[]} Feature candidates.
+ */
+function mapLabelsToFeatures( labels ) {
 	return labels
 		.filter( ( label ) =>
 			Object.keys( LABEL_FEATURE_MAPPING ).includes( label )
@@ -177,15 +185,26 @@ function getIssueFeatures( labels ) {
 		.map( ( label ) => LABEL_FEATURE_MAPPING[ label ] );
 }
 
+/**
+ * Returns whether not the given labels contain the block specific
+ * label "block library".
+ *
+ * @param {string[]} labels Label names.
+ *
+ * @return {boolean} whether or not the issue's is labbeled as block specific
+ */
 function getIsBlockSpecificIssue( labels ) {
-	return uniq(
-		labels
-			.filter( ( label ) => label.startsWith( '[Block] ' ) )
-			.map( () => 'Block Library' )
-	);
+	return !! labels.find( ( label ) => label.startsWith( '[Block] ' ) );
 }
 
-function getFeatureSpecificLabel( labels ) {
+/**
+ * Returns the first feature specific label from the given labels.
+ *
+ * @param {string[]} labels Label names.
+ *
+ * @return {string|undefined} the feature specific label.
+ */
+function getFeatureSpecificLabels( labels ) {
 	return labels.find( ( label ) => label.startsWith( '[Feature] ' ) );
 }
 
@@ -226,32 +245,50 @@ function getIssueType( issue ) {
 	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
 }
 
+/**
+ * Removes any `[Feature]` prefix from a given label.
+ *
+ * @param {string} label The label potentially containing a prefix.
+ *
+ * @return {string} the label without the prefix.
+ */
+function stripFeaturePrefix( label ) {
+	return label.replace( '[Feature] ', '' );
+}
+
+/**
+ * Returns the most appropriate feature category for the given issue based
+ * on a basic heuristic.
+ *
+ * @param {IssuesListForRepoResponseItem} issue Issue object.
+ *
+ * @return {string} the feature name.
+ */
 function getIssueFeature( issue ) {
 	const labels = issue.labels.map( ( { name } ) => name );
 
-	const featureSpecificLabel = getFeatureSpecificLabel( labels );
+	const featureSpecificLabel = getFeatureSpecificLabels( labels );
 
+	// If it's marked as as `[Feature]` label then use that feature name.
 	if ( featureSpecificLabel ) {
-		return featureSpecificLabel.replace( '[Feature] ', '' );
+		return stripFeaturePrefix( featureSpecificLabel );
 	}
 
 	const blockSpecificLabels = getIsBlockSpecificIssue( labels );
 
-	if ( blockSpecificLabels.length ) {
-		return blockSpecificLabels[ 0 ];
+	// If it's block specific issue then use the block specific label.
+	if ( blockSpecificLabels ) {
+		return 'Block Library';
 	}
 
-	const candidates = [
-		...blockSpecificLabels,
-		...getIssueFeatures( labels ),
-	];
+	const featureCandidates = mapLabelsToFeatures( labels );
 
-	if ( ! candidates.length ) {
+	if ( ! featureCandidates.length ) {
 		return UNKNOWN;
 	}
 
 	// Get occurances of the feature labels.
-	const featureCounts = countBy( candidates );
+	const featureCounts = countBy( featureCandidates );
 
 	// Check which matching label occurs most often.
 	const rankedFeatures = Object.keys( featureCounts ).sort(
