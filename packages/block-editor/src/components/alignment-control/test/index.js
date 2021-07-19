@@ -51,6 +51,17 @@ describe( 'AlignmentUI', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( 'center' );
 	} );
 
+	test( 'should allow a custom placeholder to be specified', () => {
+		const wrapperPlaceholder = shallow(
+			<AlignmentUI placeholder="center" />
+		);
+		expect( wrapperPlaceholder ).toMatchSnapshot();
+
+		const wrapperIllegalPlaceholder = () =>
+			shallow( <AlignmentUI placeholder="illegal-value" /> );
+		expect( wrapperIllegalPlaceholder ).not.toThrowError();
+	} );
+
 	test( 'should allow custom alignment controls to be specified', () => {
 		const wrapperCustomControls = shallow(
 			<AlignmentUI

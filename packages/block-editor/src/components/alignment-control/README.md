@@ -44,6 +44,13 @@ _Note:_ In this example that we render `AlignmentControl` as a child of the `Blo
 
 The current value of the alignment setting. You may only choose from the `Options` listed above.
 
+### `placeholder`
+-   **Type:** `String`
+-   **Default:** `left` for left-to-right languages, `right` for right-to-left languages
+-   **Options:**: `left`, `center`, `right`
+
+The placeholder alignment value that will be reflected by the toolbar icon when the value is `undefined`. If the content inside your block is aligned to center when no specific `value` is defined, you should set `placeholder` to `center`.
+
 ### `onChange`
 
 -   **Type:** `Function`

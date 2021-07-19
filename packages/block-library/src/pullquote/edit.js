@@ -7,11 +7,13 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { Platform, useEffect, useRef } from '@wordpress/element';
 import {
 	RichText,
 	ContrastChecker,
+	AlignmentToolbar,
+	BlockControls,
 	InspectorControls,
 	withColors,
 	PanelColorSettings,
@@ -33,7 +35,7 @@ import { SOLID_COLOR_CLASS } from './shared';
 function PullQuoteEdit( {
 	colorUtils,
 	textColor,
-	attributes: { value, citation },
+	attributes: { value, citation, textAlign },
 	setAttributes,
 	setTextColor,
 	setMainColor,
@@ -55,6 +57,15 @@ function PullQuoteEdit( {
 			? { ...style, backgroundColor: mainColor.color }
 			: { ...style, borderColor: mainColor.color },
 	};
+
+	// The default and the solid color styles align text differently when `textAlign`
+	// is undefined, so we need to make sure the placeholder icon on the `AlignmentToolbar`
+	// reflects with the default alignment properly.
+	function pullQuoteTextAlignPlaceholder() {
+		// The solid color style aligns text to the side, not center.
+		const solidColorStyleAlign = isRTL() ? 'right' : 'left';
+		return isSolidColorStyle ? solidColorStyleAlign : 'center';
+	}
 
 	function pullQuoteMainColorSetter( colorValue ) {
 		const needTextColor =
@@ -108,12 +119,13 @@ function PullQuoteEdit( {
 					style={ {
 						color: textColor.color,
 					} }
-					className={
-						textColor.color &&
-						classnames( 'has-text-color', {
+					className={ classnames( {
+						[ `has-text-align-${ textAlign }` ]: textAlign,
+						...( textColor.color && {
+							'has-text-color': true,
 							[ textColor.class ]: textColor.class,
-						} )
-					}
+						} ),
+					} ) }
 				>
 					<RichText
 						identifier="value"
@@ -157,6 +169,15 @@ function PullQuoteEdit( {
 					) }
 				</BlockQuote>
 			</Figure>
+			<BlockControls>
+				<AlignmentToolbar
+					value={ textAlign }
+					placeholder={ pullQuoteTextAlignPlaceholder() }
+					onChange={ ( nextTextAlign ) =>
+						setAttributes( { textAlign: nextTextAlign } )
+					}
+				/>
+			</BlockControls>
 			{ Platform.OS === 'web' && (
 				<InspectorControls>
 					<PanelColorSettings

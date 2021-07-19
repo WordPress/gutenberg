@@ -21,6 +21,7 @@
 	footer {
 		position: relative;
 	}
+
 	.has-text-color a {
 		color: inherit;
 	}
@@ -30,14 +31,31 @@
 	background: none;
 }
 
+/*
+ * 1. Defining `text-align` on the parent would get overwritten by the theme’s
+*     defintion of the default style.
+ * 2. When no text alignment is set, the solid color style aligns text to the
+ *    side, not center.
+ * 3. Twenty Twenty-One has a hardcoded `text-align` on `blockquote::before`.
+ *    The only way to make the decorative quotation mark follow the same
+ *    alignment as its parent (both in the editor and on the front-end) is
+ *    by resetting the property with `!important`.
+ */
 .wp-block-pullquote.is-style-solid-color {
 	border: none;
+
 	blockquote {
 		margin-left: auto;
 		margin-right: auto;
-		text-align: left;
-
 		max-width: 60%;
+
+		&:not([class*="has-text-align-"]) { /* 1 */
+			text-align: left; /* 2 */
+		}
+
+		&::before {
+			text-align: inherit !important; /* 3 */
+		}
 
 		p {
 			margin-top: 0;

@@ -35,6 +35,7 @@ const POPOVER_PROPS = {
 
 function AlignmentUI( {
 	value,
+	placeholder,
 	onChange,
 	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
 	label = __( 'Align' ),
@@ -51,8 +52,15 @@ function AlignmentUI( {
 		( control ) => control.align === value
 	);
 
+	const placeholderAlignment = find(
+		alignmentControls,
+		( control ) => control.align === placeholder
+	);
+
 	function setIcon() {
 		if ( activeAlignment ) return activeAlignment.icon;
+		if ( placeholderAlignment ) return placeholderAlignment.icon;
+
 		return isRTL() ? alignRight : alignLeft;
 	}
 
