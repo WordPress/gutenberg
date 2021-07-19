@@ -164,6 +164,16 @@ function LinkControl( {
 	}, [ isEditingLink ] );
 
 	/**
+	 * Update the state value internalInputValue if the url value changes
+	 * for example when clicking on another anchor
+	 */
+	useEffect( () => {
+		if ( value?.url ) {
+			setInternalInputValue( value.url );
+		}
+	}, [ value ] );
+
+	/**
 	 * Cancels editing state and marks that focus may need to be restored after
 	 * the next render, if focus was within the wrapper when editing finished.
 	 */
