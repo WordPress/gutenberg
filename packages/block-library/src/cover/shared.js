@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 
 const POSITION_CLASSNAMES = {
@@ -111,19 +109,18 @@ export function getPositionClassName( contentPosition ) {
 /**
  * Hook that hides and shows the duotone control based on when it should work.
  *
- * @param {string}  clientId               Block client id.
- * @param {Object}  attributes             Block attributes.
- * @param {string}  attributes.url         Media URL.
- * @param {boolean} attributes.hasParallax Parallax enabled.
- * @param {boolean} attributes.isRepeated  Repeat enabled.
+ * @param {Function} showDuotoneControls    Function to show or hide duotone controls.
+ * @param {Object}   attributes             Block attributes.
+ * @param {string}   attributes.url         Media URL.
+ * @param {boolean}  attributes.hasParallax Parallax enabled.
+ * @param {boolean}  attributes.isRepeated  Repeat enabled.
  */
 export function useDuotoneControlVisibility(
-	clientId,
+	showDuotoneControls,
 	{ url, hasParallax, isRepeated }
 ) {
 	const isDuotoneAvailable = !! url && ! hasParallax && ! isRepeated;
-	const { showDuotoneControls } = useDispatch( blockEditorStore );
 	useEffect( () => {
-		showDuotoneControls( clientId, isDuotoneAvailable );
-	}, [ clientId, isDuotoneAvailable ] );
+		showDuotoneControls( isDuotoneAvailable );
+	}, [ showDuotoneControls, isDuotoneAvailable ] );
 }

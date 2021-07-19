@@ -81,7 +81,6 @@ const INNER_BLOCKS_TEMPLATE = [
 
 const Cover = ( {
 	attributes,
-	clientId,
 	getStylesFromColorScheme,
 	isParentSelected,
 	onFocus,
@@ -92,6 +91,7 @@ const Cover = ( {
 	isSelected,
 	selectBlock,
 	blockWidth,
+	showDuotoneControls,
 } ) => {
 	const {
 		backgroundType,
@@ -105,7 +105,7 @@ const Cover = ( {
 		minHeightUnit = 'px',
 	} = attributes;
 
-	useDuotoneControlVisibility( clientId, attributes );
+	useDuotoneControlVisibility( showDuotoneControls, attributes );
 
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false

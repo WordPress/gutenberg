@@ -10,7 +10,7 @@ import tinycolor from 'tinycolor2';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { SVG } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { useContext, createPortal } from '@wordpress/element';
 
@@ -126,7 +126,7 @@ ${ selector } {
 	);
 }
 
-function DuotonePanel( { attributes, setAttributes, clientId } ) {
+function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
 
@@ -137,15 +137,7 @@ function DuotonePanel( { attributes, setAttributes, clientId } ) {
 		! useSetting( 'color.customDuotone' ) ||
 		( colorPalette?.length === 0 && disableCustomColors );
 
-	const disableDuotoneUI = useSelect( ( select ) => {
-		const { getDuotoneVisibility } = select( blockEditorStore );
-		return ! getDuotoneVisibility( clientId );
-	}, [] );
-
-	if (
-		disableDuotoneUI ||
-		( duotonePalette?.length === 0 && disableCustomDuotone )
-	) {
+	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
 		return null;
 	}
 
@@ -208,6 +200,16 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const { showDuotoneControls } = useDispatch( blockEditorStore );
+		function _showDuotoneControls( isShown ) {
+			return showDuotoneControls( props.clientId, isShown );
+		}
+
+		const isDuotoneActive = useSelect( ( select ) => {
+			const { getDuotoneVisibility } = select( blockEditorStore );
+			return getDuotoneVisibility( props.clientId );
+		}, [] );
+
 		const hasDuotoneSupport = hasBlockSupport(
 			props.name,
 			'color.__experimentalDuotone'
@@ -215,8 +217,13 @@ const withDuotoneControls = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockEdit { ...props } />
-				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
+				<BlockEdit
+					{ ...props }
+					showDuotoneControls={ _showDuotoneControls }
+				/>
+				{ hasDuotoneSupport && isDuotoneActive && (
+					<DuotonePanel { ...props } />
+				) }
 			</>
 		);
 	},

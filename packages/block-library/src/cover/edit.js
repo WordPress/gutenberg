@@ -307,6 +307,7 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
+	showDuotoneControls,
 } ) {
 	const {
 		contentPosition,
@@ -322,7 +323,7 @@ function CoverEdit( {
 		url,
 	} = attributes;
 
-	useDuotoneControlVisibility( clientId, attributes );
+	useDuotoneControlVisibility( showDuotoneControls, attributes );
 
 	const {
 		gradientClass,

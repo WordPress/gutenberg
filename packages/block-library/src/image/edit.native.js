@@ -179,14 +179,8 @@ export class ImageEdit extends Component {
 				image.source_url;
 			this.props.setAttributes( { url } );
 		}
-		if (
-			previousProps.clientId !== this.props.clientId ||
-			! previousProps.attributes.url !== ! attributes.url
-		) {
-			this.props.showDuotoneControls(
-				this.props.clientId,
-				!! attributes.url
-			);
+		if ( ! previousProps.attributes.url !== ! attributes.url ) {
+			this.props.showDuotoneControls( !! attributes.url );
 		}
 	}
 
@@ -725,9 +719,6 @@ export default compose( [
 		return {
 			closeSettingsBottomSheet() {
 				dispatch( editPostStore ).closeGeneralSidebar();
-			},
-			showDuotoneControls( ...args ) {
-				dispatch( blockEditorStore ).showDuotoneControls( ...args );
 			},
 		};
 	} ),

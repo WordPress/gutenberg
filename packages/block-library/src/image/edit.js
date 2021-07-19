@@ -9,7 +9,7 @@ import { get, has, omit, pick } from 'lodash';
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withNotices } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
 	BlockControls,
@@ -97,6 +97,7 @@ export function ImageEdit( {
 	noticeOperations,
 	onReplace,
 	clientId,
+	showDuotoneControls,
 } ) {
 	const {
 		url = '',
@@ -111,10 +112,9 @@ export function ImageEdit( {
 
 	// Hide and show duotone controls depending on when it should work.
 	const isDuotoneAvailable = !! url;
-	const { showDuotoneControls } = useDispatch( blockEditorStore );
 	useEffect( () => {
-		showDuotoneControls( clientId, isDuotoneAvailable );
-	}, [ clientId, isDuotoneAvailable ] );
+		showDuotoneControls( isDuotoneAvailable );
+	}, [ showDuotoneControls, isDuotoneAvailable ] );
 
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
