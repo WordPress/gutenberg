@@ -26,6 +26,8 @@ import {
 import { roundClamp } from '../utils/math';
 import { INITIAL_BOUNDS } from './utils';
 
+let cacheMediaRefAndIconCoordinates = {};
+
 export class FocalPointPicker extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -80,9 +82,36 @@ export class FocalPointPicker extends Component {
 			isDragging,
 			percentages: { x, y },
 		} = this.state;
+
 		const { value } = this.props;
-		if ( ! isDragging && ( value.x !== x || value.y !== y ) ) {
+		if (
+			! isDragging &&
+			( value.x !== x || value.y !== y ) &&
+			prevProps.url !== this.props.url
+		) {
 			this.setState( { percentages: this.props.value } );
+		}
+
+		const imgUrlCached = cacheMediaRefAndIconCoordinates.hasOwnProperty(
+			this.props.url
+		);
+
+		if (
+			! isDragging &&
+			prevProps.url !== this.props.url &&
+			! imgUrlCached
+		) {
+			this.setState( {
+				percentages: { x: 0.5, y: 0.5 },
+			} );
+		} else if (
+			! isDragging &&
+			prevProps.url !== this.props.url &&
+			imgUrlCached
+		) {
+			this.setState( {
+				percentages: cacheMediaRefAndIconCoordinates[ imgUrlCached ],
+			} );
 		}
 	}
 	componentWillUnmount() {
@@ -223,6 +252,17 @@ export class FocalPointPicker extends Component {
 		nextX = roundClamp( nextX, 0, 1, step );
 		nextY = roundClamp( nextY, 0, 1, step );
 
+		//recording src of current image in focal picer and icon coordinates
+
+		const currentImgSrc = this?.mediaRef?.current?.currentSrc
+			? this.mediaRef.current.currentSrc
+			: 'string';
+
+		cacheMediaRefAndIconCoordinates[ currentImgSrc ] = {
+			x: nextX,
+			y: nextY,
+		};
+
 		return { x: nextX, y: nextY };
 	}
 	pickerDimensions() {
@@ -253,6 +293,7 @@ export class FocalPointPicker extends Component {
 			percentages: { x, y },
 		} = this.state;
 
+		const { width, height } = this.pickerDimensions();
 		if ( bounds.left === undefined || bounds.top === undefined ) {
 			return {
 				left: '50%',
@@ -260,7 +301,6 @@ export class FocalPointPicker extends Component {
 			};
 		}
 
-		const { width, height } = this.pickerDimensions();
 		return {
 			left: x * ( width - bounds.left * 2 ) + bounds.left,
 			top: y * ( height - bounds.top * 2 ) + bounds.top,
