@@ -27,7 +27,7 @@ describe( 'unit-values', () => {
 			${ '10pc' }            | ${ [ 10, 'pc' ] }
 			${ '10pt' }            | ${ [ 10, 'pt' ] }
 			${ '10px' }            | ${ [ 10, 'px' ] }
-			${ 'abc em' }          | ${ [ undefined, 'em' ] }
+			${ 'abc em' }          | ${ [ undefined, undefined ] }
 			${ '10ex' }            | ${ [ 10, 'ex' ] }
 			${ '10ch' }            | ${ [ 10, 'ch' ] }
 			${ '10rem' }           | ${ [ 10, 'rem' ] }
@@ -37,7 +37,7 @@ describe( 'unit-values', () => {
 			${ '10vmin' }          | ${ [ 10, 'vmin' ] }
 			${ '10vmax' }          | ${ [ 10, 'vmax' ] }
 			${ '10 vmax' }         | ${ [ 10, 'vmax' ] }
-			${ '10notacssunit' }   | ${ [ 10, undefined ] }
+			${ '10notacssunit' }   | ${ [ undefined, undefined ] }
 			${ 'notaunitedvalue' } | ${ [ undefined, undefined ] }
 			${ '10' }              | ${ [ 10, undefined ] }
 			${ 10 }                | ${ [ 10, undefined ] }

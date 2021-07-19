@@ -3,7 +3,7 @@
  */
 import { isNil } from 'lodash';
 
-const UNITED_VALUE_REGEX = /[\d.\-+]*\s*(fr|cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|vw|vh|vmin|vmax|%|cap|ic|rlh|vi|vb|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)$/;
+const UNITED_VALUE_REGEX = /^([\d.\-+]*)\s*(fr|cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|vw|vh|vmin|vmax|%|cap|ic|rlh|vi|vb|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?$/;
 
 /**
  * Parses a number and unit from a value.
@@ -21,16 +21,15 @@ export function parseCSSUnitValue(
 
 	const value = String( toParse ).trim();
 
-	let num: number | undefined = parseFloat( value );
-	num = Number.isNaN( num ) ? undefined : num;
-
 	const matched = value.match( UNITED_VALUE_REGEX );
 	if ( ! matched ) {
-		return [ num, undefined ];
+		return [ undefined, undefined ];
 	}
-	const [ , unit ] = matched;
+	const [ , num, unit ] = matched;
+	let numParsed: number | undefined = parseFloat( num );
+	numParsed = Number.isNaN( numParsed ) ? undefined : numParsed;
 
-	return [ num, unit ];
+	return [ numParsed, unit ];
 }
 
 /**
