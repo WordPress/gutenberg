@@ -1,0 +1,13 @@
+[
+	{
+		"blockName": "core/breadcrumbs",
+		"attrs": {
+			"nestingLevel": 4,
+			"separator": "|",
+			"showLeadingSeparator": true
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

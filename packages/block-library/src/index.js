@@ -90,6 +90,7 @@ import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
 import * as postTerms from './post-terms';
 import * as termDescription from './term-description';
+import * as breadcrumbs from './breadcrumbs';
 
 /**
  * Function to register an individual block.
@@ -184,6 +185,7 @@ export const __experimentalGetCoreBlocks = () => [
 	postExcerpt,
 	postFeaturedImage,
 	postTerms,
+	breadcrumbs,
 
 	logInOut,
 ];

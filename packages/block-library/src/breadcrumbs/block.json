@@ -1,0 +1,54 @@
+{
+	"apiVersion": 2,
+	"name": "core/breadcrumbs",
+	"title": "Breadcrumbs",
+	"category": "design",
+	"description": "Displays breadcrumbs of a page's hierarchy",
+	"textdomain": "default",
+	"usesContext": [ "postId", "postType" ],
+	"attributes": {
+		"nestingLevel": {
+			"type": "number",
+			"default": 0
+		},
+		"separator": {
+			"type": "string",
+			"default": "/"
+		},
+		"showCurrentPageTitle": {
+			"type": "boolean",
+			"default": false
+		},
+		"showLeadingSeparator": {
+			"type": "boolean",
+			"default": false
+		},
+		"textAlign": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"align": true,
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"html": false,
+		"spacing": {
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		}
+	},
+	"editorStyle": "wp-block-breadcrumbs-editor",
+	"style": "wp-block-breadcrumbs"
+}
