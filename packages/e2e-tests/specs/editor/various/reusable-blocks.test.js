@@ -14,6 +14,7 @@ import {
 	toggleGlobalBlockInserter,
 	openDocumentSettingsSidebar,
 	saveDraft,
+	publishPost,
 } from '@wordpress/e2e-test-utils';
 
 const reusableBlockNameInputSelector =
@@ -22,11 +23,22 @@ const reusableBlockInspectorNameInputSelector =
 	'.block-editor-block-inspector .components-text-control__input';
 
 const saveAll = async () => {
-	await page.click( '.editor-post-publish-button__button.has-changes-dot' );
-	await page.waitForSelector(
-		'button.editor-entities-saved-states__save-button'
+	const publishButtonSelector =
+		'.editor-post-publish-button__button.has-changes-dot';
+	// Wait for the Publish button to become enabled in case the editor is autosaving ATM:
+	const publishButton = await page.waitForSelector(
+		publishButtonSelector + '[aria-disabled="false"]'
 	);
-	await page.click( 'button.editor-entities-saved-states__save-button' );
+	await publishButton.click();
+
+	const saveButtonSelector =
+		'button.editor-entities-saved-states__save-button';
+	const saveButton = await page.waitForSelector( saveButtonSelector );
+	await saveButton.click();
+};
+
+const saveAllButDontPublish = async () => {
+	await saveAll();
 
 	// no need to publish the post.
 	const cancelPublish = await page.waitForSelector(
@@ -106,7 +118,7 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Oh! ' );
 
 		// Save the reusable block
-		await saveAll();
+		await saveAllButDontPublish();
 
 		// Check that its content is up to date
 		const text = await page.$eval(
@@ -135,6 +147,41 @@ describe( 'Reusable blocks', () => {
 			( element ) => element.innerText
 		);
 		expect( paragraphContent ).toMatch( 'Oh! Hello there!' );
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/33072.
+	it( 'can be saved when modified inside of a published post', async () => {
+		await createReusableBlock(
+			'Guten Berg!',
+			'Alternative greeting block'
+		);
+
+		// Make sure the reusable block has loaded properly before attempting to publish the post.
+		await page.waitForSelector( 'p[aria-label="Paragraph block"]' );
+
+		await publishPost();
+
+		// Close publish panel.
+		const closePublishPanelSelector =
+			'.editor-post-publish-panel__header button[aria-label="Close panel"]';
+		await page.waitForSelector( closePublishPanelSelector );
+		await page.click( closePublishPanelSelector );
+
+		await page.waitForSelector( 'p[aria-label="Paragraph block"]' );
+		await page.focus( 'p[aria-label="Paragraph block"]' );
+
+		// Change the block's content
+		await page.keyboard.type( 'Einen ' );
+
+		// Save the reusable block and update the post
+		await saveAll();
+
+		// Check that its content is up to date
+		const paragraphContent = await page.$eval(
+			'p[aria-label="Paragraph block"]',
+			( element ) => element.innerText
+		);
+		expect( paragraphContent ).toMatch( 'Einen Guten Berg!' );
 	} );
 
 	it( 'can be inserted after refresh', async () => {
