@@ -93,9 +93,15 @@ class Editor extends Component {
 
 		this.subscriptionParentFeaturedImageIdNativeUpdated = subscribeFeaturedImageIdNativeUpdated(
 			( payload ) => {
-				editEntityRecord( 'postType', postType, postId, {
-					featured_media: payload.featuredImageId,
-				} );
+				editEntityRecord(
+					'postType',
+					postType,
+					postId,
+					{ featured_media: payload.featuredImageId },
+					{
+						undoIgnore: true,
+					}
+				);
 			}
 		);
 	}
