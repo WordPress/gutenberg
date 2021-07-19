@@ -1,11 +1,11 @@
 const ENTRY_CLASS_NAME = 'wp-block-table-of-contents__entry';
 
 export default function TableOfContentsList( { nestedHeadingList } ) {
-	return nestedHeadingList.map( ( childNode, index ) => {
-		const { anchor, content } = childNode.heading;
+	return nestedHeadingList.map( ( node, index ) => {
+		const { content, link } = node.heading;
 
-		const entry = anchor ? (
-			<a className={ ENTRY_CLASS_NAME } href={ anchor }>
+		const entry = link ? (
+			<a className={ ENTRY_CLASS_NAME } href={ link }>
 				{ content }
 			</a>
 		) : (
@@ -15,10 +15,10 @@ export default function TableOfContentsList( { nestedHeadingList } ) {
 		return (
 			<li key={ index }>
 				{ entry }
-				{ childNode.children ? (
+				{ node.children ? (
 					<ul>
 						<TableOfContentsList
-							nestedHeadingList={ childNode.children }
+							nestedHeadingList={ node.children }
 						/>
 					</ul>
 				) : null }

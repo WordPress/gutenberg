@@ -22,120 +22,144 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { renderToString, useEffect, useState } from '@wordpress/element';
+import { renderToString, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
+import icon from './icon';
 import TableOfContentsList from './list';
-import { getHeadingsFromContent, linearToNestedHeadingList } from './utils';
+import { linearToNestedHeadingList } from './utils';
+
+/**
+ * @typedef HeadingData
+ *
+ * @property {string} content The plain text content of the heading.
+ * @property {number} level   The heading level.
+ * @property {string} link    Link to the heading.
+ */
 
 /**
  * Table of Contents block edit component.
  *
  * @param {Object}                       props                                   The props.
  * @param {Object}                       props.attributes                        The block attributes.
- * @param {boolean}                      props.attributes.onlyIncludeCurrentPage
- *                                                                               Whether to only include headings from the current page (if the post is
- *                                                                               paginated).
+ * @param {HeadingData[]}                props.attributes.headings               A list of data for each heading in the post.
+ * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
  * @param {string}                       props.clientId
  * @param {(attributes: Object) => void} props.setAttributes
  *
  * @return {WPComponent} The component.
  */
 export default function TableOfContentsEdit( {
-	attributes: { onlyIncludeCurrentPage },
+	attributes: { headings = [], onlyIncludeCurrentPage },
 	clientId,
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps();
 
-	// Local state; not saved to block attributes. The saved block is dynamic and uses PHP to generate its content.
-	const [ headings, setHeadings ] = useState( [] );
-	const [ headingTree, setHeadingTree ] = useState( [] );
-
-	const { listBlockExists, postContent } = useSelect(
-		( select ) => ( {
-			listBlockExists: !! select( blocksStore ).getBlockType(
-				'core/list'
-			),
-			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
-			// Blocks can be loaded into a *non-post* block editor.
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			postContent: select( 'core/editor' ).getEditedPostContent(),
-		} ),
+	const listBlockExists = useSelect(
+		( select ) => !! select( blocksStore ).getBlockType( 'core/list' ),
 		[]
 	);
 
-	// The page this block would be part of on the front-end. For performance
-	// reasons, this is only calculated when onlyIncludeCurrentPage is true.
-	const pageIndex = useSelect(
-		( select ) => {
-			if ( ! onlyIncludeCurrentPage ) {
-				return null;
-			}
+	const {
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceBlocks,
+	} = useDispatch( blockEditorStore );
 
+	const latestHeadings = useSelect(
+		( select ) => {
 			const {
 				getBlockAttributes,
 				getBlockIndex,
 				getBlockName,
 				getBlockOrder,
+				getGlobalBlockCount,
 			} = select( blockEditorStore );
+			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+			// Blocks can be loaded into a *non-post* block editor.
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			const { getPermalink } = select( 'core/editor' );
+
+			const isPaginated = getGlobalBlockCount( 'core/nextpage' ) !== 0;
 
 			const blockIndex = getBlockIndex( clientId );
 			const blockOrder = getBlockOrder();
 
-			// Calculate which page the block will appear in on the front-end by
-			// counting how many <!--nextpage--> tags precede it.
-			// Unfortunately, this implementation only accounts for Page Break and
-			// Classic blocks, so if there are any <!--nextpage--> tags in any
-			// other block, they won't be counted. This will result in the table
-			// of contents showing headings from the wrong page if
-			// onlyIncludeCurrentPage === true. Thankfully, this issue only
-			// affects the editor implementation.
-			let page = 1;
-			for ( let i = 0; i < blockIndex; i++ ) {
-				const blockName = getBlockName( blockOrder[ i ] );
-				if ( blockName === 'core/nextpage' ) {
-					page++;
-				} else if ( blockName === 'core/freeform' ) {
-					// Count the page breaks inside the Classic block.
-					const pageBreaks = getBlockAttributes(
-						blockOrder[ i ]
-					).content?.match( /<!--nextpage-->/g );
+			const _latestHeadings = [];
 
-					if ( pageBreaks !== null && pageBreaks !== undefined ) {
-						page += pageBreaks.length;
+			// The page (of a paginated post) the Table of Contents block will be
+			// part of.
+			let tocPage = 1;
+
+			// The page (of a paginated post) a heading will be part of.
+			let headingPage = 1;
+
+			// Link to post including pagination query if necessary.
+			const permalink = getPermalink();
+
+			let headingPageLink = isPaginated
+				? addQueryArgs( permalink, { page: headingPage } )
+				: permalink;
+
+			for ( const [ i, blockClientId ] of blockOrder.entries() ) {
+				const blockName = getBlockName( blockClientId );
+				if ( blockName === 'core/nextpage' ) {
+					headingPage++;
+					headingPageLink = addQueryArgs(
+						removeQueryArgs( permalink, [ 'page' ] ),
+						{ page: headingPage }
+					);
+					if ( i < blockIndex ) {
+						tocPage++;
+					}
+				} else if ( blockName === 'core/heading' ) {
+					// If we're only including headings from the current page (of a
+					// paginated post), then exit the loop if we've reached headings
+					// on the pages after the one with the Table of Contents block.
+					if ( onlyIncludeCurrentPage && headingPage > tocPage ) {
+						break;
+					}
+					// If we're including all headings or we've reached headings on
+					// the same page as the Table of Contents block, add them to the
+					// list.
+					if ( ! onlyIncludeCurrentPage || headingPage === tocPage ) {
+						const headingAttributes = getBlockAttributes(
+							blockClientId
+						);
+
+						const hasAnchor =
+							typeof headingAttributes.anchor === 'string' &&
+							headingAttributes.anchor !== '';
+
+						_latestHeadings.push( {
+							content: headingAttributes.content,
+							level: headingAttributes.level,
+							link: hasAnchor
+								? `${ headingPageLink }#${ headingAttributes.anchor }`
+								: null,
+						} );
 					}
 				}
 			}
 
-			return page;
+			return _latestHeadings;
 		},
 		[ clientId, onlyIncludeCurrentPage ]
 	);
 
 	useEffect( () => {
-		let latestHeadings;
-
-		if ( onlyIncludeCurrentPage ) {
-			const pagesOfContent = postContent.split( '<!--nextpage-->' );
-
-			latestHeadings = getHeadingsFromContent(
-				pagesOfContent[ pageIndex - 1 ]
-			);
-		} else {
-			latestHeadings = getHeadingsFromContent( postContent );
-		}
-
 		if ( ! isEqual( headings, latestHeadings ) ) {
-			setHeadings( latestHeadings );
-			setHeadingTree( linearToNestedHeadingList( latestHeadings ) );
+			// This is required to keep undo working and not create 2 undo steps for each heading change.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { headings: latestHeadings } );
 		}
-	}, [ pageIndex, postContent, onlyIncludeCurrentPage ] );
+	} );
 
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const headingTree = linearToNestedHeadingList( headings );
 
 	const toolbarControls = listBlockExists && (
 		<BlockControls>
@@ -191,7 +215,7 @@ export default function TableOfContentsEdit( {
 			<>
 				<div { ...blockProps }>
 					<Placeholder
-						icon={ <BlockIcon icon="list-view" /> }
+						icon={ <BlockIcon icon={ icon } /> }
 						label="Table of Contents"
 						instructions={ __(
 							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
