@@ -11,12 +11,14 @@ import { Fragment, useEffect } from '@wordpress/element';
 
 import {
 	BlockControls,
+	ButtonBlockerAppender,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
 	JustifyContentControl,
 	ContrastChecker,
 	PanelColorSettings,
+	store as blockEditorStore,
 	withColors,
 } from '@wordpress/block-editor';
 import {
@@ -26,6 +28,7 @@ import {
 	ToggleControl,
 	ToolbarDropdownMenu,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
@@ -41,6 +44,7 @@ const sizeOptions = [
 export function SocialLinksEdit( props ) {
 	const {
 		attributes,
+		clientId,
 		iconBackgroundColor,
 		iconColor,
 		isSelected,
@@ -81,12 +85,6 @@ export function SocialLinksEdit( props ) {
 		</li>
 	);
 
-	const SelectedSocialPlaceholder = (
-		<li className="wp-block-social-links__social-prompt">
-			{ __( 'Click plus to add' ) }
-		</li>
-	);
-
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.
 	const className = classNames( size, {
@@ -96,13 +94,30 @@ export function SocialLinksEdit( props ) {
 		[ `items-justified-${ itemsJustification }` ]: itemsJustification,
 	} );
 
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
+			0,
+		[ clientId ]
+	);
+
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
-		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
+		placeholder: ! isSelected && SocialPlaceholder,
 		templateLock: false,
-		__experimentalAppenderTagName: 'li',
+		renderAppender:
+			isSelected && ! hasInnerBlocks
+				? () => (
+						<ButtonBlockerAppender
+							__experimentalShowLabel
+							className="block-list-appender__toggle"
+							rootClientId={ clientId }
+							tagName="li"
+						/>
+				  )
+				: undefined,
 	} );
 
 	const POPOVER_PROPS = {

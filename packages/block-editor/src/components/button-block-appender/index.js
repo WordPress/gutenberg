@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
@@ -18,7 +18,7 @@ import deprecated from '@wordpress/deprecated';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender(
-	{ rootClientId, className, onFocus, tabIndex },
+	{ rootClientId, className, onFocus, tabIndex, __experimentalShowLabel },
 	ref
 ) {
 	return (
@@ -32,9 +32,10 @@ function ButtonBlockAppender(
 				isOpen,
 				blockTitle,
 				hasSingleBlockType,
+				hasBlockVariations,
 			} ) => {
 				let label;
-				if ( hasSingleBlockType ) {
+				if ( hasSingleBlockType || hasBlockVariations ) {
 					label = sprintf(
 						// translators: %s: the name of the block when there is only one
 						_x( 'Add %s', 'directly add the only allowed block' ),
@@ -48,34 +49,31 @@ function ButtonBlockAppender(
 				}
 				const isToggleButton = ! hasSingleBlockType;
 
-				let inserterButton = (
+				return (
 					<Button
 						ref={ ref }
 						onFocus={ onFocus }
 						tabIndex={ tabIndex }
 						className={ classnames(
 							className,
-							'block-editor-button-block-appender'
+							'block-editor-button-block-appender',
+							{ 'has-visible-label': __experimentalShowLabel }
 						) }
 						onClick={ onToggle }
 						aria-haspopup={ isToggleButton ? 'true' : undefined }
 						aria-expanded={ isToggleButton ? isOpen : undefined }
 						disabled={ disabled }
-						label={ label }
+						label={ __experimentalShowLabel ? undefined : label }
+						tooltipPosition="bottom"
+						showTooltip={ ! __experimentalShowLabel }
 					>
-						{ ! hasSingleBlockType && (
+						{ ! hasSingleBlockType && ! __experimentalShowLabel && (
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
 						) }
 						<Icon icon={ plus } />
+						{ __experimentalShowLabel && <span>{ label }</span> }
 					</Button>
 				);
-
-				if ( isToggleButton || hasSingleBlockType ) {
-					inserterButton = (
-						<Tooltip text={ label }>{ inserterButton }</Tooltip>
-					);
-				}
-				return inserterButton;
 			} }
 			isAppender
 		/>

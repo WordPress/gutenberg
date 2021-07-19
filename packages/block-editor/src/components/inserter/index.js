@@ -29,10 +29,11 @@ const defaultRenderToggle = ( {
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
+	hasBlockVariations,
 	toggleProps = {},
 } ) => {
 	let label;
-	if ( hasSingleBlockType ) {
+	if ( hasSingleBlockType || hasBlockVariations ) {
 		label = sprintf(
 			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
@@ -102,6 +103,7 @@ class Inserter extends Component {
 			disabled,
 			blockTitle,
 			hasSingleBlockType,
+			hasBlockVariations,
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
@@ -113,6 +115,7 @@ class Inserter extends Component {
 			disabled: disabled || ! hasItems,
 			blockTitle,
 			hasSingleBlockType,
+			hasBlockVariations,
 			toggleProps,
 		} );
 	}
@@ -168,12 +171,13 @@ class Inserter extends Component {
 		const {
 			position,
 			hasSingleBlockType,
+			hasBlockVariations,
 			insertOnlyAllowedBlock,
 			__experimentalIsQuick: isQuick,
 			onSelectOrClose,
 		} = this.props;
 
-		if ( hasSingleBlockType ) {
+		if ( hasSingleBlockType && ! hasBlockVariations ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 
@@ -210,20 +214,22 @@ export default compose( [
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
-		const hasSingleBlockType =
-			size( allowedBlocks ) === 1 &&
-			size(
-				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-			) === 0;
+		const hasSingleBlockType = size( allowedBlocks ) === 1;
 
 		let allowedBlockType = false;
+		let hasBlockVariations = false;
 		if ( hasSingleBlockType ) {
 			allowedBlockType = allowedBlocks[ 0 ];
+			hasBlockVariations =
+				size(
+					getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
+				) > 0;
 		}
 
 		return {
 			hasItems: hasInserterItems( rootClientId ),
 			hasSingleBlockType,
+			hasBlockVariations,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
 			rootClientId,
