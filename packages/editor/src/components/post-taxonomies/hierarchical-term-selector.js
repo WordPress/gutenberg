@@ -109,7 +109,7 @@ function findTerm( terms, parent, name ) {
  * @param {string} filterValue Filter value.
  * @return {(function(Object): (Object|boolean))} Matcher function.
  */
-function getFilterMatcher( filterValue ) {
+export function getFilterMatcher( filterValue ) {
 	const matchTermsForFilter = ( originalTerm ) => {
 		if ( '' === filterValue ) {
 			return originalTerm;
