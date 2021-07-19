@@ -9,6 +9,7 @@ import { map, filter } from 'lodash';
  */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
 import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
@@ -28,6 +29,8 @@ import {
 	ToolbarButton,
 	ExternalLink,
 	FocalPointPicker,
+	__experimentalUnitControl as UnitControl,
+	BaseControl,
 } from '@wordpress/components';
 import { pullLeft, pullRight } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -36,7 +39,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import MediaContainer from './media-container';
-import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
+import { DEFAULT_MEDIA_SIZE_SLUG, CSS_UNITS } from './constants';
 
 /**
  * Constants
@@ -137,8 +140,12 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		mediaWidth,
 		rel,
 		verticalAlignment,
+		minHeight,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
+
+	const instanceId = useInstanceId( UnitControl );
+	const inputId = `block-media-text-height-input-${ instanceId }`;
 
 	const image = useSelect(
 		( select ) =>
@@ -188,6 +195,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const style = {
 		gridTemplateColumns,
 		msGridColumns: gridTemplateColumns,
+		minHeight,
 	};
 	const onMediaAltChange = ( newMediaAlt ) => {
 		setAttributes( { mediaAlt: newMediaAlt } );
@@ -290,6 +298,28 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		</PanelBody>
 	);
 
+	const dimensions = (
+		<PanelBody title={ __( 'Dimensions' ) }>
+			<BaseControl
+				id={ inputId }
+				label={ __( 'Minimum height of Media & Text' ) }
+			>
+				<UnitControl
+					id={ inputId }
+					style={ { maxWidth: 80, marginTop: 8 } }
+					units={ CSS_UNITS }
+					value={ minHeight }
+					step="1"
+					isResetValueOnUnitChange
+					min={ 0 }
+					onChange={ ( value ) => {
+						setAttributes( { minHeight: value } );
+					} }
+				></UnitControl>
+			</BaseControl>
+		</PanelBody>
+	);
+
 	const blockProps = useBlockProps( {
 		className: classNames,
 		style,
@@ -302,7 +332,10 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 
 	return (
 		<>
-			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
+			<InspectorControls>
+				{ mediaTextGeneralSettings }
+				{ dimensions }
+			</InspectorControls>
 			<BlockControls group="block">
 				<BlockVerticalAlignmentControl
 					onChange={ onVerticalAlignmentChange }
