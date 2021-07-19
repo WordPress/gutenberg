@@ -63,19 +63,29 @@ function useDarkThemeBodyClassName( styles ) {
 	);
 }
 
-export default function EditorStyles( { styles } ) {
+function PrefixedEditorStyles( { styles } ) {
 	const transformedStyles = useMemo(
 		() => transformStyles( styles, EDITOR_STYLES_SELECTOR ),
 		[ styles ]
 	);
+	return transformedStyles.map( ( css, index ) => (
+		<style key={ index }>{ css }</style>
+	) );
+}
+
+export default function EditorStyles( { styles, prefix = true } ) {
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
 			<style ref={ useDarkThemeBodyClassName( styles ) } />
-			{ transformedStyles.map( ( css, index ) => (
-				<style key={ index }>{ css }</style>
-			) ) }
+			{ prefix ? (
+				<PrefixedEditorStyles styles={ styles } />
+			) : (
+				styles.map( ( { css }, index ) => (
+					<style key={ index }>{ css }</style>
+				) )
+			) }
 		</>
 	);
 }
