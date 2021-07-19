@@ -100,7 +100,7 @@ describe( 'Multi-entity save flow', () => {
 
 			// Add a template part and edit it.
 			await insertBlock( 'Template Part' );
-			const [ createNewButton ] = await page.$x(
+			const createNewButton = await page.waitForXPath(
 				createNewButtonSelector
 			);
 			await createNewButton.click();
