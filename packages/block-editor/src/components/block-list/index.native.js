@@ -69,9 +69,6 @@ export class BlockList extends Component {
 		);
 		this.scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 		this.addBlockToEndOfPost = this.addBlockToEndOfPost.bind( this );
-		this.shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind(
-			this
-		);
 		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind(
 			this
 		);
@@ -79,6 +76,10 @@ export class BlockList extends Component {
 		this.getExtraData = this.getExtraData.bind( this );
 
 		this.onLayout = this.onLayout.bind( this );
+
+		this.listHeight = 0;
+		this.offsetOfIndex = this.offsetOfIndex.bind( this );
+		this.itemHeights = [];
 
 		this.state = {
 			blockWidth: this.props.blockWidth || 0,
@@ -100,10 +101,6 @@ export class BlockList extends Component {
 
 	scrollViewInnerRef( ref ) {
 		this.scrollViewRef = ref;
-	}
-
-	shouldFlatListPreventAutomaticScroll() {
-		return this.props.isBlockInsertionPointVisible;
 	}
 
 	shouldShowInnerBlockAppender() {
@@ -155,6 +152,9 @@ export class BlockList extends Component {
 		const { blockWidth } = this.state;
 		const { isRootList, maxWidth } = this.props;
 
+		// update the known list height. Using it to compute how much empty space to reserve in the footer
+		this.listHeight = layout.height;
+
 		const layoutWidth = Math.floor( layout.width );
 		if ( isRootList && blockWidth !== layoutWidth ) {
 			this.setState( {
@@ -162,6 +162,59 @@ export class BlockList extends Component {
 			} );
 		} else if ( ! isRootList && ! blockWidth ) {
 			this.setState( { blockWidth: Math.min( layoutWidth, maxWidth ) } );
+		}
+	}
+
+	/* eslint-disable jsdoc/require-param */
+	/**
+	 * Computes the offset of a block in pixels, by adding up all the block heights before it.
+	 */
+	/* eslint-enable jsdoc/require-param */
+	offsetOfIndex( heights, blockClientIds, index ) {
+		const ITEM_HEIGHT = 30; // just a kinda arbitrary default height, just to have it non zero.
+		const offset = blockClientIds
+			.slice( 0, index + 1 ) // only add up to the index we want (adding 1 to include the indexed item itself too)
+			.reduce(
+				// accumulate the heights of the items
+				( acc, id ) =>
+					heights[ id ] && heights[ id ] > 0
+						? acc + heights[ id ]
+						: acc + ITEM_HEIGHT,
+				0
+			);
+		return offset;
+	}
+
+	componentDidUpdate( prevProps ) {
+		const {
+			isBlockInsertionPointVisible,
+			insertionPoint,
+			blockClientIds,
+		} = this.props;
+
+		// if we're now showing the new-block indicator, trigger a scroll to it
+		if (
+			isBlockInsertionPointVisible !==
+			prevProps.isBlockInsertionPointVisible
+		) {
+			const insertionPointInRootList =
+				insertionPoint.rootClientId === undefined;
+			if ( insertionPointInRootList && isBlockInsertionPointVisible ) {
+				const jumpToIndex = insertionPoint.index - 1; // scrolling goes to the bottom of the item so, let's scroll to one above
+				const offset =
+					jumpToIndex < 0
+						? 0
+						: this.offsetOfIndex(
+								this.itemHeights,
+								blockClientIds,
+								jumpToIndex
+						  );
+				if ( Platform.OS === 'android' ) {
+					this.scrollViewRef.scrollToOffset( { offset } );
+				} else {
+					this.scrollViewRef.scrollTo( { y: offset } );
+				}
+			}
 		}
 	}
 
@@ -277,9 +330,6 @@ export class BlockList extends Component {
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
-					shouldPreventAutomaticScroll={
-						this.shouldFlatListPreventAutomaticScroll
-					}
 					title={ title }
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
@@ -333,6 +383,11 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
+				onLayout={
+					( object ) =>
+						( this.itemHeights[ clientId ] =
+							object.nativeEvent.layout.height ) // Capture the block height. We'll use the list of heights to compute offsets.
+				}
 			/>
 		);
 	}
@@ -346,6 +401,11 @@ export class BlockList extends Component {
 		} = this.props;
 
 		if ( ! isReadOnly && withFooter ) {
+			const footerHeight = Math.max(
+				( this.listHeight * 3 ) / 4, // set the footer to 3 quarters of the list height to give room for the inserter *plus* the insertion point
+				styles.blockListFooter.minHeight
+			);
+
 			return (
 				<>
 					<TouchableWithoutFeedback
@@ -355,7 +415,12 @@ export class BlockList extends Component {
 							this.addBlockToEndOfPost( paragraphBlock );
 						} }
 					>
-						<View style={ styles.blockListFooter } />
+						<View
+							style={ [
+								styles.blockListFooter,
+								{ height: footerHeight },
+							] }
+						/>
 					</TouchableWithoutFeedback>
 				</>
 			);
@@ -373,6 +438,7 @@ export default compose( [
 				getBlockCount,
 				getBlockOrder,
 				getSelectedBlockClientId,
+				getBlockInsertionPoint,
 				isBlockInsertionPointVisible,
 				getSettings,
 			} = select( blockEditorStore );
@@ -395,11 +461,15 @@ export default compose( [
 
 			const isFloatingToolbarVisible =
 				!! selectedBlockClientId && hasRootInnerBlocks;
+
+			const insertionPoint = getBlockInsertionPoint();
+
 			return {
 				blockClientIds,
 				blockCount,
-				isBlockInsertionPointVisible:
-					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
+				insertionPoint,
+				isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
+				selectedBlockClientId,
 				isReadOnly,
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible,

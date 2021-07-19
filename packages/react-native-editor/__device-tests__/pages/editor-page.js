@@ -99,9 +99,9 @@ class EditorPage {
 	}
 
 	async getFirstBlockVisible() {
-		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
+		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row 1")]`; // notice the `1`, looking only for the first block but the "Block. Row 1" text is there in many of the parent components
 		const elements = await this.driver.elementsByXPath( firstBlockLocator );
-		return elements[ 0 ];
+		return elements[ elements.length - 1 ]; // return the last found as it will be the innermost
 	}
 
 	async getLastBlockVisible() {
