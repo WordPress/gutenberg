@@ -1,0 +1,112 @@
+version: '3.7'
+services:
+    mysql:
+        image: mariadb
+        ports:
+            - '3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: wordpress
+        volumes:
+            - 'mysql:/var/lib/mysql'
+    tests-mysql:
+        image: mariadb
+        ports:
+            - '3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: tests-wordpress
+        volumes:
+            - 'mysql-test:/var/lib/mysql'
+    wordpress:
+        build: .
+        depends_on:
+            - mysql
+        image: wordpress
+        ports:
+            - '${WP_ENV_PORT:-8888}:80'
+        environment:
+            WORDPRESS_DB_USER: root
+            WORDPRESS_DB_PASSWORD: password
+            WORDPRESS_DB_NAME: wordpress
+        volumes: &ref_0
+            - >-
+                /Users/ockham/.wp-env/f225b6dcecc0956ba67033945142a55c/WordPress:/var/www/html
+            - >-
+                /Users/ockham/src/gutenberg:/var/www/html/wp-content/plugins/gutenberg
+            - >-
+                /Users/ockham/.wp-env/f225b6dcecc0956ba67033945142a55c/theme-experiments/tt1-blocks:/var/www/html/wp-content/themes/tt1-blocks
+    tests-wordpress:
+        depends_on:
+            - tests-mysql
+        image: wordpress
+        ports:
+            - '${WP_ENV_TESTS_PORT:-8889}:80'
+        environment:
+            WORDPRESS_DB_USER: root
+            WORDPRESS_DB_PASSWORD: password
+            WORDPRESS_DB_NAME: tests-wordpress
+            WORDPRESS_DB_HOST: tests-mysql
+        volumes: &ref_1
+            - >-
+                /Users/ockham/.wp-env/f225b6dcecc0956ba67033945142a55c/tests-WordPress:/var/www/html
+            - >-
+                /Users/ockham/src/gutenberg/packages/e2e-tests/mu-plugins:/var/www/html/wp-content/mu-plugins
+            - >-
+                /Users/ockham/src/gutenberg/packages/e2e-tests/plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins
+            - >-
+                /Users/ockham/src/gutenberg:/var/www/html/wp-content/plugins/gutenberg
+            - >-
+                /Users/ockham/.wp-env/f225b6dcecc0956ba67033945142a55c/theme-experiments/tt1-blocks:/var/www/html/wp-content/themes/tt1-blocks
+    cli:
+        depends_on:
+            - wordpress
+        image: 'wordpress:cli'
+        volumes: *ref_0
+        user: '33:33'
+        environment:
+            WORDPRESS_DB_USER: root
+            WORDPRESS_DB_PASSWORD: password
+            WORDPRESS_DB_NAME: wordpress
+    tests-cli:
+        depends_on:
+            - tests-wordpress
+        image: 'wordpress:cli'
+        volumes: *ref_1
+        user: '33:33'
+        environment:
+            WORDPRESS_DB_USER: root
+            WORDPRESS_DB_PASSWORD: password
+            WORDPRESS_DB_NAME: tests-wordpress
+            WORDPRESS_DB_HOST: tests-mysql
+    composer:
+        image: composer
+        volumes:
+            - '/Users/ockham/src/gutenberg:/app'
+    phpunit:
+        image: 'wordpressdevelop/phpunit:latest'
+        depends_on:
+            - tests-wordpress
+        volumes:
+            - >-
+                /Users/ockham/.wp-env/f225b6dcecc0956ba67033945142a55c/tests-WordPress:/var/www/html
+            - >-
+                /Users/ockham/src/gutenberg/packages/e2e-tests/mu-plugins:/var/www/html/wp-content/mu-plugins
+            - >-
+                /Users/ockham/src/gutenberg/packages/e2e-tests/plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins
+            - >-
+                /Users/ockham/src/gutenberg:/var/www/html/wp-content/plugins/gutenberg
+            - >-
+                /Users/ockham/.wp-env/f225b6dcecc0956ba67033945142a55c/theme-experiments/tt1-blocks:/var/www/html/wp-content/themes/tt1-blocks
+            - 'phpunit-uploads:/var/www/html/wp-content/uploads'
+        environment:
+            LOCAL_DIR: html
+            WP_PHPUNIT__TESTS_CONFIG: /var/www/html/phpunit-wp-config.php
+            WORDPRESS_DB_USER: root
+            WORDPRESS_DB_PASSWORD: password
+            WORDPRESS_DB_NAME: tests-wordpress
+            WORDPRESS_DB_HOST: tests-mysql
+volumes:
+    mysql: {}
+    mysql-test: {}
+    phpunit-uploads: {}
