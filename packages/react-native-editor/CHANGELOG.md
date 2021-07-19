@@ -47,6 +47,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fixes color picker rendering bug when scrolling [#30994]
 -   [*] Add enableCaching param to fetch request on Android [#31186]
 -   [***] Add reusable blocks to the inserter menu. [#28495]
+-   [*] Bottom-sheet text area: automatically expands/shrinks with text entry. [#31818]
 
 ## 1.52.2
 
