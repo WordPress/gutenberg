@@ -172,7 +172,11 @@ class VideoEdit extends Component {
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return <Icon icon={ SvgIconRetry } { ...style.icon } />;
+				iconStyle = this.props.getStylesFromColorScheme(
+					style.icon,
+					style.iconDark
+				);
+				return <Icon icon={ SvgIconRetry } { ...iconStyle } />;
 			case ICON_TYPE.PLACEHOLDER:
 				iconStyle = this.props.getStylesFromColorScheme(
 					style.icon,
@@ -300,6 +304,11 @@ class VideoEdit extends Component {
 									? style.containerFocused
 									: style.container;
 
+							const uploadFailedTextStyle = this.props.getStylesFromColorScheme(
+								style.uploadFailedText,
+								style.uploadFailedTextDark
+							);
+
 							return (
 								<View
 									onLayout={ this.onVideoContanerLayout }
@@ -335,7 +344,7 @@ class VideoEdit extends Component {
 											{ isUploadFailed && (
 												<Text
 													style={
-														style.uploadFailedText
+														uploadFailedTextStyle
 													}
 												>
 													{ retryMessage }
