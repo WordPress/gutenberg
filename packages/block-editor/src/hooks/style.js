@@ -18,6 +18,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -224,6 +225,12 @@ export function addEditProps( settings ) {
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const shouldDisplayControls = useDisplayBlockControls();
+		const [ visualizers, setVisualizers ] = useState( null );
+		const setStyleVisualizer = ( key ) => ( next ) =>
+			setVisualizers( ( prev ) => ( {
+				...prev,
+				[ key ]: typeof next === 'function' ? next( prev ) : next,
+			} ) );
 
 		return (
 			<>
@@ -232,10 +239,15 @@ export const withBlockControls = createHigherOrderComponent(
 						<TypographyPanel { ...props } />
 						<BorderPanel { ...props } />
 						<ColorEdit { ...props } />
-						<SpacingPanel { ...props } />
+						<SpacingPanel
+							{ ...props }
+							setSpacingVisualizer={ setStyleVisualizer(
+								'spacing'
+							) }
+						/>
 					</>
 				) }
-				<BlockEdit { ...props } />
+				<BlockEdit { ...props } styleVisualizer={ visualizers } />
 			</>
 		);
 	},

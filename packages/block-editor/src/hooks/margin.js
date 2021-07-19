@@ -52,6 +52,7 @@ export function MarginEdit( props ) {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
+		setVisualizer,
 	} = props;
 
 	const units = useCustomUnits( {
@@ -83,26 +84,13 @@ export function MarginEdit( props ) {
 		} );
 	};
 
-	const onChangeShowVisualizer = ( next ) => {
-		const newStyle = {
-			...style,
-			visualizers: {
-				margin: next,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
 	return Platform.select( {
 		web: (
 			<>
 				<BoxControl
 					values={ style?.spacing?.margin }
 					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
+					onChangeShowVisualizer={ setVisualizer }
 					label={ __( 'Margin' ) }
 					sides={ sides }
 					units={ units }

@@ -52,6 +52,7 @@ export function PaddingEdit( props ) {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
+		setVisualizer,
 	} = props;
 
 	const units = useCustomUnits( {
@@ -83,26 +84,13 @@ export function PaddingEdit( props ) {
 		} );
 	};
 
-	const onChangeShowVisualizer = ( next ) => {
-		const newStyle = {
-			...style,
-			visualizers: {
-				padding: next,
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
 	return Platform.select( {
 		web: (
 			<>
 				<BoxControl
 					values={ style?.spacing?.padding }
 					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
+					onChangeShowVisualizer={ setVisualizer }
 					label={ __( 'Padding' ) }
 					sides={ sides }
 					units={ units }

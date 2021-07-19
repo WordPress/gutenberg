@@ -29,6 +29,11 @@ export const SPACING_SUPPORT_KEY = 'spacing';
 export function SpacingPanel( props ) {
 	const isDisabled = useIsSpacingDisabled( props );
 	const isSupported = hasSpacingSupport( props.name );
+	const setSpacingVisualizer = ( key ) => ( next ) =>
+		props.setSpacingVisualizer( ( prev ) => ( {
+			...prev,
+			[ key ]: typeof next === 'function' ? next( prev ) : next,
+		} ) );
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
@@ -37,8 +42,14 @@ export function SpacingPanel( props ) {
 	return (
 		<InspectorControls key="spacing">
 			<PanelBody title={ __( 'Spacing' ) }>
-				<PaddingEdit { ...props } />
-				<MarginEdit { ...props } />
+				<PaddingEdit
+					{ ...props }
+					setVisualizer={ setSpacingVisualizer( 'padding' ) }
+				/>
+				<MarginEdit
+					{ ...props }
+					setVisualizer={ setSpacingVisualizer( 'margin' ) }
+				/>
 			</PanelBody>
 		</InspectorControls>
 	);
