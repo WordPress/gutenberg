@@ -224,7 +224,7 @@ function HierarchicalTermSelector( { slug } ) {
 
 	const availableTermsTree = useMemo(
 		() => sortBySelected( buildTermsTree( availableTerms ), terms ),
-		[ availableTerms, terms ]
+		[ availableTerms ]
 	);
 
 	if ( ! hasAssignAction ) {
