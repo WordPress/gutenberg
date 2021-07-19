@@ -278,31 +278,5 @@ describe( 'BoxControl', () => {
 				left: undefined,
 			} );
 		} );
-
-		it( 'should clear side attribute when control is cleared', () => {
-			let state = {
-				top: '1em',
-				right: '1em',
-				bottom: '1em',
-				left: '1em',
-			};
-			const setState = jest.fn( ( newState ) => ( state = newState ) );
-
-			render( <BoxControl values={ state } onChange={ setState } /> );
-
-			const input = screen.getByLabelText( 'Box Control', {
-				selector: 'input',
-			} );
-			input.focus();
-			fireEvent.change( input, { target: { value: '' } } );
-			fireEvent.keyDown( input, { keyCode: ENTER } );
-
-			expect( setState ).toHaveBeenCalledWith( {
-				top: undefined,
-				right: undefined,
-				bottom: undefined,
-				left: undefined,
-			} );
-		} );
 	} );
 } );
