@@ -37,11 +37,11 @@ Use selects for binary questions.
 
 ### Behavior
 
-A SelectControl includes a double-arrow indicator. The menu appears layered over the select.
+A SelectControl includes a double-arrow indicator, unless the `multiple` property is set to `true`. If the `multiple` property is not set to `true`, then the menu appears layered over the select, otherwise the select will be expanded to show multiple options at once.
 
 #### Opening and Closing
 
-Once the menu is displayed onscreen, it remains open until the user chooses a menu item, clicks outside of the menu, or switches to another browser tab.
+Once the menu is displayed onscreen, it remains open until the user chooses a menu item, clicks outside of the menu, or switches to another browser tab. However if  the `multiple` property is set to `true`, the menu will always be visible within the select itself.
 
 ### Content Guidelines
 

@@ -77,6 +77,12 @@ function SelectControl(
 
 	const classes = classNames( 'components-select-control', className );
 
+	const downArrowWrapper = multiple === false ? {
+		<DownArrowWrapper>
+			<Icon icon={ chevronDown } size={ 18 } />
+		</DownArrowWrapper>
+		} : { <></> };
+
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
 		<BaseControl help={ help }>
@@ -88,11 +94,7 @@ function SelectControl(
 				isFocused={ isFocused }
 				label={ label }
 				size={ size }
-				suffix={
-					<DownArrowWrapper>
-						<Icon icon={ chevronDown } size={ 18 } />
-					</DownArrowWrapper>
-				}
+				suffix={ downArrowWrapper }
 				labelPosition={ labelPosition }
 				{ ...props }
 			>
