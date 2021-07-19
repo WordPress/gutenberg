@@ -1,16 +1,12 @@
 /**
  * External dependencies
  */
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { FlatList } from 'react-native';
-import { isEqual } from 'lodash';
+import { KeyboardAwareFlatList as RNKeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
 
 /**
  * WordPress dependencies
  */
-import { memo } from '@wordpress/element';
-
-const List = memo( FlatList, isEqual );
+import { useRef } from '@wordpress/element';
 
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
@@ -19,53 +15,62 @@ export const KeyboardAwareFlatList = ( {
 	autoScroll,
 	scrollViewStyle,
 	inputAccessoryViewHeight,
+	scrollEnabled,
 	...listProps
-} ) => (
-	<KeyboardAwareScrollView
-		style={ [ { flex: 1 }, scrollViewStyle ] }
-		keyboardDismissMode="none"
-		enableResetScrollToCoords={ false }
-		keyboardShouldPersistTaps="handled"
-		extraScrollHeight={ extraScrollHeight }
-		extraHeight={ 0 }
-		inputAccessoryViewHeight={ inputAccessoryViewHeight }
-		enableAutomaticScroll={ autoScroll === undefined ? false : autoScroll }
-		ref={ ( ref ) => {
-			this.scrollViewRef = ref;
-			innerRef( ref );
-		} }
-		onKeyboardWillHide={ () => {
-			this.keyboardWillShowIndicator = false;
-		} }
-		onKeyboardDidHide={ () => {
-			setTimeout( () => {
-				if (
-					! this.keyboardWillShowIndicator &&
-					this.latestContentOffsetY !== undefined &&
-					! shouldPreventAutomaticScroll()
-				) {
-					// Reset the content position if keyboard is still closed
-					if ( this.scrollViewRef ) {
-						this.scrollViewRef.scrollToPosition(
-							0,
-							this.latestContentOffsetY,
-							true
-						);
+} ) => {
+	const scrollViewRef = useRef();
+	const keyboardWillShowIndicator = useRef();
+	const latestContentOffsetY = useRef();
+	return (
+		<RNKeyboardAwareFlatList
+			style={ [ { flex: 1 }, scrollViewStyle ] }
+			contentContainerStyle={ { flexGrow: 1, backgroundColor: 'red' } }
+			keyboardDismissMode="none"
+			enableResetScrollToCoords={ false }
+			keyboardShouldPersistTaps="handled"
+			extraScrollHeight={ extraScrollHeight }
+			extraHeight={ 0 }
+			inputAccessoryViewHeight={ inputAccessoryViewHeight }
+			enableAutomaticScroll={
+				autoScroll === undefined ? false : autoScroll
+			}
+			ref={ ( ref ) => {
+				scrollViewRef.current = ref;
+				innerRef( ref );
+			} }
+			onKeyboardWillHide={ () => {
+				keyboardWillShowIndicator.current = false;
+			} }
+			onKeyboardDidHide={ () => {
+				setTimeout( () => {
+					if (
+						! keyboardWillShowIndicator.current &&
+						latestContentOffsetY.current !== undefined &&
+						! shouldPreventAutomaticScroll()
+					) {
+						// Reset the content position if keyboard is still closed
+						if ( scrollViewRef.current ) {
+							scrollViewRef.current.scrollToPosition(
+								0,
+								latestContentOffsetY.current,
+								true
+							);
+						}
 					}
-				}
-			}, 50 );
-		} }
-		onKeyboardWillShow={ () => {
-			this.keyboardWillShowIndicator = true;
-		} }
-		scrollEnabled={ listProps.scrollEnabled }
-		onScroll={ ( event ) => {
-			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
-		} }
-	>
-		<List { ...listProps } />
-	</KeyboardAwareScrollView>
-);
+				}, 50 );
+			} }
+			onKeyboardWillShow={ () => {
+				keyboardWillShowIndicator.current = true;
+			} }
+			scrollEnabled={ scrollEnabled }
+			onScroll={ ( event ) => {
+				latestContentOffsetY.current =
+					event.nativeEvent.contentOffset.y;
+			} }
+			{ ...listProps }
+		/>
+	);
+};
 
 KeyboardAwareFlatList.handleCaretVerticalPositionChange = (
 	scrollView,
