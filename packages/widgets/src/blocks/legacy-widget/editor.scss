@@ -1,18 +1,84 @@
-.wp-block-legacy-widget__edit-form {
-	&:not([hidden]) {
-		display: flow-root;
+$wide-header-height: 46px;
+
+.wp-block-legacy-widget__edit-form:not([hidden]) {
+	display: flow-root;
+
+	&.is-wide {
+		display: flex;
 	}
+}
+
+.wp-block-legacy-widget__edit-form {
 	background: $white;
 	border-radius: $radius-block-ui;
 	border: 1px solid $gray-900;
-	padding: $grid-unit-15 - 1px; //Subtract the border width.
+
+	&.is-wide {
+		flex-direction: column;
+		position: fixed;
+		top: max(#{$wide-header-height}, var(--budge-top, 0));
+		left: 299px;
+		min-width: 300px;
+		width: calc(100vw - 299px);
+		max-width: 660px;
+		max-height: calc(100% - #{$wide-header-height});
+		padding: 0;
+		background: none;
+		border-radius: 0;
+		border: none;
+
+		@media (min-width: 641px) {
+			// The customizer sidebar has a footer and the bottom of the form
+			// is offset from it.
+			padding-bottom: $wide-header-height;
+			// Allows pointer interaction to pass through.
+			pointer-events: none;
+
+			// Restores pointer interaction for the content.
+			.wp-block-legacy-widget__edit-form-header,
+			.wp-block-legacy-widget__edit-form-body {
+				pointer-events: auto;
+			}
+		}
+
+		.wp-block-legacy-widget__edit-form-header {
+			position: absolute;
+			left: 0;
+			width: 100%;
+			z-index: 1;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			background: #f0f0f1;
+			height: $wide-header-height;
+			padding: 0 5px 0 21px;
+			margin: 0;
+			border: 1px solid #dcdcde;
+		}
+
+		.wp-block-legacy-widget__edit-form-body {
+			overflow: auto;
+			margin-top: $wide-header-height;
+			border: 1px solid #dcdcde;
+			border-top-width: 0;
+			background: #fff;
+		}
+	}
+
+	.wp-block-legacy-widget__edit-form-header {
+		margin: 0 0 $grid-unit-15 0;
+		padding: $grid-unit-20 21px 0;
+	}
+	.wp-block-legacy-widget__edit-form-body {
+		padding: 0 $grid-unit-15 $grid-unit-05;
+	}
 
 	.wp-block-legacy-widget__edit-form-title {
 		color: $black;
 		font-family: $default-font;
 		font-size: 14px;
 		font-weight: 600;
-		margin: 0 0 $grid-unit-15 0;
+		margin: 0;
 	}
 
 	.widget-inside.widget-inside {
@@ -71,6 +137,10 @@
 		select {
 			padding-left: $grid-unit-05;
 		}
+	}
+
+	.widget {
+		margin-bottom: 0;
 	}
 
 	// Reset z-index set on https://github.com/WordPress/wordpress-develop/commit/f26d4d37351a55fd1fc5dad0f5fef8f0f964908c.
@@ -144,19 +214,6 @@
 .interface-complementary-area .wp-block-legacy-widget-inspector-card__name {
 	margin: 0 0 5px;
 	font-weight: 500;
-}
-
-// When wide widget is selected it opens in a popover but its container should still have a bit of height.
-.is-selected {
-	.wp-block-legacy-widget__container {
-		padding: $grid-unit-10 $grid-unit-15;
-		min-height: 50px;
-	}
-}
-
-// Wide widgets opening in popovers in the Customizer should have a min-width
-.components-popover__content .wp-block-legacy-widget__edit-form {
-	min-width: 400px;
 }
 
 .wp-block-legacy-widget {
