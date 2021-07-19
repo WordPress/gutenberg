@@ -42,7 +42,7 @@ export const separated = css`
 		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
 	}
 
-	> *:last-child:not( :focus ) {
+	> *:last-of-type:not( :focus ) {
 		border-bottom-color: transparent;
 	}
 `;
@@ -56,12 +56,12 @@ export const spacedAround = css`
 export const rounded = css`
 	border-radius: ${ borderRadius };
 
-	> *:first-child {
+	> *:first-of-type {
 		border-top-left-radius: ${ borderRadius };
 		border-top-right-radius: ${ borderRadius };
 	}
 
-	> *:last-child {
+	> *:last-of-type {
 		border-bottom-left-radius: ${ borderRadius };
 		border-bottom-right-radius: ${ borderRadius };
 	}
