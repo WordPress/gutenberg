@@ -2245,15 +2245,3 @@ export function wasBlockJustInserted( state, clientId, source ) {
 		lastBlockInserted.source === source
 	);
 }
-
-/**
- * Returns the visibility state of the duotone controls for a given clientId.
- *
- * @param {Object} state Block editor state.
- * @param {Object} clientId Client Id of the block.
- *
- * @return {boolean} Visibility of the duotone controls.
- */
-export function getDuotoneVisibility( state, clientId ) {
-	return state.duotoneControlVisibility?.[ clientId ] ?? true;
-}

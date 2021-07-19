@@ -1711,18 +1711,6 @@ export function lastBlockInserted( state = {}, action ) {
 	return state;
 }
 
-export function duotoneControlVisibility( state = {}, action ) {
-	if ( action.type === 'SHOW_DUOTONE_CONTROLS' ) {
-		const { clientId, isShown } = action;
-		return {
-			...state,
-			[ clientId ]: isShown,
-		};
-	}
-
-	return state;
-}
-
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1744,5 +1732,4 @@ export default combineReducers( {
 	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
-	duotoneControlVisibility,
 } );

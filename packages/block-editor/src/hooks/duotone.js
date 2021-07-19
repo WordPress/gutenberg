@@ -10,9 +10,8 @@ import tinycolor from 'tinycolor2';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { SVG } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-import { useContext, createPortal } from '@wordpress/element';
+import { createPortal, useContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,7 +22,6 @@ import {
 	useSetting,
 } from '../components';
 import { Head } from '../components/block-list/head';
-import { store as blockEditorStore } from '../store';
 
 const EMPTY_ARRAY = [];
 
@@ -200,15 +198,7 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { showDuotoneControls } = useDispatch( blockEditorStore );
-		function _showDuotoneControls( isShown ) {
-			return showDuotoneControls( props.clientId, isShown );
-		}
-
-		const isDuotoneActive = useSelect( ( select ) => {
-			const { getDuotoneVisibility } = select( blockEditorStore );
-			return getDuotoneVisibility( props.clientId );
-		}, [] );
+		const [ isDuotoneActive, setIsDuotoneActive ] = useState( true );
 
 		const hasDuotoneSupport = hasBlockSupport(
 			props.name,
@@ -219,7 +209,7 @@ const withDuotoneControls = createHigherOrderComponent(
 			<>
 				<BlockEdit
 					{ ...props }
-					showDuotoneControls={ _showDuotoneControls }
+					showDuotoneControls={ setIsDuotoneActive }
 				/>
 				{ hasDuotoneSupport && isDuotoneActive && (
 					<DuotonePanel { ...props } />
