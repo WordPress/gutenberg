@@ -20,31 +20,48 @@
 }
 
 .embed__icon {
-	width: 24px;
-	height: 24px;
-	justify-content: center;
-	align-items: center;
-	fill: $gray-dark;
+	fill: $light-secondary;
+}
+
+.embed__icon--dark {
+	fill: $dark-secondary;
+}
+
+.embed__icon--error {
+	margin-bottom: 6;
 }
 
 .embed__label {
 	text-align: center;
 	margin-top: 4;
-	margin-bottom: 16;
+	margin-bottom: 4;
 	font-size: 14;
-	color: #2e4453;
+	font-weight: 500;
+	color: $gray-90;
 }
 
 .embed__label--dark {
-	color: $white;
+	color: $gray-10;
 }
 
-.embed-empty__description {
+.embed__description {
+	font-size: $default-font-size;
+	text-align: center;
+	margin-bottom: 4;
+	color: $light-secondary;
+}
+
+.embed__description--dark {
+	color: $dark-secondary;
+}
+
+.embed__action {
 	width: 100%;
 	text-align: center;
 	color: $blue-wordpress;
 	font-size: 14;
 	font-weight: 500;
+	margin-top: 4;
 }
 
 .embed-preview__loading {
@@ -62,12 +79,71 @@
 	background-color: $background-dark-secondary;
 }
 
-.embed-preview__placeholder-text {
-	font-size: $default-font-size;
-	text-align: center;
-	color: $light-primary;
+.embed-preview__image {
+	flex: 1 1 auto;
 }
 
-.embed-preview__placeholder-text--dark {
-	color: $dark-primary;
+.embed-no-preview__container {
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.embed-no-preview__help-icon {
+	position: absolute;
+	top: 12;
+	right: 12;
+	width: 16;
+	height: 16;
+	fill: $light-secondary;
+}
+
+.embed-no-preview__help-icon--dark {
+	fill: $gray-20;
+}
+
+.embed-no-preview__sheet-icon {
+	width: 36;
+	height: 36;
+	fill: $light-quaternary;
+}
+
+.embed-no-preview__sheet-icon--dark {
+	fill: $gray-20;
+}
+
+.embed-no-preview__sheet-title {
+	font-weight: 600;
+	font-size: 20;
+	line-height: 28px;
+	text-align: center;
+	color: $gray-90;
+
+	padding-top: 8;
+	padding-bottom: 8;
+}
+
+.embed-no-preview__sheet-title--dark {
+	color: $white;
+}
+
+.embed-no-preview__sheet-description {
+	font-size: 16;
+	line-height: 24px;
+	text-align: center;
+	color: $gray-50;
+
+	padding-bottom: 24;
+}
+
+.embed-no-preview__sheet-description--dark {
+	color: $gray-20;
+}
+
+.embed-no-preview__sheet-button {
+	color: $blue-50;
+}
+
+.embed-no-preview__sheet-button--dark {
+	color: $blue-30;
 }

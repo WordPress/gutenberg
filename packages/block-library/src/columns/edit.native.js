@@ -107,7 +107,7 @@ function ColumnsEditContainer( {
 	const { width } = sizes || {};
 
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'layout.units' ) || [
+		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
 			'px',
 			'em',

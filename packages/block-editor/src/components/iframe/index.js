@@ -18,6 +18,7 @@ import { __experimentalStyleProvider as StyleProvider } from '@wordpress/compone
  * Internal dependencies
  */
 import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { useWritingFlow } from '../writing-flow';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -49,6 +50,12 @@ function styleSheetsCompat( doc ) {
 			return;
 		}
 
+		// Generally, ignore inline styles. We add inline styles belonging to a
+		// stylesheet later, which may or may not match the selectors.
+		if ( ownerNode.tagName !== 'LINK' ) {
+			return;
+		}
+
 		// Don't try to add the reset styles, which were removed as a dependency
 		// from `edit-blocks` for the iframe since we don't need to reset admin
 		// styles.
@@ -69,9 +76,17 @@ function styleSheetsCompat( doc ) {
 				`Stylesheet ${ ownerNode.id } was not properly added.
 For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
 For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`,
-				ownerNode
+				ownerNode.outerHTML
 			);
 			doc.head.appendChild( ownerNode.cloneNode( true ) );
+
+			// Add inline styles belonging to the stylesheet.
+			const inlineCssId = ownerNode.id.replace( '-css', '-inline-css' );
+			const inlineCssElement = document.getElementById( inlineCssId );
+
+			if ( inlineCssElement ) {
+				doc.head.appendChild( inlineCssElement.cloneNode( true ) );
+			}
 		}
 	} );
 }
@@ -177,6 +192,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 	const styles = useParsedAssets( window.__editorAssets.styles );
 	const scripts = useParsedAssets( window.__editorAssets.scripts );
 	const clearerRef = useBlockSelectionClearer();
+	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const setRef = useCallback( ( node ) => {
 		if ( ! node ) {
 			return;
@@ -202,6 +218,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			setIframeDocument( contentDocument );
 			clearerRef( documentElement );
 			clearerRef( body );
+			writingFlowRef( body );
 
 			scripts
 				.reduce(
@@ -239,33 +256,48 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 	head = (
 		<>
 			<style>{ 'body{margin:0}' }</style>
-			{ styles.map( ( { tagName, href, id, rel, media }, index ) => {
-				const TagName = tagName.toLowerCase();
-				return (
-					<TagName { ...{ href, id, rel, media } } key={ index } />
-				);
-			} ) }
+			{ styles.map(
+				( { tagName, href, id, rel, media, textContent } ) => {
+					const TagName = tagName.toLowerCase();
+
+					if ( TagName === 'style' ) {
+						return (
+							<TagName { ...{ id } } key={ id }>
+								{ textContent }
+							</TagName>
+						);
+					}
+
+					return (
+						<TagName { ...{ href, id, rel, media } } key={ id } />
+					);
+				}
+			) }
 			{ head }
 		</>
 	);
 
 	return (
-		<iframe
-			{ ...props }
-			ref={ useMergeRefs( [ ref, setRef ] ) }
-			tabIndex="0"
-			title={ __( 'Editor canvas' ) }
-			name="editor-canvas"
-		>
-			{ iframeDocument &&
-				createPortal(
-					<StyleProvider document={ iframeDocument }>
-						{ children }
-					</StyleProvider>,
-					iframeDocument.body
-				) }
-			{ iframeDocument && createPortal( head, iframeDocument.head ) }
-		</iframe>
+		<>
+			{ before }
+			<iframe
+				{ ...props }
+				ref={ useMergeRefs( [ ref, setRef ] ) }
+				tabIndex="0"
+				title={ __( 'Editor canvas' ) }
+				name="editor-canvas"
+			>
+				{ iframeDocument &&
+					createPortal(
+						<StyleProvider document={ iframeDocument }>
+							{ children }
+						</StyleProvider>,
+						iframeDocument.body
+					) }
+				{ iframeDocument && createPortal( head, iframeDocument.head ) }
+			</iframe>
+			{ after }
+		</>
 	);
 }
 

@@ -803,6 +803,29 @@ export const isSavingPost = createRegistrySelector( ( select ) => ( state ) => {
 } );
 
 /**
+ * Returns true if non-post entities are currently being saved, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether non-post entities are being saved.
+ */
+export const isSavingNonPostEntityChanges = createRegistrySelector(
+	( select ) => ( state ) => {
+		const entitiesBeingSaved = select(
+			coreStore
+		).__experimentalGetEntitiesBeingSaved();
+		const { type, id } = getCurrentPost( state );
+		return some(
+			entitiesBeingSaved,
+			( entityRecord ) =>
+				entityRecord.kind !== 'postType' ||
+				entityRecord.name !== type ||
+				entityRecord.key !== id
+		);
+	}
+);
+
+/**
  * Returns true if a previous post save was attempted successfully, or false
  * otherwise.
  *
