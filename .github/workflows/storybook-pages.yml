@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+env:
+  BROWSERSLIST_IGNORE_OLD_DATA: 1
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

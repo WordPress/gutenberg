@@ -2,7 +2,11 @@ on:
   pull_request_target:
     types: [opened]
   push:
+
 name: Pull request automation
+
+env:
+  BROWSERSLIST_IGNORE_OLD_DATA: 1
 
 jobs:
   pull-request-automation:

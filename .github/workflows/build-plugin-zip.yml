@@ -11,6 +11,9 @@ on:
     paths-ignore:
     - '**.md'
 
+env:
+  BROWSERSLIST_IGNORE_OLD_DATA: 1
+
 jobs:
   build:
     name: Build Release Artifact

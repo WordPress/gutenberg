@@ -12,6 +12,9 @@ on:
     paths-ignore:
     - '**.md'
 
+env:
+  BROWSERSLIST_IGNORE_OLD_DATA: 1
+
 jobs:
   unit-js:
     name: JavaScript

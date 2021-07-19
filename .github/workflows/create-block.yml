@@ -13,6 +13,9 @@ on:
     - '!packages/**/test/**'
     - '!packages/**/*.md'
 
+env:
+  BROWSERSLIST_IGNORE_OLD_DATA: 1
+
 jobs:
   checks:
     name: Checks

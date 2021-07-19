@@ -1,5 +1,7 @@
 name: Cancel
 on: pull_request
+env:
+  BROWSERSLIST_IGNORE_OLD_DATA: 1
 jobs:
   cancel:
     name: 'Cancel Previous Runs'
