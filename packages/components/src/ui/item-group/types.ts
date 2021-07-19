@@ -14,5 +14,5 @@ export interface ItemProps {
 
 export type ItemGroupContext = {
 	spacedAround: boolean;
-	size: 'small' | 'medium' | 'large';
+	size: ItemSize;
 };
