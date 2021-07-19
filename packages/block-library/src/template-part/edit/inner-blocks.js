@@ -52,9 +52,9 @@ export default function TemplatePartInnerBlocks( {
 		value: blocks,
 		onInput,
 		onChange,
-		renderAppender: hasInnerBlocks
-			? undefined
-			: InnerBlocks.ButtonBlockAppender,
+		appender: hasInnerBlocks ? undefined : (
+			<InnerBlocks.ButtonBlockAppender />
+		),
 		__experimentalLayout: _layout,
 	} );
 

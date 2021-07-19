@@ -17,9 +17,9 @@ const QUOTE_INSERT_BUTTON_SELECTOR = '//button[.="Quote"]';
 const APPENDER_SELECTOR = '.my-custom-awesome-appender';
 const DYNAMIC_APPENDER_SELECTOR = 'my-dynamic-blocks-appender';
 
-describe( 'RenderAppender prop of InnerBlocks', () => {
+describe( 'Appender prop of InnerBlocks', () => {
 	beforeAll( async () => {
-		await activatePlugin( 'gutenberg-test-innerblocks-render-appender' );
+		await activatePlugin( 'gutenberg-test-innerblocks-appender' );
 	} );
 
 	beforeEach( async () => {
@@ -27,12 +27,12 @@ describe( 'RenderAppender prop of InnerBlocks', () => {
 	} );
 
 	afterAll( async () => {
-		await deactivatePlugin( 'gutenberg-test-innerblocks-render-appender' );
+		await deactivatePlugin( 'gutenberg-test-innerblocks-appender' );
 	} );
 
 	it( 'Users can customize the appender and can still insert blocks using exposed components', async () => {
-		// Insert the InnerBlocks renderAppender block.
-		await insertBlock( 'InnerBlocks renderAppender' );
+		// Insert the InnerBlocks appender block.
+		await insertBlock( 'InnerBlocks appender' );
 		await closeGlobalBlockInserter();
 		// Wait for the custom block appender to appear.
 		await page.waitForSelector( APPENDER_SELECTOR );
@@ -67,8 +67,8 @@ describe( 'RenderAppender prop of InnerBlocks', () => {
 	} );
 
 	it( 'Users can dynamically customize the appender', async () => {
-		// Insert the InnerBlocks renderAppender dynamic block.
-		await insertBlock( 'InnerBlocks renderAppender dynamic' );
+		// Insert the InnerBlocks appender dynamic block.
+		await insertBlock( 'InnerBlocks appender dynamic' );
 		await closeGlobalBlockInserter();
 
 		// Wait for the custom dynamic block appender to appear.

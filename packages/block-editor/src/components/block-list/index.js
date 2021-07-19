@@ -81,6 +81,7 @@ function Items( {
 	placeholder,
 	rootClientId,
 	renderAppender,
+	appender,
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
 } ) {
@@ -142,6 +143,7 @@ function Items( {
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
+				appender={ appender }
 			/>
 		</LayoutProvider>
 	);

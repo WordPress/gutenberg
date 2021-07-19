@@ -10,6 +10,7 @@ import classnames from 'classnames';
 import { createContext } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -30,19 +31,33 @@ function BlockListAppender( {
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
-	renderAppender: CustomAppender,
+	renderAppender: CustomAppender, // Deprecated.
+	appender,
 	className,
 	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	if ( isLocked || CustomAppender === false ) {
+	if ( CustomAppender !== undefined ) {
+		deprecated( 'renderAppender prop', {
+			since: '11.0',
+			alternative: 'appender prop',
+		} );
+	}
+
+	if (
+		isLocked ||
+		appender === null ||
+		appender === false ||
+		CustomAppender === false
+	) {
 		return null;
 	}
 
-	let appender;
-	if ( CustomAppender ) {
-		// Prefer custom render prop if provided.
-		appender = <CustomAppender />;
+	let blockAppender;
+	if ( appender ) {
+		blockAppender = appender;
+	} else if ( CustomAppender ) {
+		blockAppender = <CustomAppender />;
 	} else {
 		const isDocumentAppender = ! rootClientId;
 		const isParentSelected = selectedBlockClientId === rootClientId;
@@ -60,18 +75,18 @@ function BlockListAppender( {
 		}
 
 		if ( canInsertDefaultBlock ) {
-			// Render the default block appender when renderAppender has not been
+			// Render the default block appender when appender has not been
 			// provided and the context supports use of the default appender.
-			appender = (
+			blockAppender = (
 				<DefaultBlockAppender
 					rootClientId={ rootClientId }
 					lastBlockClientId={ last( blockClientIds ) }
 				/>
 			);
 		} else {
-			// Fallback in the case no renderAppender has been provided and the
+			// Fallback in the case no appender has been provided and the
 			// default block can't be inserted.
-			appender = (
+			blockAppender = (
 				<ButtonBlockAppender
 					rootClientId={ rootClientId }
 					className="block-list-appender__toggle"
@@ -96,7 +111,7 @@ function BlockListAppender( {
 			onFocus={ stopPropagation }
 			className={ classnames( 'block-list-appender', className ) }
 		>
-			{ appender }
+			{ blockAppender }
 		</TagName>
 	);
 }

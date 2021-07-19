@@ -14,7 +14,6 @@ import {
 	Platform,
 } from '@wordpress/element';
 import {
-	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	JustifyToolbar,
@@ -149,12 +148,11 @@ function Navigation( {
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: attributes.orientation || 'horizontal',
-			renderAppender:
-				( isImmediateParentOfSelectedBlock &&
+			appender:
+				( ( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
-				isSelected
-					? InnerBlocks.DefaultAppender
-					: false,
+					isSelected ) &&
+				undefined,
 			__experimentalAppenderTagName: 'li',
 			__experimentalCaptureToolbars: true,
 			// Template lock set to false here so that the Nav
