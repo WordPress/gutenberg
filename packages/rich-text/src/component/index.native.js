@@ -867,6 +867,7 @@ export class RichText extends Component {
 			parentBlockStyles,
 			accessibilityLabel,
 			disableEditingMenu = false,
+			baseGlobalStyles,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -986,6 +987,7 @@ export class RichText extends Component {
 					placeholderTextColor={
 						style?.placeholderColor ||
 						this.props.placeholderTextColor ||
+						( baseGlobalStyles && baseGlobalStyles?.color?.text ) ||
 						defaultPlaceholderTextColor
 					}
 					deleteEnter={ this.props.deleteEnter }
@@ -1011,6 +1013,7 @@ export class RichText extends Component {
 					color={
 						( style && style.color ) ||
 						( parentBlockStyles && parentBlockStyles.color ) ||
+						( baseGlobalStyles && baseGlobalStyles?.color?.text ) ||
 						defaultColor
 					}
 					maxImagesWidth={ 200 }
@@ -1077,12 +1080,15 @@ export default compose( [
 			'attributes',
 			'childrenStyles',
 		] );
+		const baseGlobalStyles = getSettings()
+			?.__experimentalGlobalStylesBaseStyles;
 
 		return {
 			areMentionsSupported:
 				getSettings( 'capabilities' ).mentions === true,
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
 			...{ parentBlockStyles },
+			baseGlobalStyles,
 		};
 	} ),
 	withPreferredColorScheme,
