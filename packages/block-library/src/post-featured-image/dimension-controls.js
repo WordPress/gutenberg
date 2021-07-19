@@ -41,8 +41,9 @@ const DimensionControls = ( {
 	attributes: { width, height, scale },
 	setAttributes,
 } ) => {
+	const defaultUnits = [ 'px', '%', 'vw', 'em', 'rem' ];
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
+		availableUnits: useSetting( 'spacing.units' ) || defaultUnits,
 	} );
 	const onDimensionChange = ( dimension, nextValue ) => {
 		const parsedValue = parseFloat( nextValue );
