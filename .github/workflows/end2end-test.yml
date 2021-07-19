@@ -35,6 +35,12 @@ jobs:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
+            - name: Configure Jest cache
+              uses: actions/cache@c64c572235d810460d0d6876e9c705ad5002b353 # v.2.1.6
+              with:
+                  path: ${{ github.workspace }}/.jest-cache
+                  key: ${{ runner.os }}-jest-${{ hashFiles( 'packages/e2e-tests' ) }}
+
             - name: Npm install and build
               run: |
                   npm ci
@@ -47,7 +53,7 @@ jobs:
             - name: Running the tests
               run: |
                   $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
+                  $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == ${{ matrix.part }} - 1' < ${{ github.workspace }}/.jest-e2e-tests )
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
               uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
