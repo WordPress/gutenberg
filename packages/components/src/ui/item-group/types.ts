@@ -11,3 +11,8 @@ export interface ItemProps {
 	isAction?: boolean;
 	size?: ItemSize;
 }
+
+export type ItemGroupContext = {
+	spacedAround: boolean;
+	size: 'small' | 'medium' | 'large';
+};
