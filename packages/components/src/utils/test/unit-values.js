@@ -19,6 +19,7 @@ describe( 'unit-values', () => {
 	describe( 'parseCSSUnitValue', () => {
 		it.each`
 			value                  | output
+			${ '10fr' }            | ${ [ 10, 'fr' ] }
 			${ '10cm' }            | ${ [ 10, 'cm' ] }
 			${ '10mm' }            | ${ [ 10, 'mm' ] }
 			${ '10Q' }             | ${ [ 10, 'Q' ] }
@@ -38,6 +39,8 @@ describe( 'unit-values', () => {
 			${ '10 vmax' }         | ${ [ 10, 'vmax' ] }
 			${ '10notacssunit' }   | ${ [ 10, undefined ] }
 			${ 'notaunitedvalue' } | ${ [ undefined, undefined ] }
+			${ '10' }              | ${ [ 10, undefined ] }
+			${ 10 }                | ${ [ 10, undefined ] }
 			${ null }              | ${ [ undefined, undefined ] }
 			${ undefined }         | ${ [ undefined, undefined ] }
 		`( 'should parse $value into $output', ( { value, output } ) =>

@@ -23,14 +23,12 @@ export function parseCSSUnitValue(
 	num = Number.isNaN( num ) ? undefined : num;
 
 	const matched = value.match(
-		/[\d.\-+]*\s*(cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|vw|vh|vmin|vmax)/
+		/[\d.\-+]*\s*(fr|cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|vw|vh|vmin|vmax)/
 	);
 	if ( ! matched ) {
 		return [ num, undefined ];
 	}
-	const [ , unitMatch ] = matched;
-
-	const unit = ! isNil( unitMatch ) ? unitMatch : '';
+	const [ , unit ] = matched;
 
 	return [ num, unit ];
 }
