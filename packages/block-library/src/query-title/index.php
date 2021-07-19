@@ -15,18 +15,8 @@
  * @return string Returns the query title based on the queried object.
  */
 function render_block_core_query_title( $attributes ) {
-	$type       = isset( $attributes['type'] ) ? $attributes['type'] : null;
 	$is_search  = is_search();
 	$is_archive = is_archive();
-	$is_404		= is_404();
-	if (
-		! $type ||
-		( 'archive' === $type && ! $is_archive ) ||
-		( 'search' === $type && ! $is_search ) ||
-		( '404' === $type && ! $is_404 )
-	) {
-		return '';
-	}
 	$title = isset( $attributes['content'] ) ? $attributes['content'] : '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();

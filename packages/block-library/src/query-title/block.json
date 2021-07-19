@@ -7,10 +7,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"content": {
-			"type": "string"
-		},
-		"type": {
-			"type": "string"
+			"type": "string",
+			"default": "Query title"
 		},
 		"textAlign": {
 			"type": "string"

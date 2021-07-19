@@ -21,28 +21,16 @@ import { __ } from '@wordpress/i18n';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
-const SUPPORTED_TYPES = [ 'archive', 'search', '404' ];
-
 export default function QueryTitleEdit( {
 	attributes: { content, type, level, textAlign },
 	setAttributes,
 } ) {
 	const TagName = `h${ level }`;
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: classnames( 'wp-block-query-title__placeholder', {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
-			'wp-block-query-title__placeholder': type === 'archive',
 		} ),
 	} );
-	// The plan is to augment this block with more
-	// block variations like `Search Title`.
-	if ( ! SUPPORTED_TYPES.includes( type ) ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>{ __( 'Provided type is not supported.' ) }</Warning>
-			</div>
-		);
-	}
 
 	let titleElement;
 	if ( type === 'archive' ) {
