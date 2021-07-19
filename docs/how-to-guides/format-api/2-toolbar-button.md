@@ -66,7 +66,7 @@ You may also want to check that upon clicking the button the `toggle format` mes
 ## Show the button only for specific blocks
 
 By default, the button is rendered on every rich text toolbar (image captions, buttons, paragraphs, etc).
-It is possible to render the button only on blocks of a certain type by using `wp.data.withSelect` together with `wp.compose.ifCondition`.
+It is possible to render the button only on blocks of a certain type by using `wp.data.useSelect` together with `wp.compose.ifCondition`.
 The following sample code renders the previously shown button only on Paragraph blocks:
 
 {% codetabs %}
@@ -74,7 +74,7 @@ The following sample code renders the previously shown button only on Paragraph 
 
 ```js
 ( function ( wp ) {
-	var withSelect = wp.data.withSelect;
+	var useSelect = wp.data.useSelect;
 	var ifCondition = wp.compose.ifCondition;
 	var compose = wp.compose.compose;
 	var MyCustomButton = function ( props ) {
@@ -87,7 +87,7 @@ The following sample code renders the previously shown button only on Paragraph 
 		} );
 	};
 	var ConditionalButton = compose(
-		withSelect( function ( select ) {
+		useSelect( function ( select ) {
 			return {
 				selectedBlock: select( 'core/editor' ).getSelectedBlock(),
 			};
@@ -115,7 +115,7 @@ The following sample code renders the previously shown button only on Paragraph 
 import { compose, ifCondition } from '@wordpress/compose';
 import { registerFormatType } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 const MyCustomButton = ( props ) => {
 	return (
@@ -130,7 +130,7 @@ const MyCustomButton = ( props ) => {
 };
 
 const ConditionalButton = compose(
-	withSelect( function ( select ) {
+	useSelect( function ( select ) {
 		return {
 			selectedBlock: select( 'core/editor' ).getSelectedBlock(),
 		};

@@ -10,7 +10,7 @@ The first step is to convert the functions `mapSelectToProps` and `mapDispatchTo
 	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
-	var withSelect = wp.data.withSelect;
+	var useSelect = wp.data.useSelect;
 	var withDispatch = wp.data.withDispatch;
 
 	var MetaBlockField = function ( props ) {
@@ -23,7 +23,7 @@ The first step is to convert the functions `mapSelectToProps` and `mapDispatchTo
 		} );
 	};
 
-	var MetaBlockFieldWithData = withSelect( function ( select ) {
+	var MetaBlockFieldWithData = useSelect( function ( select ) {
 		return {
 			metaFieldValue: select( 'core/editor' ).getEditedPostAttribute(
 				'meta'
@@ -69,7 +69,7 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
-	var withSelect = wp.data.withSelect;
+	var useSelect = wp.data.useSelect;
 	var withDispatch = wp.data.withDispatch;
 	var compose = wp.compose.compose;
 
@@ -83,7 +83,7 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 				},
 			};
 		} ),
-		withSelect( function ( select ) {
+		useSelect( function ( select ) {
 			return {
 				metaFieldValue: select( 'core/editor' ).getEditedPostAttribute(
 					'meta'
@@ -120,11 +120,11 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 } )( window.wp );
 ```
 
-Finally, extract the meta field name (`sidebar_plugin_meta_block_field`) from the `withSelect` and `withDispatch` functions to a single place, so it's easier to change in the future. You can leverage the fact that `withSelect` and `withDispatch` first functions can take the props of the UI component they wrap as a second argument. For example:
+Finally, extract the meta field name (`sidebar_plugin_meta_block_field`) from the `useSelect` and `withDispatch` functions to a single place, so it's easier to change in the future. You can leverage the fact that `useSelect` and `withDispatch` first functions can take the props of the UI component they wrap as a second argument. For example:
 
 ```js
 // ...
-var MetaBlockFieldWithData = withSelect( function ( select, props ) {
+var MetaBlockFieldWithData = useSelect( function ( select, props ) {
 	console.log( props.metaFieldName );
 } )( MetaBlockField );
 
@@ -135,7 +135,7 @@ el( MetaBlockFieldWithData, {
 // ...
 ```
 
-Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change the code to take advantage of that:
+Notice how the `metaFieldName` can be accessed within `useSelect`. Let's change the code to take advantage of that:
 
 ```js
 ( function ( wp ) {
@@ -143,7 +143,7 @@ Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change
 	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
-	var withSelect = wp.data.withSelect;
+	var useSelect = wp.data.useSelect;
 	var withDispatch = wp.data.withDispatch;
 	var compose = wp.compose.compose;
 
@@ -157,7 +157,7 @@ Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change
 				},
 			};
 		} ),
-		withSelect( function ( select, props ) {
+		useSelect( function ( select, props ) {
 			return {
 				metaFieldValue: select( 'core/editor' ).getEditedPostAttribute(
 					'meta'
