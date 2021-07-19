@@ -32,6 +32,7 @@ const DEFAULT_QUERY = {
 	per_page: -1,
 	orderby: 'name',
 	order: 'asc',
+	_fields: 'id,name,parent',
 	context: 'view',
 };
 
