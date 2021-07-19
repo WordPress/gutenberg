@@ -75,6 +75,10 @@ function createScreencastClient() {
 					} );
 			}
 
+			if ( ! this.currentFrame ) {
+				return;
+			}
+
 			this.ctx.clearRect( 0, 0, this.canvas.width, this.canvas.height );
 			this.ctx.drawImage( this.currentFrame, 0, 0 );
 		}
