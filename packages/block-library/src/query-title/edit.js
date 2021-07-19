@@ -21,7 +21,7 @@ import { useEffect } from '@wordpress/element';
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 export default function QueryTitleEdit( {
-	attributes: { level, textAlign },
+	attributes: { content, level, textAlign },
 	setAttributes,
 	context: { templateSlug },
 } ) {
@@ -32,31 +32,32 @@ export default function QueryTitleEdit( {
 		} ),
 	} );
 
-	let titleContent;
+	// Infer title content from template slug context
+	// Defaults to content attribute prop
 	switch ( templateSlug ) {
 		case 'archive':
-			titleContent = __( 'Archive title' );
+			content = __( 'Archive title' );
 			break;
 		case 'search':
 			// translators: Title for search template with dynamic content placeholders.
-			titleContent = _x(
+			content = _x(
 				'Search results for "%search%"',
 				'search template title'
 			);
 			break;
 		case '404':
 			// translators: Title for 404 template.
-			titleContent = _x( 'Nothing found', '404 template title' );
+			content = _x( 'Nothing found', '404 template title' );
 			break;
 	}
 
-	const titleElement = <TagName { ...blockProps }>{ titleContent }</TagName>;
-
 	useEffect( () => {
 		setAttributes( {
-			content: titleContent,
+			content,
 		} );
 	}, [] );
+
+	const titleElement = <TagName { ...blockProps }>{ content }</TagName>;
 
 	return (
 		<>
