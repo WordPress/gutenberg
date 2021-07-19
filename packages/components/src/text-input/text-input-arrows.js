@@ -14,6 +14,7 @@ import {
 	forwardRef,
 	useRef,
 } from '@wordpress/element';
+import { useI18n } from '@wordpress/react-i18n';
 
 /**
  * Internal dependencies
@@ -66,6 +67,7 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 	const timeoutDurationEnd = 20;
 	const timeoutDurationRef = useRef( timeoutDurationStart );
 	const cx = useCx();
+	const { __ } = useI18n();
 
 	const handleOnClearTimers = useCallback( () => {
 		if ( timeoutRef.current ) {
@@ -118,6 +120,8 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 		<>
 			<Icon
 				className={ cx( styles.SpinnerArrowUp ) }
+				aria-label={ __( 'Increment' ) }
+				role="button"
 				onClick={ onIncrement }
 				onMouseDown={ handleOnMouseDownIncrement }
 				onMouseLeave={ handleOnClearTimers }
@@ -129,6 +133,8 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 			/>
 			<Icon
 				className={ cx( styles.SpinnerArrowDown ) }
+				aria-label={ __( 'Decrement' ) }
+				role="button"
 				onClick={ onDecrement }
 				onMouseDown={ handleOnMouseDownDecrement }
 				onMouseLeave={ handleOnClearTimers }

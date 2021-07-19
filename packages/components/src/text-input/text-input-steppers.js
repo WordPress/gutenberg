@@ -14,6 +14,7 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { minus, plus } from '@wordpress/icons';
+import { useI18n } from '@wordpress/react-i18n';
 
 /**
  * Internal dependencies
@@ -77,6 +78,7 @@ function TextInputSteppers( props, forwardedRef ) {
  * @return {import('react').ReactElement} The _UpDownArrows component.
  */
 const _UpDownArrows = ( { disabled, onIncrement, onDecrement } ) => {
+	const { __ } = useI18n();
 	/** @type {import('react').MutableRefObject<number | undefined>} */
 	const timeoutRef = useRef();
 	const timeoutDurationStart = 500;
@@ -156,6 +158,7 @@ const _UpDownArrows = ( { disabled, onIncrement, onDecrement } ) => {
 				onMouseUp={ handleOnClearTimers }
 				height={ `calc(100% - 4px)` }
 				type="button"
+				aria-label={ __( 'Increment' ) }
 			>
 				<Icon icon={ plus } size={ 12 } width={ 20 } />
 			</styles.StepperButton>
@@ -167,6 +170,7 @@ const _UpDownArrows = ( { disabled, onIncrement, onDecrement } ) => {
 				onMouseUp={ handleOnClearTimers }
 				height={ `calc(100% - 4px)` }
 				type="button"
+				aria-label={ __( 'Decrement' ) }
 			>
 				<Icon icon={ minus } size={ 12 } width={ 20 } />
 			</styles.StepperButton>
