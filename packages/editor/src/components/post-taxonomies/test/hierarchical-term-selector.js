@@ -4,6 +4,7 @@
 import {
 	sortBySelected,
 	getFilterMatcher,
+	findTerm,
 } from '../hierarchical-term-selector';
 
 describe( 'sortBySelected', () => {
@@ -79,6 +80,43 @@ describe( 'sortBySelected', () => {
 
 		const tree = sortBySelected( input, [ 2245 ] );
 		expect( tree ).toEqual( output );
+	} );
+} );
+
+describe( 'findTerm', () => {
+	test( 'should be match term', () => {
+		const input = [
+			{ id: 2249, parent: 0, name: 'single' },
+			{ id: 2232, parent: 0, name: 'parent' },
+			{ id: 2245, parent: 2232, name: 'child1' },
+			{ id: 2246, parent: 2232, name: 'child2' },
+		];
+
+		const output = { id: 2232, parent: 0, name: 'parent' };
+		expect( findTerm( input, 0, 'parent' ) ).toEqual( output );
+	} );
+
+	test( 'should be match child term.', () => {
+		const input = [
+			{ id: 2249, parent: 0, name: 'single' },
+			{ id: 2232, parent: 0, name: 'parent' },
+			{ id: 2245, parent: 2232, name: 'child1' },
+			{ id: 2246, parent: 2232, name: 'child2' },
+		];
+
+		const output = { id: 2245, parent: 2232, name: 'child1' };
+		expect( findTerm( input, 2232, 'child1' ) ).toEqual( output );
+	} );
+
+	test( 'should be undefined when the wrong parent is specified', () => {
+		const input = [
+			{ id: 2249, parent: 0, name: 'single' },
+			{ id: 2232, parent: 0, name: 'parent' },
+			{ id: 2245, parent: 2232, name: 'child1' },
+			{ id: 2246, parent: 2232, name: 'child2' },
+		];
+
+		expect( findTerm( input, 2249, 'child1' ) ).toEqual( undefined );
 	} );
 } );
 

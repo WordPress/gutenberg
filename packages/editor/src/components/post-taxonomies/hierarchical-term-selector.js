@@ -93,7 +93,7 @@ export function sortBySelected( termsTree, terms ) {
  * @param {string}        name   Term name.
  * @return {Object} Term object.
  */
-function findTerm( terms, parent, name ) {
+export function findTerm( terms, parent, name ) {
 	return find( terms, ( term ) => {
 		return (
 			( ( ! term.parent && ! parent ) ||
