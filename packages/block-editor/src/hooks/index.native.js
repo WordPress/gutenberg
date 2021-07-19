@@ -11,3 +11,4 @@ import './font-size';
 
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
+export { getSpacingClassesAndStyles } from './use-spacing-props';

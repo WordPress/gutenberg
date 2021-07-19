@@ -66,6 +66,10 @@
 			"__experimentalFontFamily": true
 		},
 		"reusable": false,
+		"spacing": {
+			"__experimentalSkipSerialization": true,
+			"padding": true
+		},
 		"__experimentalBorder": {
 			"radius": true,
 			"__experimentalSkipSerialization": true
