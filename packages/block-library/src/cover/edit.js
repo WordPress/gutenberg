@@ -60,7 +60,6 @@ import {
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
-	useDuotoneControlVisibility,
 } from './shared';
 
 /**
@@ -323,7 +322,10 @@ function CoverEdit( {
 		url,
 	} = attributes;
 
-	useDuotoneControlVisibility( showDuotoneControls, attributes );
+	const isDuotoneAvailable = !! url && ! hasParallax && ! isRepeated;
+	useEffect( () => {
+		showDuotoneControls( isDuotoneAvailable );
+	}, [ showDuotoneControls, isDuotoneAvailable ] );
 
 	const {
 		gradientClass,

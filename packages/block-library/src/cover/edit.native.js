@@ -58,7 +58,6 @@ import { store as editPostStore } from '@wordpress/edit-post';
 import styles from './style.scss';
 import {
 	attributesFromMedia,
-	useDuotoneControlVisibility,
 	ALLOWED_MEDIA_TYPES,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
@@ -91,7 +90,6 @@ const Cover = ( {
 	isSelected,
 	selectBlock,
 	blockWidth,
-	showDuotoneControls,
 } ) => {
 	const {
 		backgroundType,
@@ -104,9 +102,6 @@ const Cover = ( {
 		customOverlayColor,
 		minHeightUnit = 'px',
 	} = attributes;
-
-	useDuotoneControlVisibility( showDuotoneControls, attributes );
-
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false
 	);

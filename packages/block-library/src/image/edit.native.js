@@ -171,16 +171,12 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		const { attributes } = this.props;
 		if ( ! previousProps.image && this.props.image ) {
-			const { image } = this.props;
+			const { image, attributes } = this.props;
 			const url =
 				getUrlForSlug( image, attributes?.sizeSlug ) ||
 				image.source_url;
 			this.props.setAttributes( { url } );
-		}
-		if ( ! previousProps.attributes.url !== ! attributes.url ) {
-			this.props.showDuotoneControls( !! attributes.url );
 		}
 	}
 

@@ -105,22 +105,3 @@ export function getPositionClassName( contentPosition ) {
 
 	return POSITION_CLASSNAMES[ contentPosition ];
 }
-
-/**
- * Hook that hides and shows the duotone control based on when it should work.
- *
- * @param {Function} showDuotoneControls    Function to show or hide duotone controls.
- * @param {Object}   attributes             Block attributes.
- * @param {string}   attributes.url         Media URL.
- * @param {boolean}  attributes.hasParallax Parallax enabled.
- * @param {boolean}  attributes.isRepeated  Repeat enabled.
- */
-export function useDuotoneControlVisibility(
-	showDuotoneControls,
-	{ url, hasParallax, isRepeated }
-) {
-	const isDuotoneAvailable = !! url && ! hasParallax && ! isRepeated;
-	useEffect( () => {
-		showDuotoneControls( isDuotoneAvailable );
-	}, [ showDuotoneControls, isDuotoneAvailable ] );
-}
