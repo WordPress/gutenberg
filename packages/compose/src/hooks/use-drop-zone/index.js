@@ -138,12 +138,27 @@ export default function useDropZone( {
 				}
 			}
 
+			/** @type {number | undefined} */
+			let lastDragX;
+			/** @type {number | undefined} */
+			let lastDragY;
 			function onDragOver( /** @type {DragEvent} */ event ) {
 				// Only call onDragOver for the innermost hovered drop zones.
-				if ( ! event.defaultPrevented && onDragOverRef.current ) {
-					onDragOverRef.current( event );
+				if (
+					! event.defaultPrevented &&
+					onDragOverRef.current &&
+					lastDragX !== undefined &&
+					lastDragY !== undefined
+				) {
+					const distance =
+						Math.abs( event.clientY - lastDragY ) +
+						Math.abs( event.clientX - lastDragX );
+					if ( distance !== 0 && distance < 10 ) {
+						onDragOverRef.current( event );
+					}
 				}
-
+				lastDragX = event.clientX;
+				lastDragY = event.clientY;
 				// Prevent the browser default while also signalling to parent
 				// drop zones that `onDragOver` is already handled.
 				event.preventDefault();
