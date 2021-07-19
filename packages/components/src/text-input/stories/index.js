@@ -82,6 +82,19 @@ export const numberStepper = () => {
 	);
 };
 
+export const numberArrows = () => {
+	return (
+		<View
+			style={ {
+				marginTop: '20vh',
+			} }
+			width={ 480 }
+		>
+			<TextInput arrows type="number" defaultValue="1" />
+		</View>
+	);
+};
+
 export const multiline = () => {
 	return <TextInput maxRows={ 6 } minRows={ 3 } multiline />;
 };

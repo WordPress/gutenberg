@@ -26,9 +26,9 @@ import { useCx } from '../utils/hooks';
 
 /**
  * @typedef Props
- * @property {import('react').MutableRefObject<null | HTMLElement>} [dragHandlersRef] Drag handler React ref.
- * @property {() => void}                                           [increment]       Increment text input number value callback.
- * @property {() => void}                                           [decrement]       Decrement text input number value callback.
+ * @property {import('react').MutableRefObject<import('./hooks/use-base-drag-handlers').UseBaseDragHandlersProps>} [dragHandlersRef] Drag handler React ref.
+ * @property {() => void}                                                                                          [increment]       Increment text input number value callback.
+ * @property {() => void}                                                                                          [decrement]       Decrement text input number value callback.
  */
 
 /**
@@ -43,10 +43,9 @@ function TextInputArrows( props, forwardedRef ) {
 
 	return (
 		<View className={ cx( styles.SpinnerWrapper ) }>
-			{ /* @ts-ignore Check PolymorphicComponent. No overload matches this call. */ }
 			<VStack
 				{ ...dragHandlers }
-				className={ styles.Spinner }
+				className={ cx( styles.Spinner ) }
 				expanded={ true }
 				spacing={ 0 }
 				ref={ forwardedRef }
@@ -66,6 +65,7 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 	const timeoutDurationStart = 500;
 	const timeoutDurationEnd = 20;
 	const timeoutDurationRef = useRef( timeoutDurationStart );
+	const cx = useCx();
 
 	const handleOnClearTimers = useCallback( () => {
 		if ( timeoutRef.current ) {
@@ -117,7 +117,7 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 	return (
 		<>
 			<Icon
-				className={ styles.SpinnerArrowUp }
+				className={ cx( styles.SpinnerArrowUp ) }
 				onClick={ onIncrement }
 				onMouseDown={ handleOnMouseDownIncrement }
 				onMouseLeave={ handleOnClearTimers }
@@ -128,7 +128,7 @@ const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
 				width={ 16 }
 			/>
 			<Icon
-				className={ styles.SpinnerArrowDown }
+				className={ cx( styles.SpinnerArrowDown ) }
 				onClick={ onDecrement }
 				onMouseDown={ handleOnMouseDownDecrement }
 				onMouseLeave={ handleOnClearTimers }
