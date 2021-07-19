@@ -7,8 +7,12 @@ import type { FormElementProps, SizeRangeReduced } from '../utils/types';
 export type TextInputArrow = 'stepper' | boolean;
 type TextInputFormat = 'number' | 'type';
 
+export type DragAxis = 'x' | 'y';
+
 export type Props = Omit< BaseFieldProps, 'isClickable' | 'isSubtle' > &
 	FormElementProps< string > & {
+		min?: number;
+		max?: number;
 		/**
 		 * Renders specified incrementer/decrementer arrows.
 		 *
@@ -18,7 +22,7 @@ export type Props = Omit< BaseFieldProps, 'isClickable' | 'isSubtle' > &
 		/**
 		 * The axis along which to drag a number input's value.
 		 */
-		dragAxis?: 'x' | 'y';
+		dragAxis?: DragAxis;
 		/**
 		 * Renders an error state.
 		 *

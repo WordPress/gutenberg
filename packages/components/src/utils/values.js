@@ -63,6 +63,7 @@ const ARABIC_NUMERAL_LOCALES = [ 'ar', 'fa', 'ur', 'ckb', 'ps' ];
 
 const EASTERN_ARABIC_NUMBERS = /([۰-۹]|[٠-٩])/g;
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Checks to see if a value is a numeric value (`number` or `string`).
  *
@@ -71,9 +72,10 @@ const EASTERN_ARABIC_NUMBERS = /([۰-۹]|[٠-٩])/g;
  *
  * @param {any}    value
  * @param {string} [locale]
- * @return {boolean} Whether value is numeric.
+ * @return {value is string | number} Whether value is numeric.
  */
 export function isValueNumeric( value, locale = window.navigator.language ) {
+	/* eslint-enable jsdoc/valid-types */
 	if ( ARABIC_NUMERAL_LOCALES.some( ( l ) => locale.startsWith( l ) ) ) {
 		locale = 'en-GB';
 		if ( EASTERN_ARABIC_NUMBERS.test( value ) ) {

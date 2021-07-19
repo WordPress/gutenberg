@@ -12,32 +12,31 @@ import { useCallback, useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-
+import type { DragAxis } from '../types';
 import { clearSelection } from '../../utils/clear-selection';
+import { useCx } from '../../utils/hooks';
 
 import * as styles from '../styles';
 
-/**
- * @typedef Props
- * @property {(int: number|undefined) => void} [increment] Increment text input number value callback.
- * @property {(int: number|undefined) => void} [decrement] Decrement text input number value callback.
- * @property {boolean} [isTypeNumeric] Whether the type is numeric.
- * @property {string} [dragAxis] The drag axis, e.g., `x` or `y`.
- */
+export interface UseBaseDragHandlersProps {
+	increment?: ( n?: number ) => void;
+	decrement?: ( n?: number ) => void;
+	isTypeNumeric?: boolean;
+	dragAxis?: DragAxis;
+}
 
-/**
- * @param {Props} props
- */
 export function useBaseDragHandlers( {
 	decrement = noop,
 	dragAxis,
 	increment = noop,
 	isTypeNumeric = true,
-} ) {
-	const [ dragState, setDragState ] = useState(
-		/** @type {undefined | 'x' | 'y'} */ ( undefined )
+}: UseBaseDragHandlersProps ) {
+	const [ dragState, setDragState ] = useState< DragAxis | undefined >(
+		undefined
 	);
 	const threshold = 10;
+
+	const cx = useCx();
 
 	useEffect( () => {
 		if ( dragState ) {
@@ -45,25 +44,25 @@ export function useBaseDragHandlers( {
 
 			if ( dragState === 'x' ) {
 				document.documentElement.classList.add(
-					styles.globalDraggableX
+					cx( styles.globalDraggableX )
 				);
 				document.documentElement.classList.remove(
-					styles.globalDraggableY
+					cx( styles.globalDraggableY )
 				);
 			} else {
 				document.documentElement.classList.remove(
-					styles.globalDraggableX
+					cx( styles.globalDraggableX )
 				);
 				document.documentElement.classList.add(
-					styles.globalDraggableY
+					cx( styles.globalDraggableY )
 				);
 			}
 		} else {
 			document.documentElement.classList.remove(
-				styles.globalDraggableX
+				cx( styles.globalDraggableX )
 			);
 			document.documentElement.classList.remove(
-				styles.globalDraggableY
+				cx( styles.globalDraggableY )
 			);
 		}
 	}, [ dragState ] );
@@ -107,7 +106,7 @@ export function useBaseDragHandlers( {
 	const gestures = {
 		...baseGestures,
 		onMouseUp: handleOnMouseUp,
-	};
+	} as const;
 
 	return gestures;
 }

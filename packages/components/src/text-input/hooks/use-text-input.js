@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { cx } from 'emotion';
 import TextareaAutosize from 'react-autosize-textarea';
 
 /**
@@ -17,13 +16,14 @@ import { useBaseField } from '../../base-field';
 import { useFormGroupContextId } from '../../ui/form-group';
 import * as styles from '../styles';
 import { useTextInputState } from './use-text-input-state';
+import { useCx } from '../../utils/hooks';
 
 /**
  * @typedef Props
- * @property {import('react').MutableRefObject<any>} [dragHandlersRef] Drag handlers ref.
- * @property {import('react').MutableRefObject<undefined | HTMLElement>} [inputRef] The input element ref.
- * @property {boolean} [isFocused] Renders focus styles.
- * @property {boolean} [isTypeNumeric] Whether the type is numeric.
+ * @property {import('react').MutableRefObject<any>}                     [dragHandlersRef] Drag handlers ref.
+ * @property {import('react').MutableRefObject<undefined | HTMLElement>} [inputRef]        The input element ref.
+ * @property {boolean}                                                   [isFocused]       Renders focus styles.
+ * @property {boolean}                                                   [isTypeNumeric]   Whether the type is numeric.
  */
 
 /**
@@ -64,7 +64,7 @@ const useRootEventHandlers = ( {
 
 /**
  *
- * @param  {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'input'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'input'>} props
  */
 export function useTextInput( props ) {
 	const {
@@ -120,7 +120,7 @@ export function useTextInput( props ) {
 		max,
 		min,
 		shiftStep,
-		step,
+		step: typeof step === 'string' ? parseInt( step, 10 ) : step,
 		value: valueProp,
 		validate,
 		type,
@@ -141,6 +141,8 @@ export function useTextInput( props ) {
 	} );
 
 	const InputComponent = multiline ? TextareaAutosize : 'input';
+
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
@@ -193,7 +195,6 @@ export function useTextInput( props ) {
 		isTypeNumeric,
 		isInputTypeNumeric,
 		prefix,
-		// @ts-ignore This method might need typing: useScrollHandlers packages/components/src/text-input/hooks/use-text-input-state.js
 		scrollHandlers,
 		suffix,
 	};

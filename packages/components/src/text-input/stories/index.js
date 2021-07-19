@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import NumberFormat from 'react-number-format';
+import InnerNumberFormat from 'react-number-format';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,8 +20,12 @@ import { View } from '../../view';
 
 export default {
 	component: TextInput,
-	title: 'G2 Components (Experimental)/TextInput',
+	title: 'Components (Experimental)/TextInput',
 };
+
+const NumberFormat = forwardRef( ( props, forwardedRef ) => (
+	<InnerNumberFormat { ...props } getInputRef={ forwardedRef } />
+) );
 
 export const _default = () => {
 	return <TextInput placeholder="Code is Poetry" />;
@@ -32,9 +36,9 @@ export const Number = () => {
 
 	return (
 		<View
-			css={ `
-				margin-top: 20vh;
-			` }
+			style={ {
+				marginTop: '20vh',
+			} }
 			width={ 480 }
 		>
 			<TextInput
@@ -54,7 +58,13 @@ export const NumberWithExternalChange = () => {
 		<div>
 			<div>Value: { value }</div>
 			<button onClick={ () => setValue( 10 ) }>Make ten</button>
-			<TextInput onChange={ setValue } type="number" value={ value } />
+			<TextInput
+				onChange={ setValue }
+				type="number"
+				value={ value }
+				max={ Infinity }
+				min={ -10 }
+			/>
 		</div>
 	);
 };
@@ -62,12 +72,12 @@ export const NumberWithExternalChange = () => {
 export const numberStepper = () => {
 	return (
 		<View
-			style={ `
-				margin-top: 20vh;
-			` }
+			style={ {
+				marginTop: '20vh',
+			} }
 			width={ 480 }
 		>
-			<TextInput arrows="stepper" type="number" value="1" />
+			<TextInput arrows="stepper" type="number" defaultValue="1" />
 		</View>
 	);
 };
@@ -84,6 +94,7 @@ export const custom = () => {
 			</Text>
 			<TextInput
 				as={ NumberFormat }
+				refProp="getInputRef"
 				prefix={ '$' }
 				thousandSeparator={ true }
 			/>
@@ -94,10 +105,10 @@ export const custom = () => {
 export const inlineRendering = () => {
 	return (
 		<VStack
-			css={ `
-				margin: auto;
-				width: 320px;
-			` }
+			style={ {
+				margin: 'auto',
+				width: '320px',
+			} }
 		>
 			<Text adjustLineHeightForInnerControls>
 				My site name is <TextInput isInline />
@@ -117,10 +128,10 @@ const Gerund = () => <MadLib isInline type="Gerund" />;
  */
 export const madLibs = () => (
 	<VStack
-		css={ `
-			margin: auto;
-			text-align: justify;
-		` }
+		style={ {
+			margin: 'auto',
+			textAlign: 'justify',
+		} }
 	>
 		<Text adjustLineHeightForInnerControls>
 			A vacation is when you take a trip to some <Adjective /> place with

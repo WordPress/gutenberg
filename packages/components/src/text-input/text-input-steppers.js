@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { clamp, noop } from 'lodash';
+import { clamp } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,18 +22,19 @@ import Icon from '../icon';
 import { HStack } from '../h-stack';
 import { View } from '../view';
 import * as styles from './styles';
+import { useCx } from '../utils/hooks';
 
 /**
  * @typedef Props
- * @property {boolean} [disabled] Whether the stepper controls are disabled.
- * @property {import('react').MutableRefObject<null | HTMLElement>} [dragHandlersRef] Drag handler React ref.
- * @property {() => void} [increment] Increment text input number value callback.
- * @property {() => void} [decrement] Decrement text input number value callback.
+ * @property {boolean}                                                                                             [disabled]        Whether the stepper controls are disabled.
+ * @property {import('react').MutableRefObject<import('./hooks/use-base-drag-handlers').UseBaseDragHandlersProps>} [dragHandlersRef] Drag handler React ref.
+ * @property {() => void}                                                                                          increment         Increment text input number value callback.
+ * @property {() => void}                                                                                          decrement         Decrement text input number value callback.
  */
 
 /**
  *
- * @param {Props} props
+ * @param {Props}                    props
  * @param {import('react').Ref<any>} forwardedRef
  * @return {import('react').ReactElement} The text input stepper component.
  */
@@ -41,12 +42,13 @@ function TextInputSteppers( props, forwardedRef ) {
 	const { decrement, disabled, dragHandlersRef, increment } = props;
 	const dragHandlers = dragHandlersRef?.current;
 
+	const cx = useCx();
+
 	return (
-		<View className={ styles.SpinnerWrapper }>
-			{ /* @ts-ignore Check PolymorphicComponent. No overload matches this call. */ }
+		<View className={ cx( styles.SpinnerWrapper ) }>
 			<HStack
 				{ ...dragHandlers }
-				className={ styles.Steppers }
+				className={ cx( styles.Steppers ) }
 				expanded={ true }
 				spacing={ 0 }
 				ref={ forwardedRef }
@@ -64,9 +66,9 @@ function TextInputSteppers( props, forwardedRef ) {
 /**
  *
  * @typedef UpDownArrowsProps
- * @property {boolean | undefined} disabled Whether the controls are disabled.
- * @property {() => void} [onIncrement] Increment text input number value callback.
- * @property {() => void} [onDecrement] Decrement text input number value callback.
+ * @property {boolean | undefined} disabled    Whether the controls are disabled.
+ * @property {() => void}          onIncrement Increment text input number value callback.
+ * @property {() => void}          onDecrement Decrement text input number value callback.
  */
 
 /**
@@ -74,11 +76,7 @@ function TextInputSteppers( props, forwardedRef ) {
  * @param {UpDownArrowsProps} props
  * @return {import('react').ReactElement} The _UpDownArrows component.
  */
-const _UpDownArrows = ( {
-	disabled,
-	onIncrement = noop,
-	onDecrement = noop,
-} ) => {
+const _UpDownArrows = ( { disabled, onIncrement, onDecrement } ) => {
 	/** @type {import('react').MutableRefObject<number | undefined>} */
 	const timeoutRef = useRef();
 	const timeoutDurationStart = 500;
@@ -150,34 +148,28 @@ const _UpDownArrows = ( {
 
 	return (
 		<>
-			<Icon
-				as="button"
-				className={ styles.SteppersUp }
+			<styles.StepperButton
 				disabled={ disabled }
 				onClick={ handleOnIncrement }
 				onMouseDown={ handleOnMouseDownIncrement }
 				onMouseLeave={ handleOnClearTimers }
 				onMouseUp={ handleOnClearTimers }
-				type="button"
 				height={ `calc(100% - 4px)` }
-				icon={ plus }
-				size={ 12 }
-				width={ 20 }
-			/>
-			<Icon
-				as="button"
-				className={ styles.SteppersDown }
+				type="button"
+			>
+				<Icon icon={ plus } size={ 12 } width={ 20 } />
+			</styles.StepperButton>
+			<styles.StepperButton
 				disabled={ disabled }
 				onClick={ handleOnDecrement }
 				onMouseDown={ handleOnMouseDownDecrement }
 				onMouseLeave={ handleOnClearTimers }
 				onMouseUp={ handleOnClearTimers }
-				type="button"
 				height={ `calc(100% - 4px)` }
-				icon={ minus }
-				size={ 12 }
-				width={ 20 }
-			/>
+				type="button"
+			>
+				<Icon icon={ minus } size={ 12 } width={ 20 } />
+			</styles.StepperButton>
 		</>
 	);
 };

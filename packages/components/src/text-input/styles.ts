@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { css } from 'emotion';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
@@ -9,7 +10,7 @@ import { css } from 'emotion';
 import CONFIG from '../utils/config-values';
 import COLORS from '../utils/colors-values';
 
-export { scrollableScrollbar } from '../ui/scrollable/styles';
+export { scrollableScrollbar } from '../scrollable/styles';
 
 export const focus = css`
 	border-color: ${ COLORS.blue };
@@ -134,7 +135,9 @@ export const Steppers = css`
 	opacity: 1;
 `;
 
-export const StepperButton = css`
+export const StepperButton = styled.button< {
+	height: string;
+} >`
 	${ SpinnerArrow };
 	border: 1px solid transparent;
 	color: ${ CONFIG.controlInnerControlTextColor };
@@ -142,6 +145,7 @@ export const StepperButton = css`
 	display: block;
 	outline: none;
 	padding: 3px;
+	height: ${ ( props ) => props.height };
 
 	&:hover {
 		background-color: ${ CONFIG.controlBackgroundColorHover };
@@ -155,14 +159,6 @@ export const StepperButton = css`
 	&[disabled] {
 		pointer-events: none;
 	}
-`;
-
-export const SteppersUp = css`
-	${ StepperButton };
-`;
-
-export const SteppersDown = css`
-	${ StepperButton };
 `;
 
 export const globalDraggableX = css`

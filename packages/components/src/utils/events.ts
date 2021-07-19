@@ -1,4 +1,10 @@
-type EventHandler< T extends Event > = ( event: T ) => void;
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { SyntheticEvent } from 'react';
+
+type EventHandler< T extends SyntheticEvent > = ( event: T ) => void;
 
 /**
  * Merges event handlers together.
@@ -7,7 +13,7 @@ type EventHandler< T extends Event > = ( event: T ) => void;
  * @param  handler
  * @param  otherHandler
  */
-function mergeEvent< TEvent extends Event >(
+function mergeEvent< TEvent extends SyntheticEvent >(
 	handler: EventHandler< TEvent >,
 	otherHandler: EventHandler< TEvent >
 ): EventHandler< TEvent > {
@@ -29,7 +35,7 @@ function mergeEvent< TEvent extends Event >(
  * @param  extraHandlers
  */
 export function mergeEventHandlers<
-	TEvent extends Event,
+	TEvent extends SyntheticEvent,
 	TLeft extends Record< string, EventHandler< TEvent > >,
 	TRight extends Record< string, EventHandler< TEvent > >
 >( handlers: TLeft, extraHandlers: TRight ): TLeft & TRight {

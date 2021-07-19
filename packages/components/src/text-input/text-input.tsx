@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
@@ -6,19 +12,18 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { contextConnect } from '../ui/context';
+import { contextConnect, PolymorphicComponentProps } from '../ui/context';
 import { View } from '../view';
 import TextInputArrows from './text-input-arrows';
 import TextInputSteppers from './text-input-steppers';
 import { useTextInput } from './hooks/use-text-input';
 import * as styles from './styles';
+import type { Props } from './types';
 
-/**
- *
- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'input'>} props
- * @param {import('react').Ref<any>} forwardedRef
- */
-function TextInput( props, forwardedRef ) {
+function TextInput(
+	props: PolymorphicComponentProps< Props, 'input' >,
+	forwardedRef: Ref< any >
+) {
 	const {
 		arrows,
 		decrement,
@@ -38,7 +43,6 @@ function TextInput( props, forwardedRef ) {
 	const mergedRefs = useMergeRefs( [ inputRef, forwardedRef ] );
 
 	return (
-		// @ts-ignore Will we have to update View types?
 		<View { ...otherProps } disabled={ disabled }>
 			{ prefix }
 			<View
@@ -74,7 +78,7 @@ function TextInput( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { TextInput } from `@wordpress/components`
+ * import { __experimentalTextInput as TextInput } from `@wordpress/components`
  *
  * function Example() {
  *   return <TextInput placeholder="First name" />

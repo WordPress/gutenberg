@@ -22,25 +22,27 @@ import Icon from '../icon';
 import { View } from '../view';
 import { VStack } from '../v-stack';
 import * as styles from './styles';
+import { useCx } from '../utils/hooks';
 
 /**
  * @typedef Props
  * @property {import('react').MutableRefObject<null | HTMLElement>} [dragHandlersRef] Drag handler React ref.
- * @property {() => void} [increment] Increment text input number value callback.
- * @property {() => void} [decrement] Decrement text input number value callback.
+ * @property {() => void}                                           [increment]       Increment text input number value callback.
+ * @property {() => void}                                           [decrement]       Decrement text input number value callback.
  */
 
 /**
  *
- * @param {Props} props
+ * @param {Props}                    props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function TextInputArrows( props, forwardedRef ) {
 	const { decrement, dragHandlersRef, increment } = props;
 	const dragHandlers = dragHandlersRef?.current;
+	const cx = useCx();
 
 	return (
-		<View className={ styles.SpinnerWrapper }>
+		<View className={ cx( styles.SpinnerWrapper ) }>
 			{ /* @ts-ignore Check PolymorphicComponent. No overload matches this call. */ }
 			<VStack
 				{ ...dragHandlers }
