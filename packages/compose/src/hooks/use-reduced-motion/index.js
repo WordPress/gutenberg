@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import useMediaQuery from '../use-media-query';
@@ -10,7 +15,7 @@ import useMediaQuery from '../use-media-query';
  */
 const IS_IE =
 	typeof window !== 'undefined' &&
-	window.navigator.userAgent.indexOf( 'Trident' ) >= 0;
+      	get( window, [ 'navigator', 'userAgent' ], [] ).indexOf( 'Trident' ) >= 0;
 
 /**
  * Hook returning whether the user has a preference for reduced motion.
