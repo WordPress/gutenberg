@@ -5,7 +5,7 @@ import { blockNames } from './pages/editor-page';
 import { isAndroid } from './helpers/utils';
 import { slashInserter, shortText } from './helpers/test-data';
 
-const ANIMATION_TIME = 200;
+const ANIMATION_TIME = 400;
 
 // helper function for asserting slash inserter presence
 async function assertSlashInserterPresent( checkIsVisible ) {
@@ -70,8 +70,7 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 		if ( isAndroid() ) {
 			await editorPage.typeTextToParagraphBlock(
 				paragraphBlockElement,
-				`${ shortText }`,
-				true
+				`${ shortText }`
 			);
 		} else {
 			await editorPage.typeTextToParagraphBlock(
@@ -114,6 +113,8 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 		// Add image block
 		await imageButtonElement.click();
 
+		await editorPage.driver.sleep( ANIMATION_TIME );
+
 		// Check image exists in the editor
 		expect(
 			await editorPage.hasBlockAtPosition( 1, blockNames.image )
@@ -137,9 +138,15 @@ describe.skip( 'Gutenberg Editor Slash Inserter tests', () => {
 
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			'/img\n',
+			'/img'
+		);
+		await editorPage.typeTextToParagraphBlock(
+			paragraphBlockElement,
+			'\n',
 			false
 		);
+		await editorPage.driver.sleep( ANIMATION_TIME );
+
 		expect(
 			await editorPage.hasBlockAtPosition( 1, blockNames.image )
 		).toBe( true );
