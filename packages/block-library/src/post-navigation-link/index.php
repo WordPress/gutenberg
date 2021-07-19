@@ -18,7 +18,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		return '';
 	}
 
-	// Get the nagigation type to show the proper link. Available options are `next|previous`.
+	// Get the navigation type to show the proper link. Available options are `next|previous`.
 	$navigation_type = isset( $attributes['type'] ) ? $attributes['type'] : 'next';
 	// Allow only `next` and `previous` in `$navigation_type`.
 	if ( ! in_array( $navigation_type, array( 'next', 'previous' ), true ) ) {

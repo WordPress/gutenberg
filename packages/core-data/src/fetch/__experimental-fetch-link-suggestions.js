@@ -153,6 +153,35 @@ const fetchLinkSuggestions = async (
 		);
 	}
 
+	if (
+		type &&
+		type !== 'post' &&
+		type !== 'term' &&
+		type !== 'post-format'
+	) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/__experimental/menu-custom-items', {
+					type,
+				} ),
+			} ).then( ( results ) => {
+				const customItems = results.filter(
+					( result ) =>
+						search === '' ||
+						result.title
+							.toLowerCase()
+							.includes( search.toLowerCase() )
+				);
+				return customItems.map( ( item ) => ( {
+					id: item.id,
+					title: item.title,
+					url: item.url,
+					type: 'URL',
+				} ) );
+			} )
+		);
+	}
+
 	return Promise.all( queries ).then( ( results ) => {
 		return results
 			.reduce(

@@ -50,6 +50,15 @@ function gutenberg_register_rest_customizer_nonces() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
 
 /**
+ * Registers the custom menu items REST API route.
+ */
+function gutenberg_register_rest_menu_custom_items() {
+	$nav_menu_location = new WP_REST_Menu_Custom_Items_Controller();
+	$nav_menu_location->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_menu_custom_items' );
+
+/**
  * Registers the Sidebars & Widgets REST API routes.
  */
 function gutenberg_register_sidebars_and_widgets_endpoint() {

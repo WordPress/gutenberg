@@ -130,7 +130,7 @@ function getSuggestionsQuery( type, kind ) {
 			if ( kind === 'post-type' ) {
 				return { type: 'post', subtype: type };
 			}
-			return {};
+			return { type };
 	}
 }
 
