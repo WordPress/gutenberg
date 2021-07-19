@@ -4,6 +4,9 @@ on:
 
 name: Upload Gutenberg plugin to WordPress.org plugin repo
 
+env:
+  BROWSERSLIST_IGNORE_OLD_DATA: 1
+
 jobs:
   upload:
     name: Upload Gutenberg Plugin

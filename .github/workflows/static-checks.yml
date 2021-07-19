@@ -5,6 +5,9 @@ on:
   push:
     branches: [master]
 
+env:
+  BROWSERSLIST_IGNORE_OLD_DATA: 1
+
 jobs:
   check:
     name: All

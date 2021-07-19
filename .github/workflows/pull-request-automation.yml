@@ -2,7 +2,11 @@ on:
   pull_request_target:
     types: [opened]
   push:
+
 name: Pull request automation
+
+env:
+  BROWSERSLIST_IGNORE_OLD_DATA: 1
 
 jobs:
   pull-request-automation:
@@ -12,7 +16,7 @@ jobs:
     # isn't necessarily `master` (e.g. in the case of a merge).
     - uses: actions/checkout@v2
       with:
-        ref: master
+        ref: wp/5.7
 
     # Changing into the action's directory and running `npm install` is much
     # faster than a full project-wide `npm ci`.

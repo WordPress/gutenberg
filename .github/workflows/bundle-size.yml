@@ -2,6 +2,9 @@ name: Compressed Size
 
 on: [pull_request]
 
+env:
+  BROWSERSLIST_IGNORE_OLD_DATA: 1
+
 jobs:
   build:
     name: Check
