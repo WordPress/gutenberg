@@ -94,18 +94,37 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Security': 'Security',
 };
 
+/**
+ * Mapping of label names to arbitary features in the release notes.
+ *
+ * Mapping a given label to a feature will guarantee it will be categorised
+ * under that feature name in the changelog within each section.
+ *
+ * @type {Record<string,string>}
+ */
 const LABEL_FEATURE_MAPPING = {
+	'[Feature] Widgets Screen': 'Widgets Editor',
+	'[Feature] Design Tools': 'Design Tools',
+	'[Feature] UI Components': 'Components',
+	'[Feature] Component System': 'Components',
+	'[Feature] Template Editing Mode': 'Template Editor',
+	'[Feature] Blocks': 'Block Library',
+	'[Feature] Inserter': 'Block Editor',
+	'[Feature] Drag and Drop': 'Block Editor',
+	'[Feature] Block Multi Selection': 'Block Editor',
+	'[Feature] Link Editing': 'Block Editor',
+	'[Package] Edit Post': 'Post Editor',
+	'[Package] Icons': 'Icons',
 	'[Package] Block Editor': 'Block Editor',
 	'[Package] Editor': 'Editor',
 	'[Package] Edit Widgets': 'Widgets Editor',
 	'[Package] Widgets Customizer': 'Widgets Editor',
-	'[Feature] Widgets Screen': 'Widgets Editor',
-	'[Block] Legacy Widget': 'Widgets Editor',
 	'[Package] Components': 'Components',
-	'[Feature] UI Components': 'Components',
-	'[Feature] Component System': 'Components',
 	'[Package] Block Library': 'Block Library',
-	'[Feature] Blocks': 'Block Library',
+	'[Package] Rich text': 'Block Editor',
+	'[Package] Data': 'Data Layer',
+	'[Block] Legacy Widget': 'Widgets Editor',
+	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
 };
 
