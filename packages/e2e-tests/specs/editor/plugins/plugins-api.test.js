@@ -4,9 +4,12 @@
 import {
 	activatePlugin,
 	clickBlockAppender,
+	clickBlockToolbarButton,
+	clickButton,
 	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
+	insertBlock,
 	openDocumentSettingsSidebar,
 	openPublishPanel,
 	publishPost,
@@ -154,6 +157,18 @@ describe( 'Using Plugins API', () => {
 				( el ) => el.innerText
 			);
 			expect( pluginDocumentSettingsText ).toMatchSnapshot();
+		} );
+	} );
+
+	describe( 'Block Settings Menu Item', () => {
+		it( 'Should render a new item', async () => {
+			await insertBlock( 'List' );
+			await page.keyboard.type( 'one' );
+			await page.keyboard.press( 'Enter' );
+			await clickBlockToolbarButton( 'More options' );
+			await clickButton( 'My new plugin' );
+
+			expect( console ).toHaveLoggedWith( 'Block clicked' );
 		} );
 	} );
 } );

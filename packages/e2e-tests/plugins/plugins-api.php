@@ -86,6 +86,18 @@ function enqueue_plugins_api_plugin_scripts() {
 		filemtime( plugin_dir_path( __FILE__ ) . 'plugins-api/document-setting.js' ),
 		true
 	);
+
+	wp_enqueue_script(
+		'gutenberg-test-plugins-api-block-settings',
+		plugins_url( 'plugins-api/block-settings.js', __FILE__ ),
+		array(
+			'wp-element',
+			'wp-edit-post',
+			'wp-plugins',
+		),
+		filemtime( plugin_dir_path( __FILE__ ) . 'plugins-api/block-settings.js' ),
+		true
+	);
 }
 
 add_action( 'init', 'enqueue_plugins_api_plugin_scripts' );
