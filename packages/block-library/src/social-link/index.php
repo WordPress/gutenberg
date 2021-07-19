@@ -278,6 +278,8 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 		),
 	);
 
+	$services_data = apply_filters( 'block_editor_social_link_services', $services_data );
+
 	if ( ! empty( $service )
 		&& ! empty( $field )
 		&& isset( $services_data[ $service ] )

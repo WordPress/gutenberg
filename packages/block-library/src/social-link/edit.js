@@ -25,7 +25,7 @@ import { keyboardReturn } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { getIconBySite, getNameBySite } from './social-list';
+import { useServiceIcon, useServiceName } from './social-list';
 
 const SocialLinkURLPopover = ( {
 	url,
@@ -77,8 +77,8 @@ const SocialLinkEdit = ( {
 	} );
 
 	const ref = useRef();
-	const IconComponent = getIconBySite( service );
-	const socialLinkName = getNameBySite( service );
+	const IconComponent = useServiceIcon( service );
+	const socialLinkName = useServiceName( service );
 	const blockProps = useBlockProps( {
 		className: classes,
 		style: {
