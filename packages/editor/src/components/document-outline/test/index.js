@@ -11,15 +11,39 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { DocumentOutline } from '../';
+import DocumentOutline from '../';
+
+function mockUseSelect( blocks ) {
+	useSelect.mockImplementation( ( cb ) => {
+		return cb( () => ( {
+			getBlocks: () => blocks,
+			getEditedPostAttribute( attr ) {
+				if ( attr === 'type' ) {
+					return 'post';
+				} else if ( attr === 'title' ) {
+					return 'Mocked post title';
+				}
+				return undefined;
+			},
+			getPostType: () => ( { supports: { title: true } } ),
+		} ) );
+	} );
+}
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	BlockTitle: () => 'Block Title',
 } ) );
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
 
 describe( 'DocumentOutline', () => {
 	let paragraph, headingH1, headingH2, headingH3, nestedHeading;
@@ -47,9 +71,9 @@ describe( 'DocumentOutline', () => {
 			save: () => {},
 		} );
 
-		registerBlockType( 'core/columns', {
-			category: 'text',
-			title: 'Paragraph',
+		registerBlockType( 'core/group', {
+			category: 'design',
+			title: 'Group',
 			edit: () => {},
 			save: () => {},
 		} );
@@ -67,7 +91,7 @@ describe( 'DocumentOutline', () => {
 			content: 'Heading 3',
 			level: 3,
 		} );
-		nestedHeading = createBlock( 'core/columns', undefined, [ headingH3 ] );
+		nestedHeading = createBlock( 'core/group', undefined, [ headingH3 ] );
 	} );
 
 	afterAll( () => {
@@ -77,6 +101,7 @@ describe( 'DocumentOutline', () => {
 
 	describe( 'no header blocks present', () => {
 		it( 'should not render when no blocks provided', () => {
+			mockUseSelect( [] );
 			const wrapper = shallow( <DocumentOutline /> );
 
 			expect( wrapper.html() ).toBe( null );
@@ -87,7 +112,8 @@ describe( 'DocumentOutline', () => {
 				// Set client IDs to a predictable value.
 				return { ...block, clientId: `clientId_${ index }` };
 			} );
-			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+			mockUseSelect( blocks );
+			const wrapper = shallow( <DocumentOutline /> );
 
 			expect( wrapper.html() ).toBe( null );
 		} );
@@ -99,14 +125,16 @@ describe( 'DocumentOutline', () => {
 				// Set client IDs to a predictable value.
 				return { ...block, clientId: `clientId_${ index }` };
 			} );
-			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+			mockUseSelect( blocks );
+			const wrapper = shallow( <DocumentOutline /> );
 
 			expect( wrapper ).toMatchSnapshot();
 		} );
 
 		it( 'should render an item when only one heading provided', () => {
 			const blocks = [ headingH2 ];
-			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+			mockUseSelect( blocks );
+			const wrapper = shallow( <DocumentOutline /> );
 
 			expect( wrapper.find( 'TableOfContentsItem' ) ).toHaveLength( 1 );
 		} );
@@ -119,7 +147,8 @@ describe( 'DocumentOutline', () => {
 				headingH3,
 				paragraph,
 			];
-			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+			mockUseSelect( blocks );
+			const wrapper = shallow( <DocumentOutline /> );
 
 			expect( wrapper.find( 'TableOfContentsItem' ) ).toHaveLength( 2 );
 		} );
@@ -131,7 +160,8 @@ describe( 'DocumentOutline', () => {
 					return { ...block, clientId: `clientId_${ index }` };
 				}
 			);
-			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
+			mockUseSelect( blocks );
+			const wrapper = shallow( <DocumentOutline /> );
 
 			expect( wrapper ).toMatchSnapshot();
 		} );
@@ -145,9 +175,10 @@ describe( 'DocumentOutline', () => {
 				'.document-outline__item-content';
 
 			const blocks = [ headingH2, nestedHeading ];
-			const wrapper = mount( <DocumentOutline blocks={ blocks } /> );
+			mockUseSelect( blocks );
+			const wrapper = mount( <DocumentOutline /> );
 
-			// Unnested heading and nested heading should appear as items
+			// Unnested heading and nested heading should appear as items.
 			const tableOfContentItems = wrapper.find(
 				tableOfContentItemsSelector
 			);
