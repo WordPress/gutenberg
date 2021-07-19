@@ -16,16 +16,18 @@ import { isFunction } from 'lodash';
  *
  * @typedef {Object} WPPlugin
  *
- * @property {string}                    name    A string identifying the plugin. Must be
- *                                               unique across all registered plugins.
- * @property {string|WPElement|Function} [icon]  An icon to be shown in the UI. It can
- *                                               be a slug of the Dashicon, or an element
- *                                               (or function returning an element) if you
- *                                               choose to render your own SVG.
- * @property {Function}                  render  A component containing the UI elements
- *                                               to be rendered.
- * @property {string}                    [scope] The optional scope to be used when rendering inside
- *                                               a plugin area. No scope by default.
+ * @property {string}                    name       A string identifying the plugin. Must be
+ *                                                  unique across all registered plugins.
+ * @property {string|WPElement|Function} [icon]     An icon to be shown in the UI. It can
+ *                                                  be a slug of the Dashicon, or an element
+ *                                                  (or function returning an element) if you
+ *                                                  choose to render your own SVG.
+ * @property {Function}                  render     A component containing the UI elements
+ *                                                  to be rendered.
+ * @property {string}                    [scope]    The optional scope to be used when rendering inside
+ *                                                  a plugin area. No scope by default.
+ * @property {number}                    [priority] Allows for controlling the display order of this
+ *                                                  plugin. Default is 10.
  */
 
 /**
@@ -76,6 +78,7 @@ const plugins = {};
  * registerPlugin( 'plugin-name', {
  * 	icon: moreIcon,
  * 	render: Component,
+ * 	priority: 5
  * 	scope: 'my-page',
  * } );
  * ```
@@ -106,6 +109,7 @@ const plugins = {};
  * registerPlugin( 'plugin-name', {
  * 	icon: more,
  * 	render: Component,
+ * 	priority: 5
  * 	scope: 'my-page',
  * } );
  * ```
@@ -119,6 +123,11 @@ export function registerPlugin( name, settings ) {
 	}
 	if ( typeof name !== 'string' ) {
 		console.error( 'Plugin name must be string.' );
+		return null;
+	}
+	const { priority = 10 } = settings;
+	if ( ! Number.isInteger( priority ) ) {
+		console.error( 'The "priority" property must be a number' );
 		return null;
 	}
 	if ( ! /^[a-z][a-z0-9-]*$/.test( name ) ) {
@@ -159,6 +168,7 @@ export function registerPlugin( name, settings ) {
 	plugins[ name ] = {
 		name,
 		icon: pluginsIcon,
+		priority,
 		...settings,
 	};
 

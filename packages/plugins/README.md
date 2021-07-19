@@ -111,6 +111,7 @@ function Component() {
 registerPlugin( 'plugin-name', {
 	icon: moreIcon,
 	render: Component,
+	priority: 5
 	scope: 'my-page',
 } );
 ```
@@ -135,6 +136,7 @@ const Component = () => (
 registerPlugin( 'plugin-name', {
 	icon: more,
 	render: Component,
+	priority: 5
 	scope: 'my-page',
 } );
 ```

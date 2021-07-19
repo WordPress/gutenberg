@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, sortBy } from 'lodash';
 import memoize from 'memize';
 
 /**
@@ -9,6 +9,7 @@ import memoize from 'memize';
  */
 import { Component } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -55,10 +56,11 @@ class PluginArea extends Component {
 		super( ...arguments );
 
 		this.setPlugins = this.setPlugins.bind( this );
-		this.memoizedContext = memoize( ( name, icon ) => {
+		this.memoizedContext = memoize( ( name, icon, priority ) => {
 			return {
 				name,
 				icon,
+				priority,
 			};
 		} );
 		this.state = this.getCurrentPluginsState();
@@ -66,15 +68,20 @@ class PluginArea extends Component {
 
 	getCurrentPluginsState() {
 		return {
-			plugins: map(
-				getPlugins( this.props.scope ),
-				( { icon, name, render } ) => {
-					return {
-						Plugin: render,
-						context: this.memoizedContext( name, icon ),
-					};
-				}
-			),
+			plugins: compose(
+				( list ) =>
+					map( list, ( { icon, name, render, priority } ) => {
+						return {
+							Plugin: render,
+							context: this.memoizedContext(
+								name,
+								icon,
+								priority
+							),
+						};
+					} ),
+				( list ) => sortBy( list, [ 'priority' ] )
+			)( getPlugins( this.props.scope ) ),
 		};
 	}
 
