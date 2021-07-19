@@ -45,6 +45,15 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		)
 	);
 
+	// Add default https if no protocol specified. The following chunk of code
+	// is taken from esc_url which is hard-coded to use http. This can be
+	// changed to pass the parameter in esc_url after
+	// https://core.trac.wordpress.org/ticket/52886 is in core.
+	if ( strpos( $url, ':' ) === false && ! in_array( $url[0], array( '/', '#', '?' ), true ) &&
+		! preg_match( '/^[a-z0-9-]+?\.php/i', $url ) ) {
+		$url = 'https://' . $url;
+	}
+
 	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $attribute . ' class="wp-block-social-link-anchor"> ' . $icon . '</a></li>';
 }
 
