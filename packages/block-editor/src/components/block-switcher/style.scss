@@ -21,7 +21,7 @@
 }
 
 .block-editor-block-switcher__toggle-text {
-	margin-left: $grid-unit-10;
+	margin-right: $grid-unit-10;
 
 	// Account for double label when show-text-buttons is set.
 	.show-icon-labels & {
