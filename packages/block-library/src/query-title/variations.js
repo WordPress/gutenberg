@@ -41,7 +41,8 @@ const variations = [
 		description: __( 'Displays a title in a 404 template.' ),
 		attributes: {
 			type: '404',
-			content: __( 'Nothing found' ),
+			// translators: Title for 404 template.
+			content: _x( 'Nothing found', '404 template title' ),
 		},
 		scope: [ 'inserter' ],
 	},
