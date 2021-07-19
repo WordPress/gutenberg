@@ -6,12 +6,38 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useResizeObserver } from '@wordpress/compose';
+import { useResizeObserver, useRefEffect } from '@wordpress/compose';
+import { useState, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Icon from '../icon';
+import StyleProvider from '../style-provider';
+
+function AdminShadow( { children } ) {
+	const [ shadow, setShadow ] = useState();
+	const ref = useRefEffect( ( element ) => {
+		const root = element.attachShadow( { mode: 'open' } );
+		Array.from( document.styleSheets ).forEach( ( { ownerNode } ) => {
+			if ( ! ownerNode.getAttribute( 'data-emotion' ) ) {
+				root.appendChild( ownerNode.cloneNode( true ) );
+			}
+		} );
+		setShadow( root );
+	}, [] );
+	return (
+		<div ref={ ref }>
+			{ shadow &&
+				createPortal(
+					<StyleProvider document={ { head: shadow } }>
+						{ children }
+					</StyleProvider>,
+					shadow
+				) }
+		</div>
+	);
+}
 
 /**
  * Renders a placeholder. Normally used by blocks to render their empty state.
@@ -61,25 +87,27 @@ function Placeholder( {
 		'is-column-layout': isColumnLayout,
 	} );
 	return (
-		<div { ...additionalProps } className={ classes }>
-			{ resizeListener }
-			{ notices }
-			{ preview && (
-				<div className="components-placeholder__preview">
-					{ preview }
+		<AdminShadow>
+			<div { ...additionalProps } className={ classes }>
+				{ resizeListener }
+				{ notices }
+				{ preview && (
+					<div className="components-placeholder__preview">
+						{ preview }
+					</div>
+				) }
+				<div className="components-placeholder__label">
+					<Icon icon={ icon } />
+					{ label }
 				</div>
-			) }
-			<div className="components-placeholder__label">
-				<Icon icon={ icon } />
-				{ label }
+				{ !! instructions && (
+					<div className="components-placeholder__instructions">
+						{ instructions }
+					</div>
+				) }
+				<div className={ fieldsetClasses }>{ children }</div>
 			</div>
-			{ !! instructions && (
-				<div className="components-placeholder__instructions">
-					{ instructions }
-				</div>
-			) }
-			<div className={ fieldsetClasses }>{ children }</div>
-		</div>
+		</AdminShadow>
 	);
 }
 
