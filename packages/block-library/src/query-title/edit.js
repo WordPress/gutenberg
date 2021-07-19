@@ -11,10 +11,9 @@ import {
 	AlignmentControl,
 	BlockControls,
 	useBlockProps,
-	Warning,
-	RichText,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,8 +21,9 @@ import { __ } from '@wordpress/i18n';
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 export default function QueryTitleEdit( {
-	attributes: { content, type, level, textAlign },
+	attributes: { level, textAlign },
 	setAttributes,
+	context: { templateSlug },
 } ) {
 	const TagName = `h${ level }`;
 	const blockProps = useBlockProps( {
@@ -32,27 +32,32 @@ export default function QueryTitleEdit( {
 		} ),
 	} );
 
-	let titleElement;
-	if ( type === 'archive' ) {
-		titleElement = (
-			<TagName { ...blockProps }>{ __( 'Archive title' ) }</TagName>
-		);
-	} else {
-		titleElement = (
-			<div { ...blockProps }>
-				<RichText
-					tagName={ TagName }
-					value={ content }
-					placeholder={ __( 'Query title' ) }
-					allowedFormats={ [ 'core/bold', 'core/italic' ] }
-					onChange={ ( newContent ) =>
-						setAttributes( { content: newContent } )
-					}
-					disableLineBreaks={ true }
-				/>
-			</div>
-		);
+	let titleContent;
+	switch ( templateSlug ) {
+		case 'archive':
+			titleContent = __( 'Archive title' );
+			break;
+		case 'search':
+			// translators: Title for search template with dynamic content placeholders.
+			titleContent = _x(
+				'Search results for "%search%"',
+				'search template title'
+			);
+			break;
+		case '404':
+			// translators: Title for 404 template.
+			titleContent = _x( 'Nothing found', '404 template title' );
+			break;
 	}
+
+	const titleElement = <TagName { ...blockProps }>{ titleContent }</TagName>;
+
+	useEffect( () => {
+		setAttributes( {
+			content: titleContent,
+		} );
+	}, [] );
+
 	return (
 		<>
 			<BlockControls group="block">
