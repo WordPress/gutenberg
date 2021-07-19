@@ -29,6 +29,7 @@
 
 .embed__icon--error {
 	margin-bottom: 6;
+	fill: $alert-red;
 }
 
 .embed__label {
@@ -53,6 +54,10 @@
 
 .embed__description--dark {
 	color: $dark-secondary;
+}
+
+.embed__description--error {
+	color: $alert-red;
 }
 
 .embed__action {
