@@ -182,9 +182,7 @@ class DependencyExtractionWebpackPlugin {
 
 			const assetData = {
 				// Get a sorted array so we can produce a stable, stringified representation.
-					dependencies: Array.from(
-						entrypointExternalizedWpDeps
-					).sort(),
+				dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
 				version: runtimeChunk.hash,
 			};
 
@@ -226,8 +224,8 @@ class DependencyExtractionWebpackPlugin {
 			// The type indicates the option may be `undefined`.
 			// However, at this point in compilation, webpack has filled the options in if
 			// they were not provided.
-				const outputFolder = /** @type {{path:string}} */ ( compiler
-					.options.output ).path;
+			const outputFolder = /** @type {{path:string}} */ ( compiler.options
+				.output ).path;
 
 			const assetsFilePath = path.resolve(
 				outputFolder,
