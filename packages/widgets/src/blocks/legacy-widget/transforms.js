@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 const legacyWidgetTransforms = [
 	{
@@ -79,6 +80,16 @@ const legacyWidgetTransforms = [
 				preload,
 				loop,
 			};
+		},
+	},
+	{
+		block: 'core/paragraph',
+		widget: 'text',
+		transform: ( { text } ) => ( {
+			content: text,
+		} ),
+		isMatch: ( { instance } ) => {
+			return stripHTML( instance.raw.text ) === instance.raw.text;
 		},
 	},
 	{
@@ -160,12 +171,16 @@ const legacyWidgetTransforms = [
 			};
 		},
 	},
-].map( ( { block, widget, transform } ) => {
+].map( ( { block, widget, transform, isMatch } ) => {
 	return {
 		type: 'block',
 		blocks: [ block ],
 		isMatch: ( { idBase, instance } ) => {
-			return idBase === widget && !! instance?.raw;
+			const check = idBase === widget && !! instance?.raw;
+			if ( check && isMatch ) {
+				return isMatch( { instance } );
+			}
+			return check;
 		},
 		transform: ( { instance } ) => {
 			const transformedBlock = createBlock(
