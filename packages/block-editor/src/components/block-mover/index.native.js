@@ -26,7 +26,7 @@ export const BLOCK_MOVER_DIRECTION_BOTTOM =
 export const BlockMover = ( {
 	isFirst,
 	isLast,
-	isLocked,
+	canMove,
 	onMoveDown,
 	onMoveUp,
 	onLongMove,
@@ -86,7 +86,7 @@ export const BlockMover = ( {
 		if ( option && option.onSelect ) option.onSelect();
 	};
 
-	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
+	if ( ! canMove || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
 	}
 
@@ -130,7 +130,7 @@ export default compose(
 	withSelect( ( select, { clientIds } ) => {
 		const {
 			getBlockIndex,
-			getTemplateLock,
+			canMoveBlocks,
 			getBlockRootClientId,
 			getBlockOrder,
 		} = select( blockEditorStore );
@@ -149,7 +149,7 @@ export default compose(
 			numberOfBlocks: blockOrder.length - 1,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
-			isLocked: getTemplateLock( rootClientId ) === 'all',
+			canMove: canMoveBlocks( clientIds, rootClientId ),
 			rootClientId,
 		};
 	} ),
