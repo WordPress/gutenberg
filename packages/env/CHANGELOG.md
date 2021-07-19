@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `wp-env` is better at fetching git sources which use tags.
+-   `wp-env` now pulls branches of git sources -- previously it only fetched them. This restores the intended behavior.
+
 ## 4.0.3 (2021-04-29)
 
 ### Bug Fix
