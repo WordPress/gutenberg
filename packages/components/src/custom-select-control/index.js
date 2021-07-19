@@ -128,7 +128,14 @@ export default function CustomSelectControl( {
 					className="components-custom-select-control__button-icon"
 				/>
 			</Button>
-			<ul { ...menuProps }>
+			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+			<ul
+				{ ...menuProps }
+				onKeyDown={ ( e ) => {
+					e.nativeEvent.stopImmediatePropagation();
+					menuProps.onKeyDown( e );
+				} }
+			>
 				{ isOpen &&
 					items.map( ( item, index ) => (
 						// eslint-disable-next-line react/jsx-key
