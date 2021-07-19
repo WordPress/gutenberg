@@ -13,8 +13,8 @@
 		text-align: center;
 	}
 
-	&.alignfull img,
-	&.alignwide img {
+	&.alignfull > img,
+	&.alignwide > img {
 		width: 100%;
 	}
 
@@ -59,6 +59,10 @@
 	// so we supply the styles so as to not appear broken or unstyled in those themes.
 	figcaption {
 		@include caption-style();
+
+		img {
+			display: inline;
+		}
 	}
 
 	// Variations
