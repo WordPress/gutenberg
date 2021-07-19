@@ -132,7 +132,7 @@ $z-layers: (
 
 	// Show popovers above wp-admin menus and submenus and sidebar:
 	// #adminmenuwrap { z-index: 9990 }
-	".components-popover": 1000000,
+	".components-popover": 100000,
 
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
