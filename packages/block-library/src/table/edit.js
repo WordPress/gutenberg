@@ -14,6 +14,7 @@ import {
 	BlockIcon,
 	AlignmentControl,
 	useBlockProps,
+	withColors,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
@@ -55,6 +56,8 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
+import { getColorPropsFromObjects } from './utils';
+import SecondaryColorControls from './secondary-color-controls';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -90,19 +93,23 @@ function TSection( { name, ...props } ) {
 	return <TagName { ...props } />;
 }
 
-function TableEdit( {
-	attributes,
-	setAttributes,
-	insertBlocksAfter,
-	isSelected,
-} ) {
+function TableEdit( props ) {
+	const { attributes, setAttributes, insertBlocksAfter, isSelected } = props;
 	const { hasFixedLayout, caption, head, foot } = attributes;
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
 
+	const blockProps = useBlockProps();
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
+
+	const isStripedStyle = blockProps.className.includes( 'is-style-stripes' );
+
+	// Secondary color props to be applied conditionally to inner elements.
+	const headerProps = getColorPropsFromObjects( 'header', props );
+	const stripedProps = getColorPropsFromObjects( 'secondary', props );
+	const footerProps = getColorPropsFromObjects( 'footer', props );
 
 	/**
 	 * Updates the initial column count used for table creation.
@@ -383,10 +390,27 @@ function TableEdit( {
 		},
 	];
 
+	const getRowProps = ( name, rowIndex ) => {
+		if ( name === 'head' ) {
+			return headerProps;
+		}
+
+		if ( name === 'foot' ) {
+			return footerProps;
+		}
+
+		// Striped styling only applies to table body.
+		if ( isStripedStyle && rowIndex % 2 === 0 ) {
+			return stripedProps;
+		}
+
+		return {};
+	};
+
 	const renderedSections = [ 'head', 'body', 'foot' ].map( ( name ) => (
 		<TSection name={ name } key={ name }>
 			{ attributes[ name ].map( ( { cells }, rowIndex ) => (
-				<tr key={ rowIndex }>
+				<tr key={ rowIndex } { ...getRowProps( name, rowIndex ) }>
 					{ cells.map(
 						(
 							{ content, tag: CellTag, scope, align },
@@ -425,7 +449,7 @@ function TableEdit( {
 	const isEmpty = ! sections.length;
 
 	return (
-		<figure { ...useBlockProps() }>
+		<figure { ...blockProps }>
 			{ ! isEmpty && (
 				<>
 					<BlockControls group="block">
@@ -450,6 +474,11 @@ function TableEdit( {
 			) }
 			{ ! isEmpty && (
 				<InspectorControls>
+					<SecondaryColorControls
+						sections={ sections }
+						isStripedStyle={ isStripedStyle }
+						tableProps={ props }
+					/>
 					<PanelBody
 						title={ __( 'Table settings' ) }
 						className="blocks-table-settings"
@@ -540,4 +569,11 @@ function TableEdit( {
 	);
 }
 
-export default TableEdit;
+export default withColors( {
+	secondaryBackgroundColor: 'background-color',
+	secondaryTextColor: 'color',
+	headerBackgroundColor: 'background-color',
+	headerTextColor: 'color',
+	footerBackgroundColor: 'background-color',
+	footerTextColor: 'color',
+} )( TableEdit );
