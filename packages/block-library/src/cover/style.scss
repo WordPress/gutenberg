@@ -11,6 +11,8 @@
 	padding: 1em;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+	// Overflow is hidden to handle border radius being applied on the block wrapper.
+	overflow: hidden;
 
 	&.has-parallax {
 		background-attachment: fixed;
@@ -39,11 +41,15 @@
 	 * background-color class implies that another style will provide the background color
 	 * for the overlay.
 	 *
+	 * The default background color has been moved to the before pseudo element
+	 * to allow custom border styles. If left on the `.has-background-dim`
+	 * element the color acts as a background to the dotted/dashed borders.
+	 *
 	 * See:
 	 *   - Issue with background color specificity: https://github.com/WordPress/gutenberg/issues/26545
 	 *   - Issue with alternative fix: https://github.com/WordPress/gutenberg/issues/26545
 	 */
-	&.has-background-dim:not([class*="-background-color"]) {
+	&.has-background-dim:not([class*="-background-color"])::before {
 		background-color: $black;
 	}
 
