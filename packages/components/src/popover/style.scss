@@ -179,6 +179,7 @@ $arrow-size: 8px;
 	.components-popover & {
 		position: absolute;
 		height: auto;
+		overflow-x: hidden;
 		overflow-y: auto;
 	}
 
