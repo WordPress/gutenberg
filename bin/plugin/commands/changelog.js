@@ -108,6 +108,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Feature] UI Components': 'Components',
 	'[Feature] Component System': 'Components',
 	'[Feature] Template Editing Mode': 'Template Editor',
+	'[Feature] Writing Flow': 'Block Editor',
 	'[Feature] Blocks': 'Block Library',
 	'[Feature] Inserter': 'Block Editor',
 	'[Feature] Drag and Drop': 'Block Editor',
@@ -634,16 +635,13 @@ async function getChangelog( settings ) {
 
 		Object.keys( featureGroups )
 			.sort( ( a, b ) => {
-				return featureGroups[ b ].length - featureGroups[ a ].length;
-			} )
-			.sort( ( a, b ) => {
 				// sort "Unknown" to always be at the end
 				if ( a === 'Unknown' ) {
 					return 1;
 				} else if ( b === 'Unknown' ) {
 					return -1;
 				}
-				return 0;
+				return featureGroups[ b ].length - featureGroups[ a ].length;
 			} )
 			.forEach( ( feature ) => {
 				const featureGroup = featureGroups[ feature ];
