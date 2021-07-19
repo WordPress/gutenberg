@@ -1,0 +1,22 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/image",
+		"isValid": true,
+		"attributes": {
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"alt": "",
+			"caption": "",
+			"id": 260,
+			"sizeSlug": "large",
+			"linkDestination": "none",
+			"style": {
+				"border": {
+					"radius": 50
+				}
+			}
+		},
+		"innerBlocks": [],
+		"originalContent": "<figure class=\"wp-block-image size-large\" style=\"border-radius:50px\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" class=\"wp-image-260\"/></figure>"
+	}
+]

@@ -7,7 +7,11 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -34,11 +38,17 @@ export default function save( { attributes } ) {
 		'is-resized': width || height,
 	} );
 
+	const borderProps = getBorderClassesAndStyles( attributes );
+	const imageClasses = classnames( borderProps.className, {
+		[ `wp-image-${ id }` ]: !! id,
+	} );
+
 	const image = (
 		<img
 			src={ url }
 			alt={ alt }
-			className={ id ? `wp-image-${ id }` : null }
+			className={ imageClasses || undefined }
+			style={ borderProps.style }
 			width={ width }
 			height={ height }
 			title={ title }

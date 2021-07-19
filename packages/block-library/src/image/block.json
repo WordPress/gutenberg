@@ -82,7 +82,11 @@
 			"background": false
 		},
 		"__experimentalBorder": {
-			"radius": true
+			"__experimentalSkipSerialization": true,
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
 		}
 	},
 	"styles": [
