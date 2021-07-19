@@ -2,6 +2,7 @@
  * External dependencies
  */
 import Hr from 'react-native-hr';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -13,16 +14,30 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 
-const HR = ( { getStylesFromColorScheme, ...props } ) => {
+const HR = ( { getStylesFromColorScheme, style, ...props } ) => {
 	const lineStyle = getStylesFromColorScheme( styles.line, styles.lineDark );
+	const customBackground = style?.backgroundColor
+		? { backgroundColor: style.backgroundColor }
+		: {};
 
 	return (
-		<Hr
-			{ ...props }
-			lineStyle={ [ lineStyle, props.lineStyle ] }
-			marginLeft={ 0 }
-			marginRight={ 0 }
-		/>
+		<View
+			style={ {
+				marginTop: style?.marginTop,
+				marginBottom: style?.marginBottom,
+			} }
+		>
+			<Hr
+				{ ...props }
+				lineStyle={ {
+					...lineStyle,
+					...props.lineStyle,
+					...customBackground,
+				} }
+				marginLeft={ 0 }
+				marginRight={ 0 }
+			/>
+		</View>
 	);
 };
 
