@@ -12,7 +12,15 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetupBeforeClass( $factory ) {
-		switch_theme( 'tt1-blocks' );
+		register_theme_directory( __DIR__ . '/fixtures/themes/' );
+
+		// Without this filter, get_template_directory() would erroneously return the default theme path
+		// (wp-content/themes/) for `test-theme` (rather than ./fixtures/themes/). Maybe a WP bug?
+		add_filter( 'template_directory', array( __CLASS__, 'change_theme_directory' ), 10, 2 );
+		add_filter( 'stylesheet_directory', array( __CLASS__, 'change_theme_directory' ), 10, 2 );
+
+		switch_theme( 'test-theme' );
+
 		gutenberg_register_template_post_type();
 		gutenberg_register_template_part_post_type();
 		gutenberg_register_wp_theme_taxonomy();
@@ -22,6 +30,15 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'role' => 'administrator',
 			)
 		);
+	}
+
+	public static function wpTearDownAfterClass() {
+		remove_filter( 'stylesheet_directory', array( __CLASS__, 'change_theme_directory' ) );
+		remove_filter( 'template_directory', array( __CLASS__, 'change_theme_directory' ) );
+	}
+
+	static function change_theme_directory( $theme_dir, $theme ) {
+		return __DIR__ . '/fixtures/themes/' . $theme;
 	}
 
 	public function test_register_routes() {
@@ -63,8 +80,8 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//index',
-				'theme'          => 'tt1-blocks',
+				'id'             => 'test-theme//index',
+				'theme'          => 'test-theme',
 				'slug'           => 'index',
 				'title'          => array(
 					'raw'      => 'Index',
@@ -77,7 +94,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'wp_id'          => null,
 				'has_theme_file' => true,
 			),
-			find_and_normalize_template_by_id( $data, 'tt1-blocks//index' )
+			find_and_normalize_template_by_id( $data, 'test-theme//index' )
 		);
 
 		// Test template parts.
@@ -87,8 +104,8 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//header',
-				'theme'          => 'tt1-blocks',
+				'id'             => 'test-theme//header',
+				'theme'          => 'test-theme',
 				'slug'           => 'header',
 				'title'          => array(
 					'raw'      => 'header',
@@ -102,13 +119,13 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'area'           => WP_TEMPLATE_PART_AREA_HEADER,
 				'has_theme_file' => true,
 			),
-			find_and_normalize_template_by_id( $data, 'tt1-blocks//header' )
+			find_and_normalize_template_by_id( $data, 'test-theme//header' )
 		);
 	}
 
 	public function test_get_item() {
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/tt1-blocks//index' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/test-theme//index' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		unset( $data['content'] );
@@ -116,8 +133,8 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//index',
-				'theme'          => 'tt1-blocks',
+				'id'             => 'test-theme//index',
+				'theme'          => 'test-theme',
 				'slug'           => 'index',
 				'title'          => array(
 					'raw'      => 'Index',
@@ -134,15 +151,15 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		);
 
 		// Test template parts.
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/template-parts/tt1-blocks//header' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/template-parts/test-theme//header' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		unset( $data['content'] );
 		unset( $data['_links'] );
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//header',
-				'theme'          => 'tt1-blocks',
+				'id'             => 'test-theme//header',
+				'theme'          => 'test-theme',
 				'slug'           => 'header',
 				'title'          => array(
 					'raw'      => 'header',
@@ -178,8 +195,8 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//my_custom_template',
-				'theme'          => 'tt1-blocks',
+				'id'             => 'test-theme//my_custom_template',
+				'theme'          => 'test-theme',
 				'slug'           => 'my_custom_template',
 				'title'          => array(
 					'raw'      => 'My Template',
@@ -215,8 +232,8 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 		$this->assertEquals(
 			array(
-				'id'             => 'tt1-blocks//my_custom_template_part',
-				'theme'          => 'tt1-blocks',
+				'id'             => 'test-theme//my_custom_template_part',
+				'theme'          => 'test-theme',
 				'slug'           => 'my_custom_template_part',
 				'title'          => array(
 					'raw'      => 'My Template Part',
@@ -238,7 +255,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 
 	public function test_update_item() {
 		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/tt1-blocks//index' );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/templates/test-theme//index' );
 		$request->set_body_params(
 			array(
 				'title' => 'My new Index Title',
@@ -250,7 +267,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$this->assertEquals( 'custom', $data['source'] );
 
 		// Test template parts.
-		$request = new WP_REST_Request( 'PUT', '/wp/v2/template-parts/tt1-blocks//header' );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/template-parts/test-theme//header' );
 		$request->set_body_params(
 			array(
 				'area' => 'something unsupported',
@@ -268,8 +285,9 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_template_not_found', $response, 404 );
 
+		// Cannot delete a file-based template.
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/templates/tt1-blocks//single' );
+		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/templates/test-theme//page' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_invalid_template', $response, 400 );
 	}
