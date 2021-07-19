@@ -46,7 +46,7 @@ const DEFAULT_QUERY = {
 
 const MIN_TERMS_COUNT_FOR_FILTER = 8;
 
-class HierarchicalTermSelector extends Component {
+export class HierarchicalTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
 		this.findTerm = this.findTerm.bind( this );
@@ -219,6 +219,29 @@ class HierarchicalTermSelector extends Component {
 		if ( this.props.taxonomy !== prevProps.taxonomy ) {
 			this.fetchTerms();
 		}
+
+		// Rebuild the available terms tree when the selected terms have changed.
+		if ( prevProps.terms.length !== this.props.terms.length ) {
+			this.setState( ( { availableTerms, filterValue } ) => {
+				const newAvailableTermsTree = this.sortBySelected(
+					buildTermsTree( availableTerms )
+				);
+
+				const newState = {
+					availableTermsTree: newAvailableTermsTree,
+				};
+
+				// If searching, rebuild the filtered terms tree also.
+				if ( 0 < filterValue.length ) {
+					newState.filteredTermsTree = this.getFilteredTermsTree(
+						filterValue,
+						newAvailableTermsTree
+					);
+				}
+
+				return newState;
+			} );
+		}
 	}
 
 	fetchTerms() {
@@ -277,14 +300,12 @@ class HierarchicalTermSelector extends Component {
 			}
 			return false;
 		};
-		const termOrChildIsSelected = ( termA, termB ) => {
+
+		const sortTerms = ( termA, termB ) => {
 			const termASelected = treeHasSelection( termA );
 			const termBSelected = treeHasSelection( termB );
 
-			if ( termASelected === termBSelected ) {
-				return 0;
-			}
-
+			// Selected terms come first.
 			if ( termASelected && ! termBSelected ) {
 				return -1;
 			}
@@ -293,18 +314,35 @@ class HierarchicalTermSelector extends Component {
 				return 1;
 			}
 
-			return 0;
+			// Neither is selected. Now sort by name.
+			if ( termA.name === termB.name ) {
+				return 0;
+			}
+
+			return termA.name < termB.name ? -1 : 1;
 		};
-		termsTree.sort( termOrChildIsSelected );
-		return termsTree;
+
+		termsTree.sort( sortTerms );
+
+		// Apply sorting recursively to all children.
+		return termsTree.map( ( termTree ) => {
+			if (
+				undefined === termTree.children ||
+				termTree.children.length === 0
+			) {
+				return termTree;
+			}
+
+			return {
+				...termTree,
+				children: this.sortBySelected( termTree.children ),
+			};
+		} );
 	}
 
 	setFilterValue( event ) {
-		const { availableTermsTree } = this.state;
 		const filterValue = event.target.value;
-		const filteredTermsTree = availableTermsTree
-			.map( this.getFilterMatcher( filterValue ) )
-			.filter( ( term ) => term );
+
 		const getResultCount = ( terms ) => {
 			let count = 0;
 			for ( let i = 0; i < terms.length; i++ ) {
@@ -315,6 +353,12 @@ class HierarchicalTermSelector extends Component {
 			}
 			return count;
 		};
+
+		const filteredTermsTree = this.getFilteredTermsTree(
+			filterValue,
+			this.state.availableTermsTree
+		);
+
 		this.setState( {
 			filterValue,
 			filteredTermsTree,
@@ -327,6 +371,12 @@ class HierarchicalTermSelector extends Component {
 			resultCount
 		);
 		this.props.debouncedSpeak( resultsFoundMessage, 'assertive' );
+	}
+
+	getFilteredTermsTree( filterValue, availableTermsTree ) {
+		return availableTermsTree
+			.map( this.getFilterMatcher( filterValue ) )
+			.filter( ( term ) => term );
 	}
 
 	getFilterMatcher( filterValue ) {
@@ -368,6 +418,7 @@ class HierarchicalTermSelector extends Component {
 
 	renderTerms( renderedTerms ) {
 		const { terms = [] } = this.props;
+
 		return renderedTerms.map( ( term ) => {
 			return (
 				<div
