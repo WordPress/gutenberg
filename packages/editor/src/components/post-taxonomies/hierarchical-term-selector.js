@@ -224,6 +224,8 @@ function HierarchicalTermSelector( { slug } ) {
 
 	const availableTermsTree = useMemo(
 		() => sortBySelected( buildTermsTree( availableTerms ), terms ),
+		// Remove `terms` from the dependency list to avoid reordering every time
+		// checking or unchecking a term.
 		[ availableTerms ]
 	);
 
