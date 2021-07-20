@@ -306,6 +306,7 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
+	styleVisualizer,
 } ) {
 	const {
 		contentPosition,
@@ -630,7 +631,7 @@ function CoverEdit( {
 			>
 				<BoxControlVisualizer
 					values={ styleAttribute?.spacing?.padding }
-					showValues={ styleAttribute?.visualizers?.padding }
+					showValues={ styleVisualizer?.spacing?.padding }
 				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
