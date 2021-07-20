@@ -7,10 +7,8 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import UnitControl from './unit-control';
-import { LABELS } from './utils';
+import { ALL_SIDES, LABELS } from './utils';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
-
-const allSides = [ 'top', 'right', 'bottom', 'left' ];
 
 export default function BoxInputControls( {
 	onChange = noop,
@@ -18,6 +16,8 @@ export default function BoxInputControls( {
 	onHoverOn = noop,
 	onHoverOff = noop,
 	values,
+	selectedUnits,
+	setSelectedUnits,
 	sides,
 	...props
 } ) {
@@ -40,8 +40,10 @@ export default function BoxInputControls( {
 	const createHandleOnChange = ( side ) => ( next, { event } ) => {
 		const { altKey } = event;
 		const nextValues = { ...values };
+		const isNumeric = ! isNaN( parseFloat( next ) );
+		const nextValue = isNumeric ? next : undefined;
 
-		nextValues[ side ] = next;
+		nextValues[ side ] = nextValue;
 
 		/**
 		 * Supports changing pair sides. For example, holding the ALT key
@@ -50,16 +52,16 @@ export default function BoxInputControls( {
 		if ( altKey ) {
 			switch ( side ) {
 				case 'top':
-					nextValues.bottom = next;
+					nextValues.bottom = nextValue;
 					break;
 				case 'bottom':
-					nextValues.top = next;
+					nextValues.top = nextValue;
 					break;
 				case 'left':
-					nextValues.right = next;
+					nextValues.right = nextValue;
 					break;
 				case 'right':
-					nextValues.left = next;
+					nextValues.left = nextValue;
 					break;
 			}
 		}
@@ -67,10 +69,16 @@ export default function BoxInputControls( {
 		handleOnChange( nextValues );
 	};
 
+	const createHandleOnUnitChange = ( side ) => ( next ) => {
+		const newUnits = { ...selectedUnits };
+		newUnits[ side ] = next;
+		setSelectedUnits( newUnits );
+	};
+
 	// Filter sides if custom configuration provided, maintaining default order.
 	const filteredSides = sides?.length
-		? allSides.filter( ( side ) => sides.includes( side ) )
-		: allSides;
+		? ALL_SIDES.filter( ( side ) => sides.includes( side ) )
+		: ALL_SIDES;
 
 	const first = filteredSides[ 0 ];
 	const last = filteredSides[ filteredSides.length - 1 ];
@@ -90,7 +98,11 @@ export default function BoxInputControls( {
 						isLast={ last === side }
 						isOnly={ only === side }
 						value={ values[ side ] }
+						unit={
+							values[ side ] ? undefined : selectedUnits[ side ]
+						}
 						onChange={ createHandleOnChange( side ) }
+						onUnitChange={ createHandleOnUnitChange( side ) }
 						onFocus={ createHandleOnFocus( side ) }
 						onHoverOn={ createHandleOnHoverOn( side ) }
 						onHoverOff={ createHandleOnHoverOff( side ) }
