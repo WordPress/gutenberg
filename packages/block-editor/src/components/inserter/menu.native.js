@@ -38,7 +38,7 @@ function InserterMenu( {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ showTabs, setShowTabs ] = useState( true );
 	// eslint-disable-next-line no-undef
-	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
+	const [ showSearchForm, setShowSearchForm ] = useState( true );
 	const [ tabIndex, setTabIndex ] = useState( 0 );
 
 	const {
