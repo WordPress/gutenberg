@@ -47,7 +47,12 @@ const DimensionControls = ( {
 	} );
 	const onDimensionChange = ( dimension, nextValue ) => {
 		const parsedValue = parseFloat( nextValue );
-		if ( isNaN( parsedValue ) ) return;
+		/**
+		 * If we have no value set and we change the unit,
+		 * we don't want to set the attribute, as it would
+		 * end up having the unit as value without any number.
+		 */
+		if ( isNaN( parsedValue ) && nextValue ) return;
 		setAttributes( {
 			[ dimension ]: parsedValue < 0 ? '0' : nextValue,
 		} );
