@@ -42,6 +42,7 @@ export function getDefinedValue( values = [], fallbackValue ) {
 }
 
 /**
+ *
  * @param {string} [locale]
  * @return {[RegExp, RegExp]} The delimiter and decimal regexp
  */
@@ -62,6 +63,7 @@ const ARABIC_NUMERAL_LOCALES = [ 'ar', 'fa', 'ur', 'ckb', 'ps' ];
 
 const EASTERN_ARABIC_NUMBERS = /([۰-۹]|[٠-٩])/g;
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Checks to see if a value is a numeric value (`number` or `string`).
  *
@@ -70,9 +72,10 @@ const EASTERN_ARABIC_NUMBERS = /([۰-۹]|[٠-٩])/g;
  *
  * @param {any}    value
  * @param {string} [locale]
- * @return {boolean} Whether value is numeric.
+ * @return {value is string | number} Whether value is numeric.
  */
 export function isValueNumeric( value, locale = window.navigator.language ) {
+	/* eslint-enable jsdoc/valid-types */
 	if ( ARABIC_NUMERAL_LOCALES.some( ( l ) => locale.startsWith( l ) ) ) {
 		locale = 'en-GB';
 		if ( EASTERN_ARABIC_NUMBERS.test( value ) ) {
@@ -98,5 +101,11 @@ export function isValueNumeric( value, locale = window.navigator.language ) {
 					.replace( decimalRegexp, '.' )
 					.replace( INTERNATIONAL_THOUSANDS_DELIMITER, '' )
 			: value;
-	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
+	return (
+		! isNaN( parseFloat( valueToCheck ) ) &&
+		! isNaN( Number( valueToCheck ) ) &&
+		isFinite( valueToCheck ) &&
+		Object.prototype.toString.call( valueToCheck ).toLowerCase() !==
+			'[object array]'
+	);
 }

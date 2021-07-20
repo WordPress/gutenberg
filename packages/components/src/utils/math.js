@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { clamp } from 'lodash';
-
-/**
  * Parses and retrieves a number value.
  *
  * @param {unknown} value The incoming value.
@@ -62,25 +57,45 @@ function getPrecision( value ) {
 }
 
 /**
+ * We can't use Lodash here because it doesn't handle Infinity like we want
+ *
+ * @see https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_clamp
+ * @param {number}             number
+ * @param {number | undefined} min
+ * @param {number | undefined} max
+ * @return {number} The clamped value
+ */
+const clamp = ( number, min, max ) => {
+	if ( min === Infinity && max === Infinity ) return number;
+	if ( typeof max === 'undefined' ) {
+		if ( typeof min === 'undefined' || number > min ) return number;
+		return min;
+	}
+
+	if ( typeof min === 'undefined' ) {
+		if ( typeof max === 'undefined' || number < max ) return number;
+		return max;
+	}
+
+	// otherwise everything is defined
+	if ( number < min ) return min;
+	if ( number > max ) return max;
+	return number;
+};
+
+/**
  * Clamps a value based on a min/max range with rounding
  *
- * @param {number} value The value.
- * @param {number} min   The minimum range.
- * @param {number} max   The maximum range.
- * @param {number} step  A multiplier for the value.
+ * @param {number}             value The value.
+ * @param {number | undefined} min   The minimum range.
+ * @param {number | undefined} max   The maximum range.
+ * @param {number}             step  A multiplier for the value.
  *
  * @return {number} The rounded and clamped value.
  */
-export function roundClamp(
-	value = 0,
-	min = Infinity,
-	max = Infinity,
-	step = 1
-) {
-	const baseValue = getNumber( value );
-	const stepValue = getNumber( step );
+export function roundClamp( value = 0, min, max, step = 1 ) {
 	const precision = getPrecision( step );
-	const rounded = Math.round( baseValue / stepValue ) * stepValue;
+	const rounded = Math.round( value / step ) * step;
 	const clampedValue = clamp( rounded, min, max );
 
 	return precision
