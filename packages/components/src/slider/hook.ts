@@ -118,7 +118,9 @@ export function useSlider(
 		'aria-valuemin': min,
 		'aria-valuemax': max,
 		'aria-valuenow': value,
-		'aria-valuetext': createCSSUnitValue( value, initialUnit ),
+		...( initialUnit && {
+			'aria-valuetext': createCSSUnitValue( value, initialUnit ),
+		} ),
 		role: 'slider',
 	};
 }
