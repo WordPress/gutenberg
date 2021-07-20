@@ -92,6 +92,7 @@ class NativeEditorProvider extends Component {
 	componentDidMount() {
 		const {
 			capabilities,
+			locale,
 			updateSettings,
 			galleryWithImageBlocks,
 		} = this.props;
@@ -100,6 +101,7 @@ class NativeEditorProvider extends Component {
 			...capabilities,
 			...{ __unstableGalleryWithImageBlocks: galleryWithImageBlocks },
 			...this.getThemeColors( this.props ),
+			locale,
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
