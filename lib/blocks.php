@@ -22,6 +22,7 @@ function gutenberg_reregister_core_block_types() {
 				'column',
 				'columns',
 				'cover',
+				'credits',
 				'gallery',
 				'group',
 				'heading',
