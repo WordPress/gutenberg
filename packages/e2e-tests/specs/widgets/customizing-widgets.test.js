@@ -101,7 +101,7 @@ describe( 'Widgets Customizer', () => {
 		await searchOption.click();
 
 		const addedSearchBlock = await find( {
-			role: undefined,
+			role: 'group',
 			name: 'Block: Search',
 		} );
 
@@ -305,7 +305,7 @@ describe( 'Widgets Customizer', () => {
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
 		const paragraphBlock = await find( {
-			role: undefined,
+			role: 'group',
 			name: 'Paragraph block',
 		} );
 		await paragraphBlock.focus();
@@ -394,7 +394,7 @@ describe( 'Widgets Customizer', () => {
 		await editParagraphWidget.click();
 
 		const firstParagraphBlock = await find( {
-			role: undefined,
+			role: 'group',
 			name: 'Paragraph block',
 			text: 'First Paragraph',
 		} );
@@ -426,7 +426,7 @@ describe( 'Widgets Customizer', () => {
 		await editHeadingWidget.click();
 
 		const headingBlock = await find( {
-			role: undefined,
+			role: 'group',
 			name: 'Block: Heading',
 			text: 'First Heading',
 		} );
@@ -792,7 +792,7 @@ async function addBlock( blockName ) {
 	await blockOption.click();
 
 	const addedBlock = await find( {
-		role: undefined,
+		role: 'group',
 		selector: '.is-selected[data-block]',
 	} );
 	await addedBlock.focus();
