@@ -227,6 +227,7 @@
 				"docs/reference-guides/filters/README.md": [
 					{ "docs/reference-guides/filters/block-filters.md": [] },
 					{ "docs/reference-guides/filters/editor-filters.md": [] },
+					{ "docs/reference-guides/filters/i18n-filters.md": [] },
 					{ "docs/reference-guides/filters/parser-filters.md": [] },
 					{
 						"docs/reference-guides/filters/autocomplete-filters.md": []
