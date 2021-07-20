@@ -111,10 +111,10 @@ This is done by adding JavaScript code to your block's definition. In this examp
 
 ```js
 transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ 'core/legacy-widget' ],
+	from: [
+		{
+			type: 'block',
+			blocks: [ 'core/legacy-widget' ],
 			isMatch: ( { idBase, instance } ) => {
 				if ( ! instance?.raw ) {
 					// Can't transform if raw instance is not shown in REST API.
@@ -122,13 +122,13 @@ transforms: {
 				}
 				return idBase === 'example_widget';
 			},
-            transform: ( { instance } ) => {
-                return createBlock( 'example/block', {
+			transform: ( { instance } ) => {
+				return createBlock( 'example/block', {
 					name: instance.raw.name,
-                } );
-            },
-        },
-    ]
+				} );
+			},
+		},
+	]
 },
 ```
 

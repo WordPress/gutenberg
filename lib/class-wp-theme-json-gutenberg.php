@@ -1308,7 +1308,7 @@ class WP_Theme_JSON_Gutenberg {
 				$theme_settings['settings']['spacing'] = array();
 			}
 			$theme_settings['settings']['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
-				array( 'px', 'em', 'rem', 'vh', 'vw' ) :
+				array( 'px', 'em', 'rem', 'vh', 'vw', '%' ) :
 				$settings['enableCustomUnits'];
 		}
 
