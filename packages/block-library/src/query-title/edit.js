@@ -10,15 +10,18 @@ import classnames from 'classnames';
 import {
 	AlignmentControl,
 	BlockControls,
+	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
+
+const SUPPORTED_TEMPLATES = [ 'archive', 'search', '404' ];
 
 export default function QueryTitleEdit( {
 	attributes: { content, level, textAlign },
@@ -59,6 +62,14 @@ export default function QueryTitleEdit( {
 	}, [] );
 
 	const titleElement = <TagName { ...blockProps }>{ content }</TagName>;
+
+	if ( ! SUPPORTED_TEMPLATES.includes( templateSlug ) ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>{ __( 'Template is not supported.' ) }</Warning>
+			</div>
+		);
+	}
 
 	return (
 		<>
