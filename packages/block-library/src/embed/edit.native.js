@@ -28,7 +28,12 @@ import { View } from '@wordpress/primitives';
 
 const EmbedEdit = ( props ) => {
 	const {
-		attributes: { providerNameSlug, responsive, url: attributesUrl },
+		attributes: {
+			providerNameSlug,
+			previewable,
+			responsive,
+			url: attributesUrl,
+		},
 		attributes,
 		isSelected,
 		onReplace,
@@ -157,6 +162,7 @@ const EmbedEdit = ( props ) => {
 	}
 
 	const showEmbedPlaceholder = ! preview || cannotEmbed;
+	const { type } = getMergedAttributes();
 
 	return (
 		<>
@@ -186,6 +192,10 @@ const EmbedEdit = ( props ) => {
 							insertBlocksAfter={ insertBlocksAfter }
 							isSelected={ isSelected }
 							label={ title }
+							onFocus={ onFocus }
+							preview={ preview }
+							previewable={ previewable }
+							type={ type }
 							url={ url }
 						/>
 					</View>

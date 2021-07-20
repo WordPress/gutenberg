@@ -53,6 +53,7 @@ const EmbedEdit = ( props ) => {
 		setAttributes,
 		insertBlocksAfter,
 		onFocus,
+		clientId,
 	} = props;
 
 	const defaultEmbedInfo = {
@@ -261,6 +262,7 @@ const EmbedEdit = ( props ) => {
 					icon={ icon }
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
+					clientId={ clientId }
 				/>
 			</View>
 		</>
