@@ -59,6 +59,7 @@ function gutenberg_reregister_core_block_types() {
 				'loginout.php'                  => 'core/loginout',
 				'navigation.php'                => 'core/navigation',
 				'navigation-link.php'           => 'core/navigation-link',
+				'navigation-heading.php'        => 'core/navigation-heading',
 				'home-link.php'                 => 'core/home-link',
 				'rss.php'                       => 'core/rss',
 				'search.php'                    => 'core/search',

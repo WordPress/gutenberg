@@ -33,6 +33,7 @@ import * as html from './html';
 import * as mediaText from './media-text';
 import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
+import * as navigationHeading from './navigation-heading';
 import * as homeLink from './home-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
@@ -230,6 +231,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				[
 					navigation,
 					navigationLink,
+					navigationHeading,
 					homeLink,
 
 					// Register Full Site Editing Blocks.
