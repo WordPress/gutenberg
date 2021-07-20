@@ -6,9 +6,16 @@
 	"description": "Displays credits for the site.",
 	"textdomain": "default",
 	"attributes": {
+		"contentID": {
+			"type": "number",
+			"default": 0
+		},
 		"content": {
 			"type": "string",
-			"default": "Powered by WordPress"
+			"default": ""
+		},
+		"textAlign": {
+			"type": "string"
 		}
 	},
 	"supports": {

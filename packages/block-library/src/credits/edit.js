@@ -1,44 +1,78 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import {
+	useBlockProps,
+	InspectorControls,
+	AlignmentControl,
+	BlockControls,
+} from '@wordpress/block-editor';
 import { PanelBody, SelectControl } from '@wordpress/components';
+import { useEffect } from '@wordpress/element';
 
 export default function CreditsEdit( {
-	attributes: { content },
+	attributes: { contentID, content, textAlign },
 	setAttributes,
-	setCreditText,
 } ) {
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 	const creditOptions = [
-		{ value: 1, label: __( 'Option 1' ) },
-		{ value: 2, label: __( 'Option 2' ) },
+		{ value: 0, label: __( 'Built with WordPress' ) },
+		{ value: 1, label: __( 'Powered by WordPress' ) },
+		{ value: 2, label: __( 'Website built with WordPress' ) },
+		{ value: 3, label: __( 'Website powered by WordPress' ) },
 	];
-	const { creditsText } = content;
+
 	useEffect( () => {
-		setAttributes( {
-			content,
-		} );
+		if ( content === '' ) {
+			setAttributes( {
+				content: getLabel( contentID ),
+			} );
+		}
 	}, [] );
-	const onCreditsTextChange = ( newValue ) => {
-		const updateQuery = { creditsText: newValue };
-		setCreditText( updateQuery );
-	};
+
+	function getLabel( value ) {
+		const selectedOption = creditOptions.find(
+			( option ) => option.value === parseInt( value )
+		);
+		return selectedOption.label;
+	}
+
 	return (
-		<div { ...blockProps }>
+		<p { ...blockProps }>
+			<BlockControls group="block">
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
+			</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody title={ __( 'Settings' ) }>
 					<SelectControl
 						options={ creditOptions }
-						value={ creditsText }
+						value={ contentID }
 						label={ __( 'Credits text' ) }
-						onChange={ onCreditsTextChange }
+						onChange={ ( value ) =>
+							setAttributes( {
+								contentID: value,
+								content: getLabel( value ),
+							} )
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>
 			{ content }
-		</div>
+		</p>
 	);
 }
