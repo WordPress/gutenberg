@@ -12,6 +12,8 @@ function register_gutenberg_patterns() {
 	// Register categories used for block patterns.
 	if ( ! WP_Block_Pattern_Categories_Registry::get_instance()->is_registered( 'query' ) ) {
 		register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
+		register_block_pattern_category( 'page-header', array( 'label' => __( 'Page Header', 'gutenberg' ) ) );
+		register_block_pattern_category( 'page-footer', array( 'label' => __( 'Page Footer', 'gutenberg' ) ) );
 	}
 
 	$patterns = array(
@@ -157,6 +159,238 @@ function register_gutenberg_patterns() {
 								<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
 								<!-- /wp:social-links -->',
 		),
+		'template-part/header-site-title-navigation' => array(
+			'title'      => __( 'Header with title and navigation', 'gutenberg' ),
+			'categories'    => array( 'page-header' ),
+			'blockTypes' => array( 'core/template-part/header' ),
+			'content'    => '<!-- wp:columns {"isStackedOnMobile":false,"align":"full","className":"alignfull are-vertically-aligned-center"} -->
+							<div class="wp-block-columns alignfull is-not-stacked-on-mobile are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"33.33%","style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;flex-basis:33.33%"><!-- wp:site-title {"fontSize":"normal"} /--></div>
+							<!-- /wp:column -->
+
+							<!-- wp:column {"verticalAlignment":"center","width":"66.66%","style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;flex-basis:66.66%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right","isResponsive":true} /--></div>
+							<!-- /wp:column --></div>
+							<!-- /wp:columns -->',
+		),
+		'template-part/header-logo-site-title-navigation' => array(
+			'title'      => __( 'Header with logo, title and navigation', 'gutenberg' ),
+			'categories'    => array( 'page-header' ),
+			'blockTypes' => array( 'core/template-part/header' ),
+			'content'    => '<!-- wp:columns {"isStackedOnMobile":false,"align":"full","className":"are-vertically-aligned-center"} -->
+							<div class="wp-block-columns alignfull is-not-stacked-on-mobile are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"32px","style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;flex-basis:32px"><!-- wp:site-logo {"width":32} /--></div>
+							<!-- /wp:column -->
+
+							<!-- wp:column {"width":""} -->
+							<div class="wp-block-column"><!-- wp:site-title {"fontSize":"normal"} /--></div>
+							<!-- /wp:column -->
+
+							<!-- wp:column {"verticalAlignment":"center","width":"","style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right","isResponsive":true} /--></div>
+							<!-- /wp:column --></div>
+							<!-- /wp:columns -->',
+		),
+		'template-part/header-site-logo-navigation' => array(
+			'title'      => __( 'Header with logo and navigation', 'gutenberg' ),
+			'categories'    => array( 'page-header' ),
+			'blockTypes' => array( 'core/template-part/header' ),
+			'content'    => '<!-- wp:columns {"isStackedOnMobile":false,"align":"full","className":"alignfull are-vertically-aligned-center"} -->
+							<div class="wp-block-columns alignfull is-not-stacked-on-mobile are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"32px","style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;flex-basis:32px"><!-- wp:site-logo {"width":32} /--></div>
+							<!-- /wp:column -->
+
+							<!-- wp:column {"verticalAlignment":"center","width":"","style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right","isResponsive":true} /--></div>
+							<!-- /wp:column --></div>
+							<!-- /wp:columns -->',
+		),
+		'template-part/header-with-social-links' => array(
+			'title'      => __( 'Header with social links', 'gutenberg' ),
+			'categories'    => array( 'page-header' ),
+			'blockTypes' => array( 'core/template-part/header' ),
+			'content'    => '<!-- wp:columns {"isStackedOnMobile":false,"verticalAlignment":"center","align":"full"} -->
+							<div class="wp-block-columns alignfull is-not-stacked-on-mobile are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"33.33%"} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"left","isResponsive":true} /--></div>
+							<!-- /wp:column -->
+							<!-- wp:column {"verticalAlignment":"center","width":"33.33%"} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:site-title {"textAlign":"center"} /--></div>
+							<!-- /wp:column -->
+							<!-- wp:column {"verticalAlignment":"center","width":"33.33%"} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:social-links {"className":"items-justified-right is-style-logos-only"} -->
+							<ul class="wp-block-social-links items-justified-right is-style-logos-only"><!-- wp:social-link {"url":"#","service":"twitter"} /-->
+							<!-- wp:social-link {"url":"#","service":"instagram"} /-->
+							<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
+							<!-- /wp:social-links --></div>
+							<!-- /wp:column --></div>
+							<!-- /wp:columns -->',
+		),
+		'template-part/centered-header' => array(
+			'title'      => __( 'Centered page header', 'gutenberg' ),
+			'categories'    => array( 'page-header' ),
+			'blockTypes' => array( 'core/template-part/header' ),
+			'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"2em","right":"2em","bottom":"2em","left":"2em"}}}} -->
+							<div class="wp-block-group alignfull" style="padding-top:2em;padding-right:2em;padding-bottom:2em;padding-left:2em">
+
+							<!-- wp:site-logo {"align":"center"} /-->
+
+							<!-- wp:site-title {"textAlign":"center","style":{"typography":{"fontSize":"48px","textTransform":"capitalize","lineHeight":"1.1"},"spacing":{"padding":{"top":"0px","right":"0px","bottom":"0px","left":"0px"}}}} /-->
+
+							<!-- wp:site-tagline {"textAlign":"center"} /-->
+
+							<!-- wp:spacer {"height":40} -->
+							<div style="height:40px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+
+							<!-- wp:navigation {"orientation":"horizontal","itemsJustification":"center","isResponsive":true} /--></div>
+							<!-- /wp:group -->',
+		),
+		'template-part/header-large-image' => array(
+			'title'      => __( 'Header with large image', 'gutenberg' ),
+			'categories'    => array( 'page-header' ),
+			'blockTypes' => array( 'core/template-part/header' ),
+			'content'    => '<!-- wp:cover {"url":"https://s.w.org/images/core/5.8/forest.jpg","id":2613,"minHeight":600,"contentPosition":"center center","align":"full"} -->
+							<div class="wp-block-cover alignfull has-background-dim" style="min-height:600px"><img class="wp-block-cover__image-background wp-image-2613" alt="" src="https://s.w.org/images/core/5.8/forest.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:columns {"isStackedOnMobile":false,"align":"wide"} -->
+							<div class="wp-block-columns is-not-stacked-on-mobile alignwide"><!-- wp:column {"verticalAlignment":"center"} -->
+							<div class="wp-block-column is-vertically-aligned-center"><!-- wp:site-title {"style":{"elements":{"link":{"color":{"text":"#FFFFFF"}}}}} /--></div>
+							<!-- /wp:column -->
+
+							<!-- wp:column -->
+							<div class="wp-block-column"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right","fontSize":"normal","isResponsive":true} /--></div>
+							<!-- /wp:column --></div>
+							<!-- /wp:columns -->
+
+							<!-- wp:spacer {"height":400} -->
+							<div style="height:400px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+
+							<!-- wp:columns {"align":"wide"} -->
+							<div class="wp-block-columns alignwide"><!-- wp:column {"width":"75%"} -->
+							<div class="wp-block-column" style="flex-basis:75%"><!-- wp:heading {"style":{"typography":{"fontSize":"48px"}}} -->
+							<h2 style="font-size:48px">' . esc_html__( 'Our natural environment provides endless opportunities for adventure.', 'default' ) . '</h2>
+							<!-- /wp:heading -->
+
+							<!-- wp:button {"style":{"color":{"text":"#000000","background":"#ffffff"},"border":{"radius":0}}} -->
+							<div class="wp-block-button"><a class="wp-block-button__link has-text-color has-background no-border-radius" href="#" style="background-color:#ffffff;color:#000000">' . esc_html__( 'Learn more.', 'default' ) . '</a></div>
+							<!-- /wp:button --></div>
+							<!-- /wp:column --></div>
+							<!-- /wp:columns -->
+
+							<!-- wp:column -->
+							<div class="wp-block-column"></div>
+							<!-- /wp:column --></div></div>
+							<!-- /wp:cover -->',
+		),
+		'template-part/modern-header-with-image-on-the-right' => array(
+			'title'      => __( 'Modern header with image on the right', 'gutenberg' ),
+			'categories'    => array( 'page-header' ),
+			'blockTypes' => array( 'core/template-part/header' ),
+			'content'    => '<!-- wp:media-text {"align":"full","mediaPosition":"right","mediaId":2589,"mediaLink":"https://s.w.org/images/core/5.8/nature-above-02.jpg","mediaType":"image","imageFill":true,"style":{"color":{"background":"#d7e4d9","text":"#000000"},"elements":{"link":{"color":{"text":"#000000"}}}}} -->
+							<div class="wp-block-media-text alignfull has-media-on-the-right is-stacked-on-mobile is-image-fill has-text-color has-background has-link-color" style="background-color:#d7e4d9;color:#000000"><figure class="wp-block-media-text__media" style="background-image:url(https://s.w.org/images/core/5.8/nature-above-02.jpg);background-position:50% 50%"><img src="https://s.w.org/images/core/5.8/nature-above-02.jpg" alt="" class="wp-image-2589 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:spacer {"height":50} -->
+							<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+
+							<!-- wp:site-logo {"className":"is-style-default"} /-->
+
+							<!-- wp:spacer {"height":400} -->
+							<div style="height:400px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+
+							<!-- wp:site-title {"style":{"typography":{"textTransform":"capitalize","fontSize":"48px","lineHeight":"1.0"}}} /-->
+
+							<!-- wp:navigation {"orientation":"horizontal","color":{"text":"#161616"}},"style":{"typography":{"textTransform":"uppercase"}},"fontSize":"normal"} /-->
+
+							<!-- wp:spacer {"height":50} -->
+							<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer --></div></div>
+							<!-- /wp:media-text -->',
+		),
+		'template-part/footer-navigation-credit' => array(
+			'title'      => __( 'Footer with navigation and credit line', 'gutenberg' ),
+			'categories'    => array( 'page-footer' ),
+			'blockTypes' => array( 'core/template-part/footer' ),
+			'content'    => '<!-- wp:columns {"isStackedOnMobile":false,"verticalAlignment":"center","align":"full"} -->
+							<div class="wp-block-columns alignfull is-not-stacked-on-mobile are-vertically-aligned-center"><!-- wp:column {"style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px"><!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /--></div>
+							<!-- /wp:column -->
+
+							<!-- wp:column {"style":{"spacing":{"padding":{"top":"10px","right":"20px","bottom":"10px","left":"20px"}}}} -->
+							<div class="wp-block-column" style="padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px"><!-- wp:paragraph {"align":"right","fontSize":"normal"} -->
+							<p class="has-text-align-right has-normal-font-size">' . esc_html__( 'Proudly powered by WordPress', 'default' ) . '</p>
+							<!-- /wp:paragraph --></div>
+							<!-- /wp:column --></div>
+							<!-- /wp:columns -->',
+		),
+		'template-part/footer-centered-social' => array(
+			'title'      => __( 'Centered footer with social links', 'gutenberg' ),
+			'categories'    => array( 'page-footer' ),
+			'blockTypes' => array( 'core/template-part/footer' ),
+			'content'    => '<!-- wp:spacer {"height":30} --><div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div><!-- /wp:spacer --><!-- wp:social-links {"className":"items-justified-center is-style-logos-only"} --> <ul class="wp-block-social-links items-justified-center is-style-logos-only"><!-- wp:social-link {"url":"#","service":"twitter"} /--> <!-- wp:social-link {"url":"#","service":"instagram"} /--> <!-- wp:social-link {"url":"#","service":"mail"} /--></ul> <!-- /wp:social-links --><!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"16px"}}} --><p class="has-text-align-center" style="font-size:16px">' . esc_html__( 'Powered by WordPress', 'default' ) . '</p><!-- /wp:paragraph -->', ),
+		'template-part/footer-latest-posts' => array(
+			'title'      => __( 'Footer with latest posts', 'gutenberg' ),
+			'categories'    => array( 'page-footer' ),
+			'blockTypes' => array( 'core/template-part/footer' ),
+			'content'    => '<!-- wp:group {"align":"full","style":{"color":{"background":"#121212","text":"#f1f1f1"},"elements":{"link":{"color":{"text":"#f1f1f1"}}}}} -->
+							<div class="wp-block-group alignfull has-text-color has-background has-link-color" style="background-color:#121212;color:#f1f1f1"><!-- wp:spacer {"height":10} -->
+							<div style="height:10px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+							<!-- wp:latest-posts {"postsToShow":3,"displayPostContent":true,"excerptLength":12,"postLayout":"grid","displayFeaturedImage":true,"featuredImageSizeSlug":"large","addLinkToFeaturedImage":true} /-->
+							<!-- wp:spacer {"height":20} -->
+							<div style="height:20px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+							<!-- wp:columns {"verticalAlignment":"bottom","align":"wide"} -->
+							<div class="wp-block-columns alignwide are-vertically-aligned-bottom"><!-- wp:column {"verticalAlignment":"bottom","width":"33.33%"} -->
+							<div class="wp-block-column is-vertically-aligned-bottom" style="flex-basis:33.33%"><!-- wp:site-title {"fontSize":"large"} /--></div>
+							<!-- /wp:column -->
+							<!-- wp:column {"verticalAlignment":"bottom","width":"66.67%"} -->
+							<div class="wp-block-column is-vertically-aligned-bottom" style="flex-basis:66.67%"><!-- wp:paragraph {"align":"right","fontSize":"extra-small"} -->
+							<p class="has-text-align-right has-extra-small-font-size">' . esc_html__( '© 2021 The Earth', 'default' ) . '</p>
+							<!-- /wp:paragraph --></div>
+							<!-- /wp:column --></div>
+							<!-- /wp:columns -->
+							<!-- wp:spacer {"height":10} -->
+							<div style="height:10px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer --></div>
+							<!-- /wp:group -->',
+		),
+		'template-part/footer-modern' => array(
+			'title'      => __( 'Modern footer with description and logo', 'gutenberg' ),
+			'categories'    => array( 'page-footer' ),
+			'blockTypes' => array( 'core/template-part/footer' ),
+			'content'    => '<!-- wp:columns {"align":"full","style":{"color":{"background":"#d7e4d9"}}} -->
+							<div class="wp-block-columns alignfull has-background" style="background-color:#d7e4d9"><!-- wp:column {"width":"33%"} -->
+							<div class="wp-block-column" style="flex-basis:33%"><!-- wp:paragraph -->
+							<p><strong>' . esc_html__( 'ABOUT US', 'default' ) . '</strong></p>
+							<!-- /wp:paragraph -->
+							<!-- wp:paragraph -->
+							<p>' . esc_html__( 'This website has been around since 2003. Its current iteration includes a photography blog, an art gallery dedicated to found geometric shapes, and a store that sells t-shirts.', 'default' ) . '</p>
+							<!-- /wp:paragraph -->
+							<!-- wp:spacer {"height":200} -->
+							<div style="height:200px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+							<!-- wp:paragraph {"fontSize":"extra-small"} -->
+							<p class="has-extra-small-font-size">' . esc_html__( '© The Earth', 'default' ) . '</p>
+							<!-- /wp:paragraph --></div>
+							<!-- /wp:column -->
+							<!-- wp:column {"width":"33.33%"} -->
+							<div class="wp-block-column" style="flex-basis:33.33%"></div>
+							<!-- /wp:column -->
+							<!-- wp:column {"verticalAlignment":"bottom","width":"33.33%"} -->
+							<div class="wp-block-column is-vertically-aligned-bottom" style="flex-basis:33.33%"><!-- wp:site-logo {"align":"right","width":40} /--></div>
+							<!-- /wp:column --></div>
+							<!-- /wp:columns -->',
+		),
+		'social-links/shared-background-color' => array(
+			'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
+			'categories'    => array( 'buttons' ),
+			'blockTypes'    => array( 'core/social-links' ),
+			'viewportWidth' => 500,
+			'content'       => '<!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->
+								<ul class="wp-block-social-links has-icon-color has-icon-background-color"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->
+								<!-- wp:social-link {"url":"#","service":"chain"} /-->
+								<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
+								<!-- /wp:social-links -->',
+		)
 	);
 
 	foreach ( $patterns as $name => $pattern ) {
@@ -235,7 +469,6 @@ function load_remote_patterns() {
 		}
 	}
 }
-
 
 add_action(
 	'init',
