@@ -200,6 +200,8 @@ export default function Sandbox( {
 		<WebView
 			ref={ ref }
 			source={ { html: iframeHtml } }
+			// Wildcard value is required for static HTML
+			// Reference: https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md#source
 			originWhitelist={ [ '*' ] }
 			style={ [
 				sandboxStyles[ 'sandbox-webview__container' ],
