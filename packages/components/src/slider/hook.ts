@@ -115,5 +115,10 @@ export function useSlider(
 		style: componentStyles,
 		type: 'range',
 		value,
+		'aria-valuemin': min,
+		'aria-valuemax': max,
+		'aria-valuenow': value,
+		'aria-valuetext': createCSSUnitValue( value, initialUnit ),
+		role: 'slider',
 	};
 }

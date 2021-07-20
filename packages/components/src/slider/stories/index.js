@@ -22,10 +22,10 @@ export const _default = () => {
 	return (
 		<VStack>
 			<Text>Value: { value }</Text>
-			<FormGroup label="Slider">
+			<FormGroup label="Test slider">
 				<Slider onChange={ setValue } value={ value } />
 			</FormGroup>
-			<FormGroup label="Slider">
+			<FormGroup label="Test slider">
 				<Slider onChange={ setValue } value={ value } />
 			</FormGroup>
 		</VStack>

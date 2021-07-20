@@ -19,6 +19,20 @@ const Slider = (
 	return <View { ...useSlider( props ) } as="input" ref={ forwardedRef } />;
 };
 
+/**
+ * `Slider` is a form component lets users choose a value within a range.
+ *
+ * @example
+ * ```jsx
+ * import { __experimentalSlider as Slider } from `@wordpress/components`
+ *
+ * function Example() {
+ *   return (
+ *     <Slider />
+ *   );
+ * }
+ * ```
+ */
 const ConnectedSlider = contextConnect( Slider, 'Slider' );
 
 export default ConnectedSlider;
