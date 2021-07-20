@@ -103,6 +103,7 @@ export function ImageEdit( {
 		alt,
 		caption,
 		align,
+		alignCaption,
 		id,
 		width,
 		height,
@@ -300,6 +301,7 @@ export function ImageEdit( {
 		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
+		[ `align-caption-${ alignCaption }` ]: alignCaption,
 	} );
 
 	const blockProps = useBlockProps( {

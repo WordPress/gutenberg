@@ -15,6 +15,7 @@ export default function save( { attributes } ) {
 		alt,
 		caption,
 		align,
+		alignCaption,
 		href,
 		rel,
 		linkClass,
@@ -30,6 +31,7 @@ export default function save( { attributes } ) {
 
 	const classes = classnames( {
 		[ `align${ align }` ]: align,
+		[ `align-caption-${ alignCaption }` ]: alignCaption,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
 	} );
