@@ -88,6 +88,7 @@ const NavigationPanel = ( { isOpen } ) => {
 		<div
 			className={ classnames( `edit-site-navigation-panel`, {
 				'is-open': isOpen,
+				'display-none': !isOpen,
 			} ) }
 			ref={ panelRef }
 			tabIndex="-1"
