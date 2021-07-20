@@ -154,11 +154,23 @@
 .post-publish-panel__postpublish-post-address {
 	margin-bottom: $grid-unit-20;
 
+	.components-base-control__field {
+		margin-bottom: 0;
+	}
+
 	input[readonly] {
 		padding: 10px;
 		background: $gray-300;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+}
+
+.post-publish-panel__postpublish-post-address__button-wrap {
+	flex-shrink: 0;
+
+	.components-button {
+		height: 38px;
 	}
 }
 
@@ -172,4 +184,15 @@
 
 .post-publish-panel__tip {
 	color: $alert-yellow;
+}
+
+.post-publish-panel__dashboard-link {
+	margin-top: $grid-unit-15;
+	display: flex;
+	justify-content: center;
+
+	.components-button {
+		color: inherit;
+		text-decoration: none;
+	}
 }
