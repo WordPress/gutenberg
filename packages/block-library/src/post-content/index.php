@@ -17,6 +17,9 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	static $seen_ids = array();
 
 	if ( ! isset( $block->context['postId'] ) ) {
+		if ( is_404() ) {
+			return __( 'It looks like nothing was found at this location.' );
+		}
 		return '';
 	}
 
