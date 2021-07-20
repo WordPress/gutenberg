@@ -298,9 +298,8 @@ class HierarchicalTermSelector extends Component {
 		return termsTree;
 	}
 
-	setFilterValue( value ) {
+	setFilterValue( filterValue ) {
 		const { availableTermsTree } = this.state;
-		const filterValue = value;
 		const filteredTermsTree = availableTermsTree
 			.map( this.getFilterMatcher( filterValue ) )
 			.filter( ( term ) => term );
