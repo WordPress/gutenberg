@@ -71,7 +71,7 @@
 		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#v9.13.7-wp",
 		"react-native-url-polyfill": "^1.1.2",
 		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#5.0.2-wp",
-		"react-native-webview": "git+https://github.com/wordpress-mobile/react-native-webview.git#d78cb7d4e1ad2ce471965c2a9ed4f34d8ad7ddbd"
+		"react-native-webview": "git+https://github.com/wordpress-mobile/react-native-webview.git#v11.6.2-wp"
 	},
 	"publishConfig": {
 		"access": "public"
