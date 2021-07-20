@@ -17,7 +17,7 @@
 function render_block_core_query_title( $attributes ) {
 	$is_search  = is_search();
 	$is_archive = is_archive();
-	$title = isset( $attributes['content'] ) ? $attributes['content'] : '';
+	$title      = isset( $attributes['content'] ) ? $attributes['content'] : '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
 	}
