@@ -21,7 +21,7 @@ function render_block_core_query_title( $attributes ) {
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
 	}
-	if ( $is_search ) {
+	elseif ( $is_search ) {
 		global $wp_query;
 		$formats      = array( '%total%', '%search%' );
 		$replacements = array( $wp_query->found_posts, get_search_query() );
