@@ -5,6 +5,12 @@
 	"category": "design",
 	"description": "Displays credits for the site.",
 	"textdomain": "default",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"default": "Powered by WordPress"
+		}
+	},
 	"supports": {
 		"html": false
 	},
