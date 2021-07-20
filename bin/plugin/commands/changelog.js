@@ -678,7 +678,7 @@ async function getChangelog( settings ) {
  * Sorts the feature groups by the feature which contains the greatest number of PRs
  * ready for output into the changelog.
  *
- * @param {Object[]} featureGroups feature specific PRs keyed by feature name.
+ * @param {Object.<string, IssuesListForRepoResponseItem[]>} featureGroups feature specific PRs keyed by feature name.
  * @return {string[]} sorted list of feature names.
  */
 function sortFeatureGroups( featureGroups ) {
