@@ -6,13 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-// import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import {
 	AlignmentControl,
 	BlockControls,
 	useBlockProps,
 	Warning,
 	RichText,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
@@ -35,6 +36,9 @@ export default function QueryTitleEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
 	let titleElement;
 
 	// Infer title content from template slug context
@@ -89,6 +93,7 @@ export default function QueryTitleEdit( {
 
 	// Update content based on current template
 	useEffect( () => {
+		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( {
 			content,
 		} );
