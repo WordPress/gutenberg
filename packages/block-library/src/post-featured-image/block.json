@@ -9,6 +9,16 @@
 		"isLink": {
 			"type": "boolean",
 			"default": false
+		},
+		"width": {
+			"type": "string"
+		},
+		"height": {
+			"type": "string"
+		},
+		"scale": {
+			"type": "string",
+			"default": "cover"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
