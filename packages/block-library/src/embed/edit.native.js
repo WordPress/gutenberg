@@ -192,6 +192,7 @@ const EmbedEdit = ( props ) => {
 							insertBlocksAfter={ insertBlocksAfter }
 							isSelected={ isSelected }
 							label={ title }
+							onFocus={ onFocus }
 							preview={ preview }
 							previewable={ previewable }
 							type={ type }
