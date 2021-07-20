@@ -17,7 +17,7 @@ class AddReadableJsAssetsWebpackPlugin {
 		for ( const [ file, source ] of compilation.unminifiedAssets ) {
 			await fs.promises.writeFile(
 				path.join( compilation.options.output.path, file ),
-				source
+				source.replace( /\r\n/g, '\n' )
 			);
 		}
 	}
