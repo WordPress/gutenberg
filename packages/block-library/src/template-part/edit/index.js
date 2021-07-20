@@ -49,6 +49,7 @@ export default function TemplatePartEdit( {
 		defaultWrapper,
 		area,
 		enableSelection,
+		hasResolvedReplacements,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -102,6 +103,10 @@ export default function TemplatePartEdit( {
 				defaultWrapper: defaultWrapperElement || 'div',
 				area: _area,
 				enableSelection: _enableSelection,
+				hasResolvedReplacements: hasFinishedResolution(
+					'getEntityRecords',
+					availableReplacementArgs
+				),
 			};
 		},
 		[ templatePartId, clientId ]
@@ -159,6 +164,7 @@ export default function TemplatePartEdit( {
 						clientId={ clientId }
 						setAttributes={ setAttributes }
 						enableSelection={ enableSelection }
+						hasResolvedReplacements={ hasResolvedReplacements }
 					/>
 				</TagName>
 			) }
