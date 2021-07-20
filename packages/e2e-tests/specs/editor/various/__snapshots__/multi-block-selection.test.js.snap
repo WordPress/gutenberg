@@ -79,7 +79,11 @@ exports[`Multi-block selection should gradually multi-select 1`] = `
 
 <!-- wp:paragraph -->
 <p>2</p>
-<!-- /wp:paragraph --></div>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li>1</li></ul>
+<!-- /wp:list --></div>
 <!-- /wp:column -->
 
 <!-- wp:column -->
