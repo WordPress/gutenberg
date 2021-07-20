@@ -93,18 +93,13 @@
 			"type": "boolean",
 			"default": false
 		},
-		"isGrouped": {
-			"type": "boolean",
-			"default": true
-		},
 		"imageCount": {
 			"type": "number",
 			"default": 0
 		}
 	},
 	"providesContext": {
-		"allowResize": "allowResize",
-		"isGrouped": "isGrouped"
+		"allowResize": "allowResize"
 	},
 	"supports": {
 		"anchor": true,

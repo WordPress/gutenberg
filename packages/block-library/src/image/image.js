@@ -88,7 +88,7 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { allowResize = true, isGrouped = false } = context;
+	const { allowResize = true } = context;
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -321,7 +321,7 @@ export default function Image( {
 						label={ __( 'Upload external image' ) }
 					/>
 				) }
-				{ ! isGrouped && ! multiImageSelection && canInsertCover && (
+				{ ! multiImageSelection && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }
