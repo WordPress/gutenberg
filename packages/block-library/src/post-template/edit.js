@@ -136,7 +136,13 @@ export default function PostTemplateEdit( {
 	}
 
 	if ( ! posts.length ) {
-		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
+		return (
+			<p { ...blockProps }>
+				{ __(
+					"There are no published posts yet. When you create or publish a post, you'll see it here."
+				) }
+			</p>
+		);
 	}
 
 	return (
