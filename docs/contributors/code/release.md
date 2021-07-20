@@ -113,6 +113,20 @@ If a bug is found in a release candidate and a fix is committed to `trunk`, we s
 
 If you decide that the fixes deserve another release candidate before the stable version is published, create one by following the instructions above. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7).
 
+### Creating Point Releases
+
+Occasionally it's necessary to create a point release (i.e. X.Y._Z_) of the Plugin.
+
+The method for doing this is nearly identical to the main Plugin release process (see above). In the `Run workflow` control specify `stable` and, _if_ the previous version was stable (`x.y.z`), the workflow will release a point release, with z incremented (`x.y.(z+1)`) as necessary.
+
+**Please note** however, that if the previous release was an _RC_ (e.g. `x.y.0-rc.1`), the workflow will try to release the next major _stable_ version. Therefore, should you wish to release a point release for a stable version of the Plugin (e.g. `10.1.0`) but there is an _RC already published_ for the _next_ version of the Plugin (e.g. `10.2.0-rc.1`) you will need to manually select the stable version's release branch when creating the release.
+
+To do this, when running the Workflow, select the appropriate `release/` branch from the `Use workflow from` dropdown (e.g. `release/10.1`) and specify `stable` in the text input field.
+
+Please note you **cannot create point releases for previous stable releases once a more recent stable release has been published** as this would require significant changes to how we upload plugin versions to the WP.org plugin SVN repo).
+
+More more information please see [this Issue](https://github.com/WordPress/gutenberg/issues/33277#issuecomment-876289457).
+
 ## Packages Releases to npm and WordPress Core Updates
 
 The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wordpress.org/core/handbook/about/release-cycle/) in terms of branching for each SVN branch, a corresponding Gutenberg `wp/*` branch is created:
