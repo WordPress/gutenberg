@@ -41,9 +41,14 @@ export default function QueryTitleEdit( {
 	// Defaults to content attribute prop
 	switch ( templateSlug ) {
 		case 'archive':
-			// translators: Title for archive template.
-			content = _x( 'Archive title', 'archive template title' );
-			titleElement = <TagName { ...blockProps }>{ content }</TagName>;
+			titleElement = (
+				<TagName { ...blockProps }>
+					{
+						// translators: Title for archive template.
+						_x( 'Archive title', 'archive template title' )
+					}
+				</TagName>
+			);
 			break;
 		case 'search':
 			// translators: Title for search template with dynamic content placeholders.
