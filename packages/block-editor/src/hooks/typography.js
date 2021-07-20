@@ -68,18 +68,18 @@ export function TypographyPanel( props ) {
 
 	if ( isDisabled || ! isSupported ) return null;
 
-	const isSupporteWeb = Platform.OS === 'web';
+	const isSupporteOnWeb = Platform.OS === 'web';
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Typography' ) }>
-				{ isSupporteWeb && <FontFamilyEdit { ...props } /> }
-				{ isSupporteWeb && <FontSizeEdit { ...props } /> }
-				{ isSupporteWeb && <FontAppearanceEdit { ...props } /> }
+				{ isSupporteOnWeb && <FontFamilyEdit { ...props } /> }
+				{ isSupporteOnWeb && <FontSizeEdit { ...props } /> }
+				{ isSupporteOnWeb && <FontAppearanceEdit { ...props } /> }
 				{ <LineHeightEdit { ...props } /> }
-				{ isSupporteWeb && (
+				{ isSupporteOnWeb && (
 					<TextDecorationAndTransformEdit { ...props } />
 				) }
-				{ isSupporteWeb && <LetterSpacingEdit { ...props } /> }
+				{ isSupporteOnWeb && <LetterSpacingEdit { ...props } /> }
 			</PanelBody>
 		</InspectorControls>
 	);
