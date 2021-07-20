@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { archiveTitle as icon } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import metadata from './block.json';
@@ -8,5 +13,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
+	icon,
 	edit,
 };
