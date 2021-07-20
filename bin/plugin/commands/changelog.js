@@ -266,17 +266,6 @@ function getIssueType( issue ) {
 }
 
 /**
- * Removes any `[Feature]` prefix from a given label.
- *
- * @param {string} label The label potentially containing a prefix.
- *
- * @return {string} the label without the prefix.
- */
-function stripFeaturePrefix( label ) {
-	return label.replace( '[Feature] ', '' );
-}
-
-/**
  * Returns the most appropriate feature category for the given issue based
  * on a basic heuristic.
  *
@@ -307,7 +296,7 @@ function getIssueFeature( issue ) {
 	const featureSpecificLabel = getFeatureSpecificLabels( labels );
 
 	if ( featureSpecificLabel ) {
-		return stripFeaturePrefix( featureSpecificLabel );
+		return removeFeaturePrefix( featureSpecificLabel );
 	}
 
 	// 3. Block specific labels.
@@ -456,6 +445,17 @@ function removeRedundantTypePrefix( title, issue ) {
 		),
 		''
 	);
+}
+
+/**
+ * Removes any `[Feature] ` prefix from a given string.
+ *
+ * @param {string} text The string of text potentially containing a prefix.
+ *
+ * @return {string} the text without the prefix.
+ */
+function removeFeaturePrefix( text ) {
+	return text.replace( '[Feature] ', '' );
 }
 
 /**
