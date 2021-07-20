@@ -53,7 +53,7 @@ export default function QueryTitleEdit( {
 			);
 
 			// Use placeholder content if new Query Title block is added
-			if ( content === 'Query title' ) {
+			if ( content === '' ) {
 				content = placeholderContent;
 			}
 
