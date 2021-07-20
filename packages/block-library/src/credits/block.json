@@ -1,0 +1,12 @@
+{
+	"apiVersion": 2,
+	"name": "core/credits",
+	"title": "Credits",
+	"category": "design",
+	"description": "Displays credits for the site.",
+	"textdomain": "default",
+	"supports": {
+		"html": false
+	},
+	"editorStyle": "wp-block-credits-editor"
+}
