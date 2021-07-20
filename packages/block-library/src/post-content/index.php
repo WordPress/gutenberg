@@ -49,7 +49,7 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	unset( $seen_ids[ $post_id ] );
 
 	if ( empty( $content ) ) {
-		return 'hello';
+		return '';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
