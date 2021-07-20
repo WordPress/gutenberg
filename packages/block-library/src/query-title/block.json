@@ -9,7 +9,7 @@
 	"attributes": {
 		"content": {
 			"type": "string",
-			"default": ""
+			"default": "Query title"
 		},
 		"textAlign": {
 			"type": "string"

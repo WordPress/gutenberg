@@ -20,8 +20,7 @@ function render_block_core_query_title( $attributes ) {
 	$title      = isset( $attributes['content'] ) ? $attributes['content'] : '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
-	}
-	elseif ( $is_search ) {
+	} elseif ( $is_search ) {
 		global $wp_query;
 		$formats      = array( '%total%', '%search%' );
 		$replacements = array( $wp_query->found_posts, get_search_query() );
@@ -30,7 +29,7 @@ function render_block_core_query_title( $attributes ) {
 	$tag_name           = isset( $attributes['level'] ) ? 'h' . (int) $attributes['level'] : 'h1';
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
-	if ( empty( $title ) ) {
+	if ( 'Query title' === $title || empty( $title ) ) {
 		return;
 	}
 	return sprintf(
