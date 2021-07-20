@@ -4,7 +4,7 @@
 import { createContext, useContext } from '@wordpress/element';
 
 /**
- * @typedef {{ id?: import('react').ReactText, horizontal: boolean }} FormGroupContext
+ * @typedef {{ id?: string, horizontal: boolean }} FormGroupContext
  */
 
 /**
@@ -23,7 +23,7 @@ export const useFormGroupContext = () => useContext( FormGroupContext );
 
 /**
  * @param {string | undefined} id The preferred id for the form group element.
- * @return {import('react').ReactText | undefined} The form group context id.
+ * @return {string | undefined} The form group context id.
  */
 export const useFormGroupContextId = ( id ) => {
 	const contextId = useFormGroupContext().id;

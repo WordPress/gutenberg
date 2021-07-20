@@ -4,6 +4,17 @@
 import { space } from '../ui/utils/space';
 import { COLORS } from './colors-values';
 
+const SURFACE_PROPS = {
+	surfaceBackgroundColor: COLORS.white,
+	surfaceBackgroundSubtleColor: '#F3F3F3',
+	surfaceBackgroundTintColor: '#F5F5F5',
+	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
+	surfaceBorderBoldColor: 'rgba(0, 0, 0, 0.15)',
+	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
+	surfaceBackgroundTertiaryColor: COLORS.white,
+	surfaceColor: COLORS.white,
+};
+
 const CONTROL_HEIGHT = '36px';
 const CONTROL_PADDING_X = '12px';
 
@@ -14,6 +25,7 @@ const CONTROL_PROPS = {
 	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
 	controlBackgroundColor: COLORS.white,
+	controlBackgroundDimColor: 'rgba(0, 0, 0, 0.1)',
 	controlBorderRadius: '2px',
 	controlBorderColor: COLORS.gray[ 700 ],
 	controlBoxShadow: 'transparent',
@@ -25,7 +37,10 @@ const CONTROL_PROPS = {
 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
 	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
 	controlHeightXLarge: `calc( ${ CONTROL_HEIGHT } * 1.4 )`,
+	controlPseudoBoxShadowFocusSmall: `0 0 0 2px ${ SURFACE_PROPS.surfaceBackgroundColor }, 0 0 0 3px ${ COLORS.admin.theme }`,
+	controlDestructivePseudoBoxShadowFocusSmall: `0 0 0 2px ${ SURFACE_PROPS.surfaceBackgroundColor }, 0 0 0 3px ${ COLORS.alert.red }`,
 };
+
 const SEGMENTED_CONTROL_PROPS = {
 	segmentedControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
 	segmentedControlBorderColor: COLORS.ui.border,
@@ -35,13 +50,20 @@ const SEGMENTED_CONTROL_PROPS = {
 	segmentedControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
 };
 
+const SLIDER_CONTROL_PROPS = {
+	sliderThumbBoxShadow: 'none',
+};
+
 export default {
 	...CONTROL_PROPS,
 	...SEGMENTED_CONTROL_PROPS,
+	...SLIDER_CONTROL_PROPS,
+	...SURFACE_PROPS,
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
 	colorScrollbarTrack: 'rgba(0, 0, 0, 0.04)',
+	colorTextMuted: '#717171',
 	elevationIntensity: 1,
 	radiusBlockUi: '2px',
 	borderWidth: '1px',
@@ -68,14 +90,6 @@ export default {
 	cardPaddingSmall: `${ space( 4 ) }`,
 	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
 	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
-	surfaceBackgroundColor: COLORS.white,
-	surfaceBackgroundSubtleColor: '#F3F3F3',
-	surfaceBackgroundTintColor: '#F5F5F5',
-	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
-	surfaceBorderBoldColor: 'rgba(0, 0, 0, 0.15)',
-	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
-	surfaceBackgroundTertiaryColor: COLORS.white,
-	surfaceColor: COLORS.white,
 	transitionDuration: '200ms',
 	transitionDurationFast: '160ms',
 	transitionDurationFaster: '120ms',

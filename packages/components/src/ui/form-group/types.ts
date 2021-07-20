@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { CSSProperties, ReactNode, ReactText } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -12,7 +12,7 @@ import type { Props as GridProps } from '../../grid/types';
 
 export type FormGroupLabelProps = ControlLabelProps & {
 	labelHidden?: boolean;
-	id?: ReactText;
+	id?: string;
 };
 
 export type FormGroupContentProps = FormGroupLabelProps & {

@@ -1,0 +1,145 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Slider should render correctly 1`] = `
+.emotion-0 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  display: block;
+  height: 36px;
+  max-width: 100%;
+  min-width: 0;
+  padding: calc(4px * 1);
+  width: 100%;
+}
+
+.emotion-0:focus {
+  outline: none;
+}
+
+.emotion-0::-moz-focus-outer {
+  border: 0;
+}
+
+.emotion-0::-webkit-slider-runnable-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			rgba(0, 0, 0, 0.1) calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+}
+
+*:disabled.emotion-0::-webkit-slider-runnable-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.emotion-0::-moz-range-track {
+  background: linear-gradient(
+  			to right,
+  			var( --wp-admin-theme-color, #00669b) calc( var( --progress ) ),
+  			rgba(0, 0, 0, 0.1) calc( var( --progress ) )
+  		);
+  border-radius: 2px;
+  height: 2px;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.emotion-0::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+}
+
+*:disabled.emotion-0::-webkit-slider-thumb {
+  background: #717171;
+  border-color: #717171;
+}
+
+.emotion-0::-moz-range-thumb {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  background-color: var( --wp-admin-theme-color, #00669b);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  box-shadow: none;
+  cursor: pointer;
+  height: 12px;
+  margin-top: -5px;
+  opacity: 1;
+  width: 12px;
+  -webkit-transition: box-shadow ease 160ms;
+  transition: box-shadow ease 160ms;
+  will-change: transform;
+}
+
+*:disabled.emotion-0::-moz-range-thumb {
+  background: #717171;
+  border-color: #717171;
+}
+
+.emotion-0:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 3px var( --wp-admin-theme-color, #00669b);
+}
+
+.emotion-0:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 2px #fff,0 0 0 3px var( --wp-admin-theme-color, #00669b);
+}
+
+<input
+  aria-valuemax="100"
+  aria-valuemin="0"
+  aria-valuenow="50"
+  class="components-slider emotion-0 emotion-1"
+  data-wp-c16t="true"
+  data-wp-component="Slider"
+  max="100"
+  min="0"
+  role="slider"
+  style="--progress: 50%;"
+  type="range"
+  value="50"
+/>
+`;
+
+exports[`Slider should render valuetext for united values 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,10 +1,9 @@
+  <input
+    aria-valuemax="100"
+    aria-valuemin="0"
+    aria-valuenow="50"
+-   aria-valuetext="50px"
+    class="components-slider css-78ao8c-View-getFocusBoxShadow-Slider em57xhy0"
+    data-wp-c16t="true"
+    data-wp-component="Slider"
+    max="100"
+    min="0"
+`;
