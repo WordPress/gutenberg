@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import { isNil } from 'lodash';
-
 const UNITED_VALUE_REGEX = /^([\d.\-+]*)\s*(fr|cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|lh|vw|vh|vmin|vmax|%|cap|ic|rlh|vi|vb|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?$/;
 
 /**
@@ -13,13 +8,9 @@ const UNITED_VALUE_REGEX = /^([\d.\-+]*)\s*(fr|cm|mm|Q|in|pc|pt|px|em|ex|ch|rem|
  * @return  The extracted number and unit.
  */
 export function parseCSSUnitValue(
-	toParse: string | number
+	toParse: string
 ): [ number | undefined, string | undefined ] {
-	if ( isNil( toParse ) ) {
-		return [ undefined, undefined ];
-	}
-
-	const value = String( toParse ).trim();
+	const value = toParse.trim();
 
 	const matched = value.match( UNITED_VALUE_REGEX );
 	if ( ! matched ) {

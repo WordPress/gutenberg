@@ -40,9 +40,6 @@ describe( 'unit-values', () => {
 			${ '10notacssunit' }   | ${ [ undefined, undefined ] }
 			${ 'notaunitedvalue' } | ${ [ undefined, undefined ] }
 			${ '10' }              | ${ [ 10, undefined ] }
-			${ 10 }                | ${ [ 10, undefined ] }
-			${ null }              | ${ [ undefined, undefined ] }
-			${ undefined }         | ${ [ undefined, undefined ] }
 		`( 'should parse $value into $output', ( { value, output } ) =>
 			expect( parseCSSUnitValue( value ) ).toEqual( output )
 		);
