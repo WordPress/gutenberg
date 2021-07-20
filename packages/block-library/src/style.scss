@@ -1,8 +1,3 @@
-// This tag marks the start of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
-#start-resizable-editor-section {
-	display: none;
-}
-
 @import "./archives/style.scss";
 @import "./audio/style.scss";
 @import "./button/style.scss";

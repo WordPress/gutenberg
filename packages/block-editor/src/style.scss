@@ -1,10 +1,3 @@
-// This tag marks the start of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
-#start-resizable-editor-section {
-	display: none;
-}
-
-// Only add styles for components that are used inside the editing canvas here:
-
 @import "./autocompleters/style.scss";
 @import "./components/block-alignment-matrix-control/style.scss";
 @import "./components/block-icon/style.scss";
@@ -62,13 +55,6 @@
 @import "./hooks/anchor.scss";
 @import "./hooks/layout.scss";
 @import "./hooks/border.scss";
-
-// This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
-#end-resizable-editor-section {
-	display: none;
-}
-
-// Styles for components that are used outside of the editing canvas go here:
 
 @import "./components/block-toolbar/style.scss";
 @import "./components/inserter/style.scss";
