@@ -15,7 +15,7 @@ exports[`props should render correctly 1`] = `
   opacity: 1;
 }
 
-.emotion-3 {
+.emotion-2 {
   background: rgba( 0, 0, 0, 0.8 );
   border-radius: 6px;
   box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
@@ -24,7 +24,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="emotion-0 components-tooltip-content emotion-1 emotion-2"
+  class="components-tooltip-content emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="TooltipContent"
   id="base-tooltip"
@@ -32,7 +32,7 @@ exports[`props should render correctly 1`] = `
   style="position: fixed; left: 100%; top: 100%; pointer-events: none;"
 >
   <div
-    class="emotion-3 emotion-4"
+    class="emotion-2 emotion-3"
   >
     Code is Poetry
   </div>

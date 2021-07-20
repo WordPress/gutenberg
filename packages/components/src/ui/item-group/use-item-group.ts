@@ -1,12 +1,4 @@
 /**
- * External dependencies
- */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
-
-/**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
@@ -17,38 +9,35 @@ import type { PolymorphicComponentProps } from '../context';
  * Internal dependencies
  */
 import * as styles from './styles';
-
-export interface Props {
-	bordered?: boolean;
-	rounded?: boolean;
-	separated?: boolean;
-	size?: 'large' | 'medium' | 'small';
-}
+import { useCx } from '../../utils/hooks/use-cx';
+import type { ItemGroupProps } from './types';
 
 export function useItemGroup(
-	props: PolymorphicComponentProps< Props, 'div' >
+	props: PolymorphicComponentProps< ItemGroupProps, 'div' >
 ) {
 	const {
 		className,
-		bordered = false,
-		rounded = true,
-		separated = false,
+		isBordered = false,
+		isRounded = true,
+		isSeparated = false,
 		role = 'list',
 		...otherProps
 	} = useContextSystem( props, 'ItemGroup' );
 
+	const cx = useCx();
+
 	const classes = cx(
-		bordered && styles.bordered,
-		( bordered || separated ) && styles.separated,
-		rounded && styles.rounded,
+		isBordered && styles.bordered,
+		( isBordered || isSeparated ) && styles.separated,
+		isRounded && styles.rounded,
 		className
 	);
 
 	return {
-		bordered,
+		isBordered,
 		className: classes,
 		role,
-		separated,
+		isSeparated,
 		...otherProps,
 	};
 }

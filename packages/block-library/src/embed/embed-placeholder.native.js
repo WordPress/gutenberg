@@ -8,11 +8,13 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+import { noticeOutline } from '../../../components/src/mobile/gridicons';
 
 const EmbedPlaceholder = ( {
 	icon,
@@ -29,14 +31,17 @@ const EmbedPlaceholder = ( {
 		styles.embed__label,
 		styles[ 'embed__label--dark' ]
 	);
-	const descriptionStyle = usePreferredColorSchemeStyle(
-		styles.embed__description,
-		styles[ 'embed__description--dark' ]
-	);
+	const descriptionStyle = styles.embed__description;
+	const descriptionErrorStyle = styles[ 'embed__description--error' ];
 	const actionStyle = usePreferredColorSchemeStyle(
 		styles.embed__action,
 		styles[ 'embed__action--dark' ]
 	);
+	const embedIconStyle = usePreferredColorSchemeStyle(
+		styles.embed__icon,
+		styles[ 'embed__icon--dark' ]
+	);
+	const embedIconErrorStyle = styles[ 'embed__icon--error' ];
 
 	return (
 		<>
@@ -47,21 +52,33 @@ const EmbedPlaceholder = ( {
 				disabled={ ! isSelected }
 			>
 				<View style={ containerStyle }>
-					<View style={ styles.embed__icon }>{ icon }</View>
-					<Text style={ labelStyle }>{ label }</Text>
 					{ cannotEmbed ? (
 						<>
-							<Text style={ descriptionStyle }>
-								{ __(
-									'Sorry, this content could not be embedded.'
-								) }
+							<Icon
+								icon={ noticeOutline }
+								fill={ embedIconErrorStyle.fill }
+								style={ embedIconErrorStyle }
+							/>
+							<Text
+								style={ [
+									descriptionStyle,
+									descriptionErrorStyle,
+								] }
+							>
+								{ __( 'Unable to embed media' ) }
 							</Text>
 							<Text style={ actionStyle }>
 								{ __( 'EDIT LINK' ) }
 							</Text>
 						</>
 					) : (
-						<Text style={ actionStyle }>{ __( 'ADD LINK' ) }</Text>
+						<>
+							<Icon icon={ icon } fill={ embedIconStyle.fill } />
+							<Text style={ labelStyle }>{ label }</Text>
+							<Text style={ actionStyle }>
+								{ __( 'ADD LINK' ) }
+							</Text>
+						</>
 					) }
 				</View>
 			</TouchableWithoutFeedback>

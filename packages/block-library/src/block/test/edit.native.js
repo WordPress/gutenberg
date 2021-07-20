@@ -182,7 +182,7 @@ describe( 'Reusable block', () => {
 			},
 		} );
 
-		const headingInnerBlock = waitFor( () =>
+		const headingInnerBlock = await waitFor( () =>
 			within( reusableBlock ).getByA11yLabel(
 				'Heading Block. Row 1. Level 2. First Reusable block'
 			)

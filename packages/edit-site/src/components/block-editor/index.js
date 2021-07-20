@@ -9,7 +9,6 @@ import {
 	BlockEditorKeyboardShortcuts,
 	__experimentalLinkControl,
 	BlockInspector,
-	WritingFlow,
 	BlockList,
 	BlockTools,
 	__unstableBlockSettingsMenuFirstItem,
@@ -97,12 +96,10 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						ref={ ref }
 						contentRef={ mergedRefs }
 					>
-						<WritingFlow>
-							<BlockList
-								className="edit-site-block-editor__block-list"
-								__experimentalLayout={ LAYOUT }
-							/>
-						</WritingFlow>
+						<BlockList
+							className="edit-site-block-editor__block-list"
+							__experimentalLayout={ LAYOUT }
+						/>
 					</Iframe>
 				</BlockTools>
 				<__unstableBlockSettingsMenuFirstItem>
