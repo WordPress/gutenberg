@@ -46,6 +46,7 @@ function gutenberg_register_template_part_post_type() {
 		'show_in_rest'          => true,
 		'rest_base'             => 'template-parts',
 		'rest_controller_class' => 'Gutenberg_REST_Templates_Controller',
+		'capability_type'       => array( 'template', 'templates' ),
 		'map_meta_cap'          => true,
 		'supports'              => array(
 			'title',
