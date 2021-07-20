@@ -79,9 +79,9 @@ function register_gutenberg_patterns() {
 			'content'    => '<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"flex","columns":3}} -->
 							<div class="wp-block-query">
 							<!-- wp:post-template -->
-							<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
-							<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:post-title {"isLink":true} /-->
-							<!-- wp:post-excerpt {"wordCount":20} /-->
+							<!-- wp:group {"style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
+							<div class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:post-title {"isLink":true} /-->
+							<!-- wp:post-excerpt /-->
 							<!-- wp:post-date /--></div>
 							<!-- /wp:group -->
 							<!-- /wp:post-template -->
@@ -116,8 +116,8 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Offset', 'gutenberg' ),
 			'blockTypes' => array( 'core/query' ),
 			'categories' => array( 'query' ),
-			'content'    => '<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
-							<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:columns -->
+			'content'    => '<!-- wp:group {"style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
+							<div class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:columns -->
 							<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->
 							<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"displayLayout":{"type":"list"}} -->
 							<div class="wp-block-query"><!-- wp:post-template -->
@@ -142,7 +142,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:post-template --></div>
 							<!-- /wp:query --></div>
 							<!-- /wp:column --></div>
-							<!-- /wp:columns --></main>
+							<!-- /wp:columns --></div>
 							<!-- /wp:group -->',
 		),
 		// Initial block pattern to be used with block transformations with patterns.
@@ -200,15 +200,26 @@ function remove_core_patterns() {
 }
 
 /**
- * Import patterns from wordpress.org/patterns.
+ * Register Core's official patterns from wordpress.org/patterns.
+ *
+ * @since 5.8.0
  */
 function load_remote_patterns() {
 	// This is the core function that provides the same feature.
 	if ( function_exists( '_load_remote_block_patterns' ) ) {
 		return;
 	}
-	$patterns = get_transient( 'gutenberg_remote_block_patterns' );
-	if ( ! $patterns ) {
+
+	/**
+	 * Filter to disable remote block patterns.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param bool $should_load_remote
+	 */
+	$should_load_remote = apply_filters( 'should_load_remote_block_patterns', true );
+
+	if ( $should_load_remote ) {
 		$request         = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$core_keyword_id = 11; // 11 is the ID for "core".
 		$request->set_param( 'keyword', $core_keyword_id );
@@ -217,12 +228,11 @@ function load_remote_patterns() {
 			return;
 		}
 		$patterns = $response->get_data();
-		set_transient( 'gutenberg_remote_block_patterns', $patterns, HOUR_IN_SECONDS );
-	}
 
-	foreach ( $patterns as $settings ) {
-		$pattern_name = 'core/' . sanitize_title( $settings['title'] );
-		register_block_pattern( $pattern_name, (array) $settings );
+		foreach ( $patterns as $settings ) {
+			$pattern_name = 'core/' . sanitize_title( $settings['title'] );
+			register_block_pattern( $pattern_name, (array) $settings );
+		}
 	}
 }
 

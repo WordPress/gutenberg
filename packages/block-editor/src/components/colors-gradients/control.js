@@ -14,7 +14,7 @@ import {
 	ButtonGroup,
 	ColorIndicator,
 	ColorPalette,
-	__experimentalGradientPicker as GradientPicker,
+	GradientPicker,
 } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 

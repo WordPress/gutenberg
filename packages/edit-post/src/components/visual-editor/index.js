@@ -57,13 +57,14 @@ function MaybeIframe( {
 		return (
 			<>
 				<EditorStyles styles={ styles } />
-				<div
+				<WritingFlow
 					ref={ contentRef }
 					className="editor-styles-wrapper"
 					style={ { flex: '1', ...style } }
+					tabIndex={ -1 }
 				>
 					{ children }
-				</div>
+				</WritingFlow>
 			</>
 		);
 	}
@@ -137,6 +138,7 @@ export default function VisualEditor( { styles } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
 	const defaultLayout = useSetting( 'layout' );
 	const { contentSize, wideSize } = defaultLayout || {};
+	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode
 		? templateModeStyles
@@ -219,6 +221,7 @@ export default function VisualEditor( { styles } ) {
 					<motion.div
 						animate={ animatedStyles }
 						initial={ desktopCanvasStyles }
+						className={ previewMode }
 					>
 						<MaybeIframe
 							isTemplateMode={ isTemplateMode }
@@ -232,18 +235,14 @@ export default function VisualEditor( { styles } ) {
 									layout={ defaultLayout }
 								/>
 							) }
-							<WritingFlow>
-								{ ! isTemplateMode && (
-									<div className="edit-post-visual-editor__post-title-wrapper">
-										<PostTitle />
-									</div>
-								) }
-								<RecursionProvider>
-									<BlockList
-										__experimentalLayout={ layout }
-									/>
-								</RecursionProvider>
-							</WritingFlow>
+							{ ! isTemplateMode && (
+								<div className="edit-post-visual-editor__post-title-wrapper">
+									<PostTitle />
+								</div>
+							) }
+							<RecursionProvider>
+								<BlockList __experimentalLayout={ layout } />
+							</RecursionProvider>
 						</MaybeIframe>
 					</motion.div>
 				</motion.div>

@@ -3,21 +3,18 @@
 /**
  * External dependencies
  */
-/**
- * WordPress dependencies
- */
-import RCTAztecView from '@wordpress/react-native-aztec';
 import { View, Platform } from 'react-native';
-import {
-	showUserSuggestions,
-	showXpostSuggestions,
-} from '@wordpress/react-native-bridge';
 import { get, pickBy, debounce, isString } from 'lodash';
 import memize from 'memize';
 
 /**
  * WordPress dependencies
  */
+import RCTAztecView from '@wordpress/react-native-aztec';
+import {
+	showUserSuggestions,
+	showXpostSuggestions,
+} from '@wordpress/react-native-bridge';
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -870,6 +867,7 @@ export class RichText extends Component {
 			parentBlockStyles,
 			accessibilityLabel,
 			disableEditingMenu = false,
+			baseGlobalStyles,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -982,11 +980,14 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
-						linkTextColor: defaultTextDecorationColor,
+						linkTextColor:
+							style?.linkColor || defaultTextDecorationColor,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
+						style?.placeholderColor ||
 						this.props.placeholderTextColor ||
+						( baseGlobalStyles && baseGlobalStyles?.color?.text ) ||
 						defaultPlaceholderTextColor
 					}
 					deleteEnter={ this.props.deleteEnter }
@@ -1012,6 +1013,7 @@ export class RichText extends Component {
 					color={
 						( style && style.color ) ||
 						( parentBlockStyles && parentBlockStyles.color ) ||
+						( baseGlobalStyles && baseGlobalStyles?.color?.text ) ||
 						defaultColor
 					}
 					maxImagesWidth={ 200 }
@@ -1078,12 +1080,15 @@ export default compose( [
 			'attributes',
 			'childrenStyles',
 		] );
+		const baseGlobalStyles = getSettings()
+			?.__experimentalGlobalStylesBaseStyles;
 
 		return {
 			areMentionsSupported:
 				getSettings( 'capabilities' ).mentions === true,
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
 			...{ parentBlockStyles },
+			baseGlobalStyles,
 		};
 	} ),
 	withPreferredColorScheme,

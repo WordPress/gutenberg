@@ -126,7 +126,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_widgets_init' );
  * @return bool Filtered decision about loading block assets.
  */
 function gutenberg_widgets_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
-	if ( is_callable( 'get_current_screen' ) && 'appearance_page_gutenberg-widgets' === get_current_screen()->base ) {
+	if ( is_callable( 'get_current_screen' ) && get_current_screen() && 'appearance_page_gutenberg-widgets' === get_current_screen()->base ) {
 		return true;
 	}
 

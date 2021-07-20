@@ -12,6 +12,7 @@ import { useSelect } from '@wordpress/data';
 import { wordpress } from '@wordpress/icons';
 import { filterURLForDisplay } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -105,7 +106,7 @@ function PostPublishPanelPrepublish( { children } ) {
 				{ siteIcon }
 				<div className="components-site-info">
 					<span className="components-site-name">
-						{ siteTitle || __( '(Untitled)' ) }
+						{ decodeEntities( siteTitle ) || __( '(Untitled)' ) }
 					</span>
 					<span className="components-site-home">{ siteHome }</span>
 				</div>

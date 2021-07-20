@@ -48,11 +48,12 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeFeaturedImageIdNativeUpdated: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
 		subscribeAndroidModalClosed: jest.fn(),
-		subscribeUpdateTheme: jest.fn(),
+		subscribeUpdateEditorSettings: jest.fn(),
 		subscribePreferredColorScheme: () => 'light',
 		subscribeUpdateCapabilities: jest.fn(),
 		subscribeShowNotice: jest.fn(),
 		subscribeParentGetHtml: jest.fn(),
+		subscribeShowEditorHelp: jest.fn(),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
@@ -69,16 +70,6 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 			siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 		},
 		fetchRequest: jest.fn(),
-	};
-} );
-
-jest.mock( 'react-native-dark-mode', () => {
-	return {
-		initialMode: 'light',
-		eventEmitter: {
-			on: jest.fn(),
-		},
-		useDarkModeContext: () => 'light',
 	};
 } );
 
@@ -178,3 +169,25 @@ jest.mock(
 		} ) ),
 	} )
 );
+
+// Silences the warning: dispatchCommand was called with a ref that isn't a native
+// component. Use React.forwardRef to get access to the underlying native component.
+// This is a known bug of react-native-testing-library package:
+// https://github.com/callstack/react-native-testing-library/issues/329#issuecomment-737307473
+jest.mock( 'react-native/Libraries/Components/Switch/Switch', () => {
+	const jestMockComponent = require( 'react-native/jest/mockComponent' );
+	return jestMockComponent(
+		'react-native/Libraries/Components/Switch/Switch'
+	);
+} );
+
+jest.mock( '@wordpress/compose', () => {
+	return {
+		...jest.requireActual( '@wordpress/compose' ),
+		useViewportMatch: jest.fn(),
+		useResizeObserver: jest.fn( () => [
+			mockComponent( 'ResizeObserverMock' )( {} ),
+			{ width: 100, height: 100 },
+		] ),
+	};
+} );

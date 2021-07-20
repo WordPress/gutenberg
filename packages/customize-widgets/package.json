@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/customize-widgets",
-	"version": "1.0.7",
+	"version": "1.0.13",
 	"description": "Widgets blocks in Customizer Module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -42,7 +42,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/widgets": "file:../widgets",
-		"classnames": "^2.2.6",
+		"classnames": "^2.3.1",
 		"lodash": "^4.17.21"
 	},
 	"publishConfig": {

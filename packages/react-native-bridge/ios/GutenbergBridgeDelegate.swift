@@ -17,6 +17,7 @@ public struct MediaInfo: Encodable {
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
     case contactInfoBlock
+    case layoutGridBlock
     case mediaFilesCollectionBlock
     case mentions
     case xposts
@@ -24,7 +25,7 @@ public enum Capabilities: String {
     case canEnableUnsupportedBlockEditor
     case isAudioBlockMediaUploadEnabled
     case reusableBlock
-    case canViewEditorOnboarding
+    case editorOnboarding
 }
 
 /// Wrapper for single block data
@@ -232,6 +233,8 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
 
     func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
+    
+    func gutenbergDidRequestPreview()
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

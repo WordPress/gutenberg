@@ -108,10 +108,15 @@ export function* saveWidgetArea( widgetAreaId ) {
 		( { sidebar } ) => sidebar === widgetAreaId
 	);
 
-	// Remove all duplicate reference widget instances
+	// Remove all duplicate reference widget instances for legacy widgets.
+	// Why? We filter out the widgets with duplicate IDs to prevent adding more than one instance of a widget
+	// implemented using a function. WordPress doesn't support having more than one instance of these, if you try to
+	// save multiple instances of these in different sidebars you will run into undefined behaviors.
 	const usedReferenceWidgets = [];
-	const widgetsBlocks = post.blocks.filter( ( { attributes: { id } } ) => {
-		if ( id ) {
+	const widgetsBlocks = post.blocks.filter( ( block ) => {
+		const { id } = block.attributes;
+
+		if ( block.name === 'core/legacy-widget' && id ) {
 			if ( usedReferenceWidgets.includes( id ) ) {
 				return false;
 			}
@@ -143,13 +148,15 @@ export function* saveWidgetArea( widgetAreaId ) {
 		const widgetId = getWidgetIdFromBlock( block );
 		const oldWidget = widgets[ widgetId ];
 		const widget = transformBlockToWidget( block, oldWidget );
+
 		// We'll replace the null widgetId after save, but we track it here
 		// since order is important.
 		sidebarWidgetsIds.push( widgetId );
 
-		// We need to check for the id in the widget object here, because a deleted
-		// and restored widget won't have this id.
-		if ( widget.id ) {
+		// Check oldWidget as widgetId might refer to an ID which has been
+		// deleted, e.g. if a deleted block is restored via undo after saving.
+		if ( oldWidget ) {
+			// Update an existing widget.
 			yield dispatch(
 				'core',
 				'editEntityRecord',
@@ -179,6 +186,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 				saveEditedEntityRecord( 'root', 'widget', widgetId )
 			);
 		} else {
+			// Create a new widget.
 			batchTasks.push( ( { saveEntityRecord } ) =>
 				saveEntityRecord( 'root', 'widget', {
 					...widget,

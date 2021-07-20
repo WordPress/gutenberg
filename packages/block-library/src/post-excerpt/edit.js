@@ -16,7 +16,7 @@ import {
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, ToggleControl, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -24,29 +24,8 @@ import { __ } from '@wordpress/i18n';
  */
 import { useCanEditEntity } from '../utils/hooks';
 
-function usePostContentExcerpt( wordCount, postId, postType ) {
-	// Don't destrcuture items from content here, it can be undefined.
-	const [ , , content ] = useEntityProp(
-		'postType',
-		postType,
-		'content',
-		postId
-	);
-	const renderedPostContent = content?.rendered;
-	return useMemo( () => {
-		if ( ! renderedPostContent ) {
-			return '';
-		}
-		const excerptElement = document.createElement( 'div' );
-		excerptElement.innerHTML = renderedPostContent;
-		const excerpt =
-			excerptElement.textContent || excerptElement.innerText || '';
-		return excerpt.trim().split( ' ', wordCount ).join( ' ' );
-	}, [ renderedPostContent, wordCount ] );
-}
-
 export default function PostExcerptEditor( {
-	attributes: { textAlign, wordCount, moreText, showMoreOnNewLine },
+	attributes: { textAlign, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
 	context: { postId, postType, queryId },
@@ -59,16 +38,24 @@ export default function PostExcerptEditor( {
 		setExcerpt,
 		{ rendered: renderedExcerpt, protected: isProtected } = {},
 	] = useEntityProp( 'postType', postType, 'excerpt', postId );
-	const postContentExcerpt = usePostContentExcerpt(
-		wordCount,
-		postId,
-		postType
-	);
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+	/**
+	 * When excerpt is editable, strip the html tags from
+	 * rendered excerpt. This will be used if the entity's
+	 * excerpt has been produced from the content.
+	 */
+	const strippedRenderedExcerpt = useMemo( () => {
+		if ( ! renderedExcerpt ) return '';
+		const document = new window.DOMParser().parseFromString(
+			renderedExcerpt,
+			'text/html'
+		);
+		return document.body.textContent || document.body.innerText || '';
+	}, [ renderedExcerpt ] );
 	if ( ! postType || ! postId ) {
 		return (
 			<div { ...blockProps }>
@@ -110,16 +97,17 @@ export default function PostExcerptEditor( {
 			aria-label={ __( 'Post excerpt text' ) }
 			value={
 				rawExcerpt ||
-				postContentExcerpt ||
+				strippedRenderedExcerpt ||
 				( isSelected ? '' : __( 'No post excerpt found' ) )
 			}
 			onChange={ setExcerpt }
 		/>
 	) : (
 		( renderedExcerpt && (
-			<RawHTML key="html">{ renderedExcerpt }</RawHTML>
+			<Disabled>
+				<RawHTML key="html">{ renderedExcerpt }</RawHTML>
+			</Disabled>
 		) ) ||
-		postContentExcerpt ||
 		__( 'No post excerpt found' )
 	);
 	return (
@@ -134,17 +122,6 @@ export default function PostExcerptEditor( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Post Excerpt Settings' ) }>
-					{ ! renderedExcerpt && (
-						<RangeControl
-							label={ __( 'Max words' ) }
-							value={ wordCount }
-							onChange={ ( newExcerptLength ) =>
-								setAttributes( { wordCount: newExcerptLength } )
-							}
-							min={ 10 }
-							max={ 100 }
-						/>
-					) }
 					<ToggleControl
 						label={ __( 'Show link on new line' ) }
 						checked={ showMoreOnNewLine }

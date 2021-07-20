@@ -85,6 +85,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'color'      => array(
 			'custom'         => null,
+			'customDuotone'  => null,
 			'customGradient' => null,
 			'duotone'        => null,
 			'gradients'      => null,
@@ -92,7 +93,10 @@ class WP_Theme_JSON_Gutenberg {
 			'palette'        => null,
 		),
 		'custom'     => null,
-		'layout'     => null,
+		'layout'     => array(
+			'contentSize' => null,
+			'wideSize'    => null,
+		),
 		'spacing'    => array(
 			'customMargin'  => null,
 			'customPadding' => null,
@@ -1073,7 +1077,6 @@ class WP_Theme_JSON_Gutenberg {
 		// For leaf values that are arrays it will use the numeric indexes for replacement.
 		// In those cases, we want to replace the existing with the incoming value, if it exists.
 		$to_replace   = array();
-		$to_replace[] = array( 'custom' );
 		$to_replace[] = array( 'spacing', 'units' );
 		$to_replace[] = array( 'color', 'duotone' );
 		foreach ( self::VALID_ORIGINS as $origin ) {
@@ -1087,8 +1090,8 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $nodes as $metadata ) {
 			foreach ( $to_replace as $property_path ) {
 				$path = array_merge( $metadata['path'], $property_path );
-				$node = _wp_array_get( $incoming_data, $path, array() );
-				if ( ! empty( $node ) ) {
+				$node = _wp_array_get( $incoming_data, $path, null );
+				if ( isset( $node ) ) {
 					gutenberg_experimental_set( $this->theme_json, $path, $node );
 				}
 			}
@@ -1305,7 +1308,7 @@ class WP_Theme_JSON_Gutenberg {
 				$theme_settings['settings']['spacing'] = array();
 			}
 			$theme_settings['settings']['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
-				array( 'px', 'em', 'rem', 'vh', 'vw' ) :
+				array( 'px', 'em', 'rem', 'vh', 'vw', '%' ) :
 				$settings['enableCustomUnits'];
 		}
 
@@ -1349,6 +1352,10 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// Things that didn't land in core yet, so didn't have a setting assigned.
+		// This should be removed when the plugin minimum WordPress version
+		// is bumped to 5.8.
+		//
+		// Do not port this to WordPress core.
 		if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
 			if ( ! isset( $theme_settings['settings']['color'] ) ) {
 				$theme_settings['settings']['color'] = array();

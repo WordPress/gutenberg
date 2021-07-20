@@ -4,11 +4,7 @@
 	"title": "Navigation",
 	"category": "theme",
 	"description": "A collection of blocks that allow visitors to get around your site.",
-	"keywords": [
-		"menu",
-		"navigation",
-		"links"
-	],
+	"keywords": [ "menu", "navigation", "links" ],
 	"textdomain": "default",
 	"attributes": {
 		"orientation": {
@@ -45,6 +41,18 @@
 		},
 		"__unstableLocation": {
 			"type": "string"
+		},
+		"overlayBackgroundColor": {
+			"type": "string"
+		},
+		"customOverlayBackgroundColor": {
+			"type": "string"
+		},
+		"overlayTextColor": {
+			"type": "string"
+		},
+		"customOverlayTextColor": {
+			"type": "string"
 		}
 	},
 	"providesContext": {
@@ -52,6 +60,10 @@
 		"customTextColor": "customTextColor",
 		"backgroundColor": "backgroundColor",
 		"customBackgroundColor": "customBackgroundColor",
+		"overlayTextColor": "overlayTextColor",
+		"customOverlayTextColor": "customOverlayTextColor",
+		"overlayBackgroundColor": "overlayBackgroundColor",
+		"customOverlayBackgroundColor": "customOverlayBackgroundColor",
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
@@ -59,10 +71,7 @@
 		"orientation": "orientation"
 	},
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
@@ -74,9 +83,9 @@
 			"__experimentalTextTransform": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true
-		},
-		"color": true
+		}
 	},
+	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
 }

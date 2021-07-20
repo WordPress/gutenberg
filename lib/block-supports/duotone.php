@@ -351,7 +351,15 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		1
 	);
 
-	return $content . $duotone;
+	add_action(
+		// Ideally we should use wp_head, but SVG defs can't be put in there.
+		'wp_footer',
+		function () use ( $duotone ) {
+			echo $duotone;
+		}
+	);
+
+	return $content;
 }
 
 // Register the block support.
@@ -361,4 +369,7 @@ WP_Block_Supports::get_instance()->register(
 		'register_attribute' => 'gutenberg_register_duotone_support',
 	)
 );
+
+// Remove WordPress core filter to avoid rendering duplicate support elements.
+remove_filter( 'render_block', 'wp_render_duotone_support', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );

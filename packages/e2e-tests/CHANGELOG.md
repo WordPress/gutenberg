@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Bail out tests if a prior snapshot failed. Fixed a bug which failing snapshots won't trigger screenshots [#33448](https://github.com/WordPress/gutenberg/pull/33448).
+
 ## 2.0.0 (2021-01-21)
 
 ### Breaking Changes

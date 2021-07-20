@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from 'emotion';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -15,6 +10,7 @@ import { useContextSystem } from '../ui/context';
 import { useControlGroupContext } from '../ui/control-group';
 import { useFlex } from '../flex';
 import * as styles from './styles';
+import { useCx } from '../utils/hooks/use-cx';
 
 /**
  * @typedef OwnProps
@@ -42,6 +38,7 @@ export function useBaseField( props ) {
 	} = useContextSystem( props, 'BaseField' );
 
 	const { styles: controlGroupStyles } = useControlGroupContext();
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>

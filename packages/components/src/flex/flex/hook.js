@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import { useContextSystem } from '../../ui/context';
 import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
 import { space } from '../../ui/utils/space';
 import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  *
@@ -61,6 +62,8 @@ export function useFlex( props ) {
 		typeof direction === 'string' && !! direction.includes( 'column' );
 	const isReverse =
 		typeof direction === 'string' && direction.includes( 'reverse' );
+
+	const cx = useCx();
 
 	const classes = useMemo( () => {
 		const sx = {};

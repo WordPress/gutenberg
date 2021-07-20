@@ -10,6 +10,7 @@ import {
 	canvas,
 	openDocumentSettingsSidebar,
 	pressKeyWithModifier,
+	selectBlockByClientId,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -218,7 +219,7 @@ describe( 'Multi-entity editor states', () => {
 			removeErrorMocks();
 		} );
 
-		afterEach( async () => {
+		const saveAndWaitResponse = async () => {
 			await Promise.all( [
 				saveAllEntities(),
 
@@ -241,9 +242,9 @@ describe( 'Multi-entity editor states', () => {
 				} ),
 			] );
 			removeErrorMocks();
-		} );
+		};
 
-		it( 'should only dirty the parent entity when editing the parent', async () => {
+		it.skip( 'should only dirty the parent entity when editing the parent', async () => {
 			// Clear selection so that the block is not added to the template part.
 			await insertBlock( 'Paragraph' );
 
@@ -253,9 +254,12 @@ describe( 'Multi-entity editor states', () => {
 			expect( await isEntityDirty( templateName ) ).toBe( true );
 			expect( await isEntityDirty( templatePartName ) ).toBe( false );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( false );
+			await saveAndWaitResponse();
 		} );
 
-		it( 'should only dirty the child when editing the child', async () => {
+		it.skip( 'should only dirty the child when editing the child', async () => {
+			// Select parent TP to unlock selecting content.
+			await canvas().click( '.wp-block-template-part' );
 			await canvas().click(
 				'.wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
@@ -264,9 +268,16 @@ describe( 'Multi-entity editor states', () => {
 			expect( await isEntityDirty( templateName ) ).toBe( false );
 			expect( await isEntityDirty( templatePartName ) ).toBe( true );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( false );
+			await saveAndWaitResponse();
 		} );
 
-		it( 'should only dirty the nested entity when editing the nested entity', async () => {
+		it.skip( 'should only dirty the nested entity when editing the nested entity', async () => {
+			// Select parent TP to unlock selecting child.
+			await canvas().click( '.wp-block-template-part' );
+			// Select child TP to unlock selecting content.
+			await canvas().click(
+				'.wp-block-template-part .wp-block-template-part'
+			);
 			await canvas().click(
 				'.wp-block-template-part .wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
@@ -275,6 +286,21 @@ describe( 'Multi-entity editor states', () => {
 			expect( await isEntityDirty( templateName ) ).toBe( false );
 			expect( await isEntityDirty( templatePartName ) ).toBe( false );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( true );
+			await saveAndWaitResponse();
+		} );
+
+		it.skip( 'should not allow selecting template part content without parent selected', async () => {
+			// Unselect blocks.
+			await selectBlockByClientId();
+			// Try to select a child block of a template part.
+			await canvas().click(
+				'.wp-block-template-part .wp-block-template-part .wp-block[data-type="core/paragraph"]'
+			);
+
+			const selectedBlock = await page.evaluate( () => {
+				return wp.data.select( 'core/block-editor' ).getSelectedBlock();
+			} );
+			expect( selectedBlock?.name ).toBe( 'core/template-part' );
 		} );
 	} );
 } );

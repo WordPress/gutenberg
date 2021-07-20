@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Plugin scaffolded requires WordPress 5.8 now ([#33252](https://github.com/WordPress/gutenberg/pull/33252).
+-   Scaffolded block is now registered from `block.json` with the `register_block_type` helper ([#33252](https://github.com/WordPress/gutenberg/pull/33252)).
+
 ## 1.2.0 (2021-04-06)
 
 ### Enhancement

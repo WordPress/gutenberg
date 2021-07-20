@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__experimentalBlockNavigationTree as BlockNavigationTree,
+	__experimentalListView as ListView,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
@@ -62,7 +62,7 @@ export default function ListViewSidebar() {
 				className="edit-site-editor__list-view-panel-content"
 				ref={ useMergeRefs( [ focusReturnRef, focusOnMountRef ] ) }
 			>
-				<BlockNavigationTree
+				<ListView
 					onSelect={ selectEditorBlock }
 					showNestedBlocks
 					__experimentalPersistentListViewFeatures

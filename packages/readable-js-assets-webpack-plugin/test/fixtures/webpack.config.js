@@ -37,7 +37,7 @@ module.exports = {
 	},
 	entry: {
 		index: './index.js',
-		frontend: './frontend.js',
+		view: './view.js',
 	},
 	output: {
 		filename: '[name].min.js',

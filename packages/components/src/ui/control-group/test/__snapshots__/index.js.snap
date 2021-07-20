@@ -15,25 +15,24 @@ exports[`props should render correctly 1`] = `
   flex-direction: row;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
   justify-content: space-between;
   width: 100%;
 }
 
-.emotion-0 > * + *:not(marquee) {
+.emotion-0>*+*:not(marquee) {
   margin-left: -1px;
 }
 
-.emotion-0 > * {
+.emotion-0>* {
   min-width: 0;
 }
 
-.emotion-0 > *:focus-within {
+.emotion-0>*:focus-within {
   z-index: 1;
 }
 
 <div
-  class="components-flex components-control-group emotion-0 emotion-1 emotion-2"
+  class="components-flex components-control-group emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="ControlGroup"
 >

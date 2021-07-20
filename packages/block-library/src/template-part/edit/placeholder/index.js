@@ -9,10 +9,9 @@ import { find } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Placeholder, Dropdown, Button } from '@wordpress/components';
+import { Placeholder, Dropdown, Button, Spinner } from '@wordpress/components';
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -30,14 +29,18 @@ export default function TemplatePartPlaceholder( {
 	clientId,
 	setAttributes,
 	enableSelection,
+	hasResolvedReplacements,
 } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.initial );
 
 	const { areaIcon, areaLabel } = useSelect(
 		( select ) => {
+			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
+			// Blocks can be loaded into a *non-post* block editor.
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
 			const definedAreas = select(
-				editorStore
+				'core/editor'
 			).__experimentalGetDefaultTemplatePartAreas();
 
 			const selectedArea = find( definedAreas, { area } );
@@ -100,44 +103,52 @@ export default function TemplatePartPlaceholder( {
 							  )
 					}
 				>
-					<Dropdown
-						contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
-						position="bottom right left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<>
-								{ enableSelection && (
-									<Button
-										variant="primary"
-										onClick={ onToggle }
-										aria-expanded={ isOpen }
-									>
-										{ __( 'Choose existing' ) }
-									</Button>
-								) }
-								<Button
-									variant={
-										enableSelection ? 'tertiary' : 'primary'
-									}
-									onClick={ () =>
-										setStep( PLACEHOLDER_STEPS.patterns )
-									}
-								>
-									{ sprintf(
-										// Translators: %s as template part area title ("Header", "Footer", etc.).
-										'New %s',
-										areaLabel.toLowerCase()
+					{ ! hasResolvedReplacements ? (
+						<Spinner />
+					) : (
+						<Dropdown
+							contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
+							position="bottom right left"
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<>
+									{ enableSelection && (
+										<Button
+											variant="primary"
+											onClick={ onToggle }
+											aria-expanded={ isOpen }
+										>
+											{ __( 'Choose existing' ) }
+										</Button>
 									) }
-								</Button>
-							</>
-						) }
-						renderContent={ ( { onClose } ) => (
-							<TemplatePartSelection
-								setAttributes={ setAttributes }
-								onClose={ onClose }
-								area={ area }
-							/>
-						) }
-					/>
+									<Button
+										variant={
+											enableSelection
+												? 'tertiary'
+												: 'primary'
+										}
+										onClick={ () =>
+											setStep(
+												PLACEHOLDER_STEPS.patterns
+											)
+										}
+									>
+										{ sprintf(
+											// Translators: %s as template part area title ("Header", "Footer", etc.).
+											'New %s',
+											areaLabel.toLowerCase()
+										) }
+									</Button>
+								</>
+							) }
+							renderContent={ ( { onClose } ) => (
+								<TemplatePartSelection
+									setAttributes={ setAttributes }
+									onClose={ onClose }
+									area={ area }
+								/>
+							) }
+						/>
+					) }
 				</Placeholder>
 			) }
 			{ step === PLACEHOLDER_STEPS.patterns && (
