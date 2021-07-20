@@ -20,7 +20,9 @@ import {
  * Internal dependencies
  */
 import HeadingLevelDropdown from './heading-level-dropdown';
-import { useAllHeadingAnchors, generateAnchor } from './autogenerate-anchors';
+import { generateAnchor } from './autogenerate-anchors';
+
+const allHeadingAnchors = new Set();
 
 function HeadingEdit( {
 	attributes,
@@ -38,26 +40,30 @@ function HeadingEdit( {
 		} ),
 		style,
 	} );
-	const allHeadingAnchors = useAllHeadingAnchors( clientId );
 
 	// Initially set anchor for headings that have content but no anchor set.
 	// This is used when transforming a block to heading, or for legacy anchors.
 	useEffect( () => {
 		if ( ! anchor && content ) {
 			setAttributes( {
-				anchor: generateAnchor( content, allHeadingAnchors ),
+				anchor: generateAnchor( clientId, content, allHeadingAnchors ),
 			} );
 		}
-	}, [ allHeadingAnchors ] );
+		allHeadingAnchors[ clientId ] = anchor;
+	}, [ content, anchor ] );
 
 	const onContentChange = ( value ) => {
 		const newAttrs = { content: value };
 		if (
 			! anchor ||
 			! value ||
-			generateAnchor( content, allHeadingAnchors ) === anchor
+			generateAnchor( clientId, content, allHeadingAnchors ) === anchor
 		) {
-			newAttrs.anchor = generateAnchor( value, allHeadingAnchors );
+			newAttrs.anchor = generateAnchor(
+				clientId,
+				value,
+				allHeadingAnchors
+			);
 		}
 		setAttributes( newAttrs );
 	};
