@@ -11,7 +11,8 @@
  * @return boolean Whether the current theme is an FSE theme or not.
  */
 function gutenberg_is_fse_theme() {
-	return is_readable( get_stylesheet_directory() . '/block-templates/index.html' );
+	$is_fse_theme = is_readable( get_stylesheet_directory() . '/block-templates/index.html' );
+	return apply_filters( 'gutenberg_is_fse_theme', $is_fse_theme );
 }
 
 /**
