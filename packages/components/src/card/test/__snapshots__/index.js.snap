@@ -366,6 +366,12 @@ Object {
   border-radius: 2px;
 }
 
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-18 {
+    transition-duration: 0ms;
+  }
+}
+
 <body>
     <div>
       <div
@@ -616,6 +622,12 @@ Object {
   border-radius: 2px;
 }
 
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-18 {
+    transition-duration: 0ms;
+  }
+}
+
 <div>
     <div
       class="components-surface components-card components-card emotion-0 emotion-1"
@@ -757,15 +769,15 @@ Snapshot Diff:
     </div>
     <div
       aria-hidden="true"
--     class="components-elevation css-180mfx7-View-Elevation-sx-Base-elevationClassName em57xhy0"
-+     class="components-elevation css-19ozpqv-View-Elevation-sx-Base-elevationClassName em57xhy0"
+-     class="components-elevation css-1b4rkmt-View-Elevation-sx-Base-elevationClassName em57xhy0"
++     class="components-elevation css-91yjwm-View-Elevation-sx-Base-elevationClassName em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />
     <div
       aria-hidden="true"
--     class="components-elevation css-179ju9e-View-Elevation-sx-Base-elevationClassName em57xhy0"
-+     class="components-elevation css-19ozpqv-View-Elevation-sx-Base-elevationClassName em57xhy0"
+-     class="components-elevation css-o8otup-View-Elevation-sx-Base-elevationClassName em57xhy0"
++     class="components-elevation css-91yjwm-View-Elevation-sx-Base-elevationClassName em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />
@@ -805,6 +817,12 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
   border-radius: 2px;
 }
 
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-4 {
+    transition-duration: 0ms;
+  }
+}
+
 .emotion-6 {
   background: transparent;
   display: block;
@@ -822,6 +840,12 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
   -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
   border-radius: 2px;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-6 {
+    transition-duration: 0ms;
+  }
 }
 
 <div>

@@ -519,7 +519,7 @@ describe( 'Widgets screen', () => {
 		} );
 	} );
 
-	it( 'Should duplicate the widgets', async () => {
+	it.skip( 'Should duplicate the widgets', async () => {
 		let [ firstWidgetArea ] = await findAll( {
 			role: 'group',
 			name: 'Block: Widget Area',
@@ -743,7 +743,7 @@ describe( 'Widgets screen', () => {
 	` );
 	} );
 
-	it( 'allows widgets to be moved between widget areas using the dropdown in the block toolbar', async () => {
+	it.skip( 'allows widgets to be moved between widget areas using the dropdown in the block toolbar', async () => {
 		const widgetAreas = await findAll( {
 			role: 'group',
 			name: 'Block: Widget Area',

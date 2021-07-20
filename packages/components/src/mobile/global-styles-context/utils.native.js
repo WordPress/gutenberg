@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, startsWith } from 'lodash';
+import { find, startsWith, get } from 'lodash';
 
 export const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
@@ -120,40 +120,89 @@ export function getBlockColors(
 	return blockStyles;
 }
 
-export function parseColorVariables( styles, colorPalette ) {
-	const stylesBase = styles;
-	const colorPrefixRegex = /var\(--wp--preset--color--(.*?)\)/g;
+export function parseStylesVariables( styles, mappedValues, customValues ) {
+	let stylesBase = styles;
+	const variables = [ 'preset', 'custom' ];
 
-	return stylesBase
-		? JSON.parse(
-				stylesBase?.replace( colorPrefixRegex, ( _$1, $2 ) => {
-					const mappedColor = find( colorPalette, {
-						slug: $2,
+	variables.forEach( ( variable ) => {
+		// Examples
+		// var(--wp--preset--color--gray)
+		// var(--wp--custom--body--typography--font-family)
+		const regex = new RegExp( `var\\(--wp--${ variable }--(.*?)\\)`, 'g' );
+
+		if ( variable === 'preset' ) {
+			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
+				const path = $2.split( '--' );
+				const mappedPresetValue = mappedValues[ path[ 0 ] ];
+				if ( mappedPresetValue && mappedPresetValue.slug ) {
+					const matchedValue = find( mappedPresetValue.values, {
+						slug: path[ 1 ],
 					} );
-					return mappedColor?.color;
-				} )
-		  )
-		: styles;
+					return matchedValue?.[ mappedPresetValue.slug ];
+				}
+				return UNKNOWN_VALUE;
+			} );
+		}
+		if ( variable === 'custom' ) {
+			const customValuesData = customValues ?? JSON.parse( stylesBase );
+			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
+				const path = $2.split( '--' );
+				return get( customValuesData, path );
+			} );
+		}
+	} );
+
+	return JSON.parse( stylesBase );
 }
 
-export function getGlobalStyles( rawStyles, rawFeatures, colors, gradients ) {
-	const parsedGradients = parseColorVariables(
-		JSON.stringify( gradients ),
-		colors
+export function getMappedValues( features, palette ) {
+	const mappedValues = {
+		color: {
+			values: palette?.theme,
+			slug: 'color',
+		},
+		'font-size': {
+			values: features?.typography?.fontSizes?.theme,
+			slug: 'size',
+		},
+	};
+	return mappedValues;
+}
+
+export function getGlobalStyles( rawStyles, rawFeatures ) {
+	const features = JSON.parse( rawFeatures );
+	const mappedValues = getMappedValues( features, features?.color?.palette );
+	const colors = parseStylesVariables(
+		JSON.stringify( features?.color ),
+		mappedValues
 	);
-	const globalStyles = parseColorVariables( rawStyles, colors );
-	const parsedExperimentalFeatures = parseColorVariables(
-		rawFeatures,
-		colors
+	const gradients = parseStylesVariables(
+		JSON.stringify( features?.color?.gradients ),
+		mappedValues
+	);
+	const customValues = parseStylesVariables(
+		JSON.stringify( features.custom ),
+		mappedValues
+	);
+	const globalStyles = parseStylesVariables(
+		rawStyles,
+		mappedValues,
+		customValues
 	);
 
 	return {
 		colors,
-		gradients: parsedGradients,
+		gradients,
 		__experimentalFeatures: {
 			color: {
-				palette: parsedExperimentalFeatures?.color?.palette,
-				gradients: parsedExperimentalFeatures?.color?.gradients,
+				palette: colors?.palette,
+				gradients,
+			},
+			typography: {
+				fontSizes: features?.typography?.fontSizes,
+				custom: {
+					'line-height': features?.custom?.[ 'line-height' ],
+				},
 			},
 		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,
