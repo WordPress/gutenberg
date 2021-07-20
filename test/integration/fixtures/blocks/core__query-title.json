@@ -4,6 +4,7 @@
 		"name": "core/query-title",
 		"isValid": true,
 		"attributes": {
+			"content": "",
 			"level": 1
 		},
 		"innerBlocks": [],
