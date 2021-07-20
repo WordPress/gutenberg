@@ -167,6 +167,23 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 // }
 ```
 
+## Duplicable Attributes
+
+The `duplicable` key is used to indicate whether a block attribute should be copied when a block is duplicated. If an attribute sets the `duplicable` key to `false`, its value will not be copied, and it will instead fall back to the default value if one is supplied. If the key is not explicitly set, the attribute will be considered duplicable by default.
+
+The `duplicable` key should not be used for attributes that are extracted from block content using an [attribute source](#common-sources).
+
+_Example_: A `resourceId` attribute which should not be copied to duplicate blocks.
+
+```js
+{
+	resourceId: {
+		type: 'string',
+		duplicable: false
+	}
+}
+```
+
 ## Meta (deprecated)
 
 <div class="callout callout-alert">

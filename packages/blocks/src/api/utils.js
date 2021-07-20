@@ -237,11 +237,16 @@ export function getAccessibleBlockLabel(
  * Ensure attributes contains only values defined by block type, and merge
  * default values for missing attributes.
  *
- * @param {string} name       The block's name.
- * @param {Object} attributes The block's attributes.
+ * @param {string}  name                            The block's name.
+ * @param {Object}  attributes                      The block's attributes.
+ * @param {boolean} shouldRemoveDuplicateAttributes Whether to remove non-duplicable attributes.
  * @return {Object} The sanitized attributes.
  */
-export function __experimentalSanitizeBlockAttributes( name, attributes ) {
+export function __experimentalSanitizeBlockAttributes(
+	name,
+	attributes,
+	{ shouldRemoveDuplicateAttributes = false } = {}
+) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
@@ -255,7 +260,21 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 			const value = attributes[ key ];
 
 			if ( undefined !== value ) {
-				accumulator[ key ] = value;
+				// Remove non-duplicable attributes and merge default values.
+				if ( shouldRemoveDuplicateAttributes ) {
+					// An attribute is duplicable by default if not specified in the schema.
+					const duplicable =
+						! schema.hasOwnProperty( 'duplicable' ) ||
+						schema.duplicable;
+
+					if ( duplicable ) {
+						accumulator[ key ] = value;
+					} else if ( schema.hasOwnProperty( 'default' ) ) {
+						accumulator[ key ] = schema.default;
+					}
+				} else {
+					accumulator[ key ] = value;
+				}
 			} else if ( schema.hasOwnProperty( 'default' ) ) {
 				accumulator[ key ] = schema.default;
 			}

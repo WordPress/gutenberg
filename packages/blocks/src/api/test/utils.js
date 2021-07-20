@@ -280,6 +280,59 @@ describe( 'sanitizeBlockAttributes', () => {
 		} );
 	} );
 
+	it( 'does not strip non-duplicable attributes by default', () => {
+		registerBlockType( 'core/test-block', {
+			attributes: {
+				nonDupicableAttr: {
+					type: 'string',
+					duplicable: false,
+				},
+			},
+			title: 'Test block',
+		} );
+
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{
+				nonDupicableAttr: 'unique-value',
+			}
+		);
+
+		expect( attributes ).toEqual( {
+			nonDupicableAttr: 'unique-value',
+		} );
+	} );
+
+	it( 'removes non-duplicable attributes and falls back to defaults when shouleRemoveDuplicateAttributes is true', () => {
+		registerBlockType( 'core/test-block', {
+			attributes: {
+				nonDuplicableAttr: {
+					type: 'string',
+					duplicable: false,
+				},
+				nonDuplicableAttrWithDefault: {
+					type: 'string',
+					duplicable: false,
+					default: 'default-value',
+				},
+			},
+			title: 'Test block',
+		} );
+
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{
+				nonDuplicableAttr: 'unique-value',
+				nonDuplicableAttrWithDefault: 'unique-non-default-value',
+			},
+			{ shouldRemoveDuplicateAttributes: true }
+		);
+
+		expect( attributes ).toEqual( {
+			nonDuplicableAttrWithDefault: 'default-value',
+		} );
+	} );
+
 	it( 'handles node and children sources as arrays', () => {
 		registerBlockType( 'core/test-block', {
 			attributes: {
