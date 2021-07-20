@@ -177,7 +177,7 @@ describe( 'getIssueFeature', () => {
 	it( 'returns "Unknown" as feature if there are no labels', () => {
 		const result = getIssueFeature( { labels: [] } );
 
-		expect( result ).toBe( 'Unknown' );
+		expect( result ).toBe( 'Uncategorized' );
 	} );
 
 	it( 'falls by to "Unknown" as the feature if unable to classify by other means', () => {
@@ -195,7 +195,7 @@ describe( 'getIssueFeature', () => {
 			],
 		} );
 
-		expect( result ).toEqual( 'Unknown' );
+		expect( result ).toEqual( 'Uncategorized' );
 	} );
 
 	it( 'gives precedence to manual feature mapping', () => {

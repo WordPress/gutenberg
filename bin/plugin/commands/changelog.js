@@ -19,7 +19,7 @@ const config = require( '../config' );
 // @ts-ignore
 const manifest = require( '../../../package.json' );
 
-const UNKNOWN = 'Unknown';
+const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
 
 /** @typedef {import('@octokit/rest')} GitHub */
 /** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
@@ -318,7 +318,7 @@ function getIssueFeature( issue ) {
 	}
 
 	// Fallback - if we couldn't find a good match.
-	return UNKNOWN;
+	return UNKNOWN_FEATURE_FALLBACK_NAME;
 }
 
 /**
@@ -620,6 +620,7 @@ async function getChangelog( settings ) {
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
 
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
+
 	for ( const group of sortedGroups ) {
 		const groupPullRequests = groupedPullRequests[ group ];
 		const groupEntries = groupPullRequests
@@ -630,40 +631,73 @@ async function getChangelog( settings ) {
 			continue;
 		}
 
-		const featureGroups = groupBy( groupPullRequests, getIssueFeature );
+		// Start a new section within the changelog.
 		changelog += '### ' + group + '\n\n';
 
-		Object.keys( featureGroups )
-			.sort( ( a, b ) => {
-				// sort "Unknown" to always be at the end
-				if ( a === 'Unknown' ) {
-					return 1;
-				} else if ( b === 'Unknown' ) {
-					return -1;
-				}
-				return featureGroups[ b ].length - featureGroups[ a ].length;
-			} )
-			.forEach( ( feature ) => {
-				const featureGroup = featureGroups[ feature ];
-				// Start new markdown list
-				changelog += '- ' + feature + '\n';
-				const featureGroupEntries = featureGroup
-					.map( getEntry )
-					.filter( Boolean );
-				featureGroupEntries.forEach( ( entry ) => {
-					// Strip feature name from entry if present.
-					entry = entry && entry.replace( `[${ feature } - `, '[' );
+		// Group PRs within this section into "Features".
+		const featureGroups = groupBy( groupPullRequests, getIssueFeature );
 
-					// Add a new bullet point to the list.
-					changelog += `  ${ entry }\n`;
-				} );
-				// End the markdown list.
-				changelog += '\n';
+		const featuredGroupNames = sortFeatureGroups( featureGroups );
+
+		// Start output of Features within the section.
+		featuredGroupNames.forEach( ( featureName ) => {
+			const featureGroupPRs = featureGroups[ featureName ];
+
+			const featureGroupEntries = featureGroupPRs
+				.map( getEntry )
+				.filter( Boolean );
+
+			// Don't create feature sections when there are no PRs.
+			if ( ! featureGroupEntries.length ) {
+				return;
+			}
+
+			// Start new <ul> for the Feature group.
+			changelog += '- ' + featureName + '\n';
+
+			// Add a <li> for each PR in the Feature.
+			featureGroupEntries.forEach( ( entry ) => {
+				// Strip feature name from entry if present.
+				entry = entry && entry.replace( `[${ featureName } - `, '[' );
+
+				// Add a new bullet point to the list.
+				changelog += `  ${ entry }\n`;
 			} );
+
+			// Close the <ul> for the Feature group.
+			changelog += '\n';
+		} );
+
 		changelog += '\n';
 	}
 
 	return changelog;
+}
+
+/**
+ * Sorts the feature groups by the feature which contains the greatest number of PRs
+ * ready for output into the changelog.
+ *
+ * @param {Object[]} featureGroups feature specific PRs keyed by feature name.
+ * @return {string[]} sorted list of feature names.
+ */
+function sortFeatureGroups( featureGroups ) {
+	return Object.keys( featureGroups ).sort(
+		( featureAName, featureBName ) => {
+			// Sort "Unknown" to always be at the end
+			if ( featureAName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
+				return 1;
+			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
+				return -1;
+			}
+
+			// Sort by greatest number of PRs in the group first.
+			return (
+				featureGroups[ featureBName ].length -
+				featureGroups[ featureAName ].length
+			);
+		}
+	);
 }
 
 /**
