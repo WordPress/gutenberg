@@ -7,6 +7,7 @@ import memize from 'memize';
  * WordPress dependencies
  */
 import RNReactNativeGutenbergBridge, {
+	requestBlockTypeImpressions,
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
@@ -35,6 +36,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { getGlobalStyles } from '@wordpress/components';
+import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -161,6 +163,11 @@ class NativeEditorProvider extends Component {
 			// purposes and will be replaced with actual logic in a later PR.
 			this.setState( { isHelpVisible: true } );
 		} );
+
+		// Request current block impressions from native app
+		requestBlockTypeImpressions( ( impressions ) => {
+			updateSettings( { impressions } );
+		}, NEW_BLOCK_TYPES );
 	}
 
 	componentWillUnmount() {
@@ -332,6 +339,7 @@ export default compose( [
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
+			getSettings: getBlockEditorSettings,
 		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -341,6 +349,7 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
+			getBlockEditorSettings,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),

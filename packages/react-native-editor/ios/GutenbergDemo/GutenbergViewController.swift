@@ -244,6 +244,14 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestPreview() {
         print(#function)
     }
+
+    func gutenbergDidRequestBlockTypeImpressions(_ newBlockTypes: [String]) -> [String: Int] {
+        return newBlockTypes.reduce(into: [:], { $0[$1] = 3 })
+    }
+
+    func gutenbergDidRequestSetBlockTypeImpressionCount(_ name: String, count: Int) -> Void {
+        print("Gutenberg requested setting \"\(name)\" block type impression count to \(count).")
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -292,7 +300,8 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .mediaFilesCollectionBlock: true,
             .isAudioBlockMediaUploadEnabled: true,
             .reusableBlock: false,
-            .editorOnboarding: false
+            .editorOnboarding: false,
+            .firstGutenbergEditorSession: false,
         ]
     }
 

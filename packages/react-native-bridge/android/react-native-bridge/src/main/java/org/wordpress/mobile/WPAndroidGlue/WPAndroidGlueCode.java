@@ -25,9 +25,11 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -96,6 +98,7 @@ public class WPAndroidGlueCode {
     private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
     private OnFocalPointPickerTooltipShownEventListener mOnFocalPointPickerTooltipShownListener;
     private OnGutenbergDidRequestPreviewListener mOnGutenbergDidRequestPreviewListener;
+    private OnBlockTypeImpressionsEventListener mOnBlockTypeImpressionsEventListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -215,6 +218,11 @@ public class WPAndroidGlueCode {
 
     public interface OnGutenbergDidRequestPreviewListener {
         void gutenbergDidRequestPreview();
+    }
+
+    public interface OnBlockTypeImpressionsEventListener {
+        void onSetBlockTypeImpressionCount(String name, Double count);
+        Map<String, Double> onRequestBlockTypeImpressions(ArrayList<Object> newBlockTypes);
     }
 
     public void mediaSelectionCancelled() {
@@ -494,6 +502,21 @@ public class WPAndroidGlueCode {
             public void requestPreview() {
                 mOnGutenbergDidRequestPreviewListener.gutenbergDidRequestPreview();
             }
+
+            @Override
+            public void requestBlockTypeImpressions(ReadableArray newBlockTypes, BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
+                Map<String, Double> storedImpressions = mOnBlockTypeImpressionsEventListener.onRequestBlockTypeImpressions(newBlockTypes.toArrayList());
+                WritableMap impressions = Arguments.createMap();
+                for (Map.Entry<String, Double> entry: storedImpressions.entrySet()) {
+                    impressions.putDouble(entry.getKey(), entry.getValue());
+                }
+                blockTypeImpressionsCallback.onRequestBlockTypeImpressions(impressions);
+            }
+
+            @Override
+            public void setBlockTypeImpressionCount(String name, Double count) {
+                mOnBlockTypeImpressionsEventListener.onSetBlockTypeImpressionCount(name, count);
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -572,6 +595,7 @@ public class WPAndroidGlueCode {
                                   OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
                                   OnFocalPointPickerTooltipShownEventListener onFocalPointPickerTooltipListener,
                                   OnGutenbergDidRequestPreviewListener onGutenbergDidRequestPreviewListener,
+                                  OnBlockTypeImpressionsEventListener onBlockTypeImpressionsEventListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -591,6 +615,7 @@ public class WPAndroidGlueCode {
         mOnMediaFilesCollectionBasedBlockEditorListener = onMediaFilesCollectionBasedBlockEditorListener;
         mOnFocalPointPickerTooltipShownListener = onFocalPointPickerTooltipListener;
         mOnGutenbergDidRequestPreviewListener = onGutenbergDidRequestPreviewListener;
+        mOnBlockTypeImpressionsEventListener = onBlockTypeImpressionsEventListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 

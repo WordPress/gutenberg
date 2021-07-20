@@ -24,6 +24,7 @@ const selectMock = {
 	canInsertBlockType: jest.fn(),
 	getBlockType: jest.fn(),
 	getClipboard: jest.fn(),
+	getSettings: jest.fn( () => ( {} ) ),
 };
 
 describe( 'BlockTypesTab component', () => {

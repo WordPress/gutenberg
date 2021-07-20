@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import styles from './style.scss';
+import Badge from '../badge';
 
 class MenuItem extends Component {
 	constructor() {
@@ -80,13 +81,20 @@ class MenuItem extends Component {
 							isClipboardBlock && clipboardBlockStyles,
 						] }
 					>
-						<View style={ modalIconStyle }>
-							<Icon
-								icon={ item.icon.src || item.icon }
-								fill={ modalIconStyle.fill }
-								size={ modalIconStyle.width }
-							/>
-						</View>
+						<Badge
+							label={ __( 'New' ) }
+							position={ { top: 4, left: 4 } }
+							show={ item.isNew === true }
+							size="small"
+						>
+							<View style={ modalIconStyle }>
+								<Icon
+									icon={ item.icon.src || item.icon }
+									fill={ modalIconStyle.fill }
+									size={ modalIconStyle.width }
+								/>
+							</View>
+						</Badge>
 					</View>
 					<Text numberOfLines={ 3 } style={ modalItemLabelStyle }>
 						{ blockTitle }

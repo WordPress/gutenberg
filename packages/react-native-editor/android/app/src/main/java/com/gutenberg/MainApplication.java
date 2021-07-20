@@ -11,7 +11,9 @@ import androidx.core.util.Consumer;
 
 import com.facebook.react.ReactApplication;
 import com.BV.LinearGradient.LinearGradientPackage;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.bridge.ReadableArray;
@@ -243,6 +245,20 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void requestPreview() {
                 Toast.makeText(MainApplication.this, "requestPreview called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestBlockTypeImpressions(ReadableArray newBlockTypes, BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
+                WritableMap impressions = Arguments.createMap();
+                for (int i = 0; i < newBlockTypes.size(); i++) {
+                    impressions.putDouble(newBlockTypes.getString(i), 3.0);
+                }
+                blockTypeImpressionsCallback.onRequestBlockTypeImpressions(impressions);
+            }
+
+            @Override
+            public void setBlockTypeImpressionCount(String name, Double count) {
+                Log.d("BlockTypeImpressions", String.format("Gutenberg requested setting \"%s\" block type impression count to %1.0f.", name, count));
             }
 
         }, isDarkMode());

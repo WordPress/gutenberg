@@ -277,3 +277,14 @@ export const registerCoreBlocks = () => {
 		setGroupingBlockName( group.name );
 	}
 };
+
+/**
+ * Dictates which block types are considered "new." For each of the block type
+ * names below, if the native host app does not already have an impression count
+ * set, an initial count will be set. When a block type's impression count is
+ * greater than 0, a "new" badge is displayed on the block type within the block
+ * inserter.
+ *
+ * @constant {string[]}
+ */
+export const NEW_BLOCK_TYPES = [ embed.name, search.name, audio.name ];
