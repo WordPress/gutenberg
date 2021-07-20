@@ -455,7 +455,6 @@ class HierarchicalTermSelector extends Component {
 					label={ filterLabel }
 					value={ filterValue }
 					onChange={ this.setFilterValue }
-					required
 				/>
 			),
 			<div
