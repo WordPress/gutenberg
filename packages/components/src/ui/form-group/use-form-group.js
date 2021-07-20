@@ -27,7 +27,7 @@ export function useFormGroup( props ) {
 		...otherProps
 	} = useContextSystem( props, 'FormGroup' );
 
-	const id = useInstanceId( useFormGroup, 'form-group', idProp );
+	const id = useInstanceId( useFormGroup, 'form-group', idProp ).toString();
 
 	const cx = useCx();
 
