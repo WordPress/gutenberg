@@ -13,6 +13,11 @@ import {
 	useEffect,
 } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import sandboxStyles from './style.scss';
+
 const observeAndResizeJS = `
 	( function() {
 		var observer;
@@ -196,9 +201,12 @@ export default function Sandbox( {
 			ref={ ref }
 			source={ { html: iframeHtml } }
 			originWhitelist={ [ '*' ] }
-			style={ {
-				aspectRatio: getAspectRatio(),
-			} }
+			style={ [
+				sandboxStyles[ 'sandbox-webview__container' ],
+				{
+					aspectRatio: getAspectRatio(),
+				},
+			] }
 			onMessage={ checkMessageForResize }
 		/>
 	);
