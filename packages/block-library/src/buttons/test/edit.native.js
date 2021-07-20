@@ -30,8 +30,8 @@ afterAll( () => {
 describe( 'when a button is shown', () => {
 	it( 'adjusts the border radius', async () => {
 		const initialHtml = `<!-- wp:buttons -->
-		<div class="wp-block-buttons"><!-- wp:button -->
-		<div class="wp-block-button"><a class="wp-block-button__link">Hello</a></div>
+		<div class="wp-block-buttons"><!-- wp:button {"style":{"border":{"radius":"5%"}}} -->
+		<div class="wp-block-button"><a class="wp-block-button__link" style="border-radius:5%" >Hello</a></div>
 		<!-- /wp:button --></div>
 		<!-- /wp:buttons -->`;
 		const { getByA11yLabel, getByTestId } = await initializeEditor( {
@@ -72,8 +72,8 @@ describe( 'when a button is shown', () => {
 		fireEvent( radiusSlider, 'valueChange', '25' );
 
 		const expectedHtml = `<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"style":{"border":{"radius":25}}} -->
-<div class="wp-block-button"><a class="wp-block-button__link" href="">Hello</a></div>
+<div class="wp-block-buttons"><!-- wp:button {"style":{"border":{"radius":"25%"}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link" href="" style="border-radius:25%">Hello</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );

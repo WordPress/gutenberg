@@ -175,7 +175,6 @@ function ColumnEdit( {
 								onChange={ onChange }
 								onComplete={ onChangeWidth }
 								onUnitChange={ onChangeUnit }
-								decimalNum={ 1 }
 								value={
 									getWidths( columns )[ selectedColumnIndex ]
 								}

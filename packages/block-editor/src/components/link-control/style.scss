@@ -51,7 +51,7 @@ $preview-image-height: 140px;
 }
 
 .block-editor-link-control__search-error {
-	margin: -$grid-unit-20/2 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
+	margin: -$grid-unit-20*0.5 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
 }
 
 .block-editor-link-control__search-actions {
@@ -68,8 +68,8 @@ $preview-image-height: 140px;
 	 *  - Horizontally, pad to the minimum of: default input padding, or the
 	 *    equivalent of the vertical padding.
 	 */
-	top: $grid-unit-20 + 1px + ( ( 40px - $button-size ) / 2 );
-	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) / 2);
+	top: $grid-unit-20 + 1px + ( ( 40px - $button-size ) * 0.5 );
+	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) * 0.5);
 }
 
 .components-button .block-editor-link-control__search-submit .has-icon {
@@ -92,7 +92,7 @@ $preview-image-height: 140px;
 	}
 
 	&::before {
-		height: $grid-unit-20/2;
+		height: $grid-unit-20*0.5;
 		top: 0;
 		bottom: auto;
 	}
@@ -112,7 +112,7 @@ $preview-image-height: 140px;
 
 .block-editor-link-control__search-results {
 	margin: 0;
-	padding: $grid-unit-20/2 $grid-unit-20 $grid-unit-20/2;
+	padding: $grid-unit-20*0.5 $grid-unit-20 $grid-unit-20*0.5;
 	max-height: 200px;
 	overflow-y: auto; // allow results list to scroll
 
@@ -434,8 +434,8 @@ $preview-image-height: 140px;
 		 *    then artificially create spacing that mimics as if the spinner
 		 *    were center-padded to the same width as an icon button.
 		 */
-		top: $grid-unit-20 + 1px + ( ( 40px - $spinner-size ) / 2 );
-		right: $grid-unit-20 + 1px + ( $button-size * $block-editor-link-control-number-of-actions ) + ( ( $button-size - $spinner-size ) / 2 );
+		top: $grid-unit-20 + 1px + ( ( 40px - $spinner-size ) * 0.5 );
+		right: $grid-unit-20 + 1px + ( $button-size * $block-editor-link-control-number-of-actions ) + ( ( $button-size - $spinner-size ) * 0.5 );
 	}
 }
 
