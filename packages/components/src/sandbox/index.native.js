@@ -172,6 +172,17 @@ export default function Sandbox( {
 		setHeight( data.height );
 	}
 
+	function getAspectRatio() {
+		const contentWidth = Math.ceil( width );
+		const contentHeight = Math.ceil( height );
+
+		if ( contentWidth && contentHeight ) {
+			return contentWidth / contentHeight;
+		}
+
+		return 1;
+	}
+
 	useEffect( () => {
 		trySandbox();
 	}, [ title, type, styles, scripts ] );
@@ -186,7 +197,7 @@ export default function Sandbox( {
 			source={ { html: iframeHtml } }
 			originWhitelist={ [ '*' ] }
 			style={ {
-				aspectRatio: Math.ceil( width ) / Math.ceil( height ) || 1,
+				aspectRatio: getAspectRatio(),
 			} }
 			onMessage={ checkMessageForResize }
 		/>
