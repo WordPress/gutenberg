@@ -34,7 +34,7 @@ export function TemplatePanel() {
 		isViewable,
 		template,
 		supportsTemplateMode,
-		canUserEdit,
+		canUserCreate,
 	} = useSelect( ( select ) => {
 		const {
 			isEditorPanelEnabled,
@@ -73,7 +73,7 @@ export function TemplatePanel() {
 			template: _supportsTemplateMode && getEditedPostTemplate(),
 			isViewable: _isViewable,
 			supportsTemplateMode: _supportsTemplateMode,
-			canUserEdit: canUser( 'update', 'settings' ),
+			canUserCreate: canUser( 'create', 'templates' ),
 		};
 	}, [] );
 
@@ -91,7 +91,7 @@ export function TemplatePanel() {
 		! isEnabled ||
 		! isViewable ||
 		( isEmpty( availableTemplates ) &&
-			( ! supportsTemplateMode || ! canUserEdit ) )
+			( ! supportsTemplateMode || ! canUserCreate ) )
 	) {
 		return null;
 	}
@@ -131,7 +131,7 @@ export function TemplatePanel() {
 					label: templateName,
 				} ) ) }
 			/>
-			{ canUserEdit && <PostTemplateActions /> }
+			{ canUserCreate && <PostTemplateActions /> }
 		</PanelBody>
 	);
 }
