@@ -41,14 +41,19 @@ export function LayoutStyle( { selector, layout = {} } ) {
 	let style =
 		!! contentSize || !! wideSize
 			? `
+				${ selector } {
+					--wp--layout--content-size: ${ contentSize ?? wideSize };
+					--wp--layout--wide-size: ${ wideSize ?? contentSize };
+				}
+
 				${ appendSelectors( selector, '> *' ) } {
-					max-width: ${ contentSize ?? wideSize };
+					max-width: var(--wp--layout--content-size);
 					margin-left: auto !important;
 					margin-right: auto !important;
 				}
 
-				${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
-					max-width: ${ wideSize ?? contentSize };
+				${ appendSelectors( selector, '> [data-align="wide"]' ) } {
+					max-width: var(--wp--layout--wide-size);
 				}
 
 				${ appendSelectors( selector, '> [data-align="full"]' ) } {
