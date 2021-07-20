@@ -41,6 +41,7 @@ function SelectControl(
 		size = 'default',
 		value: valueProp,
 		labelPosition = 'top',
+		children,
 		...props
 	},
 	ref
@@ -50,7 +51,7 @@ function SelectControl(
 	const helpId = help ? `${ id }__help` : undefined;
 
 	// Disable reason: A select with an onchange throws a warning
-	if ( isEmpty( options ) ) return null;
+	if ( isEmpty( options ) && ! children ) return null;
 
 	const handleOnBlur = ( event ) => {
 		onBlur( event );
@@ -110,21 +111,22 @@ function SelectControl(
 					size={ size }
 					value={ valueProp }
 				>
-					{ options.map( ( option, index ) => {
-						const key =
-							option.id ||
-							`${ option.label }-${ option.value }-${ index }`;
+					{ children ||
+						options.map( ( option, index ) => {
+							const key =
+								option.id ||
+								`${ option.label }-${ option.value }-${ index }`;
 
-						return (
-							<option
-								key={ key }
-								value={ option.value }
-								disabled={ option.disabled }
-							>
-								{ option.label }
-							</option>
-						);
-					} ) }
+							return (
+								<option
+									key={ key }
+									value={ option.value }
+									disabled={ option.disabled }
+								>
+									{ option.label }
+								</option>
+							);
+						} ) }
 				</Select>
 			</InputBase>
 		</BaseControl>
