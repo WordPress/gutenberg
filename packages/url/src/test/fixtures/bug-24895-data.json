@@ -1,0 +1,6 @@
+[
+	{ "input": "HTTP: HyperText Transfer Protocol", "failure": true },
+	{ "input": "URLs begin with a http:// prefix", "failure": true },
+	{ "input": "Note: Not a real scheme", "failure": true },
+	{ "input": "Note:Not a real scheme", "failure": true }
+]
