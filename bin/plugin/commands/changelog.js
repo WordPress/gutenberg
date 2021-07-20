@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { groupBy, escapeRegExp, uniq } = require( 'lodash' );
+const { countBy, groupBy, escapeRegExp, uniq } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
@@ -18,6 +18,8 @@ const { log, formats } = require( '../lib/logger' );
 const config = require( '../config' );
 // @ts-ignore
 const manifest = require( '../../../package.json' );
+
+const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
 
 /** @typedef {import('@octokit/rest')} GitHub */
 /** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
@@ -93,6 +95,41 @@ const LABEL_TYPE_MAPPING = {
 };
 
 /**
+ * Mapping of label names to arbitary features in the release notes.
+ *
+ * Mapping a given label to a feature will guarantee it will be categorised
+ * under that feature name in the changelog within each section.
+ *
+ * @type {Record<string,string>}
+ */
+const LABEL_FEATURE_MAPPING = {
+	'[Feature] Widgets Screen': 'Widgets Editor',
+	'[Feature] Design Tools': 'Design Tools',
+	'[Feature] UI Components': 'Components',
+	'[Feature] Component System': 'Components',
+	'[Feature] Template Editing Mode': 'Template Editor',
+	'[Feature] Writing Flow': 'Block Editor',
+	'[Feature] Blocks': 'Block Library',
+	'[Feature] Inserter': 'Block Editor',
+	'[Feature] Drag and Drop': 'Block Editor',
+	'[Feature] Block Multi Selection': 'Block Editor',
+	'[Feature] Link Editing': 'Block Editor',
+	'[Package] Edit Post': 'Post Editor',
+	'[Package] Icons': 'Icons',
+	'[Package] Block Editor': 'Block Editor',
+	'[Package] Editor': 'Editor',
+	'[Package] Edit Widgets': 'Widgets Editor',
+	'[Package] Widgets Customizer': 'Widgets Editor',
+	'[Package] Components': 'Components',
+	'[Package] Block Library': 'Block Library',
+	'[Package] Rich text': 'Block Editor',
+	'[Package] Data': 'Data Layer',
+	'[Block] Legacy Widget': 'Widgets Editor',
+	'REST API Interaction': 'REST API',
+	'New Block': 'Block Library',
+};
+
+/**
  * Order in which to print group titles. A value of `undefined` is used as slot
  * in which unrecognized headings are to be inserted.
  *
@@ -153,6 +190,45 @@ function getTypesByLabels( labels ) {
 }
 
 /**
+ * Returns candidates by retrieving the appropriate mapping
+ * from the label -> feature lookup.
+ *
+ * @param {string[]} labels Label names.
+ *
+ * @return {string[]} Feature candidates.
+ */
+function mapLabelsToFeatures( labels ) {
+	return labels
+		.filter( ( label ) =>
+			Object.keys( LABEL_FEATURE_MAPPING ).includes( label )
+		)
+		.map( ( label ) => LABEL_FEATURE_MAPPING[ label ] );
+}
+
+/**
+ * Returns whether not the given labels contain the block specific
+ * label "block library".
+ *
+ * @param {string[]} labels Label names.
+ *
+ * @return {boolean} whether or not the issue's is labbeled as block specific
+ */
+function getIsBlockSpecificIssue( labels ) {
+	return !! labels.find( ( label ) => label.startsWith( '[Block] ' ) );
+}
+
+/**
+ * Returns the first feature specific label from the given labels.
+ *
+ * @param {string[]} labels Label names.
+ *
+ * @return {string|undefined} the feature specific label.
+ */
+function getFeatureSpecificLabels( labels ) {
+	return labels.find( ( label ) => label.startsWith( '[Feature] ' ) );
+}
+
+/**
  * Returns type candidates based on given issue title.
  *
  * @param {string} title Issue title.
@@ -180,12 +256,58 @@ function getTypesByTitle( title ) {
  */
 function getIssueType( issue ) {
 	const labels = issue.labels.map( ( { name } ) => name );
+
 	const candidates = [
 		...getTypesByLabels( labels ),
 		...getTypesByTitle( issue.title ),
 	];
 
 	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
+}
+
+/**
+ * Returns the most appropriate feature category for the given issue based
+ * on a basic heuristic.
+ *
+ * @param {IssuesListForRepoResponseItem} issue Issue object.
+ *
+ * @return {string} the feature name.
+ */
+function getIssueFeature( issue ) {
+	const labels = issue.labels.map( ( { name } ) => name );
+
+	const featureCandidates = mapLabelsToFeatures( labels );
+
+	// 1. Prefer explicit mapping of label to feature.
+	if ( featureCandidates.length ) {
+		// Get occurances of the feature labels.
+		const featureCounts = countBy( featureCandidates );
+
+		// Check which matching label occurs most often.
+		const rankedFeatures = Object.keys( featureCounts ).sort(
+			( a, b ) => featureCounts[ b ] - featureCounts[ a ]
+		);
+
+		// Return the one that appeared most often.
+		return rankedFeatures[ 0 ];
+	}
+
+	// 2. `[Feature]` labels
+	const featureSpecificLabel = getFeatureSpecificLabels( labels );
+
+	if ( featureSpecificLabel ) {
+		return removeFeaturePrefix( featureSpecificLabel );
+	}
+
+	// 3. Block specific labels.
+	const blockSpecificLabels = getIsBlockSpecificIssue( labels );
+
+	if ( blockSpecificLabels ) {
+		return 'Block Library';
+	}
+
+	// Fallback - if we couldn't find a good match.
+	return UNKNOWN_FEATURE_FALLBACK_NAME;
 }
 
 /**
@@ -323,6 +445,17 @@ function removeRedundantTypePrefix( title, issue ) {
 		),
 		''
 	);
+}
+
+/**
+ * Removes any `[Feature] ` prefix from a given string.
+ *
+ * @param {string} text The string of text potentially containing a prefix.
+ *
+ * @return {string} the text without the prefix.
+ */
+function removeFeaturePrefix( text ) {
+	return text.replace( '[Feature] ', '' );
 }
 
 /**
@@ -485,7 +618,9 @@ async function getChangelog( settings ) {
 	let changelog = '';
 
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
+
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
+
 	for ( const group of sortedGroups ) {
 		const groupPullRequests = groupedPullRequests[ group ];
 		const groupEntries = groupPullRequests
@@ -496,12 +631,73 @@ async function getChangelog( settings ) {
 			continue;
 		}
 
+		// Start a new section within the changelog.
 		changelog += '### ' + group + '\n\n';
-		groupEntries.forEach( ( entry ) => ( changelog += entry + '\n' ) );
+
+		// Group PRs within this section into "Features".
+		const featureGroups = groupBy( groupPullRequests, getIssueFeature );
+
+		const featuredGroupNames = sortFeatureGroups( featureGroups );
+
+		// Start output of Features within the section.
+		featuredGroupNames.forEach( ( featureName ) => {
+			const featureGroupPRs = featureGroups[ featureName ];
+
+			const featureGroupEntries = featureGroupPRs
+				.map( getEntry )
+				.filter( Boolean );
+
+			// Don't create feature sections when there are no PRs.
+			if ( ! featureGroupEntries.length ) {
+				return;
+			}
+
+			// Start new <ul> for the Feature group.
+			changelog += '- ' + featureName + '\n';
+
+			// Add a <li> for each PR in the Feature.
+			featureGroupEntries.forEach( ( entry ) => {
+				// Strip feature name from entry if present.
+				entry = entry && entry.replace( `[${ featureName } - `, '[' );
+
+				// Add a new bullet point to the list.
+				changelog += `  ${ entry }\n`;
+			} );
+
+			// Close the <ul> for the Feature group.
+			changelog += '\n';
+		} );
+
 		changelog += '\n';
 	}
 
 	return changelog;
+}
+
+/**
+ * Sorts the feature groups by the feature which contains the greatest number of PRs
+ * ready for output into the changelog.
+ *
+ * @param {Object.<string, IssuesListForRepoResponseItem[]>} featureGroups feature specific PRs keyed by feature name.
+ * @return {string[]} sorted list of feature names.
+ */
+function sortFeatureGroups( featureGroups ) {
+	return Object.keys( featureGroups ).sort(
+		( featureAName, featureBName ) => {
+			// Sort "Unknown" to always be at the end
+			if ( featureAName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
+				return 1;
+			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
+				return -1;
+			}
+
+			// Sort by greatest number of PRs in the group first.
+			return (
+				featureGroups[ featureBName ].length -
+				featureGroups[ featureAName ].length
+			);
+		}
+	);
 }
 
 /**
@@ -562,6 +758,7 @@ async function getReleaseChangelog( options ) {
 	getNormalizedTitle,
 	getReleaseChangelog,
 	getIssueType,
+	getIssueFeature,
 	sortGroup,
 	getTypesByLabels,
 	getTypesByTitle,

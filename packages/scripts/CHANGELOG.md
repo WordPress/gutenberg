@@ -15,6 +15,7 @@
 -   Update `markdownlint` package to `0.23.1` ([#32633](https://github.com/WordPress/gutenberg/pull/32633)).
 -   Update `markdownlint-cli` package to `0.27.1` ([#32633](https://github.com/WordPress/gutenberg/pull/32633)).
 -   Update `eslint-plugin-markdown` package to `2.20.0` ([#33432](https://github.com/WordPress/gutenberg/pull/33432)).
+-   Update `sass` package to `1.35.2` ([#33433](https://github.com/WordPress/gutenberg/pull/33433)).
 
 ## 16.1.0 (2021-05-20)
 

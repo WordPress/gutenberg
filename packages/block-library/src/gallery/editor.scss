@@ -95,7 +95,7 @@ figure.wp-block-gallery {
 		// Use smaller buttons to fit when there are many columns.
 		.columns-7 &,
 		.columns-8 & {
-			padding: $grid-unit-05 / 2;
+			padding: $grid-unit-05 * 0.5;
 		}
 	}
 

@@ -106,7 +106,7 @@ $block-inserter-tabs-height: 44px;
 	z-index: z-index(".block-editor-inserter__search");
 
 	.components-search-control__icon {
-		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) / 2;
+		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
 	}
 }
 

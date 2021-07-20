@@ -54,6 +54,12 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-7 {
+    transition-duration: 0ms;
+  }
+}
+
 .emotion-9 {
   background: transparent;
   display: block;
@@ -71,6 +77,12 @@ exports[`props should render correctly 1`] = `
   -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
   border-radius: 2px;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-9 {
+    transition-duration: 0ms;
+  }
 }
 
 <div
@@ -169,6 +181,6 @@ Snapshot Diff:
       </div>
       <div
         aria-hidden="true"
-        class="components-elevation css-180mfx7-View-Elevation-sx-Base-elevationClassName em57xhy0"
+        class="components-elevation css-1b4rkmt-View-Elevation-sx-Base-elevationClassName em57xhy0"
         data-wp-c16t="true"
 `;
