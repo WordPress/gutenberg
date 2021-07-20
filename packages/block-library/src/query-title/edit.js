@@ -55,6 +55,7 @@ export default function QueryTitleEdit( {
 			break;
 	}
 
+	// Update content based on current template
 	useEffect( () => {
 		setAttributes( {
 			content,
