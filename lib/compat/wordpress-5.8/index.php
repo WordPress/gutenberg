@@ -104,7 +104,7 @@ if ( ! function_exists( 'build_query_vars_from_query_block' ) ) {
 	}
 }
 
-if ( ! function_exists( 'gutenberg_register_legacy_query_loop_block' ) ) {
+if ( ! function_exists( 'gutenberg_render_legacy_query_loop_block' ) ) {
 	/**
 	 * Renders the legacy `core/query-loop` block on the server.
 	 * It triggers a developer warning and then calls the renamed
