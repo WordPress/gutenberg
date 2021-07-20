@@ -27,7 +27,7 @@
 }
 
 .emptyHeader {
-	margin-top: $grid-unit-20 / 2;
+	margin-top: $grid-unit-20 * 0.5;
 }
 
 .background {
@@ -174,14 +174,16 @@
 
 // Range Text Input
 
-.verticalBorder {
+.textInputIOS {
 	border-right-width: 1px;
 	text-align: center;
 	border-color: $light-gray-400;
+	color: $gray-dark;
 }
 
-.verticalBorderDark {
+.textInputIOSDark {
 	border-color: $gray-70;
+	color: $white;
 }
 
 .textInputContainer {

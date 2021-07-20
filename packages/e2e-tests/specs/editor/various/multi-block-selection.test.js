@@ -295,23 +295,11 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'ArrowUp' );
 
-		const [ coord1, coord2 ] = await page.evaluate( () => {
-			const elements = Array.from(
-				document.querySelectorAll( '[data-type="core/paragraph"]' )
-			);
-			const rect1 = elements[ 0 ].getBoundingClientRect();
-			const rect2 = elements[ 1 ].getBoundingClientRect();
-			return [
-				{
-					x: rect1.x + rect1.width / 2,
-					y: rect1.y + rect1.height / 2,
-				},
-				{
-					x: rect2.x + rect2.width / 2,
-					y: rect2.y + rect2.height / 2,
-				},
-			];
-		} );
+		const [ paragraph1, paragraph2 ] = await page.$$(
+			'[data-type="core/paragraph"]'
+		);
+		const coord1 = await paragraph1.clickablePoint();
+		const coord2 = await paragraph2.clickablePoint();
 
 		await page.mouse.move( coord1.x, coord1.y );
 		await page.mouse.down();
@@ -344,24 +332,11 @@ describe( 'Multi-block selection', () => {
 
 		await page.keyboard.type( '2' );
 
-		const [ coord1, coord2 ] = await page.evaluate( () => {
-			const elements = Array.from(
-				document.querySelectorAll( '[data-type="core/paragraph"]' )
-			);
-			const rect1 = elements[ 0 ].getBoundingClientRect();
-			const rect2 = elements[ 1 ].getBoundingClientRect();
-
-			return [
-				{
-					x: rect1.x + rect1.width / 2,
-					y: rect1.y + rect1.height / 2,
-				},
-				{
-					x: rect2.x + rect2.width / 2,
-					y: rect2.y + rect2.height / 2,
-				},
-			];
-		} );
+		const [ paragraph1, paragraph2 ] = await page.$$(
+			'[data-type="core/paragraph"]'
+		);
+		const coord1 = await paragraph1.clickablePoint();
+		const coord2 = await paragraph2.clickablePoint();
 
 		await page.mouse.move( coord1.x, coord1.y );
 		await page.mouse.down();
@@ -465,23 +440,9 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3' );
 
-		const [ coord1, coord2 ] = await page.evaluate( () => {
-			const elements = Array.from(
-				document.querySelectorAll( '[data-type="core/paragraph"]' )
-			);
-			const rect1 = elements[ 2 ].getBoundingClientRect();
-			const rect2 = elements[ 1 ].getBoundingClientRect();
-			return [
-				{
-					x: rect1.x + rect1.width / 2,
-					y: rect1.y + rect1.height / 2,
-				},
-				{
-					x: rect2.x + rect2.width / 2,
-					y: rect2.y + rect2.height / 2,
-				},
-			];
-		} );
+		const paragraphs = await page.$$( '[data-type="core/paragraph"]' );
+		const coord1 = await paragraphs[ 2 ].clickablePoint();
+		const coord2 = await paragraphs[ 1 ].clickablePoint();
 
 		await page.mouse.move( coord1.x, coord1.y );
 		await page.mouse.down();
@@ -507,17 +468,12 @@ describe( 'Multi-block selection', () => {
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 1, 2 ] );
-
-		const coord = await page.evaluate( () => {
-			const element = document.querySelector(
-				'[data-type="core/paragraph"]'
-			);
-			const rect = element.getBoundingClientRect();
-			return {
-				x: rect.x - 1,
-				y: rect.y + rect.height / 2,
-			};
-		} );
+		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const rect = await paragraph.boundingBox();
+		const coord = {
+			x: rect.x - 1,
+			y: rect.y + rect.height / 2,
+		};
 
 		await page.mouse.click( coord.x, coord.y );
 
@@ -675,5 +631,28 @@ describe( 'Multi-block selection', () => {
 		await page.waitForSelector(
 			'[data-type="core/paragraph"].is-multi-selected'
 		);
+	} );
+
+	it( 'should select all from empty selection', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		// Confirm setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Clear the selected block.
+		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const box = await paragraph.boundingBox();
+		await page.mouse.click( box.x - 1, box.y );
+
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect both paragraphs to be deleted.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

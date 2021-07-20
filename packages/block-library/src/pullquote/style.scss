@@ -5,7 +5,7 @@
 
 	&.alignleft,
 	&.alignright {
-		max-width: $content-width / 2;
+		max-width: $content-width * 0.5;
 
 		p {
 			font-size: 1.25em;

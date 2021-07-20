@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableWithoutFeedback, Image } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -17,7 +17,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import EmbedNoPreview from './embed-no-preview';
-import styles from './styles.scss';
 
 const EmbedPreview = ( {
 	clientId,
@@ -27,8 +26,6 @@ const EmbedPreview = ( {
 	label,
 	onBlur,
 	onFocus,
-	preview,
-	previewable,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 
@@ -56,13 +53,6 @@ const EmbedPreview = ( {
 		}
 	}
 
-	const cannotShowThumbnail =
-		! previewable ||
-		! preview ||
-		! preview.thumbnail_url?.length ||
-		! preview.height ||
-		! preview.width;
-
 	return (
 		<TouchableWithoutFeedback
 			accessible={ ! isSelected }
@@ -70,25 +60,12 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				{ cannotShowThumbnail ? (
-					<EmbedNoPreview
-						label={ label }
-						icon={ icon }
-						isSelected={ isSelected }
-						onPress={ () => setIsCaptionSelected( false ) }
-					/>
-				) : (
-					<Image
-						style={ [
-							styles[ 'embed-preview__image' ],
-							{ aspectRatio: preview.width / preview.height },
-						] }
-						source={ {
-							uri: preview.thumbnail_url,
-						} }
-						resizeMode="cover"
-					/>
-				) }
+				<EmbedNoPreview
+					label={ label }
+					icon={ icon }
+					isSelected={ isSelected }
+					onPress={ () => setIsCaptionSelected( false ) }
+				/>
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }
 					accessible

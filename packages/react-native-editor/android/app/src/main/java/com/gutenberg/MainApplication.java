@@ -323,6 +323,13 @@ public class MainApplication extends Application implements ReactApplication, Gu
                 mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
             }
         });
+
+        devSupportManager.addCustomDevOption("Help", new DevOptionHandler() {
+            @Override
+            public void onOptionSelected() {
+                mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showEditorHelp();
+            }
+        });
     }
 
     @Override

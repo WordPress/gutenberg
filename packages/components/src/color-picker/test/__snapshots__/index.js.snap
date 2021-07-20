@@ -5,7 +5,7 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -11,36 +11,36 @@
+@@ -11,38 +11,38 @@
           onTouchMove={[Function bound handleChange]}
           onTouchStart={[Function bound handleChange]}
           role="application"
@@ -39,15 +39,17 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden"
+            className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+            data-wp-c16t={true}
+            data-wp-component="VisuallyHidden"
 -           id="color-picker-saturation-4"
 +           id="color-picker-saturation-3"
-          >
-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-          </div>
-        </div>
-      </div>
-@@ -56,11 +56,11 @@
+            style={
+              Object {
+                "WebkitClipPath": "inset( 50% )",
+                "border": 0,
+                "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -73,11 +73,11 @@
         >
           <div
             className="components-color-picker__active"
@@ -60,7 +62,7 @@ Snapshot Diff:
           />
         </div>
         <div
-@@ -78,29 +78,29 @@
+@@ -95,31 +95,31 @@
                 onMouseDown={[Function bound handleMouseDown]}
                 onTouchMove={[Function bound handleChange]}
                 onTouchStart={[Function bound handleChange]}
@@ -86,15 +88,17 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden"
+                  className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+                  data-wp-c16t={true}
+                  data-wp-component="VisuallyHidden"
 -                 id="components-color-picker__hue-description-4"
 +                 id="components-color-picker__hue-description-3"
-                >
-                  Move the arrow left or right to change hue.
-                </p>
-              </div>
-            </div>
-@@ -119,22 +119,22 @@
+                  style={
+                    Object {
+                      "WebkitClipPath": "inset( 50% )",
+                      "border": 0,
+                      "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -153,22 +153,22 @@
             <div
               className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
@@ -127,7 +131,7 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -11,36 +11,36 @@
+@@ -11,38 +11,38 @@
           onTouchMove={[Function bound handleChange]}
           onTouchStart={[Function bound handleChange]}
           role="application"
@@ -161,15 +165,17 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden"
+            className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+            data-wp-c16t={true}
+            data-wp-component="VisuallyHidden"
 -           id="color-picker-saturation-8"
 +           id="color-picker-saturation-7"
-          >
-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-          </div>
-        </div>
-      </div>
-@@ -56,11 +56,11 @@
+            style={
+              Object {
+                "WebkitClipPath": "inset( 50% )",
+                "border": 0,
+                "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -73,11 +73,11 @@
         >
           <div
             className="components-color-picker__active"
@@ -182,7 +188,7 @@ Snapshot Diff:
           />
         </div>
         <div
-@@ -78,29 +78,29 @@
+@@ -95,31 +95,31 @@
                 onMouseDown={[Function bound handleMouseDown]}
                 onTouchMove={[Function bound handleChange]}
                 onTouchStart={[Function bound handleChange]}
@@ -208,15 +214,17 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden"
+                  className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+                  data-wp-c16t={true}
+                  data-wp-component="VisuallyHidden"
 -                 id="components-color-picker__hue-description-8"
 +                 id="components-color-picker__hue-description-7"
-                >
-                  Move the arrow left or right to change hue.
-                </p>
-              </div>
-            </div>
-@@ -119,22 +119,22 @@
+                  style={
+                    Object {
+                      "WebkitClipPath": "inset( 50% )",
+                      "border": 0,
+                      "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -153,22 +153,22 @@
             <div
               className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
@@ -249,7 +257,7 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -11,36 +11,36 @@
+@@ -11,38 +11,38 @@
           onTouchMove={[Function bound handleChange]}
           onTouchStart={[Function bound handleChange]}
           role="application"
@@ -283,15 +291,17 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden"
+            className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+            data-wp-c16t={true}
+            data-wp-component="VisuallyHidden"
 -           id="color-picker-saturation-10"
 +           id="color-picker-saturation-9"
-          >
-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-          </div>
-        </div>
-      </div>
-@@ -56,11 +56,11 @@
+            style={
+              Object {
+                "WebkitClipPath": "inset( 50% )",
+                "border": 0,
+                "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -73,11 +73,11 @@
         >
           <div
             className="components-color-picker__active"
@@ -304,7 +314,7 @@ Snapshot Diff:
           />
         </div>
         <div
-@@ -78,29 +78,29 @@
+@@ -95,31 +95,31 @@
                 onMouseDown={[Function bound handleMouseDown]}
                 onTouchMove={[Function bound handleChange]}
                 onTouchStart={[Function bound handleChange]}
@@ -330,15 +340,17 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden"
+                  className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+                  data-wp-c16t={true}
+                  data-wp-component="VisuallyHidden"
 -                 id="components-color-picker__hue-description-10"
 +                 id="components-color-picker__hue-description-9"
-                >
-                  Move the arrow left or right to change hue.
-                </p>
-              </div>
-            </div>
-@@ -119,22 +119,22 @@
+                  style={
+                    Object {
+                      "WebkitClipPath": "inset( 50% )",
+                      "border": 0,
+                      "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -153,22 +153,22 @@
             <div
               className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
@@ -371,7 +383,7 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -11,36 +11,36 @@
+@@ -11,38 +11,38 @@
           onTouchMove={[Function bound handleChange]}
           onTouchStart={[Function bound handleChange]}
           role="application"
@@ -405,15 +417,17 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden"
+            className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+            data-wp-c16t={true}
+            data-wp-component="VisuallyHidden"
 -           id="color-picker-saturation-6"
 +           id="color-picker-saturation-5"
-          >
-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-          </div>
-        </div>
-      </div>
-@@ -56,11 +56,11 @@
+            style={
+              Object {
+                "WebkitClipPath": "inset( 50% )",
+                "border": 0,
+                "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -73,11 +73,11 @@
         >
           <div
             className="components-color-picker__active"
@@ -426,7 +440,7 @@ Snapshot Diff:
           />
         </div>
         <div
-@@ -78,29 +78,29 @@
+@@ -95,31 +95,31 @@
                 onMouseDown={[Function bound handleMouseDown]}
                 onTouchMove={[Function bound handleChange]}
                 onTouchStart={[Function bound handleChange]}
@@ -452,15 +466,17 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden"
+                  className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+                  data-wp-c16t={true}
+                  data-wp-component="VisuallyHidden"
 -                 id="components-color-picker__hue-description-6"
 +                 id="components-color-picker__hue-description-5"
-                >
-                  Move the arrow left or right to change hue.
-                </p>
-              </div>
-            </div>
-@@ -119,22 +119,22 @@
+                  style={
+                    Object {
+                      "WebkitClipPath": "inset( 50% )",
+                      "border": 0,
+                      "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -153,22 +153,22 @@
             <div
               className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
@@ -506,20 +522,20 @@ Snapshot Diff:
             onKeyDown={[Function preventKeyEvents]}
             style={
               Object {
-@@ -36,11 +36,11 @@
-            }
-            type="button"
+@@ -38,11 +38,11 @@
           />
           <div
-            className="components-visually-hidden"
+            className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+            data-wp-c16t={true}
+            data-wp-component="VisuallyHidden"
 -           id="color-picker-saturation-2"
 +           id="color-picker-saturation-1"
-          >
-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
-          </div>
-        </div>
-      </div>
-@@ -78,11 +78,11 @@
+            style={
+              Object {
+                "WebkitClipPath": "inset( 50% )",
+                "border": 0,
+                "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -95,11 +95,11 @@
                 onMouseDown={[Function bound handleMouseDown]}
                 onTouchMove={[Function bound handleChange]}
                 onTouchStart={[Function bound handleChange]}
@@ -532,20 +548,20 @@ Snapshot Diff:
                   aria-valuemax="1"
                   aria-valuemin="359"
                   aria-valuenow={0}
-@@ -96,11 +96,11 @@
-                  }
-                  tabIndex="0"
+@@ -115,11 +115,11 @@
                 />
                 <p
-                  className="components-visually-hidden"
+                  className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+                  data-wp-c16t={true}
+                  data-wp-component="VisuallyHidden"
 -                 id="components-color-picker__hue-description-2"
 +                 id="components-color-picker__hue-description-1"
-                >
-                  Move the arrow left or right to change hue.
-                </p>
-              </div>
-            </div>
-@@ -119,22 +119,22 @@
+                  style={
+                    Object {
+                      "WebkitClipPath": "inset( 50% )",
+                      "border": 0,
+                      "clip": "rect(1px, 1px, 1px, 1px)",
+@@ -153,22 +153,22 @@
             <div
               className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
             >
@@ -574,20 +590,20 @@ Snapshot Diff:
 `;
 
 exports[`ColorPicker should render color picker 1`] = `
-.emotion-0 {
+.emotion-4 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-2 {
+.emotion-6 {
   margin-bottom: calc(4px * 2);
 }
 
-.components-panel__row .emotion-2 {
+.components-panel__row .emotion-6 {
   margin-bottom: inherit;
 }
 
-.emotion-4 {
+.emotion-8 {
   display: inline-block;
   margin-bottom: calc(4px * 2);
 }
@@ -631,8 +647,25 @@ exports[`ColorPicker should render color picker 1`] = `
           type="button"
         />
         <div
-          className="components-visually-hidden"
+          className="components-visually-hidden emotion-0 emotion-1"
+          data-wp-c16t={true}
+          data-wp-component="VisuallyHidden"
           id="color-picker-saturation-0"
+          style={
+            Object {
+              "WebkitClipPath": "inset( 50% )",
+              "border": 0,
+              "clip": "rect(1px, 1px, 1px, 1px)",
+              "clipPath": "inset( 50% )",
+              "height": "1px",
+              "margin": "-1px",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "absolute",
+              "width": "1px",
+              "wordWrap": "normal",
+            }
+          }
         >
           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
         </div>
@@ -691,8 +724,25 @@ exports[`ColorPicker should render color picker 1`] = `
                 tabIndex="0"
               />
               <p
-                className="components-visually-hidden"
+                className="components-visually-hidden emotion-0 emotion-1"
+                data-wp-c16t={true}
+                data-wp-component="VisuallyHidden"
                 id="components-color-picker__hue-description-0"
+                style={
+                  Object {
+                    "WebkitClipPath": "inset( 50% )",
+                    "border": 0,
+                    "clip": "rect(1px, 1px, 1px, 1px)",
+                    "clipPath": "inset( 50% )",
+                    "height": "1px",
+                    "margin": "-1px",
+                    "overflow": "hidden",
+                    "padding": 0,
+                    "position": "absolute",
+                    "width": "1px",
+                    "wordWrap": "normal",
+                  }
+                }
               >
                 Move the arrow left or right to change hue.
               </p>
@@ -708,13 +758,13 @@ exports[`ColorPicker should render color picker 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field emotion-0 emotion-1"
+          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
         >
           <div
-            className="components-base-control__field emotion-2 emotion-3"
+            className="components-base-control__field emotion-6 emotion-7"
           >
             <label
-              className="components-base-control__label emotion-4 emotion-5"
+              className="components-base-control__label emotion-8 emotion-9"
               htmlFor="inspector-text-control-0"
             >
               Color value in hexadecimal

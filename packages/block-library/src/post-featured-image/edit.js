@@ -44,7 +44,13 @@ function PostFeaturedImageDisplay( {
 	);
 	const media = useSelect(
 		( select ) =>
-			featuredImage && select( coreStore ).getMedia( featuredImage ),
+			featuredImage &&
+			select( coreStore ).getEntityRecord(
+				'root',
+				'media',
+				featuredImage,
+				{ context: 'view' }
+			),
 		[ featuredImage ]
 	);
 	const blockProps = useBlockProps();

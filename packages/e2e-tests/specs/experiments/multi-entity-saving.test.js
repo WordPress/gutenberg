@@ -82,7 +82,7 @@ describe( 'Multi-entity save flow', () => {
 			expect( multiSaveButton ).toBeNull();
 		};
 
-		it.skip( 'Save flow should work as expected.', async () => {
+		it( 'Save flow should work as expected.', async () => {
 			await createNewPost();
 			// Edit the page some.
 			await page.click( '.editor-post-title' );
@@ -100,7 +100,7 @@ describe( 'Multi-entity save flow', () => {
 
 			// Add a template part and edit it.
 			await insertBlock( 'Template Part' );
-			const [ createNewButton ] = await page.$x(
+			const createNewButton = await page.waitForXPath(
 				createNewButtonSelector
 			);
 			await createNewButton.click();

@@ -6,6 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -31,6 +34,7 @@ function InterfaceSkeleton(
 		header,
 		sidebar,
 		secondarySidebar,
+		notices,
 		content,
 		drawer,
 		actions,
@@ -103,6 +107,11 @@ function InterfaceSkeleton(
 							tabIndex="-1"
 						>
 							{ secondarySidebar }
+						</div>
+					) }
+					{ !! notices && (
+						<div className="interface-interface-skeleton__notices">
+							{ notices }
 						</div>
 					) }
 					<div

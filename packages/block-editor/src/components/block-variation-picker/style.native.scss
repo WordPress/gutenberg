@@ -1,8 +1,8 @@
 .contentContainerStyle {
 	flex-direction: row;
 	padding-bottom: $grid-unit-15;
-	padding-left: $grid-unit-20 / 2;
-	padding-right: $grid-unit-20 / 2;
+	padding-left: $grid-unit-20 * 0.5;
+	padding-right: $grid-unit-20 * 0.5;
 }
 
 .containerStyle {

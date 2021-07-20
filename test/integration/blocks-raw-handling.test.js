@@ -447,13 +447,22 @@ describe( 'Blocks raw handling', () => {
 			// eslint-disable-next-line jest/valid-title
 			it( type, () => {
 				const HTML = readFile(
-					path.join( __dirname, `fixtures/${ type }-in.html` )
+					path.join(
+						__dirname,
+						`fixtures/documents/${ type }-in.html`
+					)
 				);
 				const plainText = readFile(
-					path.join( __dirname, `fixtures/${ type }-in.txt` )
+					path.join(
+						__dirname,
+						`fixtures/documents/${ type }-in.txt`
+					)
 				);
 				const output = readFile(
-					path.join( __dirname, `fixtures/${ type }-out.html` )
+					path.join(
+						__dirname,
+						`fixtures/documents/${ type }-out.html`
+					)
 				);
 
 				if ( ! ( HTML || plainText ) || ! output ) {
@@ -483,7 +492,10 @@ describe( 'Blocks raw handling', () => {
 
 		it( 'should remove extra blank lines', () => {
 			const HTML = readFile(
-				path.join( __dirname, 'fixtures/google-docs-blank-lines.html' )
+				path.join(
+					__dirname,
+					'fixtures/documents/google-docs-blank-lines.html'
+				)
 			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
@@ -491,7 +503,7 @@ describe( 'Blocks raw handling', () => {
 
 		it( 'should strip windows data', () => {
 			const HTML = readFile(
-				path.join( __dirname, 'fixtures/windows.html' )
+				path.join( __dirname, 'fixtures/documents/windows.html' )
 			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 		} );
@@ -500,7 +512,7 @@ describe( 'Blocks raw handling', () => {
 			const HTML = readFile(
 				path.join(
 					__dirname,
-					'fixtures/inline-with-html-formatting-space.html'
+					'fixtures/documents/inline-with-html-formatting-space.html'
 				)
 			);
 			expect( pasteHandler( { HTML } ) ).toMatchSnapshot();
@@ -512,21 +524,24 @@ describe( 'Blocks raw handling', () => {
 describe( 'rawHandler', () => {
 	it( 'should convert HTML post to blocks with minimal content changes', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/wordpress-convert.html' )
+			path.join( __dirname, 'fixtures/documents/wordpress-convert.html' )
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a caption shortcode', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/shortcode-caption.html' )
+			path.join( __dirname, 'fixtures/documents/shortcode-caption.html' )
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a caption shortcode with link', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/shortcode-caption-with-link.html' )
+			path.join(
+				__dirname,
+				'fixtures/documents/shortcode-caption-with-link.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
@@ -535,7 +550,7 @@ describe( 'rawHandler', () => {
 		const HTML = readFile(
 			path.join(
 				__dirname,
-				'fixtures/shortcode-caption-with-caption-link.html'
+				'fixtures/documents/shortcode-caption-with-caption-link.html'
 			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
@@ -543,7 +558,10 @@ describe( 'rawHandler', () => {
 
 	it( 'should convert a list with attributes', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/list-with-attributes.html' )
+			path.join(
+				__dirname,
+				'fixtures/documents/list-with-attributes.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );

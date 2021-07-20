@@ -4,10 +4,40 @@
 import { space } from '../ui/utils/space';
 import { COLORS } from './colors-values';
 
-const CONTROL_HEIGHT = '30px';
+const CONTROL_HEIGHT = '36px';
 const CONTROL_PADDING_X = '12px';
 
+const CONTROL_PROPS = {
+	controlSurfaceColor: COLORS.white,
+	controlTextActiveColor: COLORS.ui.theme,
+	controlPaddingX: CONTROL_PADDING_X,
+	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
+	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
+	controlBackgroundColor: COLORS.white,
+	controlBorderRadius: '2px',
+	controlBorderColor: COLORS.gray[ 700 ],
+	controlBoxShadow: 'transparent',
+	controlBorderColorHover: COLORS.gray[ 700 ],
+	controlBoxShadowFocus: `0 0 0, 0.5px, ${ COLORS.admin.theme }`,
+	controlDestructiveBorderColor: COLORS.alert.red,
+	controlHeight: CONTROL_HEIGHT,
+	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
+	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
+	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
+	controlHeightXLarge: `calc( ${ CONTROL_HEIGHT } * 1.4 )`,
+};
+const SEGMENTED_CONTROL_PROPS = {
+	segmentedControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
+	segmentedControlBorderColor: COLORS.ui.border,
+	segmentedControlBackdropBackgroundColor: CONTROL_PROPS.controlSurfaceColor,
+	segmentedControlBackdropBorderColor: COLORS.ui.border,
+	segmentedControlBackdropBoxShadow: 'transparent',
+	segmentedControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
+};
+
 export default {
+	...CONTROL_PROPS,
+	...SEGMENTED_CONTROL_PROPS,
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
@@ -33,20 +63,6 @@ export default {
 	fontWeight: 'normal',
 	fontWeightHeading: '600',
 	gridBase: '4px',
-	controlPaddingX: CONTROL_PADDING_X,
-	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
-	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
-	controlBackgroundColor: COLORS.white,
-	controlBorderRadius: '2px',
-	controlBorderColor: COLORS.gray[ 700 ],
-	controlBoxShadow: 'transparent',
-	controlBorderColorHover: COLORS.gray[ 700 ],
-	controlBoxShadowFocus: `0 0 0, 0.5px, ${ COLORS.admin }`,
-	controlDestructiveBorderColor: COLORS.alert.red,
-	controlHeight: CONTROL_HEIGHT,
-	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
-	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
-	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
 	cardBorderRadius: '2px',
 	cardPaddingXSmall: `${ space( 2 ) }`,
 	cardPaddingSmall: `${ space( 4 ) }`,

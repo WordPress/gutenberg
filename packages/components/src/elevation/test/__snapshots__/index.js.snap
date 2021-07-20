@@ -19,6 +19,12 @@ exports[`props should render active 1`] = `
   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
 }
 
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-0 {
+    transition-duration: 0ms;
+  }
+}
+
 *:hover>.emotion-0 {
   box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
 }
@@ -29,7 +35,7 @@ exports[`props should render active 1`] = `
 
 <div
   aria-hidden="true"
-  class="components-elevation emotion-0 emotion-1 emotion-2"
+  class="components-elevation emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -54,9 +60,15 @@ exports[`props should render correctly 1`] = `
   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
 }
 
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-0 {
+    transition-duration: 0ms;
+  }
+}
+
 <div
   aria-hidden="true"
-  class="components-elevation emotion-0 emotion-1 emotion-2"
+  class="components-elevation emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -81,13 +93,19 @@ exports[`props should render hover 1`] = `
   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
 }
 
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-0 {
+    transition-duration: 0ms;
+  }
+}
+
 *:hover>.emotion-0 {
   box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
 }
 
 <div
   aria-hidden="true"
-  class="components-elevation emotion-0 emotion-1 emotion-2"
+  class="components-elevation emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -112,6 +130,12 @@ exports[`props should render isInteractive 1`] = `
   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
 }
 
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-0 {
+    transition-duration: 0ms;
+  }
+}
+
 *:hover>.emotion-0 {
   box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
 }
@@ -122,7 +146,7 @@ exports[`props should render isInteractive 1`] = `
 
 <div
   aria-hidden="true"
-  class="components-elevation emotion-0 emotion-1 emotion-2"
+  class="components-elevation emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -147,6 +171,12 @@ exports[`props should render offset 1`] = `
   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
 }
 
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-0 {
+    transition-duration: 0ms;
+  }
+}
+
 *:hover>.emotion-0 {
   box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
 }
@@ -157,7 +187,7 @@ exports[`props should render offset 1`] = `
 
 <div
   aria-hidden="true"
-  class="components-elevation emotion-0 emotion-1 emotion-2"
+  class="components-elevation emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -182,9 +212,15 @@ exports[`props should render value 1`] = `
   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
 }
 
+@media ( prefers-reduced-motion: reduce ) {
+  .emotion-0 {
+    transition-duration: 0ms;
+  }
+}
+
 <div
   aria-hidden="true"
-  class="components-elevation emotion-0 emotion-1 emotion-2"
+  class="components-elevation emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />

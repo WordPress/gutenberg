@@ -36,6 +36,7 @@
 	},
 	"peerDependencies": {
 		"jest": ">=26",
+		"jest-snapshot": ">=26",
 		"puppeteer": ">=1.19.0"
 	},
 	"publishConfig": {

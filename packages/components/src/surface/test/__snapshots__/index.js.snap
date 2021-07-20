@@ -6,8 +6,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface css-1v0lads-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
-+   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+-   class="components-surface css-k1ws5-View-Surface-getBorders-primary em57xhy0"
++   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -21,8 +21,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface css-xbskxc-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
-+   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+-   class="components-surface css-gi9sau-View-Surface-getBorders-primary em57xhy0"
++   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -36,8 +36,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface css-pznwh2-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
-+   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+-   class="components-surface css-1lwskr8-View-Surface-getBorders-primary em57xhy0"
++   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -51,8 +51,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface css-17wbg6n-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
-+   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+-   class="components-surface css-sdy6q1-View-Surface-getBorders-primary em57xhy0"
++   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -68,7 +68,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface emotion-0 emotion-1 emotion-2"
+  class="components-surface emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Surface"
 >
@@ -82,8 +82,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface css-rpogp2-Surface-getBorders-secondary css-1mm2cvy-View em57xhy0"
-+   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+-   class="components-surface css-jkj9zl-View-Surface-getBorders-secondary em57xhy0"
++   class="components-surface css-avigp2-View-Surface-getBorders-primary em57xhy0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >

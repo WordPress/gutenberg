@@ -41,7 +41,7 @@ const deprecatedFlags = {
 		}
 
 		if ( settings.enableCustomUnits === true ) {
-			return [ 'px', 'em', 'rem', 'vh', 'vw' ];
+			return [ 'px', 'em', 'rem', 'vh', 'vw', '%' ];
 		}
 
 		return settings.enableCustomUnits;

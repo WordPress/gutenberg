@@ -12,6 +12,7 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
+	EditorSnackbars,
 	store as editorStore,
 } from '@wordpress/editor';
 import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
@@ -225,6 +226,7 @@ function Layout( { styles } ) {
 						</>
 					)
 				}
+				notices={ <EditorSnackbars /> }
 				content={
 					<>
 						<EditorNotices />

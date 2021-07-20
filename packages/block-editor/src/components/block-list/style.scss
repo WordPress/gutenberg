@@ -90,7 +90,7 @@
 				box-shadow 0.1s linear;
 			right: 0;
 			left: 0;
-			top: -$default-block-margin / 2;
+			top: -$default-block-margin * 0.5;
 			border-radius: $radius-block-ui;
 			border-top: 4px solid $gray-400;
 		}

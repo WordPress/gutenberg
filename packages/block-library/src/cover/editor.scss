@@ -50,7 +50,7 @@
 
 [data-align="left"] > .wp-block-cover,
 [data-align="right"] > .wp-block-cover {
-	max-width: $content-width / 2;
+	max-width: $content-width * 0.5;
 	width: 100%;
 }
 

@@ -186,6 +186,18 @@ exports[`Multi-block selection should return original focus after failed multi s
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Multi-block selection should select all from empty selection 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should select all from empty selection 2`] = `""`;
+
 exports[`Multi-block selection should set attributes for multiple paragraphs 1`] = `
 "<!-- wp:paragraph {\\"align\\":\\"center\\"} -->
 <p class=\\"has-text-align-center\\">1</p>

@@ -28,12 +28,7 @@ import { View } from '@wordpress/primitives';
 
 const EmbedEdit = ( props ) => {
 	const {
-		attributes: {
-			providerNameSlug,
-			previewable,
-			responsive,
-			url: attributesUrl,
-		},
+		attributes: { providerNameSlug, responsive, url: attributesUrl },
 		attributes,
 		isSelected,
 		onReplace,
@@ -191,8 +186,6 @@ const EmbedEdit = ( props ) => {
 							insertBlocksAfter={ insertBlocksAfter }
 							isSelected={ isSelected }
 							label={ title }
-							preview={ preview }
-							previewable={ previewable }
 							url={ url }
 						/>
 					</View>

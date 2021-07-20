@@ -351,7 +351,15 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		1
 	);
 
-	return $content . $duotone;
+	add_action(
+		// Ideally we should use wp_head, but SVG defs can't be put in there.
+		'wp_footer',
+		function () use ( $duotone ) {
+			echo $duotone;
+		}
+	);
+
+	return $content;
 }
 
 // Register the block support.

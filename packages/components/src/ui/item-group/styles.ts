@@ -1,10 +1,7 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { css } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -45,7 +42,7 @@ export const separated = css`
 		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
 	}
 
-	> *:last-child:not( :focus ) {
+	> *:last-of-type:not( :focus ) {
 		border-bottom-color: transparent;
 	}
 `;
@@ -59,12 +56,12 @@ export const spacedAround = css`
 export const rounded = css`
 	border-radius: ${ borderRadius };
 
-	> *:first-child {
+	> *:first-of-type {
 		border-top-left-radius: ${ borderRadius };
 		border-top-right-radius: ${ borderRadius };
 	}
 
-	> *:last-child {
+	> *:last-of-type {
 		border-bottom-left-radius: ${ borderRadius };
 		border-bottom-right-radius: ${ borderRadius };
 	}
@@ -85,12 +82,12 @@ const paddingYLarge = `calc((${ CONFIG.controlHeightLarge } - ${ baseFontHeight 
 
 export const itemSizes = {
 	small: css`
-		padding: ${ paddingYSmall }, ${ CONFIG.controlPaddingXSmall };
+		padding: ${ paddingYSmall } ${ CONFIG.controlPaddingXSmall };
 	`,
 	medium: css`
-		padding: ${ paddingY }, ${ CONFIG.controlPaddingX };
+		padding: ${ paddingY } ${ CONFIG.controlPaddingX };
 	`,
 	large: css`
-		padding: ${ paddingYLarge }, ${ CONFIG.controlPaddingXLarge };
+		padding: ${ paddingYLarge } ${ CONFIG.controlPaddingXLarge };
 	`,
 };

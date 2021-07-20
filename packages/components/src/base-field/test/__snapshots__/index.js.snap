@@ -25,7 +25,7 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -14,19 +14,18 @@
+@@ -14,18 +14,17 @@
       "background": "#fff",
       "border": "1px solid",
       "border-color": "#757575",
@@ -45,7 +45,6 @@ Snapshot Diff:
 -     "width": "auto",
 +     "width": "100%",
     },
-    Object {},
   ]
 `;
 
@@ -131,11 +130,11 @@ exports[`base field should render correctly 1`] = `
 .emotion-0:focus,
 .emotion-0[data-focused='true'] {
   border-color: var( --wp-admin-theme-color, #00669b);
-  box-shadow: 0 0 0,0.5px,[object Object];
+  box-shadow: 0 0 0,0.5px,var( --wp-admin-theme-color, #00669b);
 }
 
 <div
-  class="components-flex components-base-field emotion-0 emotion-1 emotion-2"
+  class="components-flex components-base-field emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="BaseField"
 />

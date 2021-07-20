@@ -187,6 +187,12 @@ describe( 'validation', () => {
 
 			expect( normalizedLength ).toBe( '50%' );
 		} );
+
+		it( 'adds leading zero to percentage', () => {
+			const normalizedLength = getNormalizedLength( '.5%' );
+
+			expect( normalizedLength ).toBe( '0.5%' );
+		} );
 	} );
 
 	describe( 'getNormalizedStyleValue()', () => {
@@ -206,6 +212,12 @@ describe( 'validation', () => {
 			);
 
 			expect( normalizedValue ).toBe( '44% 0 18em 0' );
+		} );
+
+		it( 'add leading zero to units that have it missing', () => {
+			const normalizedValue = getNormalizedStyleValue( '.23% .75em' );
+
+			expect( normalizedValue ).toBe( '0.23% 0.75em' );
 		} );
 
 		it( 'leaves zero values in calc() expressions alone', () => {

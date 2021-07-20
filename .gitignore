@@ -5,6 +5,7 @@ build-style
 build-types
 node_modules
 gutenberg.zip
+coverage
 
 # Directories/files that may appear in your environment
 *.log

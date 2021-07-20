@@ -207,47 +207,51 @@ export default function useListViewDropZone() {
 		target || {};
 
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
+
+	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(
-		useCallback( ( event, currentTarget ) => {
-			const position = { x: event.clientX, y: event.clientY };
-			const isBlockDrag = !! event.dataTransfer.getData( 'wp-blocks' );
+		useCallback(
+			( event, currentTarget ) => {
+				const position = { x: event.clientX, y: event.clientY };
+				const isBlockDrag = !! draggedBlockClientIds?.length;
 
-			const draggedBlockClientIds = isBlockDrag
-				? getDraggedBlockClientIds()
-				: undefined;
+				const blockElements = Array.from(
+					currentTarget.querySelectorAll( '[data-block]' )
+				);
 
-			const blockElements = Array.from(
-				currentTarget.querySelectorAll( '[data-block]' )
-			);
+				const blocksData = blockElements.map( ( blockElement ) => {
+					const clientId = blockElement.dataset.block;
+					const rootClientId = getBlockRootClientId( clientId );
 
-			const blocksData = blockElements.map( ( blockElement ) => {
-				const clientId = blockElement.dataset.block;
-				const rootClientId = getBlockRootClientId( clientId );
+					return {
+						clientId,
+						rootClientId,
+						blockIndex: getBlockIndex( clientId, rootClientId ),
+						element: blockElement,
+						isDraggedBlock: isBlockDrag
+							? draggedBlockClientIds.includes( clientId )
+							: false,
+						innerBlockCount: getBlockCount( clientId ),
+						canInsertDraggedBlocksAsSibling: isBlockDrag
+							? canInsertBlocks(
+									draggedBlockClientIds,
+									rootClientId
+							  )
+							: true,
+						canInsertDraggedBlocksAsChild: isBlockDrag
+							? canInsertBlocks( draggedBlockClientIds, clientId )
+							: true,
+					};
+				} );
 
-				return {
-					clientId,
-					rootClientId,
-					blockIndex: getBlockIndex( clientId, rootClientId ),
-					element: blockElement,
-					isDraggedBlock: isBlockDrag
-						? draggedBlockClientIds.includes( clientId )
-						: false,
-					innerBlockCount: getBlockCount( clientId ),
-					canInsertDraggedBlocksAsSibling: isBlockDrag
-						? canInsertBlocks( draggedBlockClientIds, rootClientId )
-						: true,
-					canInsertDraggedBlocksAsChild: isBlockDrag
-						? canInsertBlocks( draggedBlockClientIds, clientId )
-						: true,
-				};
-			} );
+				const newTarget = getListViewDropTarget( blocksData, position );
 
-			const newTarget = getListViewDropTarget( blocksData, position );
-
-			if ( newTarget ) {
-				setTarget( newTarget );
-			}
-		}, [] ),
+				if ( newTarget ) {
+					setTarget( newTarget );
+				}
+			},
+			[ draggedBlockClientIds ]
+		),
 		200
 	);
 

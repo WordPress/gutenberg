@@ -18,7 +18,7 @@ import { useRef } from '@wordpress/element';
  */
 import useIsDraggingWithin from './use-is-dragging-within';
 
-export default function WidgetAreaInnerBlocks() {
+export default function WidgetAreaInnerBlocks( { id } ) {
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'root',
 		'postType'
@@ -40,6 +40,7 @@ export default function WidgetAreaInnerBlocks() {
 
 	return (
 		<div
+			data-widget-area-id={ id }
 			className={ classnames(
 				'wp-block-widget-area__inner-blocks block-editor-inner-blocks editor-styles-wrapper',
 				{

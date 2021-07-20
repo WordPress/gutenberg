@@ -43,7 +43,7 @@ import { TAB } from '@wordpress/keycodes';
  */
 import { calculateHueChange } from './utils';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 
 export class Hue extends Component {
 	constructor() {

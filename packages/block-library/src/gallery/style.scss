@@ -106,7 +106,7 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
 			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc(#{ 100% / $i } - #{ 1em * ( $i - 1 ) / $i });
+				width: calc(#{ math.div(100%, $i) } - #{ math.div(1em * ( $i - 1 ), $i) });
 				margin-right: 1em;
 			}
 		}
@@ -129,7 +129,7 @@
 	// Apply max-width to floated items that have no intrinsic width.
 	&.alignleft,
 	&.alignright {
-		max-width: $content-width / 2;
+		max-width: $content-width * 0.5;
 		width: 100%;
 	}
 

@@ -115,7 +115,7 @@ $colors-selector-size: 22px;
 		margin-right: auto;
 
 		// colors-selector - selection status.
-		border-radius: $colors-selector-size / 2;
+		border-radius: $colors-selector-size * 0.5;
 		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 
 		width: $colors-selector-size;
@@ -353,7 +353,7 @@ $color-control-label-height: 20px;
 	font-family: $default-font;
 
 	.components-button.components-dropdown-menu__toggle.has-icon {
-		padding: ($grid-unit-15 / 2) $grid-unit-05 ($grid-unit-15 / 2) $grid-unit-15;
+		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) $grid-unit-15;
 		display: flex;
 		flex-direction: row-reverse; // This puts the chevron, which is hidden from screen readers, on the right.
 	}

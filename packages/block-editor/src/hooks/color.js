@@ -217,9 +217,11 @@ function immutableSet( object, path, value ) {
  */
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
-	const isLinkColorEnabled = useSetting( 'color.link' );
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const solids = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
+	const areCustomSolidsEnabled = useSetting( 'color.custom' );
+	const areCustomGradientsEnabled = useSetting( 'color.customGradient' );
+	const isLinkEnabled = useSetting( 'color.link' );
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -234,19 +236,39 @@ export function ColorEdit( props ) {
 		return null;
 	}
 
-	const hasBackground = hasBackgroundColorSupport( blockName );
-	const hasGradient = hasGradientSupport( blockName );
+	const hasLinkColor =
+		hasLinkColorSupport( blockName ) &&
+		isLinkEnabled &&
+		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasTextColor =
+		hasTextColorSupport( blockName ) &&
+		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasBackgroundColor =
+		hasBackgroundColorSupport( blockName ) &&
+		( solids.length > 0 || areCustomSolidsEnabled );
+	const hasGradientColor =
+		hasGradientSupport( blockName ) &&
+		( gradients.length > 0 || areCustomGradientsEnabled );
+
+	if (
+		! hasLinkColor &&
+		! hasTextColor &&
+		! hasBackgroundColor &&
+		! hasGradientColor
+	) {
+		return null;
+	}
 
 	const { style, textColor, backgroundColor, gradient } = attributes;
 	let gradientValue;
-	if ( hasGradient && gradient ) {
+	if ( hasGradientColor && gradient ) {
 		gradientValue = getGradientValueBySlug( gradients, gradient );
-	} else if ( hasGradient ) {
+	} else if ( hasGradientColor ) {
 		gradientValue = style?.color?.gradient;
 	}
 
 	const onChangeColor = ( name ) => ( value ) => {
-		const colorObject = getColorObjectByColorValue( colors, value );
+		const colorObject = getColorObjectByColorValue( solids, value );
 		const attributeName = name + 'Color';
 		const newStyle = {
 			...localAttributes.current.style,
@@ -305,7 +327,7 @@ export function ColorEdit( props ) {
 	};
 
 	const onChangeLinkColor = ( value ) => {
-		const colorObject = getColorObjectByColorValue( colors, value );
+		const colorObject = getColorObjectByColorValue( solids, value );
 		const newLinkColorValue = colorObject?.slug
 			? `var:preset|color|${ colorObject.slug }`
 			: value;
@@ -325,45 +347,45 @@ export function ColorEdit( props ) {
 			}
 			clientId={ props.clientId }
 			settings={ [
-				...( hasTextColorSupport( blockName )
+				...( hasTextColor
 					? [
 							{
 								label: __( 'Text color' ),
 								onColorChange: onChangeColor( 'text' ),
 								colorValue: getColorObjectByAttributeValues(
-									colors,
+									solids,
 									textColor,
 									style?.color?.text
 								).color,
 							},
 					  ]
 					: [] ),
-				...( hasBackground || hasGradient
+				...( hasBackgroundColor || hasGradientColor
 					? [
 							{
 								label: __( 'Background color' ),
-								onColorChange: hasBackground
+								onColorChange: hasBackgroundColor
 									? onChangeColor( 'background' )
 									: undefined,
 								colorValue: getColorObjectByAttributeValues(
-									colors,
+									solids,
 									backgroundColor,
 									style?.color?.background
 								).color,
 								gradientValue,
-								onGradientChange: hasGradient
+								onGradientChange: hasGradientColor
 									? onChangeGradient
 									: undefined,
 							},
 					  ]
 					: [] ),
-				...( isLinkColorEnabled && hasLinkColorSupport( blockName )
+				...( hasLinkColor
 					? [
 							{
 								label: __( 'Link Color' ),
 								onColorChange: onChangeLinkColor,
 								colorValue: getLinkColorFromAttributeValue(
-									colors,
+									solids,
 									style?.elements?.link?.color?.text
 								),
 								clearable: !! style?.elements?.link?.color

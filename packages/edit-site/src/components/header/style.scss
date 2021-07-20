@@ -132,7 +132,7 @@ body.is-navigation-sidebar-open {
 
 	.editor-post-saved-state,
 	.components-button.is-tertiary {
-		padding: 0 #{$grid-unit-15 / 2};
+		padding: 0 #{$grid-unit-15 * 0.5};
 	}
 
 	.edit-site-more-menu .components-button,

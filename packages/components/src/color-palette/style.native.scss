@@ -8,10 +8,10 @@
 }
 
 .verticalSeparator {
-	border-width: $border-width / 2;
+	border-width: $border-width * 0.5;
 	border-color: $light-gray-400;
 	height: 38px;
-	margin-right: $grid-unit-20 / 2;
+	margin-right: $grid-unit-20 * 0.5;
 	align-self: center;
 }
 

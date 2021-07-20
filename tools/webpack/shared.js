@@ -1,0 +1,107 @@
+/**
+ * External dependencies
+ */
+const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
+const { DefinePlugin } = require( 'webpack' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
+const { compact } = require( 'lodash' );
+const postcss = require( 'postcss' );
+
+/**
+ * WordPress dependencies
+ */
+const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const ReadableJsAssetsWebpackPlugin = require( '@wordpress/readable-js-assets-webpack-plugin' );
+
+const {
+	NODE_ENV: mode = 'development',
+	WP_DEVTOOL: devtool = mode === 'production' ? false : 'source-map',
+} = process.env;
+
+const baseConfig = {
+	optimization: {
+		// Only concatenate modules in production, when not analyzing bundles.
+		concatenateModules:
+			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+		minimizer: [
+			new TerserPlugin( {
+				cache: true,
+				parallel: true,
+				sourceMap: mode !== 'production',
+				terserOptions: {
+					output: {
+						comments: /translators:/i,
+					},
+					compress: {
+						passes: 2,
+					},
+					mangle: {
+						reserved: [ '__', '_n', '_nx', '_x' ],
+					},
+				},
+				extractComments: false,
+			} ),
+		],
+	},
+	mode,
+	module: {
+		rules: compact( [
+			mode !== 'production' && {
+				test: /\.js$/,
+				use: require.resolve( 'source-map-loader' ),
+				enforce: 'pre',
+			},
+		] ),
+	},
+	watchOptions: {
+		ignored: [ '**/node_modules', '**/packages/*/src' ],
+		aggregateTimeout: 500,
+	},
+	devtool,
+};
+
+const plugins = [
+	// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
+	// content as a convenient interactive zoomable treemap.
+	process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+	new DefinePlugin( {
+		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
+		'process.env.GUTENBERG_PHASE': JSON.stringify(
+			parseInt( process.env.npm_package_config_GUTENBERG_PHASE, 10 ) || 1
+		),
+		'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
+			process.env.FORCE_REDUCED_MOTION
+		),
+	} ),
+	new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
+];
+
+const stylesTransform = ( content ) => {
+	if ( mode === 'production' ) {
+		return postcss( [
+			require( 'cssnano' )( {
+				preset: [
+					'default',
+					{
+						discardComments: {
+							removeAll: true,
+						},
+					},
+				],
+			} ),
+		] )
+			.process( content, {
+				from: 'src/app.css',
+				to: 'dest/app.css',
+			} )
+			.then( ( result ) => result.css );
+	}
+	return content;
+};
+
+module.exports = {
+	baseConfig,
+	plugins,
+	stylesTransform,
+};

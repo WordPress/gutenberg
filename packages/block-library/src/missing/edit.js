@@ -11,6 +11,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { safeHTML } from '@wordpress/dom';
 
 function MissingBlockWarning( { attributes, convertToHTML } ) {
 	const { originalName, originalUndelimitedContent } = attributes;
@@ -45,7 +46,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	return (
 		<div { ...useBlockProps( { className: 'has-warning' } ) }>
 			<Warning actions={ actions }>{ messageHTML }</Warning>
-			<RawHTML>{ originalUndelimitedContent }</RawHTML>
+			<RawHTML>{ safeHTML( originalUndelimitedContent ) }</RawHTML>
 		</div>
 	);
 }

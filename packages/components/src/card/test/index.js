@@ -182,11 +182,9 @@ describe( 'Card', () => {
 
 			it( 'should allow scrolling content with the scrollable prop is true', () => {
 				const { container: containerScrollable } = render(
-					<CardBody>Body</CardBody>
+					<CardBody isScrollable={ true }>Body</CardBody>
 				);
-				const { container } = render(
-					<CardBody isScrollable={ false }>Body</CardBody>
-				);
+				const { container } = render( <CardBody>Body</CardBody> );
 				expect( container ).toMatchDiffSnapshot( containerScrollable );
 			} );
 		} );

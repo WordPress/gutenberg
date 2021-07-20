@@ -19,6 +19,7 @@ import {
 } from '@wordpress/interface';
 import {
 	EditorNotices,
+	EditorSnackbars,
 	EntitiesSavedStates,
 	UnsavedChangesWarning,
 	store as editorStore,
@@ -213,6 +214,7 @@ function Editor( { initialSettings } ) {
 												}
 											/>
 										}
+										notices={ <EditorSnackbars /> }
 										content={
 											<>
 												<EditorNotices />

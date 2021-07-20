@@ -16,7 +16,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
 }
 
 <span
-  class="components-truncate components-text emotion-0 emotion-1 emotion-2"
+  class="components-truncate components-text emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Text"
 >
@@ -38,7 +38,7 @@ exports[`Text snapshot tests should render correctly 1`] = `
 }
 
 <span
-  class="components-truncate components-text emotion-0 emotion-1 emotion-2"
+  class="components-truncate components-text emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Text"
 >

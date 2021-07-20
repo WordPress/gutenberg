@@ -61,8 +61,8 @@
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: center;
-	padding-left: $grid-unit-20 / 2;
-	padding-right: $grid-unit-20 / 2;
+	padding-left: $grid-unit-20 * 0.5;
+	padding-right: $grid-unit-20 * 0.5;
 	padding-top: 0;
 	padding-bottom: 0;
 }

@@ -32,7 +32,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
 		"@wordpress/element": "file:../element",
-		"classnames": "^2.2.5"
+		"classnames": "^2.3.1"
 	},
 	"publishConfig": {
 		"access": "public"

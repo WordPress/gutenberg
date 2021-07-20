@@ -22,6 +22,7 @@ import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 import BlockToolsBackCompat from '../block-tools/back-compat';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { Head } from './head';
 
 export const IntersectionObserver = createContext();
 
@@ -42,24 +43,26 @@ function Root( { className, children } ) {
 		[]
 	);
 	return (
-		<div
-			ref={ useMergeRefs( [
-				useBlockSelectionClearer(),
-				useBlockDropZone(),
-				useInBetweenInserter(),
-			] ) }
-			className={ classnames(
-				'block-editor-block-list__layout is-root-container',
-				className,
-				{
-					'is-outline-mode': isOutlineMode,
-					'is-focus-mode': isFocusMode && isLargeViewport,
-					'is-navigate-mode': isNavigationMode,
-				}
-			) }
-		>
-			{ children }
-		</div>
+		<Head>
+			<div
+				ref={ useMergeRefs( [
+					useBlockSelectionClearer(),
+					useBlockDropZone(),
+					useInBetweenInserter(),
+				] ) }
+				className={ classnames(
+					'block-editor-block-list__layout is-root-container',
+					className,
+					{
+						'is-outline-mode': isOutlineMode,
+						'is-focus-mode': isFocusMode && isLargeViewport,
+						'is-navigate-mode': isNavigationMode,
+					}
+				) }
+			>
+				{ children }
+			</div>
+		</Head>
 	);
 }
 

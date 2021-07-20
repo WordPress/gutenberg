@@ -11,8 +11,9 @@
  * @group pattern-directory
  */
 class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_Testcase {
+
 	/**
-	 * Administrator user id.
+	 * Contributor user id.
 	 *
 	 * @since 5.8.0
 	 *
@@ -62,12 +63,9 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_register_routes() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
 		$routes = rest_get_server()->get_routes();
 
-		$this->assertArrayHasKey( '/__experimental/pattern-directory/patterns', $routes );
+		$this->assertArrayHasKey( '/wp/v2/pattern-directory/patterns', $routes );
 	}
 
 	/**
@@ -76,10 +74,7 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_context_param() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
-		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/pattern-directory/patterns' );
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/pattern-directory/patterns' );
 		$response = rest_get_server()->dispatch( $request );
 		$patterns = $response->get_data();
 
@@ -93,13 +88,10 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_get_items() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
 		wp_set_current_user( self::$contributor_id );
 		self::mock_successful_response( 'browse-all', true );
 
-		$request  = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$response = rest_do_request( $request );
 		$patterns = $response->get_data();
 
@@ -116,13 +108,10 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_get_items_by_category() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
 		wp_set_current_user( self::$contributor_id );
 		self::mock_successful_response( 'browse-category', true );
 
-		$request = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$request->set_query_params( array( 'category' => 2 ) );
 		$response = rest_do_request( $request );
 		$patterns = $response->get_data();
@@ -144,13 +133,10 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_get_items_by_keyword() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
 		wp_set_current_user( self::$contributor_id );
 		self::mock_successful_response( 'browse-keyword', true );
 
-		$request = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$request->set_query_params( array( 'keyword' => 11 ) );
 		$response = rest_do_request( $request );
 		$patterns = $response->get_data();
@@ -172,14 +158,11 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_get_items_search() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
 		wp_set_current_user( self::$contributor_id );
 		self::mock_successful_response( 'search', true );
 
 		$search_term = 'button';
-		$request     = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request     = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$request->set_query_params( array( 'search' => $search_term ) );
 		$response = rest_do_request( $request );
 		$patterns = $response->get_data();
@@ -203,13 +186,10 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_get_items_wdotorg_unavailable() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
 		wp_set_current_user( self::$contributor_id );
 		self::prevent_requests_to_host( 'api.wordpress.org' );
 
-		$request  = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$response = rest_do_request( $request );
 
 		$this->assertErrorResponse( 'patterns_api_failed', $response, 500 );
@@ -221,10 +201,7 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_get_items_logged_out() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
-		$request = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$request->set_query_params( array( 'search' => 'button' ) );
 		$response = rest_do_request( $request );
 
@@ -237,13 +214,10 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_get_items_no_results() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
 		wp_set_current_user( self::$contributor_id );
 		self::mock_successful_response( 'browse-all', false );
 
-		$request = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$request->set_query_params( array( 'category' => PHP_INT_MAX ) );
 		$response = rest_do_request( $request );
 		$patterns = $response->get_data();
@@ -258,13 +232,10 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_get_items_search_no_results() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
 		wp_set_current_user( self::$contributor_id );
 		self::mock_successful_response( 'search', false );
 
-		$request = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$request->set_query_params( array( 'search' => '0c4549ee68f24eaaed46a49dc983ecde' ) );
 		$response = rest_do_request( $request );
 		$patterns = $response->get_data();
@@ -279,17 +250,54 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @since 5.8.0
 	 */
 	public function test_get_items_invalid_response_data() {
-		$this->markTestSkipped(
-			'The test is failing with latest WordPress core.'
-		);
 		wp_set_current_user( self::$contributor_id );
 		self::mock_successful_response( 'invalid-data', true );
 
-		$request  = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
 		$response = rest_do_request( $request );
 
 		$this->assertSame( 500, $response->status );
 		$this->assertWPError( $response->as_error() );
+	}
+
+	/**
+	 * @covers WP_REST_Pattern_Directory_Controller::get_items
+	 *
+	 * @since 5.8.0
+	 */
+	public function test_get_items_prepare_filter() {
+		wp_set_current_user( self::$contributor_id );
+		self::mock_successful_response( 'browse-all', true );
+
+		// Test that filter changes uncached values.
+		add_filter(
+			'rest_prepare_block_pattern',
+			function() {
+				return 'initial value';
+			}
+		);
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+		$response = rest_do_request( $request );
+		$patterns = $response->get_data();
+
+		$this->assertSame( 'initial value', $patterns[0] );
+
+		// Test that filter changes cached values (the previous request primed the cache).
+		add_filter(
+			'rest_prepare_block_pattern',
+			function() {
+				return 'modified the cache';
+			},
+			11
+		);
+
+		// Test that the filter works against cached values.
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/pattern-directory/patterns' );
+		$response = rest_do_request( $request );
+		$patterns = $response->get_data();
+
+		$this->assertSame( 'modified the cache', $patterns[0] );
 	}
 
 	public function test_get_item() {
@@ -350,26 +358,28 @@ class WP_REST_Pattern_Directory_Controller_Test extends WP_Test_REST_Controller_
 	 * @return string
 	 */
 	private static function get_raw_response( $action ) {
+		$fixtures_dir = __DIR__ . '/fixtures/rest-api/pattern-directory';
+
 		switch ( $action ) {
 			default:
 			case 'browse-all':
 				// Response from https://api.wordpress.org/patterns/1.0/.
-				$response = file_get_contents( __DIR__ . '/fixtures/rest-api/pattern-directory/browse-all.json' );
+				$response = file_get_contents( $fixtures_dir . '/browse-all.json' );
 				break;
 
 			case 'browse-category':
 				// Response from https://api.wordpress.org/patterns/1.0/?pattern-categories=2.
-				$response = file_get_contents( __DIR__ . '/fixtures/rest-api/pattern-directory/browse-category-2.json' );
+				$response = file_get_contents( $fixtures_dir . '/browse-category-2.json' );
 				break;
 
 			case 'browse-keyword':
 				// Response from https://api.wordpress.org/patterns/1.0/?pattern-keywords=11.
-				$response = file_get_contents( __DIR__ . '/fixtures/rest-api/pattern-directory/browse-keyword-11.json' );
+				$response = file_get_contents( $fixtures_dir . '/browse-keyword-11.json' );
 				break;
 
 			case 'search':
 				// Response from https://api.wordpress.org/patterns/1.0/?search=button.
-				$response = file_get_contents( __DIR__ . '/fixtures/rest-api/pattern-directory/search-button.json' );
+				$response = file_get_contents( $fixtures_dir . '/search-button.json' );
 				break;
 
 			case 'invalid-data':

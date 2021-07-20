@@ -7,16 +7,22 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createContext, useMemo, useCallback } from '@wordpress/element';
+import {
+	createContext,
+	useMemo,
+	useCallback,
+	RawHTML,
+} from '@wordpress/element';
 import {
 	getBlockType,
-	getSaveElement,
+	getSaveContent,
 	isUnmodifiedDefaultBlock,
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
 import { compose, pure, ifCondition } from '@wordpress/compose';
+import { safeHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -134,10 +140,12 @@ function BlockListBlock( {
 	let block;
 
 	if ( ! isValid ) {
+		const saveContent = getSaveContent( blockType, attributes );
+
 		block = (
 			<Block className="has-warning">
 				<BlockInvalidWarning clientId={ clientId } />
-				<div>{ getSaveElement( blockType, attributes ) }</div>
+				<RawHTML>{ safeHTML( saveContent ) }</RawHTML>
 			</Block>
 		);
 	} else if ( mode === 'html' ) {

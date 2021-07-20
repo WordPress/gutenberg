@@ -21,6 +21,7 @@ import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
 import useCreatePage from './use-create-page';
 import { ViewerFill } from './viewer-slot';
+import { DEFAULT_LINK_SETTINGS } from './constants';
 
 /**
  * Default properties associated with a link control value.
@@ -104,7 +105,7 @@ import { ViewerFill } from './viewer-slot';
 function LinkControl( {
 	searchInputPlaceholder,
 	value,
-	settings,
+	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
 	onRemove,
 	noDirectEntry = false,
@@ -190,6 +191,11 @@ function LinkControl( {
 		stopEditing();
 	};
 
+	const shownUnlinkControl =
+		onRemove && value && ! isEditingLink && ! isCreatingPage;
+
+	const showSettingsDrawer = !! settings?.length;
+
 	return (
 		<div
 			tabIndex={ -1 }
@@ -261,23 +267,25 @@ function LinkControl( {
 				/>
 			) }
 
-			<div className="block-editor-link-control__tools">
-				<LinkControlSettingsDrawer
-					value={ value }
-					settings={ settings }
-					onChange={ onChange }
-				/>
-				{ onRemove && value && ! isEditingLink && ! isCreatingPage && (
-					<Button
-						className="block-editor-link-control__unlink"
-						isDestructive
-						variant="link"
-						onClick={ onRemove }
-					>
-						{ __( 'Unlink' ) }
-					</Button>
-				) }
-			</div>
+			{ ( showSettingsDrawer || shownUnlinkControl ) && (
+				<div className="block-editor-link-control__tools">
+					<LinkControlSettingsDrawer
+						value={ value }
+						settings={ settings }
+						onChange={ onChange }
+					/>
+					{ shownUnlinkControl && (
+						<Button
+							className="block-editor-link-control__unlink"
+							isDestructive
+							variant="link"
+							onClick={ onRemove }
+						>
+							{ __( 'Unlink' ) }
+						</Button>
+					) }
+				</div>
+			) }
 		</div>
 	);
 }

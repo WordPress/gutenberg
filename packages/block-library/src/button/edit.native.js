@@ -19,11 +19,14 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
-	RangeControl,
 	ToolbarGroup,
 	ToolbarButton,
 	LinkSettingsNavigation,
+	UnitControl,
+	getValueAndUnit,
 	BottomSheetSelectControl,
+	CSS_UNITS,
+	filterUnitsWithSettings,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -88,6 +91,9 @@ class ButtonEdit extends Component {
 		super( props );
 		this.onChangeText = this.onChangeText.bind( this );
 		this.onChangeBorderRadius = this.onChangeBorderRadius.bind( this );
+		this.onChangeBorderRadiusUnit = this.onChangeBorderRadiusUnit.bind(
+			this
+		);
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.onSetMaxWidth = this.onSetMaxWidth.bind( this );
@@ -100,11 +106,15 @@ class ButtonEdit extends Component {
 		this.onRemove = this.onRemove.bind( this );
 		this.getPlaceholderWidth = this.getPlaceholderWidth.bind( this );
 
+		const borderRadius = props?.attributes?.style?.border?.radius;
+		const { valueUnit = 'px' } = getValueAndUnit( borderRadius ) || {};
+
 		this.state = {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
 			isButtonFocused: true,
 			placeholderTextWidth: 0,
+			borderRadiusUnit: valueUnit,
 		};
 
 		this.linkSettingsActions = [
@@ -238,16 +248,32 @@ class ButtonEdit extends Component {
 
 	onChangeBorderRadius( newRadius ) {
 		const { setAttributes, attributes } = this.props;
+		const { borderRadiusUnit } = this.state;
 		const { style } = attributes;
-		const newStyle = {
+		const newStyle = this.getNewStyle( style, newRadius, borderRadiusUnit );
+
+		setAttributes( { style: newStyle } );
+	}
+
+	onChangeBorderRadiusUnit( newRadiusUnit ) {
+		const { setAttributes, attributes } = this.props;
+		const { style } = attributes;
+		const borderRadius = this.getBorderRadiusValue(
+			attributes?.style?.border?.radius
+		);
+		const newStyle = this.getNewStyle( style, borderRadius, newRadiusUnit );
+		setAttributes( { style: newStyle } );
+		this.setState( { borderRadiusUnit: newRadiusUnit } );
+	}
+
+	getNewStyle( style, radius, radiusUnit ) {
+		return {
 			...style,
 			border: {
 				...style?.border,
-				radius: newRadius,
+				radius: `${ radius }${ radiusUnit }`, // Store the value with the unit so that it works as expected.
 			},
 		};
-
-		setAttributes( { style: newStyle } );
 	}
 
 	onShowLinkSettings() {
@@ -368,6 +394,14 @@ class ButtonEdit extends Component {
 		}
 	}
 
+	getBorderRadiusValue( borderRadius, defaultBorderRadius ) {
+		const valueAndUnit = getValueAndUnit( borderRadius );
+		if ( Number.isInteger( parseInt( valueAndUnit?.valueToConvert ) ) ) {
+			return parseFloat( valueAndUnit.valueToConvert );
+		}
+		return defaultBorderRadius;
+	}
+
 	render() {
 		const {
 			attributes,
@@ -387,7 +421,12 @@ class ButtonEdit extends Component {
 			align = 'center',
 			width,
 		} = attributes;
-		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
+		const {
+			maxWidth,
+			isButtonFocused,
+			placeholderTextWidth,
+			borderRadiusUnit,
+		} = this.state;
 		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
 		if ( parentWidth === 0 ) {
@@ -395,13 +434,18 @@ class ButtonEdit extends Component {
 		}
 
 		const borderRadius = buttonStyle?.border?.radius;
+		const borderRadiusValue = this.getBorderRadiusValue(
+			borderRadius,
+			styles.defaultButton.borderRadius
+		);
 
-		const borderRadiusValue = Number.isInteger( borderRadius )
-			? borderRadius
-			: styles.defaultButton.borderRadius;
+		const buttonBorderRadiusValue =
+			borderRadiusUnit === 'px' || borderRadiusUnit === '%'
+				? borderRadiusValue
+				: Math.floor( 14 * borderRadiusValue ); // lets assume that the font size is set to 14px; TO get a nicer preview.
 		const outlineBorderRadius =
-			borderRadiusValue > 0
-				? borderRadiusValue + spacing + borderWidth
+			buttonBorderRadiusValue > 0
+				? buttonBorderRadiusValue + spacing + borderWidth
 				: 0;
 
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
@@ -433,7 +477,7 @@ class ButtonEdit extends Component {
 			<View onLayout={ this.onLayout }>
 				{ this.getPlaceholderWidth( placeholderText ) }
 				<ColorBackground
-					borderRadiusValue={ borderRadiusValue }
+					borderRadiusValue={ buttonBorderRadiusValue }
 					backgroundColor={ backgroundColor }
 					isSelected={ isSelected }
 				>
@@ -504,12 +548,20 @@ class ButtonEdit extends Component {
 						{ this.getLinkSettings( false ) }
 						<InspectorControls>
 							<PanelBody title={ __( 'Border Settings' ) }>
-								<RangeControl
+								<UnitControl
 									label={ __( 'Border Radius' ) }
-									minimumValue={ MIN_BORDER_RADIUS_VALUE }
-									maximumValue={ MAX_BORDER_RADIUS_VALUE }
+									min={ MIN_BORDER_RADIUS_VALUE }
+									max={ MAX_BORDER_RADIUS_VALUE }
 									value={ borderRadiusValue }
 									onChange={ this.onChangeBorderRadius }
+									onUnitChange={
+										this.onChangeBorderRadiusUnit
+									}
+									unit={ this.state.borderRadiusUnit }
+									units={ filterUnitsWithSettings(
+										[ 'px', 'em', 'rem' ],
+										CSS_UNITS
+									) }
 								/>
 							</PanelBody>
 							<WidthPanel

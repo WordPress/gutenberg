@@ -34,7 +34,7 @@ export default function warning( message ) {
 	}
 
 	// Skip if already logged.
-	if ( message in logged ) {
+	if ( logged.has( message ) ) {
 		return;
 	}
 
@@ -50,5 +50,5 @@ export default function warning( message ) {
 		// do nothing
 	}
 
-	logged[ message ] = true;
+	logged.add( message );
 }

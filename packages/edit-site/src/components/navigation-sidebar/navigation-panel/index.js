@@ -15,6 +15,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -95,7 +96,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
 					<div className="edit-site-navigation-panel__site-title">
-						{ siteTitle }
+						{ decodeEntities( siteTitle ) }
 					</div>
 				</div>
 				<div className="edit-site-navigation-panel__scroll-container">

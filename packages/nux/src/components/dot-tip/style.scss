@@ -1,3 +1,4 @@
+
 $dot-size: 8px; // Size of the indicator dot
 $dot-scale: 3;  // How much the pulse animation should scale up by in size
 
@@ -15,17 +16,17 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 		background: rgba(#00739c, 0.9);
 		opacity: 0.9;
 		height: $dot-size * $dot-scale;
-		left: -($dot-size * $dot-scale) / 2;
-		top: -($dot-size * $dot-scale) / 2;
-		transform: scale((1 / $dot-scale));
+		left: -($dot-size * $dot-scale) * 0.5;
+		top: -($dot-size * $dot-scale) * 0.5;
+		transform: scale(math.div(1, $dot-scale));
 		width: $dot-size * $dot-scale;
 	}
 
 	&::after {
 		background: #00739c;
 		height: $dot-size;
-		left: -$dot-size / 2;
-		top: -$dot-size / 2;
+		left: -$dot-size * 0.5;
+		top: -$dot-size * 0.5;
 		width: $dot-size;
 	}
 
@@ -56,16 +57,16 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 
 	// Position the dot right next to the edge of the button
 	&[data-y-axis="top"] {
-		margin-top: -$dot-size / 2;
+		margin-top: -$dot-size * 0.5;
 	}
 	&[data-y-axis="bottom"] {
-		margin-top: $dot-size / 2;
+		margin-top: $dot-size * 0.5;
 	}
 	&[data-y-axis="middle"][data-y-axis="left"] {
-		margin-left: -$dot-size / 2;
+		margin-left: -$dot-size * 0.5;
 	}
 	&[data-y-axis="middle"][data-y-axis="right"] {
-		margin-left: $dot-size / 2;
+		margin-left: $dot-size * 0.5;
 	}
 
 	// Position the tip content away from the dot

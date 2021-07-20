@@ -6,7 +6,7 @@ Snapshot Diff:
 + Second value
 
 @@ -7,14 +7,10 @@
-      class="components-flex-item css-1o3e1r5-Item-sx-Base css-1mm2cvy-View em57xhy0"
+      class="components-flex-item css-mw3lhz-View-Item-sx-Base em57xhy0"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
     />
@@ -15,7 +15,7 @@ Snapshot Diff:
 -   />
 -   <div />
 -   <div
-      class="components-flex-item components-flex-block css-12rtc5p-Item-sx-Base-block css-1mm2cvy-View em57xhy0"
+      class="components-flex-item components-flex-block css-14wzr73-View-Item-sx-Base-block em57xhy0"
       data-wp-c16t="true"
       data-wp-component="FlexBlock"
     />
@@ -76,7 +76,7 @@ exports[`props should render correctly 1`] = `
   min-width: 0;
 }
 
-.emotion-3 {
+.emotion-2 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -84,7 +84,7 @@ exports[`props should render correctly 1`] = `
   min-width: 0;
 }
 
-.emotion-6 {
+.emotion-4 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -96,17 +96,17 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-flex emotion-0 emotion-1 emotion-2"
+  class="components-flex emotion-0 emotion-1"
   data-wp-c16t="true"
   data-wp-component="Flex"
 >
   <div
-    class="components-flex-item emotion-3 emotion-1 emotion-2"
+    class="components-flex-item emotion-2 emotion-1"
     data-wp-c16t="true"
     data-wp-component="FlexItem"
   />
   <div
-    class="components-flex-item components-flex-block emotion-6 emotion-1 emotion-2"
+    class="components-flex-item components-flex-block emotion-4 emotion-1"
     data-wp-c16t="true"
     data-wp-component="FlexBlock"
   />
@@ -137,7 +137,6 @@ Snapshot Diff:
 +     "justify-content": "space-between",
       "width": "100%",
     },
-    Object {},
   ]
 `;
 
