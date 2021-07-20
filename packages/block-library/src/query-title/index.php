@@ -18,9 +18,6 @@ function render_block_core_query_title( $attributes ) {
 	$is_search  = is_search();
 	$is_archive = is_archive();
 	$title = isset( $attributes['content'] ) ? $attributes['content'] : '';
-	if ( empty( $title ) ) {
-		return;
-	}
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
 	}
@@ -33,6 +30,9 @@ function render_block_core_query_title( $attributes ) {
 	$tag_name           = isset( $attributes['level'] ) ? 'h' . (int) $attributes['level'] : 'h1';
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	if ( empty( $title ) ) {
+		return;
+	}
 	return sprintf(
 		'<%1$s %2$s>%3$s</%1$s>',
 		$tag_name,
