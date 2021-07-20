@@ -100,7 +100,6 @@ export default function SidebarBlockEditor( {
 			<KeyboardShortcuts.Register />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
-				<BlockEditorKeyboardShortcuts />
 				<KeyboardShortcuts
 					undo={ sidebar.undo }
 					redo={ sidebar.redo }

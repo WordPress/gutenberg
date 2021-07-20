@@ -6,7 +6,6 @@ import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
-	BlockEditorKeyboardShortcuts,
 	__experimentalLinkControl,
 	BlockInspector,
 	BlockList,
@@ -71,7 +70,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
-			<BlockEditorKeyboardShortcuts />
 			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
