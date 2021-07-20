@@ -7,7 +7,7 @@
 
 /**
  * Renders the `core/query-title` block on the server.
- * For now it supports Archive title and Search title,
+ * For now it supports Archive title, Search title and 404 title,
  * using queried object information
  *
  * @param array $attributes Block attributes.
