@@ -3,11 +3,13 @@
 	"name": "core/query-title",
 	"title": "Query Title",
 	"category": "design",
-	"description": "Display the query title.",
+	"description": "Display the query title based on the queried object. Supports search, archive and 404 templates. Dynamic content is available on the search template for: %search%, %total%.",
 	"textdomain": "default",
+	"usesContext": [ "templateSlug" ],
 	"attributes": {
-		"type": {
-			"type": "string"
+		"content": {
+			"type": "string",
+			"default": "Query title"
 		},
 		"textAlign": {
 			"type": "string"
