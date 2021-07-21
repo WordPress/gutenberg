@@ -410,7 +410,7 @@ async function publishNpmLatestDistTag() {
 		"To perform a release you'll have to be a member of the WordPress Team on npm.\n"
 	);
 
-	const minimumVersionBump = await prompt( [
+	const { minimumVersionBump } = await prompt( [
 		{
 			type: 'list',
 			name: 'minimumVersionBump',
