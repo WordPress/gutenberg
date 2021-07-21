@@ -14,7 +14,9 @@ import {
 	Warning,
 	RichText,
 	store as blockEditorStore,
+	InspectorControls,
 } from '@wordpress/block-editor';
+import { TextControl, PanelBody } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 
@@ -146,6 +148,32 @@ export default function QueryTitleEdit( {
 					} }
 				/>
 			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Title Contents' ) }>
+					<TextControl
+						label={ __( 'Search Title' ) }
+						help={ `${ __(
+							'Edit the search template title. Dynamic content is available with: '
+						) } %search%, %total%` }
+						value={ searchTitle }
+						onChange={ ( value ) =>
+							setAttributes( {
+								searchTitleContent: value,
+							} )
+						}
+					/>
+					<TextControl
+						label={ __( '404 Title' ) }
+						help={ __( 'Edit the 404 template title.' ) }
+						value={ nothingFoundTitle }
+						onChange={ ( value ) =>
+							setAttributes( {
+								nothingFoundTitleContent: value,
+							} )
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
 			{ titleElement }
 		</>
 	);
