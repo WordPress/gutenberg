@@ -92,6 +92,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 					<iframe
 						ref={ ref }
 						className="wp-block-legacy-widget__edit-preview-iframe"
+						tabIndex="-1"
 						title={ __( 'Legacy Widget Preview' ) }
 						// TODO: This chokes when the query param is too big.
 						// Ideally, we'd render a <ServerSideRender>. Maybe by
