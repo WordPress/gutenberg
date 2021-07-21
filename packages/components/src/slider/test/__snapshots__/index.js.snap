@@ -126,7 +126,7 @@ exports[`Slider should render correctly 1`] = `
 />
 `;
 
-exports[`Slider should render valuetext for united values 1`] = `
+exports[`Slider should render valuetext for unit-ed values 1`] = `
 Snapshot Diff:
 - First value
 + Second value
