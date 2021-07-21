@@ -21,6 +21,13 @@ import { filePasteHandler } from './file-paste-handler';
 import { addActiveFormats, isShortcode } from './utils';
 import { splitValue } from './split-value';
 
+function normalizePastedHtml( html ) {
+	const startReg = new RegExp( '.*<!--StartFragment-->', 's' );
+	const endReg = new RegExp( '<!--EndFragment-->.*', 's' );
+
+	return html.replace( startReg, '' ).replace( endReg, '' );
+}
+
 export function usePasteHandler( props ) {
 	const propsRef = useRef( props );
 	propsRef.current = props;
@@ -68,6 +75,8 @@ export function usePasteHandler( props ) {
 					return;
 				}
 			}
+
+			html = normalizePastedHtml( html );
 
 			event.preventDefault();
 
