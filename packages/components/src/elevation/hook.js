@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
-import { isNil } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -49,13 +48,13 @@ export function useElevation( props ) {
 
 	const classes = useMemo( () => {
 		/** @type {number | undefined} */
-		let hoverValue = ! isNil( hover ) ? hover : value * 2;
+		let hoverValue = hover != null ? hover : value * 2;
 		/** @type {number | undefined} */
-		let activeValue = ! isNil( active ) ? active : value / 2;
+		let activeValue = active != null ? active : value / 2;
 
 		if ( ! isInteractive ) {
-			hoverValue = ! isNil( hover ) ? hover : undefined;
-			activeValue = ! isNil( active ) ? active : undefined;
+			hoverValue = hover != null ? hover : undefined;
+			activeValue = active != null ? active : undefined;
 		}
 
 		const transition = `box-shadow ${ CONFIG.transitionDuration } ${ CONFIG.transitionTimingFunction }`;
@@ -76,7 +75,7 @@ export function useElevation( props ) {
 			reduceMotion( 'transition' )
 		);
 
-		if ( ! isNil( hoverValue ) ) {
+		if ( hoverValue != null ) {
 			sx.hover = css`
 				*:hover > & {
 					box-shadow: ${ getBoxShadow( hoverValue ) };
@@ -84,7 +83,7 @@ export function useElevation( props ) {
 			`;
 		}
 
-		if ( ! isNil( activeValue ) ) {
+		if ( activeValue != null ) {
 			sx.active = css`
 				*:active > & {
 					box-shadow: ${ getBoxShadow( activeValue ) };
@@ -92,7 +91,7 @@ export function useElevation( props ) {
 			`;
 		}
 
-		if ( ! isNil( focus ) ) {
+		if ( focus != null ) {
 			sx.focus = css`
 				*:focus > & {
 					box-shadow: ${ getBoxShadow( focus ) };

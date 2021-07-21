@@ -8,7 +8,6 @@ import {
 	isArray,
 	isEmpty,
 	isFunction,
-	isNil,
 	isObject,
 	isPlainObject,
 	isString,
@@ -186,7 +185,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 			continue;
 		}
 		serverSideBlockDefinitions[ blockName ] = mapKeys(
-			pickBy( definitions[ blockName ], ( value ) => ! isNil( value ) ),
+			pickBy( definitions[ blockName ], ( value ) => value != null ),
 			( value, key ) => camelCase( key )
 		);
 	}

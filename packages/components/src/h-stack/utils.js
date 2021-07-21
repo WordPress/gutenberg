@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import { isNil } from 'lodash';
-
 /** @type {import('./types').Alignments} */
 const ALIGNMENTS = {
 	bottom: { align: 'flex-end', justify: 'center' },
@@ -41,7 +36,7 @@ const V_ALIGNMENTS = {
  */
 /* eslint-enable jsdoc/valid-types */
 export function getAlignmentProps( alignment, direction = 'row' ) {
-	if ( isNil( alignment ) ) {
+	if ( alignment == null ) {
 		return {};
 	}
 	const isVertical = direction === 'column';

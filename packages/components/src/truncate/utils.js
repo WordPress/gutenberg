@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import { isNil } from 'lodash';
-
 export const TRUNCATE_ELLIPSIS = '…';
 export const TRUNCATE_TYPE = {
 	auto: 'auto',
@@ -38,7 +33,7 @@ export function truncateMiddle( word, headLength, tailLength, ellipsis ) {
 	// eslint-disable-next-line no-bitwise
 	const backLength = ~~tailLength;
 	/* istanbul ignore next */
-	const truncateStr = ! isNil( ellipsis ) ? ellipsis : TRUNCATE_ELLIPSIS;
+	const truncateStr = ellipsis != null ? ellipsis : TRUNCATE_ELLIPSIS;
 
 	if (
 		( frontLength === 0 && backLength === 0 ) ||
