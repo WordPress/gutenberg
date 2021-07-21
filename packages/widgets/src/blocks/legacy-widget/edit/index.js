@@ -40,30 +40,22 @@ export default function Edit( props ) {
 		ref.current.focus();
 	}, [ setIsEditing ] );
 
-	props = { ...props, isEditing, stopEditing };
-
-	// isWide is applicable only at breakpoints greater than small
+	// wide display of widgets applies only at breakpoints greater than small
 	const canWideFit = useViewportMatch( 'small' );
-	props.isWide &&= canWideFit;
+	const isWide = props.isWide && canWideFit;
 
 	const ref = useRef();
 
-	useEffect( () => {
-		if ( props.isSelected ) {
-			setIsEditing( true );
-		} else {
-			setIsEditing( false );
-		}
-	}, [ props.isSelected ] );
+	useEffect( () => setIsEditing( props.isSelected ), [ props.isSelected ] );
 
 	const blockProps = useBlockProps( {
 		ref,
 		className: classnames( {
-			'is-wide-widget': props.isWide,
+			'is-wide-widget': isWide,
 		} ),
 	} );
 
-	if ( props.isWide ) {
+	if ( isWide ) {
 		blockProps.onClick = ( { currentTarget, target } ) => {
 			if ( currentTarget.contains( target ) ) {
 				setIsEditing( true );
@@ -76,7 +68,7 @@ export default function Edit( props ) {
 			{ ! id && ! idBase ? (
 				<Empty { ...props } />
 			) : (
-				<NotEmpty { ...props } />
+				<NotEmpty { ...{ ...props, isWide, isEditing, stopEditing } } />
 			) }
 		</div>
 	);
