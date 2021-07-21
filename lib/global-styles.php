@@ -26,9 +26,18 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 
 	if ( $can_use_cached ) {
 		// Check if we have the styles already cached.
-		$cached = get_transient( 'global_styles' );
-		if ( $cached ) {
-			return $cached;
+		$stylesheet = get_transient( 'global_styles' );
+		if ( $stylesheet ) {
+			/**
+			 * Filters global styles.
+			 *
+			 * @param string        $stylesheet The styles.
+			 * @param WP_Theme_JSON $tree       Input tree.
+			 * @param string        $type       Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+			 *
+			 * @return string Stylesheet.
+			 */
+			return apply_filters( 'global_styles', $stylesheet, $type, $tree );
 		}
 	}
 
@@ -40,7 +49,16 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 		set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
 	}
 
-	return $stylesheet;
+	/**
+	 * Filters global styles.
+	 *
+	 * @param string        $stylesheet The styles.
+	 * @param WP_Theme_JSON $tree       Input tree.
+	 * @param string        $type       Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+	 *
+	 * @return string Stylesheet.
+	 */
+	return apply_filters( 'global_styles', $stylesheet, $type, $tree );
 }
 
 /**
