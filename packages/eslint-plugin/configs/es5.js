@@ -16,7 +16,7 @@ module.exports = {
 		curly: [ 'error', 'all' ],
 		'dot-notation': 'error',
 		'eol-last': 'error',
-		eqeqeq: 'error',
+		eqeqeq: [ 'error', 'always', { null: 'ignore' } ],
 		'func-call-spacing': 'error',
 		indent: [ 'error', 'tab', { SwitchCase: 1 } ],
 		'key-spacing': 'error',

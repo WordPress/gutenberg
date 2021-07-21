@@ -20,7 +20,6 @@ const EmotionCacheContext: Context< EmotionCache > = CacheProvider._context;
 const useEmotionCacheContext = () => useContext( EmotionCacheContext );
 
 const isSerializedStyles = ( o: any ): o is SerializedStyles =>
-	// eslint-disable-next-line eqeqeq
 	o != null &&
 	[ 'name', 'styles' ].every( ( p ) => typeof o[ p ] !== 'undefined' );
 
