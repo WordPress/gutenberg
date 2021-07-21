@@ -22,7 +22,7 @@ import {
 import HeadingLevelDropdown from './heading-level-dropdown';
 import { generateAnchor } from './autogenerate-anchors';
 
-const allHeadingAnchors = new Set();
+const allHeadingAnchors = {};
 
 function HeadingEdit( {
 	attributes,
