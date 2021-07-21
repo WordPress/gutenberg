@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 4.1.0 (2021-07-21)
-
 ## 4.0.0 (2021-05-20)
 ### Breaking Changes
 

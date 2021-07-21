@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 17.0.0 (2021-07-21)
-
 ### Breaking Changes
 
 - Upgrade `puppeteer-core` (`^9.0.0`) to version `^10.1.0`. This version drops support for Node v10.
