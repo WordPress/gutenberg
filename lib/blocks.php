@@ -513,78 +513,80 @@ if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
 	add_filter( 'block_type_metadata', 'gutenberg_migrate_old_typography_shape' );
 }
 
-/**
- * Enqueue a stylesheet for a specific block.
- *
- * If the theme has opted-in to separate-styles loading,
- * then the stylesheet will be enqueued on-render,
- * otherwise when the block inits.
- *
- * @param string $block_name The block-name, including namespace.
- * @param array  $args       An array of arguments [handle,src,deps,ver,media].
- *
- * @return void
- */
-function wp_enqueue_block_style( $block_name, $args ) {
-	$args = wp_parse_args(
-		$args,
-		array(
-			'handle' => '',
-			'src'    => '',
-			'deps'   => array(),
-			'ver'    => false,
-			'media'  => 'all',
-		)
-	);
-
+if ( ! function_exists( 'wp_enqueue_block_style' ) ) {
 	/**
-	 * Callback function to register and enqueue styles.
+	 * Enqueue a stylesheet for a specific block.
 	 *
-	 * @param string $content When the callback is used for the render_block filter,
-	 *                        the content needs to be returned so the function parameter
-	 *                        is to ensure the content exists.
+	 * If the theme has opted-in to separate-styles loading,
+	 * then the stylesheet will be enqueued on-render,
+	 * otherwise when the block inits.
 	 *
-	 * @return string
+	 * @param string $block_name The block-name, including namespace.
+	 * @param array  $args       An array of arguments [handle,src,deps,ver,media].
+	 *
+	 * @return void
 	 */
-	$callback = function( $content ) use ( $args ) {
-		// Register the stylesheet.
-		if ( ! empty( $args['src'] ) ) {
-			wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
-		}
+	function wp_enqueue_block_style( $block_name, $args ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'handle' => '',
+				'src'    => '',
+				'deps'   => array(),
+				'ver'    => false,
+				'media'  => 'all',
+			)
+		);
 
-		// Add `path` data if provided.
-		if ( isset( $args['path'] ) ) {
-			wp_style_add_data( $args['handle'], 'path', $args['path'] );
+		/**
+		 * Callback function to register and enqueue styles.
+		 *
+		 * @param string $content When the callback is used for the render_block filter,
+		 *                        the content needs to be returned so the function parameter
+		 *                        is to ensure the content exists.
+		 *
+		 * @return string
+		 */
+		$callback = function( $content ) use ( $args ) {
+			// Register the stylesheet.
+			if ( ! empty( $args['src'] ) ) {
+				wp_register_style( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['media'] );
+			}
 
-			// Get the RTL file path.
-			$rtl_file_path = str_replace( '.css', '-rtl.css', $args['path'] );
+			// Add `path` data if provided.
+			if ( isset( $args['path'] ) ) {
+				wp_style_add_data( $args['handle'], 'path', $args['path'] );
 
-			// Add RTL stylesheet.
-			if ( file_exists( $rtl_file_path ) ) {
-				wp_style_add_data( $args['hanle'], 'rtl', 'replace' );
+				// Get the RTL file path.
+				$rtl_file_path = str_replace( '.css', '-rtl.css', $args['path'] );
 
-				if ( is_rtl() ) {
-					wp_style_add_data( $args['handle'], 'path', $rtl_file_path );
+				// Add RTL stylesheet.
+				if ( file_exists( $rtl_file_path ) ) {
+					wp_style_add_data( $args['hanle'], 'rtl', 'replace' );
+
+					if ( is_rtl() ) {
+						wp_style_add_data( $args['handle'], 'path', $rtl_file_path );
+					}
 				}
 			}
+
+			// Enqueue the stylesheet.
+			wp_enqueue_style( $args['handle'] );
+
+			return $content;
+		};
+
+		$hook = did_action( 'wp_enqueue_scripts' ) ? 'wp_footer' : 'wp_enqueue_scripts';
+		if ( wp_should_load_separate_core_block_assets() ) {
+			$hook = "render_block_$block_name";
 		}
 
-		// Enqueue the stylesheet.
-		wp_enqueue_style( $args['handle'] );
+		// Enqueue assets in the frontend.
+		add_filter( $hook, $callback );
 
-		return $content;
-	};
-
-	$hook = did_action( 'wp_enqueue_scripts' ) ? 'wp_footer' : 'wp_enqueue_scripts';
-	if ( wp_should_load_separate_core_block_assets() ) {
-		$hook = "render_block_$block_name";
+		// Enqueue assets in the editor.
+		add_action( 'enqueue_block_assets', $callback );
 	}
-
-	// Enqueue assets in the frontend.
-	add_filter( $hook, $callback );
-
-	// Enqueue assets in the editor.
-	add_action( 'enqueue_block_assets', $callback );
 }
 
 /**
