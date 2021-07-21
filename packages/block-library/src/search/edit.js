@@ -217,8 +217,7 @@ export default function SearchEdit( {
 			...colorProps.style,
 			...( isButtonPositionInside
 				? { borderRadius }
-				: borderProps.style
-			)
+				: borderProps.style ),
 		};
 
 		return (

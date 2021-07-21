@@ -215,11 +215,13 @@ function styles_for_block_core_search( $attributes ) {
 					$name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
 
 					// Add shared styles for individual border radii for input & button.
-					$shared_styles[] = sprintf(
+					$border_style = sprintf(
 						'border-%s-radius: %s;',
 						esc_attr( $name ),
 						esc_attr( $value )
 					);
+					$input_styles[]  = $border_style;
+					$button_styles[] = $border_style;
 
 					// Add adjusted border radius styles for the wrapper element
 					// if button is positioned inside.
@@ -236,7 +238,9 @@ function styles_for_block_core_search( $attributes ) {
 		} else {
 			// Numeric check is for backwards compatibility purposes.
 			$border_radius   = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
-			$shared_styles[] = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
+			$border_style    = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
+			$input_styles[]  = $border_style;
+			$button_styles[] = $border_style;
 
 			if ( $is_button_inside && intval( $border_radius ) !== 0 ) {
 				// Adjust wrapper border radii to maintain visual consistency
@@ -262,7 +266,8 @@ function styles_for_block_core_search( $attributes ) {
 		if ( $is_button_inside ) {
 			$wrapper_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
 		} else {
-			$shared_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
+			$button_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
+			$input_styles[]  = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
 		}
 	}
 
