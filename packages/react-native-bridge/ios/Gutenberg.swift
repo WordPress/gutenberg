@@ -85,6 +85,8 @@ public class Gutenberg: NSObject {
             settingsUpdates
         }
 
+        initialProps["crashLoggingOptions"] = dataSource.gutenbergCrashLoggingOptions()
+        
         return initialProps
     }
 
@@ -240,8 +242,10 @@ extension Gutenberg: RCTBridgeDelegate {
     }
 
     public func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {
+        // Aztec
         let aztecManager = RCTAztecViewManager()
         aztecManager.attachmentDelegate = dataSource.aztecAttachmentDelegate()
+        
         let baseModules:[RCTBridgeModule] = [bridgeModule, aztecManager]
         return baseModules + extraModules
     }

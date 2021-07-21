@@ -307,6 +307,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
         return [.filesApp, .otherApps]
     }
+    
+    func gutenbergCrashLoggingOptions() -> [String: Any]? {
+        return nil
+    }
 }
 
 extension Gutenberg.MediaSource {
