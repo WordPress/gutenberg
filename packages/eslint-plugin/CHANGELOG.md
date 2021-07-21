@@ -5,6 +5,7 @@
 ### Enhancement
 
 -   Adds JSDoc alignment check ([#25300](https://github.com/WordPress/gutenberg/pull/25300)).
+-	Ignore the `eqeqeq` rule for comparing against null ([#33598](https://github.com/WordPress/gutenberg/pull/33598))
 
 ## 9.0.1 (2021-03-19)
 
