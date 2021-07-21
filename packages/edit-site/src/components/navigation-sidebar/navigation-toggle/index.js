@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button, Icon } from '@wordpress/components';
+import { Button, Icon, withFilters } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -12,7 +12,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
  */
 import { store as editSiteStore } from '../../../store';
 
-function NavigationToggle( { icon, isOpen } ) {
+function NavigationToggle( { icon, isOpen, label, onClick } ) {
 	const {
 		isRequestingSiteIcon,
 		navigationPanelMenu,
@@ -73,8 +73,8 @@ function NavigationToggle( { icon, isOpen } ) {
 		>
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
-				label={ __( 'Toggle navigation' ) }
-				onClick={ toggleNavigationPanel }
+				label={ label || __( 'Toggle navigation' ) }
+				onClick={ onClick || toggleNavigationPanel }
 				showTooltip
 			>
 				{ buttonIcon }
@@ -83,4 +83,4 @@ function NavigationToggle( { icon, isOpen } ) {
 	);
 }
 
-export default NavigationToggle;
+export default withFilters( 'editSite.NavigationToggle' )( NavigationToggle );
