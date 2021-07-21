@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.5.0 (2021-07-21)
+
 ### Enhancements
 
 -   Add support for the new `version` field in the `block.json` metadata file ([#33075](https://github.com/WordPress/gutenberg/pull/33075)).
