@@ -32,7 +32,8 @@
 			"__experimentalFontFamily": true,
 			"__experimentalTextTransform": true,
 			"__experimentalFontStyle": true,
-			"__experimentalFontWeight": true
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true
 		}
 	},
 	"editorStyle": "wp-block-site-title-editor"

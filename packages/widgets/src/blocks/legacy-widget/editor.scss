@@ -74,7 +74,8 @@
 	}
 
 	// Reset z-index set on https://github.com/WordPress/wordpress-develop/commit/f26d4d37351a55fd1fc5dad0f5fef8f0f964908c.
-	.widget.open {
+	.widget.open,
+	.widget.open:focus-within {
 		z-index: 0;
 	}
 }
@@ -113,10 +114,15 @@
 	width: 100%;
 }
 
-.wp-block-legacy-widget__edit-no-preview {
+.wp-block-legacy-widget__edit-no-preview.wp-block-legacy-widget__edit-no-preview.wp-block-legacy-widget__edit-no-preview {
+	&,
+	& h3,
+	& p {
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
+
 	background: $gray-100;
-	font-family: $default-font;
-	font-size: $default-font-size;
 	padding: $grid-unit-10 $grid-unit-15;
 
 	h3 {
@@ -154,6 +160,9 @@
 }
 
 .wp-block-legacy-widget {
+	.components-base-control {
+		width: 100%;
+	}
 	.components-select-control__input {
 		padding: 0;
 		font-family: system-ui;

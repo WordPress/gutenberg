@@ -85,7 +85,7 @@ const DEFAULT_COLUMNS_NUM = 2;
  */
 const MIN_COLUMNS_NUM = 1;
 
-const { isWider, isFullWidth } = alignmentHelpers;
+const { isFullWidth } = alignmentHelpers;
 
 function ColumnsEditContainer( {
 	attributes,
@@ -107,7 +107,7 @@ function ColumnsEditContainer( {
 	const { width } = sizes || {};
 
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'layout.units' ) || [
+		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
 			'px',
 			'em',
@@ -132,16 +132,9 @@ function ColumnsEditContainer( {
 	}, [ width, columnCount ] );
 
 	const renderAppender = () => {
-		const isEqualWidth = width === screenWidth;
-
 		if ( isSelected ) {
 			return (
-				<View
-					style={
-						( isWider( screenWidth, 'mobile' ) || isEqualWidth ) &&
-						styles.columnAppender
-					}
-				>
+				<View style={ isFullWidth( align ) && styles.columnAppender }>
 					<InnerBlocks.ButtonBlockAppender
 						onAddBlock={ onAddBlock }
 					/>
@@ -381,7 +374,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 					...getMappedColumnWidths( innerBlocks, widths ),
 					...times( newColumns - previousColumns, () => {
 						return createBlock( 'core/column', {
-							width: newColumnWidth,
+							width: `${ newColumnWidth }%`,
 							verticalAlignment,
 						} );
 					} ),
@@ -449,7 +442,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 )( memo( ColumnsEditContainer ) );
 
 const ColumnsEdit = ( props ) => {
-	const { clientId, isSelected } = props;
+	const { clientId, isSelected, style } = props;
 	const {
 		columnCount,
 		isDefaultColumns,
@@ -512,7 +505,7 @@ const ColumnsEdit = ( props ) => {
 	}, [] );
 
 	return (
-		<>
+		<View style={ style }>
 			<ColumnsEditContainerWrapper
 				columnCount={ columnCount }
 				innerWidths={ memoizedInnerWidths }
@@ -527,7 +520,7 @@ const ColumnsEdit = ( props ) => {
 				clientId={ clientId }
 				isVisible={ isVisible }
 			/>
-		</>
+		</View>
 	);
 };
 

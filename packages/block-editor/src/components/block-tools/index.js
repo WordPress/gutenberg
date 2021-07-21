@@ -19,8 +19,8 @@ import { usePopoverScroll } from './use-popover-scroll';
  * insertion point and a slot for the inline rich text toolbar). Must be wrapped
  * around the block content and editor styles wrapper or iframe.
  *
- * @param {Object} $0          Props.
- * @param {Object} $0.children The block content and style container.
+ * @param {Object} $0                      Props.
+ * @param {Object} $0.children             The block content and style container.
  * @param {Object} $0.__unstableContentRef Ref holding the content scroll container.
  */
 export default function BlockTools( { children, __unstableContentRef } ) {

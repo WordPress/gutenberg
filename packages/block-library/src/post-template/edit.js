@@ -30,7 +30,7 @@ export default function PostTemplateEdit( {
 		query: {
 			perPage,
 			offset,
-			categoryIds,
+			categoryIds = [],
 			postType,
 			tagIds = [],
 			order,

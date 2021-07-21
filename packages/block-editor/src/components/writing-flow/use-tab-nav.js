@@ -12,12 +12,6 @@ import { useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 
-/**
- * Useful for positioning an element within the viewport so focussing the
- * element does not scroll the page.
- */
-const PREVENT_SCROLL_ON_FOCUS = { position: 'fixed' };
-
 function isFormElement( element ) {
 	const { tagName } = element;
 	return (
@@ -75,7 +69,6 @@ export default function useTabNav() {
 			ref={ focusCaptureBeforeRef }
 			tabIndex={ focusCaptureTabIndex }
 			onFocus={ onFocusCapture }
-			style={ PREVENT_SCROLL_ON_FOCUS }
 		/>
 	);
 
@@ -84,7 +77,6 @@ export default function useTabNav() {
 			ref={ focusCaptureAfterRef }
 			tabIndex={ focusCaptureTabIndex }
 			onFocus={ onFocusCapture }
-			style={ PREVENT_SCROLL_ON_FOCUS }
 		/>
 	);
 
@@ -92,6 +84,7 @@ export default function useTabNav() {
 		function onKeyDown( event ) {
 			if ( event.keyCode === ESCAPE && ! hasMultiSelection() ) {
 				event.stopPropagation();
+				event.preventDefault();
 				setNavigationMode( true );
 				return;
 			}
@@ -110,6 +103,13 @@ export default function useTabNav() {
 			const direction = isShift ? 'findPrevious' : 'findNext';
 
 			if ( ! hasMultiSelection() && ! getSelectedBlockClientId() ) {
+				// Preserve the behaviour of entering navigation mode when
+				// tabbing into the content without a block selection.
+				// `onFocusCapture` already did this previously, but we need to
+				// do it again here because after clearing block selection,
+				// focus land on the writing flow container and pressing Tab
+				// will no longer send focus through the focus capture element.
+				if ( event.target === node ) setNavigationMode( true );
 				return;
 			}
 
@@ -131,16 +131,62 @@ export default function useTabNav() {
 			// doesn't refocus this block and so it allows default behaviour
 			// (moving focus to the next tabbable element).
 			noCapture.current = true;
-			next.current.focus();
+
+			// Focusing the focus capture element, which is located above and
+			// below the editor, should not scroll the page all the way up or
+			// down.
+			next.current.focus( { preventScroll: true } );
 		}
 
 		function onFocusOut( event ) {
 			lastFocus.current = event.target;
 		}
 
+		// When tabbing back to an element in block list, this event handler prevents scrolling if the
+		// focus capture divs (before/after) are outside of the viewport. (For example shift+tab back to a paragraph
+		// when focus is on a sidebar element. This prevents the scrollable writing area from jumping either to the
+		// top or bottom of the document.
+		//
+		// Note that it isn't possible to disable scrolling in the onFocus event. We need to intercept this
+		// earlier in the keypress handler, and call focus( { preventScroll: true } ) instead.
+		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLOrForeignElement/focus#parameters
+		function preventScrollOnTab( event ) {
+			if ( event.keyCode !== TAB ) {
+				return;
+			}
+
+			if ( event.target?.getAttribute( 'role' ) === 'region' ) {
+				return;
+			}
+
+			if ( container.current === event.target ) {
+				return;
+			}
+
+			const isShift = event.shiftKey;
+			const direction = isShift ? 'findPrevious' : 'findNext';
+			const target = focus.tabbable[ direction ]( event.target );
+			// only do something when the next tabbable is a focus capture div (before/after)
+			if (
+				target === focusCaptureBeforeRef.current ||
+				target === focusCaptureAfterRef.current
+			) {
+				event.preventDefault();
+				target.focus( { preventScroll: true } );
+			}
+		}
+
+		node.ownerDocument.defaultView.addEventListener(
+			'keydown',
+			preventScrollOnTab
+		);
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'focusout', onFocusOut );
 		return () => {
+			node.ownerDocument.defaultView.removeEventListener(
+				'keydown',
+				preventScrollOnTab
+			);
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'focusout', onFocusOut );
 		};

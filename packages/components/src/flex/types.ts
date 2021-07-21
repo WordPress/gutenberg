@@ -8,6 +8,7 @@ import type { CSSProperties } from 'react';
  * Internal dependencies
  */
 import type { ResponsiveCSSValue } from '../ui/utils/types';
+import type { SpaceInput } from '../ui/utils/space';
 
 export type FlexDirection = ResponsiveCSSValue<
 	CSSProperties[ 'flexDirection' ]
@@ -39,7 +40,7 @@ export type FlexProps = {
 	 *
 	 * @default 2
 	 */
-	gap?: import('react').ReactText;
+	gap?: SpaceInput;
 	/**
 	 * Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
 	 * In the example below, `flex-start` will align the children content to the left.
@@ -53,6 +54,10 @@ export type FlexProps = {
 	 * @default false
 	 */
 	wrap?: boolean;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 	/**
 	 * @deprecated
 	 */
@@ -70,6 +75,10 @@ export type FlexItemProps = {
 	 * @default true
 	 */
 	isBlock?: boolean;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 };
 
 export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' >;

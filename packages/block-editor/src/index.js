@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import '@wordpress/rich-text';
-
-/**
  * Internal dependencies
  */
 import './hooks';

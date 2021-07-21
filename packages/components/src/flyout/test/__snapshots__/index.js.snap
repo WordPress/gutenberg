@@ -1,0 +1,204 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render correctly 1`] = `
+.emotion-1 {
+  background-color: #fff;
+  color: #000;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  outline: none;
+  border-radius: 2px;
+}
+
+.emotion-2 .components-card-body {
+  max-height: 80vh;
+}
+
+.emotion-4 {
+  height: 100%;
+}
+
+.emotion-7 {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: auto;
+  max-height: 100%;
+  padding: calc(4px * 4) calc(4px * 6);
+}
+
+@media only screen and ( min-device-width: 40em ) {
+  .emotion-7::-webkit-scrollbar {
+    height: 12px;
+    width: 12px;
+  }
+
+  .emotion-7::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .emotion-7::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 8px;
+  }
+
+  .emotion-7::-webkit-scrollbar-thumb {
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba( 0, 0, 0, 0 );
+    border-radius: 7px;
+  }
+
+  .emotion-7:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.emotion-7:first-of-type {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.emotion-7:last-of-type {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.emotion-10 {
+  background: transparent;
+  display: block;
+  margin: 0!important;
+  pointer-events: none;
+  position: absolute;
+  will-change: box-shadow;
+  border-radius: inherit;
+  bottom: 0;
+  box-shadow: 0 1px 2px 0 rgba(0 ,0, 0, 0.05);
+  opacity: 1;
+  left: 0;
+  right: 0;
+  top: 0;
+  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+  border-radius: 2px;
+}
+
+.emotion-13 {
+  background: transparent;
+  display: block;
+  margin: 0!important;
+  pointer-events: none;
+  position: absolute;
+  will-change: box-shadow;
+  border-radius: inherit;
+  bottom: 0;
+  box-shadow: 0 5px 10px 0 rgba(0 ,0, 0, 0.25);
+  opacity: 1;
+  left: 0;
+  right: 0;
+  top: 0;
+  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+  border-radius: 2px;
+}
+
+<div
+  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2 emotion-3"
+  data-wp-c16t="true"
+  data-wp-component="Card"
+>
+  <div
+    class="emotion-4 emotion-5 emotion-3"
+  >
+    <iframe
+      aria-hidden="true"
+      frameborder="0"
+      src="about:blank"
+      style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
+      tabindex="-1"
+    />
+    <div
+      class="components-scrollable components-card__body components-card-body emotion-7 emotion-5 emotion-3"
+      data-wp-c16t="true"
+      data-wp-component="CardBody"
+    >
+      Code is Poetry
+    </div>
+  </div>
+  <div
+    aria-hidden="true"
+    class="components-elevation emotion-10 emotion-5 emotion-3"
+    data-wp-c16t="true"
+    data-wp-component="Elevation"
+  />
+  <div
+    aria-hidden="true"
+    class="components-elevation emotion-13 emotion-5 emotion-3"
+    data-wp-c16t="true"
+    data-wp-component="Elevation"
+  />
+</div>
+`;
+
+exports[`props should render label 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,12 +1,12 @@
+  <div
+-   aria-label="show"
++   aria-label="flyout-base-flyout"
+    class="components-flyout-content components-flyout css-1b8wigk-FlyoutContentView e1vtu5161"
+    data-dialog="true"
+    data-wp-c16t="true"
+    data-wp-component="Flyout"
+-   id="labelled-flyout"
++   id="base-flyout"
+    role="dialog"
+    style="position: fixed; left: 100%; top: 100%; max-width: 360px;"
+    tabindex="-1"
+  >
+    <div
+`;
+
+exports[`props should render without content 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,12 +1,12 @@
+  <div
+-   aria-label="flyout-contentless-flyout"
++   aria-label="flyout-base-flyout"
+    class="components-flyout-content components-flyout css-1b8wigk-FlyoutContentView e1vtu5161"
+    data-dialog="true"
+    data-wp-c16t="true"
+    data-wp-component="Flyout"
+-   id="contentless-flyout"
++   id="base-flyout"
+    role="dialog"
+    style="position: fixed; left: 100%; top: 100%; max-width: 360px;"
+    tabindex="-1"
+  >
+    <div
+@@ -22,10 +22,17 @@
+          frameborder="0"
+          src="about:blank"
+          style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
+          tabindex="-1"
+        />
++       <div
++         class="components-scrollable components-card__body components-card-body css-1x21s5j-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
++         data-wp-c16t="true"
++         data-wp-component="CardBody"
++       >
++         Code is Poetry
++       </div>
+      </div>
+      <div
+        aria-hidden="true"
+        class="components-elevation css-1446wzr-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
+        data-wp-c16t="true"
+`;

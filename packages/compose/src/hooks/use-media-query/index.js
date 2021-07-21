@@ -33,5 +33,5 @@ export default function useMediaQuery( query ) {
 		};
 	}, [ query ] );
 
-	return query && match;
+	return !! query && match;
 }

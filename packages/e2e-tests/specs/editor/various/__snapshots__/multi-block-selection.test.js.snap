@@ -70,6 +70,40 @@ exports[`Multi-block selection should cut and paste 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Multi-block selection should gradually multi-select 1`] = `
+"<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"><!-- wp:column -->
+<div class=\\"wp-block-column\\"><!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class=\\"wp-block-column\\"></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Multi-block selection should gradually multi-select 2`] = `
+"<!-- wp:columns -->
+<div class=\\"wp-block-columns\\"></div>
+<!-- /wp:columns -->"
+`;
+
+exports[`Multi-block selection should multi-select from within the list block 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li>1</li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`Multi-block selection should not multi select single block 1`] = `
 "<!-- wp:paragraph -->
 <p></p>
@@ -151,6 +185,18 @@ exports[`Multi-block selection should return original focus after failed multi s
 <p>2</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`Multi-block selection should select all from empty selection 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should select all from empty selection 2`] = `""`;
 
 exports[`Multi-block selection should set attributes for multiple paragraphs 1`] = `
 "<!-- wp:paragraph {\\"align\\":\\"center\\"} -->

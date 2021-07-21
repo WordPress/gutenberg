@@ -116,8 +116,8 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
       aria-expanded={false}
       aria-haspopup="true"
       aria-label="Custom color picker"
-      isLink={true}
       onClick={[Function]}
+      variant="link"
     >
       <button
         aria-describedby={null}
@@ -550,8 +550,8 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 aria-expanded={false}
                 aria-haspopup="true"
                 aria-label="Custom color picker"
-                isLink={true}
                 onClick={[Function]}
+                variant="link"
               >
                 <button
                   aria-describedby={null}
@@ -573,9 +573,9 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         >
           <ForwardRef(Button)
             className="components-circular-option-picker__clear"
-            isSecondary={true}
             isSmall={true}
             onClick={[Function]}
+            variant="secondary"
           >
             <button
               aria-describedby={null}

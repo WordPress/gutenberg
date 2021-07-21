@@ -56,16 +56,16 @@ which will attempt to open your app in the iOS Simulator if you're on a Mac and 
 
 ### Running on Other iOS Device Simulators
 
-To compile and run the app using a different device simulator, use:
+To compile and run the app using a different device simulator, use the following, noting the double sets of `--` to pass the simulator option down to the `react-native` CLI.
 
 ```
-npm run native ios --simulator="DEVICE_NAME"
+npm run native ios -- -- --simulator="DEVICE_NAME"
 ```
 
 For example, if you'd like to run in an iPhone Xs Max, try:
 
 ```
-npm run native ios --simulator="iPhone Xs Max"
+npm run native ios -- -- --simulator="iPhone Xs Max"
 ```
 
 To see a list of all of your available iOS devices, use `xcrun simctl list devices`.

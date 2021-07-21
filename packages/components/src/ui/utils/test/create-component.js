@@ -15,7 +15,7 @@ import { createComponent } from '../create-component';
 
 describe( 'createComponent', () => {
 	/**
-	 * @param {import('../context').ViewOwnProps<{}, 'output'>} props
+	 * @param {import('../context').PolymorphicComponentProps<{}, 'output'>} props
 	 */
 	const useHook = ( props ) => ( { ...props, 'data-hook-test-prop': true } );
 	const name = 'Output';

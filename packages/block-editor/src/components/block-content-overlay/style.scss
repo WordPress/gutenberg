@@ -1,0 +1,41 @@
+// Specificity required to ensure overlay width is not restricted to that
+// of standard block content.  The overlay's width should be as wide as
+// its children require.
+.editor-styles-wrapper .wp-block .block-editor-block-content-overlay__overlay {
+	max-width: none;
+}
+
+.block-editor-block-content-overlay {
+	.block-editor-block-content-overlay__overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: transparent;
+		border: none;
+		border-radius: $radius-block-ui;
+		z-index: z-index(".block-editor-block-content-overlay__overlay");
+	}
+
+	&:hover:not(.is-dragging-blocks),
+	&.parent-highlighted {
+		> .block-editor-block-content-overlay__overlay {
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
+		}
+	}
+
+	&.overlay-active:not(.is-dragging-blocks) {
+		*:not(.block-editor-block-content-overlay__overlay) {
+			pointer-events: none;
+		}
+	}
+
+	&.is-dragging-blocks {
+		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+		.block-editor-block-content-overlay__overlay {
+			pointer-events: none;
+		}
+	}
+}

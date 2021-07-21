@@ -179,7 +179,7 @@ describe( 'processingQueue', () => {
 
 describe( 'selectedMenuId', () => {
 	it( 'should apply default state', () => {
-		expect( selectedMenuId( undefined, {} ) ).toEqual( 0 );
+		expect( selectedMenuId( undefined, {} ) ).toEqual( null );
 	} );
 
 	it( 'should update when a new menu is selected', () => {

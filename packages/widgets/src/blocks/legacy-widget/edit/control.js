@@ -23,10 +23,10 @@ export default class Control {
 	 * Creates and loads a new control.
 	 *
 	 * @access public
-	 * @param {Object} params
-	 * @param {string} params.id
-	 * @param {string} params.idBase
-	 * @param {Object} params.instance
+	 * @param {Object}   params
+	 * @param {string}   params.id
+	 * @param {string}   params.idBase
+	 * @param {Object}   params.instance
 	 * @param {Function} params.onChangeInstance
 	 * @param {Function} params.onChangeHasPreview
 	 * @param {Function} params.onError

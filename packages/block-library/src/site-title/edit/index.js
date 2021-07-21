@@ -16,6 +16,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -34,7 +35,7 @@ export default function SiteTitleEdit( {
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
 		return {
 			canUserEdit: canUser( 'update', 'settings' ),
-			readOnlyTitle: siteData?.name,
+			readOnlyTitle: decodeEntities( siteData?.name ),
 		};
 	}, [] );
 	const TagName = level === 0 ? 'p' : `h${ level }`;
@@ -49,7 +50,6 @@ export default function SiteTitleEdit( {
 		<TagName { ...blockProps }>
 			<RichText
 				tagName="a"
-				style={ { display: 'inline-block' } }
 				aria-label={ __( 'Site title text' ) }
 				placeholder={ __( 'Write site title…' ) }
 				value={ title || readOnlyTitle }

@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { css, cx } from '@emotion/css';
 
 /**
  * WordPress dependencies
@@ -19,8 +22,8 @@ import * as styles from '../styles';
 
 /**
  *
- * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
- * @return {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} props
+ * @return {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
  */
 function useDeprecatedProps( { isReversed, ...otherProps } ) {
 	if ( typeof isReversed !== 'undefined' ) {
@@ -38,7 +41,7 @@ function useDeprecatedProps( { isReversed, ...otherProps } ) {
 }
 
 /**
- * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
+ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} props
  */
 export function useFlex( props ) {
 	const {

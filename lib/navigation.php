@@ -299,9 +299,14 @@ function gutenberg_output_block_nav_menu( $output, $args ) {
 		$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
 	}
 
+	$block_attributes = array();
+	if ( isset( $args->block_attributes ) ) {
+		$block_attributes = $args->block_attributes;
+	}
+
 	$navigation_block = array(
 		'blockName'   => 'core/navigation',
-		'attrs'       => array(),
+		'attrs'       => $block_attributes,
 		'innerBlocks' => gutenberg_convert_menu_items_to_blocks(
 			isset( $menu_items_by_parent_id[0] )
 				? $menu_items_by_parent_id[0]

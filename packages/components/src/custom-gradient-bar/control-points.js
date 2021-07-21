@@ -249,7 +249,7 @@ function ControlPoints( {
 										);
 										onClose();
 									} }
-									isLink
+									variant="link"
 								>
 									{ __( 'Remove Control Point' ) }
 								</Button>

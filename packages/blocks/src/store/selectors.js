@@ -55,7 +55,7 @@ export const getBlockTypes = createSelector(
  * Returns a block type by name.
  *
  * @param {Object} state Data state.
- * @param {string} name Block type name.
+ * @param {string} name  Block type name.
  *
  * @return {Object?} Block Type.
  */
@@ -253,11 +253,11 @@ export const getChildBlockNames = createSelector(
 /**
  * Returns the block support value for a feature, if defined.
  *
- * @param  {Object}          state           Data state.
- * @param  {(string|Object)} nameOrType      Block name or type object
- * @param  {string}          feature         Feature to retrieve
- * @param  {*}               defaultSupports Default value to return if not
- *                                           explicitly defined
+ * @param {Object}          state           Data state.
+ * @param {(string|Object)} nameOrType      Block name or type object
+ * @param {Array|string}    feature         Feature to retrieve
+ * @param {*}               defaultSupports Default value to return if not
+ *                                          explicitly defined
  *
  * @return {?*} Block support value
  */
@@ -268,18 +268,17 @@ export const getBlockSupport = (
 	defaultSupports
 ) => {
 	const blockType = getNormalizedBlockType( state, nameOrType );
+	if ( ! blockType?.supports ) {
+		return defaultSupports;
+	}
 
-	return get(
-		blockType,
-		[ 'supports', ...feature.split( '.' ) ],
-		defaultSupports
-	);
+	return get( blockType.supports, feature, defaultSupports );
 };
 
 /**
  * Returns true if the block defines support for a feature, or false otherwise.
  *
- * @param  {Object}         state           Data state.
+ * @param {Object}          state           Data state.
  * @param {(string|Object)} nameOrType      Block name or type object.
  * @param {string}          feature         Feature to test.
  * @param {boolean}         defaultSupports Whether feature is supported by

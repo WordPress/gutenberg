@@ -43,6 +43,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
+import im.shimo.react.prompt.RNPromptPackage;
+
 public class MainApplication extends Application implements ReactApplication, GutenbergBridgeInterface {
 
     private static final String TAG = "MainApplication";
@@ -110,6 +112,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void requestImageUploadCancel(int mediaId) {
+            }
+
+            @Override
+            public void setFeaturedImage(int mediaId) {
             }
 
             @Override
@@ -234,6 +240,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             }
 
+            @Override
+            public void requestPreview() {
+                Toast.makeText(MainApplication.this, "requestPreview called", Toast.LENGTH_SHORT).show();
+            }
+
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
@@ -258,6 +269,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new ReanimatedPackage(),
                         new SafeAreaContextPackage(),
                         new RNScreensPackage(),
+                        new RNPromptPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 

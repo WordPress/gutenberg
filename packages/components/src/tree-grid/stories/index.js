@@ -65,7 +65,7 @@ const Rows = ( { items, level = 1 } ) => {
 						{ ( props ) => (
 							<>
 								<Descender level={ level } />
-								<Button isPrimary { ...props }>
+								<Button variant="primary" { ...props }>
 									{ item.name }
 								</Button>
 							</>
@@ -73,14 +73,14 @@ const Rows = ( { items, level = 1 } ) => {
 					</TreeGridCell>
 					<TreeGridCell>
 						{ ( props ) => (
-							<Button isSecondary { ...props }>
+							<Button variant="secondary" { ...props }>
 								Move Up
 							</Button>
 						) }
 					</TreeGridCell>
 					<TreeGridCell>
 						{ ( props ) => (
-							<Button isSecondary { ...props }>
+							<Button variant="secondary" { ...props }>
 								Move Down
 							</Button>
 						) }

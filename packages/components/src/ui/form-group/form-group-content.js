@@ -12,7 +12,7 @@ import FormGroupHelp from './form-group-help';
 import FormGroupLabel from './form-group-label';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').FormGroupContentProps, 'label'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupContentProps, 'label'>} props
  */
 function FormGroupContent( {
 	alignLabel,

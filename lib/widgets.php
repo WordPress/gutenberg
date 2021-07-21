@@ -56,8 +56,6 @@ function gutenberg_use_widgets_block_editor() {
  * @return array Legacy widget settings.
  */
 function gutenberg_get_legacy_widget_settings() {
-	global $wp_widget_factory;
-
 	$settings = array();
 
 	$widget_types_to_hide_from_legacy_widget_block = apply_filters(
@@ -77,7 +75,6 @@ function gutenberg_get_legacy_widget_settings() {
 			'recent-comments',
 			'rss',
 			'tag_cloud',
-			'nav_menu',
 			'custom_html',
 			'block',
 		)
@@ -129,7 +126,7 @@ add_action( 'widgets_init', 'gutenberg_register_block_widget' );
 
 /**
  * Sets show_instance_in_rest to true on all of the core WP_Widget subclasses.
- * When merge dto Core, this property should be added to WP_Widget and set to
+ * When merged to Core, this property should be added to WP_Widget and set to
  * true on each WP_Widget subclass.
  */
 function gutenberg_set_show_instance_in_rest_on_core_widgets() {

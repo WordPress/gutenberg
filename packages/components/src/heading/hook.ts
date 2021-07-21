@@ -3,7 +3,7 @@
  */
 import { useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
-import type { ViewOwnProps } from '../ui/context';
+import type { PolymorphicComponentProps } from '../ui/context';
 import type { Props as TextProps } from '../text/types';
 import { useText } from '../text';
 import { getHeadingFontSize } from '../ui/utils/font-size';
@@ -50,7 +50,9 @@ export interface HeadingProps extends Omit< TextProps, 'size' > {
 	level: HeadingSize;
 }
 
-export function useHeading( props: ViewOwnProps< HeadingProps, 'h1' > ) {
+export function useHeading(
+	props: PolymorphicComponentProps< HeadingProps, 'h1' >
+) {
 	const { as: asProp, level = 2, ...otherProps } = useContextSystem(
 		props,
 		'Heading'

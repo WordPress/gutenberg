@@ -39,14 +39,16 @@ describe( 'firstTimeContributorAccountLink', () => {
 		};
 
 		const octokit = {
-			repos: {
-				listCommits: jest.fn(),
+			rest: {
+				repos: {
+					listCommits: jest.fn(),
+				},
 			},
 		};
 
 		await firstTimeContributorAccountLink( payloadForBranchPush, octokit );
 
-		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
+		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if commit pull request undeterminable', async () => {
@@ -65,56 +67,71 @@ describe( 'firstTimeContributorAccountLink', () => {
 		};
 
 		const octokit = {
-			repos: {
-				listCommits: jest.fn(),
+			rest: {
+				repos: {
+					listCommits: jest.fn(),
+				},
 			},
 		};
 
 		await firstTimeContributorAccountLink( payloadDirectToTrunk, octokit );
 
-		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
+		expect( octokit.rest.repos.listCommits ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if the user has multiple commits', async () => {
 		const octokit = {
-			repos: {
-				listCommits: jest.fn( () =>
-					Promise.resolve( {
-						data: [
-							{ sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241' },
-							{ sha: '59b07cc57adff90630fc9d5cf2317269a0f4f158' },
-						],
-					} )
-				),
-			},
-			issues: {
-				createComment: jest.fn(),
+			rest: {
+				repos: {
+					listCommits: jest.fn( () =>
+						Promise.resolve( {
+							data: [
+								{
+									sha:
+										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+								},
+								{
+									sha:
+										'59b07cc57adff90630fc9d5cf2317269a0f4f158',
+								},
+							],
+						} )
+					),
+				},
+				issues: {
+					createComment: jest.fn(),
+				},
 			},
 		};
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
-		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
+		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.issues.createComment ).not.toHaveBeenCalled();
+		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
 	} );
 
 	it( 'aborts if the request to retrieve WordPress.org user profile fails', async () => {
 		const octokit = {
-			repos: {
-				listCommits: jest.fn( () =>
-					Promise.resolve( {
-						data: [
-							{ sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241' },
-						],
-					} )
-				),
-			},
-			issues: {
-				createComment: jest.fn(),
+			rest: {
+				repos: {
+					listCommits: jest.fn( () =>
+						Promise.resolve( {
+							data: [
+								{
+									sha:
+										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+								},
+							],
+						} )
+					),
+				},
+				issues: {
+					createComment: jest.fn(),
+				},
 			},
 		};
 
@@ -124,27 +141,32 @@ describe( 'firstTimeContributorAccountLink', () => {
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
-		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
+		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.issues.createComment ).not.toHaveBeenCalled();
+		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
 	} );
 
 	it( 'prompts the user to link their GitHub account to their WordPress.org profile', async () => {
 		const octokit = {
-			repos: {
-				listCommits: jest.fn( () =>
-					Promise.resolve( {
-						data: [
-							{ sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241' },
-						],
-					} )
-				),
-			},
-			issues: {
-				createComment: jest.fn(),
+			rest: {
+				repos: {
+					listCommits: jest.fn( () =>
+						Promise.resolve( {
+							data: [
+								{
+									sha:
+										'4c535288a6a2b75ff23ee96c75f7d9877e919241',
+								},
+							],
+						} )
+					),
+				},
+				issues: {
+					createComment: jest.fn(),
+				},
 			},
 		};
 
@@ -152,12 +174,12 @@ describe( 'firstTimeContributorAccountLink', () => {
 
 		await firstTimeContributorAccountLink( payload, octokit );
 
-		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
+		expect( octokit.rest.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
 		} );
-		expect( octokit.issues.createComment ).toHaveBeenCalledWith( {
+		expect( octokit.rest.issues.createComment ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			issue_number: 123,

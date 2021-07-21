@@ -287,7 +287,7 @@ export function computePopoverYAxisPosition(
  *                                        relative positioned parent container.
  * @param {Element} boundaryElement       Boundary element.
  * @param {boolean} forcePosition         Don't adjust position based on anchor.
- *  @param {boolean} forceXAlignment       Don't adjust alignment based on YAxis
+ * @param {boolean} forceXAlignment       Don't adjust alignment based on YAxis
  *
  * @return {Object} Popover position and constraints.
  */

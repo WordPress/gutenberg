@@ -9,9 +9,9 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  * Places the caret at the top or bottom of a given element.
  *
  * @param {HTMLElement} container           Focusable element.
- * @param {boolean} isReverse           True for bottom, false for top.
- * @param {DOMRect} [rect]              The rectangle to position the caret with.
- * @param {boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
+ * @param {boolean}     isReverse           True for bottom, false for top.
+ * @param {DOMRect}     [rect]              The rectangle to position the caret with.
+ * @param {boolean}     [mayUseScroll=true] True to allow scrolling, false to disallow.
  */
 export default function placeCaretAtVerticalEdge(
 	container,

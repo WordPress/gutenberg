@@ -13,6 +13,7 @@ import { useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
+	CopyHandler,
 } from '@wordpress/block-editor';
 import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
@@ -20,7 +21,7 @@ import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
  * Internal dependencies
  */
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
@@ -39,13 +40,13 @@ export default function WidgetAreasBlockEditorProvider( {
 	} = useSelect(
 		( select ) => ( {
 			hasUploadPermissions: defaultTo(
-				select( 'core' ).canUser( 'create', 'media' ),
+				select( coreStore ).canUser( 'create', 'media' ),
 				true
 			),
 			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
 			widgets: select( editWidgetsStore ).getWidgets(),
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
-				? select( 'core' ).getEntityRecords( 'postType', 'wp_block' )
+				? select( coreStore ).getEntityRecords( 'postType', 'wp_block' )
 				: [],
 			isFixedToolbarActive: select(
 				editWidgetsStore
@@ -108,7 +109,7 @@ export default function WidgetAreasBlockEditorProvider( {
 					useSubRegistry={ false }
 					{ ...props }
 				>
-					{ children }
+					<CopyHandler>{ children }</CopyHandler>
 					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
 				</BlockEditorProvider>
 			</SlotFillProvider>

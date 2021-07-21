@@ -117,7 +117,7 @@ export function items( state = {}, action ) {
  * safe to use queried data for a non-`_fields`-limited request.
  *
  * @param {Object<string,boolean>} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Object}                 action Dispatched action.
  *
  * @return {Object<string,boolean>} Next state.
  */

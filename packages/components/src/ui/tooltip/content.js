@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { cx } from 'emotion';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { cx } from '@emotion/css';
 // eslint-disable-next-line no-restricted-imports
 import { Tooltip as ReakitTooltip } from 'reakit';
 
@@ -17,8 +20,8 @@ const { TooltipPopoverView } = styles;
 
 /**
  *
- * @param {import('../context').ViewOwnProps<import('reakit').TooltipProps, 'div'>} props
- * @param {import('react').Ref<any>} forwardedRef
+ * @param {import('../context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
+ * @param {import('react').Ref<any>}                                                              forwardedRef
  */
 function TooltipContent( props, forwardedRef ) {
 	const { children, className, ...otherProps } = useContextSystem(

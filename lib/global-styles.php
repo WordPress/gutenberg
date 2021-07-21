@@ -62,9 +62,13 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	wp_register_style( 'global-styles', false, array(), true, true );
-	wp_add_inline_style( 'global-styles', $stylesheet );
-	wp_enqueue_style( 'global-styles' );
+	if ( isset( wp_styles()->registered['global-styles'] ) ) {
+		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
+	} else {
+		wp_register_style( 'global-styles', false, array(), true, true );
+		wp_add_inline_style( 'global-styles', $stylesheet );
+		wp_enqueue_style( 'global-styles' );
+	}
 }
 
 /**
@@ -130,6 +134,20 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			'__experimentalNoWrapper' => true,
 		);
 
+		// Make sure the styles array exists.
+		// In some contexts, like the navigation editor, it doesn't.
+		if ( ! isset( $settings['styles'] ) ) {
+			$settings['styles'] = array();
+		}
+
+		// Reset existing global styles.
+		foreach ( $settings['styles'] as $key => $style ) {
+			if ( isset( $style['__unstableType'] ) && 'globalStyles' === $style['__unstableType'] ) {
+				unset( $settings['styles'][ $key ] );
+			}
+		}
+
+		// Add the new ones.
 		$settings['styles'][] = $css_variables;
 		$settings['styles'][] = $block_styles;
 	}

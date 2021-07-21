@@ -5,9 +5,9 @@ exports[`PostSavedState returns a switch to draft link if the post is published 
 exports[`PostSavedState should return Save button if edits to be saved 1`] = `
 <ForwardRef(Button)
   className="editor-post-save-draft"
-  isTertiary={true}
   onClick={[Function]}
   shortcut="Ctrl+S"
+  variant="tertiary"
 >
   Save draft
 </ForwardRef(Button)>

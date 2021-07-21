@@ -6,6 +6,7 @@ import {
 	createNewPost,
 	clickBlockAppender,
 	clickBlockToolbarButton,
+	setPostContent,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'invalid blocks', () => {
@@ -49,5 +50,55 @@ describe( 'invalid blocks', () => {
 		expect( htmlBlockContent ).toEqual(
 			'<p>hello</p><p>invalid paragraph'
 		);
+	} );
+
+	it( 'should strip potentially malicious on* attributes', async () => {
+		let hasAlert = false;
+
+		page.on( 'dialog', () => {
+			hasAlert = true;
+		} );
+
+		// The paragraph block contains invalid HTML, which causes it to be an
+		// invalid block.
+		await setPostContent(
+			`
+			<!-- wp:paragraph -->
+			<p>aaaa <img src onerror=alert(1)></x dde></x>1
+			<!-- /wp:paragraph -->
+			`
+		);
+
+		// Give the browser time to show the alert.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		expect( console ).toHaveWarned();
+		expect( console ).toHaveErrored();
+		expect( hasAlert ).toBe( false );
+	} );
+
+	it( 'should strip potentially malicious script tags', async () => {
+		let hasAlert = false;
+
+		page.on( 'dialog', () => {
+			hasAlert = true;
+		} );
+
+		// The shortcode block contains invalid HTML, which causes it to be an
+		// invalid block.
+		await setPostContent(
+			`
+			<!-- wp:shortcode -->
+			<animate onbegin=alert(1) attributeName=x dur=1s><script>alert("EVIL");</script><style>@keyframes x{}</style><a style="animation-name:x" onanimationstart="alert(2)"></a>
+			<!-- /wp:shortcode -->
+			`
+		);
+
+		// Give the browser time to show the alert.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		expect( console ).toHaveWarned();
+		expect( console ).toHaveErrored();
+		expect( hasAlert ).toBe( false );
 	} );
 } );

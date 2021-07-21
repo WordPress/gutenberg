@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { cx } from 'emotion';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { cx } from '@emotion/css';
 
 /**
  * Internal dependencies
@@ -12,7 +15,7 @@ import { ControlGroupContext } from './context';
 import * as styles from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 export function useControlGroup( props ) {
 	const {

@@ -12,8 +12,8 @@ import { MENU_ROOT } from '../components/navigation-sidebar/navigation-panel/con
 /**
  * Reducer returning the user preferences.
  *
- * @param {Object}  state Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  * @return {Object} Updated state.
  */
 export const preferences = combineReducers( {
@@ -99,7 +99,7 @@ export function editedPost( state = {}, action ) {
 /**
  * Reducer for information about the site's homepage.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
@@ -120,7 +120,7 @@ export function homeTemplateId( state, action ) {
  * Note: this reducer interacts with the inserter and list view panels reducers
  * to make sure that only one of the three panels is open at the same time.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
 export function navigationPanel(
@@ -189,7 +189,7 @@ export function blockInserterPanel( state = false, action ) {
  * Note: this reducer interacts with the navigation and inserter panels reducers
  * to make sure that only one of the three panels is open at the same time.
  *
- * @param {Object} state Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  */
 export function listViewPanel( state = false, action ) {

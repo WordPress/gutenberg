@@ -109,7 +109,7 @@ export default function TemplatePartPlaceholder( {
 							<>
 								{ enableSelection && (
 									<Button
-										isPrimary
+										variant="primary"
 										onClick={ onToggle }
 										aria-expanded={ isOpen }
 									>
@@ -117,9 +117,9 @@ export default function TemplatePartPlaceholder( {
 									</Button>
 								) }
 								<Button
-									{ ...( enableSelection
-										? { isTertiary: true }
-										: { isPrimary: true } ) }
+									variant={
+										enableSelection ? 'tertiary' : 'primary'
+									}
 									onClick={ () =>
 										setStep( PLACEHOLDER_STEPS.patterns )
 									}

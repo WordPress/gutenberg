@@ -1,6 +1,8 @@
 # Heading
 
-> **Experimental!**
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 `Heading` renders headings and titles using the library's typography system.
 

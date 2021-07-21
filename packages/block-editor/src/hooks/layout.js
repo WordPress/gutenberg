@@ -20,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
+import { useContext, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,6 +29,7 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
+import { Head } from '../components/block-list/head';
 
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;
@@ -39,7 +41,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 	}, [] );
 
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'layout.units' ) || [
+		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
 			'px',
 			'em',
@@ -113,7 +115,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 						</div>
 						<div className="block-editor-hooks__layout-controls-reset">
 							<Button
-								isSecondary
+								variant="secondary"
 								isSmall
 								disabled={ ! contentSize && ! wideSize }
 								onClick={ () =>
@@ -144,8 +146,9 @@ function LayoutPanel( { setAttributes, attributes } ) {
 /**
  * Filters registered block settings, extending attributes to include `layout`.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	if ( has( settings.attributes, [ 'layout', 'type' ] ) ) {
@@ -166,8 +169,9 @@ export function addAttribute( settings ) {
 /**
  * Override the default edit UI to include layout controls
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
@@ -188,8 +192,9 @@ export const withInspectorControls = createHigherOrderComponent(
 /**
  * Override the default block element to add the layout styles.
  *
- * @param  {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
+ * @param {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
@@ -207,12 +212,18 @@ export const withLayoutStyles = createHigherOrderComponent(
 			`wp-container-${ id }`
 		);
 
+		const element = useContext( Head.context );
+
 		return (
 			<>
-				<LayoutStyle
-					selector={ `.wp-container-${ id }` }
-					layout={ usedLayout }
-				/>
+				{ element &&
+					createPortal(
+						<LayoutStyle
+							selector={ `.wp-container-${ id }` }
+							layout={ usedLayout }
+						/>,
+						element
+					) }
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);

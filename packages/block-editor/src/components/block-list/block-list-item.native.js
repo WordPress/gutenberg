@@ -73,7 +73,7 @@ export class BlockListItem extends Component {
 		) {
 			const isScreenWidthEqual = parentWidth === screenWidth;
 			if ( isScreenWidthEqual || isWider( screenWidth, 'mobile' ) ) {
-				return marginHorizontal * 2;
+				return marginHorizontal;
 			}
 		}
 

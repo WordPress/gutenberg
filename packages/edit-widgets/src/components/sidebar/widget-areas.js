@@ -61,7 +61,7 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 								'autofocus[panel]': 'widgets',
 								return: window.location.pathname,
 							} ) }
-							isTertiary
+							variant="tertiary"
 						>
 							{ __( 'Manage with live preview' ) }
 						</Button>

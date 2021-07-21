@@ -13,6 +13,7 @@ import { apiFetch } from '@wordpress/data-controls';
  * Internal dependencies
  */
 import { regularFetch } from './controls';
+import { STORE_NAME } from './name';
 
 /**
  * Internal dependencies
@@ -85,13 +86,13 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 	}
 
 	const lock = yield* __unstableAcquireStoreLock(
-		'core',
+		STORE_NAME,
 		[ 'entities', 'data', kind, name, key ],
 		{ exclusive: false }
 	);
 	try {
 		if ( query !== undefined && query._fields ) {
-			// If requesting specific fields, items and query assocation to said
+			// If requesting specific fields, items and query association to said
 			// records are stored by ID reference. Thus, fields must always include
 			// the ID.
 			query = {
@@ -122,7 +123,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 			// fields, so it's tested here, prior to initiating the REST request,
 			// and without causing `getEntityRecords` resolution to occur.
 			const hasRecords = yield controls.select(
-				'core',
+				STORE_NAME,
 				'hasEntityRecords',
 				kind,
 				name,
@@ -162,9 +163,9 @@ export const getEditedEntityRecord = ifNotResolved(
 /**
  * Requests the entity's records from the REST API.
  *
- * @param {string}  kind   Entity kind.
- * @param {string}  name   Entity name.
- * @param {Object?} query  Query Object.
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {Object?} query Query Object.
  */
 export function* getEntityRecords( kind, name, query = {} ) {
 	const entities = yield getKindEntities( kind );
@@ -174,13 +175,13 @@ export function* getEntityRecords( kind, name, query = {} ) {
 	}
 
 	const lock = yield* __unstableAcquireStoreLock(
-		'core',
+		STORE_NAME,
 		[ 'entities', 'data', kind, name ],
 		{ exclusive: false }
 	);
 	try {
 		if ( query._fields ) {
-			// If requesting specific fields, items and query assocation to said
+			// If requesting specific fields, items and query association to said
 			// records are stored by ID reference. Thus, fields must always include
 			// the ID.
 			query = {
@@ -271,7 +272,7 @@ export function* getThemeSupports() {
 /**
  * Requests a preview from the from the Embed API.
  *
- * @param {string} url   URL to get the preview for.
+ * @param {string} url URL to get the preview for.
  */
 export function* getEmbedPreview( url ) {
 	try {
@@ -369,7 +370,7 @@ export function* canUserEditEntityRecord( kind, name, recordId ) {
  */
 export function* getAutosaves( postType, postId ) {
 	const { rest_base: restBase } = yield controls.resolveSelect(
-		'core',
+		STORE_NAME,
 		'getPostType',
 		postType
 	);
@@ -392,13 +393,18 @@ export function* getAutosaves( postType, postId ) {
  * @param {number} postId   The id of the parent post.
  */
 export function* getAutosave( postType, postId ) {
-	yield controls.resolveSelect( 'core', 'getAutosaves', postType, postId );
+	yield controls.resolveSelect(
+		STORE_NAME,
+		'getAutosaves',
+		postType,
+		postId
+	);
 }
 
 /**
  * Retrieve the frontend template used for a given link.
  *
- * @param {string} link  Link.
+ * @param {string} link Link.
  */
 export function* __experimentalGetTemplateForLink( link ) {
 	// Ideally this should be using an apiFetch call
@@ -421,7 +427,7 @@ export function* __experimentalGetTemplateForLink( link ) {
 
 	yield getEntityRecord( 'postType', 'wp_template', template.id );
 	const record = yield controls.select(
-		'core',
+		STORE_NAME,
 		'getEntityRecord',
 		'postType',
 		'wp_template',

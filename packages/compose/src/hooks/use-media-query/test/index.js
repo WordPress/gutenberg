@@ -138,7 +138,8 @@ describe( 'useMediaQuery', () => {
 		await act( async () => {
 			root = create( <TestComponent /> );
 		} );
-		expect( root.toJSON() ).toBe( 'useMediaQuery: undefined' );
+		// query will be case to a boolean to simplify the return type.
+		expect( root.toJSON() ).toBe( 'useMediaQuery: false' );
 
 		await act( async () => {
 			root.update( <TestComponent query={ false } /> );

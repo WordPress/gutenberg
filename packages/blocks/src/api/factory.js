@@ -97,9 +97,9 @@ export function createBlocksFromInnerBlocksTemplate(
  * Given a block object, returns a copy of the block object while sanitizing its attributes,
  * optionally merging new attributes and/or replacing its inner blocks.
  *
- * @param {Object} block              Block instance.
- * @param {Object} mergeAttributes    Block attributes.
- * @param {?Array} newInnerBlocks     Nested blocks.
+ * @param {Object} block           Block instance.
+ * @param {Object} mergeAttributes Block attributes.
+ * @param {?Array} newInnerBlocks  Nested blocks.
  *
  * @return {Object} A cloned block.
  */
@@ -134,9 +134,9 @@ export function __experimentalCloneSanitizedBlock(
  * Given a block object, returns a copy of the block object,
  * optionally merging new attributes and/or replacing its inner blocks.
  *
- * @param {Object} block              Block instance.
- * @param {Object} mergeAttributes    Block attributes.
- * @param {?Array} newInnerBlocks     Nested blocks.
+ * @param {Object} block           Block instance.
+ * @param {Object} mergeAttributes Block attributes.
+ * @param {?Array} newInnerBlocks  Nested blocks.
  *
  * @return {Object} A cloned block.
  */
@@ -162,7 +162,7 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
  *
  * @param {Object} transform The transform object to validate.
  * @param {string} direction Is this a 'from' or 'to' transform.
- * @param {Array} blocks The blocks to transform from.
+ * @param {Array}  blocks    The blocks to transform from.
  *
  * @return {boolean} Is the transform possible?
  */
@@ -244,7 +244,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
  * Returns block types that the 'blocks' can be transformed into, based on
  * 'from' transforms on other blocks.
  *
- * @param {Array}  blocks  The blocks to transform from.
+ * @param {Array} blocks The blocks to transform from.
  *
  * @return {Array} Block types that the blocks can be transformed into.
  */
@@ -327,7 +327,7 @@ export const isWildcardBlockTransform = ( t ) =>
  * acts as a container Block for other Blocks as part of the
  * Grouping mechanics
  *
- * @param  {string} name the name of the Block to test against
+ * @param {string} name the name of the Block to test against
  *
  * @return {boolean} whether or not the Block is the container Block type
  */
@@ -399,8 +399,8 @@ export function findTransform( transforms, predicate ) {
  * If no block name is provided, returns transforms for all blocks. A normal
  * transform object includes `blockName` as a property.
  *
- * @param {string}  direction Transform direction ("to", "from").
- * @param {string|Object} blockTypeOrName  Block type or name.
+ * @param {string}        direction       Transform direction ("to", "from").
+ * @param {string|Object} blockTypeOrName Block type or name.
  *
  * @return {Array} Block transforms for direction.
  */

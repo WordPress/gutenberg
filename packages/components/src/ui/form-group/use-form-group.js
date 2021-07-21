@@ -1,17 +1,24 @@
 /**
  * External dependencies
  */
-import { cx } from 'emotion';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { cx } from '@emotion/css';
+
+/**
+ * WordPress dependencies
+ */
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
 import * as styles from './form-group-styles';
-import { useInstanceId } from '../utils';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
  */
 export function useFormGroup( props ) {
 	const {

@@ -22,6 +22,7 @@ import {
 } from './locks';
 import { createBatch } from './batch';
 import { getDispatch } from './controls';
+import { STORE_NAME } from './name';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -56,7 +57,7 @@ export function receiveCurrentUser( currentUser ) {
 /**
  * Returns an action object used in adding new entities.
  *
- * @param {Array} entities  Entities received.
+ * @param {Array} entities Entities received.
  *
  * @return {Object} Action object.
  */
@@ -140,8 +141,8 @@ export function receiveThemeSupports( themeSupports ) {
  * Returns an action object used in signalling that the preview data for
  * a given URl has been received.
  *
- * @param {string}  url     URL to preview the embed for.
- * @param {*}       preview Preview data.
+ * @param {string} url     URL to preview the embed for.
+ * @param {*}      preview Preview data.
  *
  * @return {Object} Action object.
  */
@@ -182,7 +183,7 @@ export function* deleteEntityRecord(
 	}
 
 	const lock = yield* __unstableAcquireStoreLock(
-		'core',
+		STORE_NAME,
 		[ 'entities', 'data', kind, name, recordId ],
 		{ exclusive: true }
 	);
@@ -236,17 +237,17 @@ export function* deleteEntityRecord(
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string} kind     Kind of the edited entity record.
- * @param {string} name     Name of the edited entity record.
- * @param {number} recordId Record ID of the edited entity record.
- * @param {Object} edits    The edits.
- * @param {Object} options  Options for the edit.
+ * @param {string}  kind               Kind of the edited entity record.
+ * @param {string}  name               Name of the edited entity record.
+ * @param {number}  recordId           Record ID of the edited entity record.
+ * @param {Object}  edits              The edits.
+ * @param {Object}  options            Options for the edit.
  * @param {boolean} options.undoIgnore Whether to ignore the edit in undo history or not.
  *
  * @return {Object} Action object.
  */
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const entity = yield controls.select( 'core', 'getEntity', kind, name );
+	const entity = yield controls.select( STORE_NAME, 'getEntity', kind, name );
 	if ( ! entity ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
@@ -254,14 +255,14 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
 	const record = yield controls.select(
-		'core',
+		STORE_NAME,
 		'getRawEntityRecord',
 		kind,
 		name,
 		recordId
 	);
 	const editedRecord = yield controls.select(
-		'core',
+		STORE_NAME,
 		'getEditedEntityRecord',
 		kind,
 		name,
@@ -306,7 +307,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
  * an entity record, if any.
  */
 export function* undo() {
-	const undoEdit = yield controls.select( 'core', 'getUndoEdit' );
+	const undoEdit = yield controls.select( STORE_NAME, 'getUndoEdit' );
 	if ( ! undoEdit ) {
 		return;
 	}
@@ -324,7 +325,7 @@ export function* undo() {
  * edit to an entity record, if any.
  */
 export function* redo() {
-	const redoEdit = yield controls.select( 'core', 'getRedoEdit' );
+	const redoEdit = yield controls.select( STORE_NAME, 'getRedoEdit' );
 	if ( ! redoEdit ) {
 		return;
 	}
@@ -374,7 +375,7 @@ export function* saveEntityRecord(
 	const recordId = record[ entityIdKey ];
 
 	const lock = yield* __unstableAcquireStoreLock(
-		'core',
+		STORE_NAME,
 		[ 'entities', 'data', kind, name, recordId || uuid() ],
 		{ exclusive: true }
 	);
@@ -385,7 +386,7 @@ export function* saveEntityRecord(
 			if ( typeof value === 'function' ) {
 				const evaluatedValue = value(
 					yield controls.select(
-						'core',
+						STORE_NAME,
 						'getEditedEntityRecord',
 						kind,
 						name,
@@ -419,7 +420,7 @@ export function* saveEntityRecord(
 				recordId ? '/' + recordId : ''
 			}`;
 			const persistedRecord = yield controls.select(
-				'core',
+				STORE_NAME,
 				'getRawEntityRecord',
 				kind,
 				name,
@@ -432,12 +433,12 @@ export function* saveEntityRecord(
 				// but ideally this should all be handled in the back end,
 				// so the client just sends and receives objects.
 				const currentUser = yield controls.select(
-					'core',
+					STORE_NAME,
 					'getCurrentUser'
 				);
 				const currentUserId = currentUser ? currentUser.id : undefined;
 				const autosavePost = yield controls.select(
-					'core',
+					STORE_NAME,
 					'getAutosave',
 					persistedRecord.type,
 					persistedRecord.id,
@@ -608,7 +609,7 @@ export function* __experimentalBatch( requests ) {
 	const api = {
 		saveEntityRecord( kind, name, record, options ) {
 			return batch.add( ( add ) =>
-				dispatch( 'core' ).saveEntityRecord( kind, name, record, {
+				dispatch( STORE_NAME ).saveEntityRecord( kind, name, record, {
 					...options,
 					__unstableFetch: add,
 				} )
@@ -616,7 +617,7 @@ export function* __experimentalBatch( requests ) {
 		},
 		saveEditedEntityRecord( kind, name, recordId, options ) {
 			return batch.add( ( add ) =>
-				dispatch( 'core' ).saveEditedEntityRecord(
+				dispatch( STORE_NAME ).saveEditedEntityRecord(
 					kind,
 					name,
 					recordId,
@@ -629,7 +630,7 @@ export function* __experimentalBatch( requests ) {
 		},
 		deleteEntityRecord( kind, name, recordId, query, options ) {
 			return batch.add( ( add ) =>
-				dispatch( 'core' ).deleteEntityRecord(
+				dispatch( STORE_NAME ).deleteEntityRecord(
 					kind,
 					name,
 					recordId,
@@ -660,7 +661,7 @@ export function* __experimentalBatch( requests ) {
 export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	if (
 		! ( yield controls.select(
-			'core',
+			STORE_NAME,
 			'hasEditsForEntityRecord',
 			kind,
 			name,
@@ -670,7 +671,7 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 		return;
 	}
 	const edits = yield controls.select(
-		'core',
+		STORE_NAME,
 		'getEntityRecordNonTransientEdits',
 		kind,
 		name,
@@ -683,11 +684,11 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 /**
  * Action triggered to save only specified properties for the entity.
  *
- * @param {string} kind     Kind of the entity.
- * @param {string} name     Name of the entity.
- * @param {Object} recordId ID of the record.
- * @param {Array} itemsToSave List of entity properties to save.
- * @param {Object} options  Saving options.
+ * @param {string} kind        Kind of the entity.
+ * @param {string} name        Name of the entity.
+ * @param {Object} recordId    ID of the record.
+ * @param {Array}  itemsToSave List of entity properties to save.
+ * @param {Object} options     Saving options.
  */
 export function* __experimentalSaveSpecifiedEntityEdits(
 	kind,
@@ -698,7 +699,7 @@ export function* __experimentalSaveSpecifiedEntityEdits(
 ) {
 	if (
 		! ( yield controls.select(
-			'core',
+			STORE_NAME,
 			'hasEditsForEntityRecord',
 			kind,
 			name,
@@ -708,7 +709,7 @@ export function* __experimentalSaveSpecifiedEntityEdits(
 		return;
 	}
 	const edits = yield controls.select(
-		'core',
+		STORE_NAME,
 		'getEntityRecordNonTransientEdits',
 		kind,
 		name,

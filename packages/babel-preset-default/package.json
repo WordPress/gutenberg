@@ -46,6 +46,6 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "./bin/index.js"
+		"build": "node ./bin/index.js"
 	}
 }

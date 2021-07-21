@@ -240,6 +240,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestSetFocalPointPickerTooltipShown(_ tooltipShown: Bool) {
         print("Gutenberg requested setting tooltip flag")
     }
+
+    func gutenbergDidRequestPreview() {
+        print(#function)
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -286,8 +290,9 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
-            .audioBlock: true,
-            .canViewEditorOnboarding: false
+            .isAudioBlockMediaUploadEnabled: true,
+            .reusableBlock: false,
+            .editorOnboarding: false
         ]
     }
 
@@ -295,7 +300,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return ExampleAttachmentDelegate()
     }
 
-    func gutenbergEditorTheme() -> GutenbergEditorTheme? {
+    func gutenbergEditorSettings() -> GutenbergEditorSettings? {
         return nil
     }
 

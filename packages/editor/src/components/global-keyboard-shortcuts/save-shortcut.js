@@ -5,13 +5,18 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 function SaveShortcut( { resetBlocksOnSave } ) {
-	const { resetEditorBlocks, savePost } = useDispatch( 'core/editor' );
+	const { resetEditorBlocks, savePost } = useDispatch( editorStore );
 	const { isEditedPostDirty, getPostEdits } = useSelect( ( select ) => {
 		const {
 			isEditedPostDirty: _isEditedPostDirty,
 			getPostEdits: _getPostEdits,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 
 		return {
 			isEditedPostDirty: _isEditedPostDirty,

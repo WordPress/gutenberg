@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { css, cx } from '@emotion/css';
 
 /**
  * WordPress dependencies
@@ -17,7 +20,7 @@ import { useResponsiveValue } from '../ui/utils/use-responsive-value';
 import CONFIG from '../utils/config-values';
 
 /**
- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
  */
 export default function useGrid( props ) {
 	const {
@@ -42,9 +45,9 @@ export default function useGrid( props ) {
 	const row = useResponsiveValue( rowsAsArray );
 
 	const gridTemplateColumns =
-		templateColumns || ( !! columns && `repeat(${ column }, 1fr)` );
+		templateColumns || ( !! columns && `repeat( ${ column }, 1fr )` );
 	const gridTemplateRows =
-		templateRows || ( !! rows && `repeat(${ row }, 1fr)` );
+		templateRows || ( !! rows && `repeat( ${ row }, 1fr )` );
 
 	const classes = useMemo( () => {
 		const alignmentProps = getAlignmentProps( alignment );

@@ -29,9 +29,6 @@ export default function Sidebar( {
 	isMenuBeingDeleted,
 	onDeleteMenu,
 	onSelectMenu,
-	isManageLocationsModalOpen,
-	closeManageLocationsModal,
-	openManageLocationsModal,
 	hasPermanentSidebar,
 } ) {
 	const { sidebar, hasBlockSelection, hasSidebarEnabled } = useSelect(
@@ -94,9 +91,6 @@ export default function Sidebar( {
 						menus={ menus }
 						selectedMenuId={ menuId }
 						onSelectMenu={ onSelectMenu }
-						isModalOpen={ isManageLocationsModalOpen }
-						closeModal={ closeManageLocationsModal }
-						openModal={ openManageLocationsModal }
 					/>
 					<DeleteMenu
 						onDeleteMenu={ onDeleteMenu }

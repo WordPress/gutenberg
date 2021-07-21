@@ -20,8 +20,9 @@ export const TEXT_DECORATION_SUPPORT_KEY =
 /**
  * Inspector control panel containing the text decoration options.
  *
- * @param  {Object} props Block properties.
- * @return {WPElement}    Text decoration edit element.
+ * @param {Object} props Block properties.
+ *
+ * @return {WPElement} Text decoration edit element.
  */
 export function TextDecorationEdit( props ) {
 	const {
@@ -57,8 +58,9 @@ export function TextDecorationEdit( props ) {
 /**
  * Checks if text-decoration settings have been disabled.
  *
- * @param  {string} name Name of the block.
- * @return {boolean}     Whether or not the setting is disabled.
+ * @param {string} name Name of the block.
+ *
+ * @return {boolean} Whether or not the setting is disabled.
  */
 export function useIsTextDecorationDisabled( { name: blockName } = {} ) {
 	const notSupported = ! hasBlockSupport(

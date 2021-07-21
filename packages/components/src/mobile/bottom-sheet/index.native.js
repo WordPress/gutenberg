@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -90,11 +91,6 @@ class BottomSheet extends Component {
 			isMaxHeightSet: true,
 			isFullScreen: this.props.isFullScreen || false,
 		};
-
-		SafeArea.getSafeAreaInsetsForRootView().then(
-			this.onSafeAreaInsetsUpdate
-		);
-		Dimensions.addEventListener( 'change', this.onDimensionsChange );
 	}
 
 	keyboardShow( e ) {
@@ -177,6 +173,10 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
+		SafeArea.getSafeAreaInsetsForRootView().then(
+			this.onSafeAreaInsetsUpdate
+		);
+
 		if ( Platform.OS === 'android' ) {
 			this.androidModalClosedSubscription = subscribeAndroidModalClosed(
 				() => {
@@ -184,6 +184,8 @@ class BottomSheet extends Component {
 				}
 			);
 		}
+
+		Dimensions.addEventListener( 'change', this.onDimensionsChange );
 
 		// 'Will' keyboard events are not available on Android.
 		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener
@@ -204,6 +206,7 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		Dimensions.removeEventListener( 'change', this.onDimensionsChange );
 		this.keyboardShowListener.remove();
 		this.keyboardHideListener.remove();
 		if ( this.androidModalClosedSubscription ) {
@@ -493,7 +496,7 @@ class BottomSheet extends Component {
 				backdropOpacity={ 0.2 }
 				onBackdropPress={ this.onCloseBottomSheet }
 				onBackButtonPress={ this.onHardwareButtonPress }
-				onSwipe={ this.onCloseBottomSheet }
+				onSwipeComplete={ this.onCloseBottomSheet }
 				onDismiss={ Platform.OS === 'ios' ? this.onDismiss : undefined }
 				onModalHide={
 					Platform.OS === 'android' ? this.onDismiss : undefined
@@ -508,7 +511,9 @@ class BottomSheet extends Component {
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
 				onAccessibilityEscape={ this.onCloseBottomSheet }
-				{ ...rest }
+				// We need to prevent overwriting the onDismiss prop,
+				// for this reason it is excluded from the rest object.
+				{ ...omit( rest, 'onDismiss' ) }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }

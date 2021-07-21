@@ -24,6 +24,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_font_size_support       = _wp_array_get( $typography_supports, array( 'fontSize' ), false );
 	$has_font_style_support      = _wp_array_get( $typography_supports, array( '__experimentalFontStyle' ), false );
 	$has_font_weight_support     = _wp_array_get( $typography_supports, array( '__experimentalFontWeight' ), false );
+	$has_letter_spacing_support  = _wp_array_get( $typography_supports, array( '__experimentalLetterSpacing' ), false );
 	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
@@ -32,6 +33,7 @@ function gutenberg_register_typography_support( $block_type ) {
 		|| $has_font_size_support
 		|| $has_font_style_support
 		|| $has_font_weight_support
+		|| $has_letter_spacing_support
 		|| $has_line_height_support
 		|| $has_text_decoration_support
 		|| $has_text_transform_support;
@@ -86,6 +88,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_font_size_support       = _wp_array_get( $typography_supports, array( 'fontSize' ), false );
 	$has_font_style_support      = _wp_array_get( $typography_supports, array( '__experimentalFontStyle' ), false );
 	$has_font_weight_support     = _wp_array_get( $typography_supports, array( '__experimentalFontWeight' ), false );
+	$has_letter_spacing_support  = _wp_array_get( $typography_supports, array( '__experimentalLetterSpacing' ), false );
 	$has_line_height_support     = _wp_array_get( $typography_supports, array( 'lineHeight' ), false );
 	$has_text_decoration_support = _wp_array_get( $typography_supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $typography_supports, array( '__experimentalTextTransform' ), false );
@@ -148,6 +151,13 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$text_transform_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textTransform', 'text-transform' );
 		if ( $text_transform_style ) {
 			$styles[] = $text_transform_style;
+		}
+	}
+
+	if ( $has_letter_spacing_support ) {
+		$letter_spacing_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'letterSpacing', 'letter-spacing' );
+		if ( $letter_spacing_style ) {
+			$styles[] = $letter_spacing_style;
 		}
 	}
 

@@ -32,11 +32,7 @@ import {
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
-import {
-	createBlock,
-	getBlockType,
-	switchToBlockType,
-} from '@wordpress/blocks';
+import { createBlock, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -91,7 +87,6 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { getBlock } = useSelect( blockEditorStore );
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -111,16 +106,46 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
+	const {
+		canInsertCover,
+		getBlock,
+		imageEditing,
+		imageSizes,
+		maxWidth,
+		mediaUpload,
+	} = useSelect(
 		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			return pick( getSettings(), [
+			const {
+				getBlock: _getBlock,
+				getBlockRootClientId,
+				getBlockTransformItems,
+				getSettings,
+			} = select( blockEditorStore );
+
+			const block = _getBlock( clientId );
+			const rootClientId = getBlockRootClientId( clientId );
+			const transformations = getBlockTransformItems(
+				[ block ],
+				rootClientId
+			);
+			const settings = pick( getSettings(), [
 				'imageEditing',
 				'imageSizes',
 				'maxWidth',
 				'mediaUpload',
 			] );
-		}
+
+			return {
+				...settings,
+				getBlock: _getBlock,
+				canInsertCover:
+					transformations?.length &&
+					!! transformations.find(
+						( { name } ) => name === 'core/cover'
+					),
+			};
+		},
+		[ clientId ]
 	);
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
@@ -140,9 +165,6 @@ export default function Image( {
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
 
-	// Check if the cover block is registered.
-	const coverBlockExists = !! getBlockType( 'core/cover' );
-
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
 	// we can enable a button in the toolbar to upload the image.
@@ -154,7 +176,9 @@ export default function Image( {
 		window
 			.fetch( url )
 			.then( ( response ) => response.blob() )
-			.then( ( blob ) => setExternalBlob( blob ) );
+			.then( ( blob ) => setExternalBlob( blob ) )
+			// Do nothing, cannot upload.
+			.catch( () => {} );
 	}, [ id, url, isSelected, externalBlob ] );
 
 	// Focus the caption after inserting an image from the placeholder. This is
@@ -297,7 +321,7 @@ export default function Image( {
 						label={ __( 'Upload external image' ) }
 					/>
 				) }
-				{ ! multiImageSelection && coverBlockExists && (
+				{ ! multiImageSelection && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }

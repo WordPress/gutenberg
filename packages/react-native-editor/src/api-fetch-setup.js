@@ -8,6 +8,7 @@ import apiFetch from '@wordpress/api-fetch';
 const SUPPORTED_ENDPOINTS = [
 	/wp\/v2\/(media|categories|blocks)\/?\d*?.*/i,
 	/wp\/v2\/search\?.*/i,
+	/oembed\/1\.0\/proxy\?.*/i,
 ];
 
 // [ONLY ON ANDROID] The requests made to these endpoints won't be cached.

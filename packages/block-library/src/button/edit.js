@@ -23,6 +23,7 @@ import {
 	InspectorAdvancedControls,
 	RichText,
 	useBlockProps,
+	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
@@ -49,7 +50,11 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 						<Button
 							key={ widthValue }
 							isSmall
-							isPrimary={ widthValue === selectedWidth }
+							variant={
+								widthValue === selectedWidth
+									? 'primary'
+									: undefined
+							}
 							onClick={ () => handleChange( widthValue ) }
 						>
 							{ widthValue }%
@@ -192,7 +197,7 @@ function ButtonEdit( props ) {
 		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
 	};
 
-	const borderRadius = style?.border?.radius;
+	const borderProps = useBorderProps( attributes );
 	const colorProps = useColorProps( attributes );
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
@@ -216,14 +221,15 @@ function ButtonEdit( props ) {
 						className,
 						'wp-block-button__link',
 						colorProps.className,
+						borderProps.className,
 						{
-							'no-border-radius': borderRadius === 0,
+							// For backwards compatibility add style that isn't
+							// provided via block support.
+							'no-border-radius': style?.border?.radius === 0,
 						}
 					) }
 					style={ {
-						borderRadius: borderRadius
-							? borderRadius + 'px'
-							: undefined,
+						...borderProps.style,
 						...colorProps.style,
 					} }
 					onSplit={ ( value ) =>

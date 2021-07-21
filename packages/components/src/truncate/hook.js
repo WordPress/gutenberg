@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+// Disable reason: Temporarily disable for existing usages
+// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+// eslint-disable-next-line no-restricted-imports
+import { css, cx } from '@emotion/css';
 
 /**
  * WordPress dependencies
@@ -16,7 +19,7 @@ import * as styles from './styles';
 import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
 
 /**
- * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'span'>} props
+ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
  */
 export default function useTruncate( props ) {
 	const {

@@ -32,7 +32,8 @@ function gutenberg_menu() {
 
 	if (
 		gutenberg_use_widgets_block_editor() &&
-		! function_exists( 'wp_use_widgets_block_editor' )
+		! function_exists( 'wp_use_widgets_block_editor' ) &&
+		current_theme_supports( 'widgets' )
 	) {
 		add_theme_page(
 			__( 'Widgets', 'gutenberg' ),
@@ -217,7 +218,7 @@ add_filter( 'rest_index', 'register_site_logo_to_rest_index' );
 add_theme_support( 'widgets-block-editor' );
 
 /**
- * Enable the block templates (editor mode) for themes with theme.json.
+ * Enable block templates (editor mode) for themes with theme.json.
  */
 function gutenberg_enable_block_templates() {
 	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
