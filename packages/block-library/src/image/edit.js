@@ -97,6 +97,7 @@ export function ImageEdit( {
 	noticeOperations,
 	onReplace,
 	clientId,
+	showDuotoneControls,
 } ) {
 	const {
 		url = '',
@@ -108,6 +109,13 @@ export function ImageEdit( {
 		height,
 		sizeSlug,
 	} = attributes;
+
+	// Hide and show duotone controls depending on when it should work.
+	const isDuotoneAvailable = !! url;
+	useEffect( () => {
+		showDuotoneControls( isDuotoneAvailable );
+	}, [ showDuotoneControls, isDuotoneAvailable ] );
+
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const altRef = useRef();

@@ -306,6 +306,7 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
+	showDuotoneControls,
 } ) {
 	const {
 		contentPosition,
@@ -320,6 +321,12 @@ function CoverEdit( {
 		style: styleAttribute,
 		url,
 	} = attributes;
+
+	const isDuotoneAvailable = !! url && ! hasParallax && ! isRepeated;
+	useEffect( () => {
+		showDuotoneControls( isDuotoneAvailable );
+	}, [ showDuotoneControls, isDuotoneAvailable ] );
+
 	const {
 		gradientClass,
 		gradientValue,

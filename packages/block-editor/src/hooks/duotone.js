@@ -11,7 +11,7 @@ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { SVG } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { useContext, createPortal } from '@wordpress/element';
+import { createPortal, useContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -198,6 +198,8 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const [ isDuotoneActive, setIsDuotoneActive ] = useState( true );
+
 		const hasDuotoneSupport = hasBlockSupport(
 			props.name,
 			'color.__experimentalDuotone'
@@ -205,8 +207,13 @@ const withDuotoneControls = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockEdit { ...props } />
-				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
+				<BlockEdit
+					{ ...props }
+					showDuotoneControls={ setIsDuotoneActive }
+				/>
+				{ hasDuotoneSupport && isDuotoneActive && (
+					<DuotonePanel { ...props } />
+				) }
 			</>
 		);
 	},
