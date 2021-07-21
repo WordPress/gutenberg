@@ -213,13 +213,10 @@ export default function SearchEdit( {
 			colorProps.className,
 			isButtonPositionInside ? undefined : borderProps.className
 		);
-		// const borderStyles = isButtonPositionInside
-		// 	? { borderRadius }
-		// 	: borderProps.style;
 		const buttonStyles = {
 			...colorProps.style,
 			...( isButtonPositionInside
-				? borderRadius
+				? { borderRadius }
 				: borderProps.style
 			)
 		};
