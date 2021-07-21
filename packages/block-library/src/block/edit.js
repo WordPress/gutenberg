@@ -15,6 +15,7 @@ import {
 	TextControl,
 	PanelBody,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -28,12 +29,18 @@ import {
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
+
+/**
+ * Internal dependencies
+ */
+import ReusableBlockWelcomeGuide from './reusable-block-welcome-guide';
 
 export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		ref
 	);
-	const { isMissing, hasResolved } = useSelect(
+	const { isMissing, hasResolved, hasEdits } = useSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
 				'postType',
@@ -47,9 +54,15 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				'wp_block',
 				ref,
 			] );
+			const blockHasEdits = select( coreStore ).hasEditsForEntityRecord(
+				'postType',
+				'wp_block',
+				ref
+			);
 			return {
 				hasResolved: hasResolvedBlock,
 				isMissing: hasResolvedBlock && ! persistedBlock,
+				hasEdits: blockHasEdits,
 			};
 		},
 		[ ref, clientId ]
@@ -84,6 +97,31 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				: InnerBlocks.ButtonBlockAppender,
 		}
 	);
+
+	// local states for gudie modal
+	const [ isGuideOpen, setIsGuideOpen ] = useState( false );
+
+	const { saveEditedEntityRecord } = useDispatch( coreStore );
+	const { createNotice } = useDispatch( noticesStore );
+
+	// save the unsaved records
+	const saveEditedRecords = () => {
+		saveEditedEntityRecord( 'postType', 'wp_block', ref );
+		showSnackbar();
+	};
+
+	const showSnackbar = () => {
+		createNotice( 'success', __( 'Reusable block saved.' ), {
+			type: 'snackbar',
+			isDismissible: true,
+			actions: [
+				{
+					label: __( 'Learn more' ),
+					onClick: () => setIsGuideOpen( true ),
+				},
+			],
+		} );
+	};
 
 	if ( hasAlreadyRendered ) {
 		return (
@@ -127,6 +165,18 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 							showTooltip
 						/>
 					</ToolbarGroup>
+					<ToolbarGroup>
+						<ToolbarButton
+							isPrimary
+							className="block-library-block__reusable-block-save-button"
+							onClick={ saveEditedRecords }
+							label={ __( 'Save reusable block' ) }
+							showTooltip
+							isDisabled={ ! hasEdits }
+						>
+							{ __( 'Save' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody>
@@ -142,6 +192,12 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 					wrapperProps={ innerBlocksProps }
 					className="block-library-block__reusable-block-container"
 				/>
+				{ isGuideOpen && (
+					<ReusableBlockWelcomeGuide
+						isGuideOpen={ isGuideOpen }
+						setIsGuideOpen={ setIsGuideOpen }
+					/>
+				) }
 			</div>
 		</RecursionProvider>
 	);

@@ -14,3 +14,47 @@
 		display: none;
 	}
 }
+
+// Styles for save button
+.components-toolbar-group {
+	.block-library-block__reusable-block-save-button {
+		margin: 7px;
+		height: $grid-unit-40;
+
+		// override the default box inset properties to match height and width of the save button
+		&::before {
+			left: 0 !important;
+			right: 0 !important;
+			height: $grid-unit-40 !important;
+		}
+	}
+}
+
+
+// Styles for Reusable Block Welcome Guide
+.edit-reusable-block-welcome-guide {
+	$image-height: 240px;
+	$image-width: 312px;
+	width: 312px;
+
+	&__heading {
+		font-family: $default-font;
+		font-size: 24px;
+		line-height: 1.4;
+		margin: $grid-unit-20 0 $grid-unit-20 0;
+		padding: 0 $grid-unit-40;
+	}
+
+	&__text {
+		font-size: $default-font-size;
+		line-height: 1.4;
+		margin: 0 0 $grid-unit-30 0;
+		padding: 0 $grid-unit-40;
+	}
+
+	&__image {
+		background: #00a0d2;
+		height: 240px;
+		margin: 0 0 $grid-unit-20;
+	}
+}
