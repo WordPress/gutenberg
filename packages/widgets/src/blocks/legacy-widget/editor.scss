@@ -16,7 +16,7 @@ $wide-header-height: 46px;
 	&.is-wide {
 		flex-direction: column;
 		position: fixed;
-		top: max(#{$wide-header-height}, var(--budge-top, 0));
+		top: max(#{$wide-header-height}, var(--align-top, 0));
 		left: 299px;
 		min-width: 300px;
 		width: calc(100vw - 299px);

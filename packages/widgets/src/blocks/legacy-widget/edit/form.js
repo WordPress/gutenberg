@@ -19,7 +19,7 @@ import { closeSmall } from '@wordpress/icons';
  * Internal dependencies
  */
 import Control from './control';
-import { useBudgeTopBy } from './utils';
+import { useAlignTopWithinViewport } from './utils';
 
 export default function Form( {
 	title,
@@ -109,7 +109,7 @@ export default function Form( {
 
 	if ( isWide ) {
 		return (
-			<WideFormDialog isVisible={ isVisible }>
+			<WideFormDialog isVisible={ isVisible } onClose={ onClose }>
 				{ formCore }
 			</WideFormDialog>
 		);
@@ -125,16 +125,19 @@ export default function Form( {
 	);
 }
 
-function WideFormDialog( { isVisible, children } ) {
-	const containerRef = useRef();
-	const [ dialogRef, dialogProps ] = useDialog( { focusOnMount: false } );
+function WideFormDialog( { isVisible, onClose, children } ) {
+	const ref = useRef();
+	const [ dialogRef, dialogProps ] = useDialog( {
+		focusOnMount: false,
+		onClose,
+	} );
 	const {
-		ref: budgeRef,
+		ref: alignTopRef,
 		resizeObserver,
-	} = useBudgeTopBy( containerRef.current, { isEnabled: isVisible } );
+	} = useAlignTopWithinViewport( ref.current, { isEnabled: isVisible } );
 	return (
 		<div
-			ref={ containerRef }
+			ref={ ref }
 			className={ classnames( 'wp-block-legacy-widget__container', {
 				'is-visible': isVisible,
 			} ) }
@@ -142,7 +145,7 @@ function WideFormDialog( { isVisible, children } ) {
 			<Fill name="Popover">
 				<div
 					className="wp-block-legacy-widget__edit-form is-wide"
-					ref={ useMergeRefs( [ dialogRef, budgeRef ] ) }
+					ref={ useMergeRefs( [ dialogRef, alignTopRef ] ) }
 					{ ...dialogProps }
 					hidden={ ! isVisible }
 				>
