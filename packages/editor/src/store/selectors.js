@@ -543,6 +543,10 @@ export function isEditedPostSaveable( state ) {
 		return false;
 	}
 
+	if ( isPostLocked( state ) ) {
+		return false;
+	}
+
 	// TODO: Post should not be saveable if not dirty. Cannot be added here at
 	// this time since posts where meta boxes are present can be saved even if
 	// the post is not dirty. Currently this restriction is imposed at UI, but
@@ -1151,7 +1155,7 @@ export function getPermalinkParts( state ) {
  * @return {boolean} Is locked.
  */
 export function isPostLocked( state ) {
-	return state.postLock.isLocked;
+	return state.postLock?.isLocked ?? false;
 }
 
 /**

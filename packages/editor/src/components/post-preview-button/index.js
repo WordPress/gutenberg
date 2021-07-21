@@ -190,7 +190,7 @@ export class PostPreviewButton extends Component {
 	}
 
 	render() {
-		const { previewLink, currentPostLink, isSaveable, role } = this.props;
+		const { previewLink, currentPostLink, role } = this.props;
 
 		// Link to the `?preview=true` URL if we have it, since this lets us see
 		// changes that were autosaved since the post was last published. Otherwise,
@@ -210,7 +210,6 @@ export class PostPreviewButton extends Component {
 				className={ classNames }
 				href={ href }
 				target={ this.getWindowTarget() }
-				disabled={ ! isSaveable }
 				onClick={ this.openPreviewWindow }
 				ref={ this.buttonRef }
 				role={ role }
@@ -239,7 +238,6 @@ export default compose( [
 			getCurrentPostId,
 			getCurrentPostAttribute,
 			getEditedPostAttribute,
-			isEditedPostSaveable,
 			isEditedPostAutosaveable,
 			getEditedPostPreviewLink,
 			isPostLocked,
@@ -254,7 +252,6 @@ export default compose( [
 			currentPostLink: getCurrentPostAttribute( 'link' ),
 			previewLink:
 				forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
-			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
 			isDraft:

@@ -57,7 +57,6 @@ describe( 'PostPreviewButton', () => {
 				<PostPreviewButton
 					postId={ 1 }
 					currentPostLink="https://wordpress.org/?p=1"
-					isSaveable
 					modified="2017-08-03T15:05:50"
 				/>
 			);
@@ -153,7 +152,6 @@ describe( 'PostPreviewButton', () => {
 			const wrapper = shallow(
 				<PostPreviewButton
 					postId={ 1 }
-					isSaveable
 					previewLink="https://wordpress.org/?p=1&preview=true"
 					currentPostLink="https://wordpress.org/?p=1"
 				/>
@@ -166,23 +164,11 @@ describe( 'PostPreviewButton', () => {
 			const wrapper = shallow(
 				<PostPreviewButton
 					postId={ 1 }
-					isSaveable
 					currentPostLink="https://wordpress.org/?p=1"
 				/>
 			);
 
 			expect( wrapper ).toMatchSnapshot();
-		} );
-
-		it( 'should be disabled if post is not saveable', () => {
-			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					currentPostLink="https://wordpress.org/?p=1"
-				/>
-			);
-
-			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 	} );
 } );
