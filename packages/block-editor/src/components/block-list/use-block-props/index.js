@@ -99,7 +99,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				index: getBlockIndex( clientId, rootClientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
-				blockTitle: blockType.title,
+				blockTitle: blockType?.title,
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
@@ -107,7 +107,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					! isTyping() &&
 					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 				lightBlockWrapper:
-					blockType.apiVersion > 1 ||
+					blockType?.apiVersion > 1 ||
 					hasBlockSupport( blockType, 'lightBlockWrapper', false ),
 			};
 		},
@@ -139,7 +139,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	const blockEditContext = useBlockEditContext();
 	// Ensures it warns only inside the `edit` implementation for the block.
-	if ( ! lightBlockWrapper && clientId === blockEditContext.clientId ) {
+	if (
+		name &&
+		! lightBlockWrapper &&
+		clientId === blockEditContext.clientId
+	) {
 		warning(
 			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
 		);

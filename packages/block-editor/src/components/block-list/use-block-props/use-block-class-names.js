@@ -39,9 +39,14 @@ export function useBlockClassNames( clientId ) {
 				__experimentalSpotlightEntityBlocks: spotlightEntityBlocks,
 				outlineMode,
 			} = getSettings();
+			const name = getBlockName( clientId );
+
+			if ( ! name ) {
+				return;
+			}
+
 			const isDragging = isBlockBeingDragged( clientId );
 			const isSelected = isBlockSelected( clientId );
-			const name = getBlockName( clientId );
 			const checkDeep = true;
 			// "ancestor" is the more appropriate label due to "deep" check
 			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
