@@ -16,6 +16,7 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
+export { AspectRatio as __experimentalAspectRatio } from './aspect-ratio';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,

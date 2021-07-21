@@ -678,6 +678,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "AspectRatio",
+		"slug": "aspect-ratio",
+		"markdown_source": "../packages/components/src/aspect-ratio/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Autocomplete",
 		"slug": "autocomplete",
 		"markdown_source": "../packages/components/src/autocomplete/README.md",
