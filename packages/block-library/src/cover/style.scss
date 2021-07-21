@@ -104,7 +104,13 @@
 	.wp-block-cover__inner-container {
 		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
-		color: $white;
+
+	}
+
+	&.is-dark-theme {
+		.wp-block-cover__inner-container {
+			color: $white;
+		}
 	}
 
 	p,
