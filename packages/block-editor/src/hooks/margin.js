@@ -31,7 +31,7 @@ export function hasMarginSupport( blockType ) {
 /**
  * Checks if there is a current value in the margin block support attributes.
  *
- * @param  {Object} props Block props.
+ * @param {Object} props Block props.
  * @return {boolean}      Whether or not the block has a margin value set.
  */
 export function hasMarginValue( props ) {
@@ -50,13 +50,13 @@ export function resetMargin( { attributes = {}, setAttributes } ) {
 	const { style } = attributes;
 
 	setAttributes( {
-		style: {
+		style: cleanEmptyObject( {
 			...style,
 			spacing: {
 				...style?.spacing,
 				margin: undefined,
 			},
-		},
+		} ),
 	} );
 }
 

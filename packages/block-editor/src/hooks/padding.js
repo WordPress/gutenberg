@@ -31,7 +31,7 @@ export function hasPaddingSupport( blockType ) {
 /**
  * Checks if there is a current value in the padding block support attributes.
  *
- * @param  {Object} props Block props.
+ * @param {Object} props Block props.
  * @return {boolean}      Whether or not the block has a padding value set.
  */
 export function hasPaddingValue( props ) {
@@ -50,13 +50,13 @@ export function resetPadding( { attributes = {}, setAttributes } ) {
 	const { style } = attributes;
 
 	setAttributes( {
-		style: {
+		style: cleanEmptyObject( {
 			...style,
 			spacing: {
 				...style?.spacing,
 				padding: undefined,
 			},
-		},
+		} ),
 	} );
 }
 
