@@ -88,7 +88,12 @@ const renderQueue = createQueue();
  *
  * @return {Function}  A custom react hook.
  */
-export default function useSelect( _mapSelect, deps ) {
+export default function useSelect( _mapSelect, deps, { debug } = {} ) {
+	function debugLog( ...args ) {
+		if ( debug ) {
+			console.log( ...args );
+		}
+	}
 	const isWithoutMapping = typeof _mapSelect !== 'function';
 
 	if ( isWithoutMapping ) {
@@ -194,6 +199,7 @@ export default function useSelect( _mapSelect, deps ) {
 						return;
 					}
 					latestMapOutput.current = newMapOutput;
+					debugLog( '> useSelect: UPDATE', latestMapOutput.current );
 				} catch ( error ) {
 					latestMapOutputError.current = error;
 				}
@@ -229,5 +235,6 @@ export default function useSelect( _mapSelect, deps ) {
 		};
 	}, [ registry, trapSelect, depsChangedFlag, isWithoutMapping ] );
 
+	debugLog( '> useSelect: RETURN', mapOutput );
 	return isWithoutMapping ? registry.select( _mapSelect ) : mapOutput;
 }
