@@ -19,7 +19,7 @@
 				"sticky": "",
 				"inherit": true
 			},
-			"layout": {
+			"displayLayout": {
 				"type": "list"
 			}
 		},

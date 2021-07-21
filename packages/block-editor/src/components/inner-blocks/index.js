@@ -55,7 +55,8 @@ function UncontrolledInnerBlocks( props ) {
 		allowedBlocks,
 		templateLock,
 		captureToolbars,
-		orientation
+		orientation,
+		__experimentalLayout
 	);
 
 	useInnerBlockTemplateSync(

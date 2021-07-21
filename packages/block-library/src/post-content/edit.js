@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useMemo, RawHTML } from '@wordpress/element';
+import { RawHTML } from '@wordpress/element';
 import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -46,21 +46,6 @@ function EditableContent( { layout, context = {} } ) {
 	}, [] );
 	const defaultLayout = useSetting( 'layout' ) || {};
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
-	const { contentSize, wideSize } = usedLayout;
-	const _layout = useMemo( () => {
-		if ( themeSupportsLayout ) {
-			const alignments =
-				contentSize || wideSize
-					? [ 'wide', 'full', 'left', 'center', 'right' ]
-					: [ 'left', 'center', 'right' ];
-			return {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments,
-			};
-		}
-		return undefined;
-	}, [ themeSupportsLayout, contentSize, wideSize ] );
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -73,7 +58,7 @@ function EditableContent( { layout, context = {} } ) {
 			value: blocks,
 			onInput,
 			onChange,
-			__experimentalLayout: _layout,
+			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 		}
 	);
 	return <div { ...props } />;
