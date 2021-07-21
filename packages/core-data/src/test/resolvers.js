@@ -120,8 +120,18 @@ describe( 'getEntityRecords', () => {
 		page: { slug: 'page', id: 2 },
 	};
 	const ENTITIES = [
-		{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
-		{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
+		{
+			name: 'postType',
+			kind: 'root',
+			baseURL: '/wp/v2/types',
+			baseURLParams: { context: 'edit' },
+		},
+		{
+			name: 'postType',
+			kind: 'root',
+			baseURL: '/wp/v2/types',
+			baseURLParams: { context: 'edit' },
+		},
 	];
 
 	it( 'yields with requested post type', async () => {

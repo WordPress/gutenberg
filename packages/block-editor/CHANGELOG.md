@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.2.0 (2021-07-21)
+
 ### New Features
 
 -   `ButtonBlockerAppender` is now `ButtonBlockAppender`, the original name was a typo, but is still being exported for backward compatibility.

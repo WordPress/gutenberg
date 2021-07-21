@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from 'emotion';
-
-/**
  * WordPress dependencies
  */
 import warn from '@wordpress/warning';
@@ -14,6 +9,7 @@ import warn from '@wordpress/warning';
 import { useComponentsContext } from './context-system-provider';
 import { getNamespace, getConnectedNamespace } from './utils';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @template TProps
@@ -51,6 +47,8 @@ export function useContextSystem( props, namespace ) {
 	const initialMergedProps = Object.entries( otherContextProps ).length
 		? Object.assign( {}, otherContextProps, props )
 		: props;
+
+	const cx = useCx();
 
 	const classes = cx(
 		getStyledClassNameFromKey( namespace ),

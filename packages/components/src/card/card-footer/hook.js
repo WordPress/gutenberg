@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from 'emotion';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -13,6 +8,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
@@ -26,6 +22,8 @@ export function useCardFooter( props ) {
 		size = 'medium',
 		...otherProps
 	} = useContextSystem( props, 'CardFooter' );
+
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
