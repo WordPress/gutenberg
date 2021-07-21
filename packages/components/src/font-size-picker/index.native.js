@@ -62,10 +62,10 @@ function FontSizePicker( {
 					value={
 						selectedValue
 							? sprintf(
-									// translators: %1$s: Select control font size e.g. 12px , %2$s: Select control font size name e.g. Small
+									// translators: %1$s: Select control font size name e.g. Small, %2$s: Select control font size e.g. 12px
 									__( '%1$s (%2$s)' ),
-									selectedValue,
-									selectedOption.name
+									selectedOption.name,
+									selectedValue
 							  )
 							: __( 'Default' )
 					}
