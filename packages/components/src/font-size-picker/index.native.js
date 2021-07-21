@@ -1,0 +1,171 @@
+/**
+ * External dependencies
+ */
+import { Text, View } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
+import { useNavigation } from '@react-navigation/native';
+import { useState } from '@wordpress/element';
+import { Icon, chevronRight, check } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import { BottomSheet } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { default as UnitControl, useCustomUnits } from '../unit-control';
+import styles from './style.scss';
+
+function FontSizePicker( {
+	fontSizes = [],
+	disableCustomFontSizes = false,
+	onChange,
+	value: selectedValue,
+} ) {
+	const [ showSubSheet, setShowSubSheet ] = useState( false );
+	const navigation = useNavigation();
+
+	const onChangeValue = ( value ) => {
+		return () => {
+			goBack();
+			onChange( value );
+		};
+	};
+
+	const selectedOption = fontSizes.find(
+		( option ) => option.size === selectedValue
+	) ?? { label: 'Custom' };
+
+	const goBack = () => {
+		setShowSubSheet( false );
+		navigation.goBack();
+	};
+
+	const openSubSheet = () => {
+		navigation.navigate( BottomSheet.SubSheet.screenName );
+		setShowSubSheet( true );
+	};
+
+	const label = __( 'Font Size' );
+
+	const units = useCustomUnits( {
+		availableUnits: [ 'px', 'em', 'rem' ],
+	} );
+
+	return (
+		<BottomSheet.SubSheet
+			navigationButton={
+				<BottomSheet.Cell
+					label={ label }
+					separatorType="none"
+					value={ selectedValue ? selectedValue : 'Default' }
+					onPress={ openSubSheet }
+					accessibilityRole={ 'button' }
+					accessibilityLabel={ selectedOption.label }
+					accessibilityHint={ sprintf(
+						// translators: %s: Select control button label e.g. "Button width"
+						__( 'Navigates to select %s' ),
+						selectedOption.label
+					) }
+				>
+					<Icon icon={ chevronRight }></Icon>
+				</BottomSheet.Cell>
+			}
+			showSheet={ showSubSheet }
+		>
+			<>
+				<BottomSheet.NavigationHeader
+					screen={ label }
+					leftButtonOnPress={ goBack }
+				/>
+				<View style={ styles[ 'components-font-size-picker' ] }>
+					<BottomSheet.Cell
+						customActionButton
+						separatorType="none"
+						label={ __( 'Default' ) }
+						onPress={ onChangeValue( undefined ) }
+						leftAlign={ true }
+						key={ 'default' }
+						accessibilityRole={ 'button' }
+						accessibilityLabel={ __( 'Selected: Default' ) }
+						accessibilityHint={ __(
+							'Double tap to select default font size'
+						) }
+					>
+						<View>
+							{ selectedValue === undefined && (
+								<Icon icon={ check }></Icon>
+							) }
+						</View>
+					</BottomSheet.Cell>
+					{ fontSizes.map( ( item, index ) => (
+						<BottomSheet.Cell
+							customActionButton
+							separatorType="none"
+							label={
+								<>
+									{ item.name }{ ' ' }
+									<Text
+										style={
+											styles[
+												'components-font-size-picker__font-size'
+											]
+										}
+									>
+										{ item.size }
+									</Text>
+								</>
+							}
+							onPress={ onChangeValue( item.size ) }
+							leftAlign={ true }
+							key={ index }
+							accessibilityRole={ 'button' }
+							accessibilityLabel={
+								item.size === selectedValue
+									? sprintf(
+											// translators: %s: Select control option value e.g: "Auto, 25%".
+											__( 'Selected: %s' ),
+											item.name
+									  )
+									: item.name
+							}
+							accessibilityHint={ __(
+								'Double tap to select font size'
+							) }
+						>
+							<View>
+								{ item.size === selectedValue && (
+									<Icon icon={ check }></Icon>
+								) }
+							</View>
+						</BottomSheet.Cell>
+					) ) }
+					{ ! disableCustomFontSizes && (
+						<UnitControl
+							label={ __( 'Custom' ) }
+							min={ 0 }
+							max={ 200 }
+							step={ 1 }
+							value={ selectedValue }
+							onChange={ ( nextSize ) => {
+								if (
+									0 === parseFloat( nextSize ) ||
+									! nextSize
+								) {
+									onChange( undefined );
+								} else {
+									onChange( nextSize );
+								}
+							} }
+							units={ units }
+						/>
+					) }
+				</View>
+			</>
+		</BottomSheet.SubSheet>
+	);
+}
+
+export default FontSizePicker;
