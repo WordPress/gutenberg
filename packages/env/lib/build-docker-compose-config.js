@@ -150,13 +150,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 		phpunitTag = '5' + phpunitPhpVersion;
 	} else if ( testsPhpVersion === '7.0' ) {
 		phpunitTag = '6' + phpunitPhpVersion;
-	} else if ( testsPhpVersion === '7.1' ) {
-		phpunitTag = '7' + phpunitPhpVersion;
-	} else if ( [ '7.2', '7.3', '7.4' ].indexOf( testsPhpVersion ) >= 0 ) {
-		phpunitTag = '8' + phpunitPhpVersion;
-	} else if ( testsPhpVersion === '8.0' ) {
-		phpunitTag = '9' + phpunitPhpVersion;
 	}
+	// Note: the WP tests lib does not yet support PHPunit above 7, so we keep it at "latest" in that case.
 	const phpunitImage = `wordpressdevelop/phpunit:${ phpunitTag }`;
 
 	// The www-data user in wordpress:cli has a different UID (82) to the
