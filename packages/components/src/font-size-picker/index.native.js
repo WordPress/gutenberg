@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -36,7 +36,7 @@ function FontSizePicker( {
 
 	const selectedOption = fontSizes.find(
 		( option ) => option.size === selectedValue
-	) ?? { label: 'Custom' };
+	) ?? { name: 'Custom' };
 
 	const goBack = () => {
 		setShowSubSheet( false );
@@ -47,7 +47,6 @@ function FontSizePicker( {
 		navigation.navigate( BottomSheet.SubSheet.screenName );
 		setShowSubSheet( true );
 	};
-
 	const label = __( 'Font Size' );
 
 	const units = useCustomUnits( {
@@ -60,14 +59,23 @@ function FontSizePicker( {
 				<BottomSheet.Cell
 					label={ label }
 					separatorType="none"
-					value={ selectedValue ? selectedValue : 'Default' }
+					value={
+						selectedValue
+							? sprintf(
+									// translators: %1$s: Select control font size e.g. 12px , %2$s: Select control font size name e.g. Small
+									__( '%1$s (%2$s)' ),
+									selectedValue,
+									selectedOption.name
+							  )
+							: __( 'Default' )
+					}
 					onPress={ openSubSheet }
 					accessibilityRole={ 'button' }
-					accessibilityLabel={ selectedOption.label }
+					accessibilityLabel={ selectedOption.name }
 					accessibilityHint={ sprintf(
-						// translators: %s: Select control button label e.g. "Button width"
+						// translators: %s: Select control button label e.g. Small
 						__( 'Navigates to select %s' ),
-						selectedOption.label
+						selectedOption.name
 					) }
 				>
 					<Icon icon={ chevronRight }></Icon>
@@ -104,20 +112,8 @@ function FontSizePicker( {
 						<BottomSheet.Cell
 							customActionButton
 							separatorType="none"
-							label={
-								<>
-									{ item.name }{ ' ' }
-									<Text
-										style={
-											styles[
-												'components-font-size-picker__font-size'
-											]
-										}
-									>
-										{ item.size }
-									</Text>
-								</>
-							}
+							label={ item.name }
+							subLabel={ item.size }
 							onPress={ onChangeValue( item.size ) }
 							leftAlign={ true }
 							key={ index }
