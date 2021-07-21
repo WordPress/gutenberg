@@ -1086,6 +1086,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ProgressiveDisclosurePanel",
+		"slug": "progressive-disclosure-panel",
+		"markdown_source": "../packages/components/src/progressive-disclosure-panel/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "QueryControls",
 		"slug": "query-controls",
 		"markdown_source": "../packages/components/src/query-controls/README.md",
