@@ -52,6 +52,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'text' ],
 		support: [ 'color' ],
 	},
+	columnCount: {
+		value: [ 'typography', 'columnCount' ],
+		support: [ 'typography', '__experimentalColumnCount' ],
+	},
 	linkColor: {
 		value: [ 'elements', 'link', 'color', 'text' ],
 		support: [ 'color', 'link' ],

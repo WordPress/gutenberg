@@ -6,6 +6,7 @@ import {
 	__experimentalFontFamilyControl as FontFamilyControl,
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 	__experimentalLetterSpacingControl as LetterSpacingControl,
+	__experimentalColumnCountControl as ColumnCountControl,
 } from '@wordpress/block-editor';
 import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -19,10 +20,13 @@ export function useHasTypographyPanel( { supports, name } ) {
 	const hasLineHeight = useHasLineHeightControl( { supports, name } );
 	const hasFontAppearance = useHasAppearanceControl( { supports, name } );
 	const hasLetterSpacing = useHasLetterSpacingControl( { supports, name } );
+	const hasColumnCount = useHasColumnCountControl( { supports, name } );
+
 	return (
 		hasLineHeight ||
 		hasFontAppearance ||
 		hasLetterSpacing ||
+		hasColumnCount ||
 		supports.includes( 'fontSize' )
 	);
 }
@@ -51,6 +55,13 @@ function useHasLetterSpacingControl( { supports, name } ) {
 	);
 }
 
+function useHasColumnCountControl( { supports, name } ) {
+	return (
+		useSetting( 'typography.customColumnCount', name ) &&
+		supports.includes( 'columnCount' )
+	);
+}
+
 export default function TypographyPanel( {
 	context: { supports, name },
 	getStyle,
@@ -71,6 +82,10 @@ export default function TypographyPanel( {
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
 	const hasAppearanceControl = useHasAppearanceControl( { supports, name } );
 	const hasLetterSpacingControl = useHasLetterSpacingControl( {
+		supports,
+		name,
+	} );
+	const hasColumnCountControl = useHasColumnCountControl( {
 		supports,
 		name,
 	} );
@@ -123,6 +138,14 @@ export default function TypographyPanel( {
 					value={ getStyle( name, 'letterSpacing' ) }
 					onChange={ ( value ) =>
 						setStyle( name, 'letterSpacing', value )
+					}
+				/>
+			) }
+			{ hasColumnCountControl && (
+				<ColumnCountControl
+					value={ getStyle( name, 'columnCount' ) }
+					onChange={ ( value ) =>
+						setStyle( name, 'columnCount', value )
 					}
 				/>
 			) }

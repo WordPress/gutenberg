@@ -16,7 +16,11 @@ describe( 'getInlineStyles', () => {
 		expect(
 			getInlineStyles( {
 				color: { text: 'red', background: 'black' },
-				typography: { lineHeight: 1.5, fontSize: 10 },
+				typography: {
+					columnCount: 2,
+					fontSize: 10,
+					lineHeight: 1.5,
+				},
 				border: {
 					radius: '10px',
 					width: '1em',
@@ -35,6 +39,7 @@ describe( 'getInlineStyles', () => {
 			borderStyle: 'dotted',
 			borderWidth: '1em',
 			color: 'red',
+			columnCount: 2,
 			lineHeight: 1.5,
 			fontSize: 10,
 			marginBottom: '15px',

@@ -65,6 +65,7 @@ class WP_Theme_JSON_Gutenberg {
 			'padding' => null,
 		),
 		'typography' => array(
+			'columnCount'    => null,
 			'fontFamily'     => null,
 			'fontSize'       => null,
 			'fontStyle'      => null,
@@ -103,6 +104,7 @@ class WP_Theme_JSON_Gutenberg {
 			'units'         => null,
 		),
 		'typography' => array(
+			'customColumnCount'     => null,
 			'customFontSize'        => null,
 			'customFontStyle'       => null,
 			'customFontWeight'      => null,
@@ -217,6 +219,7 @@ class WP_Theme_JSON_Gutenberg {
 		'border-width'               => array( 'border', 'width' ),
 		'border-style'               => array( 'border', 'style' ),
 		'color'                      => array( 'color', 'text' ),
+		'column-count'               => array( 'typography', 'columnCount' ),
 		'font-family'                => array( 'typography', 'fontFamily' ),
 		'font-size'                  => array( 'typography', 'fontSize' ),
 		'font-style'                 => array( 'typography', 'fontStyle' ),

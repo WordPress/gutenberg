@@ -179,6 +179,7 @@
 			"customLineHeight": false,
 			"customFontStyle": true,
 			"customFontWeight": true,
+			"customColumnCount": false,
 			"customTextTransforms": true,
 			"customTextDecorations": true,
 			"customLetterSpacing": true,

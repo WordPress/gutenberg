@@ -16,6 +16,11 @@ import InspectorControls from '../components/inspector-controls';
 import TextDecorationAndTransformEdit from '../components/text-decoration-and-transform';
 
 import {
+	COLUMN_COUNT_SUPPORT_KEY,
+	ColumnCountEdit,
+	useIsColumnCountDisabled,
+} from './column-count';
+import {
 	LINE_HEIGHT_SUPPORT_KEY,
 	LineHeightEdit,
 	useIsLineHeightDisabled,
@@ -60,6 +65,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
+	COLUMN_COUNT_SUPPORT_KEY,
 ];
 
 export function TypographyPanel( props ) {
@@ -77,6 +83,7 @@ export function TypographyPanel( props ) {
 				<LineHeightEdit { ...props } />
 				<TextDecorationAndTransformEdit { ...props } />
 				<LetterSpacingEdit { ...props } />
+				<ColumnCountEdit { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -97,6 +104,7 @@ function useIsTypographyDisabled( props = {} ) {
 		useIsFontSizeDisabled( props ),
 		useIsLineHeightDisabled( props ),
 		useIsFontFamilyDisabled( props ),
+		useIsColumnCountDisabled( props ),
 		useIsTextDecorationDisabled( props ),
 		useIsTextTransformDisabled( props ),
 		useIsLetterSpacingDisabled( props ),
