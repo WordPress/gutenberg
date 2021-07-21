@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.3.0 (2021-07-21)
+
 ## Breaking Changes
 
 -   Removes the `core/legacy-widget` block. This is now in `@wordpress/widgets`
