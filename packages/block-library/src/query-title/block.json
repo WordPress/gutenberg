@@ -11,6 +11,12 @@
 			"type": "string",
 			"default": "Query title"
 		},
+		"searchTitleContent": {
+			"type": "string"
+		},
+		"nothingFoundTitleContent": {
+			"type": "string"
+		},
 		"textAlign": {
 			"type": "string"
 		},

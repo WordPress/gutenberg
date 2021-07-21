@@ -23,10 +23,16 @@ import { useEffect } from '@wordpress/element';
  */
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
-const SUPPORTED_TEMPLATES = [ 'archive', 'search', '404' ];
+const SUPPORTED_TEMPLATES = [ 'archive', 'search', '404', 'index' ];
 
 export default function QueryTitleEdit( {
-	attributes: { content, level, textAlign },
+	attributes: {
+		content,
+		searchTitleContent,
+		nothingFoundTitleContent,
+		level,
+		textAlign,
+	},
 	setAttributes,
 	context: { templateSlug },
 } ) {
@@ -41,29 +47,39 @@ export default function QueryTitleEdit( {
 	);
 	let titleElement;
 
+	// translators: Title for index template.
+	const defaultTitle = _x(
+		'Query title placeholder',
+		'index template title'
+	);
+
+	// translators: Title for 404 template.
+	const nothingFoundTitle = _x( 'Nothing found', '404 template title' );
+
+	// translators: Title for archive template.
+	const archiveTitle = _x(
+		'Archive title placeholder',
+		'archive template title'
+	);
+
+	// translators: Title for search template with dynamic content placeholders.
+	const searchTitle = _x(
+		'Search results for "%search%"',
+		'search template title'
+	);
+
 	// Infer title content from template slug context
 	// Defaults to content attribute prop
 	switch ( templateSlug ) {
 		case 'archive':
 			titleElement = (
-				<TagName { ...blockProps }>
-					{
-						// translators: Title for archive template.
-						_x( 'Archive title', 'archive template title' )
-					}
-				</TagName>
+				<TagName { ...blockProps }>{ archiveTitle }</TagName>
 			);
 			break;
 		case 'search':
-			// translators: Title for search template with dynamic content placeholders.
-			const placeholderContent = _x(
-				'Search results for "%search%"',
-				'search template title'
-			);
-
 			// Use placeholder content if new Query Title block is added
 			if ( content === 'Query title' ) {
-				content = placeholderContent;
+				content = searchTitle;
 			}
 
 			titleElement = (
@@ -71,7 +87,7 @@ export default function QueryTitleEdit( {
 					<RichText
 						tagName={ TagName }
 						value={ content }
-						placeholder={ placeholderContent }
+						placeholder={ content }
 						allowedFormats={ [ 'core/bold', 'core/italic' ] }
 						onChange={ ( newContent ) =>
 							setAttributes( { content: newContent } )
@@ -82,9 +98,14 @@ export default function QueryTitleEdit( {
 			);
 			break;
 		case '404':
-			// translators: Title for 404 template.
-			content = _x( 'Nothing found', '404 template title' );
-			titleElement = <TagName { ...blockProps }>{ content }</TagName>;
+			titleElement = (
+				<TagName { ...blockProps }>{ nothingFoundTitle }</TagName>
+			);
+			break;
+		case 'index':
+			titleElement = (
+				<TagName { ...blockProps }>{ defaultTitle }</TagName>
+			);
 			break;
 		default:
 			titleElement = <TagName { ...blockProps }>{ content }</TagName>;
@@ -96,6 +117,8 @@ export default function QueryTitleEdit( {
 		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( {
 			content,
+			searchTitleContent: searchTitle,
+			nothingFoundTitleContent: nothingFoundTitle,
 		} );
 	}, [] );
 

@@ -17,14 +17,18 @@
 function render_block_core_query_title( $attributes ) {
 	$is_search  = is_search();
 	$is_archive = is_archive();
+	$is_404     = is_404();
 	$title      = isset( $attributes['content'] ) ? $attributes['content'] : '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
 	} elseif ( $is_search ) {
+		$title = isset( $attributes['searchTitleContent'] ) ? $attributes['searchTitleContent'] : '';
 		global $wp_query;
 		$formats      = array( '%total%', '%search%' );
 		$replacements = array( $wp_query->found_posts, get_search_query() );
 		$title        = str_replace( $formats, $replacements, $title );
+	} elseif ( $is_404 ) {
+		$title = isset( $attributes['nothingFoundTitleContent'] ) ? $attributes['nothingFoundTitleContent'] : '';
 	}
 	$tag_name           = isset( $attributes['level'] ) ? 'h' . (int) $attributes['level'] : 'h1';
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
