@@ -40,7 +40,7 @@ exports[`Quote can be converted to paragraphs and renders only one paragraph for
 
 exports[`Quote can be created by converting a heading 1`] = `
 "<!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>test</p></blockquote>
+<blockquote class=\\"wp-block-quote\\" id=\\"test\\"><p>test</p></blockquote>
 <!-- /wp:quote -->"
 `;
 
@@ -144,7 +144,7 @@ exports[`Quote can be split in the middle and merged back 4`] = `
 
 exports[`Quote is transformed to a heading and a quote if the quote contains a citation 1`] = `
 "<!-- wp:heading -->
-<h2>one</h2>
+<h2 id=\\"one\\">one</h2>
 <!-- /wp:heading -->
 
 <!-- wp:quote -->
@@ -154,7 +154,7 @@ exports[`Quote is transformed to a heading and a quote if the quote contains a c
 
 exports[`Quote is transformed to a heading and a quote if the quote contains multiple paragraphs 1`] = `
 "<!-- wp:heading -->
-<h2>one</h2>
+<h2 id=\\"one\\">one</h2>
 <!-- /wp:heading -->
 
 <!-- wp:quote -->
@@ -164,7 +164,7 @@ exports[`Quote is transformed to a heading and a quote if the quote contains mul
 
 exports[`Quote is transformed to a heading if the quote just contains one paragraph 1`] = `
 "<!-- wp:heading -->
-<h2>one</h2>
+<h2 id=\\"one\\">one</h2>
 <!-- /wp:heading -->"
 `;
 
@@ -176,7 +176,7 @@ exports[`Quote is transformed to an empty heading if the quote is empty 1`] = `
 
 exports[`Quote the resuling quote after transforming to a heading can be transformed again 1`] = `
 "<!-- wp:heading -->
-<h2>one</h2>
+<h2 id=\\"one\\">one</h2>
 <!-- /wp:heading -->
 
 <!-- wp:quote -->
@@ -186,11 +186,11 @@ exports[`Quote the resuling quote after transforming to a heading can be transfo
 
 exports[`Quote the resuling quote after transforming to a heading can be transformed again 2`] = `
 "<!-- wp:heading -->
-<h2>one</h2>
+<h2 id=\\"one\\">one</h2>
 <!-- /wp:heading -->
 
 <!-- wp:heading -->
-<h2>two</h2>
+<h2 id=\\"two\\">two</h2>
 <!-- /wp:heading -->
 
 <!-- wp:quote -->
@@ -200,14 +200,14 @@ exports[`Quote the resuling quote after transforming to a heading can be transfo
 
 exports[`Quote the resuling quote after transforming to a heading can be transformed again 3`] = `
 "<!-- wp:heading -->
-<h2>one</h2>
+<h2 id=\\"one\\">one</h2>
 <!-- /wp:heading -->
 
 <!-- wp:heading -->
-<h2>two</h2>
+<h2 id=\\"two\\">two</h2>
 <!-- /wp:heading -->
 
 <!-- wp:heading -->
-<h2>cite</h2>
+<h2 id=\\"cite\\">cite</h2>
 <!-- /wp:heading -->"
 `;
