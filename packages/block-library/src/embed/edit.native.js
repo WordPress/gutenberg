@@ -59,7 +59,7 @@ const EmbedEdit = ( props ) => {
 		isSelected && wasBlockJustInserted && ! url
 	);
 
-	const { preview, fetching, cannotEmbed } = useSelect(
+	const { preview, fetching, cannotEmbed, embedPreviewResponse } = useSelect(
 		( select ) => {
 			const {
 				getEmbedPreview,
@@ -87,6 +87,7 @@ const EmbedEdit = ( props ) => {
 				preview: validPreview ? embedPreview : undefined,
 				fetching: isRequestingEmbedPreview( attributesUrl ),
 				cannotEmbed: ! validPreview || previewIsFallback,
+				embedPreviewResponse: embedPreview,
 			};
 		},
 		[ attributesUrl ]
@@ -148,7 +149,7 @@ const EmbedEdit = ( props ) => {
 
 	const blockProps = useBlockProps();
 
-	if ( fetching ) {
+	if ( fetching || ( attributesUrl && ! embedPreviewResponse ) ) {
 		return (
 			<View { ...blockProps }>
 				<EmbedLoading />
