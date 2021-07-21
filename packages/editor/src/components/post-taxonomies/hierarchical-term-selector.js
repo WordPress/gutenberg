@@ -11,11 +11,12 @@ import { useMemo, useState } from '@wordpress/element';
 import {
 	Button,
 	CheckboxControl,
+	TextControl,
 	TreeSelect,
 	withFilters,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useDebounce, useInstanceId } from '@wordpress/compose';
+import { useDebounce } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 
@@ -152,7 +153,6 @@ export function getFilterMatcher( filterValue ) {
  * @return {WPElement}        Hierarchical term selector component.
  */
 function HierarchicalTermSelector( { slug } ) {
-	const instanceId = useInstanceId( HierarchicalTermSelector );
 	const [ adding, setAdding ] = useState( false );
 	const [ formName, setFormName ] = useState( '' );
 	/**
@@ -265,10 +265,8 @@ function HierarchicalTermSelector( { slug } ) {
 		onUpdateTerms( newTerms );
 	};
 
-	const onChangeFormName = ( event ) => {
-		const newValue =
-			event.target.value.trim() === '' ? '' : event.target.value;
-		setFormName( newValue );
+	const onChangeFormName = ( value ) => {
+		setFormName( value );
 	};
 
 	/**
@@ -326,8 +324,7 @@ function HierarchicalTermSelector( { slug } ) {
 		onUpdateTerms( [ ...terms, newTerm.id ] );
 	};
 
-	const setFilter = ( event ) => {
-		const value = event.target.value;
+	const setFilter = ( value ) => {
 		const newFilteredTermsTree = availableTermsTree
 			.map( getFilterMatcher( filterValue ) )
 			.filter( ( term ) => term );
@@ -407,8 +404,6 @@ function HierarchicalTermSelector( { slug } ) {
 	);
 	const noParentOption = `— ${ parentSelectLabel } —`;
 	const newTermSubmitLabel = newTermButtonLabel;
-	const inputId = `editor-post-taxonomies__hierarchical-terms-input-${ instanceId }`;
-	const filterInputId = `editor-post-taxonomies__hierarchical-terms-filter-${ instanceId }`;
 	const filterLabel = get(
 		taxonomy,
 		[ 'labels', 'search_items' ],
@@ -420,15 +415,11 @@ function HierarchicalTermSelector( { slug } ) {
 	return (
 		<>
 			{ showFilter && (
-				<label htmlFor={ filterInputId }>{ filterLabel }</label>
-			) }
-			{ showFilter && (
-				<input
-					type="search"
-					id={ filterInputId }
+				<TextControl
+					className="editor-post-taxonomies__hierarchical-terms-filter"
+					label={ filterLabel }
 					value={ filterValue }
 					onChange={ setFilter }
-					className="editor-post-taxonomies__hierarchical-terms-filter"
 				/>
 			) }
 			<div
@@ -453,16 +444,9 @@ function HierarchicalTermSelector( { slug } ) {
 			) }
 			{ showForm && (
 				<form onSubmit={ onAddTerm }>
-					<label
-						htmlFor={ inputId }
-						className="editor-post-taxonomies__hierarchical-terms-label"
-					>
-						{ newTermLabel }
-					</label>
-					<input
-						type="text"
-						id={ inputId }
+					<TextControl
 						className="editor-post-taxonomies__hierarchical-terms-input"
+						label={ newTermLabel }
 						value={ formName }
 						onChange={ onChangeFormName }
 						required

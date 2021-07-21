@@ -213,7 +213,7 @@
 		"spacing": {
 			"customMargin": false,
 			"customPadding": false,
-			"units": [ "px", "em", "rem", "vh", "vw" ]
+			"units": [ "px", "em", "rem", "vh", "vw", "%" ]
 		},
 		"border": {
 			"customColor": false,
@@ -225,6 +225,14 @@
 			"core/button": {
 				"border": {
 					"customRadius": true
+				}
+			},
+			"core/pullquote": {
+				"border": {
+					"customColor": true,
+					"customRadius": true,
+					"customStyle": true,
+					"customWidth": true
 				}
 			}
 		}

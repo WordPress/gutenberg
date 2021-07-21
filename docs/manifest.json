@@ -1152,6 +1152,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "SegmentedControl",
+		"slug": "segmented-control",
+		"markdown_source": "../packages/components/src/segmented-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "SelectControl",
 		"slug": "select-control",
 		"markdown_source": "../packages/components/src/select-control/README.md",

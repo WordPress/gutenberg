@@ -69,7 +69,7 @@ export default function BorderPanel( {
 	setStyle,
 } ) {
 	const units = useCustomUnits( {
-		availableUnits: [ 'px', 'em', 'rem' ],
+		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
 	} );
 
 	// Border width.
