@@ -144,7 +144,7 @@ function getSuggestionsQuery( type, kind ) {
  * 4: Theme colors
  * 5: Global styles
  *
- * @param {Object} context
+ * @param {Object}  context
  * @param {boolean} isSubMenu
  */
 function getColors( context, isSubMenu ) {
@@ -266,6 +266,78 @@ export const updateNavigationLinkBlockAttributes = (
 	} );
 };
 
+const useIsInvalidLink = ( kind, type, id ) => {
+	const isPostType =
+		'post-type' === kind || 'post' === type || 'page' === type;
+	const hasId = Number.isInteger( id );
+	const postStatus = useSelect(
+		( select ) => {
+			if ( ! isPostType ) {
+				return null;
+			}
+			const { getEntityRecord } = select( coreStore );
+			return getEntityRecord( 'postType', type, id )?.status;
+		},
+		[ isPostType, type, id ]
+	);
+
+	// Check Navigation Link validity if:
+	// 1. Link is 'post-type'.
+	// 2. It has an id.
+	// 3. It's neither null, nor undefined, as valid items might be either of those while loading.
+	// If those conditions are met, check if
+	// 1. The post status is published.
+	// 2. The Navigation Link item has no label.
+	// If either of those is true, invalidate.
+	const isInvalid =
+		isPostType && hasId && postStatus && 'publish' !== postStatus;
+
+	return isInvalid;
+};
+
+const useMissingText = ( type, isInvalid ) => {
+	let missingText = '';
+
+	switch ( type ) {
+		case 'post':
+			/* translators: label for missing post in navigation link block */
+			missingText = __( 'Select post' );
+			break;
+		case 'page':
+			/* translators: label for missing page in navigation link block */
+			missingText = __( 'Select page' );
+			break;
+		case 'category':
+			/* translators: label for missing category in navigation link block */
+			missingText = __( 'Select category' );
+			break;
+		case 'tag':
+			/* translators: label for missing tag in navigation link block */
+			missingText = __( 'Select tag' );
+			break;
+		default:
+			/* translators: label for missing values in navigation link block */
+			missingText = __( 'Add link' );
+	}
+
+	return (
+		<>
+			<span>{ missingText }</span>
+			{ isInvalid && (
+				<span className="wp-block-navigation-link__invalid-item">
+					{ ' ' }
+					(
+					{ __(
+						/* translators: Whether or not the navigation link is invalid. */
+						'Invalid'
+					) }
+					)
+				</span>
+			) }
+		</>
+	);
+};
+
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -277,6 +349,7 @@ export default function NavigationLinkEdit( {
 	clientId,
 } ) {
 	const {
+		id,
 		label,
 		type,
 		opensInNewTab,
@@ -298,6 +371,7 @@ export default function NavigationLinkEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
+	const isInvalid = useIsInvalidLink( kind, type, id );
 
 	const {
 		isAtMaxNesting,
@@ -471,7 +545,7 @@ export default function NavigationLinkEdit( {
 		},
 	} );
 
-	if ( ! url ) {
+	if ( ! url || isInvalid ) {
 		blockProps.onClick = () => setIsLinkOpen( true );
 	}
 
@@ -511,31 +585,10 @@ export default function NavigationLinkEdit( {
 	);
 
 	const classes = classnames( 'wp-block-navigation-link__content', {
-		'wp-block-navigation-link__placeholder': ! url,
+		'wp-block-navigation-link__placeholder': ! url || isInvalid,
 	} );
 
-	let missingText = '';
-	switch ( type ) {
-		case 'post':
-			/* translators: label for missing post in navigation link block */
-			missingText = __( 'Select post' );
-			break;
-		case 'page':
-			/* translators: label for missing page in navigation link block */
-			missingText = __( 'Select page' );
-			break;
-		case 'category':
-			/* translators: label for missing category in navigation link block */
-			missingText = __( 'Select category' );
-			break;
-		case 'tag':
-			/* translators: label for missing tag in navigation link block */
-			missingText = __( 'Select tag' );
-			break;
-		default:
-			/* translators: label for missing values in navigation link block */
-			missingText = __( 'Add link' );
-	}
+	const missingText = useMissingText( type, isInvalid );
 
 	return (
 		<Fragment>
@@ -599,7 +652,7 @@ export default function NavigationLinkEdit( {
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
-					{ ! url ? (
+					{ ! url || isInvalid ? (
 						<div className="wp-block-navigation-link__placeholder-text">
 							<KeyboardShortcuts
 								shortcuts={ {
