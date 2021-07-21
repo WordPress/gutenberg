@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.0.0 (2021-07-21)
+
 ### Breaking Changes
 
 -   The deprecated `registerBlockTypeFromMetadata` function was removed. Please use `registerBlockType` that covers the same functionality ([#32030](https://github.com/WordPress/gutenberg/pull/32030)).
