@@ -1,7 +1,7 @@
 module.exports = {
 	rules: {
 		curly: 'error',
-		eqeqeq: 'error',
+		eqeqeq: [ 'error', 'always', { null: 'ignore' } ],
 		'no-caller': 'error',
 		'no-cond-assign': [ 'error', 'except-parens' ],
 		'no-eq-null': 'error',
