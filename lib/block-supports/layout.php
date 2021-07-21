@@ -63,7 +63,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$style = '';
 	if ( $content_size || $wide_size ) {
-		$style  = ".wp-container-$id > * {";
+		$style  = ".wp-container-$id > *:not([class*='wp-container-']) {";
 		$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 		$style .= 'margin-left: auto !important;';
 		$style .= 'margin-right: auto !important;';
