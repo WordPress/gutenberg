@@ -525,7 +525,7 @@ if ( ! function_exists( 'wp_migrate_old_typography_shape' ) ) {
  *
  * @return void
  */
-function gutenberg_enqueue_block_style( $block_name, $args ) {
+function wp_enqueue_block_style( $block_name, $args ) {
 	$args = wp_parse_args(
 		$args,
 		array(
@@ -599,7 +599,7 @@ function gutenberg_multiple_block_styles( $metadata ) {
 		if ( ! empty( $metadata[ $key ] ) && is_array( $metadata[ $key ] ) ) {
 			$default_style = array_shift( $metadata[ $key ] );
 			foreach ( $metadata[ $key ] as $handle ) {
-				gutenberg_enqueue_block_style( $metadata['name'], array( 'handle' => $handle ) );
+				wp_enqueue_block_style( $metadata['name'], array( 'handle' => $handle ) );
 			}
 
 			// Only return the 1st item in the array.
