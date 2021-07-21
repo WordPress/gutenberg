@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.4.0 (2021-07-21)
+
 ### Enhancement
 
 -   Plugin scaffolded with the `esnext` template requires WordPress 5.8 now ([#33252](https://github.com/WordPress/gutenberg/pull/33252).
