@@ -55,6 +55,11 @@ async function runWordPressReleaseBranchSyncStep(
 		'Getting into the WordPress release branch',
 		abortMessage,
 		async () => {
+			const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
+			const pluginReleaseBranch = findReleaseBranchName(
+				packageJsonPath
+			);
+
 			// Creating the release branch
 			await git.checkoutRemoteBranch(
 				gitWorkingDirectoryPath,
@@ -67,12 +72,6 @@ async function runWordPressReleaseBranchSyncStep(
 			);
 
 			if ( [ 'latest', 'next' ].includes( releaseType ) ) {
-				const packageJsonPath =
-					gitWorkingDirectoryPath + '/package.json';
-				const pluginReleaseBranch = findReleaseBranchName(
-					packageJsonPath
-				);
-
 				await askForConfirmation(
 					`The branch is ready for sync with the latest plugin release changes applied to "${ pluginReleaseBranch }". Proceed?`,
 					true,
