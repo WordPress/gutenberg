@@ -1,7 +1,7 @@
 buildscript {
     ext {
         gradlePluginVersion = '4.0.2'
-        kotlinVersion = '1.3.61'
+        kotlinVersion = '1.5.20'
         supportLibVersion = '29.0.2'
         tagSoupVersion = '1.2.1'
         glideVersion = '3.7.0'
@@ -12,10 +12,16 @@ buildscript {
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
         aztecVersion = 'v1.3.45'
-        willPublishReactNativeAztecBinary = properties["publishReactNativeAztecVersion"]?.trim() as boolean
+        willPublishReactNativeAztecBinary = properties["willPublishReactNativeAztecBinary"]?.toBoolean() ?: false
     }
 
     repositories {
+        maven {
+            url 'https://a8c-libs.s3.amazonaws.com/android'
+            content {
+                includeGroup 'com.automattic.android'
+            }
+        }
         jcenter()
         google()
     }
@@ -24,13 +30,14 @@ buildscript {
         classpath "com.android.tools.build:gradle:$gradlePluginVersion"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath 'com.automattic.android:publish-to-s3:0.6.1'
     }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'maven-publish'
+apply plugin: 'com.automattic.android.publish-to-s3'
 
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
@@ -116,34 +123,27 @@ dependencies {
     }
 }
 
-if (willPublishReactNativeAztecBinary) {
-    project.afterEvaluate {
-        publishing {
-            publications {
-                ReactNativeAztecPublication(MavenPublication) {
-                    artifact bundleReleaseAar
+project.afterEvaluate {
+    publishing {
+        publications {
+            ReactNativeAztecPublication(MavenPublication) {
+                artifact bundleReleaseAar
 
-                    groupId 'org.wordpress-mobile.gutenberg-mobile'
-                    artifactId 'react-native-aztec'
-                    version publishReactNativeAztecVersion
+                groupId 'org.wordpress-mobile.gutenberg-mobile'
+                artifactId 'react-native-aztec'
+                // version is set by 'publish-to-s3' plugin
 
-                    addDependenciesToPom(pom)
-                }
-            }
-            repositories {
-                maven {
-                    url "s3://a8c-libs.s3.amazonaws.com/android"
-                    credentials(AwsCredentials) {
-                        accessKey project.hasProperty('awsAccessKey') ? project.properties['awsAccessKey'] : System.getenv('AWS_ACCESS_KEY')
-                        secretKey project.hasProperty('awsSecretKey') ? project.properties['awsSecretKey'] : System.getenv('AWS_SECRET_KEY')
-                    }
-                }
+                addDependenciesToPom(pom)
             }
         }
-    }
+   }
 }
 
-// Publication doesn't know about dependencies, so we need to manually add them
+publishToS3Plugin {
+    mavenPublishGroupId 'org.wordpress-mobile.gutenberg-mobile'
+    mavenPublishArtifactId 'react-native-aztec'
+}
+
 def addDependenciesToPom(pom) {
     pom.withXml {
         def dependenciesNode = asNode().getAt('dependencies')[0] ?: asNode().appendNode('dependencies')
@@ -159,24 +159,3 @@ def addDependenciesToPom(pom) {
                 }
     }
 }
-
-tasks.register('checkIfVersionIsAlreadyPublished') {
-    def pomUrl = "https://a8c-libs.s3.amazonaws.com/android/org/wordpress-mobile/gutenberg-mobile/react-native-aztec/${publishReactNativeAztecVersion}/react-native-aztec-${publishReactNativeAztecVersion}.pom"
-    def responseCode = new URL(pomUrl).openConnection().with { connection ->
-        requestMethod = 'HEAD'
-        connect()
-        responseCode
-    }
-
-    if (responseCode == 200) {
-        throw new GradleException("'$publishReactNativeAztecVersion' is already published, please use a different version name. If this happened in CI for a PR, a new commit is necessary. If this happened for a tag, the existing version needs to be manually removed from S3.")
-    } else if (responseCode == 403 || responseCode == 404) {
-        // If a file doesn't exist, which is what we want, S3 returns 403 if we don't have the List ACL or 404 if we do have the List ACL. Proceed to publish in those cases.
-    } else {
-        throw new GradleException("An unexpected status code ($responseCode) was received while checking if the version ($publishReactNativeAztecVersion) is already published to S3. If this issue persists, please contact Platform 9 team for help.")
-    }
-}
-
-publish.dependsOn(tasks.named('checkIfVersionIsAlreadyPublished'))
-publish.doLast { println "Successfully published 'react-native-aztec' version '$publishReactNativeAztecVersion'" }
-
