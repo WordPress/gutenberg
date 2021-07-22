@@ -26,17 +26,15 @@ function Example() {
 
 ## Props
 
-##### ratio
+### `ratio`: `number`
 
--   Type: `number`
 -   Required: No
 -   Default: `1`
 
 The width:height ratio to render.
 
-##### width
+### `width`: `CSSProperties[ 'width' ]`
 
--   Type: `CSSProperties[ 'width' ]`
 -   Required: No
 
 A custom width.
