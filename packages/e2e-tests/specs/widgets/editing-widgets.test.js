@@ -842,6 +842,7 @@ describe( 'Widgets screen', () => {
 		await page.keyboard.type( 'Second Paragraph' );
 
 		await saveWidgets();
+		await page.focus( '.block-editor-writing-flow' );
 
 		// Delete the last block and save again.
 		await pressKeyWithModifier( 'access', 'z' );
