@@ -130,6 +130,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Block] Legacy Widget': 'Widgets Editor',
 	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
+	'Accessibility (a11y)': 'Accessibility',
 };
 
 /**
