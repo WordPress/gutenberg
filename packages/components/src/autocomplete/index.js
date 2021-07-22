@@ -266,7 +266,6 @@ function useAutocomplete( {
 		// Any handled keycode should prevent original behavior. This relies on
 		// the early return in the default case.
 		event.preventDefault();
-		event.stopPropagation();
 	}
 
 	let textContent;
