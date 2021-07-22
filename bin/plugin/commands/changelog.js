@@ -109,6 +109,8 @@ const LABEL_FEATURE_MAPPING = {
 	'[Feature] Component System': 'Components',
 	'[Feature] Template Editing Mode': 'Template Editor',
 	'[Feature] Writing Flow': 'Block Editor',
+	'[Feature] Pattern Directory': 'Patterns',
+	'[Feature] Patterns': 'Patterns',
 	'[Feature] Blocks': 'Block Library',
 	'[Feature] Inserter': 'Block Editor',
 	'[Feature] Drag and Drop': 'Block Editor',
