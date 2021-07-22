@@ -4,13 +4,18 @@
 const glob = require( 'glob' ).sync;
 
 const defaultPlatform = 'android';
-const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
-if ( process.env.TEST_RN_PLATFORM ) {
+const selectedPlatform = process.env.TEST_RN_PLATFORM;
+const rnPlatform = selectedPlatform || defaultPlatform;
+if ( selectedPlatform ) {
 	// eslint-disable-next-line no-console
-	console.log( 'Setting RN platform to: ' + process.env.TEST_RN_PLATFORM );
+	console.log(
+		`=== Running '${ selectedPlatform }' platform test files ===`
+	);
 } else {
 	// eslint-disable-next-line no-console
-	console.log( 'Setting RN platform to: default (' + defaultPlatform + ')' );
+	console.log(
+		`=== Running default test files (using '${ defaultPlatform }' as default platform) ===`
+	);
 }
 
 const configPath = 'test/native';
@@ -18,6 +23,13 @@ const configPath = 'test/native';
 const transpiledPackageNames = glob( '../../packages/*/src/index.js' ).map(
 	( fileName ) => fileName.split( '/' )[ 3 ]
 );
+
+const testMatch = selectedPlatform
+	? [ `**/test/*.${ selectedPlatform }.[jt]s?(x)` ]
+	: [
+			`**/test/*.native.[jt]s?(x)`,
+			'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
+	  ];
 
 module.exports = {
 	verbose: true,
@@ -30,10 +42,7 @@ module.exports = {
 		'<rootDir>/' + configPath + '/enzyme.config.js',
 	],
 	testEnvironment: 'jsdom',
-	testMatch: [
-		'**/test/*.native.[jt]s?(x)',
-		'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
-	],
+	testMatch,
 	testPathIgnorePatterns: [
 		'/node_modules/',
 		'/__device-tests__/',
