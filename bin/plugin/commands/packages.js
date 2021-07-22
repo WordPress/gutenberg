@@ -65,6 +65,7 @@ async function runWordPressReleaseBranchSyncStep(
 				gitWorkingDirectoryPath,
 				wordpressReleaseBranch
 			);
+			await git.fetch( gitWorkingDirectoryPath, [ '--depth=100' ] );
 			log(
 				'>> The local release branch ' +
 					formats.success( wordpressReleaseBranch ) +
