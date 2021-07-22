@@ -18,6 +18,20 @@ export function addActiveFormats( value, activeFormats ) {
 }
 
 /**
+ * Normalizes a given string of HTML to remove the Windows specific "Fragment" comments
+ * and any preceeding and trailing whitespace.
+ *
+ * @param {string} html the html to be normalized
+ * @return {string} the normalized html
+ */
+export function normalizeCopiedHtml( html ) {
+	const startReg = new RegExp( '.*<!--StartFragment-->', 's' );
+	const endReg = new RegExp( '<!--EndFragment-->.*', 's' );
+
+	return html.replace( startReg, '' ).replace( endReg, '' );
+}
+
+/**
  * Get the multiline tag based on the multiline prop.
  *
  * @param {?(string|boolean)} multiline The multiline prop.

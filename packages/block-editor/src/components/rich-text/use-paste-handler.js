@@ -18,15 +18,8 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import { filePasteHandler } from './file-paste-handler';
-import { addActiveFormats, isShortcode } from './utils';
+import { addActiveFormats, isShortcode, normalizeCopiedHtml } from './utils';
 import { splitValue } from './split-value';
-
-function normalizePastedHtml( html ) {
-	const startReg = new RegExp( '.*<!--StartFragment-->', 's' );
-	const endReg = new RegExp( '<!--EndFragment-->.*', 's' );
-
-	return html.replace( startReg, '' ).replace( endReg, '' );
-}
 
 export function usePasteHandler( props ) {
 	const propsRef = useRef( props );
@@ -76,7 +69,8 @@ export function usePasteHandler( props ) {
 				}
 			}
 
-			html = normalizePastedHtml( html );
+			// Remove OS-specific metadata appended within copied HTML text.
+			html = normalizeCopiedHtml( html );
 
 			event.preventDefault();
 
