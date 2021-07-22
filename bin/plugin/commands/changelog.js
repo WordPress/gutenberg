@@ -131,6 +131,9 @@ const LABEL_FEATURE_MAPPING = {
 	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
 	'Accessibility (a11y)': 'Accessibility',
+	'[Package] E2E Tests': 'Testing',
+	'[Package] E2E Test Utils': 'Testing',
+	'Automated Testing': 'Testing',
 };
 
 /**
