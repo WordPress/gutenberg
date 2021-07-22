@@ -8,8 +8,7 @@
 	"usesContext": [ "templateSlug" ],
 	"attributes": {
 		"content": {
-			"type": "string",
-			"default": "Query title placeholder"
+			"type": "string"
 		},
 		"searchTitle": {
 			"type": "string"
