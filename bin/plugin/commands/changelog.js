@@ -104,6 +104,7 @@ const LABEL_TYPE_MAPPING = {
  */
 const LABEL_FEATURE_MAPPING = {
 	'[Feature] Widgets Screen': 'Widgets Editor',
+	'[Feature] Widgets Customizer': 'Widgets Editor',
 	'[Feature] Design Tools': 'Design Tools',
 	'[Feature] UI Components': 'Components',
 	'[Feature] Component System': 'Components',
@@ -120,6 +121,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Package] Edit Post': 'Post Editor',
 	'[Package] Icons': 'Icons',
 	'[Package] Block Editor': 'Block Editor',
+	'[Package] Block library': 'Block Library',
 	'[Package] Editor': 'Editor',
 	'[Package] Edit Widgets': 'Widgets Editor',
 	'[Package] Widgets Customizer': 'Widgets Editor',
@@ -138,6 +140,10 @@ const LABEL_FEATURE_MAPPING = {
 	'[Package] E2E Tests': 'Testing',
 	'[Package] E2E Test Utils': 'Testing',
 	'Automated Testing': 'Testing',
+	'CSS Styling': 'Style and Layout',
+	'developer-docs': 'Documentation',
+	'[Type] Documentation': 'Documentation',
+	'Global Styles': 'Global Styles',
 };
 
 /**
