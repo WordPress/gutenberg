@@ -73,7 +73,7 @@ describe( 'when a button is shown', () => {
 		const incrementButton = await waitFor( () =>
 			within( radiusStepper ).getByTestId( 'Increment' )
 		);
-		fireEvent.press( incrementButton );
+		fireEvent( incrementButton, 'onPressIn' );
 
 		await waitFor( () => getByA11yLabel( /Border Radius/ ) );
 
