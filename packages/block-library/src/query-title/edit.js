@@ -12,7 +12,6 @@ import {
 	BlockControls,
 	useBlockProps,
 	Warning,
-	RichText,
 	store as blockEditorStore,
 	InspectorControls,
 } from '@wordpress/block-editor';
