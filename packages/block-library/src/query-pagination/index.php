@@ -8,8 +8,8 @@
 /**
  * Renders the `core/query-pagination` block on the server.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
+ * @param array  $attributes Block attributes.
+ * @param string $content    Block default content.
  *
  * @return string Returns the wrapper for the Query pagination.
  */
