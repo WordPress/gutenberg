@@ -18,21 +18,35 @@ describe( 'props', () => {
 		expect( container.firstChild ).toMatchSnapshot();
 	} );
 
-	test( 'should render with custom ratio', () => {
-		const { container } = render(
-			<AspectRatio ratio={ 16 / 9 }>
+	test( 'should add different ratio when provided', () => {
+		const { container: withRatio } = render(
+			<AspectRatio ratio={ 21 / 9 }>
 				<img alt="Snow" />
 			</AspectRatio>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		const { container: defaultRatio } = render(
+			<AspectRatio>
+				<img alt="Snow" />
+			</AspectRatio>
+		);
+		expect( withRatio.firstChild ).toMatchDiffSnapshot(
+			defaultRatio.firstChild
+		);
 	} );
 
-	test( 'should render with custom width', () => {
-		const { container } = render(
-			<AspectRatio ratio={ 21 / 9 } width={ 320 }>
+	test( 'should add different width when provided', () => {
+		const { container: withWidth } = render(
+			<AspectRatio ratio={ 21 / 9 } width={ '320px' }>
 				<img alt="Snow" />
 			</AspectRatio>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		const { container: defaultWidth } = render(
+			<AspectRatio ratio={ 21 / 9 }>
+				<img alt="Snow" />
+			</AspectRatio>
+		);
+		expect( withWidth.firstChild ).toMatchDiffSnapshot(
+			defaultWidth.firstChild
+		);
 	} );
 } );

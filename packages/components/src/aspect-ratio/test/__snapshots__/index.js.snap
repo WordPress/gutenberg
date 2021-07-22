@@ -1,5 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`props should add different ratio when provided 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -7,8 +7,8 @@
+      alt="Snow"
+      class="css-17i08y2-content"
+    />
+    <div
+      aria-hidden="true"
+-     class="css-q6czde-AspectRatioResizer-resizerClasses e8w5upx0"
++     class="css-nz8uzz-AspectRatioResizer-resizerClasses e8w5upx0"
+    />
+  </div>
+`;
+
+exports[`props should add different width when provided 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -1,7 +1,7 @@
+  <div
+-   class="components-aspect-ratio css-eji9eb-AspectRatioView-classes e8w5upx1"
++   class="components-aspect-ratio css-y2g68t-AspectRatioView-classes e8w5upx1"
+    data-wp-c16t="true"
+    data-wp-component="AspectRatio"
+  >
+    <img
+      alt="Snow"
+`;
+
 exports[`props should render correctly 1`] = `
 .emotion-0 {
   max-width: 100%;
@@ -8,6 +41,14 @@ exports[`props should render correctly 1`] = `
 }
 
 .emotion-2 {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.emotion-3 {
   height: 0;
   pointer-events: none;
   padding-bottom: 100%;
@@ -20,67 +61,11 @@ exports[`props should render correctly 1`] = `
 >
   <img
     alt="Snow"
+    class="emotion-2"
   />
   <div
     aria-hidden="true"
-    class="emotion-2 emotion-3"
-  />
-</div>
-`;
-
-exports[`props should render with custom ratio 1`] = `
-.emotion-0 {
-  max-width: 100%;
-  position: relative;
-  width: 100%;
-}
-
-.emotion-2 {
-  height: 0;
-  pointer-events: none;
-  padding-bottom: 56.25%;
-}
-
-<div
-  class="components-aspect-ratio emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="AspectRatio"
->
-  <img
-    alt="Snow"
-  />
-  <div
-    aria-hidden="true"
-    class="emotion-2 emotion-3"
-  />
-</div>
-`;
-
-exports[`props should render with custom width 1`] = `
-.emotion-0 {
-  max-width: 100%;
-  position: relative;
-  width: 100%;
-  max-width: 320px;
-}
-
-.emotion-2 {
-  height: 0;
-  pointer-events: none;
-  padding-bottom: 42.857142857142854%;
-}
-
-<div
-  class="components-aspect-ratio emotion-0 emotion-1"
-  data-wp-c16t="true"
-  data-wp-component="AspectRatio"
->
-  <img
-    alt="Snow"
-  />
-  <div
-    aria-hidden="true"
-    class="emotion-2 emotion-3"
+    class="emotion-3 emotion-4"
   />
 </div>
 `;

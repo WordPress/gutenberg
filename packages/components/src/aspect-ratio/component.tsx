@@ -36,7 +36,7 @@ function AspectRatio(
 	const cx = useCx();
 
 	const [ clonedChild ] = Children.map( children, ( child ) => {
-		if ( ! isValidElement( child ) || typeof child.type === 'string' ) {
+		if ( ! isValidElement( child ) ) {
 			return child;
 		}
 		return cloneElement( child, {
