@@ -127,3 +127,9 @@ jobs:
 
             - name: Running the tests
               run: npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+
+            - name: Running the Android tests
+              run: npm run test-unit:native:android -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+
+            - name: Running the iOS tests
+              run: npm run test-unit:native:ios -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
