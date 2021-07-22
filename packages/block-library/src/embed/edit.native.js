@@ -16,7 +16,7 @@ import EmbedBottomSheet from './embed-bottom-sheet';
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
@@ -25,6 +25,16 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
+
+function getResponsiveHelp( checked ) {
+	return checked
+		? __(
+				'This embed will preserve its aspect ratio when the browser is resized.'
+		  )
+		: __(
+				'This embed may not preserve its aspect ratio when the browser is resized.'
+		  );
+}
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -59,12 +69,18 @@ const EmbedEdit = ( props ) => {
 		isSelected && wasBlockJustInserted && ! url
 	);
 
-	const { preview, fetching, cannotEmbed } = useSelect(
+	const {
+		preview,
+		fetching,
+		themeSupportsResponsive,
+		cannotEmbed,
+	} = useSelect(
 		( select ) => {
 			const {
 				getEmbedPreview,
 				isPreviewEmbedFallback,
 				isRequestingEmbedPreview,
+				getThemeSupports,
 			} = select( coreStore );
 			if ( ! attributesUrl ) {
 				return { fetching: false, cannotEmbed: false };
@@ -95,6 +111,9 @@ const EmbedEdit = ( props ) => {
 			return {
 				preview: validPreview ? embedPreview : undefined,
 				fetching: isFetching,
+				themeSupportsResponsive: getThemeSupports()[
+					'responsive-embeds'
+				],
 				cannotEmbed: ! validPreview || previewIsFallback,
 			};
 		},
@@ -116,6 +135,13 @@ const EmbedEdit = ( props ) => {
 				allowResponsive
 			),
 		};
+	};
+
+	const toggleResponsive = () => {
+		const { allowResponsive } = attributes;
+		setAttributes( {
+			allowResponsive: ! allowResponsive,
+		} );
 	};
 
 	useEffect( () => {
@@ -167,6 +193,15 @@ const EmbedEdit = ( props ) => {
 
 	const showEmbedPlaceholder = ! preview || cannotEmbed;
 
+	// Even though we set attributes that get derived from the preview,
+	// we don't access them directly because for the initial render,
+	// the `setAttributes` call will not have taken effect. If we're
+	// rendering responsive content, setting the responsive classes
+	// after the preview has been rendered can result in unwanted
+	// clipping or scrollbars. The `getAttributesFromPreview` function
+	// that `getMergedAttributes` uses is memoized so that we're not
+	const { allowResponsive } = getMergedAttributes();
+
 	return (
 		<>
 			{ showEmbedPlaceholder ? (
@@ -186,6 +221,11 @@ const EmbedEdit = ( props ) => {
 				<>
 					<EmbedControls
 						showEditButton={ preview && ! cannotEmbed }
+						themeSupportsResponsive={ themeSupportsResponsive }
+						blockSupportsResponsive={ responsive }
+						allowResponsive={ allowResponsive }
+						getResponsiveHelp={ getResponsiveHelp }
+						toggleResponsive={ toggleResponsive }
 						switchBackToURLInput={ () => setIsEditingURL( true ) }
 					/>
 					<View { ...blockProps }>
