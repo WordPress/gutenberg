@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { memo } from '@wordpress/element';
@@ -11,11 +16,16 @@ const ToggleControl = memo(
 	( { label, checked, help, instanceId, className, onChange, ...props } ) => {
 		const id = `inspector-toggle-control-${ instanceId }`;
 
+		let helpLabel;
+		if ( help ) {
+			helpLabel = isFunction( help ) ? help( checked ) : help;
+		}
+
 		return (
 			<SwitchCell
 				label={ label }
 				id={ id }
-				help={ help }
+				help={ helpLabel }
 				className={ className }
 				value={ checked }
 				onValueChange={ onChange }
