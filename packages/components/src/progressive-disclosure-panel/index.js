@@ -41,11 +41,20 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	useEffect( () => {
 		const items = {};
 
-		filteredChildren.forEach( ( { props: { hasValue, label } } ) => {
-			// New item is checked if:
+		filteredChildren.forEach( ( { props: childProps } ) => {
+			const { hasValue, isShownByDefault, label } = childProps;
+
+			// Menu item is checked if:
 			// - it currently has a value
 			// - or it was checked in previous menuItems state.
-			items[ label ] = hasValue() || menuItems[ label ];
+			const isChecked = hasValue() || menuItems[ label ] === true;
+
+			// Menu item will be `disabled` if:
+			// - it is not checked
+			// - and is shown by default.
+			const isDisabled = ! isChecked && isShownByDefault;
+
+			items[ label ] = isDisabled ? 'disabled' : isChecked;
 		} );
 
 		setMenuItems( items );
@@ -66,7 +75,7 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	const toggleChild = ( label ) => {
 		const wasSelected = menuItems[ label ];
 		const child = getChildByMenuLabel( label );
-		const { onDeselect, onSelect } = child.props;
+		const { onDeselect, onSelect, isShownByDefault } = child.props;
 
 		if ( wasSelected && onDeselect ) {
 			onDeselect();
@@ -76,9 +85,13 @@ const ProgressiveDisclosurePanel = ( props ) => {
 			onSelect();
 		}
 
+		// If child is was checked but is no longer and also shown by default
+		// disable the child's menu item.
+		const isDisabled = wasSelected && isShownByDefault;
+
 		setMenuItems( {
 			...menuItems,
-			[ label ]: ! wasSelected,
+			[ label ]: isDisabled ? 'disabled' : ! wasSelected,
 		} );
 	};
 
@@ -89,11 +102,13 @@ const ProgressiveDisclosurePanel = ( props ) => {
 		}
 
 		// Turn off all menu items. Default controls will continue to display
-		// by virtue of their `isShownByDefault` prop.
+		// by virtue of their `isShownByDefault` prop however their menu item
+		// will be disabled to prevent behaviour where toggling has no effect.
 		const resetMenuItems = {};
 
-		filteredChildren.forEach( ( child ) => {
-			resetMenuItems[ child.props.label ] = false;
+		filteredChildren.forEach( ( { props: childProps } ) => {
+			const { label, isShownByDefault } = childProps;
+			resetMenuItems[ label ] = isShownByDefault ? 'disabled' : false;
 		} );
 
 		setMenuItems( resetMenuItems );

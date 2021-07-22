@@ -28,12 +28,16 @@ const ProgressiveDisclosurePanelTitle = ( props ) => {
 					<>
 						<MenuGroup label={ __( 'Display options' ) }>
 							{ Object.entries( menuItems ).map(
-								( [ label, isSelected ] ) => {
+								( [ label, itemState ] ) => {
+									const isSelected = itemState === true;
+									const isDisabled = itemState === 'disabled';
+
 									return (
 										<MenuItem
 											key={ label }
 											icon={ isSelected && check }
-											isSelected={ !! isSelected }
+											isSelected={ isSelected }
+											disabled={ isDisabled }
 											onClick={ () => {
 												toggleChild( label );
 												onClose();
