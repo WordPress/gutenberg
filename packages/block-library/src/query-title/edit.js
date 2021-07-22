@@ -12,10 +12,9 @@ import {
 	BlockControls,
 	useBlockProps,
 	Warning,
+	RichText,
 	store as blockEditorStore,
-	InspectorControls,
 } from '@wordpress/block-editor';
-import { TextControl, PanelBody } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 
@@ -40,16 +39,10 @@ export default function QueryTitleEdit( {
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
-	let titleContent;
-
-	// translators: Title for index template.
-	const defaultTitle = _x(
-		'Query title placeholder',
-		'index template title'
-	);
+	let titleElement;
 
 	// translators: Title for archive template.
-	const defaultArchiveTitle = _x(
+	const archiveTitle = _x(
 		'Archive title placeholder',
 		'archive template title'
 	);
@@ -69,29 +62,64 @@ export default function QueryTitleEdit( {
 	// Infer title content from template slug context
 	switch ( templateSlug ) {
 		case 'archive':
-			titleContent = defaultArchiveTitle;
+			titleElement = (
+				<TagName { ...blockProps }>{ archiveTitle }</TagName>
+			);
 			break;
 		case 'search':
-			titleContent = searchTitle;
+		case 'index':
+			titleElement = (
+				<div { ...blockProps }>
+					<RichText
+						tagName={ TagName }
+						value={ searchTitle }
+						placeholder={ searchTitle }
+						allowedFormats={ [ 'core/bold', 'core/italic' ] }
+						onChange={ ( newSearchTitle ) =>
+							setAttributes( { searchTitle: newSearchTitle } )
+						}
+						disableLineBreaks={ true }
+					/>
+				</div>
+			);
 			break;
 		case '404':
-			titleContent = nothingFoundTitle;
+			titleElement = (
+				<div { ...blockProps }>
+					<RichText
+						tagName={ TagName }
+						value={ nothingFoundTitle }
+						placeholder={ nothingFoundTitle }
+						allowedFormats={ [ 'core/bold', 'core/italic' ] }
+						onChange={ ( newNothingFoundTitle ) =>
+							setAttributes( {
+								nothingFoundTitle: newNothingFoundTitle,
+							} )
+						}
+						disableLineBreaks={ true }
+					/>
+				</div>
+			);
 			break;
 		default:
-			titleContent = content;
 			break;
 	}
 
-	const titleElement = <TagName { ...blockProps }>{ titleContent }</TagName>;
-
-	// Update content based on current template
+	// Update default content based on current template
 	useEffect( () => {
 		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			content: defaultTitle,
-			searchTitle: defaultSearchTitle,
-			nothingFoundTitle: defaultNothingFoundTitle,
-		} );
+
+		if ( ! searchTitle ) {
+			setAttributes( {
+				searchTitle: defaultSearchTitle,
+			} );
+		}
+
+		if ( ! nothingFoundTitle ) {
+			setAttributes( {
+				nothingFoundTitle: defaultNothingFoundTitle,
+			} );
+		}
 	}, [] );
 
 	if ( ! SUPPORTED_TEMPLATES.includes( templateSlug ) ) {
@@ -118,32 +146,6 @@ export default function QueryTitleEdit( {
 					} }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Custom Title Contents' ) }>
-					<TextControl
-						label={ __( 'Search Page Title' ) }
-						help={ `${ __(
-							'Edit the search template title. Dynamic content is available with: '
-						) } %search%, %total%` }
-						value={ searchTitle }
-						onChange={ ( value ) =>
-							setAttributes( {
-								searchTitle: value,
-							} )
-						}
-					/>
-					<TextControl
-						label={ __( '404 Page Title' ) }
-						help={ __( 'Edit the 404 template title.' ) }
-						value={ nothingFoundTitle }
-						onChange={ ( value ) =>
-							setAttributes( {
-								nothingFoundTitle: value,
-							} )
-						}
-					/>
-				</PanelBody>
-			</InspectorControls>
 			{ titleElement }
 		</>
 	);
