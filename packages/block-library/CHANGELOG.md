@@ -2,12 +2,13 @@
 
 ## Unreleased
 
-## Breaking Changes
+## 4.0.0 (2021-07-21)
 
--   Removes the `core/legacy-widget` block. This is now in `@wordpress/widgets`
-	via `registerLegacyWidgetBlock()`.
+### Breaking Changes
 
-## Bug Fixes
+-   Removes the `core/legacy-widget` block. This is now in `@wordpress/widgets` via `registerLegacyWidgetBlock()`.
+
+### Bug Fixes
 
 -   Include missing attributes when upgrading embed block ([#33235](https://github.com/WordPress/gutenberg/pull/33235))
 

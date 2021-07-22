@@ -74,7 +74,7 @@ describe( 'Widgets screen', () => {
 	async function getBlockInGlobalInserter( blockName ) {
 		const addBlockButton = await find( {
 			role: 'button',
-			name: 'Add block',
+			name: 'Toggle block inserter',
 			pressed: false,
 		} );
 		await addBlockButton.click();
