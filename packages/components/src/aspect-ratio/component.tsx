@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { cloneElement } from '@wordpress/element';
+import { Children, cloneElement, isValidElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -36,13 +36,9 @@ function AspectRatio(
 	} = useContextSystem( props, 'AspectRatio' );
 	const cx = useCx();
 
-	/**
-	 * Noting that only the first valid ReactElement will be actually
-	 * rendered. Other children (if any) are ignored.
-	 */
-	const [ child ] = getValidChildren( children );
+	const child = Children.only( children );
 	const clonedChild =
-		child &&
+		isValidElement( child ) &&
 		cloneElement( child, {
 			...child.props,
 			className: cx( styles.content, child.props.className ),
