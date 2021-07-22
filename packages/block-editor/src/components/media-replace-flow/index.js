@@ -104,7 +104,6 @@ const MediaReplaceFlow = ( {
 	const openOnArrowDown = ( event ) => {
 		if ( event.keyCode === DOWN ) {
 			event.preventDefault();
-			event.stopPropagation();
 			event.target.click();
 		}
 	};

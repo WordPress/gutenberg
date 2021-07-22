@@ -72,7 +72,6 @@ class GalleryImage extends Component {
 			this.props.isSelected &&
 			[ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
 		) {
-			event.stopPropagation();
 			event.preventDefault();
 			this.props.onRemove();
 		}
