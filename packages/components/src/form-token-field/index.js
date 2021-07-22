@@ -7,7 +7,6 @@ import {
 	clone,
 	uniq,
 	map,
-	noop,
 	difference,
 	each,
 	identity,
@@ -600,7 +599,6 @@ class FormTokenField extends Component {
 			disabled: this.props.disabled,
 			value: this.state.incompleteTokenValue,
 			onBlur: this.onBlur,
-			onChange: noop,
 			isExpanded: this.state.isExpanded,
 			selectedSuggestionIndex: this.state.selectedSuggestionIndex,
 		};
