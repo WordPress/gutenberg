@@ -655,4 +655,20 @@ describe( 'Multi-block selection', () => {
 		// Expect both paragraphs to be deleted.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should select title if the cursor is on title', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await page.type( '.editor-post-title__input', 'Post title' );
+
+		await pressKeyWithModifier( 'primary', 'a' );
+		const selectedText = await page.evaluate( () => {
+			return window.getSelection().toString();
+		} );
+		expect( selectedText ).toEqual( 'Post title' );
+	} );
 } );
