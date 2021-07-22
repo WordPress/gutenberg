@@ -15,7 +15,7 @@ export type AspectRatioProps = {
 	 * <AspectRatio ratio={16/9} />
 	 * ```
 	 */
-	ratio?: number;
+	ratio?: CSSProperties[ 'aspectRatio' ];
 	/**
 	 * A custom width.
 	 */

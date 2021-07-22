@@ -30,7 +30,7 @@ function Example() {
 
 ## Props
 
-### `ratio`: `number`
+### `ratio`: `CSSProperties[ 'aspectRatio' ]`
 
 -   Required: No
 -   Default: `1`

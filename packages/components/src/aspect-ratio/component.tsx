@@ -19,9 +19,8 @@ import {
 import type { AspectRatioProps } from './types';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks';
-import { getValidChildren } from '../ui/utils/get-valid-children';
 
-const { AspectRatioResizer, AspectRatioView } = styles;
+const { AspectRatioView } = styles;
 
 function AspectRatio(
 	props: PolymorphicComponentProps< AspectRatioProps, 'div' >,
@@ -30,27 +29,31 @@ function AspectRatio(
 	const {
 		children,
 		className,
-		ratio = 1,
+		ratio = 'auto',
 		width,
 		...otherProps
 	} = useContextSystem( props, 'AspectRatio' );
 	const cx = useCx();
-
 	const child = Children.only( children );
 	const clonedChild =
 		isValidElement( child ) &&
 		cloneElement( child, {
 			...child.props,
-			className: cx( styles.content, child.props.className ),
+			className: cx(
+				styles.content,
+				/**
+				 * We need to use string interpolation here, as this value
+				 * is passed through emotion serialization and `aspectRatio`
+				 * is not considered a unitless value. This results in adding
+				 * a `px` suffix, making the value invalid.
+				 *
+				 * @see https://github.com/emotion-js/emotion/blob/main/packages/unitless/src/index.js
+				 */
+				css( { aspectRatio: `${ ratio }` } ),
+				child.props.className
+			),
 		} );
-
 	const classes = cx( css( { maxWidth: width } ), className );
-	const resizerClasses = cx(
-		css( {
-			paddingBottom: `${ ( 1 / ratio ) * 100 }%`,
-		} )
-	);
-
 	return (
 		<AspectRatioView
 			{ ...otherProps }
@@ -58,7 +61,6 @@ function AspectRatio(
 			ref={ forwardedRef }
 		>
 			{ clonedChild }
-			<AspectRatioResizer aria-hidden className={ resizerClasses } />
 		</AspectRatioView>
 	);
 }

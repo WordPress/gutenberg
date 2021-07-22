@@ -5,14 +5,14 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -7,8 +7,8 @@
+@@ -3,8 +3,8 @@
+    data-wp-c16t="true"
+    data-wp-component="AspectRatio"
+  >
+    <img
       alt="Snow"
-      class="css-17i08y2-content"
-    />
-    <div
-      aria-hidden="true"
--     class="css-q6czde-AspectRatioResizer-resizerClasses e8w5upx0"
-+     class="css-nz8uzz-AspectRatioResizer-resizerClasses e8w5upx0"
+-     class="css-vl0irh-content css-3ecvn7-className"
++     class="css-vl0irh-content css-1jydpxs-className"
     />
   </div>
 `;
@@ -24,8 +24,8 @@ Snapshot Diff:
 
 @@ -1,7 +1,7 @@
   <div
--   class="components-aspect-ratio css-eji9eb-AspectRatioView-classes e8w5upx1"
-+   class="components-aspect-ratio css-y2g68t-AspectRatioView-classes e8w5upx1"
+-   class="components-aspect-ratio css-eji9eb-AspectRatioView-classes e8w5upx0"
++   class="components-aspect-ratio css-y2g68t-AspectRatioView-classes e8w5upx0"
     data-wp-c16t="true"
     data-wp-component="AspectRatio"
   >
@@ -41,17 +41,11 @@ exports[`props should render correctly 1`] = `
 }
 
 .emotion-2 {
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
   width: 100%;
 }
 
 .emotion-3 {
-  height: 0;
-  pointer-events: none;
-  padding-bottom: 100%;
+  aspect-ratio: auto;
 }
 
 <div
@@ -61,11 +55,7 @@ exports[`props should render correctly 1`] = `
 >
   <img
     alt="Snow"
-    class="emotion-2"
-  />
-  <div
-    aria-hidden="true"
-    class="emotion-3 emotion-4"
+    class="emotion-2 emotion-3"
   />
 </div>
 `;
