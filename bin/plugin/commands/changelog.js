@@ -108,6 +108,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Feature] Design Tools': 'Design Tools',
 	'[Feature] UI Components': 'Components',
 	'[Feature] Component System': 'Components',
+	Storybook: 'Components',
 	'[Feature] Template Editing Mode': 'Template Editor',
 	'[Feature] Writing Flow': 'Block Editor',
 	'[Feature] Pattern Directory': 'Patterns',
@@ -144,6 +145,9 @@ const LABEL_FEATURE_MAPPING = {
 	'developer-docs': 'Documentation',
 	'[Type] Documentation': 'Documentation',
 	'Global Styles': 'Global Styles',
+	'[Type] Build Tooling': 'Build Tooling',
+	'npm Packages': 'Plugin',
+	'Gutenberg Plugin': 'Plugin',
 };
 
 /**
