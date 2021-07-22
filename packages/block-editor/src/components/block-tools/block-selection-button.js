@@ -26,7 +26,6 @@ import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
-import { speak } from '@wordpress/a11y';
 import { focus } from '@wordpress/dom';
 import { __ } from '@wordpress/i18n';
 
@@ -44,9 +43,9 @@ import useBlockDisplayInformation from '../use-block-display-information';
  *
  * @return {boolean} Whether the user is using Windows.
  */
-function isWindows() {
+/*function isWindows() {
 	return window.navigator.platform.indexOf( 'Win' ) > -1;
-}
+}*/
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -90,13 +89,6 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
 		ref.current.focus();
-
-		// NVDA on windows suffers from a bug where focus changes are not announced properly
-		// See WordPress/gutenberg#24121 and nvaccess/nvda#5825 for more details
-		// To solve it we announce the focus change manually.
-		if ( isWindows() ) {
-			speak( label );
-		}
 	}, [] );
 
 	const {
@@ -272,6 +264,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 						onKeyDown={ onKeyDown }
 						label={ label }
 						className="block-selection-button_select-button"
+						aria-live="polite"
 					>
 						<BlockTitle clientId={ clientId } />
 					</Button>
