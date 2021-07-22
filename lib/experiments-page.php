@@ -110,7 +110,7 @@ function gutenberg_display_experiment_section() {
 function gutenberg_experiments_editor_settings( $settings ) {
 	$experiments = get_option( 'gutenberg-experiments' );
 	$experiments_settings = array(
-		'__unstableGalleryWithInnerBlocks' => isset( $experiments['gutenberg-gallery-refactor'] ),
+		'__unstableGalleryWithImageBlocks' => isset( $experiments['gutenberg-gallery-refactor'] ),
 	);
 	return array_merge( $settings, $experiments_settings );
 }
