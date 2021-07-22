@@ -328,12 +328,12 @@ export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 
 		let key = event.key.toLowerCase();
 
-		if ( includes( mods, ALT ) ) {
-			key = String.fromCharCode( event.keyCode ).toLowerCase();
-		}
-
 		if ( ! character ) {
 			return includes( mods, key );
+		}
+
+		if ( event.altKey ) {
+			key = String.fromCharCode( event.keyCode ).toLowerCase();
 		}
 
 		// For backwards compatibility.
