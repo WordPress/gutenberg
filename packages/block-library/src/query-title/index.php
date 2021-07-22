@@ -18,12 +18,11 @@ function render_block_core_query_title( $attributes ) {
 	$is_search  = is_search();
 	$is_archive = is_archive();
 	$is_404     = is_404();
-	$title      = isset( $attributes['content'] ) ? $attributes['content'] : '';
 	if ( $is_archive ) {
 		$title = get_the_archive_title();
 	} elseif ( $is_search ) {
-		$title = isset( $attributes['searchTitle'] ) ? $attributes['searchTitle'] : '';
 		global $wp_query;
+		$title        = isset( $attributes['searchTitle'] ) ? $attributes['searchTitle'] : '';
 		$formats      = array( '%total%', '%search%' );
 		$replacements = array( $wp_query->found_posts, get_search_query() );
 		$title        = str_replace( $formats, $replacements, $title );
