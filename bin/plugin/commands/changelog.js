@@ -114,6 +114,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Feature] Drag and Drop': 'Block Editor',
 	'[Feature] Block Multi Selection': 'Block Editor',
 	'[Feature] Link Editing': 'Block Editor',
+	'[Feature] Raw Handling': 'Block Editor',
 	'[Package] Edit Post': 'Post Editor',
 	'[Package] Icons': 'Icons',
 	'[Package] Block Editor': 'Block Editor',
