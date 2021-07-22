@@ -42,6 +42,12 @@ export default function QueryTitleEdit( {
 	let titleElement;
 
 	// translators: Title for archive template.
+	const defaultTitle = _x(
+		'Query title placeholder',
+		'query template title'
+	);
+
+	// translators: Title for archive template.
 	const archiveTitle = _x(
 		'Archive title placeholder',
 		'archive template title'
@@ -67,7 +73,6 @@ export default function QueryTitleEdit( {
 			);
 			break;
 		case 'search':
-		case 'index':
 			titleElement = (
 				<div { ...blockProps }>
 					<RichText
@@ -99,6 +104,11 @@ export default function QueryTitleEdit( {
 						disableLineBreaks={ true }
 					/>
 				</div>
+			);
+			break;
+		case 'index':
+			titleElement = (
+				<TagName { ...blockProps }>{ defaultTitle }</TagName>
 			);
 			break;
 		default:
