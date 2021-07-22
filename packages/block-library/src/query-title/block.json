@@ -9,7 +9,7 @@
 	"attributes": {
 		"content": {
 			"type": "string",
-			"default": "Query title"
+			"default": "Query title placeholder"
 		},
 		"searchTitle": {
 			"type": "string"
