@@ -11,10 +11,10 @@
 			"type": "string",
 			"default": "Query title"
 		},
-		"searchTitleContent": {
+		"searchTitle": {
 			"type": "string"
 		},
-		"nothingFoundTitleContent": {
+		"nothingFoundTitle": {
 			"type": "string"
 		},
 		"textAlign": {

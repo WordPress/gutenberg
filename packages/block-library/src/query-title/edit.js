@@ -28,13 +28,7 @@ import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 const SUPPORTED_TEMPLATES = [ 'archive', 'search', '404', 'index' ];
 
 export default function QueryTitleEdit( {
-	attributes: {
-		content,
-		searchTitleContent,
-		nothingFoundTitleContent,
-		level,
-		textAlign,
-	},
+	attributes: { content, searchTitle, nothingFoundTitle, level, textAlign },
 	setAttributes,
 	context: { templateSlug },
 } ) {
@@ -47,7 +41,7 @@ export default function QueryTitleEdit( {
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
-	let titleElement;
+	let titleContent;
 
 	// translators: Title for index template.
 	const defaultTitle = _x(
@@ -55,72 +49,49 @@ export default function QueryTitleEdit( {
 		'index template title'
 	);
 
-	// translators: Title for 404 template.
-	const nothingFoundTitle = _x( 'Nothing found', '404 template title' );
-
 	// translators: Title for archive template.
-	const archiveTitle = _x(
+	const defaultArchiveTitle = _x(
 		'Archive title placeholder',
 		'archive template title'
 	);
 
+	// translators: Title for 404 template.
+	const defaultNothingFoundTitle = _x(
+		'Nothing found',
+		'404 template title'
+	);
+
 	// translators: Title for search template with dynamic content placeholders.
-	const searchTitle = _x(
+	const defaultSearchTitle = _x(
 		'Search results for "%search%"',
 		'search template title'
 	);
 
 	// Infer title content from template slug context
-	// Defaults to content attribute prop
 	switch ( templateSlug ) {
 		case 'archive':
-			titleElement = (
-				<TagName { ...blockProps }>{ archiveTitle }</TagName>
-			);
+			titleContent = defaultArchiveTitle;
 			break;
 		case 'search':
-			// Use placeholder content if new Query Title block is added
-			if ( content === 'Query title' ) {
-				content = searchTitle;
-			}
-
-			titleElement = (
-				<div { ...blockProps }>
-					<RichText
-						tagName={ TagName }
-						value={ content }
-						placeholder={ content }
-						allowedFormats={ [ 'core/bold', 'core/italic' ] }
-						onChange={ ( newContent ) =>
-							setAttributes( { content: newContent } )
-						}
-						disableLineBreaks={ true }
-					/>
-				</div>
-			);
+			titleContent = searchTitle;
 			break;
 		case '404':
-			titleElement = (
-				<TagName { ...blockProps }>{ nothingFoundTitle }</TagName>
-			);
-			break;
-		case 'index':
-			titleElement = (
-				<TagName { ...blockProps }>{ defaultTitle }</TagName>
-			);
+			titleContent = nothingFoundTitle;
 			break;
 		default:
-			titleElement = <TagName { ...blockProps }>{ content }</TagName>;
+			titleContent = content;
 			break;
 	}
+
+	const titleElement = <TagName { ...blockProps }>{ titleContent }</TagName>;
 
 	// Update content based on current template
 	useEffect( () => {
 		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( {
-			content,
-			searchTitleContent: searchTitle,
-			nothingFoundTitleContent: nothingFoundTitle,
+			content: defaultTitle,
+			searchTitle: defaultSearchTitle,
+			nothingFoundTitle: defaultNothingFoundTitle,
 		} );
 	}, [] );
 
@@ -149,26 +120,26 @@ export default function QueryTitleEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Title Contents' ) }>
+				<PanelBody title={ __( 'Custom Title Contents' ) }>
 					<TextControl
-						label={ __( 'Search Title' ) }
+						label={ __( 'Search Page Title' ) }
 						help={ `${ __(
 							'Edit the search template title. Dynamic content is available with: '
 						) } %search%, %total%` }
 						value={ searchTitle }
 						onChange={ ( value ) =>
 							setAttributes( {
-								searchTitleContent: value,
+								searchTitle: value,
 							} )
 						}
 					/>
 					<TextControl
-						label={ __( '404 Title' ) }
+						label={ __( '404 Page Title' ) }
 						help={ __( 'Edit the 404 template title.' ) }
 						value={ nothingFoundTitle }
 						onChange={ ( value ) =>
 							setAttributes( {
-								nothingFoundTitleContent: value,
+								nothingFoundTitle: value,
 							} )
 						}
 					/>
