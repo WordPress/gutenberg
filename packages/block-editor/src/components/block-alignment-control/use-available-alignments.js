@@ -26,7 +26,7 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
 		[]
 	);
 	const layout = useLayout();
-	const layoutType = getLayoutType( layout?.type ?? 'default' );
+	const layoutType = getLayoutType( layout?.type );
 	const layoutAlignments = layoutType.getAlignments( layout );
 
 	if ( themeSupportsLayout ) {

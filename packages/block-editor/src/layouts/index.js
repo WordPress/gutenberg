@@ -12,7 +12,7 @@ const layoutTypes = [ flow, flex ];
  * @param {string} name - The name of the layout type.
  * @return {Object} Layout type.
  */
-export function getLayoutType( name ) {
+export function getLayoutType( name = 'default' ) {
 	return layoutTypes.find( ( layoutType ) => layoutType.name === name );
 }
 

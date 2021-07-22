@@ -25,8 +25,7 @@ export function useLayout() {
 }
 
 export function LayoutStyle( { layout = {}, ...props } ) {
-	const type = layout.type ?? 'default';
-	const layoutType = getLayoutType( type );
+	const layoutType = getLayoutType( layout.type );
 
 	if ( layoutType ) {
 		return <layoutType.save layout={ layout } { ...props } />;

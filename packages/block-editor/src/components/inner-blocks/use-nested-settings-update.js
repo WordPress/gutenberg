@@ -79,7 +79,7 @@ export default function useNestedSettingsUpdate(
 		if ( orientation !== undefined ) {
 			newSettings.orientation = orientation;
 		} else {
-			const layoutType = getLayoutType( layout?.type || 'default' );
+			const layoutType = getLayoutType( layout?.type );
 			newSettings.orientation = layoutType.getOrientation( layout );
 		}
 
