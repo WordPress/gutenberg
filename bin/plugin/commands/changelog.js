@@ -669,8 +669,12 @@ async function getChangelog( settings ) {
 				return;
 			}
 
-			// Start new <ul> for the Feature group.
-			changelog += '- ' + featureName + '\n';
+			// Avoids double nesting such as "Documentation" feature under
+			// the "Documentation" section.
+			if ( group !== featureName ) {
+				// Start new <ul> for the Feature group.
+				changelog += '- ' + featureName + '\n';
+			}
 
 			// Add a <li> for each PR in the Feature.
 			featureGroupEntries.forEach( ( entry ) => {
