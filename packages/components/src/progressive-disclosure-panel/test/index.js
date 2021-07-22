@@ -168,6 +168,26 @@ describe( 'ProgressiveDisclosurePanel', () => {
 			expect( menuItems[ 1 ] ).toHaveAttribute( 'aria-checked', 'false' );
 		} );
 
+		it( 'should disable default control menu items when the control has no value', async () => {
+			render(
+				<ProgressiveDisclosurePanel { ...defaultProps }>
+					<PanelItem { ...controlProps } isShownByDefault={ true }>
+						<div>Example control</div>
+					</PanelItem>
+					<PanelItem { ...altControlProps } isShownByDefault={ true }>
+						<div>Alt control</div>
+					</PanelItem>
+				</ProgressiveDisclosurePanel>
+			);
+			openDropdownMenu();
+
+			const menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
+
+			expect( menuItems.length ).toEqual( 2 );
+			expect( menuItems[ 0 ] ).not.toHaveAttribute( 'disabled' );
+			expect( menuItems[ 1 ] ).toHaveAttribute( 'disabled' );
+		} );
+
 		it( 'should render panel title', () => {
 			renderPanel();
 			const title = screen.getByText( defaultProps.title );
