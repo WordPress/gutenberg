@@ -35,12 +35,19 @@ describe( 'Slider', () => {
 		expect( onBlur ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'should fire onChange', async () => {
+	it( 'should fire onChange with united value', async () => {
 		const onChange = jest.fn();
-		render( <Slider onChange={ onChange } defaultValue="50" /> );
+		render( <Slider onChange={ onChange } value="50px" /> );
 		const slider = ( await screen.findAllByRole( 'slider' ) )[ 1 ];
-		fireEvent.focusIn( slider );
-		fireEvent.keyPress( slider, { key: 'ArrowUp', code: 'ArrowUp' } );
-		expect( onChange ).toHaveBeenCalledWith( '51' );
+		fireEvent.change( slider, { target: { value: '51' } } );
+		expect( onChange ).toHaveBeenCalledWith( '51px' );
+	} );
+
+	it( 'should fire onChange with non-united value', async () => {
+		const onChange = jest.fn();
+		render( <Slider onChange={ onChange } value="50" /> );
+		const slider = ( await screen.findAllByRole( 'slider' ) )[ 1 ];
+		fireEvent.change( slider, { target: { value: '51' } } );
+		expect( onChange ).toHaveBeenCalledWith( 51 );
 	} );
 } );
