@@ -58,7 +58,7 @@ export default function getInserterOuterSection() {
 						! event.defaultPrevented
 					) {
 						event.preventDefault();
-
+						event.stopPropagation();
 						this.close();
 					}
 				},
