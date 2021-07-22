@@ -27,7 +27,7 @@ import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 const SUPPORTED_TEMPLATES = [ 'archive', 'search', '404', 'index' ];
 
 export default function QueryTitleEdit( {
-	attributes: { content, searchTitle, nothingFoundTitle, level, textAlign },
+	attributes: { searchTitle, nothingFoundTitle, level, textAlign },
 	setAttributes,
 	context: { templateSlug },
 } ) {

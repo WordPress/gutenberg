@@ -7,9 +7,6 @@
 	"textdomain": "default",
 	"usesContext": [ "templateSlug" ],
 	"attributes": {
-		"content": {
-			"type": "string"
-		},
 		"searchTitle": {
 			"type": "string"
 		},
