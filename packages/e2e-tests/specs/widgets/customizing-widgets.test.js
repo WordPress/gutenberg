@@ -792,7 +792,7 @@ async function addBlock( blockName ) {
 	await blockOption.click();
 
 	const addedBlock = await find( {
-		role: 'group',
+		role: 'document',
 		selector: '.is-selected[data-block]',
 	} );
 	await addedBlock.focus();
