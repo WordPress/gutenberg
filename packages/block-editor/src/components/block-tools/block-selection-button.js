@@ -43,9 +43,9 @@ import useBlockDisplayInformation from '../use-block-display-information';
  *
  * @return {boolean} Whether the user is using Windows.
  */
-/*function isWindows() {
+function isWindows() {
 	return window.navigator.platform.indexOf( 'Win' ) > -1;
-}*/
+}
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -264,7 +264,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 						onKeyDown={ onKeyDown }
 						label={ label }
 						className="block-selection-button_select-button"
-						aria-live="polite"
+						aria-live={ isWindows() ? "assertive" : undefined }
 					>
 						<BlockTitle clientId={ clientId } />
 					</Button>
