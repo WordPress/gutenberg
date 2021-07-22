@@ -6,6 +6,10 @@ This feature is still experimental. “Experimental” means this is an early im
 
 `AspectRatio` renders content with a given width:height ratio. A common example would be the **HD** `16:9` ratio. Typically, media-based content (such as images or video) would benefit from an `AspectRatio` controlled container. Another common use-case for `AspectRatio` would be to render `iframe` content with a specific responsive width:height ratio.
 
+<div class="callout callout-alert">
+Noting that only the first valid `ReactElement` will be actually rendered. Other children (if any) are ignored.
+</div>
+
 ## Usage
 
 ```js

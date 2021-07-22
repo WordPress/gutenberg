@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { cloneElement, Children, isValidElement } from '@wordpress/element';
+import { cloneElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +19,7 @@ import {
 import type { AspectRatioProps } from './types';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks';
+import { getValidChildren } from '../ui/utils/get-valid-children';
 
 const { AspectRatioResizer, AspectRatioView } = styles;
 
@@ -35,15 +36,17 @@ function AspectRatio(
 	} = useContextSystem( props, 'AspectRatio' );
 	const cx = useCx();
 
-	const [ clonedChild ] = Children.map( children, ( child ) => {
-		if ( ! isValidElement( child ) ) {
-			return child;
-		}
-		return cloneElement( child, {
+	/**
+	 * Noting that only the first valid ReactElement will be actually
+	 * rendered. Other children (if any) are ignored.
+	 */
+	const [ child ] = getValidChildren( children );
+	const clonedChild =
+		child &&
+		cloneElement( child, {
 			...child.props,
 			className: cx( styles.content, child.props.className ),
 		} );
-	} );
 
 	const classes = cx( css( { maxWidth: width } ), className );
 	const resizerClasses = cx(
