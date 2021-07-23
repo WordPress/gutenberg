@@ -275,8 +275,6 @@
 		"test-unit-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose'",
 		"pretest-unit-php-multisite": "wp-env start",
 		"test-unit-php-multisite": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit/multisite.xml --verbose'",
-		"test-unit:native": "cd test/native/ && cross-env NODE_ENV=test jest --config ./jest.config.js",
-		"test-unit:native:debug": "cd test/native/ && node --inspect ../../node_modules/.bin/jest --runInBand --config ./jest.config.js",
 		"prestorybook:build": "npm run build:packages",
 		"storybook:build": "build-storybook -c ./storybook -o ./storybook/build",
 		"prestorybook:dev": "npm run build:packages",
