@@ -2,22 +2,51 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { BlockControls } from '@wordpress/block-editor';
+import {
+	ToolbarButton,
+	PanelBody,
+	ToggleControl,
+	ToolbarGroup,
+} from '@wordpress/components';
+import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { edit } from '@wordpress/icons';
 
-const EmbedControls = ( { showEditButton, switchBackToURLInput } ) => (
-	<BlockControls>
-		<ToolbarGroup>
-			{ showEditButton && (
-				<ToolbarButton
-					label={ __( 'Edit URL' ) }
-					icon={ edit }
-					onClick={ switchBackToURLInput }
-				/>
+const EmbedControls = ( {
+	blockSupportsResponsive,
+	showEditButton,
+	themeSupportsResponsive,
+	allowResponsive,
+	getResponsiveHelp,
+	toggleResponsive,
+	switchBackToURLInput,
+} ) => {
+	return (
+		<>
+			<BlockControls>
+				<ToolbarGroup>
+					{ showEditButton && (
+						<ToolbarButton
+							label={ __( 'Edit URL' ) }
+							icon={ edit }
+							onClick={ switchBackToURLInput }
+						/>
+					) }
+				</ToolbarGroup>
+			</BlockControls>
+			{ themeSupportsResponsive && blockSupportsResponsive && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Media settings' ) }>
+						<ToggleControl
+							label={ __( 'Resize for smaller devices' ) }
+							checked={ allowResponsive }
+							help={ getResponsiveHelp }
+							onChange={ toggleResponsive }
+						/>
+					</PanelBody>
+				</InspectorControls>
 			) }
-		</ToolbarGroup>
-	</BlockControls>
-);
+		</>
+	);
+};
 
 export default EmbedControls;
