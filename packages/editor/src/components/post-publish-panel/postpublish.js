@@ -144,11 +144,14 @@ class PostPublishPanelPostpublish extends Component {
 
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
-							<Button variant="secondary" href={ link }>
+							<Button variant="primary" href={ link }>
 								{ viewPostLabel }
 							</Button>
 						) }
-						<Button variant="secondary" href={ addLink }>
+						<Button
+							variant={ isScheduled ? 'primary' : 'secondary' }
+							href={ addLink }
+						>
 							{ addNewPostLabel }
 						</Button>
 					</div>
