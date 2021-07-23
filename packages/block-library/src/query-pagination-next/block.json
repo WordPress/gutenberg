@@ -9,6 +9,10 @@
 	"attributes": {
 		"label": {
 			"type": "string"
+		},
+		"arrow": {
+			"default": "",
+			"type": "string"
 		}
 	},
 	"usesContext": [ "queryId", "query" ],

@@ -50,7 +50,8 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		}
 		wp_reset_postdata(); // Restore original Post Data.
 	}
-	return $content;
+
+	return '<div class="wp-block-query-pagination-next">' . $content . ' ' . $attributes['arrow'] . '</div>';
 }
 
 /**
