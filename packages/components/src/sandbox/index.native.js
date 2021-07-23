@@ -113,7 +113,7 @@ export default function Sandbox( {
 	const [ height, setHeight ] = useState( 0 );
 	const [ iframeHtml, setiFrameHtml ] = useState();
 
-	function trySandbox() {
+	function trySandbox( forceRerender = false ) {
 		// TODO: Use the device's locale
 		const lang = 'en';
 
@@ -154,8 +154,17 @@ export default function Sandbox( {
 				</body>
 			</html>
 		);
+		const newiFrameHtml = '<!DOCTYPE html>' + renderToString( htmlDoc );
 
-		setiFrameHtml( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
+		if ( forceRerender && iframeHtml === newiFrameHtml ) {
+			// The re-render is forced by updating the state with empty HTML,
+			// waiting for the JS code to be executed with "setImmediate" and then
+			// setting the IFrame HTML again.
+			setiFrameHtml( '' );
+			setImmediate( () => setiFrameHtml( newiFrameHtml ) );
+		} else {
+			setiFrameHtml( newiFrameHtml );
+		}
 	}
 
 	function checkMessageForResize( event ) {
