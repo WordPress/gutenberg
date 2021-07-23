@@ -27,6 +27,14 @@ import { unescapeString, unescapeTerm, unescapeTerms } from '../../utils/terms';
 import MostUsedTerms from './most-used-terms';
 
 /**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation.
+ *
+ * @type {Array<any>}
+ */
+const EMPTY_ARRAY = [];
+
+/**
  * Module constants
  */
 const MAX_TERMS_SUGGESTIONS = 20;
@@ -95,7 +103,7 @@ function FlatTermSelector( { slug, speak } ) {
 			const _taxonomy = getTaxonomy( slug );
 			const _termIds = _taxonomy
 				? getEditedPostAttribute( _taxonomy.rest_base )
-				: [];
+				: EMPTY_ARRAY;
 
 			const query = {
 				...DEFAULT_QUERY,
@@ -128,7 +136,7 @@ function FlatTermSelector( { slug, speak } ) {
 				termIds: _termIds,
 				terms: _termIds.length
 					? getEntityRecords( 'taxonomy', slug, query )
-					: [],
+					: EMPTY_ARRAY,
 				isLoading: isResolving( 'getEntityRecords', [
 					'taxonomy',
 					slug,
@@ -150,7 +158,7 @@ function FlatTermSelector( { slug, speak } ) {
 								...DEFAULT_QUERY,
 								search,
 						  } )
-						: [],
+						: EMPTY_ARRAY,
 			};
 		},
 		[ search ]
@@ -158,15 +166,15 @@ function FlatTermSelector( { slug, speak } ) {
 
 	const { editPost } = useDispatch( editorStore );
 
-	// @TODO useMemo, Luke.
-	const selectedTerms =
-		terms?.map( ( term ) => unescapeString( term.name ) ) || [];
-	const suggestions =
-		searchResults?.map( ( term ) => unescapeString( term.name ) ) || [];
-
 	if ( ! hasAssignAction ) {
 		return null;
 	}
+
+	// @TODO useMemo, Luke.
+	const selectedTerms = terms.map( ( term ) => unescapeString( term.name ) );
+	const suggestions = searchResults.map( ( term ) =>
+		unescapeString( term.name )
+	);
 
 	function onUpdateTerms( newTermIds ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
