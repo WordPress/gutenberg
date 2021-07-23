@@ -146,7 +146,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Type] Documentation': 'Documentation',
 	'Global Styles': 'Global Styles',
 	'[Type] Build Tooling': 'Build Tooling',
-	'npm Packages': 'NPM Packages',
+	'npm Packages': 'npm Packages',
 	'Gutenberg Plugin': 'Plugin',
 };
 
