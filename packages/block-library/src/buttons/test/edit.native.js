@@ -75,8 +75,6 @@ describe( 'when a button is shown', () => {
 		);
 		fireEvent( incrementButton, 'onPressIn' );
 
-		await waitFor( () => getByA11yLabel( /Border Radius/ ) );
-
 		const expectedHtml = `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button {"style":{"border":{"radius":"6px"}}} -->
 <div class="wp-block-button"><a class="wp-block-button__link" href="" style="border-radius:6px">Hello</a></div>
