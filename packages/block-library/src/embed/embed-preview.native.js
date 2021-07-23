@@ -91,7 +91,7 @@ const EmbedPreview = ( {
 			} );
 	}
 
-	const { scripts } = preview;
+	const { scripts, provider_url: providerUrl } = preview;
 	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
 	const parsedHost = new URL( url ).host.split( '.' );
 	const parsedHostBaseUrl = parsedHost
@@ -126,6 +126,7 @@ const EmbedPreview = ( {
 							html={ html }
 							scripts={ scripts }
 							title={ iframeTitle }
+							providerUrl={ providerUrl }
 							// type={ sandboxClassnames }
 						/>
 					</View>

@@ -102,10 +102,11 @@ const style = `
 
 export default function Sandbox( {
 	html = '',
+	providerUrl = '',
+	scripts = [],
+	styles = [],
 	title = '',
 	type,
-	styles = [],
-	scripts = [],
 } ) {
 	const ref = useRef();
 	const [ width, setWidth ] = useState( 0 );
@@ -199,7 +200,7 @@ export default function Sandbox( {
 	return (
 		<WebView
 			ref={ ref }
-			source={ { html: iframeHtml } }
+			source={ { baseUrl: providerUrl, html: iframeHtml } }
 			// Wildcard value is required for static HTML
 			// Reference: https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md#source
 			originWhitelist={ [ '*' ] }
