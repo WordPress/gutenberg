@@ -74,7 +74,7 @@ function UnitControl( {
 			</View>
 		);
 
-		if ( hasUnits( units ) ) {
+		if ( hasUnits( units ) && units?.length > 1 ) {
 			return (
 				<TouchableWithoutFeedback
 					onPress={ onPickerPresent }
@@ -118,7 +118,7 @@ function UnitControl( {
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
 				{ renderUnitButton }
-				{ hasUnits( units ) ? (
+				{ hasUnits( units ) && units?.length > 1 ? (
 					<Picker
 						ref={ pickerRef }
 						options={ units }
