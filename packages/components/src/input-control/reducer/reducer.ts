@@ -36,7 +36,7 @@ function mergeInitialState(
 		...initialInputControlState,
 		...initialState,
 		initialValue: value,
-	};
+	} as InputState;
 }
 
 /**
