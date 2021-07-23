@@ -90,7 +90,7 @@ function findOrCreateTerm( termName, restBase ) {
 
 function FlatTermSelector( { slug, speak } ) {
 	const [ search, setSearch ] = useState( '' );
-	const searchTerms = useDebounce( setSearch, 500 );
+	const debouncedSearch = useDebounce( setSearch, 500 );
 
 	const { terms, termIds, taxonomy, isLoading, hasAssignAction } = useSelect(
 		( select ) => {
@@ -172,7 +172,7 @@ function FlatTermSelector( { slug, speak } ) {
 
 	// The getEntityRecords returns null when items are unknown.
 	// This is the reason for the extra check and empty fallback array.
-	const selectedTerms =
+	const values =
 		terms?.map( ( term ) => unescapeString( term.name ) ) || EMPTY_ARRAY;
 	const suggestions =
 		searchResults?.map( ( term ) => unescapeString( term.name ) ) ||
@@ -261,10 +261,10 @@ function FlatTermSelector( { slug, speak } ) {
 	return (
 		<>
 			<FormTokenField
-				value={ selectedTerms }
-				suggestions={ suggestions || selectedTerms }
+				value={ values }
+				suggestions={ suggestions }
 				onChange={ onChange }
-				onInputChange={ searchTerms }
+				onInputChange={ debouncedSearch }
 				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
 				disabled={ isLoading }
 				label={ newTermLabel }
