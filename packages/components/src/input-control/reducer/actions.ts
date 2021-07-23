@@ -4,6 +4,11 @@
 // eslint-disable-next-line no-restricted-imports
 import type { SyntheticEvent } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { DragProps } from '../types';
+
 export const CHANGE = 'CHANGE';
 export const COMMIT = 'COMMIT';
 export const DRAG_END = 'DRAG_END';
@@ -34,9 +39,9 @@ export type CommitAction = Action< typeof COMMIT, ValuePayload >;
 export type PressUpAction = Action< typeof PRESS_UP >;
 export type PressDownAction = Action< typeof PRESS_DOWN >;
 export type PressEnterAction = Action< typeof PRESS_ENTER >;
-export type DragStartAction = Action< typeof DRAG_START >;
-export type DragEndAction = Action< typeof DRAG_END >;
-export type DragAction = Action< typeof DRAG >;
+export type DragStartAction = Action< typeof DRAG_START, DragProps >;
+export type DragEndAction = Action< typeof DRAG_END, DragProps >;
+export type DragAction = Action< typeof DRAG, DragProps >;
 export type ResetAction = Action< typeof RESET, Partial< ValuePayload > >;
 export type UpdateAction = Action< typeof UPDATE, ValuePayload >;
 export type InvalidateAction = Action<

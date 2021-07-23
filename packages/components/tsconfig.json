@@ -34,6 +34,7 @@
 		"src/grid/**/*",
 		"src/h-stack/**/*",
 		"src/heading/**/*",
+		"src/input-control/**/*",
 		"src/icon/**/*",
 		"src/scroll-lock/**/*",
 		"src/scrollable/**/*",

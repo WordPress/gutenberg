@@ -36,7 +36,7 @@ function mergeInitialState(
 		...initialInputControlState,
 		...initialState,
 		initialValue: value,
-	};
+	} as InputState;
 }
 
 /**
@@ -185,7 +185,7 @@ export function useInputControlStateReducer(
 		dispatch( {
 			type,
 			payload: { value: nextValue, event },
-		} );
+		} as actions.InputAction );
 	};
 
 	const createKeyEvent = ( type: actions.KeyEventAction[ 'type' ] ) => (
