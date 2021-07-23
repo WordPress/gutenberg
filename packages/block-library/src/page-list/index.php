@@ -135,7 +135,7 @@ function block_core_page_list_build_css_font_sizes( $context ) {
  *
  * @return string List markup.
  */
-function block_core_page_list_render_nested_page_list( $nested_pages, $active_page_ancestor_ids = array(), $colors, $depth = 0 ) {
+function block_core_page_list_render_nested_page_list( $nested_pages, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
