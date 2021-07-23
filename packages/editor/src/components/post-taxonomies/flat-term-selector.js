@@ -170,11 +170,13 @@ function FlatTermSelector( { slug, speak } ) {
 		return null;
 	}
 
-	// @TODO useMemo, Luke.
-	const selectedTerms = terms.map( ( term ) => unescapeString( term.name ) );
-	const suggestions = searchResults.map( ( term ) =>
-		unescapeString( term.name )
-	);
+	// The getEntityRecords returns null when items are unknown.
+	// This is the reason for the extra check and empty fallback array.
+	const selectedTerms =
+		terms?.map( ( term ) => unescapeString( term.name ) ) || EMPTY_ARRAY;
+	const suggestions =
+		searchResults?.map( ( term ) => unescapeString( term.name ) ) ||
+		EMPTY_ARRAY;
 
 	function onUpdateTerms( newTermIds ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
