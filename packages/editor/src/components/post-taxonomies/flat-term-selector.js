@@ -152,13 +152,12 @@ function FlatTermSelector( { slug, speak } ) {
 			const { getEntityRecords } = select( coreStore );
 
 			return {
-				searchResults:
-					search.length >= 3
-						? getEntityRecords( 'taxonomy', slug, {
-								...DEFAULT_QUERY,
-								search,
-						  } )
-						: EMPTY_ARRAY,
+				searchResults: !! search
+					? getEntityRecords( 'taxonomy', slug, {
+							...DEFAULT_QUERY,
+							search,
+					  } )
+					: EMPTY_ARRAY,
 			};
 		},
 		[ search ]
