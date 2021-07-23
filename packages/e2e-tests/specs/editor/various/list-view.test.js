@@ -16,7 +16,9 @@ async function dragAndDrop( draggableElement, targetElement, offsetY ) {
 		y: targetClickablePoint.y + offsetY,
 	};
 
-	return await page.mouse.dragAndDrop( draggablePoint, targetPoint );
+	return await page.mouse.dragAndDrop( draggablePoint, targetPoint, {
+		delay: 100,
+	} );
 }
 
 describe( 'List view', () => {
