@@ -32,7 +32,7 @@ export function NumberControl(
 		label,
 		max = Infinity,
 		min = -Infinity,
-		required,
+		required = false,
 		shiftStep = 10,
 		step = 1,
 		type: typeProp = 'number',

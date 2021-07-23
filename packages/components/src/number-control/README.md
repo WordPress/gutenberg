@@ -83,10 +83,11 @@ The position of the label (`top`, `side`, `bottom`, or `edge`).
 
 ### required
 
-If boolean false, allows an empty string as a valid value.
+If `true` enforces a valid number within the control's min/max range. If `false` allows an empty string as a valid value.
 
 -   Type: `Boolean`
 -   Required: No
+-   Default: `false`
 
 ### shiftStep
 
