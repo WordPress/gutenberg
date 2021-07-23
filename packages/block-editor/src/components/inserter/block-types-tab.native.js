@@ -12,12 +12,7 @@ import { store as blockEditorStore } from '../../store';
 
 const NON_BLOCK_CATEGORIES = [ 'reusable' ];
 
-const ALLOWED_EMBED_VARIATIONS = [
-	'core/embed',
-	'core/embed/youtube',
-	'core/embed/twitter',
-	'core/embed/instagram',
-];
+const ALLOWED_EMBED_VARIATIONS = [ 'core/embed' ];
 
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
