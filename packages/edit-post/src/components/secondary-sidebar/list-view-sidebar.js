@@ -34,8 +34,8 @@ export default function ListViewSidebar() {
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const focusReturnRef = useFocusReturn();
 	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE ) {
-			event.stopPropagation();
+		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+			event.preventDefault();
 			setIsListViewOpened( false );
 		}
 	}

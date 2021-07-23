@@ -74,7 +74,7 @@ describe( 'Widgets screen', () => {
 	async function getBlockInGlobalInserter( blockName ) {
 		const addBlockButton = await find( {
 			role: 'button',
-			name: 'Add block',
+			name: 'Toggle block inserter',
 			pressed: false,
 		} );
 		await addBlockButton.click();
@@ -842,6 +842,7 @@ describe( 'Widgets screen', () => {
 		await page.keyboard.type( 'Second Paragraph' );
 
 		await saveWidgets();
+		await page.focus( '.block-editor-writing-flow' );
 
 		// Delete the last block and save again.
 		await pressKeyWithModifier( 'access', 'z' );

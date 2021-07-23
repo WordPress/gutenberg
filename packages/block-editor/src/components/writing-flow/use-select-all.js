@@ -31,6 +31,12 @@ export default function useSelectAll() {
 				return;
 			}
 
+			if (
+				event.target.classList.contains( 'editor-post-title__input' )
+			) {
+				return;
+			}
+
 			const selectedClientIds = getSelectedBlockClientIds();
 
 			if (
