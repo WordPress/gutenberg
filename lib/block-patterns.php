@@ -302,3 +302,38 @@ add_action(
 		}
 	}
 );
+
+/**
+ * Inject the block_types value into the API response.
+ *
+ * @param WP_REST_Response $response    The response object.
+ * @param object           $raw_pattern The unprepared pattern.
+ */
+function filter_block_pattern_response( $response, $raw_pattern ) {
+	$data = $response->get_data();
+	$data['block_types'] = array_map( 'sanitize_text_field', $raw_pattern->meta->wpop_block_types );
+	$response->set_data( $data );
+	return $response;
+}
+add_filter( 'rest_prepare_block_pattern', 'filter_block_pattern_response', 10, 2 );
+
+/**
+ * Add the schema to the block_types value. The value itself is injected in the
+ * `rest_prepare_*` filter, so that the raw pattern response is available.
+ */
+function add_block_pattern_block_types_schema() {
+	register_rest_field(
+		'pattern-directory-item',
+		'block_types',
+		array(
+			'schema' => array(
+				'description' => __( 'The block types which can use this pattern.', 'gutenberg' ),
+				'type'        => 'array',
+				'uniqueItems' => true,
+				'items'       => array( 'type' => 'string' ),
+				'context'     => array( 'view', 'embed' ),
+			),
+		)
+	);
+}
+add_filter( 'rest_api_init', 'add_block_pattern_block_types_schema' );
