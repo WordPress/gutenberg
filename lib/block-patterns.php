@@ -200,16 +200,30 @@ function gutenberg_remove_core_patterns() {
 }
 
 /**
+ * Normalize the settings from the API (snake_case) to the format expected by `register_block_pattern` (camelCase).
+ *
+ * @param array $settings Settings as returned from the API.
+ */
+function gutenber_pattern_normalize_settings( $settings ) {
+	if ( isset( $settings['block_types'] ) ) {
+		$settings['blockTypes'] = $settings['block_types'];
+		unset( $settings['block_types'] );
+	}
+
+	if ( isset( $settings['viewport_width'] ) ) {
+		$settings['viewportWidth'] = $settings['viewport_width'];
+		unset( $settings['viewport_width'] );
+	}
+
+	return (array) $settings;
+}
+
+/**
  * Register Core's official patterns from wordpress.org/patterns.
  *
  * @since 5.8.0
  */
 function gutenberg_load_remote_core_patterns() {
-	// This is the core function that provides the same feature.
-	if ( function_exists( '_load_remote_block_patterns' ) ) {
-		return;
-	}
-
 	/**
 	 * Filter to disable remote block patterns.
 	 *
@@ -231,15 +245,11 @@ function gutenberg_load_remote_core_patterns() {
 
 		foreach ( $patterns as $settings ) {
 			$pattern_name = 'core/' . sanitize_title( $settings['title'] );
-			if ( isset( $settings['block_types'] ) ) {
-				$settings['blockTypes'] = $settings['block_types'];
-				unset( $settings['block_types'] );
+			if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $pattern_name ) ) {
+				unregister_block_pattern( $pattern_name );
 			}
-			if ( isset( $settings['viewport_width'] ) ) {
-				$settings['viewportWidth'] = $settings['viewport_width'];
-				unset( $settings['viewport_width'] );
-			}
-			register_block_pattern( $pattern_name, (array) $settings );
+			$normalized_settings = gutenber_pattern_normalize_settings( $settings );
+			register_block_pattern( $pattern_name, $normalized_settings );
 		}
 	}
 }
@@ -277,13 +287,16 @@ function gutenberg_load_remote_featured_patterns() {
 		$pattern_name = sanitize_title( $pattern['title'] );
 		$registry     = WP_Block_Patterns_Registry::get_instance();
 		// Some patterns might be already registerd as `core patterns with the `core` prefix.
-		$is_registered = $registry->is_registered( $pattern_name ) || $registry->is_registered( "core/$pattern_name" );
-		if ( ! $is_registered ) {
-			register_block_pattern( $pattern_name, (array) $pattern );
+		if ( $registry->is_registered( $pattern_name ) ) {
+			unregister_block_pattern( $pattern_name );
+		} elseif ( $registry->is_registered( "core/$pattern_name" ) ) {
+			unregister_block_pattern( "core/$pattern_name" );
 		}
+
+		$normalized_settings = gutenber_pattern_normalize_settings( $pattern );
+		register_block_pattern( $pattern_name, $normalized_settings );
 	}
 }
-
 
 add_action(
 	'init',
@@ -308,7 +321,8 @@ add_action(
 			gutenberg_load_remote_core_patterns();
 			gutenberg_load_remote_featured_patterns();
 		}
-	}
+	},
+	15
 );
 
 /**
