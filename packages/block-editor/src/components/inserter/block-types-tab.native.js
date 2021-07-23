@@ -12,6 +12,13 @@ import { store as blockEditorStore } from '../../store';
 
 const NON_BLOCK_CATEGORIES = [ 'reusable' ];
 
+const ALLOWED_EMBED_VARIATIONS = [
+	'core/embed',
+	'core/embed/youtube',
+	'core/embed/twitter',
+	'core/embed/instagram',
+];
+
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
 
@@ -21,7 +28,14 @@ function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 
 			const allItems = getInserterItems( rootClientId );
 			const blockItems = allItems.filter(
-				( { category } ) => ! NON_BLOCK_CATEGORIES.includes( category )
+				( { id, category } ) =>
+					! NON_BLOCK_CATEGORIES.includes( category ) &&
+					// We don't want to show all possible embed variations
+					// as different blocks in the inserter. We'll only show a
+					// few popular ones.
+					( category !== 'embed' ||
+						( category === 'embed' &&
+							ALLOWED_EMBED_VARIATIONS.includes( id ) ) )
 			);
 
 			return {
