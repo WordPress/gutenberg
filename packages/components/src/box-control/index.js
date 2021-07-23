@@ -17,7 +17,7 @@ import Button from '../button';
 import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
-import VerticalHorizontalInputControls from './vertical-horizontal-input-controls';
+import AxialInputControls from './axial-input-controls';
 import BoxControlIcon from './icon';
 import { Text } from '../text';
 import LinkedButton from './linked-button';
@@ -157,9 +157,7 @@ export default function BoxControl( {
 				) }
 				{ ! isLinked && splitOnAxis && (
 					<FlexBlock>
-						<VerticalHorizontalInputControls
-							{ ...inputControlProps }
-						/>
+						<AxialInputControls { ...inputControlProps } />
 					</FlexBlock>
 				) }
 				{ ! hasOneSide && (

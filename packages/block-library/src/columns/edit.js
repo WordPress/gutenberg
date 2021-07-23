@@ -8,7 +8,12 @@ import { dropRight, get, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl, Notice } from '@wordpress/components';
+import {
+	Notice,
+	PanelBody,
+	RangeControl,
+	ToggleControl,
+} from '@wordpress/components';
 
 import {
 	InspectorControls,
@@ -49,11 +54,12 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
+	setAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { isStackedOnMobile, verticalAlignment } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -66,6 +72,7 @@ function ColumnsEditContainer( {
 
 	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
 	} );
 
 	const blockProps = useBlockProps( {
@@ -101,6 +108,15 @@ function ColumnsEditContainer( {
 							) }
 						</Notice>
 					) }
+					<ToggleControl
+						label={ __( 'Stack on mobile' ) }
+						checked={ isStackedOnMobile }
+						onChange={ () =>
+							setAttributes( {
+								isStackedOnMobile: ! isStackedOnMobile,
+							} )
+						}
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />

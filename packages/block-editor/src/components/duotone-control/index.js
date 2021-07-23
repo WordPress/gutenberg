@@ -15,14 +15,11 @@ function DuotoneControl( {
 	colorPalette,
 	duotonePalette,
 	disableCustomColors,
+	disableCustomDuotone,
 	value,
 	onChange,
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
-
-	if ( ! duotonePalette ) {
-		return null;
-	}
 
 	const onToggle = () => {
 		setIsOpen( ( prev ) => ! prev );
@@ -31,7 +28,6 @@ function DuotoneControl( {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
-			event.stopPropagation();
 			onToggle();
 		}
 	};
@@ -55,6 +51,7 @@ function DuotoneControl( {
 					duotonePalette={ duotonePalette }
 					colorPalette={ colorPalette }
 					disableCustomColors={ disableCustomColors }
+					disableCustomDuotone={ disableCustomDuotone }
 				/>
 			) }
 		</>

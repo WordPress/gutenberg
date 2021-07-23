@@ -56,7 +56,7 @@ export default function HomeEdit( {
 
 	return (
 		<>
-			<li { ...blockProps }>
+			<div { ...blockProps }>
 				<a
 					className="wp-block-home-link__content"
 					href={ homeUrl }
@@ -80,7 +80,7 @@ export default function HomeEdit( {
 						] }
 					/>
 				</a>
-			</li>
+			</div>
 		</>
 	);
 }

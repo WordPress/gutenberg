@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from 'emotion';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -13,6 +8,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
@@ -20,11 +16,13 @@ import * as styles from '../styles';
 export function useCardBody( props ) {
 	const {
 		className,
-		isScrollable = true,
+		isScrollable = false,
 		isShady = false,
 		size = 'medium',
 		...otherProps
 	} = useContextSystem( props, 'CardBody' );
+
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>

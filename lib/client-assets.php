@@ -102,6 +102,20 @@ function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $v
 		$output = sprintf( "wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ '%s' ] }, 'default' );", $ltr );
 		$scripts->add_inline_script( 'wp-i18n', $output, 'after' );
 	}
+
+	/*
+	 * Wp-editor module is exposed as window.wp.editor.
+	 * Problem: there is quite some code expecting window.wp.oldEditor object available under window.wp.editor.
+	 * Solution: fuse the two objects together to maintain backward compatibility.
+	 * For more context, see https://github.com/WordPress/gutenberg/issues/33203
+	 */
+	if ( 'wp-editor' === $handle ) {
+		$scripts->add_inline_script(
+			'wp-editor',
+			'Object.assign( window.wp.editor, window.wp.oldEditor );',
+			'after'
+		);
+	}
 }
 
 /**
@@ -236,15 +250,14 @@ function gutenberg_register_packages_scripts( $scripts ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
-	$suffix          = '.min.js';
 
-	foreach ( glob( gutenberg_dir_path() . "build/*/index$suffix" ) as $path ) {
+	foreach ( glob( gutenberg_dir_path() . 'build/*/index.min.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
 		// For example, `…/build/a11y/index.min.js` becomes `wp-a11y`.
 		$handle = 'wp-' . basename( dirname( $path ) );
 
-		// Replace suffix and extension with `.asset.php` to find the generated dependencies file.
-		$asset_file   = substr( $path, 0, -( strlen( $suffix ) ) ) . '.asset.php';
+		// Replace extension with `.asset.php` to find the generated dependencies file.
+		$asset_file   = substr( $path, 0, -( strlen( '.js' ) ) ) . '.asset.php';
 		$asset        = file_exists( $asset_file )
 			? require( $asset_file )
 			: null;
@@ -746,7 +759,8 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	ob_start();
 
-	wp_styles()->done = array();
+	// We do not need reset styles for the iframed editor.
+	wp_styles()->done = array( 'wp-reset-editor-styles' );
 	wp_styles()->do_items( $style_handles );
 	wp_styles()->done = $done;
 

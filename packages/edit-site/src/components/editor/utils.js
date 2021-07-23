@@ -71,6 +71,7 @@ export const PRESET_METADATA = [
 ];
 
 const STYLE_PROPERTIES_TO_CSS_VAR_INFIX = {
+	linkColor: 'color',
 	backgroundColor: 'color',
 	background: 'gradient',
 };
@@ -110,6 +111,57 @@ export function useSetting( path, blockName = '' ) {
 	return result;
 }
 
+function findInPresetsBy(
+	styles,
+	context,
+	presetPath,
+	presetProperty,
+	presetValueValue
+) {
+	// Block presets take priority above root level presets.
+	const orderedPresetsByOrigin = [
+		get( styles, [ 'settings', 'blocks', context, ...presetPath ] ),
+		get( styles, [ 'settings', ...presetPath ] ),
+	];
+	for ( const presetByOrigin of orderedPresetsByOrigin ) {
+		if ( presetByOrigin ) {
+			// Preset origins ordered by priority.
+			const origins = [ 'user', 'theme', 'core' ];
+			for ( const origin of origins ) {
+				const presets = presetByOrigin[ origin ];
+				if ( presets ) {
+					const presetObject = find(
+						presets,
+						( preset ) =>
+							preset[ presetProperty ] === presetValueValue
+					);
+					if ( presetObject ) {
+						if ( presetProperty === 'slug' ) {
+							return presetObject;
+						}
+						// if there is a highest priority preset with the same slug but different value the preset we found was overwritten and should be ignored.
+						const highestPresetObjectWithSameSlug = findInPresetsBy(
+							styles,
+							context,
+							presetPath,
+							'slug',
+							presetObject.slug
+						);
+						if (
+							highestPresetObjectWithSameSlug[
+								presetProperty
+							] === presetObject[ presetProperty ]
+						) {
+							return presetObject;
+						}
+						return undefined;
+					}
+				}
+			}
+		}
+	}
+}
+
 export function getPresetVariable( styles, context, propertyName, value ) {
 	if ( ! value ) {
 		return value;
@@ -121,17 +173,16 @@ export function getPresetVariable( styles, context, propertyName, value ) {
 		// so the value should be returned as it is.
 		return value;
 	}
+	const { valueKey, path, cssVarInfix } = metadata;
 
-	const basePath =
-		ROOT_BLOCK_NAME === context
-			? [ 'settings' ]
-			: [ 'settings', 'blocks', context ];
-	const { valueKey, path: propertyPath, cssVarInfix } = metadata;
-	const presets = get( styles, [ ...basePath, ...propertyPath ] );
-	const presetObject = find(
-		presets,
-		( preset ) => preset[ valueKey ] === value
+	const presetObject = findInPresetsBy(
+		styles,
+		context,
+		path,
+		valueKey,
+		value
 	);
+
 	if ( ! presetObject ) {
 		// Value wasn't found in the presets,
 		// so it must be a custom value.
@@ -153,14 +204,14 @@ function getValueFromPresetVariable(
 		return variable;
 	}
 
-	const presets =
-		get( styles, [ 'settings', 'blocks', blockName, ...metadata.path ] ) ??
-		get( styles, [ 'settings', ...metadata.path ] );
-	if ( ! presets ) {
-		return variable;
-	}
+	const presetObject = findInPresetsBy(
+		styles,
+		blockName,
+		metadata.path,
+		'slug',
+		slug
+	);
 
-	const presetObject = find( presets, ( preset ) => preset.slug === slug );
 	if ( presetObject ) {
 		const { valueKey } = metadata;
 		const result = presetObject[ valueKey ];

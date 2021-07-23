@@ -131,7 +131,8 @@ function NotEmpty( {
 		);
 	}
 
-	const mode = isNavigationMode || ! isSelected ? 'preview' : 'edit';
+	const mode =
+		idBase && ( isNavigationMode || ! isSelected ) ? 'preview' : 'edit';
 
 	return (
 		<>

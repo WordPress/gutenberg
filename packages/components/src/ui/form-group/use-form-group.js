@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from 'emotion';
-
-/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
@@ -13,6 +8,7 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import { useContextSystem } from '../context';
 import * as styles from './form-group-styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
@@ -32,6 +28,8 @@ export function useFormGroup( props ) {
 	} = useContextSystem( props, 'FormGroup' );
 
 	const id = useInstanceId( useFormGroup, 'form-group', idProp );
+
+	const cx = useCx();
 
 	const classes = cx( styles.FormGroup, className );
 

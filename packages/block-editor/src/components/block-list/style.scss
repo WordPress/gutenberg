@@ -90,7 +90,7 @@
 				box-shadow 0.1s linear;
 			right: 0;
 			left: 0;
-			top: -$default-block-margin / 2;
+			top: -$default-block-margin * 0.5;
 			border-radius: $radius-block-ui;
 			border-top: 4px solid $gray-400;
 		}
@@ -172,6 +172,7 @@
 			// 2px outside.
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
+			outline: 2px solid transparent; // This shows up in Windows High Contrast Mode.
 
 			// Show a light color for dark themes.
 			.is-dark-theme & {

@@ -14,11 +14,11 @@ import {
 	BlockTools,
 	BlockSelectionClearer,
 	BlockInspector,
+	CopyHandler,
 	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
-	ButtonBlockAppender,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 
@@ -32,6 +32,7 @@ import SidebarEditorProvider from './sidebar-editor-provider';
 import { store as customizeWidgetsStore } from '../../store';
 import WelcomeGuide from '../welcome-guide';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import BlockAppender from '../block-appender';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -80,6 +81,7 @@ export default function SidebarBlockEditor( {
 			mediaUpload: mediaUploadBlockEditor,
 			hasFixedToolbar: isFixedToolbarActive,
 			keepCaretInsideBlock,
+			__unstableHasCustomAppender: true,
 		};
 	}, [
 		hasUploadPermissions,
@@ -98,7 +100,6 @@ export default function SidebarBlockEditor( {
 			<KeyboardShortcuts.Register />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
-				<BlockEditorKeyboardShortcuts />
 				<KeyboardShortcuts
 					undo={ sidebar.undo }
 					redo={ sidebar.redo }
@@ -113,17 +114,19 @@ export default function SidebarBlockEditor( {
 					isFixedToolbarActive={ isFixedToolbarActive }
 				/>
 
-				<BlockTools>
-					<BlockSelectionClearer>
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList
-									renderAppender={ ButtonBlockAppender }
-								/>
-							</ObserveTyping>
-						</WritingFlow>
-					</BlockSelectionClearer>
-				</BlockTools>
+				<CopyHandler>
+					<BlockTools>
+						<BlockSelectionClearer>
+							<WritingFlow>
+								<ObserveTyping>
+									<BlockList
+										renderAppender={ BlockAppender }
+									/>
+								</ObserveTyping>
+							</WritingFlow>
+						</BlockSelectionClearer>
+					</BlockTools>
+				</CopyHandler>
 
 				{ createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>

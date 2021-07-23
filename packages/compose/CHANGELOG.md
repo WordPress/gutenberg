@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.2.0 (2021-07-21)
+
 ### Deprecations
 
 -   `withState` HOC has been deprecated. Use `useState` hook instead.

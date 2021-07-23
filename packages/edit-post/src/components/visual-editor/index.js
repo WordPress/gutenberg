@@ -57,13 +57,14 @@ function MaybeIframe( {
 		return (
 			<>
 				<EditorStyles styles={ styles } />
-				<div
+				<WritingFlow
 					ref={ contentRef }
 					className="editor-styles-wrapper"
 					style={ { flex: '1', ...style } }
+					tabIndex={ -1 }
 				>
 					{ children }
-				</div>
+				</WritingFlow>
 			</>
 		);
 	}
@@ -137,6 +138,7 @@ export default function VisualEditor( { styles } ) {
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
 	const defaultLayout = useSetting( 'layout' );
 	const { contentSize, wideSize } = defaultLayout || {};
+	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode
 		? templateModeStyles
@@ -190,69 +192,65 @@ export default function VisualEditor( { styles } ) {
 	}, [ isTemplateMode, themeSupportsLayout, contentSize, wideSize ] );
 
 	return (
-		<div
+		<BlockTools
+			__unstableContentRef={ ref }
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }
 		>
 			<VisualEditorGlobalKeyboardShortcuts />
-			<BlockTools __unstableContentRef={ ref }>
-				<motion.div
-					className="edit-post-visual-editor__content-area"
-					animate={ {
-						padding: isTemplateMode ? '48px 48px 0' : '0',
-					} }
-					ref={ blockSelectionClearerRef }
-				>
-					{ isTemplateMode && (
-						<Button
-							className="edit-post-visual-editor__exit-template-mode"
-							icon={ arrowLeft }
-							onClick={ () => {
-								clearSelectedBlock();
-								setIsEditingTemplate( false );
-							} }
-						>
-							{ __( 'Back' ) }
-						</Button>
-					) }
-					<motion.div
-						animate={ animatedStyles }
-						initial={ desktopCanvasStyles }
+			<motion.div
+				className="edit-post-visual-editor__content-area"
+				animate={ {
+					padding: isTemplateMode ? '48px 48px 0' : '0',
+				} }
+				ref={ blockSelectionClearerRef }
+			>
+				{ isTemplateMode && (
+					<Button
+						className="edit-post-visual-editor__exit-template-mode"
+						icon={ arrowLeft }
+						onClick={ () => {
+							clearSelectedBlock();
+							setIsEditingTemplate( false );
+						} }
 					>
-						<MaybeIframe
-							isTemplateMode={ isTemplateMode }
-							contentRef={ contentRef }
-							styles={ styles }
-							style={ { paddingBottom } }
-						>
-							{ themeSupportsLayout && ! isTemplateMode && (
-								<LayoutStyle
-									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-									layout={ defaultLayout }
-								/>
-							) }
-							<WritingFlow>
-								{ ! isTemplateMode && (
-									<div className="edit-post-visual-editor__post-title-wrapper">
-										<PostTitle />
-									</div>
-								) }
-								<RecursionProvider>
-									<BlockList
-										__experimentalLayout={ layout }
-									/>
-								</RecursionProvider>
-							</WritingFlow>
-						</MaybeIframe>
-					</motion.div>
+						{ __( 'Back' ) }
+					</Button>
+				) }
+				<motion.div
+					animate={ animatedStyles }
+					initial={ desktopCanvasStyles }
+					className={ previewMode }
+				>
+					<MaybeIframe
+						isTemplateMode={ isTemplateMode }
+						contentRef={ contentRef }
+						styles={ styles }
+						style={ { paddingBottom } }
+					>
+						{ themeSupportsLayout && ! isTemplateMode && (
+							<LayoutStyle
+								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+								layout={ defaultLayout }
+							/>
+						) }
+						{ ! isTemplateMode && (
+							<div className="edit-post-visual-editor__post-title-wrapper">
+								<PostTitle />
+							</div>
+						) }
+						<RecursionProvider>
+							<BlockList __experimentalLayout={ layout } />
+						</RecursionProvider>
+					</MaybeIframe>
 				</motion.div>
-			</BlockTools>
+			</motion.div>
 			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__unstableBlockSettingsMenuFirstItem>
-		</div>
+		</BlockTools>
 	);
 }

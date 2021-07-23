@@ -1,13 +1,21 @@
 /**
  * Internal dependencies
  */
-import { getBlockPaddings, getBlockColors } from '../utils';
+import {
+	getBlockPaddings,
+	getBlockColors,
+	parseStylesVariables,
+	getGlobalStyles,
+} from '../utils';
 
-const DEFAULT_COLORS = [
-	{ color: '#cd2653', name: 'Accent Color', slug: 'accent' },
-	{ color: '#000000', name: 'Primary', slug: 'primary' },
-	{ color: '#6d6d6d', name: 'Secondary', slug: 'secondary' },
-];
+import {
+	DEFAULT_COLORS,
+	GLOBAL_STYLES_GRADIENTS,
+	DEFAULT_GLOBAL_STYLES,
+	PARSED_GLOBAL_STYLES,
+	RAW_FEATURES,
+	MAPPED_VALUES,
+} from './fixtures/theme';
 
 describe( 'getBlockPaddings', () => {
 	const PADDING = 12;
@@ -80,6 +88,58 @@ describe( 'getBlockColors', () => {
 		expect( blockColors ).toEqual(
 			expect.objectContaining( {
 				color: '#4ddddd',
+			} )
+		);
+	} );
+} );
+
+describe( 'parseStylesVariables', () => {
+	it( 'returns the parsed preset values correctly', () => {
+		const customValues = parseStylesVariables(
+			JSON.stringify( RAW_FEATURES.custom ),
+			MAPPED_VALUES
+		);
+		const blockColors = parseStylesVariables(
+			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			MAPPED_VALUES,
+			customValues
+		);
+		expect( blockColors ).toEqual(
+			expect.objectContaining( PARSED_GLOBAL_STYLES )
+		);
+	} );
+} );
+
+describe( 'getGlobalStyles', () => {
+	it( 'returns the global styles data correctly', () => {
+		const rawFeatures = JSON.stringify( RAW_FEATURES );
+		const gradients = parseStylesVariables(
+			JSON.stringify( GLOBAL_STYLES_GRADIENTS ),
+			MAPPED_VALUES
+		);
+
+		const globalStyles = getGlobalStyles(
+			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			rawFeatures
+		);
+
+		expect( globalStyles ).toEqual(
+			expect.objectContaining( {
+				colors: RAW_FEATURES.color,
+				gradients,
+				__experimentalFeatures: {
+					color: {
+						palette: RAW_FEATURES.color.palette,
+						gradients,
+					},
+					typography: {
+						fontSizes: RAW_FEATURES.typography.fontSizes,
+						custom: {
+							'line-height': RAW_FEATURES.custom[ 'line-height' ],
+						},
+					},
+				},
+				__experimentalGlobalStylesBaseStyles: PARSED_GLOBAL_STYLES,
 			} )
 		);
 	} );

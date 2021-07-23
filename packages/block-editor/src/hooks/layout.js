@@ -20,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
+import { useContext, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,6 +29,7 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
+import { Head } from '../components/block-list/head';
 
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;
@@ -39,7 +41,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 	}, [] );
 
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'layout.units' ) || [
+		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
 			'px',
 			'em',
@@ -210,12 +212,18 @@ export const withLayoutStyles = createHigherOrderComponent(
 			`wp-container-${ id }`
 		);
 
+		const element = useContext( Head.context );
+
 		return (
 			<>
-				<LayoutStyle
-					selector={ `.wp-container-${ id }` }
-					layout={ usedLayout }
-				/>
+				{ element &&
+					createPortal(
+						<LayoutStyle
+							selector={ `.wp-container-${ id }` }
+							layout={ usedLayout }
+						/>,
+						element
+					) }
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);

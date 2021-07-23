@@ -19,6 +19,7 @@ import { useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import useIsFloatingKeyboard from '../utils/use-is-floating-keyboard';
 import styles from './styles.scss';
 
 const AnimatedKeyboardAvoidingView = Animated.createAnimatedComponent(
@@ -37,6 +38,7 @@ export const KeyboardAvoidingView = ( {
 	const [ isKeyboardOpen, setIsKeyboardOpen ] = useState( false );
 	const [ safeAreaBottomInset, setSafeAreaBottomInset ] = useState( 0 );
 	const { height = 0 } = sizes || {};
+	const floatingKeyboard = useIsFloatingKeyboard();
 
 	const animatedHeight = useRef( new Animated.Value( MIN_HEIGHT ) ).current;
 
@@ -101,6 +103,7 @@ export const KeyboardAvoidingView = ( {
 	return (
 		<AnimatedKeyboardAvoidingView
 			{ ...otherProps }
+			enabled={ ! floatingKeyboard }
 			behavior="padding"
 			keyboardVerticalOffset={ keyboardVerticalOffset }
 			style={

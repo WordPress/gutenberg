@@ -62,7 +62,7 @@ function ColumnEdit( {
 	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
 
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'layout.units' ) || [
+		availableUnits: useSetting( 'spacing.units' ) || [
 			'%',
 			'px',
 			'em',
@@ -175,7 +175,6 @@ function ColumnEdit( {
 								onChange={ onChange }
 								onComplete={ onChangeWidth }
 								onUnitChange={ onChangeUnit }
-								decimalNum={ 1 }
 								value={
 									getWidths( columns )[ selectedColumnIndex ]
 								}

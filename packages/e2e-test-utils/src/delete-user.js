@@ -35,6 +35,14 @@ export async function deleteUser( username ) {
 		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
 	] );
 
+	// If there's content owned by this user, delete it.
+	const deleteContentRadioButton = await page.$(
+		'input[type="radio"][name="delete_option"][value="delete"]'
+	);
+	if ( deleteContentRadioButton ) {
+		await deleteContentRadioButton.click();
+	}
+
 	// Confirm
 	await Promise.all( [
 		page.click( 'input#submit' ),
