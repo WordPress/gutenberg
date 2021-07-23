@@ -1878,6 +1878,46 @@ describe( 'Rich link previews', () => {
 		expect( isRichLinkPreview ).toBe( true );
 	} );
 
+	it( 'should not display placeholders for the image and description if neither is available in the data', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title: '',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description: '',
+				image: '',
+			} )
+		);
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRichUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		// Todo: refactor to use user-facing queries.
+		const hasRichImagePreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-image'
+		);
+
+		// Todo: refactor to use user-facing queries.
+		const hasRichDescriptionPreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-description'
+		);
+
+		expect( hasRichImagePreview ).toBeFalsy();
+		expect( hasRichDescriptionPreview ).toBeFalsy();
+	} );
+
 	it( 'should display a fallback when title is missing from rich data', async () => {
 		mockFetchRichUrlData.mockImplementation( () =>
 			Promise.resolve( {
