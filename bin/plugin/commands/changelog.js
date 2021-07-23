@@ -141,7 +141,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Package] E2E Tests': 'Testing',
 	'[Package] E2E Test Utils': 'Testing',
 	'Automated Testing': 'Testing',
-	'CSS Styling': 'Style and Layout',
+	'CSS Styling': 'CSS & Styling',
 	'developer-docs': 'Documentation',
 	'[Type] Documentation': 'Documentation',
 	'Global Styles': 'Global Styles',
