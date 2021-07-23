@@ -42,7 +42,8 @@ const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
 	orderby: 'count',
 	order: 'desc',
-	_fields: 'id,name,count',
+	_fields: 'id,name',
+	context: 'view',
 };
 
 const isSameTermName = ( termA, termB ) =>
