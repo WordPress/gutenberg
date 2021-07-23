@@ -92,7 +92,14 @@ function FlatTermSelector( { slug, speak } ) {
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
 
-	const { terms, termIds, taxonomy, isLoading, hasAssignAction } = useSelect(
+	const {
+		terms,
+		termIds,
+		taxonomy,
+		isLoading,
+		hasAssignAction,
+		hasCreateAction,
+	} = useSelect(
 		( select ) => {
 			const { getCurrentPost, getEditedPostAttribute } = select(
 				editorStore
@@ -197,6 +204,10 @@ function FlatTermSelector( { slug, speak } ) {
 			);
 		}
 
+		if ( ! hasCreateAction ) {
+			return;
+		}
+
 		Promise.all(
 			newTermNames.map( ( termName ) =>
 				findOrCreateTerm( termName, taxonomy.rest_base )
@@ -215,7 +226,6 @@ function FlatTermSelector( { slug, speak } ) {
 		}
 
 		const newTermIds = [ ...termIds, newTerm.id ];
-
 		const termAddedMessage = sprintf(
 			/* translators: %s: term name. */
 			_x( '%s added', 'term' ),
@@ -227,7 +237,6 @@ function FlatTermSelector( { slug, speak } ) {
 		);
 
 		speak( termAddedMessage, 'assertive' );
-
 		onUpdateTerms( newTermIds );
 	}
 
