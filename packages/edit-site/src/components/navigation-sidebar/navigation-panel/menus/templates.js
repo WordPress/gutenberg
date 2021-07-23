@@ -9,6 +9,7 @@ import { map, find } from 'lodash';
 import {
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
+	Button,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -144,6 +145,9 @@ export default function TemplatesMenu() {
 				title={ __( 'Unused templates' ) }
 				templates={ templatesWithLocation }
 			/>
+			<NavigationItem className="edit-site-navigation-panel__template-item">
+				<Button onClick={ () => {} }>All templates1</Button>
+			</NavigationItem>
 		</NavigationMenu>
 	);
 }

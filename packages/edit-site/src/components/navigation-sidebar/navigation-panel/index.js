@@ -9,6 +9,9 @@ import classnames from 'classnames';
 import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationBackButton as NavigationBackButton,
+	__experimentalNavigationItem as NavigationItem,
+	__experimentalNavigationMenu as NavigationMenu,
+	Button,
 } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -56,6 +59,7 @@ const NavigationPanel = ( { isOpen } ) => {
 	const {
 		setNavigationPanelActiveMenu: setActive,
 		setIsNavigationPanelOpened,
+		switchEditorMode,
 	} = useDispatch( editSiteStore );
 
 	let activeItem;
@@ -116,6 +120,11 @@ const NavigationPanel = ( { isOpen } ) => {
 						) }
 						<SiteMenu />
 					</Navigation>
+					<div className="edit-site-navigation-panel__template-item edit-site-navigation-panel__all-templates">
+						<Button onClick={ () => switchEditorMode( 'mosaic' ) }>
+							{ __( 'All templates' ) }
+						</Button>
+					</div>
 				</div>
 			</div>
 		</div>

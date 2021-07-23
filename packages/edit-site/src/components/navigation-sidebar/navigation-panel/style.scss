@@ -90,6 +90,13 @@
 	}
 }
 
+.edit-site-navigation-panel__all-templates {
+	position: absolute;
+	bottom: $grid-unit-20;
+	left: $grid-unit-20;
+	color: $gray-600;
+}
+
 .edit-site-navigation-panel__template-item {
 	display: block;
 
