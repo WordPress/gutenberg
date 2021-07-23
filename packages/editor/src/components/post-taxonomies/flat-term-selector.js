@@ -84,11 +84,24 @@ function FlatTermSelector( { slug, speak } ) {
 	const [ search, setSearch ] = useState( '' );
 	const searchTerms = useDebounce( setSearch, 500 );
 
-	const { hasAssignAction, termIds, taxonomy } = useSelect(
+	const { terms, termIds, taxonomy, isLoading, hasAssignAction } = useSelect(
 		( select ) => {
-			const { getCurrentPost } = select( editorStore );
-			const { getTaxonomy } = select( coreStore );
+			const { getCurrentPost, getEditedPostAttribute } = select(
+				editorStore
+			);
+			const { getEntityRecords, getTaxonomy, isResolving } = select(
+				coreStore
+			);
 			const _taxonomy = getTaxonomy( slug );
+			const _termIds = _taxonomy
+				? getEditedPostAttribute( _taxonomy.rest_base )
+				: [];
+
+			const query = {
+				...DEFAULT_QUERY,
+				include: _termIds,
+				per_page: _termIds.length,
+			};
 
 			return {
 				hasCreateAction: _taxonomy
@@ -111,39 +124,19 @@ function FlatTermSelector( { slug, speak } ) {
 							false
 					  )
 					: false,
-				termIds: _taxonomy
-					? select( editorStore ).getEditedPostAttribute(
-							_taxonomy.rest_base
-					  )
-					: [],
 				taxonomy: _taxonomy,
-			};
-		},
-		[ slug ]
-	);
-
-	const { terms, isLoading } = useSelect(
-		( select ) => {
-			const { getEntityRecords, isResolving } = select( coreStore );
-
-			const query = {
-				...DEFAULT_QUERY,
-				include: termIds.join( ',' ),
-				per_page: termIds.length || 1,
-			};
-
-			return {
-				terms: termIds.length
+				termIds: _termIds,
+				terms: _termIds.length
 					? getEntityRecords( 'taxonomy', slug, query )
 					: [],
 				isLoading: isResolving( 'getEntityRecords', [
 					'taxonomy',
-					taxonomy.slug,
+					slug,
 					query,
 				] ),
 			};
 		},
-		[ termIds ]
+		[ slug ]
 	);
 
 	const { searchResults } = useSelect(
