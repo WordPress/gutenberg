@@ -153,7 +153,7 @@ const EmbedEdit = ( props ) => {
 
 	const blockProps = useBlockProps();
 
-	if ( fetching ) {
+	if ( fetching || ( url !== attributesUrl && preview ) ) {
 		return (
 			<View { ...blockProps }>
 				<EmbedLoading />
