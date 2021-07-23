@@ -16,7 +16,7 @@ import EmbedBottomSheet from './embed-bottom-sheet';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
@@ -25,16 +25,6 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
-
-function getResponsiveHelp( checked ) {
-	return checked
-		? __(
-				'This embed will preserve its aspect ratio when the browser is resized.'
-		  )
-		: __(
-				'This embed may not preserve its aspect ratio when the browser is resized.'
-		  );
-}
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -224,7 +214,6 @@ const EmbedEdit = ( props ) => {
 						themeSupportsResponsive={ themeSupportsResponsive }
 						blockSupportsResponsive={ responsive }
 						allowResponsive={ allowResponsive }
-						getResponsiveHelp={ getResponsiveHelp }
 						toggleResponsive={ toggleResponsive }
 						switchBackToURLInput={ () => setIsEditingURL( true ) }
 					/>
