@@ -47,7 +47,7 @@ function InputField(
 		onValidate = noop,
 		size = 'default',
 		setIsFocused,
-		stateReducer = ( state: any ) => state,
+		stateReducer,
 		value: valueProp,
 		type,
 		...props
@@ -75,42 +75,42 @@ function InputField(
 		isPressEnterToChange,
 	} );
 
-	const { _event, value, isDragging, isDirty } = state;
-	const wasDirtyOnBlur = useRef( false );
+	const { _event, value, isDragging, isDirty, error } = state;
+	const wasPendentOnBlur = useRef( false );
 
 	const dragCursor = useDragCursor( isDragging, dragDirection );
 
 	/*
-	 * Handles synchronization of external and internal value state.
-	 * If not focused and did not hold a dirty value[1] on blur
-	 * updates the value from the props. Otherwise if not holding
-	 * a dirty value[1] propagates the value and event through onChange.
-	 * [1] value is only made dirty if isPressEnterToChange is true
+	 * Handles switching modes between controlled – while not focused – and
+	 * uncontrolled – while focused. Exceptions are made when the internal
+	 * value is either dirty or invalid. In such cases, the value does not
+	 * propagate while focused and the first render while not focused ignores
+	 * the value from props and instead propagates the internal value.
 	 */
 	useUpdateEffect( () => {
 		if ( valueProp === value ) {
 			return;
 		}
-		if ( ! isFocused && ! wasDirtyOnBlur.current ) {
+		if ( ! isFocused && ! wasPendentOnBlur.current ) {
 			update( valueProp, _event as SyntheticEvent );
-		} else if ( ! isDirty ) {
+		} else if ( ! isDirty && ! error ) {
 			onChange( value, {
 				event: _event as ChangeEvent< HTMLInputElement >,
 			} );
-			wasDirtyOnBlur.current = false;
+			wasPendentOnBlur.current = false;
 		}
-	}, [ value, isDirty, isFocused, valueProp ] );
+	}, [ value, isDirty, isFocused, valueProp, error ] );
 
 	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
 		onBlur( event );
 		setIsFocused?.( false );
 
 		/**
-		 * If isPressEnterToChange is set, this commits the value to
-		 * the onChange callback.
+		 * Commits the value in cases where it has not yet propagated. In case
+		 * of an error the commit will resolve the value before propagation.
 		 */
-		if ( isPressEnterToChange && isDirty ) {
-			wasDirtyOnBlur.current = true;
+		if ( isDirty || error ) {
+			wasPendentOnBlur.current = true;
 			handleOnCommit( event );
 		}
 	};
