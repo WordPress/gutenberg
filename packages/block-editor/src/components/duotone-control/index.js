@@ -18,6 +18,8 @@ function DuotoneControl( {
 	disableCustomDuotone,
 	value,
 	onChange,
+	onPosterizeToggle,
+	posterize,
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
@@ -52,6 +54,8 @@ function DuotoneControl( {
 					colorPalette={ colorPalette }
 					disableCustomColors={ disableCustomColors }
 					disableCustomDuotone={ disableCustomDuotone }
+					onPosterizeToggle={ onPosterizeToggle }
+					posterize={ posterize }
 				/>
 			) }
 		</>

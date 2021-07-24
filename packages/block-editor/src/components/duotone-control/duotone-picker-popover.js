@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Popover, MenuGroup, DuotonePicker } from '@wordpress/components';
+import {
+	Popover,
+	MenuGroup,
+	DuotonePicker,
+	ToggleControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 function DuotonePickerPopover( {
@@ -12,6 +17,8 @@ function DuotonePickerPopover( {
 	colorPalette,
 	disableCustomColors,
 	disableCustomDuotone,
+	posterize,
+	onPosterizeToggle,
 } ) {
 	return (
 		<Popover
@@ -27,6 +34,11 @@ function DuotonePickerPopover( {
 					disableCustomDuotone={ disableCustomDuotone }
 					value={ value }
 					onChange={ onChange }
+				/>
+				<ToggleControl
+					checked={ posterize }
+					onChange={ onPosterizeToggle }
+					label={ __( 'Posterize' ) }
 				/>
 			</MenuGroup>
 		</Popover>

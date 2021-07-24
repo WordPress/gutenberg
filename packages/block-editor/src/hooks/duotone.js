@@ -62,15 +62,17 @@ export function getValuesFromColors( colors = [] ) {
  * @param {string} props.selector Selector to apply the filter to.
  * @param {string} props.id       Unique id for this duotone filter.
  * @param {Values} props.values   R, G, and B values to filter with.
+ * @param {boolean} props.posterize Decides whether to use discrete values or table values for the filter.
  *
  * @return {WPElement} Duotone element.
  */
-function DuotoneFilter( { selector, id, values } ) {
+function DuotoneFilter( { selector, id, values, posterize } ) {
 	const stylesheet = `
 ${ selector } {
 	filter: url( #${ id } );
 }
 `;
+	const type = posterize ? 'discrete' : 'table';
 
 	return (
 		<>
@@ -104,15 +106,15 @@ ${ selector } {
 							colorInterpolationFilters="sRGB"
 						>
 							<feFuncR
-								type="table"
+								type={ type }
 								tableValues={ values.r.join( ' ' ) }
 							/>
 							<feFuncG
-								type="table"
+								type={ type }
 								tableValues={ values.g.join( ' ' ) }
 							/>
 							<feFuncB
-								type="table"
+								type={ type }
 								tableValues={ values.b.join( ' ' ) }
 							/>
 						</feComponentTransfer>
@@ -127,6 +129,7 @@ ${ selector } {
 function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
+	const posterize = style?.posterize;
 
 	const duotonePalette = useSetting( 'color.duotone' ) || EMPTY_ARRAY;
 	const colorPalette = useSetting( 'color.palette' ) || EMPTY_ARRAY;
@@ -154,6 +157,14 @@ function DuotonePanel( { attributes, setAttributes } ) {
 							...style?.color,
 							duotone: newDuotone,
 						},
+					};
+					setAttributes( { style: newStyle } );
+				} }
+				posterize={ posterize }
+				onPosterizeToggle={ ( newPosterize ) => {
+					const newStyle = {
+						...style,
+						posterize: newPosterize,
 					};
 					setAttributes( { style: newStyle } );
 				} }
@@ -227,6 +238,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 			'color.__experimentalDuotone'
 		);
 		const values = props?.attributes?.style?.color?.duotone;
+		const posterize = props?.attributes?.style?.posterize;
 
 		if ( ! duotoneSupport || ! values ) {
 			return <BlockListBlock { ...props } />;
@@ -252,6 +264,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 							selector={ selectorsGroup }
 							id={ id }
 							values={ getValuesFromColors( values ) }
+							posterize={ posterize }
 						/>,
 						element
 					) }
