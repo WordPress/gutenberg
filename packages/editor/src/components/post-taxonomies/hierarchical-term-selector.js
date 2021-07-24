@@ -258,7 +258,7 @@ function HierarchicalTermSelector( { slug } ) {
 	 * @param {number} termId
 	 */
 	const onChange = ( termId ) => {
-		const hasTerm = terms.indexOf( termId ) !== -1;
+		const hasTerm = terms.includes( termId );
 		const newTerms = hasTerm
 			? without( terms, termId )
 			: [ ...terms, termId ];
