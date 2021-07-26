@@ -3,7 +3,7 @@
  */
 import { __experimentalBlockPatternSetup as BlockPatternSetup } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	TextControl,
 	Flex,
@@ -14,6 +14,7 @@ import {
 
 export default function PatternsSetup( {
 	area,
+	areaLabel,
 	clientId,
 	onCreate,
 	resetPlaceholder,
@@ -49,8 +50,11 @@ export default function PatternsSetup( {
 			/>
 			{ isTitleStep && (
 				<Modal
-					title={ __( 'Create a template part' ) }
-					closeLabel={ __( 'Close' ) }
+					title={ sprintf(
+						'Name and create your new %s',
+						areaLabel.toLowerCase()
+					) }
+					closeLabel={ __( 'Cancel' ) }
 					onRequestClose={ () => {
 						resetPlaceholder();
 					} }

@@ -156,6 +156,7 @@ export default function TemplatePartPlaceholder( {
 			{ step === PLACEHOLDER_STEPS.patterns && (
 				<PatternsSetup
 					area={ area }
+					areaLabel={ areaLabel }
 					onCreate={ onCreate }
 					clientId={ clientId }
 					resetPlaceholder={ () =>
