@@ -12,8 +12,8 @@ import { boolean, select } from '@storybook/addon-knobs';
  * Internal dependencies
  */
 import { ItemGroup, Item } from '..';
-import { Flyout } from '../../../flyout';
-import Button from '../../../button';
+import { Flyout } from '../../flyout';
+import Button from '../../button';
 
 export default {
 	component: ItemGroup,

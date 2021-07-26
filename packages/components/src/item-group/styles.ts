@@ -6,8 +6,8 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { CONFIG } from '../../utils';
-import COLORS from '../../utils/colors-values';
+import { CONFIG } from '../utils';
+import COLORS from '../utils/colors-values';
 
 export const unstyledButton = css`
 	appearance: none;

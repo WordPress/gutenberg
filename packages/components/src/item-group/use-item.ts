@@ -7,12 +7,12 @@ import type { ElementType } from 'react';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
+import { useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
-import type { PolymorphicComponentProps } from '../context';
+import type { PolymorphicComponentProps } from '../ui/context';
 import * as styles from './styles';
 import { useItemGroupContext } from './context';
-import { useCx } from '../../utils/hooks/use-cx';
+import { useCx } from '../utils/hooks/use-cx';
 import type { ItemProps } from './types';
 
 export function useItem(
