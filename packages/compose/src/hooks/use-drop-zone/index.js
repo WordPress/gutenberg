@@ -59,6 +59,11 @@ export default function useDropZone( {
 	const onDragLeaveRef = useFreshRef( _onDragLeave );
 	const onDragEndRef = useFreshRef( _onDragEnd );
 	const onDragOverRef = useFreshRef( _onDragOver );
+	const dragTimingRef = useFreshRef( {
+		dragX: 0,
+		dragY: 0,
+		timestamp: Date.now(),
+	} );
 
 	return useRefEffect(
 		( element ) => {
@@ -67,13 +72,6 @@ export default function useDropZone( {
 			}
 
 			let isDragging = false;
-			/** @type {number} */
-			let lastDragX = 0;
-			/** @type {number} */
-			let lastDragY = 0;
-			/** @type { number } */
-			let lastTimestamp = Date.now(); // Note that FF will reduce precision to 100ms when privacy.resistFingerprinting is enabled
-
 			const { ownerDocument } = element;
 
 			/**
@@ -106,9 +104,11 @@ export default function useDropZone( {
 				}
 
 				isDragging = true;
-				lastTimestamp = Date.now();
-				lastDragX = event.clientX;
-				lastDragY = event.clientY;
+				if ( dragTimingRef.current ) {
+					dragTimingRef.current.timestamp = Date.now();
+					dragTimingRef.current.dragX = event.clientX;
+					dragTimingRef.current.dragY = event.clientY;
+				}
 
 				ownerDocument.removeEventListener(
 					'dragenter',
@@ -149,18 +149,26 @@ export default function useDropZone( {
 
 			function onDragOver( /** @type {DragEvent} */ event ) {
 				// Only call onDragOver for the innermost hovered drop zones.
-				if ( ! event.defaultPrevented && onDragOverRef.current ) {
+				if (
+					! event.defaultPrevented &&
+					onDragOverRef.current &&
+					dragTimingRef.current
+				) {
 					const time = Date.now();
-					if ( time - lastTimestamp > 33 ) {
+					if ( time - dragTimingRef.current.timestamp > 33 ) {
 						const distance =
-							Math.abs( event.clientY - lastDragY ) +
-							Math.abs( event.clientX - lastDragX );
+							Math.abs(
+								event.clientY - dragTimingRef.current.dragY
+							) +
+							Math.abs(
+								event.clientX - dragTimingRef.current.dragX
+							);
 						if ( distance < 10 ) {
 							onDragOverRef.current( event );
 						}
-						lastDragX = event.clientX;
-						lastDragY = event.clientY;
-						lastTimestamp = time;
+						dragTimingRef.current.dragX = event.clientX;
+						dragTimingRef.current.dragY = event.clientY;
+						dragTimingRef.current.timestamp = time;
 					}
 				}
 				// Prevent the browser default while also signalling to parent
