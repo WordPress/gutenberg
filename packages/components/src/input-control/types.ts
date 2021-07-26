@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, ReactNode, ChangeEvent } from 'react';
 import type { useDrag } from 'react-use-gesture';
 
 /**
@@ -32,7 +32,10 @@ export interface InputFieldProps extends BaseProps {
 	dragThreshold?: number;
 	isDragEnabled?: boolean;
 	isPressEnterToChange?: boolean;
-	onChange?: ( nextValue: string ) => void;
+	onChange?: (
+		nextValue: string,
+		extra: { event: ChangeEvent< HTMLInputElement > }
+	) => void;
 	onValidate?: ( nextValue: string ) => void;
 	setIsFocused?: ( isFocused: boolean ) => void;
 	stateReducer?: StateReducer;

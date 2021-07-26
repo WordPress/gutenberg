@@ -96,7 +96,9 @@ function InputField(
 		if ( ! isFocused && ! wasDirtyOnBlur.current ) {
 			update( valueProp, _event as SyntheticEvent );
 		} else if ( ! isDirty ) {
-			onChange( value );
+			onChange( value, {
+				event: _event as ChangeEvent< HTMLInputElement >,
+			} );
 			wasDirtyOnBlur.current = false;
 		}
 	}, [ value, isDirty, isFocused, valueProp ] );
