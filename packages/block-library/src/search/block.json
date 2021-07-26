@@ -42,7 +42,7 @@
 	"supports": {
 		"align": [ "left", "center", "right" ],
 		"color": {
-			"gradient": true,
+			"gradients": true,
 			"__experimentalSkipSerialization": true
 		},
 		"__experimentalBorder": {

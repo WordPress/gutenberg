@@ -272,15 +272,19 @@ function styles_for_block_core_search( $attributes ) {
 	}
 
 	// Add color styles.
-	$has_colors = ! empty( $attributes['style']['color'] );
+	$has_text_color = ! empty( $attributes['style']['color']['text'] );
+	if ( $has_text_color ) {
+		$button_styles[] = sprintf( 'color: %s;', esc_attr( $attributes['style']['color']['text'] ) );
+	}
 
-	if ( $has_colors ) {
-		if ( ! empty( $attributes['style']['color']['text'] ) ) {
-			$button_styles[] = sprintf( 'color: %s;', esc_attr( $attributes['style']['color']['text'] ) );
-		}
-		if ( ! empty( $attributes['style']['color']['background'] ) ) {
-			$button_styles[] = sprintf( 'background-color: %s;', esc_attr( $attributes['style']['color']['background'] ) );
-		}
+	$has_background_color = ! empty( $attributes['style']['color']['background'] );
+	if ( $has_background_color ) {
+		$button_styles[] = sprintf( 'background-color: %s;', esc_attr( $attributes['style']['color']['background'] ) );
+	}
+
+	$has_custom_gradient = ! empty( $attributes['style']['color']['gradient'] );
+	if ( $has_custom_gradient ) {
+		$button_styles[] = sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
 	}
 
 	return array(
@@ -318,9 +322,9 @@ function get_color_classes_for_block_core_search( $attributes ) {
 	$classnames = array();
 
 	// Text color.
-	$has_preset_text_color = ! empty( $attributes['textColor'] );
+	$has_named_text_color = ! empty( $attributes['textColor'] );
 	$has_custom_text_color = ! empty( $attributes['style']['color']['text'] );
-	if ( $has_preset_text_color ) {
+	if ( $has_named_text_color ) {
 		$classnames[] = sprintf( 'has-text-color has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// If a custom 'textColor' was selected instead of a preset, still add the generic `has-text-color` class.
@@ -328,13 +332,23 @@ function get_color_classes_for_block_core_search( $attributes ) {
 	}
 
 	// Background color.
-	$has_preset_background_color = ! empty( $attributes['backgroundColor'] );
+	$has_named_background_color = ! empty( $attributes['backgroundColor'] );
 	$has_custom_background_color = ! empty( $attributes['style']['color']['background'] );
-	if ( $has_preset_background_color ) {
-		$classnames[] = sprintf( 'has-background has-%s-background-color', $attributes['backgroundColor'] );
-	} elseif ( $has_custom_background_color ) {
-		// If a custom 'backgroundColor' was selected instead of a preset, still add the generic `has-background` class.
+	$has_named_gradient = ! empty( $attributes['gradient'] );
+	$has_custom_gradient = ! empty( $attributes['style']['color']['gradient'] );
+	if (
+		$has_named_background_color ||
+		$has_custom_background_color ||
+		$has_named_gradient ||
+		$has_custom_gradient
+	) {
 		$classnames[] = 'has-background';
+	}
+	if ( $has_named_background_color ) {
+		$classnames[] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
+	}
+	if ( $has_named_gradient ) {
+		$classnames[] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
 	}
 
 	return implode( ' ', $classnames );
