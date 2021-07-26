@@ -5,7 +5,7 @@ on:
     release:
         types: [published]
     push:
-        branches: [trunk, add/log-perf]
+        branches: [trunk]
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
