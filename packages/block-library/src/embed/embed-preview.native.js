@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Alert, Linking, TouchableWithoutFeedback } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -59,38 +59,6 @@ const EmbedPreview = ( {
 		}
 	}
 
-	function openContentInBrowser() {
-		Linking.canOpenURL( url )
-			.then( ( supported ) => {
-				if ( ! supported ) {
-					Alert.alert(
-						__( 'Problem opening the embedded content' ),
-						__(
-							'No application can handle this request. Please install a Web browser.'
-						)
-					);
-					// eslint-disable-next-line no-console
-					console.warn(
-						'No application found that can open the video with URL: ' +
-							url
-					);
-				} else {
-					return Linking.openURL( url );
-				}
-			} )
-			.catch( ( err ) => {
-				Alert.alert(
-					__( 'Problem opening the embedded content' ),
-					__( 'An unknown error occurred. Please try again.' )
-				);
-				// eslint-disable-next-line no-console
-				console.error(
-					'An error occurred while opening the embed URL: ' + url,
-					err
-				);
-			} );
-	}
-
 	const { scripts, provider_url: providerUrl } = preview;
 	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
 	const parsedHost = new URL( url ).host.split( '.' );
@@ -115,13 +83,9 @@ const EmbedPreview = ( {
 						if ( isCaptionSelected ) {
 							setIsCaptionSelected( false );
 						}
-						if ( isSelected ) {
-							// TODO: Request confirmation from user before opening the content.
-							openContentInBrowser();
-						}
 					} }
 				>
-					<View pointerEvents="box-only">
+					<View pointerEvents={ isSelected ? 'auto' : 'none' }>
 						<SandBox
 							html={ html }
 							scripts={ scripts }
