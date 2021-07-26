@@ -632,4 +632,43 @@ describe( 'Multi-block selection', () => {
 			'[data-type="core/paragraph"].is-multi-selected'
 		);
 	} );
+
+	it( 'should select all from empty selection', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		// Confirm setup.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Clear the selected block.
+		const paragraph = await page.$( '[data-type="core/paragraph"]' );
+		const box = await paragraph.boundingBox();
+		await page.mouse.click( box.x - 1, box.y );
+
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect both paragraphs to be deleted.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should select title if the cursor is on title', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await page.type( '.editor-post-title__input', 'Post title' );
+
+		await pressKeyWithModifier( 'primary', 'a' );
+		const selectedText = await page.evaluate( () => {
+			return window.getSelection().toString();
+		} );
+		expect( selectedText ).toEqual( 'Post title' );
+	} );
 } );

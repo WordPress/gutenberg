@@ -27,6 +27,17 @@ async function clone( repositoryUrl ) {
 }
 
 /**
+ * Fetches changes from the repository.
+ *
+ * @param {string}          gitWorkingDirectoryPath Local repository path.
+ * @param {string[]|Object} options                 Git options to apply.
+ */
+async function fetch( gitWorkingDirectoryPath, options = [] ) {
+	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	await simpleGit.fetch( options );
+}
+
+/**
  * Commits changes to the repository.
  *
  * @param {string}   gitWorkingDirectoryPath Local repository path.
@@ -166,6 +177,7 @@ module.exports = {
 	checkoutRemoteBranch,
 	createLocalBranch,
 	createLocalTag,
+	fetch,
 	pushBranchToOrigin,
 	pushTagsToOrigin,
 	discardLocalChanges,

@@ -27,15 +27,17 @@ export default function useSelectAll() {
 
 	return useRefEffect( ( node ) => {
 		function onKeyDown( event ) {
-			const selectedClientIds = getSelectedBlockClientIds();
-
-			if ( ! selectedClientIds.length ) {
-				return;
-			}
-
 			if ( ! isMatch( 'core/block-editor/select-all', event ) ) {
 				return;
 			}
+
+			if (
+				event.target.classList.contains( 'editor-post-title__input' )
+			) {
+				return;
+			}
+
+			const selectedClientIds = getSelectedBlockClientIds();
 
 			if (
 				selectedClientIds.length === 1 &&
@@ -72,5 +74,5 @@ export default function useSelectAll() {
 		return () => {
 			node.removeEventListener( 'keydown', onKeyDown );
 		};
-	} );
+	}, [] );
 }

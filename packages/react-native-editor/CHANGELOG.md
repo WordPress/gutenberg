@@ -10,6 +10,11 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.58.0
+-   [***] New Block: Embed block. [#33452]
+
+## 1.57.0
 -   [*] Update loading and failed screens for web version of the editor [#32395]
 -   [*] Handle floating keyboard case - Fix issue with the block selector on iPad. [#33089]
 -   [**] Added color/background customization for text blocks. [#33250]

@@ -1,0 +1,37 @@
+.contentContainer {
+	padding: 0;
+}
+
+.sectionContainer {
+	padding: 0 16px;
+}
+
+.separator {
+	background-color: $light-gray-400;
+	height: 1px;
+	width: 100%;
+}
+
+.separatorDark {
+	background-color: $gray-70;
+}
+
+.bottomSheetHeader {
+	flex-direction: row;
+	align-items: center;
+	padding-right: $grid-unit-20;
+	padding-left: $grid-unit-20;
+	min-height: 44px;
+}
+
+.bottomSheetHeaderTitle {
+	color: $light-primary;
+	text-align: center;
+	font-weight: 600;
+	font-size: 16px;
+	flex: 2;
+}
+
+.bottomSheetHeaderTitleDark {
+	color: $dark-primary;
+}

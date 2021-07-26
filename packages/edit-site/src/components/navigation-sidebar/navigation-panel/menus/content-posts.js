@@ -55,7 +55,9 @@ export default function ContentPostsMenu() {
 		[ searchQuery ]
 	);
 
-	const { setPage } = useDispatch( editSiteStore );
+	const { setPage, setIsNavigationPanelOpened } = useDispatch(
+		editSiteStore
+	);
 
 	const onActivateFrontItem = useCallback( () => {
 		setPage( {
@@ -65,7 +67,8 @@ export default function ContentPostsMenu() {
 				queryContext: { page: 1 },
 			},
 		} );
-	}, [ setPage ] );
+		setIsNavigationPanelOpened( false );
+	}, [ setPage, setIsNavigationPanelOpened ] );
 
 	const shouldShowLoadingForDebouncing = search && isDebouncing;
 	const showLoading = ! isResolved || shouldShowLoadingForDebouncing;

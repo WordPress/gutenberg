@@ -42,8 +42,8 @@
 
 	justify-content: center;
 
-	top: calc(50% - #{  $button-size-small / 2 });
-	left: calc(50% - #{  $button-size-small / 2 });
+	top: calc(50% - #{  $button-size-small * 0.5 });
+	left: calc(50% - #{  $button-size-small * 0.5 });
 }
 
 .block-editor-block-list__block-popover-inserter {
@@ -150,11 +150,11 @@
 
 	// Extra specificity to override standard toolbar button styles.
 	.block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
-		min-width: $block-toolbar-height/2;
-		width: $block-toolbar-height/2;
+		min-width: $block-toolbar-height*0.5;
+		width: $block-toolbar-height*0.5;
 
 		svg {
-			min-width: $block-toolbar-height/2;
+			min-width: $block-toolbar-height*0.5;
 		}
 	}
 }
@@ -204,7 +204,7 @@
 		align-items: center;
 
 		> .components-flex__item {
-			margin-right: $grid-unit-15 / 2;
+			margin-right: $grid-unit-15 * 0.5;
 		}
 	}
 	.components-button.has-icon.block-selection-button_drag-handle {
