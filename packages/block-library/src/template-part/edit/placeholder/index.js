@@ -158,6 +158,9 @@ export default function TemplatePartPlaceholder( {
 					area={ area }
 					onCreate={ onCreate }
 					clientId={ clientId }
+					resetPlaceholder={ () =>
+						setStep( PLACEHOLDER_STEPS.initial )
+					}
 				/>
 			) }
 		</>

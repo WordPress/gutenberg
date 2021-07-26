@@ -12,7 +12,12 @@ import {
 	Modal,
 } from '@wordpress/components';
 
-export default function PatternsSetup( { area, clientId, onCreate } ) {
+export default function PatternsSetup( {
+	area,
+	clientId,
+	onCreate,
+	resetPlaceholder,
+} ) {
 	const blockNameWithArea = area
 		? `core/template-part/${ area }`
 		: 'core/template-part';
@@ -47,8 +52,7 @@ export default function PatternsSetup( { area, clientId, onCreate } ) {
 					title={ __( 'Create a template part' ) }
 					closeLabel={ __( 'Close' ) }
 					onRequestClose={ () => {
-						setIsTitleStep( false );
-						setTitle( __( 'Untitled Template Part' ) );
+						resetPlaceholder();
 					} }
 					overlayClassName="edit-site-template-part-converter__modal"
 				>
@@ -56,8 +60,6 @@ export default function PatternsSetup( { area, clientId, onCreate } ) {
 						onSubmit={ ( event ) => {
 							event.preventDefault();
 							onCreate( startingBlocks, title );
-							// setIsTitleStep( false );
-							// setTitle( __( 'Untitled Template Part' ) );
 						} }
 					>
 						<TextControl
@@ -73,10 +75,7 @@ export default function PatternsSetup( { area, clientId, onCreate } ) {
 								<Button
 									variant="secondary"
 									onClick={ () => {
-										setIsTitleStep( false );
-										setTitle(
-											__( 'Untitled Template Part' )
-										);
+										resetPlaceholder();
 									} }
 								>
 									{ __( 'Cancel' ) }
