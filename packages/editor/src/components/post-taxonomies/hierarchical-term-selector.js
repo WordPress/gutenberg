@@ -326,7 +326,7 @@ function HierarchicalTermSelector( { slug } ) {
 
 	const setFilter = ( value ) => {
 		const newFilteredTermsTree = availableTermsTree
-			.map( getFilterMatcher( filterValue ) )
+			.map( getFilterMatcher( value ) )
 			.filter( ( term ) => term );
 		const getResultCount = ( termsTree ) => {
 			let count = 0;
