@@ -158,7 +158,7 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } figure.wp-block-image:not(#individual-image) {
 				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
-				width: calc(#{100% / $i} - calc(var(--gallery-block--gutter-size, #{$grid-unit-20}) * calc(#{$i - 1}) / #{$i}));
+				width: calc(#{100% / $i} - (var(--gallery-block--gutter-size, #{$grid-unit-20}) * #{$i - 1} / #{$i}));
 			}
 
 			// Prevent collapsing margin while sibling is being dragged.
@@ -176,7 +176,7 @@
 		&.columns-default {
 			figure.wp-block-image:not(#individual-image) {
 				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
-				width: calc(33.33% - calc(var(--gallery-block--gutter-size, 16px) * 2 / 3))
+				width: calc(33.33% - (var(--gallery-block--gutter-size, 16px) * 2 / 3));
 			}
 			figure.wp-block-image:not(#individual-image):nth-of-type(3n+3) {
 				margin-right: 0;
