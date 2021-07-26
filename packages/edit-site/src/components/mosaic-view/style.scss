@@ -1,0 +1,13 @@
+.edit-site-mosaic-view {
+	display: grid;
+	align-items: center;
+	grid-template-columns: repeat(auto-fit, 400px);
+	grid-template-rows: repeat(auto-fit, 400px);
+	grid-gap: $grid-unit-60;
+
+}
+
+.edit-site-mosaic-view__mosaic-item {
+	height: 400px;
+	overflow: hidden;
+}
