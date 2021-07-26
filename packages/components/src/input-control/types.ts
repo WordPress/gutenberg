@@ -2,12 +2,16 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
+<<<<<<< HEAD
 import type {
 	CSSProperties,
 	ReactNode,
 	ChangeEvent,
 	SyntheticEvent,
 } from 'react';
+=======
+import type { CSSProperties, ReactNode, ChangeEvent } from 'react';
+>>>>>>> 38b7df613c (Add back event to onChange)
 import type { useDrag } from 'react-use-gesture';
 
 /**
