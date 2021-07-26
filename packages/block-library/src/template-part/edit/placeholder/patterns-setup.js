@@ -58,7 +58,7 @@ export default function PatternsSetup( {
 					onRequestClose={ () => {
 						resetPlaceholder();
 					} }
-					overlayClassName="edit-site-template-part-converter__modal"
+					overlayClassName="wp-block-template-part__placeholder-title-form"
 				>
 					<form
 						onSubmit={ ( event ) => {
@@ -72,7 +72,7 @@ export default function PatternsSetup( {
 							onChange={ setTitle }
 						/>
 						<Flex
-							className="edit-site-template-part-converter__convert-modal-actions"
+							className="wp-block-template-part__placeholder-title-form-actions"
 							justify="flex-end"
 						>
 							<FlexItem>
