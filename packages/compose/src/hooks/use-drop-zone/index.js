@@ -67,6 +67,12 @@ export default function useDropZone( {
 			}
 
 			let isDragging = false;
+			/** @type {number} */
+			let lastDragX = 0;
+			/** @type {number} */
+			let lastDragY = 0;
+			/** @type { number } */
+			let lastTimestamp = Date.now(); // Note that FF will reduce precision to 100ms when privacy.resistFingerprinting is enabled
 
 			const { ownerDocument } = element;
 
@@ -100,6 +106,9 @@ export default function useDropZone( {
 				}
 
 				isDragging = true;
+				lastTimestamp = Date.now();
+				lastDragX = event.clientX;
+				lastDragY = event.clientY;
 
 				ownerDocument.removeEventListener(
 					'dragenter',
@@ -138,27 +147,11 @@ export default function useDropZone( {
 				}
 			}
 
-			/** @type {number | undefined} */
-			let lastDragX;
-			/** @type {number | undefined} */
-			let lastDragY;
-			/** @type { number | undefined } */
-			let lastTime; // Note that FF will reduce precision to 100ms when privacy.resistFingerprinting is enabled
 			function onDragOver( /** @type {DragEvent} */ event ) {
 				// Only call onDragOver for the innermost hovered drop zones.
 				if ( ! event.defaultPrevented && onDragOverRef.current ) {
 					const time = Date.now();
-					if (
-						lastTime === undefined ||
-						lastDragX === undefined ||
-						lastDragY === undefined
-					) {
-						//first frame
-						lastTime = time;
-						lastDragX = event.clientX;
-						lastDragY = event.clientY;
-					}
-					if ( time - lastTime > 33 ) {
+					if ( time - lastTimestamp > 33 ) {
 						const distance =
 							Math.abs( event.clientY - lastDragY ) +
 							Math.abs( event.clientX - lastDragX );
@@ -167,7 +160,7 @@ export default function useDropZone( {
 						}
 						lastDragX = event.clientX;
 						lastDragY = event.clientY;
-						lastTime = time;
+						lastTimestamp = time;
 					}
 				}
 				// Prevent the browser default while also signalling to parent
