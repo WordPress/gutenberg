@@ -19,10 +19,10 @@ import { store as editorStore } from '../../store';
 
 export function PostAuthorCheck( {
 	hasAssignAuthorAction,
-	authors,
+	hasAuthors,
 	children,
 } ) {
-	if ( ! hasAssignAuthorAction || ! authors || 1 >= authors.length ) {
+	if ( ! hasAssignAuthorAction || ! hasAuthors ) {
 		return null;
 	}
 
@@ -36,14 +36,14 @@ export function PostAuthorCheck( {
 export default compose( [
 	withSelect( ( select ) => {
 		const post = select( editorStore ).getCurrentPost();
+		const authors = select( coreStore ).getUsers( AUTHORS_QUERY );
 		return {
 			hasAssignAuthorAction: get(
 				post,
 				[ '_links', 'wp:action-assign-author' ],
 				false
 			),
-			postType: select( editorStore ).getCurrentPostType(),
-			authors: select( coreStore ).getUsers( AUTHORS_QUERY ),
+			hasAuthors: authors?.length >= 1,
 		};
 	} ),
 	withInstanceId,
