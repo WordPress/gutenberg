@@ -16,7 +16,14 @@ import EditWithoutInnerBlocks from './v1/edit';
  * use of hooks lint errors if adding this logic to the top of the edit component.
  */
 export default function GalleryEditWrapper( props ) {
-	const { attributes } = props;
+	const { attributes, clientId } = props;
+
+	const innerBlockImages = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).getBlock( clientId )?.innerBlocks;
+		},
+		[ clientId ]
+	);
 
 	const __unstableGalleryWithImageBlocks = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
@@ -26,7 +33,7 @@ export default function GalleryEditWrapper( props ) {
 	// This logic is used to infer version information from content with higher
 	// precedence than the flag. New galleries (and existing empty galleries) will
 	// honor the flag.
-	const hasNewVersionContent = !! attributes?.imageCount;
+	const hasNewVersionContent = !! innerBlockImages.length;
 	const hasOldVersionContent =
 		0 < attributes?.ids?.length || 0 < attributes?.images?.length;
 	if (

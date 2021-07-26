@@ -86,8 +86,7 @@ function GalleryEdit( props ) {
 	} = props;
 
 	const {
-		imageCount,
-		columns = defaultColumnsNumber( imageCount ),
+		columns,
 		imageCrop,
 		linkTarget,
 		linkTo,
@@ -155,17 +154,6 @@ function GalleryEdit( props ) {
 		setAttributes( { shortCodeTransforms: undefined } );
 	}, [ shortCodeTransforms, shortCodeImages ] );
 
-	useEffect( () => {
-		if ( ! images ) {
-			setAttributes( { imageCount: undefined } );
-			return;
-		}
-
-		if ( images.length !== imageCount ) {
-			setAttributes( { imageCount: images.length } );
-		}
-	}, [ images ] );
-
 	const imageSizeOptions = useImageSizes(
 		imageData,
 		isSelected,
@@ -181,8 +169,8 @@ function GalleryEdit( props ) {
 	 * it already existed in the gallery. If the image is in fact new, we need
 	 * to apply the gallery's current settings to the image.
 	 *
-	 * @param  {Object} existingBlock Existing Image block that still exists after gallery update.
-	 * @param  {Object} image         Media object for the actual image.
+	 * @param {Object} existingBlock Existing Image block that still exists after gallery update.
+	 * @param {Object} image         Media object for the actual image.
 	 * @return {Object}               Attributes to set on the new image block.
 	 */
 	function buildImageAttributes( existingBlock, image ) {
@@ -462,7 +450,11 @@ function GalleryEdit( props ) {
 					{ images.length > 1 && (
 						<RangeControl
 							label={ __( 'Columns' ) }
-							value={ columns }
+							value={
+								columns
+									? columns
+									: defaultColumnsNumber( images.length )
+							}
 							onChange={ setColumnsNumber }
 							min={ 1 }
 							max={ Math.min( MAX_COLUMNS, images.length ) }

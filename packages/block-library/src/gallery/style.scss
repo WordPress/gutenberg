@@ -166,11 +166,29 @@
 				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
 			}
 		}
-
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
 		@for $column-count from 1 through 8 {
 			&.columns-#{$column-count} figure.wp-block-image:not(#individual-image):nth-of-type(#{ $column-count }n) {
 				margin-right: 0;
+			}
+		}
+		// If number of columns not explicitly set default to 3 columns if 3 or more images.
+		&.columns-default {
+			figure.wp-block-image:not(#individual-image) {
+				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
+				width: calc(33.33% - calc(var(--gallery-block--gutter-size, 16px) * calc(2) / 3))
+			}
+			figure.wp-block-image:not(#individual-image):nth-of-type(3n+3) {
+				margin-right: 0;
+			}
+			// If only 2 child images use 2 columns.
+			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2),
+			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2) ~ figure.wp-block-image:not(#individual-image) {
+				width: calc(50% - (var(--gallery-block--gutter-size, 16px) / 2));
+			}
+			// For a single image set to 100%.
+			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(1) {
+				width: 100%;
 			}
 		}
 	}
