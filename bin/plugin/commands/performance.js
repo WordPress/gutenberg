@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { pickBy, mapValues } = require( 'lodash' );
+const { mapValues } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -39,36 +39,19 @@ const config = require( '../config' );
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number} load             Load Time.
- * @property {number} type             Average type time.
- * @property {number} minType          Minium type time.
- * @property {number} maxType          Maximum type time.
- * @property {number} focus            Average block selection time.
- * @property {number} minFocus         Min block selection time.
- * @property {number} maxFocus         Max block selection time.
- * @property {number} inserterOpen     Average time to open global inserter.
- * @property {number} minInserterOpen  Min time to open global inserter.
- * @property {number} maxInserterOpen  Max time to open global inserter.
- * @property {number} inserterHover    Average time to move mouse between two block item in the inserter.
- * @property {number} minInserterHover Min time to move mouse between two block item in the inserter.
- * @property {number} maxInserterHover Max time to move mouse between two block item in the inserter.
- */
-/**
- * @typedef WPFormattedPerformanceResults
- *
- * @property {string=} load             Load Time.
- * @property {string=} type             Average type time.
- * @property {string=} minType          Minium type time.
- * @property {string=} maxType          Maximum type time.
- * @property {string=} focus            Average block selection time.
- * @property {string=} minFocus         Min block selection time.
- * @property {string=} maxFocus         Max block selection time.
- * @property {string=} inserterOpen     Average time to open global inserter.
- * @property {string=} minInserterOpen  Min time to open global inserter.
- * @property {string=} maxInserterOpen  Max time to open global inserter.
- * @property {string=} inserterHover    Average time to move mouse between two block item in the inserter.
- * @property {string=} minInserterHover Min time to move mouse between two block item in the inserter.
- * @property {string=} maxInserterHover Max time to move mouse between two block item in the inserter.
+ * @property {number=} load             Load Time.
+ * @property {number=} type             Average type time.
+ * @property {number=} minType          Minium type time.
+ * @property {number=} maxType          Maximum type time.
+ * @property {number=} focus            Average block selection time.
+ * @property {number=} minFocus         Min block selection time.
+ * @property {number=} maxFocus         Max block selection time.
+ * @property {number=} inserterOpen     Average time to open global inserter.
+ * @property {number=} minInserterOpen  Min time to open global inserter.
+ * @property {number=} maxInserterOpen  Max time to open global inserter.
+ * @property {number=} inserterHover    Average time to move mouse between two block item in the inserter.
+ * @property {number=} minInserterHover Min time to move mouse between two block item in the inserter.
+ * @property {number=} maxInserterHover Max time to move mouse between two block item in the inserter.
  */
 
 /**
@@ -102,11 +85,11 @@ function median( array ) {
  *
  * @param {number} number
  *
- * @return {string} Formatted time.
+ * @return {number} Formatted time.
  */
 function formatTime( number ) {
 	const factor = Math.pow( 10, 2 );
-	return Math.round( number * factor ) / factor + ' ms';
+	return Math.round( number * factor ) / factor;
 }
 
 /**
@@ -161,7 +144,7 @@ async function setUpGitBranch( branch, environmentDirectory ) {
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
  *
- * @return {Promise<WPFormattedPerformanceResults>} Performance results for the branch.
+ * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
 async function runTestSuite( testSuite, performanceTestDirectory ) {
 	const results = [];
@@ -198,10 +181,8 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 		median
 	);
 
-	// Remove results for which we don't have data (and where the statistical functions thus returned NaN or Infinity etc).
-	const finiteMedians = pickBy( medians, isFinite );
 	// Format results as times.
-	return mapValues( finiteMedians, formatTime );
+	return mapValues( medians, formatTime );
 }
 
 /**
@@ -293,7 +274,7 @@ async function runPerformanceTests( branches, options ) {
 
 	const testSuites = [ 'post-editor', 'site-editor' ];
 
-	/** @type {Record<string,Record<string, WPFormattedPerformanceResults>>} */
+	/** @type {Record<string,Record<string, WPPerformanceResults>>} */
 	let results = {};
 	for ( const branch of branches ) {
 		await setUpGitBranch( branch, environmentDirectory );
@@ -331,13 +312,22 @@ async function runPerformanceTests( branches, options ) {
 				for ( const entry of Object.keys( val ) ) {
 					if ( ! acc[ entry ] ) acc[ entry ] = {};
 					// @ts-ignore
-					acc[ entry ][ key ] = val[ entry ];
+					if ( isFinite( val[ entry ] ) ) {
+						// @ts-ignore
+						acc[ entry ][ key ] = val[ entry ] + ' ms';
+					}
 				}
 				return acc;
 			},
 			invertedResult
 		);
 		console.table( invertedResult );
+
+		const resultsFilename = testSuite + '-performance-results.json';
+		fs.writeFileSync(
+			path.resolve( __dirname, '../../../', resultsFilename ),
+			JSON.stringify( results[ testSuite ], null, 2 )
+		);
 	}
 }
 
