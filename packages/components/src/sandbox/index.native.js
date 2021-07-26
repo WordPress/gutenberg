@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 /**
@@ -223,8 +224,12 @@ export default function Sandbox( {
 			] }
 			onMessage={ checkMessageForResize }
 			onShouldStartLoadWithRequest={ ( request ) => {
-				// Navigation within the webview is disabled by only allowing a specifc number of requests.
+				// On Android, this callback is not called on the first load so we can prevent the rest of requests.
+				if ( Platform.OS === 'android' ) {
+					return false;
+				}
 
+				// On iOS, navigation within the webview is disabled by only allowing a specifc number of requests.
 				// Requests to empty pages are not considered as loaded requests.
 				if ( request.url !== 'about:blank' ) {
 					loadedRequests.current++;
