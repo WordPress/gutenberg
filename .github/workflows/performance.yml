@@ -5,7 +5,7 @@ on:
     release:
         types: [published]
     push:
-        branches: [trunk,add/log-perf]
+        branches: [trunk, add/log-perf]
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -63,7 +63,7 @@ jobs:
                   github-token: ${{secrets.GITHUB_TOKEN}}
                   script: |
                       const commit_details = await github.git.getCommit({owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha});
-                      return commit_details.data.author.date
+                      return parseInt((new Date( commit_details.data.author.date ).getTime() / 1000).toFixed(0))
 
             - name: Publish performance results
               if: github.event_name == 'push'
