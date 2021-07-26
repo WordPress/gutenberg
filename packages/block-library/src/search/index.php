@@ -75,7 +75,7 @@ function render_block_core_search( $attributes ) {
 		$button_internal_markup = '';
 		$button_classes         = $color_classes;
 
-		if ( $is_button_inside ) {
+		if ( ! $is_button_inside ) {
 			$button_classes .= $border_color_classes;
 		}
 		if ( ! $use_icon_button ) {
