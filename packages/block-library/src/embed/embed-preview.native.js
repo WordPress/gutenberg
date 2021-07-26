@@ -20,6 +20,15 @@ import { SandBox } from '@wordpress/components';
 import { getPhotoHtml } from './util';
 import EmbedNoPreview from './embed-no-preview';
 
+const DEFAULT_MAX_ALLOWED_REQUESTS = 1;
+const MAX_ALLOWED_REQUESTS_BY_PROVIDER = {
+	'amazon.com': 2,
+	twitter: 2,
+	'reverbnation.com': 2,
+	'scribd.com': 2,
+	videopress: 2,
+};
+
 const EmbedPreview = ( {
 	clientId,
 	icon,
@@ -71,6 +80,9 @@ const EmbedPreview = ( {
 		parsedHostBaseUrl
 	);
 
+	const maxAllowedRequests =
+		MAX_ALLOWED_REQUESTS_BY_PROVIDER[ parsedHostBaseUrl ] ||
+		DEFAULT_MAX_ALLOWED_REQUESTS;
 	const embedWrapper =
 		/* We should render here: <WpEmbedPreview html={ html } /> */
 		'wp-embed' === type ? null : (
@@ -87,6 +99,7 @@ const EmbedPreview = ( {
 				>
 					<View pointerEvents={ isSelected ? 'auto' : 'none' }>
 						<SandBox
+							maxAllowedRequests={ maxAllowedRequests }
 							html={ html }
 							scripts={ scripts }
 							title={ iframeTitle }
