@@ -37,7 +37,7 @@ function render_block_core_search( $attributes ) {
 	$input_markup     = '';
 	$button_markup    = '';
 	$inline_styles    = styles_for_block_core_search( $attributes );
-	$color_classes   = get_color_classes_for_block_core_search( $attributes );
+	$color_classes    = get_color_classes_for_block_core_search( $attributes );
 	$is_button_inside = ! empty( $attributes['buttonPosition'] ) &&
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
@@ -215,7 +215,7 @@ function styles_for_block_core_search( $attributes ) {
 					$name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
 
 					// Add shared styles for individual border radii for input & button.
-					$border_style = sprintf(
+					$border_style    = sprintf(
 						'border-%s-radius: %s;',
 						esc_attr( $name ),
 						esc_attr( $value )
@@ -322,7 +322,7 @@ function get_color_classes_for_block_core_search( $attributes ) {
 	$classnames = array();
 
 	// Text color.
-	$has_named_text_color = ! empty( $attributes['textColor'] );
+	$has_named_text_color  = ! empty( $attributes['textColor'] );
 	$has_custom_text_color = ! empty( $attributes['style']['color']['text'] );
 	if ( $has_named_text_color ) {
 		$classnames[] = sprintf( 'has-text-color has-%s-color', $attributes['textColor'] );
@@ -332,10 +332,10 @@ function get_color_classes_for_block_core_search( $attributes ) {
 	}
 
 	// Background color.
-	$has_named_background_color = ! empty( $attributes['backgroundColor'] );
+	$has_named_background_color  = ! empty( $attributes['backgroundColor'] );
 	$has_custom_background_color = ! empty( $attributes['style']['color']['background'] );
-	$has_named_gradient = ! empty( $attributes['gradient'] );
-	$has_custom_gradient = ! empty( $attributes['style']['color']['gradient'] );
+	$has_named_gradient          = ! empty( $attributes['gradient'] );
+	$has_custom_gradient         = ! empty( $attributes['style']['color']['gradient'] );
 	if (
 		$has_named_background_color ||
 		$has_custom_background_color ||
