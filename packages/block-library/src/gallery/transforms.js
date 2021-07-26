@@ -61,7 +61,6 @@ const transforms = {
 					return createBlock(
 						'core/gallery',
 						{
-							imageCount: innerBlocks.length,
 							align,
 							sizeSlug,
 						},

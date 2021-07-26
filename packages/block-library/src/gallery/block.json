@@ -92,10 +92,6 @@
 		"allowResize": {
 			"type": "boolean",
 			"default": false
-		},
-		"imageCount": {
-			"type": "number",
-			"default": 0
 		}
 	},
 	"providesContext": {

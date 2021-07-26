@@ -21,7 +21,6 @@ export const settings = {
 	example: {
 		attributes: {
 			columns: 2,
-			imageCount: 2,
 		},
 		innerBlocks: [
 			{
