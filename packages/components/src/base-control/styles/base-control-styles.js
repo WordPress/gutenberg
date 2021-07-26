@@ -12,6 +12,8 @@ import { space } from '../../ui/utils/space';
 export const Wrapper = styled.div`
 	font-family: ${ font( 'default.fontFamily' ) };
 	font-size: ${ font( 'default.fontSize' ) };
+	margin-bottom: ${ space( 2 ) };
+
 	> *:not(:last-child) {
 		margin-bottom: ${ space( 2 ) };
 	}
