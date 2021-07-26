@@ -1,22 +1,18 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Spinner } from '@wordpress/components';
 import { store as editorStore } from '@wordpress/editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { BlockPreview } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
 
-export default function TemplatePreview( { templateId } ) {
-	console.error('TemplatePreview');
+/**
+ * Internal dependencies
+ */
+import TemplatePreview from '../navigation-sidebar/navigation-panel/template-preview';
+
+export default function MosaicTemplatePreview( { templateId } ) {
 	const { isResolved, template, postId, postType } = useSelect(
 		( select ) => {
 			const { getEntityRecord, hasFinishedResolution } = select(
@@ -43,13 +39,6 @@ export default function TemplatePreview( { templateId } ) {
 		[ templateId ]
 	);
 
-	const blocks = useMemo( () => {
-		if ( ! template?.content?.raw ) {
-			return [];
-		}
-		return parse( template.content.raw );
-	}, [ template ] );
-	console.log({ blocks, template });
 	const defaultBlockContext = useMemo( () => {
 		return { postId, postType };
 	}, [ postId, postType ] );
@@ -57,6 +46,9 @@ export default function TemplatePreview( { templateId } ) {
 	return ! isResolved ? (
 		<Spinner />
 	) : (
-		<BlockPreview blocks={ blocks } context={ defaultBlockContext } />
+		<TemplatePreview
+			rawContent={ template?.content?.raw }
+			context={ defaultBlockContext }
+		/>
 	);
 }

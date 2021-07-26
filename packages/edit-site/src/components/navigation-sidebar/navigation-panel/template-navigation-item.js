@@ -18,19 +18,21 @@ import { NavigationPanelPreviewFill } from '../index';
 import { store as editSiteStore } from '../../../store';
 
 export default function TemplateNavigationItem( { item } ) {
-	const { title, description } = useSelect(
-		( select ) =>
-			'wp_template' === item.type
+	const { title, description, editorMode } = useSelect( ( select ) => {
+		return {
+			...( 'wp_template' === item.type
 				? select( editorStore ).__experimentalGetTemplateInfo( item )
 				: {
 						title: item?.title?.rendered || item?.slug,
 						description: '',
-				  },
-		[]
-	);
+				  } ),
+			editorMode: select( editSiteStore ).getEditorMode(),
+		};
+	}, [] );
 	const {
 		setTemplate,
 		setTemplatePart,
+		switchEditorMode,
 		setIsNavigationPanelOpened,
 	} = useDispatch( editSiteStore );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
@@ -46,6 +48,9 @@ export default function TemplateNavigationItem( { item } ) {
 			setTemplatePart( item.id );
 		}
 		setIsNavigationPanelOpened( false );
+		if ( editorMode !== 'visual' ) {
+			switchEditorMode( 'visual' );
+		}
 	};
 
 	return (
@@ -75,7 +80,10 @@ export default function TemplateNavigationItem( { item } ) {
 
 			{ isPreviewVisible && (
 				<NavigationPanelPreviewFill>
-					<TemplatePreview rawContent={ item.content.raw } />
+					<TemplatePreview
+						className="edit-site-navigation-panel__preview"
+						rawContent={ item.content.raw }
+					/>
 				</NavigationPanelPreviewFill>
 			) }
 		</NavigationItem>

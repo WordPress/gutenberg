@@ -16,7 +16,6 @@ import BlockEditorProvider from '../provider';
 import LiveBlockPreview from './live';
 import AutoHeightBlockPreview from './auto';
 import { store as blockEditorStore } from '../../store';
-import { BlockContextProvider } from '../block-context';
 
 export function BlockPreview( {
 	blocks,
@@ -24,7 +23,6 @@ export function BlockPreview( {
 	viewportWidth = 1200,
 	__experimentalLive = false,
 	__experimentalOnClick,
-	context,
 } ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
@@ -40,18 +38,16 @@ export function BlockPreview( {
 		return null;
 	}
 	return (
-		<BlockContextProvider value={ context }>
-			<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
-				{ __experimentalLive ? (
-					<LiveBlockPreview onClick={ __experimentalOnClick } />
-				) : (
-					<AutoHeightBlockPreview
-						viewportWidth={ viewportWidth }
-						__experimentalPadding={ __experimentalPadding }
-					/>
-				) }
-			</BlockEditorProvider>
-		</BlockContextProvider>
+		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+			{ __experimentalLive ? (
+				<LiveBlockPreview onClick={ __experimentalOnClick } />
+			) : (
+				<AutoHeightBlockPreview
+					viewportWidth={ viewportWidth }
+					__experimentalPadding={ __experimentalPadding }
+				/>
+			) }
+		</BlockEditorProvider>
 	);
 }
 

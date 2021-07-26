@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { first } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useCallback, useRef } from '@wordpress/element';
@@ -11,7 +16,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
 import { listView, plus } from '@wordpress/icons';
-import { Button } from '@wordpress/components';
+import { Button, Slot } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -45,6 +50,7 @@ export default function Header( {
 		isListViewOpen,
 		listViewShortcut,
 		isLoaded,
+		editorMode,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -52,6 +58,7 @@ export default function Header( {
 			getEditedPostId,
 			isInserterOpened,
 			isListViewOpened,
+			getEditorMode,
 		} = select( editSiteStore );
 		const { getEditedEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
@@ -79,6 +86,7 @@ export default function Header( {
 			listViewShortcut: getShortcutRepresentation(
 				'core/edit-site/toggle-list-view'
 			),
+			editorMode: getEditorMode(),
 		};
 	}, [] );
 
@@ -107,41 +115,43 @@ export default function Header( {
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
-				<div className="edit-site-header__toolbar">
-					<Button
-						ref={ inserterButton }
-						variant="primary"
-						isPressed={ isInserterOpen }
-						className="edit-site-header-toolbar__inserter-toggle"
-						onMouseDown={ preventDefault }
-						onClick={ openInserter }
-						icon={ plus }
-						label={ _x(
-							'Toggle block inserter',
-							'Generic label for block inserter button'
+				{ editorMode !== 'mosaic' && (
+					<div className="edit-site-header__toolbar">
+						<Button
+							ref={ inserterButton }
+							variant="primary"
+							isPressed={ isInserterOpen }
+							className="edit-site-header-toolbar__inserter-toggle"
+							onMouseDown={ preventDefault }
+							onClick={ openInserter }
+							icon={ plus }
+							label={ _x(
+								'Toggle block inserter',
+								'Generic label for block inserter button'
+							) }
+						/>
+						{ isLargeViewport && (
+							<>
+								<ToolSelector />
+								<UndoButton />
+								<RedoButton />
+								<Button
+									className="edit-site-header-toolbar__list-view-toggle"
+									icon={ listView }
+									isPressed={ isListViewOpen }
+									/* translators: button label text should, if possible, be under 16 characters. */
+									label={ __( 'List View' ) }
+									onClick={ toggleListView }
+									shortcut={ listViewShortcut }
+								/>
+							</>
 						) }
-					/>
-					{ isLargeViewport && (
-						<>
-							<ToolSelector />
-							<UndoButton />
-							<RedoButton />
-							<Button
-								className="edit-site-header-toolbar__list-view-toggle"
-								icon={ listView }
-								isPressed={ isListViewOpen }
-								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ __( 'List View' ) }
-								onClick={ toggleListView }
-								shortcut={ listViewShortcut }
-							/>
-						</>
-					) }
-				</div>
+					</div>
+				) }
 			</div>
 
 			<div className="edit-site-header_center">
-				{ 'wp_template' === templateType && (
+				{ editorMode !== 'mosaic' && 'wp_template' === templateType && (
 					<DocumentActions
 						entityTitle={ entityTitle }
 						entityLabel="template"
@@ -155,27 +165,65 @@ export default function Header( {
 						) }
 					</DocumentActions>
 				) }
-				{ 'wp_template_part' === templateType && (
-					<DocumentActions
-						entityTitle={ entityTitle }
-						entityLabel="template part"
-						isLoaded={ isLoaded }
-					/>
+				{ editorMode !== 'mosaic' &&
+					'wp_template_part' === templateType && (
+						<DocumentActions
+							entityTitle={ entityTitle }
+							entityLabel="template part"
+							isLoaded={ isLoaded }
+						/>
+					) }
+				{ editorMode === 'mosaic' && (
+					<span>{ __( 'All templates' ) }</span>
 				) }
 			</div>
 
 			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
-					<PreviewOptions
-						deviceType={ deviceType }
-						setDeviceType={ setPreviewDeviceType }
-					/>
-					<SaveButton
-						openEntitiesSavedStates={ openEntitiesSavedStates }
-						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
-					/>
-					<PinnedItems.Slot scope="core/edit-site" />
-					<MoreMenu />
+					{ editorMode !== 'mosaic' && (
+						<>
+							<PreviewOptions
+								deviceType={ deviceType }
+								setDeviceType={ setPreviewDeviceType }
+							/>
+							<SaveButton
+								openEntitiesSavedStates={
+									openEntitiesSavedStates
+								}
+								isEntitiesSavedStatesOpen={
+									isEntitiesSavedStatesOpen
+								}
+							/>
+							<PinnedItems.Slot scope="core/edit-site" />
+							<MoreMenu />
+						</>
+					) }
+					{ editorMode === 'mosaic' && (
+						<Slot name="PinnedItems/core/edit-site">
+							{ ( fills ) => {
+								const globalStylesFill =
+									fills &&
+									fills.find &&
+									fills.find( ( element ) => {
+										if ( ! element ) {
+											return false;
+										}
+										const firstElement = first( element );
+										if ( ! firstElement ) {
+											return false;
+										}
+										return (
+											firstElement.props &&
+											firstElement.props.identifier ===
+												'edit-site/global-styles'
+										);
+									} );
+								return globalStylesFill
+									? globalStylesFill
+									: null;
+							} }
+						</Slot>
+					) }
 				</div>
 			</div>
 		</div>

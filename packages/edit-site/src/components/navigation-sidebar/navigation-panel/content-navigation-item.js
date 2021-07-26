@@ -76,6 +76,7 @@ export default function ContentNavigationItem( { item } ) {
 			{ isPreviewVisible && previewContent && (
 				<NavigationPanelPreviewFill>
 					<TemplatePreview
+						className="edit-site-navigation-panel__preview"
 						rawContent={ previewContent }
 						blockContext={ {
 							postType: item.type,

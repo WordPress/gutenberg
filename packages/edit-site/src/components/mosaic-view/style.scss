@@ -8,6 +8,10 @@
 }
 
 .edit-site-mosaic-view__mosaic-item {
+	border: $border-width solid $gray-400;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
+	color: $gray-900;
 	height: 400px;
 	overflow: hidden;
 }
