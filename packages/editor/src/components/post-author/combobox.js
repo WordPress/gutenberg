@@ -15,6 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import { AUTHORS_QUERY } from './constants';
 import { store as editorStore } from '../../store';
 
 function PostAuthorCombobox() {
@@ -22,20 +23,21 @@ function PostAuthorCombobox() {
 
 	const { authorId, isLoading, authors, postAuthor } = useSelect(
 		( select ) => {
-			const { __unstableGetAuthor, getAuthors, isResolving } = select(
-				coreStore
-			);
+			const { getUser, getUsers, isResolving } = select( coreStore );
 			const { getEditedPostAttribute } = select( editorStore );
-			const author = __unstableGetAuthor(
-				getEditedPostAttribute( 'author' )
-			);
-			const query =
-				! fieldValue || '' === fieldValue ? {} : { search: fieldValue };
+			const author = getUser( getEditedPostAttribute( 'author' ), {
+				context: 'view',
+			} );
+			const query = {
+				search: ! fieldValue ? undefined : fieldValue,
+				...AUTHORS_QUERY,
+			};
+
 			return {
 				authorId: getEditedPostAttribute( 'author' ),
 				postAuthor: author,
-				authors: getAuthors( query ),
-				isLoading: isResolving( 'core', 'getAuthors', [ query ] ),
+				authors: getUsers( query ),
+				isLoading: isResolving( 'core', 'getUsers', [ query ] ),
 			};
 		},
 		[ fieldValue ]

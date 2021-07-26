@@ -11,11 +11,13 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { AUTHORS_QUERY } from './constants';
 
 function PostAuthorSelect() {
 	const { editPost } = useDispatch( editorStore );
 	const { postAuthor, authors } = useSelect( ( select ) => {
-		const authorsFromAPI = select( coreStore ).getAuthors();
+		const authorsFromAPI = select( coreStore ).getUsers( AUTHORS_QUERY );
+
 		return {
 			postAuthor: select( editorStore ).getEditedPostAttribute(
 				'author'

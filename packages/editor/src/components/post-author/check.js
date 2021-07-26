@@ -13,6 +13,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import { AUTHORS_QUERY } from './constants';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 
@@ -42,7 +43,7 @@ export default compose( [
 				false
 			),
 			postType: select( editorStore ).getCurrentPostType(),
-			authors: select( coreStore ).getAuthors(),
+			authors: select( coreStore ).getUsers( AUTHORS_QUERY ),
 		};
 	} ),
 	withInstanceId,
