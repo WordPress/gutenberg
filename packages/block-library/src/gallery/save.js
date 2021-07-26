@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
@@ -13,11 +18,13 @@ export default function saveWithInnerBlocks( { attributes } ) {
 		return saveWithoutInnerBlocks( { attributes } );
 	}
 
-	const { caption, columns = 'default', imageCrop } = attributes;
+	const { caption, columns, imageCrop } = attributes;
 
-	const className = `blocks-gallery-grid has-nested-images columns-${ columns } ${
-		imageCrop ? 'is-cropped' : ''
-	}`;
+	const className = classnames( 'blocks-gallery-grid', 'has-nested-images', {
+		[ `columns-${ columns }` ]: columns !== undefined,
+		[ `columns-default` ]: columns === undefined,
+		'is-cropped': imageCrop,
+	} );
 
 	return (
 		<figure { ...useBlockProps.save( { className } ) }>

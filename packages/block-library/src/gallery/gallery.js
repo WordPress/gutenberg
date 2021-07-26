@@ -32,7 +32,7 @@ export const Gallery = ( props ) => {
 		blockProps,
 	} = props;
 
-	const { align, columns = 'default', caption, imageCrop } = attributes;
+	const { align, columns, caption, imageCrop } = attributes;
 
 	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
 		allowedBlocks,
@@ -73,7 +73,8 @@ export const Gallery = ( props ) => {
 				'blocks-gallery-grid',
 				{
 					[ `align${ align }` ]: align,
-					[ `columns-${ columns }` ]: columns,
+					[ `columns-${ columns }` ]: columns !== undefined,
+					[ `columns-default` ]: columns === undefined,
 					'is-cropped': imageCrop,
 				}
 			) }
