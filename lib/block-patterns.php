@@ -332,7 +332,7 @@ add_action(
  * @param object           $raw_pattern The unprepared pattern.
  */
 function filter_block_pattern_response( $response, $raw_pattern ) {
-	$data = $response->get_data();
+	$data                = $response->get_data();
 	$data['block_types'] = array_map( 'sanitize_text_field', $raw_pattern->meta->wpop_block_types );
 	$response->set_data( $data );
 	return $response;
