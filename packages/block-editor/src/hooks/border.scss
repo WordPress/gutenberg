@@ -1,19 +1,11 @@
-.block-editor-hooks__border-controls {
-	.block-editor-hooks__border-controls-row {
-		display: flex;
-		justify-content: space-between;
-
-		> * {
-			width: calc(50% - #{ $grid-unit-10 });
-		}
+.block-editor-block-inspector .block-editor-hooks__border-controls,
+.edit-site .components-progressive-disclosure-panel {
+	.components-unit-control-wrapper,
+	.components-border-style-control {
+		grid-column: span 1;
 	}
 
-	.components-unit-control-wrapper {
-		margin-bottom: $grid-unit-30;
-
-		&:last-child {
-			margin-bottom: $grid-unit-10;
-		}
+	.components-base-control__field {
+		margin-bottom: 0;
 	}
 }
-
