@@ -28,10 +28,11 @@ function PostAuthorCombobox() {
 			const author = getUser( getEditedPostAttribute( 'author' ), {
 				context: 'view',
 			} );
-			const query = {
-				search: ! fieldValue ? undefined : fieldValue,
-				...AUTHORS_QUERY,
-			};
+			const query = { ...AUTHORS_QUERY };
+
+			if ( fieldValue ) {
+				query.search = fieldValue;
+			}
 
 			return {
 				authorId: getEditedPostAttribute( 'author' ),
