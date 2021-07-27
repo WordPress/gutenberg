@@ -155,7 +155,7 @@ export default function useDropZone( {
 					dragTimingRef.current
 				) {
 					const time = Date.now();
-					if ( time - dragTimingRef.current.timestamp > 33 ) {
+					if ( time - dragTimingRef.current.timestamp > 16 ) {
 						const distance =
 							Math.abs(
 								event.clientY - dragTimingRef.current.dragY
