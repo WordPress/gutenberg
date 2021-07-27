@@ -2,7 +2,12 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import type { CSSProperties, ReactNode, ChangeEvent } from 'react';
+import type {
+	CSSProperties,
+	ReactNode,
+	ChangeEvent,
+	SyntheticEvent,
+} from 'react';
 import type { useDrag } from 'react-use-gesture';
 
 /**
@@ -12,7 +17,6 @@ import type { StateReducer } from './reducer/state';
 import type { FlexProps } from '../flex/types';
 import type { PolymorphicComponentProps } from '../ui/context';
 
-// @todo ??? What is edge ???
 export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
 
 export type DragDirection = 'n' | 's' | 'e' | 'w';
@@ -36,7 +40,10 @@ export interface InputFieldProps extends BaseProps {
 		nextValue: string,
 		extra: { event: ChangeEvent< HTMLInputElement > }
 	) => void;
-	onValidate?: ( nextValue: string ) => void;
+	onValidate?: (
+		nextValue: string,
+		event?: SyntheticEvent< HTMLInputElement >
+	) => void;
 	setIsFocused?: ( isFocused: boolean ) => void;
 	stateReducer?: StateReducer;
 	value?: string;

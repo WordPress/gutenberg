@@ -135,7 +135,7 @@ function InputField(
 		const nextValue = ( event.target as HTMLInputElement ).value;
 
 		try {
-			onValidate( nextValue );
+			onValidate( nextValue, event );
 			commit( nextValue, event );
 		} catch ( err ) {
 			invalidate( err, event );
