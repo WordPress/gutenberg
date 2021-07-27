@@ -6,7 +6,7 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
@@ -67,14 +67,6 @@ function PostAuthorCombobox() {
 
 		return fetchedAuthors;
 	}, [ authors, postAuthor ] );
-
-	// Initializes the post author properly
-	// Also ensures external changes are reflected.
-	useEffect( () => {
-		if ( postAuthor ) {
-			setFieldValue( postAuthor.name );
-		}
-	}, [ postAuthor ] );
 
 	/**
 	 * Handle author selection.
