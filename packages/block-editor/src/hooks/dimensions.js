@@ -27,6 +27,7 @@ import {
 	resetPadding,
 	useIsPaddingDisabled,
 } from './padding';
+import { cleanEmptyObject } from './utils';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
 
@@ -57,14 +58,14 @@ export function DimensionsPanel( props ) {
 		const { style } = props.attributes;
 
 		props.setAttributes( {
-			style: {
+			style: cleanEmptyObject( {
 				...style,
 				spacing: {
 					...style?.spacing,
 					margin: undefined,
 					padding: undefined,
 				},
-			},
+			} ),
 		} );
 	};
 
