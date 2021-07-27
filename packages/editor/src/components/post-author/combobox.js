@@ -10,13 +10,14 @@ import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { AUTHORS_QUERY } from './constants';
 import { store as editorStore } from '../../store';
+import { AUTHORS_QUERY } from './constants';
 
 function PostAuthorCombobox() {
 	const [ fieldValue, setFieldValue ] = useState();
@@ -49,7 +50,7 @@ function PostAuthorCombobox() {
 		const fetchedAuthors = ( authors ?? [] ).map( ( author ) => {
 			return {
 				value: author.id,
-				label: author.name,
+				label: decodeEntities( author.name ),
 			};
 		} );
 
@@ -60,7 +61,10 @@ function PostAuthorCombobox() {
 
 		if ( foundAuthor < 0 && postAuthor ) {
 			return [
-				{ value: postAuthor.id, label: postAuthor.name },
+				{
+					value: postAuthor.id,
+					label: decodeEntities( postAuthor.name ),
+				},
 				...fetchedAuthors,
 			];
 		}
