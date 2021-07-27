@@ -26,6 +26,10 @@ export interface ItemGroupProps {
 	 * @default 'medium'
 	 */
 	size?: ItemSize;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 }
 
 export interface ItemProps {
@@ -41,6 +45,10 @@ export interface ItemProps {
 	 * @default 'medium'
 	 */
 	size?: ItemSize;
+	/**
+	 * The children elements.
+	 */
+	children: React.ReactNode;
 }
 
 export type ItemGroupContext = {
