@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
@@ -16,6 +17,10 @@ const htmlArrowStyles = ( { hideHTMLArrows } ) => {
 		&::-webkit-inner-spin-button {
 			-webkit-appearance: none !important;
 			margin: 0 !important;
+		}
+
+		input[type='number'] {
+			-moz-appearance: textfield;
 		}
 	`;
 };

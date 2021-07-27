@@ -92,7 +92,7 @@ function SelectControl(
 
 	const handleOnChange = ( event: ChangeEvent< HTMLSelectElement > ) => {
 		if ( multiple ) {
-			const selectedOptions = [ ...event.target.options ].filter(
+			const selectedOptions = Array.from( event.target.options ).filter(
 				( { selected } ) => selected
 			);
 			const newValues = selectedOptions.map( ( { value } ) => value );
