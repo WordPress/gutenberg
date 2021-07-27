@@ -158,7 +158,8 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } figure.wp-block-image:not(#individual-image) {
 				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
-				width: calc(#{100% / $i} - (var(--gallery-block--gutter-size, #{$grid-unit-20}) * #{$i - 1} / #{$i}));
+				width: calc(#{math.div(100%, $i)} - (math.div(var(--gallery-block--gutter-size, $grid-unit-20) * $i - 1, $i)));
+
 			}
 
 			// Prevent collapsing margin while sibling is being dragged.
@@ -196,7 +197,7 @@
 	// Apply max-width to floated items that have no intrinsic width.
 	&.alignleft,
 	&.alignright {
-		max-width: $content-width / 2;
+		max-width: $content-width * 0.5;
 		width: 100%;
 	}
 

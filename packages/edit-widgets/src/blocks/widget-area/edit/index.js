@@ -78,7 +78,7 @@ export default function WidgetAreaEdit( {
 							type="postType"
 							id={ `widget-area-${ id }` }
 						>
-							<WidgetAreaInnerBlocks />
+							<WidgetAreaInnerBlocks id={ id } />
 						</EntityProvider>
 					</DisclosureContent>
 				) }

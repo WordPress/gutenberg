@@ -1,7 +1,7 @@
 .block-editor-block-draggable-chip-wrapper {
 	position: absolute;
 	// Offset position so that cursor is centered over the drag handle.
-	top: -#{$block-toolbar-height / 2};
+	top: -#{$block-toolbar-height * 0.5};
 	left: 0;
 }
 
@@ -25,7 +25,7 @@
 		justify-content: flex-start;
 
 		> .components-flex__item {
-			margin-right: $grid-unit-15 / 2;
+			margin-right: $grid-unit-15 * 0.5;
 
 			&:last-child {
 				margin-right: 0;
