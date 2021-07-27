@@ -7,9 +7,7 @@ import type { Ref } from 'react';
 /**
  * Internal dependencies
  */
-import type { PolymorphicComponentProps } from '../../ui/context';
-// eslint-disable-next-line no-duplicate-imports
-import { contextConnect } from '../../ui/context';
+import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
 import { useItemGroup } from './hook';
 import { ItemGroupContext, useItemGroupContext } from '../context';
 import { View } from '../../view';

@@ -7,9 +7,7 @@ import type { ElementType } from 'react';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
-// eslint-disable-next-line no-duplicate-imports
-import type { PolymorphicComponentProps } from '../../ui/context';
+import { useContextSystem, PolymorphicComponentProps } from '../../ui/context';
 import * as styles from '../styles';
 import { useItemGroupContext } from '../context';
 import { useCx } from '../../utils/hooks/use-cx';

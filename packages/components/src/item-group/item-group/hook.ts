@@ -1,9 +1,7 @@
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../../ui/context';
-// eslint-disable-next-line no-duplicate-imports
-import type { PolymorphicComponentProps } from '../../ui/context';
+import { useContextSystem, PolymorphicComponentProps } from '../../ui/context';
 
 /**
  * Internal dependencies
