@@ -35,7 +35,7 @@ function PostAuthorCombobox() {
 				authorId: getEditedPostAttribute( 'author' ),
 				postAuthor: author,
 				authors: getAuthors( query ),
-				isLoading: isResolving( 'core', 'getAuthors', [ query ] ),
+				isLoading: isResolving( 'getAuthors', [ query ] ),
 			};
 		},
 		[ fieldValue ]

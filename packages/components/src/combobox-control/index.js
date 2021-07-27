@@ -26,6 +26,7 @@ import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
+import Spinner from '../spinner';
 import { Flex, FlexBlock, FlexItem } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
 
@@ -51,6 +52,7 @@ function ComboboxControl( {
 	help,
 	allowReset = true,
 	className,
+	isLoading = false,
 	messages = {
 		selected: __( 'Item selected.' ),
 	},
@@ -221,6 +223,7 @@ function ComboboxControl( {
 								onChange={ onInputChange }
 							/>
 						</FlexBlock>
+						{ isLoading && <Spinner /> }
 						{ allowReset && (
 							<FlexItem>
 								<Button
