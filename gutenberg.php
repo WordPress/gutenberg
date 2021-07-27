@@ -3,8 +3,8 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Requires at least: 5.6
- * Requires PHP: 5.6
+ * Requires at least: 5.8
+ * Requires PHP: 5.8
  * Version: 11.1.0
  * Author: Gutenberg Team
  * Text Domain: gutenberg
@@ -64,7 +64,7 @@ function gutenberg_pre_init() {
 	// Compare against major release versions (X.Y) rather than minor (X.Y.Z)
 	// unless a minor release is the actual minimum requirement. WordPress reports
 	// X.Y for its major releases.
-	if ( version_compare( $version, '5.6', '<' ) ) {
+	if ( version_compare( $version, '5.8', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
 		return;
 	}
