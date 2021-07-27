@@ -27,9 +27,9 @@ function useBlockTypeImpressions( blockTypes ) {
 	const { updateSettings } = useDispatch( blockEditorStore );
 
 	const items = enableEditorOnboarding
-		? blockTypes.map( ( b ) => ( {
-				...b,
-				isNew: blockTypeImpressions[ b.name ] > 0,
+		? blockTypes.map( ( blockType ) => ( {
+				...blockType,
+				isNew: blockTypeImpressions[ blockType.name ] > 0,
 		  } ) )
 		: blockTypes;
 
