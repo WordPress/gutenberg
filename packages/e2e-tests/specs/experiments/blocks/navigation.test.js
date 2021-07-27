@@ -343,14 +343,15 @@ describe( 'Navigation', () => {
 
 			await selectDropDownOption( 'Test Menu 2' );
 
-			await page.waitForSelector(
-				'.interface-interface-skeleton__content .wp-block-navigation__container'
-			);
-
 			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
 			// block previews.
+			const navLinkSelector =
+				'[aria-label="Editor content"][role="region"] div[aria-label="Block: Custom Link"]';
+
+			await page.waitForSelector( navLinkSelector );
+
 			const navBlockItemsLength = await page.$$eval(
-				'.interface-interface-skeleton__content .wp-block-navigation__container [data-type="core/navigation-link"]',
+				navLinkSelector,
 				( els ) => els.length
 			);
 
@@ -374,7 +375,7 @@ describe( 'Navigation', () => {
 			// Scope element selector to the "Editor content" as otherwise it picks up on
 			// Block Style live previews.
 			const navBlockItemsLength = await page.$$eval(
-				'.interface-interface-skeleton__content .wp-block-navigation__container [data-type="core/navigation-link"]',
+				'[aria-label="Editor content"][role="region"] li[aria-label="Block: Link"]',
 				( els ) => els.length
 			);
 
