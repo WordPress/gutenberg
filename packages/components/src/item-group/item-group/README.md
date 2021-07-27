@@ -31,28 +31,29 @@ function Example() {
 
 ### `isBordered`: `boolean`
 
-[Description TBD].
+Renders borders around each items.
 
 - Required: No
 - Default: `false`
 
 ### `isRounded`: `boolean`
 
-[Description TBD].
+Renders with rounded corners.
 
 - Required: No
 - Default: `true`
 
 ### `isSeparated`: `boolean`
 
-[Description TBD].
+Renders items individually. Even if `isBordered` is `false`, a border in between each item will be still be displayed.
 
 - Required: No
 - Default: `false`
 
 ### `size`: `'small' | 'medium' | 'large'`
 
-[Description TBD].
+Determines the amount of padding within the component.
+When not defined, it defaults to the value from the context (which is `medium` by default).
 
 - Required: No
 - Default: `medium`

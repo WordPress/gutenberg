@@ -31,14 +31,14 @@ function Example() {
 
 ### `isAction`: `boolean`
 
-[Description TBD].
+Renders the item as an interactive `button` element.
 
 - Required: No
 - Default: `false`
 
 ### `size`: `'small' | 'medium' | 'large'`
 
-[Description TBD].
+Determines the amount of padding within the component.
 
 - Required: No
 - Default: `medium`
