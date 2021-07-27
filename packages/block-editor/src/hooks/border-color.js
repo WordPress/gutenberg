@@ -21,7 +21,11 @@ import {
 	getColorObjectByAttributeValues,
 } from '../components/colors';
 import useSetting from '../components/use-setting';
-import { hasBorderSupport, shouldSkipSerialization } from './border';
+import {
+	hasBorderSupport,
+	removeBorderAttribute,
+	shouldSkipSerialization,
+} from './border';
 import { cleanEmptyObject } from './utils';
 
 // Defining empty array here instead of inline avoids unnecessary re-renders of
@@ -90,6 +94,39 @@ export function BorderColorEdit( props ) {
 			onColorChange={ onChangeColor }
 		/>
 	);
+}
+
+/**
+ * Checks if there is a current value in the border color block support
+ * attributes.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}     Whether or not the block has a border color value set.
+ */
+export function hasBorderColorValue( props ) {
+	const {
+		attributes: { borderColor, style },
+	} = props;
+
+	return !! borderColor || !! style?.border?.color;
+}
+
+/**
+ * Resets the border color block support attributes. This can be used when
+ * disabling the border color support controls for a block via a progressive
+ * discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetBorderColor( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		borderColor: undefined,
+		style: removeBorderAttribute( style, 'radius' ),
+	} );
 }
 
 /**

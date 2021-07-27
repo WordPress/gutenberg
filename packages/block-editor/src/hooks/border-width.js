@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
+import { removeBorderAttribute } from './border';
 import useSetting from '../components/use-setting';
 
 const MIN_BORDER_WIDTH = 0;
@@ -113,3 +114,28 @@ export const BorderWidthEdit = ( props ) => {
 		/>
 	);
 };
+
+/**
+ * Checks if there is a current value in the border width block support
+ * attributes.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}     Whether or not the block has a border width value set.
+ */
+export function hasBorderWidthValue( props ) {
+	return !! props.attributes.style?.border?.width;
+}
+
+/**
+ * Resets the border width block support attribute. This can be used when
+ * disabling the border width support control for a block via a progressive
+ * discovery panel.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetBorderWidth( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+	setAttributes( { style: removeBorderAttribute( style, 'width' ) } );
+}
