@@ -3,15 +3,36 @@
 	align-items: center;
 	grid-template-columns: repeat(auto-fit, 400px);
 	grid-template-rows: repeat(auto-fit, 400px);
-	grid-gap: $grid-unit-60;
-
+	grid-gap: $grid-unit-40;
+	background-color: $white;
+	padding: $grid-unit-40;
+	justify-content: center;
 }
 
 .edit-site-mosaic-view__mosaic-item {
+	height: 400px;
+	display: grid;
+	grid-template-columns: auto $button-size+$border-width-focus;
+	grid-template-rows: minmax(auto, calc(100% - 80px) ) minmax(auto, 80px);
+	grid-gap: $grid-unit-20;
+	.components-base-control__help {
+		margin-left: $grid-unit-40;
+	}
+	&:focus {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+}
+
+.edit-site-mosaic-view__template-preview {
 	border: $border-width solid $gray-400;
-	box-shadow: $shadow-popover;
 	border-radius: $radius-block-ui;
 	color: $gray-900;
-	height: 400px;
+	grid-column: span 2;
 	overflow: hidden;
+}
+
+.edit-site-mosaic-view__added-by-text {
+	margin-left: $grid-unit;
 }

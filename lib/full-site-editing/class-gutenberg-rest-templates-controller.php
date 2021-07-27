@@ -408,6 +408,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 			'status'         => $template->status,
 			'wp_id'          => $template->wp_id,
 			'has_theme_file' => $template->has_theme_file,
+			'author'         => $template->author,
 		);
 
 		if ( 'wp_template_part' === $template->type ) {
@@ -564,6 +565,12 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 				'has_theme_file' => array(
 					'description' => __( 'Theme file exists.', 'gutenberg' ),
 					'type'        => 'bool',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'author' => array(
+					'description' => __( 'Template author', 'gutenberg' ),
+					'type'        => 'integer',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),

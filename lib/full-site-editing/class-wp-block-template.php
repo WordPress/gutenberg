@@ -87,4 +87,11 @@ class WP_Block_Template {
 	 * @var boolean
 	 */
 	public $has_theme_file;
+
+	/**
+	 * Template author.
+	 *
+	 * @var integer|null
+	 */
+	public $author;
 }

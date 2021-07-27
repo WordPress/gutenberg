@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
  */
 import TemplatePreview from '../navigation-sidebar/navigation-panel/template-preview';
 
-export default function MosaicTemplatePreview( { templateId } ) {
+export default function MosaicTemplatePreview( { className, templateId, onClick } ) {
 	const { isResolved, template, postId, postType } = useSelect(
 		( select ) => {
 			const { getEntityRecord, hasFinishedResolution } = select(
@@ -44,9 +44,11 @@ export default function MosaicTemplatePreview( { templateId } ) {
 	}, [ postId, postType ] );
 
 	return ! isResolved ? (
-		<Spinner />
+		<Spinner className={ className } />
 	) : (
 		<TemplatePreview
+			onClick={ onClick }
+			className={ className }
 			rawContent={ template?.content?.raw }
 			context={ defaultBlockContext }
 		/>

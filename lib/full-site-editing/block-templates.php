@@ -225,6 +225,7 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$template->title          = $template_file['slug'];
 	$template->status         = 'publish';
 	$template->has_theme_file = true;
+	$template->author         = null;
 
 	if ( 'wp_template' === $template_type && isset( $default_template_types[ $template_file['slug'] ] ) ) {
 		$template->description = $default_template_types[ $template_file['slug'] ]['description'];
@@ -272,6 +273,7 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->title          = $post->post_title;
 	$template->status         = $post->post_status;
 	$template->has_theme_file = $has_theme_file;
+	$template->author         = intval( $post->post_author );
 
 	if ( 'wp_template_part' === $post->post_type ) {
 		$type_terms = get_the_terms( $post, 'wp_template_part_area' );
