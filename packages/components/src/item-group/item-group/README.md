@@ -4,11 +4,11 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`ItemGroup` is [TBD]
+`ItemGroup` displays a list of `Item`s grouped and styled together.
 
 ## Usage
 
-`ItemGroup` should be used in combination with the [`Item` component](/packages/components/src/item-group/item/README.md).
+`ItemGroup` should be used in combination with the [`Item` sub-component](/packages/components/src/item-group/item/README.md).
 
 ```jsx
 import {
@@ -58,6 +58,21 @@ When not defined, it defaults to the value from the context (which is `medium` b
 - Required: No
 - Default: `medium`
 
-## Context
+### Context
 
-[TBD]
+The [`Item` sub-component](/packages/components/src/item-group/item/README.md) is connected to `<ItemGroup />` using [Context](https://reactjs.org/docs/context.html). Therefore, `Item` receives the `size` prop from the `ItemGroup` parent component.
+
+In the following example, the `<Item />` will render with a size of `small`:
+
+```jsx
+import {
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+} from '@wordpress/components';
+
+const Example = () => (
+	<ItemGroup size="small">
+		<Item>Item text</Item>
+	</ItemGroup>
+);
+```

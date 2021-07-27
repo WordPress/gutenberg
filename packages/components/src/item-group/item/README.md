@@ -4,7 +4,7 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`Item` is [TBD]
+`Item` is used in combination with `ItemGroup` to display a list of items grouped and styled together.
 
 ## Usage
 
@@ -43,6 +43,21 @@ Determines the amount of padding within the component.
 - Required: No
 - Default: `medium`
 
-## Context
+### Context
 
-[TBD]
+`Item` is connected to [the `<ItemGroup />` parent component](/packages/components/src/item-group/item-group/README.md) using [Context](https://reactjs.org/docs/context.html). Therefore, `Item` receives the `size` prop from the `ItemGroup` parent component.
+
+In the following example, the `<Item />` will render with a size of `small`:
+
+```jsx
+import {
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+} from '@wordpress/components';
+
+const Example = () => (
+	<ItemGroup size="small">
+		<Item>...</Item>
+	</ItemGroup>
+);
+```
