@@ -139,7 +139,6 @@ const config = {
 				},
 				extractComments: false,
 			} ),
-			new OptimizeCssAssetsPlugin(),
 		],
 	},
 	module: {
@@ -230,6 +229,8 @@ const config = {
 		// obsolete and should be removed. Related webpack issue:
 		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/85
 		new FixStyleWebpackPlugin(),
+		// OptimizeCssAssetsPlugin to minify CSS
+		new OptimizeCssAssetsPlugin(),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload
 		// works when running watch mode.
 		! isProduction &&
