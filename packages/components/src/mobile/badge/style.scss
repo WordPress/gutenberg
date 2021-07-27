@@ -2,7 +2,7 @@
 	background-color: $gray-dark;
 	border-color: $gray-dark;
 	border-radius: 3px;
-	color: $white;
+	color: $gray-light;
 	overflow: hidden;
 	padding: 3px 6px;
 	position: absolute;
@@ -11,4 +11,9 @@
 .badge--small {
 	font-size: 12px;
 	padding: 1px 4px;
+}
+
+.badge--dark {
+	background-color: $white;
+	color: $gray-900;
 }

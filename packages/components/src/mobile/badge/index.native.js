@@ -4,6 +4,11 @@
 import { Text } from 'react-native';
 
 /**
+ * WordPress dependencies
+ */
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import styles from './style.scss';
@@ -16,7 +21,7 @@ const Badge = ( {
 	size,
 } ) => {
 	const badgeStyle = [
-		styles.badge,
+		usePreferredColorSchemeStyle( styles.badge, styles[ 'badge--dark' ] ),
 		position,
 		size === 'small' && styles[ 'badge--small' ],
 	];
