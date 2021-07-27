@@ -4,42 +4,49 @@
 import { shallow } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import { PostAuthorCheck } from '../check';
+import PostAuthorCheck from '../check';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
 
 describe( 'PostAuthorCheck', () => {
 	it( 'should not render anything if has no authors', () => {
-		const wrapper = shallow(
-			<PostAuthorCheck
-				hasAuthors={ false }
-				hasAssignAuthorAction={ true }
-			>
-				authors
-			</PostAuthorCheck>
-		);
+		useSelect.mockImplementation( () => ( {
+			hasAuthors: false,
+			hasAssignAuthorAction: true,
+		} ) );
+
+		const wrapper = shallow( <PostAuthorCheck>authors</PostAuthorCheck> );
 		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( "should not render anything if doesn't have author action", () => {
-		const wrapper = shallow(
-			<PostAuthorCheck
-				hasAuthors={ true }
-				hasAssignAuthorAction={ false }
-			>
-				authors
-			</PostAuthorCheck>
-		);
+		useSelect.mockImplementation( () => ( {
+			hasAuthors: true,
+			hasAssignAuthorAction: false,
+		} ) );
+
+		const wrapper = shallow( <PostAuthorCheck>authors</PostAuthorCheck> );
 		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( 'should render control', () => {
-		const wrapper = shallow(
-			<PostAuthorCheck hasAuthors={ true } hasAssignAuthorAction={ true }>
-				authors
-			</PostAuthorCheck>
-		);
+		useSelect.mockImplementation( () => ( {
+			hasAuthors: true,
+			hasAssignAuthorAction: true,
+		} ) );
 
+		const wrapper = shallow( <PostAuthorCheck>authors</PostAuthorCheck> );
 		expect( wrapper.type() ).not.toBe( null );
 	} );
 } );
