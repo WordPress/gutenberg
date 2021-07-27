@@ -34,6 +34,7 @@ const EmbedControls = ( {
 			<ToolbarGroup>
 				{ showEditButton && (
 					<ToolbarButton
+						className="components-toolbar__control"
 						label={ __( 'Edit URL' ) }
 						icon={ edit }
 						onClick={ switchBackToURLInput }
@@ -46,6 +47,7 @@ const EmbedControls = ( {
 				<PanelBody title={ __( 'Media settings' ) }>
 					<ToggleControl
 						label={ __( 'Resize for smaller devices' ) }
+						className="blocks-responsive"
 						checked={ allowResponsive }
 						help={ getResponsiveHelp }
 						onChange={ toggleResponsive }
