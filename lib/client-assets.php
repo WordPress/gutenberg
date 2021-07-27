@@ -759,6 +759,7 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	ob_start();
 
+	wp_styles()->done = array();
 	wp_styles()->do_items( $style_handles );
 	wp_styles()->done = $done;
 
