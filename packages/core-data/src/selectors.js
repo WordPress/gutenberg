@@ -70,18 +70,6 @@ export function getAuthors( state, query ) {
 }
 
 /**
- * Returns all available authors.
- *
- * @param {Object} state Data state.
- * @param {number} id    The author id.
- *
- * @return {Array} Authors list.
- */
-export function __unstableGetAuthor( state, id ) {
-	return get( state, [ 'users', 'byId', id ], null );
-}
-
-/**
  * Returns the current user.
  *
  * @param {Object} state Data state.
