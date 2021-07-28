@@ -553,25 +553,6 @@ supports: {
 }
 ```
 
-## lock
-
--   Type: `Object`
--   Default value: null
--   Subproperties:
-    -   `remove`: type `boolean`, default value depend on parent templateLock
-    -   `move`: type `boolean`, default value depend on parent templateLock.
-A block may want to disable the ability of being removed or moved around. By default all blocks can be removed or moved. You can also restrict removing or moving by changing the `templateLock` value to `"all"` or `"insert"` but this value will supersede it.
-
-```js
-supports: {
-	// Prevent a block from being moved or removed.
-	lock: {
-		remove: true,
-		move: true,
-	}
-}
-```
-
 ## spacing
 
 -   Type: `Object`

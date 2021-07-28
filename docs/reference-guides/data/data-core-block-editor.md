@@ -48,6 +48,62 @@ _Returns_
 
 -   `boolean`: Whether the given block type is allowed to be inserted.
 
+### canMoveBlock
+
+Determines if the given block is allowed to be moved.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: The block client Id.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `boolean`: Whether the given block is allowed to be moved.
+
+### canMoveBlocks
+
+Determines if the given blocks are allowed to be moved.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientIds_ `string`: The block client IDs to be moved.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `boolean`: Whether the given blocks are allowed to be moved.
+
+### canRemoveBlock
+
+Determines if the given block is allowed to be deleted.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: The block client Id.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `boolean`: Whether the given block is allowed to be removed.
+
+### canRemoveBlocks
+
+Determines if the given blocks are allowed to be removed.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientIds_ `string`: The block client IDs to be removed.
+-   _rootClientId_ `?string`: Optional root client ID of block list.
+
+_Returns_
+
+-   `boolean`: Whether the given blocks are allowed to be removed.
+
 ### didAutomaticChange
 
 Returns true if the last change was an automatic change, false otherwise.

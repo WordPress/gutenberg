@@ -25,7 +25,6 @@ import {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
-	getBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
 } from '@wordpress/blocks';
@@ -1304,30 +1303,16 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 }
 
 /**
- * Determines if the given block type is allowed to be deleted.
+ * Determines if the given block is allowed to be deleted.
  *
- * @param {Object}         state        Editor state.
- * @param {string|Object}  blockName    The block type object, e.g., the response
- *                                      from the block directory; or a string name of
- *                                      an installed block type, e.g.' core/paragraph'.
- * @param {?string}        rootClientId Optional root client ID of block list.
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientId     The block client Id.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {boolean} Whether the given block type is allowed to be removed.
+ * @return {boolean} Whether the given block is allowed to be removed.
  */
-export function canRemoveBlockType( state, blockName, rootClientId = null ) {
-	let blockType;
-	if ( blockName && 'object' === typeof blockName ) {
-		blockType = blockName;
-		blockName = blockType.name;
-	} else {
-		blockType = getBlockType( blockName );
-	}
-	// undefined blocks can still be deleted.
-	if ( ! blockType ) {
-		return true;
-	}
-
-	const lock = getBlockSupport( blockName, 'lock', null );
+export function canRemoveBlock( state, clientId, rootClientId = null ) {
+	const { lock } = getBlockAttributes( state, clientId );
 	const parentIsLocked = !! getTemplateLock( state, rootClientId );
 	// If we don't have a lock on the blockType level, we differ to the parent templateLock.
 	if ( lock === null || lock?.remove === undefined ) {
@@ -1348,31 +1333,22 @@ export function canRemoveBlockType( state, blockName, rootClientId = null ) {
  * @return {boolean} Whether the given blocks are allowed to be removed.
  */
 export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
-	return clientIds.every( ( id ) =>
-		canRemoveBlockType( state, getBlockName( state, id ), rootClientId )
+	return clientIds.every( ( clientId ) =>
+		canRemoveBlock( state, clientId, rootClientId )
 	);
 }
 
 /**
- * Determines if the given block type can be moved.
+ * Determines if the given block is allowed to be moved.
  *
- * @param {Object}         state        Editor state.
- * @param {string|Object}  blockName    The block type object, e.g., the response
- *                                      from the block directory; or a string name of
- *                                      an installed block type, e.g.' core/paragraph'.
- * @param {?string}        rootClientId Optional root client ID of block list.
+ * @param {Object}  state        Editor state.
+ * @param {string}  clientId     The block client Id.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
- * @return {boolean} Whether the given block type can be moved.
+ * @return {boolean} Whether the given block is allowed to be moved.
  */
-export function canMoveBlockType( state, blockName, rootClientId = null ) {
-	if ( blockName && 'object' === typeof blockName ) {
-		blockName = blockName.name;
-	}
-
-	if ( ! blockName ) {
-		return false;
-	}
-	const lock = getBlockSupport( blockName, 'lock', null );
+export function canMoveBlock( state, clientId, rootClientId = null ) {
+	const { lock } = getBlockAttributes( state, clientId );
 	const parentIsLocked = getTemplateLock( state, rootClientId ) === 'all';
 	// If we don't have a lock on the blockType level, we differ to the parent templateLock.
 	if ( lock === null || lock?.move === undefined ) {
@@ -1393,8 +1369,8 @@ export function canMoveBlockType( state, blockName, rootClientId = null ) {
  * @return {boolean} Whether the given blocks are allowed to be moved.
  */
 export function canMoveBlocks( state, clientIds, rootClientId = null ) {
-	return clientIds.every( ( id ) =>
-		canMoveBlockType( state, getBlockName( state, id ), rootClientId )
+	return clientIds.every( ( clientId ) =>
+		canMoveBlock( state, clientId, rootClientId )
 	);
 }
 
