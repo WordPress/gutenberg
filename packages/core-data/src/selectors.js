@@ -57,8 +57,7 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  */
 export function getAuthors( state, query ) {
 	deprecated( "select( 'core' ).getAuthors()", {
-		since: '11.3',
-		plugin: 'Gutenberg',
+		since: '5.9',
 		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
 	} );
 
