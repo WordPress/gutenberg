@@ -63,7 +63,7 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 				{ notices.map( ( notice ) => {
 					return (
 						<motion.div
-							layout //see https://www.framer.com/docs/animation/#layout-animations
+							layout={ ! isReducedMotion } //see https://www.framer.com/docs/animation/#layout-animations
 							initial={ 'init' }
 							animate={ 'open' }
 							exit={ 'exit' }
