@@ -45,7 +45,10 @@ import BottomSheetSubSheet from './sub-sheet';
 import NavigationHeader from './navigation-header';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
-const DEFAULT_LAYOUT_ANIMATION = LayoutAnimation.Presets.easeInEaseOut;
+const DEFAULT_LAYOUT_ANIMATION_PROPERTIES = {
+	type: 'easeIn',
+	duration: 150,
+};
 
 class BottomSheet extends Component {
 	constructor() {
@@ -162,13 +165,28 @@ class BottomSheet extends Component {
 		}
 
 		const layoutAnimation = useLastLayoutAnimation
-			? this.lastLayoutAnimation || DEFAULT_LAYOUT_ANIMATION
-			: DEFAULT_LAYOUT_ANIMATION;
+			? this.lastLayoutAnimation || DEFAULT_LAYOUT_ANIMATION_PROPERTIES
+			: DEFAULT_LAYOUT_ANIMATION_PROPERTIES;
 
 		this.lastLayoutAnimationFinished = false;
-		LayoutAnimation.configureNext( layoutAnimation, () => {
-			this.lastLayoutAnimationFinished = true;
-		} );
+
+		LayoutAnimation.configureNext(
+			{
+				duration: layoutAnimation.duration,
+				update: layoutAnimation,
+				create: {
+					...layoutAnimation,
+					property: LayoutAnimation.Properties.opacity,
+				},
+				delete: {
+					...layoutAnimation,
+					property: LayoutAnimation.Properties.opacity,
+				},
+			},
+			() => {
+				this.lastLayoutAnimationFinished = true;
+			}
+		);
 		this.lastLayoutAnimation = layoutAnimation;
 	}
 
