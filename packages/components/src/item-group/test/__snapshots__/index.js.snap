@@ -5,26 +5,27 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -6,22 +6,22 @@
-  >
+@@ -7,11 +7,11 @@
     <div
+      class="css-dcjs67-itemWrapper"
       role="listitem"
     >
       <div
--       class="components-item css-re261t-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-1hpmscp-View-large-item-spacedAround em57xhy0"
+-       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
++       class="components-item css-1c3a883-View-large-itemWrapper-spacedAround em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
         Code
       </div>
-    </div>
+@@ -19,11 +19,11 @@
     <div
+      class="css-dcjs67-itemWrapper"
       role="listitem"
     >
       <div
--       class="components-item css-re261t-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-1hpmscp-View-large-item-spacedAround em57xhy0"
+-       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
++       class="components-item css-1c3a883-View-large-itemWrapper-spacedAround em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -38,12 +39,13 @@ Snapshot Diff:
 + Second value
 
   <div
+    class="css-dcjs67-itemWrapper"
     role="listitem"
   >
 -   <div
--     class="components-item css-1x4a3cb-View-medium-item em57xhy0"
+-     class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
 +   <button
-+     class="components-item css-wgc9wf-View-unstyledButton-medium-item em57xhy0"
++     class="components-item css-1t39803-View-unstyledButton-medium-itemWrapper em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Item"
     >
@@ -58,13 +60,14 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,10 +1,10 @@
+@@ -1,11 +1,11 @@
   <div
+    class="css-dcjs67-itemWrapper"
     role="listitem"
   >
     <div
--     class="components-item css-1x4a3cb-View-medium-item em57xhy0"
-+     class="components-item css-1f4zt9-View-large-item em57xhy0"
+-     class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
++     class="components-item css-1esf9dc-View-large-itemWrapper em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Item"
     >
@@ -77,17 +80,22 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
   border-radius: 2px;
 }
 
-.emotion-0>*:first-of-type {
+.emotion-0>*:first-of-type>* {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-0>*:last-of-type {
+.emotion-0>*:last-of-type>* {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
 .emotion-2 {
+  width: 100%;
+  display: block;
+}
+
+.emotion-3 {
   padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
   width: 100%;
   display: block;
@@ -101,10 +109,11 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
   role="list"
 >
   <div
+    class="emotion-2"
     role="listitem"
   >
     <div
-      class="components-item emotion-2 emotion-1"
+      class="components-item emotion-3 emotion-1"
       data-wp-c16t="true"
       data-wp-component="Item"
     >
@@ -119,20 +128,21 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,16 +1,16 @@
+@@ -1,17 +1,17 @@
   <div
--   class="components-item-group css-1r84h6l-View-rounded em57xhy0"
-+   class="components-item-group css-1d5fx4g-View-separated-rounded em57xhy0"
+-   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
++   class="components-item-group css-18qvw1m-View-separated-rounded em57xhy0"
     data-wp-c16t="true"
     data-wp-component="ItemGroup"
     role="list"
   >
     <div
+      class="css-dcjs67-itemWrapper"
       role="listitem"
     >
       <div
--       class="components-item css-re261t-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-1x4a3cb-View-medium-item em57xhy0"
+-       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
++       class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -145,20 +155,21 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -1,16 +1,16 @@
+@@ -1,17 +1,17 @@
   <div
--   class="components-item-group css-1r84h6l-View-rounded em57xhy0"
-+   class="components-item-group css-qixh5a-View-bordered-separated-rounded em57xhy0"
+-   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
++   class="components-item-group css-acyoj6-View-bordered-rounded em57xhy0"
     data-wp-c16t="true"
     data-wp-component="ItemGroup"
     role="list"
   >
     <div
+      class="css-dcjs67-itemWrapper"
       role="listitem"
     >
       <div
--       class="components-item css-re261t-View-medium-item-spacedAround em57xhy0"
-+       class="components-item css-1x4a3cb-View-medium-item em57xhy0"
+-       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
++       class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -173,7 +184,7 @@ Snapshot Diff:
 
 @@ -1,7 +1,7 @@
   <div
--   class="components-item-group css-1r84h6l-View-rounded em57xhy0"
+-   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
 +   class="components-item-group css-1mm2cvy-View em57xhy0"
     data-wp-c16t="true"
     data-wp-component="ItemGroup"
