@@ -400,7 +400,7 @@ describe( 'Post generator actions', () => {
 
 describe( 'Editor actions', () => {
 	describe( 'setupEditor()', () => {
-		it( 'should yield the setup editor actions but not reset blocks when the template is empty', () => {		
+		it( 'should yield the setup editor actions but not reset blocks when the template is empty', () => {
 			const post = { content: { raw: '' }, status: 'publish' };
 			const fulfillment = actions.setupEditor( post );
 			let { value } = fulfillment.next();
