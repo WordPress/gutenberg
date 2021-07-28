@@ -158,7 +158,7 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } figure.wp-block-image:not(#individual-image) {
 				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
-				width: calc(#{math.div(100%, $i)} - (math.div(var(--gallery-block--gutter-size, $grid-unit-20) * $i - 1, $i)));
+				width: calc(#{math.div(100%, $i)} - (var(--gallery-block--gutter-size, #{$grid-unit-20}) * #{math.div($i - 1, $i)}));
 
 			}
 
@@ -177,7 +177,7 @@
 		&.columns-default {
 			figure.wp-block-image:not(#individual-image) {
 				margin-right: var(--gallery-block--gutter-size, #{$grid-unit-20});
-				width: calc(33.33% - (var(--gallery-block--gutter-size, 16px) * 2 / 3));
+				width: calc(33.33% - (var(--gallery-block--gutter-size, 16px) * #{math.div(2, 3)}));
 			}
 			figure.wp-block-image:not(#individual-image):nth-of-type(3n+3) {
 				margin-right: 0;
@@ -185,7 +185,7 @@
 			// If only 2 child images use 2 columns.
 			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2),
 			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(2) ~ figure.wp-block-image:not(#individual-image) {
-				width: calc(50% - (var(--gallery-block--gutter-size, 16px) / 2));
+				width: calc(50% - (var(--gallery-block--gutter-size, 16px) * 0.5));
 			}
 			// For a single image set to 100%.
 			figure.wp-block-image:not(#individual-image):first-child:nth-last-child(1) {
