@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
@@ -6,6 +11,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -25,33 +31,46 @@ export default function BlockParentSelector() {
 	const { selectBlock, toggleBlockHighlight } = useDispatch(
 		blockEditorStore
 	);
-	const { firstParentClientId, shouldHide, hasReducedUI } = useSelect(
-		( select ) => {
-			const {
-				getBlockName,
-				getBlockParents,
-				getSelectedBlockClientId,
-				getSettings,
-			} = select( blockEditorStore );
-			const { hasBlockSupport } = select( blocksStore );
-			const selectedBlockClientId = getSelectedBlockClientId();
-			const parents = getBlockParents( selectedBlockClientId );
-			const _firstParentClientId = parents[ parents.length - 1 ];
-			const parentBlockName = getBlockName( _firstParentClientId );
-			const _parentBlockType = getBlockType( parentBlockName );
-			const settings = getSettings();
-			return {
-				firstParentClientId: _firstParentClientId,
-				shouldHide: ! hasBlockSupport(
-					_parentBlockType,
-					'__experimentalParentSelector',
-					true
-				),
-				hasReducedUI: settings.hasReducedUI,
-			};
-		},
-		[]
-	);
+	const {
+		firstParentClientId,
+		shouldHide,
+		hasReducedUI,
+		reusableBlockHasEdits,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getBlockParents,
+			getSelectedBlockClientId,
+			getSettings,
+			getBlockAttributes,
+		} = select( blockEditorStore );
+		const { hasBlockSupport } = select( blocksStore );
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const parents = getBlockParents( selectedBlockClientId );
+		const _firstParentClientId = parents[ parents.length - 1 ];
+		const parentBlockName = getBlockName( _firstParentClientId );
+		const _parentBlockType = getBlockType( parentBlockName );
+		const settings = getSettings();
+		const parentBlockRef = getBlockAttributes( _firstParentClientId )?.ref;
+		const blockHasEdits = select( coreStore ).hasEditsForEntityRecord(
+			'postType',
+			'wp_block',
+			parentBlockRef
+		);
+		const _reusableBlockHasEdits =
+			blockHasEdits && parentBlockName === 'core/block';
+
+		return {
+			firstParentClientId: _firstParentClientId,
+			shouldHide: ! hasBlockSupport(
+				_parentBlockType,
+				'__experimentalParentSelector',
+				true
+			),
+			hasReducedUI: settings.hasReducedUI,
+			reusableBlockHasEdits: _reusableBlockHasEdits,
+		};
+	}, [] );
 	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 
 	// Allows highlighting the parent block outline when focusing or hovering
@@ -71,13 +90,18 @@ export default function BlockParentSelector() {
 		return null;
 	}
 
+	const classes = classnames( 'block-editor-block-parent-selector', {
+		'block-has-changes': reusableBlockHasEdits,
+	} );
+
 	return (
 		<div
-			className="block-editor-block-parent-selector"
+			className={ classes }
 			key={ firstParentClientId }
 			ref={ nodeRef }
 			{ ...showMoversGestures }
 		>
+			{ reusableBlockHasEdits && <div className="has-changes-dot"></div> }
 			<ToolbarButton
 				className="block-editor-block-parent-selector__button"
 				onClick={ () => selectBlock( firstParentClientId ) }

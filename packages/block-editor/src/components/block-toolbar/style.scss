@@ -54,6 +54,14 @@
 	}
 }
 
+.block-editor-block-contextual-toolbar.block-has-changes:not(.is-fixed) {
+	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-30});
+
+	.show-icon-labels & {
+		margin-left: 0;
+	}
+}
+
 .block-editor-block-parent-selector {
 	position: absolute;
 	top: -$border-width;

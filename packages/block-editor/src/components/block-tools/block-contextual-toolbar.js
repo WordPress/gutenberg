@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -18,35 +19,47 @@ import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
-	const { blockType, hasParents, showParentSelector } = useSelect(
-		( select ) => {
-			const {
-				getBlockName,
-				getBlockParents,
-				getSelectedBlockClientIds,
-			} = select( blockEditorStore );
-			const { getBlockType } = select( blocksStore );
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-			const parents = getBlockParents( selectedBlockClientId );
-			const firstParentClientId = parents[ parents.length - 1 ];
-			const parentBlockName = getBlockName( firstParentClientId );
-			const parentBlockType = getBlockType( parentBlockName );
+	const {
+		blockType,
+		hasParents,
+		showParentSelector,
+		reusableBlockHasEdits,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getBlockParents,
+			getSelectedBlockClientIds,
+			getBlockAttributes,
+		} = select( blockEditorStore );
+		const { getBlockType } = select( blocksStore );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+		const parents = getBlockParents( selectedBlockClientId );
+		const firstParentClientId = parents[ parents.length - 1 ];
+		const parentBlockName = getBlockName( firstParentClientId );
+		const parentBlockType = getBlockType( parentBlockName );
+		const parentBlockRef = getBlockAttributes( firstParentClientId )?.ref;
+		const blockHasEdits = select( coreStore ).hasEditsForEntityRecord(
+			'postType',
+			'wp_block',
+			parentBlockRef
+		);
+		const _reusableBlockHasEdits =
+			blockHasEdits && parentBlockName === 'core/block';
 
-			return {
-				blockType:
-					selectedBlockClientId &&
-					getBlockType( getBlockName( selectedBlockClientId ) ),
-				hasParents: parents.length,
-				showParentSelector: hasBlockSupport(
-					parentBlockType,
-					'__experimentalParentSelector',
-					true
-				),
-			};
-		},
-		[]
-	);
+		return {
+			blockType:
+				selectedBlockClientId &&
+				getBlockType( getBlockName( selectedBlockClientId ) ),
+			hasParents: parents.length,
+			showParentSelector: hasBlockSupport(
+				parentBlockType,
+				'__experimentalParentSelector',
+				true
+			),
+			reusableBlockHasEdits: _reusableBlockHasEdits,
+		};
+	}, [] );
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
 			return null;
@@ -57,6 +70,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	const classes = classnames( 'block-editor-block-contextual-toolbar', {
 		'has-parent': hasParents && showParentSelector,
 		'is-fixed': isFixed,
+		'block-has-changes': reusableBlockHasEdits,
 	} );
 
 	return (

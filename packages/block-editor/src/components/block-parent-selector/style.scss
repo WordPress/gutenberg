@@ -9,3 +9,30 @@
 		border-radius: $radius-block-ui;
 	}
 }
+
+// styles for parent block selector when reusable block has changes
+.block-editor-block-parent-selector.block-has-changes {
+	left: calc(-#{$grid-unit-60} - #{$grid-unit-30} - #{$border-width});
+
+	// increase the width of parent selector to make room for the dot
+	.block-editor-block-parent-selector__button {
+		width: $grid-unit-60 + $grid-unit-20;
+	}
+
+	// move the parent selector icon to right side to make room for the dot
+	.block-editor-block-icon {
+		margin-right: -15px;
+	}
+
+	// add the dot before the parent selector icon
+	.has-changes-dot {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		background: var(--wp-admin-theme-color);
+		border-radius: 4px;
+		height: 8px;
+		width: 8px;
+		margin-left: 12px;
+	}
+}
