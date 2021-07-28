@@ -73,9 +73,7 @@ Snapshot Diff:
 `;
 
 exports[`ItemGroup ItemGroup component should render correctly 1`] = `
-Object {
-  "asFragment": [Function],
-  "baseElement": .emotion-0 {
+.emotion-0 {
   border-radius: 2px;
 }
 
@@ -96,121 +94,24 @@ Object {
   border-radius: 2px;
 }
 
-<body>
-    <div>
-      <div
-        class="components-item-group emotion-0 emotion-1"
-        data-wp-c16t="true"
-        data-wp-component="ItemGroup"
-        role="list"
-      >
-        <div
-          role="listitem"
-        >
-          <div
-            class="components-item emotion-2 emotion-1"
-            data-wp-c16t="true"
-            data-wp-component="Item"
-          >
-            Code is poetry
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>,
-  "container": .emotion-0 {
-  border-radius: 2px;
-}
-
-.emotion-0>*:first-of-type {
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
-}
-
-.emotion-0>*:last-of-type {
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-}
-
-.emotion-2 {
-  padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
-  width: 100%;
-  display: block;
-  border-radius: 2px;
-}
-
-<div>
+<div
+  class="components-item-group emotion-0 emotion-1"
+  data-wp-c16t="true"
+  data-wp-component="ItemGroup"
+  role="list"
+>
+  <div
+    role="listitem"
+  >
     <div
-      class="components-item-group emotion-0 emotion-1"
+      class="components-item emotion-2 emotion-1"
       data-wp-c16t="true"
-      data-wp-component="ItemGroup"
-      role="list"
+      data-wp-component="Item"
     >
-      <div
-        role="listitem"
-      >
-        <div
-          class="components-item emotion-2 emotion-1"
-          data-wp-c16t="true"
-          data-wp-component="Item"
-        >
-          Code is poetry
-        </div>
-      </div>
+      Code is poetry
     </div>
-  </div>,
-  "debug": [Function],
-  "findAllByAltText": [Function],
-  "findAllByDisplayValue": [Function],
-  "findAllByLabelText": [Function],
-  "findAllByPlaceholderText": [Function],
-  "findAllByRole": [Function],
-  "findAllByTestId": [Function],
-  "findAllByText": [Function],
-  "findAllByTitle": [Function],
-  "findByAltText": [Function],
-  "findByDisplayValue": [Function],
-  "findByLabelText": [Function],
-  "findByPlaceholderText": [Function],
-  "findByRole": [Function],
-  "findByTestId": [Function],
-  "findByText": [Function],
-  "findByTitle": [Function],
-  "getAllByAltText": [Function],
-  "getAllByDisplayValue": [Function],
-  "getAllByLabelText": [Function],
-  "getAllByPlaceholderText": [Function],
-  "getAllByRole": [Function],
-  "getAllByTestId": [Function],
-  "getAllByText": [Function],
-  "getAllByTitle": [Function],
-  "getByAltText": [Function],
-  "getByDisplayValue": [Function],
-  "getByLabelText": [Function],
-  "getByPlaceholderText": [Function],
-  "getByRole": [Function],
-  "getByTestId": [Function],
-  "getByText": [Function],
-  "getByTitle": [Function],
-  "queryAllByAltText": [Function],
-  "queryAllByDisplayValue": [Function],
-  "queryAllByLabelText": [Function],
-  "queryAllByPlaceholderText": [Function],
-  "queryAllByRole": [Function],
-  "queryAllByTestId": [Function],
-  "queryAllByText": [Function],
-  "queryAllByTitle": [Function],
-  "queryByAltText": [Function],
-  "queryByDisplayValue": [Function],
-  "queryByLabelText": [Function],
-  "queryByPlaceholderText": [Function],
-  "queryByRole": [Function],
-  "queryByTestId": [Function],
-  "queryByText": [Function],
-  "queryByTitle": [Function],
-  "rerender": [Function],
-  "unmount": [Function],
-}
+  </div>
+</div>
 `;
 
 exports[`ItemGroup ItemGroup component should render items individually when the isSeparated prop is true 1`] = `
