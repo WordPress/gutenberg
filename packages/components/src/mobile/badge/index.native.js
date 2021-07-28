@@ -1,37 +1,27 @@
 /**
  * External dependencies
  */
-import { Text } from 'react-native';
+import { View, Text } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-const Badge = ( {
-	children,
-	label,
-	position = { top: 8, left: 8 },
-	show = true,
-	size,
-} ) => {
-	const badgeStyle = [
-		usePreferredColorSchemeStyle( styles.badge, styles[ 'badge--dark' ] ),
-		position,
-		size === 'small' && styles[ 'badge--small' ],
-	];
-
+const Badge = ( { label, children, show = true } ) => {
 	return (
 		<>
 			{ children }
-			{ show && <Text style={ badgeStyle }>{ label }</Text> }
+			<View style={ styles.badgeContainer }>
+				{ show && <Text style={ styles.badge }>{ label }</Text> }
+			</View>
 		</>
 	);
 };
 
-export default Badge;
+export default withPreferredColorScheme( Badge );
