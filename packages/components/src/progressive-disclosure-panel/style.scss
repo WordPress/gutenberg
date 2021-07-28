@@ -31,16 +31,16 @@
 			height: $grid-unit-30;
 		}
 	}
+}
 
-	> div,
-	> fieldset {
-		padding-bottom: 0;
-		margin-bottom: 0;
-		max-width: 100%;
-		grid-column: span 2;
-
-		&:last-child {
-			margin-bottom: $grid-unit-10;
+.block-editor-block-inspector {
+	.components-progressive-disclosure-panel {
+		> div,
+		> fieldset {
+			padding-bottom: 0;
+			margin-bottom: 0;
+			max-width: 100%;
+			grid-column: span 2;
 		}
 	}
 }
