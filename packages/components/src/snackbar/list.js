@@ -28,10 +28,9 @@ const SNACKBAR_VARIANTS = {
 		},
 	},
 	exit: {
-		x: -300,
 		opacity: 0,
 		transition: {
-			x: { stiffness: 1000, velocity: -100 },
+			duration: 0.2,
 		},
 	},
 };
@@ -64,6 +63,7 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 				{ notices.map( ( notice ) => {
 					return (
 						<motion.div
+							layout //see https://www.framer.com/docs/animation/#layout-animations
 							initial={ 'init' }
 							animate={ 'open' }
 							exit={ 'exit' }
