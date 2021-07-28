@@ -41,9 +41,12 @@ export function useItem(
 		className
 	);
 
+	const wrapperClassName = cx( styles.itemWrapper );
+
 	return {
 		as,
 		className: classes,
+		wrapperClassName,
 		role,
 		...otherProps,
 	};

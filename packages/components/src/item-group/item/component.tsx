@@ -16,10 +16,10 @@ function Item(
 	props: PolymorphicComponentProps< ItemProps, 'div' >,
 	forwardedRef: Ref< any >
 ) {
-	const { role, ...otherProps } = useItem( props );
+	const { role, wrapperClassName, ...otherProps } = useItem( props );
 
 	return (
-		<div role={ role }>
+		<div role={ role } className={ wrapperClassName }>
 			<View { ...otherProps } ref={ forwardedRef } />
 		</div>
 	);
