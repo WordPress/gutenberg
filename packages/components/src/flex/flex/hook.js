@@ -6,7 +6,6 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
-import { isRTL } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -17,7 +16,7 @@ import { useContextSystem } from '../../ui/context';
 import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
 import { space } from '../../ui/utils/space';
 import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
+import { useCx, rtl } from '../../utils';
 
 /**
  *
@@ -68,8 +67,6 @@ export function useFlex( props ) {
 
 	const classes = useMemo( () => {
 		const sx = {};
-		const marginLeftProperty = isRTL() ? 'marginRight' : 'marginLeft';
-		const marginRightProperty = isRTL() ? 'marginLeft' : 'marginRight';
 
 		sx.Base = css( {
 			alignItems: isColumn ? 'normal' : align,
@@ -81,37 +78,43 @@ export function useFlex( props ) {
 			marginBottom: wrap ? `calc(${ space( gap ) } * -1)` : undefined,
 		} );
 
-		sx.Items = css( {
-			/**
-			 * Workaround to optimize DOM rendering.
-			 * We'll enhance alignment with naive parent flex assumptions.
-			 *
-			 * Trade-off:
-			 * Far less DOM less. However, UI rendering is not as reliable.
-			 */
-			'> * + *:not(marquee)': {
-				marginTop: isColumn ? space( gap ) : undefined,
-				[ marginRightProperty ]:
-					! isColumn && isReverse ? space( gap ) : undefined,
-				[ marginLeftProperty ]:
-					! isColumn && ! isReverse ? space( gap ) : undefined,
-			},
-		} );
+		/**
+		 * Workaround to optimize DOM rendering.
+		 * We'll enhance alignment with naive parent flex assumptions.
+		 *
+		 * Trade-off:
+		 * Far less DOM less. However, UI rendering is not as reliable.
+		 */
+		sx.Items = css`
+			> * + *:not( marquee ) {
+				margin-top: ${ isColumn ? space( gap ) : undefined };
+				${ rtl( {
+					marginLeft:
+						! isColumn && ! isReverse ? space( gap ) : undefined,
+					marginRight:
+						! isColumn && isReverse ? space( gap ) : undefined,
+				} )() }
+			}
+		`;
 
-		sx.WrapItems = css( {
-			'> *:not(marquee)': {
-				marginBottom: space( gap ),
-				[ marginLeftProperty ]:
-					! isColumn && isReverse ? space( gap ) : undefined,
-				[ marginRightProperty ]:
-					! isColumn && ! isReverse ? space( gap ) : undefined,
-			},
-			'> *:last-child:not(marquee)': {
-				[ marginLeftProperty ]: ! isColumn && isReverse ? 0 : undefined,
-				[ marginRightProperty ]:
-					! isColumn && ! isReverse ? 0 : undefined,
-			},
-		} );
+		sx.WrapItems = css`
+			> *:not( marquee ) {
+				margin-bottom: ${ space( gap ) };
+				${ rtl( {
+					marginLeft:
+						! isColumn && isReverse ? space( gap ) : undefined,
+					marginRight:
+						! isColumn && ! isReverse ? space( gap ) : undefined,
+				} )() }
+			}
+
+			> *:last-child:not( marquee ) {
+				${ rtl( {
+					marginLeft: ! isColumn && isReverse ? 0 : undefined,
+					marginRight: ! isColumn && ! isReverse ? 0 : undefined,
+				} )() }
+			}
+		`;
 
 		return cx(
 			styles.Flex,
