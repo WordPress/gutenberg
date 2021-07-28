@@ -6,6 +6,7 @@ import { css } from '@emotion/react';
 /**
  * WordPress dependencies
  */
+import { isRTL } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -67,6 +68,8 @@ export function useFlex( props ) {
 
 	const classes = useMemo( () => {
 		const sx = {};
+		const marginLeftProperty = isRTL() ? 'marginRight' : 'marginLeft';
+		const marginRightProperty = isRTL() ? 'marginLeft' : 'marginRight';
 
 		sx.Base = css( {
 			alignItems: isColumn ? 'normal' : align,
@@ -88,8 +91,9 @@ export function useFlex( props ) {
 			 */
 			'> * + *:not(marquee)': {
 				marginTop: isColumn ? space( gap ) : undefined,
-				marginRight: ! isColumn && isReverse ? space( gap ) : undefined,
-				marginLeft:
+				[ marginRightProperty ]:
+					! isColumn && isReverse ? space( gap ) : undefined,
+				[ marginLeftProperty ]:
 					! isColumn && ! isReverse ? space( gap ) : undefined,
 			},
 		} );
@@ -97,13 +101,15 @@ export function useFlex( props ) {
 		sx.WrapItems = css( {
 			'> *:not(marquee)': {
 				marginBottom: space( gap ),
-				marginLeft: ! isColumn && isReverse ? space( gap ) : undefined,
-				marginRight:
+				[ marginLeftProperty ]:
+					! isColumn && isReverse ? space( gap ) : undefined,
+				[ marginRightProperty ]:
 					! isColumn && ! isReverse ? space( gap ) : undefined,
 			},
 			'> *:last-child:not(marquee)': {
-				marginLeft: ! isColumn && isReverse ? 0 : undefined,
-				marginRight: ! isColumn && ! isReverse ? 0 : undefined,
+				[ marginLeftProperty ]: ! isColumn && isReverse ? 0 : undefined,
+				[ marginRightProperty ]:
+					! isColumn && ! isReverse ? 0 : undefined,
 			},
 		} );
 
