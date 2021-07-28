@@ -186,7 +186,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 		mappedValues
 	);
 	const customValues = parseStylesVariables(
-		JSON.stringify( features.custom ),
+		JSON.stringify( features?.custom ),
 		mappedValues
 	);
 	const globalStyles = parseStylesVariables(
