@@ -8,17 +8,17 @@ _Parts of the source code were derived and modified from [react-color](https://g
 
 ```jsx
 import { ColorPicker } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyColorPicker = withState( {
-	color: '#f00',
-} )( ( { color, setState } ) => {
+const MyColorPicker = () => {
+	const [ color, setColor ] = useState( '#f00' );
+
 	return (
 		<ColorPicker
 			color={ color }
-			onChangeComplete={ ( value ) => setState( value.hex ) }
+			onChangeComplete={ ( value ) => setColor( value.hex ) }
 			disableAlpha
 		/>
 	);
-} );
+};
 ```

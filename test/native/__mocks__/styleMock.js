@@ -119,4 +119,20 @@ module.exports = {
 	ripple: {
 		backgroundColor: 'white',
 	},
+	spacing: {
+		marginLeft: 6,
+		marginRight: 6,
+	},
+	arrow: {
+		color: 'red',
+	},
+	button: {
+		color: 'red',
+	},
+	textInput: {
+		color: 'black',
+	},
+	buttonNoBg: {
+		color: 'orange',
+	},
 };

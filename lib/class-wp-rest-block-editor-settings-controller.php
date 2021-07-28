@@ -16,7 +16,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	 * Constructs the controller.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental/wp-block-editor/v1';
+		$this->namespace = 'wp-block-editor/v1';
 		$this->rest_base = 'settings';
 	}
 

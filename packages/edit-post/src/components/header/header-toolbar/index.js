@@ -66,7 +66,7 @@ function HeaderToolbar() {
 			showIconLabels: isFeatureActive( 'showIconLabels' ),
 			isListViewOpen: isListViewOpened(),
 			listViewShortcut: getShortcutRepresentation(
-				'core/edit-post/toggle-block-navigation'
+				'core/edit-post/toggle-list-view'
 			),
 		};
 	}, [] );
@@ -135,7 +135,8 @@ function HeaderToolbar() {
 					) }
 					showTooltip={ ! showIconLabels }
 				>
-					{ showIconLabels && __( 'Add' ) }
+					{ showIconLabels &&
+						( ! isInserterOpened ? __( 'Add' ) : __( 'Close' ) ) }
 				</ToolbarItem>
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>

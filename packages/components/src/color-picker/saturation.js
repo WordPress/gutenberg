@@ -44,7 +44,7 @@ import { compose, pure, withInstanceId } from '@wordpress/compose';
 import { calculateSaturationChange } from './utils';
 import Button from '../button';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 
 export class Saturation extends Component {
 	constructor( props ) {

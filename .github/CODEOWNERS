@@ -128,6 +128,11 @@
 /lib/full-site-editing                          @timothybjabocs @spacedmonkey @janw-me
 /phpunit/class-wp-theme-json-test.php           @nosolosw
 
+# Web App
+/packages/admin-manifest                        @ellatrix
+/lib/pwa.php                                    @ellatrix
+/lib/service-worker.js                          @ellatrix
+
 # Native (Unowned)
 *.native.js                                     @ghost
 *.android.js                                    @ghost

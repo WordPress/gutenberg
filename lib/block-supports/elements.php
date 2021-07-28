@@ -63,5 +63,6 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 
 }
 
-
+// Remove WordPress core filter to avoid rendering duplicate elements stylesheet.
+remove_filter( 'render_block', 'wp_render_elements_support', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_elements_support', 10, 2 );

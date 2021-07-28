@@ -267,7 +267,7 @@ When the block declares support for `color.gradient`, the attributes definition 
           type: 'object',
           default: {
               color: {
-                  background: 'linear-gradient(135deg,rgb(170,187,204) 0%,rgb(17,34,51) 100%)',
+                  gradient: 'linear-gradient(135deg,rgb(170,187,204) 0%,rgb(17,34,51) 100%)',
               }
           }
       }

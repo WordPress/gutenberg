@@ -8,78 +8,80 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import {
-	useBlockEditContext,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import EmbedBottomSheet from './embed-bottom-sheet';
 import styles from './styles.scss';
+import { noticeOutline } from '../../../components/src/mobile/gridicons';
 
 const EmbedPlaceholder = ( {
 	icon,
 	isSelected,
 	label,
-	onFocus,
-	value,
-	onSubmit,
+	onPress,
+	cannotEmbed,
 } ) => {
-	const { clientId } = useBlockEditContext();
-	const { wasBlockJustInserted } = useSelect(
-		( select ) => ( {
-			wasBlockJustInserted: select(
-				blockEditorStore
-			).wasBlockJustInserted( clientId, 'inserter_menu' ),
-		} ),
-		[ clientId ]
+	const containerStyle = usePreferredColorSchemeStyle(
+		styles.embed__container,
+		styles[ 'embed__container--dark' ]
 	);
-	const [ isEmbedSheetVisible, setIsEmbedSheetVisible ] = useState(
-		isSelected && wasBlockJustInserted && ! value
+	const labelStyle = usePreferredColorSchemeStyle(
+		styles.embed__label,
+		styles[ 'embed__label--dark' ]
 	);
-
-	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
-		styles.emptyStateContainer,
-		styles.emptyStateContainerDark
+	const descriptionStyle = styles.embed__description;
+	const descriptionErrorStyle = styles[ 'embed__description--error' ];
+	const actionStyle = usePreferredColorSchemeStyle(
+		styles.embed__action,
+		styles[ 'embed__action--dark' ]
 	);
-
-	const emptyStateTitleStyle = usePreferredColorSchemeStyle(
-		styles.emptyStateTitle,
-		styles.emptyStateTitleDark
+	const embedIconStyle = usePreferredColorSchemeStyle(
+		styles.embed__icon,
+		styles[ 'embed__icon--dark' ]
 	);
+	const embedIconErrorStyle = styles[ 'embed__icon--error' ];
 
 	return (
 		<>
-			{ value ? (
-				<Text>{ value }</Text>
-			) : (
-				<TouchableWithoutFeedback
-					accessibilityRole={ 'button' }
-					accessibilityHint={ __( 'Double tap to add a link.' ) }
-					onPress={ ( event ) => {
-						onFocus( event );
-						setIsEmbedSheetVisible( true );
-					} }
-				>
-					<View style={ emptyStateContainerStyle }>
-						<View style={ styles.modalIcon }>{ icon }</View>
-						<Text style={ emptyStateTitleStyle }>{ label }</Text>
-						<Text style={ styles.emptyStateDescription }>
-							{ __( 'ADD LINK' ) }
-						</Text>
-					</View>
-				</TouchableWithoutFeedback>
-			) }
-			<EmbedBottomSheet
-				value={ value }
-				isVisible={ isEmbedSheetVisible }
-				onClose={ () => setIsEmbedSheetVisible( false ) }
-				onSubmit={ onSubmit }
-			/>
+			<TouchableWithoutFeedback
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Double tap to add a link.' ) }
+				onPress={ onPress }
+				disabled={ ! isSelected }
+			>
+				<View style={ containerStyle }>
+					{ cannotEmbed ? (
+						<>
+							<Icon
+								icon={ noticeOutline }
+								fill={ embedIconErrorStyle.fill }
+								style={ embedIconErrorStyle }
+							/>
+							<Text
+								style={ [
+									descriptionStyle,
+									descriptionErrorStyle,
+								] }
+							>
+								{ __( 'Unable to embed media' ) }
+							</Text>
+							<Text style={ actionStyle }>
+								{ __( 'EDIT LINK' ) }
+							</Text>
+						</>
+					) : (
+						<>
+							<Icon icon={ icon } fill={ embedIconStyle.fill } />
+							<Text style={ labelStyle }>{ label }</Text>
+							<Text style={ actionStyle }>
+								{ __( 'ADD LINK' ) }
+							</Text>
+						</>
+					) }
+				</View>
+			</TouchableWithoutFeedback>
 		</>
 	);
 };
