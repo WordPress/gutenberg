@@ -37,15 +37,9 @@ const SNACKBAR_VARIANTS = {
 };
 
 const SNACKBAR_REDUCE_MOTION_VARIANTS = {
-	init: {
-		opacity: 0,
-	},
-	open: {
-		opacity: 1,
-	},
-	exit: {
-		opacity: 0,
-	},
+	init: false,
+	open: false,
+	exit: false,
 };
 
 /**
