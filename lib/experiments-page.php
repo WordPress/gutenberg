@@ -108,7 +108,7 @@ function gutenberg_display_experiment_section() {
  * @return array Filtered editor settings.
  */
 function gutenberg_experiments_editor_settings( $settings ) {
-	$experiments = get_option( 'gutenberg-experiments' );
+	$experiments          = get_option( 'gutenberg-experiments' );
 	$experiments_settings = array(
 		'__unstableGalleryWithImageBlocks' => isset( $experiments['gutenberg-gallery-refactor'] ),
 	);
