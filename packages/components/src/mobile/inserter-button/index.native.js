@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableHighlight, Text } from 'react-native';
+import { Image, View, TouchableHighlight, Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -9,13 +9,12 @@ import { View, TouchableHighlight, Text } from 'react-native';
 import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import Badge from '../badge';
 
 class MenuItem extends Component {
 	constructor() {
@@ -57,6 +56,16 @@ class MenuItem extends Component {
 
 		const isClipboardBlock = item.id === 'clipboard';
 		const blockTitle = isClipboardBlock ? __( 'Copied block' ) : item.title;
+		const blockIsNew = item.isNew === true;
+		const accessibilityLabelFormat = blockIsNew
+			? // translators: Newly added block type title. %s: The localized block name
+			  __( '%s block, newly available' )
+			: // translators: Block type title. %s: The localized block name
+			  __( '%s block' );
+		const accessibilityLabel = sprintf(
+			accessibilityLabelFormat,
+			item.title
+		);
 
 		return (
 			<TouchableHighlight
@@ -67,7 +76,7 @@ class MenuItem extends Component {
 				underlayColor="transparent"
 				activeOpacity={ 0.5 }
 				accessibilityRole="button"
-				accessibilityLabel={ `${ item.title } block` }
+				accessibilityLabel={ accessibilityLabel }
 				onPress={ this.onPress }
 				disabled={ item.isDisabled }
 			>
@@ -81,20 +90,19 @@ class MenuItem extends Component {
 							isClipboardBlock && clipboardBlockStyles,
 						] }
 					>
-						<Badge
-							label={ __( 'New' ) }
-							position={ { top: 4, left: 4 } }
-							show={ item.isNew === true }
-							size="small"
-						>
-							<View style={ modalIconStyle }>
-								<Icon
-									icon={ item.icon.src || item.icon }
-									fill={ modalIconStyle.fill }
-									size={ modalIconStyle.width }
-								/>
-							</View>
-						</Badge>
+						{ blockIsNew && (
+							<Image
+								source={ require( './images/sparkles.png' ) }
+								style={ styles.newIndicator }
+							/>
+						) }
+						<View style={ modalIconStyle }>
+							<Icon
+								icon={ item.icon.src || item.icon }
+								fill={ modalIconStyle.fill }
+								size={ modalIconStyle.width }
+							/>
+						</View>
 					</View>
 					<Text numberOfLines={ 3 } style={ modalItemLabelStyle }>
 						{ blockTitle }
