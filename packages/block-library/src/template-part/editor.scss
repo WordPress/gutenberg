@@ -8,11 +8,11 @@
 }
 
 .wp-block-template-part__selection-preview-search-form {
-	border-bottom: $border-width solid $gray-300;
+	border-bottom: $border-width solid $gray-400;
 }
 
 .wp-block-template-part__selection-preview-container {
-	background: $gray-100;
+	background: $white;
 	padding-bottom: 16px;
 
 	.wp-block-template-part__selection-preview-item {
@@ -20,7 +20,7 @@
 		cursor: pointer;
 		margin-top: $grid-unit-20;
 		transition: all 0.05s ease-in-out;
-		border: $border-width solid $gray-300;
+		border: $border-width solid $gray-400;
 		width: 100%;
 		background-color: $white;
 
@@ -38,13 +38,16 @@
 		&.is-placeholder {
 			min-height: 100px;
 		}
+
+		.block-editor-block-preview__container {
+			border-bottom: $border-width solid $gray-400;
+		}
 	}
 
 	.wp-block-template-part__selection-preview-item-title {
 		padding: $grid-unit-05;
 		font-size: $helptext-font-size;
 		text-align: left;
-		border-top: $border-width solid $gray-300;
 	}
 
 	.wp-block-template-part__selection-panel-group-header {
