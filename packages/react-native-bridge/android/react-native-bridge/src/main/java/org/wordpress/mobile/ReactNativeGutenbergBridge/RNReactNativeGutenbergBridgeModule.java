@@ -406,21 +406,21 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void requestBlockTypeImpressions(final ReadableArray newBlockTypes, final Callback jsCallback) {
+    public void requestBlockTypeImpressions(final Callback jsCallback) {
         BlockTypeImpressionsCallback blockTypeImpressionsCallback = requestBlockTypeImpressionsCallback(jsCallback);
-        mGutenbergBridgeJS2Parent.requestBlockTypeImpressions(newBlockTypes, blockTypeImpressionsCallback);
+        mGutenbergBridgeJS2Parent.requestBlockTypeImpressions(blockTypeImpressionsCallback);
     }
 
     private BlockTypeImpressionsCallback requestBlockTypeImpressionsCallback(final Callback jsCallback) {
         return new GutenbergBridgeJS2Parent.BlockTypeImpressionsCallback() {
-            @Override public void onRequestBlockTypeImpressions(WritableMap impressions) {
+            @Override public void onRequestBlockTypeImpressions(ReadableMap impressions) {
                 jsCallback.invoke(impressions);
             }
         };
     }
 
     @ReactMethod
-    public void setBlockTypeImpressionCount(String name, Double count) {
-        mGutenbergBridgeJS2Parent.setBlockTypeImpressionCount(name, count);
+    public void setBlockTypeImpressions(final ReadableMap impressions) {
+        mGutenbergBridgeJS2Parent.setBlockTypeImpressions(impressions);
     }
 }

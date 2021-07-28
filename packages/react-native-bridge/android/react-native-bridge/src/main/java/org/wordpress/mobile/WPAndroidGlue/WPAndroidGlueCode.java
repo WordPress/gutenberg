@@ -221,8 +221,8 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnBlockTypeImpressionsEventListener {
-        void onSetBlockTypeImpressionCount(String name, Double count);
-        Map<String, Double> onRequestBlockTypeImpressions(ArrayList<Object> newBlockTypes);
+        void onSetBlockTypeImpressions(ReadableMap impressions);
+        Map<String, Double> onRequestBlockTypeImpressions();
     }
 
     public void mediaSelectionCancelled() {
@@ -504,8 +504,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestBlockTypeImpressions(ReadableArray newBlockTypes, BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
-                Map<String, Double> storedImpressions = mOnBlockTypeImpressionsEventListener.onRequestBlockTypeImpressions(newBlockTypes.toArrayList());
+            public void requestBlockTypeImpressions(BlockTypeImpressionsCallback blockTypeImpressionsCallback) {
+                Map<String, Double> storedImpressions = mOnBlockTypeImpressionsEventListener.onRequestBlockTypeImpressions();
                 WritableMap impressions = Arguments.createMap();
                 for (Map.Entry<String, Double> entry: storedImpressions.entrySet()) {
                     impressions.putDouble(entry.getKey(), entry.getValue());
@@ -514,8 +514,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void setBlockTypeImpressionCount(String name, Double count) {
-                mOnBlockTypeImpressionsEventListener.onSetBlockTypeImpressionCount(name, count);
+            public void setBlockTypeImpressions(ReadableMap impressions) {
+                mOnBlockTypeImpressionsEventListener.onSetBlockTypeImpressions(impressions);
             }
         }, mIsDarkMode);
 

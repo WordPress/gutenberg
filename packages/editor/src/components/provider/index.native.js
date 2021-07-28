@@ -8,6 +8,7 @@ import memize from 'memize';
  */
 import RNReactNativeGutenbergBridge, {
 	requestBlockTypeImpressions,
+	setBlockTypeImpressions,
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
@@ -165,9 +166,22 @@ class NativeEditorProvider extends Component {
 		} );
 
 		// Request current block impressions from native app
-		requestBlockTypeImpressions( ( impressions ) => {
+		requestBlockTypeImpressions( ( storedImpressions ) => {
+			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
+
+			// Persist impressions to JavaScript store
 			updateSettings( { impressions } );
-		}, NEW_BLOCK_TYPES );
+
+			// Persist impressions to native store if they do not include latest
+			// `NEW_BLOCK_TYPES` configuration
+			const storedImpressionKeys = Object.keys( storedImpressions );
+			const storedImpressionsCurrent = Object.keys(
+				NEW_BLOCK_TYPES
+			).every( ( newKey ) => storedImpressionKeys.includes( newKey ) );
+			if ( ! storedImpressionsCurrent ) {
+				setBlockTypeImpressions( impressions );
+			}
+		} );
 	}
 
 	componentWillUnmount() {

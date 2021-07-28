@@ -56,7 +56,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     }
 
     interface BlockTypeImpressionsCallback {
-        void onRequestBlockTypeImpressions(WritableMap impressions);
+        void onRequestBlockTypeImpressions(ReadableMap impressions);
     }
 
     // Ref: https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
@@ -167,8 +167,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void requestPreview();
 
-    void requestBlockTypeImpressions(ReadableArray newBlockTypes, BlockTypeImpressionsCallback blockTypeImpressionsCallback);
+    void requestBlockTypeImpressions(BlockTypeImpressionsCallback blockTypeImpressionsCallback);
 
-    void setBlockTypeImpressionCount(String name, Double count);
+    void setBlockTypeImpressions(ReadableMap impressions);
 
 }

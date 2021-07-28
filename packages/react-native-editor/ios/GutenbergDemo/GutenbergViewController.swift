@@ -245,12 +245,12 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print(#function)
     }
 
-    func gutenbergDidRequestBlockTypeImpressions(_ newBlockTypes: [String]) -> [String: Int] {
-        return newBlockTypes.reduce(into: [:], { $0[$1] = 3 })
+    func gutenbergDidRequestBlockTypeImpressions() -> [String: Int] {
+        return [:]
     }
 
-    func gutenbergDidRequestSetBlockTypeImpressionCount(_ name: String, count: Int) -> Void {
-        print("Gutenberg requested setting \"\(name)\" block type impression count to \(count).")
+    func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int]) -> Void {
+        print("Gutenberg requested setting block type impressions to \(impressions).")
     }
 }
 

@@ -42,7 +42,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		removeEventListener: jest.fn(),
 		requestBlockTypeImpressions: jest.fn( () => {} ),
 		requestFocalPointPickerTooltipShown: jest.fn( () => true ),
-		setBlockTypeImpressionCount: jest.fn(),
+		setBlockTypeImpressions: jest.fn(),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
 		subscribeSetFocusOnTitle: jest.fn(),
