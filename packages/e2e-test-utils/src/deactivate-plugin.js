@@ -1,9 +1,7 @@
 /**
  * Internal dependencies
  */
-import { switchUserToAdmin } from './switch-user-to-admin';
-import { switchUserToTest } from './switch-user-to-test';
-import { visitAdminPage } from './visit-admin-page';
+import { shell } from './wp-shell';
 
 /**
  * Deactivates an active plugin.
@@ -11,14 +9,15 @@ import { visitAdminPage } from './visit-admin-page';
  * @param {string} slug Plugin slug.
  */
 export async function deactivatePlugin( slug ) {
-	await switchUserToAdmin();
-	await visitAdminPage( 'plugins.php' );
-	const deleteLink = await page.$( `tr[data-slug="${ slug }"] .delete a` );
-	if ( deleteLink ) {
-		await switchUserToTest();
-		return;
-	}
-	await page.click( `tr[data-slug="${ slug }"] .deactivate a` );
-	await page.waitForSelector( `tr[data-slug="${ slug }"] .delete a` );
-	await switchUserToTest();
+	await shell`
+		require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+		$plugins = get_plugins();
+
+		foreach ( $plugins as $plugin_id => $plugin ) {
+			if ( '${ slug }' == sanitize_title( $plugin['Title'] ) ) {
+				return deactivate_plugins( $plugin_id );
+			}
+		}
+	`;
 }
