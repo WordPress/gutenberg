@@ -82,5 +82,6 @@ export { openPreviewPage } from './preview';
 export { wpDataSelect } from './wp-data-select';
 export { deleteAllWidgets } from './widgets';
 export { rest } from './rest-api';
+export { shell } from './wp-shell';
 
 export * from './mocks';

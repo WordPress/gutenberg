@@ -660,6 +660,27 @@ _Parameters_
 
 -   _mocks_ `Array`: Array of mock settings.
 
+### shell
+
+Evaluate WordPress commands remotely via wp-shell test plugin.
+
+_Usage_
+
+```js
+await shell`
+	return switch_theme( 'twentytwenty' );
+`;
+```
+
+_Parameters_
+
+-   _strings_ `Array<string>|string`: The commands strings.
+-   _args_ `...any`: Additional arguments.
+
+_Returns_
+
+-   `Promise<any>`: Evaluated result.
+
 ### showBlockToolbar
 
 The block toolbar is not always visible while typing.
