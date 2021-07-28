@@ -14,9 +14,14 @@ import { space } from '../utils/space';
 interface HexInputProps {
 	color: string;
 	onChange: ( value: string ) => void;
+	disableAlpha: boolean;
 }
 
-export const HexInput = ( { color, onChange }: HexInputProps ) => {
+export const HexInput = ( {
+	color,
+	onChange,
+	disableAlpha,
+}: HexInputProps ) => {
 	const handleValidate = ( value: string ) => {
 		if ( ! colorize( value ).isValid() ) {
 			throw new Error( 'Invalid hex color input' );
@@ -25,9 +30,9 @@ export const HexInput = ( { color, onChange }: HexInputProps ) => {
 
 	return (
 		<InputControl
-			__unstableInputWidth="7em"
-			suffix={
-				<Spacer as={ Text } marginX={ space( 2 ) } color="blue">
+			__unstableInputWidth="8em"
+			prefix={
+				<Spacer as={ Text } marginLeft={ space( 2 ) } color="blue">
 					#
 				</Spacer>
 			}
@@ -36,6 +41,7 @@ export const HexInput = ( { color, onChange }: HexInputProps ) => {
 				onChange( colorize( nextValue ).toHex8String() )
 			}
 			onValidate={ handleValidate }
+			maxLength={ disableAlpha ? 6 : 8 }
 		/>
 	);
 };

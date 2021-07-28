@@ -9,20 +9,23 @@ interface ColorInputProps {
 	colorType: 'hsl' | 'hex' | 'rgb';
 	color: string;
 	onChange: ( value: string ) => void;
+	disableAlpha: boolean;
 }
 
 export const ColorInput = ( {
 	colorType,
 	color,
 	onChange,
+	disableAlpha,
 }: ColorInputProps ) => {
+	const props = { color, onChange, disableAlpha };
 	switch ( colorType ) {
 		case 'hsl':
-			return <HslInput color={ color } onChange={ onChange } />;
+			return <HslInput { ...props } />;
 		case 'rgb':
-			return <RgbInput color={ color } onChange={ onChange } />;
+			return <RgbInput { ...props } />;
 		default:
 		case 'hex':
-			return <HexInput color={ color } onChange={ onChange } />;
+			return <HexInput { ...props } />;
 	}
 };

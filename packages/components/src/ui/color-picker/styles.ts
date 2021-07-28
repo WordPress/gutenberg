@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import InnerSelectControl from '../../select-control';
+import { StyledField } from '../../base-control/styles/base-control-styles';
 import { space } from '../utils/space';
 
 export const SelectControl = styled( InnerSelectControl )`
@@ -36,5 +37,9 @@ export const ColorfulWrapper = styled.div`
 		width: 184px;
 		border-radius: 16px;
 		margin-bottom: ${ space( 2 ) };
+	}
+
+	${ StyledField } {
+		margin-bottom: 0;
 	}
 `;

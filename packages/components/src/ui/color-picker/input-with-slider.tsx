@@ -53,8 +53,8 @@ export const InputWithSlider = ( {
 				hideLabelFromVision
 				value={ value }
 				onChange={ onChange }
-				suffix={
-					<Spacer as={ Text } paddingX={ space( 1 ) } color="blue">
+				prefix={
+					<Spacer as={ Text } paddingLeft={ space( 1 ) } color="blue">
 						{ abbreviation }
 					</Spacer>
 				}

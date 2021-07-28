@@ -9,6 +9,7 @@ import type { Ref } from 'react';
  */
 import { useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -20,18 +21,21 @@ import {
 } from '../context';
 import { HStack } from '../../h-stack';
 import Button from '../../button';
+import { Spacer } from '../../spacer';
 import { ColorfulWrapper, SelectControl } from './styles';
 import { HexColorPicker } from './hex-color-picker';
-import { HslaColorPicker } from './hsla-color-picker';
+import { RgbaColorPicker } from './rgba-color-picker';
 import { ColorDisplay } from './color-display';
 import { ColorInput } from './color-input';
+import { useControlledValue } from '../../utils/hooks';
 
+import type { ColorType } from './types';
 interface ColorPickerProps {
 	disableAlpha?: boolean;
-	initialColor?: string;
+	color?: string;
+	onChange?: ( hex8Color: string ) => void;
+	defaultValue?: string;
 }
-
-type ColorType = 'rgb' | 'hsl' | 'hex';
 
 const options = [
 	{ label: 'RGB', value: 'rgb' as const },
@@ -43,24 +47,34 @@ const ColorPicker = (
 	props: PolymorphicComponentProps< ColorPickerProps, 'div', false >,
 	forwardedRef: Ref< any >
 ) => {
-	const { disableAlpha = true, initialColor } = useContextSystem(
-		props,
-		'ColorPicker'
-	);
+	const {
+		disableAlpha = true,
+		color: colorProp,
+		onChange,
+		defaultValue,
+	} = useContextSystem( props, 'ColorPicker' );
+
+	const [ color, setColor ] = useControlledValue( {
+		onChange,
+		value: colorProp,
+		defaultValue,
+	} );
+
+	// Debounce to prevent rapid changes from conflicting with one another.
+	const debouncedSetColor = useDebounce( setColor );
+
+	// Use a safe default value for the color and remove the possibility of `undefined`. This is what react-colorful defaults to if it's not passed anything so it's the safest default
+	const safeColor = ! color ? '#fff' : color;
 
 	const [ showInputs, setShowInputs ] = useState< boolean >( false );
 	const [ colorType, setColorType ] = useState< ColorType >( 'rgb' );
 
-	const [ color, setColor ] = useState(
-		initialColor || ( disableAlpha ? '#000000' : '#000000ff' )
-	);
-
-	const Picker = disableAlpha ? HexColorPicker : HslaColorPicker;
+	const Picker = disableAlpha ? HexColorPicker : RgbaColorPicker;
 
 	return (
 		<ColorfulWrapper ref={ forwardedRef }>
-			<Picker onChange={ setColor } color={ color } />
-			<HStack>
+			<Picker onChange={ debouncedSetColor } color={ safeColor } />
+			<HStack justify="space-between">
 				{ showInputs ? (
 					<SelectControl
 						options={ options }
@@ -70,19 +84,25 @@ const ColorPicker = (
 						}
 					/>
 				) : (
-					<ColorDisplay color={ color } colorType={ colorType } />
+					<ColorDisplay
+						color={ safeColor }
+						colorType={ colorType }
+						disableAlpha={ disableAlpha }
+					/>
 				) }
 				<Button
 					onClick={ () => setShowInputs( ! showInputs ) }
 					icon={ moreVertical }
 					isPressed={ showInputs }
-				></Button>
+				/>
 			</HStack>
+			<Spacer />
 			{ showInputs && (
 				<ColorInput
 					colorType={ colorType }
-					color={ color }
-					onChange={ setColor }
+					color={ safeColor }
+					onChange={ debouncedSetColor }
+					disableAlpha={ disableAlpha }
 				/>
 			) }
 		</ColorfulWrapper>

@@ -11,10 +11,15 @@ import { InputWithSlider } from './input-with-slider';
 interface RgbInputProps {
 	color: string;
 	onChange: ( color: string ) => void;
+	disableAlpha: boolean;
 }
 
-export const RgbInput = ( { color, onChange }: RgbInputProps ) => {
-	const { r, g, b } = colorize( color ).toRgb();
+export const RgbInput = ( {
+	color,
+	onChange,
+	disableAlpha,
+}: RgbInputProps ) => {
+	const { r, g, b, a } = colorize( color ).toRgb();
 
 	return (
 		<>
@@ -25,7 +30,7 @@ export const RgbInput = ( { color, onChange }: RgbInputProps ) => {
 				abbreviation="R"
 				value={ r }
 				onChange={ ( nextR: number ) =>
-					onChange( colorize( { r: nextR, g, b } ).toHex8String() )
+					onChange( colorize( { r: nextR, g, b, a } ).toHex8String() )
 				}
 			/>
 			<InputWithSlider
@@ -35,7 +40,7 @@ export const RgbInput = ( { color, onChange }: RgbInputProps ) => {
 				abbreviation="G"
 				value={ g }
 				onChange={ ( nextG: number ) =>
-					onChange( colorize( { r, g: nextG, b } ).toHex8String() )
+					onChange( colorize( { r, g: nextG, b, a } ).toHex8String() )
 				}
 			/>
 			<InputWithSlider
@@ -45,9 +50,28 @@ export const RgbInput = ( { color, onChange }: RgbInputProps ) => {
 				abbreviation="B"
 				value={ b }
 				onChange={ ( nextB: number ) =>
-					onChange( colorize( { r, g, b: nextB } ).toHex8String() )
+					onChange( colorize( { r, g, b: nextB, a } ).toHex8String() )
 				}
 			/>
+			{ ! disableAlpha && (
+				<InputWithSlider
+					min={ 0 }
+					max={ 100 }
+					label="Alpha"
+					abbreviation="A"
+					value={ Math.trunc( a * 100 ) }
+					onChange={ ( nextA: number ) =>
+						onChange(
+							colorize( {
+								r,
+								g,
+								b,
+								a: nextA / 100,
+							} ).toHex8String()
+						)
+					}
+				/>
+			) }
 		</>
 	);
 };

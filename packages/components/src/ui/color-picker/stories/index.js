@@ -4,31 +4,35 @@
 import { boolean } from '@storybook/addon-knobs';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { ColorPicker } from '..';
+import { Flex } from '../../../flex';
 
 export default {
 	component: ColorPicker,
 	title: 'Components (Experimental)/ColorPicker',
 };
 
-export const _default = () => {
+const Example = () => {
+	const [ color, setColor ] = useState( '#fff' );
 	const props = {
 		disableAlpha: boolean( 'disableAlpha', true ),
 	};
 
 	return (
-		<div
-			style={ {
-				width: '100vw',
-				height: '100vh',
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-			} }
-		>
-			<ColorPicker { ...props } />
-		</div>
+		<Flex gap={ 8 } align="flex-start">
+			<ColorPicker { ...props } color={ color } onChange={ setColor } />
+			<ColorPicker { ...props } color={ color } onChange={ setColor } />
+		</Flex>
 	);
+};
+
+export const _default = () => {
+	return <Example />;
 };
