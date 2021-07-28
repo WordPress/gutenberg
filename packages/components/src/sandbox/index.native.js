@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Platform } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 /**
@@ -116,6 +116,17 @@ export default function Sandbox( {
 	const [ height, setHeight ] = useState( 0 );
 	const [ iframeHtml, setiFrameHtml ] = useState();
 
+	const windowSize = Dimensions.get( 'window' );
+	const [ isLandscape, setIsLandscape ] = useState(
+		windowSize.width >= windowSize.height
+	);
+	// On Android, we need to recreate the WebView when the device rotates, otherwise it disappears.
+	// For this purpose, the key value used in the WebView will change when the device orientation gets updated.
+	const key = Platform.select( {
+		android: `${ providerUrl }-${ isLandscape ? 'landscape' : 'portrait' }`,
+		ios: providerUrl,
+	} );
+
 	function trySandbox( forceRerender = false ) {
 		// TODO: Use the device's locale
 		const lang = 'en';
@@ -201,6 +212,17 @@ export default function Sandbox( {
 		return 1;
 	}
 
+	function onChangeDimensions( dimensions ) {
+		setIsLandscape( dimensions.window.width >= dimensions.window.height );
+	}
+
+	useEffect( () => {
+		Dimensions.addEventListener( 'change', onChangeDimensions );
+		return () => {
+			Dimensions.removeEventListener( 'change', onChangeDimensions );
+		};
+	}, [] );
+
 	useEffect( () => {
 		trySandbox();
 	}, [ title, type, styles, scripts ] );
@@ -211,6 +233,7 @@ export default function Sandbox( {
 
 	return (
 		<WebView
+			key={ key }
 			ref={ ref }
 			source={ { baseUrl: providerUrl, html: iframeHtml } }
 			// Wildcard value is required for static HTML
