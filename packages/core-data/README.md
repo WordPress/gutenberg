@@ -290,6 +290,8 @@ _Returns_
 
 ### getAuthors
 
+> **Deprecated** since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
+
 Returns all available authors.
 
 _Parameters_
