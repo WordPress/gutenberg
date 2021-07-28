@@ -58,9 +58,9 @@ class MenuItem extends Component {
 		const blockTitle = isClipboardBlock ? __( 'Copied block' ) : item.title;
 		const blockIsNew = item.isNew === true;
 		const accessibilityLabelFormat = blockIsNew
-			? // translators: Newly added block type title. %s: The localized block name
+			? // translators: Newly available block name. %s: The localized block name
 			  __( '%s block, newly available' )
-			: // translators: Block type title. %s: The localized block name
+			: // translators: Block name. %s: The localized block name
 			  __( '%s block' );
 		const accessibilityLabel = sprintf(
 			accessibilityLabelFormat,
