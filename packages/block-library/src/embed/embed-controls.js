@@ -44,10 +44,12 @@ const EmbedControls = ( {
 		</BlockControls>
 		{ themeSupportsResponsive && blockSupportsResponsive && (
 			<InspectorControls>
-				<PanelBody title={ __( 'Media settings' ) }>
+				<PanelBody
+					title={ __( 'Media settings' ) }
+					className="blocks-responsive"
+				>
 					<ToggleControl
 						label={ __( 'Resize for smaller devices' ) }
-						className="blocks-responsive"
 						checked={ allowResponsive }
 						help={ getResponsiveHelp }
 						onChange={ toggleResponsive }
