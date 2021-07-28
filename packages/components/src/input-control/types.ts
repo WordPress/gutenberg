@@ -37,7 +37,7 @@ export interface InputFieldProps extends BaseProps {
 	isDragEnabled?: boolean;
 	isPressEnterToChange?: boolean;
 	onChange?: (
-		nextValue: string,
+		nextValue: string | undefined,
 		extra: { event: ChangeEvent< HTMLInputElement > }
 	) => void;
 	onValidate?: (
