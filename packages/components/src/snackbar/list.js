@@ -28,24 +28,17 @@ const SNACKBAR_VARIANTS = {
 		},
 	},
 	exit: {
-		x: -300,
 		opacity: 0,
 		transition: {
-			x: { stiffness: 1000, velocity: -100 },
+			duration: 0.5,
 		},
 	},
 };
 
 const SNACKBAR_REDUCE_MOTION_VARIANTS = {
-	init: {
-		opacity: 0,
-	},
-	open: {
-		opacity: 1,
-	},
-	exit: {
-		opacity: 0,
-	},
+	init: false,
+	open: false,
+	exit: false,
 };
 
 /**
@@ -70,6 +63,7 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
 				{ notices.map( ( notice ) => {
 					return (
 						<motion.div
+							layout={ ! isReducedMotion } //see https://www.framer.com/docs/animation/#layout-animations
 							initial={ 'init' }
 							animate={ 'open' }
 							exit={ 'exit' }
