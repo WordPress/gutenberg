@@ -34,6 +34,11 @@ export default function PatternsSetup( {
 		setIsTitleStep( true );
 	};
 
+	const submitForCreation = ( event ) => {
+		event.preventDefault();
+		onCreate( startingBlocks, title );
+	};
+
 	return (
 		<>
 			<BlockPatternSetup
@@ -55,32 +60,23 @@ export default function PatternsSetup( {
 						areaLabel.toLowerCase()
 					) }
 					closeLabel={ __( 'Cancel' ) }
-					onRequestClose={ () => {
-						resetPlaceholder();
-					} }
-					overlayClassName="wp-block-template-part__placeholder-title-form"
+					onRequestClose={ resetPlaceholder }
+					overlayClassName="wp-block-template-part__placeholder-create-new__title-form"
 				>
-					<form
-						onSubmit={ ( event ) => {
-							event.preventDefault();
-							onCreate( startingBlocks, title );
-						} }
-					>
+					<form onSubmit={ submitForCreation }>
 						<TextControl
 							label={ __( 'Name' ) }
 							value={ title }
 							onChange={ setTitle }
 						/>
 						<Flex
-							className="wp-block-template-part__placeholder-title-form-actions"
+							className="wp-block-template-part__placeholder-create-new__title-form-actions"
 							justify="flex-end"
 						>
 							<FlexItem>
 								<Button
 									variant="secondary"
-									onClick={ () => {
-										resetPlaceholder();
-									} }
+									onClick={ resetPlaceholder }
 								>
 									{ __( 'Cancel' ) }
 								</Button>
