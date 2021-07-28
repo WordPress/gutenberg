@@ -12,7 +12,7 @@
 }
 
 .wp-block-template-part__selection-preview-container {
-	background: $white;
+	background: $gray-100;
 	padding-bottom: 16px;
 
 	.wp-block-template-part__selection-preview-item {
@@ -20,7 +20,7 @@
 		cursor: pointer;
 		margin-top: $grid-unit-20;
 		transition: all 0.05s ease-in-out;
-		border: $border-width solid transparent;
+		border: $border-width solid $gray-300;
 		width: 100%;
 		background-color: $white;
 
@@ -44,6 +44,7 @@
 		padding: $grid-unit-05;
 		font-size: $helptext-font-size;
 		text-align: left;
+		border-top: $border-width solid $gray-300;
 	}
 
 	.wp-block-template-part__selection-panel-group-header {
