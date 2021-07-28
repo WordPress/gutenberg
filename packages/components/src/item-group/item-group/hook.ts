@@ -26,7 +26,7 @@ export function useItemGroup(
 
 	const classes = cx(
 		isBordered && styles.bordered,
-		( isBordered || isSeparated ) && styles.separated,
+		isSeparated && styles.separated,
 		isRounded && styles.rounded,
 		className
 	);

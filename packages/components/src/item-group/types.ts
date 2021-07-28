@@ -2,7 +2,7 @@ type ItemSize = 'small' | 'medium' | 'large';
 
 export interface ItemGroupProps {
 	/**
-	 * Renders borders around each items.
+	 * Renders a border around the itemgroup.
 	 *
 	 * @default false
 	 */
@@ -14,8 +14,7 @@ export interface ItemGroupProps {
 	 */
 	isRounded?: boolean;
 	/**
-	 * Renders items individually. Even if `isBordered` is `false`, a border
-	 * in between each item will be still be displayed.
+	 * Renders a separator between each item.
 	 *
 	 * @default false
 	 */
