@@ -31,7 +31,7 @@ import { useControlledValue } from '../../utils/hooks';
 
 import type { ColorType } from './types';
 interface ColorPickerProps {
-	disableAlpha?: boolean;
+	enableAlpha?: boolean;
 	color?: string;
 	onChange?: ( hex8Color: string ) => void;
 	defaultValue?: string;
@@ -48,7 +48,7 @@ const ColorPicker = (
 	forwardedRef: Ref< any >
 ) => {
 	const {
-		disableAlpha = true,
+		enableAlpha = false,
 		color: colorProp,
 		onChange,
 		defaultValue,
@@ -69,7 +69,7 @@ const ColorPicker = (
 	const [ showInputs, setShowInputs ] = useState< boolean >( false );
 	const [ colorType, setColorType ] = useState< ColorType >( 'rgb' );
 
-	const Picker = disableAlpha ? HexColorPicker : RgbaColorPicker;
+	const Picker = enableAlpha ? RgbaColorPicker : HexColorPicker;
 
 	return (
 		<ColorfulWrapper ref={ forwardedRef }>
@@ -87,7 +87,7 @@ const ColorPicker = (
 					<ColorDisplay
 						color={ safeColor }
 						colorType={ colorType }
-						disableAlpha={ disableAlpha }
+						enableAlpha={ enableAlpha }
 					/>
 				) }
 				<Button
@@ -102,7 +102,7 @@ const ColorPicker = (
 					colorType={ colorType }
 					color={ safeColor }
 					onChange={ debouncedSetColor }
-					disableAlpha={ disableAlpha }
+					enableAlpha={ enableAlpha }
 				/>
 			) }
 		</ColorfulWrapper>

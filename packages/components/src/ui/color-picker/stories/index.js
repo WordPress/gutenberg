@@ -13,6 +13,8 @@ import { useState } from '@wordpress/element';
  */
 import { ColorPicker } from '..';
 import { Flex } from '../../../flex';
+import { Spacer } from '../../../spacer';
+import { space } from '../../utils/space';
 
 export default {
 	component: ColorPicker,
@@ -22,11 +24,17 @@ export default {
 const Example = () => {
 	const [ color, setColor ] = useState( '#fff' );
 	const props = {
-		disableAlpha: boolean( 'disableAlpha', true ),
+		enableAlpha: boolean( 'enableAlpha', false ),
 	};
 
 	return (
-		<Flex gap={ 8 } align="flex-start">
+		<Flex
+			as={ Spacer }
+			gap={ space( 2 ) }
+			justify="space-around"
+			align="flex-start"
+			marginTop={ space( 10 ) }
+		>
 			<ColorPicker { ...props } color={ color } onChange={ setColor } />
 			<ColorPicker { ...props } color={ color } onChange={ setColor } />
 		</Flex>

@@ -11,14 +11,10 @@ import { InputWithSlider } from './input-with-slider';
 interface RgbInputProps {
 	color: string;
 	onChange: ( color: string ) => void;
-	disableAlpha: boolean;
+	enableAlpha: boolean;
 }
 
-export const RgbInput = ( {
-	color,
-	onChange,
-	disableAlpha,
-}: RgbInputProps ) => {
+export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 	const { r, g, b, a } = colorize( color ).toRgb();
 
 	return (
@@ -53,7 +49,7 @@ export const RgbInput = ( {
 					onChange( colorize( { r, g, b: nextB, a } ).toHex8String() )
 				}
 			/>
-			{ ! disableAlpha && (
+			{ enableAlpha && (
 				<InputWithSlider
 					min={ 0 }
 					max={ 100 }

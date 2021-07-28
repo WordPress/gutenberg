@@ -22,12 +22,12 @@ import { space } from '../utils/space';
 interface ColorDisplayProps {
 	color: string;
 	colorType: ColorType;
-	disableAlpha: boolean;
+	enableAlpha: boolean;
 }
 
 interface DisplayProps {
 	color: string;
-	disableAlpha: boolean;
+	enableAlpha: boolean;
 }
 
 type Values = [ number, string ][];
@@ -49,7 +49,7 @@ const ValueDisplay = ( { values }: ValueDisplayProps ) => (
 	</>
 );
 
-const HslDisplay = ( { color, disableAlpha }: DisplayProps ) => {
+const HslDisplay = ( { color, enableAlpha }: DisplayProps ) => {
 	const { h, s, l, a } = colorize( color ).toHsl();
 
 	const values: Values = [
@@ -57,14 +57,14 @@ const HslDisplay = ( { color, disableAlpha }: DisplayProps ) => {
 		[ Math.round( s * 100 ), 'S' ],
 		[ Math.round( l * 100 ), 'L' ],
 	];
-	if ( ! disableAlpha ) {
+	if ( enableAlpha ) {
 		values.push( [ Math.round( a * 100 ), 'A' ] );
 	}
 
 	return <ValueDisplay values={ values } />;
 };
 
-const RgbDisplay = ( { color, disableAlpha }: DisplayProps ) => {
+const RgbDisplay = ( { color, enableAlpha }: DisplayProps ) => {
 	const { r, g, b, a } = colorize( color ).toRgb();
 
 	const values: Values = [
@@ -73,7 +73,7 @@ const RgbDisplay = ( { color, disableAlpha }: DisplayProps ) => {
 		[ b, 'B' ],
 	];
 
-	if ( ! disableAlpha ) {
+	if ( enableAlpha ) {
 		values.push( [ Math.round( a * 100 ), 'A' ] );
 	}
 
@@ -105,10 +105,10 @@ const getComponent = ( colorType: ColorType ) => {
 export const ColorDisplay = ( {
 	color,
 	colorType,
-	disableAlpha,
+	enableAlpha,
 }: ColorDisplayProps ) => {
 	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
-	const props = { color, disableAlpha };
+	const props = { color, enableAlpha };
 	const Component = getComponent( colorType );
 	const copyRef = useCopyToClipboard< HTMLDivElement >( color, () =>
 		setCopiedColor( color )

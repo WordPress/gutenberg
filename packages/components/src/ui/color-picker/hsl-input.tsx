@@ -11,14 +11,10 @@ import { InputWithSlider } from './input-with-slider';
 interface HslInputProps {
 	color: string;
 	onChange: ( color: string ) => void;
-	disableAlpha: boolean;
+	enableAlpha: boolean;
 }
 
-export const HslInput = ( {
-	color,
-	onChange,
-	disableAlpha,
-}: HslInputProps ) => {
+export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
 	const { h, s, l, a } = colorize( color ).toHsl();
 
 	return (
@@ -57,7 +53,7 @@ export const HslInput = ( {
 					)
 				}
 			/>
-			{ ! disableAlpha && (
+			{ enableAlpha && (
 				<InputWithSlider
 					min={ 0 }
 					max={ 100 }
