@@ -14,10 +14,9 @@ function slugify( str ) {
 	return str
 		.trim() // Trim white spaces.
 		.toLowerCase() // Convert to lower cases.
-		.replace( /[^a-z0-9 -]/g, '' ) // Remove invalid chars.
 		.replace( /\s+/g, '-' ) // Collapse whitespace and replace by a dash.
 		.replace( /-+/g, '-' ) // Collapse dashes.
-		.replace( /\//g, '' ); // Collapse all forward-slashes.
+		.replace( /[^a-z0-9 -]/g, '' ); // Remove invalid chars.
 }
 
 const pluginsMapPromise = ( async function getPluginsMap() {
