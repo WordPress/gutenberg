@@ -191,8 +191,18 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string|WP_Error The HTTP response from the remote URL, or an error.
 	 */
 	private function get_remote_url( $url ) {
+
+		// Provide a modify UA string to workaround web properties which block WordPress "Pingbacks".
+		// Why? The UA string used for pingback requests contains `WordPress/` which is very similar
+		// to that used as the default UA string by the WP HTTP API. Therefore requests from this
+		// REST endpoint are being unintentionally blocked as they are misidentified as pingback requests.
+		// By slightly modifying the UA string, but still retaining the "WordPress" identification (via "WP")
+		// we are able to work around this issue.
+		$modified_user_agent = 'WP(' . get_bloginfo( 'version' ) . ') ' . get_bloginfo( 'url' ) . ': URL details request.';
+
 		$args = array(
 			'limit_response_size' => 150 * KB_IN_BYTES,
+			'user-agent'          => $modified_user_agent
 		);
 
 		/**
