@@ -4,7 +4,7 @@ title: "<title>"
 body:
 
 - type: markdown
-    attributes:
+  attributes:
       value: |
         Thanks for taking the time to fill out this bug report! If this is a security issue, please report it in HackerOne instead: https://hackerone.com/wordpress
 
