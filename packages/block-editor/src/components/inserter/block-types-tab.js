@@ -80,7 +80,7 @@ export function BlockTypesTab( {
 	 */
 	const currentlyRenderedCategories = useAsyncList( categories );
 	const didRenderAllCategories =
-		categories.length === currentlyRenderedCategories;
+		categories.length === currentlyRenderedCategories.length;
 	const currentlyRenderedCollections = useAsyncList(
 		didRenderAllCategories ? collections : []
 	);
