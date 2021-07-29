@@ -18,22 +18,19 @@
 	&.is-selected .block-editor-list-view-block-contents {
 		background: var(--wp-admin-theme-color);
 		color: $white;
-
-		// Hide selection styles while a user is dragging blocks/files etc.
-		.is-dragging-components-draggable & {
-			background: none;
-			color: $gray-900;
-		}
 	}
+
 	&.is-selected .block-editor-list-view-block-contents:focus {
 		box-shadow:
 			inset 0 0 0 1px $white,
 			0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+	&.is-moving {
+		z-index: 1;
+	}
 
-		// Hide focus styles while a user is dragging blocks/files etc.
-		.is-dragging-components-draggable & {
-			box-shadow: none;
-		}
+	&.is-moving .block-editor-list-view-block-contents:focus {
+		box-shadow: none;
 	}
 
 	&.is-branch-selected.is-selected .block-editor-list-view-block-contents {
@@ -56,10 +53,6 @@
 		border-radius: 0 0 2px 2px;
 	}
 
-	&.is-dragging {
-		display: none;
-	}
-
 	.block-editor-list-view-block-contents {
 		display: flex;
 		align-items: center;
@@ -72,28 +65,9 @@
 		position: relative;
 		white-space: nowrap;
 
-		&:hover,
 		&:focus {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-			// Hide hover styles while a user is dragging blocks/files etc.
-			.is-dragging-components-draggable & {
-				box-shadow: none;
-			}
-		}
-		&:focus {
 			z-index: 1;
-		}
-
-		&.is-dropping-before::before {
-			content: "";
-			position: absolute;
-			pointer-events: none;
-			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
-			top: -2px;
-			right: 0;
-			left: 0;
-			border-top: 4px solid var(--wp-admin-theme-color);
 		}
 
 		.components-modal__content & {
@@ -269,9 +243,9 @@
 	width: $icon-size;
 }
 
-// First level of indentation is aria-level 2, max indent is 8.
+// First level of indentation is aria-level 2, max indent is 7.
 // Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
-$block-navigation-max-indent: 8;
+$block-navigation-max-indent: 7;
 .block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {
 	margin-left: ( $icon-size ) * $block-navigation-max-indent + 4 * ( $block-navigation-max-indent - 1 );
 }
@@ -293,6 +267,33 @@ $block-navigation-max-indent: 8;
 	}
 }
 
+.block-editor-list-view-tree .block-editor-list-view-leaf {
+	button {
+		cursor: pointer;
+	}
+
+	.block-editor-block-icon {
+		cursor: grab;
+	}
+
+	.block-editor-block-icon:active,
+	&.is-moving button,
+	&.is-moving .block-editor-list-view__expander,
+	&.is-moving .block-editor-list-view-block-select-button__title,
+	&.is-moving .block-editor-block-icon {
+		cursor: grabbing;
+	}
+
+	button:hover {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	// Hide hover styles while a user is dragging blocks/files etc.
+	&.is-moving button {
+		box-shadow: none;
+	}
+}
+
 .block-editor-list-view-leaf .block-editor-list-view__expander {
 	visibility: hidden;
 }
@@ -311,21 +312,5 @@ $block-navigation-max-indent: 8;
 	transform: rotate(0deg);
 	transition: transform 0.2s ease;
 	@include reduce-motion("transition");
-}
-
-.block-editor-list-view-drop-indicator {
-	pointer-events: none;
-
-	.block-editor-list-view-drop-indicator__line {
-		background: var(--wp-admin-theme-color);
-		height: $border-width;
-	}
-}
-
-// Reset some popover defaults for the drop indicator.
-.block-editor-list-view-drop-indicator:not([data-y-axis="middle"][data-x-axis="right"]) > .components-popover__content {
-	margin-left: 0;
-	border: none;
-	box-shadow: none;
 }
 

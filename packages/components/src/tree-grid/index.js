@@ -14,6 +14,10 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import RovingTabIndexContainer from './roving-tab-index';
+import {
+	__unstableMotion as motion,
+	__unstableAnimateSharedLayout as AnimateSharedLayout,
+} from '../animation';
 
 /**
  * Return focusables in a row element, excluding those from other branches
@@ -43,10 +47,17 @@ function getRowFocusables( rowElement ) {
  * @param {WPElement} props.children      Children to be rendered.
  * @param {Function}  props.onExpandRow   Callback to fire when row is expanded.
  * @param {Function}  props.onCollapseRow Callback to fire when row is collapsed.
+ * @param {boolean}   props.useAnimation  Layout animation is enabled when true.
  * @param {Object}    ref                 A ref to the underlying DOM table element.
  */
 function TreeGrid(
-	{ children, onExpandRow = () => {}, onCollapseRow = () => {}, ...props },
+	{
+		children,
+		onExpandRow = () => {},
+		onCollapseRow = () => {},
+		useAnimation = false,
+		...props
+	},
 	ref
 ) {
 	const onKeyDown = useCallback( ( event ) => {
@@ -201,7 +212,11 @@ function TreeGrid(
 				onKeyDown={ onKeyDown }
 				ref={ ref }
 			>
-				<tbody>{ children }</tbody>
+				<AnimateSharedLayout>
+					<motion.tbody layout={ useAnimation ? 'position' : false }>
+						{ children }
+					</motion.tbody>
+				</AnimateSharedLayout>
 			</table>
 		</RovingTabIndexContainer>
 	);

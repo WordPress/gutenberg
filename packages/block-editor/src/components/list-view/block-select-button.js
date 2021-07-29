@@ -32,9 +32,6 @@ function ListViewBlockSelectButton(
 		level,
 		tabIndex,
 		onFocus,
-		onDragStart,
-		onDragEnd,
-		draggable,
 	},
 	ref
 ) {
@@ -59,13 +56,12 @@ function ListViewBlockSelectButton(
 				ref={ ref }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
-				onDragStart={ onDragStart }
-				onDragEnd={ onDragEnd }
-				draggable={ draggable }
 			>
 				<ListViewExpander onClick={ onToggleExpanded } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
-				<BlockTitle clientId={ clientId } />
+				<span className="block-editor-list-view-block-select-button__title">
+					<BlockTitle clientId={ clientId } />
+				</span>
 				{ blockInformation?.anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor">
 						{ blockInformation.anchor }

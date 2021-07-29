@@ -27,6 +27,7 @@ export default function BlockNavigationList( {
 	return (
 		<div style={ { minHeight } }>
 			<ListView
+				rootId={ clientId }
 				ref={ listViewRef }
 				blocks={ blocks }
 				showBlockMovers
