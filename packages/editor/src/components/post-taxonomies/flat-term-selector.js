@@ -8,16 +8,13 @@ import { escape as escapeString, find, get, uniqBy } from 'lodash';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import {
-	FormTokenField,
-	withFilters,
-	withSpokenMessages,
-} from '@wordpress/components';
+import { FormTokenField, withFilters } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { compose, useDebounce } from '@wordpress/compose';
+import { useDebounce } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -89,7 +86,7 @@ function findOrCreateTerm( termName, restBase ) {
 		.then( unescapeTerm );
 }
 
-function FlatTermSelector( { slug, speak } ) {
+function FlatTermSelector( { slug } ) {
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
 
@@ -288,7 +285,4 @@ function FlatTermSelector( { slug, speak } ) {
 	);
 }
 
-export default compose(
-	withSpokenMessages,
-	withFilters( 'editor.PostTaxonomyType' )
-)( FlatTermSelector );
+export default withFilters( 'editor.PostTaxonomyType' )( FlatTermSelector );
