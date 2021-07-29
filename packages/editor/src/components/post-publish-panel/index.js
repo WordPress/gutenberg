@@ -62,6 +62,7 @@ export class PostPublishPanel extends Component {
 			isPublishSidebarEnabled,
 			isScheduled,
 			isSaving,
+			isSavingNonPostEntityChanges,
 			onClose,
 			onTogglePublishSidebar,
 			PostPublishExtension,
@@ -98,7 +99,7 @@ export class PostPublishPanel extends Component {
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
 								<Button
-									disabled={ isSaving }
+									disabled={ isSavingNonPostEntityChanges }
 									onClick={ onClose }
 									variant="secondary"
 								>
@@ -144,6 +145,7 @@ export default compose( [
 			isEditedPostBeingScheduled,
 			isEditedPostDirty,
 			isSavingPost,
+			isSavingNonPostEntityChanges,
 		} = select( editorStore );
 		const { isPublishSidebarEnabled } = select( editorStore );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
@@ -160,6 +162,7 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
 			isSaving: isSavingPost(),
+			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
 		};
 	} ),

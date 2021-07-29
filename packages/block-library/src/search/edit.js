@@ -11,12 +11,12 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
+	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUnitControl as UnitControl,
+	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
 import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
+	ToolbarDropdownMenu,
 	ToolbarGroup,
 	Button,
 	ButtonGroup,
@@ -73,8 +73,23 @@ export default function SearchEdit( {
 	} = attributes;
 
 	const borderRadius = style?.border?.radius;
+	const borderColor = style?.border?.color;
+	const borderProps = useBorderProps( attributes );
+
+	// Check for old deprecated numerical border radius. Done as a separate
+	// check so that a borderRadius style won't overwrite the longhand
+	// per-corner styles.
+	if ( typeof borderRadius === 'number' ) {
+		borderProps.style.borderRadius = `${ borderRadius }px`;
+	}
+
+	const colorProps = useColorProps( attributes );
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
+	const isButtonPositionInside = 'button-inside' === buttonPosition;
+	const isButtonPositionOutside = 'button-outside' === buttonPosition;
+	const hasNoButton = 'no-button' === buttonPosition;
+	const hasOnlyButton = 'button-only' === buttonPosition;
 
 	const units = useCustomUnits( {
 		availableUnits: [ '%', 'px' ],
@@ -84,26 +99,59 @@ export default function SearchEdit( {
 	const getBlockClassNames = () => {
 		return classnames(
 			className,
-			'button-inside' === buttonPosition
+			! isButtonPositionInside ? borderProps.className : undefined,
+			isButtonPositionInside
 				? 'wp-block-search__button-inside'
 				: undefined,
-			'button-outside' === buttonPosition
+			isButtonPositionOutside
 				? 'wp-block-search__button-outside'
 				: undefined,
-			'no-button' === buttonPosition
-				? 'wp-block-search__no-button'
-				: undefined,
-			'button-only' === buttonPosition
-				? 'wp-block-search__button-only'
-				: undefined,
-			! buttonUseIcon && 'no-button' !== buttonPosition
+			hasNoButton ? 'wp-block-search__no-button' : undefined,
+			hasOnlyButton ? 'wp-block-search__button-only' : undefined,
+			! buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__text-button'
 				: undefined,
-			buttonUseIcon && 'no-button' !== buttonPosition
+			buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__icon-button'
 				: undefined
 		);
 	};
+
+	const buttonPositionControls = [
+		{
+			role: 'menuitemradio',
+			title: __( 'Button outside' ),
+			isActive: buttonPosition === 'button-outside',
+			icon: buttonOutside,
+			onClick: () => {
+				setAttributes( {
+					buttonPosition: 'button-outside',
+				} );
+			},
+		},
+		{
+			role: 'menuitemradio',
+			title: __( 'Button inside' ),
+			isActive: buttonPosition === 'button-inside',
+			icon: buttonInside,
+			onClick: () => {
+				setAttributes( {
+					buttonPosition: 'button-inside',
+				} );
+			},
+		},
+		{
+			role: 'menuitemradio',
+			title: __( 'No button' ),
+			isActive: buttonPosition === 'no-button',
+			icon: noButton,
+			onClick: () => {
+				setAttributes( {
+					buttonPosition: 'no-button',
+				} );
+			},
+		},
+	];
 
 	const getButtonPositionIcon = () => {
 		switch ( buttonPosition ) {
@@ -119,21 +167,30 @@ export default function SearchEdit( {
 	};
 
 	const getResizableSides = () => {
-		if ( 'button-only' === buttonPosition ) {
+		if ( hasOnlyButton ) {
 			return {};
 		}
 
 		return {
-			right: align === 'right' ? false : true,
-			left: align === 'right' ? true : false,
+			right: align !== 'right',
+			left: align === 'right',
 		};
 	};
 
 	const renderTextField = () => {
+		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
+		const textFieldClasses = classnames(
+			'wp-block-search__input',
+			isButtonPositionInside ? undefined : borderProps.className
+		);
+		const textFieldStyles = isButtonPositionInside
+			? { borderRadius }
+			: borderProps.style;
+
 		return (
 			<input
-				className="wp-block-search__input"
-				style={ { borderRadius } }
+				className={ textFieldClasses }
+				style={ textFieldStyles }
 				aria-label={ __( 'Optional placeholder text' ) }
 				// We hide the placeholder field's placeholder when there is a value. This
 				// stops screen readers from reading the placeholder field's placeholder
@@ -150,20 +207,33 @@ export default function SearchEdit( {
 	};
 
 	const renderButton = () => {
+		// If the button is inside the wrapper, the wrapper gets the border color styles/classes, not the button.
+		const buttonClasses = classnames(
+			'wp-block-search__button',
+			colorProps.className,
+			isButtonPositionInside ? undefined : borderProps.className
+		);
+		const buttonStyles = {
+			...colorProps.style,
+			...( isButtonPositionInside
+				? { borderRadius }
+				: borderProps.style ),
+		};
+
 		return (
 			<>
 				{ buttonUseIcon && (
 					<Button
 						icon={ search }
-						className="wp-block-search__button"
-						style={ { borderRadius } }
+						className={ buttonClasses }
+						style={ buttonStyles }
 					/>
 				) }
 
 				{ ! buttonUseIcon && (
 					<RichText
-						className="wp-block-search__button"
-						style={ { borderRadius } }
+						className={ buttonClasses }
+						style={ buttonStyles }
 						aria-label={ __( 'Button text' ) }
 						placeholder={ __( 'Add button text…' ) }
 						withoutInteractiveFormatting
@@ -191,50 +261,12 @@ export default function SearchEdit( {
 						} }
 						className={ showLabel ? 'is-pressed' : undefined }
 					/>
-					<DropdownMenu
+					<ToolbarDropdownMenu
 						icon={ getButtonPositionIcon() }
 						label={ __( 'Change button position' ) }
-					>
-						{ ( { onClose } ) => (
-							<MenuGroup className="wp-block-search__button-position-menu">
-								<MenuItem
-									icon={ noButton }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'no-button',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'No Button' ) }
-								</MenuItem>
-								<MenuItem
-									icon={ buttonOutside }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'button-outside',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Button Outside' ) }
-								</MenuItem>
-								<MenuItem
-									icon={ buttonInside }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'button-inside',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Button Inside' ) }
-								</MenuItem>
-							</MenuGroup>
-						) }
-					</DropdownMenu>
-
-					{ 'no-button' !== buttonPosition && (
+						controls={ buttonPositionControls }
+					/>
+					{ ! hasNoButton && (
 						<ToolbarButton
 							title={ __( 'Use button with icon' ) }
 							icon={ buttonWithIcon }
@@ -319,23 +351,52 @@ export default function SearchEdit( {
 		</>
 	);
 
+	const padBorderRadius = ( radius ) =>
+		radius ? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })` : undefined;
+
 	const getWrapperStyles = () => {
-		if ( 'button-inside' === buttonPosition && style?.border?.radius ) {
+		const styles = {
+			borderColor,
+		};
+
+		const isNonZeroBorderRadius = parseInt( borderRadius, 10 ) !== 0;
+
+		if ( isButtonPositionInside && isNonZeroBorderRadius ) {
 			// We have button inside wrapper and a border radius value to apply.
 			// Add default padding so we don't get "fat" corners.
 			//
 			// CSS calc() is used here to support non-pixel units. The inline
 			// style using calc() will only apply if both values have units.
+
+			if ( typeof borderRadius === 'object' ) {
+				// Individual corner border radii present.
+				const {
+					topLeft,
+					topRight,
+					bottomLeft,
+					bottomRight,
+				} = borderRadius;
+
+				return {
+					borderTopLeftRadius: padBorderRadius( topLeft ),
+					borderTopRightRadius: padBorderRadius( topRight ),
+					borderBottomLeftRadius: padBorderRadius( bottomLeft ),
+					borderBottomRightRadius: padBorderRadius( bottomRight ),
+					...styles,
+				};
+			}
+
+			// The inline style using calc() will only apply if both values
+			// supplied to calc() have units. Deprecated block's may have
+			// unitless integer.
 			const radius = Number.isInteger( borderRadius )
 				? `${ borderRadius }px`
 				: borderRadius;
 
-			return {
-				borderRadius: `calc(${ radius } + ${ DEFAULT_INNER_PADDING })`,
-			};
+			styles.borderRadius = `calc(${ radius } + ${ DEFAULT_INNER_PADDING })`;
 		}
 
-		return undefined;
+		return styles;
 	};
 
 	const blockProps = useBlockProps( {
@@ -361,7 +422,10 @@ export default function SearchEdit( {
 				size={ {
 					width: `${ width }${ widthUnit }`,
 				} }
-				className="wp-block-search__inside-wrapper"
+				className={ classnames(
+					'wp-block-search__inside-wrapper',
+					isButtonPositionInside ? borderProps.className : undefined
+				) }
 				style={ getWrapperStyles() }
 				minWidth={ MIN_WIDTH }
 				enable={ getResizableSides() }
@@ -380,16 +444,15 @@ export default function SearchEdit( {
 				} }
 				showHandle={ isSelected }
 			>
-				{ ( 'button-inside' === buttonPosition ||
-					'button-outside' === buttonPosition ) && (
+				{ ( isButtonPositionInside || isButtonPositionOutside ) && (
 					<>
 						{ renderTextField() }
 						{ renderButton() }
 					</>
 				) }
 
-				{ 'button-only' === buttonPosition && renderButton() }
-				{ 'no-button' === buttonPosition && renderTextField() }
+				{ hasOnlyButton && renderButton() }
+				{ hasNoButton && renderTextField() }
 			</ResizableBox>
 		</div>
 	);

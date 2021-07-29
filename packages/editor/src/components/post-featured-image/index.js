@@ -215,12 +215,16 @@ function PostFeaturedImage( {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getMedia, getPostType } = select( coreStore );
+	const { getEntityRecord, getPostType } = select( coreStore );
 	const { getCurrentPostId, getEditedPostAttribute } = select( editorStore );
 	const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 	return {
-		media: featuredImageId ? getMedia( featuredImageId ) : null,
+		media: featuredImageId
+			? getEntityRecord( 'root', 'media', featuredImageId, {
+					context: 'view',
+			  } )
+			: null,
 		currentPostId: getCurrentPostId(),
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		featuredImageId,

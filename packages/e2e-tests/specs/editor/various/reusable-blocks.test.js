@@ -274,11 +274,16 @@ describe( 'Reusable blocks', () => {
 		await saveDraft();
 		await page.reload();
 
-		// Replace the content of the  first paragraph
-		const paragraphBlock = await page.waitForSelector(
+		// Wait for the paragraph to be loaded.
+		await page.waitForSelector(
 			'.block-editor-block-list__block[data-type="core/paragraph"]'
 		);
-		paragraphBlock.focus();
+		// The first click selects the reusable block wrapper.
+		// The second click selects the actual paragraph block.
+		await page.click( '.wp-block-block' );
+		await page.focus(
+			'.block-editor-block-list__block[data-type="core/paragraph"]'
+		);
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' modified' );
@@ -289,13 +294,15 @@ describe( 'Reusable blocks', () => {
 
 		// Check that the content of the second reusable block has been updated.
 		const reusableBlocks = await page.$$( '.wp-block-block' );
-		reusableBlocks.forEach( async ( paragraph ) => {
-			const content = await paragraph.$eval(
-				'p',
-				( element ) => element.textContent
-			);
-			expect( content ).toEqual( 'Awesome Paragraph modified' );
-		} );
+		await Promise.all(
+			reusableBlocks.map( async ( paragraph ) => {
+				const content = await paragraph.$eval(
+					'p',
+					( element ) => element.textContent
+				);
+				expect( content ).toEqual( 'Awesome Paragraph modified' );
+			} )
+		);
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/26421.

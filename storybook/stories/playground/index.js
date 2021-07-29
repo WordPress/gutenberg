@@ -42,7 +42,6 @@ function App() {
 						<BlockTools>
 							<div className="editor-styles-wrapper">
 								<BlockEditorKeyboardShortcuts.Register />
-								<BlockEditorKeyboardShortcuts />
 								<WritingFlow>
 									<ObserveTyping>
 										<BlockList />

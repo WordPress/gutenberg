@@ -1,28 +1,39 @@
 /**
  * External dependencies
  */
-import { find, startsWith } from 'lodash';
+import { find, startsWith, get } from 'lodash';
 
-export const BLOCK_STYLE_ATTRIBUTES = [ 'textColor', 'backgroundColor' ];
+export const BLOCK_STYLE_ATTRIBUTES = [
+	'textColor',
+	'backgroundColor',
+	'style',
+];
 
 // Mapping style properties name to native
 const BLOCK_STYLE_ATTRIBUTES_MAPPING = {
 	textColor: 'color',
+	text: 'color',
+	background: 'backgroundColor',
+	link: 'linkColor',
+	placeholder: 'placeholderColor',
 };
 
-const PADDING = 12; // solid-border-space
+const PADDING = 12; // $solid-border-space
+const UNKNOWN_VALUE = 'undefined';
 
 export function getBlockPaddings(
 	mergedStyle,
 	wrapperPropsStyle,
-	blockStyleAttributes
+	blockStyleAttributes,
+	blockColors
 ) {
 	const blockPaddings = {};
 
 	if (
 		! mergedStyle.padding &&
 		( wrapperPropsStyle?.backgroundColor ||
-			blockStyleAttributes?.backgroundColor )
+			blockStyleAttributes?.backgroundColor ||
+			blockColors?.backgroundColor )
 	) {
 		blockPaddings.padding = PADDING;
 		return blockPaddings;
@@ -32,7 +43,8 @@ export function getBlockPaddings(
 	if (
 		mergedStyle?.padding &&
 		! wrapperPropsStyle?.backgroundColor &&
-		! blockStyleAttributes?.backgroundColor
+		! blockStyleAttributes?.backgroundColor &&
+		! blockColors?.backgroundColor
 	) {
 		blockPaddings.padding = undefined;
 	}
@@ -40,9 +52,44 @@ export function getBlockPaddings(
 	return blockPaddings;
 }
 
-export function getBlockColors( blockStyleAttributes, defaultColors ) {
+export function getBlockColors(
+	blockStyleAttributes,
+	defaultColors,
+	blockName,
+	baseGlobalStyles
+) {
 	const blockStyles = {};
+	const customBlockStyles = blockStyleAttributes?.style?.color || {};
+	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ blockName ];
 
+	// Global styles colors
+	if ( blockGlobalStyles?.color ) {
+		Object.entries( blockGlobalStyles.color ).forEach(
+			( [ key, value ] ) => {
+				const styleKey = BLOCK_STYLE_ATTRIBUTES_MAPPING[ key ];
+
+				if ( styleKey && value !== UNKNOWN_VALUE ) {
+					const color = customBlockStyles[ key ] ?? value;
+					blockStyles[ styleKey ] = color;
+				}
+			}
+		);
+	} else if ( baseGlobalStyles?.styles?.color?.text ) {
+		blockStyles[ BLOCK_STYLE_ATTRIBUTES_MAPPING.text ] =
+			baseGlobalStyles?.styles?.color?.text;
+	}
+
+	// Global styles elements
+	if ( blockGlobalStyles?.elements ) {
+		const linkColor = blockGlobalStyles.elements?.link?.color?.text;
+		const styleKey = BLOCK_STYLE_ATTRIBUTES_MAPPING.link;
+
+		if ( styleKey && linkColor && linkColor !== UNKNOWN_VALUE ) {
+			blockStyles[ styleKey ] = linkColor;
+		}
+	}
+
+	// Custom colors
 	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {
 		const isCustomColor = startsWith( value, '#' );
 		let styleKey = key;
@@ -64,43 +111,103 @@ export function getBlockColors( blockStyleAttributes, defaultColors ) {
 		}
 	} );
 
+	// Color placeholder
+	if ( blockStyles?.color ) {
+		blockStyles[ BLOCK_STYLE_ATTRIBUTES_MAPPING.placeholder ] =
+			blockStyles.color;
+	}
+
 	return blockStyles;
 }
 
-export function parseColorVariables( styles, colorPalette ) {
-	const stylesBase = styles;
-	const colorPrefixRegex = /var\(--wp--preset--color--(.*?)\)/g;
+export function parseStylesVariables( styles, mappedValues, customValues ) {
+	let stylesBase = styles;
+	const variables = [ 'preset', 'custom' ];
 
-	return stylesBase
-		? JSON.parse(
-				stylesBase?.replace( colorPrefixRegex, ( _$1, $2 ) => {
-					const mappedColor = find( colorPalette, {
-						slug: $2,
+	if ( ! stylesBase ) {
+		return styles;
+	}
+
+	variables.forEach( ( variable ) => {
+		// Examples
+		// var(--wp--preset--color--gray)
+		// var(--wp--custom--body--typography--font-family)
+		const regex = new RegExp( `var\\(--wp--${ variable }--(.*?)\\)`, 'g' );
+
+		if ( variable === 'preset' ) {
+			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
+				const path = $2.split( '--' );
+				const mappedPresetValue = mappedValues[ path[ 0 ] ];
+				if ( mappedPresetValue && mappedPresetValue.slug ) {
+					const matchedValue = find( mappedPresetValue.values, {
+						slug: path[ 1 ],
 					} );
-					return mappedColor?.color;
-				} )
-		  )
-		: styles;
+					return matchedValue?.[ mappedPresetValue.slug ];
+				}
+				return UNKNOWN_VALUE;
+			} );
+		}
+		if ( variable === 'custom' ) {
+			const customValuesData = customValues ?? JSON.parse( stylesBase );
+			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
+				const path = $2.split( '--' );
+				return get( customValuesData, path );
+			} );
+		}
+	} );
+
+	return JSON.parse( stylesBase );
 }
 
-export function getGlobalStyles( rawStyles, rawFeatures, colors, gradients ) {
-	const parsedGradients = parseColorVariables(
-		JSON.stringify( gradients ),
-		colors
+export function getMappedValues( features, palette ) {
+	const colors = { ...palette?.theme, ...palette?.user };
+	const mappedValues = {
+		color: {
+			values: colors,
+			slug: 'color',
+		},
+		'font-size': {
+			values: features?.typography?.fontSizes?.theme,
+			slug: 'size',
+		},
+	};
+	return mappedValues;
+}
+
+export function getGlobalStyles( rawStyles, rawFeatures ) {
+	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
+	const mappedValues = getMappedValues( features, features?.color?.palette );
+	const colors = parseStylesVariables(
+		JSON.stringify( features?.color ),
+		mappedValues
 	);
-	const globalStyles = parseColorVariables( rawStyles, colors );
-	const parsedExperimentalFeatures = parseColorVariables(
-		rawFeatures,
-		colors
+	const gradients = parseStylesVariables(
+		JSON.stringify( features?.color?.gradients ),
+		mappedValues
+	);
+	const customValues = parseStylesVariables(
+		JSON.stringify( features?.custom ),
+		mappedValues
+	);
+	const globalStyles = parseStylesVariables(
+		rawStyles,
+		mappedValues,
+		customValues
 	);
 
 	return {
 		colors,
-		gradients: parsedGradients,
+		gradients,
 		__experimentalFeatures: {
 			color: {
-				palette: parsedExperimentalFeatures?.color?.palette,
-				gradients: parsedExperimentalFeatures?.color?.gradients,
+				palette: colors?.palette,
+				gradients,
+			},
+			typography: {
+				fontSizes: features?.typography?.fontSizes,
+				custom: {
+					'line-height': features?.custom?.[ 'line-height' ],
+				},
 			},
 		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,

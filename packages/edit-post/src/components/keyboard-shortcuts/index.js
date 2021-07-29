@@ -61,7 +61,7 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-post/toggle-block-navigation',
+			name: 'core/edit-post/toggle-list-view',
 			category: 'global',
 			description: __( 'Open the block list view.' ),
 			keyCombination: {
@@ -166,7 +166,7 @@ function KeyboardShortcuts() {
 	);
 
 	useShortcut(
-		'core/edit-post/toggle-block-navigation',
+		'core/edit-post/toggle-list-view',
 		() => setIsListViewOpened( ! isListViewOpened() ),
 		{ bindGlobal: true }
 	);

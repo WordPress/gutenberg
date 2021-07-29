@@ -9,6 +9,7 @@ import { set, map, find, get, filter, compact } from 'lodash';
  */
 import { createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -47,29 +48,24 @@ export const isRequestingEmbedPreview = createRegistrySelector(
 /**
  * Returns all available authors.
  *
+ * @deprecated since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
+ *
  * @param {Object}           state Data state.
  * @param {Object|undefined} query Optional object of query parameters to
  *                                 include with request.
  * @return {Array} Authors list.
  */
 export function getAuthors( state, query ) {
+	deprecated( "select( 'core' ).getAuthors()", {
+		since: '5.9',
+		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
+	} );
+
 	const path = addQueryArgs(
 		'/wp/v2/users/?who=authors&per_page=100',
 		query
 	);
 	return getUserQueryResults( state, path );
-}
-
-/**
- * Returns all available authors.
- *
- * @param {Object} state Data state.
- * @param {number} id    The author id.
- *
- * @return {Array} Authors list.
- */
-export function __unstableGetAuthor( state, id ) {
-	return get( state, [ 'users', 'byId', id ], null );
 }
 
 /**
@@ -312,6 +308,56 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 		} );
 
 		return dirtyRecords;
+	},
+	( state ) => [ state.entities.data ]
+);
+
+/**
+ * Returns the list of entities currently being saved.
+ *
+ * @param {Object} state State tree.
+ *
+ * @return {[{ title: string, key: string, name: string, kind: string }]} The list of records being saved.
+ */
+export const __experimentalGetEntitiesBeingSaved = createSelector(
+	( state ) => {
+		const {
+			entities: { data },
+		} = state;
+		const recordsBeingSaved = [];
+		Object.keys( data ).forEach( ( kind ) => {
+			Object.keys( data[ kind ] ).forEach( ( name ) => {
+				const primaryKeys = Object.keys(
+					data[ kind ][ name ].saving
+				).filter( ( primaryKey ) =>
+					isSavingEntityRecord( state, kind, name, primaryKey )
+				);
+
+				if ( primaryKeys.length ) {
+					const entity = getEntity( state, kind, name );
+					primaryKeys.forEach( ( primaryKey ) => {
+						const entityRecord = getEditedEntityRecord(
+							state,
+							kind,
+							name,
+							primaryKey
+						);
+						recordsBeingSaved.push( {
+							// We avoid using primaryKey because it's transformed into a string
+							// when it's used as an object key.
+							key:
+								entityRecord[
+									entity.key || DEFAULT_ENTITY_KEY
+								],
+							title: entity?.getTitle?.( entityRecord ) || '',
+							name,
+							kind,
+						} );
+					} );
+				}
+			} );
+		} );
+		return recordsBeingSaved;
 	},
 	( state ) => [ state.entities.data ]
 );

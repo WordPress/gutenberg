@@ -13,35 +13,40 @@
 	padding-top: 8;
 }
 
-.searchForm {
-	height: 46px;
-	border-radius: 8px;
-	color: $gray-dark;
-	margin: $grid-unit-30;
-	background-color: $gray-light;
-	flex-direction: row;
-	justify-content: space-between;
+.inserter-search-results__column {
+	padding: $grid-unit-20;
 }
 
-.searchFormDark {
-	background-color: rgba($white, 0.07);
+.inserter-search-results__row-separator {
+	height: 12px;
 }
 
-.searchFormInput {
-	color: $gray-dark;
-	flex: 2;
+.inserter-search-results__list {
+	padding-bottom: 20px;
+	padding-top: 8px;
 }
 
-.searchFormInputDark {
-	color: $white;
+.inserter-search-no-results__container {
+	margin-top: 60px;
+	align-items: center;
 }
 
-.searchFormPlaceholder {
-	color: $gray;
+.inserter-search-no-results__text-primary {
+	font-size: 16px;
+	color: $light-primary;
 }
 
-.searchFormPlaceholderDark {
-	color: rgba($white, 0.8);
+.inserter-search-no-results__text-primary--dark {
+	color: $dark-primary;
+}
+
+.inserter-search-no-results__text-secondary {
+	font-size: 14px;
+	color: $light-secondary;
+}
+
+.inserter-search-no-results__text-secondary--dark {
+	color: $dark-secondary;
 }
 
 .inserter-tabs__wrapper {

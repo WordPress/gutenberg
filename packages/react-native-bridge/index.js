@@ -161,6 +161,16 @@ export function subscribeReplaceBlock( callback ) {
 }
 
 /**
+ * Subscribe a listener for handling requests to open the editor help topics page.
+ *
+ * @param {Function} callback RN Callback function to display the editor
+ * 							  help topics.
+ */
+export function subscribeShowEditorHelp( callback ) {
+	return gutenbergBridgeEvents.addListener( 'showEditorHelp', callback );
+}
+
+/**
  * Request media picker for the given media source.
  *
  * Kinds of media source can be device library, camera, etc.
@@ -378,6 +388,10 @@ export function setFocalPointPickerTooltipShown( tooltipShown ) {
 	return RNReactNativeGutenbergBridge.setFocalPointPickerTooltipShown(
 		tooltipShown
 	);
+}
+
+export function requestPreview() {
+	RNReactNativeGutenbergBridge.requestPreview();
 }
 
 export default RNReactNativeGutenbergBridge;

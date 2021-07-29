@@ -8,13 +8,12 @@ import classnames from 'classnames';
  */
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { Button, SearchControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import InserterSearchForm from './search-form';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import usePatternsState from './hooks/use-patterns-state';
@@ -87,7 +86,8 @@ export default function QuickInserter( {
 			} ) }
 		>
 			{ showSearch && (
-				<InserterSearchForm
+				<SearchControl
+					className="block-editor-inserter__search"
 					value={ filterValue }
 					onChange={ ( value ) => {
 						setFilterValue( value );

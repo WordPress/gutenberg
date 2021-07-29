@@ -17,7 +17,7 @@ import Button from '../button';
 import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
-import VerticalHorizontalInputControls from './vertical-horizontal-input-controls';
+import AxialInputControls from './axial-input-controls';
 import BoxControlIcon from './icon';
 import { Text } from '../text';
 import LinkedButton from './linked-button';
@@ -27,6 +27,7 @@ import {
 	Header,
 	HeaderControlWrapper,
 } from './styles/box-control-styles';
+import { parseUnit } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
 	DEFAULT_VISUALIZER_VALUES,
@@ -74,6 +75,16 @@ export default function BoxControl( {
 		getInitialSide( isLinked, splitOnAxis )
 	);
 
+	// Tracking selected units via internal state allows filtering of CSS unit
+	// only values from being saved while maintaining preexisting unit selection
+	// behaviour. Filtering CSS only values prevents invalid style values.
+	const [ selectedUnits, setSelectedUnits ] = useState( {
+		top: parseUnit( valuesProp?.top )[ 1 ],
+		right: parseUnit( valuesProp?.right )[ 1 ],
+		bottom: parseUnit( valuesProp?.bottom )[ 1 ],
+		left: parseUnit( valuesProp?.left )[ 1 ],
+	} );
+
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
 
@@ -103,6 +114,7 @@ export default function BoxControl( {
 	const handleOnReset = () => {
 		onChange( resetValues );
 		setValues( resetValues );
+		setSelectedUnits( resetValues );
 		setIsDirty( false );
 	};
 
@@ -114,6 +126,8 @@ export default function BoxControl( {
 		onHoverOff: handleOnHoverOff,
 		isLinked,
 		units,
+		selectedUnits,
+		setSelectedUnits,
 		sides,
 		values: inputValues,
 	};
@@ -157,9 +171,7 @@ export default function BoxControl( {
 				) }
 				{ ! isLinked && splitOnAxis && (
 					<FlexBlock>
-						<VerticalHorizontalInputControls
-							{ ...inputControlProps }
-						/>
+						<AxialInputControls { ...inputControlProps } />
 					</FlexBlock>
 				) }
 				{ ! hasOneSide && (
