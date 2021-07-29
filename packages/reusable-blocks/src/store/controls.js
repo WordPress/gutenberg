@@ -90,6 +90,24 @@ const controls = {
 	CONVERT_BLOCKS_TO_REUSABLE: createRegistryControl(
 		( registry ) =>
 			async function ( { clientIds, title } ) {
+				const blocks = registry
+					.select( 'core/block-editor' )
+					.getBlocksByClientId( clientIds );
+
+				const alignments = [ 'wide', 'full' ];
+
+				// Determine the widest setting of all the blocks to be grouped
+				const widestAlignment = blocks.reduce(
+					( accumulator, block ) => {
+						const { align } = block.attributes;
+						return alignments.indexOf( align ) >
+							alignments.indexOf( accumulator )
+							? align
+							: accumulator;
+					},
+					undefined
+				);
+
 				const reusableBlock = {
 					title: title || __( 'Untitled Reusable block' ),
 					content: serialize(
@@ -106,6 +124,7 @@ const controls = {
 
 				const newBlock = createBlock( 'core/block', {
 					ref: updatedRecord.id,
+					align: widestAlignment,
 				} );
 				registry
 					.dispatch( blockEditorStore )
