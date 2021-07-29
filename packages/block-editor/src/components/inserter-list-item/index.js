@@ -16,7 +16,6 @@ import { ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import BlockIcon from '../block-icon';
 import { InserterListboxItem } from '../inserter-listbox';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 
@@ -132,7 +131,6 @@ function InserterListItem( {
 							className="block-editor-block-types-list__item-icon"
 							style={ itemIconStyle }
 						>
-							<BlockIcon icon={ item.icon } showColors />
 						</span>
 						<span className="block-editor-block-types-list__item-title">
 							{ item.title }
