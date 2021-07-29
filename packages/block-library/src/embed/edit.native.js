@@ -28,12 +28,7 @@ import { View } from '@wordpress/primitives';
 
 const EmbedEdit = ( props ) => {
 	const {
-		attributes: {
-			providerNameSlug,
-			previewable,
-			responsive,
-			url: attributesUrl,
-		},
+		attributes: { providerNameSlug, responsive, url: attributesUrl },
 		attributes,
 		isSelected,
 		onReplace,
@@ -88,9 +83,18 @@ const EmbedEdit = ( props ) => {
 			const wordpressCantEmbed = embedPreview?.code === '404';
 			const validPreview =
 				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
+
+			// `isRequestingEmbedPreview` is returning false just before an
+			// `apiFetch` is triggered. We're assuming that a fetch is happening
+			// if there is an `attributesUrl` set but there is no data in
+			// `embedPreview` which represents the response returned from the API.
+			const isFetching =
+				isRequestingEmbedPreview( attributesUrl ) ||
+				( attributesUrl && ! embedPreview );
+
 			return {
 				preview: validPreview ? embedPreview : undefined,
-				fetching: isRequestingEmbedPreview( attributesUrl ),
+				fetching: isFetching,
 				cannotEmbed: ! validPreview || previewIsFallback,
 			};
 		},
@@ -191,8 +195,6 @@ const EmbedEdit = ( props ) => {
 							insertBlocksAfter={ insertBlocksAfter }
 							isSelected={ isSelected }
 							label={ title }
-							preview={ preview }
-							previewable={ previewable }
 							url={ url }
 						/>
 					</View>

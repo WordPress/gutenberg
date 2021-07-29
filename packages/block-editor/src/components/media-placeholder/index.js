@@ -317,8 +317,7 @@ export function MediaPlaceholder( {
 					return (
 						<Button
 							variant="tertiary"
-							onClick={ ( event ) => {
-								event.stopPropagation();
+							onClick={ () => {
 								open();
 							} }
 						>

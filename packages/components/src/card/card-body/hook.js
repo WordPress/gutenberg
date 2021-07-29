@@ -16,7 +16,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 export function useCardBody( props ) {
 	const {
 		className,
-		isScrollable = true,
+		isScrollable = false,
 		isShady = false,
 		size = 'medium',
 		...otherProps

@@ -23,12 +23,17 @@
 	padding: $grid-unit-15 $grid-unit-30 0;
 
 	.block-editor-media-replace-flow__image-url-label {
+		display: block;
 		top: $grid-unit-20;
+		margin-bottom: $grid-unit-10;
 	}
 
 	.block-editor-link-control {
-		margin-top: -16px;
-		width: auto;
+		width: 200px; // hardcoded width avoids resizing of control when switching between preview/edit
+
+		.block-editor-url-input {
+			padding: 0; // cancel unnecessary default 1px padding in this case
+		}
 
 		.components-base-control .components-base-control__field {
 			margin-bottom: 0;
@@ -36,7 +41,6 @@
 
 		.block-editor-link-control__search-item-title {
 			max-width: 180px;
-			margin-top: $grid-unit-20;
 		}
 
 		.block-editor-link-control__search-item.is-current {
@@ -45,11 +49,12 @@
 		}
 
 		.block-editor-link-control__search-input.block-editor-link-control__search-input input[type="text"] {
-			margin: 16px 0 0 0;
+			margin: 0;
 			width: 100%;
 		}
 
 		.block-editor-link-control__search-actions {
+			top: 0; // cancel default top positioning
 			right: 4px;
 		}
 	}

@@ -126,4 +126,13 @@ module.exports = {
 	arrow: {
 		color: 'red',
 	},
+	button: {
+		color: 'red',
+	},
+	textInput: {
+		color: 'black',
+	},
+	buttonNoBg: {
+		color: 'orange',
+	},
 };
