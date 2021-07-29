@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
+import {
+	__experimentalTreeGridCell as TreeGridCell,
+	__experimentalTreeGridRow as TreeGridRow,
+} from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -14,7 +17,6 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import ListViewLeaf from './leaf';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 
@@ -23,7 +25,6 @@ export default function ListViewAppender( {
 	position,
 	level,
 	rowCount,
-	path,
 } ) {
 	const isDragging = useSelect(
 		( select ) => {
@@ -49,12 +50,13 @@ export default function ListViewAppender( {
 	);
 
 	return (
-		<ListViewLeaf
-			className={ classnames( { 'is-dragging': isDragging } ) }
+		<TreeGridRow
+			className={ classnames( 'block-editor-list-view-leaf', {
+				'is-dragging': isDragging,
+			} ) }
 			level={ level }
-			position={ position }
-			rowCount={ rowCount }
-			path={ path }
+			positionInSet={ position }
+			setSize={ rowCount }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-appender__cell"
@@ -77,6 +79,6 @@ export default function ListViewAppender( {
 					</div>
 				) }
 			</TreeGridCell>
-		</ListViewLeaf>
+		</TreeGridRow>
 	);
 }

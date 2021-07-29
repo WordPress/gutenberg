@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { includes } from 'lodash';
+import { motion, AnimateSharedLayout } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -43,10 +44,17 @@ function getRowFocusables( rowElement ) {
  * @param {WPElement} props.children      Children to be rendered.
  * @param {Function}  props.onExpandRow   Callback to fire when row is expanded.
  * @param {Function}  props.onCollapseRow Callback to fire when row is collapsed.
+ * @param {boolean}   props.motionEnabled Boolean item animation is enabled when true.
  * @param {Object}    ref                 A ref to the underlying DOM table element.
  */
 function TreeGrid(
-	{ children, onExpandRow = () => {}, onCollapseRow = () => {}, ...props },
+	{
+		children,
+		onExpandRow = () => {},
+		onCollapseRow = () => {},
+		motionEnabled = true,
+		...props
+	},
 	ref
 ) {
 	const onKeyDown = useCallback( ( event ) => {
@@ -201,7 +209,11 @@ function TreeGrid(
 				onKeyDown={ onKeyDown }
 				ref={ ref }
 			>
-				<tbody>{ children }</tbody>
+				<AnimateSharedLayout>
+					<motion.tbody layout={ motionEnabled }>
+						{ children }
+					</motion.tbody>
+				</AnimateSharedLayout>
 			</table>
 		</RovingTabIndexContainer>
 	);

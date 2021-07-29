@@ -27,7 +27,6 @@ export default function ListViewBranch( props ) {
 		parentBlockClientId,
 		level = 1,
 		terminatedLevels = [],
-		path = [],
 		isBranchSelected = false,
 		isLastOfBranch = false,
 	} = props;
@@ -55,7 +54,6 @@ export default function ListViewBranch( props ) {
 				const updatedTerminatedLevels = isLastRowAtLevel
 					? [ ...terminatedLevels, level ]
 					: terminatedLevels;
-				const updatedPath = [ ...path, position ];
 				const hasNestedBlocks =
 					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
 				const hasNestedAppender = itemHasAppender( clientId );
@@ -108,7 +106,6 @@ export default function ListViewBranch( props ) {
 							siblingBlockCount={ blockCount }
 							showBlockMovers={ showBlockMovers }
 							terminatedLevels={ terminatedLevels }
-							path={ updatedPath }
 							isExpanded={ isExpanded }
 						/>
 						{ hasNestedBranch && isExpanded && (
@@ -126,7 +123,6 @@ export default function ListViewBranch( props ) {
 								parentBlockClientId={ clientId }
 								level={ level + 1 }
 								terminatedLevels={ updatedTerminatedLevels }
-								path={ updatedPath }
 							/>
 						) }
 					</Fragment>
@@ -139,7 +135,6 @@ export default function ListViewBranch( props ) {
 					rowCount={ appenderPosition }
 					level={ level }
 					terminatedLevels={ terminatedLevels }
-					path={ [ ...path, appenderPosition ] }
 				/>
 			) }
 		</>

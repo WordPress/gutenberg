@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
+	__experimentalTreeGridRow as TreeGridRow,
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
@@ -20,7 +21,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import ListViewLeaf from './leaf';
 import {
 	BlockMoverUpButton,
 	BlockMoverDownButton,
@@ -42,7 +42,6 @@ export default function ListViewBlock( {
 	rowCount,
 	siblingBlockCount,
 	showBlockMovers,
-	path,
 	isExpanded,
 } ) {
 	const cellRef = useRef( null );
@@ -122,6 +121,7 @@ export default function ListViewBlock( {
 	};
 
 	const classes = classnames( {
+		'block-editor-list-view-leaf': true,
 		'is-selected': isSelected,
 		'is-branch-selected':
 			withExperimentalPersistentListViewFeatures && isBranchSelected,
@@ -132,16 +132,15 @@ export default function ListViewBlock( {
 	} );
 
 	return (
-		<ListViewLeaf
+		<TreeGridRow
 			className={ classes }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }
 			onBlur={ onMouseLeave }
 			level={ level }
-			position={ position }
-			rowCount={ rowCount }
-			path={ path }
+			positionInSet={ position }
+			setSize={ rowCount }
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
 			isExpanded={ isExpanded }
@@ -243,6 +242,6 @@ export default function ListViewBlock( {
 					) }
 				</TreeGridCell>
 			) }
-		</ListViewLeaf>
+		</TreeGridRow>
 	);
 }

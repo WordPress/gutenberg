@@ -269,9 +269,9 @@
 	width: $icon-size;
 }
 
-// First level of indentation is aria-level 2, max indent is 8.
+// First level of indentation is aria-level 2, max indent is 7.
 // Indent is a full icon size, plus 4px which optically aligns child icons to the text label above.
-$block-navigation-max-indent: 8;
+$block-navigation-max-indent: 7;
 .block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {
 	margin-left: ( $icon-size ) * $block-navigation-max-indent + 4 * ( $block-navigation-max-indent - 1 );
 }
