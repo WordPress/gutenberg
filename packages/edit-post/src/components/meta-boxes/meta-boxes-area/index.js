@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
@@ -15,23 +15,34 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as editPostStore } from '../../../store';
 
+/**
+ * Render metabox area.
+ *
+ * @param {Object} props          Component props.
+ * @param {string} props.location metabox location.
+ * @return {WPComponent} The component to be rendered.
+ */
 const MetaBoxesArea = ( { location } ) => {
 	const container = useRef( null );
-	const [ form, setForm ] = useState( null );
+	const formRef = useRef( null );
 
 	useEffect( () => {
-		setForm( document.querySelector( '.metabox-location-' + location ) );
+		formRef.current = document.querySelector(
+			'.metabox-location-' + location
+		);
 
-		if ( form ) {
-			container.current.appendChild( form );
+		if ( formRef.current ) {
+			container.current.appendChild( formRef.current );
 		}
 
 		return () => {
-			if ( form ) {
-				document.querySelector( '#metaboxes' ).appendChild( form );
+			if ( formRef.current ) {
+				document
+					.querySelector( '#metaboxes' )
+					.appendChild( formRef.current );
 			}
 		};
-	}, [ form, location ] );
+	}, [ location ] );
 
 	const isSaving = useSelect( ( select ) => {
 		return select( editPostStore ).isSavingMetaBoxes();
