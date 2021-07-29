@@ -265,6 +265,12 @@ export default function Sandbox( {
 					loadedRequests.current <= maxAllowedRequests + extraRequests
 				);
 			} }
+			// Support multiple windows has to be disabled for enabling "onShouldStartLoadWithRequest" callback on Android,
+			// this is a known issue that is still unresolved: https://github.com/react-native-webview/react-native-webview/issues/1869
+			// However, setting this to false can expose the application to this vulnerability allowing a malicious iframe
+			// to escape into the top layer DOM.
+			// Vulnerability reference : https://alesandroortiz.com/articles/uxss-android-webview-cve-2020-6506/
+			setSupportMultipleWindows={ false }
 		/>
 	);
 }
