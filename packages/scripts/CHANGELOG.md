@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 17.1.0 (2021-07-29)
+
 ### Enhancements
 
 -   Update `eslint-plugin-markdown` package to `2.20.0` ([#33432](https://github.com/WordPress/gutenberg/pull/33432)).
