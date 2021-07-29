@@ -11,27 +11,11 @@ body:
 - type: checkboxes
   attributes:
     label: Is there an existing issue for this?
-    description: Please heck if the bug has already been reported by searching https://github.com/WordPress/gutenberg/issues.
+    description: Please check if the bug has already been reported by searching https://github.com/WordPress/gutenberg/issues.
     options:
     - label: I have searched the existing issues
       required: true
-      
-- type: checkboxes
-  attributes:
-    label: Have you tested with the latest version of WordPress and/or Gutenberg?
-    description: Please make sure you are using the latest versions before reporting.
-    options:
-    - label: I have tested against the latest versions.
-      required: true
 
-- type: checkboxes
-  attributes:
-    label: Have you tested with the latest version of WordPress and/or Gutenberg?
-    description: Please make sure you are using the latest versions before reporting.
-    options:
-    - label: I have tested against the latest versions.
-      required: true
-      
 - type: checkboxes
   attributes:
     label: Have you tried deactivating all plugins except Gutenberg?
@@ -48,13 +32,6 @@ body:
     - label: I have tested with a default theme.
       required: true
 
-- type: checkboxes
-  attributes:
-    label: Have you tried replicating the bug using a default theme e.g. Twenty Twenty?
-    description: Please make sure you have confirmed it's not a theme specific problem.
-    options:
-    - label: I have tested with a default theme.
-      required: true
 - type: textarea
   attributes:
     label: Description
@@ -76,12 +53,6 @@ body:
   attributes:
     label: Expected Behavior
     description: Please describe what you expected to happen.
-  validations:
-    required: true
-- type: textarea
-  attributes:
-    label: Current Behavior
-    description: A concise description of what you're experiencing.
   validations:
     required: true
 - type: textarea
