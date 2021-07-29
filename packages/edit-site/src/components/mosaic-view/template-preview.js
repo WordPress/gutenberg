@@ -12,8 +12,12 @@ import { useMemo } from '@wordpress/element';
  */
 import TemplatePreview from '../navigation-sidebar/navigation-panel/template-preview';
 
-export default function MosaicTemplatePreview( { className, templateId, onClick } ) {
-	const { isResolved, template, postId, postType } = useSelect(
+export default function MosaicTemplatePreview( {
+	className,
+	templateId,
+	onClick,
+} ) {
+	const { isResolved, templateContent, postId, postType } = useSelect(
 		( select ) => {
 			const { getEntityRecord, hasFinishedResolution } = select(
 				coreStore
@@ -22,7 +26,7 @@ export default function MosaicTemplatePreview( { className, templateId, onClick 
 				editorStore
 			);
 			const getEntityArgs = [ 'postType', 'wp_template', templateId ];
-			const entityRecord = templateId
+			const template = templateId
 				? getEntityRecord( ...getEntityArgs )
 				: null;
 			const hasResolvedEntity = templateId
@@ -30,7 +34,7 @@ export default function MosaicTemplatePreview( { className, templateId, onClick 
 				: false;
 
 			return {
-				template: entityRecord,
+				templateContent: template?.content?.raw,
 				isResolved: hasResolvedEntity,
 				postId: getCurrentPostId(),
 				postType: getCurrentPostType(),
@@ -49,7 +53,7 @@ export default function MosaicTemplatePreview( { className, templateId, onClick 
 		<TemplatePreview
 			onClick={ onClick }
 			className={ className }
-			rawContent={ template?.content?.raw }
+			rawContent={ templateContent }
 			context={ defaultBlockContext }
 		/>
 	);

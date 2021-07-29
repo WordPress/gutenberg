@@ -145,9 +145,6 @@ export default function TemplatesMenu() {
 				title={ __( 'Unused templates' ) }
 				templates={ templatesWithLocation }
 			/>
-			<NavigationItem className="edit-site-navigation-panel__template-item">
-				<Button onClick={ () => {} }>All templates1</Button>
-			</NavigationItem>
 		</NavigationMenu>
 	);
 }

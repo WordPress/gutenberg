@@ -19,19 +19,39 @@ import TemplatePreview from './template-preview';
 import TemplateActions from './template-actions';
 import { store as editSiteStore } from '../../store';
 
-function TemplateContainer( { template, composite } ) {
+function TemplateContainer( { templateId, composite } ) {
+	const { setTemplate, setIsNavigationPanelOpened } = useDispatch(
+		editSiteStore
+	);
 	const {
-		setTemplate,
-		setIsNavigationPanelOpened,
-		switchEditorMode,
-	} = useDispatch( editSiteStore );
-
+		hasThemeFile,
+		templateAuthor,
+		templateDescription,
+		templateSlug,
+		templateSource,
+		templateTitle,
+	} = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord } = select( coreStore );
+			const template = templateId
+				? getEditedEntityRecord( 'postType', 'wp_template', templateId )
+				: {};
+			console.log({ template });
+			return {
+				hasThemeFile: template.has_theme_file,
+				templateAuthor: template.author,
+				templateDescription: template.description,
+				templateSlug: template.slug,
+				templateSource: template.source,
+				templateTitle: template.title,
+			};
+		},
+		[ templateId ]
+	);
 	const onActivateItem = () => {
-		setTemplate( template.id, template.slug );
+		setTemplate( templateId, templateSlug );
 		setIsNavigationPanelOpened( false );
-		switchEditorMode( 'visual' );
 	};
-	const actionsPossible = ! template.has_theme_file || template.wp_id;
 	return (
 		<CompositeItem
 			{ ...composite }
@@ -48,17 +68,22 @@ function TemplateContainer( { template, composite } ) {
 		>
 			<TemplatePreview
 				className="edit-site-mosaic-view__template-preview"
-				templateId={ template.id }
+				templateId={ templateId }
 				onClick={ onActivateItem }
 			/>
 			<CheckboxControl
-				disabled={ ! actionsPossible }
-				label={ template.title.rendered }
-				help={ template.description }
+				disabled={ templateSource !== 'custom' }
+				label={ templateTitle }
+				help={ templateDescription }
 			/>
-			{ actionsPossible && (
+			{ templateSource === 'custom' && (
 				<div>
-					<TemplateActions template={ template } />
+					<TemplateActions
+						hasThemeFile={ hasThemeFile }
+						templateAuthor={ templateAuthor }
+						templateId={ templateId }
+						templateTitle={ templateTitle }
+					/>
 				</div>
 			) }
 		</CompositeItem>
@@ -88,7 +113,7 @@ export default function MosaicView() {
 			{ templates.map( ( template ) => (
 				<TemplateContainer
 					key={ template.id }
-					template={ template }
+					templateId={ template.id }
 					composite={ composite }
 				/>
 			) ) }

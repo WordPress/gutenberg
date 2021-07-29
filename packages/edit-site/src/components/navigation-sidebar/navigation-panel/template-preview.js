@@ -6,10 +6,9 @@ import { BlockPreview, BlockContextProvider } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 
 export default function TemplatePreview( {
-	...props,
 	rawContent,
 	blockContext,
-	onClick,
+	...props
 } ) {
 	const blocks = useMemo( () => ( rawContent ? parse( rawContent ) : [] ), [
 		rawContent,
@@ -21,7 +20,7 @@ export default function TemplatePreview( {
 
 	if ( blockContext ) {
 		return (
-			<div {...props }>
+			<div { ...props }>
 				<BlockContextProvider value={ blockContext }>
 					<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />
 				</BlockContextProvider>
@@ -30,7 +29,7 @@ export default function TemplatePreview( {
 	}
 
 	return (
-		<div {...props }>
+		<div { ...props }>
 			<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />
 		</div>
 	);

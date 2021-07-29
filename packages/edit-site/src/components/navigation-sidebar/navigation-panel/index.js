@@ -11,7 +11,7 @@ import {
 	__experimentalNavigationBackButton as NavigationBackButton,
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
-	Button,
+	__experimentalNavigationGroup as NavigationGroup,
 } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -35,12 +35,14 @@ const NavigationPanel = ( { isOpen } ) => {
 		editedPostType,
 		activeMenu,
 		siteTitle,
+		editorMode,
 	} = useSelect( ( select ) => {
 		const {
 			getEditedPostType,
 			getEditedPostId,
 			getNavigationPanelActiveMenu,
 			getPage,
+			getEditorMode,
 		} = select( editSiteStore );
 		const { getEntityRecord } = select( coreDataStore );
 
@@ -53,6 +55,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			editedPostType: getEditedPostType(),
 			activeMenu: getNavigationPanelActiveMenu(),
 			siteTitle: siteData.name,
+			editorMode: getEditorMode(),
 		};
 	}, [] );
 
@@ -120,11 +123,24 @@ const NavigationPanel = ( { isOpen } ) => {
 						) }
 						<SiteMenu />
 					</Navigation>
-					<div className="edit-site-navigation-panel__template-item edit-site-navigation-panel__all-templates">
-						<Button onClick={ () => switchEditorMode( 'mosaic' ) }>
-							{ __( 'All templates' ) }
-						</Button>
-					</div>
+					<Navigation
+						className="edit-site-navigation-panel__all-templates"
+						activeItem={
+							editorMode === 'mosaic' ? 'all-templates' : ''
+						}
+					>
+						<NavigationMenu>
+							<NavigationItem
+								onClick={ () => {
+									if ( editorMode !== 'mosaic' ) {
+										switchEditorMode( 'mosaic' );
+									}
+								} }
+								item="all-templates"
+								title={ __( 'All templates' ) }
+							/>
+						</NavigationMenu>
+					</Navigation>
 				</div>
 			</div>
 		</div>

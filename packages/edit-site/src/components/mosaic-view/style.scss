@@ -7,6 +7,8 @@
 	background-color: $white;
 	padding: $grid-unit-40;
 	justify-content: center;
+	min-height: 100%;
+	overflow: auto;
 }
 
 .edit-site-mosaic-view__mosaic-item {

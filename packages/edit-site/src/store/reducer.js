@@ -33,6 +33,15 @@ export const preferences = combineReducers( {
 		if ( action.type === 'SWITCH_MODE' ) {
 			return action.mode;
 		}
+		if ( state === 'mosaic' ) {
+			if (
+				[ 'SET_TEMPLATE', 'SET_PAGE', 'SET_TEMPLATE_PART' ].includes(
+					action.type
+				)
+			) {
+				return 'visual';
+			}
+		}
 
 		return state;
 	},
@@ -98,6 +107,12 @@ export function editedPost( state = {}, action ) {
 				type: 'wp_template_part',
 				id: action.templatePartId,
 			};
+		case 'SWITCH_MODE': {
+			if ( action.mode !== 'mosaic' ) {
+				return state;
+			}
+			return {};
+		}
 	}
 
 	return state;
@@ -135,6 +150,16 @@ export function navigationPanel(
 	action
 ) {
 	switch ( action.type ) {
+		case 'SWITCH_MODE': {
+			if ( action.mode !== 'mosaic' ) {
+				return state;
+			}
+			return {
+				...state,
+				isOpen: false,
+				menu: MENU_ROOT,
+			};
+		}
 		case 'SET_NAVIGATION_PANEL_ACTIVE_MENU':
 			return {
 				...state,
