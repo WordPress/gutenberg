@@ -69,6 +69,24 @@
     display: none;
 }
 
+.components-dropdown-menu__menu
+	.components-menu-group
+	> div
+	> button:nth-child( 2 ) {
+	display: block;
+	min-height: 0;
+	height: 0;
+	padding: 0;
+}
+
+.components-menu-group > div > button:nth-child( 2 ) span {
+	display: none;
+}
+
+.components-button:focus:not( :disabled ) {
+	box-shadow: none;
+}
+
 /* Remove \'delete block\' button inside \'...\' button in block toolbar */
 .components-dropdown-menu__menu > div:not(:first-child) {
     display: none;
