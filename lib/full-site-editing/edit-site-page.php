@@ -103,6 +103,7 @@ function gutenberg_edit_site_init( $hook ) {
 	);
 
 	$site_editor_context = new WP_Block_Editor_Context();
+	/** This filter is documented in wp-includes/wp-block-editor.php */
 	$settings = apply_filters( 'block_editor_settings_all', $settings, $site_editor_context );
 
 	gutenberg_initialize_editor(
