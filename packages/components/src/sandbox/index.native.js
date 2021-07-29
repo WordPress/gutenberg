@@ -102,7 +102,6 @@ const style = `
 `;
 
 export default function Sandbox( {
-	maxAllowedRequests = 1,
 	html = '',
 	providerUrl = '',
 	scripts = [],
@@ -111,7 +110,6 @@ export default function Sandbox( {
 	type,
 } ) {
 	const ref = useRef();
-	const loadedRequests = useRef( 0 );
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
 	const [ iframeHtml, setiFrameHtml ] = useState();
@@ -246,25 +244,6 @@ export default function Sandbox( {
 				},
 			] }
 			onMessage={ checkMessageForResize }
-			onShouldStartLoadWithRequest={ ( request ) => {
-				// On Android, this callback is not called on the first load so we can prevent the rest of requests.
-				if ( Platform.OS === 'android' ) {
-					return false;
-				}
-
-				// On iOS, navigation within the webview is disabled by only allowing a specifc number of requests.
-				// Requests to empty pages are not considered as loaded requests.
-				if ( request.url !== 'about:blank' ) {
-					loadedRequests.current++;
-				}
-
-				// The provider url is always requested so we have to consider it as an extra request.
-				const extraRequests = providerUrl ? 1 : 0;
-
-				return (
-					loadedRequests.current <= maxAllowedRequests + extraRequests
-				);
-			} }
 		/>
 	);
 }
