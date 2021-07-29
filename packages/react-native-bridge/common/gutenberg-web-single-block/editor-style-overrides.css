@@ -73,6 +73,11 @@
 	.components-menu-group
 	> div
 	> button:nth-child( 2 ) {
+/* 
+ Load second button in component menu group but hide it from view.
+ This is to fix a Chrome-specific bug that occurs if this button is set to "display: none;" 
+ For additional context, see: https://github.com/WordPress/gutenberg/pull/33740
+*/
 	display: block;
 	min-height: 0;
 	height: 0;
