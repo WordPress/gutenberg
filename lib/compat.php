@@ -238,12 +238,18 @@ function gutenberg_user_settings_data_persistence_inline_script() {
 
 	$persistence_script = <<<JS
 ( function() {
+	locallyPersistentValues = {};
 	wp.data.use( wp.data.plugins.persistence, {
 		storage: {
-			getItem: function() {
+			getItem: function( key ) {
+				console.log( locallyPersistentValues );
+				if ( locallyPersistentValues[ key ] ) {
+					return locallyPersistentValues[ key ];
+				}
 				return {$persisted_value};
 			},
 			setItem: function( key, value ) {
+				locallyPersistentValues[ key ] = value;
 				wp.apiFetch( {
 					path: '/wp/v2/users/me',
 					method: 'POST',
