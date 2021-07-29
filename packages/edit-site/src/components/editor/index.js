@@ -10,7 +10,11 @@ import {
 	Notice,
 } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
-import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockContextProvider,
+	BlockBreadcrumb,
+	__unstableEditorStyles as EditorStyles,
+} from '@wordpress/block-editor';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
@@ -39,6 +43,7 @@ import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
 import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
+import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
 import MosaicView from '../mosaic-view';
 
@@ -47,7 +52,7 @@ const interfaceLabels = {
 	drawer: __( 'Navigation Sidebar' ),
 };
 
-function Editor( { initialSettings } ) {
+function Editor( { initialSettings, onError } ) {
 	const {
 		isInserterOpen,
 		isListViewOpen,
@@ -205,90 +210,101 @@ function Editor( { initialSettings } ) {
 										settings.__experimentalGlobalStylesBaseStyles
 									}
 								>
-									<KeyboardShortcuts.Register />
-									<SidebarComplementaryAreaFills />
-									<InterfaceSkeleton
-										labels={ interfaceLabels }
-										drawer={ <NavigationSidebar /> }
-										secondarySidebar={ secondarySidebar() }
-										sidebar={
-											sidebarIsOpened && (
-												<ComplementaryArea.Slot scope="core/edit-site" />
-											)
-										}
-										header={
-											<Header
-												openEntitiesSavedStates={
-													openEntitiesSavedStates
-												}
-											/>
-										}
-										notices={ <EditorSnackbars /> }
-										content={
-											<>
-												<EditorNotices />
-												{ editorMode === 'visual' &&
-													template && (
-														<BlockEditor
-															setIsInserterOpen={
-																setIsInserterOpened
+									{
+										// Template previews need the editor styles to be available.
+										<EditorStyles
+											styles={ settings.styles }
+										/>
+									}
+									<ErrorBoundary onError={ onError }>
+										<FullscreenMode isActive />
+										<UnsavedChangesWarning />
+										<KeyboardShortcuts.Register />
+										<SidebarComplementaryAreaFills />
+										<InterfaceSkeleton
+											labels={ interfaceLabels }
+											drawer={ <NavigationSidebar /> }
+											secondarySidebar={ secondarySidebar() }
+											sidebar={
+												sidebarIsOpened && (
+													<ComplementaryArea.Slot scope="core/edit-site" />
+												)
+											}
+											header={
+												<Header
+													openEntitiesSavedStates={
+														openEntitiesSavedStates
+													}
+												/>
+											}
+											notices={ <EditorSnackbars /> }
+											content={
+												<>
+													<EditorNotices />
+													{ editorMode === 'visual' &&
+														template && (
+															<BlockEditor
+																setIsInserterOpen={
+																	setIsInserterOpened
+																}
+															/>
+														) }
+													{ editorMode === 'visual' &&
+														templateResolved &&
+														! template &&
+														settings?.siteUrl &&
+														entityId && (
+															<Notice
+																status="warning"
+																isDismissible={
+																	false
+																}
+															>
+																{ __(
+																	"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+																) }
+															</Notice>
+														) }
+													{ editorMode ===
+														'mosaic' && (
+														<MosaicView />
+													) }
+													<KeyboardShortcuts />
+												</>
+											}
+											actions={
+												<>
+													{ isEntitiesSavedStatesOpen ? (
+														<EntitiesSavedStates
+															close={
+																closeEntitiesSavedStates
 															}
 														/>
+													) : (
+														<div className="edit-site-editor__toggle-save-panel">
+															<Button
+																variant="secondary"
+																className="edit-site-editor__toggle-save-panel-button"
+																onClick={
+																	openEntitiesSavedStates
+																}
+																aria-expanded={
+																	false
+																}
+															>
+																{ __(
+																	'Open save panel'
+																) }
+															</Button>
+														</div>
 													) }
-												{ editorMode === 'visual' &&
-													templateResolved &&
-													! template &&
-													settings?.siteUrl &&
-													entityId && (
-														<Notice
-															status="warning"
-															isDismissible={
-																false
-															}
-														>
-															{ __(
-																"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-															) }
-														</Notice>
-													) }
-												{ editorMode === 'mosaic' && (
-													<MosaicView />
-												) }
-												<KeyboardShortcuts />
-											</>
-										}
-										actions={
-											<>
-												{ isEntitiesSavedStatesOpen ? (
-													<EntitiesSavedStates
-														close={
-															closeEntitiesSavedStates
-														}
-													/>
-												) : (
-													<div className="edit-site-editor__toggle-save-panel">
-														<Button
-															variant="secondary"
-															className="edit-site-editor__toggle-save-panel-button"
-															onClick={
-																openEntitiesSavedStates
-															}
-															aria-expanded={
-																false
-															}
-														>
-															{ __(
-																'Open save panel'
-															) }
-														</Button>
-													</div>
-												) }
-											</>
-										}
-										footer={ <BlockBreadcrumb /> }
-									/>
-									<Popover.Slot />
-									<PluginArea />
+												</>
+											}
+											footer={ <BlockBreadcrumb /> }
+										/>
+										<Popover.Slot />
+										<PluginArea />
+									</ErrorBoundary>
 								</GlobalStylesProvider>
 							</BlockContextProvider>
 						</EntityProvider>

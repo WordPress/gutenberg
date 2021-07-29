@@ -462,3 +462,10 @@ export function* switchEditorMode( mode ) {
 		speak( messages[ mode ], 'assertive' );
 	}
 }
+
+export function toggleSelectedTemplate( templateId ) {
+	return {
+		type: 'TOGGLE_SELECTED_TEMPLATE',
+		templateId,
+	};
+}

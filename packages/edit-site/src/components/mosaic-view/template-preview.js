@@ -48,13 +48,15 @@ export default function MosaicTemplatePreview( {
 	}, [ postId, postType ] );
 
 	return ! isResolved ? (
-		<Spinner className={ className } />
+		<div className={ className }>
+			<Spinner />
+		</div>
 	) : (
 		<TemplatePreview
-			onClick={ onClick }
 			className={ className }
+			onClick={ onClick }
 			rawContent={ templateContent }
-			context={ defaultBlockContext }
+			blockContext={ defaultBlockContext }
 		/>
 	);
 }

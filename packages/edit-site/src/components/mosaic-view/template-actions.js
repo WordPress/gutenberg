@@ -35,7 +35,9 @@ export default function TemplateActions( {
 		},
 		[ hasThemeFile, templateAuthor ]
 	);
-	const { revertTemplate } = useDispatch( editSiteStore );
+	const { revertTemplate, toggleSelectedTemplate } = useDispatch(
+		editSiteStore
+	);
 	const { deleteEntityRecord } = useDispatch( coreStore );
 	return (
 		<DropdownMenu icon={ moreVertical } label={ __( 'Template actions' ) }>
@@ -61,6 +63,7 @@ export default function TemplateActions( {
 											templateId
 										)
 									);
+									toggleSelectedTemplate( templateId );
 									onClose();
 								} }
 							>
@@ -87,6 +90,7 @@ export default function TemplateActions( {
 											'wp_template',
 											templateId
 										);
+										toggleSelectedTemplate( templateId );
 										onClose();
 									}
 								} }

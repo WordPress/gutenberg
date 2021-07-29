@@ -267,3 +267,11 @@ export function isListViewOpened( state ) {
 export function getEditorMode( state ) {
 	return state.preferences.editorMode || 'visual';
 }
+
+export function getSelectedTemplates( state ) {
+	return state.selectedTemplates;
+}
+
+export function isTemplateSelected( state, templateId ) {
+	return state.selectedTemplates.includes( templateId );
+}

@@ -33,6 +33,19 @@
 	color: $gray-900;
 	grid-column: span 2;
 	overflow: hidden;
+	.components-spinner {
+		position: relative;
+		top: calc( 50% - #{ math.div( $spinner-size, 2 ) } );
+		left: calc( 50% - #{ math.div( $spinner-size, 2 ) } );
+	}
+
+	.block-editor-block-preview__container {
+		// We have a bug on packages/block-editor/src/components/block-preview/auto.js.
+		// Because of some reason contentHeight is always 0. Even thought the iframe used for the computation has an height.
+		// It seems like useResizeObserver is not rerunning on this case.
+		// This rule should be removed after the bug is addressed.
+		height: 100% !important;
+	}
 }
 
 .edit-site-mosaic-view__added-by-text {

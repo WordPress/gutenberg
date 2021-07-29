@@ -238,6 +238,18 @@ export function listViewPanel( state = false, action ) {
 	return state;
 }
 
+export function selectedTemplates( state = [], action ) {
+	if ( 'TOGGLE_SELECTED_TEMPLATE' === action.type ) {
+		if ( state.includes( action.templateId ) ) {
+			return state.filter(
+				( template ) => template !== action.templateId
+			);
+		}
+		return [ ...state, action.templateId ];
+	}
+	return state;
+}
+
 export default combineReducers( {
 	preferences,
 	deviceType,
@@ -247,4 +259,5 @@ export default combineReducers( {
 	navigationPanel,
 	blockInserterPanel,
 	listViewPanel,
+	selectedTemplates,
 } );

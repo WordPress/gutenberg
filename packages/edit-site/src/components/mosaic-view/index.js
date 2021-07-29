@@ -20,9 +20,11 @@ import TemplateActions from './template-actions';
 import { store as editSiteStore } from '../../store';
 
 function TemplateContainer( { templateId, composite } ) {
-	const { setTemplate, setIsNavigationPanelOpened } = useDispatch(
-		editSiteStore
-	);
+	const {
+		setTemplate,
+		setIsNavigationPanelOpened,
+		toggleSelectedTemplate,
+	} = useDispatch( editSiteStore );
 	const {
 		hasThemeFile,
 		templateAuthor,
@@ -30,13 +32,14 @@ function TemplateContainer( { templateId, composite } ) {
 		templateSlug,
 		templateSource,
 		templateTitle,
+		isSelected,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord } = select( coreStore );
+			const { isTemplateSelected } = select( editSiteStore );
 			const template = templateId
 				? getEditedEntityRecord( 'postType', 'wp_template', templateId )
 				: {};
-			console.log({ template });
 			return {
 				hasThemeFile: template.has_theme_file,
 				templateAuthor: template.author,
@@ -44,6 +47,7 @@ function TemplateContainer( { templateId, composite } ) {
 				templateSlug: template.slug,
 				templateSource: template.source,
 				templateTitle: template.title,
+				isSelected: isTemplateSelected( templateId ),
 			};
 		},
 		[ templateId ]
@@ -75,6 +79,8 @@ function TemplateContainer( { templateId, composite } ) {
 				disabled={ templateSource !== 'custom' }
 				label={ templateTitle }
 				help={ templateDescription }
+				checked={ isSelected }
+				onChange={ () => toggleSelectedTemplate( templateId ) }
 			/>
 			{ templateSource === 'custom' && (
 				<div>

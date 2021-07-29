@@ -35,6 +35,10 @@ $header-toolbar-min-width: 335px;
 	.edit-site-header_end {
 		justify-content: flex-end;
 	}
+	&.is-selecting-templates {
+		background-color: #1e1e1e;
+		color: $white
+	}
 }
 
 // Keeps the document title centered when the sidebar is open

@@ -17,10 +17,14 @@ function NavigationToggle( { icon, isOpen } ) {
 		isRequestingSiteIcon,
 		navigationPanelMenu,
 		siteIconUrl,
+		hasSelectedTemplates,
+		editorMode,
 	} = useSelect( ( select ) => {
-		const { getCurrentTemplateNavigationPanelSubMenu } = select(
-			editSiteStore
-		);
+		const {
+			getCurrentTemplateNavigationPanelSubMenu,
+			getSelectedTemplates,
+			getEditorMode,
+		} = select( editSiteStore );
 		const { getEntityRecord, isResolving } = select( coreDataStore );
 		const siteData =
 			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
@@ -33,6 +37,8 @@ function NavigationToggle( { icon, isOpen } ) {
 			] ),
 			navigationPanelMenu: getCurrentTemplateNavigationPanelSubMenu(),
 			siteIconUrl: siteData.site_icon_url,
+			hasSelectedTemplates: getSelectedTemplates().length > 0,
+			editorMode: getEditorMode(),
 		};
 	}, [] );
 
@@ -40,6 +46,10 @@ function NavigationToggle( { icon, isOpen } ) {
 		openNavigationPanelToMenu,
 		setIsNavigationPanelOpened,
 	} = useDispatch( editSiteStore );
+
+	if ( editorMode === 'mosaic' && hasSelectedTemplates && ! isOpen ) {
+		return null;
+	}
 
 	const toggleNavigationPanel = () => {
 		if ( isOpen ) {
