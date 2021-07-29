@@ -202,7 +202,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		$args = array(
 			'limit_response_size' => 150 * KB_IN_BYTES,
-			'user-agent'          => $modified_user_agent
+			'user-agent'          => $modified_user_agent,
 		);
 
 		/**
