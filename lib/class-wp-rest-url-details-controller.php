@@ -192,7 +192,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 */
 	private function get_remote_url( $url ) {
 
-		// Provide a modify UA string to workaround web properties which block WordPress "Pingbacks".
+		// Provide a modified UA string to workaround web properties which block WordPress "Pingbacks".
 		// Why? The UA string used for pingback requests contains `WordPress/` which is very similar
 		// to that used as the default UA string by the WP HTTP API. Therefore requests from this
 		// REST endpoint are being unintentionally blocked as they are misidentified as pingback requests.
