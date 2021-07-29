@@ -32,7 +32,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 					#
 				</Spacer>
 			}
-			value={ color.slice( 1 ) }
+			value={ color.slice( 1 ).toUpperCase() }
 			onChange={ ( nextValue ) =>
 				onChange( colorize( nextValue ).toHex8String() )
 			}

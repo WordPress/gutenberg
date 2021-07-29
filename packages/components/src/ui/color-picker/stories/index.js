@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean } from '@storybook/addon-knobs';
+import { boolean, select } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -21,11 +21,22 @@ export default {
 	title: 'Components (Experimental)/ColorPicker',
 };
 
+const PROP_UNSET = 'unset';
+
 const Example = () => {
-	const [ color, setColor ] = useState( '#fff' );
+	const [ color, setColor ] = useState( undefined );
 	const props = {
 		enableAlpha: boolean( 'enableAlpha', false ),
+		copyFormat: select(
+			'copyFormat',
+			[ PROP_UNSET, 'rgb', 'hsl', 'hex' ],
+			PROP_UNSET
+		),
 	};
+
+	if ( props.copyFormat === PROP_UNSET ) {
+		delete props.copyFormat;
+	}
 
 	return (
 		<Flex

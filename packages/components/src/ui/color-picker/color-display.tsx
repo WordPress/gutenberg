@@ -81,12 +81,12 @@ const RgbDisplay = ( { color, enableAlpha }: DisplayProps ) => {
 };
 
 const HexDisplay = ( { color }: DisplayProps ) => {
-	const colorWithoutHash = color.slice( 1 );
+	const colorWithoutHash = color.slice( 1 ).toUpperCase();
 	return (
-		<>
-			<Text>{ colorWithoutHash }</Text>
+		<FlexItem>
 			<Text color="blue">#</Text>
-		</>
+			<Text>{ colorWithoutHash }</Text>
+		</FlexItem>
 	);
 };
 
@@ -110,8 +110,9 @@ export const ColorDisplay = ( {
 	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
 	const props = { color, enableAlpha };
 	const Component = getComponent( colorType );
-	const copyRef = useCopyToClipboard< HTMLDivElement >( color, () =>
-		setCopiedColor( color )
+	const copyRef = useCopyToClipboard< HTMLDivElement >(
+		color.toUpperCase(),
+		() => setCopiedColor( color )
 	);
 	return (
 		<Tooltip

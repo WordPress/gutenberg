@@ -3,6 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
+import colorize from 'tinycolor2';
 
 /**
  * WordPress dependencies
@@ -30,11 +31,13 @@ import { ColorInput } from './color-input';
 import { useControlledValue } from '../../utils/hooks';
 
 import type { ColorType } from './types';
+
 interface ColorPickerProps {
 	enableAlpha?: boolean;
 	color?: string;
-	onChange?: ( hex8Color: string ) => void;
+	onChange?: ( hexColor: string ) => void;
 	defaultValue?: string;
+	copyFormat?: ColorType;
 }
 
 const options = [
@@ -42,6 +45,11 @@ const options = [
 	{ label: 'HSL', value: 'hsl' as const },
 	{ label: 'Hex', value: 'hex' as const },
 ];
+
+const getSafeColor = ( color: string | undefined, enableAlpha: boolean ) => {
+	const def = enableAlpha ? '#ffffffff' : '#ffffff';
+	return ! color ? def : color;
+};
 
 const ColorPicker = (
 	props: PolymorphicComponentProps< ColorPickerProps, 'div', false >,
@@ -52,6 +60,7 @@ const ColorPicker = (
 		color: colorProp,
 		onChange,
 		defaultValue,
+		copyFormat,
 	} = useContextSystem( props, 'ColorPicker' );
 
 	const [ color, setColor ] = useControlledValue( {
@@ -63,17 +72,27 @@ const ColorPicker = (
 	// Debounce to prevent rapid changes from conflicting with one another.
 	const debouncedSetColor = useDebounce( setColor );
 
+	const handleChange = ( nextValue: string ) => {
+		debouncedSetColor(
+			enableAlpha
+				? colorize( nextValue ).toHex8String()
+				: colorize( nextValue ).toHexString()
+		);
+	};
+
 	// Use a safe default value for the color and remove the possibility of `undefined`. This is what react-colorful defaults to if it's not passed anything so it's the safest default
-	const safeColor = ! color ? '#fff' : color;
+	const safeColor = getSafeColor( color, enableAlpha );
 
 	const [ showInputs, setShowInputs ] = useState< boolean >( false );
-	const [ colorType, setColorType ] = useState< ColorType >( 'rgb' );
+	const [ colorType, setColorType ] = useState< ColorType >(
+		copyFormat || 'hex'
+	);
 
 	const Picker = enableAlpha ? RgbaColorPicker : HexColorPicker;
 
 	return (
 		<ColorfulWrapper ref={ forwardedRef }>
-			<Picker onChange={ debouncedSetColor } color={ safeColor } />
+			<Picker onChange={ handleChange } color={ safeColor } />
 			<HStack justify="space-between">
 				{ showInputs ? (
 					<SelectControl
@@ -86,7 +105,7 @@ const ColorPicker = (
 				) : (
 					<ColorDisplay
 						color={ safeColor }
-						colorType={ colorType }
+						colorType={ copyFormat || colorType }
 						enableAlpha={ enableAlpha }
 					/>
 				) }
@@ -101,7 +120,7 @@ const ColorPicker = (
 				<ColorInput
 					colorType={ colorType }
 					color={ safeColor }
-					onChange={ debouncedSetColor }
+					onChange={ handleChange }
 					enableAlpha={ enableAlpha }
 				/>
 			) }

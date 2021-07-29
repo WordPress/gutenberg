@@ -49,3 +49,9 @@ Defaults to `false`. When `true` the color picker will display the alpha channel
 **Type**: `string | undefined`
 
 An optional default value to use for the color picker.
+
+### `copyFormat`
+
+**Type**: `'hex' | 'hsl' | 'rgb' | undefined`
+
+The format to copy when clicking the displayed color format.
