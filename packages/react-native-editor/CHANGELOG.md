@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.58.1
+-   [*] Global styles: Check for undefined values and merge user colors [#33707]
+
 ## 1.58.0
 -   [***] New Block: Embed block. [#33452]
 
