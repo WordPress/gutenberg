@@ -16,6 +16,13 @@ module.exports = {
 		document: true,
 		wp: 'readonly',
 	},
+	settings: {
+		'import/resolver': {
+			node: {
+				extensions: [ '.js', '.jsx' ],
+			},
+		},
+	},
 	rules: {
 		'import/no-extraneous-dependencies': [
 			'error',
