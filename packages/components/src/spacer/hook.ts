@@ -1,10 +1,7 @@
 /**
  * External dependencies
  */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { css, cx } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -12,79 +9,14 @@ import { css, cx } from '@emotion/css';
 import { useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../ui/context';
-import { space, SpaceInput } from '../ui/utils/space';
+import { space } from '../ui/utils/space';
+import { useCx } from '../utils/hooks/use-cx';
+import type { Props } from './types';
 
 const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
 	typeof o !== 'undefined' && o !== null;
 
-export interface SpacerProps {
-	/**
-	 * Adjusts all margins.
-	 */
-	margin?: SpaceInput;
-	/**
-	 * Adjusts top and bottom margins.
-	 */
-	marginY?: SpaceInput;
-	/**
-	 * Adjusts left and right margins.
-	 */
-	marginX?: SpaceInput;
-	/**
-	 * Adjusts top margins.
-	 */
-	marginTop?: SpaceInput;
-	/**
-	 * Adjusts bottom margins.
-	 *
-	 * @default 2
-	 */
-	marginBottom?: SpaceInput;
-	/**
-	 * Adjusts left margins.
-	 */
-	marginLeft?: SpaceInput;
-	/**
-	 * Adjusts right margins.
-	 */
-	marginRight?: SpaceInput;
-	/**
-	 * Adjusts all padding.
-	 */
-	padding?: SpaceInput;
-	/**
-	 * Adjusts top and bottom padding.
-	 */
-	paddingY?: SpaceInput;
-	/**
-	 * Adjusts left and right padding.
-	 */
-	paddingX?: SpaceInput;
-	/**
-	 * Adjusts top padding.
-	 */
-	paddingTop?: SpaceInput;
-	/**
-	 * Adjusts bottom padding.
-	 */
-	paddingBottom?: SpaceInput;
-	/**
-	 * Adjusts left padding.
-	 */
-	paddingLeft?: SpaceInput;
-	/**
-	 * Adjusts right padding.
-	 */
-	paddingRight?: SpaceInput;
-	/**
-	 * The children elements.
-	 */
-	children?: React.ReactNode;
-}
-
-export function useSpacer(
-	props: PolymorphicComponentProps< SpacerProps, 'div' >
-) {
+export function useSpacer( props: PolymorphicComponentProps< Props, 'div' > ) {
 	const {
 		className,
 		margin,
@@ -104,7 +36,23 @@ export function useSpacer(
 		...otherProps
 	} = useContextSystem( props, 'Spacer' );
 
+	const cx = useCx();
+
 	const classes = cx(
+		isDefined( margin ) &&
+			css`
+				margin: ${ space( margin ) };
+			`,
+		isDefined( marginY ) &&
+			css`
+				margin-bottom: ${ space( marginY ) };
+				margin-top: ${ space( marginY ) };
+			`,
+		isDefined( marginX ) &&
+			css`
+				margin-left: ${ space( marginX ) };
+				margin-right: ${ space( marginX ) };
+			`,
 		isDefined( marginTop ) &&
 			css`
 				margin-top: ${ space( marginTop ) };
@@ -121,19 +69,19 @@ export function useSpacer(
 			css`
 				margin-right: ${ space( marginRight ) };
 			`,
-		isDefined( marginX ) &&
+		isDefined( padding ) &&
 			css`
-				margin-left: ${ space( marginX ) };
-				margin-right: ${ space( marginX ) };
+				padding: ${ space( padding ) };
 			`,
-		isDefined( marginY ) &&
+		isDefined( paddingY ) &&
 			css`
-				margin-bottom: ${ space( marginY ) };
-				margin-top: ${ space( marginY ) };
+				padding-bottom: ${ space( paddingY ) };
+				padding-top: ${ space( paddingY ) };
 			`,
-		isDefined( margin ) &&
+		isDefined( paddingX ) &&
 			css`
-				margin: ${ space( margin ) };
+				padding-left: ${ space( paddingX ) };
+				padding-right: ${ space( paddingX ) };
 			`,
 		isDefined( paddingTop ) &&
 			css`
@@ -150,20 +98,6 @@ export function useSpacer(
 		isDefined( paddingRight ) &&
 			css`
 				padding-right: ${ space( paddingRight ) };
-			`,
-		isDefined( paddingX ) &&
-			css`
-				padding-left: ${ space( paddingX ) };
-				padding-right: ${ space( paddingX ) };
-			`,
-		isDefined( paddingY ) &&
-			css`
-				padding-bottom: ${ space( paddingY ) };
-				padding-top: ${ space( paddingY ) };
-			`,
-		isDefined( padding ) &&
-			css`
-				padding: ${ space( padding ) };
 			`,
 		className
 	);

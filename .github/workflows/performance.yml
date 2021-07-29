@@ -4,6 +4,8 @@ on:
     pull_request:
     release:
         types: [published]
+    push:
+        branches: [trunk]
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -49,3 +51,22 @@ jobs:
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
                   ./bin/plugin/cli.js perf --ci "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --wp-version "$WP_MAJOR"
+
+            - name: Compare performance with base branch
+              if: github.event_name == 'push'
+              run: ./bin/plugin/cli.js perf --ci $GITHUB_SHA wp/5.8 --tests-branch $GITHUB_SHA
+
+            - uses: actions/github-script@0.3.0
+              if: github.event_name == 'push'
+              id: commit-timestamp
+              with:
+                  github-token: ${{secrets.GITHUB_TOKEN}}
+                  script: |
+                      const commit_details = await github.git.getCommit({owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha});
+                      return parseInt((new Date( commit_details.data.author.date ).getTime() / 1000).toFixed(0))
+
+            - name: Publish performance results
+              if: github.event_name == 'push'
+              env:
+                  COMMITTED_AT: ${{ steps.commit-timestamp.outputs.result }}
+              run: ./bin/log-perormance-results.js trunk $GITHUB_SHA wp/5.8 $COMMITTED_AT

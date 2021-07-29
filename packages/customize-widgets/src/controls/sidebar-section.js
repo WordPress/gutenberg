@@ -45,7 +45,7 @@ export default function getSidebarSection() {
 				..._args,
 				completeCallback() {
 					controls.forEach( ( control ) => {
-						control.onChangeSectionExpanded( expanded, args );
+						control.onChangeSectionExpanded?.( expanded, args );
 					} );
 					_args.completeCallback?.();
 				},
