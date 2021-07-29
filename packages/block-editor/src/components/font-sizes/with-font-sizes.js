@@ -97,12 +97,9 @@ export default ( ...fontSizeNames ) => {
 						fontSizeAttributeName,
 						customFontSizeAttributeName
 					) {
-						return ( fontSizeUnit ) => {
-							const fontSizeValue = fontSizeUnit
-								? parseInt( fontSizeUnit, 10 )
-								: undefined;
+						return ( fontSizeValue ) => {
 							const fontSizeObject = find( this.props.fontSizes, {
-								size: fontSizeValue,
+								size: Number( fontSizeValue ),
 							} );
 							this.props.setAttributes( {
 								[ fontSizeAttributeName ]:
