@@ -137,7 +137,6 @@ export default function VisualEditor( { styles } ) {
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
 	const defaultLayout = useSetting( 'layout' );
-	const { contentSize, wideSize } = defaultLayout || {};
 	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode
@@ -178,18 +177,11 @@ export default function VisualEditor( { styles } ) {
 		}
 
 		if ( themeSupportsLayout ) {
-			const alignments =
-				contentSize || wideSize
-					? [ 'wide', 'full', 'left', 'center', 'right' ]
-					: [ 'left', 'center', 'right' ];
-			return {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments,
-			};
+			return defaultLayout;
 		}
+
 		return undefined;
-	}, [ isTemplateMode, themeSupportsLayout, contentSize, wideSize ] );
+	}, [ isTemplateMode, themeSupportsLayout ] );
 
 	return (
 		<BlockTools

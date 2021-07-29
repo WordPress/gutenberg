@@ -86,26 +86,27 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor">
-				<BlockTools __unstableContentRef={ contentRef }>
-					<Iframe
-						style={ resizedCanvasStyles }
-						head={ <EditorStyles styles={ settings.styles } /> }
-						ref={ ref }
-						contentRef={ mergedRefs }
-					>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							__experimentalLayout={ LAYOUT }
-						/>
-					</Iframe>
-				</BlockTools>
+			<BlockTools
+				className="edit-site-visual-editor"
+				__unstableContentRef={ contentRef }
+			>
+				<Iframe
+					style={ resizedCanvasStyles }
+					head={ <EditorStyles styles={ settings.styles } /> }
+					ref={ ref }
+					contentRef={ mergedRefs }
+				>
+					<BlockList
+						className="edit-site-block-editor__block-list"
+						__experimentalLayout={ LAYOUT }
+					/>
+				</Iframe>
 				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />
 					) }
 				</__unstableBlockSettingsMenuFirstItem>
-			</div>
+			</BlockTools>
 		</BlockEditorProvider>
 	);
 }

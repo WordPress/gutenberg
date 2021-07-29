@@ -37,6 +37,7 @@ function render_block_core_search( $attributes ) {
 	$input_markup     = '';
 	$button_markup    = '';
 	$inline_styles    = styles_for_block_core_search( $attributes );
+	$color_classes    = get_color_classes_for_block_core_search( $attributes );
 	$is_button_inside = ! empty( $attributes['buttonPosition'] ) &&
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
@@ -66,14 +67,17 @@ function render_block_core_search( $attributes ) {
 			$input_classes,
 			esc_attr( get_search_query() ),
 			esc_attr( $attributes['placeholder'] ),
-			$inline_styles['shared']
+			$inline_styles['input']
 		);
 	}
 
 	if ( $show_button ) {
 		$button_internal_markup = '';
-		$button_classes         = ! $is_button_inside ? $border_color_classes : '';
+		$button_classes         = $color_classes;
 
+		if ( ! $is_button_inside ) {
+			$button_classes .= $border_color_classes;
+		}
 		if ( ! $use_icon_button ) {
 			if ( ! empty( $attributes['buttonText'] ) ) {
 				$button_internal_markup = $attributes['buttonText'];
@@ -89,7 +93,7 @@ function render_block_core_search( $attributes ) {
 		$button_markup = sprintf(
 			'<button type="submit" class="wp-block-search__button %s" %s>%s</button>',
 			$button_classes,
-			$inline_styles['shared'],
+			$inline_styles['button'],
 			$button_internal_markup
 		);
 	}
@@ -177,8 +181,9 @@ function classnames_for_block_core_search( $attributes ) {
  * @return array Style HTML attribute.
  */
 function styles_for_block_core_search( $attributes ) {
-	$shared_styles  = array();
 	$wrapper_styles = array();
+	$button_styles  = array();
+	$input_styles   = array();
 
 	// Add width styles.
 	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
@@ -210,11 +215,13 @@ function styles_for_block_core_search( $attributes ) {
 					$name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
 
 					// Add shared styles for individual border radii for input & button.
-					$shared_styles[] = sprintf(
+					$border_style    = sprintf(
 						'border-%s-radius: %s;',
 						esc_attr( $name ),
 						esc_attr( $value )
 					);
+					$input_styles[]  = $border_style;
+					$button_styles[] = $border_style;
 
 					// Add adjusted border radius styles for the wrapper element
 					// if button is positioned inside.
@@ -231,7 +238,9 @@ function styles_for_block_core_search( $attributes ) {
 		} else {
 			// Numeric check is for backwards compatibility purposes.
 			$border_radius   = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
-			$shared_styles[] = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
+			$border_style    = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
+			$input_styles[]  = $border_style;
+			$button_styles[] = $border_style;
 
 			if ( $is_button_inside && intval( $border_radius ) !== 0 ) {
 				// Adjust wrapper border radii to maintain visual consistency
@@ -257,12 +266,30 @@ function styles_for_block_core_search( $attributes ) {
 		if ( $is_button_inside ) {
 			$wrapper_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
 		} else {
-			$shared_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
+			$button_styles[] = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
+			$input_styles[]  = sprintf( 'border-color: %s;', esc_attr( $border_color ) );
 		}
 	}
 
+	// Add color styles.
+	$has_text_color = ! empty( $attributes['style']['color']['text'] );
+	if ( $has_text_color ) {
+		$button_styles[] = sprintf( 'color: %s;', esc_attr( $attributes['style']['color']['text'] ) );
+	}
+
+	$has_background_color = ! empty( $attributes['style']['color']['background'] );
+	if ( $has_background_color ) {
+		$button_styles[] = sprintf( 'background-color: %s;', esc_attr( $attributes['style']['color']['background'] ) );
+	}
+
+	$has_custom_gradient = ! empty( $attributes['style']['color']['gradient'] );
+	if ( $has_custom_gradient ) {
+		$button_styles[] = sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
+	}
+
 	return array(
-		'shared'  => ! empty( $shared_styles ) ? sprintf( ' style="%s"', implode( ' ', $shared_styles ) ) : '',
+		'input'   => ! empty( $input_styles ) ? sprintf( ' style="%s"', implode( ' ', $input_styles ) ) : '',
+		'button'  => ! empty( $button_styles ) ? sprintf( ' style="%s"', implode( ' ', $button_styles ) ) : '',
 		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', implode( ' ', $wrapper_styles ) ) : '',
 	);
 }
@@ -282,4 +309,47 @@ function get_border_color_classes_for_block_core_search( $attributes ) {
 		$border_color_classes = 'has-border-color';
 	}
 	return $border_color_classes;
+}
+
+/**
+ * Returns color classnames depending on whether there are named or custom text and background colors.
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string The color classnames to be applied to the block elements.
+ */
+function get_color_classes_for_block_core_search( $attributes ) {
+	$classnames = array();
+
+	// Text color.
+	$has_named_text_color  = ! empty( $attributes['textColor'] );
+	$has_custom_text_color = ! empty( $attributes['style']['color']['text'] );
+	if ( $has_named_text_color ) {
+		$classnames[] = sprintf( 'has-text-color has-%s-color', $attributes['textColor'] );
+	} elseif ( $has_custom_text_color ) {
+		// If a custom 'textColor' was selected instead of a preset, still add the generic `has-text-color` class.
+		$classnames[] = 'has-text-color';
+	}
+
+	// Background color.
+	$has_named_background_color  = ! empty( $attributes['backgroundColor'] );
+	$has_custom_background_color = ! empty( $attributes['style']['color']['background'] );
+	$has_named_gradient          = ! empty( $attributes['gradient'] );
+	$has_custom_gradient         = ! empty( $attributes['style']['color']['gradient'] );
+	if (
+		$has_named_background_color ||
+		$has_custom_background_color ||
+		$has_named_gradient ||
+		$has_custom_gradient
+	) {
+		$classnames[] = 'has-background';
+	}
+	if ( $has_named_background_color ) {
+		$classnames[] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
+	}
+	if ( $has_named_gradient ) {
+		$classnames[] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
+	}
+
+	return implode( ' ', $classnames );
 }
