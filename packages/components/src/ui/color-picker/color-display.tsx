@@ -111,7 +111,20 @@ export const ColorDisplay = ( {
 	const props = { color, enableAlpha };
 	const Component = getComponent( colorType );
 	const copyRef = useCopyToClipboard< HTMLDivElement >(
-		color.toUpperCase(),
+		() => {
+			switch ( colorType ) {
+				case 'hsl': {
+					return colorize( color ).toHslString();
+				}
+				case 'rgb': {
+					return colorize( color ).toRgbString();
+				}
+				default:
+				case 'hex': {
+					return color.toUpperCase();
+				}
+			}
+		},
 		() => setCopiedColor( color )
 	);
 	return (
