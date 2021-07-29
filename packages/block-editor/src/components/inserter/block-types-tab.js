@@ -8,6 +8,7 @@ import { map, flow, groupBy, orderBy } from 'lodash';
  */
 import { __, _x } from '@wordpress/i18n';
 import { useMemo, useEffect } from '@wordpress/element';
+import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -71,6 +72,19 @@ export function BlockTypesTab( {
 	// Hide block preview on unmount.
 	useEffect( () => () => onHover( null ), [] );
 
+	/**
+	 * The inserter contains a big number of blocks and opening it is a costful operation.
+	 * The rendering is the most costful part of it, in order to improve the responsiveness
+	 * of the "opening" action, these lazy lists allow us to render the inserter category per category,
+	 * once all the categories are rendered, we start rendering the collections and the uncategorized block types.
+	 */
+	const currentlyRenderedCategories = useAsyncList( categories );
+	const didRenderAllCategories =
+		categories.length === currentlyRenderedCategories;
+	const currentlyRenderedCollections = useAsyncList(
+		didRenderAllCategories ? collections : []
+	);
+
 	return (
 		<InserterListbox>
 			<div>
@@ -85,7 +99,7 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-				{ map( categories, ( category ) => {
+				{ map( currentlyRenderedCategories, ( category ) => {
 					const categoryItems = itemsPerCategory[ category.slug ];
 					if ( ! categoryItems || ! categoryItems.length ) {
 						return null;
@@ -106,7 +120,7 @@ export function BlockTypesTab( {
 					);
 				} ) }
 
-				{ uncategorizedItems.length > 0 && (
+				{ didRenderAllCategories && uncategorizedItems.length > 0 && (
 					<InserterPanel
 						className="block-editor-inserter__uncategorized-blocks-panel"
 						title={ __( 'Uncategorized' ) }
@@ -120,27 +134,30 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-				{ map( collections, ( collection, namespace ) => {
-					const collectionItems = itemsPerCollection[ namespace ];
-					if ( ! collectionItems || ! collectionItems.length ) {
-						return null;
-					}
+				{ map(
+					currentlyRenderedCollections,
+					( collection, namespace ) => {
+						const collectionItems = itemsPerCollection[ namespace ];
+						if ( ! collectionItems || ! collectionItems.length ) {
+							return null;
+						}
 
-					return (
-						<InserterPanel
-							key={ namespace }
-							title={ collection.title }
-							icon={ collection.icon }
-						>
-							<BlockTypesList
-								items={ collectionItems }
-								onSelect={ onSelectItem }
-								onHover={ onHover }
-								label={ collection.title }
-							/>
-						</InserterPanel>
-					);
-				} ) }
+						return (
+							<InserterPanel
+								key={ namespace }
+								title={ collection.title }
+								icon={ collection.icon }
+							>
+								<BlockTypesList
+									items={ collectionItems }
+									onSelect={ onSelectItem }
+									onHover={ onHover }
+									label={ collection.title }
+								/>
+							</InserterPanel>
+						);
+					}
+				) }
 			</div>
 		</InserterListbox>
 	);
