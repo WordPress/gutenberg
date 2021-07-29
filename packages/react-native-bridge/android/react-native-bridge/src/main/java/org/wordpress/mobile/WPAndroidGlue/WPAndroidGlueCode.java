@@ -29,6 +29,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
@@ -221,7 +222,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnBlockTypeImpressionsEventListener {
-        void onSetBlockTypeImpressions(ReadableMap impressions);
+        void onSetBlockTypeImpressions(Map<String, Double> impressions);
         Map<String, Double> onRequestBlockTypeImpressions();
     }
 
@@ -516,7 +517,13 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void setBlockTypeImpressions(ReadableMap impressions) {
+            public void setBlockTypeImpressions(ReadableMap newImpressions) {
+                Map<String, Double> impressions = new HashMap<>();
+                ReadableMapKeySetIterator iterator = newImpressions.keySetIterator();
+                while (iterator.hasNextKey()) {
+                    String key = iterator.nextKey();
+                    impressions.put(key, newImpressions.getDouble(key));
+                }
                 mOnBlockTypeImpressionsEventListener.onSetBlockTypeImpressions(impressions);
             }
         }, mIsDarkMode);
