@@ -1,18 +1,14 @@
 /**
- * External dependencies
- */
-import { useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
-
-/**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
 import { useFormGroupContextId } from '../form-group';
-import { useText } from '../text';
+import { useText } from '../../text';
 import * as styles from './styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'label'>} props
+ * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'label'>} props
  */
 export function useControlLabel( props ) {
 	const {
@@ -29,10 +25,12 @@ export function useControlLabel( props ) {
 		truncate,
 	} );
 
+	const cx = useCx();
+
 	const htmlFor = useFormGroupContextId( htmlForProp );
 	const classes = cx(
 		styles.ControlLabel,
-		styles[ size ],
+		styles[ /** @type {'small' | 'medium' | 'large'} */ ( size ) ],
 		className,
 		isBlock ? styles.block : styles.inline
 	);

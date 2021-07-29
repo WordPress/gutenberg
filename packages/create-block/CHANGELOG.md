@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 2.5.0 (2021-07-21)
+
+### Enhancements
+
+-   Add support for the new `version` field in the `block.json` metadata file ([#33075](https://github.com/WordPress/gutenberg/pull/33075)).
+
+## 2.4.0 (2021-07-21)
+
+### Enhancement
+
+-   Plugin scaffolded with the `esnext` template requires WordPress 5.8 now ([#33252](https://github.com/WordPress/gutenberg/pull/33252).
+-   Block scaffolded with the `esnext` template is now registered from `block.json` with the `register_block_type` helper ([#33252](https://github.com/WordPress/gutenberg/pull/33252)).
+
+## 2.3.0 (2021-04-29)
+
+### Enhancement
+
+-   Rename `format:js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
+-   Updated `.editorconfig` template files to work with automatic file formatting ([#30794](https://github.com/WordPress/gutenberg/pull/30794)).
+
 ## 2.2.0 (2021-04-06)
 
 ### Enhancement

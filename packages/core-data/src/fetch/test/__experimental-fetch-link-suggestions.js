@@ -40,12 +40,14 @@ jest.mock( '@wordpress/api-fetch', () =>
 						title: 'Gallery',
 						url: 'http://wordpress.local/type/gallery/',
 						type: 'post-format',
+						kind: 'taxonomy',
 					},
 					{
 						id: 'quote',
 						title: 'Quote',
 						url: 'http://wordpress.local/type/quote/',
 						type: 'post-format',
+						kind: 'taxonomy',
 					},
 				] );
 			case '/wp/v2/search?search=&per_page=3&type=post&subtype=page':
@@ -93,6 +95,7 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Contact Page',
 					type: 'page',
 					url: 'http://wordpress.local/contact-page/',
+					kind: 'post-type',
 				},
 			] )
 		);
@@ -108,12 +111,14 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Cats',
 					url: 'http://wordpress.local/category/cats/',
 					type: 'category',
+					kind: 'taxonomy',
 				},
 				{
 					id: 1,
 					title: 'Uncategorized',
 					url: 'http://wordpress.local/category/uncategorized/',
 					type: 'category',
+					kind: 'taxonomy',
 				},
 			] )
 		);
@@ -128,12 +133,14 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Gallery',
 					url: 'http://wordpress.local/type/gallery/',
 					type: 'post-format',
+					kind: 'taxonomy',
 				},
 				{
 					id: 'quote',
 					title: 'Quote',
 					url: 'http://wordpress.local/type/quote/',
 					type: 'post-format',
+					kind: 'taxonomy',
 				},
 			] )
 		);
@@ -155,30 +162,35 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Contact Page',
 					url: 'http://wordpress.local/contact-page/',
 					type: 'page',
+					kind: 'post-type',
 				},
 				{
 					id: 9,
 					title: 'Cats',
 					url: 'http://wordpress.local/category/cats/',
 					type: 'category',
+					kind: 'taxonomy',
 				},
 				{
 					id: 1,
 					title: 'Uncategorized',
 					url: 'http://wordpress.local/category/uncategorized/',
 					type: 'category',
+					kind: 'taxonomy',
 				},
 				{
 					id: 'gallery',
 					title: 'Gallery',
 					url: 'http://wordpress.local/type/gallery/',
 					type: 'post-format',
+					kind: 'taxonomy',
 				},
 				{
 					id: 'quote',
 					title: 'Quote',
 					url: 'http://wordpress.local/type/quote/',
 					type: 'post-format',
+					kind: 'taxonomy',
 				},
 			] )
 		);
@@ -195,6 +207,7 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Limit Case',
 					url: 'http://wordpress.local/limit-case/',
 					type: 'page',
+					kind: 'post-type',
 				},
 			] )
 		);
@@ -211,6 +224,7 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Page Case',
 					url: 'http://wordpress.local/page-case/',
 					type: 'page',
+					kind: 'post-type',
 				},
 			] )
 		);

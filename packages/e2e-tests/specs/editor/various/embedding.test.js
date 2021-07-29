@@ -33,6 +33,15 @@ const MOCK_EMBED_RICH_SUCCESS_RESPONSE = {
 	version: '1.0',
 };
 
+const MOCK_EMBED_PHOTO_SUCCESS_RESPONSE = {
+	url: 'https://cloudup.com/cQFlxqtY4ob',
+	html: '<p>Mock success response.</p>',
+	type: 'photo',
+	provider_name: 'Cloudup',
+	provider_url: 'https://cloudup.com',
+	version: '1.0',
+};
+
 const MOCK_EMBED_VIDEO_SUCCESS_RESPONSE = {
 	url: 'https://www.youtube.com/watch?v=lXMskKTw3Bc',
 	html: '<iframe width="16" height="9"></iframe>',
@@ -123,7 +132,7 @@ const MOCK_RESPONSES = [
 	},
 	{
 		match: createEmbeddingMatcher( 'https://cloudup.com/cQFlxqtY4ob' ),
-		onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_PHOTO_SUCCESS_RESPONSE ),
 	},
 	{
 		match: createEmbeddingMatcher( 'https://twitter.com/notnownikki' ),
@@ -208,6 +217,10 @@ describe( 'Embedding content', () => {
 
 		// Photo content. Should render valid figure element.
 		await insertEmbed( 'https://cloudup.com/cQFlxqtY4ob' );
+		await page.waitForSelector(
+			'iframe[title="Embedded content from cloudup"'
+		);
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

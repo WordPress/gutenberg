@@ -15,7 +15,7 @@ import { createComponent } from '../create-component';
 
 describe( 'createComponent', () => {
 	/**
-	 * @param {import('@wp-g2/create-styles').ViewOwnProps<{}, 'output'>} props
+	 * @param {import('../context').PolymorphicComponentProps<{}, 'output'>} props
 	 */
 	const useHook = ( props ) => ( { ...props, 'data-hook-test-prop': true } );
 	const name = 'Output';
@@ -23,6 +23,7 @@ describe( 'createComponent', () => {
 		as: 'output',
 		name,
 		useHook,
+		memo: true,
 	} );
 	const Output = createComponent( {
 		as: 'output',
@@ -40,7 +41,7 @@ describe( 'createComponent', () => {
 		expect( container.firstChild.innerHTML ).toBe( 'Example output' );
 	} );
 
-	it( 'should create a memoized, ref-forwarded component by default', () => {
+	it( 'should create a memoized, ref-forwarded component', () => {
 		expect( MemoizedOutput.$$typeof ).toEqual( Symbol.for( 'react.memo' ) );
 		const ref = createRef();
 		const wrapper = render(

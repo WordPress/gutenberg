@@ -43,6 +43,16 @@ function PatternInserterPanel( {
 		);
 	};
 
+	// In iOS-based mobile devices, the onBlur will fire when selecting an option
+	// from a Select element. To prevent closing the useDialog on iOS devices, we
+	// stop propagating the onBlur event if there is no relatedTarget, which means
+	// that the user most likely did not click on an element within the editor canvas.
+	const onBlur = ( event ) => {
+		if ( ! event?.relatedTarget ) {
+			event.stopPropagation();
+		}
+	};
+
 	return (
 		<>
 			<div className={ getPanelHeaderClassName() }>
@@ -52,6 +62,7 @@ function PatternInserterPanel( {
 					hideLabelFromVision
 					value={ selectedCategory.name }
 					onChange={ onChangeSelect }
+					onBlur={ onBlur }
 					options={ categoryOptions() }
 				/>
 			</div>

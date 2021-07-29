@@ -1,5 +1,7 @@
 <!-- Learn the overall process and best practices for pull requests at https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/repository-management.md#pull-requests. -->
 
+<!-- Gutenberg's license is in the process of updating to be dual-licensed under the GPL and MPL. As part of that transition, all new contributions are dual-licensed. For more information, see: https://github.com/WordPress/gutenberg/blob/trunk/LICENSE.md -->
+
 ## Description
 <!-- Please describe what you have changed or added -->
 

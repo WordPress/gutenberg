@@ -17,27 +17,17 @@ Renders the block's variations which have the `transform` option set in `scope` 
 
 ```jsx
 import { useSelect } from '@wordpress/data';
-import {
-	__experimentalBlockVariationTransforms as BlockVariationTransforms,
-} from '@wordpress/block-editor';
+import { __experimentalBlockVariationTransforms as BlockVariationTransforms } from '@wordpress/block-editor';
 
 const MyBlockVariationTransforms = () => {
-	const { selectedBlockClientId } = useSelect(
-		( select ) => {
-			const { getSelectedBlockClientId } = select(
-				'core/block-editor'
-			);
-			return {
-				selectedBlockClientId: getSelectedBlockClientId(),
-			};
-		}
-	);
+	const { selectedBlockClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+		return {
+			selectedBlockClientId: getSelectedBlockClientId(),
+		};
+	} );
 
-	return (
-		<BlockVariationTransforms
-			blockClientId={ selectedBlockClientId }
-		/>
-	);
+	return <BlockVariationTransforms blockClientId={ selectedBlockClientId } />;
 };
 ```
 
@@ -47,7 +37,7 @@ const MyBlockVariationTransforms = () => {
 
 The block's client id.
 
-- Type: `string`
+-   Type: `string`
 
 ## Related components
 

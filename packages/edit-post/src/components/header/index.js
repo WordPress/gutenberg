@@ -20,8 +20,8 @@ import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 import MainDashboardButton from './main-dashboard-button';
-import TemplateSaveButton from './template-save-button';
 import { store as editPostStore } from '../../store';
+import TemplateTitle from './template-title';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
@@ -30,7 +30,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isSaving,
 		showIconLabels,
 		hasReducedUI,
-		isEditingTemplate,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -44,7 +43,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			hasReducedUI: select( editPostStore ).isFeatureActive(
 				'reducedUI'
 			),
-			isEditingTemplate: select( editPostStore ).isEditingTemplate(),
 		} ),
 		[]
 	);
@@ -62,37 +60,33 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar />
+				<TemplateTitle />
 			</div>
 			<div className="edit-post-header__settings">
-				{ ! isEditingTemplate && (
-					<>
-						{ ! isPublishSidebarOpened && (
-							// This button isn't completely hidden by the publish sidebar.
-							// We can't hide the whole toolbar when the publish sidebar is open because
-							// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
-							// We track that DOM node to return focus to the PostPublishButtonOrToggle
-							// when the publish sidebar has been closed.
-							<PostSavedState
-								forceIsDirty={ hasActiveMetaboxes }
-								forceIsSaving={ isSaving }
-								showIconLabels={ showIconLabels }
-							/>
-						) }
-						<DevicePreview />
-						<PostPreviewButton
-							forceIsAutosaveable={ hasActiveMetaboxes }
-							forcePreviewLink={ isSaving ? null : undefined }
-						/>
-						<PostPublishButtonOrToggle
-							forceIsDirty={ hasActiveMetaboxes }
-							forceIsSaving={ isSaving }
-							setEntitiesSavedStatesCallback={
-								setEntitiesSavedStatesCallback
-							}
-						/>
-					</>
+				{ ! isPublishSidebarOpened && (
+					// This button isn't completely hidden by the publish sidebar.
+					// We can't hide the whole toolbar when the publish sidebar is open because
+					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+					// We track that DOM node to return focus to the PostPublishButtonOrToggle
+					// when the publish sidebar has been closed.
+					<PostSavedState
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+						showIconLabels={ showIconLabels }
+					/>
 				) }
-				{ isEditingTemplate && <TemplateSaveButton /> }
+				<DevicePreview />
+				<PostPreviewButton
+					forceIsAutosaveable={ hasActiveMetaboxes }
+					forcePreviewLink={ isSaving ? null : undefined }
+				/>
+				<PostPublishButtonOrToggle
+					forceIsDirty={ hasActiveMetaboxes }
+					forceIsSaving={ isSaving }
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
+				/>
 				{ ( isLargeViewport || ! showIconLabels ) && (
 					<>
 						<PinnedItems.Slot scope="core/edit-post" />

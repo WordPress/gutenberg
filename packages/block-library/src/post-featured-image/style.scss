@@ -1,9 +1,16 @@
 .wp-block-post-featured-image {
+	margin-left: 0;
+	margin-right: 0;
 	a {
 		display: inline-block;
 	}
 	img {
 		max-width: 100%;
 		height: auto;
+	}
+
+	&.alignwide img,
+	&.alignfull img {
+		width: 100%;
 	}
 }

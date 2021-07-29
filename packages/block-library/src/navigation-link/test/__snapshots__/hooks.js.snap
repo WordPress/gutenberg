@@ -17,6 +17,7 @@ Object {
     },
     Object {
       "attributes": Object {
+        "kind": "post-type",
         "type": "post",
       },
       "description": "A link to a post.",
@@ -34,6 +35,7 @@ Object {
     },
     Object {
       "attributes": Object {
+        "kind": "post-type",
         "type": "page",
       },
       "description": "A link to a page.",
@@ -51,6 +53,7 @@ Object {
     },
     Object {
       "attributes": Object {
+        "kind": "taxonomy",
         "type": "category",
       },
       "description": "A link to a category.",
@@ -70,6 +73,7 @@ Object {
     },
     Object {
       "attributes": Object {
+        "kind": "taxonomy",
         "type": "tag",
       },
       "description": "A link to a tag.",

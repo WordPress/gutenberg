@@ -36,11 +36,15 @@ module.exports = {
 	},
 	snapshotSerializers: [
 		'enzyme-to-json/serializer',
-		'jest-emotion',
+		'@emotion/jest/serializer',
 		'snapshot-diff/serializer',
 	],
 	watchPlugins: [
 		'jest-watch-typeahead/filename',
 		'jest-watch-typeahead/testname',
+	],
+	reporters: [
+		'default',
+		'<rootDir>packages/scripts/config/jest-github-actions-reporter.js',
 	],
 };

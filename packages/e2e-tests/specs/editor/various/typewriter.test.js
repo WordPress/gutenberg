@@ -119,6 +119,10 @@ describe( 'TypeWriter', () => {
 				wp.dom.getScrollContainer( document.activeElement )
 					.scrollTop === 2
 		);
+		// Wait for the caret rectangle to be recalculated.
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 
 		// After hitting Enter to create a new block, the caret screen
 		// coordinates should be the same.

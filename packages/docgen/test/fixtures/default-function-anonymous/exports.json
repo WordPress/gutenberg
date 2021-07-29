@@ -12,10 +12,7 @@
 			"column": 28
 		}
 	},
-	"range": [
-		41,
-		69
-	],
+	"range": [ 41, 69 ],
 	"declaration": {
 		"type": "FunctionDeclaration",
 		"start": 56,
@@ -30,10 +27,7 @@
 				"column": 28
 			}
 		},
-		"range": [
-			56,
-			69
-		],
+		"range": [ 56, 69 ],
 		"id": null,
 		"generator": false,
 		"expression": false,
@@ -53,10 +47,7 @@
 					"column": 28
 				}
 			},
-			"range": [
-				67,
-				69
-			],
+			"range": [ 67, 69 ],
 			"body": []
 		}
 	},
@@ -66,10 +57,7 @@
 			"value": "*\n * Function declaration example.\n ",
 			"start": 0,
 			"end": 40,
-			"range": [
-				0,
-				40
-			],
+			"range": [ 0, 40 ],
 			"loc": {
 				"start": {
 					"line": 1,

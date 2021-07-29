@@ -12,10 +12,7 @@
 			"column": 40
 		}
 	},
-	"range": [
-		38,
-		78
-	],
+	"range": [ 38, 78 ],
 	"declaration": {
 		"type": "ClassDeclaration",
 		"start": 53,
@@ -30,10 +27,7 @@
 				"column": 40
 			}
 		},
-		"range": [
-			53,
-			78
-		],
+		"range": [ 53, 78 ],
 		"id": {
 			"type": "Identifier",
 			"start": 59,
@@ -48,10 +42,7 @@
 					"column": 37
 				}
 			},
-			"range": [
-				59,
-				75
-			],
+			"range": [ 59, 75 ],
 			"name": "ClassDeclaration"
 		},
 		"superClass": null,
@@ -69,10 +60,7 @@
 					"column": 40
 				}
 			},
-			"range": [
-				76,
-				78
-			],
+			"range": [ 76, 78 ],
 			"body": []
 		}
 	},
@@ -82,10 +70,7 @@
 			"value": "*\n * Class declaration example.\n ",
 			"start": 0,
 			"end": 37,
-			"range": [
-				0,
-				37
-			],
+			"range": [ 0, 37 ],
 			"loc": {
 				"start": {
 					"line": 1,

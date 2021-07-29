@@ -1,6 +1,6 @@
 # BottomSheetSelectControl
 
-`BottomSheetSelectControl` allows users to select an item from a single-option menu just like [`SelectControl`](/packages/components/src/select-control/readme.md), 
+`BottomSheetSelectControl` allows users to select an item from a single-option menu just like [`SelectControl`](/packages/components/src/select-control/readme.md),
 However, instead of opening up the selection in a modal, the selection opens up in a BottomSheet.
 
 ### Usage
@@ -87,4 +87,11 @@ Function called with the control's internal state changes. The `selectedItem` pr
 Can be used to externally control the value of the control, like in the `MyControlledCustomSelectControl` example above.
 
 -   Type: `Object`
+-   Required: No
+
+#### icon
+
+The icon for the control.
+
+-   Type: `Icon component`
 -   Required: No

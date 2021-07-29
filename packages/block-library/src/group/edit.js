@@ -7,7 +7,7 @@ import {
 	useBlockProps,
 	InspectorAdvancedControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/components';
@@ -25,14 +25,10 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
-	const defaultLayout = useEditorFeature( 'layout' ) || {};
+	const defaultLayout = useSetting( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
-	const { contentSize, wideSize } = usedLayout;
-	const alignments =
-		contentSize || wideSize
-			? [ 'wide', 'full' ]
-			: [ 'left', 'center', 'right' ];
+
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps(
 		themeSupportsLayout
@@ -43,11 +39,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments: themeSupportsLayout ? alignments : undefined,
-			},
+			__experimentalLayout: themeSupportsLayout ? usedLayout : undefined,
 		}
 	);
 

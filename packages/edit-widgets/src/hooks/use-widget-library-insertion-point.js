@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -11,7 +13,7 @@ import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../store/utils';
 const useWidgetLibraryInsertionPoint = () => {
 	const firstRootId = useSelect( ( select ) => {
 		// Default to the first widget area
-		const { getEntityRecord } = select( 'core' );
+		const { getEntityRecord } = select( coreStore );
 		const widgetAreasPost = getEntityRecord(
 			KIND,
 			POST_TYPE,
@@ -27,7 +29,7 @@ const useWidgetLibraryInsertionPoint = () => {
 				getBlockSelectionEnd,
 				getBlockOrder,
 				getBlockIndex,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			const clientId = getBlockSelectionEnd() || firstRootId;
 			const rootClientId = getBlockRootClientId( clientId );

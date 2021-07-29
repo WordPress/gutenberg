@@ -19,6 +19,8 @@ const getInput = () =>
 	document.body.querySelector( '.components-unit-control input' );
 const getSelect = () =>
 	document.body.querySelector( '.components-unit-control select' );
+const getUnitLabel = () =>
+	document.body.querySelector( '.components-unit-control__unit-label' );
 
 const fireKeyDown = ( data ) =>
 	fireEvent.keyDown( document.activeElement || document.body, data );
@@ -49,6 +51,16 @@ describe( 'UnitControl', () => {
 
 			expect( input ).toBeTruthy();
 			expect( select ).toBeFalsy();
+		} );
+
+		it( 'should render label if single units', () => {
+			render( <UnitControl units={ [ { value: '%', label: '%' } ] } /> );
+
+			const select = getSelect();
+			const label = getUnitLabel();
+
+			expect( select ).toBeFalsy();
+			expect( label ).toBeTruthy();
 		} );
 	} );
 
@@ -207,6 +219,26 @@ describe( 'UnitControl', () => {
 			fireEvent.change( select, { target: { value: 'pt' } } );
 
 			expect( state ).toBe( '50pt' );
+		} );
+
+		it( 'should set correct unit if single units', () => {
+			let state = '50%';
+			const setState = ( value ) => ( state = value );
+
+			render(
+				<UnitControl
+					value={ state }
+					unit="%"
+					units={ [ { value: '%', label: '%' } ] }
+					onChange={ setState }
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: 62 } } );
+
+			expect( state ).toBe( '62%' );
 		} );
 	} );
 

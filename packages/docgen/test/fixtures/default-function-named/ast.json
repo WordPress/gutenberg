@@ -12,10 +12,7 @@
 			"column": 42
 		}
 	},
-	"range": [
-		41,
-		83
-	],
+	"range": [ 41, 83 ],
 	"body": [
 		{
 			"type": "ExportDefaultDeclaration",
@@ -31,10 +28,7 @@
 					"column": 42
 				}
 			},
-			"range": [
-				41,
-				83
-			],
+			"range": [ 41, 83 ],
 			"declaration": {
 				"type": "FunctionDeclaration",
 				"start": 56,
@@ -49,10 +43,7 @@
 						"column": 42
 					}
 				},
-				"range": [
-					56,
-					83
-				],
+				"range": [ 56, 83 ],
 				"id": {
 					"type": "Identifier",
 					"start": 65,
@@ -67,10 +58,7 @@
 							"column": 37
 						}
 					},
-					"range": [
-						65,
-						78
-					],
+					"range": [ 65, 78 ],
 					"name": "myDeclaration"
 				},
 				"generator": false,
@@ -91,10 +79,7 @@
 							"column": 42
 						}
 					},
-					"range": [
-						81,
-						83
-					],
+					"range": [ 81, 83 ],
 					"body": []
 				}
 			},
@@ -104,10 +89,7 @@
 					"value": "*\n * Function declaration example.\n ",
 					"start": 0,
 					"end": 40,
-					"range": [
-						0,
-						40
-					],
+					"range": [ 0, 40 ],
 					"loc": {
 						"start": {
 							"line": 1,
@@ -129,10 +111,7 @@
 			"value": "*\n * Function declaration example.\n ",
 			"start": 0,
 			"end": 40,
-			"range": [
-				0,
-				40
-			],
+			"range": [ 0, 40 ],
 			"loc": {
 				"start": {
 					"line": 1,

@@ -51,7 +51,7 @@ describe( 'Post visibility', () => {
 		);
 		await (
 			await page.$x(
-				'//td[contains(concat(" ", @class, " "), " CalendarDay ")][text() = "15"]'
+				'//td[contains(concat(" ", @class, " "), " CalendarDay ")]/div[contains(concat(" ", @class, " "), " components-datetime__date__day ")][text() = "15"]'
 			)
 		 )[ 0 ].click();
 

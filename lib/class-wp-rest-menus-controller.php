@@ -189,6 +189,10 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		$fields = $this->get_fields_for_response( $request );
 		$data   = $response->get_data();
 
+		if ( in_array( 'locations', $fields, true ) ) {
+			$data['locations'] = $this->get_menu_locations( $nav_menu->term_id );
+		}
+
 		if ( in_array( 'auto_add', $fields, true ) ) {
 			$auto_add         = $this->get_menu_auto_add( $nav_menu->term_id );
 			$data['auto_add'] = $auto_add;
@@ -215,16 +219,14 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	protected function prepare_links( $term ) {
 		$links = parent::prepare_links( $term );
 
-		$locations = get_nav_menu_locations();
+		$locations = $this->get_menu_locations( $term->term_id );
 		$rest_base = 'menu-locations';
-		foreach ( $locations as $menu_name => $menu_id ) {
-			if ( $term->term_id === $menu_id ) {
-				$url                                        = rest_url( sprintf( '__experimental/%s/%s', $rest_base, $menu_name ) );
-				$links['https://api.w.org/menu-location'][] = array(
-					'href'       => $url,
-					'embeddable' => true,
-				);
-			}
+		foreach ( $locations as $location ) {
+			$url                                        = rest_url( sprintf( '__experimental/%s/%s', $rest_base, $location ) );
+			$links['https://api.w.org/menu-location'][] = array(
+				'href'       => $url,
+				'embeddable' => true,
+			);
 		}
 
 		return $links;
@@ -529,6 +531,28 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 		do_action( 'wp_update_nav_menu', $menu_id );
 
 		return $update;
+	}
+
+	/**
+	 * Returns names of the locations assigned to the menu.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param int $menu_id The menu id.
+	 *
+	 * @return string[] $menu_locations The locations assigned to the menu.
+	 */
+	protected function get_menu_locations( $menu_id ) {
+		$locations      = get_nav_menu_locations();
+		$menu_locations = array();
+
+		foreach ( $locations as $location => $assigned_menu_id ) {
+			if ( $menu_id === $assigned_menu_id ) {
+				$menu_locations[] = $location;
+			}
+		}
+
+		return $menu_locations;
 	}
 
 	/**

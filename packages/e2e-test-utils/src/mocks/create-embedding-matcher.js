@@ -7,7 +7,7 @@ import { join } from 'path';
  * Creates a function to determine if a request has a parameter with a certain value.
  *
  * @param {string} parameterName The query parameter to check.
- * @param {string} value The value to check for.
+ * @param {string} value         The value to check for.
  * @return {Function} Function that determines if a request's query parameter is the specified value.
  */
 function parameterEquals( parameterName, value ) {

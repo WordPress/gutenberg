@@ -9,6 +9,11 @@ import { get } from 'lodash';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
 export function PostVisibilityCheck( { hasPublishAction, render } ) {
 	const canEdit = hasPublishAction;
 	return render( { canEdit } );
@@ -16,7 +21,7 @@ export function PostVisibilityCheck( { hasPublishAction, render } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getCurrentPost, getCurrentPostType } = select( 'core/editor' );
+		const { getCurrentPost, getCurrentPostType } = select( editorStore );
 		return {
 			hasPublishAction: get(
 				getCurrentPost(),

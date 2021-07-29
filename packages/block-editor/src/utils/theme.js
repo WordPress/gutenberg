@@ -6,7 +6,7 @@ import { SETTINGS_DEFAULTS } from '../store/defaults';
 /**
  * Given an array of theme colors checks colors for validity
  *
- * @param {Array}   colors  The array of theme colors
+ * @param {Array} colors The array of theme colors
  *
  * @return {Array} The array of valid theme colors or the default colors
  */
@@ -28,7 +28,7 @@ export function validateThemeColors( colors ) {
 /**
  * Given an array of theme gradients checks gradients for validity
  *
- * @param {Array}   gradients  The array of theme gradients
+ * @param {Array} gradients The array of theme gradients
  *
  * @return {Array} The array of valid theme gradients or the default gradients
  */

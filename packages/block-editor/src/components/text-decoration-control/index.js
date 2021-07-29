@@ -21,10 +21,11 @@ const TEXT_DECORATIONS = [
 /**
  * Control to facilitate text decoration selections.
  *
- * @param  {Object}   props                 Component props.
- * @param  {string}   props.value           Currently selected text decoration.
- * @param  {Function} props.onChange        Handles change in text decoration selection.
- * @return {WPElement}                      Text decoration control.
+ * @param {Object}   props          Component props.
+ * @param {string}   props.value    Currently selected text decoration.
+ * @param {Function} props.onChange Handles change in text decoration selection.
+ *
+ * @return {WPElement} Text decoration control.
  */
 export default function TextDecorationControl( { value, onChange } ) {
 	return (

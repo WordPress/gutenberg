@@ -4,6 +4,7 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
+const OptimizeCssAssetsPlugin = require( 'optimize-css-assets-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const path = require( 'path' );
@@ -35,6 +36,9 @@ const cssLoaders = [
 		loader: require.resolve( 'css-loader' ),
 		options: {
 			sourceMap: ! isProduction,
+			modules: {
+				auto: true,
+			},
 		},
 	},
 	{
@@ -43,8 +47,10 @@ const cssLoaders = [
 			// Provide a fallback configuration if there's not
 			// one explicitly available in the project.
 			...( ! hasPostCSSConfig() && {
-				ident: 'postcss',
-				plugins: postcssPlugins,
+				postcssOptions: {
+					ident: 'postcss',
+					plugins: postcssPlugins,
+				},
 			} ),
 		},
 	},
@@ -107,7 +113,7 @@ const config = {
 		splitChunks: {
 			cacheGroups: {
 				style: {
-					test: /[\\/]style\.(sc|sa|c)ss$/,
+					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
 					automaticNameDelimiter: '-',
@@ -218,11 +224,13 @@ const config = {
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
-		new MiniCSSExtractPlugin( { esModule: false, filename: '[name].css' } ),
+		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
 		// MiniCSSExtractPlugin creates JavaScript assets for CSS that are
 		// obsolete and should be removed. Related webpack issue:
 		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/85
 		new FixStyleWebpackPlugin(),
+		// OptimizeCssAssetsPlugin to minify CSS
+		new OptimizeCssAssetsPlugin(),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload
 		// works when running watch mode.
 		! isProduction &&

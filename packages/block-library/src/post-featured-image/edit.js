@@ -31,10 +31,11 @@ const placeholderChip = (
 function PostFeaturedImageDisplay( {
 	attributes: { isLink },
 	setAttributes,
-	context: { postId, postType },
+	context: { postId, postType, queryId },
 	noticeUI,
 	noticeOperations,
 } ) {
+	const isDescendentOfQueryLoop = !! queryId;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postType,
@@ -43,9 +44,16 @@ function PostFeaturedImageDisplay( {
 	);
 	const media = useSelect(
 		( select ) =>
-			featuredImage && select( coreStore ).getMedia( featuredImage ),
+			featuredImage &&
+			select( coreStore ).getEntityRecord(
+				'root',
+				'media',
+				featuredImage,
+				{ context: 'view' }
+			),
 		[ featuredImage ]
 	);
+	const blockProps = useBlockProps();
 	const onSelectImage = ( value ) => {
 		if ( value?.id ) {
 			setFeaturedImage( value.id );
@@ -56,6 +64,9 @@ function PostFeaturedImageDisplay( {
 		noticeOperations.createErrorNotice( message );
 	}
 	let image;
+	if ( ! featuredImage && isDescendentOfQueryLoop ) {
+		return <div { ...blockProps }>{ placeholderChip }</div>;
+	}
 	if ( ! featuredImage ) {
 		image = (
 			<MediaPlaceholder
@@ -100,8 +111,8 @@ function PostFeaturedImageDisplay( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls group="other">
-				{ !! media && (
+			{ !! media && ! isDescendentOfQueryLoop && (
+				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ featuredImage }
 						mediaURL={ media.source_url }
@@ -110,9 +121,9 @@ function PostFeaturedImageDisplay( {
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
 					/>
-				) }
-			</BlockControls>
-			<div { ...useBlockProps() }>{ image }</div>
+				</BlockControls>
+			) }
+			<figure { ...blockProps }>{ image }</figure>
 		</>
 	);
 }
@@ -120,8 +131,9 @@ function PostFeaturedImageDisplay( {
 const PostFeaturedImageWithNotices = withNotices( PostFeaturedImageDisplay );
 
 export default function PostFeaturedImageEdit( props ) {
+	const blockProps = useBlockProps();
 	if ( ! props.context?.postId ) {
-		return placeholderChip;
+		return <div { ...blockProps }>{ placeholderChip }</div>;
 	}
 	return <PostFeaturedImageWithNotices { ...props } />;
 }

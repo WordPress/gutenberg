@@ -44,8 +44,9 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
     private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
-    private static final String EVENT_NAME_UPDATE_THEME = "updateTheme";
+    private static final String EVENT_NAME_UPDATE_EDITOR_SETTINGS = "updateEditorSettings";
     private static final String EVENT_NAME_SHOW_NOTICE = "showNotice";
+    private static final String EVENT_NAME_SHOW_EDITOR_HELP = "showEditorHelp";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
@@ -57,6 +58,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
     private static final String MAP_KEY_THEME_UPDATE_COLORS = "colors";
     private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
+    private static final String MAP_KEY_THEME_UPDATE_RAW_STYLES = "rawStyles";
     public static final String MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE = "success";
 
     private static final String MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK = "isPreferredColorSchemeDark";
@@ -67,6 +69,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     private static final String MAP_KEY_REPLACE_BLOCK_HTML = "html";
     private static final String MAP_KEY_REPLACE_BLOCK_BLOCK_ID = "clientId";
+
+    public static final String MAP_KEY_FEATURED_IMAGE_ID = "featuredImageId";
 
     private boolean mIsDarkMode;
 
@@ -142,6 +146,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         WritableMap writableMap = new WritableNativeMap();
         Serializable colors = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_COLORS);
         Serializable gradients = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_GRADIENTS);
+        Serializable rawStyles = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_RAW_STYLES);
 
         if (colors != null) {
             writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, Arguments.fromList((ArrayList)colors));
@@ -151,7 +156,15 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             writableMap.putArray(MAP_KEY_THEME_UPDATE_GRADIENTS, Arguments.fromList((ArrayList)gradients));
         }
 
-        emitToJS(EVENT_NAME_UPDATE_THEME, writableMap);
+        if (rawStyles != null) {
+            writableMap.putString(MAP_KEY_THEME_UPDATE_RAW_STYLES, rawStyles.toString());
+        }
+
+        emitToJS(EVENT_NAME_UPDATE_EDITOR_SETTINGS, writableMap);
+    }
+
+    public void showEditorHelp() {
+        emitToJS(EVENT_NAME_SHOW_EDITOR_HELP, null);
     }
 
     @ReactMethod
@@ -226,6 +239,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void setFeaturedImage(final int mediaId) {
+        mGutenbergBridgeJS2Parent.setFeaturedImage(mediaId);
+    }
+
+    @ReactMethod
     public void requestImageFullscreenPreview(String mediaUrl) {
         mGutenbergBridgeJS2Parent.requestImageFullscreenPreview(mediaUrl);
     }
@@ -278,8 +296,9 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void fetchRequest(String path, Promise promise) {
+    public void fetchRequest(String path, boolean enableCaching, Promise promise) {
         mGutenbergBridgeJS2Parent.performRequest(path,
+                enableCaching,
                 promise::resolve,
                 errorBundle -> {
                     WritableMap writableMap = Arguments.makeNativeMap(errorBundle);
@@ -347,6 +366,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 jsCallback.invoke(tooltipShown);
             }
         };
+    }
+
+    @ReactMethod
+    public void requestPreview() {
+        mGutenbergBridgeJS2Parent.requestPreview();
     }
 
     private GutenbergBridgeJS2Parent.MediaSelectedCallback getNewMediaSelectedCallback(final Boolean allowMultipleSelection, final Callback jsCallback) {

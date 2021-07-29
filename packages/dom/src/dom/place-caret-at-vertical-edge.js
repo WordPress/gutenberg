@@ -3,14 +3,15 @@
  */
 import placeCaretAtHorizontalEdge from './place-caret-at-horizontal-edge';
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
+import { assertIsDefined } from '../utils/assert-is-defined';
 
 /**
  * Places the caret at the top or bottom of a given element.
  *
- * @param {Element} container           Focusable element.
- * @param {boolean} isReverse           True for bottom, false for top.
- * @param {DOMRect} [rect]              The rectangle to position the caret with.
- * @param {boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
+ * @param {HTMLElement} container           Focusable element.
+ * @param {boolean}     isReverse           True for bottom, false for top.
+ * @param {DOMRect}     [rect]              The rectangle to position the caret with.
+ * @param {boolean}     [mayUseScroll=true] True to allow scrolling, false to disallow.
  */
 export default function placeCaretAtVerticalEdge(
 	container,
@@ -26,6 +27,8 @@ export default function placeCaretAtVerticalEdge(
 		placeCaretAtHorizontalEdge( container, isReverse );
 		return;
 	}
+
+	container.focus();
 
 	// Offset by a buffer half the height of the caret rect. This is needed
 	// because caretRangeFromPoint may default to the end of the selection if
@@ -62,12 +65,9 @@ export default function placeCaretAtVerticalEdge(
 		return;
 	}
 
+	assertIsDefined( defaultView, 'defaultView' );
 	const selection = defaultView.getSelection();
-	selection.removeAllRanges();
-	selection.addRange( range );
-	container.focus();
-	// Editable was already focussed, it goes back to old range...
-	// This fixes it.
+	assertIsDefined( selection, 'selection' );
 	selection.removeAllRanges();
 	selection.addRange( range );
 }

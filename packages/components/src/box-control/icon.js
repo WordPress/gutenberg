@@ -15,12 +15,24 @@ const BASE_ICON_SIZE = 24;
 export default function BoxControlIcon( {
 	size = 24,
 	side = 'all',
+	sides,
 	...props
 } ) {
-	const top = getSide( side, 'top' );
-	const right = getSide( side, 'right' );
-	const bottom = getSide( side, 'bottom' );
-	const left = getSide( side, 'left' );
+	const isSideDisabled = ( value ) =>
+		sides?.length && ! sides.includes( value );
+
+	const hasSide = ( value ) => {
+		if ( isSideDisabled( value ) ) {
+			return false;
+		}
+
+		return side === 'all' || side === value;
+	};
+
+	const top = hasSide( 'top' ) || hasSide( 'vertical' );
+	const right = hasSide( 'right' ) || hasSide( 'horizontal' );
+	const bottom = hasSide( 'bottom' ) || hasSide( 'vertical' );
+	const left = hasSide( 'left' ) || hasSide( 'horizontal' );
 
 	// Simulates SVG Icon scaling
 	const scale = size / BASE_ICON_SIZE;
@@ -35,8 +47,4 @@ export default function BoxControlIcon( {
 			</Viewbox>
 		</Root>
 	);
-}
-
-function getSide( side, value ) {
-	return side === 'all' || side === value;
 }

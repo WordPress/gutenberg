@@ -63,9 +63,9 @@ With this trick, the different files won't override each other's variables. Unfo
 It turns out there are a few ways to execute anonymous functions in JavaScript, but the most popular is this:
 
 ```js
-( function() {
+( function () {
 	// your code goes here
-} )( )
+} )();
 ```
 
 You wrap your function between parentheses, and then call it like any other named function. This pattern is known as [Immediately-Invoked Function Expression](http://benalman.com/news/2010/11/immediately-invoked-function-expression/), or IIFE for short.
@@ -73,27 +73,27 @@ You wrap your function between parentheses, and then call it like any other name
 This is `first.js` written as an IIFE:
 
 ```js
-( function() {
+( function () {
 	var pluginName = 'MyPlugin';
 	console.log( 'Plugin name is ', pluginName );
-} )( )
+} )();
 ```
 
 And this is `second.js`:
 
 ```js
-( function() {
+( function () {
 	var pluginName = 'DifferentPlugin';
 	console.log( 'Plugin name is ', pluginName );
-} )( )
+} )();
 ```
 
 And this is `third.js`:
 
 ```js
-( function() {
+( function () {
 	console.log( 'Plugin name is ', pluginName );
-} )( )
+} )();
 ```
 
 The code in `first.js` and `second.js` is unaffected by other variables in the global scope, so it's safe and deterministic.
@@ -101,9 +101,9 @@ The code in `first.js` and `second.js` is unaffected by other variables in the g
 On the other hand, `third.js` doesn't declare a `pluginName` variable, but needs to be provided one. IIFEs still allow you to take a variable from the global scope and pass it into your function. Provided that there was a global `window.pluginName` variable, we could rewrite `third.js` as:
 
 ```js
-( function( name ) {
+( function ( name ) {
 	console.log( 'Plugin name is ', name );
-} )( window.pluginName )
+} )( window.pluginName );
 ```
 
 ## Future Changes
