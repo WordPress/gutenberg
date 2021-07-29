@@ -78,13 +78,17 @@
  This is to fix a Chrome-specific bug that occurs if this button is set to "display: none;" 
  For additional context, see: https://github.com/WordPress/gutenberg/pull/33740
 */
+.components-dropdown-menu__menu
+	> .components-menu-group
+	> div
+	> button:nth-child( 2 ) {
 	display: block;
 	min-height: 0;
 	height: 0;
 	padding: 0;
 }
 
-.components-menu-group > div > button:nth-child( 2 ) span {
+.components-menu-group > div > button:nth-child( 2 ) > span {
 	display: none;
 }
 
