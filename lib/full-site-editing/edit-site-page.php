@@ -101,7 +101,9 @@ function gutenberg_edit_site_init( $hook ) {
 			'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
 		)
 	);
-	$settings = apply_filters( 'block_editor_settings_all', $settings );
+
+	$site_editor_context = new WP_Block_Editor_Context();
+	$settings = apply_filters( 'block_editor_settings_all', $settings, $site_editor_context );
 
 	gutenberg_initialize_editor(
 		'edit_site_editor',
