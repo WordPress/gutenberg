@@ -24,7 +24,7 @@ const PanelContext = createContext( {} );
 
 export const usePanelContext = () => useContext( PanelContext );
 
-const isMenuItem = ( item ) => item.type === ProgressiveDisclosurePanelItem;
+const isMenuItem = ( item ) => item?.type === ProgressiveDisclosurePanelItem;
 
 const ProgressiveDisclosurePanel = ( props ) => {
 	const { children, className, label: menuLabel, resetAll, title } = props;
