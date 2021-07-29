@@ -112,4 +112,36 @@ describe( 'fetchUrlData', () => {
 			expect( apiFetch ).toBeCalledTimes( 2 );
 		} );
 	} );
+
+	describe( 'URL validation', () => {
+		it.each( [ '#internal-link' ] )(
+			'errors when an invalid URL is passed',
+			async ( targetUrl ) => {
+				expect( apiFetch ).toBeCalledTimes( 0 );
+
+				await expect( fetchUrlData( targetUrl ) ).rejects.toEqual(
+					expect.stringContaining(
+						`${ targetUrl } is not a valid URL.`
+					)
+				);
+			}
+		);
+		it.each( [
+			'tel:123456',
+			'ftp://something',
+			'mailto:example@wordpress.org',
+			'file:somefilehere',
+		] )(
+			'errors when a non-http protocol (%s) is passed as part of URL',
+			async ( targetUrl ) => {
+				expect( apiFetch ).toBeCalledTimes( 0 );
+
+				await expect( fetchUrlData( targetUrl ) ).rejects.toEqual(
+					expect.stringContaining(
+						`${ targetUrl } does not have a valid protocol.`
+					)
+				);
+			}
+		);
+	} );
 } );

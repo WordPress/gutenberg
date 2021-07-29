@@ -52,9 +52,7 @@ const fetchUrlData = async ( url, options = {} ) => {
 	};
 
 	if ( ! isURL( url ) ) {
-		return Promise.reject(
-			new TypeError( `${ url } is not a valid URL.` )
-		);
+		return Promise.reject( `${ url } is not a valid URL.` );
 	}
 
 	// Test for "http" based URL as it is possible for valid
@@ -67,7 +65,7 @@ const fetchUrlData = async ( url, options = {} ) => {
 		! /^https?:\/\/[^\/\s]/i.test( url )
 	) {
 		return Promise.reject(
-			new TypeError( `${ url } does not have a valid protocol.` )
+			`${ url } does not have a valid protocol. URLs must be "http" based`
 		);
 	}
 
