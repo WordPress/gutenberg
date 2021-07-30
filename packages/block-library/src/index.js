@@ -27,6 +27,7 @@ import * as code from './code';
 import * as columns from './columns';
 import * as column from './column';
 import * as cover from './cover';
+import * as dropdown from './dropdown';
 import * as embed from './embed';
 import * as file from './file';
 import * as html from './html';
@@ -231,6 +232,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					navigation,
 					navigationLink,
 					homeLink,
+					dropdown,
 
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks

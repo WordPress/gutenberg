@@ -1,0 +1,22 @@
+.wp-block-dropdown {
+	position: relative;
+	display: flex;
+
+	button.wp-block-dropdown__submenu-icon.wp-block-dropdown__submenu-icon.wp-block-dropdown__submenu-icon.wp-block-dropdown__submenu-icon {
+		padding: $grid-unit $grid-unit-20;
+		background-color: inherit;
+		color: currentColor;
+		border: none;
+	}
+
+	.wp-block-dropdown__submenu-icon svg {
+		stroke: currentColor;
+	}
+
+	// Custom menu items.
+	// Show submenus on hover.
+	&:hover > .wp-block-dropdown__container {
+		visibility: visible;
+		opacity: 1;
+	}
+}
