@@ -1,4 +1,4 @@
-# Progressive Disclosure Panel
+# ProgressiveDisclosurePanel
 
 These panels provide progressive discovery options for their children. For
 example the controls provided via block supports.
