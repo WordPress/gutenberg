@@ -8,6 +8,11 @@ import { render, fireEvent, screen } from '@testing-library/react';
  */
 import FontSizePicker from '../';
 
+const getUnitSelect = () =>
+	document.body.querySelector( '.components-unit-control select' );
+const getUnitLabel = () =>
+	document.body.querySelector( '.components-unit-control__unit-label' );
+
 describe( 'FontSizePicker', () => {
 	describe( 'onChange values', () => {
 		it( 'should not use units when the initial value is a number', () => {
@@ -20,6 +25,8 @@ describe( 'FontSizePicker', () => {
 				<FontSizePicker value={ fontSize } onChange={ setFontSize } />
 			);
 
+			const unitSelect = getUnitSelect();
+			const unitLabel = getUnitLabel();
 			const input = screen.getByLabelText( 'Custom', {
 				selector: 'input',
 			} );
@@ -27,6 +34,8 @@ describe( 'FontSizePicker', () => {
 			input.focus();
 			fireEvent.change( input, { target: { value: 16 } } );
 
+			expect( unitSelect ).toBeFalsy();
+			expect( unitLabel ).toBeTruthy();
 			expect( fontSize ).toBe( 16 );
 		} );
 
@@ -40,6 +49,8 @@ describe( 'FontSizePicker', () => {
 				<FontSizePicker value={ fontSize } onChange={ setFontSize } />
 			);
 
+			const unitSelect = getUnitSelect();
+			const unitLabel = getUnitLabel();
 			const input = screen.getByLabelText( 'Custom', {
 				selector: 'input',
 			} );
@@ -47,6 +58,8 @@ describe( 'FontSizePicker', () => {
 			input.focus();
 			fireEvent.change( input, { target: { value: 16 } } );
 
+			expect( unitSelect ).toBeTruthy();
+			expect( unitLabel ).toBeFalsy();
 			expect( fontSize ).toBe( '16px' );
 		} );
 
@@ -71,6 +84,8 @@ describe( 'FontSizePicker', () => {
 				/>
 			);
 
+			const unitSelect = getUnitSelect();
+			const unitLabel = getUnitLabel();
 			const input = screen.getByLabelText( 'Custom', {
 				selector: 'input',
 			} );
@@ -78,6 +93,8 @@ describe( 'FontSizePicker', () => {
 			input.focus();
 			fireEvent.change( input, { target: { value: 16 } } );
 
+			expect( unitSelect ).toBeFalsy();
+			expect( unitLabel ).toBeTruthy();
 			expect( fontSize ).toBe( 16 );
 		} );
 
@@ -102,6 +119,8 @@ describe( 'FontSizePicker', () => {
 				/>
 			);
 
+			const unitSelect = getUnitSelect();
+			const unitLabel = getUnitLabel();
 			const input = screen.getByLabelText( 'Custom', {
 				selector: 'input',
 			} );
@@ -109,6 +128,8 @@ describe( 'FontSizePicker', () => {
 			input.focus();
 			fireEvent.change( input, { target: { value: 16 } } );
 
+			expect( unitSelect ).toBeTruthy();
+			expect( unitLabel ).toBeFalsy();
 			expect( fontSize ).toBe( '16px' );
 		} );
 	} );

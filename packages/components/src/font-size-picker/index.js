@@ -133,7 +133,7 @@ function FontSizePicker(
 								);
 							}
 						} }
-						units={ units }
+						units={ hasUnits ? units : false }
 					/>
 				) }
 				<Button
