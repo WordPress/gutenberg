@@ -23,7 +23,6 @@ exports[`MoreMenu should match snapshot 1`] = `
     }
     toggleProps={
       Object {
-        "isTertiary": undefined,
         "showTooltip": true,
         "tooltipPosition": "bottom",
       }

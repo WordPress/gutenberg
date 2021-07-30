@@ -36,14 +36,14 @@ Given a block type, a block variation is a predefined set of its initial attribu
 
 **More on Blocks**
 
-- **[Block API](/docs/reference-guides/block-api/README.md)**
-- **[Tutorial: Building A Custom Block](/docs/getting-started/tutorials/create-block/README.md)**
+-   **[Block API](/docs/reference-guides/block-api/README.md)**
+-   **[Tutorial: Building A Custom Block](/docs/getting-started/tutorials/create-block/README.md)**
 
 ## Reusable Blocks
 
-A reusable blocks is a block (or multiple blocks) that can be inserted and edited globally at once. If a reusable block is edited in one place, those changes are reflected across all posts and pages that that block is used. Examples of reusable blocks include a block consisting of a heading whose content and a custom color that would be appear on multiple pages of the site and sidebar widgets that would appear on every page. 
+A reusable blocks is a block (or multiple blocks) that can be inserted and edited globally at once. If a reusable block is edited in one place, those changes are reflected across all posts and pages that that block is used. Examples of reusable blocks include a block consisting of a heading whose content and a custom color that would be appear on multiple pages of the site and sidebar widgets that would appear on every page.
 
-Any edits to a reusable block will appear on every other use of that block, saving time from having to make the same edit on different posts. 
+Any edits to a reusable block will appear on every other use of that block, saving time from having to make the same edit on different posts.
 
 In technical details, reusable blocks are stored as a hidden post type (`wp_block`) and are dynamic blocks that "ref" or reference the `post_id` and return the `post_content` for that block.
 

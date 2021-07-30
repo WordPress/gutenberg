@@ -1,4 +1,4 @@
-# Block Transforms
+# Transforms
 
 Block Transforms is the API that allows a block to be transformed _from_ and _to_ other blocks, as well as _from_ other entities. Existing entities that work with this API include shortcodes, files, regular expressions, and raw DOM nodes.
 
@@ -8,26 +8,30 @@ A block declares which transformations it supports via the optional `transforms`
 
 ```js
 export const settings = {
-    title: 'My Block Title',
-    description: 'My block description',
-    /* ... */
-    transforms: {
-        from: [ /* supported from transforms */ ],
-        to: [ /* supported to transforms */ ],
-    }
-}
+	title: 'My Block Title',
+	description: 'My block description',
+	/* ... */
+	transforms: {
+		from: [
+			/* supported from transforms */
+		],
+		to: [
+			/* supported to transforms */
+		],
+	},
+};
 ```
 
 ## Transformations Types
 
 This section goes through the existing types of transformations blocks support:
 
-* block
-* enter
-* files
-* prefix
-* raw
-* shortcode
+-   block
+-   enter
+-   files
+-   prefix
+-   raw
+-   shortcode
 
 ### Block
 
@@ -35,12 +39,12 @@ This type of transformations support both _from_ and _to_ directions, allowing b
 
 A transformation of type `block` is an object that takes the following parameters:
 
-- **type** _(string)_: the value `block`.
-- **blocks** _(array)_: a list of known block types. It also accepts the wildcard value (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
-- **transform** _(function)_: a callback that receives the attributes and inner blocks of the block being processed. It should return a block object or an array of block objects.
-- **isMatch** _(function, optional)_: a callback that receives the block attributes and should return a boolean. Returning `false` from this function will prevent the transform from being available and displayed as an option to the user.
-- **isMultiBlock** _(boolean, optional)_: whether the transformation can be applied when multiple blocks are selected. If true, the `transform` function's first parameter will be an array containing each selected block's attributes, and the second an array of each selected block's inner blocks. False by default.
-- **priority** _(number, optional)_: controls the priority with which a transformation is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **type** _(string)_: the value `block`.
+-   **blocks** _(array)_: a list of known block types. It also accepts the wildcard value (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
+-   **transform** _(function)_: a callback that receives the attributes and inner blocks of the block being processed. It should return a block object or an array of block objects.
+-   **isMatch** _(function, optional)_: a callback that receives the block attributes and should return a boolean. Returning `false` from this function will prevent the transform from being available and displayed as an option to the user.
+-   **isMultiBlock** _(boolean, optional)_: whether the transformation can be applied when multiple blocks are selected. If true, the `transform` function's first parameter will be an array containing each selected block's attributes, and the second an array of each selected block's inner blocks. False by default.
+-   **priority** _(number, optional)_: controls the priority with which a transformation is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from Paragraph block to Heading block**
 
@@ -48,6 +52,7 @@ To declare this transformation we add the following code into the heading block 
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 transforms: {
     from: [
@@ -63,7 +68,9 @@ transforms: {
     ]
 },
 ```
+
 {% ES5 %}
+
 ```js
 transforms: {
     from: [
@@ -79,6 +86,7 @@ transforms: {
     ]
 },
 ```
+
 {% end %}
 
 **Example: blocks that have InnerBlocks**
@@ -87,6 +95,7 @@ A block with InnerBlocks can also be transformed from and to another block with 
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 transforms: {
     to: [
@@ -104,7 +113,9 @@ transforms: {
     ],
 },
 ```
+
 {% ES5 %}
+
 ```js
 transforms: {
     to: [
@@ -122,6 +133,7 @@ transforms: {
     ],
 },
 ```
+
 {% end %}
 
 ### Enter
@@ -130,10 +142,10 @@ This type of transformations support the _from_ direction, allowing blocks to be
 
 A transformation of type `enter` is an object that takes the following parameters:
 
-- **type** _(string)_: the value `enter`.
-- **regExp** _(RegExp)_: the Regular Expression to use as a matcher. If the value matches, the transformation will be applied.
-- **transform** _(function)_: a callback that receives the value that has been entered. It should return a block object or an array of block objects.
-- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **type** _(string)_: the value `enter`.
+-   **regExp** _(RegExp)_: the Regular Expression to use as a matcher. If the value matches, the transformation will be applied.
+-   **transform** _(function)_: a callback that receives the value that has been entered. It should return a block object or an array of block objects.
+-   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from --- to Separator block**
 
@@ -141,31 +153,35 @@ To create a separator block when the user types the hypen three times and then h
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 transforms = {
-    from: [
-        {
-            type: 'enter',
-            regExp: /^-{3,}$/,
-            transform: () => createBlock( 'core/separator' ),
-        },
-    ]
-}
+	from: [
+		{
+			type: 'enter',
+			regExp: /^-{3,}$/,
+			transform: () => createBlock( 'core/separator' ),
+		},
+	],
+};
 ```
+
 {% ES5 %}
+
 ```js
 transforms = {
-    from: [
-        {
-            type: 'enter',
-            regExp: /^-{3,}$/,
-            transform: function( value ) {
-                return createBlock( 'core/separator' );
-            },
-        },
-    ]
-}
+	from: [
+		{
+			type: 'enter',
+			regExp: /^-{3,}$/,
+			transform: function ( value ) {
+				return createBlock( 'core/separator' );
+			},
+		},
+	],
+};
 ```
+
 {% end %}
 
 ### Files
@@ -174,10 +190,10 @@ This type of transformations support the _from_ direction, allowing blocks to be
 
 A transformation of type `files` is an object that takes the following parameters:
 
-- **type** _(string)_: the value `files`.
-- **transform** _(function)_: a callback that receives the array of files being processed. It should return a block object or an array of block objects.
-- **isMatch** _(function, optional)_: a callback that receives the array of files being processed and should return a boolean. Returning `false` from this function will prevent the transform from being applied.
-- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **type** _(string)_: the value `files`.
+-   **transform** _(function)_: a callback that receives the array of files being processed. It should return a block object or an array of block objects.
+-   **isMatch** _(function, optional)_: a callback that receives the array of files being processed and should return a boolean. Returning `false` from this function will prevent the transform from being applied.
+-   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from file to File block**
 
@@ -185,57 +201,61 @@ To create a File block when the user drops a file into the editor we can use the
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 transforms: {
-    from: [
-        {
-            type: 'files',
-            isMatch: ( files ) => files.length === 1,
-            // By defining a lower priority than the default of 10,
-            // we make that the File block to be created as a fallback,
-            // if no other transform is found.
-            priority: 15,
-            transform: ( files ) => {
-                const file = files[ 0 ];
-                const blobURL = createBlobURL( file );
-                // File will be uploaded in componentDidMount()
-                return createBlock( 'core/file', {
-                    href: blobURL,
-                    fileName: file.name,
-                    textLinkHref: blobURL,
-                } );
-            },
-        },
-    ];
+	from: [
+		{
+			type: 'files',
+			isMatch: ( files ) => files.length === 1,
+			// By defining a lower priority than the default of 10,
+			// we make that the File block to be created as a fallback,
+			// if no other transform is found.
+			priority: 15,
+			transform: ( files ) => {
+				const file = files[ 0 ];
+				const blobURL = createBlobURL( file );
+				// File will be uploaded in componentDidMount()
+				return createBlock( 'core/file', {
+					href: blobURL,
+					fileName: file.name,
+					textLinkHref: blobURL,
+				} );
+			},
+		},
+	];
 }
 ```
+
 {% ES5 %}
+
 ```js
 transforms: {
-    from: [
-        {
-            type: 'files',
-            isMatch: function( files ) {
-                return files.length === 1;
-            },
-            // By defining a lower priority than the default of 10,
-            // we make that the File block to be created as a fallback,
-            // if no other transform is found.
-            priority: 15,
-            transform: function( files ) {
-                var file = files[ 0 ];
-                var blobURL = createBlobURL( file );
-                // File will be uploaded in componentDidMount()
-                return createBlock( 'core/file', {
-                    href: blobURL,
-                    fileName: file.name,
-                    textLinkHref: blobURL,
-                } );
-            },
-        },
-    ];
+	from: [
+		{
+			type: 'files',
+			isMatch: function ( files ) {
+				return files.length === 1;
+			},
+			// By defining a lower priority than the default of 10,
+			// we make that the File block to be created as a fallback,
+			// if no other transform is found.
+			priority: 15,
+			transform: function ( files ) {
+				var file = files[ 0 ];
+				var blobURL = createBlobURL( file );
+				// File will be uploaded in componentDidMount()
+				return createBlock( 'core/file', {
+					href: blobURL,
+					fileName: file.name,
+					textLinkHref: blobURL,
+				} );
+			},
+		},
+	];
 }
 ```
+
 {% end %}
 
 ### Prefix
@@ -244,10 +264,10 @@ This type of transformations support the _from_ direction, allowing blocks to be
 
 A transformation of type `prefix` is an object that takes the following parameters:
 
-- **type** _(string)_: the value `files`.
-- **prefix** _(string)_: the character or sequence of characters that match this transfrom.
-- **transform** _(function)_: a callback that receives the content introduced. It should return a block object or an array of block objects.
-- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **type** _(string)_: the value `files`.
+-   **prefix** _(string)_: the character or sequence of characters that match this transfrom.
+-   **transform** _(function)_: a callback that receives the content introduced. It should return a block object or an array of block objects.
+-   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from text to custom block**
 
@@ -255,37 +275,41 @@ If we want to create a custom block when the user types the question mark, we co
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 transforms: {
-    from: [
-        {
-            type: 'prefix',
-            prefix: '?',
-            transform( content ) {
-                return createBlock( 'my-plugin/question', {
-                    content,
-                } );
-            },
-        },
-    ];
+	from: [
+		{
+			type: 'prefix',
+			prefix: '?',
+			transform( content ) {
+				return createBlock( 'my-plugin/question', {
+					content,
+				} );
+			},
+		},
+	];
 }
 ```
+
 {% ES5 %}
+
 ```js
 transforms: {
-    from: [
-        {
-            type: 'prefix',
-            prefix: '?',
-            transform: function( content ) {
-                return createBlock( 'my-plugin/question', {
-                    content,
-                } );
-            },
-        },
-    ];
+	from: [
+		{
+			type: 'prefix',
+			prefix: '?',
+			transform: function ( content ) {
+				return createBlock( 'my-plugin/question', {
+					content,
+				} );
+			},
+		},
+	];
 }
 ```
+
 {% end %}
 
 ### Raw
@@ -294,12 +318,12 @@ This type of transformations support the _from_ direction, allowing blocks to be
 
 A transformation of type `raw` is an object that takes the following parameters:
 
-- **type** _(string)_: the value `raw`.
-- **transform** _(function, optional)_: a callback that receives the node being processed. It should return a block object or an array of block objects.
-- **schema** _(object|function, optional)_: it defines the attributes and children of the node that will be preserved on paste, according to its [HTML content model](https://html.spec.whatwg.org/multipage/dom.html#content-models). Take a look at [pasteHandler](/packages/blocks/README.md#pasteHandler) for more info.
-- **selector** _(string, optional)_: a CSS selector string to determine whether the element matches according to the [element.matches](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) method. The transform won't be executed if the element doesn't match. This is a shorthand and alternative to using `isMatch`, which, if present, will take precedence.
-- **isMatch** _(function, optional)_: a callback that receives the node being processed and should return a boolean. Returning `false` from this function will prevent the transform from being applied.
-- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **type** _(string)_: the value `raw`.
+-   **transform** _(function, optional)_: a callback that receives the node being processed. It should return a block object or an array of block objects.
+-   **schema** _(object|function, optional)_: it defines the attributes and children of the node that will be preserved on paste, according to its [HTML content model](https://html.spec.whatwg.org/multipage/dom.html#content-models). Take a look at [pasteHandler](/packages/blocks/README.md#pasteHandler) for more info.
+-   **selector** _(string, optional)_: a CSS selector string to determine whether the element matches according to the [element.matches](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) method. The transform won't be executed if the element doesn't match. This is a shorthand and alternative to using `isMatch`, which, if present, will take precedence.
+-   **isMatch** _(function, optional)_: a callback that receives the node being processed and should return a boolean. Returning `false` from this function will prevent the transform from being applied.
+-   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from URLs to Embed block**
 
@@ -307,6 +331,7 @@ If we want to create an Embed block when the user pastes some URL in the editor,
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 transforms: {
     from: [
@@ -324,7 +349,9 @@ transforms: {
     ],
 }
 ```
+
 {% ES5 %}
+
 ```js
 transforms: {
     from: [
@@ -343,6 +370,7 @@ transforms: {
     ],
 }
 ```
+
 {% end %}
 
 ### Shortcode
@@ -351,11 +379,11 @@ This type of transformations support the _from_ direction, allowing blocks to be
 
 A transformation of type `shortcode` is an object that takes the following parameters:
 
-- **type** _(string)_: the value `shortcode`.
-- **tag** _(string|array)_: the shortcode tag or list of shortcode aliases this transform can work with.
-- **attributes** _(object)_: object representing where the block attributes should be sourced from, according to the attributes shape defined by the [block configuration object](./block-registration.md). If a particular attribute contains a `shortcode` key, it should be a function that receives the shortcode attributes as the first arguments and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as second, and returns a value for the attribute that will be sourced in the block's comment.
-- **isMatch** _(function, optional)_: a callback that receives the shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API) and should return a boolean. Returning `false` from this function will prevent the shortcode to be transformed into this block.
-- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **type** _(string)_: the value `shortcode`.
+-   **tag** _(string|array)_: the shortcode tag or list of shortcode aliases this transform can work with.
+-   **attributes** _(object)_: object representing where the block attributes should be sourced from, according to the attributes shape defined by the [block configuration object](./block-registration.md). If a particular attribute contains a `shortcode` key, it should be a function that receives the shortcode attributes as the first arguments and the [WPShortcodeMatch](/packages/shortcode/README.md#next) as second, and returns a value for the attribute that will be sourced in the block's comment.
+-   **isMatch** _(function, optional)_: a callback that receives the shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API) and should return a boolean. Returning `false` from this function will prevent the shortcode to be transformed into this block.
+-   **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from shortcode to block**
 
@@ -363,6 +391,7 @@ An existing shortcode can be transformed into its block counterpart.
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 transforms: {
     from: [
@@ -396,7 +425,9 @@ transforms: {
     ]
 },
 ```
+
 {% ES5 %}
+
 ```js
 transforms: {
     from: [
@@ -431,4 +462,5 @@ transforms: {
     ]
 },
 ```
+
 {% end %}

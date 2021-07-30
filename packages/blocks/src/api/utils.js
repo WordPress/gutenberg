@@ -30,9 +30,9 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
  * and its attributes are equal to the default attributes
  * which means the block is unmodified.
  *
- * @param  {WPBlock} block Block Object
+ * @param {WPBlock} block Block Object
  *
- * @return {boolean}       Whether the block is an unmodified default block
+ * @return {boolean} Whether the block is an unmodified default block
  */
 export function isUnmodifiedDefaultBlock( block ) {
 	const defaultBlockName = getDefaultBlockName();
@@ -62,7 +62,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 /**
  * Function that checks if the parameter is a valid icon.
  *
- * @param {*} icon  Parameter to be checked.
+ * @param {*} icon Parameter to be checked.
  *
  * @return {boolean} True if the parameter is a valid icon and false otherwise.
  */
@@ -117,7 +117,7 @@ export function normalizeIconObject( icon ) {
  * it converts it to the matching block type object.
  * It passes the original object otherwise.
  *
- * @param {string|Object} blockTypeOrName  Block type or name.
+ * @param {string|Object} blockTypeOrName Block type or name.
  *
  * @return {?Object} Block type.
  */
@@ -273,5 +273,24 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 			return accumulator;
 		},
 		{}
+	);
+}
+
+/**
+ * Filter block attributes by `role` and return their names.
+ *
+ * @param {string} name Block attribute's name.
+ * @param {string} role The role of a block attribute.
+ *
+ * @return {string[]} The attribute names that have the provided role.
+ */
+export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
+	const attributes = getBlockType( name )?.attributes;
+	if ( ! attributes ) return [];
+	const attributesNames = Object.keys( attributes );
+	if ( ! role ) return attributesNames;
+	return attributesNames.filter(
+		( attributeName ) =>
+			attributes[ attributeName ]?.__experimentalRole === role
 	);
 }

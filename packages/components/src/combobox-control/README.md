@@ -20,41 +20,43 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
 /**
  * WordPress dependencies
  */
-import { ComboboxControl } from "@wordpress/components";
-import { useState } from "@wordpress/compose";
+import { ComboboxControl } from '@wordpress/components';
+import { useState } from '@wordpress/compose';
 
 const options = [
 	{
-		value: "small",
-		label: "Small"
+		value: 'small',
+		label: 'Small',
 	},
 	{
-		value: "normal",
-		label: "Normal"
+		value: 'normal',
+		label: 'Normal',
 	},
 	{
-		value: "large",
-		label: "Large"
+		value: 'large',
+		label: 'Large',
 	},
 	{
-		value: "huge",
-		label: "Huge"
-	}
+		value: 'huge',
+		label: 'Huge',
+	},
 ];
 
 function MyComboboxControl() {
-	const [fontSize, setFontSize] = useState();
-	const [filteredOptions, setFilteredOptions] = useState(options);
+	const [ fontSize, setFontSize ] = useState();
+	const [ filteredOptions, setFilteredOptions ] = useState( options );
 	return (
 		<ComboboxControl
 			label="Font Size"
-			value={fontSize}
-			onChange={setFontSize}
-			options={filteredOptions}
-			onInputChange={(inputValue) =>
+			value={ fontSize }
+			onChange={ setFontSize }
+			options={ filteredOptions }
+			onInputChange={ ( inputValue ) =>
 				setFilteredOptions(
-					options.filter(option =>
-						option.label.toLowerCase().startsWith(inputValue.toLowerCase())
+					options.filter( ( option ) =>
+						option.label
+							.toLowerCase()
+							.startsWith( inputValue.toLowerCase() )
 					)
 				)
 			}
@@ -69,53 +71,55 @@ function MyComboboxControl() {
 
 The label for the control.
 
-- Type: `String`
-- Required: Yes
+-   Type: `String`
+-   Required: Yes
 
 #### hideLabelFromVision
+
 If true, the label will only be visible to screen readers.
 
-- Type: `Boolean`
-- Required: No
+-   Type: `Boolean`
+-   Required: No
 
 #### help
+
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 #### options
 
 The options that can be chosen from.
 
-- Type: `Array<{ value: String, label: String }>`
-- Required: Yes
+-   Type: `Array<{ value: String, label: String }>`
+-   Required: Yes
 
 #### onFilterValueChange
 
 Function called with the control's search input value changes. The argument contains the next input value.
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No
 
 #### onChange
 
 Function called with the selected value changes.
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No
 
 #### value
 
 The current value of the input.
 
-- Type: `mixed`
-- Required: Yes
+-   Type: `mixed`
+-   Required: Yes
 
 ## Related components
 
-- Like this component, but without a search input, the `CustomSelectControl` component.
+-   Like this component, but without a search input, the `CustomSelectControl` component.
 
-- To select one option from a set, when you want to show all the available options at once, use the `Radio` component.
-- To select one or more items from a set, use the `CheckboxControl` component.
-- To toggle a single setting on or off, use the `ToggleControl` component.
+-   To select one option from a set, when you want to show all the available options at once, use the `Radio` component.
+-   To select one or more items from a set, use the `CheckboxControl` component.
+-   To toggle a single setting on or off, use the `ToggleControl` component.

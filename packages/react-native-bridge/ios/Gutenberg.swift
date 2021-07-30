@@ -196,7 +196,7 @@ public class Gutenberg: NSObject {
             themeUpdates["gradients"] = gradients
         }
 
-        bridgeModule.sendEventIfNeeded(.updateTheme, body:themeUpdates)
+        sendEvent(.updateTheme, body:themeUpdates)
     }
 
     public func showNotice(_ message: String) {

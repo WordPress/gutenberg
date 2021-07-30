@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	BlockControls,
-	AlignmentToolbar,
+	AlignmentControl,
 } from '@wordpress/block-editor';
 
 export default function TermDescriptionEdit( {
@@ -27,8 +27,8 @@ export default function TermDescriptionEdit( {
 	} );
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );

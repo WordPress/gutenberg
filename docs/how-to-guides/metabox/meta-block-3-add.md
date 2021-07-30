@@ -10,6 +10,7 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import { TextControl } from '@wordpress/components';
@@ -28,14 +29,10 @@ registerBlockType( 'myguten/meta-block', {
 			( select ) => select( 'core/editor' ).getCurrentPostType(),
 			[]
 		);
-		const [ meta, setMeta ] = useEntityProp(
-			'postType',
-			postType,
-			'meta'
-		);
-		const metaFieldValue = meta['myguten_meta_block_field'];
+		const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
+		const metaFieldValue = meta[ 'myguten_meta_block_field' ];
 		function updateMetaValue( newValue ) {
-			setMeta( { ...meta, 'myguten_meta_block_field': newValue } );
+			setMeta( { ...meta, myguten_meta_block_field: newValue } );
 		}
 
 		return (
@@ -56,9 +53,11 @@ registerBlockType( 'myguten/meta-block', {
 	},
 } );
 ```
+
 {% ES5 %}
+
 ```js
-( function( wp ) {
+( function ( wp ) {
 	var el = wp.element.createElement;
 	var registerBlockType = wp.blocks.registerBlockType;
 	var TextControl = wp.components.TextControl;
@@ -71,32 +70,21 @@ registerBlockType( 'myguten/meta-block', {
 		icon: 'smiley',
 		category: 'text',
 
-		edit: function( props ) {
+		edit: function ( props ) {
 			var blockProps = useBlockProps();
-			var postType = useSelect(
-				function( select ) {
-					return select( 'core/editor' ).getCurrentPostType();
-				},
-				[]
-			);
-			var entityProp = useEntityProp(
-				'postType',
-				postType,
-				'meta'
-			);
+			var postType = useSelect( function ( select ) {
+				return select( 'core/editor' ).getCurrentPostType();
+			}, [] );
+			var entityProp = useEntityProp( 'postType', postType, 'meta' );
 			var meta = entityProp[ 0 ];
 			var setMeta = entityProp[ 1 ];
 
-			var metaFieldValue = meta['myguten_meta_block_field'];
+			var metaFieldValue = meta[ 'myguten_meta_block_field' ];
 			function updateMetaValue( newValue ) {
 				setMeta(
-					Object.assign(
-						{},
-						meta,
-						{
-							'myguten_meta_block_field': newValue,
-						}
-					)
+					Object.assign( {}, meta, {
+						myguten_meta_block_field: newValue,
+					} )
 				);
 			}
 
@@ -113,12 +101,13 @@ registerBlockType( 'myguten/meta-block', {
 
 		// No information saved to the block
 		// Data is saved to post meta via attributes
-		save: function() {
+		save: function () {
 			return null;
 		},
 	} );
 } )( window.wp );
 ```
+
 {% end %}
 
 **Important:** Before you test, you need to enqueue your JavaScript file and its dependencies. Note the WordPress packages used above are `wp.element`, `wp.blocks`, `wp.components`, `wp.data`, and `wp.coreData`. Each of these need to be included in the array of dependencies. Update the `myguten-meta-block.php` file adding the enqueue function:

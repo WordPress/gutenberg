@@ -31,7 +31,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	// Set default values.
 	$format = '%link';
-	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link', 'gutenberg' ) : _x( 'Previous', 'label for previous post link', 'gutenberg' );
+	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
 	$label  = '';
 	// If a custom label is provided, make this a link.
 	// `$label` is used to prepend the provided label, if we want to show the page title as well.

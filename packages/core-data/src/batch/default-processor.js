@@ -14,7 +14,7 @@ import apiFetch from '@wordpress/api-fetch';
  */
 export default async function defaultProcessor( requests ) {
 	const batchResponse = await apiFetch( {
-		path: '/v1/batch',
+		path: '/batch/v1',
 		method: 'POST',
 		data: {
 			validation: 'require-all-validate',

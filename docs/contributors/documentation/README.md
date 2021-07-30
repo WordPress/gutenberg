@@ -94,6 +94,37 @@ The preferred format for code examples is ESNext, this should be the default vie
 
 **Note:** it is not required to include ES5 code examples. The guidance is to include `ES5` code for beginner tutorials, but the majority of code in Gutenberg packages and across the larger React and JavaScript ecosystem is in ESNext.
 
+### Callout Notices
+
+The Block Editor handbook supports the same [notice styles as other WordPress handbooks](https://make.wordpress.org/docs/handbook/documentation-team-handbook/handbooks-style-and-formatting-guide/#formatting). However, the shortcode implementation is not ideal with the different locations the block editor handbook documentation is published (npm, GitHub).
+
+The recommended way to implement in markdown is to use the raw HTML and `callout callout-LEVEL` classes. For example:
+
+```html
+    <div class="callout callout-info">
+        This is an **info** callout.
+    </div>
+```
+
+The following classes are available: `info`, `tip`, `alert`, `warning`
+
+<div class="callout callout-tip">
+This is a **tip** callout.
+</div>
+
+<div class="callout callout-info">
+This is an **info** callout.
+</div>
+
+<div class="callout callout-alert">
+This is an **alert** callout.
+</div>
+
+<div class="callout callout-warning">
+This is a **warning** callout.
+</div>
+
+
 ### Editor Config
 
 You should configure your editor to use Prettier to auto-format markdown documents. See the [Getting Started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for complete details.
@@ -101,11 +132,15 @@ You should configure your editor to use Prettier to auto-format markdown documen
 An example config for using Visual Studio Code and the Prettier extensions:
 
 ```json
-"\[markdown\]": {
+"[[markdown]]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
 },
 ```
+
+ <div class="callout callout-info">
+ Note: depending on where you are viewing this document, the brackets may show as double, the proper format is just a single bracket.
+</div>
 
 ## Resources
 

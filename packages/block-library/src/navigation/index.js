@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { navigation as icon } from '@wordpress/icons';
 
 /**
@@ -18,12 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Navigation', 'block title' ),
 	icon,
-	description: __(
-		'A collection of blocks that allow visitors to get around your site.'
-	),
-	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
 	variations,
 	example: {
 		innerBlocks: [

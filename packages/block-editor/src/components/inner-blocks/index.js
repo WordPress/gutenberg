@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { getBlockType, withBlockContentContext } from '@wordpress/blocks';
 
@@ -24,6 +24,7 @@ import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
+import useBlockDropZone from '../use-block-drop-zone';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -133,7 +134,6 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
-	const fallbackRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const hasOverlay = useSelect(
@@ -155,7 +155,12 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		[ clientId, isSmallScreen ]
 	);
 
-	const ref = useMergeRefs( [ props.ref, fallbackRef ] );
+	const ref = useMergeRefs( [
+		props.ref,
+		useBlockDropZone( {
+			rootClientId: clientId,
+		} ),
+	] );
 	const InnerBlocks =
 		options.value && options.onChange
 			? ControlledInnerBlocks
@@ -171,13 +176,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				'has-overlay': hasOverlay,
 			}
 		),
-		children: (
-			<InnerBlocks
-				{ ...options }
-				clientId={ clientId }
-				wrapperRef={ fallbackRef }
-			/>
-		),
+		children: <InnerBlocks { ...options } clientId={ clientId } />,
 	};
 }
 

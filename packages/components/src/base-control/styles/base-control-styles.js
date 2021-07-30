@@ -6,7 +6,8 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { font, space, color } from '../../utils';
+import { font, COLORS } from '../../utils';
+import { space } from '../../ui/utils/space';
 
 export const Wrapper = styled.div`
 	font-family: ${ font( 'default.fontFamily' ) };
@@ -14,7 +15,7 @@ export const Wrapper = styled.div`
 `;
 
 export const StyledField = styled.div`
-	margin-bottom: ${ space( 1 ) };
+	margin-bottom: ${ space( 2 ) };
 
 	.components-panel__row & {
 		margin-bottom: inherit;
@@ -23,11 +24,11 @@ export const StyledField = styled.div`
 
 export const StyledLabel = styled.label`
 	display: inline-block;
-	margin-bottom: ${ space( 1 ) };
+	margin-bottom: ${ space( 2 ) };
 `;
 
 export const StyledHelp = styled.p`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
-	color: ${ color( 'mediumGray.text' ) };
+	color: ${ COLORS.mediumGray.text };
 `;

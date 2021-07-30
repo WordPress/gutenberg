@@ -1,9 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
+import {
+	useThrottle,
+	__experimentalUseDropZone as useDropZone,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -40,11 +43,6 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 	let candidateDistance;
 
 	elements.forEach( ( element, index ) => {
-		// Ensure the element is a block. It should have the `wp-block` class.
-		if ( ! element.classList.contains( 'wp-block' ) ) {
-			return;
-		}
-
 		const rect = element.getBoundingClientRect();
 		const [ distance, edge ] = getDistanceToNearestEdge(
 			position,
@@ -56,16 +54,7 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 			// If the user is dropping to the trailing edge of the block
 			// add 1 to the index to represent dragging after.
 			const isTrailingEdge = edge === 'bottom' || edge === 'right';
-			let offset = isTrailingEdge ? 1 : 0;
-
-			// If the target is the dragged block itself and another 1 to
-			// index as the dragged block is set to `display: none` and
-			// should be skipped in the calculation.
-			const isTargetDraggedBlock =
-				isTrailingEdge &&
-				elements[ index + 1 ] &&
-				elements[ index + 1 ].classList.contains( 'is-dragging' );
-			offset += isTargetDraggedBlock ? 1 : 0;
+			const offset = isTrailingEdge ? 1 : 0;
 
 			// Update the currently known best candidate.
 			candidateDistance = distance;
@@ -78,7 +67,6 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 
 /**
  * @typedef  {Object} WPBlockDropZoneConfig
- * @property {Object} element      A React ref object pointing to the block list's DOM element.
  * @property {string} rootClientId The root client id for the block list.
  */
 
@@ -88,66 +76,67 @@ export function getNearestBlockIndex( elements, position, orientation ) {
  * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
  */
 export default function useBlockDropZone( {
-	element,
 	// An undefined value represents a top-level block. Default to an empty
 	// string for this so that `targetRootClientId` can be easily compared to
 	// values returned by the `getRootBlockClientId` selector, which also uses
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
-} ) {
+} = {} ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
-	const { isLockedAll, orientation } = useSelect(
+	const isLockedAll = useSelect(
 		( select ) => {
-			const { getBlockListSettings, getTemplateLock } = select(
-				blockEditorStore
-			);
-			return {
-				isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
-				orientation: getBlockListSettings( targetRootClientId )
-					?.orientation,
-			};
+			const { getTemplateLock } = select( blockEditorStore );
+			return getTemplateLock( targetRootClientId ) === 'all';
 		},
 		[ targetRootClientId ]
 	);
 
+	const { getBlockListSettings } = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
-	const dropEventHandlers = useOnBlockDrop(
-		targetRootClientId,
-		targetBlockIndex
-	);
-
-	const { position, isDraggingOverDocument } = useDropZone( {
-		element,
-		isDisabled: isLockedAll,
-		withPosition: true,
-		...dropEventHandlers,
-	} );
-
-	useEffect( () => {
-		if ( position ) {
-			const blockElements = Array.from( element.current.children );
-
+	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
+	const throttled = useThrottle(
+		useCallback( ( event, currentTarget ) => {
+			const blockElements = Array.from( currentTarget.children ).filter(
+				// Ensure the element is a block. It should have the `wp-block` class.
+				( element ) => element.classList.contains( 'wp-block' )
+			);
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
-				position,
-				orientation
+				{ x: event.clientX, y: event.clientY },
+				getBlockListSettings( targetRootClientId )?.orientation
 			);
 
 			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
-		} else {
-			setTargetBlockIndex( null );
-		}
-	}, [ position ] );
 
-	useEffect( () => {
-		if ( ! isDraggingOverDocument ) {
+			if ( targetIndex !== null ) {
+				showInsertionPoint( targetRootClientId, targetIndex );
+			}
+		}, [] ),
+		200
+	);
+
+	return useDropZone( {
+		isDisabled: isLockedAll,
+		onDrop: onBlockDrop,
+		onDragOver( event ) {
+			// `currentTarget` is only available while the event is being
+			// handled, so get it now and pass it to the thottled function.
+			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
+			throttled( event, event.currentTarget );
+		},
+		onDragLeave() {
+			throttled.cancel();
 			hideInsertionPoint();
-		} else if ( targetBlockIndex !== null ) {
-			showInsertionPoint( targetRootClientId, targetBlockIndex );
-		}
-	}, [ targetBlockIndex, isDraggingOverDocument ] );
+			setTargetBlockIndex( null );
+		},
+		onDragEnd() {
+			throttled.cancel();
+			hideInsertionPoint();
+			setTargetBlockIndex( null );
+		},
+	} );
 }

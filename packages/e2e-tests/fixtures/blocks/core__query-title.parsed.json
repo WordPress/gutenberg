@@ -1,18 +1,9 @@
 [
-    {
-        "blockName": "core/query-title",
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "",
-        "innerContent": []
-    },
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
-        ]
-    }
+	{
+		"blockName": "core/query-title",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
 ]

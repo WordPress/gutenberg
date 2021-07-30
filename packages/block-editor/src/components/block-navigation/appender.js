@@ -15,7 +15,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockNavigationLeaf from './leaf';
-import Indentation from './indentation';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 
@@ -63,7 +62,6 @@ export default function BlockNavigationAppender( {
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-appender__container">
-						<Indentation level={ level } />
 						<Inserter
 							rootClientId={ parentBlockClientId }
 							__experimentalIsQuick

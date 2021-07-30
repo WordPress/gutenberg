@@ -47,7 +47,7 @@ export default function MenuSwitcher( {
 				/>
 			</MenuGroup>
 			<MenuGroup hideSeparator>
-				<MenuItem isPrimary onClick={ openModal }>
+				<MenuItem variant="primary" onClick={ openModal }>
 					{ __( 'Create a new menu' ) }
 				</MenuItem>
 				{ isModalVisible && (

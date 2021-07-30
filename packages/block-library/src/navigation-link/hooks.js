@@ -35,7 +35,7 @@ export function enhanceNavigationLinkVariations( settings, name ) {
 	}
 
 	// Fallback handling may be deleted after supported WP ranges understand the `variations`
-	// property when passed to register_block_type_from_metadata in index.php
+	// property when passed to register_block_type in index.php
 	if ( ! settings.variations ) {
 		return {
 			...settings,

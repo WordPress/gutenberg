@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { Flex } from '../../flex';
-import { color } from '../../utils/style-mixins';
+import { COLORS } from '../../utils';
 
 const CIRCLE_SIZE = 30;
 
@@ -17,7 +17,7 @@ export const Root = styled( Flex )`
 
 export const CircleRoot = styled.div`
 	border-radius: 50%;
-	border: 1px solid ${ color( 'ui.borderLight' ) };
+	border: 1px solid ${ COLORS.ui.borderLight };
 	box-sizing: border-box;
 	cursor: grab;
 	height: ${ CIRCLE_SIZE }px;
@@ -33,9 +33,9 @@ export const CircleIndicatorWrapper = styled.div`
 `;
 
 export const CircleIndicator = styled.div`
-	background: ${ color( 'ui.border' ) };
+	background: ${ COLORS.ui.border };
 	border-radius: 50%;
-	border: 3px solid ${ color( 'ui.border' ) };
+	border: 3px solid ${ COLORS.ui.border };
 	bottom: 0;
 	box-sizing: border-box;
 	display: block;

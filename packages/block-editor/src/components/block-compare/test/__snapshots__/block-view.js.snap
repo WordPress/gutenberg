@@ -27,9 +27,9 @@ exports[`BlockView should match snapshot 1`] = `
     className="block-editor-block-compare__action"
   >
     <ForwardRef(Button)
-      isSecondary={true}
       onClick={[Function]}
       tabIndex="0"
+      variant="secondary"
     >
       action
     </ForwardRef(Button)>

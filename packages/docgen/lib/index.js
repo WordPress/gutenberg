@@ -65,7 +65,7 @@ const processFile = ( rootDir, inputFile ) => {
 		return result;
 	} catch ( e ) {
 		process.stderr.write( `\n${ e }` );
-		process.stderr.write( '\n\n' );
+		process.stderr.write( '\n' );
 		process.exit( 1 );
 	}
 };

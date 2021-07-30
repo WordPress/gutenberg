@@ -4,11 +4,11 @@ Performance is a key feature for editor applications and the Block editor is not
 
 ## Metrics
 
-To ensure the block editor stays performant across releases and development, we monitor some key metrics using [performance testing](/docs/contributors/code/testing-overview.md#performance-testing). 
+To ensure the block editor stays performant across releases and development, we monitor some key metrics using [performance testing](/docs/contributors/code/testing-overview.md#performance-testing).
 
 **Loading Time:** The time it takes to load an editor page.
 **Typing Time:** The time it takes for the browser to respond while typing on the editor.
-**Block Selection Time:**  The time it takes for the browser to respond after a user selects block. (Inserting a block is also equivalent to selecting a block. Monitoring the selection is sufficient to cover both metrics).
+**Block Selection Time:** The time it takes for the browser to respond after a user selects block. (Inserting a block is also equivalent to selecting a block. Monitoring the selection is sufficient to cover both metrics).
 
 ## Key Performance Decisions and Solutions
 
@@ -26,5 +26,4 @@ Based on the idea that **when editing a given block, it is very rare that an upd
 
 ## Going further
 
- - [Journey towards a performant editor](https://riad.blog/2020/02/14/a-journey-towards-a-performant-web-editor/)
-
+-   [Journey towards a performant editor](https://riad.blog/2020/02/14/a-journey-towards-a-performant-web-editor/)

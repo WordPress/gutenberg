@@ -10,6 +10,7 @@ Here is an example of using the `editor.Autocomplete.completers` filter to add a
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 // Our completer
 const acronymCompleter = {
@@ -44,7 +45,9 @@ wp.hooks.addFilter(
 	appendAcronymCompleter
 );
 ```
+
 {% ES5 %}
+
 ```js
 // Our completer
 var acronymCompleter = {
@@ -55,14 +58,14 @@ var acronymCompleter = {
 		{ letters: 'AFAIK', expansion: 'As Far As I Know' },
 		{ letters: 'IIRC', expansion: 'If I Recall Correctly' },
 	],
-	getOptionKeywords: function( abbr ) {
+	getOptionKeywords: function ( abbr ) {
 		var expansionWords = abbr.expansion.split( /\s+/ );
 		return [ abbr.letters ].concat( expansionWords );
 	},
-	getOptionLabel: function( acronym ) {
+	getOptionLabel: function ( acronym ) {
 		return acronym.letters;
 	},
-	getOptionCompletion: function( abbr ) {
+	getOptionCompletion: function ( abbr ) {
 		return wp.element.createElement(
 			'abbr',
 			{ title: abbr.expansion },
@@ -73,9 +76,9 @@ var acronymCompleter = {
 
 // Our filter function
 function appendAcronymCompleter( completers, blockName ) {
-	return blockName === 'my-plugin/foo' ?
-		completers.concat( acronymCompleter ) :
-		completers;
+	return blockName === 'my-plugin/foo'
+		? completers.concat( acronymCompleter )
+		: completers;
 }
 
 // Adding the filter
@@ -85,4 +88,5 @@ wp.hooks.addFilter(
 	appendAcronymCompleter
 );
 ```
+
 {% end %}

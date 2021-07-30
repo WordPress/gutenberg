@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/keycodes --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Usage
 
@@ -23,7 +23,7 @@ import { DOWN, ENTER } from '@wordpress/keycodes';
 
 onKeyDown( event ) {
 	const { keyCode } = event;
-	
+
 	if ( keyCode === DOWN ) {
 		alert( 'You pressed the down arrow!' );
 	} else if ( keyCode === ENTER ) {
@@ -72,7 +72,7 @@ displayShortcut.primary( 'm' );
 
 _Type_
 
--   `WPModifierHandler<WPKeyHandler<string>>` Keyed map of functions to display shortcuts.
+-   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to display shortcuts.
 
 <a name="displayShortcutList" href="#displayShortcutList">#</a> **displayShortcutList**
 
@@ -88,7 +88,7 @@ displayShortcutList.primary( 'm' );
 
 _Type_
 
--   `WPModifierHandler<WPKeyHandler<string[]>>` Keyed map of functions to shortcut sequences.
+-   `WPModifierHandler<WPKeyHandler<string[]>>`Keyed map of functions to shortcut sequences.
 
 <a name="DOWN" href="#DOWN">#</a> **DOWN**
 
@@ -121,7 +121,7 @@ isKeyboardEvent.primary( event, 'm' );
 
 _Type_
 
--   `WPModifierHandler<WPEventKeyHandler>` Keyed map of functions to match events.
+-   `WPModifierHandler<WPEventKeyHandler>`Keyed map of functions to match events.
 
 <a name="LEFT" href="#LEFT">#</a> **LEFT**
 
@@ -134,7 +134,7 @@ depending on platform.
 
 _Type_
 
--   `WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>` 
+-   `WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>`
 
 <a name="rawShortcut" href="#rawShortcut">#</a> **rawShortcut**
 
@@ -152,7 +152,7 @@ rawShortcut.primary( 'm' )
 
 _Type_
 
--   `WPModifierHandler<WPKeyHandler<string>>` Keyed map of functions to raw shortcuts.
+-   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to raw shortcuts.
 
 <a name="RIGHT" href="#RIGHT">#</a> **RIGHT**
 
@@ -177,7 +177,7 @@ shortcutAriaLabel.primary( '.' );
 
 _Type_
 
--   `WPModifierHandler<WPKeyHandler<string>>` Keyed map of functions to shortcut ARIA labels.
+-   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to shortcut ARIA labels.
 
 <a name="SPACE" href="#SPACE">#</a> **SPACE**
 

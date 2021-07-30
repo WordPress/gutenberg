@@ -19,7 +19,7 @@ import { getScrollContainer } from '@wordpress/dom';
 /**
  * Simple reducer used to increment a counter.
  *
- * @param {number} state  Previous counter value.
+ * @param {number} state Previous counter value.
  * @return {number} New state value.
  */
 const counterReducer = ( state ) => state + 1;

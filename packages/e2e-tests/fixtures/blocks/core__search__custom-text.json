@@ -1,17 +1,17 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/search",
-        "isValid": true,
-        "attributes": {
-            "label": "Custom label",
-            "showLabel": true,
-            "placeholder": "Custom placeholder",
-            "buttonText": "Custom button text",
-            "buttonPosition": "button-outside",
-            "buttonUseIcon": false
-        },
-        "innerBlocks": [],
-        "originalContent": ""
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/search",
+		"isValid": true,
+		"attributes": {
+			"label": "Custom label",
+			"showLabel": true,
+			"placeholder": "Custom placeholder",
+			"buttonText": "Custom button text",
+			"buttonPosition": "button-outside",
+			"buttonUseIcon": false
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
 ]

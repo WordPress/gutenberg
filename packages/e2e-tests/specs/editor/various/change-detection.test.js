@@ -280,14 +280,17 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressKeyWithModifier( 'primary', 'S' );
 
+		// Start this check immediately after save since dirtying the post will
+		// remove the "Saved" with the Save button.
+		const savedPromise = page.waitForSelector(
+			'.editor-post-saved-state.is-saved'
+		);
+
 		// Dirty post while save is in-flight.
 		await page.type( '.editor-post-title__input', '!' );
 
 		// Allow save to complete. Disabling interception flushes pending.
-		await Promise.all( [
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-			releaseSaveIntercept(),
-		] );
+		await Promise.all( [ savedPromise, releaseSaveIntercept() ] );
 
 		await assertIsDirty( true );
 	} );
@@ -302,14 +305,17 @@ describe( 'Change detection', () => {
 		// Keyboard shortcut Ctrl+S save.
 		await pressKeyWithModifier( 'primary', 'S' );
 
+		// Start this check immediately after save since dirtying the post will
+		// remove the "Saved" with the Save button.
+		const savedPromise = page.waitForSelector(
+			'.editor-post-saved-state.is-saved'
+		);
+
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph' );
 
 		// Allow save to complete. Disabling interception flushes pending.
-		await Promise.all( [
-			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-			releaseSaveIntercept(),
-		] );
+		await Promise.all( [ savedPromise, releaseSaveIntercept() ] );
 
 		await assertIsDirty( true );
 	} );

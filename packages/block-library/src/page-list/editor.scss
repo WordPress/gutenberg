@@ -4,6 +4,22 @@
 	.wp-block-page-list {
 		background-color: inherit;
 	}
+
+	// space-between justification.
+	&.items-justified-space-between {
+		.wp-block-page-list > div,
+		.wp-block-page-list {
+			display: contents;
+			flex: 1;
+		}
+
+		&.has-child-selected .wp-block-page-list > div,
+		&.has-child-selected .wp-block-page-list,
+		&.is-selected .wp-block-page-list > div,
+		&.is-selected .wp-block-page-list {
+			flex: inherit;
+		}
+	}
 }
 
 // Make links unclickable in the editor.
@@ -18,5 +34,19 @@
 
 	.components-spinner {
 		margin: 0.5em;
+	}
+}
+
+// Modal that shows conversion option.
+.wp-block-page-list-modal {
+	max-width: 400px;
+}
+
+.wp-block-page-list-modal-buttons {
+	display: flex;
+	justify-content: flex-end;
+
+	.components-button {
+		margin-left: $grid-unit-15;
 	}
 }

@@ -4,17 +4,13 @@
 import { Button, Dropdown } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import {
-	useShortcut,
-	store as keyboardShortcutsStore,
-} from '@wordpress/keyboard-shortcuts';
-import { useCallback, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { listView } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import BlockNavigation from './';
+import BlockNavigationTree from './tree';
 import { store as blockEditorStore } from '../../store';
 
 function BlockNavigationDropdownToggle( {
@@ -24,22 +20,6 @@ function BlockNavigationDropdownToggle( {
 	innerRef,
 	...props
 } ) {
-	useShortcut(
-		'core/edit-post/toggle-block-navigation',
-		useCallback( onToggle, [ onToggle ] ),
-		{
-			bindGlobal: true,
-			isDisabled: ! isEnabled,
-		}
-	);
-	const shortcut = useSelect(
-		( select ) =>
-			select( keyboardShortcutsStore ).getShortcutRepresentation(
-				'core/edit-post/toggle-block-navigation'
-			),
-		[]
-	);
-
 	return (
 		<Button
 			{ ...props }
@@ -51,7 +31,6 @@ function BlockNavigationDropdownToggle( {
 			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'List view' ) }
 			className="block-editor-block-navigation"
-			shortcut={ shortcut }
 			aria-disabled={ ! isEnabled }
 		/>
 	);
@@ -80,11 +59,18 @@ function BlockNavigationDropdown(
 					isEnabled={ isEnabled }
 				/>
 			) }
-			renderContent={ ( { onClose } ) => (
-				<BlockNavigation
-					onSelect={ onClose }
-					__experimentalFeatures={ __experimentalFeatures }
-				/>
+			renderContent={ () => (
+				<div className="block-editor-block-navigation__container">
+					<p className="block-editor-block-navigation__label">
+						{ __( 'List view' ) }
+					</p>
+
+					<BlockNavigationTree
+						showNestedBlocks
+						showOnlyCurrentHierarchy
+						__experimentalFeatures={ __experimentalFeatures }
+					/>
+				</div>
 			) }
 		/>
 	);

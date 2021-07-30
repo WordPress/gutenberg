@@ -1,0 +1,25 @@
+{
+	"apiVersion": 2,
+	"name": "core/post-comments-link",
+	"title": "Post Comments Link",
+	"category": "theme",
+	"description": "Displays the link to the current post comments.",
+	"textdomain": "default",
+	"usesContext": [ "postType", "postId" ],
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"html": false,
+		"color": {
+			"link": true,
+			"text": false
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		}
+	}
+}

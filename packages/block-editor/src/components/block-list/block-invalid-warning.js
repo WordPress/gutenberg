@@ -56,7 +56,7 @@ export function BlockInvalidWarning( {
 					<Button
 						key="recover"
 						onClick={ attemptBlockRecovery }
-						isPrimary
+						variant="primary"
 					>
 						{ __( 'Attempt Block Recovery' ) }
 					</Button>,

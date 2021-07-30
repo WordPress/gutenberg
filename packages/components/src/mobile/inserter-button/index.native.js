@@ -88,7 +88,9 @@ class MenuItem extends Component {
 							/>
 						</View>
 					</View>
-					<Text style={ modalItemLabelStyle }>{ blockTitle }</Text>
+					<Text numberOfLines={ 3 } style={ modalItemLabelStyle }>
+						{ blockTitle }
+					</Text>
 				</View>
 			</TouchableHighlight>
 		);

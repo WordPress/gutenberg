@@ -1,12 +1,12 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/site-title",
-        "isValid": true,
-        "attributes": {
-            "level": 1
-        },
-        "innerBlocks": [],
-        "originalContent": ""
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/site-title",
+		"isValid": true,
+		"attributes": {
+			"level": 1
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
 ]

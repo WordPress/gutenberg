@@ -22,6 +22,7 @@ const BlockNavigationBlockContents = forwardRef(
 	(
 		{
 			onClick,
+			onToggleExpanded,
 			block,
 			isSelected,
 			position,
@@ -98,7 +99,7 @@ const BlockNavigationBlockContents = forwardRef(
 							ref={ ref }
 							className={ className }
 							block={ block }
-							onClick={ onClick }
+							onToggleExpanded={ onToggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
@@ -114,6 +115,7 @@ const BlockNavigationBlockContents = forwardRef(
 							className={ className }
 							block={ block }
 							onClick={ onClick }
+							onToggleExpanded={ onToggleExpanded }
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }

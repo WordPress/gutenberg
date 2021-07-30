@@ -6,8 +6,9 @@
 	}
 
 	// Provide a sane starting point for the size.
-	&:not(.is-resized) img {
+	&.is-default-size img {
 		width: 120px;
+		height: auto;
 	}
 
 	.aligncenter {

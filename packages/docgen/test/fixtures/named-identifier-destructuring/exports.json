@@ -12,10 +12,7 @@
 			"column": 44
 		}
 	},
-	"range": [
-		96,
-		140
-	],
+	"range": [ 96, 140 ],
 	"declaration": null,
 	"specifiers": [
 		{
@@ -32,10 +29,7 @@
 					"column": 41
 				}
 			},
-			"range": [
-				105,
-				137
-			],
+			"range": [ 105, 137 ],
 			"local": {
 				"type": "Identifier",
 				"start": 105,
@@ -50,10 +44,7 @@
 						"column": 24
 					}
 				},
-				"range": [
-					105,
-					120
-				],
+				"range": [ 105, 120 ],
 				"name": "someDeclaration"
 			},
 			"exported": {
@@ -70,10 +61,7 @@
 						"column": 41
 					}
 				},
-				"range": [
-					124,
-					137
-				],
+				"range": [ 124, 137 ],
 				"name": "myDeclaration"
 			}
 		}

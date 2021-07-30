@@ -17,6 +17,11 @@
 	line-height: initial;
 	color: initial;
 
+	// Many themes with white backgrounds load editor styles but fail to also provide
+	// an explicit white background color, assuming a white editing canvas.
+	// So to match browser defaults, we provide a white default here as well.
+	background: #fff;
+
 	// For full-wide blocks, we compensate for the base padding.
 	// These margins should match the padding value above.
 	.block-editor-block-list__layout.is-root-container > .wp-block[data-align="full"] {

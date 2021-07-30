@@ -8,12 +8,13 @@ const { types: babelTypes } = require( '@babel/core' );
 /** @typedef {ReturnType<import('comment-parser').parse>[0]} CommentBlock */
 /** @typedef {CommentBlock['tags'][0]} CommentTag */
 /** @typedef {babelTypes.TSType} TypeAnnotation */
+/** @typedef {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} ExtendedTypeAnnotation */
 /** @typedef {import('@babel/core').Node} ASTNode */
 /* eslint-enable jsdoc/valid-types */
 
 /**
- * @param {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} typeAnnotation
- * @param {' => ' | ': '} returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
+ * @param {ExtendedTypeAnnotation} typeAnnotation
+ * @param {' => ' | ': '}          returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
  */
 function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 	const nonRestParams = typeAnnotation.parameters
@@ -43,7 +44,9 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 			typeAnnotation.typeAnnotation.typeAnnotation
 	);
 
-	return `( ${ params } )${ returnIndicator }${ returnType }`;
+	const paramsWithParens = params.length ? `( ${ params } )` : `()`;
+
+	return `${ paramsWithParens }${ returnIndicator }${ returnType }`;
 }
 
 /**
@@ -376,6 +379,10 @@ function getTypeAnnotation( typeAnnotation ) {
  */
 function getFunctionToken( token ) {
 	let resolvedToken = token;
+	if ( babelTypes.isExportDefaultDeclaration( resolvedToken ) ) {
+		resolvedToken = resolvedToken.declaration;
+	}
+
 	if ( babelTypes.isExportNamedDeclaration( resolvedToken ) ) {
 		resolvedToken = resolvedToken.declaration;
 	}
@@ -391,7 +398,7 @@ function getFunctionToken( token ) {
 function getFunctionNameForError( declarationToken ) {
 	let namedFunctionToken = declarationToken;
 	if ( babelTypes.isExportNamedDeclaration( declarationToken ) ) {
-		namedFunctionToken = declarationToken;
+		namedFunctionToken = declarationToken.declaration;
 	}
 
 	if ( babelTypes.isVariableDeclaration( namedFunctionToken ) ) {
@@ -401,23 +408,56 @@ function getFunctionNameForError( declarationToken ) {
 	return namedFunctionToken.id.name;
 }
 
+function getArrayTagNamePosition( tag ) {
+	return parseInt( tag.name.split( '.' ).slice( -1 )[ 0 ], 0 );
+}
+
+function getQualifiedArrayPatternTypeAnnotation( tag, paramType ) {
+	if ( babelTypes.isTSArrayType( paramType ) ) {
+		if ( babelTypes.isTSTypeReference( paramType.elementType ) ) {
+			// just get the element type for the array
+			return paramType.elementType.typeName.name;
+		}
+		return getTypeAnnotation( paramType.elementType.typeAnnotation );
+	} else if ( babelTypes.isTSTupleType( paramType ) ) {
+		return getTypeAnnotation(
+			paramType.elementTypes[ getArrayTagNamePosition( tag ) ]
+		);
+	}
+
+	// anything else, `Alias[ position ]`
+	return `( ${ getTypeAnnotation( paramType ) } )[ ${ getArrayTagNamePosition(
+		tag
+	) } ]`;
+}
+
+function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
+	const memberName = tag.name.split( '.' ).slice( -1 )[ 0 ];
+	if ( babelTypes.isTSTypeLiteral( paramType ) ) {
+		// if it's a type literal we can try to find the member on the type
+		const member = paramType.members.find(
+			( m ) => m.key.name === memberName
+		);
+		if ( member !== undefined ) {
+			return getTypeAnnotation( member.typeAnnotation.typeAnnotation );
+		}
+	}
+	// If we couldn't find a specific member for the type then we'll just return something like `Type[ memberName ]` to indicate the parameter is a member of that type
+	const typeAnnotation = getTypeAnnotation( paramType );
+	return `${ typeAnnotation }[ '${ memberName }' ]`;
+}
+
 /**
- * @param {CommentTag} tag The documented parameter.
- * @param {ASTNode} declarationToken The function the parameter is documented on.
+ * @param {CommentTag} tag              The documented parameter.
+ * @param {ASTNode}    declarationToken The function the parameter is documented on.
+ * @param {number}     paramIndex       The parameter index.
  * @return {null | string} The parameter's type annotation.
  */
-function getParamTypeAnnotation( tag, declarationToken ) {
+function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
 
 	// otherwise find the corresponding parameter token for the documented parameter
-	/** @type {babelTypes.Identifier} */
-	const paramToken = functionToken.params.reduce( ( found, pToken ) => {
-		if ( found ) return found;
-		const tokenName = babelTypes.isRestElement( pToken )
-			? pToken.argument.name
-			: pToken.name;
-		return tokenName === tag.name ? pToken : found;
-	}, null );
+	let paramToken = functionToken.params[ paramIndex ];
 
 	// This shouldn't happen due to our ESLint enforcing correctly documented parameter names but just in case
 	// we'll give a descriptive error so that it's easy to diagnose the issue.
@@ -429,10 +469,28 @@ function getParamTypeAnnotation( tag, declarationToken ) {
 		);
 	}
 
+	const isQualifiedName = tag.name.includes( '.' );
+
 	try {
-		/** @type {babelTypes.TSTypeAnnotation} */
-		const typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
-		return getTypeAnnotation( typeAnnotation );
+		if ( babelTypes.isAssignmentPattern( paramToken ) ) {
+			paramToken = paramToken.left;
+		}
+
+		const paramType = paramToken.typeAnnotation.typeAnnotation;
+
+		if (
+			babelTypes.isIdentifier( paramToken ) ||
+			babelTypes.isRestElement( paramToken ) ||
+			( ( babelTypes.isArrayPattern( paramToken ) ||
+				babelTypes.isObjectPattern( paramToken ) ) &&
+				! isQualifiedName )
+		) {
+			return getTypeAnnotation( paramType );
+		} else if ( babelTypes.isArrayPattern( paramToken ) ) {
+			return getQualifiedArrayPatternTypeAnnotation( tag, paramType );
+		} else if ( babelTypes.isObjectPattern( paramToken ) ) {
+			return getQualifiedObjectPatternTypeAnnotation( tag, paramType );
+		}
 	} catch ( e ) {
 		throw new Error(
 			`Could not find type for parameter '${
@@ -460,13 +518,41 @@ function getReturnTypeAnnotation( declarationToken ) {
 	}
 }
 
+/**
+ * @param {ASTNode} declarationToken
+ * @return {string} The type annotation for the variable.
+ */
+function getVariableTypeAnnotation( declarationToken ) {
+	let resolvedToken = declarationToken;
+	if ( babelTypes.isExportNamedDeclaration( resolvedToken ) ) {
+		resolvedToken = resolvedToken.declaration;
+	}
+
+	if ( babelTypes.isClassDeclaration( resolvedToken ) ) {
+		// just use the classname if we're exporting a class
+		return resolvedToken.id.name;
+	}
+
+	if ( babelTypes.isVariableDeclaration( resolvedToken ) ) {
+		resolvedToken = resolvedToken.declarations[ 0 ].id;
+	}
+
+	try {
+		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
+	} catch ( e ) {
+		// assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
+		return '';
+	}
+}
+
 module.exports =
 	/**
-	 * @param {CommentTag} tag A comment tag.
-	 * @param {ASTNode} token A function token.
+	 * @param {CommentTag}    tag   A comment tag.
+	 * @param {ASTNode}       token A function token.
+	 * @param {number | null} index The index of the parameter or `null` if not a param tag.
 	 * @return {null | string} The type annotation for the given tag or null if the tag has no type annotation.
 	 */
-	function ( tag, token ) {
+	function ( tag, token, index ) {
 		// If the file is using JSDoc type annotations, use the JSDoc.
 		if ( tag.type ) {
 			return tag.type;
@@ -474,10 +560,13 @@ module.exports =
 
 		switch ( tag.tag ) {
 			case 'param': {
-				return getParamTypeAnnotation( tag, token );
+				return getParamTypeAnnotation( tag, token, index );
 			}
 			case 'return': {
 				return getReturnTypeAnnotation( token );
+			}
+			case 'type': {
+				return getVariableTypeAnnotation( token );
 			}
 			default: {
 				return '';
