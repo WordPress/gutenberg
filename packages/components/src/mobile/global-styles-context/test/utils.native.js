@@ -4,151 +4,18 @@
 import {
 	getBlockPaddings,
 	getBlockColors,
-	parseColorVariables,
+	parseStylesVariables,
 	getGlobalStyles,
 } from '../utils';
 
-const DEFAULT_COLORS = [
-	{ color: '#cd2653', name: 'Accent Color', slug: 'accent' },
-	{ color: '#000000', name: 'Primary', slug: 'primary' },
-	{ color: '#6d6d6d', name: 'Secondary', slug: 'secondary' },
-];
-
-const GLOBAL_STYLES_PALETTE = [
-	{
-		slug: 'green',
-		color: '#D1E4DD',
-		name: 'Green',
-	},
-	{
-		slug: 'blue',
-		color: '#D1DFE4',
-		name: 'Blue',
-	},
-	{
-		slug: 'purple',
-		color: '#D1D1E4',
-		name: 'Purple',
-	},
-];
-
-const GLOBAL_STYLES_GRADIENTS = [
-	{
-		slug: 'purple-to-blue',
-		gradient:
-			'linear-gradient(160deg, var(--wp--preset--color--purple), var(--wp--preset--color--blue))',
-		name: 'Purple to Blue',
-	},
-	{
-		slug: 'green-to-purple',
-		gradient:
-			'linear-gradient(160deg, var(--wp--preset--color--green), var(--wp--preset--color--purple))',
-		name: 'Green to Purple',
-	},
-];
-
-const DEFAULT_GLOBAL_STYLES = {
-	styles: {
-		color: {
-			background: 'var(--wp--preset--color--green)',
-			text: 'var(--wp--preset--color--blue)',
-		},
-		elements: {
-			link: {
-				color: {
-					text: 'var(--wp--preset--color--purple)',
-				},
-			},
-		},
-	},
-};
-
-const PARSED_GLOBAL_STYLES = {
-	styles: {
-		color: {
-			background: '#D1E4DD',
-			text: '#D1DFE4',
-		},
-		elements: {
-			link: {
-				color: {
-					text: '#D1D1E4',
-				},
-			},
-		},
-	},
-};
-
-const RAW_FEATURES = {
-	color: {
-		palette: {
-			core: [
-				{
-					name: 'Black',
-					slug: 'black',
-					color: '#000000',
-				},
-				{
-					name: 'Cyan bluish gray',
-					slug: 'cyan-bluish-gray',
-					color: '#abb8c3',
-				},
-				{
-					name: 'White',
-					slug: 'white',
-					color: '#ffffff',
-				},
-			],
-			theme: [
-				{
-					slug: 'green',
-					color: '#D1E4DD',
-					name: 'Green',
-				},
-				{
-					slug: 'blue',
-					color: '#D1DFE4',
-					name: 'Blue',
-				},
-				{
-					slug: 'purple',
-					color: '#D1D1E4',
-					name: 'Purple',
-				},
-			],
-		},
-		gradients: {
-			core: [
-				{
-					name: 'Vivid cyan blue to vivid purple',
-					gradient:
-						'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
-					slug: 'vivid-cyan-blue-to-vivid-purple',
-				},
-				{
-					name: 'Light green cyan to vivid green cyan',
-					gradient:
-						'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)',
-					slug: 'light-green-cyan-to-vivid-green-cyan',
-				},
-			],
-			theme: [
-				{
-					slug: 'purple-to-blue',
-					gradient:
-						'linear-gradient(160deg, var(--wp--preset--color--purple), var(--wp--preset--color--blue))',
-					name: 'Purple to Blue',
-				},
-				{
-					slug: 'green-to-purple',
-					gradient:
-						'linear-gradient(160deg, var(--wp--preset--color--green), var(--wp--preset--color--purple))',
-					name: 'Green to Purple',
-				},
-			],
-		},
-	},
-};
+import {
+	DEFAULT_COLORS,
+	GLOBAL_STYLES_GRADIENTS,
+	DEFAULT_GLOBAL_STYLES,
+	PARSED_GLOBAL_STYLES,
+	RAW_FEATURES,
+	MAPPED_VALUES,
+} from './fixtures/theme';
 
 describe( 'getBlockPaddings', () => {
 	const PADDING = 12;
@@ -226,11 +93,16 @@ describe( 'getBlockColors', () => {
 	} );
 } );
 
-describe( 'parseColorVariables', () => {
-	it( 'returns the parsed colors values correctly', () => {
-		const blockColors = parseColorVariables(
+describe( 'parseStylesVariables', () => {
+	it( 'returns the parsed preset values correctly', () => {
+		const customValues = parseStylesVariables(
+			JSON.stringify( RAW_FEATURES.custom ),
+			MAPPED_VALUES
+		);
+		const blockColors = parseStylesVariables(
 			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
-			GLOBAL_STYLES_PALETTE
+			MAPPED_VALUES,
+			customValues
 		);
 		expect( blockColors ).toEqual(
 			expect.objectContaining( PARSED_GLOBAL_STYLES )
@@ -241,29 +113,30 @@ describe( 'parseColorVariables', () => {
 describe( 'getGlobalStyles', () => {
 	it( 'returns the global styles data correctly', () => {
 		const rawFeatures = JSON.stringify( RAW_FEATURES );
+		const gradients = parseStylesVariables(
+			JSON.stringify( GLOBAL_STYLES_GRADIENTS ),
+			MAPPED_VALUES
+		);
+
 		const globalStyles = getGlobalStyles(
 			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
-			rawFeatures,
-			GLOBAL_STYLES_PALETTE,
-			GLOBAL_STYLES_GRADIENTS
-		);
-		const gradients = parseColorVariables(
-			JSON.stringify( GLOBAL_STYLES_GRADIENTS ),
-			GLOBAL_STYLES_PALETTE
-		);
-		const parsedExperimentalFeatures = parseColorVariables(
-			rawFeatures,
-			GLOBAL_STYLES_PALETTE
+			rawFeatures
 		);
 
 		expect( globalStyles ).toEqual(
 			expect.objectContaining( {
-				colors: GLOBAL_STYLES_PALETTE,
+				colors: RAW_FEATURES.color,
 				gradients,
 				__experimentalFeatures: {
 					color: {
-						palette: parsedExperimentalFeatures?.color?.palette,
-						gradients: parsedExperimentalFeatures?.color?.gradients,
+						palette: RAW_FEATURES.color.palette,
+						gradients,
+					},
+					typography: {
+						fontSizes: RAW_FEATURES.typography.fontSizes,
+						custom: {
+							'line-height': RAW_FEATURES.custom[ 'line-height' ],
+						},
 					},
 				},
 				__experimentalGlobalStylesBaseStyles: PARSED_GLOBAL_STYLES,

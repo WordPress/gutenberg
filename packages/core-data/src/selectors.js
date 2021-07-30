@@ -9,6 +9,7 @@ import { set, map, find, get, filter, compact } from 'lodash';
  */
 import { createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -47,29 +48,24 @@ export const isRequestingEmbedPreview = createRegistrySelector(
 /**
  * Returns all available authors.
  *
+ * @deprecated since 11.3. Callers should use `select( 'core' ).getUsers({ who: 'authors' })` instead.
+ *
  * @param {Object}           state Data state.
  * @param {Object|undefined} query Optional object of query parameters to
  *                                 include with request.
  * @return {Array} Authors list.
  */
 export function getAuthors( state, query ) {
+	deprecated( "select( 'core' ).getAuthors()", {
+		since: '5.9',
+		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
+	} );
+
 	const path = addQueryArgs(
 		'/wp/v2/users/?who=authors&per_page=100',
 		query
 	);
 	return getUserQueryResults( state, path );
-}
-
-/**
- * Returns all available authors.
- *
- * @param {Object} state Data state.
- * @param {number} id    The author id.
- *
- * @return {Array} Authors list.
- */
-export function __unstableGetAuthor( state, id ) {
-	return get( state, [ 'users', 'byId', id ], null );
 }
 
 /**
