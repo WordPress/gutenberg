@@ -30,13 +30,20 @@ export const ColorfulWrapper = styled.div`
 		border-radius: 0;
 		height: 216px;
 		margin-bottom: ${ space( 4 ) };
+		border-bottom: none;
 	}
 
 	.react-colorful__hue,
 	.react-colorful__alpha {
 		width: 184px;
+		height: 16px;
 		border-radius: 16px;
 		margin-bottom: ${ space( 2 ) };
+	}
+
+	.react-colorful__pointer {
+		height: 16px;
+		width: 16px;
 	}
 
 	${ StyledField } {
