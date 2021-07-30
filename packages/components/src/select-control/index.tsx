@@ -21,6 +21,7 @@ import InputBase from '../input-control/input-base';
 import type { InputBaseProps, LabelPosition } from '../input-control/types';
 import { Select, DownArrowWrapper } from './styles/select-control-styles';
 import type { Size } from './types';
+import type { PolymorphicComponentProps } from '../ui/context';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -67,7 +68,7 @@ function SelectControl(
 		value: valueProp,
 		labelPosition = 'top',
 		...props
-	}: SelectControlProps,
+	}: PolymorphicComponentProps< SelectControlProps, 'select', false >,
 	ref: Ref< HTMLSelectElement >
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -114,15 +115,17 @@ function SelectControl(
 				label={ label }
 				size={ size }
 				suffix={
-					<DownArrowWrapper>
-						<Icon icon={ chevronDown } size={ 18 } />
-					</DownArrowWrapper>
+					props.suffix || (
+						<DownArrowWrapper>
+							<Icon icon={ chevronDown } size={ 18 } />
+						</DownArrowWrapper>
+					)
 				}
+				prefix={ props.prefix }
 				labelPosition={ labelPosition }
-				{ ...props }
 			>
 				<Select
-					{ ...omit( props, 'prefix' ) }
+					{ ...omit( props, 'prefix', 'suffix' ) }
 					aria-describedby={ helpId }
 					className="components-select-control__input"
 					disabled={ disabled }
