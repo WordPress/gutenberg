@@ -26,6 +26,7 @@ import {
 	BottomSheet,
 	BottomSheetTextControl,
 	BottomSheetSelectControl,
+	FooterMessageControl,
 	FooterMessageLink,
 	Badge,
 } from '@wordpress/components';
@@ -562,6 +563,13 @@ export class ImageEdit extends Component {
 					{ androidOnly &&
 						canImageBeFeatured &&
 						this.getSetFeaturedButton( isFeaturedImage ) }
+				</PanelBody>
+				<PanelBody>
+					<FooterMessageControl
+						label={ __(
+							'Note: Changes to featured image will not be affected by the undo/redo buttons'
+						) }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		);
