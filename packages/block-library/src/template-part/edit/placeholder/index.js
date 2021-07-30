@@ -143,7 +143,7 @@ export default function TemplatePartPlaceholder( {
 												>
 													{ sprintf(
 														// Translators: %s as template part area title ("Header", "Footer", etc.).
-														'Link this block to an existing %s',
+														'Connect this block to an existing %s',
 														areaLabel.toLowerCase()
 													) }
 												</Button>
