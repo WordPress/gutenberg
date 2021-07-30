@@ -20,6 +20,11 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import DimensionControls from './dimension-controls';
+
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const placeholderChip = (
 	<div className="post-featured-image_placeholder">
@@ -29,13 +34,14 @@ const placeholderChip = (
 );
 
 function PostFeaturedImageDisplay( {
-	attributes: { isLink },
+	attributes,
 	setAttributes,
 	context: { postId, postType, queryId },
 	noticeUI,
 	noticeOperations,
 } ) {
 	const isDescendentOfQueryLoop = !! queryId;
+	const { isLink, height, width, scale } = attributes;
 	const [ featuredImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postType,
@@ -53,7 +59,9 @@ function PostFeaturedImageDisplay( {
 			),
 		[ featuredImage ]
 	);
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		style: { width },
+	} );
 	const onSelectImage = ( value ) => {
 		if ( value?.id ) {
 			setFeaturedImage( value.id );
@@ -92,6 +100,7 @@ function PostFeaturedImageDisplay( {
 			<img
 				src={ media.source_url }
 				alt={ media.alt_text || __( 'Featured image' ) }
+				style={ { height, objectFit: height && scale } }
 			/>
 		);
 	}
@@ -99,6 +108,10 @@ function PostFeaturedImageDisplay( {
 	return (
 		<>
 			<InspectorControls>
+				<DimensionControls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+				/>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
 						label={ sprintf(
