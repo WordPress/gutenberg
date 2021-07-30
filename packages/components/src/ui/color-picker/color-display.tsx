@@ -42,7 +42,7 @@ const ValueDisplay = ( { values }: ValueDisplayProps ) => (
 			return (
 				<FlexItem key={ abbreviation } isBlock display="flex">
 					<Text color="blue">{ abbreviation }</Text>
-					<div>{ value }</div>
+					<Text>{ value }</Text>
 				</FlexItem>
 			);
 		} ) }
