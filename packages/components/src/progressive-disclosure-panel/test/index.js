@@ -7,7 +7,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
  * Internal dependencies
  */
 import ProgressiveDisclosurePanel from '../';
-import PanelItem from '../item';
+import ProgressiveDisclosurePanelItem from '../item';
 
 const resetAll = jest.fn();
 
@@ -53,12 +53,12 @@ const renderPanel = () => {
 	return render(
 		<ProgressiveDisclosurePanel { ...defaultProps }>
 			{ false && <div>Hidden</div> }
-			<PanelItem { ...controlProps }>
+			<ProgressiveDisclosurePanelItem { ...controlProps }>
 				<div>Example control</div>
-			</PanelItem>
-			<PanelItem { ...altControlProps }>
+			</ProgressiveDisclosurePanelItem>
+			<ProgressiveDisclosurePanelItem { ...altControlProps }>
 				<div>Alt control</div>
-			</PanelItem>
+			</ProgressiveDisclosurePanelItem>
 			<span>Visible</span>
 		</ProgressiveDisclosurePanel>
 	);
@@ -91,7 +91,11 @@ describe( 'ProgressiveDisclosurePanel', () => {
 			// This covers case where children prop is not an array.
 			const { container } = render(
 				<ProgressiveDisclosurePanel { ...defaultProps }>
-					{ false && <PanelItem>Should not show</PanelItem> }
+					{ false && (
+						<ProgressiveDisclosurePanelItem>
+							Should not show
+						</ProgressiveDisclosurePanelItem>
+					) }
 				</ProgressiveDisclosurePanel>
 			);
 
@@ -101,8 +105,16 @@ describe( 'ProgressiveDisclosurePanel', () => {
 		it( 'should not render when there are no progressive panel items', () => {
 			const { container } = render(
 				<ProgressiveDisclosurePanel { ...defaultProps }>
-					{ false && <PanelItem>Should not show</PanelItem> }
-					{ false && <PanelItem>Not shown either</PanelItem> }
+					{ false && (
+						<ProgressiveDisclosurePanelItem>
+							Should not show
+						</ProgressiveDisclosurePanelItem>
+					) }
+					{ false && (
+						<ProgressiveDisclosurePanelItem>
+							Not shown either
+						</ProgressiveDisclosurePanelItem>
+					) }
 					<span>Visible but insignificant</span>
 				</ProgressiveDisclosurePanel>
 			);
@@ -127,12 +139,15 @@ describe( 'ProgressiveDisclosurePanel', () => {
 		it( 'should render child flagged as default control even without value', () => {
 			render(
 				<ProgressiveDisclosurePanel { ...defaultProps }>
-					<PanelItem { ...controlProps }>
+					<ProgressiveDisclosurePanelItem { ...controlProps }>
 						<div>Example control</div>
-					</PanelItem>
-					<PanelItem { ...altControlProps } isShownByDefault={ true }>
+					</ProgressiveDisclosurePanelItem>
+					<ProgressiveDisclosurePanelItem
+						{ ...altControlProps }
+						isShownByDefault={ true }
+					>
 						<div>Alt control</div>
-					</PanelItem>
+					</ProgressiveDisclosurePanelItem>
 				</ProgressiveDisclosurePanel>
 			);
 
@@ -171,12 +186,18 @@ describe( 'ProgressiveDisclosurePanel', () => {
 		it( 'should disable default control menu items when the control has no value', async () => {
 			render(
 				<ProgressiveDisclosurePanel { ...defaultProps }>
-					<PanelItem { ...controlProps } isShownByDefault={ true }>
+					<ProgressiveDisclosurePanelItem
+						{ ...controlProps }
+						isShownByDefault={ true }
+					>
 						<div>Example control</div>
-					</PanelItem>
-					<PanelItem { ...altControlProps } isShownByDefault={ true }>
+					</ProgressiveDisclosurePanelItem>
+					<ProgressiveDisclosurePanelItem
+						{ ...altControlProps }
+						isShownByDefault={ true }
+					>
 						<div>Alt control</div>
-					</PanelItem>
+					</ProgressiveDisclosurePanelItem>
 				</ProgressiveDisclosurePanel>
 			);
 			openDropdownMenu();
