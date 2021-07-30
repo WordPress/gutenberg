@@ -52,6 +52,7 @@ const migrateCustomColors = ( attributes ) => {
 	return {
 		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
 		style,
+		isStackedOnMobile: true,
 	};
 };
 
@@ -166,7 +167,13 @@ export default [
 				createBlock( 'core/column', {}, columnBlocks )
 			);
 
-			return [ omit( attributes, [ 'columns' ] ), migratedInnerBlocks ];
+			return [
+				{
+					...omit( attributes, [ 'columns' ] ),
+					isStackedOnMobile: true,
+				},
+				migratedInnerBlocks,
+			];
 		},
 		save( { attributes } ) {
 			const { columns } = attributes;
@@ -186,7 +193,10 @@ export default [
 			},
 		},
 		migrate( attributes, innerBlocks ) {
-			attributes = omit( attributes, [ 'columns' ] );
+			attributes = {
+				...omit( attributes, [ 'columns' ] ),
+				isStackedOnMobile: true,
+			};
 
 			return [ attributes, innerBlocks ];
 		},

@@ -25,6 +25,7 @@ export function useInBetweenInserter() {
 		isBlockInsertionPointVisible,
 		isMultiSelecting,
 		getSelectedBlockClientIds,
+		getTemplateLock,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
 		blockEditorStore
@@ -66,6 +67,11 @@ export function useInBetweenInserter() {
 						? event.target
 						: event.target.closest( '[data-block]' );
 					rootClientId = blockElement.getAttribute( 'data-block' );
+				}
+
+				// Don't set the insertion point if the template is locked.
+				if ( getTemplateLock( rootClientId ) ) {
+					return;
 				}
 
 				const orientation =

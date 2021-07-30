@@ -12,7 +12,7 @@ import {
 
 describe( 'autocomplete mentions', () => {
 	beforeAll( async () => {
-		await createUser( 'testuser', 'Jane', 'Doe' );
+		await createUser( 'testuser', { firstName: 'Jane', lastName: 'Doe' } );
 	} );
 
 	beforeEach( async () => {

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from '@emotion/css';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -13,12 +8,15 @@ import { useMemo } from '@wordpress/element';
  */
 import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
  */
 export function useCardMedia( props ) {
 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
+
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>

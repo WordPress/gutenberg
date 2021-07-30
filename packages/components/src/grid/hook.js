@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css, cx } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { useContextSystem } from '../ui/context';
 import { getAlignmentProps } from './utils';
 import { useResponsiveValue } from '../ui/utils/use-responsive-value';
 import CONFIG from '../utils/config-values';
+import { useCx } from '../utils/hooks/use-cx';
 
 /**
  * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
@@ -45,6 +46,8 @@ export default function useGrid( props ) {
 		templateColumns || ( !! columns && `repeat( ${ column }, 1fr )` );
 	const gridTemplateRows =
 		templateRows || ( !! rows && `repeat( ${ row }, 1fr )` );
+
+	const cx = useCx();
 
 	const classes = useMemo( () => {
 		const alignmentProps = getAlignmentProps( alignment );

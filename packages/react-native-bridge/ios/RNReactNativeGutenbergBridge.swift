@@ -349,6 +349,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             self.delegate?.gutenbergDidSendButtonPressedAction(button)
         }
     }
+    
+    @objc
+    func requestPreview() {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestPreview()
+        }
+    }
 
 }
 
@@ -369,11 +376,12 @@ extension RNReactNativeGutenbergBridge {
         case mediaUpload
         case setFocusOnTitle
         case mediaAppend
-        case updateTheme
+        case updateEditorSettings
         case replaceBlock
         case updateCapabilities
         case showNotice
         case mediaSave
+        case showEditorHelp
     }
 
     public override func supportedEvents() -> [String]! {

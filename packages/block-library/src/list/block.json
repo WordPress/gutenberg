@@ -42,7 +42,8 @@
 			"__experimentalFontFamily": true
 		},
 		"color": {
-			"gradients": true
+			"gradients": true,
+			"link": true
 		},
 		"__unstablePasteTextInline": true,
 		"__experimentalSelector": "ol,ul"

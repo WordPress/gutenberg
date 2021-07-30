@@ -244,7 +244,7 @@ describe( 'Multi-entity editor states', () => {
 			removeErrorMocks();
 		};
 
-		it( 'should only dirty the parent entity when editing the parent', async () => {
+		it.skip( 'should only dirty the parent entity when editing the parent', async () => {
 			// Clear selection so that the block is not added to the template part.
 			await insertBlock( 'Paragraph' );
 
@@ -257,7 +257,7 @@ describe( 'Multi-entity editor states', () => {
 			await saveAndWaitResponse();
 		} );
 
-		it( 'should only dirty the child when editing the child', async () => {
+		it.skip( 'should only dirty the child when editing the child', async () => {
 			// Select parent TP to unlock selecting content.
 			await canvas().click( '.wp-block-template-part' );
 			await canvas().click(
@@ -271,7 +271,7 @@ describe( 'Multi-entity editor states', () => {
 			await saveAndWaitResponse();
 		} );
 
-		it( 'should only dirty the nested entity when editing the nested entity', async () => {
+		it.skip( 'should only dirty the nested entity when editing the nested entity', async () => {
 			// Select parent TP to unlock selecting child.
 			await canvas().click( '.wp-block-template-part' );
 			// Select child TP to unlock selecting content.
@@ -289,7 +289,7 @@ describe( 'Multi-entity editor states', () => {
 			await saveAndWaitResponse();
 		} );
 
-		it( 'should not allow selecting template part content without parent selected', async () => {
+		it.skip( 'should not allow selecting template part content without parent selected', async () => {
 			// Unselect blocks.
 			await selectBlockByClientId();
 			// Try to select a child block of a template part.

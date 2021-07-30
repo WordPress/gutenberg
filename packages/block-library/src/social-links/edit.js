@@ -107,7 +107,6 @@ export function SocialLinksEdit( props ) {
 
 	const POPOVER_PROPS = {
 		position: 'bottom right',
-		isAlternate: true,
 	};
 
 	return (

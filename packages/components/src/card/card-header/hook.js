@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { cx } from '@emotion/css';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -13,6 +8,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
@@ -25,6 +21,8 @@ export function useCardHeader( props ) {
 		size = 'medium',
 		...otherProps
 	} = useContextSystem( props, 'CardHeader' );
+
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>

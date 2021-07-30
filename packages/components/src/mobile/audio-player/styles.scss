@@ -12,7 +12,7 @@
 @mixin circle($width) {
 	width: $width;
 	height: $width;
-	border-radius: $width/2;
+	border-radius: $width*0.5;
 }
 
 .iconContainer {

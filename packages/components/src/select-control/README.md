@@ -83,24 +83,24 @@ Render a user interface to select the size of an image.
 
 ```jsx
 import { SelectControl } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MySelectControl = withState( {
-	size: '50%',
-} )( ( { size, setState } ) => (
-	<SelectControl
-		label="Size"
-		value={ size }
-		options={ [
-			{ label: 'Big', value: '100%' },
-			{ label: 'Medium', value: '50%' },
-			{ label: 'Small', value: '25%' },
-		] }
-		onChange={ ( size ) => {
-			setState( { size } );
-		} }
-	/>
-) );
+const MySelectControl = () => {
+	const [ size, setSize ] = useState( '50%' );
+
+	return (
+		<SelectControl
+			label="Size"
+			value={ size }
+			options={ [
+				{ label: 'Big', value: '100%' },
+				{ label: 'Medium', value: '50%' },
+				{ label: 'Small', value: '25%' },
+			] }
+			onChange={ ( newSize ) => setSize( newSize ) }
+		/>
+	);
+};
 ```
 
 Render a user interface to select multiple users from a list.

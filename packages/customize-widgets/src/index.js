@@ -11,6 +11,7 @@ import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
 } from '@wordpress/widgets';
+import { setFreeformContentHandlerName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -48,6 +49,12 @@ export function initialize( editorName, blockEditorSettings ) {
 		} );
 	}
 	registerLegacyWidgetVariations( blockEditorSettings );
+
+	// As we are unregistering `core/freeform` to avoid the Classic block, we must
+	// replace it with something as the default freeform content handler. Failure to
+	// do this will result in errors in the default block parser.
+	// see: https://github.com/WordPress/gutenberg/issues/33097
+	setFreeformContentHandlerName( 'core/html' );
 
 	const SidebarControl = getSidebarControl( blockEditorSettings );
 

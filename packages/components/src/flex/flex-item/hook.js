@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css, cx } from '@emotion/css';
+import { css } from '@emotion/react';
 
 /**
  * Internal dependencies
@@ -9,6 +9,7 @@ import { css, cx } from '@emotion/css';
 import { useContextSystem } from '../../ui/context';
 import { useFlexContext } from '../context';
 import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexItemProps, 'div'>} props
@@ -27,6 +28,8 @@ export function useFlexItem( props ) {
 	sx.Base = css( {
 		display: displayProp || contextDisplay,
 	} );
+
+	const cx = useCx();
 
 	const classes = cx(
 		styles.Item,

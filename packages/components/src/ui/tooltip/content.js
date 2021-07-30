@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { cx } from '@emotion/css';
 // eslint-disable-next-line no-restricted-imports
 import { Tooltip as ReakitTooltip } from 'reakit';
 
@@ -12,6 +11,7 @@ import { contextConnect, useContextSystem } from '../context';
 import { View } from '../../view';
 import { useTooltipContext } from './context';
 import * as styles from './styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 const { TooltipPopoverView } = styles;
 
@@ -26,6 +26,7 @@ function TooltipContent( props, forwardedRef ) {
 		'TooltipContent'
 	);
 	const { tooltip } = useTooltipContext();
+	const cx = useCx();
 	const classes = cx( styles.TooltipContent, className );
 
 	return (

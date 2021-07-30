@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 17.1.0 (2021-07-29)
+
+### Enhancements
+
+-   Update `eslint-plugin-markdown` package to `2.20.0` ([#33432](https://github.com/WordPress/gutenberg/pull/33432)).
+-   Update `sass` package to `1.35.2` ([#33433](https://github.com/WordPress/gutenberg/pull/33433)).
+-   Update webpack config to minimize also CSS files ([#33676](https://github.com/WordPress/gutenberg/pull/33676)).
+
+## 17.0.0 (2021-07-21)
+
+### Breaking Changes
+
+-   Upgrade `puppeteer-core` (`^9.0.0`) to version `^10.1.0`. This version drops support for Node v10.
+
 ### New Features
 
 -   Add .markdownlintignore config and reference from lint-md-docs script ([#32633](https://github.com/WordPress/gutenberg/pull/32633)).

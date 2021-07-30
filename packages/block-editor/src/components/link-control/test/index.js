@@ -227,6 +227,49 @@ describe( 'Basic rendering', () => {
 			expect( isEditing() ).toBe( false );
 		} );
 	} );
+
+	describe( 'Unlinking', () => {
+		it( 'should not show "Unlink" button if no onRemove handler is provided', () => {
+			act( () => {
+				render(
+					<LinkControl value={ { url: 'https://example.com' } } />,
+					container
+				);
+			} );
+
+			const unLinkButton = queryByRole( container, 'button', {
+				name: 'Unlink',
+			} );
+
+			expect( unLinkButton ).toBeNull();
+			expect( unLinkButton ).not.toBeInTheDocument();
+		} );
+
+		it( 'should show "Unlink" button if a onRemove handler is provided', () => {
+			const mockOnRemove = jest.fn();
+			act( () => {
+				render(
+					<LinkControl
+						value={ { url: 'https://example.com' } }
+						onRemove={ mockOnRemove }
+					/>,
+					container
+				);
+			} );
+
+			const unLinkButton = queryByRole( container, 'button', {
+				name: 'Unlink',
+			} );
+			expect( unLinkButton ).toBeTruthy();
+			expect( unLinkButton ).toBeInTheDocument();
+
+			act( () => {
+				Simulate.click( unLinkButton );
+			} );
+
+			expect( mockOnRemove ).toHaveBeenCalled();
+		} );
+	} );
 } );
 
 describe( 'Searching for a link', () => {
@@ -1835,6 +1878,46 @@ describe( 'Rich link previews', () => {
 		expect( isRichLinkPreview ).toBe( true );
 	} );
 
+	it( 'should not display placeholders for the image and description if neither is available in the data', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title: '',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description: '',
+				image: '',
+			} )
+		);
+
+		act( () => {
+			render(
+				<LinkControl value={ selectedLink } hasRichPreviews />,
+				container
+			);
+		} );
+
+		// mockFetchRichUrlData resolves on next "tick" of event loop
+		await act( async () => {
+			await eventLoopTick();
+		} );
+
+		const linkPreview = container.querySelector(
+			"[aria-label='Currently selected']"
+		);
+
+		// Todo: refactor to use user-facing queries.
+		const hasRichImagePreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-image'
+		);
+
+		// Todo: refactor to use user-facing queries.
+		const hasRichDescriptionPreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-description'
+		);
+
+		expect( hasRichImagePreview ).toBeFalsy();
+		expect( hasRichDescriptionPreview ).toBeFalsy();
+	} );
+
 	it( 'should display a fallback when title is missing from rich data', async () => {
 		mockFetchRichUrlData.mockImplementation( () =>
 			Promise.resolve( {
@@ -1915,7 +1998,7 @@ describe( 'Rich link previews', () => {
 	} );
 
 	it.each( [ 'image', 'description' ] )(
-		'should display a fallback placeholder when %s it is missing from the rich data',
+		'should not display the rich %s when it is missing from the data',
 		async ( dataItem ) => {
 			mockFetchRichUrlData.mockImplementation( () => {
 				const data = {
@@ -1952,10 +2035,10 @@ describe( 'Rich link previews', () => {
 			expect( isRichLinkPreview ).toBe( true );
 
 			const missingDataItem = linkPreview.querySelector(
-				`.block-editor-link-control__search-item-${ dataItem }.is-placeholder`
+				`.block-editor-link-control__search-item-${ dataItem }`
 			);
 
-			expect( missingDataItem ).toBeTruthy();
+			expect( missingDataItem ).toBeFalsy();
 		}
 	);
 

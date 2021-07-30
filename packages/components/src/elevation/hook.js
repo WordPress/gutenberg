@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css, cx } from '@emotion/css';
+import { css } from '@emotion/react';
 import { isNil } from 'lodash';
 
 /**
@@ -14,7 +14,8 @@ import { useMemo } from '@wordpress/element';
  */
 import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
-import CONFIG from '../utils/config-values';
+import { CONFIG, reduceMotion } from '../utils';
+import { useCx } from '../utils/hooks/use-cx';
 
 /**
  * @param {number} value
@@ -44,6 +45,8 @@ export function useElevation( props ) {
 		...otherProps
 	} = useContextSystem( props, 'Elevation' );
 
+	const cx = useCx();
+
 	const classes = useMemo( () => {
 		/** @type {number | undefined} */
 		let hoverValue = ! isNil( hover ) ? hover : value * 2;
@@ -59,16 +62,19 @@ export function useElevation( props ) {
 
 		const sx = {};
 
-		sx.Base = css( {
-			borderRadius,
-			bottom: offset,
-			boxShadow: getBoxShadow( value ),
-			opacity: CONFIG.elevationIntensity,
-			left: offset,
-			right: offset,
-			top: offset,
-			transition,
-		} );
+		sx.Base = css(
+			{
+				borderRadius,
+				bottom: offset,
+				boxShadow: getBoxShadow( value ),
+				opacity: CONFIG.elevationIntensity,
+				left: offset,
+				right: offset,
+				top: offset,
+				transition,
+			},
+			reduceMotion( 'transition' )
+		);
 
 		if ( ! isNil( hoverValue ) ) {
 			sx.hover = css`

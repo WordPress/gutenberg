@@ -451,4 +451,23 @@ describe( 'RichText', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		expect( await page.$( blockToolbarSelector ) ).toBe( null );
 	} );
+
+	it( 'should run input rules after composition end', async () => {
+		await clickBlockAppender();
+		// Puppeteer doesn't support composition, so emulate it by inserting
+		// text in the DOM directly, setting selection in the right place, and
+		// firing `compositionend`.
+		// See https://github.com/puppeteer/puppeteer/issues/4981.
+		await page.evaluate( () => {
+			document.activeElement.textContent = '`a`';
+			const selection = window.getSelection();
+			selection.selectAllChildren( document.activeElement );
+			selection.collapseToEnd();
+			document.activeElement.dispatchEvent(
+				new CompositionEvent( 'compositionend' )
+			);
+		} );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

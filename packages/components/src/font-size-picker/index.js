@@ -17,7 +17,7 @@ import Button from '../button';
 import RangeControl from '../range-control';
 import { default as UnitControl, useCustomUnits } from '../unit-control';
 import CustomSelectControl from '../custom-select-control';
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
@@ -126,10 +126,14 @@ function FontSizePicker(
 							if ( 0 === parseFloat( nextSize ) || ! nextSize ) {
 								onChange( undefined );
 							} else {
-								onChange( nextSize );
+								onChange(
+									hasUnits
+										? nextSize
+										: parseInt( nextSize, 10 )
+								);
 							}
 						} }
-						units={ units }
+						units={ hasUnits ? units : false }
 					/>
 				) }
 				<Button
