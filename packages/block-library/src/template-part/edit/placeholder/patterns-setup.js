@@ -4,11 +4,11 @@
 import { __experimentalBlockPatternSetup as BlockPatternSetup } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 
-export default function PatternsSetup( { area, clientId, onCreate } ) {
-	const blockNameWithArea = area
-		? `core/template-part/${ area }`
-		: 'core/template-part';
-
+export default function PatternsSetup( {
+	filterPatternsFn,
+	clientId,
+	onCreate,
+} ) {
 	return (
 		<BlockPatternSetup
 			clientId={ clientId }
@@ -16,11 +16,7 @@ export default function PatternsSetup( { area, clientId, onCreate } ) {
 				<StartBlankComponent onCreate={ onCreate } />
 			}
 			onBlockPatternSelect={ onCreate }
-			filterPatternsFn={ ( pattern ) =>
-				pattern?.blockTypes?.some?.(
-					( blockType ) => blockType === blockNameWithArea
-				)
-			}
+			filterPatternsFn={ filterPatternsFn }
 		/>
 	);
 }

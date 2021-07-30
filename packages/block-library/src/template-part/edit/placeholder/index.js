@@ -9,9 +9,17 @@ import { find } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Placeholder, Dropdown, Button, Spinner } from '@wordpress/components';
+import {
+	Placeholder,
+	Dropdown,
+	Button,
+	Spinner,
+	Flex,
+	FlexItem,
+} from '@wordpress/components';
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -34,7 +42,16 @@ export default function TemplatePartPlaceholder( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.initial );
 
-	const { areaIcon, areaLabel } = useSelect(
+	const blockNameWithArea = area
+		? `core/template-part/${ area }`
+		: 'core/template-part';
+
+	const filterPatternsFn = ( pattern ) =>
+		pattern?.blockTypes?.some?.(
+			( blockType ) => blockType === blockNameWithArea
+		);
+
+	const { areaIcon, areaLabel, availablePatterns } = useSelect(
 		( select ) => {
 			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 			// Blocks can be loaded into a *non-post* block editor.
@@ -46,9 +63,14 @@ export default function TemplatePartPlaceholder( {
 			const selectedArea = find( definedAreas, { area } );
 			const defaultArea = find( definedAreas, { area: 'uncategorized' } );
 
+			const _availablePatterns = select( blockEditorStore )
+				.__experimentalGetAllowedPatterns?.()
+				.filter( filterPatternsFn );
+
 			return {
 				areaIcon: selectedArea?.icon || defaultArea?.icon,
 				areaLabel: selectedArea?.label || __( 'Template Part' ),
+				availablePatterns: _availablePatterns,
 			};
 		},
 		[ area ]
@@ -106,56 +128,65 @@ export default function TemplatePartPlaceholder( {
 					{ ! hasResolvedReplacements ? (
 						<Spinner />
 					) : (
-						<Dropdown
-							contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
-							position="bottom right left"
-							renderToggle={ ( { isOpen, onToggle } ) => (
-								<>
-									{ enableSelection && (
-										<Button
-											variant="primary"
-											onClick={ onToggle }
-											aria-expanded={ isOpen }
-										>
-											{ __( 'Choose existing' ) }
-										</Button>
-									) }
-									<Button
-										variant={
-											enableSelection
-												? 'tertiary'
-												: 'primary'
-										}
-										onClick={ () =>
-											setStep(
-												PLACEHOLDER_STEPS.patterns
-											)
-										}
-									>
-										{ sprintf(
-											// Translators: %s as template part area title ("Header", "Footer", etc.).
-											'New %s',
-											areaLabel.toLowerCase()
+						<Flex direction="column">
+							<Dropdown
+								contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
+								position="bottom right left"
+								renderToggle={ ( { isOpen, onToggle } ) => (
+									<>
+										{ enableSelection && (
+											<FlexItem>
+												<Button
+													variant="primary"
+													onClick={ onToggle }
+													aria-expanded={ isOpen }
+												>
+													{ sprintf(
+														// Translators: %s as template part area title ("Header", "Footer", etc.).
+														'Link this block to an existing %s',
+														areaLabel.toLowerCase()
+													) }
+												</Button>
+											</FlexItem>
 										) }
-									</Button>
-								</>
-							) }
-							renderContent={ ( { onClose } ) => (
-								<TemplatePartSelection
-									setAttributes={ setAttributes }
-									onClose={ onClose }
-									area={ area }
-								/>
-							) }
-						/>
+									</>
+								) }
+								renderContent={ ( { onClose } ) => (
+									<TemplatePartSelection
+										setAttributes={ setAttributes }
+										onClose={ onClose }
+										area={ area }
+									/>
+								) }
+							/>
+							<FlexItem>
+								<Button
+									variant={
+										enableSelection ? 'tertiary' : 'primary'
+									}
+									onClick={ () =>
+										setStep( PLACEHOLDER_STEPS.patterns )
+									}
+								>
+									{ sprintf(
+										// Translators: %s as template part area title ("Header", "Footer", etc.).
+										'Create a new %s',
+										areaLabel.toLowerCase()
+									) }
+									{ !! availablePatterns?.length &&
+										// Translators: block patterns are available for this action.
+										__( ' (patterns available)' ) }
+								</Button>
+							</FlexItem>
+						</Flex>
 					) }
 				</Placeholder>
 			) }
 			{ step === PLACEHOLDER_STEPS.patterns && (
 				<PatternsSetup
-					area={ area }
 					onCreate={ onCreate }
 					clientId={ clientId }
+					filterPatternsFn={ filterPatternsFn }
 				/>
 			) }
 		</>
