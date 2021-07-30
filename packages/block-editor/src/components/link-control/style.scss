@@ -186,6 +186,9 @@ $preview-image-height: 140px;
 		margin-right: $grid-unit-10;
 		max-height: 24px;
 		flex-shrink: 0;
+		width: 24px;
+		display: flex;
+		justify-content: center;
 
 		img {
 			width: 16px;
