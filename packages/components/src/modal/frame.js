@@ -34,8 +34,12 @@ function ModalFrameContent( {
 	onRequestClose,
 } ) {
 	function handleEscapeKeyDown( event ) {
-		if ( shouldCloseOnEsc && event.keyCode === ESCAPE ) {
-			event.stopPropagation();
+		if (
+			shouldCloseOnEsc &&
+			event.keyCode === ESCAPE &&
+			! event.defaultPrevented
+		) {
+			event.preventDefault();
 			if ( onRequestClose ) {
 				onRequestClose( event );
 			}

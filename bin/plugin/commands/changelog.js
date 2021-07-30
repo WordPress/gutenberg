@@ -104,19 +104,25 @@ const LABEL_TYPE_MAPPING = {
  */
 const LABEL_FEATURE_MAPPING = {
 	'[Feature] Widgets Screen': 'Widgets Editor',
+	'[Feature] Widgets Customizer': 'Widgets Editor',
 	'[Feature] Design Tools': 'Design Tools',
 	'[Feature] UI Components': 'Components',
 	'[Feature] Component System': 'Components',
+	Storybook: 'Components',
 	'[Feature] Template Editing Mode': 'Template Editor',
 	'[Feature] Writing Flow': 'Block Editor',
+	'[Feature] Pattern Directory': 'Patterns',
+	'[Feature] Patterns': 'Patterns',
 	'[Feature] Blocks': 'Block Library',
 	'[Feature] Inserter': 'Block Editor',
 	'[Feature] Drag and Drop': 'Block Editor',
 	'[Feature] Block Multi Selection': 'Block Editor',
 	'[Feature] Link Editing': 'Block Editor',
+	'[Feature] Raw Handling': 'Block Editor',
 	'[Package] Edit Post': 'Post Editor',
 	'[Package] Icons': 'Icons',
 	'[Package] Block Editor': 'Block Editor',
+	'[Package] Block library': 'Block Library',
 	'[Package] Editor': 'Editor',
 	'[Package] Edit Widgets': 'Widgets Editor',
 	'[Package] Widgets Customizer': 'Widgets Editor',
@@ -127,6 +133,21 @@ const LABEL_FEATURE_MAPPING = {
 	'[Block] Legacy Widget': 'Widgets Editor',
 	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
+	'Accessibility (a11y)': 'Accessibility',
+	'[a11y] Color Contrast': 'Accessibility',
+	'[a11y] Keyboard & Focus': 'Accessibility',
+	'[a11y] Labelling': 'Accessibility',
+	'[a11y] Zooming': 'Accessibility',
+	'[Package] E2E Tests': 'Testing',
+	'[Package] E2E Test Utils': 'Testing',
+	'Automated Testing': 'Testing',
+	'CSS Styling': 'CSS & Styling',
+	'developer-docs': 'Documentation',
+	'[Type] Documentation': 'Documentation',
+	'Global Styles': 'Global Styles',
+	'[Type] Build Tooling': 'Build Tooling',
+	'npm Packages': 'npm Packages',
+	'Gutenberg Plugin': 'Plugin',
 };
 
 /**
@@ -652,8 +673,12 @@ async function getChangelog( settings ) {
 				return;
 			}
 
-			// Start new <ul> for the Feature group.
-			changelog += '- ' + featureName + '\n';
+			// Avoids double nesting such as "Documentation" feature under
+			// the "Documentation" section.
+			if ( group !== featureName ) {
+				// Start new <ul> for the Feature group.
+				changelog += '- ' + featureName + '\n';
+			}
 
 			// Add a <li> for each PR in the Feature.
 			featureGroupEntries.forEach( ( entry ) => {

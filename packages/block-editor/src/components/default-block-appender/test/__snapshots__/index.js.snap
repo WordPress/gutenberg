@@ -2,7 +2,7 @@
 
 exports[`DefaultBlockAppender should append a default block when input focused 1`] = `
 <div
-  className="block-editor-default-block-appender"
+  className="block-editor-default-block-appender has-visible-prompt"
   data-root-client-id=""
 >
   <p
@@ -38,7 +38,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
 
 exports[`DefaultBlockAppender should match snapshot 1`] = `
 <div
-  className="block-editor-default-block-appender"
+  className="block-editor-default-block-appender has-visible-prompt"
   data-root-client-id=""
 >
   <p

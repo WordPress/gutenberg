@@ -343,12 +343,15 @@ describe( 'Navigation', () => {
 
 			await selectDropDownOption( 'Test Menu 2' );
 
-			await page.waitForSelector( '.wp-block-navigation__container' );
-
 			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
 			// block previews.
+			const navLinkSelector =
+				'[aria-label="Editor content"][role="region"] div[aria-label="Block: Custom Link"]';
+
+			await page.waitForSelector( navLinkSelector );
+
 			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Editor content"][role="region"] div[aria-label="Block: Custom Link"]',
+				navLinkSelector,
 				( els ) => els.length
 			);
 

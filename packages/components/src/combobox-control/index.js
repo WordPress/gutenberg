@@ -104,6 +104,10 @@ function ComboboxControl( {
 	const onKeyDown = ( event ) => {
 		let preventDefault = false;
 
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
 		switch ( event.keyCode ) {
 			case ENTER:
 				if ( selectedSuggestion ) {
@@ -123,7 +127,6 @@ function ComboboxControl( {
 				setIsExpanded( false );
 				setSelectedSuggestion( null );
 				preventDefault = true;
-				event.stopPropagation();
 				break;
 			default:
 				break;

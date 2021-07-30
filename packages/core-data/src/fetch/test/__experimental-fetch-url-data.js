@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import fetchRemoteUrlData from '../__experimental-fetch-remote-url-data';
+import fetchUrlData from '../__experimental-fetch-url-data';
 /**
  * WordPress dependencies
  */
@@ -9,7 +9,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 jest.mock( '@wordpress/api-fetch' );
 
-describe( 'fetchRemoteUrlData', () => {
+describe( 'fetchUrlData', () => {
 	afterEach( () => {
 		apiFetch.mockReset();
 	} );
@@ -26,7 +26,7 @@ describe( 'fetchRemoteUrlData', () => {
 			apiFetch.mockReturnValueOnce( Promise.resolve( data ) );
 
 			await expect(
-				fetchRemoteUrlData( 'https://www.wordpress.org' )
+				fetchUrlData( 'https://www.wordpress.org' )
 			).resolves.toEqual( data );
 
 			expect( apiFetch ).toBeCalledTimes( 1 );
@@ -36,7 +36,7 @@ describe( 'fetchRemoteUrlData', () => {
 			apiFetch.mockReturnValueOnce( Promise.reject( 'fetch failed' ) );
 
 			await expect(
-				fetchRemoteUrlData( 'https://www.wordpress.org/1' )
+				fetchUrlData( 'https://www.wordpress.org/1' )
 			).rejects.toEqual( 'fetch failed' );
 		} );
 	} );
@@ -45,7 +45,7 @@ describe( 'fetchRemoteUrlData', () => {
 		it( 'passes options argument through to fetch API', async () => {
 			apiFetch.mockReturnValueOnce( Promise.resolve() );
 
-			await fetchRemoteUrlData( 'https://www.wordpress.org/2', {
+			await fetchUrlData( 'https://www.wordpress.org/2', {
 				method: 'POST',
 			} );
 
@@ -73,9 +73,7 @@ describe( 'fetchRemoteUrlData', () => {
 			};
 			apiFetch.mockReturnValueOnce( Promise.resolve( data ) );
 
-			await expect( fetchRemoteUrlData( targetUrl ) ).resolves.toEqual(
-				data
-			);
+			await expect( fetchUrlData( targetUrl ) ).resolves.toEqual( data );
 			expect( apiFetch ).toBeCalledTimes( 1 );
 
 			// Allow us to reassert on calls without it being polluted by first fetch
@@ -83,9 +81,7 @@ describe( 'fetchRemoteUrlData', () => {
 			apiFetch.mockClear();
 
 			// Fetch the same URL again...should be cached.
-			await expect( fetchRemoteUrlData( targetUrl ) ).resolves.toEqual(
-				data
-			);
+			await expect( fetchUrlData( targetUrl ) ).resolves.toEqual( data );
 
 			// Should now be in cache so no need to refetch from API.
 			expect( apiFetch ).toBeCalledTimes( 0 );
@@ -105,17 +101,47 @@ describe( 'fetchRemoteUrlData', () => {
 				.mockReturnValueOnce( Promise.reject( 'fetch failed' ) )
 				.mockReturnValueOnce( Promise.resolve( data ) );
 
-			await expect( fetchRemoteUrlData( targetUrl ) ).rejects.toEqual(
+			await expect( fetchUrlData( targetUrl ) ).rejects.toEqual(
 				'fetch failed'
 			);
 
 			// Cache should not store the previous failed fetch and should retry
 			// with a new fetch.
-			await expect( fetchRemoteUrlData( targetUrl ) ).resolves.toEqual(
-				data
-			);
+			await expect( fetchUrlData( targetUrl ) ).resolves.toEqual( data );
 
 			expect( apiFetch ).toBeCalledTimes( 2 );
 		} );
+	} );
+
+	describe( 'URL validation', () => {
+		it.each( [ '#internal-link' ] )(
+			'errors when an invalid URL is passed',
+			async ( targetUrl ) => {
+				expect( apiFetch ).toBeCalledTimes( 0 );
+
+				await expect( fetchUrlData( targetUrl ) ).rejects.toEqual(
+					expect.stringContaining(
+						`${ targetUrl } is not a valid URL.`
+					)
+				);
+			}
+		);
+		it.each( [
+			'tel:123456',
+			'ftp://something',
+			'mailto:example@wordpress.org',
+			'file:somefilehere',
+		] )(
+			'errors when a non-http protocol (%s) is passed as part of URL',
+			async ( targetUrl ) => {
+				expect( apiFetch ).toBeCalledTimes( 0 );
+
+				await expect( fetchUrlData( targetUrl ) ).rejects.toEqual(
+					expect.stringContaining(
+						`${ targetUrl } does not have a valid protocol.`
+					)
+				);
+			}
+		);
 	} );
 } );
