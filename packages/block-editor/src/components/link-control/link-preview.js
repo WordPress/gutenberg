@@ -28,9 +28,9 @@ export default function LinkPreview( {
 	hasRichPreviews = false,
 } ) {
 	// Avoid fetching if rich previews are not desired.
-	const useRichPreviews = hasRichPreviews ? value?.url : null;
+	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
-	const { richData, isFetching } = useRichUrlData( useRichPreviews );
+	const { richData, isFetching } = useRichUrlData( showRichPreviews );
 
 	// Rich data may be an empty object so test for that.
 	const hasRichData = richData && Object.keys( richData ).length;
