@@ -17,6 +17,7 @@ import { setFreeformContentHandlerName } from '@wordpress/blocks';
  * Internal dependencies
  */
 import CustomizeWidgets from './components/customize-widgets';
+import SidebarControls from './components/sidebar-controls';
 import getSidebarSection from './controls/sidebar-section';
 import getSidebarControl from './controls/sidebar-control';
 import './filters';
@@ -100,12 +101,14 @@ export function initialize( editorName, blockEditorSettings ) {
 		);
 
 		render(
-			<CustomizeWidgets
-				api={ wp.customize }
-				sidebarControls={ sidebarControls }
-				blockEditorSettings={ blockEditorSettings }
-				onError={ reboot }
-			/>,
+			<SidebarControls sidebarControls={ sidebarControls }>
+				<CustomizeWidgets
+					api={ wp.customize }
+					sidebarControls={ sidebarControls }
+					blockEditorSettings={ blockEditorSettings }
+					onError={ reboot }
+				/>
+			</SidebarControls>,
 			container
 		);
 	} );
