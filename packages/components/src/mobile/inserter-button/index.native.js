@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, View, TouchableHighlight, Text } from 'react-native';
+import { View, TouchableHighlight, Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
+import { sparkles } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -91,8 +92,8 @@ class MenuItem extends Component {
 						] }
 					>
 						{ blockIsNew && (
-							<Image
-								source={ require( './images/sparkles.png' ) }
+							<Icon
+								icon={ sparkles }
 								style={ styles.newIndicator }
 							/>
 						) }
