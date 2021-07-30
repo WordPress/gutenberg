@@ -77,8 +77,10 @@ export default function TemplatePartPlaceholder( {
 	);
 
 	const onCreate = useCallback(
-		async ( startingBlocks = [] ) => {
-			const title = __( 'Untitled Template Part' );
+		async (
+			startingBlocks = [],
+			title = __( 'Untitled Template Part' )
+		) => {
 			// If we have `area` set from block attributes, means an exposed
 			// block variation was inserted. So add this prop to the template
 			// part entity on creation. Afterwards remove `area` value from
@@ -184,9 +186,14 @@ export default function TemplatePartPlaceholder( {
 			) }
 			{ step === PLACEHOLDER_STEPS.patterns && (
 				<PatternsSetup
+					areaLabel={ areaLabel }
+					areaIcon={ areaIcon }
 					onCreate={ onCreate }
 					clientId={ clientId }
 					filterPatternsFn={ filterPatternsFn }
+					resetPlaceholder={ () =>
+						setStep( PLACEHOLDER_STEPS.initial )
+					}
 				/>
 			) }
 		</>

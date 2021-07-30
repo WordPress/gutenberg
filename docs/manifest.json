@@ -1020,6 +1020,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "ItemGroup",
+		"slug": "item-group",
+		"markdown_source": "../packages/components/src/item-group/item-group/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Item",
+		"slug": "item",
+		"markdown_source": "../packages/components/src/item-group/item/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "KeyboardShortcuts",
 		"slug": "keyboard-shortcuts",
 		"markdown_source": "../packages/components/src/keyboard-shortcuts/README.md",

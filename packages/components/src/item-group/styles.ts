@@ -6,8 +6,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { CONFIG } from '../../utils';
-import COLORS from '../../utils/colors-values';
+import { CONFIG, COLORS } from '../utils';
 
 export const unstyledButton = css`
 	appearance: none;
@@ -28,21 +27,23 @@ export const unstyledButton = css`
 	}
 `;
 
-export const item = css`
+export const itemWrapper = css`
 	width: 100%;
 	display: block;
 `;
+
+export const item = itemWrapper;
 
 export const bordered = css`
 	border: 1px solid ${ CONFIG.surfaceBorderColor };
 `;
 
 export const separated = css`
-	> *:not( marquee ) {
+	> *:not( marquee ) > * {
 		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
 	}
 
-	> *:last-of-type:not( :focus ) {
+	> *:last-of-type > *:not( :focus ) {
 		border-bottom-color: transparent;
 	}
 `;
@@ -56,12 +57,12 @@ export const spacedAround = css`
 export const rounded = css`
 	border-radius: ${ borderRadius };
 
-	> *:first-of-type {
+	> *:first-of-type > * {
 		border-top-left-radius: ${ borderRadius };
 		border-top-right-radius: ${ borderRadius };
 	}
 
-	> *:last-of-type {
+	> *:last-of-type > * {
 		border-bottom-left-radius: ${ borderRadius };
 		border-bottom-right-radius: ${ borderRadius };
 	}

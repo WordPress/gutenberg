@@ -103,7 +103,7 @@ export default function ManageLocations( {
 				labelPosition="top"
 				value={ menuLocation.menu }
 				options={ [
-					{ value: 0, label: __( '-' ), key: 0 },
+					{ value: 0, label: __( 'Select a Menu' ), key: 0 },
 					...menus.map( ( { id, name } ) => ( {
 						key: id,
 						value: id,
