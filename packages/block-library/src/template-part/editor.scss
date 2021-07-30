@@ -20,7 +20,7 @@
 		cursor: pointer;
 		margin-top: $grid-unit-20;
 		transition: all 0.05s ease-in-out;
-		border: $border-width solid transparent;
+		border: $border-width solid $gray-300;
 		width: 100%;
 		background-color: $white;
 
@@ -37,6 +37,10 @@
 
 		&.is-placeholder {
 			min-height: 100px;
+		}
+
+		.block-editor-block-preview__container {
+			border-bottom: $border-width solid $gray-300;
 		}
 	}
 
