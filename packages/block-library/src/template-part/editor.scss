@@ -81,3 +81,18 @@
 		}
 	}
 }
+
+.wp-block-template-part__placeholder-create-new__title-form {
+	.wp-block-template-part__placeholder-create-new__title-form-actions {
+		padding-top: $grid-unit-15;
+		// Unsure why these styles need to be added since we are using the Flex component with
+		// flex-end setting.  Created issue https://github.com/WordPress/gutenberg/issues/33735 to
+		// attempt document this issue.
+		display: flex;
+		justify-content: flex-end;
+
+		.components-flex-item {
+			margin-left: $grid-unit-15;
+		}
+	}
+}
