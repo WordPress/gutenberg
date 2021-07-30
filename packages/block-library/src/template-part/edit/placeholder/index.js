@@ -157,6 +157,7 @@ export default function TemplatePartPlaceholder( {
 				<PatternsSetup
 					area={ area }
 					areaLabel={ areaLabel }
+					areaIcon={ areaIcon }
 					onCreate={ onCreate }
 					clientId={ clientId }
 					resetPlaceholder={ () =>

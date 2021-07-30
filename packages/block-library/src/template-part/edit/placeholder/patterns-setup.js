@@ -10,11 +10,13 @@ import {
 	FlexItem,
 	Button,
 	Modal,
+	Placeholder,
 } from '@wordpress/components';
 
 export default function PatternsSetup( {
 	area,
 	areaLabel,
+	areaIcon,
 	clientId,
 	onCreate,
 	resetPlaceholder,
@@ -44,7 +46,11 @@ export default function PatternsSetup( {
 			<BlockPatternSetup
 				clientId={ clientId }
 				startBlankComponent={
-					<StartBlankComponent setTitleStep={ setIsTitleStep } />
+					<StartBlankComponent
+						setTitleStep={ setIsTitleStep }
+						areaLabel={ areaLabel }
+						areaIcon={ areaIcon }
+					/>
 				}
 				onBlockPatternSelect={ selectPattern }
 				filterPatternsFn={ ( pattern ) =>
@@ -82,7 +88,12 @@ export default function PatternsSetup( {
 								</Button>
 							</FlexItem>
 							<FlexItem>
-								<Button variant="primary" type="submit">
+								<Button
+									variant="primary"
+									type="submit"
+									disabled={ ! title.length }
+									aria-disabled={ ! title.length }
+								>
 									{ __( 'Create' ) }
 								</Button>
 							</FlexItem>
@@ -94,9 +105,19 @@ export default function PatternsSetup( {
 	);
 }
 
-function StartBlankComponent( { setTitleStep } ) {
+function StartBlankComponent( { setTitleStep, areaLabel, areaIcon } ) {
 	useEffect( () => {
 		setTitleStep( true );
 	}, [] );
-	return null;
+	return (
+		<Placeholder
+			label={ areaLabel }
+			icon={ areaIcon }
+			instructions={ sprintf(
+				// Translators: %s as template part area title ("Header", "Footer", "Template Part", etc.).
+				'Creating your new %s...',
+				areaLabel.toLowerCase()
+			) }
+		/>
+	);
 }
