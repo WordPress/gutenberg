@@ -22,6 +22,14 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 const MAX_SUGGESTED_ITEMS = 6;
 
+/**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation and rerendering the component.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
+
 export function BlockTypesTab( {
 	rootClientId,
 	onInsert,
@@ -82,7 +90,7 @@ export function BlockTypesTab( {
 	const didRenderAllCategories =
 		categories.length === currentlyRenderedCategories.length;
 	const currentlyRenderedCollections = useAsyncList(
-		didRenderAllCategories ? collections : []
+		didRenderAllCategories ? collections : EMPTY_ARRAY
 	);
 
 	return (
