@@ -32,15 +32,15 @@
 }
 
 .setFeaturedButton {
-	border-top-width: $border-width;
-	border-top-color: $light-gray-400;
-	padding: $grid-unit-20;
-	text-align: center;
+	border-bottom-width: $border-width;
+	border-bottom-color: $light-gray-400;
+	padding-bottom: $grid-unit-20;
+	text-align: left;
 	color: $blue-50;
 }
 
 .setFeaturedButtonDark {
-	border-top-color: $gray-70;
+	border-bottom-color: $gray-70;
 	color: $blue-30;
 }
 
