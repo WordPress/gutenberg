@@ -1,5 +1,9 @@
 # ProgressiveDisclosurePanel
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 These panels provide progressive discovery options for their children. For
 example the controls provided via block supports.
 
@@ -66,18 +70,24 @@ export function DimensionPanel( props ) {
 
 ### Props
 
-#### label
+#### `label`: `string`
 
 The label for the panel's dropdown menu.
 
-#### resetAll
+- Required: Yes
+
+#### `resetAll`: `function`
 
 A function to call when the `Reset all` menu option is selected. This is passed
 through to the panel's title component.
 
-#### title
+- Required: Yes
 
-Title to be displayed within the panel's title.
+#### `title`: `string`
+
+Text to be displayed within the panel's title.
+
+- Required: Yes
 
 ### Sub-Components
 
