@@ -19,7 +19,7 @@ import {
  * Internal dependencies
  */
 import ProgressiveDisclosurePanelItem from '../progressive-disclosure-panel-item';
-import ProgressiveDisclosurePanelTitle from '../progressive-disclosure-panel-title';
+import ProgressiveDisclosurePanelHeader from '../progressive-disclosure-panel-header';
 
 const PanelContext = createContext( {} );
 
@@ -28,7 +28,7 @@ export const usePanelContext = () => useContext( PanelContext );
 const isMenuItem = ( item ) => item?.type === ProgressiveDisclosurePanelItem;
 
 const ProgressiveDisclosurePanel = ( props ) => {
-	const { children, className, label: menuLabel, resetAll, title } = props;
+	const { children, className, header, label: menuLabel, resetAll } = props;
 	const [ menuItems, setMenuItems ] = useState( {} );
 
 	// This panel only needs to concern itself with the
@@ -123,11 +123,11 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	return (
 		<div className={ classes }>
 			<PanelContext.Provider value={ menuItems }>
-				<ProgressiveDisclosurePanelTitle
+				<ProgressiveDisclosurePanelHeader
+					header={ header }
 					menuLabel={ menuLabel }
-					title={ title }
-					toggleChild={ toggleChild }
 					resetAll={ resetAllChildren }
+					toggleChild={ toggleChild }
 				/>
 				{ children }
 			</PanelContext.Provider>

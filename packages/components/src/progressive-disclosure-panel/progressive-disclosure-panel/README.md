@@ -50,8 +50,8 @@ export function DimensionPanel( props ) {
 
 	return (
 		<ProgressiveDisclosurePanel
+			header={ __( 'Dimensions' ) }
 			label={ __( 'Dimensions options' ) }
-			title={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 		>
 			{ ! isPaddingDisabled && (
@@ -79,12 +79,12 @@ The label for the panel's dropdown menu.
 ### `resetAll`: `function`
 
 A function to call when the `Reset all` menu option is selected. This is passed
-through to the panel's title component.
+through to the panel's header component.
 
 - Required: Yes
 
-### `title`: `string`
+### `header`: `string`
 
-Text to be displayed within the panel's title.
+Text to be displayed within the panel's header.
 
 - Required: Yes

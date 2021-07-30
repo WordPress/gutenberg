@@ -73,7 +73,7 @@ export function DimensionsPanel( props ) {
 		<InspectorControls key="dimensions">
 			<ProgressiveDisclosurePanel
 				label={ __( 'Dimensions options' ) }
-				title={ __( 'Dimensions' ) }
+				header={ __( 'Dimensions' ) }
 				resetAll={ resetAll }
 			>
 				{ ! isPaddingDisabled && (

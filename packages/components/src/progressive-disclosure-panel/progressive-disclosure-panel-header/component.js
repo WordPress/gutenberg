@@ -12,17 +12,17 @@ import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import DropdownMenu from '../../dropdown-menu';
 
-const ProgressiveDisclosurePanelTitle = ( props ) => {
-	const { menuLabel, resetAll, title, toggleChild } = props;
+const ProgressiveDisclosurePanelHeader = ( props ) => {
+	const { menuLabel, resetAll, header, toggleChild } = props;
 	const menuItems = usePanelContext();
 
-	if ( ! title ) {
+	if ( ! header ) {
 		return null;
 	}
 
 	return (
-		<h2 className="components-progressive-disclosure-panel__title">
-			{ title }
+		<h2 className="components-progressive-disclosure-panel__header">
+			{ header }
 			<DropdownMenu icon={ moreHorizontal } label={ menuLabel }>
 				{ ( { onClose } ) => (
 					<>
@@ -67,4 +67,4 @@ const ProgressiveDisclosurePanelTitle = ( props ) => {
 	);
 };
 
-export default ProgressiveDisclosurePanelTitle;
+export default ProgressiveDisclosurePanelHeader;

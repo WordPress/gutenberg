@@ -15,8 +15,8 @@ const resetAll = jest.fn();
 
 // Default props for the progressive disclosure panel.
 const defaultProps = {
+	header: 'Panel header',
 	label: 'Display options',
-	title: 'Panel title',
 	resetAll,
 };
 
@@ -211,11 +211,11 @@ describe( 'ProgressiveDisclosurePanel', () => {
 			expect( menuItems[ 1 ] ).toHaveAttribute( 'disabled' );
 		} );
 
-		it( 'should render panel title', () => {
+		it( 'should render panel header', () => {
 			renderPanel();
-			const title = screen.getByText( defaultProps.title );
+			const header = screen.getByText( defaultProps.header );
 
-			expect( title ).toBeInTheDocument();
+			expect( header ).toBeInTheDocument();
 		} );
 	} );
 

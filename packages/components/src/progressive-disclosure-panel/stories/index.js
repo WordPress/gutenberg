@@ -36,8 +36,8 @@ export const _default = () => {
 		<PanelWrapperView>
 			<Panel>
 				<ProgressiveDisclosurePanel
+					header="Progressive Disclosure Panel"
 					label="Display options"
-					title="Progressive Disclosure Panel"
 					resetAll={ resetAll }
 				>
 					<ProgressiveDisclosurePanelItem

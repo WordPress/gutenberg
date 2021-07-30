@@ -1,12 +1,11 @@
-# ProgressiveDisclosurePanelTitle
+# ProgressiveDisclosurePanelHeader
 
 <div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 <br />
 
-This component renders a progressive disclosure panel's title and menu.
-
+This component renders a progressive disclosure panel's header including a menu.
 
 ## Usage
 
