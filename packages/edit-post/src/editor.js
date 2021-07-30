@@ -61,7 +61,9 @@ function Editor( {
 		const { getEntityRecord, getPostType, getEntityRecords } = select(
 			coreStore
 		);
-		const { getEditorSettings, __unstableIsEditorReady } = select( editorStore );
+		const { getEditorSettings, __unstableIsEditorReady } = select(
+			editorStore
+		);
 		const { getBlockTypes } = select( blocksStore );
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postType
