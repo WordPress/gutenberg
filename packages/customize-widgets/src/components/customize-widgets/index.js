@@ -17,7 +17,6 @@ export default function CustomizeWidgets( {
 	api,
 	sidebarControls,
 	blockEditorSettings,
-	onError,
 } ) {
 	const [ activeSidebarControl, setActiveSidebarControl ] = useState( null );
 	const parentContainer = document.getElementById(
@@ -44,7 +43,7 @@ export default function CustomizeWidgets( {
 	const activeSidebar =
 		activeSidebarControl &&
 		createPortal(
-			<ErrorBoundary onError={ onError }>
+			<ErrorBoundary>
 				<SidebarBlockEditor
 					key={ activeSidebarControl.id }
 					blockEditorSettings={ blockEditorSettings }

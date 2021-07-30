@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { render, unmountComponentAtNode } from '@wordpress/element';
+import { render } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -25,25 +25,6 @@ const { wp } = window;
 
 const DISABLED_BLOCKS = [ 'core/more', 'core/block', 'core/freeform' ];
 const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
-
-export function reinitializeEditor( target, sidebarControls, settings ) {
-	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind(
-		null,
-		target,
-		sidebarControls,
-		settings
-	);
-	render(
-		<CustomizeWidgets
-			api={ wp.customize }
-			sidebarControls={ sidebarControls }
-			blockEditorSettings={ settings }
-			onError={ reboot }
-		/>,
-		target
-	);
-}
 
 /**
  * Initializes the widgets block editor in the customizer.
@@ -92,19 +73,11 @@ export function initialize( editorName, blockEditorSettings ) {
 			}
 		} );
 
-		const reboot = reinitializeEditor.bind(
-			null,
-			container,
-			sidebarControls,
-			blockEditorSettings
-		);
-
 		render(
 			<CustomizeWidgets
 				api={ wp.customize }
 				sidebarControls={ sidebarControls }
 				blockEditorSettings={ blockEditorSettings }
-				onError={ reboot }
 			/>,
 			container
 		);

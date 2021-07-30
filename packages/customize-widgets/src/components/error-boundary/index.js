@@ -19,9 +19,6 @@ function CopyButton( { text, children } ) {
 export default class ErrorBoundary extends Component {
 	constructor() {
 		super( ...arguments );
-
-		this.reboot = this.reboot.bind( this );
-
 		this.state = {
 			error: null,
 		};
@@ -29,10 +26,6 @@ export default class ErrorBoundary extends Component {
 
 	componentDidCatch( error ) {
 		this.setState( { error } );
-	}
-
-	reboot() {
-		this.props.onError();
 	}
 
 	render() {
@@ -45,13 +38,6 @@ export default class ErrorBoundary extends Component {
 			<Warning
 				className="customize-widgets-error-boundary"
 				actions={ [
-					<Button
-						key="recovery"
-						onClick={ this.reboot }
-						variant="secondary"
-					>
-						{ __( 'Attempt Recovery' ) }
-					</Button>,
 					<CopyButton key="copy-error" text={ error.stack }>
 						{ __( 'Copy Error' ) }
 					</CopyButton>,
