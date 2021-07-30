@@ -9,6 +9,7 @@ import { WebView } from 'react-native-webview';
  */
 import {
 	renderToString,
+	memo,
 	useRef,
 	useState,
 	useEffect,
@@ -101,7 +102,7 @@ const style = `
 	}
 `;
 
-export default function Sandbox( {
+function Sandbox( {
 	html = '',
 	providerUrl = '',
 	scripts = [],
@@ -247,3 +248,5 @@ export default function Sandbox( {
 		/>
 	);
 }
+
+export default memo( Sandbox );
