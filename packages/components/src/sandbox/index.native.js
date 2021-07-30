@@ -113,7 +113,7 @@ function Sandbox( {
 	const ref = useRef();
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
-	const [ iframeHtml, setiFrameHtml ] = useState();
+	const [ contentHtml, setContentHtml ] = useState( getHtmlDoc() );
 
 	const windowSize = Dimensions.get( 'window' );
 	const [ isLandscape, setIsLandscape ] = useState(
@@ -126,7 +126,7 @@ function Sandbox( {
 		ios: providerUrl,
 	} );
 
-	function trySandbox( forceRerender = false ) {
+	function getHtmlDoc() {
 		// TODO: Use the device's locale
 		const lang = 'en';
 
@@ -167,16 +167,20 @@ function Sandbox( {
 				</body>
 			</html>
 		);
-		const newiFrameHtml = '<!DOCTYPE html>' + renderToString( htmlDoc );
+		return '<!DOCTYPE html>' + renderToString( htmlDoc );
+	}
 
-		if ( forceRerender && iframeHtml === newiFrameHtml ) {
+	function updateContentHtml( forceRerender = false ) {
+		const newContentHtml = getHtmlDoc();
+
+		if ( forceRerender && contentHtml === newContentHtml ) {
 			// The re-render is forced by updating the state with empty HTML,
 			// waiting for the JS code to be executed with "setImmediate" and then
-			// setting the IFrame HTML again.
-			setiFrameHtml( '' );
-			setImmediate( () => setiFrameHtml( newiFrameHtml ) );
+			// setting the content HTML again.
+			setContentHtml( '' );
+			setImmediate( () => setContentHtml( newContentHtml ) );
 		} else {
-			setiFrameHtml( newiFrameHtml );
+			setContentHtml( newContentHtml );
 		}
 	}
 
@@ -223,18 +227,14 @@ function Sandbox( {
 	}, [] );
 
 	useEffect( () => {
-		trySandbox();
-	}, [ title, type, styles, scripts ] );
-
-	useEffect( () => {
-		trySandbox( true );
-	}, [ html ] );
+		updateContentHtml();
+	}, [ html, title, type, styles, scripts ] );
 
 	return (
 		<WebView
 			key={ key }
 			ref={ ref }
-			source={ { baseUrl: providerUrl, html: iframeHtml } }
+			source={ { baseUrl: providerUrl, html: contentHtml } }
 			// Wildcard value is required for static HTML
 			// Reference: https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md#source
 			originWhitelist={ [ '*' ] }
