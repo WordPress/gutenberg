@@ -89,8 +89,13 @@ export function BlockTypesTab( {
 	const currentlyRenderedCategories = useAsyncList( categories );
 	const didRenderAllCategories =
 		categories.length === currentlyRenderedCategories.length;
+
+	// Async List requires an array
+	const collectionEntries = useMemo( () => {
+		return Object.entries( collections );
+	}, [ collections ] );
 	const currentlyRenderedCollections = useAsyncList(
-		didRenderAllCategories ? collections : EMPTY_ARRAY
+		didRenderAllCategories ? collectionEntries : EMPTY_ARRAY
 	);
 
 	return (
@@ -144,7 +149,7 @@ export function BlockTypesTab( {
 
 				{ map(
 					currentlyRenderedCollections,
-					( collection, namespace ) => {
+					( [ namespace, collection ] ) => {
 						const collectionItems = itemsPerCollection[ namespace ];
 						if ( ! collectionItems || ! collectionItems.length ) {
 							return null;
