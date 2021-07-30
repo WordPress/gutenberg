@@ -191,7 +191,7 @@ $preview-image-height: 140px;
 		justify-content: center;
 
 		img {
-			width: 16px;
+			width: 16px; // favicons often have a source of 32px
 		}
 	}
 
