@@ -280,7 +280,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		// If the icon is a data URL, return it.
 		$parsed_icon = parse_url( $icon );
-		if ( 'data' === $parsed_icon['scheme'] ) {
+		if ( isset( $parsed_icon['schema'] ) && 'data' === $parsed_icon['scheme'] ) {
 			return $icon;
 		}
 
