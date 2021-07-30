@@ -474,13 +474,7 @@ export class ImageEdit extends Component {
 			/>
 		);
 
-		return (
-			<PanelBody>
-				{ isFeaturedImage
-					? removeFeaturedButton()
-					: setFeaturedButton() }
-			</PanelBody>
-		);
+		return isFeaturedImage ? removeFeaturedButton() : setFeaturedButton();
 	}
 
 	render() {
@@ -564,9 +558,11 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ androidOnly &&
-					canImageBeFeatured &&
-					this.getSetFeaturedButton( isFeaturedImage ) }
+				<PanelBody title={ __( 'Featured Image' ) }>
+					{ androidOnly &&
+						canImageBeFeatured &&
+						this.getSetFeaturedButton( isFeaturedImage ) }
+				</PanelBody>
 			</InspectorControls>
 		);
 
