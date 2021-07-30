@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
+	Children,
 	createContext,
 	useContext,
 	useEffect,
@@ -33,7 +34,7 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	// This panel only needs to concern itself with the
 	// ProgressiveDisclosurePanelItem components to be displayed in the menu.
 	const filteredChildren = useMemo( () => {
-		return Array.isArray( children ) ? children.filter( isMenuItem ) : [];
+		return Children.toArray( children ).filter( isMenuItem );
 	}, [ children ] );
 
 	// Refresh which children should be reflected in the menu and what their
