@@ -62,7 +62,6 @@ export function initialize( editorName, blockEditorSettings ) {
 	wp.customize.controlConstructor.sidebar_block_editor = SidebarControl;
 
 	const container = document.createElement( 'div' );
-	container.classList.add( 'test' );
 	document.body.appendChild( container );
 
 	wp.customize.bind( 'ready', () => {
