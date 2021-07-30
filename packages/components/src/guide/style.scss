@@ -62,11 +62,6 @@
 		padding: 0 $grid-unit-40;
 		position: relative;
 		width: 100%;
-
-		@media (max-width: $break-small) {
-			position: absolute;
-			bottom: 0;
-		}
 	}
 
 	&__page-control {
@@ -92,15 +87,15 @@
 	height: 80vh;
 	max-height: 575px;
 
-	@media (max-width: $break-small) {
-		position: absolute;
-		bottom: 5%;
-		left: $grid-unit-20;
-		right: $grid-unit-20;
-		top: 5%;
-		margin: 0 auto;
+	@media ( max-width: $break-small ) {
+		margin: auto;
 		min-width: 280px;
 		max-width: calc(100vw - #{$grid-unit-20} * 2);
+
+		// This can be avoided if we add styles to let the image resize or don't change the min-width
+		&.components-modal__content {
+			overflow-x: hidden;
+		}
 	}
 }
 
