@@ -1,4 +1,6 @@
 .wp-block-dropdown {
+	display: block;
+
 	// Show on editor selected, even if on frontend it only stays open on focus-within.
 	&.is-selected,
 	&.has-child-selected {
