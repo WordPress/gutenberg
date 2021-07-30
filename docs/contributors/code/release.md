@@ -89,7 +89,7 @@ Guidelines for proof-reading include:
 -   When multiple pull requests relate to the same task (such as a follow-up pull request), try to combine them to a single entry.
 -   If subtasks of a related set of pull requests are substantial, consider organizing as entries in a nested list.
 -   If one or more pull requests revert one or more pull requests in the same release netting a zero-sum of code changes, remove them.
--   Remove all mobile app pull request entries.
+-   Remove all mobile app pull request entries (the only exception to this rule is if the mobile PR also updates functionality for the web).
 
 #### 2. Selecting the release highlights
 
