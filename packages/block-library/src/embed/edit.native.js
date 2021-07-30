@@ -28,12 +28,7 @@ import { View } from '@wordpress/primitives';
 
 const EmbedEdit = ( props ) => {
 	const {
-		attributes: {
-			providerNameSlug,
-			previewable,
-			responsive,
-			url: attributesUrl,
-		},
+		attributes: { providerNameSlug, previewable, responsive, url },
 		attributes,
 		isSelected,
 		onReplace,
@@ -49,8 +44,6 @@ const EmbedEdit = ( props ) => {
 	};
 	const { icon, title } =
 		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;
-
-	const [ url, setURL ] = useState( attributesUrl );
 
 	const { wasBlockJustInserted } = useSelect(
 		( select ) => ( {
@@ -71,12 +64,12 @@ const EmbedEdit = ( props ) => {
 				isPreviewEmbedFallback,
 				isRequestingEmbedPreview,
 			} = select( coreStore );
-			if ( ! attributesUrl ) {
+			if ( ! url ) {
 				return { fetching: false, cannotEmbed: false };
 			}
 
-			const embedPreview = getEmbedPreview( attributesUrl );
-			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
+			const embedPreview = getEmbedPreview( url );
+			const previewIsFallback = isPreviewEmbedFallback( url );
 
 			// The external oEmbed provider does not exist. We got no type info and no html.
 			const badEmbedProvider =
@@ -94,8 +87,7 @@ const EmbedEdit = ( props ) => {
 			// if there is an `attributesUrl` set but there is no data in
 			// `embedPreview` which represents the response returned from the API.
 			const isFetching =
-				isRequestingEmbedPreview( attributesUrl ) ||
-				( attributesUrl && ! embedPreview );
+				isRequestingEmbedPreview( url ) || ( url && ! embedPreview );
 
 			return {
 				preview: validPreview ? embedPreview : undefined,
@@ -103,7 +95,7 @@ const EmbedEdit = ( props ) => {
 				cannotEmbed: ! validPreview || previewIsFallback,
 			};
 		},
-		[ attributesUrl ]
+		[ url ]
 	);
 
 	/**
@@ -129,11 +121,10 @@ const EmbedEdit = ( props ) => {
 		}
 		// At this stage, we're not fetching the preview and know it can't be embedded,
 		// so try removing any trailing slash, and resubmit.
-		const newURL = attributesUrl.replace( /\/$/, '' );
-		setURL( newURL );
+		const newURL = url.replace( /\/$/, '' );
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
-	}, [ preview?.html, attributesUrl ] );
+	}, [ preview?.html, url ] );
 
 	// Handle incoming preview
 	useEffect( () => {
@@ -162,7 +153,7 @@ const EmbedEdit = ( props ) => {
 
 	const blockProps = useBlockProps();
 
-	if ( fetching || ( url !== attributesUrl && preview ) ) {
+	if ( fetching ) {
 		return (
 			<View { ...blockProps }>
 				<EmbedLoading />
@@ -215,10 +206,6 @@ const EmbedEdit = ( props ) => {
 				isVisible={ isEditingURL }
 				onClose={ () => setIsEditingURL( false ) }
 				onSubmit={ ( value ) => {
-					// On native, the URL change is only notified when submitting,
-					// and not via 'onChange', so we have to explicitly set the URL.
-					setURL( value );
-
 					setIsEditingURL( false );
 					setAttributes( { url: value } );
 				} }
