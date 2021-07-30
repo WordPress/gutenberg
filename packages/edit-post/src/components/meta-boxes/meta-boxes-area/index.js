@@ -22,7 +22,7 @@ import { store as editPostStore } from '../../../store';
  * @param {string} props.location metabox location.
  * @return {WPComponent} The component to be rendered.
  */
-const MetaBoxesArea = ( { location } ) => {
+function MetaBoxesArea( { location } ) {
 	const container = useRef( null );
 	const formRef = useRef( null );
 
@@ -66,6 +66,6 @@ const MetaBoxesArea = ( { location } ) => {
 			<div className="edit-post-meta-boxes-area__clear" />
 		</div>
 	);
-};
+}
 
 export default MetaBoxesArea;
