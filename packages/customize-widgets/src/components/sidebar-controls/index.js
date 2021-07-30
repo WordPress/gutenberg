@@ -1,33 +1,15 @@
 /**
  * WordPress dependencies
  */
-import {
-	createContext,
-	useMemo,
-	useContext,
-	useEffect,
-	useState,
-} from '@wordpress/element';
+import { createContext, useMemo, useContext } from '@wordpress/element';
 
 export const SidebarControlsContext = createContext();
 
-export default function SidebarControls( { sidebarControls, children } ) {
-	const [ activeSidebarControl, setActiveSidebarControl ] = useState( null );
-
-	useEffect( () => {
-		const unsubscribers = sidebarControls.map( ( sidebarControl ) =>
-			sidebarControl.subscribe( ( expanded ) => {
-				if ( expanded ) {
-					setActiveSidebarControl( sidebarControl );
-				}
-			} )
-		);
-
-		return () => {
-			unsubscribers.forEach( ( unsubscriber ) => unsubscriber() );
-		};
-	}, [ sidebarControls ] );
-
+export default function SidebarControls( {
+	sidebarControls,
+	activeSidebarControl,
+	children,
+} ) {
 	const context = useMemo(
 		() => ( {
 			sidebarControls,
