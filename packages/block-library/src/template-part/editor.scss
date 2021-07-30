@@ -8,7 +8,7 @@
 }
 
 .wp-block-template-part__selection-preview-search-form {
-	border-bottom: $border-width solid $gray-400;
+	border-bottom: $border-width solid $gray-300;
 }
 
 .wp-block-template-part__selection-preview-container {
@@ -20,7 +20,7 @@
 		cursor: pointer;
 		margin-top: $grid-unit-20;
 		transition: all 0.05s ease-in-out;
-		border: $border-width solid $gray-400;
+		border: $border-width solid $gray-300;
 		width: 100%;
 		background-color: $white;
 
@@ -40,7 +40,7 @@
 		}
 
 		.block-editor-block-preview__container {
-			border-bottom: $border-width solid $gray-400;
+			border-bottom: $border-width solid $gray-300;
 		}
 	}
 
