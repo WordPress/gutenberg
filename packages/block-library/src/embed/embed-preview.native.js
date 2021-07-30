@@ -91,7 +91,6 @@ const EmbedPreview = ( {
 							scripts={ scripts }
 							title={ iframeTitle }
 							providerUrl={ providerUrl }
-							// type={ sandboxClassnames }
 						/>
 					</View>
 				</TouchableWithoutFeedback>
@@ -105,16 +104,19 @@ const EmbedPreview = ( {
 			disabled={ ! isSelected }
 		>
 			<View>
-				{ previewable ? (
-					embedWrapper
-				) : (
-					<EmbedNoPreview
-						label={ label }
-						icon={ icon }
-						isSelected={ isSelected }
-						onPress={ () => setIsCaptionSelected( false ) }
-					/>
-				) }
+				{
+					// eslint-disable-next-line no-undef
+					__DEV__ && previewable ? (
+						embedWrapper
+					) : (
+						<EmbedNoPreview
+							label={ label }
+							icon={ icon }
+							isSelected={ isSelected }
+							onPress={ () => setIsCaptionSelected( false ) }
+						/>
+					)
+				}
 				<BlockCaption
 					accessibilityLabelCreator={ accessibilityLabelCreator }
 					accessible
