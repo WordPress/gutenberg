@@ -11,7 +11,7 @@ import { View } from '@wordpress/primitives';
 
 import { BlockCaption } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { memo, useState } from '@wordpress/element';
 import { SandBox } from '@wordpress/components';
 
 /**
@@ -131,4 +131,4 @@ const EmbedPreview = ( {
 	);
 };
 
-export default EmbedPreview;
+export default memo( EmbedPreview );
