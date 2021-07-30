@@ -124,7 +124,7 @@ $preview-image-height: 140px;
 .block-editor-link-control__search-item {
 	position: relative;
 	display: flex;
-	align-items: center;
+	align-items: flex-start; // when link text is very long it is important this indicator remains visible and thus should be aligned top.
 	font-size: $default-font-size;
 	cursor: pointer;
 	background: $white;
