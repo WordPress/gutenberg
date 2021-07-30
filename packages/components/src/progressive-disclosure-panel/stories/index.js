@@ -11,8 +11,10 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ProgressiveDisclosurePanel from '../';
-import ProgressiveDisclosurePanelItem from '../item';
+import {
+	ProgressiveDisclosurePanel,
+	ProgressiveDisclosurePanelItem,
+} from '../';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 

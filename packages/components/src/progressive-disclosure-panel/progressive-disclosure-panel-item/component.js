@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { usePanelContext } from './';
+import { usePanelContext } from '../progressive-disclosure-panel';
 
 // This wraps controls to be conditionally displayed within a progressive
 // disclosure panel. It helps prevent props being applied to HTML elements that

@@ -1092,9 +1092,21 @@
 		"parent": "components"
 	},
 	{
+		"title": "ProgressiveDisclosurePanelItem",
+		"slug": "progressive-disclosure-panel-item",
+		"markdown_source": "../packages/components/src/progressive-disclosure-panel/progressive-disclosure-panel-item/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ProgressiveDisclosurePanelTitle",
+		"slug": "progressive-disclosure-panel-title",
+		"markdown_source": "../packages/components/src/progressive-disclosure-panel/progressive-disclosure-panel-title/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ProgressiveDisclosurePanel",
 		"slug": "progressive-disclosure-panel",
-		"markdown_source": "../packages/components/src/progressive-disclosure-panel/README.md",
+		"markdown_source": "../packages/components/src/progressive-disclosure-panel/progressive-disclosure-panel/README.md",
 		"parent": "components"
 	},
 	{

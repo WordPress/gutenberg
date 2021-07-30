@@ -3,7 +3,7 @@
 <div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
-
+<br />
 These panels provide progressive discovery options for their children. For
 example the controls provided via block supports.
 
@@ -24,7 +24,7 @@ displaying by default through the `isShownByDefault` prop. Determining whether a
 child has a value is done via the `hasValue` function provided through the
 child's props.
 
-### Usage
+## Usage
 
 ```jsx
 import {
@@ -68,50 +68,23 @@ export function DimensionPanel( props ) {
 }
 ```
 
-### Props
+## Props
 
-#### `label`: `string`
+### `label`: `string`
 
 The label for the panel's dropdown menu.
 
 - Required: Yes
 
-#### `resetAll`: `function`
+### `resetAll`: `function`
 
 A function to call when the `Reset all` menu option is selected. This is passed
 through to the panel's title component.
 
 - Required: Yes
 
-#### `title`: `string`
+### `title`: `string`
 
 Text to be displayed within the panel's title.
 
 - Required: Yes
-
-### Sub-Components
-
-#### ProgressiveDisclosurePanelItem
-
-This component acts a wrapper and controls the display of items to contained
-within a ProgressiveDisclosurePanel. An item is displayed if it is
-flagged as a default control or the corresponding panel menu item, provided via
-context, is toggled on for this item.
-
-##### Props
-###### isShownByDefault
-
-This prop identifies the current item as being displayed by default. This means
-it will show regardless of whether it has a value set or is toggled on in the
-panel's menu.
-
--   Type: `boolean`
--   Required: Yes
-
-###### label
-
-The label acts as a key to locate the corresponding item in the panel's menu
-context. This is used when checking if the panel item should be displayed.
-
--   Type: `string`
--   Required: Yes

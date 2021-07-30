@@ -6,8 +6,10 @@ import { render, screen, fireEvent } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import ProgressiveDisclosurePanel from '../';
-import ProgressiveDisclosurePanelItem from '../item';
+import {
+	ProgressiveDisclosurePanel,
+	ProgressiveDisclosurePanelItem,
+} from '../';
 
 const resetAll = jest.fn();
 
