@@ -10,6 +10,10 @@
 
 -	Updated the visual styles of the RangeControl component ([#33824](https://github.com/WordPress/gutenberg/pull/33824))
 
+### New Feature
+
+-	Add `hideLabelFromVision` prop to `RangeControl` ([#33714](https://github.com/WordPress/gutenberg/pull/33714))
+
 ## 15.0.0 (2021-07-29)
 
 ### Breaking Change
