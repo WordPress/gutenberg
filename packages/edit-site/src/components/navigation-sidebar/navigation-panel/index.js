@@ -77,8 +77,8 @@ const NavigationPanel = ( { isOpen } ) => {
 	}, [ activeMenu, isOpen ] );
 
 	const closeOnEscape = ( event ) => {
-		if ( event.keyCode === ESCAPE ) {
-			event.stopPropagation();
+		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+			event.preventDefault();
 			setIsNavigationPanelOpened( false );
 		}
 	};

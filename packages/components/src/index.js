@@ -78,6 +78,10 @@ export { Heading as __experimentalHeading } from './heading';
 export { HStack as __experimentalHStack } from './h-stack';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
+export {
+	ItemGroup as __experimentalItemGroup,
+	Item as __experimentalItem,
+} from './item-group';
 export { default as __experimentalInputControl } from './input-control';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
@@ -147,7 +151,7 @@ export {
 	useCustomUnits as __experimentalUseCustomUnits,
 	parseUnit as __experimentalParseUnit,
 } from './unit-control';
-export { default as VisuallyHidden } from './visually-hidden';
+export { VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {

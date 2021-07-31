@@ -29,6 +29,7 @@
 
 .embed__icon--error {
 	margin-bottom: 6;
+	fill: $alert-red;
 }
 
 .embed__label {
@@ -55,6 +56,10 @@
 	color: $dark-secondary;
 }
 
+.embed__description--error {
+	color: $alert-red;
+}
+
 .embed__action {
 	width: 100%;
 	text-align: center;
@@ -77,10 +82,6 @@
 
 .embed-preview__loading--dark {
 	background-color: $background-dark-secondary;
-}
-
-.embed-preview__image {
-	flex: 1 1 auto;
 }
 
 .embed-no-preview__container {
