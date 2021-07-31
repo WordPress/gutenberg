@@ -22,8 +22,8 @@ export const HelpDetailSectionHeadingText = ( { text } ) => {
 };
 
 export const HelpDetailImage = ( { source } ) => {
-	return useMemo( () => {
-		console.log( Image.resolveAssetSource( source ) );
-		return <Image source={ source } style={ styles.helpDetailImage } />;
-	}, [ source ] );
+	return useMemo(
+		() => <Image source={ source } style={ styles.helpDetailImage } />,
+		[ source ]
+	);
 };
