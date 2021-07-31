@@ -7,7 +7,6 @@ import { View, Text } from 'react-native';
  * WordPress dependencies
  */
 import { BottomSheet, PanelBody } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -22,13 +21,13 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
-import HelpDetailNavigationScreen from './help-detail-navigation-screen.js';
-import HelpTopicRow from './help-topic-row.js';
-import IntroToBlocks from './intro-to-blocks';
-import AddBlocks from './add-blocks';
-import MoveBlocks from './move-blocks';
-import RemoveBlocks from './remove-blocks';
-import CustomizeBlocks from './customize-blocks';
+import HelpDetailNavigationScreen from './help-detail-navigation-screen.native.js';
+import HelpTopicRow from './help-topic-row.native.js';
+import IntroToBlocks from './intro-to-blocks.native.js';
+import AddBlocks from './add-blocks.native.js';
+import MoveBlocks from './move-blocks.native.js';
+import RemoveBlocks from './remove-blocks.native.js';
+import CustomizeBlocks from './customize-blocks.native.js';
 
 const HELP_TOPICS = [
 	{
@@ -56,7 +55,7 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 		styles.bottomSheetHeaderTitleDark
 	);
 
-	return useMemo( () => (
+	return (
 		<BottomSheet
 			isVisible={ isVisible }
 			onClose={ onClose }
@@ -105,7 +104,7 @@ function EditorHelpTopics( { isVisible, onClose, getStylesFromColorScheme } ) {
 				} ) }
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
-	) );
+	);
 }
 
 export default withPreferredColorScheme( EditorHelpTopics );

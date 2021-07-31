@@ -16,21 +16,19 @@ import {
 	HelpDetailBodyText,
 	HelpDetailSectionHeadingText,
 	HelpDetailImage,
-} from './view-sections';
+} from './view-sections.native';
 
-const RemoveBlocks = () => {
+const MoveBlocks = () => {
 	return (
 		<View style={ styles.helpDetailContainer }>
-			<HelpDetailImage
-				source={ require( './images/remove-blocks.png' ) }
-			/>
+			<HelpDetailImage source={ require( './images/move-blocks.png' ) } />
 			<HelpDetailBodyText
 				text={ __(
-					'To remove a block, select the block and click the three dots in the bottom right of the block to view the settings. From there, choose the option to remove the block.'
+					'You can rearrange blocks by tapping a block and then tapping the up and down arrows that appear on the bottom left side of the block to move it above or below other blocks.'
 				) }
 			/>
 		</View>
 	);
 };
 
-export default RemoveBlocks;
+export default MoveBlocks;

@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import styles from './style.scss';
-import { HelpDetailBodyText, HelpDetailImage } from './view-sections';
+import { HelpDetailBodyText, HelpDetailImage } from './view-sections.native';
 
 const CustomizeBlocks = () => {
 	return (

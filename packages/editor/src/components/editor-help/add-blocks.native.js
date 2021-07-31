@@ -16,7 +16,7 @@ import {
 	HelpDetailBodyText,
 	HelpDetailSectionHeadingText,
 	HelpDetailImage,
-} from './view-sections';
+} from './view-sections.native';
 
 const AddBlocks = () => {
 	return (
