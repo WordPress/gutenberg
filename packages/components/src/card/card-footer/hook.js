@@ -1,12 +1,4 @@
 /**
- * External dependencies
- */
-// Disable reason: Temporarily disable for existing usages
-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
-// eslint-disable-next-line no-restricted-imports
-import { cx } from '@emotion/css';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -16,6 +8,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { useContextSystem } from '../../ui/context';
 import * as styles from '../styles';
+import { useCx } from '../../utils/hooks/use-cx';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
@@ -29,6 +22,8 @@ export function useCardFooter( props ) {
 		size = 'medium',
 		...otherProps
 	} = useContextSystem( props, 'CardFooter' );
+
+	const cx = useCx();
 
 	const classes = useMemo(
 		() =>

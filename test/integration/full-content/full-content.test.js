@@ -20,7 +20,10 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import prettierConfig from '@wordpress/prettier-config';
-//eslint-disable-next-line no-restricted-syntax
+
+/**
+ * Internal dependencies
+ */
 import {
 	blockNameToFixtureBasename,
 	getAvailableBlockFixturesBasenames,
@@ -31,7 +34,7 @@ import {
 	writeBlockFixtureParsedJSON,
 	writeBlockFixtureJSON,
 	writeBlockFixtureSerializedHTML,
-} from '@wordpress/e2e-tests/fixtures';
+} from '../fixtures';
 
 const blockBasenames = getAvailableBlockFixturesBasenames();
 

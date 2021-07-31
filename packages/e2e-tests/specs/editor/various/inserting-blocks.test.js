@@ -57,7 +57,7 @@ describe( 'Inserting blocks', () => {
 		return page.mouse.click( x, y );
 	}
 
-	it( 'Should insert content using the placeholder and the regular inserter', async () => {
+	it.skip( 'Should insert content using the placeholder and the regular inserter', async () => {
 		// This ensures the editor is loaded in navigation mode.
 		await page.reload();
 		await page.waitForSelector( '.edit-post-layout' );
@@ -378,6 +378,7 @@ describe( 'Inserting blocks', () => {
 
 	it( 'shows block preview when hovering over block in inserter', async () => {
 		await openGlobalBlockInserter();
+		await page.waitForSelector( '.editor-block-list-item-paragraph' );
 		await page.focus( '.editor-block-list-item-paragraph' );
 		const preview = await page.waitForSelector(
 			'.block-editor-inserter__preview',

@@ -240,6 +240,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             }
 
+            @Override
+            public void requestPreview() {
+                Toast.makeText(MainApplication.this, "requestPreview called", Toast.LENGTH_SHORT).show();
+            }
+
         }, isDarkMode());
 
         return new ReactNativeHost(this) {

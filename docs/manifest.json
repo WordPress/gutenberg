@@ -570,6 +570,12 @@
 		"parent": "filters"
 	},
 	{
+		"title": "i18n Filters",
+		"slug": "i18n-filters",
+		"markdown_source": "../docs/reference-guides/filters/i18n-filters.md",
+		"parent": "filters"
+	},
+	{
 		"title": "Parser Filters",
 		"slug": "parser-filters",
 		"markdown_source": "../docs/reference-guides/filters/parser-filters.md",
@@ -1014,6 +1020,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "ItemGroup",
+		"slug": "item-group",
+		"markdown_source": "../packages/components/src/item-group/item-group/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Item",
+		"slug": "item",
+		"markdown_source": "../packages/components/src/item-group/item/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "KeyboardShortcuts",
 		"slug": "keyboard-shortcuts",
 		"markdown_source": "../packages/components/src/keyboard-shortcuts/README.md",
@@ -1149,6 +1167,12 @@
 		"title": "SearchControl",
 		"slug": "search-control",
 		"markdown_source": "../packages/components/src/search-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "SegmentedControl",
+		"slug": "segmented-control",
+		"markdown_source": "../packages/components/src/segmented-control/README.md",
 		"parent": "components"
 	},
 	{

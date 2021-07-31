@@ -51,6 +51,8 @@ export class PostSlug extends Component {
 			<PostSlugCheck>
 				<label htmlFor={ inputId }>{ __( 'Slug' ) }</label>
 				<input
+					autoComplete="off"
+					spellCheck="false"
 					type="text"
 					id={ inputId }
 					value={ editedSlug }

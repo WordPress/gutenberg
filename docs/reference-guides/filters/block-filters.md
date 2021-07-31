@@ -339,47 +339,56 @@ wp.blocks.getBlockTypes().forEach( function ( blockType ) {
 
 ## Hiding blocks from the inserter
 
-On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types` filter. You can return either true (all block types supported), false (no block types supported), or an array of block type names to allow. You can also use the second provided param `$post` to filter block types based on its content.
+### `allowed_block_types_all`
+
+_**Note:** Before WordPress 5.8 known as `allowed_block_types`. In the case when you want to support older versions of WordPress you might need a way to detect which filter should be used – the deprecated one vs the new one. The recommended way to proceed is to check if the `WP_Block_Editor_Context` class exists._
+
+On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types_all` filter. You can return either true (all block types supported), false (no block types supported), or an array of block type names to allow. You can also use the second provided param `$editor_context` to filter block types based on its content.
 
 ```php
 <?php
 // my-plugin.php
 
-function my_plugin_allowed_block_types( $allowed_block_types, $post ) {
-	if ( $post->post_type !== 'post' ) {
-		return $allowed_block_types;
+function filter_allowed_block_types_when_post_provided( $allowed_block_types, $editor_context ) {
+	if ( ! empty( $editor_context->post ) ) {
+		return array( 'core/paragraph', 'core/heading' );
 	}
-	return array( 'core/paragraph' );
+	return $allowed_block_types;
 }
 
-add_filter( 'allowed_block_types', 'my_plugin_allowed_block_types', 10, 2 );
+add_filter( 'allowed_block_types_all', 'filter_allowed_block_types_when_post_provided', 10, 2 );
 ```
 
 ## Managing block categories
 
-It is possible to filter the list of default block categories using the `block_categories` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during blocks registration and to group blocks in the inserter. You can also use the second provided param `$post` to generate a different list depending on the post's content.
+### `block_categories_all`
+
+_**Note:** Before WordPress 5.8 known as `block_categories`. In the case when you want to support older versions of WordPress you might need a way to detect which filter should be used – the deprecated one vs the new one. The recommended way to proceed is to check if the `WP_Block_Editor_Context` class exists._
+
+It is possible to filter the list of default block categories using the `block_categories_all` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during blocks registration and to group blocks in the inserter. You can also use the second provided param `$editor_context` to filter the based on its content.
 
 ```php
 <?php
 // my-plugin.php
 
-function my_plugin_block_categories( $categories, $post ) {
-	if ( $post->post_type !== 'post' ) {
-		return $categories;
-	}
-	return array_merge(
-		$categories,
-		array(
+function filter_block_categories_when_post_provided( $block_categories, $editor_context ) {
+	if ( ! empty( $editor_context->post ) ) {
+		array_push(
+			$block_categories,
 			array(
-				'slug' => 'my-category',
-				'title' => __( 'My category', 'my-plugin' ),
-				'icon'  => 'wordpress',
-			),
-		)
-	);
+				'slug'  => 'custom-category',
+				'title' => __( 'Custom Category', 'custom-plugin' ),
+				'icon'  => null,
+			)
+		);
+	}
+	return $block_categories;
 }
-add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
+
+add_filter( 'block_categories_all', 'filter_block_categories_when_post_provided', 10, 2 );
 ```
+
+### `wp.blocks.updateCategory`
 
 You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/).
 

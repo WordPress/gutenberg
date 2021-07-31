@@ -10,7 +10,7 @@ import {
 	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
-async function openBlockNavigator() {
+async function openListViewSidebar() {
 	await pressKeyWithModifier( 'access', 'o' );
 	await page.waitForSelector( '.block-editor-list-view-leaf.is-selected' );
 }
@@ -35,7 +35,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await createNewPost();
 	} );
 
-	it( 'should navigate using the block hierarchy dropdown menu', async () => {
+	it( 'should navigate using the list view sidebar', async () => {
 		await insertBlock( 'Columns' );
 		await page.click( '[aria-label="Two columns; equal split"]' );
 
@@ -105,7 +105,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks using the keyboard.
-		await openBlockNavigator();
+		await openListViewSidebar();
 		await pressKeyTimes( 'ArrowUp', 2 );
 		await page.keyboard.press( 'Enter' );
 
@@ -118,11 +118,14 @@ describe( 'Navigating the block hierarchy', () => {
 		// Tweak the columns count by increasing it by one.
 		await page.keyboard.press( 'ArrowRight' );
 
-		// Navigate to the last column in the columns block.
+		// Navigate to the third column in the columns block.
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyTimes( 'Tab', 2 );
 		await pressKeyTimes( 'ArrowDown', 4 );
+		await page.waitForSelector(
+			'.is-highlighted[aria-label="Block: Column (3 of 3)"]'
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 
@@ -150,7 +153,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await insertBlock( 'Image' );
 
 		// Return to first block.
-		await openBlockNavigator();
+		await openListViewSidebar();
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Space' );
 

@@ -16,7 +16,7 @@ $toggle-border-width: 1px;
 		border: $toggle-border-width solid $gray-900;
 		width: $toggle-width;
 		height: $toggle-height;
-		border-radius: $toggle-height / 2;
+		border-radius: $toggle-height * 0.5;
 		transition: 0.2s background ease;
 		@include reduce-motion("transition");
 	}
@@ -40,7 +40,7 @@ $toggle-border-width: 1px;
 	&.is-checked .components-form-toggle__track {
 		background-color: var(--wp-admin-theme-color);
 		border: $toggle-border-width solid var(--wp-admin-theme-color);
-		border: #{ $toggle-height / 2 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
+		border: #{ $toggle-height * 0.5 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
 	}
 
 	.components-form-toggle__input:focus + .components-form-toggle__track {
