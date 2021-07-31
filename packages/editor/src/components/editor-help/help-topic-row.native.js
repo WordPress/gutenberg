@@ -16,7 +16,8 @@ import { chevronRight } from '@wordpress/icons';
  */
 import styles from './style.scss';
 
-const HelpTopicRow = ( { label, icon, view } ) => {
+const HelpTopicRow = ( { topic } ) => {
+	const { label, icon, view } = topic;
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
 

@@ -21,5 +21,12 @@ export const HelpDetailSectionHeadingText = ( { text } ) => {
 };
 
 export const HelpDetailImage = ( { source } ) => {
-	return <Image source={ source } style={ styles.helpDetailImage } />;
+	return (
+		<Image
+			source={ source }
+			style={ styles.helpDetailImage }
+			resizeMode="cover"
+			resizeMethod="auto"
+		/>
+	);
 };

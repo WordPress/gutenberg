@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View, Text, Image } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -21,9 +21,7 @@ import {
 const IntroToBlocks = () => {
 	return (
 		<View style={ styles.helpDetailContainer }>
-			<HelpDetailImage
-				source={ require( './images/intro-blocks-1.png' ) }
-			/>
+			<Image source={ require( './images/intro-blocks-1.png' ) } />
 			<Text style={ styles.helpDetailTitle }>
 				{ __( 'Welcome to the world of blocks' ) }
 			</Text>

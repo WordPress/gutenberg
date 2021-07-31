@@ -7,7 +7,6 @@ import { View, Text } from 'react-native';
  * WordPress dependencies
  */
 import { BottomSheet, PanelBody } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
@@ -55,7 +54,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 		styles.bottomSheetHeaderTitleDark
 	);
 
-	return useMemo( () => (
+	return (
 		<BottomSheet
 			isVisible={ isVisible }
 			onClose={ onClose }
@@ -83,8 +82,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 							return (
 								<HelpTopicRow
 									key={ topic.label }
-									label={ topic.label }
-									icon={ topic.icon }
+									topic={ topic }
 								/>
 							);
 						} ) }
@@ -98,7 +96,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
-	) );
+	);
 }
 
 export default EditorHelpTopics;
