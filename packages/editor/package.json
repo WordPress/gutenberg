@@ -63,7 +63,6 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
-		"react-native": "^0.64.0",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
