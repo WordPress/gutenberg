@@ -91,14 +91,6 @@ function gutenberg_override_query_template( $template, $type, array $templates )
 		}
 	}
 
-	// Add hooks for template canvas.
-	// Add viewport meta tag.
-	add_action( 'wp_head', 'gutenberg_viewport_meta_tag', 0 );
-
-	// Render title tag with content, regardless of whether theme has title-tag support.
-	remove_action( 'wp_head', '_wp_render_title_tag', 1 );    // Remove conditional title tag rendering...
-	add_action( 'wp_head', 'gutenberg_render_title_tag', 1 ); // ...and make it unconditional.
-
 	// This file will be included instead of the theme's template file.
 	return gutenberg_dir_path() . 'lib/template-canvas.php';
 }
