@@ -56,17 +56,17 @@ export default function Dropdown( {
 	}
 
 	/**
-	 * Closes the dropdown if a focus leaves the dropdown wrapper. This is
-	 * intentionally distinct from `onClose` since focus loss from the popover
-	 * is expected to occur when using the Dropdown's toggle button, in which
-	 * case the correct behavior is to keep the dropdown closed. The same applies
-	 * in case when focus is moved to the modal dialog.
+	 * Closes the popover when focus leaves it unless the toggle was pressed or
+	 * focus has moved to a separate dialog. The former is to let the toggle
+	 * handle closing the popover and the latter is to preserve presence in
+	 * case a dialog has opened, allowing focus to return when it's dismissed.
 	 */
 	function closeIfFocusOutside() {
 		const { ownerDocument } = containerRef.current;
+		const dialog = ownerDocument.activeElement.closest( '[role="dialog"]' );
 		if (
 			! containerRef.current.contains( ownerDocument.activeElement ) &&
-			! ownerDocument.activeElement.closest( '[role="dialog"]' )
+			( ! dialog || dialog.contains( containerRef.current ) )
 		) {
 			close();
 		}

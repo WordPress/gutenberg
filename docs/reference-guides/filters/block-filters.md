@@ -2,132 +2,56 @@
 
 To modify the behavior of existing blocks, WordPress exposes several APIs:
 
-### Block Styles
+## Registration
 
-Block Styles allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the block style is selected. See the [Getting Started with JavaScript tutorial](/docs/how-to-guides/javascript/) for a full example.
+The following filters are available to extend the settings for blocks during their registration.
+
+### `block_type_metadata`
+
+Filters the raw metadata loaded from the `block.json` file when registering a block type on the server with PHP. It allows applying modifications before the metadata gets processed.
+
+The filter takes one param:
+
+-   `$metadata` (`array`) – metadata loaded from `block.json` for registering a block type.
+
+_Example_:
+
+```php
+<?php
+
+function filter_metadata_registration( $metadata ) {
+	$metadata['apiVersion'] = 1;
+	return $metadata;
+};
+add_filter( 'block_type_metadata', 'filter_metadata_registration', 10, 2 );
+
+register_block_type( __DIR__ );
+```
+
+### `block_type_metadata_settings`
+
+Filters the settings determined from the processed block type metadata. It makes it possible to apply custom modifications using the block metadata that isn’t handled by default.
+
+The filter takes two params:
+
+-   `$settings` (`array`) – Array of determined settings for registering a block type.
+-   `$metadata` (`array`) – Metadata loaded from the `block.json` file.
 
 _Example:_
 
-```js
-wp.blocks.registerBlockStyle( 'core/quote', {
-	name: 'fancy-quote',
-	label: 'Fancy Quote',
-} );
-```
-
-The example above registers a block style named `fancy-quote` to the `core/quote` block. When the user selects this block style from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
-
-By adding `isDefault: true` you can mark the registered block style as the one that is recognized as active when no custom class name is provided. It also means that there will be no custom class name added to the HTML output for the style that is marked as default.
-
-To remove a block style use `wp.blocks.unregisterBlockStyle()`.
-
-_Example:_
-
-```js
-wp.blocks.unregisterBlockStyle( 'core/quote', 'large' );
-```
-
-The above removes the block style named `large` from the `core/quote` block.
-
-**Important:** When unregistering a block style, there can be a [race condition](https://en.wikipedia.org/wiki/Race_condition) on which code runs first: registering the style, or unregistering the style. You want your unregister code to run last. The way to do that is specify the component that is registering the style as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
-
-Enqueue your JavaScript with the following PHP code:
-
 ```php
-function myguten_enqueue() {
-	wp_enqueue_script(
-		'myguten-script',
-		plugins_url( 'myguten.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-dom-ready', 'wp-edit-post' ),
-		filemtime( plugin_dir_path( __FILE__ ) . '/myguten.js' )
-	);
-}
-add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
+function filter_metadata_registration( $settings, $metadata ) {
+	$settings['api_version'] = $metadata['apiVersion'] + 1;
+	return $settings;
+};
+add_filter( 'block_type_metadata_settings', 'filter_metadata_registration', 10, 2 );
+
+register_block_type( __DIR__ );
 ```
 
-The JavaScript code in `myguten.js`:
+### `blocks.registerBlockType`
 
-```js
-wp.domReady( function () {
-	wp.blocks.unregisterBlockStyle( 'core/quote', 'large' );
-} );
-```
-
-### Server-side registration helper
-
-While the samples provided do allow full control of block styles, they do require a considerable amount of code.
-
-To simplify the process of registering and unregistering block styles, two server-side functions are also available: `register_block_style`, and `unregister_block_style`.
-
-#### register_block_style
-
-The `register_block_style` function receives the name of the block as the first argument and an array describing properties of the style as the second argument.
-
-The properties of the style array must include `name` and `label`:
-
--   `name`: The identifier of the style used to compute a CSS class.
--   `label`: A human-readable label for the style.
-
-Besides the two mandatory properties, the styles properties array should also include an `inline_style` or a `style_handle` property:
-
--   `inline_style`: Contains inline CSS code that registers the CSS class required for the style.
--   `style_handle`: Contains the handle to an already registered style that should be enqueued in places where block styles are needed.
-
-It is also possible to set the `is_default` property to `true` to mark one of the block styles as the default one.
-
-The following code sample registers a style for the quote block named "Blue Quote", and provides an inline style that makes quote blocks with the "Blue Quote" style have blue color:
-
-```php
-register_block_style(
-    'core/quote',
-    array(
-        'name'         => 'blue-quote',
-        'label'        => __( 'Blue Quote' ),
-        'inline_style' => '.wp-block-quote.is-style-blue-quote { color: blue; }',
-    )
-);
-```
-
-Alternatively, if a stylesheet was already registered which contains the CSS for the block style, it is possible to just pass the stylesheet's handle so `register_block_style` function will make sure it is enqueue.
-
-The following code sample provides an example of this use case:
-
-```php
-wp_register_style( 'myguten-style', get_template_directory_uri() . '/custom-style.css' );
-
-// ...
-
-register_block_style(
-    'core/quote',
-    array(
-        'name'         => 'fancy-quote',
-        'label'        => 'Fancy Quote',
-        'style_handle' => 'myguten-style',
-    )
-);
-```
-
-#### unregister_block_style
-
-`unregister_block_style` allows unregistering a block style previously registered on the server using `register_block_style`.
-
-The function's first argument is the registered name of the block, and the name of the style as the second argument.
-
-The following code sample unregisters the style named 'fancy-quote' from the quote block:
-
-```php
-unregister_block_style( 'core/quote', 'fancy-quote' );
-```
-
-**Important:** The function `unregister_block_style` only unregisters styles that were registered on the server using `register_block_style`. The function does not unregister a style registered using client-side code.
-
-### Filters
-
-Extending blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
-
-#### `blocks.registerBlockType`
-
-Used to filter the block settings. It receives the block settings and the name of the registered block as arguments. Since v6.1.0 this filter is also applied to each of a block's deprecated settings.
+Used to filter the block settings when registering the block on the client with JavaScript. It receives the block settings and the name of the registered block as arguments. This filter is also applied to each of a block's deprecated settings.
 
 _Example:_
 
@@ -153,7 +77,11 @@ wp.hooks.addFilter(
 );
 ```
 
-#### `blocks.getSaveElement`
+## Block Editor
+
+The following filters are available to change the behavior of blocks while editing in the block editor.
+
+### `blocks.getSaveElement`
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
@@ -185,7 +113,7 @@ _Note:_ A [block validation](/docs/reference-guides/block-api/block-edit-save.md
 
 To avoid this validation error, use `render_block` server-side to modify existing post content instead of this filter. See [render_block documentation](https://developer.wordpress.org/reference/hooks/render_block/).
 
-#### `blocks.getBlockDefaultClassName`
+### `blocks.getBlockDefaultClassName`
 
 Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature. This filter allows to provide an alternative class name.
 
@@ -205,15 +133,15 @@ wp.hooks.addFilter(
 );
 ```
 
-#### `blocks.switchToBlockType.transformedBlock`
+### `blocks.switchToBlockType.transformedBlock`
 
 Used to filter an individual transform result from block transformation. All of the original blocks are passed since transformations are many-to-many, not one-to-one.
 
-#### `blocks.getBlockAttributes`
+### `blocks.getBlockAttributes`
 
 Called immediately after the default parsing of a block's attributes and before validation to allow a plugin to manipulate attribute values in time for validation and/or the initial values rendering of the block in the editor.
 
-#### `editor.BlockEdit`
+### `editor.BlockEdit`
 
 Used to modify the block's `edit` component. It receives the original block `BlockEdit` component and returns a new wrapped component.
 
@@ -340,30 +268,6 @@ wp.hooks.addFilter(
 
 {% end %}
 
-#### `media.crossOrigin`
-
-Used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e `<img>`, `<audio>` , `<img>` , `<link>` , `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information the `crossOrigin` attribute, its values and how it applies to each element.
-
-One example of it in action is in the Image block's transform feature to allow cross-origin images to be used in a `<canvas>`.
-
-_Example:_
-
-```js
-addFilter(
-	'media.crossOrigin',
-	'my-plugin/with-cors-media',
-	// The callback accepts a second `mediaSrc` argument which references
-	// the url to actual foreign media, useful if you want to decide
-	// the value of crossOrigin based upon it.
-	( crossOrigin, mediaSrc ) => {
-		if ( mediaSrc.startsWith( 'https://example.com' ) ) {
-			return 'use-credentials';
-		}
-		return crossOrigin;
-	}
-);
-```
-
 ## Removing Blocks
 
 ### Using a deny list
@@ -435,47 +339,56 @@ wp.blocks.getBlockTypes().forEach( function ( blockType ) {
 
 ## Hiding blocks from the inserter
 
-On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types` filter. You can return either true (all block types supported), false (no block types supported), or an array of block type names to allow. You can also use the second provided param `$post` to filter block types based on its content.
+### `allowed_block_types_all`
+
+_**Note:** Before WordPress 5.8 known as `allowed_block_types`. In the case when you want to support older versions of WordPress you might need a way to detect which filter should be used – the deprecated one vs the new one. The recommended way to proceed is to check if the `WP_Block_Editor_Context` class exists._
+
+On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types_all` filter. You can return either true (all block types supported), false (no block types supported), or an array of block type names to allow. You can also use the second provided param `$editor_context` to filter block types based on its content.
 
 ```php
 <?php
 // my-plugin.php
 
-function my_plugin_allowed_block_types( $allowed_block_types, $post ) {
-	if ( $post->post_type !== 'post' ) {
-		return $allowed_block_types;
+function filter_allowed_block_types_when_post_provided( $allowed_block_types, $editor_context ) {
+	if ( ! empty( $editor_context->post ) ) {
+		return array( 'core/paragraph', 'core/heading' );
 	}
-	return array( 'core/paragraph' );
+	return $allowed_block_types;
 }
 
-add_filter( 'allowed_block_types', 'my_plugin_allowed_block_types', 10, 2 );
+add_filter( 'allowed_block_types_all', 'filter_allowed_block_types_when_post_provided', 10, 2 );
 ```
 
 ## Managing block categories
 
-It is possible to filter the list of default block categories using the `block_categories` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during blocks registration and to group blocks in the inserter. You can also use the second provided param `$post` to generate a different list depending on the post's content.
+### `block_categories_all`
+
+_**Note:** Before WordPress 5.8 known as `block_categories`. In the case when you want to support older versions of WordPress you might need a way to detect which filter should be used – the deprecated one vs the new one. The recommended way to proceed is to check if the `WP_Block_Editor_Context` class exists._
+
+It is possible to filter the list of default block categories using the `block_categories_all` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during blocks registration and to group blocks in the inserter. You can also use the second provided param `$editor_context` to filter the based on its content.
 
 ```php
 <?php
 // my-plugin.php
 
-function my_plugin_block_categories( $categories, $post ) {
-	if ( $post->post_type !== 'post' ) {
-		return $categories;
-	}
-	return array_merge(
-		$categories,
-		array(
+function filter_block_categories_when_post_provided( $block_categories, $editor_context ) {
+	if ( ! empty( $editor_context->post ) ) {
+		array_push(
+			$block_categories,
 			array(
-				'slug' => 'my-category',
-				'title' => __( 'My category', 'my-plugin' ),
-				'icon'  => 'wordpress',
-			),
-		)
-	);
+				'slug'  => 'custom-category',
+				'title' => __( 'Custom Category', 'custom-plugin' ),
+				'icon'  => null,
+			)
+		);
+	}
+	return $block_categories;
 }
-add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
+
+add_filter( 'block_categories_all', 'filter_block_categories_when_post_provided', 10, 2 );
 ```
+
+### `wp.blocks.updateCategory`
 
 You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/).
 

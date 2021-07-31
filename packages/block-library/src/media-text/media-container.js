@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { ResizableBox, withNotices } from '@wordpress/components';
+import { ResizableBox, Spinner, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
@@ -19,6 +19,7 @@ import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -74,6 +75,7 @@ function PlaceholderContainer( {
 	className,
 	noticeOperations,
 	noticeUI,
+	mediaUrl,
 	onSelectMedia,
 } ) {
 	const onUploadError = ( message ) => {
@@ -93,6 +95,7 @@ function PlaceholderContainer( {
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			notices={ noticeUI }
 			onError={ onUploadError }
+			disableMediaButtons={ mediaUrl }
 		/>
 	);
 }
@@ -115,9 +118,11 @@ function MediaContainer( props, ref ) {
 		onWidthChange,
 	} = props;
 
+	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
+
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
-	if ( mediaType && mediaUrl ) {
+	if ( mediaUrl ) {
 		const onResizeStart = () => {
 			toggleSelection( false );
 		};
@@ -148,7 +153,8 @@ function MediaContainer( props, ref ) {
 				as="figure"
 				className={ classnames(
 					className,
-					'editor-media-container__resizer'
+					'editor-media-container__resizer',
+					{ 'is-transient': isTemporaryMedia }
 				) }
 				style={ backgroundStyles }
 				size={ { width: mediaWidth + '%' } }
@@ -169,6 +175,8 @@ function MediaContainer( props, ref ) {
 					mediaId={ mediaId }
 				/>
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
+				{ isTemporaryMedia && <Spinner /> }
+				<PlaceholderContainer { ...props } />
 			</ResizableBoxContainer>
 		);
 	}

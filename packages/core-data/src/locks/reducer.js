@@ -14,8 +14,8 @@ const DEFAULT_STATE = {
 /**
  * Reducer returning locks.
  *
- * @param  {Object} state  Current state.
- * @param  {Object} action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */

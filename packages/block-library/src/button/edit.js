@@ -23,21 +23,16 @@ import {
 	InspectorAdvancedControls,
 	RichText,
 	useBlockProps,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalUseColorProps as useColorProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	__experimentalLinkControl as LinkControl,
-	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import getColorAndStyleProps from './color-props';
-
 const NEW_TAB_REL = 'noreferrer noopener';
-
-const EMPTY_ARRAY = [];
 
 function WidthPanel( { selectedWidth, setAttributes } ) {
 	function handleChange( newWidth ) {
@@ -56,7 +51,11 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 						<Button
 							key={ widthValue }
 							isSmall
-							isPrimary={ widthValue === selectedWidth }
+							variant={
+								widthValue === selectedWidth
+									? 'primary'
+									: undefined
+							}
 							onClick={ () => handleChange( widthValue ) }
 						>
 							{ widthValue }%
@@ -174,7 +173,6 @@ function ButtonEdit( props ) {
 		},
 		[ setAttributes ]
 	);
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -200,8 +198,9 @@ function ButtonEdit( props ) {
 		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
 	};
 
-	const borderRadius = style?.border?.radius;
-	const colorProps = getColorAndStyleProps( attributes, colors, true );
+	const borderProps = useBorderProps( attributes );
+	const colorProps = useColorProps( attributes );
+	const spacingProps = useSpacingProps( attributes );
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
 
@@ -224,15 +223,17 @@ function ButtonEdit( props ) {
 						className,
 						'wp-block-button__link',
 						colorProps.className,
+						borderProps.className,
 						{
-							'no-border-radius': borderRadius === 0,
+							// For backwards compatibility add style that isn't
+							// provided via block support.
+							'no-border-radius': style?.border?.radius === 0,
 						}
 					) }
 					style={ {
-						borderRadius: borderRadius
-							? borderRadius + 'px'
-							: undefined,
+						...borderProps.style,
 						...colorProps.style,
+						...spacingProps.style,
 					} }
 					onSplit={ ( value ) =>
 						createBlock( 'core/button', {

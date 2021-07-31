@@ -1,0 +1,13 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/site-logo",
+		"isValid": true,
+		"attributes": {
+			"isLink": true,
+			"linkTarget": "_self"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

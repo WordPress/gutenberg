@@ -34,7 +34,7 @@ describe( 'Using Plugins API', () => {
 	 * Annotates the text in the first block from start to end.
 	 *
 	 * @param {number} start Position to start the annotation.
-	 * @param {number} end Position to end the annotation.
+	 * @param {number} end   Position to end the annotation.
 	 *
 	 * @return {void}
 	 */

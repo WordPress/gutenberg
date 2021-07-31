@@ -53,10 +53,12 @@ export default function getInserterOuterSection() {
 				( event ) => {
 					if (
 						this.isOpen &&
-						( event.keyCode === ESCAPE || event.code === 'Escape' )
+						( event.keyCode === ESCAPE ||
+							event.code === 'Escape' ) &&
+						! event.defaultPrevented
 					) {
+						event.preventDefault();
 						event.stopPropagation();
-
 						this.close();
 					}
 				},

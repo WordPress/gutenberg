@@ -32,6 +32,7 @@ export function NumberControl(
 		label,
 		max = Infinity,
 		min = -Infinity,
+		required = false,
 		shiftStep = 10,
 		step = 1,
 		type: typeProp = 'number',
@@ -56,7 +57,7 @@ export function NumberControl(
 	 * This allows us to tap into actions to transform the (next) state for
 	 * InputControl.
 	 *
-	 * @param {Object} state State from InputControl
+	 * @param {Object} state  State from InputControl
 	 * @param {Object} action Action triggering state change
 	 * @return {Object} The updated state to apply to InputControl
 	 */
@@ -155,7 +156,11 @@ export function NumberControl(
 			type === inputControlActionTypes.PRESS_ENTER ||
 			type === inputControlActionTypes.COMMIT
 		) {
-			state.value = roundClamp( currentValue, min, max );
+			const applyEmptyValue = required === false && currentValue === '';
+
+			state.value = applyEmptyValue
+				? currentValue
+				: roundClamp( currentValue, min, max, step );
 		}
 
 		return state;
@@ -174,6 +179,7 @@ export function NumberControl(
 			max={ max }
 			min={ min }
 			ref={ ref }
+			required={ required }
 			step={ jumpStep }
 			type={ typeProp }
 			value={ valueProp }

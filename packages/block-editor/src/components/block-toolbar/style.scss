@@ -6,14 +6,16 @@
 	display: flex;
 	flex-grow: 1;
 	width: 100%;
-	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
+
+	// Allow horizontal scrolling on mobile.
+	overflow-y: hidden;
+	overflow-x: auto;
 
 	// Animation
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
 	@include reduce-motion("transition");
 
-	// Allow overflow on desktop.
 	@include break-small() {
 		overflow: inherit;
 	}
@@ -44,7 +46,7 @@
 	}
 }
 
-.block-editor-block-contextual-toolbar.has-parent {
+.block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
 	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
 
 	.show-icon-labels & {
@@ -80,15 +82,14 @@
 			width: $button-size-small !important;
 			margin: 0 !important;
 		}
-
-		&:focus::before {
-			right: $grid-unit-05 !important;
-		}
 	}
+
+	// Match the parent selector button.
+	margin-left: -$border-width;
 
 	// Compensate for width of block switcher.
 	.block-editor-block-mover {
-		margin-left: -$grid-unit-15 / 2;
+		margin-left: -$grid-unit-15 * 0.5;
 	}
 }
 
@@ -152,10 +153,6 @@
 		.block-editor-block-icon {
 			width: 0 !important;
 			height: 0 !important;
-		}
-
-		&:focus::before {
-			right: $grid-unit-05 !important;
 		}
 	}
 

@@ -12,13 +12,11 @@ import {
 	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
+	store as editorStore,
 } from '@wordpress/editor';
 import { StrictMode, useMemo } from '@wordpress/element';
-import {
-	KeyboardShortcuts,
-	SlotFillProvider,
-	__unstableDropZoneContextProvider as DropZoneContextProvider,
-} from '@wordpress/components';
+import { KeyboardShortcuts, SlotFillProvider } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -59,9 +57,9 @@ function Editor( {
 			getEditedPostTemplate,
 		} = select( editPostStore );
 		const { getEntityRecord, getPostType, getEntityRecords } = select(
-			'core'
+			coreStore
 		);
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getEditorSettings } = select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postType
@@ -169,27 +167,25 @@ function Editor( {
 		<StrictMode>
 			<EditPostSettings.Provider value={ settings }>
 				<SlotFillProvider>
-					<DropZoneContextProvider>
-						<EditorProvider
-							settings={ editorSettings }
-							post={ post }
-							initialEdits={ initialEdits }
-							useSubRegistry={ false }
-							__unstableTemplate={
-								isTemplateMode ? template : undefined
-							}
-							{ ...props }
-						>
-							<ErrorBoundary onError={ onError }>
-								<EditorInitialization postId={ postId } />
-								<Layout styles={ styles } />
-								<KeyboardShortcuts
-									shortcuts={ preventEventDiscovery }
-								/>
-							</ErrorBoundary>
-							<PostLockedModal />
-						</EditorProvider>
-					</DropZoneContextProvider>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ post }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						__unstableTemplate={
+							isTemplateMode ? template : undefined
+						}
+						{ ...props }
+					>
+						<ErrorBoundary onError={ onError }>
+							<EditorInitialization postId={ postId } />
+							<Layout styles={ styles } />
+							<KeyboardShortcuts
+								shortcuts={ preventEventDiscovery }
+							/>
+						</ErrorBoundary>
+						<PostLockedModal />
+					</EditorProvider>
 				</SlotFillProvider>
 			</EditPostSettings.Provider>
 		</StrictMode>

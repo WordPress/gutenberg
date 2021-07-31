@@ -9,13 +9,17 @@ import { some } from 'lodash';
 import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
-export default function SaveButton( { openEntitiesSavedStates } ) {
+export default function SaveButton( {
+	openEntitiesSavedStates,
+	isEntitiesSavedStatesOpen,
+} ) {
 	const { isDirty, isSaving } = useSelect( ( select ) => {
 		const {
 			__experimentalGetDirtyEntityRecords,
 			isSavingEntityRecord,
-		} = select( 'core' );
+		} = select( coreStore );
 		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		return {
 			isDirty: dirtyEntityRecords.length > 0,
@@ -30,9 +34,10 @@ export default function SaveButton( { openEntitiesSavedStates } ) {
 	return (
 		<>
 			<Button
-				isPrimary
+				variant="primary"
 				className="edit-site-save-button__button"
 				aria-disabled={ disabled }
+				aria-expanded={ isEntitiesSavedStatesOpen }
 				disabled={ disabled }
 				isBusy={ isSaving }
 				onClick={ disabled ? undefined : openEntitiesSavedStates }

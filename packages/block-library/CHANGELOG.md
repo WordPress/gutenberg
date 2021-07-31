@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+## 5.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
+## 4.0.0 (2021-07-21)
+
+### Breaking Changes
+
+-   Removes the `core/legacy-widget` block. This is now in `@wordpress/widgets` via `registerLegacyWidgetBlock()`.
+
+### Bug Fixes
+
+-   Include missing attributes when upgrading embed block ([#33235](https://github.com/WordPress/gutenberg/pull/33235))
+
+## 3.2.0 (2021-05-24)
+
+### New Features
+
+-   Marks the `core/legacy-widget` block as stable.
+
+## 3.1.0 (2021-05-20)
+
+## 3.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
 ## 2.29.0 (2021-03-17)
 
 ### Bug Fixes

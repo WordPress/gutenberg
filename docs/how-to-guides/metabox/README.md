@@ -14,4 +14,4 @@ The first method is to use Blocks to store extra data with a post. The data is s
 
 ## Sidebar Plugin
 
-If you are interested in working with the post meta outside the editor, check out the [Sidebar Tutorial](/docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md/).
+If you are interested in working with the post meta outside the editor, check out the [Sidebar Tutorial](/docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md).

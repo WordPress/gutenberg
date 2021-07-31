@@ -23,9 +23,5 @@ export default function QueryPaginationEdit() {
 		],
 		orientation: 'horizontal',
 	} );
-	return (
-		<div { ...blockProps }>
-			<div { ...innerBlocksProps } />
-		</div>
-	);
+	return <div { ...innerBlocksProps } />;
 }

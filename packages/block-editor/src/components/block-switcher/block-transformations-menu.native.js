@@ -29,8 +29,7 @@ const BlockTransformationsMenu = ( {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const pickerOptions = () => {
-		const selectedBlockName =
-			( selectedBlock.length && selectedBlock[ 0 ].name ) || '';
+		const selectedBlockName = selectedBlock?.name ?? '';
 		const blocksThatSplitWhenTransformed = {
 			'core/list': [ 'core/paragraph', 'core/heading' ],
 			'core/quote': [ 'core/paragraph' ],

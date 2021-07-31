@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { settingIdToWidgetId } from '../../utils';
+
 const { wp } = window;
 
 function parseWidgetId( widgetId ) {
@@ -22,31 +27,45 @@ function widgetIdToSettingId( widgetId ) {
 	return `widget_${ idBase }`;
 }
 
-function parseSettingId( settingId ) {
-	const matches = settingId.match( /^widget_(.+)(?:\[(\d+)\])$/ );
-	if ( matches ) {
-		return {
-			idBase: matches[ 1 ],
-			number: parseInt( matches[ 2 ], 10 ),
-		};
+/**
+ * This is a custom debounce function to call different callbacks depending on
+ * whether it's the _leading_ call or not.
+ *
+ * @param {Function} leading  The callback that gets called first.
+ * @param {Function} callback The callback that gets called after the first time.
+ * @param {number}   timeout  The debounced time in milliseconds.
+ * @return {Function} The debounced function.
+ */
+function debounce( leading, callback, timeout ) {
+	let isLeading = false;
+	let timerID;
+
+	function debounced( ...args ) {
+		const result = ( isLeading ? callback : leading ).apply( this, args );
+
+		isLeading = true;
+
+		clearTimeout( timerID );
+
+		timerID = setTimeout( () => {
+			isLeading = false;
+		}, timeout );
+
+		return result;
 	}
 
-	return { idBase: settingId };
-}
+	debounced.cancel = () => {
+		isLeading = false;
+		clearTimeout( timerID );
+	};
 
-function settingIdToWidgetId( settingId ) {
-	const { idBase, number } = parseSettingId( settingId );
-	if ( number ) {
-		return `${ idBase }-${ number }`;
-	}
-
-	return idBase;
+	return debounced;
 }
 
 export default class SidebarAdapter {
-	constructor( setting, allSettings ) {
+	constructor( setting, api ) {
 		this.setting = setting;
-		this.allSettings = allSettings;
+		this.api = api;
 
 		this.locked = false;
 		this.widgetsCache = new WeakMap();
@@ -58,33 +77,28 @@ export default class SidebarAdapter {
 			),
 		];
 		this.historyIndex = 0;
-
-		this._handleSettingChange = this._handleSettingChange.bind( this );
-		this._handleAllSettingsChange = this._handleAllSettingsChange.bind(
-			this
+		this.historySubscribers = new Set();
+		// Debounce the input for 1 second.
+		this._debounceSetHistory = debounce(
+			this._pushHistory,
+			this._replaceHistory,
+			1000
 		);
-		this.canUndo = this.canUndo.bind( this );
-		this.canRedo = this.canRedo.bind( this );
+
+		this.setting.bind( this._handleSettingChange.bind( this ) );
+		this.api.bind( 'change', this._handleAllSettingsChange.bind( this ) );
+
 		this.undo = this.undo.bind( this );
 		this.redo = this.redo.bind( this );
+		this.save = this.save.bind( this );
 	}
 
 	subscribe( callback ) {
-		if ( ! this.subscribers.size ) {
-			this.setting.bind( this._handleSettingChange );
-			this.allSettings.bind( 'change', this._handleAllSettingsChange );
-		}
-
 		this.subscribers.add( callback );
-	}
 
-	unsubscribe( callback ) {
-		this.subscribers.delete( callback );
-
-		if ( ! this.subscribers.size ) {
-			this.setting.unbind( this._handleSettingChange );
-			this.allSettings.unbind( 'change', this._handleAllSettingsChange );
-		}
+		return () => {
+			this.subscribers.delete( callback );
+		};
 	}
 
 	getWidgets() {
@@ -109,6 +123,16 @@ export default class SidebarAdapter {
 			),
 		];
 		this.historyIndex += 1;
+
+		this.historySubscribers.forEach( ( listener ) => listener() );
+	}
+
+	_replaceHistory() {
+		this.history[
+			this.historyIndex
+		] = this._getWidgetIds().map( ( widgetId ) =>
+			this.getWidget( widgetId )
+		);
 	}
 
 	_handleSettingChange() {
@@ -170,7 +194,7 @@ export default class SidebarAdapter {
 				: 'refresh',
 			previewer: this.setting.previewer,
 		};
-		const setting = this.allSettings.create(
+		const setting = this.api.create(
 			settingId,
 			settingId,
 			'',
@@ -183,19 +207,40 @@ export default class SidebarAdapter {
 		return widgetId;
 	}
 
+	_removeWidget( widget ) {
+		const settingId = widgetIdToSettingId( widget.id );
+		const setting = this.api( settingId );
+
+		if ( setting ) {
+			const instance = setting.get();
+			this.widgetsCache.delete( instance );
+		}
+
+		this.api.remove( settingId );
+	}
+
 	_updateWidget( widget ) {
 		const prevWidget = this.getWidget( widget.id );
 
-		// Bail out update.
+		// Bail out update if nothing changed.
 		if ( prevWidget === widget ) {
 			return widget.id;
 		}
 
-		const settingId = widgetIdToSettingId( widget.id );
-		this.allSettings( settingId ).set( widget.instance );
-		// TODO: what about the other stuff?
+		// Update existing setting if only the widget's instance changed.
+		if (
+			prevWidget.idBase &&
+			widget.idBase &&
+			prevWidget.idBase === widget.idBase
+		) {
+			const settingId = widgetIdToSettingId( widget.id );
+			this.api( settingId ).set( widget.instance );
+			return widget.id;
+		}
 
-		return widget.id;
+		// Otherwise delete and re-create.
+		this._removeWidget( widget );
+		return this._createWidget( widget );
 	}
 
 	getWidget( widgetId ) {
@@ -205,7 +250,7 @@ export default class SidebarAdapter {
 
 		const { idBase, number } = parseWidgetId( widgetId );
 		const settingId = widgetIdToSettingId( widgetId );
-		const setting = this.allSettings( settingId );
+		const setting = this.api( settingId );
 
 		if ( ! setting ) {
 			return null;
@@ -248,7 +293,10 @@ export default class SidebarAdapter {
 			return widgetId;
 		} );
 
-		// TODO: We should in theory also handle delete widgets here too.
+		const deletedWidgets = this.getWidgets().filter(
+			( widget ) => ! nextWidgetIds.includes( widget.id )
+		);
+		deletedWidgets.forEach( ( widget ) => this._removeWidget( widget ) );
 
 		this.setting.set( nextWidgetIds );
 
@@ -260,7 +308,7 @@ export default class SidebarAdapter {
 	setWidgets( nextWidgets ) {
 		const addedWidgetIds = this._updateWidgets( nextWidgets );
 
-		this._pushHistory();
+		this._debounceSetHistory();
 
 		return addedWidgetIds;
 	}
@@ -268,11 +316,11 @@ export default class SidebarAdapter {
 	/**
 	 * Undo/Redo related features
 	 */
-	canUndo() {
+	hasUndo() {
 		return this.historyIndex > 0;
 	}
 
-	canRedo() {
+	hasRedo() {
 		return this.historyIndex < this.history.length - 1;
 	}
 
@@ -286,10 +334,13 @@ export default class SidebarAdapter {
 		this._updateWidgets( widgets );
 
 		this._emit( currentWidgets, this.getWidgets() );
+
+		this.historySubscribers.forEach( ( listener ) => listener() );
+		this._debounceSetHistory.cancel();
 	}
 
 	undo() {
-		if ( ! this.canUndo() ) {
+		if ( ! this.hasUndo() ) {
 			return;
 		}
 
@@ -297,10 +348,22 @@ export default class SidebarAdapter {
 	}
 
 	redo() {
-		if ( ! this.canRedo() ) {
+		if ( ! this.hasRedo() ) {
 			return;
 		}
 
 		this._seek( this.historyIndex + 1 );
+	}
+
+	subscribeHistory( listener ) {
+		this.historySubscribers.add( listener );
+
+		return () => {
+			this.historySubscribers.delete( listener );
+		};
+	}
+
+	save() {
+		this.api.previewer.save();
 	}
 }

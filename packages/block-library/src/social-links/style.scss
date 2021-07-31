@@ -69,7 +69,7 @@
 	}
 }
 
-.wp-social-link {
+.wp-block-social-link {
 	display: block;
 	border-radius: 9999px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
 	transition: transform 0.1s ease;
@@ -84,20 +84,22 @@
 		transition: transform 0.1s ease;
 	}
 
-	a,
-	a:hover,
-	a:active,
-	a:visited,
-	svg {
-		color: currentColor;
-		fill: currentColor;
-	}
-
 	&:hover {
 		transform: scale(1.1);
 	}
 }
 
+// This needs specificity because themes usually override it with things like .widget-area a.
+.wp-block-social-links .wp-block-social-link .wp-block-social-link-anchor {
+	&,
+	&:hover,
+	&:active,
+	&:visited,
+	svg {
+		color: currentColor;
+		fill: currentColor;
+	}
+}
 
 // Provide colors for a range of icons.
 .wp-block-social-links:not(.is-style-logos-only) {

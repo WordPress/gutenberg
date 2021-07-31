@@ -58,6 +58,8 @@ The block editor allows themes to opt-in to slightly more opinionated styles for
 add_theme_support( 'wp-block-styles' );
 ```
 
+You can see the CSS that will be included in the [block library theme file](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/theme.scss).
+
 ### Wide Alignment:
 
 Some blocks such as the image block have the possibility to define a "wide" or "full" alignment by adding the corresponding classname to the block's wrapper ( `alignwide` or `alignfull` ). A theme can opt-in for this feature by calling:
@@ -238,7 +240,9 @@ As an example for the regular font size, a theme may provide the following class
 }
 ```
 
-**Note:** The slugs `default` and `custom` are reserved and cannot be used by themes.
+<div class="callout callout-info">
+<strong>Note:</strong> The slugs `default` and `custom` are reserved and cannot be used by themes.
+</div>
 
 ### Disabling custom font sizes
 
@@ -387,32 +391,34 @@ Some blocks can have padding controls. This is off by default, and requires the 
 add_theme_support('custom-spacing');
 ```
 
-## Experimental — Link color control
+## Link color control
 
-Using the Gutenberg plugin (version 8.3 or later), link color control is available to the Paragraph, Heading, Group, Columns, and Media & Text blocks. This is off by default, and requires the theme to opt in by declaring support:
+Link support has been made stable as part of WordPress 5.8. It's `false` by default and themes can enable it via the [theme.json file](./theme-json.md):
 
-```php
-add_theme_support('experimental-link-color');
-```
-
-If a theme opts in, it should [define default link colors](https://developer.wordpress.org/block-editor/developers/themes/theme-json/#color-properties) in `experimental-theme.json` (or in its theme styles if no `experimental-theme.json` is present). For example:
-
-```css
+```json
 {
-    "global": {
-        "styles": {
-            "color": {
-                "link": "hotpink"
-            }
-        }
-    }
+	"version": 1,
+	"settings": {
+		"color": {
+			"link": true
+		}
+	}
 }
 ```
 
-If the theme styles the link color in its stylesheets (editor and front-end), it should ensure it maps to the `--wp--style--color--link` CSS variable:
+> Alternatively, with the Gutenberg plugin active, the old legacy support `add_theme_support('experimental-link-color')` would also work. This fallback would be removed when the Gutenberg plugin requires WordPress 5.8 as the minimum version.
+
+When the user sets the link color of a block, a new style will be added in the form of:
 
 ```css
-a {
-	color: var( --wp--style--color--link );
+.wp-elements-<uuid> a {
+	color: <link-color> !important;
 }
 ```
+
+where
+
+- `<uuid>` is a random number
+- `<link-color>` is either `var(--wp--preset--color--slug)` (if the user selected a preset value) or a raw color value (if the user selected a custom value)
+
+The block will get attached the class `.wp-elements-<uuid>`.

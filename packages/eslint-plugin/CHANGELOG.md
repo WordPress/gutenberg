@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 9.1.0 (2021-07-21)
+
+### Enhancement
+
+-   Adds JSDoc alignment check ([#25300](https://github.com/WordPress/gutenberg/pull/25300)).
+
 ## 9.0.1 (2021-03-19)
 
 ### Bug Fix

@@ -16,7 +16,7 @@
  */
 function render_block_core_query_pagination_numbers( $attributes, $content, $block ) {
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : filter_var( $_GET[ $page_key ], FILTER_VALIDATE_INT );
+	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
 	$wrapper_attributes = get_block_wrapper_attributes();
@@ -32,7 +32,7 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 		);
 		$content       = paginate_links( $paginate_args );
 	} else {
-		$block_query = new WP_Query( construct_wp_query_args( $block, $page ) );
+		$block_query = new WP_Query( build_query_vars_from_query_block( $block, $page ) );
 		// `paginate_links` works with the global $wp_query, so we have to
 		// temporarily switch it with our custom query.
 		$prev_wp_query = $wp_query;

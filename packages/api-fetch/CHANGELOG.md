@@ -2,9 +2,26 @@
 
 ## Unreleased
 
-### Breaking changes
+## 5.2.0 (2021-07-21)
 
-- `OPTIONS` requests which are handled by the preloading middleware are no longer resolved as unparsed responses unless you explicitly set `parse: false`, for consistency with other request methods. If you expect an unparsed response, add `{ parse: false }` to your request options to preserve the previous behavior.
+### New feature
+
+-   `AbortError` being thrown by the default fetch handler can now be caught and handled separately in user-land. Add documentation about aborting a request ([#32530](https://github.com/WordPress/gutenberg/pull/32530)).
+
+## 5.1.0 (2021-05-20)
+
+## 5.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
+## 4.0.0 (2021-04-29)
+
+### Breaking Changes
+
+-   `OPTIONS` requests which are handled by the preloading middleware are no longer resolved as unparsed responses unless you explicitly set `parse: false`, for consistency with other request methods. If you expect an unparsed response, add `{ parse: false }` to your request options to preserve the previous behavior.
 
 ## 3.23.1 (2021-04-15)
 

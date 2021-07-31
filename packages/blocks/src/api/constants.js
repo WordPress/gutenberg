@@ -13,6 +13,7 @@ export const DEPRECATED_ENTRY_KEYS = [
 ];
 
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
+	//kept for back-compatibility purposes.
 	'--wp--style--color--link': {
 		value: [ 'color', 'link' ],
 		support: [ 'color', 'link' ],
@@ -32,6 +33,12 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	borderRadius: {
 		value: [ 'border', 'radius' ],
 		support: [ '__experimentalBorder', 'radius' ],
+		properties: {
+			borderTopLeftRadius: 'topLeft',
+			borderTopRightRadius: 'topRight',
+			borderBottomLeftRadius: 'bottomLeft',
+			borderBottomRightRadius: 'bottomRight',
+		},
 	},
 	borderStyle: {
 		value: [ 'border', 'style' ],
@@ -45,37 +52,70 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'text' ],
 		support: [ 'color' ],
 	},
+	linkColor: {
+		value: [ 'elements', 'link', 'color', 'text' ],
+		support: [ 'color', 'link' ],
+	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
-		support: [ '__experimentalFontFamily' ],
+		support: [ 'typography', '__experimentalFontFamily' ],
 	},
 	fontSize: {
 		value: [ 'typography', 'fontSize' ],
-		support: [ 'fontSize' ],
+		support: [ 'typography', 'fontSize' ],
 	},
 	fontStyle: {
 		value: [ 'typography', 'fontStyle' ],
-		support: [ '__experimentalFontStyle' ],
+		support: [ 'typography', '__experimentalFontStyle' ],
 	},
 	fontWeight: {
 		value: [ 'typography', 'fontWeight' ],
-		support: [ '__experimentalFontWeight' ],
+		support: [ 'typography', '__experimentalFontWeight' ],
 	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
-		support: [ 'lineHeight' ],
+		support: [ 'typography', 'lineHeight' ],
+	},
+	margin: {
+		value: [ 'spacing', 'margin' ],
+		support: [ 'spacing', 'margin' ],
+		properties: {
+			marginTop: 'top',
+			marginRight: 'right',
+			marginBottom: 'bottom',
+			marginLeft: 'left',
+		},
 	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
-		properties: [ 'top', 'right', 'bottom', 'left' ],
+		properties: {
+			paddingTop: 'top',
+			paddingRight: 'right',
+			paddingBottom: 'bottom',
+			paddingLeft: 'left',
+		},
 	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
-		support: [ '__experimentalTextDecoration' ],
+		support: [ 'typography', '__experimentalTextDecoration' ],
 	},
 	textTransform: {
 		value: [ 'typography', 'textTransform' ],
-		support: [ '__experimentalTextTransform' ],
+		support: [ 'typography', '__experimentalTextTransform' ],
 	},
+	letterSpacing: {
+		value: [ 'typography', 'letterSpacing' ],
+		support: [ '__experimentalLetterSpacing' ],
+	},
+};
+
+export const __EXPERIMENTAL_ELEMENTS = {
+	link: 'a',
+	h1: 'h1',
+	h2: 'h2',
+	h3: 'h3',
+	h4: 'h4',
+	h5: 'h5',
+	h6: 'h6',
 };

@@ -128,6 +128,15 @@ Only applies if `gallery === true`.
 -   Default: `false`
 -   Platform: Web
 
+### autoOpen
+
+If true, the picker of the respective platform auto-opens.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+- Platform: Mobile
+
 ### gallery
 
 If true, the component will initiate all the states required to represent a gallery. By default, the media modal opens in the gallery edit frame, but that can be changed using the `addToGallery`flag.

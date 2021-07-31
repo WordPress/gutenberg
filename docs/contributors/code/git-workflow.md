@@ -83,6 +83,7 @@ Suggested prefixes:
 -   `try/` = experimental feature, "tentatively add"
 -   `update/` = update an existing feature
 -   `remove/` = remove an existing feature
+-   `fix/` = fix an existing issue
 
 For example, `add/gallery-block` means you're working on adding a new gallery block.
 

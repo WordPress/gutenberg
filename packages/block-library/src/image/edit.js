@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, omit, pick } from 'lodash';
+import { get, has, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -53,7 +53,7 @@ export const pickRelevantMediaFiles = ( image, size ) => {
  * Is the URL a temporary blob URL? A blob URL is one that is used temporarily
  * while the image is being uploaded and will not have an id yet allocated.
  *
- * @param {number=} id The id of the image.
+ * @param {number=} id  The id of the image.
  * @param {string=} url The url of the image.
  *
  * @return {boolean} Is the URL a Blob URL
@@ -71,6 +71,22 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
  */
 export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
+/**
+ * Checks if WP generated default image size. Size generation is skipped
+ * when the image is smaller than the said size.
+ *
+ * @param {Object} image
+ * @param {string} defaultSize
+ *
+ * @return {boolean} Whether or not it has default image size.
+ */
+function hasDefaultSize( image, defaultSize ) {
+	return (
+		has( image, [ 'sizes', defaultSize, 'url' ] ) ||
+		has( image, [ 'media_details', 'sizes', defaultSize, 'source_url' ] )
+	);
+}
+
 export function ImageEdit( {
 	attributes,
 	setAttributes,
@@ -80,6 +96,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
+	clientId,
 } ) {
 	const {
 		url = '',
@@ -147,7 +164,11 @@ export function ImageEdit( {
 			additionalAttributes = {
 				width: undefined,
 				height: undefined,
-				sizeSlug: imageDefaultSize,
+				// Fallback to size "full" if there's no default image size.
+				// It means the image is smaller, and the block will use a full-size URL.
+				sizeSlug: hasDefaultSize( media, imageDefaultSize )
+					? imageDefaultSize
+					: 'full',
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size"
@@ -300,6 +321,7 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
 					containerRef={ ref }
+					clientId={ clientId }
 				/>
 			) }
 			{ ! url && (

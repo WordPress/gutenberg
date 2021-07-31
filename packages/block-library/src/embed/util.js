@@ -43,8 +43,8 @@ export const getEmbedInfoByProvider = ( provider ) =>
 /**
  * Returns true if any of the regular expressions match the URL.
  *
- * @param {string}   url      The URL to test.
- * @param {Array}    patterns The list of regular expressions to test agains.
+ * @param {string} url      The URL to test.
+ * @param {Array}  patterns The list of regular expressions to test agains.
  * @return {boolean} True if any of the regular expressions match the URL.
  */
 export const matchesPatterns = ( url, patterns = [] ) =>
@@ -54,7 +54,7 @@ export const matchesPatterns = ( url, patterns = [] ) =>
  * Finds the block variation that should be used for the URL,
  * based on the provided URL and the variation's patterns.
  *
- * @param {string}  url The URL to test.
+ * @param {string} url The URL to test.
  * @return {WPBlockVariation} The block variation that should be used for this URL
  */
 export const findMoreSuitableBlock = ( url ) =>
@@ -87,15 +87,16 @@ export const getPhotoHtml = ( photo ) => {
  * versions, so we require that these are generated separately.
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
- * @param {Object} props                  The block's props.
- * @param {Object} [attributesFromPreview]  Attributes generated from the block's most up to date preview.
+ * @param {Object} props                   The block's props.
+ * @param {Object} [attributesFromPreview] Attributes generated from the block's most up to date preview.
  * @return {Object|undefined} A more suitable embed block if one exists.
  */
 export const createUpgradedEmbedBlock = (
 	props,
 	attributesFromPreview = {}
 ) => {
-	const { preview, attributes: { url, providerNameSlug, type } = {} } = props;
+	const { preview, attributes = {} } = props;
+	const { url, providerNameSlug, type, ...restAttributes } = attributes;
 
 	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) return;
 
@@ -115,6 +116,7 @@ export const createUpgradedEmbedBlock = (
 	if ( shouldCreateNewBlock ) {
 		return createBlock( DEFAULT_EMBED_BLOCK, {
 			url,
+			...restAttributes,
 			...matchedBlock.attributes,
 		} );
 	}

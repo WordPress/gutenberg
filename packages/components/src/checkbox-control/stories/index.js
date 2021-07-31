@@ -37,16 +37,8 @@ export const _default = () => {
 };
 
 export const all = () => {
-	const heading = text( 'Heading', 'User' );
 	const label = text( 'Label', 'Is author' );
 	const help = text( 'Help', 'Is the user an author or not?' );
 
-	return (
-		<CheckboxControlWithState
-			heading={ heading }
-			label={ label }
-			help={ help }
-			checked
-		/>
-	);
+	return <CheckboxControlWithState label={ label } help={ help } checked />;
 };

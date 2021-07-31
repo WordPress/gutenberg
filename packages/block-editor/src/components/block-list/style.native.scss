@@ -58,6 +58,8 @@
 
 .containerStyleAddHere {
 	flex-direction: row;
+	padding-left: 12px;
+	padding-right: 12px;
 }
 
 .blockListFooter {
@@ -69,11 +71,13 @@
 }
 
 .defaultAppender {
-	margin: $block-edge-to-content;
+	margin-top: $block-edge-to-content;
+	margin-bottom: $block-edge-to-content;
+	width: 100%;
 }
 
 .innerAppender {
-	margin: $block-edge-to-content / 2;
+	margin: $block-edge-to-content * 0.5;
 }
 
 .blockBorder {

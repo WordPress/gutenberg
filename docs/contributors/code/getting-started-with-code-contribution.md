@@ -99,6 +99,31 @@ The WordPress installation should now be available at `http://localhost:8888`
 
 You can access the Dashboard at: `http://localhost:8888/wp-admin/` using **Username**: `admin`, **Password**: `password`. You'll notice the Gutenberg plugin installed and activated, this is your local build.
 
+#### Accessing the MySQL Database
+
+To access the MySQL database on the `wp-env` instance you will first need the connection details. To do this:
+
+1. In a terminal, navigate to your local Gutenberg repo.
+2. Run `npm run wp-env start` - various information about the `wp-env` environment should be logged into the terminal.
+3. In the output from step 2, look for information about the _MySQL_ port:
+   For example:
+
+> MySQL is listening on port {MYSQL_PORT_NUMBER}
+
+4. Copy / make a note of this port number (note this will change each time `wp-env` restarts).
+5. You can now connect to the MySQL instance using the following details (being sure to replace `{MYSQL_PORT_NUMBER}` with the port number from step three):
+
+```
+Host: 127.0.0.1
+Username: root
+Database: wordpress
+Port: {MYSQL_PORT_NUMBER}
+```
+
+**Please note**: the MySQL port number will change each time `wp-env` restarts. If you find you can no longer access your database, simply repeat the steps above to find the new port number and restore your connection.
+
+**Tip**: [Sequel Ace](https://sequel-ace.com/) is a useful GUI tool for accessing a MySQL database. Other tools are available and documented in this [article on accessing the WordPress database](https://wordpress.org/support/article/creating-database-for-wordpress/).
+
 #### Troubleshooting
 
 If you run into an issue, check the [troubleshooting section in `wp-env` documentation](/packages/env/README.md#troubleshooting-common-problems).

@@ -1,3 +1,5 @@
+@import "./functions";
+
 /**
  * Breakpoint mixins
  */
@@ -264,21 +266,6 @@
 	&:-ms-input-placeholder {
 		color: $dark-gray-placeholder;
 	}
-
-	.is-dark-theme & {
-		&::-webkit-input-placeholder {
-			color: $light-gray-placeholder;
-		}
-
-		&::-moz-placeholder {
-			opacity: 1; // Necessary because Firefox reduces this from 1.
-			color: $light-gray-placeholder;
-		}
-
-		&:-ms-input-placeholder {
-			color: $light-gray-placeholder;
-		}
-	}
 }
 
 @mixin checkbox-control {
@@ -440,11 +427,15 @@
 }
 
 @mixin admin-scheme($color-primary) {
+	// Define RGB equivalents for use in rgba function.
+	// Hexadecimal css vars do not work in the rgba function.
 	--wp-admin-theme-color: #{$color-primary};
-
+	--wp-admin-theme-color--rgb: #{hex-to-rgb($color-primary)};
 	// Darker shades.
 	--wp-admin-theme-color-darker-10: #{darken($color-primary, 5%)};
+	--wp-admin-theme-color-darker-10--rgb: #{hex-to-rgb(darken($color-primary, 5%))};
 	--wp-admin-theme-color-darker-20: #{darken($color-primary, 10%)};
+	--wp-admin-theme-color-darker-20--rgb: #{hex-to-rgb(darken($color-primary, 10%))};
 
 	// Focus style width.
 	// Avoid rounding issues by showing a whole 2px for 1x screens, and 1.5px on high resolution screens.

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { html as icon } from '@wordpress/icons';
 
 /**
@@ -17,10 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Custom HTML', 'block title' ),
-	description: __( 'Add custom HTML code and preview it as you edit.' ),
 	icon,
-	keywords: [ __( 'embed' ) ],
 	example: {
 		attributes: {
 			content:

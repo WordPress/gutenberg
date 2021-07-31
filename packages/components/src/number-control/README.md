@@ -1,5 +1,9 @@
 # NumberControl
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 NumberControl is an enhanced HTML [`input[type="number]`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number) element.
 
 ## Usage
@@ -76,6 +80,14 @@ The position of the label (`top`, `side`, `bottom`, or `edge`).
 
 -   Type: `String`
 -   Required: No
+
+### required
+
+If `true` enforces a valid number within the control's min/max range. If `false` allows an empty string as a valid value.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ### shiftStep
 

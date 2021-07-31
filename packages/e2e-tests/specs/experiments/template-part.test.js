@@ -94,6 +94,15 @@ describe( 'Template Part', () => {
 			expect( paragraphInTemplatePart ).not.toBeNull();
 		}
 
+		async function awaitHeaderAndFooterLoad() {
+			await canvas().waitForSelector(
+				'.wp-block-template-part.site-header.block-editor-block-list__layout'
+			);
+			await canvas().waitForSelector(
+				'.wp-block-template-part.site-footer.block-editor-block-list__layout'
+			);
+		}
+
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			await updateHeader( 'Header Template Part 123' );
 
@@ -164,9 +173,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert selected block to template part', async () => {
-			await canvas().waitForSelector(
-				'.wp-block-template-part.block-editor-block-list__layout'
-			);
+			await awaitHeaderAndFooterLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -204,9 +211,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert multiple selected blocks to template part', async () => {
-			await canvas().waitForSelector(
-				'.wp-block-template-part.block-editor-block-list__layout'
-			);
+			await awaitHeaderAndFooterLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -271,16 +276,23 @@ describe( 'Template Part', () => {
 			'//button[contains(text(), "New template part")]';
 		const chooseExistingButtonSelector =
 			'//button[contains(text(), "Choose existing")]';
+		const confirmTitleButtonSelector =
+			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
 		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
+			await page.waitForXPath( chooseExistingButtonSelector );
 			const [ createNewButton ] = await page.$x(
 				createNewButtonSelector
 			);
 			await createNewButton.click();
+			const confirmTitleButton = await page.waitForSelector(
+				confirmTitleButtonSelector
+			);
+			await confirmTitleButton.click();
 
 			const newTemplatePart = await page.waitForSelector(
 				activatedTemplatePartSelector
@@ -297,7 +309,7 @@ describe( 'Template Part', () => {
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			const [ chooseExistingButton ] = await page.$x(
+			const chooseExistingButton = await page.waitForXPath(
 				chooseExistingButtonSelector
 			);
 			await chooseExistingButton.click();

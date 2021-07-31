@@ -334,7 +334,15 @@ export function isEquivalentTextTokens(
  * @return {string} Normalized CSS length value.
  */
 export function getNormalizedLength( value ) {
-	return 0 === parseFloat( value ) ? '0' : value;
+	if ( 0 === parseFloat( value ) ) {
+		return '0';
+	}
+	// Normalize strings with floats to always include a leading zero.
+	if ( value.indexOf( '.' ) === 0 ) {
+		return '0' + value;
+	}
+
+	return value;
 }
 
 /**
@@ -556,8 +564,8 @@ function getHTMLTokens( html, logger = createLogger() ) {
 /**
  * Returns true if the next HTML token closes the current token.
  *
- * @param {Object} currentToken Current token to compare with.
- * @param {Object|undefined} nextToken Next token to compare against.
+ * @param {Object}           currentToken Current token to compare with.
+ * @param {Object|undefined} nextToken    Next token to compare against.
  *
  * @return {boolean} true if `nextToken` closes `currentToken`, false otherwise
  */
@@ -677,7 +685,7 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  * @param {string|Object} blockTypeOrName      Block type.
  * @param {Object}        attributes           Parsed block attributes.
  * @param {string}        originalBlockContent Original block content.
- * @param {Object}        logger           	   Validation logger object.
+ * @param {Object}        logger               Validation logger object.
  *
  * @return {Object} Whether block is valid and contains validation messages.
  */

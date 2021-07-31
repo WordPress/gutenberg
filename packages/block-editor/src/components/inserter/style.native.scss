@@ -1,9 +1,5 @@
 /** @format */
 
-.rowSeparator {
-	height: 12px;
-}
-
 .addBlockButton {
 	color: $blue-wordpress;
 }
@@ -12,41 +8,56 @@
 	color: $blue-30;
 }
 
-.columnPadding {
+.list {
+	padding-bottom: 20;
+	padding-top: 8;
+}
+
+.inserter-search-results__column {
 	padding: $grid-unit-20;
 }
 
-.list {
-	padding-bottom: 20;
+.inserter-search-results__row-separator {
+	height: 12px;
 }
 
-.searchForm {
-	height: 46px;
-	border-radius: 8px;
-	color: $gray-dark;
-	margin: $grid-unit-30;
-	background-color: $gray-light;
-	flex-direction: row;
-	justify-content: space-between;
+.inserter-search-results__list {
+	padding-bottom: 20px;
+	padding-top: 8px;
 }
 
-.searchFormDark {
-	background-color: rgba($white, 0.07);
+.inserter-search-no-results__container {
+	margin-top: 60px;
+	align-items: center;
 }
 
-.searchFormInput {
-	color: $gray-dark;
-	flex: 2;
+.inserter-search-no-results__text-primary {
+	font-size: 16px;
+	color: $light-primary;
 }
 
-.searchFormInputDark {
-	color: $white;
+.inserter-search-no-results__text-primary--dark {
+	color: $dark-primary;
 }
 
-.searchFormPlaceholder {
-	color: $gray;
+.inserter-search-no-results__text-secondary {
+	font-size: 14px;
+	color: $light-secondary;
 }
 
-.searchFormPlaceholderDark {
-	color: rgba($white, 0.8);
+.inserter-search-no-results__text-secondary--dark {
+	color: $dark-secondary;
+}
+
+.inserter-tabs__wrapper {
+	overflow: hidden;
+}
+
+.inserter-tabs__container {
+	height: 100%;
+	width: 100%;
+}
+
+.inserter-tabs__item {
+	position: absolute;
 }

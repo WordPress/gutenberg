@@ -3,10 +3,12 @@
  */
 import {
 	createNewPost,
+	disablePrePublishChecks,
 	insertBlock,
 	publishPost,
 	trashAllPosts,
 	activateTheme,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -64,6 +66,8 @@ describe( 'Multi-entity save flow', () => {
 		const saveA11ySelector =
 			'.edit-post-layout__toggle-entities-saved-states-panel-button';
 		const publishPanelSelector = '.editor-post-publish-panel';
+		const confirmTitleButtonSelector =
+			'.wp-block-template-part__placeholder-create-new__title-form .components-button.is-primary';
 
 		// Reusable assertions inside Post editor.
 		const assertMultiSaveEnabled = async () => {
@@ -98,13 +102,16 @@ describe( 'Multi-entity save flow', () => {
 
 			// Add a template part and edit it.
 			await insertBlock( 'Template Part' );
-			const [ createNewButton ] = await page.$x(
+			const createNewButton = await page.waitForXPath(
 				createNewButtonSelector
 			);
 			await createNewButton.click();
+			const confirmTitleButton = await page.waitForSelector(
+				confirmTitleButtonSelector
+			);
+			await confirmTitleButton.click();
+
 			await page.waitForSelector( activatedTemplatePartSelector );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( 'test-template-part' );
 			await page.click( '.block-editor-button-block-appender' );
 			await page.click( '.editor-block-list-item-paragraph' );
 			await page.keyboard.type( 'some words...' );
@@ -161,12 +168,66 @@ describe( 'Multi-entity save flow', () => {
 
 			// Update template part.
 			await page.click( templatePartSelector );
+			await page.click(
+				`${ templatePartSelector } .wp-block[data-type="core/paragraph"]`
+			);
 			await page.keyboard.type( '...some more words...' );
 			await page.keyboard.press( 'Enter' );
 
 			// Multi-entity saving should be enabled.
 			await assertMultiSaveEnabled();
 			await assertExistance( saveA11ySelector, true );
+		} );
+
+		it( 'Site blocks should save individually', async () => {
+			await createNewPost();
+			await disablePrePublishChecks();
+
+			await insertBlock( 'Site Title' );
+			// Ensure title is retrieved before typing.
+			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' );
+			const editableSiteTitleSelector =
+				'.wp-block-site-title a[contenteditable="true"]';
+			await page.waitForSelector( editableSiteTitleSelector );
+			await page.focus( editableSiteTitleSelector );
+			await page.keyboard.type( '...' );
+
+			await insertBlock( 'Site Tagline' );
+			// Ensure tagline is retrieved before typing.
+			await page.waitForXPath(
+				'//p[contains(text(), "Just another WordPress site")]'
+			);
+			const editableSiteTagLineSelector =
+				'.wp-block-site-tagline[contenteditable="true"]';
+			await page.waitForSelector( editableSiteTagLineSelector );
+			await page.focus( editableSiteTagLineSelector );
+			await page.keyboard.type( '...' );
+
+			await clickButton( 'Publish' );
+			await page.waitForSelector( savePanelSelector );
+			let checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 3 );
+
+			await checkboxInputs[ 1 ].click();
+			await page.click( entitiesSaveSelector );
+
+			await clickButton( 'Update…' );
+			await page.waitForSelector( savePanelSelector );
+			checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 1 );
+
+			// Reset site entity to default value to not affect other tests.
+			await page.evaluate( () => {
+				wp.data
+					.dispatch( 'core' )
+					.editEntityRecord( 'root', 'site', undefined, {
+						title: 'gutenberg',
+						description: 'Just another WordPress site',
+					} );
+				wp.data
+					.dispatch( 'core' )
+					.saveEditedEntityRecord( 'root', 'site', undefined );
+			} );
 		} );
 	} );
 
@@ -188,9 +249,9 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.clickItemByText( 'Index' );
 
 			// Select the header template part via list view.
-			await page.click( 'button[aria-label="List View"]' );
+			await page.click( '.edit-site-header-toolbar__list-view-toggle' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
-				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
+				'//button[contains(@class, "block-editor-list-view-block-select-button")][contains(., "Header")]'
 			);
 			headerTemplatePartListViewButton.click();
 			await page.click( 'button[aria-label="Close list view sidebar"]' );

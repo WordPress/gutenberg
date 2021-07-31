@@ -261,7 +261,6 @@ class URLInput extends Component {
 				// position.
 				case UP: {
 					if ( 0 !== event.target.selectionStart ) {
-						event.stopPropagation();
 						event.preventDefault();
 
 						// Set the input caret to position 0
@@ -275,7 +274,6 @@ class URLInput extends Component {
 					if (
 						this.props.value.length !== event.target.selectionStart
 					) {
-						event.stopPropagation();
 						event.preventDefault();
 
 						// Set the input caret to the last position
@@ -284,6 +282,15 @@ class URLInput extends Component {
 							this.props.value.length
 						);
 					}
+					break;
+				}
+
+				// Submitting while loading should trigger onSubmit
+				case ENTER: {
+					if ( this.props.onSubmit ) {
+						this.props.onSubmit();
+					}
+
 					break;
 				}
 			}
@@ -297,7 +304,6 @@ class URLInput extends Component {
 
 		switch ( event.keyCode ) {
 			case UP: {
-				event.stopPropagation();
 				event.preventDefault();
 				const previousIndex = ! selectedSuggestion
 					? suggestions.length - 1
@@ -308,7 +314,6 @@ class URLInput extends Component {
 				break;
 			}
 			case DOWN: {
-				event.stopPropagation();
 				event.preventDefault();
 				const nextIndex =
 					selectedSuggestion === null ||
@@ -330,9 +335,15 @@ class URLInput extends Component {
 			}
 			case ENTER: {
 				if ( this.state.selectedSuggestion !== null ) {
-					event.stopPropagation();
 					this.selectLink( suggestion );
+
+					if ( this.props.onSubmit ) {
+						this.props.onSubmit( suggestion );
+					}
+				} else if ( this.props.onSubmit ) {
+					this.props.onSubmit();
 				}
+
 				break;
 			}
 		}

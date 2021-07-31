@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { normalizedSearch } from './utils';
 import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 import TemplateNavigationItem from './template-navigation-item';
 import ContentNavigationItem from './content-navigation-item';
 
@@ -37,7 +38,7 @@ export default function SearchResults( { items, search, disableFilter } ) {
 			if ( itemType === 'wp_template' ) {
 				const {
 					__experimentalGetTemplateInfo: getTemplateInfo,
-				} = select( 'core/editor' );
+				} = select( editorStore );
 
 				return items.map( ( item ) => ( {
 					slug: item.slug,
