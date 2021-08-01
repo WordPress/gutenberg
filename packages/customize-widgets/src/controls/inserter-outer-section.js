@@ -75,12 +75,27 @@ export default function getInserterOuterSection() {
 			);
 
 			this.contentContainer.addClass( 'widgets-inserter' );
+
+			// Set a flag if the state is being changed from open() or close().
+			// Don't propagate the event if it's an internal action to prevent infinite loop.
+			this.isFromInternalAction = false;
+			this.expanded.bind( () => {
+				if ( ! this.isFromInternalAction ) {
+					// Propagate the event to React to sync the state.
+					dispatch( customizeWidgetsStore ).setIsInserterOpened(
+						this.expanded()
+					);
+				}
+				this.isFromInternalAction = false;
+			} );
 		}
 		open() {
 			if ( ! this.expanded() ) {
 				const contentContainer = this.contentContainer[ 0 ];
 				this.activeElementBeforeExpanded =
 					contentContainer.ownerDocument.activeElement;
+
+				this.isFromInternalAction = true;
 
 				this.expand( {
 					completeCallback() {
@@ -102,6 +117,8 @@ export default function getInserterOuterSection() {
 				const contentContainer = this.contentContainer[ 0 ];
 				const activeElement =
 					contentContainer.ownerDocument.activeElement;
+
+				this.isFromInternalAction = true;
 
 				this.collapse( {
 					completeCallback() {
