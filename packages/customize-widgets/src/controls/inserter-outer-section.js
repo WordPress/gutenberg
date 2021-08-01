@@ -3,6 +3,12 @@
  */
 import { ESCAPE } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
+import { dispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as customizeWidgetsStore } from '../store';
 
 export default function getInserterOuterSection() {
 	const {
@@ -52,14 +58,16 @@ export default function getInserterOuterSection() {
 				'keydown',
 				( event ) => {
 					if (
-						this.isOpen &&
+						this.expanded() &&
 						( event.keyCode === ESCAPE ||
 							event.code === 'Escape' ) &&
 						! event.defaultPrevented
 					) {
 						event.preventDefault();
 						event.stopPropagation();
-						this.close();
+						dispatch( customizeWidgetsStore ).setIsInserterOpened(
+							false
+						);
 					}
 				},
 				// Use capture mode to make this run before other event listeners.
@@ -68,15 +76,8 @@ export default function getInserterOuterSection() {
 
 			this.contentContainer.addClass( 'widgets-inserter' );
 		}
-		get isOpen() {
-			return this.expanded();
-		}
-		subscribe( handler ) {
-			this.expanded.bind( handler );
-			return () => this.expanded.unbind( handler );
-		}
 		open() {
-			if ( ! this.isOpen ) {
+			if ( ! this.expanded() ) {
 				const contentContainer = this.contentContainer[ 0 ];
 				this.activeElementBeforeExpanded =
 					contentContainer.ownerDocument.activeElement;
@@ -97,7 +98,7 @@ export default function getInserterOuterSection() {
 			}
 		}
 		close() {
-			if ( this.isOpen ) {
+			if ( this.expanded() ) {
 				const contentContainer = this.contentContainer[ 0 ];
 				const activeElement =
 					contentContainer.ownerDocument.activeElement;
