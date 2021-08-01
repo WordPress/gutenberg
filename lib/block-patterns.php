@@ -244,7 +244,7 @@ add_action(
 			return;
 		}
 		remove_core_patterns();
-		register_gutenberg_patterns();
+		// register_gutenberg_patterns();
 	}
 );
 
@@ -257,7 +257,7 @@ add_action(
 
 		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
 		if ( $current_screen->is_block_editor || $is_site_editor ) {
-			load_remote_patterns();
+			// load_remote_patterns();
 		}
 	}
 );
