@@ -223,6 +223,18 @@ export function isInserterOpened( state ) {
 }
 
 /**
+ * Get the insertion point for the inserter.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The root client ID and index to insert at.
+ */
+export function __experimentalGetInsertionPoint( state ) {
+	const { rootClientId, insertionIndex } = state.blockInserterPanel;
+	return { rootClientId, insertionIndex };
+}
+
+/**
  * Returns true if a block can be inserted into a widget area.
  *
  * @param {Array}  state     The open state of the widget areas.

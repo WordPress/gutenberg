@@ -2,11 +2,14 @@
 
 ## Unreleased
 
+## 17.1.0 (2021-07-29)
+
 ### Enhancements
 
 -   Update `eslint-plugin-markdown` package to `2.20.0` ([#33432](https://github.com/WordPress/gutenberg/pull/33432)).
 -   Update `sass` package to `1.35.2` ([#33433](https://github.com/WordPress/gutenberg/pull/33433)).
 -   Update webpack config to minimize also CSS files ([#33676](https://github.com/WordPress/gutenberg/pull/33676)).
+-   The default PostCSS config uses cssnano to minimize CSS output ([#33750](https://github.com/WordPress/gutenberg/pull/33750)).
 
 ## 17.0.0 (2021-07-21)
 
