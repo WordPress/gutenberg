@@ -88,6 +88,14 @@
 	@include break-medium {
 		display: block;
 	}
+	.block-editor-block-preview__container {
+		// We have a bug on packages/block-editor/src/components/block-preview/auto.js.
+		// Because of some reason contentHeight is always 0. Even thought the iframe used for the computation has an height.
+		// It seems like useResizeObserver is not rerunning on this case.
+		// This rule should be removed after the bug is addressed.
+		height: 100% !important;
+		min-height: 200px;
+	}
 }
 
 .edit-site-navigation-panel__template-item {

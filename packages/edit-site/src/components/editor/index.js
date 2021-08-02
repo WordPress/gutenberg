@@ -10,7 +10,11 @@ import {
 	Notice,
 } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
-import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockContextProvider,
+	BlockBreadcrumb,
+	__unstableEditorStyles as EditorStyles,
+} from '@wordpress/block-editor';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
@@ -201,6 +205,12 @@ function Editor( { initialSettings } ) {
 										settings.__experimentalGlobalStylesBaseStyles
 									}
 								>
+									{
+										// Template previews need the editor styles to be available.
+										<EditorStyles
+											styles={ settings.styles }
+										/>
+									}
 									<KeyboardShortcuts.Register />
 									<SidebarComplementaryAreaFills />
 									<InterfaceSkeleton
