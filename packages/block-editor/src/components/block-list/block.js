@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { omit } from 'lodash';
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -63,9 +64,12 @@ function mergeWrapperProps( propsA, propsB ) {
 
 function Block( { children, isHtml, ...props } ) {
 	return (
-		<div { ...useBlockProps( props, { __unstableIsHtml: isHtml } ) }>
+		<motion.div
+			{ ...useBlockProps( props, { __unstableIsHtml: isHtml } ) }
+			layout="position"
+		>
 			{ children }
-		</div>
+		</motion.div>
 	);
 }
 
@@ -88,6 +92,8 @@ function BlockListBlock( {
 } ) {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
+
+	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -122,18 +128,24 @@ function BlockListBlock( {
 		);
 	}
 
-	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
-
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column.
 	if ( isAligned ) {
 		blockEdit = (
-			<div
+			<motion.div
 				className="wp-block"
 				data-align={ wrapperProps[ 'data-align' ] }
+				layout="position"
 			>
 				{ blockEdit }
-			</div>
+			</motion.div>
+		);
+	} else {
+		//TODO: we can wrap custom components but must forward a ref
+		blockEdit = (
+			<motion.div className="wp-block" layout="position">
+				{ blockEdit }
+			</motion.div>
 		);
 	}
 

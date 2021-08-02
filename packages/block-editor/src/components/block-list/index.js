@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
+import { motion, AnimateSharedLayout } from 'framer-motion';
 /**
  * WordPress dependencies
  */
@@ -44,24 +44,27 @@ function Root( { className, children } ) {
 	);
 	return (
 		<Head>
-			<div
-				ref={ useMergeRefs( [
-					useBlockSelectionClearer(),
-					useBlockDropZone(),
-					useInBetweenInserter(),
-				] ) }
-				className={ classnames(
-					'block-editor-block-list__layout is-root-container',
-					className,
-					{
-						'is-outline-mode': isOutlineMode,
-						'is-focus-mode': isFocusMode && isLargeViewport,
-						'is-navigate-mode': isNavigationMode,
-					}
-				) }
-			>
-				{ children }
-			</div>
+			<AnimateSharedLayout>
+				<motion.div
+					layout="position"
+					ref={ useMergeRefs( [
+						useBlockSelectionClearer(),
+						useBlockDropZone(),
+						useInBetweenInserter(),
+					] ) }
+					className={ classnames(
+						'block-editor-block-list__layout is-root-container',
+						className,
+						{
+							'is-outline-mode': isOutlineMode,
+							'is-focus-mode': isFocusMode && isLargeViewport,
+							'is-navigate-mode': isNavigationMode,
+						}
+					) }
+				>
+					{ children }
+				</motion.div>
+			</AnimateSharedLayout>
 		</Head>
 	);
 }
