@@ -10,6 +10,7 @@ import {
 	BlockControls,
 	useBlockProps,
 	store as blockEditorStore,
+	getColorClassName,
 } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { ToolbarButton } from '@wordpress/components';
@@ -28,7 +29,46 @@ import ConvertToLinksModal from './convert-to-links-modal';
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 
-export default function PageListEdit( { context, clientId } ) {
+export default function PageListEdit( {
+	context,
+	clientId,
+	attributes,
+	setAttributes,
+} ) {
+	// Copy context to attributes to make it accessible in the editor's
+	// ServerSideRender
+	useEffect( () => {
+		const {
+			textColor,
+			customTextColor,
+			backgroundColor,
+			customBackgroundColor,
+			overlayTextColor,
+			customOverlayTextColor,
+			overlayBackgroundColor,
+			customOverlayBackgroundColor,
+		} = context;
+		setAttributes( {
+			textColor,
+			customTextColor,
+			backgroundColor,
+			customBackgroundColor,
+			overlayTextColor,
+			customOverlayTextColor,
+			overlayBackgroundColor,
+			customOverlayBackgroundColor,
+		} );
+	}, [
+		context.textColor,
+		context.customTextColor,
+		context.backgroundColor,
+		context.customBackgroundColor,
+		context.overlayTextColor,
+		context.customOverlayTextColor,
+		context.overlayBackgroundColor,
+		context.customOverlayBackgroundColor,
+	] );
+
 	const { textColor, backgroundColor, showSubmenuIcon, style } =
 		context || {};
 
@@ -37,9 +77,12 @@ export default function PageListEdit( { context, clientId } ) {
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			'has-text-color': !! textColor,
-			[ `has-${ textColor }-color` ]: !! textColor,
+			[ getColorClassName( 'color', textColor ) ]: !! textColor,
 			'has-background': !! backgroundColor,
-			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+			[ getColorClassName(
+				'background-color',
+				backgroundColor
+			) ]: !! backgroundColor,
 			'show-submenu-icons': !! showSubmenuIcon,
 		} ),
 		style: { ...style?.color },
@@ -94,7 +137,10 @@ export default function PageListEdit( { context, clientId } ) {
 				/>
 			) }
 			<div { ...blockProps }>
-				<ServerSideRender block="core/page-list" />
+				<ServerSideRender
+					block="core/page-list"
+					attributes={ attributes }
+				/>
 			</div>
 		</>
 	);

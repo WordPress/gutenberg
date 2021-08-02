@@ -12,23 +12,34 @@ import { applyFilters, doAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { cloneElement } from './react';
+import { Component, cloneElement } from './react';
 
-const render = ( element, id ) =>
-	AppRegistry.registerComponent( id, () => ( propsFromParent ) => {
-		const parentProps = omit( propsFromParent || {}, [ 'rootTag' ] );
+const render = ( element, id ) => {
+	class App extends Component {
+		constructor() {
+			super( ...arguments );
 
-		doAction( 'native.pre-render', parentProps );
+			const parentProps = omit( this.props || {}, [ 'rootTag' ] );
 
-		const filteredProps = applyFilters(
-			'native.block_editor_props',
-			parentProps
-		);
+			doAction( 'native.pre-render', parentProps );
 
-		doAction( 'native.render', filteredProps );
+			this.filteredProps = applyFilters(
+				'native.block_editor_props',
+				parentProps
+			);
+		}
 
-		return cloneElement( element, filteredProps );
-	} );
+		componentDidMount() {
+			doAction( 'native.render', this.filteredProps );
+		}
+
+		render() {
+			return cloneElement( element, this.filteredProps );
+		}
+	}
+
+	AppRegistry.registerComponent( id, () => App );
+};
 
 /**
  * Render a given element on Native.

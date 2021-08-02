@@ -16,6 +16,10 @@ export function useUndoAutomaticChange() {
 		function onKeyDown( event ) {
 			const { keyCode } = event;
 
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
 			if (
 				keyCode !== DELETE &&
 				keyCode !== BACKSPACE &&

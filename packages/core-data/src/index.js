@@ -24,8 +24,8 @@ import { STORE_NAME } from './name';
 
 const entitySelectors = defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name ) ] = ( state, key ) =>
-		selectors.getEntityRecord( state, kind, name, key );
+	result[ getMethodName( kind, name ) ] = ( state, key, query ) =>
+		selectors.getEntityRecord( state, kind, name, key, query );
 	result[ getMethodName( kind, name, 'get', true ) ] = ( state, ...args ) =>
 		selectors.getEntityRecords( state, kind, name, ...args );
 	return result;
@@ -33,8 +33,8 @@ const entitySelectors = defaultEntities.reduce( ( result, entity ) => {
 
 const entityResolvers = defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
-	result[ getMethodName( kind, name ) ] = ( key ) =>
-		resolvers.getEntityRecord( kind, name, key );
+	result[ getMethodName( kind, name ) ] = ( key, query ) =>
+		resolvers.getEntityRecord( kind, name, key, query );
 	const pluralMethodName = getMethodName( kind, name, 'get', true );
 	result[ pluralMethodName ] = ( ...args ) =>
 		resolvers.getEntityRecords( kind, name, ...args );

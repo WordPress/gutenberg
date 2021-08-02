@@ -53,7 +53,7 @@ const transforms = {
 				const validImages = filter( attributes, ( { url } ) => url );
 
 				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__experimentalGalleryRefactor ) {
+				if ( settings.__unstableGalleryWithImageBlocks ) {
 					const innerBlocks = validImages.map( ( image ) => {
 						return createBlock( 'core/image', image );
 					} );
@@ -61,7 +61,6 @@ const transforms = {
 					return createBlock(
 						'core/gallery',
 						{
-							imageCount: innerBlocks.length,
 							align,
 							sizeSlug,
 						},
@@ -95,7 +94,7 @@ const transforms = {
 						const settings = select(
 							blockEditorStore
 						).getSettings();
-						if ( ! settings.__experimentalGalleryRefactor ) {
+						if ( ! settings.__unstableGalleryWithImageBlocks ) {
 							return parseShortcodeIds( ids ).map( ( id ) => ( {
 								id: toString( id ),
 							} ) );
@@ -108,7 +107,7 @@ const transforms = {
 						const settings = select(
 							blockEditorStore
 						).getSettings();
-						if ( ! settings.__experimentalGalleryRefactor ) {
+						if ( ! settings.__unstableGalleryWithImageBlocks ) {
 							return parseShortcodeIds( ids );
 						}
 					},
@@ -119,7 +118,7 @@ const transforms = {
 						const settings = select(
 							blockEditorStore
 						).getSettings();
-						if ( settings.__experimentalGalleryRefactor ) {
+						if ( settings.__unstableGalleryWithImageBlocks ) {
 							return parseShortcodeIds( ids ).map( ( id ) => ( {
 								id: parseInt( id ),
 							} ) );
@@ -138,7 +137,7 @@ const transforms = {
 						const settings = select(
 							blockEditorStore
 						).getSettings();
-						if ( ! settings.__experimentalGalleryRefactor ) {
+						if ( ! settings.__unstableGalleryWithImageBlocks ) {
 							switch ( link ) {
 								case 'post':
 									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
@@ -164,7 +163,11 @@ const transforms = {
 			},
 		},
 		{
-			// When created by drag and dropping multiple files on an insertion point
+			// When created by drag and dropping multiple files on an insertion point. Because multiple
+			// files must not be transformed to a gallery when dropped within a gallery there is another transform
+			// within the image block to handle that case. Therefore this transform has to have priority 1
+			// set so that it overrrides the image block transformation when mulitple images are dropped outside
+			// of a gallery block.
 			type: 'files',
 			priority: 1,
 			isMatch( files ) {
@@ -178,7 +181,7 @@ const transforms = {
 			},
 			transform( files ) {
 				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__experimentalGalleryRefactor ) {
+				if ( settings.__unstableGalleryWithImageBlocks ) {
 					const innerBlocks = files.map( ( file ) =>
 						createBlock( 'core/image', {
 							url: createBlobURL( file ),
@@ -197,46 +200,6 @@ const transforms = {
 				return block;
 			},
 		},
-		{
-			// Allow transform to new gallery format if experimental flag enabled.
-			type: 'block',
-			isMultiBlock: false,
-			blocks: [ 'core/gallery' ],
-			priority: 1,
-			isMatch( { ids } ) {
-				const settings = select( blockEditorStore ).getSettings();
-				return settings.__experimentalGalleryRefactor && ids.length > 0;
-			},
-			transform( { images, linkTo, sizeSlug } ) {
-				let link;
-				switch ( linkTo ) {
-					case 'post':
-						link = LINK_DESTINATION_ATTACHMENT;
-						break;
-					case 'file':
-						link = LINK_DESTINATION_MEDIA;
-						break;
-					default:
-						link = LINK_DESTINATION_NONE;
-						break;
-				}
-				const innerBlocks = images.map( ( image ) =>
-					createBlock( 'core/image', {
-						id: parseInt( image.id, 10 ),
-						url: image.url,
-						alt: image.alt,
-						caption: image.caption,
-						linkDestination: link,
-					} )
-				);
-
-				return createBlock(
-					'core/gallery',
-					{ sizeSlug, linkTo: link },
-					innerBlocks
-				);
-			},
-		},
 	],
 	to: [
 		{
@@ -244,7 +207,7 @@ const transforms = {
 			blocks: [ 'core/image' ],
 			transform: ( { align, images, ids, sizeSlug }, innerBlocks ) => {
 				const settings = select( blockEditorStore ).getSettings();
-				if ( settings.__experimentalGalleryRefactor ) {
+				if ( settings.__unstableGalleryWithImageBlocks ) {
 					if ( innerBlocks.length > 0 ) {
 						return innerBlocks.map(
 							( {

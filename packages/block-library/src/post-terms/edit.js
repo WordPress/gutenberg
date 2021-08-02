@@ -8,11 +8,12 @@ import classnames from 'classnames';
  */
 import {
 	AlignmentToolbar,
+	InspectorAdvancedControls,
 	BlockControls,
 	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Spinner } from '@wordpress/components';
+import { Spinner, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -27,7 +28,7 @@ export default function PostTermsEdit( {
 	context,
 	setAttributes,
 } ) {
-	const { term, textAlign } = attributes;
+	const { term, textAlign, separator } = attributes;
 	const { postId, postType } = context;
 
 	const selectedTerm = useSelect(
@@ -78,6 +79,17 @@ export default function PostTermsEdit( {
 					} }
 				/>
 			</BlockControls>
+			<InspectorAdvancedControls>
+				<TextControl
+					autoComplete="off"
+					label={ __( 'Separator' ) }
+					value={ separator || '' }
+					onChange={ ( nextValue ) => {
+						setAttributes( { separator: nextValue } );
+					} }
+					help={ __( 'Enter character(s) used to separate terms.' ) }
+				/>
+			</InspectorAdvancedControls>
 			<div { ...blockProps }>
 				{ isLoading && <Spinner /> }
 				{ ! isLoading &&
@@ -92,7 +104,15 @@ export default function PostTermsEdit( {
 								{ postTerm.name }
 							</a>
 						) )
-						.reduce( ( prev, curr ) => [ prev, ' | ', curr ] ) }
+						.reduce( ( prev, curr ) => (
+							<>
+								{ prev }
+								<span className="wp-block-post-terms__separator">
+									{ separator || ' ' }
+								</span>
+								{ curr }
+							</>
+						) ) }
 				{ ! isLoading &&
 					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||

@@ -40,6 +40,13 @@ selectorNames.forEach( ( name ) => {
 				);
 			},
 
+			__experimentalGetEntitiesBeingSaved() {
+				return (
+					state.__experimentalGetEntitiesBeingSaved &&
+					state.__experimentalGetEntitiesBeingSaved()
+				);
+			},
+
 			getEntityRecordEdits() {
 				const present = state.editor && state.editor.present;
 				let edits = present && present.edits;
@@ -170,6 +177,7 @@ const {
 	getCurrentPostAttribute,
 	getEditedPostAttribute,
 	isSavingPost,
+	isSavingNonPostEntityChanges,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
@@ -2082,6 +2090,53 @@ describe( 'selectors', () => {
 			};
 
 			expect( isSavingPost( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isSavingNonPostEntityChanges', () => {
+		it( 'should return true if changes to an arbitrary entity are being saved', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [
+						{ kind: 'someKind', name: 'someName', key: 'someKey' },
+					];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( true );
+		} );
+		it( 'should return false if the only changes being saved are for the current post', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [ { kind: 'postType', name: 'post', key: 1 } ];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( false );
+		} );
+		it( 'should return true if changes to multiple posts are being saved', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [
+						{ kind: 'postType', name: 'post', key: 1 },
+						{ kind: 'postType', name: 'post', key: 2 },
+					];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( true );
+		} );
+		it( 'should return true if changes to multiple posts of different post types are being saved', () => {
+			const state = {
+				currentPost: { id: 1, type: 'post' },
+				__experimentalGetEntitiesBeingSaved() {
+					return [
+						{ kind: 'postType', name: 'post', key: 1 },
+						{ kind: 'postType', name: 'wp_template', key: 1 },
+					];
+				},
+			};
+			expect( isSavingNonPostEntityChanges( state ) ).toBe( true );
 		} );
 	} );
 

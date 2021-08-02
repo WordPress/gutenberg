@@ -144,10 +144,6 @@ describe( 'Widgets Customizer', () => {
 			name: 'My Search',
 			selector: '.widget-content *',
 		} ).toBeFound( findOptions );
-
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
 	} );
 
 	it( 'should open the inspector panel', async () => {
@@ -233,10 +229,6 @@ describe( 'Widgets Customizer', () => {
 		} ).toBeFound();
 
 		await expect( inspectorHeading ).not.toBeVisible();
-
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
 	} );
 
 	it( 'should handle the inserter outer section', async () => {
@@ -344,10 +336,6 @@ describe( 'Widgets Customizer', () => {
 			name: 'Add a block',
 			level: 2,
 		} ).not.toBeFound();
-
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
 	} );
 
 	it( 'should move focus to the block', async () => {
@@ -443,10 +431,6 @@ describe( 'Widgets Customizer', () => {
 			text: 'First Heading',
 		} );
 		await expect( headingBlock ).toHaveFocus();
-
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
 	} );
 
 	it( 'should clear block selection', async () => {
@@ -509,10 +493,6 @@ describe( 'Widgets Customizer', () => {
 			role: 'toolbar',
 			name: 'Block tools',
 		} ).not.toBeFound();
-
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
 	} );
 
 	it( 'should handle legacy widgets', async () => {
@@ -637,10 +617,6 @@ describe( 'Widgets Customizer', () => {
 			disabled: true,
 		} );
 
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
-
 		await page.goto( createURL( '/' ) );
 
 		// Expect the saved widgets to show on frontend.
@@ -695,10 +671,6 @@ describe( 'Widgets Customizer', () => {
 			selector: '*[aria-live="polite"][aria-relevant="additions text"]',
 		} ).toBeFound();
 		await expect( paragraphBlock ).toBeVisible();
-
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
 	} );
 
 	it( 'should move (inner) blocks to another sidebar', async () => {
@@ -758,10 +730,6 @@ describe( 'Widgets Customizer', () => {
 		await expect( movedParagraphBlockQuery ).toBeFound();
 		const movedParagraphBlock = await find( movedParagraphBlockQuery );
 		await expect( movedParagraphBlock ).toHaveFocus();
-
-		expect( console ).toHaveWarned(
-			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
-		);
 	} );
 } );
 

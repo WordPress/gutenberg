@@ -58,7 +58,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
-							style: `width: ${ width }px;`,
+							style: width ? `width: ${ width }px;` : '',
 						},
 					};
 

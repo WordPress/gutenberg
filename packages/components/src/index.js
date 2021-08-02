@@ -109,6 +109,10 @@ export { default as ResizableBox } from './resizable-box';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as SearchControl } from './search-control';
+export {
+	SegmentedControl as __experimentalSegmentedControl,
+	SegmentedControlOption as __experimentalSegmentedControlOption,
+} from './segmented-control';
 export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
@@ -143,7 +147,7 @@ export {
 	useCustomUnits as __experimentalUseCustomUnits,
 	parseUnit as __experimentalParseUnit,
 } from './unit-control';
-export { default as VisuallyHidden } from './visually-hidden';
+export { VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {

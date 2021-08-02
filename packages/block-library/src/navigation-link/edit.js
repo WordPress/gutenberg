@@ -29,6 +29,7 @@ import {
 	__experimentalLinkControl as LinkControl,
 	useBlockProps,
 	store as blockEditorStore,
+	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import {
@@ -134,6 +135,61 @@ function getSuggestionsQuery( type, kind ) {
 }
 
 /**
+ * Determine the colors for a menu.
+ *
+ * Order of priority is:
+ * 1: Overlay custom colors (if submenu)
+ * 2: Overlay theme colors (if submenu)
+ * 3: Custom colors
+ * 4: Theme colors
+ * 5: Global styles
+ *
+ * @param {Object} context
+ * @param {boolean} isSubMenu
+ */
+function getColors( context, isSubMenu ) {
+	const {
+		textColor,
+		customTextColor,
+		backgroundColor,
+		customBackgroundColor,
+		overlayTextColor,
+		customOverlayTextColor,
+		overlayBackgroundColor,
+		customOverlayBackgroundColor,
+		style,
+	} = context;
+
+	const colors = {};
+
+	if ( isSubMenu && !! customOverlayTextColor ) {
+		colors.customTextColor = customOverlayTextColor;
+	} else if ( isSubMenu && !! overlayTextColor ) {
+		colors.textColor = overlayTextColor;
+	} else if ( !! customTextColor ) {
+		colors.customTextColor = customTextColor;
+	} else if ( !! textColor ) {
+		colors.textColor = textColor;
+	} else if ( !! style?.color?.text ) {
+		colors.customTextColor = style.color.text;
+	}
+
+	if ( isSubMenu && !! customOverlayBackgroundColor ) {
+		colors.customBackgroundColor = customOverlayBackgroundColor;
+	} else if ( isSubMenu && !! overlayBackgroundColor ) {
+		colors.backgroundColor = overlayBackgroundColor;
+	} else if ( !! customBackgroundColor ) {
+		colors.customBackgroundColor = customBackgroundColor;
+	} else if ( !! backgroundColor ) {
+		colors.backgroundColor = backgroundColor;
+	} else if ( !! style?.color?.background ) {
+		colors.customTextColor = style.color.background;
+	}
+
+	return colors;
+}
+
+/**
  * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
  */
 
@@ -234,7 +290,7 @@ export default function NavigationLinkEdit( {
 		url,
 		opensInNewTab,
 	};
-	const { textColor, backgroundColor, style, showSubmenuIcon } = context;
+	const { showSubmenuIcon } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
@@ -245,6 +301,7 @@ export default function NavigationLinkEdit( {
 
 	const {
 		isAtMaxNesting,
+		isTopLevelLink,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -270,6 +327,8 @@ export default function NavigationLinkEdit( {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, name ).length >=
 					MAX_NESTING,
+				isTopLevelLink:
+					getBlockParentsByBlockName( clientId, name ).length === 0,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
@@ -295,6 +354,9 @@ export default function NavigationLinkEdit( {
 		},
 		[ clientId ]
 	);
+
+	// Store the colors from context as attributes for rendering
+	useEffect( () => setAttributes( { isTopLevelLink } ), [ isTopLevelLink ] );
 
 	/**
 	 * Insert a link block when submenu is added.
@@ -381,6 +443,13 @@ export default function NavigationLinkEdit( {
 		};
 	}
 
+	const {
+		textColor,
+		customTextColor,
+		backgroundColor,
+		customBackgroundColor,
+	} = getColors( context, ! isTopLevelLink );
+
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( {
@@ -388,14 +457,17 @@ export default function NavigationLinkEdit( {
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
-			'has-text-color': !! textColor || !! style?.color?.text,
-			[ `has-${ textColor }-color` ]: !! textColor,
-			'has-background': !! backgroundColor || !! style?.color?.background,
-			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+			'has-text-color': !! textColor || !! customTextColor,
+			[ getColorClassName( 'color', textColor ) ]: !! textColor,
+			'has-background': !! backgroundColor || customBackgroundColor,
+			[ getColorClassName(
+				'background-color',
+				backgroundColor
+			) ]: !! backgroundColor,
 		} ),
 		style: {
-			color: style?.color?.text,
-			backgroundColor: style?.color?.background,
+			color: ! textColor && customTextColor,
+			backgroundColor: ! backgroundColor && customBackgroundColor,
 		},
 	} );
 
@@ -403,11 +475,27 @@ export default function NavigationLinkEdit( {
 		blockProps.onClick = () => setIsLinkOpen( true );
 	}
 
+	// Always use overlay colors for submenus
+	const innerBlocksColors = getColors( context, true );
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: classnames( 'wp-block-navigation-link__container', {
 				'is-parent-of-selected-block': isParentOfSelectedBlock,
+				'has-text-color': !! (
+					innerBlocksColors.textColor ||
+					innerBlocksColors.customTextColor
+				),
+				[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
+				'has-background': !! (
+					innerBlocksColors.backgroundColor ||
+					innerBlocksColors.customBackgroundColor
+				),
+				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
 			} ),
+			style: {
+				color: innerBlocksColors.customTextColor,
+				backgroundColor: innerBlocksColors.customBackgroundColor,
+			},
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
@@ -430,23 +518,23 @@ export default function NavigationLinkEdit( {
 	switch ( type ) {
 		case 'post':
 			/* translators: label for missing post in navigation link block */
-			missingText = __( 'Select a post' );
+			missingText = __( 'Select post' );
 			break;
 		case 'page':
 			/* translators: label for missing page in navigation link block */
-			missingText = __( 'Select a page' );
+			missingText = __( 'Select page' );
 			break;
 		case 'category':
 			/* translators: label for missing category in navigation link block */
-			missingText = __( 'Select a category' );
+			missingText = __( 'Select category' );
 			break;
 		case 'tag':
 			/* translators: label for missing tag in navigation link block */
-			missingText = __( 'Select a tag' );
+			missingText = __( 'Select tag' );
 			break;
 		default:
 			/* translators: label for missing values in navigation link block */
-			missingText = __( 'Add a link' );
+			missingText = __( 'Add link' );
 	}
 
 	return (

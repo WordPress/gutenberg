@@ -49,6 +49,7 @@ function Stepper( {
 				<Icon icon={ minus } size={ 24 } color={ buttonStyle.color } />
 			</TouchableOpacity>
 			<TouchableOpacity
+				testID={ 'Increment' }
 				disabled={ isMaxValue }
 				onPressIn={ onPressInIncrement }
 				onPressOut={ onPressOut }

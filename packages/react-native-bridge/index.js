@@ -392,4 +392,8 @@ export function setFocalPointPickerTooltipShown( tooltipShown ) {
 	);
 }
 
+export function requestPreview() {
+	RNReactNativeGutenbergBridge.requestPreview();
+}
+
 export default RNReactNativeGutenbergBridge;
