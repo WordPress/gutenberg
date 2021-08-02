@@ -17,6 +17,7 @@ import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import {
 	CheckboxControl,
+	TextControl,
 	TreeSelect,
 	withSpokenMessages,
 	withFilters,
@@ -79,10 +80,8 @@ class HierarchicalTermSelector extends Component {
 		onUpdateTerms( newTerms, taxonomy.rest_base );
 	}
 
-	onChangeFormName( event ) {
-		const newValue =
-			event.target.value.trim() === '' ? '' : event.target.value;
-		this.setState( { formName: newValue } );
+	onChangeFormName( value ) {
+		this.setState( { formName: value } );
 	}
 
 	onChangeFormParent( newParent ) {
@@ -299,9 +298,8 @@ class HierarchicalTermSelector extends Component {
 		return termsTree;
 	}
 
-	setFilterValue( event ) {
+	setFilterValue( filterValue ) {
 		const { availableTermsTree } = this.state;
-		const filterValue = event.target.value;
 		const filteredTermsTree = availableTermsTree
 			.map( this.getFilterMatcher( filterValue ) )
 			.filter( ( term ) => term );
@@ -393,13 +391,7 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	render() {
-		const {
-			slug,
-			taxonomy,
-			instanceId,
-			hasCreateAction,
-			hasAssignAction,
-		} = this.props;
+		const { slug, taxonomy, hasCreateAction, hasAssignAction } = this.props;
 
 		if ( ! hasAssignAction ) {
 			return null;
@@ -442,8 +434,6 @@ class HierarchicalTermSelector extends Component {
 		);
 		const noParentOption = `— ${ parentSelectLabel } —`;
 		const newTermSubmitLabel = newTermButtonLabel;
-		const inputId = `editor-post-taxonomies__hierarchical-terms-input-${ instanceId }`;
-		const filterInputId = `editor-post-taxonomies__hierarchical-terms-filter-${ instanceId }`;
 		const filterLabel = get(
 			this.props.taxonomy,
 			[ 'labels', 'search_items' ],
@@ -458,18 +448,12 @@ class HierarchicalTermSelector extends Component {
 
 		return [
 			showFilter && (
-				<label key="filter-label" htmlFor={ filterInputId }>
-					{ filterLabel }
-				</label>
-			),
-			showFilter && (
-				<input
-					type="search"
-					id={ filterInputId }
+				<TextControl
+					key="term-filter-input"
+					className="editor-post-taxonomies__hierarchical-terms-filter"
+					label={ filterLabel }
 					value={ filterValue }
 					onChange={ this.setFilterValue }
-					className="editor-post-taxonomies__hierarchical-terms-filter"
-					key="term-filter-input"
 				/>
 			),
 			<div
@@ -496,16 +480,9 @@ class HierarchicalTermSelector extends Component {
 			),
 			showForm && (
 				<form onSubmit={ this.onAddTerm } key="hierarchical-terms-form">
-					<label
-						htmlFor={ inputId }
-						className="editor-post-taxonomies__hierarchical-terms-label"
-					>
-						{ newTermLabel }
-					</label>
-					<input
-						type="text"
-						id={ inputId }
+					<TextControl
 						className="editor-post-taxonomies__hierarchical-terms-input"
+						label={ newTermLabel }
 						value={ formName }
 						onChange={ this.onChangeFormName }
 						required

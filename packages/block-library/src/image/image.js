@@ -88,7 +88,7 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { allowResize = true, isGrouped = false } = context;
+	const { allowResize = true } = context;
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -178,7 +178,9 @@ export default function Image( {
 		window
 			.fetch( url )
 			.then( ( response ) => response.blob() )
-			.then( ( blob ) => setExternalBlob( blob ) );
+			.then( ( blob ) => setExternalBlob( blob ) )
+			// Do nothing, cannot upload.
+			.catch( () => {} );
 	}, [ id, url, isSelected, externalBlob ] );
 
 	// Focus the caption after inserting an image from the placeholder. This is
@@ -321,7 +323,7 @@ export default function Image( {
 						label={ __( 'Upload external image' ) }
 					/>
 				) }
-				{ ! isGrouped && ! multiImageSelection && canInsertCover && (
+				{ ! multiImageSelection && canInsertCover && (
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }

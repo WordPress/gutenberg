@@ -19,6 +19,7 @@ import {
 } from '@wordpress/interface';
 import {
 	EditorNotices,
+	EditorSnackbars,
 	EntitiesSavedStates,
 	UnsavedChangesWarning,
 	store as editorStore,
@@ -55,6 +56,7 @@ function Editor( { initialSettings } ) {
 		templateType,
 		page,
 		template,
+		templateResolved,
 		isNavigationOpen,
 	} = useSelect( ( select ) => {
 		const {
@@ -66,6 +68,7 @@ function Editor( { initialSettings } ) {
 			getPage,
 			isNavigationOpened,
 		} = select( editSiteStore );
+		const { hasFinishedResolution, getEntityRecord } = select( coreStore );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
@@ -80,12 +83,15 @@ function Editor( { initialSettings } ) {
 			templateType: postType,
 			page: getPage(),
 			template: postId
-				? select( coreStore ).getEntityRecord(
+				? getEntityRecord( 'postType', postType, postId )
+				: null,
+			templateResolved: postId
+				? hasFinishedResolution( 'getEntityRecord', [
 						'postType',
 						postType,
-						postId
-				  )
-				: null,
+						postId,
+				  ] )
+				: false,
 			entityId: postId,
 			isNavigationOpen: isNavigationOpened(),
 		};
@@ -213,6 +219,7 @@ function Editor( { initialSettings } ) {
 												}
 											/>
 										}
+										notices={ <EditorSnackbars /> }
 										content={
 											<>
 												<EditorNotices />
@@ -223,7 +230,8 @@ function Editor( { initialSettings } ) {
 														}
 													/>
 												) }
-												{ ! template &&
+												{ templateResolved &&
+													! template &&
 													settings?.siteUrl &&
 													entityId && (
 														<Notice

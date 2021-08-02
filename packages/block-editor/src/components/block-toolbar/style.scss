@@ -89,7 +89,7 @@
 
 	// Compensate for width of block switcher.
 	.block-editor-block-mover {
-		margin-left: -$grid-unit-15 / 2;
+		margin-left: -$grid-unit-15 * 0.5;
 	}
 }
 

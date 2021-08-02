@@ -13,10 +13,10 @@ import { RichText } from '@wordpress/block-editor';
  * Original function to determine default number of columns from a block's
  * attributes.
  *
- * Used in deprecations: v1-6.
+ * Used in deprecations: v1-6, for versions of the gallery block that didn't use inner blocks.
  *
- * @param  {Object} attributes Block attributes.
- * @return {number}            Default number of columns for the gallery.
+ * @param {Object} attributes Block attributes.
+ * @return {number}           Default number of columns for the gallery.
  */
 export function defaultColumnsNumberV1( attributes ) {
 	return Math.min( 3, attributes.images.length );

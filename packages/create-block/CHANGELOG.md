@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 2.5.0 (2021-07-21)
+
+### Enhancements
+
+-   Add support for the new `version` field in the `block.json` metadata file ([#33075](https://github.com/WordPress/gutenberg/pull/33075)).
+
+## 2.4.0 (2021-07-21)
+
 ### Enhancement
 
 -   Plugin scaffolded with the `esnext` template requires WordPress 5.8 now ([#33252](https://github.com/WordPress/gutenberg/pull/33252).

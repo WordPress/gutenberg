@@ -53,12 +53,12 @@ function gutenberg_initialize_experiments_settings() {
 	);
 	add_settings_field(
 		'gutenberg-gallery-refactor',
-		__( 'Gallery Refactor', 'gutenberg' ),
+		__( 'Gallery block experiment', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable the refactored gallery block (Warning: The refactored gallery is not compatible with WordPress mobile apps prior to version 17.8. If you use the mobile app, please update to the latest version to avoid content loss.)', 'gutenberg' ),
+			'label' => __( 'Test a new gallery block that uses nested image blocks (Warning: The new gallery is not compatible with WordPress mobile apps prior to version 18.1. If you use the mobile app, please update to the latest version to avoid content loss.)', 'gutenberg' ),
 			'id'    => 'gutenberg-gallery-refactor',
 		)
 	);
@@ -108,9 +108,9 @@ function gutenberg_display_experiment_section() {
  * @return array Filtered editor settings.
  */
 function gutenberg_experiments_editor_settings( $settings ) {
-	$experiments_exist    = get_option( 'gutenberg-experiments' );
+	$experiments          = get_option( 'gutenberg-experiments' );
 	$experiments_settings = array(
-		'__experimentalGalleryRefactor'          => $experiments_exist ? array_key_exists( 'gutenberg-gallery-refactor', get_option( 'gutenberg-experiments' ) ) : false,
+		'__unstableGalleryWithImageBlocks' => isset( $experiments['gutenberg-gallery-refactor'] ),
 	);
 	return array_merge( $settings, $experiments_settings );
 }

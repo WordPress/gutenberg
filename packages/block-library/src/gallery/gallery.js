@@ -20,11 +20,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { defaultColumnsNumber } from './shared';
-
 const allowedBlocks = [ 'core/image' ];
 
 export const Gallery = ( props ) => {
@@ -37,13 +32,7 @@ export const Gallery = ( props ) => {
 		blockProps,
 	} = props;
 
-	const {
-		imageCount,
-		align,
-		columns = defaultColumnsNumber( imageCount ),
-		caption,
-		imageCrop,
-	} = attributes;
+	const { align, columns, caption, imageCrop } = attributes;
 
 	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
 		allowedBlocks,
@@ -84,7 +73,8 @@ export const Gallery = ( props ) => {
 				'blocks-gallery-grid',
 				{
 					[ `align${ align }` ]: align,
-					[ `columns-${ columns }` ]: columns,
+					[ `columns-${ columns }` ]: columns !== undefined,
+					[ `columns-default` ]: columns === undefined,
 					'is-cropped': imageCrop,
 				}
 			) }

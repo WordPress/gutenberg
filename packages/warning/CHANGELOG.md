@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.2.0 (2021-07-21)
+
+### Enhancement
+
+-   Ensure that the warning for a given message is logged only once.
+
 ## 2.1.0 (2021-05-20)
 
 ## 2.0.0 (2021-05-14)

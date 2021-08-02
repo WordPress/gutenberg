@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
@@ -6,24 +11,20 @@ import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { defaultColumnsNumber } from './shared';
-import saveV1 from './v1/save';
+import saveWithoutInnerBlocks from './v1/save';
 
-export default function save( { attributes } ) {
+export default function saveWithInnerBlocks( { attributes } ) {
 	if ( attributes?.ids?.length > 0 || attributes?.images?.length > 0 ) {
-		return saveV1( { attributes } );
+		return saveWithoutInnerBlocks( { attributes } );
 	}
 
-	const {
-		imageCount,
-		caption,
-		columns = defaultColumnsNumber( imageCount ),
-		imageCrop,
-	} = attributes;
+	const { caption, columns, imageCrop } = attributes;
 
-	const className = `blocks-gallery-grid has-nested-images columns-${ columns } ${
-		imageCrop ? 'is-cropped' : ''
-	}`;
+	const className = classnames( 'blocks-gallery-grid', 'has-nested-images', {
+		[ `columns-${ columns }` ]: columns !== undefined,
+		[ `columns-default` ]: columns === undefined,
+		'is-cropped': imageCrop,
+	} );
 
 	return (
 		<figure { ...useBlockProps.save( { className } ) }>
