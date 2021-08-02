@@ -118,11 +118,14 @@ describe( 'Navigating the block hierarchy', () => {
 		// Tweak the columns count by increasing it by one.
 		await page.keyboard.press( 'ArrowRight' );
 
-		// Navigate to the last column in the columns block.
+		// Navigate to the third column in the columns block.
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyTimes( 'Tab', 2 );
 		await pressKeyTimes( 'ArrowDown', 4 );
+		await page.waitForSelector(
+			'.is-highlighted[aria-label="Block: Column (3 of 3)"]'
+		);
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 

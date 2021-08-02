@@ -52,9 +52,7 @@ export function TemplatePanel() {
 			select( editorStore ).getEditorSettings().supportsTemplateMode &&
 			_isViewable;
 
-		const wpTemplates = getEntityRecords( 'postType', 'wp_template', {
-			per_page: -1,
-		} );
+		const wpTemplates = getEntityRecords( 'postType', 'wp_template' );
 
 		const newAvailableTemplates = fromPairs(
 			( wpTemplates || [] ).map( ( { slug, title } ) => [

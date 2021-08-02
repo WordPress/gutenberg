@@ -37,24 +37,6 @@ import {
  * @param {Array?} template Block Template.
  */
 export function* setupEditor( post, edits, template ) {
-	// In order to ensure maximum of a single parse during setup, edits are
-	// included as part of editor setup action. Assume edited content as
-	// canonical if provided, falling back to post.
-	let content;
-	if ( has( edits, [ 'content' ] ) ) {
-		content = edits.content;
-	} else {
-		content = post.content.raw;
-	}
-
-	let blocks = parse( content );
-
-	// Apply a template for new posts only, if exists.
-	const isNewPost = post.status === 'auto-draft';
-	if ( isNewPost && template ) {
-		blocks = synchronizeBlocksWithTemplate( blocks, template );
-	}
-
 	yield resetPost( post );
 	yield {
 		type: 'SETUP_EDITOR',
@@ -62,10 +44,25 @@ export function* setupEditor( post, edits, template ) {
 		edits,
 		template,
 	};
-	yield resetEditorBlocks( blocks, {
-		__unstableShouldCreateUndoLevel: false,
-	} );
 	yield setupEditorState( post );
+	// Apply a template for new posts only, if exists.
+	const isNewPost = post.status === 'auto-draft';
+	if ( isNewPost && template ) {
+		// In order to ensure maximum of a single parse during setup, edits are
+		// included as part of editor setup action. Assume edited content as
+		// canonical if provided, falling back to post.
+		let content;
+		if ( has( edits, [ 'content' ] ) ) {
+			content = edits.content;
+		} else {
+			content = post.content.raw;
+		}
+		let blocks = parse( content );
+		blocks = synchronizeBlocksWithTemplate( blocks, template );
+		yield resetEditorBlocks( blocks, {
+			__unstableShouldCreateUndoLevel: false,
+		} );
+	}
 	if (
 		edits &&
 		Object.keys( edits ).some(

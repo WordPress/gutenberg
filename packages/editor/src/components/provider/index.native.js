@@ -207,7 +207,7 @@ class NativeEditorProvider extends Component {
 
 	getThemeColors( { colors, gradients, rawStyles, rawFeatures } ) {
 		return {
-			...( rawStyles
+			...( rawStyles && rawFeatures
 				? getGlobalStyles( rawStyles, rawFeatures )
 				: {
 						colors: validateThemeColors( colors ),
