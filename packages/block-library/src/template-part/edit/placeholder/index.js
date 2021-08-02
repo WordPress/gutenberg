@@ -117,7 +117,7 @@ export default function TemplatePartPlaceholder( {
 						enableSelection
 							? sprintf(
 									// Translators: %s as template part area title ("Header", "Footer", etc.).
-									'Choose an existing %s or create a new one.',
+									'Connect this block to an existing %s or create a new one.',
 									areaLabel.toLowerCase()
 							  )
 							: sprintf(
