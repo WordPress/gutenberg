@@ -23,27 +23,3 @@ index 52cbda4..3e3b71e 100644
    hidesWhenStopped: true,
    size: 'small',
  };
-diff --git a/node_modules/react-native/Libraries/Image/AssetSourceResolver.js b/node_modules/react-native/Libraries/Image/AssetSourceResolver.js
-index 5ebd97a..3f511b9 100644
---- a/node_modules/react-native/Libraries/Image/AssetSourceResolver.js
-+++ b/node_modules/react-native/Libraries/Image/AssetSourceResolver.js
-@@ -92,9 +92,18 @@ class AssetSourceResolver {
-    */
-   assetServerURL(): ResolvedAssetSource {
-     invariant(!!this.serverUrl, 'need server to load from');
-+		/**
-+		 * The monorepo configuration we have set up is suffering from local static
-+		 * images not displaying. It would appear the server URL is incorrect. This
-+		 * is not a proper fix, but a stopgap.
-+		 * - https://git.io/JBV4e
-+		 * - https://git.io/JBV4k
-+		 */
-+		const brokenMonorepoAsset = /(^assets\/\.\.\/)(?!\.\.\/|node_modules)(.*)/g;
-     return this.fromSource(
-       this.serverUrl +
--        getScaledAssetPath(this.asset) +
-+        getScaledAssetPath(this.asset)
-+					.replace(brokenMonorepoAsset, '$1packages/$2') +
-         '?platform=' +
-         Platform.OS +
-         '&hash=' +
