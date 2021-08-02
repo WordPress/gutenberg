@@ -4,7 +4,6 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-const OptimizeCssAssetsPlugin = require( 'optimize-css-assets-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const path = require( 'path' );
@@ -21,6 +20,7 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 const {
 	getPackageProp,
 	hasBabelConfig,
+	hasCssnanoConfig,
 	hasPostCSSConfig,
 } = require( '../utils' );
 const FixStyleWebpackPlugin = require( './fix-style-webpack-plugin' );
@@ -49,7 +49,26 @@ const cssLoaders = [
 			...( ! hasPostCSSConfig() && {
 				postcssOptions: {
 					ident: 'postcss',
-					plugins: postcssPlugins,
+					sourceMap: ! isProduction,
+					plugins: isProduction
+						? [
+								...postcssPlugins,
+								require( 'cssnano' )( {
+									// Provide a fallback configuration if there's not
+									// one explicitly available in the project.
+									...( ! hasCssnanoConfig() && {
+										preset: [
+											'default',
+											{
+												discardComments: {
+													removeAll: true,
+												},
+											},
+										],
+									} ),
+								} ),
+						  ]
+						: postcssPlugins,
 				},
 			} ),
 		},
@@ -229,8 +248,6 @@ const config = {
 		// obsolete and should be removed. Related webpack issue:
 		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/85
 		new FixStyleWebpackPlugin(),
-		// OptimizeCssAssetsPlugin to minify CSS
-		new OptimizeCssAssetsPlugin(),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload
 		// works when running watch mode.
 		! isProduction &&

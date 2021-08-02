@@ -226,7 +226,7 @@ This property adds UI controls which allow the user to apply a gradient backgrou
 ```js
 supports: {
     color: {
-        gradient: true,
+        gradients: true,
 
         // Default values must be disabled if you don't want to use them with gradient.
         background: false,

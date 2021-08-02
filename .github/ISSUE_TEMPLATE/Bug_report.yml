@@ -1,127 +1,127 @@
 name: Bug report
 description: Report a bug with the WordPress block editor or Gutenberg plugin
-title: "<title>"
+title: '<title>'
 body:
-- type: markdown
-  attributes:
-    value: |
-      Thanks for taking the time to fill out this bug report! If this is a security issue, please report it in HackerOne instead: https://hackerone.com/wordpress
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for taking the time to fill out this bug report! If this is a security issue, please report it in HackerOne instead: https://hackerone.com/wordpress
 
-- type: checkboxes
-  attributes:
-    label: Is there an existing issue for this?
-    description: Please check if the bug has already been reported by searching https://github.com/WordPress/gutenberg/issues.
-    options:
-      - label: I have searched the existing issues
-        required: true
+    - type: checkboxes
+      attributes:
+          label: Is there an existing issue for this?
+          description: Please check if the bug has already been reported by searching https://github.com/WordPress/gutenberg/issues.
+          options:
+              - label: I have searched the existing issues
+                required: true
 
-- type: checkboxes
-  attributes:
-    label: Have you tried deactivating all plugins except Gutenberg?
-    description: Please make sure you have ruled out plugin conflicts before reporting.
-    options:
-      - label: I have tested with all plugins deactivated.
-        required: true
+    - type: checkboxes
+      attributes:
+          label: Have you tried deactivating all plugins except Gutenberg?
+          description: Please make sure you have ruled out plugin conflicts before reporting.
+          options:
+              - label: I have tested with all plugins deactivated.
+                required: true
 
-- type: checkboxes
-  attributes:
-    label: Have you tried replicating the bug using a default theme e.g. Twenty Twenty?
-    description: Please make sure you have confirmed it's not a theme specific problem.
-    options:
-      - label: I have tested with a default theme.
-        required: true
+    - type: checkboxes
+      attributes:
+          label: Have you tried replicating the bug using a default theme e.g. Twenty Twenty?
+          description: Please make sure you have confirmed it's not a theme specific problem.
+          options:
+              - label: I have tested with a default theme.
+                required: true
 
-- type: textarea
-  attributes:
-    label: Description
-    description: Please write a brief description of the bug.
-  validations:
-    required: true
+    - type: textarea
+      attributes:
+          label: Description
+          description: Please write a brief description of the bug.
+      validations:
+          required: true
 
-- type: textarea
-  attributes:
-    label: Step-by-step reproduction instructions
-    description: Please list the steps needed to reproduce the bug.
-    placeholder: |
-      1. Go to '...'
-      2. Click on '...'
-      3. Scroll down to '...'
-      4. See error...
-  validations:
-    required: true
+    - type: textarea
+      attributes:
+          label: Step-by-step reproduction instructions
+          description: Please list the steps needed to reproduce the bug.
+          placeholder: |
+              1. Go to '...'
+              2. Click on '...'
+              3. Scroll down to '...'
+              4. See error...
+      validations:
+          required: true
 
-- type: textarea
-  attributes:
-    label: Expected Behavior
-    description: Please describe what you expected to happen.
-  validations:
-    required: true
+    - type: textarea
+      attributes:
+          label: Expected Behavior
+          description: Please describe what you expected to happen.
+      validations:
+          required: true
 
-- type: textarea
-  attributes:
-    label: Current Behavior
-    description: A concise description of what you're experiencing.
-  validations:
-    required: true
+    - type: textarea
+      attributes:
+          label: Current Behavior
+          description: A concise description of what you're experiencing.
+      validations:
+          required: true
 
-- type: textarea
-  attributes:
-    label: Screenshots or screen recording (optional)
-    description: |
-      If possible, please upload a screenshot or screen recording which demonstrates the bug. You can use LIEcap to create a GIF screen recording: https://www.cockos.com/licecap/
-      Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
-  validations:
-    required: false
+    - type: textarea
+      attributes:
+          label: Screenshots or screen recording (optional)
+          description: |
+              If possible, please upload a screenshot or screen recording which demonstrates the bug. You can use LIEcap to create a GIF screen recording: https://www.cockos.com/licecap/
+              Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+      validations:
+          required: false
 
-- type: textarea
-  attributes:
-    label: Code snippet (optional)
-    description: |
-      If this bug is to related to a developer API, please share a code snippet that demonstrates the issue. For small snippets paste it directly here, or you can use GitHub Gist to share multiple code files: https://gist.github.com
-      Please ensure the shared code can be used by a developer to reproduce the issue—ideally it can be copied into a local development environment or executed in a browser console to help debug the issue.
-  validations:
-    required: false
+    - type: textarea
+      attributes:
+          label: Code snippet (optional)
+          description: |
+              If this bug is to related to a developer API, please share a code snippet that demonstrates the issue. For small snippets paste it directly here, or you can use GitHub Gist to share multiple code files: https://gist.github.com
+              Please ensure the shared code can be used by a developer to reproduce the issue—ideally it can be copied into a local development environment or executed in a browser console to help debug the issue.
+      validations:
+          required: false
 
-- type: textarea
-  attributes:
-    label: WordPress Information
-    description: |
-      Please list what WordPress version you are using. You can find this information in Tools → Site Health → Info → WordPress
-  validations:
-    required: false
+    - type: textarea
+      attributes:
+          label: WordPress Information
+          description: |
+              Please list what WordPress version you are using. You can find this information in Tools → Site Health → Info → WordPress
+      validations:
+          required: false
 
-- type: textarea
-  attributes:
-    label: Gutenberg Information
-    description: |
-      Please list what Gutenberg version you are using. If you aren't using Gutenberg, please note that it's not installed.
-  validations:
-    required: false
+    - type: textarea
+      attributes:
+          label: Gutenberg Information
+          description: |
+              Please list what Gutenberg version you are using. If you aren't using Gutenberg, please note that it's not installed.
+      validations:
+          required: false
 
-- type: dropdown
-  id: browsers
-  attributes:
-    label: What browsers are you seeing the problem on?
-    multiple: true
-    options:
-      - Firefox
-      - Chrome
-      - Safari
-      - Microsoft Edge
-      - Other
+    - type: dropdown
+      id: browsers
+      attributes:
+          label: What browsers are you seeing the problem on?
+          multiple: true
+          options:
+              - Firefox
+              - Chrome
+              - Safari
+              - Microsoft Edge
+              - Other
 
-- type: textarea
-  attributes:
-    label: Device Information
-    description: |
-      Please list what device you are using e.g. "Desktop" or "iPhone 11".
-  validations:
-    required: false
+    - type: textarea
+      attributes:
+          label: Device Information
+          description: |
+              Please list what device you are using e.g. "Desktop" or "iPhone 11".
+      validations:
+          required: false
 
-- type: textarea
-  attributes:
-    label: Operating System Information
-    description: |
-      Please list what operating system you are using e.g. "Windows 10" or "iOS 14"
-  validations:
-    required: false
+    - type: textarea
+      attributes:
+          label: Operating System Information
+          description: |
+              Please list what operating system you are using e.g. "Windows 10" or "iOS 14"
+      validations:
+          required: false
