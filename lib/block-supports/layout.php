@@ -58,12 +58,12 @@ function gutenberg_get_layout_style( $selector, $layout ) {
 			$style .= '}';
 
 			$style .= "$selector > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
-
 			$style .= "$selector .alignfull { max-width: none; }";
 		}
 
 		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
 		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
+		$style .= "$selector > * + * { margin-top: var( --wp-theme-block-gap ); margin-bottom: 0; }";
 	} elseif ( 'flex' === $layout_type ) {
 		$style  = "$selector {";
 		$style .= 'display: flex;';

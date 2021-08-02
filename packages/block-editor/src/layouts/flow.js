@@ -134,6 +134,11 @@ export default {
 				float: right;
 				margin-left: 2em;
 			}
+
+			${ appendSelectors( selector, '> * + *' ) } {
+				margin-top: var( --wp-theme-block-gap );
+				margin-bottom: 0;
+			}
 		`;
 
 		return <style>{ style }</style>;
