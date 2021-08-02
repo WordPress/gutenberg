@@ -67,6 +67,8 @@ function SelectControl(
 		size = 'default',
 		value: valueProp,
 		labelPosition = 'top',
+		prefix,
+		suffix,
 		...props
 	}: PolymorphicComponentProps< SelectControlProps, 'select', false >,
 	ref: Ref< HTMLSelectElement >
@@ -115,17 +117,17 @@ function SelectControl(
 				label={ label }
 				size={ size }
 				suffix={
-					props.suffix || (
+					suffix || (
 						<DownArrowWrapper>
 							<Icon icon={ chevronDown } size={ 18 } />
 						</DownArrowWrapper>
 					)
 				}
-				prefix={ props.prefix }
+				prefix={ prefix }
 				labelPosition={ labelPosition }
 			>
 				<Select
-					{ ...omit( props, 'prefix', 'suffix' ) }
+					{ ...props }
 					aria-describedby={ helpId }
 					className="components-select-control__input"
 					disabled={ disabled }
