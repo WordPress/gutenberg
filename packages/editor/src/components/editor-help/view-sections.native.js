@@ -4,11 +4,6 @@
 import { Text, Image } from 'react-native';
 
 /**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import styles from './style.scss';
@@ -22,8 +17,5 @@ export const HelpDetailSectionHeadingText = ( { text } ) => {
 };
 
 export const HelpDetailImage = ( { source } ) => {
-	return useMemo(
-		() => <Image source={ source } style={ styles.helpDetailImage } />,
-		[ source ]
-	);
+	return <Image source={ source } style={ styles.helpDetailImage } />;
 };
