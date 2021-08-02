@@ -567,7 +567,7 @@ export class ImageEdit extends Component {
 				<PanelBody>
 					<FooterMessageControl
 						label={ __(
-							'Note: Changes to featured image will not be affected by the undo/redo buttons'
+							'Changes to featured image will not be affected by the undo/redo buttons.'
 						) }
 					/>
 				</PanelBody>
