@@ -55,7 +55,7 @@ function RangeControl(
 		onFocus = noop,
 		onMouseMove = noop,
 		onMouseLeave = noop,
-		railColor,
+		railColor = 'var( --wp-admin-theme-color )',
 		resetFallbackValue,
 		renderTooltipContent = ( v ) => v,
 		showTooltip: showTooltipProp,
