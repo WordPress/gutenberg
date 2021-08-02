@@ -133,8 +133,20 @@ function gutenberg_reregister_core_block_types() {
 				$registry->unregister( $metadata['name'] );
 			}
 
-			gutenberg_register_core_block_assets( $folder_name );
-			register_block_type_from_metadata( $block_json_file );
+			if ( in_array( $metadata['name'], array(
+				'core/paragraph',
+				'core/image',
+				'core/heading',
+				'core/gallery',
+				'core/list',
+				'core/quote',
+				'core/group',
+				'core/freeform',
+				'core/missing',
+			) ) ) {
+				gutenberg_register_core_block_assets( $folder_name );
+				register_block_type_from_metadata( $block_json_file );
+			}
 		}
 
 		foreach ( $block_names as $file => $sub_block_names ) {
@@ -147,10 +159,10 @@ function gutenberg_reregister_core_block_types() {
 				if ( $registry->is_registered( $block_name ) ) {
 					$registry->unregister( $block_name );
 				}
-				gutenberg_register_core_block_assets( $block_name );
+				// gutenberg_register_core_block_assets( $block_name );
 			}
 
-			require_once $blocks_dir . $file;
+			// require_once $blocks_dir . $file;
 		}
 	}
 }
