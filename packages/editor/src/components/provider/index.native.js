@@ -86,7 +86,11 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities, updateSettings, galleryWithImageBlocks } = this.props;
+		const {
+			capabilities,
+			updateSettings,
+			galleryWithImageBlocks
+		} = this.props;
 
 		updateSettings( {
 			...capabilities,
