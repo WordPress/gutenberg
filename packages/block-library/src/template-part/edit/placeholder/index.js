@@ -9,14 +9,7 @@ import { find } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	Placeholder,
-	Dropdown,
-	Button,
-	Spinner,
-	Flex,
-	FlexItem,
-} from '@wordpress/components';
+import { Placeholder, Dropdown, Button, Spinner } from '@wordpress/components';
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -130,57 +123,57 @@ export default function TemplatePartPlaceholder( {
 					{ ! hasResolvedReplacements ? (
 						<Spinner />
 					) : (
-						<Flex direction="column">
-							<Dropdown
-								contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
-								position="bottom right left"
-								renderToggle={ ( { isOpen, onToggle } ) => (
-									<>
-										{ enableSelection && (
-											<FlexItem>
-												<Button
-													variant="primary"
-													onClick={ onToggle }
-													aria-expanded={ isOpen }
-												>
-													{ sprintf(
-														// Translators: %s as template part area title ("Header", "Footer", etc.).
-														'Connect this block to an existing %s',
-														areaLabel.toLowerCase()
+						<Dropdown
+							contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
+							position="bottom right left"
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<>
+									{ enableSelection && (
+										<>
+											<Button
+												variant="primary"
+												onClick={ onToggle }
+												aria-expanded={ isOpen }
+											>
+												{ __(
+													// Translators: Connect this placeholder block to an existing template part entity/cpt ("Header", "Footer", etc.).
+													'Connect to existing'
+												) }
+											</Button>
+											<Button
+												variant={
+													enableSelection
+														? 'tertiary'
+														: 'primary'
+												}
+												onClick={ () =>
+													setStep(
+														PLACEHOLDER_STEPS.patterns
+													)
+												}
+											>
+												{ __(
+													// Translators: Create a new template part ("Header", "Footer", etc.).
+													'Create new'
+												) }
+												{ !! availablePatterns?.length &&
+													// Translators: block patterns are available for this action.
+													__(
+														' (patterns available)'
 													) }
-												</Button>
-											</FlexItem>
-										) }
-									</>
-								) }
-								renderContent={ ( { onClose } ) => (
-									<TemplatePartSelection
-										setAttributes={ setAttributes }
-										onClose={ onClose }
-										area={ area }
-									/>
-								) }
-							/>
-							<FlexItem>
-								<Button
-									variant={
-										enableSelection ? 'tertiary' : 'primary'
-									}
-									onClick={ () =>
-										setStep( PLACEHOLDER_STEPS.patterns )
-									}
-								>
-									{ sprintf(
-										// Translators: %s as template part area title ("Header", "Footer", etc.).
-										'Create a new %s',
-										areaLabel.toLowerCase()
+											</Button>
+										</>
 									) }
-									{ !! availablePatterns?.length &&
-										// Translators: block patterns are available for this action.
-										__( ' (patterns available)' ) }
-								</Button>
-							</FlexItem>
-						</Flex>
+								</>
+							) }
+							renderContent={ ( { onClose } ) => (
+								<TemplatePartSelection
+									setAttributes={ setAttributes }
+									onClose={ onClose }
+									area={ area }
+								/>
+							) }
+						/>
 					) }
 				</Placeholder>
 			) }
