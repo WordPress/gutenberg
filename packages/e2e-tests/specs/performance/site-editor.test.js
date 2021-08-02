@@ -24,7 +24,7 @@ import { readFile, deleteFile, getTypingEventDurations } from './utils';
 
 jest.setTimeout( 1000000 );
 
-describe( 'Site Editor Performance', () => {
+describe.skip( 'Site Editor Performance', () => {
 	beforeAll( async () => {
 		await activateTheme( 'tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
