@@ -28,6 +28,7 @@ import {
 } from '@wordpress/blocks';
 import { focus } from '@wordpress/dom';
 import { __ } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -77,10 +78,20 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
+	const blockType = getBlockType( name );
+	const label = getAccessibleBlockLabel(
+		blockType,
+		attributes,
+		index + 1,
+		orientation
+	);
+
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
 		ref.current.focus();
-	}, [] );
+
+		speak( label );
+	}, [ label ] );
 
 	const {
 		hasBlockMovingClientId,
@@ -206,14 +217,6 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		}
 	}
 
-	const blockType = getBlockType( name );
-	const label = getAccessibleBlockLabel(
-		blockType,
-		attributes,
-		index + 1,
-		orientation
-	);
-
 	const classNames = classnames(
 		'block-editor-block-list__block-selection-button',
 		{
@@ -255,7 +258,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 						onKeyDown={ onKeyDown }
 						label={ label }
 						className="block-selection-button_select-button"
-						aria-live="assertive"
+						//						aria-live="assertive"
 					>
 						<BlockTitle clientId={ clientId } />
 					</Button>
