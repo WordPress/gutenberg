@@ -7,7 +7,7 @@ import { escape as escapeString, find, get, uniqBy } from 'lodash';
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { FormTokenField, withFilters } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -168,19 +168,21 @@ function FlatTermSelector( { slug } ) {
 		[ search ]
 	);
 
+	const values = useMemo( () => {
+		return ( terms ?? [] ).map( ( term ) => unescapeString( term.name ) );
+	}, [ terms ] );
+
+	const suggestions = useMemo( () => {
+		return ( searchResults ?? [] ).map( ( term ) =>
+			unescapeString( term.name )
+		);
+	}, [ searchResults ] );
+
 	const { editPost } = useDispatch( editorStore );
 
 	if ( ! hasAssignAction ) {
 		return null;
 	}
-
-	// The getEntityRecords returns null when items are unknown.
-	// This is the reason for the extra check and empty fallback array.
-	const values =
-		terms?.map( ( term ) => unescapeString( term.name ) ) || EMPTY_ARRAY;
-	const suggestions =
-		searchResults?.map( ( term ) => unescapeString( term.name ) ) ||
-		EMPTY_ARRAY;
 
 	function onUpdateTerms( newTermIds ) {
 		editPost( { [ taxonomy.rest_base ]: newTermIds } );
