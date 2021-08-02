@@ -27,7 +27,12 @@ panel's menu.
 
 ### `label`: `string`
 
-The label acts as a key to locate the corresponding item in the panel's menu
-context. This is used when checking if the panel item should be displayed.
+The supplied label is dual purpose.
+It is used as:
+1. the human readable label for the panel's dropdown menu
+2. a key to locate the corresponding item in the panel's menu context to determine
+if the panel item should be displayed.
+
+A panel item's `label` should be unique among all items within a single panel.
 
 -   Required: Yes

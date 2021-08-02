@@ -81,50 +81,7 @@ const selectMenuItem = async ( label ) => {
 
 describe( 'ProgressiveDisclosurePanel', () => {
 	describe( 'basic rendering', () => {
-		it( 'should not render when no children provided', () => {
-			const { container } = render(
-				<ProgressiveDisclosurePanel { ...defaultProps } />
-			);
-
-			expect( getPanel( container ) ).not.toBeInTheDocument();
-		} );
-
-		it( 'should not render when only child has been filtered out', () => {
-			// This covers case where children prop is not an array.
-			const { container } = render(
-				<ProgressiveDisclosurePanel { ...defaultProps }>
-					{ false && (
-						<ProgressiveDisclosurePanelItem>
-							Should not show
-						</ProgressiveDisclosurePanelItem>
-					) }
-				</ProgressiveDisclosurePanel>
-			);
-
-			expect( getPanel( container ) ).not.toBeInTheDocument();
-		} );
-
-		it( 'should not render when there are no progressive panel items', () => {
-			const { container } = render(
-				<ProgressiveDisclosurePanel { ...defaultProps }>
-					{ false && (
-						<ProgressiveDisclosurePanelItem>
-							Should not show
-						</ProgressiveDisclosurePanelItem>
-					) }
-					{ false && (
-						<ProgressiveDisclosurePanelItem>
-							Not shown either
-						</ProgressiveDisclosurePanelItem>
-					) }
-					<span>Visible but insignificant</span>
-				</ProgressiveDisclosurePanel>
-			);
-
-			expect( getPanel( container ) ).not.toBeInTheDocument();
-		} );
-
-		it( 'should render panel when at least one panel item as child', () => {
+		it( 'should render panel', () => {
 			const { container } = renderPanel();
 
 			expect( getPanel( container ) ).toBeInTheDocument();
@@ -138,7 +95,7 @@ describe( 'ProgressiveDisclosurePanel', () => {
 			expect( nonPanelItem ).toBeInTheDocument();
 		} );
 
-		it( 'should render child flagged as default control even without value', () => {
+		it( 'should render panel item flagged as default control even without value', () => {
 			render(
 				<ProgressiveDisclosurePanel { ...defaultProps }>
 					<ProgressiveDisclosurePanelItem { ...controlProps }>
@@ -158,7 +115,28 @@ describe( 'ProgressiveDisclosurePanel', () => {
 			expect( altControl ).toBeInTheDocument();
 		} );
 
-		it( 'should render display options menu', () => {
+		it( 'should not render panel menu when there are no progressive panel items', () => {
+			render(
+				<ProgressiveDisclosurePanel { ...defaultProps }>
+					{ false && (
+						<ProgressiveDisclosurePanelItem>
+							Should not show
+						</ProgressiveDisclosurePanelItem>
+					) }
+					{ false && (
+						<ProgressiveDisclosurePanelItem>
+							Not shown either
+						</ProgressiveDisclosurePanelItem>
+					) }
+					<span>Visible but insignificant</span>
+				</ProgressiveDisclosurePanel>
+			);
+
+			const menu = screen.queryByLabelText( defaultProps.label );
+			expect( menu ).not.toBeInTheDocument();
+		} );
+
+		it( 'should render panel menu when at least one panel item', () => {
 			renderPanel();
 
 			const menuButton = screen.getByLabelText( defaultProps.label );
@@ -174,7 +152,7 @@ describe( 'ProgressiveDisclosurePanel', () => {
 			expect( resetAllItem ).toBeInTheDocument();
 		} );
 
-		it( 'should render display options menu items correctly', async () => {
+		it( 'should render panel menu items correctly', async () => {
 			renderPanel();
 			openDropdownMenu();
 
@@ -219,8 +197,8 @@ describe( 'ProgressiveDisclosurePanel', () => {
 		} );
 	} );
 
-	describe( 'conditional rendering of children', () => {
-		it( 'should render child when it has a value', () => {
+	describe( 'conditional rendering of panel items', () => {
+		it( 'should render panel item when it has a value', () => {
 			renderPanel();
 
 			const exampleControl = screen.getByText( 'Example control' );
@@ -230,7 +208,7 @@ describe( 'ProgressiveDisclosurePanel', () => {
 			expect( altControl ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render child when corresponding menu item is selected', async () => {
+		it( 'should render panel item when corresponding menu item is selected', async () => {
 			renderPanel();
 			await selectMenuItem( altControlProps.label );
 			const control = await screen.findByText( 'Alt control' );
@@ -238,7 +216,7 @@ describe( 'ProgressiveDisclosurePanel', () => {
 			expect( control ).toBeInTheDocument();
 		} );
 
-		it( 'should prevent child rendering when toggled off via menu item', async () => {
+		it( 'should prevent panel item rendering when toggled off via menu item', async () => {
 			renderPanel();
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );

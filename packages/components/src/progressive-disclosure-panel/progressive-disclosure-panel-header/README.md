@@ -18,17 +18,30 @@ This component is generated automatically by its parent
 
 ## Props
 
-### `isShownByDefault`: `boolean`
+### `header`: `string`
 
-This prop identifies the current item as being displayed by default. This means
-it will show regardless of whether it has a value set or is toggled on in the
-panel's menu.
+Text to be displayed within the panel header.
 
 -   Required: Yes
 
-### `label`: `string`
+### `menuLabel`: `string`
 
-The label acts as a key to locate the corresponding item in the panel's menu
-context. This is used when checking if the panel item should be displayed.
+This is passed along as the `label` for the panel header's `DropdownMenu`.
+
+-   Required: No
+
+### `resetAll`: `function`
+
+The `resetAll` prop provides the callback to execute when the "Reset all" menu
+item is selected. It's purpose is to facilitate resetting any control values
+for items contained within this header's panel.
+
+-   Required: Yes
+
+### `toggleItem`: `function`
+
+This is executed when an individual control's menu item is toggled. It
+will update the panel's menu item state and call the panel item's `onSelect` or
+`onDeselect` callbacks as appropriate.
 
 -   Required: Yes
