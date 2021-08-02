@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -445,7 +445,7 @@ export class ImageEdit extends Component {
 		closeSettingsBottomSheet();
 	}
 
-	getSetFeaturedButton( isFeaturedImage ) {
+	getFeaturedButtonPanel( isFeaturedImage ) {
 		const { attributes, getStylesFromColorScheme } = this.props;
 
 		const setFeaturedButtonStyle = getStylesFromColorScheme(
@@ -518,14 +518,14 @@ export class ImageEdit extends Component {
 		}
 
 		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
-		// Images that haven't been uploaded to a site's library have an id of 'undefined', which the 'canImageBeFeatured' check filters out.
-		const canImageBeFeatured = typeof attributes.id !== 'undefined';
+		// The 'canImageBeFeatured' check filters out images that haven't been uploaded based on the following:
+		// - Images that are embedded in a post but are uploaded elsewhere have an id of 'undefined'.
+		// - Image that are uploading or have failed to upload are given a temporary negative ID.
+		const canImageBeFeatured =
+			typeof attributes.id !== 'undefined' && attributes.id > 0;
 
 		const isFeaturedImage =
 			canImageBeFeatured && featuredImageId === attributes.id;
-
-		// eslint-disable-next-line no-unused-vars
-		const androidOnly = Platform.OS === 'android';
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -564,9 +564,8 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ androidOnly &&
-					canImageBeFeatured &&
-					this.getSetFeaturedButton( isFeaturedImage ) }
+				{ canImageBeFeatured &&
+					this.getFeaturedButtonPanel( isFeaturedImage ) }
 			</InspectorControls>
 		);
 
