@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The bundled `webpack` dependency has been updated to the next major version `^5.47.1` (see [Breaking Changes](https://webpack.js.org/migrate/5/), [#26382](https://github.com/WordPress/gutenberg/pull/26382)).
+-   The bundled `webpack-cli` dependency has been updated to the next major version `^4.7.2` ([#26382](https://github.com/WordPress/gutenberg/pull/26382)).
+
 ## 17.1.0 (2021-07-29)
 
 ### Enhancements
