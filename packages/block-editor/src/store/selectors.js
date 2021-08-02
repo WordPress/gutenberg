@@ -2242,3 +2242,17 @@ export function wasBlockJustInserted( state, clientId, source ) {
 		lastBlockInserted.source === source
 	);
 }
+
+/**
+ * Checks if a given block is in Placeholder state. This is
+ * useful for showing/hiding controls and other things,
+ * depending on this state.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {boolean} True if the block is in Placeholder state.
+ */
+export function isBlockInPlaceholderState( state, clientId ) {
+	return !! state.blocks.inPlaceholderState[ clientId ];
+}

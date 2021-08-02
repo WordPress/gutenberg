@@ -1105,6 +1105,15 @@ export const blocks = flow(
 		}
 		return state;
 	},
+	inPlaceholderState( state = {}, { type, clientId, isInPlaceholderState } ) {
+		if ( type === 'SET_IS_IN_PLACEHOLDER_STATE' ) {
+			return {
+				...state,
+				[ clientId ]: isInPlaceholderState,
+			};
+		}
+		return state;
+	},
 } );
 
 /**

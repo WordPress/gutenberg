@@ -38,11 +38,13 @@ const BlockInspector = ( {
 		selectedBlockName,
 		selectedBlockClientId,
 		blockType,
+		isInPlaceholderState,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
 			getSelectedBlockCount,
 			getBlockName,
+			isBlockInPlaceholderState,
 		} = select( blockEditorStore );
 		const { getBlockStyles } = select( blocksStore );
 
@@ -60,6 +62,9 @@ const BlockInspector = ( {
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
 			hasBlockStyles: blockStyles && blockStyles.length > 0,
+			isInPlaceholderState: isBlockInPlaceholderState(
+				_selectedBlockClientId
+			),
 		};
 	}, [] );
 
@@ -99,6 +104,7 @@ const BlockInspector = ( {
 			blockName={ blockType.name }
 			hasBlockStyles={ hasBlockStyles }
 			bubblesVirtually={ bubblesVirtually }
+			isInPlaceholderState={ isInPlaceholderState }
 		/>
 	);
 };
@@ -107,6 +113,7 @@ const BlockInspectorSingleBlock = ( {
 	clientId,
 	blockName,
 	hasBlockStyles,
+	isInPlaceholderState,
 	bubblesVirtually,
 } ) => {
 	const blockInformation = useBlockDisplayInformation( clientId );
@@ -114,7 +121,7 @@ const BlockInspectorSingleBlock = ( {
 		<div className="block-editor-block-inspector">
 			<BlockCard { ...blockInformation } />
 			<BlockVariationTransforms blockClientId={ clientId } />
-			{ hasBlockStyles && (
+			{ hasBlockStyles && ! isInPlaceholderState && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
 						<BlockStyles clientId={ clientId } />

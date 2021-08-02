@@ -42,21 +42,26 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		icon,
 		blockTitle,
 		patterns,
+		isInPlaceholderState,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
 				getBlockTransformItems,
 				__experimentalGetPatternTransformItems,
+				isBlockInPlaceholderState,
 			} = select( blockEditorStore );
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
 				castArray( clientIds )[ 0 ]
 			);
-			const [ { name: firstBlockName } ] = blocks;
+			const [
+				{ name: firstBlockName, clientId: firstBlockClientId },
+			] = blocks;
 			const _isSingleBlockSelected = blocks.length === 1;
 			const styles =
 				_isSingleBlockSelected && getBlockStyles( firstBlockName );
+			const _hasBlockStyles = !! styles?.length;
 			let _icon;
 			if ( _isSingleBlockSelected ) {
 				_icon = blockInformation?.icon; // Take into account active block variations.
@@ -69,18 +74,22 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					? getBlockType( firstBlockName )?.icon
 					: stack;
 			}
+
 			return {
 				possibleBlockTransformations: getBlockTransformItems(
 					blocks,
 					rootClientId
 				),
-				hasBlockStyles: !! styles?.length,
+				hasBlockStyles: _hasBlockStyles,
 				icon: _icon,
 				blockTitle: getBlockType( firstBlockName ).title,
 				patterns: __experimentalGetPatternTransformItems(
 					blocks,
 					rootClientId
 				),
+				isInPlaceholderState:
+					_hasBlockStyles &&
+					isBlockInPlaceholderState( firstBlockClientId ),
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]
@@ -195,12 +204,13 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 											} }
 										/>
 									) }
-									{ hasBlockStyles && (
-										<BlockStylesMenu
-											hoveredBlock={ blocks[ 0 ] }
-											onSwitch={ onClose }
-										/>
-									) }
+									{ hasBlockStyles &&
+										! isInPlaceholderState && (
+											<BlockStylesMenu
+												hoveredBlock={ blocks[ 0 ] }
+												onSwitch={ onClose }
+											/>
+										) }
 								</div>
 							)
 						}

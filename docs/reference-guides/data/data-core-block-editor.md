@@ -845,6 +845,21 @@ _Returns_
 
 -   `boolean`: Whether the block is currently highlighted.
 
+### isBlockInPlaceholderState
+
+Checks if a given block is in Placeholder state. This is
+useful for showing/hiding controls and other things,
+depending on this state.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: The block to check.
+
+_Returns_
+
+-   `boolean`: True if the block is in Placeholder state.
+
 ### isBlockInsertionPointVisible
 
 Returns true if we should show the block insertion point.
@@ -1391,6 +1406,15 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
+
+### setIsInPlaceholderState
+
+Returns an action object that sets whether the block is in Placeholder state.
+
+_Parameters_
+
+-   _clientId_ `string`: The block's clientId.
+-   _isInPlaceholderState_ `boolean`: True if the block is in Placeholder state.
 
 ### setNavigationMode
 

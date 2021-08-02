@@ -1404,3 +1404,17 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+/**
+ * Returns an action object that sets whether the block is in Placeholder state.
+ *
+ * @param {string}  clientId             The block's clientId.
+ * @param {boolean} isInPlaceholderState True if the block is in Placeholder state.
+ */
+export function setIsInPlaceholderState( clientId, isInPlaceholderState ) {
+	return {
+		type: 'SET_IS_IN_PLACEHOLDER_STATE',
+		isInPlaceholderState,
+		clientId,
+	};
+}

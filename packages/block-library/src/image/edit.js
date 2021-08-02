@@ -9,7 +9,7 @@ import { get, has, omit, pick } from 'lodash';
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withNotices } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockAlignmentControl,
 	BlockControls,
@@ -284,6 +284,11 @@ export function ImageEdit( {
 			revokeBlobURL( temporaryURL );
 		};
 	}, [ temporaryURL ] );
+
+	const { setIsInPlaceholderState } = useDispatch( blockEditorStore );
+	useEffect( () => {
+		setIsInPlaceholderState( clientId, ! url );
+	}, [ url ] );
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
