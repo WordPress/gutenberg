@@ -89,7 +89,7 @@ class NativeEditorProvider extends Component {
 		const {
 			capabilities,
 			updateSettings,
-			galleryWithImageBlocks
+			galleryWithImageBlocks,
 		} = this.props;
 
 		updateSettings( {
