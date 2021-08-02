@@ -26,9 +26,9 @@ import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
+import { speak } from '@wordpress/a11y';
 import { focus } from '@wordpress/dom';
 import { __ } from '@wordpress/i18n';
-import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -259,7 +259,6 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 						onKeyDown={ onKeyDown }
 						label={ label }
 						className="block-selection-button_select-button"
-						//						aria-live="assertive"
 					>
 						<BlockTitle clientId={ clientId } />
 					</Button>
