@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, RawHTML } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
@@ -47,7 +47,9 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 			<div className="edit-widgets-widget-areas__top-container">
 				<BlockIcon icon={ blockDefault } />
 				<div>
-					<p>{ description }</p>
+					<p>
+						<RawHTML>{ description }</RawHTML>
+					</p>
 					{ widgetAreas?.length === 0 && (
 						<p>
 							{ __(
