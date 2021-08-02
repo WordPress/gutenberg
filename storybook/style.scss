@@ -1,3 +1,5 @@
+@use "sass:math";
+
 // Loading @wordpress/base-styles as they have mixins and other dependencies
 // used within @wordpress/*/src/*.scss
 @import "~@wordpress/base-styles/animations";

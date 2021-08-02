@@ -52,6 +52,7 @@ const postTypeEntities = [
 		meta: true,
 	},
 } ) );
+import { EditorHelpTopics } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -79,13 +80,21 @@ class NativeEditorProvider extends Component {
 				maxSize: 1,
 			}
 		);
+		this.state = {
+			isHelpVisible: false,
+		};
 	}
 
 	componentDidMount() {
-		const { capabilities, updateSettings } = this.props;
+		const {
+			capabilities,
+			updateSettings,
+			galleryWithImageBlocks,
+		} = this.props;
 
 		updateSettings( {
 			...capabilities,
+			...{ __unstableGalleryWithImageBlocks: galleryWithImageBlocks },
 			...this.getThemeColors( this.props ),
 		} );
 
@@ -135,8 +144,13 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
 			( editorSettings ) => {
-				const themeColors = this.getThemeColors( editorSettings );
-				updateSettings( themeColors );
+				updateSettings( {
+					...{
+						__unstableGalleryWithImageBlocks:
+							editorSettings.galleryWithImageBlocks,
+					},
+					...this.getThemeColors( editorSettings ),
+				} );
 			}
 		);
 
@@ -155,9 +169,7 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
 			// Temporary: feature hidden from production. This is just here for testing
 			// purposes and will be replaced with actual logic in a later PR.
-			this.props.createSuccessNotice(
-				'Show Editor Help request received by JS!'
-			);
+			this.setState( { isHelpVisible: true } );
 		} );
 	}
 
@@ -206,7 +218,7 @@ class NativeEditorProvider extends Component {
 	getThemeColors( { colors, gradients, rawStyles, rawFeatures } ) {
 		return {
 			...( rawStyles
-				? getGlobalStyles( rawStyles, rawFeatures, colors, gradients )
+				? getGlobalStyles( rawStyles, rawFeatures )
 				: {
 						colors: validateThemeColors( colors ),
 						gradients: validateThemeGradients( gradients ),
@@ -299,13 +311,19 @@ class NativeEditorProvider extends Component {
 		const editorSettings = this.getEditorSettings( settings, capabilities );
 
 		return (
-			<EditorProvider
-				post={ this.post }
-				settings={ editorSettings }
-				{ ...props }
-			>
-				{ children }
-			</EditorProvider>
+			<>
+				<EditorProvider
+					post={ this.post }
+					settings={ editorSettings }
+					{ ...props }
+				>
+					{ children }
+				</EditorProvider>
+				<EditorHelpTopics
+					isVisible={ this.state.isHelpVisible }
+					onClose={ () => this.setState( { isHelpVisible: false } ) }
+				/>
+			</>
 		);
 	}
 }

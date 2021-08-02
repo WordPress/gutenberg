@@ -145,7 +145,7 @@ describe( 'Post Editor Template mode', () => {
 		);
 	} );
 
-	it( 'Allow creating custom block templates in classic themes', async () => {
+	it.skip( 'Allow creating custom block templates in classic themes', async () => {
 		await activateTheme( 'twentytwentyone' );
 		await createNewPost();
 		// Create a random post.

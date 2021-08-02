@@ -677,6 +677,56 @@ export const spec = [
 			text: '12',
 		},
 	},
+	{
+		description: 'should disarm script',
+		html: '<script>alert("1")</script>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 0,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
+		record: {
+			start: 0,
+			end: 0,
+			formats: [ , ],
+			replacements: [
+				{
+					attributes: { 'data-rich-text-script': 'alert(%221%22)' },
+					type: 'script',
+				},
+			],
+			text: '\ufffc',
+		},
+	},
+	{
+		description: 'should disarm on* attribute',
+		html: '<img onerror="alert(\'1\')">',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 0,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
+		record: {
+			start: 0,
+			end: 0,
+			formats: [ , ],
+			replacements: [
+				{
+					attributes: {
+						'data-disable-rich-text-onerror': "alert('1')",
+					},
+					type: 'img',
+				},
+			],
+			text: '\ufffc',
+		},
+	},
 ];
 
 export const specWithRegistration = [

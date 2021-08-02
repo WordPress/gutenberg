@@ -334,7 +334,15 @@ export function isEquivalentTextTokens(
  * @return {string} Normalized CSS length value.
  */
 export function getNormalizedLength( value ) {
-	return 0 === parseFloat( value ) ? '0' : value;
+	if ( 0 === parseFloat( value ) ) {
+		return '0';
+	}
+	// Normalize strings with floats to always include a leading zero.
+	if ( value.indexOf( '.' ) === 0 ) {
+		return '0' + value;
+	}
+
+	return value;
 }
 
 /**

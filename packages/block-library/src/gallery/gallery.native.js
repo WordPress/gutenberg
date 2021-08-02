@@ -52,9 +52,9 @@ export const Gallery = ( props ) => {
 	}, [ sizes ] );
 
 	const {
-		imageCount,
+		images,
 		align,
-		columns = defaultColumnsNumber( imageCount ),
+		columns = defaultColumnsNumber( images.length ),
 	} = attributes;
 
 	const displayedColumns = Math.min(

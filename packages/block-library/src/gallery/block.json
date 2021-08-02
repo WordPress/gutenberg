@@ -92,20 +92,10 @@
 		"allowResize": {
 			"type": "boolean",
 			"default": false
-		},
-		"isGrouped": {
-			"type": "boolean",
-			"default": true
-		},
-		"imageCount": {
-			"type": "number",
-			"default": 0
 		}
 	},
 	"providesContext": {
-		"allowResize": "allowResize",
-		"isGrouped": "isGrouped",
-		"imageCrop": "imageCrop"
+		"allowResize": "allowResize"
 	},
 	"supports": {
 		"anchor": true,
