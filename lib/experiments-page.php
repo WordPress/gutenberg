@@ -58,7 +58,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new gallery block that uses nested image blocks', 'gutenberg' ),
+			'label' => __( 'Test a new gallery block that uses nested image blocks (Warning: The new gallery is not compatible with WordPress mobile apps prior to version 18.1. If you use the mobile app, please update to the latest version to avoid content loss.)', 'gutenberg' ),
 			'id'    => 'gutenberg-gallery-refactor',
 		)
 	);
