@@ -86,11 +86,11 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities, updateSettings, galleryRefactor } = this.props;
+		const { capabilities, updateSettings, galleryWithImageBlocks } = this.props;
 
 		updateSettings( {
 			...capabilities,
-			...{ __experimentalGalleryRefactor: galleryRefactor },
+			...{ __unstableGalleryWithImageBlocks: galleryWithImageBlocks },
 			...this.getThemeColors( this.props ),
 		} );
 
@@ -142,8 +142,8 @@ class NativeEditorProvider extends Component {
 			( editorSettings ) => {
 				updateSettings( {
 					...{
-						__experimentalGalleryRefactor:
-							editorSettings.galleryRefactor,
+						__unstableGalleryWithImageBlocks:
+							editorSettings.galleryWithImageBlocks,
 					},
 					...this.getThemeColors( editorSettings ),
 				} );
