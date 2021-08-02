@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { usePanelContext } from '../progressive-disclosure-panel';
+import { MENU_STATES, usePanelContext } from '../progressive-disclosure-panel';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import DropdownMenu from '../../dropdown-menu';
@@ -33,9 +33,10 @@ const ProgressiveDisclosurePanelHeader = ( props ) => {
 							<MenuGroup label={ __( 'Display options' ) }>
 								{ Object.entries( menuItems ).map(
 									( [ label, itemState ] ) => {
-										const isSelected = itemState === true;
+										const isSelected =
+											itemState === MENU_STATES.CHECKED;
 										const isDisabled =
-											itemState === 'disabled';
+											itemState === MENU_STATES.DISABLED;
 
 										return (
 											<MenuItem

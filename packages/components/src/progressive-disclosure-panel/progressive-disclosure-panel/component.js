@@ -19,8 +19,13 @@ import {
 import ProgressiveDisclosurePanelHeader from '../progressive-disclosure-panel-header';
 
 const PanelContext = createContext( {} );
-
 export const usePanelContext = () => useContext( PanelContext );
+
+export const MENU_STATES = {
+	CHECKED: 'checked',
+	UNCHECKED: 'unchecked',
+	DISABLED: 'disabled',
+};
 
 const ProgressiveDisclosurePanel = ( props ) => {
 	const { children, className, header, label: menuLabel, resetAll } = props;
@@ -40,17 +45,16 @@ const ProgressiveDisclosurePanel = ( props ) => {
 		const items = {};
 
 		panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
-			// Menu item is checked if:
-			// - it currently has a value
-			// - or it was checked in previous menuItems state.
-			const isChecked = hasValue() || menuItems[ label ] === true;
+			let menuItemState = hasValue()
+				? MENU_STATES.CHECKED
+				: MENU_STATES.UNCHECKED;
 
-			// Menu item will be `disabled` if:
-			// - it is not checked
-			// - and is shown by default.
-			const isDisabled = ! isChecked && isShownByDefault;
+			// Disable the menu item if its unchecked and a default control.
+			if ( menuItemState === MENU_STATES.UNCHECKED && isShownByDefault ) {
+				menuItemState = MENU_STATES.DISABLED;
+			}
 
-			items[ label ] = isDisabled ? 'disabled' : isChecked;
+			items[ label ] = menuItemState;
 		} );
 
 		setMenuItems( items );
@@ -60,7 +64,7 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	const checkMenuItem = ( label ) => {
 		setMenuItems( ( items ) => ( {
 			...items,
-			[ label ]: true,
+			[ label ]: MENU_STATES.CHECKED,
 		} ) );
 	};
 
@@ -68,24 +72,31 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	// isn't to be displayed by default. When toggling a panel item its
 	// onSelect or onDeselect callbacks are called as appropriate.
 	const toggleItem = ( label ) => {
-		const wasSelected = menuItems[ label ];
+		const wasChecked = menuItems[ label ] === MENU_STATES.CHECKED;
 		const panelItem = panelItems.find( ( item ) => item.label === label );
 
-		if ( wasSelected && panelItem?.onDeselect ) {
+		if ( wasChecked && panelItem?.onDeselect ) {
 			panelItem.onDeselect();
 		}
 
-		if ( ! wasSelected && panelItem?.onSelect ) {
+		if ( ! wasChecked && panelItem?.onSelect ) {
 			panelItem.onSelect();
 		}
 
-		// If item was checked but is no longer and also shown by default
-		// disable the item's menu item.
-		const isDisabled = wasSelected && panelItem.isShownByDefault;
+		let menuItemState = wasChecked
+			? MENU_STATES.UNCHECKED
+			: MENU_STATES.CHECKED;
+
+		if (
+			menuItemState === MENU_STATES.UNCHECKED &&
+			panelItem.isShownByDefault
+		) {
+			menuItemState = MENU_STATES.DISABLED;
+		}
 
 		setMenuItems( {
 			...menuItems,
-			[ label ]: isDisabled ? 'disabled' : ! wasSelected,
+			[ label ]: menuItemState,
 		} );
 	};
 
@@ -101,7 +112,9 @@ const ProgressiveDisclosurePanel = ( props ) => {
 		const resetMenuItems = {};
 
 		panelItems.forEach( ( { label, isShownByDefault } ) => {
-			resetMenuItems[ label ] = isShownByDefault ? 'disabled' : false;
+			resetMenuItems[ label ] = isShownByDefault
+				? MENU_STATES.DISABLED
+				: MENU_STATES.UNCHECKED;
 		} );
 
 		setMenuItems( resetMenuItems );
