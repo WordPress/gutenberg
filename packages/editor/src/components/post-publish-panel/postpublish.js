@@ -10,7 +10,7 @@ import { PanelBody, Button, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { safeDecodeURIComponent } from '@wordpress/url';
+import { addQueryArgs, safeDecodeURIComponent } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
@@ -92,8 +92,12 @@ class PostPublishPanelPostpublish extends Component {
 		const { children, isScheduled, post, postType } = this.props;
 		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
 		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
+		const addNewPostLabel = get( postType, [ 'labels', 'add_new_item' ] );
 		const link =
 			post.status === 'future' ? getFuturePostUrl( post ) : post.link;
+		const addLink = addQueryArgs( 'post-new.php', {
+			post_type: post.type,
+		} );
 
 		const postPublishNonLinkHeader = isScheduled ? (
 			<>
@@ -116,28 +120,40 @@ class PostPublishPanelPostpublish extends Component {
 					<p className="post-publish-panel__postpublish-subheader">
 						<strong>{ __( 'What’s next?' ) }</strong>
 					</p>
-					<TextControl
-						className="post-publish-panel__postpublish-post-address"
-						readOnly
-						label={ sprintf(
-							/* translators: %s: post type singular name */
-							__( '%s address' ),
-							postLabel
-						) }
-						value={ safeDecodeURIComponent( link ) }
-						onFocus={ this.onSelectInput }
-					/>
+					<div className="post-publish-panel__postpublish-post-address-container">
+						<TextControl
+							className="post-publish-panel__postpublish-post-address"
+							readOnly
+							label={ sprintf(
+								/* translators: %s: post type singular name */
+								__( '%s address' ),
+								postLabel
+							) }
+							value={ safeDecodeURIComponent( link ) }
+							onFocus={ this.onSelectInput }
+						/>
+
+						<div className="post-publish-panel__postpublish-post-address__copy-button-wrap">
+							<CopyButton text={ link } onCopy={ this.onCopy }>
+								{ this.state.showCopyConfirmation
+									? __( 'Copied!' )
+									: __( 'Copy' ) }
+							</CopyButton>
+						</div>
+					</div>
+
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
-							<Button variant="secondary" href={ link }>
+							<Button variant="primary" href={ link }>
 								{ viewPostLabel }
 							</Button>
 						) }
-						<CopyButton text={ link } onCopy={ this.onCopy }>
-							{ this.state.showCopyConfirmation
-								? __( 'Copied!' )
-								: __( 'Copy Link' ) }
-						</CopyButton>
+						<Button
+							variant={ isScheduled ? 'primary' : 'secondary' }
+							href={ addLink }
+						>
+							{ addNewPostLabel }
+						</Button>
 					</div>
 				</PanelBody>
 				{ children }

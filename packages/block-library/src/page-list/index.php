@@ -135,7 +135,7 @@ function block_core_page_list_build_css_font_sizes( $context ) {
  *
  * @return string List markup.
  */
-function block_core_page_list_render_nested_page_list( $nested_pages, $active_page_ancestor_ids = array(), $colors, $depth = 0 ) {
+function block_core_page_list_render_nested_page_list( $nested_pages, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
@@ -150,7 +150,7 @@ function block_core_page_list_render_nested_page_list( $nested_pages, $active_pa
 		}
 
 		// If this is the first level of submenus, include the overlay colors.
-		if ( 1 === $depth ) {
+		if ( 1 === $depth && isset( $colors['overlay_css_classes'], $colors['overlay_inline_styles'] ) ) {
 			$css_class .= ' ' . trim( implode( ' ', $colors['overlay_css_classes'] ) );
 			if ( '' !== $colors['overlay_inline_styles'] ) {
 				$style_attribute = sprintf( ' style="%s"', esc_attr( $colors['overlay_inline_styles'] ) );

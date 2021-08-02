@@ -51,17 +51,6 @@ export function* getAuthors( query ) {
 }
 
 /**
- * Temporary approach to resolving editor access to author queries.
- *
- * @param {number} id The author id.
- */
-export function* __unstableGetAuthor( id ) {
-	const path = `/wp/v2/users?who=authors&include=${ id }`;
-	const users = yield apiFetch( { path } );
-	yield receiveUserQuery( 'author', users );
-}
-
-/**
  * Requests the current user from the REST API.
  */
 export function* getCurrentUser() {

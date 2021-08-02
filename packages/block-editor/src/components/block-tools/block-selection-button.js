@@ -160,8 +160,9 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		}
 		const startingBlockClientId = hasBlockMovingClientId();
 
-		if ( isEscape && startingBlockClientId ) {
+		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
 			setBlockMovingClientId( null );
+			event.preventDefault();
 		}
 		if ( ( isEnter || isSpace ) && startingBlockClientId ) {
 			const sourceRoot = getBlockRootClientId( startingBlockClientId );

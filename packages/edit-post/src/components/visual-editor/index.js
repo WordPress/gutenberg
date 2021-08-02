@@ -137,7 +137,6 @@ export default function VisualEditor( { styles } ) {
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
 	const defaultLayout = useSetting( 'layout' );
-	const { contentSize, wideSize } = defaultLayout || {};
 	const previewMode = 'is-' + deviceType.toLowerCase() + '-preview';
 
 	let animatedStyles = isTemplateMode
@@ -178,80 +177,72 @@ export default function VisualEditor( { styles } ) {
 		}
 
 		if ( themeSupportsLayout ) {
-			const alignments =
-				contentSize || wideSize
-					? [ 'wide', 'full', 'left', 'center', 'right' ]
-					: [ 'left', 'center', 'right' ];
-			return {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments,
-			};
+			return defaultLayout;
 		}
+
 		return undefined;
-	}, [ isTemplateMode, themeSupportsLayout, contentSize, wideSize ] );
+	}, [ isTemplateMode, themeSupportsLayout ] );
 
 	return (
-		<div
+		<BlockTools
+			__unstableContentRef={ ref }
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }
 		>
 			<VisualEditorGlobalKeyboardShortcuts />
-			<BlockTools __unstableContentRef={ ref }>
-				<motion.div
-					className="edit-post-visual-editor__content-area"
-					animate={ {
-						padding: isTemplateMode ? '48px 48px 0' : '0',
-					} }
-					ref={ blockSelectionClearerRef }
-				>
-					{ isTemplateMode && (
-						<Button
-							className="edit-post-visual-editor__exit-template-mode"
-							icon={ arrowLeft }
-							onClick={ () => {
-								clearSelectedBlock();
-								setIsEditingTemplate( false );
-							} }
-						>
-							{ __( 'Back' ) }
-						</Button>
-					) }
-					<motion.div
-						animate={ animatedStyles }
-						initial={ desktopCanvasStyles }
-						className={ previewMode }
+			<motion.div
+				className="edit-post-visual-editor__content-area"
+				animate={ {
+					padding: isTemplateMode ? '48px 48px 0' : '0',
+				} }
+				ref={ blockSelectionClearerRef }
+			>
+				{ isTemplateMode && (
+					<Button
+						className="edit-post-visual-editor__exit-template-mode"
+						icon={ arrowLeft }
+						onClick={ () => {
+							clearSelectedBlock();
+							setIsEditingTemplate( false );
+						} }
 					>
-						<MaybeIframe
-							isTemplateMode={ isTemplateMode }
-							contentRef={ contentRef }
-							styles={ styles }
-							style={ { paddingBottom } }
-						>
-							{ themeSupportsLayout && ! isTemplateMode && (
-								<LayoutStyle
-									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-									layout={ defaultLayout }
-								/>
-							) }
-							{ ! isTemplateMode && (
-								<div className="edit-post-visual-editor__post-title-wrapper">
-									<PostTitle />
-								</div>
-							) }
-							<RecursionProvider>
-								<BlockList __experimentalLayout={ layout } />
-							</RecursionProvider>
-						</MaybeIframe>
-					</motion.div>
+						{ __( 'Back' ) }
+					</Button>
+				) }
+				<motion.div
+					animate={ animatedStyles }
+					initial={ desktopCanvasStyles }
+					className={ previewMode }
+				>
+					<MaybeIframe
+						isTemplateMode={ isTemplateMode }
+						contentRef={ contentRef }
+						styles={ styles }
+						style={ { paddingBottom } }
+					>
+						{ themeSupportsLayout && ! isTemplateMode && (
+							<LayoutStyle
+								selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+								layout={ defaultLayout }
+							/>
+						) }
+						{ ! isTemplateMode && (
+							<div className="edit-post-visual-editor__post-title-wrapper">
+								<PostTitle />
+							</div>
+						) }
+						<RecursionProvider>
+							<BlockList __experimentalLayout={ layout } />
+						</RecursionProvider>
+					</MaybeIframe>
 				</motion.div>
-			</BlockTools>
+			</motion.div>
 			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__unstableBlockSettingsMenuFirstItem>
-		</div>
+		</BlockTools>
 	);
 }

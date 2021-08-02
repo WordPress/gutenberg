@@ -279,7 +279,7 @@ To retain backward compatibility, the existing `add_theme_support` declarations 
 
 | add_theme_support           | theme.json setting                                        |
 | --------------------------- | --------------------------------------------------------- |
-| `custom-line-height`        | Set `typography.customLineHeight`to `false`.              |
+| `custom-line-height`        | Set `typography.customLineHeight` to `false`.             |
 | `custom-spacing`            | Set `spacing.customPadding` to `true`.                    |
 | `custom-units`              | Provide the list of units via `spacing.units`.            |
 | `disable-custom-colors`     | Set `color.custom` to `false`.                            |

@@ -82,12 +82,56 @@ describe( 'NumberControl', () => {
 			expect( input.value ).toBe( '0' );
 		} );
 
-		it( 'should parse to number value on ENTER keypress', () => {
-			render( <NumberControl value={ 5 } /> );
+		it( 'should parse to number value on ENTER keypress when required', () => {
+			render( <NumberControl value={ 5 } required={ true } /> );
 
 			const input = getInput();
 			input.focus();
 			fireEvent.change( input, { target: { value: '10 abc' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '0' );
+		} );
+
+		it( 'should parse to empty string on ENTER keypress when not required', () => {
+			render( <NumberControl value={ 5 } required={ false } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '10 abc' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '' );
+		} );
+
+		it( 'should accept empty string on ENTER keypress for optional field', () => {
+			render( <NumberControl value={ 5 } required={ false } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '' );
+		} );
+
+		it( 'should not enforce numerical value for empty string when required is omitted', () => {
+			render( <NumberControl value={ 5 } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '' } } );
+			fireKeyDown( { keyCode: ENTER } );
+
+			expect( input.value ).toBe( '' );
+		} );
+
+		it( 'should enforce numerical value for empty string when required', () => {
+			render( <NumberControl value={ 5 } required={ true } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: '' } } );
 			fireKeyDown( { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '0' );
