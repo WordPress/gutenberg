@@ -96,7 +96,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 						<HelpDetailNavigationScreen
 							key={ topic.label }
 							name={ topic.label }
-							view={ topic.view }
+							content={ topic.view }
 						/>
 					);
 				} ) }

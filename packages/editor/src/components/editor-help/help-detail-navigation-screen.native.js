@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 
-const HelpDetailNavigationScreen = ( { name, view } ) => {
+const HelpDetailNavigationScreen = ( { name, content } ) => {
 	const navigation = useNavigation();
 
 	const goBack = () => {
@@ -29,7 +29,7 @@ const HelpDetailNavigationScreen = ( { name, view } ) => {
 				leftButtonOnPress={ goBack }
 			/>
 			<View style={ styles.separator } />
-			{ view }
+			{ content }
 		</BottomSheet.NavigationScreen>
 	);
 };
