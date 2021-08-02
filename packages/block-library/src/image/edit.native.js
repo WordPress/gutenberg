@@ -648,9 +648,7 @@ export class ImageEdit extends Component {
 								retryMessage,
 							} ) => {
 								return (
-									<View
-										style={ styles.isGallery }
-									>
+									<View style={ styles.isGallery }>
 										<Image
 											align={
 												align && alignToFlex[ align ]
