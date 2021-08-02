@@ -66,9 +66,9 @@ module.exports = {
 		] ),
 		new CopyWebpackPlugin( {
 			patterns: gutenbergPackages.map( ( packageName ) => ( {
-				from: `./packages/${ packageName }/build-style/*.css`,
-				to: `./build/${ packageName }/`,
-				flatten: true,
+				from: '*.css',
+				context: `./packages/${ packageName }/build-style`,
+				to: `./build/${ packageName }`,
 				transform: stylesTransform,
 				noErrorOnMissing: true,
 			} ) ),
