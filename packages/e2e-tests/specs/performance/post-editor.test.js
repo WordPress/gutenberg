@@ -40,7 +40,7 @@ describe( 'Post Editor Performance', () => {
 		};
 
 		const html = readFile(
-			join( __dirname, '../../assets/large-post.html' )
+			join( __dirname, '../../assets/small-post.html' )
 		);
 
 		await createNewPost();
