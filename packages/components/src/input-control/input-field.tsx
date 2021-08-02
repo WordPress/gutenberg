@@ -132,7 +132,7 @@ function InputField(
 	};
 
 	const handleOnCommit = ( event: SyntheticEvent< HTMLInputElement > ) => {
-		const nextValue = ( event.target as HTMLInputElement ).value;
+		const nextValue = event.currentTarget.value;
 
 		try {
 			onValidate( nextValue, event );
@@ -210,10 +210,9 @@ function InputField(
 		handleOnMouseDown = ( event: MouseEvent< HTMLInputElement > ) => {
 			props.onMouseDown?.( event );
 			if (
-				event.target !==
-				( event.target as HTMLInputElement ).ownerDocument.activeElement
+				event.target !== event.currentTarget.ownerDocument.activeElement
 			) {
-				( event.target as HTMLInputElement ).focus();
+				event.currentTarget.focus();
 			}
 		};
 	}
