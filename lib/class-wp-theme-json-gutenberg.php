@@ -839,7 +839,7 @@ class WP_Theme_JSON_Gutenberg {
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
 			if ( self::ROOT_BLOCK_SELECTOR === $selector ) {
-				$block_rules .= ' .wp-site-blocks > * + *, body > * + * { margin-top: var( --wp-theme-block-gap ); margin-bottom: 0; }';
+				$block_rules .= ' .wp-site-blocks > * + * { margin-top: var( --wp-theme-block-gap ); margin-bottom: 0; }';
 			}
 		}
 

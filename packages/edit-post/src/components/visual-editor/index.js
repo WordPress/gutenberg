@@ -233,7 +233,14 @@ export default function VisualEditor( { styles } ) {
 							</div>
 						) }
 						<RecursionProvider>
-							<BlockList __experimentalLayout={ layout } />
+							<BlockList
+								className={
+									isTemplateMode
+										? 'wp-site-blocks'
+										: undefined
+								}
+								__experimentalLayout={ layout }
+							/>
 						</RecursionProvider>
 					</MaybeIframe>
 				</motion.div>

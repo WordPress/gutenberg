@@ -97,7 +97,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					contentRef={ mergedRefs }
 				>
 					<BlockList
-						className="edit-site-block-editor__block-list"
+						className="edit-site-block-editor__block-list wp-site-blocks"
 						__experimentalLayout={ LAYOUT }
 					/>
 				</Iframe>
