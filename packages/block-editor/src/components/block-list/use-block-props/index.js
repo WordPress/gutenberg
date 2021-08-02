@@ -20,7 +20,6 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import useMovingAnimation from '../../use-moving-animation';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
@@ -37,12 +36,6 @@ import { useBlockRefProvider } from './use-block-refs';
 import { useMultiSelection } from './use-multi-selection';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { store as blockEditorStore } from '../../../store';
-
-/**
- * If the block count exceeds the threshold, we disable the reordering animation
- * to avoid laginess.
- */
-const BLOCK_ANIMATION_THRESHOLD = 200;
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -64,24 +57,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const { clientId, className, wrapperProps = {}, isAligned } = useContext(
 		BlockListBlockContext
 	);
-	const {
-		index,
-		mode,
-		name,
-		blockTitle,
-		isPartOfSelection,
-		adjustScrolling,
-		enableAnimation,
-		lightBlockWrapper,
-	} = useSelect(
+	const { mode, name, blockTitle, lightBlockWrapper } = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
 				getBlockIndex,
 				getBlockMode,
 				getBlockName,
-				isTyping,
-				getGlobalBlockCount,
 				isBlockSelected,
 				isBlockMultiSelected,
 				isAncestorMultiSelected,
@@ -103,9 +85,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isPartOfSelection: isSelected || isPartOfMultiSelection,
 				adjustScrolling:
 					isSelected || isFirstMultiSelectedBlock( clientId ),
-				enableAnimation:
-					! isTyping() &&
-					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 				lightBlockWrapper:
 					blockType.apiVersion > 1 ||
 					hasBlockSupport( blockType, 'lightBlockWrapper', false ),
@@ -129,12 +108,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useNavModeExit( clientId ),
 		useIsHovered(),
 		useIntersectionObserver(),
-		useMovingAnimation( {
-			isSelected: isPartOfSelection,
-			adjustScrolling,
-			enableAnimation,
-			triggerAnimationOnChange: index,
-		} ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
