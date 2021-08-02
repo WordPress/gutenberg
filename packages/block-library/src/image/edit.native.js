@@ -507,7 +507,7 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
-			context: { isGrouped = false, imageCrop = false } = {},
+			context: { imageCrop = false } = {},
 			featuredImageId,
 			wasBlockJustInserted,
 		} = this.props;
@@ -611,12 +611,10 @@ export class ImageEdit extends Component {
 			wide: 'center',
 		};
 
-		const additionalImageProps = isGrouped
-			? {
-					height: '100%',
-					resizeMode: imageCrop ? 'cover' : 'contain',
-			  }
-			: {};
+		const additionalImageProps = {
+			height: '100%',
+			resizeMode: imageCrop ? 'cover' : 'contain',
+		};
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
@@ -650,9 +648,7 @@ export class ImageEdit extends Component {
 								retryMessage,
 							} ) => {
 								return (
-									<View
-										style={ isGrouped && styles.isGallery }
-									>
+									<View style={ styles.isGallery }>
 										<Image
 											align={
 												align && alignToFlex[ align ]

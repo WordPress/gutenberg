@@ -18,7 +18,7 @@ import { chevronDown } from '@wordpress/icons';
  */
 import Button from '../button';
 import TextControl from '../text-control';
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 import { isValidHex } from './utils';
 
 /* Wrapper for TextControl, only used to handle intermediate state while typing. */

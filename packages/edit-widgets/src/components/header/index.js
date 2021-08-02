@@ -97,7 +97,7 @@ function Header() {
 							/* translators: button label text should, if possible, be under 16
 					characters. */
 							label={ _x(
-								'Add block',
+								'Toggle block inserter',
 								'Generic label for block inserter button'
 							) }
 						/>

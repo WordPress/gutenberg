@@ -90,11 +90,7 @@ export function useFocusFirstElement( clientId ) {
 		const target =
 			( isReverse ? last : first )( textInputs ) || ref.current;
 
-		if (
-			// Don't focus inner block or block appenders.
-			! isInsideRootBlock( ref.current, target ) ||
-			target.closest( '.block-list-appender' )
-		) {
+		if ( ! isInsideRootBlock( ref.current, target ) ) {
 			ref.current.focus();
 			return;
 		}

@@ -87,7 +87,7 @@ export default function MoreMenu() {
 								role="menuitem"
 								icon={ external }
 								href={ __(
-									'https://wordpress.org/support/article/wordpress-editor/'
+									'https://wordpress.org/support/article/block-based-widgets-editor/'
 								) }
 								target="_blank"
 								rel="noopener noreferrer"

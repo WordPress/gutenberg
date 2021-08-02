@@ -26,7 +26,7 @@ async function didMasonryLoadCorrectly( context ) {
 	} );
 }
 
-describe( 'changing image size', () => {
+describe( 'iframed masonry block', () => {
 	beforeEach( async () => {
 		await activatePlugin( 'gutenberg-test-iframed-masonry-block' );
 		await createNewPost( { postType: 'page' } );
