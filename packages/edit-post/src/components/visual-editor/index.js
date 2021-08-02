@@ -120,7 +120,8 @@ export default function VisualEditor( { styles } ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
-		height: '100%',
+		// We intentionally omit a 100% height here. The container is a flex item, so the 100% height is granted by default.
+		// If a percentage height is present, older browsers such as Safari 13 apply that, but do so incorrectly as the inheritance is buggy.
 		width: '100%',
 		margin: 0,
 		display: 'flex',
