@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+-   [*] [Android] Fix UBE's inaccessible "more" toolbar item. [#33740]
 ## 1.58.0
 -   [***] New Block: Embed block. [#33452]
 
