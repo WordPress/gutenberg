@@ -210,7 +210,8 @@ function InputField(
 		handleOnMouseDown = ( event: MouseEvent< HTMLInputElement > ) => {
 			props.onMouseDown?.( event );
 			if (
-				event.target !== event.currentTarget.ownerDocument.activeElement
+				event.currentTarget !==
+				event.currentTarget.ownerDocument.activeElement
 			) {
 				event.currentTarget.focus();
 			}
