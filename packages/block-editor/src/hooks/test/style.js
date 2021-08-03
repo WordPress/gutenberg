@@ -24,6 +24,7 @@ describe( 'getInlineStyles', () => {
 					color: '#21759b',
 				},
 				spacing: {
+					gap: { row: '1em' },
 					padding: { top: '10px' },
 					margin: { bottom: '15px' },
 				},
@@ -37,6 +38,7 @@ describe( 'getInlineStyles', () => {
 			color: 'red',
 			lineHeight: 1.5,
 			fontSize: 10,
+			rowGap: '1em',
 			marginBottom: '15px',
 			paddingTop: '10px',
 		} );
@@ -66,6 +68,10 @@ describe( 'getInlineStyles', () => {
 		expect(
 			getInlineStyles( {
 				spacing: {
+					gap: {
+						column: '5px',
+						row: '1em',
+					},
 					margin: {
 						top: '10px',
 						right: '0.5rem',
@@ -81,6 +87,8 @@ describe( 'getInlineStyles', () => {
 				},
 			} )
 		).toEqual( {
+			columnGap: '5px',
+			rowGap: '1em',
 			marginTop: '10px',
 			marginRight: '0.5rem',
 			marginBottom: '0.5em',
@@ -96,11 +104,13 @@ describe( 'getInlineStyles', () => {
 		expect(
 			getInlineStyles( {
 				spacing: {
+					gap: '1em',
 					margin: '10px',
 					padding: '20px',
 				},
 			} )
 		).toEqual( {
+			gap: '1em',
 			margin: '10px',
 			padding: '20px',
 		} );
