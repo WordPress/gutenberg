@@ -106,7 +106,7 @@ const EmbedPreview = ( {
 			<View>
 				{
 					// eslint-disable-next-line no-undef
-					__DEV__ && previewable ? (
+					previewable ? (
 						embedWrapper
 					) : (
 						<EmbedNoPreview
