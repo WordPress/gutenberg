@@ -7,6 +7,8 @@ import memize from 'memize';
  * WordPress dependencies
  */
 import RNReactNativeGutenbergBridge, {
+	requestBlockTypeImpressions,
+	setBlockTypeImpressions,
 	subscribeParentGetHtml,
 	subscribeParentToggleHTMLMode,
 	subscribeUpdateHtml,
@@ -35,6 +37,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { getGlobalStyles } from '@wordpress/components';
+import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -160,6 +163,24 @@ class NativeEditorProvider extends Component {
 			// Temporary: feature hidden from production. This is just here for testing
 			// purposes and will be replaced with actual logic in a later PR.
 			this.setState( { isHelpVisible: true } );
+		} );
+
+		// Request current block impressions from native app
+		requestBlockTypeImpressions( ( storedImpressions ) => {
+			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
+
+			// Persist impressions to JavaScript store
+			updateSettings( { impressions } );
+
+			// Persist impressions to native store if they do not include latest
+			// `NEW_BLOCK_TYPES` configuration
+			const storedImpressionKeys = Object.keys( storedImpressions );
+			const storedImpressionsCurrent = Object.keys(
+				NEW_BLOCK_TYPES
+			).every( ( newKey ) => storedImpressionKeys.includes( newKey ) );
+			if ( ! storedImpressionsCurrent ) {
+				setBlockTypeImpressions( impressions );
+			}
 		} );
 	}
 
@@ -332,6 +353,7 @@ export default compose( [
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
+			getSettings: getBlockEditorSettings,
 		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -341,6 +363,7 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			title: getEditedPostAttribute( 'title' ),
 			getEditedPostContent,
+			getBlockEditorSettings,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
 			blockCount: getGlobalBlockCount(),
 			paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
