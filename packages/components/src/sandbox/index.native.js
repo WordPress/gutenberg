@@ -153,9 +153,9 @@ const EMPTY_ARRAY = [];
 
 function Sandbox( {
 	containerStyle,
+	customJS,
 	html = '',
 	lang = 'en',
-	customJS,
 	providerUrl = '',
 	scripts = EMPTY_ARRAY,
 	styles = EMPTY_ARRAY,
