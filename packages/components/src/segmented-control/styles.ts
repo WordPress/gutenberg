@@ -27,7 +27,7 @@ export const SegmentedControl = css`
 
 	&:focus-within {
 		border-color: ${ COLORS.ui.borderFocus };
-		box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b );
+		box-shadow: ${ CONFIG.controlBoxShadowFocus };
 		outline: none;
 		z-index: 1;
 	}
