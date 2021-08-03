@@ -178,24 +178,21 @@ const config = {
 			{
 				test: /\.svg$/,
 				use: [ '@svgr/webpack', 'url-loader' ],
+				type: 'javascript/auto',
 			},
 			{
 				test: /\.(bmp|png|jpe?g|gif)$/i,
-				loader: require.resolve( 'file-loader' ),
-				options: {
-					name: 'images/[name].[hash:8].[ext]',
+				type: 'asset/resource',
+				generator: {
+					filename: 'images/[name].[hash:8][ext]',
 				},
 			},
 			{
-				test: /\.(woff|woff2|eot|ttf|otf)$/,
-				use: [
-					{
-						loader: 'file-loader',
-						options: {
-							name: 'fonts/[name].[hash:8].[ext]',
-						},
-					},
-				],
+				test: /\.(woff|woff2|eot|ttf|otf)$/i,
+				type: 'asset/resource',
+				generator: {
+					filename: 'fonts/[name].[hash:8][ext]',
+				},
 			},
 		],
 	},
