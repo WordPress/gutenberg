@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "10.2.0",
+	"version": "11.0.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,6 +31,7 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
