@@ -10,11 +10,11 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 
 module.exports = ( { config } ) => {
 	config.module.rules.push(
-		{
+		/*{
 			test: /\/stories\/.+\.js$/,
 			loaders: [ require.resolve( '@storybook/source-loader' ) ],
 			enforce: 'pre',
-		},
+		},*/
 		{
 			test: /\.scss$/,
 			use: [
