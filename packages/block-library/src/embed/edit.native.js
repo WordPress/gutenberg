@@ -28,7 +28,7 @@ import { View } from '@wordpress/primitives';
 
 const EmbedEdit = ( props ) => {
 	const {
-		attributes: { providerNameSlug, previewable, responsive, url },
+		attributes: { align, providerNameSlug, previewable, responsive, url },
 		attributes,
 		isSelected,
 		onReplace,
@@ -187,6 +187,7 @@ const EmbedEdit = ( props ) => {
 					/>
 					<View { ...blockProps }>
 						<EmbedPreview
+							align={ align }
 							clientId={ clientId }
 							icon={ icon }
 							insertBlocksAfter={ insertBlocksAfter }

@@ -103,6 +103,7 @@ const style = `
 `;
 
 function Sandbox( {
+	containerStyle,
 	html = '',
 	providerUrl = '',
 	scripts = [],
@@ -232,6 +233,7 @@ function Sandbox( {
 
 	return (
 		<WebView
+			containerStyle={ containerStyle }
 			key={ key }
 			ref={ ref }
 			source={ { baseUrl: providerUrl, html: contentHtml } }

@@ -19,8 +19,10 @@ import { SandBox } from '@wordpress/components';
  */
 import { getPhotoHtml } from './util';
 import EmbedNoPreview from './embed-no-preview';
+import styles from './styles.scss';
 
 const EmbedPreview = ( {
+	align,
 	clientId,
 	icon,
 	insertBlocksAfter,
@@ -34,6 +36,14 @@ const EmbedPreview = ( {
 	url,
 } ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+
+	const wrapperStyle = styles[ 'embed-preview__wrapper' ];
+	const wrapperAlignStyle =
+		styles[ `embed-preview__wrapper--align-${ align }` ] ||
+		styles[ 'embed-preview__wrapper--align' ];
+	const sandboxAlignStyle =
+		styles[ `embed-preview__sandbox--align-${ align }` ] ||
+		styles[ 'embed-preview__sandbox--align' ];
 
 	function accessibilityLabelCreator( caption ) {
 		return isEmpty( caption )
@@ -85,12 +95,16 @@ const EmbedPreview = ( {
 						}
 					} }
 				>
-					<View pointerEvents="box-only">
+					<View
+						pointerEvents="box-only"
+						style={ [ wrapperStyle, wrapperAlignStyle ] }
+					>
 						<SandBox
 							html={ html }
 							scripts={ scripts }
 							title={ iframeTitle }
 							providerUrl={ providerUrl }
+							containerStyle={ sandboxAlignStyle }
 						/>
 					</View>
 				</TouchableWithoutFeedback>
