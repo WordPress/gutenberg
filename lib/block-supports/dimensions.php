@@ -92,10 +92,13 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 
 	if ( $has_gap_support ) {
 		$gap_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'gap' ), null );
-		if ( null !== $gap_value ) {
+
+		if ( is_array( $gap_value ) ) {
 			foreach ( $gap_value as $key => $value ) {
 				$styles[] = sprintf( '%s-gap: %s', $key, $value );
 			}
+		} elseif ( null !== $gap_value )  {
+			$styles[] = sprintf( 'gap: %s', $gap_value );
 		}
 	}
 
