@@ -252,7 +252,7 @@ function gutenberg_user_settings_data_persistence_inline_script() {
 				locallyPersistentValues[ key ] = value;
 				wp.apiFetch( {
 					path: '/wp/v2/users/me',
-					method: 'POST',
+					method: 'PUT',
 					data: {
 						meta: {
 							data_persistence: JSON.parse( value ),
