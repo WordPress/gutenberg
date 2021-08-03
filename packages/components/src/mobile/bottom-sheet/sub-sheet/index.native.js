@@ -7,11 +7,7 @@ import { SafeAreaView } from 'react-native';
  * WordPress dependencies
  */
 import { Children, useEffect, useContext } from '@wordpress/element';
-import {
-	createSlotFill,
-	BottomSheetConsumer,
-	BottomSheetContext,
-} from '@wordpress/components';
+import { createSlotFill, BottomSheetContext } from '@wordpress/components';
 
 const { Fill, Slot } = createSlotFill( 'BottomSheetSubSheet' );
 
@@ -34,11 +30,9 @@ const BottomSheetSubSheet = ( {
 			{ showSheet && (
 				<Fill>
 					<SafeAreaView>
-						<BottomSheetConsumer>
-							{ () => {
-								return children;
-							} }
-						</BottomSheetConsumer>
+						{ () => {
+							return children;
+						} }
 					</SafeAreaView>
 				</Fill>
 			) }
