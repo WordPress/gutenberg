@@ -7,7 +7,7 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { useToolsPanelContext } from '../context';
-import { MENU_STATES } from '../tools-panel';
+import { MENU_STATES } from '../utils';
 
 // This wraps controls to be conditionally displayed within a tools panel. It
 // prevents props being applied to HTML elements that would make them invalid.

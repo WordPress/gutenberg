@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useToolsPanelContext } from '../context';
-import { MENU_STATES } from '../tools-panel';
+import { MENU_STATES } from '../utils';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import DropdownMenu from '../../dropdown-menu';

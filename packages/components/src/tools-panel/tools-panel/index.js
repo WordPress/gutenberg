@@ -1,1 +1,1 @@
-export { default, MENU_STATES } from './component';
+export { default } from './component';

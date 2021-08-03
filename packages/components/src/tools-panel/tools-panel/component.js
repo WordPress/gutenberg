@@ -13,12 +13,7 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import ToolsPanelHeader from '../tools-panel-header';
 import { ToolsPanelContext } from '../context';
-
-export const MENU_STATES = {
-	CHECKED: 'checked',
-	UNCHECKED: 'unchecked',
-	DISABLED: 'disabled',
-};
+import { MENU_STATES } from '../utils';
 
 const ToolsPanel = ( props ) => {
 	const { children, className, header, label: menuLabel, resetAll } = props;
