@@ -7,14 +7,15 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { MENU_STATES, usePanelContext } from '../tools-panel';
+import { useToolsPanelContext } from '../context';
+import { MENU_STATES } from '../tools-panel';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import DropdownMenu from '../../dropdown-menu';
 
 const ToolsPanelHeader = ( props ) => {
 	const { menuLabel, resetAll, header, toggleItem } = props;
-	const { menuItems } = usePanelContext();
+	const { menuItems } = useToolsPanelContext();
 
 	if ( ! header ) {
 		return null;

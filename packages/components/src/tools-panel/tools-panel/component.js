@@ -6,20 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	createContext,
-	useContext,
-	useEffect,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import ToolsPanelHeader from '../tools-panel-header';
-
-const PanelContext = createContext( {} );
-export const usePanelContext = () => useContext( PanelContext );
+import { ToolsPanelContext } from '../context';
 
 export const MENU_STATES = {
 	CHECKED: 'checked',
@@ -125,7 +118,7 @@ const ToolsPanel = ( props ) => {
 
 	return (
 		<div className={ classes }>
-			<PanelContext.Provider value={ panelContext }>
+			<ToolsPanelContext.Provider value={ panelContext }>
 				<ToolsPanelHeader
 					header={ header }
 					menuLabel={ menuLabel }
@@ -133,7 +126,7 @@ const ToolsPanel = ( props ) => {
 					toggleItem={ toggleItem }
 				/>
 				{ children }
-			</PanelContext.Provider>
+			</ToolsPanelContext.Provider>
 		</div>
 	);
 };

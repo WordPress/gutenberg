@@ -1,1 +1,1 @@
-export { default, usePanelContext, MENU_STATES } from './component';
+export { default, MENU_STATES } from './component';

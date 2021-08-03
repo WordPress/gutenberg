@@ -6,7 +6,8 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { MENU_STATES, usePanelContext } from '../tools-panel';
+import { useToolsPanelContext } from '../context';
+import { MENU_STATES } from '../tools-panel';
 
 // This wraps controls to be conditionally displayed within a tools panel. It
 // prevents props being applied to HTML elements that would make them invalid.
@@ -18,7 +19,12 @@ const ToolsPanelItem = ( {
 	onDeselect,
 	onSelect,
 } ) => {
-	const { checkMenuItem, menuItems, registerPanelItem } = usePanelContext();
+	const {
+		checkMenuItem,
+		menuItems,
+		registerPanelItem,
+	} = useToolsPanelContext();
+
 	const isValueSet = hasValue();
 
 	useEffect( () => {
