@@ -3,8 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalProgressiveDisclosurePanel as ProgressiveDisclosurePanel,
-	__experimentalProgressiveDisclosurePanelItem as ProgressiveDisclosurePanelItem,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
@@ -104,13 +104,13 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	};
 
 	return (
-		<ProgressiveDisclosurePanel
+		<ToolsPanel
 			label={ __( 'Dimensions options' ) }
 			title={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 		>
 			{ showPaddingControl && (
-				<ProgressiveDisclosurePanelItem
+				<ToolsPanelItem
 					hasValue={ hasPaddingValue }
 					label={ __( 'Padding' ) }
 					onDeselect={ resetPaddingValue }
@@ -124,10 +124,10 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 						units={ units }
 						allowReset={ false }
 					/>
-				</ProgressiveDisclosurePanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showMarginControl && (
-				<ProgressiveDisclosurePanelItem
+				<ToolsPanelItem
 					hasValue={ hasMarginValue }
 					label={ __( 'Margin' ) }
 					onDeselect={ resetMarginValue }
@@ -141,8 +141,8 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 						units={ units }
 						allowReset={ false }
 					/>
-				</ProgressiveDisclosurePanelItem>
+				</ToolsPanelItem>
 			) }
-		</ProgressiveDisclosurePanel>
+		</ToolsPanel>
 	);
 }

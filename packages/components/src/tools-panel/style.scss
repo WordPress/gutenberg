@@ -1,4 +1,4 @@
-.components-progressive-disclosure-panel {
+.components-tools-panel {
 	border: none;
 	border-top: $border-width solid $gray-200;
 	padding: $grid-unit-20;
@@ -8,7 +8,7 @@
 	column-gap: $grid-unit-20;
 	row-gap: $grid-unit-30;
 
-	.components-progressive-disclosure-panel__header {
+	.components-tools-panel__header {
 		margin: 0;
 		display: flex;
 		align-items: center;
@@ -35,7 +35,7 @@
 
 .block-editor-block-inspector,
 .edit-site {
-	.components-progressive-disclosure-panel {
+	.components-tools-panel {
 		> div,
 		> fieldset {
 			padding-bottom: 0;
@@ -47,11 +47,11 @@
 }
 
 .edit-site {
-	.components-progressive-disclosure-panel {
+	.components-tools-panel {
 		border-bottom: $border-width solid $gray-200;
 	}
 
-	.components-progressive-disclosure-panel + .components-panel__body {
+	.components-tools-panel + .components-panel__body {
 		margin-top: -1px;
 	}
 }

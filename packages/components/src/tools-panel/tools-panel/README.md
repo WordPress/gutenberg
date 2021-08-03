@@ -1,7 +1,8 @@
-# ProgressiveDisclosurePanel
+# ToolsPanel
 
 <div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+This feature is still experimental. “Experimental” means this is an early
+implementation subject to drastic and breaking changes.
 </div>
 <br />
 These panels provide progressive discovery options for their children. For
@@ -9,9 +10,9 @@ example the controls provided via block supports.
 
 ## Development guidelines
 
-The `ProgressiveDisclosurePanel` creates a container with a header including a
+The `ToolsPanel` creates a container with a header including a
 dropdown menu. The menu is generated automatically from the panel's children
-matching the `ProgressiveDisclosurePanelItem` component type.
+matching the `ToolsPanelItem` component type.
 
 Each menu item allows for the display of the corresponding child to be
 toggled on or off. The control's `onSelect` and `onDeselect` callbacks are fired
@@ -28,8 +29,8 @@ child's props.
 
 ```jsx
 import {
-	__experimentalProgressiveDisclosurePanel as ProgressiveDisclosurePanel,
-	__experimentalProgressiveDisclosurePanelItem as ProgressiveDisclosurePanelItem,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -49,21 +50,21 @@ export function DimensionPanel( props ) {
 	};
 
 	return (
-		<ProgressiveDisclosurePanel
+		<ToolsPanel
 			header={ __( 'Dimensions' ) }
 			label={ __( 'Dimensions options' ) }
 			resetAll={ resetAll }
 		>
 			{ ! isPaddingDisabled && (
-				<ProgressiveDisclosurePanelItem
+				<ToolsPanelItem
 					hasValue={ () => hasPaddingValue( props ) }
 					label={ __( 'Padding' ) }
 					onDeselect={ () => resetPadding( props ) }
 				>
 					<PaddingEdit { ...props } />
-				</ProgressiveDisclosurePanelItem>
+				</ToolsPanelItem>
 			) }
-		</ProgressiveDisclosurePanel>
+		</ToolsPanel>
 	);
 }
 ```

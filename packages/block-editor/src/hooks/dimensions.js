@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import {
-	__experimentalProgressiveDisclosurePanel as ProgressiveDisclosurePanel,
-	__experimentalProgressiveDisclosurePanelItem as ProgressiveDisclosurePanelItem,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -71,32 +71,32 @@ export function DimensionsPanel( props ) {
 
 	return (
 		<InspectorControls key="dimensions">
-			<ProgressiveDisclosurePanel
+			<ToolsPanel
 				label={ __( 'Dimensions options' ) }
 				header={ __( 'Dimensions' ) }
 				resetAll={ resetAll }
 			>
 				{ ! isPaddingDisabled && (
-					<ProgressiveDisclosurePanelItem
+					<ToolsPanelItem
 						hasValue={ () => hasPaddingValue( props ) }
 						label={ __( 'Padding' ) }
 						onDeselect={ () => resetPadding( props ) }
 						isShownByDefault={ defaultSpacingControls?.padding }
 					>
 						<PaddingEdit { ...props } />
-					</ProgressiveDisclosurePanelItem>
+					</ToolsPanelItem>
 				) }
 				{ ! isMarginDisabled && (
-					<ProgressiveDisclosurePanelItem
+					<ToolsPanelItem
 						hasValue={ () => hasMarginValue( props ) }
 						label={ __( 'Margin' ) }
 						onDeselect={ () => resetMargin( props ) }
 						isShownByDefault={ defaultSpacingControls?.margin }
 					>
 						<MarginEdit { ...props } />
-					</ProgressiveDisclosurePanelItem>
+					</ToolsPanelItem>
 				) }
-			</ProgressiveDisclosurePanel>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 }

@@ -1,16 +1,16 @@
-# ProgressiveDisclosurePanelHeader
+# ToolsPanelHeader
 
 <div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 <br />
 
-This component renders a progressive disclosure panel's header including a menu.
+This component renders a tools panel's header including a menu.
 
 ## Usage
 
 This component is generated automatically by its parent
-`ProgressiveDisclosurePanel`.
+`ToolsPanel`.
 
 <div class="callout callout-alert">
 <strong>In general, this should not be used directly.</strong>

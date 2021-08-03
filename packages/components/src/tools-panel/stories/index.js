@@ -11,16 +11,13 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	ProgressiveDisclosurePanel,
-	ProgressiveDisclosurePanelItem,
-} from '../';
+import { ToolsPanel, ToolsPanelItem } from '../';
 import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 
 export default {
-	title: 'Components/ProgressiveDisclosurePanel',
-	component: ProgressiveDisclosurePanel,
+	title: 'Components/ToolsPanel',
+	component: ToolsPanel,
 };
 
 export const _default = () => {
@@ -35,12 +32,12 @@ export const _default = () => {
 	return (
 		<PanelWrapperView>
 			<Panel>
-				<ProgressiveDisclosurePanel
-					header="Progressive Disclosure Panel"
+				<ToolsPanel
+					header="Tools Panel"
 					label="Display options"
 					resetAll={ resetAll }
 				>
-					<ProgressiveDisclosurePanelItem
+					<ToolsPanelItem
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
@@ -50,8 +47,8 @@ export const _default = () => {
 							value={ height }
 							onChange={ ( next ) => setHeight( next ) }
 						/>
-					</ProgressiveDisclosurePanelItem>
-					<ProgressiveDisclosurePanelItem
+					</ToolsPanelItem>
+					<ToolsPanelItem
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
@@ -61,8 +58,8 @@ export const _default = () => {
 							value={ width }
 							onChange={ ( next ) => setWidth( next ) }
 						/>
-					</ProgressiveDisclosurePanelItem>
-				</ProgressiveDisclosurePanel>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</Panel>
 		</PanelWrapperView>
 	);

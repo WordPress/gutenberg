@@ -16,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import ProgressiveDisclosurePanelHeader from '../progressive-disclosure-panel-header';
+import ToolsPanelHeader from '../tools-panel-header';
 
 const PanelContext = createContext( {} );
 export const usePanelContext = () => useContext( PanelContext );
@@ -27,7 +27,7 @@ export const MENU_STATES = {
 	DISABLED: 'disabled',
 };
 
-const ProgressiveDisclosurePanel = ( props ) => {
+const ToolsPanel = ( props ) => {
 	const { children, className, header, label: menuLabel, resetAll } = props;
 
 	// Allow panel items to register themselves.
@@ -120,17 +120,13 @@ const ProgressiveDisclosurePanel = ( props ) => {
 		setMenuItems( resetMenuItems );
 	};
 
-	const classes = classnames(
-		'components-progressive-disclosure-panel',
-		className
-	);
-
+	const classes = classnames( 'components-tools-panel', className );
 	const panelContext = { checkMenuItem, menuItems, registerPanelItem };
 
 	return (
 		<div className={ classes }>
 			<PanelContext.Provider value={ panelContext }>
-				<ProgressiveDisclosurePanelHeader
+				<ToolsPanelHeader
 					header={ header }
 					menuLabel={ menuLabel }
 					resetAll={ resetAllItems }
@@ -142,4 +138,4 @@ const ProgressiveDisclosurePanel = ( props ) => {
 	);
 };
 
-export default ProgressiveDisclosurePanel;
+export default ToolsPanel;

@@ -40,7 +40,7 @@ export function hasPaddingValue( props ) {
 
 /**
  * Resets the padding block support attributes. This can be used when disabling
- * the padding support controls for a block via a progressive discovery panel.
+ * the padding support controls for a block via a `ToolsPanel`.
  *
  * @param {Object} props               Block props.
  * @param {Object} props.attributes    Block's attributes.

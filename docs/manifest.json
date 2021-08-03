@@ -1092,24 +1092,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "ProgressiveDisclosurePanelHeader",
-		"slug": "progressive-disclosure-panel-header",
-		"markdown_source": "../packages/components/src/progressive-disclosure-panel/progressive-disclosure-panel-header/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "ProgressiveDisclosurePanelItem",
-		"slug": "progressive-disclosure-panel-item",
-		"markdown_source": "../packages/components/src/progressive-disclosure-panel/progressive-disclosure-panel-item/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "ProgressiveDisclosurePanel",
-		"slug": "progressive-disclosure-panel",
-		"markdown_source": "../packages/components/src/progressive-disclosure-panel/progressive-disclosure-panel/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "QueryControls",
 		"slug": "query-controls",
 		"markdown_source": "../packages/components/src/query-controls/README.md",
@@ -1281,6 +1263,24 @@
 		"title": "Toolbar",
 		"slug": "toolbar",
 		"markdown_source": "../packages/components/src/toolbar/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanelHeader",
+		"slug": "tools-panel-header",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel-header/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanelItem",
+		"slug": "tools-panel-item",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel-item/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ToolsPanel",
+		"slug": "tools-panel",
+		"markdown_source": "../packages/components/src/tools-panel/tools-panel/README.md",
 		"parent": "components"
 	},
 	{

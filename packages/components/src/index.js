@@ -100,10 +100,6 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
-export {
-	ProgressiveDisclosurePanel as __experimentalProgressiveDisclosurePanel,
-	ProgressiveDisclosurePanelItem as __experimentalProgressiveDisclosurePanelItem,
-} from './progressive-disclosure-panel';
 export { default as QueryControls } from './query-controls';
 export { default as __experimentalRadio } from './radio';
 export { default as __experimentalRadioGroup } from './radio-group';
@@ -137,6 +133,10 @@ export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
+export {
+	ToolsPanel as __experimentalToolsPanel,
+	ToolsPanelItem as __experimentalToolsPanelItem,
+} from './tools-panel';
 export { default as Tooltip } from './tooltip';
 export {
 	default as __experimentalTreeGrid,

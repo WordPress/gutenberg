@@ -7,12 +7,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { MENU_STATES, usePanelContext } from '../progressive-disclosure-panel';
+import { MENU_STATES, usePanelContext } from '../tools-panel';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import DropdownMenu from '../../dropdown-menu';
 
-const ProgressiveDisclosurePanelHeader = ( props ) => {
+const ToolsPanelHeader = ( props ) => {
 	const { menuLabel, resetAll, header, toggleItem } = props;
 	const { menuItems } = usePanelContext();
 
@@ -24,7 +24,7 @@ const ProgressiveDisclosurePanelHeader = ( props ) => {
 	const hasMenuItems = !! menuItemEntries.length;
 
 	return (
-		<h2 className="components-progressive-disclosure-panel__header">
+		<h2 className="components-tools-panel__header">
 			{ header }
 			{ hasMenuItems && (
 				<DropdownMenu icon={ moreHorizontal } label={ menuLabel }>
@@ -74,4 +74,4 @@ const ProgressiveDisclosurePanelHeader = ( props ) => {
 	);
 };
 
-export default ProgressiveDisclosurePanelHeader;
+export default ToolsPanelHeader;

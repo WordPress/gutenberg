@@ -6,12 +6,11 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { MENU_STATES, usePanelContext } from '../progressive-disclosure-panel';
+import { MENU_STATES, usePanelContext } from '../tools-panel';
 
-// This wraps controls to be conditionally displayed within a progressive
-// disclosure panel. It helps prevent props being applied to HTML elements that
-// would otherwise be invalid.
-const ProgressiveDisclosurePanelItem = ( {
+// This wraps controls to be conditionally displayed within a tools panel. It
+// prevents props being applied to HTML elements that would make them invalid.
+const ToolsPanelItem = ( {
 	children,
 	hasValue,
 	isShownByDefault,
@@ -41,7 +40,7 @@ const ProgressiveDisclosurePanelItem = ( {
 	}, [ isValueSet ] );
 
 	// Note: `label` is used as a key when building menu item state in
-	// `ProgressiveDisclosurePanel`.
+	// `ToolsPanel`.
 
 	// Do not show if menu item not selected and not shown by default.
 	if ( menuItems[ label ] === MENU_STATES.UNCHECKED ) {
@@ -51,4 +50,4 @@ const ProgressiveDisclosurePanelItem = ( {
 	return children;
 };
 
-export default ProgressiveDisclosurePanelItem;
+export default ToolsPanelItem;
