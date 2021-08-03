@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { BottomSheet } from '@wordpress/components';
+import { useNavigation } from '@react-navigation/native';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 
-const HelpDetailNavigationScreen = ( { name } ) => {
+const HelpDetailNavigationScreen = ( { name, content } ) => {
 	const navigation = useNavigation();
 
 	const goBack = () => {
@@ -29,7 +29,7 @@ const HelpDetailNavigationScreen = ( { name } ) => {
 				leftButtonOnPress={ goBack }
 			/>
 			<View style={ styles.separator } />
-			<Text>Amanda todo</Text>
+			{ content }
 		</BottomSheet.NavigationScreen>
 	);
 };
