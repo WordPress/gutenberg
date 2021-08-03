@@ -6,6 +6,30 @@
  */
 
 /**
+ * Gets the contents of a template file from the theme directory.
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string The render or null.
+ */
+function get_block_template_part_from_theme( $attributes ) {
+	if ( 0 !== validate_file( $attributes['slug'] ) ) {
+		return null;
+	}
+
+	$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
+	if ( ! file_exists( $template_part_file_path ) ) {
+		$template_part_file_path = get_template_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
+	}
+
+	if ( file_exists( $template_part_file_path ) ) {
+		return _gutenberg_inject_theme_attribute_in_content( file_get_contents( $template_part_file_path ) );
+	}
+
+	return null;
+}
+
+/**
  * Renders the `core/template-part` block on the server.
  *
  * @param array $attributes The block attributes.
@@ -53,10 +77,7 @@ function render_block_core_template_part( $attributes ) {
 		} else {
 			// Else, if the template part was provided by the active theme,
 			// render the corresponding file content.
-			$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
-			if ( 0 === validate_file( $attributes['slug'] ) && file_exists( $template_part_file_path ) ) {
-				$content = _gutenberg_inject_theme_attribute_in_content( file_get_contents( $template_part_file_path ) );
-			}
+			$content = get_block_template_part_from_theme( $attributes );
 		}
 	}
 
