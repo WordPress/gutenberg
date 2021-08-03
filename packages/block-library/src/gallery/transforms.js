@@ -10,6 +10,7 @@ import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { select } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -32,6 +33,33 @@ const parseShortcodeIds = ( ids ) => {
 
 	return ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) );
 };
+
+function transformV1FormatFromThirdPartyBlocks( block ) {
+	const settings = select( blockEditorStore ).getSettings();
+	if (
+		settings.__unstableGalleryWithImageBlocks &&
+		block.name === 'core/gallery' &&
+		block.attributes?.images
+	) {
+		const innerBlocks = block.attributes.images.map( ( image ) => {
+			return createBlock( 'core/image', {
+				url: image.url,
+				id: image.id,
+			} );
+		} );
+
+		delete block.attributes.ids;
+		delete block.attributes.images;
+		block.innerBlocks = innerBlocks;
+	}
+
+	return block;
+}
+addFilter(
+	'blocks.switchToBlockType.transformedBlock',
+	'core.transformthirdpartygalleries',
+	transformV1FormatFromThirdPartyBlocks
+);
 
 const transforms = {
 	from: [
