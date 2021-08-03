@@ -47,6 +47,11 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 			<div className="edit-widgets-widget-areas__top-container">
 				<BlockIcon icon={ blockDefault } />
 				<div>
+					{ /*
+						Use dangerouslySetInnerHTML instead of <RawHTML> inside
+						the paragraph. <RawHTML> renders a <div> element, which
+						is not compatible inside <p>.
+					*/ }
 					<p dangerouslySetInnerHTML={ { __html: description } } />
 					{ widgetAreas?.length === 0 && (
 						<p>
