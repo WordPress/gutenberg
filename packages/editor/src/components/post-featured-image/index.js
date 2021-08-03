@@ -74,7 +74,7 @@ function PostFeaturedImage( {
 			// get fallbackMediaSize if mediaSize is not available
 			const fallbackMediaSize = applyFilters(
 				'editor.PostFeaturedImage.imageSize',
-				'thumbnail',
+				'full',
 				media.id,
 				currentPostId
 			);
