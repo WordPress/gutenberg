@@ -104,7 +104,9 @@ const config = {
 					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
-					automaticNameDelimiter: '-',
+					name( module, chunks, cacheGroupKey ) {
+						return `${ cacheGroupKey }-${ chunks[ 0 ].name }`;
+					},
 				},
 				default: false,
 			},
