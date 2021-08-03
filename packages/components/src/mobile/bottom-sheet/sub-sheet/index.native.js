@@ -29,11 +29,7 @@ const BottomSheetSubSheet = ( {
 		<>
 			{ showSheet && (
 				<Fill>
-					<SafeAreaView>
-						{ () => {
-							return children;
-						} }
-					</SafeAreaView>
+					<SafeAreaView>{ children }</SafeAreaView>
 				</Fill>
 			) }
 			{ Children.count( children ) > 0 && navigationButton }
