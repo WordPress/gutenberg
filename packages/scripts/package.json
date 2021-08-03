@@ -55,7 +55,6 @@
 		"eslint-plugin-markdown": "^2.2.0",
 		"expect-puppeteer": "^4.4.0",
 		"filenamify": "^4.2.0",
-		"ignore-emit-webpack-plugin": "^2.0.6",
 		"jest": "^26.6.3",
 		"jest-circus": "^26.6.3",
 		"jest-dev-server": "^4.4.0",
@@ -81,8 +80,7 @@
 		"webpack": "^5.47.1",
 		"webpack-bundle-analyzer": "^4.4.2",
 		"webpack-cli": "^4.7.2",
-		"webpack-livereload-plugin": "^3.0.1",
-		"webpack-sources": "^3.2.0"
+		"webpack-livereload-plugin": "^3.0.1"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
--   The bundled `webpack-sources` dependency has been updated from requiring `^2.2.0` to requiring `^3.2.0` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
-
 ## 3.0.0 (2021-01-21)
 
 ### Breaking Changes
