@@ -230,6 +230,12 @@
 					"customRadius": true
 				}
 			},
+			"core/cover": {
+				"spacing": {
+					"customMargin": true,
+					"customPadding": true
+				}
+			},
 			"core/pullquote": {
 				"border": {
 					"customColor": true,
