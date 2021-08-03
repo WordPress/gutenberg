@@ -21,6 +21,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.FocalPointPickerTooltipShownCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.BlockTypeImpressionsCallback;
 import org.wordpress.mobile.WPAndroidGlue.DeferredEventEmitter;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
@@ -402,5 +403,24 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     public void notifyModalClosed() {
         emitToJS(EVENT_NAME_NOTIFY_MODAL_CLOSED, null);
+    }
+
+    @ReactMethod
+    public void requestBlockTypeImpressions(final Callback jsCallback) {
+        BlockTypeImpressionsCallback blockTypeImpressionsCallback = requestBlockTypeImpressionsCallback(jsCallback);
+        mGutenbergBridgeJS2Parent.requestBlockTypeImpressions(blockTypeImpressionsCallback);
+    }
+
+    private BlockTypeImpressionsCallback requestBlockTypeImpressionsCallback(final Callback jsCallback) {
+        return new GutenbergBridgeJS2Parent.BlockTypeImpressionsCallback() {
+            @Override public void onRequestBlockTypeImpressions(ReadableMap impressions) {
+                jsCallback.invoke(impressions);
+            }
+        };
+    }
+
+    @ReactMethod
+    public void setBlockTypeImpressions(final ReadableMap impressions) {
+        mGutenbergBridgeJS2Parent.setBlockTypeImpressions(impressions);
     }
 }

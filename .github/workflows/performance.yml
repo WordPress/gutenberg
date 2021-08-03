@@ -69,4 +69,5 @@ jobs:
               if: github.event_name == 'push'
               env:
                   COMMITTED_AT: ${{ steps.commit-timestamp.outputs.result }}
-              run: ./bin/log-perormance-results.js trunk $GITHUB_SHA wp/5.8 $COMMITTED_AT
+                  CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
+              run: ./bin/log-perormance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA wp/5.8 $COMMITTED_AT

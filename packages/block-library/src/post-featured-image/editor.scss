@@ -25,3 +25,15 @@ div[data-type="core/post-featured-image"] {
 		}
 	}
 }
+
+// TODO this is temp styles.
+.block-library-post-featured-image-scale-controls {
+	margin-top: $grid-unit-20;
+	.components-flex {
+		border: $border-width solid $gray-700;
+	}
+	button {
+		width: 100%;
+		display: block;
+	}
+}

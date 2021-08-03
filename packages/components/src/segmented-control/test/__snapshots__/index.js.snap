@@ -30,7 +30,7 @@ exports[`SegmentedControl should render correctly 1`] = `
 
 .emotion-0:focus-within {
   border-color: var( --wp-admin-theme-color-darker-10, #007cba);
-  box-shadow: 0 0 0,0.5px,var( --wp-admin-theme-color, #00669b);
+  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
   outline: none;
   z-index: 1;
 }

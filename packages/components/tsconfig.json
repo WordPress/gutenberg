@@ -35,6 +35,7 @@
 		"src/h-stack/**/*",
 		"src/heading/**/*",
 		"src/icon/**/*",
+		"src/item-group/**/*",
 		"src/scroll-lock/**/*",
 		"src/scrollable/**/*",
 		"src/segmented-control/**/*",

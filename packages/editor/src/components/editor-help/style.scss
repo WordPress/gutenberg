@@ -35,3 +35,32 @@
 .bottomSheetHeaderTitleDark {
 	color: $dark-primary;
 }
+
+.helpDetailContainer {
+	width: 100%;
+	padding: 0;
+	height: 100%;
+}
+
+.helpDetailImage {
+	width: 100%;
+	margin-bottom: 16px;
+}
+
+.helpDetailTitle {
+	font-weight: 700;
+	font-size: 28px;
+	padding: 16px;
+}
+
+.helpDetailSectionHeading {
+	font-weight: 600;
+	font-size: 16px;
+	padding: 0 16px 16px 16px;
+}
+
+.helpDetailBody {
+	width: 100%;
+	padding: 0 16px 16px 16px;
+	font-size: 16px;
+}

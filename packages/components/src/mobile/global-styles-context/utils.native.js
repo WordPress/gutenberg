@@ -124,6 +124,10 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 	let stylesBase = styles;
 	const variables = [ 'preset', 'custom' ];
 
+	if ( ! stylesBase ) {
+		return styles;
+	}
+
 	variables.forEach( ( variable ) => {
 		// Examples
 		// var(--wp--preset--color--gray)
@@ -156,9 +160,10 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 }
 
 export function getMappedValues( features, palette ) {
+	const colors = { ...palette?.theme, ...palette?.user };
 	const mappedValues = {
 		color: {
-			values: palette?.theme,
+			values: colors,
 			slug: 'color',
 		},
 		'font-size': {
@@ -170,7 +175,7 @@ export function getMappedValues( features, palette ) {
 }
 
 export function getGlobalStyles( rawStyles, rawFeatures ) {
-	const features = JSON.parse( rawFeatures );
+	const features = rawFeatures ? JSON.parse( rawFeatures ) : {};
 	const mappedValues = getMappedValues( features, features?.color?.palette );
 	const colors = parseStylesVariables(
 		JSON.stringify( features?.color ),
@@ -181,7 +186,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 		mappedValues
 	);
 	const customValues = parseStylesVariables(
-		JSON.stringify( features.custom ),
+		JSON.stringify( features?.custom ),
 		mappedValues
 	);
 	const globalStyles = parseStylesVariables(

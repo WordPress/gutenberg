@@ -890,7 +890,7 @@ export function isPreviewingPost( state ) {
 	if ( ! isSavingPost( state ) ) {
 		return false;
 	}
-	return !! state.saving.options.isPreview;
+	return !! get( state.saving, [ 'options', 'isPreview' ] );
 }
 
 /**

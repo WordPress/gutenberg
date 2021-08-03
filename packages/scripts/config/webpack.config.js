@@ -20,6 +20,7 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 const {
 	getPackageProp,
 	hasBabelConfig,
+	hasCssnanoConfig,
 	hasPostCSSConfig,
 } = require( '../utils' );
 const FixStyleWebpackPlugin = require( './fix-style-webpack-plugin' );
@@ -48,7 +49,26 @@ const cssLoaders = [
 			...( ! hasPostCSSConfig() && {
 				postcssOptions: {
 					ident: 'postcss',
-					plugins: postcssPlugins,
+					sourceMap: ! isProduction,
+					plugins: isProduction
+						? [
+								...postcssPlugins,
+								require( 'cssnano' )( {
+									// Provide a fallback configuration if there's not
+									// one explicitly available in the project.
+									...( ! hasCssnanoConfig() && {
+										preset: [
+											'default',
+											{
+												discardComments: {
+													removeAll: true,
+												},
+											},
+										],
+									} ),
+								} ),
+						  ]
+						: postcssPlugins,
 				},
 			} ),
 		},
