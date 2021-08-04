@@ -13,7 +13,12 @@ import {
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
+import {
+	AXIAL_SIDES,
+	SPACING_SUPPORT_KEY,
+	useCustomSides,
+	useIsDimensionsSupportValid,
+} from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -69,7 +74,9 @@ export function resetMargin( { attributes = {}, setAttributes } ) {
  */
 export function useIsMarginDisabled( { name: blockName } = {} ) {
 	const isDisabled = ! useSetting( 'spacing.customMargin' );
-	return ! hasMarginSupport( blockName ) || isDisabled;
+	const isInvalid = ! useIsDimensionsSupportValid( blockName, 'margin' );
+
+	return ! hasMarginSupport( blockName ) || isDisabled || isInvalid;
 }
 
 /**
@@ -97,8 +104,7 @@ export function MarginEdit( props ) {
 	} );
 	const sides = useCustomSides( blockName, 'margin' );
 	const splitOnAxis =
-		sides &&
-		( sides.includes( 'horizontal' ) || sides.includes( 'vertical' ) );
+		sides && sides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 
 	if ( useIsMarginDisabled( props ) ) {
 		return null;

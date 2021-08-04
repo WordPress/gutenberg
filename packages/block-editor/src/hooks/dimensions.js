@@ -30,6 +30,8 @@ import {
 import { cleanEmptyObject } from './utils';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
+export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
 /**
  * Inspector controls for dimensions support.
@@ -151,4 +153,32 @@ export function useCustomSides( blockName, feature ) {
 	}
 
 	return support[ feature ];
+}
+
+/**
+ * Custom hook to determine whether the sides configured in the
+ * block support are valid. A spacing property cannot declare
+ * support for a mix of axial and individual sides.
+ *
+ * @param {string} blockName Block name.
+ * @param {string} feature   The feature custom sides relate to e.g. padding or margins.
+ *
+ * @return {boolean} If the feature has a valid configuration of sides.
+ */
+export function useIsDimensionsSupportValid( blockName, feature ) {
+	const sides = useCustomSides( blockName, feature );
+
+	if (
+		sides &&
+		sides.some( ( side ) => ALL_SIDES.includes( side ) ) &&
+		sides.some( ( side ) => AXIAL_SIDES.includes( side ) )
+	) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`The ${ feature } support for the "${ blockName }" block can not be configured to support both axial and arbitrary sides.`
+		);
+		return false;
+	}
+
+	return true;
 }
