@@ -48,12 +48,11 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 			<div className="edit-widgets-widget-areas__top-container">
 				<BlockIcon icon={ blockDefault } />
 				<div>
-					{ /*
-						Use dangerouslySetInnerHTML instead of <RawHTML> inside
-						the paragraph. <RawHTML> renders a <div> element, which
-						is not compatible inside <p>.
-					*/ }
 					<p
+						// Use `dangerouslySetInnerHTML` to keep backwards
+						// compatibility. Basic markup in the description is an
+						// established feature of WordPress.
+						// @see https://github.com/WordPress/gutenberg/issues/33106
 						dangerouslySetInnerHTML={ {
 							__html: safeHTML( description ),
 						} }
