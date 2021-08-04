@@ -7,6 +7,7 @@ import { registerBlockType } from '@wordpress/blocks';
  * Internal dependencies
  */
 import * as legacyWidget from './blocks/legacy-widget';
+import * as widgetBox from './blocks/widget-box';
 
 export * from './components';
 export * from './utils';
@@ -21,6 +22,11 @@ export * from './utils';
  */
 export function registerLegacyWidgetBlock() {
 	const { metadata, settings, name } = legacyWidget;
+	registerBlockType( { name, ...metadata }, settings );
+}
+
+export function registerWidgetBoxBlock() {
+	const { metadata, settings, name } = widgetBox;
 	registerBlockType( { name, ...metadata }, settings );
 }
 
