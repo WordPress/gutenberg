@@ -26,7 +26,6 @@ const EmbedPreview = ( {
 	insertBlocksAfter,
 	isSelected,
 	label,
-	onBlur,
 	onFocus,
 	preview,
 	previewable,
@@ -123,7 +122,6 @@ const EmbedPreview = ( {
 					clientId={ clientId }
 					insertBlocksAfter={ insertBlocksAfter }
 					isSelected={ isCaptionSelected }
-					onBlur={ onBlur }
 					onFocus={ onFocusCaption }
 				/>
 			</View>
