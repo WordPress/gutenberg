@@ -63,14 +63,6 @@ const ToolsPanel = ( props ) => {
 		const wasChecked = menuItems[ label ] === MENU_STATES.CHECKED;
 		const panelItem = panelItems.find( ( item ) => item.label === label );
 
-		if ( wasChecked && panelItem?.onDeselect ) {
-			panelItem.onDeselect();
-		}
-
-		if ( ! wasChecked && panelItem?.onSelect ) {
-			panelItem.onSelect();
-		}
-
 		let menuItemState = wasChecked
 			? MENU_STATES.UNCHECKED
 			: MENU_STATES.CHECKED;

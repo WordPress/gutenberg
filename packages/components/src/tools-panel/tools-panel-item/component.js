@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { usePrevious } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -16,8 +17,8 @@ const ToolsPanelItem = ( {
 	hasValue,
 	isShownByDefault,
 	label,
-	onDeselect,
-	onSelect,
+	onDeselect = () => undefined,
+	onSelect = () => undefined,
 } ) => {
 	const {
 		checkMenuItem,
@@ -32,8 +33,6 @@ const ToolsPanelItem = ( {
 			hasValue,
 			isShownByDefault,
 			label,
-			onDeselect,
-			onSelect,
 		} );
 	}, [] );
 
@@ -47,6 +46,25 @@ const ToolsPanelItem = ( {
 
 	// Note: `label` is used as a key when building menu item state in
 	// `ToolsPanel`.
+	const isMenuItemChecked = menuItems[ label ] === MENU_STATES.CHECKED;
+	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
+
+	useEffect( () => {
+		// If the panel's menu item is now checked but wasn't previously and
+		// we don't have a current value, consider the menu item has just been
+		// selected.
+		if (
+			isMenuItemChecked &&
+			! isValueSet &&
+			wasMenuItemChecked === false
+		) {
+			onSelect();
+		}
+
+		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
+			onDeselect();
+		}
+	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet ] );
 
 	// Do not show if menu item not selected and not shown by default.
 	if ( menuItems[ label ] === MENU_STATES.UNCHECKED ) {

@@ -106,7 +106,7 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	return (
 		<ToolsPanel
 			label={ __( 'Dimensions options' ) }
-			title={ __( 'Dimensions' ) }
+			header={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 		>
 			{ showPaddingControl && (
