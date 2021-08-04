@@ -31,6 +31,9 @@ const observeAndResizeJS = `
 		function sendResize() {
 			var clientBoundingRect = document.body.getBoundingClientRect();
 
+			// The function postMessage is exposed by the react-native-webview library 
+			// to communicate between React Native and the WebView, in this case, 
+			// we use it for notifying resize changes.
             window.ReactNativeWebView.postMessage(JSON.stringify( {
                 action: 'resize',
 				width: clientBoundingRect.width,
