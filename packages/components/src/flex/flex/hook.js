@@ -112,7 +112,7 @@ export function useFlex( props ) {
 				${ rtl( {
 					marginLeft: ! isColumn && isReverse ? 0 : undefined,
 					marginRight: ! isColumn && ! isReverse ? 0 : undefined,
-				} )() }
+				} ) }
 			}
 		`;
 
