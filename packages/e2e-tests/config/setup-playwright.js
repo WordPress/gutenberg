@@ -168,20 +168,11 @@ export async function trashExistingPosts( postType = 'post' ) {
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
 beforeAll( async () => {
-	const originalWaitForSelector = page.waitForSelector;
 	page.$x = page.$$;
 	page.select = page.selectOption;
-	page.waitForXPath = ( selector, options ) => {
-		return originalWaitForSelector.call(
-			page,
-			'xpath=' + selector,
-			options
-		);
-	};
+	page.waitForXPath = page.waitForSelector;
 	page.waitFor = page.waitForTimeout;
-	page.waitForSelector = ( selector, options ) => {
-		return originalWaitForSelector.call( page, 'css=' + selector, options );
-	};
+	page.cookies = () => page.context().cookies();
 	await setupBrowser();
 	await enablePageDialogAccept();
 	await observeConsoleLogging();

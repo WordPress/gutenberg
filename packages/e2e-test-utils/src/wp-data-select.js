@@ -20,13 +20,11 @@
  */
 export async function wpDataSelect( store, selector, ...parameters ) {
 	return page.evaluate(
-		( _store, _selector, ..._parameters ) => {
+		( args ) => {
 			return window.wp.data
-				.select( _store )
-				[ _selector ]( ..._parameters );
+				.select( args.store )
+				[ args.selector ]( ...args.parameters );
 		},
-		store,
-		selector,
-		...parameters
+		{ store, selector, parameters }
 	);
 }

@@ -91,13 +91,12 @@ async function emulateSelectAll() {
  */
 export async function setClipboardData( { plainText = '', html = '' } ) {
 	await page.evaluate(
-		( _plainText, _html ) => {
+		( args ) => {
 			window._clipboardData = new DataTransfer();
-			window._clipboardData.setData( 'text/plain', _plainText );
-			window._clipboardData.setData( 'text/html', _html );
+			window._clipboardData.setData( 'text/plain', args.plainText );
+			window._clipboardData.setData( 'text/html', args.html );
 		},
-		plainText,
-		html
+		{ plainText, html }
 	);
 }
 

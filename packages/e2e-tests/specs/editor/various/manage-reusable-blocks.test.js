@@ -45,7 +45,7 @@ describe( 'Managing reusable blocks', () => {
 			'greeting-reusable-block.json'
 		);
 		const input = await page.$( '.list-reusable-blocks-import-form input' );
-		await input.uploadFile( testReusableBlockFile );
+		await input.setInputFiles( testReusableBlockFile );
 
 		// Submit the form
 		const button = await page.$(

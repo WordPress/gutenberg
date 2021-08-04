@@ -46,7 +46,7 @@ describe( 'changing image size', () => {
 		const filename = uuid();
 		const tmpFileName = path.join( os.tmpdir(), filename + '.jpg' );
 		fs.copyFileSync( testImagePath, tmpFileName );
-		await inputElement.uploadFile( tmpFileName );
+		await inputElement.setInputFiles( tmpFileName );
 
 		// Wait for upload to finish.
 		await page.waitForSelector(
