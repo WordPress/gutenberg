@@ -8,11 +8,18 @@ Integration testing is defined as a type of testing where different parts are te
 
 A test can be structured with the following parts:
 
--   Set up
--   Rendering
--   Query elements + Fire events
--   Expect correct element behaviour
--   Cleanup
+-   [Setup](#setup)
+-   [Rendering](#rendering)
+-   [Query elements](#query-elements)
+-   [Fire events](#fire-events)
+-   [Expect correct element behaviour](#expect-correct-element-behaviour)
+-   [Cleanup](#cleanup)
+
+We also include examples of common tasks as well as tips in the following sections:
+
+-   [Common flows](#common-flows)
+-   [Tools](#tools)
+-   [Common pitfalls and caveats](#common-pitfalls-and-caveats)
 
 ## Setup
 
@@ -113,7 +120,7 @@ const radiusSlider = getByTestId( 'Slider Border Radius' );
 
 Note that either a plain string or a regular expression can be passed into these queries. A regular expression is best for querying part of a string (e.g. any element whose accessibility label contains `Unsupported Block. Row 1`). Note that special characters such as `.` need to be escaped.
 
-## Use of `waitFor`
+### Use of `waitFor`
 
 After rendering the components or firing an event, side effects might happen due to potential state updates so the element we’re looking for might not be yet rendered. In this case, we would need to wait for the element to be available and for this purpose, we can use the `waitFor` function, which periodically executes the provided callback to determine whether the element appeared or not.
 
@@ -141,7 +148,7 @@ In most cases we’ll use the `waitFor` function, but it’s important to note t
 
 NOTE: The `react-native-testing-library` package provides the `query*` and `find*` functions for this purpose too, but we should avoid using them for now because there’s a [known issue](https://github.com/callstack/react-native-testing-library/issues/379) that would make the test fail.
 
-## `within` queries
+### `within` queries
 
 It’s also possible to query elements contained in other elements via the `within` function, here is an example:
 
@@ -208,9 +215,9 @@ afterAll( () => {
 } );
 ```
 
-# Common flows
+## Common flows
 
-## Query a block
+### Query a block
 
 A common way to query a block is by its accessibility label, here is an example:
 
@@ -222,7 +229,7 @@ getByA11yLabel( /Spacer Block\. Row 1/ )
 
 For further information about the accessibility label of a block, you can check the code of the [function `getAccessibleBlockLabel`](https://github.com/WordPress/gutenberg/blob/520cbd9d2af4bbc275d388edf92a6cadb685de56/packages/blocks/src/api/utils.js#L167-L234).
 
-## Add a block
+### Add a block
 
 Here is an example of how to insert a Paragraph block:
 
@@ -244,7 +251,7 @@ fireEvent.scroll( blockList, {
 fireEvent.press( await waitFor( () => getByText( `Paragraph` ) ) );
 ```
 
-## Open block settings
+### Open block settings
 
 The block settings can be accessed by tapping the "Open Settings" button after selecting the block, here is an example:
 
@@ -257,7 +264,7 @@ const settingsButton = await waitFor( () =>
 fireEvent.press( settingsButton );
 ```
 
-### Using the Scoped Component approach
+#### Using the Scoped Component approach
 
 When using the scoped component approach, we need first to render the `SlotFillProvider` and the `BottomSheetSettings` (note that we’re passing the `isVisible` prop to force the bottom sheet to be displayed) along with the block:
 
@@ -272,7 +279,7 @@ See examples:
 
 -   [Cover block](https://github.com/WordPress/gutenberg/blob/b403b977b029911f46247012fa2dcbc42a5aa3cf/packages/block-library/src/cover/test/edit.native.js#L37-L42)
 
-## FlatList items
+### FlatList items
 
 The `FlatList` component renders its items depending on the scroll position, the view and content size. This means that when rendering this component it might happen that some of the items can’t be queried because they haven’t been rendered yet. To address this issue we have to explicitly fire an event to make the `FlatList` render all the items.
 
@@ -290,7 +297,7 @@ fireEvent.scroll( blockList, {
 } );
 ```
 
-## Sliders
+### Sliders
 
 Sliders found in bottom sheets should be queried using their `testID`:
 
@@ -303,7 +310,7 @@ fireEvent( radiusSlider, 'valueChange', '30' );
 
 Note that a slider’s `testID` is "Slider " + label. So for a slider with a label of "Border Radius", `testID` is "Slider Border Radius".
 
-## Selecting an inner block
+### Selecting an inner block
 
 One caveat when adding blocks is that if they contain inner blocks, these inner blocks are not rendered. The following example shows how we can make a Buttons block render its inner Button blocks (assumes we’ve already obtained a reference to the Buttons block as `buttonsBlock`):
 
@@ -325,31 +332,31 @@ const buttonInnerBlock = await waitFor( () =>
 fireEvent.press( buttonInnerBlock );
 ```
 
-# Tools
+## Tools
 
-## Using the Accessibility Inspector
+### Using the Accessibility Inspector
 
 If you have trouble locating an element’s identifier, you may wish to use Xcode’s Accessibility Inspector. Most identifiers are cross-platform, so even though the tests are run on Android by default, the Accessibility Inspector can be used to find the right identifier.
 
 <img src="../../assets/xcode-accessibility-inspector-screenshot.png" width="500" alt="Screenshot of the Xcode Accessibility Inspector app. The screenshot shows how to choose the correct target in the device dropdown, enable target mode, and locate accessibility labels after tapping on screen elements"/>
 
-# Common pitfalls and caveats
+## Common pitfalls and caveats
 
-## False positives when omitting `await` before `waitFor` function
+### False positives when omitting `await` before `waitFor` function
 
-Omitting the `await` before a `waitFor` can lead to scenarios where tests pass but are not testing the intended behavior. For example, if `toBeDefined` is used to assert the result of a call to `waitFor`, the assertion will pass because `waitFor` returns a value, even though it’s not the `ReactTestInstance` we meant to check for.
+Omitting the `await` before a `waitFor` can lead to scenarios where tests pass but are not testing the intended behaviour. For example, if `toBeDefined` is used to assert the result of a call to `waitFor`, the assertion will pass because `waitFor` returns a value, even though it’s not the `ReactTestInstance` we meant to check for.
 
-## `waitFor` timeout
+### `waitFor` timeout
 
 The default timeout for the `waitFor` function is set to 1000 ms, so far this value is enough for all the render logic we’re testing, however, if while testing we notice that an element requires more time to be rendered we should increase it.
 
-## Replace current UI unit tests
+### Replace current UI unit tests
 
 Some components already have unit tests that cover component rendering, although it’s not mandatory, in these cases, it would be nice to analyze the potential migration to an integration test.
 
 In case we want to keep both, we’ll add the word "integration" to the integration test file to avoid naming conflicts, here is an example: [packages/block-library/src/missing/test/edit-integration.native.js](https://github.com/WordPress/gutenberg/blob/9201906891a68ca305daf7f8b6cd006e2b26291e/packages/block-library/src/missing/test/edit-integration.native.js).
 
-## Platform selection
+### Platform selection
 
 By default, all tests run in Jest use the Android platform, so in case we need to test a specific behaviour related to a different platform, we would need to support platform test files.
 
