@@ -148,7 +148,7 @@ export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
 
 	// Skip when setting is boolean as theme isn't setting arbitrary sides.
-	if ( typeof support[ feature ] === 'boolean' ) {
+	if ( typeof support?.[ feature ] === 'boolean' ) {
 		return;
 	}
 
@@ -157,7 +157,7 @@ export function useCustomSides( blockName, feature ) {
 
 /**
  * Custom hook to determine whether the sides configured in the
- * block support are valid. A spacing property cannot declare
+ * block support are valid. A dimension property cannot declare
  * support for a mix of axial and individual sides.
  *
  * @param {string} blockName Block name.
