@@ -187,8 +187,17 @@ export const ThumbWrapper = styled.span`
 const thumbFocus = ( { isFocused } ) => {
 	return isFocused
 		? css`
-				outline: solid 1px var( --wp-admin-theme-color );
-				outline-offset: 2px;
+				&::before {
+					content: ' ';
+					position: absolute;
+					background-color: transparent;
+					box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+					border-radius: 50%;
+					height: ${ thumbSize + 4 }px;
+					width: ${ thumbSize + 4 }px;
+					top: -2px;
+					left: -2px;
+				}
 		  `
 		: '';
 };
