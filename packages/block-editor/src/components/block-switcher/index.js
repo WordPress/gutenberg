@@ -12,6 +12,7 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	ToolbarItem,
+	Slot,
 } from '@wordpress/components';
 import {
 	switchToBlockType,
@@ -21,6 +22,7 @@ import {
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { stack } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -89,6 +91,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
+	// states to add dot to the reusable block toolbar, if the reusable block has changes
+	const [ reusableBlockHasDot, setReusableBlockHasDot ] = useState( false );
+
 	// Simple block tranformation based on the `Block Transforms` API.
 	const onBlockTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
@@ -133,6 +138,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		hasBlockStyles ||
 		hasPossibleBlockTransformations ||
 		hasPatternTransformation;
+
 	return (
 		<ToolbarGroup>
 			<ToolbarItem>
@@ -147,6 +153,18 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						} }
 						icon={
 							<>
+								{ /* Update the reusableBlockHasDot state in BlockHasDot using Slot/Fill to update to add dot to reusable block toolbar if it has edit.  */ }
+								<Slot
+									name="reusable-block-toolbar-has-dot"
+									fillProps={ {
+										setReusableBlockHasDot,
+									} }
+								></Slot>
+								{ /* Add dot to the reusable block toolbar if resuable block has edits. */ }
+								{ isReusable && reusableBlockHasDot && (
+									<div className="reusable-block-toolbar-has-dot"></div>
+								) }
+
 								<BlockIcon
 									icon={ icon }
 									className="block-editor-block-switcher__toggle"

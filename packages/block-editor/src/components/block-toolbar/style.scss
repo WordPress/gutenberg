@@ -54,7 +54,8 @@
 	}
 }
 
-.block-editor-block-contextual-toolbar.block-has-changes:not(.is-fixed) {
+// move contextual toolbar to right
+.block-editor-block-contextual-toolbar.parent-block-has-changes:not(.is-fixed) {
 	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-30});
 
 	.show-icon-labels & {

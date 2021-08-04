@@ -110,6 +110,7 @@ export { default as BlockSettingsMenuControls } from './block-settings-menu-cont
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as BlockTools } from './block-tools';
+export { default as BlockHasDot } from './block-has-dot';
 export {
 	default as CopyHandler,
 	useClipboardHandler as __unstableUseClipboardHandler,

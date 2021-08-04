@@ -21,11 +21,13 @@ import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	__experimentalBlockContentOverlay as BlockContentOverlay,
+	BlockHasDot,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
@@ -67,6 +69,37 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		},
 		[ ref, clientId ]
 	);
+
+	const {
+		parentReusableBlockHasEdits,
+		selectedReusableBlockHasEdits,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockParents,
+			getSelectedBlockClientId,
+			getBlockAttributes,
+		} = select( blockEditorStore );
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const _selectedBlockRef = getBlockAttributes( selectedBlockClientId )
+			?.ref;
+		// check if the selected reusable block has edits
+		const _selectedblockHasEdits = select(
+			coreStore
+		).hasEditsForEntityRecord( 'postType', 'wp_block', _selectedBlockRef );
+
+		const parents = getBlockParents( selectedBlockClientId );
+		const _firstParentClientId = parents[ parents.length - 1 ];
+		const _parentBlockRef = getBlockAttributes( _firstParentClientId )?.ref;
+		// check if the parent reusable block has edits
+		const _parentblockHasEdits = select(
+			coreStore
+		).hasEditsForEntityRecord( 'postType', 'wp_block', _parentBlockRef );
+
+		return {
+			parentReusableBlockHasEdits: _parentblockHasEdits,
+			selectedReusableBlockHasEdits: _selectedblockHasEdits,
+		};
+	}, [] );
 
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
@@ -156,6 +189,13 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	return (
 		<RecursionProvider>
 			<div { ...blockProps }>
+				{ /* Adds a dot to the parent selector and the reusable block toolbar when Reusable block has edits. */ }
+				<BlockHasDot
+					parentReusableBlockHasEdits={ parentReusableBlockHasEdits }
+					selectedReusableBlockHasEdits={
+						selectedReusableBlockHasEdits
+					}
+				/>
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton

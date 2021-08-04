@@ -149,6 +149,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+<a name="BlockHasDot" href="#BlockHasDot">#</a> **BlockHasDot**
+
+Undocumented declaration.
+
 <a name="BlockIcon" href="#BlockIcon">#</a> **BlockIcon**
 
 Undocumented declaration.

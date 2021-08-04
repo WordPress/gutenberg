@@ -7,11 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, Slot } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,46 +30,34 @@ export default function BlockParentSelector() {
 	const { selectBlock, toggleBlockHighlight } = useDispatch(
 		blockEditorStore
 	);
-	const {
-		firstParentClientId,
-		shouldHide,
-		hasReducedUI,
-		reusableBlockHasEdits,
-	} = useSelect( ( select ) => {
-		const {
-			getBlockName,
-			getBlockParents,
-			getSelectedBlockClientId,
-			getSettings,
-			getBlockAttributes,
-		} = select( blockEditorStore );
-		const { hasBlockSupport } = select( blocksStore );
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const parents = getBlockParents( selectedBlockClientId );
-		const _firstParentClientId = parents[ parents.length - 1 ];
-		const parentBlockName = getBlockName( _firstParentClientId );
-		const _parentBlockType = getBlockType( parentBlockName );
-		const settings = getSettings();
-		const parentBlockRef = getBlockAttributes( _firstParentClientId )?.ref;
-		const blockHasEdits = select( coreStore ).hasEditsForEntityRecord(
-			'postType',
-			'wp_block',
-			parentBlockRef
-		);
-		const _reusableBlockHasEdits =
-			blockHasEdits && parentBlockName === 'core/block';
+	const { firstParentClientId, shouldHide, hasReducedUI } = useSelect(
+		( select ) => {
+			const {
+				getBlockName,
+				getBlockParents,
+				getSelectedBlockClientId,
+				getSettings,
+			} = select( blockEditorStore );
+			const { hasBlockSupport } = select( blocksStore );
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const parents = getBlockParents( selectedBlockClientId );
+			const _firstParentClientId = parents[ parents.length - 1 ];
+			const parentBlockName = getBlockName( _firstParentClientId );
+			const _parentBlockType = getBlockType( parentBlockName );
+			const settings = getSettings();
 
-		return {
-			firstParentClientId: _firstParentClientId,
-			shouldHide: ! hasBlockSupport(
-				_parentBlockType,
-				'__experimentalParentSelector',
-				true
-			),
-			hasReducedUI: settings.hasReducedUI,
-			reusableBlockHasEdits: _reusableBlockHasEdits,
-		};
-	}, [] );
+			return {
+				firstParentClientId: _firstParentClientId,
+				shouldHide: ! hasBlockSupport(
+					_parentBlockType,
+					'__experimentalParentSelector',
+					true
+				),
+				hasReducedUI: settings.hasReducedUI,
+			};
+		},
+		[]
+	);
 	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 
 	// Allows highlighting the parent block outline when focusing or hovering
@@ -86,12 +73,17 @@ export default function BlockParentSelector() {
 		},
 	} );
 
+	// states to check reusable block edits
+	const [ reusableBlockHasEdits, setReusableBlockHasEdits ] = useState(
+		false
+	);
+
 	if ( shouldHide || firstParentClientId === undefined ) {
 		return null;
 	}
 
 	const classes = classnames( 'block-editor-block-parent-selector', {
-		'block-has-changes': reusableBlockHasEdits,
+		'parent-block-has-changes': reusableBlockHasEdits,
 	} );
 
 	return (
@@ -101,7 +93,18 @@ export default function BlockParentSelector() {
 			ref={ nodeRef }
 			{ ...showMoversGestures }
 		>
-			{ reusableBlockHasEdits && <div className="has-changes-dot"></div> }
+			{ /* Update the reusableBlockHasEdits state in BlockHasDot using Slot/Fill to update the parent-selector classes and to add dot to parent selector.  */ }
+			<Slot
+				name="parent-selector-has-dot"
+				fillProps={ {
+					setReusableBlockHasEdits,
+				} }
+			></Slot>
+			{ /* Add dot to the parent selector if it is a reusable block and if the reusable block has edits. */ }
+			{ reusableBlockHasEdits && (
+				<div className="block-parent-selector-has-dot"></div>
+			) }
+
 			<ToolbarButton
 				className="block-editor-block-parent-selector__button"
 				onClick={ () => selectBlock( firstParentClientId ) }
