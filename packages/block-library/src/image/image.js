@@ -139,7 +139,7 @@ export default function Image( {
 				...settings,
 				getBlock: _getBlock,
 				canInsertCover:
-					transformations?.length &&
+					transformations?.length > 0 &&
 					!! transformations.find(
 						( { name } ) => name === 'core/cover'
 					),
