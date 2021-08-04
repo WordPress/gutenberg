@@ -206,7 +206,8 @@ describe( 'Post Editor Performance', () => {
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
-		for ( let j = 0; j < 10; j++ ) {
+		await paragraphs[ 0 ].click();
+		for ( let j = 1; j <= 10; j++ ) {
 			// Wait for the browser to be idle before starting the monitoring.
 			// eslint-disable-next-line no-restricted-syntax
 			await page.waitForTimeout( 200 );
