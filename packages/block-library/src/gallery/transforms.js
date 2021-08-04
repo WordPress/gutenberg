@@ -46,9 +46,9 @@ const parseShortcodeIds = ( ids ) => {
  * @typedef  {Object} Block
  * @property {Attributes} attributes The attributes of the block.
  * @param    {Block}      block      The transformed block.
- * @return   {string}     The internal widget id.
+ * @return   {Block}     			 The transformed block.
  */
-function transformV1FormatFromThirdPartyBlocks( block ) {
+function updateThirdPartyTransformToGallery( block ) {
 	const settings = select( blockEditorStore ).getSettings();
 	if (
 		settings.__unstableGalleryWithImageBlocks &&
@@ -71,8 +71,53 @@ function transformV1FormatFromThirdPartyBlocks( block ) {
 }
 addFilter(
 	'blocks.switchToBlockType.transformedBlock',
-	'core/gallery/transform-third-party',
-	transformV1FormatFromThirdPartyBlocks
+	'core/gallery/update-third-party-transform-to',
+	updateThirdPartyTransformToGallery
+);
+
+/**
+ * Third party block plugins don't have an easy way to detect if the
+ * innerBlocks version of the Gallery is running when they run a
+ * 3rdPartyBlock -> GallaryBlock transform so this tranform filter
+ * will handle this. Once the innerBlocks version is the default
+ * in a core release, this could be deprecated and removed after
+ * plugin authors have been given time to update transforms.
+ *
+ * @typedef  {Object} Attributes
+ * @typedef  {Object} Block
+ * @property {Attributes} attributes The attributes of the block.
+ * @param    {Block}      toBlock    The block yo transform to.
+ * @param    {Block[]}    fromBlocks The block yo transform to.
+ * @return   {Block}                 The transformed block.
+ */
+function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
+	const settings = select( blockEditorStore ).getSettings();
+	const galleryBlock = fromBlocks.find(
+		( transformedBlock ) =>
+			transformedBlock.name === 'core/gallery' &&
+			transformedBlock.innerBlocks.length > 0 &&
+			! toBlock.name.includes( 'core/' )
+	);
+
+	if ( settings.__unstableGalleryWithImageBlocks && galleryBlock ) {
+		const images = galleryBlock.innerBlocks.map(
+			( { attributes: { url, id } } ) => ( {
+				url,
+				id,
+			} )
+		);
+		const ids = images.map( ( { id } ) => id );
+		galleryBlock.attributes.images = images;
+		galleryBlock.attributes.ids = ids;
+		galleryBlock.innerBlocks = [];
+	}
+
+	return toBlock;
+}
+addFilter(
+	'blocks.switchToBlockType.transformedBlock',
+	'core/gallery/update-third-party-transform-from',
+	updateThirdPartyTransformFromGallery
 );
 
 const transforms = {
