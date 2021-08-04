@@ -176,7 +176,7 @@ fireEvent( heightSlider, 'valueChange', '50' );
 
 ## Expect correct element behaviour
 
-After querying elements and firing events, we have to verify that the logic works as expected, for this purpose we can use the same expect function from Jest as we use in unit tests.
+After querying elements and firing events, we have to verify that the logic works as expected, for this purpose we can use the same `expect` function from Jest as we use in unit tests.
 
 Here is an example:
 
