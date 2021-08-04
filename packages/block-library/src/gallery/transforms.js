@@ -34,6 +34,20 @@ const parseShortcodeIds = ( ids ) => {
 	return ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) );
 };
 
+/**
+ * Third party block plugins don't have an easy way to detect if the
+ * innerBlocks version of the Gallery is running when they run a
+ * 3rdPartyBlock -> GallaryBlock transform so this tranform filter
+ * will handle this. Once the innerBlocks version is the default
+ * in a core release, this could be deprecated and removed after
+ * plugin authors have been given time to update transforms.
+ *
+ * @typedef  {Object} Attributes
+ * @typedef  {Object} Block
+ * @property {Attributes} attributes The attributes of the block.
+ * @param    {Block}      block      The transformed block.
+ * @return   {string}     The internal widget id.
+ */
 function transformV1FormatFromThirdPartyBlocks( block ) {
 	const settings = select( blockEditorStore ).getSettings();
 	if (
@@ -41,10 +55,10 @@ function transformV1FormatFromThirdPartyBlocks( block ) {
 		block.name === 'core/gallery' &&
 		block.attributes?.images
 	) {
-		const innerBlocks = block.attributes.images.map( ( image ) => {
+		const innerBlocks = block.attributes.images.map( ( { url, id } ) => {
 			return createBlock( 'core/image', {
-				url: image.url,
-				id: image.id,
+				url,
+				id,
 			} );
 		} );
 
@@ -57,7 +71,7 @@ function transformV1FormatFromThirdPartyBlocks( block ) {
 }
 addFilter(
 	'blocks.switchToBlockType.transformedBlock',
-	'core.transformthirdpartygalleries',
+	'core/gallery/transform-third-party',
 	transformV1FormatFromThirdPartyBlocks
 );
 
