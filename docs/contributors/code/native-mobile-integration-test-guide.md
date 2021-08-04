@@ -1,4 +1,4 @@
-# Integration Test Guide
+# React Native Integration Test Guide
 
 ## What’s an integration test?
 
