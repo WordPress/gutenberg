@@ -227,6 +227,13 @@
 					"customRadius": true
 				}
 			},
+			"core/cover": {
+				"border": {
+					"customColor": true,
+					"customStyle": true,
+					"customWidth": true
+				}
+			},
 			"core/pullquote": {
 				"border": {
 					"customColor": true,
