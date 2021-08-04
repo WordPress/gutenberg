@@ -44,8 +44,6 @@ export const Wrapper = styled.div`
 	${ wrapperColor };
 	${ rangeHeight };
 	${ wrapperMargin };
-
-	${ rtl( { marginLeft: 10 } ) }
 `;
 
 export const BeforeIconWrapper = styled.span`
@@ -83,7 +81,7 @@ export const Rail = styled.span`
 	position: absolute;
 	margin-top: 14px;
 	top: 0;
-	border-radius: 3px;
+	border-radius: 9999px;
 
 	${ railBackgroundColor };
 `;
@@ -102,7 +100,7 @@ const trackBackgroundColor = ( { disabled, trackColor } ) => {
 
 export const Track = styled.span`
 	background-color: currentColor;
-	border-radius: 3px;
+	border-radius: 9999px;
 	box-sizing: border-box;
 	height: 3px;
 	pointer-events: none;
