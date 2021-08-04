@@ -101,6 +101,7 @@ function RangeControl(
 	const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
 	const fillValue = isValueReset ? 50 : calculatedFillValue;
 	const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
+	const tooltipOffset = `calc( ${ fillValueOffset } - 4px )`;
 
 	const classes = classnames( 'components-range-control', className );
 
@@ -189,6 +190,9 @@ function RangeControl(
 	const offsetStyle = {
 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 	};
+	const tooltipOffsetStyle = {
+		[ isRTL() ? 'right' : 'left' ]: tooltipOffset,
+	};
 
 	return (
 		<BaseControl
@@ -257,7 +261,7 @@ function RangeControl(
 							inputRef={ inputRef }
 							renderTooltipContent={ renderTooltipContent }
 							show={ isCurrentlyFocused || showTooltip }
-							style={ offsetStyle }
+							style={ tooltipOffsetStyle }
 							value={ value }
 						/>
 					) }
