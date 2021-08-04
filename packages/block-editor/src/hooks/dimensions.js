@@ -148,7 +148,7 @@ export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
 
 	// Skip when setting is boolean as theme isn't setting arbitrary sides.
-	if ( typeof support?.[ feature ] === 'boolean' ) {
+	if ( ! support || typeof support[ feature ] === 'boolean' ) {
 		return;
 	}
 
