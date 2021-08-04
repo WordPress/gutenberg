@@ -1,0 +1,12 @@
+diff --git a/node_modules/wd/lib/callbacks.js b/node_modules/wd/lib/callbacks.js
+index ff9953a..5b79c7c 100644
+--- a/node_modules/wd/lib/callbacks.js
++++ b/node_modules/wd/lib/callbacks.js
+@@ -57,6 +57,7 @@ exports.simpleCallback = function(cb) {
+           cb(error);
+         }
+       } else {
++        console.log("file: callbacks.js ~ line 60 ~ return function ~ jsonWireRes || data", jsonWireRes || data);
+         // something wrong
+         cb(newError(
+           {message:'Unexpected data in simpleCallback.', data: jsonWireRes || data}) );
