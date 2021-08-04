@@ -6,6 +6,7 @@
  * @see https://www.framer.com/docs/animation/
  */
 
+// eslint-disable-next-line no-restricted-imports
 export {
 	motion as __unstableMotion,
 	AnimatePresence as __unstableAnimatePresence,
