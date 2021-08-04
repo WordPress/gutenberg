@@ -16,7 +16,7 @@
 
 	// Add a uniform margin around the block.
 	// This can hopefully avoid havoc in flex containers.
-	margin: $grid-unit-10;
+	margin: 0 $grid-unit-10;
 
 	// Black square plus appender.
 	.block-list-appender__toggle {
