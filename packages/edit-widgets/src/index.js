@@ -24,6 +24,8 @@ import {
 import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';
+import * as widgetBox from './blocks/widget-box';
+
 import Layout from './components/layout';
 import {
 	ALLOW_REUSABLE_BLOCKS,
@@ -80,6 +82,7 @@ export function initialize( id, settings ) {
 	}
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
+	registerBlock( widgetBox );
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 
