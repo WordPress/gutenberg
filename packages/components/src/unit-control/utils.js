@@ -163,7 +163,7 @@ export function getParsedValue( value, unit, units ) {
  * @return {boolean} Whether units are defined.
  */
 export function hasUnits( units ) {
-	return ! isEmpty( units ) && units.length > 1 && units !== false;
+	return ! isEmpty( units ) && units !== false;
 }
 
 /**

@@ -7,13 +7,11 @@ import type { ElementType } from 'react';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
-// eslint-disable-next-line no-duplicate-imports
-import type { PolymorphicComponentProps } from '../context';
-import * as styles from './styles';
-import { useItemGroupContext } from './context';
+import { useContextSystem, PolymorphicComponentProps } from '../../ui/context';
+import * as styles from '../styles';
+import { useItemGroupContext } from '../context';
 import { useCx } from '../../utils/hooks/use-cx';
-import type { ItemProps } from './types';
+import type { ItemProps } from '../types';
 
 export function useItem(
 	props: PolymorphicComponentProps< ItemProps, 'div' >
@@ -43,9 +41,12 @@ export function useItem(
 		className
 	);
 
+	const wrapperClassName = cx( styles.itemWrapper );
+
 	return {
 		as,
 		className: classes,
+		wrapperClassName,
 		role,
 		...otherProps,
 	};

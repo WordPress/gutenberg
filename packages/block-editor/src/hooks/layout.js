@@ -9,17 +9,15 @@ import { has } from 'lodash';
  */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
+	ButtonGroup,
 	ToggleControl,
 	PanelBody,
-	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 import { useContext, createPortal } from '@wordpress/element';
 
 /**
@@ -30,29 +28,40 @@ import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 import { Head } from '../components/block-list/head';
+import { getLayoutType, getLayoutTypes } from '../layouts';
 
-function LayoutPanel( { setAttributes, attributes } ) {
+const layoutBlockSupportKey = '__experimentalLayout';
+
+const canBlockSwitchLayout = ( blockTypeOrName ) => {
+	const layoutBlockSupportConfig = getBlockSupport(
+		blockTypeOrName,
+		layoutBlockSupportKey
+	);
+
+	return layoutBlockSupportConfig?.allowSwitching;
+};
+
+function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const { layout = {} } = attributes;
-	const { wideSize, contentSize, inherit = false } = layout;
 	const defaultLayout = useSetting( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
 	}, [] );
 
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
-	} );
-
 	if ( ! themeSupportsLayout ) {
 		return null;
 	}
+
+	const allowLayoutSwitching = canBlockSwitchLayout( blockName );
+	const { inherit = false, type = 'default' } = layout;
+	const layoutType = getLayoutType( type );
+
+	const onChangeType = ( newType ) =>
+		setAttributes( { layout: { type: newType } } );
+	const onChangeLayout = ( newLayout ) =>
+		setAttributes( { layout: newLayout } );
+
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Layout' ) }>
@@ -65,81 +74,40 @@ function LayoutPanel( { setAttributes, attributes } ) {
 						}
 					/>
 				) }
-				{ ! inherit && (
-					<>
-						<div className="block-editor-hooks__layout-controls">
-							<div className="block-editor-hooks__layout-controls-unit">
-								<UnitControl
-									label={ __( 'Content' ) }
-									labelPosition="top"
-									__unstableInputWidth="80px"
-									value={ contentSize || wideSize || '' }
-									onChange={ ( nextWidth ) => {
-										nextWidth =
-											0 > parseFloat( nextWidth )
-												? '0'
-												: nextWidth;
-										setAttributes( {
-											layout: {
-												...layout,
-												contentSize: nextWidth,
-											},
-										} );
-									} }
-									units={ units }
-								/>
-								<Icon icon={ positionCenter } />
-							</div>
-							<div className="block-editor-hooks__layout-controls-unit">
-								<UnitControl
-									label={ __( 'Wide' ) }
-									labelPosition="top"
-									__unstableInputWidth="80px"
-									value={ wideSize || contentSize || '' }
-									onChange={ ( nextWidth ) => {
-										nextWidth =
-											0 > parseFloat( nextWidth )
-												? '0'
-												: nextWidth;
-										setAttributes( {
-											layout: {
-												...layout,
-												wideSize: nextWidth,
-											},
-										} );
-									} }
-									units={ units }
-								/>
-								<Icon icon={ stretchWide } />
-							</div>
-						</div>
-						<div className="block-editor-hooks__layout-controls-reset">
-							<Button
-								variant="secondary"
-								isSmall
-								disabled={ ! contentSize && ! wideSize }
-								onClick={ () =>
-									setAttributes( {
-										layout: {
-											contentSize: undefined,
-											wideSize: undefined,
-											inherit: false,
-										},
-									} )
-								}
-							>
-								{ __( 'Reset' ) }
-							</Button>
-						</div>
-					</>
+
+				{ ! inherit && allowLayoutSwitching && (
+					<LayoutTypeSwitcher
+						type={ type }
+						onChange={ onChangeType }
+					/>
 				) }
-				<p className="block-editor-hooks__layout-controls-helptext">
-					{ __(
-						'Customize the width for all elements that are assigned to the center or wide columns.'
-					) }
-				</p>
+
+				{ ! inherit && layoutType && (
+					<layoutType.edit
+						layout={ layout }
+						onChange={ onChangeLayout }
+					/>
+				) }
 			</PanelBody>
 		</InspectorControls>
+	);
+}
+
+function LayoutTypeSwitcher( { type, onChange } ) {
+	return (
+		<ButtonGroup>
+			{ getLayoutTypes().map( ( { name, label } ) => {
+				return (
+					<Button
+						key={ name }
+						isPressed={ type === name }
+						onClick={ () => onChange( name ) }
+					>
+						{ label }
+					</Button>
+				);
+			} ) }
+		</ButtonGroup>
 	);
 }
 
@@ -154,7 +122,7 @@ export function addAttribute( settings ) {
 	if ( has( settings.attributes, [ 'layout', 'type' ] ) ) {
 		return settings;
 	}
-	if ( hasBlockSupport( settings, '__experimentalLayout' ) ) {
+	if ( hasBlockSupport( settings, layoutBlockSupportKey ) ) {
 		settings.attributes = {
 			...settings.attributes,
 			layout: {
@@ -178,7 +146,7 @@ export const withInspectorControls = createHigherOrderComponent(
 		const { name: blockName } = props;
 		const supportLayout = hasBlockSupport(
 			blockName,
-			'__experimentalLayout'
+			layoutBlockSupportKey
 		);
 
 		return [
@@ -199,7 +167,7 @@ export const withInspectorControls = createHigherOrderComponent(
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
-		const supportLayout = hasBlockSupport( name, '__experimentalLayout' );
+		const supportLayout = hasBlockSupport( name, layoutBlockSupportKey );
 		const id = useInstanceId( BlockListBlock );
 		const defaultLayout = useSetting( 'layout' ) || {};
 		if ( ! supportLayout ) {

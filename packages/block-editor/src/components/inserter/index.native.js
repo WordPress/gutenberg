@@ -32,7 +32,7 @@ import { store as blockEditorStore } from '../../store';
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
 const defaultRenderToggle = ( {
-	enableEditorOnboarding,
+	displayEditorOnboardingTooltip,
 	onToggle,
 	disabled,
 	style,
@@ -40,7 +40,7 @@ const defaultRenderToggle = ( {
 } ) => (
 	<ToolbarButton
 		title={
-			enableEditorOnboarding
+			displayEditorOnboardingTooltip
 				? __( 'Tap to add content' )
 				: __( 'Add block' )
 		}
@@ -51,7 +51,7 @@ const defaultRenderToggle = ( {
 				color={ style.color }
 			/>
 		}
-		showTooltip={ enableEditorOnboarding }
+		showTooltip={ displayEditorOnboardingTooltip }
 		tooltipPosition="top right"
 		onClick={ onToggle }
 		extraProps={ {
@@ -200,7 +200,7 @@ export class Inserter extends Component {
 	 */
 	renderInserterToggle( { onToggle, isOpen } ) {
 		const {
-			enableEditorOnboarding,
+			displayEditorOnboardingTooltip,
 			disabled,
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
@@ -247,7 +247,7 @@ export class Inserter extends Component {
 		return (
 			<>
 				{ renderToggle( {
-					enableEditorOnboarding,
+					displayEditorOnboardingTooltip,
 					onToggle: onPress,
 					isOpen,
 					disabled,
@@ -378,7 +378,9 @@ export default compose( [
 		const insertionIndexEnd = endOfRootIndex;
 
 		return {
-			enableEditorOnboarding: getBlockEditorSettings().editorOnboarding,
+			displayEditorOnboardingTooltip:
+				getBlockEditorSettings().editorOnboarding &&
+				getBlockEditorSettings().firstGutenbergEditorSession,
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,

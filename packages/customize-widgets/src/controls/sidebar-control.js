@@ -1,8 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { dispatch } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import SidebarAdapter from '../components/sidebar-block-editor/sidebar-adapter';
 import getInserterOuterSection from './inserter-outer-section';
+import { store as customizeWidgetsStore } from '../store';
 
 const getInserterId = ( controlId ) => `widgets-inserter-${ controlId }`;
 
@@ -45,7 +51,9 @@ export default function getSidebarControl() {
 			if ( ! args.unchanged ) {
 				// Close the inserter when the section collapses.
 				if ( ! expanded ) {
-					this.inserter.close();
+					dispatch( customizeWidgetsStore ).setIsInserterOpened(
+						false
+					);
 				}
 
 				this.subscribers.forEach( ( subscriber ) =>

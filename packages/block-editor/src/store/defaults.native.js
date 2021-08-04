@@ -9,6 +9,7 @@ import {
 const SETTINGS_DEFAULTS = {
 	...SETTINGS,
 	alignWide: true,
+	supportsLayout: false,
 };
 
 export { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS };

@@ -55,7 +55,6 @@ const renderToggleComponent = ( { TextColor, BackgroundColor } ) => ( {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
-			event.stopPropagation();
 			onToggle();
 		}
 	};

@@ -67,8 +67,8 @@ function MenuTitleSearch( {
 	};
 
 	function onKeyDown( event ) {
-		if ( event.keyCode === ESCAPE ) {
-			event.stopPropagation();
+		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
+			event.preventDefault();
 			onClose();
 		}
 	}

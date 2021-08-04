@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+## 5.0.0 (2021-07-29)
+
+### Breaking Change
+
+-   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
+
 ## 4.1.0 (2021-07-21)
 
 ## 4.0.0 (2021-05-20)
+
 ### Breaking Changes
 
 -   Removed icons: `camera`, `chartLine`, `closeCircleFilled`, `controlsRepeat`, `expand`, as they all have better existing alternatives, and were unused by the block editor. Instead of `camera`, use `capturePhoto`. Instead of `chartLine`, use `chartBar` or `trendingUp` or `trendingDown`, instead of `closeCircleFilled`, use `close`, instead of `controlsRepeat` which was used for Reusable Blocks, consider `reusableBlock`, and instead of `expand`, use `fullscreen`.
