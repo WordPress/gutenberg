@@ -8,6 +8,7 @@ import { BlockIcon } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+import { safeHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -52,7 +53,11 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 						the paragraph. <RawHTML> renders a <div> element, which
 						is not compatible inside <p>.
 					*/ }
-					<p dangerouslySetInnerHTML={ { __html: description } } />
+					<p
+						dangerouslySetInnerHTML={ {
+							__html: safeHTML( description ),
+						} }
+					/>
 					{ widgetAreas?.length === 0 && (
 						<p>
 							{ __(
