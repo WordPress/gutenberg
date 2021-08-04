@@ -79,3 +79,6 @@ export function rtl( ltrStyles = {}, rtlStyles ) {
 		return isRTL() ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
 	};
 }
+
+// Useful when in need of observing RTL/LTR changes in the current locale.
+rtl.watch = () => isRTL();
