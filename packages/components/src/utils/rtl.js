@@ -66,7 +66,7 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
  * @param {import('react').CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
  * @param {import('react').CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
  *
- * @return {Function} A function to output CSS styles for Emotion's renderer
+ * @return {() => import('@emotion/react').SerializedStyles} A function to output CSS styles for Emotion's renderer
  */
 export function rtl( ltrStyles = {}, rtlStyles ) {
 	return () => {
