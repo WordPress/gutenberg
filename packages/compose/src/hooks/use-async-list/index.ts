@@ -39,7 +39,10 @@ function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
  *
  * @return Async array.
  */
-function useAsyncList< T >( list: T[], config: AsyncListConfig ): T[] {
+function useAsyncList< T >(
+	list: T[],
+	config: AsyncListConfig = { step: 1 }
+): T[] {
 	const { step = 1 } = config;
 	const [ current, setCurrent ] = useState( [] as T[] );
 
