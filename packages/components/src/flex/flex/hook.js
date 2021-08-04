@@ -133,6 +133,7 @@ export function useFlex( props ) {
 		isReverse,
 		justify,
 		wrap,
+		rtl.watch(),
 	] );
 
 	return { ...otherProps, className: classes, isColumn };
