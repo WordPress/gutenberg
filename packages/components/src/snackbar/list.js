@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import { omit, noop } from 'lodash';
-import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -14,6 +13,10 @@ import { useReducedMotion } from '@wordpress/compose';
  * Internal dependencies
  */
 import Snackbar from './';
+import {
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '../animation';
 
 const SNACKBAR_VARIANTS = {
 	init: {

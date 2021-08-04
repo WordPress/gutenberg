@@ -16,6 +16,11 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
+export {
+	__unstableMotion,
+	__unstableAnimatePresence,
+	__unstableAnimateSharedLayout,
+} from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
