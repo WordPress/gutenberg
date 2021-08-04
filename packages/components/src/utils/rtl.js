@@ -80,5 +80,16 @@ export function rtl( ltrStyles = {}, rtlStyles ) {
 	};
 }
 
-// Useful when in need of observing RTL/LTR changes in the current locale.
+/**
+ * Call this in the `useMemo` dependency array to ensure that subsequent renders will
+ * cause rtl styles to update based on the `isRTL` return value even if all other dependencies
+ * remain the same.
+ *
+ * @example
+ * const styles = useMemo( () => {
+ *   return css`
+ *     ${ rtl( { marginRight: '10px' } ) }
+ *   `;
+ * }, [ rtl.watch() ] );
+ */
 rtl.watch = () => isRTL();
