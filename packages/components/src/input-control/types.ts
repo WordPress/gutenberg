@@ -26,7 +26,7 @@ export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
 interface BaseProps {
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	hideLabelFromVision?: boolean;
-	isFocused?: boolean;
+	isFocused: boolean;
 	labelPosition?: LabelPosition;
 	size?: 'default' | 'small';
 }
@@ -44,7 +44,7 @@ export interface InputFieldProps extends BaseProps {
 		nextValue: string,
 		event?: SyntheticEvent< HTMLInputElement >
 	) => void;
-	setIsFocused?: ( isFocused: boolean ) => void;
+	setIsFocused: ( isFocused: boolean ) => void;
 	stateReducer?: StateReducer;
 	value?: string;
 	onDragEnd?: ( dragProps: DragProps ) => void;

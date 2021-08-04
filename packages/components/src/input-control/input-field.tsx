@@ -105,7 +105,7 @@ function InputField(
 
 	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
 		onBlur( event );
-		setIsFocused?.( false );
+		setIsFocused( false );
 
 		/**
 		 * If isPressEnterToChange is set, this commits the value to
@@ -123,7 +123,7 @@ function InputField(
 
 	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
 		onFocus( event );
-		setIsFocused?.( true );
+		setIsFocused( true );
 	};
 
 	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
