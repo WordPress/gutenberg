@@ -18,7 +18,7 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import { filePasteHandler } from './file-paste-handler';
-import { addActiveFormats, isShortcode, normalizeCopiedHtml } from './utils';
+import { addActiveFormats, isShortcode } from './utils';
 import { splitValue } from './split-value';
 
 export function usePasteHandler( props ) {
@@ -69,8 +69,8 @@ export function usePasteHandler( props ) {
 				}
 			}
 
-			// Remove OS-specific metadata appended within copied HTML text.
-			html = normalizeCopiedHtml( html );
+			// Remove Windows-specific metadata appended within copied HTML text.
+			html = removeWindowsFragments( html );
 
 			event.preventDefault();
 
@@ -224,4 +224,18 @@ export function usePasteHandler( props ) {
 			element.removeEventListener( 'paste', _onPaste );
 		};
 	}, [] );
+}
+
+/**
+ * Normalizes a given string of HTML to remove the Windows specific "Fragment" comments
+ * and any preceeding and trailing whitespace.
+ *
+ * @param {string} html the html to be normalized
+ * @return {string} the normalized html
+ */
+function removeWindowsFragments( html ) {
+	const startReg = new RegExp( '.*<!--StartFragment-->', 's' );
+	const endReg = new RegExp( '<!--EndFragment-->.*', 's' );
+
+	return html.replace( startReg, '' ).replace( endReg, '' );
 }
