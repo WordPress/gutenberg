@@ -83,6 +83,24 @@ export function initialize( id, settings ) {
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 
+	settings.__experimentalBlockPatterns = [
+		{
+			title: 'Widget with Title',
+			categories: [ 'widgets' ],
+			viewportWidth: 1440,
+			content:
+				'<!-- wp:group {"className":"c-widget"} --><div class="wp-block-group c-widget"><!-- wp:heading {"className":"c-widget__title", "placeholder":"Add Widget Title"} --><h2 class="c-widget__title"></h2><!-- /wp:heading --></div><!-- /wp:group -->',
+			name: 'widgets/widget-with-title',
+		},
+	];
+
+	settings.__experimentalBlockPatternCategories = [
+		{
+			name: 'widgets',
+			label: 'Widgets',
+		},
+	];
+
 	// As we are unregistering `core/freeform` to avoid the Classic block, we must
 	// replace it with something as the default freeform content handler. Failure to
 	// do this will result in errors in the default block parser.
