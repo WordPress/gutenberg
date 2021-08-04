@@ -57,6 +57,24 @@ The HTTP request method to use, either 'GET' or 'POST'. It's 'GET' by default. T
 -   Type: `String`
 -   Required: No
 
+#### Example:
+```php
+function add_rest_method( $endpoints ) {
+    if ( is_wp_version_compatible( '5.5' ) ) {
+        return $endpoints;
+    }
+
+    foreach ( $endpoints as $route => $handler ) {
+        if ( isset( $endpoints[ $route ][0] ) ) {
+            $endpoints[ $route ][0]['methods'] = [ WP_REST_Server::READABLE, WP_REST_Server::CREATABLE ];
+        }
+    }
+
+    return $endpoints;
+}
+add_filter( 'rest_endpoints', 'add_rest_method');
+```
+
 ### urlQueryArgs
 
 Query arguments to apply to the request URL.

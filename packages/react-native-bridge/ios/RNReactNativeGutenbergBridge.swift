@@ -364,6 +364,15 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
+    @objc
+    func requestBlockTypeImpressions(_ callback: @escaping RCTResponseSenderBlock) {
+        callback([self.delegate?.gutenbergDidRequestBlockTypeImpressions() ?? [:]])
+    }
+
+    @objc
+    func setBlockTypeImpressions(_ impressions: [String: Int]) {
+        self.delegate?.gutenbergDidRequestSetBlockTypeImpressions(impressions)
+    }
 }
 
 // MARK: - RCTBridgeModule delegate

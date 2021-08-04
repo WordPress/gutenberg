@@ -18,7 +18,7 @@ const CONTROL_PROPS = {
 	controlBorderColor: COLORS.gray[ 700 ],
 	controlBoxShadow: 'transparent',
 	controlBorderColorHover: COLORS.gray[ 700 ],
-	controlBoxShadowFocus: `0 0 0, 0.5px, ${ COLORS.admin.theme }`,
+	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.admin.theme }`,
 	controlDestructiveBorderColor: COLORS.alert.red,
 	controlHeight: CONTROL_HEIGHT,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
