@@ -105,7 +105,7 @@ export function useFlex( props ) {
 						! isColumn && isReverse ? space( gap ) : undefined,
 					marginRight:
 						! isColumn && ! isReverse ? space( gap ) : undefined,
-				} )() }
+				} ) }
 			}
 
 			> *:last-child:not( marquee ) {
