@@ -93,7 +93,7 @@ export function useFlex( props ) {
 						! isColumn && ! isReverse ? space( gap ) : undefined,
 					marginRight:
 						! isColumn && isReverse ? space( gap ) : undefined,
-				} ) }
+				} )() }
 			}
 		`;
 
@@ -105,14 +105,14 @@ export function useFlex( props ) {
 						! isColumn && isReverse ? space( gap ) : undefined,
 					marginRight:
 						! isColumn && ! isReverse ? space( gap ) : undefined,
-				} ) }
+				} )() }
 			}
 
 			> *:last-child:not( marquee ) {
 				${ rtl( {
 					marginLeft: ! isColumn && isReverse ? 0 : undefined,
 					marginRight: ! isColumn && ! isReverse ? 0 : undefined,
-				} ) }
+				} )() }
 			}
 		`;
 
