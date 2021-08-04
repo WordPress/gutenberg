@@ -8,6 +8,7 @@ import {
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockSupport } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -27,6 +28,7 @@ import {
 	resetPadding,
 	useIsPaddingDisabled,
 } from './padding';
+import { store as blockEditorStore } from '../store';
 import { cleanEmptyObject } from './utils';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -39,10 +41,16 @@ export const SPACING_SUPPORT_KEY = 'spacing';
  * @return {WPElement} Inspector controls for spacing support features.
  */
 export function DimensionsPanel( props ) {
+	const { clientId, setAttributes } = props;
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
+
+	const getBlock = useSelect(
+		( select ) => select( blockEditorStore ).getBlock,
+		[ clientId ]
+	);
 
 	if ( isDisabled || ! isSupported ) {
 		return null;
@@ -53,20 +61,35 @@ export function DimensionsPanel( props ) {
 		'__experimentalDefaultControls',
 	] );
 
+	// Attributes updated via the reset functions need to be freshly retrieved
+	// to avoid attribute values being cached within the callbacks passed
+	// through the from ToolsPanelItems into the parent ToolsPanel state when
+	// they register.
+
 	// Callback to reset all block support attributes controlled via this panel.
 	const resetAll = () => {
-		const { style } = props.attributes;
+		const { attributes } = getBlock( props.clientId );
 
 		props.setAttributes( {
 			style: cleanEmptyObject( {
-				...style,
+				...attributes.style,
 				spacing: {
-					...style?.spacing,
+					...attributes.style?.spacing,
 					margin: undefined,
 					padding: undefined,
 				},
 			} ),
 		} );
+	};
+
+	const resetPaddingValue = () => {
+		const { attributes } = getBlock( props.clientId );
+		resetPadding( { attributes, setAttributes } );
+	};
+
+	const resetMarginValue = () => {
+		const { attributes } = getBlock( props.clientId );
+		resetMargin( { attributes, setAttributes } );
 	};
 
 	return (
@@ -80,7 +103,7 @@ export function DimensionsPanel( props ) {
 					<ToolsPanelItem
 						hasValue={ () => hasPaddingValue( props ) }
 						label={ __( 'Padding' ) }
-						onDeselect={ () => resetPadding( props ) }
+						onDeselect={ resetPaddingValue }
 						isShownByDefault={ defaultSpacingControls?.padding }
 					>
 						<PaddingEdit { ...props } />
@@ -90,7 +113,7 @@ export function DimensionsPanel( props ) {
 					<ToolsPanelItem
 						hasValue={ () => hasMarginValue( props ) }
 						label={ __( 'Margin' ) }
-						onDeselect={ () => resetMargin( props ) }
+						onDeselect={ resetMarginValue }
 						isShownByDefault={ defaultSpacingControls?.margin }
 					>
 						<MarginEdit { ...props } />
