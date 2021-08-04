@@ -101,6 +101,7 @@ const config = {
 		splitChunks: {
 			cacheGroups: {
 				style: {
+					type: 'css/mini-extract',
 					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
