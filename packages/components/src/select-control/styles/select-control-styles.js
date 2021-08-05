@@ -75,7 +75,7 @@ export const Select = styled.select`
 		${ fontSizeStyles };
 		${ sizeStyles };
 
-		${ rtl( { paddingLeft: 8, paddingRight: 24 } )() }
+		${ rtl( { paddingLeft: 8, paddingRight: 24 } ) }
 	}
 `;
 
@@ -89,7 +89,7 @@ export const DownArrowWrapper = styled.div`
 	position: absolute;
 	top: 0;
 
-	${ rtl( { right: 0 } )() }
+	${ rtl( { right: 0 } ) }
 
 	svg {
 		display: block;
