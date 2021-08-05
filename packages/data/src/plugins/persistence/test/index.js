@@ -6,7 +6,11 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import plugin, { createPersistenceInterface, withLazySameState } from '../';
+import plugin, {
+	createPersistenceInterface,
+	withLazySameState,
+	migrateFeaturePreferencesToInterfaceStore,
+} from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
 
@@ -374,6 +378,50 @@ describe( 'persistence', () => {
 
 			expect( state ).toBe( 1 );
 			expect( reducer ).not.toHaveBeenCalled();
+		} );
+	} );
+} );
+
+describe( 'migrateFeaturePreferencesToInterfaceStore', () => {
+	it( 'migrates preferences from the source to the interface store', () => {
+		const persistenceInterface = createPersistenceInterface( {
+			storageKey: 'test-username',
+		} );
+
+		const initialState = {
+			preferences: {
+				features: {
+					featureA: true,
+					featureB: false,
+					featureC: true,
+				},
+			},
+		};
+
+		persistenceInterface.set( 'core/test', initialState );
+
+		migrateFeaturePreferencesToInterfaceStore(
+			persistenceInterface,
+			'core/test'
+		);
+
+		expect( persistenceInterface.get() ).toEqual( {
+			'core/interface': {
+				preferences: {
+					features: {
+						'core/test': {
+							featureA: true,
+							featureB: false,
+							featureC: true,
+						},
+					},
+				},
+			},
+			'core/test': {
+				preferences: {
+					features: undefined,
+				},
+			},
 		} );
 	} );
 } );
