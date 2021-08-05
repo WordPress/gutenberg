@@ -26,7 +26,7 @@ function TreeGridRow(
 		positionInSet,
 		setSize,
 		isExpanded,
-		motionEnabled = true,
+		animate = false,
 		animateOnMount = false,
 		...props
 	},
@@ -40,12 +40,10 @@ function TreeGridRow(
 		//
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<motion.tr
-			layout={ motionEnabled ? 'position' : false }
+			layout={ animate ? 'position' : false }
 			initial={ animateOnMount ? 'init' : false }
 			animate={ 'open' }
-			variants={
-				motionEnabled ? TREE_GRID_ROW_VARIANTS : NO_MOTION_VARIANTS
-			}
+			variants={ animate ? TREE_GRID_ROW_VARIANTS : NO_MOTION_VARIANTS }
 			{ ...props }
 			ref={ ref }
 			role="row"

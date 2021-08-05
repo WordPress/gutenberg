@@ -81,6 +81,7 @@ export default function ListViewBlock( {
 		__experimentalFeatures: withExperimentalFeatures,
 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
 		isTreeGridMounted,
+		animate,
 	} = useListViewContext();
 	const listViewBlockSettingsClassName = classnames(
 		'block-editor-list-view-block__menu-cell',
@@ -145,6 +146,7 @@ export default function ListViewBlock( {
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
 			isExpanded={ isExpanded }
+			animate={ animate }
 			animateOnMount={ animateToggleOpen }
 		>
 			<TreeGridCell

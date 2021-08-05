@@ -47,7 +47,7 @@ function getRowFocusables( rowElement ) {
  * @param {WPElement} props.children      Children to be rendered.
  * @param {Function}  props.onExpandRow   Callback to fire when row is expanded.
  * @param {Function}  props.onCollapseRow Callback to fire when row is collapsed.
- * @param {boolean}   props.motionEnabled Boolean item animation is enabled when true.
+ * @param {boolean}   props.animate       Boolean layout animation is enabled when true.
  * @param {Object}    ref                 A ref to the underlying DOM table element.
  */
 function TreeGrid(
@@ -55,7 +55,7 @@ function TreeGrid(
 		children,
 		onExpandRow = () => {},
 		onCollapseRow = () => {},
-		motionEnabled = true,
+		animate = false,
 		...props
 	},
 	ref
@@ -213,7 +213,7 @@ function TreeGrid(
 				ref={ ref }
 			>
 				<AnimateSharedLayout>
-					<motion.tbody layout={ motionEnabled ? 'position' : false }>
+					<motion.tbody layout={ animate ? 'position' : false }>
 						{ children }
 					</motion.tbody>
 				</AnimateSharedLayout>

@@ -49,6 +49,7 @@ export default function ListViewBranch( props ) {
 		expand,
 		collapse,
 		isTreeGridMounted,
+		animate,
 	} = useListViewContext();
 
 	return (
@@ -97,11 +98,12 @@ export default function ListViewBranch( props ) {
 					}
 				};
 
-				const animate =
-					animateToggleOpen ||
-					( isExpanded &&
-						isTreeGridMounted &&
-						expandedState[ clientId ] !== undefined );
+				const animateToggle =
+					animate &&
+					( animateToggleOpen ||
+						( isExpanded &&
+							isTreeGridMounted &&
+							expandedState[ clientId ] !== undefined ) );
 
 				return (
 					<Fragment key={ clientId }>
@@ -119,7 +121,7 @@ export default function ListViewBranch( props ) {
 							showBlockMovers={ showBlockMovers }
 							terminatedLevels={ terminatedLevels }
 							isExpanded={ isExpanded }
-							animateToggleOpen={ animate }
+							animateToggleOpen={ animateToggle }
 						/>
 						{ hasNestedBranch && isExpanded && (
 							<ListViewBranch
@@ -136,7 +138,7 @@ export default function ListViewBranch( props ) {
 								parentBlockClientId={ clientId }
 								level={ level + 1 }
 								terminatedLevels={ updatedTerminatedLevels }
-								animateToggleOpen={ animate }
+								animateToggleOpen={ animateToggle }
 							/>
 						) }
 					</Fragment>
