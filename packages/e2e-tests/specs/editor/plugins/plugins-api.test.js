@@ -165,7 +165,7 @@ describe( 'Using Plugins API', () => {
 			await insertBlock( 'List' );
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
-			await clickBlockToolbarButton( 'More options' );
+			await clickBlockToolbarButton( 'Options' );
 			await clickButton( 'My new plugin' );
 
 			expect( console ).toHaveLoggedWith( 'Block clicked' );
