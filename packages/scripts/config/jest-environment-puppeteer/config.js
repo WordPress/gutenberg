@@ -70,6 +70,7 @@ function getPuppeteer( { browser } ) {
 	switch ( browser.toLowerCase() ) {
 		case 'chromium':
 			try {
+				// eslint-disable-next-line import/no-extraneous-dependencies
 				return require( 'puppeteer' );
 			} catch ( e ) {
 				return require( 'puppeteer-core' );
