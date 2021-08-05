@@ -16,6 +16,7 @@ import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wor
 import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
+	registerWidgetBoxBlock,
 } from '@wordpress/widgets';
 
 /**
@@ -24,7 +25,6 @@ import {
 import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';
-import * as widgetBox from './blocks/widget-box';
 
 import Layout from './components/layout';
 import {
@@ -82,7 +82,8 @@ export function initialize( id, settings ) {
 	}
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
-	registerBlock( widgetBox );
+	registerWidgetBoxBlock();
+
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 
