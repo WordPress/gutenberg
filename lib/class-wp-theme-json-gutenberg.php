@@ -61,9 +61,9 @@ class WP_Theme_JSON_Gutenberg {
 			'text'       => null,
 		),
 		'spacing'    => array(
-			'margin'  => null,
-			'padding' => null,
-			'gap'     => null,
+			'margin'   => null,
+			'padding'  => null,
+			'blockGap' => null,
 		),
 		'typography' => array(
 			'fontFamily'     => null,
@@ -234,7 +234,7 @@ class WP_Theme_JSON_Gutenberg {
 		'padding-right'              => array( 'spacing', 'padding', 'right' ),
 		'padding-bottom'             => array( 'spacing', 'padding', 'bottom' ),
 		'padding-left'               => array( 'spacing', 'padding', 'left' ),
-		'--wp-theme-block-gap'       => array( 'spacing', 'gap' ),
+		'--wp-theme-block-gap'       => array( 'spacing', 'blockGap' ),
 		'text-decoration'            => array( 'typography', 'textDecoration' ),
 		'text-transform'             => array( 'typography', 'textTransform' ),
 	);
