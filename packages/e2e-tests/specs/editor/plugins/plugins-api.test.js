@@ -5,7 +5,7 @@ import {
 	activatePlugin,
 	clickBlockAppender,
 	clickBlockToolbarButton,
-	clickButton,
+	clickMenuItem,
 	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
@@ -166,7 +166,7 @@ describe( 'Using Plugins API', () => {
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
 			await clickBlockToolbarButton( 'Options' );
-			await clickButton( 'My new plugin' );
+			await clickMenuItem( 'My new plugin' );
 
 			expect( console ).toHaveLoggedWith( 'Block clicked' );
 		} );
