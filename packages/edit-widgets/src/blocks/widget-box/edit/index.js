@@ -28,9 +28,7 @@ export default function Edit() {
 		}
 	);
 
-	const blockProps = useBlockProps( {
-		className: 'widget_archive', // TODO: make dynamic based on the selected innerblock widget
-	} );
+	const blockProps = useBlockProps();
 
 	return (
 		<div { ...blockProps }>
