@@ -10,7 +10,8 @@
 		"html": false,
 		"inserter": true,
 		"customClassName": true,
-		"reusable": false
+		"reusable": false,
+		"lightBlockWrapper": true
 	},
 	"editorStyle": "wp-block-widget-box-editor",
 	"style": "wp-block-widget-box",
