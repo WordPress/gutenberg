@@ -46,7 +46,7 @@ const parseShortcodeIds = ( ids ) => {
  * @typedef  {Object} Block
  * @property {Attributes} attributes The attributes of the block.
  * @param    {Block}      block      The transformed block.
- * @return   {Block}     			 The transformed block.
+ * @return   {Block}                 The transformed block.
  */
 function updateThirdPartyTransformToGallery( block ) {
 	const settings = select( blockEditorStore ).getSettings();
