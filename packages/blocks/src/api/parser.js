@@ -577,13 +577,18 @@ export function createBlockWithFallback( blockNode ) {
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
 	if ( ! isFallbackBlock ) {
-		const { isValid, validationIssues } = getBlockContentValidationResult(
+		const {
+			isValid,
+			validationIssues,
+			attributes: fixedAttributes,
+		} = getBlockContentValidationResult(
 			blockType,
 			block.attributes,
 			innerHTML
 		);
 		block.isValid = isValid;
 		block.validationIssues = validationIssues;
+		attributes = fixedAttributes;
 	}
 
 	// Preserve original content for future use in case the block is parsed

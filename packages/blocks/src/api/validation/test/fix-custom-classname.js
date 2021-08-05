@@ -6,7 +6,7 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { getHTMLRootElementClasses } from '../custom-class-name';
+import { getHTMLRootElementClasses } from '../fix-custom-classname';
 
 describe( 'custom className', () => {
 	const blockSettings = {
