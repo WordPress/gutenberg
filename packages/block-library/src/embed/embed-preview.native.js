@@ -98,6 +98,7 @@ const EmbedPreview = ( {
 							title={ iframeTitle }
 							type={ sandboxClassnames }
 							providerUrl={ providerUrl }
+							url={ url }
 						/>
 					</View>
 				</TouchableWithoutFeedback>

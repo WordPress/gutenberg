@@ -110,6 +110,7 @@ function Sandbox( {
 	styles = [],
 	title = '',
 	type,
+	url,
 } ) {
 	const ref = useRef();
 	const [ width, setWidth ] = useState( 0 );
@@ -123,8 +124,8 @@ function Sandbox( {
 	// On Android, we need to recreate the WebView when the device rotates, otherwise it disappears.
 	// For this purpose, the key value used in the WebView will change when the device orientation gets updated.
 	const key = Platform.select( {
-		android: `${ providerUrl }-${ isLandscape ? 'landscape' : 'portrait' }`,
-		ios: providerUrl,
+		android: `${ url }-${ isLandscape ? 'landscape' : 'portrait' }`,
+		ios: url,
 	} );
 
 	function getHtmlDoc() {
