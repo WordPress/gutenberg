@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { includes } from 'lodash';
-import { motion, AnimateSharedLayout } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -15,6 +14,10 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import RovingTabIndexContainer from './roving-tab-index';
+import {
+	__unstableMotion as motion,
+	__unstableAnimateSharedLayout as AnimateSharedLayout,
+} from '../animation';
 
 /**
  * Return focusables in a row element, excluding those from other branches

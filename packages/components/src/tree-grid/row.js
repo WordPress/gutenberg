@@ -1,12 +1,12 @@
 /**
- * External dependencies
- */
-import { motion } from 'framer-motion';
-
-/**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { __unstableMotion as motion } from '../animation';
 
 const TREE_GRID_ROW_VARIANTS = {
 	init: {
