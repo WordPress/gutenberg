@@ -42,7 +42,7 @@ function TreeGridRow(
 		//
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<motion.tr
-			layout={ motionEnabled }
+			layout={ motionEnabled ? 'position' : false }
 			initial={ 'init' }
 			animate={ 'open' }
 			exit={ 'exit' }

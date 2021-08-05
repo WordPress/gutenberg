@@ -17,6 +17,7 @@ import RovingTabIndexContainer from './roving-tab-index';
 import {
 	__unstableMotion as motion,
 	__unstableAnimateSharedLayout as AnimateSharedLayout,
+	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
 
 /**
@@ -213,8 +214,10 @@ function TreeGrid(
 				ref={ ref }
 			>
 				<AnimateSharedLayout>
-					<motion.tbody layout={ motionEnabled }>
-						{ children }
+					<motion.tbody layout={ motionEnabled ? 'position' : false }>
+						<AnimatePresence>
+							{ children }
+						</AnimatePresence>
 					</motion.tbody>
 				</AnimateSharedLayout>
 			</table>
