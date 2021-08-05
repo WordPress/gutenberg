@@ -36,7 +36,6 @@ jobs:
                   cache: npm
 
             - name: Npm install and build
-              uses: lhotari/action-upterm@v1
               run: |
                   npm ci
                   FORCE_REDUCED_MOTION=true npm run build
