@@ -7,17 +7,12 @@ import {
 	InnerBlocks,
 } from '@wordpress/block-editor';
 
-import { __ } from '@wordpress/i18n';
+/**
+ * Internal dependencies
+ */
+import { HEADING_PLACEHOLDER } from './constants';
 
-const TEMPLATE = [
-	[
-		'core/heading',
-		{
-			placeholder: __( 'Add your Widget title' ),
-			className: 'widget-title',
-		},
-	],
-];
+const TEMPLATE = [ HEADING_PLACEHOLDER ];
 
 export default function Edit() {
 	const innerBlocksProps = useInnerBlocksProps(
