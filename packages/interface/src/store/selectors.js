@@ -63,7 +63,8 @@ export function isItemPinned( state, scope, item ) {
 }
 
 /**
- *
+ * Returns a boolean indicating whether a feature is active for a particular
+ * scope.
  *
  * @param {Object} state       The store state.
  * @param {string} scope       The scope of the feature (e.g. core/edit-post).
