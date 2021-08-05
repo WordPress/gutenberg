@@ -204,6 +204,15 @@ describe( 'Widgets Customizer', () => {
 
 		await expect( inspectorHeading ).not.toBeVisible();
 
+		// Wait for the transition to finish to prevent it from
+		// clicking on the wrong element.
+		// The transition takes 180ms, 200ms should be enough.
+		// This is a temporary solution, a more ideal alternative
+		// would be to disable the transition entirely.
+		// See https://github.com/WordPress/gutenberg/pull/33875#issuecomment-893122147
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 200 );
+
 		await clickBlockToolbarButton( 'Options' );
 		showMoreSettingsButton = await find( {
 			role: 'menuitem',
