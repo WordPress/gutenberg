@@ -238,6 +238,6 @@
 		}
 	},
 	"styles": {
-		"spacing": { "blockGap": "30px" }
+		"spacing": { "blockGap": "24px" }
 	}
 }
