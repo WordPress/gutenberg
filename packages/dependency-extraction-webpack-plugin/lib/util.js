@@ -32,6 +32,14 @@ function defaultRequestToExternal( request ) {
 
 		case 'react-dom':
 			return 'ReactDOM';
+
+		case 'object-assign':
+			return [ 'Object', 'assign' ];
+
+		case '@wordpress/element/jsx-runtime':
+			return [ 'wp', 'jsxRuntime' ];
+		case '@wordpress/element/jsx-dev-runtime':
+			return [ 'wp', 'jsxDevRuntime' ];
 	}
 
 	if ( BUNDLED_PACKAGES.includes( request ) ) {
@@ -64,6 +72,15 @@ function defaultRequestToHandle( request ) {
 
 		case 'lodash-es':
 			return 'lodash';
+
+		// Ignore object-assign ponyfill, which is used by jsx-(dev)-runtime.
+		case 'object-assign':
+			return 'wp-polyfill';
+
+		case '@wordpress/element/jsx-runtime':
+			return 'wp-jsx-runtime';
+		case '@wordpress/element/jsx-dev-runtime':
+			return 'wp-jsx-dev-runtime';
 	}
 
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {

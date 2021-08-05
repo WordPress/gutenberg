@@ -43,21 +43,39 @@ const exportDefaultPackages = [
 module.exports = {
 	...baseConfig,
 	name: 'packages',
-	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
-		return {
-			...memo,
-			[ packageName ]: {
-				import: `./packages/${ packageName }`,
+	entry: gutenbergPackages.reduce(
+		( memo, packageName ) => {
+			return {
+				...memo,
+				[ packageName ]: {
+					import: `./packages/${ packageName }`,
+					library: {
+						name: [ 'wp', camelCaseDash( packageName ) ],
+						type: 'window',
+						export: exportDefaultPackages.includes( packageName )
+							? 'default'
+							: undefined,
+					},
+				},
+			};
+		},
+		{
+			'jsx-runtime': {
+				import: './packages/element/jsx-runtime',
 				library: {
-					name: [ 'wp', camelCaseDash( packageName ) ],
+					name: [ 'wp', 'jsxRuntime' ],
 					type: 'window',
-					export: exportDefaultPackages.includes( packageName )
-						? 'default'
-						: undefined,
 				},
 			},
-		};
-	}, {} ),
+			'jsx-dev-runtime': {
+				import: './packages/element/jsx-dev-runtime',
+				library: {
+					name: [ 'wp', 'jsxDevRuntime' ],
+					type: 'window',
+				},
+			},
+		}
+	),
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './build/[name]/index.min.js',

@@ -14,6 +14,8 @@ module.exports = {
 		[ `@wordpress\\/(${ transpiledPackageNames.join(
 			'|'
 		) })$` ]: 'packages/$1/src',
+		'@wordpress\\/element\\/(jsx\\-runtime|jsx\\-dev\\-runtime)$':
+			'packages/element/src/$1',
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [

@@ -11,6 +11,7 @@ module.exports = ( api ) => {
 		);
 
 	const isTestEnv = api.env() === 'test';
+	const isDevEnv = api.env() === 'development';
 
 	api.caller( ( caller ) => {
 		if ( caller && isWPBuild( caller.name ) ) {
@@ -72,19 +73,11 @@ module.exports = ( api ) => {
 		plugins: [
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
-				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
-				{
-					scopeVariable: 'createElement',
-					scopeVariableFrag: 'Fragment',
-					source: '@wordpress/element',
-					isDefault: false,
-				},
-			],
-			[
 				require.resolve( '@babel/plugin-transform-react-jsx' ),
 				{
-					pragma: 'createElement',
-					pragmaFrag: 'Fragment',
+					runtime: 'automatic',
+					importSource: '@wordpress/element',
+					development: isDevEnv,
 				},
 			],
 			maybeGetPluginTransformRuntime(),
