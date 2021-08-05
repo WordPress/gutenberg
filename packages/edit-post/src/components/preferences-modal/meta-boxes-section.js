@@ -55,7 +55,8 @@ export default withSelect( ( select ) => {
 	return {
 		// This setting should not live in the block editor's store.
 		areCustomFieldsRegistered:
-			getEditorSettings().enableCustomFields !== undefined,
+			getEditorSettings().enableCustomFields !== undefined &&
+			getEditorSettings().enableCustomFields !== null,
 		metaBoxes: getAllMetaBoxes(),
 	};
 } )( MetaBoxesSection );
