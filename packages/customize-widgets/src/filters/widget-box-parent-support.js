@@ -16,7 +16,7 @@ import { addFilter } from '@wordpress/hooks';
  * @param {string} name     the name of the block.
  * @return {Object} the new block settings.
  */
-function addListBlockClassName( settings, name ) {
+function removeWidgetBoxParent( settings, name ) {
 	if ( name !== 'core/widget-box' ) {
 		return settings;
 	}
@@ -31,5 +31,5 @@ function addListBlockClassName( settings, name ) {
 addFilter(
 	'blocks.registerBlockType',
 	'core/customize-widgets/widget-box-no-parent-supports',
-	addListBlockClassName
+	removeWidgetBoxParent
 );
