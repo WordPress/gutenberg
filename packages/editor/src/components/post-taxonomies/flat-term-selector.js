@@ -56,12 +56,12 @@ const termNamesToIds = ( names, terms ) => {
 
 // Tries to create a term or fetch it if it already exists.
 function findOrCreateTerm( termName, restBase ) {
-	const escpapedTermName = escapeString( termName );
+	const escapedTermName = escapeString( termName );
 
 	return apiFetch( {
 		path: `/wp/v2/${ restBase }`,
 		method: 'POST',
-		data: { name: escpapedTermName },
+		data: { name: escapedTermName },
 	} )
 		.catch( ( error ) => {
 			const errorCode = error.code;
@@ -70,7 +70,7 @@ function findOrCreateTerm( termName, restBase ) {
 				const addRequest = apiFetch( {
 					path: addQueryArgs( `/wp/v2/${ restBase }`, {
 						...DEFAULT_QUERY,
-						search: escpapedTermName,
+						search: escapedTermName,
 					} ),
 				} ).then( unescapeTerms );
 
