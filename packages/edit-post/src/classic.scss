@@ -1,15 +1,7 @@
-// We use :where to keep specificity minimal.
-// https://css-tricks.com/almanac/selectors/w/where/
 // Provide baseline auto margin for centering blocks.
-.editor-styles-wrapper :where(.wp-block) {
-	margin-left: auto;
-	margin-right: auto;
-}
-
-// This needs specificity to override theme editor styles
-// such as ol { margin-left: 0; }.
-.editor-styles-wrapper ol.wp-block,
-.editor-styles-wrapper ul.wp-block {
+// Specificity is kept at this level as many classic themes output
+// rules like figure { margin: 0; } which would break centering.
+.editor-styles-wrapper .wp-block {
 	margin-left: auto;
 	margin-right: auto;
 }
