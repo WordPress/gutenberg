@@ -7,14 +7,23 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useToolsPanelContext } from '../context';
-import { MENU_STATES } from '../utils';
+import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
-import DropdownMenu from '../../dropdown-menu';
+import { useToolsPanelContext } from '../context';
+import { useToolsPanelHeader } from './hook';
+import { MENU_STATES } from '../utils';
+import { contextConnect } from '../../ui/context';
 
-const ToolsPanelHeader = ( props ) => {
-	const { menuLabel, resetAll, header, toggleItem } = props;
+const ToolsPanelHeader = ( props, forwardedRef ) => {
+	const {
+		menuLabel,
+		resetAll,
+		header,
+		toggleItem,
+		...headerProps
+	} = useToolsPanelHeader( props );
+
 	const { menuItems } = useToolsPanelContext();
 
 	if ( ! header ) {
@@ -25,7 +34,7 @@ const ToolsPanelHeader = ( props ) => {
 	const hasMenuItems = !! menuItemEntries.length;
 
 	return (
-		<h2 className="components-tools-panel__header">
+		<h2 { ...headerProps } ref={ forwardedRef }>
 			{ header }
 			{ hasMenuItems && (
 				<DropdownMenu icon={ moreHorizontal } label={ menuLabel }>
@@ -75,4 +84,9 @@ const ToolsPanelHeader = ( props ) => {
 	);
 };
 
-export default ToolsPanelHeader;
+const ConnectedToolsPanelHeader = contextConnect(
+	ToolsPanelHeader,
+	'ToolsPanelHeader'
+);
+
+export default ConnectedToolsPanelHeader;

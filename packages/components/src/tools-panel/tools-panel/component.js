@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
@@ -13,10 +8,19 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import ToolsPanelHeader from '../tools-panel-header';
 import { ToolsPanelContext } from '../context';
+import { useToolsPanel } from './hook';
 import { MENU_STATES } from '../utils';
+import { View } from '../../view';
+import { contextConnect } from '../../ui/context';
 
-const ToolsPanel = ( props ) => {
-	const { children, className, header, label: menuLabel, resetAll } = props;
+const ToolsPanel = ( props, forwardedRef ) => {
+	const {
+		children,
+		header,
+		label: menuLabel,
+		resetAll,
+		...toolsPanelProps
+	} = useToolsPanel( props );
 
 	// Allow panel items to register themselves.
 	const [ panelItems, setPanelItems ] = useState( [] );
@@ -100,11 +104,10 @@ const ToolsPanel = ( props ) => {
 		setMenuItems( resetMenuItems );
 	};
 
-	const classes = classnames( 'components-tools-panel', className );
 	const panelContext = { checkMenuItem, menuItems, registerPanelItem };
 
 	return (
-		<div className={ classes }>
+		<View { ...toolsPanelProps } ref={ forwardedRef }>
 			<ToolsPanelContext.Provider value={ panelContext }>
 				<ToolsPanelHeader
 					header={ header }
@@ -114,8 +117,10 @@ const ToolsPanel = ( props ) => {
 				/>
 				{ children }
 			</ToolsPanelContext.Provider>
-		</div>
+		</View>
 	);
 };
 
-export default ToolsPanel;
+const ConnectedToolsPanel = contextConnect( ToolsPanel, 'ToolsPanel' );
+
+export default ConnectedToolsPanel;
