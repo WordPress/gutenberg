@@ -28,7 +28,6 @@ buildscript {
 
     dependencies {
         classpath "com.android.tools.build:gradle:$gradlePluginVersion"
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.automattic.android:publish-to-s3:0.6.1'
     }
@@ -36,7 +35,6 @@ buildscript {
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.automattic.android.publish-to-s3'
 
 // import the `readReactNativeVersion()` function
