@@ -89,7 +89,7 @@ export function initialize( id, settings ) {
 			categories: [ 'widgets' ],
 			viewportWidth: 1440,
 			content:
-				'<!-- wp:group {"className":"c-widget"} --><div class="wp-block-group c-widget"><!-- wp:heading {"className":"c-widget__title", "placeholder":"Add Widget Title"} --><h2 class="c-widget__title"></h2><!-- /wp:heading --></div><!-- /wp:group -->',
+				'<!-- wp:group {"className":"widget"} --><div class="wp-block-group widget"><!-- wp:heading {"className":"widget-title", "placeholder":"Add Widget Title"} --><h2 class="widget-title"></h2><!-- /wp:heading --></div><!-- /wp:group -->',
 			name: 'widgets/widget-with-title',
 		},
 	];
