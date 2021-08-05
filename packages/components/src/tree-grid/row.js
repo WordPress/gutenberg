@@ -15,12 +15,9 @@ const TREE_GRID_ROW_VARIANTS = {
 	open: {
 		opacity: 1,
 	},
-	exit: {
-		opacity: 0,
-	},
 };
 
-const NO_MOTION_VARIANTS = { init: false, open: false, exit: false };
+const NO_MOTION_VARIANTS = { init: false, open: false };
 
 function TreeGridRow(
 	{
@@ -30,6 +27,7 @@ function TreeGridRow(
 		setSize,
 		isExpanded,
 		motionEnabled = true,
+		animateOnMount = false,
 		...props
 	},
 	ref
@@ -43,9 +41,8 @@ function TreeGridRow(
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<motion.tr
 			layout={ motionEnabled ? 'position' : false }
-			initial={ 'init' }
+			initial={ animateOnMount ? 'init' : false }
 			animate={ 'open' }
-			exit={ 'exit' }
 			variants={
 				motionEnabled ? TREE_GRID_ROW_VARIANTS : NO_MOTION_VARIANTS
 			}

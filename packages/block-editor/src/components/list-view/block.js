@@ -43,6 +43,7 @@ export default function ListViewBlock( {
 	siblingBlockCount,
 	showBlockMovers,
 	isExpanded,
+	animateToggleOpen,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -144,6 +145,7 @@ export default function ListViewBlock( {
 			id={ `list-view-block-${ clientId }` }
 			data-block={ clientId }
 			isExpanded={ isExpanded }
+			animateOnMount={ animateToggleOpen }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
