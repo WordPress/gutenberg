@@ -1,8 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, RichText } from '@wordpress/block-editor';
 
-export default function save() {
-	return <InnerBlocks.Content />;
+export default function save( { attributes } ) {
+	return (
+		<>
+			<RichText.Content
+				tagName="h2"
+				className="widget-title"
+				value={ attributes.widgetTitle }
+			/>
+			<InnerBlocks.Content />
+		</>
+	);
 }
