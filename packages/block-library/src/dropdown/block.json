@@ -59,6 +59,7 @@
 		"reusable": false,
 		"html": false
 	},
+	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-dropdown-editor",
 	"style": "wp-block-dropdown"
 }

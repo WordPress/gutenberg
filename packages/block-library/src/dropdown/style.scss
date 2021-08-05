@@ -13,9 +13,9 @@
 		stroke: currentColor;
 	}
 
-	// Custom menu items.
-	// Show submenus on hover.
-	&:hover > .wp-block-dropdown__container {
+	// Show submenus on hover and on click.
+	&:hover > .wp-block-dropdown__container,
+	.wp-block-dropdown__toggle[aria-expanded="true"] + .wp-block-dropdown__container {
 		visibility: visible;
 		opacity: 1;
 	}

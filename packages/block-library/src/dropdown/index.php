@@ -123,6 +123,10 @@ function block_core_dropdown_render_submenu_icon() {
  * @return string Returns the post content with the legacy widget added.
  */
 function render_block_core_dropdown( $attributes, $content, $block ) {
+	if ( ! wp_script_is( 'wp-block-dropdown-view' ) ) {
+		wp_enqueue_script( 'wp-block-dropdown-view' );
+	}
+
 	$navigation_link_has_id = isset( $attributes['id'] ) && is_numeric( $attributes['id'] );
 	$is_post_type           = isset( $attributes['kind'] ) && 'post-type' === $attributes['kind'];
 	$is_post_type           = $is_post_type || isset( $attributes['type'] ) && ( 'post' === $attributes['type'] || 'page' === $attributes['type'] );
@@ -217,11 +221,11 @@ function render_block_core_dropdown( $attributes, $content, $block ) {
 
 		// The submenu icon has to be rendered in a button here
 		// so that there's a clickable elment to open the submenu.
-		$html .= '<button class="wp-block-dropdown__submenu-icon" aria-expanded="false">' . block_core_dropdown_render_submenu_icon() . '</button>';
+		$html .= '<button class="wp-block-dropdown__submenu-icon wp-block-dropdown__toggle" aria-expanded="false">' . block_core_dropdown_render_submenu_icon() . '</button>';
 
 	} else {
 		// If the Parent element is not a link, we render the whole thing as a button.
-		$html .= '<button class="wp-block-dropdown__parent" aria-expanded="false">';
+		$html .= '<button class="wp-block-dropdown__parent wp-block-dropdown__toggle" aria-expanded="false">';
 
 		// Wrap title with span to isolate it from submenu icon.
 		$html .= '<span class="wp-block-navigation-link__label">';
@@ -258,10 +262,6 @@ function render_block_core_dropdown( $attributes, $content, $block ) {
 		$html .= '</button>';
 
 	}
-
-
-	
-	
 
 	if ( $has_submenu ) {
 		$inner_blocks_html = '';
