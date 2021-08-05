@@ -182,7 +182,7 @@ export default function VisualEditor( { styles } ) {
 		}
 
 		return undefined;
-	}, [ isTemplateMode, themeSupportsLayout ] );
+	}, [ isTemplateMode, themeSupportsLayout, defaultLayout ] );
 
 	return (
 		<BlockTools
