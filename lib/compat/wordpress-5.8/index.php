@@ -122,7 +122,7 @@ if ( ! function_exists( 'gutenberg_render_legacy_query_loop_block' ) ) {
 			sprintf( __( 'Block %1$s has been renamed to Post Template. %1$s will be supported until WordPress version 5.9.', 'gutenberg' ), $block->name ),
 			headers_sent() || WP_DEBUG ? E_USER_WARNING : E_USER_NOTICE
 		);
-		return render_block_core_post_template( $attributes, $content, $block );
+		return gutenberg_render_block_core_post_template( $attributes, $content, $block );
 	}
 }
 
