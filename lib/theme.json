@@ -227,6 +227,12 @@
 					"customRadius": true
 				}
 			},
+			"core/group": {
+				"spacing": {
+					"customMargin": true,
+					"customPadding": true
+				}
+			},
 			"core/pullquote": {
 				"border": {
 					"customColor": true,
