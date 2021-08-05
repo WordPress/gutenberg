@@ -55,12 +55,15 @@ function updateThirdPartyTransformToGallery( block ) {
 		block.name === 'core/gallery' &&
 		block.attributes?.images
 	) {
-		const innerBlocks = block.attributes.images.map( ( { url, id } ) => {
-			return createBlock( 'core/image', {
-				url,
-				id,
-			} );
-		} );
+		const innerBlocks = block.attributes.images.map(
+			( { url, id, alt } ) => {
+				return createBlock( 'core/image', {
+					url,
+					id,
+					alt,
+				} );
+			}
+		);
 
 		delete block.attributes.ids;
 		delete block.attributes.images;
@@ -102,9 +105,10 @@ function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
 
 	if ( settings.__unstableGalleryWithImageBlocks && galleryBlock ) {
 		const images = galleryBlock.innerBlocks.map(
-			( { attributes: { url, id } } ) => ( {
+			( { attributes: { url, id, alt } } ) => ( {
 				url,
 				id,
+				alt,
 			} )
 		);
 		const ids = images.map( ( { id } ) => id );
