@@ -79,15 +79,18 @@ export function multipleEnableItems(
 }
 
 /**
- * Reducer returning the user preferences.
+ * Reducer returning the defaults for user preferences.
  *
- * @param {Object}  state  Current state.
- * @param {Object}  action Dispatched action.
+ * This is kept intentionally separate from the preferences
+ * themselves so that defaults are not persisted.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export const preferences = flow( [ combineReducers ] )( {
-	featuresDefaults( state = {}, action ) {
+export const preferenceDefaults = flow( [ combineReducers ] )( {
+	features( state = {}, action ) {
 		if ( action.type === 'SET_FEATURE_DEFAULTS' ) {
 			const { scope, defaults } = action;
 			return {
@@ -101,6 +104,17 @@ export const preferences = flow( [ combineReducers ] )( {
 
 		return state;
 	},
+} );
+
+/**
+ * Reducer returning the user preferences.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const preferences = flow( [ combineReducers ] )( {
 	features( state = {}, action ) {
 		if ( action.type === 'TOGGLE_FEATURE' ) {
 			const { scope, featureName } = action;

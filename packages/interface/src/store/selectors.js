@@ -76,7 +76,7 @@ export function isFeatureActive( state, scope, featureName ) {
 	const defaultedFeatureValue =
 		featureValue !== undefined
 			? featureValue
-			: state.preferences.featuresDefaults[ scope ]?.[ featureName ];
+			: state.preferenceDefaults.features[ scope ]?.[ featureName ];
 
 	return !! defaultedFeatureValue;
 }
