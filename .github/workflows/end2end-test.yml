@@ -41,6 +41,10 @@ jobs:
                   npm ci
                   FORCE_REDUCED_MOTION=true npm run build
 
+            - name: Start ssh debugging when failed
+              if: ${{ failure() }}
+              uses: lhotari/action-upterm@v1
+ 
             - name: Install WordPress
               run: |
                   npm run wp-env start
