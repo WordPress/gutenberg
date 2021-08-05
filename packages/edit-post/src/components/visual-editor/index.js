@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -32,7 +31,7 @@ import {
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
 import { useRef, useMemo } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
