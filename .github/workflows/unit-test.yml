@@ -42,6 +42,7 @@ jobs:
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: |
+                  npm install -g npm@latest
                   npm ci
                   npx lerna run build
 
@@ -67,6 +68,7 @@ jobs:
 
             - name: Npm install and build
               run: |
+                  npm install -g npm@latest
                   npm ci
                   npm run build
 
@@ -104,6 +106,7 @@ jobs:
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: |
+                  npm install -g npm@latest
                   npm ci
                   npx lerna run build
 

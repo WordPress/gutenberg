@@ -33,5 +33,6 @@ jobs:
 
             - name: npm install, build, format and lint
               run: |
+                  npm install -g npm@latest
                   npm ci
                   npm run test:create-block

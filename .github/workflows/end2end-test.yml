@@ -37,6 +37,7 @@ jobs:
 
             - name: Npm install and build
               run: |
+                  npm install -g npm@latest
                   npm ci
                   npm run build
 

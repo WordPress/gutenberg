@@ -31,6 +31,7 @@ jobs:
 
             - name: Npm install
               run: |
+                  npm install -g npm@latest
                   npm ci
 
             - name: Compare performance with trunk

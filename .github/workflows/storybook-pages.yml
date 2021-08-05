@@ -26,7 +26,9 @@ jobs:
                   cache: npm
 
             - name: Install Dependencies
-              run: npm ci
+              run: |
+                  npm install -g npm@latest
+                  npm ci
 
             - name: Build Storybook
               run: npm run storybook:build

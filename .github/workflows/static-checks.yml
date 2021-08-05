@@ -35,7 +35,9 @@ jobs:
               # with an error status code if the lock file is inaccurate.
               #
               # See: https://github.com/WordPress/gutenberg/issues/16157
-              run: npm install
+              run: |
+                  npm install -g npm@latest
+                  npm install
 
             - name: Lint JavaScript and Styles
               run: npm run lint
