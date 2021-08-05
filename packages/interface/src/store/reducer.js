@@ -138,5 +138,6 @@ const enableItems = combineReducers( {
 
 export default combineReducers( {
 	enableItems,
+	preferenceDefaults,
 	preferences,
 } );
