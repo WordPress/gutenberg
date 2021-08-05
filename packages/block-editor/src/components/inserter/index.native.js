@@ -164,27 +164,30 @@ export class Inserter extends Component {
 	onToggle( isOpen ) {
 		const { blockTypeImpressions, onToggle, updateSettings } = this.props;
 
-		const impressionsRemain = Object.values( blockTypeImpressions ).some(
-			( count ) => count > 0
-		);
-		if ( ! isOpen && impressionsRemain ) {
-			const decrementedImpressions = Object.entries(
+		if ( ! isOpen ) {
+			const impressionsRemain = Object.values(
 				blockTypeImpressions
-			).reduce(
-				( acc, [ blockName, count ] ) => ( {
-					...acc,
-					[ blockName ]: Math.max( count - 1, 0 ),
-				} ),
-				{}
-			);
+			).some( ( count ) => count > 0 );
 
-			// Persist block type impression to JavaScript store
-			updateSettings( {
-				impressions: decrementedImpressions,
-			} );
+			if ( impressionsRemain ) {
+				const decrementedImpressions = Object.entries(
+					blockTypeImpressions
+				).reduce(
+					( acc, [ blockName, count ] ) => ( {
+						...acc,
+						[ blockName ]: Math.max( count - 1, 0 ),
+					} ),
+					{}
+				);
 
-			// Persist block type impression count to native app store
-			setBlockTypeImpressions( decrementedImpressions );
+				// Persist block type impression to JavaScript store
+				updateSettings( {
+					impressions: decrementedImpressions,
+				} );
+
+				// Persist block type impression count to native app store
+				setBlockTypeImpressions( decrementedImpressions );
+			}
 		}
 
 		// Surface toggle callback to parent component
