@@ -10,28 +10,24 @@ import { __ } from '@wordpress/i18n';
 import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
-import { useToolsPanelContext } from '../context';
 import { useToolsPanelHeader } from './hook';
 import { MENU_STATES } from '../utils';
 import { contextConnect } from '../../ui/context';
 
 const ToolsPanelHeader = ( props, forwardedRef ) => {
 	const {
+		hasMenuItems,
+		header,
+		menuItems,
 		menuLabel,
 		resetAll,
-		header,
 		toggleItem,
 		...headerProps
 	} = useToolsPanelHeader( props );
 
-	const { menuItems } = useToolsPanelContext();
-
 	if ( ! header ) {
 		return null;
 	}
-
-	const menuItemEntries = Object.entries( menuItems );
-	const hasMenuItems = !! menuItemEntries.length;
 
 	return (
 		<h2 { ...headerProps } ref={ forwardedRef }>
