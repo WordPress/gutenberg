@@ -10,6 +10,7 @@ import {
 import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
+	registerWidgetBoxBlock,
 } from '@wordpress/widgets';
 import { setFreeformContentHandlerName } from '@wordpress/blocks';
 
@@ -49,6 +50,7 @@ export function initialize( editorName, blockEditorSettings ) {
 		} );
 	}
 	registerLegacyWidgetVariations( blockEditorSettings );
+	registerWidgetBoxBlock();
 
 	// As we are unregistering `core/freeform` to avoid the Classic block, we must
 	// replace it with something as the default freeform content handler. Failure to
