@@ -96,6 +96,7 @@ function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
 		( transformedBlock ) =>
 			transformedBlock.name === 'core/gallery' &&
 			transformedBlock.innerBlocks.length > 0 &&
+			! transformedBlock.attributes.images?.length > 0 &&
 			! toBlock.name.includes( 'core/' )
 	);
 
@@ -109,7 +110,6 @@ function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
 		const ids = images.map( ( { id } ) => id );
 		galleryBlock.attributes.images = images;
 		galleryBlock.attributes.ids = ids;
-		galleryBlock.innerBlocks = [];
 	}
 
 	return toBlock;
