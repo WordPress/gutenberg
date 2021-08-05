@@ -51,17 +51,20 @@ function useHasLetterSpacingControl( { supports, name } ) {
 	);
 }
 
-function mergeWithoutDuplicateFontFamilies( firstList, secondList ) {
-	const fontFamilies = [ ...firstList, ...secondList ];
-	const mergedFonts = fontFamilies.reduce( ( mergedList, font ) => {
-		if ( ! mergedList[ font.slug ] ) {
-			mergedList[ font.slug ] = font;
+function mergeWithoutDuplicateFontFamilies( ...fontLists ) {
+	const allFonts = fontLists.reduce( ( mergedList, fontList ) => {
+		return fontList ? mergedList.concat( ...fontList ) : mergedList;
+	}, [] );
+
+	const uniqueFonts = allFonts.reduce( ( uniqueList, font ) => {
+		if ( ! uniqueList[ font.slug ] ) {
+			uniqueList[ font.slug ] = font;
 		}
 
-		return mergedList;
+		return uniqueList;
 	}, {} );
 
-	return Object.values( mergedFonts );
+	return Object.values( uniqueFonts );
 }
 
 export default function TypographyPanel( {
