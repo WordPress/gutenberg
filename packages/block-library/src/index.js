@@ -5,8 +5,8 @@ import {
 	registerBlockType,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
-	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
+	setUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
 
 /**
@@ -90,6 +90,8 @@ import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
 import * as postTerms from './post-terms';
 import * as termDescription from './term-description';
+
+import { toRegisterCoreBlocksByName } from './common';
 
 /**
  * Function to register an individual block.
@@ -212,6 +214,11 @@ export const registerCoreBlocks = (
 	setUnregisteredTypeHandlerName( missing.name );
 	setGroupingBlockName( group.name );
 };
+
+export const registerCoreBlocksByName = toRegisterCoreBlocksByName( {
+	registerCoreBlocks,
+	getCoreBlocks: __experimentalGetCoreBlocks,
+} );
 
 /**
  * Function to register experimental core blocks depending on editor settings.

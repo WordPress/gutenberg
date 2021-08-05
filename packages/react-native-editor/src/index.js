@@ -18,7 +18,7 @@ import {
 	validateThemeColors,
 	validateThemeGradients,
 } from '@wordpress/block-editor';
-import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
+import { getBlockType, unregisterBlockType } from '@wordpress/blocks';
 
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
@@ -55,7 +55,7 @@ const setupInitHooks = () => {
 		'native.pre-render',
 		'core/react-native-editor',
 		( props ) => {
-			setupLocale( props.locale, props.translations );
+			setupLocale( props );
 
 			const capabilities = props.capabilities ?? {};
 			if (
@@ -117,7 +117,12 @@ const setupInitHooks = () => {
 
 let blocksRegistered = false;
 
-const setupLocale = ( locale, extraTranslations ) => {
+const setupLocale = ( {
+	locale,
+	extraTranslations,
+	acceptBlocks = [ 'core/verse', 'core/buttons' ],
+	rejectBlocks = [ 'core/quote', 'core/code' ],
+} ) => {
 	const setLocaleData = require( '@wordpress/i18n' ).setLocaleData;
 
 	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
@@ -144,9 +149,8 @@ const setupLocale = ( locale, extraTranslations ) => {
 		return;
 	}
 
-	const registerCoreBlocks = require( '@wordpress/block-library' )
-		.registerCoreBlocks;
-	registerCoreBlocks();
+	const { registerCoreBlocksByName } = require( '@wordpress/block-library' );
+	registerCoreBlocksByName( { acceptBlocks, rejectBlocks } );
 	blocksRegistered = true;
 };
 

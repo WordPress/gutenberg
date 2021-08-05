@@ -64,6 +64,7 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 
 import { transformationCategory } from './transformationCategories';
+import { toRegisterCoreBlocksByName } from './common';
 
 const ALLOWED_BLOCKS_GRADIENT_SUPPORT = [ 'core/button' ];
 
@@ -221,8 +222,46 @@ addFilter(
 	}
 );
 
+export const __experimentalGetCoreBlocks = () => [
+	paragraph,
+	heading,
+	devOnly( code ),
+	missing,
+	more,
+	image,
+	video,
+	nextpage,
+	separator,
+	list,
+	quote,
+	mediaText,
+	preformatted,
+	gallery,
+	columns,
+	column,
+	group,
+	classic,
+	button,
+	spacer,
+	shortcode,
+	buttons,
+	latestPosts,
+	verse,
+	cover,
+	socialLink,
+	socialLinks,
+	pullquote,
+	file,
+	audio,
+	reusableBlock,
+	search,
+	embed,
+];
+
 /**
  * Function to register core blocks provided by the block editor.
+ *
+ * @param {Array} blocks An optional array of the core blocks being registered.
  *
  * @example
  * ```js
@@ -231,43 +270,12 @@ addFilter(
  * registerCoreBlocks();
  * ```
  */
-export const registerCoreBlocks = () => {
+export const registerCoreBlocks = (
+	blocks = __experimentalGetCoreBlocks()
+) => {
+	// debugger;
 	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
-	[
-		paragraph,
-		heading,
-		devOnly( code ),
-		missing,
-		more,
-		image,
-		video,
-		nextpage,
-		separator,
-		list,
-		quote,
-		mediaText,
-		preformatted,
-		gallery,
-		columns,
-		column,
-		group,
-		classic,
-		button,
-		spacer,
-		shortcode,
-		buttons,
-		latestPosts,
-		verse,
-		cover,
-		socialLink,
-		socialLinks,
-		pullquote,
-		file,
-		audio,
-		reusableBlock,
-		search,
-		embed,
-	].forEach( registerBlock );
+	blocks.forEach( registerBlock );
 
 	registerBlockVariations( socialLink );
 	setDefaultBlockName( paragraph.name );
@@ -277,6 +285,11 @@ export const registerCoreBlocks = () => {
 		setGroupingBlockName( group.name );
 	}
 };
+
+export const registerCoreBlocksByName = toRegisterCoreBlocksByName( {
+	registerCoreBlocks,
+	getCoreBlocks: __experimentalGetCoreBlocks,
+} );
 
 /**
  * Dictates which block types are considered "new." For each of the block types
