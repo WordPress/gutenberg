@@ -163,6 +163,15 @@ export const MarkLabel = styled.span`
 	${ markLabelFill };
 `;
 
+const thumbColor = ( { disabled } ) =>
+	disabled
+		? css`
+				background-color: ${ COLORS.lightGray[ 800 ] };
+		  `
+		: css`
+				background-color: var( --wp-admin-theme-color );
+		  `;
+
 export const ThumbWrapper = styled.span`
 	align-items: center;
 	box-sizing: border-box;
@@ -176,9 +185,9 @@ export const ThumbWrapper = styled.span`
 	top: 0;
 	user-select: none;
 	width: ${ thumbSize }px;
-	background-color: var( --wp-admin-theme-color );
 	border-radius: 50%;
 
+	${ thumbColor };
 	${ rtl( { marginLeft: -10 } ) };
 `;
 
@@ -202,7 +211,6 @@ const thumbFocus = ( { isFocused } ) => {
 
 export const Thumb = styled.span`
 	align-items: center;
-	background-color: var( --wp-admin-theme-color );
 	border-radius: 50%;
 	box-sizing: border-box;
 	height: 100%;
@@ -211,6 +219,7 @@ export const Thumb = styled.span`
 	user-select: none;
 	width: 100%;
 
+	${ thumbColor };
 	${ thumbFocus };
 `;
 

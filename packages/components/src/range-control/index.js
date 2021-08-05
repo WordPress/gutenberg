@@ -249,10 +249,11 @@ function RangeControl(
 						style={ { width: fillValueOffset } }
 						trackColor={ trackColor }
 					/>
-					<ThumbWrapper style={ offsetStyle }>
+					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
 						<Thumb
 							aria-hidden={ true }
 							isFocused={ isThumbFocused }
+							disabled={ disabled }
 						/>
 					</ThumbWrapper>
 					{ enableTooltip && (
