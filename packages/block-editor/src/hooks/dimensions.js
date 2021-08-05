@@ -106,13 +106,14 @@ export function DimensionsPanel( props ) {
 					</ToolsPanelItem>
 				) }
 				{ ! isGapDisabled && (
-					<GapEdit
-						{ ...props }
-						hasValue={ hasGapValue }
+					<ToolsPanelItem
+						hasValue={ () => hasGapValue( props ) }
 						label={ __( 'Gap' ) }
-						reset={ resetGap }
+						onDeselect={ () => resetGap( props ) }
 						isShownByDefault={ defaultSpacingControls?.gap }
-					/>
+					>
+						<GapEdit { ...props } />
+					</ToolsPanelItem>
 				) }
 			</ToolsPanel>
 		</InspectorControls>

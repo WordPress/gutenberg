@@ -126,11 +126,18 @@ export function GapEdit( props ) {
 		} );
 	};
 
+	const boxValues = {
+		top: style?.spacing?.gap?.row,
+		right: style?.spacing.gap?.column,
+		bottom: style?.spacing.gap?.row,
+		left: style?.spacing.gap?.column,
+	};
+
 	return Platform.select( {
 		web: (
 			<>
 				<BoxControl
-					values={ style?.spacing?.gap }
+					values={ boxValues }
 					onChange={ onChange }
 					onChangeShowVisualizer={ onChangeShowVisualizer }
 					label={ __( 'Gap' ) }
