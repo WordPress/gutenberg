@@ -87,6 +87,10 @@ export default function useMultiSelection() {
 	 * select the entire block contents.
 	 */
 	useEffect( () => {
+		if ( ! ref.current ) {
+			return;
+		}
+
 		const { ownerDocument } = ref.current;
 		const { defaultView } = ownerDocument;
 
