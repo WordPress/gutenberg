@@ -5,7 +5,9 @@ exports[`TreeGridCell uses a child render function to render children 1`] = `
   onKeyDown={[Function]}
   role="treegrid"
 >
-  <tbody>
+  <tbody
+    style={Object {}}
+  >
     <tr>
       <td
         role="gridcell"

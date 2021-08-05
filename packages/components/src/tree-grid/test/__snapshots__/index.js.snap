@@ -5,7 +5,9 @@ exports[`TreeGrid renders a table, tbody and any child elements 1`] = `
   onKeyDown={[Function]}
   role="treegrid"
 >
-  <tbody>
+  <tbody
+    style={Object {}}
+  >
     <tr>
       <td>
         Test

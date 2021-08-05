@@ -8,6 +8,7 @@ exports[`TreeGridRow forwards other props to the rendered tr element 1`] = `
     aria-setsize="1"
     className="my-row"
     role="row"
+    style={Object {}}
   >
     <td>
       Test
@@ -23,6 +24,7 @@ exports[`TreeGridRow renders a tr with support for level, positionInSet and setS
     aria-posinset="1"
     aria-setsize="1"
     role="row"
+    style={Object {}}
   >
     <td>
       Test
