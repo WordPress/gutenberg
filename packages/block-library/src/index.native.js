@@ -288,7 +288,7 @@ export const registerCoreBlocks = () => {
  * @constant {{ string, number }}
  */
 export const NEW_BLOCK_TYPES = {
-	[ embed.name ]: 3,
-	[ search.name ]: 3,
-	[ audio.name ]: 3,
+	[ embed.name ]: 10,
+	[ search.name ]: 10,
+	[ audio.name ]: 10,
 };
