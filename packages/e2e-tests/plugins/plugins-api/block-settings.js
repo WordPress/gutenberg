@@ -5,8 +5,9 @@
 			{
 				icon: 'screenoptions',
 				label: 'My new plugin',
-				allowedBlocks: [ 'core/paragraph' ],
-				onClick: function() {
+				allowedBlocks: [ 'core/list' ],
+				onClick() {
+					// eslint-disable-next-line no-console
 					console.log( 'Block clicked' );
 				},
 			},
