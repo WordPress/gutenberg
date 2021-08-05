@@ -3,6 +3,7 @@
  */
 import { TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
+import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
@@ -21,6 +22,7 @@ import { getPhotoHtml } from './util';
 import EmbedNoPreview from './embed-no-preview';
 
 const EmbedPreview = ( {
+	className,
 	clientId,
 	icon,
 	insertBlocksAfter,
@@ -69,6 +71,11 @@ const EmbedPreview = ( {
 		__( 'Embedded content from %s' ),
 		parsedHostBaseUrl
 	);
+	const sandboxClassnames = classnames(
+		type,
+		className,
+		'wp-block-embed__wrapper'
+	);
 
 	const embedWrapper =
 		/* We should render here: <WpEmbedPreview html={ html } /> */
@@ -89,6 +96,7 @@ const EmbedPreview = ( {
 							html={ html }
 							scripts={ scripts }
 							title={ iframeTitle }
+							type={ sandboxClassnames }
 							providerUrl={ providerUrl }
 						/>
 					</View>

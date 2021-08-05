@@ -96,8 +96,6 @@ const style = `
 	body.wp-has-aspect-ratio,
 	body.wp-has-aspect-ratio > div,
 	body.wp-has-aspect-ratio > div iframe {
-		height: 100%;
-		overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
 	}
 	body > div > * {
 		margin-top: 0 !important; /* Has to have !important to override inline styles. */
