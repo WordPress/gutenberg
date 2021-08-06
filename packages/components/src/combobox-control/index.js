@@ -161,12 +161,14 @@ function ComboboxControl( {
 		inputContainer.current.input.focus();
 	};
 
-	// Update selections on filter change.
+	// Update current selections when the filter input changes.
 	useEffect( () => {
-		const currentSelectionNotInSuggestions =
-			matchingSuggestions.indexOf( selectedSuggestion ) < 0;
-		if ( matchingSuggestions.length && currentSelectionNotInSuggestions ) {
-			// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestion
+		const hasMatchingSuggestions = matchingSuggestions.length > 0;
+		const hasSelectedMatchingSuggestions =
+			matchingSuggestions.indexOf( selectedSuggestion ) > 0;
+
+		if ( hasMatchingSuggestions && ! hasSelectedMatchingSuggestions ) {
+			// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestions.
 			setSelectedSuggestion( matchingSuggestions[ 0 ] );
 		}
 	}, [ matchingSuggestions, selectedSuggestion ] );
