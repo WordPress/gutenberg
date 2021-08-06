@@ -163,11 +163,9 @@ function ComboboxControl( {
 
 	// Update selections on filter change.
 	useEffect( () => {
-		const currentSelectionNotInSuggestions = matchingSuggestions.indexOf( selectedSugestion ) < 0;
-		if (
-			matchingSuggestions.length &&
-			currentSelectionNotInSuggestions
-		) {
+		const currentSelectionNotInSuggestions =
+			matchingSuggestions.indexOf( selectedSuggestion ) < 0;
+		if ( matchingSuggestions.length && currentSelectionNotInSuggestions ) {
 			// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestion
 			setSelectedSuggestion( matchingSuggestions[ 0 ] );
 		}
