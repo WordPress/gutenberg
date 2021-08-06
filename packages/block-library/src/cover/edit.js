@@ -56,7 +56,6 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
-	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -394,21 +393,15 @@ function CoverEdit( {
 	const isImgElement = ! ( hasParallax || isRepeated );
 
 	const style = {
-		...( isImageBackground && ! isImgElement
-			? backgroundImageStyles( url )
-			: {
-					backgroundImage: gradientValue ? gradientValue : undefined,
-			  } ),
 		backgroundColor: overlayColor.color,
+		backgroundImage: gradientValue ? gradientValue : undefined,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
-	const mediaStyle = {
-		objectPosition:
-			focalPoint && isImgElement
-				? mediaPosition( focalPoint )
-				: undefined,
-	};
+	const backgroundImage = ! isImgElement && url ? `url(${ url })` : undefined;
+	const backgroundPosition = focalPoint
+		? mediaPosition( focalPoint )
+		: undefined;
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 	const showFocalPointPicker =
@@ -607,8 +600,6 @@ function CoverEdit( {
 			'is-dark-theme': isDark,
 			'has-background-dim': dimRatio !== 0,
 			'is-transient': isUploadingMedia,
-			'has-parallax': hasParallax,
-			'is-repeated': isRepeated,
 			[ overlayColor.class ]: overlayColor.class,
 			'has-background-gradient': gradientValue,
 			[ gradientClass ]: ! url && gradientClass,
@@ -618,6 +609,11 @@ function CoverEdit( {
 		},
 		getPositionClassName( contentPosition )
 	);
+
+	const backgroundClasses = classnames( {
+		'has-parallax': hasParallax,
+		'is-repeated': isRepeated,
+	} );
 
 	return (
 		<>
@@ -656,13 +652,24 @@ function CoverEdit( {
 						style={ { backgroundImage: gradientValue } }
 					/>
 				) }
+				{ url && isImageBackground && ! isImgElement && (
+					<div
+						ref={ isDarkElement }
+						role="img"
+						className={ classnames(
+							'wp-block-cover__image-background',
+							backgroundClasses
+						) }
+						style={ { backgroundImage, backgroundPosition } }
+					/>
+				) }
 				{ url && isImageBackground && isImgElement && (
 					<img
 						ref={ isDarkElement }
 						className="wp-block-cover__image-background"
 						alt=""
 						src={ url }
-						style={ mediaStyle }
+						style={ { objectPosition: backgroundPosition } }
 					/>
 				) }
 				{ url && isVideoBackground && (
@@ -673,7 +680,7 @@ function CoverEdit( {
 						muted
 						loop
 						src={ url }
-						style={ mediaStyle }
+						style={ { objectPosition: backgroundPosition } }
 					/>
 				) }
 				{ isUploadingMedia && <Spinner /> }

@@ -21,9 +21,6 @@ export const VIDEO_BACKGROUND_TYPE = 'video';
 export const COVER_MIN_HEIGHT = 50;
 export const COVER_MAX_HEIGHT = 1000;
 export const COVER_DEFAULT_HEIGHT = 300;
-export function backgroundImageStyles( url ) {
-	return url ? { backgroundImage: `url(${ url })` } : {};
-}
 export const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 
 export function dimRatioToClass( ratio ) {

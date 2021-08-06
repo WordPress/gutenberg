@@ -19,7 +19,6 @@ import {
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
@@ -57,27 +56,22 @@ export default function save( { attributes } ) {
 	const isImgElement = ! ( hasParallax || isRepeated );
 
 	const style = {
-		...( isImageBackground && ! isImgElement
-			? backgroundImageStyles( url )
-			: {} ),
 		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
-		background: customGradient && ! url ? customGradient : undefined,
+		backgroundImage: customGradient && ! url ? customGradient : undefined,
 		minHeight: minHeight || undefined,
 	};
 
-	const objectPosition =
-		// prettier-ignore
-		focalPoint && isImgElement
-			? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
-			: undefined;
+	const backgroundImage = ! isImgElement && url ? `url(${ url })` : undefined;
+	// prettier-ignore
+	const backgroundPosition = focalPoint
+		? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+		: undefined;
 
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),
 		overlayColorClass,
 		{
 			'has-background-dim': dimRatio !== 0,
-			'has-parallax': hasParallax,
-			'is-repeated': isRepeated,
 			'has-background-gradient': gradient || customGradient,
 			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(
@@ -86,6 +80,11 @@ export default function save( { attributes } ) {
 		},
 		getPositionClassName( contentPosition )
 	);
+
+	const backgroundClasses = classnames( {
+		'has-parallax': hasParallax,
+		'is-repeated': isRepeated,
+	} );
 
 	return (
 		<div { ...useBlockProps.save( { className: classes, style } ) }>
@@ -103,7 +102,17 @@ export default function save( { attributes } ) {
 					}
 				/>
 			) }
-			{ isImageBackground && isImgElement && url && (
+			{ url && isImageBackground && ! isImgElement && (
+				<div
+					role="img"
+					className={ classnames(
+						'wp-block-cover__image-background',
+						backgroundClasses
+					) }
+					style={ { backgroundImage, backgroundPosition } }
+				/>
+			) }
+			{ url && isImageBackground && isImgElement && (
 				<img
 					className={ classnames(
 						'wp-block-cover__image-background',
@@ -111,12 +120,12 @@ export default function save( { attributes } ) {
 					) }
 					alt=""
 					src={ url }
-					style={ { objectPosition } }
+					style={ { objectPosition: backgroundPosition } }
 					data-object-fit="cover"
-					data-object-position={ objectPosition }
+					data-object-position={ backgroundPosition }
 				/>
 			) }
-			{ isVideoBackground && url && (
+			{ url && isVideoBackground && (
 				<video
 					className={ classnames(
 						'wp-block-cover__video-background',
@@ -127,9 +136,9 @@ export default function save( { attributes } ) {
 					loop
 					playsInline
 					src={ url }
-					style={ { objectPosition } }
+					style={ { objectPosition: backgroundPosition } }
 					data-object-fit="cover"
-					data-object-position={ objectPosition }
+					data-object-position={ backgroundPosition }
 				/>
 			) }
 			<div className="wp-block-cover__inner-container">

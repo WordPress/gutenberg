@@ -1,8 +1,6 @@
 .wp-block-cover-image,
 .wp-block-cover {
 	position: relative;
-	background-size: cover;
-	background-position: center center;
 	min-height: 430px;
 	width: 100%;
 	display: flex;
@@ -11,27 +9,6 @@
 	padding: 1em;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
-
-	&.has-parallax {
-		background-attachment: fixed;
-
-		// Mobile Safari does not support fixed background attachment properly.
-		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
-		// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
-		@supports (-webkit-overflow-scrolling: touch) {
-			background-attachment: scroll;
-		}
-
-		// Remove the appearance of scrolling based on OS-level animation preferences.
-		@media (prefers-reduced-motion: reduce) {
-			background-attachment: scroll;
-		}
-	}
-
-	&.is-repeated {
-		background-repeat: repeat;
-		background-size: auto;
-	}
 
 	/**
 	 * Set a default background color for has-background-dim _unless_ it includes another
@@ -167,6 +144,7 @@
 	}
 
 	// Extra specificity for in edit mode where other styles would override it otherwise.
+	div.wp-block-cover__image-background,
 	img.wp-block-cover__image-background,
 	video.wp-block-cover__video-background {
 		position: absolute;
@@ -184,6 +162,32 @@
 		outline: none;
 		border: none;
 		box-shadow: none;
+	}
+
+	div.wp-block-cover__image-background {
+		background-size: cover;
+		background-position: center center;
+
+		&.has-parallax {
+			background-attachment: fixed;
+
+			// Mobile Safari does not support fixed background attachment properly.
+			// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
+			// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
+			@supports (-webkit-overflow-scrolling: touch) {
+				background-attachment: scroll;
+			}
+
+			// Remove the appearance of scrolling based on OS-level animation preferences.
+			@media (prefers-reduced-motion: reduce) {
+				background-attachment: scroll;
+			}
+		}
+
+		&.is-repeated {
+			background-repeat: repeat;
+			background-size: auto;
+		}
 	}
 }
 
