@@ -59,8 +59,10 @@ function updateThirdPartyTransformToGallery( block ) {
 			( { url, id, alt } ) => {
 				return createBlock( 'core/image', {
 					url,
-					id,
+					id: parseInt( id, 10 ),
 					alt,
+					sizeSlug: block.attributes.sizeSlug,
+					linkDestination: block.attributes.linkDestination,
 				} );
 			}
 		);
@@ -107,7 +109,7 @@ function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
 		const images = galleryBlock.innerBlocks.map(
 			( { attributes: { url, id, alt } } ) => ( {
 				url,
-				id,
+				id: parseInt( id, 10 ),
 				alt,
 			} )
 		);
