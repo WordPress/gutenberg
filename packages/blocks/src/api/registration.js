@@ -122,7 +122,7 @@ import { store as blocksStore } from '../store';
 /**
  * Defined behavior of a block type.
  *
- * @typedef {Object} WPBlock
+ * @typedef {Object} WPBlockType
  *
  * @property {string}             name          Block type's namespaced name.
  * @property {string}             title         Human-readable block type label.
@@ -244,7 +244,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
  * @param {string|Object} blockNameOrMetadata Block type name or its metadata.
  * @param {Object}        settings            Block settings.
  *
- * @return {?WPBlock} The block, if it has been successfully registered;
+ * @return {?WPBlockType} The block, if it has been successfully registered;
  *                    otherwise `undefined`.
  */
 export function registerBlockType( blockNameOrMetadata, settings ) {
@@ -450,7 +450,7 @@ export function unregisterBlockCollection( namespace ) {
  *
  * @param {string} name Block name.
  *
- * @return {?WPBlock} The previous block value, if it has been successfully
+ * @return {?WPBlockType} The previous block value, if it has been successfully
  *                    unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {

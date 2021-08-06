@@ -13,8 +13,11 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { createLogger, createQueuedLogger } from './logger';
-import { fixCustomClassname } from './fix-custom-classname';
 import { getSaveContent } from '../serializer';
+import {
+	getFreeformContentHandlerName,
+	getUnregisteredTypeHandlerName,
+} from '../registration';
 import { normalizeBlockType } from '../utils';
 
 /**
@@ -690,53 +693,47 @@ export function isEquivalentHTML( actual, expected, logger = createLogger() ) {
  *
  * @return {Object} Whether block is valid and contains validation messages.
  */
-export function getBlockContentValidationResult(
-	blockTypeOrName,
-	attributes,
-	originalBlockContent,
-	logger = createQueuedLogger()
-) {
+
+/**
+ * Returns an object with `isValid` property set to `true` if the parsed block
+ * is valid given the input content. A block is considered valid if, when serialized
+ * with assumed attributes, the content matches the original value. If block is
+ * invalid, this function returns all validations issues as well.
+ *
+ * @param {import('../parser').WPBlock}           block           block object.
+ * @param {import('../registration').WPBlockType} blockTypeOrName Block type or name.
+ *
+ * @return {[boolean,Object]} validation results.
+ */
+export function validateBlock( block, blockTypeOrName ) {
+	const isFallbackBlock =
+		block.name === getFreeformContentHandlerName() ||
+		block.name === getUnregisteredTypeHandlerName();
+
+	// Shortcut to avoid costly validation.
+	if ( isFallbackBlock ) {
+		return [ true ];
+	}
+
+	const logger = createQueuedLogger();
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let generatedBlockContent;
-	let fixedBlockAttributes = attributes;
 	try {
-		generatedBlockContent = getSaveContent( blockType, attributes );
+		generatedBlockContent = getSaveContent( blockType, block.attributes );
 	} catch ( error ) {
 		logger.error(
 			'Block validation failed because an error occurred while generating block content:\n\n%s',
 			error.toString()
 		);
 
-		return {
-			isValid: false,
-			validationIssues: logger.getItems(),
-		};
+		return [ false, logger.getItems() ];
 	}
 
-	let isValid = isEquivalentHTML(
-		originalBlockContent,
+	const isValid = isEquivalentHTML(
+		block.originalContent,
 		generatedBlockContent,
 		logger
 	);
-
-	// Try fixing the custom classnames
-	if ( ! isValid ) {
-		fixedBlockAttributes = fixCustomClassname(
-			attributes,
-			blockType,
-			originalBlockContent
-		);
-		generatedBlockContent = getSaveContent(
-			blockType,
-			fixedBlockAttributes
-		);
-
-		isValid = isEquivalentHTML(
-			originalBlockContent,
-			generatedBlockContent,
-			logger
-		);
-	}
 
 	if ( ! isValid ) {
 		logger.error(
@@ -744,15 +741,11 @@ export function getBlockContentValidationResult(
 			blockType.name,
 			blockType,
 			generatedBlockContent,
-			originalBlockContent
+			block.originalContent
 		);
 	}
 
-	return {
-		isValid,
-		validationIssues: logger.getItems(),
-		attributes: fixedBlockAttributes,
-	};
+	return [ isValid, logger.getItems() ];
 }
 
 /**
@@ -773,12 +766,14 @@ export function isValidBlockContent(
 	attributes,
 	originalBlockContent
 ) {
-	const { isValid } = getBlockContentValidationResult(
-		blockTypeOrName,
+	const blockType = normalizeBlockType( blockTypeOrName );
+	const block = {
+		name: blockType.name,
 		attributes,
-		originalBlockContent,
-		createLogger()
-	);
+		innerBlocks: [],
+		originalContent: originalBlockContent,
+	};
+	const [ isValid ] = validateBlock( block, blockType );
 
 	return isValid;
 }

@@ -13,7 +13,7 @@ import { regexp, next } from '@wordpress/shortcode';
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
-import { getBlockAttributes } from '../parser';
+import { getBlockAttributes } from '../parser/get-block-attributes';
 
 function segmentHTMLToShortcodeBlock(
 	HTML,

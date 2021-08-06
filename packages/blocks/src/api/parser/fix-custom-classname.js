@@ -8,7 +8,7 @@ import { difference, omit } from 'lodash';
  */
 import { hasBlockSupport } from '../registration';
 import { getSaveContent } from '../serializer';
-import { parseWithAttributeSchema } from '../parser';
+import { parseWithAttributeSchema } from './get-block-attributes';
 
 /**
  * Given an HTML string, returns an array of class names assigned to the root
