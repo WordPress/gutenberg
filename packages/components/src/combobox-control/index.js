@@ -55,13 +55,15 @@ function ComboboxControl( {
 		selected: __( 'Item selected.' ),
 	},
 } ) {
+	const currentOption = options.find( ( option ) => option.value === value );
+	const currentLabel = currentOption?.label ?? '';
 	const instanceId = useInstanceId( ComboboxControl );
-	const [ selectedSuggestion, setSelectedSuggestion ] = useState( null );
+	const [ selectedSuggestion, setSelectedSuggestion ] = useState(
+		currentOption || null
+	);
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const inputContainer = useRef();
-	const currentOption = options.find( ( option ) => option.value === value );
-	const currentLabel = currentOption?.label ?? '';
 
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch = [];
