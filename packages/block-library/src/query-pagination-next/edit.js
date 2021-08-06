@@ -42,7 +42,7 @@ export default function QueryPaginationNextEdit( {
 		( arrowControl ) => arrowControl.value === arrow
 	);
 
-	// This can happen if the user switches from an LTR to RTL
+	// This can happen if the user switches from an LTR to RTL site language.
 	if ( selectedArrow.length === 0 ) {
 		selectedArrow = arrowControls[ 0 ];
 		setAttributes( {
