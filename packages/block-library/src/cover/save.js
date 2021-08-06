@@ -60,11 +60,8 @@ export default function save( { attributes } ) {
 		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
 			: {} ),
-		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
-		background: customGradient && ! url ? customGradient : undefined,
 		minHeight: minHeight || undefined,
 	};
-
 	const objectPosition =
 		// prettier-ignore
 		focalPoint && isImgElement
@@ -73,7 +70,6 @@ export default function save( { attributes } ) {
 
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),
-		overlayColorClass,
 		{
 			'has-background-dim': dimRatio !== 0,
 			'has-parallax': hasParallax,
@@ -86,21 +82,31 @@ export default function save( { attributes } ) {
 		},
 		getPositionClassName( contentPosition )
 	);
-
+	/**
+	 * We default to `black` background to enable the opacity of
+	 * images/videos when we haven't explicitly set any overlay color.
+	 */
+	const usedColor = overlayColor || customOverlayColor || 'black';
 	return (
 		<div { ...useBlockProps.save( { className: classes, style } ) }>
-			{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
+			{ dimRatio !== 0 && (
 				<span
 					aria-hidden="true"
 					className={ classnames(
 						'wp-block-cover__gradient-background',
-						gradientClass
+						gradientClass,
+						overlayColorClass
 					) }
-					style={
-						customGradient
-							? { background: customGradient }
-							: undefined
-					}
+					style={ {
+						backgroundImage: customGradient
+							? customGradient
+							: undefined,
+						backgroundColor:
+							! customGradient && ! overlayColorClass
+								? usedColor
+								: undefined,
+						opacity: dimRatio / 100,
+					} }
 				/>
 			) }
 			{ isImageBackground && isImgElement && url && (
