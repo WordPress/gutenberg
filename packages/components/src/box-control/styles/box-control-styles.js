@@ -46,10 +46,10 @@ export const Layout = styled( Flex )`
 
 const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {
 	if ( isFirst ) {
-		return rtl( { borderTopRightRadius: 0, borderBottomRightRadius: 0 } )();
+		return rtl( { borderTopRightRadius: 0, borderBottomRightRadius: 0 } );
 	}
 	if ( isLast ) {
-		return rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )();
+		return rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } );
 	}
 	if ( isOnly ) {
 		return css( { borderRadius: 2 } );
@@ -63,7 +63,7 @@ const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {
 const unitControlMarginStyles = ( { isFirst, isOnly } ) => {
 	const marginLeft = isFirst || isOnly ? 0 : -1;
 
-	return rtl( { marginLeft } )();
+	return rtl( { marginLeft } );
 };
 
 export const UnitControl = styled( BaseUnitControl )`
