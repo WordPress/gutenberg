@@ -10,6 +10,11 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] [Android] Fix UBE's inaccessible "more" toolbar item. [#33740]
+-   [*] Image block: Add a "featured" banner and ability to set or remove an image as featured. (iOS only) [#31345]
+
+## 1.58.2
+-   [*] Fix issue with text input in alt text settings [#33845]
 
 ## 1.58.1
 -   [*] Global styles: Check for undefined values and merge user colors [#33707]

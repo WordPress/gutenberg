@@ -1,6 +1,16 @@
 == Changelog ==
 
-= 11.2.0-rc.1 =
+= 11.2.1 =
+
+### Bug Fixes
+
+- Fix available alignments and layout for the post editor. ([33894](https://github.com/WordPress/gutenberg/pull/33894))
+
+
+
+
+
+= 11.2.0 =
 
 ### Features
 
@@ -13,7 +23,6 @@
 
 - Post Editor
   - Add a new page/post button on publish panel. ([33276](https://github.com/WordPress/gutenberg/pull/33276))
-  - Mobile - Global styles: Font sizes and line height data. ([33390](https://github.com/WordPress/gutenberg/pull/33390))
 
 - Widgets Editor
   - Widget inserter: Clarify that the button toggles the inserter. ([33561](https://github.com/WordPress/gutenberg/pull/33561))
@@ -63,7 +72,6 @@
   - Card: Add missing `box-sizing` CSS rules. ([33511](https://github.com/WordPress/gutenberg/pull/33511))
   - CardBody: Change default value of `isScrollable` to `false`. ([33490](https://github.com/WordPress/gutenberg/pull/33490))
   - `ItemGroup`: Fix padding, split types, rename boolean props. ([33553](https://github.com/WordPress/gutenberg/pull/33553))
-  - RNMobile: Fix slider and stepper text inputs in dark mode. ([33402](https://github.com/WordPress/gutenberg/pull/33402))
 
 - Themes
   - I18n: Fix broken loop in `WP_Theme_JSON_Resolver`. ([33624](https://github.com/WordPress/gutenberg/pull/33624))
@@ -133,6 +141,7 @@
   - Add i18n filters to documentation table of contents. ([33556](https://github.com/WordPress/gutenberg/pull/33556))
   - Update the create a block theme how-to guide. ([33382](https://github.com/WordPress/gutenberg/pull/33382))
   - Block API: Improve how blocks assets are versioned. ([33075](https://github.com/WordPress/gutenberg/pull/33075))
+  - Update the tested up to version in the readme file. ([33760](https://github.com/WordPress/gutenberg/pull/33760))
   - Correct {% end%} tag - missing a space. ([33189](https://github.com/WordPress/gutenberg/pull/33189))
   - Use tabs instead of spaces in block transform doc example. ([33549](https://github.com/WordPress/gutenberg/pull/33549))
   - Fix flaky widgets end-to-end tests by waiting for the snackbar correctly. ([33317](https://github.com/WordPress/gutenberg/pull/33317))
@@ -155,6 +164,8 @@
 
 - Post Editor
   - Editor: Refactor Post Author component. ([33695](https://github.com/WordPress/gutenberg/pull/33695))
+
+
 
 
 = 11.1.0 =

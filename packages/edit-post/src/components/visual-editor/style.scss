@@ -22,15 +22,16 @@
 		}
 	}
 
-	flex: 1 1 auto;
+	// The following flex rule is important for the canvas layout, please be careful when refactoring,
+	// as older browser interpret flex height behavior differently. Be sure to test on Safari 13.
+	// The syntax is `flex: [flex-grow] [flex-shrink] [flex-basis];`
+	// We set the canvas to be allowed to grow (vertically), but not shrink.
+	flex: 1 0 auto;
 
-	// In IE11 flex-basis: 100% cause a bug where the metaboxes area overlap with the content area.
-	// But it works as expected without it.
-	// The flex-basis is needed for the other browsers to make sure the content area is full-height.
-	@supports (position: sticky) {
-		flex-basis: 100%;
-	}
-
+	// Since the parent container is also a flex container, a `flex-basis: 100%;` is not needed,
+	// as align-items: stretch is inherited by default.Additionally due to older browser's flex height
+	// interpretation, any percentage value is likely going to cause issues, such as metaboxes overlapping.
+	// See also https://www.w3.org/TR/CSS22/visudet.html#the-height-property.
 }
 
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks
@@ -69,4 +70,10 @@
 	height: 100%;
 	position: relative;
 	display: flex;
+
+	// This is necessary for older browsers due to their flex height interpretation.
+	// These browsers (including Safari 13) ignore the percentage value entirely.
+	// By setting flex-grow, the element stretches to fill the parent.
+	// See also https://www.w3.org/TR/CSS22/visudet.html#the-height-property
+	flex-grow: 1;
 }

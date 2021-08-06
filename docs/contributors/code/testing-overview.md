@@ -371,7 +371,7 @@ Part of the unit-tests suite is a set of Jest tests run exercise native-mobile c
 To locally run the tests in debug mode, follow these steps:
 
 0. Make sure you have ran `npm ci` to install all the packages
-1. Run `npm run test-unit:native:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
+1. Run `npm run native test:debug` inside the Gutenberg root folder, on the CLI. Node is now waiting for the debugger to connect.
 2. Open `chrome://inspect` in Chrome
 3. Under the "Remote Target" section, look for a `../../node_modules/.bin/jest` target and click on the "inspect" link. That will open a new window with the Chrome DevTools debugger attached to the process and stopped at the beginning of the `jest.js` file. Alternatively, if the targets are not visible, click on the `Open dedicated DevTools for Node` link in the same page.
 4. You can place breakpoints or `debugger;` statements throughout the code, including the tests code, to stop and inspect
@@ -381,6 +381,10 @@ To locally run the tests in debug mode, follow these steps:
 ### Native mobile end-to-end tests
 
 Contributors to Gutenberg will note that PRs include continuous integration E2E tests running the native mobile E2E tests on Android and iOS. For troubleshooting failed tests, check our guide on [native mobile tests in continious integration](docs/contributors/native-mobile.md#native-mobile-e2e-tests-in-continuous-integration). More information on running these tests locally can be found in the [relevant directory README.md](https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-editor/__device-tests__).
+
+### Native mobile integration tests
+
+There is an ongoing effort to add integration tests to the native mobile project using the [`react-native-testing-library`](https://testing-library.com/docs/react-native-testing-library/intro/) library. A guide to writing integration tests can be found [here](native-mobile-integration-test-guide.md).
 
 ## End-to-end Testing
 

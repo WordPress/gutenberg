@@ -101,7 +101,7 @@ describe( 'Widgets Customizer', () => {
 		await searchOption.click();
 
 		const addedSearchBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Search',
 		} );
 
@@ -204,6 +204,15 @@ describe( 'Widgets Customizer', () => {
 
 		await expect( inspectorHeading ).not.toBeVisible();
 
+		// Wait for the transition to finish to prevent it from
+		// clicking on the wrong element.
+		// The transition takes 180ms, 200ms should be enough.
+		// This is a temporary solution, a more ideal alternative
+		// would be to disable the transition entirely.
+		// See https://github.com/WordPress/gutenberg/pull/33875#issuecomment-893122147
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitForTimeout( 200 );
+
 		await clickBlockToolbarButton( 'Options' );
 		showMoreSettingsButton = await find( {
 			role: 'menuitem',
@@ -305,7 +314,7 @@ describe( 'Widgets Customizer', () => {
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
 		const paragraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 		} );
 		await paragraphBlock.focus();
@@ -394,7 +403,7 @@ describe( 'Widgets Customizer', () => {
 		await editParagraphWidget.click();
 
 		const firstParagraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 			text: 'First Paragraph',
 		} );
@@ -426,7 +435,7 @@ describe( 'Widgets Customizer', () => {
 		await editHeadingWidget.click();
 
 		const headingBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Heading',
 			text: 'First Heading',
 		} );
@@ -701,7 +710,7 @@ describe( 'Widgets Customizer', () => {
 
 		// Refocus the paragraph block.
 		const paragraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 			value: 'First Paragraph',
 		} );
@@ -723,7 +732,7 @@ describe( 'Widgets Customizer', () => {
 
 		// The paragraph block should be moved to the new sidebar and have focus.
 		const movedParagraphBlockQuery = {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 			value: 'First Paragraph',
 		};
@@ -792,7 +801,7 @@ async function addBlock( blockName ) {
 	await blockOption.click();
 
 	const addedBlock = await find( {
-		role: 'group',
+		role: 'document',
 		selector: '.is-selected[data-block]',
 	} );
 	await addedBlock.focus();
