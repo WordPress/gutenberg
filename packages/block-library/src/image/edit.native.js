@@ -461,6 +461,7 @@ export class ImageEdit extends Component {
 					setFeaturedButtonStyle,
 					styles.removeFeaturedButton,
 				] }
+				cellContainerStyle={ styles.setFeaturedCellContainer }
 				onPress={ () =>
 					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
 				}
@@ -471,6 +472,7 @@ export class ImageEdit extends Component {
 			<BottomSheet.Cell
 				label={ __( 'Set as Featured Image ' ) }
 				labelStyle={ setFeaturedButtonStyle }
+				cellContainerStyle={ styles.setFeaturedCellContainer }
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);
@@ -569,6 +571,7 @@ export class ImageEdit extends Component {
 						label={ __(
 							'Changes to featured image will not be affected by the undo/redo buttons.'
 						) }
+						cellContainerStyle={ styles.setFeaturedCellContainer }
 					/>
 				</PanelBody>
 			</InspectorControls>

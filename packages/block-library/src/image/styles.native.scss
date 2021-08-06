@@ -31,6 +31,10 @@
 	padding-bottom: $grid-unit;
 }
 
+.setFeaturedCellContainer {
+	align-items: flex-start;
+}
+
 .setFeaturedButton {
 	text-align: left;
 	color: $blue-50;
