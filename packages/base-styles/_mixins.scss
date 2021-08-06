@@ -479,7 +479,20 @@
 	}
 }
 
+// Deprecated from UI, kept for back-compat.
+@mixin background-colors-deprecated() {
+	.has-very-light-gray-background-color {
+		background-color: #eee;
+	}
+
+	.has-very-dark-gray-background-color {
+		background-color: #313131;
+	}
+}
+
 @mixin background-colors() {
+	@include background-colors-deprecated();
+
 	.has-pale-pink-background-color {
 		background-color: #f78da7;
 	}
@@ -520,18 +533,8 @@
 		background-color: #fff;
 	}
 
-	// Deprecated from UI, kept for back-compat.
-	.has-very-light-gray-background-color {
-		background-color: #eee;
-	}
-
 	.has-cyan-bluish-gray-background-color {
 		background-color: #abb8c3;
-	}
-
-	// Deprecated from UI, kept for back-compat.
-	.has-very-dark-gray-background-color {
-		background-color: #313131;
 	}
 
 	.has-black-background-color {
@@ -539,7 +542,20 @@
 	}
 }
 
+// Deprecated from UI, kept for back-compat.
+@mixin foreground-colors-deprecated() {
+	.has-very-light-gray-color {
+		color: #eee;
+	}
+
+	.has-very-dark-gray-color {
+		color: #313131;
+	}
+}
+
 @mixin foreground-colors() {
+	@include foreground-colors-deprecated();
+
 	.has-pale-pink-color {
 		color: #f78da7;
 	}
@@ -580,18 +596,8 @@
 		color: #fff;
 	}
 
-	// Deprecated from UI, kept for back-compat.
-	.has-very-light-gray-color {
-		color: #eee;
-	}
-
 	.has-cyan-bluish-gray-color {
 		color: #abb8c3;
-	}
-
-	// Deprecated from UI, kept for back-compat.
-	.has-very-dark-gray-color {
-		color: #313131;
 	}
 
 	.has-black-color {
@@ -599,16 +605,43 @@
 	}
 }
 
+@mixin gradient-colors-deprecated() {
+	/* stylelint-disable function-comma-space-after */
+
+	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
+		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
+	}
+
+	.has-purple-crush-gradient-background {
+		background: linear-gradient(135deg,rgb(52,226,228) 0%,rgb(71,33,251) 50%,rgb(171,29,254) 100%);
+	}
+
+	.has-hazy-dawn-gradient-background {
+		background: linear-gradient(135deg,rgb(250,172,168) 0%,rgb(218,208,236) 100%);
+	}
+
+	.has-subdued-olive-gradient-background {
+		background: linear-gradient(135deg,rgb(250,250,225) 0%,rgb(103,166,113) 100%);
+	}
+
+	.has-atomic-cream-gradient-background {
+		background: linear-gradient(135deg,rgb(253,215,154) 0%,rgb(0,74,89) 100%);
+	}
+
+	.has-nightshade-gradient-background {
+		background: linear-gradient(135deg,rgb(51,9,104) 0%,rgb(49,205,207) 100%);
+	}
+	/* stylelint-enable function-comma-space-after */
+}
+
 @mixin gradient-colors() {
 	// Our classes uses the same values we set for gradient value attributes, and we can not use spacing because of WP multi site kses rule.
+
+	@include gradient-colors-deprecated();
 
 	/* stylelint-disable function-comma-space-after */
 	.has-vivid-cyan-blue-to-vivid-purple-gradient-background {
 		background: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);
-	}
-
-	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
-		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
 	}
 
 	.has-light-green-cyan-to-vivid-green-cyan-gradient-background {
@@ -639,16 +672,8 @@
 		background: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);
 	}
 
-	.has-purple-crush-gradient-background {
-		background: linear-gradient(135deg,rgb(52,226,228) 0%,rgb(71,33,251) 50%,rgb(171,29,254) 100%);
-	}
-
 	.has-luminous-dusk-gradient-background {
 		background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);
-	}
-
-	.has-hazy-dawn-gradient-background {
-		background: linear-gradient(135deg,rgb(250,172,168) 0%,rgb(218,208,236) 100%);
 	}
 
 	.has-pale-ocean-gradient-background {
@@ -657,18 +682,6 @@
 
 	.has-electric-grass-gradient-background {
 		background: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);
-	}
-
-	.has-subdued-olive-gradient-background {
-		background: linear-gradient(135deg,rgb(250,250,225) 0%,rgb(103,166,113) 100%);
-	}
-
-	.has-atomic-cream-gradient-background {
-		background: linear-gradient(135deg,rgb(253,215,154) 0%,rgb(0,74,89) 100%);
-	}
-
-	.has-nightshade-gradient-background {
-		background: linear-gradient(135deg,rgb(51,9,104) 0%,rgb(49,205,207) 100%);
 	}
 
 	.has-midnight-gradient-background {
