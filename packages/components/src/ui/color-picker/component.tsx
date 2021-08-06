@@ -32,12 +32,13 @@ import { useControlledValue } from '../../utils/hooks';
 
 import type { ColorType } from './types';
 
-interface ColorPickerProps {
+export interface ColorPickerProps {
 	enableAlpha?: boolean;
 	color?: string;
 	onChange?: ( hexColor: string ) => void;
 	defaultValue?: string;
 	copyFormat?: ColorType;
+	className?: string;
 }
 
 const options = [
@@ -61,6 +62,7 @@ const ColorPicker = (
 		onChange,
 		defaultValue,
 		copyFormat,
+		className,
 	} = useContextSystem( props, 'ColorPicker' );
 
 	const [ color, setColor ] = useControlledValue( {
@@ -91,7 +93,7 @@ const ColorPicker = (
 	const Picker = enableAlpha ? RgbaColorPicker : HexColorPicker;
 
 	return (
-		<ColorfulWrapper ref={ forwardedRef }>
+		<ColorfulWrapper ref={ forwardedRef } className={ className }>
 			<Picker onChange={ handleChange } color={ safeColor } />
 			<HStack justify="space-between">
 				{ showInputs ? (
