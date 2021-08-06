@@ -14,13 +14,14 @@ const PatternEdit = ( { attributes, clientId, isSelected } ) => {
 			attributes.slug
 		)
 	);
-	const isInnerBlockSelected = useSelect( ( select ) => {
-		const { getBlock, hasSelectedInnerBlock } = select( blockEditorStore );
 
-		const block = getBlock( clientId );
-		const hasInnerBlocks = !! ( block && block.innerBlocks.length );
-		return hasInnerBlocks && hasSelectedInnerBlock( clientId, true );
-	} );
+	const hasSelection = useSelect(
+		( select ) =>
+			isSelected ||
+			select( blockEditorStore ).hasSelectedInnerBlock( clientId, true ),
+		[ isSelected, clientId ]
+	);
+
 	const {
 		replaceBlocks,
 		replaceInnerBlocks,
@@ -31,14 +32,11 @@ const PatternEdit = ( { attributes, clientId, isSelected } ) => {
 	// This replaces the Pattern block wrapper with the content of the pattern.
 	// This change won't be saved unless further changes are made to the InnerBlocks.
 	useEffect( () => {
-		if (
-			( isSelected || isInnerBlockSelected ) &&
-			selectedPattern?.blocks
-		) {
+		if ( selectedPattern?.blocks ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceBlocks( clientId, selectedPattern.blocks );
 		}
-	}, [ isSelected, isInnerBlockSelected ] );
+	}, [ hasSelection ] );
 
 	// Run this effect when the component loads.
 	// This adds the Pattern block template as InnerBlocks.
