@@ -150,7 +150,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	public static function get_fields_to_translate() {
 		if ( null === self::$theme_json_i18n ) {
-			$file_structure        = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
+			$file_structure        = self::read_json_file( __DIR__ . '/theme-i18n.json' );
 			self::$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
 		}
 		return self::$theme_json_i18n;
