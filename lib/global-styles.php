@@ -245,7 +245,7 @@ function gutenberg_global_styles_filter_post( $content ) {
 		$data_to_encode = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $decoded_data );
 
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
-		return wp_json_encode( $data_to_encode );
+		return wp_json_encode( addslashes( $data_to_encode ) );
 	}
 	return $content;
 }
