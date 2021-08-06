@@ -30,7 +30,8 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-export interface SelectControlProps extends Omit< InputBaseProps, 'children' > {
+export interface SelectControlProps
+	extends Omit< InputBaseProps, 'children' | 'isFocused' > {
 	help?: string;
 	hideLabelFromVision?: boolean;
 	multiple?: boolean;
