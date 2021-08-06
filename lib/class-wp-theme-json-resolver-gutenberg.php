@@ -247,7 +247,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return self::$core;
 		}
 
-		$config     = self::read_json_file( __DIR__ . '/experimental-default-theme.json' );
+		$config     = self::read_json_file( __DIR__ . '/theme.json' );
 		$config     = self::translate( $config );
 		self::$core = new WP_Theme_JSON_Gutenberg( $config, 'core' );
 
