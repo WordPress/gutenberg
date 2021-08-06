@@ -146,7 +146,6 @@ class Screencast {
 	}
 
 	async start() {
-		this.client = await this.page.target().createCDPSession();
 		const viewport = this.page.viewport();
 
 		await this.screencastClient.evaluate(

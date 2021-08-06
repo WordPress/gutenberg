@@ -36,6 +36,20 @@ describe( 'Widgets Customizer', () => {
 					.__unstableToggleFeature( 'welcomeGuide' )
 			);
 		}
+
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
 	} );
 
 	beforeAll( async () => {
@@ -56,20 +70,6 @@ describe( 'Widgets Customizer', () => {
 	} );
 
 	it( 'should add blocks', async () => {
-		const widgetsPanel = await find( {
-			role: 'heading',
-			name: /Widgets/,
-			level: 3,
-		} );
-		await widgetsPanel.click();
-
-		const footer1Section = await find( {
-			role: 'heading',
-			name: /Footer #1/,
-			level: 3,
-		} );
-		await footer1Section.click();
-
 		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
@@ -147,20 +147,6 @@ describe( 'Widgets Customizer', () => {
 	} );
 
 	it( 'should open the inspector panel', async () => {
-		const widgetsPanel = await find( {
-			role: 'heading',
-			name: /Widgets/,
-			level: 3,
-		} );
-		await widgetsPanel.click();
-
-		const footer1Section = await find( {
-			role: 'heading',
-			name: /Footer #1/,
-			level: 3,
-		} );
-		await footer1Section.click();
-
 		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
@@ -241,20 +227,6 @@ describe( 'Widgets Customizer', () => {
 	} );
 
 	it( 'should handle the inserter outer section', async () => {
-		const widgetsPanel = await find( {
-			role: 'heading',
-			name: /Widgets/,
-			level: 3,
-		} );
-		await widgetsPanel.click();
-
-		const footer1Section = await find( {
-			role: 'heading',
-			name: /^Footer #1/,
-			level: 3,
-		} );
-		await footer1Section.click();
-
 		// We need to make some changes for the publish settings to appear.
 		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
@@ -348,20 +320,6 @@ describe( 'Widgets Customizer', () => {
 	} );
 
 	it( 'should move focus to the block', async () => {
-		const widgetsPanel = await find( {
-			role: 'heading',
-			name: /Widgets/,
-			level: 3,
-		} );
-		await widgetsPanel.click();
-
-		const footer1Section = await find( {
-			role: 'heading',
-			name: /^Footer #1/,
-			level: 3,
-		} );
-		await footer1Section.click();
-
 		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
@@ -443,20 +401,6 @@ describe( 'Widgets Customizer', () => {
 	} );
 
 	it( 'should clear block selection', async () => {
-		const widgetsPanel = await find( {
-			role: 'heading',
-			name: /Widgets/,
-			level: 3,
-		} );
-		await widgetsPanel.click();
-
-		const footer1Section = await find( {
-			role: 'heading',
-			name: /^Footer #1/,
-			level: 3,
-		} );
-		await footer1Section.click();
-
 		const paragraphBlock = await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 		await showBlockToolbar();
@@ -505,20 +449,6 @@ describe( 'Widgets Customizer', () => {
 	} );
 
 	it( 'should handle legacy widgets', async () => {
-		const widgetsPanel = await find( {
-			role: 'heading',
-			name: /Widgets/,
-			level: 3,
-		} );
-		await widgetsPanel.click();
-
-		const footer1Section = await find( {
-			role: 'heading',
-			name: /^Footer #1/,
-			level: 3,
-		} );
-		await footer1Section.click();
-
 		const legacyWidgetBlock = await addBlock( 'Legacy Widget' );
 		const selectLegacyWidgets = await find( {
 			role: 'combobox',
@@ -636,20 +566,6 @@ describe( 'Widgets Customizer', () => {
 	} );
 
 	it( 'should handle esc key events', async () => {
-		const widgetsPanel = await find( {
-			role: 'heading',
-			name: /Widgets/,
-			level: 3,
-		} );
-		await widgetsPanel.click();
-
-		const footer1Section = await find( {
-			role: 'heading',
-			name: /^Footer #1/,
-			level: 3,
-		} );
-		await footer1Section.click();
-
 		const paragraphBlock = await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 		await showBlockToolbar();
@@ -683,20 +599,6 @@ describe( 'Widgets Customizer', () => {
 	} );
 
 	it( 'should move (inner) blocks to another sidebar', async () => {
-		const widgetsPanel = await find( {
-			role: 'heading',
-			name: /Widgets/,
-			level: 3,
-		} );
-		await widgetsPanel.click();
-
-		const footer1Section = await find( {
-			role: 'heading',
-			name: /Footer #1/,
-			level: 3,
-		} );
-		await footer1Section.click();
-
 		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
