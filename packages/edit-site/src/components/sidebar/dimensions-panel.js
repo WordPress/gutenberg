@@ -18,8 +18,9 @@ import { useSetting } from '../editor/utils';
 export function useHasDimensionsPanel( context ) {
 	const hasPadding = useHasPadding( context );
 	const hasMargin = useHasMargin( context );
+	const hasGap = useHasGap( context );
 
-	return hasPadding || hasMargin;
+	return hasPadding || hasMargin || hasGap;
 }
 
 function useHasPadding( { name, supports } ) {
@@ -34,6 +35,12 @@ function useHasMargin( { name, supports } ) {
 	return settings && supports.includes( 'margin' );
 }
 
+function useHasGap( { name, supports } ) {
+	const settings = useSetting( 'spacing.customGap', name );
+
+	return settings && supports.includes( 'gap' );
+}
+
 function filterValuesBySides( values, sides ) {
 	if ( ! sides ) {
 		// If no custom side configuration all sides are opted into by default.
@@ -45,6 +52,26 @@ function filterValuesBySides( values, sides ) {
 	sides.forEach( ( side ) => ( filteredValues[ side ] = values[ side ] ) );
 
 	return filteredValues;
+}
+
+function filterGapValuesBySides( values, sides ) {
+	if ( ! sides ) {
+		return {
+			row: values?.top,
+			column: values?.left,
+		};
+	}
+
+	const filteredValues = {};
+
+	sides.forEach( ( side ) => {
+		if ( side === 'horizontal' ) {
+			filteredValues.column = values?.left;
+		}
+		if ( side === 'vertical' ) {
+			filteredValues.row = values?.top;
+		}
+	} );
 }
 
 function splitStyleValue( value ) {
@@ -62,10 +89,31 @@ function splitStyleValue( value ) {
 	return value;
 }
 
+function splitGapStyleValue( value ) {
+	// Check for shorthand value ( a string value ).
+	if ( value && typeof value === 'string' ) {
+		return {
+			top: value,
+			right: value,
+			bottom: value,
+			left: value,
+		};
+	}
+
+	// Convert rows and columns to individual side values.
+	return {
+		top: value?.row,
+		right: value?.column,
+		bottom: value?.row,
+		left: value?.column,
+	};
+}
+
 export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
 	const showPaddingControl = useHasPadding( context );
 	const showMarginControl = useHasMargin( context );
+	const showGapControl = useHasGap( context );
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units', name ) || [
 			'%',
@@ -98,9 +146,20 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const hasMarginValue = () =>
 		marginValues && Object.keys( marginValues ).length;
 
+	const gapValues = splitGapStyleValue( getStyle( name, 'gap' ) );
+	const gapSides = useCustomSides( name, 'gap' );
+
+	const setGapValues = ( newGapValues ) => {
+		const gap = filterGapValuesBySides( newGapValues, gapSides );
+		setStyle( name, 'gap', gap );
+	};
+	const resetGapValue = () => setGapValues( {} );
+	const hasGapValue = () => gapValues && Object.keys( gapValues ).length;
+
 	const resetAll = () => {
 		resetPaddingValue();
 		resetMarginValue();
+		resetGapValue();
 	};
 
 	return (
@@ -140,6 +199,24 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 						sides={ marginSides }
 						units={ units }
 						allowReset={ false }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showGapControl && (
+				<ToolsPanelItem
+					hasValue={ hasGapValue }
+					label={ __( 'Gap' ) }
+					onDeselect={ resetGapValue }
+					isShownByDefault={ true }
+				>
+					<BoxControl
+						values={ gapValues }
+						onChange={ setGapValues }
+						label={ __( 'Gap' ) }
+						sides={ gapSides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ true }
 					/>
 				</ToolsPanelItem>
 			) }
