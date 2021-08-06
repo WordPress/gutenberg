@@ -161,6 +161,16 @@ function ComboboxControl( {
 		inputContainer.current.input.focus();
 	};
 
+	// Update selections on filter change.
+	useEffect( () => {
+		if (
+			matchingSuggestions.length &&
+			matchingSuggestions.indexOf( selectedSuggestion ) < 0
+		) {
+			setSelectedSuggestion( matchingSuggestions[ 0 ] );
+		}
+	}, [ matchingSuggestions, selectedSuggestion ] );
+
 	// Announcements
 	useEffect( () => {
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
