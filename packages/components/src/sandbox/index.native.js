@@ -96,6 +96,8 @@ const style = `
 	body.wp-has-aspect-ratio,
 	body.wp-has-aspect-ratio > div,
 	body.wp-has-aspect-ratio > div iframe {
+		height: auto;
+		overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
 	}
 	body > div > * {
 		margin-top: 0 !important; /* Has to have !important to override inline styles. */
@@ -206,15 +208,15 @@ function Sandbox( {
 		setHeight( data.height );
 	}
 
-	function getAspectRatio() {
+	function getSizeStyle() {
 		const contentWidth = Math.ceil( width );
 		const contentHeight = Math.ceil( height );
 
 		if ( contentWidth && contentHeight ) {
-			return contentWidth / contentHeight;
+			return { width: contentWidth, height: contentHeight };
 		}
 
-		return 1;
+		return { aspectRatio: 1 };
 	}
 
 	function onChangeDimensions( dimensions ) {
@@ -242,9 +244,7 @@ function Sandbox( {
 			originWhitelist={ [ '*' ] }
 			style={ [
 				sandboxStyles[ 'sandbox-webview__container' ],
-				{
-					aspectRatio: getAspectRatio(),
-				},
+				getSizeStyle(),
 			] }
 			onMessage={ checkMessageForResize }
 		/>
