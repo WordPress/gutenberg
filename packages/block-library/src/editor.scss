@@ -61,7 +61,7 @@
 	@include foreground-colors-deprecated();
 
 	// Gradients
-	@include gradient-colors();
+	@include gradient-colors-deprecated();
 }
 
 // Font sizes.
