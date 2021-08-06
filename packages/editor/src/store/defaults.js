@@ -27,6 +27,6 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	richEditingEnabled: true,
 	codeEditingEnabled: true,
-	enableCustomFields: false,
+	enableCustomFields: undefined,
 	supportsLayout: true,
 };
