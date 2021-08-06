@@ -561,7 +561,10 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				<PanelBody title={ __( 'Featured Image' ) }>
+				<PanelBody
+					title={ __( 'Featured Image' ) }
+					titleStyle={ styles.featuredImagePanelTitle }
+				>
 					{ androidOnly &&
 						canImageBeFeatured &&
 						this.getSetFeaturedButton( isFeaturedImage ) }
