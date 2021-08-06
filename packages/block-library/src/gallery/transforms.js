@@ -91,8 +91,8 @@ addFilter(
  * @typedef  {Object} Attributes
  * @typedef  {Object} Block
  * @property {Attributes} attributes The attributes of the block.
- * @param    {Block}      toBlock    The block yo transform to.
- * @param    {Block[]}    fromBlocks The block yo transform to.
+ * @param    {Block}      toBlock    The block to transform to.
+ * @param    {Block[]}    fromBlocks The blocks to transform from.
  * @return   {Block}                 The transformed block.
  */
 function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
