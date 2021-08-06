@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import * as styles from '../styles';
-import { MENU_STATES } from '../utils';
 import { useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
 
@@ -37,50 +36,18 @@ export function useToolsPanel( props ) {
 		const items = {};
 
 		panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
-			let menuItemState = hasValue()
-				? MENU_STATES.CHECKED
-				: MENU_STATES.UNCHECKED;
-
-			// Disable the menu item if its unchecked and a default control.
-			if ( menuItemState === MENU_STATES.UNCHECKED && isShownByDefault ) {
-				menuItemState = MENU_STATES.DISABLED;
-			}
-
-			items[ label ] = menuItemState;
+			items[ label ] = isShownByDefault || hasValue();
 		} );
 
 		setMenuItems( items );
 	}, [ panelItems ] );
 
-	// When a panel item gets a value set, update its menu item.
-	const checkMenuItem = ( label ) => {
-		setMenuItems( ( items ) => ( {
-			...items,
-			[ label ]: MENU_STATES.CHECKED,
-		} ) );
-	};
-
-	// Toggles the customized state of the panel item and its display if it
-	// isn't to be displayed by default. When toggling a panel item its
-	// onSelect or onDeselect callbacks are called as appropriate.
+	// Toggle the checked state of a menu item which is then used to determine
+	// display of the item within the panel.
 	const toggleItem = ( label ) => {
-		const wasChecked = menuItems[ label ] === MENU_STATES.CHECKED;
-		const panelItem = panelItems.find( ( item ) => item.label === label );
-
-		let menuItemState = wasChecked
-			? MENU_STATES.UNCHECKED
-			: MENU_STATES.CHECKED;
-
-		if (
-			menuItemState === MENU_STATES.UNCHECKED &&
-			panelItem.isShownByDefault
-		) {
-			menuItemState = MENU_STATES.DISABLED;
-		}
-
 		setMenuItems( {
 			...menuItems,
-			[ label ]: menuItemState,
+			[ label ]: ! menuItems[ label ],
 		} );
 	};
 
@@ -90,21 +57,17 @@ export function useToolsPanel( props ) {
 			resetAll();
 		}
 
-		// Turn off all menu items. Default controls will continue to display
-		// by virtue of their `isShownByDefault` prop however their menu item
-		// will be disabled to prevent behaviour where toggling has no effect.
+		// Turn off display of all non-default items.
 		const resetMenuItems = {};
 
 		panelItems.forEach( ( { label, isShownByDefault } ) => {
-			resetMenuItems[ label ] = isShownByDefault
-				? MENU_STATES.DISABLED
-				: MENU_STATES.UNCHECKED;
+			resetMenuItems[ label ] = !! isShownByDefault;
 		} );
 
 		setMenuItems( resetMenuItems );
 	};
 
-	const panelContext = { checkMenuItem, menuItems, registerPanelItem };
+	const panelContext = { menuItems, registerPanelItem };
 
 	return {
 		...otherProps,

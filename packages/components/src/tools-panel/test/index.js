@@ -231,32 +231,6 @@ describe( 'ToolsPanel', () => {
 			expect( menuItems[ 1 ] ).toHaveAttribute( 'aria-checked', 'false' );
 		} );
 
-		it( 'should disable default control menu items when the control has no value', async () => {
-			render(
-				<ToolsPanel { ...defaultProps }>
-					<ToolsPanelItem
-						{ ...controlProps }
-						isShownByDefault={ true }
-					>
-						<div>Example control</div>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						{ ...altControlProps }
-						isShownByDefault={ true }
-					>
-						<div>Alt control</div>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			);
-			openDropdownMenu();
-
-			const menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
-
-			expect( menuItems.length ).toEqual( 2 );
-			expect( menuItems[ 0 ] ).not.toHaveAttribute( 'disabled' );
-			expect( menuItems[ 1 ] ).toHaveAttribute( 'disabled' );
-		} );
-
 		it( 'should render panel header', () => {
 			renderPanel();
 			const header = screen.getByText( defaultProps.header );
@@ -290,6 +264,28 @@ describe( 'ToolsPanel', () => {
 			const control = screen.queryByText( 'Example control' );
 
 			expect( control ).not.toBeInTheDocument();
+		} );
+
+		it( 'should prevent shown by default item rendering when toggled off via menu item', async () => {
+			render(
+				<ToolsPanel { ...defaultProps }>
+					<ToolsPanelItem
+						{ ...controlProps }
+						isShownByDefault={ true }
+					>
+						<div>Default control</div>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			);
+
+			const control = screen.getByText( 'Default control' );
+
+			expect( control ).toBeInTheDocument();
+
+			await selectMenuItem( controlProps.label );
+			const resetControl = screen.queryByText( 'Default control' );
+
+			expect( resetControl ).not.toBeInTheDocument();
 		} );
 	} );
 
@@ -350,41 +346,6 @@ describe( 'ToolsPanel', () => {
 			expect( altItem ).toBeInTheDocument();
 			expect( altMenuItem ).toHaveAttribute( 'aria-checked', 'false' );
 		} );
-
-		it( 'should check menu item when updating grouped item control value', async () => {
-			const { rerender } = render(
-				<ToolsPanel { ...defaultProps }>
-					<GroupedItems
-						defaultGroupedProps={ nestedControlProps }
-						altGroupedProps={ {
-							...altNestedControlProps,
-							isShownByDefault: true,
-						} }
-					/>
-				</ToolsPanel>
-			);
-
-			openDropdownMenu();
-			const menuItem = screen.getByText( 'Nested Control 2' ).parentNode;
-
-			expect( menuItem ).toHaveAttribute( 'aria-checked', 'false' );
-			altNestedControlProps.attributes = { value: true };
-
-			rerender(
-				<ToolsPanel { ...defaultProps }>
-					<GroupedItems
-						defaultGroupedProps={ nestedControlProps }
-						altGroupedProps={ {
-							...altNestedControlProps,
-							isShownByDefault: true,
-						} }
-					/>
-				</ToolsPanel>
-			);
-
-			expect( menuItem ).toHaveAttribute( 'aria-checked', 'true' );
-			altNestedControlProps.attributes = { value: false };
-		} );
 	} );
 
 	describe( 'wrapped panel items within custom components', () => {
@@ -419,39 +380,6 @@ describe( 'ToolsPanel', () => {
 
 			expect( altItem ).toBeInTheDocument();
 			expect( altMenuItem ).toHaveAttribute( 'aria-checked', 'false' );
-		} );
-
-		it( 'should check menu item when updating wrapped item control value', () => {
-			const { rerender } = render(
-				<ToolsPanel { ...defaultProps }>
-					<WrappedItem
-						{ ...altNestedControlProps }
-						text="Wrapped"
-						isShownByDefault={ true }
-					/>
-				</ToolsPanel>
-			);
-
-			openDropdownMenu();
-			const menuItem = screen.getByText( 'Nested Control 2' ).parentNode;
-
-			expect( menuItem ).toHaveAttribute( 'aria-checked', 'false' );
-			altNestedControlProps.attributes = { value: true };
-
-			rerender(
-				<ToolsPanel { ...defaultProps }>
-					<GroupedItems
-						defaultGroupedProps={ nestedControlProps }
-						altGroupedProps={ {
-							...altNestedControlProps,
-							isShownByDefault: true,
-						} }
-					/>
-				</ToolsPanel>
-			);
-
-			expect( menuItem ).toHaveAttribute( 'aria-checked', 'true' );
-			altNestedControlProps.attributes = { value: false };
 		} );
 	} );
 } );

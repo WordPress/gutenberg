@@ -11,7 +11,6 @@ import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
 import { useToolsPanelHeader } from './hook';
-import { MENU_STATES } from '../utils';
 import { contextConnect } from '../../ui/context';
 
 const ToolsPanelHeader = ( props, forwardedRef ) => {
@@ -38,18 +37,12 @@ const ToolsPanelHeader = ( props, forwardedRef ) => {
 						<>
 							<MenuGroup label={ __( 'Display options' ) }>
 								{ Object.entries( menuItems ).map(
-									( [ label, itemState ] ) => {
-										const isSelected =
-											itemState === MENU_STATES.CHECKED;
-										const isDisabled =
-											itemState === MENU_STATES.DISABLED;
-
+									( [ label, isSelected ] ) => {
 										return (
 											<MenuItem
 												key={ label }
 												icon={ isSelected && check }
 												isSelected={ isSelected }
-												disabled={ isDisabled }
 												onClick={ () => {
 													toggleItem( label );
 													onClose();
