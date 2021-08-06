@@ -144,7 +144,7 @@ function getSuggestionsQuery( type, kind ) {
  * 4: Theme colors
  * 5: Global styles
  *
- * @param {Object} context
+ * @param {Object}  context
  * @param {boolean} isSubMenu
  */
 function getColors( context, isSubMenu ) {
@@ -469,7 +469,7 @@ export default function NavigationLinkEdit( {
 
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
-		className: classnames( {
+		className: classnames( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
@@ -527,9 +527,13 @@ export default function NavigationLinkEdit( {
 		}
 	);
 
-	const classes = classnames( 'wp-block-navigation-link__content', {
-		'wp-block-navigation-link__placeholder': ! url,
-	} );
+	const classes = classnames(
+		'wp-block-navigation-link__content',
+		'wp-block-navigation-item__content',
+		{
+			'wp-block-navigation-link__placeholder': ! url,
+		}
+	);
 
 	let missingText = '';
 	switch ( type ) {
