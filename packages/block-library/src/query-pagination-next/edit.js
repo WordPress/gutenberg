@@ -1,88 +1,83 @@
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	PlainText,
-	BlockControls,
+	InspectorControls,
 } from '@wordpress/block-editor';
-import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import {
-	arrowLeft,
-	arrowRight,
-	chevronLeft,
-	chevronRight,
-	textColor,
-} from '@wordpress/icons';
+	PanelBody,
+	__experimentalSegmentedControl as SegmentedControl,
+	__experimentalSegmentedControlOption as SegmentedControlOption,
+} from '@wordpress/components';
 
 export default function QueryPaginationNextEdit( {
 	attributes: { label, arrow },
 	setAttributes,
 } ) {
-	const arrowIcon = isRTL() ? arrowLeft : arrowRight;
-	const arrowValue = isRTL() ? '←' : '→';
-	const chevronIcon = isRTL() ? chevronLeft : chevronRight;
-	const chevronValue = '⟩'; // chevrons seem to handle their own RTL.
-
 	const arrowControls = [
 		{
-			icon: textColor,
 			value: '',
-			title: __( 'No arrow' ),
-			isActive: '' === arrow,
-			onClick: () => {
-				setAttributes( {
-					arrow: '',
-				} );
-			},
+			label: _x( 'None', 'Arrow option for Query Pagination Next block' ),
 		},
 		{
-			icon: arrowIcon,
-			value: arrowValue,
-			title: __( 'Arrow' ),
-			isActive: arrowValue === arrow,
-			onClick: () => {
-				setAttributes( {
-					arrow: arrowValue,
-				} );
-			},
+			value: isRTL() ? '←' : '→',
+			label: _x(
+				'Arrow',
+				'Arrow option for Query Pagination Next block'
+			),
 		},
 		{
-			icon: chevronIcon,
-			value: chevronValue,
-			title: __( 'Chevron' ),
-			isActive: chevronValue === arrow,
-			onClick: () => {
-				setAttributes( {
-					arrow: chevronValue,
-				} );
-			},
+			value: isRTL() ? '«' : '»',
+			label: _x(
+				'Chevron',
+				'Arrow option for Query Pagination Next block'
+			),
 		},
 	];
 
-	const getIcon = () => {
-		const currentArrow = arrowControls.filter(
-			( arrowControl ) => arrowControl.value === arrow
-		);
-		if ( currentArrow.length > 0 ) {
-			return currentArrow[ 0 ].icon;
-		}
+	let selectedArrow = arrowControls.filter(
+		( arrowControl ) => arrowControl.value === arrow
+	);
 
-		return null;
-	};
+	// This can happen if the user switches from an LTR to RTL
+	if ( selectedArrow.length === 0 ) {
+		selectedArrow = arrowControls[ 0 ];
+		setAttributes( {
+			arrow: '',
+		} );
+	} else {
+		selectedArrow = selectedArrow[ 0 ];
+	}
 
 	return (
 		<div className="wp-block-query-pagination-next">
-			<BlockControls group="block">
-				<ToolbarGroup>
-					<ToolbarDropdownMenu
-						icon={ getIcon() }
-						label={ __( 'Change arrow' ) }
-						controls={ arrowControls }
-					/>
-				</ToolbarGroup>
-			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Arrow settings' ) }>
+					<SegmentedControl
+						label={ selectedArrow.label }
+						value={ arrow }
+						onChange={ ( value ) => {
+							setAttributes( {
+								arrow: value,
+							} );
+						} }
+						isBlock
+					>
+						{ arrowControls.map( ( arrowControl ) => {
+							return (
+								<SegmentedControlOption
+									key={ arrowControl.value }
+									value={ arrowControl.value }
+									label={ arrowControl.label }
+								/>
+							);
+						} ) }
+					</SegmentedControl>
+				</PanelBody>
+			</InspectorControls>
 			<PlainText
 				__experimentalVersion={ 2 }
 				tagName="a"
