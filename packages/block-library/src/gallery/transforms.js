@@ -53,13 +53,13 @@ function updateThirdPartyTransformToGallery( block ) {
 	if (
 		settings.__unstableGalleryWithImageBlocks &&
 		block.name === 'core/gallery' &&
-		block.attributes?.images
+		block.attributes?.images.length > 0
 	) {
 		const innerBlocks = block.attributes.images.map(
 			( { url, id, alt } ) => {
 				return createBlock( 'core/image', {
 					url,
-					id: parseInt( id, 10 ),
+					id: id ? parseInt( id, 10 ) : null,
 					alt,
 					sizeSlug: block.attributes.sizeSlug,
 					linkDestination: block.attributes.linkDestination,
@@ -109,7 +109,7 @@ function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
 		const images = galleryBlock.innerBlocks.map(
 			( { attributes: { url, id, alt } } ) => ( {
 				url,
-				id: parseInt( id, 10 ),
+				id: id ? parseInt( id, 10 ) : null,
 				alt,
 			} )
 		);
