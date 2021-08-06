@@ -6,7 +6,7 @@
 		"attributes": {
 			"hasParallax": false,
 			"dimRatio": 100,
-			"overlayColor": "primary",
+			"overlayColor": "purple",
 			"backgroundType": "image",
 			"isRepeated": false
 		},
@@ -17,15 +17,15 @@
 				"isValid": true,
 				"attributes": {
 					"align": "center",
-					"content": "",
+					"content": "hi",
 					"dropCap": false,
 					"placeholder": "Write title…",
 					"fontSize": "large"
 				},
 				"innerBlocks": [],
-				"originalContent": "<p class=\"has-text-align-center has-large-font-size\"></p>"
+				"originalContent": "<p class=\"has-text-align-center has-large-font-size\">hi</p>"
 			}
 		],
-		"originalContent": "<div class=\"wp-block-cover has-primary-background-color has-background-dim\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+		"originalContent": "<div class=\"wp-block-cover has-purple-background-color has-background-dim\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
 	}
 ]

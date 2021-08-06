@@ -5,9 +5,9 @@
 		"isValid": true,
 		"attributes": {
 			"hasParallax": false,
-			"isRepeated": false,
-			"dimRatio": 50,
+			"dimRatio": 100,
 			"backgroundType": "image",
+			"isRepeated": false,
 			"customGradient": "linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%)"
 		},
 		"innerBlocks": [
