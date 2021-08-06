@@ -566,7 +566,7 @@ export class ImageEdit extends Component {
 					titleStyle={ styles.featuredImagePanelTitle }
 				>
 					{ canImageBeFeatured &&
-						this.getSetFeaturedButton( isFeaturedImage ) }
+						this.getFeaturedButtonPanel( isFeaturedImage ) }
 				</PanelBody>
 				<PanelBody>
 					<FooterMessageControl
