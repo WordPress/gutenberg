@@ -396,10 +396,7 @@ function CoverEdit( {
 	const style = {
 		...( isImageBackground && ! isImgElement
 			? backgroundImageStyles( url )
-			: {
-					backgroundImage: gradientValue ? gradientValue : undefined,
-			  } ),
-		backgroundColor: overlayColor.color,
+			: {} ),
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
@@ -500,7 +497,6 @@ function CoverEdit( {
 										url: undefined,
 										id: undefined,
 										backgroundType: undefined,
-										dimRatio: undefined,
 										focalPoint: undefined,
 										hasParallax: undefined,
 										isRepeated: undefined,
@@ -539,21 +535,19 @@ function CoverEdit( {
 						},
 					] }
 				>
-					{ !! url && (
-						<RangeControl
-							label={ __( 'Opacity' ) }
-							value={ dimRatio }
-							onChange={ ( newDimRation ) =>
-								setAttributes( {
-									dimRatio: newDimRation,
-								} )
-							}
-							min={ 0 }
-							max={ 100 }
-							step={ 10 }
-							required
-						/>
-					) }
+					<RangeControl
+						label={ __( 'Opacity' ) }
+						value={ dimRatio }
+						onChange={ ( newDimRatio ) =>
+							setAttributes( {
+								dimRatio: newDimRatio,
+							} )
+						}
+						min={ 0 }
+						max={ 100 }
+						step={ 10 }
+						required
+					/>
 				</PanelColorGradientSettings>
 			</InspectorControls>
 		</>
@@ -609,7 +603,6 @@ function CoverEdit( {
 			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
-			[ overlayColor.class ]: overlayColor.class,
 			'has-background-gradient': gradientValue,
 			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(
@@ -646,14 +639,26 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-				{ url && gradientValue && dimRatio !== 0 && (
+				{ dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
 						className={ classnames(
 							'wp-block-cover__gradient-background',
-							gradientClass
+							gradientClass,
+							{ [ overlayColor.class ]: overlayColor.class }
 						) }
-						style={ { backgroundImage: gradientValue } }
+						style={ {
+							backgroundImage: gradientValue,
+							/**
+							 * We default to `black` background to enable the opacity of
+							 * images/videos when we haven't explicitly set any overlay color.
+							 */
+							backgroundColor:
+								! gradientValue && ! overlayColor.class
+									? overlayColor.color || 'black'
+									: undefined,
+							opacity: dimRatio / 100,
+						} }
 					/>
 				) }
 				{ url && isImageBackground && isImgElement && (
