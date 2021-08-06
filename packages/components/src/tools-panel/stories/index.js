@@ -38,22 +38,24 @@ export const _default = () => {
 					resetAll={ resetAll }
 				>
 					<ToolsPanelItem
+						className="single-column"
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
 					>
-						<PlaceholderControl
+						<UnitControl
 							label="Height"
 							value={ height }
 							onChange={ ( next ) => setHeight( next ) }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
+						className="single-column"
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
 					>
-						<PlaceholderControl
+						<UnitControl
 							label="Width"
 							value={ width }
 							onChange={ ( next ) => setWidth( next ) }
@@ -64,12 +66,6 @@ export const _default = () => {
 		</PanelWrapperView>
 	);
 };
-
-function PlaceholderControl( { label, value, onChange } ) {
-	return (
-		<UnitControl label={ label } value={ value } onChange={ onChange } />
-	);
-}
 
 const PanelWrapperView = styled.div`
 	max-width: 250px;
