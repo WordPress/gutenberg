@@ -37,7 +37,7 @@ const parseShortcodeIds = ( ids ) => {
 /**
  * Third party block plugins don't have an easy way to detect if the
  * innerBlocks version of the Gallery is running when they run a
- * 3rdPartyBlock -> GallaryBlock transform so this tranform filter
+ * 3rdPartyBlock -> GalleryBlock transform so this tranform filter
  * will handle this. Once the innerBlocks version is the default
  * in a core release, this could be deprecated and removed after
  * plugin authors have been given time to update transforms.
