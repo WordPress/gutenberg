@@ -1,4 +1,4 @@
-# Block Theme
+# Block Theme 
 
 <div class="callout callout-alert">
 These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors and theme authors.
@@ -33,7 +33,7 @@ theme
 
 The difference with existing WordPress themes is that the different templates in the template hierarchy, and template parts, are block templates instead of php files. In addition, this example includes a [`theme.json`](/docs/how-to-guides/themes/theme-json.md) file for some styles.
 
-## What is a block template?
+## What is a block template? 
 
 A block template is made up of a list of blocks. Any WordPress block can be used in a template. Templates can also reuse parts of their content using "Template Parts". For example, all the block templates can have the same header included from a separate `header.html` template part.
 
