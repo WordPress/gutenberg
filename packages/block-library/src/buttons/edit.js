@@ -59,6 +59,7 @@ function ButtonsEdit( {
 			],
 		],
 		orientation,
+		__experimentalCaptureToolbars: true,
 		__experimentalLayout: LAYOUT,
 		templateInsertUpdatesSelection: true,
 	} );
@@ -70,7 +71,7 @@ function ButtonsEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
+			<BlockControls group="block" __experimentalExposeToChildren>
 				<JustifyContentControl
 					allowedControls={ justifyControls }
 					value={ contentJustification }

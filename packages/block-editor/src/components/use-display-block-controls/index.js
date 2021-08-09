@@ -9,31 +9,36 @@ import { useSelect } from '@wordpress/data';
 import { useBlockEditContext } from '../block-edit/context';
 import { store as blockEditorStore } from '../../store';
 
-export default function useDisplayBlockControls() {
+export default function useDisplayBlockControls( {
+	__experimentalExposeToChildren = false,
+} = {} ) {
 	const { isSelected, clientId, name } = useBlockEditContext();
-	const isFirstAndSameTypeMultiSelected = useSelect(
+	const isActive = useSelect(
 		( select ) => {
-			// Don't bother checking, see OR statement below.
 			if ( isSelected ) {
-				return;
+				return true;
 			}
 
 			const {
 				getBlockName,
 				isFirstMultiSelectedBlock,
 				getMultiSelectedBlockClientIds,
+				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
 
-			if ( ! isFirstMultiSelectedBlock( clientId ) ) {
-				return false;
+			if ( isFirstMultiSelectedBlock( clientId ) ) {
+				return getMultiSelectedBlockClientIds().every(
+					( id ) => getBlockName( id ) === name
+				);
+			}
+			if ( __experimentalExposeToChildren ) {
+				return hasSelectedInnerBlock( clientId );
 			}
 
-			return getMultiSelectedBlockClientIds().every(
-				( id ) => getBlockName( id ) === name
-			);
+			return false;
 		},
 		[ clientId, isSelected, name ]
 	);
 
-	return isSelected || isFirstAndSameTypeMultiSelected;
+	return isActive;
 }

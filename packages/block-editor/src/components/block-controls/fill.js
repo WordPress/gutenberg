@@ -22,8 +22,9 @@ export default function BlockControlsFill( {
 	group = 'default',
 	controls,
 	children,
+	__experimentalExposeToChildren = false,
 } ) {
-	if ( ! useDisplayBlockControls() ) {
+	if ( ! useDisplayBlockControls( { __experimentalExposeToChildren } ) ) {
 		return null;
 	}
 	const Fill = groups[ group ].Fill;
