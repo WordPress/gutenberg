@@ -720,7 +720,7 @@ export default function NavigationLinkEdit( {
 						</Popover>
 					) }
 					{ hasDescendants && showSubmenuIcon && (
-						<span className="wp-block-navigation-link__submenu-icon">
+						<span className="wp-block-navigation-link__submenu-icon wp-block-navigation__submenu-icon">
 							<ItemSubmenuIcon />
 						</span>
 					) }
