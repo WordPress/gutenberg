@@ -36,7 +36,7 @@ export const settings = {
 					}
 
 					// Put the selected blocks inside the new Widget Box's innerBlocks.
-					const innerBlocks = [
+					let innerBlocks = [
 						...blocks.map( ( block ) => {
 							return createBlock(
 								block.name,
@@ -46,7 +46,28 @@ export const settings = {
 						} ),
 					];
 
-					return createBlock( 'core/widget-box', {}, innerBlocks );
+					// If the first block is a heading then assume this is intended
+					// to be the Widget's "title".
+					const firstHeadingBlock =
+						innerBlocks[ 0 ].name === 'core/heading'
+							? innerBlocks[ 0 ]
+							: null;
+
+					// Remove the first heading block as we're copying
+					// it's content into the Widget Box's title attribute.
+					innerBlocks = innerBlocks.filter(
+						( block ) => block !== firstHeadingBlock
+					);
+
+					return createBlock(
+						'core/widget-box',
+						{
+							...( firstHeadingBlock && {
+								title: firstHeadingBlock.attributes.content,
+							} ),
+						},
+						innerBlocks
+					);
 				},
 			},
 		],
