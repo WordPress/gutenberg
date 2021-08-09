@@ -96,7 +96,6 @@ addFilter(
  * @return   {Block}                 The transformed block.
  */
 function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
-	const settings = select( blockEditorStore ).getSettings();
 	const galleryBlock = fromBlocks.find(
 		( transformedBlock ) =>
 			transformedBlock.name === 'core/gallery' &&
@@ -105,7 +104,7 @@ function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
 			! toBlock.name.includes( 'core/' )
 	);
 
-	if ( settings.__unstableGalleryWithImageBlocks && galleryBlock ) {
+	if ( galleryBlock ) {
 		const images = galleryBlock.innerBlocks.map(
 			( { attributes: { url, id, alt } } ) => ( {
 				url,
