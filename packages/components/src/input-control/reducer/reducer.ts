@@ -2,47 +2,34 @@
  * External dependencies
  */
 import { isEmpty } from 'lodash';
+// eslint-disable-next-line no-restricted-imports
+import type { SyntheticEvent } from 'react';
+
 /**
  * WordPress dependencies
  */
 import { useReducer } from '@wordpress/element';
 
-const initialStateReducer = ( state ) => state;
-
-const initialInputControlState = {
-	_event: {},
-	error: null,
-	initialValue: '',
-	isDirty: false,
-	isDragEnabled: false,
-	isDragging: false,
-	isPressEnterToChange: false,
-	value: '',
-};
-
-const actionTypes = {
-	CHANGE: 'CHANGE',
-	COMMIT: 'COMMIT',
-	DRAG_END: 'DRAG_END',
-	DRAG_START: 'DRAG_START',
-	DRAG: 'DRAG',
-	INVALIDATE: 'INVALIDATE',
-	PRESS_DOWN: 'PRESS_DOWN',
-	PRESS_ENTER: 'PRESS_ENTER',
-	PRESS_UP: 'PRESS_UP',
-	RESET: 'RESET',
-	UPDATE: 'UPDATE',
-};
-
-export const inputControlActionTypes = actionTypes;
+/**
+ * Internal dependencies
+ */
+import {
+	InputState,
+	StateReducer,
+	initialInputControlState,
+	initialStateReducer,
+} from './state';
+import * as actions from './actions';
 
 /**
  * Prepares initialState for the reducer.
  *
- * @param {Object} initialState The initial state.
- * @return {Object} Prepared initialState for the reducer
+ * @param  initialState The initial state.
+ * @return Prepared initialState for the reducer
  */
-function mergeInitialState( initialState = initialInputControlState ) {
+function mergeInitialState(
+	initialState: Partial< InputState > = initialInputControlState
+): InputState {
 	const { value } = initialState;
 
 	return {
@@ -56,15 +43,17 @@ function mergeInitialState( initialState = initialInputControlState ) {
  * Composes multiple stateReducers into a single stateReducer, building
  * the pipeline to control the flow for state and actions.
  *
- * @param {...Function} fns State reducers.
- * @return {Function} The single composed stateReducer.
+ * @param  fns State reducers.
+ * @return The single composed stateReducer.
  */
-export const composeStateReducers = ( ...fns ) => {
+export const composeStateReducers = (
+	...fns: StateReducer[]
+): StateReducer => {
 	return ( ...args ) => {
 		return fns.reduceRight( ( state, fn ) => {
 			const fnState = fn( ...args );
 			return isEmpty( fnState ) ? state : { ...state, ...fnState };
-		}, {} );
+		}, {} as InputState );
 	};
 };
 
@@ -75,43 +64,44 @@ export const composeStateReducers = ( ...fns ) => {
  * This technique uses the "stateReducer" design pattern:
  * https://kentcdodds.com/blog/the-state-reducer-pattern/
  *
- * @param {Function} composedStateReducers A custom reducer that can subscribe and modify state.
- * @return {Function} The reducer.
+ * @param  composedStateReducers A custom reducer that can subscribe and modify state.
+ * @return The reducer.
  */
-function inputControlStateReducer( composedStateReducers ) {
+function inputControlStateReducer(
+	composedStateReducers: StateReducer
+): StateReducer {
 	return ( state, action ) => {
 		const nextState = { ...state };
-		const { type, payload } = action;
 
-		switch ( type ) {
+		switch ( action.type ) {
 			/**
 			 * Keyboard events
 			 */
-			case actionTypes.PRESS_UP:
+			case actions.PRESS_UP:
 				nextState.isDirty = false;
 				break;
 
-			case actionTypes.PRESS_DOWN:
+			case actions.PRESS_DOWN:
 				nextState.isDirty = false;
 				break;
 
 			/**
 			 * Drag events
 			 */
-			case actionTypes.DRAG_START:
+			case actions.DRAG_START:
 				nextState.isDragging = true;
 				break;
 
-			case actionTypes.DRAG_END:
+			case actions.DRAG_END:
 				nextState.isDragging = false;
 				break;
 
 			/**
 			 * Input events
 			 */
-			case actionTypes.CHANGE:
+			case actions.CHANGE:
 				nextState.error = null;
-				nextState.value = payload.value;
+				nextState.value = action.payload.value;
 
 				if ( state.isPressEnterToChange ) {
 					nextState.isDirty = true;
@@ -119,32 +109,32 @@ function inputControlStateReducer( composedStateReducers ) {
 
 				break;
 
-			case actionTypes.COMMIT:
-				nextState.value = payload.value;
+			case actions.COMMIT:
+				nextState.value = action.payload.value;
 				nextState.isDirty = false;
 				break;
 
-			case actionTypes.RESET:
+			case actions.RESET:
 				nextState.error = null;
 				nextState.isDirty = false;
-				nextState.value = payload.value || state.initialValue;
+				nextState.value = action.payload.value || state.initialValue;
 				break;
 
-			case actionTypes.UPDATE:
-				nextState.value = payload.value;
+			case actions.UPDATE:
+				nextState.value = action.payload.value;
 				nextState.isDirty = false;
 				break;
 
 			/**
 			 * Validation
 			 */
-			case actionTypes.INVALIDATE:
-				nextState.error = payload.error;
+			case actions.INVALIDATE:
+				nextState.error = action.payload.error;
 				break;
 		}
 
-		if ( payload.event ) {
-			nextState._event = payload.event;
+		if ( action.payload.event ) {
+			nextState._event = action.payload.event;
 		}
 
 		/**
@@ -166,20 +156,23 @@ function inputControlStateReducer( composedStateReducers ) {
  * This technique uses the "stateReducer" design pattern:
  * https://kentcdodds.com/blog/the-state-reducer-pattern/
  *
- * @param {Function} stateReducer An external state reducer.
- * @param {Object}   initialState The initial state for the reducer.
- * @return {Object} State, dispatch, and a collection of actions.
+ * @param  stateReducer An external state reducer.
+ * @param  initialState The initial state for the reducer.
+ * @return State, dispatch, and a collection of actions.
  */
 export function useInputControlStateReducer(
-	stateReducer = initialStateReducer,
-	initialState = initialInputControlState
+	stateReducer: StateReducer = initialStateReducer,
+	initialState: Partial< InputState > = initialInputControlState
 ) {
-	const [ state, dispatch ] = useReducer(
+	const [ state, dispatch ] = useReducer< StateReducer >(
 		inputControlStateReducer( stateReducer ),
 		mergeInitialState( initialState )
 	);
 
-	const createChangeEvent = ( type ) => ( nextValue, event ) => {
+	const createChangeEvent = ( type: actions.ChangeEventAction[ 'type' ] ) => (
+		nextValue: actions.ChangeEventAction[ 'payload' ][ 'value' ],
+		event: actions.ChangeEventAction[ 'payload' ][ 'event' ]
+	) => {
 		/**
 		 * Persist allows for the (Synthetic) event to be used outside of
 		 * this function call.
@@ -192,10 +185,12 @@ export function useInputControlStateReducer(
 		dispatch( {
 			type,
 			payload: { value: nextValue, event },
-		} );
+		} as actions.InputAction );
 	};
 
-	const createKeyEvent = ( type ) => ( event ) => {
+	const createKeyEvent = ( type: actions.KeyEventAction[ 'type' ] ) => (
+		event: actions.KeyEventAction[ 'payload' ][ 'event' ]
+	) => {
 		/**
 		 * Persist allows for the (Synthetic) event to be used outside of
 		 * this function call.
@@ -208,26 +203,29 @@ export function useInputControlStateReducer(
 		dispatch( { type, payload: { event } } );
 	};
 
-	const createDragEvent = ( type ) => ( dragProps ) => {
-		dispatch( { type, payload: dragProps } );
+	const createDragEvent = ( type: actions.DragEventAction[ 'type' ] ) => (
+		payload: actions.DragEventAction[ 'payload' ]
+	) => {
+		dispatch( { type, payload } );
 	};
 
 	/**
 	 * Actions for the reducer
 	 */
-	const change = createChangeEvent( actionTypes.CHANGE );
-	const invalidate = createChangeEvent( actionTypes.INVALIDATE );
-	const reset = createChangeEvent( actionTypes.RESET );
-	const commit = createChangeEvent( actionTypes.COMMIT );
-	const update = createChangeEvent( actionTypes.UPDATE );
+	const change = createChangeEvent( actions.CHANGE );
+	const invalidate = ( error: Error, event: SyntheticEvent ) =>
+		dispatch( { type: actions.INVALIDATE, payload: { error, event } } );
+	const reset = createChangeEvent( actions.RESET );
+	const commit = createChangeEvent( actions.COMMIT );
+	const update = createChangeEvent( actions.UPDATE );
 
-	const dragStart = createDragEvent( actionTypes.DRAG_START );
-	const drag = createDragEvent( actionTypes.DRAG );
-	const dragEnd = createDragEvent( actionTypes.DRAG_END );
+	const dragStart = createDragEvent( actions.DRAG_START );
+	const drag = createDragEvent( actions.DRAG );
+	const dragEnd = createDragEvent( actions.DRAG_END );
 
-	const pressUp = createKeyEvent( actionTypes.PRESS_UP );
-	const pressDown = createKeyEvent( actionTypes.PRESS_DOWN );
-	const pressEnter = createKeyEvent( actionTypes.PRESS_ENTER );
+	const pressUp = createKeyEvent( actions.PRESS_UP );
+	const pressDown = createKeyEvent( actions.PRESS_DOWN );
+	const pressEnter = createKeyEvent( actions.PRESS_ENTER );
 
 	return {
 		change,
@@ -243,5 +241,5 @@ export function useInputControlStateReducer(
 		reset,
 		state,
 		update,
-	};
+	} as const;
 }
