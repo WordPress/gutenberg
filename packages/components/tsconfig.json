@@ -35,6 +35,7 @@
 		"src/grid/**/*",
 		"src/h-stack/**/*",
 		"src/heading/**/*",
+		"src/item-group/**/*",
 		"src/input-control/**/*",
 		"src/icon/**/*",
 		"src/number-control/**/*",

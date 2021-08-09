@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import colorize from 'tinycolor2';
+import colorize, { ColorFormats } from 'tinycolor2';
 
 /**
  * WordPress dependencies
@@ -20,13 +20,13 @@ import type { ColorType } from './types';
 import { space } from '../utils/space';
 
 interface ColorDisplayProps {
-	color: string;
+	color: ColorFormats.HSLA;
 	colorType: ColorType;
 	enableAlpha: boolean;
 }
 
 interface DisplayProps {
-	color: string;
+	color: ColorFormats.HSLA;
 	enableAlpha: boolean;
 }
 
@@ -80,8 +80,14 @@ const RgbDisplay = ( { color, enableAlpha }: DisplayProps ) => {
 	return <ValueDisplay values={ values } />;
 };
 
-const HexDisplay = ( { color }: DisplayProps ) => {
-	const colorWithoutHash = color.slice( 1 ).toUpperCase();
+const HexDisplay = ( { color, enableAlpha }: DisplayProps ) => {
+	const colorized = colorize( color );
+	const colorWithoutHash = ( enableAlpha
+		? colorized.toHex8String()
+		: colorized.toHexString()
+	)
+		.slice( 1 )
+		.toUpperCase();
 	return (
 		<FlexItem>
 			<Text color="blue">#</Text>
@@ -121,17 +127,22 @@ export const ColorDisplay = ( {
 				}
 				default:
 				case 'hex': {
-					return color.toUpperCase();
+					const colorized = colorize( color );
+					return enableAlpha
+						? colorized.toHex8String()
+						: colorized.toHexString();
 				}
 			}
 		},
-		() => setCopiedColor( color )
+		() => setCopiedColor( colorize( color ).toHex8String() )
 	);
 	return (
 		<Tooltip
 			content={
 				<Text color="white">
-					{ copiedColor === color ? __( 'Copied!' ) : __( 'Copy' ) }
+					{ copiedColor === colorize( color ).toHex8String()
+						? __( 'Copied!' )
+						: __( 'Copy' ) }
 				</Text>
 			}
 		>

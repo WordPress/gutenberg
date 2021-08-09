@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import colorize from 'tinycolor2';
+import colorize, { ColorFormats } from 'tinycolor2';
 
 /**
  * Internal dependencies
@@ -12,8 +12,8 @@ import InputControl from '../../input-control';
 import { space } from '../utils/space';
 
 interface HexInputProps {
-	color: string;
-	onChange: ( value: string ) => void;
+	color: ColorFormats.HSLA;
+	onChange: ( value: ColorFormats.HSLA ) => void;
 	enableAlpha: boolean;
 }
 
@@ -24,6 +24,11 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 		}
 	};
 
+	const colorized = colorize( color );
+	const value = enableAlpha
+		? colorized.toHex8String()
+		: colorized.toHexString();
+
 	return (
 		<InputControl
 			__unstableInputWidth="8em"
@@ -32,9 +37,9 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 					#
 				</Spacer>
 			}
-			value={ color.slice( 1 ).toUpperCase() }
+			value={ value.slice( 1 ).toUpperCase() }
 			onChange={ ( nextValue ) =>
-				onChange( colorize( nextValue ).toHex8String() )
+				onChange( colorize( nextValue ).toHsl() )
 			}
 			onValidate={ handleValidate }
 			maxLength={ enableAlpha ? 8 : 6 }

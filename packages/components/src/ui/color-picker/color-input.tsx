@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ColorFormats } from 'tinycolor2';
+
+/**
  * Internal dependencies
  */
 import { RgbInput } from './rgb-input';
@@ -7,8 +12,8 @@ import { HexInput } from './hex-input';
 
 interface ColorInputProps {
 	colorType: 'hsl' | 'hex' | 'rgb';
-	color: string;
-	onChange: ( value: string ) => void;
+	color: ColorFormats.HSLA;
+	onChange: ( value: ColorFormats.HSLA ) => void;
 	enableAlpha: boolean;
 }
 
