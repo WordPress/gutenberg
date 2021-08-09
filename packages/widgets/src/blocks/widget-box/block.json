@@ -15,5 +15,4 @@
 	},
 	"editorStyle": "wp-block-widget-box-editor",
 	"style": "wp-block-widget-box",
-	"parent": [ "core/widget-area" ]
 }
