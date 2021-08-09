@@ -201,6 +201,7 @@ function InserterMenu( {
 			hasNavigation
 			setMinHeightToMaxHeight={ showSearchForm }
 			contentStyle={ styles.list }
+			isFullScreen={ true }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => (

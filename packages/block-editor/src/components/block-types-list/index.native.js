@@ -81,7 +81,7 @@ export default function BlockTypesList( { name, items, onSelect, listProps } ) {
 			keyboardShouldPersistTaps="always"
 			numColumns={ numberOfColumns }
 			data={ items }
-			initialNumToRender={ 3 }
+			initialNumToRender={ 10 }
 			ItemSeparatorComponent={ () => (
 				<TouchableWithoutFeedback accessible={ false }>
 					<View

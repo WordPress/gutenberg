@@ -242,18 +242,17 @@ class BottomSheet extends Component {
 
 	onSetMaxHeight() {
 		const { height, width } = Dimensions.get( 'window' );
-		const { safeAreaBottomInset } = this.state;
+		//const { safeAreaBottomInset } = this.state;
 		const statusBarHeight =
 			Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
 		// `maxHeight` when modal is opened along with a keyboard
 		const maxHeightWithOpenKeyboard =
 			0.95 *
-			( Dimensions.get( 'window' ).height -
-				this.keyboardHeight -
+			( height -
+				//this.keyboardHeight -
 				statusBarHeight -
 				this.headerHeight );
-
 		// On horizontal mode `maxHeight` has to be set on 90% of width
 		if ( width > height ) {
 			this.setState( {
@@ -262,10 +261,7 @@ class BottomSheet extends Component {
 			//	On vertical mode `maxHeight` has to be set on 50% of width
 		} else {
 			this.setState( {
-				maxHeight: Math.min(
-					height / 2 - safeAreaBottomInset,
-					maxHeightWithOpenKeyboard
-				),
+				maxHeight: height - 75,
 			} );
 		}
 	}
@@ -435,7 +431,7 @@ class BottomSheet extends Component {
 
 		let listStyle = {};
 		if ( isFullScreen ) {
-			listStyle = { flexGrow: 1 };
+			listStyle = { maxHeight };
 		} else if ( isMaxHeightSet ) {
 			listStyle = { maxHeight };
 
@@ -524,7 +520,7 @@ class BottomSheet extends Component {
 							Platform.OS === 'ios' && isFullScreen
 								? safeAreaTopInset
 								: 0,
-						flex: isFullScreen ? 1 : undefined,
+						flex: 1, //isFullScreen ? 1 : undefined,
 						...( Platform.OS === 'android' && isFullScreen
 							? styles.backgroundFullScreen
 							: {} ),
@@ -533,9 +529,7 @@ class BottomSheet extends Component {
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
 					<View onLayout={ this.onHeaderLayout }>
-						{ ! ( Platform.OS === 'android' && isFullScreen ) && (
-							<View style={ styles.dragIndicator } />
-						) }
+						<View style={ styles.dragIndicator } />
 						{ ! hideHeader && getHeader() }
 					</View>
 					<WrapperView
