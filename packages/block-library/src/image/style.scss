@@ -102,3 +102,13 @@
 .wp-block-image figure {
 	margin: 0;
 }
+
+// Set baseline border styles with zero specificity to improve visual feedback
+// when user alters individual border properties via block support UI.
+html :where(.wp-block-image img) {
+	border: 0 solid currentColor;
+}
+
+html :where(.wp-block-image__crop-area) {
+	border: 0 solid currentColor;
+}
