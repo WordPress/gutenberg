@@ -1,30 +1,12 @@
 /**
- * External dependencies
- */
-import styled from '@emotion/styled';
-
-/**
  * Internal dependencies
  */
-import RangeControl from '../../range-control';
 import NumberControl from '../../number-control';
 import { HStack } from '../../h-stack';
 import { Text } from '../../text';
 import { Spacer } from '../../spacer';
 import { space } from '../utils/space';
-import { StyledField } from '../../base-control/styles/base-control-styles';
-
-const StyledRangeControl = styled( RangeControl )`
-	flex: 1;
-
-	${ StyledField } {
-		margin-bottom: 0;
-	}
-`;
-
-const Wrapper = styled( HStack )`
-	margin-bottom: ${ space( 2 ) };
-`;
+import { RangeControl } from './styles';
 
 interface InputWithSliderProps {
 	min: number;
@@ -44,7 +26,7 @@ export const InputWithSlider = ( {
 	value,
 }: InputWithSliderProps ) => {
 	return (
-		<Wrapper>
+		<Spacer as={ HStack }>
 			<NumberControl
 				__unstableInputWidth="5em"
 				min={ min }
@@ -60,7 +42,7 @@ export const InputWithSlider = ( {
 				}
 				hideHTMLArrows
 			/>
-			<StyledRangeControl
+			<RangeControl
 				label={ label }
 				hideLabelFromVision
 				min={ min }
@@ -69,6 +51,6 @@ export const InputWithSlider = ( {
 				onChange={ onChange }
 				withInputField={ false }
 			/>
-		</Wrapper>
+		</Spacer>
 	);
 };

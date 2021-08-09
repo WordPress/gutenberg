@@ -7,11 +7,20 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import InnerSelectControl from '../../select-control';
+import InnerRangeControl from '../../range-control';
 import { StyledField } from '../../base-control/styles/base-control-styles';
 import { space } from '../utils/space';
 
 export const SelectControl = styled( InnerSelectControl )`
 	width: 5em;
+`;
+
+export const RangeControl = styled( InnerRangeControl )`
+	flex: 1;
+
+	${ StyledField } {
+		margin-bottom: 0;
+	}
 `;
 
 export const ColorfulWrapper = styled.div`
