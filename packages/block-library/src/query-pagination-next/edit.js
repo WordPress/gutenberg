@@ -18,7 +18,7 @@ export default function QueryPaginationNextEdit( {
 	setAttributes,
 } ) {
 	return (
-		<div className="wp-block-query-pagination-next">
+		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Arrow settings' ) }>
 					<SegmentedControl
@@ -57,22 +57,30 @@ export default function QueryPaginationNextEdit( {
 					</SegmentedControl>
 				</PanelBody>
 			</InspectorControls>
-			<PlainText
-				__experimentalVersion={ 2 }
-				tagName="a"
-				aria-label={ __( 'Next page link' ) }
-				placeholder={ __( 'Next Page' ) }
-				value={ label }
-				onChange={ ( newLabel ) =>
-					setAttributes( { label: newLabel } )
-				}
+			<a
+				href="#pagination-next-pseudo-link"
+				onClick={ ( event ) => event.preventDefault() }
 				{ ...useBlockProps() }
-			/>{ ' ' }
-			<span
-				className={ `wp-block-query-pagination-next-arrow has-arrow-$(arrow)` }
 			>
-				{ arrow }
-			</span>
-		</div>
+				<PlainText
+					__experimentalVersion={ 2 }
+					tagName="span"
+					aria-label={ __( 'Next page link' ) }
+					placeholder={ __( 'Next Page' ) }
+					value={ label }
+					onChange={ ( newLabel ) =>
+						setAttributes( { label: newLabel } )
+					}
+				/>
+				{ arrow && (
+					<>
+						{ ' ' }
+						<span className="wp-block-query-pagination-next-arrow">
+							{ arrow }
+						</span>
+					</>
+				) }
+			</a>
+		</>
 	);
 }

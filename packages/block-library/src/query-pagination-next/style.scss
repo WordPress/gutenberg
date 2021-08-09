@@ -1,5 +1,5 @@
-.wp-block-query-pagination-next-arrow.is-arrow {
+.wp-block-query-pagination-next-arrow {
 	display: inline-block; // Needed so that the transform works.
 	// Flip for RTL.
-	transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the chevron right for LTR and left for RTL.
+	transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the arrow right for LTR and left for RTL.
 }

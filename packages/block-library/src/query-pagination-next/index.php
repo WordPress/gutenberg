@@ -22,7 +22,10 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$default_label      = __( 'Next Page' );
 	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
-	$content            = '';
+	if ( ! empty( $attributes['arrow'] ) ) {
+		$label .= " <span class='wp-block-query-pagination-next-arrow'>{$attributes['arrow']}</span>";
+	}
+	$content = '';
 
 	// Check if the pagination is for Query that inherits the global context.
 	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
@@ -51,11 +54,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		wp_reset_postdata(); // Restore original Post Data.
 	}
 
-	if ( $attributes['arrow'] === "→" ) {
-		$arrow_class = 'is-arrow';
-	}
-
-	return '<div class="wp-block-query-pagination-next">' . $content . ' <span class="wp-block-query-pagination-next-arrow ' . $arrow_class . '">' . $attributes['arrow'] . '</span></div>';
+	return $content;
 }
 
 /**
