@@ -179,6 +179,7 @@ function Editor( { initialSettings, onError } ) {
 
 	return (
 		<>
+			<URLQueryController />
 			<SlotFillProvider>
 				<EntityProvider kind="root" type="site">
 					<EntityProvider
@@ -200,7 +201,6 @@ function Editor( { initialSettings, onError } ) {
 									}
 								>
 									<ErrorBoundary onError={ onError }>
-										<URLQueryController />
 										<FullscreenMode isActive />
 										<UnsavedChangesWarning />
 										<KeyboardShortcuts.Register />
