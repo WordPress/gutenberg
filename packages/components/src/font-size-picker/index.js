@@ -92,6 +92,8 @@ function FontSizePicker(
 
 	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
 
+	const currentFontSizeSR = `Currently selected font size: ${ options.find( ( option ) => option.key === selectedFontSizeSlug ).name }`;
+
 	return (
 		<fieldset
 			className="components-font-size-picker"
@@ -103,6 +105,7 @@ function FontSizePicker(
 					<CustomSelectControl
 						className={ 'components-font-size-picker__select' }
 						label={ __( 'Font size' ) }
+						describedBy={ currentFontSizeSR }
 						options={ options }
 						value={ options.find(
 							( option ) => option.key === selectedFontSizeSlug
