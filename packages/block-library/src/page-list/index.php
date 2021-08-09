@@ -264,7 +264,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
 
-	$is_navigation_child = ! empty( $block->context );
+	$is_navigation_child = array_key_exists('isNavigationChild', $attributes) ? $attributes['isNavigationChild'] : ! empty( $block->context);
 
 	$wrapper_markup = '<ul %1$s>%2$s</ul>';
 

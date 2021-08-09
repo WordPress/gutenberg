@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -68,6 +69,9 @@ export default function PageListEdit( {
 		context.overlayBackgroundColor,
 		context.customOverlayBackgroundColor,
 	] );
+
+	const isNavigationChild = isEmpty( context ) ? false : true;
+	setAttributes( { isNavigationChild } );
 
 	const { textColor, backgroundColor, showSubmenuIcon, style } =
 		context || {};
