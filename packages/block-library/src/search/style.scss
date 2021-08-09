@@ -31,6 +31,7 @@
 	}
 
 	.wp-block-search__input {
+		padding: $grid-unit-10;
 		flex-grow: 1;
 		min-width: 3em;
 		border: 1px solid $gray-600;
