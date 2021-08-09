@@ -6,16 +6,24 @@ import {
 	useBlockProps,
 	InnerBlocks,
 	RichText,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 export default function Edit( {
 	attributes,
 	setAttributes,
 	clientId,
 	onReplace,
+	mergeBlocks,
 } ) {
+	const { getBlock } = useSelect( blockEditorStore );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+
+	const { innerBlocks } = getBlock( clientId );
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-widget-box__inner-blocks',
@@ -27,23 +35,18 @@ export default function Edit( {
 
 	const blockProps = useBlockProps();
 
-	function allowSingleLineOnly( value, isOriginal ) {
-		let block;
-
-		if ( isOriginal || value ) {
-			block = createBlock( 'core/heading', {
-				...attributes,
-				content: value,
-			} );
-		} else {
-			block = createBlock( 'core/paragraph' );
-		}
-
-		if ( isOriginal ) {
-			block.clientId = clientId;
-		}
-
-		return block;
+	/**
+	 * Split RichText on ENTER by manually creating a new paragraph block
+	 * within the innerBlocks of the **existing** Widget Box block.
+	 * If we don't do this then RichText will be split into heading + para
+	 * thereby entirely removint the Widget Box block altogether.
+	 */
+	function allowSingleLineOnly() {
+		replaceInnerBlocks(
+			clientId,
+			[ createBlock( 'core/paragraph', {} ), ...innerBlocks ],
+			true
+		);
 	}
 
 	return (
@@ -56,8 +59,11 @@ export default function Edit( {
 				placeholder={ __( 'Add a Widget title' ) }
 				value={ attributes.title }
 				onChange={ ( value ) => setAttributes( { title: value } ) }
-				onSplit={ allowSingleLineOnly }
 				onReplace={ onReplace }
+				onMerge={ mergeBlocks }
+				onSplit={ allowSingleLineOnly }
+				onRemove={ () => onReplace( [] ) }
+				{ ...blockProps }
 			/>
 			<div { ...innerBlocksProps } />
 		</div>
