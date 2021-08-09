@@ -128,6 +128,7 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 /**
  * Outputs Page list markup from an array of pages with nested children.
  *
+ * @param boolean   $is_navigation_child If block is a child of Navigation block.
  * @param array   $nested_pages The array of nested pages.
  * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
  * @param array   $colors Color information for overlay styles.
@@ -149,7 +150,7 @@ function block_core_page_list_render_nested_page_list( $is_navigation_child, $ne
 			$css_class .= ' has-child';
 		}
 
-		if( $is_navigation_child ) {
+		if ( $is_navigation_child ) {
 			$css_class .= ' wp-block-navigation-item';
 		}
 
