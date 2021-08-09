@@ -116,13 +116,13 @@ export const preferenceDefaults = flow( [ combineReducers ] )( {
  */
 export const preferences = flow( [ combineReducers ] )( {
 	features( state = {}, action ) {
-		if ( action.type === 'TOGGLE_FEATURE' ) {
-			const { scope, featureName } = action;
+		if ( action.type === 'SET_FEATURE_VALUE' ) {
+			const { scope, featureName, value } = action;
 			return {
 				...state,
 				[ scope ]: {
 					...state[ scope ],
-					[ featureName ]: ! state?.[ scope ]?.[ featureName ],
+					[ featureName ]: value,
 				},
 			};
 		}
