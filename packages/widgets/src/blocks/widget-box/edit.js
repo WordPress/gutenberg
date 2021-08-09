@@ -10,7 +10,12 @@ import {
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 
-export default function Edit( { attributes, setAttributes, clientId } ) {
+export default function Edit( {
+	attributes,
+	setAttributes,
+	clientId,
+	onReplace,
+} ) {
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-widget-box__inner-blocks',
@@ -25,6 +30,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	return (
 		<div { ...blockProps }>
 			<RichText
+				identifier="content"
 				className="widget-title"
 				tagName="h2"
 				aria-label={ __( 'Widget title' ) }
@@ -51,6 +57,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 
 					return block;
 				} }
+				onReplace={ onReplace }
 			/>
 			<div { ...innerBlocksProps } />
 		</div>
