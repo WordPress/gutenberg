@@ -51,7 +51,11 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		wp_reset_postdata(); // Restore original Post Data.
 	}
 
-	return '<div class="wp-block-query-pagination-next">' . $content . ' ' . $attributes['arrow'] . '</div>';
+	if ( $attributes['arrow'] === "→" ) {
+		$arrow_class = 'is-arrow';
+	}
+
+	return '<div class="wp-block-query-pagination-next">' . $content . ' <span class="wp-block-query-pagination-next-arrow ' . $arrow_class . '">' . $attributes['arrow'] . '</span></div>';
 }
 
 /**
