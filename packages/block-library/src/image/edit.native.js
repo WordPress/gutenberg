@@ -462,6 +462,7 @@ export class ImageEdit extends Component {
 					styles.removeFeaturedButton,
 				] }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
 				onPress={ () =>
 					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
 				}
@@ -473,6 +474,7 @@ export class ImageEdit extends Component {
 				label={ __( 'Set as Featured Image ' ) }
 				labelStyle={ setFeaturedButtonStyle }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);
@@ -567,8 +569,6 @@ export class ImageEdit extends Component {
 				>
 					{ canImageBeFeatured &&
 						this.getFeaturedButtonPanel( isFeaturedImage ) }
-				</PanelBody>
-				<PanelBody>
 					<FooterMessageControl
 						label={ __(
 							'Changes to featured image will not be affected by the undo/redo buttons.'
