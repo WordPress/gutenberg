@@ -70,8 +70,10 @@ export default function PageListEdit( {
 		context.customOverlayBackgroundColor,
 	] );
 
-	const isNavigationChild = isEmpty( context ) ? false : true;
-	setAttributes( { isNavigationChild } );
+	useEffect( () => {
+		const isNavigationChild = isEmpty( context ) ? false : true;
+		setAttributes( { isNavigationChild } );
+	}, [] );
 
 	const { textColor, backgroundColor, showSubmenuIcon, style } =
 		context || {};
