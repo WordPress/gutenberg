@@ -54,10 +54,8 @@ export default function Edit( {
 				tagName="h2"
 				aria-label={ __( 'Widget title' ) }
 				placeholder={ __( 'Add a Widget title' ) }
-				value={ attributes.widgetTitle }
-				onChange={ ( value ) =>
-					setAttributes( { widgetTitle: value } )
-				}
+				value={ attributes.title }
+				onChange={ ( value ) => setAttributes( { title: value } ) }
 				onSplit={ allowSingleLineOnly }
 				onReplace={ onReplace }
 			/>

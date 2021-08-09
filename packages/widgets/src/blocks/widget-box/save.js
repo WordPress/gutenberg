@@ -9,7 +9,7 @@ export default function save( { attributes } ) {
 			<RichText.Content
 				tagName="h2"
 				className="widget-title"
-				value={ attributes.widgetTitle }
+				value={ attributes.title }
 			/>
 			<InnerBlocks.Content />
 		</>

@@ -12,7 +12,6 @@ import edit from './edit';
 import save from './save';
 const { name } = metadata;
 export { metadata, name };
-import { HEADING_PLACEHOLDER } from './constants';
 
 export const settings = {
 	title: __( 'Widget Box' ),
@@ -37,9 +36,7 @@ export const settings = {
 					}
 
 					// Put the selected blocks inside the new Widget Box's innerBlocks.
-					// Also include a placeholder for a heading.
 					const innerBlocks = [
-						createBlock( ...HEADING_PLACEHOLDER ),
 						...blocks.map( ( block ) => {
 							return createBlock(
 								block.name,
