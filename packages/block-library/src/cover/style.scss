@@ -282,3 +282,10 @@ section.wp-block-cover-image > h2,
 	padding: 0.44em;
 	text-align: center;
 }
+
+// The following sets baseline border styles with zero specificity such that
+// when a user begins to alter cover block borders via the block support UI they
+// see immediately visual changes.
+html :where(.wp-block-cover) {
+	border: 0 solid currentColor;
+}
