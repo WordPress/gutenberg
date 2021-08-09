@@ -27,6 +27,25 @@ export default function Edit( {
 
 	const blockProps = useBlockProps();
 
+	function allowSingleLineOnly( value, isOriginal ) {
+		let block;
+
+		if ( isOriginal || value ) {
+			block = createBlock( 'core/heading', {
+				...attributes,
+				content: value,
+			} );
+		} else {
+			block = createBlock( 'core/paragraph' );
+		}
+
+		if ( isOriginal ) {
+			block.clientId = clientId;
+		}
+
+		return block;
+	}
+
 	return (
 		<div { ...blockProps }>
 			<RichText
@@ -39,24 +58,7 @@ export default function Edit( {
 				onChange={ ( value ) =>
 					setAttributes( { widgetTitle: value } )
 				}
-				onSplit={ ( value, isOriginal ) => {
-					let block;
-
-					if ( isOriginal || value ) {
-						block = createBlock( 'core/heading', {
-							...attributes,
-							content: value,
-						} );
-					} else {
-						block = createBlock( 'core/paragraph' );
-					}
-
-					if ( isOriginal ) {
-						block.clientId = clientId;
-					}
-
-					return block;
-				} }
+				onSplit={ allowSingleLineOnly }
 				onReplace={ onReplace }
 			/>
 			<div { ...innerBlocksProps } />
