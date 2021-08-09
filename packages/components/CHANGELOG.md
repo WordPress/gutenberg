@@ -4,7 +4,12 @@
 
 ### Bug Fix
 
+-   Listen to `resize` events correctly in `useBreakpointIndex`. This hook is used in `useResponsiveValue` and consequently in the `Flex` and `Grid` components  ([#33902](https://github.com/WordPress/gutenberg/pull/33902))
 -   Fixed RTL styles in `Flex` component ([#33729](https://github.com/WordPress/gutenberg/pull/33729)).
+
+### Breaking Change
+
+-	Updated the visual styles of the RangeControl component ([#33824](https://github.com/WordPress/gutenberg/pull/33824))
 
 ## 15.0.0 (2021-07-29)
 

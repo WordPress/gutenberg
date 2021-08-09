@@ -1,5 +1,15 @@
 == Changelog ==
 
+= 11.2.1 =
+
+### Bug Fixes
+
+- Fix available alignments and layout for the post editor. ([33894](https://github.com/WordPress/gutenberg/pull/33894))
+
+
+
+
+
 = 11.2.0 =
 
 ### Features

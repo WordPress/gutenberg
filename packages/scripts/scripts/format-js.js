@@ -26,7 +26,7 @@ const keypress = async () => {
 			'format-js'
 		) } script has been renamed to ${ chalk.green( 'format' ) }.\n` +
 		"If you're calling it from any of your own scripts, please update them accordingly.\n" +
-		'Press any key to continiue.';
+		'Press any key to continue.';
 
 	// eslint-disable-next-line no-console
 	console.log( message );
