@@ -170,7 +170,12 @@ function block_core_page_list_render_nested_page_list( $is_navigation_child, $ne
 		) . '</a>';
 		if ( isset( $page['children'] ) ) {
 			$markup .= '<span class="wp-block-page-list__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
-			$markup .= '<ul class="submenu-container">' . block_core_page_list_render_nested_page_list( $is_navigation_child, $page['children'], $active_page_ancestor_ids, $colors, $depth + 1 ) . '</ul>';
+			$markup .= '<ul class="submenu-container';
+			// Extra classname is added when the block is a child of Navigation.
+			if ( $is_navigation_child ) {
+				$markup .= ' wp-block-navigation__submenu-container';
+			}
+			$markup .= '">' . block_core_page_list_render_nested_page_list( $is_navigation_child, $page['children'], $active_page_ancestor_ids, $colors, $depth + 1 ) . '</ul>';
 		}
 		$markup .= '</li>';
 	}

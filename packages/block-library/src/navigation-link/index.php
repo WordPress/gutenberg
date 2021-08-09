@@ -233,7 +233,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		}
 
 		$html .= sprintf(
-			'<ul class="wp-block-navigation-link__container">%s</ul>',
+			'<ul class="wp-block-navigation-link__container wp-block-navigation__submenu-container">%s</ul>',
 			$inner_blocks_html
 		);
 	}

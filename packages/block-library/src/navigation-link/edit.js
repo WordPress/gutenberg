@@ -496,19 +496,23 @@ export default function NavigationLinkEdit( {
 	const innerBlocksColors = getColors( context, true );
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: classnames( 'wp-block-navigation-link__container', {
-				'is-parent-of-selected-block': isParentOfSelectedBlock,
-				'has-text-color': !! (
-					innerBlocksColors.textColor ||
-					innerBlocksColors.customTextColor
-				),
-				[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
-				'has-background': !! (
-					innerBlocksColors.backgroundColor ||
-					innerBlocksColors.customBackgroundColor
-				),
-				[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
-			} ),
+			className: classnames(
+				'wp-block-navigation-link__container',
+				'wp-block-navigation__submenu-container',
+				{
+					'is-parent-of-selected-block': isParentOfSelectedBlock,
+					'has-text-color': !! (
+						innerBlocksColors.textColor ||
+						innerBlocksColors.customTextColor
+					),
+					[ `has-${ innerBlocksColors.textColor }-color` ]: !! innerBlocksColors.textColor,
+					'has-background': !! (
+						innerBlocksColors.backgroundColor ||
+						innerBlocksColors.customBackgroundColor
+					),
+					[ `has-${ innerBlocksColors.backgroundColor }-background-color` ]: !! innerBlocksColors.backgroundColor,
+				}
+			),
 			style: {
 				color: innerBlocksColors.customTextColor,
 				backgroundColor: innerBlocksColors.customBackgroundColor,
