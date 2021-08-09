@@ -22,7 +22,9 @@ export default function QueryPaginationNextEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Arrow settings' ) }>
 					<SegmentedControl
-						label={ __( 'A decorative arrow appended to the next page link.' ) }
+						label={ __(
+							'A decorative arrow appended to the next page link.'
+						) }
 						value={ arrow }
 						onChange={ ( value ) => {
 							setAttributes( {
@@ -33,7 +35,10 @@ export default function QueryPaginationNextEdit( {
 					>
 						<SegmentedControlOption
 							value=""
-							label={ _x( 'None', 'Arrow option for Query Pagination Next block' ) }
+							label={ _x(
+								'None',
+								'Arrow option for Query Pagination Next block'
+							) }
 						/>
 						<SegmentedControlOption
 							value="→"
@@ -63,7 +68,11 @@ export default function QueryPaginationNextEdit( {
 				}
 				{ ...useBlockProps() }
 			/>{ ' ' }
-			<span className={ `wp-block-query-pagination-next-arrow has-arrow-$(arrow)` }>{ arrow }</span>
+			<span
+				className={ `wp-block-query-pagination-next-arrow has-arrow-$(arrow)` }
+			>
+				{ arrow }
+			</span>
 		</div>
 	);
 }
