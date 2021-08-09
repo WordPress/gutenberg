@@ -27,8 +27,8 @@ export default class ErrorBoundary extends Component {
 		};
 	}
 
-	static getDerivedStateFromError( error ) {
-		return { error };
+	componentDidCatch( error ) {
+		this.setState( { error } );
 	}
 
 	reboot() {
