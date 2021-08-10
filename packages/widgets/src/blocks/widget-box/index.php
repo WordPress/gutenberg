@@ -7,7 +7,7 @@
 
 
 function render_block_core_widget_box() {
-    return 'Hello rendered';
+    return '<p>Hello rendered</p>';
 }
 
 /**

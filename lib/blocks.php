@@ -106,9 +106,11 @@ function gutenberg_reregister_core_block_types() {
 		__DIR__ . '/../build/widgets/blocks/'       => array(
 			'block_folders' => array(
 				'legacy-widget',
+				'widget-box',
 			),
 			'block_names'   => array(
 				'legacy-widget.php' => 'core/legacy-widget',
+				'widget-box.php' => 'core/widget-box',
 			),
 		),
 	);
