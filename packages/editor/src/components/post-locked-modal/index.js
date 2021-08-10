@@ -9,7 +9,7 @@ import { get } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { Modal, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { addQueryArgs } from '@wordpress/url';
+import { addQueryArgs, getWPAdminURL } from '@wordpress/url';
 import { useEffect } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
@@ -18,7 +18,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { getWPAdminURL } from '../../utils/url';
 import PostPreviewButton from '../post-preview-button';
 import { store as editorStore } from '../../store';
 
