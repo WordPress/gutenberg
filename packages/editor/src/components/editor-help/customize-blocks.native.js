@@ -22,7 +22,7 @@ const CustomizeBlocks = () => {
 			/>
 			<HelpDetailBodyText
 				text={ __(
-					'Each block has its own settings. To find them, click on a block. Its settings will appear on the toolbar at the bottom of the screen.'
+					'Each block has its own settings. To find them, tap on a block. Its settings will appear on the toolbar at the bottom of the screen.'
 				) }
 			/>
 			<HelpDetailBodyText
