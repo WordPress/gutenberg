@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { parseRawBlock, default as parsePegjs } from '../';
+import { parseRawBlock, default as parse } from '../';
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -150,13 +150,8 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'parse() of @wordpress/block-serialization-spec-parser', () => {
+	describe( 'parse', () => {
 		// run the test cases using the PegJS defined parser
-		testCases( parsePegjs );
-	} );
-
-	// encapsulate the test cases so we can run them multiple time but with a different parse() function
-	function testCases( parse ) {
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
@@ -347,5 +342,5 @@ describe( 'block parser', () => {
 			const parsed = parse( serialized );
 			expect( parsed[ 0 ].attributes.content ).toBe( content );
 		} );
-	}
+	} );
 } );
