@@ -2,10 +2,6 @@
 	padding: 0;
 }
 
-.sectionContainer {
-	padding: 0 16px;
-}
-
 .separator {
 	background-color: $light-gray-400;
 	height: 1px;
@@ -37,30 +33,33 @@
 }
 
 .helpDetailContainer {
-	width: 100%;
-	padding: 0;
-	height: 100%;
+	padding: 0 16px;
 }
 
 .helpDetailImage {
+	background-color: $gray-light;
+	margin-bottom: 16px;
 	width: 100%;
+}
+
+.helpDetailTitle,
+.helpDetailSectionHeading,
+.helpDetailBody {
 	margin-bottom: 16px;
 }
 
 .helpDetailTitle {
 	font-weight: 700;
 	font-size: 28px;
-	padding: 16px;
 }
 
 .helpDetailSectionHeading {
 	font-weight: 600;
 	font-size: 16px;
-	padding: 0 16px 16px 16px;
+	margin-top: 24px;
 }
 
 .helpDetailBody {
-	width: 100%;
-	padding: 0 16px 16px 16px;
 	font-size: 16px;
+	line-height: 24px;
 }

@@ -74,10 +74,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 						</Text>
 					</View>
 					<View style={ styles.separator } />
-					<PanelBody
-						title={ __( 'The basics' ) }
-						style={ styles.sectionContainer }
-					>
+					<PanelBody title={ __( 'The basics' ) }>
 						{ /* Print out help topics */ }
 						{ HELP_TOPICS.map( ( topic ) => {
 							return (
