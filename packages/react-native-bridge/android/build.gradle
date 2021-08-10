@@ -1,8 +1,6 @@
 buildscript {
     ext {
         willPublishReactNativeBridgeBinary = properties["willPublishReactNativeBridgeBinary"]?.toBoolean() ?: false
-
-        gradlePluginVersion = '4.2.2'
     }
 }
 
