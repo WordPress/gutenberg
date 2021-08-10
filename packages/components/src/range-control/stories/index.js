@@ -8,6 +8,7 @@ import { boolean, number, text } from '@storybook/addon-knobs';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -27,10 +28,13 @@ const RangeControlWithState = ( props ) => {
 const DefaultExample = () => {
 	const [ value, setValue ] = useState( undefined );
 
+	const showBeforeIcon = boolean( 'beforeIcon', false );
+	const showAfterIcon = boolean( 'afterIcon', false );
+
 	const props = {
-		afterIcon: text( 'afterIcon', '' ),
+		afterIcon: showAfterIcon ? wordpress : undefined,
 		allowReset: boolean( 'allowReset', false ),
-		beforeIcon: text( 'beforeIcon', '' ),
+		beforeIcon: showBeforeIcon ? wordpress : undefined,
 		color: text( 'color', COLORS.ui.theme ),
 		disabled: boolean( 'disabled', false ),
 		help: text( 'help', '' ),
