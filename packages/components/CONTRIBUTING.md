@@ -11,6 +11,8 @@ The following is a set of guidelines for contributing to the `@wordpress/compone
 - Set of components mainly focused on building Gutenberg-specific UI (toolbars and sidebars)
 - Primitive vs High-level vs Utility (https://github.com/WordPress/gutenberg/issues/33111)
 - Composition and API consistency (https://github.com/WordPress/gutenberg/issues/33391) (e.g. boolean props begin with `is` or `has`, event callbacks begin with `on`, etc)
+- Layout: Each component should worry only about the layout of its children (e.g. no margins around itself). Layout components separate from
+- Styled components should be suffixed with "*View", to make it clear that they're styled components in other files
 
 Note: didn't we say that we'd remove the `createComponent` function?
 
