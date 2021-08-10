@@ -252,7 +252,12 @@ $color-control-label-height: 20px;
 		flex-wrap: nowrap;
 	}
 
-	// .. but hide entirely when the placeholder can still be toggled.
+	// Hide entirely when vertical.
+	.is-vertical.is-selected & {
+		display: none;
+	}
+
+	// Hide entirely when the placeholder can still be toggled.
 	.wp-block-navigation.is-selected .is-small & {
 		display: none;
 	}
