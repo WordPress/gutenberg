@@ -32,7 +32,7 @@
 		"@babel/runtime": "^7.13.10",
 		"@react-native-community/blur": "3.6.0",
 		"@react-native-community/masked-view": "git+https://github.com/wordpress-mobile/react-native-masked-view.git#v0.1.11-wp",
-		"@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#v3.0.2-wp",
+		"@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#b194e67e7e3e9db81a694be2f4b14c55d4e6df7a",
 		"@react-navigation/core": "5.12.0",
 		"@react-navigation/native": "5.7.0",
 		"@react-navigation/routers": "5.4.9",
@@ -68,7 +68,7 @@
 		"react-native-safe-area-context": "git+https://github.com/wordpress-mobile/react-native-safe-area-context.git#v3.2.0-wp",
 		"react-native-sass-transformer": "^1.1.1",
 		"react-native-screens": "git+https://github.com/wordpress-mobile/react-native-screens.git#2.9.0-wp",
-		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#v9.13.7-wp",
+		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#69b22d1c11370134c9f16a5e539c11959d1d58d6",
 		"react-native-url-polyfill": "^1.1.2",
 		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#5.0.2-wp"
 	},
