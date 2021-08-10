@@ -121,7 +121,7 @@ export default function CustomSelectControl( {
 					'aria-labelledby': undefined,
 					className: 'components-custom-select-control__button',
 					isSmall: true,
-					describedBy: describedBy ? describedBy : undefined,
+					describedBy,
 				} ) }
 			>
 				{ itemToString( selectedItem ) }

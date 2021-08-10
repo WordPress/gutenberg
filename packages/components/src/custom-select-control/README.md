@@ -93,6 +93,13 @@ The label for the control.
 -   Type: `String`
 -   Required: Yes
 
+#### describedBy
+
+Pass in a description that will be shown to screen readers associated with the select trigger button.
+
+-   Type: `String`
+-   Required: No
+
 #### options
 
 The options that can be chosen from.

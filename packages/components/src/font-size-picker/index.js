@@ -92,7 +92,9 @@ function FontSizePicker(
 
 	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
 
-	const currentFontSizeSR = `Currently selected font size: ${ options.find( ( option ) => option.key === selectedFontSizeSlug ).name }`;
+	const currentFontSizeSR = `Currently selected font size: ${
+		options.find( ( option ) => option.key === selectedFontSizeSlug ).name
+	}`;
 
 	return (
 		<fieldset
