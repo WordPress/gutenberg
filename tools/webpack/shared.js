@@ -19,15 +19,14 @@ const {
 } = process.env;
 
 const baseConfig = {
+	target: 'browserslist',
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
 		concatenateModules:
 			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
 		minimizer: [
 			new TerserPlugin( {
-				cache: true,
 				parallel: true,
-				sourceMap: mode !== 'production',
 				terserOptions: {
 					output: {
 						comments: /translators:/i,
