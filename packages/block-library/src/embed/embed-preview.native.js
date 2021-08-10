@@ -20,6 +20,7 @@ import { SandBox } from '@wordpress/components';
  */
 import { getPhotoHtml } from './util';
 import EmbedNoPreview from './embed-no-preview';
+import WpEmbedPreview from './wp-embed-preview';
 
 const EmbedPreview = ( {
 	className,
@@ -77,21 +78,27 @@ const EmbedPreview = ( {
 		'wp-block-embed__wrapper'
 	);
 
-	const embedWrapper =
-		/* We should render here: <WpEmbedPreview html={ html } /> */
-		'wp-embed' === type ? null : (
-			<>
-				<TouchableWithoutFeedback
-					onPress={ () => {
-						if ( onFocus ) {
-							onFocus();
-						}
-						if ( isCaptionSelected ) {
-							setIsCaptionSelected( false );
-						}
-					} }
-				>
-					<View pointerEvents="box-only">
+	const embedWrapper = (
+		<>
+			<TouchableWithoutFeedback
+				onPress={ () => {
+					if ( onFocus ) {
+						onFocus();
+					}
+					if ( isCaptionSelected ) {
+						setIsCaptionSelected( false );
+					}
+				} }
+			>
+				<View pointerEvents="box-only">
+					{ 'wp-embed' === type ? (
+						<WpEmbedPreview
+							html={ html }
+							title={ iframeTitle }
+							providerUrl={ providerUrl }
+							url={ url }
+						/>
+					) : (
 						<SandBox
 							html={ html }
 							title={ iframeTitle }
@@ -99,11 +106,11 @@ const EmbedPreview = ( {
 							providerUrl={ providerUrl }
 							url={ url }
 						/>
-					</View>
-				</TouchableWithoutFeedback>
-			</>
-		);
-
+					) }
+				</View>
+			</TouchableWithoutFeedback>
+		</>
+	);
 	return (
 		<TouchableWithoutFeedback
 			accessible={ ! isSelected }
