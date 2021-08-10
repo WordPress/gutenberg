@@ -128,7 +128,7 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 /**
  * Outputs Page list markup from an array of pages with nested children.
  *
- * @param boolean   $is_navigation_child If block is a child of Navigation block.
+ * @param boolean $is_navigation_child If block is a child of Navigation block.
  * @param array   $nested_pages The array of nested pages.
  * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
  * @param array   $colors Color information for overlay styles.
@@ -272,7 +272,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$nested_pages = block_core_page_list_nest_pages( $top_level_pages, $pages_with_children );
 
-	$is_navigation_child = array_key_exists('isNavigationChild', $attributes) ? $attributes['isNavigationChild'] : ! empty( $block->context);
+	$is_navigation_child = array_key_exists( 'isNavigationChild', $attributes ) ? $attributes['isNavigationChild'] : ! empty( $block->context );
 
 	$wrapper_markup = '<ul %1$s>%2$s</ul>';
 
