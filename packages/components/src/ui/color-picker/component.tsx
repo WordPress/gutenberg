@@ -34,7 +34,7 @@ import type { ColorType } from './types';
 interface ColorPickerProps {
 	enableAlpha?: boolean;
 	color?: ColorFormats.HSL | ColorFormats.HSLA;
-	onChange?: ( hexColor: ColorFormats.HSL | ColorFormats.HSLA ) => void;
+	onChange?: ( color: ColorFormats.HSL | ColorFormats.HSLA ) => void;
 	defaultValue?: ColorFormats.HSL | ColorFormats.HSLA;
 	copyFormat?: ColorType;
 }
