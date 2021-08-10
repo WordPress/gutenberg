@@ -135,11 +135,13 @@ export default function Image( {
 				'mediaUpload',
 			] );
 
+			const hasTransforms = !! transformations.length;
+
 			return {
 				...settings,
 				getBlock: _getBlock,
 				canInsertCover:
-					transformations?.length &&
+					hasTransforms &&
 					!! transformations.find(
 						( { name } ) => name === 'core/cover'
 					),

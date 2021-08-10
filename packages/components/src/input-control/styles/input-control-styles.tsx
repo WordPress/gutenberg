@@ -1,27 +1,39 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/react';
+import { css, SerializedStyles } from '@emotion/react';
 import styled from '@emotion/styled';
+// eslint-disable-next-line no-restricted-imports
+import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
+import type { PolymorphicComponentProps } from '../../ui/context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { COLORS, rtl } from '../../utils';
+import type { LabelPosition } from '../types';
 
-const rootFloatLabelStyles = () => {
-	return css( { paddingTop: 0 } );
+type ContainerProps = {
+	disabled?: boolean;
+	hideLabel?: boolean;
+	__unstableInputWidth?: CSSProperties[ 'width' ];
+	labelPosition?: LabelPosition;
 };
 
-const rootFocusedStyles = ( { isFocused } ) => {
+type RootProps = {
+	isFocused?: boolean;
+	labelPosition?: LabelPosition;
+};
+
+const rootFocusedStyles = ( { isFocused }: RootProps ) => {
 	if ( ! isFocused ) return '';
 
 	return css( { zIndex: 1 } );
 };
 
-const rootLabelPositionStyles = ( { labelPosition } ) => {
+const rootLabelPositionStyles = ( { labelPosition }: RootProps ) => {
 	switch ( labelPosition ) {
 		case 'top':
 			return css`
@@ -42,16 +54,15 @@ const rootLabelPositionStyles = ( { labelPosition } ) => {
 	}
 };
 
-export const Root = styled( Flex )`
+export const Root = styled( Flex )< RootProps >`
 	position: relative;
 	border-radius: 2px;
-
-	${ rootFloatLabelStyles }
+	padding-top: 0;
 	${ rootFocusedStyles }
 	${ rootLabelPositionStyles }
 `;
 
-const containerDisabledStyles = ( { disabled } ) => {
+const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
 	const backgroundColor = disabled
 		? COLORS.ui.backgroundDisabled
 		: COLORS.ui.background;
@@ -60,11 +71,14 @@ const containerDisabledStyles = ( { disabled } ) => {
 };
 
 // Normalizes the margins from the <Flex /> (components/ui/flex/) container.
-const containerMarginStyles = ( { hideLabel } ) => {
+const containerMarginStyles = ( { hideLabel }: ContainerProps ) => {
 	return hideLabel ? css( { margin: '0 !important' } ) : null;
 };
 
-const containerWidthStyles = ( { __unstableInputWidth, labelPosition } ) => {
+const containerWidthStyles = ( {
+	__unstableInputWidth,
+	labelPosition,
+}: ContainerProps ) => {
 	if ( ! __unstableInputWidth ) return css( { width: '100%' } );
 
 	if ( labelPosition === 'side' ) return '';
@@ -78,7 +92,7 @@ const containerWidthStyles = ( { __unstableInputWidth, labelPosition } ) => {
 	return css( { width: __unstableInputWidth } );
 };
 
-export const Container = styled.div`
+export const Container = styled.div< ContainerProps >`
 	align-items: center;
 	box-sizing: border-box;
 	border-radius: inherit;
@@ -91,7 +105,16 @@ export const Container = styled.div`
 	${ containerWidthStyles }
 `;
 
-const disabledStyles = ( { disabled } ) => {
+type Size = 'default' | 'small';
+
+type InputProps = {
+	disabled?: boolean;
+	inputSize?: Size;
+	isDragging?: boolean;
+	dragCursor?: CSSProperties[ 'cursor' ];
+};
+
+const disabledStyles = ( { disabled }: InputProps ) => {
 	if ( ! disabled ) return '';
 
 	return css( {
@@ -99,13 +122,13 @@ const disabledStyles = ( { disabled } ) => {
 	} );
 };
 
-const fontSizeStyles = ( { size } ) => {
+const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
 	};
 
-	const fontSize = sizes[ size ];
+	const fontSize = sizes[ size as Size ] || sizes.default;
 	const fontSizeMobile = '16px';
 
 	if ( ! fontSize ) return '';
@@ -119,7 +142,7 @@ const fontSizeStyles = ( { size } ) => {
 	`;
 };
 
-const sizeStyles = ( { size } ) => {
+const sizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: {
 			height: 30,
@@ -133,22 +156,14 @@ const sizeStyles = ( { size } ) => {
 		},
 	};
 
-	const style = sizes[ size ] || sizes.default;
+	const style = sizes[ size as Size ] || sizes.default;
 
 	return css( style );
 };
 
-const placeholderStyles = () => {
-	return css`
-		&::-webkit-input-placeholder {
-			line-height: normal;
-		}
-	`;
-};
-
-const dragStyles = ( { isDragging, dragCursor } ) => {
-	let defaultArrowStyles = '';
-	let activeDragCursorStyles = '';
+const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
+	let defaultArrowStyles: SerializedStyles | undefined;
+	let activeDragCursorStyles: SerializedStyles | undefined;
 
 	if ( isDragging ) {
 		defaultArrowStyles = css`
@@ -180,7 +195,7 @@ const dragStyles = ( { isDragging, dragCursor } ) => {
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
-export const Input = styled.input`
+export const Input = styled.input< InputProps >`
 	&&& {
 		background-color: transparent;
 		box-sizing: border-box;
@@ -199,19 +214,17 @@ export const Input = styled.input`
 		${ fontSizeStyles }
 		${ sizeStyles }
 
-		${ placeholderStyles }
+		&::-webkit-input-placeholder {
+			line-height: normal;
+		}
 	}
 `;
 
-const labelTruncation = () => {
-	return css`
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	`;
-};
-
-const labelPadding = ( { labelPosition } ) => {
+const labelPadding = ( {
+	labelPosition,
+}: {
+	labelPosition?: LabelPosition;
+} ) => {
 	let paddingBottom = 4;
 
 	if ( labelPosition === 'edge' || labelPosition === 'side' ) {
@@ -221,7 +234,7 @@ const labelPadding = ( { labelPosition } ) => {
 	return css( { paddingTop: 0, paddingBottom } );
 };
 
-const BaseLabel = styled( Text )`
+const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 	&&& {
 		box-sizing: border-box;
 		color: currentColor;
@@ -231,20 +244,36 @@ const BaseLabel = styled( Text )`
 		z-index: 1;
 
 		${ labelPadding }
-		${ labelTruncation }
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 `;
 
-export const Label = ( props ) => <BaseLabel { ...props } as="label" />;
+export const Label = (
+	props: PolymorphicComponentProps<
+		{ labelPosition?: LabelPosition; children: ReactNode },
+		'label',
+		false
+	>
+) => <BaseLabel { ...props } as="label" />;
 
 export const LabelWrapper = styled( FlexItem )`
 	max-width: calc( 100% - 10px );
 `;
 
-const backdropFocusedStyles = ( { disabled, isFocused } ) => {
+type BackdropProps = {
+	disabled?: boolean;
+	isFocused?: boolean;
+};
+
+const backdropFocusedStyles = ( {
+	disabled,
+	isFocused,
+}: BackdropProps ): SerializedStyles => {
 	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
 
-	let boxShadow = null;
+	let boxShadow;
 
 	if ( isFocused ) {
 		boxShadow = `0 0 0 1px ${ COLORS.ui.borderFocus } inset`;
@@ -262,7 +291,7 @@ const backdropFocusedStyles = ( { disabled, isFocused } ) => {
 	} );
 };
 
-export const BackdropUI = styled.div`
+export const BackdropUI = styled.div< BackdropProps >`
 	&&& {
 		box-sizing: border-box;
 		border-radius: inherit;

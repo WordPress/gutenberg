@@ -31,6 +31,9 @@ const observeAndResizeJS = `
 		function sendResize() {
 			var clientBoundingRect = document.body.getBoundingClientRect();
 
+			// The function postMessage is exposed by the react-native-webview library 
+			// to communicate between React Native and the WebView, in this case, 
+			// we use it for notifying resize changes.
             window.ReactNativeWebView.postMessage(JSON.stringify( {
                 action: 'resize',
 				width: clientBoundingRect.width,
@@ -93,7 +96,7 @@ const style = `
 	body.wp-has-aspect-ratio,
 	body.wp-has-aspect-ratio > div,
 	body.wp-has-aspect-ratio > div iframe {
-		height: 100%;
+		height: auto;
 		overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
 	}
 	body > div > * {
@@ -109,6 +112,7 @@ function Sandbox( {
 	styles = [],
 	title = '',
 	type,
+	url,
 } ) {
 	const ref = useRef();
 	const [ width, setWidth ] = useState( 0 );
@@ -122,8 +126,8 @@ function Sandbox( {
 	// On Android, we need to recreate the WebView when the device rotates, otherwise it disappears.
 	// For this purpose, the key value used in the WebView will change when the device orientation gets updated.
 	const key = Platform.select( {
-		android: `${ providerUrl }-${ isLandscape ? 'landscape' : 'portrait' }`,
-		ios: providerUrl,
+		android: `${ url }-${ isLandscape ? 'landscape' : 'portrait' }`,
+		ios: url,
 	} );
 
 	function getHtmlDoc() {
@@ -204,15 +208,15 @@ function Sandbox( {
 		setHeight( data.height );
 	}
 
-	function getAspectRatio() {
+	function getSizeStyle() {
 		const contentWidth = Math.ceil( width );
 		const contentHeight = Math.ceil( height );
 
 		if ( contentWidth && contentHeight ) {
-			return contentWidth / contentHeight;
+			return { width: contentWidth, height: contentHeight };
 		}
 
-		return 1;
+		return { aspectRatio: 1 };
 	}
 
 	function onChangeDimensions( dimensions ) {
@@ -240,9 +244,7 @@ function Sandbox( {
 			originWhitelist={ [ '*' ] }
 			style={ [
 				sandboxStyles[ 'sandbox-webview__container' ],
-				{
-					aspectRatio: getAspectRatio(),
-				},
+				getSizeStyle(),
 			] }
 			onMessage={ checkMessageForResize }
 		/>

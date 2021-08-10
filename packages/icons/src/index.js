@@ -184,6 +184,7 @@ export { default as share } from './library/share';
 export { default as shield } from './library/shield';
 export { default as shortcode } from './library/shortcode';
 export { default as siteLogo } from './library/site-logo';
+export { default as sparkles } from './library/sparkles';
 export { default as stack } from './library/stack';
 export { default as starEmpty } from './library/star-empty';
 export { default as starFilled } from './library/star-filled';

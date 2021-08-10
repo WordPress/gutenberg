@@ -3,6 +3,16 @@
  */
 import { noop } from 'lodash';
 import { useDrag } from 'react-use-gesture';
+// eslint-disable-next-line no-restricted-imports
+import type {
+	SyntheticEvent,
+	ChangeEvent,
+	KeyboardEvent,
+	PointerEvent,
+	FocusEvent,
+	Ref,
+	MouseEvent,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -12,11 +22,13 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
+import type { PolymorphicComponentProps } from '../ui/context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
-import { useInputControlStateReducer } from './state';
+import { useInputControlStateReducer } from './reducer/reducer';
 import { isValueEmpty } from '../utils/values';
 import { useUpdateEffect } from '../utils';
+import type { InputFieldProps } from './types';
 
 function InputField(
 	{
@@ -37,12 +49,12 @@ function InputField(
 		onValidate = noop,
 		size = 'default',
 		setIsFocused,
-		stateReducer = ( state ) => state,
+		stateReducer = ( state: any ) => state,
 		value: valueProp,
 		type,
 		...props
-	},
-	ref
+	}: PolymorphicComponentProps< InputFieldProps, 'input', false >,
+	ref: Ref< HTMLInputElement >
 ) {
 	const {
 		// State
@@ -82,14 +94,16 @@ function InputField(
 			return;
 		}
 		if ( ! isFocused && ! wasDirtyOnBlur.current ) {
-			update( valueProp );
+			update( valueProp, _event as SyntheticEvent );
 		} else if ( ! isDirty ) {
-			onChange( value, { event: _event } );
+			onChange( value, {
+				event: _event as ChangeEvent< HTMLInputElement >,
+			} );
 			wasDirtyOnBlur.current = false;
 		}
 	}, [ value, isDirty, isFocused, valueProp ] );
 
-	const handleOnBlur = ( event ) => {
+	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
 		onBlur( event );
 		setIsFocused( false );
 
@@ -102,23 +116,23 @@ function InputField(
 			if ( ! isValueEmpty( value ) ) {
 				handleOnCommit( event );
 			} else {
-				reset( valueProp );
+				reset( valueProp, event );
 			}
 		}
 	};
 
-	const handleOnFocus = ( event ) => {
+	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
 		onFocus( event );
 		setIsFocused( true );
 	};
 
-	const handleOnChange = ( event ) => {
+	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
 		const nextValue = event.target.value;
 		change( nextValue, event );
 	};
 
-	const handleOnCommit = ( event ) => {
-		const nextValue = event.target.value;
+	const handleOnCommit = ( event: SyntheticEvent< HTMLInputElement > ) => {
+		const nextValue = event.currentTarget.value;
 
 		try {
 			onValidate( nextValue, event );
@@ -128,7 +142,7 @@ function InputField(
 		}
 	};
 
-	const handleOnKeyDown = ( event ) => {
+	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
 		const { keyCode } = event;
 		onKeyDown( event );
 
@@ -152,7 +166,7 @@ function InputField(
 		}
 	};
 
-	const dragGestureProps = useDrag(
+	const dragGestureProps = useDrag< PointerEvent< HTMLInputElement > >(
 		( dragProps ) => {
 			const { distance, dragging, event } = dragProps;
 			// The event is persisted to prevent errors in components using this
@@ -193,10 +207,13 @@ function InputField(
 	 */
 	let handleOnMouseDown;
 	if ( type === 'number' ) {
-		handleOnMouseDown = ( event ) => {
+		handleOnMouseDown = ( event: MouseEvent< HTMLInputElement > ) => {
 			props.onMouseDown?.( event );
-			if ( event.target !== event.target.ownerDocument.activeElement ) {
-				event.target.focus();
+			if (
+				event.currentTarget !==
+				event.currentTarget.ownerDocument.activeElement
+			) {
+				event.currentTarget.focus();
 			}
 		};
 	}
@@ -216,7 +233,7 @@ function InputField(
 			onKeyDown={ handleOnKeyDown }
 			onMouseDown={ handleOnMouseDown }
 			ref={ ref }
-			size={ size }
+			inputSize={ size }
 			value={ value }
 			type={ type }
 		/>

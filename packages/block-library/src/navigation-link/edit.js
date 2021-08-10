@@ -144,7 +144,7 @@ function getSuggestionsQuery( type, kind ) {
  * 4: Theme colors
  * 5: Global styles
  *
- * @param {Object} context
+ * @param {Object}  context
  * @param {boolean} isSubMenu
  */
 function getColors( context, isSubMenu ) {
@@ -419,6 +419,23 @@ export default function NavigationLinkEdit( {
 		selection.addRange( range );
 	}
 
+	/**
+	 * Removes the current link if set.
+	 */
+	function removeLink() {
+		// Reset all attributes that comprise the link.
+		setAttributes( {
+			url: '',
+			label: '',
+			id: '',
+			kind: '',
+			type: '',
+		} );
+
+		// Close the link editing UI.
+		setIsLinkOpen( false );
+	}
+
 	let userCanCreate = false;
 	if ( ! type || type === 'page' ) {
 		userCanCreate = userCanCreatePages;
@@ -690,6 +707,7 @@ export default function NavigationLinkEdit( {
 										attributes
 									)
 								}
+								onRemove={ removeLink }
 							/>
 						</Popover>
 					) }

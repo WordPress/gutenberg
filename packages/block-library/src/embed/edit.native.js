@@ -14,6 +14,11 @@ import EmbedPreview from './embed-preview';
 import EmbedBottomSheet from './embed-bottom-sheet';
 
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
@@ -162,7 +167,8 @@ const EmbedEdit = ( props ) => {
 	}
 
 	const showEmbedPlaceholder = ! preview || cannotEmbed;
-	const { type } = getMergedAttributes();
+	const { type, className: classFromPreview } = getMergedAttributes();
+	const className = classnames( classFromPreview, props.className );
 
 	return (
 		<>
@@ -187,6 +193,7 @@ const EmbedEdit = ( props ) => {
 					/>
 					<View { ...blockProps }>
 						<EmbedPreview
+							className={ className }
 							clientId={ clientId }
 							icon={ icon }
 							insertBlocksAfter={ insertBlocksAfter }
