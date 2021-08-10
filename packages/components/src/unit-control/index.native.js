@@ -43,6 +43,8 @@ function UnitControl( {
 	const pickerRef = useRef();
 	const anchorNodeRef = useRef();
 
+	const isPickerButtonEnabled = hasUnits( units ) && units?.length > 1;
+
 	const onPickerPresent = useCallback( () => {
 		if ( pickerRef?.current ) {
 			pickerRef.current.presentPicker();
@@ -55,8 +57,12 @@ function UnitControl( {
 		: initialPosition;
 
 	const unitButtonTextStyle = getStylesFromColorScheme(
-		styles.unitButtonText,
-		styles.unitButtonTextDark
+		isPickerButtonEnabled
+			? styles.unitButtonText
+			: styles.unitButtonTextDisabled,
+		isPickerButtonEnabled
+			? styles.unitButtonTextDark
+			: styles.unitButtonTextDisabledDark
 	);
 
 	/* translators: accessibility text. Inform about current unit value. %s: Current unit value. */
@@ -74,7 +80,7 @@ function UnitControl( {
 			</View>
 		);
 
-		if ( hasUnits( units ) && units?.length > 1 ) {
+		if ( isPickerButtonEnabled ) {
 			return (
 				<TouchableWithoutFeedback
 					onPress={ onPickerPresent }
@@ -118,7 +124,7 @@ function UnitControl( {
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
 				{ renderUnitButton }
-				{ hasUnits( units ) && units?.length > 1 ? (
+				{ isPickerButtonEnabled ? (
 					<Picker
 						ref={ pickerRef }
 						options={ units }

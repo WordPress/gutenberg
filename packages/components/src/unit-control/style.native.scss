@@ -6,6 +6,14 @@
 	color: $blue-30;
 }
 
+.unitButtonTextDisabled {
+	color: $gray-dark;
+}
+
+.unitButtonTextDisabledDark {
+	color: $white;
+}
+
 .unitButton {
 	padding-right: $grid-unit;
 	padding-left: $grid-unit;
