@@ -87,6 +87,7 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
+	const { getBlock } = useSelect( blockEditorStore );
 	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -108,7 +109,6 @@ export default function Image( {
 	);
 	const {
 		canInsertCover,
-		getBlock,
 		imageEditing,
 		imageSizes,
 		maxWidth,
@@ -116,7 +116,6 @@ export default function Image( {
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlock: _getBlock,
 				getBlockRootClientId,
 				getSettings,
 				canInsertBlockType,
@@ -132,7 +131,6 @@ export default function Image( {
 
 			return {
 				...settings,
-				getBlock: _getBlock,
 				canInsertCover: canInsertBlockType(
 					'core/cover',
 					rootClientId
