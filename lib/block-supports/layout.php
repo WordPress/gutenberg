@@ -65,10 +65,13 @@ function gutenberg_get_layout_style( $selector, $layout ) {
 		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
 		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
 	} elseif ( 'flex' === $layout_type ) {
+		$justify_content = isset( $layout['justifyContent'] ) ? $layout['justifyContent'] : 'flex-start';
+
 		$style  = "$selector {";
 		$style .= 'display: flex;';
+		$style .= 'flex-direction: row;';
 		$style .= 'column-gap: 0.5em;';
-		$style .= 'align-items: center;';
+		$style .= "justify-content: $justify_content;";
 		$style .= '}';
 	}
 

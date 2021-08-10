@@ -40,7 +40,15 @@
 	},
 	"supports": {
 		"align": [ "left", "center", "right" ],
-		"anchor": true
+		"anchor": true,
+		"__experimentalLayout": {
+			"allowSwitching": false,
+			"default": {
+				"type": "flex",
+				"justifyContent": "flex-start",
+				"column-gap": "normal"
+			}
+		}
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },

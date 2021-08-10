@@ -12,10 +12,11 @@ import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
-	Button,
-	ButtonGroup,
+	BaseControl,
 	ToggleControl,
 	PanelBody,
+	__experimentalSegmentedControl as SegmentedControl,
+	__experimentalSegmentedControlOption as SegmentedControlOption,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useContext, createPortal } from '@wordpress/element';
@@ -32,29 +33,45 @@ import { getLayoutType, getLayoutTypes } from '../layouts';
 
 const layoutBlockSupportKey = '__experimentalLayout';
 
-const canBlockSwitchLayout = ( blockTypeOrName ) => {
+const getLayoutBlockSettings = ( blockTypeOrName ) => {
 	const layoutBlockSupportConfig = getBlockSupport(
 		blockTypeOrName,
 		layoutBlockSupportKey
 	);
 
-	return layoutBlockSupportConfig?.allowSwitching;
+	const {
+		allowSwitching: canBlockSwitchLayout,
+		default: defaultBlockLayout,
+	} = layoutBlockSupportConfig || {}; // TODO: check if this is needed based on the value return by `getBlockSupport`.
+
+	return {
+		canBlockSwitchLayout,
+		defaultBlockLayout,
+	};
 };
 
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
-	const { layout = {} } = attributes;
-	const defaultLayout = useSetting( 'layout' );
+	const { layout } = attributes;
+	// TODO: check if a theme should provide default values per `layoutType`.
+	// Fow now we use the values from `flow` (content, width).
+	const defaultThemeLayout = useSetting( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
 	}, [] );
 
+	// TODO: If we implement layout for blocks and replace
+	// current display of them like this PR explores, shouldn't this check change?
 	if ( ! themeSupportsLayout ) {
 		return null;
 	}
 
-	const allowLayoutSwitching = canBlockSwitchLayout( blockName );
-	const { inherit = false, type = 'default' } = layout;
+	const { allowLayoutSwitching, defaultBlockLayout } = getLayoutBlockSettings(
+		blockName
+	);
+
+	const usedLayout = layout ? layout : defaultBlockLayout || {};
+	const { inherit = false, type = 'default' } = usedLayout;
 	const layoutType = getLayoutType( type );
 
 	const onChangeType = ( newType ) =>
@@ -65,7 +82,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Layout' ) }>
-				{ !! defaultLayout && (
+				{ layoutType.canInherit && !! defaultThemeLayout && (
 					<ToggleControl
 						label={ __( 'Inherit default layout' ) }
 						checked={ !! inherit }
@@ -74,7 +91,6 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						}
 					/>
 				) }
-
 				{ ! inherit && allowLayoutSwitching && (
 					<LayoutTypeSwitcher
 						type={ type }
@@ -84,7 +100,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 				{ ! inherit && layoutType && (
 					<layoutType.edit
-						layout={ layout }
+						layout={ usedLayout }
 						onChange={ onChangeLayout }
 					/>
 				) }
@@ -95,19 +111,21 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
-		<ButtonGroup>
-			{ getLayoutTypes().map( ( { name, label } ) => {
-				return (
-					<Button
+		<BaseControl>
+			<SegmentedControl
+				value={ type }
+				onChange={ onChange }
+				isBlock={ true }
+			>
+				{ getLayoutTypes().map( ( { name, label } ) => (
+					<SegmentedControlOption
 						key={ name }
-						isPressed={ type === name }
-						onClick={ () => onChange( name ) }
-					>
-						{ label }
-					</Button>
-				);
-			} ) }
-		</ButtonGroup>
+						value={ name }
+						label={ label }
+					></SegmentedControlOption>
+				) ) }
+			</SegmentedControl>
+		</BaseControl>
 	);
 }
 

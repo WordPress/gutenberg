@@ -113,11 +113,9 @@ export default {
 						margin-left: auto !important;
 						margin-right: auto !important;
 					}
-	
 					${ appendSelectors( selector, '> [data-align="wide"]' ) }  {
 						max-width: ${ wideSize ?? contentSize };
 					}
-	
 					${ appendSelectors( selector, '> [data-align="full"]' ) } {
 						max-width: none;
 					}
@@ -129,7 +127,6 @@ export default {
 				float: left;
 				margin-right: 2em;
 			}
-	
 			${ appendSelectors( selector, '> [data-align="right"]' ) } {
 				float: right;
 				margin-left: 2em;
@@ -152,4 +149,5 @@ export default {
 			? [ 'wide', 'full', 'left', 'center', 'right' ]
 			: [ 'left', 'center', 'right' ];
 	},
+	canInherit: true,
 };
