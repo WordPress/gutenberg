@@ -23,6 +23,6 @@ export const HelpDetailSectionHeadingText = ( { text } ) => {
 	);
 };
 
-export const HelpDetailImage = ( { source } ) => {
-	return <Image source={ source } style={ styles.helpDetailImage } />;
+export const HelpDetailImage = ( props ) => {
+	return <Image style={ styles.helpDetailImage } { ...props } />;
 };

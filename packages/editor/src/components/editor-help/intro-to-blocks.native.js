@@ -39,6 +39,10 @@ const IntroToBlocks = () => {
 				) }
 			/>
 			<HelpDetailImage
+				accessible={ true }
+				accessibilityLabel={ __(
+					'Text formatting controls are located within the toolbar positioned above the keyboard while editing a text block'
+				) }
 				source={ require( './images/intro-blocks-2.png' ) }
 			/>
 			<HelpDetailSectionHeadingText text={ __( 'Embed media' ) } />
