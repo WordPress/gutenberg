@@ -19,13 +19,11 @@ export async function deleteAllWidgets() {
 		} ) )
 	);
 
-	await Promise.all(
-		sidebars.map( ( sidebar ) =>
-			rest( {
-				method: 'POST',
-				path: `/wp/v2/sidebars/${ sidebar.id }`,
-				data: { id: sidebar.id, widgets: [] },
-			} )
-		)
+	await batch(
+		sidebars.map( ( sidebar ) => ( {
+			method: 'POST',
+			path: `/wp/v2/sidebars/${ sidebar.id }`,
+			body: { id: sidebar.id, widgets: [] },
+		} ) )
 	);
 }
