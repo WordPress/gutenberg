@@ -22,3 +22,16 @@
 		margin-bottom: $block-padding + $grid-unit-05;
 	}
 }
+
+
+.block-library-group-block-html-element-control {
+	margin-bottom: $grid-unit-20;
+
+	.components-base-control {
+		margin-bottom: $grid-unit-10;
+	}
+
+	.components-notice {
+		margin: 0;
+	}
+}
