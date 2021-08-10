@@ -47,21 +47,25 @@ jobs:
               if: steps.run_result.outputs.run_result != 'success'
 
             - name: Use desired version of NodeJS
+              if: steps.run_result.outputs.run_result != 'success'
               uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
               with:
                   node-version: ${{ matrix.node }}
                   cache: npm
 
             - name: Npm install and build
+              if: steps.run_result.outputs.run_result != 'success'
               run: |
                   npm ci
                   FORCE_REDUCED_MOTION=true npm run build
 
             - name: Install WordPress
+              if: steps.run_result.outputs.run_result != 'success'
               run: |
                   npm run wp-env start
 
             - name: Running the tests
+              if: steps.run_result.outputs.run_result != 'success'
               run: |
                   $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
                   $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
