@@ -14,7 +14,6 @@ import {
 	Platform,
 } from '@wordpress/element';
 import {
-	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	JustifyToolbar,
@@ -153,9 +152,8 @@ function Navigation( {
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				isSelected
-					? InnerBlocks.DefaultAppender
+					? undefined
 					: false,
-			__experimentalAppenderTagName: 'li',
 			__experimentalCaptureToolbars: true,
 			// Template lock set to false here so that the Nav
 			// Block on the experimental menus screen does not
