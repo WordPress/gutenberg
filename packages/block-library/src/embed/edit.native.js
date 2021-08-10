@@ -3,6 +3,7 @@
  */
 import {
 	createUpgradedEmbedBlock,
+	getClassNames,
 	getAttributesFromPreview,
 	getEmbedInfoByProvider,
 } from './util';
@@ -12,6 +13,11 @@ import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
 import EmbedBottomSheet from './embed-bottom-sheet';
+
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -128,9 +134,17 @@ const EmbedEdit = ( props ) => {
 	};
 
 	const toggleResponsive = () => {
-		const { allowResponsive } = attributes;
+		const { allowResponsive, className } = attributes;
+		const { html } = preview;
+		const newAllowResponsive = ! allowResponsive;
+
 		setAttributes( {
-			allowResponsive: ! allowResponsive,
+			allowResponsive: newAllowResponsive,
+			className: getClassNames(
+				html,
+				className,
+				responsive && newAllowResponsive
+			),
 		} );
 	};
 
@@ -190,7 +204,11 @@ const EmbedEdit = ( props ) => {
 	// after the preview has been rendered can result in unwanted
 	// clipping or scrollbars. The `getAttributesFromPreview` function
 	// that `getMergedAttributes` uses is memoized so that we're not
-	const { allowResponsive } = getMergedAttributes();
+	const {
+		allowResponsive,
+		className: classFromPreview,
+	} = getMergedAttributes();
+	const className = classnames( classFromPreview, props.className );
 
 	return (
 		<>
@@ -219,6 +237,7 @@ const EmbedEdit = ( props ) => {
 					/>
 					<View { ...blockProps }>
 						<EmbedPreview
+							className={ className }
 							clientId={ clientId }
 							icon={ icon }
 							insertBlocksAfter={ insertBlocksAfter }
