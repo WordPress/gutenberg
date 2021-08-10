@@ -118,16 +118,11 @@ export default function Image( {
 			const {
 				getBlock: _getBlock,
 				getBlockRootClientId,
-				getBlockTransformItems,
 				getSettings,
+				canInsertBlockType,
 			} = select( blockEditorStore );
 
-			const block = _getBlock( clientId );
 			const rootClientId = getBlockRootClientId( clientId );
-			const transformations = getBlockTransformItems(
-				[ block ],
-				rootClientId
-			);
 			const settings = pick( getSettings(), [
 				'imageEditing',
 				'imageSizes',
@@ -135,16 +130,13 @@ export default function Image( {
 				'mediaUpload',
 			] );
 
-			const hasTransforms = !! transformations.length;
-
 			return {
 				...settings,
 				getBlock: _getBlock,
-				canInsertCover:
-					hasTransforms &&
-					!! transformations.find(
-						( { name } ) => name === 'core/cover'
-					),
+				canInsertCover: canInsertBlockType(
+					'core/cover',
+					rootClientId
+				),
 			};
 		},
 		[ clientId ]
