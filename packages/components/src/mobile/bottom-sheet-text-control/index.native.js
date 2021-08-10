@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { Icon, chevronRight } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
@@ -44,6 +44,10 @@ const BottomSheetTextControl = ( {
 
 	const [ value, onChangeText ] = useState( initialValue );
 
+	useEffect( () => {
+		onChange( value );
+	}, [ value ] );
+
 	const horizontalBorderStyle = usePreferredColorSchemeStyle(
 		styles.horizontalBorder,
 		styles.horizontalBorderDark
@@ -78,7 +82,6 @@ const BottomSheetTextControl = ( {
 					<TextInput
 						label={ label }
 						onChangeText={ ( text ) => onChangeText( text ) }
-						onChange={ onChange( value ) }
 						value={ value }
 						multiline={ true }
 						placeholder={ placeholder }
