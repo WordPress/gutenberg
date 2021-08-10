@@ -98,6 +98,7 @@ function BottomSheetNavigationHeader( {
 		<View style={ styles.bottomSheetHeader }>
 			{ renderBackButton() }
 			<Text
+				accessibilityRole="header"
 				style={ bottomSheetHeaderTitleStyle }
 				maxFontSizeMultiplier={ 3 }
 			>

@@ -66,6 +66,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 				<BottomSheet.NavigationScreen name={ __( 'Topics' ) }>
 					<View style={ styles.bottomSheetHeader }>
 						<Text
+							accessibilityRole="header"
 							style={ bottomSheetHeaderTitleStyle }
 							maxFontSizeMultiplier={ 3 }
 						>
