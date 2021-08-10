@@ -9,7 +9,6 @@ import useResizeAware from 'react-resize-aware';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
 /**
- *
  * @param { { onResize?: () => any } } onResize
  */
 export function useFlyoutResizeUpdater( { onResize } ) {

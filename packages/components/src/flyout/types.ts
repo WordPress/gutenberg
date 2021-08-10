@@ -4,21 +4,16 @@
 // eslint-disable-next-line no-restricted-imports
 import type { PopoverStateReturn } from 'reakit';
 // eslint-disable-next-line no-restricted-imports
-import type { CSSProperties, FunctionComponentElement } from 'react';
+import type { CSSProperties } from 'react';
 
 /**
  * Internal dependencies
  */
 import type { PopperProps } from '../utils/types';
 
-export type Context = {
-	flyoutState?: PopoverStateReturn;
-	label?: string;
-};
+export type Context = PopoverStateReturn;
 
 export type Props = PopperProps & {
-	state?: PopoverStateReturn;
-	label?: string;
 	/**
 	 * Determines if `Flyout` has animations.
 	 *
@@ -52,26 +47,15 @@ export type Props = PopperProps & {
 	/**
 	 * Callback for when the `visible` state changes.
 	 */
-	onVisibleChange?: ( ...args: any ) => void;
+	onToggle?: ( isOpen: boolean ) => void;
 	/**
-	 * Element that triggers the `visible` state of `Flyout` when clicked.
-	 *
-	 * @example
-	 * ```jsx
-	 * <Flyout trigger={<Button>Greet</Button>}>
-	 *  <Text>Hi! I'm Olaf!</Text>
-	 * </Flyout>
-	 * ```
-	 */
-	trigger: FunctionComponentElement< any >;
-	/**
-	 * Whether `Flyout` is visible.
+	 * Whether `Flyout` is open.
 	 *
 	 * @default false
 	 *
 	 * @see https://reakit.io/docs/popover/#usepopoverstate
 	 */
-	visible?: boolean;
+	isOpen?: boolean;
 	/**
 	 * The children elements.
 	 */

@@ -6,7 +6,6 @@ import { FlyoutContentView, CardView } from '../styles';
 import { contextConnect, useContextSystem } from '../../ui/context';
 
 /**
- *
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').ContentProps, 'div', false>} props
  * @param {import('react').Ref<any>}                                                                            forwardedRef
  */
@@ -19,7 +18,7 @@ function FlyoutContent( props, forwardedRef ) {
 		...otherProps
 	} = useContextSystem( props, 'FlyoutContent' );
 
-	const { label, flyoutState } = useFlyoutContext();
+	const flyoutState = useFlyoutContext();
 
 	if ( ! flyoutState ) {
 		throw new Error(
@@ -31,7 +30,6 @@ function FlyoutContent( props, forwardedRef ) {
 
 	return (
 		<FlyoutContentView
-			aria-label={ label }
 			// maxWidth is applied via inline styles in order to avoid the `React does
 			// not recognize the maxWidth prop on a DOM element` error that comes from
 			// passing `maxWidth` as a prop to `FlyoutContentView`

@@ -1,8 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { CardBody, CardHeader } from '../../card';
-import Button from '../../button';
 import { Flyout } from '..';
 
 export default {
@@ -11,12 +15,9 @@ export default {
 };
 
 export const _default = () => {
+	const [ isOpen, setIsOpen ] = useState( false );
 	return (
-		<Flyout
-			trigger={ <Button>Click</Button> }
-			visible
-			placement="bottom-start"
-		>
+		<Flyout text="Click" isOpen={ isOpen } onToggle={ setIsOpen }>
 			<CardHeader>Go</CardHeader>
 			<CardBody>Stuff</CardBody>
 		</Flyout>

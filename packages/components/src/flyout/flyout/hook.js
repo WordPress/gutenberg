@@ -8,6 +8,7 @@ import { usePopoverState } from 'reakit';
  * Internal dependencies
  */
 import { useContextSystem } from '../../ui/context';
+import { useUpdateEffect } from '../../utils';
 
 /**
  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div', false>} props
@@ -21,8 +22,8 @@ export function useFlyout( props ) {
 		id,
 		maxWidth = 360,
 		placement,
-		state,
-		visible,
+		onToggle,
+		isOpen,
 		...otherProps
 	} = useContextSystem( props, 'Flyout' );
 
@@ -30,11 +31,18 @@ export function useFlyout( props ) {
 		animated: animated ? animationDuration : undefined,
 		baseId: baseId || id,
 		placement,
-		visible,
+		visible: isOpen,
 		...otherProps,
 	} );
 
-	const flyoutState = state || _flyoutState;
+	const flyoutState = {
+		..._flyoutState,
+		visible: isOpen ?? _flyoutState.visible,
+	};
+
+	useUpdateEffect( () => {
+		onToggle?.( _flyoutState.visible );
+	}, [ _flyoutState.visible ] );
 
 	return {
 		...otherProps,
