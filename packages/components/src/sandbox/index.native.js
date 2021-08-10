@@ -105,11 +105,13 @@ const style = `
 	}
 `;
 
+const EMPTY_ARRAY = [];
+
 function Sandbox( {
 	html = '',
 	providerUrl = '',
-	scripts = [],
-	styles = [],
+	scripts = EMPTY_ARRAY,
+	styles = EMPTY_ARRAY,
 	title = '',
 	type,
 	url,
