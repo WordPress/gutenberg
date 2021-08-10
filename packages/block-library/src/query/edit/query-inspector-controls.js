@@ -235,7 +235,7 @@ export default function QueryInspectorControls( {
 						}
 					/>
 					<TextControl
-						label={ __( 'Keyword' ) }
+						label={ __( 'Tags' ) }
 						value={ querySearch }
 						onChange={ setQuerySearch }
 					/>
