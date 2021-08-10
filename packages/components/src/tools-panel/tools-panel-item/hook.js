@@ -47,7 +47,7 @@ export function useToolsPanelItem( props ) {
 	const isMenuItemChecked = menuItems[ label ];
 	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
 
-	// Determine if the panel item's corresponding menu it is being toggled and
+	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
