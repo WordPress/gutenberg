@@ -16,7 +16,7 @@ import Panel from '../../panel';
 import UnitControl from '../../unit-control';
 
 export default {
-	title: 'Components/ToolsPanel',
+	title: 'Components (Experimental)/ToolsPanel',
 	component: ToolsPanel,
 };
 
