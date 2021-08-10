@@ -154,8 +154,8 @@ export function parseRawBlock( rawBlock ) {
 	let normalizedBlock = normalizeRawBlock( rawBlock );
 
 	// During the lifecycle of the project, we renamed some old blocks
-	// And transformed others to new blocks, to avoid breaking existing content
-	// We added this function to properly parse the old content.
+	// and transformed others to new blocks. To avoid breaking existing content,
+	// we added this function to properly parse the old content.
 	normalizedBlock = convertLegacyBlocks( normalizedBlock );
 
 	// Try finding the type for known block name.
@@ -210,9 +210,10 @@ export function parseRawBlock( rawBlock ) {
 	parsedBlock.isValid = isValid;
 	parsedBlock.validationIssues = validationIssues;
 
-	// Run the block deprecation an migrations.
-	// This is performed on valid blocks as well because some migration with migrate functions
-	// Should run even if the output is deemed valid.
+	// Run the block deprecation and migrations.
+	// This is performed on both invalid and valid blocks because
+	// migration using the `migrate` functions should run even
+	// if the output is deemed valid.
 	parsedBlock = applyBlockDeprecatedVersions(
 		parsedBlock,
 		normalizedBlock,
