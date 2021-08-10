@@ -28,11 +28,17 @@ import {
 } from '@wordpress/block-editor';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { ungroup } from '@wordpress/icons';
+import { useEffect } from '@wordpress/element';
 
-export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
+export default function ReusableBlockEdit( {
+	attributes: { ref, inheritedAlignment },
+	setAttributes,
+	clientId,
+} ) {
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		ref
 	);
+
 	const { isMissing, hasResolved } = useSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
@@ -71,7 +77,29 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 
-	const blockProps = useBlockProps();
+	useEffect( () => {
+		const alignments = [ 'wide', 'full' ];
+
+		// Determine the widest setting of all the contained blocks.
+		const widestAlignment = blocks.reduce( ( accumulator, block ) => {
+			const { align } = block.attributes;
+			return alignments.indexOf( align ) >
+				alignments.indexOf( accumulator )
+				? align
+				: accumulator;
+		}, undefined );
+
+		// Set the attribute of the Reusable block to match the widest
+		// alignment.
+
+		setAttributes( {
+			inheritedAlignment: widestAlignment ?? '',
+		} );
+	}, [ blocks ] );
+
+	const blockProps = useBlockProps( {
+		'data-align': inheritedAlignment,
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{},
