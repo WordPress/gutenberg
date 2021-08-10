@@ -27,7 +27,27 @@ jobs:
                 node: ['14']
 
         steps:
+            - id: timestamp
+              run: echo "::set-output name=timestamp::$(timestamp +%s)"
+
+            - name: Restore the previous run result
+              uses: actions/cache@v2
+              with:
+                  path: |
+                      run_result
+                  key: ${{ github.run_id }}-${{ github.job }}-${{ steps.timestamp.outputs.timestamp }}
+                  restore-keys: |
+                      ${{ github.run_id }}-${{ github.job }}-
+
+            - name: Get the previous run result
+              id: run_result
+              run: cat run_result 2>/dev/null || echo 'default'
+
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              if: steps.run_result.outputs.run_result != 'success'
+
+            - if: steps.run_result.outputs.run_result != 'success'
+              run: echo "Success" && exit 0
 
             - name: Use desired version of NodeJS
               uses: actions/setup-node@38d90ce44d5275ad62cc48384b3d8a58c500bb5f # v2.2.2
@@ -55,3 +75,5 @@ jobs:
               with:
                   name: failures-artifacts
                   path: artifacts
+
+            - run: echo "::set-output name=run_result::success" > run_result
