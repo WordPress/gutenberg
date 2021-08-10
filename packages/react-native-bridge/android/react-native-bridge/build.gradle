@@ -62,10 +62,10 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     implementation "org.wordpress:utils:1.22"
 
-    api "com.github.wordpress-mobile:react-native-svg:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-svg', 'dependencies')}"
+    //api "com.github.wordpress-mobile:react-native-svg:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-svg', 'dependencies')}"
     api "com.github.wordpress-mobile:react-native-video:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-video', 'dependencies')}"
     api "com.github.wordpress-mobile:react-native-linear-gradient:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-linear-gradient', 'dependencies')}"
-    api "com.github.wordpress-mobile:react-native-slider:${readHashedVersion('../../../react-native-editor/package.json', '@react-native-community/slider', 'dependencies')}"
+    //api "com.github.wordpress-mobile:react-native-slider:${readHashedVersion('../../../react-native-editor/package.json', '@react-native-community/slider', 'dependencies')}"
     api "com.github.wordpress-mobile:react-native-get-random-values:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-get-random-values', 'dependencies')}"
     api "com.github.wordpress-mobile:react-native-masked-view:${readHashedVersion('../../../react-native-editor/package.json', '@react-native-community/masked-view', 'dependencies')}"
     api "com.github.wordpress-mobile:react-native-gesture-handler:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-gesture-handler', 'dependencies')}"
@@ -80,13 +80,16 @@ dependencies {
         implementation "com.facebook.react:react-native:$rnVersion"
         implementation "org.wordpress-mobile.gutenberg-mobile:react-native-aztec:$reactNativeAztecVersion"
         runtimeOnly "org.wordpress-mobile:hermes-release-mirror:0.64.0"
+
+        api "com.github.wordpress-mobile:react-native-svg:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-svg', 'dependencies')}"
+        api "com.github.wordpress-mobile:react-native-slider:${readHashedVersion('../../../react-native-editor/package.json', '@react-native-community/slider', 'dependencies')}"
    } else {
         api 'com.facebook.react:react-native:+'
         api project(':@wordpress_react-native-aztec')
 //        api project(':react-native-linear-gradient')
-//        api project(':react-native-svg')
+        api project(':react-native-svg')
 //        api project(':react-native-video')
-//        api project(':@react-native-community_slider')
+        api project(':@react-native-community_slider')
 //        api project(':react-native-get-random-values')
 //        api project(':@react-native-community_masked-view')
 //        api project(':react-native-gesture-handler')
