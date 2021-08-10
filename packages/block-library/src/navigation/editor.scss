@@ -229,12 +229,16 @@ $color-control-label-height: 20px;
 		}
 	}
 
-	svg {
-		fill: currentColor;
+	.wp-block-navigation-placeholder__preview-search-icon {
+		height: $icon-size;
+		svg {
+			fill: currentColor;
+		}
 	}
 
+
 	.wp-block-navigation-link.wp-block-navigation-link,
-	svg {
+	.wp-block-navigation-placeholder__preview-search-icon {
 		opacity: 0.3;
 	}
 

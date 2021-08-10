@@ -9,7 +9,9 @@ const PlaceholderPreview = () => {
 			<li className="wp-block-navigation-link">&#8203;</li>
 			<li className="wp-block-navigation-link">&#8203;</li>
 			<li className="wp-block-navigation-link">&#8203;</li>
-			<Icon icon={ search } />
+			<li className="wp-block-navigation-placeholder__preview-search-icon">
+				<Icon icon={ search } />
+			</li>
 		</ul>
 	);
 };
