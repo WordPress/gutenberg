@@ -29,7 +29,7 @@ const fontSizeStyles = ( { selectSize }: SelectProps ) => {
 		small: '11px',
 	};
 
-	const fontSize = sizes[ selectSize ];
+	const fontSize = sizes[ selectSize as Size ];
 	const fontSizeMobile = '16px';
 
 	if ( ! fontSize ) return '';
@@ -57,7 +57,7 @@ const sizeStyles = ( { selectSize }: SelectProps ) => {
 		},
 	};
 
-	const style = sizes[ selectSize ] || sizes.default;
+	const style = sizes[ selectSize as Size ] || sizes.default;
 
 	return css( style );
 };

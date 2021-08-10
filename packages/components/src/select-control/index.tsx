@@ -30,7 +30,8 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-export interface SelectControlProps extends Omit< InputBaseProps, 'children' > {
+export interface SelectControlProps
+	extends Omit< InputBaseProps, 'children' | 'isFocused' > {
 	help?: string;
 	hideLabelFromVision?: boolean;
 	multiple?: boolean;
@@ -92,7 +93,7 @@ function SelectControl(
 
 	const handleOnChange = ( event: ChangeEvent< HTMLSelectElement > ) => {
 		if ( multiple ) {
-			const selectedOptions = [ ...event.target.options ].filter(
+			const selectedOptions = Array.from( event.target.options ).filter(
 				( { selected } ) => selected
 			);
 			const newValues = selectedOptions.map( ( { value } ) => value );
