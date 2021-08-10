@@ -4,6 +4,11 @@
 import colorize, { ColorFormats } from 'tinycolor2';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { Text } from '../../text';
@@ -43,6 +48,8 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 			}
 			onValidate={ handleValidate }
 			maxLength={ enableAlpha ? 8 : 6 }
+			label={ __( 'Hex color' ) }
+			hideLabelFromVision
 		/>
 	);
 };

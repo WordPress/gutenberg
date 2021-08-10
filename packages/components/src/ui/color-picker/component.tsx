@@ -11,6 +11,7 @@ import type { ColorFormats } from 'tinycolor2';
 import { useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useDebounce } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -101,6 +102,8 @@ const ColorPicker = (
 						onChange={ ( nextColorType ) =>
 							setColorType( nextColorType as ColorType )
 						}
+						label={ __( 'Color format' ) }
+						hideLabelFromVision
 					/>
 				) : (
 					<ColorDisplay
@@ -113,6 +116,11 @@ const ColorPicker = (
 					onClick={ () => setShowInputs( ! showInputs ) }
 					icon={ moreVertical }
 					isPressed={ showInputs }
+					label={
+						showInputs
+							? __( 'Hide detailed inputs' )
+							: __( 'Show detailed inputs' )
+					}
 				/>
 			</HStack>
 			<Spacer />
