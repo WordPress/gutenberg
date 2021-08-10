@@ -34,7 +34,7 @@
 		padding: 8px;
 		flex-grow: 1;
 		min-width: 3em;
-		border: 1px solid $gray-600;
+		border: 1px solid #949494;
 	}
 
 	&.wp-block-search__button-only {
@@ -45,7 +45,7 @@
 
 	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
 		padding: 4px;
-		border: 1px solid $gray-600;
+		border: 1px solid #949494;
 
 		.wp-block-search__input {
 			border-radius: 0;
