@@ -82,7 +82,7 @@ const BottomSheetTextControl = ( {
 					<TextInput
 						label={ label }
 						onChangeText={ ( text ) => onChangeText( text ) }
-						value={ value }
+						defaultValue={ value }
 						multiline={ true }
 						placeholder={ placeholder }
 						placeholderTextColor={ '#87a6bc' }
