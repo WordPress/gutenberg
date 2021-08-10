@@ -10,7 +10,7 @@ import classnames from 'classnames';
 import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, select as dataSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
@@ -34,6 +34,8 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
+		getNextBlockClientId,
+		getBlockOrder,
 	} = select( blockEditorStore );
 	return {
 		isNavigationMode: isNavigationMode(),
@@ -43,6 +45,8 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		lastClientId: getLastMultiSelectedBlockClientId(),
+		getNextBlockClientId,
+		getBlockOrder,
 	};
 }
 
@@ -63,13 +67,14 @@ function BlockPopover( {
 		hasMultiSelection,
 		hasFixedToolbar,
 		lastClientId,
+		getNextBlockClientId,
+		getBlockOrder,
 	} = useSelect( selector, [] );
 	const isInsertionPointVisible = useSelect(
 		( select ) => {
 			const {
 				isBlockInsertionPointVisible,
 				getBlockInsertionPoint,
-				getBlockOrder,
 			} = select( blockEditorStore );
 
 			if ( ! isBlockInsertionPointVisible() ) {
@@ -132,6 +137,9 @@ function BlockPopover( {
 	const lastSelectedElement = useBlockElement( lastClientId );
 	const capturingElement = useBlockElement( capturingClientId );
 
+	const nextElement = useBlockElement( getNextBlockClientId( clientId ) );
+	const isFirstBlock = getBlockOrder()[ 0 ] === clientId;
+
 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
 	if (
@@ -154,6 +162,11 @@ function BlockPopover( {
 	}
 
 	let anchorRef = node;
+
+	// If this is the first block and in the site editor, try using second block as anchor.
+	if ( dataSelect( 'core/edit-site' ) && isFirstBlock && nextElement ) {
+		anchorRef = nextElement;
+	}
 
 	if ( hasMultiSelection ) {
 		// Wait to render the popover until the bottom reference is available
