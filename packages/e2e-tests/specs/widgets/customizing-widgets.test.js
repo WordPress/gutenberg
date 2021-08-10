@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import {
-	activatePlugin,
+	__experimentalActivatePlugin as activatePlugin,
 	activateTheme,
-	deactivatePlugin,
+	__experimentalDeactivatePlugin as deactivatePlugin,
 	visitAdminPage,
 	showBlockToolbar,
 	clickBlockToolbarButton,

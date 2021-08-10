@@ -2,15 +2,15 @@
  * WordPress dependencies
  */
 import {
-	activatePlugin,
+	__experimentalActivatePlugin as activatePlugin,
 	activateTheme,
 	clickBlockToolbarButton,
-	deactivatePlugin,
+	__experimentalDeactivatePlugin as deactivatePlugin,
 	showBlockToolbar,
 	visitAdminPage,
 	deleteAllWidgets,
 	pressKeyWithModifier,
-	rest,
+	__experimentalRest as rest,
 } from '@wordpress/e2e-test-utils';
 
 /**

@@ -545,18 +545,6 @@ _Returns_
 
 -   `Promise`: Promise resolving when publish is complete.
 
-### rest
-
-Call REST API using `apiFetch` to build and clear test states.
-
-_Parameters_
-
--   _options_ `Object`: `apiFetch` options.
-
-_Returns_
-
--   `Promise<any>`: The response value.
-
 ### saveDraft
 
 Saves the post as a draft, resolving once the request is complete (once the

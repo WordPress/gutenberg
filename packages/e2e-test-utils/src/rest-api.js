@@ -54,4 +54,23 @@ async function rest( options = {} ) {
 	} );
 }
 
-export { rest };
+/**
+ * Call a set of REST APIs in batch.
+ * See https://make.wordpress.org/core/2020/11/20/rest-api-batch-framework-in-wordpress-5-6/
+ * Note that calling GET requests in batch is not supported.
+ *
+ * @param {Array<Object>} requests The request objects.
+ * @return {Promise<any>} The response value.
+ */
+async function batch( requests ) {
+	return await rest( {
+		method: 'POST',
+		path: '/batch/v1',
+		data: {
+			requests,
+			validation: 'require-all-validate',
+		},
+	} );
+}
+
+export { rest, batch };
