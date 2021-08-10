@@ -30,6 +30,7 @@ describe( 'getInlineStyles', () => {
 				},
 			} )
 		).toEqual( {
+			'--wp--theme--block-row-gap': '1em',
 			backgroundColor: 'black',
 			borderColor: '#21759b',
 			borderRadius: '10px',
@@ -38,7 +39,6 @@ describe( 'getInlineStyles', () => {
 			color: 'red',
 			lineHeight: 1.5,
 			fontSize: 10,
-			rowGap: '1em',
 			marginBottom: '15px',
 			paddingTop: '10px',
 		} );
@@ -87,8 +87,8 @@ describe( 'getInlineStyles', () => {
 				},
 			} )
 		).toEqual( {
-			columnGap: '5px',
-			rowGap: '1em',
+			'--wp--theme--block-column-gap': '5px',
+			'--wp--theme--block-row-gap': '1em',
 			marginTop: '10px',
 			marginRight: '0.5rem',
 			marginBottom: '0.5em',
@@ -110,7 +110,7 @@ describe( 'getInlineStyles', () => {
 				},
 			} )
 		).toEqual( {
-			gap: '1em',
+			'--wp--theme--block-gap': '1em',
 			margin: '10px',
 			padding: '20px',
 		} );
