@@ -13,8 +13,8 @@ import { cx as innerCx, ClassNamesArg } from '@emotion/css';
 import { useCallback } from '@wordpress/element';
 
 const isSerializedStyles = ( o: any ): o is SerializedStyles =>
-	// eslint-disable-next-line eqeqeq
-	o != null &&
+	typeof o !== 'undefined' &&
+	o !== null &&
 	[ 'name', 'styles' ].every( ( p ) => typeof o[ p ] !== 'undefined' );
 
 /**
