@@ -60,7 +60,7 @@
 		"react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
 		"react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker#v1.0.1-wp",
 		"react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#v0.8.8-wp",
-		"react-native-linear-gradient": "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#v2.5.6-wp",
+		"react-native-linear-gradient": "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#37aadbd3739b90d199a01aeb108422ecd67ad67f",
 		"react-native-modal": "^11.10.0",
 		"react-native-prompt-android": "git+https://github.com/wordpress-mobile/react-native-prompt-android.git#v1.0.0-wp",
 		"react-native-reanimated": "git+https://github.com/wordpress-mobile/react-native-reanimated.git#1.9.0-wp",
@@ -70,7 +70,7 @@
 		"react-native-screens": "git+https://github.com/wordpress-mobile/react-native-screens.git#2.9.0-wp",
 		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#69b22d1c11370134c9f16a5e539c11959d1d58d6",
 		"react-native-url-polyfill": "^1.1.2",
-		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#5.0.2-wp"
+		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#eddce078976cd1bd9061aebc921a2e619ed4b204"
 	},
 	"publishConfig": {
 		"access": "public"
