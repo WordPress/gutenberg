@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -26,6 +26,7 @@ import {
 	BottomSheet,
 	BottomSheetTextControl,
 	BottomSheetSelectControl,
+	FooterMessageControl,
 	FooterMessageLink,
 	Badge,
 } from '@wordpress/components';
@@ -445,7 +446,7 @@ export class ImageEdit extends Component {
 		closeSettingsBottomSheet();
 	}
 
-	getSetFeaturedButton( isFeaturedImage ) {
+	getFeaturedButtonPanel( isFeaturedImage ) {
 		const { attributes, getStylesFromColorScheme } = this.props;
 
 		const setFeaturedButtonStyle = getStylesFromColorScheme(
@@ -460,6 +461,8 @@ export class ImageEdit extends Component {
 					setFeaturedButtonStyle,
 					styles.removeFeaturedButton,
 				] }
+				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
 				onPress={ () =>
 					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
 				}
@@ -470,17 +473,13 @@ export class ImageEdit extends Component {
 			<BottomSheet.Cell
 				label={ __( 'Set as Featured Image ' ) }
 				labelStyle={ setFeaturedButtonStyle }
+				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);
 
-		return (
-			<PanelBody>
-				{ isFeaturedImage
-					? removeFeaturedButton()
-					: setFeaturedButton() }
-			</PanelBody>
-		);
+		return isFeaturedImage ? removeFeaturedButton() : setFeaturedButton();
 	}
 
 	render() {
@@ -518,14 +517,14 @@ export class ImageEdit extends Component {
 		}
 
 		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
-		// Images that haven't been uploaded to a site's library have an id of 'undefined', which the 'canImageBeFeatured' check filters out.
-		const canImageBeFeatured = typeof attributes.id !== 'undefined';
+		// The 'canImageBeFeatured' check filters out images that haven't been uploaded based on the following:
+		// - Images that are embedded in a post but are uploaded elsewhere have an id of 'undefined'.
+		// - Image that are uploading or have failed to upload are given a temporary negative ID.
+		const canImageBeFeatured =
+			typeof attributes.id !== 'undefined' && attributes.id > 0;
 
 		const isFeaturedImage =
 			canImageBeFeatured && featuredImageId === attributes.id;
-
-		// eslint-disable-next-line no-unused-vars
-		const androidOnly = Platform.OS === 'android';
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -564,9 +563,21 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ androidOnly &&
-					canImageBeFeatured &&
-					this.getSetFeaturedButton( isFeaturedImage ) }
+				<PanelBody
+					title={ __( 'Featured Image' ) }
+					titleStyle={ styles.featuredImagePanelTitle }
+				>
+					{ canImageBeFeatured &&
+						this.getFeaturedButtonPanel( isFeaturedImage ) }
+					<FooterMessageControl
+						label={ __(
+							'Changes to featured image will not be affected by the undo/redo buttons.'
+						) }
+						cellContainerStyle={
+							styles.setFeaturedButtonCellContainer
+						}
+					/>
+				</PanelBody>
 			</InspectorControls>
 		);
 

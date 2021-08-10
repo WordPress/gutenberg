@@ -128,6 +128,7 @@ This behavior is useful if we want to render a list of items asynchronously for 
 _Parameters_
 
 -   _list_ `T[]`: Source array.
+-   _config_ `AsyncListConfig`: Configuration object.
 
 _Returns_
 

@@ -3,6 +3,8 @@
  */
 import { noop } from 'lodash';
 import classNames from 'classnames';
+// eslint-disable-next-line no-restricted-imports
+import type { Ref } from 'react';
 
 /**
  * WordPress dependencies
@@ -15,8 +17,9 @@ import { useState, forwardRef } from '@wordpress/element';
  */
 import InputBase from './input-base';
 import InputField from './input-field';
+import type { InputControlProps } from './types';
 
-function useUniqueId( idProp ) {
+function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputControl );
 	const id = `inspector-input-control-${ instanceId }`;
 
@@ -42,8 +45,8 @@ export function InputControl(
 		suffix,
 		value,
 		...props
-	},
-	ref
+	}: InputControlProps,
+	ref: Ref< HTMLInputElement >
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 
