@@ -1,32 +1,58 @@
 /**
  * External dependencies
  */
+import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
  */
-import { TextControl, Icon } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { BottomSheet, TextControl, Icon } from '@wordpress/components';
 import { chevronRight } from '@wordpress/icons';
 
-const HelpTopicRow = ( { label, icon } ) => {
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
+
+const HelpTopicRow = ( { content, label, icon } ) => {
+	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
 
 	const openSubSheet = () => {
-		navigation.navigate( label );
+		setShowSubSheet( true );
+		navigation.navigate( BottomSheet.SubSheet.screenName );
+	};
+
+	const goBack = () => {
+		navigation.goBack();
+		setShowSubSheet( false );
 	};
 
 	return (
-		<TextControl
-			separatorType="leftMargin"
-			customActionButton
-			leftAlign
-			onPress={ openSubSheet }
-			label={ label }
-			icon={ icon }
+		<BottomSheet.SubSheet
+			navigationButton={
+				<TextControl
+					separatorType="leftMargin"
+					customActionButton
+					leftAlign
+					onPress={ openSubSheet }
+					label={ label }
+					icon={ icon }
+				>
+					<Icon icon={ chevronRight } />
+				</TextControl>
+			}
+			showSheet={ showSubSheet }
 		>
-			<Icon icon={ chevronRight } />
-		</TextControl>
+			<BottomSheet.NavigationHeader
+				screen={ label }
+				leftButtonOnPress={ goBack }
+			/>
+			<View style={ styles.separator } />
+			{ content }
+		</BottomSheet.SubSheet>
 	);
 };
 

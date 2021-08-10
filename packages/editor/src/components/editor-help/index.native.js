@@ -21,7 +21,6 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
-import HelpDetailNavigationScreen from './help-detail-navigation-screen';
 import HelpTopicRow from './help-topic-row';
 import IntroToBlocks from './intro-to-blocks';
 import AddBlocks from './add-blocks';
@@ -85,21 +84,17 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 									key={ topic.label }
 									label={ topic.label }
 									icon={ topic.icon }
+									content={ topic.view }
 								/>
 							);
 						} ) }
 					</PanelBody>
 				</BottomSheet.NavigationScreen>
-				{ /* Print out help detail screens */ }
-				{ HELP_TOPICS.map( ( topic ) => {
-					return (
-						<HelpDetailNavigationScreen
-							key={ topic.label }
-							name={ topic.label }
-							content={ topic.view }
-						/>
-					);
-				} ) }
+				<BottomSheet.NavigationScreen
+					name={ BottomSheet.SubSheet.screenName }
+				>
+					<BottomSheet.SubSheet.Slot />
+				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);
