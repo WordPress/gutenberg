@@ -39,7 +39,6 @@ const MediaReplaceFlow = ( {
 	onSelect,
 	onSelectURL,
 	onFilesUpload = noop,
-	name = __( 'Replace' ),
 	createNotice,
 	removeNotice,
 } ) => {
@@ -112,6 +111,15 @@ const MediaReplaceFlow = ( {
 		isAlternate: true,
 	};
 
+	let name = __( 'Replace' );
+	if ( allowedTypes[ 0 ] === 'image' && allowedTypes.length === 1 ) {
+		name = __( 'Change image' );
+	} else if ( allowedTypes[ 0 ] === 'video' && allowedTypes.length === 1 ) {
+		name = __( 'Change video' );
+	} else if ( allowedTypes[ 0 ] === 'audio' && allowedTypes.length === 1 ) {
+		name = __( 'Change audio' );
+	}
+
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
@@ -136,6 +144,7 @@ const MediaReplaceFlow = ( {
 							allowedTypes={ allowedTypes }
 							render={ ( { open } ) => (
 								<MenuItem icon={ mediaIcon } onClick={ open }>
+									{ allowedTypes }
 									{ __( 'Open Media Library' ) }
 								</MenuItem>
 							) }
