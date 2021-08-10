@@ -38,7 +38,7 @@ function useHasMargin( { name, supports } ) {
 function useHasGap( { name, supports } ) {
 	const settings = useSetting( 'spacing.customGap', name );
 
-	return settings && supports.includes( 'gap' );
+	return settings && supports.includes( '--wp--theme--block-gap' );
 }
 
 function filterValuesBySides( values, sides ) {
@@ -146,12 +146,14 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const hasMarginValue = () =>
 		marginValues && Object.keys( marginValues ).length;
 
-	const gapValues = splitGapStyleValue( getStyle( name, 'gap' ) );
-	const gapSides = useCustomSides( name, 'gap' );
+	const gapValues = splitGapStyleValue(
+		getStyle( name, '--wp--theme--block-gap' )
+	);
+	const gapSides = useCustomSides( name, '--wp--theme--block-gap' );
 
 	const setGapValues = ( newGapValues ) => {
 		const gap = filterGapValuesBySides( newGapValues, gapSides );
-		setStyle( name, 'gap', gap );
+		setStyle( name, '--wp--theme--block-gap', gap );
 	};
 	const resetGapValue = () => setGapValues( {} );
 	const hasGapValue = () => gapValues && Object.keys( gapValues ).length;

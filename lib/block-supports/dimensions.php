@@ -95,10 +95,10 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 
 		if ( is_array( $gap_value ) ) {
 			foreach ( $gap_value as $key => $value ) {
-				$styles[] = sprintf( '%s-gap: %s', $key, $value );
+				$styles[] = sprintf( '--wp--theme--block-%s-gap: %s', $key, $value );
 			}
 		} elseif ( null !== $gap_value )  {
-			$styles[] = sprintf( 'gap: %s', $gap_value );
+			$styles[] = sprintf( '--wp--theme--block-: %s', $gap_value );
 		}
 	}
 

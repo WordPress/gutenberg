@@ -72,12 +72,12 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'typography', 'fontWeight' ],
 		support: [ 'typography', '__experimentalFontWeight' ],
 	},
-	gap: {
+	'--wp--theme--block-gap': {
 		value: [ 'spacing', 'gap' ],
 		support: [ 'spacing', 'gap' ],
 		properties: {
-			columnGap: 'column',
-			rowGap: 'row',
+			'--wp--theme--block-column-gap': 'column',
+			'--wp--theme--block-row-gap': 'row',
 		},
 	},
 	lineHeight: {
