@@ -8,13 +8,15 @@
 	"attributes": {
 		"ref": {
 			"type": "number"
+		},
+		"inheritedAlignment": {
+			"type": "string"
 		}
 	},
 	"supports": {
 		"customClassName": false,
 		"html": false,
-		"inserter": false,
-		"align": [ "wide", "full" ]
+		"inserter": false
 	},
 	"editorStyle": "wp-block-editor"
 }
