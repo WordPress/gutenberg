@@ -24,7 +24,7 @@ const IntroToBlocks = () => {
 			<HelpDetailImage
 				source={ require( './images/intro-blocks-1.png' ) }
 			/>
-			<Text style={ styles.helpDetailTitle }>
+			<Text accessibilityRole="header" style={ styles.helpDetailTitle }>
 				{ __( 'Welcome to the world of blocks' ) }
 			</Text>
 			<HelpDetailBodyText

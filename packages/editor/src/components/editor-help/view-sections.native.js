@@ -13,7 +13,14 @@ export const HelpDetailBodyText = ( { text } ) => {
 };
 
 export const HelpDetailSectionHeadingText = ( { text } ) => {
-	return <Text style={ styles.helpDetailSectionHeading }>{ text }</Text>;
+	return (
+		<Text
+			accessibilityRole="header"
+			style={ styles.helpDetailSectionHeading }
+		>
+			{ text }
+		</Text>
+	);
 };
 
 export const HelpDetailImage = ( { source } ) => {
