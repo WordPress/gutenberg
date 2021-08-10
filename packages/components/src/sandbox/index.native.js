@@ -125,6 +125,7 @@ function Sandbox( {
 	const [ isLandscape, setIsLandscape ] = useState(
 		windowSize.width >= windowSize.height
 	);
+	const wasLandscape = useRef( isLandscape );
 	// On Android, we need to recreate the WebView when the device rotates, otherwise it disappears.
 	// For this purpose, the key value used in the WebView will change when the device orientation gets updated.
 	const key = Platform.select( {
@@ -235,6 +236,16 @@ function Sandbox( {
 	useEffect( () => {
 		updateContentHtml();
 	}, [ html, title, type, styles, scripts ] );
+
+	useEffect( () => {
+		// When device orientation changes we have to recalculate the size,
+		// for this purpose we reset the current size value.
+		if ( wasLandscape.current !== isLandscape ) {
+			setWidth( 0 );
+			setHeight( 0 );
+		}
+		wasLandscape.current = isLandscape;
+	}, [ isLandscape ] );
 
 	return (
 		<WebView
