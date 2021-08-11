@@ -5,16 +5,17 @@
  * of the editor by themes.
  */
 
+// The following styles revert to the browser defaults overriding the WPAdmin styles.
+// This is only needed while the block editor is not being loaded in an iframe.
+// The font-family is output as an inline style, so it needs higher specificity here.
+.editor-styles-wrapper {
+	font-family: serif; // unfortunately initial doesn't work for font-family.
+}
+
 // We use :where to keep specificity minimal.
 // https://css-tricks.com/almanac/selectors/w/where/
 html :where(.editor-styles-wrapper) {
 	padding: 8px;
-
-	/**
-	* The following styles revert to the browser defaults overriding the WPAdmin styles.
-	* This is only needed while the block editor is not being loaded in an iframe.
-	*/
-	font-family: serif; // unfortunately initial doesn't work for font-family.
 	font-size: initial;
 	line-height: initial;
 	color: initial;
