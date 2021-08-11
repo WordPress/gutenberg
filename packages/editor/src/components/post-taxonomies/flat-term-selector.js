@@ -94,7 +94,6 @@ function FlatTermSelector( { slug } ) {
 		terms,
 		termIds,
 		taxonomy,
-		isLoading,
 		hasAssignAction,
 		hasCreateAction,
 	} = useSelect(
@@ -102,9 +101,8 @@ function FlatTermSelector( { slug } ) {
 			const { getCurrentPost, getEditedPostAttribute } = select(
 				editorStore
 			);
-			const { getEntityRecords, getTaxonomy, isResolving } = select(
-				coreStore
-			);
+			const { getEntityRecords, getTaxonomy } = select( coreStore );
+			const post = getCurrentPost();
 			const _taxonomy = getTaxonomy( slug );
 			const _termIds = _taxonomy
 				? getEditedPostAttribute( _taxonomy.rest_base )
@@ -119,7 +117,7 @@ function FlatTermSelector( { slug } ) {
 			return {
 				hasCreateAction: _taxonomy
 					? get(
-							getCurrentPost(),
+							post,
 							[
 								'_links',
 								'wp:action-create-' + _taxonomy.rest_base,
@@ -129,7 +127,7 @@ function FlatTermSelector( { slug } ) {
 					: false,
 				hasAssignAction: _taxonomy
 					? get(
-							getCurrentPost(),
+							post,
 							[
 								'_links',
 								'wp:action-assign-' + _taxonomy.rest_base,
@@ -142,11 +140,6 @@ function FlatTermSelector( { slug } ) {
 				terms: _termIds.length
 					? getEntityRecords( 'taxonomy', slug, query )
 					: EMPTY_ARRAY,
-				isLoading: isResolving( 'getEntityRecords', [
-					'taxonomy',
-					slug,
-					query,
-				] ),
 			};
 		},
 		[ slug ]
@@ -274,7 +267,6 @@ function FlatTermSelector( { slug } ) {
 				onChange={ onChange }
 				onInputChange={ debouncedSearch }
 				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-				disabled={ isLoading }
 				label={ newTermLabel }
 				messages={ {
 					added: termAddedLabel,
