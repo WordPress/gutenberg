@@ -1,12 +1,16 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { ScrollView, StyleSheet, View, Text } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { BottomSheet, PanelBody } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	PanelBody,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
@@ -62,38 +66,76 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 			hasNavigation
 			contentStyle={ styles.contentContainer }
 		>
-			<BottomSheet.NavigationContainer animate main>
-				<BottomSheet.NavigationScreen name={ __( 'Topics' ) }>
-					<View style={ styles.bottomSheetHeader }>
-						<Text
-							accessibilityRole="header"
-							style={ bottomSheetHeaderTitleStyle }
-							maxFontSizeMultiplier={ 3 }
-						>
-							{ __( 'How to edit your site' ) }
-						</Text>
-					</View>
-					<View style={ styles.separator } />
-					<PanelBody title={ __( 'The basics' ) }>
-						{ /* Print out help topics */ }
-						{ HELP_TOPICS.map( ( topic ) => {
-							return (
-								<HelpTopicRow
-									key={ topic.label }
-									label={ topic.label }
-									icon={ topic.icon }
-									content={ topic.view }
-								/>
-							);
-						} ) }
-					</PanelBody>
-				</BottomSheet.NavigationScreen>
-				<BottomSheet.NavigationScreen
-					name={ BottomSheet.SubSheet.screenName }
-				>
-					<BottomSheet.SubSheet.Slot />
-				</BottomSheet.NavigationScreen>
-			</BottomSheet.NavigationContainer>
+			<BottomSheetConsumer>
+				{ ( { listProps } ) => {
+					const {
+						style: containerStyle,
+						...scrollViewProps
+					} = listProps;
+					const contentContainerStyle = StyleSheet.flatten(
+						scrollViewProps.contentContainerStyle
+					);
+					return (
+						<BottomSheet.NavigationContainer animate main>
+							<BottomSheet.NavigationScreen
+								isScrollable
+								name={ __( 'Topics' ) }
+							>
+								<View style={ containerStyle }>
+									<View style={ styles.bottomSheetHeader }>
+										<Text
+											accessibilityRole="header"
+											style={
+												bottomSheetHeaderTitleStyle
+											}
+											maxFontSizeMultiplier={ 3 }
+										>
+											{ __( 'How to edit your site' ) }
+										</Text>
+									</View>
+									<View style={ styles.separator } />
+									<ScrollView
+										{ ...scrollViewProps }
+										contentContainerStyle={ {
+											...contentContainerStyle,
+											paddingBottom: Math.max(
+												scrollViewProps.safeAreaBottomInset,
+												contentContainerStyle.paddingBottom
+											),
+											/**
+											 * Remove margin set via `hideHeader`. Combining a header
+											 * and navigation in this bottom sheet is at odds with the
+											 * current `BottomSheet` implementation.
+											 */
+											marginTop: 0,
+										} }
+									>
+										<PanelBody title={ __( 'The basics' ) }>
+											{ /* Print out help topics */ }
+											{ HELP_TOPICS.map( ( topic ) => {
+												return (
+													<HelpTopicRow
+														key={ topic.label }
+														label={ topic.label }
+														icon={ topic.icon }
+														content={ topic.view }
+													/>
+												);
+											} ) }
+										</PanelBody>
+									</ScrollView>
+								</View>
+							</BottomSheet.NavigationScreen>
+							<BottomSheet.NavigationScreen
+								isScrollable
+								name={ BottomSheet.SubSheet.screenName }
+							>
+								<BottomSheet.SubSheet.Slot />
+							</BottomSheet.NavigationScreen>
+						</BottomSheet.NavigationContainer>
+					);
+				} }
+			</BottomSheetConsumer>
 		</BottomSheet>
 	);
 }
