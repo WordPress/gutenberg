@@ -25,12 +25,18 @@ export function useBlockSelectionClearer() {
 	return useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
-				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
+				// Only handle clicks on the element, not the children.
+				if ( event.target !== node ) {
 					return;
 				}
 
-				// Only handle clicks on the element, not the children.
-				if ( event.target !== node ) {
+				// Prevent default browser behaviour:
+				// Some browsers redirect focus to the horizontally closest
+				// inline-block element.
+				// See https://stackoverflow.com/questions/34354085/clicking-outside-a-contenteditable-div-stills-give-focus-to-it
+				event.preventDefault();
+
+				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
 					return;
 				}
 
