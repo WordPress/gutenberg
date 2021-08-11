@@ -14,14 +14,17 @@ body:
               1. Go to '...'
               2. Click on '...'
               3. Scroll down to '...'
-              4. See error...
+              4. See error '...'
       validations:
           required: true
 
     - type: textarea
       attributes:
           label: Expected vs Current Behavior
-          description: Please describe what you expected to happen and what you are actually experiencing.
+          description: Please describe what you expect to happen and what is currently happening.
+          placeholder: |
+              - I expect '...' to happen
+              - However, '...' happens
       validations:
           required: true
 
