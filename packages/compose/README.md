@@ -186,7 +186,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
+-   `import('react').Ref<TElementType>`: A ref to assign to the target element.
 
 ### useDebounce
 

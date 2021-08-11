@@ -63,17 +63,20 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 }
 
 export interface InputControlProps
-	extends Omit< InputBaseProps, 'children' >,
+	extends Omit< InputBaseProps, 'children' | 'isFocused' >,
 		/**
 		 * The `prefix` prop in `PolymorphicComponentProps< InputFieldProps, 'input', false >` comes from the
 		 * `HTMLInputAttributes` and clashes with the one from `InputBaseProps`. So we have to omit it from
 		 * `PolymorphicComponentProps< InputFieldProps, 'input', false >` in order that `InputBaseProps[ 'prefix' ]`
 		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
 		 * with an unresolvable type.
+		 *
+		 * `isFocused` and `setIsFocused` are managed internally by the InputControl, but the rest of the props
+		 * for InputField are passed through.
 		 */
 		Omit<
 			PolymorphicComponentProps< InputFieldProps, 'input', false >,
-			'stateReducer' | 'prefix'
+			'stateReducer' | 'prefix' | 'isFocused' | 'setIsFocused'
 		> {
 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
 }
