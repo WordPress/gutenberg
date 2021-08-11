@@ -64,6 +64,7 @@ const LegacyExample = () => {
 	const legacyProps = {
 		color: legacyColor,
 		onChangeComplete: setLegacyColor,
+		disableAlpha: boolean( 'disableAlpha', true ),
 	};
 
 	return (
