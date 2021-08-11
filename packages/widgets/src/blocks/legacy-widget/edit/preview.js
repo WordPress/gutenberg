@@ -21,7 +21,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 	}, [] );
 
 	const widgetPreviewUrl = settings.wpAbsoluteAdminUrl + 'widgets.php';
-	const widgetPreviewUrlOptions = {
+	const widgetPreviewUrlQueryParameters = {
 		'legacy-widget-preview': { idBase, instance },
 	};
 
@@ -108,7 +108,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						// rendering one in an iframe via a portal.
 						src={ addQueryArgs(
 							widgetPreviewUrl,
-							widgetPreviewUrlOptions
+							widgetPreviewUrlQueryParameters
 						) }
 						onLoad={ ( event ) => {
 							// To hide the scrollbars of the preview frame for some edge cases,
