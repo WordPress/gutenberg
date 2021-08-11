@@ -22,7 +22,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 
 	const widgetPreviewUrl = settings.wpAbsoluteAdminUrl + 'widgets.php';
 	const widgetPreviewUrlOptions = {
-		'legacy-widget-preview' : { idBase, instance }
+		'legacy-widget-preview': { idBase, instance },
 	};
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
@@ -106,7 +106,10 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						// TODO: This chokes when the query param is too big.
 						// Ideally, we'd render a <ServerSideRender>. Maybe by
 						// rendering one in an iframe via a portal.
-						src={ addQueryArgs( widgetPreviewUrl, widgetPreviewUrlOptions ) }
+						src={ addQueryArgs(
+							widgetPreviewUrl,
+							widgetPreviewUrlOptions
+						) }
 						onLoad={ ( event ) => {
 							// To hide the scrollbars of the preview frame for some edge cases,
 							// such as negative margins in the Gallery Legacy Widget.
