@@ -190,9 +190,20 @@ export function computePopoverYAxisPosition(
 		const stickyPosition = stickyRect.top + height - relativeOffsetTop;
 
 		if ( anchorRect.top <= stickyPosition ) {
+			// If there is enough room below the block, return coordinates for the bottom position.
+			// Otherwise, use the stickyPosition.
+			if (
+				anchorRect.bottom + relativeOffsetTop + height + HEIGHT_OFFSET <
+				window.innerHeight
+			) {
+				return {
+					yAxis: 'bottom',
+					popoverTop: anchorRect.bottom,
+				};
+			}
 			return {
 				yAxis,
-				popoverTop: Math.min( anchorRect.bottom, stickyPosition ),
+				popoverTop: stickyPosition,
 			};
 		}
 	}
