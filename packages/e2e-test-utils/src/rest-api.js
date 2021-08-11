@@ -2,6 +2,7 @@
  * External dependencies
  */
 import fetch from 'node-fetch';
+import FormData from 'form-data';
 
 /**
  * WordPress dependencies
@@ -11,7 +12,8 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { WP_BASE_URL, WP_USERNAME, WP_PASSWORD } from './shared/config';
+import { WP_BASE_URL } from './shared/config';
+import { createURL } from './create-url';
 
 // `apiFetch` expects `window.fetch` to be available in its default handler.
 global.window = global.window || {};
@@ -29,8 +31,54 @@ const setAPIRootURL = ( async () => {
 Link header: ${ links }` );
 	}
 
-	const rootURL = restLink[ 1 ];
+	const [ , rootURL ] = restLink;
 	apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
+} )();
+
+const setNonce = ( async () => {
+	const formData = new FormData();
+	formData.append( 'log', 'admin' );
+	formData.append( 'pwd', 'password' );
+
+	// Login to admin using fetch.
+	const loginResponse = await fetch( createURL( 'wp-login.php' ), {
+		method: 'POST',
+		headers: formData.getHeaders(),
+		body: formData,
+		redirect: 'manual',
+	} );
+
+	// Retrieve the cookies.
+	const cookies = loginResponse.headers.get( 'set-cookie' );
+	const cookie = cookies
+		.split( ',' )
+		.map( ( setCookie ) => setCookie.split( ';' )[ 0 ] )
+		.join( ';' );
+
+	apiFetch.nonceEndpoint = createURL(
+		'wp-admin/admin-ajax.php',
+		'action=rest-nonce'
+	);
+
+	// Get the initial nonce.
+	const res = await fetch( apiFetch.nonceEndpoint, {
+		headers: { cookie },
+	} );
+	const nonce = await res.text();
+
+	// Register the nonce middleware.
+	apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
+
+	// For the nonce to work we have to also pass the cookies.
+	apiFetch.use( function setCookieMiddleware( request, next ) {
+		return next( {
+			...request,
+			headers: {
+				...request.headers,
+				cookie,
+			},
+		} );
+	} );
 } )();
 
 /**
@@ -40,18 +88,10 @@ Link header: ${ links }` );
  * @return {Promise<any>} The response value.
  */
 async function rest( options = {} ) {
-	await setAPIRootURL;
+	// Only need to set them once but before any requests.
+	await Promise.all( [ setAPIRootURL, setNonce ] );
 
-	return await apiFetch( {
-		...options,
-		headers: {
-			...( options.headers || {} ),
-			// Authorize via basic authentication and test plugin.
-			Authorization: `Basic ${ Buffer.from(
-				`${ WP_USERNAME }:${ WP_PASSWORD }`
-			).toString( 'base64' ) }`,
-		},
-	} );
+	return await apiFetch( options );
 }
 
 /**
