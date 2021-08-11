@@ -160,19 +160,15 @@ export default function Layout( { blockEditorSettings } ) {
 											/>
 										) }
 									{ isBlockEditorReady && (
-										<div
+										<BlockTools
 											className="edit-navigation-layout__content-area"
 											ref={ contentAreaRef }
 										>
-											<BlockTools>
-												<Editor
-													isPending={
-														! hasLoadedMenus
-													}
-													blocks={ blocks }
-												/>
-											</BlockTools>
-										</div>
+											<Editor
+												isPending={ ! hasLoadedMenus }
+												blocks={ blocks }
+											/>
+										</BlockTools>
 									) }
 								</>
 							}

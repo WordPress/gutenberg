@@ -10,6 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,20 +21,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import { usePopoverScroll } from './use-popover-scroll';
 
-/**
- * Renders block tools (the block toolbar, select/navigation mode toolbar, the
- * insertion point and a slot for the inline rich text toolbar). Must be wrapped
- * around the block content and editor styles wrapper or iframe.
- *
- * @param {Object} $0                      Props.
- * @param {Object} $0.children             The block content and style container.
- * @param {Object} $0.__unstableContentRef Ref holding the content scroll container.
- */
-export default function BlockTools( {
-	children,
-	__unstableContentRef,
-	...props
-} ) {
+function BlockTools( { children, __unstableContentRef, ...props }, ref ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const hasFixedToolbar = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().hasFixedToolbar,
@@ -114,7 +102,7 @@ export default function BlockTools( {
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div { ...props } onKeyDown={ onKeyDown }>
+		<div { ...props } onKeyDown={ onKeyDown } ref={ ref }>
 			<InsertionPoint __unstableContentRef={ __unstableContentRef }>
 				{ ( hasFixedToolbar || ! isLargeViewport ) && (
 					<BlockContextualToolbar isFixed />
@@ -134,3 +122,14 @@ export default function BlockTools( {
 		</div>
 	);
 }
+
+/**
+ * Renders block tools (the block toolbar, select/navigation mode toolbar, the
+ * insertion point and a slot for the inline rich text toolbar). Must be wrapped
+ * around the block content and editor styles wrapper or iframe.
+ *
+ * @param {Object} $0                      Props.
+ * @param {Object} $0.children             The block content and style container.
+ * @param {Object} $0.__unstableContentRef Ref holding the content scroll container.
+ */
+export default forwardRef( BlockTools );
