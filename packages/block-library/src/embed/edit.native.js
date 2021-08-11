@@ -192,8 +192,6 @@ const EmbedEdit = ( props ) => {
 	}
 
 	const showEmbedPlaceholder = ! preview || cannotEmbed;
-	const { type, className: classFromPreview } = getMergedAttributes();
-	const className = classnames( classFromPreview, props.className );
 
 	// Even though we set attributes that get derived from the preview,
 	// we don't access them directly because for the initial render,
@@ -203,6 +201,7 @@ const EmbedEdit = ( props ) => {
 	// clipping or scrollbars. The `getAttributesFromPreview` function
 	// that `getMergedAttributes` uses is memoized so that we're not
 	const {
+		type,
 		allowResponsive,
 		className: classFromPreview,
 	} = getMergedAttributes();
