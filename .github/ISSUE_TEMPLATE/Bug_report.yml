@@ -8,23 +8,14 @@ body:
               Thanks for taking the time to fill out this bug report! If this is a security issue, please report it in HackerOne instead: https://hackerone.com/wordpress
     - type: textarea
       attributes:
-          label: Description ands step-by-step reproduction instructions
-          description: Please write a brief description of the bug and the steps needed to reproduce it.
+          label: Description and step-by-step reproduction instructions
+          description: Please write a brief description of the bug and the steps needed to reproduce it, including what you expect to happen and what is currently happening.
           placeholder: |
+              Feature '...' is not working properly because '...'. Steps to reproduce:
               1. Go to '...'
               2. Click on '...'
               3. Scroll down to '...'
-              4. See error '...'
-      validations:
-          required: true
-
-    - type: textarea
-      attributes:
-          label: Expected vs Current Behavior
-          description: Please describe what you expect to happen and what is currently happening.
-          placeholder: |
-              - I expect '...' to happen
-              - However, '...' happens
+              4. I expect '...' to happen, but '...' happens instead
       validations:
           required: true
 
