@@ -10,7 +10,6 @@ import tinycolor from 'tinycolor2';
  */
 import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import {
-	BaseControl,
 	Button,
 	FocalPointPicker,
 	PanelBody,
@@ -20,10 +19,9 @@ import {
 	Spinner,
 	ToggleControl,
 	withNotices,
-	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
-import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
+import { compose, withInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
@@ -33,11 +31,9 @@ import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
-	useSetting,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
-	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
@@ -84,74 +80,6 @@ function retrieveFastAverageColor() {
 		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
 	}
 	return retrieveFastAverageColor.fastAverageColor;
-}
-
-function CoverHeightInput( {
-	onChange,
-	onUnitChange,
-	unit = 'px',
-	value = '',
-} ) {
-	const [ temporaryInput, setTemporaryInput ] = useState( null );
-
-	const instanceId = useInstanceId( UnitControl );
-	const inputId = `block-cover-height-input-${ instanceId }`;
-	const isPx = unit === 'px';
-
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'px',
-			'em',
-			'rem',
-			'vw',
-			'vh',
-		],
-		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
-	} );
-
-	const handleOnChange = ( unprocessedValue ) => {
-		const inputValue =
-			unprocessedValue !== ''
-				? parseInt( unprocessedValue, 10 )
-				: undefined;
-
-		if ( isNaN( inputValue ) && inputValue !== undefined ) {
-			setTemporaryInput( unprocessedValue );
-			return;
-		}
-		setTemporaryInput( null );
-		onChange( inputValue );
-		if ( inputValue === undefined ) {
-			onUnitChange();
-		}
-	};
-
-	const handleOnBlur = () => {
-		if ( temporaryInput !== null ) {
-			setTemporaryInput( null );
-		}
-	};
-
-	const inputValue = temporaryInput !== null ? temporaryInput : value;
-	const min = isPx ? COVER_MIN_HEIGHT : 0;
-
-	return (
-		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
-			<UnitControl
-				id={ inputId }
-				isResetValueOnUnitChange
-				min={ min }
-				onBlur={ handleOnBlur }
-				onChange={ handleOnChange }
-				onUnitChange={ onUnitChange }
-				step="1"
-				style={ { maxWidth: 80 } }
-				unit={ unit }
-				units={ units }
-				value={ inputValue }
-			/>
-		</BaseControl>
-	);
 }
 
 const RESIZABLE_BOX_ENABLE_OPTION = {
@@ -315,8 +243,6 @@ function CoverEdit( {
 		focalPoint,
 		hasParallax,
 		isRepeated,
-		minHeight,
-		minHeightUnit,
 		style: styleAttribute,
 		url,
 	} = attributes;
@@ -328,36 +254,53 @@ function CoverEdit( {
 	const onSelectMedia = attributesFromMedia( setAttributes );
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
-	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
-	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
-		minHeightUnit
-	);
-	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
+	const { minHeight } = styleAttribute?.dimensions || {};
+
+	// Used to track the full height toggle value.
+	const [ prevMinHeight, setPrevMinHeight ] = useState( minHeight );
+	const isMinFullHeight = minHeight === '100vh';
+
+	// Used to track the resizer values.
+	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
 
 	const toggleMinFullHeight = () => {
 		if ( isMinFullHeight ) {
 			// If there aren't previous values, take the default ones.
-			if ( prevMinHeightUnit === 'vh' && prevMinHeightValue === 100 ) {
+			if ( prevMinHeight === '100vh' ) {
 				return setAttributes( {
-					minHeight: undefined,
-					minHeightUnit: undefined,
+					style: {
+						...styleAttribute,
+						dimensions: {
+							...styleAttribute?.dimensions,
+							minHeight: undefined,
+						},
+					},
 				} );
 			}
 
 			// Set the previous values of height.
 			return setAttributes( {
-				minHeight: prevMinHeightValue,
-				minHeightUnit: prevMinHeightUnit,
+				style: {
+					...styleAttribute,
+					dimensions: {
+						...styleAttribute?.dimensions,
+						minHeight: prevMinHeight,
+					},
+				},
 			} );
 		}
 
-		setPrevMinHeightValue( minHeight );
-		setPrevMinHeightUnit( minHeightUnit );
+		setPrevMinHeight( styleAttribute?.dimensions?.minHeight );
 
 		// Set full height.
 		return setAttributes( {
-			minHeight: 100,
-			minHeightUnit: 'vh',
+			style: {
+				...styleAttribute,
+				dimensions: {
+					...styleAttribute?.dimensions,
+					minHeight: '100vh',
+				},
+			},
 		} );
 	};
 
@@ -385,23 +328,7 @@ function CoverEdit( {
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
-	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
-
-	const minHeightWithUnit = minHeightUnit
-		? `${ minHeight }${ minHeightUnit }`
-		: minHeight;
-
 	const isImgElement = ! ( hasParallax || isRepeated );
-
-	const style = {
-		...( isImageBackground && ! isImgElement
-			? backgroundImageStyles( url )
-			: {
-					backgroundImage: gradientValue ? gradientValue : undefined,
-			  } ),
-		backgroundColor: overlayColor.color,
-		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
-	};
 
 	const mediaStyle = {
 		objectPosition:
@@ -512,20 +439,6 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelBody title={ __( 'Dimensions' ) }>
-					<CoverHeightInput
-						value={ temporaryMinHeight || minHeight }
-						unit={ minHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
-						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
-								minHeightUnit: nextUnit,
-							} )
-						}
-					/>
-				</PanelBody>
 				<PanelColorGradientSettings
 					title={ __( 'Overlay' ) }
 					initialOpen={ true }
@@ -571,6 +484,7 @@ function CoverEdit( {
 		}
 	);
 
+	// Initial view of freshly-placed block;
 	if ( ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
@@ -619,13 +533,24 @@ function CoverEdit( {
 		getPositionClassName( contentPosition )
 	);
 
+	const coverBlockStyles = {
+		...( isImageBackground && ! isImgElement
+			? backgroundImageStyles( url )
+			: {
+					backgroundImage: gradientValue ? gradientValue : undefined,
+			  } ),
+		backgroundColor: overlayColor.color,
+		...blockProps.style,
+		minHeight: temporaryMinHeight || minHeight,
+	};
+
 	return (
 		<>
 			{ controls }
 			<div
 				{ ...blockProps }
 				className={ classnames( classes, blockProps.className ) }
-				style={ { ...style, ...blockProps.style } }
+				style={ { ...coverBlockStyles } }
 				data-url={ url }
 			>
 				<BoxControlVisualizer
@@ -634,14 +559,21 @@ function CoverEdit( {
 				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"
-					onResizeStart={ () => {
-						setAttributes( { minHeightUnit: 'px' } );
-						toggleSelection( false );
+					onResizeStart={ () => toggleSelection( false ) }
+					onResize={ ( newMinHeight ) => {
+						setTemporaryMinHeight( `${ newMinHeight }px` );
 					} }
-					onResize={ setTemporaryMinHeight }
 					onResizeStop={ ( newMinHeight ) => {
 						toggleSelection( true );
-						setAttributes( { minHeight: newMinHeight } );
+						setAttributes( {
+							style: {
+								...styleAttribute,
+								dimensions: {
+									...styleAttribute?.dimensions,
+									minHeight: `${ newMinHeight }px`,
+								},
+							},
+						} );
 						setTemporaryMinHeight( null );
 					} }
 					showHandle={ isSelected }

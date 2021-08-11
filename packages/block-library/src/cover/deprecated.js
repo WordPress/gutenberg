@@ -60,6 +60,10 @@ const blockAttributes = {
 };
 
 const deprecated = [
+	// { Using block supports for min-height
+	// This deprecation should handle:
+	//	- combine and remap former minHeight and minHeightUnit attributes to style.dimensions.minHeight
+	// },
 	{
 		attributes: {
 			...blockAttributes,

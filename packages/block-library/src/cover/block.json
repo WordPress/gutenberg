@@ -60,6 +60,13 @@
 		"spacing": {
 			"padding": true
 		},
+		"__experimentalDimensions": {
+			"minHeight": true,
+			"__experimentalDefaultControls": {
+				"minHeight": true
+			},
+			"__experimentalSkipSerialization": true
+		},
 		"color": {
 			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
 			"text": false,
