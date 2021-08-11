@@ -88,6 +88,19 @@ function createIcon( { svgElement, size, color, backgroundColor, circle } ) {
 	} );
 }
 
+function getAdminBarColors() {
+	const adminBarDummy = document.createElement( 'div' );
+	adminBarDummy.id = 'wpadminbar';
+	document.body.appendChild( adminBarDummy );
+	const { color, backgroundColor } = window.getComputedStyle( adminBarDummy );
+	document.body.removeChild( adminBarDummy );
+	// Fall back to black and white if no admin/color stylesheet was loaded.
+	return {
+		color: color || 'white',
+		backgroundColor: backgroundColor || 'black',
+	};
+}
+
 // eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener( 'load', () => {
 	if ( ! ( 'serviceWorker' in window.navigator ) ) {
@@ -106,8 +119,7 @@ window.addEventListener( 'load', () => {
 		icons: [],
 	};
 
-	const adminBar = document.getElementById( 'wpadminbar' );
-	const { color, backgroundColor } = window.getComputedStyle( adminBar );
+	const { color, backgroundColor } = getAdminBarColors();
 	const svgElement = createSvgElement( logo );
 
 	Promise.all( [

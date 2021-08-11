@@ -61,8 +61,12 @@ function useDialog( options ) {
 			/** @type {KeyboardEvent} */ event
 		) => {
 			// Close on escape
-			if ( event.keyCode === ESCAPE && currentOptions.current?.onClose ) {
-				event.stopPropagation();
+			if (
+				event.keyCode === ESCAPE &&
+				! event.defaultPrevented &&
+				currentOptions.current?.onClose
+			) {
+				event.preventDefault();
 				currentOptions.current.onClose();
 			}
 		} );

@@ -15,7 +15,7 @@ const {
 const { fromConfigRoot, fromProjectRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
 
-// See https://babeljs.io/docs/en/config-files#configuration-file-types
+// See https://babeljs.io/docs/en/config-files#configuration-file-types.
 const hasBabelConfig = () =>
 	hasProjectFile( '.babelrc.js' ) ||
 	hasProjectFile( '.babelrc.json' ) ||
@@ -23,6 +23,16 @@ const hasBabelConfig = () =>
 	hasProjectFile( 'babel.config.json' ) ||
 	hasProjectFile( '.babelrc' ) ||
 	hasPackageProp( 'babel' );
+
+// See https://cssnano.co/docs/config-file.
+const hasCssnanoConfig = () =>
+	hasProjectFile( '.cssnanorc' ) ||
+	hasProjectFile( '.cssnanorc.js' ) ||
+	hasProjectFile( '.cssnanorc.json' ) ||
+	hasProjectFile( '.cssnanorc.yaml' ) ||
+	hasProjectFile( '.cssnanorc.yml' ) ||
+	hasProjectFile( 'cssnano.config.js' ) ||
+	hasPackageProp( 'cssnano' );
 
 /**
  * Returns path to a Jest configuration which should be provided as the explicit
@@ -52,9 +62,11 @@ function getJestOverrideConfigFile( suffix ) {
 	}
 }
 
+// See https://jestjs.io/docs/configuration.
 const hasJestConfig = () =>
 	hasProjectFile( 'jest.config.js' ) ||
 	hasProjectFile( 'jest.config.json' ) ||
+	hasProjectFile( 'jest.config.ts' ) ||
 	hasPackageProp( 'jest' );
 
 // See https://prettier.io/docs/en/configuration.html.
@@ -138,10 +150,11 @@ const getWebpackArgs = () => {
 };
 
 module.exports = {
+	getJestOverrideConfigFile,
 	getWebpackArgs,
 	hasBabelConfig,
-	getJestOverrideConfigFile,
+	hasCssnanoConfig,
 	hasJestConfig,
-	hasPrettierConfig,
 	hasPostCSSConfig,
+	hasPrettierConfig,
 };

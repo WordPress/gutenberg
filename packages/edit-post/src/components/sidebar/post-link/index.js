@@ -68,6 +68,8 @@ function PostLink( {
 					<TextControl
 						label={ __( 'URL Slug' ) }
 						value={ forceEmptyField ? '' : postSlug }
+						autoComplete="off"
+						spellCheck="false"
 						onChange={ ( newValue ) => {
 							editPermalink( newValue );
 							// When we delete the field the permalink gets

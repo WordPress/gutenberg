@@ -44,6 +44,20 @@ describe( 'Widgets Customizer', () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
+		// Disable the transition timing function to make it "snap".
+		// We can't disable all the transitions yet because of #32024.
+		await page.evaluateOnNewDocument( () => {
+			const style = document.createElement( 'style' );
+			style.innerHTML = `
+				* {
+					transition-timing-function: step-start !important;
+					animation-timing-function: step-start !important;
+				}
+			`;
+			window.addEventListener( 'DOMContentLoaded', () => {
+				document.head.appendChild( style );
+			} );
+		} );
 		await activatePlugin( 'gutenberg-test-widgets' );
 	} );
 
@@ -101,7 +115,7 @@ describe( 'Widgets Customizer', () => {
 		await searchOption.click();
 
 		const addedSearchBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Search',
 		} );
 
@@ -305,7 +319,7 @@ describe( 'Widgets Customizer', () => {
 		// Focus the block and start typing to hide the block toolbar.
 		// Shouldn't be needed if we automatically hide the toolbar on blur.
 		const paragraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 		} );
 		await paragraphBlock.focus();
@@ -394,7 +408,7 @@ describe( 'Widgets Customizer', () => {
 		await editParagraphWidget.click();
 
 		const firstParagraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 			text: 'First Paragraph',
 		} );
@@ -426,7 +440,7 @@ describe( 'Widgets Customizer', () => {
 		await editHeadingWidget.click();
 
 		const headingBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Block: Heading',
 			text: 'First Heading',
 		} );
@@ -701,7 +715,7 @@ describe( 'Widgets Customizer', () => {
 
 		// Refocus the paragraph block.
 		const paragraphBlock = await find( {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 			value: 'First Paragraph',
 		} );
@@ -723,7 +737,7 @@ describe( 'Widgets Customizer', () => {
 
 		// The paragraph block should be moved to the new sidebar and have focus.
 		const movedParagraphBlockQuery = {
-			role: 'group',
+			role: 'document',
 			name: 'Paragraph block',
 			value: 'First Paragraph',
 		};
@@ -792,7 +806,7 @@ async function addBlock( blockName ) {
 	await blockOption.click();
 
 	const addedBlock = await find( {
-		role: 'group',
+		role: 'document',
 		selector: '.is-selected[data-block]',
 	} );
 	await addedBlock.focus();

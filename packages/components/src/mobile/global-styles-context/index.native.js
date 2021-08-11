@@ -36,10 +36,17 @@ export const getMergedGlobalStyles = (
 		blockAttributes,
 		BLOCK_STYLE_ATTRIBUTES
 	);
+	// This prevents certain wrapper styles from being applied to blocks that
+	// don't support them yet.
+	const wrapperPropsStyleFiltered = pick(
+		wrapperPropsStyle,
+		BLOCK_STYLE_ATTRIBUTES
+	);
+
 	const mergedStyle = {
 		...baseGlobalColors,
 		...globalStyle,
-		...wrapperPropsStyle,
+		...wrapperPropsStyleFiltered,
 	};
 	const blockColors = getBlockColors(
 		blockStyleAttributes,
