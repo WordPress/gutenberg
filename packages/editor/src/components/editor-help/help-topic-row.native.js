@@ -21,6 +21,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { chevronRight } from '@wordpress/icons';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -35,6 +36,10 @@ const HelpTopicRow = ( { content, label, icon } ) => {
 	} = useContext( BottomSheetContext );
 	const contentContainerStyle = StyleSheet.flatten(
 		scrollViewProps.contentContainerStyle
+	);
+	const separatorStyle = usePreferredColorSchemeStyle(
+		styles.separator,
+		styles.separatorDark
 	);
 
 	const openSubSheet = () => {
@@ -68,7 +73,7 @@ const HelpTopicRow = ( { content, label, icon } ) => {
 					screen={ label }
 					leftButtonOnPress={ goBack }
 				/>
-				<View style={ styles.separator } />
+				<View style={ separatorStyle } />
 				<ScrollView
 					{ ...scrollViewProps }
 					contentContainerStyle={ {

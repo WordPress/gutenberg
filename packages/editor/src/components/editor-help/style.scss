@@ -42,6 +42,10 @@
 	width: 100%;
 }
 
+.helpDetailImageDark {
+	background-color: $gray-dark;
+}
+
 .helpDetailTitle,
 .helpDetailSectionHeading,
 .helpDetailBody {
@@ -49,17 +53,32 @@
 }
 
 .helpDetailTitle {
+	color: $light-primary;
 	font-weight: 700;
 	font-size: 28px;
 }
 
+.helpDetailTitleDark {
+	color: $dark-primary;
+}
+
 .helpDetailSectionHeading {
+	color: $light-primary;
 	font-weight: 600;
 	font-size: 16px;
 	margin-top: 24px;
 }
 
+.helpDetailSectionHeadingDark {
+	color: $dark-secondary;
+}
+
 .helpDetailBody {
+	color: $light-secondary;
 	font-size: 16px;
 	line-height: 24px;
+}
+
+.helpDetailBodyDark {
+	color: $dark-secondary;
 }

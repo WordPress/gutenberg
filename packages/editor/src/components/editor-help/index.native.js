@@ -57,6 +57,10 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 		styles.bottomSheetHeaderTitle,
 		styles.bottomSheetHeaderTitleDark
 	);
+	const separatorStyle = usePreferredColorSchemeStyle(
+		styles.separator,
+		styles.separatorDark
+	);
 
 	return (
 		<BottomSheet
@@ -93,7 +97,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 											{ __( 'How to edit your site' ) }
 										</Text>
 									</View>
-									<View style={ styles.separator } />
+									<View style={ separatorStyle } />
 									<ScrollView
 										{ ...scrollViewProps }
 										contentContainerStyle={ {

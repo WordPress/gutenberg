@@ -7,6 +7,7 @@ import { View, Text } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,16 +20,17 @@ import {
 } from './view-sections';
 
 const IntroToBlocks = () => {
+	const titleStyle = usePreferredColorSchemeStyle(
+		styles.helpDetailTitle,
+		styles.helpDetailTitleDark
+	);
 	return (
 		<>
 			<HelpDetailImage
 				source={ require( './images/intro-blocks-1.png' ) }
 			/>
 			<View style={ styles.helpDetailContainer }>
-				<Text
-					accessibilityRole="header"
-					style={ styles.helpDetailTitle }
-				>
+				<Text accessibilityRole="header" style={ titleStyle }>
 					{ __( 'Welcome to the world of blocks' ) }
 				</Text>
 				<HelpDetailBodyText

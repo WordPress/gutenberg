@@ -4,25 +4,39 @@
 import { Text, Image } from 'react-native';
 
 /**
+ * WordPress dependencies
+ */
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import styles from './style.scss';
 
 export const HelpDetailBodyText = ( { text } ) => {
-	return <Text style={ styles.helpDetailBody }>{ text }</Text>;
+	const bodyStyle = usePreferredColorSchemeStyle(
+		styles.helpDetailBody,
+		styles.helpDetailBodyDark
+	);
+	return <Text style={ bodyStyle }>{ text }</Text>;
 };
 
 export const HelpDetailSectionHeadingText = ( { text } ) => {
+	const headingStyle = usePreferredColorSchemeStyle(
+		styles.helpDetailSectionHeading,
+		styles.helpDetailSectionHeadingDark
+	);
 	return (
-		<Text
-			accessibilityRole="header"
-			style={ styles.helpDetailSectionHeading }
-		>
+		<Text accessibilityRole="header" style={ headingStyle }>
 			{ text }
 		</Text>
 	);
 };
 
 export const HelpDetailImage = ( props ) => {
-	return <Image style={ styles.helpDetailImage } { ...props } />;
+	const imageStyle = usePreferredColorSchemeStyle(
+		styles.helpDetailImage,
+		styles.helpDetailImageDark
+	);
+	return <Image style={ imageStyle } { ...props } />;
 };
