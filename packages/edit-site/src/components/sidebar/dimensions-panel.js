@@ -3,8 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
-	PanelBody,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
@@ -14,7 +15,7 @@ import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block
  */
 import { useSetting } from '../editor/utils';
 
-export function useHasSpacingPanel( context ) {
+export function useHasDimensionsPanel( context ) {
 	const hasPadding = useHasPadding( context );
 	const hasMargin = useHasMargin( context );
 
@@ -61,7 +62,7 @@ function splitStyleValue( value ) {
 	return value;
 }
 
-export default function SpacingPanel( { context, getStyle, setStyle } ) {
+export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
 	const showPaddingControl = useHasPadding( context );
 	const showMarginControl = useHasMargin( context );
@@ -82,6 +83,9 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 		const padding = filterValuesBySides( newPaddingValues, paddingSides );
 		setStyle( name, 'padding', padding );
 	};
+	const resetPaddingValue = () => setPaddingValues( {} );
+	const hasPaddingValue = () =>
+		paddingValues && Object.keys( paddingValues ).length;
 
 	const marginValues = splitStyleValue( getStyle( name, 'margin' ) );
 	const marginSides = useCustomSides( name, 'margin' );
@@ -90,27 +94,55 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 		const margin = filterValuesBySides( newMarginValues, marginSides );
 		setStyle( name, 'margin', margin );
 	};
+	const resetMarginValue = () => setMarginValues( {} );
+	const hasMarginValue = () =>
+		marginValues && Object.keys( marginValues ).length;
+
+	const resetAll = () => {
+		resetPaddingValue();
+		resetMarginValue();
+	};
 
 	return (
-		<PanelBody title={ __( 'Spacing' ) }>
+		<ToolsPanel
+			label={ __( 'Dimensions options' ) }
+			header={ __( 'Dimensions' ) }
+			resetAll={ resetAll }
+		>
 			{ showPaddingControl && (
-				<BoxControl
-					values={ paddingValues }
-					onChange={ setPaddingValues }
+				<ToolsPanelItem
+					hasValue={ hasPaddingValue }
 					label={ __( 'Padding' ) }
-					sides={ paddingSides }
-					units={ units }
-				/>
+					onDeselect={ resetPaddingValue }
+					isShownByDefault={ true }
+				>
+					<BoxControl
+						values={ paddingValues }
+						onChange={ setPaddingValues }
+						label={ __( 'Padding' ) }
+						sides={ paddingSides }
+						units={ units }
+						allowReset={ false }
+					/>
+				</ToolsPanelItem>
 			) }
 			{ showMarginControl && (
-				<BoxControl
-					values={ marginValues }
-					onChange={ setMarginValues }
+				<ToolsPanelItem
+					hasValue={ hasMarginValue }
 					label={ __( 'Margin' ) }
-					sides={ marginSides }
-					units={ units }
-				/>
+					onDeselect={ resetMarginValue }
+					isShownByDefault={ true }
+				>
+					<BoxControl
+						values={ marginValues }
+						onChange={ setMarginValues }
+						label={ __( 'Margin' ) }
+						sides={ marginSides }
+						units={ units }
+						allowReset={ false }
+					/>
+				</ToolsPanelItem>
 			) }
-		</PanelBody>
+		</ToolsPanel>
 	);
 }

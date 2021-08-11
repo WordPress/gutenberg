@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
+import { SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -26,6 +26,38 @@ import { cleanEmptyObject } from './utils';
 export function hasPaddingSupport( blockType ) {
 	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
 	return !! ( true === support || support?.padding );
+}
+
+/**
+ * Checks if there is a current value in the padding block support attributes.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}      Whether or not the block has a padding value set.
+ */
+export function hasPaddingValue( props ) {
+	return props.attributes.style?.spacing?.padding !== undefined;
+}
+
+/**
+ * Resets the padding block support attributes. This can be used when disabling
+ * the padding support controls for a block via a `ToolsPanel`.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetPadding( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			spacing: {
+				...style?.spacing,
+				padding: undefined,
+			},
+		} ),
+	} );
 }
 
 /**
@@ -106,6 +138,7 @@ export function PaddingEdit( props ) {
 					label={ __( 'Padding' ) }
 					sides={ sides }
 					units={ units }
+					allowReset={ false }
 				/>
 			</>
 		),

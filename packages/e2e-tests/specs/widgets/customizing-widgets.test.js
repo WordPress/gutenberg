@@ -44,6 +44,20 @@ describe( 'Widgets Customizer', () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
+		// Disable the transition timing function to make it "snap".
+		// We can't disable all the transitions yet because of #32024.
+		await page.evaluateOnNewDocument( () => {
+			const style = document.createElement( 'style' );
+			style.innerHTML = `
+				* {
+					transition-timing-function: step-start !important;
+					animation-timing-function: step-start !important;
+				}
+			`;
+			window.addEventListener( 'DOMContentLoaded', () => {
+				document.head.appendChild( style );
+			} );
+		} );
 		await activatePlugin( 'gutenberg-test-widgets' );
 	} );
 
@@ -203,15 +217,6 @@ describe( 'Widgets Customizer', () => {
 		} );
 
 		await expect( inspectorHeading ).not.toBeVisible();
-
-		// Wait for the transition to finish to prevent it from
-		// clicking on the wrong element.
-		// The transition takes 180ms, 200ms should be enough.
-		// This is a temporary solution, a more ideal alternative
-		// would be to disable the transition entirely.
-		// See https://github.com/WordPress/gutenberg/pull/33875#issuecomment-893122147
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 200 );
 
 		await clickBlockToolbarButton( 'Options' );
 		showMoreSettingsButton = await find( {
