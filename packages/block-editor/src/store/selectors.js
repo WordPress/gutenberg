@@ -1579,9 +1579,7 @@ export const getInserterItems = createSelector(
 				name: 'core/block',
 				initialAttributes: { ref: reusableBlock.id },
 				title: reusableBlock.title.raw,
-				icon: referencedBlockType
-					? referencedBlockType.icon
-					: symbol,
+				icon: referencedBlockType ? referencedBlockType.icon : symbol,
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
