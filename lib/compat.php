@@ -186,6 +186,9 @@ function gutenberg_safe_style_attrs( $attrs ) {
 	$attrs[] = 'border-top-right-radius';
 	$attrs[] = 'border-bottom-right-radius';
 	$attrs[] = 'border-bottom-left-radius';
+	$attrs[] = 'gap';
+	$attrs[] = 'column-gap';
+	$attrs[] = 'row-gap';
 
 	return $attrs;
 }

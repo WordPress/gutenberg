@@ -14,6 +14,13 @@ import { getBlockSupport } from '@wordpress/blocks';
  */
 import InspectorControls from '../components/inspector-controls';
 import {
+	GapEdit,
+	hasGapSupport,
+	hasGapValue,
+	resetGap,
+	useIsGapDisabled,
+} from './gap';
+import {
 	MarginEdit,
 	hasMarginSupport,
 	hasMarginValue,
@@ -41,6 +48,7 @@ export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
  * @return {WPElement} Inspector controls for spacing support features.
  */
 export function DimensionsPanel( props ) {
+	const isGapDisabled = useIsGapDisabled( props );
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
@@ -64,6 +72,7 @@ export function DimensionsPanel( props ) {
 				...style,
 				spacing: {
 					...style?.spacing,
+					gap: undefined,
 					margin: undefined,
 					padding: undefined,
 				},
@@ -98,6 +107,16 @@ export function DimensionsPanel( props ) {
 						<MarginEdit { ...props } />
 					</ToolsPanelItem>
 				) }
+				{ ! isGapDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasGapValue( props ) }
+						label={ __( 'Gap' ) }
+						onDeselect={ () => resetGap( props ) }
+						isShownByDefault={ defaultSpacingControls?.gap }
+					>
+						<GapEdit { ...props } />
+					</ToolsPanelItem>
+				) }
 			</ToolsPanel>
 		</InspectorControls>
 	);
@@ -115,7 +134,11 @@ export function hasDimensionsSupport( blockName ) {
 		return false;
 	}
 
-	return hasPaddingSupport( blockName ) || hasMarginSupport( blockName );
+	return (
+		hasGapSupport( blockName ) ||
+		hasPaddingSupport( blockName ) ||
+		hasMarginSupport( blockName )
+	);
 }
 
 /**
@@ -126,10 +149,11 @@ export function hasDimensionsSupport( blockName ) {
  * @return {boolean} If spacing support is completely disabled.
  */
 const useIsDimensionsDisabled = ( props = {} ) => {
+	const gapDisabled = useIsGapDisabled( props );
 	const paddingDisabled = useIsPaddingDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
 
-	return paddingDisabled && marginDisabled;
+	return gapDisabled && paddingDisabled && marginDisabled;
 };
 
 /**

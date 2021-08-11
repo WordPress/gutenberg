@@ -20,8 +20,9 @@ const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 export function useHasDimensionsPanel( context ) {
 	const hasPadding = useHasPadding( context );
 	const hasMargin = useHasMargin( context );
+	const hasGap = useHasGap( context );
 
-	return hasPadding || hasMargin;
+	return hasPadding || hasMargin || hasGap;
 }
 
 function useHasPadding( { name, supports } ) {
@@ -34,6 +35,12 @@ function useHasMargin( { name, supports } ) {
 	const settings = useSetting( 'spacing.customMargin', name );
 
 	return settings && supports.includes( 'margin' );
+}
+
+function useHasGap( { name, supports } ) {
+	const settings = useSetting( 'spacing.customGap', name );
+
+	return settings && supports.includes( '--wp--theme--block-gap' );
 }
 
 function filterValuesBySides( values, sides ) {
@@ -59,6 +66,26 @@ function filterValuesBySides( values, sides ) {
 	return filteredValues;
 }
 
+function filterGapValuesBySides( values, sides ) {
+	if ( ! sides ) {
+		return {
+			row: values?.top,
+			column: values?.left,
+		};
+	}
+
+	const filteredValues = {};
+
+	sides.forEach( ( side ) => {
+		if ( side === 'horizontal' ) {
+			filteredValues.column = values?.left;
+		}
+		if ( side === 'vertical' ) {
+			filteredValues.row = values?.top;
+		}
+	} );
+}
+
 function splitStyleValue( value ) {
 	// Check for shorthand value ( a string value ).
 	if ( value && typeof value === 'string' ) {
@@ -74,10 +101,31 @@ function splitStyleValue( value ) {
 	return value;
 }
 
+function splitGapStyleValue( value ) {
+	// Check for shorthand value ( a string value ).
+	if ( value && typeof value === 'string' ) {
+		return {
+			top: value,
+			right: value,
+			bottom: value,
+			left: value,
+		};
+	}
+
+	// Convert rows and columns to individual side values.
+	return {
+		top: value?.row,
+		right: value?.column,
+		bottom: value?.row,
+		left: value?.column,
+	};
+}
+
 export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
 	const showPaddingControl = useHasPadding( context );
 	const showMarginControl = useHasMargin( context );
+	const showGapControl = useHasGap( context );
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units', name ) || [
 			'%',
@@ -116,9 +164,22 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const hasMarginValue = () =>
 		marginValues && Object.keys( marginValues ).length;
 
+	const gapValues = splitGapStyleValue(
+		getStyle( name, '--wp--theme--block-gap' )
+	);
+	const gapSides = useCustomSides( name, '--wp--theme--block-gap' );
+
+	const setGapValues = ( newGapValues ) => {
+		const gap = filterGapValuesBySides( newGapValues, gapSides );
+		setStyle( name, '--wp--theme--block-gap', gap );
+	};
+	const resetGapValue = () => setGapValues( {} );
+	const hasGapValue = () => gapValues && Object.keys( gapValues ).length;
+
 	const resetAll = () => {
 		resetPaddingValue();
 		resetMarginValue();
+		resetGapValue();
 	};
 
 	return (
@@ -160,6 +221,24 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 						units={ units }
 						allowReset={ false }
 						splitOnAxis={ isAxialMargin }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showGapControl && (
+				<ToolsPanelItem
+					hasValue={ hasGapValue }
+					label={ __( 'Gap' ) }
+					onDeselect={ resetGapValue }
+					isShownByDefault={ true }
+				>
+					<BoxControl
+						values={ gapValues }
+						onChange={ setGapValues }
+						label={ __( 'Gap' ) }
+						sides={ gapSides }
+						units={ units }
+						allowReset={ false }
+						splitOnAxis={ true }
 					/>
 				</ToolsPanelItem>
 			) }
