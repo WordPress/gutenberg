@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { reusableBlockType as icon } from '@wordpress/icons';
+import { symbol as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

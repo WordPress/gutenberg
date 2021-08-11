@@ -8,7 +8,7 @@ import { startCase } from 'lodash';
  */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
-import { templatePart } from '@wordpress/icons';
+import { symbolFilled } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -22,7 +22,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon: templatePart,
+	icon: symbolFilled,
 	__experimentalLabel: ( { slug, theme } ) => {
 		// Attempt to find entity title if block is a template part.
 		// Require slug to request, otherwise entity is uncreated and will throw 404.

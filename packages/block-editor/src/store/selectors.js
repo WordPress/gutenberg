@@ -29,7 +29,7 @@ import {
 	parse,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
-import { reusableBlockType } from '@wordpress/icons';
+import { symbol } from '@wordpress/icons';
 
 /**
  * A block selection object.
@@ -1581,7 +1581,7 @@ export const getInserterItems = createSelector(
 				title: reusableBlock.title.raw,
 				icon: referencedBlockType
 					? referencedBlockType.icon
-					: reusableBlockType,
+					: symbol,
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
