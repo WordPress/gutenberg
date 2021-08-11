@@ -61,6 +61,17 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
 		}
 	}
 
+	// Minimum height support.
+	$has_min_height_support = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions', 'minHeight' ), false );
+
+	if ( $has_min_height_support ) {
+		$min_height_value = _wp_array_get( $block_attributes, array( 'style', 'dimensions', 'minHeight' ), null );
+
+		if ( null !== $min_height_value ) {
+			$styles[] = sprintf( 'min-height: %s;', $min_height_value );
+		}
+	}
+
 	// Width support to be added in near future.
 
 	return empty( $styles ) ? array() : array( 'style' => implode( ' ', $styles ) );

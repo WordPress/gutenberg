@@ -90,6 +90,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 			marginLeft: 'left',
 		},
 	},
+	minHeight: {
+		value: [ 'dimensions', 'minHeight' ],
+		support: [ '__experimentalDimensions', 'minHeight' ],
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],

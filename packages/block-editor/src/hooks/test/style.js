@@ -25,6 +25,7 @@ describe( 'getInlineStyles', () => {
 				},
 				dimensions: {
 					height: '500px',
+					minHeight: '200px',
 				},
 				spacing: {
 					padding: { top: '10px' },
@@ -41,6 +42,7 @@ describe( 'getInlineStyles', () => {
 			lineHeight: 1.5,
 			fontSize: 10,
 			height: '500px',
+			minHeight: '200px',
 			marginBottom: '15px',
 			paddingTop: '10px',
 		} );
