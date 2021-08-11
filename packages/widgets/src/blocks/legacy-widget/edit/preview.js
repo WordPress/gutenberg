@@ -11,9 +11,19 @@ import { addQueryArgs } from '@wordpress/url';
 import { useState } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
+	const settings = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings();
+	}, [] );
+
+	const widgetPreviewUrl = settings.wpAbsoluteAdminUrl + 'widgets.php';
+	const widgetPreviewUrlOptions = {
+		'legacy-widget-preview' : { idBase, instance }
+	};
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
 	const ref = useRefEffect(
@@ -96,12 +106,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						// TODO: This chokes when the query param is too big.
 						// Ideally, we'd render a <ServerSideRender>. Maybe by
 						// rendering one in an iframe via a portal.
-						src={ addQueryArgs( 'widgets.php', {
-							'legacy-widget-preview': {
-								idBase,
-								instance,
-							},
-						} ) }
+						src={ addQueryArgs( widgetPreviewUrl, widgetPreviewUrlOptions ) }
 						onLoad={ ( event ) => {
 							// To hide the scrollbars of the preview frame for some edge cases,
 							// such as negative margins in the Gallery Legacy Widget.
