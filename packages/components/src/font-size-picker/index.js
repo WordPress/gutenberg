@@ -6,7 +6,7 @@ import { isNumber, isString } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { textColor } from '@wordpress/icons';
 import { useMemo, forwardRef } from '@wordpress/element';
 
@@ -92,9 +92,11 @@ function FontSizePicker(
 
 	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
 
-	const currentFontSizeSR = `Currently selected font size: ${
+	const currentFontSizeSR = sprintf(
+		// translators: %s: Currently selected font size.
+		__( 'Currently selected font size: %s' ),
 		options.find( ( option ) => option.key === selectedFontSizeSlug ).name
-	}`;
+	);
 
 	return (
 		<fieldset

@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Icon, check, chevronDown } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -78,6 +79,12 @@ export default function CustomSelectControl( {
 		stateReducer,
 	} );
 
+	const describedByBuild = describedBy
+		? describedBy
+		: sprintf(
+			// translators: %s: The selected option.
+			__( 'Currently selected: %s' ), selectedItem.name );
+
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
@@ -121,7 +128,7 @@ export default function CustomSelectControl( {
 					'aria-labelledby': undefined,
 					className: 'components-custom-select-control__button',
 					isSmall: true,
-					describedBy,
+					describedBy: describedByBuild,
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
