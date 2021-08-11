@@ -41,6 +41,8 @@ function InserterMenu( {
 	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
 	const [ tabIndex, setTabIndex ] = useState( 0 );
 
+	const isIOS = Platform.OS === 'ios';
+
 	const {
 		showInsertionPoint,
 		hideInsertionPoint,
@@ -201,6 +203,7 @@ function InserterMenu( {
 			hasNavigation
 			setMinHeightToMaxHeight={ showSearchForm }
 			contentStyle={ styles.list }
+			isFullScreen={ ! isIOS }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => (
