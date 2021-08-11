@@ -63,7 +63,7 @@ function gutenberg_get_layout_style( $selector, $layout ) {
 
 		$style .= "$selector .alignleft { float: left; margin-right: 2em; }";
 		$style .= "$selector .alignright { float: right; margin-left: 2em; }";
-		$style .= "$selector > * + * { margin-top: var( --wp-theme-block-gap ); margin-bottom: 0; }";
+		$style .= "$selector > * + * { margin-top: var( --wp--style--block-gap ); margin-bottom: 0; }";
 	} elseif ( 'flex' === $layout_type ) {
 		$style  = "$selector {";
 		$style .= 'display: flex;';

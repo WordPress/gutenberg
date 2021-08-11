@@ -22,7 +22,7 @@ export default {
 			<style>{ `
 				${ appendSelectors( selector ) } {
 					display: flex;
-					gap: var( --wp-theme-block-gap, 0.5em );
+					gap: var( --wp--style--block-gap, 0.5em );
 					flex-wrap: wrap;
 					align-items: center;
 				}

@@ -136,7 +136,7 @@ export default {
 			}
 
 			${ appendSelectors( selector, '> * + *' ) } {
-				margin-top: var( --wp-theme-block-gap );
+				margin-top: var( --wp--style--block-gap );
 				margin-bottom: 0;
 			}
 		`;
