@@ -40,7 +40,11 @@ export function useBlockSelectionClearer() {
 					return;
 				}
 
+				const { ownerDocument } = node;
+				const { defaultView } = ownerDocument;
+
 				clearSelectedBlock();
+				defaultView.getSelection().removeAllRanges();
 			}
 
 			node.addEventListener( 'mousedown', onMouseDown );
