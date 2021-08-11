@@ -43,6 +43,7 @@
 		"anchor": true,
 		"__experimentalLayout": {
 			"allowSwitching": false,
+			"inherit": false,
 			"default": {
 				"type": "flex",
 				"justifyContent": "flex-start",

@@ -33,23 +33,6 @@ import { getLayoutType, getLayoutTypes } from '../layouts';
 
 const layoutBlockSupportKey = '__experimentalLayout';
 
-const getLayoutBlockSettings = ( blockTypeOrName ) => {
-	const layoutBlockSupportConfig = getBlockSupport(
-		blockTypeOrName,
-		layoutBlockSupportKey
-	);
-
-	const {
-		allowSwitching: canBlockSwitchLayout,
-		default: defaultBlockLayout,
-	} = layoutBlockSupportConfig || {}; // TODO: check if this is needed based on the value return by `getBlockSupport`.
-
-	return {
-		canBlockSwitchLayout,
-		defaultBlockLayout,
-	};
-};
-
 function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 	const { layout } = attributes;
 	// TODO: check if a theme should provide default values per `layoutType`.
@@ -66,23 +49,24 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 		return null;
 	}
 
-	const { allowLayoutSwitching, defaultBlockLayout } = getLayoutBlockSettings(
-		blockName
-	);
+	const {
+		allowSwitching: canBlockSwitchLayout,
+		default: defaultBlockLayout,
+	} = getBlockSupport( blockName, layoutBlockSupportKey ) || {};
 
 	const usedLayout = layout ? layout : defaultBlockLayout || {};
 	const { inherit = false, type = 'default' } = usedLayout;
 	const layoutType = getLayoutType( type );
 
 	const onChangeType = ( newType ) =>
-		setAttributes( { layout: { type: newType } } );
+		setAttributes( { layout: { type: newType } } ); // TODO needs checking with block defaults.
 	const onChangeLayout = ( newLayout ) =>
 		setAttributes( { layout: newLayout } );
 
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Layout' ) }>
-				{ layoutType.canInherit && !! defaultThemeLayout && (
+				{ inherit && !! defaultThemeLayout && (
 					<ToggleControl
 						label={ __( 'Inherit default layout' ) }
 						checked={ !! inherit }
@@ -91,7 +75,7 @@ function LayoutPanel( { setAttributes, attributes, name: blockName } ) {
 						}
 					/>
 				) }
-				{ ! inherit && allowLayoutSwitching && (
+				{ ! inherit && canBlockSwitchLayout && (
 					<LayoutTypeSwitcher
 						type={ type }
 						onChange={ onChangeType }

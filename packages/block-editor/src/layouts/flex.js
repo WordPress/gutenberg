@@ -56,5 +56,4 @@ export default {
 	getAlignments() {
 		return [];
 	},
-	canInherit: false,
 };

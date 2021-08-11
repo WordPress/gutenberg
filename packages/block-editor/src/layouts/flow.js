@@ -149,5 +149,4 @@ export default {
 			? [ 'wide', 'full', 'left', 'center', 'right' ]
 			: [ 'left', 'center', 'right' ];
 	},
-	canInherit: true,
 };
