@@ -21,8 +21,6 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
@@ -56,7 +54,6 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$gradle.ext.kotlinVersion"
     // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:2.0.0'
     implementation 'com.google.android.material:material:1.2.1'
