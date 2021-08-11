@@ -13,6 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { ColorPicker } from '..';
+import { LegacyAdapter } from '../legacy-adapter';
 import { Flex } from '../../../flex';
 import { Spacer } from '../../../spacer';
 import { space } from '../../utils/space';
@@ -57,3 +58,22 @@ const Example = () => {
 export const _default = () => {
 	return <Example />;
 };
+
+const LegacyExample = () => {
+	const [ legacyColor, setLegacyColor ] = useState( '#fff' );
+	const legacyProps = {
+		color: legacyColor,
+		onChangeComplete: setLegacyColor,
+	};
+
+	return (
+		<Flex align="flex-start" justify="flex-start">
+			<LegacyAdapter { ...legacyProps } />
+			<pre style={ { width: '20em' } }>
+				{ JSON.stringify( legacyColor, undefined, 4 ) }
+			</pre>
+		</Flex>
+	);
+};
+
+export const legacy = () => <LegacyExample />;
