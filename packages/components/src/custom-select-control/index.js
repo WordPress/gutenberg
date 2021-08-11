@@ -79,11 +79,12 @@ export default function CustomSelectControl( {
 		stateReducer,
 	} );
 
-	const describedByBuild = describedBy
-		? describedBy
-		: sprintf(
-			// translators: %s: The selected option.
-			__( 'Currently selected: %s' ), selectedItem.name );
+	const controlDescribedBy = describedBy
+		? describedBy : sprintf(
+				// translators: %s: The selected option.
+				__( 'Currently selected: %s' ),
+				selectedItem.name
+		  );
 
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
@@ -128,7 +129,7 @@ export default function CustomSelectControl( {
 					'aria-labelledby': undefined,
 					className: 'components-custom-select-control__button',
 					isSmall: true,
-					describedBy: describedByBuild,
+					describedBy: controlDescribedBy,
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
