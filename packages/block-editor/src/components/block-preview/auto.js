@@ -56,7 +56,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 							__experimentalPadding + 'px';
 					} }
 					aria-hidden
-					__unstableDisabled
+					tabIndex={ -1 }
 					style={ {
 						position: 'absolute',
 						width: viewportWidth,
