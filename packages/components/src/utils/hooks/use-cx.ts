@@ -44,7 +44,9 @@ export const useCx = () => {
 	const cx = useCallback(
 		( ...classNames: ( ClassNamesArg | SerializedStyles )[] ) => {
 			if ( cache === null ) {
-				return '';
+				throw new Error(
+					'The `useCx` hook should be only used within a valid Emotion Cache Context'
+				);
 			}
 
 			return innerCx(
