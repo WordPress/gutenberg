@@ -17,6 +17,7 @@ import {
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import {
+	ExternalLink,
 	FormTokenField,
 	withFilters,
 	withSpokenMessages,
@@ -295,6 +296,15 @@ class FlatTermSelector extends Component {
 					taxonomy={ taxonomy }
 					onSelect={ this.appendTerm }
 				/>
+				{ slug === 'post_tag' && (
+					<ExternalLink
+						href={
+							'https://wordpress.com/blog/2014/04/21/better-tagging/'
+						}
+					>
+						{ __( 'Build your audience with tags' ) }
+					</ExternalLink>
+				) }
 			</>
 		);
 	}
