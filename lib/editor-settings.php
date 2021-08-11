@@ -28,7 +28,7 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 		$settings['defaultTemplatePartAreas'] = gutenberg_get_allowed_template_part_areas();
 	}
 
-	// Some widgets have to use absolute url
+	// Some blocks have to use absolute url.
 	$settings['wpAbsoluteAdminUrl'] = admin_url();
 
 	return $settings;
