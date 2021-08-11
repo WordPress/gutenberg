@@ -54,8 +54,5 @@ body:
           description: Please check if the bug has already been reported by searching https://github.com/WordPress/gutenberg/issues and make sure before reporting the bug is neither related to another plugin nor theme specific.
           options:
               - label: I have searched the existing issues.
-                required: true
               - label: I have tested with all plugins deactivated except Gutenberg.
-                required: true
               - label: I have tested with a default theme.
-                required: true
