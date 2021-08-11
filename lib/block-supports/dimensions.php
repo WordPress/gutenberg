@@ -43,7 +43,7 @@ function gutenberg_register_dimensions_support( $block_type ) {
  *
  * @return array Block dimensions CSS classes and inline styles.
  */
-function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) {
 	if ( gutenberg_skip_dimensions_serialization( $block_type ) ) {
 		return array();
 	}
@@ -61,7 +61,7 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
 		}
 	}
 
-	// Minimum height support.
+	// Minimum height.
 	$has_min_height_support = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions', 'minHeight' ), false );
 
 	if ( $has_min_height_support ) {
