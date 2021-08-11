@@ -19,7 +19,7 @@ export const settings = {
 	description: __( 'A widget container.' ),
 	__experimentalLabel: ( { name: label } ) => label,
 	edit,
-	// save,
+	save,
 	transforms: {
 		from: [
 			{
