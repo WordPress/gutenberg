@@ -47,6 +47,7 @@ function SegmentedControl(
 		isBlock = false,
 		id: idProp,
 		label,
+		hideLabelFromVision = false,
 		help,
 		onChange = noop,
 		value,
@@ -83,16 +84,20 @@ function SegmentedControl(
 				'medium',
 				className
 			),
-		[ className ]
+		[ className, isBlock ]
 	);
 	return (
 		<BaseControl aria-label={ label } help={ help } id={ id }>
 			<SegmentedControlContext.Provider
 				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
 			>
-				<div>
-					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
-				</div>
+				{ ! hideLabelFromVision && (
+					<div>
+						<BaseControl.VisualLabel>
+							{ label }
+						</BaseControl.VisualLabel>
+					</div>
+				) }
 				<RadioGroup
 					{ ...radio }
 					aria-label={ label }

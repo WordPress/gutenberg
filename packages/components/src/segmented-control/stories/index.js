@@ -46,7 +46,12 @@ export const _default = () => {
 				</SegmentedControl>
 			</Spacer>
 			<Spacer>
-				<SegmentedControl isAdaptiveWidth label={ label } value="long">
+				<SegmentedControl
+					isAdaptiveWidth
+					label={ label }
+					value="long"
+					hideLabelFromVision={ true }
+				>
 					<SegmentedControlOption value="short" label="Short" />
 					<SegmentedControlOption
 						value="long"

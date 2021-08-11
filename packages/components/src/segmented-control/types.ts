@@ -25,6 +25,12 @@ export type SegmentedControlProps = Omit<
 	 */
 	label: string;
 	/**
+	 * If true, the label will only be visible to screen readers.
+	 *
+	 * @default false
+	 */
+	hideLabelFromVision: boolean;
+	/**
 	 * ID that will serve as a base for all the items IDs.
 	 *
 	 * @see https://reakit.io/docs/radio/#useradiostate

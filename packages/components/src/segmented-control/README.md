@@ -32,6 +32,14 @@ function Example() {
 
 Label for the form element.
 
+### `hideLabelFromVision`
+
+-   Type: `boolean`
+-   Required: No
+-   Default: `false`
+
+If true, the label will only be visible to screen readers.
+
 ### `baseId`
 
 -   Type: `string`
@@ -68,6 +76,7 @@ Callback when a segment is selected.
 -   Type: `string | number`
 
 The value of the `SegmentedControl`.
+
 ### `help`
 
 -   Type: `ReactNode`
