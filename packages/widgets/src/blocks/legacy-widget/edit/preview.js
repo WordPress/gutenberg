@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { getWPAdminURL } from '@wordpress/url';
+import { addQueryArgs } from '@wordpress/url';
 import { useState } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -96,7 +96,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 						// TODO: This chokes when the query param is too big.
 						// Ideally, we'd render a <ServerSideRender>. Maybe by
 						// rendering one in an iframe via a portal.
-						src={ getWPAdminURL( 'widgets.php', {
+						src={ addQueryArgs( 'widgets.php', {
 							'legacy-widget-preview': {
 								idBase,
 								instance,
