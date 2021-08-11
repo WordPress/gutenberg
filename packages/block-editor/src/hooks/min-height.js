@@ -49,13 +49,13 @@ export function resetMinHeight( { attributes = {}, setAttributes } ) {
 	const { style } = attributes;
 
 	setAttributes( {
-		style: {
+		style: cleanEmptyObject( {
 			...style,
 			dimensions: {
 				...style?.dimensions,
 				minHeight: undefined,
 			},
-		},
+		} ),
 	} );
 }
 
