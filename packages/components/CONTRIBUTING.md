@@ -6,37 +6,131 @@ The following is a set of guidelines for contributing to the `@wordpress/compone
 
 ## Core principles
 
-- Mix of legacy and newer components
-- Avoid breaking changes as much as possible
-- Set of components mainly focused on building Gutenberg-specific UI (toolbars and sidebars)
-- Primitive vs High-level vs Utility (https://github.com/WordPress/gutenberg/issues/33111)
-- Composition and API consistency (https://github.com/WordPress/gutenberg/issues/33391) (e.g. boolean props begin with `is` or `has`, event callbacks begin with `on`, etc)
-- Layout: Each component should worry only about the layout of its children (e.g. no margins around itself). Layout components separate from
-- Styled components should be suffixed with "*View", to make it clear that they're styled components in other files
+Contributions to the `@wordpress/components` package should follow a set of core principles and technical requirements.
 
-Note: didn't we say that we'd remove the `createComponent` function?
+This set of guidelines should apply especially to newly introduced components. It is, in fact, possible that some of the older component don't respect some of these guidelines for legacy/compat reasons.
+
+### Compatibility
+
+The `@wordpress/components` package includes several components which are relied upon by many developers across different projects. It is, therefore, very important to avoid introducing breaking changes as much as possible.
+
+In these situations, an alternative approach is to "soft-deprecate" the given legacy API. This is achieved by removing traces of the API from the docs, while the code keeps supporing it in the background (with or without a warning)
+
+### Components structure
+
+The contents of the `@wordpress/components` package can be divided into three groups: UI Primitives, UI Blocks, and Utilities.
+
+#### UI Primitives
+
+Lower-level components, which are usually composed together to build the second type of components: UI Blocks. UI Primitives usually don't contain translated text and aim at being highly configurable (at the expense of exposing more props and therefore more complexity).
+
+UI Primitives can be useful when in need of building an app with all new UI that looks and feels like WordPress but isn't powered by other WordPress technologies (like `@wordpress/i18n`).
+
+_[Note: we need to discuss how to properly classify/label these components. Should we introduce `primitives`, `blocks` and `utils` folders in the `src` folder? Should we include a standard way in each component's README to show which category it belongs to?]_
+
+#### UI Blocks
+
+Higher-level components, which usually offer fewer props compared to UI Primitives and contain translated text. These components use other WordPress technologies and are ready to be used in Gutenberg's UI.
+
+#### Utilities
+
+Components and other utilities function that don't necessarily render a piece of UI to screen, but are instead useful when implementing a given piece of functionality.
+
+### Components composition
+
+[To be expanded] E.g.:
+
+- Polymorphic Components
+- Using `children` vs custom render props vs arbitrary "data" props
+- Controlled and semi-controlled components
+- Composition patterns
+- Sub-components naming conventions
+- Components' layout responsibilities and boundaries (i.e., a component should only affect the layout of its children, not its own)
+- ...
+
+### APIs Consinstency
+
+[To be expanded] E.g.:
+
+- Boolean component props should be prefixed with `is*` (e.g. `isChecked`) or `has*` (`hasValue`).
+- Event callback props should be prefixed with `on*` (e.g. `onChanged`)
+- `styled` components should be suffixed with `*View` (e.g. `BoxView`)
+- ...
 
 ### Technical requirements for new components
 
-- TypeScript (Polymorphic component props)
-- Emotion
-- Context system
-- Unit tests
-- Storybook
-- Folder structure (sub-components folders with hook and component)
-- Docs
+The following are a set of technical requirements for all newly introduced components. These requirements are also retroactively being applied to existing components.
 
-## Examples
+For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group);
 
-Each component needs to include an example in its README.md file to demonstrate the usage of the component.
+#### TypeScript
 
-These examples can be consumed automatically from other projects in order to visualize them in their documentation. To ensure these examples are extractable, compilable and renderable, they should be structured in the following way:
+All new components should be written in TypeScript and should be typed using the `PolymorphicComponent` type (more details about polymorphism can be found above in the "Components composition" section).
 
--   It has to be included in a `jsx` code block.
--   It has to work out-of-the-box. No additional code should be needed to have working the example.
--   It has to define a React component called `My<ComponentName>` which renders the example (i.e.: `MyButton`). Examples for the Higher Order Components should define a `MyComponent<ComponentName>` component (i.e.: `MyComponentWithNotices`).
+#### Emotion
 
+All new component should be styled using [Emotion](https://emotion.sh/docs/introduction).
 
-## Pull Request Process
+Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
 
-TBD
+#### Context system
+
+[To be expanded]
+
+#### Hooks vs Components
+
+[To be expanded]
+
+#### Unit tests
+
+All new components should include unit tests using [testing library](https://testing-library.com/). Ideally, the component's main piece of functionality would be tested explicitely (rather than using snapshots).
+
+#### Storybook
+
+All new components should include Storybook examples.
+
+#### Documentation
+
+All components, in addition to being typed, should be using JSDoc when necessary.
+
+Each component that is exported from the `@wordpress/components` package should include a `README.md` file, explaining how to use the component, showing examples, and documenting all the props.
+
+#### Folder structure
+
+Following all previous guidelines, all new components should follow this folder structure:
+
+```
+component-parent-folder/
+├── sub-component-folder/
+├── component.tsx
+├── context.ts
+├── hook.ts
+├── index.ts
+├── README.md
+├── styles.ts
+└── types.ts
+```
+
+In case of a family of components (e.g. `Card` and `CardBody`, `CardFooter`, `CardHeader` ...), each component's implementation should be added in a separate subfolder:
+
+```
+component-parent-folder/
+├── sub-component-folder/
+│   ├── index.ts
+│   ├── component.tsx
+│   ├── hook.ts
+│   └── README.md
+├── sub-component-folder/
+│   ├── index.ts
+│   ├── component.tsx
+│   ├── hook.ts
+│   └── README.md
+├── stories
+│   └── index.js
+├── test
+│   └── index.js
+├── context.ts
+├── index.ts
+├── styles.ts
+└── types.ts
+```
