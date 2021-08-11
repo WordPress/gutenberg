@@ -160,8 +160,9 @@ async function runTestSuite(
 	environmentDirectory
 ) {
 	await runShellScript(
-		`ENVIRONMENT_DIRECTORY=${ environmentDirectory } npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
-		performanceTestDirectory
+		`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
+		performanceTestDirectory,
+		{ ENVIRONMENT_DIRECTORY: environmentDirectory }
 	);
 	const rawResults = await readJSONFile(
 		path.join(
