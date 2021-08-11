@@ -9,11 +9,9 @@ import { useSelect } from '@wordpress/data';
 import { useBlockEditContext } from '../block-edit/context';
 import { store as blockEditorStore } from '../../store';
 
-export default function useDisplayBlockControls( {
-	__experimentalExposeToChildren = false,
-} = {} ) {
+export default function useDisplayBlockControls() {
 	const { isSelected, clientId, name } = useBlockEditContext();
-	const isActive = useSelect(
+	return useSelect(
 		( select ) => {
 			if ( isSelected ) {
 				return true;
@@ -23,7 +21,6 @@ export default function useDisplayBlockControls( {
 				getBlockName,
 				isFirstMultiSelectedBlock,
 				getMultiSelectedBlockClientIds,
-				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
 
 			if ( isFirstMultiSelectedBlock( clientId ) ) {
@@ -31,14 +28,9 @@ export default function useDisplayBlockControls( {
 					( id ) => getBlockName( id ) === name
 				);
 			}
-			if ( __experimentalExposeToChildren ) {
-				return hasSelectedInnerBlock( clientId );
-			}
 
 			return false;
 		},
 		[ clientId, isSelected, name ]
 	);
-
-	return isActive;
 }

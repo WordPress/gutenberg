@@ -15,8 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import useDisplayBlockControls from '../use-display-block-controls';
-import groups from './groups';
+import useBlockControlsFill from './hook';
 
 export default function BlockControlsFill( {
 	group = 'default',
@@ -24,10 +23,10 @@ export default function BlockControlsFill( {
 	children,
 	__experimentalExposeToChildren = false,
 } ) {
-	if ( ! useDisplayBlockControls( { __experimentalExposeToChildren } ) ) {
+	const Fill = useBlockControlsFill( group, __experimentalExposeToChildren );
+	if ( ! Fill ) {
 		return null;
 	}
-	const Fill = groups[ group ].Fill;
 
 	return (
 		<StyleProvider document={ document }>
