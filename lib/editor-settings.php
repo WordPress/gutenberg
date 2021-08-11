@@ -28,6 +28,8 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 		$settings['defaultTemplatePartAreas'] = gutenberg_get_allowed_template_part_areas();
 	}
 
+	$settings['wpAbsoluteAdminUrl'] = admin_url();
+
 	return $settings;
 }
 // This can be removed when plugin support requires WordPress 5.8.0+.
@@ -102,5 +104,5 @@ function gutenberg_initialize_editor( $editor_name, $editor_script_handle, $sett
 		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
 	);
 
-	wp_add_inline_script( 'wp-blocks', sprintf( 'wp.blocks.setWPAdminURL( %s );', wp_json_encode( admin_url() ) ), 'after' );
+
 }
