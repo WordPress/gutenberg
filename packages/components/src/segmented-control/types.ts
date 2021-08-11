@@ -54,6 +54,11 @@ export type SegmentedControlProps = Omit<
 	 * React children
 	 */
 	children: ReactNode;
+	/**
+	 * If this property is added, a help text will be generated
+	 * using help property as the content.
+	 */
+	help?: ReactNode;
 };
 
 export type SegmentedControlContextProps = RadioStateReturn & {

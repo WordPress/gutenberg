@@ -68,3 +68,8 @@ Callback when a segment is selected.
 -   Type: `string | number`
 
 The value of the `SegmentedControl`.
+### `help`
+
+-   Type: `ReactNode`
+
+If this property is added, a help text will be generated using help property as the content.
