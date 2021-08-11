@@ -21,6 +21,13 @@ import {
 	useIsHeightDisabled,
 } from './height';
 import {
+	MinHeightEdit,
+	hasMinHeightSupport,
+	hasMinHeightValue,
+	resetMinHeight,
+	useIsMinHeightDisabled,
+} from './min-height';
+import {
 	MarginEdit,
 	hasMarginSupport,
 	hasMarginValue,
@@ -49,6 +56,7 @@ export function DimensionsPanel( props ) {
 	const isPaddingDisabled = useIsPaddingDisabled( props );
 	const isMarginDisabled = useIsMarginDisabled( props );
 	const isHeightDisabled = useIsHeightDisabled( props );
+	const isMinHeightDisabled = useIsMinHeightDisabled( props );
 	const isDisabled = useIsDimensionsDisabled( props );
 	const isSupported = hasDimensionsSupport( props.name );
 
@@ -76,6 +84,7 @@ export function DimensionsPanel( props ) {
 				dimensions: {
 					...style?.dimensions,
 					height: undefined,
+					minHeight: undefined,
 				},
 				spacing: {
 					...style?.spacing,
@@ -102,6 +111,19 @@ export function DimensionsPanel( props ) {
 						isShownByDefault={ defaultDimensionsControls?.height }
 					>
 						<HeightEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+				{ ! isMinHeightDisabled && (
+					<ToolsPanelItem
+						className="single-column"
+						hasValue={ () => hasMinHeightValue( props ) }
+						label={ __( 'Minimum height' ) }
+						onDeselect={ () => resetMinHeight( props ) }
+						isShownByDefault={
+							defaultDimensionsControls?.minHeight
+						}
+					>
+						<MinHeightEdit { ...props } />
 					</ToolsPanelItem>
 				) }
 				{ ! isPaddingDisabled && (
@@ -143,6 +165,7 @@ export function hasDimensionsSupport( blockName ) {
 
 	return (
 		hasHeightSupport( blockName ) ||
+		hasMinHeightSupport( blockName ) ||
 		hasPaddingSupport( blockName ) ||
 		hasMarginSupport( blockName )
 	);
@@ -156,10 +179,13 @@ export function hasDimensionsSupport( blockName ) {
  */
 const useIsDimensionsDisabled = ( props = {} ) => {
 	const heightDisabled = useIsHeightDisabled( props );
+	const minHeightDisabled = useIsMinHeightDisabled( props );
 	const paddingDisabled = useIsPaddingDisabled( props );
 	const marginDisabled = useIsMarginDisabled( props );
 
-	return heightDisabled && paddingDisabled && marginDisabled;
+	return (
+		heightDisabled && minHeightDisabled && paddingDisabled && marginDisabled
+	);
 };
 
 /**

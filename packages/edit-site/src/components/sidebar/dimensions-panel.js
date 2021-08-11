@@ -18,16 +18,23 @@ import { useSetting } from '../editor/utils';
 
 export function useHasDimensionsPanel( context ) {
 	const hasHeight = useHasHeight( context );
+	const hasMinHeight = useHasMinHeight( context );
 	const hasPadding = useHasPadding( context );
 	const hasMargin = useHasMargin( context );
 
-	return hasHeight || hasPadding || hasMargin;
+	return hasHeight || hasMinHeight || hasPadding || hasMargin;
 }
 
 function useHasHeight( { name, supports } ) {
 	const settings = useSetting( 'dimensions.customHeight', name );
 
 	return settings && supports.includes( 'height' );
+}
+
+function useHasMinHeight( { name, supports } ) {
+	const settings = useSetting( 'dimensions.customMinHeight', name );
+
+	return settings && supports.includes( 'minHeight' );
 }
 
 function useHasPadding( { name, supports } ) {
@@ -73,6 +80,7 @@ function splitStyleValue( value ) {
 export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
 	const showHeightControl = useHasHeight( context );
+	const showMinHeightControl = useHasMinHeight( context );
 	const showPaddingControl = useHasPadding( context );
 	const showMarginControl = useHasMargin( context );
 	const units = useCustomUnits( {
@@ -90,6 +98,12 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const setHeightValue = ( next ) => setStyle( name, 'height', next );
 	const resetHeightValue = () => setHeightValue( undefined );
 	const hasHeightValue = () => !! heightValue;
+
+	// Min height.
+	const minHeightValue = getStyle( name, 'minHeight' );
+	const setMinHeightValue = ( next ) => setStyle( name, 'minHeight', next );
+	const resetMinHeightValue = () => setMinHeightValue( undefined );
+	const hasMinHeightValue = () => !! minHeightValue;
 
 	// Padding.
 	const paddingValues = splitStyleValue( getStyle( name, 'padding' ) );
@@ -117,6 +131,7 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 
 	const resetAll = () => {
 		resetHeightValue();
+		resetMinHeightValue();
 		resetPaddingValue();
 		resetMarginValue();
 	};
@@ -139,6 +154,23 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 						label={ __( 'Height' ) }
 						value={ heightValue }
 						onChange={ setHeightValue }
+						units={ units }
+						min={ 0 }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showMinHeightControl && (
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ hasMinHeightValue }
+					label={ __( 'Minimum height' ) }
+					onDeselect={ resetMinHeightValue }
+					isShownByDefault={ true }
+				>
+					<UnitControl
+						label={ __( 'Minimum height' ) }
+						value={ minHeightValue }
+						onChange={ setMinHeightValue }
 						units={ units }
 						min={ 0 }
 					/>

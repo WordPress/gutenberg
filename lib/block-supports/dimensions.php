@@ -62,14 +62,27 @@ function gutenberg_get_dimensions_styles( $block_type, $block_attributes ) {
 		return array();
 	}
 
+	$styles = array();
+
+	// Height support.
 	$has_height_support = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions', 'height' ), false );
-	$styles             = array();
 
 	if ( $has_height_support ) {
 		$height_value = _wp_array_get( $block_attributes, array( 'style', 'dimensions', 'height' ), null );
 
 		if ( null !== $height_value ) {
 			$styles[] = sprintf( 'height: %s;', $height_value );
+		}
+	}
+
+	// Minimum height support.
+	$has_min_height_support = gutenberg_block_has_support( $block_type, array( '__experimentalDimensions', 'minHeight' ), false );
+
+	if ( $has_min_height_support ) {
+		$min_height_value = _wp_array_get( $block_attributes, array( 'style', 'dimensions', 'minHeight' ), null );
+
+		if ( null !== $min_height_value ) {
+			$styles[] = sprintf( 'min-height: %s;', $min_height_value );
 		}
 	}
 
