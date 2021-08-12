@@ -18,35 +18,39 @@ import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 
 function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
-	const { blockType, hasParents, showParentSelector } = useSelect(
-		( select ) => {
-			const {
-				getBlockName,
-				getBlockParents,
-				getSelectedBlockClientIds,
-			} = select( blockEditorStore );
-			const { getBlockType } = select( blocksStore );
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-			const parents = getBlockParents( selectedBlockClientId );
-			const firstParentClientId = parents[ parents.length - 1 ];
-			const parentBlockName = getBlockName( firstParentClientId );
-			const parentBlockType = getBlockType( parentBlockName );
+	const {
+		blockType,
+		hasParents,
+		showParentSelector,
+		isMultiSelecting,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getBlockParents,
+			getSelectedBlockClientIds,
+		} = select( blockEditorStore );
+		const { getBlockType } = select( blocksStore );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+		const parents = getBlockParents( selectedBlockClientId );
+		const firstParentClientId = parents[ parents.length - 1 ];
+		const parentBlockName = getBlockName( firstParentClientId );
+		const parentBlockType = getBlockType( parentBlockName );
 
-			return {
-				blockType:
-					selectedBlockClientId &&
-					getBlockType( getBlockName( selectedBlockClientId ) ),
-				hasParents: parents.length,
-				showParentSelector: hasBlockSupport(
-					parentBlockType,
-					'__experimentalParentSelector',
-					true
-				),
-			};
-		},
-		[]
-	);
+		return {
+			blockType:
+				selectedBlockClientId &&
+				getBlockType( getBlockName( selectedBlockClientId ) ),
+			hasParents: parents.length,
+			showParentSelector: hasBlockSupport(
+				parentBlockType,
+				'__experimentalParentSelector',
+				true
+			),
+			isMultiSelecting: selectedBlockClientIds.length > 1,
+		};
+	}, [] );
+
 	if ( blockType ) {
 		if ( ! hasBlockSupport( blockType, '__experimentalToolbar', true ) ) {
 			return null;
@@ -55,7 +59,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = classnames( 'block-editor-block-contextual-toolbar', {
-		'has-parent': hasParents && showParentSelector,
+		'has-parent': hasParents && showParentSelector && ! isMultiSelecting,
 		'is-fixed': isFixed,
 	} );
 
