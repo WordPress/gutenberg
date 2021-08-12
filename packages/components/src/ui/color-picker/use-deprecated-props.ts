@@ -24,6 +24,7 @@ type ColorPickerProps = ComponentProps< typeof ColorPicker >;
 type LegacyColor =
 	| string
 	| {
+			color: colorize.Instance;
 			hex: string;
 			hsl: ColorFormats.HSL | ColorFormats.HSLA;
 			hsv: ColorFormats.HSV | ColorFormats.HSVA;
@@ -36,9 +37,6 @@ type LegacyColor =
 			 * @deprecated
 			 */
 			source: 'hex';
-			draftHex: string;
-			draftHsl: ColorFormats.HSL | ColorFormats.HSLA;
-			draftRgb: ColorFormats.RGB | ColorFormats.RGBA;
 	  };
 
 /**
@@ -65,7 +63,7 @@ function isLegacyProps( props: any ): props is LegacyProps {
 	return (
 		typeof props.onChangeComplete !== 'undefined' ||
 		typeof props.color === 'string' ||
-		typeof props.hex === 'string'
+		typeof props.color.hex === 'string'
 	);
 }
 
@@ -105,13 +103,11 @@ const transformHslToLegacyColor = memoize(
 		const hex = isTransparent ? 'transparent' : `#${ rawHex }`;
 
 		return {
+			color,
 			hex,
 			rgb,
 			hsv,
 			hsl,
-			draftHex: hex.toLowerCase(),
-			draftHsl: hsl,
-			draftRgb: rgb,
 			source: 'hex',
 			oldHue: hsl.h,
 		};
