@@ -1,0 +1,44 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"hasParallax": false,
+			"dimRatio": 50,
+			"overlayColor": "secondary",
+			"backgroundType": "image",
+			"title": "",
+			"contentAlign": "center",
+			"isRepeated": false,
+			"style": {
+				"spacing": {
+					"padding": {
+						"top": "177px",
+						"right": "177px",
+						"bottom": "177px",
+						"left": "177px"
+					}
+				},
+				"minHeight": "468px"
+			}
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "Cover block",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"originalContent": "<p class=\"has-text-align-center has-large-font-size\">Cover block</p>"
+			}
+		],
+		"originalContent": "<div class=\"wp-block-cover has-secondary-background-color has-background-dim\" style=\"padding-top:177px;padding-right:177px;padding-bottom:177px;padding-left:177px;min-height:468px\"><div class=\"wp-block-cover__inner-container\"></div></div>"
+	}
+]

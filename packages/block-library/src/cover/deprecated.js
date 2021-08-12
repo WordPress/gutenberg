@@ -60,10 +60,186 @@ const blockAttributes = {
 };
 
 const deprecated = [
-	// { Using block supports for min-height
-	// This deprecation should handle:
-	//	- combine and remap former minHeight and minHeightUnit attributes to style.dimensions.minHeight
-	// },
+	// After this version we are using block supports for min-height
+	// The migration for this deprecation combine and remap former
+	// minHeight and minHeightUnit attributes to style.minHeight.
+	// core__cover__deprecated-7.html
+	{
+		attributes: {
+			...blockAttributes,
+			title: {
+				type: 'string',
+				source: 'html',
+				selector: 'p',
+			},
+			contentAlign: {
+				type: 'string',
+				default: 'center',
+			},
+			isRepeated: {
+				type: 'boolean',
+				default: false,
+			},
+			minHeight: {
+				type: 'number',
+			},
+			minHeightUnit: {
+				type: 'string',
+			},
+			gradient: {
+				type: 'string',
+			},
+			customGradient: {
+				type: 'string',
+			},
+			contentPosition: {
+				type: 'string',
+			},
+		},
+		supports: {
+			anchor: true,
+			align: true,
+			spacing: {
+				padding: true,
+			},
+			color: {
+				__experimentalDuotone:
+					'> .wp-block-cover__image-background, > .wp-block-cover__video-background',
+			},
+		},
+		save( { attributes } ) {
+			const {
+				backgroundType,
+				gradient,
+				contentPosition,
+				customGradient,
+				customOverlayColor,
+				dimRatio,
+				focalPoint,
+				hasParallax,
+				isRepeated,
+				overlayColor,
+				url,
+				id,
+				minHeight: minHeightProp,
+				minHeightUnit,
+			} = attributes;
+			const overlayColorClass = getColorClassName(
+				'background-color',
+				overlayColor
+			);
+			const gradientClass = __experimentalGetGradientClass( gradient );
+			const minHeight = minHeightUnit
+				? `${ minHeightProp }${ minHeightUnit }`
+				: minHeightProp;
+
+			const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+			const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+			const isImgElement = ! ( hasParallax || isRepeated );
+
+			const style = {
+				...( isImageBackground && ! isImgElement
+					? backgroundImageStyles( url )
+					: {} ),
+				backgroundColor: ! overlayColorClass
+					? customOverlayColor
+					: undefined,
+				background:
+					customGradient && ! url ? customGradient : undefined,
+				minHeight: minHeight || undefined,
+			};
+
+			const objectPosition =
+				// prettier-ignore
+				focalPoint && isImgElement
+					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+					: undefined;
+
+			const classes = classnames(
+				dimRatioToClass( dimRatio ),
+				overlayColorClass,
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+					'is-repeated': isRepeated,
+					'has-background-gradient': gradient || customGradient,
+					[ gradientClass ]: ! url && gradientClass,
+					'has-custom-content-position': ! isContentPositionCenter(
+						contentPosition
+					),
+				},
+				getPositionClassName( contentPosition )
+			);
+
+			return (
+				<div { ...useBlockProps.save( { className: classes, style } ) }>
+					{ url &&
+						( gradient || customGradient ) &&
+						dimRatio !== 0 && (
+							<span
+								aria-hidden="true"
+								className={ classnames(
+									'wp-block-cover__gradient-background',
+									gradientClass
+								) }
+								style={
+									customGradient
+										? { background: customGradient }
+										: undefined
+								}
+							/>
+						) }
+					{ isImageBackground && isImgElement && url && (
+						<img
+							className={ classnames(
+								'wp-block-cover__image-background',
+								id ? `wp-image-${ id }` : null
+							) }
+							alt=""
+							src={ url }
+							style={ { objectPosition } }
+							data-object-fit="cover"
+							data-object-position={ objectPosition }
+						/>
+					) }
+					{ isVideoBackground && url && (
+						<video
+							className={ classnames(
+								'wp-block-cover__video-background',
+								'intrinsic-ignore'
+							) }
+							autoPlay
+							muted
+							loop
+							playsInline
+							src={ url }
+							style={ { objectPosition } }
+							data-object-fit="cover"
+							data-object-position={ objectPosition }
+						/>
+					) }
+					<div className="wp-block-cover__inner-container">
+						<InnerBlocks.Content />
+					</div>
+				</div>
+			);
+		},
+		// This version uses min-height values and units via attributes.
+		// Min-height is controlled by block supports going forward.
+		migrate: ( attributes ) => {
+			const { minHeight, minHeightUnit, style } = attributes;
+			return {
+				...attributes,
+				style: {
+					...style,
+					minHeight: `${ minHeight }${ minHeightUnit || 'px' }`,
+				},
+				minHeight: undefined,
+				minHeightUnit: undefined,
+			};
+		},
+	},
 	{
 		attributes: {
 			...blockAttributes,
