@@ -304,6 +304,10 @@ _Returns_
 
 -   `WPComponent`: The component to be rendered.
 
+### batch
+
+Undocumented declaration.
+
 ### combineReducers
 
 The combineReducers helper function turns an object whose values are different

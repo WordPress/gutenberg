@@ -137,10 +137,12 @@ export function useRichText( {
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
-		onSelectionChange( start, end );
-		onChange( _value.current, {
-			__unstableFormats: formats,
-			__unstableText: text,
+		wp.data.batch( () => {
+			onSelectionChange( start, end );
+			onChange( _value.current, {
+				__unstableFormats: formats,
+				__unstableText: text,
+			} );
 		} );
 		forceRender();
 	}

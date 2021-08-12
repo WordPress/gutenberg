@@ -50,12 +50,16 @@ import { STORE_NAME } from './store/name';
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	let listeners = [];
+	let isPaused = false;
 	const __experimentalListeningStores = new Set();
 
 	/**
 	 * Global listener called for each store's update.
 	 */
 	function globalListener() {
+		if ( isPaused ) {
+			return;
+		}
 		listeners.forEach( ( listener ) => listener() );
 	}
 
@@ -177,6 +181,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		if ( typeof config.subscribe !== 'function' ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
+		const currentSubscribe = config.subscribe;
+		config.subscribe = ( listener ) => {
+			return currentSubscribe( () => {
+				if ( isPaused ) {
+					return;
+				}
+				listener();
+			} );
+		};
 		stores[ key ] = config;
 		config.subscribe( globalListener );
 	}
@@ -213,7 +226,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return parent.__experimentalSubscribeStore( storeName, handler );
 	}
 
+	function batch( callback ) {
+		isPaused = true;
+		callback();
+		isPaused = false;
+		globalListener();
+	}
+
 	let registry = {
+		batch,
 		registerGenericStore,
 		stores,
 		namespaces: stores, // TODO: Deprecate/remove this.
