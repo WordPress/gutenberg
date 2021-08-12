@@ -402,6 +402,7 @@ class BottomSheet extends Component {
 			children,
 			withHeaderSeparator = false,
 			hasNavigation,
+			showDragIndicator = true,
 			...rest
 		} = this.props;
 		const {
@@ -541,7 +542,9 @@ class BottomSheet extends Component {
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
 					<View onLayout={ this.onHeaderLayout }>
-						<View style={ styles.dragIndicator } />
+						{ ( ! isFullScreen || showDragIndicator ) && (
+							<View style={ styles.dragIndicator } />
+						) }
 						{ ! hideHeader && getHeader() }
 					</View>
 					<WrapperView
