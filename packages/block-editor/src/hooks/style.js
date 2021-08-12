@@ -144,7 +144,7 @@ function addAttribute( settings ) {
 	return settings;
 }
 
-const skipSerializationPaths = {
+const skipSerializationPathsEdit = {
 	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
 	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		COLOR_SUPPORT_KEY,
@@ -157,23 +157,34 @@ const skipSerializationPaths = {
 	],
 };
 
+const skipSerializationPathsSave = {
+	...skipSerializationPathsEdit,
+	[ `${ SPACING_SUPPORT_KEY }` ]: [ 'spacing', 'blockGap' ],
+};
+
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param {Object} props      Additional props applied to save element.
  * @param {Object} blockType  Block type.
  * @param {Object} attributes Block attributes.
+ * @param {Object} skipPaths  An object of keys and paths to skip serialization.
  *
  * @return {Object} Filtered props applied to save element.
  */
-export function addSaveProps( props, blockType, attributes ) {
+export function addSaveProps(
+	props,
+	blockType,
+	attributes,
+	skipPaths = skipSerializationPathsSave
+) {
 	if ( ! hasStyleSupport( blockType ) ) {
 		return props;
 	}
 
 	let { style } = attributes;
 
-	forEach( skipSerializationPaths, ( path, indicator ) => {
+	forEach( skipPaths, ( path, indicator ) => {
 		if ( getBlockSupport( blockType, indicator ) ) {
 			style = omit( style, path );
 		}
@@ -207,7 +218,12 @@ export function addEditProps( settings ) {
 			props = existingGetEditWrapperProps( attributes );
 		}
 
-		return addSaveProps( props, settings, attributes );
+		return addSaveProps(
+			props,
+			settings,
+			attributes,
+			skipSerializationPathsEdit
+		);
 	};
 
 	return settings;
