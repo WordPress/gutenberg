@@ -8,14 +8,21 @@ body:
               Thanks for taking the time to fill out this bug report! If this is a security issue, please report it in HackerOne instead: https://hackerone.com/wordpress
     - type: textarea
       attributes:
-          label: Description and step-by-step reproduction instructions
-          description: Please write a brief description of the bug and the steps needed to reproduce it, including what you expect to happen and what is currently happening.
+          label: Description
+          description: Please write a brief description of the bug, including what you expect to happen and what is currently happening.
           placeholder: |
-              Feature '...' is not working properly because '...'. Steps to reproduce:
+              Feature '...' is not working properly. I expect '...' to happen, but '...' happens instead
+      validations:
+          required: true
+          
+    - type: textarea
+      attributes:
+          label: Step-by-step reproduction instructions
+          description: Please write the steps needed to reproduce the bug.
+          placeholder: |
               1. Go to '...'
               2. Click on '...'
               3. Scroll down to '...'
-              4. I expect '...' to happen, but '...' happens instead
       validations:
           required: true
 
@@ -36,7 +43,7 @@ body:
           description: |
               Please list what Gutenberg version you are using. If you aren't using Gutenberg, please note that it's not installed.
           placeholder: |
-            - WordPress version, Gutenberg version.
+            - WordPress version, Gutenberg version, and active Theme you are using.
             - Browser(s) are you seeing the problem on.
             - Device you are using and operating system (e.g. "Desktop with Windows 10", "iPhone with iOS 14", etc.).
       validations:
@@ -45,8 +52,7 @@ body:
     - type: checkboxes
       attributes:
           label: Pre-checks
-          description: Please check if the bug has already been reported by searching https://github.com/WordPress/gutenberg/issues and make sure before reporting the bug is neither related to another plugin nor theme specific.
+          description: Please check if the bug has already been reported by searching https://github.com/WordPress/gutenberg/issues and make sure the bug is not related to another plugin.
           options:
               - label: I have searched the existing issues.
               - label: I have tested with all plugins deactivated except Gutenberg.
-              - label: I have tested with a default theme.
