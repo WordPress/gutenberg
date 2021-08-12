@@ -14,12 +14,18 @@ describe( 'createURL', () => {
 	} );
 
 	it( 'when given query string, should append to the URL', async () => {
-		expect( createURL( '', '?bar=baz&fiz=a/b/c' ) ).toEqual( WP_BASE_URL + '/?bar=baz&fiz=a/b/c' );
-		expect( createURL( '/foo', '?bar=baz&fiz=a/b/c' ) ).toEqual( WP_BASE_URL + '/foo?bar=baz&fiz=a/b/c' );
+		expect( createURL( '', '?bar=baz&fiz=a/b/c' ) ).toEqual(
+			WP_BASE_URL + '/?bar=baz&fiz=a/b/c'
+		);
+		expect( createURL( '/foo', '?bar=baz&fiz=a/b/c' ) ).toEqual(
+			WP_BASE_URL + '/foo?bar=baz&fiz=a/b/c'
+		);
 	} );
 
 	it( 'when given absolute path, should parse it relatively to the base', async () => {
 		const baseURL = new URL( WP_BASE_URL );
-		expect( createURL( '//www.example.com/bar' ) ).toEqual( baseURL.protocol + '//www.example.com/bar' );
+		expect( createURL( '//www.example.com/bar' ) ).toEqual(
+			baseURL.protocol + '//www.example.com/bar'
+		);
 	} );
 } );
