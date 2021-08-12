@@ -673,9 +673,11 @@ async function getChangelog( settings ) {
 				return;
 			}
 
+			const shouldNest = featureName !== UNKNOWN_FEATURE_FALLBACK_NAME;
+
 			// Avoids double nesting such as "Documentation" feature under
 			// the "Documentation" section.
-			if ( group !== featureName ) {
+			if ( group !== featureName && shouldNest ) {
 				// Start new <ul> for the Feature group.
 				changelog += '#### ' + featureName + '\n';
 			}
@@ -686,7 +688,7 @@ async function getChangelog( settings ) {
 				entry = entry && entry.replace( `[${ featureName } - `, '[' );
 
 				// Add a new bullet point to the list.
-				changelog += `${ entry }\n`;
+				changelog += shouldNest ? `  ${ entry }\n` : `${ entry }\n`;
 			} );
 
 			// Close the <ul> for the Feature group.
@@ -711,9 +713,9 @@ function sortFeatureGroups( featureGroups ) {
 		( featureAName, featureBName ) => {
 			// Sort "Unknown" to always be at the end
 			if ( featureAName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
-				return 1;
-			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
 				return -1;
+			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
+				return 1;
 			}
 
 			// Sort by greatest number of PRs in the group first.
