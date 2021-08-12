@@ -19,10 +19,15 @@ export interface ToolsPanelHeaderProps {
 	header: string;
 	resetAll: () => undefined;
 	toggleItem: ( label: string ) => undefined;
+	className?: string;
 }
 
 export interface ToolPanelItem {
 	hasValue: () => boolean;
 	isShownByDefault: boolean;
 	label: string;
+}
+
+export interface TPContext {
+	menuItems?: { [ key: string ]: boolean };
 }

@@ -3,5 +3,10 @@
  */
 import { createContext, useContext } from '@wordpress/element';
 
-export const ToolsPanelContext = createContext( {} );
+/**
+ * Internal dependencies
+ */
+import type { TPContext } from './types';
+
+export const ToolsPanelContext = createContext< TPContext >( {} );
 export const useToolsPanelContext = () => useContext( ToolsPanelContext );

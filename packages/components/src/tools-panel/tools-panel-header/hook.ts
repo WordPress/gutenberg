@@ -10,8 +10,9 @@ import * as styles from '../styles';
 import { useToolsPanelContext } from '../context';
 import { useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { ToolsPanelHeaderProps } from '../types';
 
-export function useToolsPanelHeader( props ) {
+export function useToolsPanelHeader( props: ToolsPanelHeaderProps ) {
 	const { className, ...otherProps } = useContextSystem(
 		props,
 		'ToolsPanelHeader'
