@@ -677,7 +677,7 @@ async function getChangelog( settings ) {
 			// the "Documentation" section.
 			if ( group !== featureName ) {
 				// Start new <ul> for the Feature group.
-				changelog += '- ' + featureName + '\n';
+				changelog += '#### ' + featureName + '\n';
 			}
 
 			// Add a <li> for each PR in the Feature.
@@ -686,7 +686,7 @@ async function getChangelog( settings ) {
 				entry = entry && entry.replace( `[${ featureName } - `, '[' );
 
 				// Add a new bullet point to the list.
-				changelog += `  ${ entry }\n`;
+				changelog += `${ entry }\n`;
 			} );
 
 			// Close the <ul> for the Feature group.
