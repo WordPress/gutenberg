@@ -4,10 +4,14 @@
 import { useToolsPanelItem } from './hook';
 import { View } from '../../view';
 import { contextConnect } from '../../ui/context';
+import type { forwardRef, ToolsPanelItemProps } from '../types';
 
 // This wraps controls to be conditionally displayed within a tools panel. It
 // prevents props being applied to HTML elements that would make them invalid.
-const ToolsPanelItem = ( props, forwardedRef ) => {
+const ToolsPanelItem = (
+	props: ToolsPanelItemProps,
+	forwardedRef: forwardRef
+) => {
 	const { children, isShown, ...toolsPanelItemProps } = useToolsPanelItem(
 		props
 	);
