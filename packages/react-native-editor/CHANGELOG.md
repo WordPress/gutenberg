@@ -9,6 +9,8 @@ For each user feature we should also add a importance categorization label  to i
 [*] → Minor enhancements and fixes that address annoyances — things our users can miss.
 -->
 
+## Unreleased
+
 ## 1.59.1
 -   [*] Global styles - Add color to the block styles filter list [#34000]
 -   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
