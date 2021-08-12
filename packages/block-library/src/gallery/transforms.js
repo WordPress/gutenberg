@@ -10,6 +10,7 @@ import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { select } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -32,6 +33,97 @@ const parseShortcodeIds = ( ids ) => {
 
 	return ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) );
 };
+
+/**
+ * Third party block plugins don't have an easy way to detect if the
+ * innerBlocks version of the Gallery is running when they run a
+ * 3rdPartyBlock -> GalleryBlock transform so this tranform filter
+ * will handle this. Once the innerBlocks version is the default
+ * in a core release, this could be deprecated and removed after
+ * plugin authors have been given time to update transforms.
+ *
+ * @typedef  {Object} Attributes
+ * @typedef  {Object} Block
+ * @property {Attributes} attributes The attributes of the block.
+ * @param    {Block}      block      The transformed block.
+ * @return   {Block}                 The transformed block.
+ */
+function updateThirdPartyTransformToGallery( block ) {
+	const settings = select( blockEditorStore ).getSettings();
+	if (
+		settings.__unstableGalleryWithImageBlocks &&
+		block.name === 'core/gallery' &&
+		block.attributes?.images.length > 0
+	) {
+		const innerBlocks = block.attributes.images.map(
+			( { url, id, alt } ) => {
+				return createBlock( 'core/image', {
+					url,
+					id: id ? parseInt( id, 10 ) : null,
+					alt,
+					sizeSlug: block.attributes.sizeSlug,
+					linkDestination: block.attributes.linkDestination,
+				} );
+			}
+		);
+
+		delete block.attributes.ids;
+		delete block.attributes.images;
+		block.innerBlocks = innerBlocks;
+	}
+
+	return block;
+}
+addFilter(
+	'blocks.switchToBlockType.transformedBlock',
+	'core/gallery/update-third-party-transform-to',
+	updateThirdPartyTransformToGallery
+);
+
+/**
+ * Third party block plugins don't have an easy way to detect if the
+ * innerBlocks version of the Gallery is running when they run a
+ * GalleryBlock -> 3rdPartyBlock transform so this transform filter
+ * will handle this. Once the innerBlocks version is the default
+ * in a core release, this could be deprecated and removed after
+ * plugin authors have been given time to update transforms.
+ *
+ * @typedef  {Object} Attributes
+ * @typedef  {Object} Block
+ * @property {Attributes} attributes The attributes of the block.
+ * @param    {Block}      toBlock    The block to transform to.
+ * @param    {Block[]}    fromBlocks The blocks to transform from.
+ * @return   {Block}                 The transformed block.
+ */
+function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
+	const galleryBlock = fromBlocks.find(
+		( transformedBlock ) =>
+			transformedBlock.name === 'core/gallery' &&
+			transformedBlock.innerBlocks.length > 0 &&
+			! transformedBlock.attributes.images?.length > 0 &&
+			! toBlock.name.includes( 'core/' )
+	);
+
+	if ( galleryBlock ) {
+		const images = galleryBlock.innerBlocks.map(
+			( { attributes: { url, id, alt } } ) => ( {
+				url,
+				id: id ? parseInt( id, 10 ) : null,
+				alt,
+			} )
+		);
+		const ids = images.map( ( { id } ) => id );
+		galleryBlock.attributes.images = images;
+		galleryBlock.attributes.ids = ids;
+	}
+
+	return toBlock;
+}
+addFilter(
+	'blocks.switchToBlockType.transformedBlock',
+	'core/gallery/update-third-party-transform-from',
+	updateThirdPartyTransformFromGallery
+);
 
 const transforms = {
 	from: [
