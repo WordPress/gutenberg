@@ -16,11 +16,11 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 
 export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
-	const settings = useSelect( ( select ) => {
+	const { adminUrl } = useSelect( ( select ) => {
 		return select( blockEditorStore ).getSettings();
 	}, [] );
 
-	const widgetPreviewUrl = settings.adminUrl + 'widgets.php';
+	const widgetPreviewUrl = (adminUrl ?? '') + 'widgets.php';
 	const widgetPreviewUrlQueryParameters = {
 		'legacy-widget-preview': { idBase, instance },
 	};
