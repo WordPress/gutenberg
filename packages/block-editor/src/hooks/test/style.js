@@ -24,7 +24,7 @@ describe( 'getInlineStyles', () => {
 					color: '#21759b',
 				},
 				spacing: {
-					blockGap: { row: '1em' },
+					blockGap: '1em',
 					padding: { top: '10px' },
 					margin: { bottom: '15px' },
 				},
