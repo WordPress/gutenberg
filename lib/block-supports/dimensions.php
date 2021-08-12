@@ -110,7 +110,7 @@ function gutenberg_skip_spacing_serialization( $block_type ) {
 
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
-	'dimensions',
+	'spacing', // This is deliberately `spacing` instead of `dimensions` for backwards compatibility.
 	array(
 		'register_attribute' => 'gutenberg_register_dimensions_support',
 		'apply'              => 'gutenberg_apply_dimensions_support',
