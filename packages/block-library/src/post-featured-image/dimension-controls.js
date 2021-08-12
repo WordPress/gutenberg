@@ -1,11 +1,15 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
 import {
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
-	BaseControl,
 	Flex,
 	FlexItem,
 	__experimentalSegmentedControl as SegmentedControl,
@@ -60,32 +64,36 @@ const DimensionControls = ( {
 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
 	return (
 		<PanelBody title={ __( 'Dimensions' ) }>
-			<BaseControl>
-				<Flex justify="space-between">
-					<FlexItem>
-						<UnitControl
-							label={ __( 'Height' ) }
-							labelPosition="top"
-							value={ height || '' }
-							onChange={ ( nextHeight ) => {
-								onDimensionChange( 'height', nextHeight );
-							} }
-							units={ units }
-						/>
-					</FlexItem>
-					<FlexItem>
-						<UnitControl
-							label={ __( 'Width' ) }
-							labelPosition="top"
-							value={ width || '' }
-							onChange={ ( nextWidth ) => {
-								onDimensionChange( 'width', nextWidth );
-							} }
-							units={ units }
-						/>
-					</FlexItem>
-				</Flex>
-			</BaseControl>
+			<Flex
+				justify="space-between"
+				className={ classNames(
+					'block-library-post-featured-image-dimension-controls',
+					{ 'scale-control-is-visible': !! height }
+				) }
+			>
+				<FlexItem>
+					<UnitControl
+						label={ __( 'Height' ) }
+						labelPosition="top"
+						value={ height || '' }
+						onChange={ ( nextHeight ) => {
+							onDimensionChange( 'height', nextHeight );
+						} }
+						units={ units }
+					/>
+				</FlexItem>
+				<FlexItem>
+					<UnitControl
+						label={ __( 'Width' ) }
+						labelPosition="top"
+						value={ width || '' }
+						onChange={ ( nextWidth ) => {
+							onDimensionChange( 'width', nextWidth );
+						} }
+						units={ units }
+					/>
+				</FlexItem>
+			</Flex>
 			{ !! height && (
 				<SegmentedControl
 					label={ scaleLabel }
