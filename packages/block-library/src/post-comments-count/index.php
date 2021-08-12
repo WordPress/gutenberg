@@ -18,16 +18,18 @@ function render_block_core_post_comments_count( $attributes, $content, $block ) 
 		return '';
 	}
 
-	$classes = '';
+	$comments_count = get_comments_number( $block->context['postId'] );
+	$classes        = sprintf( 'comments-count-%1$s', $comments_count );
+
 	if ( isset( $attributes['textAlign'] ) ) {
-		$classes .= 'has-text-align-' . $attributes['textAlign'];
+		$classes .= ' has-text-align-' . $attributes['textAlign'];
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
-		get_comments_number( $block->context['postId'] )
+		$comments_count
 	);
 }
 
