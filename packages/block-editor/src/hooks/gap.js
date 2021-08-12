@@ -115,11 +115,11 @@ export function GapEdit( props ) {
 		web: (
 			<>
 				<UnitControl
-					label={ __( 'Gap' ) }
-					value={ style?.spacing?.blockGap }
-					units={ units }
-					onChange={ onChange }
+					label={ __( 'Block gap' ) }
 					min={ 0 }
+					onChange={ onChange }
+					units={ units }
+					value={ style?.spacing?.blockGap }
 				/>
 			</>
 		),

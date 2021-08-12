@@ -183,17 +183,18 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 			) }
 			{ showGapControl && (
 				<ToolsPanelItem
+					className="single-column"
 					hasValue={ hasGapValue }
-					label={ __( 'Gap' ) }
+					label={ __( 'Block gap' ) }
 					onDeselect={ resetGapValue }
 					isShownByDefault={ true }
 				>
 					<UnitControl
-						label={ __( 'Gap' ) }
-						value={ gapValue }
-						units={ units }
-						onChange={ setGapValue }
+						label={ __( 'Block gap' ) }
 						min={ 0 }
+						onChange={ setGapValue }
+						units={ units }
+						value={ gapValue }
 					/>
 				</ToolsPanelItem>
 			) }
