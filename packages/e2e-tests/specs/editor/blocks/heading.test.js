@@ -8,6 +8,13 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
+const openColorToolsPanelMenu = async () => {
+	const toggleSelector =
+		"//div[contains(@class, 'color-block-support-panel')]//button[contains(@class, 'components-dropdown-menu__toggle')]";
+	const toggle = await page.waitForXPath( toggleSelector );
+	return toggle.click();
+};
+
 describe( 'Heading', () => {
 	const COLOR_ITEM_SELECTOR =
 		'.block-editor-panel-color-gradient-settings__item';
@@ -16,8 +23,6 @@ describe( 'Heading', () => {
 		'.components-color-picker button[aria-label="Show detailed inputs"]';
 	const COLOR_INPUT_FIELD_SELECTOR =
 		'.components-color-picker .components-input-control__input';
-	const COLOR_PANEL_TOGGLE_X_SELECTOR =
-		"//button[./span[contains(text(),'Color')]]";
 
 	beforeEach( async () => {
 		await createNewPost();
@@ -73,10 +78,8 @@ describe( 'Heading', () => {
 	it( 'should correctly apply custom colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '### Heading' );
-		const colorPanelToggle = await page.waitForXPath(
-			COLOR_PANEL_TOGGLE_X_SELECTOR
-		);
-		await colorPanelToggle.click();
+		await openColorToolsPanelMenu();
+		await page.click( 'button[aria-label="Show Text"]' );
 
 		const textColorButton = await page.waitForSelector(
 			COLOR_ITEM_SELECTOR
@@ -101,10 +104,8 @@ describe( 'Heading', () => {
 	it( 'should correctly apply named colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '## Heading' );
-		const [ colorPanelToggle ] = await page.$x(
-			COLOR_PANEL_TOGGLE_X_SELECTOR
-		);
-		await colorPanelToggle.click();
+		await openColorToolsPanelMenu();
+		await page.click( 'button[aria-label="Show Text"]' );
 
 		const textColorButton = await page.waitForSelector(
 			COLOR_ITEM_SELECTOR
