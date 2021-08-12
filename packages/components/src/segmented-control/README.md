@@ -80,5 +80,6 @@ The value of the `SegmentedControl`.
 ### `help`
 
 -   Type: `ReactNode`
+-   Required: No
 
 If this property is added, a help text will be generated using help property as the content.
