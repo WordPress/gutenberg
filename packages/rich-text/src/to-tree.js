@@ -287,7 +287,7 @@ export function toTree( {
 		}
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( ! isEditableTree && replacements[ i ].type === 'script' ) {
+			if ( ! isEditableTree && replacements[ i ]?.type === 'script' ) {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {
