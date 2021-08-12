@@ -1,5 +1,5 @@
 .block-editor-block-content-overlay {
-	&::before {
+	&.overlay-active::before {
 		content: "";
 		position: absolute;
 		top: 0;
@@ -12,8 +12,8 @@
 		z-index: z-index(".block-editor-block-content-overlay__overlay");
 	}
 
-	&:hover:not(.is-dragging-blocks)::before,
-	&.parent-highlighted::before {
+	&:hover:not(.is-dragging-blocks).overlay-active::before,
+	&.parent-highlighted.overlay-active::before {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
 		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color) inset;
 	}
@@ -24,7 +24,7 @@
 
 	&.is-dragging-blocks {
 		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
-		&::before {
+		&.overlay-active::before {
 			pointer-events: none;
 		}
 	}
