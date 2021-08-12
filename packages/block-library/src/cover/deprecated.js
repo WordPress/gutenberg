@@ -258,6 +258,15 @@ const deprecated = [
 	{
 		attributes: {
 			...blockAttributes,
+			title: {
+				type: 'string',
+				source: 'html',
+				selector: 'p',
+			},
+			contentAlign: {
+				type: 'string',
+				default: 'center',
+			},
 			isRepeated: {
 				type: 'boolean',
 				default: false,
@@ -393,6 +402,15 @@ const deprecated = [
 	{
 		attributes: {
 			...blockAttributes,
+			title: {
+				type: 'string',
+				source: 'html',
+				selector: 'p',
+			},
+			contentAlign: {
+				type: 'string',
+				default: 'center',
+			},
 			minHeight: {
 				type: 'number',
 			},
@@ -491,6 +509,15 @@ const deprecated = [
 	{
 		attributes: {
 			...blockAttributes,
+			title: {
+				type: 'string',
+				source: 'html',
+				selector: 'p',
+			},
+			contentAlign: {
+				type: 'string',
+				default: 'center',
+			},
 			minHeight: {
 				type: 'number',
 			},
