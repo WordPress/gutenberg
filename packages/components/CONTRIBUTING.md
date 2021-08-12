@@ -54,7 +54,6 @@ Components and other utilities function that don't necessarily render a piece of
 
 - Boolean component props should be prefixed with `is*` (e.g. `isChecked`), `has*` (e.g. `hasValue`) or `enable*` (e.g. `enableScroll`)
 - Event callback props should be prefixed with `on*` (e.g. `onChanged`)
-- `styled` components should be suffixed with `*View` (e.g. `BoxView`)
 - ...
 
 ### Technical requirements for new components
