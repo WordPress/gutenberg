@@ -9,9 +9,12 @@ For each user feature we should also add a importance categorization label  to i
 [*] → Minor enhancements and fixes that address annoyances — things our users can miss.
 -->
 
-## Unreleased
+## 1.59.0
 -   [*] [Android] Fix UBE's inaccessible "more" toolbar item. [#33740]
 -   [*] Image block: Add a "featured" banner and ability to set or remove an image as featured. (iOS only) [#31345]
+
+## 1.58.3
+-   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
 
 ## 1.58.2
 -   [*] Fix issue with text input in alt text settings [#33845]

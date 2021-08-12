@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
+import { SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -26,6 +26,38 @@ import { cleanEmptyObject } from './utils';
 export function hasMarginSupport( blockType ) {
 	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
 	return !! ( true === support || support?.margin );
+}
+
+/**
+ * Checks if there is a current value in the margin block support attributes.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean}      Whether or not the block has a margin value set.
+ */
+export function hasMarginValue( props ) {
+	return props.attributes.style?.spacing?.margin !== undefined;
+}
+
+/**
+ * Resets the margin block support attributes. This can be used when disabling
+ * the margin support controls for a block via a `ToolsPanel`.
+ *
+ * @param {Object} props               Block props.
+ * @param {Object} props.attributes    Block's attributes.
+ * @param {Object} props.setAttributes Function to set block's attributes.
+ */
+export function resetMargin( { attributes = {}, setAttributes } ) {
+	const { style } = attributes;
+
+	setAttributes( {
+		style: cleanEmptyObject( {
+			...style,
+			spacing: {
+				...style?.spacing,
+				margin: undefined,
+			},
+		} ),
+	} );
 }
 
 /**
@@ -106,6 +138,7 @@ export function MarginEdit( props ) {
 					label={ __( 'Margin' ) }
 					sides={ sides }
 					units={ units }
+					allowReset={ false }
 				/>
 			</>
 		),

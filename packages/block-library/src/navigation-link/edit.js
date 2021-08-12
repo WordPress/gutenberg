@@ -144,7 +144,7 @@ function getSuggestionsQuery( type, kind ) {
  * 4: Theme colors
  * 5: Global styles
  *
- * @param {Object} context
+ * @param {Object}  context
  * @param {boolean} isSubMenu
  */
 function getColors( context, isSubMenu ) {

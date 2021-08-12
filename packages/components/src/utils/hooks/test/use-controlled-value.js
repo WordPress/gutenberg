@@ -38,7 +38,7 @@ describe( 'useControlledValue', () => {
 		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 	} );
 
-	it( 'should not call onChange only when there is no value being passed in', () => {
+	it( 'should call onChange only when there is no value being passed in', () => {
 		const onChange = jest.fn();
 		render( <Input defaultValue="WordPress.org" onChange={ onChange } /> );
 
@@ -47,7 +47,7 @@ describe( 'useControlledValue', () => {
 		fireEvent.change( getInput(), { target: { value: 'Code is Poetry' } } );
 
 		expect( getInput() ).toHaveValue( 'Code is Poetry' );
-		expect( onChange ).not.toHaveBeenCalled();
+		expect( onChange ).toHaveBeenCalledWith( 'Code is Poetry' );
 	} );
 
 	it( 'should call onChange when there is a value passed in', () => {

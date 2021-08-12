@@ -51,8 +51,6 @@ function useAutosaveNotice() {
 		( select ) => ( {
 			postId: select( editorStore ).getCurrentPostId(),
 			isEditedPostNew: select( editorStore ).isEditedPostNew(),
-			getEditedPostAttribute: select( editorStore )
-				.getEditedPostAttribute,
 			hasRemoteAutosave: !! select( editorStore ).getEditorSettings()
 				.autosave,
 		} ),
