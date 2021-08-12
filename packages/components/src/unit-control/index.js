@@ -19,7 +19,7 @@ import { composeStateReducers } from '../input-control/reducer/reducer';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
-import { useControlledState } from '../utils/hooks';
+import { useControlledState, useUpdateEffect } from '../utils/hooks';
 
 function UnitControl(
 	{
@@ -52,6 +52,19 @@ function UnitControl(
 	const refParsedValue = useRef( null );
 
 	const classes = classnames( 'components-unit-control', className );
+
+	// Watch for incoming updates to the unit.
+	useUpdateEffect( () => {
+		if ( initialUnit !== unit ) {
+			const parsedUnitValue = getValidParsedUnit(
+				initialUnit,
+				units,
+				value,
+				unit
+			).join( '' );
+			setUnit( parsedUnitValue );
+		}
+	}, [ initialUnit ] );
 
 	const handleOnChange = ( next, changeProps ) => {
 		if ( next === '' ) {
