@@ -711,7 +711,7 @@ async function getChangelog( settings ) {
 function sortFeatureGroups( featureGroups ) {
 	return Object.keys( featureGroups ).sort(
 		( featureAName, featureBName ) => {
-			// Sort "Unknown" to always be at the end
+			// Sort "uncategorized" items to *always* be at the top of the section
 			if ( featureAName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
 				return -1;
 			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
