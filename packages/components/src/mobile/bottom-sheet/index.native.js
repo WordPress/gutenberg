@@ -242,28 +242,40 @@ class BottomSheet extends Component {
 
 	onSetMaxHeight() {
 		const { height, width } = Dimensions.get( 'window' );
-		//const { safeAreaBottomInset } = this.state;
+		const { safeAreaBottomInset, isFullScreen } = this.state;
 		const statusBarHeight =
 			Platform.OS === 'android' ? StatusBar.currentHeight : 0;
+
+		let maxHeight = height;
 
 		// `maxHeight` when modal is opened along with a keyboard
 		const maxHeightWithOpenKeyboard =
 			0.95 *
 			( height -
-				//this.keyboardHeight -
+				this.keyboardHeight -
 				statusBarHeight -
 				this.headerHeight );
-		// On horizontal mode `maxHeight` has to be set on 90% of width
-		if ( width > height ) {
-			this.setState( {
-				maxHeight: Math.min( 0.9 * height, maxHeightWithOpenKeyboard ),
-			} );
-			//	On vertical mode `maxHeight` has to be set on 50% of width
+
+		// If full screen, use 100% of the inset height
+		// If landscape, use 90% of inset height
+		// If portait, use 50% of inset height
+		if ( isFullScreen ) {
+			maxHeight =
+				height -
+				safeAreaBottomInset -
+				1.2 * this.keyboardHeight -
+				this.headerHeight;
+		} else if ( width > height ) {
+			// Landscape
+			maxHeight = Math.min( 0.9 * height, maxHeightWithOpenKeyboard );
 		} else {
-			this.setState( {
-				maxHeight: height - 75,
-			} );
+			// Portrait
+			maxHeight = Math.min(
+				0.5 * height - safeAreaBottomInset,
+				maxHeightWithOpenKeyboard
+			);
 		}
+		this.setState( { maxHeight } );
 	}
 
 	onDimensionsChange() {
@@ -431,7 +443,7 @@ class BottomSheet extends Component {
 
 		let listStyle = {};
 		if ( isFullScreen ) {
-			listStyle = { maxHeight };
+			listStyle = { flexGrow: 1, maxHeight };
 		} else if ( isMaxHeightSet ) {
 			listStyle = { maxHeight };
 
