@@ -3,6 +3,7 @@
  */
 import { getBlockSupport } from '@wordpress/blocks';
 import {
+	__experimentalParseUnit as parseUnit,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
@@ -62,7 +63,7 @@ export function resetMinHeight( { attributes = {}, setAttributes } ) {
 /**
  * Custom hook that checks if min-height controls have been disabled.
  *
- * @param {Object} props Block props.
+ * @param {Object} props      Block props.
  * @param {string} props.name The name of the block.
  * @return {boolean} Whether min-height control is disabled.
  */
@@ -110,11 +111,15 @@ export function MinHeightEdit( props ) {
 		setAttributes( { style: cleanEmptyObject( newStyle ) } );
 	};
 
+	const minHeight = style?.dimensions?.minHeight;
+	const [ , minHeightUnit ] = parseUnit( minHeight, units );
+
 	return (
 		<UnitControl
 			label={ __( 'Minimum height' ) }
-			value={ style?.dimensions?.minHeight }
+			value={ minHeight }
 			units={ units }
+			unit={ minHeightUnit }
 			onChange={ onChange }
 			min={ 0 }
 		/>
