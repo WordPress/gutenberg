@@ -118,18 +118,20 @@ component-parent-folder/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
-│   └── README.md
+│   ├── README.md
+│   ├── styles.ts
+│   └── types.ts
 ├── sub-component-folder/
 │   ├── index.ts
 │   ├── component.tsx
 │   ├── hook.ts
-│   └── README.md
+│   ├── README.md
+│   ├── styles.ts
+│   └── types.ts
 ├── stories
 │   └── index.js
 ├── test
 │   └── index.js
 ├── context.ts
-├── index.ts
-├── styles.ts
-└── types.ts
+└── index.ts
 ```
