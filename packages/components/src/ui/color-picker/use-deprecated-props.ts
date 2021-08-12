@@ -62,7 +62,11 @@ export interface LegacyProps {
 }
 
 function isLegacyProps( props: any ): props is LegacyProps {
-	return typeof props.onChangeComplete !== 'undefined';
+	return (
+		typeof props.onChangeComplete !== 'undefined' ||
+		typeof props.color === 'string' ||
+		typeof props.hex === 'string'
+	);
 }
 
 function getColorFromLegacyProps(

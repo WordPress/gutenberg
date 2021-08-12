@@ -13,7 +13,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { ColorPicker } from '..';
-import { LegacyAdapter } from '../legacy-adapter';
 import { Flex } from '../../../flex';
 import { Spacer } from '../../../spacer';
 import { space } from '../../utils/space';
@@ -69,7 +68,7 @@ const LegacyExample = () => {
 
 	return (
 		<Flex align="flex-start" justify="flex-start">
-			<LegacyAdapter { ...legacyProps } />
+			<ColorPicker { ...legacyProps } />
 			<pre style={ { width: '20em' } }>
 				{ JSON.stringify( legacyColor, undefined, 4 ) }
 			</pre>
