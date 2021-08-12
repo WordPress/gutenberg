@@ -75,7 +75,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $current_screen, $post, $editor_styles, $wp_styles;
+	global $current_screen, $post, $editor_styles;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
@@ -140,9 +140,9 @@ function gutenberg_edit_site_init( $hook ) {
 	// Remove wp-reset-editor-styles, as it's not needed in the iframed site editor.
 	// When the site editor is merged to Core, wp-edit-blocks can be updated to load
 	// without the styles reset for the site editor. Until then, we remove it manually.
-	if ( isset( $wp_styles->registered['wp-edit-blocks'] ) ) {
-		$wp_edit_blocks_dependencies                   = array_diff( $wp_styles->registered['wp-edit-blocks']->deps, array( 'wp-reset-editor-styles' ) );
-		$wp_styles->registered['wp-edit-blocks']->deps = $wp_edit_blocks_dependencies;
+	if ( isset( wp_styles()->registered['wp-edit-blocks'] ) ) {
+		$wp_edit_blocks_dependencies                    = array_diff( wp_styles()->registered['wp-edit-blocks']->deps, array( 'wp-reset-editor-styles' ) );
+		wp_styles()->registered['wp-edit-blocks']->deps = $wp_edit_blocks_dependencies;
 	}
 
 	/**
