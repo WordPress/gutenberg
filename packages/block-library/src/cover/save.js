@@ -39,17 +39,12 @@ export default function save( { attributes } ) {
 		overlayColor,
 		url,
 		id,
-		minHeight: minHeightProp,
-		minHeightUnit,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
 		overlayColor
 	);
 	const gradientClass = __experimentalGetGradientClass( gradient );
-	const minHeight = minHeightUnit
-		? `${ minHeightProp }${ minHeightUnit }`
-		: minHeightProp;
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -62,7 +57,6 @@ export default function save( { attributes } ) {
 			: {} ),
 		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
 		background: customGradient && ! url ? customGradient : undefined,
-		minHeight: minHeight || undefined,
 	};
 
 	const objectPosition =
