@@ -11,8 +11,9 @@ import * as styles from '../styles';
 import { useToolsPanelContext } from '../context';
 import { useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
+import type { ToolsPanelItemProps } from '../types';
 
-export function useToolsPanelItem( props ) {
+export function useToolsPanelItem( props: ToolsPanelItemProps ) {
 	const {
 		className,
 		hasValue,
@@ -28,7 +29,7 @@ export function useToolsPanelItem( props ) {
 	const cx = useCx();
 	const classes = useMemo( () => {
 		return cx( styles.ToolsPanelItem, className );
-	} );
+	}, [ styles.ToolsPanelItem, className ] );
 
 	const {
 		panelId: currentPanelId,

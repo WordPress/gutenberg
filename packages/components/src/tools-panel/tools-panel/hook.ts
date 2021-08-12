@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import * as styles from '../styles';
 import { useContextSystem } from '../../ui/context';
 import { useCx } from '../../utils/hooks/use-cx';
-import type { ToolsPanelProps, ToolPanelItem } from '../types';
+import type { ToolsPanelProps, ToolsPanelItem } from '../types';
 
 const generateMenuItems = ( { panelItems, reset } ) => {
 	const menuItems = { default: {}, optional: {} };
@@ -49,7 +49,7 @@ export function useToolsPanel( props: ToolsPanelProps ) {
 	// Allow panel items to register themselves.
 	const [ panelItems, setPanelItems ] = useState( [] );
 
-	const registerPanelItem = ( item: ToolPanelItem ) => {
+	const registerPanelItem = ( item: ToolsPanelItem ) => {
 		setPanelItems( ( items ) => [ ...items, item ] );
 	};
 
