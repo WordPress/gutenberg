@@ -108,15 +108,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 	return (
 		<div className={ classes }>
 			{ ! isMultiToolbar && ! displayHeaderToolbar && (
-				<>
-					<BlockParentSelector clientIds={ blockClientIds } />
-					{ shouldShowVisualToolbar && (
-						<BlockControls.Slot
-							group="parent"
-							className="block-editor-block-toolbar__slot"
-						/>
-					) }
-				</>
+				<BlockParentSelector clientIds={ blockClientIds } />
 			) }
 			<div ref={ nodeRef } { ...showMoversGestures }>
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
@@ -131,6 +123,10 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			</div>
 			{ shouldShowVisualToolbar && (
 				<>
+					<BlockControls.Slot
+						group="parent"
+						className="block-editor-block-toolbar__slot"
+					/>
 					<BlockControls.Slot
 						group="block"
 						className="block-editor-block-toolbar__slot"

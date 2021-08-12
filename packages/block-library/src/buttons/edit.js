@@ -59,7 +59,6 @@ function ButtonsEdit( {
 			],
 		],
 		orientation,
-		__experimentalCaptureToolbars: true,
 		__experimentalLayout: LAYOUT,
 		templateInsertUpdatesSelection: true,
 	} );

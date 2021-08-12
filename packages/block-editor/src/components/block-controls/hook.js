@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -16,9 +17,18 @@ export default function useBlockControlsFill( group, exposeToChildren ) {
 	const { clientId } = useBlockEditContext();
 	const isParentDisplayed = useSelect(
 		( select ) => {
+			const { getBlockName, hasSelectedInnerBlock } = select(
+				blockEditorStore
+			);
+			const { hasBlockSupport } = select( blocksStore );
 			return (
 				exposeToChildren &&
-				select( blockEditorStore ).hasSelectedInnerBlock( clientId )
+				hasBlockSupport(
+					getBlockName( clientId ),
+					'__experimentalCaptureToolbars',
+					false
+				) &&
+				hasSelectedInnerBlock( clientId )
 			);
 		},
 		[ exposeToChildren, clientId ]
