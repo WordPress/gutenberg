@@ -227,6 +227,11 @@
 					"customRadius": true
 				}
 			},
+			"core/cover": {
+				"dimensions": {
+					"customMinHeight": true
+				}
+			},
 			"core/pullquote": {
 				"border": {
 					"customColor": true,
