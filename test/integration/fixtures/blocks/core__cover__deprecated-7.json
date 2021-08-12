@@ -1,0 +1,73 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"hasParallax": false,
+			"isRepeated": false,
+			"dimRatio": 100,
+			"overlayColor": "purple",
+			"backgroundType": "image"
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "hi",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"originalContent": "<p class=\"has-text-align-center has-large-font-size\">hi</p>"
+			}
+		],
+		"originalContent": "<div class=\"wp-block-cover has-purple-background-color has-background-dim\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+	},
+	{
+		"clientId": "_clientId_1",
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"hasParallax": false,
+			"isRepeated": false,
+			"dimRatio": 100,
+			"overlayColor": "black",
+			"backgroundType": "image",
+			"minHeight": 363,
+			"className": "is-style-twentytwentyone-border",
+			"style": {
+				"spacing": {
+					"padding": {
+						"top": "107px",
+						"right": "107px",
+						"bottom": "107px",
+						"left": "107px"
+					}
+				}
+			}
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "Cover block pre-opacity",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"textColor": "white",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"originalContent": "<p class=\"has-text-align-center has-white-color has-text-color has-large-font-size\">Cover block pre-opacity</p>"
+			}
+		],
+		"originalContent": "<div class=\"wp-block-cover has-black-background-color has-background-dim is-style-twentytwentyone-border\" style=\"padding-top:107px;padding-right:107px;padding-bottom:107px;padding-left:107px;min-height:363px\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+	}
+]

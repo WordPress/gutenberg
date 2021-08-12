@@ -7,14 +7,12 @@
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
 			"id": 35,
 			"hasParallax": false,
-			"dimRatio": 50,
+			"dimRatio": 100,
 			"backgroundType": "image",
 			"focalPoint": {
 				"x": "0.07",
 				"y": "0.07"
-			},
-			"title": "",
-			"contentAlign": "center"
+			}
 		},
 		"innerBlocks": [
 			{

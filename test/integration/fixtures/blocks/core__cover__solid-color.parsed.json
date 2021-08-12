@@ -19,9 +19,9 @@
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-cover has-primary-background-color has-background-dim\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
+		"innerHTML": "\n<div class=\"wp-block-cover has-background-dim\">\n\t<span aria-hidden=\"true\" class=\"wp-block-cover__gradient-background has-primary-background-color\" style=\"opacity:1\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-cover has-primary-background-color has-background-dim\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
+			"\n<div class=\"wp-block-cover has-background-dim\">\n\t<span aria-hidden=\"true\" class=\"wp-block-cover__gradient-background has-primary-background-color\" style=\"opacity:1\"></span>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t",
 			null,
 			"\n\t</div>\n</div>\n"
 		]
