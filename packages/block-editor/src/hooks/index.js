@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import './align';
+import './lock';
 import './anchor';
 import './custom-class-name';
 import './generated-class-name';

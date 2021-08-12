@@ -1312,10 +1312,17 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean} Whether the given block is allowed to be removed.
  */
 export function canRemoveBlock( state, clientId, rootClientId = null ) {
-	const { lock } = getBlockAttributes( state, clientId );
+	const attributes = getBlockAttributes( state, clientId );
+
+	// attributes can be null if the block is already deleted.
+	if ( attributes === null ) {
+		return;
+	}
+
+	const { lock } = attributes;
 	const parentIsLocked = !! getTemplateLock( state, rootClientId );
 	// If we don't have a lock on the blockType level, we differ to the parent templateLock.
-	if ( lock === null || lock?.remove === undefined ) {
+	if ( lock === undefined || lock?.remove === undefined ) {
 		return ! parentIsLocked;
 	}
 
@@ -1348,10 +1355,15 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId, rootClientId = null ) {
-	const { lock } = getBlockAttributes( state, clientId );
+	const attributes = getBlockAttributes( state, clientId );
+	if ( attributes === null ) {
+		return;
+	}
+
+	const { lock } = attributes;
 	const parentIsLocked = getTemplateLock( state, rootClientId ) === 'all';
 	// If we don't have a lock on the blockType level, we differ to the parent templateLock.
-	if ( lock === null || lock?.move === undefined ) {
+	if ( lock === undefined || lock?.move === undefined ) {
 		return ! parentIsLocked;
 	}
 
