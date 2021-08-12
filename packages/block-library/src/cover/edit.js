@@ -648,7 +648,9 @@ function CoverEdit( {
 							{ [ overlayColor.class ]: overlayColor.class }
 						) }
 						style={ {
-							backgroundImage: gradientValue,
+							backgroundImage: gradientValue
+								? gradientValue
+								: undefined,
 							/**
 							 * We default to `black` background to enable the opacity of
 							 * images/videos when we haven't explicitly set any overlay color.

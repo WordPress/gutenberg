@@ -42,7 +42,7 @@ const blockAttributes = {
 	},
 	dimRatio: {
 		type: 'number',
-		default: 50,
+		default: 100,
 	},
 	overlayColor: {
 		type: 'string',
@@ -67,7 +67,10 @@ const blockAttributes = {
 
 const migrateDimRatio = ( attributes ) => {
 	if ( !! attributes.url ) {
-		return attributes;
+		return {
+			...attributes,
+			dimRatio: attributes.dimRatio ?? 50, // This is the previous default when `url` was set.
+		};
 	}
 	return { ...attributes, dimRatio: 100 };
 };
@@ -258,15 +261,6 @@ const deprecated = [
 	{
 		attributes: {
 			...blockAttributes,
-			title: {
-				type: 'string',
-				source: 'html',
-				selector: 'p',
-			},
-			contentAlign: {
-				type: 'string',
-				default: 'center',
-			},
 			isRepeated: {
 				type: 'boolean',
 				default: false,
@@ -402,15 +396,6 @@ const deprecated = [
 	{
 		attributes: {
 			...blockAttributes,
-			title: {
-				type: 'string',
-				source: 'html',
-				selector: 'p',
-			},
-			contentAlign: {
-				type: 'string',
-				default: 'center',
-			},
 			minHeight: {
 				type: 'number',
 			},
@@ -509,15 +494,6 @@ const deprecated = [
 	{
 		attributes: {
 			...blockAttributes,
-			title: {
-				type: 'string',
-				source: 'html',
-				selector: 'p',
-			},
-			contentAlign: {
-				type: 'string',
-				default: 'center',
-			},
 			minHeight: {
 				type: 'number',
 			},
