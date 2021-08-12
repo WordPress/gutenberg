@@ -140,7 +140,13 @@ export function FontSizeEdit( props ) {
 	const fontSizeValue =
 		fontSizeObject?.size || style?.typography?.fontSize || fontSize;
 
-	return <FontSizePicker onChange={ onChange } value={ fontSizeValue } />;
+	return (
+		<FontSizePicker
+			onChange={ onChange }
+			value={ fontSizeValue }
+			allowReset={ false }
+		/>
+	);
 }
 
 /**

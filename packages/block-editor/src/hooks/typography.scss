@@ -1,8 +1,19 @@
-.block-editor-block-inspector,
-.edit-site {
-	.typography-controls {
-		.block-editor-line-height-control input {
-			max-width: 100%;
+.typography-controls {
+	.block-editor-line-height-control input {
+		max-width: 100%;
+	}
+
+	.components-font-size-picker__controls {
+		.components-font-size-picker__select {
+			flex: 1;
+
+			> button {
+				width: 100%;
+			}
+		}
+
+		.components-unit-control-wrapper {
+			margin-right: 0;
 		}
 	}
 }
