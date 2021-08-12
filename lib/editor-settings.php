@@ -29,7 +29,7 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 	}
 
 	// Some blocks have to use absolute url.
-	$settings['adminUrl'] = is_callable( 'admin_url' ) ? admin_url() : '';
+	$settings['adminUrl'] = function_exists( 'admin_url' ) ? admin_url() : '';
 
 	return $settings;
 }
