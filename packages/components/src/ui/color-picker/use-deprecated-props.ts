@@ -63,7 +63,7 @@ function isLegacyProps( props: any ): props is LegacyProps {
 	return (
 		typeof props.onChangeComplete !== 'undefined' ||
 		typeof props.color === 'string' ||
-		typeof props.color.hex === 'string'
+		typeof props.color?.hex === 'string'
 	);
 }
 
