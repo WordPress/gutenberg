@@ -533,7 +533,7 @@ class BottomSheet extends Component {
 							Platform.OS === 'ios' && isFullScreen
 								? safeAreaTopInset
 								: 0,
-						flex: 1, //isFullScreen ? 1 : undefined,
+						flex: isFullScreen ? 1 : undefined,
 						...( Platform.OS === 'android' && isFullScreen
 							? styles.backgroundFullScreen
 							: {} ),
