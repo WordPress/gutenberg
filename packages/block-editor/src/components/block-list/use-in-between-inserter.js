@@ -109,10 +109,10 @@ export function useInBetweenInserter() {
 
 				// Don't show the insertion point if a parent block has an "overlay"
 				// See https://github.com/WordPress/gutenberg/pull/34012#pullrequestreview-727762337
-				const parentOverlay = element.closest(
+				const parentOverlay = element.parentElement?.closest(
 					'.block-editor-block-content-overlay.overlay-active'
 				);
-				if ( parentOverlay && element !== parentOverlay ) {
+				if ( parentOverlay ) {
 					return;
 				}
 
