@@ -7,22 +7,29 @@
 
 
 function render_block_core_widget_box( $attributes, $content, $block ) {
-	$inner_blocks = $block->inner_blocks;
+	global $wp_registered_sidebars, $_sidebar_being_rendered;
 
-	if ( empty( $inner_blocks ) ) {
-		return '';
+	if ( isset( $wp_registered_sidebars[ $_sidebar_being_rendered ] ) ) {
+		$before_title = $wp_registered_sidebars[ $_sidebar_being_rendered ]['before_title'];
+		$after_title  = $wp_registered_sidebars[ $_sidebar_being_rendered ]['after_title'];
+	} else {
+		$before_title = '<h2 class="widget-title">';
+		$after_title  = '</h2>';
 	}
 
-	$inner_blocks_html = '';
+	$html = '';
+
+	if ( ! empty( $attributes['title'] ) ) {
+		$html .= $before_title . $attributes['title'] . $after_title;
+	}
+
+	$html .= '<div class="wp-widget-box__inner-blocks">';
 	foreach ( $block->inner_blocks as $inner_block ) {
-		$inner_blocks_html .= $inner_block->render();
+		$html .= $inner_block->render();
 	}
+	$html .= '</div>';
 
-	return sprintf(
-		'<div>%1$s</div>',
-		$inner_blocks_html
-	);
-
+	return $html;
 }
 
 /**
@@ -38,3 +45,15 @@ function register_block_core_widget_box() {
 }
 
 add_action( 'init', 'register_block_core_widget_box' );
+
+function note_sidebar_being_rendered( $index ) {
+	global $_sidebar_being_rendered;
+	$_sidebar_being_rendered = $index;
+}
+add_action( 'dynamic_sidebar_before', 'note_sidebar_being_rendered' );
+
+function discard_sidebar_being_rendered( $index ) {
+	global $_sidebar_being_rendered;
+	unset( $_sidebar_being_rendered );
+}
+add_action( 'dynamic_sidebar_after', 'discard_sidebar_being_rendered' );

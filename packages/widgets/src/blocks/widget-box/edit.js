@@ -4,7 +4,6 @@
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
-	InnerBlocks,
 	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -24,14 +23,9 @@ export default function Edit( {
 
 	const { innerBlocks } = getBlock( clientId );
 
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'wp-widget-box__inner-blocks',
-		},
-		{
-			renderAppender: InnerBlocks.ButtonBlockAppender,
-		}
-	);
+	const innerBlocksProps = useInnerBlocksProps( {
+		className: 'wp-widget-box__inner-blocks',
+	} );
 
 	const blockProps = useBlockProps();
 
@@ -56,7 +50,7 @@ export default function Edit( {
 				className="widget-title"
 				tagName="h2"
 				aria-label={ __( 'Widget title' ) }
-				placeholder={ __( 'Add a Widget title' ) }
+				placeholder={ __( 'Add title' ) }
 				value={ attributes.title }
 				onChange={ ( value ) => setAttributes( { title: value } ) }
 				onReplace={ onReplace }

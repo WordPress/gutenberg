@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { group as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,8 +16,9 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Widget Box' ),
+	title: __( 'Widget Group' ),
 	description: __( 'A widget container.' ),
+	icon,
 	__experimentalLabel: ( { name: label } ) => label,
 	edit,
 	save,
