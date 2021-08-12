@@ -32,7 +32,9 @@ function mergeProps( defaultProps = {}, props = {} ) {
 
 	return mergedProps;
 }
-
+/**
+ * @param {import('./types').Props} props
+ */
 function DropdownMenu( {
 	children,
 	className,
