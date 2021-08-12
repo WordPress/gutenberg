@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.58.3
+-   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
+
 ## 1.58.2
 -   [*] Fix issue with text input in alt text settings [#33845]
 
