@@ -21,7 +21,8 @@ import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	__experimentalBlockContentOverlay as BlockContentOverlay,
-	BlockHasDot,
+	__experimentalParentBlockSelectorUnsavedChangesIndicator as ParentBlockSelectorUnsavedChangesIndicator,
+	__experimentalSelectedBlockUnsavedChangesIndicator as SelectedBlockUnsavedChangesIndicator,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
@@ -70,34 +71,20 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		[ ref, clientId ]
 	);
 
-	const {
-		parentReusableBlockHasEdits,
-		selectedReusableBlockHasEdits,
-	} = useSelect( ( select ) => {
-		const {
-			getBlockParents,
-			getSelectedBlockClientId,
-			getBlockAttributes,
-		} = select( blockEditorStore );
+	const { isChildSelected, isSelected } = useSelect( ( select ) => {
+		const { getBlockParents, getSelectedBlockClientId } = select(
+			blockEditorStore
+		);
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const _selectedBlockRef = getBlockAttributes( selectedBlockClientId )
-			?.ref;
-		// check if the selected reusable block has edits
-		const _selectedblockHasEdits = select(
-			coreStore
-		).hasEditsForEntityRecord( 'postType', 'wp_block', _selectedBlockRef );
+		const _isSelected = selectedBlockClientId === clientId;
 
 		const parents = getBlockParents( selectedBlockClientId );
-		const _firstParentClientId = parents[ parents.length - 1 ];
-		const _parentBlockRef = getBlockAttributes( _firstParentClientId )?.ref;
-		// check if the parent reusable block has edits
-		const _parentblockHasEdits = select(
-			coreStore
-		).hasEditsForEntityRecord( 'postType', 'wp_block', _parentBlockRef );
+		const firstParentClientId = parents[ parents.length - 1 ];
+		const _isChildSelected = firstParentClientId === clientId;
 
 		return {
-			parentReusableBlockHasEdits: _parentblockHasEdits,
-			selectedReusableBlockHasEdits: _selectedblockHasEdits,
+			isChildSelected: _isChildSelected,
+			isSelected: _isSelected,
 		};
 	}, [] );
 
@@ -189,13 +176,14 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 	return (
 		<RecursionProvider>
 			<div { ...blockProps }>
-				{ /* Adds a dot to the parent selector and the reusable block toolbar when Reusable block has edits. */ }
-				<BlockHasDot
-					parentReusableBlockHasEdits={ parentReusableBlockHasEdits }
-					selectedReusableBlockHasEdits={
-						selectedReusableBlockHasEdits
-					}
-				/>
+				{ isSelected && hasEdits && (
+					<SelectedBlockUnsavedChangesIndicator />
+				) }
+
+				{ isChildSelected && hasEdits && (
+					<ParentBlockSelectorUnsavedChangesIndicator />
+				) }
+
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton

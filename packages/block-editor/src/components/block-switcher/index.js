@@ -22,7 +22,6 @@ import {
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { stack } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -33,7 +32,6 @@ import BlockIcon from '../block-icon';
 import BlockTitle from '../block-title';
 import BlockTransformationsMenu from './block-transformations-menu';
 import BlockStylesMenu from './block-styles-menu';
-import PatternTransformationsMenu from './pattern-transformations-menu';
 
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
@@ -43,14 +41,12 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		hasBlockStyles,
 		icon,
 		blockTitle,
-		patterns,
 	} = useSelect(
 		( select ) => {
-			const {
-				getBlockRootClientId,
-				getBlockTransformItems,
-				__experimentalGetPatternTransformItems,
-			} = select( blockEditorStore );
+			const { getBlockRootClientId, getBlockTransformItems } = select(
+				blockEditorStore
+			);
+
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
 				castArray( clientIds )[ 0 ]
@@ -71,6 +67,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					? getBlockType( firstBlockName )?.icon
 					: stack;
 			}
+
 			return {
 				possibleBlockTransformations: getBlockTransformItems(
 					blocks,
@@ -79,10 +76,6 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
 				blockTitle: getBlockType( firstBlockName ).title,
-				patterns: __experimentalGetPatternTransformItems(
-					blocks,
-					rootClientId
-				),
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]
@@ -91,17 +84,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
-	// states to add dot to the reusable block toolbar, if the reusable block has changes
-	const [ reusableBlockHasDot, setReusableBlockHasDot ] = useState( false );
-
-	// Simple block tranformation based on the `Block Transforms` API.
-	const onBlockTransform = ( name ) =>
+	const onTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
-	// Pattern transformation through the `Patterns` API.
-	const onPatternTransform = ( transformedBlocks ) =>
-		replaceBlocks( clientIds, transformedBlocks );
 	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
-	const hasPatternTransformation = !! patterns?.length;
 	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 		return (
 			<ToolbarGroup>
@@ -119,13 +104,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 
 	const blockSwitcherDescription =
 		1 === blocks.length
-			? sprintf(
-					/* translators: %s: block title. */
-					__( '%s: Change block type or style' ),
-					blockTitle
-			  )
+			? __( 'Change block type or style' )
 			: sprintf(
-					/* translators: %d: number of blocks. */
+					/* translators: %s: number of blocks. */
 					_n(
 						'Change type of %d block',
 						'Change type of %d blocks',
@@ -133,11 +114,6 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					),
 					blocks.length
 			  );
-
-	const showDropDown =
-		hasBlockStyles ||
-		hasPossibleBlockTransformations ||
-		hasPatternTransformation;
 
 	return (
 		<ToolbarGroup>
@@ -153,18 +129,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						} }
 						icon={
 							<>
-								{ /* Update the reusableBlockHasDot state in BlockHasDot using Slot/Fill to update to add dot to reusable block toolbar if it has edit.  */ }
-								<Slot
-									name="reusable-block-toolbar-has-dot"
-									fillProps={ {
-										setReusableBlockHasDot,
-									} }
-								></Slot>
-								{ /* Add dot to the reusable block toolbar if resuable block has edits. */ }
-								{ isReusable && reusableBlockHasDot && (
-									<div className="reusable-block-toolbar-has-dot"></div>
+								{ isReusable && (
+									<Slot name="block-unsaved-changes-indicator" />
 								) }
-
 								<BlockIcon
 									icon={ icon }
 									className="block-editor-block-switcher__toggle"
@@ -184,22 +151,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						menuProps={ { orientation: 'both' } }
 					>
 						{ ( { onClose } ) =>
-							showDropDown && (
+							( hasBlockStyles ||
+								hasPossibleBlockTransformations ) && (
 								<div className="block-editor-block-switcher__container">
-									{ hasPatternTransformation && (
-										<PatternTransformationsMenu
-											blocks={ blocks }
-											patterns={ patterns }
-											onSelect={ (
-												transformedBlocks
-											) => {
-												onPatternTransform(
-													transformedBlocks
-												);
-												onClose();
-											} }
-										/>
-									) }
 									{ hasPossibleBlockTransformations && (
 										<BlockTransformationsMenu
 											className="block-editor-block-switcher__transforms__menugroup"
@@ -208,7 +162,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 											}
 											blocks={ blocks }
 											onSelect={ ( name ) => {
-												onBlockTransform( name );
+												onTransform( name );
 												onClose();
 											} }
 										/>

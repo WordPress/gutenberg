@@ -1,8 +1,8 @@
 .block-editor-block-switcher {
 	position: relative;
 
-	// Show dot before the block switcher in reusable block toolbar if reusable block has edits
-	.reusable-block-toolbar-has-dot {
+	// Show dot before the block switcher in block toolbar if block has edits
+	.block-unsaved-changes-indicator {
 		position: relative;
 		background: var(--wp-admin-theme-color);
 		border-radius: 4px;

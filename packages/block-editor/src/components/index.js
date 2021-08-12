@@ -110,7 +110,8 @@ export { default as BlockSettingsMenuControls } from './block-settings-menu-cont
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as BlockTools } from './block-tools';
-export { default as BlockHasDot } from './block-has-dot';
+export { default as __experimentalParentBlockSelectorUnsavedChangesIndicator } from './block-unsaved-changes-indicator/parent-block-selector-unsaved-changes-indicator';
+export { default as __experimentalSelectedBlockUnsavedChangesIndicator } from './block-unsaved-changes-indicator/selected-block-unsaved-changes-indicator';
 export {
 	default as CopyHandler,
 	useClipboardHandler as __unstableUseClipboardHandler,

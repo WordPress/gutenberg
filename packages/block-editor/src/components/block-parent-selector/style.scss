@@ -10,7 +10,7 @@
 	}
 }
 
-// styles for parent block selector when reusable block has changes
+// styles for parent block selector when parent block has changes
 .block-editor-block-parent-selector.parent-block-has-changes {
 	left: calc(-#{$grid-unit-60} - #{$grid-unit-30} - #{$border-width});
 
@@ -25,7 +25,7 @@
 	}
 
 	// add the dot before the parent selector icon
-	.block-parent-selector-has-dot {
+	.parent-block-selector-unsaved-changes-indicator {
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
@@ -33,6 +33,7 @@
 		border-radius: 4px;
 		height: 8px;
 		width: 8px;
-		margin-left: 12px;
+		margin: 0 12px;
 	}
 }
+

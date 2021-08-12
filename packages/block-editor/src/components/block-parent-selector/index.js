@@ -1,16 +1,11 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton, Slot } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef, useState } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,7 +40,6 @@ export default function BlockParentSelector() {
 			const parentBlockName = getBlockName( _firstParentClientId );
 			const _parentBlockType = getBlockType( parentBlockName );
 			const settings = getSettings();
-
 			return {
 				firstParentClientId: _firstParentClientId,
 				shouldHide: ! hasBlockSupport(
@@ -73,38 +67,18 @@ export default function BlockParentSelector() {
 		},
 	} );
 
-	// states to check reusable block edits
-	const [ reusableBlockHasEdits, setReusableBlockHasEdits ] = useState(
-		false
-	);
-
 	if ( shouldHide || firstParentClientId === undefined ) {
 		return null;
 	}
 
-	const classes = classnames( 'block-editor-block-parent-selector', {
-		'parent-block-has-changes': reusableBlockHasEdits,
-	} );
-
 	return (
 		<div
-			className={ classes }
+			className="block-editor-block-parent-selector"
 			key={ firstParentClientId }
 			ref={ nodeRef }
 			{ ...showMoversGestures }
 		>
-			{ /* Update the reusableBlockHasEdits state in BlockHasDot using Slot/Fill to update the parent-selector classes and to add dot to parent selector.  */ }
-			<Slot
-				name="parent-selector-has-dot"
-				fillProps={ {
-					setReusableBlockHasEdits,
-				} }
-			></Slot>
-			{ /* Add dot to the parent selector if it is a reusable block and if the reusable block has edits. */ }
-			{ reusableBlockHasEdits && (
-				<div className="block-parent-selector-has-dot"></div>
-			) }
-
+			<Slot name="parent-block-selector-unsaved-changes-indicator" />
 			<ToolbarButton
 				className="block-editor-block-parent-selector__button"
 				onClick={ () => selectBlock( firstParentClientId ) }
