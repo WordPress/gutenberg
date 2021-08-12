@@ -20,7 +20,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 		return select( blockEditorStore ).getSettings();
 	}, [] );
 
-	const widgetPreviewUrl = settings.wpAbsoluteAdminUrl + 'widgets.php';
+	const widgetPreviewUrl = settings.adminUrl + 'widgets.php';
 	const widgetPreviewUrlQueryParameters = {
 		'legacy-widget-preview': { idBase, instance },
 	};
