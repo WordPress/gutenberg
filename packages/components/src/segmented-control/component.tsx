@@ -10,7 +10,7 @@ import useResizeAware from 'react-resize-aware';
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useMemo } from '@wordpress/element';
-import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,12 +29,6 @@ import type { SegmentedControlProps } from './types';
 import SegmentedControlContext from './segmented-control-context';
 
 const noop = () => {};
-function useUniqueId( idProp?: string ) {
-	const instanceId = useInstanceId( SegmentedControl );
-	const id = `inspector-select-control-${ instanceId }`;
-
-	return idProp || id;
-}
 
 function SegmentedControl(
 	props: PolymorphicComponentProps< SegmentedControlProps, 'input' >,
@@ -45,7 +39,7 @@ function SegmentedControl(
 		baseId,
 		isAdaptiveWidth = false,
 		isBlock = false,
-		id: idProp,
+		id,
 		label,
 		hideLabelFromVision = false,
 		help,
@@ -58,7 +52,6 @@ function SegmentedControl(
 	const containerRef = useRef();
 	const [ resizeListener, sizes ] = useResizeAware();
 
-	const id = useUniqueId( idProp );
 	const radio = useRadioState( {
 		baseId: baseId || id,
 		state: value,
@@ -87,7 +80,7 @@ function SegmentedControl(
 		[ className, isBlock ]
 	);
 	return (
-		<BaseControl aria-label={ label } help={ help } id={ id }>
+		<BaseControl help={ help }>
 			<SegmentedControlContext.Provider
 				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
 			>
