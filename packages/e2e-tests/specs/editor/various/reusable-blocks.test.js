@@ -205,7 +205,7 @@ describe( 'Reusable blocks', () => {
 		await clearAllBlocks();
 		await insertReusableBlock( 'Random reusable block' );
 
-		await visitAdminPage( 'edit.php', [ 'post_type=wp_block' ] );
+		await visitAdminPage( 'edit.php', 'post_type=wp_block' );
 
 		const [ editButton ] = await page.$x(
 			`//a[contains(@aria-label, 'Random reusable block')]`
