@@ -28,6 +28,7 @@ export default function PostCommentsCountEdit( {
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
+			[ `comments-count-${ commentsCount }` ]: commentsCount,
 		} ),
 	} );
 
