@@ -68,7 +68,7 @@ function getQueriedItemsUncached( state, query ) {
 		}
 
 		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
-			return null;
+			continue;
 		}
 
 		const item = state.items[ context ][ itemId ];
