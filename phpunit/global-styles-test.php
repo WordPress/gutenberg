@@ -23,6 +23,6 @@ class WP_Global_Styles_Test extends WP_UnitTestCase {
 		}';
 
 		$filtered_user_theme_json = gutenberg_global_styles_filter_post( $user_theme_json );
-		$this->assertEqual( $user_theme_json, $filtered_user_theme_json );
+		$this->assertEquals( $user_theme_json, $filtered_user_theme_json );
 	}
 }
