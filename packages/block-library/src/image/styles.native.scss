@@ -31,16 +31,21 @@
 	padding-bottom: $grid-unit;
 }
 
+.featuredImagePanelTitle {
+	padding-bottom: 0;
+}
+
+.setFeaturedButtonCellContainer {
+	align-items: flex-start;
+}
+
 .setFeaturedButton {
-	border-top-width: $border-width;
-	border-top-color: $light-gray-400;
-	padding: $grid-unit-20;
-	text-align: center;
+	text-align: left;
 	color: $blue-50;
+	padding: $grid-unit-15 0;
 }
 
 .setFeaturedButtonDark {
-	border-top-color: $gray-70;
 	color: $blue-30;
 }
 

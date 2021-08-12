@@ -3,6 +3,7 @@
  */
 import { basename, join } from 'path';
 import { writeFileSync } from 'fs';
+import { sum } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,12 +32,15 @@ jest.setTimeout( 1000000 );
 
 describe( 'Post Editor Performance', () => {
 	it( 'Loading, typing and selecting blocks', async () => {
+		const traceFile = __dirname + '/trace.json';
+		let traceResults;
 		const results = {
 			load: [],
 			type: [],
 			focus: [],
 			inserterOpen: [],
 			inserterHover: [],
+			inserterSearch: [],
 		};
 
 		const html = readFile(
@@ -60,9 +64,8 @@ describe( 'Post Editor Performance', () => {
 		}, html );
 		await saveDraft();
 
-		let i = 5;
-
 		// Measuring loading time
+		let i = 5;
 		while ( i-- ) {
 			const startTime = new Date();
 			await page.reload();
@@ -72,8 +75,6 @@ describe( 'Post Editor Performance', () => {
 
 		// Measure time to open inserter
 		await page.waitForSelector( '.edit-post-layout' );
-		const traceFile = __dirname + '/trace.json';
-		let traceResults;
 		for ( let j = 0; j < 10; j++ ) {
 			await page.tracing.start( {
 				path: traceFile,
@@ -82,7 +83,6 @@ describe( 'Post Editor Performance', () => {
 			} );
 			await openGlobalBlockInserter();
 			await page.tracing.stop();
-
 			traceResults = JSON.parse( readFile( traceFile ) );
 			const [ mouseClickEvents ] = getClickEventDurations( traceResults );
 			for ( let k = 0; k < mouseClickEvents.length; k++ ) {
@@ -90,6 +90,39 @@ describe( 'Post Editor Performance', () => {
 			}
 			await closeGlobalBlockInserter();
 		}
+
+		// Measure time to search the inserter and get results
+		await openGlobalBlockInserter();
+		for ( let j = 0; j < 10; j++ ) {
+			// Wait for the browser to be idle before starting the monitoring.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 500 );
+			await page.tracing.start( {
+				path: traceFile,
+				screenshots: false,
+				categories: [ 'devtools.timeline' ],
+			} );
+			await page.keyboard.type( 'p' );
+			await page.tracing.stop();
+			traceResults = JSON.parse( readFile( traceFile ) );
+			const [
+				keyDownEvents,
+				keyPressEvents,
+				keyUpEvents,
+			] = getTypingEventDurations( traceResults );
+			if (
+				keyDownEvents.length === keyPressEvents.length &&
+				keyPressEvents.length === keyUpEvents.length
+			) {
+				results.inserterSearch.push(
+					sum( keyDownEvents ) +
+						sum( keyPressEvents ) +
+						sum( keyUpEvents )
+				);
+			}
+			await page.keyboard.press( 'Backspace' );
+		}
+		await closeGlobalBlockInserter();
 
 		// Measure inserter hover performance
 		const paragraphBlockItem =
@@ -100,7 +133,10 @@ describe( 'Post Editor Performance', () => {
 		await page.waitForSelector( paragraphBlockItem );
 		await page.hover( paragraphBlockItem );
 		await page.hover( headingBlockItem );
-		for ( let j = 0; j < 20; j++ ) {
+		for ( let j = 0; j < 10; j++ ) {
+			// Wait for the browser to be idle before starting the monitoring.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 200 );
 			await page.tracing.start( {
 				path: traceFile,
 				screenshots: false,
@@ -124,16 +160,18 @@ describe( 'Post Editor Performance', () => {
 
 		// Measuring typing performance
 		await insertBlock( 'Paragraph' );
-		i = 200;
+		i = 20;
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
 		while ( i-- ) {
+			// Wait for the browser to be idle before starting the monitoring.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 200 );
 			await page.keyboard.type( 'x' );
 		}
-
 		await page.tracing.stop();
 		traceResults = JSON.parse( readFile( traceFile ) );
 		const [
@@ -141,7 +179,6 @@ describe( 'Post Editor Performance', () => {
 			keyPressEvents,
 			keyUpEvents,
 		] = getTypingEventDurations( traceResults );
-
 		if (
 			keyDownEvents.length === keyPressEvents.length &&
 			keyPressEvents.length === keyUpEvents.length
@@ -163,31 +200,29 @@ describe( 'Post Editor Performance', () => {
 				.map( () => createBlock( 'core/paragraph' ) );
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
-
 		const paragraphs = await page.$$( '.wp-block' );
-
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
-		for ( let j = 0; j < 10; j++ ) {
+		await paragraphs[ 0 ].click();
+		for ( let j = 1; j <= 10; j++ ) {
+			// Wait for the browser to be idle before starting the monitoring.
+			// eslint-disable-next-line no-restricted-syntax
+			await page.waitForTimeout( 200 );
 			await paragraphs[ j ].click();
 		}
-
 		await page.tracing.stop();
-
 		traceResults = JSON.parse( readFile( traceFile ) );
 		const [ focusEvents ] = getSelectionEventDurations( traceResults );
 		results.focus = focusEvents;
 
 		const resultsFilename = basename( __filename, '.js' ) + '.results.json';
-
 		writeFileSync(
 			join( __dirname, resultsFilename ),
 			JSON.stringify( results, null, 2 )
 		);
-
 		deleteFile( traceFile );
 
 		expect( true ).toBe( true );

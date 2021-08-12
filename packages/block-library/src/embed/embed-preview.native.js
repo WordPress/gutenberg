@@ -3,6 +3,7 @@
  */
 import { TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
+import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
@@ -23,12 +24,12 @@ import styles from './styles.scss';
 
 const EmbedPreview = ( {
 	align,
+	className,
 	clientId,
 	icon,
 	insertBlocksAfter,
 	isSelected,
 	label,
-	onBlur,
 	onFocus,
 	preview,
 	previewable,
@@ -69,7 +70,7 @@ const EmbedPreview = ( {
 		}
 	}
 
-	const { scripts, provider_url: providerUrl } = preview;
+	const { provider_url: providerUrl } = preview;
 	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
 	const parsedHost = new URL( url ).host.split( '.' );
 	const parsedHostBaseUrl = parsedHost
@@ -79,6 +80,11 @@ const EmbedPreview = ( {
 		// translators: %s: host providing embed content e.g: www.youtube.com
 		__( 'Embedded content from %s' ),
 		parsedHostBaseUrl
+	);
+	const sandboxClassnames = classnames(
+		type,
+		className,
+		'wp-block-embed__wrapper'
 	);
 
 	const embedWrapper =
@@ -101,9 +107,10 @@ const EmbedPreview = ( {
 					>
 						<SandBox
 							html={ html }
-							scripts={ scripts }
 							title={ iframeTitle }
+							type={ sandboxClassnames }
 							providerUrl={ providerUrl }
+							url={ url }
 							containerStyle={ sandboxAlignStyle }
 						/>
 					</View>
@@ -137,7 +144,6 @@ const EmbedPreview = ( {
 					clientId={ clientId }
 					insertBlocksAfter={ insertBlocksAfter }
 					isSelected={ isCaptionSelected }
-					onBlur={ onBlur }
 					onFocus={ onFocusCaption }
 				/>
 			</View>

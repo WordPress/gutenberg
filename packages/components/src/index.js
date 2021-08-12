@@ -16,6 +16,7 @@ export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
+export { __unstableMotion } from './animation';
 export { default as AnglePickerControl } from './angle-picker-control';
 export {
 	default as Autocomplete,
@@ -137,6 +138,10 @@ export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
+export {
+	ToolsPanel as __experimentalToolsPanel,
+	ToolsPanelItem as __experimentalToolsPanelItem,
+} from './tools-panel';
 export { default as Tooltip } from './tooltip';
 export {
 	default as __experimentalTreeGrid,

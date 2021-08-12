@@ -26,7 +26,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 
 	if ( $can_use_cached ) {
 		// Check if we have the styles already cached.
-		$cached = get_transient( 'global_styles' );
+		$cached = get_transient( 'gutenberg_global_styles' );
 		if ( $cached ) {
 			return $cached;
 		}
@@ -37,7 +37,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 	if ( $can_use_cached ) {
 		// Cache for a minute.
 		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
-		set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
+		set_transient( 'gutenberg_global_styles', $stylesheet, MINUTE_IN_SECONDS );
 	}
 
 	return $stylesheet;
