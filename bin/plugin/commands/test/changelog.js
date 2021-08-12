@@ -13,7 +13,9 @@ import {
 	getTypesByLabels,
 	getTypesByTitle,
 	getIssueFeature,
+	formatChangelog,
 } from '../changelog';
+import pullRequests from './fixtures/pull-requests.json';
 
 describe( 'getNormalizedTitle', () => {
 	const DEFAULT_ISSUE = {
@@ -310,5 +312,11 @@ describe( 'getTypesByTitle', () => {
 		const result = getTypesByTitle( title );
 
 		expect( result ).toEqual( [ 'Bug Fixes' ] );
+	} );
+} );
+
+describe( 'formatChangelog', () => {
+	test( 'verify that the changelog is properly formatted', () => {
+		expect( formatChangelog( pullRequests ) ).toMatchSnapshot();
 	} );
 } );
