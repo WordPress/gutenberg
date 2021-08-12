@@ -6,6 +6,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
+	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
@@ -38,9 +39,9 @@ function useHasMargin( { name, supports } ) {
 }
 
 function useHasGap( { name, supports } ) {
-	const settings = useSetting( 'spacing.customGap', name );
+	const settings = useSetting( 'spacing.customBlockGap', name );
 
-	return settings && supports.includes( '--wp--theme--block-gap' );
+	return settings && supports.includes( '--wp--style--block-gap' );
 }
 
 function filterValuesBySides( values, sides ) {
@@ -66,26 +67,6 @@ function filterValuesBySides( values, sides ) {
 	return filteredValues;
 }
 
-function filterGapValuesBySides( values, sides ) {
-	if ( ! sides ) {
-		return {
-			row: values?.top,
-			column: values?.left,
-		};
-	}
-
-	const filteredValues = {};
-
-	sides.forEach( ( side ) => {
-		if ( side === 'horizontal' ) {
-			filteredValues.column = values?.left;
-		}
-		if ( side === 'vertical' ) {
-			filteredValues.row = values?.top;
-		}
-	} );
-}
-
 function splitStyleValue( value ) {
 	// Check for shorthand value ( a string value ).
 	if ( value && typeof value === 'string' ) {
@@ -99,26 +80,6 @@ function splitStyleValue( value ) {
 	}
 
 	return value;
-}
-
-function splitGapStyleValue( value ) {
-	// Check for shorthand value ( a string value ).
-	if ( value && typeof value === 'string' ) {
-		return {
-			top: value,
-			right: value,
-			bottom: value,
-			left: value,
-		};
-	}
-
-	// Convert rows and columns to individual side values.
-	return {
-		top: value?.row,
-		right: value?.column,
-		bottom: value?.row,
-		left: value?.column,
-	};
 }
 
 export default function DimensionsPanel( { context, getStyle, setStyle } ) {
@@ -164,17 +125,13 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 	const hasMarginValue = () =>
 		marginValues && Object.keys( marginValues ).length;
 
-	const gapValues = splitGapStyleValue(
-		getStyle( name, '--wp--theme--block-gap' )
-	);
-	const gapSides = useCustomSides( name, '--wp--theme--block-gap' );
+	const gapValue = getStyle( name, '--wp--style--block-gap' );
 
-	const setGapValues = ( newGapValues ) => {
-		const gap = filterGapValuesBySides( newGapValues, gapSides );
-		setStyle( name, '--wp--theme--block-gap', gap );
+	const setGapValue = ( newGapValue ) => {
+		setStyle( name, '--wp--style--block-gap', newGapValue );
 	};
-	const resetGapValue = () => setGapValues( {} );
-	const hasGapValue = () => gapValues && Object.keys( gapValues ).length;
+	const resetGapValue = () => setGapValue( undefined );
+	const hasGapValue = () => !! gapValue;
 
 	const resetAll = () => {
 		resetPaddingValue();
@@ -231,14 +188,12 @@ export default function DimensionsPanel( { context, getStyle, setStyle } ) {
 					onDeselect={ resetGapValue }
 					isShownByDefault={ true }
 				>
-					<BoxControl
-						values={ gapValues }
-						onChange={ setGapValues }
+					<UnitControl
 						label={ __( 'Gap' ) }
-						sides={ gapSides }
+						value={ gapValue }
 						units={ units }
-						allowReset={ false }
-						splitOnAxis={ true }
+						onChange={ setGapValue }
+						min={ 0 }
 					/>
 				</ToolsPanelItem>
 			) }

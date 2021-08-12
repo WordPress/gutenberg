@@ -72,7 +72,7 @@ export function DimensionsPanel( props ) {
 				...style,
 				spacing: {
 					...style?.spacing,
-					gap: undefined,
+					blockGap: undefined,
 					margin: undefined,
 					padding: undefined,
 				},
@@ -112,7 +112,7 @@ export function DimensionsPanel( props ) {
 						hasValue={ () => hasGapValue( props ) }
 						label={ __( 'Gap' ) }
 						onDeselect={ () => resetGap( props ) }
-						isShownByDefault={ defaultSpacingControls?.gap }
+						isShownByDefault={ defaultSpacingControls?.blockGap }
 					>
 						<GapEdit { ...props } />
 					</ToolsPanelItem>

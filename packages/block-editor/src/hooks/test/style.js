@@ -24,13 +24,13 @@ describe( 'getInlineStyles', () => {
 					color: '#21759b',
 				},
 				spacing: {
-					gap: { row: '1em' },
+					blockGap: { row: '1em' },
 					padding: { top: '10px' },
 					margin: { bottom: '15px' },
 				},
 			} )
 		).toEqual( {
-			'--wp--theme--block-row-gap': '1em',
+			'--wp--style--block-gap': '1em',
 			backgroundColor: 'black',
 			borderColor: '#21759b',
 			borderRadius: '10px',
@@ -68,10 +68,6 @@ describe( 'getInlineStyles', () => {
 		expect(
 			getInlineStyles( {
 				spacing: {
-					gap: {
-						column: '5px',
-						row: '1em',
-					},
 					margin: {
 						top: '10px',
 						right: '0.5rem',
@@ -87,8 +83,6 @@ describe( 'getInlineStyles', () => {
 				},
 			} )
 		).toEqual( {
-			'--wp--theme--block-column-gap': '5px',
-			'--wp--theme--block-row-gap': '1em',
 			marginTop: '10px',
 			marginRight: '0.5rem',
 			marginBottom: '0.5em',
@@ -104,13 +98,13 @@ describe( 'getInlineStyles', () => {
 		expect(
 			getInlineStyles( {
 				spacing: {
-					gap: '1em',
+					blockGap: '1em',
 					margin: '10px',
 					padding: '20px',
 				},
 			} )
 		).toEqual( {
-			'--wp--theme--block-gap': '1em',
+			'--wp--style--block-gap': '1em',
 			margin: '10px',
 			padding: '20px',
 		} );

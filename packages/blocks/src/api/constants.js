@@ -72,13 +72,9 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'typography', 'fontWeight' ],
 		support: [ 'typography', '__experimentalFontWeight' ],
 	},
-	'--wp--theme--block-gap': {
-		value: [ 'spacing', 'gap' ],
-		support: [ 'spacing', 'gap' ],
-		properties: {
-			'--wp--theme--block-column-gap': 'column',
-			'--wp--theme--block-row-gap': 'row',
-		},
+	'--wp--style--block-gap': {
+		value: [ 'spacing', 'blockGap' ],
+		support: [ 'spacing', 'blockGap' ],
 	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],

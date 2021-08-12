@@ -55,14 +55,10 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
 	// Width support to be added in near future.
 
 	if ( $has_gap_support ) {
-		$gap_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'gap' ), null );
+		$gap_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'blockGap' ), null );
 
-		if ( is_array( $gap_value ) ) {
-			foreach ( $gap_value as $key => $value ) {
-				$styles[] = sprintf( '--wp--theme--block-%s-gap: %s', $key, $value );
-			}
-		} elseif ( null !== $gap_value )  {
-			$styles[] = sprintf( '--wp--theme--block-: %s', $gap_value );
+		if ( is_string( $gap_value ) ) {
+			$styles[] = sprintf( '--wp--style--block-gap: %s', $gap_value );
 		}
 	}
 

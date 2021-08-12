@@ -6,14 +6,14 @@ import { Platform } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalBoxControl as BoxControl,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import useSetting from '../components/use-setting';
-import { SPACING_SUPPORT_KEY, useCustomSides } from './dimensions';
+import { SPACING_SUPPORT_KEY } from './dimensions';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -24,7 +24,7 @@ import { cleanEmptyObject } from './utils';
  */
 export function hasGapSupport( blockType ) {
 	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
-	return !! ( true === support || support?.gap );
+	return !! ( true === support || support?.blockGap );
 }
 
 /**
@@ -34,7 +34,7 @@ export function hasGapSupport( blockType ) {
  * @return {boolean}      Whether or not the block has a gap value set.
  */
 export function hasGapValue( props ) {
-	return props.attributes.style?.spacing?.gap !== undefined;
+	return props.attributes.style?.spacing?.blockGap !== undefined;
 }
 
 /**
@@ -53,7 +53,7 @@ export function resetGap( { attributes = {}, setAttributes } ) {
 			...style,
 			spacing: {
 				...style?.spacing,
-				gap: undefined,
+				blockGap: undefined,
 			},
 		},
 	} );
@@ -66,7 +66,7 @@ export function resetGap( { attributes = {}, setAttributes } ) {
  * @return {boolean}     Whether the gap setting is disabled.
  */
 export function useIsGapDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'spacing.customGap' );
+	const isDisabled = ! useSetting( 'spacing.customBlockGap' );
 	return ! hasGapSupport( blockName ) || isDisabled;
 }
 
@@ -79,7 +79,6 @@ export function useIsGapDisabled( { name: blockName } = {} ) {
  */
 export function GapEdit( props ) {
 	const {
-		name: blockName,
 		attributes: { style },
 		setAttributes,
 	} = props;
@@ -93,7 +92,6 @@ export function GapEdit( props ) {
 			'vw',
 		],
 	} );
-	const sides = useCustomSides( blockName, 'gap' );
 
 	if ( useIsGapDisabled( props ) ) {
 		return null;
@@ -104,47 +102,24 @@ export function GapEdit( props ) {
 			...style,
 			spacing: {
 				...style?.spacing,
-				gap: { row: next?.top, column: next?.left },
+				blockGap: next,
 			},
 		};
 
 		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
 		} );
-	};
-
-	const onChangeShowVisualizer = ( next ) => {
-		const newStyle = {
-			...style,
-			visualizers: {
-				gap: { row: next?.top, column: next?.left },
-			},
-		};
-
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
-
-	const boxValues = {
-		top: style?.spacing?.gap?.row,
-		right: style?.spacing?.gap?.column,
-		bottom: style?.spacing?.gap?.row,
-		left: style?.spacing?.gap?.column,
 	};
 
 	return Platform.select( {
 		web: (
 			<>
-				<BoxControl
-					values={ boxValues }
-					onChange={ onChange }
-					onChangeShowVisualizer={ onChangeShowVisualizer }
+				<UnitControl
 					label={ __( 'Gap' ) }
-					sides={ sides }
+					value={ style?.spacing?.blockGap }
 					units={ units }
-					allowReset={ false }
-					splitOnAxis={ true }
+					onChange={ onChange }
+					min={ 0 }
 				/>
 			</>
 		),

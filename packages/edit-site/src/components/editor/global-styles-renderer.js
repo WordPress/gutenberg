@@ -159,9 +159,7 @@ function getStylesDeclarations( blockStyles = {} ) {
 						return;
 					}
 
-					const cssProperty = name.startsWith( '--' )
-						? name
-						: kebabCase( name );
+					const cssProperty = kebabCase( name );
 					declarations.push(
 						`${ cssProperty }: ${ compileStyleValue(
 							get( styleValue, [ prop ] )
