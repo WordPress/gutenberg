@@ -28,7 +28,6 @@ function DuotoneControl( {
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
-			event.stopPropagation();
 			onToggle();
 		}
 	};

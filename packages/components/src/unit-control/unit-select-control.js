@@ -31,7 +31,7 @@ export default function UnitSelectControl( {
 	value = 'px',
 	...props
 } ) {
-	if ( ! hasUnits( options ) ) {
+	if ( ! hasUnits( options ) || options.length === 1 ) {
 		return (
 			<UnitLabel
 				className="components-unit-control__unit-label"

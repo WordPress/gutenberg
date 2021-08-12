@@ -88,6 +88,7 @@ export default function SidebarBlockEditor( {
 		blockEditorSettings,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
+		setIsInserterOpened,
 	] );
 
 	if ( isWelcomeGuideActive ) {
@@ -100,7 +101,6 @@ export default function SidebarBlockEditor( {
 			<KeyboardShortcuts.Register />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
-				<BlockEditorKeyboardShortcuts />
 				<KeyboardShortcuts
 					undo={ sidebar.undo }
 					redo={ sidebar.redo }

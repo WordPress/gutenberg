@@ -7,6 +7,7 @@ import { SlotFillProvider, Popover } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import ErrorBoundary from '../error-boundary';
 import SidebarBlockEditor from '../sidebar-block-editor';
 import FocusControl from '../focus-control';
 import SidebarControls from '../sidebar-controls';
@@ -42,13 +43,15 @@ export default function CustomizeWidgets( {
 	const activeSidebar =
 		activeSidebarControl &&
 		createPortal(
-			<SidebarBlockEditor
-				key={ activeSidebarControl.id }
-				blockEditorSettings={ blockEditorSettings }
-				sidebar={ activeSidebarControl.sidebarAdapter }
-				inserter={ activeSidebarControl.inserter }
-				inspector={ activeSidebarControl.inspector }
-			/>,
+			<ErrorBoundary>
+				<SidebarBlockEditor
+					key={ activeSidebarControl.id }
+					blockEditorSettings={ blockEditorSettings }
+					sidebar={ activeSidebarControl.sidebarAdapter }
+					inserter={ activeSidebarControl.inserter }
+					inspector={ activeSidebarControl.inspector }
+				/>
+			</ErrorBoundary>,
 			activeSidebarControl.container[ 0 ]
 		);
 
