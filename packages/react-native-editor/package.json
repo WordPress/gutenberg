@@ -58,7 +58,7 @@
 		"react-native-gesture-handler": "git+https://github.com/wordpress-mobile/react-native-gesture-handler.git#e75fec4a771b7a8c29c303cae6bb1ed7dc561e74",
 		"react-native-get-random-values": "git+https://github.com/wordpress-mobile/react-native-get-random-values.git#6532636076591fb50c8e529bd3af5e6e1eb3b532",
 		"react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
-		"react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker#v1.0.1-wp",
+		"react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker#8e84413b84126a6bead72038b73fe4871b93493f",
 		"react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#v0.8.8-wp",
 		"react-native-linear-gradient": "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#37aadbd3739b90d199a01aeb108422ecd67ad67f",
 		"react-native-modal": "^11.10.0",
