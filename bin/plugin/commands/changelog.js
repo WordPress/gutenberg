@@ -673,11 +673,12 @@ async function getChangelog( settings ) {
 				return;
 			}
 
-			const shouldNest = featureName !== UNKNOWN_FEATURE_FALLBACK_NAME;
-
 			// Avoids double nesting such as "Documentation" feature under
 			// the "Documentation" section.
-			if ( group !== featureName && shouldNest ) {
+			if (
+				group !== featureName &&
+				featureName !== UNKNOWN_FEATURE_FALLBACK_NAME
+			) {
 				// Start new <ul> for the Feature group.
 				changelog += '#### ' + featureName + '\n';
 			}
@@ -688,7 +689,7 @@ async function getChangelog( settings ) {
 				entry = entry && entry.replace( `[${ featureName } - `, '[' );
 
 				// Add a new bullet point to the list.
-				changelog += shouldNest ? `  ${ entry }\n` : `${ entry }\n`;
+				changelog += `${ entry }\n`;
 			} );
 
 			// Close the <ul> for the Feature group.
