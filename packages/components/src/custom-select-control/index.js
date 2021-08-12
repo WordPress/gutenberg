@@ -81,8 +81,8 @@ export default function CustomSelectControl( {
 
 	const controlDescribedBy = describedBy
 		? describedBy
-		// translators: %s: The selected option.
-		: sprintf( __( 'Currently selected: %s' ), selectedItem.name );
+		: // translators: %s: The selected option.
+		  sprintf( __( 'Currently selected: %s' ), selectedItem.name );
 
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
