@@ -144,6 +144,13 @@ function addAttribute( settings ) {
 	return settings;
 }
 
+/**
+ * A dictionary of paths to flag skipping block support serialization as the key,
+ * with values providing the style paths to be omitted from serialization.
+ *
+ * @constant
+ * @type {Record<string,string[]>}
+ */
 const skipSerializationPathsEdit = {
 	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
 	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
@@ -157,9 +164,21 @@ const skipSerializationPathsEdit = {
 	],
 };
 
+/**
+ * A dictionary of paths to flag skipping block support serialization as the key,
+ * with values providing the style paths to be omitted from serialization.
+ *
+ * Extends the Edit skip paths to enable skipping additional paths in just
+ * the Save component. This allows a block support to be serialized within the
+ * editor, while using an alternate approach, such as server-side rendering, when
+ * the support is saved.
+ *
+ * @constant
+ * @type {Record<string,string[]>}
+ */
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
-	[ `${ SPACING_SUPPORT_KEY }` ]: [ 'spacing', 'blockGap' ],
+	[ `${ SPACING_SUPPORT_KEY }` ]: [ 'spacing.blockGap' ],
 };
 
 /**
