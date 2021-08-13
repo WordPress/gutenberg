@@ -2,7 +2,6 @@
  * External dependencies
  */
 import {
-	SafeAreaView,
 	ScrollView,
 	StyleSheet,
 	TouchableWithoutFeedback,
@@ -54,6 +53,7 @@ const HelpTopicRow = ( { content, label, icon } ) => {
 
 	return (
 		<BottomSheet.SubSheet
+			isFullScreen
 			navigationButton={
 				<TextControl
 					separatorType="leftMargin"
@@ -68,7 +68,7 @@ const HelpTopicRow = ( { content, label, icon } ) => {
 			}
 			showSheet={ showSubSheet }
 		>
-			<SafeAreaView style={ containerStyle }>
+			<View style={ [ containerStyle, styles.container ] }>
 				<BottomSheet.NavigationHeader
 					screen={ label }
 					leftButtonOnPress={ goBack }
@@ -94,7 +94,7 @@ const HelpTopicRow = ( { content, label, icon } ) => {
 						<View>{ content }</View>
 					</TouchableWithoutFeedback>
 				</ScrollView>
-			</SafeAreaView>
+			</View>
 		</BottomSheet.SubSheet>
 	);
 };

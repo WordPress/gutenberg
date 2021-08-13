@@ -72,20 +72,17 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => {
-					const {
-						style: containerStyle,
-						...scrollViewProps
-					} = listProps;
 					const contentContainerStyle = StyleSheet.flatten(
-						scrollViewProps.contentContainerStyle
+						listProps.contentContainerStyle
 					);
 					return (
 						<BottomSheet.NavigationContainer animate main>
 							<BottomSheet.NavigationScreen
 								isScrollable
+								fullScreen
 								name={ __( 'Topics' ) }
 							>
-								<View style={ containerStyle }>
+								<View style={ styles.container }>
 									<View style={ styles.bottomSheetHeader }>
 										<Text
 											accessibilityRole="header"
@@ -99,11 +96,11 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 									</View>
 									<View style={ separatorStyle } />
 									<ScrollView
-										{ ...scrollViewProps }
+										{ ...listProps }
 										contentContainerStyle={ {
 											...contentContainerStyle,
 											paddingBottom: Math.max(
-												scrollViewProps.safeAreaBottomInset,
+												listProps.safeAreaBottomInset,
 												contentContainerStyle.paddingBottom
 											),
 											/**
@@ -132,6 +129,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 							</BottomSheet.NavigationScreen>
 							<BottomSheet.NavigationScreen
 								isScrollable
+								fullScreen
 								name={ BottomSheet.SubSheet.screenName }
 							>
 								<BottomSheet.SubSheet.Slot />

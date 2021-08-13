@@ -26,6 +26,10 @@
 	background-color: $gray-70;
 }
 
+.header {
+	flex-shrink: 1;
+}
+
 .emptyHeader {
 	margin-top: $grid-unit-20 * 0.5;
 }
