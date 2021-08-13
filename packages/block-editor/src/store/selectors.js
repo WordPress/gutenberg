@@ -3,18 +3,18 @@
  */
 import {
 	castArray,
-	flatMap,
+	filter,
+	find,
 	first,
+	flatMap,
 	isArray,
 	isBoolean,
 	last,
 	map,
-	reduce,
-	some,
-	find,
-	filter,
 	mapKeys,
 	orderBy,
+	reduce,
+	some,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -24,11 +24,11 @@ import createSelector from 'rememo';
 import {
 	getBlockType,
 	getBlockTypes,
-	hasBlockSupport,
 	getPossibleBlockTransformations,
+	hasBlockSupport,
 	parse,
 } from '@wordpress/blocks';
-import { SVG, Rect, G, Path } from '@wordpress/components';
+import { G, Path, Rect, SVG } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 
 /**
@@ -1628,25 +1628,32 @@ export const getInserterItems = createSelector(
 				blockVariations.push( ...variations.map( variationMapper ) );
 			}
 		}
-		// Prioritize core blocks's display in inserter.
-		const prioritizeCoreBlocks = ( a, b ) => {
-			const coreBlockNamePrefix = 'core/';
-			const firstIsCoreBlock = a.name.startsWith( coreBlockNamePrefix );
-			const secondIsCoreBlock = b.name.startsWith( coreBlockNamePrefix );
-			if ( firstIsCoreBlock && secondIsCoreBlock ) {
-				return 0;
-			}
-			return firstIsCoreBlock && ! secondIsCoreBlock ? -1 : 1;
-		};
 		// Ensure core blocks are prioritized in the returned results,
 		// because third party blocks can be registered earlier than
 		// the core blocks (usually by using the `init` action),
 		// thus affecting the display order.
 		// We don't sort reusable blocks as they are handled differently.
+		const toTyped = ( blocks, block ) => {
+			const { core, noncore } = blocks;
+			const type = block.name.startsWith( 'core/' ) ? core : noncore;
+
+			type.push( block );
+			return blocks;
+		};
+		const items = visibleBlockTypeInserterItems.reduce( toTyped, {
+			core: [],
+			noncore: [],
+		} );
+		const variations = blockVariations.reduce( toTyped, {
+			core: [],
+			noncore: [],
+		} );
 		const sortedBlockTypes = [
-			...visibleBlockTypeInserterItems,
-			...blockVariations,
-		].sort( prioritizeCoreBlocks );
+			...items.core,
+			...items.noncore,
+			...variations.core,
+			...variations.noncore,
+		];
 		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [
