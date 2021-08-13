@@ -267,6 +267,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks_html .= $inner_block->render();
 	}
 
+	if ( true === $is_list_open ) {
+		$inner_blocks_html .= '</ul>';
+	}
+
 	$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
 
 	$wrapper_attributes = get_block_wrapper_attributes(
