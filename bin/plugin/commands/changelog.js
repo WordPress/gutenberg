@@ -283,6 +283,12 @@ function getIssueType( issue ) {
 		...getTypesByTitle( issue.title ),
 	];
 
+	// Force all tasks identified as Documentation tasks
+	// to appear under the main "Documentation" section.
+	if ( candidates.includes( 'Documentation' ) ) {
+		return 'Documentation';
+	}
+
 	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
 }
 
