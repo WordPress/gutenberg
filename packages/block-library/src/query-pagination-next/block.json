@@ -11,8 +11,8 @@
 			"type": "string"
 		},
 		"arrow": {
-			"default": "",
-			"type": "string"
+			"type": "string",
+			"default": "none"
 		}
 	},
 	"usesContext": [ "queryId", "query" ],
@@ -27,5 +27,6 @@
 			"fontSize": true,
 			"lineHeight": true
 		}
-	}
+	},
+	"style": "wp-block-query-pagination-next"
 }

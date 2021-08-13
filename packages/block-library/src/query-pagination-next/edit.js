@@ -1,61 +1,58 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	PlainText,
 	InspectorControls,
 } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import {
-	PanelBody,
-	__experimentalSegmentedControl as SegmentedControl,
-	__experimentalSegmentedControlOption as SegmentedControlOption,
-} from '@wordpress/components';
+	useQueryPaginationContext,
+	QueryPaginationArrowControls,
+} from '../query-pagination';
+
+const arrowMap = {
+	none: '',
+	arrow: '→',
+	chevron: '»',
+};
 
 export default function QueryPaginationNextEdit( {
 	attributes: { label, arrow },
 	setAttributes,
 } ) {
+	const [
+		{ arrow: arrowFromContext = 'none' },
+		setQueryPaginationContext,
+	] = useQueryPaginationContext();
+	/**
+	 * Use arrow from context as the single source of truth.
+	 * It is initialized from the the first matching pagination
+	 * next/previous block it finds.
+	 */
+	useEffect( () => {
+		if ( arrow !== arrowFromContext ) {
+			setAttributes( {
+				arrow: arrowFromContext,
+			} );
+		}
+	}, [ arrow, arrowFromContext ] );
+	const displayArrow = arrowMap[ arrow ];
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Arrow settings' ) }>
-					<SegmentedControl
-						label={ __(
-							'A decorative arrow appended to the next page link.'
-						) }
-						value={ arrow }
-						onChange={ ( value ) => {
-							setAttributes( {
-								arrow: value,
-							} );
-						} }
-						isBlock
-					>
-						<SegmentedControlOption
-							value=""
-							label={ _x(
-								'None',
-								'Arrow option for Query Pagination Next block'
-							) }
-						/>
-						<SegmentedControlOption
-							value="→"
-							label={ _x(
-								'Arrow',
-								'Arrow option for Query Pagination Next block'
-							) }
-						/>
-						<SegmentedControlOption
-							value="»"
-							label={ _x(
-								'Chevron',
-								'Arrow option for Query Pagination Next block'
-							) }
-						/>
-					</SegmentedControl>
-				</PanelBody>
+				<QueryPaginationArrowControls
+					value={ arrowFromContext }
+					onChange={ ( value ) => {
+						setQueryPaginationContext( { arrow: value } );
+					} }
+				/>
 			</InspectorControls>
 			<a
 				href="#pagination-next-pseudo-link"
@@ -72,13 +69,10 @@ export default function QueryPaginationNextEdit( {
 						setAttributes( { label: newLabel } )
 					}
 				/>
-				{ arrow && (
-					<>
-						{ ' ' }
-						<span className="wp-block-query-pagination-next-arrow">
-							{ arrow }
-						</span>
-					</>
+				{ displayArrow && (
+					<span className="wp-block-query-pagination-next-arrow">
+						{ displayArrow }
+					</span>
 				) }
 			</a>
 		</>

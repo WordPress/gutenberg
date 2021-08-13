@@ -19,11 +19,18 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
+	$arrow_map = array(
+		'none'    => '',
+		'arrow'   => '→',
+		'chevron' => '»',
+	);
+
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$default_label      = __( 'Next Page' );
 	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
-	if ( ! empty( $attributes['arrow'] ) ) {
-		$label .= " <span class='wp-block-query-pagination-next-arrow'>{$attributes['arrow']}</span>";
+	if ( ! empty( $attributes['arrow'] ) && array_key_exists( $attributes['arrow'], $arrow_map ) ) {
+		$arrow  = $arrow_map[ $attributes['arrow'] ];
+		$label .= "<span class='wp-block-query-pagination-next-arrow'>$arrow</span>";
 	}
 	$content = '';
 

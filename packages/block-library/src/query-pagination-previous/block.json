@@ -9,6 +9,10 @@
 	"attributes": {
 		"label": {
 			"type": "string"
+		},
+		"arrow": {
+			"type": "string",
+			"default": "none"
 		}
 	},
 	"usesContext": [ "queryId", "query" ],
@@ -23,5 +27,6 @@
 			"fontSize": true,
 			"lineHeight": true
 		}
-	}
+	},
+	"style": "wp-block-query-pagination-previous"
 }
