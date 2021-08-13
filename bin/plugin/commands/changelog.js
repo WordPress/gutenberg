@@ -642,6 +642,17 @@ async function getChangelog( settings ) {
 		}
 	}
 
+	return formatChangelog( pullRequests );
+}
+
+/**
+ * Formats the changelog string for a given list of pull requests.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted changelog string.
+ */
+function formatChangelog( pullRequests ) {
 	let changelog = '';
 
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
@@ -796,4 +807,5 @@ async function getReleaseChangelog( options ) {
 	sortGroup,
 	getTypesByLabels,
 	getTypesByTitle,
+	formatChangelog,
 };
