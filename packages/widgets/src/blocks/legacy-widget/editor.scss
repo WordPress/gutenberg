@@ -67,14 +67,11 @@
 			line-height: 1;
 			min-height: 30px;
 			padding-left: $grid-unit-10;
+			padding-top: $grid-unit * 1.25;
+			padding-bottom: $grid-unit * 1.25;
 		}
 		select {
 			padding-left: $grid-unit-05;
-		}
-		@-moz-document url-prefix() {
-			select {
-				padding-top: $grid-unit-20;
-			}
 		}
 	}
 
