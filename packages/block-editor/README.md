@@ -315,6 +315,10 @@ _Returns_
 
 Undocumented declaration.
 
+### DimensionControls
+
+Undocumented declaration.
+
 ### FontSizePicker
 
 Undocumented declaration.

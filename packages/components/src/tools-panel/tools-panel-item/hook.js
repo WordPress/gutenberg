@@ -18,6 +18,7 @@ export function useToolsPanelItem( props ) {
 		hasValue,
 		isShownByDefault,
 		label,
+		resetAllFilter,
 		onDeselect = () => undefined,
 		onSelect = () => undefined,
 		...otherProps
@@ -41,6 +42,7 @@ export function useToolsPanelItem( props ) {
 			hasValue,
 			isShownByDefault,
 			label,
+			resetAllFilter,
 		} );
 
 		return () => deregisterPanelItem( label );
