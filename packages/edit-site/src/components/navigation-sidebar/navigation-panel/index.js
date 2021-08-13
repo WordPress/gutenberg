@@ -122,24 +122,26 @@ const NavigationPanel = ( { isOpen } ) => {
 						) }
 						<SiteMenu />
 					</Navigation>
-					<Navigation
-						className="edit-site-navigation-panel__all-templates"
-						activeItem={
-							editorMode === 'mosaic' ? 'all-templates' : ''
-						}
-					>
-						<NavigationMenu>
-							<NavigationItem
-								onClick={ () => {
-									if ( editorMode !== 'mosaic' ) {
-										switchEditorMode( 'mosaic' );
-									}
-								} }
-								item="all-templates"
-								title={ __( 'All templates' ) }
-							/>
-						</NavigationMenu>
-					</Navigation>
+					{ activeMenu.startsWith( 'templates' ) && (
+						<Navigation
+							className="edit-site-navigation-panel__all-templates"
+							activeItem={
+								editorMode === 'mosaic' ? 'all-templates' : ''
+							}
+						>
+							<NavigationMenu>
+								<NavigationItem
+									onClick={ () => {
+										if ( editorMode !== 'mosaic' ) {
+											switchEditorMode( 'mosaic' );
+										}
+									} }
+									item="all-templates"
+									title={ __( 'View all' ) }
+								/>
+							</NavigationMenu>
+						</Navigation>
+					) }
 				</div>
 			</div>
 		</div>

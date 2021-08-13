@@ -76,6 +76,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'type'           => 'wp_template',
 				'wp_id'          => null,
 				'has_theme_file' => true,
+				'author'         => null,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//index' )
 		);
@@ -101,6 +102,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'wp_id'          => null,
 				'area'           => WP_TEMPLATE_PART_AREA_HEADER,
 				'has_theme_file' => true,
+				'author'         => null,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//header' )
 		);
@@ -129,6 +131,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'type'           => 'wp_template',
 				'wp_id'          => null,
 				'has_theme_file' => true,
+				'author'         => null,
 			),
 			$data
 		);
@@ -155,6 +158,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				'wp_id'          => null,
 				'area'           => WP_TEMPLATE_PART_AREA_HEADER,
 				'has_theme_file' => true,
+				'author'         => null,
 			),
 			$data
 		);
@@ -193,6 +197,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 					'raw' => 'Content',
 				),
 				'has_theme_file' => false,
+				'author'         => 2,
 			),
 			$data
 		);
@@ -231,6 +236,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 				),
 				'area'           => 'header',
 				'has_theme_file' => false,
+				'author'         => 2,
 			),
 			$data
 		);

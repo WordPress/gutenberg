@@ -188,8 +188,6 @@ function Editor( { initialSettings, onError } ) {
 	return (
 		<>
 			<URLQueryController />
-			<FullscreenMode isActive />
-			<UnsavedChangesWarning />
 			<SlotFillProvider>
 				<EntityProvider kind="root" type="site">
 					<EntityProvider

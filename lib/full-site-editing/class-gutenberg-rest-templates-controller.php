@@ -568,7 +568,7 @@ class Gutenberg_REST_Templates_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'author' => array(
+				'author'         => array(
 					'description' => __( 'Template author', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'embed', 'view', 'edit' ),
