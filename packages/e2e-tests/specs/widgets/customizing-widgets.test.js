@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import {
-	activatePlugin,
+	__experimentalActivatePlugin as activatePlugin,
 	activateTheme,
-	deactivatePlugin,
+	__experimentalDeactivatePlugin as deactivatePlugin,
 	visitAdminPage,
 	showBlockToolbar,
 	clickBlockToolbarButton,
@@ -44,6 +44,20 @@ describe( 'Widgets Customizer', () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
+		// Disable the transition timing function to make it "snap".
+		// We can't disable all the transitions yet because of #32024.
+		await page.evaluateOnNewDocument( () => {
+			const style = document.createElement( 'style' );
+			style.innerHTML = `
+				* {
+					transition-timing-function: step-start !important;
+					animation-timing-function: step-start !important;
+				}
+			`;
+			window.addEventListener( 'DOMContentLoaded', () => {
+				document.head.appendChild( style );
+			} );
+		} );
 		await activatePlugin( 'gutenberg-test-widgets' );
 	} );
 

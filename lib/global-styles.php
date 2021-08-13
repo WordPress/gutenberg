@@ -232,7 +232,7 @@ function gutenberg_experimental_global_styles_register_user_cpt() {
  * @return string Filtered post content with unsafe rules removed.
  */
 function gutenberg_global_styles_filter_post( $content ) {
-	$decoded_data        = json_decode( stripslashes( $content ), true );
+	$decoded_data        = json_decode( wp_unslash( $content ), true );
 	$json_decoding_error = json_last_error();
 	if (
 		JSON_ERROR_NONE === $json_decoding_error &&
@@ -245,7 +245,7 @@ function gutenberg_global_styles_filter_post( $content ) {
 		$data_to_encode = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $decoded_data );
 
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
-		return wp_json_encode( $data_to_encode );
+		return wp_slash( wp_json_encode( $data_to_encode ) );
 	}
 	return $content;
 }
