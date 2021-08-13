@@ -3,6 +3,9 @@
 exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 "### Enhancements
 
+- Scripts: Use cssnano to minimize CSS files with build. ([33750](https://github.com/WordPress/gutenberg/pull/33750))
+- Scripts: Webpack configuration update to minimize CSS. ([33676](https://github.com/WordPress/gutenberg/pull/33676))
+
 #### Components
 - components: Use updated range styles. ([33824](https://github.com/WordPress/gutenberg/pull/33824))
 - Components: Update snackbar to use framer motion instead of react spring. ([33717](https://github.com/WordPress/gutenberg/pull/33717))
@@ -30,12 +33,14 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 #### Global Styles
 - Dimensions Panel: Add new ToolsPanel component and update spacing supports. ([32392](https://github.com/WordPress/gutenberg/pull/32392))
 
-#### Uncategorized
-- Scripts: Use cssnano to minimize CSS files with build. ([33750](https://github.com/WordPress/gutenberg/pull/33750))
-- Scripts: Webpack configuration update to minimize CSS. ([33676](https://github.com/WordPress/gutenberg/pull/33676))
-
 
 ### Bug Fixes
+
+- Fix block appender position in classic themes. ([33895](https://github.com/WordPress/gutenberg/pull/33895))
+- Fix positioning discrepancy with draggable chip. ([33893](https://github.com/WordPress/gutenberg/pull/33893))
+- Fix misspelling of \\"queries\\" in filter documentation. ([33799](https://github.com/WordPress/gutenberg/pull/33799))
+- ESLint Plugin: Include .jsx extenstion when linting import statements. ([33746](https://github.com/WordPress/gutenberg/pull/33746))
+- Correct \`function_exists()\` check typo introduced in #33331. ([33513](https://github.com/WordPress/gutenberg/pull/33513))
 
 #### Block Library
 - Fix navigation block appender invalid html. ([33964](https://github.com/WordPress/gutenberg/pull/33964))
@@ -79,24 +84,16 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 #### Build Tooling
 - Readable JS assets Plugin: Fix webpack 5 support. ([33785](https://github.com/WordPress/gutenberg/pull/33785))
 
-#### Documentation
-- fix: Broken link in documentation to block support mechanism. ([33780](https://github.com/WordPress/gutenberg/pull/33780))
-
 #### Accessibility
 - Fix some JAWS bugs. ([33627](https://github.com/WordPress/gutenberg/pull/33627))
 
 #### Template Editor
 - Template: Only show post template actions to users with correct capabilities. ([33392](https://github.com/WordPress/gutenberg/pull/33392))
 
-#### Uncategorized
-- Fix block appender position in classic themes. ([33895](https://github.com/WordPress/gutenberg/pull/33895))
-- Fix positioning discrepancy with draggable chip. ([33893](https://github.com/WordPress/gutenberg/pull/33893))
-- Fix misspelling of \\"queries\\" in filter documentation. ([33799](https://github.com/WordPress/gutenberg/pull/33799))
-- ESLint Plugin: Include .jsx extenstion when linting import statements. ([33746](https://github.com/WordPress/gutenberg/pull/33746))
-- Correct \`function_exists()\` check typo introduced in #33331. ([33513](https://github.com/WordPress/gutenberg/pull/33513))
-
 
 ### Performance
+
+- Avoid double parsing the content when loading the editor. ([33727](https://github.com/WordPress/gutenberg/pull/33727))
 
 #### Block Library
 - Improve the rendering/update performance of the image block. ([33974](https://github.com/WordPress/gutenberg/pull/33974))
@@ -114,9 +111,6 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 
 #### Editor
 - Refactor the HierarchicalTermSelector so that it does not cause unnecessary loading of terms. ([33418](https://github.com/WordPress/gutenberg/pull/33418))
-
-#### Uncategorized
-- Avoid double parsing the content when loading the editor. ([33727](https://github.com/WordPress/gutenberg/pull/33727))
 
 
 ### Experiments
@@ -139,6 +133,7 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 - Fix gutenberg_resolve_template() return documentation. ([33800](https://github.com/WordPress/gutenberg/pull/33800))
 - Add spaces in add_theme_support documentation code. ([33796](https://github.com/WordPress/gutenberg/pull/33796))
 - [docs] fix: \`supports.color.gradients\` is plural. ([33781](https://github.com/WordPress/gutenberg/pull/33781))
+- fix: Broken link in documentation to block support mechanism. ([33780](https://github.com/WordPress/gutenberg/pull/33780))
 - Add missing comma. ([33764](https://github.com/WordPress/gutenberg/pull/33764))
 - Example for rest_endpoints filter in PHP. ([33738](https://github.com/WordPress/gutenberg/pull/33738))
 - Update documentation to reflect new automated process for feature grouping. ([33573](https://github.com/WordPress/gutenberg/pull/33573))
@@ -146,6 +141,8 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 
 
 ### Code Quality
+
+- Scripts: Fix typo in format change message. ([33945](https://github.com/WordPress/gutenberg/pull/33945))
 
 #### Components
 - Components: Use the \`__unsafe_useEmotionCache\` in the \`useCx\` hook. ([33982](https://github.com/WordPress/gutenberg/pull/33982))
@@ -166,11 +163,12 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 #### Post Editor
 - Refactor MetaBoxesArea to to functional components using hooks. ([30542](https://github.com/WordPress/gutenberg/pull/30542))
 
-#### Uncategorized
-- Scripts: Fix typo in format change message. ([33945](https://github.com/WordPress/gutenberg/pull/33945))
-
 
 ### Tools
+
+- GitHub Templates: Format bug report template. ([33786](https://github.com/WordPress/gutenberg/pull/33786))
+- GitHub Templates: Fix spacing in bug report template. ([33761](https://github.com/WordPress/gutenberg/pull/33761))
+- Update bug issue template to use forms. ([33713](https://github.com/WordPress/gutenberg/pull/33713))
 
 #### Testing
 - Add search performance measure and make other measures more stable. ([33848](https://github.com/WordPress/gutenberg/pull/33848))
@@ -179,13 +177,13 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 #### Build Tooling
 - Scripts: Update webpack to v5 (try 2). ([33818](https://github.com/WordPress/gutenberg/pull/33818))
 
-#### Uncategorized
-- GitHub Templates: Format bug report template. ([33786](https://github.com/WordPress/gutenberg/pull/33786))
-- GitHub Templates: Fix spacing in bug report template. ([33761](https://github.com/WordPress/gutenberg/pull/33761))
-- Update bug issue template to use forms. ([33713](https://github.com/WordPress/gutenberg/pull/33713))
-
 
 ### Various
+
+- Tune appender margin. ([33866](https://github.com/WordPress/gutenberg/pull/33866))
+- RNMobile: Add integration test guide. ([33833](https://github.com/WordPress/gutenberg/pull/33833))
+- Core Data: Deprecate \`getAuthors\` in favor of \`getUsers\`. ([33725](https://github.com/WordPress/gutenberg/pull/33725))
+- RNMobile: Try unifying the unit test command on mobile. ([33657](https://github.com/WordPress/gutenberg/pull/33657))
 
 #### Block Library
 - Search Block: Removed components class from icon button and polished css. ([33961](https://github.com/WordPress/gutenberg/pull/33961))
@@ -210,12 +208,6 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 
 #### CSS & Styling
 - Try: Reduce specificity of reset & classic styles. ([32659](https://github.com/WordPress/gutenberg/pull/32659))
-
-#### Uncategorized
-- Tune appender margin. ([33866](https://github.com/WordPress/gutenberg/pull/33866))
-- RNMobile: Add integration test guide. ([33833](https://github.com/WordPress/gutenberg/pull/33833))
-- Core Data: Deprecate \`getAuthors\` in favor of \`getUsers\`. ([33725](https://github.com/WordPress/gutenberg/pull/33725))
-- RNMobile: Try unifying the unit test command on mobile. ([33657](https://github.com/WordPress/gutenberg/pull/33657))
 
 
 "

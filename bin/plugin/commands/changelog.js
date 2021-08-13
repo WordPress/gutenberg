@@ -653,11 +653,11 @@ async function getChangelog( settings ) {
  * @return {string} The formatted changelog string.
  */
 function formatChangelog( pullRequests ) {
+	let changelog = '';
+
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
 
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
-
-	let changelog = '';
 
 	for ( const group of sortedGroups ) {
 		const groupPullRequests = groupedPullRequests[ group ];
