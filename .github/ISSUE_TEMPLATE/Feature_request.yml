@@ -1,6 +1,7 @@
 name: Feature request
 description: Report a bug with the WordPress block editor or Gutenberg plugin
 title: 'Feature request: '
+body:
     - type: textarea
       attributes:
           label: What problem does this address?
