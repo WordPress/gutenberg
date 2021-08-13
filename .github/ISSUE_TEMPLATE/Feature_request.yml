@@ -10,7 +10,7 @@ body:
               I'm always frustrated when '...'. It is currently difficult to '...'.
       validations:
           required: true
-     - type: textarea
+    - type: textarea
       attributes:
           label: What is your proposed solution?
           description: Please outline the feature or enhancement that you want and how it addresses any problem identified above.
