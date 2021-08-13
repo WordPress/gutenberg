@@ -1,0 +1,19 @@
+name: Feature request
+description: Report a bug with the WordPress block editor or Gutenberg plugin
+title: 'Feature request: '
+    - type: textarea
+      attributes:
+          label: What problem does this address?
+          description: Please describe if this feature or enhancement is related to a current problem or pain point.
+          placeholder: |
+              I'm always frustrated when '...'. It is currently difficult to '...'.
+      validations:
+          required: true
+     - type: textarea
+      attributes:
+          label: What is your proposed solution?
+          description: Please outline the feature or enhancement that you want and how it addresses any problem identified above.
+          placeholder: |
+              It would be great if '...' was posible.
+      validations:
+          required: true
