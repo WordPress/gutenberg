@@ -12,6 +12,7 @@ import {
 	useState,
 	useLayoutEffect,
 	forwardRef,
+	useEffect,
 } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import deprecated from '@wordpress/deprecated';
@@ -266,12 +267,17 @@ const Popover = (
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
+	const startsSticky = useRef( null );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
 	const slot = useSlot( __unstableSlotName );
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const [ containerResizeListener, contentSize ] = useResizeObserver();
 	noArrow = isExpanded || noArrow;
+
+	useEffect( () => {
+		startsSticky.current = null;
+	}, anchorRef?.current );
 
 	useLayoutEffect( () => {
 		if ( isExpanded ) {
@@ -352,7 +358,8 @@ const Popover = (
 				relativeOffsetTop,
 				boundaryElement,
 				__unstableForcePosition,
-				__unstableForceXAlignment
+				__unstableForceXAlignment,
+				startsSticky
 			);
 
 			if (
