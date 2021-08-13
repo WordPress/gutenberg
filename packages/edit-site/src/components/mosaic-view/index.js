@@ -9,6 +9,7 @@ import {
 	__unstableComposite as Composite,
 	__unstableUseCompositeState as useCompositeState,
 	__unstableCompositeItem as CompositeItem,
+	BaseControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -75,22 +76,34 @@ function TemplateContainer( { templateId, composite } ) {
 				templateId={ templateId }
 				onClick={ onActivateItem }
 			/>
-			<CheckboxControl
-				disabled={ templateSource !== 'custom' }
-				label={ templateTitle }
-				help={ templateDescription }
-				checked={ isSelected }
-				onChange={ () => toggleSelectedTemplate( templateId ) }
-			/>
 			{ templateSource === 'custom' && (
-				<div>
-					<TemplateActions
-						hasThemeFile={ hasThemeFile }
-						templateAuthor={ templateAuthor }
-						templateId={ templateId }
-						templateTitle={ templateTitle }
+				<>
+					<CheckboxControl
+						disabled={ templateSource !== 'custom' }
+						label={ templateTitle }
+						help={ templateDescription }
+						checked={ isSelected }
+						onChange={ () => toggleSelectedTemplate( templateId ) }
 					/>
-				</div>
+					<div>
+						<TemplateActions
+							hasThemeFile={ hasThemeFile }
+							templateAuthor={ templateAuthor }
+							templateId={ templateId }
+							templateTitle={ templateTitle }
+						/>
+					</div>
+				</>
+			) }
+			{ templateSource !== 'custom' && (
+				<BaseControl
+					help={ templateDescription }
+					className="edit-site-mosaic-view__template-actions-disabled"
+				>
+					<BaseControl.VisualLabel>
+						{ templateTitle }
+					</BaseControl.VisualLabel>
+				</BaseControl>
 			) }
 		</CompositeItem>
 	);

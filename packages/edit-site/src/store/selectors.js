@@ -268,10 +268,25 @@ export function getEditorMode( state ) {
 	return state.preferences.editorMode || 'visual';
 }
 
+/**
+ * Returns the current selected templates.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} Array of selected template id's.
+ */
 export function getSelectedTemplates( state ) {
 	return state.selectedTemplates;
 }
 
+/**
+ * Returns if the template with id templateId is selected or not.
+ *
+ * @param {Object} state      Global application state.
+ * @param {string} templateId The id of the template.
+ *
+ * @return {boolean} True if the template is selected and false otherwise.
+ */
 export function isTemplateSelected( state, templateId ) {
 	return state.selectedTemplates.includes( templateId );
 }

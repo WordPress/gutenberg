@@ -11,7 +11,6 @@ import {
 	__experimentalNavigationBackButton as NavigationBackButton,
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
-	__experimentalNavigationGroup as NavigationGroup,
 } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';

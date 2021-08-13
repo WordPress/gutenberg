@@ -15,7 +15,7 @@
 	height: 400px;
 	display: grid;
 	grid-template-columns: auto $button-size+$border-width-focus;
-	grid-template-rows: minmax(auto, calc(100% - 80px) ) minmax(auto, 80px);
+	grid-template-rows: minmax(auto, calc(100% - 80px)) minmax(auto, 80px);
 	grid-gap: $grid-unit-20;
 	.components-base-control__help {
 		margin-left: $grid-unit-40;
@@ -35,8 +35,8 @@
 	overflow: hidden;
 	.components-spinner {
 		position: relative;
-		top: calc( 50% - #{ math.div( $spinner-size, 2 ) } );
-		left: calc( 50% - #{ math.div( $spinner-size, 2 ) } );
+		top: calc(50% - #{ math.div($spinner-size, 2) });
+		left: calc(50% - #{ math.div($spinner-size, 2) });
 	}
 
 	.block-editor-block-preview__container {
@@ -50,4 +50,11 @@
 
 .edit-site-mosaic-view__added-by-text {
 	margin-left: $grid-unit;
+}
+
+.edit-site-mosaic-view__template-actions-disabled {
+	.components-base-control__label,
+	.components-base-control__help {
+		margin-left: $grid-unit-10;
+	}
 }

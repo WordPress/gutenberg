@@ -29,7 +29,7 @@ export const preferences = combineReducers( {
 				return state;
 		}
 	},
-	editorMode( state, action ) {
+	editorMode( state = PREFERENCES_DEFAULTS.editorMode, action ) {
 		if ( action.type === 'SWITCH_MODE' ) {
 			return action.mode;
 		}

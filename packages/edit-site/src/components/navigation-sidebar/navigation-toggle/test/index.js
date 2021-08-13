@@ -34,6 +34,8 @@ describe( 'NavigationToggle', () => {
 						site_icon_url: 'https://fakeUrl.com',
 					} ),
 					isResolving: () => false,
+					getSelectedTemplates: () => [],
+					getEditorMode: () => 'visual',
 				} ) );
 			} );
 
@@ -53,6 +55,8 @@ describe( 'NavigationToggle', () => {
 						site_icon_url: '',
 					} ),
 					isResolving: () => false,
+					getSelectedTemplates: () => [],
+					getEditorMode: () => 'visual',
 				} ) );
 			} );
 
