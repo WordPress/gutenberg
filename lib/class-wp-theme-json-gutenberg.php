@@ -1065,6 +1065,43 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Returns a filtered tree by the given base and property.
+	 * It keeps the version intact.
+	 *
+	 * @param string $base One of the top-level keys.
+	 * @param array $property The property to filter the object by.
+	 *
+	 * @return WP_Theme_JSON
+	 */
+	public function filter_by( $base = '', $property = array() ) {
+		// This object may have already processed presets with multiple origins.
+		// Instead of having to re-create one-by-one in a new object,
+		// we take that already processed data directly.
+		$new = clone $this;
+		$new->theme_json = array();
+		$new->theme_json['version'] = $this->theme_json['version'];
+
+		if ( $base === 'settings' ) {
+			$nodes = self::get_setting_nodes( $this->theme_json, self::get_blocks_metadata() );
+		} else if ( $base === 'styles' ) {
+			$nodes = self::get_style_nodes( $this->theme_json, self::get_blocks_metadata() );
+		} else {
+			// TODO: other top-level keys.
+		}
+
+		foreach ( $nodes as $metadata ) {
+			$path = array_merge( $metadata['path'], $property );
+			$node = _wp_array_get( $this->theme_json, $path );
+
+			if ( isset( $node ) ) {
+				_wp_array_set( $new->theme_json, $path, $node );
+			}
+		}
+
+		return $new;
+	}
+
+	/**
 	 * Merge new incoming data.
 	 *
 	 * @param WP_Theme_JSON $incoming Data to merge.

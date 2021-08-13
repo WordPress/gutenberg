@@ -49,15 +49,43 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
 	if (
-		! get_theme_support( 'experimental-link-color' ) && // link color support needs the presets CSS variables regardless of the presence of theme.json file.
-		! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		! WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() &&
+		! current_theme_supports( 'experimental-link-color' ) &&
+		current_theme_supports( 'editor-color-palette' ) &&
+		current_theme_supports( 'editor-gradient-presets' )
+	) {
 		return;
 	}
 
+	/*
+	 * We need to enqueue different styles for different situations:
+	 *
+	 * - Themes with theme.json support => everything.
+	 * - Themes without theme.json support but legacy link support => the color variables.
+	 * - Themes without theme.json support and no own color palette => the color classes + related variables.
+	 * - Themes without theme.json support and no own gradient palette => the gradient classes + related variables.
+	 */
 	$settings = gutenberg_get_default_block_editor_settings();
 	$all      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
 
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
+	$stylesheet = '';
+	if ( WP_Theme_JSON_Resolver_Gutenberg::theme_has_support() ) {
+		$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
+	} else {
+		if ( current_theme_supports( 'experimental-link-color' ) ) {
+			// The theme only needs the custom properties for colors (solids, not gradients).
+			$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all->filter_by( 'settings', array( 'color', 'palette' ) ), 'css_variables' );
+		}
+		if ( ! current_theme_supports( 'editor-color-palette' ) ) {
+			// Override $stylesheet because this enqueues both color custom properties and the corresponding classes.
+			$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all->filter_by( 'settings', array( 'color', 'palette' ) ) );
+		}
+		if ( ! current_theme_supports( 'editor-gradient-presets' ) ) {
+			// Append gradients (custom properties + classes).
+			$stylesheet = $stylesheet . gutenberg_experimental_global_styles_get_stylesheet( $all->filter_by( 'settings', array( 'color', 'gradients' ) ) );
+		}
+	}
+
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
