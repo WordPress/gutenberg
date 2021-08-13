@@ -189,7 +189,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			} );
 
 			return () => {
-				unsubscribeFromRootStore();
+				if ( unsubscribeFromRootStore ) {
+					unsubscribeFromRootStore();
+				}
 				unsubscribeFromStoreEmitter();
 			};
 		};

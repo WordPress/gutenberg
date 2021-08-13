@@ -37,7 +37,7 @@ export function useRichText( {
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
 } ) {
-	const registry = useRegistry( registry );
+	const registry = useRegistry();
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const ref = useRef();
 

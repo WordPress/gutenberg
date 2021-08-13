@@ -746,7 +746,7 @@ import { RegistryProvider, createRegistry, useRegistry } from '@wordpress/data';
 const registry = createRegistry( {} );
 
 const SomeChildUsingRegistry = ( props ) => {
-	const registry = useRegistry( registry );
+	const registry = useRegistry();
 	// ...logic implementing the registry in other react hooks.
 };
 
