@@ -8,8 +8,6 @@
 			"hasParallax": false,
 			"dimRatio": 40,
 			"backgroundType": "image",
-			"title": "",
-			"contentAlign": "center",
 			"isRepeated": false
 		},
 		"innerBlocks": [
@@ -44,8 +42,6 @@
 				"x": "0.50",
 				"y": "0.40"
 			},
-			"title": "",
-			"contentAlign": "center",
 			"isRepeated": false,
 			"minHeight": 48,
 			"minHeightUnit": "vw",
