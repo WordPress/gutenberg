@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Embed block: Add "Resize for smaller devices" setting. [#33654]
 
 ## 1.59.1
 -   [*] Global styles - Add color to the block styles filter list [#34000]
