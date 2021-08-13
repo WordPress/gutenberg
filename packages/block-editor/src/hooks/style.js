@@ -149,7 +149,7 @@ function addAttribute( settings ) {
  * with values providing the style paths to be omitted from serialization.
  *
  * @constant
- * @type {Record<string,string[]>}
+ * @type {Record<string, string[]>}
  */
 const skipSerializationPathsEdit = {
 	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
@@ -174,7 +174,7 @@ const skipSerializationPathsEdit = {
  * the support is saved.
  *
  * @constant
- * @type {Record<string,string[]>}
+ * @type {Record<string, string[]>}
  */
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
@@ -184,10 +184,10 @@ const skipSerializationPathsSave = {
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
- * @param {Object} props      Additional props applied to save element.
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
- * @param {Object} skipPaths  An object of keys and paths to skip serialization.
+ * @param {Object}                    props      Additional props applied to save element.
+ * @param {Object}                    blockType  Block type.
+ * @param {Object}                    attributes Block attributes.
+ * @param {?Record<string, string[]>} skipPaths  An object of keys and paths to skip serialization.
  *
  * @return {Object} Filtered props applied to save element.
  */
