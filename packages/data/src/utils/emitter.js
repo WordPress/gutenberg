@@ -34,6 +34,7 @@ export function createEmitter() {
 
 		emit() {
 			if ( isPaused ) {
+				isPending = true;
 				return;
 			}
 			notifyListeners();
