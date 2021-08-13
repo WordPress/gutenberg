@@ -16,13 +16,13 @@
  */
 function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'all' ) {
 	// Check if we can use cached.
-	$can_use_cached = (
+	$can_use_cached = false; /*(
 		( 'all' === $type ) &&
 		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
 		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
 		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
 		! is_admin()
-	);
+	);*/
 
 	if ( $can_use_cached ) {
 		// Check if we have the styles already cached.
@@ -56,11 +56,12 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 
 	$settings = gutenberg_get_default_block_editor_settings();
 	$all      = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( $settings );
-
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
+
+	do_action( 'gutenberg_experimental_global_styles', $all );
 
 	if ( isset( wp_styles()->registered['global-styles'] ) ) {
 		wp_styles()->registered['global-styles']->extra['after'][0] = $stylesheet;
