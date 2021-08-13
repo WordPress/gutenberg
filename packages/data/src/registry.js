@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { without, mapValues, isObject } from 'lodash';
+import { mapValues, isObject, forEach } from 'lodash';
 
 /**
  * Internal dependencies
@@ -9,6 +9,7 @@ import { without, mapValues, isObject } from 'lodash';
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
 import { STORE_NAME } from './store/name';
+import { createEmitter } from './utils/emitter';
 
 /** @typedef {import('./types').WPDataStore} WPDataStore */
 
@@ -49,18 +50,14 @@ import { STORE_NAME } from './store/name';
  */
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
-	let listeners = [];
-	let isPaused = false;
+	const emitter = createEmitter();
 	const __experimentalListeningStores = new Set();
 
 	/**
 	 * Global listener called for each store's update.
 	 */
 	function globalListener() {
-		if ( isPaused ) {
-			return;
-		}
-		listeners.forEach( ( listener ) => listener() );
+		emitter.emit();
 	}
 
 	/**
@@ -71,11 +68,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @return {Function} Unsubscribe function.
 	 */
 	const subscribe = ( listener ) => {
-		listeners.push( listener );
-
-		return () => {
-			listeners = without( listeners, listener );
-		};
+		return emitter.subscribe( listener );
 	};
 
 	/**
@@ -181,14 +174,24 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		if ( typeof config.subscribe !== 'function' ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
+		config.emitter = createEmitter();
 		const currentSubscribe = config.subscribe;
 		config.subscribe = ( listener ) => {
-			return currentSubscribe( () => {
-				if ( isPaused ) {
+			const unsubscribeFromStoreEmitter = config.emitter.subscribe(
+				listener
+			);
+			const unsubscribeFromRootStore = currentSubscribe( () => {
+				if ( config.emitter.isPaused ) {
+					config.emitter.emit();
 					return;
 				}
 				listener();
 			} );
+
+			return () => {
+				unsubscribeFromRootStore();
+				unsubscribeFromStoreEmitter();
+			};
 		};
 		stores[ key ] = config;
 		config.subscribe( globalListener );
@@ -227,10 +230,11 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	function batch( callback ) {
-		isPaused = true;
+		emitter.pause();
+		forEach( stores, ( store ) => store.emitter.pause() );
 		callback();
-		isPaused = false;
-		globalListener();
+		emitter.resume();
+		forEach( stores, ( store ) => store.emitter.resume() );
 	}
 
 	let registry = {
