@@ -4,7 +4,7 @@ exports[`Navigation editor allows creation of a menu when there are existing men
 
 exports[`Navigation editor allows creation of a menu when there are no current menu items 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"vertical\\"} -->
-<!-- wp:page-list /-->
+<!-- wp:page-list {\\"isNavigationChild\\":true} /-->
 <!-- /wp:navigation -->"
 `;
 

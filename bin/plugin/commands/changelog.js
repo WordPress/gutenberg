@@ -283,6 +283,12 @@ function getIssueType( issue ) {
 		...getTypesByTitle( issue.title ),
 	];
 
+	// Force all tasks identified as Documentation tasks
+	// to appear under the main "Documentation" section.
+	if ( candidates.includes( 'Documentation' ) ) {
+		return 'Documentation';
+	}
+
 	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
 }
 
@@ -636,6 +642,17 @@ async function getChangelog( settings ) {
 		}
 	}
 
+	return formatChangelog( pullRequests );
+}
+
+/**
+ * Formats the changelog string for a given list of pull requests.
+ *
+ * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
+ *
+ * @return {string} The formatted changelog string.
+ */
+function formatChangelog( pullRequests ) {
 	let changelog = '';
 
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
@@ -675,9 +692,12 @@ async function getChangelog( settings ) {
 
 			// Avoids double nesting such as "Documentation" feature under
 			// the "Documentation" section.
-			if ( group !== featureName ) {
+			if (
+				group !== featureName &&
+				featureName !== UNKNOWN_FEATURE_FALLBACK_NAME
+			) {
 				// Start new <ul> for the Feature group.
-				changelog += '- ' + featureName + '\n';
+				changelog += '#### ' + featureName + '\n';
 			}
 
 			// Add a <li> for each PR in the Feature.
@@ -686,7 +706,7 @@ async function getChangelog( settings ) {
 				entry = entry && entry.replace( `[${ featureName } - `, '[' );
 
 				// Add a new bullet point to the list.
-				changelog += `  ${ entry }\n`;
+				changelog += `${ entry }\n`;
 			} );
 
 			// Close the <ul> for the Feature group.
@@ -709,11 +729,11 @@ async function getChangelog( settings ) {
 function sortFeatureGroups( featureGroups ) {
 	return Object.keys( featureGroups ).sort(
 		( featureAName, featureBName ) => {
-			// Sort "Unknown" to always be at the end
+			// Sort "uncategorized" items to *always* be at the top of the section
 			if ( featureAName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
-				return 1;
-			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
 				return -1;
+			} else if ( featureBName === UNKNOWN_FEATURE_FALLBACK_NAME ) {
+				return 1;
 			}
 
 			// Sort by greatest number of PRs in the group first.
@@ -787,4 +807,5 @@ async function getReleaseChangelog( options ) {
 	sortGroup,
 	getTypesByLabels,
 	getTypesByTitle,
+	formatChangelog,
 };

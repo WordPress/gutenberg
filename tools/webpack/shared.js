@@ -53,7 +53,10 @@ const baseConfig = {
 		] ),
 	},
 	watchOptions: {
-		ignored: [ '**/node_modules', '**/packages/*/src' ],
+		ignored: [
+			'**/node_modules',
+			'**/packages/*/src/**/*.{js,ts,tsx,scss}',
+		],
 		aggregateTimeout: 500,
 	},
 	devtool,
