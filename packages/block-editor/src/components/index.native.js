@@ -22,8 +22,10 @@ export {
 	default as InnerBlocks,
 	useInnerBlocksProps as __experimentalUseInnerBlocksProps,
 } from './inner-blocks';
-export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
-export { default as InspectorControls } from './inspector-controls';
+export {
+	default as InspectorControls,
+	InspectorAdvancedControls,
+} from './inspector-controls';
 export {
 	JustifyToolbar,
 	JustifyContentControl,
