@@ -188,8 +188,6 @@ export const registerStore = defaultRegistry.registerStore;
  */
 export const use = defaultRegistry.use;
 
-export const batch = defaultRegistry.batch;
-
 /**
  * Registers a standard `@wordpress/data` store definition.
  *

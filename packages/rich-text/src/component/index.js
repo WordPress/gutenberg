@@ -3,6 +3,7 @@
  */
 import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -36,6 +37,7 @@ export function useRichText( {
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
 } ) {
+	const registry = useRegistry( registry );
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const ref = useRef();
 
@@ -137,7 +139,8 @@ export function useRichText( {
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
-		wp.data.batch( () => {
+		// We batch both calls to only attempty to rerender once.
+		registry.batch( () => {
 			onSelectionChange( start, end );
 			onChange( _value.current, {
 				__unstableFormats: formats,
