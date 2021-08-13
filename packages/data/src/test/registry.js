@@ -737,8 +737,22 @@ describe( 'createRegistry', () => {
 				store.dispatch( { type: 'dummy' } );
 				store.dispatch( { type: 'dummy' } );
 			} );
-
 			expect( listener ).toHaveBeenCalledTimes( 1 );
+
+			const listener2 = jest.fn();
+			// useSelect subscribes to the stores differently,
+			// This test ensures batching works in this case as well.
+			const unsubscribe = registry.__experimentalSubscribeStore(
+				'myAwesomeReducer',
+				listener2
+			);
+			registry.batch( () => {
+				store.dispatch( { type: 'dummy' } );
+				store.dispatch( { type: 'dummy' } );
+			} );
+			unsubscribe();
+
+			expect( listener2 ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
