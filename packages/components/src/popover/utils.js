@@ -190,6 +190,9 @@ export function computePopoverYAxisPosition(
 		const stickyRect = stickyBoundaryElement.getBoundingClientRect();
 		const stickyPosition = stickyRect.top + height - relativeOffsetTop;
 
+		const bottomStickyPosition =
+			stickyRect.bottom - height - relativeOffsetTop;
+
 		if ( anchorRect.top <= stickyPosition || startsSticky.current ) {
 			if ( startsSticky.current === null || startsSticky.current ) {
 				// Enable startsSticky behavior.  If the popover starts where it would be placed in the
@@ -199,33 +202,31 @@ export function computePopoverYAxisPosition(
 				// scrolling to prevent jumpiness of the popover in the editor.
 				startsSticky.current = true;
 
-				// If there is enough room below the block to host the popover.
-				const canFitUnderneath =
-					anchorRect.bottom +
-						relativeOffsetTop +
-						height +
-						HEIGHT_OFFSET <
-					window.innerHeight;
-
-				if ( canFitUnderneath ) {
+				// Keep returning the bottom position / bottom sticky positions until the top of the
+				// anchor is below the bottom sticky position.
+				if ( anchorRect.top <= bottomStickyPosition + height ) {
 					return {
 						yAxis: 'bottom',
-						popoverTop: anchorRect.bottom,
+						popoverTop: Math.min(
+							bottomStickyPosition,
+							anchorRect.bottom
+						),
 					};
 				}
-				// If the popover can no longer fit underneath the anchor, we break the startsSticky
-				// behavior.
+				// At this point the bottom sticky position is higher than the anchor's top
+				// position and we can reset to default behavior.
 				startsSticky.current = false;
+			} else {
+				// Default sticky behavior.
+				return {
+					yAxis,
+					popoverTop: Math.min( anchorRect.bottom, stickyPosition ),
+				};
 			}
-			// Default sticky behavior.
-			return {
-				yAxis,
-				popoverTop: Math.min( anchorRect.bottom, stickyPosition ),
-			};
 		}
 	}
 
-	// If this is still null, the popover did not start in the sticky position.
+	// If startsSticky.current is still null, the popover did not start in the sticky position.
 	if ( startsSticky.current === null ) {
 		startsSticky.current = false;
 	}
