@@ -71,6 +71,11 @@
 		select {
 			padding-left: $grid-unit-05;
 		}
+		@-moz-document url-prefix() {
+			select {
+				padding-top: $grid-unit-20;
+			}
+		}
 	}
 
 	// Reset z-index set on https://github.com/WordPress/wordpress-develop/commit/f26d4d37351a55fd1fc5dad0f5fef8f0f964908c.
