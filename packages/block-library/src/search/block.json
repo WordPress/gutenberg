@@ -49,7 +49,11 @@
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
-			"__experimentalSkipSerialization": true
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true
+			}
 		},
 		"html": false
 	},
