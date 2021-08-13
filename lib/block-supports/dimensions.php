@@ -43,7 +43,7 @@ function gutenberg_register_dimensions_support( $block_type ) {
  *
  * @return array Block dimensions CSS classes and inline styles.
  */
-function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) {
+function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	if ( gutenberg_skip_dimensions_serialization( $block_type ) ) {
 		return array();
 	}
