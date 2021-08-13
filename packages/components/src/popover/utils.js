@@ -192,29 +192,40 @@ export function computePopoverYAxisPosition(
 
 		if ( anchorRect.top <= stickyPosition || startsSticky.current ) {
 			if ( startsSticky.current === null || startsSticky.current ) {
+				// Enable startsSticky behavior.  If the popover starts where it would be placed in the
+				// sticky position, we want to place it below the anchor if there is room.  This
+				// prevents the block popover from hindering interactions with the block.  Furthermore,
+				// we want to keep this positioned below the block for as long as possible while
+				// scrolling to prevent jumpiness of the popover in the editor.
 				startsSticky.current = true;
-				// If there is enough room below the block, return coordinates for the bottom position.
-				// Otherwise, use the stickyPosition.
-				if (
+
+				// If there is enough room below the block to host the popover.
+				const canFitUnderneath =
 					anchorRect.bottom +
 						relativeOffsetTop +
 						height +
 						HEIGHT_OFFSET <
-					window.innerHeight
-				) {
+					window.innerHeight;
+
+				if ( canFitUnderneath ) {
 					return {
 						yAxis: 'bottom',
 						popoverTop: anchorRect.bottom,
 					};
 				}
+				// If the popover can no longer fit underneath the anchor, we break the startsSticky
+				// behavior.
+				startsSticky.current = false;
 			}
+			// Default sticky behavior.
 			return {
 				yAxis,
-				popoverTop: stickyPosition,
+				popoverTop: Math.min( anchorRect.bottom, stickyPosition ),
 			};
 		}
 	}
 
+	// If this is still null, the popover did not start in the sticky position.
 	if ( startsSticky.current === null ) {
 		startsSticky.current = false;
 	}
