@@ -12,6 +12,13 @@
 		"id": {
 			"type": "number"
 		},
+		"alt": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "img",
+			"attribute": "alt",
+			"default": ""
+		},
 		"hasParallax": {
 			"type": "boolean",
 			"default": false
