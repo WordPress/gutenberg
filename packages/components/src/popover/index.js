@@ -277,7 +277,7 @@ const Popover = (
 
 	useEffect( () => {
 		startsSticky.current = null;
-	}, anchorRef?.current );
+	}, [ anchorRef ] );
 
 	useLayoutEffect( () => {
 		if ( isExpanded ) {
