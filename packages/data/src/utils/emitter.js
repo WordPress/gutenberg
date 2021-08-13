@@ -8,7 +8,7 @@ export function createEmitter() {
 	let isPending = false;
 	const listeners = new Set();
 	const notifyListeners = () =>
-		listeners.forEach( ( listener ) => listener() );
+		Array.from( listeners ).forEach( ( listener ) => listener() );
 
 	return {
 		get isPaused() {
@@ -34,7 +34,6 @@ export function createEmitter() {
 
 		emit() {
 			if ( isPaused ) {
-				isPending = true;
 				return;
 			}
 			notifyListeners();
