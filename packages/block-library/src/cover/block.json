@@ -58,7 +58,10 @@
 		"align": true,
 		"html": false,
 		"spacing": {
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
 		},
 		"color": {
 			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
