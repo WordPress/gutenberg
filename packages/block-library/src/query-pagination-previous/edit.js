@@ -60,7 +60,9 @@ export default function QueryPaginationPreviousEdit( {
 				{ ...useBlockProps() }
 			>
 				{ displayArrow && (
-					<span className="wp-block-query-pagination-previous-arrow">
+					<span
+						className={ `wp-block-query-pagination-previous-arrow is-arrow-${ arrow }` }
+					>
 						{ displayArrow }
 					</span>
 				) }
@@ -77,15 +79,4 @@ export default function QueryPaginationPreviousEdit( {
 			</a>
 		</>
 	);
-	// return (
-	// 	<PlainText
-	// 		__experimentalVersion={ 2 }
-	// 		tagName="a"
-	// 		aria-label={ __( 'Previous page link' ) }
-	// 		placeholder={ __( 'Previous Page' ) }
-	// 		value={ label }
-	// 		onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
-	// 		{ ...useBlockProps() }
-	// 	/>
-	// );
 }

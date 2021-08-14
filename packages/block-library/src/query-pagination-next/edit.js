@@ -70,7 +70,9 @@ export default function QueryPaginationNextEdit( {
 					}
 				/>
 				{ displayArrow && (
-					<span className="wp-block-query-pagination-next-arrow">
+					<span
+						className={ `wp-block-query-pagination-next-arrow is-arrow-${ arrow }` }
+					>
 						{ displayArrow }
 					</span>
 				) }

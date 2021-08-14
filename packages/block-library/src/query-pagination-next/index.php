@@ -28,9 +28,11 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$default_label      = __( 'Next Page' );
 	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
-	if ( ! empty( $attributes['arrow'] ) && array_key_exists( $attributes['arrow'], $arrow_map ) ) {
-		$arrow  = $arrow_map[ $attributes['arrow'] ];
-		$label .= "<span class='wp-block-query-pagination-next-arrow'>$arrow</span>";
+	if ( ! empty( $attributes['arrow'] ) && array_key_exists( $attributes['arrow'], $arrow_map ) && ! empty( $arrow_map[ $attributes['arrow'] ] ) ) {
+		$arrow_attribute = $attributes['arrow'];
+		$arrow           = $arrow_map[ $attributes['arrow'] ];
+		$arrow_classes   = "wp-block-query-pagination-next-arrow is-arrow-$arrow_attribute";
+		$label          .= "<span class='$arrow_classes'>$arrow</span>";
 	}
 	$content = '';
 
