@@ -174,6 +174,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		if ( typeof config.subscribe !== 'function' ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
+		// Thi emitter is used to keep track of active listeners when the registry
+		// get paused, that way, when resumed we should be able to call all these
+		// pending listeners.
 		config.emitter = createEmitter();
 		const currentSubscribe = config.subscribe;
 		config.subscribe = ( listener ) => {
