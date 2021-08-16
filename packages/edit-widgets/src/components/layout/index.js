@@ -1,8 +1,15 @@
 /**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Popover } from '@wordpress/components';
 import { PluginArea } from '@wordpress/plugins';
+import { useMemo } from '@wordpress/element';
+import { WidgetsSettings } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -15,18 +22,27 @@ import UnsavedChangesWarning from './unsaved-changes-warning';
 import WelcomeGuide from '../welcome-guide';
 
 function Layout( { blockEditorSettings, onError } ) {
+	const settings = useMemo( () => omit( blockEditorSettings, 'adminUrl' ), [
+		blockEditorSettings,
+	] );
+	const widgetsSettings = useMemo(
+		() => ( { adminUrl: blockEditorSettings.adminUrl } ),
+		[ blockEditorSettings ]
+	);
 	return (
 		<ErrorBoundary onError={ onError }>
-			<WidgetAreasBlockEditorProvider
-				blockEditorSettings={ blockEditorSettings }
-			>
-				<Interface blockEditorSettings={ blockEditorSettings } />
-				<Sidebar />
-				<Popover.Slot />
-				<PluginArea />
-				<UnsavedChangesWarning />
-				<WelcomeGuide />
-			</WidgetAreasBlockEditorProvider>
+			<WidgetsSettings.Provider value={ widgetsSettings }>
+				<WidgetAreasBlockEditorProvider
+					blockEditorSettings={ settings }
+				>
+					<Interface blockEditorSettings={ blockEditorSettings } />
+					<Sidebar />
+					<Popover.Slot />
+					<PluginArea />
+					<UnsavedChangesWarning />
+					<WelcomeGuide />
+				</WidgetAreasBlockEditorProvider>
+			</WidgetsSettings.Provider>
 		</ErrorBoundary>
 	);
 }

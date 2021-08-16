@@ -8,17 +8,18 @@ import classnames from 'classnames';
  */
 import { useRefEffect } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
-import { useState } from '@wordpress/element';
+import { useState, useContext } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import WidgetsSettings from '../../../components/widgets-settings';
 
 export default function Preview( { idBase, instance, isVisible } ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
-	const { adminUrl } = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings();
-	}, [] );
+	const { adminUrl } = useContext( WidgetsSettings );
 
 	const widgetPreviewUrl = ( adminUrl ?? '' ) + 'widgets.php';
 	const widgetPreviewUrlQueryParameters = {
