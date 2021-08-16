@@ -265,10 +265,33 @@ describe( 'RichText', () => {
 
 		await page.keyboard.press( 'Home' );
 		await page.keyboard.type( '-' );
-		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'End' ); // Scrolls the page down
+
+		// Wait for the scroll to finish and hit End again
+		// const paragraph = await page.waitForSelector(
+		// 	'[aria-label="Paragraph block"]'
+		// );
+		// await paragraph.waitForElementState( 'stable' );
+		// await page.keyboard.press( 'End' );
+
 		await page.keyboard.type( '+' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+		/**
+		 * - Snapshot  - 1
+		 * + Received  + 1
+		 *
+		 *   <!-- wp:paragraph -->
+		 * - <p>-<strong>12</strong>+</p>
+		 * + <p>-+<strong>12</strong></p>
+		 *   <!-- /wp:paragraph -->
+		 *
+		 * This one's correct to be failing because the first End key press scrolls the page to the end
+		 * and only the second one (after the scroll finished) will move the cursor to the EOL. This can
+		 * be confirmed by testing manually, and TBH I'm not sure why Puppeteer is behaving differently
+		 * here, but I have a hunch that it has something to do with how it resizes the browser to match
+		 * the given viewport.
+		 */
 	} );
 
 	it( 'should update internal selection after fresh focus', async () => {
@@ -382,43 +405,42 @@ describe( 'RichText', () => {
 		// Add text and select to color.
 		await page.keyboard.type( '1' );
 		await pressKeyWithModifier( 'primary', 'a' );
+
+		// Open the color menu.
 		await clickBlockToolbarButton( 'More' );
+		await page.click( 'button:text-is( "Highlight" )' );
 
-		const button = await page.waitForXPath(
-			`//button[text()='Highlight']`
-		);
-		// Clicks may fail if the button is out of view. Assure it is before click.
-		await button.evaluate( ( element ) => element.scrollIntoView() );
-		await button.click();
+		// Apply the "Pale pink" color.
+		await page.click( 'button[ aria-label="Color: Pale pink" ]' );
 
-		// Tab to the "Text" tab.
-		await page.keyboard.press( 'Tab' );
-		// Tab to black.
-		await page.keyboard.press( 'Tab' );
-		// Select color other than black.
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
-
+		// Make sure the colored text is visible
+		const coloredTextSelector = '.has-pale-pink-color:text-is( "1" )';
+		await page.waitForSelector( coloredTextSelector, { state: 'visible' } );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Dismiss color picker popover
-		await page.keyboard.press( 'Escape' );
+		await page.keyboard.press( 'Escape', { delay: 100 } );
 
 		// Navigate to the block.
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab', { delay: 100 } );
 
 		// Copy the colored text.
 		await pressKeyWithModifier( 'primary', 'c' );
 
 		// Collapsed the selection to the end.
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight', { delay: 100 } );
 
 		// Create a new paragraph.
-		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter', { delay: 100 } );
 
 		// Paste the colored text.
 		await pressKeyWithModifier( 'primary', 'v' );
 
+		// Make sure the pasted/second colored text is visible
+		await page.waitForSelector(
+			`:nth-match( ${ coloredTextSelector }, 2 )`,
+			{ state: 'visible' }
+		);
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -430,30 +452,47 @@ describe( 'RichText', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '1' );
 
-		// Expect '1🍓'.
+		// Expect the text to be typed correctly.
+		await page.waitForSelector( '1🍓', { state: 'visible' } );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should show/hide toolbar when entering/exiting format', async () => {
 		const blockToolbarSelector = '.block-editor-block-toolbar';
 		await clickBlockAppender();
+
 		await page.keyboard.type( '1' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await page.waitForSelector( blockToolbarSelector, { state: 'hidden' } );
+
 		await pressKeyWithModifier( 'primary', 'b' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.waitForSelector( blockToolbarSelector, {
+			state: 'visible',
+		} );
+
 		await page.keyboard.type( '2' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.waitForSelector( blockToolbarSelector, {
+			state: 'visible',
+		} );
+
 		await pressKeyWithModifier( 'primary', 'b' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await page.waitForSelector( blockToolbarSelector, { state: 'hidden' } );
+
 		await page.keyboard.type( '3' );
 		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await page.waitForSelector( blockToolbarSelector, { state: 'hidden' } );
+
 		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.waitForSelector( blockToolbarSelector, {
+			state: 'visible',
+		} );
+
 		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).not.toBe( null );
+		await page.waitForSelector( blockToolbarSelector, {
+			state: 'visible',
+		} );
+
 		await page.keyboard.press( 'ArrowLeft' );
-		expect( await page.$( blockToolbarSelector ) ).toBe( null );
+		await page.waitForSelector( blockToolbarSelector, { state: 'hidden' } );
 	} );
 
 	it( 'should run input rules after composition end', async () => {
@@ -472,6 +511,7 @@ describe( 'RichText', () => {
 			);
 		} );
 
+		await page.waitForSelector( 'code:text-is( "a" )' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
