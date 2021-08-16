@@ -1640,8 +1640,8 @@ export const getInserterItems = createSelector(
 		} );
 		const sortedBlockTypes = [
 			...items.core,
-			...items.noncore,
 			...variations.core,
+			...items.noncore,
 			...variations.noncore,
 		];
 		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];

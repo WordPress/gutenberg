@@ -3781,11 +3781,11 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			'core/block',
 			'core/test-block-a',
 			'core/test-block-with-variations',
+			'core/test-block-with-variations/variation-a',
+			'core/test-block-with-variations/variation-b',
 			'plugin/block-a',
 			'another-plugin/block-b',
 			'plugin/block-c-with-variations',
-			'core/test-block-with-variations/variation-a',
-			'core/test-block-with-variations/variation-b',
 			'plugin/block-c-with-variations/variation-a',
 			'plugin/block-c-with-variations/variation-b',
 		];
