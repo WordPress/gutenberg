@@ -48,7 +48,7 @@ export default function QueryPaginationNextEdit( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Arrow settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<QueryPaginationArrowControls
 						value={ arrowFromContext }
 						onChange={ ( value ) => {

@@ -10,11 +10,12 @@ import {
 export function QueryPaginationArrowControls( { value, onChange } ) {
 	return (
 		<SegmentedControl
-			label={ __(
-				'A decorative arrow appended to the next and previous page link.'
-			) }
+			label={ __( 'Arrow' ) }
 			value={ value }
 			onChange={ onChange }
+			help={ __(
+				'A decorative arrow appended to the next and previous page link.'
+			) }
 			isBlock
 		>
 			<SegmentedControlOption
