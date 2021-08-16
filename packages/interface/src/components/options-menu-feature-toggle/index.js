@@ -10,7 +10,7 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { store as interfaceWidgetsStore } from '../../store';
+import { store as interfaceStore } from '../../store';
 
 export default function OptionsMenuFeatureToggle( {
 	scope,
@@ -23,10 +23,10 @@ export default function OptionsMenuFeatureToggle( {
 } ) {
 	const isActive = useSelect(
 		( select ) =>
-			select( interfaceWidgetsStore ).isFeatureActive( scope, feature ),
+			select( interfaceStore ).isFeatureActive( scope, feature ),
 		[ feature ]
 	);
-	const { toggleFeature } = useDispatch( interfaceWidgetsStore );
+	const { toggleFeature } = useDispatch( interfaceStore );
 	const speakMessage = () => {
 		if ( isActive ) {
 			speak( messageDeactivated || __( 'Feature deactivated' ) );
