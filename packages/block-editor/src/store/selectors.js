@@ -1623,18 +1623,18 @@ export const getInserterItems = createSelector(
 		// the core blocks (usually by using the `init` action),
 		// thus affecting the display order.
 		// We don't sort reusable blocks as they are handled differently.
-		const toTyped = ( blocks, block ) => {
+		const groupByType = ( blocks, block ) => {
 			const { core, noncore } = blocks;
 			const type = block.name.startsWith( 'core/' ) ? core : noncore;
 
 			type.push( block );
 			return blocks;
 		};
-		const items = visibleBlockTypeInserterItems.reduce( toTyped, {
+		const items = visibleBlockTypeInserterItems.reduce( groupByType, {
 			core: [],
 			noncore: [],
 		} );
-		const variations = blockVariations.reduce( toTyped, {
+		const variations = blockVariations.reduce( groupByType, {
 			core: [],
 			noncore: [],
 		} );
