@@ -17,8 +17,8 @@ describe( 'Spacer', () => {
 		// Create a spacer with the slash block shortcut.
 		await clickBlockAppender();
 		await page.keyboard.type( '/spacer' );
-		await page.waitForXPath(
-			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Spacer')]`
+		await page.waitForSelector(
+			'button[aria-selected="true"]:text-is("Spacer")'
 		);
 		await page.keyboard.press( 'Enter' );
 
@@ -29,20 +29,17 @@ describe( 'Spacer', () => {
 		// Create a spacer with the slash block shortcut.
 		await clickBlockAppender();
 		await page.keyboard.type( '/spacer' );
-		await page.waitForXPath(
-			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Spacer')]`
+		await page.waitForSelector(
+			'button[aria-selected="true"]:text-is("Spacer")'
 		);
 		await page.keyboard.press( 'Enter' );
 
-		const resizableHandle = await page.$(
+		const resizableHandle = await page.waitForSelector(
 			'.block-library-spacer__resize-container .components-resizable-box__handle'
 		);
 		await dragAndResize( resizableHandle, { x: 0, y: 50 } );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		const selectedSpacer = await page.$(
-			'[data-type="core/spacer"].is-selected'
-		);
-		expect( selectedSpacer ).not.toBe( null );
+		await page.waitForSelector( '[data-type="core/spacer"].is-selected' );
 	} );
 } );
