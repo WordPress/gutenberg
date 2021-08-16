@@ -25,7 +25,7 @@ describe( 'missing block', () => {
 		expect( hasAlert ).toBe( false );
 	} );
 
-	it( 'hould strip potentially malicious script tags', async () => {
+	it( 'should strip potentially malicious script tags', async () => {
 		let hasAlert = false;
 
 		page.on( 'dialog', () => {
