@@ -424,4 +424,72 @@ describe( 'migrateFeaturePreferencesToInterfaceStore', () => {
 			},
 		} );
 	} );
+
+	it( 'handles multiple preferences from different stores to be migrated', () => {
+		const persistenceInterface = createPersistenceInterface( {
+			storageKey: 'test-username',
+		} );
+
+		const initialStateA = {
+			preferences: {
+				features: {
+					featureA: true,
+					featureB: false,
+					featureC: true,
+				},
+			},
+		};
+
+		const initialStateB = {
+			preferences: {
+				features: {
+					featureD: true,
+					featureE: false,
+					featureF: true,
+				},
+			},
+		};
+
+		persistenceInterface.set( 'core/test-a', initialStateA );
+		persistenceInterface.set( 'core/test-b', initialStateB );
+
+		migrateFeaturePreferencesToInterfaceStore(
+			persistenceInterface,
+			'core/test-a'
+		);
+
+		migrateFeaturePreferencesToInterfaceStore(
+			persistenceInterface,
+			'core/test-b'
+		);
+
+		expect( persistenceInterface.get() ).toEqual( {
+			'core/interface': {
+				preferences: {
+					features: {
+						'core/test-a': {
+							featureA: true,
+							featureB: false,
+							featureC: true,
+						},
+						'core/test-b': {
+							featureD: true,
+							featureE: false,
+							featureF: true,
+						},
+					},
+				},
+			},
+			'core/test-a': {
+				preferences: {
+					features: undefined,
+				},
+			},
+			'core/test-b': {
+				preferences: {
+					features: undefined,
+				},
+			},
+		} );
+	} );
 } );

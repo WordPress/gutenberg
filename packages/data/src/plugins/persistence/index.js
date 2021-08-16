@@ -242,13 +242,15 @@ export function migrateFeaturePreferencesToInterfaceStore(
 		const targetFeatures =
 			state[ interfaceStoreName ]?.preferences?.features;
 
-		if ( ! targetFeatures ) {
+		// Avoid migrating features again if they've previously been migrated.
+		if ( ! targetFeatures?.[ sourceStoreName ] ) {
 			// Set the feature values in the interface store, the features
 			// object is keyed by 'scope', which matches the store name for
 			// the source.
 			persistence.set( interfaceStoreName, {
 				preferences: {
 					features: {
+						...targetFeatures,
 						[ sourceStoreName ]: sourceFeatures,
 					},
 				},
