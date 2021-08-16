@@ -150,19 +150,13 @@ async function setUpGitBranch( branch, environmentDirectory ) {
  *
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
- * @param {string} environmentDirectory     Path to the environment directory.
  *
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
-async function runTestSuite(
-	testSuite,
-	performanceTestDirectory,
-	environmentDirectory
-) {
+async function runTestSuite( testSuite, performanceTestDirectory ) {
 	await runShellScript(
 		`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
-		performanceTestDirectory,
-		{ ENVIRONMENT_DIRECTORY: environmentDirectory }
+		performanceTestDirectory
 	);
 	const rawResults = await readJSONFile(
 		path.join(
@@ -306,8 +300,7 @@ async function runPerformanceTests( branches, options ) {
 				log( '        >> Running the test.' );
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
-					performanceTestDirectory,
-					environmentDirectory
+					performanceTestDirectory
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(
