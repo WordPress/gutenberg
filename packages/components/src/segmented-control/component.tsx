@@ -10,7 +10,7 @@ import useResizeAware from 'react-resize-aware';
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useMemo } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -36,10 +36,8 @@ function SegmentedControl(
 ) {
 	const {
 		className,
-		baseId,
 		isAdaptiveWidth = false,
 		isBlock = false,
-		id,
 		label,
 		hideLabelFromVision = false,
 		help,
@@ -51,9 +49,12 @@ function SegmentedControl(
 	const cx = useCx();
 	const containerRef = useRef();
 	const [ resizeListener, sizes ] = useResizeAware();
-
+	const baseId = useInstanceId(
+		SegmentedControl,
+		'segmented-control'
+	).toString();
 	const radio = useRadioState( {
-		baseId: baseId || id,
+		baseId,
 		state: value,
 	} );
 

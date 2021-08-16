@@ -188,7 +188,7 @@ exports[`SegmentedControl should render correctly 1`] = `
       class="medium components-segmented-control emotion-4 emotion-5"
       data-wp-c16t="true"
       data-wp-component="SegmentedControl"
-      id="segmented"
+      id="segmented-control-0"
       role="radiogroup"
     >
       <iframe
@@ -214,7 +214,7 @@ exports[`SegmentedControl should render correctly 1`] = `
           data-value="rigas"
           data-wp-c16t="true"
           data-wp-component="SegmentedControlOption"
-          id="segmented-0"
+          id="segmented-control-0-0"
           role="radio"
           tabindex="0"
         >
@@ -246,7 +246,7 @@ exports[`SegmentedControl should render correctly 1`] = `
           data-value="jack"
           data-wp-c16t="true"
           data-wp-component="SegmentedControlOption"
-          id="segmented-1"
+          id="segmented-control-0-1"
           role="radio"
           tabindex="-1"
         >

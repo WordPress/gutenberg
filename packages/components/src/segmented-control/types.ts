@@ -31,12 +31,6 @@ export type SegmentedControlProps = Omit<
 	 */
 	hideLabelFromVision: boolean;
 	/**
-	 * ID that will serve as a base for all the items IDs.
-	 *
-	 * @see https://reakit.io/docs/radio/#useradiostate
-	 */
-	baseId?: string;
-	/**
 	 * Determines if segments should be rendered with equal widths.
 	 *
 	 * @default false

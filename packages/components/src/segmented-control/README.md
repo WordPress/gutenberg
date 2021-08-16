@@ -40,13 +40,6 @@ Label for the form element.
 
 If true, the label will only be visible to screen readers.
 
-### `baseId`
-
--   Type: `string`
--   Required: No
-
-ID that will serve as a base for all the items IDs.
-
 ### `isAdaptiveWidth`
 
 -   Type: `boolean`
