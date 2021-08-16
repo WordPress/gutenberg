@@ -96,7 +96,8 @@ addFilter(
  * @return   {Block}                 The transformed block.
  */
 function updateThirdPartyTransformFromGallery( toBlock, fromBlocks ) {
-	const galleryBlock = fromBlocks.find(
+	const from = Array.isArray( fromBlocks ) ? fromBlocks : [ fromBlocks ];
+	const galleryBlock = from.find(
 		( transformedBlock ) =>
 			transformedBlock.name === 'core/gallery' &&
 			transformedBlock.innerBlocks.length > 0 &&
