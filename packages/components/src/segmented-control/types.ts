@@ -25,11 +25,11 @@ export type SegmentedControlProps = Omit<
 	 */
 	label: string;
 	/**
-	 * ID that will serve as a base for all the items IDs.
+	 * If true, the label will only be visible to screen readers.
 	 *
-	 * @see https://reakit.io/docs/radio/#useradiostate
+	 * @default false
 	 */
-	baseId?: string;
+	hideLabelFromVision: boolean;
 	/**
 	 * Determines if segments should be rendered with equal widths.
 	 *
@@ -54,6 +54,11 @@ export type SegmentedControlProps = Omit<
 	 * React children
 	 */
 	children: ReactNode;
+	/**
+	 * If this property is added, a help text will be generated
+	 * using help property as the content.
+	 */
+	help?: ReactNode;
 };
 
 export type SegmentedControlContextProps = RadioStateReturn & {

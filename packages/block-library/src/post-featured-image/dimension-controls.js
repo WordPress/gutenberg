@@ -1,11 +1,15 @@
 /**
+ * External dependencies
+ */
+import classNames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
 import {
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
-	BaseControl,
 	Flex,
 	FlexItem,
 	__experimentalSegmentedControl as SegmentedControl,
@@ -60,7 +64,13 @@ const DimensionControls = ( {
 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
 	return (
 		<PanelBody title={ __( 'Dimensions' ) }>
-			<Flex justify="space-between">
+			<Flex
+				justify="space-between"
+				className={ classNames(
+					'block-library-post-featured-image-dimension-controls',
+					{ 'scale-control-is-visible': !! height }
+				) }
+			>
 				<FlexItem>
 					<UnitControl
 						label={ __( 'Height' ) }
@@ -85,30 +95,18 @@ const DimensionControls = ( {
 				</FlexItem>
 			</Flex>
 			{ !! height && (
-				<>
-					<BaseControl
-						aria-label={ scaleLabel }
-						className="block-library-post-featured-image-scale-controls"
-					>
-						<div>
-							<BaseControl.VisualLabel>
-								{ scaleLabel }
-							</BaseControl.VisualLabel>
-						</div>
-						<SegmentedControl
-							label={ scaleLabel }
-							value={ scale }
-							onChange={ ( value ) => {
-								setAttributes( {
-									scale: value,
-								} );
-							} }
-							isBlock
-						>
-							{ SCALE_OPTIONS }
-						</SegmentedControl>
-					</BaseControl>
-				</>
+				<SegmentedControl
+					label={ scaleLabel }
+					value={ scale }
+					onChange={ ( value ) => {
+						setAttributes( {
+							scale: value,
+						} );
+					} }
+					isBlock
+				>
+					{ SCALE_OPTIONS }
+				</SegmentedControl>
 			) }
 		</PanelBody>
 	);

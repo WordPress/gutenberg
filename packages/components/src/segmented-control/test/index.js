@@ -17,7 +17,7 @@ describe( 'SegmentedControl', () => {
 	);
 	it( 'should render correctly', () => {
 		const { container } = render(
-			<SegmentedControl baseId="segmented" label="Test Segmented Control">
+			<SegmentedControl label="Test Segmented Control">
 				{ options }
 			</SegmentedControl>
 		);
@@ -27,7 +27,6 @@ describe( 'SegmentedControl', () => {
 		const mockOnChange = jest.fn();
 		const { getByLabelText } = render(
 			<SegmentedControl
-				baseId="segmented"
 				value="jack"
 				onChange={ mockOnChange }
 				label="Test Segmented Control"
