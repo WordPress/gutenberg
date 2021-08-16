@@ -539,6 +539,27 @@ function getEntry( issue ) {
 }
 
 /**
+ * Returns a formatted changelog entry for a given issue object and matching feature name, or undefined
+ * if entry should be omitted.
+ *
+ * @param {IssuesListForRepoResponseItem} issue       Issue object.
+ * @param {string}                        featureName Feature name.
+ *
+ * @return {string=} Formatted changelog entry, or undefined to omit.
+ */
+function getFeatureEntry( issue, featureName ) {
+	return getEntry( issue )
+		?.replace(
+			new RegExp( `\\[${ featureName.toLowerCase() } \- `, 'i' ),
+			'['
+		)
+		.replace(
+			new RegExp( `(?<=^- )${ featureName.toLowerCase() }: `, 'i' ),
+			''
+		);
+}
+
+/**
  * Returns the latest release for a given series
  *
  * @param {GitHub} octokit Initialized Octokit REST client.
@@ -682,8 +703,9 @@ function formatChangelog( pullRequests ) {
 			const featureGroupPRs = featureGroups[ featureName ];
 
 			const featureGroupEntries = featureGroupPRs
-				.map( getEntry )
-				.filter( Boolean );
+				.map( ( issue ) => getFeatureEntry( issue, featureName ) )
+				.filter( Boolean )
+				.sort();
 
 			// Don't create feature sections when there are no PRs.
 			if ( ! featureGroupEntries.length ) {
@@ -702,9 +724,6 @@ function formatChangelog( pullRequests ) {
 
 			// Add a <li> for each PR in the Feature.
 			featureGroupEntries.forEach( ( entry ) => {
-				// Strip feature name from entry if present.
-				entry = entry && entry.replace( `[${ featureName } - `, '[' );
-
 				// Add a new bullet point to the list.
 				changelog += `${ entry }\n`;
 			} );
