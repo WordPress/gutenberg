@@ -13,7 +13,6 @@ import { getBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import DimensionControls from '../components/dimension-controls';
 import {
 	MarginEdit,
 	hasMarginSupport,
@@ -74,7 +73,10 @@ export function DimensionsPanel( props ) {
 		// Injected controls can register additional functions to further adjust
 		// the attributes being reset.
 		resetFilters.forEach( ( resetFilter ) => {
-			newAttributes = resetFilter( newAttributes );
+			newAttributes = {
+				...newAttributes,
+				...resetFilter( newAttributes ),
+			};
 		} );
 
 		// Enforce a cleaned style object.
@@ -93,37 +95,30 @@ export function DimensionsPanel( props ) {
 				header={ __( 'Dimensions' ) }
 				resetAll={ resetAll }
 			>
-				<DimensionControls.Slot>
-					{ ( fills ) => (
-						<>
-							{ ! isPaddingDisabled && (
-								<ToolsPanelItem
-									hasValue={ () => hasPaddingValue( props ) }
-									label={ __( 'Padding' ) }
-									onDeselect={ () => resetPadding( props ) }
-									isShownByDefault={
-										defaultSpacingControls?.padding
-									}
-								>
-									<PaddingEdit { ...props } />
-								</ToolsPanelItem>
-							) }
-							{ ! isMarginDisabled && (
-								<ToolsPanelItem
-									hasValue={ () => hasMarginValue( props ) }
-									label={ __( 'Margin' ) }
-									onDeselect={ () => resetMargin( props ) }
-									isShownByDefault={
-										defaultSpacingControls?.margin
-									}
-								>
-									<MarginEdit { ...props } />
-								</ToolsPanelItem>
-							) }
-							{ fills }
-						</>
-					) }
-				</DimensionControls.Slot>
+				{ ! isPaddingDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasPaddingValue( props ) }
+						label={ __( 'Padding' ) }
+						onDeselect={ () => resetPadding( props ) }
+						isShownByDefault={ defaultSpacingControls?.padding }
+					>
+						<PaddingEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+				{ ! isMarginDisabled && (
+					<ToolsPanelItem
+						hasValue={ () => hasMarginValue( props ) }
+						label={ __( 'Margin' ) }
+						onDeselect={ () => resetMargin( props ) }
+						isShownByDefault={ defaultSpacingControls?.margin }
+					>
+						<MarginEdit { ...props } />
+					</ToolsPanelItem>
+				) }
+				<InspectorControls.Slot
+					__experimentalGroup="dimensions"
+					bubblesVirtually={ false }
+				/>
 			</ToolsPanel>
 		</InspectorControls>
 	);
