@@ -14,7 +14,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
+import {
+	forwardRef,
+	useCallback,
+	useMemo,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ENTER } from '@wordpress/keycodes';
 
@@ -36,9 +42,11 @@ import { useControlledState } from '../utils/hooks';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import type { StateReducer } from '../input-control/reducer/state';
 
+const passThrough: StateReducer = ( state ) => state;
+
 function UnitControl(
 	{
-		__unstableStateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducer = passThrough,
 		autoComplete = 'off',
 		className,
 		disabled = false,
@@ -176,16 +184,10 @@ function UnitControl(
 		}
 	};
 
-	/**
-	 * "Middleware" function that intercepts updates from InputControl.
-	 * This allows us to tap into actions to transform the (next) state for
-	 * InputControl.
-	 *
-	 * @param  state  State from InputControl
-	 * @param  action Action triggering state change
-	 * @return The updated state to apply to InputControl
-	 */
-	const unitControlStateReducer: StateReducer = ( state, action ) => {
+	// Specialized state reducer for UnitControl
+	const {
+		current: unitControlStateReducer,
+	}: { current: StateReducer } = useRef( ( state, action ) => {
 		/*
 		 * On commits (when pressing ENTER and on blur if
 		 * isPressEnterToChange is true), if a parse has been performed
@@ -199,7 +201,12 @@ function UnitControl(
 		}
 
 		return state;
-	};
+	} );
+
+	const reducer = useCallback(
+		composeStateReducers( unitControlStateReducer, stateReducer ),
+		[ unitControlStateReducer, stateReducer ]
+	);
 
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
@@ -244,10 +251,7 @@ function UnitControl(
 				suffix={ inputSuffix }
 				value={ parsedQuantity ?? '' }
 				step={ step }
-				__unstableStateReducer={ composeStateReducers(
-					unitControlStateReducer,
-					stateReducer
-				) }
+				__unstableStateReducer={ reducer }
 			/>
 		</Root>
 	);

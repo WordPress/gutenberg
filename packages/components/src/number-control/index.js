@@ -7,7 +7,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useCallback } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -19,52 +19,34 @@ import { composeStateReducers } from '../input-control/reducer/reducer';
 import { add, subtract, roundClamp } from '../utils/math';
 import { isValueEmpty } from '../utils/values';
 
-export function NumberControl(
-	{
-		__unstableStateReducer: stateReducer = ( state ) => state,
-		className,
-		dragDirection = 'n',
-		hideHTMLArrows = false,
-		isDragEnabled = true,
-		isShiftStepEnabled = true,
-		label,
-		max = Infinity,
-		min = -Infinity,
-		required = false,
-		shiftStep = 10,
-		step = 1,
-		type: typeProp = 'number',
-		value: valueProp,
-		...props
-	},
-	ref
-) {
-	const isStepAny = step === 'any';
-	const baseStep = isStepAny ? 1 : parseFloat( step );
-	const baseValue = roundClamp( 0, min, max, baseStep );
-	const constrainValue = ( value, stepOverride ) => {
-		// When step is "any" clamp the value, otherwise round and clamp it.
-		return isStepAny
-			? Math.min( max, Math.max( min, value ) )
-			: roundClamp( value, min, max, stepOverride ?? baseStep );
-	};
+// Creates a state reducer for specialization of InputControl.
+const useNumberControlStateReducer = ( props ) => {
+	const {
+		dragDirection,
+		isDragEnabled,
+		isShiftStepEnabled,
+		min,
+		max,
+		required,
+		shiftStep,
+		step,
+	} = props;
 
-	const autoComplete = typeProp === 'number' ? 'off' : null;
-	const classes = classNames( 'components-number-control', className );
-
-	/**
-	 * "Middleware" function that intercepts updates from InputControl.
-	 * This allows us to tap into actions to transform the (next) state for
-	 * InputControl.
-	 *
-	 * @param {Object} state  State from InputControl
-	 * @param {Object} action Action triggering state change
-	 * @return {Object} The updated state to apply to InputControl
-	 */
-	const numberControlStateReducer = ( state, action ) => {
+	return useCallback( ( state, action ) => {
 		const { type, payload } = action;
-		const event = payload?.event;
+		const event = state._event;
 		const currentValue = state.value;
+
+		const isStepAny = step === 'any';
+		const baseStep = isStepAny ? 1 : parseFloat( step );
+		const baseValue = roundClamp( 0, min, max, baseStep );
+
+		const constrainValue = ( value, stepOverride ) => {
+			// When step is "any" clamp the value, otherwise round and clamp it.
+			return isStepAny
+				? Math.min( max, Math.max( min, value ) )
+				: roundClamp( value, min, max, stepOverride ?? baseStep );
+		};
 
 		/**
 		 * Handles custom UP and DOWN Keyboard events
@@ -172,6 +154,7 @@ export function NumberControl(
 			type === inputControlActionTypes.CHANGE &&
 			! state.isPressEnterToChange
 		) {
+			// console.log('NC', event.target.value, state.value )
 			const { valid } = event.target.validity;
 			if ( ! valid ) {
 				state.error = 'invalid';
@@ -179,7 +162,49 @@ export function NumberControl(
 		}
 
 		return state;
-	};
+	}, Object.keys( props ) );
+};
+
+const passThrough = ( state ) => state;
+
+export function NumberControl(
+	{
+		__unstableStateReducer: stateReducer = passThrough,
+		className,
+		dragDirection = 'n',
+		hideHTMLArrows = false,
+		isDragEnabled = true,
+		isShiftStepEnabled = true,
+		label,
+		max = Infinity,
+		min = -Infinity,
+		required = false,
+		shiftStep = 10,
+		step = 1,
+		type: typeProp = 'number',
+		value: valueProp,
+		...props
+	},
+	ref
+) {
+	const autoComplete = typeProp === 'number' ? 'off' : null;
+	const classes = classNames( 'components-number-control', className );
+
+	const numberControlStateReducer = useNumberControlStateReducer( {
+		dragDirection,
+		isDragEnabled,
+		isShiftStepEnabled,
+		min,
+		max,
+		required,
+		shiftStep,
+		step,
+	} );
+
+	const reducer = useCallback(
+		composeStateReducers( numberControlStateReducer, stateReducer ),
+		[ numberControlStateReducer, stateReducer ]
+	);
 
 	return (
 		<Input
@@ -193,15 +218,13 @@ export function NumberControl(
 			label={ label }
 			max={ max }
 			min={ min }
+			// onValidate={ onValidate }
 			ref={ ref }
 			required={ required }
 			step={ step }
 			type={ typeProp }
 			value={ valueProp }
-			__unstableStateReducer={ composeStateReducers(
-				numberControlStateReducer,
-				stateReducer
-			) }
+			__unstableStateReducer={ reducer }
 		/>
 	);
 }
