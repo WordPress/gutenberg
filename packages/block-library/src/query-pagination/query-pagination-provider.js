@@ -14,14 +14,20 @@ const QueryPaginationContext = createContext();
 export default function QueryPaginationProvider( { clientId, children } ) {
 	const paginationArrow = useSelect( ( select ) => {
 		const { getBlocks } = select( blockEditorStore );
-		const aaa = getBlocks( clientId );
-		const arr = aaa?.find( ( innerBlock ) => {
+		const innerBlocks = getBlocks( clientId );
+		/**
+		 * Query Pagination Next/Previous blocks' arrows should be synced
+		 * inside a Query Pagination block. So we initialize the context
+		 * arrow value from the the first matching Query Pagination
+		 * Next/Previous block we find.
+		 */
+		const match = innerBlocks?.find( ( innerBlock ) => {
 			return [
 				'core/query-pagination-next',
 				'core/query-pagination-previous',
 			].includes( innerBlock.name );
 		} );
-		return arr?.attributes?.arrow || '';
+		return match?.attributes?.arrow;
 	}, [] );
 	const [ queryPaginationContext, setQueryPaginationContext ] = useState( {
 		arrow: paginationArrow,

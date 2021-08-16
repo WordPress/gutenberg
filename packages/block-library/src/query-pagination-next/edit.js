@@ -7,6 +7,7 @@ import {
 	PlainText,
 	InspectorControls,
 } from '@wordpress/block-editor';
+import { PanelBody } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -47,12 +48,14 @@ export default function QueryPaginationNextEdit( {
 	return (
 		<>
 			<InspectorControls>
-				<QueryPaginationArrowControls
-					value={ arrowFromContext }
-					onChange={ ( value ) => {
-						setQueryPaginationContext( { arrow: value } );
-					} }
-				/>
+				<PanelBody title={ __( 'Arrow settings' ) }>
+					<QueryPaginationArrowControls
+						value={ arrowFromContext }
+						onChange={ ( value ) => {
+							setQueryPaginationContext( { arrow: value } );
+						} }
+					/>
+				</PanelBody>
 			</InspectorControls>
 			<a
 				href="#pagination-next-pseudo-link"

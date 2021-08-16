@@ -3,7 +3,9 @@
 		"clientId": "_clientId_0",
 		"name": "core/query-pagination-next",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"arrow": "none"
+		},
 		"innerBlocks": [],
 		"originalContent": ""
 	}
