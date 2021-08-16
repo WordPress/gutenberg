@@ -60,8 +60,26 @@ describe( 'NumberControl', () => {
 			const input = getInput();
 			input.focus();
 			fireEvent.change( input, { target: { value: 10 } } );
-
 			expect( spy ).toHaveBeenCalledWith( '10' );
+		} );
+
+		it( 'should not call onChange callback with invalid values', () => {
+			const spy = jest.fn();
+
+			render(
+				<NumberControl
+					value={ 5 }
+					min={ 2 }
+					max={ 10 }
+					onChange={ ( v ) => spy( v ) }
+				/>
+			);
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: 1 } } );
+			expect( input.value ).toBe( '1' );
+			expect( spy ).not.toHaveBeenCalled();
 		} );
 	} );
 
@@ -78,8 +96,18 @@ describe( 'NumberControl', () => {
 			 * This is zero because the value has been adjusted to
 			 * respect the min/max range of the input.
 			 */
-
 			expect( input.value ).toBe( '0' );
+		} );
+
+		it( 'should clamp value within range on blur', () => {
+			render( <NumberControl value={ 0 } min={ -5 } max={ 5 } /> );
+
+			const input = getInput();
+			input.focus();
+			fireEvent.change( input, { target: { value: -10 } } );
+			input.blur();
+
+			expect( input.value ).toBe( '-5' );
 		} );
 
 		it( 'should parse to number value on ENTER keypress when required', () => {
