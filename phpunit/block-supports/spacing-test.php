@@ -32,7 +32,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 	function tearDown() {
 		unregister_block_type( 'test/test-block' );
 
-		$GLOBALS['wp_styles']  = $this->old_wp_styles;
+		$GLOBALS['wp_styles'] = $this->old_wp_styles;
 
 		add_action( 'wp_default_styles', 'wp_default_styles' );
 		add_action( 'wp_print_styles', 'print_emoji_styles' );
@@ -122,7 +122,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 		);
 
 		register_block_type( 'test/test-block', $test_block_args );
-		$render_output = gutenberg_render_spacing_support( $this->sample_block_content, $block );
+		$render_output    = gutenberg_render_spacing_support( $this->sample_block_content, $block );
 		$wp_footer_output = $this->get_footer_styles();
 
 		$this->assertEquals(
@@ -158,7 +158,7 @@ class WP_Block_Supports_Spacing_Test extends WP_UnitTestCase {
 		);
 
 		register_block_type( 'test/test-block', $test_block_args );
-		$render_output = gutenberg_render_spacing_support( $this->sample_block_content, $block );
+		$render_output    = gutenberg_render_spacing_support( $this->sample_block_content, $block );
 		$wp_footer_output = $this->get_footer_styles();
 
 		$this->assertEquals(
