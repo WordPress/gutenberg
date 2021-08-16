@@ -141,4 +141,4 @@ export default function Edit( { attributes, setAttributes } ) {
 }
 ```
 
-Next Section: [Finishing Touches](/docs/getting-started/tutorials/create-block/finishing.md)
+Next Section: [Finishing Touches](/docs/getting-started/create-block/finishing.md)

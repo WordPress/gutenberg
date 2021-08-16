@@ -22,7 +22,7 @@ The Editor offers rich new value to users with visual, drag-and-drop creation to
 
 ### Create a Block Tutorial
 
-[Learn how to create your first block](/docs/getting-started/tutorials/create-block/README.md) for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
+[Learn how to create your first block](/docs/getting-started/create-block/README.md) for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
 
 ### Develop for the block editor
 

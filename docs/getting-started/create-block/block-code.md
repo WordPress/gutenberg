@@ -43,4 +43,4 @@ Note: the block classname is prefixed with `wp-block`. The `create-block/gutenpr
 
 After updating, rebuild the block using `npm run build` then reload the post and refresh the browser. If you are using a browser that supports color fonts (Firefox) then you will see it styled.
 
-Next Section: [Authoring Experience](/docs/getting-started/tutorials/create-block/author-experience.md)
+Next Section: [Authoring Experience](/docs/getting-started/create-block/author-experience.md)
