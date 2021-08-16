@@ -11,7 +11,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const createDemoPosts = async () => {
-	await createNewPost( { postType: 'post', title: `Post 1` } );
+	await createNewPost( { postType: 'post', title: 'Post 1' } );
 	await publishPost();
 };
 
@@ -44,21 +44,19 @@ describe( 'Query block', () => {
 			await page.waitForSelector(
 				'li.pattern-slide.active-slide[aria-label="Query Test 1"]'
 			);
-			const nextPatternButton = await page.waitForSelector(
+			await page.click(
 				'.block-editor-block-pattern-setup__navigation button[aria-label="Next pattern"]'
 			);
-			await nextPatternButton.click();
 			await page.waitForSelector(
 				'li.pattern-slide.active-slide[aria-label="Query Test 2"]'
 			);
 			// Choose the selected pattern.
-			const chooseButton = await page.waitForXPath(
-				'//div[contains(@class, "block-editor-block-pattern-setup__actions")]//button[text()="Choose"]'
+			await page.click(
+				'.block-editor-block-pattern-setup__actions button:text("Choose")'
 			);
-			chooseButton.click();
 			// Wait for pattern setup to go away.
 			await page.waitForSelector( '.block-editor-block-pattern-setup', {
-				hidden: true,
+				state: 'hidden',
 			} );
 			/**
 			 * We can't use `getEditedPostContent` easily for now because
@@ -75,18 +73,16 @@ describe( 'Query block', () => {
 				'.block-editor-block-pattern-setup__display-controls'
 			);
 			// Click the Grid view button.
-			const gridViewButton = await page.waitForSelector(
+			await page.click(
 				'.block-editor-block-pattern-setup__display-controls button[aria-label="Grid view"]'
 			);
-			await gridViewButton.click();
 			// Wait for patterns to be loaded and click the wanted pattern.
-			const gridPattern = await page.waitForXPath(
-				'//div[@class="block-editor-block-pattern-setup-list__item-title" and contains(text(), "Query Test 2")]'
+			await page.click(
+				'.block-editor-block-pattern-setup-list__item-title:text("Query Test 2")'
 			);
-			await gridPattern.click();
 			// Wait for pattern setup to go away.
 			await page.waitForSelector( '.block-editor-block-pattern-setup', {
-				hidden: true,
+				state: 'hidden',
 			} );
 			/**
 			 * We can't use `getEditedPostContent` easily for now because
