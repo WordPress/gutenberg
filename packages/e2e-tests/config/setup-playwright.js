@@ -7,8 +7,8 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import {
-	//clearLocalStorage,
-	activatePlugin,
+	activateTheme,
+	deactivatePlugin,
 	enablePageDialogAccept,
 	isOfflineMode,
 	setBrowserViewport,
@@ -177,5 +177,9 @@ beforeAll( async () => {
 	await enablePageDialogAccept();
 	await observeConsoleLogging();
 	await trashExistingPosts();
-	await activatePlugin( 'gutenberg-test-plugin-disables-the-css-animations' );
+	await activateTheme( 'twentytwenty' );
+
+	await deactivatePlugin(
+		'gutenberg-test-plugin-disables-the-css-animations'
+	);
 } );
