@@ -10,6 +10,7 @@
 		border: none;
 		border-radius: $radius-block-ui;
 		z-index: z-index(".block-editor-block-content-overlay__overlay");
+		pointer-events: none;
 	}
 
 	&:hover:not(.is-dragging-blocks).overlay-active::before,
