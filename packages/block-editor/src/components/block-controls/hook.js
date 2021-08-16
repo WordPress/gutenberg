@@ -25,7 +25,7 @@ export default function useBlockControlsFill( group, exposeToChildren ) {
 				exposeToChildren &&
 				hasBlockSupport(
 					getBlockName( clientId ),
-					'__experimentalCaptureToolbars',
+					'__experimentalExposeControlsToChildren',
 					false
 				) &&
 				hasSelectedInnerBlock( clientId )

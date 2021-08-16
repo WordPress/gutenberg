@@ -41,7 +41,7 @@
 	"supports": {
 		"align": [ "left", "center", "right" ],
 		"anchor": true,
-		"__experimentalCaptureToolbars": true
+		"__experimentalExposeControlsToChildren": true
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },

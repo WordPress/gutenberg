@@ -144,7 +144,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const { __experimentalCaptureToolbars, hasOverlay } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return;
+				return {};
 			}
 
 			const {
@@ -160,7 +160,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					blocksStore
 				).hasBlockSupport(
 					blockName,
-					'__experimentalCaptureToolbars',
+					'__experimentalExposeControlsToChildren',
 					false
 				),
 				hasOverlay:
