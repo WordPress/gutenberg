@@ -138,7 +138,7 @@ _Options:_
 -   `remove` — Locks the ability of a block from being removed.
 -   `move` — Locks the ability of a block from being moved.
 
-You can use this with `templateLock` to lock all blocks except a single block bypassing `false` in `remove` or `move`.
+You can use this with `templateLock` to lock all blocks except a single block by using `false` in `remove` or `move`.
 
 ## Nested Templates
 
