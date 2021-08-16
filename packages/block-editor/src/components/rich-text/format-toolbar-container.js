@@ -7,6 +7,7 @@ import { Popover, ToolbarGroup } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockControls from '../block-controls';
+import blockToolbarSlotFill from '../block-toolbar/slot-fill';
 import FormatToolbar from './format-toolbar';
 
 const FormatToolbarContainer = ( { inline, anchorRef } ) => {
@@ -19,7 +20,7 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
 				focusOnMount={ false }
 				anchorRef={ anchorRef }
 				className="block-editor-rich-text__inline-format-toolbar"
-				__unstableSlotName="block-toolbar"
+				__unstableSlotFill={ blockToolbarSlotFill }
 			>
 				<div className="block-editor-rich-text__inline-format-toolbar-group">
 					<ToolbarGroup>

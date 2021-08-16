@@ -52,7 +52,7 @@ function BlockPopover( {
 	isValid,
 	isEmptyDefaultBlock,
 	capturingClientId,
-	__unstablePopoverSlot,
+	__unstablePopoverSlotFill,
 	__unstableContentRef,
 } ) {
 	const {
@@ -208,7 +208,7 @@ function BlockPopover( {
 			__unstableStickyBoundaryElement={ stickyBoundaryElement }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+			__unstableSlotFill={ __unstablePopoverSlotFill || null }
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
@@ -322,7 +322,7 @@ function wrapperSelector( select ) {
 }
 
 export default function WrappedBlockPopover( {
-	__unstablePopoverSlot,
+	__unstablePopoverSlotFill,
 	__unstableContentRef,
 } ) {
 	const selected = useSelect( wrapperSelector, [] );
@@ -351,7 +351,7 @@ export default function WrappedBlockPopover( {
 			isValid={ isValid }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
 			capturingClientId={ capturingClientId }
-			__unstablePopoverSlot={ __unstablePopoverSlot }
+			__unstablePopoverSlotFill={ __unstablePopoverSlotFill }
 			__unstableContentRef={ __unstableContentRef }
 		/>
 	);

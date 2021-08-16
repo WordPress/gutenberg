@@ -49,12 +49,10 @@ export function createSlotFill( name ) {
 
 	const SlotComponent = ( props ) => <Slot name={ name } { ...props } />;
 	SlotComponent.displayName = name + 'Slot';
-	SlotComponent.__unstableName = name;
 
 	return {
 		Fill: FillComponent,
 		Slot: SlotComponent,
+		useSlot: () => useSlot( name ),
 	};
 }
-
-export { useSlot };

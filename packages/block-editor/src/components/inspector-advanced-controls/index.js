@@ -12,7 +12,7 @@ import {
 import { useBlockEditContext } from '../block-edit/context';
 
 const name = 'InspectorAdvancedControls';
-const { Fill, Slot } = createSlotFill( name );
+const { Fill, Slot, useSlot } = createSlotFill( name );
 
 function InspectorAdvancedControls( { children } ) {
 	const { isSelected } = useBlockEditContext();
@@ -23,8 +23,8 @@ function InspectorAdvancedControls( { children } ) {
 	) : null;
 }
 
-InspectorAdvancedControls.slotName = name;
 InspectorAdvancedControls.Slot = Slot;
+InspectorAdvancedControls.__unstableUseSlot = useSlot;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-advanced-controls/README.md

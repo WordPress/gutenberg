@@ -18,6 +18,7 @@ import InsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import BlockContextualToolbar from './block-contextual-toolbar';
+import blockToolbarSlotFill from '../block-toolbar/slot-fill';
 import { usePopoverScroll } from './use-popover-scroll';
 
 /**
@@ -124,7 +125,7 @@ export default function BlockTools( {
 				<BlockPopover __unstableContentRef={ __unstableContentRef } />
 				{ /* Used for the inline rich text toolbar. */ }
 				<Popover.Slot
-					name="block-toolbar"
+					Slot={ blockToolbarSlotFill.Slot }
 					ref={ usePopoverScroll( __unstableContentRef ) }
 				/>
 				{ children }

@@ -1,28 +1,23 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalUseSlot as useSlot,
-	createSlotFill,
-} from '@wordpress/components';
+import { createSlotFill } from '@wordpress/components';
 
-const slotName = '__experimentalMainDashboardButton';
+const { Fill: MainDashboardButton, Slot, useSlot } = createSlotFill(
+	'__experimentalMainDashboardButton'
+);
 
-const { Fill, Slot: MainDashboardButtonSlot } = createSlotFill( slotName );
-
-const MainDashboardButton = Fill;
-
-const Slot = ( { children } ) => {
-	const slot = useSlot( slotName );
+const MainDashboardButtonSlot = ( { children } ) => {
+	const slot = useSlot();
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( ! hasFills ) {
 		return children;
 	}
 
-	return <MainDashboardButtonSlot bubblesVirtually />;
+	return <Slot bubblesVirtually />;
 };
 
-MainDashboardButton.Slot = Slot;
+MainDashboardButton.Slot = MainDashboardButtonSlot;
 
 export default MainDashboardButton;

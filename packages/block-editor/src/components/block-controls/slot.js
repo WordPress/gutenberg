@@ -5,7 +5,6 @@ import { useContext } from '@wordpress/element';
 import {
 	__experimentalToolbarContext as ToolbarContext,
 	ToolbarGroup,
-	__experimentalUseSlot as useSlot,
 } from '@wordpress/components';
 
 /**
@@ -14,11 +13,10 @@ import {
 import groups from './groups';
 
 export default function BlockControlsSlot( { group = 'default', ...props } ) {
+	const { Slot, useSlot } = groups[ group ];
 	const accessibleToolbarState = useContext( ToolbarContext );
-	const Slot = groups[ group ].Slot;
-	const slot = useSlot( Slot.__unstableName );
+	const slot = useSlot();
 	const hasFills = Boolean( slot.fills && slot.fills.length );
-
 	if ( ! hasFills ) {
 		return null;
 	}

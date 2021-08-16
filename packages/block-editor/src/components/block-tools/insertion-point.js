@@ -28,7 +28,7 @@ import { usePopoverScroll } from './use-popover-scroll';
 export const InsertionPointOpenRef = createContext();
 
 function InsertionPointPopover( {
-	__unstablePopoverSlot,
+	__unstablePopoverSlotFill,
 	__unstableContentRef,
 } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
@@ -215,7 +215,7 @@ function InsertionPointPopover( {
 			className="block-editor-block-list__insertion-point-popover"
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+			__unstableSlotFill={ __unstablePopoverSlotFill || null }
 		>
 			<div
 				ref={ ref }
@@ -256,7 +256,7 @@ function InsertionPointPopover( {
 
 export default function InsertionPoint( {
 	children,
-	__unstablePopoverSlot,
+	__unstablePopoverSlotFill,
 	__unstableContentRef,
 } ) {
 	const isVisible = useSelect( ( select ) => {
@@ -267,7 +267,7 @@ export default function InsertionPoint( {
 		<InsertionPointOpenRef.Provider value={ useRef( false ) }>
 			{ isVisible && (
 				<InsertionPointPopover
-					__unstablePopoverSlot={ __unstablePopoverSlot }
+					__unstablePopoverSlotFill={ __unstablePopoverSlotFill }
 					__unstableContentRef={ __unstableContentRef }
 				/>
 			) }

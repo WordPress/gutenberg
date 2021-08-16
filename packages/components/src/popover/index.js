@@ -29,15 +29,15 @@ import { close } from '@wordpress/icons';
 import { computePopoverPosition, offsetIframe } from './utils';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
-import { Slot, Fill, useSlot } from '../slot-fill';
+import { createSlotFill } from '../slot-fill';
 import { getAnimateClassName } from '../animate';
 
 /**
- * Name of slot in which popover should fill.
+ * The default SlotFill that popover uses.
  *
- * @type {string}
+ * @type {Object}
  */
-const SLOT_NAME = 'Popover';
+const defaultSlotFill = createSlotFill( 'Popover' );
 
 function computeAnchorRect(
 	anchorRefFallback,
@@ -253,7 +253,7 @@ const Popover = (
 		onClickOutside,
 		onFocusOutside,
 		__unstableStickyBoundaryElement,
-		__unstableSlotName = SLOT_NAME,
+		__unstableSlotFill = defaultSlotFill,
 		__unstableObserveElement,
 		__unstableBoundaryParent,
 		__unstableForcePosition,
@@ -263,12 +263,13 @@ const Popover = (
 	},
 	ref
 ) => {
+	const { Fill, useSlot } = __unstableSlotFill;
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
-	const slot = useSlot( __unstableSlotName );
+	const slot = useSlot();
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const [ containerResizeListener, contentSize ] = useResizeObserver();
 	noArrow = isExpanded || noArrow;
@@ -566,7 +567,7 @@ const Popover = (
 	);
 
 	if ( slot.ref ) {
-		content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
+		content = <Fill>{ content }</Fill>;
 	}
 
 	if ( anchorRef || anchorRect ) {
@@ -578,15 +579,8 @@ const Popover = (
 
 const PopoverContainer = forwardRef( Popover );
 
-function PopoverSlot( { name = SLOT_NAME }, ref ) {
-	return (
-		<Slot
-			bubblesVirtually
-			name={ name }
-			className="popover-slot"
-			ref={ ref }
-		/>
-	);
+function PopoverSlot( { Slot = defaultSlotFill.Slot }, ref ) {
+	return <Slot bubblesVirtually className="popover-slot" ref={ ref } />;
 }
 
 PopoverContainer.Slot = forwardRef( PopoverSlot );

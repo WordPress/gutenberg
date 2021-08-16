@@ -8,10 +8,7 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import {
-	PanelBody,
-	__experimentalUseSlot as useSlot,
-} from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -27,6 +24,8 @@ import DefaultStylePicker from '../default-style-picker';
 import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
+
+const useAdvancedControlsSlot = InspectorAdvancedControls.__unstableUseSlot;
 
 const BlockInspector = ( {
 	showNoBlockSelectedMessage = true,
@@ -128,18 +127,15 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			<div>
-				<AdvancedControls
-					slotName={ InspectorAdvancedControls.slotName }
-					bubblesVirtually={ bubblesVirtually }
-				/>
+				<AdvancedControls bubblesVirtually={ bubblesVirtually } />
 			</div>
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);
 };
 
-const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
-	const slot = useSlot( slotName );
+const AdvancedControls = ( { bubblesVirtually } ) => {
+	const slot = useAdvancedControlsSlot();
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( ! hasFills ) {

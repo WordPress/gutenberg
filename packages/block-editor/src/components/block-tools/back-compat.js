@@ -10,6 +10,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import InsertionPoint, { InsertionPointOpenRef } from './insertion-point';
 import BlockPopover from './block-popover';
+import blockToolbarSlotFill from '../block-toolbar/slot-fill';
 
 export default function BlockToolsBackCompat( { children } ) {
 	const openRef = useContext( InsertionPointOpenRef );
@@ -25,8 +26,8 @@ export default function BlockToolsBackCompat( { children } ) {
 	} );
 
 	return (
-		<InsertionPoint __unstablePopoverSlot="block-toolbar">
-			<BlockPopover __unstablePopoverSlot="block-toolbar" />
+		<InsertionPoint __unstablePopoverSlotFill={ blockToolbarSlotFill }>
+			<BlockPopover __unstablePopoverSlotFill={ blockToolbarSlotFill } />
 			{ children }
 		</InsertionPoint>
 	);
