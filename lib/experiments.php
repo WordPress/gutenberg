@@ -6,6 +6,20 @@
  */
 
 /**
+ * Checks whether the Gutenberg experiment is enabled.
+ *
+ * @since 6.7.0
+ *
+ * @param string $name The name of the experiment.
+ *
+ * @return bool True when the experiment is enabled.
+ */
+function gutenberg_is_experiment_enabled( $name ) {
+	$experiments = get_option( 'gutenberg-experiments' );
+	return ! empty( $experiments[ $name ] );
+}
+
+/**
  * The main entry point for the Gutenberg experiments page.
  *
  * @since 6.3.0

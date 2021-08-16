@@ -6,6 +6,10 @@
  * @package    WordPress
  */
 
+if ( class_exists( 'WP_REST_Menu_Locations_Controller' ) ) {
+	return;
+}
+
 /**
  * Core class used to access menu locations via the REST API.
  *

@@ -7,6 +7,10 @@
  * @since 5.6.0
  */
 
+if ( class_exists( 'WP_REST_Widgets_Controller' ) ) {
+	return;
+}
+
 /**
  * Core class to access widgets via the REST API.
  *

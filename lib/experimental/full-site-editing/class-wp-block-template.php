@@ -6,6 +6,10 @@
  * @since 5.5.0
  */
 
+if ( class_exists( 'WP_Block_Template' ) ) {
+	return;
+}
+
 /**
  * Class representing a block template.
  */

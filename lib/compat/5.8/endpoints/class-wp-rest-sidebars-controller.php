@@ -27,6 +27,10 @@
  * @link      https://github.com/martin-pettersson/wp-rest-api-sidebars
  */
 
+if ( class_exists( 'WP_REST_Sidebars_Controller' ) ) {
+	return;
+}
+
 /**
  * Core class used to manage a site's sidebars.
  *

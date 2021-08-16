@@ -5,6 +5,10 @@
  * @package Gutenberg
  */
 
+if ( class_exists( 'WP_REST_URL_Details_Controller' ) ) {
+	return;
+}
+
 /**
  * Controller which provides REST endpoint for retrieving information
  * from a remote site's HTML response.

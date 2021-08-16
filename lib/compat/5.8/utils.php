@@ -24,6 +24,8 @@
  *         ),
  *     );
  *
+ * Can be removed in favour of _wp_array_set() once plugin requires 5.8.
+ *
  * @param array $array   An array that we want to mutate to include a specific value in a path.
  * @param array $path    An array of keys describing the path that we want to mutate.
  * @param mixed $value   The value that will be set.
@@ -76,6 +78,8 @@ function gutenberg_experimental_set( &$array, $path, $value = null ) {
  * We can't remove or update the client's library due to backward compatibility
  * (some of the output of lodash's kebabCaseare saved in the post content).
  * We have to make the server behave like the client.
+ *
+ * Can be removed in favour of _wp_to_kebab_case() once plugin requires 5.8.
  *
  * @link https://github.com/lodash/lodash/blob/4.17/dist/lodash.js#L14369
  * @link https://github.com/lodash/lodash/blob/4.17/dist/lodash.js#L278

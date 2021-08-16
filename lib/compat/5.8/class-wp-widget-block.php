@@ -5,6 +5,13 @@
  * @package Gutenberg
  */
 
+// We can't use class_exists( 'WP_Widget_Block' ) because core loads widgets
+// *after* plugins, so test for wp_use_widgets_block_editor() which we know
+// implies the existence of WP_Widget_Block.
+if ( function_exists( 'wp_use_widgets_block_editor' ) ) {
+	return;
+}
+
 /**
  * Core class used to implement a Block widget.
  *

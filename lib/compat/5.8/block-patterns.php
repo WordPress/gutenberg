@@ -172,6 +172,7 @@ function register_gutenberg_patterns() {
  */
 function remove_core_patterns() {
 	$core_block_patterns = array(
+		// Patterns that exist in 5.5 - 5.7.
 		'text-two-columns',
 		'two-buttons',
 		'two-images',
@@ -182,6 +183,7 @@ function remove_core_patterns() {
 		'three-buttons',
 		'heading-paragraph',
 		'quote',
+		// Patterns that exist in 5.8.
 		'query-standard-posts',
 		'query-medium-posts',
 		'query-small-posts',

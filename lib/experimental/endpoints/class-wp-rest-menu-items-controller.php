@@ -6,6 +6,10 @@
  * @subpackage REST_API
  */
 
+if ( class_exists( 'WP_REST_Menu_Items_Controller' ) ) {
+	return;
+}
+
 /**
  * Core class to access nav items via the REST API.
  *

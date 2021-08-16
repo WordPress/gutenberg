@@ -7,6 +7,10 @@
  * @package gutenberg
  */
 
+if ( class_exists( 'WP_REST_Pattern_Directory_Controller' ) ) {
+	return;
+}
+
 /**
  * Controller which provides REST endpoint for block patterns.
  *

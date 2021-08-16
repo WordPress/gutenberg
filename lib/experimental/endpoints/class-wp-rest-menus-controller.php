@@ -6,6 +6,10 @@
  * @subpackage REST_API
  */
 
+if ( class_exists( 'WP_REST_Menus_Controller' ) ) {
+	return;
+}
+
 /**
  * Core class used to managed menu terms associated via the REST API.
  *
