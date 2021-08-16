@@ -45,6 +45,7 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 
 	$has_padding_support = gutenberg_block_has_support( $block_type, array( 'spacing', 'padding' ), false );
 	$has_margin_support  = gutenberg_block_has_support( $block_type, array( 'spacing', 'margin' ), false );
+	$has_gap_support     = gutenberg_block_has_support( $block_type, array( 'spacing', 'blockGap' ), false );
 	$styles              = array();
 
 	if ( $has_padding_support ) {
@@ -71,6 +72,14 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 		}
 	}
 
+	if ( $has_gap_support ) {
+		$gap_value = _wp_array_get( $block_attributes, array( 'style', 'spacing', 'blockGap' ), null );
+
+		if ( is_string( $gap_value ) ) {
+			$styles[] = sprintf( '--wp--style--block-gap: %s', $gap_value );
+		}
+	}
+
 	return empty( $styles ) ? array() : array( 'style' => implode( ' ', $styles ) );
 }
 
@@ -90,6 +99,51 @@ function gutenberg_skip_spacing_serialization( $block_type ) {
 		$spacing_support['__experimentalSkipSerialization'];
 }
 
+
+/**
+ * Renders the spacing support to the block wrapper, for supports that
+ * require block-level server-side rendering, for example blockGap support
+ * which uses CSS variables.
+ *
+ * @param  string $block_content Rendered block content.
+ * @param  array  $block         Block object.
+ * @return string                Filtered block content.
+ */
+function gutenberg_render_spacing_support( $block_content, $block ) {
+	$block_type      = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$has_gap_support = gutenberg_block_has_support( $block_type, array( 'spacing', 'blockGap' ), false );
+	if ( ! $has_gap_support || ! isset( $block['attrs']['style']['spacing']['blockGap'] ) ) {
+		return $block_content;
+	}
+
+	$id    = uniqid();
+	$style = sprintf(
+		'.wp-container-%s { --wp--style--block-gap: %s; }',
+		$id,
+		esc_attr( $block['attrs']['style']['spacing']['blockGap'] )
+	);
+
+	// This assumes the hook only applies to blocks with a single wrapper.
+	$content = preg_replace(
+		'/' . preg_quote( 'class="', '/' ) . '/',
+		'class="wp-container-' . $id . ' ',
+		$block_content,
+		1
+	);
+
+	// Ideally styles should be loaded in the head, but blocks may be parsed
+	// after that, so loading in the footer for now.
+	// See https://core.trac.wordpress.org/ticket/53494.
+	add_action(
+		'wp_footer',
+		function () use ( $style ) {
+			echo '<style>' . $style . '</style>';
+		}
+	);
+
+	return $content;
+}
+
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'spacing',
@@ -98,3 +152,5 @@ WP_Block_Supports::get_instance()->register(
 		'apply'              => 'gutenberg_apply_spacing_support',
 	)
 );
+
+add_filter( 'render_block', 'gutenberg_render_spacing_support', 10, 2 );
