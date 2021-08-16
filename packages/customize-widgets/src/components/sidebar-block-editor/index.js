@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { defaultTo } from 'lodash';
+import { defaultTo, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,6 +21,7 @@ import {
 	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
+import { WidgetsSettings } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -63,6 +64,11 @@ export default function SidebarBlockEditor( {
 			).__unstableIsFeatureActive( 'welcomeGuide' ),
 		};
 	}, [] );
+
+	const widgetsSettings = useMemo(
+		() => ( { adminUrl: blockEditorSettings.adminUrl } ),
+		[ blockEditorSettings ]
+	);
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
 		if ( hasUploadPermissions ) {
@@ -76,7 +82,7 @@ export default function SidebarBlockEditor( {
 		}
 
 		return {
-			...blockEditorSettings,
+			...omit( blockEditorSettings, 'adminUrl' ),
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			mediaUpload: mediaUploadBlockEditor,
 			hasFixedToolbar: isFixedToolbarActive,
@@ -100,44 +106,49 @@ export default function SidebarBlockEditor( {
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 
-			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
-				<KeyboardShortcuts
-					undo={ sidebar.undo }
-					redo={ sidebar.redo }
-					save={ sidebar.save }
-				/>
-
-				<Header
+			<WidgetsSettings.Provider value={ widgetsSettings }>
+				<SidebarEditorProvider
 					sidebar={ sidebar }
-					inserter={ inserter }
-					isInserterOpened={ isInserterOpened }
-					setIsInserterOpened={ setIsInserterOpened }
-					isFixedToolbarActive={ isFixedToolbarActive }
-				/>
+					settings={ settings }
+				>
+					<KeyboardShortcuts
+						undo={ sidebar.undo }
+						redo={ sidebar.redo }
+						save={ sidebar.save }
+					/>
 
-				<CopyHandler>
-					<BlockTools>
-						<BlockSelectionClearer>
-							<WritingFlow>
-								<ObserveTyping>
-									<BlockList
-										renderAppender={ BlockAppender }
-									/>
-								</ObserveTyping>
-							</WritingFlow>
-						</BlockSelectionClearer>
-					</BlockTools>
-				</CopyHandler>
+					<Header
+						sidebar={ sidebar }
+						inserter={ inserter }
+						isInserterOpened={ isInserterOpened }
+						setIsInserterOpened={ setIsInserterOpened }
+						isFixedToolbarActive={ isFixedToolbarActive }
+					/>
 
-				{ createPortal(
-					// This is a temporary hack to prevent button component inside <BlockInspector>
-					// from submitting form when type="button" is not specified.
-					<form onSubmit={ ( event ) => event.preventDefault() }>
-						<BlockInspector />
-					</form>,
-					inspector.contentContainer[ 0 ]
-				) }
-			</SidebarEditorProvider>
+					<CopyHandler>
+						<BlockTools>
+							<BlockSelectionClearer>
+								<WritingFlow>
+									<ObserveTyping>
+										<BlockList
+											renderAppender={ BlockAppender }
+										/>
+									</ObserveTyping>
+								</WritingFlow>
+							</BlockSelectionClearer>
+						</BlockTools>
+					</CopyHandler>
+
+					{ createPortal(
+						// This is a temporary hack to prevent button component inside <BlockInspector>
+						// from submitting form when type="button" is not specified.
+						<form onSubmit={ ( event ) => event.preventDefault() }>
+							<BlockInspector />
+						</form>,
+						inspector.contentContainer[ 0 ]
+					) }
+				</SidebarEditorProvider>
+			</WidgetsSettings.Provider>
 
 			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
