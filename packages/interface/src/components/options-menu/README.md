@@ -1,6 +1,6 @@
-# OptionsMenuDropdown
+# OptionsMenu
 
-`OptionsMenuDropdown` is a convenient component for rendering an editor options menu. This is typically a menu that provides:
+`OptionsMenu` is a convenient component for rendering an editor options menu. This is typically a menu that provides:
 
 - menu items for quick toggling editor preferences.
 - a way to open dialogs for keyboard shortcuts and editor preferences.
@@ -17,7 +17,7 @@ Note that just like the `DropdownMenu` component, this component accepts a rende
 ```jsx
 function MyEditorMenu() {
 	return (
-		<OptionsMenuDropdown>
+		<OptionsMenu>
 			{ () => (
 				<MenuGroup label={ __( 'Features' ) }>
 					<OptionsMenuFeatureToggle
@@ -30,7 +30,7 @@ function MyEditorMenu() {
 					/>
 				</MenuGroup>
 			) }
-		</OptionsMenuDropdown>
+		</OptionsMenu>
 	);
 }
 ```
