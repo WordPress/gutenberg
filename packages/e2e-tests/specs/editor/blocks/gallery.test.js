@@ -17,8 +17,9 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
-	await page.waitForSelector( selector );
-	const inputElement = await page.$( selector );
+	const inputElement = await page.waitForSelector( selector, {
+		state: 'attached',
+	} );
 	const testImagePath = path.join(
 		__dirname,
 		'..',
