@@ -1,4 +1,5 @@
 .wp-block-query-pagination-next-arrow {
+	margin-left: 2px;
 	display: inline-block; // Needed so that the transform works.
 	// chevron(`»`) symbol doesn't need the mirroring by us.
 	&:not(.is-arrow-chevron) {
