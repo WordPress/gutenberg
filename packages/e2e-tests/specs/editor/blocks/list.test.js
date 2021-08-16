@@ -36,6 +36,7 @@ describe( 'List', () => {
 		await page.keyboard.type( 'test' );
 		await pressKeyTimes( 'ArrowLeft', 4 );
 		await page.keyboard.type( '* ' );
+		await page.waitForSelector( 'ul[aria-label="Block: List"]' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -51,52 +52,67 @@ describe( 'List', () => {
 	it( 'can undo asterisk transform', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1. ' );
+		await page.waitForSelector( 'ol[aria-label="Block: List"]' );
 		await pressKeyWithModifier( 'primary', 'z' );
 
+		await page.waitForSelector( 'p:text-is("1. ")' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should undo asterisk transform with backspace', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( '* ' );
+		// A delay is needed here because the UI doesn't keep up and the whole
+		// content gets removed instead being reverted to "* ".
+		await page.keyboard.type( '* ', { delay: 100 } );
+		await page.waitForSelector( 'ul[aria-label="Block: List"]' );
+		// Adding delay to the Backspace will not have any effect because the
+		// undo action happens on keydown, not keyup (delay is between those events).
 		await page.keyboard.press( 'Backspace' );
 
+		await page.waitForSelector( 'p:text-is("* ")' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should undo asterisk transform with backspace after selection changes', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( '* ' );
+		await page.keyboard.type( '* ', { delay: 100 } );
+		await page.waitForSelector( 'ul[aria-label="Block: List"]' );
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'Backspace' );
 
+		await page.waitForSelector( 'p:text-is("* ")' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should undo asterisk transform with backspace setting isTyping state', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( '* ' );
+		await page.keyboard.type( '* ', { delay: 100 } );
+		await page.waitForSelector( 'ul[aria-label="Block: List"]' );
 		await showBlockToolbar();
 		await page.keyboard.press( 'Backspace' );
 
+		await page.waitForSelector( 'p:text-is("* ")' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback', async () => {
 		await clickBlockAppender();
 		await page.evaluate( () => delete window.requestIdleCallback );
-		await page.keyboard.type( '* ' );
-		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
+		await page.keyboard.type( '* ', { delay: 100 } );
+		await page.waitForSelector( 'ul[aria-label="Block: List"]' );
 		await page.keyboard.press( 'Backspace' );
 
+		await page.waitForSelector( 'p:text-is("* ")' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should undo asterisk transform with escape', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( '* ' );
+		await page.keyboard.type( '* ', { delay: 100 } );
+		await page.waitForSelector( 'ul[aria-label="Block: List"]' );
 		await page.keyboard.press( 'Escape' );
 
+		await page.waitForSelector( 'p:text-is("* ")' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -126,8 +142,8 @@ describe( 'List', () => {
 		// Create a list with the slash block shortcut.
 		await clickBlockAppender();
 		await page.keyboard.type( '/list' );
-		await page.waitForXPath(
-			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'List')]`
+		await page.waitForSelector(
+			'button[aria-selected="true"]:text("List")'
 		);
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'I’m a list' );
