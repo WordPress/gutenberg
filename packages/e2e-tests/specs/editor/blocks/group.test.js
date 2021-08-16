@@ -23,8 +23,8 @@ describe( 'Group', () => {
 	it( 'can be created using the slash inserter', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '/group' );
-		await page.waitForXPath(
-			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Group')]`
+		await page.waitForSelector(
+			'button[aria-selected="true"] >> text="Group"'
 		);
 		await page.keyboard.press( 'Enter' );
 
