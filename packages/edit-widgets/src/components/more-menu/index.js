@@ -7,7 +7,7 @@ import { __, _x } from '@wordpress/i18n';
 import { external } from '@wordpress/icons';
 import {
 	OptionsMenuDropdown,
-	MoreMenuFeatureToggle,
+	OptionsMenuFeatureToggle,
 } from '@wordpress/interface';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -43,7 +43,7 @@ export default function MoreMenu() {
 					<>
 						{ isLargeViewport && (
 							<MenuGroup label={ _x( 'View', 'noun' ) }>
-								<MoreMenuFeatureToggle
+								<OptionsMenuFeatureToggle
 									scope="core/edit-widgets"
 									feature="fixedToolbar"
 									label={ __( 'Top toolbar' ) }
@@ -68,7 +68,7 @@ export default function MoreMenu() {
 							>
 								{ __( 'Keyboard shortcuts' ) }
 							</MenuItem>
-							<MoreMenuFeatureToggle
+							<OptionsMenuFeatureToggle
 								scope="core/edit-widgets"
 								feature="welcomeGuide"
 								label={ __( 'Welcome Guide' ) }
@@ -92,7 +92,7 @@ export default function MoreMenu() {
 							</MenuItem>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Preferences' ) }>
-							<MoreMenuFeatureToggle
+							<OptionsMenuFeatureToggle
 								scope="core/edit-widgets"
 								feature="keepCaretInsideBlock"
 								label={ __(
@@ -108,7 +108,7 @@ export default function MoreMenu() {
 									'Contain text cursor inside block deactivated'
 								) }
 							/>
-							<MoreMenuFeatureToggle
+							<OptionsMenuFeatureToggle
 								scope="core/edit-widgets"
 								feature="themeStyles"
 								info={ __(
@@ -117,7 +117,7 @@ export default function MoreMenu() {
 								label={ __( 'Use theme styles' ) }
 							/>
 							{ isLargeViewport && (
-								<MoreMenuFeatureToggle
+								<OptionsMenuFeatureToggle
 									scope="core/edit-widgets"
 									feature="showBlockBreadcrumbs"
 									label={ __( 'Display block breadcrumbs' ) }

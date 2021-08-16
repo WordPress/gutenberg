@@ -12,7 +12,7 @@ import { speak } from '@wordpress/a11y';
  */
 import { store as interfaceWidgetsStore } from '../../store';
 
-export default function MoreMenuFeatureToggle( {
+export default function OptionsMenuFeatureToggle( {
 	scope,
 	label,
 	info,
