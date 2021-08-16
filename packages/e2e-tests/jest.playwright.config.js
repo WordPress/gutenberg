@@ -1,7 +1,8 @@
 module.exports = {
 	preset: 'jest-playwright-preset',
-	testMatch: [ '**/specs/**/*.[jt]s', '**/?(*.)spec.[jt]s' ],
+	testMatch: [ '**/specs/editor/blocks/**/*.js' ],
 	testPathIgnorePatterns: [ '/node_modules/', '/wordpress/' ],
+	testRunner: 'jest-circus/runner',
 	reporters:
 		'TRAVIS' in process.env && 'CI' in process.env
 			? [
@@ -13,4 +14,14 @@ module.exports = {
 		'<rootDir>/config/setup-playwright.js',
 		'@wordpress/jest-console',
 	],
+	testEnvironmentOptions: {
+		'jest-playwright': {
+			launchOptions: {
+				// devtools: true,
+				// headless: false, // use PWDEBUG=1 for headfull run with debugger window
+				// slowMo: 100,
+				args: [ '--enable-blink-features=ComputedAccessibilityInfo' ],
+			},
+		},
+	},
 };
