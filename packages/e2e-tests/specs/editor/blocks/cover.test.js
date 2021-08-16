@@ -29,16 +29,12 @@ describe( 'Cover', () => {
 			'.block-editor-list-view-block__contents-container button'
 		);
 
-		const heightInput = (
-			await page.$x(
-				'//div[./label[contains(text(),"Minimum height of cover")]]//input'
-			)
-		 )[ 0 ];
+		const heightInput = await page.waitForSelector(
+			'input:below(:text("Minimum height of cover"))'
+		);
 
 		// Verify the height of the cover is not defined
-		expect(
-			await page.evaluate( ( { value } ) => value, heightInput )
-		).toBeFalsy();
+		expect( await heightInput.getAttribute( 'value' ) ).toBeFalsy();
 
 		const resizeButton = await page.$(
 			'.components-resizable-box__handle-bottom'
@@ -81,10 +77,7 @@ describe( 'Cover', () => {
 
 		// Verify the height of the cover has changed.
 		expect(
-			await page.evaluate(
-				( { value } ) => Number.parseInt( value ),
-				heightInput
-			)
+			Number.parseInt( await heightInput.getAttribute( 'value' ) )
 		).toBeGreaterThan( 100 );
 	} );
 } );
