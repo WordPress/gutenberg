@@ -101,7 +101,12 @@ describe( 'Classic', () => {
 		expect( await getEditedPostContent() ).toMatch( /<!-- wp:gallery/ );
 	} );
 
-	it( 'Should not fail after save/reload', async () => {
+	/**
+	 * I'm skipping this for now because setCacheEnabled is not available in Playwright as the cache
+	 * is disabled by default because of separate browser context. It's worth noting though that
+	 * Puppeteer's setCacheEnabled is for network cache, not disk.
+	 */
+	it.skip( 'Should not fail after save/reload', async () => {
 		// Might move to utils if this becomes useful enough for other tests
 		const runWithoutCache = async ( cb ) => {
 			try {
