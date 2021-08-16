@@ -25,10 +25,9 @@ describe( 'Classic', () => {
 
 	it( 'should be inserted', async () => {
 		await insertBlock( 'Classic' );
-		// Wait for TinyMCE to initialise.
-		await page.waitForSelector( '.mce-content-body' );
+
 		// Ensure there is focus.
-		await page.focus( '.mce-content-body' );
+		await page.click( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
 		await pressKeyWithModifier( 'shift', 'Tab' );
@@ -38,21 +37,20 @@ describe( 'Classic', () => {
 
 	it( 'should insert media, convert to blocks, and undo in one step', async () => {
 		await insertBlock( 'Classic' );
-		// Wait for TinyMCE to initialise.
-		await page.waitForSelector( '.mce-content-body' );
+
 		// Ensure there is focus.
-		await page.focus( '.mce-content-body' );
+		await page.click( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 
 		// Click the image button.
-		await page.waitForSelector( 'div[aria-label^="Add Media"]' );
 		await page.click( 'div[aria-label^="Add Media"]' );
-
 		await page.click( '.media-menu-item#menu-item-gallery' );
 
 		// Wait for media modal to appear and upload image.
-		await page.waitForSelector( '.media-modal input[type=file]' );
-		const inputElement = await page.$( '.media-modal input[type=file]' );
+		const inputElement = await page.waitForSelector(
+			'.media-modal input[type=file]',
+			{ state: 'attached' }
+		);
 		const testImagePath = path.join(
 			__dirname,
 			'..',
@@ -68,7 +66,8 @@ describe( 'Classic', () => {
 
 		// Wait for upload.
 		await page.waitForSelector(
-			`.media-modal li[aria-label="${ filename }"]`
+			`.media-modal li[aria-label="${ filename }"]`,
+			{ state: 'visible' }
 		);
 
 		// Insert the uploaded image.
@@ -119,11 +118,8 @@ describe( 'Classic', () => {
 
 		await insertBlock( 'Classic' );
 
-		// Wait for TinyMCE to initialise.
-		await page.waitForSelector( '.mce-content-body' );
-
 		// Ensure there is focus.
-		await page.focus( '.mce-content-body' );
+		await page.click( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 
 		// Move focus away.
@@ -137,9 +133,7 @@ describe( 'Classic', () => {
 		// in case it regresses. To test this, revert commit 65c9f74, build and run the test.
 		await runWithoutCache( () => page.reload() );
 
-		const classicBlockSelector = 'div[aria-label^="Block: Classic"]';
-		await page.waitForSelector( classicBlockSelector );
-		await page.focus( classicBlockSelector );
+		await page.focus( 'div[aria-label^="Block: Classic"]' );
 		expect( console ).not.toHaveErrored();
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
