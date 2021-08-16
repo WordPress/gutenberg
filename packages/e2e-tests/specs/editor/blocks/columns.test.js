@@ -19,13 +19,11 @@ describe( 'Columns', () => {
 		await closeGlobalBlockInserter();
 		await page.click( '[aria-label="Two columns; equal split"]' );
 		await page.click( '.edit-post-header-toolbar__list-view-toggle' );
-		const columnBlockMenuItem = (
-			await page.$x(
-				'//button[contains(concat(" ", @class, " "), " block-editor-list-view-block-select-button ")][text()="Column"]'
-			)
-		 )[ 0 ];
-		await columnBlockMenuItem.click();
+		await page.click(
+			'.block-editor-list-view-block-select-button:text-is("Column")'
+		);
 		await openGlobalBlockInserter();
+
 		expect( await getAllBlockInserterItemTitles() ).toHaveLength( 1 );
 	} );
 } );
