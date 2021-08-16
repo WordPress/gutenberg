@@ -5,7 +5,10 @@ import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { external } from '@wordpress/icons';
-import { MoreMenuDropdown, MoreMenuFeatureToggle } from '@wordpress/interface';
+import {
+	OptionsMenuDropdown,
+	MoreMenuFeatureToggle,
+} from '@wordpress/interface';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
@@ -35,7 +38,7 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<MoreMenuDropdown>
+			<OptionsMenuDropdown>
 				{ () => (
 					<>
 						{ isLargeViewport && (
@@ -132,7 +135,7 @@ export default function MoreMenu() {
 						</MenuGroup>
 					</>
 				) }
-			</MoreMenuDropdown>
+			</OptionsMenuDropdown>
 			<KeyboardShortcutHelpModal
 				isModalActive={ isKeyboardShortcutsModalActive }
 				toggleModal={ toggleKeyboardShortcutsModal }

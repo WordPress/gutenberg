@@ -1,6 +1,6 @@
 # MoreMenuFeatureToggle
 
-`MoreMenuFeatureToggle` renders a menu item that can be used as a child of the `MoreMenuDropdown` component. The component
+`MoreMenuFeatureToggle` renders a menu item that can be used as a child of the `OptionsMenuDropdown` component. The component
 is connected to the interface package's store, and will toggle the value of a 'feature' between true and false.
 
 This component implements a `MenuItem` component from the `@wordpress/components` package.
