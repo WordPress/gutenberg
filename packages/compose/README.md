@@ -128,6 +128,7 @@ This behavior is useful if we want to render a list of items asynchronously for 
 _Parameters_
 
 -   _list_ `T[]`: Source array.
+-   _config_ `AsyncListConfig`: Configuration object.
 
 _Returns_
 
@@ -185,7 +186,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
+-   `import('react').Ref<TElementType>`: A ref to assign to the target element.
 
 ### useDebounce
 

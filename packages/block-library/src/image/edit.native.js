@@ -26,6 +26,7 @@ import {
 	BottomSheet,
 	BottomSheetTextControl,
 	BottomSheetSelectControl,
+	FooterMessageControl,
 	FooterMessageLink,
 	Badge,
 } from '@wordpress/components';
@@ -476,6 +477,8 @@ export class ImageEdit extends Component {
 					setFeaturedButtonStyle,
 					styles.removeFeaturedButton,
 				] }
+				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
 				onPress={ () =>
 					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
 				}
@@ -486,17 +489,13 @@ export class ImageEdit extends Component {
 			<BottomSheet.Cell
 				label={ __( 'Set as Featured Image ' ) }
 				labelStyle={ setFeaturedButtonStyle }
+				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
+				separatorType={ 'none' }
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);
 
-		return (
-			<PanelBody>
-				{ isFeaturedImage
-					? removeFeaturedButton()
-					: setFeaturedButton() }
-			</PanelBody>
-		);
+		return isFeaturedImage ? removeFeaturedButton() : setFeaturedButton();
 	}
 
 	render() {
@@ -581,8 +580,21 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ canImageBeFeatured &&
-					this.getFeaturedButtonPanel( isFeaturedImage ) }
+				<PanelBody
+					title={ __( 'Featured Image' ) }
+					titleStyle={ styles.featuredImagePanelTitle }
+				>
+					{ canImageBeFeatured &&
+						this.getFeaturedButtonPanel( isFeaturedImage ) }
+					<FooterMessageControl
+						label={ __(
+							'Changes to featured image will not be affected by the undo/redo buttons.'
+						) }
+						cellContainerStyle={
+							styles.setFeaturedButtonCellContainer
+						}
+					/>
+				</PanelBody>
 			</InspectorControls>
 		);
 

@@ -8,8 +8,6 @@
 			"hasParallax": false,
 			"dimRatio": 50,
 			"backgroundType": "image",
-			"title": "",
-			"contentAlign": "center",
 			"gradient": "midnight"
 		},
 		"innerBlocks": [

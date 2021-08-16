@@ -8,7 +8,6 @@ import type { Ref } from 'react';
  * Internal dependencies
  */
 import { useContextSystem, contextConnect } from '../context';
-// eslint-disable-next-line no-duplicate-imports
 import type { PolymorphicComponentProps } from '../context';
 import { View } from '../../view';
 

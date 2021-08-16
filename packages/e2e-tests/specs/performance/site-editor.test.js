@@ -44,6 +44,7 @@ describe( 'Site Editor Performance', () => {
 			focus: [],
 			inserterOpen: [],
 			inserterHover: [],
+			inserterSearch: [],
 		};
 
 		const html = readFile(

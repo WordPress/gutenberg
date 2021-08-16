@@ -1,3 +1,7 @@
+export {
+	activatePlugin as __experimentalActivatePlugin,
+	deactivatePlugin as __experimentalDeactivatePlugin,
+} from './plugins';
 export { activatePlugin } from './activate-plugin';
 export { activateTheme } from './activate-theme';
 export { arePrePublishChecksEnabled } from './are-pre-publish-checks-enabled';
@@ -81,5 +85,9 @@ export { showBlockToolbar } from './show-block-toolbar';
 export { openPreviewPage } from './preview';
 export { wpDataSelect } from './wp-data-select';
 export { deleteAllWidgets } from './widgets';
+export {
+	rest as __experimentalRest,
+	batch as __experimentalBatch,
+} from './rest-api';
 
 export * from './mocks';

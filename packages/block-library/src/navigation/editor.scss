@@ -229,12 +229,16 @@ $color-control-label-height: 20px;
 		}
 	}
 
-	svg {
-		fill: currentColor;
+	.wp-block-navigation-placeholder__preview-search-icon {
+		height: $icon-size;
+		svg {
+			fill: currentColor;
+		}
 	}
 
+
 	.wp-block-navigation-link.wp-block-navigation-link,
-	svg {
+	.wp-block-navigation-placeholder__preview-search-icon {
 		opacity: 0.3;
 	}
 
@@ -248,7 +252,12 @@ $color-control-label-height: 20px;
 		flex-wrap: nowrap;
 	}
 
-	// .. but hide entirely when the placeholder can still be toggled.
+	// Hide entirely when vertical.
+	.is-vertical.is-selected & {
+		display: none;
+	}
+
+	// Hide entirely when the placeholder can still be toggled.
 	.wp-block-navigation.is-selected .is-small & {
 		display: none;
 	}

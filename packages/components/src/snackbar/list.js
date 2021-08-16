@@ -3,18 +3,46 @@
  */
 import classnames from 'classnames';
 import { omit, noop } from 'lodash';
-import { useTransition, animated } from 'react-spring/web.cjs';
 
 /**
  * WordPress dependencies
  */
 import { useReducedMotion } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Snackbar from './';
+import {
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '../animation';
+
+const SNACKBAR_VARIANTS = {
+	init: {
+		height: 0,
+		opacity: 0,
+	},
+	open: {
+		height: 'auto',
+		opacity: 1,
+		transition: {
+			height: { stiffness: 1000, velocity: -100 },
+		},
+	},
+	exit: {
+		opacity: 0,
+		transition: {
+			duration: 0.5,
+		},
+	},
+};
+
+const SNACKBAR_REDUCE_MOTION_VARIANTS = {
+	init: false,
+	open: false,
+	exit: false,
+};
 
 /**
  * Renders a list of notices.
@@ -29,42 +57,38 @@ import Snackbar from './';
  */
 function SnackbarList( { notices, className, children, onRemove = noop } ) {
 	const isReducedMotion = useReducedMotion();
-	const [ refMap ] = useState( () => new WeakMap() );
-	const transitions = useTransition( notices, ( notice ) => notice.id, {
-		from: { opacity: 0, height: 0 },
-		enter: ( item ) => async ( next ) =>
-			await next( {
-				opacity: 1,
-				height: refMap.get( item ).offsetHeight,
-			} ),
-		leave: () => async ( next ) => {
-			await next( { opacity: 0 } );
-			await next( { height: 0 } );
-		},
-		immediate: isReducedMotion,
-	} );
-
 	className = classnames( 'components-snackbar-list', className );
 	const removeNotice = ( notice ) => () => onRemove( notice.id );
-
 	return (
 		<div className={ className }>
 			{ children }
-			{ transitions.map( ( { item: notice, key, props: style } ) => (
-				<animated.div key={ key } style={ style }>
-					<div
-						className="components-snackbar-list__notice-container"
-						ref={ ( ref ) => ref && refMap.set( notice, ref ) }
-					>
-						<Snackbar
-							{ ...omit( notice, [ 'content' ] ) }
-							onRemove={ removeNotice( notice ) }
+			<AnimatePresence>
+				{ notices.map( ( notice ) => {
+					return (
+						<motion.div
+							layout={ ! isReducedMotion } //see https://www.framer.com/docs/animation/#layout-animations
+							initial={ 'init' }
+							animate={ 'open' }
+							exit={ 'exit' }
+							key={ notice.id }
+							variants={
+								isReducedMotion
+									? SNACKBAR_REDUCE_MOTION_VARIANTS
+									: SNACKBAR_VARIANTS
+							}
 						>
-							{ notice.content }
-						</Snackbar>
-					</div>
-				</animated.div>
-			) ) }
+							<div className="components-snackbar-list__notice-container">
+								<Snackbar
+									{ ...omit( notice, [ 'content' ] ) }
+									onRemove={ removeNotice( notice ) }
+								>
+									{ notice.content }
+								</Snackbar>
+							</div>
+						</motion.div>
+					);
+				} ) }
+			</AnimatePresence>
 		</div>
 	);
 }

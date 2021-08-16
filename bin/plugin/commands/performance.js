@@ -29,29 +29,33 @@ const config = require( '../config' );
 /**
  * @typedef WPRawPerformanceResults
  *
- * @property {number[]} load          Load Time.
- * @property {number[]} type          Average type time.
- * @property {number[]} focus         Average block selection time.
- * @property {number[]} inserterOpen  Average time to open global inserter.
- * @property {number[]} inserterHover Average time to move mouse between two block item in the inserter.
+ * @property {number[]} load           Load Time.
+ * @property {number[]} type           Average type time.
+ * @property {number[]} focus          Average block selection time.
+ * @property {number[]} inserterOpen   Average time to open global inserter.
+ * @property {number[]} inserterSearch Average time to search the inserter.
+ * @property {number[]} inserterHover  Average time to move mouse between two block item in the inserter.
  */
 
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number=} load             Load Time.
- * @property {number=} type             Average type time.
- * @property {number=} minType          Minium type time.
- * @property {number=} maxType          Maximum type time.
- * @property {number=} focus            Average block selection time.
- * @property {number=} minFocus         Min block selection time.
- * @property {number=} maxFocus         Max block selection time.
- * @property {number=} inserterOpen     Average time to open global inserter.
- * @property {number=} minInserterOpen  Min time to open global inserter.
- * @property {number=} maxInserterOpen  Max time to open global inserter.
- * @property {number=} inserterHover    Average time to move mouse between two block item in the inserter.
- * @property {number=} minInserterHover Min time to move mouse between two block item in the inserter.
- * @property {number=} maxInserterHover Max time to move mouse between two block item in the inserter.
+ * @property {number=} load              Load Time.
+ * @property {number=} type              Average type time.
+ * @property {number=} minType           Minium type time.
+ * @property {number=} maxType           Maximum type time.
+ * @property {number=} focus             Average block selection time.
+ * @property {number=} minFocus          Min block selection time.
+ * @property {number=} maxFocus          Max block selection time.
+ * @property {number=} inserterOpen      Average time to open global inserter.
+ * @property {number=} minInserterOpen   Min time to open global inserter.
+ * @property {number=} maxInserterOpen   Max time to open global inserter.
+ * @property {number=} inserterSearch    Average time to open global inserter.
+ * @property {number=} minInserterSearch Min time to open global inserter.
+ * @property {number=} maxInserterSearch Max time to open global inserter.
+ * @property {number=} inserterHover     Average time to move mouse between two block item in the inserter.
+ * @property {number=} minInserterHover  Min time to move mouse between two block item in the inserter.
+ * @property {number=} maxInserterHover  Max time to move mouse between two block item in the inserter.
  */
 
 /**
@@ -111,6 +115,9 @@ function curateResults( results ) {
 		inserterOpen: average( results.inserterOpen ),
 		minInserterOpen: Math.min( ...results.inserterOpen ),
 		maxInserterOpen: Math.max( ...results.inserterOpen ),
+		inserterSearch: average( results.inserterSearch ),
+		minInserterSearch: Math.min( ...results.inserterSearch ),
+		maxInserterSearch: Math.max( ...results.inserterSearch ),
 		inserterHover: average( results.inserterHover ),
 		minInserterHover: Math.min( ...results.inserterHover ),
 		maxInserterHover: Math.max( ...results.inserterHover ),
@@ -143,13 +150,19 @@ async function setUpGitBranch( branch, environmentDirectory ) {
  *
  * @param {string} testSuite                Name of the tests set.
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
+ * @param {string} environmentDirectory     Path to the environment directory.
  *
  * @return {Promise<WPPerformanceResults>} Performance results for the branch.
  */
-async function runTestSuite( testSuite, performanceTestDirectory ) {
+async function runTestSuite(
+	testSuite,
+	performanceTestDirectory,
+	environmentDirectory
+) {
 	await runShellScript(
 		`npm run test-performance -- packages/e2e-tests/specs/performance/${ testSuite }.test.js`,
-		performanceTestDirectory
+		performanceTestDirectory,
+		{ ENVIRONMENT_DIRECTORY: environmentDirectory }
 	);
 	const rawResults = await readJSONFile(
 		path.join(
@@ -293,7 +306,8 @@ async function runPerformanceTests( branches, options ) {
 				log( '        >> Running the test.' );
 				rawResults[ i ][ branch ] = await runTestSuite(
 					testSuite,
-					performanceTestDirectory
+					performanceTestDirectory,
+					environmentDirectory
 				);
 				log( '        >> Stopping the environment' );
 				await runShellScript(
@@ -322,6 +336,15 @@ async function runPerformanceTests( branches, options ) {
 					),
 					maxInserterOpen: rawResults.map(
 						( r ) => r[ branch ].maxInserterOpen
+					),
+					inserterSearch: rawResults.map(
+						( r ) => r[ branch ].inserterSearch
+					),
+					minInserterSearch: rawResults.map(
+						( r ) => r[ branch ].minInserterSearch
+					),
+					maxInserterSearch: rawResults.map(
+						( r ) => r[ branch ].maxInserterSearch
 					),
 					inserterHover: rawResults.map(
 						( r ) => r[ branch ].inserterHover
