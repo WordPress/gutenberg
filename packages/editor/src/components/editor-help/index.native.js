@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { kebabCase } from 'lodash';
 import { ScrollView, StyleSheet, View, Text } from 'react-native';
 
 /**
@@ -26,6 +27,7 @@ import {
  */
 import styles from './style.scss';
 import HelpTopicRow from './help-topic-row';
+import HelpDetailNavigationScreen from './help-detail-navigation-screen';
 import IntroToBlocks from './intro-to-blocks';
 import AddBlocks from './add-blocks';
 import MoveBlocks from './move-blocks';
@@ -80,7 +82,7 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 							<BottomSheet.NavigationScreen
 								isScrollable
 								fullScreen
-								name={ __( 'Topics' ) }
+								name="help-topics"
 							>
 								<View style={ styles.container }>
 									<View style={ styles.bottomSheetHeader }>
@@ -113,27 +115,39 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 									>
 										<PanelBody title={ __( 'The basics' ) }>
 											{ /* Print out help topics */ }
-											{ HELP_TOPICS.map( ( topic ) => {
-												return (
-													<HelpTopicRow
-														key={ topic.label }
-														label={ topic.label }
-														icon={ topic.icon }
-														content={ topic.view }
-													/>
-												);
-											} ) }
+											{ HELP_TOPICS.map(
+												( { label, icon } ) => {
+													const labelSlug = kebabCase(
+														label
+													);
+													return (
+														<HelpTopicRow
+															icon={ icon }
+															key={ labelSlug }
+															label={ label }
+															screenName={
+																labelSlug
+															}
+														/>
+													);
+												}
+											) }
 										</PanelBody>
 									</ScrollView>
 								</View>
 							</BottomSheet.NavigationScreen>
-							<BottomSheet.NavigationScreen
-								isScrollable
-								fullScreen
-								name={ BottomSheet.SubSheet.screenName }
-							>
-								<BottomSheet.SubSheet.Slot />
-							</BottomSheet.NavigationScreen>
+							{ /* Print out help detail screens */ }
+							{ HELP_TOPICS.map( ( { view, label } ) => {
+								const labelSlug = kebabCase( label );
+								return (
+									<HelpDetailNavigationScreen
+										content={ view }
+										key={ labelSlug }
+										label={ label }
+										name={ labelSlug }
+									/>
+								);
+							} ) }
 						</BottomSheet.NavigationContainer>
 					);
 				} }
