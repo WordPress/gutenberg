@@ -20,9 +20,10 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-async function upload( selector ) {
-	await page.waitForSelector( selector );
-	const inputElement = await page.$( selector );
+async function upload( inputSelector ) {
+	const inputElement = await page.waitForSelector( inputSelector, {
+		state: 'attached',
+	} );
 	const testImagePath = path.join(
 		__dirname,
 		'..',
@@ -39,14 +40,18 @@ async function upload( selector ) {
 }
 
 async function waitForImage( filename ) {
-	await page.waitForSelector(
-		`.wp-block-image img[src$="${ filename }.png"]`
+	const imageElement = await page.waitForSelector(
+		`.wp-block-image img[src$="${ filename }.png"]`,
+		{ state: 'visible' }
 	);
+
+	return imageElement;
 }
 
 async function getSrc( elementHandle ) {
-	return elementHandle.evaluate( ( node ) => node.src );
+	return await elementHandle.getAttribute( 'src' );
 }
+
 async function getDataURL( elementHandle ) {
 	return elementHandle.evaluate( ( node ) => {
 		const canvas = document.createElement( 'canvas' );
@@ -110,12 +115,14 @@ describe( 'Image', () => {
 		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 
-	it.skip( 'should place caret at end of caption after merging empty paragraph', async () => {
+	it( 'should place caret at end of caption after merging empty paragraph', async () => {
 		await insertBlock( 'Image' );
 		const fileName = await upload( '.wp-block-image input[type="file"]' );
 		await waitForImage( fileName );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
+		// Make sure the <p> is created between keypresses
+		await page.waitForSelector( 'p[aria-label*="Empty block"]' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '2' );
 
@@ -318,7 +325,7 @@ describe( 'Image', () => {
 		// Resize the Uploaded Image.
 		await openDocumentSettingsSidebar();
 		await page.click(
-			'[aria-label="Image size presets"] button:first-child'
+			'button:text("25%"):below(:text("Image dimensions"))'
 		);
 
 		const regexBefore = new RegExp(
@@ -331,18 +338,8 @@ describe( 'Image', () => {
 		// Replace uploaded image with an URL.
 		await clickButton( 'Replace' );
 		await clickButton( 'Edit' );
-
-		await page.waitForSelector( '.block-editor-url-input__input' );
-		await page.evaluate(
-			() =>
-				( document.querySelector(
-					'.block-editor-url-input__input'
-				).value = '' )
-		);
-
-		await page.focus( '.block-editor-url-input__input' );
-		await page.keyboard.type( imageUrl );
-		await page.click( '.block-editor-link-control__search-submit' );
+		await page.fill( 'input:below(:text("Current media URL:"))', imageUrl );
+		await page.keyboard.press( 'Enter' );
 
 		const regexAfter = new RegExp(
 			`<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="${ imageUrl }" alt=""/></figure>\\s*<!-- /wp:image -->`
@@ -359,6 +356,7 @@ describe( 'Image', () => {
 		await pressKeyWithModifier( 'primary', 'z' );
 		// Expect an empty image block (placeholder) rather than one with a
 		// broken temporary URL.
+		await page.waitForSelector( 'text=/Upload an image file/' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
