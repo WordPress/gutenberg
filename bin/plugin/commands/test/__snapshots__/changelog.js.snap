@@ -22,7 +22,7 @@ exports[`formatChangelog verify that the changelog is properly formatted 1`] = `
 - Add error boundaries to widget screens. ([33771](https://github.com/WordPress/gutenberg/pull/33771))
 
 #### Patterns
-- Block Add translation context on titles. ([33734](https://github.com/WordPress/gutenberg/pull/33734))
+- Block patterns: Add translation context on titles. ([33734](https://github.com/WordPress/gutenberg/pull/33734))
 
 #### Document Settings
 - Disable spellcheck and autocomplete in permalink slug field. ([33708](https://github.com/WordPress/gutenberg/pull/33708))

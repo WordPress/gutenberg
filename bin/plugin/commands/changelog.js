@@ -553,7 +553,10 @@ function getFeatureEntry( issue, featureName ) {
 			new RegExp( `\\[${ featureName.toLowerCase() } \- `, 'i' ),
 			'['
 		)
-		.replace( new RegExp( `(?<=^- )${ featureName.toLowerCase() }: `, 'i' ), '' );
+		.replace(
+			new RegExp( `(?<=^- )${ featureName.toLowerCase() }: `, 'i' ),
+			''
+		);
 }
 
 /**
