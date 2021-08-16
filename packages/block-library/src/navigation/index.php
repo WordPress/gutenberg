@@ -267,7 +267,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks_html .= $inner_block->render();
 	}
 
-	if ( true === $is_list_open ) {
+	if ( $is_list_open ) {
 		$inner_blocks_html .= '</ul>';
 	}
 
