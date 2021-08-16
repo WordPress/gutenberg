@@ -29,34 +29,22 @@ async function setOption( setting, value ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'options-general.php' );
 
-	await page.focus( `#${ setting }` );
-	await pressKeyWithModifier( 'primary', 'a' );
-	await page.type( `#${ setting }`, value );
+	await page.fill( `#${ setting }`, value );
 
 	await Promise.all( [
 		page.click( '#submit' ),
-		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+		page.waitForNavigation( { waitUntil: 'networkidle' } ),
 	] );
 
 	await switchUserToTest();
 }
 
 const saveEntities = async () => {
-	const savePostSelector = '.editor-post-publish-button__button';
-	const savePanelSelector = '.entities-saved-states__panel';
-	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
-	const publishPanelSelector = '.editor-post-publish-panel';
-	const closePanelButtonSelector =
-		'.editor-post-publish-panel__header-cancel-button button';
-
-	await page.click( savePostSelector );
-	await page.waitForSelector( savePanelSelector );
-	await page.click( entitiesSaveSelector );
-	await page.waitForSelector( publishPanelSelector );
-	await page.waitForSelector(
-		'.editor-post-publish-panel__header-cancel-button button:not([disabled])'
-	);
-	await page.click( closePanelButtonSelector );
+	await page.click( 'button:text-is("Publish")' );
+	await Promise.all( [
+		page.waitForResponse( /settings/ ),
+		page.click( 'button:text-is("Save")' ),
+	] );
 };
 
 describe( 'Site Title block', () => {
@@ -75,12 +63,9 @@ describe( 'Site Title block', () => {
 	it( 'Can edit the site title as admin', async () => {
 		await createNewPost();
 		await insertBlock( 'Site Title' );
-		const editableSiteTitleSelector =
-			'[aria-label="Block: Site Title"] a[contenteditable="true"]';
-		await page.waitForSelector( editableSiteTitleSelector );
-		await page.focus( editableSiteTitleSelector );
-		await pressKeyWithModifier( 'primary', 'a' );
 
+		await page.click( '[aria-label="Site title text"]' );
+		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'New Site Title' );
 
 		await saveEntities();
