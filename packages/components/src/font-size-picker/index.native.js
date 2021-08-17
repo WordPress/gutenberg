@@ -109,6 +109,7 @@ function FontSizePicker( {
 						</View>
 					</BottomSheet.Cell>
 					{ fontSizes.map( ( item, index ) => {
+						// Only display a choice that we can currenly select.
 						if ( ! parseFloat( item.size ) ) {
 							return null;
 						}
