@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 18.0.0-next.0 (2021-08-17)
-
 ### Breaking Changes
 
 -   Increase the minimum Node.js version to v12.13 matching requirements from bundled dependencies ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).

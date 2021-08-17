@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 16.0.0-next.0 (2021-08-17)
-
 ### Bug Fix
 
 -   Listen to `resize` events correctly in `useBreakpointIndex`. This hook is used in `useResponsiveValue` and consequently in the `Flex` and `Grid` components  ([#33902](https://github.com/WordPress/gutenberg/pull/33902))
