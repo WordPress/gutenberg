@@ -213,13 +213,12 @@ export function computePopoverYAxisPosition(
 
 				// At this point there is no longer any need to retain the startsSticky behavior.
 				startsSticky.current = false;
-			} else {
-				// Default sticky behavior.
-				return {
-					yAxis,
-					popoverTop: Math.min( anchorRect.bottom, stickyPosition ),
-				};
 			}
+			// Default sticky behavior.
+			return {
+				yAxis,
+				popoverTop: Math.min( anchorRect.bottom, stickyPosition ),
+			};
 		}
 	}
 
