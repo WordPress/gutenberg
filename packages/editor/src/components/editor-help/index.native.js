@@ -3,6 +3,7 @@
  */
 import { kebabCase } from 'lodash';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { TransitionPresets } from '@react-navigation/stack';
 
 /**
  * WordPress dependencies
@@ -129,6 +130,10 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 										key={ labelSlug }
 										label={ label }
 										name={ labelSlug }
+										options={ {
+											gestureEnabled: true,
+											...TransitionPresets.DefaultTransition,
+										} }
 									/>
 								);
 							} ) }
