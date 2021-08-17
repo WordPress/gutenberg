@@ -394,6 +394,7 @@ class BottomSheet extends Component {
 			children,
 			withHeaderSeparator = false,
 			hasNavigation,
+			allowDragIndicator = false,
 			...rest
 		} = this.props;
 		const {
@@ -536,9 +537,11 @@ class BottomSheet extends Component {
 						style={ styles.header }
 						onLayout={ this.onHeaderLayout }
 					>
-						{ ! ( Platform.OS === 'android' && isFullScreen ) && (
-							<View style={ styles.dragIndicator } />
-						) }
+						{ ( ! Platform.OS === 'android' ||
+							allowDragIndicator ) &&
+							isFullScreen && (
+								<View style={ styles.dragIndicator } />
+							) }
 						{ ! hideHeader && getHeader() }
 					</View>
 					<WrapperView
