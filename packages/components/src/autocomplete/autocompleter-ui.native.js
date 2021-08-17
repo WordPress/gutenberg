@@ -188,7 +188,9 @@ export function getAutoCompleterUI( autocompleter ) {
 											>
 												<Icon
 													icon={
-														option?.value?.icon?.src
+														option?.value?.icon
+															?.src ||
+														option?.value?.icon
 													}
 													size={ 24 }
 													style={ iconStyle }
