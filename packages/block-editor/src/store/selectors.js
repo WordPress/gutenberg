@@ -1628,25 +1628,32 @@ export const getInserterItems = createSelector(
 				blockVariations.push( ...variations.map( variationMapper ) );
 			}
 		}
-		// Prioritize core blocks's display in inserter.
-		const prioritizeCoreBlocks = ( a, b ) => {
-			const coreBlockNamePrefix = 'core/';
-			const firstIsCoreBlock = a.name.startsWith( coreBlockNamePrefix );
-			const secondIsCoreBlock = b.name.startsWith( coreBlockNamePrefix );
-			if ( firstIsCoreBlock && secondIsCoreBlock ) {
-				return 0;
-			}
-			return firstIsCoreBlock && ! secondIsCoreBlock ? -1 : 1;
-		};
 		// Ensure core blocks are prioritized in the returned results,
 		// because third party blocks can be registered earlier than
 		// the core blocks (usually by using the `init` action),
 		// thus affecting the display order.
 		// We don't sort reusable blocks as they are handled differently.
+		const groupByType = ( blocks, block ) => {
+			const { core, noncore } = blocks;
+			const type = block.name.startsWith( 'core/' ) ? core : noncore;
+
+			type.push( block );
+			return blocks;
+		};
+		const items = visibleBlockTypeInserterItems.reduce( groupByType, {
+			core: [],
+			noncore: [],
+		} );
+		const variations = blockVariations.reduce( groupByType, {
+			core: [],
+			noncore: [],
+		} );
 		const sortedBlockTypes = [
-			...visibleBlockTypeInserterItems,
-			...blockVariations,
-		].sort( prioritizeCoreBlocks );
+			...items.core,
+			...variations.core,
+			...items.noncore,
+			...variations.noncore,
+		];
 		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [
