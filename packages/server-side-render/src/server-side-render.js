@@ -39,11 +39,20 @@ function DefaultErrorResponsePlaceholder( { response, className } ) {
 	return <Placeholder className={ className }>{ errorMessage }</Placeholder>;
 }
 
-function DefaultLoadingResponsePlaceholder( { className } ) {
+function DefaultLoadingResponsePlaceholder( { children } ) {
 	return (
-		<Placeholder className={ className }>
-			<Spinner />
-		</Placeholder>
+		<div style={ { position: 'relative' } }>
+			<div
+				style={ {
+					position: 'absolute',
+					top: '10px',
+					right: '0',
+				} }
+			>
+				<Spinner />
+			</div>
+			{ children }
+		</div>
 	);
 }
 
@@ -67,9 +76,6 @@ export default function ServerSideRender( props ) {
 	function fetchData() {
 		if ( ! isMountedRef.current ) {
 			return;
-		}
-		if ( null !== response ) {
-			setResponse( null );
 		}
 
 		const sanitizedAttributes =
@@ -142,7 +148,11 @@ export default function ServerSideRender( props ) {
 	if ( response === '' ) {
 		return <EmptyResponsePlaceholder { ...props } />;
 	} else if ( ! response ) {
-		return <LoadingResponsePlaceholder { ...props } />;
+		return (
+			<LoadingResponsePlaceholder { ...props }>
+				<RawHTML className={ className }>{ response }</RawHTML>
+			</LoadingResponsePlaceholder>
+		);
 	} else if ( response.error ) {
 		return <ErrorResponsePlaceholder response={ response } { ...props } />;
 	}
