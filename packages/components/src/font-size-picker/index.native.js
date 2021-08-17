@@ -108,36 +108,41 @@ function FontSizePicker( {
 							) }
 						</View>
 					</BottomSheet.Cell>
-					{ fontSizes.map( ( item, index ) => (
-						<BottomSheet.Cell
-							customActionButton
-							separatorType="none"
-							label={ item.name }
-							subLabel={ item.size }
-							onPress={ onChangeValue( item.size ) }
-							leftAlign={ true }
-							key={ index }
-							accessibilityRole={ 'button' }
-							accessibilityLabel={
-								item.size === selectedValue
-									? sprintf(
-											// translators: %s: Select control option value e.g: "Auto, 25%".
-											__( 'Selected: %s' ),
-											item.name
-									  )
-									: item.name
-							}
-							accessibilityHint={ __(
-								'Double tap to select font size'
-							) }
-						>
-							<View>
-								{ item.size === selectedValue && (
-									<Icon icon={ check }></Icon>
+					{ fontSizes.map( ( item, index ) => {
+						if ( ! parseFloat( item.size ) ) {
+							return null;
+						}
+						return (
+							<BottomSheet.Cell
+								customActionButton
+								separatorType="none"
+								label={ item.name }
+								subLabel={ item.size }
+								onPress={ onChangeValue( item.size ) }
+								leftAlign={ true }
+								key={ index }
+								accessibilityRole={ 'button' }
+								accessibilityLabel={
+									item.size === selectedValue
+										? sprintf(
+												// translators: %s: Select control option value e.g: "Auto, 25%".
+												__( 'Selected: %s' ),
+												item.name
+										  )
+										: item.name
+								}
+								accessibilityHint={ __(
+									'Double tap to select font size'
 								) }
-							</View>
-						</BottomSheet.Cell>
-					) ) }
+							>
+								<View>
+									{ item.size === selectedValue && (
+										<Icon icon={ check }></Icon>
+									) }
+								</View>
+							</BottomSheet.Cell>
+						);
+					} ) }
 					{ ! disableCustomFontSizes && (
 						<UnitControl
 							label={ __( 'Custom' ) }
