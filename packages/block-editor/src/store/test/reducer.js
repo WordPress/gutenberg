@@ -294,6 +294,7 @@ describe( 'state', () => {
 						[ newChildBlockId ]: {},
 					},
 					controlledInnerBlocks: {},
+					inPlaceholderState: {},
 				} );
 				expect( state.cache.chicken ).not.toBe(
 					existingState.cache.chicken
@@ -376,6 +377,7 @@ describe( 'state', () => {
 						[ newChildBlockId ]: {},
 					},
 					controlledInnerBlocks: {},
+					inPlaceholderState: {},
 				} );
 				expect( state.cache.chicken ).not.toBe(
 					existingState.cache.chicken
@@ -517,6 +519,7 @@ describe( 'state', () => {
 						[ newChildBlockId2 ]: {},
 						[ newChildBlockId3 ]: {},
 					},
+					inPlaceholderState: {},
 					controlledInnerBlocks: {},
 				} );
 			} );
@@ -608,6 +611,7 @@ describe( 'state', () => {
 						chicken: {},
 						[ newChildBlockId ]: {},
 					},
+					inPlaceholderState: {},
 					controlledInnerBlocks: {},
 				} );
 
@@ -629,6 +633,7 @@ describe( 'state', () => {
 				isPersistentChange: true,
 				isIgnoredChange: false,
 				cache: {},
+				inPlaceholderState: {},
 				controlledInnerBlocks: {},
 			} );
 		} );

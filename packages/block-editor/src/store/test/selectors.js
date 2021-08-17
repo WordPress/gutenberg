@@ -53,6 +53,7 @@ const {
 	isDraggingBlocks,
 	getDraggedBlockClientIds,
 	isBlockBeingDragged,
+	isBlockInPlaceholderState,
 	isAncestorBeingDragged,
 	isCaretWithinFormattedText,
 	getBlockInsertionPoint,
@@ -3682,6 +3683,29 @@ describe( 'selectors', () => {
 			expect(
 				wasBlockJustInserted( state, clientId, expectedSource )
 			).toBe( false );
+		} );
+	} );
+	describe( 'isBlockInPlaceholderState', () => {
+		it( 'when clientId is not in state', () => {
+			const state = {
+				blocks: { inPlaceholderState: { clientId1: true } },
+			};
+			expect( isBlockInPlaceholderState( state, 'clientId2' ) ).toBe(
+				false
+			);
+		} );
+		it( 'when clientId state is set', () => {
+			const state = {
+				blocks: {
+					inPlaceholderState: { clientId1: false, clientId2: true },
+				},
+			};
+			expect( isBlockInPlaceholderState( state, 'clientId1' ) ).toBe(
+				false
+			);
+			expect( isBlockInPlaceholderState( state, 'clientId2' ) ).toBe(
+				true
+			);
 		} );
 	} );
 } );
