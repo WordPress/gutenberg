@@ -26,8 +26,8 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
-import HelpTopicRow from './help-topic-row';
 import HelpDetailNavigationScreen from './help-detail-navigation-screen';
+import HelpTopicRow from './help-topic-row';
 import IntroToBlocks from './intro-to-blocks';
 import AddBlocks from './add-blocks';
 import MoveBlocks from './move-blocks';
@@ -63,25 +63,25 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 			hasNavigation
 			contentStyle={ styles.contentContainer }
 		>
-			<BottomSheetConsumer>
-				{ ( { listProps } ) => {
-					const contentContainerStyle = StyleSheet.flatten(
-						listProps.contentContainerStyle
-					);
-					return (
-						<BottomSheet.NavigationContainer animate main>
-							<BottomSheet.NavigationScreen
-								isScrollable
-								fullScreen
-								name="help-topics"
-							>
-								<View style={ styles.container }>
-									<BottomSheet.NavigationHeader
-										isFullscreen
-										leftButtonOnPress={ close }
-										leftButtonText={ __( 'Close' ) }
-										screen={ __( 'How to edit your site' ) }
-									/>
+			<BottomSheet.NavigationContainer animate main>
+				<BottomSheet.NavigationScreen
+					isScrollable
+					fullScreen
+					name="help-topics"
+				>
+					<View style={ styles.container }>
+						<BottomSheet.NavigationHeader
+							isFullscreen
+							leftButtonOnPress={ close }
+							leftButtonText={ __( 'Close' ) }
+							screen={ __( 'How to edit your site' ) }
+						/>
+						<BottomSheetConsumer>
+							{ ( { listProps } ) => {
+								const contentContainerStyle = StyleSheet.flatten(
+									listProps.contentContainerStyle
+								);
+								return (
 									<ScrollView
 										{ ...listProps }
 										contentContainerStyle={ {
@@ -107,9 +107,9 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 													);
 													return (
 														<HelpTopicRow
-															icon={ icon }
 															key={ labelSlug }
 															label={ label }
+															icon={ icon }
 															screenName={
 																labelSlug
 															}
@@ -119,28 +119,28 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											) }
 										</PanelBody>
 									</ScrollView>
-								</View>
-							</BottomSheet.NavigationScreen>
-							{ /* Print out help detail screens */ }
-							{ HELP_TOPICS.map( ( { view, label } ) => {
-								const labelSlug = kebabCase( label );
-								return (
-									<HelpDetailNavigationScreen
-										content={ view }
-										key={ labelSlug }
-										label={ label }
-										name={ labelSlug }
-										options={ {
-											gestureEnabled: true,
-											...TransitionPresets.DefaultTransition,
-										} }
-									/>
 								);
-							} ) }
-						</BottomSheet.NavigationContainer>
+							} }
+						</BottomSheetConsumer>
+					</View>
+				</BottomSheet.NavigationScreen>
+				{ /* Print out help detail screens */ }
+				{ HELP_TOPICS.map( ( { view, label } ) => {
+					const labelSlug = kebabCase( label );
+					return (
+						<HelpDetailNavigationScreen
+							key={ labelSlug }
+							name={ labelSlug }
+							content={ view }
+							label={ label }
+							options={ {
+								gestureEnabled: true,
+								...TransitionPresets.DefaultTransition,
+							} }
+						/>
 					);
-				} }
-			</BottomSheetConsumer>
+				} ) }
+			</BottomSheet.NavigationContainer>
 		</BottomSheet>
 	);
 }

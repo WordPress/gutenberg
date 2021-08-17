@@ -14,41 +14,33 @@ import { useNavigation } from '@react-navigation/native';
  */
 import { BottomSheet, BottomSheetContext } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-const HelpTopicScreen = ( { content, label } ) => {
+const HelpDetailNavigationScreen = ( { content, label } ) => {
 	const navigation = useNavigation();
 
-	const {
-		listProps: { style: containerStyle, ...scrollViewProps },
-	} = useContext( BottomSheetContext );
+	const { listProps } = useContext( BottomSheetContext );
 	const contentContainerStyle = StyleSheet.flatten(
-		scrollViewProps.contentContainerStyle
-	);
-	const separatorStyle = usePreferredColorSchemeStyle(
-		styles.separator,
-		styles.separatorDark
+		listProps.contentContainerStyle
 	);
 
 	return (
 		<BottomSheet.NavigationScreen isScrollable fullScreen>
-			<View style={ [ containerStyle, styles.container ] }>
+			<View style={ styles.container }>
 				<BottomSheet.NavigationHeader
 					screen={ label }
 					leftButtonOnPress={ navigation.goBack }
 				/>
-				<View style={ separatorStyle } />
 				<ScrollView
-					{ ...scrollViewProps }
+					{ ...listProps }
 					contentContainerStyle={ {
 						...contentContainerStyle,
 						paddingBottom: Math.max(
-							scrollViewProps.safeAreaBottomInset,
+							listProps.safeAreaBottomInset,
 							contentContainerStyle.paddingBottom
 						),
 						/**
@@ -68,4 +60,4 @@ const HelpTopicScreen = ( { content, label } ) => {
 	);
 };
 
-export default HelpTopicScreen;
+export default HelpDetailNavigationScreen;
