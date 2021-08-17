@@ -225,7 +225,6 @@ function RichTextWrapper(
 		selectionEnd,
 		onSelectionChange,
 		placeholder,
-		__unstableIsSelected: isSelected,
 		__unstableMultilineTag: multilineTag,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
