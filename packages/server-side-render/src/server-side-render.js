@@ -71,11 +71,15 @@ export default function ServerSideRender( props ) {
 	const isMountedRef = useRef( true );
 	const fetchRequestRef = useRef();
 	const [ response, setResponse ] = useState( null );
+	const previousResponse = usePrevious( response );
 	const prevProps = usePrevious( props );
 
 	function fetchData() {
 		if ( ! isMountedRef.current ) {
 			return;
+		}
+		if ( null !== response ) {
+			setResponse( null );
 		}
 
 		const sanitizedAttributes =
@@ -150,7 +154,11 @@ export default function ServerSideRender( props ) {
 	} else if ( ! response ) {
 		return (
 			<LoadingResponsePlaceholder { ...props }>
-				<RawHTML className={ className }>{ response }</RawHTML>
+				{ !! previousResponse && (
+					<RawHTML className={ className }>
+						{ previousResponse }
+					</RawHTML>
+				) }
 			</LoadingResponsePlaceholder>
 		);
 	} else if ( response.error ) {
