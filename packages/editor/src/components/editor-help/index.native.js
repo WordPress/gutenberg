@@ -21,6 +21,8 @@ import {
 	trashFilled,
 	cogAlt,
 } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -55,6 +57,10 @@ const HELP_TOPICS = [
 ];
 
 function EditorHelpTopics( { close, isVisible, onClose } ) {
+	const { postType } = useSelect( ( select ) => ( {
+		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
+	} ) );
+
 	return (
 		<BottomSheet
 			isVisible={ isVisible }
@@ -74,7 +80,11 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 							isFullscreen
 							leftButtonOnPress={ close }
 							leftButtonText={ __( 'Close' ) }
-							screen={ __( 'How to edit your site' ) }
+							screen={
+								postType === 'page'
+									? __( 'How to edit your page' )
+									: __( 'How to edit your post' )
+							}
 						/>
 						<BottomSheetConsumer>
 							{ ( { listProps } ) => {
