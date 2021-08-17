@@ -37,6 +37,25 @@ function gutenberg_tinycolor_bound01( $n, $max ) {
 }
 
 /**
+ * Direct port of tinycolor's boundAlpha function to maintain consistency with
+ * how tinycolor works.
+ *
+ * @see https://github.com/bgrins/TinyColor
+ *
+ * @param  mixed $n   Number of unknown type.
+ * @return float      Value in the range [0,1].
+ */
+function gutenberg_tinycolor_bound_alpha( $n ) {
+	if ( is_numeric( $n ) ) {
+		$n = (float) $n;
+		if ( $n >= 0 && $n <= 1 ) {
+			return $n;
+		}
+	}
+	return 1;
+}
+
+/**
  * Round and convert values of an RGB object.
  *
  * @see https://github.com/bgrins/TinyColor
@@ -138,90 +157,112 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 
 	$rgb_regexp = '/^rgb' . $permissive_match3 . '$/';
 	if ( preg_match( $rgb_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb(
+		$rgb = gutenberg_tinycolor_rgb_to_rgb(
 			array(
 				'r' => $match[1],
 				'g' => $match[2],
 				'b' => $match[3],
 			)
 		);
+		$rgb['a'] = 1;
+		return $rgb;
 	}
 
 	$rgba_regexp = '/^rgba' . $permissive_match4 . '$/';
 	if ( preg_match( $rgba_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb(
+		$rgb = gutenberg_tinycolor_rgb_to_rgb(
 			array(
 				'r' => $match[1],
 				'g' => $match[2],
 				'b' => $match[3],
 			)
 		);
+		$rgb['a'] = gutenberg_tinycolor_bound_alpha( $match[4] );
+		return $rgb;
 	}
 
 	$hsl_regexp = '/^hsl' . $permissive_match3 . '$/';
 	if ( preg_match( $hsl_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_hsl_to_rgb(
+		$rgb = gutenberg_tinycolor_hsl_to_rgb(
 			array(
 				'h' => $match[1],
 				's' => $match[2],
 				'l' => $match[3],
 			)
 		);
+		$rgb['a'] = 1;
+		return $rgb;
 	}
 
 	$hsla_regexp = '/^hsla' . $permissive_match4 . '$/';
 	if ( preg_match( $hsla_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_hsl_to_rgb(
+		$rgb = gutenberg_tinycolor_hsl_to_rgb(
 			array(
 				'h' => $match[1],
 				's' => $match[2],
 				'l' => $match[3],
+				'a' => $match[4],
 			)
 		);
+		$rgb['a'] = gutenberg_tinycolor_bound_alpha( $match[4] );
+		return $rgb;
 	}
 
 	$hex8_regexp = '/^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/';
 	if ( preg_match( $hex8_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb(
+		$rgb = gutenberg_tinycolor_rgb_to_rgb(
 			array(
 				'r' => base_convert( $match[1], 16, 10 ),
 				'g' => base_convert( $match[2], 16, 10 ),
 				'b' => base_convert( $match[3], 16, 10 ),
 			)
 		);
+		$rgb['a'] = gutenberg_tinycolor_bound_alpha(
+			base_convert( $match[4], 16, 10 ) / 255
+		);
+		return $rgb;
 	}
 
 	$hex6_regexp = '/^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/';
 	if ( preg_match( $hex6_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb(
+		$rgb = gutenberg_tinycolor_rgb_to_rgb(
 			array(
 				'r' => base_convert( $match[1], 16, 10 ),
 				'g' => base_convert( $match[2], 16, 10 ),
 				'b' => base_convert( $match[3], 16, 10 ),
+				'a' => 1,
 			)
 		);
+		$rgb['a'] = 1;
+		return $rgb;
 	}
 
 	$hex4_regexp = '/^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/';
 	if ( preg_match( $hex4_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb(
+		$rgb = gutenberg_tinycolor_rgb_to_rgb(
 			array(
 				'r' => base_convert( $match[1] . $match[1], 16, 10 ),
 				'g' => base_convert( $match[2] . $match[2], 16, 10 ),
 				'b' => base_convert( $match[3] . $match[3], 16, 10 ),
 			)
 		);
+		$rgb['a'] = gutenberg_tinycolor_bound_alpha(
+			base_convert( $match[4] . $match[4], 16, 10 ) / 255
+		);
+		return $rgb;
 	}
 
 	$hex3_regexp = '/^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/';
 	if ( preg_match( $hex3_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb(
+		$rgb = gutenberg_tinycolor_rgb_to_rgb(
 			array(
 				'r' => base_convert( $match[1] . $match[1], 16, 10 ),
 				'g' => base_convert( $match[2] . $match[2], 16, 10 ),
 				'b' => base_convert( $match[3] . $match[3], 16, 10 ),
 			)
 		);
+		$rgb['a'] = 1;
+		return $rgb;
 	}
 }
 
@@ -280,6 +321,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		'r' => array(),
 		'g' => array(),
 		'b' => array(),
+		'a' => array(),
 	);
 	foreach ( $duotone_colors as $color_str ) {
 		$color = gutenberg_tinycolor_string_to_rgb( $color_str );
@@ -287,6 +329,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		$duotone_values['r'][] = $color['r'] / 255;
 		$duotone_values['g'][] = $color['g'] / 255;
 		$duotone_values['b'][] = $color['b'] / 255;
+		$duotone_values['a'][] = $color['a'];
 	}
 
 	$duotone_id = 'wp-duotone-filter-' . uniqid();
@@ -327,13 +370,14 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 					values=".299 .587 .114 0 0
 							.299 .587 .114 0 0
 							.299 .587 .114 0 0
-							0 0 0 1 0"
+							.299 .587 .114 0 0"
 					<?php // phpcs:enable Generic.WhiteSpace.DisallowSpaceIndent ?>
 				/>
 				<feComponentTransfer color-interpolation-filters="sRGB" >
 					<feFuncR type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />
 					<feFuncG type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['g'] ) ); ?>" />
 					<feFuncB type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['b'] ) ); ?>" />
+					<feFuncA type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['a'] ) ); ?>" />
 				</feComponentTransfer>
 			</filter>
 		</defs>

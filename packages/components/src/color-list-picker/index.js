@@ -15,6 +15,7 @@ function ColorOption( {
 	value,
 	colors,
 	disableCustomColors,
+	disableAlpha,
 	onChange,
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
@@ -34,6 +35,7 @@ function ColorOption( {
 					clearable={ false }
 					onChange={ onChange }
 					disableCustomColors={ disableCustomColors }
+					disableAlpha={ disableAlpha }
 				/>
 			) }
 		</>
@@ -45,6 +47,7 @@ function ColorListPicker( {
 	labels,
 	value = [],
 	disableCustomColors,
+	disableAlpha,
 	onChange,
 } ) {
 	return (
@@ -56,6 +59,7 @@ function ColorListPicker( {
 					value={ value[ index ] }
 					colors={ colors }
 					disableCustomColors={ disableCustomColors }
+					disableAlpha={ disableAlpha }
 					onChange={ ( newColor ) => {
 						const newColors = value.slice();
 						newColors[ index ] = newColor;

@@ -33,7 +33,7 @@ const EMPTY_ARRAY = [];
  * @return {Object} R, G, and B values.
  */
 export function getValuesFromColors( colors = [] ) {
-	const values = { r: [], g: [], b: [] };
+	const values = { r: [], g: [], b: [], a: [] };
 
 	colors.forEach( ( color ) => {
 		// Access values directly to skip extra rounding that tinycolor.toRgb() does.
@@ -41,6 +41,7 @@ export function getValuesFromColors( colors = [] ) {
 		values.r.push( tcolor._r / 255 );
 		values.g.push( tcolor._g / 255 );
 		values.b.push( tcolor._b / 255 );
+		values.a.push( tcolor._a );
 	} );
 
 	return values;
@@ -53,6 +54,7 @@ export function getValuesFromColors( colors = [] ) {
  * @property {number[]} r Red values.
  * @property {number[]} g Green values.
  * @property {number[]} b Blue values.
+ * @property {number[]} a Alpha values.
  */
 
 /**
@@ -61,7 +63,7 @@ export function getValuesFromColors( colors = [] ) {
  * @param {Object} props          Duotone props.
  * @param {string} props.selector Selector to apply the filter to.
  * @param {string} props.id       Unique id for this duotone filter.
- * @param {Values} props.values   R, G, and B values to filter with.
+ * @param {Values} props.values   R, G, B, and A values to filter with.
  *
  * @return {WPElement} Duotone element.
  */
@@ -97,7 +99,7 @@ ${ selector } {
 							values=".299 .587 .114 0 0
 							        .299 .587 .114 0 0
 							        .299 .587 .114 0 0
-							        0 0 0 1 0"
+							        .299 .587 .114 0 0"
 						/>
 						<feComponentTransfer
 							// Use sRGB instead of linearRGB to be consistent with how CSS gradients work.
@@ -114,6 +116,10 @@ ${ selector } {
 							<feFuncB
 								type="table"
 								tableValues={ values.b.join( ' ' ) }
+							/>
+							<feFuncA
+								type="table"
+								tableValues={ values.a.join( ' ' ) }
 							/>
 						</feComponentTransfer>
 					</filter>

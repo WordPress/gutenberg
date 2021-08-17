@@ -85,6 +85,7 @@ function DuotonePicker( {
 					colors={ colorPalette }
 					value={ value }
 					disableCustomColors={ disableCustomColors }
+					disableAlpha={ false }
 					onChange={ ( newColors ) => {
 						if ( ! newColors[ 0 ] ) {
 							newColors[ 0 ] = defaultDark;
