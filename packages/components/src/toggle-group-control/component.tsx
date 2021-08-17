@@ -24,14 +24,14 @@ import { View } from '../view';
 import BaseControl from '../base-control';
 import * as styles from './styles';
 import { useUpdateEffect, useCx } from '../utils/hooks';
-import Backdrop from './segmented-control-backdrop';
-import type { SegmentedControlProps } from './types';
-import SegmentedControlContext from './segmented-control-context';
+import Backdrop from './toggle-group-control-backdrop';
+import type { ToggleGroupControlProps } from './types';
+import ToggleGroupControlContext from './toggle-group-control-context';
 
 const noop = () => {};
 
-function SegmentedControl(
-	props: PolymorphicComponentProps< SegmentedControlProps, 'input' >,
+function ToggleGroupControl(
+	props: PolymorphicComponentProps< ToggleGroupControlProps, 'input' >,
 	forwardedRef: import('react').Ref< any >
 ) {
 	const {
@@ -45,13 +45,13 @@ function SegmentedControl(
 		value,
 		children,
 		...otherProps
-	} = useContextSystem( props, 'SegmentedControl' );
+	} = useContextSystem( props, 'ToggleGroupControl' );
 	const cx = useCx();
 	const containerRef = useRef();
 	const [ resizeListener, sizes ] = useResizeAware();
 	const baseId = useInstanceId(
-		SegmentedControl,
-		'segmented-control'
+		ToggleGroupControl,
+		'toggle-group-control'
 	).toString();
 	const radio = useRadioState( {
 		baseId,
@@ -73,7 +73,7 @@ function SegmentedControl(
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.SegmentedControl,
+				styles.ToggleGroupControl,
 				isBlock && styles.block,
 				'medium',
 				className
@@ -82,7 +82,7 @@ function SegmentedControl(
 	);
 	return (
 		<BaseControl help={ help }>
-			<SegmentedControlContext.Provider
+			<ToggleGroupControlContext.Provider
 				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
 			>
 				{ ! hideLabelFromVision && (
@@ -108,9 +108,9 @@ function SegmentedControl(
 					/>
 					{ children }
 				</RadioGroup>
-			</SegmentedControlContext.Provider>
+			</ToggleGroupControlContext.Provider>
 		</BaseControl>
 	);
 }
 
-export default contextConnect( SegmentedControl, 'SegmentedControl' );
+export default contextConnect( ToggleGroupControl, 'ToggleGroupControl' );

@@ -11,12 +11,12 @@ import type { RadioStateReturn } from 'reakit';
  */
 import type { FormElementProps } from '../utils/types';
 
-export type SegmentedControlOptionProps = {
+export type ToggleGroupControlOptionProps = {
 	value: ReactText;
 	label: string;
 };
 
-export type SegmentedControlProps = Omit<
+export type ToggleGroupControlProps = Omit<
 	FormElementProps< any >,
 	'defaultValue'
 > & {
@@ -37,7 +37,7 @@ export type SegmentedControlProps = Omit<
 	 */
 	isAdaptiveWidth?: boolean;
 	/**
-	 * Renders `SegmentedControl` as a (CSS) block element.
+	 * Renders `ToggleGroupControl` as a (CSS) block element.
 	 *
 	 * @default false
 	 */
@@ -47,7 +47,7 @@ export type SegmentedControlProps = Omit<
 	 */
 	onChange?: ( value: ReactText | undefined ) => void;
 	/**
-	 * The value of `SegmentedControl`
+	 * The value of `ToggleGroupControl`
 	 */
 	value?: ReactText;
 	/**
@@ -61,20 +61,20 @@ export type SegmentedControlProps = Omit<
 	help?: ReactNode;
 };
 
-export type SegmentedControlContextProps = RadioStateReturn & {
+export type ToggleGroupControlContextProps = RadioStateReturn & {
 	/**
-	 * Renders `SegmentedControl` as a (CSS) block element.
+	 * Renders `ToggleGroupControl` as a (CSS) block element.
 	 *
 	 * @default false
 	 */
 	isBlock?: boolean;
 };
 
-export type SegmentedControlButtonProps = {
+export type ToggleGroupControlButtonProps = {
 	className?: string;
 	forwardedRef?: Ref< any >;
 	/**
-	 * Renders `SegmentedControl` is a (CSS) block element.
+	 * Renders `ToggleGroupControl` is a (CSS) block element.
 	 *
 	 * @default false
 	 */
@@ -85,7 +85,7 @@ export type SegmentedControlButtonProps = {
 	state?: any;
 };
 
-export type SegmentedControlBackdropProps = {
+export type ToggleGroupControlBackdropProps = {
 	containerRef: MutableRefObject< HTMLElement | undefined >;
 	containerWidth?: number | null;
 	state?: any;

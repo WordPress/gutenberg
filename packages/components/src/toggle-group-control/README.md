@@ -1,25 +1,25 @@
-# SegementedControl
+# ToggleGroupControl
 
 <div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`SegementedControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `SegmentedControlOption` component.
+`ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `ToggleGroupControlOption` component.
 
 ## Usage
 
 ```js
 import {
-	__experimentalSegmentedControl as SegmentedControl,
-	__experimentalSegmentedControlOption as SegmentedControlOption,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 
 function Example() {
 	return (
-		<SegmentedControl label="my label" value="vertical" isBlock>
-			<SegmentedControlOption value="horizontal" label="Horizontal" />
-			<SegmentedControlOption value="vertical" label="Vertical" />
-		</SegmentedControl>
+		<ToggleGroupControl label="my label" value="vertical" isBlock>
+			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
+			<ToggleGroupControlOption value="vertical" label="Vertical" />
+		</ToggleGroupControl>
 	);
 }
 ```
@@ -54,7 +54,7 @@ Determines if segments should be rendered with equal widths.
 -   Required: No
 -   Default: `false`
 
-Renders `SegmentedControl` as a (CSS) block element.
+Renders `ToggleGroupControl` as a (CSS) block element.
 
 ### `onChange`
 
@@ -68,7 +68,7 @@ Callback when a segment is selected.
 
 -   Type: `string | number`
 
-The value of the `SegmentedControl`.
+The value of the `ToggleGroupControl`.
 
 ### `help`
 

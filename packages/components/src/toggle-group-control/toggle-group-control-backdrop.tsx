@@ -6,14 +6,14 @@ import { useState, useEffect, memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { SegmentedControlBackdropProps } from './types';
+import type { ToggleGroupControlBackdropProps } from './types';
 import { BackdropView } from './styles';
 
-function SegmentedControlBackdrop( {
+function ToggleGroupControlBackdrop( {
 	containerRef,
 	containerWidth,
 	state,
-}: SegmentedControlBackdropProps ) {
+}: ToggleGroupControlBackdropProps ) {
 	const [ left, setLeft ] = useState( 0 );
 	const [ width, setWidth ] = useState( 0 );
 	const [ canAnimate, setCanAnimate ] = useState( false );
@@ -57,4 +57,4 @@ function SegmentedControlBackdrop( {
 	);
 }
 
-export default memo( SegmentedControlBackdrop );
+export default memo( ToggleGroupControlBackdrop );

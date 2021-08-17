@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SegmentedControl should render correctly 1`] = `
+exports[`ToggleGroupControl should render correctly 1`] = `
 .emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
@@ -180,15 +180,15 @@ exports[`SegmentedControl should render correctly 1`] = `
       <span
         class="components-base-control__label"
       >
-        Test Segmented Control
+        Test Toggle Group Control
       </span>
     </div>
     <div
-      aria-label="Test Segmented Control"
-      class="medium components-segmented-control emotion-4 emotion-5"
+      aria-label="Test Toggle Group Control"
+      class="medium components-toggle-group-control emotion-4 emotion-5"
       data-wp-c16t="true"
-      data-wp-component="SegmentedControl"
-      id="segmented-control-0"
+      data-wp-component="ToggleGroupControl"
+      id="toggle-group-control-0"
       role="radiogroup"
     >
       <iframe
@@ -210,11 +210,11 @@ exports[`SegmentedControl should render correctly 1`] = `
         <button
           aria-checked="false"
           aria-label="R"
-          class="emotion-10 components-segmented-control-option"
+          class="emotion-10 components-toggle-group-control-option"
           data-value="rigas"
           data-wp-c16t="true"
-          data-wp-component="SegmentedControlOption"
-          id="segmented-control-0-0"
+          data-wp-component="ToggleGroupControlOption"
+          id="toggle-group-control-0-0"
           role="radio"
           tabindex="0"
         >
@@ -242,11 +242,11 @@ exports[`SegmentedControl should render correctly 1`] = `
         <button
           aria-checked="false"
           aria-label="J"
-          class="emotion-10 components-segmented-control-option"
+          class="emotion-10 components-toggle-group-control-option"
           data-value="jack"
           data-wp-c16t="true"
-          data-wp-component="SegmentedControlOption"
-          id="segmented-control-0-1"
+          data-wp-component="ToggleGroupControlOption"
+          id="toggle-group-control-0-1"
           role="radio"
           tabindex="-1"
         >

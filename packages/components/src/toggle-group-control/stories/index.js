@@ -7,57 +7,60 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { __experimentalSpacer as Spacer } from '../../';
-import { SegmentedControl, SegmentedControlOption } from '../index';
+import { ToggleGroupControl, ToggleGroupControlOption } from '../index';
 import { View } from '../../view';
 
 export default {
-	component: SegmentedControl,
-	title: 'Components/SegmentedControl',
+	component: ToggleGroupControl,
+	title: 'Components/ToggleGroupControl',
 };
 
 const aligns = [ 'Left', 'Center', 'Right', 'Justify' ];
 const alignOptions = aligns.map( ( key ) => (
-	<SegmentedControlOption key={ key } value={ key } label={ key } />
+	<ToggleGroupControlOption key={ key } value={ key } label={ key } />
 ) );
 
 export const _default = () => {
 	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
-	const label = 'Segmented Control';
+	const label = 'Toggle Group Control';
 
 	return (
 		<View>
 			<Spacer>
-				<SegmentedControl
+				<ToggleGroupControl
 					isBlock
 					onChange={ setAlignState }
 					value={ alignState }
 					label={ label }
 				>
 					{ alignOptions }
-				</SegmentedControl>
+				</ToggleGroupControl>
 			</Spacer>
 			<Spacer>
-				<SegmentedControl label={ label } value="horizontal">
-					<SegmentedControlOption
+				<ToggleGroupControl label={ label } value="horizontal">
+					<ToggleGroupControlOption
 						value="horizontal"
 						label="Horizontal"
 					/>
-					<SegmentedControlOption value="vertical" label="Vertical" />
-				</SegmentedControl>
+					<ToggleGroupControlOption
+						value="vertical"
+						label="Vertical"
+					/>
+				</ToggleGroupControl>
 			</Spacer>
 			<Spacer>
-				<SegmentedControl
+				<ToggleGroupControl
 					isAdaptiveWidth
 					label={ label }
 					value="long"
 					hideLabelFromVision={ true }
 				>
-					<SegmentedControlOption value="short" label="Short" />
-					<SegmentedControlOption
+					<ToggleGroupControlOption value="short" label="Short" />
+					<ToggleGroupControlOption
 						value="long"
 						label="Looooooooooooong"
 					/>
-				</SegmentedControl>
+				</ToggleGroupControl>
 			</Spacer>
 		</View>
 	);
