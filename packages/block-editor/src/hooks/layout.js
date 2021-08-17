@@ -177,21 +177,18 @@ export const withLayoutStyles = createHigherOrderComponent(
 			},
 			[ clientId ]
 		);
-		if ( ! supportLayout && ! hasInnerBlocks ) {
-			return <BlockListBlock { ...props } />;
-		}
+		const element = useContext( Head.context );
+		const shouldRenderLayoutStyles = supportLayout || hasInnerBlocks;
 		const { layout = {} } = attributes;
 		const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
-		const className = classnames(
-			props?.className,
-			`wp-container-${ id }`
-		);
-
-		const element = useContext( Head.context );
+		const className = classnames( props?.className, {
+			[ `wp-container-${ id }` ]: shouldRenderLayoutStyles,
+		} );
 
 		return (
 			<>
-				{ element &&
+				{ shouldRenderLayoutStyles &&
+					element &&
 					createPortal(
 						<LayoutStyle
 							selector={ `.wp-container-${ id }` }
