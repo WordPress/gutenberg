@@ -190,23 +190,21 @@ export function computePopoverYAxisPosition(
 		const stickyRect = stickyBoundaryElement.getBoundingClientRect();
 		const stickyPosition = stickyRect.top + height - relativeOffsetTop;
 
-		if ( anchorRect.top <= stickyPosition || startsSticky.current ) {
+		if ( anchorRect.top <= stickyPosition ) {
 			if ( startsSticky.current === null || startsSticky.current ) {
 				// Enable startsSticky behavior.  If the popover starts where it would be placed in
 				// the sticky position, we want to place it below the anchor if there is room.  This
 				// prevents the block popover from hindering interactions with the block.  This
-				// stays below the anchor until there is either room above the anchor or no longer
-				// any room below to host the popover.
+				// stays below the anchor until sticky behavior breaks (there is room above the
+				// anchor) or no longer any room below to host the popover.
 				startsSticky.current = true;
 
-				// Return the bottom position unless there is no room below or there is now adequate
-				// room above the anchor for default behavior.
-				const isRoomAbove = anchorRect.top >= stickyPosition;
-				const isNoRoomBelow =
-					anchorRect.bottom >=
+				// Return the bottom position if there is room.
+				const isRoomBelow =
+					anchorRect.bottom <=
 					stickyRect.bottom - height - relativeOffsetTop;
 
-				if ( ! ( isRoomAbove || isNoRoomBelow ) ) {
+				if ( isRoomBelow ) {
 					return {
 						yAxis: 'bottom',
 						popoverTop: anchorRect.bottom,
@@ -225,10 +223,9 @@ export function computePopoverYAxisPosition(
 		}
 	}
 
-	// If startsSticky.current is still null, the popover did not start in the sticky position.
-	if ( startsSticky.current === null ) {
-		startsSticky.current = false;
-	}
+	// If we get to this line the popover is not in sticky position, so we break any behavior
+	// associated with startsSticky.
+	startsSticky.current = false;
 
 	// y axis alignment choices
 	let anchorMidPoint = anchorRect.top + anchorRect.height / 2;

@@ -275,6 +275,8 @@ const Popover = (
 	const [ containerResizeListener, contentSize ] = useResizeObserver();
 	noArrow = isExpanded || noArrow;
 
+	// When the anchorRef changes we need to reset the startsSticky ref so we may start the
+	// evaluation over for the new anchor.
 	useEffect( () => {
 		startsSticky.current = null;
 	}, [ anchorRef ] );
