@@ -92,6 +92,8 @@ export default function PostTitle() {
 		editPost( { title: newTitle } );
 	}
 
+	const [ selection, setSelection ] = useState( {} );
+
 	function onSelect() {
 		setIsSelected( true );
 		clearSelectedBlock();
@@ -99,6 +101,7 @@ export default function PostTitle() {
 
 	function onUnselect() {
 		setIsSelected( false );
+		setSelection( {} );
 	}
 
 	function onChange( value ) {
@@ -172,12 +175,12 @@ export default function PostTitle() {
 			'has-fixed-toolbar': hasFixedToolbar,
 		}
 	);
-	const decodedPlaceholder = decodeEntities( placeholder );
-	const [ selection, setSelection ] = useState( {} );
+	const decodedPlaceholder =
+		decodeEntities( placeholder ) || __( 'Add title' );
 	const { ref: richTextRef } = useRichText( {
 		value: title,
 		onChange,
-		placeholder: decodedPlaceholder || __( 'Add title' ),
+		placeholder: decodedPlaceholder,
 		selectionStart: selection.start,
 		selectionEnd: selection.end,
 		onSelectionChange( newStart, newEnd ) {
@@ -204,6 +207,7 @@ export default function PostTitle() {
 					ref={ useMergeRefs( [ richTextRef, ref ] ) }
 					contentEditable
 					className="editor-post-title__input rich-text"
+					aria-label={ decodedPlaceholder }
 					onFocus={ onSelect }
 					onBlur={ onUnselect }
 					onKeyDown={ onKeyDown }

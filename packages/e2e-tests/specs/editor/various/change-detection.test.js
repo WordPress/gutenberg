@@ -331,7 +331,7 @@ describe( 'Change detection', () => {
 		// Verify that the title is empty.
 		const title = await page.$eval(
 			'.editor-post-title__input',
-			( element ) => element.innerHTML
+			( element ) => element.textContent
 		);
 		expect( title ).toBe( '' );
 
