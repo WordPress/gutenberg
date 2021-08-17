@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import TextareaAutosize from 'react-autosize-textarea';
 import classnames from 'classnames';
 
 /**
@@ -12,10 +11,10 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { VisuallyHidden } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { pasteHandler } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __unstableUseRichText as useRichText } from '@wordpress/rich-text';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,7 +28,6 @@ import { store as editorStore } from '../../store';
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
 export default function PostTitle() {
-	const instanceId = useInstanceId( PostTitle );
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );
 	const { editPost } = useDispatch( editorStore );
@@ -103,8 +101,8 @@ export default function PostTitle() {
 		setIsSelected( false );
 	}
 
-	function onChange( event ) {
-		onUpdate( event.target.value.replace( REGEXP_NEWLINES, ' ' ) );
+	function onChange( value ) {
+		onUpdate( value.replace( REGEXP_NEWLINES, ' ' ) );
 	}
 
 	function onKeyDown( event ) {
@@ -175,23 +173,37 @@ export default function PostTitle() {
 		}
 	);
 	const decodedPlaceholder = decodeEntities( placeholder );
+	const [ selection, setSelection ] = useState( {} );
+	const { ref: richTextRef } = useRichText( {
+		value: title,
+		onChange,
+		placeholder: decodedPlaceholder || __( 'Add title' ),
+		selectionStart: selection.start,
+		selectionEnd: selection.end,
+		onSelectionChange( newStart, newEnd ) {
+			setSelection( ( sel ) => {
+				const { start, end } = sel;
+				if ( start === newStart && end === newEnd ) {
+					return sel;
+				}
+				return {
+					start: newStart,
+					end: newEnd,
+				};
+			} );
+		},
+		__unstableDisableFormats: true,
+		preserveWhiteSpace: true,
+	} );
 
+	/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-interactions */
 	return (
 		<PostTypeSupportCheck supportKeys="title">
 			<div className={ className }>
-				<VisuallyHidden
-					as="label"
-					htmlFor={ `post-title-${ instanceId }` }
-				>
-					{ decodedPlaceholder || __( 'Add title' ) }
-				</VisuallyHidden>
-				<TextareaAutosize
-					ref={ ref }
-					id={ `post-title-${ instanceId }` }
-					className="editor-post-title__input"
-					value={ title }
-					onChange={ onChange }
-					placeholder={ decodedPlaceholder || __( 'Add title' ) }
+				<h1
+					ref={ useMergeRefs( [ richTextRef, ref ] ) }
+					contentEditable
+					className="editor-post-title__input rich-text"
 					onFocus={ onSelect }
 					onBlur={ onUnselect }
 					onKeyDown={ onKeyDown }
@@ -201,4 +213,5 @@ export default function PostTitle() {
 			</div>
 		</PostTypeSupportCheck>
 	);
+	/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-interactions */
 }
