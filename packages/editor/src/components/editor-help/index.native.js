@@ -108,7 +108,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 											marginTop: 0,
 										} }
 									>
-										<PanelBody title={ __( 'The basics' ) }>
+										<PanelBody>
 											{ /* Print out help topics */ }
 											{ HELP_TOPICS.map(
 												( { label, icon } ) => {
