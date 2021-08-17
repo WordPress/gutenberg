@@ -89,9 +89,10 @@ function GalleryEdit( props ) {
 	} = attributes;
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
+	const {
+		__unstableMarkNextChangeAsNotPersistent,
+		setIsInPlaceholderState,
+	} = useDispatch( blockEditorStore );
 
 	const {
 		imageSizes,
@@ -408,6 +409,10 @@ function GalleryEdit( props ) {
 	);
 
 	const blockProps = useBlockProps();
+
+	useEffect( () => {
+		setIsInPlaceholderState( clientId, ! hasImages );
+	}, [ hasImages ] );
 
 	if ( ! hasImages ) {
 		return <View { ...blockProps }>{ mediaPlaceholder }</View>;

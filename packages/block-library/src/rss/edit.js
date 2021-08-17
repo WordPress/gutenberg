@@ -5,6 +5,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -16,7 +17,8 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 import { grid, list, edit, rss } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import ServerSideRender from '@wordpress/server-side-render';
@@ -24,7 +26,7 @@ import ServerSideRender from '@wordpress/server-side-render';
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 10;
 
-export default function RSSEdit( { attributes, setAttributes } ) {
+export default function RSSEdit( { attributes, setAttributes, clientId } ) {
 	const [ isEditing, setIsEditing ] = useState( ! attributes.feedURL );
 
 	const {
@@ -56,6 +58,10 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 
 	const blockProps = useBlockProps();
 
+	const { setIsInPlaceholderState } = useDispatch( blockEditorStore );
+	useEffect( () => {
+		setIsInPlaceholderState( clientId, isEditing );
+	}, [ isEditing ] );
 	if ( isEditing ) {
 		return (
 			<div { ...blockProps }>

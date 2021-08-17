@@ -109,7 +109,9 @@ function Navigation( {
 		false
 	);
 
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, setIsInPlaceholderState } = useDispatch(
+		blockEditorStore
+	);
 
 	const navRef = useRef();
 
@@ -196,7 +198,9 @@ function Navigation( {
 			);
 		}
 	} );
-
+	useEffect( () => {
+		setIsInPlaceholderState( clientId, isPlaceholderShown );
+	}, [ isPlaceholderShown ] );
 	if ( isPlaceholderShown ) {
 		return (
 			<div { ...blockProps }>

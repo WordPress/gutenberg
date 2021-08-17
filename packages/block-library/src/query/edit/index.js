@@ -159,6 +159,10 @@ const QueryEdit = ( props ) => {
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
+	const { setIsInPlaceholderState } = useDispatch( blockEditorStore );
+	useEffect( () => {
+		setIsInPlaceholderState( clientId, ! hasInnerBlocks );
+	}, [ hasInnerBlocks ] );
 	const Component = hasInnerBlocks ? QueryContent : QueryPatternSetup;
 	return <Component { ...props } />;
 };

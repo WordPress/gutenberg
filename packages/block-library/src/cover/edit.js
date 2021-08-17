@@ -45,7 +45,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { withDispatch, useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
 
@@ -307,7 +307,6 @@ function CoverEdit( {
 	overlayColor,
 	setAttributes,
 	setOverlayColor,
-	toggleSelection,
 } ) {
 	const {
 		contentPosition,
@@ -323,6 +322,9 @@ function CoverEdit( {
 		url,
 		alt,
 	} = attributes;
+	const { setIsInPlaceholderState, toggleSelection } = useDispatch(
+		blockEditorStore
+	);
 	const {
 		gradientClass,
 		gradientValue,
@@ -595,7 +597,11 @@ function CoverEdit( {
 		}
 	);
 
-	if ( ! hasInnerBlocks && ! hasBackground ) {
+	const inPlaceholderState = ! hasInnerBlocks && ! hasBackground;
+	useEffect( () => {
+		setIsInPlaceholderState( clientId, inPlaceholderState );
+	}, [ inPlaceholderState ] );
+	if ( inPlaceholderState ) {
 		return (
 			<>
 				{ controls }
@@ -714,13 +720,6 @@ function CoverEdit( {
 }
 
 export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( blockEditorStore );
-
-		return {
-			toggleSelection,
-		};
-	} ),
 	withColors( { overlayColor: 'background-color' } ),
 	withNotices,
 	withInstanceId,

@@ -14,7 +14,7 @@ import {
 	RangeControl,
 	ToggleControl,
 } from '@wordpress/components';
-
+import { useEffect } from '@wordpress/element';
 import {
 	InspectorControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -273,6 +273,10 @@ const ColumnsEdit = ( props ) => {
 			select( blockEditorStore ).getBlocks( clientId ).length > 0,
 		[ clientId ]
 	);
+	const { setIsInPlaceholderState } = useDispatch( blockEditorStore );
+	useEffect( () => {
+		setIsInPlaceholderState( clientId, ! hasInnerBlocks );
+	}, [ hasInnerBlocks ] );
 	const Component = hasInnerBlocks
 		? ColumnsEditContainerWrapper
 		: Placeholder;

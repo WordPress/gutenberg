@@ -16,6 +16,7 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -40,6 +41,7 @@ import {
 	table,
 } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -95,6 +97,7 @@ function TableEdit( {
 	setAttributes,
 	insertBlocksAfter,
 	isSelected,
+	clientId,
 } ) {
 	const { hasFixedLayout, caption, head, foot } = attributes;
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
@@ -423,6 +426,10 @@ function TableEdit( {
 	) );
 
 	const isEmpty = ! sections.length;
+	const { setIsInPlaceholderState } = useDispatch( blockEditorStore );
+	useEffect( () => {
+		setIsInPlaceholderState( clientId, isEmpty );
+	}, [ isEmpty ] );
 
 	return (
 		<figure { ...useBlockProps() }>
