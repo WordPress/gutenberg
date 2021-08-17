@@ -72,7 +72,7 @@ export function BorderPanel( props ) {
 			border: undefined,
 		} );
 
-		props.setAttributes( { style: newStyle } );
+		props.setAttributes( { style: newStyle, borderColor: undefined } );
 	};
 
 	return (
