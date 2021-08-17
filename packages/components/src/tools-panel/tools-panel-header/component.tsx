@@ -7,7 +7,7 @@ import type { Ref } from 'react';
 /**
  * WordPress dependencies
  */
-import { check, reset, moreVertical } from '@wordpress/icons';
+import { check, reset, moreVertical, plus } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -118,6 +118,7 @@ const ToolsPanelHeader = (
 	const {
 		dropdownMenuClassName,
 		hasMenuItems,
+		hasSelectedMenuItems,
 		label: labelText,
 		menuItems,
 		resetAll,
@@ -137,7 +138,7 @@ const ToolsPanelHeader = (
 			{ labelText }
 			{ hasMenuItems && (
 				<DropdownMenu
-					icon={ moreVertical }
+					icon={ hasSelectedMenuItems ? moreVertical : plus }
 					label={ labelText }
 					menuProps={ { className: dropdownMenuClassName } }
 				>
