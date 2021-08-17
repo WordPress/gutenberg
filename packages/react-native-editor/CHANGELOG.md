@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.59.2
+-   [*] Inserter: Prevent non-deterministic order of inserter items [#34078]
+
 ## 1.59.1
 -   [*] Global styles - Add color to the block styles filter list [#34000]
 -   [*] Rich text - toTree - Add check in replacements before accessing its type [#34020]
