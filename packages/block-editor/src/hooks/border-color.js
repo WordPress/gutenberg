@@ -130,7 +130,7 @@ export function resetBorderColor( { attributes = {}, setAttributes } ) {
 
 	setAttributes( {
 		borderColor: undefined,
-		style: removeBorderAttribute( style, 'radius' ),
+		style: removeBorderAttribute( style, 'color' ),
 	} );
 }
 
