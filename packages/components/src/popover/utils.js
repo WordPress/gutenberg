@@ -190,31 +190,30 @@ export function computePopoverYAxisPosition(
 		const stickyRect = stickyBoundaryElement.getBoundingClientRect();
 		const stickyPosition = stickyRect.top + height - relativeOffsetTop;
 
-		const bottomStickyPosition =
-			stickyRect.bottom - height - relativeOffsetTop;
-
 		if ( anchorRect.top <= stickyPosition || startsSticky.current ) {
 			if ( startsSticky.current === null || startsSticky.current ) {
-				// Enable startsSticky behavior.  If the popover starts where it would be placed in the
-				// sticky position, we want to place it below the anchor if there is room.  This
-				// prevents the block popover from hindering interactions with the block.  Furthermore,
-				// we want to keep this positioned below the block for as long as possible while
-				// scrolling to prevent jumpiness of the popover in the editor.
+				// Enable startsSticky behavior.  If the popover starts where it would be placed in
+				// the sticky position, we want to place it below the anchor if there is room.  This
+				// prevents the block popover from hindering interactions with the block.  This
+				// stays below the anchor until there is either room above the anchor or no longer
+				// any room below to host the popover.
 				startsSticky.current = true;
 
-				// Keep returning the bottom position / bottom sticky positions until the top of the
-				// anchor is below the bottom sticky position.
-				if ( anchorRect.top <= bottomStickyPosition + height ) {
+				// Return the bottom position unless there is no room below or there is now adequate
+				// room above the anchor for default behavior.
+				const isRoomAbove = anchorRect.top >= stickyPosition;
+				const isNoRoomBelow =
+					anchorRect.bottom >=
+					stickyRect.bottom - height - relativeOffsetTop;
+
+				if ( ! ( isRoomAbove || isNoRoomBelow ) ) {
 					return {
 						yAxis: 'bottom',
-						popoverTop: Math.min(
-							bottomStickyPosition,
-							anchorRect.bottom
-						),
+						popoverTop: anchorRect.bottom,
 					};
 				}
-				// At this point the bottom sticky position is higher than the anchor's top
-				// position and we can reset to default behavior.
+
+				// At this point there is no longer any need to retain the startsSticky behavior.
 				startsSticky.current = false;
 			} else {
 				// Default sticky behavior.
