@@ -985,11 +985,21 @@ As the application grows, this can become costful, so it's important to ensure t
 _Usage_
 
 ```js
-// This will only rerender the components once.
-registry.batch( () => {
-	registry.dispatch( someStore ).someAction();
-	registry.dispatch( someStore ).someOtherAction();
-} );
+import { useRegistry } from '@wordpress/data';
+
+function Component() {
+	const registry = useRegistry();
+
+	function callback() {
+		// This will only rerender the components once.
+		registry.batch( () => {
+			registry.dispatch( someStore ).someAction();
+			registry.dispatch( someStore ).someOtherAction();
+		} );
+	}
+
+	return <button onClick={ callback }>Click me</button>;
+}
 ```
 
 ## Going further
