@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/escape-html",
-	"version": "2.2.1",
+	"version": "2.2.2-next.5df0cd52b7.0",
 	"description": "Escape HTML utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
