@@ -12,7 +12,6 @@ import {
 	useState,
 	useLayoutEffect,
 	forwardRef,
-	useEffect,
 } from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import deprecated from '@wordpress/deprecated';
@@ -267,19 +266,12 @@ const Popover = (
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
-	const startsSticky = useRef( null );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
 	const slot = useSlot( __unstableSlotName );
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const [ containerResizeListener, contentSize ] = useResizeObserver();
 	noArrow = isExpanded || noArrow;
-
-	// When the anchorRef changes we need to reset the startsSticky ref so we may start the
-	// evaluation over for the new anchor.
-	useEffect( () => {
-		startsSticky.current = null;
-	}, [ anchorRef ] );
 
 	useLayoutEffect( () => {
 		if ( isExpanded ) {
@@ -360,8 +352,7 @@ const Popover = (
 				relativeOffsetTop,
 				boundaryElement,
 				__unstableForcePosition,
-				__unstableForceXAlignment,
-				startsSticky
+				__unstableForceXAlignment
 			);
 
 			if (
