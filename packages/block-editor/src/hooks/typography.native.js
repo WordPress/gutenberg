@@ -34,7 +34,9 @@ export function TypographyPanel( props ) {
 	const isDisabled = useIsTypographyDisabled( props );
 	const isSupported = hasTypographySupport( props.name );
 
-	if ( isDisabled || ! isSupported ) return null;
+	// only enable TypographyPanel for development
+	// eslint-disable-next-line no-undef
+	if ( isDisabled || ! isSupported || ! __DEV__ ) return null;
 
 	return (
 		<InspectorControls>
