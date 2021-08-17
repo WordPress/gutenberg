@@ -17,6 +17,7 @@ function InserterSearchResults( {
 	onSelect,
 	listProps,
 	rootClientId,
+	isFullScreen,
 } ) {
 	const { blockTypes } = useSelect(
 		( select ) => {
@@ -46,6 +47,7 @@ function InserterSearchResults( {
 	return (
 		<BlockTypesList
 			name="Blocks"
+			initialNumToRender={ isFullScreen ? 10 : 3 }
 			{ ...{ items, onSelect: handleSelect, listProps } }
 		/>
 	);

@@ -215,6 +215,7 @@ function InserterMenu( {
 								filterValue={ filterValue }
 								onSelect={ onSelectItem }
 								listProps={ listProps }
+								isFullScreen={ ! isIOS && showSearchForm }
 							/>
 						) : (
 							<InserterTabs
