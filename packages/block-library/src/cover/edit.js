@@ -138,7 +138,7 @@ function CoverHeightInput( {
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
-		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
+		<BaseControl id={ inputId }>
 			<UnitControl
 				id={ inputId }
 				isResetValueOnUnitChange
@@ -536,7 +536,7 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				<PanelBody title={ __( 'Dimensions' ) }>
+				<PanelBody title={ __( 'Minimum height' ) }>
 					<CoverHeightInput
 						value={ temporaryMinHeight || minHeight }
 						unit={ minHeightUnit }

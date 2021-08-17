@@ -294,7 +294,7 @@ function Controls( {
 				</PanelBody>
 			) : null }
 
-			<PanelBody title={ __( 'Dimensions' ) }>
+			<PanelBody>
 				<UnitControl
 					label={ __( 'Minimum height' ) }
 					min={ minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1 }
