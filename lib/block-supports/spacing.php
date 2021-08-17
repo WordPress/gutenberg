@@ -116,32 +116,30 @@ function gutenberg_render_spacing_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$id    = uniqid();
 	$style = sprintf(
-		'.wp-container-%s { --wp--style--block-gap: %s; }',
-		$id,
+		'--wp--style--block-gap: %s;',
 		esc_attr( $block['attrs']['style']['spacing']['blockGap'] )
 	);
 
-	// This assumes the hook only applies to blocks with a single wrapper.
-	$content = preg_replace(
-		'/' . preg_quote( 'class="', '/' ) . '/',
-		'class="wp-container-' . $id . ' ',
+	// Attempt to update an existing style attribute on the wrapper element.
+	$injected_style = preg_replace(
+		'/^(.+?)(' . preg_quote( 'style="', '/' ) . ')(?=.+?>)/',
+		'$1$2' . $style . ' ',
 		$block_content,
 		1
 	);
 
-	// Ideally styles should be loaded in the head, but blocks may be parsed
-	// after that, so loading in the footer for now.
-	// See https://core.trac.wordpress.org/ticket/53494.
-	add_action(
-		'wp_footer',
-		function () use ( $style ) {
-			echo '<style>' . $style . '</style>';
-		}
-	);
+	// If there is no existing style attribute, add one to the wrapper element.
+	if ( $injected_style === $block_content ) {
+		$injected_style = preg_replace(
+			'/<([a-zA-Z]+)/',
+			'<$1 style="' . $style . '"',
+			$block_content,
+			1
+		);
+	};
 
-	return $content;
+	return $injected_style;
 }
 
 // Register the block support.
