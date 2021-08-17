@@ -41,6 +41,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockInspectorButton from './block-inspector-button';
+import ClassicMetaBoxButton from '../meta-boxes';
 import { store as editPostStore } from '../../store';
 
 function MaybeIframe( {
@@ -234,6 +235,7 @@ export default function VisualEditor( { styles } ) {
 						) }
 						<RecursionProvider>
 							<BlockList __experimentalLayout={ layout } />
+							{ ! isTemplateMode && <ClassicMetaBoxButton /> }
 						</RecursionProvider>
 					</MaybeIframe>
 				</motion.div>

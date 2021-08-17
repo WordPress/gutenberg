@@ -17,6 +17,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as editPostStore } from '../../store';
+import ClassicMetaBoxButton from '../meta-boxes';
 
 function TextEditor( { onExit, isRichEditingEnabled } ) {
 	return (
@@ -37,6 +38,7 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 			<div className="edit-post-text-editor__body">
 				<PostTitle />
 				<PostTextEditor />
+				<ClassicMetaBoxButton />
 			</div>
 		</div>
 	);
