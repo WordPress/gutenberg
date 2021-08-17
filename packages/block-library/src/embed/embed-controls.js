@@ -11,12 +11,21 @@ import {
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { edit } from '@wordpress/icons';
 
+function getResponsiveHelp( checked ) {
+	return checked
+		? __(
+				'This embed will preserve its aspect ratio when the browser is resized.'
+		  )
+		: __(
+				'This embed may not preserve its aspect ratio when the browser is resized.'
+		  );
+}
+
 const EmbedControls = ( {
 	blockSupportsResponsive,
 	showEditButton,
 	themeSupportsResponsive,
 	allowResponsive,
-	getResponsiveHelp,
 	toggleResponsive,
 	switchBackToURLInput,
 } ) => (

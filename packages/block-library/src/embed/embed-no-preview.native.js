@@ -16,6 +16,7 @@ import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { BottomSheet, Icon, TextControl } from '@wordpress/components';
 import { help } from '@wordpress/icons';
+import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -37,10 +38,6 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 	const labelStyle = usePreferredColorSchemeStyle(
 		styles.embed__label,
 		styles[ 'embed__label--dark' ]
-	);
-	const embedIconStyle = usePreferredColorSchemeStyle(
-		styles.embed__icon,
-		styles[ 'embed__icon--dark' ]
 	);
 	const descriptionStyle = usePreferredColorSchemeStyle(
 		styles.embed__description,
@@ -118,7 +115,7 @@ const EmbedNoPreview = ( { label, icon, isSelected, onPress } ) => {
 				onPress={ onPressContainer }
 			>
 				<View style={ containerStyle }>
-					<Icon icon={ icon } fill={ embedIconStyle.fill } />
+					<BlockIcon icon={ icon } />
 					<Text style={ labelStyle }>{ label }</Text>
 					<Text style={ descriptionStyle }>
 						{ __( 'Embed previews not yet available' ) }

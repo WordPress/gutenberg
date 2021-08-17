@@ -3725,6 +3725,13 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			title: 'Another Plugin Block B',
 			icon: 'test',
 		} );
+		registerBlockType( 'plugin/block-c-with-variations', {
+			save() {},
+			category: 'text',
+			title: 'Plugin Block C with variations',
+			icon: 'test',
+			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
+		} );
 		registerBlockType( 'core/block', {
 			save() {},
 			category: 'text',
@@ -3737,13 +3744,23 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			icon: 'test',
 			keywords: [ 'testing' ],
 		} );
+		registerBlockType( 'core/test-block-with-variations', {
+			save() {},
+			category: 'text',
+			title: 'Core Block C with variations',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
+		} );
 	} );
 	afterEach( () => {
 		[
 			'plugin/block-a',
 			'another-plugin/block-b',
+			'plugin/block-c-with-variations',
 			'core/block',
 			'core/test-block-a',
+			'core/test-block-with-variations',
 		].forEach( unregisterBlockType );
 	} );
 	it( 'should prioritize core blocks by sorting them at the top of the returned list', () => {
@@ -3763,10 +3780,16 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 		const expectedResult = [
 			'core/block',
 			'core/test-block-a',
+			'core/test-block-with-variations',
+			'core/test-block-with-variations/variation-a',
+			'core/test-block-with-variations/variation-b',
 			'plugin/block-a',
 			'another-plugin/block-b',
+			'plugin/block-c-with-variations',
+			'plugin/block-c-with-variations/variation-a',
+			'plugin/block-c-with-variations/variation-b',
 		];
-		expect( items.map( ( { name } ) => name ) ).toEqual( expectedResult );
+		expect( items.map( ( { id } ) => id ) ).toEqual( expectedResult );
 	} );
 } );
 

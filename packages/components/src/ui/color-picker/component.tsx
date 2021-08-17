@@ -32,7 +32,7 @@ import { useControlledValue } from '../../utils/hooks';
 
 import type { ColorType } from './types';
 
-interface ColorPickerProps {
+export interface ColorPickerProps {
 	enableAlpha?: boolean;
 	color?: ColorFormats.HSL | ColorFormats.HSLA;
 	onChange?: ( color: ColorFormats.HSL | ColorFormats.HSLA ) => void;
@@ -62,6 +62,7 @@ const ColorPicker = (
 		onChange,
 		defaultValue,
 		copyFormat,
+		...divProps
 	} = useContextSystem( props, 'ColorPicker' );
 
 	const [ color, setColor ] = useControlledValue( {
@@ -88,7 +89,7 @@ const ColorPicker = (
 	);
 
 	return (
-		<ColorfulWrapper ref={ forwardedRef }>
+		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
 			<Picker
 				onChange={ handleChange }
 				color={ safeColor }
