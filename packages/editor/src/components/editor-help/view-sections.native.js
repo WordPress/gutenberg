@@ -18,7 +18,11 @@ export const HelpDetailBodyText = ( { text } ) => {
 		styles.helpDetailBody,
 		styles.helpDetailBodyDark
 	);
-	return <Text style={ bodyStyle }>{ text }</Text>;
+	return (
+		<Text selectable style={ bodyStyle }>
+			{ text }
+		</Text>
+	);
 };
 
 export const HelpDetailSectionHeadingText = ( { text } ) => {
@@ -27,7 +31,7 @@ export const HelpDetailSectionHeadingText = ( { text } ) => {
 		styles.helpDetailSectionHeadingDark
 	);
 	return (
-		<Text accessibilityRole="header" style={ headingStyle }>
+		<Text accessibilityRole="header" selectable style={ headingStyle }>
 			{ text }
 		</Text>
 	);

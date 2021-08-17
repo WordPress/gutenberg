@@ -30,7 +30,11 @@ const IntroToBlocks = () => {
 				source={ require( './images/intro-blocks-1.png' ) }
 			/>
 			<View style={ styles.helpDetailContainer }>
-				<Text accessibilityRole="header" style={ titleStyle }>
+				<Text
+					accessibilityRole="header"
+					selectable
+					style={ titleStyle }
+				>
 					{ __( 'Welcome to the world of blocks' ) }
 				</Text>
 				<HelpDetailBodyText
