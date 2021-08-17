@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { kebabCase } from 'lodash';
-import { ScrollView, StyleSheet, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,6 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
 	helpFilled,
 	plusCircleFilled,
@@ -54,16 +53,7 @@ const HELP_TOPICS = [
 	},
 ];
 
-function EditorHelpTopics( { isVisible, onClose } ) {
-	const bottomSheetHeaderTitleStyle = usePreferredColorSchemeStyle(
-		styles.bottomSheetHeaderTitle,
-		styles.bottomSheetHeaderTitleDark
-	);
-	const separatorStyle = usePreferredColorSchemeStyle(
-		styles.separator,
-		styles.separatorDark
-	);
-
+function EditorHelpTopics( { close, isVisible, onClose } ) {
 	return (
 		<BottomSheet
 			isVisible={ isVisible }
@@ -85,18 +75,12 @@ function EditorHelpTopics( { isVisible, onClose } ) {
 								name="help-topics"
 							>
 								<View style={ styles.container }>
-									<View style={ styles.bottomSheetHeader }>
-										<Text
-											accessibilityRole="header"
-											style={
-												bottomSheetHeaderTitleStyle
-											}
-											maxFontSizeMultiplier={ 3 }
-										>
-											{ __( 'How to edit your site' ) }
-										</Text>
-									</View>
-									<View style={ separatorStyle } />
+									<BottomSheet.NavigationHeader
+										isFullscreen
+										leftButtonOnPress={ close }
+										leftButtonText={ __( 'Close' ) }
+										screen={ __( 'How to edit your site' ) }
+									/>
 									<ScrollView
 										{ ...listProps }
 										contentContainerStyle={ {

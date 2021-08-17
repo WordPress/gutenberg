@@ -17,6 +17,7 @@ import styles from './styles.scss';
 import chevronBack from './chevron-back';
 
 function BottomSheetNavigationHeader( {
+	leftButtonText,
 	leftButtonOnPress,
 	screen,
 	applyButtonOnPress,
@@ -57,7 +58,13 @@ function BottomSheetNavigationHeader( {
 					style={ chevronLeftStyle }
 				/>
 			);
-			backText = isFullscreen ? __( 'Cancel' ) : __( 'Back' );
+			if ( leftButtonText ) {
+				backText = leftButtonText;
+			} else if ( isFullscreen ) {
+				backText = __( 'Cancel' );
+			} else {
+				backText = __( 'Back' );
+			}
 		} else {
 			backIcon = (
 				<Icon
