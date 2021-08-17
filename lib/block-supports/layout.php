@@ -83,9 +83,10 @@ function gutenberg_get_layout_style( $selector, $layout ) {
  * @return string                Filtered block content.
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
-	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$support_layout = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	if ( ! $support_layout ) {
+	$block_type        = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$support_layout    = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$has_innner_blocks = count( $block['innerBlocks'] ) > 0;
+	if ( ! $support_layout && ! $has_innner_blocks ) {
 		return $block_content;
 	}
 
